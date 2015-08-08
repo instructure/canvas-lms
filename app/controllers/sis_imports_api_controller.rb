@@ -224,7 +224,7 @@ class SisImportsApiController < ApplicationController
       if created_since = CanvasTime.try_parse(params[:created_since])
         scope = scope.where("created_at > ?", created_since)
       end
-      @batches = Api.paginate(scope, self, url_for({action: :index, controller: :sis_imports_api}))
+      @batches = Api.paginate(scope, self, api_v1_account_sis_imports_url)
       render :json => ({ sis_imports: @batches})
     end
   end

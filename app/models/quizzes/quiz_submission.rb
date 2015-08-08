@@ -79,8 +79,8 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     submission.update_attribute(:workflow_state, "graded")
   end
 
-  serialize :quiz_data
-  serialize :submission_data
+  serialize_utf8_safe :quiz_data
+  serialize_utf8_safe :submission_data
 
   simply_versioned :automatic => false
 

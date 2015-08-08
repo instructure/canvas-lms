@@ -239,7 +239,7 @@ class UserMerge
     ContextModuleProgression.
       where("context_module_progressions.user_id = ?", from_user.id).
       where("EXISTS (SELECT *
-                     FROM context_module_progressions cmp2
+                     FROM #{ContextModuleProgression.quoted_table_name} cmp2
                      WHERE context_module_progressions.context_module_id=cmp2.context_module_id
                        AND cmp2.user_id = ?)", target_user.id).find_each do |cmp|
 

@@ -2,7 +2,7 @@ module Exporters
   class SubmissionExporter
 
     def self.export_user_submissions(user, base_folder, zipfile, files_in_zip)
-      user.submissions.with_each_shard.each do |main_sub|
+      user.submissions.shard(user).each do |main_sub|
         base_path = File.join(*[base_folder, main_sub.context.name.presence, main_sub.assignment.name.presence].compact)
 
         main_sub.versions.each do |version|

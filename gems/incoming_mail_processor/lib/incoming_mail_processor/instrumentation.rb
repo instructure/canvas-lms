@@ -34,10 +34,10 @@ module IncomingMailProcessor
     private_class_method :mailbox_accounts
 
     def self.report_unreads(unreads)
-      result = Hash[mailbox_accounts.map{|a| a.config[:username]}.zip(unreads)]
+      result = Hash[mailbox_accounts.map(&:escaped_address).zip(unreads)]
       result.delete_if { |_k, v| v.nil? }
-      result.each_pair do |username, count|
-        name = "incoming_mail_processor." + CanvasStatsd::Statsd.escape(username)
+      result.each_pair do |identifier, count|
+        name = "incoming_mail_processor.mailbox_queue_size.#{identifier}"
         CanvasStatsd::Statsd.gauge name, count
       end
     end

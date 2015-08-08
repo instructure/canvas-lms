@@ -127,4 +127,8 @@ class Announcement < DiscussionTopic
   def published?
     true
   end
+
+  def assignment
+    nil
+  end
 end

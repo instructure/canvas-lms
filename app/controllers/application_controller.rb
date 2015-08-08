@@ -34,6 +34,7 @@ class ApplicationController < ActionController::Base
   include Api::V1::WikiPage
   include LegalInformationHelper
   around_filter :set_locale
+  around_filter :enable_request_cache
 
   helper :all
 
@@ -106,16 +107,20 @@ class ApplicationController < ActionController::Base
     return {} unless request.format.html?
     # set some defaults
     unless @js_env
+      editor_css = view_context.stylesheet_path(css_url_for('what_gets_loaded_inside_the_tinymce_editor'))
       @js_env = {
-        :current_user_id => @current_user.try(:id),
-        :current_user => user_display_json(@current_user, :profile),
-        :current_user_roles => @current_user.try(:roles, @domain_root_account),
-        :files_domain => HostUrl.file_host(@domain_root_account || Account.default, request.host_with_port),
-        :DOMAIN_ROOT_ACCOUNT_ID => @domain_root_account.try(:global_id),
-        :use_new_styles => use_new_styles?,
-        :k12 => k12?,
-        :use_high_contrast => @current_user.try(:prefers_high_contrast?),
-        :SETTINGS => {
+        ASSET_HOST: asset_host,
+        active_brand_config: active_brand_config.try(:md5),
+        url_to_what_gets_loaded_inside_the_tinymce_editor_css: editor_css,
+        current_user_id: @current_user.try(:id),
+        current_user: user_display_json(@current_user, :profile),
+        current_user_roles: @current_user.try(:roles, @domain_root_account),
+        files_domain: HostUrl.file_host(@domain_root_account || Account.default, request.host_with_port),
+        DOMAIN_ROOT_ACCOUNT_ID: @domain_root_account.try(:global_id),
+        use_new_styles: use_new_styles?,
+        k12: k12?,
+        use_high_contrast: @current_user.try(:prefers_high_contrast?),
+        SETTINGS: {
           open_registration: @domain_root_account.try(:open_registration?)
         }
       }
@@ -161,12 +166,12 @@ class ApplicationController < ActionController::Base
   end
 
   def k12?
-    @domain_root_account && @domain_root_account.feature_enabled?('k12')
+    @domain_root_account && @domain_root_account.feature_enabled?(:k12)
   end
   helper_method 'k12?'
 
   def use_new_styles?
-    @domain_root_account && @domain_root_account.feature_enabled?(:use_new_styles)
+    @domain_root_account && @domain_root_account.feature_enabled?(:use_new_styles) || k12?
   end
   helper_method 'use_new_styles?'
 
@@ -253,6 +258,12 @@ class ApplicationController < ActionController::Base
     yield if block_given?
   ensure
     I18n.localizer = nil
+  end
+
+  def enable_request_cache
+    RequestCache.enable do
+      yield
+    end
   end
 
   def store_session_locale
@@ -554,23 +565,27 @@ class ApplicationController < ActionController::Base
     raise(ArgumentError, "Need a starting context") if @context.nil?
 
     @contexts = [@context]
-    only_contexts = ActiveRecord::Base.parse_asset_string_list(params[:only_contexts])
+    only_contexts = ActiveRecord::Base.parse_asset_string_list(opts[:only_contexts] || params[:only_contexts])
     if @context && @context.is_a?(User)
       # we already know the user can read these courses and groups, so skip
       # the grants_right? check to avoid querying for the various memberships
       # again.
-      courses = @context.enrollments.current.shard(@context).select { |e| e.state_based_on_date == :active }.map(&:course).uniq
-      groups = opts[:include_groups] ? @context.current_groups.with_each_shard.reject{|g| g.context_type == "Course" &&
-          g.context.concluded?} : []
+      enrollment_scope = @context.enrollments.current.shard(@context).preload(:course)
+      group_scope = opts[:include_groups] ? @context.current_groups : nil
+
       if only_contexts.present?
         # find only those courses and groups passed in the only_contexts
         # parameter, but still scoped by user so we know they have rights to
         # view them.
         course_ids = only_contexts.select { |c| c.first == "Course" }.map(&:last)
-        courses = course_ids.empty? ? [] : courses.select { |c| course_ids.include?(c.id) }
-        group_ids = only_contexts.select { |c| c.first == "Group" }.map(&:last)
-        groups = group_ids.empty? ? [] : groups.select { |g| group_ids.include?(g.id) } if opts[:include_groups]
+        enrollment_scope = enrollment_scope.where(:course_id => course_ids)
+        if group_scope
+          group_ids = only_contexts.select { |c| c.first == "Group" }.map(&:last)
+          group_scope = group_scope.where(:id => group_ids)
+        end
       end
+      courses = enrollment_scope.select { |e| e.state_based_on_date == :active }.map(&:course).uniq
+      groups = group_scope ? group_scope.shard(@context).to_a.reject{|g| g.context_type == "Course" && g.context.concluded?} : []
 
       if opts[:favorites_first]
         favorite_course_ids = @context.favorite_context_ids("Course")
@@ -580,14 +595,17 @@ class ApplicationController < ActionController::Base
       @contexts.concat courses
       @contexts.concat groups
     end
-    if params[:include_contexts]
-      params[:include_contexts].split(",").each do |include_context|
+
+    include_contexts = opts[:include_contexts] || params[:include_contexts]
+    if include_contexts
+      include_contexts.split(",").each do |include_context|
         # don't load it again if we've already got it
         next if @contexts.any? { |c| c.asset_string == include_context }
         context = Context.find_by_asset_string(include_context)
         @contexts << context if context && context.grants_right?(@current_user, :read)
       end
     end
+
     @contexts = @contexts.uniq
     Course.require_assignment_groups(@contexts)
     @context_enrollment = @context.membership_for_user(@current_user) if @context.respond_to?(:membership_for_user)
@@ -653,7 +671,7 @@ class ApplicationController < ActionController::Base
     @courses.each { |course| log_course(course) }
 
     if @current_user
-      @submissions = @current_user.submissions.with_each_shard
+      @submissions = @current_user.submissions.shard(@current_user).to_a
       @submissions.each{ |s| s.mute if s.muted_assignment? }
     else
       @submissions = []
@@ -1294,7 +1312,7 @@ class ApplicationController < ActionController::Base
         variable_expander = Lti::VariableExpander.new(@domain_root_account, @context, self,{
                                                         current_user: @current_user,
                                                         current_pseudonym: @current_pseudonym,
-                                                        content_tag: tag,
+                                                        content_tag: @module_tag || tag,
                                                         assignment: @assignment,
                                                         tool: @tool})
         adapter = Lti::LtiOutboundAdapter.new(@tool, @current_user, @context).prepare_tool_launch(@return_url, variable_expander, opts)
@@ -1317,7 +1335,7 @@ class ApplicationController < ActionController::Base
         @lti_launch.analytics_id = @tool.tool_id
 
         @append_template = 'context_modules/tool_sequence_footer'
-        render Lti::AppUtil.display_template
+        render Lti::AppUtil.display_template(params['display'])
       end
     else
       flash[:error] = t "#application.errors.invalid_tag_type", "Didn't recognize the item type for this tag"
@@ -1644,16 +1662,49 @@ class ApplicationController < ActionController::Base
     super
   end
 
-  def jammit_css_bundles; @jammit_css_bundles ||= []; end
-  helper_method :jammit_css_bundles
+  def active_brand_config
+    return @active_brand_config if defined? @active_brand_config
+    @active_brand_config = begin
+      if !use_new_styles? || (@current_user && @current_user.prefers_high_contrast?)
+        nil
+      elsif session.key?(:brand_config_md5)
+        BrandConfig.where(md5: session[:brand_config_md5]).first
+      elsif @domain_root_account.brand_config
+        @domain_root_account.brand_config
+      elsif k12?
+        BrandConfig.where(name: 'K12 Theme', share: true).first
+      end
+    end
+  end
+  helper_method :active_brand_config
 
-  def jammit_css(*args)
+  def brand_config_includes
+    return @brand_config_includes if defined? @brand_config_includes
+    includes = {}
+    if @domain_root_account.allow_global_includes? && active_brand_config.present?
+      includes[:js] = active_brand_config[:js_overrides] if active_brand_config[:js_overrides].present?
+      includes[:css] = active_brand_config[:css_overrides] if active_brand_config[:css_overrides].present?
+    end
+    includes
+  end
+  helper_method :brand_config_includes
+
+  def css_bundles
+    @css_bundles ||= []
+  end
+  helper_method :css_bundles
+
+  def css_bundle(*args)
     opts = (args.last.is_a?(Hash) ? args.pop : {})
     Array(args).flatten.each do |bundle|
-      jammit_css_bundles << [bundle, opts[:plugin]] unless jammit_css_bundles.include? [bundle, opts[:plugin]]
+      css_bundles << [bundle, opts[:plugin]] unless css_bundles.include? [bundle, opts[:plugin]]
     end
     nil
   end
+  helper_method :css_bundle
+
+  alias_method :jammit_css, :css_bundle
+  deprecate :jammit_css
   helper_method :jammit_css
 
   def js_bundles; @js_bundles ||= []; end

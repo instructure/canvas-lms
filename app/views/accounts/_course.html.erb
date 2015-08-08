@@ -1,3 +1,4 @@
+<% course ||= nil %>
 <% if !course || !course.deleted? %>
 <% teacher_names = course && (course.teacher_names || course.teachers.uniq.map(&:name)) %>
 <% student_count = course && (course.student_count || course.students.where("enrollments.type <> ?", "StudentViewEnrollment").count) %>

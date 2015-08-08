@@ -235,3 +235,54 @@ def fill_in_multiple_blanks_question_one_blank_data
     { :text => "dumb", :weight => 100, :id => 1235, :blank_id => "myblank" },
   ], :question_text => "<p>there's no such thing as a [myblank] question</p>" }.with_indifferent_access
 end
+
+def assignment_quiz(questions, opts={})
+  course = opts[:course] || course(:active_course => true)
+  user = opts[:user] || user(:active_user => true)
+  course.enroll_student(user, :enrollment_state => 'active') unless user.enrollments.any? { |e| e.course_id == course.id }
+  @assignment = course.assignments.create(:title => "Test Assignment")
+  @assignment.workflow_state = "published"
+  @assignment.submission_types = "online_quiz"
+  @assignment.save
+  @quiz = Quizzes::Quiz.where(assignment_id: @assignment).first
+  @questions = questions.map { |q| @quiz.quiz_questions.create!(q) }
+  @quiz.generate_quiz_data
+  @quiz.published_at = Time.now
+  @quiz.workflow_state = "available"
+  @quiz.save!
+end
+
+# The block should return the submission_data. A block is used so
+# that we have access to the @questions variable that is created
+# in this method
+def quiz_with_graded_submission(questions, opts={}, &block)
+  assignment_quiz(questions, opts)
+  @quiz_submission = @quiz.generate_submission(@user)
+  @quiz_submission.mark_completed
+  @quiz_submission.submission_data = yield if block_given?
+  Quizzes::SubmissionGrader.new(@quiz_submission).grade_submission
+end
+
+def survey_with_submission(questions, &block)
+  course_with_student(:active_all => true)
+  @assignment = @course.assignments.create(:title => "Test Assignment")
+  @assignment.workflow_state = "published"
+  @assignment.submission_types = "online_quiz"
+  @assignment.save
+  @quiz = Quizzes::Quiz.where(assignment_id: @assignment).first
+  @quiz.anonymous_submissions = true
+  @quiz.quiz_type = "graded_survey"
+  @questions = questions.map { |q| @quiz.quiz_questions.create!(q) }
+  @quiz.generate_quiz_data
+  @quiz.save!
+  @quiz_submission = @quiz.generate_submission(@user)
+  @quiz_submission.mark_completed
+  @quiz_submission.submission_data = yield if block_given?
+end
+
+def course_quiz(active=false)
+  @quiz = @course.quizzes.create
+  @quiz.workflow_state = "available" if active
+  @quiz.save!
+  @quiz
+end

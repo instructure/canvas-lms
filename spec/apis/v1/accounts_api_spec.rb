@@ -17,6 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper')
 
 describe "Accounts API", type: :request do
   before :once do
@@ -76,25 +77,57 @@ describe "Accounts API", type: :request do
       course_with_teacher(:user => @user, :account => @a2)
 
       json = api_call(:get, "/api/v1/course_accounts",
-                      { :controller => 'accounts', :action => 'course_accounts', :format => 'json' })
+        { :controller => 'accounts', :action => 'course_accounts', :format => 'json' })
       expect(json.sort_by { |a| a['id'] }).to eq [
-          {
+            {
               'id' => @a1.id,
               'name' => 'root',
               'root_account_id' => nil,
               'parent_account_id' => nil,
               'workflow_state' => 'active',
               'default_time_zone' => 'Etc/UTC',
-          },
-          {
+            },
+            {
               'id' => @a2.id,
               'name' => 'subby',
               'root_account_id' => @a1.id,
               'parent_account_id' => @a1.id,
               'workflow_state' => 'active',
               'default_time_zone' => 'America/Juneau',
-          },
-      ]
+            },
+          ]
+    end
+
+    describe "with sharding" do
+      specs_require_sharding
+      it "should include cross-shard accounts in course_accounts" do
+        course_with_teacher(:user => @user, :account => @a1)
+        @shard1.activate do
+          @a5 = account_model(:name => "crossshard", :default_time_zone => 'UTC')
+          course_with_teacher(:user => @user, :account => @a5)
+        end
+
+        json = api_call(:get, "/api/v1/course_accounts",
+                        { :controller => 'accounts', :action => 'course_accounts', :format => 'json' })
+        expect(json.sort_by { |a| a['id'] }).to eq [
+            {
+                'id' => @a1.id,
+                'name' => 'root',
+                'root_account_id' => nil,
+                'parent_account_id' => nil,
+                'workflow_state' => 'active',
+                'default_time_zone' => 'Etc/UTC',
+            },
+            {
+                'id' => @a5.global_id,
+                'name' => 'crossshard',
+                'root_account_id' => nil,
+                'parent_account_id' => nil,
+                'workflow_state' => 'active',
+                'default_time_zone' => 'Etc/UTC',
+            },
+        ]
+      end
     end
   end
 

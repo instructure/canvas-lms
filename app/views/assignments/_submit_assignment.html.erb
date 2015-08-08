@@ -6,7 +6,7 @@
 -%>
 <%
   js_bundle :submit_assignment
-  jammit_css :tinymce
+  css_bundle :tinymce
   js_env({
     :SUBMIT_ASSIGNMENT => {
       :ALLOWED_EXTENSIONS => (@assignment.allowed_extensions || []),

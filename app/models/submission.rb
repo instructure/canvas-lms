@@ -82,8 +82,8 @@ class Submission < ActiveRecord::Base
     select("assignments.id, assignments.title, assignments.points_possible, assignments.due_at,
             submissions.grade, submissions.score, submissions.graded_at, assignments.grading_type,
             assignments.context_id, assignments.context_type, courses.name AS context_name").
-    joins("JOIN assignments ON assignments.id=submissions.assignment_id
-           JOIN courses ON courses.id=assignments.context_id").
+    joins(:assignment).
+    joins("JOIN #{Course.quoted_table_name} ON courses.id=assignments.context_id").
     where("graded_at>? AND user_id=? AND muted=?", date, user_id, false).
     order("graded_at DESC").
     limit(limit)
@@ -164,7 +164,7 @@ class Submission < ActiveRecord::Base
       update_all(["needs_grading_count=needs_grading_count+?, updated_at=?", amount, Time.now.utc])
     # TODO: add this to the SQL above when DA is on for everybody
     # and remove NeedsGradingCountQuery#manual_count
-    # AND EXISTS(SELECT assignment_student_visibilities.* WHERE assignment_student_visibilities.user_id = NEW.user_id AND assignment_student_visibilities.assignment_id = NEW.assignment_id);
+    # AND EXISTS (SELECT assignment_student_visibilities.* WHERE assignment_student_visibilities.user_id = NEW.user_id AND assignment_student_visibilities.assignment_id = NEW.assignment_id);
   end
 
   after_create :update_needs_grading_count, if: :needs_grading?

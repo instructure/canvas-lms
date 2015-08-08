@@ -3,11 +3,11 @@
 <% if @context.feature_enabled?(:modules_next) %>
   <%
     @body_classes << 'padless-content'
-    jammit_css :modules_next
+    css_bundle :modules_next
     js_bundle :modules
   %>
 <% else %>
-	<% jammit_css :context_modules2 %>
+  <% css_bundle :context_modules2 %>
   <%= render :partial => "context_modules/content_next" %>
 <% end %>
 

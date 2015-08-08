@@ -10,8 +10,7 @@
     :SHOW_SCHEDULER => @domain_root_account.show_scheduler?
   }
   js_bundle :calendar2
-  jammit_css :calendar2
-  jammit_css :agenda_view
+  css_bundle :calendar2, :agenda_view
   crumbs.clear
   @body_classes << "full-width no-page-block hide-content-while-scripts-not-loaded"
 %>

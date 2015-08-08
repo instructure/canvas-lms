@@ -1,0 +1,582 @@
+@import "base/environment";
+
+
+//// Vertical content alignment on elements in Theme editor
+///////
+.te-Flex {
+  display: flex;
+  .te-Flex__block {flex: 1;}
+  .te-Flex__end {
+    align-self: flex-end;
+  }
+  &.te-Flex--v-middle {
+    align-items: center;
+  }
+}
+//// Make sure we're using border-box
+///////
+* {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+//// Override for Canvas full-width (may be taken out with responsive redesign)
+///////
+body, html {height: 100vh;margin: 0; padding: 0;}
+#main {
+  max-width: 100% !important;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+.grid-row--fix {
+  overflow: hidden;
+  margin: 0;
+}
+//// Variables for theme editor
+///////
+$te-bgd: $ic-color-neutral;
+$te-content-bgd: $ic-color-light;
+$te-border-color: darken($ic-color-neutral, 10);
+$te-input-height: 30px;
+//// Layout for Theme editor
+///////
+@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+.Theme__container {
+  height: 100vh;
+  display: flex;
+  opacity: 0.01;
+  animation: fadeIn ease-in 1;
+  animation-fill-mode:forwards;
+  animation-duration: 0.2s;
+}
+.Theme__editor {
+  height: 100vh;
+  width: 300px;
+  z-index: 10;
+  box-shadow: 0 0 8px $ic-color-dark;
+  background: $te-bgd;
+}
+.Theme__preview {
+  flex: 1;
+  width: 100%;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  margin-left: 300px;
+  padding-right: 300px;
+
+  .grid-row {margin: 0;}
+}
+.Theme__preview-overlay {
+  background: rgba(255, 255, 255, 0.7);
+  height: 100vh;
+  width: 100%;
+  z-index: 8000;
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+.Theme__preview-overlay__container {
+  text-align: center;
+  height: 100vh;
+  margin: 0 auto;
+  padding-right: 300px; /* adjust for width of theme editor */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.Theme__preview-button-text {
+  padding-left: $ic-sp;
+}
+.Theme__preview iframe {
+  border: none;
+  width: 100%;
+  height: 100vh;
+}
+//// Theme Editor content
+///////
+
+.Theme__editor-header {
+  background: $ic-color-dark;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  position: relative;
+
+  .Theme__editor-header_title {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    @include overwrite-default-icon-size(18px);
+  }
+
+  .Theme__editor-header_title-text {
+    color: $ic-color-light;
+    line-height: normal;
+    font-size: 16px;
+    font-weight: 300;
+    margin: 0 0 0 $ic-sp;
+    flex: 1;
+    line-height: 1.2;
+  }
+
+  .Theme__editor-header_title-icon {
+    line-height: 1;
+    color: #D5412F;
+  }
+
+  .Theme__editor-header_actions {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .Theme__editor-header_button {
+    margin-left: $ic-sp/2;
+  }
+}
+
+.Theme__editor-shared-themes {
+  text-align: center;
+  color: $ic-color-light;
+  background: lighten($ic-color-dark, 20);
+  padding: $ic-sp;
+  border-bottom: 1px solid $te-border-color;
+
+  select {
+    margin: 0;
+  }
+}
+
+//// Tabs for Theme Editor
+///////
+.Theme__editor-tabs {
+  background: $gray-darker;
+
+  $te-tab-text-color: darken($ic-color-light, 10);
+  $te-tab-text-color-hover: $ic-color-light;
+
+  .Theme__editor-tabs_item {
+    color: $te-tab-text-color;
+    padding: $ic-sp;
+    display: inline-block;
+    font-size: 14px;
+    margin: 0;
+    cursor: pointer;
+    font-weight: normal;
+    vertical-align: 0;
+
+    &:hover, &:focus {
+      color: $te-tab-text-color-hover;
+    }
+  }
+
+  .Theme__editor-tabs_input {
+    opacity: 0;
+    position: absolute;
+    top: 0; left: 0;
+  }
+
+  .Theme__editor-tabs_panel {
+    border-top: 1px solid $te-border-color;
+  }
+
+  #te-editor:checked ~ #te-editor-tab,
+  #te-upload:checked ~ #te-upload-tab {
+     position: relative;
+     cursor: default;
+
+    &:before {
+      content: "";
+      border: 8px transparent solid;
+      width: 0; height: 0;
+      border-bottom-color: lighten($ic-color-dark, 20);
+      position: absolute;
+      bottom: 0;
+      left: 0; right: 0;
+      margin: 0 auto;
+    }
+
+    &:hover {
+      color: $te-tab-text-color;
+    }
+  }
+
+  #te-upload:checked ~ #te-upload-tab:before {
+    border-bottom-color: $te-bgd;
+  }
+
+  #te-editor:checked ~ #te-upload-panel,
+  #te-upload:checked ~ #te-editor-panel {
+    display: none;
+  }
+
+  .Theme__editor-tabs_item ~ .Theme__editor-tabs_panel {
+    border: none;
+  }
+}
+
+
+//// File Upload styles for Theme Editor
+///////
+
+.Theme__editor-upload-overrides {
+  background-color: $te-bgd;
+  color: $ic-color-dark;
+
+  .Theme__editor-upload-overrides_header {
+    font-weight: 300;
+    padding: $ic-sp;
+  }
+
+  .Theme__editor-upload-overrides_form {
+    background: $te-content-bgd;
+    color: $ic-color-light;
+  }
+}
+
+.ThemeEditorFileUpload {
+  padding: $ic-sp;
+  width: 100%;
+}
+
+.ThemeEditorFileUpload__file-chooser {
+  display: flex;
+  flex: 1;
+
+  input[type="file"] {
+    position: absolute;
+    top: 0; left: -9999px;
+    opacity: 0;
+  }
+}
+
+.ThemeEditorFileUpload__fake-input {
+  color: $gray-light;
+  white-space: nowrap;
+  overflow: hidden;
+  display: inline-block;
+  cursor: default;
+
+  input[type="file"]:focus ~ & {
+    border-color: $ic-brand-primary;
+  }
+}
+
+.ThemeEditorFileUpload__reset-button {
+  min-width: 44px;
+  cursor: pointer;
+  justify-content: center;
+
+  &:disabled {
+    cursor: default;
+  }
+
+  @if $use_high_contrast == false { outline: none; }
+}
+
+//// Accordion styles for Theme Editor
+///////
+// There is a lot of overriding here to support our jquery
+// accordion ui, but the theme for theme editor
+@mixin animate-icon {
+  transform: rotate(90deg);
+}
+@mixin animate-hover {
+  transition: padding 0.2s;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+.Theme__editor-accordion.ui-accordion {
+  .ui-accordion-header {
+    border: none;
+    background: $te-bgd;
+    font-weight: 300;
+    border-radius: 0;
+    color: $ic-color-dark;
+    &:not(:first-child) {
+      border-top: 1px solid $te-border-color;
+    }
+    $te-accordion-hover: $ic-color-dark;
+    // Default accordion state
+    &.ui-state-default {
+      background: $te-bgd;
+      box-shadow: none;
+      border: none;
+      border-bottom: 1px solid $te-border-color;
+      border-radius: 0;
+      padding: 8px $ic-sp;
+      margin-top: 0;
+      color: $ic-color-dark;
+      .Theme__editor-accordion-icon {
+        transform: rotate(-90deg);
+      }
+      &:last-child {
+        border-bottom: none;
+      }
+      // Link, Link hover & Focus accordion state
+      a {
+        color: $ic-color-dark;
+        transition: color 0.2s;
+        border-radius: 0;
+        transition: padding 0.2s;
+        padding: $ic-sp/2 0;
+        font-weight: 500;
+        font-size: 14px;
+        &:hover {
+          color: $ic-color-light;
+        }
+      }
+      &.ui-state-hover
+        {
+        background: $te-accordion-hover;
+        &,
+        a:hover,
+        &.ui-state-hover a:hover,
+        &.ui-state-hover a {
+        color: $ic-color-light;
+        }
+        .Theme__editor-accordion-icon {
+          @include animate-icon;
+        }
+      }
+      &.ui-state-focus {
+        background: $te-accordion-hover;
+        border: none;
+        outline: none;
+        a {
+          color: $ic-color-light;
+          box-shadow: none;
+          outline: none;
+          @if $use_high_contrast {
+            box-shadow: inset 0 0 0 2px $te-accordion-hover;
+          }
+        }
+        .Theme__editor-accordion-icon {
+          @include animate-icon;
+        }
+      }
+      // Active & Focus accordion state
+      &.ui-state-active {
+        border: none;
+        background: $te-bgd;
+        border-color: $te-content-bgd;
+        &,
+        &.ui-state-hover,
+        &.ui-state-hover a:hover,
+        &.ui-state-hover a {
+          color: $ic-color-dark;
+        }
+        &.ui-state-focus {
+          a, a:hover {
+            box-shadow: none;
+            outline: none;
+            @if $use_high_contrast {
+              box-shadow: inset 0 0 0 2px $te-content-bgd;
+            }
+            color: $ic-color-dark;
+          }
+        }
+        .Theme__editor-accordion-icon {
+          @include animate-icon;
+        }
+      }
+      // Takes out un-needed jquery icon
+      > span {display: none;}
+    }
+  }
+  .ui-accordion-content {
+    background: $te-content-bgd;
+    padding: 0 $ic-sp;
+    color: $ic-color-light;
+    border: none;
+    border-radius: 0;
+    &.ui-accordion-content-active {
+      overflow: visible !important;
+      border-radius: 0;
+      box-shadow: inset 0px 0 5px lighten($ic-color-neutral, 0.2);
+    }
+  }
+}
+//// Panel Content Styles
+//////
+.Theme__editor-accordion_element {
+  padding: $ic-sp 0;
+  margin: 0;
+}
+.Theme__editor-form--color {
+  display: flex;
+  align-items: center;
+  .Theme__editor-color-label {
+    padding: 0;
+    margin: 0;
+  }
+}
+////
+// Styles for color block
+////
+.Theme__editor-color_title {
+  flex: 1 80px;
+  padding: 0;
+  margin: 0;
+  font-size: $h2-font-size;
+  color: $ic-color-dark;
+}
+.Theme__editor-color-block {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  .Theme__editor-color-block_input {
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+    border: none;
+    outline: none;
+  }
+
+  .Theme__editor-color-block_input-text {
+    width: 75px;
+    height: $te-input-height;
+    margin: 0 $ic-sp 0 0;
+    padding: 0 $ic-sp/2;
+    color: $ic-color-dark;
+    border: 1px solid $ic-color-neutral;
+    border-radius: 3px;
+  }
+  .Theme__editor-color-block_label-sample {
+    border: 1px solid $ic-color-neutral;
+    border-radius: 3px;
+    cursor: pointer;
+  }
+  .Theme__editor-color-block_input-sample {
+    visibility: hidden;
+    display: block;
+    width: $te-input-height;
+    height: $te-input-height;
+    box-shadow: none;
+  }
+  input[type="text"].Theme__editor-color-block_input--has-error {
+    &, &:focus{
+      border-color: $ic-color-danger;
+    }
+  }
+  .ic-Form-message.ic-Form-message--error{
+    position: absolute;
+    top: 40px;
+    right: 40px;
+    left: auto;
+    height: auto; width: auto;
+    .ic-Form-message__Layout {
+      flex-direction: row;
+      max-width: 200px; // allows for better presentation for longer string errors
+      span {
+        box-sizing: border-box;
+        align-self: stretch;
+        display: block;
+        flex: 0 0 150px;
+      }
+      &:after {
+        right: 16px;
+        left: auto;
+      }
+    }
+  }
+}
+////
+// Styles for image upload block
+////
+.Theme__editor-upload {
+  .Theme__editor-form--upload {
+    width: 100%; // needed for IE to size image previews based on width of parent
+  }
+  .Theme__editor-form__header {
+    display: flex;
+  }
+  .Theme__editor-upload_title {
+    font-size: $h2-font-size;
+    color: $ic-color-dark;
+  }
+  .Theme__editor-image_upload {
+    flex: 100%;
+  }
+  .Theme__editor-upload_restrictions {
+    color: $ic-color-dark;
+    font-style: italic;
+    display: block;
+    font-size: 12px;
+    font-weight: normal;
+    padding-top: $ic-sp/2;
+  }
+  .Theme__editor_preview-img-container {
+    padding: $ic-sp;
+    width: 100%;
+    height: $ic-sp*10;
+    border: 1px solid rgba($ic-color-neutral, 0.2);
+    background: $ic-color-neutral;
+    .Theme__editor_preview-img {
+      text-align: center;
+      overflow: hidden;
+      height: $ic-sp*8;
+      width: 100%;
+      img {
+        max-height: 100%;
+      }
+    }
+    &.Theme__editor_preview-img-container--ic-brand-header-image {
+      background: $ic-brand-global-nav-logo-bgd;
+    }
+    &.Theme__editor_preview-img-container--ic-brand-favicon {
+      background: #ffffff; // will always be white due to xbrowsers
+    }
+    &.Theme__editor_preview-img-container--ic-brand-apple-touch-icon {
+      background: #212121;
+      .Theme__editor_preview-img {
+        img {border-radius: 15px;}
+      }
+    }
+    &.Theme__editor_preview-img-container--ic-brand-msapplication-tile-square,
+    &.Theme__editor_preview-img-container--ic-brand-msapplication-tile-wide{
+      background: $ic-brand-msapplication-tile-color;
+    }
+  }
+  .Theme__editor-placeholder--main {
+    align-self: center;
+  }
+  .Theme__editor-image_upload {
+    margin: 0;
+    border: 1px solid $ic-color-neutral;
+    border-top: none;
+    padding: $ic-sp/2 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+
+    .Theme__editor-image_upload-label {
+      margin-bottom: 0;
+    }
+    .Theme__editor-input_upload {
+      position: absolute;
+      top: 0; left: -9999px;
+      opacity: 0;
+    }
+    .Theme__editor-input_resets {
+      z-index: 2; // make sure these go over the hidden input box
+      display: flex;
+      align-items: flex-end;
+    }
+  }
+}
+
+.ReactModal__Overlay--Theme__editor_progress {
+  background-color: transparentize($ic-color-light, .2);
+}
+
+@import "components/ProgressBar";
+.Theme__editor_progress {
+  width: 300px;
+  text-align: center;
+  color: ensure-contrast($ic-color-dark, $ic-color-light, true);
+  .progress-bar__bar-container {
+    background-color: $ic-color-light;
+  }
+}

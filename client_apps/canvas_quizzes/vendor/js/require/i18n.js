@@ -68,9 +68,19 @@ define([], function() {
         return ''+value;
       };
 
+      var beforeLabel = function(text) {
+        return this.t("#before_label_wrapper", "%{text}:", {'text': text});
+      };
+      
+      var lookup = function(scope, options) {
+        return ["hello", "goodbye"];
+      };
+      
       onLoad({
         t: t,
-        l: l
+        l: l,
+        beforeLabel: beforeLabel,
+        lookup: lookup
       });
     }
   };

@@ -144,11 +144,12 @@ class AccountsController < ApplicationController
   # @returns [Account]
   def course_accounts
     if @current_user
-        course_accounts = BookmarkedCollection.wrap(Account::Bookmarker,
-          Account.where(:id => Account.joins(:courses => :enrollments).merge(
-            @current_user.enrollments.admin.except(:select)).
-            select("accounts.id").uniq.with_each_shard.map(&:id))
-        )
+      account_ids = Rails.cache.fetch(['admin_enrollment_course_account_ids', @current_user].cache_key) do
+        Account.joins(:courses => :enrollments).merge(
+          @current_user.enrollments.admin.shard(@current_user).except(:select)
+        ).select("accounts.id").uniq.pluck(:id).map{|id| Shard.global_id_for(id)}
+      end
+      course_accounts = BookmarkedCollection.wrap(Account::Bookmarker, Account.where(:id => account_ids))
       @accounts = Api.paginate(course_accounts, self, api_v1_accounts_url)
     else
       @accounts = []
@@ -454,21 +455,6 @@ class AccountsController < ApplicationController
           params[:account].delete :services
         end
         if @account.grants_right?(@current_user, :manage_site_settings)
-
-          # handle branding stuff
-          if @account.root_account? && params[:account][:settings]
-            (Account::BRANDING_SETTINGS - [:msapplication_tile_color]).each do |setting|
-              if params[:account][:settings]["#{setting}_remove"] == "1"
-                params[:account][:settings][setting] = nil
-              elsif params[:account][:settings][setting].present?
-                attachment = Attachment.create(uploaded_data: params[:account][:settings][setting], context: @account)
-                params[:account][:settings][setting] = attachment.authenticated_s3_url(:expires => 15.years)
-              end
-            end
-          end
-
-
-
           # If the setting is present (update is called from 2 different settings forms, one for notifications)
           if params[:account][:settings] && params[:account][:settings][:outgoing_email_default_name_option].present?
             # If set to default, remove the custom name so it doesn't get saved
@@ -491,7 +477,7 @@ class AccountsController < ApplicationController
           end
         else
           # must have :manage_site_settings to update these
-          ([ :admins_can_change_passwords,
+          [ :admins_can_change_passwords,
             :admins_can_view_notifications,
             :enable_alerts,
             :enable_eportfolios,
@@ -499,7 +485,7 @@ class AccountsController < ApplicationController
             :show_scheduler,
             :global_includes,
             :gmail_domain
-          ] + Account::BRANDING_SETTINGS).each do |key|
+          ].each do |key|
             params[:account][:settings].try(:delete, key)
           end
         end
@@ -547,7 +533,7 @@ class AccountsController < ApplicationController
         @last_reports = {}
         if AccountReport.connection.adapter_name == 'PostgreSQL'
           scope = @account.account_reports.select("DISTINCT ON (report_type) account_reports.*").order(:report_type)
-          @last_complete_reports = scope.last_complete_of_type(@available_reports.keys, nil).includes(:attachment).index_by(&:report_type)
+          @last_complete_reports = scope.last_complete_of_type(@available_reports.keys, nil).preload(:attachment).index_by(&:report_type)
           @last_reports = scope.last_of_type(@available_reports.keys, nil).index_by(&:report_type)
         else
           @available_reports.keys.each do |report|

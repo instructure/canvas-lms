@@ -13,10 +13,9 @@ define([
     render() {
 
       var paragraph = I18n.t(
-        '*See some LTI tools* that work great with Canvas. You can also check out the **Canvas Community topics about LTI tools**.',
+        '*See some LTI tools* that work great with Canvas.',
         { wrappers: [
           '<a href="https://www.eduappcenter.com/">$1</a>',
-          '<a href="http://help.instructure.com/entries/20878626-lti-tools-and-examples">$1</a>'
         ]}
       );
 

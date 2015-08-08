@@ -163,7 +163,7 @@ module Quizzes
     end
 
     def section_count
-      context.active_course_sections.count
+      context.active_section_count
     end
 
     def locked_for_json_type

@@ -567,6 +567,32 @@ describe ContextModule do
       expect(@module.evaluate_for(@user)).to be_completed
     end
 
+    it "should fulfill all assignment requirements on excused submission" do
+      course_module
+      student_in_course course: @course, active_all: true
+
+      @teacher = User.create!(:name => "some teacher")
+      @course.enroll_teacher(@teacher)
+
+      @assign = @course.assignments.create!(title: 'title', submission_types: 'online_text_entry')
+      @tag1 = @module.add_item({id: @assign.id, type: 'assignment'})
+      @tag2 = @module.add_item({id: @assign.id, type: 'assignment'})
+      @tag3 = @module.add_item({id: @assign.id, type: 'assignment'})
+
+      @module.completion_requirements = {
+        @tag1.id => {type: 'must_mark_done'},
+        @tag2.id => {type: 'min_score', score: 5},
+        @tag3.id => {type: 'must_view'}
+      }
+      @module.save!
+
+      expect(@module.evaluate_for(@student)).to be_unlocked
+
+      @assign.reload
+      @assign.grade_student(@student, :grader => @teacher, :excuse => true)
+      expect(@module.evaluate_for(@student)).to be_completed
+    end
+
     describe "must_submit requirement" do
       before :each do
         course_module

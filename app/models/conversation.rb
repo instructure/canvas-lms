@@ -18,8 +18,6 @@
 
 class Conversation < ActiveRecord::Base
   include SimpleTags
-  include ModelCache
-  cacheable_by :id, :private_hash
 
   has_many :conversation_participants, :dependent => :destroy
   has_many :conversation_messages, :order => "created_at DESC, id DESC", :dependent => :delete_all
@@ -327,7 +325,7 @@ class Conversation < ActiveRecord::Base
       skip_users = message.conversation_message_participants.active.select(:user_id).all
     end
 
-    self.conversation_participants.with_each_shard do |cps|
+    self.conversation_participants.shard(self).activate do |cps|
       cps.update_all(:root_account_ids => options[:root_account_ids]) if options[:root_account_ids].present?
 
       cps = cps.visible if options[:only_existing]
@@ -439,7 +437,7 @@ class Conversation < ActiveRecord::Base
 
   def update_participants(message, options = {})
     updated = false
-    self.conversation_participants.with_each_shard do |conversation_participants|
+    self.conversation_participants.shard(self).activate do |conversation_participants|
       conversation_participants = conversation_participants.where(:user_id =>
         (options[:only_users]).map(&:id)) if options[:only_users]
 
@@ -520,7 +518,7 @@ class Conversation < ActiveRecord::Base
       Shard.birth.activate { self.conversation_participants.reload.map(&:user_id) } )
     return unless private_hash_changed?
     existing = self.shard.activate do
-      ConversationParticipant.send(:with_exclusive_scope) do
+      ConversationParticipant.unscoped do
         ConversationParticipant.where(private_hash: private_hash).first.try(:conversation)
       end
     end
@@ -702,7 +700,7 @@ class Conversation < ActiveRecord::Base
     shard.activate do
       conversation_message_participants.scoped.delete_all
     end
-    conversation_participants.with_each_shard { |scope| scope.scoped.delete_all; nil }
+    conversation_participants.shard(self).delete_all
   end
 
   protected

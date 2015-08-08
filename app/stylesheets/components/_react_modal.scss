@@ -143,6 +143,7 @@ See `app/jsx/examples/ReactModalExample.jsx` for complete example usage.
 
     .ReactModal__Header-Title {
       flex: 1;
+      overflow: hidden;
       // remove margin from heading elements
       * { margin: 0; }
     }

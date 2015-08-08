@@ -106,16 +106,16 @@ module AccountReports
                   courses.sis_source_id AS course_sis_id, cs.id AS section_id,
                   cs.sis_source_id AS section_sis_id, cs.name AS section_name,
                   e.workflow_state AS enrollment_state").
-          joins("INNER JOIN enrollments e ON e.course_id = courses.id
+          joins("INNER JOIN #{Enrollment.quoted_table_name} e ON e.course_id = courses.id
                    AND e.root_account_id = courses.root_account_id
                    AND e.type = 'StudentEnrollment'
-                 INNER JOIN course_sections cs ON cs.id = e.course_section_id
-                 INNER JOIN pseudonyms p ON e.user_id = p.user_id
+                 INNER JOIN #{CourseSection.quoted_table_name} cs ON cs.id = e.course_section_id
+                 INNER JOIN #{Pseudonym.quoted_table_name} p ON e.user_id = p.user_id
                    AND courses.root_account_id = p.account_id
-                 INNER JOIN users u ON u.id = p.user_id").
+                 INNER JOIN #{User.quoted_table_name} u ON u.id = p.user_id").
           where("NOT EXISTS (SELECT s.user_id
-                             FROM submissions s
-                             INNER JOIN assignments a ON s.assignment_id = a.id
+                             FROM #{Submission.quoted_table_name} s
+                             INNER JOIN #{Assignment.quoted_table_name} a ON s.assignment_id = a.id
                                AND a.context_type = 'Course'
                              WHERE s.user_id = p.user_id
                                AND a.context_id = courses.id
@@ -199,7 +199,7 @@ module AccountReports
 
         data = data.
           where("NOT EXISTS (SELECT user_id, context_id
-                             FROM asset_user_accesses aua
+                             FROM #{AssetUserAccess.quoted_table_name} aua
                              WHERE aua.user_id = enrollments.user_id
                                AND aua.context_id = enrollments.course_id
                                AND aua.context_type = 'Course'
@@ -251,21 +251,21 @@ module AccountReports
           select('pseudonyms.last_request_at, pseudonyms.user_id,
                   pseudonyms.sis_user_id, users.sortable_name,
                   pseudonyms.current_login_ip').
-          joins('INNER JOIN users ON users.id = pseudonyms.user_id')
+          joins(:user)
 
         students = add_user_sub_account_scope(students)
 
         if term
           students = students.
-            joins('INNER JOIN enrollments e ON e.user_id = pseudonyms.user_id
-                   INNER JOIN courses c on c.id = e.course_id')
+            joins("INNER JOIN #{Enrollment.quoted_table_name} e ON e.user_id = pseudonyms.user_id
+                   INNER JOIN #{Course.quoted_table_name} c on c.id = e.course_id")
           students = add_term_scope(students, 'c')
         end
 
         if course
           students = students.
-            joins('INNER JOIN enrollments e ON e.user_id = pseudonyms.user_id
-                   INNER JOIN courses c on c.id = e.course_id').
+            joins("INNER JOIN #{Enrollment.quoted_table_name} e ON e.user_id = pseudonyms.user_id
+                   INNER JOIN #{Course.quoted_table_name} c on c.id = e.course_id").
             where('c.id = ?', course)
         end
 

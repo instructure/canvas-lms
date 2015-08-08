@@ -38,7 +38,7 @@ describe "scheduler" do
       expect(f('.end_time')['value']).to include(":13")
     end
 
-    it "should split time slots", :priority => "1", :test_id => 140190 do
+    it "should split time slots", priority: "1", test_id: 140190 do
       start_time_text = '02'
       end_time_text = '06'
       local_start_time = '01'
@@ -118,7 +118,7 @@ describe "scheduler" do
       expect(f('[type=checkbox][name="max_appointments_per_participant_option"]').selected?).to be_falsey
     end
 
-    it "should send messages to appropriate participants", :priority => "1", :test_id => 140192 do
+    it "should send messages to appropriate participants", priority: "1", test_id: 140192 do
       gc = group_category
       ug1 = @course.groups.create!(:group_category => gc)
       ug1.users << student1 = student_in_course(:course => @course, :active_all => true).user
@@ -167,7 +167,7 @@ describe "scheduler" do
       expect(student5.conversations.first.messages.size).to eq 2 # unregistered/all * 1 (doesn't meet any sub_context criteria)
     end
 
-    it "should validate the appointment group shows up on the calendar", :priority => "1", :test_id => 140193 do
+    it "should validate the appointment group shows up on the calendar", priority: "1", test_id: 140193 do
       create_appointment_group
       get "/calendar2"
       click_scheduler_link
@@ -176,7 +176,7 @@ describe "scheduler" do
       expect(element_exists('.fc-event-bg')).to be_truthy
     end
 
-    it "should not allow limiting the max appointments per participant to less than 1", :priority => "1", :test_id => 140194 do
+    it "should not allow limiting the max appointments per participant to less than 1", priority: "1", test_id: 140194 do
       get "/calendar2"
       click_scheduler_link
       fill_out_appointment_group_form('max appointments')
@@ -187,7 +187,7 @@ describe "scheduler" do
       expect(get_value('[name="max_appointments_per_participant"]').to_i).to be > 0
     end
 
-    it "should allow removing individual appointment users",:priority  => "1", :test_id => 140196 do
+    it "should allow removing individual appointment users",:priority  => "1", test_id: 140196 do
       #set_native_events("false")
       # user appointment group
       create_appointment_group

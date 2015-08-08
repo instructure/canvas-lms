@@ -26,7 +26,6 @@ class GroupCategory < ActiveRecord::Base
   has_many :groups, :dependent => :destroy
   has_many :assignments, :dependent => :nullify
   has_many :progresses, :as => 'context', :dependent => :destroy
-  has_many :discussion_topics
   has_one :current_progress, :as => 'context', :class_name => 'Progress', :conditions => "workflow_state IN ('queued','running')", :order => 'created_at'
 
   EXPORTABLE_ATTRIBUTES = [ :id, :context_id, :context_type, :name, :role,
@@ -407,6 +406,12 @@ class GroupCategory < ActiveRecord::Base
   set_policy do
     given { |user, session| context.grants_right?(user, session, :read) }
     can :read
+  end
+
+  def discussion_topics
+    self.shard.activate do
+      DiscussionTopic.where(context_type: self.context_type, context_id: self.context_id, group_category_id: self)
+    end
   end
 
   protected

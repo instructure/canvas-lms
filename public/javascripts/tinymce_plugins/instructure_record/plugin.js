@@ -37,7 +37,7 @@ define([
       ed.addButton('instructure_record', {
         title: 'Record/Upload Media',
         cmd: 'instructureRecord',
-        image: url + '/img/record.gif'
+        icon: 'video icon-video'
       });
     },
 

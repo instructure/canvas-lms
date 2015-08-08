@@ -17,6 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
+require 'rotp'
 
 describe User do
 
@@ -331,7 +332,7 @@ describe User do
     p1.save!
     user.pseudonyms.create! :unique_id => "id2", :account => account2
     user.remove_from_root_account account1
-    expect(user.associated_root_accounts).to eql [account2]
+    expect(user.associated_root_accounts.to_a).to eql [account2]
   end
 
   describe "update_account_associations" do
@@ -409,19 +410,19 @@ describe User do
         @shard1.activate do
           @account = Account.create!
           au = @account.account_users.create!(user: @user)
-          expect(@user.user_account_associations.with_each_shard.map(&:account).sort_by(&:id)).to eq(
+          expect(@user.user_account_associations.shard(@user).map(&:account).sort_by(&:id)).to eq(
               [Account.site_admin, @account].sort_by(&:id)
           )
           expect(@account.user_account_associations.map(&:user)).to eq [@user]
 
           au.destroy
 
-          expect(@user.user_account_associations.with_each_shard.map(&:account)).to eq [Account.site_admin]
+          expect(@user.user_account_associations.shard(@user).map(&:account)).to eq [Account.site_admin]
           expect(@account.reload.user_account_associations.map(&:user)).to eq []
 
           @account.account_users.create!(user: @user)
 
-          expect(@user.user_account_associations.with_each_shard.map(&:account).sort_by(&:id)).to eq(
+          expect(@user.user_account_associations.shard(@user).map(&:account).sort_by(&:id)).to eq(
               [Account.site_admin, @account].sort_by(&:id)
           )
           expect(@account.reload.user_account_associations.map(&:user)).to eq [@user]
@@ -433,7 +434,7 @@ describe User do
         @shard2.activate do
           @user.update_account_associations
 
-          expect(@user.user_account_associations.with_each_shard.map(&:account).sort_by(&:id)).to eq(
+          expect(@user.user_account_associations.shard(@user).map(&:account).sort_by(&:id)).to eq(
               [Account.site_admin, @account].sort_by(&:id)
           )
           expect(@account.reload.user_account_associations.map(&:user)).to eq [@user]
@@ -1683,7 +1684,7 @@ describe User do
     end
   end
 
-  describe "assignments_visibile_in_course" do
+  describe "assignments_visible_in_course" do
     before do
       @teacher_enrollment = course_with_teacher(:active_course => true)
       @course_section = @course.course_sections.create
@@ -1704,9 +1705,9 @@ describe User do
       context "differentiated_assignments on" do
         before {@course.enable_feature!(:differentiated_assignments)}
         it "should return assignments only when a student has overrides" do
-          expect(@student1.assignments_visibile_in_course(@course).include?(@assignment)).to be_truthy
-          expect(@student2.assignments_visibile_in_course(@course).include?(@assignment)).to be_falsey
-          expect(@student1.assignments_visibile_in_course(@course).include?(@unpublished_assignment)).to be_falsey
+          expect(@student1.assignments_visible_in_course(@course).include?(@assignment)).to be_truthy
+          expect(@student2.assignments_visible_in_course(@course).include?(@assignment)).to be_falsey
+          expect(@student1.assignments_visible_in_course(@course).include?(@unpublished_assignment)).to be_falsey
         end
       end
 
@@ -1715,15 +1716,15 @@ describe User do
           @course.disable_feature!(:differentiated_assignments)
         }
         it "should return all assignments" do
-          expect(@student1.assignments_visibile_in_course(@course).include?(@assignment)).to be_truthy
+          expect(@student1.assignments_visible_in_course(@course).include?(@assignment)).to be_truthy
         end
       end
     end
 
     context "as teacher" do
       it "should return all assignments" do
-        expect(@teacher_enrollment.user.assignments_visibile_in_course(@course).include?(@assignment)).to be_truthy
-        expect(@teacher_enrollment.user.assignments_visibile_in_course(@course).include?(@unpublished_assignment)).to be_truthy
+        expect(@teacher_enrollment.user.assignments_visible_in_course(@course).include?(@assignment)).to be_truthy
+        expect(@teacher_enrollment.user.assignments_visible_in_course(@course).include?(@unpublished_assignment)).to be_truthy
       end
     end
 
@@ -1737,18 +1738,18 @@ describe User do
         context "observer watching student with visibility" do
           before{ @observer_enrollment.update_attribute(:associated_user_id, @student1.id) }
           it "should be true" do
-            expect(@observer.assignments_visibile_in_course(@course).include?(@assignment)).to be_truthy
+            expect(@observer.assignments_visible_in_course(@course).include?(@assignment)).to be_truthy
           end
         end
         context "observer watching student without visibility" do
           before{ @observer_enrollment.update_attribute(:associated_user_id, @student2.id) }
           it "should be false" do
-            expect(@observer.assignments_visibile_in_course(@course).include?(@assignment)).to be_falsey
+            expect(@observer.assignments_visible_in_course(@course).include?(@assignment)).to be_falsey
           end
         end
         context "observer watching a only section" do
           it "should be true" do
-            expect(@observer.assignments_visibile_in_course(@course).include?(@assignment)).to be_truthy
+            expect(@observer.assignments_visible_in_course(@course).include?(@assignment)).to be_truthy
           end
         end
       end
@@ -1757,18 +1758,18 @@ describe User do
         context "observer watching student with visibility" do
           before{ @observer_enrollment.update_attribute(:associated_user_id, @student1.id) }
           it "should be true" do
-            expect(@observer.assignments_visibile_in_course(@course).include?(@assignment)).to be_truthy
+            expect(@observer.assignments_visible_in_course(@course).include?(@assignment)).to be_truthy
           end
         end
         context "observer watching student without visibility" do
           before{ @observer_enrollment.update_attribute(:associated_user_id, @student2.id) }
           it "should be true" do
-            expect(@observer.assignments_visibile_in_course(@course).include?(@assignment)).to be_truthy
+            expect(@observer.assignments_visible_in_course(@course).include?(@assignment)).to be_truthy
           end
         end
         context "observer watching a only section" do
           it "should be true" do
-            expect(@observer.assignments_visibile_in_course(@course).include?(@assignment)).to be_truthy
+            expect(@observer.assignments_visible_in_course(@course).include?(@assignment)).to be_truthy
           end
         end
       end

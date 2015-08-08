@@ -1,13 +1,10 @@
+require_dependency 'canvas/draft_state_validations'
+
 module Canvas
   # defines the behavior when a protected attribute is assigned to in mass
   # assignment. The default, and Rails' normal behavior, is to just :log. Set
   # this to :raise to raise an exception.
   mattr_accessor :protected_attribute_error
-
-  # defines extensions that could possibly be used, so that specs can move them to the
-  # correct schemas for sharding
-  mattr_accessor :possible_postgres_extensions
-  self.possible_postgres_extensions = [:pg_collkey, :pg_trgm]
 
   def self.active_record_foreign_key_check(name, type, options)
     if name.to_s =~ /_id\z/ && type.to_s == 'integer' && options[:limit].to_i < 8

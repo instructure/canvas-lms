@@ -73,6 +73,7 @@ class Enrollment < ActiveRecord::Base
   after_save :update_linked_enrollments
   after_save :update_cached_due_dates
   after_save :touch_graders_if_needed
+  after_save :reset_notifications_cache
 
   attr_accessor :already_enrolled
   attr_accessible :user, :course, :workflow_state, :course_section, :limit_privileges_to_course_section, :already_enrolled, :start_at, :end_at
@@ -312,7 +313,7 @@ class Enrollment < ActiveRecord::Base
 
   def other_section_enrollment_count
     # The number of other active sessions that the user is enrolled in.
-    self.course.student_enrollments.active.for_user(self.user).where("id != ?", self.id).count 
+    self.course.student_enrollments.active.for_user(self.user).where("id != ?", self.id).count
   end
 
   def audit_groups_for_deleted_enrollments
@@ -330,12 +331,12 @@ class Enrollment < ActiveRecord::Base
     self.user.groups.includes(:group_category).where(
       :context_type => 'Course', :context_id => section.course_id).each do |group|
 
-      # check group deletion criteria if either enrollment is not a deletion 
+      # check group deletion criteria if either enrollment is not a deletion
       # or it may be a deletion/unenrollment from a section but not from the course as a whole (still enrolled in another section)
-      if self.workflow_state != 'deleted' || other_section_enrollment_count > 0    
+      if self.workflow_state != 'deleted' || other_section_enrollment_count > 0
         # don't bother unless the group's category has section restrictions
         next unless group.group_category && group.group_category.restricted_self_signup?
-        
+
         # skip if the user is the only user in the group. there's no one to have
         # a conflicting section.
         next if group.users.count == 1
@@ -579,6 +580,12 @@ class Enrollment < ActiveRecord::Base
     touch_user
   end
 
+  def reset_notifications_cache
+    if self.workflow_state_changed?
+      StreamItemCache.invalidate_recent_stream_items(self.user_id, "Course", self.course_id)
+    end
+  end
+
   workflow do
     state :invited do
       event :reject, :transitions_to => :rejected do self.user.touch; end
@@ -612,6 +619,12 @@ class Enrollment < ActiveRecord::Base
   end
 
   def state_based_on_date
+    RequestCache.cache('enrollment_state_based_on_date', self) do
+      calculated_state_based_on_date
+    end
+  end
+
+  def calculated_state_based_on_date
     if state == :completed || ([:invited, :active].include?(state) && self.course.completed?)
       if self.restrict_past_view?
         return :inactive
@@ -649,11 +662,15 @@ class Enrollment < ActiveRecord::Base
   end
 
   def restrict_past_view?
-    self.view_restrictable? && self.course.restrict_student_past_view?
+    self.view_restrictable? && RequestCache.cache('restrict_student_past_view', self.global_course_id) do
+      self.course.restrict_student_past_view?
+    end
   end
 
   def restrict_future_view?
-    self.view_restrictable? && self.course.restrict_student_future_view?
+    self.view_restrictable? && RequestCache.cache('restrict_student_future_view', self.global_course_id) do
+      self.course.restrict_student_future_view?
+    end
   end
 
   def active?

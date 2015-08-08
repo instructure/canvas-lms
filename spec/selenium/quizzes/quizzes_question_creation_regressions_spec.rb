@@ -9,7 +9,7 @@ describe 'quizzes question creation edge cases' do
     @last_quiz = start_quiz_question
   end
 
-  it 'should create a quiz with a variety of quiz questions', priority: '1', test_id: 197489 do
+  it 'should create a quiz with a variety of quiz questions', priority: "1", test_id: 197489 do
     quiz = @last_quiz
 
     create_multiple_choice_question
@@ -30,7 +30,7 @@ describe 'quizzes question creation edge cases' do
     expect(questions[2]).to have_class('short_answer_question')
   end
 
-  it 'should not create an extra, blank, correct answer when you use [answer] as a placeholder', priority: '1', test_id: 197490 do
+  it 'should not create an extra, blank, correct answer when you use [answer] as a placeholder', priority: "1", test_id: 197490 do
     quiz = @last_quiz
 
     # be a multiple dropdown question
@@ -69,7 +69,7 @@ describe 'quizzes question creation edge cases' do
     expect(quiz.quiz_questions.first.question_data['answers'].detect{|a| a['text'] == ''}).to be_nil
   end
 
-  it 'respects character limits on short answer questions', priority: '1', test_id: 197493 do
+  it 'respects character limits on short answer questions', priority: "1", test_id: 197493 do
     quiz = @last_quiz
     question = fj('.question_form:visible')
     click_option('.question_form:visible .question_type', 'Fill In the Blank')
@@ -93,7 +93,7 @@ describe 'quizzes question creation edge cases' do
     alert.dismiss
   end
 
-  it 'should show errors for graded quizzes but not surveys', priority: '1', test_id: 197491 do
+  it 'should show errors for graded quizzes but not surveys', priority: "1", test_id: 197491 do
     quiz_with_new_questions
     change_quiz_type_to 'Graded Survey'
     expect_new_page_load {

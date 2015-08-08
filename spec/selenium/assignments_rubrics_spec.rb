@@ -21,7 +21,7 @@ describe "assignment rubrics" do
       @assignment
     end
 
-    it "should add a new rubric to assignment and verify points" do
+    it "should add a new rubric to assignment and verify points", priority: "1", test_id: 114341 do
       initial_points = 2.5
       rubric_name = 'new rubric'
       create_assignment_with_points(initial_points)
@@ -42,7 +42,7 @@ describe "assignment rubrics" do
       expect(f('#rubrics .rubric .rubric_title .displaying .title')).to include_text(rubric_name)
     end
 
-    it "should carry decimal values through rubric to grading" do
+    it "should carry decimal values through rubric to grading", priority: "2", test_id: 220315 do
       student_in_course
       @assignment = create_assignment_with_points(2.5)
       rubric_model(:title => 'new rubric', :data =>
@@ -71,7 +71,7 @@ describe "assignment rubrics" do
       expect(f('#rubric_summary_container .rubric_total').text).to eq '2.5'
     end
 
-    it "should import rubric to assignment" do
+    it "should import rubric to assignment", priority: "1", test_id: 220317 do
       create_assignment_with_points(2)
 
       outcome_with_rubric
@@ -88,7 +88,7 @@ describe "assignment rubrics" do
       expect(f('#rubric_'+@rubric.id.to_s+' .rubric_title .title')).to include_text(@rubric.title)
     end
 
-    it "should not adjust assignment points possible for grading rubric" do
+    it "should not adjust assignment points possible for grading rubric", priority: "1", test_id: 220324 do
       create_assignment_with_points(2)
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
@@ -103,7 +103,7 @@ describe "assignment rubrics" do
       expect(f("#assignment_show .points_possible").text).to eq '2'
     end
 
-    it "should adjust assignment points possible for grading rubric" do
+    it "should adjust assignment points possible for grading rubric", priority: "1", test_id: 220326 do
       create_assignment_with_points(2)
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
@@ -119,7 +119,7 @@ describe "assignment rubrics" do
       expect(f("#assignment_show .points_possible").text).to eq '5'
     end
 
-    it "should not allow XSS attacks through rubric descriptions" do
+    it "should not allow XSS attacks through rubric descriptions", priority: "2", test_id: 220327 do
       student = user_with_pseudonym :active_user => true,
                                     :username => "student@example.com",
                                     :password => "password"
@@ -169,7 +169,7 @@ describe "assignment rubrics" do
           text).to eq "<b>This text should not be bold</b>"
     end
 
-    it "should follow learning outcome ignore_for_scoring" do
+    it "should follow learning outcome ignore_for_scoring", priority: "2", test_id: 220328 do
       student_in_course(:active_all => true)
       outcome_with_rubric
       @assignment = @course.assignments.create(:name => 'assignment with rubric')
@@ -199,7 +199,7 @@ describe "assignment rubrics" do
       wait_for_ajaximations
     end
 
-    it "should properly manage rubric focus on submission preview page" do
+    it "should properly manage rubric focus on submission preview page", priority: "2", test_id: 220329 do
       student_in_course(:active_all => true)
       outcome_with_rubric
       @assignment = @course.assignments.create(:name => 'assignment with rubric')
@@ -222,7 +222,7 @@ describe "assignment rubrics" do
       check_element_has_focus(f(".assess_submission_link"))
     end
 
-    it "should allow multiple rubric associations for grading" do
+    it "should allow multiple rubric associations for grading", priority: "1", test_id: 220330 do
       outcome_with_rubric
       @assignment1 = @course.assignments.create!(:name => "assign 1", :points_possible => @rubric.points_possible)
       @assignment2 = @course.assignments.create!(:name => "assign 2", :points_possible => @rubric.points_possible)
@@ -242,7 +242,7 @@ describe "assignment rubrics" do
       expect(@association2.rubric.id).to eq @rubric.id
     end
 
-    it "shows status of 'use_for_grading' properly" do
+    it "shows status of 'use_for_grading' properly", priority: "1", test_id: 220331 do
       outcome_with_rubric
       @assignment1 = @course.assignments.create!(
         :name => "assign 1",
@@ -267,7 +267,7 @@ describe "assignment rubrics" do
       course_with_student_logged_in
     end
 
-    it "should properly show rubric criterion details for learning outcomes" do
+    it "should properly show rubric criterion details for learning outcomes", priority: "2", test_id: 220332 do
       @assignment = @course.assignments.create(:name => 'assignment with rubric')
       outcome_with_rubric
 
@@ -280,7 +280,7 @@ describe "assignment rubrics" do
       expect(f(".ui-dialog div.long_description").text).to eq "This is awesome."
     end
 
-    it "should show criterion comments" do
+    it "should show criterion comments", priority: "2", test_id: 220333 do
       # given
       comment = 'a comment'
       teacher_in_course(:course => @course)
@@ -306,7 +306,7 @@ describe "assignment rubrics" do
       expect(ee.last).not_to be_displayed
     end
 
-    it "shouldn't show 'update description' button in long description dialog" do
+    it "shouldn't show 'update description' button in long description dialog", priority: "2", test_id: 220334 do
       @assignment = @course.assignments.create(:name => 'assignment with rubric')
       rubric_for_course
       @rubric.associate_with(@assignment, @course, :purpose => 'grading')
@@ -323,7 +323,7 @@ describe "assignment rubrics" do
       course_with_designer_logged_in
     end
 
-    it "should allow a designer to create a course rubric" do
+    it "should allow a designer to create a course rubric", priority: "2", test_id: 220335 do
       rubric_name = 'this is a new rubric'
       get "/courses/#{@course.id}/rubrics"
 

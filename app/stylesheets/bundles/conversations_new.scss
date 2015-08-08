@@ -1,4 +1,4 @@
 @import "base/environment";
-@import "vendor/_simlink-to-public_javascripts_vendor_bootstrap-select_bootstrap-select.css.scss";
+@import "../../../public/javascripts/vendor/bootstrap-select/bootstrap-select";
 @import "pages/conversations/conversations_new";
 @import "pages/conversations/compose_message_dialog";

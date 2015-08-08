@@ -101,7 +101,7 @@ Simply add the **.ui-accordion--mini** class to the parent **.accordion** elemen
       background: lighten($ic-color-neutral, 5%);
       box-shadow: none;
       border-color: $ic-border-light;
-      border-bottom: 1px solid $ic-border-light !important;
+      border-bottom: 1px solid $ic-border-light;
       &.ui-state-focus {
         a { @include button-focus-light; }
       }
@@ -110,11 +110,11 @@ Simply add the **.ui-accordion--mini** class to the parent **.accordion** elemen
         border-bottom-left-radius: 0;
         border-bottom-right-radius: 0;
         border-color: darken($ic-brand-primary, 5%);
-        border-bottom: 1px solid darken($ic-brand-primary, 5%) !important;
+        border-bottom: 1px solid darken($ic-brand-primary, 5%);
         background: $ic-brand-primary;
         &.ui-state-focus {
           border-color: darken($ic-brand-primary, 10%);
-          border-bottom: 1px solid darken($ic-brand-primary, 10%) !important;
+          border-bottom: 1px solid darken($ic-brand-primary, 10%);
           a { @include button-focus-dark; }
         }
       }

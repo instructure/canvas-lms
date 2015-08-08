@@ -40,21 +40,25 @@ def download_from_preview
   f('.icon-download').click
 end
 
-def delete_from_cog_icon(row_selected = 0)
-  ff('.al-trigger')[row_selected].click
-  fln("Delete").click
+def delete(row_selected = 0, delete_using = :cog_icon)
+  if delete_using == :cog_icon
+    ff('.al-trigger')[row_selected].click
+    fln("Delete").click
+  elsif delete_using == :toolbar_menu
+    ff('.ef-item-row')[row_selected].click
+    f('.btn-delete').click
+  end
   confirm_delete_on_dialog
 end
 
-def delete_from_toolbar(row_selected = 0)
-  ff('.ef-item-row')[row_selected].click
-  f('.btn-delete').click
-  confirm_delete_on_dialog
-end
-
-def move_using_cog_icon(file_name, row_selected = 0)
-  ff('.al-trigger')[row_selected].click
-  fln("Move").click
+def move(file_name, row_selected = 0, move_using = :cog_icon)
+  if move_using == :cog_icon
+    ff('.al-trigger')[row_selected].click
+    fln("Move").click
+  elsif move_using ==  :toolbar_menu
+    ff('.ef-item-row')[row_selected].click
+    f('.btn-move').click
+  end
   wait_for_ajaximations
   expect(f(".ReactModal__Header-Title h4").text).to eq "Where would you like to move #{file_name}?"
   ff(".treeLabel span")[3].click
@@ -63,9 +67,30 @@ def move_using_cog_icon(file_name, row_selected = 0)
   ff(".btn-primary")[1].click
 end
 
+def move_multiple_using_toolbar(files = [])
+  files.each do |file_name|
+    file = driver.find_element(xpath: "//span[contains(text(), '#{file_name}') and @class='media-body']")
+                 .find_element(xpath: "../..")
+    driver.action.key_down(:control).click(file).key_up(:control).perform
+  end
+  wait_for_ajaximations
+  f('.btn-move').click
+  wait_for_ajaximations
+  expect(f(".ReactModal__Header-Title h4").text).to eq "Where would you like to move these #{files.count} items?"
+  ff(".treeLabel span")[3].click
+  driver.action.send_keys(:return).perform
+  wait_for_ajaximations
+  ff(".btn-primary")[1].click
+end
+
 #This method sets permissions on files/folders
-def set_item_permissions(permission_type = :publish, restricted_access_option = nil)
-  f('.btn-link.published-status').click
+def set_item_permissions(permission_type = :publish, restricted_access_option = nil, set_permissions_from = :cloud_icon)
+  if set_permissions_from == :cloud_icon
+    f('.btn-link.published-status').click
+  elsif set_permissions_from == :toolbar_menu
+    ff('.ef-item-row')[0].click
+    f('.btn-restrict').click
+  end
   wait_for_ajaximations
   if permission_type == :publish
      driver.find_elements(:name, 'permissions')[0].click

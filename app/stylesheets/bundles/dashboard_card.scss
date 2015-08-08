@@ -20,6 +20,10 @@ $ic-DashboardCard-action--active: $ic-brand-primary;
   margin-bottom: $ic-sp*2;
 }
 
+.ic-DashboardCard__background {
+  position: relative;
+}
+
 .ic-DashboardCard__link {
   transition: background 0.2s;
   box-sizing: border-box;
@@ -39,7 +43,7 @@ $ic-DashboardCard-action--active: $ic-brand-primary;
   }
   // if NOT high contrast, do not show ugly underline on :hover, but DO show it on :focus
   @if $use_high_contrast == false {
-    &:hover { text-decoration: none; }  
+    &:hover { text-decoration: none; }
   }
 }
 
@@ -53,6 +57,16 @@ $ic-DashboardCard-action--active: $ic-brand-primary;
   @include breakpoint(short) { max-height: $ic-sp*9; }
 }
 
+.ic-DashboardCard__header-button {
+  position: absolute;
+  top: $ic-sp/2; right: $ic-sp/2;
+}
+
+.ic-DashboardCard_settings_icon {
+  color: #fff;
+  opacity: 0.6;
+}
+
 .ic-DashboardCard__header-title {
   transition: all 0.2s ease-out;
   transform: translate3d(0,0,0);
@@ -62,7 +76,7 @@ $ic-DashboardCard-action--active: $ic-brand-primary;
   line-height: 1.3;
   font-size: $baseFontSize + 2;
   font-weight: 500;
-  @include breakpoint(wide) { 
+  @include breakpoint(wide) {
     font-size: $baseFontSize + 3;
     @include breakpoint(short) { font-size: $baseFontSize + 2; }
   }
@@ -84,6 +98,7 @@ $ic-DashboardCard-action--active: $ic-brand-primary;
   align-items: center;
   .ic-DashboardCard__action {
     transition: background 0.2s, color 0.2s;
+    background-color: $ic-color-light;
     flex: 1;
     display: block; // fix for IE10
     position: relative; // for :after alignment

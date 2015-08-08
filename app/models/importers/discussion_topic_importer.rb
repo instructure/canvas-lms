@@ -1,3 +1,5 @@
+require_dependency 'importers'
+
 module Importers
   class DiscussionTopicImporter < Importer
 
@@ -110,6 +112,10 @@ module Importers
 
       if options[:attachment_ids].present?
         item.message += Attachment.attachment_list_from_migration(context, options[:attachment_ids])
+      end
+
+      if options[:has_group_category]
+        item.group_category ||= context.group_categories.active.where(:name => I18n.t("Project Groups")).first_or_create
       end
 
       item.save_without_broadcasting!

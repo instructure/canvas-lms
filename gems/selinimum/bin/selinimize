@@ -1,0 +1,60 @@
+#!/usr/bin/env ruby
+
+require "getoptlong"
+require_relative "../lib/selinimum"
+
+opts = GetoptLong.new(
+  [ "--help", "-h", GetoptLong::NO_ARGUMENT ],
+  [ "--sha", "-s", GetoptLong::REQUIRED_ARGUMENT ],
+  [ "--json-path", "-j", GetoptLong::REQUIRED_ARGUMENT ]
+)
+sha = nil
+json_path = nil
+opts.each do |opt, arg|
+  case opt
+  when "--sha"
+    sha = arg
+  when "--json-path"
+    json_path = arg
+  when "--help"
+    puts <<-HELP
+selinimize [-h] [-s sha [-j json-path]] file ...
+
+outputs a selinimized file list (or the original list, if selinimization
+can't be done)
+
+-h, --help:
+    show help
+
+-s, --sha <SHA>:
+    defaults to the nearest ancestor commit that has a post-merge selenium
+    run with captured spec dependency data. file arguments will be
+    selenimized relative to <SHA>; any changes between <SHA>..HEAD will be
+    cross referenced with <SHA>'s spec dependency data to see if
+    selinimization is possible (and to what extent)
+
+-j, --json-path <PATH>:
+    load spec dependency json files from this path instead of fetching
+    from S3; useful for local testing, ignored if -s is not set
+HELP
+    exit
+  end
+end
+
+def fail(error)
+  $stderr.puts("ERROR: #{error}")
+  $stderr.puts("usage: selinimize [options] file ...")
+  exit 1
+end
+
+spec_files = ARGV
+
+fail "no files specified" if spec_files.empty?
+
+begin
+  spec_files = Selinimum.minimize!(spec_files, {sha: sha, json_path: json_path, verbose: true})
+rescue Selinimum::SelinimumError
+  fail $!
+end
+
+puts spec_files.join(" ")

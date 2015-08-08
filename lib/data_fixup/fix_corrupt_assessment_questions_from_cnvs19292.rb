@@ -100,10 +100,10 @@ DataFixup::FixCorruptAssessmentQuestionsFromCnvs19292 = Struct.new(:question_typ
 
     query = AssessmentQuestion
             .joins(:assessment_question_bank => {:quiz_groups => :quiz})
-            .joins('INNER JOIN quiz_questions
+            .joins("INNER JOIN #{Quizzes::QuizQuestion.quoted_table_name}
                       ON quiz_questions.assessment_question_id = assessment_questions.id
                       AND quiz_questions.quiz_id = quizzes.id
-                  ')
+                  ")
             .where("quiz_questions.updated_at > assessment_questions.updated_at")
             .where(question_type_queries)
 

@@ -1,4 +1,6 @@
-<% entry_exists = entry && entry ? true : false
+<%
+  entry ||= nil
+  entry_exists = entry && entry ? true : false
   out_of_context ||= false
   entry_context ||= entry && entry.context ? entry.context : @context
   entry_id = entry ? entry.id : "{{ id }}"
@@ -88,7 +90,7 @@
           </div>
         <% end %>
         <% entries.each_with_index do |entry, idx| %>
-          <%= render :partial => "discussion_topics/sub_entry", :object => entry, :locals => {:hide_entry => entries.length > 3 && idx < entries.length - 2 && !@context.try_rescue(:show_all_discussion_entries)} %>
+          <%= render :partial => "discussion_topics/sub_entry", :locals => {:entry => entry, :hide_entry => entries.length > 3 && idx < entries.length - 2 && !@context.try_rescue(:show_all_discussion_entries)} %>
         <% end %>
       <% end %>
       <% if entry && entry.editor_id && entry.editor_id != entry.user_id %>
@@ -101,7 +103,7 @@
           <a href="#" class="add_entry_link textarea"><%= t :make_side_comment, "Make a Side Comment..." %></a>
         </div>
       </div>
-      <%= render :partial => 'discussion_topics/sub_entry', :object => nil, :locals => {:parent_entry => entry || topic} %>
+      <%= render :partial => 'discussion_topics/sub_entry', :locals => {:entry => nil, :parent_entry => entry || topic} %>
     </div>
   </div>
   <div style="display: none;">

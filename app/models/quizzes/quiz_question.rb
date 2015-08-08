@@ -55,7 +55,7 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
   before_destroy :delete_assessment_question, unless: :generated?
   before_destroy :update_quiz
   validates_presence_of :quiz_id
-  serialize :question_data
+  serialize_utf8_safe :question_data
   after_save :update_quiz
 
   workflow do

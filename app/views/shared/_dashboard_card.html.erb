@@ -1,4 +1,6 @@
 <% js_bundle :dashboard_card %>
-<% jammit_css :dashboard_card %>
+<% css_bundle :dashboard_card %>
+
+<% js_env :DASHBOARD_COURSES => map_courses_for_menu(@current_user.menu_courses, :include_section_tabs => true) %>
 
 <div id="DashboardCard_Container"></div>

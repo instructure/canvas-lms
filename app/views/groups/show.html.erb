@@ -1,5 +1,5 @@
 <% content_for :page_title do %><%= join_title @group.name, @context.full_name %><% end %>
-<% jammit_css :dashboard %>
+<% css_bundle :dashboard %>
 <% js_bundle :dashboard %>
 <%  @active_tab = "home" %>
 <% content_for :auto_discovery do %>

@@ -67,12 +67,12 @@ class Notification < ActiveRecord::Base
 
   end
 
-  def self.all
-    @all ||= super.to_a.each(&:readonly!)
+  def self.all_cached
+    @all ||= self.all.to_a.each(&:readonly!)
   end
 
   def self.find(id, options = {})
-    (@all_by_id ||= all.index_by(&:id))[id.to_i] or raise ActiveRecord::RecordNotFound
+    (@all_by_id ||= all_cached.index_by(&:id))[id.to_i] or raise ActiveRecord::RecordNotFound
   end
 
   def self.reset_cache!
@@ -166,7 +166,7 @@ class Notification < ActiveRecord::Base
   def self.dashboard_categories(user = nil)
     seen_types = {}
     res = []
-    Notification.all.each do |n|
+    Notification.all_cached.each do |n|
       if !seen_types[n.category] && (user.nil? || n.relevant_to_user?(user))
         seen_types[n.category] = true
         res << n if n.category && n.dashboard?

@@ -1,5 +1,5 @@
 <%
-  jammit_css :quizzes
+  css_bundle :quizzes
   js_bundle :quizzes_bundle
   js_env :QUIZZES => {:QUIZ => true}
   content_for :page_title, (@quiz.quiz_title || !@quiz.quiz_title.empty? ? @quiz.quiz_title : t(:default_page_title, 'New Quiz'))

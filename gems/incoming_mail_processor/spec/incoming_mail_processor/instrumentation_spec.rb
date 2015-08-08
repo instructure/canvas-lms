@@ -9,7 +9,7 @@ describe IncomingMailProcessor::Instrumentation do
 
   let(:single_config) do
     { 'imap' => {
-        'username' => "fake@fake.fake"
+        'address' => "fake@fake.fake"
       }
     }
   end
@@ -34,7 +34,7 @@ describe IncomingMailProcessor::Instrumentation do
     it 'should push to statsd for one mailbox' do
       IncomingMailProcessor::IncomingMessageProcessor.configure(single_config)
 
-      CanvasStatsd::Statsd.expects(:gauge).with("incoming_mail_processor.fake@fake_fake",4)
+      CanvasStatsd::Statsd.expects(:gauge).with("incoming_mail_processor.mailbox_queue_size.fake@fake_fake",4)
 
       IncomingMailProcessor::Instrumentation.process
     end
@@ -42,9 +42,9 @@ describe IncomingMailProcessor::Instrumentation do
     it 'should push to statsd for multiple mailboxes' do
       IncomingMailProcessor::IncomingMessageProcessor.configure(multi_config)
 
-      CanvasStatsd::Statsd.expects(:gauge).with("incoming_mail_processor.user1@fake_fake", 4)
-      CanvasStatsd::Statsd.expects(:gauge).with("incoming_mail_processor.user3@fake_fake", 0)
-      CanvasStatsd::Statsd.expects(:gauge).with("incoming_mail_processor.user4@fake_fake", 50)
+      CanvasStatsd::Statsd.expects(:gauge).with("incoming_mail_processor.mailbox_queue_size.user1@fake_fake", 4)
+      CanvasStatsd::Statsd.expects(:gauge).with("incoming_mail_processor.mailbox_queue_size.user3@fake_fake", 0)
+      CanvasStatsd::Statsd.expects(:gauge).with("incoming_mail_processor.mailbox_queue_size.user4@fake_fake", 50)
 
       IncomingMailProcessor::Instrumentation.process
     end

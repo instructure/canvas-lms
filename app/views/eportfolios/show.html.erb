@@ -1,7 +1,7 @@
 <% content_for :page_title do %><%= join_title @page.name, @category.name, @portfolio.name %><% end %>
 <%
   js_bundle :eportfolio
-  jammit_css :tinymce
+  css_bundle :tinymce
   @no_left_side_list_view = true
 %>
 

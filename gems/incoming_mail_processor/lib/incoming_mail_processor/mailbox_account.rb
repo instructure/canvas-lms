@@ -35,5 +35,9 @@ module IncomingMailProcessor
     def address
       @address ||= self.class.default_outgoing_email
     end
+
+    def escaped_address
+      CanvasStatsd::Statsd.escape(address) unless address.nil?
+    end
   end
 end

@@ -48,7 +48,7 @@ module Mutable
     if self.respond_to? :submissions
       stream_items = StreamItem.select([:id, :context_type, :context_id]).
           where(:asset_type => 'Submission', :asset_id => submissions).
-          includes(:context).to_a
+          preload(:context).to_a
       stream_item_contexts = stream_items.map { |si| [si.context_type, si.context_id] }
       associated_shards = stream_items.inject([]) { |result, si| result | si.associated_shards }
       Shard.with_each_shard(associated_shards) do
@@ -63,7 +63,7 @@ module Mutable
       submissions        = submissions(:include => {:hidden_submission_comments => :author})
       stream_items = StreamItem.select([:id, :context_type, :context_id]).
           where(:asset_type => 'Submission', :asset_id => submissions).
-          includes(:context).to_a
+          preload(:context).to_a
       stream_item_contexts = stream_items.map { |si| [si.context_type, si.context_id] }
       associated_shards = stream_items.inject([]) { |result, si| result | si.associated_shards }
       Shard.with_each_shard(associated_shards) do

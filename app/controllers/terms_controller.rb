@@ -24,7 +24,7 @@ class TermsController < ApplicationController
   def index
     @root_account = @context.root_account
     @context.default_enrollment_term
-    @terms = @context.enrollment_terms.active.includes(:enrollment_dates_overrides).order("COALESCE(start_at, created_at) DESC").to_a
+    @terms = @context.enrollment_terms.active.preload(:enrollment_dates_overrides).order("COALESCE(start_at, created_at) DESC").to_a
   end
   
   # @API Create enrollment term

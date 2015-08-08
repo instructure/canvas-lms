@@ -37,7 +37,12 @@ module ShardedBookmarkedCollection
     # not the result of association.with_each_shard because we don't want it to
     # flatten our list of pairs
     collections = []
-    association.with_each_shard do |sharded_association|
+    association = association.scoped
+    if association.is_a?(ActiveRecord::Relation) && association.shard_category != :explicit &&
+        owner = (association.respond_to?(:proxy_association) && association.proxy_association.try(:owner))
+      association = association.shard(owner)
+    end
+    association.activate do |sharded_association|
       sharded_association = yield sharded_association if block_given?
       collections << [Shard.current.id, BookmarkedCollection.wrap(bookmarker, sharded_association)]
       nil

@@ -4,7 +4,7 @@ def ping
   STDOUT.sync = true
   print '.'
 end
-  
+
 def create_notification(values = {})
   ping
   Canvas::MessageHelper.create_notification(values)
@@ -97,11 +97,11 @@ namespace :db do
         puts "No notification found in db for #{name}" unless Notification.where(name: titled).first
       end
     end
-    Notification.all.each do |n|
+    Notification.all_cached.each do |n|
       puts "No notification files found for #{n.name}" if Dir.glob(Rails.root.join('app', 'messages', "#{n.name.downcase.gsub(/\s/, '_')}.*.erb")).empty?
     end
   end
-  
+
   desc "Find or create the notifications"
   task :load_notifications => :load_environment do
     # Load the "notification_types.yml" file that provides initial values for the notifications.
@@ -180,7 +180,7 @@ namespace :db do
       end
     end
   end
-  
+
   desc "Configure usage statistics collection"
   task :configure_statistics_collection => [:load_environment] do
     gather_data = ENV["CANVAS_LMS_STATS_COLLECTION"] || ""
@@ -204,25 +204,25 @@ namespace :db do
           puts "You have opted out."
         }
       end
-    
+
       puts "You can change this feature at any time by running the rake task 'rake db:configure_statistics_collection'"
     end
-    
+
     Setting.set("usage_statistics_collection", gather_data)
     Reporting::CountsReport.process
   end
-  
+
   desc "Configure default settings"
   task :configure_default_settings => :load_environment do
     Setting.set("support_multiple_account_types", "false")
     Setting.set("show_opensource_linkback", "true")
   end
-  
+
   desc "generate data"
   task :generate_data => [:configure_default_settings, :load_notifications, :ensure_scribd_mime_types,
       :evaluate_notification_templates] do
   end
-  
+
   desc "Configure Default Account Name"
   task :configure_account_name => :load_environment do
     if (ENV['CANVAS_LMS_ACCOUNT_NAME'] || "").empty?
@@ -241,14 +241,14 @@ namespace :db do
       a.save!
     end
   end
-  
+
   desc "Create all the initial data, including notifications and admin account"
   task :load_initial_data => [:create_default_accounts, :configure_admin, :configure_account_name, :configure_statistics_collection, :generate_data] do
-   
+
     puts "\nInitial data loaded"
-    
+
   end # Task: load_initial_data
-  
+
   desc "Useful initial setup task"
   task :initial_setup => [:generate_security_key, :migrate] do
     load 'app/models/pseudonym.rb'
@@ -256,7 +256,7 @@ namespace :db do
     ActiveRecord::Base.all_models.reject{ |m| m == Shard }.each(&:reset_column_information)
     Rake::Task['db:load_initial_data'].invoke
   end
-  
+
 end # Namespace: db
 
 

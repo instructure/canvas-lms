@@ -1,4 +1,4 @@
-  <% jammit_css :user_logins %>
+  <% css_bundle :user_logins %>
   <% js_bundle :user_logins %>
   <% js_env :PASSWORD_POLICY => (@domain_root_account.try(:password_policy) || {}) %>
   <fieldset id="login_information">

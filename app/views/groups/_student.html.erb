@@ -1,3 +1,4 @@
+<% student ||= nil %>
 <% sections = student && student.sections_for_course(@context) %>
 <li class="student user_<%= student ? student.id : "blank" %>" title="<%= t :drag_drop_instructions, "Click and Drag to move student to another group" %>">
   <div class="name"><%= student.last_name_first rescue "" %></div>

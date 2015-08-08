@@ -1,0 +1,16 @@
+defaults: &defaults
+  # host: 'the hostname to use for static asset cdn, eg: https://mydistribution.cloudfront.net'
+  # bucket: "name of the s3 bucket to push things to"
+  # aws_access_key_id: "secret aws_access_key_id that has write access to that bucket"
+  # aws_secret_access_key: "secret_access_key for that access_key_id"
+  # enabled: true #set false to not push anything to s3 and serve assets from same hostname as rails
+
+development:
+  <<: *defaults
+
+test:
+  <<: *defaults
+  enabled: false
+
+production:
+  <<: *defaults

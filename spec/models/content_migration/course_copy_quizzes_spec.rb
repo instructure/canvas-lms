@@ -904,5 +904,22 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
       expect(qq2.question_data['question_text']).to eq expected_html
       expect(other_quiz2.quiz_data.first['question_text']).to eq expected_html
     end
+
+    it "should properly copy escaped brackets in html comments" do
+      bank1 = @copy_from.assessment_question_banks.create!(:title => 'bank')
+      text = "&lt;braaackets&gt;"
+      q = bank1.assessment_questions.create!(:question_data => {
+          "question_type" => "multiple_choice_question", 'name' => 'test question',
+          'answers' => [{'id' => 1, "text" => "Correct", "weight" => 100, "comments_html" => text},
+            {'id' => 2, "text" => "inorrect", "weight" => 0}],
+          "correct_comments_html" => text
+        })
+
+      run_course_copy
+
+      q2 = @copy_to.assessment_questions.first
+      expect(q2.question_data['correct_comments_html']).to eq text
+      expect(q2.question_data['answers'].first['comments_html']).to eq text
+    end
   end
 end

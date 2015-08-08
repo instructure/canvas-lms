@@ -17,7 +17,7 @@
 #
 
 # # enforce the version of bundler itself, to avoid any surprises
-req_bundler_version_floor, req_bundler_version_ceiling = '1.7.10', '1.10.3'
+req_bundler_version_floor, req_bundler_version_ceiling = '1.7.10', '1.10.5'
 bundler_requirements = [">=#{req_bundler_version_floor}",
                         "<=#{req_bundler_version_ceiling}"]
 gem 'bundler', bundler_requirements

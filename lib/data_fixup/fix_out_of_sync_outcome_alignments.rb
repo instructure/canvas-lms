@@ -2,7 +2,7 @@ module DataFixup::FixOutOfSyncOutcomeAlignments
   def self.run
     # Active alignments to deleted rubrics
     scope = ContentTag.joins("
-      INNER JOIN rubrics r
+      INNER JOIN #{Rubric.quoted_table_name} r
         ON content_tags.content_id = r.id
         AND content_tags.content_type = 'Rubric'
     ").select("content_tags.*")
@@ -17,7 +17,7 @@ module DataFixup::FixOutOfSyncOutcomeAlignments
 
     # Active alignments to rubrics that should no longer be aligned
     scope = ContentTag.joins("
-      INNER JOIN rubrics r
+      INNER JOIN #{Rubric.quoted_table_name} r
         ON content_tags.content_id = r.id
         AND content_tags.content_type = 'Rubric'
     ").select("content_tags.*")
@@ -33,10 +33,10 @@ module DataFixup::FixOutOfSyncOutcomeAlignments
 
     # Active alignments to assignments without rubrics
     scope = ContentTag.joins("
-      INNER JOIN assignments a
+      INNER JOIN #{Assignment.quoted_table_name} a
         ON content_tags.content_id = a.id
         AND content_tags.content_type = 'Assignment'
-      LEFT OUTER JOIN rubric_associations ra
+      LEFT OUTER JOIN #{RubricAssociation.quoted_table_name} ra
         ON ra.association_id = a.id
         AND ra.association_type = 'Assignment'
     ").select("content_tags.*")
@@ -52,15 +52,15 @@ module DataFixup::FixOutOfSyncOutcomeAlignments
     # Active alignments to assignments with rubrics
     # that don't have a matching alignment
     scope = ContentTag.joins("
-      INNER JOIN assignments a
+      INNER JOIN #{Assignment.quoted_table_name} a
         ON content_tags.content_id = a.id
         AND content_tags.content_type = 'Assignment'
-      INNER JOIN rubric_associations ra
+      INNER JOIN #{RubricAssociation.quoted_table_name} ra
         ON ra.association_id = a.id
         AND ra.association_type = 'Assignment'
-      INNER JOIN rubrics r
+      INNER JOIN #{Rubric.quoted_table_name} r
         ON ra.rubric_id = r.id
-      LEFT OUTER JOIN content_tags ct2
+      LEFT OUTER JOIN #{ContentTag.quoted_table_name} ct2
         ON ct2.content_id = r.id
         AND ct2.content_type = 'Rubric'
         AND ct2.tag_type = 'learning_outcome'

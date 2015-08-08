@@ -199,6 +199,22 @@ module PostgreSQLAdapterExtensions
       super
     end
   end
+
+  def extension_installed?(extension)
+    @extensions ||= {}
+    @extensions.fetch(extension) do
+      select_value(<<-SQL)
+        SELECT nspname
+        FROM pg_extension
+          INNER JOIN pg_namespace ON extnamespace=pg_namespace.oid
+        WHERE extname='#{extension}'
+      SQL
+    end
+  end
+
+  def extension_available?(extension)
+    select_value("SELECT 1 FROM pg_available_extensions WHERE name='#{extension}'").to_i == 1
+  end
 end
 
 ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.prepend(PostgreSQLAdapterExtensions)

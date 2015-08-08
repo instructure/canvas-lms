@@ -26,13 +26,13 @@ class AddRoleIdColumns < ActiveRecord::Migration
 
       # de-duplicate roles in same account chain into their parents
       delete_duplicate_roles_sql = "
-        UPDATE roles SET workflow_state = 'deleted' WHERE roles.workflow_state = 'active' AND EXISTS (
-          SELECT id FROM roles AS other_role WHERE roles.id <> other_role.id AND roles.name = other_role.name AND
+        UPDATE #{Role.quoted_table_name} SET workflow_state = 'deleted' WHERE roles.workflow_state = 'active' AND EXISTS (
+          SELECT id FROM #{Role.quoted_table_name} AS other_role WHERE roles.id <> other_role.id AND roles.name = other_role.name AND
           roles.root_account_id = other_role.root_account_id AND other_role.workflow_state = 'active' AND other_role.account_id IN (
             WITH RECURSIVE t AS (
-              SELECT * FROM accounts WHERE id=roles.account_id
+              SELECT * FROM #{Account.quoted_table_name} WHERE id=roles.account_id
               UNION
-              SELECT accounts.* FROM accounts INNER JOIN t ON accounts.id=t.parent_account_id
+              SELECT accounts.* FROM #{Account.quoted_table_name} INNER JOIN t ON accounts.id=t.parent_account_id
             )
             SELECT id FROM t
           ) LIMIT 1

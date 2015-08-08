@@ -6,7 +6,7 @@ describe "editing grades" do
     gradebook_data_setup
   end
 
-  context 'submission details dialog' do
+  context 'submission details dialog', priority: "1", test_id: 220305 do
     it 'successfully grades a submission' do
       get "/courses/#{@course.id}/gradebook"
       wait_for_ajaximations
@@ -21,7 +21,7 @@ describe "editing grades" do
     end
   end
 
-  it "should update a graded quiz and have the points carry over to the quiz attempts page" do
+  it "should update a graded quiz and have the points carry over to the quiz attempts page", priority: "1", test_id: 220310 do
     points = 50
     q = factory_with_protected_attributes(@course.quizzes, :title => "new quiz", :points_possible => points, :quiz_type => 'assignment', :workflow_state => 'available')
     q.save!
@@ -38,7 +38,7 @@ describe "editing grades" do
     expect(f('#after_fudge_points_total').text).to eq points.to_s
   end
 
-  it "should treat ungraded as 0s when asked, and ignore when not" do
+  it "should treat ungraded as 0s when asked, and ignore when not", priority: "1", test_id: 164222 do
     get "/courses/#{@course.id}/gradebook"
     wait_for_ajaximations
 
@@ -64,11 +64,17 @@ describe "editing grades" do
 
     # NOTE: gradebook1 does not handle 'remembering' the `include_ungraded_assignments` setting
 
+    # check that reverting back to unchecking 'include_ungraded_assignments' also reverts grades
+    open_gradebook_settings(f('label[for="include_ungraded_assignments"]'))
+    expect(is_checked('#include_ungraded_assignments')).to be_falsey
+    expect(final_score_for_row(0)).to eq @student_1_total_ignoring_ungraded
+    expect(final_score_for_row(1)).to eq @student_2_total_ignoring_ungraded
+
     # clear our saved settings
     driver.execute_script 'localStorage.clear();'
   end
 
-  it "should validate initial grade totals are correct" do
+  it "should validate initial grade totals are correct", priority: "1", test_id: 220311 do
     get "/courses/#{@course.id}/gradebook"
     wait_for_ajaximations
 
@@ -76,7 +82,7 @@ describe "editing grades" do
     expect(final_score_for_row(1)).to eq @student_2_total_ignoring_ungraded
   end
 
-  it "should change grades and validate course total is correct" do
+  it "should change grades and validate course total is correct", priority: "1", test_id: 220312 do
     expected_edited_total = "33.33%"
     get "/courses/#{@course.id}/gradebook"
 
@@ -93,7 +99,7 @@ describe "editing grades" do
     expect(final_score_for_row(1)).to eq expected_edited_total
   end
 
-  it "should allow setting a letter grade on a no-points assignment" do
+  it "should allow setting a letter grade on a no-points assignment", priority: "1", test_id: 220313 do
     assignment_model(:course => @course, :grading_type => 'letter_grade', :points_possible => nil, :title => 'no-points')
     get "/courses/#{@course.id}/gradebook"
     wait_for_ajaximations
@@ -107,7 +113,7 @@ describe "editing grades" do
     expect(sub.score).to eq 0.0
   end
 
-  it "should not update default grades for users not in this section" do
+  it "should not update default grades for users not in this section", priority: "1", test_id: 220314 do
     # create new user and section
 
     get "/courses/#{@course.id}/gradebook"
@@ -120,7 +126,7 @@ describe "editing grades" do
     @course.default_section.users.each { |u| expect(u.submissions.map(&:grade)).not_to include '13' }
   end
 
-  it "should edit a grade, move to the next cell and validate focus is not lost" do
+  it "should edit a grade, move to the next cell and validate focus is not lost", priority: "1", test_id: 220318 do
     get "/courses/#{@course.id}/gradebook"
     wait_for_ajaximations
 
@@ -135,7 +141,7 @@ describe "editing grades" do
     expect(f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l3')).to have_class('editable')
   end
 
-  it "should display dropped grades correctly after editing a grade" do
+  it "should display dropped grades correctly after editing a grade", priority: "1", test_id: 220316 do
     @course.assignment_groups.first.update_attribute :rules, 'drop_lowest:1'
     get "/courses/#{@course.id}/gradebook"
     wait_for_ajaximations
@@ -158,7 +164,7 @@ describe "editing grades" do
     expect(f(assignment_2_sel)['class']).to include 'dropped'
   end
 
-  it "should update a grade when clicking outside of slickgrid" do
+  it "should update a grade when clicking outside of slickgrid", priority: "1", test_id: 220319 do
     get "/courses/#{@course.id}/gradebook"
     wait_for_ajaximations
 
@@ -173,7 +179,7 @@ describe "editing grades" do
     expect(ff('.gradebook_cell_editable').count).to eq 0
   end
 
-  it "should validate curving grades option" do
+  it "should validate curving grades option", priority: "1", test_id: 220320 do
     curved_grade_text = "8"
 
     get "/courses/#{@course.id}/gradebook"
@@ -193,7 +199,7 @@ describe "editing grades" do
     expect(find_slick_cells(1, f('#gradebook_grid .container_1'))[0].text).to eq curved_grade_text
   end
 
-  it "should optionally assign zeroes to unsubmitted assignments during curving" do
+  it "should optionally assign zeroes to unsubmitted assignments during curving", priority: "1", test_id: 220321 do
     get "/courses/#{@course.id}/gradebook"
 
     wait_for_ajaximations
@@ -216,7 +222,7 @@ describe "editing grades" do
     expect(find_slick_cells(1, f('#gradebook_grid .container_1'))[0].text).to eq '0'
   end
 
-  it "should correctly set default grades for a specific section" do
+  it "should correctly set default grades for a specific section"  do
       skip("intermittently fails")
       open_section_menu_and_click ->(menu_item_css) do
         f('#section_to_show').click
@@ -237,7 +243,7 @@ describe "editing grades" do
       validate_cell_text(f("#{gradebook_row_1} .r2"), '-')
   end
 
-  it "should not factor non graded assignments into group total" do
+  it "should not factor non graded assignments into group total", priority: "1", test_id: 220323 do
     expected_totals = [@student_1_total_ignoring_ungraded, @student_2_total_ignoring_ungraded]
     ungraded_submission = @ungraded_assignment.submit_homework(@student_1, :body => 'student 1 submission ungraded assignment')
     @ungraded_assignment.grade_student(@student_1, :grade => 20)
@@ -250,7 +256,7 @@ describe "editing grades" do
     end
   end
 
-  it "should validate setting default grade for an assignment" do
+  it "should validate setting default grade for an assignment", priority: "1", test_id: 220383 do
     expected_grade = "45"
     get "/courses/#{@course.id}/gradebook"
     wait_for_ajaximations
@@ -261,7 +267,7 @@ describe "editing grades" do
     end
   end
 
-  it "should display an error on failed updates" do
+  it "should display an error on failed updates", priority: "1", test_id: 220384 do
     SubmissionsApiController.any_instance.expects(:update).returns('bad response')
     get "/courses/#{@course.id}/gradebook"
     wait_for_ajaximations

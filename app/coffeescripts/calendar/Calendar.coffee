@@ -20,6 +20,7 @@ define [
   'compiled/views/calendar/CalendarNavigator'
   'compiled/views/calendar/AgendaView'
   'compiled/calendar/CalendarDefaults'
+  'compiled/contextColorer'
   'compiled/util/deparam'
   'str/htmlEscape'
 
@@ -28,7 +29,7 @@ define [
   'jquery.instructure_misc_plugins'
   'vendor/jquery.ba-tinypubsub'
   'jqueryui/button'
-], (I18n, $, _, userSettings, hsvToRgb, colorSlicer, calendarAppTemplate, EventDataSource, commonEventFactory, ShowEventDetailsDialog, EditEventDetailsDialog, Scheduler, CalendarNavigator, AgendaView, calendarDefaults, deparam, htmlEscape) ->
+], (I18n, $, _, userSettings, hsvToRgb, colorSlicer, calendarAppTemplate, EventDataSource, commonEventFactory, ShowEventDetailsDialog, EditEventDetailsDialog, Scheduler, CalendarNavigator, AgendaView, calendarDefaults, ContextColorer, deparam, htmlEscape) ->
 
   class Calendar
     constructor: (selector, @contexts, @manageContexts, @dataSource, @options) ->
@@ -677,11 +678,17 @@ define [
           '/api/v1/users/' + @options.userId + '/colors/'
           (data) =>
             customColors = data.custom_colors
-
             colors = colorSlicer.getColors(@contextCodes.length, 275, {unsafe: !ENV.use_high_contrast})
+
+            newCustomColors = {}
             html = (for contextCode, index in @contextCodes
               # Use a custom color if found.
-              color = if customColors[contextCode] then customColors[contextCode] else colors[index]
+              if customColors[contextCode]
+                color = customColors[contextCode]
+              else
+                color = colors[index]
+                newCustomColors[contextCode] = color
+
               color = htmlEscape(color)
               contextCode = htmlEscape(contextCode)
               ".group_#{contextCode}{
@@ -690,6 +697,8 @@ define [
                  background-color: #{color};
               }"
             ).join('')
+
+            ContextColorer.persistContextColors(newCustomColors, @options.userId)
 
             $styleContainer.html "<style>#{html}</style>"
       )

@@ -81,7 +81,7 @@ class ConversationMessage < ActiveRecord::Base
 
       Shackles.activate(:slave) do
         ret = where(base_conditions).
-          joins('JOIN conversation_message_participants ON conversation_messages.id = conversation_message_id').
+          joins("JOIN #{ConversationMessageParticipant.quoted_table_name} ON conversation_messages.id = conversation_message_id").
           select("conversation_messages.*, conversation_participant_id, conversation_message_participants.user_id, conversation_message_participants.tags").
           order('conversation_id DESC, user_id DESC, created_at DESC').
           distinct_on(:conversation_id, :user_id).to_a
@@ -287,7 +287,7 @@ class ConversationMessage < ActiveRecord::Base
   end
 
   def forwarded_messages
-    @forwarded_messages ||= forwarded_message_ids && self.class.send(:with_exclusive_scope){ self.class.where(id: forwarded_message_ids.split(',')).order('created_at DESC').to_a} || []
+    @forwarded_messages ||= forwarded_message_ids && self.class.unscoped { self.class.where(id: forwarded_message_ids.split(',')).order('created_at DESC').to_a} || []
   end
 
   def all_forwarded_messages

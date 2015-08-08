@@ -49,10 +49,10 @@ describe Api::V1::GradebookHistory do
     let_once(:course) { Course.create! }
 
     before :once do
-      students = (1..3).inject([]) do |memo, _idx|
+      students = (1..3).map do |_idx|
         student = User.create!
         course.enroll_student(student)
-        memo << student
+        student
       end
       @grader1 = User.create!(:name => 'grader 1')
       @grader2 = User.create!(:name => 'grader 2')

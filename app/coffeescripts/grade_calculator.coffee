@@ -1,6 +1,7 @@
 define [
   'underscore'
-], (_) ->
+  'compiled/util/round'
+], (_, round) ->
 
   partition = (list, f) ->
     trueList  = []
@@ -108,7 +109,7 @@ define [
     # This approach is based on the algorithm described in "Dropping Lowest
     # Grades" by Daniel Kane and Jonathan Kane.  Please see that paper for
     # a full explanation of the math.
-    # (http://web.mit.edu/dankane/www/droplowest.pdf)
+    # (http://cseweb.ucsd.edu/~dakane/droplowest.pdf)
     @dropAssignments: (submissions, rules) ->
       rules or= {}
       dropLowest   = rules.drop_lowest  || 0
@@ -246,7 +247,7 @@ define [
         else if fullWeight < 100
           finalGrade *= 100 / fullWeight
         ret =
-          score: finalGrade && Math.round(finalGrade * 10) / 10
+          score: finalGrade && round(finalGrade, round.DEFAULT)
           possible: 100
       else
         [score, possible] = _.reduce groupSums

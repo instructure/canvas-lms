@@ -211,7 +211,7 @@ class AssignmentGroup < ActiveRecord::Base
     elsif user.nil?
       scope = context.active_assignments.published.where(:assignment_group_id => assignment_groups)
     else
-      scope = user.assignments_visibile_in_course(context).
+      scope = user.assignments_visible_in_course(context).
               where(:assignment_group_id => assignment_groups).published
     end
     includes.any? ? scope.preload(includes) : scope

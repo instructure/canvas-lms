@@ -39,7 +39,7 @@ describe "calendar2" do
         expect(fj('.agenda-wrapper:visible')).to be_present
       end
 
-      it "should set the header in the format 'Oct 11, 2013'", :priority => "1", :test_id => 28546 do
+      it "should set the header in the format 'Oct 11, 2013'", priority: "1", test_id: 28546 do
         start_date = Time.now.beginning_of_day + 12.hours
         event = @course.calendar_events.create!(title: "ohai",
                                                 start_at: start_date, end_at: start_date + 1.hour)
@@ -112,7 +112,7 @@ describe "calendar2" do
         expect(f('.navigation_title')).not_to include_text('Invalid')
       end
 
-      it "should allow deleting events", :priority => "1", :test_id => 138857 do
+      it "should allow deleting events", priority: "1", test_id: 138857 do
         tomorrow = 3.day.from_now
         event = make_event(start: tomorrow)
 
@@ -127,7 +127,7 @@ describe "calendar2" do
         expect(ffj('.ig-row').length).to eq 0
       end
 
-      it "should allow deleting assignments", :priority => "1", :test_id => 138858 do
+      it "should allow deleting assignments", priority: "1", test_id: 138858 do
         title = "Maniac Mansion"
         @assignment = @course.assignments.create!(:name => title,:due_at => 3.day.from_now)
 
@@ -142,7 +142,7 @@ describe "calendar2" do
         expect(ffj('.ig-row').length).to eq 0
       end
 
-      it "should allow deleting a graded discussion", :priority => "1", :test_id => 138859 do
+      it "should allow deleting a graded discussion", priority: "1", test_id: 138859 do
         create_graded_discussion
 
         load_agenda_view
@@ -156,7 +156,7 @@ describe "calendar2" do
         expect(ffj('.ig-row').length).to eq 0
       end
 
-      it "should allow deleting a quiz", :priority => "1" do
+      it "should allow deleting a quiz", priority: "1" do
         create_quiz
 
         load_agenda_view
@@ -186,7 +186,7 @@ describe "calendar2" do
         expect(fj('.event-details:visible time')).to include_text('11:59')
       end
 
-      it "should have a working today button", :priority => "1", :test_id => 28550 do
+      it "should have a working today button", priority: "1", test_id: 28550 do
         load_month_view
         #Go to a future calendar date to test going back
         change_calendar
@@ -204,7 +204,7 @@ describe "calendar2" do
         expect(f('.navigation_title').text).to include(date)
       end
 
-      it "should show the location when clicking on a calendar event", :priority => "1", :test_id => 138890 do
+      it "should show the location when clicking on a calendar event", priority: "1", test_id: 138890 do
         location_name = "brighton"
         location_address = "cottonwood"
         make_event(:location_name => location_name, :location_address => location_address)
@@ -218,7 +218,7 @@ describe "calendar2" do
         expect(f('.event-details-content').text).to include_text(location_address)
       end
 
-      it "should bring up a calendar date picker when clicking on the agenda range", :priority => "1", :test_id => 140223 do
+      it "should bring up a calendar date picker when clicking on the agenda range", priority: "1", test_id: 140223 do
         load_agenda_view
 
         #Click on the agenda header
@@ -230,7 +230,7 @@ describe "calendar2" do
         expect(f('.ui-datepicker-calendar').text).to include_text("Mo")
       end
 
-      it "show quizes on agenda view", :priority => "1", :test_id => 138850 do
+      it "show quizes on agenda view", priority: "1", test_id: 138850 do
         create_quiz
 
         load_agenda_view
@@ -245,7 +245,7 @@ describe "calendar2" do
         course_with_student_logged_in
       end
 
-    it "student can not delete events created by a teacher", :priority => "1", :test_id => 138856 do
+    it "student can not delete events created by a teacher", priority: "1", test_id: 138856 do
       # create an event as the teacher
       @course.calendar_events.create!(title: "Monkey Island", start_at: Time.zone.now.advance(days:4))
 

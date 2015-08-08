@@ -20,7 +20,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 
 describe UserList do
-  
+
   before(:each) do
     @account = Account.default
     @account.settings = { :open_registration => true }
@@ -73,7 +73,7 @@ describe UserList do
     expect(ul.errors).to eq []
     expect(ul.duplicate_addresses).to eq []
   end
-  
+
   it "should process a list of only emails, without brackets" do
     ul = UserList.new without_brackets
     expect(ul.addresses.map{|x| [x[:name], x[:address]]}).to eql([
@@ -82,7 +82,7 @@ describe UserList do
     expect(ul.errors).to eq []
     expect(ul.duplicate_addresses).to eq []
   end
-  
+
   it "should work with a mixed entry list" do
     ul = UserList.new regular + "," + %{otherryankshaw@gmail.com, otherlastfirst@gmail.com}
     expect(ul.addresses.map{|x| [x[:name], x[:address]]}).to eql([
@@ -93,7 +93,7 @@ describe UserList do
     expect(ul.errors).to eq []
     expect(ul.duplicate_addresses).to eq []
   end
-  
+
   it "should work well with a single address" do
     ul = UserList.new('ryankshaw@gmail.com')
     expect(ul.addresses.map{|x| [x[:name], x[:address]]}).to eql([
@@ -101,7 +101,7 @@ describe UserList do
     expect(ul.errors).to eq []
     expect(ul.duplicate_addresses).to eq []
   end
-  
+
   it "should remove duplicates" do
     user = User.create!(:name => 'A 123451')
     user.pseudonyms.create!(:unique_id => "A123451", :account => @account)
@@ -156,7 +156,7 @@ describe UserList do
     expect(ul.addresses.length).to eq 1
     expect(ul.duplicate_addresses.length).to eq 1
   end
-  
+
   it "should process login ids, SIS ids, and email addresses" do
     user = User.create!(:name => 'A 112351243')
     user.pseudonyms.create!(:unique_id => "A112351243", :account => @account)
@@ -180,7 +180,7 @@ describe UserList do
     expect(ul.errors).to eq []
     expect(ul.duplicate_addresses).to eq []
   end
-  
+
   it "should not process login ids if they don't exist" do
     user = User.create!(:name => 'A 112351243')
     user.pseudonyms.create!(:unique_id => "A112351243", :account => @account)

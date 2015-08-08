@@ -61,21 +61,28 @@ define [
                 props.collection.models
               else
                 props.currentFolder.files.models
+      folders = props.currentFolder.folders.models
 
-      otherItems =  files.filter (file) ->
+      items = _.extend files, folders
+      otherItems =  items.filter (item) ->
                       return true unless onlyIdsToPreview
-                      file.id in onlyIdsToPreview
+                      item.id in onlyIdsToPreview
 
       visibleFile = @getQuery().preview and _.findWhere(files, {id: @getQuery().preview})
+      visibleFolder = @getQuery().preview and _.findWhere(folders, {id: @getQuery().preview})
 
-      if !visibleFile
+      if !visibleFile and !visibleFolder
         responseDataRequested = ["enhanced_preview_url"]
         responseDataRequested.push("usage_rights") if props.usageRightsRequiredForContext
         new File({id: @getQuery().preview}, {preflightUrl: 'no/url/needed'}).fetch(data: $.param({"include": responseDataRequested})).success (file) ->
           initialItem = new FilesystemObject(file)
           cb?({initialItem, otherItems})
       else
-        initialItem = visibleFile or (files[0] if files.length)
+        if visibleFile
+          initialItem = visibleFile or (files[0] if files.length)
+        else if visibleFolder
+          initialItem = visibleFolder or (folders[0] if folder.length)
+
         cb?({initialItem, otherItems})
 
     stateProperties: (items, props) ->
@@ -205,6 +212,10 @@ define [
                 src: @state.displayedItem.get 'preview_url'
                 className: 'ef-file-preview-frame' + if @state.displayedItem.get('content-type') is 'text/html' then ' ef-file-preview-frame-html' else ''
               }
+            else if @state.displayedItem instanceof Folder
+              div className: 'ef-file-not-found ef-file-preview-frame',
+                i className:'media-object ef-not-found-icon FilesystemObjectThumbnail mimeClass-folder'
+                @state.displayedItem.attributes.name
             else # file was not found
               div className: 'ef-file-not-found ef-file-preview-frame',
                 i className:'media-object ef-not-found-icon FilesystemObjectThumbnail mimeClass-file'

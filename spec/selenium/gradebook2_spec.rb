@@ -30,7 +30,7 @@ describe "gradebook2" do
     let(:uneditable_cells) { f('.cannot_edit') }
     let(:gradebook_header) { f('#gradebook_grid .container_1 .slick-header') }
 
-    it "should load gradebook when no grading periods have been created" do
+    it "should load gradebook when no grading periods have been created", priority: "1", test_id: 210011 do
       get "/courses/#{@course.id}/gradebook2"
       expect(f('#gradebook-grid-wrapper')).to be_displayed
     end
@@ -41,7 +41,7 @@ describe "gradebook2" do
                                     title: "past-due assignment"
       end
 
-      it "admins should be able to edit" do
+      it "admins should be able to edit", priority: "1", test_id: 210012 do
         get "/courses/#{@course.id}/gradebook2"
 
         select_period_in_the_past
@@ -49,7 +49,7 @@ describe "gradebook2" do
         expect(uneditable_cells).to_not be_present
       end
 
-      it "teachers should not be able to edit" do
+      it "teachers should not be able to edit", priority: "1", test_id: 210023 do
         sign_in_as_a_teacher
 
         get "/courses/#{@course.id}/gradebook2"
@@ -65,14 +65,14 @@ describe "gradebook2" do
         @course.assignments.create! title: "No Due Date"
       end
 
-      it "admins should be able to edit" do
+      it "admins should be able to edit", priority: "1", test_id: 210014 do
         get "/courses/#{@course.id}/gradebook2"
 
         expect(gradebook_header).to include_text("No Due Date")
         expect(uneditable_cells).to_not be_present
       end
 
-      it "teachers should be able to edit" do
+      it "teachers should be able to edit", priority: "1", test_id: 210015 do
         sign_in_as_a_teacher
 
         get "/courses/#{@course.id}/gradebook2"
@@ -86,7 +86,7 @@ describe "gradebook2" do
   context "as a teacher" do
     let!(:setup) { gradebook_data_setup }
 
-    it "hides unpublished/shows published assignments" do
+    it "hides unpublished/shows published assignments", priority: "1", test_id: 210016 do
       assignment = @course.assignments.create! title: 'unpublished'
       assignment.unpublish
       get "/courses/#{@course.id}/gradebook2"
@@ -99,7 +99,7 @@ describe "gradebook2" do
       expect(f('#gradebook_grid .container_1 .slick-header')).to include_text(@first_assignment.title)
     end
 
-    it "should not show 'not-graded' assignments" do
+    it "should not show 'not-graded' assignments", priority: "1", test_id: 210017 do
       get "/courses/#{@course.id}/gradebook2"
 
       expect(f('.slick-header-columns')).not_to include_text(@ungraded_assignment.title)
@@ -114,7 +114,7 @@ describe "gradebook2" do
       ff('.student-name')
     end
 
-    it 'should filter students' do
+    it 'should filter students', priority: "1", test_id: 210018 do
       get "/courses/#{@course.id}/gradebook2"
       expect(get_visible_students.length).to eq @all_students.size
       filter_student 'student 1'
@@ -123,17 +123,18 @@ describe "gradebook2" do
       expect(visible_students[0].text).to eq 'student 1'
     end
 
+    # duplicate of test_id: 210017
     it "should not show not-graded assignments" do
       expect(f('#gradebook_grid .slick-header')).not_to include_text(@ungraded_assignment.title)
     end
 
-    it "should validate correct number of students showing up in gradebook" do
+    it "should validate correct number of students showing up in gradebook", priority: "1", test_id: 210019 do
       get "/courses/#{@course.id}/gradebook2"
 
       expect(ff('.student-name').count).to eq @course.students.count
     end
 
-    it "should not show concluded enrollments in active courses by default" do
+    it "should not show concluded enrollments in active courses by default", priority: "1", test_id: 210020 do
       @student_1.enrollments.where(course_id: @course).first.conclude
 
       expect(@course.students.count).to eq @all_students.size - 1
@@ -150,7 +151,7 @@ describe "gradebook2" do
       expect(driver.find_elements(:css, '.student-name').count).to eq @course.all_students.count
     end
 
-    it "should show concluded enrollments in concluded courses by default" do
+    it "should show concluded enrollments in concluded courses by default", priority: "1", test_id: 210021 do
       @course.complete!
 
       expect(@course.students.count).to eq 0
@@ -164,13 +165,13 @@ describe "gradebook2" do
       expect(driver.find_elements(:css, '.student-name').count).to eq @course.all_students.count
     end
 
-    it "should show students sorted by their sortable_name" do
+    it "should show students sorted by their sortable_name", priority: "1", test_id: 210022 do
       get "/courses/#{@course.id}/gradebook2"
       dom_names = ff('.student-name').map(&:text)
       expect(dom_names).to eq @all_students.map(&:name)
     end
 
-    it "should not show student avatars until they are enabled" do
+    it "should not show student avatars until they are enabled", priority: "1", test_id: 210023 do
       get "/courses/#{@course.id}/gradebook2"
 
       expect(ff('.student-name').length).to eq @all_students.size
@@ -188,7 +189,7 @@ describe "gradebook2" do
     end
 
 
-    it "should allow showing only a certain section" do
+    it "should allow showing only a certain section", priority: "1", test_id: 210024 do
       get "/courses/#{@course.id}/gradebook2"
       # grade the first assignment
       edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2', 0)
@@ -228,7 +229,7 @@ describe "gradebook2" do
     end
 
 
-    it "should handle muting/unmuting correctly" do
+    it "should handle muting/unmuting correctly", priority: "1", test_id: 210025 do
       get "/courses/#{@course.id}/gradebook2"
       toggle_muting(@second_assignment)
       expect(fj(".container_1 .slick-header-column[id*='assignment_#{@second_assignment.id}'] .muted")).to be_displayed
@@ -251,7 +252,7 @@ describe "gradebook2" do
         get "/courses/#{@course.id}/gradebook2"
       end
 
-      it "should allow editing grades" do
+      it "should allow editing grades", priority: "1", test_id: 210026 do
         cell = f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2')
         expect(f('.gradebook-cell', cell).text).to eq '10'
         cell.click
@@ -265,14 +266,14 @@ describe "gradebook2" do
         get "/courses/#{@course.id}/gradebook2"
       end
 
-      it "should not allow editing grades" do
+      it "should not allow editing grades", priority: "1", test_id: 210027 do
         cell = f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2')
         expect(f('.gradebook-cell', cell).text).to eq '10'
         cell.click
         expect(ff('.grade', cell)).to be_blank
       end
 
-      it "should hide mutable actions from the menu" do
+      it "should hide mutable actions from the menu", priority: "1", test_id: 210028 do
         open_gradebook_settings do |menu|
           expect(ff("a.gradebook_upload_link", menu)).to be_blank
           expect(ff("a.set_group_weights", menu)).to be_blank
@@ -280,14 +281,14 @@ describe "gradebook2" do
       end
     end
 
-    it "should validate that gradebook settings is displayed when button is clicked" do
+    it "should validate that gradebook settings is displayed when button is clicked", priority: "1", test_id: 210029 do
       get "/courses/#{@course.id}/gradebook2"
       wait_for_ajaximations
 
       open_gradebook_settings
     end
 
-    it "should validate posting a comment to a graded assignment" do
+    it "should validate posting a comment to a graded assignment", priority: "1", test_id: 210046 do
       comment_text = "This is a new comment!"
 
       get "/courses/#{@course.id}/gradebook2"
@@ -305,7 +306,7 @@ describe "gradebook2" do
       expect(comment).to include_text(comment_text)
     end
 
-    it "should let you post a group comment to a group assignment" do
+    it "should let you post a group comment to a group assignment", priority: "1", test_id: 210047 do
       group_assignment = @course.assignments.create!({
                                                          :title => 'group assignment',
                                                          :due_at => (Time.now + 1.week),
@@ -337,7 +338,7 @@ describe "gradebook2" do
       expect(comment).to include_text(comment_text)
     end
 
-    it "should validate assignment details" do
+    it "should validate assignment details", priority: "1", test_id: 210048 do
       submissions_count = @second_assignment.submissions.count.to_s + ' submissions'
 
       get "/courses/#{@course.id}/gradebook2"
@@ -864,7 +865,41 @@ describe "gradebook2" do
   end
 
   context 'excused assignment' do
-    it 'is not included in grade calculations', priority: '1', test_id: 196596 do
+    it 'default grade cannot be set to excused', priority: "1", test_id: 219380 do
+      init_course_with_students
+
+      assignment = @course.assignments.create! title: 'Test Me!', points_possible: 20
+      get "/courses/#{@course.id}/grades"
+      f('.assignment_header_drop').click
+      f('.gradebook-header-menu [data-action="setDefaultGrade"]').click
+
+      ['EX', 'eX', 'Ex', 'ex'].each_with_index do |ex, i|
+        replace_content f("#student_grading_#{assignment.id}"), "#{ex}\n"
+        wait_for_ajaximations
+        expect(ff('.ic-flash-error').length).to be i + 1
+        expect(f('.ic-flash-error').text).to include 'Default grade cannot be set to EX'
+      end
+    end
+
+    it 'formats excused grade like dropped assignment', priority: "1", test_id: 216380 do
+      init_course_with_students
+
+      assignment = @course.assignments.create! title: 'Excuse Me', points_possible: 20
+      assignment.grade_student(@students[0], {excuse: true})
+
+      user_session(@students[0])
+      get "/courses/#{@course.id}/grades"
+
+      grade_row = f("#submission_#{assignment.id}")
+      grade_cell = f(".assignment_score .grade", grade_row)
+      grade = grade_cell.text.scan(/\d+|EX/).first
+
+      expect(grade_row).to have_class '.excused'
+      expect(grade).to eq 'EX'
+      expect(grade_row.attribute 'title').to eq 'This assignment is excused and will not be considered in the total calculation'
+    end
+
+    it 'is not included in grade calculations', priority: "1", test_id: 196596 do
       init_course_with_students
 
       a1 = @course.assignments.create! title: 'Excuse Me', points_possible: 20
@@ -901,7 +936,7 @@ describe "gradebook2" do
 
     it "should allow observer to see grade totals" do
       get "/courses/#{@course.id}/grades/#{@student_2.id}"
-      expect(f(".final_grade .grade")).to include_text("66.7")
+      expect(f(".final_grade .grade")).to include_text("66.67")
       f("#only_consider_graded_assignments").click
       wait_for_ajax_requests
       expect(f(".final_grade .grade")).to include_text("12.5")
@@ -911,6 +946,12 @@ describe "gradebook2" do
   describe "post_grades" do
     before(:each) do
       gradebook_data_setup
+      create_sis_assignment
+    end
+
+    def create_sis_assignment
+      @assignment.post_to_sis = true
+      @assignment.save
     end
 
     it "should not be visible by default" do
@@ -946,8 +987,6 @@ describe "gradebook2" do
       Account.default.set_feature_flag!('post_grades', 'on')
       @course.sis_source_id = 'xyz'
       @course.save
-      @assignment.post_to_sis = true
-      @assignment.save
       get "/courses/#{@course.id}/gradebook2"
       wait_for_ajaximations
       expect(f('.post-grades-placeholder > button')).to be_displayed
@@ -985,6 +1024,20 @@ describe "gradebook2" do
         expect(f('iframe.post-grades-frame')).to be_displayed
       end
 
+      it "should hide post grades lti button when section selected" do
+        create_post_grades_tool
+
+        get "/courses/#{@course.id}/gradebook2"
+        wait_for_ajaximations
+        expect(f('button.external-tools-dialog')).to be_displayed
+
+        f('button.section-select-button').click
+        wait_for_ajaximations
+        fj('ul#section-to-show-menu li:nth(4)').click
+        wait_for_ajaximations
+        expect(f('button.external-tools-dialog')).not_to be_displayed
+      end
+
       it "should show as drop down menu when multiple tools are installed" do
         (0...10).each do |i|
           create_post_grades_tool(name: "test tool #{i}")
@@ -998,6 +1051,22 @@ describe "gradebook2" do
         ff('li.external-tools-dialog > a').first.click
         wait_for_ajaximations
         expect(f('iframe.post-grades-frame')).to be_displayed
+      end
+
+      it "should hide post grades lti dropdown when section selected" do
+        (0...10).each do |i|
+          create_post_grades_tool(name: "test tool #{i}")
+        end
+
+        get "/courses/#{@course.id}/gradebook2"
+        wait_for_ajaximations
+        expect(ff('li.external-tools-dialog').count).to eq(10)
+
+        f('button.section-select-button').click
+        wait_for_ajaximations
+        fj('ul#section-to-show-menu li:nth(4)').click
+        wait_for_ajaximations
+        expect(f('button#post_grades')).not_to be_displayed
       end
 
       it "should show as drop down menu with an ellipsis when too many tools are installed" do
@@ -1038,6 +1107,68 @@ describe "gradebook2" do
         wait_for_ajaximations
         expect(f('iframe.post-grades-frame')).to be_displayed
       end
+
+      it "should show menu with powerschool if section configured and selected and lti tools are disabled" do
+        Account.default.set_feature_flag!('post_grades', 'on')
+        @course.sis_source_id = 'xyz'
+        @course.save
+        @assignment.post_to_sis = true
+        @assignment.save
+
+        CourseSection.all.each_with_index do |course_section, index|
+          course_section.sis_source_id = index.to_s
+          course_section.save
+        end
+
+        create_post_grades_tool
+
+        get "/courses/#{@course.id}/gradebook2"
+        wait_for_ajaximations
+        expect(f('li.post-grades-placeholder > a')).to be_present
+        expect(f('li.external-tools-dialog')).to be_present
+
+        section_id = fj('ul#section-to-show-menu li:nth(3) a label')['for']
+        section_id.slice!('section_option_')
+
+        f('button.section-select-button').click
+        wait_for_ajaximations
+        fj('ul#section-to-show-menu li:nth(4)').click
+        wait_for_ajaximations
+        expect(f('button#post_grades')).to be_displayed
+
+        f('button#post_grades').click
+        wait_for_ajaximations
+        f('li.post-grades-placeholder > a').click
+        wait_for_ajaximations
+        expect(f('.post-grades-dialog')).to be_displayed
+      end
+    end
+  end
+
+  context 'Grading History' do
+    it 'displays excused grades', priority: "1", test_id: 208844 do
+      course_with_teacher_logged_in(name: 'Teacher')
+      course_with_student(course: @course, active_all: true)
+
+      assignment = @course.assignments.build
+      assignment.publish
+      assignment.grade_student(@student, {grade: 15})
+      assignment.grade_student(@student, {excuse: true})
+
+      get "/courses/#{@course.id}/gradebook/history"
+      f('.assignment_header').click
+      wait_for_ajaximations
+      expect(f('.assignment_header .changes').text).to eq '1 change'
+
+      changed_values = ff('.assignment_details td').map(& :text)
+      expect(changed_values).to eq ['15', 'EX', 'EX']
+
+      assignment.grade_student(@student, {grade: 10})
+      refresh_page
+      f('.assignment_header').click
+      wait_for_ajaximations
+      changed_values = ff('.assignment_details td').map(& :text)
+      expect(changed_values).to eq ['EX', '10', '10']
     end
   end
 end

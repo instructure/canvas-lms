@@ -1,0 +1,23 @@
+<noscript>
+  <div role="alert" class="ic-flash-static ic-flash-error">
+    <h1><%= t :javascript_required, "You need to have JavaScript enabled in order to access this site." %></h1>
+  </div>
+</noscript>
+
+<% if session.has_key? :brand_config_md5 %>
+  <div role="alert" class="ic-flash-static ic-flash-info ic-flash--Theme-Editor">
+    <%= t("You're editing your Canvas Theme! The changes have not been applied yet.") %>
+    <% unless params[:editing_brand_config] %>
+      <%= link_to t("Apply Changes"), brand_configs_new_path, :class => "Button Button--success Button--flash" %>
+      or
+      <%= link_to t("Open Theme Editor"), brand_configs_new_path, :class => '' %>
+
+    <% end %>
+  </div>
+<% end %>
+
+<% if @current_user.try(:show_bouncing_channel_message?) %>
+  <div role="alert" class="ic-flash-static ic-flash-warning">
+  <%= t(:bouncing_communication_channels, "There appears to be a problem with one of your contact methods. Please check your *Settings Page*.", wrapper: link_to('\1', settings_profile_path)) %>
+  </div>
+<% end %>

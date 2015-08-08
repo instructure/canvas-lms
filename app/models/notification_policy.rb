@@ -44,7 +44,7 @@ class NotificationPolicy < ActiveRecord::Base
       scoped
     end
   }
-  
+
   # TODO: the scope name should be self-explanatory... change this to
   # by_frequency or something This is for choosing a policy by frequency
   scope :by, lambda { |freq| where(:frequency => Array(freq).map(&:to_s)) }
@@ -75,7 +75,7 @@ class NotificationPolicy < ActiveRecord::Base
       # User preference change not being made. Make a notification policy change.
 
       # Using the category name, fetch all Notifications for the category. Will set the desired value on them.
-      notifications = Notification.all.select { |n| (n.category && n.category.underscore.gsub(/\s/, '_')) == params[:category] }.map(&:id)
+      notifications = Notification.all_cached.select { |n| (n.category && n.category.underscore.gsub(/\s/, '_')) == params[:category] }.map(&:id)
       frequency = params[:frequency]
 
       # Find any existing NotificationPolicies for the category and the channel. If frequency is 'never', delete the
@@ -151,7 +151,7 @@ class NotificationPolicy < ActiveRecord::Base
     frequencies = Hash[frequencies.map { |name, frequency| [BroadcastPolicy.notification_finder.by_name(name.titleize), frequency] }]
     communication_channel.shard.activate do
       policies = communication_channel.notification_policies.to_a
-      Notification.all.each do |notification|
+      Notification.all_cached.each do |notification|
         policy = policies.find { |p| p.notification_id == notification.id }
         if policy
           if frequencies[notification]

@@ -487,9 +487,9 @@ class UsersController < ApplicationController
 
     js_env({
       :DASHBOARD_SIDEBAR_URL => dashboard_sidebar_url,
-      :DASHBOARD_COURSES => map_courses_for_menu(@current_user.menu_courses),
       :PREFERENCES => {
-        :recent_activity_dashboard => @current_user.preferences[:recent_activity_dashboard]
+        :recent_activity_dashboard => @current_user.preferences[:recent_activity_dashboard],
+        :custom_colors => @current_user.custom_colors
       }
     })
 
@@ -511,7 +511,7 @@ class UsersController < ApplicationController
       assignments = upcoming_events.select{ |e| e.is_a?(Assignment) }
       Shard.partition_by_shard(assignments) do |shard_assignments|
         Submission.
-          select([:id, :assignment_id, :score, :workflow_state]).
+          select([:id, :assignment_id, :score, :workflow_state, :updated_at]).
           where(:assignment_id => shard_assignments, :user_id => user)
       end
     end
@@ -980,7 +980,7 @@ class UsersController < ApplicationController
       # course_section and enrollment term will only be used if the enrollment dates haven't been cached yet;
       # maybe should just look at the first enrollment and check if it's cached to decide if we should include
       # them here
-      @enrollments = @user.enrollments.with_each_shard { |scope| scope.where("enrollments.workflow_state<>'deleted' AND courses.workflow_state<>'deleted'").includes({:course => { :enrollment_term => :enrollment_dates_overrides }}, :associated_user, :course_section) }
+      @enrollments = @user.enrollments.shard(@user).where("enrollments.workflow_state<>'deleted' AND courses.workflow_state<>'deleted'").includes({:course => { :enrollment_term => :enrollment_dates_overrides }}, :associated_user, :course_section).to_a
 
       # restrict view for other users
       if @user != @current_user
@@ -1019,7 +1019,7 @@ class UsersController < ApplicationController
   #
   # @returns User
   def api_show
-    @user = params[:id] && params[:id] != 'self' ? User.find(params[:id]) : @current_user
+    @user = params[:id] && params[:id] != 'self' ? api_find(User, params[:id]) : @current_user
     if @user.grants_any_right?(@current_user, session, :manage, :manage_user_details)
       render :json => user_json(@user, @current_user, session, %w{locale avatar_url permissions}, @current_user.pseudonym.account)
     else
@@ -1590,6 +1590,9 @@ class UsersController < ApplicationController
           end
           session.delete(:require_terms)
           flash[:notice] = t('user_updated', 'User was successfully updated.')
+          unless params[:redirect_to_previous].blank?
+            return redirect_to :back
+          end
           format.html { redirect_to user_url(@user) }
           format.json {
             render :json => user_json(@user, @current_user, session, %w{locale avatar_url},
@@ -1799,7 +1802,7 @@ class UsersController < ApplicationController
 
       if params[:student_id]
         student = User.find(params[:student_id])
-        enrollments = student.student_enrollments.active.includes(:course).with_each_shard
+        enrollments = student.student_enrollments.active.includes(:course).shard(student).to_a
         enrollments.each do |enrollment|
           should_include = enrollment.course.user_has_been_instructor?(@teacher) &&
                            enrollment.course.enrollments_visible_to(@teacher, :include_priors => true).where(id: enrollment).first &&
@@ -1918,7 +1921,7 @@ class UsersController < ApplicationController
       student[:last_interaction] = [student[:last_interaction], date].compact.max
     end
     scope = ConversationMessage.
-        joins('INNER JOIN conversation_participants ON conversation_participants.conversation_id=conversation_messages.conversation_id').
+        joins("INNER JOIN #{ConversationParticipant.quoted_table_name} ON conversation_participants.conversation_id=conversation_messages.conversation_id").
         where('conversation_messages.author_id = ? AND conversation_participants.user_id IN (?) AND NOT conversation_messages.generated', teacher, ids)
     # fake_arel can't pass an array in the group by through the scope
     last_message_dates = scope.group(['conversation_participants.user_id', 'conversation_messages.author_id']).maximum(:created_at)

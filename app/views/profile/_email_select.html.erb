@@ -1,3 +1,4 @@
+<% email_select ||= nil %>
 <select class="email_select contact_select" name="channel_id">
   <% if @email_channels.empty? %>
     <option value=""><%= t(:default_email_option, "[Select Email]") %></option>

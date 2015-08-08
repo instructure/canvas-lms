@@ -1,3 +1,4 @@
+<% outcome_result ||= nil %>
 <% show_results_link = true if show_results_link.nil? %>
 <li class="outcome_result" id="result_<%= outcome_result ? outcome_result.id : "blank" %>" style="<%= hidden unless outcome_result %>">
   <% if show_results_link %>

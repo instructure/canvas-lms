@@ -1,8 +1,4 @@
-<%
-notices = flash_notices()
-js_env(:notices => notices)
-%>
+<% js_env notices: flash_notices() %>
 
 <ul role="alert" aria-live="assertive" id="flash_message_holder"></ul>
 <div role="alert" aria-live="assertive" id="flash_screenreader_holder" class="screenreader-only"></div>
-

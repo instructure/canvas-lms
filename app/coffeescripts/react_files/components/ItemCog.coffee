@@ -53,17 +53,19 @@ define [
       else
         externalToolMenuItems = []
 
-      wrap = (fn) =>
+      wrap = (fn, params = {}) =>
         preventDefault (event) =>
           singularContextType = @props.model.collection?.parentFolder?.get('context_type').toLowerCase()
           pluralContextType = singularContextType + 's' if singularContextType?
           contextType = pluralContextType || filesEnv.contextType
           contextId = @props.model.collection?.parentFolder?.get('context_id') || filesEnv.contextId
-          fn([@props.model], {
+          args = {
             contextType: contextType
             contextId: contextId
             returnFocusTo: @refs.settingsCogBtn.getDOMNode()
-          })
+          }
+          args = $.extend(args, params)
+          fn([@props.model], args)
 
       span style: minWidth: "45px",
 
@@ -101,7 +103,7 @@ define [
               li {},
                 a {
                   href:'#'
-                  onClick: wrap(openMoveDialog)
+                  onClick: wrap(openMoveDialog, {clearSelectedItems: @props.clearSelectedItems})
                   ref: 'move'
                 },
                   I18n.t('move', 'Move')

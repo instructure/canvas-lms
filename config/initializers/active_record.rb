@@ -53,8 +53,7 @@ class ActiveRecord::Base
 
   def self.all_models
     return @all_models if @all_models.present?
-    @all_models = (ActiveRecord::Base.send(:subclasses) +
-                   ActiveRecord::Base.models_from_files +
+    @all_models = (ActiveRecord::Base.models_from_files +
                    [Version]).compact.uniq.reject { |model|
       !(model.superclass == ActiveRecord::Base || model.superclass.abstract_class?) ||
       (model.respond_to?(:tableless?) && model.tableless?) ||
@@ -63,19 +62,14 @@ class ActiveRecord::Base
   end
 
   def self.models_from_files
-    @from_files ||= Dir[
-      "#{Rails.root}/app/models/**/*.rb",
-      "#{Rails.root}/vendor/plugins/*/app/models/**/*.rb",
-      "#{Rails.root}/gems/plugins/*/app/models/**/*.rb",
-    ].sort.collect { |file|
-      model = begin
-          file.sub(%r{.*/app/models/(.*)\.rb$}, '\1').camelize.constantize
-        rescue NameError, LoadError
-          next
-        end
-      next unless model < ActiveRecord::Base
-      model
-    }
+    @from_files ||= begin
+      Dir[
+        "#{Rails.root}/app/models/**/*.rb",
+        "#{Rails.root}/vendor/plugins/*/app/models/**/*.rb",
+        "#{Rails.root}/gems/plugins/*/app/models/**/*.rb",
+      ].sort.each { |file| ActiveSupport::Dependencies.require_or_load(file) }
+      ActiveRecord::Base.descendants
+    end
   end
 
   def self.maximum_text_length
@@ -265,8 +259,10 @@ class ActiveRecord::Base
     # We are in the process of migrating away from including the root in all our
     # json serializations at all. Once that's done, we can remove this and the
     # monkey patch to Serialzer, below.
+
+    # ^hahahahahahaha
     unless options.key?(:include_root)
-      options[:include_root] = ActiveRecord::Base.include_root_in_json
+      options[:include_root] = true
     end
 
     hash = serializable_hash(options)
@@ -368,11 +364,13 @@ class ActiveRecord::Base
       # If that extension isn't around, casting to a bytea sucks for international characters,
       # but at least it's consistent, and orders commas before letters so you don't end up with
       # Johnson, Bob sorting before Johns, Jimmy
-      @collkey ||= connection.select_value("SELECT COUNT(*) FROM pg_proc WHERE proname='collkey'").to_i
-      if @collkey == 0
-        "CAST(LOWER(replace(#{col}, '\\', '\\\\')) AS bytea)"
+      unless instance_variable_defined?(:@collkey)
+        @collkey = connection.extension_installed?(:pg_collkey)
+      end
+      if @collkey
+        "#{@collkey}.collkey(#{col}, '#{Canvas::ICU.locale_for_collation}', false, 0, true)"
       else
-        "collkey(#{col}, '#{Canvas::ICU.locale_for_collation}', false, 0, true)"
+        "CAST(LOWER(replace(#{col}, '\\', '\\\\')) AS bytea)"
       end
     else
       # Not yet optimized for other dbs (MySQL's default collation is case insensitive;
@@ -438,12 +436,12 @@ class ActiveRecord::Base
 
     result = if ActiveRecord::Base.configurations[Rails.env]['adapter'] == 'postgresql'
       sql = ''
-      sql << "SELECT NULL AS #{column} WHERE EXISTS(SELECT * FROM #{table_name} WHERE #{column} IS NULL) UNION ALL (" if options[:include_nil]
+      sql << "SELECT NULL AS #{column} WHERE EXISTS (SELECT * FROM #{quoted_table_name} WHERE #{column} IS NULL) UNION ALL (" if options[:include_nil]
       sql << <<-SQL
         WITH RECURSIVE t AS (
-          SELECT MIN(#{column}) AS #{column} FROM #{table_name}
+          SELECT MIN(#{column}) AS #{column} FROM #{quoted_table_name}
           UNION ALL
-          SELECT (SELECT MIN(#{column}) FROM #{table_name} WHERE #{column} > t.#{column})
+          SELECT (SELECT MIN(#{column}) FROM #{quoted_table_name} WHERE #{column} > t.#{column})
           FROM t
           WHERE t.#{column} IS NOT NULL
         )
@@ -638,7 +636,7 @@ ActiveRecord::Relation.class_eval do
       self.activate { find_in_batches_with_temp_table(options, &block) }
     else
       find_in_batches_without_usefulness(options) do |batch|
-        klass.send(:with_exclusive_scope) { yield batch }
+        klass.unscoped { yield batch }
       end
     end
   end
@@ -659,7 +657,7 @@ ActiveRecord::Relation.class_eval do
         cursor = "#{table_name}_in_batches_cursor_#{sql.hash.abs.to_s(36)}"
         connection.execute("DECLARE #{cursor} CURSOR FOR #{sql}")
         includes = includes_values
-        klass.send(:with_exclusive_scope) do
+        klass.unscoped do
           batch = connection.uncached { klass.find_by_sql("FETCH FORWARD #{batch_size} FROM #{cursor}") }
           while !batch.empty?
             ActiveRecord::Associations::Preloader.new(batch, includes).run if includes
@@ -685,6 +683,7 @@ ActiveRecord::Relation.class_eval do
           column_name.to_s
         end
       end
+      pluck = pluck.map(&:to_s)
     end
     batch_size = options[:batch_size] || 1000
     if pluck
@@ -701,7 +700,7 @@ ActiveRecord::Relation.class_eval do
         when 'PostgreSQL'
           begin
             old_proc = connection.raw_connection.set_notice_processor {}
-            if pluck && pluck.length == 1 && pluck.first.to_s == primary_key.to_s
+            if pluck && pluck.any?{|p| p == primary_key.to_s}
               connection.add_index table, primary_key, name: index
               index = primary_key
             else
@@ -724,9 +723,9 @@ ActiveRecord::Relation.class_eval do
       end
 
       includes = includes_values
-      klass.send(:with_exclusive_scope) do
+      klass.unscoped do
         if pluck
-          batch = klass.from(table).order(index).limit(batch_size).pluck(pluck)
+          batch = klass.from(table).order(index).limit(batch_size).pluck(*pluck)
         else
           sql = "SELECT * FROM #{table} ORDER BY #{index} LIMIT #{batch_size}"
           batch = klass.find_by_sql(sql)
@@ -737,8 +736,8 @@ ActiveRecord::Relation.class_eval do
           break if batch.size < batch_size
 
           if pluck
-            last_value = pluck.length == 1 ? batch.last : batch.last[index]
-            batch = klass.from(table).order(index).where("#{index} > ?", last_value).limit(batch_size).pluck(pluck)
+            last_value = pluck.length == 1 ? batch.last : batch.last[pluck.index(index)]
+            batch = klass.from(table).order(index).where("#{index} > ?", last_value).limit(batch_size).pluck(*pluck)
           else
             last_value = batch.last[index]
             sql = "SELECT *
@@ -781,7 +780,13 @@ ActiveRecord::Relation.class_eval do
 
           scope = self
           join_conditions.each { |join| scope = scope.where(join) }
-          sql.concat(scope.arel.where_sql.to_s)
+          binds = scope.bind_values.dup
+          where_statements = scope.arel.constraints.map do |node|
+            connection.visitor.accept(node) do
+              connection.quote(*binds.shift.reverse)
+            end
+          end
+          sql.concat('WHERE ' + where_statements.join(' AND '))
           connection.update(sql, "#{name} Update")
         else
           update_all_without_joins(updates, conditions, options)
@@ -810,14 +815,21 @@ ActiveRecord::Relation.class_eval do
 
           scope = self
           join_conditions.each { |join| scope = scope.where(join) }
-          sql.concat(scope.arel.where_sql.to_s)
+
+          binds = scope.bind_values.dup
+          where_statements = scope.arel.constraints.map do |node|
+            connection.visitor.accept(node) do
+              connection.quote(*binds.shift.reverse)
+            end
+          end
+          sql.concat('WHERE ' + where_statements.join(' AND '))
         when 'MySQL', 'Mysql2'
           sql = "DELETE #{quoted_table_name} FROM #{quoted_table_name} #{arel.join_sql} #{arel.where_sql}"
         else
           raise "Joins in delete not supported!"
         end
 
-        connection.delete(sql, "#{name} Delete all")
+        connection.exec_query(sql, "#{name} Delete all", scope.bind_values)
       end
     else
       delete_all_without_joins(conditions)
@@ -852,22 +864,6 @@ ActiveRecord::Relation.class_eval do
     lock_without_exclusive_smarts(lock_type)
   end
   alias_method_chain :lock, :exclusive_smarts
-
-  def with_each_shard(*args)
-    scope = self
-    if self.respond_to?(:proxy_association) && (owner = self.proxy_association.try(:owner)) && self.shard_category != :explicit
-      scope = scope.shard(owner)
-    end
-    scope = scope.shard(args) if args.any?
-    if block_given?
-      ret = scope.activate{ |rel|
-        yield(rel)
-      }
-      Array(ret)
-    else
-      scope.to_a
-    end
-  end
 
   def polymorphic_where(args)
     raise ArgumentError unless args.length == 1
@@ -1422,7 +1418,7 @@ end
 
 module UnscopeCallbacks
   def run_callbacks(kind)
-    scope = self.class.unscoped
+    scope = self.class.base_class.unscoped
     scope.default_scoped = true
     scope.scoping { super }
   end

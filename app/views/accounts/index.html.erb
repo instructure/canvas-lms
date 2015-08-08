@@ -4,7 +4,7 @@
 <% content_for :right_side do %>
 <% end %>
 
-<% jammit_css :context_list %>
+<% css_bundle :context_list %>
 
 <h2><%= t(:title, "Accounts I Manage") %></h2>
 <%= t(:no_accounts_message, "No Accounts") if @accounts.empty? %>

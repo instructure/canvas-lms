@@ -3,8 +3,8 @@ module.exports = {
     options: {
       style: 'expanded',
       includePaths: [
-        'vendor/canvas/app/stylesheets',
-        'vendor/canvas/app/stylesheets/variants/new_styles_normal_contrast'
+        'vendor/canvas_app/stylesheets',
+        'vendor/canvas_app/stylesheets/variants/new_styles_normal_contrast'
       ],
       outputStyle: 'nested'
     },

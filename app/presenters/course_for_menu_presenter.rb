@@ -9,7 +9,7 @@ class CourseForMenuPresenter
 
   def initialize(course, available_section_tabs)
     @course = course
-    @available_section_tabs = available_section_tabs.select do |tab|
+    @available_section_tabs = (available_section_tabs || []).select do |tab|
       DASHBOARD_CARD_TABS.include?(tab[:id])
     end
   end
@@ -20,6 +20,7 @@ class CourseForMenuPresenter
       longName: "#{course.name} - #{course.short_name}",
       shortName: course.name,
       courseCode: course.course_code,
+      assetString: course.asset_string,
       href: course_path(course, :invitation => course.read_attribute(:invitation)),
       term: term || nil,
       subtitle: subtitle,
