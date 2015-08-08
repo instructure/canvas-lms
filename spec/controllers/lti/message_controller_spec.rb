@@ -25,7 +25,8 @@ module Lti
       context 'course' do
         it 'initiates a tool proxy registration request' do
           course_with_teacher_logged_in(:active_all => true)
-          get 'registration', course_id: @course.id, tool_consumer_url: 'http://tool.consumer.url'
+          course = @course
+          get 'registration', course_id: course.id, tool_consumer_url: 'http://tool.consumer.url'
           expect(response).to be_success
           lti_launch = assigns[:lti_launch]
           expect(lti_launch.resource_url).to eq 'http://tool.consumer.url'
@@ -35,8 +36,8 @@ module Lti
           expect(launch_params['launch_presentation_document_target']).to eq 'iframe'
           expect(launch_params['reg_key']).not_to be_empty
           expect(launch_params['reg_password']).not_to be_empty
-
-          account_tp_url_stub = course_tool_consumer_profile_url(@course, 'abc123').gsub('abc123', '')
+          expect(launch_params['launch_presentation_return_url']).to include "courses/#{course.id}/lti/registration_return/#{launch_params['reg_key']}"
+          account_tp_url_stub = course_tool_consumer_profile_url(course, 'abc123').gsub('abc123', '')
           expect(launch_params['tc_profile_url']).to include(account_tp_url_stub)
         end
 

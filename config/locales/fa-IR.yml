@@ -1875,9 +1875,6 @@ fa-IR:
         submission: ارسال
         submission_not_turned_in: "تحویل داده نشد!"
         submission_turned_in: "تحویل داده شد!"
-    submission_type_icon: 
-      tooltips: 
-        submitted: "ارسال شد"
     submission_types_form: 
       advanced_turnitin_settings: "تنظیمات پیشرفته Turnitin"
       descriptions: 
@@ -2444,7 +2441,6 @@ fa-IR:
       would_you_like_to_cancel_that_and_sign_up_for_this: "مایلید که آن را لغو کنید و برای این یکی ثبت نام کنید؟"
       you_are_already_signed_up_for: "شما قبلا ثبت نام کرده اید برای:"
     save: "ذخیره سازی"
-    save_and_publish: "ذخیره سازی و انتشار"
     save_changes: "ذخیره سازی تغییرات"
     scheduler_right_side_admin_section: 
       create_a_new_set_of_appointments: "ایجاد یک گروه قرار ملاقات"
@@ -3197,14 +3193,8 @@ fa-IR:
       delete_item: "مطمئنید که می خواهید این مورد از ماژول حذف شود؟"
     content_next: 
       add_prerequisite: "افزودن پیش نیاز به *%{module}*"
-      assignment_points_possible: "از %{points_possible}"
-      button: 
-        delete_label: "حذف پیش نیازها"
-        delete_title: "حذف پیش نیازها"
       buttons: 
-        add_module: "افزودن ماژول"
         add_prerequisite: "افزودن پیش نیاز"
-      criterion_for_assignment: "برای %{assignment}، کاربران باید %{select_criterion}"
       headings: 
         add_prerequisite: "افزودن پیش نیاز به %{name}"
         course_modules: "ماژول‌های درس"
@@ -3233,50 +3223,17 @@ fa-IR:
           one: "تورفتگی به میزان 1 سطح"
           other: "تورفتگی به میزان %{count} سطح"
           zero: "بدون تو رفتگی"
-      key: 
-        description: 
-          delete: "حذف ماژول/مورد فعلی"
-          edit: "ویرایش ماژول/مورد"
-          indent: "افزایش تورفتگی"
-          new: "ماژول جدید"
-          next: "ماژول/مورد بعدی"
-          outdent: "کاهش تورفتگی"
-          previous: "ماژول/مورد قبلی"
-      keycode_descriptions: 
-        next_module_item: "انتخاب ماژول یا مورد ماژول بعدی"
-        previous_module_item: "انتخاب ماژول یا مورد ماژول قبلی"
-        toggle_module_dragging: "برای شروع کشیدن مورد را انتخاب کنید یا مورد انتخاب شده قبلی را رها کنید"
-      keycodes: 
-        delete: d
-        edit: e
-        indent: i
-        new: "n"
-        next: j
-        next_module_item: Up
-        outdent: o
-        previous: k
-        previous_module_item: Down
-        toggle_module_dragging: Space
       labels: 
         indent: تورفتگی
-        module_complete_when: "این ماژول زمانی کامل می شود که"
-        modules: 
-          before_students_view: "قبل از اینکه دانشجویان بتوانند این ماژول را ببینند"
         new_tab: "بارگذاری در یک زبانه جدید"
-        publish_final_grade: "انتشار نمره نهایی برای دانشجو در هنگامی که این ماژول تکمیل شده است"
-        require_sequential_progress: "دانشجویان باید الزامات موجود در این ماژول را به صورت ترتیبی پیش ببرند"
         title: عنوان
-        unlock_at: "قفل گشایی در"
         url: "نشانی اینترنتی"
       links: 
-        add_prerequisite: "افزودن پیش نیاز"
-        add_requirement: "افزودن الزام"
         student_progress: "مشاهده پیشرفت"
         title: 
           remove_prerequisite: "حذف این پیش نیاز"
       module: ماژول
       module_details: "ماژولها به ترتیب نمایش داده می شوند، بنابراین فقط ماژول هایی که بالای %{name} هستند را می توان به عنوان پیش نیاز تعیین کرد."
-      module_name: "نام ماژول"
       modules_keyboard_hint_updated: "هشدار: برای دسترس پذیری بهتر در مرتب سازی دوباره ماژول ها (یا موردهای ماژول)، لطفا از گزینه «انتقال به کادر گفتگو» موجود در منو استفاده کنید."
       move_module: 
         after: "بعد از"
@@ -3287,12 +3244,8 @@ fa-IR:
         into: به
         or: OR
         place: مکان
-      must_complete_prerequisites: "باید کامل شوند"
-      no_preprequisites: "پیش نیاز مشخص نشده است"
-      no_requirements: "هیچ الزامی تعیین نشده است"
       prerequisites: 
         another_module: "یک ماژول دیگر"
-      prerequisites_need_item: " قبل از اینکه بتوانید تعیین کنید چگونه یک کاربر این ماژول را کامل خواهد کرد، باید موردها را اضافه کنید"
       requirements: 
         must_contribute: "مشارکت کردن در صفحه"
         must_score_at_least: "حداقل نمره"
@@ -3300,7 +3253,6 @@ fa-IR:
         must_view: "مشاهده مورد"
       select_module: 
         instructions: "انتخاب ماژول"
-        name: "ماژول %{module}"
       select_prerequisite: "نوع پیش نیاز را انتخاب کنید. تا وقتی همه پیش نیاز ها فراهم نشوند، دانشجویان نمی توانند یک ماژول را مشاهده کنند."
     context_module: 
       unpublish: "لغو انتشار"
@@ -3395,13 +3347,6 @@ fa-IR:
       quizzes: "آزمون ها"
       wiki_pages: "صفحه های ویکی"
     points_possible_short: "%{points} امتیاز"
-    prerequisites_footer: 
-      default_module_name: ماژول
-      labels: 
-        prerequisites: "پیش نیازها"
-      links: 
-        title: 
-          remove_prerequisite: "حذف این پیش نیاز"
     progressions: 
       titles: 
         student_progress: "پیشرفت دانشجو"
@@ -4996,7 +4941,6 @@ fa-IR:
       anonymous_user: ناشناس
     pinned_discussions: "بحث های الصاق شده"
     reply: 
-      error_saving_reply: "*یک خطا رخ داد*، لطفا پاسخ خود را بعداً دوباره ارسال نمایید"
       saving_reply: "در حال ذخیره سازی پاسخ..."
     reply_attachment: 
       attachment_label: پیوست
@@ -6971,8 +6915,6 @@ fa-IR:
       ویژگی ها، تنظیمات و سبک هایی که به طور خاص در یک محیط K-12 معنادارتر
       هستند. اکنون این مورد فقط
       در برخی تغییرهای سبک کاربرد دارد، اما ویژگی های بیشتر خاص K-12 ممکن است در آینده افزوده شوند.
-  labels: 
-    lock_module_until: "قفل کردن ماژول تا یک تاریخ خاص"
   last_user_access_title: "آخرین دسترسی کاربر"
   late_percent_b91d01b3: "دارای تأخیر: %{percent}"
   latest_f604a75: جدیدترین
@@ -6980,15 +6922,12 @@ fa-IR:
   launch_url_e150bd41: "راه اندازی نشانی اینترنتی"
   layouts: 
     application: 
-      bouncing_communication_channels: "یکی از روش های تماس شما ظاهرا اشکال دارد. لطفا *صفحه تنظیمات* خود را بازبینی کنید."
       group_switch: تغییر
-      javascript_required: "برای دسترسی به این تارنما، جاوااسکریپت باید فعال باشد."
       keyboard_navigation: 
         close: "برای بستن این کادر گفتگو، ویرگول را فشار دهید"
       links: 
         close: بستن
         dashboard: "داشبورد من"
-        skip_to_content: "رفتن به محتوا"
     fixed_bottom: 
       masquerading: 
         stop: "متوقف کردن تغییر عنوان"
@@ -7005,8 +6944,6 @@ fa-IR:
       view_all_or_customize: "مشاهده همه یا سفارشی سازی"
     mobile_auth: 
       log_in_to_canvas: "ورود به کانواس"
-    styleguide: 
-      default_page_title: "سیستم مدیریت آموزش کانواس"
   learning_mastery_gradebook_description: |-
       دفتر نمره تسلط یادگیری روشی را به اساتید ارائه می دهد که بتوانند پیشرفت دانشجو و درس را در نتایج یادگیری 
       درس به سرعت مشاهده کنند. نتایج در قالبی 
@@ -7202,7 +7139,6 @@ fa-IR:
         logout_response_redirect_from_idp: "پاسخ به خروج را از IdP دریافت کرد"
         logout_response_redirect_to_idp: "ارسال درخواست خروج به IdP"
         redirect_from_idp: "پاسخ به ورود را از IdP دریافت کرد"
-  logo_a040ae0e: نماد
   low_score_4eeb95b2: "پایین: %{score}"
   lower_limit_of_range_6ddd4983: "حد پایین تر محدوده"
   lti: 
@@ -11730,7 +11666,6 @@ fa-IR:
       one: "%{count} مورد به %{destinationFolder} انتقال یافت"
       other: "%{count} مورد به %{destinationFolder} انتقال یافت"
     name: نام
-    progress_error: "در هنگام اقدام برای آماده سازی بارگیری، خطایی رخ داد، لطفا دوباره سعی کنید."
     progress_message: "در حال آماده سازی بارگیری: %{percent}% انجام شده است"
     restrict_access: "محدود کردن دسترسی"
     results_count: "در حال نمایش %{num_results} نتیجه جستجو"
@@ -12230,7 +12165,6 @@ fa-IR:
         crosslist_this_section: "فهرست بندی متقابل این بخش"
         current_enrollments: "ثبت نام های جاری"
         decrosslist_section: "لغو فهرست بندی متقابل این بخش"
-  see_some_lti_tools_that_work_great_with_canvas_you_3c27bc7b: "*برخی از ابزارهای LTI را ببینید* که با کانواس عالی کار می کنند. همچنین می توانید **موضوع های انجمن کانواس درباره ابزارهای LTI** را بازبینی کنید."
   select_content: "انتخاب محتوا"
   select_content_checkbox: 
     select_content_error: "باید یک گزینه محتوا را انتخاب کنید"
@@ -12632,8 +12566,6 @@ fa-IR:
       teacher: "%{course} به عنوان استاد."
       teacher_title: "به عنوان استاد دعوت شده اید، برای مشاهده درس کلیک کنید"
     primary_header_navigation: 
-      links: 
-        inbox: "صندوق ورودی"
       menu: 
         calendar: تقویم
         grades: "نمره ها"

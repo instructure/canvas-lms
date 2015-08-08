@@ -1,3 +1,4 @@
+<% current_conference ||= nil %>
 <% conference = current_conference %>
 <% if conference.active? && can_do(conference, @current_user, :join) %>
 <div class="global-message image-block conference">

@@ -473,7 +473,8 @@ class Assignment < ActiveRecord::Base
     tags_to_update.each { |tag| tag.context_module_action(user, action, points) }
   end
 
-  def context_module_tag_info(user)
+  def context_module_tag_info(user, context)
+    self.association(:context).target ||= context
     tag_info = {:points_possible => self.points_possible}
     if self.multiple_due_dates_apply_to?(user)
       tag_info[:vdd_tooltip] = OverrideTooltipPresenter.new(self, user).as_json
@@ -943,7 +944,7 @@ class Assignment < ActiveRecord::Base
     students = [student]
     if has_group_category? && group = group_category.group_for(student)
       students = group.users
-        .joins("INNER JOIN enrollments ON enrollments.user_id=users.id")
+        .joins(:enrollments)
         .where(:enrollments => { :course_id => self.context})
         .where(Course.reflections[:student_enrollments].options[:conditions])
         .order("users.id") # this helps with preventing deadlock with other things that touch lots of users
@@ -1036,7 +1037,12 @@ class Assignment < ActiveRecord::Base
         end
 
         submission.grade_matches_current_submission = true if did_grade
-        submission_updated = true if !(submission.changes.keys - ['user_id', 'assignment_id']).empty?
+
+        if submission.changes.except(*%w{user_id assignment_id}).values.flatten.any?(&:present?)
+          # changing turnitin_data from nil to {} doesn't count
+          submission_updated = true
+        end
+
         submission.workflow_state = "graded" if submission.score_changed? || submission.grade_matches_current_submission
         submission.group = group
         submission.graded_at = Time.zone.now if did_grade
@@ -1703,8 +1709,10 @@ class Assignment < ActiveRecord::Base
   }
 
   scope :not_ignored_by, lambda { |user, purpose|
-    where("NOT EXISTS (SELECT * FROM ignores WHERE asset_type='Assignment' AND asset_id=assignments.id AND user_id=? AND purpose=?)",
-          user, purpose)
+    where("NOT EXISTS (?)",
+          Ignore.where(asset_type: 'Assignment',
+                       user_id: user,
+                       purpose: purpose).where('asset_id=assignments.id'))
   }
 
   # the map on the API_NEEDED_FIELDS here is because PostgreSQL will see the
@@ -1945,7 +1953,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def self.with_student_submission_count
-    joins("LEFT OUTER JOIN submissions s ON
+    joins("LEFT OUTER JOIN #{Submission.quoted_table_name} s ON
            s.assignment_id = assignments.id AND
            s.submission_type IS NOT NULL AND
            s.user_id IS NOT NULL")
@@ -1955,7 +1963,19 @@ class Assignment < ActiveRecord::Base
 
   def can_unpublish?
     return true if new_record?
-    !has_student_submissions?
+    return @can_unpublish unless @can_unpublish.nil?
+    @can_unpublish = !has_student_submissions?
+  end
+  attr_writer :can_unpublish
+
+  def self.preload_can_unpublish(assignments, assmnt_ids_with_subs=nil)
+    return unless assignments.any?
+    assmnt_ids_with_subs ||= assignment_ids_with_submissions(assignments.map(&:id))
+    assignments.each{|a| a.can_unpublish = !(assmnt_ids_with_subs.include?(a.id)) }
+  end
+
+  def self.assignment_ids_with_submissions(assignment_ids)
+    Submission.having_submission.where(:assignment_id => assignment_ids).uniq.pluck(:assignment_id)
   end
 
   # override so validations are called

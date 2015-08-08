@@ -155,7 +155,7 @@ class Quizzes::QuizSubmissionQuestionsController < ApplicationController
 
     @service.update_question(record, @quiz_submission, params[:attempt])
 
-    render json: quiz_submission_questions_json(quiz_questions.all, @quiz_submission.reload)
+    render json: quiz_submission_questions_json(quiz_questions.all, @quiz_submission.reload, censored: true)
   end
 
   # @API Flagging a question.

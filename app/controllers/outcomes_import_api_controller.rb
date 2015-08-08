@@ -54,7 +54,10 @@ class OutcomesImportApiController < ApplicationController
 
     begin
       cm = ContentMigration.find(params[:migration_id])
-      render json: content_migration_json(cm, @current_user, session)
+      cm_issues = cm.migration_issues
+      cmj = content_migration_json(cm, @current_user, session)
+      cmj[:migration_issues] = migration_issues_json(cm_issues, cm, @current_user, session)
+      render json: cmj
     rescue ActiveRecord::RecordNotFound => e
       render json: { error: "no content migration matching id #{params[:migration_id]}" }
     end

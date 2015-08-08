@@ -162,6 +162,23 @@ describe ContextModulesController do
       expect(response).to redirect_to course_assignment_url(@course, assignment1, :module_item_id => assignmentTag1.id)
     end
 
+    it "should still redirect for unpublished modules if teacher and course is concluded" do
+      user_session(@teacher)
+
+      @module = @course.context_modules.create!
+      ag = @course.assignment_groups.create!
+      assignment1 = ag.assignments.create!(:context => @course)
+
+      assignmentTag1 = @module.add_item :type => 'assignment', :id => assignment1.id
+
+      assignmentTag1.unpublish
+      @course.complete!
+
+      get 'item_redirect', :course_id => @course.id, :id => assignmentTag1.id
+      expect(response).to be_redirect
+      expect(response).to redirect_to course_assignment_url(@course, assignment1, :module_item_id => assignmentTag1.id)
+    end
+
     it "should not redirect for unpublished modules if student" do
       user_session(@student)
 

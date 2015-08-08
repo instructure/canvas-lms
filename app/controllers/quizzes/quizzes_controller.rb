@@ -83,6 +83,9 @@ class Quizzes::QuizzesController < ApplicationController
       quizzes.map(&:id), # invalidate on add/delete of quizzes
       quizzes.map(&:updated_at).sort.last # invalidate on modifications
     ].cache_key) do
+      if can_manage
+        Quizzes::Quiz.preload_can_unpublish(quizzes)
+      end
       quizzes.each_with_object({}) do |quiz, quiz_user_permissions|
         quiz_user_permissions[quiz.id] = {
           can_update: can_manage,

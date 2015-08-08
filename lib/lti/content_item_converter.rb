@@ -14,6 +14,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
+require 'ims/lti'
+
 module Lti
   class ContentItemConverter
 
@@ -58,7 +60,7 @@ module Lti
       when 'file'
         IMS::LTI::Models::ContentItems::FileItem.new(converted_opts)
       when 'lti_launch_url'
-        IMS::LTI::Models::ContentItems::LtiLink.new(converted_opts)
+        IMS::LTI::Models::ContentItems::LtiLinkItem.new(converted_opts)
       else
         IMS::LTI::Models::ContentItems::ContentItem.new(converted_opts)
       end

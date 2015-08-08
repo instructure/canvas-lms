@@ -7,10 +7,40 @@ describe "conversations new" do
     conversation_setup
     @s1 = user(name: "first student")
     @s2 = user(name: "second student")
+    @teacher.update_attribute(:name, 'teacher')
     [@s1, @s2].each { |s| @course.enroll_student(s).update_attribute(:workflow_state, 'active') }
     cat = @course.group_categories.create(:name => "the groups")
     @group = cat.groups.create(:name => "the group", :context => @course)
     @group.users = [@s1, @s2]
+  end
+
+  describe "message list" do
+    before(:each) do
+      @participant = conversation(@teacher,@s1, body: 'hi there',workflow_state: 'unread')
+      @convo = @participant.conversation
+      @convo.update_attribute(:subject, 'test')
+    end
+
+    it "should display relevant information for messages", priority: "1", test_id: 86605 do
+      # Normalizes time zone to be safe, in case user object and browser are not matching. Must do this
+      # before page renders
+      @teacher.time_zone = 'America/Juneau'
+      @teacher.save!
+      get_conversations
+      expect(conversation_elements.size).to eq 1
+      expect(f('li .author')).to include_text("#{@teacher.name}, #{@s1.name}")
+      expect(f('ul .read-state')).to be_present
+      expect(f('li .subject')).to include_text('test')
+      expect(f('li .summary')).to include_text('hi there')
+
+      # We're interested in the element's attribute datetime for matching the timestamp
+      rendered_time = f('time').attribute('datetime')
+
+      # Gotta parse the times so they match, which includes removing the milliseconds by
+      # converting both to integer
+      # We do all this to test the time rendered on screen against the time the object was created
+      expect(Time.zone.parse(rendered_time).to_i).to match(@participant.last_message_at.to_i)
+    end
   end
 
   describe "view filter" do

@@ -185,7 +185,7 @@ define [
         @$field.data
           'time-hour': tz.format(@datetime, "%-k")
           'time-minute': tz.format(@datetime, "%M")
-          'time-ampm': tz.format(@datetime, null)
+          'time-ampm': null
 
     updateSuggest: ->
       text = @formatSuggest()

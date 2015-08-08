@@ -20,7 +20,7 @@ require 'open_object'
 require 'set'
 
 class StreamItem < ActiveRecord::Base
-  serialize :data
+  serialize_utf8_safe :data
 
   has_many :stream_item_instances
   has_many :users, :through => :stream_item_instances
@@ -65,6 +65,7 @@ class StreamItem < ActiveRecord::Base
     end
 
     res.instance_variable_set(:@attributes, data)
+    res.instance_variable_set(:@attributes_cache, {})
     res.instance_variable_set(:@new_record, false) if data['id']
     res
   end
@@ -330,7 +331,7 @@ class StreamItem < ActiveRecord::Base
     count = 0
 
     scope = where("updated_at<?", before_date).
-        includes(:context).
+        preload(:context).
         limit(1000)
     scope = scope.includes(:stream_item_instances) if touch_users
 
@@ -403,7 +404,7 @@ class StreamItem < ActiveRecord::Base
 
   public
   def destroy_stream_item_instances
-    self.stream_item_instances.with_each_shard do |scope|
+    self.stream_item_instances.shard(self).activate do |scope|
       user_ids = scope.pluck(:user_id)
       if !self.invalidate_immediately && user_ids.count > 100
         StreamItemCache.send_later_if_production_enqueue_args(:invalidate_all_recent_stream_items,

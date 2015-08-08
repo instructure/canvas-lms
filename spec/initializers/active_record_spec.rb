@@ -98,7 +98,7 @@ module ActiveRecord
           User.create(name: 'dr who')
           User.create(name: 'dr who')
 
-          expect { User.joins("INNER JOIN users u ON users.sortable_name = u.sortable_name").
+          expect { User.joins("INNER JOIN #{User.quoted_table_name} u ON users.sortable_name = u.sortable_name").
             where("u.sortable_name <> users.sortable_name").delete_all }.to_not raise_error
         end
       end

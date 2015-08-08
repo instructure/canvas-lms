@@ -273,7 +273,7 @@ class Course < ActiveRecord::Base
         includes(:child_events).
         reject(&:hidden?) +
       AppointmentGroup.manageable_by(user, [asset_string]) +
-        user.assignments_visibile_in_course(self)
+        user.assignments_visible_in_course(self)
     else
       calendar_events.active.includes(:child_events).reject(&:hidden?) +
         assignments.active
@@ -309,7 +309,7 @@ class Course < ActiveRecord::Base
   end
 
   def modules_visible_to(user)
-    if self.grants_right?(user, :manage_content)
+    if self.grants_right?(user, :view_unpublished_items)
       self.context_modules.not_deleted
     else
       self.context_modules.active
@@ -317,7 +317,7 @@ class Course < ActiveRecord::Base
   end
 
   def module_items_visible_to(user)
-    if user_is_teacher = self.grants_right?(user, :manage_content)
+    if user_is_teacher = self.grants_right?(user, :view_unpublished_items)
       tags = self.context_module_tags.not_deleted.joins(:context_module).where("context_modules.workflow_state <> 'deleted'")
     else
       tags = self.context_module_tags.active.joins(:context_module).where(:context_modules => {:workflow_state => 'active'})
@@ -510,7 +510,7 @@ class Course < ActiveRecord::Base
 
   scope :recently_started, -> { where(:start_at => 1.month.ago..Time.zone.now).order("start_at DESC").limit(10) }
   scope :recently_ended, -> { where(:conclude_at => 1.month.ago..Time.zone.now).order("start_at DESC").limit(10) }
-  scope :recently_created, -> { where("created_at>?", 1.month.ago).order("created_at DESC").limit(50).includes(:teachers) }
+  scope :recently_created, -> { where("created_at>?", 1.month.ago).order("created_at DESC").limit(50).preload(:teachers) }
   scope :for_term, lambda {|term| term ? where(:enrollment_term_id => term) : scoped }
   scope :active_first, -> { order("CASE WHEN courses.workflow_state='available' THEN 0 ELSE 1 END, #{best_unicode_collation_key('name')}") }
   scope :name_like, lambda {|name| where(coalesced_wildcard('courses.name', 'courses.sis_source_id', 'courses.course_code', name)) }
@@ -523,11 +523,11 @@ class Course < ActiveRecord::Base
     user_id = args[0]
     workflow_states = (args[1].present? ? %w{'active' 'completed'} : %w{'active'}).join(', ')
     uniq.joins("INNER JOIN (
-         SELECT caa.course_id, au.user_id FROM course_account_associations AS caa
+         SELECT caa.course_id, au.user_id FROM #{CourseAccountAssociation.quoted_table_name} AS caa
          INNER JOIN accounts AS a ON a.id = caa.account_id AND a.workflow_state = 'active'
          INNER JOIN account_users AS au ON au.account_id = a.id AND au.user_id = #{user_id.to_i}
-       UNION SELECT courses.id AS course_id, e.user_id FROM courses
-         INNER JOIN enrollments AS e ON e.course_id = courses.id AND e.user_id = #{user_id.to_i}
+       UNION SELECT courses.id AS course_id, e.user_id FROM #{Course.quoted_table_name}
+         INNER JOIN #{Enrollment.quoted_table_name} AS e ON e.course_id = courses.id AND e.user_id = #{user_id.to_i}
            AND e.workflow_state IN(#{workflow_states}) AND e.type IN ('TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment')
          WHERE courses.workflow_state <> 'deleted') as course_users
        ON course_users.course_id = courses.id")
@@ -570,7 +570,10 @@ class Course < ActiveRecord::Base
     p.to { participating_students }
     p.whenever { |record|
       (record.available? && @grade_weight_changed) ||
-      record.changed_in_state(:available, :fields => :group_weighting_scheme)
+      (
+        record.prior_version.present? &&
+        record.changed_in_state(:available, :fields => :group_weighting_scheme)
+      )
     }
 
     p.dispatch :new_course
@@ -594,7 +597,7 @@ class Course < ActiveRecord::Base
     scope = User.joins(:not_ended_enrollments).
       where(enrollments: {course_id: self, type: 'StudentEnrollment'}).
       where(Group.not_in_group_sql_fragment(groups.map(&:id))).
-      select("users.id, users.name").uniq
+      select("users.id, users.name, users.updated_at").uniq
     scope = scope.select(opts[:order]).order(opts[:order]) if opts[:order]
     scope
   end
@@ -609,58 +612,72 @@ class Course < ActiveRecord::Base
 
   def user_is_instructor?(user)
     return unless user
-    Rails.cache.fetch([self, user, "course_user_is_instructor"].cache_key) do
-      user.cached_current_enrollments(preload_courses: true).any? { |e| e.course_id == self.id && e.participating_instructor? }
+    TempCache.cache('user_is_instructor', self, user) do
+      Rails.cache.fetch([self, user, "course_user_is_instructor"].cache_key) do
+        user.cached_current_enrollments(preload_courses: true).any? { |e| e.course_id == self.id && e.participating_instructor? }
+      end
     end
   end
 
   def user_is_student?(user, opts = {})
     return unless user
-    Rails.cache.fetch([self, user, "course_user_is_student", opts[:include_future]].cache_key) do
-      user.cached_current_enrollments(:preload_courses => true, :include_future => opts[:include_future]).any? { |e|
-        e.course_id == self.id && (opts[:include_future] ? e.student? : e.participating_student?)
-      }
+    TempCache.cache('user_is_student', self, user, opts) do
+      Rails.cache.fetch([self, user, "course_user_is_student", opts[:include_future]].cache_key) do
+        user.cached_current_enrollments(:preload_courses => true, :include_future => opts[:include_future]).any? { |e|
+          e.course_id == self.id && (opts[:include_future] ? e.student? : e.participating_student?)
+        }
+      end
     end
   end
 
   def user_has_been_instructor?(user)
     return unless user
     # enrollments should be on the course's shard
-    self.shard.activate do
-      Rails.cache.fetch([self, user, "course_user_has_been_instructor"].cache_key) do
-        # active here is !deleted; it still includes concluded, etc.
-        self.instructor_enrollments.active.where(user_id: user).exists?
+    TempCache.cache('user_has_been_instructor', self, user) do
+      self.shard.activate do
+        Rails.cache.fetch([self, user, "course_user_has_been_instructor"].cache_key) do
+          # active here is !deleted; it still includes concluded, etc.
+          self.instructor_enrollments.active.where(user_id: user).exists?
+        end
       end
     end
   end
 
   def user_has_been_admin?(user)
     return unless user
-    Rails.cache.fetch([self, user, "course_user_has_been_admin"].cache_key) do
-      # active here is !deleted; it still includes concluded, etc.
-      self.admin_enrollments.active.where(user_id: user).exists?
+    TempCache.cache('user_has_been_admin', self, user) do
+      Rails.cache.fetch([self, user, "course_user_has_been_admin"].cache_key) do
+        # active here is !deleted; it still includes concluded, etc.
+        self.admin_enrollments.active.where(user_id: user).exists?
+      end
     end
   end
 
   def user_has_been_observer?(user)
     return unless user
-    Rails.cache.fetch([self, user, "course_user_has_been_observer"].cache_key) do
-      # active here is !deleted; it still includes concluded, etc.
-      self.observer_enrollments.active.where(user_id: user).exists?
+    TempCache.cache('user_has_been_observer', self, user) do
+      Rails.cache.fetch([self, user, "course_user_has_been_observer"].cache_key) do
+        # active here is !deleted; it still includes concluded, etc.
+        self.observer_enrollments.active.where(user_id: user).exists?
+      end
     end
   end
 
   def user_has_been_student?(user)
     return unless user
-    Rails.cache.fetch([self, user, "course_user_has_been_student"].cache_key) do
-      self.all_student_enrollments.where(user_id: user).exists?
+    TempCache.cache('user_has_been_student', self, user) do
+      Rails.cache.fetch([self, user, "course_user_has_been_student"].cache_key) do
+        self.all_student_enrollments.where(user_id: user).exists?
+      end
     end
   end
 
   def user_has_no_enrollments?(user)
     return unless user
-    Rails.cache.fetch([self, user, "course_user_has_no_enrollments"].cache_key) do
-      !enrollments.where(user_id: user).exists?
+    TempCache.cache('user_has_no_enrollments', self, user) do
+      Rails.cache.fetch([self, user, "course_user_has_no_enrollments"].cache_key) do
+        !enrollments.where(user_id: user).exists?
+      end
     end
   end
 
@@ -836,7 +853,7 @@ class Course < ActiveRecord::Base
   # to ensure permissions on the root folder are updated after hiding or showing the files tab
   def touch_root_folder_if_necessary
     if tab_configuration_changed?
-      files_tab_was_hidden = tab_configuration_was && tab_configuration_was.any? { |h| h['id'] == TAB_FILES && h['hidden'] }
+      files_tab_was_hidden = tab_configuration_was && tab_configuration_was.any? { |h| !h.blank? && h['id'] == TAB_FILES && h['hidden'] }
       Folder.root_folders(self).each { |f| f.touch } if files_tab_was_hidden != tab_hidden?(TAB_FILES)
     end
     true
@@ -1115,7 +1132,7 @@ class Course < ActiveRecord::Base
          end
         )
     end
-    can [:read, :read_as_admin, :read_roster, :read_prior_roster, :read_forum, :use_student_view, :read_outcomes]
+    can [:read, :read_as_admin, :read_roster, :read_prior_roster, :read_forum, :use_student_view, :read_outcomes, :view_unpublished_items]
 
     given do |user|
       !self.deleted? && user &&
@@ -2114,7 +2131,7 @@ class Course < ActiveRecord::Base
       :storage_quota, :tab_configuration, :allow_wiki_comments,
       :turnitin_comments, :self_enrollment, :license, :indexed, :locale,
       :hide_final_grade, :hide_distribution_graphs,
-      :allow_student_discussion_topics, :lock_all_announcements ]
+      :allow_student_discussion_topics, :allow_student_discussion_editing, :lock_all_announcements ]
   end
 
   def set_course_dates_if_blank(shift_options)
@@ -2607,7 +2624,9 @@ class Course < ActiveRecord::Base
     class_eval <<-CODE
       def #{setting}
         if Course.settings_options[#{setting.inspect}][:inherited]
-          inherited = self.account.send(#{setting.inspect})
+          inherited = RequestCache.cache('inherited_course_setting', #{setting.inspect}, self.global_account_id) do
+            self.account.send(#{setting.inspect})
+          end
           if inherited[:locked] || settings_frd[#{setting.inspect}].nil?
             inherited[:value]
           else
@@ -2873,8 +2892,12 @@ class Course < ActiveRecord::Base
     )
   end
 
+  def active_section_count
+    @section_count ||= self.active_course_sections.count
+  end
+
   def multiple_sections?
-    self.active_course_sections.count > 1
+    active_section_count > 1
   end
 
   def content_exports_visible_to(user)

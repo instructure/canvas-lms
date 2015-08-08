@@ -22,7 +22,7 @@ class ContextExternalTool < ActiveRecord::Base
   validates_presence_of :config_xml, :if => lambda { |t| t.config_type == "by_xml" }
   validates_length_of :domain, :maximum => 253, :allow_blank => true
   validate :url_or_domain_is_set
-  serialize :settings
+  serialize_utf8_safe :settings
   attr_accessor :config_type, :config_url, :config_xml
 
   before_save :infer_defaults, :validate_vendor_help_link
@@ -549,10 +549,10 @@ class ContextExternalTool < ActiveRecord::Base
                         else
                           ''
                         end
-      where(default_placement_sql + 'EXISTS (
-              SELECT * FROM context_external_tool_placements
-              WHERE context_external_tools.id = context_external_tool_placements.context_external_tool_id
-              AND context_external_tool_placements.placement_type IN (?) )', placements || [])
+      return none unless placements
+      where(default_placement_sql + 'EXISTS (?)',
+            ContextExternalToolPlacement.where(placement_type: placements).
+        where("context_external_tools.id = context_external_tool_placements.context_external_tool_id"))
     else
       scoped
     end

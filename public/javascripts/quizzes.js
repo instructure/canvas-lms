@@ -3005,6 +3005,11 @@ define([
 
       // rewrite the data so that it fits the jsonapi format
       processData: function(data) {
+        var quizGroupQuestionPoints = data['quiz_group[question_points]'];
+        if (quizGroupQuestionPoints && quizGroupQuestionPoints < 0) {
+          $(this).find("input[name='quiz_group[question_points]']").errorBox(I18n.t('question.positive_points', "Must be zero or greater"));
+          return false;
+        }
         var newData = {};
         _.each(data, function(val, key) {
           newData[key.replace('quiz_group[', 'quiz_groups[][')] = val;

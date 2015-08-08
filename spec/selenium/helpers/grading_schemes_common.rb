@@ -17,6 +17,7 @@ end
 def should_add_a_grading_scheme(options = {name: "new grading standard"})
   new_standard_name = options[:name]
   f('.add_standard_link').click
+  expect(f('.add_standard_link')).to have_class('disabled')
   replace_content(f('.scheme_name'), new_standard_name)
   f('.save_button').click
   wait_for_ajax_requests
@@ -63,6 +64,7 @@ def should_add_a_grading_scheme_item
   save_and_reload_changes(@grading_standard)
   expect(@grading_standard.data.count).to eq data_count + 1
   expect(@grading_standard.data[1][0]).to eq 'Z'
+  # TODO: check for change in upper limit of next row item
 end
 
 
@@ -74,6 +76,7 @@ def should_edit_a_grading_scheme_item
   replace_content(grading_standard_rows[0].find_element(:css, '.standard_name'), 'F')
   save_and_reload_changes(@grading_standard)
   expect(@grading_standard.data[0][0]).to eq 'F'
+  # TODO: check that changing lower limit changes upper limit of next row item
 end
 
 def should_not_update_invalid_grading_scheme_input
@@ -90,6 +93,7 @@ def should_delete_a_grading_scheme_item
   save_and_reload_changes(@grading_standard)
   expect(@grading_standard.data.count).to eq data_count - 1
   expect(@grading_standard.data[0][0]).to eq 'B'
+  # TODO: check that changing upped limit of next row item changes to lower limit of line above
 end
 
 def should_contain_a_tab_for_grading_schemes_and_periods(url)

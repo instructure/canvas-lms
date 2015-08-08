@@ -11,4 +11,7 @@ if CANVAS_RAILS3
       end
     end
   end
+else
+  ActiveSupport::TimeWithZone.delegate :to_yaml, :to => :utc
+  ActiveSupport::SafeBuffer.delegate :to_yaml, :to => :to_str
 end

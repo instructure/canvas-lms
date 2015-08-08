@@ -96,11 +96,11 @@ class Quizzes::Quiz < ActiveRecord::Base
   after_save :touch_context
   after_save :regrade_if_published
 
-  serialize :quiz_data
+  serialize_utf8_safe :quiz_data
 
   simply_versioned
 
-  has_many :context_module_tags, :as => :content, :class_name => 'ContentTag', :conditions => "content_tags.tag_type='context_module' AND content_tags.workflow_state<>'deleted'", :include => {:context_module => [:content_tags]}
+  has_many :context_module_tags, :as => :content, :class_name => 'ContentTag', :conditions => "content_tags.tag_type='context_module' AND content_tags.workflow_state<>'deleted'"
 
   # This callback is listed here in order for the :link_assignment_overrides
   # method to be called after the simply_versioned callbacks. We want the
@@ -386,7 +386,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   def update_assignment
     send_later_if_production(:set_unpublished_question_count) if self.id
     if !self.assignment_id && @old_assignment_id
-      self.context_module_tags.each { |tag| tag.confirm_valid_module_requirements }
+      self.context_module_tags.preload(:context_module => :content_tags).each { |tag| tag.confirm_valid_module_requirements }
     end
     if !self.graded? && (@old_assignment_id || self.last_assignment_id)
       ::Assignment.where(:id => [@old_assignment_id, self.last_assignment_id].compact, :submission_types => 'online_quiz').update_all(:workflow_state => 'deleted', :updated_at => Time.now.utc)
@@ -1139,8 +1139,22 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   def can_unpublish?
     return true if new_record?
-    !has_student_submissions? &&
-      (assignment.blank? || assignment.can_unpublish?)
+    return @can_unpublish unless @can_unpublish.nil?
+    @can_unpublish = !has_student_submissions? && (assignment.blank? || assignment.can_unpublish?)
+  end
+  attr_writer :can_unpublish
+
+  def self.preload_can_unpublish(quizzes, assmnt_ids_with_subs=nil)
+    return unless quizzes.any?
+    assmnt_ids_with_subs ||= Assignment.assignment_ids_with_submissions(quizzes.map(&:assignment_id).compact)
+
+    quiz_ids_with_subs = Quizzes::QuizSubmission.where(:quiz_id => quizzes.map(&:id)).
+      not_settings_only.where("user_id IS NOT NULL").uniq.pluck(:quiz_id)
+
+    quizzes.each do |quiz|
+      quiz.can_unpublish = !(quiz_ids_with_subs.include?(quiz.id)) &&
+        (quiz.assignment_id.nil? || !assmnt_ids_with_subs.include?(quiz.assignment_id))
+    end
   end
 
   alias_method :unpublishable?, :can_unpublish?

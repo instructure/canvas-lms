@@ -17,7 +17,7 @@ def enroll_many_students
   end
 end
 
-describe "large enrollments", :priority => "2" do
+describe "large enrollments", priority: "2" do
   include_examples "in-process server selenium tests"
 
   context "page links" do

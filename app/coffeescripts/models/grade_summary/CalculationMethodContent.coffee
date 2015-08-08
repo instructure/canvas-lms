@@ -65,7 +65,7 @@ define [
         calculationIntLabel: I18n.t("Last Item: ")
         calculationIntDescription: I18n.t('Between 1% and 99%')
         exampleText: I18n.t(
-          "Most recent score counts as %{calculation_int}% of mastery weight, average of all other scores count as %{remainder}% of weight.", {
+          "Most recent result counts as %{calculation_int}% of mastery weight, average of all other results count as %{remainder}% of weight. There must be at least 2 results before a score is returned.", {
             calculation_int: @calculation_int
             remainder: 100 - @calculation_int
           }

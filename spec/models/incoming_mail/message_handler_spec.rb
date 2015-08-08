@@ -56,7 +56,8 @@ describe IncomingMail::MessageHandler do
             :subject => stub("subject", :charset => "utf8")
         },
         from: ["lucy@example.com"],
-        reply_to: ["lucy@example.com"]
+        reply_to: ["lucy@example.com"],
+        message_id: 1,
     }
   }
 
@@ -69,18 +70,29 @@ describe IncomingMail::MessageHandler do
 
   describe "#route" do
     it "activates the message's shard" do
-      Message.stubs(:where).with(id: original_message_id).returns(stub(first: original_message))
-      shard.expects(:activate)
+      enable_cache do
+        Message.stubs(:where).with(id: original_message_id).returns(stub(first: original_message))
+        shard.expects(:activate)
 
-      subject.handle(outgoing_from_address, body, html_body, incoming_message, tag)
+        subject.handle(outgoing_from_address, body, html_body, incoming_message, tag)
+      end
     end
 
     it "calls reply from on the message's context" do
-      context.expects(:reply_from)
+      enable_cache do
+        context.expects(:reply_from)
+        Message.stubs(:where).with(id: original_message_id).returns(stub(first: original_message))
+        subject.handle(outgoing_from_address, body, html_body, incoming_message, tag)
+      end
+    end
 
-      Message.stubs(:where).with(id: original_message_id).returns(stub(first: original_message))
-
-      subject.handle(outgoing_from_address, body, html_body, incoming_message, tag)
+    it "is idempotent (via caching)" do
+      enable_cache do
+        context.expects(:reply_from).once
+        Message.stubs(:where).with(id: original_message_id).returns(stub(first: original_message))
+        subject.handle(outgoing_from_address, body, html_body, incoming_message, tag)
+        subject.handle(outgoing_from_address, body, html_body, incoming_message, tag)
+      end
     end
 
     context "when a reply from error occurs" do
@@ -88,7 +100,7 @@ describe IncomingMail::MessageHandler do
         it "silently fails on no message notification id" do
           message = stub("original message without notification id", original_message_attributes.merge(:notification_id => nil))
           Message.stubs(:where).with(id: original_message_id).returns(stub(first: message))
-
+          Rails.cache.expects(:fetch).never
           Mailer.expects(:create_message).never
           message.context.expects(:reply_from).never
 
@@ -98,7 +110,7 @@ describe IncomingMail::MessageHandler do
         it "silently fails on invalid secure id" do
           Message.stubs(:where).with(id: original_message_id).returns(stub(first: original_message))
           Canvas::Security.stubs(:verify_hmac_sha1).returns(false)
-
+          Rails.cache.expects(:fetch).never
           Mailer.expects(:create_message).never
           original_message.context.expects(:reply_from).never
 
@@ -108,6 +120,7 @@ describe IncomingMail::MessageHandler do
         it "silently fails if the original message is missing" do
           Message.expects(:where).with(id: 42).returns(stub(first: nil))
           Message.any_instance.expects(:deliver).never
+          Rails.cache.expects(:fetch).never
 
           subject.handle(outgoing_from_address, body, html_body, incoming_message, "#{secure_id}-42")
         end
@@ -115,12 +128,15 @@ describe IncomingMail::MessageHandler do
         it "silently fails if the address tag is invalid" do
           Message.expects(:where).never
           Message.any_instance.expects(:deliver).never
+          Rails.cache.expects(:fetch).never
+
           subject.handle(outgoing_from_address, body, html_body, incoming_message, "#{secure_id}-not-an-id")
         end
 
         it "silently fails if the message is not from one of the original recipient's email addresses" do
           Message.stubs(:where).with(id: original_message_id).returns(stub(first: original_message))
           Message.any_instance.expects(:deliver).never
+          Rails.cache.expects(:fetch).never
           original_message.context.expects(:reply_from).never
           message = stub("incoming message with bad from",
                          incoming_message_attributes.merge(:from => ['not_lucy@example.com'],
@@ -134,13 +150,14 @@ describe IncomingMail::MessageHandler do
           message = stub("original message without user", original_message_attributes.merge(:user => nil))
           Message.stubs(:where).with(id: original_message_id).returns(stub(first: message))
           Message.any_instance.expects(:deliver)
+          Rails.cache.expects(:fetch).never
           subject.handle(outgoing_from_address, body, html_body, incoming_message, tag)
         end
 
         it "bounces the message on invalid context" do
           message = stub("original message with invalid context", original_message_attributes.merge({context: stub("context")}))
           Message.stubs(:where).with(id: original_message_id).returns(stub(first: message))
-
+          Rails.cache.expects(:fetch).never
           Message.any_instance.expects(:save)
           Message.any_instance.expects(:deliver)
 
@@ -150,7 +167,7 @@ describe IncomingMail::MessageHandler do
         it "saves and delivers the message with proper input" do
           message = stub("original message with invalid context", original_message_attributes.merge({context: stub("context")}))
           Message.stubs(:where).with(id: original_message_id).returns(stub(first: message))
-
+          Rails.cache.expects(:fetch).never
           Message.any_instance.expects(:save)
           Message.any_instance.expects(:deliver)
 
@@ -160,7 +177,7 @@ describe IncomingMail::MessageHandler do
         it "does not send a message if the incoming message has no from" do
           invalid_incoming_message = stub("invalid incoming message", incoming_message_attributes.merge(from: nil))
           Message.stubs(:where).with(id: original_message_id).returns(stub(first: original_message))
-
+          Rails.cache.expects(:fetch).never
           Message.any_instance.expects(:deliver).never
 
           subject.handle(outgoing_from_address, body, html_body, invalid_incoming_message, tag)
@@ -191,6 +208,7 @@ describe IncomingMail::MessageHandler do
             }
             expected_bounce_message = Message.new(message_attributes)
             Message.expects(:new).with(message_attributes).returns(expected_bounce_message)
+            Rails.cache.expects(:fetch).never
 
             subject.handle(outgoing_from_address, body, html_body, incoming_message, tag)
           end

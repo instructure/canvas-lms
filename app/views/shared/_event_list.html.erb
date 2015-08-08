@@ -1,4 +1,5 @@
-<% 
+<%
+  event_list ||= nil
   title ||= t('titles.events', "Events")
   display_count ||= 3
   display_count += 1 if event_list.length == display_count + 1
@@ -7,7 +8,7 @@
   show_more ||= true
   upcoming ||= false
   is_recent_feedback ||= false
-  partial = is_recent_feedback ? 'courses/recent_feedback' : 'courses/recent_event' 
+  partial = is_recent_feedback ? 'courses/recent_feedback' : 'courses/recent_event'
   contexts_to_link_to ||= nil
 %>
 <div class="events_list <%= is_recent_feedback ? 'recent_feedback' : 'coming_up' %>">
@@ -25,7 +26,7 @@
         <% end %>
       </small>
     </li>
-  <% else %>    
+  <% else %>
     <% (event_list || []).each_with_index do |e, i| %>
       <%= render :partial => partial, :object => e, :locals => {:show_context => show_context, :is_hidden => i >= display_count, :upcoming => upcoming } %>
     <% end %>
@@ -49,7 +50,7 @@
           <% else %>
             <%= t('at_least_more_events', 'at least %{count_of_events} more', :count_of_events => (event_list.length - display_count)) %>
           <% end %>
-        <% end %>    
+        <% end %>
       <% else %>
         <% if upcoming %>
           <% if period == :one_week %>
@@ -67,7 +68,7 @@
           <% else %>
             <%= t('more_events', '%{count_of_events} more', :count_of_events => (event_list.length - display_count)) %>
           <% end %>
-        <% end %>  
+        <% end %>
       <% end %>
         &hellip;</a>
     </li>

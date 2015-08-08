@@ -18,7 +18,9 @@
       margin-bottom: 0;
     }
   }
-  .ic-Dashboard-Activity {
-    padding: $ic-sp;
-  }
+
+  // fix awkward spacing when a global message appears above the dashboard
+  .global-message + .ic-Dashboard-header { margin-top: $ic-sp; }
+  
+  .ic-Dashboard-Activity { padding: $ic-sp; }
 }

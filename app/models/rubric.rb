@@ -42,7 +42,7 @@ class Rubric < ActiveRecord::Base
   after_save :update_alignments
   after_save :touch_associations
 
-  serialize :data
+  serialize_utf8_safe :data
   simply_versioned
 
   scope :publicly_reusable, -> { where(:reusable => true).order(best_unicode_collation_key('title')) }

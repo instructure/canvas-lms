@@ -2,7 +2,7 @@
    add_crumb(@user.name, user_path(@user) )
    add_crumb t('crumbs.faculty_journal', "Faculty Journal")
    js_bundle :user_notes
-   jammit_css :user_notes
+   css_bundle :user_notes
 %>
 <% content_for :page_title do %><%= t :page_title, "Faculty Journal" %><% end %>
 

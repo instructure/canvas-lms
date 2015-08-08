@@ -23,5 +23,12 @@
                       t('links.view_services', 'View Registered Services'),
                       'link' %>
   <% end %>
+
+  <% if @context.user_is_instructor?(@current_user) && can_do(@context, @current_user, :read_reports) %>
+    <%= sidebar_button user_course_teacher_activity_url(@current_user, @context),
+                       t('Student Interactions Report'),
+                       'user' %>
+  <% end %>
+
 </div>
 

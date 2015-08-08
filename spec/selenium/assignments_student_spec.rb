@@ -210,7 +210,7 @@ describe "assignments" do
         set_up_google_docs()
       end
 
-      it "should have a google doc tab if google docs is enabled", :priority => "1", :test_id => 161884 do
+      it "should have a google doc tab if google docs is enabled", priority: "1", test_id: 161884 do
         @assignment.update_attributes(:submission_types => 'online_upload')
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
         f('.submit_assignment_link').click
@@ -241,13 +241,13 @@ describe "assignments" do
           wait_for_animations
         end
 
-        it "should select a file from google drive", :priority => "1", :test_id => 161886 do
+        it "should select a file from google drive", priority: "1", test_id: 161886 do
           # find file in list
           # the file we are looking for is created as the second file in the list
           expect(ff(".filename")[1]).to include_text("test.mydoc")
         end
 
-        it "should select a file in a folder from google drive", :priority => "1", :test_id => 161885 do
+        it "should select a file in a folder from google drive", priority: "1", test_id: 161885 do
           # open folder
           f(".folder").click
           wait_for_animations
@@ -257,7 +257,7 @@ describe "assignments" do
         end
       end
 
-      it "forces users to authenticate", :priority => "1", :test_id => 161892 do
+      it "forces users to authenticate", priority: "1", test_id: 161892 do
         # stub out google drive
         google_service_connection = mock()
         google_service_connection.stubs(:service_type).returns('google_drive')

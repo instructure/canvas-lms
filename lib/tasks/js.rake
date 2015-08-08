@@ -250,6 +250,7 @@ namespace :js do
     threads << Thread.new do
       coffee_time = Benchmark.realtime do
         require 'coffee-script'
+        require 'parallel'
 
         if Canvas::CoffeeScript.coffee_script_binary_is_available?
           puts "--> Compiling CoffeeScript with 'coffee' binary"

@@ -244,6 +244,14 @@ describe GroupMembership do
       expect(GroupMembership.new(:user => @student, :group => account_group).grants_right?(@admin, :create)).to be_truthy
     end
 
+    it 'should allow a teacher to join a student to a group in an unpublished course' do
+      @course.claim!
+      student_in_course(active_all: true)
+      course_groups = group_category
+      course_group = course_groups.groups.create!(:context => @course, :join_level => "invitation_only")
+      expect(GroupMembership.new(user: @student, group: course_group).grants_right?(@teacher, :create)).to be_truthy
+    end
+
     it "should allow someone to join an open community group" do
       @account = @course.root_account
       community_groups = GroupCategory.communities_for(@account)

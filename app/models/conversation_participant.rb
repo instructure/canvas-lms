@@ -129,7 +129,7 @@ class ConversationParticipant < ActiveRecord::Base
         [<<-SQL, user_ids]
         EXISTS (
           SELECT *
-          FROM conversation_participants cp
+          FROM #{ConversationParticipant.quoted_table_name} cp
           WHERE cp.conversation_id = conversation_participants.conversation_id
           AND user_id IN (?)
         )
@@ -138,7 +138,7 @@ class ConversationParticipant < ActiveRecord::Base
         [<<-SQL, user_ids, user_ids.size]
         (
           SELECT COUNT(*)
-          FROM conversation_participants cp
+          FROM #{ConversationParticipant.quoted_table_name} cp
           WHERE cp.conversation_id = conversation_participants.conversation_id
           AND user_id IN (?)
         ) = ?
@@ -150,7 +150,7 @@ class ConversationParticipant < ActiveRecord::Base
       if Shard.current == scope_shard
         [sanitize_sql(shard_conditions)]
       else
-        with_exclusive_scope do
+        ConversationParticipant.unscoped do
           conversation_ids = ConversationParticipant.where(shard_conditions).select(:conversation_id).map do |c|
             Shard.relative_id_for(c.conversation_id, Shard.current, scope_shard)
           end
@@ -491,7 +491,7 @@ class ConversationParticipant < ActiveRecord::Base
 
   def move_to_user(new_user)
     conversation.shard.activate do
-      self.class.send :with_exclusive_scope do
+      self.class.unscoped do
         old_shard = self.user.shard
         conversation.conversation_messages.where(:author_id => user_id).update_all(:author_id => new_user)
         if existing = conversation.conversation_participants.where(user_id: new_user).first
@@ -512,7 +512,7 @@ class ConversationParticipant < ActiveRecord::Base
         end
       end
     end
-    self.class.send :with_exclusive_scope do
+    self.class.unscoped do
       conversation.regenerate_private_hash! if private?
     end
   end

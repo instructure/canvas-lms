@@ -6,7 +6,7 @@ if CANVAS_RAILS3
   gem 'routing_concerns', '0.1.0'
   gem 'strong_parameters', '0.2.3'
 else
-  gem 'rails', '4.0.12'
+  gem 'rails', '4.0.13'
   gem 'rack', '1.5.4'
   gem 'builder', '3.1.4'
   gem 'protected_attributes', '1.0.8'
@@ -20,7 +20,7 @@ gem 'authlogic', '3.4.2'
 gem 'active_model-better_errors', '1.6.7', require: 'active_model/better_errors'
 gem 'dynamic_form', '1.1.4', require: false
 gem 'rails-patch-json-encode', '0.0.1'
-gem 'switchman', '1.2.35'
+gem 'switchman', '1.2.37'
 gem 'folio-pagination', '0.0.7', require: 'folio/rails'
 gem 'will_paginate', '3.0.4', require: false
 
@@ -31,7 +31,7 @@ gem 'barby', '0.5.0', require: false
   gem 'rqrcode', '0.4.2', require: false
   gem 'chunky_png', '1.3.0', require: false
 gem 'bcrypt-ruby', '3.0.1'
-gem 'canvas_connect', '0.3.7'
+gem 'canvas_connect', '0.3.8'
   gem 'adobe_connect', '1.0.3', require: false
 gem 'canvas_webex', '0.15'
 gem 'canvas-jobs', '0.9.13'
@@ -48,10 +48,7 @@ gem 'i18nema', '0.0.8', platforms: [:ruby_20, :ruby_21, :ruby_22]
 gem 'i18nema19', '0.0.8', platform: :ruby_19
 gem 'i18nliner', '0.0.11'
 gem 'icalendar', '1.5.4', require: false
-gem 'ims-lti', '2.0.0.beta.26', require: false
-gem 'jammit', github: 'documentcloud/jammit', ref: '98b50a67029c2860717485a72a2ff0ae8ec37840'
-  gem 'cssmin', '1.0.3', require: false
-  gem 'jsmin', '1.0.1', require: false
+gem 'ims-lti', '2.0.0.beta.27'
 gem 'json', '1.8.2'
 gem 'oj', '2.5.5'
 gem 'jwt', '1.2.1', require: false
@@ -71,6 +68,8 @@ gem 'nokogiri', '1.6.6.2', require: false
 # oauth gem, with rails3 fixes rolled in
 gem 'oauth-instructure', '0.4.10', require: false
 gem 'oauth2', '1.0.0', require: false
+gem 'parallel', '1.4.1', require: false
+  gem 'ruby-progressbar', '1.7.5', require: false #used to show progress of S3Uploader
 gem 'rack-mini-profiler', '0.9.2', require: false
 gem 'flamegraph', '0.1.0', require: false
   gem 'stackprof', '0.2.7', require: false
@@ -83,7 +82,7 @@ gem 'ritex', '1.0.1', require: false
 gem 'rotp', '1.6.1', require: false
 gem 'net-ldap', '0.10.1', require: false
 gem 'ruby-duration', '3.2.0', require: false
-gem 'ruby-saml-mod', '0.2.4'
+gem 'ruby-saml-mod', '0.2.5'
 gem 'rubycas-client', '2.3.9', require: false
 gem 'rubyzip', '1.1.1', require: 'zip'
 gem 'zip-zip', '0.2' # needed until plugins use the new namespace

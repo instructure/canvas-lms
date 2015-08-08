@@ -35,7 +35,7 @@ class ConversationMessageParticipant < ActiveRecord::Base
   scope :deleted, -> { where(workflow_state: 'deleted') }
 
   scope :for_conversation_and_message, lambda { |conversation_id, message_id|
-    joins("INNER JOIN conversation_participants ON conversation_participants.id = conversation_participant_id").
+    joins(:conversation_participant).
         where(:conversation_id => conversation_id, :conversation_message_id => message_id)
   }
 

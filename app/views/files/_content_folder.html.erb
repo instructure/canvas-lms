@@ -1,3 +1,4 @@
+<% content_folder ||= nil %>
 <li class="content_item folder <%= 'folder_locked' if content_folder && !can_do(content_folder, @current_user, :read_contents) %> <%= 'currently_locked_folder' if content_folder && content_folder.currently_locked %> <%= 'draggable' if can_do(content_folder, @current_user, :update) %>" id="<%= content_folder ? "folder_content_" + content_folder.id.to_s : "folder_content_folder" %>">
   <div class="links">
     <a href="#" class="edit_item_link no-hover" style="<%= "display: none;" unless (can_do(content_folder, @current_user, :update) rescue false) %>"><%= image_tag "edit.png" %></a>

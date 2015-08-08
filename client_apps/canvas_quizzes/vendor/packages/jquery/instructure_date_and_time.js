@@ -22,6 +22,11 @@ requirejs.config({
       'str/htmlEscape': 'canvas/str/htmlEscape',
       'jquery.keycodes': 'canvas/jquery.keycodes',
       'vendor/date': 'canvas/vendor/date',
+      'jsx/shared/render-datepicker-time': 'canvas/jsx/shared/render-datepicker-time'
+    },
+    
+    'canvas/jsx/shared/render-datepicker-time': {
+      'i18n': 'i18n',
     },
 
     'canvas/str/htmlEscape': {

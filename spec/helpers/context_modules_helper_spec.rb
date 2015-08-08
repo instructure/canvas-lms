@@ -48,6 +48,7 @@ describe ContextModulesHelper do
       student_in_course(:course => t_course)
       item = t_module.add_item(type: 'discussion_topic', id: topic.id)
       expect(module_item_unpublishable?(item)).to be_truthy
+      item.reload
       topic.discussion_entries.create!(:user => @student)
       expect(module_item_unpublishable?(item)).to be_falsey
     end

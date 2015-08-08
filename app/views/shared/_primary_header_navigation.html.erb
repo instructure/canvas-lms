@@ -1,6 +1,6 @@
 <% if @current_user %>
   <ul role="navigation" id="menu" aria-label="<%= t('navigation.main', 'Main Navigation') %>">
-    <%- cache([@current_user, k12?, 'home-menu-15m'], :expires_in => 15.minutes) do -%>
+    <%- cache([@current_user, 'home-menu-15m'], :expires_in => 15.minutes) do -%>
 
     <li id="courses_menu_item" class="menu-item">
       <%= render(:partial => 'shared/home_menu') %>
@@ -8,40 +8,14 @@
     <%- end -%>
     <li id="grades_menu_item" class="menu-item">
       <a href="<%= grades_path %>" class="menu-item-no-drop">
-        <% if k12? %><%= render(:partial => 'shared/svg/svg_icon_grades.svg') %><% end %>
-        <% if k12? %><div class="menu-item__text"><% end %>
         <%= t('menu.grades', 'Grades') %>
-        <% if k12? %></div><% end %>
       </a>
     </li>
     <li id="calendar_menu_item" class="menu-item">
       <a href="<%= calendar_path %>" class="menu-item-no-drop">
-        <% if k12? %><%= render(:partial => 'shared/svg/svg_icon_calendar.svg') %><% end %>
-        <% if k12? %><div class="menu-item__text"><% end %>
         <%= t('menu.calendar', 'Calendar') %>
-        <% if k12? %></div><% end %>
       </a>
     </li>
-    <%# Inbox menu item currently only for K-12 and new styles %>
-    <% if k12? %>
-      <% unless @current_user.fake_student? %>
-        <li id="inbox_menu_item" class="menu-item">
-          <a href="<%= conversations_path %>" class="menu-item-no-drop">
-
-            <% if k12? %>
-              <div class="icon-badge-combo">
-                <div class="icon-badge-combo__icon"><%= render(:partial => 'shared/svg/svg_icon_mail.svg') %></div>
-                <% unless @current_user.disabled_inbox? %>
-                  <% unread = @current_user.unread_conversations_count %>
-                  <span class="icon-badge-combo__badge" <% if unread == 0 %> style="display: none;"<% end %>><%= unread %></span>
-                <% end %>
-              </div>
-            <% end %>
-            <div class="menu-item__text"><%= t 'links.inbox', "Inbox" %></div>
-          </a>
-        </li>
-      <% end %>
-    <% end %>
     <%= render(:partial => 'external_tools/global_nav_menu_items') %>
   </ul>
 <% end %>

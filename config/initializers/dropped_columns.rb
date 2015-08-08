@@ -53,7 +53,8 @@ class ActiveRecord::Base
                         scribd_doc
                         scribd_attempts
                         cached_scribd_thumbnail
-                        last_inline_view).freeze,
+                        last_inline_view
+                        local_filename).freeze,
     'calendar_events' => %w(calendar_event_repeat_id for_repeat_on).freeze,
     'communication_channels' => %w(access_token_id internal_path).freeze,
     'content_exports' => %w(course_id).freeze,
@@ -84,6 +85,7 @@ class ActiveRecord::Base
                         can_participate_before_start_at
                         limit_priveleges_to_course_sections
                         role_name).freeze,
+    'eportfolio_entries' => %w(attachment_id artifact_type).freeze,
     'external_feeds' => %w(body_match feed_type feed_purpose).freeze,
     'failed_jobs' => %w(original_id).freeze,
     'gradebook_uploads' => %w(context_type context_id).freeze,

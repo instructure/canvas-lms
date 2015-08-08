@@ -32,7 +32,7 @@ By adding on a modifier class, you can get the style of the button you need.
       <td>default</td>
       <td><button class="Button" type="button">.Button</button></td>
       <td><button class="Button Button--active" type="button" style="pointer-events: none">&.Button--active</button></td>
-      <td><button class="Button" type="button" disabled>&[disabled]</button></td>      
+      <td><button class="Button" type="button" disabled>&[disabled]</button></td>
     </tr>
     <tr>
       <td>.Button--primary</td>
@@ -62,7 +62,7 @@ By adding on a modifier class, you can get the style of the button you need.
       <td>.Button--danger</td>
       <td><button class="Button Button--danger" type="button">.Button--danger</button></td>
       <td><button class="Button Button--danger Button--active" type="button" style="pointer-events: none">&.Button--active</button></td>
-      <td><button class="Button Button--danger" type="button" disabled>&[disabled]</button></td>        
+      <td><button class="Button Button--danger" type="button" disabled>&[disabled]</button></td>
     </tr>
     <tr>
       <td>.Button--link</td>
@@ -75,7 +75,7 @@ By adding on a modifier class, you can get the style of the button you need.
       <td><button class="Button Button--icon-action" type="button"><i class="icon-edit"></i></button></td>
       <td><button class="Button Button--icon-action Button--active" type="button" style="pointer-events: none"><i class="icon-trash"></i></button></td>
       <td><button class="Button Button--icon-action" type="button" disabled><i class="icon-x"></i></button></td>
-    </tr> 
+    </tr>
   </tbody>
 </table>
 
@@ -90,7 +90,7 @@ If you need to change a button's size, you can do so by adding the appropriate c
 <table class="ic-Table">
   <thead>
     <th>Class</th>
-    <th>Size</th>  
+    <th>Size</th>
   </thead>
   <tbody>
     <tr>
@@ -100,7 +100,7 @@ If you need to change a button's size, you can do so by adding the appropriate c
     <tr>
       <td>.Button.Button--large</td>
       <td><button class="Button Button--large" type="button">.Button-large</button></td>
-    </tr>    
+    </tr>
     <tr>
       <td>.Button.Button--small</td>
       <td><button class="Button Button--small" type="button">.Button-small</button></td>
@@ -108,7 +108,7 @@ If you need to change a button's size, you can do so by adding the appropriate c
     <tr>
       <td>.Button.Button--mini</td>
       <td><button class="Button Button--mini" type="button">.Button-mini</button></td>
-    </tr>    
+    </tr>
   </tbody>
 </table>
 
@@ -148,8 +148,8 @@ listen to the "click" and "keyclick" events and add `tabindex="0"` and `role="bu
   text-shadow: none;
   user-select: none;
   @if $use_new_styles and $use_high_contrast == false { font-weight: 300; }
-  
-  &:focus { 
+
+  &:focus {
     text-decoration: none;
     outline: none;
     @if $use_high_contrast == false { outline: none; }
@@ -223,18 +223,20 @@ input[type="button"] {
   &.btn-block, &.Button--block { width: 100%; }
 }
 
-// Set the backgrounds
-// -------------------------
+// The colors for these come from app/stylesheets/brandable_variables.json
+// Or the values the account sets in the Theme Editor
 
-$ic-brand-button--primary-bgd: $ic-brand-primary !default;
-$ic-brand-button--primary-text: $ic-color-light !default;
-$ic-brand-button--secondary-bgd: $ic-brand-secondary !default;
-$ic-brand-button--secondary-text: $ic-color-light !default;
 
 // Primary appears as blue
 .btn-primary, // <-- deprecated- do not use
 .Button--primary {
-  @include canvas-button($ic-brand-button--primary-bgd, $ic-brand-button--primary-text);
+  $button--primary-text: $ic-brand-button--primary-text;
+  $button--primary-bgd: $ic-brand-button--primary-bgd;
+  @if $use_high_contrast {
+    $button--primary-bgd: $ic-brand-primary;
+    $button--primary-text: $ic-color-light;
+  }
+  @include canvas-button($button--primary-bgd, $button--primary-text);
 }
 // Warning appears as orange
 .btn-warning, // <-- deprecated- do not use
@@ -316,13 +318,22 @@ $ic-brand-button--secondary-text: $ic-color-light !default;
   color: $ic-icon-link-color;
   &:hover, &:focus {
     background: transparent;
-    color: $ic-icon-link-color-hover;  
+    color: $ic-icon-link-color-hover;
   }
   &.active, &.Button--active, &:active {
     background: transparent;
     box-shadow: none;
     border-color: transparent;
     color: $ic-link-color;
+  }
+}
+
+// Same as .Button--icon-action, but white for dark backgrounds
+.Button--icon-action-rev {
+  @extend .Button--icon-action;
+  color: $ic-color-light;
+  &:hover, &:focus {
+    color: $ic-color-light;
   }
 }
 
@@ -334,9 +345,13 @@ $ic-brand-button--secondary-text: $ic-color-light !default;
   @extend .Button;
   &.ui-state-hover { @extend .Button:hover }
   &.ui-state-focus { @extend .Button:focus }
-  &.ui-state-active { 
+  &.ui-state-active {
     @extend .Button--active;
     &:hover { @extend .Button--active; }
   }
   &.ui-state-disabled { @extend .Button.disabled; }
+}
+
+.Button--theme-editor-apply {
+  text-decoration: none;
 }

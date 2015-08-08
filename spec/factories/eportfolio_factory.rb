@@ -27,3 +27,13 @@ def eportfolio_model(opts={})
   @eportfolio_entry.save!
   @eportfolio
 end
+
+def eportfolio(opts={})
+  user(opts) unless @user
+  @portfolio = @user.eportfolios.create!
+end
+
+def eportfolio_with_user(opts={})
+  user(opts)
+  eportfolio(opts)
+end

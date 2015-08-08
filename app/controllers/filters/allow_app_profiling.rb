@@ -17,7 +17,7 @@
 #
 
 module Filters::AllowAppProfiling
-  def self.filter(controller)
+  def self.before(controller)
     if allow?(controller.params, controller.session, controller.logged_in_user)
       Rack::MiniProfiler.authorize_request
     else

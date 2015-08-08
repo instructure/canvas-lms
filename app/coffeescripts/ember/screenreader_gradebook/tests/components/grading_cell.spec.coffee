@@ -80,9 +80,9 @@ define [
 
     run =>
       @component.set('value', 'ohai')
-      @component.send('focusOut')
+      @component.send('focusOut', {target: {id: 'student_and_assignment_grade'}})
 
-      requestStub.then ->
-        start()
+      start()
+      setTimeout =>
         ok stub.called
 

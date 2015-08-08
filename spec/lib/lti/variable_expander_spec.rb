@@ -39,12 +39,18 @@ module Lti
     end
     let(:controller) do
       request_mock = mock('request')
+      request_mock.stubs(:url).returns('https://localhost')
       request_mock.stubs(:host).returns('/my/url')
       request_mock.stubs(:scheme).returns('https')
       m = mock('controller')
+      m.stubs(:css_url_for).with(:common).returns('/path/to/common.scss')
       m.stubs(:request).returns(request_mock)
       m.stubs(:logged_in_user).returns(user)
       m.stubs(:named_context_url).returns('url')
+      view_context_mock = mock('view_context')
+      view_context_mock.stubs(:stylesheet_path)
+                       .returns(URI.parse(request_mock.url).merge(m.css_url_for(:common)).to_s)
+      m.stubs(:view_context).returns(view_context_mock)
       m
     end
 
@@ -123,6 +129,12 @@ module Lti
         HostUrl.stubs(:context_host).returns('localhost')
         subject.expand_variables!(exp_hash)
         expect(exp_hash[:test]).to eq 'localhost'
+      end
+
+      it 'has substitution for $Canvas.css.common' do
+        exp_hash = {test: '$Canvas.css.common'}
+        subject.expand_variables!(exp_hash)
+        expect(exp_hash[:test]).to eq 'https://localhost/path/to/common.scss'
       end
 
       it 'has substitution for $Canvas.api.baseUrl' do

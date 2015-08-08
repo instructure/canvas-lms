@@ -26,7 +26,7 @@
   <% end %>
 <% end %>
 
-<% jammit_css :context_list, :course_list %>
+<% css_bundle :context_list, :course_list %>
 <% js_bundle :course_list %>
 <% @favorite_course_ids = @current_user.courses_with_primary_enrollment(:favorite_courses).map(&:id) %>
 <% @show_star_column = true %>

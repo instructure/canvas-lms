@@ -68,8 +68,6 @@ define [
         min: 95
         max: 110
 
-    DISPLAY_PRECISION = 2
-
     hasSections: $.Deferred()
     allSubmissionsLoaded: $.Deferred()
 
@@ -654,8 +652,8 @@ define [
         letterGrade = GradeCalculator.letter_grade(@options.grading_standard, percentage)
 
       templateOpts =
-        score: round(val.score, DISPLAY_PRECISION)
-        possible: round(val.possible, DISPLAY_PRECISION)
+        score: round(val.score, round.DEFAULT)
+        possible: round(val.possible, round.DEFAULT)
         letterGrade: letterGrade
         percentage: percentage
       if columnDef.type == 'total_grade'
@@ -671,7 +669,7 @@ define [
 
     calculateAndRoundGroupTotalScore: (score, possible_points) ->
       grade = (score / possible_points) * 100
-      round(grade, DISPLAY_PRECISION)
+      round(grade, round.DEFAULT)
 
     calculateStudentGrade: (student) =>
       if student.loaded
@@ -903,12 +901,14 @@ define [
         showSisSync: @options.post_grades_feature_enabled,
         currentSection: @sectionToShow)
       @sectionMenu.render()
+      @togglePostGrades(not @sectionToShow?)
 
     updateCurrentSection: (section, author) =>
       @sectionToShow = section
       @postGradesStore.setSelectedSection @sectionToShow
       userSettings[if @sectionToShow then 'contextSet' else 'contextRemove']('grading_show_only_section', @sectionToShow)
       @buildRows() if @grid
+      @togglePostGrades(not @sectionToShow?)
 
     showSections: ->
       if @sections_enabled && @options.post_grades_feature_enabled
@@ -949,6 +949,21 @@ define [
           labelText: if $placeholder.hasClass('in-menu') then I18n.t 'PowerSchool' else I18n.t 'Post Grades',
           returnFocusTo: $('#post_grades')
         React.renderComponent(app, $placeholder[0])
+
+    togglePostGrades: (visible) =>
+      # hide external tools elements
+      $('.external-tools-dialog').toggle(visible)
+      # remove menu placeholder if legacy placehoder button hidden
+      $('li.post-grades-placeholder').toggle(!$('li.post-grades-placeholder a').hasClass('hidden'))
+      # hide menu if no menu items visible
+      menuVisible = _.any(
+        _.filter(
+          $('li.external-tools-dialog, .post-grades-placeholder'),
+          (item) ->
+            return $(item).css('display') != 'none'
+        )
+      )
+      $('#post_grades').toggle(menuVisible)
 
     initHeader: =>
       @drawSectionSelectButton() if @sections_enabled || @course

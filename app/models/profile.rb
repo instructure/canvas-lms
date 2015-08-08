@@ -4,7 +4,7 @@ class Profile < ActiveRecord::Base
 
   attr_accessible :context, :root_account, :title, :path, :description, :visibility, :position
 
-  serialize :data
+  serialize_utf8_safe :data
 
   validates_presence_of :root_account
   validates_presence_of :context
@@ -73,7 +73,7 @@ class Profile < ActiveRecord::Base
     context_type = klass.name.sub(/Profile\z/, '')
     klass.class_eval { alias_method context_type.downcase.underscore, :context }
     klass.instance_eval { def table_name; "profiles"; end }
-    klass.default_scope :conditions => ["context_type = ?", context_type]
+    klass.default_scope -> { where(:context_type => context_type) }
   end
 
   def self.columns_hash
@@ -87,7 +87,8 @@ class Profile < ActiveRecord::Base
     @columns_hash
   end
 
-  def self.instantiate(record)
+  def self.instantiate(*args)
+    record = args.first
     record["type"] = "#{record["context_type"]}Profile"
     super
   end

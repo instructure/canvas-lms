@@ -94,7 +94,7 @@
 <% end %>
 
 <% js_bundle :quiz_show %>
-<% jammit_css :quizzes, :learning_outcomes %>
+<% css_bundle :quizzes, :learning_outcomes %>
 
 <div id="quiz_show">
   <% if can_do(@quiz, @current_user, :update) || can_do(@quiz, @current_user, :manage) %>

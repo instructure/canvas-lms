@@ -62,9 +62,10 @@ describe "outcomes", priority: 1 do
         it "should validate default values" do
           expect(f('#calculation_method')).to have_value('decaying_average')
           expect(f('#calculation_int')).to have_value('65')
-          expect(f('#calculation_int_example')).to include_text("Most recent score counts as 65%"\
-                                                              " of mastery weight, average of all other scores count"\
-                                                              " as 35% of weight")
+          expect(f('#calculation_int_example')).to include_text("Most recent result counts as 65%"\
+                                                              " of mastery weight, average of all other results count"\
+                                                              " as 35% of weight. There must be at least 2 results"\
+                                                              " before a score is returned.")
         end
 
         it "should validate calculation int out of range values" do

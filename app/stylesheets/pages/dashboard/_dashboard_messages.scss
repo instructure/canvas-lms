@@ -10,15 +10,21 @@
 }
 
 .global-message {
-  padding: 10px;
-  border-bottom: 1px solid #b3b3b3;
   @if $use_new_styles {
+    border-bottom: 1px solid $ic-border-light;
     padding: $ic-sp;
-    margin-bottom: $ic-sp;
-    border: none;
+    &:last-of-type { margin-bottom: $ic-sp*2; }
+  }
+  @else {
+    padding: 10px;
+    border-bottom: 1px solid #b3b3b3;
   }
   .title {
     font-weight: bold;
+    @if $use_new_styles {
+      font-size: $baseFontSize + 2;
+      margin-bottom: $ic-sp/2;
+    }
   }
   .image-block-image {
     margin-right: 18px;

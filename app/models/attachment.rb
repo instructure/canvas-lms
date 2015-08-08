@@ -17,6 +17,7 @@
 #
 
 require 'atom'
+require 'crocodoc'
 
 # See the uploads controller and views for examples on how to use this model.
 class Attachment < ActiveRecord::Base
@@ -26,13 +27,15 @@ class Attachment < ActiveRecord::Base
   end
   attr_accessible :context, :folder, :filename, :display_name, :user, :locked, :position, :lock_at, :unlock_at, :uploaded_data, :hidden
   EXPORTABLE_ATTRIBUTES = [
-    :id, :context_id, :context_type, :size, :folder_id, :content_type, :filename, :uuid, :display_name, :created_at, :updated_at,
-    :workflow_state, :user_id, :local_filename, :locked, :file_state, :deleted_at,
-    :position, :lock_at, :unlock_at, :last_lock_at, :last_unlock_at, :could_be_locked, :root_attachment_id, :cloned_item_id,
+    :id, :context_id, :context_type, :size, :folder_id, :content_type,
+    :filename, :uuid, :display_name, :created_at, :updated_at,
+    :workflow_state, :user_id, :locked, :file_state, :deleted_at,
+    :position, :lock_at, :unlock_at, :last_lock_at, :last_unlock_at,
+    :could_be_locked, :root_attachment_id, :cloned_item_id,
     :namespace, :media_entry_id, :encoding, :need_notify, :upload_error_message
-  ]
+  ].freeze
 
-  EXPORTABLE_ASSOCIATIONS = [:context, :folder, :user, :media_object, :submission]
+  EXPORTABLE_ASSOCIATIONS = [:context, :folder, :user, :media_object, :submission].freeze
 
   include PolymorphicTypeOverride
   override_polymorphic_types context_type: {'QuizStatistics' => 'Quizzes::QuizStatistics',
@@ -625,8 +628,11 @@ class Attachment < ActiveRecord::Base
           new_name = opts[:name] || self.display_name
           self.display_name = Attachment.make_unique_filename(new_name, existing_names)
 
-          if Attachment.where("id = ? AND NOT EXISTS (SELECT 1 FROM attachments WHERE id <> ? AND display_name = ? AND folder_id = ? AND file_state <> ?)",
-                              self.id, self.id, self.display_name, self.folder_id, 'deleted').limit(1).update_all(:display_name => self.display_name) > 0
+          if Attachment.where("id = ? AND NOT EXISTS (?)", self,
+                              Attachment.where("id <> ? AND display_name = ? AND folder_id = ? AND file_state <> ?",
+                                self, display_name, folder_id, 'deleted')).
+              limit(1).
+              update_all(display_name: display_name) > 0
             valid_name = true
           end
         end

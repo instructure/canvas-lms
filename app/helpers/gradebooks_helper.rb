@@ -67,14 +67,19 @@ module GradebooksHelper
   end
 
   def display_grade(grade)
-    grade.blank? ? "--" : grade
+    grade.blank? ? '-' : grade
   end
 
   def student_score_display_for(submission, show_student_view = false)
     return '-' if submission.blank?
-    score, grade = score_and_grade_for(submission, show_student_view)
+    score, grade = if show_student_view
+                     [submission.published_score, submission.published_grade]
+                   else
+                     [submission.score, submission.grade]
+                   end
+
     if submission.try(:excused?)
-      "EX"
+      'EX'
     elsif submission && grade && submission.workflow_state != 'pending_review'
       graded_submission_display(grade, score, submission.assignment.grading_type)
     elsif submission.submission_type
@@ -85,12 +90,15 @@ module GradebooksHelper
   end
 
   def graded_submission_display(grade, score, grading_type)
-    if grading_type == "pass_fail"
+    case grading_type
+    when 'pass_fail'
       pass_fail_icon(score, grade)
-    elsif grading_type == 'percent'
+    when 'percent'
       grade
-    elsif grade.to_f.round(2) == score.to_f.round(2)
-      grade.to_f.round(2)
+    when 'points'
+      score.to_f.round(2)
+    when 'gpa_scale', 'letter_grade'
+      nil
     end
   end
 
@@ -104,7 +112,7 @@ module GradebooksHelper
   end
 
   def pass_fail_icon(score, grade)
-    if score && score > 0 || grade == "complete"
+    if score && score > 0 || grade == 'complete'
       icon_attrs = pass_icon_attributes
     else
       icon_attrs = fail_icon_attributes
@@ -116,13 +124,5 @@ module GradebooksHelper
     html_classes << icon_attrs[:icon_class]
     content_tag('i', '', 'class' => html_classes.join(' '), 'aria-hidden' => true) +
       content_tag('span', icon_attrs[:screenreader_text], 'class' => 'screenreader-only')
-  end
-
-  def score_and_grade_for(submission, show_student_view = false)
-    if show_student_view
-      [submission.published_score, submission.published_grade]
-    else
-      [submission.score, submission.grade]
-    end
   end
 end

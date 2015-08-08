@@ -1,4 +1,6 @@
 require_relative "./diff_parser"
+require_relative './user_config'
+
 module RuboCop::Canvas
   class Comments
     def self.build(raw_diff_tree, cop_output, boyscout_mode = false)
@@ -36,7 +38,11 @@ module RuboCop::Canvas
     }.freeze
 
     def severe?(offense)
-      %w(warning error fatal).include?(offense['severity'])
+      if UserConfig.only_report_errors?
+        %w(error fatal).include?(offense['severity'])
+      else
+        %w(warning error fatal).include?(offense['severity'])
+      end
     end
 
     def transform_to_gergich_comment(path, offense)

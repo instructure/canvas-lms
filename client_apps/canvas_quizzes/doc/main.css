@@ -1,5 +1,5 @@
-@import "/vendor/canvas/public/stylesheets_compiled/new_styles_normal_contrast/pages/g_vendor.css";
-@import "/vendor/canvas/public/stylesheets_compiled/new_styles_normal_contrast/base/c-common.css";
+@import "/vendor/canvas_public/stylesheets_compiled/new_styles_normal_contrast/pages/g_vendor.css";
+@import "/vendor/canvas_public/stylesheets_compiled/new_styles_normal_contrast/base/c-common.css";
 @import "/dist/canvas_quizzes.css";
 
 .seed-data { display: none; }

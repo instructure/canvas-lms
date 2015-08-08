@@ -93,14 +93,7 @@ module ActiveSupport::Callbacks
       protected
       # as ActiveSupport::Callbacks#run_callbacks, but with the step filtering on
       # suspended_callback? added
-      if ActiveSupport::VERSION::STRING < '3'
-        # [ActiveSupport 2.3]
-        def run_callbacks(kind, options={}, &block)
-          cbs = self.class.send("#{kind}_callback_chain").dup
-          cbs.delete_if{ |cb| suspended_callback?(cb.method, kind) }
-          cbs.run(self, options, &block)
-        end
-      elsif ActiveSupport::VERSION::STRING < '4'
+      if ActiveSupport::VERSION::STRING < '4'
         # [ActiveSupport 3]
         def run_callbacks(kind, key=nil)
           cbs = send("_#{kind}_callbacks").dup
@@ -108,7 +101,7 @@ module ActiveSupport::Callbacks
           runner = cbs.compile(key, self)
           # provided block (if any) is executed by yields statements in the
           # compiled runner
-          instance_eval(runner)
+          instance_eval(runner, __FILE__)
         end
       elsif ActiveSupport::VERSION::STRING < '4.1'
         # [ActiveSupport 4.0]
@@ -118,7 +111,7 @@ module ActiveSupport::Callbacks
           runner = cbs.compile
           # provided block (if any) is executed by yields statements in the
           # compiled runner
-          instance_eval(runner)
+          instance_eval(runner, __FILE__)
         end
       else
         # [ActiveSupport 4.1]

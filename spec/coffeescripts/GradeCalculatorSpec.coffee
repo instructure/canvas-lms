@@ -237,8 +237,8 @@ define ['compiled/grade_calculator', 'underscore'], (GradeCalculator, _) ->
     @setup_grades @group4, [[10, 0], [5, 0]]
 
     result = GradeCalculator.calculate @submissions, groups, 'percent'
-    assertGrade result, 'current', 76.7, 100
-    assertGrade result, 'final', 76.7, 100
+    assertGrade result, 'current', 76.67, 100
+    assertGrade result, 'final', 76.67, 100
 
     result = GradeCalculator.calculate @submissions, groups, 'equal'
     assertGrade result, 'current', 29, 20

@@ -97,28 +97,11 @@ function npm_install {
     ( echo "  failed to install npm packages (see $LOG)"; kill -INT $$ )
 }
 
-function generate_js {
-  echo_console_and_log "  Generating JS ..."
-  bundle exec rake js:generate >>"$LOG" 2>&1 || \
+function compile_assets {
+  echo_console_and_log "  compiling assets ..."
+  # the `[1,0,1,0]` part means [do generate_documentation, don't check_syntax, do compile_css, don't build_js]
+  bundle exec rake 'canvas:compile_assets[0,0,1,0]' >>"$LOG" 2>&1 || \
     ( echo "  failed to generate JS (see $LOG)"; kill -INT $$ )
-}
-
-function generate_css {
-  echo_console_and_log "  Generating CSS ..."
-  npm run compile-sass >>"$LOG" 2>&1 || \
-    ( echo "  failed to generate CSS (see $LOG)"; kill -INT $$ )
-}
-
-function generate_css_styleguide {
-  echo_console_and_log "  Generating CSS Styleguide ..."
-    bundle exec rake css:styleguide >>"$LOG" 2>&1 || \
-    ( echo "  failed to generate Styleguide (see $LOG)"; kill -INT $$ )
-}
-
-function generate_docs {
-  echo_console_and_log "  Generating Docs ..."
-    bundle exec rake doc:api >>"$LOG" 2>&1 || \
-    ( echo "  failed to generate Docs (see $LOG)"; kill -INT $$ )
 }
 
 # TODO: moar tips plz
@@ -139,10 +122,7 @@ function update_canvas {
 
   # skip if QUICK_MODE
   if ! $1; then
-    generate_js
-    generate_css
-    generate_css_styleguide
-    generate_docs
+    compile_assets
   fi
 
   tips

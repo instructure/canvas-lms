@@ -60,6 +60,7 @@ define [
 
       @dialog = $("<div id=\"#{ opts.id }\"></div>").appendTo('body').dialog opts
       @dialog.parent().attr('id', opts.containerId) if opts.containerId
+      $('.ui-resizable-handle').attr('aria-hidden', true)
 
       @dialog
 

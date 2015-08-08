@@ -35,3 +35,32 @@ def grading_periods(options = {})
     )
   end
 end
+
+def create_grading_periods_for(context, opts={})
+  opts = { mgp_flag_enabled: true }.merge(opts)
+  context.root_account = Account.default if !context.root_account
+  context.root_account.enable_feature!(:multiple_grading_periods) if opts[:mgp_flag_enabled]
+  gp_group = context.grading_period_groups.create!
+  class_name = context.class.name.demodulize
+  timeframes = opts[:grading_periods] || [:current]
+  now = Time.zone.now
+  period_fixtures = {
+    old: {
+      start_date: 5.months.ago(now),
+      end_date:   2.months.ago(now)
+    },
+    current: {
+      start_date: 2.months.ago(now),
+      end_date:   2.months.from_now(now)
+    },
+    future: {
+      start_date: 2.months.from_now(now),
+      end_date:   5.months.from_now(now)
+    }
+  }
+  timeframes.map.with_index(1) do |timeframe, index|
+    period_params = period_fixtures[timeframe].merge(title: "#{class_name} Period #{index}: #{timeframe} period")
+    gp_group.grading_periods.create!(period_params)
+  end
+end
+

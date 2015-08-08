@@ -24,7 +24,7 @@ class Account < ActiveRecord::Base
     :turnitin_host, :turnitin_comments, :turnitin_pledge,
     :default_time_zone, :parent_account, :settings, :default_storage_quota,
     :default_storage_quota_mb, :storage_quota, :ip_filters, :default_locale,
-    :default_user_storage_quota_mb, :default_group_storage_quota_mb, :integration_id
+    :default_user_storage_quota_mb, :default_group_storage_quota_mb, :integration_id, :brand_config_md5
 
   EXPORTABLE_ATTRIBUTES = [:id, :name, :created_at, :updated_at, :workflow_state, :deleted_at,
     :default_time_zone, :external_status, :storage_quota,
@@ -118,13 +118,14 @@ class Account < ActiveRecord::Base
   has_many :user_account_associations
   has_many :report_snapshots
   has_many :external_integration_keys, :as => :context, :dependent => :destroy
+  belongs_to :brand_config, foreign_key: "brand_config_md5"
 
   before_validation :verify_unique_sis_source_id
   before_save :ensure_defaults
   after_save :update_account_associations_if_changed
 
-  before_save :setup_quota_cache_invalidation
-  after_save :invalidate_quota_caches_if_changed
+  before_save :setup_cache_invalidation
+  after_save :invalidate_caches_if_changed
 
   after_create :default_enrollment_term
 
@@ -223,13 +224,8 @@ class Account < ActiveRecord::Base
   add_setting :include_students_in_global_survey, boolean: true, root_only: true, default: false
   add_setting :trusted_referers, root_only: true
 
-  BRANDING_SETTINGS = [:header_image, :favicon, :apple_touch_icon,
-                       :msapplication_tile_color, :msapplication_tile_square,
-                       :msapplication_tile_wide].freeze
-
-  BRANDING_SETTINGS.each { |setting| add_setting(setting, root_only: true) }
-
   def settings=(hash)
+    @invalidate_settings_cache = true
     if hash.is_a?(Hash)
       hash.each do |key, val|
         if account_settings_options && account_settings_options[key.to_sym]
@@ -456,7 +452,7 @@ class Account < ActiveRecord::Base
       all_courses
     else
       shard.activate do
-        Course.where("EXISTS (SELECT 1 FROM course_account_associations WHERE course_id=courses.id AND account_id=?)", self)
+        Course.where("EXISTS (?)", CourseAccountAssociation.where(account_id: self).where("course_id=courses.id"))
       end
     end
   end
@@ -524,29 +520,38 @@ class Account < ActiveRecord::Base
     nil
   end
 
-  def setup_quota_cache_invalidation
-    @quota_invalidations = []
+  def setup_cache_invalidation
+    @invalidations = []
     unless self.new_record?
-      @quota_invalidations += ['default_storage_quota', 'current_quota'] if self.try_rescue(:default_storage_quota_changed?)
-      @quota_invalidations << 'default_group_storage_quota' if self.try_rescue(:default_group_storage_quota_changed?)
+      @invalidations += ['default_storage_quota', 'current_quota'] if self.try_rescue(:default_storage_quota_changed?)
+      @invalidations << 'default_group_storage_quota' if self.try_rescue(:default_group_storage_quota_changed?)
     end
   end
 
-  def invalidate_quota_caches_if_changed
-    Account.send_later_if_production(:invalidate_quota_caches, self.id, @quota_invalidations) if @quota_invalidations.present?
+  def invalidate_caches_if_changed
+    @invalidations ||= []
+    @invalidations += Account.inheritable_settings if @invalidate_settings_cache
+    if @invalidations.present?
+      @invalidations.each do |key|
+        Rails.cache.delete([key, self.global_id].cache_key)
+      end
+      Account.send_later_if_production(:invalidate_inherited_caches, self, @invalidations)
+    end
   end
 
-  def self.invalidate_quota_caches(account_id, keys)
-    account_ids = Account.sub_account_ids_recursive(account_id) + [account_id]
-    keys.each do |quota_key|
+  def self.invalidate_inherited_caches(parent_account, keys)
+    parent_account.shard.activate do
+      account_ids = Account.sub_account_ids_recursive(parent_account.id).map{|id| Shard.global_id_for(id)}
       account_ids.each do |id|
-        Rails.cache.delete([quota_key, id].cache_key)
+        keys.each do |key|
+          Rails.cache.delete([key, id].cache_key)
+        end
       end
     end
   end
 
   def quota
-    Rails.cache.fetch(['current_quota', self.id].cache_key) do
+    Rails.cache.fetch(['current_quota', self.global_id].cache_key) do
       read_attribute(:storage_quota) ||
         (self.parent_account.default_storage_quota rescue nil) ||
         Setting.get('account_default_quota', 500.megabytes.to_s).to_i
@@ -554,7 +559,7 @@ class Account < ActiveRecord::Base
   end
 
   def default_storage_quota
-    Rails.cache.fetch(['default_storage_quota', self.id].cache_key) do
+    Rails.cache.fetch(['default_storage_quota', self.global_id].cache_key) do
       read_attribute(:default_storage_quota) ||
         (self.parent_account.default_storage_quota rescue nil) ||
         Setting.get('account_default_quota', 500.megabytes.to_s).to_i
@@ -600,7 +605,7 @@ class Account < ActiveRecord::Base
   end
 
   def default_group_storage_quota
-    Rails.cache.fetch(['default_group_storage_quota', self.id].cache_key) do
+    Rails.cache.fetch(['default_group_storage_quota', self.global_id].cache_key) do
       read_attribute(:default_group_storage_quota) ||
         (self.parent_account.default_group_storage_quota rescue nil) ||
         Group.default_storage_quota
@@ -641,9 +646,9 @@ class Account < ActiveRecord::Base
       chain = Shard.shard_for(starting_account_id).activate do
         Account.find_by_sql(<<-SQL)
               WITH RECURSIVE t AS (
-                SELECT * FROM accounts WHERE id=#{Shard.local_id_for(starting_account_id).first}
+                SELECT * FROM #{Account.quoted_table_name} WHERE id=#{Shard.local_id_for(starting_account_id).first}
                 UNION
-                SELECT accounts.* FROM accounts INNER JOIN t ON accounts.id=t.parent_account_id
+                SELECT accounts.* FROM #{Account.quoted_table_name} INNER JOIN t ON accounts.id=t.parent_account_id
               )
               SELECT * FROM t
         SQL
@@ -685,10 +690,10 @@ class Account < ActiveRecord::Base
     if ActiveRecord::Base.configurations[Rails.env]['adapter'] == 'postgresql'
       Account.find_by_sql([<<-SQL, self.id, limit.to_i, offset.to_i])
           WITH RECURSIVE t AS (
-            SELECT * FROM accounts
+            SELECT * FROM #{Account.quoted_table_name}
             WHERE parent_account_id = ? AND workflow_state <>'deleted'
             UNION
-            SELECT accounts.* FROM accounts
+            SELECT accounts.* FROM #{Account.quoted_table_name}
             INNER JOIN t ON accounts.parent_account_id = t.id
             WHERE accounts.workflow_state <>'deleted'
           )
@@ -709,10 +714,10 @@ class Account < ActiveRecord::Base
     if connection.adapter_name == 'PostgreSQL'
       sql = "
           WITH RECURSIVE t AS (
-            SELECT id, parent_account_id FROM accounts
+            SELECT id, parent_account_id FROM #{Account.quoted_table_name}
             WHERE parent_account_id = #{parent_account_id} AND workflow_state <> 'deleted'
             UNION
-            SELECT accounts.id, accounts.parent_account_id FROM accounts
+            SELECT accounts.id, accounts.parent_account_id FROM #{Account.quoted_table_name}
             INNER JOIN t ON accounts.parent_account_id = t.id
             WHERE accounts.workflow_state <> 'deleted'
           )
@@ -891,7 +896,7 @@ class Account < ActiveRecord::Base
       ((details[:available_to] | details[:true_for]) & enrollment_types).each do |role_name|
         given { |user|
           user && RoleOverride.permission_for(self, permission, Role.get_built_in_role(role_name))[:enabled] &&
-          self.course_account_associations.joins('INNER JOIN enrollments ON course_account_associations.course_id=enrollments.course_id').
+          self.course_account_associations.joins("INNER JOIN #{Enrollment.quoted_table_name} ON course_account_associations.course_id=enrollments.course_id").
             where("enrollments.type=? AND enrollments.workflow_state IN ('active', 'completed') AND user_id=?", role_name, user).first &&
           (!details[:if] || send(details[:if])) }
         can permission

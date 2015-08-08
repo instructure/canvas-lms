@@ -237,9 +237,9 @@ class AssessmentItemConverter
 
     text = clear_html(node.text.gsub(/\s+/, " ")).strip
     html_node = node.at_css('div.html') || (node.name.downcase == 'div' && node['class'] =~ /\bhtml\b/) || @flavor == Qti::Flavors::ANGEL
-    is_html = false
+    is_html = (html_node && @flavor == Qti::Flavors::CANVAS) ? true : false
     # heuristic for detecting html: the sanitized html node is more than just a container for a single text node
-    sanitized = sanitize_html!(html_node ? Nokogiri::HTML::DocumentFragment.parse(node.text) : node, true) { |s| is_html = !(s.children.size == 1 && s.children.first.is_a?(Nokogiri::XML::Text)) }
+    sanitized = sanitize_html!(html_node ? Nokogiri::HTML::DocumentFragment.parse(node.text) : node, true) { |s| is_html ||= !(s.children.size == 1 && s.children.first.is_a?(Nokogiri::XML::Text)) }
     if is_html && sanitized.present?
       html = sanitized
     end

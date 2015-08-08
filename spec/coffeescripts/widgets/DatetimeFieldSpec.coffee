@@ -312,6 +312,13 @@ define [
     equal @$field.data('time-minute'), '56'
     equal @$field.data('time-ampm'), 'pm'
 
+  test 'sets time-* to fudged, 24-hour values', ->
+    tz.changeLocale(portuguese, 'pt_PT')
+    @field.updateData()
+    equal @$field.data('time-hour'), '21'
+    equal @$field.data('time-minute'), '56'
+    equal @$field.data('time-ampm'), null
+
   test 'only sets time-* if for full datetime field', ->
     @$field.removeData('time-hour')
     @field.showDate = false

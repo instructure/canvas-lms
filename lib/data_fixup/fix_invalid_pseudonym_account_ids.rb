@@ -1,6 +1,6 @@
 module DataFixup::FixInvalidPseudonymAccountIds
   def self.run
-    Pseudonym.where("NOT EXISTS (SELECT 1 FROM accounts WHERE account_id=accounts.id AND root_account_id IS NULL)").
+    Pseudonym.where("NOT EXISTS (?)", Account.where("account_id=accounts.id AND root_account_id IS NULL")).
       includes(:account, :user).find_each do |p|
       if p.workflow_state == 'deleted'
         destroy_pseudonym(p)

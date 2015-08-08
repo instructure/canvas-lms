@@ -312,28 +312,6 @@ body.files {
   padding-right: 5px;
 }
 
-.progress-bar__bar-container {
-  height: 9px;
-  margin-bottom: 12px;
-  border: solid $ic-brand-primary 1px;
-  border-radius: 20px;
-  margin-top: 10px;
-
-  &.almost-done {
-    border: solid $ic-color-success 1px;
-  }
-}
-.progress-bar__bar {
-  position: relative;
-  background: $ic-brand-primary;
-  border: none;
-  height: 9px;
-  border-radius: 20px;
-
-  &.almost-done {
-    background: $ic-color-success;
-  }
-}
 .current_uploads {
   border-radius: 10px;
   border: dashed $ic-color-neutral 2px;

@@ -1,0 +1,110 @@
+<%= form_for :context_module, :url => context_url(@context, :context_context_modules_url), :html => {:id => "add_context_module_form", :style => "display: none;"} do |f| %>
+  <div class="ic-Form-control form-element">
+    <div class="module_name form-element">
+      <%= f.text_field :name, :placeholder => t('module_name', %{Module Name}), :class => 'ic-Input' %>
+    </div>
+
+    <div class="ic-Checkbox-group form-element">
+      <div class="ic-Form-control ic-Form-control--checkbox">
+        <input type="checkbox" id="unlock_module_at">
+        <label class="ic-Label" for="unlock_module_at">
+          <%= t('#labels.lock_module_until', %{Lock until}) %>
+        </label>
+      </div>
+      <div class="unlock_module_at_details form-element">
+      <label class='screenreader-only' id='unlock_at_date_label'>
+            <%= t("Unlock module on date") %>
+            <%= datepicker_screenreader_prompt %>
+          </label>
+        <%= f.text_field :unlock_at,
+                           class: "datetime_field",
+                           'aria-labelledby' => 'unlock_at_date_label',
+                           'data-tooltip' => '',
+                           :placeholder => t("Unlock At"),
+                           title: accessible_date_format %>
+      </div>
+    </div>
+
+    <div class="prerequisites_entry form-section border border-t">
+      <%= f.label :before_viewing, "Prerequisites", class: "ic-Label form-element" %>
+      <div class="prerequisites_list">
+        <div class="no_prerequisites_message form-element">
+          <%= t('no_preprequisites', %{No prerequisites defined}) %>
+        </div>
+        <div class="criteria_list" style="display: none;"></div>
+        <div id="criterion_blank_prereq" class="criterion clearfix" style="display: none;">
+          <div class="prereq-req-item">
+            <span class="prereq_desc"></span>
+            <span class="option"></span>
+          </div>
+          <div class="prereq-req-item-delete">
+            <button class="delete_criterion_link dim-till-hover" aria-label="<%= t('button.delete_label', %{Delete prerequisites}) %>" title="<%= t('button.delete_title', %{Delete prerequisites}) %>">
+              <i class="icon-end standalone-icon" ></i>
+            </button>
+          </div>
+        </div>
+        <div class="add-item">
+          <button class="add_prerequisite_link add_prerequisite_or_requirement_link" tabindex="0" role="button">
+            <i class="icon-add"></i><%= t('links.add_prerequisite', %{Add prerequisite}) %>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="completion_entry form-section border border-t">
+      <%= f.label :module_complete_when, "Requirements", class: "ic-Label form-element" %>
+      <% if @context.feature_enabled?(:nc_or) %>
+         <div class="ic-Form-control ic-Form-control--radio requirement-count-radio">
+          <div class="ic-Radio">
+          <%= f.radio_button :requirement_count, "" %>
+          <%= f.label :requirement_count, t("Student must complete all of these requirements"), class: "ic-Label", value: "" %>
+          </div>
+          <div class="ic-Radio">
+            <%= f.radio_button :requirement_count, 1  %>
+            <%= f.label :requirement_count, t("Student must complete one of these requirements"), class: "ic-Label", value: 1 %>
+          </div>
+        </div>
+      <% end %>
+      <div class="no_items_message form-element" style="display: none;">
+        <div class="alert alert-info">
+          <%= t('No items in module') %>
+        </div>
+      </div>
+      <div class="criteria_list" style="display: none;"></div>
+      <div id="criterion_blank_req" class="criterion clearfix" style="display: none;">
+        <div class="prereq-req-item">
+          <span class="prereq_desc"><%= t('must_complete_prerequisites', %{Must complete}) %></span>
+          <span class="option"></span>
+        </div>
+        <div class="prereq-req-item-delete">
+          <button class="delete_criterion_link dim-till-hover" aria-label="<%= t('button.delete_label', %{Delete prerequisites}) %>" title="<%= t('button.delete_title', %{Delete prerequisites}) %>">
+            <i class="icon-end standalone-icon" ></i>
+          </button>
+        </div>
+      </div>
+      <div class="add-item">
+        <button class="add_completion_criterion_link add_prerequisite_or_requirement_link" tabindex="0" role="button">
+          <i class="icon-add"></i><%= t('links.add_requirement', %{Add requirement}) %>
+        </button>
+      </div>
+    </div>
+
+    <% if Canvas::Plugin.find!('grade_export').enabled? %>
+      <div class="form-element">
+        <%= f.check_box :publish_final_grade, :id => "publish_final_grade" %>
+        <%= f.label :publish_final_grade, :en => "Publish final grade for the student when this module is completed", :for => "publish_final_grade" %>
+      </div>
+    <% end %>
+
+    <div class="form-element require-sequential ic-Form-control ic-Form-control--checkbox">
+      <%= f.check_box :require_sequential_progress, :id => "require_sequential_progress" %>
+      <%= f.label :require_sequential_progress, :en => "Students must move through requirements in this module in sequential order", :for => "require_sequential_progress", class: 'ic-Label' %>
+    </div>
+
+    <div class="button-container">
+      <button type="button" class="btn cancel_button"><%= t('#buttons.cancel', %{Cancel}) %></button>
+      <button type="submit" class="btn btn-primary submit_button"><%= t('buttons.add_module', %{Add Module}) %></button>
+    </div>
+    <a href="<%= context_url(@context, :context_context_modules_url) %>" style="display: none;" class="add_context_module_url">&nbsp;</a>
+  </div>
+<% end %>

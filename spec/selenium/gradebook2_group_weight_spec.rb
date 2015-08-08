@@ -12,7 +12,7 @@ describe "group weights" do
 
   def check_group_points(expected_weight_text)
     for i in 2..3 do
-      expect(get_group_points[i].text).to eq expected_weight_text + ' of grade'
+      expect(get_group_points[i].text).to eq expected_weight_text[i-2] + ' of grade'
     end
   end
 
@@ -73,7 +73,7 @@ describe "group weights" do
     @course.reload
   end
 
-  it "should validate setting group weights" do
+  it "should validate setting group weights", priority: "1", test_id: 164007 do
     weight_numbers = [26.1, 73.5]
 
     get "/courses/#{@course.id}/gradebook2"
@@ -84,29 +84,15 @@ describe "group weights" do
 
     #set and check the group weight of the first assignment group
     set_group_weight(group_1, weight_numbers[0])
-    validate_group_weight(group_1, weight_numbers[0])
 
     #set and check the group weight of the second assignment group
     set_group_weight(group_2, weight_numbers[1])
     validate_group_weight(group_2, weight_numbers[1])
 
-    # TODO: make the header cell in the UI update to reflect new value
-    # validate_group_weight_text(AssignmentGroup.all, weight_numbers)
-  end
-
-  it "should display group weights correctly when set on assignment groups" do
+    # check display of group weights in column heading
     get "/courses/#{@course.id}/gradebook2"
     wait_for_ajaximations
-    check_group_points('50.00%')
-  end
-
-  it "should display group weights with fractional value" do
-    @group1.group_weight = 70.5; @group1.save!
-    @group2.group_weight = 29.5; @group2.save!
-
-    get "/courses/#{@course.id}/gradebook2"
-    wait_for_ajaximations
-    validate_group_weight_text([@group1, @group2], ['70.50', '29.50'])
+    check_group_points(['26.10%', '73.50%'])
   end
 
   it "should display group weights correctly when unsetting group weights through assignments page" do

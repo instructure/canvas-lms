@@ -23,7 +23,7 @@ describe NotificationPolicy do
   it "should create a new instance given valid attributes" do
     notification_policy_model
   end
-  
+
   context "channels" do
     before(:once) do
       @course = factory_with_protected_attributes(Course, :name => "test course", :workflow_state => "available")
@@ -31,6 +31,7 @@ describe NotificationPolicy do
       e = @course.enroll_student(@student)
       e.accept!
       Notification.all.each{|n| n.destroy }
+      Notification.reset_cache!
       @notif = Notification.create!(:name => "Assignment Created", :subject => "Test", :category => 'TestNever')
     end
 
@@ -47,7 +48,7 @@ describe NotificationPolicy do
       m = @assignment.messages_sent["Assignment Created"].find{|m| m.to == "secondary@example.com"}
       expect(m).not_to be_nil
     end
-    
+
     it "should prevent message dispatches if set to 'never' on triggered policies" do
       @cc = @student.communication_channels.create(:path => "secondary@example.com")
       @cc.confirm!
@@ -108,7 +109,7 @@ describe NotificationPolicy do
     expect(msg).not_to be_nil
     expect(msg.body).to include "mtn dew"
   end
-  
+
   context "named scopes" do
     it "should have a named scope for users" do
       user_with_pseudonym(:active_all => 1)
@@ -121,12 +122,12 @@ describe NotificationPolicy do
       notification_policy_model(:notification => @notification)
       expect(NotificationPolicy.for(@notification)).to eq [@notification_policy]
     end
-    
+
     it "should not slow down from other kinds of input on the *for* named scope" do
       notification_policy_model
       expect(NotificationPolicy.for(:anything_else)).to eq NotificationPolicy.all
     end
-    
+
     context "by" do
       before :once do
         user_with_pseudonym(:active_all => 1)
@@ -135,38 +136,38 @@ describe NotificationPolicy do
         @n3 = notification_policy_model(:frequency => 'weekly', :communication_channel => @cc, notification: notification_model(name: 'N3'))
         @n4 = notification_policy_model(:frequency => 'never', :communication_channel => @cc, notification: notification_model(name: 'N4'))
       end
-      
+
       it "should have a scope to differentiate by frequency" do
         expect(NotificationPolicy.by(:immediately)).to eq [@n1]
         expect(NotificationPolicy.by(:daily)).to eq [@n2]
         expect(NotificationPolicy.by(:weekly)).to eq [@n3]
         expect(NotificationPolicy.by(:never)).to eq [@n4]
       end
-    
+
       it "should be able to differentiate by several frequencies at once" do
         expect(NotificationPolicy.by([:immediately, :daily])).to be_include(@n1)
         expect(NotificationPolicy.by([:immediately, :daily])).to be_include(@n2)
       end
-      
+
       it "should be able to combine an array of frequencies with a for scope" do
         expect(NotificationPolicy.for(@user).by([:daily, :weekly])).to be_include(@n2)
         expect(NotificationPolicy.for(@user).by([:daily, :weekly])).to be_include(@n3)
         expect(NotificationPolicy.for(@user).by([:daily, :weekly])).not_to be_include(@n1)
       end
     end
-    
+
     it "should find all daily and weekly policies for the user, communication_channel, and notification" do
       user_model
       communication_channel_model
       notification_model
 
       NotificationPolicy.delete_all
-      
+
       trifecta_opts = {
         :communication_channel => @communication_channel,
         :notification => @notification
       }
-      
+
       n1 = notification_policy_model
 
       policies = NotificationPolicy.for(@notification).for(@user).for(@communication_channel).by([:daily, :weekly])
@@ -184,9 +185,9 @@ describe NotificationPolicy do
       policies = NotificationPolicy.for(@notification).for(@user).for(@communication_channel).by([:daily, :weekly])
       expect(policies).to eq [n1]
     end
-    
+
   end
-  
+
   describe "setup_for" do
     it "should not fail when params does not include a user, and the account doesn't allow scores in e-mails" do
       user_model

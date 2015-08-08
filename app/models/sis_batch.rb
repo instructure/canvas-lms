@@ -21,8 +21,8 @@ class SisBatch < ActiveRecord::Base
   belongs_to :account
   serialize :data
   serialize :options
-  serialize :processing_errors, Array
-  serialize :processing_warnings, Array
+  serialize_utf8_safe :processing_errors, Array
+  serialize_utf8_safe :processing_warnings, Array
   belongs_to :attachment
   belongs_to :generated_diff, class_name: 'Attachment'
   belongs_to :batch_mode_term, class_name: 'EnrollmentTerm'
@@ -276,7 +276,7 @@ class SisBatch < ActiveRecord::Base
     if data[:supplied_batches].include?(:section)
       # delete sections who weren't in this batch, whose course was in the selected term
       scope = CourseSection.where("course_sections.workflow_state='active' AND course_sections.root_account_id=? AND course_sections.sis_batch_id IS NOT NULL AND course_sections.sis_batch_id<>?", self.account, self)
-      scope = scope.joins("INNER JOIN courses ON courses.id=COALESCE(nonxlist_course_id, course_id)").readonly(false)
+      scope = scope.joins("INNER JOIN #{Course.quoted_table_name} ON courses.id=COALESCE(nonxlist_course_id, course_id)").readonly(false)
       scope = scope.where(:courses => { :enrollment_term_id => self.batch_mode_term })
       scope.find_each do |section|
         section.destroy

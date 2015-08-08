@@ -20,16 +20,16 @@ module Importers
     def resolve_link!(link)
       case link[:link_type]
       when :wiki_page
-        if linked_wiki = context.wiki.wiki_pages.where(migration_id: link[:migration_id]).select('url').first
-          link[:new_value] = "#{context_path}/pages/#{linked_wiki.url}"
+        if linked_wiki_url = context.wiki.wiki_pages.where(migration_id: link[:migration_id]).limit(1).pluck(:url).first
+          link[:new_value] = "#{context_path}/pages/#{linked_wiki_url}"
         end
       when :discussion_topic
-        if linked_topic = context.discussion_topics.where(migration_id: link[:migration_id]).select('id').first
-          link[:new_value] = "#{context_path}/discussion_topics/#{linked_topic.id}"
+        if linked_topic_id = context.discussion_topics.where(migration_id: link[:migration_id]).limit(1).pluck(:id).first
+          link[:new_value] = "#{context_path}/discussion_topics/#{linked_topic_id}"
         end
       when :module_item
-        if tag = context.context_module_tags.where(:migration_id => link[:migration_id]).select('id').first
-          link[:new_value] = "#{context_path}/modules/items/#{tag.id}"
+        if tag_id = context.context_module_tags.where(:migration_id => link[:migration_id]).limit(1).pluck(:id).first
+          link[:new_value] = "#{context_path}/modules/items/#{tag_id}"
         end
       when :object
         type = link[:type]
@@ -41,14 +41,14 @@ module Importers
         if type == 'pages'
           link[:new_value] = "#{context_path}/pages/#{migration_id}"
         elsif type == 'attachments'
-          if att = context.attachments.where(migration_id: migration_id).first
-            link[:new_value] = "#{context_path}/files/#{att.id}/preview"
+          if att_id = context.attachments.where(migration_id: migration_id).limit(1).pluck(:id).first
+            link[:new_value] = "#{context_path}/files/#{att_id}/preview"
           end
         elsif context.respond_to?(type) && context.send(type).respond_to?(:scoped)
           scope = context.send(type).scoped
-          if scope.table.columns.map(&:name).include?(:migration_id)
-            if object = scope.where(migration_id: migration_id).first
-              link[:new_value] = "#{context_path}/#{type_for_url}/#{object.id}"
+          if scope.table.engine.columns_hash['migration_id']
+            if object_id = scope.where(migration_id: migration_id).limit(1).pluck(:id).first
+              link[:new_value] = "#{context_path}/#{type_for_url}/#{object_id}"
             end
           end
         end

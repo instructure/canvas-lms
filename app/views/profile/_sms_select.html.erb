@@ -1,3 +1,4 @@
+<% sms_select ||= nil %>
   <select class="sms_select contact_select" name="channel_id">
     <% if @sms_channels.empty? %>
       <option value="" class="blank_option"><%= t(:default_sms_option, "[Select Cell]") %></option>

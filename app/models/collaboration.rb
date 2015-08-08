@@ -69,7 +69,7 @@ class Collaboration < ActiveRecord::Base
         (self.user_id == user.id ||
          self.users.include?(user) ||
          Collaborator.
-             joins('INNER JOIN group_memberships ON collaborators.group_id = group_memberships.group_id').
+             joins("INNER JOIN #{GroupMembership.quoted_table_name} ON collaborators.group_id = group_memberships.group_id").
              where('collaborators.group_id IS NOT NULL AND
                             group_memberships.user_id = ? AND
                             collaborators.collaboration_id = ?', user, self).exists?)

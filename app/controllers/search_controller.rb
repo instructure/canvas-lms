@@ -181,12 +181,7 @@ class SearchController < ApplicationController
   #   Only return courses that allow self enrollment. Defaults to false.
   #
   def all_courses
-    unless @domain_root_account.feature_enabled?(:course_catalog)
-      return render status: 404, template: "shared/errors/404_message"
-    end
-
-    @courses = Course
-      .where(root_account_id: @domain_root_account)
+    @courses = Course.where(root_account_id: @domain_root_account)
       .where(indexed: true)
       .where(workflow_state: 'available')
       .order('created_at')
@@ -264,7 +259,7 @@ class SearchController < ApplicationController
     if context_name.nil?
       result = if terms.blank?
                  courses = @contexts[:courses].values
-                 group_ids = @current_user.current_groups.with_each_shard.map(&:id)
+                 group_ids = @current_user.current_groups.shard(@current_user).pluck(:id)
                  groups = @contexts[:groups].slice(*group_ids).values
                  courses + groups
                else

@@ -1,6 +1,16 @@
 Rails.application.config.to_prepare do
   Switchman.cache = -> { MultiCache.cache }
 
+  module Canvas
+    module Shard
+      def clear_cache
+        connection.after_transaction_commit { super }
+      end
+    end
+  end
+
+  Switchman::Shard.prepend(Canvas::Shard)
+
   Switchman::Shard.class_eval do
     class << self
       alias :birth :default unless instance_methods.include?(:birth)
@@ -135,6 +145,19 @@ Rails.application.config.to_prepare do
         @in_current_region = !config[:region] || !ApplicationController.region || config[:region] == ApplicationController.region
       end
       @in_current_region
+    end
+
+    def self.send_in_each_region(klass, method, enqueue_args = {}, *args)
+      klass.send(method, *args)
+      regions = Set.new
+      regions << Shard.current.database_server.config[:region]
+      all.each do |db|
+        next if regions.include?(db.config[:region]) || !db.config[:region]
+        next if db.shards.empty?
+        db.shards.first.activate do
+          klass.send_later_enqueue_args(method, enqueue_args, *args)
+        end
+      end
     end
   end
 

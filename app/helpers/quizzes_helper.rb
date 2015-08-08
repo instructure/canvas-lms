@@ -396,8 +396,10 @@ module QuizzesHelper
   end
 
   def comment_get(hash, field)
-    if html = hash_get(hash, "#{field}_html".to_sym)
-      raw(html)
+    html = hash_get(hash, "#{field}_html".to_sym)
+
+    if html
+      sanitize(html)
     else
       hash_get(hash, field)
     end

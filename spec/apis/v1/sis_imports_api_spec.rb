@@ -556,6 +556,9 @@ describe SisImportsApiController, type: :request do
           "diffed_against_import_id" => nil,
       }]
     })
+
+    links = Api.parse_pagination_links(response.headers['Link'])
+    expect(links.first[:uri].path).to eq api_v1_account_sis_imports_path
   end
 
   it "should filter sis imports by date if requested" do

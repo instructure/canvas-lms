@@ -29,7 +29,7 @@
           :PROFILE => @user_data
 %>
 <% js_bundle :profile %>
-<% jammit_css :profile_edit %>
+<% css_bundle :profile_edit %>
 
 <% if service_enabled?(:avatars) %>
   <%= avatar(@user, url: '#', edit: true, class: "profile_pic_link #{@user.avatar_state}", title: t('titles.click_to_change_profile_pic', "Click to change profile pic")) %>
@@ -187,7 +187,7 @@
 </div>
 </div>
 
-<% if @user.associated_root_accounts.with_each_shard.any? { |a| a.feature_enabled?(:allow_opt_out_of_inbox) } %>
+<% if @user.associated_root_accounts.shard(@user).any? { |a| a.feature_enabled?(:allow_opt_out_of_inbox) } %>
 <h2><%= t('headers.inbox_opt_out', "Conversations Inbox Opt-out" ) %></h2>
 <p>
   <label for="disable_inbox"><input type="checkbox" id="disable_inbox" <%= 'checked' if @user.disabled_inbox? %>/>

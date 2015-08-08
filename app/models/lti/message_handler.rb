@@ -34,18 +34,17 @@ module Lti
 
     validates_presence_of :message_type, :resource_handler, :launch_path
 
-    scope :by_message_types, lambda { |*message_types| where('lti_message_handlers.message_type IN (?)', message_types) }
+    scope :by_message_types, lambda { |*message_types| where(message_type: message_types) }
 
     scope :for_context, lambda { |context|
       tool_proxies = ToolProxy.find_active_proxies_for_context(context)
-      joins(:resource_handler).where('lti_resource_handlers.tool_proxy_id' => tool_proxies)
+      joins(:resource_handler).where(lti_resource_handlers: { tool_proxy_id: tool_proxies })
     }
 
     scope :has_placements, lambda { |*placements|
-      where('EXISTS (
-              SELECT * FROM lti_resource_placements
-              WHERE lti_message_handlers.resource_handler_id = lti_resource_placements.resource_handler_id
-              AND lti_resource_placements.placement IN (?) )', placements)
+      where('EXISTS (?)',
+            Lti::ResourcePlacement.where(placement: placements).
+                where("lti_message_handlers.resource_handler_id = lti_resource_placements.resource_handler_id"))
     }
 
     def self.lti_apps_tabs(context, placements, opts)

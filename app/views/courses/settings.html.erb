@@ -1,6 +1,6 @@
 <%
   content_for :page_title, join_title(t(:page_title, "Course Details"), @context.name)
-  jammit_css :course_settings
+  css_bundle :course_settings
   js_bundle :course_settings
   @active_tab = "settings"
 

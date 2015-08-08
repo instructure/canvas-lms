@@ -10,6 +10,8 @@ define [
   GradingCellComponent = Ember.Component.extend
 
     value: null
+    excused: null
+    shouldSaveExcused: false
 
     isPoints: Ember.computed.equal('assignment.grading_type', 'points')
     isPercent: Ember.computed.equal('assignment.grading_type', 'percent')
@@ -70,12 +72,31 @@ define [
       {type, data} = options
       $.ajaxJSON url, type, data
 
+    excusedToggled: (->
+      @updateSubmissionExcused() if @shouldSaveExcused
+    ).observes('excused')
+
+    updateSubmissionExcused: () ->
+      url   = @get('saveURL')
+      value = @$('#submission-excused')?[0].checked
+
+      save = @ajax url,
+        type: "PUT"
+        data: {'submission[excuse]': value}
+      save.then @boundUpdateSuccess, @onUpdateError
+
+    setExcusedWithoutTriggeringSave: (isExcused) ->
+      @shouldSaveExcused = false
+      @set 'excused', isExcused
+      @shouldSaveExcused = true
+
     submissionDidChange: (->
       newVal = if @submission?.excused
                  'EX'
                else
                  @submission?.grade || '-'
 
+      @setExcusedWithoutTriggeringSave(@submission?.excused)
       @set 'value', newVal
     ).observes('submission').on('init')
 
@@ -85,10 +106,15 @@ define [
     onUpdateError: ->
       $.flashError(GRADEBOOK_TRANSLATIONS.submission_update_error)
 
-    focusOut: ->
-      return unless submission = @get('submission')
+    focusOut:(event) ->
+      isGradeInput = event.target.id == 'student_and_assignment_grade'
+      submission   = @get('submission')
+
+      return unless submission && isGradeInput
+
       url = @get('saveURL')
       value = @$('input, select').val()
+      @setExcusedWithoutTriggeringSave(value?.toUpperCase() == 'EX')
       if @get('isPassFail') and value == '-'
         value = ''
       return if value == submission.grade
@@ -105,8 +131,15 @@ define [
       @boundUpdateSuccess = _.bind(@onUpdateSuccess, this)
     ).on('init')
 
-    click: ->
-      @$('input, select').select()
+    click: (event) ->
+      target = event.target
+      hasCheckboxClass = target.classList[0] == 'checkbox'
+      isCheckBox = target.type == 'checkbox'
+
+      if hasCheckboxClass || isCheckBox
+        @$('#submission-excused').focus()
+      else
+        @$('input, select').select()
 
     focus: ->
       @$('input, select').select()

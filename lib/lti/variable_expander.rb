@@ -114,6 +114,9 @@ module Lti
                                                           @tool.id, include_host:true) },
                        LTI1_GUARD
 
+    register_expansion 'Canvas.css.common', [],
+                       -> { URI.parse(@request.url)
+                               .merge(@controller.view_context.stylesheet_path(@controller.css_url_for(:common))).to_s }
 
     ##### Deprecated Substitutions #####
 
@@ -259,11 +262,15 @@ module Lti
                        ENROLLMENT_GUARD
 
     register_expansion 'Canvas.module.id', [],
-                       -> { @content_tag.context_module_id },
+                       -> {
+                         @content_tag.context_module_id
+                       },
                        CONTENT_TAG_GUARD
 
     register_expansion 'Canvas.moduleItem.id', [],
-                       -> { @content_tag.id },
+                       -> {
+                         @content_tag.id
+                       },
                        CONTENT_TAG_GUARD
 
     register_expansion 'Canvas.assignment.id', [],

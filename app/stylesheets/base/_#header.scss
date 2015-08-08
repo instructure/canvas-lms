@@ -58,7 +58,7 @@ $masquerade-link-color: $ic-color-alert;
 }
 
 #header {
-  @if $is-k12 or $use_new_styles == false {
+  @if $use_new_styles == false {
     position: relative;
     z-index: 11;
     background-color: $ic-header-background;
@@ -77,48 +77,40 @@ $masquerade-link-color: $ic-color-alert;
 }
 
 #topbar {
-  @if $is-k12 == false {
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 100%;
-    overflow: hidden;
-  }
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100%;
+  overflow: hidden;
 }
 
 #identity {
   @include reset-list;
-  @if $is-k12 { font-size: 14px; }
-  @else {
-    float: right;
-    font-size: 12px;
-    margin-right: $right_side_margin;
-    // make room for the drop shadow 
-    margin-bottom: 4px;
-    padding: 0 11px;
-    @if $use_high_contrast {
-      background-color: #555;
-    }
-    @else {
-      background-color: #31383e;
-    }
-    border-bottom-left-radius: 5px;
-    border-bottom-right-radius: 5px;
-    border-top: 0;
+
+
+  float: right;
+  font-size: 12px;
+  margin-right: $right_side_margin;
+  // make room for the drop shadow
+  margin-bottom: 4px;
+  padding: 0 11px;
+  @if $use_high_contrast {
+    background-color: #555;
   }
+  @else {
+    background-color: #31383e;
+  }
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+  border-top: 0;
+
   li {
-    @if $is-k12 {
-      margin: 0 0 0 $k12-sp;
-      padding: 0;
-      display: inline-block;
-    }
-    @else {
       color: white;
       float: left;
       line-height: 1em;
       margin: 5px 8px 5px 0;
       padding-left: 8px;
-    }
+
     &.first, &#identity-help-container {
       border-left: none;
     }
@@ -127,26 +119,17 @@ $masquerade-link-color: $ic-color-alert;
     }
   }
   .user_name {
-    @if $is-k12 == false {
-      margin-right: 15px;
-    }
+
+    margin-right: 15px;
+
   }
   a {
-    @if $is-k12 {
-      color: $k12-header-text;
+    color: $ic-color-light;
+    @if $use_high_contrast {
       text-decoration: none;
-      &:hover, &:focus {
-        text-decoration: underline;
-      }
     }
-    @else {
-      color: $ic-color-light;
-      @if $use_high_contrast {
-        text-decoration: none;
-      }
-      &:hover, &:focus {
-        text-decoration: underline;
-      }
+    &:hover, &:focus {
+      text-decoration: underline;
     }
   }
   .emphasize-name {
@@ -173,127 +156,65 @@ $masquerade-link-color: $ic-color-alert;
   #menu {
     @include pie-clearfix;
     @include reset-list;
-    @if $is-k12 {  
-      display: flex;
-      flex: 1;
-      height: $k12-header-primary-height;
-    }
-    @else {
-      padding-top: 3px;
-      margin-left: $left_side_width;  
-    }
+    padding-top: 3px;
+    margin-left: $left_side_width;
   }
 }
 
 .menu-item {
   @if $use_new_styles == false {
     position: relative;
-    @if $is-k12 {
-      @include border-box;
-      border-right: 1px solid $brand-k12-dark;
-      flex: 0 0 ($k12-sp * 10);
-      display: flex;
-      @if $use_high_contrast { border-color: darken($brand-k12-dark, 15%); }
-      @include breakpoint(desktop) { flex: 0 0 ($k12-sp * 14); }
-      @include breakpoint(wide) { flex: 0 0 ($k12-sp * 16); }
-    }  
-    @else {
-      display: block;
-      float: left;
-    }
+    display: block;
+    float: left;
   }
   .menu-item-title, .menu-item-no-drop {
     position: relative;
     text-decoration: none;
     @if $use_new_styles == false {
       z-index: 100;
-      @if $is-k12 {
-        @include border-box;
-        transition: background 0.2s linear;
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        color: $k12-header-text;
-        @include breakpoint(desktop) { flex-direction: row; }
-      }    
-      @else {
-        color: #fff;
-        border: 1px solid transparent;
-        border-bottom: 0 none;
-        display: block;
-        padding: 6px 17px 5px;
-        height: 29px;
-        color: #fff;
-        font-size: 15px;
-      }
+      color: #fff;
+      border: 1px solid transparent;
+      border-bottom: 0 none;
+      display: block;
+      padding: 6px 17px 5px;
+      height: 29px;
+      color: #fff;
+      font-size: 15px;
     }
   }
   .menu-item-no-drop, .menu-item-title {
     @if $use_new_styles == false {
       &:hover, &:focus { text-decoration: underline; }
     }
-    
-    @if $is-k12 {
-      &:hover, &:focus {
-        background: rgba($k12-header-text, 0.15);
-        @if $use_high_contrast == false {
-          text-decoration: none;
-        }
-      }
-      &:active {
-        background: $brand-k12-dark;
-        box-shadow: inset 0 2px 1px rgba(black, 0.3);
-      }
-    }
   }
   &.hover {
     .menu-item-title {
       text-shadow: none;
       @if $use_new_styles == false {
-        @if $is-k12 {
-          background: rgba($k12-header-text, 0.1);
-          color: $k12-header-text;
-          @if $use_high_contrast == false {
-            text-decoration: none;
-          }
-        }      
-        @else {
-          color: $course-dropdown-text-color;
-          border-top-color: darken($ic-brand-secondary, 12%);
-          border-left-color: darken($ic-brand-secondary, 12%);
-          border-right-color: darken($ic-brand-secondary, 12%);
-          background-color: $courses-dropdown-menu-bg;
-        }
+        color: $course-dropdown-text-color;
+        border-top-color: darken($ic-brand-secondary, 12%);
+        border-left-color: darken($ic-brand-secondary, 12%);
+        border-right-color: darken($ic-brand-secondary, 12%);
+        background-color: $courses-dropdown-menu-bg;
       }
     }
     @if $use_new_styles == false {
       // bring it back on screen so you can see it
-      .menu-item-drop { left: 0; } 
+      .menu-item-drop { left: 0; }
     }
   }
-  
+
   .menu-item-drop {
     font-size: 13px;
     // hide off screen, dont do display:none, so screenreaders can see it
     overflow: hidden;
     position: absolute;
     left: -999999px;
-    @if $is-k12 {
-      padding: $k12-sp ($k12-sp / 2) ($k12-sp / 2) 0;
-      z-index: 101;
-      top: 90%;
-      // For browsers that support it, offset the dropdown by the height of the triangle shape in .menu-item-drop__inner-content
-      top: calc(100% - 11px);
-    }
-    @else {
-      background-color: $courses-dropdown-menu-bg;
-      box-shadow: 0 2px 18px rgba(0, 0, 0, 0.3);
-      // brings it down by one pixel so it doesn't overlap
-      top: 41px;
-      z-index: 99;
-    }
+    background-color: $courses-dropdown-menu-bg;
+    box-shadow: 0 2px 18px rgba(0, 0, 0, 0.3);
+    // brings it down by one pixel so it doesn't overlap
+    top: 41px;
+    z-index: 99;
     .menu-item-view-all {
       border-bottom: none;
       font-size: 12px;
@@ -355,15 +276,7 @@ $masquerade-link-color: $ic-color-alert;
         white-space: nowrap;
       }
       &:hover {
-        @if $is-k12 {
-          background: #f0f0f0;
-          &.menu-item-view-all {
-            background: transparent;
-          }
-        }
-        @else {
-          background-color: $activeBG;
-        }
+        background-color: $activeBG;
         .secondary-right, .subtitle {
           color: #666;
         }
@@ -393,9 +306,6 @@ $masquerade-link-color: $ic-color-alert;
   @include reset-list;
   width: 270px;
   li {
-    @if $is-k12 {
-      border-top: none;
-    }
     &:hover {
       .name {
         color: $ic-link-color-hover;
@@ -405,19 +315,7 @@ $masquerade-link-color: $ic-color-alert;
       display: block;
       line-height: 1.2;
       text-decoration: none;
-      @if $is-k12 {
-        padding: ($k12-sp - 4) $k12-sp;
-        color: $brand-k12-dark;
-        &:hover, &:focus {
-          color: ensure-contrast($brand-k12-dark, #f0f0f0);
-          .name {
-            color: ensure-contrast($brand-k12-dark, #f0f0f0);
-          }
-        }
-      }
-      @else {
-        padding: 6px 12px;
-      }
+      padding: 6px 12px;
     }
   }
 }
@@ -473,15 +371,7 @@ $masquerade-link-color: $ic-color-alert;
   }
   .customListOpen {
     font-size: 11px;
-    @if $is-k12 {
-      color: ensure-contrast($brand-k12-dark, #f0f0f0);
-      .name {
-        color: ensure-contrast($brand-k12-dark, #f0f0f0);
-      }
-    }
-    @else {
-      color: $ic-link-color;
-    }
+    color: $ic-link-color;
   }
 }
 

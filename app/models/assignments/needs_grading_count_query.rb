@@ -97,14 +97,14 @@ module Assignments
 
       if da_enabled?
         string += <<-SQL
-          AND EXISTS (SELECT * FROM assignment_student_visibilities asv WHERE asv.user_id = submissions.user_id AND asv.assignment_id = submissions.assignment_id)
+          AND EXISTS (SELECT * FROM #{AssignmentStudentVisibility.quoted_table_name} asv WHERE asv.user_id = submissions.user_id AND asv.assignment_id = submissions.assignment_id)
         SQL
       end
       joined_submissions.where(string, assignment, course)
     end
 
     def joined_submissions
-      assignment.submissions.joins("INNER JOIN enrollments e ON e.user_id = submissions.user_id")
+      assignment.submissions.joins("INNER JOIN #{Enrollment.quoted_table_name} e ON e.user_id = submissions.user_id")
     end
   end
 end
