@@ -1012,6 +1012,122 @@ describe "context modules" do
     end
   end
 
+  context 'adds existing items to modules' do
+    before do
+      course_with_teacher_logged_in
+      @course.context_modules.create! name: 'Module 1'
+      @mod = @course.context_modules.first
+    end
+
+     it 'should add an unpublished page to a module', priority: "1", test_id: 126709 do
+      @unpub_page = @course.wiki.wiki_pages.create!(title: 'Unpublished Page')
+      @unpub_page.workflow_state = 'unpublished'
+      @unpub_page.save!
+      @mod.add_item(type: 'wiki_page', id: @unpub_page.id)
+      go_to_modules
+      verify_persistence('Unpublished Page')
+      expect(f('span.publish-icon.unpublished.publish-icon-publish > i.icon-unpublished')).to be_displayed
+     end
+
+    it 'should add a published page to a module', priority: "1", test_id: 126710 do
+      @pub_page = @course.wiki.wiki_pages.create!(title: 'Published Page')
+      @mod.add_item(type: 'wiki_page', id: @pub_page.id)
+      go_to_modules
+      verify_persistence('Published Page')
+      expect(f('span.publish-icon.published.publish-icon-published')).to be_displayed
+    end
+
+    it 'should add an unpublished quiz to a module', priority: "1", test_id: 126720 do
+      @unpub_quiz = Quizzes::Quiz.create!(context: @course, title: 'Unpublished Quiz')
+      @unpub_quiz.workflow_state = 'unpublished'
+      @unpub_quiz.save!
+      @mod.add_item(type: 'quiz', id: @unpub_quiz.id)
+      go_to_modules
+      verify_persistence('Unpublished Quiz')
+      expect(f('span.publish-icon.unpublished.publish-icon-publish > i.icon-unpublished')).to be_displayed
+    end
+
+    it 'should add a published quiz to a module', priority: "1", test_id: 126721 do
+      @pub_quiz = Quizzes::Quiz.create!(context: @course, title: 'Published Quiz')
+      @mod.add_item(type: 'quiz', id: @pub_quiz.id)
+      go_to_modules
+      verify_persistence('Published Quiz')
+      expect(f('span.publish-icon.published.publish-icon-published')).to be_displayed
+    end
+
+    it 'should add an unpublished assignment to a module', priority: "1", test_id: 126724 do
+      @unpub_assignment = Assignment.create!(context: @course, title: 'Unpublished Assignment')
+      @unpub_assignment.workflow_state = 'unpublished'
+      @unpub_assignment.save!
+      @mod.add_item(type: 'assignment', id: @unpub_assignment.id)
+      go_to_modules
+      verify_persistence('Unpublished Assignment')
+      expect(f('span.publish-icon.unpublished.publish-icon-publish > i.icon-unpublished')).to be_displayed
+    end
+
+    it 'should add a published assignment to a module', priority: "1", test_id: 126725 do
+      @pub_assignment = Assignment.create!(context: @course, title: 'Published Assignment')
+      @mod.add_item(type: 'assignment', id: @pub_assignment.id)
+      go_to_modules
+      verify_persistence('Published Assignment')
+      expect(f('span.publish-icon.published.publish-icon-published')).to be_displayed
+    end
+
+    it 'should add an non-graded unpublished discussion to a module', priority: "1", test_id: 126712 do
+      @unpub_ungraded_discussion = @course.discussion_topics.create!(title: 'Non-graded Unpublished Discussion')
+      @unpub_ungraded_discussion.workflow_state = 'unpublished'
+      @unpub_ungraded_discussion.save!
+      @mod.add_item(type: 'discussion_topic', id: @unpub_ungraded_discussion.id)
+      go_to_modules
+      verify_persistence('Non-graded Unpublished Discussion')
+      expect(f('span.publish-icon.unpublished.publish-icon-publish > i.icon-unpublished')).to be_displayed
+    end
+
+    it 'should add a non-graded published discussion to a module', priority: "1", test_id: 126713 do
+      @pub_ungraded_discussion = @course.discussion_topics.create!(title: 'Non-graded Published Discussion')
+      @mod.add_item(type: 'discussion_topic', id: @pub_ungraded_discussion.id)
+      go_to_modules
+      verify_persistence('Non-graded Published Discussion')
+      expect(f('span.publish-icon.published.publish-icon-published')).to be_displayed
+    end
+
+    it 'should add an graded unpublished discussion to a module', priority: "1", test_id: 126714 do
+      a = @course.assignments.create!(title: 'some assignment', points_possible: 10)
+      @unpub_graded_discussion = @course.discussion_topics.build(assignment: a, title: 'Graded Unpublished Discussion')
+      @unpub_graded_discussion.workflow_state = 'unpublished'
+      @unpub_graded_discussion.save!
+      @mod.add_item(type: 'discussion_topic', id: @unpub_graded_discussion.id)
+      go_to_modules
+      verify_persistence('Graded Unpublished Discussion')
+      expect(f('span.publish-icon.unpublished.publish-icon-publish > i.icon-unpublished')).to be_displayed
+      expect(f('.points_possible_display').text).to include_text "10 pts"
+    end
+
+    it 'should add a graded published discussion to a module', priority: "1", test_id: 126715 do
+      a = @course.assignments.create!(title: 'some assignment', points_possible: 10)
+      @pub_graded_discussion = @course.discussion_topics.build(assignment: a, title: 'Graded Published Discussion')
+      @pub_graded_discussion.save!
+      @mod.add_item(type: 'discussion_topic', id: @pub_graded_discussion.id)
+      go_to_modules
+      verify_persistence('Graded Published Discussion')
+      expect(f('span.publish-icon.published.publish-icon-published')).to be_displayed
+      expect(f('.points_possible_display').text).to include_text "10 pts"
+    end
+
+    it 'should add a graded published discussion with a due date to a module', priority: "1", test_id: 126716 do
+      @due_at = 3.days.from_now
+      a = @course.assignments.create!(title: 'some assignment', points_possible: 10, due_at: @due_at)
+      @pub_graded_discussion_due = @course.discussion_topics.build(assignment: a, title: 'Graded Published Discussion with Due Date')
+      @pub_graded_discussion_due.save!
+      @mod.add_item(type: 'discussion_topic', id: @pub_graded_discussion_due.id)
+      go_to_modules
+      verify_persistence('Graded Published Discussion with Due Date')
+      expect(f('span.publish-icon.published.publish-icon-published')).to be_displayed
+      expect(f('.due_date_display').text).not_to be_blank
+      expect(f('.due_date_display').text).to eq @due_at.strftime('%b %-d')
+      expect(f('.points_possible_display').text).to include_text "10 pts"
+    end
+  end
   describe "files" do
     FILE_NAME = 'some test file'
 
