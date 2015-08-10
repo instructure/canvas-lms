@@ -33,6 +33,15 @@ def add_user_to_group(user,group,is_leader = false)
   group.save!
 end
 
+# Adds all given users to group, can use arrays or a single variable
+def add_users_to_group(students, group)
+  count = students.size
+  count.times do |n|
+    group.add_user students[n]
+    group.save!
+  end
+end
+
 def create_default_student_group(group_name = "Windfury")
   fj("#groupName").send_keys(group_name.to_s)
   fj('button.confirm-dialog-confirm-btn').click
@@ -262,4 +271,11 @@ def create_and_submit_assignment_from_group(student)
     :name => "test assignment",
     :group_category => category})
   assignment.submit_homework(student)
+end
+
+def create_group_announcement_manually(title,text)
+  expect_new_page_load { f('.btn-primary').click }
+  replace_content(f('input[name=title]'), title)
+  type_in_tiny('textarea[name=message]', text)
+  expect_new_page_load { submit_form('.form-actions') }
 end
