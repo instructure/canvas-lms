@@ -293,6 +293,37 @@ describe "Outcome Results API", type: :request do
           expect(json['linked'].keys.sort).to eq %w(users)
           expect(json['linked']['users'].size).to eq 2
         end
+
+        it "can require_outcome_context with sis_user_ids" do
+          @user = @student
+          pseudonym = pseudonym_model
+          pseudonym.user_id = @student.id
+          pseudonym.sis_user_id = '123'
+          pseudonym.save
+          api_call(:get, outcome_results_url(outcome_course, user_ids: "sis_user_id:123", include: ['users']),
+                   controller: 'outcome_results', action: 'index', format: 'json', course_id: outcome_course.id.to_s,
+                   user_ids: "sis_user_id:123", include: ['users'])
+          json = JSON.parse(response.body)
+          expect(json['linked']['users'][0]['id'].to_i).to eq @student.id
+        end
+
+        it "can take sis_user_ids" do
+          student_ids = outcome_students[0..1].map(&:id).map(&:to_s)
+          sis_id_student = outcome_students[2]
+          pseudonym = pseudonym_model
+          pseudonym.user_id = sis_id_student.id
+          pseudonym.sis_user_id = '123'
+          pseudonym.save
+          student_ids << "sis_user_id:123"
+          student_id_str = student_ids.join(',')
+          @user = @teacher
+          api_call(:get, outcome_rollups_url(outcome_course, user_ids: student_id_str, include: ['users']),
+                   controller: 'outcome_results', action: 'rollups', format: 'json', course_id: outcome_course.id.to_s,
+                   user_ids: student_id_str, include: ['users'])
+          json = JSON.parse(response.body)
+          expect(json['linked']['users'].size).to eq 3
+          expect(json['linked']['users'][2]['id'].to_i).to eq sis_id_student.id
+        end
       end
 
       describe "section_id parameter" do
