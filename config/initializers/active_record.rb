@@ -53,7 +53,8 @@ class ActiveRecord::Base
 
   def self.all_models
     return @all_models if @all_models.present?
-    @all_models = (ActiveRecord::Base.models_from_files +
+    @all_models = (ActiveRecord::Base.send(:subclasses) +
+                   ActiveRecord::Base.models_from_files +
                    [Version]).compact.uniq.reject { |model|
       !(model.superclass == ActiveRecord::Base || model.superclass.abstract_class?) ||
       (model.respond_to?(:tableless?) && model.tableless?) ||
@@ -62,14 +63,19 @@ class ActiveRecord::Base
   end
 
   def self.models_from_files
-    @from_files ||= begin
-      Dir[
-        "#{Rails.root}/app/models/**/*.rb",
-        "#{Rails.root}/vendor/plugins/*/app/models/**/*.rb",
-        "#{Rails.root}/gems/plugins/*/app/models/**/*.rb",
-      ].sort.each { |file| ActiveSupport::Dependencies.require_or_load(file) }
-      ActiveRecord::Base.descendants
-    end
+    @from_files ||= Dir[
+      "#{Rails.root}/app/models/**/*.rb",
+      "#{Rails.root}/vendor/plugins/*/app/models/**/*.rb",
+      "#{Rails.root}/gems/plugins/*/app/models/**/*.rb",
+    ].sort.collect { |file|
+      model = begin
+          file.sub(%r{.*/app/models/(.*)\.rb$}, '\1').camelize.constantize
+        rescue NameError, LoadError
+          next
+        end
+      next unless model < ActiveRecord::Base
+      model
+    }
   end
 
   def self.maximum_text_length
