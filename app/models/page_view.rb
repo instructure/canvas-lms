@@ -302,6 +302,27 @@ class PageView < ActiveRecord::Base
     "active_users:#{utc.as_json}"
   end
 
+  # this is not intended to be called often; only from console as a debugging measure
+  def self.active_user_counts_by_shard(time = Time.now)
+    members = Set.new
+    time = time..time unless time.is_a?(Range)
+    bucket_time = time.begin
+    while (time.cover?(bucket_time))
+      bucket = user_count_bucket_for_time(bucket_time)
+      members.merge(Canvas.redis.smembers(bucket))
+      bucket_time += 5.minutes
+    end
+
+    result = {}
+    members.each do |uid|
+      shard = Shard.shard_for(uid)
+      next unless shard
+      result[shard.id] ||= 0
+      result[shard.id] += 1
+    end
+    result
+  end
+
   def store_page_view_to_user_counts
     return unless Setting.get('page_views_store_active_user_counts', 'false') == 'redis' && Canvas.redis_enabled?
     return unless self.created_at.present? && self.user.present?
