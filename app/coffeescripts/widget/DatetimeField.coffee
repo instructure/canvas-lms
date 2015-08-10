@@ -64,7 +64,14 @@ define [
     addDatePicker: (options) ->
       @$field.wrap('<div class="input-append" />')
       $wrapper = @$field.parent('.input-append')
-      datepickerOptions = $.extend {}, @datepickerDefaults, {timePicker: @allowTime}, options.datepicker
+      datepickerOptions = $.extend {}, @datepickerDefaults, {
+        timePicker: @allowTime,
+        beforeShow: () =>
+          @$field.trigger("detachTooltip")
+        ,
+        onClose: () =>
+          @$field.trigger("reattachTooltip")
+      }, options.datepicker
       @$field.datepicker(datepickerOptions)
 
       # TEMPORARY FIX: Hide from aria screenreader until the jQuery UI datepicker is updated for accessibility.

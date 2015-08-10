@@ -184,7 +184,14 @@ class FilesController < ApplicationController
               @current_attachments = @current_folder.visible_file_attachments.by_position_then_display_name
             end
             @current_attachments = @current_attachments.includes(:thumbnail, :media_object)
-            render :json => @current_attachments.map{ |a| a.as_json(methods: [:readable_size, :currently_locked, :thumbnail_url], permissions: {user: @current_user, session: session}) }
+            render :json => @current_attachments.map do |a|
+              a.as_json({
+                methods: [ :readable_size, :currently_locked, :thumbnail_url ],
+                permissions: {
+                  user: @current_user, session: session
+                }
+              })
+            end
           else
             file_structure = {
               :contexts => [@context.as_json(permissions: {user: @current_user})],
@@ -249,38 +256,17 @@ class FilesController < ApplicationController
   # @returns [File]
   def api_index
     get_context
-    if @context
-      folder = Folder.root_folders(@context).first
-      raise ActiveRecord::RecordNotFound unless folder
-      context_index = true
-    else
-      verify_api_id
-      folder = Folder.find(params[:id])
-    end
+    verify_api_id unless @context.present?
+    @folder = Folder.from_context_or_id(@context, params[:id])
 
-    if authorized_action(folder, @current_user, :read_contents)
-      @context = folder.context unless context_index
-      can_view_hidden_files = can_view_hidden_files?(@context, @current_user, session)
+    if authorized_action(@folder, @current_user, :read_contents)
       params[:sort] ||= params[:sort_by] # :sort_by was undocumented; :sort is more consistent with other APIs such as wikis
       params[:include] = Array(params[:include])
       params[:include] << 'user' if params[:sort] == 'user'
 
-      if context_index
-        if can_view_hidden_files
-          scope = @context.attachments.not_deleted
-        else
-          scope = @context.attachments.visible.not_hidden.not_locked.where(
-              :folder_id => Folder.all_visible_folder_ids(@context))
-        end
-      else
-        if can_view_hidden_files
-          scope = folder.active_file_attachments
-        else
-          scope = folder.visible_file_attachments.not_hidden.not_locked
-        end
-      end
-      scope = scope.includes(:user) if params[:include].include? 'user' && params[:sort] != 'user'
-      scope = scope.includes(:usage_rights) if params[:include].include? 'usage_rights'
+      scope = Attachments::ScopedToUser.new(@context || @folder, @current_user).scope
+      scope = scope.includes(:user) if params[:include].include?('user') && params[:sort] != 'user'
+      scope = scope.includes(:usage_rights) if params[:include].include?('usage_rights')
       scope = Attachment.search_by_attribute(scope, :display_name, params[:search_term])
 
       order_clause = case params[:sort]
@@ -307,12 +293,14 @@ class FilesController < ApplicationController
         scope = scope.by_content_types(Array(params[:content_types]))
       end
 
-      url = context_index ? context_files_url : api_v1_list_files_url(folder)
+      url = @context ? context_files_url : api_v1_list_files_url(@folder)
       @files = Api.paginate(scope, self, url)
-      render :json => attachments_json(@files, @current_user, {},
-          :can_view_hidden_files => can_view_hidden_files, :include => params[:include],
-          :only => params[:only],
-          :omit_verifier_in_app => !value_to_boolean(params[:use_verifiers]))
+      render json: attachments_json(@files, @current_user, {}, {
+        can_view_hidden_files: can_view_hidden_files?(@context || @folder, @current_user, session),
+        include: params[:include],
+        only: params[:only],
+        omit_verifier_in_app: !value_to_boolean(params[:use_verifiers])
+      })
     end
   end
 
@@ -1104,7 +1092,6 @@ class FilesController < ApplicationController
   end
 
   private
-
   def render_attachment_json(attachment, deleted_attachments, folder = attachment.folder)
     json = {
       :attachment => attachment.as_json(
@@ -1121,5 +1108,4 @@ class FilesController < ApplicationController
 
     render :json => json, :as_text => true
   end
-
 end

@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "course copy" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   def validate_course_main_page
     header = f('#section-tabs-header')

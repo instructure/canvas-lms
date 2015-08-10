@@ -90,7 +90,7 @@ define([
                  overlayClassName={this.props.overlayClassName}>
             <div ref="modal" className="ReactModal__Layout">
 
-              <div className="ReactModal__InnerSection ReactModal__Header">
+              <div className="ReactModal__Header">
                 <div className="ReactModal__Header-Title">
                   <h4>{this.props.title}</h4>
                 </div>

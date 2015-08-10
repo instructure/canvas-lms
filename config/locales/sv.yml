@@ -14012,12 +14012,12 @@ sv:
   successfully_moved_model_to_newgroup_f7b7aa5a: "Flyttade %{model} till %{newGroup}"
   support: 
     array: 
-      last_word_connector: ", och"
+      last_word_connector: ", och "
       or: 
-        last_word_connector: ", eller"
-        two_words_connector: eller
-      two_words_connector: och
-      words_connector: ","
+        last_word_connector: ", eller "
+        two_words_connector: " eller "
+      two_words_connector: " och "
+      words_connector: ", "
     help_menu: 
       cisco_netacad_facebook: "Support Community"
       cisco_netacad_facebook_description: "Vänligen besök vår Networking Academy Facebooksida för community support eller kontakta din instruktör."

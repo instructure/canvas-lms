@@ -143,7 +143,7 @@ class AssignmentsController < ApplicationController
 
       if @assignment.grants_right?(@current_user, session, :grade)
         visible_student_ids = @context.enrollments_visible_to(@current_user).pluck(:user_id)
-        @current_student_submissions = @assignment.submissions.where("submissions.submission_type IS NOT NULL").where(:user_id => visible_student_ids).all
+        @current_student_submissions = @assignment.submissions.where("submissions.submission_type IS NOT NULL").where(:user_id => visible_student_ids).to_a
       end
 
       begin
@@ -289,7 +289,7 @@ class AssignmentsController < ApplicationController
     active_tab = "Syllabus"
     if authorized_action(@context, @current_user, [:read, :read_syllabus])
       return unless tab_enabled?(@context.class::TAB_SYLLABUS)
-      @groups = @context.assignment_groups.active.order(:position, AssignmentGroup.best_unicode_collation_key('name')).all
+      @groups = @context.assignment_groups.active.order(:position, AssignmentGroup.best_unicode_collation_key('name')).to_a
       @assignment_groups = @groups
       @events = @context.events_for(@current_user)
       @undated_events = @events.select {|e| e.start_at == nil}

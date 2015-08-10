@@ -82,6 +82,11 @@ def select_course(new_course)
   wait_for_ajaximations
 end
 
+def select_message(msg_index)
+  conversation_elements[msg_index].click
+  wait_for_ajaximations
+end
+
 def click_star_toggle_menu_item
   keep_trying_until do
     driver.execute_script(%q{$('#admin-btn').hover().click()})
@@ -173,4 +178,83 @@ def select_conversations(to_select = -1)
   end
 
   driver.action.key_up(modifier).perform
+end
+
+# Allows you to select between
+def click_more_options(opts,message = 0)
+  case
+  # First case is for clicking on message gear menu
+  when opts[:message]
+    # The More Options gear menu only shows up on mouse over of message
+    driver.mouse.move_to ff('.message-item-view')[message]
+    wait_for_ajaximations
+    f('.actions li .inline-block .al-trigger').click
+  # This case is for clicking on gear menu at conversation heading level
+  when opts[:convo]
+    f('.message-header .al-trigger').click
+  # Otherwise, it clicks the topmost gear menu
+  else f('#admin-btn.al-trigger').click
+  end
+  wait_for_ajaximations
+end
+
+# Manually forwards a message. Thankfully, each More Option button has the same menu elements within
+def forward_message(recipient)
+  ffj('.ui-menu-item .ui-corner-all:visible')[1].click
+  wait_for_ajaximations
+  add_message_recipient recipient
+  set_message_body('stuff')
+  f('.btn-primary.send-message').click
+  wait_for_ajaximations
+end
+
+def add_students(count)
+  @s = []
+  count.times do |n|
+    @s << User.create!(:name => "Test Student #{n+1}")
+    @course.enroll_student(@s.last).update_attribute(:workflow_state, 'active')
+  end
+end
+
+def click_reply
+  f('#reply-btn').click
+  wait_for_ajaximations
+end
+
+def reply_to_message(body = 'stuff')
+  click_reply
+  set_message_body(body)
+  click_send
+end
+
+# makes a message's star and unread buttons visible via mouse over
+def hover_over_message(msg)
+  driver.mouse.move_to(msg)
+  wait_for_ajaximations
+end
+
+def click_star_icon(msg,star_btn = nil)
+  if star_btn == nil
+    star_btn = f('.star-btn', msg)
+  end
+
+  star_btn.click
+  wait_for_ajaximations
+end
+
+# Clicks the admin archive/unarchive button
+def click_archive_button
+  f('#archive-btn').click
+  wait_for_ajaximations
+end
+
+# Clicks star cog menu item
+def click_archive_menu_item
+  f('.archive-btn.ui-corner-all').click
+  wait_for_ajaximations
+end
+
+def click_message(msg)
+  conversation_elements[msg].click
+  wait_for_ajaximations
 end

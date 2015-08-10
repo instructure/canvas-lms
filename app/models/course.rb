@@ -20,7 +20,6 @@ require 'atom'
 require 'csv'
 
 class Course < ActiveRecord::Base
-
   include Context
   include Workflow
   include TextHelper
@@ -412,8 +411,7 @@ class Course < ActiveRecord::Base
         course_ids = courses_or_course_ids
         courses = Course.where(:id => course_ids).
             includes(:course_sections => [:course, :nonxlist_course]).
-            select([:id, :account_id]).
-            all
+            select([:id, :account_id]).to_a
       end
       course_ids_to_update_user_account_associations = []
       CourseAccountAssociation.transaction do
@@ -502,7 +500,7 @@ class Course < ActiveRecord::Base
   end
 
   def associated_accounts
-    accounts = self.non_unique_associated_accounts.all.uniq.to_a
+    accounts = self.non_unique_associated_accounts.to_a.uniq
     accounts << self.account if account_id && !accounts.find { |a| a.id == account_id }
     accounts << self.root_account if root_account_id && !accounts.find { |a| a.id == root_account_id }
     accounts
@@ -1209,7 +1207,7 @@ class Course < ActiveRecord::Base
 
   def self.find_all_by_context_code(codes)
     ids = codes.map{|c| c.match(/\Acourse_(\d+)\z/)[1] rescue nil }.compact
-    Course.where(:id => ids).includes(:current_enrollments).all
+    Course.where(:id => ids).includes(:current_enrollments).to_a
   end
 
   def end_at
@@ -1281,7 +1279,7 @@ class Course < ActiveRecord::Base
       if account_chain_ids == [Account.site_admin.id]
         Account.site_admin.account_users_for(user)
       else
-        AccountUser.where(:account_id => account_chain_ids, :user_id => user).all
+        AccountUser.where(:account_id => account_chain_ids, :user_id => user).to_a
       end
     end
     @account_users[user.global_id] ||= []
@@ -1492,30 +1490,6 @@ class Course < ActiveRecord::Base
         update_all(:grade_publishing_status => 'error', :grade_publishing_message => "Timed out.")
   end
 
-  def enrollments_for_csv(options={})
-    # user: used for name in csv output
-    # course_section: used for display_name in csv output
-    # user > pseudonyms: used for sis_user_id/unique_id if options[:include_sis_id]
-    # user > pseudonyms > account: used in find_pseudonym_for_account > works_for_account
-    includes = [:user, :course_section]
-    includes = {:user => {:pseudonyms => :account}, :course_section => []} if options[:include_sis_id]
-
-    scope = if options[:user]
-              enrollment_opts = options.slice(:include_priors)
-              enrollments_visible_to(options[:user], enrollment_opts)
-            else
-              options[:include_priors] ?
-                all_student_enrollments :
-                student_enrollments
-            end
-    enrollments = scope.includes(includes).order_by_sortable_name.all
-    enrollments.partition { |enrollment|
-      enrollment.type != "StudentViewEnrollment"
-    }.flatten
-  end
-
-  private :enrollments_for_csv
-
   def gradebook_to_csv_in_background(filename, user, options = {})
     progress = progresses.build(tag: 'gradebook_to_csv')
     progress.save!
@@ -1530,150 +1504,21 @@ class Course < ActiveRecord::Base
     exported_gradebook.progress = progress
     exported_gradebook.save!
 
-    progress.process_job(self, :generate_csv, {preserve_method_args: true}, options, attachment)
+    progress.process_job(
+      self,
+      :generate_csv,
+      { preserve_method_args: true },
+      options,
+      attachment
+    )
     {attachment_id: attachment.id, progress_id: progress.id}
   end
 
   def generate_csv(options, attachment)
-    csv = gradebook_to_csv(options)
+    csv = GradebookExporter.new(self, options).to_csv
     create_attachment(attachment, csv)
   end
 
-  def gradebook_to_csv(options = {})
-    student_enrollments = enrollments_for_csv(options)
-
-    student_section_names = {}
-    student_enrollments.each do |enrollment|
-      student_section_names[enrollment.user_id] ||= []
-      student_section_names[enrollment.user_id] << (enrollment.course_section.display_name rescue nil)
-    end
-    student_enrollments = student_enrollments.uniq(&:user_id) # remove duplicate enrollments for students enrolled in multiple sections
-
-    calc = GradeCalculator.new(student_enrollments.map(&:user_id), self, :ignore_muted => false)
-    grades = calc.compute_scores
-
-    submissions = {}
-    calc.submissions.each { |s| submissions[[s.user_id, s.assignment_id]] = s }
-
-    assignments = calc.assignments.sort_by do |a|
-      [a.assignment_group_id, a.position, a.due_at || CanvasSort::Last, a.title]
-    end
-    groups = calc.groups
-
-    read_only = t('csv.read_only_field', '(read only)')
-    t 'csv.student', 'Student'
-    t 'csv.id', 'ID'
-    t 'csv.sis_user_id', 'SIS User ID'
-    t 'csv.sis_login_id', 'SIS Login ID'
-    t 'csv.root_account', 'Root Acount'
-    t 'csv.section', 'Section'
-    t 'csv.comments', 'Comments'
-    t 'csv.current_score', 'Current Score'
-    t 'csv.final_score', 'Final Score'
-    t 'csv.final_grade', 'Final Grade'
-    t 'csv.points_possible', 'Points Possible'
-    include_root_account = self.root_account.trust_exists?
-    CSV.generate do |csv|
-      #First row
-      row = ["Student", "ID"]
-      if options[:include_sis_id]
-        row << "SIS User ID" << "SIS Login ID"
-        row << "Root Account" if include_root_account
-      end
-      row << "Section"
-      row.concat assignments.map(&:title_with_id)
-      include_points = !apply_group_weights?
-      groups.each { |g|
-        if include_points
-          row << "#{g.name} Current Points" << "#{g.name} Final Points"
-        end
-        row << "#{g.name} Current Score" << "#{g.name} Final Score"
-      }
-      row << "Current Points" << "Final Points" if include_points
-      row << "Current Score" << "Final Score"
-      row << "Current Grade" << "Final Grade" if grading_standard_enabled?
-      csv << row
-
-      group_filler_length = groups.size * (include_points ? 4 : 2)
-
-      #Possible muted row
-      if assignments.any?(&:muted)
-        #This is is not translated since we look for this exact string when we upload to gradebook.
-        row = [nil, nil, nil]
-        row << nil << nil if options[:include_sis_id]
-        row.concat(assignments.map { |a| 'Muted' if a.muted? })
-        row.concat([nil] * group_filler_length)
-        row << nil << nil if include_points
-        row << nil << nil
-        row << nil if self.grading_standard_enabled?
-        csv << row
-      end
-
-      #Second Row
-      row = ["    Points Possible", nil, nil]
-      row << nil << nil if options[:include_sis_id]
-      row << nil if options[:include_sis_id] && include_root_account
-      row.concat assignments.map(&:points_possible)
-      row.concat([read_only] * group_filler_length)
-      row << read_only << read_only if include_points
-      row << read_only << read_only
-      row << read_only if self.grading_standard_enabled?
-      csv << row
-
-      name_method = list_students_by_sortable_name? ?  :sortable_name : :name
-
-      student_enrollments.each_slice(100) do |student_enrollments_batch|
-
-        if da_enabled = feature_enabled?(:differentiated_assignments)
-          visible_assignments = AssignmentStudentVisibility.visible_assignment_ids_in_course_by_user(user_id: student_enrollments_batch.map(&:user_id), course_id: id)
-        end
-
-        student_enrollments_batch.each do |student_enrollment|
-          student = student_enrollment.user
-          student_sections = student_section_names[student.id].sort.to_sentence
-          student_submissions = assignments.map do |a|
-            if da_enabled && visible_assignments[student.id] && !visible_assignments[student.id].include?(a.id)
-              "N/A"
-            else
-              submission = submissions[[student.id, a.id]]
-              if submission.try(:excused?)
-                "EX"
-              elsif a.grading_type == "gpa_scale" && submission.try(:score)
-                a.score_to_grade(submission.score)
-              else
-                submission.try(:score)
-              end
-            end
-          end
-          row = [student.send(name_method), student.id]
-          if options[:include_sis_id]
-            pseudonym = SisPseudonym.for(student, self, include_root_account)
-            row << pseudonym.try(:sis_user_id)
-            pseudonym ||= student.find_pseudonym_for_account(self.root_account, include_root_account)
-            row << pseudonym.try(:unique_id)
-            row << (pseudonym && HostUrl.context_host(pseudonym.account)) if include_root_account
-          end
-
-          row << student_sections
-          row.concat(student_submissions)
-
-          (current_info, current_group_info),
-            (final_info, final_group_info) = grades.shift
-          groups.each do |g|
-            row << current_group_info[g.id][:score] << final_group_info[g.id][:score] if include_points
-            row << current_group_info[g.id][:grade] << final_group_info[g.id][:grade]
-          end
-          row << current_info[:total] << final_info[:total] if include_points
-          row << current_info[:grade] << final_info[:grade]
-          if self.grading_standard_enabled?
-            row << score_to_grade(current_info[:grade])
-            row << score_to_grade(final_info[:grade])
-          end
-          csv << row
-        end
-      end
-    end
-  end
 
   def create_attachment(attachment, csv)
     attachment.uploaded_data = StringIO.new(csv)
@@ -2059,7 +1904,7 @@ class Course < ActiveRecord::Base
     ce = options[:content_export]
     cm = options[:content_migration]
 
-    attachments = course.attachments.where("file_state <> 'deleted'").all
+    attachments = course.attachments.where("file_state <> 'deleted'").to_a
     total = attachments.count + 1
 
     Attachment.skip_media_object_creation do
@@ -2135,10 +1980,7 @@ class Course < ActiveRecord::Base
   end
 
   def set_course_dates_if_blank(shift_options)
-    if Canvas::Plugin.value_to_boolean(shift_options[:remove_dates])
-      self.start_at = nil
-      self.conclude_at = nil
-    else
+    unless Canvas::Plugin.value_to_boolean(shift_options[:remove_dates])
       self.start_at ||= shift_options[:default_start_at]
       self.conclude_at ||= shift_options[:default_conclude_at]
     end

@@ -1167,7 +1167,7 @@ describe Quizzes::QuizzesController do
       @enrollment.conclude
       get 'statistics', :course_id => @course.id, :quiz_id => @quiz.id
       expect(response).to be_success
-      expect(response).to render_template('statistics')
+      expect(response).to render_template('statistics_cqs')
     end
 
     context "logged out submissions" do
@@ -1200,7 +1200,7 @@ describe Quizzes::QuizzesController do
 
         get 'statistics', :course_id => @course.id, :quiz_id => @quiz.id, :all_versions => '1'
         expect(response).to be_success
-        expect(response).to render_template('statistics')
+        expect(response).to render_template('statistics_cqs')
       end
     end
 
@@ -1211,25 +1211,6 @@ describe Quizzes::QuizzesController do
       course_quiz
       get 'statistics', :course_id => @course.id, :quiz_id => @quiz.id
       expect(response).to be_success
-      expect(response).to render_template('statistics')
-    end
-  end
-
-  describe "GET 'statistics' with new quiz stats feature flag enabled" do
-    before :each do
-      a = Account.default
-      a.enable_feature! :quiz_stats
-      a.save!
-
-      user_session(@teacher)
-      course_quiz
-    end
-
-    it "should redirect to the new quiz stats app" do
-      a = Account.default
-      expect(a.feature_enabled?(:quiz_stats)).to eql true
-      get 'statistics', :course_id => @course.id, :quiz_id => @quiz.id
-      assert_response :success
       expect(response).to render_template('statistics_cqs')
     end
   end

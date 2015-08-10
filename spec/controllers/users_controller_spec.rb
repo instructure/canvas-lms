@@ -1135,7 +1135,7 @@ describe UsersController do
 
       get 'teacher_activity', user_id: @teacher.id, course_id: @course.id
 
-      expect(assigns[:courses][@course][0]['last_interaction']).not_to be_nil
+      expect(assigns[:courses][@course][0][:last_interaction]).not_to be_nil
     end
   end
 

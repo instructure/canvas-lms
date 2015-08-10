@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "google analytics" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   it "should not include tracking script if not asked to" do
     get "/"

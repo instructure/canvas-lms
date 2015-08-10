@@ -68,7 +68,7 @@ class UserObserveesController < ApplicationController
   # @returns User
   def create
     # verify target observee exists and is in an account with the observer
-    observee_pseudonym = @domain_root_account.pseudonyms.by_unique_id(params[:observee][:unique_id]).first
+    observee_pseudonym = @domain_root_account.pseudonyms.active.by_unique_id(params[:observee][:unique_id]).first
     if observee_pseudonym.nil? || common_accounts_for(user, observee_pseudonym.user).empty?
       render json: {errors: [{'message' => 'Unknown observee.'}]}, status: 422
       return

@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "course catalog" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   def catalog_url
     "/search/all_courses"

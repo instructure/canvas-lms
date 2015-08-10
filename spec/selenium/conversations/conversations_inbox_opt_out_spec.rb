@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../helpers/conversations_common')
 
 describe "conversations new" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   before do
     conversation_setup

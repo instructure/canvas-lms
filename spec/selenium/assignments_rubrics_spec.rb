@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "assignment rubrics" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   context "assignment rubrics as a teacher" do
     before(:each) do

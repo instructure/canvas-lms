@@ -111,7 +111,7 @@ class GradeSummaryPresenter
   end
 
   def groups
-    @groups ||= @context.assignment_groups.active.all
+    @groups ||= @context.assignment_groups.active.to_a
   end
 
   def assignments(gp_id = nil)

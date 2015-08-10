@@ -148,7 +148,7 @@ describe "API Authentication", type: :request do
           # we have the code, we can close the browser session
           post "/login/oauth2/token", :client_id => @client_id, :client_secret => @client_secret, :code => code
           expect(response).to be_success
-          expect(response.header['content-type']).to eq 'application/json; charset=utf-8'
+          expect(response.header[content_type_key]).to eq 'application/json; charset=utf-8'
           json = JSON.parse(response.body)
           token = json['access_token']
           expect(json['user']).to eq({ 'id' => @user.id, 'name' => 'test1@example.com' })
@@ -210,6 +210,7 @@ describe "API Authentication", type: :request do
           Onelogin::Saml::Response.any_instance.stubs(:name_qualifier).returns(nil)
           Onelogin::Saml::Response.any_instance.stubs(:session_index).returns(nil)
           Onelogin::Saml::Response.any_instance.stubs(:issuer).returns("saml_entity")
+          Onelogin::Saml::Response.any_instance.stubs(:trusted_roots).returns([])
 
           post 'saml_consume', :SAMLResponse => "foo"
         end
@@ -345,7 +346,7 @@ describe "API Authentication", type: :request do
             # we have the code, we can close the browser session
             post "/login/oauth2/token", :client_id => @key.id, :client_secret => @client_secret, :code => code
             expect(response).to be_success
-            expect(response.header['content-type']).to eq 'application/json; charset=utf-8'
+            expect(response.header[content_type_key]).to eq 'application/json; charset=utf-8'
             json = JSON.parse(response.body)
             @token = json['access_token']
             expect(json['user']).to eq({ 'id' => @user.id, 'name' => 'test1@example.com' })
@@ -410,7 +411,7 @@ describe "API Authentication", type: :request do
               # exchange the code for the token
               post "/login/oauth2/token", {:code => code}, {'HTTP_AUTHORIZATION' => ActionController::HttpAuthentication::Basic.encode_credentials(@client_id, @client_secret)}
               expect(response).to be_success
-              expect(response.header['content-type']).to eq 'application/json; charset=utf-8'
+              expect(response.header[content_type_key]).to eq 'application/json; charset=utf-8'
               json = JSON.parse(response.body)
               token = json['access_token']
               reset!
@@ -458,7 +459,7 @@ describe "API Authentication", type: :request do
               # exchange the code for the token
               post "/login/oauth2/token", {:code => code}, {'HTTP_AUTHORIZATION' => ActionController::HttpAuthentication::Basic.encode_credentials(@client_id, @client_secret)}
               expect(response).to be_success
-              expect(response.header['content-type']).to eq 'application/json; charset=utf-8'
+              expect(response.header[content_type_key]).to eq 'application/json; charset=utf-8'
               JSON.parse(response.body)
             end
           end

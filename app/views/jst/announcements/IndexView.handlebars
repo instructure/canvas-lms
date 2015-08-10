@@ -67,16 +67,16 @@
       <li>{{#t "try_disabling_the_unread_filters"}}Try disabling the "Unread" filter.{{/t}}</li>
     </ul>
   </div>
-  <div class="discussionTopicIndexList"></div>
+  <ul class="discussionTopicIndexList" role="list" aria-label="announcements"></ul>
 {{else}}
   {{#if lastPageFetched}}
-    <div style="margin:auto; text-align: center; margin-top: 80px">
+    <div style="margin:auto; text-align: center;  margin-top: 80px">
       <h1>
         {{#t "there_are_no_announcements_show"}}There are no announcements to show{{/t}}
       </h1>
       {{#if options.permissions.create}}
         <a href="{{new_topic_url}}" class="btn btn-large btn-primary">
-          <i class="icon-plus"></i> 
+          <i class="icon-plus"></i>
           {{#t}}Announcement{{/t}}
         </a>
       {{/if}}

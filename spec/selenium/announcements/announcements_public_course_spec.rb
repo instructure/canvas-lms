@@ -2,7 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
 require File.expand_path(File.dirname(__FILE__) + '/../helpers/announcements_common')
 
 describe "announcements public course" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   context "replies on announcements" do
     before :each do

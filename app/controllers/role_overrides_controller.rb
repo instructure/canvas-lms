@@ -122,7 +122,7 @@ class RoleOverridesController < ApplicationController
       roles += Role.visible_built_in_roles if states.include?('active')
 
       scope = value_to_boolean(params[:show_inherited]) ? @context.available_custom_roles(true) : @context.roles
-      roles += scope.where(:workflow_state => states).order(:id).all
+      roles += scope.where(:workflow_state => states).order(:id).to_a
 
       roles = Api.paginate(roles, self, route)
       ActiveRecord::Associations::Preloader.new(roles, :account).run
@@ -276,13 +276,13 @@ class RoleOverridesController < ApplicationController
   #
   # @example_request
   #   curl 'https://<canvas>/api/v1/accounts/<account_id>/roles.json' \
-  #        -H "Authorization: Bearer <token>" \ 
+  #        -H "Authorization: Bearer <token>" \
   #        -F 'label=New Role' \
-  #        -F 'permissions[read_course_content][explicit]=1' \ 
-  #        -F 'permissions[read_course_content][enabled]=1' \ 
-  #        -F 'permissions[read_course_list][locked]=1' \ 
-  #        -F 'permissions[read_question_banks][explicit]=1' \ 
-  #        -F 'permissions[read_question_banks][enabled]=0' \ 
+  #        -F 'permissions[read_course_content][explicit]=1' \
+  #        -F 'permissions[read_course_content][enabled]=1' \
+  #        -F 'permissions[read_course_list][locked]=1' \
+  #        -F 'permissions[read_question_banks][explicit]=1' \
+  #        -F 'permissions[read_question_banks][enabled]=0' \
   #        -F 'permissions[read_question_banks][locked]=1'
   #
   # @returns Role
@@ -397,13 +397,13 @@ class RoleOverridesController < ApplicationController
   #
   # @example_request
   #   curl https://<canvas>/api/v1/accounts/:account_id/roles/2 \
-  #     -X PUT \ 
+  #     -X PUT \
   #     -H 'Authorization: Bearer <access_token>' \
   #     -F 'label=New Role Name' \
-  #     -F 'permissions[manage_groups][explicit]=1' \ 
-  #     -F 'permissions[manage_groups][enabled]=1' \ 
-  #     -F 'permissions[manage_groups][locked]=1' \ 
-  #     -F 'permissions[send_messages][explicit]=1' \ 
+  #     -F 'permissions[manage_groups][explicit]=1' \
+  #     -F 'permissions[manage_groups][enabled]=1' \
+  #     -F 'permissions[manage_groups][locked]=1' \
+  #     -F 'permissions[send_messages][explicit]=1' \
   #     -F 'permissions[send_messages][enabled]=0'
   #
   # @returns Role
@@ -476,7 +476,7 @@ class RoleOverridesController < ApplicationController
   #   Adds ENV.CURRENT_ACCOUNT with the account we are working with.
   def set_js_env_for_current_account
     js_env :CURRENT_ACCOUNT => @context
-  end 
+  end
 
   # Internal: Get role from params or return error. Used as before filter.
   #
@@ -535,15 +535,15 @@ class RoleOverridesController < ApplicationController
 
   private
 
-  def course_permissions(context) 
+  def course_permissions(context)
     site_admin = {:group_name => t('site_admin_permissions', "Site Admin Permissions"), :group_permissions => []}
     account = {:group_name => t('account_permissions', "Account Permissions"), :group_permissions => []}
     course = {:group_name => t('course_permissions',  "Course & Account Permissions"), :group_permissions => []}
-    
+
     RoleOverride.manageable_permissions(context).each do |p|
       hash = {:label => p[1][:label].call, :permission_name => p[0]}
-      
-      # Check to see if the base role name is in the list of other base role names in p[1] 
+
+      # Check to see if the base role name is in the list of other base role names in p[1]
       is_course_permission = !(Role::ENROLLMENT_TYPES & p[1][:available_to]).empty?
 
       if p[1][:account_only]
@@ -556,27 +556,27 @@ class RoleOverridesController < ApplicationController
         course[:group_permissions] << hash if is_course_permission
       end
     end
- 
+
     res = []
     res << site_admin if site_admin[:group_permissions].any?
     res << account if account[:group_permissions].any?
     res << course if course[:group_permissions].any?
- 
+
     res.each{|pg| pg[:group_permissions] = pg[:group_permissions].sort_by{|p|p[:label]} }
- 
+
     res
   end
 
   # Returns a hash with the avalible permissions grouped by groups of permissions. Permission hash looks like this
   #
-  # ie: 
+  # ie:
   #   {
   #     :group_name => "Example Name",
   #     :group_permissions => [
   #       {
   #         :label => "Some Label"
   #         :permission_name => "Some Permission Name"
-  #       }, 
+  #       },
   #       {
   #         :label => "Some Label"
   #         :permission_name => "Some Permission Name"
@@ -589,7 +589,7 @@ class RoleOverridesController < ApplicationController
     account = {:group_name => t('account_permissions', "Account Permissions"), :group_permissions => []}
     course = {:group_name => t('course_permissions',  "Course & Account Permissions"), :group_permissions => []}
     admin_tools = {:group_name => t('admin_tools_permissions',  "Admin Tools"), :group_permissions => []}
- 
+
     # Add group_permissions
     RoleOverride.manageable_permissions(context).each do |p|
       hash = {:label => p[1][:label].call, :permission_name => p[0]}
@@ -603,17 +603,17 @@ class RoleOverridesController < ApplicationController
         end
       else
         course[:group_permissions] << hash
-      end 
+      end
     end
- 
+
     res = []
     res << site_admin if site_admin[:group_permissions].any?
     res << account if account[:group_permissions].any?
     res << admin_tools if admin_tools[:group_permissions].any?
     res << course if course[:group_permissions].any?
- 
+
     res.each{|pg| pg[:group_permissions] = pg[:group_permissions].sort_by{|p|p[:label]} }
- 
+
     res
   end
 end

@@ -21,6 +21,10 @@ define [
   'jqueryui/tooltip'
 ], (_, $, htmlEscape) ->
 
+  tooltipsToShortCirtuit = {}
+  shortCircutTooltip = (target) ->
+    tooltipsToShortCirtuit[target] || tooltipsToShortCirtuit[target[0]]
+
   tooltipUtils = {
 
     setPosition: (opts)->
@@ -59,6 +63,8 @@ define [
   do ($) ->
     $.widget "custom.timeoutTooltip", $.ui.tooltip,
       _open: ( event, target, content ) ->
+        return null if shortCircutTooltip(target)
+
         # Converts arguments to an array
         args = Array.prototype.slice.call(arguments, 0)
         args.splice(2, 1, htmlEscape(content).toString())
@@ -143,5 +149,14 @@ define [
       .timeoutTooltip(opts)
       .timeoutTooltip('open')
       .click -> $this.timeoutTooltip('close')
+
+  restartTooltip = (event) ->
+    tooltipsToShortCirtuit[event.target] = false
+
+  stopTooltip = (event) ->
+    tooltipsToShortCirtuit[event.target] = true
+
+  $(this).bind("detachTooltip", stopTooltip);
+  $(this).bind("reattachTooltip", restartTooltip);
 
   return tooltipUtils

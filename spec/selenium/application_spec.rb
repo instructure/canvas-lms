@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "Authenticity Tokens" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   it "should change the masked authenticity token on each request but not the unmasked token" do
     user_logged_in

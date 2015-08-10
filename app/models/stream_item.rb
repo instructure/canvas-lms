@@ -336,7 +336,7 @@ class StreamItem < ActiveRecord::Base
     scope = scope.includes(:stream_item_instances) if touch_users
 
     while true
-      batch = scope.reload.all
+      batch = scope.reload.to_a
       batch.each do |item|
         count += 1
         if touch_users

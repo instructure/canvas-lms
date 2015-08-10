@@ -1,18 +1,16 @@
 require File.expand_path(File.dirname(__FILE__) + "/common")
 require File.expand_path(File.dirname(__FILE__) + '/helpers/conferences_common')
+require File.expand_path(File.dirname(__FILE__) + '/helpers/public_courses_context')
 
 describe "web conference" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
   let(:url) { "/courses/#{@course.id}/conferences" }
 
-  before (:each) do
-    course_with_teacher_logged_in
-    PluginSetting.create!(:name => "wimba", :settings =>
-       {"domain" => "wimba.instructure.com"})
-  end
-
   context "with no conferences" do
-    before (:each) do
+    before(:each) do
+      course_with_teacher_logged_in
+      PluginSetting.create!(:name => "wimba", :settings =>
+        {"domain" => "wimba.instructure.com"})
       get url
     end
 
@@ -54,7 +52,10 @@ describe "web conference" do
   end
 
   context "with conferences" do
-    before (:each) do
+    before(:each) do
+      course_with_teacher_logged_in
+      PluginSetting.create!(:name => "wimba", :settings =>
+        {"domain" => "wimba.instructure.com"})
       #Creates conferences before getting the page so they appear when it loads up
       @cc = WimbaConference.create!(:title => "test conference", :user => @user, :context => @course)
     end
@@ -81,7 +82,7 @@ describe "web conference" do
       expect(f('#concluded-conference-list')).to include_text("There are no concluded conferences")
     end
 
-    describe "Keyboard Accessibility" do
+    context "Keyboard Accessibility" do
       it "should set focus to the preceding conference's cog when deleting" do
         @cc2 = WimbaConference.create!(:title => "test conference", :user => @user, :context => @course)
         get url

@@ -261,12 +261,12 @@ class CalendarEventsApiController < ApplicationController
   #
   # @argument type [String, "event"|"assignment"] Defaults to "event"
   # @argument start_date [Date]
-  #   Only return events since the start_date (inclusive). 
+  #   Only return events since the start_date (inclusive).
   #   Defaults to today. The value should be formatted as: yyyy-mm-dd or ISO 8601 YYYY-MM-DDTHH:MM:SSZ.
   # @argument end_date [Date]
-  #   Only return events before the end_date (inclusive). 
+  #   Only return events before the end_date (inclusive).
   #   Defaults to start_date. The value should be formatted as: yyyy-mm-dd or ISO 8601 YYYY-MM-DDTHH:MM:SSZ.
-  #   If end_date is the same as start_date, then only events on that day are 
+  #   If end_date is the same as start_date, then only events on that day are
   #   returned.
   # @argument undated [Boolean]
   #   Defaults to false (dated events only).
@@ -276,9 +276,9 @@ class CalendarEventsApiController < ApplicationController
   #   If true, all events are returned, ignoring start_date, end_date, and undated criteria.
   # @argument context_codes[] [String]
   #   List of context codes of courses/groups/users whose events you want to see.
-  #   If not specified, defaults to the current user (i.e personal calendar, 
-  #   no course/group events). Limited to 10 context codes, additional ones are 
-  #   ignored. The format of this field is the context type, followed by an 
+  #   If not specified, defaults to the current user (i.e personal calendar,
+  #   no course/group events). Limited to 10 context codes, additional ones are
+  #   ignored. The format of this field is the context type, followed by an
   #   underscore, followed by the context id. For example: course_42
   # @argument excludes[] [Array]
   #   Array of attributes to exclude. Possible values are "description", "child_events" and "assignment"
@@ -529,9 +529,9 @@ class CalendarEventsApiController < ApplicationController
       get_options(nil)
 
       Shackles.activate(:slave) do
-        @events.concat assignment_scope.all
+        @events.concat assignment_scope.to_a
         @events = apply_assignment_overrides(@events)
-        @events.concat calendar_event_scope.events_without_child_events.all
+        @events.concat calendar_event_scope.events_without_child_events.to_a
 
         # Add in any appointment groups this user can manage and someone has reserved
         appointment_codes = manageable_appointment_group_codes
@@ -539,7 +539,7 @@ class CalendarEventsApiController < ApplicationController
                          for_user_and_context_codes(@current_user, appointment_codes).
                          send(*date_scope_and_args).
                          events_with_child_events.
-                         all
+                         to_a
       end
     else
       # if the feed url doesn't give us the requesting user,
@@ -547,9 +547,9 @@ class CalendarEventsApiController < ApplicationController
       get_all_pertinent_contexts
       Shackles.activate(:slave) do
         @contexts.each do |context|
-          @assignments = context.assignments.active.all if context.respond_to?("assignments")
+          @assignments = context.assignments.active.to_a if context.respond_to?("assignments")
           # no overrides to apply without a current user
-          @events.concat context.calendar_events.active.all
+          @events.concat context.calendar_events.active.to_a
           @events.concat @assignments || []
         end
       end

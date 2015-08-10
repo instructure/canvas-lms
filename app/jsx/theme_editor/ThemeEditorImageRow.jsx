@@ -46,14 +46,13 @@ define([
 
     render() {
       var inputName = 'brand_config[variables]['+ this.props.varDef.variable_name +']'
+      var imgSrc = this.props.userInput.val || this.props.placeholder
+
       return (
         <section className="Theme__editor-accordion_element Theme__editor-upload">
           <div className="te-Flex">
             <div className="Theme__editor-form--upload">
-              <label
-                htmlFor={'brand_config[variables]['+ this.props.varDef.variable_name +']'}
-                className="Theme__editor-upload_title"
-              >
+              <label htmlFor={inputName} className="Theme__editor-upload_title">
                 {this.props.varDef.human_name}
                 <span className="Theme__editor-upload_restrictions">
                   {this.props.varDef.helper_text}
@@ -61,12 +60,9 @@ define([
               </label>
 
               <div className={'Theme__editor_preview-img-container Theme__editor_preview-img-container--' + this.props.varDef.variable_name}>
-            {{/* ^ this utility class is to control the background color that shows behind the images you can customize in theme editor - see theme_editor.scss */}}
+            {/* ^ this utility class is to control the background color that shows behind the images you can customize in theme editor - see theme_editor.scss */}
                 <div className="Theme__editor_preview-img">
-                  <img
-                    src={this.props.userInput.val || this.props.placeholder}
-                    className="Theme__editor-placeholder"
-                  />
+                  {imgSrc && <img src={imgSrc} className="Theme__editor-placeholder" />}
                 </div>
               </div>
               <div className="Theme__editor-image_upload">

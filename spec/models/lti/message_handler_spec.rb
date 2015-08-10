@@ -108,10 +108,10 @@ module Lti
         @mh1 = create_message_handler(rh1)
         @mh2 = create_message_handler(rh2)
         @mh3 = create_message_handler(rh3)
-        rh1.placements.create(placement: ResourcePlacement::ACCOUNT_NAVIGATION)
-        rh1.placements.create(placement: ResourcePlacement::COURSE_NAVIGATION)
-        rh2.placements.create(placement: ResourcePlacement::ACCOUNT_NAVIGATION)
-        rh3.placements.create(placement: ResourcePlacement::COURSE_NAVIGATION)
+        rh1.placements.create!(placement: ResourcePlacement::ACCOUNT_NAVIGATION, message_handler: @mh1)
+        rh1.placements.create!(placement: ResourcePlacement::COURSE_NAVIGATION, message_handler: @mh1)
+        rh2.placements.create!(placement: ResourcePlacement::ACCOUNT_NAVIGATION, message_handler: @mh2)
+        rh3.placements.create!(placement: ResourcePlacement::COURSE_NAVIGATION, message_handler: @mh3)
       end
 
 
@@ -144,14 +144,14 @@ module Lti
         @mh1 = create_message_handler(rh1)
         @mh2 = create_message_handler(rh2)
         @mh3 = create_message_handler(rh3)
-        rh1.placements.create(placement: ResourcePlacement::ACCOUNT_NAVIGATION)
-        rh1.placements.create(placement: ResourcePlacement::COURSE_NAVIGATION)
-        rh2.placements.create(placement: ResourcePlacement::ACCOUNT_NAVIGATION)
-        rh3.placements.create(placement: ResourcePlacement::COURSE_NAVIGATION)
+        rh1.placements.create(placement: ResourcePlacement::ACCOUNT_NAVIGATION, message_handler: @mh1)
+        rh1.placements.create(placement: ResourcePlacement::COURSE_NAVIGATION, message_handler: @mh1)
+        rh2.placements.create(placement: ResourcePlacement::ACCOUNT_NAVIGATION, message_handler: @mh2)
+        rh3.placements.create(placement: ResourcePlacement::COURSE_NAVIGATION, message_handler: @mh3)
       end
 
       it 'converts a message handler into json tab' do
-        @tp.bindings.create(context: account)
+        @tp.bindings.create!(context: account)
 
         tabs = described_class.lti_apps_tabs(account, [ResourcePlacement::ACCOUNT_NAVIGATION], {})
         expect(tabs.count).to eq 2

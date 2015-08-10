@@ -101,6 +101,9 @@ def should_contain_a_tab_for_grading_schemes_and_periods(url)
   @course.account.enable_feature!(:multiple_grading_periods)
   get url
   expect(f(".grading_periods_tab")).to be_displayed
+  f(".grading_periods_tab").click
+  expect(f(".new-grading-period")).to be_displayed
+
   expect(f(".grading_standards_tab")).to be_displayed
   f(".grading_standards_tab").click
   expect(f(".add_standard_link")).to be_displayed

@@ -44,6 +44,7 @@ module Lti
     USER_GUARD = -> { @current_user }
     PSEUDONYM_GUARD = -> { sis_pseudonym }
     ENROLLMENT_GUARD = -> { @current_user && @context.is_a?(Course) }
+    ROLES_GUARD = -> { @current_user && (@context.is_a?(Course) || @context.is_a?(Account)) }
     CONTENT_TAG_GUARD = -> { @content_tag }
     ASSIGNMENT_GUARD = -> { @assignment }
     MEDIA_OBJECT_GUARD = -> { @attachment && @attachment.media_object}
@@ -118,6 +119,10 @@ module Lti
                        -> { URI.parse(@request.url)
                                .merge(@controller.view_context.stylesheet_path(@controller.css_url_for(:common))).to_s }
 
+    register_expansion 'Canvas.shard.id', [],
+                       -> { Shard.current.id }
+    register_expansion 'Canvas.root_account.global_id', [],
+                       -> { @root_account.global_id }
     ##### Deprecated Substitutions #####
 
     register_expansion 'Canvas.root_account.id', [],
@@ -153,7 +158,7 @@ module Lti
 
     register_expansion 'Canvas.membership.roles', [],
                        -> { lti_helper.current_canvas_roles },
-                       COURSE_GUARD
+                       ROLES_GUARD
 
     #This is a list of IMS LIS roles should have a different key
     register_expansion 'Canvas.membership.concludedRoles', [],

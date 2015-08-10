@@ -36,7 +36,7 @@ describe Quizzes::QuizGroupsController, type: :request do
               {'Accept' => 'application/vnd.api+json'}, opts)
     end
 
-    let (:new_quiz_group) { @quiz.quiz_groups.all[0] }
+    let (:new_quiz_group) { @quiz.reload; @quiz.quiz_groups.first }
 
     it "creates a question group for a quiz" do
       api_create_quiz_group('name' => 'testing')

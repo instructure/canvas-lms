@@ -2,7 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/gradebook2_common')
 
 describe "interaction with multiple grading periods" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   context "gradebook" do
     before :each do
@@ -10,7 +10,7 @@ describe "interaction with multiple grading periods" do
     end
 
     it "should display the correct grading period based on the GET param" do
-      future_grading_period = @course.grading_periods.first
+      future_grading_period = @course.grading_periods.detect{|gp| gp.start_date > Time.now}
       get "/courses/#{@course.id}/gradebook?grading_period_id=#{future_grading_period.id}"
       expect(f('.grading-period-select-button')).to include_text(future_grading_period.title)
     end
@@ -21,7 +21,7 @@ describe "interaction with multiple grading periods" do
     end
 
     it "should display the current grading period without a GET param" do
-      current_grading_period = @course.grading_periods.first
+      current_grading_period = @course.grading_periods.detect{|gp| gp.start_date < Time.now}
       get "/courses/#{@course.id}/gradebook"
       expect(f('.grading-period-select-button')).to include_text(current_grading_period.title)
     end

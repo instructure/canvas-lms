@@ -14013,12 +14013,12 @@ da:
   successfully_moved_model_to_newgroup_f7b7aa5a: "Successuldt flyttet %{model} til %{newGroup}"
   support: 
     array: 
-      last_word_connector: ", og"
+      last_word_connector: ", og "
       or: 
-        last_word_connector: ", eller"
-        two_words_connector: eller
-      two_words_connector: og
-      words_connector: ","
+        last_word_connector: ", eller "
+        two_words_connector: " eller "
+      two_words_connector: " og "
+      words_connector: ", "
     help_menu: 
       cisco_netacad_facebook: Supportfællesskab
       cisco_netacad_facebook_description: "Besøg venligst vore Networking Academy Facebook side for f´ællesskabssupport eller kontakt din instruktør."

@@ -178,8 +178,8 @@ module Canvas
 
     def self.value_to_boolean(value)
       if value.is_a?(String) || value.is_a?(Symbol)
-        return true if ["yes", "true", "on"].include?(value.to_s.downcase)
-        return false if ["no", "false", "off"].include?(value.to_s.downcase)
+        return true if ["yes", "true", "on", "1"].include?(value.to_s.downcase)
+        return false if ["no", "false", "off", "0"].include?(value.to_s.downcase)
       end
       return value if [true, false].include?(value)
       return value.to_i != 0

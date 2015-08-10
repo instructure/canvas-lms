@@ -7,11 +7,13 @@
 ].cache_key) do %>
 <div class="details">
   <h3><%= t 'titles.submission', "Submission" %></h3>
-  <% if @assignment.expects_submission? %>
+  <% if @current_user_submission.excused? %>
     <div class="header">
-      <% if @current_user_submission.excused? %>
-        <%= t "Excused!" %>
-      <% elsif @current_user_submission.has_submission? %>
+      <%= t "Excused!" %>
+     </div>
+  <% elsif @assignment.expects_submission? %>
+    <div class="header">
+      <% if @current_user_submission.has_submission? %>
         <%= image_tag "graded.png" %> <%= t 'titles.submission_turned_in', "Turned In!" %>
       <% else %>
         <%= image_tag "not_graded.png" %> <%= t 'titles.submission_not_turned_in', "Not Turned In!" %>

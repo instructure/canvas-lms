@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe GradeSummaryPresenter do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   describe 'deleted submissions', priority: "2" do
     it 'should navigate to grade summary page' do
