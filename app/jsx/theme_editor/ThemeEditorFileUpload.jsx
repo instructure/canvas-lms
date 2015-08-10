@@ -69,7 +69,7 @@ define([
       if (this.props.userInput.val || this.props.userInput.val === '') {
         return (
           <span>
-            <i className="icon-reset"/>
+            <i className="icon-reset" aria-hidden="true" />
             <span className="screenreader-only">
               { I18n.t('Undo') }
             </span>
@@ -78,10 +78,16 @@ define([
       } else if (this.props.currentValue) {
         return (
           <span>
-            <i className="icon-x"/>
+            <i className="icon-x" aria-hidden="true" />
             <span className="screenreader-only">
               { I18n.t('Clear') }
             </span>
+          </span>
+        )
+      } else {
+        return (
+          <span className="screenreader-only">
+            { I18n.t('Reset') }
           </span>
         )
       }
@@ -104,6 +110,9 @@ define([
             value={(this.props.userInput.val === '') ? '' : this.props.currentValue}
           />
           <label className="ThemeEditorFileUpload__file-chooser">
+            <div className="screenreader-only">
+              { this.props.label }
+            </div>
             <input
               type="file"
               name={this.props.userInput.val && this.props.name}
@@ -111,10 +120,7 @@ define([
               onChange={this.handleFileChanged}
               ref="fileInput"
             />
-            <div className="screenreader-only">
-              { this.props.label }
-            </div>
-            <div className="ThemeEditorFileUpload__fake-input uneditable-input ic-Input">
+            <div className="ThemeEditorFileUpload__fake-input uneditable-input ic-Input" aria-hidden="true">
               { this.displayValue() }
             </div>
             <div className="Button" aria-hidden="true">

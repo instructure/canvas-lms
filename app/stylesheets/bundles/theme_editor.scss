@@ -502,6 +502,7 @@ $te-width: 300px;
   .Theme__editor-upload_title {
     font-size: $h2-font-size;
     color: $ic-color-dark;
+    margin: 0;
   }
   .Theme__editor-image_upload {
     flex: 100%;
@@ -560,11 +561,21 @@ $te-width: 300px;
 
     .Theme__editor-image_upload-label {
       margin-bottom: 0;
+      position: relative;
     }
     .Theme__editor-input_upload {
       position: absolute;
       top: 0; left: -9999px;
       opacity: 0;
+
+      &:focus + .Theme__editor-button_upload {
+        text-decoration: underline;
+        @include button-focus-light;
+      }
+      &:active + .Theme__editor-button_upload {
+        background: rgba($ic-color-dark, 0.05);
+        box-shadow: none;
+      }
     }
     .Theme__editor-input_resets {
       z-index: 2; // make sure these go over the hidden input box

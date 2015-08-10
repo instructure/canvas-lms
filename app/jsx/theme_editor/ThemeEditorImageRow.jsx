@@ -45,35 +45,39 @@ define([
     },
 
     render() {
-      var inputName = 'brand_config[variables]['+ this.props.varDef.variable_name +']'
+      var inputName = 'brand_config[variables][' + this.props.varDef.variable_name + ']'
       var imgSrc = this.props.userInput.val || this.props.placeholder
 
       return (
         <section className="Theme__editor-accordion_element Theme__editor-upload">
           <div className="te-Flex">
             <div className="Theme__editor-form--upload">
-              <label htmlFor={inputName} className="Theme__editor-upload_title">
-                {this.props.varDef.human_name}
+              <div className="Theme__editor-upload_header">
+                <h4 className="Theme__editor-upload_title" >
+                  { this.props.varDef.human_name }
+                </h4>
                 <span className="Theme__editor-upload_restrictions">
-                  {this.props.varDef.helper_text}
+                  { this.props.varDef.helper_text }
                 </span>
-              </label>
+              </div>
 
               <div className={'Theme__editor_preview-img-container Theme__editor_preview-img-container--' + this.props.varDef.variable_name}>
             {/* ^ this utility class is to control the background color that shows behind the images you can customize in theme editor - see theme_editor.scss */}
                 <div className="Theme__editor_preview-img">
-                  {imgSrc && <img src={imgSrc} className="Theme__editor-placeholder" />}
+                  { imgSrc && <img src={imgSrc} className="Theme__editor-placeholder" alt="" /> }
                 </div>
               </div>
+
               <div className="Theme__editor-image_upload">
                 <input
                     type="hidden"
                     name={!this.props.userInput.val && inputName}
                     value={(this.props.userInput.val === '') ? '' : this.props.currentValue}
                   />
+
                 <label className="Theme__editor-image_upload-label">
-                  <span className="Theme__editor-button_upload Button Button--link">
-                    {I18n.t('Select Image')}
+                  <span className="screenreader-only">
+                    { this.props.varDef.human_name }
                   </span>
                   <input
                     type="file"
@@ -83,14 +87,18 @@ define([
                     onChange={event => this.setValue(event.target)}
                     ref="fileInput"
                   />
+                  <span className="Theme__editor-button_upload Button Button--link" aria-hidden="true">
+                    { I18n.t('Select Image') }
+                  </span>
                 </label>
+
                 {this.props.userInput.val || this.props.currentValue ? (
                   <button
                     type="button"
                     className="Button Button--link"
                     onClick={() => this.setValue(isSet(this.props.userInput.val) ? '' : null)}
                   >
-                    {isSet(this.props.userInput.val) ? I18n.t('Use Default') : I18n.t('Undo')}
+                    { isSet(this.props.userInput.val) ? I18n.t('Use Default') : I18n.t('Undo') }
                   </button>
                 ) : (
                   null
