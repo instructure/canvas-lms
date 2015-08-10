@@ -14,6 +14,7 @@ describe "groups" do
 
     let(:url) {"/groups/#{@testgroup.first.id}"}
     let(:announcements_page) {url + '/announcements'}
+    let(:people_page) {url + '/users'}
 
     describe "announcement page" do
       it "should center the add announcement button if no announcements are present", priority: "1", test_id: 273606 do
@@ -59,6 +60,15 @@ describe "groups" do
         fj(".ui-accordion-header a:contains('Announcements')").click
         expect(fln('Group Announcement')).to be_displayed
         expect(fln('Course Announcement')).to be_nil
+      end
+    end
+
+    describe "people page" do
+      it "should display and show a list of group members", priority: "1", test_id: 273614 do
+        get people_page
+        # Checks that all students and teachers created in setup are listed on page
+        expect(ff('.student_roster .user_name').size).to eq 5
+        expect(ff('.teacher_roster .user_name').size).to eq 1
       end
     end
   end
