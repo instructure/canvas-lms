@@ -59,6 +59,23 @@ describe "Wiki Pages" do
       expect(element_exists('.icon-clock')).to be_truthy
     end
 
+    it "should display a creative commons license when set", priority: "1", test_id: 272274 do
+      @course.license =  'cc_by_sa'
+      @course.save!
+      front = @course.wiki.wiki_pages.create!(title: 'Front Page with License')
+      front.set_as_front_page!
+      front.save!
+      get "/courses/#{@course.id}/wiki"
+      f('.home').click()
+      # setting front-page as home page
+      fj('.btn.button-sidebar-wide:contains("Choose Home Page")').click()
+      fj('input[type=radio][value=wiki]').click()
+      fj('button.btn.btn-primary.button_type_submit.ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-text-only').click()
+      f('.home').click()
+      wait_for_ajaximations
+      expect(f('.public-license-text').text).to include('This course content is offered under a')
+    end
+
     it "navigates to the wiki pages edit page from the show page" do
       wikiPage = @course.wiki.wiki_pages.create!(:title => "Foo")
       edit_url = edit_course_wiki_page_url(@course, wikiPage)
