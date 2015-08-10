@@ -117,6 +117,7 @@ define([
               htmlValues: ['question_text']
             });
             $question.data('question', question);
+	    $question.find(".assessment_question_id").text(question.id);
             $("#questions").append($question);
             $question.show();
           }
