@@ -28,6 +28,30 @@
       </nav>
     <% end %>
     <div class="header-buttons">
+      <div class="post-grades-button-placeholder">
+        <% if @post_grades_tools.count > 1 %>
+          <button id="post_grades" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only"><%= t('Post Grades') %></button>
+          <ul style="display: none;" class="post-grades-menu ui-kyle-menu">
+            <% @post_grades_tools.each do |tool| %>
+              <% case tool[:type] %>
+              <% when :lti %>
+                <li class="external-tools-dialog"><a aria-controls="post_grades_frame_dialog" role="button" data-url="<%= tool[:data_url]%>"><%= tool[:name]%></a></li>
+              <% when :post_grades %>
+                <li class="post-grades-placeholder in-menu"></li>
+              <% when :ellip %>
+                <li class="external-tools-dialog ellip"><a>&hellip;</a></li>
+              <% end %>
+            <% end %>
+          </ul>
+        <% elsif @post_grades_tools.count == 1 %>
+          <% case @post_grades_tools[0][:type] %>
+          <% when :lti %>
+          <button class="external-tools-dialog ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" data-url="<%= @post_grades_tools[0][:data_url]%>"><%= @post_grades_tools[0][:name]%></button>
+          <% when :post_grades %>
+          <span class="post-grades-placeholder"></span>
+          <% end %>
+        <% end %>
+      </div>
       <a href="<%= context_url(@context, :change_gradebook_version_context_gradebook_url, :version => "srgb") %>" class="Button individual-view-button" id="change_gradebook_version_link_holder" type="button"><%= t(:individual_view, "Individual View") %></a>
       <div class="section-button-placeholder"></div>
     </div>
@@ -49,37 +73,12 @@
       </div>
       <div class="gradebook_menu">
         <span class="ui-buttonset">
-
-          <% if @post_grades_tools.count > 1 %>
-            <button id="post_grades" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only"><%= t('Post Grades') %></button>
-            <ul style="display: none;" class="post-grades-menu ui-kyle-menu">
-              <% @post_grades_tools.each do |tool| %>
-                <% case tool[:type] %>
-                <% when :lti %>
-                  <li class="external-tools-dialog"><a aria-controls="post_grades_frame_dialog" role="button" data-url="<%= tool[:data_url]%>"><%= tool[:name]%></a></li>
-                <% when :post_grades %>
-                  <li class="post-grades-placeholder in-menu"></li>
-                <% when :ellip %>
-                  <li class="external-tools-dialog ellip"><a>&hellip;</a></li>
-                <% end %>
-              <% end %>
-            </ul>
-          <% elsif @post_grades_tools.count == 1 %>
-            <% case @post_grades_tools[0][:type] %>
-            <% when :lti %>
-            <button class="external-tools-dialog ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" data-url="<%= @post_grades_tools[0][:data_url]%>"><%= @post_grades_tools[0][:name]%></button>
-            <% when :post_grades %>
-            <span class="post-grades-placeholder"></span>
-            <% end %>
-          <% end %>
-
           <% if @gradebook_is_editable && @context.allows_gradebook_uploads? %>
             <%= link_to(new_course_gradebook_upload_path(@context), class: "ui-button") do %>
               <i class="icon-import"></i>
               <%= t 'Import' %>
             <% end %>
           <% end %>
-
           <button class="ui-button" id="download_csv">
             <i class="icon-export"></i>
             <%= t('download_scores', 'Export') %>
