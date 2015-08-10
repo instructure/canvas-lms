@@ -139,7 +139,7 @@ module Api::V1::Assignment
     end
 
     if assignment.grants_right?(user, :grade)
-      query = Assignments::NeedsGradingCountQuery.new(assignment, user)
+      query = Assignments::NeedsGradingCountQuery.new(assignment, user, opts[:needs_grading_course_proxy])
       if opts[:needs_grading_count_by_section]
         hash['needs_grading_count_by_section'] = query.count_by_section
       end

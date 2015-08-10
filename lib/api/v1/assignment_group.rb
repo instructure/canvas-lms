@@ -45,6 +45,10 @@ module Api::V1::AssignmentGroup
           user
         )
       end
+
+      needs_grading_course_proxy = group.context.grants_right?(user, session, :manage_grades) ?
+        Assignments::NeedsGradingCountQuery::CourseProxy.new(group.context, user) : nil
+
       hash['assignments'] = assignments.map { |a|
         overrides = opts[:overrides].select{|override| override.assignment_id == a.id } unless opts[:overrides].nil?
         a.context = group.context
@@ -58,7 +62,8 @@ module Api::V1::AssignmentGroup
           assignment_visibilities: opts[:assignment_visibilities].try(:[], a.id),
           differentiated_assignments_enabled: opts[:differentiated_assignments_enabled],
           exclude_description: opts[:exclude_descriptions],
-          overrides: overrides
+          overrides: overrides,
+          needs_grading_course_proxy: needs_grading_course_proxy
         )
       }
     end
