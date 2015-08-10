@@ -3406,6 +3406,16 @@ describe Assignment do
       expect(@assignment.errors[:moderated_grading]).to be_present
     end
 
+    it "does not allow turning off if provisional grades exist" do
+      assignment_model(course: @course, moderated_grading: true)
+      expect(@assignment).to be_moderated_grading
+      submission = @assignment.submit_homework @student, body: "blah"
+      pg = submission.find_or_create_provisional_grade! scorer: @teacher, position: 1, score: 0
+      @assignment.moderated_grading = false
+      expect(@assignment.save).to eq false
+      expect(@assignment.errors[:moderated_grading]).to be_present
+    end
+
     it "does not allow turning on for an ungraded assignment" do
       assignment_model(course: @course, submission_types: 'not_graded')
       @assignment.moderated_grading = true

@@ -139,8 +139,16 @@ class Assignment < ActiveRecord::Base
       "Group categories cannot be set directly on a discussion assignment, but should be set on the discussion instead")
   end
 
+  def provisional_grades_exist?
+    return false unless moderated_grading? || moderated_grading_changed?
+    ModeratedGrading::ProvisionalGrade
+      .where(submission_id: self.submissions.having_submission.select(:id))
+      .where('score IS NOT NULL').exists?
+  end
+
   def graded_submissions_exist?
-    graded_count > 0
+    return false unless graded?
+    (graded_count > 0) || provisional_grades_exist?
   end
 
   def moderation_setting_ok?

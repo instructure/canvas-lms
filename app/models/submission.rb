@@ -908,11 +908,13 @@ class Submission < ActiveRecord::Base
     self.provisional_grades.where(position: position).first!
   end
 
-  def find_or_create_provisional_grade!(scorer:, position:)
+  def find_or_create_provisional_grade!(scorer:, position:, score: nil)
     ModeratedGrading::ProvisionalGrade.unique_constraint_retry do
       pg = self.provisional_grades.where(position: position).first
       unless pg
-        pg = self.provisional_grades.build(position: position)
+        attrs = {position: position}
+        attrs.merge!({score: score}) unless score.nil?
+        pg = self.provisional_grades.build(attrs)
         pg.scorer_id = scorer.id
         pg.save!
       end
