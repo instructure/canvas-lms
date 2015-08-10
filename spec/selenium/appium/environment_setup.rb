@@ -4,14 +4,17 @@ module EnvironmentSetup
   # to change is the *redirect_uri* which contains the static IP address of the Canvas-lms
   # environment, but do not change it; modify the *host_url* method instead.
   def create_developer_key
-    @key = DeveloperKey.create!(
-      name: 'appium_developer_key',
-      tool_id: '68413514',
-      email: 'admin@instructure.com',
-      redirect_uri: "http://#{host_url}",
-      api_key: 'w33UkRtGDXIjQPm32of6qDi6CIAqfeQw4lFDu8CP8IXOkerc8Uw7c3ZNvp1tqBcE'
-    ) if @key.nil?
-    @key
+    if @appium_dev_key.nil?
+      truncate_table(DeveloperKey) if @appium_dev_key.nil?
+      @appium_dev_key = DeveloperKey.create!(
+        name: 'appium_developer_key',
+        tool_id: '68413514',
+        email: 'admin@instructure.com',
+        redirect_uri: "http://#{host_url}",
+        api_key: 'w33UkRtGDXIjQPm32of6qDi6CIAqfeQw4lFDu8CP8IXOkerc8Uw7c3ZNvp1tqBcE'
+      )
+    end
+    @appium_dev_key
   end
 
   # Static IP addresses entered into Mobile Verify. Comment/Uncomment to set the url.
@@ -46,40 +49,38 @@ module EnvironmentSetup
     @device_name
   end
 
-  # Appium settings are device specific. To get device version, goto on device:
+  # Appium settings are device specific. To get iOS device info:
   #   Settings > General > Version
-  def ios_version
-    # @ios_version = '8.3'
-    @ios_version = '8.4'
-    @ios_version
-  end
-
-  # Appium settings are device specific. To get the device name for connect iOS device run:
   #   $ idevice_id -l ### lists connected devices by UDID
   #   $ idevice_id [UDID] ### prints device name
-  def ios_device_name
-    # @device_name = 'QA iPhone 6'
-    # @device_name = 'iPad'
-    @device_name = 'Mobile User Testing 39'
-    @device_name
-  end
+  #   $ idevice_id -l ### lists connected devices by UDID
+  def ios_device
+    device = 'iPad' # <--- TODO: change this line to setup environment for ios device
+    case device
+    when 'QA iPhone 6'
+      @ios_version = '8.3'
+      @device_name = 'QA iPhone 6'
+      @ios_udid = 'd227f9716519ddf8959f941074d712fc5d215672'
+      @ios_type = 'iPhone'
+    when 'iPad'
+      @ios_version = '8.4'
+      @device_name = 'iPad'
+      @ios_udid = 'b94ee387573a4a0a87c877becf36eb7224e0a80b'
+      @ios_type = 'iPad'
+    when 'Mobile User Testing 39'
+      @ios_version = '8.4'
+      @device_name = 'Mobile User Testing 39'
+      @ios_udid = 'e192d707cd42f99c957bddc51e4fbe8aba43d9db'
+      @ios_type = 'iPad'
+    else
+      raise('Unsupported ios device.')
+    end
 
-  # Appium settings are device specific. To list connected iOS devices by UDID run:
-  #   idevice_id -l ### lists connected devices by UDID
-  def ios_udid
-    # @ios_udid = 'd227f9716519ddf8959f941074d712fc5d215672' # Device: QA iPhone 6
-    # @ios_udid = 'b94ee387573a4a0a87c877becf36eb7224e0a80b' # Device: iPad
-    @ios_udid = 'e192d707cd42f99c957bddc51e4fbe8aba43d9db' # Device: Mobile User Testing 39
-    @ios_udid
-  end
-
-  # Appium is not yet integrated with Jenkins, so the only way to specify the app path for iOS
-  # is to compile it locally with XCode, and update this method with the absolute path to the icanvas.app
-  # file in your DerivedData folder. Make sure you choose the right subfolder (iphoneos for real devices).
-  def ios_app_path
+    # Appium is not yet integrated with Jenkins, so the only way to specify the app path for iOS
+    # is to compile it locally with XCode, and update this method with the absolute path to the icanvas.app
+    # file in your DerivedData folder. Make sure you choose the right subfolder (iphoneos for real devices).
     @ios_app_path = '/Users/twilson/Library/Developer/Xcode/DerivedData/iCanvas-fkfdbqxlcxqugldosdstapazsjaz/Build/Products/Debug-iphoneos/iCanvas.app'
-    # @ios_app_path = '/Users/twilson/Library/Developer/Xcode/DerivedData/iCanvas-fkfdbqxlcxqugldosdstapazsjaz/Build/Products/Debug-iphonesimulator/iCanvas.app'
-    @ios_app_path
+    { versionNumber: @ios_version, deviceName: @device_name, udid: @ios_udid, app: @ios_app_path }
   end
 
   def implicit_wait_time
