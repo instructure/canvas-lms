@@ -12,7 +12,7 @@ define [
   '../modules/customPropTypes'
   '../utils/updateAPIQuerySortParams'
   '../utils/getAllPages'
-  './FilePreview'
+  'jsx/files/FilePreview'
   'jsx/files/NoResults'
   '../utils/locationOrigin'
 ], (_, I18n, React, ReactRouter, Folder, FilesCollection, withReactElement, ColumnHeadersComponent, LoadingIndicator, FolderChildComponent, customPropTypes, updateAPIQuerySortParams, getAllPages, FilePreviewComponent, NoResults) ->

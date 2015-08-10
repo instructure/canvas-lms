@@ -5,7 +5,7 @@ define [
   'react-modal'
   'compiled/react_files/components/FilesApp'
   'compiled/react_files/modules/filesEnv'
-  'compiled/react_files/components/FilePreview'
+  'jsx/files/FilePreview'
   'compiled/models/Folder'
   'compiled/models/File'
   'compiled/collections/FilesCollection'

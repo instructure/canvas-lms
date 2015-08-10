@@ -12,7 +12,7 @@ define [
   '../utils/updateAPIQuerySortParams'
   'compiled/models/Folder'
   'jsx/files/CurrentUploads'
-  './FilePreview'
+  'jsx/files/FilePreview'
   './UploadDropZone'
   '../utils/forceScreenreaderToReparse'
 ], (React, Router, _, I18n, withReactElement, filesEnv, ColumnHeadersComponent, LoadingIndicator, FolderChildComponent, getAllPages, updateAPIQuerySortParams, Folder, CurrentUploadsComponent, FilePreviewComponent, UploadDropZoneComponent, forceScreenreaderToReparse) ->

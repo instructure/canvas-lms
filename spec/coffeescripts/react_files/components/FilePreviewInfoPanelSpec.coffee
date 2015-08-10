@@ -1,7 +1,7 @@
 define [
   'react'
   'jquery'
-  'compiled/react_files/components/FilePreviewInfoPanel'
+  'jsx/files/FilePreviewInfoPanel'
   'compiled/models/File'
   'compiled/react_files/utils/getFileStatus'
 ], (React, $, FilePreviewInfoPanel, File, getFileStatus) ->

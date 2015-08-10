@@ -5,7 +5,7 @@ define [
   'react-router'
   '../mixins/BackboneMixin'
   'compiled/react/shared/utils/withReactElement'
-  './FriendlyDatetime'
+  'jsx/files/FriendlyDatetime'
   './ItemCog'
   'jsx/files/FilesystemObjectThumbnail'
   'compiled/util/friendlyBytes'
