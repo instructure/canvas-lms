@@ -6,8 +6,8 @@ include EnvironmentSetup
 
 shared_context 'appium mobile specs' do |platform_name|
   before(:all) do
-    # specs are unable to start mobile app from any page, so if a spec fails
-    # running any following specs is unsafe and will most like fail as well
+    # this tells rspec to not run remaining tests in the spec if a test fails
+    # with mobile we can't guarantee the app is navigated to a specific location, so we fail quickly to not waste time
     RSpec.configure do |c|
       c.fail_fast = true
     end
@@ -22,10 +22,29 @@ shared_context 'teacher and student users' do |platform_name|
   before(:all) do
     course(course_name: platform_name == 'Android' ? android_course_name : ios_course_name)
     @course.offer
-    @teacher = user_with_pseudonym(username: 'teacher', unique_id: 'teacher', password: 'teacher', active_user: true)
-    @student = user_with_pseudonym(username: 'student', unique_id: 'student', password: 'student', active_user: true)
+    @teacher = user_with_pseudonym(username: 'teacher1', unique_id: 'teacher1', password: 'teacher', active_user: true)
+    @student = user_with_pseudonym(username: 'student1', unique_id: 'student1', password: 'student', active_user: true)
     @course.enroll_user(@teacher, 'TeacherEnrollment').accept!
     @course.enroll_user(@student).accept!
+  end
+end
+
+shared_context 'course with all user groups' do |platform_name|
+  before(:all) do
+    course(course_name: platform_name == 'Android' ? android_course_name : ios_course_name)
+    @course.offer
+    @teacher = user_with_pseudonym(username: 'teacher1', unique_id: 'teacher1', password: 'teacher', active_user: true)
+    @ta = user_with_pseudonym(username: 'ta', unique_id: 'ta', password: 'ta1234', active_user: true)
+    @students = []
+    @observers = []
+    5.times do |i|
+      @students << user_with_pseudonym(username: "student#{i+1}", unique_id: "student#{i+1}", password: 'student', active_user: true)
+      @observers << user_with_pseudonym(username: "observer#{i+1}", unique_id: "observer#{i+1}", password: 'observer', active_user: true)
+      @course.enroll_user(@students[i]).accept!
+      @course.enroll_user(@observers[i], 'ObserverEnrollment').accept!
+    end
+    @course.enroll_user(@teacher, 'TeacherEnrollment').accept!
+    @course.enroll_user(@ta, 'TaEnrollment').accept!
   end
 end
 
