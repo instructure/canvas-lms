@@ -1,5 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/helpers/assignments_common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/discussions_common')
+require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
 
 describe "discussion assignments" do
   include_context "in-process server selenium tests"
@@ -61,6 +62,18 @@ describe "discussion assignments" do
       fln('Delete').click
       driver.switch_to.alert.accept
       assert_flash_notice_message("#{discussion_title} deleted successfully")
+    end
+  end
+
+  context "insert content using RCE" do
+    it "should insert file using rce in a discussion", priority: "1", test_id: 126674 do
+      discussion_title = 'New Discussion'
+      topic = create_discussion(discussion_title, 'threaded')
+      file = @course.attachments.create!(display_name: 'some test file', uploaded_data: default_uploaded_data)
+      file.context = @course
+      file.save!
+      get "/courses/#{@course.id}/discussion_topics/#{topic.id}/edit"
+      insert_file_from_rce(:discussion)
     end
   end
 end

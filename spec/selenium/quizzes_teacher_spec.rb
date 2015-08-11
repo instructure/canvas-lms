@@ -1,5 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/helpers/quizzes_common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/assignment_overrides.rb')
+require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
 
 describe "quizzes" do
 
@@ -132,6 +133,19 @@ describe "quizzes" do
       get "/courses/#{@course.id}/quizzes/#{q.id}"
 
       expect(f('#main .description')).to include_text(test_text)
+    end
+
+    it "should insert multiple files using RCE in the quiz", priority: "1", test_id: 132545 do
+      txt_files = ["some test file", "b_file.txt"]
+      txt_files.map do |text_file|
+       file = @course.attachments.create!(display_name: text_file, uploaded_data: default_uploaded_data)
+       file.context = @course
+       file.save!
+      end
+      @quiz = course_quiz
+      get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
+      insert_file_from_rce(:quiz)
+      expect(fln("b_file.txt")).to be_displayed
     end
 
     it "should asynchronously load student quiz results", priority: "2", test_id: 210058 do

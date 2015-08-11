@@ -1,6 +1,7 @@
 ﻿require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/assignments_common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/public_courses_context')
+require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
 
 describe "assignments" do
 
@@ -43,6 +44,15 @@ describe "assignments" do
 
         expect(f(".save_and_publish")).to be_nil
       end
+    end
+
+    it "should insert a file using RCE in the assignment", priority: "1", test_id: 126671 do
+      @assignment = @course.assignments.create(name: 'Test Assignment')
+      file = @course.attachments.create!(display_name: 'some test file', uploaded_data: default_uploaded_data)
+      file.context = @course
+      file.save!
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
+      insert_file_from_rce
     end
 
     it "should edit an assignment", priority: "1", test_id: 56012 do
