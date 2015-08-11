@@ -67,33 +67,48 @@ define([
       return m;
     },
 
-    // parses a date value (string, integer, Date, date array, etc. -- see
-    // bigeasy's tz() docs). returns null on parse failure. otherwise returns a
-    // Date (rather than _tz()'s timestamp integer) because, when treated
-    // correctly, they are interchangeable but the Date is more convenient.
-    // note that tz('') will return null, rather than the epoch start that
-    // _tz('') returns.
+    // interprets a date value (string, integer, Date, date array, etc. -- see
+    // bigeasy's tz() docs) according to _tz. returns null on parse failure.
+    // otherwise returns a Date (rather than _tz()'s timestamp integer)
+    // because, when treated correctly, they are interchangeable but the Date
+    // is more convenient.
+    raw_parse: function(value) {
+      var timestamp = _tz(value);
+      if (typeof timestamp === 'number') {
+        return new Date(timestamp);
+      }
+      return null;
+    },
+
+    // parses a date value but more robustly. returns null on parse failure. if
+    // the value is a string but does not look like an ISO8601 string
+    // (loosely), or otherwise fails to be interpreted by raw_parse(), then
+    // parsing will be attempted with tz.moment() according to the formats
+    // defined in MomentFormats.getFormats(). also note that raw_parse('') will
+    // return the epoch, but parse('') will return null.
     parse: function(value) {
-      // don't parse '' as 0, don't bother trying with null. but *do* accept 0
-      // as a value.
+      // hard code '' and null as unparseable
       if (value === '' || value == null) return null;
 
-      // try and parse the value. if it succeeds, _tz() will return a timestamp
-      // integer. otherwise, it'll assume we mean to curry and give back a
-      // (non-integer) function.
-      var timestamp = _tz(value);
-
-      if (typeof timestamp !== 'number') {
-        if ( !_.isString(value) ){ return null }
-
-        var formats = MomentFormats.getFormats()
-        var cleanValue = this.removeUnwantedChars(value)
-        var m = tz.moment(cleanValue, formats)
-
-        return m.isValid() ? m.toDate() : null
+      if (!_.isString(value)) {
+        // try and understand the value through _tz. if it doesn't work, we
+        // don't know what else to do with it as a non-string
+        return tz.raw_parse(value);
       }
 
-      return new Date(timestamp);
+      // only try _tz with strings looking loosely like an ISO8601 value. in
+      // particular, we want to avoid parsing e.g. '2016' as 2,016 milliseconds
+      // since the epoch
+      if (value.match(/[-:]/)) {
+        var result = tz.raw_parse(value);
+        if (result) return result;
+      }
+
+      // _tz parsing failed or skipped. try moment parsing
+      var formats = MomentFormats.getFormats()
+      var cleanValue = this.removeUnwantedChars(value)
+      var m = tz.moment(cleanValue, formats)
+      return m.isValid() ? m.toDate() : null
     },
 
     removeUnwantedChars: function(value){
@@ -198,14 +213,17 @@ define([
     // allow snapshotting and restoration, and extending through the
     // vendor-provided tz()'s functional composition
     snapshot: function() {
-      return _tz;
+      return [_tz, currentLocale];
     },
 
     restore: function(snapshot) {
-      // we can't actually check that the snapshot is an appropriate function,
-      // but we can at least verify it's a function.
-      if (typeof snapshot !== 'function') throw new Error('invalid tz() snapshot');
-      _tz = snapshot;
+      // we can't actually check that the snapshot has appropriate values, but
+      // we can at least verify the shape of [function, string]
+      if (!_.isArray(snapshot)) throw new Error('invalid tz() snapshot');
+      if (typeof snapshot[0] !== 'function') throw new Error('invalid tz() snapshot');
+      if (!_.isString(snapshot[1])) throw new Error('invalid tz() snapshot');
+      _tz = snapshot[0];
+      currentLocale = snapshot[1];
     },
 
     extendConfiguration: function() {

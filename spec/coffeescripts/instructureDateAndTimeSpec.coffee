@@ -212,15 +212,25 @@ define [
       'time.event': "%{date} em %{time}"
     equal $.datetimeString('1970-01-01 15:00:00Z'), "1 Jan 1970 em 15:00"
 
-  # TODO: remove these second argument specs once the pickers know how to parse
-  # localized datetimes
-  test 'should not localize if second argument is false', ->
-    tz.changeLocale(portuguese, 'pt_PT')
-    I18nStubber.setLocale 'pt'
-    equal $.datetimeString('1970-01-01 15:00:00Z', {localized: false}), "Jan 1, 1970 at 3:00pm"
+  module '$.datepicker.parseDate',
+    setup: ->
+      @snapshot = tz.snapshot()
+      I18nStubber.pushFrame()
 
-  test 'should still apply profile timezone when second argument is false', ->
+    teardown: ->
+      tz.restore(@snapshot)
+      I18nStubber.popFrame()
+
+  test 'should accept localized strings and return them fudged', ->
     tz.changeZone(detroit, 'America/Detroit')
     tz.changeLocale(portuguese, 'pt_PT')
     I18nStubber.setLocale 'pt'
-    equal $.datetimeString(new Date(0), {localized: false}), 'Dec 31, 1969 at 7:00pm'
+    I18nStubber.stub 'pt',
+      # this isn't the real format, but we want the %Y in here to make it
+      # deterministic regardless of the year it's run in
+      'date.formats.date_at_time': "%-d %b %Y em %k:%M"
+    # 6pm EDT (detroit) = 22:00Z, but parsed will be fudged, so make sure to
+    # also fudge what we're comparing to
+    parsed = $.datepicker.parseDate('dd/mm/yyyy', "3 Ago 2015 em 18:06")
+    fudged = $.fudgeDateForProfileTimezone('2015-08-03 22:06:00Z')
+    equal +parsed, +fudged

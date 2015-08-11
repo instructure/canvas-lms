@@ -118,7 +118,7 @@
                    class="datetime_field input-medium"
                    name="delayed_post_at"
                    {{! TODO: what would be the best way to get this formatted right? }}
-                   value="{{datetimeFormatted delayed_post_at false}}"
+                   value="{{datetimeFormatted delayed_post_at}}"
                    aria-labelledby="discussion_topic_delay_post_accessible_label"
                    data-tooltip='{"position":"top","force_position":"true"}'
                    title="{{accessibleDateFormat}}" />
@@ -213,7 +213,7 @@
                    id="delayed_post_at"
                    aria-labelledby="discussion_topic_available_from_accessible_label"
                    {{! TODO: what would be the best way to get this formatted right? }}
-                   value="{{datetimeFormatted delayed_post_at false}}"
+                   value="{{datetimeFormatted delayed_post_at}}"
                    data-tooltip='{"position":"top","force_position":"true"}'
                    title="{{accessibleDateFormat}}"/>
           </div>
@@ -235,7 +235,7 @@
                      id="lock_at"
                      aria-labelledby="discussion_topic_available_until_accessible_label"
                      {{! TODO: what would be the best way to get this formatted right? }}
-                     value="{{datetimeFormatted lock_at false}}"
+                     value="{{datetimeFormatted lock_at}}"
                      data-tooltip='{"position":"top","force_position":"true"}'
                      title="{{accessibleDateFormat}}"/>
             </div>
