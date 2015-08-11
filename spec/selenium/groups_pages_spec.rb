@@ -1,5 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/groups_common')
+require File.expand_path(File.dirname(__FILE__) + '/helpers/announcements_common')
 
 describe "groups" do
   include_context "in-process server selenium tests"
@@ -60,6 +61,18 @@ describe "groups" do
         fj(".ui-accordion-header a:contains('Announcements')").click
         expect(fln('Group Announcement')).to be_displayed
         expect(fln('Course Announcement')).to be_nil
+      end
+
+      it "should allow all group members to see announcements", priority: "1", test_id: 273613 do
+        @announcement = @testgroup.first.announcements.create!(title: 'Group Announcement', message: 'Group',user: @teacher)
+        # Verifying with a few different users and roles should be enough to ensure all group members can see it
+        verify_member_sees_announcement
+
+        user_session(@teacher)
+        verify_member_sees_announcement
+
+        user_session(@students.first)
+        verify_member_sees_announcement
       end
     end
 

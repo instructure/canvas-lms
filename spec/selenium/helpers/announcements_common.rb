@@ -68,3 +68,15 @@ def edit(title, message)
   expect_new_page_load { submit_form('.form-actions') }
   expect(f('#discussion_topic .discussion-title').text).to eq title
 end
+
+# DRY method that checks that a group member can see all announcements created within a group
+#   and that clicking one takes you to it. Count should always be > 0
+def verify_member_sees_announcement(count = 1)
+  index = count-1
+  get announcements_page
+  expect(ff('.discussion-topic').size).to eq count
+  # Checks that new page is loaded when the indexed announcement is clicked to verify it actually loads the topic
+  expect_new_page_load { ff('.discussion-topic')[index].click }
+  # Checks that the announcement is there by verifying the title is present and correct
+  expect(f('.discussion-title')).to include_text("#{@announcement.title}")
+end
