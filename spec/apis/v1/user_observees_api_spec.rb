@@ -359,15 +359,23 @@ describe UserObserveesController, type: :request do
   context 'DELETE #destroy' do
     it 'should remove an observee by id' do
       parent.observed_users << student
+      course.enroll_user(student)
+      observer_enrollment = parent.observer_enrollments.first
+
       expect(delete_call).to eq student.id
       expect(parent.reload.observed_users).to eq []
+      expect(observer_enrollment.reload).to be_deleted
     end
 
     it 'should remove an observee by id (for external accounts)' do
       external_parent.observed_users << external_student
+      course(:account => external_account).enroll_user(external_student)
+      observer_enrollment = external_parent.observer_enrollments.first
+
       json = delete_call(user_id: external_parent.id, observee_id: external_student.id, api_user: multi_admin, domain_root_account: external_account)
       expect(json).to eq external_student.id
       expect(external_parent.reload.observed_users).to eq []
+      expect(observer_enrollment.reload).to be_deleted
     end
 
     it 'should not succeed if the observee is not found' do
