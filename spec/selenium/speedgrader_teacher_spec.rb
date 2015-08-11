@@ -14,7 +14,7 @@ describe "speed grader" do
   end
 
   context "as a teacher" do
-    it "alerts the teacher before leaving the page if comments are not saved" do
+    it "alerts the teacher before leaving the page if comments are not saved", priority: "1", test_id: 283736 do
       student_in_course(:active_user => true).user
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
       comment_textarea = f("#speedgrader_comment_textarea")
@@ -45,7 +45,7 @@ describe "speed grader" do
       @submission2 = @assignment.submit_homework(@student2, :submission_type => "online_text_entry", :body => "there")
     end
 
-    it "lists the correct number of students", priority: "2" do
+    it "lists the correct number of students", priority: "2", test_id: 283737 do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 
       expect(f("#x_of_x_students")).to include_text("1 of 1")
@@ -53,7 +53,7 @@ describe "speed grader" do
     end
   end
 
-  it "hides answers of anonymous graded quizzes" do
+  it "hides answers of anonymous graded quizzes", priority: "1", test_id: 283738 do
     @assignment.points_possible = 10
     @assignment.submission_types = 'online_quiz'
     @assignment.title = 'Anonymous Graded Quiz'
@@ -70,7 +70,7 @@ describe "speed grader" do
     }
   end
 
-  it "updates quiz grade automatically when the update button is clicked" do
+  it "updates quiz grade automatically when the update button is clicked", priority: "1", test_id: 283739 do
     expected_points = "6"
     student = student_in_course(:active_user => true).user
     @assignment.points_possible = 10
@@ -97,7 +97,7 @@ describe "speed grader" do
     keep_trying_until { expect(f('#grade_container input')).to have_attribute('value', expected_points) }
   end
 
-  it "properly displays student quiz results when the teacher also has a student enrollment" do
+  it "properly displays student quiz results when the teacher also has a student enrollment", priority: "2", test_id: 283740 do
     student = student_in_course(:active_user => true).user
     @course.enroll_student(@teacher).accept!
 
@@ -140,7 +140,7 @@ describe "speed grader" do
       @assignment.submit_homework(@student, :submission_type => "online_url", :workflow_state => "submitted", :url => "http://www.instructure.com")
     end
 
-    it "properly shows and hides student name when name hidden toggled" do
+    it "properly shows and hides student name when name hidden toggled", priority: "2", test_id: 283741 do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 
       in_frame 'speedgrader_iframe' do
@@ -174,7 +174,7 @@ describe "speed grader" do
       end
     end
 
-    it "links to the quiz history page when there are too many quiz submissions" do
+    it "links to the quiz history page when there are too many quiz submissions", priority: "2", test_id: 283742 do
       Setting.set("too_many_quiz_submission_versions", 2)
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
       expect(fj("#submission_to_view")).to be_nil
@@ -183,7 +183,7 @@ describe "speed grader" do
       expect(uri.query).to eq "user_id=#{@student.id}"
     end
 
-    it "lets you view previous quiz submissions" do
+    it "lets you view previous quiz submissions", priority: "1", test_id: 283743 do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 
       submission_dropdown = f("#submission_to_view")
@@ -201,7 +201,7 @@ describe "speed grader" do
       end
     end
 
-    it "hides student's name from quiz if hide student names is enabled" do
+    it "hides student's name from quiz if hide student names is enabled", priority: "1", test_id: 283744 do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 
       f("#settings_link").click
@@ -256,7 +256,7 @@ describe "speed grader" do
       entry_2.context_module_action
     end
 
-    it "displays discussion entries for only one student" do
+    it "displays discussion entries for only one student", priority: "1", test_id: 283745 do
         get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 
       #check for correct submissions in speed grader iframe
@@ -277,7 +277,7 @@ describe "speed grader" do
     end
 
     context "when student names hidden" do
-      it "hides the name of student on discussion iframe" do
+      it "hides the name of student on discussion iframe", priority: "2", test_id: 283746 do
         get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 
         f("#settings_link").click
@@ -292,8 +292,7 @@ describe "speed grader" do
         end
       end
 
-      it "hides student names and shows name of grading teacher entries " +
-        "on both discussion links" do
+      it "hides student names and shows name of grading teacher entries on both discussion links", priority: "2", test_id: 283747 do
         teacher = @course.teachers.first
         teacher_message = "why did the taco cross the road?"
 
@@ -331,7 +330,7 @@ describe "speed grader" do
         end
       end
 
-      it "hides avatars on entries on both discussion links" do
+      it "hides avatars on entries on both discussion links", priority: "2", test_id: 283748 do
         get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 
         f("#settings_link").click
@@ -357,7 +356,7 @@ describe "speed grader" do
     end
   end
 
-  it "grades assignment using rubric" do
+  it "grades assignment using rubric", priority: "2", test_id: 283749 do
     student_submission
     @association.use_for_grading = true
     @association.save!
@@ -393,7 +392,7 @@ describe "speed grader" do
     expect(f('#grade_container input')).to have_attribute(:value, '8')
   end
 
-  it "allows commenting using rubric" do
+  it "allows commenting using rubric", priority: "1", test_id: 283750 do
     student_submission
     @association.use_for_grading = true
     @association.save!
@@ -417,7 +416,7 @@ describe "speed grader" do
     expect(saved_comment.text).to eq to_comment
   end
 
-  it "should not convert invalid text to 0" do
+  it "should not convert invalid text to 0", priority: "2", test_id: 283751 do
     student_submission
     @association.save!
 
@@ -438,7 +437,7 @@ describe "speed grader" do
   end
 
   describe "when rounding .rubric_total" do
-    it "should round to 2 decimal places" do
+    it "should round to 2 decimal places", priority: "1", test_id: 283752 do
       setup_and_grade_rubric('1.001', '1.01')
 
       expect(f('#rubric_full .rubric_total').text).to eq('2.01') # while entering scores
@@ -452,7 +451,7 @@ describe "speed grader" do
       expect(f('#rubric_full .rubric_total').text).to eq('2.01') # after opening the rubric up again to re-score
     end
 
-    it "should not display trailing zeros" do
+    it "should not display trailing zeros", priority: "1", test_id: 283753 do
       setup_and_grade_rubric('1', '1')
 
       expect(f('#rubric_full .rubric_total').text).to eq('2') # while entering scores
@@ -467,7 +466,7 @@ describe "speed grader" do
     end
   end
 
-  it "creates a comment on assignment" do
+  it "creates a comment on assignment", priority: "1", test_id: 283754 do
     #pending("failing because it is dependant on an external kaltura system")
 
     student_submission
@@ -502,7 +501,7 @@ describe "speed grader" do
     expect(fj('body.grades')).to be_displayed
   end
 
-  it "shows comment post time" do
+  it "shows comment post time", priority: "1", test_id: 283755 do
     @submission = student_submission
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
     wait_for_ajaximations
@@ -525,7 +524,7 @@ describe "speed grader" do
     expect(f('#comments > .comment .posted_at')).to include_text(expected_posted_at)
   end
 
-  it "properly shows avatar images only if avatars are enabled on the account" do
+  it "properly shows avatar images only if avatars are enabled on the account", priority: "1", test_id: 283756 do
     # enable avatars
     @account = Account.default
     @account.enable_service(:avatars)
@@ -562,7 +561,7 @@ describe "speed grader" do
     expect(ff("#comments > .comment .avatar")[0]).to have_attribute('style', "display: none\;")
   end
 
-  it "hides student names and avatar images if Hide student names is checked" do
+  it "hides student names and avatar images if Hide student names is checked", priority: "1", test_id: 283757 do
     # enable avatars
     @account = Account.default
     @account.enable_service(:avatars)
@@ -599,7 +598,7 @@ describe "speed grader" do
     expect(ff('#comments > .comment .author_name')[1]).to include_text('nobody@example.com')
   end
 
-  it "does not show students in other sections if visibility is limited" do
+  it "does not show students in other sections if visibility is limited", priority: "1", test_id: 283758 do
     @enrollment.update_attribute(:limit_privileges_to_course_section, true)
     student_submission
     student_submission(:username => 'otherstudent@example.com', :section => @course.course_sections.create(:name => "another section"))
@@ -622,14 +621,14 @@ describe "speed grader" do
                                            :allow_multiple_enrollments => true)
     end
 
-    it "does not duplicate students" do
+    it "does not duplicate students", priority: "1", test_id: 283985 do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
       wait_for_ajaximations
 
       expect(ff("#students_selectmenu option").length).to eq 1
     end
 
-    it "filters by section properly" do
+    it "filters by section properly", priority: "1", test_id: 283986 do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
       wait_for_ajaximations
 
@@ -642,7 +641,7 @@ describe "speed grader" do
     end
   end
 
-  it "shows the first ungraded student with a submission" do
+  it "shows the first ungraded student with a submission", priority: "1", test_id: 283987 do
     s1, s2, s3 = n_students_in_course(3)
     s1.update_attribute :name, "A"
     s2.update_attribute :name, "B"
@@ -660,7 +659,7 @@ describe "speed grader" do
     expect(fj("#students_selectmenu option[value=#{s3.id}]")[:selected]).to be_truthy
   end
 
-  it "allows the user to change sorting and hide student names" do
+  it "allows the user to change sorting and hide student names", priority: "1", test_id: 283988 do
     student_submission(name: 'student@example.com')
 
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
@@ -691,7 +690,7 @@ describe "speed grader" do
     keep_trying_until { expect(f('#combo_box_container .ui-selectmenu .ui-selectmenu-item-header').text).to eq "student@example.com" }
   end
 
-  it "ignores rubric lines for grading" do
+  it "ignores rubric lines for grading", priority: "1", test_id: 283989 do
     student_submission
     @association.use_for_grading = true
     @association.save!
@@ -749,7 +748,7 @@ describe "speed grader" do
     expect(f("#rubric_summary_container tr:nth-child(2) .description").text).to be_empty
   end
 
-  it "includes the student view student for grading" do
+  it "includes the student view student for grading", priority: "1", test_id: 283990 do
     @course.student_view_student
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
     wait_for_ajaximations
@@ -757,7 +756,7 @@ describe "speed grader" do
     expect(ff("#students_selectmenu option").length).to eq 1
   end
 
-  it "includes fake student (Student View Student) submissions in 'X/Y Graded' text" do
+  it "includes fake student (Student View Student) submissions in 'X/Y Graded' text", priority: "2", test_id: 283991 do
     fake_student = @course.student_view_student
     submission = @assignment.find_or_create_submission(fake_student)
     submission.submission_type = 'online_quiz'
@@ -770,7 +769,7 @@ describe "speed grader" do
     expect(f("#x_of_x_graded").text).to eq "1 / 1 Graded"
   end
 
-  it "marks the checkbox of students for graded assignments" do
+  it "marks the checkbox of students for graded assignments", priority: "1", test_id: 283992 do
     student_submission
 
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
@@ -790,7 +789,7 @@ describe "speed grader" do
 
   context "grading display" do
 
-    it "displays the score on the sidebar" do
+    it "displays the score on the sidebar", priority: "1", test_id: 283993 do
       create_and_enroll_students(1)
       submit_and_grade_homework(@students[0], 3)
 
@@ -800,7 +799,7 @@ describe "speed grader" do
       expect(f('#grade_container input[type=text]')).to have_attribute("value", "3")
     end
 
-    it "displays total number of graded assignments to students" do
+    it "displays total number of graded assignments to students", priority: "1", test_id: 283994 do
       create_and_enroll_students(2)
       submit_and_grade_homework(@students[0], 3)
 
@@ -810,7 +809,7 @@ describe "speed grader" do
       expect(f("#x_of_x_graded")).to include_text("1 / 2 Graded")
     end
 
-    it "displays average submission grade for total assignment submissions" do
+    it "displays average submission grade for total assignment submissions", priority: "1", test_id: 283995 do
       skip('testbot fragile')
       create_and_enroll_students(2)
 
@@ -825,7 +824,7 @@ describe "speed grader" do
   end
 
   context "Pass / Fail assignments" do
-    it "displays correct options in the speedgrader dropdown" do
+    it "displays correct options in the speedgrader dropdown", priority: "1", test_id: 283996 do
       course_with_teacher_logged_in
       course_with_student(course: @course, active_all: true)
 
@@ -839,7 +838,7 @@ describe "speed grader" do
     end
   end
 
-  it "only displays 2 decimal points on a quiz submission" do
+  it "only displays 2 decimal points on a quiz submission", priority: "1", test_id: 283997 do
     # generate a proper teacher and student in the course, then switch sessions to the teacher
     course_with_teacher_logged_in
     course_with_student(:course => @course, :active_all => true)
@@ -869,5 +868,4 @@ describe "speed grader" do
       keep_trying_until { expect(driver.execute_script("return $('#question_#{@quest1.id} .question_input')[0].value")).to eq "2.67" }
     end
   end
-
 end
