@@ -384,7 +384,7 @@ class Enrollment < ActiveRecord::Base
     return false unless observer.can_be_enrolled_in_course?(course)
     enrollment ||= observer.observer_enrollments.build
     enrollment.associated_user_id = user_id
-    enrollment.update_from(self)
+    enrollment.update_from(self, !!@skip_broadcasts)
   end
 
   def linked_enrollment_for(observer)
@@ -408,7 +408,7 @@ class Enrollment < ActiveRecord::Base
     end
   end
 
-  def update_from(other)
+  def update_from(other, skip_broadcasts=false)
     self.course_id = other.course_id
     self.workflow_state = other.workflow_state
     self.start_at = other.start_at
@@ -416,7 +416,11 @@ class Enrollment < ActiveRecord::Base
     self.course_section_id = other.course_section_id
     self.root_account_id = other.root_account_id
     self.user.touch if workflow_state_changed?
-    save!
+    if skip_broadcasts
+      save_without_broadcasting!
+    else
+      save!
+    end
   end
 
   def clear_email_caches
