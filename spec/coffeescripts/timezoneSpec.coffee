@@ -123,6 +123,12 @@ define [
   test 'parse(null) should fail', ->
     equal tz.parse(null), null
 
+  test 'parse(integer) should be ms since epoch', ->
+    equal +tz.parse(2016), +tz.raw_parse(2016)
+
+  test 'parse("looks like integer") should be a year', ->
+    equal +tz.parse('2016'), +tz.parse('2016-01-01')
+
   test 'parse() should parse relative to UTC by default', ->
     equal +tz.parse('1969-07-21 02:56'), +moonwalk
 
@@ -280,11 +286,14 @@ define [
       "8/3/2015",
       "August 3, 2015",
       "Aug 3, 2015",
+      "3 Aug 2015",
       "2015-08-03",
+      "2015 08 03",
       "August 3, 2015",
       "Monday, August 3",
       "Mon Aug 3, 2015",
-      "Mon, Aug 3"
+      "Mon, Aug 3",
+      "Aug 3"
     ]
 
     _.each engDates, (date) ->
@@ -308,6 +317,7 @@ define [
       "2015-08-03 18:06:22",
       "August 3, 2015 6:06 PM",
       "Aug 3, 2015 6:06 PM",
+      "Aug 3, 2015 6pm",
       "Monday, August 3, 2015 6:06 PM",
       "Mon, Aug 3, 2015 6:06 PM",
       "Aug 3 at 6:06pm",
@@ -318,6 +328,10 @@ define [
     _.each engDateTimes, (dateTime) ->
       d = tz.parse(dateTime)
       equal tz.format(d, '%d %H'), '03 18', "this works: #{dateTime}"
+
+  test 'parses 24hr times even if the locale lacks them', ->
+    d = tz.parse('18:06')
+    equal tz.format(d, '%H:%M'), '18:06'
 
   module 'french tz',
     setup: ->
@@ -362,6 +376,7 @@ define [
       "3 août",
       "lun., 3 août",
       "3 août 2015"
+      "3 août"
     ]
 
     _.each frenchDates, (date) ->

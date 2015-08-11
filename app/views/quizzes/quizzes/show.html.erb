@@ -164,7 +164,7 @@
                       <%= f.text_field :lock_at,
                                        class: "datetime_field",
                                        style: "width: 150px;",
-                                       value: unlocalized_datetime_string(@quiz.lock_at),
+                                       value: datetime_string(@quiz.lock_at),
                                        "aria-labelledby" => "quiz_lock_at_label",
                                        "data-tooltip" => "",
                                        title: accessible_date_format %>
