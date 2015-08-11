@@ -135,13 +135,18 @@ class ContextExternalTool < ActiveRecord::Base
   def label_for(key, lang=nil)
     lang = lang.to_s if lang
     labels = settings[key] && settings[key][:labels]
-    labels2 = settings[:labels]
     (labels && labels[lang]) ||
       (labels && lang && labels[lang.split('-').first]) ||
       (settings[key] && settings[key][:text]) ||
-      (labels2 && labels2[lang]) ||
-      (labels2 && lang && labels2[lang.split('-').first]) ||
-      settings[:text] || name || "External Tool"
+      default_label(lang)
+  end
+
+  def default_label(lang = nil)
+    lang = lang.to_s if lang
+    default_labels = settings[:labels]
+    (default_labels && default_labels[lang]) ||
+        (default_labels && lang && default_labels[lang.split('-').first]) ||
+        settings[:text] || name || "External Tool"
   end
 
   def check_for_xml_error
