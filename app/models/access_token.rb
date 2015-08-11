@@ -2,7 +2,9 @@ class AccessToken < ActiveRecord::Base
   attr_reader :full_token
   belongs_to :developer_key
   belongs_to :user
+  has_one :account, through: :developer_key
   attr_accessible :user, :purpose, :expires_at, :developer_key, :regenerate, :scopes, :remember_access
+  default_scope { includes(:account) }
 
   serialize :scopes, Array
   validate :must_only_include_valid_scopes

@@ -65,4 +65,28 @@ describe AccessToken do
       expect(token.scoped_to?(['user_profile'])).to eq false
     end
   end
+
+  describe "token with account scoped access" do
+
+    before :once do
+      @ac = account_model
+      @dk = DeveloperKey.create!(account: @ac)
+      @at = AccessToken.create!(:user => user_model, :developer_key => @dk)
+
+      @dk2 = DeveloperKey.create!
+      @at2 = AccessToken.create!(:user => user_model, :developer_key => @dk2)
+    end
+
+    it "account should be set" do
+      expect(@at.account.id).to be @ac.id
+    end
+
+    it "account should be the account from the developer key" do
+      expect(@at.account.id).to be @dk.account.id
+    end
+
+    it "account should be nil" do
+      expect(@at2.account).to be nil
+    end
+  end
 end
