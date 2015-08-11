@@ -44,22 +44,17 @@
     <% image = @submission.attachment if @submission.processed? %>
     <%= t('external_url_submission', 'This submission was a URL to an external page.') %>
     <% if image %>
-      <%= t('entry_with_image', "We've included a snapshot of what the page looked like when it was submitted. Or you can click to view the original submission.")  %>
+      <%= t('entry_with_image', "We've included a snapshot of what the page looked like when it was submitted.")  %>
     <% else %>
       <%= t('entry_no_image', 'Keep in mind that this page may have changed since the submission originally occurred.') %>
     <% end %>
     <div style="font-size: 1.4em; margin: 10px;">
-      <%= link_to t('view_original_submission',
-                    'View the Original Submission for %{user}',
-                    :user => user_name),
+      <%= link_to @submission.url,
                   @submission.url,
-                  class: "open_in_a_new_tab",
-                  target: "_blank" %>
-      <span style="display: inline-block;" class="ui-icon ui-icon-extlink ui-icon-inline"
-        title="<%= t('titles.external_link', 'Links to an external site.') %>"/>
+                  class: "not_external" %>
     </div>
     <div style="font-size: 1.4em; margin: 10px;">
-      <%= link_to @submission.url,
+      <%= link_to t('view_in_a_new_tab', '(View in a new tab)'),
                   @submission.url,
                   class: "open_in_a_new_tab",
                   target: "_blank" %>
