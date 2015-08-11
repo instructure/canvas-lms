@@ -245,6 +245,38 @@ describe Enrollment do
       expect(e.messages_sent).to be_include("Enrollment Registration")
     end
 
+    it "should not send out invitations to an observer if the student doesn't receive an invitation (e.g. sis import)" do
+      Notification.create!(:name => "Enrollment Registration", :category => "Registration")
+
+      course_with_teacher(:active_all => true)
+      student = user_with_pseudonym
+      observer = user_with_pseudonym
+      observer.observed_users << student
+
+      @course.enroll_student(student, :no_notify => true)
+      expect(student.messages).to be_empty
+      expect(observer.messages).to be_empty
+
+      course_with_teacher(:active_all => true)
+      @course.enroll_student(student)
+      student.reload
+      observer.reload
+      expect(student.messages).to_not be_empty
+      expect(observer.messages).to_not be_empty
+    end
+
+    it "should not send out invitations to an observer if the course is not published" do
+      Notification.create!(:name => "Enrollment Registration", :category => "Registration")
+
+      course_with_teacher
+      student = user_with_pseudonym
+      observer = user_with_pseudonym
+      observer.observed_users << student
+
+      @course.enroll_student(student)
+      expect(observer.messages).to be_empty
+    end
+
     it "should not send out invitations if the course is not yet published" do
       Notification.create!(:name => "Enrollment Registration")
       course_with_teacher
