@@ -118,7 +118,9 @@ module Lti
             account_admin_user(account: account)
             tp = create_tool_proxy(context: account)
             resource = create_resource_handler(tp)
-            resource.placements.create(placement: ResourcePlacement::ACCOUNT_NAVIGATION )
+            create_message_handler(resource)
+            message_handler = resource.message_handlers.where(message_type: 'basic-lti-launch-request').first
+            message_handler.placements.create(placement: ResourcePlacement::ACCOUNT_NAVIGATION)
             api_call(:put, "/api/v1/accounts/#{account.id}/tool_proxies/#{tp.id}",
                      {controller: 'lti/tool_proxy', action: 'update', format: 'json', account_id: account.id.to_s, tool_proxy_id: tp.id, workflow_state: 'disabled'}, {}, {}, {domain_root_account: account} )
 

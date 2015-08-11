@@ -38,7 +38,7 @@ module Lti
 
     belongs_to :message_handler, class_name: 'Lti::MessageHandler'
     belongs_to :resource_handler, class_name: 'Lti::ResourceHandler'
-    validates_presence_of :resource_handler, :placement
+    validates_presence_of :message_handler, :placement
 
     validates_inclusion_of :placement, :in => PLACEMENT_LOOKUP.values
 

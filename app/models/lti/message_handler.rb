@@ -46,10 +46,10 @@ module Lti
     scope :has_placements, lambda { |*placements|
       where('EXISTS (?)',
             Lti::ResourcePlacement.where(placement: placements).
-                where("lti_message_handlers.resource_handler_id = lti_resource_placements.resource_handler_id"))
+                where("lti_message_handlers.id = lti_resource_placements.message_handler_id"))
     }
 
-    def self.lti_apps_tabs(context, placements, opts)
+    def self.lti_apps_tabs(context, placements, _opts)
       apps = Lti::MessageHandler.for_context(context).
         has_placements(*placements).
         by_message_types(Lti::MessageHandler::BASIC_LTI_LAUNCH_REQUEST).to_a
