@@ -144,17 +144,8 @@ describe "speed grader" do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 
       in_frame 'speedgrader_iframe' do
-        expect(f('.open_in_a_new_tab')).to include_text("User")
-      end
-
-      f("#settings_link").click
-      f('#hide_student_names').click
-
-      expect_new_page_load { fj('.ui-dialog-buttonset .ui-button:visible:last').click }
-      wait_for_ajaximations
-
-      in_frame 'speedgrader_iframe' do
-        expect(f('.open_in_a_new_tab')).to include_text("This Student")
+        expect(f('.not_external')).to include_text("instructure")
+        expect(f('.open_in_a_new_tab')).to include_text("View")
       end
     end
   end
