@@ -4,7 +4,7 @@ require_relative '../../mobile_common'
 # Log In / Out of Mobile App
 # ======================================================================================================================
 
-def candroid_init(username, password, course_name)
+def android_app_init(username, password, course_name)
   # check for multi-user access
   if (userlink = find_ele_by_attr('id', 'name', 'text', /#{username}/)).nil?
     enter_school
@@ -36,6 +36,10 @@ def login_mobile(username, password)
 end
 
 def logout(add_account)
+  candroid_app ? logout_android(add_account) : logout_speedgrader
+end
+
+def logout_android(add_account)
   open_hamburger
   find_element(:id, 'userNameContainer').click unless exists{ find_element(:id, 'logout') }
   if add_account
@@ -47,20 +51,32 @@ def logout(add_account)
   wait_true(timeout: 10, interval: 0.100){ find_element(:id, 'enterURL') }
 end
 
+def logout_speedgrader
+  find_ele_by_attr('tag', 'android.widget.ImageButton', 'name', /(Open Drawer)/).click
+  find_element(:id, 'logoutText').click
+end
+
 def skip_tutorial
   # Getting Started screen takes a second to animate in and out
   find_element(:id, 'skip').click if exists(3){ find_element(:id, 'skip') }
-  wait_true(timeout:10, interval: 0.100){ find_element(:id, 'toolbar') }
+  if candroid_app
+    wait_true(timeout:10, interval: 0.100){ find_element(:id, 'toolbar') }
+  else
+    wait_true(timeout:10, interval: 0.100){ find_element(:id, 'courseSwitcher') }
+  end
 end
 
 # ======================================================================================================================
 # Navigation
 # ======================================================================================================================
 
+# TODO: add support for speedgrader
 def navigate_to_course(course_name)
-  tags('android.widget.ImageButton')[0].click unless exists{ find_element(:id, 'scrollview') }
-  find_element(:id, 'courses').click
-  text_exact(course_name).click
+  if candroid_app
+    tags('android.widget.ImageButton')[0].click unless exists{ find_element(:id, 'scrollview') }
+    find_element(:id, 'courses').click
+    text_exact(course_name).click
+  end
 end
 
 def navigate_to(location)

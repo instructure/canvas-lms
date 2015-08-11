@@ -4,23 +4,31 @@ require_relative 'environment_setup'
 
 include EnvironmentSetup
 
-shared_context 'appium mobile specs' do |platform_name|
+def pick_test_id_for_app(app_name, canvas, speedgrader)
+  app_name =~ /(speedgrader)/ ? speedgrader : canvas
+end
+
+# ======================================================================================================================
+# Shared Contexts and Helper Methods for Canvas Test Environment
+# ======================================================================================================================
+
+shared_context 'appium mobile specs' do |app_name|
   before(:all) do
-    # this tells rspec to not run remaining tests in the spec if a test fails
-    # with mobile we can't guarantee the app is navigated to a specific location, so we fail quickly to not waste time
-    RSpec.configure do |c|
-      c.fail_fast = true
-    end
-    create_developer_key
-    @platform_name = platform_name # TODO: remove variable Jenkins doesn't like unused block arguments
-    # appium_init(platform_name)   # TODO: uncomment to run Appium tests
+    @app_name = app_name
+    # appium_init(app_name) # TODO: uncomment to run Appium tests
     skip('Appium not yet integrated with Jenkins') # TODO: removed when Appium is integrated with Jenkins
+    create_developer_key
+    toggle_fail_fast(true)
+  end
+
+  after(:all) do
+    toggle_fail_fast(false)
   end
 end
 
-shared_context 'teacher and student users' do |platform_name|
+shared_context 'teacher and student users' do |app_name|
   before(:all) do
-    course(course_name: platform_name == 'Android' ? android_course_name : ios_course_name)
+    course(course_name: app_name =~ /(android)/ ? android_course_name : ios_course_name)
     @course.offer
     @teacher = user_with_pseudonym(username: 'teacher1', unique_id: 'teacher1', password: 'teacher', active_user: true)
     @student = user_with_pseudonym(username: 'student1', unique_id: 'student1', password: 'student', active_user: true)
@@ -29,12 +37,12 @@ shared_context 'teacher and student users' do |platform_name|
   end
 end
 
-shared_context 'course with all user groups' do |platform_name|
+shared_context 'course with all user groups' do |app_name|
   before(:all) do
-    course(course_name: platform_name == 'Android' ? android_course_name : ios_course_name)
+    course(course_name: app_name =~ /(android)/ ? android_course_name : ios_course_name)
     @course.offer
     @teacher = user_with_pseudonym(username: 'teacher1', unique_id: 'teacher1', password: 'teacher', active_user: true)
-    @ta = user_with_pseudonym(username: 'ta', unique_id: 'ta', password: 'ta1234', active_user: true)
+    @ta = user_with_pseudonym(username: 'assistant1', unique_id: 'assistant1', password: 'assistant', active_user: true)
     @students = []
     @observers = []
     5.times do |i|
@@ -48,18 +56,62 @@ shared_context 'course with all user groups' do |platform_name|
   end
 end
 
-shared_context 'student user' do |platform_name|
+shared_context 'course with a single user' do |role, app_name|
   before(:all) do
-    course_with_student(
-      course_name: platform_name == 'Android' ? android_course_name : ios_course_name,
-      user: user_with_pseudonym(username: 'student', password: 'student', active_user: true),
-      active_all: true
-    )
-    candroid_init(@user.primary_pseudonym.unique_id, @user.primary_pseudonym.unique_id, @course.name)
+    basic_course_setup(role, app_name)
+    mobile_app_init(app_name)
   end
 
   after(:all) do
     logout(false)
+  end
+end
+
+def basic_course_setup(role, app_name)
+  case role
+  when 'teacher'
+    course_with_teacher(course_arguments(role, app_name))
+  when 'student'
+    course_with_student(course_arguments(role, app_name))
+  else
+    raise('Unsupported role for custom user shared context. Additional roles coming soon...')
+  end
+end
+
+def course_arguments(role, app_name)
+  { course_name: app_name =~ /(android)/ ? android_course_name : ios_course_name,
+    user: user_with_pseudonym(username: role + '1', unique_id: role + '1', password: role, active_user: true),
+    active_all: true }
+end
+
+def mobile_app_init(app_name)
+  case app_name
+  when 'candroid', 'speedgrader_android'
+    android_app_init(@user.primary_pseudonym.unique_id, user_password(@user), @course.name)
+  when 'icanvas', 'speedgrader_ios'
+    icanvas_init(@user.primary_pseudonym.unique_id, user_password(@user), @course.name)
+  else
+    raise('Unsupported mobile application.')
+  end
+end
+
+def user_password(user)
+  user.primary_pseudonym.unique_id =~ /[a-z]+1/ ? user.primary_pseudonym.unique_id.sub(/[0-9]/, '') : user.primary_pseudonym.unique_id
+end
+
+def candroid_app
+  @app_name == 'candroid'
+end
+
+def icanvas_app
+  @app_name == 'icanvas'
+end
+
+def toggle_fail_fast(flag)
+  # this tells rspec to not run remaining tests in the spec if a test fails
+  # with mobile we can't guarantee the app is navigated to a specific location, so we fail quickly to not waste time
+  RSpec.configure do |c|
+    c.fail_fast = flag
   end
 end
 
@@ -93,14 +145,14 @@ def appium_init_ios
   }
 end
 
-def appium_init(platform_name)
+def appium_init(app_name)
   # @school = "#{host_url}:#{$server_port}"
   @school = 'twilson' # TODO: REMOVE WHEN MOBILE VERIFY SUPPORTS LOCAL ENVIRONMENT
   @appium_lib = { server_url: appium_server_url }
-  case platform_name
-  when 'Android'
+  case app_name
+  when 'candroid', 'speedgrader_android'
     appium_init_android
-  when 'iOS'
+  when 'icanvas', 'speedgrader_ios'
     appium_init_ios
   else
     raise('unsupported mobile platform')
@@ -112,17 +164,30 @@ end
 # Scrolling
 # ======================================================================================================================
 
-def scroll_to_element(opts = {})
+def scroll_to_element(opts)
   count = 0
   begin
-    return find_element(:id, opts[:id])
-  rescue
-    count += 1
+    scroll_to_element_locator(opts)
+  rescue Selenium::WebDriver::Error::NoSuchElementError
     scroll_vertically_in_view(opts[:scroll_view], opts[:time], opts[:direction])
-    retry unless count > opts[:attempts]
+    retry unless (count += 1) > opts[:attempts]
   end
 end
 
+def scroll_to_element_locator(opts)
+  case opts[:strategy]
+  when 'id'
+    return find_element(:id, opts[:id])
+  when 'tag'
+    return tag(opts[:tag])
+  when 'text_exact'
+    return text_exact(opts[:text_exact])
+  else
+    raise('Unsupported locator strategy for scroll_to_element.')
+  end
+end
+
+# Time is in milliseconds, so unless you want this to be a click send 1000 rather than 1
 def scroll_vertically_in_view(scroll_view, time, direction)
   x = scroll_view.location.x + (0.5 * scroll_view.size.width)
 
@@ -133,7 +198,6 @@ def scroll_vertically_in_view(scroll_view, time, direction)
     start_y = scroll_view.location.y + (0.9 * scroll_view.size.height)
     end_y = scroll_view.location.y + (0.1 * scroll_view.size.height)
   end
-
   action = Appium::TouchAction.new.press(x: x, y: start_y).wait(time).move_to(x: x, y: end_y).release
   action.perform
 end
