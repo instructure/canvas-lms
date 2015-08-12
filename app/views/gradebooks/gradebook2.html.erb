@@ -60,9 +60,6 @@
   <div class="assignment-gradebook-container hidden">
     <div id="gradebook-toolbar" class="toolbar">
       <div class="gradebook_dropdowns">
-        <% if !@context.feature_enabled?(:outcome_gradebook) && !@context.feature_enabled?(:post_grades)%>
-          <span class="section-button-placeholder"></span>
-        <% end %>
         <% if multiple_grading_periods? %>
           <span class="multiple-grading-periods-selector-placeholder"></span>
         <% end %>
