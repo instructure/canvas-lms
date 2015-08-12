@@ -2,7 +2,20 @@
 require File.expand_path('../boot', __FILE__)
 
 unless CANVAS_RAILS3
-  require "rails/all"
+
+  # Yes, it doesn't seem DRY to list these both in the if and else
+  # but this used to be "require 'rails/all'" which included sprockets.
+  # I needed to explicitly opt-out of sprockets but since I'm not sure
+  # about the other frameworks, I left this so it would be exactly the same
+  # as "require 'rails/all'" but without sprockets--even though it is a little
+  # different then the rails 3 else block. If the difference is not intended,
+  # they can be pulled out of the if/else
+  require "active_record/railtie"
+  require "action_controller/railtie"
+  require "action_mailer/railtie"
+  # require "sprockets/railtie" # Do not enable the Rails Asset Pipeline
+  require "rails/test_unit/railtie"
+
   Bundler.require(*Rails.groups)
 else
   require "active_record/railtie"
@@ -230,7 +243,7 @@ module CanvasRails
     config.exceptions_app = ExceptionsApp.new
 
     config.before_initialize do
-      config.action_controller.asset_host = Canvas::Cdn.config.host if Canvas::Cdn.config.host
+      config.action_controller.asset_host = Canvas::Cdn.method(:asset_host_for)
     end
   end
 end
