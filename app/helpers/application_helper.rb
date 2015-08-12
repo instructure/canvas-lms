@@ -251,7 +251,7 @@ module ApplicationHelper
       ary.concat(Canvas::RequireJs.extensions_for(bundle, 'plugins/')) unless use_optimized_js?
       ary << "#{base_url}/compiled/bundles/#{bundle}.js"
     end
-    javascript_include_tag *paths
+    javascript_include_tag(*paths)
   end
 
   def include_css_bundles
@@ -701,23 +701,16 @@ module ApplicationHelper
     if includes.length > 0
       if options[:raw]
         includes.unshift("/optimized/vendor/jquery-1.7.2.js")
-        javascript_include_tag(includes)
+        javascript_include_tag(*includes)
       else
         str = <<-ENDSCRIPT
-          (function() {
-            var inject = function(src) {
+          require(['jquery'], function () {
+            #{includes.to_json}.forEach(function (src) {
               var s = document.createElement('script');
               s.src = src;
-              s.type = 'text/javascript';
               document.body.appendChild(s);
-            };
-            var srcs = #{includes.to_json};
-            require(['jquery'], function() {
-              for (var i = 0, l = srcs.length; i < l; i++) {
-                inject(srcs[i]);
-              }
             });
-          })();
+          });
         ENDSCRIPT
         javascript_tag(str)
       end
