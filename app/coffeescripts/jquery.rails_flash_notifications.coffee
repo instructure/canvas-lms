@@ -35,8 +35,10 @@ define [
     """)
 
     $screenreader_node.appendTo($screenreader_holder)
-    # By not removing these in a timely manner, they can stack up and become repetitive
-    window.setTimeout((-> $screenreader_node.remove()), 1000)
+    # we're hiding these instead of removing them, since calling .remove() on a
+    # DOM node contained in an 'assertive' live region causes another alert that
+    # interrupts whatever alert message(s) are in progress
+    window.setTimeout((-> $screenreader_node.attr('aria-hidden', 'true')), 1000)
 
   flashBox = (type, content, timeout, cssOptions = {}) ->
     $node = $("""
