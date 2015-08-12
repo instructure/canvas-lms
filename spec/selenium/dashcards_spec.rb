@@ -66,6 +66,7 @@ describe 'dashcards' do
 
       replace_content(f('#ColorPickerCustomInput'), hex)
       f('.Button--primary').click
+      wait_for_ajaximations
 
       if f('.ic-DashboardCard__background').attribute(:style).include?('rgb')
         rgb = convert_hex_to_rgb_color(hex)
