@@ -77,7 +77,7 @@ class Login::SamlController < ApplicationController
       unique_id = response.saml_attributes["eduPersonPrincipalName"]
     elsif aac.login_attribute == 'eduPersonPrincipalName_stripped'
       unique_id = response.saml_attributes["eduPersonPrincipalName"]
-      unique_id = unique_id.split('@', 2)[0]
+      unique_id = unique_id.split('@', 2)[0] if unique_id
     end
 
     logger.info "Attempting SAML login for #{aac.login_attribute} #{unique_id} in account #{@domain_root_account.id}"
