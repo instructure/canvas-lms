@@ -124,20 +124,41 @@ module Api::V1::StreamItem
   end
 
   def api_render_stream_summary(contexts = nil)
-    opts = {}
-    opts[:contexts] = contexts
-    items = @current_user.shard.activate do
-      # not ideal, but 1. we can't aggregate in the db (boo yml) and
-      # 2. stream_item_json is where categorizing logic lives :(
-      @current_user.visible_stream_item_instances(opts).includes(:stream_item).map { |i|
-        stream_item_json(i, i.stream_item, @current_user, session)
-      }.inject({}) { |result, i|
-        key = [i['type'], i['notification_category']]
-        result[key] ||= {type: i['type'], count: 0, unread_count: 0, notification_category: i['notification_category']}
-        result[key][:count] += 1
-        result[key][:unread_count] += 1 if !i['read_state']
-        result
-      }.values.sort_by{ |i| i[:type] }
+    items = []
+    @current_user.shard.activate do
+
+      base_scope = @current_user.visible_stream_item_instances(:contexts => contexts).joins(:stream_item)
+
+      count_scope = base_scope.except(:order).group('stream_items.asset_type', 'stream_items.notification_category')
+        # as far as I can tell, the 'type' column previously extracted by stream_item_json is identical to asset_type
+
+      total_counts = count_scope.count
+      unread_counts = count_scope.where(:workflow_state => 'unread').count
+
+      # TODO: can remove after DataFixup::PopulateStreamItemNotificationCategory is run
+      if total_counts.delete(['Message', nil]) # i.e. there are Message stream items without notification_category
+        unread_counts.delete(['Message', nil])
+
+        base_scope.where(:stream_items => {:asset_type => "Message", :notification_category => nil}).
+          eager_load(:stream_item).find_each do |i|
+
+          category = i.stream_item.get_notification_category
+          key = ['Message', category]
+          total_counts[key] ||= 0
+          total_counts[key] += 1
+          unless i.read?
+            unread_counts[key] ||= 0
+            unread_counts[key] += 1
+          end
+        end
+      end
+
+      total_counts.each do |key, count|
+        type, category = key
+        items << {:type => type, :notification_category => category,
+          :count => count, :unread_count => unread_counts[key] || 0}
+      end
+      items.sort_by!{|i| i[:type]}
     end
     render :json => items
   end
