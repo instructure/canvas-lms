@@ -279,3 +279,11 @@ def create_group_announcement_manually(title,text)
   type_in_tiny('textarea[name=message]', text)
   expect_new_page_load { submit_form('.form-actions') }
 end
+
+# Checks that a group member can click a specified page entry on the index page and see its show page
+#   Expects @page is defined and index is defined as which wiki page is desired to click on. First page entry is default
+def verify_member_sees_group_page(index = 0)
+  get pages_page
+  expect_new_page_load { ff('.wiki-page-link')[index].click }
+  expect expect(f('.page-title')).to include_text("#{@page.title}")
+end

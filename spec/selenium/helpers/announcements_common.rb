@@ -70,7 +70,7 @@ def edit(title, message)
 end
 
 # DRY method that checks that a group member can see all announcements created within a group
-#   and that clicking one takes you to it. Count should always be > 0
+#   and that clicking one takes you to it. Expects @announcement is defined and count is > 0
 def verify_member_sees_announcement(count = 1)
   index = count-1
   get announcements_page

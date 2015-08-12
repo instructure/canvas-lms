@@ -2,6 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/groups_common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/announcements_common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/discussions_common')
+require File.expand_path(File.dirname(__FILE__) + '/helpers/wiki_and_tiny_common')
 
 describe "groups" do
   include_context "in-process server selenium tests"
@@ -10,6 +11,7 @@ describe "groups" do
   let(:announcements_page) {url + '/announcements'}
   let(:people_page) {url + '/users'}
   let(:discussions_page) {url + '/discussion_topics'}
+  let(:pages_page) {url + '/pages'}
 
   context "as a student" do
     before do
@@ -124,6 +126,44 @@ describe "groups" do
         expect(fln("#{course_dt.title}")).to be_nil
       end
     end
+
+    describe "pages page" do
+      it "should load pages index and display all pages", priority: "1", test_id: 273610 do
+        @testgroup.first.wiki.wiki_pages.create!(title: "Page 1", user: @teacher)
+        @testgroup.first.wiki.wiki_pages.create!(title: "Page 2", user: @teacher)
+        get pages_page
+        expect(ff('.collectionViewItems .clickable').size).to eq 2
+      end
+
+      it "should allow group members to create a page", priority: "1", test_id: 273611 do
+        get pages_page
+        manually_create_wiki_page('yo','this be a page')
+      end
+
+      it "should allow all group members to access a page", priority: "1", test_id: 273612 do
+        @page = @testgroup.first.wiki.wiki_pages.create!(title: "Page", user: @teacher)
+        # Verifying with a few different group members should be enough to ensure all group members can see it
+        verify_member_sees_group_page
+
+        user_session(@students.first)
+        verify_member_sees_group_page
+      end
+
+      it "should only list in-group pages in the content right pane", priority: "1", test_id: 273620 do
+        # create group and course announcements
+        group_page = @testgroup.first.wiki.wiki_pages.create!(user: @teacher,
+                                           title: 'Group Page', message: 'Group')
+        course_page = @course.wiki.wiki_pages.create!(user: @teacher,
+                                            title: 'Course Page', message: 'Course')
+
+        get pages_page
+        f('.btn-primary').click
+        wait_for_ajaximations
+        fj(".ui-accordion-header a:contains('Wiki Pages')").click
+        expect(fln("#{group_page.title}")).to be_displayed
+        expect(fln("#{course_page.title}")).to be_nil
+      end
+    end
   end
 
   context "as a teacher" do
@@ -171,9 +211,22 @@ describe "groups" do
         dt = DiscussionTopic.create!(context: @testgroup.first, user: @students.first,
                                      title: 'Discussion Topic', message: 'hi dudes')
         get discussions_page
-        # Verifies group member can access the teacher's group discussion & that it's the correct discussion
+        # Verifies teacher can access the group discussion & that it's the correct discussion
         expect_new_page_load { f('.discussion-title').click }
         expect(f('.message.user_content')).to include_text(dt.message)
+      end
+    end
+
+    describe "pages page" do
+      it "should allow teachers to create a page", priority: "1", test_id: 289993 do
+        get pages_page
+        manually_create_wiki_page('stuff','it happens')
+      end
+
+      it "should allow teachers to access a page", priority: "1", test_id: 289992 do
+        @page = @testgroup.first.wiki.wiki_pages.create!(title: "Page", user: @students.first)
+        # Verifies teacher can access the group page & that it's the correct page
+        verify_member_sees_group_page
       end
     end
   end
