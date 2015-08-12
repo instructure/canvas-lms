@@ -610,7 +610,7 @@ class Course < ActiveRecord::Base
 
   def user_is_instructor?(user)
     return unless user
-    TempCache.cache('user_is_instructor', self, user) do
+    RequestCache.cache('user_is_instructor', self, user) do
       Rails.cache.fetch([self, user, "course_user_is_instructor"].cache_key) do
         user.cached_current_enrollments(preload_courses: true).any? { |e| e.course_id == self.id && e.participating_instructor? }
       end
@@ -619,7 +619,7 @@ class Course < ActiveRecord::Base
 
   def user_is_student?(user, opts = {})
     return unless user
-    TempCache.cache('user_is_student', self, user, opts) do
+    RequestCache.cache('user_is_student', self, user, opts) do
       Rails.cache.fetch([self, user, "course_user_is_student", opts[:include_future]].cache_key) do
         user.cached_current_enrollments(:preload_courses => true, :include_future => opts[:include_future]).any? { |e|
           e.course_id == self.id && (opts[:include_future] ? e.student? : e.participating_student?)
@@ -631,7 +631,7 @@ class Course < ActiveRecord::Base
   def user_has_been_instructor?(user)
     return unless user
     # enrollments should be on the course's shard
-    TempCache.cache('user_has_been_instructor', self, user) do
+    RequestCache.cache('user_has_been_instructor', self, user) do
       self.shard.activate do
         Rails.cache.fetch([self, user, "course_user_has_been_instructor"].cache_key) do
           # active here is !deleted; it still includes concluded, etc.
@@ -643,7 +643,7 @@ class Course < ActiveRecord::Base
 
   def user_has_been_admin?(user)
     return unless user
-    TempCache.cache('user_has_been_admin', self, user) do
+    RequestCache.cache('user_has_been_admin', self, user) do
       Rails.cache.fetch([self, user, "course_user_has_been_admin"].cache_key) do
         # active here is !deleted; it still includes concluded, etc.
         self.admin_enrollments.active.where(user_id: user).exists?
@@ -653,7 +653,7 @@ class Course < ActiveRecord::Base
 
   def user_has_been_observer?(user)
     return unless user
-    TempCache.cache('user_has_been_observer', self, user) do
+    RequestCache.cache('user_has_been_observer', self, user) do
       Rails.cache.fetch([self, user, "course_user_has_been_observer"].cache_key) do
         # active here is !deleted; it still includes concluded, etc.
         self.observer_enrollments.active.where(user_id: user).exists?
@@ -663,7 +663,7 @@ class Course < ActiveRecord::Base
 
   def user_has_been_student?(user)
     return unless user
-    TempCache.cache('user_has_been_student', self, user) do
+    RequestCache.cache('user_has_been_student', self, user) do
       Rails.cache.fetch([self, user, "course_user_has_been_student"].cache_key) do
         self.all_student_enrollments.where(user_id: user).exists?
       end
@@ -672,7 +672,7 @@ class Course < ActiveRecord::Base
 
   def user_has_no_enrollments?(user)
     return unless user
-    TempCache.cache('user_has_no_enrollments', self, user) do
+    RequestCache.cache('user_has_no_enrollments', self, user) do
       Rails.cache.fetch([self, user, "course_user_has_no_enrollments"].cache_key) do
         !enrollments.where(user_id: user).exists?
       end

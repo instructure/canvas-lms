@@ -788,7 +788,6 @@ class CalendarEventsApiController < ApplicationController
   def apply_assignment_overrides(events)
     ActiveRecord::Associations::Preloader.new(events, [:context, :assignment_overrides]).run
 
-    TempCache.enable do
     events = events.inject([]) do |assignments, assignment|
 
       if assignment.context.user_has_been_student?(@current_user)
@@ -826,7 +825,6 @@ class CalendarEventsApiController < ApplicationController
         due_at = assignment.due_at
         due_at && (due_at > @end_date || due_at < @start_date)
       end
-    end
     end
 
     events

@@ -588,26 +588,24 @@ class AssignmentsApiController < ApplicationController
       end
 
       hashes = []
-      TempCache.enable do
-        hashes = assignments.map do |assignment|
+      hashes = assignments.map do |assignment|
 
-          visibility_array = assignment_visibilities[assignment.id] if assignment_visibilities
-          submission = submissions[assignment.id]
-          active_overrides = include_override_objects ? assignment.assignment_overrides.active : nil
-          needs_grading_course_proxy = @context.grants_right?(@current_user, session, :manage_grades) ?
-            Assignments::NeedsGradingCountQuery::CourseProxy.new(@context, @current_user) : nil
+        visibility_array = assignment_visibilities[assignment.id] if assignment_visibilities
+        submission = submissions[assignment.id]
+        active_overrides = include_override_objects ? assignment.assignment_overrides.active : nil
+        needs_grading_course_proxy = @context.grants_right?(@current_user, session, :manage_grades) ?
+          Assignments::NeedsGradingCountQuery::CourseProxy.new(@context, @current_user) : nil
 
-          assignment_json(assignment, @current_user, session,
-                          submission: submission, override_dates: override_dates,
-                          include_visibility: include_visibility,
-                          assignment_visibilities: visibility_array,
-                          needs_grading_count_by_section: needs_grading_count_by_section,
-                          needs_grading_course_proxy: needs_grading_course_proxy,
-                          include_all_dates: include_all_dates,
-                          bucket: params[:bucket],
-                          overrides: active_overrides
-                          )
-        end
+        assignment_json(assignment, @current_user, session,
+                        submission: submission, override_dates: override_dates,
+                        include_visibility: include_visibility,
+                        assignment_visibilities: visibility_array,
+                        needs_grading_count_by_section: needs_grading_count_by_section,
+                        needs_grading_course_proxy: needs_grading_course_proxy,
+                        include_all_dates: include_all_dates,
+                        bucket: params[:bucket],
+                        overrides: active_overrides
+                        )
       end
 
       render :json => hashes

@@ -164,22 +164,20 @@ class ContextModulesController < ApplicationController
   def content_tag_assignment_data
     if authorized_action(@context, @current_user, :read)
       info = {}
-      TempCache.enable do
-        @context.module_items_visible_to(@current_user).each do |tag|
-          if tag.can_have_assignment?
-            info[tag.id] = Rails.cache.fetch([tag, @current_user, "content_tag_assignment_info"].cache_key) do
-              if tag.assignment
-                tag.assignment.context_module_tag_info(@current_user, @context)
-              else
-                {
-                  :points_possible => nil,
-                  :due_date => (tag.content_type_quiz? && tag.content.due_at ? tag.content.due_at.utc.iso8601 : nil)
-                }
-              end
+      @context.module_items_visible_to(@current_user).each do |tag|
+        if tag.can_have_assignment?
+          info[tag.id] = Rails.cache.fetch([tag, @current_user, "content_tag_assignment_info"].cache_key) do
+            if tag.assignment
+              tag.assignment.context_module_tag_info(@current_user, @context)
+            else
+              {
+                :points_possible => nil,
+                :due_date => (tag.content_type_quiz? && tag.content.due_at ? tag.content.due_at.utc.iso8601 : nil)
+              }
             end
-          else
-            info[tag.id] = {:points_possible => nil, :due_date => nil}
           end
+        else
+          info[tag.id] = {:points_possible => nil, :due_date => nil}
         end
       end
       render :json => info
