@@ -19,7 +19,7 @@ describe "groups" do
       add_users_to_group(@students + [@user],@testgroup.first)
     end
 
-    describe "announcement page" do
+    describe "announcements page" do
       it "should center the add announcement button if no announcements are present", priority: "1", test_id: 273606 do
         get announcements_page
         expect(f('#content.container-fluid div')).to have_attribute(:style, 'text-align: center;')
@@ -67,10 +67,7 @@ describe "groups" do
 
       it "should allow all group members to see announcements", priority: "1", test_id: 273613 do
         @announcement = @testgroup.first.announcements.create!(title: 'Group Announcement', message: 'Group',user: @teacher)
-        # Verifying with a few different users and roles should be enough to ensure all group members can see it
-        verify_member_sees_announcement
-
-        user_session(@teacher)
+        # Verifying with a few different group members should be enough to ensure all group members can see it
         verify_member_sees_announcement
 
         user_session(@students.first)
@@ -135,6 +132,23 @@ describe "groups" do
       group_test_setup(4,1,1)
       # adds all students to the group
       add_users_to_group(@students,@testgroup.first)
+    end
+
+    describe "announcements page" do
+      it "should allow teachers to see announcements", priority: "1", test_id: 287049 do
+        @announcement = @testgroup.first.announcements.create!(title: 'Group Announcement', message: 'Group',user: @students.first)
+        verify_member_sees_announcement
+      end
+
+      it "should allow teachers to create an announcement", priority: "1", test_id: 287050 do
+        get announcements_page
+
+        # Checks that initial user can create an announcement
+        create_group_announcement_manually("Announcement by #{@teacher.name}",'sup')
+        wait_for_ajaximations
+        get announcements_page
+        expect(ff('.discussion-topic').size).to eq 1
+      end
     end
 
     describe "discussions page" do
