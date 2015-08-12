@@ -667,12 +667,13 @@ define([
       updatePrerequisites($module, data.context_module.prerequisites);
 
       // Update requirement message pill
-      if (data.context_module.completion_requirements.length === 0) {
-        $module.find('.requirements_message').replaceWith("<div class='no-requirements'></div>");
-      } else {
-        newPillMessage($module, data.context_module.requirement_count);
+      if (ENV.MODULE_FILE_PERMISSIONS.module_progression_any_condition){
+        if (data.context_module.completion_requirements.length === 0) {
+          $module.find('.requirements_message').replaceWith("<div class='no-requirements'></div>");
+        } else {
+          newPillMessage($module, data.context_module.requirement_count);
+        }
       }
-
       $module.find(".context_module_items .context_module_item")
         .removeClass('progression_requirement')
         .removeClass('min_score_requirement')
