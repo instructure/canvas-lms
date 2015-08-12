@@ -198,6 +198,11 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     end
   end
 
+  def results_visible_for_user?(user)
+    return true if user && self.quiz.grants_right?(user, :grade)
+    results_visible?
+  end
+
   def last_attempt_completed?
     completed? && quiz.allowed_attempts && attempt >= quiz.allowed_attempts
   end
