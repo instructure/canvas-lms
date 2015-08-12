@@ -61,10 +61,29 @@ describe UsersController, type: :request do
     @assignment.update_attribute(:due_at, 1.week.from_now)
     json = api_call(:get, "/api/v1/users/self/activity_stream/summary.json",
                     { :controller => "users", :action => "activity_stream_summary", :format => 'json' })
+
     expect(json).to eq [{"type" => "Conversation", "count" => 1, "unread_count" => 0, "notification_category" => nil}, # conversations don't currently set the unread state on stream items
                     {"type" => "DiscussionTopic", "count" => 2, "unread_count" => 1, "notification_category" => nil},
                     {"type" => "Message", "count" => 1, "unread_count" => 0, "notification_category" => "TestImmediately"} # check a broadcast-policy-based one
                    ]
+  end
+
+  it "should still return notification_category in the the activity stream summary if not set (yet)" do
+    # TODO: can remove this spec as well as the code in lib/api/v1/stream_item once the datafixup has been run
+    @context = @course
+    Notification.create(:name => 'Assignment Due Date Changed', :category => "TestImmediately")
+    Assignment.any_instance.stubs(:created_at).returns(4.hours.ago)
+    assignment_model(:course => @course)
+    @assignment.update_attribute(:due_at, 1.week.from_now)
+    @assignment.update_attribute(:due_at, 2.weeks.from_now)
+    # manually set the pre-datafixup state for one of them
+    StreamItem.where(:id => @user.visible_stream_item_instances.first.stream_item).update_all(:notification_category => nil)
+    json = api_call(:get, "/api/v1/users/self/activity_stream/summary.json",
+      { :controller => "users", :action => "activity_stream_summary", :format => 'json' })
+
+    expect(json).to eq [
+          {"type" => "Message", "count" => 2, "unread_count" => 0, "notification_category" => "TestImmediately"} # check a broadcast-policy-based one
+        ]
   end
 
   it "should format DiscussionTopic" do
