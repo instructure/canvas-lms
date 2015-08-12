@@ -49,7 +49,7 @@ class GradebookExporter
     I18n.t 'csv.id', 'ID'
     I18n.t 'csv.sis_user_id', 'SIS User ID'
     I18n.t 'csv.sis_login_id', 'SIS Login ID'
-    I18n.t 'csv.root_account', 'Root Acount'
+    I18n.t 'csv.root_account', 'Root Account'
     I18n.t 'csv.section', 'Section'
     I18n.t 'csv.comments', 'Comments'
     I18n.t 'csv.current_score', 'Current Score'
