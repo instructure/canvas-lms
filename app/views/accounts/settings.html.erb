@@ -445,6 +445,10 @@ TEXT
                       <td><%= settings.blabel :sis_app_token, :en => "SIS Agent Token" %></td>
                       <td><%= settings.text_field :sis_app_token, :value => @account.settings[:sis_app_token] %></td>
                     </tr>
+                    <tr>
+                      <td><%= settings.blabel :sis_app_url, :en => "SIS App URL" %></td>
+                      <td><%= settings.text_field :sis_app_url, :value => @account.settings[:sis_app_url] %></td>
+                    </tr>
                   </table>
               <% end %>
             </fieldset>
