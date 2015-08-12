@@ -82,7 +82,7 @@ module AuthenticationMethods
       @access_token.used!
 
       RequestContextGenerator.add_meta_header('at', @access_token.global_id)
-      RequestContextGenerator.add_meta_header('dk', @access_token.developer_key.global_id) if @access_token.developer_key
+      RequestContextGenerator.add_meta_header('dk', @access_token.global_developer_key_id) if @access_token.developer_key_id
     end
   end
 
