@@ -104,6 +104,7 @@ class ContentZipper
                                 :filename,
                                 :content_type,
                                 :uuid,
+                                :id,
                                 :attachment)
 
   def zip_eportfolio(zip_attachment, portfolio)
@@ -128,6 +129,7 @@ class ContentZipper
       obj.filename = "#{idx}_#{a.filename}"
       obj.content_type = a.content_type
       obj.uuid = a.uuid
+      obj.id = a.id
       obj.attachment = a
       idx += 1
       obj
@@ -145,7 +147,7 @@ class ContentZipper
         end
         update_progress(zip_attachment, idx, count)
         static_attachments.each do |a|
-          add_attachment_to_zip(a.attachment, zipfile)
+          add_attachment_to_zip(a.attachment, zipfile, a.filename)
           update_progress(zip_attachment, idx, count)
         end
         content = File.open(Rails.root.join('public', 'images', 'logo.png'), 'rb').read rescue nil
