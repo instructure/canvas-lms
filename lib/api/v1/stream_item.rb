@@ -20,6 +20,15 @@ module Api::V1::StreamItem
   include Api::V1::Context
   include Api::V1::Submission
 
+  def stream_item_preloads(stream_items)
+    discussion_topics = stream_items.select { |si| ['DiscussionTopic', 'Announcement'].include?(si.asset_type) }
+    ActiveRecord::Associations::Preloader.new(discussion_topics, :context).run
+    assessment_requests = stream_items.select { |si| si.asset_type == 'AssessmentRequest' }.map(&:data)
+    ActiveRecord::Associations::Preloader.new(assessment_requests, asset: :assignment).run
+    submissions = stream_items.select { |si| si.asset_type == 'Submission' }
+    ActiveRecord::Associations::Preloader.new(submissions, asset: { assignment: :context }).run
+  end
+
   def stream_item_json(stream_item_instance, stream_item, current_user, session)
     data = stream_item.data(current_user.id)
     {}.tap do |hash|
@@ -37,7 +46,7 @@ module Api::V1::StreamItem
 
       case stream_item.asset_type
       when 'DiscussionTopic', 'Announcement'
-        context = stream_item.asset.context
+        context = stream_item.context
         hash['message'] = api_user_content(data.message, context)
         if stream_item.data.class.name == 'DiscussionTopic'
           hash['discussion_topic_id'] = stream_item.asset_id
@@ -77,7 +86,7 @@ module Api::V1::StreamItem
         json = submission_json(stream_item.asset, stream_item.asset.assignment, current_user, session, nil, ['submission_comments', 'assignment', 'course', 'html_url', 'user'])
         json.delete('id')
         hash.merge! json
-        hash['submission_id'] = stream_item.asset.id
+        hash['submission_id'] = stream_item.asset_id
 
         # backwards compat from before using submission_json
         hash['assignment']['title'] = hash['assignment']['name']
@@ -94,7 +103,7 @@ module Api::V1::StreamItem
         hash['type'] = 'Collaboration'
         hash['html_url'] = send("#{context_type}_collaboration_url", context_id, stream_item.asset_id) if context_type
       when /AssessmentRequest/
-        assessment_request = stream_item.asset
+        assessment_request = stream_item.data
         assignment = assessment_request.asset.assignment
         hash['assessment_request_id'] = assessment_request.id
         hash['html_url'] = course_assignment_submission_url(assignment.context_id, assignment.id, assessment_request.user_id)
@@ -118,7 +127,9 @@ module Api::V1::StreamItem
       end
       Api.paginate(scope, self, self.send(opts[:paginate_url], @context), default_per_page: 21).to_a
     end
-    json = items.select(&:stream_item).map { |i| stream_item_json(i, i.stream_item, @current_user, session) }
+    items.select!(&:stream_item)
+    stream_item_preloads(items.map(&:stream_item))
+    json = items.map { |i| stream_item_json(i, i.stream_item, @current_user, session) }
     json.select! {|hash| hash['submission_comments'].present?} if opts[:asset_type] == 'Submission'
     render :json => json
   end
