@@ -403,6 +403,29 @@ describe "new groups" do
       expect(f(".group[data-id=\"#{@testgroup[2].id}\"] .group-name")).to include_text('Test Group 3')
     end
 
+    it 'should add students via drag and drop', priority: "1", test_id: 94154 do
+      group_test_setup(2,1,2)
+      get "/courses/#{@course.id}/groups"
+
+      drag_item1 = '.group-user-name:contains("Test Student 1")'
+      drag_item2 = '.group-user-name:contains("Test Student 2")'
+      drop_target1 = '.group:contains("Test Group 1")'
+
+      drag_and_drop_element(fj(drag_item1), fj(drop_target1))
+      f(".group[data-id=\"#{@testgroup[0].id}\"] .toggle-group").click
+      wait_for_ajaximations
+
+      expect(f(".group[data-id=\"#{@testgroup[0].id}\"] .group-summary")).to include_text('1 student')
+
+      drag_and_drop_element(fj(drag_item2), fj(drop_target1))
+      wait_for_ajaximations
+
+      group_to_check = ff('.group .group-user .group-user-name')
+      expect(group_to_check[0]).to include_text('Test Student 1')
+      expect(group_to_check[1]).to include_text('Test Student 2')
+      expect(f(".group[data-id=\"#{@testgroup[0].id}\"] .group-summary")).to include_text('2 students')
+    end
+
     context "using clone group set modal" do
       it "should clone a group set including its groups and memberships" do
         group_test_setup(2,1,2)
