@@ -29,7 +29,7 @@ class RubricAssessment < ActiveRecord::Base
   belongs_to :user
   belongs_to :assessor, :class_name => 'User'
   belongs_to :artifact, :polymorphic => true, :touch => true
-  validates_inclusion_of :artifact_type, :allow_nil => true, :in => ['Submission', 'Assignment']
+  validates_inclusion_of :artifact_type, :allow_nil => true, :in => ['Submission', 'Assignment', 'ModeratedGrading::ProvisionalGrade']
   has_many :assessment_requests, :dependent => :destroy
   serialize_utf8_safe :data
 
@@ -193,6 +193,7 @@ class RubricAssessment < ActiveRecord::Base
   end
 
   scope :of_type, lambda { |type| where(:assessment_type => type.to_s) }
+  scope :for_submissions, -> { where(:artifact_type => "Submission")}
 
   def methods_for_serialization(*methods)
     @serialization_methods = methods

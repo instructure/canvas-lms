@@ -109,7 +109,6 @@ class AssignmentsController < ApplicationController
         @current_user_submission = nil if @current_user_submission &&
           !@current_user_submission.graded? &&
           !@current_user_submission.submission_type
-        @current_user_rubric_assessment = @assignment.rubric_association.rubric_assessments.where(user_id: @current_user).first if @current_user && @assignment.rubric_association
         @current_user_submission.send_later(:context_module_action) if @current_user_submission
       end
 
