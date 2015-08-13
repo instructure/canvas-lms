@@ -70,6 +70,9 @@ ar:
         api_url: "عنوان Url لواجهة Api"
         common_core_guid: "المعرف الأساسي المشترك GUID (اختياري)"
   access_token_is_valid_until_d2f048cf: "رمز الوصول المميز صالح لغاية"
+  accordion_section_1_7888782d: "قسم أكورديون 1"
+  accordion_section_2_e1812997: "قسم أكورديون 2"
+  accordion_section_3_96861901: "قسم أكورديون 3"
   account: 
     ask_canvas_network: "طرح سؤال على مجتمع شبكة Canvas"
     default_account_name: "حساب افتراضي"
@@ -761,16 +764,15 @@ ar:
             field: "معرف القسم"
     settings: 
       about_google_docs: |-
-          تتيح معاينات Google Docs للمستخدمين عرض المستندات من
-          داخل Canvas دون الحاجة إلى تنزيلها وفتح البرنامج المناسب
-          (مثل Word أو Excel).
+          تتيح معاينات Google Docs للمستخدمين عرض المستندات
+          من داخل Canvas دون الحاجة إلى تنزيلها و
+          فتح البرنامج المناسب (مثل Word أو Excel).
           
-          في حالة تمكين خدمة Scribd في هذا الحساب، فسيحاول Canvas
-          استخدامها لعرض المعاينة. وإذا لم يكن ممكنًا معاينة المستند
-          في Scribd أو لم يقم المستخدم بتثبيت مشغل Flash 
-          (مثل iPad/iPhone)، فسيعود Canvas إلى استخدام معاينات
-          Google Docs إذا كانت ممكنة. باستخدام هذه الخدمة فإنك تقر
-          بأنك قرأت [شروط استخدام Google Docs Viewer](%{terms_url}) وتوافق عليها.
+          كما أن معاينات Google Docs قادرة على عرض ملفات
+          لا يدعمها عارض مستندات Canvas.
+          
+          باستخدام هذه الخدمة فإنك
+          تقر بأنك قرأت [شروط استخدام Google Docs Viewer](%{terms_url}) وتوافق عليها.
       about_google_docs_tooltip: "نبذة حول معاينات Google Docs"
       account_admins_title: "مسؤولو الحساب"
       account_quotas: 
@@ -859,6 +861,7 @@ ar:
         equella: Equella
         equella_endpoint: "نقطة نهاية Equella"
         equella_teaser: "تعليقات Equella"
+        global_brand_includes: "تحميل تضمينات CSS/JavaScript العامة في محرر النسق"
         global_includes: "CSS/JavaScript العمومية تشملان"
         global_javascript: "عنوان URL العمومي لـ JavaScript"
         global_stylesheet: "عنوان URL العمومي لـ CSS"
@@ -1231,6 +1234,7 @@ ar:
   add_files_to_the_course_da6ffd32: "إضافة ملفات إلى المساق"
   add_grading_period_6f774dc3: "إضافة فترة تقييم الدرجات"
   add_grading_scheme_81e23c05: "إضافة نظام تقييم"
+  add_icon_567dbcaa: "إضافة رمز"
   add_module_item: 
     add_assignment_to: "إضافة مهمة إلى %{module}"
     add_file_to: "إضافة ملفات إلى %{module}"
@@ -1299,6 +1303,7 @@ ar:
       threshold_should_be_numeric: "من المفترض أن يكون رقمًا إيجابيًا"
   all_4321c3a1: الكل
   all_changes_were_saved_f6f3ddcc: "تم حفظ جميع التغييرات"
+  all_configured_apps_a14eef0a: "جميع التطبيقات المكوّنة"
   all_dates_fields_must_be_present_and_formatted_cor_3a0fe925: "يجب تقديم وتنسيق كافة حقول التواريخ بشكل صحيح"
   all_finished_time_to_publish_your_course_click_the_b6f07217: "هل تم الانتهاء من كل الأمور؟ حدد توقيت لنشر المساق الخاص بك! انقر على الزر أدناه لإتاحته رسميًا! سيتيح النشر للمستخدمين المشاركة في المساق."
   all_grading_periods_77974940: "كل فترات تقييم الدرجات"
@@ -1314,6 +1319,7 @@ ar:
   always_3a59e701: دائمًا
   an_error_occured_trying_to_generate_this_theme_ple_6ae581d: "حدث خطأ أثناء محاولة إنشاء هذا النسق، يرجى المحاولة مرة أخرى."
   an_error_occurred_please_post_your_reply_again_lat_b0220ac6: "*حدث خطأ*، يرجى نشر ردك مرة أخرى لاحقًا"
+  an_error_occurred_trying_to_generate_this_theme_pl_b493e2e9: "حدث خطأ أثناء محاولة إنشاء هذا النسق، يرجى المحاولة مرة أخرى."
   an_error_occurred_trying_to_prepare_download_pleas_df6fa596: "حدث خطأ أثناء محاولة تحضير التنزيل، يرجى المحاولة مرة أخرى."
   an_error_occurred_when_setting_the_usage_right_for_d4ea78f5: "حدث خطأ أثناء إعداد حق الاستخدام الخاص بـ %{filename}"
   an_unknown_server_error_occurred_please_try_again_f517eaf3: "حدث خطأ غير معروف في الخادم. الرجاء إعادة المحاولة."
@@ -1395,6 +1401,9 @@ ar:
   anonymous_user: "مستخدم مجهول"
   anonymous_user_d984b9ce: "مستخدم مجهول"
   another_configuration_is_currently_selected_select_95b394e: "تم حالياً تحديد تكوين آخر. تحديد هذا التكوين سيلغي التكوين الآخر."
+  answer_text_80_character_limit_2fce1113: "نص الإجابة (80 حرف كحد أقصى)"
+  answer_text_909894d6: "نص الإجابة"
+  answer_weight_43420dc5: "وزن الإجابة"
   answers_will_be_shown_after_your_last_attempt_d9db6b1d: "سيتم عرض الإجابات بعد آخر محاولة"
   api_url_3ee7cb0a: "URL واجهة برمجة التطبيقات"
   app_center_will_appear_in_the_apps_tab_on_the_sett_1b9eb936: "يظهر مركز التطبيقات في علامة التبويب \"التطبيقات\" في صفحة إعدادات المساق أو صفحة إعدادات الحساب. من المفترض أن يشير عنوان URL الموجود أدناه إلى نقطة نهاية صالحة لمركز التطبيقات (على سبيل المثال، %{url} -- تأكد من حذف الشرطة المائلة اللاحقة"
@@ -2229,6 +2238,8 @@ ar:
   blue_daf8fea9: أزرق
   bookmark_service: 
     default_title: "بلا عنوان"
+  breadcrumb_1_cb3c504: "مسار التنقل 1"
+  breadcrumb_2_95ba94be: "مسار التنقل 2"
   broccoli_cloud: 
     hidden_title: "تم الإخفاء. متوفر مع ارتباط"
     published_title: منشور
@@ -2623,6 +2634,7 @@ ar:
       would_you_like_to_cancel_that_and_sign_up_for_this: "هل ترغب في إلغاء هذا ثم التسجيل في ذاك؟"
       you_are_already_signed_up_for: "أنت جاهز للتسجيل في:"
     save: حفظ
+    save_and_publish: "حفظ ونشر"
     save_changes: "حفظ التغييرات"
     scheduler_right_side_admin_section: 
       create_a_new_set_of_appointments: "إنشاء مجموعة مواعيد"
@@ -2751,6 +2763,7 @@ ar:
   canvas_ticketing_email_connector_27e253ae: "رابط تذاكر البريد الإلكتروني لـ Canvas"
   canvas_ticketing_web_post_connector_11158897: "رابط تذاكر منشورات Canvas"
   canvas_will_regrade_all_your_submissions_after_you_2d68694a: "سيعيد Canvas تقييم درجات جميع إرسالاتك بعد حفظ الاختبار، قد يستغرق ذلك بضع دقائق."
+  careful_changes_to_group_membership_will_apply_to__19a9089c: "حذار! سيتم تطبيق تغييرات عضوية المجموعة على المجموعات التي لديها إرسالات مهام. قد لا تتحاذى إرسالات مهام المجموعة كنتيجة. هل تريد إنشاء فئة مجموعة جديدة للمهام المستقبلية؟"
   cas_url_4ba2843e: "عنوان URL لـ CAS"
   cc: 
     by: "سمة CC"
@@ -2764,6 +2777,7 @@ ar:
   certificate_fingerprint_b376df90: "بصمة الشهادة"
   change_beginning_date_to_39dbd06e: "تغيير تاريخ البدء إلى"
   change_ending_date_to_d2cebd54: "تغيير تاريخ الانتهاء إلى"
+  change_groups_4e2ab6c3: "تغيير المجموعات"
   change_points_possible_to_match_rubric_dialog: 
     prompts: 
       update_assignment_points: "هذا التعيين يشتمل على %{assignmentPoints} نقطة ممكنة، هل ترغب في تغييره بحيث يشتمل على %{rubricPoints} نقطة ممكنة لمطابقة هذا المعيار؟"
@@ -2774,10 +2788,16 @@ ar:
   choose_a_csv_file_to_upload_9644480c: "اختيار ملف CSV لتحميله:"
   choose_an_authentication_service_47dc8875: "اختيار خدمة مصادقة"
   choose_usage_rights_33683854: "اختيار حقوق الاستخدام..."
+  chosencolor_is_not_a_valid_color_5d542cc: "'%{chosenColor}' ليس لون صالح."
+  clear_2084585f: مسح
   click_for_more_details_on_this_outcome_8c018d2f: "انقر للحصول على مزيد من التفاصيل عن هذه النتيجة"
   click_here_on_the_calendar_link_c9965631: "انقر هنا فوق ارتباط *التقويم*"
+  click_to_enter_comments_if_the_student_chooses_thi_507c20f6: "انقر لإدخال تعليقات، إذا اختار الطالب هذه الإجابة"
   click_to_modify_89fa26aa: "انقر للتعديل"
   click_to_report_profile_picture_370f9625: "انقر للإبلاغ عن صورة ملف تعريف"
+  click_to_set_this_answer_as_correct_1326e3fd: "انقر لتعيين هذه الإجابة كإجابة صحيحة"
+  click_to_test_dropdown_b950974d: "انقر لاختبار القائمة المنسدلة"
+  clone_group_set_c2a40e15: "استنساخ فئة مجموعات"
   close_and_return_to_canvas_80544344: "إغلاق والعودة إلى Canvas"
   close_d634289d: إغلاق
   close_picker_256aca8a: "غلق أداة الانتقاء"
@@ -2898,6 +2918,7 @@ ar:
       delete: "هل تريد حذف التعاون؟"
   collapse_list_of_group_members_for_groupname_d6c66fa0: "طي قائمة أعضاء مجموعة %{groupName}"
   collapse_subdiscussion_89af1f5c: "طي المناقشة الفرعية"
+  collapsed_510aa02a: مطوية
   coming_up_4348b0bd: "الالتحاق بالدراسة"
   comm_messages: 
     from_beginning: البداية
@@ -2967,7 +2988,11 @@ ar:
       notices: 
         contact_registered: "تم تسجيل طريقة الاتصال!"
   complete_all_items_e1779257: "إكمال جميع العناصر"
+  complete_icon_7455be93: "رمز كامل"
   complete_one_item_90e5fb03: "إكمال عنصر واحد"
+  completed_19711ce7: مكتمل
+  completed_icon_521596e4: "رمز مكتمل"
+  concluded_conferences_cdbe53f9: "المؤتمرات المنجزة"
   concluded_courses_94782e21: "المساقات المنتهية"
   conference_was_deleted_30869390: "تم حذف المؤتمر"
   conferences: 
@@ -3077,6 +3102,9 @@ ar:
       labels: 
         all_quizzes: "كل الاختبارات"
       select_quizzes: "تحديد اختبارات لتصديرها"
+  content_for_section_1_7ecfb319: "محتوى للقسم 1"
+  content_for_section_2_e7c6e2a3: "محتوى للقسم 2"
+  content_for_section_3_90c1d235: "محتوى للقسم 3"
   content_imports: 
     errors: 
       import_failed: "حدث خطأ أثناء استيراد الترحيل الخاص بك.  الرجاء إخطار مسؤول النظام لديك وإعطاؤه الكود التالي: \"%{code}\""
@@ -3600,15 +3628,15 @@ ar:
         fulfilled: "لم يتم تسجيل أكثر من %{score}"
         unfulfilled: "يجب عدم تسجيل أكثر من %{score}"
       min_score: 
-        fulfilled: "تم تسجيل %{score} على الأقل"
-        unfulfilled: "يجب تسجيل %{score} على الأقل"
+        fulfilled: "الدرجة: %{score}"
+        unfulfilled: "الدرجة: %{score}"
       modules_item_move_to: "نقل إلى..."
       must_contribute: 
-        fulfilled: "تمت المساهمة في محتوى الصفحة"
-        unfulfilled: "يجب المشاركة في محتوى الصفحة"
+        fulfilled: بمساهمة
+        unfulfilled: مساهمة
       must_submit: 
-        fulfilled: "تم إرسال المهمة"
-        unfulfilled: "يجب إرسال المهمة"
+        fulfilled: "تم الإرسال"
+        unfulfilled: إرسال
       must_view: 
         fulfilled: "تم عرض الصفحة"
         unfulfilled: "يجب عرض الصفحة"
@@ -4728,6 +4756,7 @@ ar:
     bottom: 
       student: 
         count: "العدد الأدنى للطلاب"
+    comments: التعليقات
     correct: 
       bottom: 
         student: 
@@ -4741,22 +4770,33 @@ ar:
       top: 
         student: 
           count: "العدد الأعلى الصحيح للطلاب"
+    current_score: "الدرجة الحالية"
     difficulty: 
       index: "مؤشر الصعوبة"
+    final_grade: "التقدير النهائي"
+    final_score: "الدرجة النهائية"
+    id: المعرّف
     middle: 
       student: 
         count: "العدد الأوسط للطلاب"
     point: 
       biserial: "التسلسل الثنائي لنقطة الصحيح"
       distractor: "التسلسل الثنائي لنقطة ملفت الانتباه %{num}"
+    points_possible: "النقاط الممكنة"
     question: 
       id: "معرف السؤال"
       title: "عنوان السؤال"
     quiz: 
       question: 
         count: "عدد أسئلة الاختبار"
+    read_only_field: "(للقراءة فقط)"
+    root_account: "الحساب الأصلي"
+    section: القسم
+    sis_login_id: "معرّف تسجيل دخول SIS"
+    sis_user_id: "معرّف مستخدم SIS"
     standard: 
       deviation: "الانحراف المعياري"
+    student: الطالب
     top: 
       student: 
         count: "العدد الأعلى للطلاب"
@@ -5041,6 +5081,7 @@ ar:
   delete_quiz_142b8099: "حذف الاختبار"
   delete_selected_a023ccf8: "حذف التحديد"
   delete_survey_56fddbbd: "حذف الاستطلاع"
+  delete_this_answer_f1802eaa: "حذف هذه الإجابة"
   delete_tool_app_9c9f6d35: "أتريد حذف تطبيق %{tool}؟"
   delete_toolname_app_85f9d4ee: "حذف تطبيق %{toolName}"
   deleting_6421031e: "يتم الآن الحذف..."
