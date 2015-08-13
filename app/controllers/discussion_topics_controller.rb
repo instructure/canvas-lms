@@ -426,7 +426,7 @@ class DiscussionTopicsController < ApplicationController
         }
         js_hash['VALID_DATE_RANGE'] = CourseDateRange.new(@context)
       end
-
+      js_hash[:CANCEL_REDIRECT_URL] = cancel_redirect_url
       append_sis_data(js_hash)
       js_env(js_hash)
       render :edit
@@ -798,6 +798,11 @@ class DiscussionTopicsController < ApplicationController
   end
 
   protected
+
+  def cancel_redirect_url
+    topic_type = @topic.is_announcement ? :announcements : :discussion_topics
+    @topic.new_record? ? polymorphic_url([@context, topic_type]) : polymorphic_url([@context, @topic])
+  end
 
   def pinned_topics
     @context.active_discussion_topics.only_discussion_topics.where(pinned: true)
