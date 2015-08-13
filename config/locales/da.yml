@@ -746,17 +746,15 @@ da:
             field: "Sektion ID"
     settings: 
       about_google_docs: |-
-          Google Docs Previews tillader brugere at se dokumenter fra
-          Canvas, i stedet for at downloade dem og
-          åbne dem i det relvante program (f.eks. Word eller Excel).
+          Google Docs Forhåndsvisning tillader brugere at se dokumenter
+          i Canvas, i stedet for at downloade dem og
+          åbne der korresponderende program (f.eks. Word eller Excel).
           
-          Hvis Scribd er blevet aktiveret på denne konto, Canvas vil
-          forsøge at bruge det til at vise forhåndsvisning. Hvis dokumentet
-          ikke kan forhåndsvise i Scribd, eller hvis brugeren ikke har
-          Flash player installeret (f.eks. iPad/iPhone),
-          Canvas vil gå tilbage og benytte Google Docs Previews
-          hvis de er aktiveret. Ved at benytte denne service har
-          du anerkendt at du har læst og er enig med
+          Google Docs Forhåndsvisning kan også vise filtyper
+          ikke understøttet af Canvas dokument forhåndsvisning.
+          
+          Ved at benytte denne service anderkender du 
+          at du har læst og accepterer 
           [Google Docs Viewer Terms of Service](%{terms_url}).
       about_google_docs_tooltip: "Om Google Docs Previews"
       account_admins_title: "Konti Admins"
@@ -846,6 +844,7 @@ da:
         equella: Equella
         equella_endpoint: "Equella slutpunkt"
         equella_teaser: "Equella Kommentarer"
+        global_brand_includes: "Upload global CSS/JavaScript inkluderet i Tema Editor"
         global_includes: "Global CSS-JavaScript inkludere"
         global_javascript: "Globalt JavaScript URL"
         global_stylesheet: "Globalt CSS URL"
@@ -1206,6 +1205,7 @@ da:
   add_files_to_the_course_da6ffd32: "Tilføj filer til kurset"
   add_grading_period_6f774dc3: "Tilføj bedømmelsesperiode"
   add_grading_scheme_81e23c05: "Tilføj bedømmelsessystem"
+  add_icon_567dbcaa: "tilføj ikon"
   add_module_item: 
     add_assignment_to: "Tilføj en opgave til %{module}"
     add_file_to: "Tilføj filer til %{module}"
@@ -1274,6 +1274,7 @@ da:
       threshold_should_be_numeric: "Dette bør være et positivt nummer"
   all_4321c3a1: Alle
   all_changes_were_saved_f6f3ddcc: "Alle ændringer blev gemt"
+  all_configured_apps_a14eef0a: "Alle konfigurerede Apps"
   all_dates_fields_must_be_present_and_formatted_cor_3a0fe925: "Alle datofelter skal være tilstede og formatret korrekt"
   all_finished_time_to_publish_your_course_click_the_b6f07217: "Færdig? Tid for at offentliggøre dit kursus! Klik knappen nedenfor for at gøre det officielt! Publicering vil tillade brugerne at deltage i kurset."
   all_grading_periods_77974940: "Alle bedømmelsesperioder"
@@ -1289,6 +1290,7 @@ da:
   always_3a59e701: Altid
   an_error_occured_trying_to_generate_this_theme_ple_6ae581d: "En fejl opsted mens dette tema blev oprettet. Prøv venligst igen."
   an_error_occurred_please_post_your_reply_again_lat_b0220ac6: "*En fejl opstod*, post venligst dit svar igen senere"
+  an_error_occurred_trying_to_generate_this_theme_pl_b493e2e9: "Der opstod en fejl mens dette tema forsøgtes oprettet, prøv venligst igen."
   an_error_occurred_trying_to_prepare_download_pleas_df6fa596: "En fejl opstod under forberedelse as download, prøv venligst igen."
   an_error_occurred_when_setting_the_usage_right_for_d4ea78f5: "Der opstod en fejl ved oprettelse af brugerrettigheder for %{filename}"
   an_unknown_server_error_occurred_please_try_again_f517eaf3: "Der opstod en ukendt serverfejl. Prøve venligst igen."
@@ -1366,6 +1368,9 @@ da:
   anonymous_user: "Anonym bruger"
   anonymous_user_d984b9ce: "Anonym bruger"
   another_configuration_is_currently_selected_select_95b394e: "En anden konfiguration er for øjeblikket valgt. Valg af denne konfiguration vil tilsidesætte den anden."
+  answer_text_80_character_limit_2fce1113: "Svartekst (80 karaktergrænse)"
+  answer_text_909894d6: "Svar tekst"
+  answer_weight_43420dc5: "Svar vægtning"
   answers_will_be_shown_after_your_last_attempt_d9db6b1d: "Svar vil blive vist efter dit sidste forsøg"
   api_url_3ee7cb0a: "API URL"
   app_center_will_appear_in_the_apps_tab_on_the_sett_1b9eb936: "App Center vil forekomme i \"Apps\" fanen på indstillingssiden af enten kursus eller konto. URL givet nedenfor bør pege på et gyldigt App Center endpoint (for eksempel, %{url} -- sørg for at udelade bagerste skråstreg"
@@ -2555,6 +2560,7 @@ da:
       would_you_like_to_cancel_that_and_sign_up_for_this: "Ønsker du at annullere og tilmelde dig denne?"
       you_are_already_signed_up_for: "Du er allerede tilmeldt :"
     save: Gem
+    save_and_publish: "Gem & offentliggør"
     save_changes: "Gem Ændringer"
     scheduler_right_side_admin_section: 
       create_a_new_set_of_appointments: "Opret en aftalegruppe"
@@ -2697,6 +2703,7 @@ da:
   certificate_fingerprint_b376df90: "Certifikat fingeraftryk"
   change_beginning_date_to_39dbd06e: "Ændre begyndelsesdato til"
   change_ending_date_to_d2cebd54: "Ændre slutdato til"
+  change_groups_4e2ab6c3: "Ændre grupper"
   change_points_possible_to_match_rubric_dialog: 
     prompts: 
       update_assignment_points: "Denne opgave har %{assignmentPoints} mulige points, ønsker du at ændre det til %{rubricPoints} mulige points for at matche denne instruktion?"
@@ -2707,10 +2714,13 @@ da:
   choose_a_csv_file_to_upload_9644480c: "Vælg en CVS fil at uploade:"
   choose_an_authentication_service_47dc8875: "Vælg en autorisationsservice"
   choose_usage_rights_33683854: "Vælg brugerrettigheder..."
+  chosencolor_is_not_a_valid_color_5d542cc: "'%{chosenColor}' er ikke en gyldig farve."
+  clear_2084585f: Ryd
   click_for_more_details_on_this_outcome_8c018d2f: "Klik for flere detaljer for dette resultat"
   click_here_on_the_calendar_link_c9965631: "Klik her på *Kalender* link"
   click_to_modify_89fa26aa: "Klik for at ændre"
   click_to_report_profile_picture_370f9625: "Klik for at rapportere profilbillede"
+  click_to_set_this_answer_as_correct_1326e3fd: "Klik for at sætte dette svar som korrekt"
   close_and_return_to_canvas_80544344: "Luk og vend tilbage til Canvas"
   close_d634289d: Luk
   close_picker_256aca8a: "Luk vælger"
@@ -2827,6 +2837,7 @@ da:
       delete: "Slet samarbejde?"
   collapse_list_of_group_members_for_groupname_d6c66fa0: "Sammenfold listen af gruppemedlemmer for %{groupName}"
   collapse_subdiscussion_89af1f5c: "Sammenfold under-diskussion"
+  collapsed_510aa02a: Sammenfoldet
   coming_up_4348b0bd: Kommende
   comm_messages: 
     from_beginning: Begyndelsen
@@ -3531,15 +3542,15 @@ da:
         fulfilled: "Scorede ikke mere end %{score}"
         unfulfilled: "skal opnå mere end en %{score}"
       min_score: 
-        fulfilled: "scorede mindst %{score}"
-        unfulfilled: "skal opnå mindst %{score}"
+        fulfilled: "Score: %{score}"
+        unfulfilled: "Score: %{score}"
       modules_item_move_to: "Flyt til..."
       must_contribute: 
         fulfilled: "bidrog til indholdet af siden"
         unfulfilled: "skal bidrage til indholdet af siden"
       must_submit: 
-        fulfilled: "indsendte opagven"
-        unfulfilled: "skal indsende opgave"
+        fulfilled: Indsendt
+        unfulfilled: Indsend
       must_view: 
         fulfilled: "så siden"
         unfulfilled: "skal se siden"
@@ -4626,8 +4637,12 @@ da:
     quiz: 
       question: 
         count: "Quiz spørgsmålsantal"
+    section: Sektion
+    sis_login_id: "SIS Login ID"
+    sis_user_id: "SIS Bruger ID"
     standard: 
       deviation: Standardafvigelse
+    student: Studerende
     top: 
       student: 
         count: "Topstuderende antal"
@@ -4836,6 +4851,7 @@ da:
   delete_quiz_142b8099: "Slet quiz"
   delete_selected_a023ccf8: "Slet valgte"
   delete_survey_56fddbbd: "Slet oversigt"
+  delete_this_answer_f1802eaa: "Slet dette svar"
   delete_tool_app_9c9f6d35: "Slet %{tool} App?"
   delete_toolname_app_85f9d4ee: "Slet %{toolName} App"
   deleting_6421031e: sletter...
@@ -4963,6 +4979,7 @@ da:
   diigo_993c4646: Diigo
   disable_a5c05db3: Deaktiver
   disabled_18c33a73: (dieaktiveret)
+  disabled_links_b3bdea99: "Deaktiveret links"
   discovery_url_3dce06d9: "Opdagelses URL"
   discussion_6719c51d: Diskussion
   discussion_entries: 
@@ -5412,6 +5429,7 @@ da:
   element_option_missing_error_an_element_to_attach__be433478: "`element` mulighed mangler fejl: Et element vedhæftet til TreeBrowserView skal være speciferet, når render muligheden indstilles til 'sand' for BBTreeBrowserView"
   email: 
     default_from_name: "Instructure Canvas"
+  email_address_6e0443a5: E-mailadresse
   email_already_in_use_330248e: "E-mail benyttes allerede"
   email_e366fa29: mail
   email_is_invalid_e0d982eb: "E-mail er ugyldig!"
@@ -5423,6 +5441,7 @@ da:
       Flere bedømmelsesperioder tilader lærer og admins at oprette bedømmelsesperioder med faste
       ophørsdatoer. Opgaver kan filtreres efter disse bedømmelsesperioder i Gradebook.
   enable_or_condition_for_modules_a16f02d8: "Aktiver \"ELLER\" betingelse for moduler"
+  enabled_links_be110215: "Aktiverede links"
   end_date_e0093ed7: "Slut dato"
   ending_date_e1ea13a4: Slutdato
   enrollment: 
@@ -5787,6 +5806,7 @@ da:
   expand_or_collapse_calendars_9854b0d0: "Udfold eller sammenfold kalendere"
   expand_or_collapse_undated_items_b901de09: "Udfold eller sammenfold udaterede elementer"
   expand_subdiscussion_cd226ed4: "Udfold under-diskussion"
+  expanded_f4493860: Udviddet
   export_de71cd8e: Eksport
   exporting_b1eab154: Eksporterer
   external_apps_f5490181: "Ekstern app"
@@ -9595,6 +9615,7 @@ da:
   moodle_formula_many_warning_title: "Der er %{count} formulaspørgsmål i denne bank, der skal have deres mulige svar regenereret"
   moodle_formula_warning_title: "Mulige svar skal regenereres for formulaspørgsmål"
   more_courses_5ebbe998: "Flere kurser"
+  more_information_3dfb76b5: "Mere information"
   most_recent_result_counts_as_calculation_int_of_ma_13628bf0: "Nyeste score tæller som %{calculation_int}% af beherskelsevægtning, gennemsnit over alle andre scorer tæller som %{remainder}% af vægtning. Der skal være mind 2 resultater før en score er returneret."
   most_recent_score_13a87e8c: "Nyeste score"
   move_abf00365: Flyt
@@ -9986,6 +10007,10 @@ da:
   open_color_picker_f117df0a: "Åben farvevælger"
   open_theme_editor_2d924ebe: "Åbn Theme Editor"
   open_title_in_a_new_window_b29fed77: "Åben %{title} i et nyt vidue"
+  option_1_dea39f90: "Mulighed 1"
+  option_2_47aace2a: "Mulighed 2"
+  option_3_30adfebc: "Mulighed 3"
+  option_4_aec96b1f: "Mulighed 4"
   options: 
     ? "no"
     : Nej
@@ -13803,6 +13828,7 @@ da:
   start_date_field_for_styleguide_8a8ab1d6: "Startdato felt for stilguide"
   start_from_a_template_theme_6c6e3dab: "Start fra et skabelontema:"
   start_participating_f0c75256: "Start deltagelse"
+  start_tls_26e4b0dc: "Start TLS"
   statistics: 
     csv_columns: 
       attempt: forsøg
@@ -14484,6 +14510,7 @@ da:
   up_c553575d: Op
   updated_group_group_name_727b1d98: "Opdateret gruppe %{group_name}"
   updating_6edbab78: Opdater
+  upload_8b403d05: Upload
   upload_button: 
     upload: Upload
   upload_data_dc4fa4cb: "Upload data"
@@ -15140,6 +15167,7 @@ da:
   you_must_specify_a_usage_right_5eb57f87: "Du skal specificere brugsrettighed."
   you_need_to_preview_your_changes_before_applying_t_cb048bed: "du skal 'Forhåndsvise dine ændringer' før du bruger dem for alle"
   you_re_editing_your_canvas_theme_the_changes_have__c0ae1bd1: "Du redigerer dit Canvas Theme! Ændringer  er endnu ikke blevet anvendt."
+  you_scored_d3e00111: "Du scorede"
   you_will_be_redirected_to_a_login_page_where_you_w_fc8df402: "Du vil blive omdirigeret til en login side, hvor du skal logge ind med dit barns legitimationsdetaljer."
   you_will_need_to_create_a_new_app_on_facebook_face_8fe85297: |-
       Du skal oprette en [ny app på Facebook](%{facebook_url}), og aktivere Client OAuth Login
