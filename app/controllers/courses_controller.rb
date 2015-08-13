@@ -1050,7 +1050,7 @@ class CoursesController < ApplicationController
       })
 
       @course_settings_sub_navigation_tools = ContextExternalTool.all_tools_for(@context, :type => :course_settings_sub_navigation, :root_account => @domain_root_account, :current_user => @current_user)
-      unless @context.grants_right?(@current_user, session, :manage_content)
+      unless @context.grants_right?(@current_user, session, :read_as_admin)
         @course_settings_sub_navigation_tools.reject! { |tool| tool.course_settings_sub_navigation(:visibility) == 'admins' }
       end
     end
