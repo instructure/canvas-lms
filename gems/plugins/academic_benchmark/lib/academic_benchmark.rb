@@ -4,6 +4,7 @@ require 'cgi'
 require 'academic_benchmark/api'
 require 'academic_benchmark/engine'
 require 'academic_benchmark/standard'
+require 'academic_benchmark/cli_tools'
 
 module AcademicBenchmark
   def self.config
