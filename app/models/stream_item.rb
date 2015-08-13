@@ -76,14 +76,15 @@ class StreamItem < ActiveRecord::Base
       res.instance_variable_set(:@participants, users)
     end
 
-    # the after_find from NotificationPreloader won't get triggered
-    if res.respond_to?(:preload_notification)
-      res.preload_notification
-    end
-
     res.instance_variable_set(:@attributes, data)
     res.instance_variable_set(:@attributes_cache, {})
     res.instance_variable_set(:@new_record, false) if data['id']
+
+    # the after_find from NotificationPreloader won't get triggered
+    if res.respond_to?(:preload_notification) && res.read_attribute(:notification_id)
+      res.preload_notification
+    end
+
     res
   end
 
