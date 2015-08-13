@@ -224,8 +224,6 @@ describe AcademicBenchmark::Converter do
       run_jobs
       @cm.reload
 
-      er = ErrorReport.last
-      expect(@cm.old_warnings_format).to eq [["Couldn't update standards for authority CC.", "ErrorReport:#{er.id}"]]
       expect(@cm.migration_settings[:last_error]).to be_nil
       expect(@cm.workflow_state).to eq 'imported'
     end
