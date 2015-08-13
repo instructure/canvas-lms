@@ -66,6 +66,9 @@ ru:
         api_url: "Url-адрес Api"
         common_core_guid: "Общий ключевой GUID (необязательно)"
   access_token_is_valid_until_d2f048cf: "Токен доступа действителен до"
+  accordion_section_1_7888782d: "Accordion Раздел 1"
+  accordion_section_2_e1812997: "Accordion Раздел 2"
+  accordion_section_3_96861901: "Accordion Раздел 3"
   account: 
     ask_canvas_network: "Задать вопрос сообществу сети Canvas"
     default_account_name: "Учетная запись по умолчанию"
