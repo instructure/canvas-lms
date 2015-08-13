@@ -7193,6 +7193,7 @@ es:
   immediately_c128ede6: Inmediatamente
   import_1b31507: Importar
   import_content_b2fd6620: "Importar contenido"
+  important_note_educational_institutions_have_an_ob_c9350304: "*Nota importante: Las instituciones educativas tienen la obligación de hacer que su contenido sea lo más accesible posible. Instructure recomienda al menos una proporción de 3: 1 en el color del texto con relación al fondo de pantalla para mantener el texto legible. Pruebe fácilmente sus proporciones de contraste con el **WebAIM Color Contrast Checker***."
   importers/assignment_importer: 
     errors: 
       import: 
@@ -10652,6 +10653,8 @@ es:
   previous_module_item_2bb5e499: "Módulo/Elemento Previo"
   previous_time_cc96b361: "Anterior (%{time})"
   previous_timestamp_19343a58: "Anterior (%{timestamp})"
+  primary_color_button_b75db628: "Botón de color primario"
+  primary_color_button_disabled_9081ddff: "Botón de color primario desactivado"
   privacy_290109ea: Privacidad
   product_name: Canvas
   profile: 
@@ -11029,6 +11032,7 @@ es:
     disabled_discussion_topic: "No se puede ocultar la publicación si hay envíos de alumnos"
     disabled_quiz: "No se puede ocultar la publicación si hay envíos de alumnos"
   published_click_to_modify_233c0d4: "Publicado - Haga clic para modificar"
+  published_status_icon_78f998a: "ícono de estado publicado"
   purchases: 
     new: 
       payment_info: "Información de pago"
@@ -12354,6 +12358,8 @@ es:
     top_level: "-- Nivel superior --"
     ? "true"
     : Verdadero
+  radio_button_option_1_a8ec51f9: "Opción de botón de radio 1"
+  radio_button_option_2_31e50043: "Opción de botón de radio 2"
   range_8760934b: "Intervalo:"
   range_name_90614433: "Nombre del intervalo"
   re_submit_assignment_b3e2bd28: "Renviar la tarea"
@@ -12467,9 +12473,11 @@ es:
         name: Nombre
     welcome_to_canvas: "¡Bienvenido a Canvas!"
   registration_url_60e0eaaa: "URL de registro"
+  regular_style_checkbox_ee3d71c1: "Casilla de verificación estilo regular"
   remind_me_next_time_6402eb7d: "Recordármelo la próxima vez"
   remove_attachment_ceae0973: "Eliminar el archivo adjunto"
   remove_f47dc62a: Eliminar
+  remove_icon_a4646413: "eliminar ícono"
   remove_recipient_name_a6b83cef: "Remover destinatario %{name}"
   remove_row_c198da5a: "Eliminar fila"
   remove_row_f9d59cba: "Eliminar fila"
@@ -12838,6 +12846,8 @@ es:
   search_groups_or_people_6c15d6ad: "Buscar grupos o personas"
   search_title_body_or_author_1d26711f: "Buscar título, texto o autor"
   searching_b0207e7f: Buscando
+  secondary_color_button_7589827d: "Botón de color secundario"
+  secondary_color_button_disabled_ac2252d2: "Botón de color secundario desactivado"
   section: 
     confirms: 
       delete_enrollment: "¿Seguro que quiere borrar esta inscripción permanentemente?"
@@ -12938,6 +12948,9 @@ es:
       find_links_using_service: "Encontrar enlaces usando %{service}"
   select_course_a_selection_is_required_before_recip_f622d9df: "Seleccione un curso: una selección es requerida antes de que el campo de destinatarios esté disponible"
   select_course_color_cad8e62b: "Seleccionar el color del curso"
+  select_d70f31da: Seleccionar
+  select_image_e1696a4d: "Seleccionar Imagen"
+  select_input_3dbd73c1: "Seleccionar entrada"
   select_itemname_f70db487: "Seleccione %{itemName}"
   select_navigation_links_68e1e924: "Seleccione Enlaces de navegación"
   select_the_file_you_want_to_associate_or_add_a_fil_eedd8dc4: "Seleccione el archivo que desea asociar o agregue un archivo seleccionando \"Nuevo archivo\"."
@@ -13828,8 +13841,12 @@ es:
   sso_settings_ebf98263: "Configuraciones de SSO"
   start_date_e937be8a: "Fecha de inicio"
   start_date_field_for_styleguide_8a8ab1d6: "El  campo de Fecha de comienzo para la guía de estilo"
+  start_from_a_template_380d4e8: "Comience a partir de una plantilla..."
   start_from_a_template_theme_6c6e3dab: "Comience a partir de una Plantilla de Tema."
+  start_from_a_theme_template_475c3d26: "Comience a partir de una Plantilla de Tema"
   start_participating_f0c75256: "Comenzar a participar"
+  start_tls_26e4b0dc: "Comenzar TLS"
+  started_5e138638: Comenzado
   statistics: 
     csv_columns: 
       attempt: intento
@@ -13855,6 +13872,7 @@ es:
   student_assignment_outcome_map_title: "Competencias de los alumnos"
   student_groups_desc: "Esto permite que la nueva página grupal para alumnos tenga una cuenta. La nueva página se ha creado como método de inscripción grupal más dinámico."
   student_id: "ID del alumno"
+  student_interactions_report_7717b685: "Informe de Interacciones de Estudiantes"
   student_must_complete_all_of_these_requirements_656771d6: "El estudiante debe completar todos estos requisitos."
   student_must_complete_one_of_these_requirements_6046eb3a: "El estudiante debe completar uno de estos requisitos."
   student_name: "Nombre del alumno"
@@ -14062,9 +14080,16 @@ es:
       networking_academy_description: "Ver las respuestas de Cisco a las preguntas más frecuentes."
       networking_academy_faqs: "Preguntas más frecuentes de Networking Academy"
       support_desk_livechat: "Chat en directo con el servicio de ayuda "
+  switch_style_checkbox_97a44345: "Casilla de verificación estilo interruptor"
   switch_to_3f310557: "Cambiar a"
   switch_to_group_group_name_786b913b: "Cambiar al grupo %{group_name}"
   syllabus: "Programa de estudios del curso"
+  tab_1_3d6b3fb: "Pestaña 1"
+  tab_1_content_8944c219: "Contenido de pestaña 1"
+  tab_2_9adfe241: "Pestaña 2"
+  tab_2_content_b0c9fedc: "Contenido de pestaña 2"
+  tab_3_content_a7b2ea9f: "Contenido de pestaña 3"
+  tab_3_edd8d2d7: "Pestaña 3"
   table_headings: 
     name: Nombre
     total: Total
@@ -14158,6 +14183,7 @@ es:
       timespan: "%{start_at} *a* %{end_at}"
   text_document_eacbcdb7: "Documento de texto"
   text_entry_submission_cannot_be_empty_3d187cae: "Envío de la entrada del texto no puede estar vacía"
+  text_input_d3480b8c: "Entrada de texto"
   that_user_account_has_been_deleted_please_contact__350e0e0: "Esa cuenta de usuario ha sido borrada. Por favor contacte a su administrador del sistema para que su cuenta sea reactivada."
   the_account_id_of_the_account_to_which_the_reporti_93ddb00f: "El ID de la cuenta de la cuenta a la cual el usuario que reporta pertenece"
   the_app_was_activated_a84e055f: "Se activó la aplicación"
@@ -14225,6 +14251,7 @@ es:
   this_outcome_has_been_used_to_assess_a_student_and_5a925169: "Se utilizó este resultado para evaluar a un estudiante y no puede ser editado o borrado"
   this_quiz_has_been_excused_d89d2b74: "Esta evaluación ha sido justificada.  "
   this_quiz_is_unpublished_only_teachers_can_see_the_51d281b1: "*Este cuestionario no está publicado* Solo los profesores pueden ver el cuestionario hasta que esté publicado."
+  this_sample_page_includes_common_ui_elements_in_ca_331f4ac4: "Esta página de muestra incluye elementos de interfaz de usuario comunes en Canvas para ayudarle a construir su marca personalizada. Una vez que usted comienza a hacer cambios en los valores de color e imágenes en la barra lateral izquierda, verá un botón de *Ver vista previa de sus cambios*. Haga clic en él para volver a cargar esta página y ver cómo se ven los cambios."
   this_student_wrote_f1a3f22d: "El alumno ha escrito:"
   this_will_allow_you_to_authenticate_canvas_for_pos_fdfca40: "Esto le permitirá autenticar a Canvas para que publique puntuaciones en SIS"
   this_will_apply_these_changes_to_your_entire_accou_22b86cde: "Hacer esto aplicará estos cambios a toda su cuenta. ¿Desea proceder?"
@@ -14445,10 +14472,13 @@ es:
   to_minscore_43e5452e: "a %{minScore}%"
   to_view_assignments_make_sure_the_agenda_view_is_a_5695abfd: "Para ver las tareas, asegúrese de que esté activa la vista *Agenda*."
   toggle_dashcard_view_or_recent_activity_stream_1de257: "Intercambie la vista de las cartas en el panel de control o el flujo de actividad reciente"
+  toggle_editing_answer_text_as_html_9a93fe6: "Cambiar a editar el texto de respuesta como HTML"
+  toggle_style_checkbox_1cce5eea: "Casilla de verificación estilo conmutador"
   tolerance_value_9e96573c: "Valor de tolerancia"
   too_many_failed_login_attempts_please_try_again_la_f8e0d7c8: "Ha intentado iniciar sesión demasiadas veces. Intentelo de nuevo más tarde o contacte con el administrador de su sistema."
   too_many_members_b8b15069: "Demasiados miembros"
   tool_configuration_63cd43b0: "Configuración de herramientas"
+  tool_placements_3f996c24: "Colocaciones de Herramientas"
   tooltips: 
     finished: finalizado
     incomplete: incompleto
@@ -14511,8 +14541,12 @@ es:
   up_c553575d: Arriba
   updated_group_group_name_727b1d98: "Se ha actualizado el grupo %{group_name}"
   updating_6edbab78: Actualizando
+  upload_8b403d05: Cargar
+  upload_a_css_file_ec22214b: "Cargar un archivo CSS"
+  upload_a_js_file_c89d795: "Cargar un archivo JS"
   upload_button: 
     upload: Cargar
+  upload_css_and_javascript_files_to_include_on_all__e19117c9: "Cargue archivos CSS y JavaScript para ser incluidos en todas las cargas de la página para su cuenta"
   upload_data_dc4fa4cb: "Cargar la Información"
   upload_drop_zone: 
     drop_to_upload: "Soltar los elementos que desea cargar"
@@ -14522,6 +14556,7 @@ es:
   usage_rights_f0960ad6: "Derechos de uso"
   usage_rights_have_been_set_d1b433c7: "Se han configurado los derechos de uso"
   usage_rights_will_be_set_for_all_of_the_files_cont_b192336a: "Se configurarán los derechos de uso de todos los archivos que estén incluidos:"
+  use_default_890939b7: "Usar predeterminado"
   use_new_folder_tree_in_files_eb5a451b: "Use el árbol de carpeta nuevo en Archivos"
   use_the_new_quiz_lti_tool_in_place_of_regular_canv_d7cb0c7f: "Use la nueva herramienta de LTI de evaluación en lugar de las evaluaciones de Canvas regulares"
   use_this_configuration_for_parent_observer_registr_e49f8f66: "Use esta configuración para la registración de padres/observador"
@@ -14921,14 +14956,17 @@ es:
   view_analytics_91a3b7a: "Ver análisis"
   view_app_center_6c89a3fe: "Ver el Centro de aplicaciones"
   view_app_configurations_52b52441: "Ver las configuraciones de las aplicaciones"
+  view_ba339f93: Vista
   view_course_analytics_eefe6b2: "Ver análisis del curso"
   view_grades_8d3bae6c: "Ver las Calificaciones"
   view_name_app_62a2ad8e: "Ver la aplicación %{name}"
   view_student_analytics_6b8ccd42: "Ver análisis de los alumnos"
   view_toolname_placements_4a5724d1: "Ver %{toolName} colocaciones"
+  viewed_6b75c21e: Visto
   visit_864b4060: Visitar
   visit_group_group_name_7a816081: "Visitar grupo %{group_name}"
   warning_for_improved_accessibility_in_moving_files_71e1028b: "Aviso: Para mejorar la accesibilidad a la hora de reorganizar archivos, utilice la opción Mover a diálogo que se encuentra en el menú."
+  warning_icon_f64936d7: "ícono de alerta"
   warnings: 
     test_install: 
       periodic_message: "Esta instalación de Canvas es solo de prueba y se restablecerá periódicamente."
@@ -14956,6 +14994,7 @@ es:
   webct_display: "Blackboard Vista/CE (WebCT)"
   webct_file_description: "Curso Blackboard Vista/CE, WebCT 6+"
   webct_name: "Blackboard Vista/CE (WebCT)"
+  welcome_to_the_canvas_theme_editor_73091d1: "Bienvenido al Editor de Tema de Canvas"
   welcome_to_your_courses_to_customize_the_list_of_c_22de652e: "¡Bienvenido a sus cursos! Para personalizar la lista de cursos, haga clic en el enlace de \"Todos los cursos\" y marque los cursos para mostrar."
   well_below_mastery_37664bdc: "Muy por debajo del dominio"
   what_should_the_csv_file_look_like_985a59ac: "¿Cómo se debería ver el archivo CSV?"
@@ -15115,6 +15154,7 @@ es:
         zero: "No se han encontrado %{model} "
     page_gap: "&hellip;"
     previous_label: "&#8592; Anterior"
+  will_unlock_unlock_date_1024c38d: "Se desbloqueará el %{unlock_date}"
   wimba_conference: 
     external_urls: 
       archive: Archivo
@@ -15124,6 +15164,9 @@ es:
   xml_configuration_5ea1b942: "Configuración XML"
   yellow_4cf93785: Amarillo
   yo_e4ee15a4: Yo
+  you_are_about_to_lose_any_changes_that_you_have_no_6759802f: |-
+      Está a punto de perder los cambios que aún no se han aplicado a su cuenta.
+      ¿Todavía desea proceder?
   you_are_about_to_lose_any_unsaved_changes_would_yo_e255f393: |-
       Está a punto de perder los cambios sin guardar.
       ¿Todavía desea proceder?
@@ -15146,6 +15189,7 @@ es:
   you_have_no_outcomes_click_here_to_go_to_the_outco_574bd0af: "No tiene resultados. Haga clic aquí para ir a la página de resultados."
   you_have_reached_the_maximum_webhooks_per_account__ae9a7f83: "Ha alcanzado el número máximo de webhooks por límite de cuenta (%{max})"
   you_have_reached_the_maximum_webhooks_per_user_lim_2af4b256: "Ha alcanzado el número máximo de webhooks por límite de usuario (%{max})"
+  you_have_submitted_the_assignment_7ef8a51a: "Ha enviado la tarea"
   you_ll_definitely_want_some_of_these_what_s_the_fu_f4f3578b: "Seguro que quiere algunos de estos. ¿Cuál es la gracia de impartir un curso si nadie le escucha?"
   you_ll_need_a_refresh_token_follow_the_steps_at_th_79a3984b: "Necesitará refrescar el token, siga los pasos de este enlace, puede que quiera la ayuda de un experto técnico"
   you_may_want_to_assign_some_tas_to_help_you_with_t_702244aa: "Es posible que desee asignar alguna AP para que le ayude con este curso. Las AP pueden calificar las entregas de los alumnos, ayudar a moderar los foros e incluso actualizar las fechas de vencimiento y detalles de las tareas por usted."
@@ -15153,8 +15197,11 @@ es:
   you_must_select_a_course_to_copy_content_from_e7bd9e09: "Debe seleccionar un curso para poder copiar el contenido del mismo."
   you_must_set_it_to_a_number_greater_than_or_equal__eb1d9275: "Debe configurarlas con un número mayor o igual a %{min}"
   you_must_specify_a_usage_right_5eb57f87: "Debe especificar un derecho de uso."
+  you_need_to_preview_your_changes_before_applying_t_468d56e4: "Necesita \"Ver una Vista Previa de sus Cambios\" antes de aplicarlos a todos"
   you_need_to_preview_your_changes_before_applying_t_cb048bed: "Necesita \"Ver una Vista Previa de sus Cambios\" antes de aplicarlos a todos"
+  you_re_editing_your_canvas_theme_apply_or_cancel_c_1633384e: "¡Está editando su Tema de Canvas! Aplique o cancele los cambios desde dentro del *Editor de Tema*. "
   you_re_editing_your_canvas_theme_the_changes_have__c0ae1bd1: "¡Está editando su Tema de Canvas! Los cambios aún no se han aplicado."
+  you_scored_d3e00111: "Su puntuación es"
   you_will_be_redirected_to_a_login_page_where_you_w_fc8df402: "Será redirigido a una página de inicio de sesión en la que tendrá que iniciar sesión con las credenciales de su hijo."
   you_will_need_to_create_a_new_app_on_facebook_face_8fe85297: |-
       Usted necesitará crear una [nueva aplicación en Facebook](%{facebook_url}), y establecer el acceso del OAuth del Cliente
