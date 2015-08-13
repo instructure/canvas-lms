@@ -9,7 +9,7 @@ describe 'dashcards' do
 
   context 'as a student' do
 
-    before (:each) do
+    before do
       @course = course(active_all: true)
       course_with_student_logged_in(active_all: true)
       Account.default.enable_feature! :use_new_styles
@@ -58,21 +58,22 @@ describe 'dashcards' do
     end
 
     it 'should customize dashcard color', priority: "1", test_id: 239991 do
-      hex = '#003366'
+      hex = random_hex_color
       get '/'
 
       f('.icon-settings').click
       expect(f('.ColorPicker__Container')).to be_displayed
 
-      replace_content(f('#ColorPickerCustomInput'), hex)
-      f('.Button--primary').click
-      wait_for_ajaximations
+      replace_content(fj('#ColorPickerCustomInput'), hex)
+      f('button.Button.Button--primary').click
 
-      if f('.ic-DashboardCard__background').attribute(:style).include?('rgb')
-        rgb = convert_hex_to_rgb_color(hex)
-        expect(f('.ic-DashboardCard__background').attribute(:style)).to include_text(rgb)
-      else
-        expect(f('.ic-DashboardCard__background').attribute(:style)).to include_text(hex)
+      keep_trying_until(5) do
+        if fj('.ic-DashboardCard__background').attribute(:style).include?('rgb')
+          rgb = convert_hex_to_rgb_color(hex)
+          expect(fj('.ic-DashboardCard__background').attribute(:style)).to include_text(rgb)
+        else
+          expect(fj('.ic-DashboardCard__background').attribute(:style)).to include_text(hex)
+        end
       end
     end
   end
