@@ -61,6 +61,9 @@ tr:
         api_url: "Api Url"
         common_core_guid: "Ortak Çekirdek GUID (opsiyonel)"
   access_token_is_valid_until_d2f048cf: "Erişim dizgesi şu tarihe kadar geçerli"
+  accordion_section_1_7888782d: "Akordiyon Bölüm 1"
+  accordion_section_2_e1812997: "Akordiyon Bölüm 2"
+  accordion_section_3_96861901: "Akordiyon Bölüm 3"
   account: 
     ask_canvas_network: "Canvas Ağ Topluluğuna Sor"
     default_account_name: "Varsayılan Hesap"
@@ -1205,6 +1208,7 @@ tr:
   add_files_to_the_course_da6ffd32: "Derse Dosya Ekle"
   add_grading_period_6f774dc3: "Notlandırma Peryodu Ekleyin"
   add_grading_scheme_81e23c05: "Notlandırma şeması ekle"
+  add_icon_567dbcaa: "simge ekle"
   add_module_item: 
     add_assignment_to: "%{module} modülüne sınav ekle"
     add_file_to: "%{module} modülüne dosya ekle"
@@ -1273,6 +1277,7 @@ tr:
       threshold_should_be_numeric: "Pozitif bir sayı olmalıdır"
   all_4321c3a1: Tümü
   all_changes_were_saved_f6f3ddcc: "Tüm değişiklikler kaydedildi"
+  all_configured_apps_a14eef0a: "Tüm Yapılandırılmış Uygulamalar"
   all_dates_fields_must_be_present_and_formatted_cor_3a0fe925: "Tüm tarih alanları olmalı ve doğru biçimlendirilmeli"
   all_finished_time_to_publish_your_course_click_the_b6f07217: "Her şey tamam mı? Dersinizi yayınlama zamanı! Yayınlamak için aşağıdaki butona tıklayın! Dersi yayınladığınızda kullanıcılar derse katılmaya başlayacaklar."
   all_grading_periods_77974940: "Tüm Notlandırma Periyotları"
@@ -1286,6 +1291,9 @@ tr:
   allow_students_to_see_who_has_signed_up_for_time_s_497f4a46: "Zaman aralıklarına kimlerin kaydolduğunu öğrenciler görebilsin."
   allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "ÖBS entegrasyonunda öğretmenler aktarılacak not verilerini toplu olarak   işaretleyebilsin."
   always_3a59e701: "Her zaman"
+  an_error_occurred_please_post_your_reply_again_lat_b0220ac6: "*Bir hata oluştu*, lütfen cevabınızı daha sonra tekrar gönderin"
+  an_error_occurred_trying_to_generate_this_theme_pl_b493e2e9: "Bu temayı oluşturmaya çalışırken bir hata oluştu, lütfen tekrar deneyin."
+  an_error_occurred_trying_to_prepare_download_pleas_df6fa596: "İndirmeye hazırlanırken bir hata oluştu, lütfen tekrar deneyin."
   an_error_occurred_when_setting_the_usage_right_for_d4ea78f5: "%{filename} dosyası için kullanıcı haklarını ayarlarken bir hata oluştu"
   an_unknown_server_error_occurred_please_try_again_f517eaf3: "Bilinmeyen sunucu hatası oluştu. Lütfen tekrar deneyin."
   analytics: 
@@ -1359,8 +1367,12 @@ tr:
     podcast_feed_description_group: "\"%{group}\" grubu içindeki duyurularda gömülü olan ya da bağlantı verilen ortam dosyaları bu beslemede görülecektir."
     podcast_feed_name: "%{course} Duyurularına Ait Podcast Akışı"
   anonymous_e1b8ad27: Anonim
+  anonymous_user: "İsimsiz Kullanıcı"
   anonymous_user_d984b9ce: "İsimsiz Kullanıcı"
   another_configuration_is_currently_selected_select_95b394e: "Şu anda başka bir yapılandırma seçili. Bu yapılandırmayı seçerseniz diğerinin seçimi kaldırılır."
+  answer_text_80_character_limit_2fce1113: "Cevap Metni (80 karakter sınırı)"
+  answer_text_909894d6: "Cevap Metni"
+  answer_weight_43420dc5: "Cevap Ağırlığı"
   answers_will_be_shown_after_your_last_attempt_d9db6b1d: "Son teşebbüsünüzden sonra cevaplar gösterilecektir"
   api_url_3ee7cb0a: "API URL"
   app_center_will_appear_in_the_apps_tab_on_the_sett_1b9eb936: "Bir dersin veya Hesabın ayarlar sayfasındaki \"Uygulamalar\" sekmesinde Uygulama Merkezi görülecektir. Aşağıdaki URL geçerli bir Uygulama Merkezine yönlenmelidir (örneğin %{url} -- sondaki kesme işaretini yazmayın"
@@ -2161,6 +2173,8 @@ tr:
   blue_daf8fea9: Mavi
   bookmark_service: 
     default_title: "Başlık Yok"
+  breadcrumb_1_cb3c504: "Breadcrumb 1"
+  breadcrumb_2_95ba94be: "Breadcrumb 2"
   broccoli_cloud: 
     hidden_title: "Gizli. Bir bağlantı ile kullanılabilir"
     published_title: Yayınlandı
@@ -2550,6 +2564,7 @@ tr:
       would_you_like_to_cancel_that_and_sign_up_for_this: "İptal edip buna kayıt olmak ister misiniz?"
       you_are_already_signed_up_for: "Zaten kayıtlısınız:"
     save: Kaydet
+    save_and_publish: "Kaydet & Yayınla"
     save_changes: "Değişiklikleri Kaydet"
     scheduler_right_side_admin_section: 
       create_a_new_set_of_appointments: "Randevu grubu oluştur"
@@ -2671,6 +2686,7 @@ tr:
   canvas_cartridge_file_description: "Canvas Dersi Dışarı Aktarma Paketi"
   canvas_cartridge_name: "Canvas Kartuş İçe Aktarıcı"
   canvas_cloud_information_fdd404f2: "Canvas Bulut Bilgisi"
+  canvas_default_7f81a6b8: "Canvas Varsayılan"
   canvas_did_not_recognize_your_identity_provider_cb0e50fc: "Canvas sizin kimlik saylayıcınızı tanımlayamadı"
   canvas_doesn_t_have_an_account_for_user_user_5bcae0dd: "%{user} kullanıcı Canvas üzerinde kayıtlı değil"
   canvas_error_report_ff678539: "Canvas Hata Raporu"
@@ -2691,6 +2707,7 @@ tr:
   certificate_fingerprint_b376df90: "Sertifika Takip Bilgisi"
   change_beginning_date_to_39dbd06e: "Başlangıç tarihini değiştir"
   change_ending_date_to_d2cebd54: "Bitiş tarihini değiştir"
+  change_groups_4e2ab6c3: "Grupları Değiştir"
   change_points_possible_to_match_rubric_dialog: 
     prompts: 
       update_assignment_points: "Bu ödev için şu puanlar kullanılabilir: %{assignmentPoints}. Bu yönergeye uyumlu olması için bu puanları şu puanlarla  %{rubricPoints} değiştirmek ister misiniz?"
@@ -2701,10 +2718,16 @@ tr:
   choose_a_csv_file_to_upload_9644480c: "Yüklencek bir CSV dosyası seçin:"
   choose_an_authentication_service_47dc8875: "Bir kimlik doğrulama hizmeti seçin"
   choose_usage_rights_33683854: "Kullanıcı haklarını seçin..."
+  chosencolor_is_not_a_valid_color_5d542cc: "'%{chosenColor}' geçerli bir renk değil."
+  clear_2084585f: Temizle
   click_for_more_details_on_this_outcome_8c018d2f: "Bu öğrenme çıktısı hakkında daha fazla ayrıntı için tıklayın"
   click_here_on_the_calendar_link_c9965631: "*Takvim* bağlantısı üzerinde buraya tıklayın"
+  click_to_enter_comments_if_the_student_chooses_thi_507c20f6: "Öğrenci bu cevabı seçerse, yorum girmek için tıklayın"
   click_to_modify_89fa26aa: "Değişiklik yapmak için tıklayın"
   click_to_report_profile_picture_370f9625: "Profil resmini raport etmek için tıklayın"
+  click_to_set_this_answer_as_correct_1326e3fd: "Bu cevabı doğru cevap olarak belirlemek için tıklayın"
+  click_to_test_dropdown_b950974d: "Açılır listeyi test için tıklayın"
+  clone_group_set_c2a40e15: "Grup Setini Klonla"
   close_and_return_to_canvas_80544344: "Kapat ve Canvas'a geri dön"
   close_d634289d: Kapat
   close_picker_256aca8a: "Seçiciyi Kapat"
@@ -2804,6 +2827,7 @@ tr:
       delete: "Çalışma ekibini sil?"
   collapse_list_of_group_members_for_groupname_d6c66fa0: "%{groupName} için grup üyeleri listesini daraltın"
   collapse_subdiscussion_89af1f5c: "Alt Tartışmaları Daralt"
+  collapsed_510aa02a: Daraltılmış
   coming_up_4348b0bd: "Yaklaşan Olaylar"
   comm_messages: 
     from_beginning: başlangıç
@@ -2876,6 +2900,12 @@ tr:
     profile: 
       notices: 
         contact_registered: "İletişim yöntemi kaydedildi!"
+  complete_all_items_e1779257: "Tüm Öğeleri Tamamla"
+  complete_icon_7455be93: "simgeyi tamamla"
+  complete_one_item_90e5fb03: "Bir Öğeyi Tamamla"
+  completed_19711ce7: Tamamlandı
+  completed_icon_521596e4: "tamamlanan simge"
+  concluded_conferences_cdbe53f9: "Tamamlanmış Canlı Dersler"
   concluded_courses_94782e21: "Tamamlanmış Dersler"
   conference_was_deleted_30869390: "Canlı ders silindi"
   conferences: 
@@ -2985,6 +3015,9 @@ tr:
       labels: 
         all_quizzes: "Tüm kısa sınavlar"
       select_quizzes: "Dışa Aktarılacak Kısa Sınavları Seç"
+  content_for_section_1_7ecfb319: "Bölüm 1 İçeriği"
+  content_for_section_2_e7c6e2a3: "Bölüm 2 İçeriği"
+  content_for_section_3_90c1d235: "Bölüm 3 İçeriği"
   content_imports: 
     errors: 
       import_failed: "Taşıma aktarımı sürecinde bir hata oluştu. Lütfen sistem yöneticisini bilgilendirin ve aşağıdaki kodu verin: \"%{code}\""
@@ -3350,6 +3383,20 @@ tr:
     invalid_requirement_type: "Geçersiz bitirme gereksinim türü"
   context_module_sub_header_2f39e87b: "Bağlam Modülü Alt Başlığı"
   context_modules: 
+    add_context_module_form: 
+      button: 
+        delete_label: "Ön koşulları sil"
+        delete_title: "Ön koşulları sil"
+      buttons: 
+        add_module: "Modül Ekle"
+      labels: 
+        publish_final_grade: "Modül tamamlandığında öğrenci final notlarını yayınla"
+        require_sequential_progress: "Öğrenciler bu modülde gerekli öğeleri sıra ile takip etmeli "
+      links: 
+        add_prerequisite: "Ön koşul ekle"
+        add_requirement: "Ön koşul ekle"
+      module_name: "Modül Adı"
+      must_complete_prerequisites: Tamamlanmalı
     buttons: 
       add: "Modül Ekle"
       add_item: "Öğe Ekle"
@@ -3361,8 +3408,10 @@ tr:
       delete_item: "Bu öğeyi modülden çıkarmak istediğinize emin misiniz?"
     content_next: 
       add_prerequisite: "*%{module}* modülüne ön koşul ekle"
+      assignment_points_possible: "/ %{points_possible}"
       buttons: 
         add_prerequisite: "Ön Koşul Ekle"
+      criterion_for_assignment: "%{assignment} %{select_criterion}"
       headings: 
         add_prerequisite: "%{name} ismine Ön Koşul Ekle"
         course_modules: "Ders Modülleri"
@@ -3421,6 +3470,7 @@ tr:
         must_view: "öğeyi görüntüle"
       select_module: 
         instructions: "Modül Seç"
+        name: "%{module}"
       select_prerequisite: "Ön koşul türünü seçin. Tüm ön koşullar karşılanmadıkça öğrenciler modülü göremez."
     context_module: 
       unpublish: Yayınlanmıyor
@@ -3490,15 +3540,15 @@ tr:
         fulfilled: "%{score} puanından daha fazla puan alamadı"
         unfulfilled: "%{score} puanından daha fazla puan almamalı"
       min_score: 
-        fulfilled: "En az %{score} puan aldı"
-        unfulfilled: "En az %{score} puan alınmalı"
+        fulfilled: "Puan: %{score}"
+        unfulfilled: "Puan: %{score}"
       modules_item_move_to: Taşı...
       must_contribute: 
-        fulfilled: "sayfanın içeriğine katkı sağladı"
-        unfulfilled: "sayfanın içeriğine katkı sağlamalı"
+        fulfilled: "Katkı sağladı"
+        unfulfilled: "Katkı sağla"
       must_submit: 
-        fulfilled: "ödevi gönderdi"
-        unfulfilled: "ödevi göndermeli"
+        fulfilled: Gönderildi
+        unfulfilled: Gönder
       must_view: 
         fulfilled: "sayfayı görüntüledi"
         unfulfilled: "sayfayı görüntülemeli"
