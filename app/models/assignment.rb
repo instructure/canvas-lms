@@ -1042,7 +1042,7 @@ class Assignment < ActiveRecord::Base
           submission.score = score
           submission.excused = false
         else
-         submission.score = nil
+          submission.score = nil
           submission.grade = nil
         end
 
@@ -1066,7 +1066,11 @@ class Assignment < ActiveRecord::Base
           submission_updated = true
         end
 
-        submission.workflow_state = "graded" if submission.score_changed? || submission.grade_matches_current_submission
+        if (submission.score_changed? ||
+            submission.grade_matches_current_submission) &&
+            ((submission.score && submission.grade) || submission.excused?)
+          submission.workflow_state = "graded"
+        end
         submission.group = group
         submission.graded_at = Time.zone.now if did_grade
         previously_graded ? submission.with_versioning(:explicit => true) { submission.save! } : submission.save!

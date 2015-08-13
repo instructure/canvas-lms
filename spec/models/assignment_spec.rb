@@ -1,3 +1,4 @@
+# coding: utf-8
 #
 # Copyright (C) 2011 Instructure, Inc.
 #
@@ -151,6 +152,31 @@ describe Assignment do
     context 'with a student that does not belong' do
       it 'raises an error' do
         expect { @assignment.grade_student(User.new) }.to raise_error(Assignment::GradeError, 'Student must be enrolled in the course as a student to be graded')
+      end
+    end
+
+    context 'with an invalid initial grade' do
+      before :once do
+        @result = @assignment.grade_student(@user, :grade => "{")
+        @assignment.reload
+      end
+
+      it 'does not change the workflow_state to graded' do
+        expect(@result.first.grade).to be_nil
+        expect(@result.first.workflow_state).not_to eq 'graded'
+      end
+    end
+
+    context 'with an excused assignment' do
+      before :once do
+        @result = @assignment.grade_student(@user, :excuse => true)
+        @assignment.reload
+      end
+
+      it 'excuses the assignment and marks it as graded' do
+        expect(@result.first.grade).to be_nil
+        expect(@result.first.workflow_state).to eql 'graded'
+        expect(@result.first.excused?).to eql true
       end
     end
   end
