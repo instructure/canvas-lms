@@ -1676,7 +1676,7 @@ class ApplicationController < ActionController::Base
       elsif @domain_root_account.brand_config
         @domain_root_account.brand_config
       elsif k12?
-        BrandConfig.where(name: 'K12 Theme', share: true).first
+        BrandConfig.k12_config
       end
     end
   end
