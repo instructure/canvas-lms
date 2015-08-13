@@ -11759,7 +11759,7 @@ en-AU:
           matching: "Build pairs of matching values. Students will see values on the left and have to select the matching value on the right from a dropdown. Multiple rows can have the same answer, and you can add additional distractors to the right side."
           missing_word: "Define text to go before and after the dropdown. Build a set of possible answers and select one correct answer."
           multi_answer_sets: "In the box below, every place you want to show an answer box, type a reference word (no spaces) surrounded by brackets"
-          multiple_answers: "This question will show a checkbox next to each answer, and the student must select ALL the answers you mark as correct."
+          multiple_answers: "This question will show a tickbox next to each answer, and the student must select ALL the answers you mark as correct."
           multiple_choice: "Enter your question and multiple answers, then select the one correct answer."
           multiple_dropdowns: "Enter your question, specifying where each dropdown should go. Then define possible answers for each dropdown, with one correct answer per dropdown."
           numerical: "Define the correct answer as any number within a range, or a number plus or minus some error margin. Student will be given an empty text box to type their numerical answer."
