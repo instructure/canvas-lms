@@ -2,8 +2,8 @@ define [
   'jquery'
   'react'
   'compiled/models/File'
-  'compiled/react_files/components/DialogPreview'
-  'compiled/react_files/components/FilesystemObjectThumbnail'
+  'jsx/files/DialogPreview'
+  'jsx/files/FilesystemObjectThumbnail'
 ], ($, React, File, DialogPreview, FilesystemObjectThumbnail) ->
   TestUtils = React.addons.TestUtils
 

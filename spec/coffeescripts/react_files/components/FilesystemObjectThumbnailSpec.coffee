@@ -3,7 +3,7 @@ define [
   'compiled/models/File'
   'compiled/models/Folder'
   'compiled/models/FilesystemObject'
-  'compiled/react_files/components/FilesystemObjectThumbnail'
+  'jsx/files/FilesystemObjectThumbnail'
 ], (React, File, Folder, FilesystemObject, FilesystemObjectThumbnail) ->
 
   TestUtils = React.addons.TestUtils

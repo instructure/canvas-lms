@@ -1,12 +1,11 @@
 define [
   'react'
-  './FilesystemObjectThumbnail'
+  'jsx/files/FilesystemObjectThumbnail'
   '../modules/customPropTypes'
   'compiled/react/shared/utils/withReactElement'
-], (React, FilesystemObjectThumbnailComponent, customPropTypes, withReactElement) ->
+], (React, FilesystemObjectThumbnail, customPropTypes, withReactElement) ->
 
   MAX_THUMBNAILS_TO_SHOW = 10
-  FilesystemObjectThumbnail = React.createFactory FilesystemObjectThumbnailComponent
 
   DragFeedback = React.createClass
     displayName: 'DragFeedback'
