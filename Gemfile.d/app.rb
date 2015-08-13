@@ -62,7 +62,7 @@ gem 'mini_magick', '4.2.7'
   gem 'subexec', '0.0.4', require: false
 gem 'multi_json', '1.10.1'
 gem 'netaddr', '1.5.0', require: false
-gem 'nokogiri', '1.6.6.2.20150804122945', require: false, github: 'codekitchen/nokogiri', ref: '6462d9c3ee'
+gem 'nokogiri', '1.6.6.2.20150813143452', require: false, github: 'codekitchen/nokogiri', ref: 'd47e53f885'
 # oauth gem, with rails3 fixes rolled in
 gem 'oauth-instructure', '0.4.10', require: false
 gem 'oauth2', '1.0.0', require: false
