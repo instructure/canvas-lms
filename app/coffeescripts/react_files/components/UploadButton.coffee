@@ -3,14 +3,13 @@ define [
   'react'
   'compiled/react/shared/utils/withReactElement'
   'underscore'
-  './FileRenameForm'
+  'jsx/files/FileRenameForm'
   '../modules/customPropTypes'
   './ZipFileOptionsForm'
   '../modules/FileOptionsCollection'
-], (I18n, React, withReactElement, _, FileRenameFormComponent, customPropTypes, ZipFileOptionsFormComponent, FileOptionsCollection) ->
+], (I18n, React, withReactElement, _, FileRenameForm, customPropTypes, ZipFileOptionsFormComponent, FileOptionsCollection) ->
 
   resolvedUserAction = false
-  FileRenameForm = React.createFactory FileRenameFormComponent
   ZipFileOptionsForm = React.createFactory ZipFileOptionsFormComponent
 
   UploadButton = React.createClass
