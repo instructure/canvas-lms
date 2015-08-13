@@ -286,6 +286,23 @@ describe "better_file_browsing" do
         check_element_has_focus(f('.Toolbar__ManageUsageRights'))
         verify_usage_rights_ui_updates
       end
+      it "should set usage rights on a file inside a folder via the toolbar", priority: "1", test_id: 132585 do
+        add_folder
+        move("a_file.txt", 0, :cog_icon)
+        wait_for_ajaximations
+        f('.ef-item-row').click
+        f('.Toolbar__ManageUsageRights').click
+        wait_for_ajaximations
+        expect(f('.UsageRightsDialog__fileName').text).to eq "new folder"
+        expect(f(".UsageRightsSelectBox__select")).to be_displayed
+        set_usage_rights_in_modal
+        react_modal_hidden
+        # a11y: focus should go back to the element that was clicked.
+        check_element_has_focus(f('.Toolbar__ManageUsageRights'))
+        ff('.media-body')[0].click
+        wait_for_ajaximations
+        verify_usage_rights_ui_updates
+      end
       it "should not show the creative commons selection if creative commons isn't selected", priority: "1", test_id: 194247 do
         f('.UsageRightsIndicator__openModal').click
         wait_for_ajaximations

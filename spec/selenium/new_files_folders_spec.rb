@@ -38,6 +38,20 @@ describe "better_file_browsing, folders" do
       expect(fln("test folder")).to be_present
     end
 
+    it "should validate xss on folder text", priority: "1", test_id: 133113 do
+     add_folder('<script>alert("Hi");</script>')
+     expect(ff('.media-body')[0].text).to eq '<script>alert("Hi");<_script>'
+    end
+
+    it "should move a folder", priority: "1", test_id: 133125 do
+      ff('.media-body')[0].click
+      wait_for_ajaximations
+      add_folder("test folder")
+      move("test folder", 0, :cog_icon)
+      expect(f("#flash_message_holder").text).to eq "test folder moved to course files\nClose"
+      expect(ff(".treeLabel span")[2].text).to eq "test folder"
+    end
+
     it "should delete a folder from cog icon", priority: "1", test_id: 223502 do
       delete(0, :cog_icon)
       expect(fln("new test folder")).not_to be_present
@@ -102,6 +116,22 @@ describe "better_file_browsing, folders" do
        create_new_folder
        add_folder("New Folder")
        expect(get_all_files_folders.last.text).to match /New Folder 2/
+     end
+
+     it "should display folders in tree view", priority: "1", test_id: 133099 do
+       add_file(fixture_file_upload('files/example.pdf', 'application/pdf'),
+               @course, "example.pdf")
+       get "/courses/#{@course.id}/files"
+       create_new_folder
+       add_folder("New Folder")
+       ff('.media-body')[1].click
+       wait_for_ajaximations
+       add_folder("New Folder 1.1")
+       ff(".icon-folder")[1].click
+       expect(ff('.media-body')[0].text).to eq "New Folder 1.1"
+       get "/courses/#{@course.id}/files"
+       expect(ff('.media-body')[0].text).to eq "example.pdf"
+       expect(f('.ef-folder-content')).to be_displayed
      end
 
      it "should create 15 new child folders and show them in the FolderTree when expanded", priority: "2", test_id: 121886 do
