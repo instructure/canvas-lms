@@ -66,27 +66,45 @@ describe AccessToken do
     end
   end
 
-  describe "token with account scoped access" do
+  describe "account scoped access" do
 
     before :once do
       @ac = account_model
+      @sub_ac = @ac.sub_accounts.create!
+      @foreign_ac = Account.create!
+
       @dk = DeveloperKey.create!(account: @ac)
       @at = AccessToken.create!(:user => user_model, :developer_key => @dk)
 
-      @dk2 = DeveloperKey.create!
-      @at2 = AccessToken.create!(:user => user_model, :developer_key => @dk2)
+      @dk_without_account = DeveloperKey.create!
+      @at_without_account = AccessToken.create!(:user => user_model, :developer_key => @dk2)
     end
 
     it "account should be set" do
       expect(@at.account.id).to be @ac.id
     end
 
+    it "account should be authorized" do
+      expect(@at.authorized_for_account?(@ac)).to be true
+    end
+
+    it "sub account should be authorized" do
+      expect(@at.authorized_for_account?(@sub_ac)).to be true
+    end
     it "account should be the account from the developer key" do
       expect(@at.account.id).to be @dk.account.id
     end
 
     it "account should be nil" do
-      expect(@at2.account).to be nil
+      expect(@at_without_account.account).to be nil
+    end
+
+    it "foreign account should not be authorized" do
+      expect(@at.authorized_for_account?(@foreign_ac)).to be false
+    end
+
+    it "foreign account should be authorized if there is no account" do
+      expect(@at_without_account.authorized_for_account?(@foreign_ac)).to be true
     end
   end
 end

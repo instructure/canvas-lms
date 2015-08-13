@@ -55,6 +55,11 @@ class AccessToken < ActiveRecord::Base
     developer_key.try(:name) || "No App"
   end
 
+  def authorized_for_account?(target_account)
+    return true unless self.developer_key
+    self.developer_key.authorized_for_account?(target_account)
+  end
+
   def record_last_used_threshold
     Setting.get('access_token_last_used_threshold', 10.minutes).to_i
   end

@@ -586,6 +586,62 @@ describe "API Authentication", type: :request do
       assert_status(401)
     end
 
+    context "account access" do
+      before :once do
+        @account = Account.create!
+
+        @sub_account1 = @account.sub_accounts.create!
+        @sub_account2 = @account.sub_accounts.create!
+
+        @not_sub_account = Account.create!
+        @key = DeveloperKey.create!(:redirect_uri => "http://example.com/a/b", account: @account)
+      end
+
+      it "Should allow a token previously linked to a dev key same account to work" do
+        enable_forgery_protection do
+          enable_cache do
+            user_with_pseudonym(:active_user => true, :username => 'test1@example.com', :password => 'test123', account: @account)
+            course_with_teacher(:user => @user, account: @account)
+            developer_key = DeveloperKey.create!(account: @account, redirect_uri: "http://www.example.com/my_uri")
+            @token = @user.access_tokens.create!(:developer_key => developer_key)
+
+            LoadAccount.stubs(:default_domain_root_account).returns(@account)
+            check_used {  get "/api/v1/courses", nil, { 'HTTP_AUTHORIZATION' => "Bearer #{@token.full_token}" } }
+            expect(JSON.parse(response.body).size).to eq 1
+          end
+        end
+      end
+
+      it "Should allow a token previously linked to a dev key allowed sub account to work" do
+        enable_forgery_protection do
+          enable_cache do
+            user_with_pseudonym(:active_user => true, :username => 'test1@example.com', :password => 'test123', account: @sub_account1)
+            course_with_teacher(:user => @user, account: @sub_account1)
+            developer_key = DeveloperKey.create!(account: @account, redirect_uri: "http://www.example.com/my_uri")
+            @token = @user.access_tokens.create!(:developer_key => developer_key)
+
+            LoadAccount.stubs(:default_domain_root_account).returns(@account)
+            check_used {  get "/api/v1/courses", nil, { 'HTTP_AUTHORIZATION' => "Bearer #{@token.full_token}" } }
+            expect(JSON.parse(response.body).size).to eq 1
+          end
+        end
+      end
+
+      it "Shouldn't allow a token previously linked to a dev key on foreign account to work" do
+        enable_forgery_protection do
+          enable_cache do
+            user_with_pseudonym(:active_user => true, :username => 'test1@example.com', :password => 'test123', account: @account)
+            course_with_teacher(:user => @user, account: @account)
+            developer_key = DeveloperKey.create!(account: @not_sub_account, redirect_uri: "http://www.example.com/my_uri")
+            @token = @user.access_tokens.create!(:developer_key => developer_key)
+
+            LoadAccount.stubs(:default_domain_root_account).returns(@account)
+            get "/api/v1/courses", nil, { 'HTTP_AUTHORIZATION' => "Bearer #{@token.full_token}" }
+            assert_status(401)
+          end
+        end
+      end
+    end
 
     context "sharding" do
       specs_require_sharding
@@ -602,6 +658,26 @@ describe "API Authentication", type: :request do
 
         check_used { get "/api/v1/courses", nil, { 'HTTP_AUTHORIZATION' => "Bearer #{@token.full_token}" } }
         expect(JSON.parse(response.body).size).to eq 1
+      end
+
+      it "shouldn't work for an access token from the default shard with the developer key on the different shard" do
+        @account = Account.create!
+        user_with_pseudonym(:active_user => true, :username => 'test1@example.com', :password => 'test123', :account => @account)
+        course_with_teacher(:user => @user, :account => @account)
+
+        @shard1.activate do
+
+          # create the dev key on a different account
+          account2 = Account.create!
+          developer_key = DeveloperKey.create!(account: account2, redirect_uri: "http://www.example.com/my_uri")
+          @token = @user.access_tokens.create!(:developer_key => developer_key)
+          expect(@token.developer_key.shard).to be @shard1
+
+        end
+
+        LoadAccount.stubs(:default_domain_root_account).returns(@account)
+        get "/api/v1/courses", nil, { 'HTTP_AUTHORIZATION' => "Bearer #{@token.full_token}" }
+        assert_status(401)
       end
     end
   end
