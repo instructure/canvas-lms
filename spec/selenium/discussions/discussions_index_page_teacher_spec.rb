@@ -61,6 +61,29 @@ describe "discussions" do
         expect(course.allow_student_discussion_topics).to eq false
       end
 
+      it "should allow discussions to be dragged around sections", priority: "1", test_id: 150500 do
+        teacher_topic
+        get url
+        expect(f('#open-discussions .discussion-title').text).to include('teacher topic title')
+        drag_and_drop_element(fln('teacher topic title'), f('#pinned-discussions'))
+        wait_for_ajaximations
+        expect(f('#pinned-discussions .discussion-title').text).to include('teacher topic title')
+        drag_and_drop_element(fln('teacher topic title'), f('#locked-discussions'))
+        wait_for_ajaximations
+        expect(f('#locked-discussions .discussion-title').text).to include('teacher topic title')
+        expect_new_page_load{fln('teacher topic title').click}
+        expect(f('.discussion-fyi').text).to include('This topic is closed for comments')
+
+        # Assert that the teacher can still reply to a closed discussion
+        expect(f('.discussion-reply-action')).to be_present
+
+        # Student cannot reply to a closed discussion
+        user_session(student)
+        get "/courses/#{course.id}/discussion_topics/#{teacher_topic.id}"
+        expect(f('.discussion-reply-action')).not_to be_present
+      end
+
+
       describe "publish icon" do
         before(:each) do
         end
@@ -175,6 +198,26 @@ describe "discussions" do
           wait_for_ajaximations
           expect(topic.reload.workflow_state).to eq 'deleted'
           expect(f('.discussion-list li.discussion')).to be_nil
+        end
+
+        it "should sort the discussions", priority: "1", test_id: 150509 do
+          topics = 4.times.map do |n|
+            DiscussionTopic.create!(context: course, user: teacher,
+                                    title: "Discussion Topic #{n+1}", pinned: true)
+          end
+          expect(topics.map(&:position)).to eq [1, 2, 3, 4]
+          get url
+
+          3.times do |n|
+            topic = topics[2-n]
+            fj("[data-id=#{topic.id}] .al-trigger").click
+            fj('.icon-updown:visible').click
+            click_option '.ui-dialog:visible select', "-- At the bottom --"
+            fj('.ui-dialog:visible .btn-primary').click
+            wait_for_ajaximations
+            topics.each(&:reload)
+          end
+          expect(topics.map(&:position)).to eq [4, 3, 2, 1]
         end
 
         it "should allow moving a topic", priority: "1", test_id: 270958 do
