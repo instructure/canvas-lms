@@ -13,7 +13,7 @@ kinesis:
   build: ./docker-compose/kinesalite
   command: "--path /var/lib/kinesalite"
   volumes:
-    - "tmp/cache:/var/lib/kinesalite"
+    - "./tmp/cache:/var/lib/kinesalite"
   ports:
     - "4567:4567"
   environment:
