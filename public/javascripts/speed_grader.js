@@ -164,13 +164,6 @@ define([
       this.submission = $.grep(jsonData.submissions, function(submission, i){
         return submission.user_id === student.id;
       })[0];
-      $.each(visibleRubricAssessments, function(i, rubricAssessment) {
-        rubricAssessment.user_id = rubricAssessment.user_id && String(rubricAssessment.user_id);
-        rubricAssessment.assessor_id = rubricAssessment.assessor_id && String(rubricAssessment.assessor_id);
-      });
-      this.rubric_assessments = $.grep(visibleRubricAssessments, function(rubricAssessment, i){
-        return rubricAssessment.user_id === student.id;
-      });
       jsonData.studentMap[student.id] = student;
     });
 
@@ -1624,9 +1617,9 @@ define([
 
     showGrade: function(){
       var submission;
-      var grade = EG.currentStudent.submission === undefined ? 
+      var grade = EG.currentStudent.submission === undefined ?
                   "" :
-                  EG.currentStudent.submission.grade; 
+                  EG.currentStudent.submission.grade;
 
       if ( EG.currentStudent.submission !== undefined ) {
         submission = EG.currentStudent.submission;

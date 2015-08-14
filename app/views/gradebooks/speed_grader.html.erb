@@ -292,7 +292,6 @@
 <% js_block do %>
   <script>
     window.anonymousAssignment = <%= @assignment.quiz && @assignment.quiz.survey? && @assignment.quiz.anonymous_submissions ? "true" : "false" %>;
-    window.visibleRubricAssessments = <%= raw((@assignment.visible_rubric_assessments_for(@current_user) || {}).to_json(:methods => [:assessor_name], :include_root => false)) %>;
   </script>
 <% end %>
 <div id="current_context_code" style="display: none;"><%= @context.asset_string %></div>

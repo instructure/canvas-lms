@@ -1321,11 +1321,16 @@ class Assignment < ActiveRecord::Base
 
     enrollments = context.enrollments_visible_to(user)
 
-    res[:context][:students] = students.map { |u|
-      u.as_json(:include_root => false,
+    rubric_assmnts = visible_rubric_assessments_for(user) || []
+    res[:context][:students] = students.map do |u|
+      json = u.as_json(:include_root => false,
                 :methods => avatar_methods,
                 :only => [:name, :id])
-    }
+      json[:rubric_assessments] = rubric_assmnts.select{|ra| ra.user_id == u.id}.
+        as_json(:methods => [:assessor_name], :include_root => false)
+      json
+    end
+
     res[:context][:active_course_sections] = context.sections_visible_to(user, self.sections_with_visibility(user)).
       map{|s| s.as_json(:include_root => false, :only => [:id, :name]) }
     res[:context][:enrollments] = enrollments.
@@ -1508,10 +1513,13 @@ class Assignment < ActiveRecord::Base
   end
 
   def visible_rubric_assessments_for(user)
-    if self.rubric_association
-      self.rubric_association.rubric_assessments.for_submissions.
-        select{|a| a.grants_right?(user, :read)}.sort_by{|a| [a.assessment_type == 'grading' ? CanvasSort::First : CanvasSort::Last, Canvas::ICU.collation_key(a.assessor_name)] }
+    return [] unless user && self.rubric_association
+
+    scope = self.rubric_association.rubric_assessments.for_submissions.preload(:assessor)
+    unless self.rubric_association.grants_any_right?(user, :manage, :view_rubric_assessments)
+      scope = scope.where(:assessor_id => user.id)
     end
+    scope.to_a.sort_by{|a| [a.assessment_type == 'grading' ? CanvasSort::First : CanvasSort::Last, Canvas::ICU.collation_key(a.assessor_name)] }
   end
 
   # Takes a zipped file full of assignment comments/annotated assignments
