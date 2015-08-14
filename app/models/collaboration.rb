@@ -38,12 +38,12 @@ class Collaboration < ActiveRecord::Base
 
   before_destroy { |record| Collaborator.where(:collaboration_id => record).destroy_all }
 
-  before_save :generate_document
   before_save :assign_uuid
   before_save :set_context_code
 
   after_save :include_author_as_collaborator
   after_save :touch_context
+  after_commit :generate_document, on: :create
 
   TITLE_MAX_LENGTH = 255
   validates_presence_of :title, :workflow_state
@@ -234,8 +234,11 @@ class Collaboration < ActiveRecord::Base
   #
   # Returns nothing.
   def generate_document
+    return if @generated
+    @generated = true
     assign_uuid
     initialize_document
+    save!
   end
 
   # Public: Determine if a given user can access this collaboration.
@@ -260,7 +263,7 @@ class Collaboration < ActiveRecord::Base
   #
   # Returns nothing.
   def update_members(users = [], group_ids = [])
-    save if new_record?
+    save! if new_record?
     generate_document
     users << user if user.present? && !users.include?(user)
     update_user_collaborators(users)
