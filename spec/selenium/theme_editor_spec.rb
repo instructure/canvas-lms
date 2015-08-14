@@ -19,13 +19,13 @@ describe 'Theme Editor' do
   end
 
   it 'should open theme editor', priority: "1", test_id: 239980 do
-    open_theme_editor
+    open_theme_editor(Account.default.id)
 
     expect(fj('.Theme__editor-header_title').text).to include_text 'Theme Editor'
   end
 
   it 'should close theme editor on cancel and redirect to account settings page', priority: "1", test_id: 239981 do
-    open_theme_editor
+    open_theme_editor(Account.default.id)
 
     # verifies theme editor is open
     expect(fj('.Theme__editor-header_title').text).to include_text 'Theme Editor'
@@ -38,7 +38,7 @@ describe 'Theme Editor' do
   end
 
   it 'should display the preview button when valid change is made', priority: "1", test_id: 239984 do
-    open_theme_editor
+    open_theme_editor(Account.default.id)
 
     # verifies theme editor is open
     expect(fj('.Theme__editor-header_title').text).to include_text 'Theme Editor'
@@ -49,7 +49,7 @@ describe 'Theme Editor' do
   end
 
   it 'should accept valid Hex IDs', priority: "1", test_id: 239986 do
-    open_theme_editor
+    open_theme_editor(Account.default.id)
 
     # verifies theme editor is open
     expect(fj('.Theme__editor-header_title').text).to include_text 'Theme Editor'
@@ -61,7 +61,7 @@ describe 'Theme Editor' do
   end
 
   it 'should accept valid shortened Hex IDs', priority: "2", test_id: 240455 do
-    open_theme_editor
+    open_theme_editor(Account.default.id)
 
     # verifies theme editor is open
     expect(fj('.Theme__editor-header_title').text).to include_text 'Theme Editor'
@@ -72,7 +72,7 @@ describe 'Theme Editor' do
   end
 
   it 'should accept valid color names', priority: "2", test_id: 240233 do
-    open_theme_editor
+    open_theme_editor(Account.default.id)
 
     # verifies theme editor is open
     expect(fj('.Theme__editor-header_title').text).to include_text 'Theme Editor'
@@ -83,7 +83,7 @@ describe 'Theme Editor' do
   end
 
   it 'should not accept invalid hex IDs', priority: "1", test_id: 239987 do
-    open_theme_editor
+    open_theme_editor(Account.default.id)
 
     # verifies theme editor is open
     expect(fj('.Theme__editor-header_title').text).to include_text 'Theme Editor'
@@ -99,17 +99,17 @@ describe 'Theme Editor' do
   it 'K12 Theme should be automatically set when K12 Feature Flag is turned on', priority: "1", test_id: 240001 do
     skip("Skipped because the K12 template option does not appear in selenium tests")
     Account.default.enable_feature!(:k12)
-    open_theme_editor
+    open_theme_editor(Account.default.id)
     expect(f('div.accordion.ui-accordion--mini.Theme__editor-accordion.ui-accordion.ui-widget.ui-helper-reset > div:nth-of-type(1) > section:first-child > div.Theme__editor-form--color > div.Theme__editor-color-block > span > input.Theme__editor-color-block_input-text.Theme__editor-color-block_input').attribute(:placeholder)).to include_text('#E66135')
   end
 
   it 'Theme editor has a dropdown menu for Templates', priority: "1", test_id: 244889 do
-    open_theme_editor
+    open_theme_editor(Account.default.id)
     expect(f('#sharedThemes')).to include_text('Start from a template...')
   end
 
   it 'should preview should display a progress bar when generating preview', priority: "1", test_id: 239990 do
-    open_theme_editor
+    open_theme_editor(Account.default.id)
     fj('.Theme__editor-color-block_input-text').send_keys(random_hex_color)
 
     expect(f('div.progress-bar__bar-container')).not_to be
@@ -118,7 +118,7 @@ describe 'Theme Editor' do
   end
 
   it 'should have validation for every text field', priority: "2", test_id: 241992 do
-    open_theme_editor
+    open_theme_editor(Account.default.id)
 
     # input invalid text into every text field
     create_theme('#xxxxxx')
@@ -131,7 +131,7 @@ describe 'Theme Editor' do
   end
 
   it 'should have color squares that match the hex value', priority: "2", test_id: 241993 do
-    open_theme_editor
+    open_theme_editor(Account.default.id)
     create_theme
 
     click_global_branding

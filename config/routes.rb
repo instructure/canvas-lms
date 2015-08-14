@@ -508,6 +508,14 @@ CanvasRails::Application.routes.draw do
       end
     end
 
+    scope(controller: :brand_configs) do
+      get 'theme_editor', action: :new, as: :theme_editor
+      post 'brand_configs', action: :create
+      delete 'brand_configs', action: :destroy
+      post 'brand_configs/save_to_account', action: :save_to_account
+      post 'brand_configs/save_to_user_session', action: :save_to_user_session
+    end
+
     resources :role_overrides, only: [:index, :create] do
       collection do
         post :add_role
@@ -812,14 +820,6 @@ CanvasRails::Application.routes.draw do
 
   resources :quiz_submissions do
     concerns :files
-  end
-
-  scope(controller: :brand_configs) do
-    get 'brand_configs/new', action: :new
-    post 'brand_configs', action: :create
-    delete 'brand_configs', action: :destroy
-    post 'brand_configs/save_to_account', action: :save_to_account
-    post 'brand_configs/save_to_user_session', action: :save_to_user_session
   end
 
   get 'courses/:course_id/outcome_rollups' => 'outcome_results#rollups', as: 'course_outcome_rollups'
