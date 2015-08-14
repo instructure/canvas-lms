@@ -65,7 +65,8 @@ define([
       hasUnsavedChanges: React.PropTypes.bool.isRequired,
       variableSchema: customTypes.variableSchema,
       sharedBrandConfigs: customTypes.sharedBrandConfigs,
-      allowGlobalIncludes: React.PropTypes.bool
+      allowGlobalIncludes: React.PropTypes.bool,
+      accountID: React.PropTypes.string
     },
 
     getInitialState() {
@@ -141,7 +142,7 @@ define([
     },
 
     saveToSession(md5) {
-      submitHtmlForm('/brand_configs/save_to_user_session', 'POST', md5)
+      submitHtmlForm('/accounts/'+this.props.accountID+'/brand_configs/save_to_user_session', 'POST', md5)
     },
 
     handleCancelClicked() {
@@ -152,12 +153,12 @@ define([
           return;
         }
       }
-      submitHtmlForm('/brand_configs', 'DELETE');
+      submitHtmlForm('/accounts/'+this.props.accountID+'/brand_configs', 'DELETE');
     },
 
     handleApplyClicked() {
       var msg = I18n.t('This will apply these changes to your entire account. Would you like to proceed?')
-      if (window.confirm(msg)) submitHtmlForm('/brand_configs/save_to_account', 'POST')
+      if (window.confirm(msg)) submitHtmlForm('/accounts/'+this.props.accountID+'/brand_configs/save_to_account', 'POST')
     },
 
     handleFormSubmit() {
@@ -166,7 +167,7 @@ define([
       this.setState({showProgressModal: true})
 
       $.ajax({
-        url: '/brand_configs',
+        url: '/accounts/'+this.props.accountID+'/brand_configs',
         type: 'POST',
         data: new FormData(this.refs.ThemeEditorForm.getDOMNode()),
         processData: false,
@@ -222,7 +223,7 @@ define([
             onSubmit={preventDefault(this.handleFormSubmit)}
             encType="multipart/form-data"
             acceptCharset="UTF-8"
-            action="/brand_configs"
+            action="'/accounts/'+this.props.accountID+'/brand_configs"
             method="POST"
             className="Theme__container">
             <input name="utf8" type="hidden" value="✓" />

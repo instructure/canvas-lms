@@ -10,9 +10,10 @@
       <%= t("You're editing your Canvas Theme! The changes have not been applied yet.") %>
     <% else %>
       <%= t do %>
-        You're editing your Canvas Theme! Apply or cancel changes from within the
-        <%= link_to("Theme Editor", brand_configs_new_path) %>.
+        You're editing your Canvas Theme! Apply or cancel changes from within the.
+        <%= link_to("Theme Editor", account_theme_editor_path(::Context.get_account(@context || @domain_root_account))) %>.
       <% end %>
+      <br /> <%= t do %> Note: sub-account themes are not active during this preview. <% end %>
     <% end %>
   </div>
 <% end %>

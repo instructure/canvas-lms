@@ -43,6 +43,7 @@ class Account < ActiveRecord::Base
   INSTANCE_GUID_SUFFIX = 'canvas-lms'
 
   include Workflow
+  include BrandConfigHelpers
   belongs_to :parent_account, :class_name => 'Account'
   belongs_to :root_account, :class_name => 'Account'
   authenticates_many :pseudonym_sessions

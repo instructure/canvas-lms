@@ -2,21 +2,38 @@ class BrandConfigsController < ApplicationController
 
   include Api::V1::Progress
 
+  before_filter :require_account_context
   before_filter :require_user
-  before_filter :require_manage_account_settings, except: [:destroy]
+  before_filter :require_account_management
 
   def new
-    @page_title = join_title(t('Theme Editor'), @domain_root_account.name)
+    @page_title = join_title(t('Theme Editor'), @account.name)
     css_bundle :common, :theme_editor
     js_bundle :theme_editor
-    brand_config = active_brand_config || BrandConfig.new
+    brand_config = active_brand_config(ignore_parents: true) || BrandConfig.new
     js_env brandConfig: brand_config.as_json(include_root: false),
            hasUnsavedChanges: session.key?(:brand_config_md5),
-           variableSchema: BrandableCSS::BRANDABLE_VARIABLES,
+           variableSchema: default_schema,
            sharedBrandConfigs: BrandConfig.shared(@domain_root_account).select('md5, name').as_json(include_root: false),
-           allowGlobalIncludes: @domain_root_account.allow_global_includes?
+           allowGlobalIncludes: @account.allow_global_includes?,
+           account_id: @account.id
     render text: '', layout: 'layouts/bare'
   end
+
+  def default_schema
+    parent_config = @account.first_parent_brand_config || BrandConfig.new
+    variables = parent_config.effective_variables
+    overridden_schema = BrandableCSS::BRANDABLE_VARIABLES.map(&:deep_dup)
+    overridden_schema.each do |group|
+      group["variables"].each do |var|
+        if variables.keys.include?(var["variable_name"])
+          var["default"] = variables[var["variable_name"]]
+        end
+      end
+    end
+    overridden_schema
+  end
+  private :default_schema
 
   # Preview/Create New BrandConfig
   # This is what is called when the user hits 'preview changes' in the theme editor.
@@ -29,6 +46,8 @@ class BrandConfigsController < ApplicationController
   # indicating the progress of generating the css and pushing it to the CDN
   # @returns {BrandConfig, Progress}
   def create
+    parent_config = @account.first_parent_brand_config || BrandConfig.new
+
     variables = process_variables(params[:brand_config][:variables])
     js_overrides = process_file(params[:js_overrides])
     css_overrides = process_file(params[:css_overrides])
@@ -36,7 +55,8 @@ class BrandConfigsController < ApplicationController
     brand_config = BrandConfig.for(
       variables: variables,
       js_overrides: js_overrides,
-      css_overrides: css_overrides
+      css_overrides: css_overrides,
+      parent_md5: parent_config.md5
     )
 
     if existing_config(brand_config)
@@ -73,18 +93,24 @@ class BrandConfigsController < ApplicationController
       end
     end
     BrandConfig.destroy_if_unused(old_md5) if old_md5 != session[:brand_config_md5]
-    redirect_to brand_configs_new_path
+    redirect_to account_theme_editor_path(@account)
   end
 
   # After someone is satisfied with the preview of how their session brand config looks,
   # they POST to this action to save it to their accout so everyone else sees it.
   def save_to_account
-    old_md5 = @domain_root_account.brand_config_md5
+    old_md5 = @account.brand_config_md5
     new_md5 = session.delete(:brand_config_md5).presence
-    @domain_root_account.brand_config = new_md5 && BrandConfig.find(new_md5)
-    @domain_root_account.save!
+    new_brand_config = new_md5 && BrandConfig.find(new_md5)
+
+    @account.brand_config = new_brand_config
+    @account.save!
+
+    @account.recompile_descendant_brand_configs(@current_user)
+
     BrandConfig.destroy_if_unused(old_md5)
-    redirect_to account_path(@domain_root_account), notice: t('Success! All users on this domain will now see this branding.')
+
+    redirect_to account_path(@account), notice: t('Success! All users on this domain will now see this branding.')
   end
 
   # When you close the theme editor, it will send a DELETE to this action to
@@ -94,16 +120,10 @@ class BrandConfigsController < ApplicationController
       session.delete(:brand_config_md5)
       BrandConfig.destroy_if_unused(session.delete(:brand_config_md5))
     end
-    redirect_to account_path(@domain_root_account), notice: t('Theme editor changes have been cancelled.')
+    redirect_to account_path(@account), notice: t('Theme editor changes have been cancelled.')
   end
 
   protected
-
-  def require_manage_account_settings
-    return false unless authorized_action(@domain_root_account,
-                                          @current_user,
-                                          :manage_account_settings) && use_new_styles?
-  end
 
   def process_variables(variables)
     variables.each_with_object({}) do |(key, value), memo|
@@ -131,7 +151,7 @@ class BrandConfigsController < ApplicationController
   end
 
   def upload_file(file)
-    attachment = Attachment.create(uploaded_data: file, context: @domain_root_account)
+    attachment = Attachment.create(uploaded_data: file, context: @account)
     expires_in = 15.years
     attachment.authenticated_s3_url({
       # this is how long the s3 verifier token will work

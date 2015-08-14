@@ -13,4 +13,5 @@ require [
     variableSchema: window.ENV.variableSchema
     sharedBrandConfigs: window.ENV.sharedBrandConfigs
     allowGlobalIncludes: window.ENV.allowGlobalIncludes
+    accountID: window.ENV.account_id
   }), document.body)
