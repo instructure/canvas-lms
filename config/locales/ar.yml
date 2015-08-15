@@ -766,10 +766,10 @@ ar:
     settings: 
       about_google_docs: |-
           تتيح معاينات Google Docs للمستخدمين عرض المستندات
-          من داخل Canvas دون الحاجة إلى تنزيلها و
-          فتح البرنامج المناسب (مثل Word أو Excel).
+          من داخل Canvas دون الحاجة إلى تنزيلها وفتح
+          البرنامج الذي يناسبها (مثل Word أو Excel).
           
-          كما أن معاينات Google Docs قادرة على عرض ملفات
+          وبإمكان معاينات Google Docs عرض ملفات
           لا يدعمها عارض مستندات Canvas.
           
           باستخدام هذه الخدمة فإنك
@@ -2765,7 +2765,7 @@ ar:
   canvas_ticketing_email_connector_27e253ae: "رابط تذاكر البريد الإلكتروني لـ Canvas"
   canvas_ticketing_web_post_connector_11158897: "رابط تذاكر منشورات Canvas"
   canvas_will_regrade_all_your_submissions_after_you_2d68694a: "سيعيد Canvas تقييم درجات جميع إرسالاتك بعد حفظ الاختبار، قد يستغرق ذلك بضع دقائق."
-  careful_changes_to_group_membership_will_apply_to__19a9089c: "حذار! سيتم تطبيق تغييرات عضوية المجموعة على المجموعات التي لديها إرسالات مهام. قد لا تتحاذى إرسالات مهام المجموعة كنتيجة. هل تريد إنشاء فئة مجموعة جديدة للمهام المستقبلية؟"
+  careful_changes_to_group_membership_will_apply_to__19a9089c: "حذار! سيتم تطبيق تغييرات عضوية المجموعة على المجموعات التي توجد فيها إرسالات مهام. قد لا تتحاذى إرسالات مهام المجموعة كنتيجة. هل تريد إنشاء فئة مجموعة جديدة للمهام المستقبلية؟"
   cas_url_4ba2843e: "عنوان URL لـ CAS"
   cc: 
     by: "سمة CC"
@@ -2920,7 +2920,7 @@ ar:
       delete: "هل تريد حذف التعاون؟"
   collapse_list_of_group_members_for_groupname_d6c66fa0: "طي قائمة أعضاء مجموعة %{groupName}"
   collapse_subdiscussion_89af1f5c: "طي المناقشة الفرعية"
-  collapsed_510aa02a: مطوية
+  collapsed_510aa02a: "تم الطي"
   coming_up_4348b0bd: "الالتحاق بالدراسة"
   comm_messages: 
     from_beginning: البداية
@@ -4778,7 +4778,7 @@ ar:
     current_score: "الدرجة الحالية"
     difficulty: 
       index: "مؤشر الصعوبة"
-    final_grade: "التقدير النهائي"
+    final_grade: "التقييم النهائي"
     final_score: "الدرجة النهائية"
     id: المعرّف
     middle: 
@@ -6089,7 +6089,7 @@ ar:
   expand_or_collapse_calendars_9854b0d0: "توسعة التقاويم أو طيها"
   expand_or_collapse_undated_items_b901de09: "توسعة العناصر المحدثة أو طيها"
   expand_subdiscussion_cd226ed4: "توسيع المناقشة الفرعية"
-  expanded_f4493860: "تم توسيعه"
+  expanded_f4493860: "تم التوسيع"
   export_de71cd8e: تصدير
   exporting_b1eab154: "يتم الآن التصدير"
   external_apps_f5490181: "التطبيقات الخارجية"
@@ -7025,7 +7025,7 @@ ar:
   group_name_b69c144: "اسم المجموعة"
   group_name_in_group_category_name_group_category_29bf3254: "%{group_name} في فئة المجموعة %{group_category_name}"
   group_name_is_required_5547bc0b: "اسم المجموعة مطلوب"
-  group_set_name_2aed2347: "اسم فئة المجموعات"
+  group_set_name_2aed2347: "اسم فئة المجموعة"
   group_settings: 
     invitation_sent: "تم إرسال الدعوة"
   groups: 
@@ -7531,7 +7531,7 @@ ar:
   immediately_c128ede6: فورًا
   import_1b31507: استيراد
   import_content_b2fd6620: "استيراد المحتوى"
-  important_note_educational_institutions_have_an_ob_c9350304: "*ملاحظة مهمة: المؤسسات التعليمية ملزمة بجعل محتوياتها في المتناول بقدر الإمكان. توصي Instructure بأن تكون نسبة تباين اللون بين النص والخلفية 3 إلى 1 لجعل نصك مقروءًا. قم باختبار نسب التباين باستخدام **WebAIM Color Contrast Checker***."
+  important_note_educational_institutions_have_an_ob_c9350304: "*ملاحظة مهمة: المؤسسات التعليمية ملزمة بوضع محتوياتها في المتناول بقدر الإمكان. توصي Instructure بأن تكون نسبة تباين اللون بين النص والخلفية 3 إلى 1 لجعل نصك مقروءًا. قم باختبار نسب التباين باستخدام **WebAIM Color Contrast Checker***."
   importers/assignment_importer: 
     errors: 
       import: 
@@ -7912,7 +7912,7 @@ ar:
   lock_date_cannot_be_after_term_end_cf1a188f: "لا يمكن أن يكون تاريخ التأمين بعد نهاية الفصل الدراسي"
   lock_date_cannot_be_before_due_date_ac30f54: "لا يمكن أن يكون تاريخ التأمين قبل تاريخ الاستحقاق"
   lock_icon_a9916601: "تأمين الرمز"
-  locked_762f138b: "تم تأمينه"
+  locked_762f138b: "تم التأمين"
   log_in_c9e240ef: "تسجيل الدخول"
   log_on_url_fc166e4c: "عنوان URL لتسجيل الدخول"
   log_out_379ba28a: "تسجيل الخروج"
@@ -10041,7 +10041,7 @@ ar:
   must_achieve_mastery_at_least_count_times_scores_a_628db168: "يجب تحقيق درجة الإتقان %{count} مرات على الأقل. سيتم تحديد متوسط الدرجات التي تفوق درجة الإتقان لحساب الدرجة النهائية."
   must_mark_as_done_bf6cc563: "يجب وضع علامة \"تم\""
   must_mark_assignment_as_done_e3e4af88: "يجب وضع علامة \"تم\" على المهمة"
-  must_score_at_least_points_points_16a7548e: "يجب أن يحصل على %{points} نقطة كحد أدنى"
+  must_score_at_least_points_points_16a7548e: "يجب الحصول على %{points} نقطة كحد أدنى"
   must_submit_assignment_ae38221c: "يجب إرسال المهمة"
   must_submit_new_oauth2_request_e1fb00bb: "يجب إرسال طلب OAuth2 جديد"
   must_supply_file_ids_and_or_folder_ids_parameter_9d29448c: "يجب تزويد معلمة 'file_ids' و/أو معلمة 'folder_ids'"
@@ -11456,7 +11456,7 @@ ar:
     disabled_discussion_topic: "لا يمكن إلغاء النشر في حالة وجود عمليات إرسال لطالب"
     disabled_quiz: "لا يمكن إلغاء النشر في حالة وجود عمليات إرسال لطالب"
   published_click_to_modify_233c0d4: "تم النشر - انقر للتعديل"
-  published_status_icon_78f998a: "رمز حالة \"منشور\""
+  published_status_icon_78f998a: "رمز حالة \"تم النشر\""
   purchases: 
     new: 
       payment_info: "معلومات الدفع"
