@@ -1,7 +1,7 @@
 define [
   'react'
   'jquery'
-  'compiled/react_files/components/RestrictedDialogForm'
+  'jsx/files/RestrictedDialogForm'
   'compiled/models/Folder'
 ], (React, $, RestrictedDialogForm, Folder) ->
 
@@ -46,7 +46,7 @@ define [
   test 'defaults to having nothing selected when non common items are selected', ->
     equal @restrictedDialogForm.refs.publishInput.getDOMNode().checked, false, 'not selected'
     equal @restrictedDialogForm.refs.unpublishInput.getDOMNode().checked, false, 'not selected'
-    equal @restrictedDialogForm.refs.dateRange.getDOMNode().checked, false, 'not selected'
+    equal @restrictedDialogForm.refs.permissionsInput.getDOMNode().checked, false, 'not selected'
 
   test 'button is disabled but becomes enabled when you select an item', ->
     equal @restrictedDialogForm.refs.updateBtn.props.disabled, true, 'starts off as disabled'

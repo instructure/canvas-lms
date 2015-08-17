@@ -1,13 +1,12 @@
 define [
   'react'
   'jquery'
-  'compiled/react_files/components/UsageRightsIndicator'
+  'jsx/files/UsageRightsIndicator'
   'compiled/models/Folder'
   'compiled/models/File'
 ], (React, $, UsageRightsIndicator, Folder, File) ->
 
   TestUtils = React.addons.TestUtils
-  UsageRightsIndicator = React.createFactory(UsageRightsIndicator)
 
   module 'UsageRightsIndicator',
   test 'returns null for folders', ->

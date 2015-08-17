@@ -1,7 +1,7 @@
 define [
   'react'
   'jquery'
-  'compiled/react_files/components/ItemCog'
+  'jsx/files/ItemCog'
   'compiled/models/Folder'
 ], (React, $, ItemCog, Folder) ->
 
