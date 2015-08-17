@@ -426,6 +426,29 @@ describe "new groups" do
       expect(f(".group[data-id=\"#{@testgroup[0].id}\"] .group-summary")).to include_text('2 students')
     end
 
+    it 'should move student using drag and drop', priority: "1", test_id: 94156 do
+      group_test_setup(2,1,2)
+      add_user_to_group(@students[0], @testgroup.first, false)
+      add_user_to_group(@students[1], @testgroup.last, false)
+
+      drag_item1 = '.group-user-name:contains("Test Student 2")'
+      drop_target1 = '.group:contains("Test Group 1")'
+
+      get "/courses/#{@course.id}/groups"
+      expect(f(".group[data-id=\"#{@testgroup[0].id}\"] .group-summary")).to include_text('1 student')
+      expect(f(".group[data-id=\"#{@testgroup[1].id}\"] .group-summary")).to include_text('1 student')
+
+      f(".group[data-id=\"#{@testgroup[0].id}\"] .toggle-group").click
+      f(".group[data-id=\"#{@testgroup[1].id}\"] .toggle-group").click
+      wait_for_ajaximations
+
+      drag_and_drop_element(fj(drag_item1), fj(drop_target1))
+      wait_for_ajaximations
+
+      expect(f(".group[data-id=\"#{@testgroup[0].id}\"] .group-summary")).to include_text('2 students')
+      expect(f(".group[data-id=\"#{@testgroup[1].id}\"] .group-summary")).to include_text('0 students')
+    end
+
     context "using clone group set modal" do
       it "should clone a group set including its groups and memberships" do
         group_test_setup(2,1,2)
