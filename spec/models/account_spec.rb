@@ -1292,18 +1292,19 @@ describe Account do
     it "should inherit from a parent account's default_storage_quota" do
       enable_cache do
         account = account_model
-        subaccount = account.sub_accounts.create!
 
         account.default_storage_quota = 10.megabytes
         account.save!
 
+        subaccount = account.sub_accounts.create!
         expect(subaccount.default_storage_quota).to eq 10.megabytes
 
         # should reload
-        account.default_group_storage_quota = 20.megabytes
+        account.default_storage_quota = 20.megabytes
         account.save!
 
-        expect(subaccount.default_storage_quota).to eq 10.megabytes
+        subaccount = Account.find(subaccount)
+        expect(subaccount.default_storage_quota).to eq 20.megabytes
       end
     end
   end

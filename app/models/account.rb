@@ -532,16 +532,18 @@ class Account < ActiveRecord::Base
     @invalidations ||= []
     @invalidations += Account.inheritable_settings if @invalidate_settings_cache
     if @invalidations.present?
-      @invalidations.each do |key|
-        Rails.cache.delete([key, self.global_id].cache_key)
+      shard.activate do
+        @invalidations.each do |key|
+          Rails.cache.delete([key, id].cache_key)
+        end
+        Account.send_later_if_production(:invalidate_inherited_caches, self, @invalidations)
       end
-      Account.send_later_if_production(:invalidate_inherited_caches, self, @invalidations)
     end
   end
 
   def self.invalidate_inherited_caches(parent_account, keys)
     parent_account.shard.activate do
-      account_ids = Account.sub_account_ids_recursive(parent_account.id).map{|id| Shard.global_id_for(id)}
+      account_ids = Account.sub_account_ids_recursive(parent_account.id)
       account_ids.each do |id|
         keys.each do |key|
           Rails.cache.delete([key, id].cache_key)
@@ -550,19 +552,29 @@ class Account < ActiveRecord::Base
     end
   end
 
+  def self.default_storage_quota
+    Setting.get('account_default_quota', 500.megabytes.to_s).to_i
+  end
+
   def quota
-    Rails.cache.fetch(['current_quota', self.global_id].cache_key) do
-      read_attribute(:storage_quota) ||
-        (self.parent_account.default_storage_quota rescue nil) ||
-        Setting.get('account_default_quota', 500.megabytes.to_s).to_i
+    return storage_quota if read_attribute(:storage_quote)
+    return self.class.default_storage_quota if root_account?
+
+    shard.activate do
+      Rails.cache.fetch(['current_quota', id].cache_key) do
+        self.parent_account.default_storage_quota
+      end
     end
   end
 
   def default_storage_quota
-    Rails.cache.fetch(['default_storage_quota', self.global_id].cache_key) do
-      read_attribute(:default_storage_quota) ||
-        (self.parent_account.default_storage_quota rescue nil) ||
-        Setting.get('account_default_quota', 500.megabytes.to_s).to_i
+    return super if read_attribute(:default_storage_quota)
+    return self.class.default_storage_quota if root_account?
+
+    shard.activate do
+      @default_storage_quota ||= Rails.cache.fetch(['default_storage_quota', id].cache_key) do
+        parent_account.default_storage_quota
+      end
     end
   end
 
@@ -605,10 +617,13 @@ class Account < ActiveRecord::Base
   end
 
   def default_group_storage_quota
-    Rails.cache.fetch(['default_group_storage_quota', self.global_id].cache_key) do
-      read_attribute(:default_group_storage_quota) ||
-        (self.parent_account.default_group_storage_quota rescue nil) ||
-        Group.default_storage_quota
+    return super if read_attribute(:default_group_storage_quota)
+    return Group.default_storage_quota if root_account?
+
+    shard.activate do
+      Rails.cache.fetch(['default_group_storage_quota', self.id].cache_key) do
+        self.parent_account.default_group_storage_quota
+      end
     end
   end
 
