@@ -2518,7 +2518,7 @@ class Course < ActiveRecord::Base
   end
 
   def filter_attributes_for_user(hash, user, session)
-    hash.delete('hide_final_grades') unless grants_right? user, :update
+    hash.delete('hide_final_grades') if hash.key?('hide_final_grades') && !grants_right?(user, :update)
     hash
   end
 
