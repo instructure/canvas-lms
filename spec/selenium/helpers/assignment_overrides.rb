@@ -99,6 +99,18 @@ module AssignmentOverridesSeleniumHelper
     wait_for_ajaximations
   end
 
+  def assign_dates_for_first_override_section(opts = {})
+    first_due_at_element.send_keys(opts.fetch(:due_at, Time.zone.now.advance(days:3)))
+    first_unlock_at_element.send_keys(opts.fetch(:unlock_at, Time.zone.now.advance(days:-1)))
+    first_lock_at_element.send_keys(opts.fetch(:lock_at, Time.zone.now.advance(days:3)))
+  end
+
+  def assign_dates_for_last_override_section(opts = {})
+    last_due_at_element.send_keys(opts.fetch(:due_at, Time.zone.now.advance(days:5)))
+    last_unlock_at_element.send_keys(opts.fetch(:unlock_at, Time.zone.now.advance(days:-1)))
+    last_lock_at_element.send_keys(opts.fetch(:lock_at, Time.zone.now.advance(days:5)))
+  end
+
   def add_due_date_override(assignment, due_at = Time.zone.now.advance(days:1))
     user = @user
     new_section = @course.course_sections.create!(:name => 'New Section')
@@ -113,7 +125,7 @@ module AssignmentOverridesSeleniumHelper
 
   def add_user_specific_due_date_override(assignment, opts = {})
     user = @user
-    new_section = @course.course_sections.create!(:name => 'New Section')
+    new_section = opts.fetch(:section) || @course.course_sections.create!(:name => 'New Section')
     student_in_section(new_section)
     override = assignment.assignment_overrides.build
     override.set = new_section
