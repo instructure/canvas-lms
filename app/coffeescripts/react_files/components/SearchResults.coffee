@@ -13,15 +13,14 @@ define [
   '../utils/updateAPIQuerySortParams'
   '../utils/getAllPages'
   './FilePreview'
-  './NoResults'
+  'jsx/files/NoResults'
   '../utils/locationOrigin'
-], (_, I18n, React, ReactRouter, Folder, FilesCollection, withReactElement, ColumnHeadersComponent, LoadingIndicatorComponent, FolderChildComponent, customPropTypes, updateAPIQuerySortParams, getAllPages, FilePreviewComponent, NoResultsComponent) ->
+], (_, I18n, React, ReactRouter, Folder, FilesCollection, withReactElement, ColumnHeadersComponent, LoadingIndicatorComponent, FolderChildComponent, customPropTypes, updateAPIQuerySortParams, getAllPages, FilePreviewComponent, NoResults) ->
 
   ColumnHeaders = ColumnHeadersComponent
   LoadingIndicator = React.createFactory LoadingIndicatorComponent
   FolderChild = React.createFactory FolderChildComponent
   FilePreview = React.createFactory FilePreviewComponent
-  NoResults = React.createFactory NoResultsComponent
 
   SearchResults = React.createClass
     displayName: 'SearchResults'
