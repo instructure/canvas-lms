@@ -2558,7 +2558,7 @@ class Course < ActiveRecord::Base
       # get its id to move over sections and enrollments.  Setting this course to
       # deleted has to be last otherwise it would set all the enrollments to
       # deleted before they got moved
-      self.uuid = self.sis_source_id = self.sis_batch_id = nil;
+      self.uuid = self.sis_source_id = self.sis_batch_id = self.integration_id = nil;
       self.save!
       Course.process_as_sis { new_course.save! }
       self.course_sections.update_all(:course_id => new_course)
