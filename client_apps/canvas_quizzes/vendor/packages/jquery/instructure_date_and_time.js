@@ -6,6 +6,10 @@ requirejs.config({
     '*': {
       // needed by a loader plugin, can't scope the mapping
       'timezone_core': 'canvas/timezone_core',
+      'moment': 'canvas/moment',
+      'moment_formats': 'canvas/moment_formats',
+      'locale_converter': 'canvas/locale_converter',
+      'bower': 'canvas/bower',
       'compiled': 'canvas/compiled',
       'jquery': 'canvas/vendor/jquery-1.7.2',
       'jqueryui': 'canvas/vendor/jqueryui',
@@ -24,7 +28,7 @@ requirejs.config({
       'vendor/date': 'canvas/vendor/date',
       'jsx/shared/render-datepicker-time': 'canvas/jsx/shared/render-datepicker-time'
     },
-    
+
     'canvas/jsx/shared/render-datepicker-time': {
       'i18n': 'i18n',
     },
