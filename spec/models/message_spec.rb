@@ -213,6 +213,103 @@ describe Message do
         @message.deliver
       end
     end
+
+    context 'SMS' do
+      before :once do
+        user_model
+        @user.account.enable_feature!(:international_sms)
+      end
+
+      before do
+        Canvas::Twilio.stubs(:enabled?).returns(true)
+      end
+
+      it "uses Twilio for E.164 paths" do
+        message_model(
+          dispatch_at: Time.now,
+          workflow_state: 'staged',
+          to: '+18015550100',
+          updated_at: Time.now.utc - 11.minutes,
+          path_type: 'sms',
+          user: @user
+        )
+        Canvas::Twilio.expects(:deliver).with('+18015550100', @message.body)
+        @message.expects(:deliver_via_email).never
+        @message.deliver
+      end
+
+      it "sends as email for email-ish paths" do
+        message_model(
+          dispatch_at: Time.now,
+          workflow_state: 'staged',
+          to: 'foo@example.com',
+          updated_at: Time.now.utc - 11.minutes,
+          path_type: 'sms',
+          user: @user
+        )
+        @message.expects(:deliver_via_email)
+        Canvas::Twilio.expects(:deliver).never
+        @message.deliver
+      end
+
+      it "sends as email for paths that don't look like either email addresses or E.164 numbers" do
+        message_model(
+          dispatch_at: Time.now,
+          workflow_state: 'staged',
+          to: 'bogus',
+          updated_at: Time.now.utc - 11.minutes,
+          path_type: 'sms',
+          user: @user
+        )
+        @message.expects(:deliver_via_email)
+        Canvas::Twilio.expects(:deliver).never
+        @message.deliver
+      end
+
+      it 'completes dispatch when successful' do
+        message_model(
+          dispatch_at: Time.now,
+          workflow_state: 'staged',
+          to: '+18015550100',
+          updated_at: Time.now.utc - 11.minutes,
+          path_type: 'sms',
+          user: @user
+        )
+        Canvas::Twilio.expects(:deliver)
+        @message.deliver
+        @message.reload
+        expect(@message.workflow_state).to eq('sent')
+      end
+
+      it 'cancels when Twilio raises an exception' do
+        message_model(
+          dispatch_at: Time.now,
+          workflow_state: 'staged',
+          to: '+18015550100',
+          updated_at: Time.now.utc - 11.minutes,
+          path_type: 'sms',
+          user: @user
+        )
+        Canvas::Twilio.expects(:deliver).raises('some error')
+        @message.deliver
+        @message.reload
+        expect(@message.workflow_state).to eq('cancelled')
+      end
+
+      it "doesn't send when the :international_sms feature flag is disabled" do
+        @user.account.disable_feature!(:international_sms)
+        message_model(
+          dispatch_at: Time.now,
+          workflow_state: 'staged',
+          to: '+18015550100',
+          updated_at: Time.now.utc - 11.minutes,
+          path_type: 'sms',
+          user: @user
+        )
+        Canvas::Twilio.expects(:deliver).never
+        @message.deliver
+      end
+    end
   end
 
   describe 'contextual messages' do
