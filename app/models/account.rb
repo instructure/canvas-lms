@@ -511,7 +511,7 @@ class Account < ActiveRecord::Base
   end
 
   def self.account_lookup_cache_key(id)
-    ['_account_lookup2', id].cache_key
+    ['_account_lookup3', id].cache_key
   end
 
   def self.invalidate_cache(id)
@@ -1074,13 +1074,14 @@ class Account < ActiveRecord::Base
   end
 
   def self.find_cached(id)
-    account = Rails.cache.fetch(account_lookup_cache_key(id)) do
-      account = Account.where(id: id).first
-      account.precache if account
-      account || :nil
+    birth_id = Shard.relative_id_for(id, Shard.current, Shard.birth)
+    Shard.birth.activate do
+      Rails.cache.fetch(account_lookup_cache_key(birth_id)) do
+        account = Account.where(id: id).first
+        account.precache if account
+        account
+      end
     end
-    account = nil if account == :nil
-    account
   end
 
   def self.get_special_account(special_account_type, default_account_name, force_create = false)
