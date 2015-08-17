@@ -5,6 +5,9 @@ test:
   paths:
     # setting path works for opera, chrome, and firefox
     # firefox: "/Applications/Firefox7.app/Contents/MacOS/firefox"
+  school_domain:
+    # URL to Canvas environment
+    # "twilson"
   appium_host_url:
     # setting path for test server
     # "10.0.15.242"

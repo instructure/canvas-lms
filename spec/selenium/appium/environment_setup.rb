@@ -17,6 +17,11 @@ module EnvironmentSetup
     @appium_dev_key
   end
 
+  # TODO: update when Appium is integrated with Jenkins, append $server_port
+  def school_domain
+    $selenium_config[:school_domain]
+  end
+
   # Static IP addresses entered into Mobile Verify. Comment/Uncomment to set the url.
   # Mobile Apps will not connect to local test instances other than these.
   def host_url

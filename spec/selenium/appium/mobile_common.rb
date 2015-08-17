@@ -4,6 +4,9 @@ require_relative 'environment_setup'
 
 include EnvironmentSetup
 
+# Mobile canvas and speedgrader apps have features that behave the same in both apps.
+# Because each app still has its own test case in TestRails, this method chooses
+# the proper test_id for examples that can be shared between app specs.
 def pick_test_id_for_app(app_name, canvas, speedgrader)
   app_name =~ /(speedgrader)/ ? speedgrader : canvas
 end
@@ -146,8 +149,7 @@ def appium_init_ios
 end
 
 def appium_init(app_name)
-  # @school = "#{host_url}:#{$server_port}"
-  @school = 'twilson' # TODO: REMOVE WHEN MOBILE VERIFY SUPPORTS LOCAL ENVIRONMENT
+  @school = school_domain
   @appium_lib = { server_url: appium_server_url }
   case app_name
   when 'candroid', 'speedgrader_android'
