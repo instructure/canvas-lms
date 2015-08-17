@@ -23,6 +23,7 @@ describe "account admin outcomes" do
     end
 
     context "create/edit/delete outcomes" do
+
       it "should create a learning outcome with a new rating (root level)", priority: "1", test_id: 250229 do
         should_create_a_learning_outcome_with_a_new_rating_root_level
       end
@@ -47,12 +48,20 @@ describe "account admin outcomes" do
         should_validate_calculation_method_dropdown
       end
 
-      it "should validate decaying average", priority: "2", test_id: 250235 do
-        should_validate_decaying_average
+      it "should validate decaying average_above_range", priority: "2", test_id: 250235 do
+        should_validate_decaying_average_above_range
       end
 
-      it "should validate n mastery", priority: "2", test_id: 250236 do
-        should_validate_n_mastery
+      it "should validate decaying average_below_range", priority: "2", test_id: 299445 do
+         should_validate_decaying_average_below_range
+      end
+
+      it "should validate n mastery_above_range", priority: "2", test_id: 299447 do
+        should_validate_n_mastery_above_range
+      end
+
+      it "should validate n mastery_below_range", priority: "2", test_id: 250236 do
+        should_validate_n_mastery_below_range
       end
     end
 

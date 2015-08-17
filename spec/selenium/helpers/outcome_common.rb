@@ -262,11 +262,10 @@ def should_validate_calculation_method_dropdown
   expect(drop_down).to match_array(expected_array)
 end
 
-def should_validate_decaying_average
+def should_validate_decaying_average_below_range
   get outcome_url
   f('.add_outcome_link').click
   below_range = 0
-  above_range = 100
   replace_content(f('.outcomes-content input[name=title]'), 'Decaying Average')
   click_option('#calculation_method', "Decaying Average")
   # enter invalid number below range
@@ -275,7 +274,14 @@ def should_validate_decaying_average
   wait_for_ajaximations
   expect(f('.error_box')).to be_present
   expect(fj('.error_text div').text).to include("'#{below_range}' is not a valid value")
+end
 
+def should_validate_decaying_average_above_range
+  get outcome_url
+  f('.add_outcome_link').click
+  above_range = 100
+  replace_content(f('.outcomes-content input[name=title]'), 'Decaying Average')
+  click_option('#calculation_method', "Decaying Average")
   # enter second invalid number above range
   replace_content(f('input[name=calculation_int]'), above_range)
   wait_for_ajaximations
@@ -285,11 +291,10 @@ def should_validate_decaying_average
   expect(fj('.error_text div').text).to include("'#{above_range}' is not a valid value")
 end
 
-def should_validate_n_mastery
+def should_validate_n_mastery_below_range
   get outcome_url
   f('.add_outcome_link').click
   below_range = 1
-  above_range = 6
   replace_content(f('.outcomes-content input[name=title]'), 'n Number of Times')
   click_option('#calculation_method', "n Number of Times")
   # enter invalid number below range
@@ -298,8 +303,15 @@ def should_validate_n_mastery
   wait_for_ajaximations
   expect(f('.error_box')).to be_present
   expect(fj('.error_text div').text).to include("'#{below_range}' is not a valid value")
+end
 
-  # enter second invalid number above range
+def should_validate_n_mastery_above_range
+  get outcome_url
+  f('.add_outcome_link').click
+  above_range = 6
+  replace_content(f('.outcomes-content input[name=title]'), 'n Number of Times')
+  click_option('#calculation_method', "n Number of Times")
+  # enter invalid number above range
   replace_content(f('input[name=calculation_int]'), above_range)
   f('.submit_button').click
   wait_for_ajaximations
