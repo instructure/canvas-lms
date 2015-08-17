@@ -32,7 +32,6 @@ class AccountNotification < ActiveRecord::Base
   def self.for_user_and_account(user, account)
     current = self.for_account(account)
 
-    ActiveRecord::Associations::Preloader.new(current, [:account, {account_notification_roles: :role}]).run
     user_role_ids = {}
 
     current.select! do |announcement|
@@ -99,7 +98,7 @@ class AccountNotification < ActiveRecord::Base
 
   def self.for_account(account)
     # Refreshes every 10 minutes at the longest
-    Rails.cache.fetch(['account_notifications2', account].cache_key, :expires_in => 10.minutes) do
+    Rails.cache.fetch(['account_notifications3', account].cache_key, expires_in: 10.minutes) do
       now = Time.now.utc
       # we always check the given account for the flag, even if the announcement is from the site_admin account
       # this allows us to make a global announcement that is filtered to only accounts with this flag
@@ -108,7 +107,8 @@ class AccountNotification < ActiveRecord::Base
       Shard.partition_by_shard([Account.site_admin, account]) do |accounts|
         AccountNotification.where("account_id IN (?) AND start_at <? AND end_at>?", accounts, now, now).
           where("required_account_service IS NULL OR required_account_service IN (?)", enabled_flags).
-          order('start_at DESC').all
+          order('start_at DESC').
+          preload(:account, account_notification_roles: :role)
       end
     end
   end
