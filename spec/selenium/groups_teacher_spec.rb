@@ -449,6 +449,29 @@ describe "new groups" do
       expect(f(".group[data-id=\"#{@testgroup[1].id}\"] .group-summary")).to include_text('0 students')
     end
 
+    it 'should remove student using drag and drop', priority: "1", test_id: 94159 do
+      group_test_setup(1,1,1)
+      add_user_to_group(@students[0], @testgroup.first, false)
+
+      drag_item1 = '.group-user-name:contains("Test Student 1")'
+      drop_target1 = '.ui-cnvs-scrollable'
+
+      get "/courses/#{@course.id}/groups"
+
+      expect(f(".group[data-id=\"#{@testgroup[0].id}\"] .group-summary")).to include_text('1 student')
+      expect(fj('.unassigned-users-heading.group-heading')).to include_text('Unassigned Students (0)')
+
+      f(".group[data-id=\"#{@testgroup[0].id}\"] .toggle-group").click
+      wait_for_ajaximations
+
+      drag_and_drop_element(fj(drag_item1), fj(drop_target1))
+      wait_for_ajaximations
+
+      expect(f(".group[data-id=\"#{@testgroup[0].id}\"] .group-summary")).to include_text('0 students')
+      expect(fj(drop_target1)).to include_text('Test Student 1')
+      expect(fj('.unassigned-users-heading.group-heading')).to include_text('Unassigned Students (1)')
+    end
+
     context "using clone group set modal" do
       it "should clone a group set including its groups and memberships" do
         group_test_setup(2,1,2)
