@@ -49,7 +49,7 @@ describe 'Account Grading Periods' do
       id = GradingPeriod.where(title: title).first.id
       expect(f("#period_title_#{id}")).to have_value(title)
       expect(f("#period_start_date_#{id}")).to have_value("#{start_date}, #{Time.zone.now.year} at 12:00am")
-      expect(f("#period_end_date_#{id}")).to have_value("#{end_date}, #{Time.zone.now.year} at 12:00am")
+      expect(f("#period_end_date_#{id}")).to have_value("#{end_date}, #{Time.zone.now.year} at 11:59pm")
     end
 
     it 'flashes error if missing info', priority: "1", test_id: 202310 do
@@ -104,7 +104,7 @@ describe 'Account Grading Periods' do
       # check UI
       expect(f("#period_title_#{id}")).to have_value(title)
       expect(f("#period_start_date_#{id}")).to have_value("#{start_date}, #{Time.zone.now.year} at 12:00am")
-      expect(f("#period_end_date_#{id}")).to have_value("#{end_date}, #{Time.zone.now.year} at 12:00am")
+      expect(f("#period_end_date_#{id}")).to have_value("#{end_date}, #{Time.zone.now.year} at 11:59pm")
 
       # check underlying object
       account_grading_period.reload
@@ -176,7 +176,7 @@ describe 'Account Grading Periods' do
           # check UI
           expect(f("#period_title_#{new_id}")).to have_value(title)
           expect(f("#period_start_date_#{new_id}")).to have_value("#{start_date}, #{Time.zone.now.year} at 12:00am")
-          expect(f("#period_end_date_#{new_id}")).to have_value("#{end_date}, #{Time.zone.now.year} at 12:00am")
+          expect(f("#period_end_date_#{new_id}")).to have_value("#{end_date}, #{Time.zone.now.year} at 11:59pm")
         end
 
         it 'is inherited by course, reads account grading period', priority: "1", test_id: 250249 do
@@ -210,7 +210,7 @@ describe 'Account Grading Periods' do
           # check UI
           expect(f("#period_title_#{new_id}")).to have_value(title)
           expect(f("#period_start_date_#{new_id}")).to have_value("#{start_date}, #{Time.zone.now.year} at 12:00am")
-          expect(f("#period_end_date_#{new_id}")).to have_value("#{end_date}, #{Time.zone.now.year} at 12:00am")
+          expect(f("#period_end_date_#{new_id}")).to have_value("#{end_date}, #{Time.zone.now.year} at 11:59pm")
         end
       end # as admin
 
@@ -251,7 +251,7 @@ describe 'Account Grading Periods' do
           # check UI
           expect(f("#period_title_#{new_id}")).to have_value(title)
           expect(f("#period_start_date_#{new_id}")).to have_value("#{start_date}, #{Time.zone.now.year} at 12:00am")
-          expect(f("#period_end_date_#{new_id}")).to have_value("#{end_date}, #{Time.zone.now.year} at 12:00am")
+          expect(f("#period_end_date_#{new_id}")).to have_value("#{end_date}, #{Time.zone.now.year} at 11:59pm")
         end
 
         it 'is inherited by sub-account, deleting as sub-admin reverts to account grading period', priority: "1", test_id: 250257 do
@@ -304,7 +304,7 @@ describe 'Account Grading Periods' do
           # check UI
           expect(f("#period_title_#{new_id}")).to have_value(title)
           expect(f("#period_start_date_#{new_id}")).to have_value("#{start_date}, #{Time.zone.now.year} at 12:00am")
-          expect(f("#period_end_date_#{new_id}")).to have_value("#{end_date}, #{Time.zone.now.year} at 12:00am")
+          expect(f("#period_end_date_#{new_id}")).to have_value("#{end_date}, #{Time.zone.now.year} at 11:59pm")
         end
 
         it 'is inherited by course, deleting reverts to account grading period', priority: "1", test_id: 250259 do

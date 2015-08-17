@@ -278,6 +278,22 @@ define([
         arguments[1] :
         arguments[0]
       return this.applyFeature.apply(this, arguments);
+    },
+
+    isMidnight: function(date, options){
+      if (date == null) { return false };
+
+      var timezone = options && options.timezone;
+
+      if (typeof timezone == 'string' || timezone instanceof String) {
+        return tz.format(date, '%R', timezone) == '00:00';
+      } else {
+        return tz.format(date, '%R') == '00:00';
+      };
+    },
+
+    changeToTheSecondBeforeMidnight: function(date){
+      return tz.parse(tz.format(date, "%F 23:59:59"));
     }
   };
 

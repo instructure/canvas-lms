@@ -63,11 +63,14 @@ class GradingPeriod < ActiveRecord::Base
   end
 
   def assignments(assignment_scope)
-    # TODO: avoid wasteful queries
-    assignments = assignment_scope.where( "due_at BETWEEN ? AND ?", start_date, end_date)
+    assignments, without_due_at = assignment_scope.partition(&:due_at)
+
+    # Change to millisecond zero is necessary as past versions of fancy
+    # midnight set seconds to 59.999999.
+    assignments.select! { |a| in_date_range?(a.due_at.change usec: 0) }
 
     if last?
-      assignments + assignment_scope.where(due_at: nil)
+      assignments + without_due_at
     else
       assignments
     end
