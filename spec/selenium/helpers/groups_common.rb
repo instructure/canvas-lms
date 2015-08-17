@@ -287,3 +287,17 @@ def verify_member_sees_group_page(index = 0)
   expect_new_page_load { ff('.wiki-page-link')[index].click }
   expect expect(f('.page-title')).to include_text("#{@page.title}")
 end
+
+def add_test_files
+  add_file(fixture_file_upload('files/example.pdf', 'application/pdf'),
+           @testgroup.first, "example.pdf")
+  add_file(fixture_file_upload('files/a_file.txt', 'text/plain'),
+           @course, "a_file.txt")
+end
+
+def expand_files_on_content_pane
+  fj('.ui-state-default.ui-corner-top:contains("Files")').click
+  wait_for_ajaximations
+  f('.sign.plus').click
+  wait_for_ajaximations
+end

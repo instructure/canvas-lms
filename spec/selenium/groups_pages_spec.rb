@@ -3,6 +3,7 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/groups_common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/announcements_common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/discussions_common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/wiki_and_tiny_common')
+require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
 
 describe "groups" do
   include_context "in-process server selenium tests"
@@ -12,6 +13,7 @@ describe "groups" do
   let(:people_page) {url + '/users'}
   let(:discussions_page) {url + '/discussion_topics'}
   let(:pages_page) {url + '/pages'}
+  let(:files_page) {url + '/files'}
 
   context "as a student" do
     before do
@@ -75,6 +77,14 @@ describe "groups" do
         user_session(@students.first)
         verify_member_sees_announcement
       end
+
+      it "should only access group files in announcements right content pane", priority: "1", test_id: 273624 do
+        add_test_files
+        get announcements_page
+        expect_new_page_load { f('.btn-primary').click }
+        expand_files_on_content_pane
+        expect(ffj('.file .text:visible').size).to eq 1
+      end
     end
 
     describe "people page" do
@@ -125,6 +135,14 @@ describe "groups" do
         expect(fln("#{group_dt.title}")).to be_displayed
         expect(fln("#{course_dt.title}")).to be_nil
       end
+
+      it "should only access group files in discussions right content pane", priority: "1", test_id: 303701 do
+        add_test_files
+        get discussions_page
+        expect_new_page_load { f('.btn-primary').click }
+        expand_files_on_content_pane
+        expect(ffj('.file .text:visible').size).to eq 1
+      end
     end
 
     describe "pages page" do
@@ -162,6 +180,31 @@ describe "groups" do
         fj(".ui-accordion-header a:contains('Wiki Pages')").click
         expect(fln("#{group_page.title}")).to be_displayed
         expect(fln("#{course_page.title}")).to be_nil
+      end
+
+      it "should only access group files in pages right content pane", priority: "1", test_id: 303700 do
+        add_test_files
+        get pages_page
+        f('.btn-primary').click
+        wait_for_ajaximations
+        expand_files_on_content_pane
+        expect(ffj('.file .text:visible').size).to eq 1
+      end
+    end
+
+    describe "Files page" do
+      it "should allow group members to add a new folder", priority: "1", test_id: 273625 do
+        get files_page
+        add_folder
+        expect(ff('.media-body').first.text).to eq 'new folder'
+      end
+
+      it "should only allow group members to access files", priority: "1", test_id: 273626 do
+        course_student = User.create!(name: 'course student')
+        expect_new_page_load { get files_page }
+        user_session(course_student)
+        get files_page
+        expect(f('.ui-state-error')).to be_displayed
       end
     end
   end
@@ -227,6 +270,14 @@ describe "groups" do
         @page = @testgroup.first.wiki.wiki_pages.create!(title: "Page", user: @students.first)
         # Verifies teacher can access the group page & that it's the correct page
         verify_member_sees_group_page
+      end
+    end
+
+    describe "Files page" do
+      it "should allow teacher to add a new folder", priority: "1", test_id: 303703 do
+        get files_page
+        add_folder
+        expect(ff('.media-body').first.text).to eq 'new folder'
       end
     end
   end
