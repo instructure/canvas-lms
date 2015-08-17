@@ -269,7 +269,10 @@ module AttachmentFu # :nodoc:
           :temp_path                => temp_file,
           :thumbnail_resize_options => size
         }
-        thumb.save!
+        if thumb.valid?
+          thumb.process_attachment
+          thumb.save!
+        end
       end
     end
 
@@ -286,7 +289,7 @@ module AttachmentFu # :nodoc:
       ensure
         tmp.unlink if tmp
       end
-      
+
       res
     end
 
@@ -365,7 +368,7 @@ module AttachmentFu # :nodoc:
             io = File.open(self.temp_path, 'rb')
           end
           io.rewind
-          io.each_line do |line| 
+          io.each_line do |line|
             digest.update(line)
             read_bytes = true
           end
@@ -417,7 +420,7 @@ module AttachmentFu # :nodoc:
         'unknown/unknown'
       end
     end
-    
+
     # Gets the latest temp path from the collection of temp paths.  While working with an attachment,
     # multiple Tempfile objects may be created for various processing purposes (resizing, for example).
     # An array of all the tempfile objects is stored so that the Tempfile instance is held on to until
