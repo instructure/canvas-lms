@@ -1206,6 +1206,7 @@ nb:
   add_files_to_the_course_da6ffd32: "Legg filer til Kurs"
   add_grading_period_6f774dc3: "Legg til vurderingsperiode"
   add_grading_scheme_81e23c05: "Legge til gradering ordningen"
+  add_icon_567dbcaa: "legg til ikon"
   add_module_item: 
     add_assignment_to: "Legge et oppdrag til %{module}"
     add_file_to: "Legg filer til  %{module}"
@@ -1274,6 +1275,7 @@ nb:
       threshold_should_be_numeric: "Dette skal være et positivt tall"
   all_4321c3a1: Alle
   all_changes_were_saved_f6f3ddcc: "Alle endringer ble lagret"
+  all_configured_apps_a14eef0a: "Alle konfigurerte applikasjoner"
   all_dates_fields_must_be_present_and_formatted_cor_3a0fe925: "Alle datafelt må være til stede og formatert riktig"
   all_finished_time_to_publish_your_course_click_the_b6f07217: "Alt ferdig? Tid for å publisere din kurset! Klikk på knappen under for å gjøre det offisielt! Publisering vil tillate brukerne til å begynne å delta på kurset."
   all_grading_periods_77974940: "Alle Gradering Perioder"
@@ -1289,6 +1291,7 @@ nb:
   always_3a59e701: Alltid
   an_error_occured_trying_to_generate_this_theme_ple_6ae581d: "Det oppstod en feil ved generering av denne malen, prøv igjen"
   an_error_occurred_please_post_your_reply_again_lat_b0220ac6: "*Det oppstod en feil*, vennligst publiser svaret ditt senere"
+  an_error_occurred_trying_to_generate_this_theme_pl_b493e2e9: "Det oppstod en feil ved generering av denne malen, prøv igjen"
   an_error_occurred_trying_to_prepare_download_pleas_df6fa596: "Det oppstod en feil ved forbereding av nedlastingen, vennligst prøv igjen."
   an_error_occurred_when_setting_the_usage_right_for_d4ea78f5: "En feil oppstod ved innstilling av bruk rett for %{filename}"
   an_unknown_server_error_occurred_please_try_again_f517eaf3: "En ukjent server feil oppstod. Vennligst prøv igjen."
@@ -1366,6 +1369,9 @@ nb:
   anonymous_user: "Anonym bruker"
   anonymous_user_d984b9ce: "Anonym bruker"
   another_configuration_is_currently_selected_select_95b394e: "En annen konfigurasjon er valgt. Hvis du velger denne konfigurasjonen, fjerner du den andre."
+  answer_text_80_character_limit_2fce1113: "Svartekst (80 tegn maks)"
+  answer_text_909894d6: Svartekst
+  answer_weight_43420dc5: Svarvekt
   answers_will_be_shown_after_your_last_attempt_d9db6b1d: "Svarene vil bli vist etter ditt siste forsøk"
   api_url_3ee7cb0a: "API URL"
   app_center_will_appear_in_the_apps_tab_on_the_sett_1b9eb936: "App Senter vil vises i \"Apps\" kategorien på siden av enten et kurs eller konto innstillinger. URL som er angitt nedenfor skal peke til en gyldig App senter endepunkt (for example, %{url} -- sørg for å utelate etterfølgende skråstrek"
@@ -2164,6 +2170,8 @@ nb:
   blue_daf8fea9: Blå
   bookmark_service: 
     default_title: "Ingen tittel"
+  breadcrumb_1_cb3c504: "Breadcrumb 1"
+  breadcrumb_2_95ba94be: "Breadcrumb 2"
   broccoli_cloud: 
     hidden_title: "Skjult. Tilgjengelig med en lenke"
     published_title: Publisert
@@ -2554,6 +2562,7 @@ nb:
       would_you_like_to_cancel_that_and_sign_up_for_this: "Vil du kansellere den og melde deg på denne?"
       you_are_already_signed_up_for: "Du er allerede meldt på:"
     save: Lagre
+    save_and_publish: "Lagre og publiser"
     save_changes: "Lagre endringer"
     scheduler_right_side_admin_section: 
       create_a_new_set_of_appointments: "Opprett en avtalegruppe"
@@ -2683,6 +2692,7 @@ nb:
   canvas_ticketing_email_connector_27e253ae: "Canvas ticketing e-posttilkobler"
   canvas_ticketing_web_post_connector_11158897: "Canvac ticketing webpost-tilkobler"
   canvas_will_regrade_all_your_submissions_after_you_2d68694a: "Canvas vil sette karakter på nytt i alle dine innleveringer etter at du lagrer prøven, dette kan ta noen minutter."
+  careful_changes_to_group_membership_will_apply_to__19a9089c: "Forsiktig! Endringer til gruppemedlemskap blir brukt på alle grupper som allerede har innlevering-innsendinger. Det kan hende at gruppe-innlevering-innsendinger ikke blir justert på grunn av det. Vil du opprette en ny gruppe for fremtidige innleveringer?"
   cas_url_4ba2843e: CAS-URL
   cc: 
     by: "CC Navngivelse BY"
@@ -2696,6 +2706,7 @@ nb:
   certificate_fingerprint_b376df90: Sertifikat-fingeravtrykk
   change_beginning_date_to_39dbd06e: "Endre startdato ti"
   change_ending_date_to_d2cebd54: "Endre sluttdato til"
+  change_groups_4e2ab6c3: "Bytt grupper"
   change_points_possible_to_match_rubric_dialog: 
     prompts: 
       update_assignment_points: "Denne oppgaven har %{assignmentPoints} oppnåelige poeng, ønsker du å endre den til å ha %{rubricPoints} oppnåelige poeng for å passe med denne vurderingen?"
@@ -2706,10 +2717,15 @@ nb:
   choose_a_csv_file_to_upload_9644480c: "Velg en CSV-fil å laste opp:"
   choose_an_authentication_service_47dc8875: "Velg en autentiseringstjeneste"
   choose_usage_rights_33683854: "Velg bruksrettigheter..."
+  chosencolor_is_not_a_valid_color_5d542cc: "'%{chosenColor}' er ikke en gyldig farge."
+  clear_2084585f: Tøm
   click_for_more_details_on_this_outcome_8c018d2f: "klikk for flere opplysninger om dette utfallet"
   click_here_on_the_calendar_link_c9965631: "Klikk her på *Kalender* lenken"
+  click_to_enter_comments_if_the_student_chooses_thi_507c20f6: "Klikk for å legge inn kommentarer, om eleven velger dette svaret"
   click_to_modify_89fa26aa: "Klikk for å modifisere"
   click_to_report_profile_picture_370f9625: "Klikk for å rapportere profilbilde"
+  click_to_set_this_answer_as_correct_1326e3fd: "Klikk for å sette dette svaret som riktig"
+  click_to_test_dropdown_b950974d: "Klikk for å teste dropdown"
   close_and_return_to_canvas_80544344: "Lukk og retur til Canvas"
   close_d634289d: Lukk
   close_picker_256aca8a: "Lukk picker"
@@ -2818,6 +2834,7 @@ nb:
       delete: "Slette samarbeid?"
   collapse_list_of_group_members_for_groupname_d6c66fa0: "Kollapse liste over medlemmene i gruppen for %{groupName}"
   collapse_subdiscussion_89af1f5c: "Kollapse Sub diskusjon"
+  collapsed_510aa02a: Skjult
   coming_up_4348b0bd: "Kommer snart"
   comm_messages: 
     from_beginning: begynnelsen
@@ -2889,7 +2906,11 @@ nb:
       notices: 
         contact_registered: "Kontaktmetode er registrert!"
   complete_all_items_e1779257: "Fullfør alle elementer"
+  complete_icon_7455be93: "fullført ikon"
   complete_one_item_90e5fb03: "Fullfør ett element"
+  completed_19711ce7: Fullført
+  completed_icon_521596e4: "fullført ikon"
+  concluded_conferences_cdbe53f9: "Avsluttende konferanser"
   concluded_courses_94782e21: "Konkludert Kurs"
   conference_was_deleted_30869390: "Konferanse ble slettet"
   conferences: 
@@ -2999,6 +3020,7 @@ nb:
       labels: 
         all_quizzes: "Alle prøver"
       select_quizzes: "Velg prøver å eksportere"
+  content_for_section_1_7ecfb319: "Innhold for Seksjon 1"
   content_imports: 
     errors: 
       import_failed: "Det oppsto en feil i overflytting av din import. Vær snill å kontakte system administrator og oppgi den følgende kode: \"%{code}\""
