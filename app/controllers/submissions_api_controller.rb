@@ -187,28 +187,9 @@ class SubmissionsApiController < ApplicationController
           submission_json(s, @assignment, @current_user, session, @context, includes)
         }
       end
+
       render :json => json
     end
-  end
-
-  def bulk_process_submissions_for_visibility(submissions_scope, includes)
-    result = []
-    submissions_scope.find_in_batches(batch_size: 100) do |submission_batch|
-      bulk_load_attachments_and_previews(submission_batch)
-
-      user_ids = submission_batch.map(&:user_id)
-
-      users_with_visibility = AssignmentStudentVisibility.where(course_id: @context, assignment_id: @assignment, user_id: user_ids).pluck(:user_id).to_set
-
-      submission_array = submission_batch.map { |s|
-        s.visible_to_user = users_with_visibility.include?(s.user_id)
-        submission_json(s, @assignment, @current_user, session, @context, includes)
-      }
-
-      result.concat submission_array
-
-    end
-    result
   end
 
   # @API List submissions for multiple assignments
@@ -377,21 +358,24 @@ class SubmissionsApiController < ApplicationController
           assignment_visibilities.fetch(s.assignment_id, []).include?(s.user_id) || can_view_all
         }
 
-        student_submissions.each do |submission|
+        if assignments.present?
+          student_submissions.each do |submission|
             # we've already got all the assignments loaded, so bypass AR loading
             # here and just give the submission its assignment
-            next unless assignment = assignments_hash[submission.assignment_id]
+            next unless (assignment = assignments_hash[submission.assignment_id])
             submission.assignment = assignment
             submission.user = student
 
             visible_assignments = assignment_visibilities.fetch(submission.user_id, [])
             submission.visible_to_user = visible_assignments.include? submission.assignment_id
             hash[:submissions] << submission_json(submission, submission.assignment, @current_user, session, @context, includes)
-        end unless assignments.empty?
+          end
+        end
         if includes.include?('total_scores') && params[:grouped].present?
           hash.merge!(
             :computed_final_score => enrollment.computed_final_score,
-            :computed_current_score => enrollment.computed_current_score)
+            :computed_current_score => enrollment.computed_current_score
+          )
         end
         result << hash
       end
@@ -589,7 +573,8 @@ class SubmissionsApiController < ApplicationController
     @user = get_user_considering_section(params[:user_id])
 
     authorized = false
-    @submission = @assignment.submissions.where(user_id: @user).first || @assignment.submissions.build(user: @user)
+    @submission = @assignment.submissions.where(user_id: @user).first ||
+      @assignment.submissions.build(user: @user)
 
     if params[:submission] || params[:rubric_assessment]
       authorized = authorized_action(@submission, @current_user, :grade)
@@ -602,6 +587,7 @@ class SubmissionsApiController < ApplicationController
       if params[:submission].is_a?(Hash)
         submission[:grade] = params[:submission].delete(:posted_grade)
         submission[:excuse] = params[:submission].delete(:excuse)
+        submission[:provisional] = value_to_boolean(params[:submission][:provisional])
       end
       if submission[:grade] || submission[:excuse]
         @submissions = @assignment.grade_student(@user, submission)
@@ -632,7 +618,8 @@ class SubmissionsApiController < ApplicationController
         }.merge(
           comment.slice(:media_comment_id, :media_comment_type, :group_comment)
         ).with_indifferent_access
-        if file_ids = params[:comment][:file_ids]
+        comment[:provisional] = value_to_boolean(submission[:provisional])
+        if (file_ids = params[:comment][:file_ids])
           attachments = Attachment.where(id: file_ids).to_a
           attachable = attachments.all? { |a|
             a.grants_right?(@current_user, :attach_to_submission_comment)
@@ -653,7 +640,8 @@ class SubmissionsApiController < ApplicationController
       bulk_load_attachments_and_previews([@submission])
 
       includes = %w(submission_comments)
-      includes.concat(Array.wrap(params[:include]) & ["visibility"])
+      includes.concat(Array.wrap(params[:include]) & ['visibility'])
+      includes << 'provisional_grades' if submission[:provisional]
 
       da_enabled = @context.feature_enabled?(:differentiated_assignments)
       visiblity_included = includes.include?("visibility")
@@ -811,6 +799,12 @@ class SubmissionsApiController < ApplicationController
     change_topic_read_state("unread")
   end
 
+  def map_user_ids(user_ids)
+    Api.map_ids(user_ids, User, @domain_root_account, @current_user)
+  end
+
+  private
+
   def change_topic_read_state(new_state)
     @assignment = @context.assignments.active.find(params[:assignment_id])
     @user = get_user_considering_section(params[:user_id])
@@ -834,16 +828,12 @@ class SubmissionsApiController < ApplicationController
     end
   end
 
-  def map_user_ids(user_ids)
-    Api.map_ids(user_ids, User, @domain_root_account, @current_user)
-  end
-
   def get_user_considering_section(user_id)
-    scope = @context.students_visible_to(@current_user)
+    students = @context.students_visible_to(@current_user)
     if @section
-      scope = scope.where(:enrollments => { :course_section_id => @section })
+      students = students.where(:enrollments => { :course_section_id => @section })
     end
-    api_find(scope, user_id)
+    api_find(students, user_id)
   end
 
   def visible_user_ids(opts = {})
@@ -860,4 +850,35 @@ class SubmissionsApiController < ApplicationController
     ActiveRecord::Associations::Preloader.new(attachments,
       [:canvadoc, :crocodoc_document]).run
   end
+
+  def bulk_process_submissions_for_visibility(submissions_scope, includes)
+    result = []
+
+    submissions_scope.find_in_batches(batch_size: 100) do |submission_batch|
+      bulk_load_attachments_and_previews(submission_batch)
+      user_ids = submission_batch.map(&:user_id)
+      users_with_visibility = AssignmentStudentVisibility.where(
+        course_id: @context,
+        assignment_id: @assignment,
+        user_id: user_ids
+      ).pluck(:user_id).to_set
+
+      submission_array = submission_batch.map do |submission|
+        submission.visible_to_user = users_with_visibility.include?(submission.user_id)
+        submission_json(
+          submission,
+          @assignment,
+          @current_user,
+          session,
+          @context,
+          includes
+        )
+      end
+
+      result.concat(submission_array)
+    end
+
+    result
+  end
+
 end

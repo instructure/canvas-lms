@@ -95,45 +95,45 @@ describe 'Submissions API', type: :request do
 
     it "should list submissions" do
       json = api_call(:get,
-            "/api/v1/sections/#{@default_section.id}/assignments/#{@a1.id}/submissions.json",
-            { :controller => 'submissions_api', :action => 'index',
-              :format => 'json', :section_id => @default_section.id.to_s,
-              :assignment_id => @a1.id.to_s },
-            { :include => %w(submission_history submission_comments rubric_assessment) })
+        "/api/v1/sections/#{@default_section.id}/assignments/#{@a1.id}/submissions.json",
+        { :controller => 'submissions_api', :action => 'index',
+          :format => 'json', :section_id => @default_section.id.to_s,
+          :assignment_id => @a1.id.to_s },
+        { :include => %w(submission_history submission_comments rubric_assessment) })
       expect(json.size).to eq 0
 
       json = api_call(:get,
-            "/api/v1/sections/sis_section_id:my-section-sis-id/assignments/#{@a1.id}/submissions.json",
-            { :controller => 'submissions_api', :action => 'index',
-              :format => 'json', :section_id => 'sis_section_id:my-section-sis-id',
-              :assignment_id => @a1.id.to_s },
-            { :include => %w(submission_history submission_comments rubric_assessment) })
+        "/api/v1/sections/sis_section_id:my-section-sis-id/assignments/#{@a1.id}/submissions.json",
+        { :controller => 'submissions_api', :action => 'index',
+          :format => 'json', :section_id => 'sis_section_id:my-section-sis-id',
+          :assignment_id => @a1.id.to_s },
+        { :include => %w(submission_history submission_comments rubric_assessment) })
       expect(json.size).to eq 1
       expect(json.first['user_id']).to eq @student1.id
 
       api_call(:get,
-            "/api/v1/sections/#{@default_section.id}/students/submissions",
-            { :controller => 'submissions_api', :action => 'for_students',
-              :format => 'json', :section_id => @default_section.id.to_s },
-            { :student_ids => [@student1.id] },
-            {}, expected_status: 401)
+        "/api/v1/sections/#{@default_section.id}/students/submissions",
+        { :controller => 'submissions_api', :action => 'for_students',
+          :format => 'json', :section_id => @default_section.id.to_s },
+        { :student_ids => [@student1.id] },
+        {}, expected_status: 401)
 
       json = api_call(:get,
-            "/api/v1/sections/sis_section_id:my-section-sis-id/students/submissions",
-            { :controller => 'submissions_api', :action => 'for_students',
-              :format => 'json', :section_id => 'sis_section_id:my-section-sis-id' },
-              :student_ids => [@student1.id])
+        "/api/v1/sections/sis_section_id:my-section-sis-id/students/submissions",
+        { :controller => 'submissions_api', :action => 'for_students',
+          :format => 'json', :section_id => 'sis_section_id:my-section-sis-id' },
+          :student_ids => [@student1.id])
       expect(json.size).to eq 1
     end
 
     it "should return assignment_visible" do
       @course.enable_feature!(:differentiated_assignments)
       json = api_call(:get,
-            "/api/v1/sections/#{@section.id}/assignments/#{@a1.id}/submissions.json",
-            { :controller => 'submissions_api', :action => 'index',
-              :format => 'json', :section_id => @section.id.to_s,
-              :assignment_id => @a1.id.to_s },
-              { :include => %w(visibility), :student_ids => [@student1.id] })
+        "/api/v1/sections/#{@section.id}/assignments/#{@a1.id}/submissions.json",
+        { :controller => 'submissions_api', :action => 'index',
+          :format => 'json', :section_id => @section.id.to_s,
+          :assignment_id => @a1.id.to_s },
+        { :include => %w(visibility), :student_ids => [@student1.id] })
       expect(json[0]["assignment_visible"]).to eq true
     end
 
@@ -1232,6 +1232,68 @@ describe 'Submissions API', type: :request do
     expect(json.all? { |submission| expect(submission['assignment_id']).to eq a1.id }).to be_truthy
   end
 
+  context "moderated assignments" do
+    before do
+      student_in_course(active_all: true)
+      course_with_teacher_logged_in(course: @course)
+      @assignment = @course.assignments.create!(
+        title: 'an assignment',
+        grading_type: 'letter_grade',
+        points_possible: 10
+      )
+      @assignment.update_attribute(:moderated_grading, true)
+      submission = @assignment.submit_homework(@student, body: 'nice work')
+      @provisional_grade = submission.provisional_grades.build do |grade|
+        grade.scorer = @teacher
+      end
+      @provisional_grade.save!
+    end
+
+    context "when teacher has moderate_grades rights" do
+      it "displays grades" do
+        json = api_call(:get,
+          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions.json",
+          {
+            controller: 'submissions_api',
+            action: 'index',
+            format: 'json',
+            course_id: @course.id,
+            assignment_id: @assignment.id
+          },
+          {
+            include: ['provisional_grades']
+          }
+        )
+
+        expect(json.first['provisional_grades']).to_not be_empty
+      end
+    end
+
+    context "when a TA does not have moderate_grades rights" do
+      before do
+        course_with_ta(course: @course)
+        user_session(@ta)
+      end
+      it "only shows caller's provisional grade" do
+        json = api_call(:get,
+          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions.json",
+          {
+            controller: 'submissions_api',
+            action: 'index',
+            format: 'json',
+            course_id: @course.id,
+            assignment_id: @assignment.id
+          },
+          {
+            include: ['provisional_grades']
+          }
+        )
+
+        expect(json.first['provisional_grades']).to be_empty
+      end
+    end
+  end
+
   context "for_students (differentiated_assignments)" do
     before do
       # set up course with DA and submit homework for an assignment
@@ -1868,32 +1930,53 @@ describe 'Submissions API', type: :request do
     before :once do
       student_in_course(:active_all => true)
       teacher_in_course(:active_all => true)
-      @assignment = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15)
-
+      @assignment = @course.assignments.create!(
+        title: 'assignment1',
+        grading_type: 'letter_grade',
+        points_possible: 15
+      )
     end
 
     it "should allow grading an uncreated submission" do
-      json = api_call(:put,
-            "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}.json",
-            { :controller => 'submissions_api', :action => 'update',
-              :format => 'json', :course_id => @course.id.to_s,
-              :assignment_id => @assignment.id.to_s, :user_id => @student.id.to_s },
-            { :submission => { :posted_grade => 'B' } })
+      json = api_call(
+        :put,
+        "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}.json",
+        {
+          controller: 'submissions_api',
+          action: 'update',
+          format: 'json',
+          course_id: @course.id.to_s,
+          assignment_id: @assignment.id.to_s,
+          user_id: @student.id.to_s
+        }, {
+          submission: {
+            posted_grade: 'B'
+          },
+        }
+      )
 
       expect(Submission.count).to eq 1
-      @submission = Submission.first
-
       expect(json['grade']).to eq 'B'
       expect(json['score']).to eq 12.9
     end
 
     it "can excuse assignments" do
-      json = api_call(:put,
-            "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}.json",
-            { :controller => 'submissions_api', :action => 'update',
-              :format => 'json', :course_id => @course.id.to_s,
-              :assignment_id => @assignment.id.to_s, :user_id => @student.id.to_s },
-            { :submission => { excuse: "1" } })
+      json = api_call(
+        :put,
+        "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}.json",
+        {
+          controller: 'submissions_api',
+          action: 'update',
+          format: 'json',
+          course_id: @course.id.to_s,
+          assignment_id: @assignment.id.to_s,
+          user_id: @student.id.to_s
+        }, {
+          submission: {
+            excuse: "1"
+          }
+        }
+      )
 
       submission = @assignment.submission_for_student(@student)
       expect(submission).to be_excused
@@ -1905,15 +1988,99 @@ describe 'Submissions API', type: :request do
       submission = @assignment.submission_for_student(@student)
       expect(submission).to be_excused
 
-      json = api_call(:put,
-            "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}.json",
-            { :controller => 'submissions_api', :action => 'update',
-              :format => 'json', :course_id => @course.id.to_s,
-              :assignment_id => @assignment.id.to_s, :user_id => @student.id.to_s },
-            { :submission => { excuse: "0" } })
+      json = api_call(
+        :put,
+        "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}.json",
+        {
+          controller: 'submissions_api',
+          action: 'update',
+          format: 'json',
+          course_id: @course.id.to_s,
+          assignment_id: @assignment.id.to_s,
+          user_id: @student.id.to_s
+        }, {
+          submission: { excuse: "0" }
+        }
+      )
 
       expect(submission.reload).not_to be_excused
       expect(json['excused']).to eq false
+    end
+
+    it "creates a provisional grade and comment" do
+      @assignment.update_attribute(:moderated_grading, true)
+      submission = @assignment.submit_homework(@student, :body => 'what')
+
+      json = api_call(
+        :put,
+        "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}.json",
+        {
+          controller: 'submissions_api',
+          action: 'update',
+          format: 'json',
+          course_id: @course.id.to_s,
+          assignment_id: @assignment.id.to_s,
+          user_id: @student.id.to_s
+        }, {
+          submission: {
+            posted_grade: '100',
+            provisional: true
+          },
+          comment: {
+            text_comment: 'strong work'
+          }
+        }
+      )
+
+      submission.reload
+      expect(submission.workflow_state).to eq 'submitted'
+      expect(submission.score).to be_nil
+      expect(submission.grade).to be_nil
+      expect(submission.submission_comments.count).to eq 0
+
+      pg = submission.provisional_grades.last
+      expect(pg.score).to eq 100
+      expect(pg.submission_comments.first.comment).to eq 'strong work'
+
+      expect(json['provisional_grades'].first['score']).to eq 100
+
+    end
+
+    it "creates a provisional grade and comment when no submission exists" do
+      @assignment.update_attribute(:moderated_grading, true)
+
+      json = api_call(
+        :put,
+        "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}.json",
+        {
+          controller: 'submissions_api',
+          action: 'update',
+          format: 'json',
+          course_id: @course.id.to_s,
+          assignment_id: @assignment.id.to_s,
+          user_id: @student.id.to_s
+        }, {
+          submission: {
+            posted_grade: '0',
+            provisional: true
+          },
+          comment: {
+            text_comment: 'you slacker'
+          }
+        }
+      )
+
+      sub = @assignment.submissions.where(user_id: @student).last
+      expect(sub.workflow_state).to eq 'unsubmitted'
+      expect(sub.score).to be_nil
+      expect(sub.grade).to be_nil
+      expect(sub.submission_comments.count).to eq 0
+
+      pg = sub.provisional_grades.last
+      expect(pg.score).to eq 0
+      expect(pg.submission_comments.first.comment).to eq 'you slacker'
+
+      expect(json['provisional_grades'].first['score']).to eq 0
     end
   end
 
@@ -1947,7 +2114,7 @@ describe 'Submissions API', type: :request do
 
     # since student is the most recently created user, @user = student, so this
     # call will happen as student
-    json = api_call(:put,
+    api_call(:put,
           "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student.id}.json",
           { :controller => 'submissions_api', :action => 'update',
             :format => 'json', :course_id => @course.id.to_s,

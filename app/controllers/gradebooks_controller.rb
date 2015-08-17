@@ -435,10 +435,12 @@ class GradebooksController < ApplicationController
                          'SpeedGrader is enabled only for published content.')
       return redirect_to polymorphic_url([@context, @assignment])
     end
-
-    grading_role = if @context.feature_enabled?(:moderated_grading) &&
-                      @assignment.moderated_grading? && !@assignment.grades_published?
-      @context.grants_right?(@current_user, :moderate_grades) ? :moderator : :provisional_grader
+    grading_role = if moderated_grading_enabled_and_no_grades_published
+      if @context.grants_right?(@current_user, :moderate_grades)
+        :moderator
+      else
+        :provisional_grader
+      end
     else
       :grader
     end
@@ -600,5 +602,13 @@ class GradebooksController < ApplicationController
         stringify_json_ids: opts[:stringify_json_ids] || stringify_json_ids?
       })
     }
+  end
+
+  private
+
+  def moderated_grading_enabled_and_no_grades_published
+    @context.feature_enabled?(:moderated_grading) &&
+      @assignment.moderated_grading? &&
+      !@assignment.grades_published?
   end
 end

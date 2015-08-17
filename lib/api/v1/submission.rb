@@ -38,6 +38,10 @@ module Api::V1::Submission
       end
     end
 
+    if user && includes.include?('provisional_grades') && assignment.moderated_grading?
+      hash['provisional_grades'] = submission_provisional_grades_json(submission, user)
+    end
+
     if includes.include?("submission_comments")
       hash['submission_comments'] = submission_comments_json(submission.comments_for(@current_user), user)
     end
@@ -194,5 +198,13 @@ module Api::V1::Submission
     end
 
     attachment
+  end
+
+  def submission_provisional_grades_json(submission, user)
+    provisional_grades = submission.provisional_grades
+    unless submission.assignment.context.grants_right?(user, :moderate_grades)
+      provisional_grades = provisional_grades.where(scorer_id: user)
+    end
+    provisional_grades.map(&:grade_attributes)
   end
 end
