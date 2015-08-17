@@ -54,6 +54,7 @@ describe UsersController, type: :request do
     @context = @course
     discussion_topic_model
     discussion_topic_model(:user => @user)
+    announcement_model
     conversation(User.create, @user)
     Notification.create(:name => 'Assignment Due Date Changed', :category => "TestImmediately")
     Assignment.any_instance.stubs(:created_at).returns(4.hours.ago)
@@ -62,7 +63,9 @@ describe UsersController, type: :request do
     json = api_call(:get, "/api/v1/users/self/activity_stream/summary.json",
                     { :controller => "users", :action => "activity_stream_summary", :format => 'json' })
 
-    expect(json).to eq [{"type" => "Conversation", "count" => 1, "unread_count" => 0, "notification_category" => nil}, # conversations don't currently set the unread state on stream items
+    expect(json).to eq [
+                    {"type" => "Announcement", "count" => 1, "unread_count" => 1, "notification_category" => nil},
+                    {"type" => "Conversation", "count" => 1, "unread_count" => 0, "notification_category" => nil}, # conversations don't currently set the unread state on stream items
                     {"type" => "DiscussionTopic", "count" => 2, "unread_count" => 1, "notification_category" => nil},
                     {"type" => "Message", "count" => 1, "unread_count" => 0, "notification_category" => "TestImmediately"} # check a broadcast-policy-based one
                    ]
