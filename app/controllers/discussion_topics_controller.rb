@@ -633,12 +633,17 @@ class DiscussionTopicsController < ApplicationController
   # @argument sort_by_rating [Boolean]
   #   If true, entries will be sorted by rating.
   #
+  # @argument attachment [File]
+  #   A multipart/form-data form-field-style attachment.
+  #   Attachments larger than 1 kilobyte are subject to quota restrictions.
+  #
   # @example_request
   #     curl https://<canvas>/api/v1/courses/<course_id>/discussion_topics \
   #         -F title='my topic' \
   #         -F message='initial message' \
   #         -F podcast_enabled=1 \
   #         -H 'Authorization: Bearer <token>'
+  #         -F 'attachment=@<filename>' \
   #
   # @example_request
   #     curl https://<canvas>/api/v1/courses/<course_id>/discussion_topics \
