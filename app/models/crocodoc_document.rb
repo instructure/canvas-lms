@@ -22,7 +22,6 @@ class CrocodocDocument < ActiveRecord::Base
   attr_accessible :uuid, :process_state, :attachment_id
 
   belongs_to :attachment
-  has_many :crocodoc_annotations
 
   MIME_TYPES = %w(
     application/pdf

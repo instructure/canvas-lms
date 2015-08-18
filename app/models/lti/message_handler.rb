@@ -25,7 +25,6 @@ module Lti
     attr_readonly :created_at
 
     belongs_to :resource_handler, class_name: "Lti::ResourceHandler", :foreign_key => :resource_handler_id
-    has_many :links, :class_name => 'Lti::LtiLink'
 
     has_many :placements, class_name: 'Lti::ResourcePlacement', dependent: :destroy
 
