@@ -604,7 +604,8 @@ describe "context modules" do
     @module_1.save!
     user_session(@student)
     go_to_modules
-    expect(f("#context_modules").text).to eq "module"
+    # for a11y there is a hidden header now that gets read as part of the text hence the regex matching
+    expect(f("#context_modules").text).to match(/module\s*module/)
     expect(f("#context_modules").text).not_to include_text "module_1"
   end
 
