@@ -1050,7 +1050,7 @@ class CoursesController < ApplicationController
       })
 
       @course_settings_sub_navigation_tools = ContextExternalTool.all_tools_for(@context, :type => :course_settings_sub_navigation, :root_account => @domain_root_account, :current_user => @current_user)
-      unless @context.grants_right?(@current_user, session, :manage_content)
+      unless @context.grants_right?(@current_user, session, :read_as_admin)
         @course_settings_sub_navigation_tools.reject! { |tool| tool.course_settings_sub_navigation(:visibility) == 'admins' }
       end
     end
@@ -1514,7 +1514,7 @@ class CoursesController < ApplicationController
             :add_students => course_users_path(course_id: @context),
             :add_files => context_url(@context, :context_files_url, :wizard => 1),
             :select_navigation => context_url(@context, :context_details_url),
-            :course_calendar => calendar_path(:wizard => 1),
+            :course_calendar => calendar_path(course_id: @context),
             :add_tas => course_users_path(:course_id => @context),
             :publish_course => course_path(@context)
           },
@@ -1775,8 +1775,8 @@ class CoursesController < ApplicationController
     return unless authorized_action(account, @current_user, [:create_courses, :manage_courses])
 
     # For prepopulating the date fields
-    js_env(:OLD_START_DATE => unlocalized_datetime_string(@context.start_at, :verbose))
-    js_env(:OLD_END_DATE => unlocalized_datetime_string(@context.conclude_at, :verbose))
+    js_env(:OLD_START_DATE => datetime_string(@context.start_at, :verbose))
+    js_env(:OLD_END_DATE => datetime_string(@context.conclude_at, :verbose))
   end
 
   def copy_course

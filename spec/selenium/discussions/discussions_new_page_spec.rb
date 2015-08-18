@@ -115,10 +115,10 @@ describe "discussions" do
         get url
         replace_content(f('input[name=title]'), "Student Delayed")
         type_in_tiny('textarea[name=message]', 'This is the discussion description.')
-        unlock_text = Time.zone.now.advance(days:1).strftime('%b %-d at %-l:%M') <<
-                                                                  Time.zone.now.advance(days:1).strftime('%p').downcase
-        unlock_text_index_page = Time.zone.now.advance(days:1).strftime('%b %-d')
-        f('#delayed_post_at').send_keys(Time.zone.now.advance(days:1))
+        target_time = 1.day.from_now
+        unlock_text = target_time.strftime('%b %-d at %-l:%M%P')
+        unlock_text_index_page = target_time.strftime('%b %-d')
+        f('#delayed_post_at').send_keys(unlock_text)
         expect_new_page_load {submit_form('.form-actions')}
         expect(f('.entry-content').text).to include("This topic is locked until #{unlock_text}")
         expect_new_page_load{f('#section-tabs .discussions').click}

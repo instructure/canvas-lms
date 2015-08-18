@@ -1,5 +1,6 @@
 define [
   'jquery'
+  'timezone'
   'compiled/calendar/commonEventFactory'
   'jst/calendar/editAssignment'
   'jst/calendar/editAssignmentOverride'
@@ -7,7 +8,7 @@ define [
   'jquery.instructure_date_and_time'
   'jquery.instructure_forms'
   'jquery.instructure_misc_helpers'
-], ($, commonEventFactory, editAssignmentTemplate, editAssignmentOverrideTemplate, genericSelectOptionsTemplate) ->
+], ($, tz, commonEventFactory, editAssignmentTemplate, editAssignmentOverrideTemplate, genericSelectOptionsTemplate) ->
 
   class EditAssignmentDetails
     constructor: (selector, @event, @contextChangeCB, @closeCB) ->
@@ -85,15 +86,14 @@ define [
       @$form.find(".more_options_link").attr('href', moreOptionsUrl)
 
     setupTimeAndDatePickers: () =>
-      @$form.find(".datetime_field").datetime_field()
-
-      startDate = @event.startDate()
-      endDate = @event.endDate()
-
+      $field = @$form.find(".datetime_field")
+      $field.datetime_field()
+      widget = $field.data('instance')
+      startDate = $.unfudgeDateForProfileTimezone(@event.startDate())
       if @event.allDay
-        @$form.find(".datetime_field").val(startDate.toString('MMM d, yyyy')).change()
+        widget.setDate(startDate)
       else if startDate
-        @$form.find(".datetime_field").val(startDate.toString('MMM d, yyyy h:mmtt')).change()
+        widget.setDatetime(startDate)
 
     formSubmit: (e) =>
       e.preventDefault()

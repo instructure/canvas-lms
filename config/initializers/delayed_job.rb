@@ -107,5 +107,11 @@ end
 
 Delayed::Worker.lifecycle.before(:error) do |worker, job, exception|
   info = Canvas::Errors::JobInfo.new(job, worker)
-  Canvas::Errors.capture(exception, info.to_h)
+  begin
+    (job.current_shard || Shard.default).activate do
+      Canvas::Errors.capture(exception, info.to_h)
+    end
+  rescue
+    Canvas::Errors.capture(exception, info.to_h)
+  end
 end

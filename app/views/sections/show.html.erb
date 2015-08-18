@@ -136,7 +136,7 @@ h3 .tally {
     <td>
       <%= f.text_field :start_at,
                        class: "datetime_field",
-                       value: unlocalized_datetime_string(@section.start_at),
+                       value: datetime_string(@section.start_at),
                        style: 'width: 120px;',
                        "aria-labelledby" => "section_starts_at_label",
                        "data-tooltip" => "",
@@ -154,7 +154,7 @@ h3 .tally {
     <td>
       <%= f.text_field :end_at,
                        class: "datetime_field",
-                       value: unlocalized_datetime_string(@section.end_at),
+                       value: datetime_string(@section.end_at),
                        style: 'width: 120px;',
                        "aria-labelledby" => "section_ends_at_label",
                        "data-tooltip" => "",

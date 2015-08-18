@@ -123,7 +123,6 @@ define([
         }
         $.ajaxJSON(url, 'GET', {}, function(data) {
           $(".loading_module_progressions_link").remove();
-          var current_user_id = $("#identity .user_id").text();
           var $user_progression_list = $("#current_user_progression_list");
           var progressions = [];
           for(var idx in data) {
@@ -145,7 +144,7 @@ define([
               return;
             }
             var progression = data.context_module_progression;
-            if(progression.user_id == current_user_id) {
+            if (progression.user_id == window.ENV.current_user_id) {
               var $user_progression = $user_progression_list.find(".progression_" + progression.context_module_id)
 
               if($user_progression.length === 0 && $user_progression_list.length > 0) {
@@ -650,7 +649,7 @@ define([
     // -------- BINDING THE UPDATE EVENT -----------------
     $(".context_module").bind('update', function(event, data) {
       data.context_module.displayed_unlock_at = $.datetimeString(data.context_module.unlock_at);
-      data.context_module.unlock_at = $.datetimeString(data.context_module.unlock_at, { localized: false });
+      data.context_module.unlock_at = $.datetimeString(data.context_module.unlock_at);
       var $module = $("#context_module_" + data.context_module.id);
       $module.attr('aria-label', data.context_module.name);
       $module.find(".header").fillTemplateData({

@@ -104,8 +104,8 @@ define [
     # stored elsewhere).
 
     # expects: anything that $.datetimeString can handle
-    datetimeFormatted : (datetime, localized=true) ->
-      $.datetimeString(datetime, {localized: localized})
+    datetimeFormatted : (datetime) ->
+      $.datetimeString(datetime)
 
     # Strips the time information from the datetime and accounts for the user's
     # timezone preference. expects: anything tz() can handle

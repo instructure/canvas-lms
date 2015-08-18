@@ -85,19 +85,22 @@ class SubAccountsController < ApplicationController
       @accounts[account_id][:course_count] = count
     end
   end
-  
+
   def show
     @sub_account = subaccount_or_self(params[:id])
     ActiveRecord::Associations::Preloader.new(@sub_account, [{:sub_accounts => [:parent_account, :root_account]}]).run
     render :json => @sub_account.as_json(:only => [:id, :name], :methods => [:course_count, :sub_account_count],
                                          :include => [:sub_accounts => {:only => [:id, :name], :methods => [:course_count, :sub_account_count]}])
   end
-  
+
   # @API Create a new sub-account
   # Add a new sub-account to a given account.
   #
   # @argument account[name] [Required, String]
   #   The name of the new sub-account.
+  #
+  # @argument account[sis_account_id] [String]
+  #   The account's identifier in the Student Information System.
   #
   # @argument account[default_storage_quota_mb] [Integer]
   #   The default course storage quota to be used, if not otherwise specified.
@@ -119,13 +122,21 @@ class SubAccountsController < ApplicationController
     return unless authorized_action(@parent_account, @current_user, :manage_account_settings)
     @sub_account = @parent_account.sub_accounts.build(params[:account])
     @sub_account.root_account = @context.root_account
+    if params[:account][:sis_account_id]
+      can_manage_sis = @account.grants_right?(@current_user, :manage_sis)
+      if can_manage_sis
+        @sub_account.sis_source_id = params[:account][:sis_account_id]
+      else
+        return render json: { message: I18n.t("user not authorized to manage SIS data - account[sis_account_id]") }, status: 401
+      end
+    end
     if @sub_account.save
       render :json => account_json(@sub_account, @current_user, session, [])
     else
       render :json => @sub_account.errors
     end
   end
-  
+
   def update
     @sub_account = subaccount_or_self(params[:id])
     params[:account].delete(:parent_account_id)
@@ -135,7 +146,7 @@ class SubAccountsController < ApplicationController
       render :json => @sub_account.errors
     end
   end
-  
+
   def destroy
     @sub_account = subaccount_or_self(params[:id])
     if @sub_account.associated_courses.not_deleted.exists?

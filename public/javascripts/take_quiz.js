@@ -167,7 +167,6 @@ define([
               },
               // Error callback
               function(resp, ec) {
-                var current_user_id = $("#identity .user_id").text() || "none";
                 quizSubmission.currentlyBackingUp = false;
 
                 // has the user logged out?
@@ -177,6 +176,7 @@ define([
                 }
                 else {
                   // Connectivity lost?
+                  var current_user_id = window.ENV.current_user_id || "none";
                   $.ajaxJSON(
                       location.protocol + '//' + location.host + "/simple_response.json?user_id=" + current_user_id + "&rnd=" + Math.round(Math.random() * 9999999),
                       'GET', {},

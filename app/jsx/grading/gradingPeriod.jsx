@@ -75,7 +75,7 @@ function(React, $, I18n, _) {
     },
 
     formatDateForDisplay: function(date) {
-      return $.datetimeString(date, { format: 'medium', localized: false, timezone: ENV.CONTEXT_TIMEZONE });
+      return $.datetimeString(date, { format: 'medium', timezone: ENV.CONTEXT_TIMEZONE });
     },
 
     replaceInputWithDate: function(dateRef) {

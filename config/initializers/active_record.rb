@@ -69,7 +69,10 @@ class ActiveRecord::Base
         "#{Rails.root}/app/models/**/*.rb",
         "#{Rails.root}/vendor/plugins/*/app/models/**/*.rb",
         "#{Rails.root}/gems/plugins/*/app/models/**/*.rb",
-      ].sort.each { |file| ActiveSupport::Dependencies.require_or_load(file) }
+      ].sort.each do |file|
+        next if const_defined?(file.sub(%r{.*/app/models/(.*)\.rb$}, '\1').camelize)
+        ActiveSupport::Dependencies.require_or_load(file)
+      end
       ActiveRecord::Base.descendants
     end
   end

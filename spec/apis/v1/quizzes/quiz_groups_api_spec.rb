@@ -171,4 +171,31 @@ describe Quizzes::QuizGroupsController, type: :request do
       expect(order).to eq [@question3.id, @question1.id, @question2.id]
     end
   end
+
+  describe "GET /courses/:course_id/quizzes/:quiz_id/groups/:id" do
+    let(:group) { @quiz.quiz_groups.create :name => 'Test Group' }
+    let(:path) { "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/groups/#{group.id}" }
+    let(:params) do
+      {
+          :controller => "quizzes/quiz_groups",
+          :action => "show",
+          :format => "json",
+          :course_id => "#{@course.id}",
+          :quiz_id => "#{@quiz.id}",
+          :id => "#{group.id}"
+      }
+    end
+
+    it "returns a specific QuizGroup object" do
+      teacher_in_course(active_all: true)
+      res = api_call(:get, path, params)
+      expect(res['name']).to eq('Test Group')
+    end
+
+    it "should be unauthorized for unenrolled users" do
+      @user = User.create!(name: 'unenrolled user')
+      raw_api_call(:get, path, params)
+      assert_status 401
+    end
+  end
 end
