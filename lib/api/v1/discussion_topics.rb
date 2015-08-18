@@ -101,8 +101,7 @@ module Api::V1::DiscussionTopics
                     nil
                   end
 
-    { message: api_user_content(topic.message, context),
-      require_initial_post: topic.require_initial_post?,
+    fields = { require_initial_post: topic.require_initial_post?,
       user_can_see_posts: topic.user_can_see_posts?(user), podcast_url: url,
       read_state: topic.read_state(user), unread_count: topic.unread_count(user),
       subscribed: topic.subscribed?(user), topic_children: topic.child_topics.pluck(:id),
@@ -112,6 +111,15 @@ module Api::V1::DiscussionTopics
       author: user_display_json(topic.user, topic.context),
       html_url: html_url, url: html_url, pinned: !!topic.pinned,
       group_category_id: topic.group_category_id, can_group: topic.can_group? }
+    unless opts[:exclude_messages]
+      if opts[:plain_messages]
+        fields[:message] = topic.message # used for searching by body on index
+      else
+        fields[:message] = api_user_content(topic.message, context)
+      end
+    end
+
+    fields
   end
 
   # Public: Serialize discussion entries for returning a JSON response. This method,

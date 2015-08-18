@@ -328,6 +328,13 @@ class Folder < ActiveRecord::Base
     root_folders
   end
 
+  def self.is_locked?(folder_id)
+    RequestCache.cache('folder_is_locked', folder_id) do
+      folder = Folder.where(:id => folder_id).first
+      folder && folder.locked?
+    end
+  end
+
   def attachments
     file_attachments
   end

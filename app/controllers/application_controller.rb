@@ -124,6 +124,14 @@ class ApplicationController < ActionController::Base
           open_registration: @domain_root_account.try(:open_registration?)
         }
       }
+      @js_env[:IS_LARGE_ROSTER] = true if !@js_env[:IS_LARGE_ROSTER] && @context.respond_to?(:large_roster?) && @context.large_roster?
+      @js_env[:context_asset_string] = @context.try(:asset_string) if !@js_env[:context_asset_string]
+      @js_env[:ping_url] = polymorphic_url([:api_v1, @context, :ping]) if @context.is_a?(Course)
+      @js_env[:TIMEZONE] = Time.zone.tzinfo.identifier if !@js_env[:TIMEZONE]
+      @js_env[:CONTEXT_TIMEZONE] = @context.time_zone.tzinfo.identifier if !@js_env[:CONTEXT_TIMEZONE] && @context.respond_to?(:time_zone) && @context.time_zone.present?
+      @js_env[:LOCALE] = I18n.qualified_locale if !@js_env[:LOCALE]
+      @js_env[:TOURS] = tours_to_run
+
       @js_env[:lolcalize] = true if ENV['LOLCALIZE']
     end
 
@@ -134,13 +142,7 @@ class ApplicationController < ActionController::Base
         @js_env[k] = v
       end
     end
-    @js_env[:IS_LARGE_ROSTER] = true if !@js_env[:IS_LARGE_ROSTER] && @context.respond_to?(:large_roster?) && @context.large_roster?
-    @js_env[:context_asset_string] = @context.try(:asset_string) if !@js_env[:context_asset_string]
-    @js_env[:ping_url] = polymorphic_url([:api_v1, @context, :ping]) if @context.is_a?(Course)
-    @js_env[:TIMEZONE] = Time.zone.tzinfo.identifier if !@js_env[:TIMEZONE]
-    @js_env[:CONTEXT_TIMEZONE] = @context.time_zone.tzinfo.identifier if !@js_env[:CONTEXT_TIMEZONE] && @context.respond_to?(:time_zone) && @context.time_zone.present?
-    @js_env[:LOCALE] = I18n.qualified_locale if !@js_env[:LOCALE]
-    @js_env[:TOURS] = tours_to_run
+
     @js_env
   end
   helper_method :js_env

@@ -196,7 +196,7 @@ module Api::V1::Assignment
         assignment.discussion_topic.context,
         user,
         session,
-        include_assignment: false)
+        include_assignment: false, exclude_messages: opts[:exclude_description])
     end
 
     if opts[:include_all_dates] && assignment.assignment_overrides
