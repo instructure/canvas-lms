@@ -859,7 +859,7 @@ class RoleOverride < ActiveRecord::Base
         accounts = context.account_chain
         overrides = RoleOverride.where(:context_id => accounts, :context_type => 'Account', :role_id => role)
 
-        unless accounts.include?(Account.site_admin)
+        if role_context == Account.site_admin && !accounts.include?(Account.site_admin)
           accounts << Account.site_admin
           overrides += Account.site_admin.role_overrides.where(:role_id => role)
         end
