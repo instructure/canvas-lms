@@ -64,7 +64,7 @@ gem 'mini_magick', '1.3.2'
   gem 'subexec', '0.0.4', require: false
 gem 'multi_json', '1.10.1'
 gem 'netaddr', '1.5.0', require: false
-gem 'nokogiri', '1.6.6.2', require: false
+gem 'nokogiri', '1.6.6.2.20150813143452', require: false, github: 'codekitchen/nokogiri', ref: 'd47e53f885'
 # oauth gem, with rails3 fixes rolled in
 gem 'oauth-instructure', '0.4.10', require: false
 gem 'oauth2', '1.0.0', require: false
@@ -75,14 +75,14 @@ gem 'flamegraph', '0.1.0', require: false
   gem 'stackprof', '0.2.7', require: false
 gem 'rake', '10.4.2'
 gem 'rdoc', '3.12'
-gem 'ratom', '0.9.0', require: false
+gem 'ratom-nokogiri', '0.10.3', require: false
 gem 'rdiscount', '1.6.8', require: false
 gem 'ritex', '1.0.1', require: false
 
 gem 'rotp', '1.6.1', require: false
 gem 'net-ldap', '0.10.1', require: false
 gem 'ruby-duration', '3.2.0', require: false
-gem 'ruby-saml-mod', '0.2.5'
+gem 'ruby-saml-mod', '0.2.7'
 gem 'rubycas-client', '2.3.9', require: false
 gem 'rubyzip', '1.1.1', require: 'zip'
 gem 'zip-zip', '0.2' # needed until plugins use the new namespace
