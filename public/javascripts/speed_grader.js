@@ -148,7 +148,7 @@ define([
       // this is for backwards compatability, we used to store the value as
       // strings "true" or "false", but now we store boolean true/false values.
       var settingVal = userSettings.get("eg_hide_student_names");
-      return settingVal === true || settingVal === "true" || window.anonymousAssignment;
+      return settingVal === true || settingVal === "true" || ENV.force_anonymous_grading;
     }
   };
 

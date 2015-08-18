@@ -17,6 +17,15 @@
 #
 
 module GradebooksHelper
+  def force_anonymous_grading?(assignment)
+    anonymous_assignment =
+      assignment.quiz &&
+      assignment.quiz.survey? &&
+      assignment.quiz.anonymous_submissions
+
+    !!anonymous_assignment
+  end
+
   def ungraded_submission_icon_attributes_for(submission_type)
     case submission_type
     when 'online_url'

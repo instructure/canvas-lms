@@ -439,6 +439,7 @@ class GradebooksController < ApplicationController
         env = {
           :CONTEXT_ACTION_SOURCE => :speed_grader,
           :settings_url => speed_grader_settings_course_gradebook_path,
+          :force_anonymous_grading => force_anonymous_grading?(@assignment),
         }
         if @assignment.quiz
           env[:quiz_history_url] = course_quiz_history_path @context.id,
