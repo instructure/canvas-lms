@@ -90,7 +90,8 @@ class ActiveRecord::Base
     'failed_jobs' => %w(original_id).freeze,
     'gradebook_uploads' => %w(context_type context_id).freeze,
     'grading_periods' => %w(course_id account_id).freeze,
-    'groups' => %w(sis_name type groupable_id groupable_type).freeze,
+    'groups' => %w(sis_name type groupable_id groupable_type hashtag
+                   show_public_context_messages).freeze,
     'messages' => %w(cc bcc).freeze,
     'notification_policies' => %w(user_id broadcast).freeze,
     'page_views' => %w(contributed).freeze,
