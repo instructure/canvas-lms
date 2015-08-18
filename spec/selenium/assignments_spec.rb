@@ -550,6 +550,13 @@ describe "assignments" do
         expect(f('#assignment_post_to_sis')).to be_nil
       end
     end
+
+    it 'should go to the assignment index page from left nav', priority: "1", test_id: 108724 do
+      get "/courses/#{@course.id}"
+      f('#wrapper .assignments').click
+      wait_for_ajaximations
+      expect(f('.header-bar-right .new_assignment')).to include_text('Assignment')
+    end
   end
 
   context "when a public course is accessed" do
