@@ -4,7 +4,8 @@ module AccountServices
         :google_docs => {
             :name => I18n.t("Google Docs"),
             :description => "",
-            :expose_to_ui => (GoogleDocs::Connection.config ? :service : false)
+            :expose_to_ui => :service,
+            :expose_to_ui_proc => proc { !!GoogleDocs::Connection.config }
         },
         :google_drive => {
             :name => I18n.t("Google Drive"),
@@ -24,17 +25,20 @@ module AccountServices
         :linked_in => {
             :name => I18n.t("LinkedIn"),
             :description => "",
-            :expose_to_ui => (LinkedIn::Connection.config ? :service : false)
+            :expose_to_ui => :service,
+            :expose_to_ui_proc => proc { !!LinkedIn::Connection.config }
         },
         :twitter => {
             :name => I18n.t("Twitter"),
             :description => "",
-            :expose_to_ui => (Twitter::Connection.config ? :service : false)
+            :expose_to_ui => :service,
+            :expose_to_ui_proc => proc { !!Twitter::Connection.config }
         },
         :yo => {
             :name => I18n.t("Yo"),
             :description => "",
-            :expose_to_ui => (Canvas::Plugin.find(:yo).try(:enabled?) ? :service : false)
+            :expose_to_ui => :service,
+            :expose_to_ui_proc => proc { !!Canvas::Plugin.find(:yo).try(:enabled?) }
         },
         :delicious => {
             :name => I18n.t("Delicious"),
@@ -44,7 +48,8 @@ module AccountServices
         :diigo => {
             :name => I18n.t("Diigo"),
             :description => "",
-            :expose_to_ui => (Diigo::Connection.config ? :service : false)
+            :expose_to_ui => :service,
+            :expose_to_ui_proc => proc { !!Diigo::Connection.config }
         },
         # TODO: move avatars to :settings hash, it makes more sense there
         # In the meantime, we leave it as a service but expose it in the

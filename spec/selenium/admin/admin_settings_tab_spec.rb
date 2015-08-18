@@ -10,7 +10,10 @@ describe "admin settings tab" do
   def get_default_services
     default_services = []
     service_hash = Account.default.allowed_services_hash
-    service_hash.each { |k, v| default_services.push k if  v[:expose_to_ui] }
+    service_hash.each do |k, v|
+      default_services.push k if v[:expose_to_ui] &&
+        (!v[:expose_to_ui_proc] || v[:expose_to_ui_proc].call(@user, Account.default))
+    end
     default_services
   end
 
