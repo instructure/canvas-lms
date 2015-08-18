@@ -1028,27 +1028,29 @@ class DiscussionTopic < ActiveRecord::Base
   #
   # Returns a boolean.
   def visible_for?(user = nil)
-    # user is the topic's author
-    return true if user == self.user
+    RequestCache.cache('discussion_visible_for', self, user) do
+      # user is the topic's author
+      return true if user == self.user
 
-    # user is an admin in the context (teacher/ta/designer) OR
-    # user is an account admin with appropriate permission
-    return true if context.grants_any_right?(user, :manage, :read_course_content)
+      # user is an admin in the context (teacher/ta/designer) OR
+      # user is an account admin with appropriate permission
+      return true if context.grants_any_right?(user, :manage, :read_course_content)
 
-    # assignment exists and isnt assigned to user (differentiated assignments)
-    if for_assignment? && !self.assignment.visible_to_user?(user)
-      return false
-    end
+      # assignment exists and isnt assigned to user (differentiated assignments)
+      if for_assignment? && !self.assignment.visible_to_user?(user)
+        return false
+      end
 
-    # topic is not published
-    if !published?
-      false
-    elsif is_announcement && unlock_at = available_from_for(user)
-    # unlock date exists and has passed
-      unlock_at < Time.now.utc
-    # everything else
-    else
-      true
+      # topic is not published
+      if !published?
+        false
+      elsif is_announcement && unlock_at = available_from_for(user)
+      # unlock date exists and has passed
+        unlock_at < Time.now.utc
+      # everything else
+      else
+        true
+      end
     end
   end
 

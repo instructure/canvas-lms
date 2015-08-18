@@ -241,14 +241,17 @@ class Enrollment < ActiveRecord::Base
 
 
   def self.readable_types
-    {
-      'TeacherEnrollment' => t('#enrollment.roles.teacher', "Teacher"),
-      'TaEnrollment' => t('#enrollment.roles.ta', "TA"),
-      'DesignerEnrollment' => t('#enrollment.roles.designer', "Designer"),
-      'StudentEnrollment' => t('#enrollment.roles.student', "Student"),
-      'StudentViewEnrollment' => t('#enrollment.roles.student', "Student"),
-      'ObserverEnrollment' => t('#enrollment.roles.observer', "Observer")
-    }
+    # with enough use, even translations can add up
+    RequestCache.cache('enrollment_readable_types') do
+      {
+        'TeacherEnrollment' => t('#enrollment.roles.teacher', "Teacher"),
+        'TaEnrollment' => t('#enrollment.roles.ta', "TA"),
+        'DesignerEnrollment' => t('#enrollment.roles.designer', "Designer"),
+        'StudentEnrollment' => t('#enrollment.roles.student', "Student"),
+        'StudentViewEnrollment' => t('#enrollment.roles.student', "Student"),
+        'ObserverEnrollment' => t('#enrollment.roles.observer', "Observer")
+      }
+    end
   end
 
   def self.readable_type(type)
