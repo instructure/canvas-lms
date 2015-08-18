@@ -12509,8 +12509,8 @@ es:
         description: Ocultar
     options_2: 
       description: "Programar la disponibilidad de los alumnos"
-  resume_quiz_afeceb87: "Resumir la evaluación"
-  resume_survey_58dce775: "Resumir la encuesta"
+  resume_quiz_afeceb87: "Continuar la evaluación"
+  resume_survey_58dce775: "Continuar la encuesta"
   retrieve_timeout: "no se pudo recuperar la configuración, el tiempo de respuesta del servidor ha finalizado"
   rich_content_editor_2708ef21: "Editor de contenido enriquecido"
   role: 
