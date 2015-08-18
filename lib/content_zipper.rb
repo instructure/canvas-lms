@@ -100,21 +100,41 @@ class ContentZipper
     ContentZipper.new.zip_eportfolio(*args)
   end
 
-  StaticAttachment = Struct.new(:display_name,
-                                :filename,
-                                :content_type,
-                                :uuid,
-                                :id,
-                                :attachment)
+  class StaticAttachment
+    attr_accessor :display_name, :filename, :unencoded_filename,
+                  :content_type, :uuid, :id, :attachment
+
+    # Match on /files URLs capturing the object id.
+    FILES_REGEX = %r{/files/(?<obj_id>\d+)/\w+(?:(?:[^\s"<'\?\/]*)([^\s"<']*))?}
+
+    def initialize(attachment, idx = nil)
+      @attachment = attachment
+
+      @display_name = @attachment.display_name
+      @filename = idx ? "#{idx}_#{@attachment.filename}" : @attachment.filename
+      @unencoded_filename = idx ? "#{idx}_#{@attachment.unencoded_filename}" : @attachment.unencoded_filename
+      @content_type = @attachment.content_type
+      @uuid = @attachment.uuid
+      @id = @attachment.id
+    end
+  end
 
   def zip_eportfolio(zip_attachment, portfolio)
     static_attachments = []
+    rich_text_attachments = []
     submissions = []
-    portfolio.eportfolio_entries.each do |entry|
+
+    portfolio_entries = portfolio.eportfolio_entries
+
+    idx = 1
+    portfolio_entries.each do |entry|
+      entry.readonly!
+
+      idx = rewrite_eportfolio_richtext_entry(idx, rich_text_attachments, entry)
       static_attachments += entry.attachments
       submissions += entry.submissions
     end
-    idx = 1
+
     submissions_hash = {}
     submissions.each do |s|
       submissions_hash[s.id] = s
@@ -124,30 +144,27 @@ class ContentZipper
       end
     end
     static_attachments = static_attachments.uniq.map do |a|
-      obj = StaticAttachment.new
-      obj.display_name = a.display_name
-      obj.filename = "#{idx}_#{a.filename}"
-      obj.content_type = a.content_type
-      obj.uuid = a.uuid
-      obj.id = a.id
-      obj.attachment = a
+      obj = StaticAttachment.new(a, idx)
       idx += 1
       obj
     end
+
+    all_attachments = rich_text_attachments + static_attachments
+
     filename = portfolio.name
     make_zip_tmpdir(filename) do |zip_name|
       idx = 0
-      count = static_attachments.length + 2
+      count = all_attachments.length + 2
       Zip::File.open(zip_name, Zip::File::CREATE) do |zipfile|
         update_progress(zip_attachment, idx, count)
-        portfolio.eportfolio_entries.each do |entry|
+        portfolio_entries.each do |entry|
           filename = "#{entry.full_slug}.html"
-          content = render_eportfolio_page_content(entry, portfolio, static_attachments, submissions_hash)
+          content = render_eportfolio_page_content(entry, portfolio, all_attachments, submissions_hash)
           zipfile.get_output_stream(filename) {|f| f.puts content }
         end
         update_progress(zip_attachment, idx, count)
-        static_attachments.each do |a|
-          add_attachment_to_zip(a.attachment, zipfile, a.filename)
+        all_attachments.each do |a|
+          add_attachment_to_zip(a.attachment, zipfile, a.unencoded_filename)
           update_progress(zip_attachment, idx, count)
         end
         content = File.open(Rails.root.join('public', 'images', 'logo.png'), 'rb').read rescue nil
@@ -168,6 +185,31 @@ class ContentZipper
     av.extend TextHelper
     res = av.render(:partial => "eportfolios/static_page", :locals => {:page => page, :portfolio => portfolio, :static_attachments => static_attachments, :submissions_hash => submissions_hash})
     res
+  end
+
+  def rewrite_eportfolio_richtext_entry(idx, attachments, entry)
+    # In each rich_text section, find any referenced images, replace
+    # the text with the image name, and add the image to the
+    # attachments to be downloaded. If the rich_text attachment
+    # can't be found, don't modify the the HTML, live with the
+    # broken link, but have a mostly correct zip file.
+    #
+    # All other attachments toss on the static attachment pile for
+    # later processing.
+    entry.content.select { |c| c[:section_type] == "rich_text" }.each do |rt|
+      rt[:content].gsub!(StaticAttachment::FILES_REGEX) do |match|
+        att = Attachment.find_by_id(Regexp.last_match(:obj_id))
+        if att.nil?
+          match
+        else
+          sa = StaticAttachment.new(att, idx)
+          attachments << sa
+          idx += 1
+          sa.unencoded_filename
+        end
+      end
+    end
+    return idx
   end
 
   def self.zip_base_folder(*args)
