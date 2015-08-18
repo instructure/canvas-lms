@@ -42,7 +42,7 @@ module Canvas
     end
 
     def self.capture_exception(type, exception)
-      self.capture(exception, {tags: {type: type.to_s}})
+      self.capture(exception, {type: type})
     end
 
     # This is really just for clearing out the registry during tests,

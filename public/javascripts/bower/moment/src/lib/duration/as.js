@@ -1,4 +1,4 @@
-import { daysToMonths, monthsToDays } from './bubble';
+import { daysToYears, yearsToDays } from './bubble';
 import { normalizeUnits } from '../units/aliases';
 import toInt from '../utils/to-int';
 
@@ -11,11 +11,11 @@ export function as (units) {
 
     if (units === 'month' || units === 'year') {
         days   = this._days   + milliseconds / 864e5;
-        months = this._months + daysToMonths(days);
+        months = this._months + daysToYears(days) * 12;
         return units === 'month' ? months : months / 12;
     } else {
         // handle milliseconds separately because of floating point math errors (issue #1867)
-        days = this._days + Math.round(monthsToDays(this._months));
+        days = this._days + Math.round(yearsToDays(this._months / 12));
         switch (units) {
             case 'week'   : return days / 7     + milliseconds / 6048e5;
             case 'day'    : return days         + milliseconds / 864e5;

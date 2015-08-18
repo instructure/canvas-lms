@@ -4,7 +4,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
 require File.expand_path(File.dirname(__FILE__) + '/../helpers/outcome_common')
 
 describe "account admin outcomes" do
-  include_context "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
   let(:outcome_url) { "/accounts/#{Account.default.id}/outcomes" }
   let(:who_to_login) { 'admin' }
   let(:account) { Account.default }
@@ -15,60 +15,61 @@ describe "account admin outcomes" do
 
     context "create/edit/delete outcomes" do
 
-      it "should create a learning outcome with a new rating (root level)", priority: "1", test_id: 250229 do
+      it "should create a learning outcome with a new rating (root level)" do
         should_create_a_learning_outcome_with_a_new_rating_root_level
       end
 
-      it "should create a learning outcome (nested)", priority: "1", test_id: 250230 do
+      it "should create a learning outcome (nested)" do
         should_create_a_learning_outcome_nested
       end
 
-      it "should edit a learning outcome and delete a rating", priority: "1", test_id: 250231 do
+      it "should edit a learning outcome and delete a rating" do
+        skip('193')
         should_edit_a_learning_outcome_and_delete_a_rating
       end
 
-      it "should delete a learning outcome", priority: "1", test_id: 250232 do
+      it "should delete a learning outcome" do
         should_delete_a_learning_outcome
       end
 
-      it "should validate mastery points", priority: "1", test_id: 250233 do
+      it "should validate mastery points" do
         should_validate_mastery_points
       end
 
-      it "should_validate_calculation_method_dropdown", priority: "2", test_id: 250234 do
+      it "should_validate_calculation_method_dropdown", priority: "1", test_id: 162376 do
         should_validate_calculation_method_dropdown
       end
 
-      it "should validate decaying average", priority: "2", test_id: 250235 do
+      it "should validate decaying average", priority: "1", test_id: 162377 do
         should_validate_decaying_average
       end
 
-      it "should validate n mastery", priority: "2", test_id: 250236 do
+      it "should validate n mastery", priority: "1", test_id: 162378 do
         should_validate_n_mastery
       end
     end
 
     context "create/edit/delete outcome groups" do
 
-      it "should create an outcome group (root level)", priority: "2", test_id: 56016 do
+      it "should create an outcome group (root level)" do
         should_create_an_outcome_group_root_level
       end
 
-      it "should create an outcome group (nested)", priority: "2", test_id: 250237 do
-        should_create_an_outcome_group_nested
+      it "should create a learning outcome with a new rating (nested)" do
+        should_create_a_learning_outcome_with_a_new_rating_nested
       end
 
-      it "should edit an outcome group", priority: "2", test_id: 114335  do
+      it "should edit an outcome group" do
         should_edit_an_outcome_group
       end
 
-      it "should delete an outcome group", priority: "2", test_id: 250238 do
+      it "should delete an outcome group" do
         should_delete_an_outcome_group
       end
     end
 
     describe "find/import dialog" do
-      it "should not allow importing top level groups", priority: "2", test_id: 250239 do
+      it "should not allow importing top level groups" do
         get outcome_url
         wait_for_ajaximations
 

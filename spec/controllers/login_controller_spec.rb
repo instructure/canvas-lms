@@ -47,9 +47,7 @@ describe LoginController do
       Account.default.auth_discovery_url = 'https://google.com/'
       Account.default.save!
 
-      flash_hash = ActionDispatch::Flash::FlashHash.new
-      flash_hash[:delegated_message] = 'hi'
-      controller.stubs(:flash).returns(flash_hash)
+      controller.stubs(:flash).returns(delegated_message: 'hi')
       get 'new'
       expect(response).to redirect_to('https://google.com/?message=hi')
     end

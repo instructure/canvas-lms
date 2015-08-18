@@ -21,11 +21,11 @@ export default moment.defineLocale('sq', {
     },
     longDateFormat : {
         LT : 'HH:mm',
-        LTS : 'HH:mm:ss',
+        LTS : 'LT:ss',
         L : 'DD/MM/YYYY',
         LL : 'D MMMM YYYY',
-        LLL : 'D MMMM YYYY HH:mm',
-        LLLL : 'dddd, D MMMM YYYY HH:mm'
+        LLL : 'D MMMM YYYY LT',
+        LLLL : 'dddd, D MMMM YYYY LT'
     },
     calendar : {
         sameDay : '[Sot në] LT',

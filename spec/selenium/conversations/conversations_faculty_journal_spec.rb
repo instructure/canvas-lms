@@ -1,9 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../helpers/conversations_common')
 
 describe "conversations new" do
-  include_context "in-process server selenium tests"
-  let(:account) { Account.default }
-  let(:account_settings_url) { "/accounts/#{account.id}/settings" }
+  include_examples "in-process server selenium tests"
 
   before do
     conversation_setup
@@ -15,18 +13,7 @@ describe "conversations new" do
     @group.users = [@s1, @s2]
   end
 
-  context "Course with Faculty Journal not enabled" do
-    it "should allow a site admin to enable faculty journal", priority: "2", test_id: 75005 do
-      site_admin_logged_in
-      get account_settings_url
-      f('#account_enable_user_notes').click
-      f('.btn.btn-primary[type="submit"]').click
-      wait_for_ajaximations
-      expect(is_checked('#account_enable_user_notes')).to be_truthy
-    end
-  end
-
-  context "Faculty Journal" do
+  context "faculty journal" do
     before(:each) do
       @course.account.update_attribute(:enable_user_notes, true)
       user_session(@teacher)

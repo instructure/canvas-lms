@@ -72,8 +72,7 @@ module Canvas::Migration
       end
     rescue
       # Not a valid archive file
-      raise Canvas::Migration::Error, I18n.t(:package_error,
-          "Error identifying package type: %{error}", :error => $!.message), $!.backtrace
+      :invalid_archive
     end
 
     private
@@ -89,11 +88,11 @@ module Canvas::Migration
         :unknown
       end
     end
-
+    
     def has_namespace(node, namespace)
       node.namespaces.values.any?{|ns|ns =~ /#{namespace}/i}
     end
-
+    
     def find_converter
       if plugin = Canvas::Plugin.all_for_tag(:export_system).find{|p|p.settings[:provides] && p.settings[:provides][@type]}
         return plugin.settings[:provides][@type]

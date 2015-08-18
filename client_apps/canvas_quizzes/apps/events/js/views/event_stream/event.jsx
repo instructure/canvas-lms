@@ -153,7 +153,6 @@ define(function(require) {
 
     renderQuestionAnchor: function(record) {
       var id;
-      var question;
       var position;
 
       if (typeof record === 'object') {
@@ -163,11 +162,9 @@ define(function(require) {
         id = record;
       }
 
-      question = this.props.questions.filter(function(q) {
+      position = this.props.questions.filter(function(q) {
         return q.id === id;
-      })[0];
-
-      position = question && question.position
+      })[0].position;
 
       return (
         <Link

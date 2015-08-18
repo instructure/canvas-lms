@@ -1,12 +1,11 @@
 import zeroFill from '../utils/zero-fill';
 import { createDuration } from '../duration/create';
 import { addSubtract } from '../moment/add-subtract';
-import { isMoment, copyConfig } from '../moment/constructor';
+import { isMoment } from '../moment/constructor';
 import { addFormatToken } from '../format/format';
 import { addRegexToken, matchOffset } from '../parse/regex';
 import { addParseToken } from '../parse/token';
 import { createLocal } from '../create/local';
-import { prepareConfig } from '../create/from-anything';
 import { createUTC } from '../create/utc';
 import isDate from '../utils/is-date';
 import toInt from '../utils/to-int';
@@ -68,6 +67,7 @@ export function cloneWithOffset(input, model) {
     } else {
         return createLocal(input).local();
     }
+    return model._isUTC ? createLocal(input).zone(model._offset || 0) : createLocal(input).local();
 }
 
 function getDateOffset (m) {
@@ -167,7 +167,12 @@ export function setOffsetToParsedOffset () {
 }
 
 export function hasAlignedHourOffset (input) {
-    input = input ? createLocal(input).utcOffset() : 0;
+    if (!input) {
+        input = 0;
+    }
+    else {
+        input = createLocal(input).utcOffset();
+    }
 
     return (this.utcOffset() - input) % 60 === 0;
 }
@@ -180,24 +185,12 @@ export function isDaylightSavingTime () {
 }
 
 export function isDaylightSavingTimeShifted () {
-    if (typeof this._isDSTShifted !== 'undefined') {
-        return this._isDSTShifted;
+    if (this._a) {
+        var other = this._isUTC ? createUTC(this._a) : createLocal(this._a);
+        return this.isValid() && compareArrays(this._a, other.toArray()) > 0;
     }
 
-    var c = {};
-
-    copyConfig(c, this);
-    c = prepareConfig(c);
-
-    if (c._a) {
-        var other = c._isUTC ? createUTC(c._a) : createLocal(c._a);
-        this._isDSTShifted = this.isValid() &&
-            compareArrays(c._a, other.toArray()) > 0;
-    } else {
-        this._isDSTShifted = false;
-    }
-
-    return this._isDSTShifted;
+    return false;
 }
 
 export function isLocal () {

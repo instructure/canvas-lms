@@ -1,12 +1,11 @@
 define [
   'compiled/views/groups/manage/PopoverMenuView'
-  'compiled/views/groups/manage/GroupCategoryCloneView'
   'compiled/models/GroupUser'
   'jst/groups/manage/assignToGroupMenu'
   'jquery'
   'underscore'
   'compiled/jquery/outerclick'
-], (PopoverMenuView, GroupCategoryCloneView, GroupUser, template, $, _) ->
+], (PopoverMenuView, GroupUser, template, $, _) ->
 
   class AssignToGroupMenu extends PopoverMenuView
 
@@ -32,25 +31,6 @@ define [
       e.preventDefault()
       e.stopPropagation()
       newGroupId = $(e.currentTarget).data('group-id')
-      userId = @model.id
-
-      if @collection.get(newGroupId).get("has_submission")
-        @cloneCategoryView = new GroupCategoryCloneView
-            model: @model.collection.category
-            openedFromCaution: true
-        @cloneCategoryView.open()
-        @cloneCategoryView.on "close", =>
-            if @cloneCategoryView.cloneSuccess
-              window.location.reload()
-            else if @cloneCategoryView.changeGroups
-              @moveUser(newGroupId)
-            else
-              $("[data-user-id='#{userId}']").focus()
-              @hide()
-      else
-        @moveUser(newGroupId)
-
-    moveUser: (newGroupId) ->
       @collection.category.reassignUser(@model, @collection.get(newGroupId))
       @hide()
 

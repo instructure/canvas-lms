@@ -44,8 +44,13 @@ define([
         )
       } else {
         return (
-          <td className="links text-right e-tool-table-data" nowrap="nowrap" >
-            <ExternalToolPlacementButton ref="externalToolPlacementButton" tool={this.props.tool} type="button"/>
+          <td className="links text-right" nowrap="nowrap" style={{lineHeight: '33px'}}>
+            <span className="text-muted">
+              <i className="icon-lock"
+                ref="lockIcon"
+                data-tooltip="left"
+                title={I18n.t('Installed by Admin')}></i>
+            </span>
           </td>
         );
       }
@@ -61,24 +66,10 @@ define([
       }
     },
 
-    locked() {
-      if (!this.props.tool.installed_locally) {
-        return (
-          <span className="text-muted">
-            <i className="icon-lock"
-               ref="lockIcon"
-               data-tooltip="top"
-               title={I18n.t('Installed by Admin')}></i>
-          </span>
-        );
-      }
-    },
-
     render() {
       return (
         <tr className="ExternalToolsTableRow external_tool_item">
-          <td className="e-tool-table-data center-text">{this.locked()}</td>
-          <td scope="row" nowrap="nowrap" className={this.nameClassNames() + " e-tool-table-data"} title={this.props.tool.name}>
+          <td scope="row" nowrap="nowrap" className={this.nameClassNames()} title={this.props.tool.name} style={{lineHeight: '33px'}}>
             {this.props.tool.name} {this.disabledFlag()}
           </td>
           {this.renderButtons()}

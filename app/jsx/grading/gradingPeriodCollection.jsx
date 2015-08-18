@@ -203,7 +203,8 @@ function(React, GradingPeriod, $, I18n, _, ConvertCase) {
     },
 
     updateGradingPeriodCollection: function(updatedGradingPeriodComponent) {
-      var attrs = $.extend(true, {}, updatedGradingPeriodComponent.props, updatedGradingPeriodComponent.state);
+      var props = updatedGradingPeriodComponent.props
+      var attrs = $.extend(true, props, updatedGradingPeriodComponent.state);
       var id = updatedGradingPeriodComponent.state.id;
       var existingGradingPeriod = this.getPeriodById(id);
       var indexToUpdate = this.state.periods.indexOf(existingGradingPeriod);

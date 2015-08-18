@@ -27,7 +27,6 @@ class ContentZipper
     @check_user = options.has_key?(:check_user) ? options[:check_user] : true
     @logger = Rails.logger
   end
-  attr_writer :user
 
   # we evaluate some ERB templates from under app/views/ while generating assignment zips
   include I18nUtilities

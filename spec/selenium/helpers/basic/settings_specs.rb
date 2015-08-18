@@ -1,11 +1,12 @@
-shared_examples_for "settings basic tests" do |is_sub_account|
-  include_context "in-process server selenium tests"
+shared_examples_for "settings basic tests" do
+  include_examples "in-process server selenium tests"
 
-  before(:each) do
+  before (:each) do
     course_with_admin_logged_in
   end
 
   context "admins tab" do
+
     def add_account_admin
       address = "student1@example.com"
       f(".add_users_link").click
@@ -24,16 +25,16 @@ shared_examples_for "settings basic tests" do |is_sub_account|
       admin.id
     end
 
-    before(:each) do
+    before (:each) do
       get "/accounts/#{account.id}/settings"
       f("#tab-users-link").click
     end
 
-    it "should add an account admin", priority: "1", test_id: pick_test_id(is_sub_account, 249780, 251030) do
+    it "should add an account admin" do
       add_account_admin
     end
 
-    it "should delete an account admin", priority: "1", test_id: pick_test_id(is_sub_account, 249781, 251031) do
+    it "should delete an account admin" do
       admin_id = add_account_admin
       f("#enrollment_#{admin_id} .remove_account_user_link").click
       driver.switch_to.alert.accept
@@ -43,18 +44,19 @@ shared_examples_for "settings basic tests" do |is_sub_account|
   end
 
   context "account settings" do
+
     def click_submit
       submit_form("#account_settings")
       wait_for_ajax_requests
     end
 
-    before(:each) do
+    before (:each) do
       course_with_admin_logged_in
-      group_model(context: @course)
+      group_model(:context => @course)
       get account_settings_url
     end
 
-    it "should change the account name", priority: "1", test_id: pick_test_id(is_sub_account, 249782, 251032) do
+    it "should change the account name " do
       new_account_name = 'new default account name'
       replace_content(f("#account_name"), new_account_name)
       click_submit
@@ -63,7 +65,7 @@ shared_examples_for "settings basic tests" do |is_sub_account|
       expect(f("#account_name")).to have_value(new_account_name)
     end
 
-    it "should change the default quotas", priority: "1", test_id: pick_test_id(is_sub_account, 250003, 251033) do
+    it "should change the default quotas" do
       f('#tab-quotas-link').click
 
       # update the quotas
@@ -96,7 +98,33 @@ shared_examples_for "settings basic tests" do |is_sub_account|
       expect(fj('[name="default_group_storage_quota_mb"]')).to have_value(group_quota.to_s) # fj to avoid selenium caching
     end
 
-    it "should manually change a course quota", priority: "1", test_id: pick_test_id(is_sub_account, 250004, 251034) do
+    it "should change the default user quota" do
+      if account.root_account?
+        f('#tab-quotas-link').click
+
+        # update the quotas
+        user_quota = account.default_user_storage_quota_mb
+        user_quota_input = f('[name="default_user_storage_quota_mb"]')
+        expect(user_quota_input).to have_value(user_quota.to_s)
+
+        user_quota += 15
+        replace_content(user_quota_input, user_quota.to_s)
+
+        submit_form('#default-quotas')
+        wait_for_ajax_requests
+
+        # ensure the account was updated properly
+        account.reload
+        account.default_user_storage_quota_mb == user_quota
+        expect(account.default_user_storage_quota).to eq user_quota * 1048576
+
+        # ensure the new value is reflected after a refresh
+        get account_settings_url
+        expect(fj('[name="default_user_storage_quota_mb"]')).to have_value(user_quota.to_s) # fj to avoid selenium caching
+      end
+    end
+
+    it "should manually change a course quota" do
       f('#tab-quotas-link').click
 
       # find the course by id
@@ -123,7 +151,7 @@ shared_examples_for "settings basic tests" do |is_sub_account|
       expect(@course.storage_quota_mb).to eq 42
     end
 
-    it "should manually change a group quota", priority: "1", test_id: pick_test_id(is_sub_account, 250005, 251035) do
+    it "should manually change a group quota" do
       f('#tab-quotas-link').click
 
       # find the course by id
@@ -150,7 +178,7 @@ shared_examples_for "settings basic tests" do |is_sub_account|
       expect(@group.storage_quota_mb).to eq 42
     end
 
-    it "should change the default language to spanish", priority: "1", test_id: pick_test_id(is_sub_account, 250006, 251036) do
+    it "should change the default language to spanish" do
       f("#account_default_locale option[value='es']").click
       click_submit
       account.reload
@@ -158,8 +186,4 @@ shared_examples_for "settings basic tests" do |is_sub_account|
       expect(get_value('#account_default_locale')).to eq 'es'
     end
   end
-end
-
-def pick_test_id(is_sub_account, truthy_id, falsy_id)
-  is_sub_account ? truthy_id : falsy_id
 end

@@ -29,10 +29,7 @@ addRegexToken('YYYY',   match1to4, match4);
 addRegexToken('YYYYY',  match1to6, match6);
 addRegexToken('YYYYYY', match1to6, match6);
 
-addParseToken(['YYYYY', 'YYYYYY'], YEAR);
-addParseToken('YYYY', function (input, array) {
-    array[YEAR] = input.length === 2 ? hooks.parseTwoDigitYear(input) : toInt(input);
-});
+addParseToken(['YYYY', 'YYYYY', 'YYYYYY'], YEAR);
 addParseToken('YY', function (input, array) {
     array[YEAR] = hooks.parseTwoDigitYear(input);
 });
@@ -60,3 +57,4 @@ export var getSetYear = makeGetSet('FullYear', false);
 export function getIsLeapYear () {
     return isLeapYear(this.year());
 }
+

@@ -78,7 +78,9 @@ export function getSetGlobalLocale (key, values) {
 export function defineLocale (name, values) {
     if (values !== null) {
         values.abbr = name;
-        locales[name] = locales[name] || new Locale();
+        if (!locales[name]) {
+            locales[name] = new Locale();
+        }
         locales[name].set(values);
 
         // backwards compat for now: also set the locale

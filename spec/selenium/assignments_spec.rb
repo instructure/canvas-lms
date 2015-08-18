@@ -1,12 +1,11 @@
 ﻿require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/assignments_common')
-require File.expand_path(File.dirname(__FILE__) + '/helpers/public_courses_context')
 
 describe "assignments" do
 
   # note: due date testing can be found in assignments_overrides_spec
 
-  include_context "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   context "as a teacher" do
 
@@ -508,13 +507,30 @@ describe "assignments" do
     end
 
     context 'save to sis' do
-      it 'should not show when no passback configured', priority: "1", test_id: 244956 do
+      def create_post_grades_tool(opts = {})
+        post_grades_tool = @course.context_external_tools.create!(
+          name: opts[:name] || 'test tool',
+          domain: 'example.com',
+          url: 'http://example.com/lti',
+          consumer_key: 'key',
+          shared_secret: 'secret',
+          settings: {
+            post_grades: {
+              url: 'http://example.com/lti/post_grades'
+            }
+          }
+        )
+        post_grades_tool.context_external_tool_placements.create!(placement_type: 'post_grades')
+        post_grades_tool
+      end
+
+      it 'should not show when no passback configured' do
         get "/courses/#{@course.id}/assignments/new"
         wait_for_ajaximations
         expect(f('#assignment_post_to_sis')).to be_nil
       end
 
-      it 'should show when powerschool is enabled', priority: "1", test_id: 244913 do
+      it 'should show when powerschool is enabled' do
         Account.default.set_feature_flag!('post_grades', 'on')
         @course.sis_source_id = 'xyz'
         @course.save
@@ -524,31 +540,19 @@ describe "assignments" do
         expect(f('#assignment_post_to_sis')).to_not be_nil
       end
 
-      it 'should show when post_grades lti tool installed', priority: "1", test_id: 244957 do
+      it 'should show when post_grades lti tool installed' do
+        Account.default.set_feature_flag!('post_grades', 'off')
+
+        get "/courses/#{@course.id}/assignments/new"
+        wait_for_ajaximations
+        expect(f('#assignment_post_to_sis')).to be_nil
+
         create_post_grades_tool
 
         get "/courses/#{@course.id}/assignments/new"
         wait_for_ajaximations
         expect(f('#assignment_post_to_sis')).to_not be_nil
       end
-
-      it 'should not show when post_grades lti tool not installed', priority: "1", test_id: 250261 do
-        Account.default.set_feature_flag!('post_grades', 'off')
-
-        get "/courses/#{@course.id}/assignments/new"
-        wait_for_ajaximations
-        expect(f('#assignment_post_to_sis')).to be_nil
-      end
-    end
-  end
-
-  context "when a public course is accessed" do
-    include_context "public course as a logged out user"
-
-    it "should display assignments", priority: "1", test_id: 269811 do
-      public_course.assignments.create!(:name => 'assignment 1')
-      get "/courses/#{public_course.id}/assignments"
-      validate_selector_displayed('.assignment.search_show')
     end
   end
 end

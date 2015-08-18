@@ -1118,11 +1118,9 @@ describe "Users API", type: :request do
 
     context "a user with permissions" do
       it "should be able to delete a user" do
-        Timecop.freeze do
-          json = api_call(:delete, @path, @path_options)
-          expect(@student.associated_accounts).not_to include(Account.default)
-          expect(json.to_json).to eq @student.reload.to_json
-        end
+        json = api_call(:delete, @path, @path_options)
+        expect(@student.associated_accounts).not_to include(Account.default)
+        expect(json.to_json).to eq @student.reload.to_json
       end
 
       it "should be able to delete a user by SIS ID" do
@@ -1137,12 +1135,10 @@ describe "Users API", type: :request do
       end
 
       it 'should be able to delete itself' do
-        Timecop.freeze do
-          path = "/api/v1/accounts/#{Account.default.to_param}/users/#{@user.id}"
-          json = api_call(:delete, path, @path_options.merge(:user_id => @user.to_param))
-          expect(@user.associated_accounts).not_to include(Account.default)
-          expect(json.to_json).to eq @user.reload.to_json
-        end
+        path = "/api/v1/accounts/#{Account.default.to_param}/users/#{@user.id}"
+        json = api_call(:delete, path, @path_options.merge(:user_id => @user.to_param))
+        expect(@user.associated_accounts).not_to include(Account.default)
+        expect(json.to_json).to eq @user.reload.to_json
       end
     end
 

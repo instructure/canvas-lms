@@ -187,10 +187,10 @@ class User < ActiveRecord::Base
   }
   scope :name_like, lambda { |name|
     scopes = []
-    scopes << unscoped.where(wildcard('users.name', name))
-    scopes << unscoped.where(wildcard('users.short_name', name))
-    scopes << unscoped.joins(:pseudonyms).where(wildcard('pseudonyms.sis_user_id', name)).where(pseudonyms: {workflow_state: 'active'})
-    scopes << unscoped.joins(:pseudonyms).where(wildcard('pseudonyms.unique_id', name)).where(pseudonyms: {workflow_state: 'active'})
+    scopes << where(wildcard('users.name', name))
+    scopes << where(wildcard('users.short_name', name))
+    scopes << joins(:pseudonyms).where(wildcard('pseudonyms.sis_user_id', name)).where(pseudonyms: {workflow_state: 'active'})
+    scopes << joins(:pseudonyms).where(wildcard('pseudonyms.unique_id', name)).where(pseudonyms: {workflow_state: 'active'})
 
     scopes.map!(&:to_sql)
     self.from("(#{scopes.join("\nUNION\n")}) users")
@@ -478,13 +478,14 @@ class User < ActiveRecord::Base
             Enrollment.where("workflow_state<>'deleted' AND type<>'StudentViewEnrollment'").
                 where(:user_id => shard_user_ids).
                 select([:user_id, :course_id, :course_section_id]).
-                uniq.to_a
+                uniq.
+                all
 
         # probably a lot of dups, so more efficient to use a set than uniq an array
         course_section_ids = Set.new
         shard_enrollments.each { |e| course_section_ids << e.course_section_id }
         data[:sections] += shard_sections = CourseSection.select([:id, :course_id, :nonxlist_course_id]).
-            where(:id => course_section_ids.to_a).to_a unless course_section_ids.empty?
+            where(:id => course_section_ids.to_a).all unless course_section_ids.empty?
         shard_sections ||= []
         course_ids = Set.new
         shard_sections.each do |s|
@@ -492,11 +493,11 @@ class User < ActiveRecord::Base
           course_ids << s.nonxlist_course_id if s.nonxlist_course_id
         end
 
-        data[:courses] += Course.select([:id, :account_id]).where(:id => course_ids.to_a).to_a unless course_ids.empty?
+        data[:courses] += Course.select([:id, :account_id]).where(:id => course_ids.to_a).all unless course_ids.empty?
 
-        data[:pseudonyms] += Pseudonym.active.select([:user_id, :account_id]).uniq.where(:user_id => shard_user_ids).to_a
+        data[:pseudonyms] += Pseudonym.active.select([:user_id, :account_id]).uniq.where(:user_id => shard_user_ids).all
         AccountUser.unscoped do
-          data[:account_users] += AccountUser.select([:user_id, :account_id]).uniq.where(:user_id => shard_user_ids).to_a
+          data[:account_users] += AccountUser.select([:user_id, :account_id]).uniq.where(:user_id => shard_user_ids).all
         end
       end
       # now make it easy to get the data by user id
@@ -515,7 +516,7 @@ class User < ActiveRecord::Base
         # if shards is more than just the current shard, users will be set; otherwise
         # we never loaded users, but it doesn't matter, cause it's all the current shard
         shard_user_ids = users ? users.map(&:id) : user_ids
-        UserAccountAssociation.where(:user_id => shard_user_ids).to_a
+        UserAccountAssociation.where(:user_id => shard_user_ids).all
       end.each do |aa|
         key = [aa.user_id, aa.account_id]
         # duplicates. the unique index prevents these now, but this code
@@ -912,7 +913,6 @@ class User < ActiveRecord::Base
 
       self.update_account_associations
     end
-    self.reload
   end
 
   def associate_with_shard(shard, strength = :strong)
@@ -1653,7 +1653,7 @@ class User < ActiveRecord::Base
               distinct_on(:id).shard(shards).to_a
 
           unless options[:include_completed_courses]
-            enrollments = Enrollment.where(:id => courses.map { |c| Shard.relative_id_for(c.primary_enrollment_id, c.shard, Shard.current) }).to_a
+            enrollments = Enrollment.where(:id => courses.map { |c| Shard.relative_id_for(c.primary_enrollment_id, c.shard, Shard.current) }).all
             courses_hash = courses.index_by(&:id)
             # prepopulate the reverse association
             enrollments.each { |e| e.course = courses_hash[e.course_id] }
@@ -1782,7 +1782,7 @@ class User < ActiveRecord::Base
           submissions += self.submissions.after(opts[:start_at]).for_context_codes(context_codes).
             where("submissions.score IS NOT NULL AND assignments.workflow_state=? AND assignments.muted=?", 'published', false).
             order('submissions.created_at DESC').
-            limit(opts[:limit]).to_a
+            limit(opts[:limit]).all
 
           # THIS IS SLOW, it takes ~230ms for mike
           submissions += Submission.for_context_codes(context_codes).
@@ -1802,7 +1802,7 @@ class User < ActiveRecord::Base
             SQL
             where(assignments: {muted: false, workflow_state: 'published'}).
             order('last_updated_at_from_db DESC').
-            limit(opts[:limit]).to_a
+            limit(opts[:limit]).all
 
           submissions = submissions.sort_by{|t| (t.last_updated_at_from_db.to_datetime.in_time_zone rescue nil) || t.created_at}.reverse
           submissions = submissions.uniq

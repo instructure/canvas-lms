@@ -217,7 +217,7 @@ class ExternalToolsController < ApplicationController
     }
 
     if assignment
-      launch_settings['tool_settings'] = adapter.generate_post_payload_for_assignment(assignment, lti_grade_passback_api_url(@tool), blti_legacy_grade_passback_api_url(@tool), lti_turnitin_outcomes_placement_url(@tool.id))
+      launch_settings['tool_settings'] = adapter.generate_post_payload_for_assignment(assignment, lti_grade_passback_api_url(@tool), blti_legacy_grade_passback_api_url(@tool))
     else
       launch_settings['tool_settings'] = adapter.generate_post_payload
     end
@@ -472,6 +472,7 @@ class ExternalToolsController < ApplicationController
     case placement
     when 'migration_selection'
       accept_media_types = 'application/vnd.ims.imsccv1p1,application/vnd.ims.imsccv1p2,application/vnd.ims.imsccv1p3,application/zip,application/xml'
+      return_url = course_content_migrations_url(@context)
       accept_presentation_document_targets = 'download'
       extra_params[:accept_copy_advice] = true
       extra_params[:ext_content_file_extensions] = 'zip,imscc,mbz,xml'

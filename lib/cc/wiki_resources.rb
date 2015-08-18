@@ -17,13 +17,12 @@
 #
 module CC
   module WikiResources
-
+    
     def add_wiki_pages
       wiki_folder = File.join(@export_dir, CCHelper::WIKI_FOLDER)
       FileUtils::mkdir_p wiki_folder
-
-      scope = @course.wiki.wiki_pages.not_deleted
-      WikiPages::ScopedToUser.new(@course, @user, scope).scope.each do |page|
+      
+      @course.wiki.wiki_pages.not_deleted.each do |page|
         next unless export_object?(page)
         begin
           migration_id = CCHelper.create_key(page)

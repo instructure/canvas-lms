@@ -68,15 +68,15 @@ module Api::V1::AuthenticationEvent
     accounts = []
     pseudonym_ids = events.map{ |event| event.pseudonym_id }.uniq.compact
     Shard.partition_by_shard(pseudonym_ids) do |shard_pseudonym_ids|
-      shard_pseudonyms = Pseudonym.where(:id => shard_pseudonym_ids).to_a
+      shard_pseudonyms = Pseudonym.where(:id => shard_pseudonym_ids).all
       account_ids = shard_pseudonyms.map{ |pseudonym| pseudonym.account_id }.uniq
-      accounts.concat Account.where(:id => account_ids).to_a
+      accounts.concat Account.where(:id => account_ids).all
       pseudonyms.concat shard_pseudonyms
     end
 
     user_ids = events.map{ |event| event.user_id }.uniq.compact
     users = Shard.partition_by_shard(user_ids) do |shard_user_ids|
-      User.where(:id => shard_user_ids).to_a
+      User.where(:id => shard_user_ids).all
     end
 
     page_view_ids = events.map{ |event| event.request_id }.compact

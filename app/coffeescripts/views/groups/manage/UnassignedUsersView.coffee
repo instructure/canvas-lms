@@ -5,9 +5,8 @@ define [
   'compiled/views/groups/manage/GroupUsersView'
   'compiled/views/groups/manage/AssignToGroupMenu'
   'compiled/views/groups/manage/Scrollable'
-  'compiled/views/groups/manage/GroupCategoryCloneView'
   'jst/groups/manage/groupUsers'
-], (I18n, $, _, GroupUsersView, AssignToGroupMenu, Scrollable, GroupCategoryCloneView, template) ->
+], (I18n, $, _, GroupUsersView, AssignToGroupMenu, Scrollable, template) ->
 
   class UnassignedUsersView extends GroupUsersView
 
@@ -50,7 +49,7 @@ define [
     afterRender: ->
       super
       @collection.load('first')
-      @$el.parent().droppable(_.extend({}, @dropOptions)).unbind('drop')
+      @$el.parent().droppable(_.extend({}, @dropOptions))
                    .on('drop', @_onDrop)
       @scrollContainer = @heightContainer = @$el
       @$scrollableElement = @$el.find("ul")
@@ -136,21 +135,6 @@ define [
     # ui.draggable: the user being dragged
     _onDrop: (e, ui) =>
       user = ui.draggable.data('model')
-
-      if user.has('group') and user.get('group').get("has_submission")
-        @cloneCategoryView = new GroupCategoryCloneView
-          model: @collection.category
-          openedFromCaution: true
-        @cloneCategoryView.open()
-        @cloneCategoryView.on "close", =>
-            if @cloneCategoryView.cloneSuccess
-              window.location.reload()
-            else if @cloneCategoryView.changeGroups
-              @moveUser(user)
-      else
-        @moveUser(user)
-
-    moveUser: (user) ->
       setTimeout =>
         @category.reassignUser(user, null)
 

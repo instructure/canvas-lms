@@ -1,14 +1,15 @@
 require File.expand_path(File.dirname(__FILE__) + '/helpers/quizzes_common')
 
 describe 'quizzes accessibility' do
-  include_context 'in-process server selenium tests'
 
-  before(:each) do
+  include_examples 'quizzes selenium tests'
+
+  before (:each) do
     course_with_teacher_logged_in
     @last_quiz = start_quiz_question
   end
 
-  it 'renders all answer arrows accessible to a screen reader', priority: "2", test_id: 209355 do
+  it 'should render all answer arrows accessible to a screen reader' do
     # -------------------------------------------------------------------------
     # adapted from:
     #   file: quizzes_question_creation_spec
@@ -94,4 +95,5 @@ describe 'quizzes accessibility' do
     # element instead
     expect(ffj('.answers_wrapper[aria-describedby]').length).to eq 1
   end
+
 end

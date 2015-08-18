@@ -53,9 +53,7 @@ module Lti
         description: external_tool.description,
         installed_locally: external_tool.context == @context,
         enabled: true,
-        tool_configuration: external_tool.tool_configuration,
-        context: external_tool.context_type,
-        context_id: external_tool.context.id
+        tool_configuration: external_tool.tool_configuration
       }
     end
 
@@ -67,9 +65,7 @@ module Lti
         description: tool_proxy.description,
         installed_locally: tool_proxy.context == @context,
         enabled: tool_proxy.workflow_state == 'active',
-        tool_configuration: nil,
-        context: tool_proxy.context_type,
-        context_id: tool_proxy.context.id
+        tool_configuration: nil
       }
     end
 

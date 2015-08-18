@@ -36,8 +36,8 @@ export default moment.defineLocale('ka', {
         LTS : 'h:mm:ss A',
         L : 'DD/MM/YYYY',
         LL : 'D MMMM YYYY',
-        LLL : 'D MMMM YYYY h:mm A',
-        LLLL : 'dddd, D MMMM YYYY h:mm A'
+        LLL : 'D MMMM YYYY LT',
+        LLLL : 'dddd, D MMMM YYYY LT'
     },
     calendar : {
         sameDay : '[დღეს] LT[-ზე]',

@@ -4439,9 +4439,8 @@ if (typeof jQuery != 'undefined') {
 			t.setControlsSize();
 			t.isFullScreen = true;
 
-			var percentHeightChange = (screen.height - t.height) / screen.height * 100
-			var lineHeightChangeCoefficient = 0.50
-			t.container.find('.mejs-captions-layer').css('line-height', ((percentHeightChange * lineHeightChangeCoefficient) + 100) + '%');
+			t.container.find('.mejs-captions-text').css('font-size', screen.width / t.width * 1.00 * 100 + '%');
+			t.container.find('.mejs-captions-position').css('bottom', '45px');
 		},
 
 		exitFullScreen: function() {
@@ -4495,7 +4494,8 @@ if (typeof jQuery != 'undefined') {
 			t.setControlsSize();
 			t.isFullScreen = false;
 
-			t.container.find('.mejs-captions-layer').css('line-height', '');
+			t.container.find('.mejs-captions-text').css('font-size','');
+			t.container.find('.mejs-captions-position').css('bottom', '');
 		}
 	});
 
