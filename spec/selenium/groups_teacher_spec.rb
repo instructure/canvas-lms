@@ -472,6 +472,34 @@ describe "new groups" do
       expect(fj('.unassigned-users-heading.group-heading')).to include_text('Unassigned Students (1)')
     end
 
+    it 'should change group limit status with student drag and drop', priority: "1", test_id: 94164 do
+      group_test_setup(5,1,1)
+      @group_category.first.update_attribute(:group_limit,5)
+      5.times do |n|
+        add_user_to_group(@students[n], @testgroup.first, false)
+      end
+
+      drag_item1 = '.group-user-name:contains("Test Student 3")'
+      drop_target1 = '.ui-cnvs-scrollable'
+
+      get "/courses/#{@course.id}/groups"
+
+      expect(f(".group[data-id=\"#{@testgroup[0].id}\"] .group-summary")).to include_text('5 / 5 students')
+      expect(f(".group[data-id=\"#{@testgroup[0].id}\"] span.show-group-full")).to be_displayed
+      expect(fj('.unassigned-users-heading.group-heading')).to include_text('Unassigned Students (0)')
+
+      f(".group[data-id=\"#{@testgroup[0].id}\"] .toggle-group").click
+      wait_for_ajaximations
+
+      drag_and_drop_element(fj(drag_item1), fj(drop_target1))
+      wait_for_ajaximations
+
+      expect(f(".group[data-id=\"#{@testgroup[0].id}\"] span.show-group-full").css_value 'display').to eq 'none'
+      expect(f(".group[data-id=\"#{@testgroup[0].id}\"] .group-summary")).to include_text('4 / 5 students')
+      expect(fj('.unassigned-users-heading.group-heading')).to include_text('Unassigned Students (1)')
+      expect(fj(drop_target1)).to include_text('Test Student 3')
+    end
+
     context "using clone group set modal" do
       it "should clone a group set including its groups and memberships" do
         group_test_setup(2,1,2)
