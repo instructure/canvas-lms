@@ -248,6 +248,22 @@ describe "groups" do
         expect(get_all_files_folders.count).to eq 1
         expect(ff('.media-body').first).to include_text('example.pdf')
       end
+
+      it "should allow group members to publish and unpublish a file", priority: "1", test_id: 273628 do
+        add_test_files
+        get files_page
+        set_item_permissions(:unpublish,:toolbar_menu)
+        expect(f('.btn-link.published-status.unpublished')).to be_displayed
+        set_item_permissions(:publish,:toolbar_menu)
+        expect(f('.btn-link.published-status.published')).to be_displayed
+      end
+
+      it "should allow group members to restrict access to a file", priority: "1", test_id: 304672 do
+        add_test_files
+        get files_page
+        set_item_permissions(:restricted_access, :available_with_link, :cloud_icon)
+        expect(f('.btn-link.published-status.hiddenState')).to be_displayed
+      end
     end
   end
 
@@ -348,6 +364,22 @@ describe "groups" do
         get files_page
         create_folder_structure
         move_folder(@inner_folder)
+      end
+
+      it "should allow teachers to publish and unpublish a file", priority: "2", test_id: 304673 do
+        add_test_files
+        get files_page
+        set_item_permissions(:unpublish,:toolbar_menu)
+        expect(f('.btn-link.published-status.unpublished')).to be_displayed
+        set_item_permissions(:publish,:toolbar_menu)
+        expect(f('.btn-link.published-status.published')).to be_displayed
+      end
+
+      it "should allow teachers to restrict access to a file", priority: "2", test_id: 304900 do
+        add_test_files
+        get files_page
+        set_item_permissions(:restricted_access, :available_with_link, :cloud_icon)
+        expect(f('.btn-link.published-status.hiddenState')).to be_displayed
       end
     end
   end
