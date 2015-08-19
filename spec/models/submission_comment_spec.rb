@@ -58,7 +58,7 @@ describe SubmissionComment do
     end
 
     it "should not dispatch notification on create for provisional comments" do
-      @comment = @submission.add_comment(:author => @teacher, :comment => "huttah!", :provisional_grade_position => 1)
+      @comment = @submission.add_comment(:author => @teacher, :comment => "huttah!", :provisional => true)
       expect(@comment.messages_sent).to be_empty
     end
 
@@ -130,7 +130,7 @@ This text has a http://www.google.com link in it...
   it "should not create a stream item for a provisional comment" do
     prepare_test_submission
     expect {
-      @submission.add_comment(:author => @teacher, :comment => "some comment", :provisional_grade_position => 1)
+      @submission.add_comment(:author => @teacher, :comment => "some comment", :provisional => true)
     }.to change(StreamItem, :count).by(0)
   end
 
@@ -217,10 +217,10 @@ This text has a http://www.google.com link in it...
     end
 
     it "should create reply in the same provisional grade" do
-      comment = @submission.add_comment(:user => @teacher, :comment => "blah", :provisional_grade_position => 1)
+      comment = @submission.add_comment(:user => @teacher, :comment => "blah", :provisional => true)
       reply = comment.reply_from(:user => @teacher, :text => "oops I meant blah")
+      expect(reply.provisional_grade).to eq(comment.provisional_grade)
       expect(reply.provisional_grade.scorer).to eq @teacher
-      expect(reply.provisional_grade.position).to eq 1
     end
   end
 

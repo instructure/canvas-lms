@@ -904,20 +904,20 @@ class Submission < ActiveRecord::Base
     false
   end
 
-  def provisional_grade(position)
-    self.provisional_grades.where(position: position).first!
+  def provisional_grade(scorer)
+    self.provisional_grades.where(scorer_id: scorer).first!
   end
 
-  def find_or_create_provisional_grade!(scorer:, position:, score: nil)
+  def find_or_create_provisional_grade!(scorer:, score: nil, grade: nil)
     ModeratedGrading::ProvisionalGrade.unique_constraint_retry do
-      pg = self.provisional_grades.where(position: position).first
+      pg = self.provisional_grades.where(scorer_id: scorer).first
       unless pg
-        attrs = {position: position}
-        attrs.merge!({score: score}) unless score.nil?
-        pg = self.provisional_grades.build(attrs)
+        pg = self.provisional_grades.build
         pg.scorer_id = scorer.id
-        pg.save!
       end
+      pg.grade = grade if grade
+      pg.score = score if score
+      pg.save! if pg.changed?
       pg
     end
   end
@@ -934,8 +934,8 @@ class Submission < ActiveRecord::Base
         opts[:comment] = t('attached_files_comment', "See attached files.")
       end
     end
-    if (pg_pos = opts.delete(:provisional_grade_position))
-      pg = find_or_create_provisional_grade!(scorer: opts[:author], position: pg_pos)
+    if opts.delete(:provisional)
+      pg = find_or_create_provisional_grade!(scorer: opts[:author])
       opts[:provisional_grade_id] = pg.id
     end
     self.save! if self.new_record?

@@ -6,13 +6,11 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
   belongs_to :submission
   belongs_to :scorer, class_name: 'User'
 
-  validates :position, uniqueness: { scope: :submission_id }
-  validates :position, presence: true
   validates :scorer, presence: true
   validates :submission, presence: true
 
   def valid?(*)
-    set_graded_at if grade_changed?
+    set_graded_at if grade_changed? || score_changed?
     super
   end
 

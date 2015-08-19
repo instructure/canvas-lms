@@ -2614,7 +2614,7 @@ describe Assignment do
     it "should exclude provisional comments" do
       setup_assignment_with_homework
       @submission = @assignment.submissions.first
-      @comment = @submission.add_comment(:comment => 'comment', :provisional_grade_position => 1)
+      @comment = @submission.add_comment(:comment => 'comment', :provisional => true)
       json = @assignment.speed_grader_json(@user)
       expect(json[:submissions].first[:submission_comments]).to be_empty
     end
@@ -3436,7 +3436,7 @@ describe Assignment do
       assignment_model(course: @course, moderated_grading: true)
       expect(@assignment).to be_moderated_grading
       submission = @assignment.submit_homework @student, body: "blah"
-      pg = submission.find_or_create_provisional_grade! scorer: @teacher, position: 1, score: 0
+      pg = submission.find_or_create_provisional_grade! scorer: @teacher, score: 0
       @assignment.moderated_grading = false
       expect(@assignment.save).to eq false
       expect(@assignment.errors[:moderated_grading]).to be_present

@@ -113,7 +113,8 @@ class ActiveRecord::Base
     'stream_item_instances' => %w(context_code).freeze,
     'submissions' => %w(changed_since_publish late).freeze,
     'wiki_pages' => %w(hide_from_students).freeze,
-    'lti_resource_placements' => %w(resource_handler_id).freeze
+    'lti_resource_placements' => %w(resource_handler_id).freeze,
+    'moderated_grading_provisional_grades' => %w(position).freeze
   }.freeze
 
   def self.columns_with_remove_dropped_columns
