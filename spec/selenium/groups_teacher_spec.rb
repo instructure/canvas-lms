@@ -500,6 +500,32 @@ describe "new groups" do
       expect(fj(drop_target1)).to include_text('Test Student 3')
     end
 
+    it 'should move leader via drag and drop', priority: "1", test_id: 96022 do
+      group_test_setup(5,1,2)
+      2.times do |n|
+        add_user_to_group(@students[n], @testgroup.first, false)
+        add_user_to_group(@students[n+2], @testgroup.last, false)
+      end
+      add_user_to_group(@students[4], @testgroup.last, true)
+
+      get "/courses/#{@course.id}/groups"
+
+      drag_item1 = '.group-user-name:contains("Test Student 5")'
+      drop_target1 = ".group[data-id=\"#{@testgroup[0].id}\"]"
+
+      f(".group[data-id=\"#{@testgroup[0].id}\"] .toggle-group").click
+      f(".group[data-id=\"#{@testgroup[1].id}\"] .toggle-group").click
+      wait_for_ajaximations
+
+      expect(f('.icon-user.group-leader')).to be_displayed
+
+      drag_and_drop_element(fj(drag_item1), fj(drop_target1))
+      wait_for_ajaximations
+
+      expect(f('.icon-user.group-leader')).to be_nil
+      expect(fj(drop_target1)).to include_text('Test Student 5')
+    end
+
     context "using clone group set modal" do
       it "should clone a group set including its groups and memberships" do
         group_test_setup(2,1,2)
