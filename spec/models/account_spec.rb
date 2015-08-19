@@ -525,6 +525,16 @@ describe Account do
     expect(a.grants_right?(@user, :create_courses)).to be_truthy
   end
 
+  it "does not allow create_courses even to admins on site admin and children" do
+    a = Account.site_admin
+    a.settings = { :no_enrollments_can_create_courses => true }
+    manual = a.manually_created_courses_account
+    user
+
+    expect(a.grants_right?(@user, :create_courses)).to eq false
+    expect(manual.grants_right?(@user, :create_courses)).to eq false
+  end
+
   it "should correctly return sub-accounts as options" do
     a = Account.default
     sub = Account.create!(:name => 'sub', :parent_account => a)

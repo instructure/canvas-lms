@@ -924,7 +924,7 @@ class Account < ActiveRecord::Base
     given { |user|
       result = false
 
-      if !site_admin? && user
+      if !root_account.site_admin? && user
         scope = root_account.enrollments.active.where(user_id: user)
         result = root_account.teachers_can_create_courses? &&
             scope.where(:type => ['TeacherEnrollment', 'DesignerEnrollment']).exists?
