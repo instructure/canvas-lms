@@ -16,6 +16,7 @@ Gem::Specification.new do |s|
   s.test_files = Dir["spec_canvas/**/*"]
 
   s.add_dependency "activesupport"
+  s.add_dependency "after_transaction_commit"
   s.add_development_dependency "rspec"
   s.add_development_dependency "pry"
 end
