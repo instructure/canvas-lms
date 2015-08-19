@@ -55,8 +55,11 @@ module CanvasRails
     log_config = { 'logger' => 'rails', 'log_level' => 'debug' }.merge(log_config || {})
     opts = {}
     require 'canvas_logger'
-    log_level = (CANVAS_RAILS3 ? ActiveSupport::BufferedLogger : ActiveSupport::Logger).const_get(log_config['log_level'].to_s.upcase)
+
+    config.log_level = log_config['log_level']
+    log_level = (CANVAS_RAILS3 ? ActiveSupport::BufferedLogger : ActiveSupport::Logger).const_get(config.log_level.to_s.upcase)
     opts[:skip_thread_context] = true if log_config['log_context'] == false
+
     case log_config["logger"]
       when "syslog"
         require 'syslog_wrapper'
