@@ -205,6 +205,7 @@ class Account < ActiveRecord::Base
   add_setting :external_notification_warning, :boolean => true, :default => false
   # Terms of Use and Privacy Policy settings for the root account
   add_setting :terms_changed_at, :root_only => true
+  add_setting :account_terms_required, :root_only => true, :boolean => true, :default => true
   # When a user is invited to a course, do we let them see a preview of the
   # course even without registering?  This is part of the free-for-teacher
   # account perks, since anyone can invite anyone to join any course, and it'd
@@ -316,7 +317,7 @@ class Account < ActiveRecord::Base
   end
 
   def terms_required?
-    Setting.get('terms_required', 'true') == 'true'
+    Setting.get('terms_required', 'true') == 'true' && root_account.account_terms_required?
   end
 
   def require_acceptance_of_terms?(user)

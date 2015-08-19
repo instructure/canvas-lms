@@ -1364,4 +1364,28 @@ describe Account do
       expect(@account.restrict_student_future_view).to eq({:locked => false, :value => true})
     end
   end
+
+  context "require terms of use" do
+    describe "#terms_required?" do
+      it "returns true by default" do
+        expect(account_model.terms_required?).to eq true
+      end
+
+      it "returns false if Setting is false" do
+        Setting.set(:terms_required, "false")
+        expect(account_model.terms_required?).to eq false
+      end
+
+      it "returns false if account setting is false" do
+        account = account_model(settings: {account_terms_required: false})
+        expect(account.terms_required?).to eq false
+      end
+
+      it "consults root account setting" do
+        parent_account = account_model(settings: {account_terms_required: false})
+        child_account = Account.create!(parent_account: parent_account)
+        expect(child_account.terms_required?).to eq false
+      end
+    end
+  end
 end
