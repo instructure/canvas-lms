@@ -12,7 +12,7 @@
     grade = readable_grade(recent_feedback)
     score = recent_feedback.score
     comment = recent_feedback.last_teacher_comment
-    comment_text = comment.comment if comment
+    comment_text = HtmlTextHelper.strip_and_truncate(comment.comment, :max_length => 120) if comment
     icon_explanation, icon_class = icon_data(:context => context,
                                              :current_user => @current_user,
                                              :recent_event => assignment,
@@ -23,7 +23,7 @@
   <a
     data-track-category="dashboard"
     data-track-label="recent feedback"
-    class="<%= icon_class %> tooltip" href="<%= url %>"
+    class="<%= icon_class %> recent_feedback_icon tooltip" href="<%= url %>"
   >
     <span class="tooltip_wrap">
       <span class='tooltip-carat'></span>
@@ -64,9 +64,9 @@
         <% kaltura_thumbnail_url = CanvasKaltura::ClientV3.new.thumbnail_url(comment.media_comment_id, :width => 50, :height => 35, :bgcolor => "F3F4F5") %>
         <img src="<%= kaltura_thumbnail_url %>" style="float: right; padding-left: 3px;" alt=""/>
       <% end %>
-      <b class="ellipsis"><%= recent_feedback.assignment.title %></b>
+      <b class="recent_feedback_title"><%= recent_feedback.assignment.title %></b>
       <% if comment_text or grade %>
-        <em class="ellipsis" style="color: #808080; border: 0;">
+        <em class="recent_feedback_comment">
           <% if grade %>
             <strong><%= grade %></strong>
             <%= " - " if comment_text && (!comment || !comment.media_comment?) %>
