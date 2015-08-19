@@ -122,7 +122,7 @@ end
 def dismiss_user_polling
   begin
     find_element(:id, 'How do you like Canvas?')
-    find_element(:id, 'Ask me later').click
+    find_element(:id, 'Don\'t ask me again').click
   rescue => ex
     raise ex unless ex.is_a?(Selenium::WebDriver::Error::NoSuchElementError)
   end

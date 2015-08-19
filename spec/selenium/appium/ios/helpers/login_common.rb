@@ -106,13 +106,8 @@ shared_context 'icanvas and speedgrader login credentials' do |app_name|
 
     it 'passes login and routes to home page', priority: "1", test_id: pick_test_id_for_app(app_name, 14041, 303730) do
       # App requests access to Canvas account; need to wait for next WebView to load
-      if app_name =~ /(speedgrader)/
-        wait_true(timeout: 10, interval: 0.250){ text_exact('SpeedGrader') }
-        expect(text_exact('SpeedGrader is requesting access to your account.')).to be_displayed
-      else
-        wait_true(timeout: 10, interval: 0.250){ text_exact('Canvas for iOS') }
-        expect(text_exact('Canvas for iOS is requesting access to your account.')).to be_displayed
-      end
+      wait_true(timeout: 10, interval: 0.250){ text_exact(app_login_message) }
+      expect(text_exact(app_access_message)).to be_displayed
 
       # Verify paragraph text includes username
       links = tags('UIALink')
@@ -133,12 +128,7 @@ shared_context 'icanvas and speedgrader login credentials' do |app_name|
 
       # User is occasionally polled here
       dismiss_user_polling
-
-      if app_name =~ /(speedgrader)/
-        wait_true(timeout: 10, interval: 0.250){ find_element(:id, 'CSGSlideMenuView') }
-      else
-        wait_true(timeout: 10, interval: 0.250){ find_element(:id, 'Profile') }
-      end
+      wait_true(timeout: 10, interval: 0.250){ find_element(:id, app_login_success) }
     end
   end
 end
