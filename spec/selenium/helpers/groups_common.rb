@@ -288,11 +288,19 @@ def verify_member_sees_group_page(index = 0)
   expect expect(f('.page-title')).to include_text("#{@page.title}")
 end
 
-def add_test_files
+# context test. if true, allows you to test files both in and out of group context,
+#   otherwise it adds two files to the group
+def add_test_files(context_test = true)
+  if context_test
+    second_file_context = @course
+  else
+    second_file_context = @testgroup.first
+  end
+
   add_file(fixture_file_upload('files/example.pdf', 'application/pdf'),
            @testgroup.first, "example.pdf")
   add_file(fixture_file_upload('files/a_file.txt', 'text/plain'),
-           @course, "a_file.txt")
+           second_file_context, "a_file.txt")
 end
 
 def expand_files_on_content_pane
@@ -300,4 +308,33 @@ def expand_files_on_content_pane
   wait_for_ajaximations
   f('.sign.plus').click
   wait_for_ajaximations
+end
+
+def move_file_to_folder(file_name,destination_name)
+  move(file_name, 1, :toolbar_menu)
+  wait_for_ajaximations
+  expect(f('#flash_message_holder').text).to eq "#{file_name} moved to #{destination_name}\nClose"
+  # Click folder
+  ff('.media-body').first.click
+  wait_for_ajaximations
+  expect(fln(file_name)).to be_displayed
+end
+
+# For files page, creates a folder and then adds a folder within it
+def create_folder_structure
+  @top_folder = 'Top Folder'
+  @inner_folder = 'Inner Folder'
+  add_folder(@top_folder)
+  ff('.media-body')[0].click
+  wait_for_ajaximations
+  add_folder(@inner_folder)
+  wait_for_ajaximations
+end
+
+# Moves a folder to the top level file structure
+def move_folder(folder_name)
+  move(folder_name, 0, :toolbar_menu)
+  wait_for_ajaximations
+  expect(f('#flash_message_holder').text).to eq "#{folder_name} moved to files\nClose"
+  expect(ff('.treeLabel span')[2].text).to eq folder_name
 end

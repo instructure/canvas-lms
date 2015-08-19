@@ -199,12 +199,54 @@ describe "groups" do
         expect(ff('.media-body').first.text).to eq 'new folder'
       end
 
+      it "should allow group members to delete a folder", priority: "1", test_id: 273631 do
+        get files_page
+        add_folder
+        delete(0, :cog_icon)
+        expect(get_all_files_folders.count).to eq 0
+      end
+
+      it "should allow group members to move a folder", priority: "1", test_id: 273632 do
+        get files_page
+        create_folder_structure
+        move_folder(@inner_folder)
+      end
+
       it "should only allow group members to access files", priority: "1", test_id: 273626 do
         course_student = User.create!(name: 'course student')
         expect_new_page_load { get files_page }
         user_session(course_student)
         get files_page
         expect(f('.ui-state-error')).to be_displayed
+      end
+
+      it "should allow a group member to delete a file", priority: "1", test_id: 273630 do
+        add_test_files(false)
+        get files_page
+        delete(0, :cog_icon)
+        wait_for_ajaximations
+        expect(get_all_files_folders.count).to eq 1
+        # Now try to delete the other one using toolbar menu
+        delete(0, :toolbar_menu)
+        expect(get_all_files_folders.count).to eq 0
+      end
+
+      it "should allow group members to move a file", priority: "1", test_id: 273633 do
+        add_test_files
+        get files_page
+        add_folder('destination_folder')
+        move_file_to_folder('example.pdf','destination_folder')
+      end
+
+      it "should search files only within the scope of a group", priority: "1", test_id: 273627 do
+        add_test_files
+        get files_page
+        f('input[type="search"]').send_keys 'example.pdf'
+        driver.action.send_keys(:return).perform
+        refresh_page
+        # This checks to make sure there is only one file and it is the group-level one
+        expect(get_all_files_folders.count).to eq 1
+        expect(ff('.media-body').first).to include_text('example.pdf')
       end
     end
   end
@@ -274,10 +316,38 @@ describe "groups" do
     end
 
     describe "Files page" do
-      it "should allow teacher to add a new folder", priority: "1", test_id: 303703 do
+      it "should allow teacher to add a new folder", priority: "2", test_id: 303703 do
         get files_page
         add_folder
         expect(ff('.media-body').first.text).to eq 'new folder'
+      end
+
+      it "should allow teacher to delete a folder", priority: "2", test_id: 304184 do
+        get files_page
+        add_folder
+        delete(0, :toolbar_menu)
+        expect(get_all_files_folders.count).to eq 0
+      end
+
+      it "should allow a teacher to delete a file", priority: "2", test_id: 304183 do
+        add_test_files
+        get files_page
+        delete(0, :toolbar_menu)
+        wait_for_ajaximations
+        expect(get_all_files_folders.count).to eq 0
+      end
+
+      it "should allow teachers to move a file", priority: "2", test_id: 304185 do
+        add_test_files
+        get files_page
+        add_folder('destination_folder')
+        move_file_to_folder('example.pdf','destination_folder')
+      end
+
+      it "should allow teachers to move a folder", priority: "2", test_id: 304667 do
+        get files_page
+        create_folder_structure
+        move_folder(@inner_folder)
       end
     end
   end
