@@ -227,6 +227,7 @@ CanvasRails::Application.routes.draw do
     get :locks
     concerns :discussions
     resources :assignments do
+      get 'moderate' => 'assignments#show_moderate'
       resources :submissions do
         post 'turnitin/resubmit' => 'submissions#resubmit_to_turnitin', as: :resubmit_to_turnitin
         get 'turnitin/:asset_string' => 'submissions#turnitin_report', as: :turnitin_report

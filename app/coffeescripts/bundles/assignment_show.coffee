@@ -26,7 +26,14 @@ require [
 
       new SpeedgraderLinkView(model: model, el: '#assignment-speedgrader-link')
         .render()
-      new PublishButtonView(model: model, el: $el).render()
+      pbv = new PublishButtonView(model: model, el: $el)
+      pbv.render()
+
+      pbv.on 'publish', ->
+        $('#moderated_grading_button').show()
+
+      pbv.on 'unpublish', ->
+        $('#moderated_grading_button').hide()
 
     # Add module sequence footer
     $('#sequence_footer').moduleSequenceFooter(

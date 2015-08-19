@@ -171,6 +171,22 @@ class AssignmentsController < ApplicationController
     end
   end
 
+  def show_moderate
+    return unless @context.feature_enabled?(:moderated_grading)
+    @assignment ||= @context.assignments.find(params[:assignment_id])
+
+    raise ActiveRecord::RecordNotFound unless @assignment.moderated_grading?
+
+    if authorized_action(@context, @current_user, :moderate_grades) && @assignment.moderated_grading? && @assignment.published?
+      add_crumb(@assignment.title, polymorphic_url([@context, @assignment]))
+      add_crumb(t('Moderate'))
+
+      respond_to do |format|
+        format.html { render }
+      end
+    end
+  end
+
   def list_google_docs
     assignment ||= @context.assignments.find(params[:id])
     # prevent masquerading users from accessing google docs

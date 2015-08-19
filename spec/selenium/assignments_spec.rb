@@ -44,6 +44,32 @@ describe "assignments" do
 
         expect(f(".save_and_publish")).to be_nil
       end
+
+      context "moderated grading assignments" do
+
+        before do
+          @course.root_account.allow_feature! :moderated_grading
+          @course.enable_feature! :moderated_grading
+          @assignment = @course.assignments.create({name: "Test Moderated Assignment"})
+          @assignment.update_attribute(:moderated_grading, true)
+          @assignment.unpublish
+        end
+
+        it "should show the moderate button when the assignment is published" do
+          get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+          f('#assignment_publish_button').click()
+          wait_for_ajaximations
+          expect(f('#moderated_grading_button')).to be_displayed
+        end
+
+        it "should remove the moderate button when the assignment is unpublished" do
+          @assignment.publish
+          get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+          f('#assignment_publish_button').click()
+          wait_for_ajaximations
+          expect(f('#moderated_grading_button')).not_to be_displayed
+        end
+      end
     end
 
     it "should insert a file using RCE in the assignment", priority: "1", test_id: 126671 do
@@ -566,6 +592,37 @@ describe "assignments" do
       public_course.assignments.create!(:name => 'assignment 1')
       get "/courses/#{public_course.id}/assignments"
       validate_selector_displayed('.assignment.search_show')
+    end
+  end
+
+  context "moderated grading" do
+
+    before do
+      course_with_teacher_logged_in
+      @course.start_at = nil
+      @course.save!
+      @course.root_account.allow_feature! :moderated_grading
+      @course.enable_feature! :moderated_grading
+      @assignment = @course.assignments.create({name: "Test Moderated Assignment"})
+      @assignment.update_attribute(:moderated_grading, true)
+      @assignment.publish
+    end
+
+    it "should show the moderated grading page for moderated grading assignments" do
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}/moderate"
+      expect(f('#assignment_moderation')).to be_displayed
+    end
+
+    it "should deny access for a regular student to the moderation page" do
+      course_with_student_logged_in({course: @course})
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}/moderate"
+      expect(f('#unauthorized_message')).to be_displayed
+    end
+
+    it "should not show the moderation page if it is not a moderated assignment " do
+      @assignment.update_attribute(:moderated_grading, false)
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}/moderate"
+      expect(f('#content h2').text).to eql "Page Not Found"
     end
   end
 end
