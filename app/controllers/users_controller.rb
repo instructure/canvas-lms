@@ -530,7 +530,7 @@ class UsersController < ApplicationController
     Shackles.activate(:slave) do
       prepare_current_user_dashboard_items
 
-      if @show_recent_feedback = (@current_user.student_enrollments.active.present?)
+      if @show_recent_feedback = (@current_user.student_enrollments.active.exists?)
         @recent_feedback = (@current_user && @current_user.recent_feedback) || []
       end
     end

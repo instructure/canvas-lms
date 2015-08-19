@@ -2093,21 +2093,32 @@ class Course < ActiveRecord::Base
     end
   end
 
-  def sections_visible_to(user, sections = active_course_sections)
+  # returns :all, :none, or an array of section ids
+  def course_section_visibility(user)
     visibilities = section_visibilities_for(user)
     visibility = enrollment_visibility_level_for(user, visibilities)
-    section_ids = visibilities.map{ |s| s[:course_section_id] }
-    is_scope = sections.respond_to?(:where)
-
     if [:full, :limited, :restricted, :sections].include?(visibility)
       if visibility == :sections || visibilities.all?{ |v| ['StudentEnrollment', 'StudentViewEnrollment', 'ObserverEnrollment'].include? v[:type] }
-        is_scope ? sections.where(:id => section_ids) : sections.select{|section| section_ids.include?(section.id)}
+        visibilities.map{ |s| s[:course_section_id] }
       else
-        sections
+        :all
       end
     else
+      :none
+    end
+  end
+
+  def sections_visible_to(user, sections = active_course_sections)
+    is_scope = sections.respond_to?(:where)
+    section_ids = course_section_visibility(user)
+    case section_ids
+    when :all
+      sections
+    when :none
       # return an empty set, but keep it as a scope for downstream consistency
       is_scope ? sections.none : []
+    when Array
+      is_scope ? sections.where(:id => section_ids) : sections.select{|section| section_ids.include?(section.id)}
     end
   end
 
