@@ -1,5 +1,7 @@
 module EnvironmentSetup
 
+  $appium_config = ConfigFile.load('appium')
+
   # All test environments must be seeded with this Developer Key. The only attribute allowed
   # to change is the *redirect_uri* which contains the static IP address of the Canvas-lms
   # environment, but do not change it; modify the *host_url* method instead.
@@ -19,13 +21,13 @@ module EnvironmentSetup
 
   # TODO: update when Appium is integrated with Jenkins, append $server_port
   def school_domain
-    $selenium_config[:school_domain]
+    $appium_config[:school_domain]
   end
 
   # Static IP addresses entered into Mobile Verify. Comment/Uncomment to set the url.
   # Mobile Apps will not connect to local test instances other than these.
   def host_url
-    $selenium_config[:appium_host_url]
+    $appium_config[:appium_host_url]
   end
 
   # This assumes Appium server will be running on the same host as the Canvas-lms.
@@ -44,7 +46,7 @@ module EnvironmentSetup
   # Appium settings are device specific. To list connected devices for Android run:
   #   $ <android_sdk_path>/platform-tools/adb devices
   def android_device_name
-    $selenium_config[:android_udid]
+    $appium_config[:android_udid]
   end
 
   # Appium settings are device specific. To get iOS device info:
@@ -53,14 +55,14 @@ module EnvironmentSetup
   #   $ idevice_id [UDID] ### prints device name
   #   $ idevice_id -l ### lists connected devices by UDID
   def ios_device
-    { versionNumber: $selenium_config[:ios_version],
-      deviceName: $selenium_config[:ios_device_name],
-      udid: $selenium_config[:ios_udid],
-      app: $selenium_config[:ios_app_path] }
+    { versionNumber: $appium_config[:ios_version],
+      deviceName: $appium_config[:ios_device_name],
+      udid: $appium_config[:ios_udid],
+      app: $appium_config[:ios_app_path] }
   end
 
   def ios_app_path
-    $selenium_config[:ios_app_path]
+    $appium_config[:ios_app_path]
   end
 
   def implicit_wait_time

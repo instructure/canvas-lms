@@ -5,17 +5,3 @@ test:
   paths:
     # setting path works for opera, chrome, and firefox
     # firefox: "/Applications/Firefox7.app/Contents/MacOS/firefox"
-  school_domain:
-    # URL to Canvas environment
-    # "twilson"
-  appium_host_url:
-    # setting path for test server
-    # "10.0.15.242"
-  # iOS device settings
-  ios_version: "8.4"
-  ios_device_name: "iPad"
-  ios_udid: "b94ee387573a4a0a87c877becf36eb7224e0a80b"
-  ios_type: "iPad"
-  ios_app_path:
-    # setting path for iCanvas
-    # "/Users/twilson/Library/Developer/Xcode/DerivedData/iCanvas-fkfdbqxlcxqugldosdstapazsjaz/Build/Products/Debug-iphoneos/iCanvas.app"

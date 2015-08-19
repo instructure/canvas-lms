@@ -112,11 +112,11 @@ def double_tap(element)
 end
 
 def device_is_iphone
-  $selenium_config[:ios_type] == 'iPhone'
+  $appium_config[:ios_type] == 'iPhone'
 end
 
 def device_is_ipad
-  $selenium_config[:ios_type] == 'iPad'
+  $appium_config[:ios_type] == 'iPad'
 end
 
 def dismiss_user_polling
