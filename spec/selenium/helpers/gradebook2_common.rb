@@ -265,3 +265,49 @@ def assignment_setup(opts={})
       :submission_types => 'not_graded',
       :assignment_group => @group)
 end
+
+def get_group_points
+  group_points_holder = keep_trying_until do
+    group_points_holder = ff('div.assignment-points-possible')
+    group_points_holder
+  end
+  group_points_holder
+end
+
+def check_group_points(expected_weight_text)
+  for i in 2..3 do
+    expect(get_group_points[i].text).to eq expected_weight_text[i-2] + ' of grade'
+  end
+end
+
+def set_group_weight(assignment_group, weight_number)
+  f('#gradebook_settings').click
+  wait_for_ajaximations
+  f('[aria-controls="assignment_group_weights_dialog"]').click
+
+  dialog = f('#assignment_group_weights_dialog')
+  expect(dialog).to be_displayed
+
+  group_check = dialog.find_element(:id, 'group_weighting_scheme')
+  keep_trying_until do
+    group_check.click
+    expect(is_checked('#group_weighting_scheme')).to be_truthy
+  end
+  group_weight_input = f("#assignment_group_#{assignment_group.id}_weight")
+  set_value(group_weight_input, "")
+  set_value(group_weight_input, weight_number)
+  fj('.ui-button:contains("Save")').click
+  wait_for_ajaximations
+  expect(@course.reload.group_weighting_scheme).to eq 'percent'
+end
+
+def validate_group_weight_text(assignment_groups, weight_numbers)
+  assignment_groups.each_with_index do |ag, i|
+    heading = fj(".slick-column-name:contains('#{ag.name}') .assignment-points-possible")
+    expect(heading).to include_text("#{weight_numbers[i]}% of grade")
+  end
+end
+
+def validate_group_weight(assignment_group, weight_number)
+  expect(assignment_group.reload.group_weight).to eq weight_number
+end
