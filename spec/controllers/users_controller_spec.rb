@@ -525,8 +525,17 @@ describe UsersController do
         expect(json["errors"]["user"]["terms_of_use"]).to be_present
       end
 
-      it "should not validate acceptance of the terms if not required" do
+      it "should not validate acceptance of the terms if not required by system" do
         Setting.set('terms_required', 'false')
+        post 'create', :pseudonym => { :unique_id => 'jacob@instructure.com' }, :user => { :name => 'Jacob Fugal' }
+        expect(response).to be_success
+      end
+
+      it "should not validate acceptance of the terms if not required by account" do
+        default_account = Account.default
+        default_account.settings[:account_terms_required] = false
+        default_account.save!
+
         post 'create', :pseudonym => { :unique_id => 'jacob@instructure.com' }, :user => { :name => 'Jacob Fugal' }
         expect(response).to be_success
       end
