@@ -17,6 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper')
 
 describe UsersController, type: :request do
   include Api
@@ -69,6 +70,40 @@ describe UsersController, type: :request do
                     {"type" => "DiscussionTopic", "count" => 2, "unread_count" => 1, "notification_category" => nil},
                     {"type" => "Message", "count" => 1, "unread_count" => 0, "notification_category" => "TestImmediately"} # check a broadcast-policy-based one
                    ]
+  end
+
+  context "cross-shard activity stream summary" do
+    specs_require_sharding
+    it "should return the activity stream summary with cross-shard items" do
+      @student = user(:active_all => true)
+      @shard1.activate do
+        @account = Account.create!
+        course(:active_all => true, :account => @account)
+        @course.enroll_student(@student).accept!
+        @context = @course
+        discussion_topic_model
+        discussion_topic_model(:user => @user)
+        announcement_model
+        conversation(User.create, @user)
+        Notification.create(:name => 'Assignment Due Date Changed', :category => "TestImmediately")
+        Assignment.any_instance.stubs(:created_at).returns(4.hours.ago)
+        assignment_model(:course => @course)
+        @assignment.update_attribute(:due_at, 1.week.from_now)
+        @assignment.update_attribute(:due_at, 2.weeks.from_now)
+        # manually set the pre-datafixup state for one of them
+        val = StreamItem.where(:asset_type => "Message", :id => @user.visible_stream_item_instances.map(&:stream_item)).
+          limit(1).update_all(:notification_category => nil)
+      end
+      json = api_call(:get, "/api/v1/users/self/activity_stream/summary.json",
+        { :controller => "users", :action => "activity_stream_summary", :format => 'json' })
+
+      expect(json).to eq [
+            {"type" => "Announcement", "count" => 1, "unread_count" => 1, "notification_category" => nil},
+            {"type" => "Conversation", "count" => 1, "unread_count" => 0, "notification_category" => nil}, # conversations don't currently set the unread state on stream items
+            {"type" => "DiscussionTopic", "count" => 2, "unread_count" => 1, "notification_category" => nil},
+            {"type" => "Message", "count" => 2, "unread_count" => 0, "notification_category" => "TestImmediately"} # check a broadcast-policy-based one
+          ]
+    end
   end
 
   it "should still return notification_category in the the activity stream summary if not set (yet)" do
