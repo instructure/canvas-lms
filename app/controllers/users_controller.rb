@@ -204,9 +204,7 @@ class UsersController < ApplicationController
       redirect_uri = oauth_success_url(:service => 'google_drive')
       session[:oauth_gdrive_nonce] = SecureRandom.hex
       state = Canvas::Security.create_jwt(redirect_uri: redirect_uri, return_to_url: return_to_url, nonce: session[:oauth_gdrive_nonce])
-      doc_service = @current_user.user_services.where(service: "google_docs").first
-      user_name = doc_service.service_user_name if doc_service
-      redirect_to GoogleDrive::Client.auth_uri(google_drive_client, state, user_name)
+      redirect_to GoogleDrive::Client.auth_uri(google_drive_client, state)
     elsif params[:service] == "twitter"
       success_url = oauth_success_url(:service => 'twitter')
       request_token = Twitter::Connection.request_token(success_url)
