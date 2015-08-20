@@ -241,7 +241,7 @@ describe "gradebook2" do
     end
 
 
-    it "should handle muting/unmuting correctly", priority: "1", test_id: 210025 do
+    it "should handle muting/unmuting correctly", priority: "1", test_id: 164227 do
       get "/courses/#{@course.id}/gradebook2"
       toggle_muting(@second_assignment)
       expect(fj(".container_1 .slick-header-column[id*='assignment_#{@second_assignment.id}'] .muted")).to be_displayed
@@ -716,7 +716,7 @@ describe "gradebook2" do
       end
     end
 
-    describe "Total points toggle" do
+    describe "Total points toggle", priority: "1", test_id: 164012 do
       def should_show_percentages
         ff(".total-column").each { |total| expect(total.text).to match /%/ }
       end
@@ -769,13 +769,27 @@ describe "gradebook2" do
         dialog = fj('.ui-dialog:visible')
         expect(dialog).to equal nil
       end
+      context 'as a student' do
+        it 'should display total grades as points' do
+          course_with_student_logged_in
+          assignment = @course.assignments.build
+          assignment.publish
+          assignment.grade_student(@student, {grade: 10})
+          @course.show_total_grade_as_points = true
+          @course.save!
+
+          get "/courses/#{@course.id}/grades"
+          expect(f('#submission_final-grade .grade')).to include_text("10")
+        end
+      end
+
     end
 
     def header_text(n)
       f(".container_0 .slick-header-column:nth-child(#{n})").try(:text)
     end
 
-    context "custom gradebook columns" do
+    context "custom gradebook columns", priority: "2", test_id: 164225 do
       def custom_column(opts = {})
         opts.reverse_merge! title: "<b>SIS ID</b>"
         @course.custom_gradebook_columns.create! opts
@@ -801,7 +815,7 @@ describe "gradebook2" do
         }.size).to eq 1
       end
 
-      it "lets you show and hide the teacher notes column" do
+      it "lets you show and hide the teacher notes column", priority: "1", test_id: 164008 do
         get "/courses/#{@course.id}/gradebook2"
 
         has_notes_column = lambda {
