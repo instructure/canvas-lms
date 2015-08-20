@@ -49,7 +49,7 @@ module BrandableCSS
       file = APP_ROOT.join(CONFIG['paths']['bundles_with_deps'] + SASS_STYLE)
       if file.exist?
         @combined_checksums = JSON.parse(file.read).each_with_object({}) do |(k, v), memo|
-          memo[k] = v['combinedChecksum']
+          memo[k] = v.symbolize_keys.slice(:combinedChecksum, :includesNoVariables)
         end.freeze
       elsif defined?(Rails) && Rails.env.production?
         raise "#{file.expand_path} does not exist. You need to run #{cli} before you can serve css."
@@ -58,13 +58,13 @@ module BrandableCSS
         # if you haven't ran `brandable_css` and the manifest file doesn't exist yet.
         # eg: you want to test a controller action and you don't care that it links
         # to a css file that hasn't been created yet.
-        default_value = "Error: unknown css checksum. you need to run #{cli}"
+        default_value = {combinedChecksum: "Error: unknown css checksum. you need to run #{cli}"}.freeze
         @combined_checksums = Hash.new(default_value).freeze
       end
     end
 
     # bundle path should be something like "bundles/speedgrader" or "plugins/analytics/something"
-    def fingerprint_for(bundle_path, variant)
+    def cache_for(bundle_path, variant)
       key = ["#{bundle_path}.scss", variant].join(CONFIG['manifest_key_seperator'])
       fingerprint = combined_checksums[key]
       raise "Fingerprint not found. #{bundle_path} #{variant}" unless fingerprint
@@ -73,7 +73,7 @@ module BrandableCSS
 
     def all_fingerprints_for(bundle_path)
       variants.each_with_object({}) do |variant, object|
-        object[variant] = fingerprint_for(bundle_path, variant)
+        object[variant] = cache_for(bundle_path, variant)
       end
     end
 
@@ -85,13 +85,14 @@ module BrandableCSS
       run_cli!
     end
 
-    def compile_brand!(brand_id)
-      run_cli!('--brand-id', brand_id)
+    def compile_brand!(brand_id, opts=nil)
+      run_cli!('--brand-id', brand_id, opts)
     end
 
     private
 
     def run_cli!(*args)
+      opts = args.extract_options!
       # this makes sure the symlinks to app/stylesheets/plugins/analytics, etc exist
       # so their scss files can be picked up and compiled with everything else
       require 'config/initializers/plugin_symlinks'
@@ -99,7 +100,22 @@ module BrandableCSS
       command = [cli].push(*args).shelljoin + ' 2>&1'
       msg = "running BrandableCSS CLI: #{command}"
       Rails.logger.try(:debug, msg) if defined?(Rails)
-      raise "Error: #{msg}" unless system(command)
+
+      percent_complete = 0
+      IO.popen(command).each do |line|
+        puts line.chomp!
+
+        # This is a good-enough-for-now approximation to show the progress
+        # bar in the UI.  Since we don't know exactly how many files there are,
+        # it will progress towards 100% but never quite hit it until it is complete.
+        # Each tick it will cut 4% of the remaining percentage. Meaning it will look like
+        # it goes fast at first but then slows down, but will always keep moving.
+        if opts && opts[:on_progress] && line.starts_with?('compiled ')
+          percent_complete = percent_complete + ((100.0 - percent_complete) * 0.04)
+          opts[:on_progress].call(percent_complete)
+        end
+      end
+      raise("Error #{msg}") unless $?.success?
     end
   end
 

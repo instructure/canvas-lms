@@ -276,9 +276,9 @@ module ApplicationHelper
 
   def css_url_for(bundle_name, plugin=false)
     bundle_path = "#{plugin ? "plugins/#{plugin}" : 'bundles'}/#{bundle_name}"
-    content_md5 = BrandableCSS.fingerprint_for(bundle_path, css_variant)
-    File.join('/dist', 'brandable_css', active_brand_config.try(:md5).to_s,
-              css_variant, "#{bundle_path}-#{content_md5}.css")
+    cache = BrandableCSS.cache_for(bundle_path, css_variant)
+    base_dir = cache[:includesNoVariables] ? 'no_variables' : File.join(active_brand_config.try(:md5).to_s, css_variant)
+    File.join('/dist', 'brandable_css', base_dir, "#{bundle_path}-#{cache[:combinedChecksum]}.css")
   end
 
   def brand_variable(variable_name)

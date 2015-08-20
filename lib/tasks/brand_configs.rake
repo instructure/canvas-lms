@@ -29,8 +29,6 @@ namespace :brand_configs do
 
     # This'll pick up on all those written brand_configs and compile their css.
     BrandableCSS.compile_all!
-
-    Rake::Task['canvas:cdn:upload_to_s3'].invoke
   end
 
 end
