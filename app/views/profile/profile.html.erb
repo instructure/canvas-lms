@@ -44,14 +44,14 @@
     <td><span <% unless editable_name %>id="name"<% end %>
               class="full_name <%= editable_name ? 'display_data' : 'edit_or_show_data' %>"><%=h @user.name %></span>
       <%= f.text_field :name, :class => "edit_data", :maxlength => 255, :size => 30 if editable_name %>
-      <span class="edit_or_show_data" style="font-size: 0.8em; color: #888;"><br/><%= t('hints.name', "This name will be used for grading.") %></span>
+      <span class="edit_or_show_data data_description"><br/><%= t('hints.name', "This name will be used for grading.") %></span>
   </tr>
   <tr>
     <td><%= f.blabel :short_name, :en => "Display Name" %></td>
     <td><span <% unless editable_name %>id="short_name"<% end %>
               class="short_name <%= editable_name ? 'display_data' : 'edit_or_show_data' %>"><%=h @user.short_name %></span>
       <%= f.text_field :short_name, :class => "edit_data", :maxlength => 255, :size => 30 if editable_name %>
-      <span class="edit_or_show_data" style="font-size: 0.8em; color: #888;"><br/><%= t('hints.short_name', "People will see this name in discussions, messages and comments.") %></span>
+      <span class="edit_or_show_data data_description"><br/><%= t('hints.short_name', "People will see this name in discussions, messages and comments.") %></span>
     </td>
   </tr>
   <tr>
@@ -59,7 +59,7 @@
     <td><span <% unless editable_name %>id="sortable_name"<% end %>
               class="sortable_name <%= editable_name ? 'display_data' : 'edit_or_show_data' %>"><%=h @user.sortable_name %></span>
       <%= f.text_field :sortable_name, :class => "edit_data", :maxlength => 255, :size => 30  if editable_name %>
-      <span class="edit_or_show_data" style="font-size: 0.8em; color: #888;"><br/><%= t('hints.sortable_name', "This name appears in sorted lists.") %></span>
+      <span class="edit_or_show_data data_description"><br/><%= t('hints.sortable_name', "This name appears in sorted lists.") %></span>
     </td>
   </tr>
   <% active_email_channels = @email_channels.select { |cc| cc.active? } %>
