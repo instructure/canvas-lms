@@ -60,7 +60,7 @@ define([
       //
       if (!m._f.match(/Z/) || m._pf.unusedTokens.indexOf('Z') >= 0) {
         var l = m.locale();
-        m = moment(tz.parse(m.format('YYYY-MM-DD HH:mm:ss')));
+        m = moment(tz.raw_parse(m.locale('en').format('YYYY-MM-DD HH:mm:ss')));
         m.locale(l);
       }
 
