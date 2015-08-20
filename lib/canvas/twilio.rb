@@ -43,6 +43,9 @@ module Canvas::Twilio
       Digest::SHA256.hexdigest([number, recipient_number].cache_key).hex
     end
 
+    # Ping StatsD about sending from this number
+    CanvasStatsd::Statsd.increment("notifications.twilio.message_sent_from_number.#{outbound_number}")
+
     # Then send the message.
     client.account.messages.create(from: outbound_number, to: recipient_number, body: body)
   end

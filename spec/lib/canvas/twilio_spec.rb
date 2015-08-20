@@ -84,5 +84,14 @@ describe 'Canvas::Twilio' do
 
       expect { Canvas::Twilio.deliver('+18015550100', 'message text') }.to raise_exception
     end
+
+    it 'pings StatsD about outgoing messages' do
+      stub_twilio(['+18015550100'])
+      Canvas::Twilio.client.account.messages.expects(:create)
+
+      CanvasStatsd::Statsd.expects(:increment).with('notifications.twilio.message_sent_from_number.+18015550100')
+
+      Canvas::Twilio.deliver('+18015550101', 'message text')
+    end
   end
 end
