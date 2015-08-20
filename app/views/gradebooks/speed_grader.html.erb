@@ -260,11 +260,22 @@
       [t('sort_by.submitted_at', "the date they submitted the assignment"), "submitted_at"],
       [t('sort_by.status', "by submission status (needs grading, not submitted, etc)"), "submission_status"]], cookies[:eg_sort_by]) %>
   </p>
-  <p<% if @assignment.quiz && @assignment.quiz.survey? && @assignment.quiz.anonymous_submissions %> style="display: none;"<% end %>>
-    <input type="checkbox" id="hide_student_names" name="hide_student_names"/>
-    <label for="hide_student_names"><%= t('labels.hide_names', "Hide student names in the SpeedGrader") %></label>
-  </p>
 
+  <p>
+    <input type="checkbox" id="hide_student_names" name="hide_student_names"
+      <% if force_anonymous_grading?(@assignment) %>disabled<% end %>
+    />
+    <label for="hide_student_names"
+      <% if force_anonymous_grading?(@assignment) %>
+        data-tooltip='{"tooltipClass":"popover popover-padded", "position":"top"}'
+        title="<%= force_anonymous_grading_reason(@assignment) %>"
+      <% end %> >
+      <%= t('labels.hide_names', "Hide student names in the SpeedGrader") %>
+      <% if force_anonymous_grading?(@assignment) %>
+        <span class="screenreader-only"><%= force_anonymous_grading_reason(@assignment) %></span>
+      <% end %>
+    </label>
+  </p>
   <p <% unless @assignment.quiz %>class=hidden<% end %>>
     <%= check_box_tag :enable_speedgrader_grade_by_question, "1",
       @current_user.preferences[:enable_speedgrader_grade_by_question] %>

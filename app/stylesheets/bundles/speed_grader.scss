@@ -745,3 +745,7 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
     width: 105px;
   }
 }
+
+#settings_form input[type=checkbox][disabled] + label {
+  opacity: 0.5;
+}
