@@ -69,12 +69,19 @@ module HandlebarsTasks
         if Dir.glob("app/stylesheets/jst/#{id}.scss").first
           bundle = "jst/#{id}"
           require 'lib/brandable_css'
-          fingerprints = MultiJson.dump BrandableCSS.all_fingerprints_for(bundle)
-          dependencies << "compiled/util/brandableCss"
+
           # arguments[1] will be brandableCss
+          dependencies << "compiled/util/brandableCss"
+
+          cached = BrandableCSS.all_fingerprints_for(bundle)
+          if cached.values.first[:includesNoVariables]
+            options = MultiJson.dump(cached.values.first)
+          else
+            options = "#{MultiJson.dump(cached)}[arguments[1].getCssVariant()]"
+          end
           css_registration = "
-            var fingerprint = #{fingerprints}[arguments[1].getCssVariant()];
-            arguments[1].loadStylesheet('#{bundle}-' + fingerprint);
+            var options = #{options};
+            arguments[1].loadStylesheet('#{bundle}', options);
           "
         end
 

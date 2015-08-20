@@ -97,27 +97,21 @@ class BrandConfig < ActiveRecord::Base
     scss_dir.rmtree
   end
 
-  def compile_css!
-    BrandableCSS.compile_brand!(md5)
-  end
-
-  def sync_to_s3!(&block)
-    Canvas::Cdn.push_to_s3!(public_folder, &block) if Canvas::Cdn.enabled?
+  def compile_css!(opts=nil)
+    BrandableCSS.compile_brand!(md5, opts)
   end
 
   def save_and_sync_to_s3!(progress=nil)
     progress.update_completion!(5) if progress
     save_scss_file!
     progress.update_completion!(10) if progress
-    compile_css!
-    progress.update_completion!(50) if progress
-    sync_to_s3! do |percent_complete|
+    compile_css! on_progress: -> (percent_complete) {
       # send at most 1 UPDATE query per 2 seconds
-      if progress && (progress.updated_at < 2.seconds.ago)
-        total_percent = 50 + percent_complete / 2
+      if progress && (progress.updated_at < 1.seconds.ago)
+        total_percent = 10 + percent_complete * 0.9
         progress.update_completion!(total_percent)
       end
-    end
+    }
   end
 
   def self.destroy_if_unused(md5)

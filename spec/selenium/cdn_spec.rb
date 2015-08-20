@@ -15,19 +15,20 @@ describe 'Stuff related to how we load stuff from CDN and use brandable_css' do
 
   describe BrandableCSS do
 
-    describe 'fingerprint_for' do
+    describe 'cache_for' do
 
       it 'finds the right fingerprints for normal bundles, plugins & handlebars' do
         sample_bundles = {
-          'bundles/common' => true,
-          'plugins/analytics/analytics' => true, # to test that it works with plugins
-          'jst/tinymce/EquationEditorView' => false # to test that it works with handlebars-loaded css
+          'bundles/common' => false,
+          'plugins/analytics/analytics' => false, # to test that it works with plugins
+          'jst/tinymce/EquationEditorView' => true # to test that it works with handlebars-loaded css
         }
-        sample_bundles.each do |bundle_name, bundle_loads_variables|
+        sample_bundles.each do |bundle_name, includes_no_variables|
           fingerprints = BrandableCSS.variants.map do |variant|
-            fingerprint = BrandableCSS.fingerprint_for(bundle_name, variant)
-            expect(fingerprint).to match(RE_SHORT_MD5)
-            fingerprint
+            data = BrandableCSS.cache_for(bundle_name, variant)
+            expect(data[:combinedChecksum]).to match(RE_SHORT_MD5)
+            expect(!!(data[:includesNoVariables])).to eq(includes_no_variables)
+            data
           end
 
           expect(fingerprints.length).to eq(4), 'We have 4 variants'
@@ -36,7 +37,8 @@ describe 'Stuff related to how we load stuff from CDN and use brandable_css' do
 
           msg = "all variants should outupt the same css if a bundle doesn't pull in
                  the variables file. If it does, there should be some that are different"
-          expect(fingerprints.uniq.length).to(bundle_loads_variables ? (be > 1) : eq(1), msg)
+          unique_fingerprints = fingerprints.map{ |f| f[:combinedChecksum] }.uniq
+          expect(unique_fingerprints.length).to(includes_no_variables ? eq(1): (be > 1), msg)
         end
       end
     end
@@ -44,7 +46,7 @@ describe 'Stuff related to how we load stuff from CDN and use brandable_css' do
 
 
   def check_css(bundle_name)
-    fingerprint = BrandableCSS.fingerprint_for(bundle_name, 'legacy_normal_contrast')
+    fingerprint = BrandableCSS.cache_for(bundle_name, 'legacy_normal_contrast')[:combinedChecksum]
     expect(fingerprint).to match(RE_SHORT_MD5)
     assert_tag(tag: 'link', attributes: {
       rel: 'stylesheet',

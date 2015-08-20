@@ -16,27 +16,33 @@ define ->
       variant + contrast
 
 
-    urlFor: (bundleName) ->
-      brandPart = if window.ENV.active_brand_config
-        '/' + window.ENV.active_brand_config
+    # combinedChecksum should be like '09f833ef7a'
+    # and includesNoVariables should be true if this bundle does not
+    # "@include" variables.scss, brand_variables.scss or variant_variables.scss
+    urlFor: (bundleName, {combinedChecksum, includesNoVariables}) ->
+      brandAndVariant = if includesNoVariables
+        'no_variables'
       else
-        ''
+        (if window.ENV.active_brand_config
+          "#{window.ENV.active_brand_config}/"
+        else
+          ''
+        ) + brandableCss.getCssVariant()
       return [
         window.ENV.ASSET_HOST || '',
         'dist'
-        'brandable_css' + brandPart,
-        brandableCss.getCssVariant(),
-        bundleName + '.css'
+        'brandable_css',
+        brandAndVariant,
+        "#{bundleName}-#{combinedChecksum}.css"
       ].join('/')
 
-    # bundleName needs to include the 'combinedChecksum'
-    # eg: 'jst/foo-65ed0284f8f911179a6d5655ebbb8498'
-    # 'jst/foo' will not work.
-    loadStylesheet: (bundleName) ->
+
+    # bundleName should be something like 'jst/foo'
+    loadStylesheet: (bundleName, opts) ->
       return if bundleName of loadedStylesheets
       linkElement = document.createElement("link")
       linkElement.rel = "stylesheet"
-      linkElement.href = brandableCss.urlFor(bundleName)
+      linkElement.href = brandableCss.urlFor(bundleName, opts)
 
       # give the person trying to track down a bug a hint on how
       # this link tag got on the page
