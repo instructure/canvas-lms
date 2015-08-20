@@ -1,8 +1,8 @@
 require_relative '../../../helpers/login_common'
 
 describe 'user logging into speedgrader app' do
-  include_examples 'in-process server selenium tests'
-  include_examples 'appium mobile specs', 'speedgrader_ios'
+  include_context 'in-process server appium tests'
+  include_context 'appium mobile specs', 'speedgrader_ios'
   let(:app_login_message){ 'SpeedGrader' }
   let(:app_access_message){ 'SpeedGrader is requesting access to your account.' }
   let(:app_login_success){ 'CSGSlideMenuView' }

@@ -1,7 +1,7 @@
 require_relative '../../../helpers/landing_page_common'
 
 describe 'speedgrader for android landing page' do
-  include_examples 'in-process server selenium tests'
+  include_context 'in-process server appium tests'
   include_context 'appium mobile specs', 'speedgrader_android'
   let(:default_url){ 'myschool.instructure.com' }
 

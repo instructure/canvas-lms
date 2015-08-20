@@ -1,7 +1,7 @@
 require_relative '../../../helpers/landing_page_common'
 
 describe 'candroid landing page' do
-  include_examples 'in-process server selenium tests'
+  include_context 'in-process server appium tests'
   include_context 'appium mobile specs', 'candroid'
   let(:default_url){ 'Find your school or district' }
 

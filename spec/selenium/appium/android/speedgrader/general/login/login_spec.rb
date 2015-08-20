@@ -1,7 +1,7 @@
 require_relative '../../../helpers/login_common'
 
 describe 'speedgrader login credentials' do
-  include_examples 'in-process server selenium tests'
+  include_context 'in-process server appium tests'
   include_context 'appium mobile specs', 'speedgrader_android'
   let(:app_login_message){ /(Canvas for Android)/ } # TODO: ask dev team to modify this for Speedgrader
   let(:app_access_message){ /Canvas for Android is requesting access.*/ } # TODO: ask dev team to modify this for Speedgrader

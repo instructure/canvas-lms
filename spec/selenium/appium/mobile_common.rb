@@ -1,5 +1,4 @@
 require 'appium_lib'
-require_relative '../common'
 require_relative 'environment_setup'
 
 include EnvironmentSetup
