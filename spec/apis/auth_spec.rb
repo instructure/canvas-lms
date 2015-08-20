@@ -448,6 +448,11 @@ describe "API Authentication", type: :request do
 
               get "/login/oauth2/auth", :response_type => 'code', :client_id => developer_key.id, :redirect_uri => "http://www.example.com/my_uri"
               assert_status(401)
+
+              @user.access_tokens.create!(developer_key: developer_key)
+
+              get "/login/oauth2/auth", :response_type => 'code', :client_id => developer_key.id, :redirect_uri => "http://www.example.com/my_uri"
+              assert_status(401)
             end
           end
         end
@@ -499,27 +504,7 @@ describe "API Authentication", type: :request do
           json = trusted_exchange(true)
           expect(json['access_token']).to be_nil
         end
-
-        it "Shouldn't allow an account level dev key to auth with other account's user" do
-          enable_forgery_protection do
-            enable_cache do
-
-              user_with_pseudonym(:active_user => true, :username => 'test1@example.com', :password => 'test123')
-              course_with_teacher(:user => @user)
-
-              # create the dev key on a different account
-              account2 = Account.create!
-              developer_key = DeveloperKey.create!(account: account2, redirect_uri: "http://www.example.com/my_uri")
-
-              @user.access_tokens.create!(developer_key: developer_key)
-
-              get "/login/oauth2/auth", :response_type => 'code', :client_id => developer_key.id, :redirect_uri => "http://www.example.com/my_uri"
-              assert_status(401)
-            end
-          end
-        end
       end
-
     end
   end
 
