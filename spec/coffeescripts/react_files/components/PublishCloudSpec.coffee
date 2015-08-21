@@ -1,7 +1,7 @@
 define [
   'react'
   'jquery'
-  'compiled/react_files/components/PublishCloud'
+  'jsx/shared/PublishCloud'
   'compiled/models/FilesystemObject'
 ], (React, $, PublishCloud, FilesystemObject) ->
 

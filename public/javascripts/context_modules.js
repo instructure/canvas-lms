@@ -19,7 +19,7 @@
 define([
   'underscore',
   'compiled/models/ModuleFile',
-  'compiled/react_files/components/PublishCloud',
+  'jsx/shared/PublishCloud',
   'react',
   'compiled/models/PublishableModuleItem',
   'compiled/views/PublishIconView',
