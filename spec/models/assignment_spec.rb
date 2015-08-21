@@ -2846,6 +2846,54 @@ describe Assignment do
         end
       end
     end
+
+    describe "with moderated grading" do
+      before(:once) do
+        course_with_ta :course => @course, :active_all => true
+        assignment_model(:course => @course, :submission_types => 'online_text_entry')
+        @submission = @assignment.submit_homework(@student, :submission_type => 'online_text_entry', :body => 'ahem')
+        @assignment.grade_student(@student, :comment => 'real comment', :score => 1)
+        @submission.add_comment(:author => @teacher, :comment => 'provisional comment', :provisional => true)
+        @submission.provisional_grade(@teacher).update_attribute(:score, 2)
+        @submission.add_comment(:author => @ta, :comment => 'other provisional comment', :provisional => true)
+        @submission.provisional_grade(@ta).update_attribute(:score, 3)
+      end
+
+      describe "for provisional grader" do
+        before(:once) do
+          @json = @assignment.speed_grader_json(@ta, :grading_role => :provisional_grader)
+        end
+
+        it "should include only the grader's provisional grades" do
+          expect(@json['submissions'][0]['score']).to eq 3
+          expect(@json['submissions'][0]['provisional_grades']).to be_nil
+        end
+
+        it "should include only the grader's provisional comments" do
+          expect(@json['submissions'][0]['submission_comments'].map { |comment| comment['comment'] }).to eq ['other provisional comment']
+        end
+      end
+
+      describe "for moderator" do
+        before(:once) do
+          @json = @assignment.speed_grader_json(@teacher, :grading_role => :moderator)
+        end
+
+        it "should include the moderator's provisional grades and comments" do
+          expect(@json['submissions'][0]['score']).to eq 2
+          expect(@json['submissions'][0]['submission_comments'].map { |comment| comment['comment'] }).to eq ['provisional comment']
+        end
+
+        it "should list all other provisional grades" do
+          pgs = @json['submissions'][0]['provisional_grades']
+          expect(pgs.size).to eq 1
+          expect(pgs.map { |pg| [pg['score'], pg['scorer_id'], pg['submission_comments'][0]['comment']] }).to eq(
+            [[3.0, @ta.id, "other provisional comment"]]
+          )
+        end
+      end
+
+    end
   end
 
   describe "#too_many_qs_versions" do

@@ -1286,20 +1286,26 @@ class Assignment < ActiveRecord::Base
     json
   end
 
-  def speed_grader_json(user, avatars=false)
+  def grades_published?
+    # TODO: this will, of course, change once grade publishing is implemented.
+    #       we will probably need to add a column for grade publishing status
+    !moderated_grading?
+  end
+
+  def speed_grader_json(user, avatars: false, grading_role: :grader)
     Attachment.skip_thumbnails = true
-    submission_fields = [ :user_id, :id, :submitted_at, :workflow_state,
-                          :grade, :grade_matches_current_submission,
-                          :graded_at, :turnitin_data, :submission_type, :score,
-                          :assignment_id, :submission_comments, :excused ]
+    submission_fields = [:user_id, :id, :submitted_at, :workflow_state,
+                         :grade, :grade_matches_current_submission,
+                         :graded_at, :turnitin_data, :submission_type, :score,
+                         :assignment_id, :submission_comments, :excused].freeze
 
     comment_fields = [:comment, :id, :author_name, :created_at, :author_id,
                       :media_comment_type, :media_comment_id,
-                      :cached_attachments, :attachments]
+                      :cached_attachments, :attachments].freeze
 
     attachment_fields = [:id, :comment_id, :content_type, :context_id, :context_type,
                          :display_name, :filename, :mime_class,
-                         :size, :submitter_id, :workflow_state]
+                         :size, :submitter_id, :workflow_state].freeze
 
     res = as_json(
       :include => {
@@ -1337,10 +1343,9 @@ class Assignment < ActiveRecord::Base
         map{|s| s.as_json(:include_root => false, :only => [:user_id, :course_section_id]) }
     res[:context][:quiz] = self.quiz.as_json(:include_root => false, :only => [:anonymous_submissions])
 
-    submissions = self.submissions.where(:user_id => students)
-                  .includes(:submission_comments,
-                            :versions,
-                            :quiz_submission)
+    includes = [:versions, :quiz_submission]
+    includes << (grading_role == :grader ? :submission_comments : :all_submission_comments)
+    submissions = self.submissions.where(:user_id => students).includes(*includes)
 
     res[:too_many_quiz_submissions] = too_many = too_many_qs_versions?(submissions)
     qs_versions = quiz_submission_versions(submissions, too_many)
@@ -1349,15 +1354,19 @@ class Assignment < ActiveRecord::Base
 
     res[:submissions] = submissions.map do |sub|
       json = sub.as_json(:include_root => false,
-        :include => {
-          :submission_comments => {
-            :methods => avatar_methods,
-            :only => comment_fields
-          }
-        },
         :methods => [:submission_history, :late],
         :only => submission_fields
       ).merge("from_enrollment_type" => enrollment_types_by_id[sub.user_id])
+
+      if grading_role == :provisional_grader || grading_role == :moderator
+        provisional_grade = sub.provisional_grades.where(scorer_id: user).first
+        provisional_grade ||= ModeratedGrading::NullProvisionalGrade.new(user.id)
+        json.merge! provisional_grade.grade_attributes
+      end
+
+      json[:submission_comments] = (provisional_grade || sub).submission_comments.as_json(:include_root => false,
+                                                                                          :methods => avatar_methods,
+                                                                                          :only => comment_fields)
 
       json['attachments'] = sub.attachments.map{|att| att.as_json(
           :only => [:mime_class, :comment_id, :id, :submitter_id ]
@@ -1366,9 +1375,6 @@ class Assignment < ActiveRecord::Base
       json['submission_history'] = if json['submission_history'] && (quiz.nil? || too_many)
                                      json['submission_history'].map do |version|
                                        version.as_json(
-                                         :include => {
-                                           :submission_comments => { :only => comment_fields }
-                                         },
                                          :only => submission_fields,
                                          :methods => [:versioned_attachments, :late]
                                        ).tap do |version_json|
@@ -1398,6 +1404,17 @@ class Assignment < ActiveRecord::Base
                                        }}
                                      end
                                    end
+
+      if grading_role == :moderator
+        json['provisional_grades'] = sub.provisional_grades.where('scorer_id<>?', user.id).map do |pg|
+          pg.grade_attributes.tap do |json|
+            json[:submission_comments] = pg.submission_comments.as_json(:include_root => false,
+                                                                        :methods => avatar_methods,
+                                                                        :only => comment_fields)
+          end
+        end
+      end
+
       json
     end
     res[:GROUP_GRADING_MODE] = grade_as_group?
