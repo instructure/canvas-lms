@@ -2,7 +2,7 @@ define [
   'jquery'
   'underscore'
   'react'
-  'compiled/react_files/components/ZipFileOptionsForm'
+  'jsx/files/ZipFileOptionsForm'
   ], ($, _, React, ZipFileOptionsForm ) ->
 
     ZipFileOptionsForm = React.createFactory(ZipFileOptionsForm)

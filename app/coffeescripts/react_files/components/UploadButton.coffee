@@ -5,7 +5,7 @@ define [
   'underscore'
   'jsx/files/FileRenameForm'
   '../modules/customPropTypes'
-  './ZipFileOptionsForm'
+  'jsx/files/ZipFileOptionsForm'
   '../modules/FileOptionsCollection'
 ], (I18n, React, withReactElement, _, FileRenameForm, customPropTypes, ZipFileOptionsFormComponent, FileOptionsCollection) ->
 
