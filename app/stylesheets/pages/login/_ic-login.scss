@@ -30,6 +30,7 @@
 $ic-Login-border-radius: 5px;
 $modal_box_width: 623px;
 $modal_box_padding: 20px;
+$ic-Login-confirmation-bgd: #34444f;
 
 ////////////////////////////////////////
 // New Login Styles
@@ -259,3 +260,49 @@ body.ic-Login-Body #footer.ic-Login-footer {
   }
 }
 
+.ic-Login-confirmation__headline {
+  margin: 0 0 $ic-sp;
+}
+
+.ic-Login-confirmation__actions {
+  margin-top: $ic-sp*2;
+  text-align: right;
+}
+
+////
+// Styles specific to the confirmation box, using new UI variables
+////
+body.body--login-confirmation {
+  background: darken($ic-Login-confirmation-bgd, 3%);
+}
+
+.ic-Login-confirmation {
+  box-sizing: border-box;
+  border-radius: $baseBorderRadius;
+  font-size: $baseFontSize;
+  box-shadow: 0 1px 4px 1px rgba(black, 0.4);
+  width: 400px;
+  margin: $ic-sp*3 auto 0;
+  width: 696px;
+  @include breakpoint(short) {
+    margin-top: $ic-sp;
+  }
+}
+
+.ic-Login-confirmation__header {
+  background: $ic-Login-confirmation-bgd;
+  border-top-left-radius: $baseBorderRadius;
+  border-top-right-radius: $baseBorderRadius;
+  padding: $ic-sp*1.5;
+}
+
+.ic-Login-confirmation__logo {
+  width: 140px; height: 57px;
+}
+
+.ic-Login-confirmation__content {
+  padding: $ic-sp*2;
+  background: $ic-color-light;
+  border-bottom-left-radius: $baseBorderRadius;
+  border-bottom-right-radius: $baseBorderRadius;
+}
