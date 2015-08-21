@@ -111,6 +111,15 @@ module AssignmentOverridesSeleniumHelper
     last_lock_at_element.send_keys(opts.fetch(:lock_at, Time.zone.now.advance(days:5)))
   end
 
+  def find_vdd_time(override_context)
+    @due_at_time = override_context.due_at.strftime('%b %-d at %-l:%M') <<
+                                                               override_context.lock_at.strftime('%p').downcase
+    @lock_at_time = override_context.lock_at.strftime('%b %-d at %-l:%M') <<
+                                                               override_context.lock_at.strftime('%p').downcase
+    @unlock_at_time = override_context.unlock_at.strftime('%b %-d at %-l:%M') <<
+                                                               override_context.unlock_at.strftime('%p').downcase
+  end
+
   def add_due_date_override(assignment, due_at = Time.zone.now.advance(days:1))
     user = @user
     new_section = @course.course_sections.create!(:name => 'New Section')
@@ -125,7 +134,7 @@ module AssignmentOverridesSeleniumHelper
 
   def add_user_specific_due_date_override(assignment, opts = {})
     user = @user
-    new_section = opts.fetch(:section) || @course.course_sections.create!(:name => 'New Section')
+    new_section = opts.fetch(:section, @course.course_sections.create!(:name => 'New Section'))
     student_in_section(new_section)
     override = assignment.assignment_overrides.build
     override.set = new_section
