@@ -8,14 +8,13 @@ define [
   './Toolbar'
   'jsx/files/Breadcrumbs'
   'jsx/files/FolderTree'
-  './FilesUsage'
+  'jsx/files/FilesUsage'
   '../mixins/MultiselectableMixin'
   '../mixins/dndMixin'
   '../modules/filesEnv'
-], (React, ReactRouter, ReactModal, I18n, withReactElement, splitAssetString, ToolbarComponent, Breadcrumbs, FolderTree, FilesUsageComponent, MultiselectableMixin, dndMixin, filesEnv) ->
+], (React, ReactRouter, ReactModal, I18n, withReactElement, splitAssetString, ToolbarComponent, Breadcrumbs, FolderTree, FilesUsage, MultiselectableMixin, dndMixin, filesEnv) ->
 
   Toolbar = React.createFactory ToolbarComponent
-  FilesUsage = React.createFactory FilesUsageComponent
   RouteHandler = React.createFactory ReactRouter.RouteHandler
 
 
