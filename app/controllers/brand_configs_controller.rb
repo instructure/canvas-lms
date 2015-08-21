@@ -5,6 +5,7 @@ class BrandConfigsController < ApplicationController
   before_filter :require_account_context
   before_filter :require_user
   before_filter :require_account_management
+  before_filter :require_account_branding, except: [:destroy]
 
   def new
     @page_title = join_title(t('Theme Editor'), @account.name)
@@ -124,6 +125,13 @@ class BrandConfigsController < ApplicationController
   end
 
   protected
+
+  def require_account_branding
+    unless @account.branding_allowed?
+      flash[:error] = t "You cannot edit themes on this subaccount."
+      redirect_to account_path(@account)
+    end
+  end
 
   def process_variables(variables)
     variables.each_with_object({}) do |(key, value), memo|

@@ -22,6 +22,8 @@ describe BrandConfigsController do
   before :each do
     @account = Account.default
     @account.enable_feature!(:use_new_styles)
+    @account.settings[:global_includes] = true
+    @account.save!
     @bc = BrandConfig.create(variables: {"ic-brand-primary" => "#321"})
   end
 
@@ -42,6 +44,7 @@ describe BrandConfigsController do
 
     it "should create variableSchema based on parent configs" do
       @account.brand_config_md5 = @bc.md5
+      @account.settings= {global_includes: true, sub_account_includes: true}
       @account.save!
 
       @subaccount = Account.create!(:parent_account => @account)
