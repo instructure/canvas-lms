@@ -598,6 +598,7 @@ CanvasRails::Application.routes.draw do
     member do
       get :statistics
     end
+    resources :developer_keys, only: :index
   end
 
   get 'images/users/:user_id' => 'users#avatar_image', as: :avatar_image
@@ -1318,6 +1319,9 @@ CanvasRails::Application.routes.draw do
       delete 'developer_keys/:id', action: :destroy
       put 'developer_keys/:id', action: :update
       post 'developer_keys', action: :create
+
+      get 'accounts/:account_id/developer_keys', action: :index
+      post 'accounts/:account_id/developer_keys', action: :create
     end
 
     scope(controller: :search) do

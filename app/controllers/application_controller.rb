@@ -1517,7 +1517,11 @@ class ApplicationController < ActionController::Base
   end
 
   def require_site_admin_with_permission(permission)
-    unless Account.site_admin.grants_right?(@current_user, permission)
+    require_context_with_permission(Account.site_admin, permission)
+  end
+
+  def require_context_with_permission(context, permission)
+    unless context.grants_right?(@current_user, permission)
       respond_to do |format|
         format.html do
           if @current_user
