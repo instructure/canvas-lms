@@ -187,9 +187,8 @@ describe Api::V1::GradebookHistory do
 
     it 'should properly set pervious_* attributes' do
       # regrade to get a second version
-      @submission.score = 80
       @submission.score = '80'
-      @submission.save!
+      @submission.with_versioning(:explicit => true) { @submission.save! }
 
       harness = GradebookHistoryHarness.new
       submissions = harness.submissions_for(@course, api_context, now, @grader2.id, @assignment.id)

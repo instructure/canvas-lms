@@ -1142,10 +1142,19 @@ class Assignment < ActiveRecord::Base
     submissions
   end
 
-  def find_asset_for_assessment(association, user_id)
-    user = self.context.users.where(id: user_id).first
+  def find_asset_for_assessment(association, user_or_user_id, opts={})
+    user = user_or_user_id.is_a?(User) ? user_or_user_id : self.context.users.where(id: user_or_user_id).first
     if association.purpose == "grading"
-      user ? [self.find_or_create_submission(user), user] : [nil, nil]
+      if user
+        sub = self.find_or_create_submission(user)
+        if opts[:provisional_grader]
+          [sub.find_or_create_provisional_grade!(:scorer => opts[:provisional_grader]), user]
+        else
+          [sub, user]
+        end
+      else
+        [nil, nil]
+      end
     else
       [self, user]
     end
@@ -1326,13 +1335,24 @@ class Assignment < ActiveRecord::Base
 
     enrollments = context.enrollments_visible_to(user)
 
-    rubric_assmnts = visible_rubric_assessments_for(user) || []
+    is_provisional = grading_role == :provisional_grader || grading_role == :moderator
+    rubric_assmnts = visible_rubric_assessments_for(user, :provisional_grader => is_provisional) || []
+
+    # include all the rubric assessments if a moderator
+    all_provisional_rubric_assmnts = grading_role == :moderator &&
+      (visible_rubric_assessments_for(user, :provisional_moderator => true) || [])
+
     res[:context][:students] = students.map do |u|
       json = u.as_json(:include_root => false,
                 :methods => avatar_methods,
                 :only => [:name, :id])
       json[:rubric_assessments] = rubric_assmnts.select{|ra| ra.user_id == u.id}.
         as_json(:methods => [:assessor_name], :include_root => false)
+
+      if all_provisional_rubric_assmnts
+        json[:provisional_rubric_assessments] = all_provisional_rubric_assmnts.select{|ra| ra.user_id == u.id}.
+          as_json(:methods => [:assessor_name], :include_root => false)
+      end
       json
     end
 
@@ -1527,12 +1547,20 @@ class Assignment < ActiveRecord::Base
     ).order_by_sortable_name.uniq.to_a
   end
 
-  def visible_rubric_assessments_for(user)
+  def visible_rubric_assessments_for(user, opts={})
     return [] unless user && self.rubric_association
 
-    scope = self.rubric_association.rubric_assessments.for_submissions.preload(:assessor)
-    unless self.rubric_association.grants_any_right?(user, :manage, :view_rubric_assessments)
-      scope = scope.where(:assessor_id => user.id)
+    scope = self.rubric_association.rubric_assessments.preload(:assessor)
+
+    if opts[:provisional_grader]
+      scope = scope.for_provisional_grades.where(:assessor_id => user.id)
+    elsif opts[:provisional_moderator]
+      scope = scope.for_provisional_grades.where('assessor_id <> ?', user.id)
+    else
+      scope = scope.for_submissions
+      unless self.rubric_association.grants_any_right?(user, :manage, :view_rubric_assessments)
+        scope = scope.where(:assessor_id => user.id)
+      end
     end
     scope.to_a.sort_by{|a| [a.assessment_type == 'grading' ? CanvasSort::First : CanvasSort::Last, Canvas::ICU.collation_key(a.assessor_name)] }
   end

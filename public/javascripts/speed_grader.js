@@ -696,6 +696,9 @@ define([
     $(".save_rubric_button").click(function() {
       var $rubric = $(this).parents("#rubric_holder").find(".rubric");
       var data = rubricAssessment.assessmentData($rubric);
+      if (ENV.grading_role == 'moderator' || ENV.grading_role == 'provisional_grader') {
+        data['provisional'] = '1';
+      }
       var url = $(".update_rubric_assessment_url").attr('href');
       var method = "POST";
       EG.toggleFullRubric();

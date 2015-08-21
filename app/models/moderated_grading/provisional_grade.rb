@@ -33,6 +33,10 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
     submission.all_submission_comments.for_provisional_grade(self.id)
   end
 
+  def student
+    self.submission.student
+  end
+
   private
   def set_graded_at
     self.graded_at = Time.zone.now

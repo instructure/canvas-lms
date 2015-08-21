@@ -27,9 +27,9 @@ module SimplyVersioned
     :on_update => nil,
     :on_load => nil
   }
-  
+
   module ClassMethods
-    
+
     # Marks this ActiveRecord model as being versioned. Calls to +create+ or +save+ will,
     # in future, create a series of associated Version instances that can be accessed via
     # the +versions+ association.
@@ -58,14 +58,14 @@ module SimplyVersioned
     # on the model before calling save or, alternatively, use +without_versioning+ and save
     # the model from its block.
     #
-    
+
     def simply_versioned( options = {} )
       bad_keys = options.keys - SimplyVersioned::DEFAULTS.keys
       raise SimplyVersioned::BadOptions.new( bad_keys ) unless bad_keys.empty?
-      
+
       options.reverse_merge!(DEFAULTS)
       options[:exclude] = Array( options[ :exclude ] ).map( &:to_s )
-      
+
       has_many :versions, :order => 'number DESC', :as => :versionable,
                :dependent => :destroy,
                :inverse_of => :versionable, :extend => VersionsProxyMethods
@@ -75,15 +75,15 @@ module SimplyVersioned
       # INSTRUCTURE: Lets us ignore certain things when deciding whether to store a new version
       before_save :check_if_changes_are_worth_versioning
       after_save :simply_versioned_create_version
-      
+
       cattr_accessor :simply_versioned_options
       self.simply_versioned_options = options
-      
+
       class_eval do
         def versioning_enabled=( enabled )
           self.instance_variable_set( :@simply_versioned_enabled, enabled )
         end
-        
+
         def versioning_enabled?
           enabled = self.instance_variable_get( :@simply_versioned_enabled )
           if enabled.nil?
@@ -98,7 +98,7 @@ module SimplyVersioned
 
   # Methods that will be defined on the ActiveRecord model being versioned
   module InstanceMethods
-    
+
     # Revert the attributes of this model to their values as of an earlier version.
     #
     # Pass either a Version instance or a version number.
@@ -110,20 +110,20 @@ module SimplyVersioned
       options.reverse_merge!({
         :except => [:created_at,:updated_at]
       })
-      
+
       version = if version.kind_of?( Version )
         version
       elsif version.kind_of?( Fixnum )
         self.versions.where(number: version).first
       end
-      
+
       raise "Invalid version (#{version.inspect}) specified!" unless version
-      
+
       options[:except] = options[:except].map( &:to_s )
-      
+
       self.update_attributes( YAML::load( version.yaml ).except( *options[:except] ) )
     end
-    
+
     # Invoke the supplied block passing the receiver as the sole block argument with
     # versioning enabled or disabled depending upon the value of the +enabled+ parameter
     # for the duration of the block.
@@ -145,22 +145,22 @@ module SimplyVersioned
       ensure
         @versioning_explicitly_enabled = nil
         self.versioning_enabled = versioning_was_enabled
-        @simply_versioned_explicit_enabled = explicit_enabled
+        @simply_versioned_explicit_enabled = explicit_versioning_was_enabled
       end
     end
 
     def without_versioning(&block)
       with_versioning(false, &block)
     end
-    
+
     def unversioned?
       self.versions.nil? || !self.versions.exists?
     end
-    
+
     def versioned?
       !unversioned?
     end
-    
+
     # INSTRUCTURE: Added to allow model instances pulled out
     # of versions to still know their version number
     def force_version_number(number)
@@ -189,7 +189,7 @@ module SimplyVersioned
     end
 
     protected
-    
+
     # INSTRUCTURE: If defined on a method, allow a check
     # on the before_save to see if the changes are worth
     # creating a new version for
@@ -199,7 +199,7 @@ module SimplyVersioned
         (self.changes.keys.map(&:to_s) - simply_versioned_options[:exclude] - ["updated_at"]).present?
       true
     end
-    
+
     def simply_versioned_create_version
       if self.versioning_enabled?
         # INSTRUCTURE
@@ -222,7 +222,7 @@ module SimplyVersioned
       end
       true
     end
-    
+
   end
 
   module VersionsProxyMethods
@@ -241,7 +241,7 @@ module SimplyVersioned
         end
       else
         super
-      end 
+      end
     end
 
     def populate_versionables(versions)
@@ -255,13 +255,13 @@ module SimplyVersioned
       end
       version
     end
-    
+
     # Get the Version instance corresponding to this models for the specified version number.
     def get_version( number )
       populate_versionable where(number: number).first
     end
     alias_method :get, :get_version
-    
+
     # Get the first Version corresponding to this model.
     def first_version
       populate_versionable reorder( 'number ASC' ).limit(1).to_a.first
@@ -273,7 +273,7 @@ module SimplyVersioned
       populate_versionable reorder( 'number DESC' ).limit(1).to_a.first
     end
     alias_method :current, :current_version
-    
+
     # If the model instance has more versions than the limit specified, delete all excess older versions.
     def clean_old_versions( versions_to_keep )
       where( 'number <= ?', self.maximum( :number ) - versions_to_keep ).each do |version|
@@ -281,13 +281,13 @@ module SimplyVersioned
       end
     end
     alias_method :purge, :clean_old_versions
-    
+
     # Return the Version for this model with the next higher version
     def next_version( number )
       populate_versionable reorder( 'number ASC' ).where( "number > ?", number ).limit(1).to_a.first
     end
     alias_method :next, :next_version
-    
+
     # Return the Version for this model with the next lower version
     def previous_version( number )
       populate_versionable reorder( 'number DESC' ).where( "number < ?", number ).limit(1).to_a.first

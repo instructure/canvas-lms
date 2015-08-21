@@ -233,10 +233,19 @@ class RubricAssociation < ActiveRecord::Base
     raise "Artifact required for assessing" unless opts[:artifact]
     raise "Assessment type required for assessing" unless params[:assessment_type]
 
+    if opts[:artifact].is_a?(Quizzes::QuizSubmission)
+      opts[:artifact] = self.association_object.find_or_create_submission(opts[:artifact].user)
+    end
+
     if self.association_object.is_a?(Assignment) && !self.association_object.grade_group_students_individually
-      students_to_assess = self.association_object.group_students(opts[:artifact].user).last
-      artifacts_to_assess = students_to_assess.map do |student|
-        self.association_object.find_asset_for_assessment(self, student).first
+      group, students_to_assess = self.association_object.group_students(opts[:artifact].student)
+      if group
+        provisional_grader = opts[:artifact].is_a?(ModeratedGrading::ProvisionalGrade) && opts[:assessor]
+        artifacts_to_assess = students_to_assess.map do |student|
+          self.association_object.find_asset_for_assessment(self, student, :provisional_grader => provisional_grader).first
+        end
+      else
+        artifacts_to_assess = [opts[:artifact]]
       end
     else
       artifacts_to_assess = [opts[:artifact]]
@@ -298,7 +307,7 @@ class RubricAssociation < ActiveRecord::Base
         # Assessments are unique per artifact/assessor/assessment_type.
         assessment = association.rubric_assessments.where(artifact_id: artifact, artifact_type: artifact.class.to_s, assessor_id: opts[:assessor], assessment_type: params[:assessment_type]).first
       end
-      assessment ||= association.rubric_assessments.build(:assessor => opts[:assessor], :artifact => artifact, :user => artifact.user, :rubric => self.rubric, :assessment_type => params[:assessment_type])
+      assessment ||= association.rubric_assessments.build(:assessor => opts[:assessor], :artifact => artifact, :user => artifact.student, :rubric => self.rubric, :assessment_type => params[:assessment_type])
       assessment.score = score if replace_ratings
       assessment.data = ratings if replace_ratings
       assessment.comments = params[:comments] if params[:comments]

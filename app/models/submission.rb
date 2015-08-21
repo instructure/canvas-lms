@@ -36,6 +36,7 @@ class Submission < ActiveRecord::Base
   belongs_to :group
   belongs_to :media_object
   belongs_to :student, :class_name => 'User', :foreign_key => :user_id
+
   belongs_to :quiz_submission, :class_name => 'Quizzes::QuizSubmission'
   has_many :all_submission_comments, :order => 'created_at', :class_name => 'SubmissionComment', :dependent => :destroy
   has_many :submission_comments, :order => 'created_at', :conditions => { :provisional_grade_id => nil }

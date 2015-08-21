@@ -2851,12 +2851,37 @@ describe Assignment do
       before(:once) do
         course_with_ta :course => @course, :active_all => true
         assignment_model(:course => @course, :submission_types => 'online_text_entry')
+        rubric_model
+        @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading', :use_for_grading => true)
+
         @submission = @assignment.submit_homework(@student, :submission_type => 'online_text_entry', :body => 'ahem')
         @assignment.grade_student(@student, :comment => 'real comment', :score => 1)
+
         @submission.add_comment(:author => @teacher, :comment => 'provisional comment', :provisional => true)
-        @submission.provisional_grade(@teacher).update_attribute(:score, 2)
+        teacher_pg = @submission.provisional_grade(@teacher)
+        teacher_pg.update_attribute(:score, 2)
+        @association.assess(
+          :user => @student, :assessor => @teacher, :artifact => teacher_pg,
+          :assessment => {
+            :assessment_type => 'grading',
+            :criterion_crit1 => {
+              :points => 2,
+              :comments => 'a comment',
+            }
+          })
+
         @submission.add_comment(:author => @ta, :comment => 'other provisional comment', :provisional => true)
-        @submission.provisional_grade(@ta).update_attribute(:score, 3)
+        ta_pg = @submission.provisional_grade(@ta)
+        ta_pg.update_attribute(:score, 3)
+        @association.assess(
+          :user => @student, :assessor => @ta, :artifact => ta_pg,
+          :assessment => {
+            :assessment_type => 'grading',
+            :criterion_crit1 => {
+              :points => 3,
+              :comments => 'a comment',
+            }
+          })
       end
 
       describe "for provisional grader" do
@@ -2872,6 +2897,12 @@ describe Assignment do
         it "should include only the grader's provisional comments" do
           expect(@json['submissions'][0]['submission_comments'].map { |comment| comment['comment'] }).to eq ['other provisional comment']
         end
+
+        it "should only include the grader's provisional rubric assessments" do
+          ras = @json['context']['students'][0]['rubric_assessments']
+          expect(ras.count).to eq 1
+          expect(ras[0]['assessor_id']).to eq @ta.id
+        end
       end
 
       describe "for moderator" do
@@ -2884,12 +2915,24 @@ describe Assignment do
           expect(@json['submissions'][0]['submission_comments'].map { |comment| comment['comment'] }).to eq ['provisional comment']
         end
 
+        it "should include the moderator's provisional rubric assessments" do
+          ras = @json['context']['students'][0]['rubric_assessments']
+          expect(ras.count).to eq 1
+          expect(ras[0]['assessor_id']).to eq @teacher.id
+        end
+
         it "should list all other provisional grades" do
           pgs = @json['submissions'][0]['provisional_grades']
           expect(pgs.size).to eq 1
           expect(pgs.map { |pg| [pg['score'], pg['scorer_id'], pg['submission_comments'][0]['comment']] }).to eq(
             [[3.0, @ta.id, "other provisional comment"]]
           )
+        end
+
+        it "should include all the other provisional rubric assessments" do
+          pras = @json['context']['students'][0]['provisional_rubric_assessments']
+          expect(pras.count).to eq 1
+          expect(pras[0]['assessor_id']).to eq @ta.id
         end
       end
 
