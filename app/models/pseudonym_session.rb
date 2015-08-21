@@ -23,6 +23,7 @@ class PseudonymSession < Authlogic::Session::Base
   find_by_login_method :custom_find_by_unique_id
   remember_me_for 2.weeks
   allow_http_basic_auth false
+  consecutive_failed_logins_limit 0
 
   attr_accessor :remote_ip, :too_many_attempts
 
