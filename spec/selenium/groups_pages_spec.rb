@@ -4,6 +4,7 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/announcements_common
 require File.expand_path(File.dirname(__FILE__) + '/helpers/discussions_common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/wiki_and_tiny_common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
+require File.expand_path(File.dirname(__FILE__) + '/helpers/conferences_common')
 
 describe "groups" do
   include_context "in-process server selenium tests"
@@ -14,6 +15,11 @@ describe "groups" do
   let(:discussions_page) {url + '/discussion_topics'}
   let(:pages_page) {url + '/pages'}
   let(:files_page) {url + '/files'}
+  let(:conferences_page) {url + '/conferences'}
+
+  before(:all) do
+    PluginSetting.create!(name: "wimba", settings: {"domain" => "wimba.instructure.com"})
+  end
 
   context "as a student" do
     before do
@@ -213,9 +219,8 @@ describe "groups" do
       end
 
       it "should only allow group members to access files", priority: "1", test_id: 273626 do
-        course_student = User.create!(name: 'course student')
         expect_new_page_load { get files_page }
-        user_session(course_student)
+        user_session(User.create!(name: 'course student'))
         get files_page
         expect(f('.ui-state-error')).to be_displayed
       end
@@ -263,6 +268,19 @@ describe "groups" do
         get files_page
         set_item_permissions(:restricted_access, :available_with_link, :cloud_icon)
         expect(f('.btn-link.published-status.hiddenState')).to be_displayed
+      end
+    end
+
+    describe "conferences page" do
+      it_behaves_like 'conferences_page', 'student'
+
+      it "should allow access to conferences only within the scope of a group", priority: "1", test_id: 273638 do
+        get conferences_page
+        expect(f('.new-conference-btn')).to be_displayed
+
+        user_session(User.create!(name: 'course student'))
+        get conferences_page
+        expect(f('.ui-state-error')).to be_displayed
       end
     end
   end
@@ -381,6 +399,10 @@ describe "groups" do
         set_item_permissions(:restricted_access, :available_with_link, :cloud_icon)
         expect(f('.btn-link.published-status.hiddenState')).to be_displayed
       end
+    end
+
+    describe "conferences page" do
+      it_behaves_like 'conferences_page', 'teacher'
     end
   end
 end

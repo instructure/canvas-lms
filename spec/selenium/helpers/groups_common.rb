@@ -1,5 +1,43 @@
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 
+# ======================================================================================================================
+# Shared Examples
+# ======================================================================================================================
+shared_examples 'conferences_page' do |context|
+
+  it "should allow group users to create a conference", priority: pick_priority(context,"1","2"),test_id: pick_test_id(context, 307624, 308534) do
+    title = 'test conference'
+    get conferences_page
+    create_conference(title)
+    expect(f('#new-conference-list .ig-title').text).to include(title)
+  end
+end
+
+# ======================================================================================================================
+# Helper Methods
+# ======================================================================================================================
+def pick_test_id(context, id1, id2)
+  case context
+  when 'student'
+     id1
+  when 'teacher'
+     id2
+  else
+     raise('Error: Invalid context!')
+  end
+end
+
+def pick_priority(context, p1, p2)
+  case context
+  when 'student'
+    p1
+  when 'teacher'
+    p2
+  else
+    raise('Error: Invalid context!')
+  end
+end
+
 def seed_students(count)
   @students = []
   count.times do |n|
