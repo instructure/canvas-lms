@@ -716,7 +716,7 @@ describe "gradebook2" do
       end
     end
 
-    describe "Total points toggle", priority: "1", test_id: 164012 do
+    describe "Total points toggle" do
       def should_show_percentages
         ff(".total-column").each { |total| expect(total.text).to match /%/ }
       end
@@ -743,7 +743,7 @@ describe "gradebook2" do
         expect(dialog.text).to match /Warning/
       end
 
-      it 'should allow toggling display by points or percent' do
+      it 'should allow toggling display by points or percent', priority: "1", test_id: 164012 do
         should_show_percentages
 
         get "/courses/#{@course.id}/gradebook2"
@@ -770,7 +770,7 @@ describe "gradebook2" do
         expect(dialog).to equal nil
       end
       context 'as a student' do
-        it 'should display total grades as points' do
+        it 'should display total grades as points', priority: "2", test_id: 164229  do
           course_with_student_logged_in
           assignment = @course.assignments.build
           assignment.publish
@@ -782,20 +782,19 @@ describe "gradebook2" do
           expect(f('#submission_final-grade .grade')).to include_text("10")
         end
       end
-
     end
 
     def header_text(n)
       f(".container_0 .slick-header-column:nth-child(#{n})").try(:text)
     end
 
-    context "custom gradebook columns", priority: "2", test_id: 164225 do
+    context "custom gradebook columns" do
       def custom_column(opts = {})
         opts.reverse_merge! title: "<b>SIS ID</b>"
         @course.custom_gradebook_columns.create! opts
       end
 
-      it "shows custom columns" do
+      it "shows custom columns", priority: "2", test_id: 164225 do
         hidden = custom_column title: "hidden", hidden: true
         col = custom_column
         col.update_order([col.id, hidden.id])
