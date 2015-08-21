@@ -1278,7 +1278,7 @@ nb:
   all_configured_apps_a14eef0a: "Alle konfigurerte applikasjoner"
   all_dates_fields_must_be_present_and_formatted_cor_3a0fe925: "Alle datafelt må være til stede og formatert riktig"
   all_finished_time_to_publish_your_course_click_the_b6f07217: "Alt ferdig? Tid for å publisere din kurset! Klikk på knappen under for å gjøre det offisielt! Publisering vil tillate brukerne til å begynne å delta på kurset."
-  all_grading_periods_77974940: "Alle Gradering Perioder"
+  all_grading_periods_77974940: "Alle vurderingsperioder"
   all_grading_periods_must_have_a_title_a1a38d87: "Alle vurderingsperioder må ha en tittel"
   all_start_dates_must_be_before_the_end_date_d949eca9: "Alle startdatoer må være før sluttdatoen"
   all_students_have_taken_the_quiz_b558f8b4: "Alle studentene har tatt prøven"
@@ -1495,7 +1495,7 @@ nb:
       gpa_scale_explainer: "Hva er tallkaraktersetting?"
       grading_scheme_info: "Se/rediger karaktersettingsplan"
   assignment_976578a8: Oppgave
-  assignment_comments_e43ed898: "Overdragelse Kommentarer"
+  assignment_comments_e43ed898: "Kommentarer til oppgaven"
   assignment_details: 
     no_graded_submissions: "Ingen innleveringer som er karaktersatt"
   assignment_details_dialog: 
@@ -4752,10 +4752,10 @@ nb:
       tomorrow: "I morgen"
       yesterday: "I går"
     formats: 
-      date_at_time: "%-d. %b %H:%M"
+      date_at_time: "%-d. %b %k:%M"
       default: "%d.%m.%Y"
-      full: "%b %-d, %Y %-I:%M%P"
-      full_with_weekday: "%a %b %-d, %Y %-l:%M%P"
+      full: "%b %-d, %Y %-k:%M"
+      full_with_weekday: "%a %b %-d, %Y %-k:%M"
       long: "%-d %B %Y"
       long_with_weekday: "%A %-d. %B"
       medium: "%-d %b %Y"
@@ -6373,7 +6373,7 @@ nb:
     grade: 
       muted: Passiv
     grade_summary: 
-      all_grading_periods: "Alle Gradering Perioder"
+      all_grading_periods: "Alle vurderingsperioder"
       assignments: Oppgaver
       buttons: 
         show_what_if: "Vis lagrede hva-hvis resultater"
@@ -12888,7 +12888,7 @@ nb:
   select_course_color_cad8e62b: "Velg kursfarge"
   select_itemname_f70db487: "Velg %{itemName}"
   select_navigation_links_68e1e924: "Velg navigasjonslenker"
-  select_the_file_you_want_to_associate_or_add_a_fil_eedd8dc4: "Velg filen du ønsker å assosiere, eller legge til en fil ved å velge \"Ny fil\"."
+  select_the_file_you_want_to_associate_or_add_a_fil_eedd8dc4: "Velg filen du ønsker å assosiere, eller egg til flere filer ved å velge \"Ny fil\". r"
   selected_answer: "Du valgte dette svaret."
   selected_subtree_a7693937: "Valgt %{subtree}"
   self_enrollments: 
@@ -13463,7 +13463,7 @@ nb:
       external_url_item: "Ekstern URL"
       external_url_notice: "Skriv inn en URL og et sidenavn for å legge til en lenke til et nettsted til denne *modulen*."
       file_item: Fil
-      file_notice: "Velg filen du ønsker å assosiere med denne *modulen*, eller legg til en fil ved å velge \"Ny fil\"."
+      file_notice: "Velg filen du ønsker å assosiere med denne *modulen*, eller legg til flere filer ved å velge \"Ny fil\"."
       indent_level: 
         one: "*rykk inn 1 nivå*"
         other: "*rykk inn %{count} nivåer*"
@@ -13751,7 +13751,7 @@ nb:
       submitted: "*Innlevert:* %{submittedAt}"
   spreadsheet_6d622119: Regneark
   sr_gradebook: 
-    all_grading_periods: "Alle Gradering Perioder"
+    all_grading_periods: "Alle vurderingsperioder"
     all_sections: "Alle klasser"
     assignment_muted: "Klikk for å fjerne demping."
     assignment_order_alpha: Alfabetisk
@@ -14203,8 +14203,8 @@ nb:
       default: "%a %d %b %Y %H:%M:%S %z"
       long: "%d %B %Y %H:%M"
       short: "%d %b %H:%M"
-      tiny: "%H:%M"
-      tiny_on_the_hour: "%k:%M"
+      tiny: "%k:%M"
+      tiny_on_the_hour: "%k"
     less_than_a_minute_ago: "under et minutt siden"
     pm: pm
     ranges: 
