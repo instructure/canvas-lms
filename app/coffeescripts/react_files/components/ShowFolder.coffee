@@ -6,7 +6,7 @@ define [
   'compiled/react/shared/utils/withReactElement'
   '../modules/filesEnv'
   'jsx/files/ColumnHeaders'
-  './LoadingIndicator'
+  'jsx/files/LoadingIndicator'
   './FolderChild'
   '../utils/getAllPages'
   '../utils/updateAPIQuerySortParams'
@@ -15,10 +15,9 @@ define [
   './FilePreview'
   './UploadDropZone'
   '../utils/forceScreenreaderToReparse'
-], (React, Router, _, I18n, withReactElement, filesEnv, ColumnHeadersComponent, LoadingIndicatorComponent, FolderChildComponent, getAllPages, updateAPIQuerySortParams, Folder, CurrentUploadsComponent, FilePreviewComponent, UploadDropZoneComponent, forceScreenreaderToReparse) ->
+], (React, Router, _, I18n, withReactElement, filesEnv, ColumnHeadersComponent, LoadingIndicator, FolderChildComponent, getAllPages, updateAPIQuerySortParams, Folder, CurrentUploadsComponent, FilePreviewComponent, UploadDropZoneComponent, forceScreenreaderToReparse) ->
 
   ColumnHeaders = ColumnHeadersComponent
-  LoadingIndicator = React.createFactory LoadingIndicatorComponent
   FolderChild = React.createFactory FolderChildComponent
   CurrentUploads = React.createFactory CurrentUploadsComponent
   FilePreview = React.createFactory FilePreviewComponent

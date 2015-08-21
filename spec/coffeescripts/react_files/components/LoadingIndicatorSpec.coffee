@@ -1,7 +1,7 @@
 define [
   'react'
   'jquery'
-  'compiled/react_files/components/LoadingIndicator'
+  'jsx/files/LoadingIndicator'
 ], (React, $, LoadingIndicator) ->
 
   TestUtils = React.addons.TestUtils
