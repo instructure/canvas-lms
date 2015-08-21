@@ -4738,27 +4738,27 @@ zh:
   data_set_identifier_data_set_id_c228b5df: "数据集标识符：%{data_set_id}"
   date: 
     abbr_day_names: 
-      - Sun
-      - Mon
-      - Tue
-      - Wed
-      - Thu
-      - Fri
-      - Sat
+      - 星期日
+      - 星期一
+      - 星期二
+      - 星期三
+      - 星期四
+      - 星期五
+      - 星期六
     abbr_month_names: 
       - ~
-      - Jan
-      - Feb
-      - Mar
-      - Apr
-      - May
-      - Jun
-      - Jul
-      - Aug
-      - Sep
-      - Oct
-      - Nov
-      - Dec
+      - 1月
+      - 2月
+      - 3月
+      - 4月
+      - 5月
+      - 6月
+      - 7月
+      - 8月
+      - 9月
+      - 10月
+      - 11月
+      - 12月
     datepicker: 
       column_headings: 
         - Su
@@ -4769,13 +4769,13 @@ zh:
         - Fr
         - Sa
     day_names: 
-      - Sunday
-      - Monday
-      - Tuesday
-      - Wednesday
-      - Thursday
-      - Friday
-      - Saturday
+      - 星期日
+      - 星期一
+      - 星期二
+      - 星期三
+      - 星期四
+      - 星期五
+      - 星期六
     days: 
       today: 今天
       today_lower: 今天
@@ -4798,18 +4798,18 @@ zh:
       weekday: "%A"
     month_names: 
       - ~
-      - January
-      - February
-      - March
-      - April
-      - May
-      - June
-      - July
-      - August
-      - September
-      - October
-      - November
-      - December
+      - 一月
+      - 二月
+      - 三月
+      - 四月
+      - 五月
+      - 六月
+      - 七月
+      - 八月
+      - 九月
+      - 十月
+      - 十一月
+      - 十二月
   date_error_7b38f8ff: 日期错误
   datepicker: 
     errors: 
