@@ -8,6 +8,8 @@ describe 'Theme Editor' do
   before(:each) do
     course_with_admin_logged_in
     Account.default.enable_feature!(:use_new_styles)
+    Account.default.settings[:global_includes] = true
+    Account.default.save!
   end
 
   it 'should open theme editor from the admin page', priority: "1", test_id: 244225 do

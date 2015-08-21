@@ -1681,7 +1681,7 @@ class ApplicationController < ActionController::Base
         nil
       elsif session.key?(:brand_config_md5)
         BrandConfig.where(md5: session[:brand_config_md5]).first
-      elsif @account.brand_config
+      elsif @account.brand_config && @account.branding_allowed?
         @account.brand_config
       elsif !opts[:ignore_parents] && @account.first_parent_brand_config
         @account.first_parent_brand_config
