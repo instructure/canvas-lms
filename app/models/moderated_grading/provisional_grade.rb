@@ -2,6 +2,7 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
   include Canvas::GradeValidations
 
   attr_accessible :grade, :score
+  attr_writer :force_save
 
   belongs_to :submission
   belongs_to :scorer, class_name: 'User'
@@ -10,7 +11,7 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
   validates :submission, presence: true
 
   def valid?(*)
-    set_graded_at if grade_changed? || score_changed?
+    set_graded_at if @force_save || grade_changed? || score_changed?
     super
   end
 

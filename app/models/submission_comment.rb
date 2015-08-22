@@ -215,7 +215,7 @@ class SubmissionComment < ActiveRecord::Base
   end
 
   def update_submission
-    return nil if hidden?
+    return nil if hidden? || provisional_grade_id.present?
     comments_count = SubmissionComment.where(:submission_id => submission_id, :hidden => false,
                                              :provisional_grade_id => provisional_grade_id).count
     Submission.where(:id => submission_id).update_all(:submission_comments_count => comments_count) rescue nil

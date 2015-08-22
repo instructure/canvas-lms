@@ -990,6 +990,16 @@ class Assignment < ActiveRecord::Base
 
   class GradeError < StandardError; end
 
+  def compute_grade_and_score(grade, score)
+    if grade
+      score = self.grade_to_score(grade)
+    end
+    if score
+      grade = self.score_to_grade(score, grade)
+    end
+    [grade, score]
+  end
+
   def grade_student(original_student, opts={})
     raise GradeError.new("Student is required") unless original_student
     raise GradeError.new("Student must be enrolled in the course as a student to be graded") unless context.includes_student?(original_student)
@@ -998,16 +1008,15 @@ class Assignment < ActiveRecord::Base
     if opts.key? :excuse
       opts[:excused] = Canvas::Plugin.value_to_boolean(opts.delete(:excuse))
     end
-    raise GradeError.new("Cannot simultaneously grade and excuse an assignment") if opts[:excused] && opts[:grade]
-
+    raise GradeError.new("Cannot simultaneously grade and excuse an assignment") if opts[:excused] && (opts[:grade] || opts[:score])
+    raise GradeError.new("Provisional grades require a grader") if opts[:provisional] && opts[:grader].nil?
 
     opts.delete(:id)
     dont_overwrite_grade = opts.delete(:dont_overwrite_grade)
     group_comment = Canvas::Plugin.value_to_boolean(opts.delete(:group_comment))
     group, students = group_students(original_student)
     grader = opts.delete :grader
-    grade = opts.delete :grade
-    score = opts.delete :score
+    grade, score = compute_grade_and_score(opts.delete(:grade), opts.delete(:score))
     comment = {
       :comment => (opts.delete :comment),
       :attachments => (opts.delete :comment_attachments),
@@ -1016,6 +1025,7 @@ class Assignment < ActiveRecord::Base
       :media_comment_type => (opts.delete :media_comment_type),
       :hidden => muted?,
     }
+    comment[:provisional] = true if opts[:provisional]
     comment[:group_comment_id] = CanvasSlug.generate_securish_uuid if group_comment && group
     submissions = []
 
@@ -1032,31 +1042,16 @@ class Assignment < ActiveRecord::Base
         next if student != original_student && submission.excused?
 
         did_grade = false
-        submission.attributes = opts
-        submission.assignment_id = self.id
-        submission.user_id = student.id
-        submission.grader_id = grader.try(:id)
+        submission.attributes = opts.slice(:excused, :submission_type, :url, :body)
+        submission.assignment = self
+        submission.user = student
 
-        if grade.present? || score.present?
+        unless opts[:provisional]
+          submission.grader = grader
           submission.grade = grade
           submission.score = score
-          submission.excused = false
-        else
-          submission.score = nil
-          submission.grade = nil
-        end
-
-        if submission.grade
-          did_grade = true
-          submission.score = self.grade_to_score(submission.grade)
-        end
-        if submission.score
-          did_grade = true
-          submission.grade = self.score_to_grade(submission.score, submission.grade)
-        end
-
-        if submission.excused?
-          did_grade = true
+          submission.excused = false if score.present?
+          did_grade = true if score.present? || submission.excused?
         end
 
         submission.grade_matches_current_submission = true if did_grade
@@ -1074,6 +1069,10 @@ class Assignment < ActiveRecord::Base
         submission.group = group
         submission.graded_at = Time.zone.now if did_grade
         previously_graded ? submission.with_versioning(:explicit => true) { submission.save! } : submission.save!
+
+        if opts[:provisional]
+          submission.find_or_create_provisional_grade!(scorer: grader, grade: grade, score: score, force_save: true)
+        end
       end
       submission.add_comment(comment) if comment && (group_comment || student == original_student)
       submissions << submission if group_comment || student == original_student || submission_updated
@@ -1359,8 +1358,7 @@ class Assignment < ActiveRecord::Base
       ).merge("from_enrollment_type" => enrollment_types_by_id[sub.user_id])
 
       if grading_role == :provisional_grader || grading_role == :moderator
-        provisional_grade = sub.provisional_grades.where(scorer_id: user).first
-        provisional_grade ||= ModeratedGrading::NullProvisionalGrade.new(user.id)
+        provisional_grade = sub.provisional_grade(user)
         json.merge! provisional_grade.grade_attributes
       end
 

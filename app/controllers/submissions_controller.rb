@@ -169,7 +169,7 @@ class SubmissionsController < ApplicationController
           end
         elsif params[:download]
           if params[:comment_id]
-            @attachment = @submission.submission_comments.find(params[:comment_id]).attachments.find{|a| a.id == params[:download].to_i }
+            @attachment = @submission.all_submission_comments.find(params[:comment_id]).attachments.find{|a| a.id == params[:download].to_i }
           else
             @attachment = @submission.attachment if @submission.attachment_id == params[:download].to_i
             prior_attachment_id = @submission.submission_history.map(&:attachment_id).find{|a| a == params[:download].to_i }
@@ -574,6 +574,7 @@ class SubmissionsController < ApplicationController
     @assignment = @context.assignments.active.find(params[:assignment_id])
     @user = @context.all_students.find(params[:id])
     @submission = @assignment.find_or_create_submission(@user)
+    provisional = params[:submission][:provisional]
 
     if params[:submission][:student_entered_score] && @submission.grants_right?(@current_user, session, :comment)
       update_student_entered_score(params[:submission][:student_entered_score])
@@ -602,7 +603,8 @@ class SubmissionsController < ApplicationController
           :commenter => @current_user,
           :assessment_request => @request,
           :group_comment => params[:submission][:group_comment],
-          :hidden => @assignment.muted? && admin_in_context
+          :hidden => @assignment.muted? && admin_in_context,
+          :provisional => provisional
         }
       end
       begin
@@ -613,8 +615,12 @@ class SubmissionsController < ApplicationController
       end
       respond_to do |format|
         if @submissions
-          @submissions.each{|s| s.limit_comments(@current_user, session) unless @submission.grants_right?(@current_user, session, :submit) }
           @submissions = @submissions.select{|s| s.grants_right?(@current_user, session, :read) }
+          @submissions.each do |s|
+            s.limit_comments(@current_user, session) unless @submission.grants_right?(@current_user, session, :submit)
+            s.apply_provisional_grade_filter!(s.provisional_grade(@current_user)) if provisional
+          end
+
           flash[:notice] = t('assignment_submitted', 'Assignment submitted.')
 
           format.html { redirect_to course_assignment_url(@context, @assignment) }

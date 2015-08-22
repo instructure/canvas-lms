@@ -78,6 +78,13 @@ describe ModeratedGrading::ProvisionalGrade do
         expect(provisional_grade.graded_at).to eql now
       end
     end
+    it 'updated graded_at when force_save is set, regardless of whether the grade actually changed' do
+      Timecop.freeze(now) do
+        provisional_grade.force_save = true
+        provisional_grade.save!
+        expect(provisional_grade.graded_at).to eql now
+      end
+    end
   end
 end
 

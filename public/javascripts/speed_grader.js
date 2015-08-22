@@ -1550,6 +1550,9 @@ define([
           'submission[media_comment_id]': $("#media_media_recording").data('comment_id')
         });
       }
+      if (ENV.grading_role == 'moderator' || ENV.grading_role == 'provisional_grader') {
+        formData['submission[provisional]'] = true;
+      }
 
       function formSuccess(submissions) {
         $.each(submissions, function(){
@@ -1603,6 +1606,9 @@ define([
         formData["submission[excuse]"] = true;
       } else {
         formData["submission[grade]"] = grade;
+      }
+      if (ENV.grading_role == 'moderator' || ENV.grading_role == 'provisional_grader') {
+        formData['submission[provisional]'] = true;
       }
 
       $.ajaxJSON(url, method, formData, function(submissions) {
