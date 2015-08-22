@@ -4765,8 +4765,8 @@ es:
     formats: 
       date_at_time: "%-d %b en %k:%M"
       default: "%d/%m/%Y"
-      full: "%-d %b, %Y %-l:%M%P"
-      full_with_weekday: "%a %-d %b, %Y %-l:%M%P"
+      full: "%-d %b, %Y %-k:%M"
+      full_with_weekday: "%a %-d %b, %Y %-k:%M"
       long: "%-d %B %Y"
       long_with_weekday: "%A, %-d %B"
       medium: "%-d %b %Y"
