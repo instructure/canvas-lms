@@ -265,16 +265,15 @@
     <input type="checkbox" id="hide_student_names" name="hide_student_names"
       <% if force_anonymous_grading?(@assignment) %>disabled<% end %>
     />
-    <label for="hide_student_names"
-      <% if force_anonymous_grading?(@assignment) %>
-        data-tooltip='{"tooltipClass":"popover popover-padded", "position":"top"}'
-        title="<%= force_anonymous_grading_reason(@assignment) %>"
-      <% end %> >
+    <label for="hide_student_names">
       <%= t('labels.hide_names', "Hide student names in the SpeedGrader") %>
-      <% if force_anonymous_grading?(@assignment) %>
-        <span class="screenreader-only"><%= force_anonymous_grading_reason(@assignment) %></span>
-      <% end %>
     </label>
+    <% if force_anonymous_grading?(@assignment) %>
+      <i class="icon-info" aria-hidden="true"
+        data-tooltip='{"tooltipClass":"popover popover-padded", "position":"top"}'
+        title="<%= force_anonymous_grading_reason(@assignment) %>"></i>
+      <span class="screenreader-only"><%= force_anonymous_grading_reason(@assignment) %></span>
+    <% end %>
   </p>
   <p <% unless @assignment.quiz %>class=hidden<% end %>>
     <%= check_box_tag :enable_speedgrader_grade_by_question, "1",

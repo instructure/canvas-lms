@@ -749,3 +749,8 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
 #settings_form input[type=checkbox][disabled] + label {
   opacity: 0.5;
 }
+
+#settings_form .icon-info {
+  vertical-align: -4px;
+  color: $linkColor;
+}
