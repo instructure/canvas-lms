@@ -3,18 +3,14 @@ define [
   'react-router'
   'i18n!react_files'
   'compiled/str/splitAssetString'
-  './Toolbar'
+  'jsx/files/Toolbar'
   'jsx/files/Breadcrumbs'
   'jsx/files/FolderTree'
   'jsx/files/FilesUsage'
   '../mixins/MultiselectableMixin'
   '../mixins/dndMixin'
   '../modules/filesEnv'
-], (React, ReactRouter, I18n, splitAssetString, ToolbarComponent, Breadcrumbs, FolderTree, FilesUsage, MultiselectableMixin, dndMixin, filesEnv) ->
-
-  Toolbar = React.createFactory ToolbarComponent
-  RouteHandler = React.createFactory ReactRouter.RouteHandler
-
+], (React, ReactRouter, I18n, splitAssetString, Toolbar, Breadcrumbs, FolderTree, FilesUsage, MultiselectableMixin, dndMixin, filesEnv) ->
 
   FilesApp =
     displayName: 'FilesApp'

@@ -8,7 +8,7 @@ define([
   'jsx/files/Breadcrumbs',
   'jsx/files/FolderTree',
   'jsx/files/FilesUsage',
-  'compiled/react_files/components/Toolbar'
+  'jsx/files/Toolbar'
 ], function (React, ReactRouter, ReactModal, FilesApp, filesEnv, I18n, Breadcrumbs, FolderTree, FilesUsage, Toolbar) {
 
   var RouteHandler = ReactRouter.RouteHandler;

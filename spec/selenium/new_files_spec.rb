@@ -12,6 +12,7 @@ describe "better_file_browsing" do
       get "/courses/#{@course.id}/files"
     end
     it "should display new files UI", priority: "1", test_id: 133092 do
+      wait_for_ajaximations
       expect(f('.btn-upload')).to be_displayed
       expect(get_all_files_folders.count).to eq 1
     end
