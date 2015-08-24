@@ -705,8 +705,18 @@ module ApplicationHelper
     end
   end
 
+  # allows forcing account CSS off universally for a specific situation,
+  # without requiring the global_includes=0 param
+  def disable_account_css
+    @disable_account_css = true
+  end
+
+  def disable_account_css?
+    @disable_account_css || params[:global_includes] == '0'
+  end
+
   def include_account_css
-    return if params[:global_includes] == '0'
+    return if disable_account_css?
     if use_new_styles? 
       includes = [] 
       includes << brand_config_includes[:css] if  brand_config_includes[:css].present? 
