@@ -1,7 +1,7 @@
 define [
   'react'
   'jquery'
-  'compiled/react_files/components/UploadButton'
+  'jsx/files/UploadButton'
   'compiled/react_files/modules/FileOptionsCollection'
 ], (React, $, UploadButton, FileOptionsCollection) ->
 
