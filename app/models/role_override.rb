@@ -579,11 +579,10 @@ class RoleOverride < ActiveRecord::Base
       },
       :manage_alerts => {
         :label => lambda { t('permissions.manage_announcements', "Manage global announcements") },
-        :account_only => true,
+        :account_only => :root,
         :true_for => %w(AccountAdmin),
         :available_to => %w(AccountAdmin AccountMembership),
       },
-
       :read_messages => {
         :label => lambda { t('permissions.read_messages', "View notifications sent to users") },
         :account_only => :site_admin,
