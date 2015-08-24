@@ -203,7 +203,7 @@ module Lti
       it 'has substitution for $Canvas.shard.id' do
         exp_hash = {test: '$Canvas.shard.id'}
         subject.expand_variables!(exp_hash)
-        expect(exp_hash[:test]).to eq 1
+        expect(exp_hash[:test]).to eq Shard.current.id
       end
 
       context 'context is a course' do
