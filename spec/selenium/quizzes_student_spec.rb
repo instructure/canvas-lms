@@ -43,8 +43,7 @@ describe 'quizzes' do
 
       context 'when taking a timed quiz' do
 
-        it 'warns the student before the lock date is exceeded',
-        priority: "1", test_id: 209407 do
+        it 'warns the student before the lock date is exceeded', priority: "1", test_id: 209407 do
           @context = @course
           bank = @course.assessment_question_banks.create!(title: 'Test Bank')
           q = quiz_model
@@ -103,21 +102,18 @@ describe 'quizzes' do
             @resume_text = 'Resume Quiz'
           end
 
-          it 'can see the resume quiz button if the quiz is unlocked',
-          priority: "1", test_id: 209408 do
+          it 'can see the resume quiz button if the quiz is unlocked', priority: "1", test_id: 209408 do
             get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
             validate_resume_button_text(@resume_text)
           end
 
-          it 'can see the resume quiz button if the quiz unlock_at date is < now',
-          priority: "1", test_id: 209409 do
+          it 'can see the resume quiz button if the quiz unlock_at date is < now', priority: "1", test_id: 209409 do
             update_quiz_lock(nil, 10.minutes.ago)
             get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
             validate_resume_button_text(@resume_text)
           end
 
-          it 'can\'t see the resume quiz button if quiz is locked',
-          priority: "1", test_id: 209410 do
+          it 'can\'t see the resume quiz button if quiz is locked', priority: "1", test_id: 209410 do
             update_quiz_lock(5.minutes.ago, nil)
             get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
             expect(f('#not_right_side .take_quiz_button')).not_to be_present
