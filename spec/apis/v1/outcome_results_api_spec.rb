@@ -339,7 +339,7 @@ describe "Outcome Results API", type: :request do
           json = JSON.parse(response.body)
           expect(json['linked']).to be_present
           expect(json['linked']['outcomes']).to be_present
-          expect(json['linked']['outcomes'][0]['id']).to eq outcome_object.id.to_s
+          expect(json['linked']['outcomes'][0]['id']).to eq outcome_object.id
         end
 
         it "side loads outcome groups" do
@@ -352,7 +352,7 @@ describe "Outcome Results API", type: :request do
           expect(json['linked']).to be_present
           expect(json['linked']['outcome_groups']).to be_present
           group_titles = json['linked']['outcome_groups'].map { |g| g['id'] }.sort
-          expected_titles = [root_group, child_group, grandchild_group].map(&:id).map(&:to_s).sort
+          expected_titles = [root_group, child_group, grandchild_group].map(&:id).sort
           expect(group_titles).to eq expected_titles
         end
 
@@ -363,10 +363,10 @@ describe "Outcome Results API", type: :request do
           expect(json['linked']).to be_present
           expect(json['linked']['outcome_links']).to be_present
           expect(json['linked']['outcome_links'].first['outcome_group']['id']).to eq(
-            outcome_course.root_outcome_group.id.to_s
+            outcome_course.root_outcome_group.id
           )
           expect(json['linked']['outcome_links'].first['outcome']['id']).to eq(
-            outcome_object.id.to_s
+            outcome_object.id
           )
         end
 
@@ -424,7 +424,7 @@ describe "Outcome Results API", type: :request do
       end
 
       it "filters by outcome id" do
-        outcome_ids = @outcomes[3..4].map(&:id).map(&:to_s).sort
+        outcome_ids = @outcomes[3..4].map(&:id).sort
         api_call(:get, outcome_rollups_url(outcome_course, outcome_ids: outcome_ids.join(','), include: ['outcomes']),
           controller: 'outcome_results', action: 'rollups', format: 'json', course_id: outcome_course.id.to_s, outcome_ids: outcome_ids.join(','), include: ['outcomes'])
         json = JSON.parse(response.body)
@@ -435,7 +435,7 @@ describe "Outcome Results API", type: :request do
       end
 
       it "filters by outcome group id" do
-        outcome_ids = @outcome_group.child_outcome_links.map(&:content).map(&:id).map(&:to_s).sort
+        outcome_ids = @outcome_group.child_outcome_links.map(&:content).map(&:id).sort
         api_call(:get, outcome_rollups_url(outcome_course, outcome_group_id: @outcome_group.id, include: ['outcomes']),
           controller: 'outcome_results', action: 'rollups', format: 'json', course_id: outcome_course.id.to_s, outcome_group_id: @outcome_group.id, include: ['outcomes'])
         json = JSON.parse(response.body)
@@ -540,7 +540,7 @@ describe "Outcome Results API", type: :request do
                controller: 'outcome_results', action: 'index', format: 'json', course_id: outcome_course.id.to_s)
       json = JSON.parse(response.body)
       expect(json['outcome_results']).to be_present
-      expect(json['outcome_results'][0]["id"]).to eq outcome_result.id.to_s
+      expect(json['outcome_results'][0]["id"]).to eq outcome_result.id
       expect(json['outcome_results'][0]["score"]).to eq outcome_result.score
       expect(json['outcome_results'][0]["links"]["learning_outcome"]).to eq outcome_object.id.to_s
       expect(json['outcome_results'][0]["links"]["alignment"]).to eq outcome_assignment.asset_string
