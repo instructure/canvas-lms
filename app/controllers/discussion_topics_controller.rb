@@ -348,7 +348,7 @@ class DiscussionTopicsController < ApplicationController
         render json: discussion_topics_api_json(@topics, @context, @current_user, session,
           :student_ids => student_ids, :can_moderate => user_can_moderate,
           :plain_messages => value_to_boolean(params[:plain_messages]),
-          :include_assignment => value_to_boolean(params[:include_assignments]))
+          :exclude_assignment_description => value_to_boolean(params[:exclude_assignment_descriptions]))
       end
     end
   end
