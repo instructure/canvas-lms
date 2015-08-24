@@ -13,6 +13,15 @@ shared_examples 'conferences_page' do |context|
   end
 end
 
+shared_examples 'files_page' do |context|
+  it "should allow group users to rename a file", priority: "2", test_id: pick_test_id(context, 312869, 315577) do
+    add_test_files
+    get files_page
+    edit_name_from_cog_icon('cool new name')
+    wait_for_ajaximations
+    expect(fln('cool new name')).to be_present
+  end
+end
 # ======================================================================================================================
 # Helper Methods
 # ======================================================================================================================
@@ -375,4 +384,11 @@ def move_folder(folder_name)
   wait_for_ajaximations
   expect(f('#flash_message_holder').text).to eq "#{folder_name} moved to files\nClose"
   expect(ff('.treeLabel span')[2].text).to eq folder_name
+end
+
+def verify_no_course_user_access(path)
+  # User.create! creates a course user, who won't be able to access the page
+  user_session(User.create!(name: 'course student'))
+  get path
+  expect(f('.ui-state-error')).to be_displayed
 end

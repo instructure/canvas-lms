@@ -91,6 +91,12 @@ describe "groups" do
         expand_files_on_content_pane
         expect(ffj('.file .text:visible').size).to eq 1
       end
+
+      it "should only allow group members to access announcements", priority: "1", test_id: 315329 do
+        get announcements_page
+        expect(fj('.btn-primary:contains("Announcement")')).to be_displayed
+        verify_no_course_user_access(announcements_page)
+      end
     end
 
     describe "people page" do
@@ -149,6 +155,12 @@ describe "groups" do
         expand_files_on_content_pane
         expect(ffj('.file .text:visible').size).to eq 1
       end
+
+      it "should only allow group members to access discussions", priority: "1", test_id: 315332 do
+        get discussions_page
+        expect(f('#new-discussion-btn')).to be_displayed
+        verify_no_course_user_access(discussions_page)
+      end
     end
 
     describe "pages page" do
@@ -196,9 +208,17 @@ describe "groups" do
         expand_files_on_content_pane
         expect(ffj('.file .text:visible').size).to eq 1
       end
+
+      it "should only allow group members to access pages", priority: "1", test_id: 315331 do
+        get pages_page
+        expect(fj('.btn-primary:contains("Page")')).to be_displayed
+        verify_no_course_user_access(pages_page)
+      end
     end
 
     describe "Files page" do
+      it_behaves_like 'files_page', 'student'
+
       it "should allow group members to add a new folder", priority: "1", test_id: 273625 do
         get files_page
         add_folder
@@ -220,9 +240,7 @@ describe "groups" do
 
       it "should only allow group members to access files", priority: "1", test_id: 273626 do
         expect_new_page_load { get files_page }
-        user_session(User.create!(name: 'course student'))
-        get files_page
-        expect(f('.ui-state-error')).to be_displayed
+        verify_no_course_user_access(files_page)
       end
 
       it "should allow a group member to delete a file", priority: "1", test_id: 273630 do
@@ -350,6 +368,8 @@ describe "groups" do
     end
 
     describe "Files page" do
+      it_behaves_like 'files_page', 'teacher'
+
       it "should allow teacher to add a new folder", priority: "2", test_id: 303703 do
         get files_page
         add_folder

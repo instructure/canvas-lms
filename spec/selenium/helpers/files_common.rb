@@ -26,7 +26,7 @@ def download_from_cog_icon(row_selected = 0)
 end
 
 def edit_name_from_cog_icon(file_name_new, row_selected = 0)
-  ff('.al-trigger')[row_selected].click
+  ff('.al-trigger-gray')[row_selected].click
   fln("Rename").click
   expect(f(".ef-edit-name-cancel")).to be_displayed
   file_name_textbox_el = f('.input-block-level')
