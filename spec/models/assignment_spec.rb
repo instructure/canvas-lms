@@ -340,30 +340,30 @@ describe Assignment do
       setup_assignment_without_submission
     end
 
-    it "should preserve pass/fail with zero points possible" do
-      @assignment.grading_type = 'pass_fail'
-      @assignment.points_possible = 0.0
-      @assignment.save
-      s = @assignment.grade_student(@user, :grade => 'pass')
-      expect(s).to be_is_a(Array)
-      @assignment.reload
-      expect(@assignment.submissions.size).to eql(1)
-      @submission = @assignment.submissions.first
-      expect(@submission.state).to eql(:graded)
-      expect(@submission).to eql(s[0])
-      expect(@submission.score).to eql(0.0)
-      expect(@submission.grade).to eql('complete')
-      expect(@submission.user_id).to eql(@user.id)
+    context "pass fail assignments" do
+      before :once do
+        @assignment.grading_type = 'pass_fail'
+        @assignment.points_possible = 0.0
+        @assignment.save
+      end
 
-      @assignment.grade_student(@user, :grade => 'fail')
-      @assignment.reload
-      expect(@assignment.submissions.size).to eql(1)
-      @submission = @assignment.submissions.first
-      expect(@submission.state).to eql(:graded)
-      expect(@submission).to eql(s[0])
-      expect(@submission.score).to eql(0.0)
-      expect(@submission.grade).to eql('incomplete')
-      expect(@submission.user_id).to eql(@user.id)
+      let(:submission) { @assignment.submissions.first }
+
+      it "preserves pass with zero points possible" do
+        @assignment.grade_student(@user, :grade => 'pass')
+        expect(submission.grade).to eql('complete')
+      end
+
+      it "preserves fail with zero points possible" do
+        @assignment.grade_student(@user, :grade => 'fail')
+        expect(submission.grade).to eql('incomplete')
+      end
+
+      it "should properly compute pass/fail for nil" do
+        @assignment.points_possible = 10
+        grade = @assignment.score_to_grade(nil)
+        expect(grade).to eql("incomplete")
+      end
     end
 
     it "should preserve letter grades with zero points possible" do
@@ -394,13 +394,6 @@ describe Assignment do
       @assignment.points_possible = 10
       grade = @assignment.score_to_grade(8.6999)
       expect(grade).to eql("B")
-    end
-
-    it "should properly compute pass/fail for nil" do
-      @assignment.grading_type = 'pass_fail'
-      @assignment.points_possible = 10
-      grade = @assignment.score_to_grade(nil)
-      expect(grade).to eql("incomplete")
     end
 
     it "should preserve letter grades grades with nil points possible" do
@@ -2969,29 +2962,70 @@ describe Assignment do
   end
 
   describe "update_student_submissions" do
-    before :once do
-      @student1, @student2 = create_users_in_course(@course, 2, return_type: :record)
-      @assignment = @course.assignments.create! grading_type: "pass_fail",
-                                                points_possible: 5
-      @sub1 = @assignment.grade_student(@student1, grade: "complete").first
-      @sub2 = @assignment.grade_student(@student2, grade: "incomplete").first
+    context "pass/fail assignments" do
+      before :once do
+        @student1, @student2 = create_users_in_course(@course, 2, return_type: :record)
+        @assignment = @course.assignments.create! grading_type: "pass_fail",
+        points_possible: 5
+        @sub1 = @assignment.grade_student(@student1, grade: "complete").first
+        @sub2 = @assignment.grade_student(@student2, grade: "incomplete").first
+      end
+
+      it "should save a version when changing grades" do
+        @assignment.update_attribute :points_possible, 10
+        expect(@sub1.reload.version_number).to eq 2
+      end
+
+      it "works for pass/fail assignments" do
+        @assignment.update_attribute :points_possible, 10
+        expect(@sub1.reload.grade).to eq "complete"
+        expect(@sub2.reload.grade).to eq "incomplete"
+      end
+
+      it "works for pass/fail assignments with 0 points possible" do
+        @assignment.update_attribute :points_possible, 0
+        expect(@sub1.reload.grade).to eq "complete"
+        expect(@sub2.reload.grade).to eq "incomplete"
+      end
     end
 
-    it "should save a version when changing grades" do
-      @assignment.update_attribute :points_possible, 10
-      expect(@sub1.reload.version_number).to eq 2
-    end
+    context "pass/fail assignments with initial 0 points possible" do
+      before :once do
+        setup_assignment_without_submission
+        @assignment.grading_type = "pass_fail"
+        @assignment.points_possible = 0.0
+        @assignment.save
+      end
 
-    it "works for pass/fail assignments" do
-      @assignment.update_attribute :points_possible, 10
-      expect(@sub1.reload.grade).to eq "complete"
-      expect(@sub2.reload.grade).to eq "incomplete"
-    end
+      let(:submission) { @assignment.submissions.first }
 
-    it "works for pass/fail assignments with 0 points possible" do
-      @assignment.update_attribute :points_possible, 0
-      expect(@sub1.reload.grade).to eq "complete"
-      expect(@sub2.reload.grade).to eq "incomplete"
+      it "preserves pass/fail grade when changing from 0 to positive points possible" do
+        @assignment.grade_student(@user, :grade => 'pass')
+        @assignment.points_possible = 1.0
+        @assignment.update_student_submissions
+
+        submission.reload
+        expect(submission.grade).to eql('complete')
+      end
+
+      it "changes the score of 'complete' pass/fail submissions to match the assignment's possible points" do
+        @assignment.grade_student(@user, :grade => 'pass')
+        @assignment.points_possible = 3.0
+        @assignment.update_student_submissions
+
+        submission.reload
+        expect(submission.score).to eql(3.0)
+      end
+
+      it "does not change the score of 'incomplete' pass/fail submissions if assignment points possible has changed" do
+        @assignment.grade_student(@user, :grade => 'fail')
+        @assignment.points_possible = 2.0
+        @assignment.update_student_submissions
+
+        submission.reload
+        expect(submission.score).to eql(0.0)
+      end
+
     end
   end
 

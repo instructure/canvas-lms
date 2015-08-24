@@ -309,6 +309,9 @@ class Assignment < ActiveRecord::Base
   def update_student_submissions
     graded_at = Time.zone.now
     submissions.graded.includes(:user).find_each do |s|
+      if grading_type == 'pass_fail' && ['complete', 'pass'].include?(s.grade)
+        s.score = points_possible
+      end
       s.grade = score_to_grade(s.score, s.grade)
       s.graded_at = graded_at
       s.assignment = self
@@ -573,7 +576,6 @@ class Assignment < ActiveRecord::Base
     @assignment_changed = false
     true
   end
-
 
   def points_uneditable?
     (self.submission_types == 'online_quiz') # && self.quiz && (self.quiz.edited? || self.quiz.available?))
