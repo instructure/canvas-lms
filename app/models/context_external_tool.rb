@@ -648,7 +648,7 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   def self.context_id_for(asset, shard)
-    str = asset.asset_string.to_s
+    str = asset.global_asset_string.to_s
     raise "Empty value" if str.blank?
     Canvas::Security.hmac_sha1(str, shard.settings[:encryption_key])
   end
