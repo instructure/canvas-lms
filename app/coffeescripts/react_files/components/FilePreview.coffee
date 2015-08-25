@@ -12,12 +12,11 @@ define [
   'compiled/models/File'
   'compiled/models/FilesystemObject'
   'compiled/fn/preventDefault'
-  'compiled/react/shared/utils/withReactElement'
   '../utils/collectionHandler'
   'jsx/files/FilePreviewInfoPanel'
   '../modules/filesEnv'
   '../modules/FocusStore'
-], ($, _, React, ReactRouter, ReactModal, customPropTypes, I18n, FriendlyDatetimeComponent, friendlyBytes, Folder, File, FilesystemObject, preventDefault, withReactElement, collectionHandler, FilePreviewInfoPanel, filesEnv, FocusStore) ->
+], ($, _, React, ReactRouter, ReactModal, customPropTypes, I18n, FriendlyDatetimeComponent, friendlyBytes, Folder, File, FilesystemObject, preventDefault, collectionHandler, FilePreviewInfoPanel, filesEnv, FocusStore) ->
 
   FriendlyDatetime = React.createFactory FriendlyDatetimeComponent
   Link = React.createFactory ReactRouter.Link
