@@ -55,15 +55,6 @@
   </p>
 <% end %>
 
-<% if @presenter.canvas_auth_only? %>
-  <p>
-    <%= mt("If you configure settings that cause you to "\
-           "not be able to log in you can directly access regular Canvas "\
-           "login at %{url}",
-           url: canvas_login_url) %>
-  </p>
-<% end %>
-
 <%= render partial: 'sso_settings_form',
            locals: { presenter: @presenter, account: @account }%>
 

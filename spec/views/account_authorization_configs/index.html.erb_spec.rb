@@ -33,6 +33,7 @@ describe "account_authorization_configs/index" do
   it "should list the auth ips" do
     Setting.set('account_authorization_config_ip_addresses', "192.168.0.1,192.168.0.2")
     presenter = AccountAuthorizationConfigsPresenter.new(account)
+    account.authentication_providers.scoped.delete_all
     account.authentication_providers = [
       presenter.new_config(auth_type: 'saml'),
       presenter.new_config(auth_type: 'saml')
@@ -43,6 +44,7 @@ describe "account_authorization_configs/index" do
   end
 
   it "should display the last_timeout_failure" do
+    account.authentication_providers.scoped.delete_all
     timed_out_aac = account.authentication_providers.create!(auth_type: 'ldap')
     account.authentication_providers = [
       timed_out_aac,
@@ -59,7 +61,7 @@ describe "account_authorization_configs/index" do
   end
 
   it "should display more than 2 LDAP configs" do
-    account.authentication_providers.each(&:destroy)
+    account.authentication_providers.scoped.delete_all
     4.times do
       account.authentication_providers.create!(auth_type: 'ldap')
     end

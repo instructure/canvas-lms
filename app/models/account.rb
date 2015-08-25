@@ -122,6 +122,7 @@ class Account < ActiveRecord::Base
   after_save :invalidate_caches_if_changed
 
   after_create :default_enrollment_term
+  after_create :enable_canvas_authentication
 
   serialize :settings, Hash
   include TimeZoneHelper
@@ -193,7 +194,6 @@ class Account < ActiveRecord::Base
   add_setting :enable_profiles, :boolean => true, :root_only => true, :default => false
   add_setting :enable_manage_groups2, :boolean => true, :root_only => true, :default => true
   add_setting :mfa_settings, :root_only => true
-  add_setting :canvas_authentication, :boolean => true, :root_only => true
   add_setting :admins_can_change_passwords, :boolean => true, :root_only => true, :default => false
   add_setting :admins_can_view_notifications, :boolean => true, :root_only => true, :default => false
   add_setting :outgoing_email_default_name
@@ -280,17 +280,19 @@ class Account < ActiveRecord::Base
   end
 
   def non_canvas_auth_configured?
-    authentication_providers.active.exists?
+    authentication_providers.active.where("auth_type<>'canvas'").exists?
   end
 
   def canvas_authentication?
-    settings[:canvas_authentication] != false || !non_canvas_auth_configured?
+    authentication_providers.active.where(auth_type: 'canvas').exists? || !authentication_providers.active.exists?
   end
 
   def enable_canvas_authentication
-    return if settings[:canvas_authentication]
-    settings[:canvas_authentication] = true
-    self.save!
+    return unless root_account?
+    # for migrations creating a new db
+    return unless AccountAuthorizationConfig.columns_hash.key?('workflow_state')
+    return if authentication_providers.active.where(auth_type: 'canvas').exists?
+    authentication_providers.create!(auth_type: 'canvas')
   end
 
   def open_registration?
@@ -993,10 +995,6 @@ class Account < ActiveRecord::Base
 
   def forgot_password_external_url
     self.change_password_url
-  end
-
-  def multi_auth?
-    self.authentication_providers.active.count > 1
   end
 
   def auth_discovery_url=(url)

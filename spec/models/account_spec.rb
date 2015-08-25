@@ -606,14 +606,17 @@ describe Account do
     expect(account.login_handle_name_with_inference).to eq "Email"
 
     config = account.authentication_providers.create!(auth_type: 'cas')
+    account.authentication_providers.first.move_to_bottom
     expect(account.login_handle_name_with_inference).to eq "Login"
 
     config.destroy
     config = account.authentication_providers.create!(auth_type: 'saml')
+    account.authentication_providers.active.first.move_to_bottom
     expect(account.reload.login_handle_name_with_inference).to eq "Login"
 
     config.destroy
     account.authentication_providers.create!(auth_type: 'ldap')
+    account.authentication_providers.active.first.move_to_bottom
     expect(account.reload.login_handle_name_with_inference).to eq "Email"
     account.login_handle_name = "LDAP Login"
     account.save!
@@ -940,17 +943,18 @@ describe Account do
     let(:account){ Account.default }
 
     before do
-      expect(account.delegated_authentication?).to be_falsey
+      account.authentication_providers.scoped.delete_all
+      expect(account.delegated_authentication?).to eq false
     end
 
     it "is false for LDAP" do
       account.authentication_providers.create!(auth_type: 'ldap')
-      expect(account.delegated_authentication?).to be_falsey
+      expect(account.delegated_authentication?).to eq false
     end
 
     it "is true for CAS" do
       account.authentication_providers.create!(auth_type: 'cas')
-      expect(account.delegated_authentication?).to be_truthy
+      expect(account.delegated_authentication?).to eq true
     end
   end
 
@@ -970,25 +974,6 @@ describe Account do
       Account.default.authentication_providers.create!(auth_type: 'ldap')
       account.authentication_providers.destroy_all
       expect(account.non_canvas_auth_configured?).to be_falsey
-    end
-  end
-
-  describe "canvas_authentication?" do
-    before do
-      Account.default.authentication_providers.destroy_all
-      Account.default.settings[:canvas_authentication] = false
-      Account.default.save!
-      expect(Account.default.canvas_authentication?).to be_truthy
-      Account.default.authentication_providers.create!(auth_type: 'ldap')
-    end
-
-    it "should be true if there's not an AAC" do
-      expect(Account.default.canvas_authentication?).to be_falsey
-    end
-
-    it "is true after AACs are destroyed" do
-      Account.default.authentication_providers.destroy_all
-      expect(Account.default.reload.canvas_authentication?).to be_truthy
     end
   end
 

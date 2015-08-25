@@ -53,6 +53,8 @@ class AccountAuthorizationConfig < ActiveRecord::Base
       const_get(type_name.upcase)
     when 'facebook', 'google', 'twitter'
       const_get(type_name.classify)
+    when 'canvas'
+      Canvas
     when 'github'
       GitHub
     when 'linkedin'
@@ -85,7 +87,7 @@ class AccountAuthorizationConfig < ActiveRecord::Base
   has_many :pseudonyms, foreign_key: :authentication_provider_id
   acts_as_list scope: { account: self, workflow_state: [nil, 'active'] }
 
-  VALID_AUTH_TYPES = %w[cas facebook github google ldap linkedin openid_connect saml twitter].freeze
+  VALID_AUTH_TYPES = %w[canvas cas facebook github google ldap linkedin openid_connect saml twitter].freeze
   validates_inclusion_of :auth_type, in: VALID_AUTH_TYPES, message: "invalid auth_type, must be one of #{VALID_AUTH_TYPES.join(',')}"
   validates_presence_of :account_id
 
@@ -128,12 +130,12 @@ class AccountAuthorizationConfig < ActiveRecord::Base
 
   def auth_password=(password)
     return if password.blank?
-    self.auth_crypted_password, self.auth_password_salt = Canvas::Security.encrypt_password(password, 'instructure_auth')
+    self.auth_crypted_password, self.auth_password_salt = ::Canvas::Security.encrypt_password(password, 'instructure_auth')
   end
 
   def auth_decrypted_password
     return nil unless self.auth_password_salt && self.auth_crypted_password
-    Canvas::Security.decrypt_password(self.auth_crypted_password, self.auth_password_salt, 'instructure_auth')
+    ::Canvas::Security.decrypt_password(self.auth_crypted_password, self.auth_password_salt, 'instructure_auth')
   end
 
   def auth_provider_filter
@@ -162,6 +164,7 @@ class AccountAuthorizationConfig < ActiveRecord::Base
 end
 
 # so it doesn't get mixed up with ::CAS, ::LinkedIn and ::Twitter
+require_dependency 'account_authorization_config/canvas'
 require_dependency 'account_authorization_config/cas'
 require_dependency 'account_authorization_config/google'
 require_dependency 'account_authorization_config/linked_in'

@@ -709,6 +709,7 @@ class Course < ActiveRecord::Base
     # only use the cache.  If it's already loaded and the wrong one, it will
     # force reload
     a = self.account(self.account && self.account.id != self.account_id)
+    self.root_account = a if a.root_account?
     self.root_account_id = a.root_account_id if a
     self.root_account_id ||= a.id if a
     # Ditto

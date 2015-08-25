@@ -38,7 +38,7 @@ describe 'account authentication' do
     context 'ldap' do
       it 'should allow creation of config', priority: "1", test_id: 250262 do
         add_ldap_config
-        keep_trying_until { expect(Account.default.authentication_providers.active.count).to eq 1 }
+        keep_trying_until { expect(Account.default.authentication_providers.active.count).to eq 2 }
         config = Account.default.authentication_providers.active.last
         expect(config.auth_host).to eq 'host.example.dev'
         expect(config.auth_port).to eq 1
@@ -48,7 +48,7 @@ describe 'account authentication' do
         expect(config.auth_username).to eq 'username'
         expect(config.auth_decrypted_password).to eq 'password'
 
-        expect(Account.default.authentication_providers.active.count).to eq 1
+        expect(Account.default.authentication_providers.active.count).to eq 2
       end
 
       it 'should allow update of config', priority: "1", test_id: 250263 do
@@ -65,7 +65,7 @@ describe 'account authentication' do
         ldap_form.find_element(:id, 'authentication_provider_auth_password').send_keys('newpassword')
         submit_form(ldap_form)
 
-        keep_trying_until { expect(Account.default.authentication_providers.active.count).to eq 1 }
+        keep_trying_until { expect(Account.default.authentication_providers.active.count).to eq 2 }
         config = Account.default.authentication_providers.active.last
         expect(config.auth_host).to eq ''
         expect(config.auth_port).to eq nil
@@ -85,7 +85,7 @@ describe 'account authentication' do
         ldap_form = f("#edit_ldap#{config_id}")
         submit_form(ldap_form)
 
-        keep_trying_until { expect(Account.default.authentication_providers.active.count).to eq 1 }
+        keep_trying_until { expect(Account.default.authentication_providers.active.count).to eq 2 }
         config = Account.default.authentication_providers.active.last
         expect(config.auth_host).to eq ''
         expect(config.auth_port).to eq nil
@@ -109,7 +109,7 @@ describe 'account authentication' do
         ldap_form.find_element(:id, 'authentication_provider_auth_username').send_keys('username2')
         submit_form(ldap_form)
 
-        keep_trying_until { expect(Account.default.authentication_providers.active.count).to eq 2 }
+        keep_trying_until { expect(Account.default.authentication_providers.active.count).to eq 3 }
         config = Account.default.authentication_providers.active.last
         expect(config.auth_host).to eq 'host2.example.dev'
         expect(config.auth_port).to eq 2
@@ -129,7 +129,7 @@ describe 'account authentication' do
           f(config).click
         end
 
-        expect(Account.default.authentication_providers.active.count).to eq 0
+        expect(Account.default.authentication_providers.active.count).to eq 1
       end
 
       it 'should allow deletion of multiple configs', priority: "1", test_id: 250265 do
@@ -138,21 +138,21 @@ describe 'account authentication' do
         add_ldap_config(2)
         wait_for_ajax_requests
 
-        expect(Account.default.authentication_providers.active.count).to eq 2
+        expect(Account.default.authentication_providers.active.count).to eq 3
 
         expect_new_page_load(true) do
           f('.delete_auth_link').click
         end
 
-        expect(Account.default.authentication_providers.active.count).to eq 0
-        expect(Account.default.authentication_providers.count).to eq 2
+        expect(Account.default.authentication_providers.active.count).to eq 1
+        expect(Account.default.authentication_providers.count).to eq 4
       end
     end
 
     context 'saml' do
       it 'should allow creation of config', priority: "1", test_id: 250266 do
         add_saml_config
-        keep_trying_until { expect(Account.default.authentication_providers.active.count).to eq 1 }
+        keep_trying_until { expect(Account.default.authentication_providers.active.count).to eq 2 }
         config = Account.default.authentication_providers.active.last
         expect(config.idp_entity_id).to eq 'entity.example.dev'
         expect(config.log_in_url).to eq 'login.example.dev'
@@ -175,7 +175,7 @@ describe 'account authentication' do
         f("#authentication_provider_certificate_fingerprint").clear
         submit_form(saml_form)
 
-        keep_trying_until { expect(Account.default.authentication_providers.active.count).to eq 1 }
+        keep_trying_until { expect(Account.default.authentication_providers.active.count).to eq 2 }
         config = Account.default.authentication_providers.active.last
         expect(config.idp_entity_id).to eq ''
         expect(config.log_in_url).to eq ''
@@ -196,8 +196,8 @@ describe 'account authentication' do
           f(config).click
         end
 
-        expect(Account.default.authentication_providers.active.count).to eq 0
-        expect(Account.default.authentication_providers.count).to eq 1
+        expect(Account.default.authentication_providers.active.count).to eq 1
+        expect(Account.default.authentication_providers.count).to eq 2
       end
 
       it 'should start debug info', priority: "1", test_id: 250269 do
@@ -256,7 +256,7 @@ describe 'account authentication' do
     context 'cas' do
       it 'should allow creation of config', priority: "1", test_id: 250272 do
         add_cas_config
-        keep_trying_until { expect(Account.default.authentication_providers.active.count).to eq 1 }
+        keep_trying_until { expect(Account.default.authentication_providers.active.count).to eq 2 }
         config = Account.default.authentication_providers.active.last
         expect(config.auth_base).to eq 'http://auth.base.dev'
       end
@@ -269,7 +269,7 @@ describe 'account authentication' do
         cas_form.find_element(:id, 'authentication_provider_auth_base').clear
         submit_form(cas_form)
 
-        keep_trying_until { expect(Account.default.authentication_providers.active.count).to eq 1 }
+        keep_trying_until { expect(Account.default.authentication_providers.active.count).to eq 2 }
         config = Account.default.authentication_providers.active.last
         expect(config.auth_base).to eq ''
       end
@@ -283,15 +283,15 @@ describe 'account authentication' do
           f(config).click
         end
 
-        expect(Account.default.authentication_providers.active.count).to eq 0
-        expect(Account.default.authentication_providers.count).to eq 1
+        expect(Account.default.authentication_providers.active.count).to eq 1
+        expect(Account.default.authentication_providers.count).to eq 2
       end
     end
 
     context 'facebook' do
       it 'should allow creation of config', priority: "1", test_id: 250275 do
         add_facebook_config
-        keep_trying_until { expect(Account.default.authentication_providers.active.count).to eq 1 }
+        keep_trying_until { expect(Account.default.authentication_providers.active.count).to eq 2 }
         config = Account.default.authentication_providers.active.last
         expect(config.entity_id).to eq '123'
         expect(config.login_attribute).to eq 'id'
@@ -305,7 +305,7 @@ describe 'account authentication' do
         f("#authentication_provider_app_id").clear
         submit_form(facebook_form)
 
-        keep_trying_until { expect(Account.default.authentication_providers.active.count).to eq 1 }
+        keep_trying_until { expect(Account.default.authentication_providers.active.count).to eq 2 }
         config = Account.default.authentication_providers.active.last
         expect(config.entity_id).to eq ''
       end
@@ -318,15 +318,15 @@ describe 'account authentication' do
           f(config).click
         end
 
-        expect(Account.default.authentication_providers.active.count).to eq 0
-        expect(Account.default.authentication_providers.count).to eq 1
+        expect(Account.default.authentication_providers.active.count).to eq 1
+        expect(Account.default.authentication_providers.count).to eq 2
       end
     end
 
     context 'github' do
       it 'should allow creation of config', priority: "1", test_id: 250278 do
         add_github_config
-        keep_trying_until { expect(Account.default.authentication_providers.active.count).to eq 1 }
+        keep_trying_until { expect(Account.default.authentication_providers.active.count).to eq 2 }
         config = Account.default.authentication_providers.active.last
         expect(config.auth_host).to eq 'github.com'
         expect(config.entity_id).to eq '1234'
@@ -342,7 +342,7 @@ describe 'account authentication' do
         github_form.find_element(:id, 'authentication_provider_client_id').clear
         submit_form(github_form)
 
-        keep_trying_until { expect(Account.default.authentication_providers.active.count).to eq 1 }
+        keep_trying_until { expect(Account.default.authentication_providers.active.count).to eq 2 }
         config = Account.default.authentication_providers.active.last
         expect(config.auth_host).to eq ''
         expect(config.entity_id).to eq ''
@@ -358,15 +358,15 @@ describe 'account authentication' do
           f(config).click
         end
 
-        expect(Account.default.authentication_providers.active.count).to eq 0
-        expect(Account.default.authentication_providers.count).to eq 1
+        expect(Account.default.authentication_providers.active.count).to eq 1
+        expect(Account.default.authentication_providers.count).to eq 2
       end
     end
 
     context 'google' do
       it 'should allow creation of config', priority: "1", test_id: 250281 do
         add_google_config
-        keep_trying_until { expect(Account.default.authentication_providers.active.count).to eq 1 }
+        keep_trying_until { expect(Account.default.authentication_providers.active.count).to eq 2 }
         config = Account.default.authentication_providers.active.last
         expect(config.entity_id).to eq '1234'
         expect(config.login_attribute).to eq 'sub'
@@ -380,7 +380,7 @@ describe 'account authentication' do
         google_form.find_element(:id, 'authentication_provider_client_id').clear
         submit_form(google_form)
 
-        keep_trying_until { expect(Account.default.authentication_providers.active.count).to eq 1 }
+        keep_trying_until { expect(Account.default.authentication_providers.active.count).to eq 2 }
         config = Account.default.authentication_providers.active.last
         expect(config.entity_id).to eq ''
         expect(config.login_attribute).to eq 'sub'
@@ -395,15 +395,15 @@ describe 'account authentication' do
           f(config).click
         end
 
-        expect(Account.default.authentication_providers.active.count).to eq 0
-        expect(Account.default.authentication_providers.count).to eq 1
+        expect(Account.default.authentication_providers.active.count).to eq 1
+        expect(Account.default.authentication_providers.count).to eq 2
       end
     end
 
     context 'linkedin' do
       it 'should allow creation of config', priority: "1", test_id: 250284 do
         add_linkedin_config
-        keep_trying_until { expect(Account.default.authentication_providers.active.count).to eq 1 }
+        keep_trying_until { expect(Account.default.authentication_providers.active.count).to eq 2 }
         config = Account.default.authentication_providers.active.last
         expect(config.entity_id).to eq '1234'
         expect(config.login_attribute).to eq 'id'
@@ -417,7 +417,7 @@ describe 'account authentication' do
         linkedin_form.find_element(:id, 'authentication_provider_client_id').clear
         submit_form(linkedin_form)
 
-        keep_trying_until { expect(Account.default.authentication_providers.active.count).to eq 1 }
+        keep_trying_until { expect(Account.default.authentication_providers.active.count).to eq 2 }
         config = Account.default.authentication_providers.active.last
         expect(config.entity_id).to eq ''
         expect(config.login_attribute).to eq 'id'
@@ -432,15 +432,15 @@ describe 'account authentication' do
           f(config).click
         end
 
-        expect(Account.default.authentication_providers.active.count).to eq 0
-        expect(Account.default.authentication_providers.count).to eq 1
+        expect(Account.default.authentication_providers.active.count).to eq 1
+        expect(Account.default.authentication_providers.count).to eq 2
       end
     end
 
     context 'openid connect' do
       it 'should allow creation of config', priority: "1", test_id: 250287 do
         add_openid_connect_config
-        keep_trying_until { expect(Account.default.authentication_providers.active.count).to eq 1 }
+        keep_trying_until { expect(Account.default.authentication_providers.active.count).to eq 2 }
         config = Account.default.authentication_providers.active.last
         expect(config.entity_id).to eq '1234'
         expect(config.log_in_url).to eq 'http://authorize.url.dev'
@@ -460,7 +460,7 @@ describe 'account authentication' do
         f("#authentication_provider_scope").clear
         submit_form(openid_connect_form)
 
-        keep_trying_until { expect(Account.default.authentication_providers.active.count).to eq 1 }
+        keep_trying_until { expect(Account.default.authentication_providers.active.count).to eq 2 }
         config = Account.default.authentication_providers.active.last
         expect(config.entity_id).to eq ''
         expect(config.log_in_url).to eq ''
@@ -478,15 +478,15 @@ describe 'account authentication' do
           f(config).click
         end
 
-        expect(Account.default.authentication_providers.active.count).to eq 0
-        expect(Account.default.authentication_providers.count).to eq 1
+        expect(Account.default.authentication_providers.active.count).to eq 1
+        expect(Account.default.authentication_providers.count).to eq 2
       end
     end
 
     context 'twitter' do
       it 'should allow creation of config', priority: "1", test_id: 250290 do
         add_twitter_config
-        keep_trying_until { expect(Account.default.authentication_providers.active.count).to eq 1 }
+        keep_trying_until { expect(Account.default.authentication_providers.active.count).to eq 2 }
         config = Account.default.authentication_providers.active.last
         expect(config.entity_id).to eq '1234'
         expect(config.login_attribute).to eq 'user_id'
@@ -500,7 +500,7 @@ describe 'account authentication' do
         twitter_form.find_element(:id, 'authentication_provider_consumer_key').clear
         submit_form(twitter_form)
 
-        keep_trying_until { expect(Account.default.authentication_providers.active.count).to eq 1 }
+        keep_trying_until { expect(Account.default.authentication_providers.active.count).to eq 2 }
         config = Account.default.authentication_providers.active.last
         expect(config.entity_id).to eq ''
         expect(config.login_attribute).to eq 'user_id'
@@ -515,8 +515,8 @@ describe 'account authentication' do
           f(config).click
         end
 
-        expect(Account.default.authentication_providers.active.count).to eq 0
-        expect(Account.default.authentication_providers.count).to eq 1
+        expect(Account.default.authentication_providers.active.count).to eq 1
+        expect(Account.default.authentication_providers.count).to eq 2
       end
     end
   end

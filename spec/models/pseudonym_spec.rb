@@ -292,9 +292,8 @@ describe Pseudonym do
       user_with_pseudonym(:password => 'qwerty')
       expect(@pseudonym.valid_arbitrary_credentials?('qwerty')).to be_truthy
 
-      Account.default.settings = { :canvas_authentication => false }
+      Account.default.authentication_providers.scoped.delete_all
       Account.default.authentication_providers.create!(:auth_type => 'ldap')
-      Account.default.save!
       @pseudonym.reload
 
       @pseudonym.stubs(:valid_ldap_credentials?).returns(false)
@@ -525,10 +524,6 @@ describe Pseudonym do
         end
 
         context "with canvas authentication enabled on the account" do
-          before do
-            account1.change_root_account_setting!(:canvas_authentication, true)
-          end
-
           it "should still grant admins :change_password for others on the account" do
             expect(managed_pseudonym(bob, account: account1)).to be_grants_right(sally, :change_password)
           end
@@ -544,7 +539,7 @@ describe Pseudonym do
 
         context "without canvas authentication enabled on the account" do
           before do
-            account1.change_root_account_setting!(:canvas_authentication, false)
+            account1.authentication_providers.scoped.delete_all
           end
 
           it "should no longer grant admins :change_password for others on the account" do

@@ -26,6 +26,7 @@ describe "account" do
       expect(dialog.find_element(:id, "pseudonym_unique_id")).to be_displayed
 
       Account.default.authentication_providers.create(:auth_type => 'cas')
+      Account.default.authentication_providers.first.move_to_bottom
       get "/accounts/#{Account.default.id}/users"
       f(".add_user_link").click
       dialog = f("#add_user_dialog")
