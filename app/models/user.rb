@@ -2544,7 +2544,7 @@ class User < ActiveRecord::Base
     return cid if cid
 
     Setting.transaction do
-      s = Setting.lock.where(name: 'crocodoc_counter').first
+      s = Setting.lock.where(name: 'crocodoc_counter').first_or_create(value: 0)
       cid = s.value = s.value.to_i + 1
       s.save!
     end

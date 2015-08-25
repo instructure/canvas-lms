@@ -70,11 +70,32 @@ describe Attachment do
   end
 
   context "crocodoc" do
+    include HmacHelper
+    let_once(:user) { user_model }
+    let_once(:course) { course_model }
+    let_once(:student) do
+      course.enroll_student(user_model).accept
+      @user
+    end
     before { configure_crocodoc }
 
     it "crocodocable?" do
       crocodocable_attachment_model
       expect(@attachment).to be_crocodocable
+    end
+
+    it "should include a whitelist of crocodoc_ids in the url blob" do
+      crocodocable_attachment_model
+      crocodoc_ids = [user.crocodoc_id!, student.crocodoc_id!]
+      @attachment.submit_to_crocodoc
+
+      url = Rack::Utils.parse_nested_query(@attachment.crocodoc_url(user, crocodoc_ids).sub(/^.*\?{1}/, ""))
+      blob = extract_blob(url["hmac"], url["blob"],
+                          "user_id" => user.id,
+                          "type" => "crocodoc")
+
+      expect(blob["crocodoc_ids"]).to be_present
+      expect(blob["crocodoc_ids"]).to eq(crocodoc_ids & blob["crocodoc_ids"])
     end
 
     it "should submit to crocodoc" do

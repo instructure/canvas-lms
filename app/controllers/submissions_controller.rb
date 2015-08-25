@@ -112,7 +112,7 @@ class SubmissionsController < ApplicationController
       id = @current_user.try(:id)
     end
     @user = @context.all_students.find(params[:id]) rescue nil
-    if !@user
+    unless @user
       flash[:error] = t('errors.student_not_enrolled', "The specified user is not a student in this course")
       respond_to do |format|
         format.html { redirect_to named_context_url(@context, :context_assignment_url, @assignment.id) }
@@ -127,6 +127,11 @@ class SubmissionsController < ApplicationController
 
     @submission = @assignment.submissions.where(user_id: @user).first
     @submission ||= @assignment.submissions.build(:user => @user)
+    if @context.feature_enabled?(:moderated_grading) && @assignment.moderated_grading?
+      student   = User.where(id: @submission.user_id).first
+      grader = User.where(id: @submission.grader_id).first
+      @crocodoc_ids = [student, grader].compact.map(&:crocodoc_id!)
+    end
     @rubric_association = @assignment.rubric_association
     @rubric_association.assessing_user_id = @submission.user_id if @rubric_association
     # can't just check the permission, because peer reviewiers can never read the grade
@@ -194,7 +199,7 @@ class SubmissionsController < ApplicationController
           @submission.limit_comments(@current_user, session)
           format.html
         end
-        if !json_handled
+        unless json_handled
           format.json {
             @submission.limit_comments(@current_user, session)
             excludes = @assignment.grants_right?(@current_user, session, :grade) ? [:grade, :score] : []

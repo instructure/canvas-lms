@@ -1305,7 +1305,7 @@ class Assignment < ActiveRecord::Base
     !moderated_grading? || grades_published_at.present?
   end
 
-  def speed_grader_json(user, avatars: false, grading_role: :grader)
+  def speed_grader_json(user, avatars: false, grading_role: :grader, crocodoc_ids: nil)
     Attachment.skip_thumbnails = true
     submission_fields = [:user_id, :id, :submitted_at, :workflow_state,
                          :grade, :grade_matches_current_submission,
@@ -1408,7 +1408,7 @@ class Assignment < ActiveRecord::Base
                                                :methods => [:view_inline_ping_url]
                                              ).tap { |json|
                                                json[:attachment][:canvadoc_url] = a.canvadoc_url(user)
-                                               json[:attachment][:crocodoc_url] = a.crocodoc_url(user)
+                                               json[:attachment][:crocodoc_url] = a.crocodoc_url(user, crocodoc_ids)
                                                json[:attachment][:submitted_to_crocodoc] = a.crocodoc_document.present?
                                              }
                                            end

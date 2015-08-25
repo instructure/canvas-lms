@@ -1441,20 +1441,21 @@ class Attachment < ActiveRecord::Base
     "/api/v1/canvadoc_session?#{preview_params(user, "canvadoc")}"
   end
 
-  def crocodoc_url(user)
+  def crocodoc_url(user, crocodoc_ids = nil)
     return unless crocodoc_available?
-    "/api/v1/crocodoc_session?#{preview_params(user, "crocodoc")}"
+    "/api/v1/crocodoc_session?#{preview_params(user, "crocodoc", crocodoc_ids)}"
   end
 
   def previewable_media?
     self.content_type && self.content_type.match(/\A(video|audio)/)
   end
 
-  def preview_params(user, type)
+  def preview_params(user, type, crocodoc_ids = nil)
     blob = {
       user_id: user.try(:global_id),
       attachment_id: id,
       type: type,
+      crocodoc_ids: crocodoc_ids
     }.to_json
     hmac = Canvas::Security.hmac_sha1(blob)
     "blob=#{URI.encode blob}&hmac=#{URI.encode hmac}"

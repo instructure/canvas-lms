@@ -125,7 +125,7 @@
               %>
             <% end %>
             <% if attachment.crocodoc_available? || attachment.canvadocable? %>
-              <a href=<%= preview_url %> data-tooltip title="<%= preview_document %>" class="modal_preview_link Button--link" role="button" data-attachment_id="<%= attachment.id %>" data-submission_id="<%= @submission.id %>" data-dialog-title="<%= attachment.display_name %>" <%= doc_preview_attributes(attachment) %>><%= button_text %></a>
+              <a href=<%= preview_url %> data-tooltip title="<%= preview_document %>" class="modal_preview_link Button--link" role="button" data-attachment_id="<%= attachment.id %>" data-submission_id="<%= @submission.id %>" data-dialog-title="<%= attachment.display_name %>" <%= doc_preview_attributes(attachment, crocodoc_ids: @crocodoc_ids) %>><%= button_text %></a>
             <% end %>
           </div>
 

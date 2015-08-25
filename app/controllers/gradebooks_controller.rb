@@ -440,6 +440,7 @@ class GradebooksController < ApplicationController
                          'SpeedGrader is enabled only for published content.')
       return redirect_to polymorphic_url([@context, @assignment])
     end
+
     grading_role = if moderated_grading_enabled_and_no_grades_published
       if @context.grants_right?(@current_user, :moderate_grades)
         :moderator
@@ -449,6 +450,9 @@ class GradebooksController < ApplicationController
     else
       :grader
     end
+
+    # TODO: Handle for moderator when behavior implemented
+    crocodoc_ids = [:provisional_grader].include?(grading_role) && [@current_user.crocodoc_id!]
 
     respond_to do |format|
       format.html do
@@ -474,7 +478,8 @@ class GradebooksController < ApplicationController
       format.json do
         render :json => @assignment.speed_grader_json(@current_user,
                                                       avatars: service_enabled?(:avatars),
-                                                      grading_role: grading_role)
+                                                      grading_role: grading_role,
+                                                      crocodoc_ids: crocodoc_ids)
       end
     end
   end
