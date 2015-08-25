@@ -994,7 +994,7 @@ class Attachment < ActiveRecord::Base
 
     given { |user, session|
       self.context.grants_right?(user, session, :read) &&
-      (self.context.grants_right?(user, session, :manage_files) || !self.locked_for?(user))
+      (self.context.grants_right?(user, session, :read_as_admin) || !self.locked_for?(user))
     }
     can :download
 
