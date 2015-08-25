@@ -1,7 +1,7 @@
 define [
   'react-router'
   'compiled/react_files/modules/filesEnv'
-  'compiled/react_files/components/FilesApp'
+  'jsx/files/FilesApp'
   'compiled/react_files/components/ShowFolder'
   'compiled/react_files/components/SearchResults'
 ], (ReactRouter, filesEnv, FilesApp, ShowFolder, SearchResults) ->
