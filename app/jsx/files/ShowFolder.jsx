@@ -4,7 +4,7 @@ define([
   'i18n!react_files',
   'compiled/react_files/components/ShowFolder',
   'jsx/files/FilePreview',
-  'compiled/react_files/components/FolderChild',
+  'jsx/files/FolderChild',
   'jsx/files/UploadDropZone',
   'jsx/files/ColumnHeaders',
   'jsx/files/CurrentUploads',

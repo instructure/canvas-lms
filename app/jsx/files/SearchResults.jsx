@@ -6,29 +6,31 @@ define([
   'jsx/files/NoResults',
   'jsx/files/ColumnHeaders',
   'compiled/models/Folder',
-  'compiled/react_files/components/FolderChild',
+  'jsx/files/FolderChild',
   'jsx/files/LoadingIndicator',
   'jsx/files/FilePreview'
   ], function(I18n, _, React, SearchResults, NoResults, ColumnHeaders, Folder, FolderChild, LoadingIndicator, FilePreview) {
 
   SearchResults.displayErrors =  function (errors) {
+    var error_message= null
+
+    if (errors != null) {
+      error_message = errors.map(function (error) {
+        return (
+          <li>
+            error.message
+          </li>
+        )
+      })
+    }
+
     return (
       <div>
         <p>
           {I18n.t({one: 'Your search encountered the following error:', other: 'Your search encountered the following errors:'}, {count: errors.length}) }
         </p>
         <ul>
-          if (errors != null) {
-            errors.map(function (error) {
-              if (error.message) {
-                return (
-                  <li>
-                    { error.message }
-                  </li>
-                )
-              }
-            })
-          }
+          { error_message }
         </ul>
       </div>
     );
