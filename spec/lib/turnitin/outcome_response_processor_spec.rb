@@ -60,6 +60,13 @@ module Turnitin
         expect(attachment.display_name).to eq filename
       end
 
+      it 'sets the turnitin status to pending' do
+        subject.process_without_send_later
+        submission = lti_assignment.submissions.first
+        attachment = lti_assignment.attachments.first
+        expect(submission.turnitin_data[attachment.asset_string][:status]).to eq 'pending'
+      end
+
     end
 
   end

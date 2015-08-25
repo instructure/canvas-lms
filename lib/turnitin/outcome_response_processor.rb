@@ -14,7 +14,9 @@ module Turnitin
     def process
       attachment = create_attachment
       submission = @assignment.submit_homework(@user, attachments:[attachment], submission_type: 'online_upload')
-      self.send_later(:update_originality_data, submission, attachment.asset_string)
+      asset_string = attachment.asset_string
+      update_turnitin_data!(submission, asset_string, status: 'pending')
+      self.send_later(:update_originality_data, submission, asset_string)
     end
     handle_asynchronously :process, max_attempts: 1, priority: Delayed::LOW_PRIORITY
 
@@ -38,11 +40,7 @@ module Turnitin
 
     def update_originality_data(submission, asset_string, attempt=1)
       if turnitin_client.scored?
-        all_data = submission.turnitin_data || {}
-        all_data[asset_string] = turnitin_data
-        submission.update_attribute('turnitin_data', all_data)
-        submission.turnitin_data_changed!
-        submission.save
+        update_turnitin_data!(submission, asset_string, turnitin_data)
       elsif attempt <= MAX_ATTEMPTS
         send_at(INTERVAL.from_now, :update_originality_data,  submission, asset_string, attempt + 1)
       end
@@ -99,5 +97,14 @@ module Turnitin
         status: "scored"
       }
     end
+
+    def update_turnitin_data!(submission, asset_string, new_data)
+      turnitin_data = submission.turnitin_data || {}
+      turnitin_data[asset_string] ||= {}
+      turnitin_data[asset_string].merge!(new_data)
+      submission.turnitin_data_changed!
+      submission.save
+    end
+
   end
 end
