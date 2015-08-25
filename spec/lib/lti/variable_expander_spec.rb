@@ -17,7 +17,6 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
-
 module Lti
   describe VariableExpander do
     let(:root_account) { Account.new }
@@ -380,6 +379,27 @@ module Lti
           exp_hash = {test: '$Canvas.assignment.dueAt'}
           subject.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq right_now.to_s
+        end
+
+        it 'has substitution for $Canvas.assignment.unlockAt.iso8601' do
+          assignment.stubs(:unlock_at).returns(right_now)
+          exp_hash = {test: '$Canvas.assignment.unlockAt.iso8601'}
+          subject.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq right_now.utc.iso8601.to_s
+        end
+
+        it 'has substitution for $Canvas.assignment.lockAt.iso8601' do
+          assignment.stubs(:lock_at).returns(right_now)
+          exp_hash = {test: '$Canvas.assignment.lockAt.iso8601'}
+          subject.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq right_now.utc.iso8601.to_s
+        end
+
+        it 'has substitution for $Canvas.assignment.dueAt.iso8601' do
+          assignment.stubs(:due_at).returns(right_now)
+          exp_hash = {test: '$Canvas.assignment.dueAt.iso8601'}
+          subject.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq right_now.utc.iso8601.to_s
         end
 
       end

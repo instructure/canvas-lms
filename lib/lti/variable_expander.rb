@@ -289,17 +289,31 @@ module Lti
     register_expansion 'Canvas.assignment.pointsPossible', [],
                        -> { @assignment.points_possible },
                        ASSIGNMENT_GUARD
-
+    #deprecated in favor of ISO8601
     register_expansion 'Canvas.assignment.unlockAt', [],
                        -> { @assignment.unlock_at },
                        ASSIGNMENT_GUARD
 
+    #deprecated in favor of ISO8601
     register_expansion 'Canvas.assignment.lockAt', [],
                        -> { @assignment.lock_at },
                        ASSIGNMENT_GUARD
 
+    #deprecated in favor of ISO8601
     register_expansion 'Canvas.assignment.dueAt', [],
                        -> { @assignment.due_at },
+                       ASSIGNMENT_GUARD
+
+    register_expansion 'Canvas.assignment.unlockAt.iso8601', [],
+                       -> { @assignment.unlock_at.utc.iso8601 },
+                       ASSIGNMENT_GUARD
+
+    register_expansion 'Canvas.assignment.lockAt.iso8601', [],
+                       -> { @assignment.lock_at.utc.iso8601 },
+                       ASSIGNMENT_GUARD
+
+    register_expansion 'Canvas.assignment.dueAt.iso8601', [],
+                       -> { @assignment.due_at.utc.iso8601 },
                        ASSIGNMENT_GUARD
 
     register_expansion 'LtiLink.custom.url', [],
