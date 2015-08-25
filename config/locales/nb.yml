@@ -3544,15 +3544,15 @@ nb:
         fulfilled: "oppnådde et resultat på ikke mer enn %{score}"
         unfulfilled: "må ha et resultat på ikke mer enn %{score}"
       min_score: 
-        fulfilled: "fikk et resultat på minst en %{score}"
-        unfulfilled: "må ha et resultat på minst en %{score}"
+        fulfilled: "Karakter: %{score}"
+        unfulfilled: "Karakter: %{score}"
       modules_item_move_to: "Flytte til..."
       must_contribute: 
-        fulfilled: "bidro til innholdet på siden"
-        unfulfilled: "må bidra til innholdet på siden"
+        fulfilled: Bidratt
+        unfulfilled: Bidra
       must_submit: 
-        fulfilled: "leverte inn oppgaven"
-        unfulfilled: "må levere inn oppgaven"
+        fulfilled: Sendt
+        unfulfilled: Send
       must_view: 
         fulfilled: "så på siden"
         unfulfilled: "må se på siden"
@@ -3586,6 +3586,8 @@ nb:
       new_tab: "Dette området må åpnes i et nytt nettleser-vindu"
   context_modules_api: 
     invalid_position: "Ugyldig posisjon"
+  context_nav_link_8d15d95: "Kontekst nav lenke"
+  context_nav_link_active_78adb0fa: "Kontekst nav lenke aktiv"
   continue_ac067716: Fortsett
   continue_typing_to_find_additional_sections_or_stu_49786085: "Fortsett å skrive for å finne ytterligere seksjoner eller studenter."
   conversation_dialog: 
@@ -3913,6 +3915,7 @@ nb:
       wiki_page: "Ukjent wikiside"
   course_files_62deb8f8: Kursfiler
   course_home_sub_navigation_b1ee6b03: Kursnavigering
+  course_implemented_apps_fa658f5a: "Kurs-implementerte applikasjoner"
   course_list: 
     favorited_tooltip: "Klikk for å fjerne fra kurs menyen."
     nonfavorited_tooltip: "Klikk for å legge til kurs menyen."
@@ -4612,6 +4615,7 @@ nb:
     bottom: 
       student: 
         count: "Laveste studentantall"
+    comments: Kommentarer
     correct: 
       bottom: 
         student: 
@@ -4625,22 +4629,33 @@ nb:
       top: 
         student: 
           count: "Riktig høyeste studentantall"
+    current_score: "Nåværende resultat"
     difficulty: 
       index: Vanskelighetsindeks
+    final_grade: Sluttkarakter
+    final_score: Sluttkarakter
+    id: ID
     middle: 
       student: 
         count: "Midtre studentantall"
     point: 
       biserial: "Poeng biserial av riktig"
       distractor: "Poeng biserial av distraktør %{num}"
+    points_possible: "Poeng mulig"
     question: 
       id: Spørsmåls-ID
       title: Spørsmålstittel
     quiz: 
       question: 
         count: "Antall spørsmål på prøven"
+    read_only_field: "(kun lese)"
+    root_account: Rotkonto
+    section: Seksjon
+    sis_login_id: "SIS pålogging ID"
+    sis_user_id: "SIS bruker ID"
     standard: 
       deviation: Standardavvik
+    student: Student
     top: 
       student: 
         count: "Høyeste antall studenter"
@@ -4849,6 +4864,7 @@ nb:
   delete_quiz_142b8099: "Slett prøve"
   delete_selected_a023ccf8: "Slett valgt"
   delete_survey_56fddbbd: "Slett undersøkelse"
+  delete_this_answer_f1802eaa: "Slett dette svaret"
   delete_tool_app_9c9f6d35: "Slett %{tool} App?"
   delete_toolname_app_85f9d4ee: "Slett %{toolName} App"
   deleting_6421031e: sletter…
@@ -4976,6 +4992,7 @@ nb:
   diigo_993c4646: Diigo
   disable_a5c05db3: "Slå av"
   disabled_18c33a73: (deaktivert)
+  disabled_links_b3bdea99: "Deaktiverte lenker"
   discovery_url_3dce06d9: Oppdagelse-URL
   discussion_6719c51d: Diskusjon
   discussion_entries: 
@@ -5295,6 +5312,8 @@ nb:
   down_5831a426: Ned
   download_scores_generated_on_date_ff5b9cd2: "Last ned karakterer generert på %{date}"
   download_submissions_7454665f: "Last ned innleveringer"
+  dropdown_option_1_e6ff2fc: "Dropdown-valg 1"
+  dropdown_option_2_9766a346: "Dropdown-valg 2"
   due_a73610f6: "Leveres innen"
   due_at_5e18eeac: "Frist:"
   due_by_c263dc10: "frist ved"
@@ -5425,6 +5444,7 @@ nb:
   element_option_missing_error_an_element_to_attach__be433478: "`element` alternativ manglende feil: Et element for å feste TreeBrowserView må oppgis når du setter den gjengi muligheten til å 'true' for BBTreeBrowserView"
   email: 
     default_from_name: "Instructure Canvas"
+  email_address_6e0443a5: E-postadresse
   email_already_in_use_330248e: "E-post allerede i bru"
   email_e366fa29: epost
   email_is_invalid_e0d982eb: "Epost er ugyldig!"
@@ -5436,6 +5456,7 @@ nb:
       Flere vurderingsperioder tillater lærere og administratorer opprette vurderingsperioder med valgte
       datoer. Innleveringer kan filtreres etter disse vurderingsperiodene i vurderingsboken.
   enable_or_condition_for_modules_a16f02d8: "Tillat \"eller\" betingelser for moduler"
+  enabled_links_be110215: "Aktiverte lenker"
   end_date_e0093ed7: Sluttdato
   ending_date_e1ea13a4: Sluttdato
   enrollment: 
@@ -5801,6 +5822,7 @@ nb:
   expand_or_collapse_calendars_9854b0d0: "Utvides eller skjul Kalendere"
   expand_or_collapse_undated_items_b901de09: "Utvide eller skjule Udaterte elementer"
   expand_subdiscussion_cd226ed4: "Utvide Sub diskusjon"
+  expanded_f4493860: Utvidet
   export_de71cd8e: Eksport
   exporting_b1eab154: Eksporterer
   external_apps_f5490181: "Eksterne apper"
