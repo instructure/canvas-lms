@@ -1058,6 +1058,7 @@ class Submission < ActiveRecord::Base
   #  * cached_due_date (Time)
   #  * submitted_at (Time)
   #  * score (Fixnum)
+  #  * excused (Boolean)
   #
   module Tardiness
     def past_due?
@@ -1087,7 +1088,7 @@ class Submission < ActiveRecord::Base
     # QUESTIONS FOR ME:
     #   * are we messing up graded / not graded counts???
     def graded?
-      excused? || (!!score && workflow_state == 'graded')
+      excused || (!!score && workflow_state == 'graded')
     end
   end
   include Tardiness
