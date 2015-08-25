@@ -160,11 +160,13 @@ class UserObserveesController < ApplicationController
   end
 
   def add_observee(observee)
-    unless has_observee?(observee)
-      user.user_observees.create! do |uo|
-        uo.user_id = observee.id
+    UserObserver.unique_constraint_retry do
+      unless has_observee?(observee)
+        user.user_observees.create! do |uo|
+          uo.user_id = observee.id
+        end
+        user.touch
       end
-      user.touch
     end
   end
 
