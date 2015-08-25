@@ -163,6 +163,14 @@ module AssignmentOverridesSeleniumHelper
     create_quiz_with_multiple_due_dates
   end
 
+  def prepare_multiple_due_dates_scenario_for_teacher
+    prepare_multiple_due_dates_scenario
+
+    @teacher1 = user_with_pseudonym(username: 'teacher1@example.com', active_all: 1)
+    @course.enroll_teacher(@teacher1, section: @section_a)
+    @course.enroll_teacher(@teacher1, section: @section_b)
+  end
+
   def prepare_multiple_due_dates_scenario_for_ta
     prepare_multiple_due_dates_scenario
 
