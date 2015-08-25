@@ -34,12 +34,19 @@ class Conversation < ActiveRecord::Base
   # see also MessageableUser
   def participants(reload = false)
     if !@participants || reload
-      Conversation.preload_participants([self])
+      @participants = Rails.cache.fetch([self, 'participants'].cache_key, expires_in: 1.day) do
+        Conversation.preload_participants([self])
+        @participants
+      end
     end
     @participants
   end
 
   attr_accessible
+
+  def delete_participant_cache
+    Rails.cache.delete([self, 'participants'].cache_key)
+  end
 
   def reload(options = nil)
     @current_context_strings = {}
@@ -127,7 +134,7 @@ class Conversation < ActiveRecord::Base
     self.shard.activate do
       user_ids = users.map(&:id).uniq
       raise "can't add participants to a private conversation" if private?
-      transaction do
+      message = transaction do
         lock!
         user_ids -= conversation_participants.map(&:user_id)
         next if user_ids.empty?
@@ -178,6 +185,8 @@ class Conversation < ActiveRecord::Base
           add_event_message(current_user, {:event_type => :users_added, :user_ids => user_ids}, options)
         end
       end
+      delete_participant_cache
+      message
     end
   end
 
@@ -701,6 +710,7 @@ class Conversation < ActiveRecord::Base
       conversation_message_participants.scoped.delete_all
     end
     conversation_participants.shard(self).delete_all
+    delete_participant_cache
   end
 
   protected
