@@ -35,13 +35,13 @@ define([
       );
       return (
         <div className="Lti2Permissions">
-          <div className="ReactModal__InnerSection ReactModal__Body--force-no-corners ReactModal__Body">
+          <div className="ReactModal__Body">
             <p dangerouslySetInnerHTML={{ __html: p1 }}></p>
           </div>
-          <div className="ReactModal__InnerSection ReactModal__Footer">
+          <div className="ReactModal__Footer">
             <div className="ReactModal__Footer-Actions">
               {this.toggleButton()}
-              <button type="button" className="btn btn-secondary" onClick={this.props.handleCancel}>{I18n.t("Cancel")}</button>
+              <button type="button" className="Button" onClick={this.props.handleCancel}>{I18n.t("Cancel")}</button>
             </div>
           </div>
         </div>

@@ -204,6 +204,7 @@ class Account < ActiveRecord::Base
   add_setting :external_notification_warning, :boolean => true, :default => false
   # Terms of Use and Privacy Policy settings for the root account
   add_setting :terms_changed_at, :root_only => true
+  add_setting :account_terms_required, :root_only => true, :boolean => true, :default => true
   # When a user is invited to a course, do we let them see a preview of the
   # course even without registering?  This is part of the free-for-teacher
   # account perks, since anyone can invite anyone to join any course, and it'd
@@ -315,7 +316,7 @@ class Account < ActiveRecord::Base
   end
 
   def terms_required?
-    Setting.get('terms_required', 'true') == 'true'
+    Setting.get('terms_required', 'true') == 'true' && root_account.account_terms_required?
   end
 
   def require_acceptance_of_terms?(user)
@@ -467,7 +468,7 @@ class Account < ActiveRecord::Base
     associated_courses = associated_courses.with_enrollments if opts[:hide_enrollmentless_courses]
     associated_courses = associated_courses.for_term(opts[:term]) if opts[:term].present?
     associated_courses = yield associated_courses if block_given?
-    associated_courses.limit(opts[:limit]).active_first.select(columns).all
+    associated_courses.limit(opts[:limit]).active_first.select(columns).to_a
   end
 
   def fast_all_courses(opts={})
@@ -511,7 +512,7 @@ class Account < ActiveRecord::Base
   end
 
   def self.account_lookup_cache_key(id)
-    ['_account_lookup3', id].cache_key
+    ['_account_lookup4', id].cache_key
   end
 
   def self.invalidate_cache(id)
@@ -868,7 +869,7 @@ class Account < ActiveRecord::Base
         if account_chain_ids == [Account.site_admin.id]
           Account.site_admin.account_users_for(user)
         else
-          AccountUser.where(:account_id => account_chain_ids, :user_id => user).all
+          AccountUser.where(:account_id => account_chain_ids, :user_id => user).to_a
         end
       end
     end
@@ -1025,7 +1026,7 @@ class Account < ActiveRecord::Base
     begin
       value, uri = CanvasHttp.validate_url(self.settings[:auth_discovery_url])
       self.auth_discovery_url = value
-    rescue URI::InvalidURIError, ArgumentError
+    rescue URI::Error, ArgumentError
       errors.add(:discovery_url, t('errors.invalid_discovery_url', "The discovery URL is not valid" ))
     end
   end
@@ -1077,7 +1078,7 @@ class Account < ActiveRecord::Base
     birth_id = Shard.relative_id_for(id, Shard.current, Shard.birth)
     Shard.birth.activate do
       Rails.cache.fetch(account_lookup_cache_key(birth_id)) do
-        account = Account.where(id: id).first
+        account = Account.where(id: birth_id).first
         account.precache if account
         account
       end
@@ -1272,7 +1273,7 @@ class Account < ActiveRecord::Base
       tabs << { :id => TAB_USERS, :label => t('#account.tab_users', "Users"), :css_class => 'users', :href => :account_users_path } if user && self.grants_right?(user, :read_roster)
       tabs << { :id => TAB_PERMISSIONS, :label => t('#account.tab_permissions', "Permissions"), :css_class => 'permissions', :href => :account_permissions_path } if user && self.grants_right?(user, :manage_role_overrides)
       tabs << { :id => TAB_SUB_ACCOUNTS, :label => t('#account.tab_sub_accounts', "Sub-Accounts"), :css_class => 'sub_accounts', :href => :account_sub_accounts_path } if manage_settings
-      tabs << { :id => TAB_AUTHENTICATION, :label => t('#account.tab_authentication', "Authentication"), :css_class => 'authentication', :href => :account_account_authorization_configs_path } if manage_settings
+      tabs << { :id => TAB_AUTHENTICATION, :label => t('#account.tab_authentication', "Authentication"), :css_class => 'authentication', :href => :account_authentication_providers_path } if manage_settings
       tabs << { :id => TAB_PLUGINS, :label => t("#account.tab_plugins", "Plugins"), :css_class => "plugins", :href => :plugins_path, :no_args => true } if self.grants_right?(user, :manage_site_settings)
       tabs << { :id => TAB_JOBS, :label => t("#account.tab_jobs", "Jobs"), :css_class => "jobs", :href => :jobs_path, :no_args => true } if self.grants_right?(user, :view_jobs)
       tabs << { :id => TAB_DEVELOPER_KEYS, :label => t("#account.tab_developer_keys", "Developer Keys"), :css_class => "developer_keys", :href => :developer_keys_path, :no_args => true } if self.grants_right?(user, :manage_developer_keys)
@@ -1291,7 +1292,7 @@ class Account < ActiveRecord::Base
       tabs << { :id => TAB_SUB_ACCOUNTS, :label => t('#account.tab_sub_accounts', "Sub-Accounts"), :css_class => 'sub_accounts', :href => :account_sub_accounts_path } if manage_settings
       tabs << { :id => TAB_FACULTY_JOURNAL, :label => t('#account.tab_faculty_journal', "Faculty Journal"), :css_class => 'faculty_journal', :href => :account_user_notes_path} if self.enable_user_notes && user && self.grants_right?(user, :manage_user_notes)
       tabs << { :id => TAB_TERMS, :label => t('#account.tab_terms', "Terms"), :css_class => 'terms', :href => :account_terms_path } if self.root_account? && manage_settings
-      tabs << { :id => TAB_AUTHENTICATION, :label => t('#account.tab_authentication', "Authentication"), :css_class => 'authentication', :href => :account_account_authorization_configs_path } if self.root_account? && manage_settings
+      tabs << { :id => TAB_AUTHENTICATION, :label => t('#account.tab_authentication', "Authentication"), :css_class => 'authentication', :href => :account_authentication_providers_path } if self.root_account? && manage_settings
       tabs << { :id => TAB_SIS_IMPORT, :label => t('#account.tab_sis_import', "SIS Import"), :css_class => 'sis_import', :href => :account_sis_import_path } if self.root_account? && self.allow_sis_import && user && self.grants_right?(user, :manage_sis)
     end
     tabs += external_tool_tabs(opts)
@@ -1484,7 +1485,7 @@ class Account < ActiveRecord::Base
   def format_referer(referer_url)
     begin
       referer = URI(referer_url || '')
-    rescue URI::InvalidURIError
+    rescue URI::Error
       return
     end
     return unless referer.host

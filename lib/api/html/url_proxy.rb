@@ -64,6 +64,12 @@ module Api
         # Get quiz
         %r{^/courses/(#{ID})/quizzes/(#{ID})$} => ['Quiz', :api_v1_course_quiz_url, :course_id, :id],
 
+        # List modules
+        %r{^/courses/(#{ID})/modules$} => ['[Module]', :api_v1_course_context_modules_url, :course_id],
+
+        # Get module
+        %r{^/courses/(#{ID})/modules/(#{ID})$} => ['Module', :api_v1_course_context_module_url, :course_id, :id],
+
         # Launch LTI tool
         %r{^/courses/(#{ID})/external_tools/retrieve\?url=(.*)$} => ['SessionlessLaunchUrl', :api_v1_course_external_tool_sessionless_launch_url, :course_id, :url],
     }.freeze

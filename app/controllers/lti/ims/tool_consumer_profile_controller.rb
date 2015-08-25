@@ -34,9 +34,9 @@ module Lti
       def tool_consumer_profile_url(uuid)
         case context
           when Course
-            course_tool_consumer_profile_url(context)
+            course_tool_consumer_profile_url(context, uuid)
           when Account
-            account_tool_consumer_profile_url(context)
+            account_tool_consumer_profile_url(context, uuid)
           else
             raise "Unsupported context"
         end

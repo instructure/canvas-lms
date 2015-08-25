@@ -221,6 +221,7 @@ describe ImportedHtmlConverter do
 
     it "should not error on invalid urls" do
       expect(ImportedHtmlConverter.relative_url?("stupid &^%$ url")).to be_falsey
+      expect(ImportedHtmlConverter.relative_url?("mailto:jfarnsworth@instructure.com,")).to be_falsey
     end
   end
 

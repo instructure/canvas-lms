@@ -464,6 +464,12 @@ class Folder < ActiveRecord::Base
 
     given {|user, session| self.protected? && !self.locked? && self.context.grants_right?(user, session, :read) && self.context.users.include?(user) }
     can :read and can :read_contents
+
+    given { |user, session| self.context.grants_right?(user, session, :manage_files) }
+    can :manage_files
+
+    given { |user, session| self.context.grants_right?(user, session, :read_as_admin) }
+    can :read_as_admin
   end
 
   # find all unlocked/visible folders that can be reached by following unlocked/visible folders from the root
@@ -479,7 +485,9 @@ class Folder < ActiveRecord::Base
     visible_ids
   end
 
-  private
+  def self.from_context_or_id(context, id)
+    root_folders(context).first || where(id: id).first || (raise ActiveRecord::RecordNotFound)
+  end
 
   def self.find_visible_folders(visible_ids, folder_tree, dir_contents)
     visible_ids.concat dir_contents
@@ -489,4 +497,5 @@ class Folder < ActiveRecord::Base
     end
     nil
   end
+  private_class_method :find_visible_folders
 end

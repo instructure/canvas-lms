@@ -17,12 +17,13 @@
 #
 module CC
   module AssignmentResources
-    
+
     def add_assignments
-      @course.assignments.active.no_graded_quizzes_or_topics.each do |assignment|
+      Assignments::ScopedToUser.new(@course, @user).scope.
+        no_graded_quizzes_or_topics.each do |assignment|
         next unless export_object?(assignment)
 
-        title = assignment.title rescue I18n.t('course_exports.unknown_titles.assignment', "Unknown assignment")
+        title = assignment.title || I18n.t('course_exports.unknown_titles.assignment', "Unknown assignment")
 
         if !assignment.can_copy?(@user)
           add_error(I18n.t('course_exports.errors.assignment_is_locked', "The assignment \"%{title}\" could not be copied because it is locked.", :title => title))
@@ -62,7 +63,7 @@ module CC
         add_canvas_assignment(assignment, migration_id, lo_folder, html_path)
       end
     end
-    
+
     def add_cc_assignment(assignment, migration_id, lo_folder, html_path)
       File.open(File.join(lo_folder, CCHelper::ASSIGNMENT_XML), 'w') do |assignment_file|
         document = Builder::XmlMarkup.new(:target => assignment_file, :indent => 2)
@@ -96,7 +97,7 @@ module CC
         res.file(:href => html_path)
       end
     end
-    
+
     def add_canvas_assignment(assignment, migration_id, lo_folder, html_path)
       assignment_file = File.new(File.join(lo_folder, CCHelper::ASSIGNMENT_SETTINGS), 'w')
       document = Builder::XmlMarkup.new(:target=>assignment_file, :indent=>2)

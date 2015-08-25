@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/helpers/wiki_and_tiny_common')
 
 describe "Wiki pages and Tiny WYSIWYG editor features" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   equation_button_selector = "div[aria-label='Insert Math Equation'] button"
 

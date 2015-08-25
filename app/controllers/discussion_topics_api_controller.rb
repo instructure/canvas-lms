@@ -333,7 +333,7 @@ class DiscussionTopicsApiController < ApplicationController
   #       "created_at": "2011-11-03T21:26:44Z" } ]
   def replies
     @parent = root_entries(@topic).find(params[:entry_id])
-    @replies = Api.paginate(reply_entries(@parent).newest_first, self, reply_pagination_url(@parent))
+    @replies = Api.paginate(reply_entries(@parent).newest_first, self, reply_pagination_url(@topic, @parent))
     render :json => discussion_entry_api_json(@replies, @context, @current_user, session)
   end
 

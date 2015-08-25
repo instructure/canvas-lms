@@ -68,7 +68,7 @@ define [
         json.sections = _.map json.enrollments, (en) -> ENV.CONTEXTS['sections'][en.course_section_id]
 
         users = {}
-        if observerEnrollments.length == 1 && !observerEnrollments[0].observed_user
+        if observerEnrollments.length >= 1 && _.all(observerEnrollments, (enrollment) -> !enrollment.observed_user)
           users[''] = {name: I18n.t('nobody', 'nobody')}
         else
           for en in observerEnrollments

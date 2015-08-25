@@ -254,7 +254,7 @@ class ConversationParticipant < ActiveRecord::Base
         if options[:include_indirect_participants]
           user_ids = messages.map(&:all_forwarded_messages).flatten.map(&:author_id)
           user_ids -= participants.map(&:id)
-          participants += Shackles.activate(:slave) { MessageableUser.available.where(:id => user_ids).all }
+          participants += Shackles.activate(:slave) { MessageableUser.available.where(:id => user_ids).to_a }
         end
         if options[:include_participant_contexts]
           # we do this to find out the contexts they share with the user

@@ -3,7 +3,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../helpers/calendar2_common'
 require File.expand_path(File.dirname(__FILE__) + '/../helpers/scheduler_common')
 
 describe "scheduler" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
   context "as a teacher" do
 
     before (:once) do

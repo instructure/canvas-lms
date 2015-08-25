@@ -63,7 +63,7 @@ define [
   test 'handleDateChange changes the state of the respective date passed in', ->
     startDateInput = @gradingPeriod.refs.startDate.getDOMNode()
     newDate = new Date("Feb 20, 2015 2:55 am")
-    startDateInput.value = $.datetimeString(newDate, { format: "medium", localized: false })
+    startDateInput.value = $.datetimeString(newDate, format: "medium")
     fakeEvent = { target: { name: "startDate", value: "Feb 20, 2015 2:55 am" } }
     $(startDateInput).blur()
     @gradingPeriod.handleDateChange(fakeEvent)

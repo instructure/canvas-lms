@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "self enrollment" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   context "in a full course" do
     it "should not be allowed" do

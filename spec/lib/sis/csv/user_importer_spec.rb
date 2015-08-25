@@ -1258,4 +1258,25 @@ describe SIS::CSV::UserImporter do
     expect(importer.warnings.length).to eq 1
     expect(importer.warnings.last.last).to eq "user #{@non_sis_user.id} has already claimed user_1's requested login information, skipping"
   end
+
+  it "sets authentication providers" do
+    ap = @account.authentication_providers.create!(auth_type: 'google')
+    process_csv_data_cleanly(
+        "user_id,login_id,first_name,last_name,email,status,authentication_provider_id",
+        "user_1,user1,User,Uno,user1@example.com,active,google"
+    )
+    p = @account.pseudonyms.active.where(sis_user_id: 'user_1').first
+    expect(p.authentication_provider).to eq ap
+  end
+
+  it "warns on invalid authentication providers" do
+    importer = process_csv_data(
+        "user_id,login_id,first_name,last_name,email,status,authentication_provider_id",
+        "user_1,user1,User,Uno,user1@example.com,active,google"
+    )
+    expect(importer.errors).to eq []
+    expect(importer.warnings.length).to eq 1
+    expect(importer.warnings.last.last).to eq "unrecognized authentication provider google for user_1, skipping"
+    expect(@account.pseudonyms.active.where(sis_user_id: 'user_1').first).to eq nil
+  end
 end

@@ -11,7 +11,7 @@ module Alerts
       return unless account.settings[:enable_alerts]
       alerts_cache = {}
       account.associated_courses.where(:workflow_state => 'available').find_each do |course|
-        alerts_cache[course.account_id] ||= course.account.account_chain.map { |a| a.alerts.all }.flatten
+        alerts_cache[course.account_id] ||= course.account.account_chain.map { |a| a.alerts.to_a }.flatten
         self.evaluate_for_course(course, alerts_cache[course.account_id])
       end
     end
@@ -20,7 +20,7 @@ module Alerts
       return unless course.available?
 
       alerts = Array.new(account_alerts || [])
-      alerts.concat course.alerts.all
+      alerts.concat course.alerts.to_a
       return if alerts.empty?
 
       student_enrollments = course.student_enrollments

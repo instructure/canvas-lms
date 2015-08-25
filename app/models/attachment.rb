@@ -1141,7 +1141,7 @@ class Attachment < ActiveRecord::Base
     self.file_state = 'deleted' #destroy
     self.deleted_at = Time.now.utc
     ContentTag.delete_for(self)
-    MediaObject.update_all({:attachment_id => nil, :updated_at => Time.now.utc}, {:attachment_id => self.id})
+    MediaObject.where(:attachment_id => self.id).update_all(:attachment_id => nil, :updated_at => Time.now.utc)
     save!
     # if the attachment being deleted belongs to a user and the uuid (hash of file) matches the avatar_image_url
     # then clear the avatar_image_url value.
@@ -1410,7 +1410,7 @@ class Attachment < ActiveRecord::Base
         self.upload_error_message = t :upload_error_invalid_response_code, "Invalid response code, expected 200 got %{code}", :code => e.code
       when CanvasHttp::RelativeUriError
         self.upload_error_message = t :upload_error_relative_uri, "No host provided for the URL: %{url}", :url => url
-      when URI::InvalidURIError, ArgumentError
+      when URI::Error, ArgumentError
         # assigning all ArgumentError to InvalidUri may be incorrect
         self.upload_error_message = t :upload_error_invalid_url, "Could not parse the URL: %{url}", :url => url
       when Timeout::Error

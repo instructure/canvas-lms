@@ -12,6 +12,19 @@ module Canvas
 
     let(:error){ stub("Some Error") }
 
+    describe '.capture_exception' do
+      it 'tags with the exception type' do
+        exception = details = nil
+        Canvas::Errors.register!(:test_thing) do |e, d|
+          exception = e
+          details = d
+        end
+        Canvas::Errors.capture_exception(:core_meltdown, error)
+        expect(exception).to eq(error)
+        expect(details).to eq({tags: {type: 'core_meltdown'}})
+      end
+    end
+
     it 'fires callbacks when it handles an exception' do
       called_with = nil
       Canvas::Errors.register!(:test_thing) do |exception|

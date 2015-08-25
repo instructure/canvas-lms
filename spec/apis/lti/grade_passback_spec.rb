@@ -75,7 +75,7 @@ describe LtiApiController, type: :request do
     raw_score = opts[:raw_score]
 
     sourceid ||= source_id()
-    
+
     score_xml = ''
     if score
       score_xml = <<-XML
@@ -95,7 +95,7 @@ describe LtiApiController, type: :request do
           </resultTotalScore>
       XML
     end
-    
+
     result_data_xml = ''
     if result_data && !result_data.empty?
       result_data_xml = "<resultData>\n"
@@ -104,7 +104,7 @@ describe LtiApiController, type: :request do
       end
       result_data_xml += "\n</resultData>\n"
     end
-    
+
     body = <<-XML
 <?xml version = "1.0" encoding = "UTF-8"?>
 <imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
@@ -196,7 +196,7 @@ XML
   end
 
   describe "replaceResult" do
-    
+
     def verify_xml(response)
       xml = Nokogiri::XML.parse(response.body)
       expect(xml.at_css('imsx_codeMajor').content).to eq 'success'
@@ -204,14 +204,14 @@ XML
       expect(xml.at_css('imsx_operationRefIdentifier').content).to eq 'replaceResult'
       expect(xml.at_css('imsx_POXBody *:first').name).to eq 'replaceResultResponse'
     end
-    
+
     it "should allow updating the submission score" do
       expect(@assignment.submissions.where(user_id: @student)).not_to be_exists
       make_call('body' => replace_result(score: '0.6'))
       check_success
-      
+
       verify_xml(response)
-      
+
       submission = @assignment.submissions.where(user_id: @student).first
       expect(submission).to be_present
       expect(submission).to be_graded
@@ -219,49 +219,49 @@ XML
       expect(submission.submission_type).to eql 'external_tool'
       expect(submission.score).to eq 12
     end
-    
+
     it "should set the submission data text" do
       make_call('body' => replace_result(score: '0.6', sourceid: nil, result_data: {:text =>"oioi"}))
       check_success
-    
+
       verify_xml(response)
       submission = @assignment.submissions.where(user_id: @student).first
       expect(submission.score).to eq 12
       expect(submission.body).to eq "oioi"
     end
-    
+
     it "should set complex submission text" do
       text = CGI::escapeHTML("<p>stuff</p>")
       make_call('body' => replace_result(score: '0.6', sourceid: nil, result_data: {:text => "<![CDATA[#{text}]]>" }))
       check_success
-    
+
       verify_xml(response)
       submission = @assignment.submissions.where(user_id: @student).first
       expect(submission.submission_type).to eq 'online_text_entry'
       expect(submission.body).to eq text
     end
-    
+
     it "should set the submission data url" do
       make_call('body' => replace_result(score: '0.6', sourceid: nil, result_data: {:url =>"http://www.example.com/lti"}))
       check_success
-    
+
       verify_xml(response)
       submission = @assignment.submissions.where(user_id: @student).first
       expect(submission.submission_type).to eq 'online_url'
       expect(submission.score).to eq 12
       expect(submission.url).to eq "http://www.example.com/lti"
     end
-    
+
     it "should set the submission data text even with no score" do
       make_call('body' => replace_result(score: nil, sourceid: nil, result_data: {:text =>"oioi"}))
       check_success
-    
+
       verify_xml(response)
       submission = @assignment.submissions.where(user_id: @student).first
       expect(submission.score).to eq nil
       expect(submission.body).to eq "oioi"
     end
-    
+
     it "should fail if no score and not submission data" do
       make_call('body' => replace_result(score: nil, sourceid: nil))
       expect(response).to be_success
@@ -271,7 +271,7 @@ XML
 
       expect(@assignment.submissions.where(user_id: @student)).not_to be_exists
     end
-    
+
     it "should fail if bad score given" do
       make_call('body' => replace_result(score: '1.5', sourceid: nil))
       expect(response).to be_success
@@ -291,6 +291,16 @@ XML
       expect(xml.at_css('imsx_description').content).to eq "Assignment has no points possible."
     end
 
+    it "should fail if assignment has 0 points possible" do
+      @assignment.update_attributes(:points_possible => 0, :grading_type => 'percent')
+      make_call('body' => replace_result(score: '0.75', sourceid: nil))
+      expect(response).to be_success
+      xml = Nokogiri::XML.parse(response.body)
+      expect(xml.at_css('imsx_codeMajor').content).to eq 'failure'
+      expect(xml.at_css('imsx_description').content).to eq "Assignment has no points possible."
+    end
+
+
     it "should notify users if it fails because the assignment has no points" do
       @assignment.update_attributes(:points_possible => nil, :grading_type => 'percent')
       make_call('body' => replace_result(score: '0.75', sourceid: nil))
@@ -304,6 +314,21 @@ An external tool attempted to grade this assignment as 75%, but was unable
 to because the assignment has no points possible.
       NO_POINTS
     end
+
+    it "should notify users if it fails because the assignment has 0 points" do
+      @assignment.update_attributes(:points_possible => 0, :grading_type => 'percent')
+      make_call('body' => replace_result(score: '0.75', sourceid: nil))
+      expect(response).to be_success
+      submissions = @assignment.submissions.where(user_id: @student).to_a
+      comments    = submissions.first.submission_comments
+      expect(submissions.count).to eq 1
+      expect(comments.count).to eq 1
+      expect(comments.first.comment).to eq <<-NO_POINTS.strip
+An external tool attempted to grade this assignment as 75%, but was unable
+to because the assignment has no points possible.
+      NO_POINTS
+    end
+
 
     it "should reject out of bound scores" do
       expect(@assignment.submissions.where(user_id: @student)).not_to be_exists
@@ -329,6 +354,40 @@ to because the assignment has no points possible.
       expect(@assignment.submissions.where(user_id: @student)).not_to be_exists
       make_call('body' => replace_result(score: "OHAI SCORES"))
       check_failure('failure')
+    end
+
+    context "pass_fail zero point assignments" do
+      it "should succeed with incomplete grade when score < 1" do
+        @assignment.update_attributes(:points_possible => 0, :grading_type => 'pass_fail')
+        make_call('body' => replace_result(score: '0.75', sourceid: nil))
+        check_success
+
+        verify_xml(response)
+
+        submission = @assignment.submissions.where(user_id: @student).first
+        expect(submission).to be_present
+        expect(submission).to be_graded
+        expect(submission).to be_submitted_at
+        expect(submission.submission_type).to eql 'external_tool'
+        expect(submission.score).to eq 0
+        expect(submission.grade).to eq 'incomplete'
+      end
+
+      it "should succeed with complete grade when score = 1" do
+        @assignment.update_attributes(:points_possible => 0, :grading_type => 'pass_fail')
+        make_call('body' => replace_result(score: '1', sourceid: nil))
+        check_success
+
+        verify_xml(response)
+
+        submission = @assignment.submissions.where(user_id: @student).first
+        expect(submission).to be_present
+        expect(submission).to be_graded
+        expect(submission).to be_submitted_at
+        expect(submission.submission_type).to eql 'external_tool'
+        expect(submission.score).to eq 0
+        expect(submission.grade).to eq 'complete'
+      end
     end
 
     context "sending raw score" do

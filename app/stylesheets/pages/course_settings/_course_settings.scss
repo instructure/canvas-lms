@@ -347,3 +347,20 @@ input.move-nav-item-label-spacer {
 .drag_and_drop_warning {
   @include accessibility-prompt($is-link: false);
 }
+
+a.long {
+  min-width: 20px;
+}
+
+.not-locked {
+  min-width: 16px;
+  content: 'p';
+}
+
+td.e-tool-table-data {
+  line-height: 33px;
+}
+
+td.center-text {
+  text-align: center;
+}

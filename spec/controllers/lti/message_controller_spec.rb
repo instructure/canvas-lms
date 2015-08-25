@@ -37,6 +37,8 @@ module Lti
           expect(launch_params['reg_key']).not_to be_empty
           expect(launch_params['reg_password']).not_to be_empty
           expect(launch_params['launch_presentation_return_url']).to include "courses/#{course.id}/lti/registration_return/#{launch_params['reg_key']}"
+          expect(launch_params['ext_tool_consumer_instance_guid']).to eq @course.root_account.lti_guid
+          expect(launch_params['ext_api_domain']).to eq HostUrl.context_host(course, request.host)
           account_tp_url_stub = course_tool_consumer_profile_url(course, 'abc123').gsub('abc123', '')
           expect(launch_params['tc_profile_url']).to include(account_tp_url_stub)
         end

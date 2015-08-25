@@ -23,7 +23,7 @@ module Lti
 
     describe 'validations' do
 
-      it 'requires a resource' do
+      it 'requires a resource_handler' do
         subject.save
         expect(subject.errors.first).to eq [:resource_handler, "can't be blank"]
       end

@@ -81,7 +81,7 @@ class DelayedNotification < ActiveRecord::Base
     lookups.each do |klass, ids|
       includes = []
       includes = [:user] if klass == CommunicationChannel
-      res += klass.where(:id => ids).includes(includes).all rescue []
+      res += klass.where(:id => ids).includes(includes).to_a rescue []
     end
     @to_list = res.uniq
   end

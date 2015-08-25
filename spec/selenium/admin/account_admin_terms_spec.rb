@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 
 describe "account admin terms" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   def click_term_action_link(term_div, action_link_css)
     term_div.find_element(:css, action_link_css).click

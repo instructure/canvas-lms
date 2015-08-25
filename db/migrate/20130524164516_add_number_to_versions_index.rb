@@ -13,7 +13,7 @@ class AddNumberToVersionsIndex < ActiveRecord::Migration
       find_each do |version|
         versionable_object_scope = Version.where(:versionable_id => version.versionable_id,
                                                  :versionable_type => version.versionable_type)
-        dups = versionable_object_scope.where(:number => version.number).order(:created_at, :id).all
+        dups = versionable_object_scope.where(:number => version.number).order(:created_at, :id).to_a
         # leave the first one alone
         dups.shift
         next if dups.empty? # ???

@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "users" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   context "logins" do
     it "should allow setting passwords for new pseudonyms" do
@@ -196,8 +196,23 @@ describe "users" do
       a.save!
     end
 
-    it "should not require terms if not configured to do so" do
+    it "should not require terms if globally not configured to do so" do
       Setting.set('terms_required', 'false')
+
+      get '/register'
+
+      %w{teacher student parent}.each do |type|
+        f("#signup_#{type}").click
+        form = fj('.ui-dialog:visible form')
+        expect(f('input[name="user[terms_of_use]"]', form)).to be_nil
+        fj('.ui-dialog-titlebar-close:visible').click
+      end
+    end
+
+    it "should not require terms if account not configured to do so" do
+      default_account = Account.default
+      default_account.settings[:account_terms_required] = false
+      default_account.save!
 
       get '/register'
 

@@ -756,7 +756,7 @@ class Message < ActiveRecord::Base
   # Returns nothing.
   def deliver_via_push
     begin
-      self.user.notification_endpoints.all.each do |notification_endpoint|
+      self.user.notification_endpoints.each do |notification_endpoint|
         notification_endpoint.destroy unless notification_endpoint.push_json(sns_json)
       end
       complete_dispatch

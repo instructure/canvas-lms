@@ -20,6 +20,7 @@ require 'atom'
 require 'set'
 require 'canvas/draft_state_validations'
 require 'bigdecimal'
+require_dependency 'turnitin'
 
 class Assignment < ActiveRecord::Base
   include Workflow
@@ -949,7 +950,7 @@ class Assignment < ActiveRecord::Base
         .where(Course.reflections[:student_enrollments].options[:conditions])
         .order("users.id") # this helps with preventing deadlock with other things that touch lots of users
         .uniq
-        .all
+        .to_a
     end
     [group, students]
   end
@@ -1419,7 +1420,7 @@ class Assignment < ActiveRecord::Base
   # name.  for non-group assignments this just returns all visible users
   def representatives(user)
     if grade_as_group?
-      submissions = self.submissions.includes(:user).all
+      submissions = self.submissions.includes(:user).to_a
       users_with_submissions = submissions.select(&:has_submission?).map(&:user)
       users_with_turnitin_data = if turnitin_enabled?
                                    submissions
@@ -1653,6 +1654,7 @@ class Assignment < ActiveRecord::Base
 
   scope :for_context_codes, lambda { |codes| where(:context_code => codes) }
   scope :for_course, lambda { |course_id| where(:context_type => 'Course', :context_id => course_id) }
+  scope :for_group_category, lambda { |group_category_id| where(:group_category_id => group_category_id) }
 
   # NOTE: only use for courses with differentiated assignments on
   scope :visible_to_students_in_course_with_da, lambda { |user_id, course_id|

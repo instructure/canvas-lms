@@ -153,22 +153,69 @@ module Lti
         it 'creates default placements when none are specified' do
           tool_proxy = subject.process_tool_proxy_json(tool_proxy_fixture, account, tool_proxy_guid)
           rh = tool_proxy.resources.first
+          expect(rh.message_handlers.first.placements).to include_placements %w(assignment_selection link_selection)
           expect(rh.placements).to include_placements %w(assignment_selection link_selection)
         end
 
         it "doesn't include defaults placements when one is provided" do
           tp_json = JSON.parse(tool_proxy_fixture)
+          tp_json['tool_profile']['resource_handler'][0]['message'][0]['enabled_capability'] = ['Canvas.placements.courseNavigation']
+          tool_proxy = subject.process_tool_proxy_json(tp_json.to_json, account, tool_proxy_guid)
+          rh = tool_proxy.resources.first
+          expect(rh.message_handlers.first.placements).to only_include_placement "course_navigation"
+        end
+
+        # this spec can be removed once we only want to read/write placements to the message_handler
+        it "accepts placments in message_handler enabled capability and from resource_handler ext_placements" do
+          tp_json = JSON.parse(tool_proxy_fixture)
+          tp_json['tool_profile']['resource_handler'][0]['message'][0]['enabled_capability'] = ['Canvas.placements.courseNavigation']
           tp_json["tool_profile"]["resource_handler"][0]["ext_placements"] = ['Canvas.placements.courseNavigation']
           tool_proxy = subject.process_tool_proxy_json(tp_json.to_json, account, tool_proxy_guid)
           rh = tool_proxy.resources.first
+          expect(rh.message_handlers.first.placements).to only_include_placement "course_navigation"
           expect(rh.placements).to only_include_placement "course_navigation"
+        end
+
+        # this spec can be removed once we only want to read/write placements to the message_handler
+        it "adds placements from message_handler enabled_capabilities to message_hanlder AND resource_handler" do
+          tp_json = JSON.parse(tool_proxy_fixture)
+          tp_json['tool_profile']['resource_handler'][0]['message'][0]['enabled_capability'] = ['Canvas.placements.courseNavigation']
+          tool_proxy = subject.process_tool_proxy_json(tp_json.to_json, account, tool_proxy_guid)
+          rh = tool_proxy.resources.first
+          expect(rh.message_handlers.first.placements).to only_include_placement "course_navigation"
+          expect(rh.placements).to only_include_placement "course_navigation"
+        end
+
+        # this spec can be removed once we only want to read/write placements to the message_handler
+        it "prefers placements from the message_handler over placements from the resource_handler" do
+          tp_json = JSON.parse(tool_proxy_fixture)
+          tp_json['tool_profile']['resource_handler'][0]['message'][0]['enabled_capability'] = ['Canvas.placements.accountNavigation']
+          tp_json["tool_profile"]["resource_handler"][0]["ext_placements"] = ['Canvas.placements.courseNavigation']
+          tool_proxy = subject.process_tool_proxy_json(tp_json.to_json, account, tool_proxy_guid)
+          rh = tool_proxy.resources.first
+          expect(rh.message_handlers.first.placements).to only_include_placement "account_navigation"
+          expect(rh.placements).to only_include_placement "account_navigation"
+        end
+
+        it "does not create placements on the message_handler if enabled_capabilities does not contain placements" do
+          tp_json = JSON.parse(tool_proxy_fixture)
+          tp_json['tool_profile']['resource_handler'][0]['message'][0]['enabled_capability'] = ['Canvas.placements.accountNavigation']
+          tp_json["tool_profile"]["resource_handler"][0]["ext_placements"] = ['not_a_placement']
+          tool_proxy = subject.process_tool_proxy_json(tp_json.to_json, account, tool_proxy_guid)
+          rh = tool_proxy.resources.first
+          expect(rh.message_handlers.first.placements).to only_include_placement "account_navigation"
+          expect(rh.placements).to only_include_placement "account_navigation"
         end
 
         it "handles non-valid placements" do
           tp_json = JSON.parse(tool_proxy_fixture)
-          tp_json["tool_profile"]["resource_handler"][0]["ext_placements"] = ['Canvas.placements.invalid']
-          tool_proxy = subject.process_tool_proxy_json(tp_json.to_json, account, tool_proxy_guid)
-          expect(tool_proxy.resources.first.placements.size).to eq 0
+          tp_json['tool_profile']['resource_handler'][0]['message'][0]['enabled_capability'] = ['Canvas.placements.invalid']
+          begin
+            tool_proxy = subject.process_tool_proxy_json(tp_json.to_json, account, tool_proxy_guid)
+          rescue Lti::ToolProxyService::InvalidToolProxyError => proxy_error
+            puts proxy_error.message
+          end
+          expect(tool_proxy).to eq nil
         end
 
       end

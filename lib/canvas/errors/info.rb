@@ -25,7 +25,8 @@ module Canvas
       def to_h
         {
           tags: {
-            account_id: @account.try(:global_id)
+            account_id: @account.try(:global_id),
+            type: @type,
           },
           extra: {
             request_context_id: @rci,
@@ -33,7 +34,6 @@ module Canvas
             format: @req.format,
             user_agent: @req.headers['User-Agent'],
             user_id: @user.try(:global_id),
-            type: @type
           }.merge(self.class.useful_http_env_stuff_from_request(@req))
         }
       end

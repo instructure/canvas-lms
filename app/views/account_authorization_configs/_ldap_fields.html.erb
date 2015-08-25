@@ -19,22 +19,16 @@
 </div>
 <div class="ic-Form-control ic-Form-control--radio" %>
   <div class="ic-Radio">
-    <%= f.radio_button :auth_over_tls, 'start_tls' %>
-    <%= f.label :auth_over_tls_start_tls,
-                'StartTLS',
-                class: 'ic-Label' %>
+    <%= f.radio_button :auth_over_tls, 'start_tls', id: "start_tls_#{aac.id}", checked: aac.auth_over_tls == 'start_tls' %>
+    <%= f.label :auth_over_tls, t('Start TLS'), for: "start_tls_#{aac.id}", class: 'ic-Label' %>
   </div>
   <div class="ic-Radio">
-    <%= f.radio_button :auth_over_tls, 'simple_tls' %>
-    <%= f.label :auth_over_tls_simple_tls,
-                t('Simple TLS'),
-                class: 'ic-Label' %>
+    <%= f.radio_button :auth_over_tls, 'simple_tls', id: "simple_tls_#{aac.id}", checked: aac.auth_over_tls == 'simple_tls' %>
+    <%= f.label :auth_over_tls, t('Simple TLS'), for: "simple_tls_#{aac.id}", class: 'ic-Label' %>
   </div>
   <div class="ic-Radio">
-    <%= f.radio_button :auth_over_tls, 'false', checked: !aac.auth_over_tls %>
-    <%= f.label :auth_over_tls_false,
-                t('No TLS'),
-                class: 'ic-Label' %>
+    <%= f.radio_button :auth_over_tls, false, id: "no_tls_#{aac.id}", checked: !aac.auth_over_tls %>
+    <%= f.label :auth_over_tls, t('No TLS'), for: "no_tls_#{aac.id}", class: 'ic-Label' %>
   </div>
 </div>
 <div class="ic-Form-control">

@@ -747,8 +747,8 @@ describe CoursesController do
         @course1.save!
         @course1.wiki.wiki_pages.create!(:title => 'blah').set_as_front_page!
         get 'show', :id => @course1.id
-        expect(controller.js_env[:WIKI_RIGHTS]).to eql({:read => true})
-        expect(controller.js_env[:PAGE_RIGHTS]).to eql({:read => true})
+        expect(controller.js_env[:WIKI_RIGHTS].symbolize_keys).to eql({:read => true})
+        expect(controller.js_env[:PAGE_RIGHTS].symbolize_keys).to eql({:read => true})
         expect(controller.js_env[:COURSE_TITLE]).to eql @course1.name
       end
 
@@ -1764,8 +1764,9 @@ describe CoursesController do
       user_session(@teacher)
       post 'student_view', course_id: @course.id
       test_student = @course.student_view_student
-      Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(test_student)
+      @quiz.generate_submission(test_student)
       expect(test_student.quiz_submissions.size).not_to be_zero
+
       delete 'reset_test_student', course_id: @course.id
       test_student.reload
       expect(test_student.quiz_submissions.size).to be_zero

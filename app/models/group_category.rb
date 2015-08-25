@@ -403,6 +403,20 @@ class GroupCategory < ActiveRecord::Base
     send_later_enqueue_args :assign_unassigned_members, :priority => Delayed::LOW_PRIORITY
   end
 
+  def clone_groups_and_memberships(new_group_category)
+    groups.preload(:group_memberships).find_each do |group|
+      new_group = group.dup
+      new_group.group_category = new_group_category
+      new_group.save!
+
+      group.group_memberships.find_each do |group_membership|
+        new_group_membership = group_membership.dup
+        new_group_membership.group = new_group
+        new_group_membership.save!
+      end
+    end
+  end
+
   set_policy do
     given { |user, session| context.grants_right?(user, session, :read) }
     can :read

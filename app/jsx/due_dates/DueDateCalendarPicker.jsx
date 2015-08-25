@@ -72,7 +72,7 @@ define([
     // ---------------
 
     formattedDate(){
-      return $.datetimeString(this.props.dateValue,{localized: false})
+      return $.datetimeString(this.props.dateValue)
     },
 
     wrapperClassName(){

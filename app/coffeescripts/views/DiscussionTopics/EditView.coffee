@@ -182,6 +182,8 @@ htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, Missin
 
     getFormData: ->
       data = super
+      for dateField in ['last_reply_at', 'posted_at', 'delayed_post_at']
+        data[dateField] = $.unfudgeDateForProfileTimezone(data[dateField])
       data.title ||= I18n.t 'default_discussion_title', 'No Title'
       data.discussion_type = if data.threaded is '1' then 'threaded' else 'side_comment'
       data.podcast_has_student_posts = false unless data.podcast_enabled is '1'

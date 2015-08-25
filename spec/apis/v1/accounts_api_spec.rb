@@ -155,17 +155,19 @@ describe "Accounts API", type: :request do
 
     it "should add sub account" do
       previous_sub_count = @a1.sub_accounts.size
-      json = api_call(:post,
+      api_call(:post,
         "/api/v1/accounts/#{@a1.id}/sub_accounts",
          {:controller=>'sub_accounts', :action=>'create',
           :account_id => @a1.id.to_s, :format => 'json'},
          {:account => { 'name' => 'New sub-account',
+                        'sis_account_id' => '567',
                         'default_storage_quota_mb' => 123,
                         'default_user_storage_quota_mb' => 456,
                         'default_group_storage_quota_mb' => 147 }})
       expect(@a1.sub_accounts.size).to eq previous_sub_count + 1
       sub = @a1.sub_accounts.detect{|a| a.name == "New sub-account"}
       expect(sub).not_to be_nil
+      expect(sub.sis_source_id).to eq '567'
       expect(sub.default_storage_quota_mb).to eq 123
       expect(sub.default_user_storage_quota_mb).to eq 456
       expect(sub.default_group_storage_quota_mb).to eq 147

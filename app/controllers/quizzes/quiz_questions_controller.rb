@@ -437,7 +437,7 @@ class Quizzes::QuizQuestionsController < ApplicationController
   end
 
   def render_question_set(scope, quiz_data=nil)
-    api_route = polymorphic_url([:api, :v1, @context, :quiz_questions])
+    api_route = polymorphic_url([:api, :v1, @context, :quiz_questions], {:quiz_id => @quiz})
     questions = Api.paginate(scope, self, api_route)
 
     render :json => questions_json(questions,
