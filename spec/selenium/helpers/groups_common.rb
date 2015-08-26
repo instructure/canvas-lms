@@ -392,3 +392,13 @@ def verify_no_course_user_access(path)
   get path
   expect(f('.ui-state-error')).to be_displayed
 end
+
+def setup_group_page_urls
+  let(:url) {"/groups/#{@testgroup.first.id}"}
+  let(:announcements_page) {url + '/announcements'}
+  let(:people_page) {url + '/users'}
+  let(:discussions_page) {url + '/discussion_topics'}
+  let(:pages_page) {url + '/pages'}
+  let(:files_page) {url + '/files'}
+  let(:conferences_page) {url + '/conferences'}
+end
