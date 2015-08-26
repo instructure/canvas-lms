@@ -1508,7 +1508,7 @@ class Course < ActiveRecord::Base
       self,
       :generate_csv,
       { preserve_method_args: true },
-      options,
+      options.merge(user: user),
       attachment
     )
     {attachment_id: attachment.id, progress_id: progress.id}

@@ -868,6 +868,15 @@ describe Course, "score_to_grade" do
   end
 end
 
+describe Course, "gradebook_to_csv_in_background" do
+  it "includes the user who is running it" do
+    teacher_in_course(active_all: true)
+    @course.gradebook_to_csv_in_background("csv.csv", @teacher)
+    GradebookExporter.expects(:new).with(@course, user: @teacher).once
+    run_jobs
+  end
+end
+
 describe Course, "gradebook_to_csv" do
   it "should generate gradebook csv" do
     course_with_student(:active_all => true)
