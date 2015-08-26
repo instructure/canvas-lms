@@ -333,7 +333,8 @@ describe GradebooksController do
           @course.assignments.create(:title => "Déjà vu")
           exporter = GradebookExporter.new(
             @course,
-            { user: @teacher, include_priors: false, include_sis_id: true }
+            @teacher,
+            { include_priors: false, include_sis_id: true }
           )
           raw_csv = exporter.to_csv
           expect(raw_csv).to include("Déjà vu")

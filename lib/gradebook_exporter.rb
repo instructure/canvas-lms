@@ -19,8 +19,9 @@
 class GradebookExporter
   include GradebookTransformer
 
-  def initialize(course, options = {})
+  def initialize(course, user, options = {})
     @course  = course
+    @user    = user
     @options = options
   end
 
@@ -170,14 +171,8 @@ class GradebookExporter
   end
 
   def enrollments_scope
-    if @options[:user]
-      enrollment_opts = @options.slice(:include_priors)
-      @course.enrollments_visible_to(@options[:user], enrollment_opts)
-    elsif @options[:include_priors]
-      @course.all_student_enrollments
-    else
-      @course.student_enrollments
-    end
+    enrollment_opts = @options.slice(:include_priors)
+    @course.enrollments_visible_to(@user, enrollment_opts)
   end
 
   def name_method

@@ -1506,14 +1506,15 @@ class Course < ActiveRecord::Base
       self,
       :generate_csv,
       { preserve_method_args: true },
-      options.merge(user: user),
+      user,
+      options,
       attachment
     )
     {attachment_id: attachment.id, progress_id: progress.id}
   end
 
-  def generate_csv(options, attachment)
-    csv = GradebookExporter.new(self, options).to_csv
+  def generate_csv(user, options, attachment)
+    csv = GradebookExporter.new(self, user, options).to_csv
     create_attachment(attachment, csv)
   end
 
