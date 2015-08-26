@@ -24,8 +24,17 @@ define([
     componentDidMount() {
       $(this.getDOMNode()).accordion({
         header: "h3",
-        heightStyle: "content"
-      })
+        heightStyle: "content",
+        beforeActivate: function ( event, ui) {
+          var previewIframe = $('#previewIframe');
+          if ($.trim(ui.newHeader[0].innerText) === 'Login Screen') {
+            var loginPreview = previewIframe.contents().find('#login-preview');
+            if (loginPreview) previewIframe.scrollTo(loginPreview);
+          } else {
+            previewIframe.scrollTo(0);
+          }
+        }
+      });
     },
 
     renderRow(varDef) {
