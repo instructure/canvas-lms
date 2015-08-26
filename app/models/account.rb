@@ -79,11 +79,6 @@ class Account < ActiveRecord::Base
            extend: AccountAuthorizationConfig::FindWithType,
            class_name: "AccountAuthorizationConfig"
 
-  # Shim until plugins can be updated to use "authentication_providers"
-  has_many :account_authorization_configs,
-           order: "position",
-           extend: AccountAuthorizationConfig::FindWithType
-
   has_many :account_reports
   has_many :grading_standards, :as => :context, :conditions => ['workflow_state != ?', 'deleted']
   has_many :assessment_questions, :through => :assessment_question_banks
@@ -1526,7 +1521,7 @@ class Account < ActiveRecord::Base
   end
 
   def parent_registration?
-    self.account_authorization_configs.exists?(parent_registration: true)
+    authentication_providers.where(parent_registration: true).exists?
   end
 
   def parent_auth_type
@@ -1535,6 +1530,6 @@ class Account < ActiveRecord::Base
   end
 
   def parent_registration_aac
-    account_authorization_configs.where(parent_registration: true).first
+    authentication_providers.where(parent_registration: true).first
   end
 end
