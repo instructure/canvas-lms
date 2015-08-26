@@ -274,6 +274,10 @@ describe 'quizzes question creation' do
         'If [x] + [y] is a whole number, then this is a formula question.'
 
       fj('button.recompute_variables').click
+      val = fj('.variables.value').to_i
+      expect(val <= 10 && val >= 0)
+      fj('button.recompute_variables').click
+      keep_trying_until { expect(fj('.variables.value').to_i != val) }
       fj('.supercalc:visible').send_keys('x + y')
       fj('button.save_formula_button').click
       # normally it's capped at 200 (to keep the yaml from getting crazy big)...
