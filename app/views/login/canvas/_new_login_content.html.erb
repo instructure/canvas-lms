@@ -1,4 +1,12 @@
-<% login_handle_name = @domain_root_account.login_handle_name_with_inference %>
+<%
+  login_handle_name = @domain_root_account.login_handle_name_with_inference
+  # disable form submission when previewing from theme editor
+  if params[:previewing_from_themeeditor]
+    login_btn_type = forgot_password_btn_type = "button"
+  else
+    login_btn_type = forgot_password_btn_type = "submit"
+  end
+%>
 
 <div class="ic-Login">
   <div class="ic-Login__container">
@@ -32,7 +40,7 @@
             <input type="hidden" name="redirect_to_ssl" value="1"/>
             <div class="ic-Form-control ic-Form-control--login">
               <%= f.label :unique_id, login_handle_name, :class => "ic-Label" %>
-              <%= f.text_field :unique_id, :class => "ic-Input text", :value => params[:pseudonym_session].try(:[], :unique_id) %>
+              <%= f.text_field :unique_id, :class => "ic-Input text", :value => params[:pseudonym_session].try(:[], :unique_id), :autofocus => !params[:previewing_from_themeeditor] %>
             </div>
             <div class="ic-Form-control ic-Form-control--login">
               <%= f.label :password, :en => "Password", :class => "ic-Label" %>
@@ -50,7 +58,7 @@
                 </div>
               </div>
               <div class="ic-Form-control ic-Form-control--login">
-                <button type="submit" class="Button Button--primary Button--login">
+                <button type="<%= login_btn_type %>" class="Button Button--primary Button--login">
                   <%= t('log_in', 'Log In') %>
                 </button>
               </div>
@@ -71,7 +79,7 @@
             <div class="ic-Form-control ic-Form-control--login">
               <div class="ic-Login__actions">
                 <%= link_to t('back_to_login', "Back to Login"), login_path, :class => "ic-Login__actions--left ic-Login__link login_link"%>
-                <button type="submit" class="Button Button--primary Button--login">
+                <button type="<%= forgot_password_btn_type %>" class="Button Button--primary Button--login">
                   <%= t('buttons.request_password', 'Request Password') %>
                 </button>
               </div> <!-- end ic-Login__actions -->
