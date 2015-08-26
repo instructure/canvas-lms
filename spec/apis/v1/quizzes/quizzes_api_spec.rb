@@ -66,6 +66,24 @@ describe Quizzes::QuizzesApiController, type: :request do
       expect(json.map{|h| h['id'] }.sort).to eq ids.sort
     end
 
+    it "should deterministically order quizzes for pagination" do
+      quiz_number = 10
+      quiz_number.times{ @course.quizzes.create! :title => "the same title" }
+      found_quiz_ids = []
+
+      quiz_number.times do |i|
+        page_num = i + 1
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/quizzes?page=#{page_num}&per_page=1",
+          :controller=>"quizzes/quizzes_api", :action=>"index", :format=>"json", :course_id=>"#{@course.id}",
+          :per_page => 1, :page => page_num)
+
+        id = json[0]["id"]
+        id_already_found = found_quiz_ids.include?(id)
+        expect(id_already_found).to be_falsey
+        found_quiz_ids << id
+      end
+    end
+
     it "should return unauthorized if the quiz tab is disabled" do
       @course.tab_configuration = [ { :id => Course::TAB_QUIZZES, :hidden => true } ]
       @course.save!

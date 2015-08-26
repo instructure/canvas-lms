@@ -646,6 +646,27 @@ describe EnrollmentsApiController, type: :request do
       @section = @course.course_sections.create!
     end
 
+    it "should deterministically order enrollments for pagination" do
+      enrollment_num = 10
+      enrollment_num.times do
+        u = user_with_pseudonym(name: "John Smith", sortable_name: "Smith, John")
+        @course.enroll_user(u, 'StudentEnrollment', :enrollment_state => 'active')
+      end
+
+      found_enrollment_ids = []
+      enrollment_num.times do |i|
+        page_num = i + 1
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/enrollments?page=#{page_num}&per_page=1",
+          :controller=>"enrollments_api", :action=>"index", :format=>"json", :course_id=>"#{@course.id}",
+          :per_page => 1, :page => page_num)
+
+        id = json[0]["id"]
+        id_already_found = found_enrollment_ids.include?(id)
+        expect(id_already_found).to be_falsey
+        found_enrollment_ids << id
+      end
+    end
+
     context "grading periods" do
       let(:grading_period_group) { @course.grading_period_groups.create! }
       let(:now) { Time.zone.now }

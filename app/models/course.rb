@@ -182,7 +182,7 @@ class Course < ActiveRecord::Base
   has_many :messages, :as => :context, :dependent => :destroy
   has_many :context_external_tools, :as => :context, :dependent => :destroy, :order => 'name'
   belongs_to :wiki
-  has_many :quizzes, :class_name => 'Quizzes::Quiz', :as => :context, :dependent => :destroy, :order => 'lock_at, title'
+  has_many :quizzes, :class_name => 'Quizzes::Quiz', :as => :context, :dependent => :destroy, :order => 'lock_at, title, id'
   has_many :quiz_questions, :class_name => 'Quizzes::QuizQuestion', :through => :quizzes
   has_many :active_quizzes, :class_name => 'Quizzes::Quiz', :as => :context, :include => :assignment, :conditions => ['quizzes.workflow_state != ?', 'deleted'], :order => 'created_at'
   has_many :assessment_questions, :through => :assessment_question_banks
