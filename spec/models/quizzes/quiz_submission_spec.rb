@@ -1512,4 +1512,46 @@ describe Quizzes::QuizSubmission do
       expect(@quiz_submission.points_possible_at_submission_time).to eq 0.65
     end
   end
+
+  describe "Tardiness" do
+    let(:course)      { Course.create! }
+    let(:now)         { Time.zone.now }
+    let(:quiz)        { course.quizzes.create! due_at: 3.days.ago(now) }
+    let(:submission)  { quiz.quiz_submissions.create! }
+
+    describe "#late?" do
+      it "is not late when on turned in before the due date" do
+        submission.finished_at = 4.days.ago(now)
+        submission.save
+
+        expect(submission.late?).to eq false
+      end
+
+      it "is not late when on turned in exactly at the due date" do
+        submission.finished_at = 3.days.ago(now)
+        submission.save
+
+        expect(submission.late?).to eq false
+      end
+
+      it "is not late when unfinished" do
+        expect(submission.late?).to eq false
+      end
+
+      it "is not late when the quiz has no due date" do
+        quiz_two                    = course.quizzes.create!
+        submission_two              = quiz_two.quiz_submissions.create!
+        submission_two.finished_at  = 3.days.ago(now)
+        submission_two.save
+        expect(submission_two.late?).to eq false
+      end
+
+      it "is late when on turned in after the due date" do
+        submission.finished_at = 2.days.ago(now)
+        submission.save
+
+        expect(submission.late?).to eq true
+      end
+    end
+  end
 end

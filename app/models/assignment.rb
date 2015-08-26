@@ -1417,7 +1417,7 @@ class Assignment < ActiveRecord::Base
                                          grade: qs.score,
                                          show_grade_in_dropdown: true,
                                          submitted_at: qs.finished_at,
-                                         late: sub.late?,
+                                         late: qs.late?,
                                          version: v.number,
                                        }}
                                      end

@@ -852,4 +852,12 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     fixer = ::Quizzes::QuizSubmission::QuestionReferenceDataFixer.new
     fixer.run!(self)
   end
+
+  # TODO: Extract? conceptually similar to Submission::Tardiness#late?
+  def late?
+    return false if finished_at.blank?
+    return false if quiz.due_at.blank?
+
+    finished_at > quiz.due_at
+  end
 end
