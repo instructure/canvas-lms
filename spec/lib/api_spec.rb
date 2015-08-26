@@ -630,16 +630,37 @@ describe Api do
   end
 
   context ".api_user_content" do
-    class T
-      extend Api
+    let(:klass) do
+      Class.new do
+        include Api
+      end
     end
+
     it "should ignore non-kaltura instructure_inline_media_comment links" do
       student_in_course
       html = %{<div>This is an awesome youtube:
 <a href="http://www.example.com/" class="instructure_inline_media_comment">here</a>
 </div>}
-      res = T.api_user_content(html, @course, @student)
+      res = klass.new.api_user_content(html, @course, @student)
       expect(res).to eq html
+    end
+
+    it 'prepends mobile css' do
+      student_in_course
+      account = @course.root_account
+      account.enable_feature!(:use_new_styles)
+      bc = BrandConfig.create(mobile_css_overrides: 'somewhere.css')
+      account.brand_config_md5 = bc.md5
+      account.save!
+
+      html = "<p>a</p><p>b</p>"
+
+      k = klass.new
+      k.stubs(:mobile_device?).returns(true)
+      res = k.api_user_content(html, @course, @student)
+      expect(res).to eq <<-HTML.strip
+<link rel="stylesheet" href="somewhere.css"><p>a</p><p>b</p>
+      HTML
     end
   end
 

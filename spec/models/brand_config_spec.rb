@@ -35,7 +35,9 @@ describe BrandConfig do
       variables: {"ic-brand-global-nav-bgd" => "#123"},
       parent_md5: @parent_config.md5,
       js_overrides: nil,
-      css_overrides: nil
+      css_overrides: nil,
+      mobile_js_overrides: nil,
+      mobile_css_overrides: nil
     )
     @subaccount_bc.save!
   end
@@ -58,7 +60,9 @@ describe BrandConfig do
         variables: {"ic-brand-global-nav-bgd" => "#123", "ic-brand-primary" => "red"},
         parent_md5: @parent_config.md5,
         js_overrides: nil,
-        css_overrides: nil
+        css_overrides: nil,
+        mobile_js_overrides: nil,
+        mobile_css_overrides: nil
       )
       @new_sub_bc.save!
 
