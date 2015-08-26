@@ -385,6 +385,34 @@ define([
 
                         </div>
                       </div>
+                      <div className="Theme__editor-upload-overrides">
+
+                        <div className="Theme__editor-upload-overrides_header">
+                          { I18n.t('CSS and JavaScript to load when user content is displayed in the canvas iOS or Android native apps') }
+                        </div>
+
+                        <div className="Theme__editor-upload-overrides_form">
+
+                          <ThemeEditorFileUpload
+                            label={I18n.t('Upload a CSS file...')}
+                            accept=".css"
+                            name="mobile_css_overrides"
+                            currentValue={this.props.brandConfig.mobile_css_overrides}
+                            userInput={this.state.changedValues.mobile_css_overrides}
+                            onChange={this.changeSomething.bind(null, 'mobile_css_overrides')}
+                          />
+
+                          <ThemeEditorFileUpload
+                            label={I18n.t('Upload a JS file...')}
+                            accept=".js"
+                            name="mobile_js_overrides"
+                            currentValue={this.props.brandConfig.mobile_js_overrides}
+                            userInput={this.state.changedValues.mobile_js_overrides}
+                            onChange={this.changeSomething.bind(null, 'mobile_js_overrides')}
+                          />
+
+                        </div>
+                      </div>
                     </div>
                   : null}
 

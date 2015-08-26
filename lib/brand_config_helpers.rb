@@ -73,11 +73,8 @@ module BrandConfigHelpers
   end
 
   def new_brand_config(new_parent_md5)
-    BrandConfig.for(
-      variables: brand_config.variables,
-      js_overrides: brand_config.js_overrides,
-      css_overrides: brand_config.css_overrides,
-      parent_md5: new_parent_md5
-    )
+    opts = brand_config.attributes.with_indifferent_access.slice(*BrandConfig::ATTRS_TO_INCLUDE_IN_MD5)
+    opts[:parent_md5] = new_parent_md5
+    BrandConfig.for(opts)
   end
 end

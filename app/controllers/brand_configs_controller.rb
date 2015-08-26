@@ -49,18 +49,15 @@ class BrandConfigsController < ApplicationController
   # indicating the progress of generating the css and pushing it to the CDN
   # @returns {BrandConfig, Progress}
   def create
-    parent_config = @account.first_parent_brand_config || BrandConfig.new
+    opts = {
+      parent_md5: @account.first_parent_brand_config.try(:md5),
+      variables: process_variables(params[:brand_config][:variables])
+    }
+    BrandConfig::OVERRIDE_TYPES.each do |override|
+      opts[override] = process_file(params[override])
+    end
 
-    variables = process_variables(params[:brand_config][:variables])
-    js_overrides = process_file(params[:js_overrides])
-    css_overrides = process_file(params[:css_overrides])
-
-    brand_config = BrandConfig.for(
-      variables: variables,
-      js_overrides: js_overrides,
-      css_overrides: css_overrides,
-      parent_md5: parent_config.md5
-    )
+    brand_config = BrandConfig.for(opts)
 
     if existing_config(brand_config)
       render json: { brand_config: brand_config.as_json(include_root: false) }

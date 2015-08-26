@@ -691,8 +691,7 @@ module ApplicationHelper
   def include_account_js(options = {})
     return if params[:global_includes] == '0'
     if use_new_styles?
-      includes = []
-      includes << brand_config_includes[:js] if brand_config_includes[:js].present?
+      includes = brand_config_includes.slice(:js_overrides).values
     else
       includes = get_global_includes.map do |global_include|
         global_include[:js] if global_include[:js].present?

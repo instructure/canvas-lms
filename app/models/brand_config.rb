@@ -4,7 +4,10 @@ class BrandConfig < ActiveRecord::Base
   self.primary_key = 'md5'
   serialize :variables, Hash
 
-  attr_accessible :variables, :js_overrides, :css_overrides
+  OVERRIDE_TYPES = [:js_overrides, :css_overrides, :mobile_js_overrides, :mobile_css_overrides].freeze
+  ATTRS_TO_INCLUDE_IN_MD5 = ([:variables, :parent_md5] + OVERRIDE_TYPES).freeze
+
+  attr_accessible(*([:variables] + OVERRIDE_TYPES))
 
   validates :variables, presence: true, unless: :overrides?
   validates :md5, length: {is: 32}
@@ -26,19 +29,14 @@ class BrandConfig < ActiveRecord::Base
     shared_scope
   }
 
-  def self.for(variables:, js_overrides:, css_overrides:, parent_md5:)
-    if variables.blank? && js_overrides.blank? && css_overrides.blank?
-      default
-    else
-      new_config = new(
-        variables: variables,
-        js_overrides: js_overrides,
-        css_overrides: css_overrides,
-      )
-      new_config.parent_md5 = parent_md5
-      existing_config = where(md5: new_config.generate_md5).first
-      existing_config || new_config
-    end
+  def self.for(attrs)
+    attrs = attrs.with_indifferent_access.slice(*ATTRS_TO_INCLUDE_IN_MD5)
+    return default if attrs.values.all?(&:blank?)
+
+    new_config = new(attrs)
+    new_config.parent_md5 = attrs[:parent_md5]
+    existing_config = where(md5: new_config.generate_md5).first
+    existing_config || new_config
   end
 
   def self.default
@@ -50,16 +48,15 @@ class BrandConfig < ActiveRecord::Base
   end
 
   def default?
-    self.variables.blank? && self.js_overrides.blank? && self.css_overrides.blank?
+    ([:variables] + OVERRIDE_TYPES).all? {|a| self[a].blank? }
   end
 
   def generate_md5
-    self.id = Digest::MD5.hexdigest([
-      self.variables.to_s,
-      self.css_overrides,
-      self.js_overrides,
-      self.parent_md5
-    ].join)
+    self.id = BrandConfig.md5_for(self)
+  end
+
+  def self.md5_for(brand_config)
+    Digest::MD5.hexdigest(ATTRS_TO_INCLUDE_IN_MD5.map { |a| brand_config[a] }.join)
   end
 
   def get_value(variable_name)
@@ -67,7 +64,7 @@ class BrandConfig < ActiveRecord::Base
   end
 
   def overrides?
-    self.js_overrides.present? || self.css_overrides.present?
+    OVERRIDE_TYPES.any? { |o| self[o].present? }
   end
 
   def effective_variables

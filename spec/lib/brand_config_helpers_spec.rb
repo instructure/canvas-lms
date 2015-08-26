@@ -27,6 +27,8 @@ describe BrandConfigHelpers do
       variables: {"ic-brand-primary" => "red"},
       js_overrides: nil,
       css_overrides: nil,
+      mobile_js_overrides: nil,
+      mobile_css_overrides: nil,
       parent_md5: nil
     )
     @parent_config.save!
@@ -38,7 +40,9 @@ describe BrandConfigHelpers do
       variables: {"ic-brand-global-nav-bgd" => "white"},
       parent_md5: @parent_config.md5,
       js_overrides: nil,
-      css_overrides: nil
+      css_overrides: nil,
+      mobile_js_overrides: nil,
+      mobile_css_overrides: nil
     )
     @child_config.save!
     @child_account.brand_config_md5 = @child_config.md5
@@ -49,7 +53,9 @@ describe BrandConfigHelpers do
       variables: {"ic-brand-global-nav-avatar-border" => "blue"},
       parent_md5: @child_config.md5,
       js_overrides: nil,
-      css_overrides: nil
+      css_overrides: nil,
+      mobile_js_overrides: nil,
+      mobile_css_overrides: nil
     )
     @grand_child_config.save!
     @grand_child_account.brand_config_md5 = @grand_child_config.md5
@@ -94,6 +100,8 @@ describe BrandConfigHelpers do
         variables: {"ic-brand-primary" => "purple"},
         js_overrides: nil,
         css_overrides: nil,
+        mobile_js_overrides: nil,
+        mobile_css_overrides: nil,
         parent_md5: nil
       )
       @new_parent_config.save!
