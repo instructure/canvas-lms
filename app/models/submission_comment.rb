@@ -96,7 +96,7 @@ class SubmissionComment < ActiveRecord::Base
   end
 
   set_policy do
-    given {|user,session| !self.teacher_only_comment && self.submission.grants_right?(user, session, :read_grade) && !self.hidden? }
+    given {|user,session| !self.teacher_only_comment && self.submission.user_can_read_grade?(user, session) && !self.hidden? }
     can :read
 
     given {|user| self.author == user}

@@ -69,7 +69,7 @@ class GradebooksController < ApplicationController
         submissions_json = @presenter.submissions.map { |s|
           {
             'assignment_id' => s.assignment_id,
-            'score' => s.grants_right?(@current_user, :read_grade)? s.score  : nil
+            'score' => s.user_can_read_grade?(@current_user) ? s.score  : nil
           }
         }
         ags_json = light_weight_ags_json(@presenter.groups, {student: @presenter.student})
@@ -248,8 +248,13 @@ class GradebooksController < ApplicationController
     ag_includes = [:assignments]
     ag_includes << :assignment_visibility if @context.feature_enabled?(:differentiated_assignments)
     ag_includes << 'overrides' if @context.feature_enabled?(:differentiated_assignments)
+    chunk_size = if @context.assignments.published.count < Setting.get('gradebook2.assignments_threshold', '20').to_i
+      Setting.get('gradebook2.submissions_chunk_size', '35').to_i
+    else
+      Setting.get('gradebook2.many_submissions_chunk_size', '10').to_i
+    end
     js_env  :GRADEBOOK_OPTIONS => {
-      :chunk_size => Setting.get('gradebook2.submissions_chunk_size', '35').to_i,
+      :chunk_size => chunk_size,
       :assignment_groups_url => api_v1_course_assignment_groups_url(@context, :include => ag_includes, :override_assignment_dates => "false"),
       :sections_url => api_v1_course_sections_url(@context, :include => 'passback_status'),
       :course_url => api_v1_course_url(@context, :include => 'passback_status'),

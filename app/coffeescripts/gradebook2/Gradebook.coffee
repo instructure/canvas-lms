@@ -545,6 +545,7 @@ define [
           params =
             student_ids: (student.id for student in students)
             response_fields: ['id', 'user_id', 'url', 'score', 'grade', 'submission_type', 'submitted_at', 'assignment_id', 'grade_matches_current_submission', 'attachments', 'late', 'workflow_state', 'excused']
+            exclude_response_fields: ['preview_url']
           params['grading_period_id'] = @gradingPeriodToShow if @mgpEnabled && @gradingPeriodToShow && @gradingPeriodToShow != '0' && @gradingPeriodToShow != ''
           $.ajaxJSON(@options.submissions_url, "GET", params, @gotSubmissionsChunk)
           @submissionChunkCount++

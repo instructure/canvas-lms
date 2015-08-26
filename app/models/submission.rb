@@ -224,13 +224,17 @@ class Submission < ActiveRecord::Base
   end
 
   set_policy do
-    given {|user| self.assignment.published? && user && user.id == self.user_id }
+    given {|user| user && user.id == self.user_id && self.assignment.published?}
     can :read and can :comment and can :make_group_comment and can :submit
 
+    # see user_can_read_grade? before editing :read_grade permissions
     given { |user| user && user.id == self.user_id && !self.assignment.muted? }
     can :read_grade
 
-    given {|user, session| self.assignment.context.grants_right?(user, session, :view_all_grades) }
+    given {|user, session| self.assignment.published? && self.assignment.context.grants_right?(user, session, :manage_grades) }#admins.include?(user) }
+    can :read and can :comment and can :make_group_comment and can :read_grade and can :grade
+
+    given {|user, session| self.assignment.user_can_read_grades?(user, session) }
     can :read and can :read_grade
 
     given {|user| self.assignment && self.assignment.context && user && self.user &&
@@ -241,15 +245,12 @@ class Submission < ActiveRecord::Base
       self.assignment.context.observer_enrollments.where(user_id: user, associated_user_id: self.user, workflow_state: 'active').first.try(:grants_right?, user, :read_grades) }
     can :read_grade
 
-    given {|user, session| self.assignment.published? && self.assignment.context.grants_right?(user, session, :manage_grades) }#admins.include?(user) }
-    can :read and can :comment and can :make_group_comment and can :read_grade and can :grade
-
     given {|user| self.assignment.published? && user && self.assessment_requests.map{|a| a.assessor_id}.include?(user.id) }
     can :read and can :comment
 
     given { |user, session|
-      grants_right?(user, session, :read_grade) &&
       turnitin_data &&
+      user_can_read_grade?(user, session) &&
       (assignment.context.grants_right?(user, session, :manage_grades) ||
         case assignment.turnitin_settings[:originality_report_visibility]
           when 'immediate'; true
@@ -260,6 +261,11 @@ class Submission < ActiveRecord::Base
       )
     }
     can :view_turnitin_report
+  end
+
+  def user_can_read_grade?(user, session=nil)
+    # improves performance by checking permissions on the assignment before the submission
+    self.assignment.user_can_read_grades?(user, session) || self.grants_right?(user, session, :read_grade)
   end
 
   on_update_send_to_streams do
@@ -1195,11 +1201,11 @@ class Submission < ActiveRecord::Base
   end
 
   def comments_for(user)
-    grants_right?(user, :read_grade)? submission_comments : visible_submission_comments
+    user_can_read_grade?(user) ? submission_comments : visible_submission_comments
   end
 
   def filter_attributes_for_user(hash, user, session)
-    unless grants_right?(user, :read_grade)
+    unless user_can_read_grade?(user, session)
       %w(score published_grade published_score grade).each do |secret_attr|
         hash.delete secret_attr
       end

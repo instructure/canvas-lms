@@ -46,7 +46,7 @@ module Api::V1::Submission
       hash['submission_comments'] = submission_comments_json(submission.comments_for(@current_user), user)
     end
 
-    if includes.include?("rubric_assessment") && submission.rubric_assessment && submission.grants_right?(user, :read_grade)
+    if includes.include?("rubric_assessment") && submission.rubric_assessment && submission.user_can_read_grade?(user)
       ra = submission.rubric_assessment.data
       hash['rubric_assessment'] = {}
       ra.each { |rating| hash['rubric_assessment'][rating[:criterion_id]] = rating.slice(:points, :comments) }
@@ -102,10 +102,13 @@ module Api::V1::Submission
       hash['body'] = api_user_content(hash['body'], context, user)
     end
 
-    preview_args = { 'preview' => '1' }
-    preview_args['version'] = attempt.version_number
-    hash['preview_url'] = course_assignment_submission_url(
-      context, assignment, attempt[:user_id], preview_args)
+
+    unless params[:exclude_response_fields] && params[:exclude_response_fields].include?('preview_url')
+      preview_args = { 'preview' => '1' }
+      preview_args['version'] = attempt.version_number
+      hash['preview_url'] = course_assignment_submission_url(
+        context, assignment, attempt[:user_id], preview_args)
+    end
 
     unless attempt.media_comment_id.blank?
       hash['media_comment'] = media_comment_json(:media_id => attempt.media_comment_id, :media_type => attempt.media_comment_type)

@@ -892,6 +892,13 @@ class Assignment < ActiveRecord::Base
     can :update and can :delete and can :create and can :read and can :attach_submission_comment_files
   end
 
+  def user_can_read_grades?(user, session=nil)
+    RequestCache.cache('user_can_read_grades', self, user, session) do
+      self.context.grants_right?(user, session, :view_all_grades) ||
+        (self.published? && self.context.grants_right?(user, session, :manage_grades))
+    end
+  end
+
   def filter_attributes_for_user(hash, user, session)
     if lock_info = self.locked_for?(user, :check_policies => true)
       hash.delete('description')

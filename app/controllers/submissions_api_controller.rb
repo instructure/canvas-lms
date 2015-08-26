@@ -287,7 +287,7 @@ class SubmissionsApiController < ApplicationController
 
     includes = Array(params[:include])
 
-    assignment_scope = @context.assignments.active
+    assignment_scope = @context.assignments.published
     requested_assignment_ids = Array(params[:assignment_ids]).map(&:to_i)
     if requested_assignment_ids.present?
       assignment_scope = assignment_scope.where(:id => requested_assignment_ids)
@@ -341,6 +341,7 @@ class SubmissionsApiController < ApplicationController
 
       seen_users = Set.new
       result = []
+      show_sis_info = context.grants_any_right?(@current_user, :read_sis, :manage_sis)
       scope.each do |enrollment|
         student = enrollment.user
         next if seen_users.include?(student.id)
@@ -348,7 +349,7 @@ class SubmissionsApiController < ApplicationController
         hash = { :user_id => student.id, :section_id => enrollment.course_section_id, :submissions => [] }
 
         pseudonym = SisPseudonym.for(student, context)
-        if pseudonym && context.grants_any_right?(@current_user, :read_sis, :manage_sis)
+        if pseudonym && show_sis_info
           hash[:integration_id] = pseudonym.integration_id
           hash[:sis_user_id] = pseudonym.sis_user_id
         end
