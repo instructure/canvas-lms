@@ -39,13 +39,6 @@ describe "quizzes" do
         get "/courses/#{@course.id}/quizzes"
         expect(f("#summary_quiz_#{@quiz.id} .icon-publish")).to be_displayed
       end
-
-      it "should not exist in a published quiz" do
-        @quiz = course_quiz true
-        get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
-
-        expect(f(".save_and_publish")).to be_nil
-      end
     end
 
     it "should show a summary of due dates if there are multiple", priority: "1", test_id: 210054 do
@@ -239,7 +232,7 @@ describe "quizzes" do
       keep_trying_until { expect(f("#quiz_display_points_possible .points_possible").text).to eq "2" }
     end
 
-    it "should not let you exceed the question limit", priority: "1", test_id: 210062 do
+    it "should not let you exceed the question limit", priority: "3", test_id: 210062 do
       get "/courses/#{@course.id}/quizzes/new"
 
       click_questions_tab

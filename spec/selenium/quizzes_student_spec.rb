@@ -241,7 +241,7 @@ describe 'quizzes' do
       prepare_quiz
     end
 
-    it 'highlights correct answers', priority: "2", test_id: 209417 do
+    it 'highlights correct answers', priority: "1", test_id: 209417 do
       @quiz.update_attributes(show_correct_answers: true)
       @quiz.save!
 
@@ -250,7 +250,7 @@ describe 'quizzes' do
       expect(ff('.correct_answer').length).to be > 0
     end
 
-    it 'always highlights incorrect answers', priority: "2", test_id: 209418 do
+    it 'always highlights incorrect answers', priority: "1", test_id: 209418 do
       @quiz.update_attributes(show_correct_answers: true)
       @quiz.save!
 
@@ -268,7 +268,7 @@ describe 'quizzes' do
       prepare_quiz
     end
 
-    it 'doesn\'t highlight correct answers', priority: "2", test_id: 209416 do
+    it 'doesn\'t highlight correct answers', priority: "1", test_id: 209416 do
       @quiz.update_attributes(show_correct_answers: false)
       @quiz.save!
 
@@ -277,7 +277,7 @@ describe 'quizzes' do
       expect(ff('.correct_answer').length).to eq 0
     end
 
-    it 'always highlights incorrect answers', priority: "2", test_id: 209418 do
+    it 'always highlights incorrect answers', priority: "1", test_id: 209480 do
       @quiz.update_attributes(show_correct_answers: false)
       @quiz.save!
 

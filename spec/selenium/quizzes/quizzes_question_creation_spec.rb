@@ -396,7 +396,7 @@ describe 'quizzes question creation' do
     end
   end
 
-  context 'when editing a quiz question group', priority: "2" do
+  context 'when editing a quiz question group' do
 
     before(:each) do
       course_with_teacher_logged_in
