@@ -17,6 +17,7 @@ describe "quizzes attempts" do
   end
 
   it "should show the due dates for observer linked to both students", priority: "1", test_id: 114315 do
+    skip('going to replace with better test coverage in subsequent commit')
     # enroll student in additional section
     # link observer to the student in main section and to the student in additional section
     student_in_section(@new_section, :user => @student2)

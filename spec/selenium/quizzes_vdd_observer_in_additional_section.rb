@@ -18,6 +18,7 @@ describe "quizzes attempts" do
   end
 
   it "should show the correct VDD for observer in additional section", priority: "1", test_id: 114315 do
+    skip('going to replace with better test coverage in subsequent commit')
     # enroll observer in the course in additional section
     @course1.enroll_user(@observer2, 'ObserverEnrollment', :enrollment_state => 'active',
                          :associated_user_id => @student2.id)
