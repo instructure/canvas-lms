@@ -901,14 +901,14 @@ define [
         showSisSync: @options.post_grades_feature_enabled,
         currentSection: @sectionToShow)
       @sectionMenu.render()
-      @togglePostGrades(not @sectionToShow?)
+      @togglePostGrades(not @sectionToShow? or @sectionList().length is 1)
 
     updateCurrentSection: (section, author) =>
       @sectionToShow = section
       @postGradesStore.setSelectedSection @sectionToShow
       userSettings[if @sectionToShow then 'contextSet' else 'contextRemove']('grading_show_only_section', @sectionToShow)
       @buildRows() if @grid
-      @togglePostGrades(not @sectionToShow?)
+      @togglePostGrades(not @sectionToShow? or @sectionList().length is 1)
 
     showSections: ->
       if @sections_enabled && @options.post_grades_feature_enabled

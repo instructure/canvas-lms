@@ -957,7 +957,8 @@ describe "gradebook2" do
 
     context 'post grades button' do
       def create_post_grades_tool(opts={})
-        post_grades_tool = @course.context_external_tools.create!(
+        course = opts[:course] || @course
+        post_grades_tool = course.context_external_tools.create!(
           name: opts[:name] || 'test tool',
           domain: 'example.com',
           url: 'http://example.com/lti',
@@ -977,6 +978,21 @@ describe "gradebook2" do
         create_post_grades_tool
 
         get "/courses/#{@course.id}/gradebook2"
+        wait_for_ajaximations
+        expect(f('button.external-tools-dialog')).to be_displayed
+        f('button.external-tools-dialog').click
+        wait_for_ajaximations
+        expect(f('iframe.post-grades-frame')).to be_displayed
+      end
+
+      it "should show post grades lti button when only one section available" do
+        course = Course.new(course_name: 'Math 201', account: @account, active_course: true, sis_source_id: 'xyz')
+        course.save
+        course.enroll_teacher(@user).accept!
+        course.assignments.create!(name: 'Assignment1', post_to_sis: true)
+        create_post_grades_tool(course: course)
+
+        get "/courses/#{course.id}/gradebook2"
         wait_for_ajaximations
         expect(f('button.external-tools-dialog')).to be_displayed
         f('button.external-tools-dialog').click
