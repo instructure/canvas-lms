@@ -136,6 +136,14 @@ describe "Files API", type: :request do
       expect(@attachment.reload.file_state).to eq 'available'
     end
 
+    it "should store long-ish non-ASCII filenames (local storage)" do
+      local_storage!
+      @attachment.update_attribute(:filename, "Качество образования-1.txt")
+      upload_data
+      expect { call_create_success }.not_to raise_error
+      expect(@attachment.reload.open.read).to eq "test file"
+    end
+
     it "should render the response as text/html when in app" do
       s3_storage!
       FilesController.any_instance.stubs(:in_app?).returns(true)

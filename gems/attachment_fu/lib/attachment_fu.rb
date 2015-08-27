@@ -481,7 +481,7 @@ module AttachmentFu # :nodoc:
     protected
       # Generates a unique filename for a Tempfile.
       def random_tempfile_filename
-        "#{rand Time.now.to_i}#{filename || 'attachment'}"
+        "#{rand Time.now.to_i}#{filename && filename.last(50) || 'attachment'}"
       end
 
       def sanitize_filename(filename)
