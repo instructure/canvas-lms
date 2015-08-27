@@ -163,6 +163,58 @@ module AssignmentOverridesSeleniumHelper
     create_quiz_with_multiple_due_dates
   end
 
+  def enroll_section_a_student
+    @student1 = user_with_pseudonym(username: 'student1@example.com', active_all: 1)
+    @course.self_enroll_student(@student1, section: @section_a)
+  end
+
+  def enroll_section_b_student
+    @student2 = user_with_pseudonym(username: 'student2@example.com', active_all: 1)
+    @course.self_enroll_student(@student2, section: @section_b)
+  end
+
+  def prepare_vdd_scenario_for_first_observer
+    prepare_multiple_due_dates_scenario
+
+    enroll_section_a_student
+    enroll_section_b_student
+
+    # 1 observer linked to both students
+    @observer1 = user_with_pseudonym(username: 'observer1@example.com', active_all: 1)
+    @course.enroll_user(
+      @observer1,
+      'ObserverEnrollment',
+      enrollment_state: 'active',
+      allow_multiple_enrollments: true,
+      section: @section_a,
+      associated_user_id: @student1.id
+    )
+    @course.enroll_user(
+      @observer1,
+      'ObserverEnrollment',
+      enrollment_state: 'active',
+      allow_multiple_enrollments: true,
+      section: @section_b,
+      associated_user_id: @student2.id
+    )
+  end
+
+  def prepare_vdd_scenario_for_second_observer
+    prepare_multiple_due_dates_scenario
+
+    enroll_section_b_student
+
+    # 1 observer linked to student enrolled in Section B
+    @observer2 = user_with_pseudonym(username: 'observer2@example.com', active_all: 1)
+    @course.enroll_user(
+      @observer2,
+      'ObserverEnrollment',
+      enrollment_state: 'active',
+      section: @section_b,
+      associated_user_id: @student2.id
+    )
+  end
+
   def prepare_multiple_due_dates_scenario_for_teacher
     prepare_multiple_due_dates_scenario
 
@@ -205,7 +257,7 @@ module AssignmentOverridesSeleniumHelper
   end
 
   def format_date_for_view(date)
-      date.strftime('%b %-d')
+    date.strftime('%b %-d')
   end
 
   def format_time_for_view(time)
@@ -245,6 +297,10 @@ module AssignmentOverridesSeleniumHelper
   def obtain_date_from_quiz_summary(row_number, cell_number, load_page=false)
     get "/accounts/#{@account.id}/courses/#{@course.id}/quizzes/#{@quiz.id}" if load_page
     fj("tr:nth-child(#{row_number}) td:nth-child(#{cell_number}) .screenreader-only", f('.assignment-dates'))
+  end
+
+  def validate_quiz_show_page(message)
+    expect(f('#quiz_show').text).to include_text("#{message}")
   end
 
   def validate_quiz_dates(context_selector, message)
