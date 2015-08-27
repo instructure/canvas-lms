@@ -75,6 +75,8 @@ class Feature
   #     enable_at: Date.new(2014, 1, 1),  # estimated release date shown in UI
   #     beta: false,          # 'beta' tag shown in UI
   #     development: false,   # whether the feature is restricted to development / test / beta instances
+  #                           # setting `development: true` prevents the flag from being registered on production,
+  #                           # which means `context.feature_enabled?` calls for the feature will always return false.
   #     release_notes_url: 'http://example.com/',
   #
   #     # optional: you can supply a Proc to attach warning messages to and/or forbid certain transitions
@@ -349,8 +351,8 @@ END
             display_name: -> { I18n.t('Enable "OR" Condition for Modules') },
             description:  -> { I18n.t('If enabled, modules will have the option to be marked as complete when only one of the requirements is met.') },
             applies_to: 'Course',
-            state: 'hidden',
-            development: true,
+            state: 'hidden_in_prod',
+            development: false,
             root_opt_in: true
         },
     'use_new_tree' =>
