@@ -111,29 +111,29 @@ def add_date(middle_number)
 end
 
 def create_assignment_event(assignment_title, should_add_date = false, publish = false)
-  middle_number = find_middle_day.find_element(:css, '.fc-day-number').text
+  middle_number = find_middle_day.f('.fc-day-number').text
   find_middle_day.click
   edit_event_dialog = f('#edit_event_tabs')
   expect(edit_event_dialog).to be_displayed
-  edit_event_dialog.find_element(:css, '.edit_assignment_option').click
-  edit_assignment_form = edit_event_dialog.find_element(:id, 'edit_assignment_form')
-  title = edit_assignment_form.find_element(:id, 'assignment_title')
+  edit_event_dialog.f('.edit_assignment_option').click
+  edit_assignment_form = edit_event_dialog.f('#edit_assignment_form')
+  title = edit_assignment_form.f('#assignment_title')
   keep_trying_until { title.displayed? }
   replace_content(title, assignment_title)
   add_date(middle_number) if should_add_date
-  edit_assignment_form.find_element(:id, 'assignment_published').click if publish
+  edit_assignment_form.f('#assignment_published').click if publish
   submit_form(edit_assignment_form)
   keep_trying_until { expect(f('.fc-view-month .fc-event-title')).to include_text(assignment_title) }
 end
 
 # Creates event from clicking on the mini calendar
 def create_calendar_event(event_title, should_add_date = false, should_add_location = false, should_duplicate = false)
-  middle_number = find_middle_day.find_element(:css, '.fc-day-number').text
+  middle_number = find_middle_day.f('.fc-day-number').text
   find_middle_day.click
   edit_event_dialog = f('#edit_event_tabs')
   expect(edit_event_dialog).to be_displayed
-  edit_event_form = edit_event_dialog.find_element(:id, 'edit_calendar_event_form')
-  title = edit_event_form.find_element(:id, 'calendar_event_title')
+  edit_event_form = edit_event_dialog.f('#edit_calendar_event_form')
+  title = edit_event_form.f('#calendar_event_title')
   keep_trying_until { title.displayed? }
   replace_content(title, event_title)
   add_date(middle_number) if should_add_date
@@ -141,10 +141,10 @@ def create_calendar_event(event_title, should_add_date = false, should_add_locat
 
   if should_duplicate
     f('#duplicate_event').click
-    duplicate_options = edit_event_form.find_element(:id, 'duplicate_interval')
+    duplicate_options = edit_event_form.f('#duplicate_interval')
     keep_trying_until { duplicate_options.displayed? }
-    duplicate_interval = edit_event_form.find_element(:id, 'duplicate_interval')
-    duplicate_count = edit_event_form.find_element(:id, 'duplicate_count')
+    duplicate_interval = edit_event_form.f('#duplicate_interval')
+    duplicate_count = edit_event_form.f('#duplicate_count')
     replace_content(duplicate_interval, "1")
     replace_content(duplicate_count, "3")
     f('#append_iterator').click
@@ -168,8 +168,8 @@ end
 def event_from_modal(event_title, should_add_date = false, should_add_location = false)
   edit_event_dialog = f('#edit_event_tabs')
   expect(edit_event_dialog).to be_displayed
-  edit_event_form = edit_event_dialog.find_element(:id, 'edit_calendar_event_form')
-  title = edit_event_form.find_element(:id, 'calendar_event_title')
+  edit_event_form = edit_event_dialog.f('#edit_calendar_event_form')
+  title = edit_event_form.f('#calendar_event_title')
   keep_trying_until { title.displayed? }
   replace_content(title, event_title)
   add_date(middle_number) if should_add_date
