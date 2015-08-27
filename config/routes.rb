@@ -63,6 +63,12 @@ CanvasRails::Application.routes.draw do
     get 'group_unassigned_members' => 'groups#unassigned_members'
   end
 
+  resources :group_categories do
+    member do
+      post 'clone_with_name'
+    end
+  end
+
   concern :files do
     resources :files do
       get 'inline' => 'files#text_show', as: :text_inline
@@ -524,14 +530,11 @@ CanvasRails::Application.routes.draw do
     concerns :announcements
     resources :assignments
     resources :submissions
-    put 'account_authorization_configs' => 'account_authorization_configs#update_all', as: :update_all_authorization_configs
-    delete 'account_authorization_configs' => 'account_authorization_configs#destroy_all', as: :remove_all_authorization_configs
-    get 'sso_settings' => 'account_authorization_configs#show_sso_settings',
-        as: :sso_settings
+    delete 'authentication_providers' => 'account_authorization_configs#destroy_all', as: :remove_all_authentication_providers
     put 'sso_settings' => 'account_authorization_configs#update_sso_settings',
         as: :update_sso_settings
 
-    resources :account_authorization_configs
+    resources :authentication_providers, controller: :account_authorization_configs, only: [:index, :create, :update, :destroy]
     get 'test_ldap_connections' => 'account_authorization_configs#test_ldap_connection'
     get 'test_ldap_binds' => 'account_authorization_configs#test_ldap_bind'
     get 'test_ldap_searches' => 'account_authorization_configs#test_ldap_search'
@@ -1186,12 +1189,19 @@ CanvasRails::Application.routes.draw do
     end
 
     scope(controller: :account_authorization_configs) do
+      get 'accounts/:account_id/sso_settings', action: :show_sso_settings, as: 'account_show_sso_settings_url'
+      put 'accounts/:account_id/sso_settings', action: :update_sso_settings, as: 'account_update_sso_settings_url'
+
+      get 'accounts/:account_id/authentication_providers', action: :index
+      get 'accounts/:account_id/authentication_providers/:id', action: :show
+      post 'accounts/:account_id/authentication_providers', action: :create, as: 'account_create_ap'
+      put 'accounts/:account_id/authentication_providers/:id', action: :update, as: 'account_update_ap'
+      delete 'accounts/:account_id/authentication_providers/:id', action: :destroy, as: 'account_delete_ap'
+
+      # deprecated
       get 'accounts/:account_id/account_authorization_configs/discovery_url', action: :show_discovery_url
       put 'accounts/:account_id/account_authorization_configs/discovery_url', action: :update_discovery_url, as: 'account_update_discovery_url'
       delete 'accounts/:account_id/account_authorization_configs/discovery_url', action: :destroy_discovery_url, as: 'account_destroy_discovery_url'
-
-      get 'accounts/:account_id/sso_settings', action: :show_sso_settings, as: 'account_show_sso_settings_url'
-      put 'accounts/:account_id/sso_settings', action: :update_sso_settings, as: 'account_update_sso_settings_url'
 
       get 'accounts/:account_id/account_authorization_configs', action: :index
       get 'accounts/:account_id/account_authorization_configs/:id', action: :show
@@ -1233,6 +1243,7 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :notification_preferences) do
       get 'users/:user_id/communication_channels/:communication_channel_id/notification_preferences', action: :index
+      get 'users/:user_id/communication_channels/:communication_channel_id/notification_preference_categories', action: :category_index
       get 'users/:user_id/communication_channels/:type/:address/notification_preferences', action: :index, constraints: { address: %r{[^/?]+} }
       get 'users/:user_id/communication_channels/:communication_channel_id/notification_preferences/:notification', action: :show
       get 'users/:user_id/communication_channels/:type/:address/notification_preferences/:notification', action: :show, constraints: { address: %r{[^/?]+} }
@@ -1240,6 +1251,7 @@ CanvasRails::Application.routes.draw do
       put 'users/self/communication_channels/:type/:address/notification_preferences/:notification', action: :update, constraints: { address: %r{[^/?]+} }
       put 'users/self/communication_channels/:communication_channel_id/notification_preferences', action: :update_all
       put 'users/self/communication_channels/:type/:address/notification_preferences', action: :update_all, constraints: { address: %r{[^/?]+} }
+      put 'users/self/communication_channels/:communication_channel_id/notification_preference_categories/:category', action: :update_preferences_by_category
     end
 
     scope(controller: :comm_messages_api) do
@@ -1410,6 +1422,7 @@ CanvasRails::Application.routes.draw do
       put "courses/:course_id/quizzes/:id", action: :update, as: 'course_quiz_update'
       delete "courses/:course_id/quizzes/:id", action: :destroy, as: 'course_quiz_destroy'
       post "courses/:course_id/quizzes/:id/reorder", action: :reorder, as: 'course_quiz_reorder'
+      post "courses/:course_id/quizzes/:id/validate_access_code", action: :validate_access_code, as: 'course_quiz_validate_access_code'
     end
 
     scope(controller: 'quizzes/quiz_submission_users') do
@@ -1418,6 +1431,7 @@ CanvasRails::Application.routes.draw do
     end
 
     scope(controller: 'quizzes/quiz_groups') do
+      get "courses/:course_id/quizzes/:quiz_id/groups/:id", action: :show, as: 'course_quiz_group'
       post "courses/:course_id/quizzes/:quiz_id/groups", action: :create, as: 'course_quiz_group_create'
       put "courses/:course_id/quizzes/:quiz_id/groups/:id", action: :update, as: 'course_quiz_group_update'
       delete "courses/:course_id/quizzes/:quiz_id/groups/:id", action: :destroy, as: 'course_quiz_group_destroy'
@@ -1711,6 +1725,7 @@ CanvasRails::Application.routes.draw do
     post "xapi/:token", controller: :lti_api, action: :xapi_service, as: "lti_xapi"
     post "caliper/:token", controller: :lti_api, action: :caliper_service, as: "lti_caliper"
     post "logout_service/:token", controller: :lti_api, action: :logout_service, as: "lti_logout_service"
+    post "turnitin/outcomes_placement/:tool_id", controller: :lti_api, action: :turnitin_outcomes_placement, as: "lti_turnitin_outcomes_placement"
   end
 
   ApiRouteSet.draw(self, "/api/lti") do

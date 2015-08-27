@@ -3,8 +3,11 @@ define [
   'underscore'
   'jquery'
   'jsx/due_dates/DueDateCalendarPicker'
+  'timezone'
+  'vendor/timezone/fr_FR'
+  'helpers/I18nStubber'
   'helpers/fakeENV'
-], (React, _, $, DueDateCalendarPicker, fakeENV) ->
+], (React, _, $, DueDateCalendarPicker, tz, french, I18nStubber, fakeENV) ->
 
   Simulate = React.addons.TestUtils.Simulate
   SimulateNative = React.addons.TestUtils.SimulateNative
@@ -33,6 +36,19 @@ define [
 
   test 'formattedDate returns a nicely formatted Date', ->
     equal "Feb 1, 2012 at 7:00am", @dueDateCalendarPicker.formattedDate()
+
+  test 'formattedDate returns a localized Date', ->
+    snapshot = tz.snapshot()
+    tz.changeLocale(french, 'fr_FR')
+    I18nStubber.pushFrame()
+    I18nStubber.setLocale 'fr_FR'
+    I18nStubber.stub 'fr_FR',
+      'date.formats.medium': "%-d %b %Y"
+      'time.formats.tiny': "%-k:%M"
+      'time.event': "%{date} à %{time}"
+    equal "1 févr. 2012 à 7:00", @dueDateCalendarPicker.formattedDate()
+    I18nStubber.popFrame()
+    tz.restore(snapshot)
 
   test 'recieved proper class depending on dateType', ->
     classes = @dueDateCalendarPicker.refs.datePickerWrapper.props.className

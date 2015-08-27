@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe 'Global Navigation' do
-  include_examples 'in-process server selenium tests'
+  include_context 'in-process server selenium tests'
 
   context 'As a Teacher' do
     before do

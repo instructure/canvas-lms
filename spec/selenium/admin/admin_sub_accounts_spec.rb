@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 
 describe "admin sub accounts" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
   DEFAULT_ACCOUNT_ID = Account.default.id
 
   def create_sub_account(name = 'sub account', number_to_create = 1, parent_account = Account.default)

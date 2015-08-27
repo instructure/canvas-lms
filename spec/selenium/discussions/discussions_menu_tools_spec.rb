@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../helpers/discussions_common')
 
 describe "discussions" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   let(:course) { course_model.tap{|course| course.offer!} }
   let(:teacher) { teacher_in_course(course: course, name: 'teacher', active_all: true).user }

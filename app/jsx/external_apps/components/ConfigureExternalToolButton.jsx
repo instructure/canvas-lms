@@ -64,7 +64,7 @@ define([
             onRequestClose={this.closeModal}>
 
             <div className="ReactModal__Layout">
-              <div className="ReactModal__InnerSection ReactModal__Header ReactModal__Header--force-no-corners">
+              <div className="ReactModal__Header">
                 <div className="ReactModal__Header-Title">
                   <h4>{I18n.t('Configurate %{tool} App?', {tool: this.props.tool.name})}</h4>
                 </div>
@@ -76,13 +76,13 @@ define([
                 </div>
               </div>
 
-              <div className="ReactModal__InnerSection ReactModal__Body ReactModal__Body--force-no-padding">
+              <div className="ReactModal__Body ReactModal__Body--force-no-padding">
                 {this.renderIframe()}
               </div>
 
-              <div className="ReactModal__InnerSection ReactModal__Footer">
+              <div className="ReactModal__Footer">
                 <div className="ReactModal__Footer-Actions">
-                  <button ref="btnClose" type="button" className="btn btn-default" onClick={this.closeModal}>{I18n.t('Close')}</button>
+                  <button ref="btnClose" type="button" className="Button" onClick={this.closeModal}>{I18n.t('Close')}</button>
                 </div>
               </div>
             </div>

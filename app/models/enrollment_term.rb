@@ -125,10 +125,20 @@ class EnrollmentTerm < ActiveRecord::Base
     false
   end
   
-  def users_count
-    scope = Enrollment.active.joins(:course).
-      where(root_account_id: root_account_id, courses: {enrollment_term_id: self})
-    scope.select(:user_id).uniq.count
+  def self.user_counts(root_account, terms)
+    # Warning: returns keys as strings, I think because of the join
+    Enrollment.active.joins(:course).
+      where(root_account_id: root_account, courses: {enrollment_term_id: terms}).
+      group(:enrollment_term_id).
+      uniq.
+      count(:user_id)
+  end
+
+  def self.course_counts(terms)
+    Course.active.
+      where(enrollment_term_id: terms).
+      group(:enrollment_term_id).
+      count
   end
   
   workflow do

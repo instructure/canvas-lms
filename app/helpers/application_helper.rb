@@ -352,7 +352,7 @@ module ApplicationHelper
     # account_chain_ids is in the order we need to search for tools
     # unfortunately, the db will return an arbitrary one first.
     # so, we pull all the tools (probably will only have one anyway) and look through them here
-    tools = ContextExternalTool.active.where(:context_type => 'Account', :context_id => @context.account_chain, :tool_id => tool_id).all
+    tools = ContextExternalTool.active.where(:context_type => 'Account', :context_id => @context.account_chain, :tool_id => tool_id).to_a
     @context.account_chain.each do |account|
       tool = tools.find {|t| t.context_id == account.id}
       return tool if tool
@@ -705,8 +705,18 @@ module ApplicationHelper
     end
   end
 
+  # allows forcing account CSS off universally for a specific situation,
+  # without requiring the global_includes=0 param
+  def disable_account_css
+    @disable_account_css = true
+  end
+
+  def disable_account_css?
+    @disable_account_css || params[:global_includes] == '0'
+  end
+
   def include_account_css
-    return if params[:global_includes] == '0'
+    return if disable_account_css?
     if use_new_styles? 
       includes = [] 
       includes << brand_config_includes[:css] if  brand_config_includes[:css].present? 

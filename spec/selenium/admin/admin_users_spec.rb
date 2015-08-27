@@ -3,7 +3,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../helpers/shared_user_metho
 require File.expand_path(File.dirname(__FILE__) + '/../helpers/basic/users_specs')
 
 describe "admin courses tab" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   context "add user basic" do
     describe "shared users specs" do

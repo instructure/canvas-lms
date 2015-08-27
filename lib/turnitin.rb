@@ -19,6 +19,14 @@
 require 'turnitin/response'
 
 module Turnitin
+  def self.state_from_similarity_score(similarity_score)
+    return 'none' if similarity_score == 0
+    return 'acceptable' if similarity_score < 25
+    return 'warning' if similarity_score < 50
+    return 'problem' if similarity_score < 75
+    'failure'
+  end
+
   class Client
     attr_accessor :endpoint, :account_id, :shared_secret, :host, :testing
 

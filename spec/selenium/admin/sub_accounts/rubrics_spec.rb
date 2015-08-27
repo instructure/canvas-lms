@@ -2,7 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../common')
 require File.expand_path(File.dirname(__FILE__) + '/../../helpers/rubrics_common')
 
 describe "sub account shared rubric specs" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
   let(:account) { Account.create(:name => 'sub account from default account', :parent_account => Account.default) }
   let(:rubric_url) { "/accounts/#{account.id}/rubrics" }
   let(:who_to_login) { 'admin' }

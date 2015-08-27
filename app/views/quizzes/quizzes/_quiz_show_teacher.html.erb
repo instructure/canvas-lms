@@ -5,18 +5,18 @@
 <form class="form-horizontal bootstrap-form display-only" style="margin-top:18px;">
   <fieldset>
     <div class="control-group">
-      <label class="control-label">
+      <div class="control-label">
         <%= t(:quiz_type, "Quiz Type") %>
-      </label>
+      </div>
       <div class="controls">
         <span class="value"><%= render_quiz_type(@quiz.quiz_type) %></span>
       </div>
     </div>
 
     <div class="control-group">
-      <label class="control-label">
+      <div class="control-label">
         <%= t(:points, "Points") %>
-      </label>
+      </div>
       <div class="controls">
         <span class="value"><%= @quiz.points_possible %></span>
       </div>
@@ -24,9 +24,9 @@
 
     <% if @quiz.graded? && @quiz.assignment_group.present? %>
       <div class="control-group">
-        <label class="control-label">
+        <div class="control-label">
           <%= t(:group, "Assignment Group") %>
-        </label>
+        </div>
         <div class="controls">
           <span class="value"><%= @quiz.assignment_group.name %></span>
         </div>
@@ -34,9 +34,9 @@
     <% end %>
 
     <div class="control-group">
-      <label class="control-label">
+      <div class="control-label">
         <%= t(:shuffle_answers, "Shuffle Answers") %>
-      </label>
+      </div>
       <div class="controls">
         <span class="value">
           <%= @quiz.shuffle_answers ? t('#options.yes', "Yes") : t('#options.no', "No") %>
@@ -45,9 +45,9 @@
     </div>
 
     <div class="control-group">
-      <label class="control-label">
+      <div class="control-label">
         <%= t('label.time_limit', "Time Limit") %>
-      </label>
+      </div>
       <div class="controls">
         <span class="value">
           <% if @quiz.time_limit %>
@@ -60,9 +60,9 @@
     </div>
 
     <div class="control-group">
-      <label class="control-label">
+      <div class="control-label">
         <%= t(:multiple_attempts, "Multiple Attempts") %>
-      </label>
+      </div>
       <div class="controls">
         <span class="value">
           <%= @quiz.single_attempt? ? t('#options.no', "No") : t('#options.yes', "Yes") %>
@@ -72,9 +72,9 @@
 
     <% unless @quiz.single_attempt? %>
       <div class="control-group">
-        <label class="control-label">
+        <div class="control-label">
           <%= t(:score_to_keep, "Score to Keep") %>
-        </label>
+        </div>
         <div class="controls">
           <span class="value">
             <%= render_score_to_keep(@quiz.scoring_policy) %>
@@ -83,9 +83,9 @@
       </div>
 
       <div class="control-group">
-        <label class="control-label">
+        <div class="control-label">
           <%= t(:attempts, "Attempts") %>
-        </label>
+        </div>
         <div class="controls">
           <span class="value">
             <%= @quiz.unlimited_attempts? ? "Unlimited" : @quiz.allowed_attempts %>
@@ -95,9 +95,9 @@
     <% end %>
 
     <div class="control-group">
-      <label class="control-label">
+      <div class="control-label">
         <%= t(:view_responses, "View Responses") %>
-      </label>
+      </div>
       <div class="controls">
         <span class="value">
           <%= render_show_responses(@quiz.hide_results) %>
@@ -107,9 +107,9 @@
 
     <% if @quiz.hide_results != 'always' %>
       <div class="control-group">
-        <label class="control-label">
+        <div class="control-label">
           <%= t('show_correct_answers', "Show Correct Answers") %>
-        </label>
+        </div>
         <div class="controls">
           <span class="value">
             <%= render_show_correct_answers(@quiz) %>
@@ -120,9 +120,9 @@
 
     <% unless @quiz.access_code.blank? %>
       <div class="control-group">
-        <label class="control-label">
+        <div class="control-label">
           <%= t(:code, "Access Code") %>
-        </label>
+        </div>
         <div class="controls">
           <span class="value">
             <%= @quiz.access_code %>
@@ -133,9 +133,9 @@
 
     <% unless @quiz.ip_filter.blank? %>
       <div class="control-group">
-        <label class="control-label">
+        <div class="control-label">
           <%= t(:filter, "IP Filter") %>
-        </label>
+        </div>
         <div class="controls">
           <span class="value">
             <%= @quiz.ip_filter %>
@@ -145,9 +145,9 @@
     <% end %>
 
     <div class="control-group">
-      <label class="control-label">
+      <div class="control-label">
         <%= t('one_question_at_a_time', 'One Question at a Time') %>
-      </label>
+      </div>
       <div class="controls">
         <span class="value">
           <%= @quiz.one_question_at_a_time? ? t('#options.yes', "Yes") : t('#options.no', "No") %>
@@ -157,9 +157,9 @@
 
     <% if feature_enabled?(:lockdown_browser) %>
       <div class="control-group">
-        <label class="control-label">
+        <div class="control-label">
           <%= t(:require_lockdown_browser, "Require Respondus LockDown Browser") %>
-        </label>
+        </div>
         <div class="controls">
           <span class="value">
             <%= @quiz.require_lockdown_browser ? t('#options.yes', "Yes") : t('#options.no', "No") %>
@@ -168,9 +168,9 @@
       </div>
 
       <div class="control-group">
-        <label class="control-label">
+        <div class="control-label">
           <%= t(:require_lockdown_browser_for_results, "Required to View Quiz Results") %>
-        </label>
+        </div>
         <div class="controls">
           <span class="value">
             <%= @quiz.require_lockdown_browser_for_results ? t('#options.yes', "Yes") : t('#options.no', "No") %>
@@ -179,9 +179,9 @@
       </div>
       <% if @quiz.lockdown_browser_use_lti_tool? %>
         <div class="control-group">
-          <label class="control-label">
+          <div class="control-label">
             <%= t(:require_lockdown_browser_monitor, "Webcam Required") %>
-          </label>
+          </div>
           <div class="controls">
             <span class="value">
               <%= @quiz.require_lockdown_browser_monitor ? t('#options.yes', "Yes") : t('#options.no', "No") %>
@@ -193,11 +193,11 @@
 
     <% if @quiz.one_question_at_a_time %>
       <div class="control-group">
-        <label class="control-label">
+        <div class="control-label">
           <%= t('cant_go_back', "Lock Questions After Answering") %>
-        </label>
+        </div>
         <div class="controls">
-          <span class="value"> 
+          <span class="value">
             <%= @quiz.cant_go_back ? t('#options.yes', "Yes") : t('#options.no', "No") %>
           </span>
         </div>
@@ -205,9 +205,9 @@
     <% end %>
 
     <div class="control-group" style="<%= hidden unless @quiz.survey? %>">
-      <label class="control-label">
+      <div class="control-label">
         <%= t('anonymous_submissions', "Anonymous Submissions") %>
-      </label>
+      </div>
       <div class="controls">
         <span class="value">
           <%= @quiz.anonymous_submissions ? t('#options.yes', "Yes") : t('#options.no', "No") %>
@@ -227,7 +227,7 @@
     </tr>
   </thead>
 
-  <%= render 'shared/override_list', :assignment => @quiz, 
+  <%= render 'shared/override_list', :assignment => @quiz,
     :user => @current_user %>
 
 </table>

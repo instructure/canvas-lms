@@ -44,6 +44,10 @@ $ic-brand-course-nav-link--active: $ic-brand-primary;
     font-size: 11px;
     font-style: italic;
     color: inherit;
+    @if $use_new_styles == false {
+      margin-bottom: $ic-sp/2;
+      padding: 0 $ic-sp*0.75;
+    }
   }
 
   & > *:first-child {

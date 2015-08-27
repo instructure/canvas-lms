@@ -15,9 +15,9 @@
     <% @can_manage_content = can_do(@context, @current_user, :manage_content) %>
     <% if @can_manage_content && can_do(@context, @current_user, :change_course_state) && (@context.unpublished? || @context.unpublishable?) %>
       <div id="course_status" <% unless use_new_styles? %>class="text-center"<% end %>>
-        <h4>
+        <h3>
           <%= t('headers.course_status', %{Course Status}) %>
-        </h4>
+        </h3>
         <div id='course_status_actions' class="ui-buttonset">
           <%= form_for @context do |f| %>
             <% if @context.created? || @context.claimed? %>
@@ -165,7 +165,7 @@
       <%= t('headings.unpublished', %{This Course is Unpublished}) %>
 
       <span class="Reminder__course-setup-subttitle">
-        <%= t 'teachers_only', "Only teachers can see this course until it is *published*", :wrapper => (can_do(@context, @current_user, :update) ? '<a href="#" class="publish_course_in_wizard_link"><b>\1</b></a>' : '\1') %>
+        <%= t "Only teachers can see this course until it is published" %>
       </span>
     </h2>
     <div class="body Reminder__course-setup-body">

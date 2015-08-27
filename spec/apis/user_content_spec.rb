@@ -267,6 +267,8 @@ describe UserContent, type: :request do
           <a href='/files/789/download?verifier=lolcats'>file</a>
           <a href='/courses/#{@course.id}/quizzes'>quiz index</a>
           <a href='/courses/#{@course.id}/quizzes/999'>quiz</a>
+          <a href='/courses/#{@course.id}/modules'>modules index</a>
+          <a href='/courses/#{@course.id}/modules/1024'>module</a>
           <a href='/courses/#{@course.id}/external_tools/retrieve?url=http://lti-tool-provider.example.com/lti_tool'>LTI Launch</a>
         </p>
         HTML
@@ -293,10 +295,12 @@ describe UserContent, type: :request do
           "http://www.example.com/api/v1/files/789",
           "http://www.example.com/api/v1/courses/#{@course.id}/quizzes",
           "http://www.example.com/api/v1/courses/#{@course.id}/quizzes/999",
+          "http://www.example.com/api/v1/courses/#{@course.id}/modules",
+          "http://www.example.com/api/v1/courses/#{@course.id}/modules/1024",
           "http://www.example.com/api/v1/courses/#{@course.id}/external_tools/sessionless_launch?url=http%3A%2F%2Flti-tool-provider.example.com%2Flti_tool"
         ]
         expect(doc.css('a').collect { |att| att['data-api-returntype'] }).to eq(
-            %w([Assignment] Assignment [Page] Page Page [Page] Page Page [Discussion] Discussion Folder File File [Quiz] Quiz SessionlessLaunchUrl)
+            %w([Assignment] Assignment [Page] Page Page [Page] Page Page [Discussion] Discussion Folder File File [Quiz] Quiz [Module] Module SessionlessLaunchUrl)
         )
       end
     end

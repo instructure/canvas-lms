@@ -275,7 +275,7 @@ describe ExternalToolsController do
 
         lti_launch = assigns[:lti_launch]
         expect(lti_launch.params['lti_message_type']).to eq 'ContentItemSelectionRequest'
-        expect(lti_launch.params['content_item_return_url']).to eq "http://test.host/courses/#{@course.id}/content_migrations"
+        expect(lti_launch.params['content_item_return_url']).to eq "http://test.host/courses/#{@course.id}/external_content/success/external_tool_dialog"
         expect(lti_launch.params['accept_multiple']).to eq 'false'
       end
 

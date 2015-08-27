@@ -8,7 +8,7 @@ define([
     displayName: 'ModalContent',
     getDefaultProps(){
       return {
-        className: "ReactModal__InnerSection ReactModal__Body"
+        className: "ReactModal__Body"
       }
     },
     render() {

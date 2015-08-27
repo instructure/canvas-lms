@@ -144,7 +144,7 @@ class CommunicationChannelsController < ApplicationController
 
     return render_unauthorized_action unless has_api_permissions?
 
-    params[:build_pseudonym] = 0 if api_request?
+    params[:build_pseudonym] = false if api_request?
 
     skip_confirmation = value_to_boolean(params[:skip_confirmation]) &&
         (Account.site_admin.grants_right?(@current_user, :manage_students) || @domain_root_account.grants_right?(@current_user, :manage_students))
@@ -191,7 +191,7 @@ class CommunicationChannelsController < ApplicationController
     @cc.user = @user
     @cc.re_activate! if @cc.retired?
     @cc.workflow_state = skip_confirmation ? 'active' : 'unconfirmed'
-    @cc.build_pseudonym_on_confirm = params[:build_pseudonym].to_i > 0
+    @cc.build_pseudonym_on_confirm = value_to_boolean(params[:build_pseudonym])
 
     # Save channel and return response
     if @cc.save

@@ -63,7 +63,7 @@ describe AssignmentGroupsController, type: :request do
     course_with_teacher(:active_all => true)
   end
 
-  it "should sort the returned list of assignment groups" do
+  it "sorts the returned list of assignment groups" do
     # the API returns the assignments sorted by
     # assignment_groups.position
     group1 = @course.assignment_groups.create!(:name => 'group1')

@@ -8,7 +8,7 @@ define([
     displayName: 'ModalButtons',
     getDefaultProps(){
       return {
-        className: "ReactModal__InnerSection ReactModal__Footer",
+        className: "ReactModal__Footer",
         footerClassName: "ReactModal__Footer-Actions"
       }
     },

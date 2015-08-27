@@ -189,7 +189,7 @@ define [
 
   test 'should parse and format relative to profile timezone', ->
     tz.changeZone(detroit, 'America/Detroit')
-    equal helpers.datetimeFormatted('1970-01-01 00:00:00', hash: {pubDate: false}),
+    equal helpers.datetimeFormatted('1970-01-01 00:00:00'),
       "Jan 1, 1970 at 12:00am"
 
   module 'ifSettingIs',

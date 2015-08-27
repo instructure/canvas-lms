@@ -164,7 +164,7 @@ module Api::V1::Submission
       display_name: 'submissions.zip',
       workflow_state: %w[to_be_zipped zipping zipped errored unattached],
       user_id: @current_user
-    }).order(:created_at).all
+    }).order(:created_at).to_a
 
     attachment = attachments.pop
     attachments.each { |a| a.destroy! }

@@ -84,11 +84,11 @@ define([
 
       //handles data being filled in the inputs if there are name issues on an assignment with an assignment override
       if(assignment.overrideForThisSection != undefined){
-        default_value = $.datetimeString(assignment.overrideForThisSection.due_at, {localize: false, format: 'medium'})
+        default_value = $.datetimeString(assignment.overrideForThisSection.due_at, {format: 'medium'})
         place_holder = assignment.overrideForThisSection.due_at ? null : I18n.t('No Due Date')
       }
       else{
-        default_value = $.datetimeString(assignment.due_at, {localize: false, format: 'medium'})
+        default_value = $.datetimeString(assignment.due_at, {format: 'medium'})
         place_holder = assignment.due_at ? null : I18n.t("No Due Date")
       }
       var anyError = nameError || dueAtError || nameTooLongError

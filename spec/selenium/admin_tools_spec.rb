@@ -3,7 +3,7 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/calendar2_common')
 require File.expand_path(File.dirname(__FILE__) + '/../cassandra_spec_helper')
 
 describe "admin_tools" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   def load_admin_tools_page
     get "/accounts/#{@account.id}/admin_tools"

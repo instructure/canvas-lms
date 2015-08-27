@@ -22,6 +22,7 @@ describe I18n do
   context "_core_en.js" do
     it "should be up-to-date" do
       skip('RAILS_LOAD_ALL_LOCALES=true') unless ENV['RAILS_LOAD_ALL_LOCALES']
+      skip('core en changed in Rails 4 - commit updated _core_en.js after switch') unless CANVAS_RAILS3
       translations = {'en' => I18n.backend.direct_lookup('en').slice(*I18nTasks::Utils::CORE_KEYS)}
 
       # HINT: if this spec fails, run `rake i18n:generate_js`...

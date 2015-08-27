@@ -118,6 +118,15 @@ class NotificationPolicy < ActiveRecord::Base
     NotificationPolicy.includes(:notification).for(user)
   end
 
+  # Updates notification policies for a given category in a given communication channel
+  def self.find_or_update_for_category(communication_channel, category, frequency = nil)
+    notifs = Notification.where("category = ?", category)
+    raise ActiveRecord::RecordNotFound unless notifs.exists?
+    notifs.map do |notif|
+      NotificationPolicy.find_or_update_for(communication_channel, notif.name, frequency)
+    end
+  end
+
   # Finds the current policy for a given communication channel, or creates it (with default)
   # and/or updates it
   def self.find_or_update_for(communication_channel, notification_name, frequency = nil)

@@ -73,9 +73,9 @@ class PseudonymsController < ApplicationController
     email = params[:pseudonym_session][:unique_id_forgot] if params[:pseudonym_session]
     @ccs = []
     if email.present?
-      @ccs = CommunicationChannel.email.by_path(email).active.all
+      @ccs = CommunicationChannel.email.by_path(email).active.to_a
       if @ccs.empty?
-        @ccs += CommunicationChannel.email.by_path(email).all
+        @ccs += CommunicationChannel.email.by_path(email).to_a
       end
       if @domain_root_account
         @domain_root_account.pseudonyms.active.by_unique_id(email).each do |p|
@@ -187,7 +187,7 @@ class PseudonymsController < ApplicationController
   #   them, or unassociated logins. New providers will only search for logins
   #   explicitly associated with them. This can be the integer ID of the
   #   provider, or the type of the provider (in which case, it will find the
-  #   first matching provider)
+  #   first matching provider).
   #
   # @example_request
   #

@@ -133,7 +133,7 @@ define [
 
     render: withReactElement ->
       div {className: 'ReactModal__Layout'},
-        div {className: 'ReactModal__InnerSection ReactModal__Header'},
+        div {className: 'ReactModal__Header'},
           div {className: 'ReactModal__Header-Title'},
             h4 {},
               I18n.t('Manage Usage Rights')
@@ -142,7 +142,7 @@ define [
               i {className: 'icon-x'},
                 span {className: 'screenreader-only'},
                   I18n.t('Close')
-        div {className: 'ReactModal__InnerSection ReactModal__Body'},
+        div {className: 'ReactModal__Body'},
           div { ref: 'form', className: 'form-dialog'},
             div {},
               div {className: 'UsageRightsDialog__paddingFix grid-row'},
@@ -158,7 +158,7 @@ define [
                     copyright: @copyright
                     cc_value: @cc_value
                   }
-        div {className: 'ReactModal__InnerSection ReactModal__Footer'},
+        div {className: 'ReactModal__Footer'},
           div {className: 'ReactModal__Footer-Actions'},
             button {
               ref: 'cancelButton'

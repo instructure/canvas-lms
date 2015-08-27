@@ -1,13 +1,79 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/wiki_and_tiny_common')
+require File.expand_path(File.dirname(__FILE__) + '/helpers/public_courses_context')
 
-describe "Navigating to wiki pages" do
-  include_examples "in-process server selenium tests"
+describe "Wiki Pages" do
+  include_context "in-process server selenium tests"
 
-  describe "Navigation" do
+  context "Navigation" do
     before do
       account_model
       course_with_teacher_logged_in :account => @account
+    end
+
+    it "should navigate to pages tab with no front page set", priority: "1", test_id: 126843 do
+      @course.wiki.wiki_pages.create!(title: 'Page1')
+      @course.wiki.wiki_pages.create!(title: 'Page2')
+      get "/courses/#{@course.id}"
+      f('.pages').click()
+      expect(driver.current_url).to include("/courses/#{@course.id}/pages")
+      expect(driver.current_url).not_to include("/courses/#{@course.id}/wiki")
+      get "/courses/#{@course.id}/wiki"
+      expect(driver.current_url).to include("/courses/#{@course.id}/pages")
+      expect(driver.current_url).not_to include("/courses/#{@course.id}/wiki")
+    end
+
+    it "should navigate to front page when set", priority: "1", test_id: 126844 do
+      front = @course.wiki.wiki_pages.create!(title: 'Front')
+      front.set_as_front_page!
+      front.save!
+      get "/courses/#{@course.id}"
+      f('.pages').click()
+      expect(driver.current_url).not_to include("/courses/#{@course.id}/pages")
+      expect(driver.current_url).to include("/courses/#{@course.id}/wiki")
+      expect(f('span.front-page.label')).to include_text 'Front Page'
+      get "/courses/#{@course.id}/pages"
+      expect(driver.current_url).to include("/courses/#{@course.id}/pages")
+      expect(driver.current_url).not_to include("/courses/#{@course.id}/wiki")
+    end
+
+    it "should have correct front page UI elements when set as home page", priority: "1", test_id: 126848 do
+      front = @course.wiki.wiki_pages.create!(title: 'Front')
+      front.set_as_front_page!
+      front.save!
+      get "/courses/#{@course.id}/wiki"
+      f('.home').click()
+      # setting front-page as home page
+      fj('.btn.button-sidebar-wide:contains("Choose Home Page")').click()
+      fj('input[type=radio][value=wiki]').click()
+      fj('button.btn.btn-primary.button_type_submit.ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-text-only').click()
+      f('.home').click()
+      wait_for_ajaximations
+      # validations
+      expect(element_exists('.al-trigger')).to be_truthy
+      expect(f('.course-title')).to include_text 'Unnamed Course'
+      expect(element_exists('span.front-page.label')).to be_falsey
+      expect(element_exists('button.btn.btn-published')).to be_falsey
+      f('.al-trigger').click()
+      expect(element_exists('.icon-trash')).to be_falsey
+      expect(element_exists('.icon-clock')).to be_truthy
+    end
+
+    it "should display a creative commons license when set", priority: "1", test_id: 272274 do
+      @course.license =  'cc_by_sa'
+      @course.save!
+      front = @course.wiki.wiki_pages.create!(title: 'Front Page with License')
+      front.set_as_front_page!
+      front.save!
+      get "/courses/#{@course.id}/wiki"
+      f('.home').click()
+      # setting front-page as home page
+      fj('.btn.button-sidebar-wide:contains("Choose Home Page")').click()
+      fj('input[type=radio][value=wiki]').click()
+      fj('button.btn.btn-primary.button_type_submit.ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-text-only').click()
+      f('.home').click()
+      wait_for_ajaximations
+      expect(f('.public-license-text').text).to include('This course content is offered under a')
     end
 
     it "navigates to the wiki pages edit page from the show page" do
@@ -19,9 +85,65 @@ describe "Navigating to wiki pages" do
 
       keep_trying_until { expect(driver.current_url).to eq edit_url }
     end
+
+    it "should alert a teacher when accessing a non-existant page", priority: "1", test_id: 126842 do
+      get "/courses/#{@course.id}/pages/fake"
+      expect(flash_message_present?(:info)).to be_truthy
+    end
   end
 
-  describe "Accessibility" do
+  context "Index Page as a teacher" do
+    before do
+      account_model
+      course_with_teacher_logged_in
+    end
+
+    it "should edit page title from pages index", priority: "1", test_id: 126849 do
+      @course.wiki.wiki_pages.create!(title: 'B-Team')
+      get "/courses/#{@course.id}/pages"
+      f('.al-trigger').click()
+      f('.edit-menu-item').click()
+      expect(f('.edit-control-text').attribute(:value)).to include_text('B-Team')
+      f('.edit-control-text').clear()
+      f('.edit-control-text').send_keys('A-Team')
+      fj('button:contains("Save")').click
+      wait_for_ajaximations
+      expect(f('.collectionViewItems').text).to include('A-Team')
+    end
+
+    it "should display a warning alert when accessing a deleted page", priority: "1", test_id: 126840 do
+      @course.wiki.wiki_pages.create!(title: 'deleted')
+      get "/courses/#{@course.id}/pages"
+      f('.al-trigger').click()
+      f('.delete-menu-item').click()
+      fj('button:contains("Delete")').click()
+      wait_for_ajaximations
+      get "/courses/#{@course.id}/pages/deleted"
+      expect(flash_message_present?(:info)).to be_truthy
+    end
+  end
+
+  context "Index Page as a student" do
+    before do
+      course_with_student_logged_in
+    end
+
+    it "should display a warning alert to a student when accessing a deleted page", priority: "1", test_id: 126839 do
+      page = @course.wiki.wiki_pages.create!(title: 'delete_deux')
+      # sets the workflow_state = deleted to act as a deleted page
+      page.workflow_state = 'deleted'
+      page.save!
+      get "/courses/#{@course.id}/pages/delete_deux"
+      expect(flash_message_present?(:warning)).to be_truthy
+    end
+
+    it "should display a warning alert when accessing a non-existant page", priority: "1", test_id: 126841 do
+      get "/courses/#{@course.id}/pages/non-existant"
+      expect(flash_message_present?(:warning)).to be_truthy
+    end
+  end
+
+  context "Accessibility" do
 
     def check_header_focus(attribute)
       f("[data-sort-field='#{attribute}']").click()
@@ -70,7 +192,8 @@ describe "Navigating to wiki pages" do
       end
     end
 
-    describe "Publish Cloud" do
+    context "Publish Cloud" do
+
       it "should set focus back to the publish cloud after unpublish" do
         get "/courses/#{@course.id}/pages"
         f('.publish-icon').click
@@ -87,7 +210,7 @@ describe "Navigating to wiki pages" do
       end
     end
 
-    describe "Delete Page" do
+    context "Delete Page" do
 
       before do
         get "/courses/#{@course.id}/pages"
@@ -135,7 +258,7 @@ describe "Navigating to wiki pages" do
       end
     end
 
-    describe "Use as Front Page Link" do
+    context "Use as Front Page Link" do
       before :each do
         get "/courses/#{@course.id}/pages"
         f('.al-trigger').click
@@ -153,7 +276,7 @@ describe "Navigating to wiki pages" do
       end
     end
 
-    describe "Cog menu" do
+    context "Cog menu" do
       before :each do
         get "/courses/#{@course.id}/pages"
         f('.al-trigger').click
@@ -191,7 +314,7 @@ describe "Navigating to wiki pages" do
       end
     end
 
-    describe "Revisions Page" do
+    context "Revisions Page" do
       before :once do
         account_model
         course_with_teacher :account => @account, :active_all => true
@@ -245,37 +368,72 @@ describe "Navigating to wiki pages" do
 
     end
 
-    describe "Edit Page" do
+    context "Edit Page" do
       before :each do
         get "/courses/#{@course.id}/pages/bar/edit"
         wait_for_ajaximations
       end
 
-      it "should alert user if navigating away from page with unsaved RCE changes" do
+      it "should alert user if navigating away from page with unsaved RCE changes", priority: "1", test_id: 267612 do
         add_text_to_tiny("derp")
         f('.home').click()
         expect(driver.switch_to.alert.text).to be_present
         driver.switch_to.alert.accept
       end
 
-      it "should alert user if navigating away from page with unsaved html changes" do
-        fj('a.switch_views:visible').click
+      it "should alert user if navigating away from page with unsaved html changes", priority: "1", test_id: 126838 do
+        fj('a.switch_views:visible').click()
         f('textarea').send_keys("derp")
         f('.home').click()
         expect(driver.switch_to.alert.text).to be_present
         driver.switch_to.alert.accept
       end
-    end
 
+      it "should not save changes when navigating away and not saving", priority: "1", test_id: 267613 do
+        fj('a.switch_views:visible').click()
+        f('textarea').send_keys('derp')
+        f('.home').click()
+        expect(driver.switch_to.alert.text).to be_present
+        driver.switch_to.alert.accept
+        get "/courses/#{@course.id}/pages/bar/edit"
+        expect(f('textarea')).not_to include_text('derp')
+      end
+
+      it "should alert user if navigating away from page after title change", priority: "1", test_id: 267832 do
+        fj('a.switch_views:visible').click()
+        f('.title').clear()
+        f('.title').send_keys("derpy-title")
+        f('.home').click()
+        expect(driver.switch_to.alert.text).to be_present
+        driver.switch_to.alert.accept
+      end
+    end
   end
 
-  describe "Show Page" do
-    it "shows lock information with prerequisites" do
+  context "Show Page" do
+    before do
       account_model
       course_with_student_logged_in account: @account
-      foo = @course.wiki.wiki_pages.create! title: "foo"
-      bar = @course.wiki.wiki_pages.create! title: "bar"
-      mod = @course.context_modules.create! name: "teh_mod", require_sequential_progress: true
+    end
+    
+    it "should lock page based on module date", priority: "1", test_id: 126845 do
+      locked = @course.wiki.wiki_pages.create! title: 'locked'
+      mod2 = @course.context_modules.create! name: 'mod2', unlock_at: 1.day.from_now
+      mod2.add_item id: locked.id, type: 'wiki_page'
+      mod2.save!
+
+      get "/courses/#{@course.id}/pages/locked"
+      wait_for_ajaximations
+      # validation
+      lock_explanation = f('.lock_explanation').text
+      expect(lock_explanation).to include "This page is locked until"
+      expect(lock_explanation).to include 'The following requirements need to be completed before this page will be unlocked:'
+    end
+
+    it "should lock page based on module progression", priority: "1", test_id: 126846 do
+      foo = @course.wiki.wiki_pages.create! title: 'foo'
+      bar = @course.wiki.wiki_pages.create! title: 'bar'
+      mod = @course.context_modules.create! name: 'the_mod', require_sequential_progress: true
       foo_item = mod.add_item id: foo.id, type: 'wiki_page'
       bar_item = mod.add_item id: bar.id, type: 'wiki_page'
       mod.completion_requirements = {foo_item.id => {type: 'must_view'}, bar_item.id => {type: 'must_view'}}
@@ -283,19 +441,19 @@ describe "Navigating to wiki pages" do
 
       get "/courses/#{@course.id}/pages/bar"
       wait_for_ajaximations
-
+      # validation
       lock_explanation = f('.lock_explanation').text
-      expect(lock_explanation).to include "This page is part of the module teh_mod and hasn't been unlocked yet"
+      expect(lock_explanation).to include "This page is part of the module the_mod and hasn't been unlocked yet"
       expect(lock_explanation).to match /foo\s+must view the page/
     end
   end
 
-  describe "Permissions" do
+  context "Permissions" do
     before do
       course_with_teacher
     end
 
-    it "displays public content to unregistered users" do
+    it "displays public content to unregistered users", priority: "1", test_id: 270035 do
       Canvas::Plugin.register(:kaltura, nil, :settings => {'partner_id' => 1, 'subpartner_id' => 2, 'kaltura_sis' => '1'})
 
       @course.is_public = true
@@ -345,6 +503,18 @@ describe "Navigating to wiki pages" do
       expect(link).to be_displayed
       expect(link.text).to match_ignoring_whitespace(@tool.label_for(:wiki_page_menu))
       expect(link['href']).to eq course_external_tool_url(@course, @tool) + "?launch_type=wiki_page_menu&pages[]=#{@wiki_page.id}"
+    end
+  end
+
+  context "when a public course is accessed" do
+    include_context "public course as a logged out user"
+
+    it "should display wiki content", priority: "1", test_id: 270035 do
+      title = "foo"
+      public_course.wiki.wiki_pages.create!(:title => title, :body => "bar")
+
+      get "/courses/#{public_course.id}/wiki/#{title}"
+      expect(f('.user_content')).not_to be_nil
     end
   end
 end

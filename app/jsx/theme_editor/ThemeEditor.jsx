@@ -227,115 +227,119 @@ define([
             className="Theme__container">
             <input name="utf8" type="hidden" value="✓" />
             <input name="authenticity_token" type="hidden" value={$.cookie('_csrf_token')} />
-            <div className="Theme__editor">
 
-              <div className="Theme__editor-header">
-                <div className="Theme__editor-header_title">
-                  <i className="Theme__editor-header_title-icon icon-instructure" aria-hidden="true" />
-                  <h1 className="Theme__editor-header_title-text">
-                    {I18n.t('Theme Editor')}
-                  </h1>
-                </div>
+            <div className="Theme__layout">
 
-                <div className="Theme__editor-header_actions">
-                  <span
-                    data-tooltip="bottom"
-                    title={this.somethingHasChanged() ?
-                      I18n.t('You need to "Preview Your Changes" before applying to everyone.') :
-                      null
-                    }
-                  >
+              <div className="Theme__editor">
+
+                <div className="Theme__editor-header">
+                  <div className="Theme__editor-header_title">
+                    <i className="Theme__editor-header_title-icon icon-instructure" aria-hidden="true" />
+                    <h1 className="Theme__editor-header_title-text">
+                      {I18n.t('Theme Editor')}
+                    </h1>
+                  </div>
+
+                  <div className="Theme__editor-header_actions">
+                    <span
+                      data-tooltip="bottom"
+                      title={this.somethingHasChanged() ?
+                        I18n.t('You need to "Preview Your Changes" before applying to everyone.') :
+                        null
+                      }
+                    >
+                      <button
+                        type="button"
+                        className="Theme__editor-header_button Button Button--small Button--success"
+                        disabled={!this.props.hasUnsavedChanges || this.somethingHasChanged()}
+                        onClick={this.handleApplyClicked}
+                      >
+                        {I18n.t('Apply')}
+                      </button>
+
+                    </span>
                     <button
                       type="button"
-                      className="Theme__editor-header_button Button Button--success"
-                      disabled={!this.props.hasUnsavedChanges || this.somethingHasChanged()}
-                      onClick={this.handleApplyClicked}
+                      className="Theme__editor-header_button Button Button--small"
+                      onClick={this.handleCancelClicked}
                     >
-                      {I18n.t('Apply')}
+                      {I18n.t('Cancel')}
                     </button>
-
-                  </span>
-                  <button
-                    type="button"
-                    className="Theme__editor-header_button Button"
-                    onClick={this.handleCancelClicked}
-                  >
-                    {I18n.t('Cancel')}
-                  </button>
-                </div>
-              </div>
-
-              <div className="Theme__editor-tabs">
-
-                { this.renderTabInputs() }
-
-                { this.renderTabLabels() }
-
-                <div id="te-editor-panel" className="Theme__editor-tabs_panel">
-                  <SharedBrandConfigPicker
-                    sharedBrandConfigs={this.props.sharedBrandConfigs}
-                    activeBrandConfigMd5={this.props.brandConfig.md5}
-                    saveToSession={this.saveToSession}
-                    hasUnsavedChanges={this.props.hasUnsavedChanges}
-                    somethingChanged={this.somethingHasChanged()}
-                  />
-                  <ThemeEditorAccordion
-                    variableSchema={this.props.variableSchema}
-                    brandConfigVariables={this.props.brandConfig.variables}
-                    getDisplayValue={this.getDisplayValue}
-                    changedValues={this.state.changedValues}
-                    changeSomething={this.changeSomething}
-                  />
+                  </div>
                 </div>
 
-                { this.props.allowGlobalIncludes ?
-                  <div id="te-upload-panel" className="Theme__editor-tabs_panel">
-                    <div className="Theme__editor-upload-overrides">
+                <div className="Theme__editor-tabs">
 
-                      <div className="Theme__editor-upload-overrides_header">
-                        { I18n.t('Upload CSS and JavaScript files to include on all page loads for your account') }
-                      </div>
+                  { this.renderTabInputs() }
 
-                      <div className="Theme__editor-upload-overrides_form">
+                  { this.renderTabLabels() }
 
-                        <ThemeEditorFileUpload
-                          label={I18n.t('Upload a CSS file...')}
-                          accept=".css"
-                          name="css_overrides"
-                          currentValue={this.props.brandConfig.css_overrides}
-                          userInput={this.state.changedValues.css_overrides}
-                          onChange={this.changeSomething.bind(null, 'css_overrides')}
-                        />
+                  <div id="te-editor-panel" className="Theme__editor-tabs_panel">
+                    <SharedBrandConfigPicker
+                      sharedBrandConfigs={this.props.sharedBrandConfigs}
+                      activeBrandConfigMd5={this.props.brandConfig.md5}
+                      saveToSession={this.saveToSession}
+                      hasUnsavedChanges={this.props.hasUnsavedChanges}
+                      somethingChanged={this.somethingHasChanged()}
+                    />
+                    <ThemeEditorAccordion
+                      variableSchema={this.props.variableSchema}
+                      brandConfigVariables={this.props.brandConfig.variables}
+                      getDisplayValue={this.getDisplayValue}
+                      changedValues={this.state.changedValues}
+                      changeSomething={this.changeSomething}
+                    />
+                  </div>
 
-                        <ThemeEditorFileUpload
-                          label={I18n.t('Upload a JS file...')}
-                          accept=".js"
-                          name="js_overrides"
-                          currentValue={this.props.brandConfig.js_overrides}
-                          userInput={this.state.changedValues.js_overrides}
-                          onChange={this.changeSomething.bind(null, 'js_overrides')}
-                        />
+                  { this.props.allowGlobalIncludes ?
+                    <div id="te-upload-panel" className="Theme__editor-tabs_panel">
+                      <div className="Theme__editor-upload-overrides">
 
+                        <div className="Theme__editor-upload-overrides_header">
+                          { I18n.t('Upload CSS and JavaScript files to include on all page loads for your account') }
+                        </div>
+
+                        <div className="Theme__editor-upload-overrides_form">
+
+                          <ThemeEditorFileUpload
+                            label={I18n.t('Upload a CSS file...')}
+                            accept=".css"
+                            name="css_overrides"
+                            currentValue={this.props.brandConfig.css_overrides}
+                            userInput={this.state.changedValues.css_overrides}
+                            onChange={this.changeSomething.bind(null, 'css_overrides')}
+                          />
+
+                          <ThemeEditorFileUpload
+                            label={I18n.t('Upload a JS file...')}
+                            accept=".js"
+                            name="js_overrides"
+                            currentValue={this.props.brandConfig.js_overrides}
+                            userInput={this.state.changedValues.js_overrides}
+                            onChange={this.changeSomething.bind(null, 'js_overrides')}
+                          />
+
+                        </div>
                       </div>
                     </div>
-                  </div>
-                : null}
+                  : null}
+
+                </div>
 
               </div>
+
               <div className="Theme__preview">
                 { this.somethingHasChanged() ?
                   <div className="Theme__preview-overlay">
-                    <div className="Theme__preview-overlay__container">
-                      <button
-                        type="submit"
-                        className="Button Button--primary"
-                        disabled={this.invalidForm()}>
-                        <i className="icon-refresh" />
-                        <span className="Theme__preview-button-text">
-                          {I18n.t('Preview Your Changes')}
-                        </span>
-                      </button>
-                    </div>
+                    <button
+                      type="submit"
+                      className="Button Button--primary"
+                      disabled={this.invalidForm()}>
+                      <i className="icon-refresh" />
+                      <span className="Theme__preview-button-text">
+                        {I18n.t('Preview Your Changes')}
+                      </span>
+                    </button>
                   </div>
                 : null }
                 <iframe ref="previewIframe" src="/theme-preview/?editing_brand_config=1" />

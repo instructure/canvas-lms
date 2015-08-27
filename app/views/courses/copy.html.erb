@@ -28,7 +28,7 @@
       <%= f.text_field :start_at,
                        class: 'datetime_field',
                        style: "width: 165px;",
-                       value: unlocalized_datetime_string(@context.start_at, :verbose),
+                       value: datetime_string(@context.start_at, :verbose),
                        "aria-labelledby" => "course_starts_at_label",
                        "data-tooltip" => "",
                        title: accessible_date_format %>
@@ -46,7 +46,7 @@
       <%= f.text_field :conclude_at,
                        class: 'datetime_field',
                        style: "width: 165px;",
-                       value: unlocalized_datetime_string(@context.conclude_at, :verbose),
+                       value: datetime_string(@context.conclude_at, :verbose),
                        "aria-labelledby" => "course_ends_at_label",
                        "data-tooltip" => "",
                        title: accessible_date_format %>

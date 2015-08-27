@@ -60,16 +60,14 @@
 
   <div class="control-group">
     <label class="control-label"
-           role="button"
-           aria-label="{{#t}}Add Attachment{{/t}}"
-           tabindex="0"
-           for="discussion_attachment_uploaded_data">
+      aria-label="{{#t}}Add Attachment{{/t}}"
+      for="discussion_attachment_uploaded_data">
       {{#t "attachment"}}Attachment{{/t}}
     </label>
     <div class="controls">
       {{#each attachments}}
         <div class="attachmentRow">
-          <a href="{{url}}" class="{{mimeClass content-type}}">
+          <a aria-label="attachment" href="{{url}}" class="{{mimeClass content-type}}">
             {{display_name}}
           </a>
           <button type="button"
@@ -91,7 +89,7 @@
 
   {{#ifAny isTopic contextIsCourse canModerate showAssignment}}
   <div class="control-group">
-    <label class="control-label">{{#t "options"}}Options{{/t}}</label>
+    <div class="control-label">{{#t "options"}}Options{{/t}}</div>
     <div class="controls">
       {{#if isTopic}}
         <label class="checkbox" for="threaded">
@@ -120,7 +118,7 @@
                    class="datetime_field input-medium"
                    name="delayed_post_at"
                    {{! TODO: what would be the best way to get this formatted right? }}
-                   value="{{datetimeFormatted delayed_post_at false}}"
+                   value="{{datetimeFormatted delayed_post_at}}"
                    aria-labelledby="discussion_topic_delay_post_accessible_label"
                    data-tooltip='{"position":"top","force_position":"true"}'
                    title="{{accessibleDateFormat}}" />
@@ -215,7 +213,7 @@
                    id="delayed_post_at"
                    aria-labelledby="discussion_topic_available_from_accessible_label"
                    {{! TODO: what would be the best way to get this formatted right? }}
-                   value="{{datetimeFormatted delayed_post_at false}}"
+                   value="{{datetimeFormatted delayed_post_at}}"
                    data-tooltip='{"position":"top","force_position":"true"}'
                    title="{{accessibleDateFormat}}"/>
           </div>
@@ -237,7 +235,7 @@
                      id="lock_at"
                      aria-labelledby="discussion_topic_available_until_accessible_label"
                      {{! TODO: what would be the best way to get this formatted right? }}
-                     value="{{datetimeFormatted lock_at false}}"
+                     value="{{datetimeFormatted lock_at}}"
                      data-tooltip='{"position":"top","force_position":"true"}'
                      title="{{accessibleDateFormat}}"/>
             </div>

@@ -2,7 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 
 
 describe "oauth2 flow" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   before do
     @key = DeveloperKey.create!(:name => 'Specs', :redirect_uri => 'http://www.example.com')
@@ -50,7 +50,7 @@ describe "oauth2 flow" do
   end
 
   describe "oauth2 tool icons" do
-    include_examples "in-process server selenium tests"
+    include_context "in-process server selenium tests"
     before do
       course_with_student_logged_in(:active_all => true)
     end

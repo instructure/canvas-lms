@@ -277,6 +277,8 @@ class DiscussionTopicsController < ApplicationController
               @context.active_discussion_topics.only_discussion_topics
             end
 
+    scope = DiscussionTopic::ScopedToUser.new(@context, @current_user, scope).scope
+
     scope = if params[:order_by] == 'recent_activity'
               scope.by_last_reply_at
             elsif params[:only_announcements]
@@ -300,10 +302,6 @@ class DiscussionTopicsController < ApplicationController
       elsif states.include?('unpinned')
         scope = scope.where("discussion_topics.pinned IS NOT TRUE")
       end
-    end
-
-    if @context.feature_enabled?(:differentiated_assignments)
-      scope = scope_for_differentiated_assignments(scope)
     end
 
     @topics = Api.paginate(scope, self, topic_pagination_url)
@@ -352,23 +350,6 @@ class DiscussionTopicsController < ApplicationController
       end
     end
   end
-
-  def scope_for_differentiated_assignments(scope)
-    return scope if @context.is_a?(Account)
-    return DifferentiableAssignment.scope_filter(scope, @current_user, @context) if @context.is_a?(Course)
-    return scope if @context.context.is_a?(Account)
-
-    # group context owned by a course
-    course = @context.context
-    course_scope = course.discussion_topics.active
-    course_level_topic_ids = DifferentiableAssignment.scope_filter(course_scope, @current_user, course).pluck(:id)
-    if course_level_topic_ids.any?
-      scope.where("root_topic_id IN (?) OR root_topic_id IS NULL OR id IN (?)", course_level_topic_ids, course_level_topic_ids)
-    else
-      scope.where(root_topic_id: nil)
-    end
-  end
-  private :scope_for_differentiated_assignments
 
   def is_child_topic?
     root_topic_id = params[:root_discussion_topic_id]
@@ -630,6 +611,9 @@ class DiscussionTopicsController < ApplicationController
   #   announcement's section rather than the discussions section. This requires
   #   announcment-posting permissions.
   #
+  # @argument pinned [Boolean]
+  #   If true, this topic will be listed in the "Pinned Discussion" section
+  #
   # @argument position_after [String]
   #   By default, discussions are sorted chronologically by creation date, you
   #   can pass the id of another topic to have this one show up after the other
@@ -638,6 +622,15 @@ class DiscussionTopicsController < ApplicationController
   # @argument group_category_id [Integer]
   #   If present, the topic will become a group discussion assigned
   #   to the group.
+  #
+  # @argument allow_rating [Boolean]
+  #   If true, users will be allowed to rate entries.
+  #
+  # @argument only_graders_can_rate [Boolean]
+  #   If true, only graders will be allowed to rate entries.
+  #
+  # @argument sort_by_rating [Boolean]
+  #   If true, entries will be sorted by rating.
   #
   # @example_request
   #     curl https://<canvas>/api/v1/courses/<course_id>/discussion_topics \
@@ -703,6 +696,9 @@ class DiscussionTopicsController < ApplicationController
   #   If true, this topic is an announcement. It will appear in the
   #   announcement's section rather than the discussions section. This requires
   #   announcment-posting permissions.
+  #
+  # @argument pinned [Boolean]
+  #   If true, this topic will be listed in the "Pinned Discussion" section
   #
   # @argument position_after [String]
   #   By default, discussions are sorted chronologically by creation date, you

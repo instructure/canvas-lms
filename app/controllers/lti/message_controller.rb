@@ -32,6 +32,8 @@ module Lti
             ->(tool_proxy_uuid) { polymorphic_url([@context, :registration_return], tool_proxy_uuid: tool_proxy_uuid) }
         )
         @lti_launch.params = message.post_params
+        @lti_launch.params['ext_tool_consumer_instance_guid'] = @context.root_account.lti_guid
+        @lti_launch.params['ext_api_domain'] = HostUrl.context_host(@context, request.host)
         @lti_launch.link_text = I18n.t('lti2.register_tool', 'Register Tool')
         @lti_launch.launch_type = message.launch_presentation_document_target
 

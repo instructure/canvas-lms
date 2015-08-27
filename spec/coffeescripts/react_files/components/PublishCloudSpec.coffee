@@ -34,7 +34,7 @@ define [
 
   module 'PublishCloud Student View',
     setup: ->
-      @model = new FilesystemObject(locked: false, hidden: true, lock_at: '123', unlock_at: '123', id: 42)
+      @model = new FilesystemObject(locked: false, hidden: true, lock_at: '2014-02-01', unlock_at: '2014-01-01', id: 42)
       @model.url = -> "/api/v1/folders/#{@id}"
       props =
         model: @model
@@ -47,7 +47,7 @@ define [
 
   test 'should display a non clickable restricted dates icon', ->
     equal @publishCloud.refs.publishCloud.props.onClick, undefined, 'does not have a click event'
-    equal @publishCloud.refs.publishCloud.props.title, "Available after Jan 1, 1970 at 12:00am until Jan 1, 1970 at 12:00am", "has a available from hoverover"
+    equal @publishCloud.refs.publishCloud.props.title, "Available after Jan 1, 2014 at 12:00am until Feb 1, 2014 at 12:00am", "has a available from hoverover"
 
   # Unit Tests
 

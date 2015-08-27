@@ -3,9 +3,10 @@ define [
   'jquery'
   'Backbone'
   'compiled/views/groups/manage/GroupEditView'
+  'compiled/views/groups/manage/GroupCategoryCloneView'
   'jst/groups/manage/groupDetail'
   'compiled/jquery.rails_flash_notifications'
-], (I18n, $, {View}, GroupEditView, template) ->
+], (I18n, $, {View}, GroupEditView, GroupCategoryCloneView, template) ->
 
   class GroupDetailView extends View
 
@@ -46,9 +47,25 @@ define [
 
     deleteGroup: (e) =>
       e.preventDefault()
-      unless confirm I18n.t('delete_confirm', 'Are you sure you want to remove this group?')
+      if confirm I18n.t('delete_confirm', 'Are you sure you want to remove this group?')
+        if @model.get("has_submission")
+          @cloneCategoryView = new GroupCategoryCloneView
+            model: @model.collection.category
+            openedFromCaution: true
+          @cloneCategoryView.open()
+          @cloneCategoryView.on "close", =>
+            if @cloneCategoryView.cloneSuccess
+              window.location.reload()
+            else if @cloneCategoryView.changeGroups
+              @performDeleteGroup()
+            else
+              @$groupActions.focus()
+        else
+          @performDeleteGroup()
+      else
         @$groupActions.focus()
-        return
+
+    performDeleteGroup: ->
       @model.destroy
         success: -> $.flashMessage I18n.t('flash.removed', 'Group successfully removed.')
         error: -> $.flashError I18n.t('flash.removeError', 'Unable to remove the group. Please try again later.')

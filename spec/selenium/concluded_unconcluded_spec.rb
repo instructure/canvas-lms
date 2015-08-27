@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "concluded/unconcluded" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   before do
     username = "nobody@example.com"

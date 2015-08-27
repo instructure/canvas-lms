@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 
 describe "account admin courses tab" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   def add_course(course_name, has_student = false)
     Account.default.courses.create(:name => course_name).offer!

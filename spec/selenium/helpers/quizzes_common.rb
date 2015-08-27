@@ -1,8 +1,5 @@
 require_relative "../common"
 
-shared_examples_for "quizzes selenium tests" do
-  include_examples "in-process server selenium tests"
-
   def create_quiz_with_default_due_dates
     due_at = Time.zone.now
     unlock_at = Time.zone.now.advance(days:-2)
@@ -432,4 +429,31 @@ shared_examples_for "quizzes selenium tests" do
     target = "#group_top_#{group_id} + *"
     js_drag_and_drop source, target
   end
+
+def quiz_create(params={})
+
+  @quiz = @course.quizzes.create
+
+  default_params = {
+      quiz_name: 'bender',
+      question_name: 'shiny',
+  }
+  params = default_params.merge(params)
+
+  answers = [
+      {weight: 100, answer_text: 'A', answer_comments: '', id: 1490},
+      {weight: 0, answer_text: 'B', answer_comments: '', id: 1020},
+      {weight: 0, answer_text: 'C', answer_comments: '', id: 7051}
+  ]
+  data = { question_name:params[:quiz_name], points_possible: 1, question_text: params[:question_name],
+           answers: answers, question_type: 'multiple_choice_question'
+  }
+
+  @quiz.quiz_questions.create!(question_data: data)
+
+  @quiz.workflow_state = "available"
+  @quiz.generate_quiz_data
+  @quiz.published_at = Time.now
+  @quiz.save!
+  @quiz
 end

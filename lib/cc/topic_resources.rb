@@ -17,16 +17,17 @@
 #
 module CC
   module TopicResources
-    
+
     def add_topics
-      @course.discussion_topics.active.each do |topic|
+      scope = @course.discussion_topics.active
+      DiscussionTopic::ScopedToUser.new(@course, @user, scope).scope.each do |topic|
         if topic.is_announcement
           next unless export_object?(topic, 'announcements')
         else
           next unless export_object?(topic) || export_object?(topic.assignment)
         end
 
-        title = topic.title rescue I18n.t('course_exports.unknown_titles.topic', "Unknown topic")
+        title = topic.title || I18n.t('course_exports.unknown_titles.topic', "Unknown topic")
 
         if topic.assignment && !topic.assignment.can_copy?(@user)
           add_error(I18n.t('course_exports.errors.topic_is_locked', "The topic \"%{title}\" could not be copied because it is locked.", :title => title))

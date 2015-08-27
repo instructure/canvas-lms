@@ -180,6 +180,18 @@ module CustomSeleniumActions
     end
   end
 
+  def proceed_form(form)
+    proceed_button_css = 'button[type="button"]'
+    button = form.is_a?(Selenium::WebDriver::Element) ? form.find_element(:css, proceed_button_css) : f("#{form} #{proceed_button_css}")
+    # the button may have been hidden via fixDialogButtons
+    dialog = dialog_for(button)
+    if !button.displayed? && dialog
+      submit_dialog(dialog)
+    else
+      button.click
+    end
+  end
+
   def submit_dialog(dialog, submit_button_css = ".ui-dialog-buttonpane .button_type_submit")
     dialog = f(dialog) unless dialog.is_a?(Selenium::WebDriver::Element)
     dialog = dialog_for(dialog)

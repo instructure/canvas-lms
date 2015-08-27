@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 
 shared_examples_for "external tools tests" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   def tool_checker (tool, opts)
 

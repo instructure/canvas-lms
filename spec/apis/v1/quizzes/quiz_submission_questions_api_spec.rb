@@ -327,17 +327,21 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
       end
 
       it "shouldn't give any answers information" do
-        question = create_question 'multiple_choice'
+        mc = create_question 'multiple_choice'
+        formula = create_question 'numerical'
 
         json = api_answer({
           quiz_questions: [{
-            id: question.id,
+            id: mc.id,
             answer: 1658
-          }]
+          }, {
+            id: formula.id,
+            answer: 40.0
+            }]
         })
 
-        # TODO: add more question types checks for no leaked answers
-        expect(json['quiz_submission_questions'].flat_map {|h| h["answers"].flat_map(&:keys) }.uniq.include? "weight").to be_falsey
+        expect(json['quiz_submission_questions'][0]["answers"].map(&:keys).uniq.include? "weight").to be_falsey
+        expect(json['quiz_submission_questions'][1]["answers"]).to equal(nil)
       end
 
       context 'answering questions' do

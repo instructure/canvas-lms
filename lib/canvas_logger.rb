@@ -4,6 +4,9 @@ class CanvasLogger < (CANVAS_RAILS3 ? ActiveSupport::BufferedLogger : ActiveSupp
   attr_reader :log_path
 
   def initialize(log_path, level = DEBUG, options = {})
+    unless File.exist?(log_path)
+      FileUtils.mkdir_p(File.dirname(log_path))
+    end
     super(log_path, level)
     @log_path = log_path
     @skip_thread_context = options[:skip_thread_context]

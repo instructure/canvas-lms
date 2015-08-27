@@ -4,7 +4,7 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/assignment_overrides
 describe "quizzes" do
 
   include AssignmentOverridesSeleniumHelper
-  include_examples "quizzes selenium tests"
+  include_context 'in-process server selenium tests'
 
   def add_question_to_group
     f('.add_question_link').click
@@ -317,7 +317,7 @@ describe "quizzes" do
       end
     end
 
-    it "should validate numerical input data", priority: "2", test_id: 210066 do
+    it "should validate numerical input data", priority: "1", test_id: 210066 do
       @quiz = quiz_with_new_questions do |bank, quiz|
         aq = bank.assessment_questions.create!
         quiz.quiz_questions.create!(:question_data => {:name => "numerical", 'question_type' => 'numerical_question', 'answers' => [], :points_possible => 1}, :assessment_question => aq)
@@ -571,16 +571,6 @@ describe "quizzes" do
       quiz_original_end_time < Quizzes::QuizSubmission.last.end_at
       assert_flash_notice_message /You have been given extra time on this attempt/
       expect(f('.time_running').text).to match /19 Minutes/
-    end
-
-
-    it "should display quiz statistics", priority: "1", test_id: 210071 do
-      quiz_with_submission
-      get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
-
-      click_quiz_statistics_button
-
-      expect(f('#content .question-statistics .question-text')).to include_text("Which book(s) are required for this course?")
     end
 
     it "should display a link to quiz statistics for a MOOC", priority: "2", test_id: 210072 do

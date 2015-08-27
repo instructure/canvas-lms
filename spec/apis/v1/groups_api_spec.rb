@@ -40,7 +40,8 @@ describe "Groups API", type: :request do
       'role' => group.group_category.role,
       'group_category_id' => group.group_category_id,
       'storage_quota_mb' => group.storage_quota_mb,
-      'leader' => group.leader
+      'leader' => group.leader,
+      'has_submission' => group.submission?
     }
     if opts[:include_users]
       json['users'] = users_json(group.users, opts)
@@ -673,7 +674,7 @@ describe "Groups API", type: :request do
       expect {
         @json = api_call(:post, "#{@community_path}/invite", @category_path_options.merge(:group_id => @community.to_param, :action => "invite"), invitees)
       }.to change(User, :count).by(2)
-      @memberships = @community.reload.group_memberships.where(:workflow_state => "invited").order(:id).all
+      @memberships = @community.reload.group_memberships.where(:workflow_state => "invited").order(:id).to_a
       expect(@memberships.count).to eq 2
       expect(@json.sort_by{ |a| a['id'] }).to eq @memberships.map{ |gm| membership_json(gm) }
     end

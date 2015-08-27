@@ -178,13 +178,13 @@ define([
     render() {
       return (
         <form className="ConfigurationForm" onSubmit={this.handleSubmit}>
-          <div className="ReactModal__InnerSection ReactModal__Body--force-no-corners ReactModal__Body">
+          <div className="ReactModal__Body">
             {this.configurationTypeSelector()}
             <div className="formFields">
               {this.form()}
             </div>
           </div>
-          <div className="ReactModal__InnerSection ReactModal__Footer">
+          <div className="ReactModal__Footer">
             <div className="ReactModal__Footer-Actions">
               {this.props.children}
               {this.submitButton()}

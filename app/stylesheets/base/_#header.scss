@@ -269,7 +269,7 @@ $masquerade-link-color: $ic-color-alert;
         @if $use_high_contrast {
           color: $course-dropdown-text-color;
         }
-        font-size: 9px;
+        font-size: 12px;
       }
       .menu-item-drop-float-right {
         float: right;
@@ -293,6 +293,7 @@ $masquerade-link-color: $ic-color-alert;
       }
       .name {
         display: block;
+        font-size: 14px;
       }
     }
   }

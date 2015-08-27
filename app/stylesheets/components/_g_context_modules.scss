@@ -39,11 +39,40 @@ $context_module_bg_color: #f2f3f4;
       float: right;
     }
   }
+
+  .icon-minimize {
+    color: $ic-color-alert;
+  }
+
+  .icon-check {
+    color: $ic-color-success;
+  }
+
   .ig-row {
     display: flex;
     align-items: center;
   }
-  .ig-details { flex: 0.5; }
+  .ig-details { 
+    .due_date_display {
+      text-align: center;
+      @include breakpoint(desktop) {
+        text-align: right;
+      }
+    }
+
+    .points_possible_display {
+      text-align: center;
+    }
+
+    .module-item-status-icon {
+      width: 16px;
+      padding-right: 10px;
+
+      .icon-mark-as-read {
+        opacity: 0.4;
+      }
+    }
+  }
   h2 .name {
     display: inline;
     position: absolute;
@@ -59,16 +88,26 @@ $context_module_bg_color: #f2f3f4;
       left: 20px;
     }
   }
-  .requirement-description {
-    font-size: 11px;
-    line-height: 1.3;
-    flex: 0.34;
-    @include breakpoint(desktop) {
-      flex: 0.5;
+
+  h2 .name {
+    display: inline;
+    position: absolute;
+    left: 45px;
+    right: 140px;
+    top: 6px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+  &.student-view {
+    h2 .name {
+      left: 20px;
     }
   }
+
   .completion_status .complete_icon,
   .locked_icon,
+  .in_progress_icon,
   .progression_details_link,
   .header .links,
   .add_module_item_link,
@@ -122,13 +161,33 @@ $context_module_bg_color: #f2f3f4;
       .complete_icon {
         display: inline;
       }
-      .incomplete_icon,
+      .in_progress_icon,
       .locked_icon {
         display: none;
       }
     }
   }
-  &.locked_module {
+  &.started {
+    .completion_status {
+      .in_progress_icon {
+        display: inline;
+      }
+      .complete_icon,
+      .locked_icon {
+        display: none;
+      }
+    }
+  }
+  &.unlocked {
+    .completion_status {
+      .in_progress_icon,
+      .complete_icon,
+      .locked_icon {
+        display: none;
+      }
+    }
+  }
+  &.locked {
     .context_module_item {
       opacity: 0.5;
       .title {
@@ -142,12 +201,12 @@ $context_module_bg_color: #f2f3f4;
       }
     }
     .completion_status {
-      .complete_icon,
-      .incomplete_icon {
-        display: none;
-      }
       .locked_icon {
         display: inline;
+      }
+      .complete_icon,
+      .in_progress_icon {
+        display: none;
       }
     }
     .module_item_icons {
@@ -349,24 +408,17 @@ $context_module_bg_color: #f2f3f4;
   .complete_item_icon {
     display: none;
   }
+
   &.completed_item {
     .completion_requirement {
       .requirement_type {
         .fulfilled {
           display: inline;
-          padding-left: 12px;
-          background: transparent url(/images/pass.10px.dim.png) no-repeat left center;
         }
         .unfulfilled {
           display: none;
         }
       }
-    }
-    .complete_item_icon {
-      display: inline;
-    }
-    .incomplete_item_icon {
-      display: none;
     }
   }
   &.after_current_position {
@@ -429,7 +481,7 @@ $context_module_bg_color: #f2f3f4;
   .move_item_link, .links a {
     visibility: hidden;
   }
-  .locked_module & {
+  .locked & {
     .title {
       display: none;
     }
@@ -573,15 +625,5 @@ body.ie {
 @media screen and (max-width: 1024px) {
   @if $use_new_styles == false {
     .with-left-side.modules { min-width: 700px; }
-  }  
-  #context_modules {
-    .student-view {
-      .due_date_display {
-        display: block;
-      }
-    }
-    .due_date_display {
-      display: none;
-    }
   }
 }
