@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2015 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -19,9 +19,26 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/messages_helper')
 
-describe 'pseudonym_registration.email.summary' do
-  it "should render" do
+describe 'pseudonym_registration' do
+  before do
     pseudonym_model
+  end
+
+  it "should render email" do
     generate_message(:pseudonym_registration, :email, @pseudonym, :user => @user)
+  end
+
+  it "should render sms" do
+    generate_message(:pseudonym_registration, :sms, @pseudonym, :user => @user)
+  end
+
+  it "should render summary" do
+    generate_message(:pseudonym_registration, :summary, @pseudonym, :user => @user)
+  end
+
+  it "should render twitter" do
+    generate_message(:pseudonym_registration, :twitter, @pseudonym, :user => @user)
+    expect(@message.main_link).to be_present
+    expect(@message.body).to be_present
   end
 end

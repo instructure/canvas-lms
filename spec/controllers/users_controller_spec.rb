@@ -470,8 +470,25 @@ describe UsersController do
         expect(p.user.associated_accounts).to eq [Account.default]
       end
 
+      it "should create a registered user if the skip_registration flag is passed in" do
+        post('create', {
+          :pseudonym => { :unique_id => 'jacob@instructure.com'},
+          :user => { :name => 'Jacob Fugal', :terms_of_use => '1', :skip_registration => '1' }
+        })
+        expect(response).to be_success
+
+        p = Pseudonym.where(unique_id: 'jacob@instructure.com').first
+        expect(p).to be_active
+        expect(p.user).to be_registered
+        expect(p.user.name).to eq 'Jacob Fugal'
+        expect(p.user.communication_channels.length).to eq 1
+        expect(p.user.communication_channels.first).to be_unconfirmed
+        expect(p.user.communication_channels.first.path).to eq 'jacob@instructure.com'
+        expect(p.user.associated_accounts).to eq [Account.default]
+      end
+
       it "should complain about conflicting unique_ids" do
-        u = User.create! { |u| u.workflow_state = 'registered' }
+        u = User.create! { |user| user.workflow_state = 'registered' }
         p = u.pseudonyms.create!(:unique_id => 'jacob@instructure.com')
         post 'create', :pseudonym => { :unique_id => 'jacob@instructure.com' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1' }
         assert_status(400)

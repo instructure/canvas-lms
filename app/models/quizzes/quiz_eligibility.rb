@@ -49,6 +49,14 @@ class Quizzes::QuizEligibility
     !quiz.grants_right?(user, session, :update)
   end
 
+  def section_dates_apply?
+    section_restricted_by_date? && section_is_ongoing?
+  end
+
+  def course_section
+    @course_section ||= (assignment_overrides && student_sections).first || CourseSection.new
+  end
+
   private
 
   attr_reader :course, :quiz, :user, :session, :remote_ip
@@ -142,10 +150,6 @@ class Quizzes::QuizEligibility
 
   def restricted_course_has_ended?
     course.restrict_enrollments_to_course_dates ? course_has_ended? : false
-  end
-
-  def course_section
-    @course_section ||= (assignment_overrides & student_sections).first || CourseSection.new
   end
 
   def inactive_non_admin?
