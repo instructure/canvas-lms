@@ -7,8 +7,8 @@ define([
   'jquery.ajaxJSON'
 ], function (Reflux, UserSettings, GradebookConstants, depaginate, $) {
   var StudentEnrollmentsActions = Reflux.createActions({
-    'load': {asyncResult: true},
-    'search': {asyncResult: false}
+    load: { asyncResult: true },
+    search: { asyncResult: false }
   })
 
   StudentEnrollmentsActions.load.listen(function() {

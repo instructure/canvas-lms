@@ -3,9 +3,9 @@ define([
   'react',
   'bower/reflux/dist/reflux',
   'i18n!gradebook',
-  './headerDropdownOption',
-  '../stores/gradebookToolbarStore',
-  '../actions/gradebookToolbarActions'
+  'jsx/gradebook/grid/components/dropdown_components/headerDropdownOption',
+  'jsx/gradebook/grid/stores/gradebookToolbarStore',
+  'jsx/gradebook/grid/actions/gradebookToolbarActions'
 ], function (React, Reflux, I18n, HeaderDropdownOption, GradebookToolbarStore, GradebookToolbarActions) {
 
   const TO_END = I18n.t("Move to end"),

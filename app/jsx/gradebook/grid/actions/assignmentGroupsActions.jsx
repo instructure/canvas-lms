@@ -3,8 +3,8 @@ define([
   'jquery'
 ], function (Reflux, $) {
   var AssignmentGroupsActions = Reflux.createActions({
-    'load': {asyncResult: true},
-    'replaceAssignmentGroups': {asyncResult: false}
+    load: { asyncResult: true },
+    replaceAssignmentGroups: { asyncResult: false }
   });
 
   AssignmentGroupsActions.load.listen(function() {

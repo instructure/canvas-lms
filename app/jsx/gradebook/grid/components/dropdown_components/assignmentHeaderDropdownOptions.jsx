@@ -3,8 +3,8 @@ define([
   'react',
   'underscore',
   'i18n!gradebook',
-  './headerDropdownOption',
-  '../constants',
+  'jsx/gradebook/grid/components/dropdown_components/headerDropdownOption',
+  'jsx/gradebook/grid/constants',
   'jsx/gradebook/grid/components/dropdown_components/setDefaultGradeOption'
 ], function (React, _, I18n, HeaderDropdownOption, GradebookConstants, SetDefaultGradeOption) {
 

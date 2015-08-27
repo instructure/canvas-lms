@@ -3,10 +3,10 @@ define([
   'react',
   'bower/reflux/dist/reflux',
   'i18n!gradebook',
-  '../stores/gradebookToolbarStore',
-  '../actions/gradebookToolbarActions'
-
-], function (React, Reflux, I18n, GradebookToolbarStore, GradebookToolbarActions) {
+  'jsx/gradebook/grid/stores/gradebookToolbarStore',
+  'jsx/gradebook/grid/actions/gradebookToolbarActions',
+  'jsx/gradebook/grid/components/dropdown_components/headerDropdownOption'
+], function (React, Reflux, I18n, GradebookToolbarStore, GradebookToolbarActions, HeaderDropdownOption) {
 
   var CurrentOrFinalGradeToggle = React.createClass({
     mixins: [
@@ -17,7 +17,7 @@ define([
       return this.state.toolbarOptions.treatUngradedAsZero;
     },
 
-    toggleShowFinalGrade(event) {
+    toggle(event) {
       event.preventDefault();
       var showFinalGrade = !this.showFinalGrade();
       GradebookToolbarActions.toggleTreatUngradedAsZero(showFinalGrade);
@@ -26,11 +26,7 @@ define([
     render() {
       var text = this.showFinalGrade() ? I18n.t('Show Current Grade') : I18n.t('Show Final Grade');
       return (
-        <li>
-          <a onClick={this.toggleShowFinalGrade} href='#' ref='gradeToggle'>
-            {text}
-          </a>
-        </li>
+        <HeaderDropdownOption title={text} handleClick={this.toggle} ref='gradeToggle'/>
       );
     }
   });

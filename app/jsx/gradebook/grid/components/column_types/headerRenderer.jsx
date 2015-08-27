@@ -3,11 +3,11 @@ define([
   'react',
   'underscore',
   'i18n!gradebook',
-  '../../constants',
-  '../gradebookKyleMenu',
+  'jsx/gradebook/grid/constants',
+  'jsx/gradebook/grid/components/dropdown_components/gradebookKyleMenu',
   'jquery',
-  '../assignmentHeaderDropdownOptions',
-  '../totalHeaderDropdownOptions',
+  'jsx/gradebook/grid/components/dropdown_components/assignmentHeaderDropdownOptions',
+  'jsx/gradebook/grid/components/dropdown_components/totalHeaderDropdownOptions',
   'jquery.instructure_date_and_time'
 ], function(React, _, I18n, GradebookConstants, GradebookKyleMenu, $, AssignmentHeaderDropdownOptions, TotalHeaderDropdownOptions) {
 

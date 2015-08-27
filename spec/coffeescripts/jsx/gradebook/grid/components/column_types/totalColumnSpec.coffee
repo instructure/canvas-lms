@@ -18,12 +18,17 @@ define [
   submissions = ->
     [{ assignment_id: '3', id: '6', score: 25 }]
 
+  propsWithSubmissions = ->
+    rowData:
+      enrollment: {},
+      assignmentGroups: [{ assignments: [{ id: '3', points_possible: 25 }]}],
+      submissions: submissions()
+
   gradingPeriodsData = ->
     GRADEBOOK_OPTIONS:
       current_grading_period_id: '0'
 
-  getGrade = (props) ->
-    component = buildComponent(props)
+  getGrade = (component) ->
     component.refs.totalGrade.getDOMNode().innerHTML
 
   buildComponent = (props) ->
@@ -42,25 +47,22 @@ define [
       AssignmentGroupsStore.getInitialState()
       AssignmentGroupsStore.onLoadCompleted(assignmentGroups())
     teardown: ->
+      React.unmountComponentAtNode wrapper
+      AssignmentGroupsStore.assignmentGroups = undefined
+      GradingPeriodsStore.gradingPeriods = undefined
       fakeENV.teardown()
 
   test 'mounts on build', ->
     ok(buildComponent().isMounted())
 
-  test 'displays "0%" if there are no submissions yet', ->
-    grade = buildComponent().refs.totalGrade.getDOMNode().innerHTML
-    equal(grade, '-')
+  test 'displays "-" if there are no submissions yet', ->
+    component = buildComponent()
+    deepEqual(getGrade(component), '-')
 
   test 'Displays a % on a numeric value', ->
-    cellData = {
-      rowData: {
-        enrollment: {},
-        assignmentGroups: [{ assignments: [{ id: '3', points_possible: 25 }]}],
-        submissions: [{ assignment_id: '3', score: 25 }]
-      }
-    }
-    grade = getGrade(cellData)
-    equal(grade, '100%')
+    props = propsWithSubmissions()
+    component = buildComponent(props)
+    deepEqual(getGrade(component), '100%')
 
   test 'is not editable', ->
     component = buildComponent()
@@ -84,3 +86,14 @@ define [
 
     component = buildComponent(cellData)
     ok component.refs.icon
+
+  test 'shows grade as points if the user selects "Show As Points"', ->
+    props = propsWithSubmissions()
+    component = buildComponent(props)
+    component.setState({ toolbarOptions: { showTotalGradeAsPoints: true } })
+    deepEqual(getGrade(component), '25')
+
+  test 'displays "-" if there are no submissions yet with "Show As Points" selected', ->
+    component = buildComponent()
+    component.setState({ toolbarOptions: { showTotalGradeAsPoints: true } })
+    deepEqual(getGrade(component), '-')

@@ -1,5 +1,5 @@
 define [
-  'jsx/gradebook/grid/components/currentOrFinalGradeToggle',
+  'jsx/gradebook/grid/components/dropdown_components/currentOrFinalGradeToggle',
   'jsx/gradebook/grid/actions/gradebookToolbarActions'
 ], (CurrentOrFinalGradeToggle, GradebookToolbarActions) ->
 
@@ -18,14 +18,15 @@ define [
 
   test 'Displays "Show Current Grade" if treat ungraded as zero is set to true', ->
     @component.setState({ toolbarOptions: { treatUngradedAsZero: true } })
-    deepEqual @component.refs.gradeToggle.props.children, 'Show Current Grade'
+    deepEqual @component.refs.gradeToggle.props.title, 'Show Current Grade'
 
   test 'Displays "Show Final Grade" if treat ungraded as zero is set to false', ->
     @component.setState({ toolbarOptions: { treatUngradedAsZero: false } })
-    deepEqual @component.refs.gradeToggle.props.children, 'Show Final Grade'
+    deepEqual @component.refs.gradeToggle.props.title, 'Show Final Grade'
 
   test 'Fires the appropriate action when the toggle is clicked', ->
     @component.setState({ toolbarOptions: { treatUngradedAsZero: true } })
     toggleAction = @stub(GradebookToolbarActions, 'toggleTreatUngradedAsZero')
-    Simulate.click(@component.refs.gradeToggle)
+    toggleLink = @component.refs.gradeToggle.refs.link.getDOMNode()
+    Simulate.click(toggleLink)
     ok toggleAction.calledWith(false)

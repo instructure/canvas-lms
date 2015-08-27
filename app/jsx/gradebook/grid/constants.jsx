@@ -37,7 +37,9 @@ define([
       treatUngradedAsZero: false,
       showAttendanceColumns: false,
       totalColumnInFront: false,
-      arrangeColumnsBy: 'assignment_group'
+      arrangeColumnsBy: 'assignment_group',
+      warnedAboutTotalsDisplay: false,
+      showTotalGradeAsPoints: false
     },
     ASSIGNMENT_DATES: ['created_at', 'updated_at', 'due_at', 'lock_at', 'unlock_at'],
     OVERRIDE_DATES: ['all_day_date', 'due_at', 'lock_at', 'unlock_at'],

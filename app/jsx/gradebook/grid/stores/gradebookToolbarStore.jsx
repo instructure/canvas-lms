@@ -1,3 +1,4 @@
+
 define([
   'bower/reflux/dist/reflux',
   '../actions/gradebookToolbarActions',
@@ -27,7 +28,9 @@ define([
           arrangeColumnsBy: storedSortOrder.sortType,
           treatUngradedAsZero: userSettings.contextGet('treatUngradedAsZero'),
           showAttendanceColumns: userSettings.contextGet('showAttendanceColumns'),
-          totalColumnInFront: userSettings.contextGet('total_column_in_front')
+          totalColumnInFront: userSettings.contextGet('total_column_in_front'),
+          warnedAboutTotalsDisplay: userSettings.contextGet('warned_about_totals_display'),
+          showTotalGradeAsPoints: GradebookConstants.show_total_grade_as_points
         };
 
         this.toolbarOptions = _.defaults(savedOptions, GradebookConstants.DEFAULT_TOOLBAR_PREFERENCES);
@@ -39,7 +42,7 @@ define([
         this.trigger(this.toolbarOptions);
       },
 
-      onToggleNotesColumn(hideNotesColumn) {
+      onToggleNotesColumnCompleted(hideNotesColumn) {
         this.toolbarOptions.hideNotesColumn = hideNotesColumn;
         this.trigger(this.toolbarOptions);
       },
@@ -61,6 +64,16 @@ define([
 
       onToggleTotalColumnInFront(totalColumnInFront) {
         this.toolbarOptions.totalColumnInFront = totalColumnInFront;
+        this.trigger(this.toolbarOptions);
+      },
+
+      onShowTotalGradeAsPoints(showAsPoints) {
+        this.toolbarOptions.showTotalGradeAsPoints = showAsPoints;
+        this.trigger(this.toolbarOptions);
+      },
+
+      onHideTotalDisplayWarning(hideWarning) {
+        this.toolbarOptions.warnedAboutTotalsDisplay = hideWarning;
         this.trigger(this.toolbarOptions);
       }
 

@@ -16,6 +16,8 @@ define [
         showAttendanceColumns: false
         arrangeColumnsBy: 'assignment_group'
         totalColumnInFront: false
+        warnedAboutTotalsDisplay: false
+        showTotalGradeAsPoints: false
       ENV.GRADEBOOK_OPTIONS = {}
     teardown: ->
       fakeENV.teardown()
@@ -46,11 +48,11 @@ define [
     deepEqual GradebookToolbarStore.toolbarOptions.hideStudentNames, true
     ok(triggerExpectation.once())
 
-  test '#onToggleNotesColumn should set toolbarOptions.hideNotesColumn and trigger a setState', ->
+  test '#onToggleNotesColumnCompleted should set toolbarOptions.hideNotesColumn and trigger a setState', ->
     triggerMock = @mock(GradebookToolbarStore)
     triggerExpectation = triggerMock.expects('trigger').once()
     GradebookToolbarStore.getInitialState()
-    GradebookToolbarStore.onToggleNotesColumn(false)
+    GradebookToolbarStore.onToggleNotesColumnCompleted(false)
 
     deepEqual GradebookToolbarStore.toolbarOptions.hideNotesColumn, false
     ok(triggerExpectation.once())
@@ -80,4 +82,22 @@ define [
     GradebookToolbarStore.onToggleShowAttendanceColumns(true)
 
     deepEqual GradebookToolbarStore.toolbarOptions.showAttendanceColumns, true
+    ok(triggerExpectation.once())
+
+  test '#onShowTotalGradeAsPoints should set toolbarOptions.showTotalGradeAsPoints and trigger a setState', ->
+    triggerMock = @mock(GradebookToolbarStore)
+    triggerExpectation = triggerMock.expects('trigger').once()
+    GradebookToolbarStore.getInitialState()
+    GradebookToolbarStore.onShowTotalGradeAsPoints(true)
+
+    deepEqual GradebookToolbarStore.toolbarOptions.showTotalGradeAsPoints, true
+    ok(triggerExpectation.once())
+
+  test '#onHideTotalDisplayWarning should set toolbarOptions.warnedAboutTotalsDisplay and trigger a setState', ->
+    triggerMock = @mock(GradebookToolbarStore)
+    triggerExpectation = triggerMock.expects('trigger').once()
+    GradebookToolbarStore.getInitialState()
+    GradebookToolbarStore.onHideTotalDisplayWarning(true)
+
+    deepEqual GradebookToolbarStore.toolbarOptions.warnedAboutTotalsDisplay, true
     ok(triggerExpectation.once())

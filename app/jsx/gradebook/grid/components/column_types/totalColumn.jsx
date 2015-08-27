@@ -41,7 +41,7 @@ define([
           return TotalColumn.displayWarning;
         }
 
-        if (GRADEBOOK_CONSTANTS.group_weighting_scheme === 'percent') {
+        if (ENV.GRADEBOOK_OPTIONS.group_weighting_scheme === 'percent') {
           var invalidGroups = _.filter(assignmentGroups, group  => group.shouldShowNoPointsWarning);
 
           if (invalidGroups.length > 0) {
@@ -64,7 +64,8 @@ define([
 
     render() {
       var submissions, assignmentGroups, assignmentGroupsForSubmissions,
-          groupWeightingScheme, totalGradeData, gradeFormatter, total, toolbarOptions;
+          groupWeightingScheme, totalGradeData, gradeFormatter, total, toolbarOptions,
+          showPoints;
 
       submissions = this.props.rowData.submissions;
       submissions = SubmissionsStore.submissionsInCurrentPeriod(submissions);
@@ -72,15 +73,14 @@ define([
       assignmentGroups = this.props.rowData.assignmentGroups;
       assignmentGroupsForSubmissions = SubmissionsStore.assignmentGroupsForSubmissions(submissions,
                                                                                        assignmentGroups);
-      groupWeightingScheme = GRADEBOOK_CONSTANTS.group_weighting_scheme;
+      groupWeightingScheme = ENV.GRADEBOOK_OPTIONS.group_weighting_scheme;
       totalGradeData = GradeCalculator.calculate(submissions, assignmentGroupsForSubmissions,
-                                                 GRADEBOOK_CONSTANTS.group_weighting_scheme);
-
+                                                 groupWeightingScheme);
       toolbarOptions = this.state.toolbarOptions;
+      showPoints = toolbarOptions.showTotalGradeAsPoints;
       total = totalGradeData[currentOrFinal(toolbarOptions)];
 
-      gradeFormatter = new GradeFormatter(total.score, total.possible);
-
+      gradeFormatter = new GradeFormatter(total.score, total.possible, showPoints);
       return (
         <div className='gradebook-cell' ref="cell" title={TotalColumn.getWarning(assignmentGroups)}>
           { TotalColumn.getWarning(assignmentGroups) && <i ref="icon" className='icon-warning final-warning' />}

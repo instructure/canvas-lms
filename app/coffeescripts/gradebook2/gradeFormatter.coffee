@@ -1,17 +1,18 @@
 define [
   'compiled/util/round'
 ], (round) ->
-  GradeFormatter = (score, possibleScore) ->
+  GradeFormatter = (score, possibleScore, gradeAsPoints) ->
     @score = score
     @possibleScore = possibleScore
+    @gradeAsPoints = gradeAsPoints
 
   GradeFormatter.prototype.toString = () ->
     maxDecimals = round.DEFAULT
-    result = @score / @possibleScore * 100
+    percentGrade = @score / @possibleScore * 100
 
-    if (result == Infinity || isNaN(result) || not @score?)
+    if (not @score || percentGrade == Infinity || isNaN(percentGrade))
       return '-'
     else
-      return round(result, maxDecimals) + '%'
+      return if @gradeAsPoints then @score else round(percentGrade, maxDecimals) + '%'
 
   return GradeFormatter

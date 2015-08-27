@@ -5,7 +5,7 @@ define([
   'underscore',
   'i18n!gradebook',
   'compiled/gradebook2/SetDefaultGradeDialog',
-  'jsx/gradebook/grid/components/headerDropdownOption'
+  'jsx/gradebook/grid/components/dropdown_components/headerDropdownOption'
 ], function (React, Reflux, _, I18n, SetDefaultGradeDialog, HeaderDropdownOption) {
 
   var SetDefaultGradeOption = React.createClass({

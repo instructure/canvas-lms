@@ -1,5 +1,5 @@
 define [
-  'jsx/gradebook/grid/components/assignmentHeaderDropdownOptions'
+  'jsx/gradebook/grid/components/dropdown_components/assignmentHeaderDropdownOptions'
   'underscore'
   'jsx/gradebook/grid/constants'
   'helpers/fakeENV'

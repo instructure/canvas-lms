@@ -1,6 +1,6 @@
 
 define [
-  'jsx/gradebook/grid/components/moveTotalColumnToggle',
+  'jsx/gradebook/grid/components/dropdown_components/moveTotalColumnToggle',
   'jsx/gradebook/grid/actions/gradebookToolbarActions'
 ], (MoveTotalColumnToggle, GradebookToolbarActions) ->
 

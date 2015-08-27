@@ -1,6 +1,6 @@
 define [
-  'jsx/gradebook/grid/components/gradebookKyleMenu'
-  'jsx/gradebook/grid/components/totalHeaderDropdownOptions'
+  'jsx/gradebook/grid/components/dropdown_components/gradebookKyleMenu'
+  'jsx/gradebook/grid/components/dropdown_components/totalHeaderDropdownOptions'
   'underscore'
   'jquery'
   'compiled/jquery.kylemenu'

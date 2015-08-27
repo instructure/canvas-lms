@@ -25,6 +25,9 @@ define [
     teardown: ->
       React.unmountComponentAtNode wrapper
 
+  test 'mounts on build', ->
+    ok renderComponent().isMounted()
+
   test '#students returns the users from the enrollments', ->
     expected = [{ id: '1' }, { id: '2' }, { id: '3' }]
     actual = @component.students()

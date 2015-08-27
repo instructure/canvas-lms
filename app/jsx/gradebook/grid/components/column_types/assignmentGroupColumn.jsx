@@ -44,7 +44,7 @@ define([
         assignmentGroup = {score: 0, possible: 0};
       }
 
-      gradeFormatter = new GradeFormatter(assignmentGroup.score, assignmentGroup.possible);
+      gradeFormatter = new GradeFormatter(assignmentGroup.score, assignmentGroup.possible, false);
 
       return (
         <div className='gradebook-cell' ref='cell'>

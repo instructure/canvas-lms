@@ -8,9 +8,9 @@ define([
 ], function (React, Reflux, GradebookConstants, $, _) {
 
   var SubmissionsActions = Reflux.createActions({
-    'load': {asyncResult: true},
-    'updateGrade': {asyncResult: true},
-    'updatedSubmissionsReceived': {asyncResult: false}
+    load: { asyncResult: true },
+    updateGrade: { asyncResult: true },
+    updatedSubmissionsReceived: { asyncResult: false }
   });
 
   var splitUpIds = function(studentIds) {

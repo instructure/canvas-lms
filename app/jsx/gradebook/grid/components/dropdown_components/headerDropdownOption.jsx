@@ -18,7 +18,8 @@ define([
         <li>
           <a data-action={this.props.dataAction}
              href={this.props.url || '#'}
-             onClick={this.props.handleClick}>
+             onClick={this.props.handleClick}
+             ref='link'>
             {this.props.title}
           </a>
         </li>
