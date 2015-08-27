@@ -19,6 +19,10 @@ describe "groups" do
       add_users_to_group(@students,@testgroup.first)
     end
 
+    describe "home page" do
+      it_behaves_like 'home_page', 'teacher'
+    end
+
     describe "announcements page" do
       it "should allow teachers to see announcements", priority: "1", test_id: 287049 do
         @announcement = @testgroup.first.announcements.create!(title: 'Group Announcement', message: 'Group',user: @students.first)

@@ -19,6 +19,16 @@ describe "groups" do
       add_users_to_group(@students + [@user],@testgroup.first)
     end
 
+    describe "home page" do
+      it_behaves_like 'home_page', 'student'
+
+      it "should only allow group members to access the group home page", priority: "1", test_id: 319908 do
+        get url
+        expect(f('.recent-activity-header')).to be_displayed
+        verify_no_course_user_access(url)
+      end
+    end
+
     describe "announcements page" do
       it "should center the add announcement button if no announcements are present", priority: "1", test_id: 273606 do
         get announcements_page
@@ -95,6 +105,12 @@ describe "groups" do
         # Checks that all students and teachers created in setup are listed on page
         expect(ff('.student_roster .user_name').size).to eq 5
         expect(ff('.teacher_roster .user_name').size).to eq 1
+      end
+
+      it "should allow access to people page only within the scope of a group", priority: "1", test_id: 319906 do
+        get people_page
+        expect(f('.roster.student_roster')).to be_displayed
+        verify_no_course_user_access(people_page)
       end
     end
 
@@ -289,10 +305,7 @@ describe "groups" do
       it "should allow access to conferences only within the scope of a group", priority: "1", test_id: 273638 do
         get conferences_page
         expect(f('.new-conference-btn')).to be_displayed
-
-        user_session(User.create!(name: 'course student'))
-        get conferences_page
-        expect(f('.ui-state-error')).to be_displayed
+        verify_no_course_user_access(conferences_page)
       end
     end
   end

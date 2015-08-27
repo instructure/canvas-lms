@@ -3,8 +3,52 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
 # ======================================================================================================================
 # Shared Examples
 # ======================================================================================================================
-shared_examples 'conferences_page' do |context|
+shared_examples 'home_page' do |context|
+  it "should display a coming up section with relevant events", priority: pick_priority(context,"1","2"), test_id: pick_test_id(context, 273602, 319909) do
+    # Create an event to have something in the Coming up Section
+    event = @testgroup[0].calendar_events.create!(title: "ohai",
+                                                  start_at: Time.zone.now + 1.day)
+    get url
 
+    expect('.coming_up').to be_present
+    expect(ff('.calendar.tooltip').size).to eq 1
+    expect(f('.calendar.tooltip b')).to include_text("#{event.title}")
+  end
+
+  it "should display a view calendar link on the group home page", priority: pick_priority(context,"1","2"), test_id: pick_test_id(context, 273603, 319910) do
+    get url
+    expect(f('.event-list-view-calendar')).to be_displayed
+  end
+
+  it "should have a working link to add an announcement from the group home page", priority: pick_priority(context,"1","2"), test_id: pick_test_id(context, 273604, 319911) do
+    get url
+    expect_new_page_load { fln('New Announcement').click }
+    expect(f('.btn-primary')).to be_displayed
+  end
+
+  it "should display recent activity feed on the group home page", priority: pick_priority(context,"1","2"), test_id: pick_test_id(context, 273605, 319912) do
+    DiscussionTopic.create!(context: @testgroup.first, user: @teacher,
+                            title: 'Discussion Topic', message: 'test')
+    @testgroup.first.announcements.create!(title: 'Test Announcement', message: 'Message',user: @teacher)
+
+    get url
+    expect(f('.recent-activity-header')).to be_displayed
+    activity = ff('.stream_header .title')
+    expect(activity.size).to eq 2
+    expect(activity[0]).to include_text('1 Announcement')
+    expect(activity[1]).to include_text('1 Discussion')
+  end
+
+  it "should display announcements on the group home page feed", priority: pick_priority(context,"1","2"), test_id: pick_test_id(context, 273609, 319913) do
+    @testgroup.first.announcements.create!(title: 'Test Announcement', message: 'Message',user: @teacher)
+    get url
+    expect(f('.title')).to include_text('1 Announcement')
+    f('.toggle-details').click
+    expect(f('.content_summary')).to include_text('Test Announcement')
+  end
+end
+
+shared_examples 'conferences_page' do |context|
   it "should allow group users to create a conference", priority: pick_priority(context,"1","2"),test_id: pick_test_id(context, 307624, 308534) do
     title = 'test conference'
     get conferences_page
