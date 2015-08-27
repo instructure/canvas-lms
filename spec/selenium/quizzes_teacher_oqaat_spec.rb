@@ -31,11 +31,15 @@ describe 'One Question at a Time Quizzes' do
 
       it 'displays one question at a time and prevents going back', priority: "1", test_id: 209374 do
         preview_the_quiz
+        it_should_show_cant_go_back_warning
+        accept_cant_go_back_warning
         check_if_cant_go_back
       end
 
       it 'saves answers and grades the quiz', priority: "1", test_id: 209375 do
         preview_the_quiz
+        it_should_show_cant_go_back_warning
+        accept_cant_go_back_warning
         answers_flow
       end
     end
