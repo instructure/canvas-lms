@@ -181,6 +181,11 @@ class AssignmentsController < ApplicationController
       add_crumb(@assignment.title, polymorphic_url([@context, @assignment]))
       add_crumb(t('Moderate'))
 
+      js_env({
+        :URLS => {
+          :student_submissions_url => polymorphic_url([:api_v1, @context, @assignment, :submissions]) + "?include[]=user_summary&include[]=provisional_grades"
+        }})
+      polymorphic_url([@context, @assignment])
       respond_to do |format|
         format.html { render }
       end

@@ -4,5 +4,4 @@ require [
   'jsx/assignments/ModerationApp'
 ], ($, React, ModerationApp) ->
 
-  ModerationApp = React.createFactory ModerationApp
-  React.render(React.createElement(ModerationApp), $('#assignment_moderation')[0])
+  React.render(ModerationApp(student_submissions_url: ENV.URLS.student_submissions_url), $('#assignment_moderation')[0])

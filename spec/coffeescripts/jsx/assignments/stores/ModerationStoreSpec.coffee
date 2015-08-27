@@ -5,23 +5,23 @@ define ['jsx/assignments/stores/ModerationStore'], (ModerationStore) ->
   test 'constructor', ->
     store = new ModerationStore()
     ok store, "constructs properly"
-    equal store.students.length, 0, 'student list is initally empty'
+    equal store.submissions.length, 0, 'student list is initally empty'
 
-  test 'adds multiple students to the store', ->
+  test 'adds multiple submissions to the store', ->
     store = new ModerationStore()
-    store.addStudents([{id: 1}, {id: 2}])
-    equal store.students.length, 2, 'store length is two'
+    store.addSubmissions([{id: 1}, {id: 2}])
+    equal store.submissions.length, 2, 'store length is two'
 
   test 'doesn\'t add duplicates to the store', ->
     store = new ModerationStore()
-    store.addStudents([{id: 1}])
-    store.addStudents([{id: 1}])
-    equal store.students.length, 1, 'store length is one'
+    store.addSubmissions([{id: 1}])
+    store.addSubmissions([{id: 1}])
+    equal store.submissions.length, 1, 'store length is one'
 
-  test 'triggers change when adding students', ->
+  test 'triggers change when adding submissions', ->
     store = new ModerationStore()
     called = false
     store.addChangeListener () ->
       called = true
-    store.addStudents([{id: 1}])
+    store.addSubmissions([{id: 1}])
     ok called, 'change listener handler was called'
