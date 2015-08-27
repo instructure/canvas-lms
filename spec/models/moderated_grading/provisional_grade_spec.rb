@@ -86,6 +86,32 @@ describe ModeratedGrading::ProvisionalGrade do
       end
     end
   end
+
+  describe "publish_rubric_assessments!" do
+    it "publishes rubric assessments to the submission" do
+      @course = course
+      outcome_with_rubric
+      association = @rubric.associate_with(assignment, course, :purpose => 'grading', :use_for_grading => true)
+
+      sub = assignment.submit_homework(student, :submission_type => 'online_text_entry', :body => 'hallo')
+      pg = sub.find_or_create_provisional_grade! scorer: user, score: 1
+
+      prov_assmt = association.assess(:user => student, :assessor => user, :artifact => pg,
+        :assessment => { :assessment_type => 'grading',
+          :"criterion_#{@rubric.criteria_object.first.id}" => { :points => 3, :comments => "good 4 u" } })
+
+      expect(prov_assmt.score).to eq 3
+
+      pg.publish_rubric_assessments!
+
+      real_assmt = sub.rubric_assessments.first
+      expect(real_assmt.score).to eq 3
+      expect(real_assmt.assessor).to eq user
+      expect(real_assmt.rubric_association).to eq association
+      expect(real_assmt.data).to eq prov_assmt.data
+    end
+
+  end
 end
 
 describe ModeratedGrading::NullProvisionalGrade do
