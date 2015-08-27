@@ -1,0 +1,5 @@
+// This allows the html stack below tinymce to remain
+// on the page, but hidden from view
+.mce-statusbar .mce-flow-layout {
+  visibility: hidden;
+}
