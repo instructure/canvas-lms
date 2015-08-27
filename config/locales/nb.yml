@@ -846,6 +846,7 @@ nb:
         equella: Equella
         equella_endpoint: Equella-sluttpunkt
         equella_teaser: Equella-kommentarer
+        global_brand_includes: "Last opp globale CSS/JavaScript-includeringer i Theme Editor"
         global_includes: "Globale CSS-/JavaScript-inkluderinger"
         global_javascript: "Global JavaScript-URL"
         global_stylesheet: "Global CSS-URL"
@@ -6936,6 +6937,8 @@ nb:
         randomly_assigning_students: "Fordeler studenter vilkårlig"
         search_groups: "Søk i grupper"
         search_users: "Søk blant brukere"
+      group_category_clone: 
+        cancel: Avbryt
       group_category_create: 
         allow_self_signup: "Tillat egenpåmelding"
         cancel: Avbryt
@@ -7234,6 +7237,9 @@ nb:
     warnings: 
       truncated_wiki_title: "Tittelen for følgende wikiside ble forkortet: %{title}"
   in_order_to_complete_the_process_you_will_be_redir_83376e10: "For å fullføre prosessen blir du omdirigert til en påloggingsside der du vil trenge logge inn med ditt barns opplysninger."
+  in_progress_646a8aef: Pågår
+  in_progress_9d1ce8b9: Pågår
+  in_progress_icon_6e69c998: Pågår-ikon
   inbox_bb245a60: Innboks
   include_this_assignment_s_grades_when_posting_to_y_6bff3323: "Inkluder denne oppdrags karakterer når du legger til skolens Student Information System"
   incorrect_username_and_or_password_2de73abb: "Feil brukernavn og/eller passord"
@@ -7551,6 +7557,9 @@ nb:
       no_link: "[ Ingen lenke ]"
     titles: 
       link_to_student: "Lenke til Student"
+  link_number_1_9f169e48: "Lenkenummer 1"
+  link_number_2_61fcff2: "Lenkenummer 2"
+  link_number_3_7118ff64: "Lenkenummer 3"
   link_selection_1486c5d0: Lenkeutvalg
   link_title_d959a7b3: "Link tittel"
   link_url_cf96376: "Link Url"
@@ -7573,6 +7582,8 @@ nb:
   lock_date_cannot_be_after_section_end_d37da70c: "Lås Datoen kan ikke være etter seksjon slutt"
   lock_date_cannot_be_after_term_end_cf1a188f: "Lås Datoen kan ikke være etter termin slutt"
   lock_date_cannot_be_before_due_date_ac30f54: "Låsingsdato kan ikke være før fristen"
+  lock_icon_a9916601: låsiko
+  locked_762f138b: Låst
   log_in_c9e240ef: "Logg på"
   log_on_url_fc166e4c: Pålogging-URL
   log_out_379ba28a: "Logg Ut"
@@ -7678,7 +7689,9 @@ nb:
   manual_entry_e4a4f99a: "Manuell innlegging"
   mark_as_done_6fa48d2f: "Merk som ulest"
   mark_as_done_779556d7: "merk som ferdig"
+  mark_done_9d81bcd9: "Merk som ferdig"
   marked_done_8f61ebb8: "merket som ferdig"
+  marked_done_9fd646f: "Merket ferdig"
   mastery_score_reflects_the_highest_score_of_a_grad_fd426d1e: "Master-poengsum reflekterer den høyeste poengsummen av en vurdert innlevering eller prøve."
   mastery_score_reflects_the_most_recent_graded_assi_29fd2e00: "Mestring poengsum reflekterer den siste gradert oppgave eller quiz."
   mathquill: 
@@ -9476,6 +9489,7 @@ nb:
     page: Side
     quiz: Prøve
     sub_header: Undertittel
+  module_locked_f6a7ea9d: "Modul låst"
   module_menu_3201af4e: Modul-meny
   module_module_name_was_successfully_deleted_fc9e9d47: "Modul %{module_name} ble slettet."
   modules: 
@@ -9618,6 +9632,7 @@ nb:
   moodle_formula_many_warning_title: "Det er %{count} Formel-spørsmål i denne banken som må ha sine mulige svar regenerert"
   moodle_formula_warning_title: "Mulige svar må lages på nytt for Formel-spørsmål"
   more_courses_5ebbe998: "Flere kurs"
+  more_information_3dfb76b5: "Mer informasjo"
   most_recent_result_counts_as_calculation_int_of_ma_13628bf0: "Nyligste resultatet teller som %{calculation_int}% av mester-vekten, gjennomsnittet av andre resultater teller som %{remainder}% av vekten. Minst 2 resultater må foreligge før en sum beregnes."
   most_recent_score_13a87e8c: "Siste Poeng"
   move_abf00365: Flytt
@@ -9635,6 +9650,7 @@ nb:
   multi_factor_authentication_configured_865b1bde: "Flerfaktors autentisering konfigurert"
   must_achieve_mastery_at_least_count_times_scores_a_628db168: "Må oppnå mestring minst %{count}% ganger. Resultater over mestring blir snittet for å beregne sluttkarakteren."
   must_mark_as_done_bf6cc563: "må merkes som ferdig"
+  must_mark_assignment_as_done_e3e4af88: "Må merke innleveringen som ferdig"
   must_submit_new_oauth2_request_e1fb00bb: "Må sende ny OAuth2-forespørsel"
   must_supply_file_ids_and_or_folder_ids_parameter_9d29448c: "Må oppgi 'file_ids' and/or 'folder_ids' parameter"
   mute_dialog: 
@@ -9679,6 +9695,7 @@ nb:
   no_due_date_6e6a23c1: "(no due date)"
   no_e16d9132: Nei
   no_grading_schemes_to_display_8b0e92e7: "Ingen gradering ordninger for å vise"
+  no_icon_1f6ea5f4: "ingen ikon"
   no_items_in_module_21f111a2: "Ingen elementer i modul"
   no_migration_file: "En fil er påkrevet for innholdsflytting."
   no_password_was_given_472222e5: "Intet passord oppgitt"
@@ -10009,6 +10026,10 @@ nb:
   open_color_picker_f117df0a: "Åpne fargeplukker"
   open_theme_editor_2d924ebe: "Åpne Theme Editor"
   open_title_in_a_new_window_b29fed77: "Åpne %{title} i et nytt vindu."
+  option_1_dea39f90: "Valg 1"
+  option_2_47aace2a: "Valg 2"
+  option_3_30adfebc: "Valg 3"
+  option_4_aec96b1f: "Valg 4"
   options: 
     ? "no"
     : Nei
@@ -14044,6 +14065,12 @@ nb:
   switch_to_3f310557: "Bytt til"
   switch_to_group_group_name_786b913b: "Bytt til gruppe %{group_name}"
   syllabus: Kurspensum
+  tab_1_3d6b3fb: "Fane 1"
+  tab_1_content_8944c219: "Fane 1 innhold"
+  tab_2_9adfe241: "Fane 2"
+  tab_2_content_b0c9fedc: "Fane 2 innhold"
+  tab_3_content_a7b2ea9f: "Fane 3 innhold"
+  tab_3_edd8d2d7: "Fane 3"
   table_headings: 
     name: Navn
     total: Total
@@ -14137,6 +14164,7 @@ nb:
       timespan: "%{start_at} *til* %{end_at}"
   text_document_eacbcdb7: "Tekst dokument"
   text_entry_submission_cannot_be_empty_3d187cae: "Dette tekstfeltet kan ikke stå tomt"
+  text_input_d3480b8c: Tekst-felt
   that_user_account_has_been_deleted_please_contact__350e0e0: "Den brukerkontoen er slettet. Kontakt systemadministratoren for å reaktivere kontoen."
   the_account_id_of_the_account_to_which_the_reporti_93ddb00f: "Konto-ID til denne kontoen rapporteringsbrukeren tilhører"
   the_app_was_activated_a84e055f: "Appen var aktivert"
@@ -14429,6 +14457,7 @@ nb:
   too_many_failed_login_attempts_please_try_again_la_f8e0d7c8: "For mange innloggingsforsøk. Prøv igjen senere eller kontakt systemadministratoren."
   too_many_members_b8b15069: "For mange medlemmer"
   tool_configuration_63cd43b0: Verktøy-konfigurasjon
+  tool_placements_3f996c24: Verktøy-plasseringer
   tooltips: 
     finished: ferdig
     incomplete: ufullstendig
@@ -14491,8 +14520,12 @@ nb:
   up_c553575d: Op
   updated_group_group_name_727b1d98: "Oppdatert Gruppe %{group_name}"
   updating_6edbab78: Oppdaterer
+  upload_8b403d05: "Last opp"
+  upload_a_css_file_ec22214b: "Last opp en CSS-fil…"
+  upload_a_js_file_c89d795: "Last opp en JS-fil…"
   upload_button: 
     upload: "Last opp"
+  upload_css_and_javascript_files_to_include_on_all__e19117c9: "Last opp CSS og JavaScript-filer å inkludere på alle sideinnlastinger for kontoen din"
   upload_data_dc4fa4cb: "Last opp data"
   upload_drop_zone: 
     drop_to_upload: "Slippe elementer for å laste opp"
@@ -14502,6 +14535,7 @@ nb:
   usage_rights_f0960ad6: "Bruksrettigheter:"
   usage_rights_have_been_set_d1b433c7: "Bruksrettigheter har blitt satt."
   usage_rights_will_be_set_for_all_of_the_files_cont_b192336a: "Bruksretten vil bli satt for alle filene som er inneholdt i:"
+  use_default_890939b7: "Bruk standard"
   use_new_folder_tree_in_files_eb5a451b: "Bruk nytt mappetre i filer"
   use_the_new_quiz_lti_tool_in_place_of_regular_canv_d7cb0c7f: "Bruk det nye test-LTI-verktøyet i stedet for vanlige canvas-prøver"
   use_this_configuration_for_parent_observer_registr_e49f8f66: "Bruk denne konfigurasjonen for foreldre/observatør-påmelding"
@@ -14905,14 +14939,17 @@ nb:
   view_analytics_91a3b7a: "Vis Analytics"
   view_app_center_6c89a3fe: "Vis appsenteret"
   view_app_configurations_52b52441: "Vis applikasjonskonfigurasjoner"
+  view_ba339f93: Se
   view_course_analytics_eefe6b2: "Vis Kurs Analytics"
   view_grades_8d3bae6c: "Vis karakterer"
   view_name_app_62a2ad8e: "Vis %{name} app"
   view_student_analytics_6b8ccd42: "Vis Student Analytics"
   view_toolname_placements_4a5724d1: "Vis %{toolName} plasseringer"
+  viewed_6b75c21e: Sett
   visit_864b4060: Besøk
   visit_group_group_name_7a816081: "Gå til gruppe %{group_name}"
   warning_for_improved_accessibility_in_moving_files_71e1028b: "Advarsel: For bedre tilgjengelighet i å flytte filer, kan du bruke Flytt til Dialog alternativet finner du i menyen."
+  warning_icon_f64936d7: varselsiko
   warnings: 
     test_install: 
       periodic_message: "Denne Canvas-installasjonen er kun ment for testing, og blir tilbakestilt periodevis."
@@ -14940,6 +14977,7 @@ nb:
   webct_display: "Blackboard Vista/CE (WebCT)"
   webct_file_description: "Blackboard Vista/CE, WebCT 6+ Course"
   webct_name: "Blackboard Vista/CE (WebCT)"
+  welcome_to_the_canvas_theme_editor_73091d1: "Velkommen til Canvas Theme Editor"
   welcome_to_your_courses_to_customize_the_list_of_c_22de652e: "Velkommen til dine kurs! For å tilpasse listen over kurs klikk på \"Alle kurs\" og stjernemarker kursene å vise."
   well_below_mastery_37664bdc: "Vel Nedenfor Mestring"
   what_should_the_csv_file_look_like_985a59ac: "Hvordan bør en CSV fil se ut?"
@@ -15099,6 +15137,7 @@ nb:
         zero: "Ingen %{model} fant"
     page_gap: "&hellip;"
     previous_label: "8592; Forrige"
+  will_unlock_unlock_date_1024c38d: "Vil låse opp %{unlock_date}"
   wimba_conference: 
     external_urls: 
       archive: Arkiv
@@ -15131,6 +15170,7 @@ nb:
   you_have_no_outcomes_click_here_to_go_to_the_outco_574bd0af: "Du har ingen utfall. Klikk her for å gå til utfall siden."
   you_have_reached_the_maximum_webhooks_per_account__ae9a7f83: "Du har nådd maksimalt webhooks per konto grense (%{max})"
   you_have_reached_the_maximum_webhooks_per_user_lim_2af4b256: "Du har nådd maksimalt webhooks per bruker Grense (%{max})"
+  you_have_submitted_the_assignment_7ef8a51a: "Du har levert inn en oppgave"
   you_ll_definitely_want_some_of_these_what_s_the_fu_f4f3578b: "Du vil helt sikkert ønsker noen av disse. Hva er gøy å undervise et kurs hvis ingen lytter?"
   you_ll_need_a_refresh_token_follow_the_steps_at_th_79a3984b: "Du vil trenge å oppdatere token, følge trinnene på denne koblingen. Du kan oppsøke en teknisk ekspert for hjelp"
   you_may_want_to_assign_some_tas_to_help_you_with_t_702244aa: "Det kan være lurt å tildele noen TAs til å hjelpe deg med kurset. TAs kan vurdere student innleveringer, hjelpe moderere diskusjoner og med oppdatere forfallsdatoer og oppdrags detaljene for deg."
@@ -15140,6 +15180,7 @@ nb:
   you_must_specify_a_usage_right_5eb57f87: "Du må spesifisere et bruk rett."
   you_need_to_preview_your_changes_before_applying_t_cb048bed: "du trenger å *Forhåndsvise dine endringer* før du bruker dem på alle"
   you_re_editing_your_canvas_theme_the_changes_have__c0ae1bd1: "Du redigerer din Canvas mal! Endringene har ikke blitt brukt ennå"
+  you_scored_d3e00111: "Du fikk"
   you_will_be_redirected_to_a_login_page_where_you_w_fc8df402: "Du blir omdirigert til en påloggingsside der du vil kunne logge inn med ditt barns påloggingsdetaljer."
   you_will_need_to_create_a_new_app_on_facebook_face_8fe85297: |-
       Du vil trenge å opprette en ny [new app on Facebook](%{facebook_url}), og aktivere Kunde OAuth pålogging
