@@ -272,7 +272,7 @@ class Collaboration < ActiveRecord::Base
       group_users_to_add = User.
           uniq.
           joins(:group_memberships).
-          where('group_memberships.group_id' => group_ids).to_a
+          where('group_memberships.group_id' => group_ids).all
       add_users_to_document((users + group_users_to_add).uniq)
     end
   end

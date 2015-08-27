@@ -6,6 +6,10 @@ module Users
       @force_self_registration = opts[:force_self_registration]
     end
 
+    def should_notify?
+      !!(is_self_registration? || send_confirmation)
+    end
+
     def is_self_registration?
       !!(force_self_registration || !is_manager)
     end
@@ -14,8 +18,8 @@ module Users
       if is_self_registration?
         send_self_registration_email(user, pseudonym)
         return true
-      elsif send_confirmation
-        send_confirmation_email(user, pseudonym)
+      elsif should_notify? && !user.registered?
+        pseudonym.send_registration_notification!
         return true
       elsif channel.has_merge_candidates?
         channel.send_merge_notification!
@@ -30,14 +34,6 @@ module Users
       if user.pre_registered?
         pseudonym.send_confirmation!
       elsif !user.registered?
-        pseudonym.send_registration_notification!
-      end
-    end
-
-    def send_confirmation_email(user, pseudonym)
-      if user.registered?
-        pseudonym.send_registration_done_notification!
-      else
         pseudonym.send_registration_notification!
       end
     end

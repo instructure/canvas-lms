@@ -83,11 +83,11 @@ export default moment.defineLocale('sl', {
     weekdaysMin : 'ne_po_to_sr_če_pe_so'.split('_'),
     longDateFormat : {
         LT : 'H:mm',
-        LTS : 'H:mm:ss',
+        LTS : 'LT:ss',
         L : 'DD. MM. YYYY',
         LL : 'D. MMMM YYYY',
-        LLL : 'D. MMMM YYYY H:mm',
-        LLLL : 'dddd, D. MMMM YYYY H:mm'
+        LLL : 'D. MMMM YYYY LT',
+        LLLL : 'dddd, D. MMMM YYYY LT'
     },
     calendar : {
         sameDay  : '[danes ob] LT',

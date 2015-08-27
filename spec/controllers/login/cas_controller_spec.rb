@@ -17,7 +17,6 @@
 #
 
 require_relative '../../spec_helper'
-require 'rotp'
 
 describe Login::CasController do
   def stubby(stub_response, use_mock = true)

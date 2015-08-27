@@ -20,7 +20,7 @@ module Api::V1::SisAssignment
   include Api::V1::Json
 
   API_SIS_ASSIGNMENT_JSON_OPTS = {
-    only: %i(id description created_at due_at points_possible integration_id integration_data).freeze,
+    only: %i(id description due_at points_possible integration_id integration_data).freeze,
     methods: %i(name).freeze
   }.freeze
 
@@ -34,10 +34,6 @@ module Api::V1::SisAssignment
 
   API_SIS_ASSIGNMENT_COURSE_JSON_OPTS = {
     only: %i(id name sis_source_id integration_id).freeze
-  }.freeze
-
-  API_SIS_ASSIGNMENT_OVERRIDES_JSON_OPTS = {
-    only: %i(title due_at).freeze
   }.freeze
 
   def sis_assignments_json(assignments)
@@ -62,22 +58,20 @@ module Api::V1::SisAssignment
   end
 
   def add_sis_course_sections_json(assignment, json)
-    return unless assignment.association(:context).loaded?
-    course_sections = active_course_sections_for(assignment.context)
-    return unless course_sections
-    json.merge!(sections: sis_assignment_course_sections_json(course_sections, assignment))
+    return unless assignment.association(:context).loaded? && assignment.context.respond_to?(:course_sections)
+    return unless assignment.context.association(:course_sections).loaded?
+    json.merge!(sections: sis_assignment_course_sections_json(assignment.context.course_sections))
   end
 
-  def sis_assignment_course_sections_json(course_sections, assignment)
-    course_sections.map { |s| sis_assignment_course_section_json(s, assignment) }
+  def sis_assignment_course_sections_json(course_sections)
+    course_sections.map { |s| sis_assignment_course_section_json(s) }
   end
 
-  def sis_assignment_course_section_json(course_section, assignment)
+  def sis_assignment_course_section_json(course_section)
     json = api_json(course_section, nil, nil, API_SIS_ASSIGNMENT_COURSE_SECTION_JSON_OPTS)
     json[:sis_id] = json.delete(:sis_source_id)
     json[:origin_course] = sis_assignment_course_json(course_section.nonxlist_course || course_section.course)
     json[:xlist_course] = sis_assignment_course_json(course_section.course) if course_section.crosslisted?
-    add_sis_assignment_override_json(json, assignment, course_section)
     json
   end
 
@@ -85,34 +79,5 @@ module Api::V1::SisAssignment
     json = api_json(course, nil, nil, API_SIS_ASSIGNMENT_COURSE_JSON_OPTS)
     json[:sis_id] = json.delete(:sis_source_id)
     json
-  end
-
-  def add_sis_assignment_override_json(json, assignment, course_section)
-    assignment_overrides = active_assignment_overrides_for(assignment)
-    return unless assignment_overrides
-    override = assignment_overrides.detect do |assignment_override|
-      assignment_override.set_type == 'CourseSection' && assignment_override.set_id == course_section.id
-    end
-    return if override.nil?
-
-    override_json = api_json(override, nil, nil, API_SIS_ASSIGNMENT_OVERRIDES_JSON_OPTS)
-    override_json[:override_title] = override_json.delete(:title)
-    json[:override] = override_json
-  end
-
-  private def active_course_sections_for(context)
-    if context.respond_to?(:active_course_sections) && context.association(:active_course_sections).loaded?
-      context.active_course_sections
-    elsif context.respond_to?(:course_sections) && context.association(:course_sections).loaded?
-      context.course_sections.select(&:active?)
-    end
-  end
-
-  private def active_assignment_overrides_for(assignment)
-    if assignment.association(:active_assignment_overrides).loaded?
-      assignment.active_assignment_overrides
-    elsif assignment.association(:assignment_overrides).loaded?
-      assignment.assignment_overrides.select(&:active?)
-    end
   end
 end

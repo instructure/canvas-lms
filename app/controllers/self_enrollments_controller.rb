@@ -29,9 +29,9 @@ class SelfEnrollmentsController < ApplicationController
     login_handle_name = @domain_root_account.login_handle_name_with_inference
     @login_label_name = login_handle_name if login_handle_name
 
-    if !@current_user && @domain_root_account.delegated_authentication? && !(params[:authentication_provider] == 'canvas')
+    if !@current_user && @domain_root_account.delegated_authentication?
       store_location
-      return redirect_to login_url(params.slice(:authentication_provider))
+      return redirect_to login_url
     end
   end
 

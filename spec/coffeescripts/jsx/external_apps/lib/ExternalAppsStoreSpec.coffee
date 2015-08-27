@@ -16,9 +16,7 @@ define [
           "description": "Talent provides an online, interactive video platform for professional development",
           "enabled": true,
           "installed_locally": true,
-          "name": "Talent",
-          "context": "Course",
-          "context_id": 1
+          "name": "Talent"
         },
         {
           "app_id": 2,
@@ -26,9 +24,7 @@ define [
           "description": null,
           "enabled": true,
           "installed_locally": true,
-          "name": "Twitter",
-          "context": "Course",
-          "context_id": 1
+          "name": "Twitter"
         },
         {
           "app_id": 3,
@@ -36,9 +32,7 @@ define [
           "description": null,
           "enabled": false,
           "installed_locally": true,
-          "name": "LinkedIn",
-          "context": "Course",
-          "context_id": 1
+          "name": "LinkedIn"
         }
       ]
 

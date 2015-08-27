@@ -17,7 +17,6 @@
 #
 
 require_relative '../../sharding_spec_helper'
-require 'rotp'
 
 describe Login::CanvasController do
   before :once do

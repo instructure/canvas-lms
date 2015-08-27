@@ -1,13 +1,12 @@
 define [
   'jquery'
   'underscore'
-  'timezone'
   'compiled/views/DialogBaseView'
   'compiled/util/deparam'
   'jst/conferences/editConferenceForm'
   'jst/conferences/userSettingOptions'
   'compiled/behaviors/authenticity_token'
-], ($, _, tz, DialogBaseView, deparam, template, userSettingOptionsTemplate, authenticity_token) ->
+], ($, _, DialogBaseView, deparam, template, userSettingOptionsTemplate, authenticity_token) ->
 
   class EditConferenceView extends DialogBaseView
 
@@ -101,7 +100,7 @@ define [
             when 'date_picker'
               optionObj['isDatePicker'] = true
               if(currentVal)
-                optionObj['value'] = tz.format(currentVal, 'date.formats.full_with_weekday')
+                optionObj['value'] = tz.format(currentVal, "%b %-d, %Y %l:%M%P")
               else
                 optionObj['value'] = currentVal
               break

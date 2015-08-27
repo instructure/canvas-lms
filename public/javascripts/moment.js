@@ -1,3 +1,3 @@
-define(['bower/moment/min/moment-with-locales'], function(moment) {
+define(['bower/moment/moment'], function(moment) {
   return moment;
 });

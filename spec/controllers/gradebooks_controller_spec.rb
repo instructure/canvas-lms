@@ -331,11 +331,11 @@ describe GradebooksController do
         end
         it "should get all the expected datas even with multibytes characters", :focus => true do
           @course.assignments.create(:title => "Déjà vu")
-          exporter = GradebookExporter.new(
-            @course,
-            { user: @teacher, include_priors: false, include_sis_id: true }
-          )
-          raw_csv = exporter.to_csv
+          raw_csv = @course.gradebook_to_csv({
+            :user => @teacher,
+            :include_priors => false,
+            :include_sis_id => true
+          })
           expect(raw_csv).to include("Déjà vu")
         end
       end

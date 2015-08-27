@@ -22,12 +22,19 @@ class GradebookUploadsController < ApplicationController
 
   before_filter :require_context
 
+  def gradebook_upload
+    GradebookUpload.where(
+      course_id: @context,
+      user_id: @current_user
+    ).first
+  end
+
   def new
     if authorized_action(@context, @current_user, :manage_grades)
+
       # GradebookUpload is a singleton.  If there is
       # already an instance we'll redirect to it or kill it
-      previous_upload = gradebook_upload
-      if previous_upload
+      if previous_upload = gradebook_upload
         if previous_upload.stale?
           previous_upload.destroy
         elsif previous_upload
@@ -41,6 +48,7 @@ class GradebookUploadsController < ApplicationController
 
   def show
     if authorized_action(@context, @current_user, :manage_grades)
+
       upload = gradebook_upload
       unless upload
         redirect_to new_course_gradebook_upload_path(@context)
@@ -54,16 +62,10 @@ class GradebookUploadsController < ApplicationController
 
   def create
     if authorized_action(@context, @current_user, :manage_grades)
-      if params[:gradebook_upload]
-        attachment = params[:gradebook_upload][:uploaded_data]
-        @progress = GradebookUpload.queue_from(@context, @current_user, attachment.read)
-        js_env gradebook_env(@progress)
-        render :show
-      else
-        flash[:error] = t(:no_file_attached, "We did not detect a CSV to "\
-          "upload. Please select a CSV to upload and submit again.")
-        redirect_to action: :new
-      end
+      attachment = params[:gradebook_upload][:uploaded_data]
+      @progress = GradebookUpload.queue_from(@context, @current_user, attachment.read)
+      js_env gradebook_env(@progress)
+      render :show
     end
   end
 
@@ -77,7 +79,6 @@ class GradebookUploadsController < ApplicationController
     end
   end
 
-  private
   def gradebook_env(progress)
     {
       progress: progress_json(progress, @current_user, session),
@@ -87,12 +88,5 @@ class GradebookUploadsController < ApplicationController
       create_assignment_path: api_v1_course_assignments_path(@context),
       new_gradebook_upload_path: new_course_gradebook_upload_path(@context),
     }
-  end
-
-  def gradebook_upload
-    GradebookUpload.where(
-      course_id: @context,
-      user_id: @current_user
-    ).first
   end
 end

@@ -33,7 +33,7 @@ class GradeCalculator
     assignment_scope = @course.assignments.published.gradeable
     @assignments = @grading_period ?
                      @grading_period.assignments(assignment_scope) :
-                     assignment_scope.to_a
+                     assignment_scope.all
 
     @user_ids = Array(user_ids).map(&:to_i)
     @current_updates = {}

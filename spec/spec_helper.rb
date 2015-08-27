@@ -22,7 +22,6 @@ rescue LoadError
 end
 
 require 'securerandom'
-require 'test/unit' if RUBY_VERSION >= '2.2.0'
 
 RSpec.configure do |c|
   c.raise_errors_for_deprecations!
@@ -62,21 +61,6 @@ require 'rspec/rails'
 Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
 
 ActionView::TestCase::TestController.view_paths = ApplicationController.view_paths
-
-unless CANVAS_RAILS3
-  Time.class_eval do
-    def compare_with_round(other)
-      other = Time.at(other.to_i, other.usec) if other.respond_to?(:usec)
-      Time.at(self.to_i, self.usec).compare_without_round(other)
-    end
-    alias_method :compare_without_round, :<=>
-    alias_method :<=>, :compare_with_round
-  end
-
-  # temporary patch to keep things sane
-  # TODO: actually fix the deprecation messages once we're on Rails 4 permanently and remove this
-  ActiveSupport::Deprecation.silenced = true
-end
 
 module RSpec::Rails
   module ViewExampleGroup
@@ -768,10 +752,6 @@ RSpec.configure do |config|
     send(method, url, query, headers.merge(http_headers))
   end
 
-  def content_type_key
-    CANVAS_RAILS3 ? 'content-type' : 'Content-Type'
-  end
-
   def force_string_encoding(str, encoding = "UTF-8")
     if str.respond_to?(:force_encoding)
       str.force_encoding(encoding)
@@ -906,7 +886,7 @@ RSpec.configure do |config|
       klass.connection.bulk_insert klass.table_name, records
       scope = klass.order("id DESC").limit(records.size)
       return_type == :record ?
-        scope.to_a.reverse :
+        scope.all.reverse :
         scope.pluck(:id).reverse
     end
   end

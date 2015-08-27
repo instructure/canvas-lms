@@ -1103,15 +1103,6 @@ class UsersController < ApplicationController
   #   self-registration and this canvas instance requires users to accept
   #   the terms (on by default).
   #
-  # @argument user[skip_registration] [Boolean]
-  #   Automatically mark the user as registered.
-  #
-  #   If this is true, it is recommended to set <tt>"pseudonym[send_confirmation]"</tt> to true as well.
-  #   Otherwise, the user will not receive any messages about their account creation.
-  #
-  #   The users communication channel confirmation can be skipped by setting
-  #   <tt>"communication_channel[skip_confirmation]"</tt> to true as well.
-  #
   # @argument pseudonym[unique_id] [Required, String]
   #   User's login ID. If this is a self-registration, it must be a valid
   #   email address.
@@ -1209,9 +1200,7 @@ class UsersController < ApplicationController
 
     includes = %w{locale}
 
-    cc_params = params[:communication_channel]
-
-    if cc_params
+    if cc_params = params[:communication_channel]
       cc_type = cc_params[:type] || CommunicationChannel::TYPE_EMAIL
       cc_addr = cc_params[:address] || params[:pseudonym][:unique_id]
 
@@ -1247,9 +1236,8 @@ class UsersController < ApplicationController
       @user.attributes = params[:user]
     end
     @user.name ||= params[:pseudonym][:unique_id]
-    skip_registration = value_to_boolean(params[:user][:skip_registration])
     unless @user.registered?
-      @user.workflow_state = if require_password || skip_registration
+      @user.workflow_state = if require_password
         # no email confirmation required (self_enrollment_code and password
         # validations will ensure everything is legit)
         'registered'
@@ -1945,8 +1933,8 @@ class UsersController < ApplicationController
         includes(:assignment).
         where("user_id IN (?) AND #{Submission.needs_grading_conditions}", ids).
         except(:order).
-        order(:submitted_at).to_a
-
+        order(:submitted_at).
+        all
 
     ungraded_submissions.each do |submission|
       next unless student = data[submission.user_id]

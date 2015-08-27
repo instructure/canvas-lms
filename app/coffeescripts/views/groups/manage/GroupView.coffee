@@ -5,9 +5,8 @@ define [
   'jst/groups/manage/group'
   'compiled/views/groups/manage/GroupUsersView'
   'compiled/views/groups/manage/GroupDetailView'
-  'compiled/views/groups/manage/GroupCategoryCloneView'
   'compiled/behaviors/firefox_number_fix'
-], ($, _, {View}, template, GroupUsersView, GroupDetailView, GroupCategoryCloneView) ->
+], ($, _, {View}, template, GroupUsersView, GroupDetailView) ->
 
   class GroupView extends View
 
@@ -85,12 +84,6 @@ define [
       @groupDetailView.closeMenu()
       @groupUsersView.closeMenus()
 
-    groupsAreDifferent: (user) =>
-      !user.has('group') || (user.get('group').get("id") != @model.get("id"))
-
-    eitherGroupHasSubmission: (user) =>
-      (user.has('group') && user.get('group').get("has_submission")) || @model.get('has_submission')
-
     ##
     # handle drop events on a GroupView
     # e - Event object.
@@ -99,21 +92,6 @@ define [
     #   ui.draggable - the user being dragged
     _onDrop: (e, ui) =>
       user = ui.draggable.data('model')
-
-      if @groupsAreDifferent(user) && @eitherGroupHasSubmission(user)
-        @cloneCategoryView = new GroupCategoryCloneView
-          model: @model.collection.category,
-          openedFromCaution: true
-        @cloneCategoryView.open()
-        @cloneCategoryView.on "close", =>
-          if @cloneCategoryView.cloneSuccess
-            window.location.reload()
-          else if @cloneCategoryView.changeGroups
-            @moveUser(e, user)
-      else
-        @moveUser(e, user)
-
-    moveUser: (e, user) ->
       newGroupId = $(e.currentTarget).data('id')
       setTimeout =>
         @model.collection.category.reassignUser(user, @model.collection.get(newGroupId))

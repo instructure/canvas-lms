@@ -24,7 +24,7 @@ class QuestionBanksController < ApplicationController
 
   def index
     if @context == @current_user || authorized_action(@context, @current_user, :manage_assignments)
-      @question_banks = @context.assessment_question_banks.active.except(:includes).to_a
+      @question_banks = @context.assessment_question_banks.active.except(:includes).all
       if params[:include_bookmarked] == '1'
         @question_banks += @current_user.assessment_question_banks.active
       end
@@ -43,7 +43,7 @@ class QuestionBanksController < ApplicationController
   def questions
     find_bank(params[:question_bank_id], params[:inherited] == '1') do
       @questions = @bank.assessment_questions.active
-      url = polymorphic_url([@context, :question_bank_questions], :question_bank_id => @bank)
+      url = polymorphic_url([@context, :question_bank_questions])
       @questions = Api.paginate(@questions, self, url, default_per_page: 50)
       render :json => {:pages => @questions.total_pages, :questions => @questions}
     end

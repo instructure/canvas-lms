@@ -96,10 +96,6 @@ module Lti
       message_handler.parameters = create_json(mh.parameter.as_json)
       message_handler.resource_handler = resource
       message_handler.save!
-      unless (mh.enabled_capabilities & ResourcePlacement::PLACEMENT_LOOKUP.keys).blank?
-        create_placements(mh, message_handler)
-      end
-      message_handler.save!
       message_handler
     end
 
@@ -127,49 +123,35 @@ module Lti
       resource_handlers = tp.tool_profile.resource_handlers
       if tp.tool_profile.messages.present?
         product_name = tp.tool_profile.product_instance.product_info.product_name
-        r = IMS::LTI::Models::ResourceHandler.new.from_json(
+        rh = IMS::LTI::Models::ResourceHandler.new.from_json(
           {
             resource_type: {code: 'instructure.com:default'},
             resource_name: product_name
           }.to_json
         )
-        r.message = tp.tool_profile.messages
-        resource_handlers << r
+        rh.message = tp.tool_profile.messages
+        resource_handlers << rh
       end
 
       resource_handlers.each do |rh|
         resource_handler = create_resource_handler(rh, tool_proxy)
+        create_placements(rh, resource_handler)
         rh.messages.each do |mh|
           create_message_handler(mh, tp.tool_profile.base_message_url, resource_handler)
         end
-        create_placements_rh(rh, resource_handler) if resource_handler.placements.blank?
+
       end
     end
 
-    def create_placements(mh, message_handler)
-        mh.enabled_capability.each do |p|
-          if ResourcePlacement::PLACEMENT_LOOKUP[p]
-            message_handler.placements.create(placement: ResourcePlacement::PLACEMENT_LOOKUP[p],
-                                              message_handler: message_handler,
-                                              resource_handler: message_handler.resource_handler)
-          end
-        end
-    end
-
-    def create_placements_rh(rh, resource_handler)
+    def create_placements(rh, resource_handler)
       if rh.ext_placements
         rh.ext_placements.each do |p|
-          if ResourcePlacement::PLACEMENT_LOOKUP[p]
-            resource_handler.placements.create(placement: ResourcePlacement::PLACEMENT_LOOKUP[p],
-                                               message_handler: resource_handler.message_handlers.where(message_type: 'basic-lti-launch-request').first)
+          if placement = ResourcePlacement::PLACEMENT_LOOKUP[p]
+            resource_handler.placements.create(placement: placement)
           end
         end
       else
-        ResourcePlacement::DEFAULT_PLACEMENTS.each do |p|
-          resource_handler.placements.create(placement: p,
-                                             message_handler: resource_handler.message_handlers.
-                                                 where(message_type: 'basic-lti-launch-request').first)
-        end
+        ResourcePlacement::DEFAULT_PLACEMENTS.each { |p| resource_handler.placements.create(placement: p) }
       end
     end
 

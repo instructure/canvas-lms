@@ -1,96 +1,84 @@
 require File.expand_path(File.dirname(__FILE__) + '/helpers/gradebook2_common')
-require File.expand_path(File.dirname(__FILE__) + '/helpers/groups_common')
 
 describe "gradebook2" do
-  include_context "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   describe "multiple grading periods" do
-    let!(:enable_mgp) do
+    let!(:enable_mgp_and_navigate_to_gradebook) do
       course_with_admin_logged_in
       student_in_course
       @course.root_account.enable_feature!(:multiple_grading_periods)
+      group = @course.root_account.grading_period_groups.create
+      group.grading_periods.create  start_date: 4.months.ago,
+                                    end_date:   2.months.ago,
+                                    title: "Period in the Past"
+      group.grading_periods.create  start_date: 1.month.ago,
+                                    end_date:   2.months.from_now,
+                                    title: "Current Period"
     end
 
-    it "loads gradebook when no grading periods have been created", priority: "1", test_id: 210011 do
+    let(:select_period_in_the_past) do
+      f(".grading-period-select-button").click
+      f("#ui-id-4").click # The id of the Period in the Past
+    end
+
+    let(:sign_in_as_a_teacher) do
+      teacher_in_course
+      user_session(@teacher)
+    end
+
+    let(:uneditable_cells) { f('.cannot_edit') }
+    let(:gradebook_header) { f('#gradebook_grid .container_1 .slick-header') }
+
+    it "should load gradebook when no grading periods have been created", priority: "1", test_id: 210011 do
       get "/courses/#{@course.id}/gradebook2"
       expect(f('#gradebook-grid-wrapper')).to be_displayed
     end
 
-    describe 'with a current and past grading period' do
-      let!(:create_period_group_and_default_periods) do
-        group = @course.root_account.grading_period_groups.create
-        group.grading_periods.create(
-          start_date: 4.months.ago,
-          end_date:   2.months.ago,
-          title: "Period in the Past"
-        )
-        group.grading_periods.create(
-          start_date: 1.month.ago,
-          end_date:   2.months.from_now,
-          title: "Current Period"
-        )
+    context "assignments in past grading periods" do
+      let!(:assignment_in_the_past) do
+        @course.assignments.create! due_at: 3.months.ago,
+                                    title: "past-due assignment"
       end
 
-      let(:select_period_in_the_past) do
-        f(".grading-period-select-button").click
-        f("#ui-id-4").click # The id of the Period in the Past
+      it "admins should be able to edit", priority: "1", test_id: 210012 do
+        get "/courses/#{@course.id}/gradebook2"
+
+        select_period_in_the_past
+        expect(gradebook_header).to include_text("past-due assignment")
+        expect(uneditable_cells).to_not be_present
       end
 
-      let(:sign_in_as_a_teacher) do
-        teacher_in_course
-        user_session(@teacher)
+      it "teachers should not be able to edit", priority: "1", test_id: 210023 do
+        sign_in_as_a_teacher
+
+        get "/courses/#{@course.id}/gradebook2"
+
+        select_period_in_the_past
+        expect(gradebook_header).to include_text("past-due assignment")
+        expect(uneditable_cells).to be_present
+      end
+    end
+
+    context "assignments with no due_at" do
+      let!(:assignment_without_due_at) do
+        @course.assignments.create! title: "No Due Date"
       end
 
-      let(:uneditable_cells) { f('.cannot_edit') }
-      let(:gradebook_header) { f('#gradebook_grid .container_1 .slick-header') }
+      it "admins should be able to edit", priority: "1", test_id: 210014 do
+        get "/courses/#{@course.id}/gradebook2"
 
-      context "assignments in past grading periods" do
-        let!(:assignment_in_the_past) do
-          @course.assignments.create!(
-            due_at: 3.months.ago,
-            title: "past-due assignment"
-          )
-        end
-
-        it "admins should be able to edit", priority: "1", test_id: 210012 do
-          get "/courses/#{@course.id}/gradebook2"
-
-          select_period_in_the_past
-          expect(gradebook_header).to include_text("past-due assignment")
-          expect(uneditable_cells).to_not be_present
-        end
-
-        it "teachers should not be able to edit", priority: "1", test_id: 210023 do
-          sign_in_as_a_teacher
-
-          get "/courses/#{@course.id}/gradebook2"
-
-          select_period_in_the_past
-          expect(gradebook_header).to include_text("past-due assignment")
-          expect(uneditable_cells).to be_present
-        end
+        expect(gradebook_header).to include_text("No Due Date")
+        expect(uneditable_cells).to_not be_present
       end
 
-      context "assignments with no due_at" do
-        let!(:assignment_without_due_at) do
-          @course.assignments.create! title: "No Due Date"
-        end
+      it "teachers should be able to edit", priority: "1", test_id: 210015 do
+        sign_in_as_a_teacher
 
-        it "admins should be able to edit", priority: "1", test_id: 210014 do
-          get "/courses/#{@course.id}/gradebook2"
+        get "/courses/#{@course.id}/gradebook2"
 
-          expect(gradebook_header).to include_text("No Due Date")
-          expect(uneditable_cells).to_not be_present
-        end
-
-        it "teachers should be able to edit", priority: "1", test_id: 210015 do
-          sign_in_as_a_teacher
-
-          get "/courses/#{@course.id}/gradebook2"
-
-          expect(gradebook_header).to include_text("No Due Date")
-          expect(uneditable_cells).to_not be_present
-        end
+        expect(gradebook_header).to include_text("No Due Date")
+        expect(uneditable_cells).to_not be_present
       end
     end
   end
@@ -876,6 +864,71 @@ describe "gradebook2" do
     end
   end
 
+  context 'excused assignment' do
+    it 'default grade cannot be set to excused', priority: "1", test_id: 219380 do
+      init_course_with_students
+
+      assignment = @course.assignments.create! title: 'Test Me!', points_possible: 20
+      get "/courses/#{@course.id}/grades"
+      f('.assignment_header_drop').click
+      f('.gradebook-header-menu [data-action="setDefaultGrade"]').click
+
+      ['EX', 'eX', 'Ex', 'ex'].each_with_index do |ex, i|
+        replace_content f("#student_grading_#{assignment.id}"), "#{ex}\n"
+        wait_for_ajaximations
+        expect(ff('.ic-flash-error').length).to be i + 1
+        expect(f('.ic-flash-error').text).to include 'Default grade cannot be set to EX'
+      end
+    end
+
+    it 'formats excused grade like dropped assignment', priority: "1", test_id: 216380 do
+      init_course_with_students
+
+      assignment = @course.assignments.create! title: 'Excuse Me', points_possible: 20
+      assignment.grade_student(@students[0], {excuse: true})
+
+      user_session(@students[0])
+      get "/courses/#{@course.id}/grades"
+
+      grade_row = f("#submission_#{assignment.id}")
+      grade_cell = f(".assignment_score .grade", grade_row)
+      grade = grade_cell.text.scan(/\d+|EX/).first
+
+      expect(grade_row).to have_class '.excused'
+      expect(grade).to eq 'EX'
+      expect(grade_row.attribute 'title').to eq 'This assignment is excused and will not be considered in the total calculation'
+    end
+
+    it 'is not included in grade calculations', priority: "1", test_id: 196596 do
+      init_course_with_students
+
+      a1 = @course.assignments.create! title: 'Excuse Me', points_possible: 20
+      a2 = @course.assignments.create! title: 'Don\'t Excuse Me', points_possible: 20
+
+      a1.grade_student(@students[0], {grade: 20})
+      a2.grade_student(@students[0], {grade: 5})
+
+      get "/courses/#{@course.id}/gradebook/"
+      excused = f('#gradebook_grid .container_1 .slick-row .slick-cell:nth-child(2)')
+      excused.click
+      replace_content excused.find_element(:css, '.grade'), "EX\n"
+
+      row = ff('#gradebook_grid .container_1 .slick-row .slick-cell')
+
+      expect(row[0].text).to eq '20'
+      # this should show 'EX' and have dropped class
+      expect(row[1].text).to eq('EX')
+      expect(row[1]).to have_class 'dropped'
+
+      # only one cell should have 'dropped' class
+      dropped = ff('#gradebook_grid .container_1 .slick-row .dropped')
+      expect(dropped.length).to eq 1
+
+      # 'EX' should only affect that one cell
+      expect(row[2].text).to eq '100%'
+    end
+  end
+
   context "as an observer" do
     before(:each) do
       data_setup_as_observer
@@ -901,7 +954,7 @@ describe "gradebook2" do
       @assignment.save
     end
 
-    it "should not be visible by default", priority: "1", test_id: 244958 do
+    it "should not be visible by default" do
       get "/courses/#{@course.id}/gradebook2"
       expect(ff('.post-grades-placeholder').length).to eq 0
     end
@@ -914,7 +967,7 @@ describe "gradebook2" do
       expect(ff('.post-grades-placeholder').length).to eq 1
     end
 
-    it "should not be displayed if viewing outcome gradebook", priority: "1", test_id: 244959 do
+    it "should not be displayed if viewing outcome gradebook" do
       Account.default.set_feature_flag!('post_grades', 'on')
       Account.default.set_feature_flag!('outcome_gradebook', 'on')
 
@@ -930,7 +983,7 @@ describe "gradebook2" do
       expect(f('.post-grades-placeholder')).to be_displayed
     end
 
-    it "should display post grades button when powerschool is configured", priority: "1", test_id: 164219 do
+    it "should display post grades button when powerschool is configured" do
       Account.default.set_feature_flag!('post_grades', 'on')
       @course.sis_source_id = 'xyz'
       @course.save
@@ -960,7 +1013,7 @@ describe "gradebook2" do
         post_grades_tool
       end
 
-      it "should show when a post_grades lti tool is installed", priority: "1", test_id: 244960 do
+      it "should show when a post_grades lti tool is installed" do
         create_post_grades_tool
 
         get "/courses/#{@course.id}/gradebook2"
@@ -971,7 +1024,7 @@ describe "gradebook2" do
         expect(f('iframe.post-grades-frame')).to be_displayed
       end
 
-      it "should hide post grades lti button when section selected", priority: "1", test_id: 248027 do
+      it "should hide post grades lti button when section selected" do
         create_post_grades_tool
 
         get "/courses/#{@course.id}/gradebook2"
@@ -985,7 +1038,7 @@ describe "gradebook2" do
         expect(f('button.external-tools-dialog')).not_to be_displayed
       end
 
-      it "should show as drop down menu when multiple tools are installed", priority: "1", test_id: 244920 do
+      it "should show as drop down menu when multiple tools are installed" do
         (0...10).each do |i|
           create_post_grades_tool(name: "test tool #{i}")
         end
@@ -1000,7 +1053,7 @@ describe "gradebook2" do
         expect(f('iframe.post-grades-frame')).to be_displayed
       end
 
-      it "should hide post grades lti dropdown when section selected", priority: "1", test_id: 248027 do
+      it "should hide post grades lti dropdown when section selected" do
         (0...10).each do |i|
           create_post_grades_tool(name: "test tool #{i}")
         end
@@ -1016,7 +1069,7 @@ describe "gradebook2" do
         expect(f('button#post_grades')).not_to be_displayed
       end
 
-      it "should show as drop down menu with an ellipsis when too many tools are installed", priority: "1", test_id: 244961 do
+      it "should show as drop down menu with an ellipsis when too many tools are installed" do
         (0...11).each do |i|
           create_post_grades_tool(name: "test tool #{i}")
         end
@@ -1028,7 +1081,7 @@ describe "gradebook2" do
         expect(ff('li.external-tools-dialog.ellip').count).to eq(1)
       end
 
-      it "should show as drop down menu when powerschool is configured and an lti tool is installed", priority: "1", test_id: 244962 do
+      it "should show as drop down menu when powerschool is configured and an lti tool is installed" do
         Account.default.set_feature_flag!('post_grades', 'on')
         @course.sis_source_id = 'xyz'
         @course.save

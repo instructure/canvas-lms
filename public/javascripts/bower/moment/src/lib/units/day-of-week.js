@@ -57,20 +57,18 @@ addWeekParseToken(['d', 'e', 'E'], function (input, week, config, token) {
 // HELPERS
 
 function parseWeekday(input, locale) {
-    if (typeof input !== 'string') {
-        return input;
+    if (typeof input === 'string') {
+        if (!isNaN(input)) {
+            input = parseInt(input, 10);
+        }
+        else {
+            input = locale.weekdaysParse(input);
+            if (typeof input !== 'number') {
+                return null;
+            }
+        }
     }
-
-    if (!isNaN(input)) {
-        return parseInt(input, 10);
-    }
-
-    input = locale.weekdaysParse(input);
-    if (typeof input === 'number') {
-        return input;
-    }
-
-    return null;
+    return input;
 }
 
 // LOCALES
@@ -93,7 +91,9 @@ export function localeWeekdaysMin (m) {
 export function localeWeekdaysParse (weekdayName) {
     var i, mom, regex;
 
-    this._weekdaysParse = this._weekdaysParse || [];
+    if (!this._weekdaysParse) {
+        this._weekdaysParse = [];
+    }
 
     for (i = 0; i < 7; i++) {
         // make the regex if we don't have it already

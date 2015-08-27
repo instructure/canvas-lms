@@ -1,8 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
-require File.expand_path(File.dirname(__FILE__) + '/helpers/public_courses_context')
 
 describe "course syllabus" do
-  include_context "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   def add_assignment(title, points)
     #assignment data
@@ -32,13 +31,13 @@ describe "course syllabus" do
       wait_for_ajaximations
     end
 
-    it "should confirm existing assignments and dates are correct", priority:"1", test_id: 237016 do
+    it "should confirm existing assignments and dates are correct" do
       assignment_details = ff('td.name')
       expect(assignment_details[0].text).to eq @assignment_1.title
       expect(assignment_details[1].text).to eq @assignment_2.title
     end
 
-    it "should edit the description", priority:"1", test_id: 237017 do
+    it "should edit the description" do
       new_description = "new syllabus description"
       f('.edit_syllabus_link').click
       # check that the wiki sidebar is visible
@@ -51,26 +50,17 @@ describe "course syllabus" do
       expect(f('#course_syllabus').text).to eq new_description
     end
 
-    it "should validate Jump to Today works on the mini calendar", priority:"1", test_id: 237017 do
+    it "should validate Jump to Today works on the mini calendar" do
       2.times { f('.next_month_link').click }
       f('.jump_to_today_link').click
       expect(f('.mini_month .today')).to have_attribute('id', "mini_day_#{Time.now.strftime('%Y_%m_%d')}")
     end
 
     describe "Accessibility" do
-      it "should set focus to the Jump to Today link after clicking Edit the Description", priority:"2", test_id: 237019 do
+      it "should set focus to the Jump to Today link after clicking Edit the Description" do
         f('.edit_syllabus_link').click
         check_element_has_focus(f('.jump_to_today_link'))
       end
-    end
-  end
-
-  context "when a public course is accessed" do
-    include_context "public course as a logged out user"
-
-    it "should display course syllabus", priority: "1", test_id: 270034 do
-      get "/courses/#{public_course.id}/assignments/syllabus"
-      expect(f('#course_syllabus')).to be_displayed
     end
   end
 end

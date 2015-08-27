@@ -74,7 +74,7 @@ class GradebookImporter
     @all_assignments = @context.assignments
       .published
       .gradeable
-      .select([:id, :title, :points_possible, :grading_type, :due_at])
+      .select([:id, :title, :points_possible, :grading_type])
       .index_by(&:id)
     @all_students = @context.all_students
       .select(['users.id', :name, :sortable_name])
@@ -82,6 +82,7 @@ class GradebookImporter
 
     csv = CSV.parse(contents, :converters => :nil)
     @assignments = process_header(csv)
+
     @root_accounts = {}
     @pseudonyms_by_sis_id = {}
     @pseudonyms_by_login_id = {}
@@ -99,8 +100,6 @@ class GradebookImporter
       @students << process_student(row)
       process_submissions(row, @students.last)
     end
-
-    @assignments = select_in_current_grading_periods @assignments
 
     @missing_assignments = []
     @missing_assignments = @all_assignments.values - @assignments if @missing_assignment
@@ -140,12 +139,7 @@ class GradebookImporter
         next if assignment.changed? && !readonly_assignment?(idx)
         indexes_to_delete << idx if readonly_assignment?(idx) || @students.all? do |student|
           submission = student.gradebook_importer_submissions[idx]
-
-          # Have potentially mixed case excused in grade match case
-          # expectations for the compare so it doesn't look changed
-          submission['grade'] = 'EX' if submission['grade'].to_s.upcase == 'EX'
-
-          submission['original_grade'].to_s == submission['grade'].to_s ||
+          submission['original_grade'].to_s == submission['grade'] ||
             (submission['original_grade'].blank? && submission['grade'].blank?)
         end
       end
@@ -166,8 +160,8 @@ class GradebookImporter
     @students.delete_if { |s| prior_enrollment_ids.include? s.id }
 
     @original_submissions = [] unless @missing_student || @missing_assignment
-    @upload.gradebook = self.as_json
 
+    @upload.gradebook = self.as_json
     @upload.save!
   end
 
@@ -188,25 +182,6 @@ class GradebookImporter
     return false if last_student_info_column(row) !~ /Section/
 
     true
-  end
-
-  def select_in_current_grading_periods(assignments)
-    if @context.feature_enabled?(:multiple_grading_periods)
-      assignments, assignments_without_due_at = assignments.partition(&:due_at)
-      current_periods = GradingPeriod.for(@context).active.current
-
-      current, outside = assignments.partition do |assignment|
-        current_periods.any? do |period|
-          period.in_date_range? assignment.due_at
-        end
-      end
-
-      @assignments_outside_current_periods = outside
-      current + assignments_without_due_at
-    else
-      @assignments_outside_current_periods = []
-      assignments
-    end
   end
 
   def last_student_info_column(row)
@@ -250,9 +225,7 @@ class GradebookImporter
     stripped_row.map do |name_and_id|
       title, id = Assignment.title_and_id(name_and_id)
       assignment = @all_assignments[id.to_i] if id.present?
-      # backward compat
-      assignment ||= @all_assignments.find { |_id, a| a.title == name_and_id }
-        .try(:last)
+      assignment ||= @all_assignments.detect { |_id, a| a.title == name_and_id }.try(:last) # backward compat
       assignment ||= Assignment.new(:title => title || name_and_id)
       assignment.previous_id = assignment.id
       assignment.id ||= NegativeId.generate
@@ -279,21 +252,14 @@ class GradebookImporter
         @root_accounts[ra_sis_id] = ra
       end
       ra = @root_accounts[ra_sis_id]
-      if ra && @sis_user_id_column && row[@sis_user_id_column].present?
-        sis_user_id = [ra.id, row[@sis_user_id_column]]
-      end
-      if ra && @sis_login_id_column && row[@sis_login_id_column].present?
-        sis_login_id = [ra.id, row[@sis_login_id_column]]
-      end
+      sis_user_id = [ra.id, row[@sis_user_id_column]] if ra && @sis_user_id_column && row[@sis_user_id_column].present?
+      sis_login_id = [ra.id, row[@sis_login_id_column]] if ra &&
+        @sis_login_id_column && row[@sis_login_id_column].present?
       pseudonym = @pseudonyms_by_sis_id[sis_user_id] if sis_user_id
       pseudonym ||= @pseudonyms_by_login_id[sis_login_id] if sis_login_id
       student = @all_students[pseudonym.user_id] if pseudonym
     end
-    if row[0].present?
-      student ||= @all_students.find do |_id, s|
-        s.name == row[0] || s.sortable_name == row[0]
-      end.try(:last)
-    end
+    student ||= @all_students.detect { |_id, s| s.name == row[0] || s.sortable_name == row[0] }.try(:last) if row[0].present?
     student ||= User.new(:name => row[0])
     student.previous_id = student.id
     student.id ||= NegativeId.generate
@@ -306,9 +272,7 @@ class GradebookImporter
     @assignments.each_with_index do |assignment, idx|
       assignment_id = assignment.new_record? ? assignment.id : assignment.previous_id
       grade = row[idx + @student_columns]
-      unless assignment_visible_to_student(student, assignment, assignment_id, @visible_assignments)
-        grade = ''
-      end
+      grade = '' unless assignment_visible_to_student(student, assignment, assignment_id, @visible_assignments)
       new_submission = {
         'grade' => grade,
         'assignment_id' => assignment_id
@@ -335,9 +299,7 @@ class GradebookImporter
         :students => @missing_students.map { |s| student_to_hash(s) }
       },
       :original_submissions => @original_submissions,
-      :unchanged_assignments => @unchanged_assignments,
-      :assignments_outside_current_periods =>
-        @assignments_outside_current_periods.map { |a| assignment_to_hash(a) }
+      :unchanged_assignments => @unchanged_assignments
     }
   end
 
@@ -371,8 +333,7 @@ class GradebookImporter
       :previous_id => assignment.previous_id,
       :title => assignment.title,
       :points_possible => assignment.points_possible,
-      :grading_type => assignment.grading_type,
-      :due_at => assignment.due_at
+      :grading_type => assignment.grading_type
     }
   end
 

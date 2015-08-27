@@ -23,6 +23,7 @@ def assignment_model(opts={})
   @group_category = course.group_categories.create(:name => group_category) if group_category
   opts[:group_category] = @group_category if @group_category
   @assignment = factory_with_protected_attributes(course.assignments, assignment_valid_attributes.merge(opts))
+  expect(@assignment.context).to eq course
   @a = @assignment
   @c = course
   @a
@@ -32,7 +33,7 @@ def assignment_valid_attributes
   {
     :title => "value for title",
     :description => "value for description",
-    :due_at => Time.zone.now,
+    :due_at => Time.now,
     :points_possible => "1.5"
   }
 end

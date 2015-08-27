@@ -226,14 +226,6 @@ class Group < ActiveRecord::Base
       (self.group_category.communities? || (self.group_category.student_organized? && self.context.user_is_student?(creator)))
   end
 
-  def submission?
-    if context_type == 'Course'
-      assignments = Assignment.for_group_category(group_category_id).active
-      return Submission.where(group_id: id, assignment_id: assignments).exists?
-    end
-    false
-  end
-
   def short_name
     name
   end
@@ -339,7 +331,7 @@ class Group < ActiveRecord::Base
   def bulk_add_users_to_group(users, options = {})
     return if users.empty?
     user_ids = users.map(&:id)
-    old_group_memberships = self.group_memberships.where("user_id IN (?)", user_ids).to_a
+    old_group_memberships = self.group_memberships.where("user_id IN (?)", user_ids).all
     bulk_insert_group_memberships(users, options)
     all_group_memberships = self.group_memberships.where("user_id IN (?)", user_ids)
     new_group_memberships = all_group_memberships - old_group_memberships
@@ -399,7 +391,7 @@ class Group < ActiveRecord::Base
 
   def peer_groups
     return [] if !self.context || !self.group_category || self.group_category.allows_multiple_memberships?
-    self.group_category.groups.where("id<>?", self).to_a
+    self.group_category.groups.where("id<>?", self).all
   end
 
   def migrate_content_links(html, from_course)
@@ -540,9 +532,6 @@ class Group < ActiveRecord::Base
 
       given {|user, session| self.grants_right?(user, session, :manage_content) && self.context && self.context.grants_right?(user, session, :create_conferences)}
       can :create_conferences
-
-      given {|user, session| self.context && self.context.grants_right?(user, session, :read_as_admin)}
-      can :read_as_admin
     end
   end
 

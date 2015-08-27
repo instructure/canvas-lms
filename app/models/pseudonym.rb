@@ -95,13 +95,11 @@ class Pseudonym < ActiveRecord::Base
 
     p.dispatch :pseudonym_registration
     p.to { self.communication_channel || self.user.communication_channel }
-    p.whenever { @send_registration_notification }
-
-    p.dispatch :pseudonym_registration_done
-    p.to { self.communication_channel || self.user.communication_channel }
-    p.whenever { @send_registration_done_notification }
+    p.whenever { |record|
+      @send_registration_notification
+    }
   end
-
+  
   def update_account_associations_if_account_changed
     return unless self.user && !User.skip_updating_account_associations?
     if self.id_was.nil?
@@ -126,12 +124,6 @@ class Pseudonym < ActiveRecord::Base
     @send_registration_notification = true
     self.save!
     @send_registration_notification = false
-  end
-
-  def send_registration_done_notification!
-    @send_registration_done_notification = true
-    self.save!
-    @send_registration_done_notification = false
   end
 
   def send_confirmation!

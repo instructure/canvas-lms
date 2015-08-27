@@ -31,11 +31,11 @@ export default moment.defineLocale('hy-am', {
     weekdaysMin : 'կրկ_երկ_երք_չրք_հնգ_ուրբ_շբթ'.split('_'),
     longDateFormat : {
         LT : 'HH:mm',
-        LTS : 'HH:mm:ss',
+        LTS : 'LT:ss',
         L : 'DD.MM.YYYY',
         LL : 'D MMMM YYYY թ.',
-        LLL : 'D MMMM YYYY թ., HH:mm',
-        LLLL : 'dddd, D MMMM YYYY թ., HH:mm'
+        LLL : 'D MMMM YYYY թ., LT',
+        LLLL : 'dddd, D MMMM YYYY թ., LT'
     },
     calendar : {
         sameDay: '[այսօր] LT',

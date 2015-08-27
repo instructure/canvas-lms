@@ -149,7 +149,7 @@ class Enrollment < ActiveRecord::Base
   after_create :update_needs_grading_count, if: :active_student?
   after_update :update_needs_grading_count, if: :active_student_changed?
   def update_needs_grading_count
-    self.class.connection.after_transaction_commit do
+    connection.after_transaction_commit do
       adjust_needs_grading_count(active_student? ? :increment : :decrement)
     end
   end
@@ -956,8 +956,7 @@ class Enrollment < ActiveRecord::Base
     given { |user| self.user == user }
     can :read and can :read_grades
 
-    given { |user, session| self.course.students_visible_to(user, true).where(:id => self.user_id).exists? &&
-      self.course.grants_any_right?(user, session, :manage_grades, :view_all_grades) }
+    given { |user, session| self.course.students_visible_to(user, true).map(&:id).include?(self.user_id) && self.course.grants_any_right?(user, session, :manage_grades, :view_all_grades) }
     can :read and can :read_grades
 
     given { |user| course.observer_enrollments.where(user_id: user, associated_user_id: self.user_id).exists? }

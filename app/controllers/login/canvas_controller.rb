@@ -112,9 +112,6 @@ class Login::CanvasController < ApplicationController
   protected
 
   def unsuccessful_login(message)
-    if request.format.json?
-      return render :json => {:errors => [message]}, :status => :bad_request
-    end
     flash[:error] = message
     @errored = true
     @headers = false

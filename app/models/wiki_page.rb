@@ -116,7 +116,7 @@ class WikiPage < ActiveRecord::Base
         conditions << send(scope)
       end
     end
-    url_owners = base_scope.where(conditions).to_a
+    url_owners = base_scope.where(conditions).all
     # This is the part in stringex that messed us up, since it will never allow
     # a url of "front-page" once "front-page-1" or "front-page-2" is created
     # We modify it to allow "front-page" and start the indexing at "front-page-2"
@@ -276,6 +276,7 @@ class WikiPage < ActiveRecord::Base
   end
 
   def can_read_page?(user, session=nil)
+    return true if self.wiki.grants_right?(user, session, :manage)
     return true if self.unpublished? && self.wiki.grants_right?(user, session, :view_unpublished_items)
     self.published? && self.wiki.grants_right?(user, session, :read)
   end
