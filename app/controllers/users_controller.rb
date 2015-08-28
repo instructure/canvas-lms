@@ -1143,6 +1143,15 @@ class UsersController < ApplicationController
   #   if the user does not need admin approval.
   #   Defaults to false unless explicitly provided.
   #
+  # @argument pseudonym[authentication_provider_id] [String]
+  #   The authentication provider this login is associated with. Logins
+  #   associated with a specific provider can only be used with that provider.
+  #   Legacy providers (LDAP, CAS, SAML) will search for logins associated with
+  #   them, or unassociated logins. New providers will only search for logins
+  #   explicitly associated with them. This can be the integer ID of the
+  #   provider, or the type of the provider (in which case, it will find the
+  #   first matching provider).
+  #
   # @argument communication_channel[type] [String]
   #   The communication channel type, e.g. 'email' or 'sms'.
   #
@@ -1301,6 +1310,11 @@ class UsersController < ApplicationController
     unless allow_password
       params[:pseudonym].delete(:password)
       params[:pseudonym].delete(:password_confirmation)
+    end
+    if params[:pseudonym][:authentication_provider_id]
+      @pseudonym.authentication_provider = @context.
+          authentication_providers.active.
+          find(params[:pseudonym][:authentication_provider_id])
     end
     @pseudonym.attributes = params[:pseudonym]
     @pseudonym.sis_user_id = sis_user_id

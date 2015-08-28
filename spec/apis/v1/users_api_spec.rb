@@ -677,6 +677,38 @@ describe "Users API", type: :request do
       it "should allow site admins to create users and auto-validate communication channel" do
         create_user_skip_cc_confirm(@site_admin)
       end
+
+      it "respects authentication_provider_id" do
+        ap = Account.site_admin.authentication_providers.create!(auth_type: 'facebook')
+        api_call(:post, "/api/v1/accounts/#{Account.site_admin.id}/users",
+                 {controller: 'users', action: 'create', format: 'json', account_id: Account.site_admin.id.to_s},
+                 {
+                     user: {
+                         name: "Test User",
+                         short_name: "Test",
+                         sortable_name: "User, T.",
+                         time_zone: "Mountain Time (US & Canada)",
+                         locale: 'en'
+                     },
+                     pseudonym: {
+                         unique_id: "test@example.com",
+                         password: "password123",
+                         sis_user_id: "12345",
+                         send_confirmation: 0,
+                         authentication_provider_id: 'facebook'
+                     },
+                     communication_channel: {
+                         type: "sms",
+                         address: '8018888888',
+                         skip_confirmation: 1
+                     }
+                 }
+                )
+        users = User.where(name: "Test User").to_a
+        expect(users.length).to eql 1
+        user = users.first
+        expect(user.pseudonyms.first.authentication_provider).to eq ap
+      end
     end
 
     context 'as an account admin' do
