@@ -39,6 +39,14 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
     self.submission.student
   end
 
+  def publish_submission_comments!
+    self.submission_comments.each do |prov_comment|
+      pub_comment = prov_comment.dup
+      pub_comment.provisional_grade_id = nil
+      pub_comment.save!
+    end
+  end
+
   def publish_rubric_assessments!
     self.rubric_assessments.each do |prov_assmt|
       assoc = prov_assmt.rubric_association

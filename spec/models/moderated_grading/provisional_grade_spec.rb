@@ -112,6 +112,24 @@ describe ModeratedGrading::ProvisionalGrade do
     end
 
   end
+
+  describe "publish_submission_comments!" do
+    it "publishes comments to the submission" do
+      @course = course
+      sub = assignment.submit_homework(student, :submission_type => 'online_text_entry', :body => 'hallo')
+      pg = sub.find_or_create_provisional_grade! scorer: user, score: 1
+      file = assignment.attachments.create! uploaded_data: default_uploaded_data
+      prov_comment = sub.add_comment(commenter: user, message: 'blah', attachments: [file])
+
+      pg.publish_submission_comments!
+
+      real_comment = sub.submission_comments.first
+      expect(real_comment.provisional_grade_id).to be_nil
+      expect(real_comment.author).to eq user
+      expect(real_comment.comment).to eq prov_comment.comment
+      expect(real_comment.attachments.first).to eq prov_comment.attachments.first
+    end
+  end
 end
 
 describe ModeratedGrading::NullProvisionalGrade do
