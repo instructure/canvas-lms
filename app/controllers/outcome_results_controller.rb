@@ -89,7 +89,7 @@
 #       "description": "",
 #       "properties": {
 #         "course": {
-#           "description": "If an aggregate result was requested, the course field will be present Otherwise, the user and section field will be present (Optional) The id of the course that this rollup applies to",
+#           "description": "If an aggregate result was requested, the course field will be present. Otherwise, the user and section field will be present (Optional) The id of the course that this rollup applies to",
 #           "example": 42,
 #           "type": "integer"
 #         },
@@ -417,19 +417,18 @@ class OutcomeResultsController < ApplicationController
       @outcome_links = ContentTag.learning_outcome_links.active.where(associated_asset_id: group_id).preload(:learning_outcome_content)
       @outcomes = @outcome_links.map(&:learning_outcome_content)
     else
-      @outcome_links = []
-      outcome_group_ids.each_slice(100) do |outcome_group_ids_slice|
-        @outcome_links += ContentTag.learning_outcome_links.active.where(associated_asset_id: outcome_group_ids_slice)
-      end
-      @outcome_links.each_slice(100) do |outcome_links_slice|
-        ActiveRecord::Associations::Preloader.new(outcome_links_slice, :learning_outcome_content).run
-      end
-
       if params[:outcome_ids]
         outcome_ids = Api.value_to_array(params[:outcome_ids]).map(&:to_i).uniq
-        @outcomes = @outcome_links.map(&:learning_outcome_content).select{ |outcome| outcome_ids.include?(outcome.id) }
+        @outcomes = ContentTag.learning_outcome_links.active.joins(:learning_outcome_content).where(content_id: outcome_ids).map(&:learning_outcome_content)
         reject! "can only include id's of outcomes in the outcome context" if @outcomes.count != outcome_ids.count
       else
+        @outcome_links = []
+        outcome_group_ids.each_slice(100) do |outcome_group_ids_slice|
+          @outcome_links += ContentTag.learning_outcome_links.active.where(associated_asset_id: outcome_group_ids_slice)
+        end
+        @outcome_links.each_slice(100) do |outcome_links_slice|
+          ActiveRecord::Associations::Preloader.new(outcome_links_slice, :learning_outcome_content).run
+        end
         @outcomes = @outcome_links.map(&:learning_outcome_content)
       end
     end
