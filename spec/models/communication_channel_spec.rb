@@ -275,6 +275,19 @@ describe CommunicationChannel do
       expect(cc1.has_merge_candidates?).to be_truthy
     end
 
+    it "does not return users for push channels" do
+      user2 = User.create!
+      cc2 = user2.communication_channels.create!(:path => 'push', :path_type => CommunicationChannel::TYPE_PUSH)
+      cc2.confirm!
+      Account.default.pseudonyms.create!(:user => user2, :unique_id => 'user2')
+      user3 = User.create!
+      cc3 = user3.communication_channels.create!(:path => 'push', :path_type => CommunicationChannel::TYPE_PUSH)
+      cc3.confirm!
+      Account.default.pseudonyms.create!(:user => user3, :unique_id => 'user3')
+
+      expect(cc1.has_merge_candidates?).to be_falsey
+    end
+
     describe ".bounce_for_path" do
       it "flags paths with too many bounces" do
         @cc1 = communication_channel_model(path: 'not_as_bouncy@example.edu')

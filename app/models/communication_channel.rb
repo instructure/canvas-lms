@@ -350,6 +350,7 @@ class CommunicationChannel < ActiveRecord::Base
   end
 
   def merge_candidates(break_on_first_found = false)
+    return [] if path_type == 'push'
     shards = self.class.associated_shards(self.path) if Enrollment.cross_shard_invitations?
     shards ||= [self.shard]
     scope = CommunicationChannel.active.by_path(self.path).of_type(self.path_type)

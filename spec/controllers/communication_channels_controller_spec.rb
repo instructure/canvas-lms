@@ -110,6 +110,15 @@ describe CommunicationChannelsController do
         @cc.reload
         expect(@cc).to be_active
       end
+
+      it "does not confirm invalid email addresses" do
+        user_with_pseudonym(:active_user => 1, :username => 'not-an-email')
+        user_session(@user, @pseudonym)
+        get 'confirm', :nonce => @cc.confirmation_code
+        expect(response).not_to be_success
+        expect(response).to render_template("confirm_failed")
+      end
+
     end
 
     describe "open registration" do
