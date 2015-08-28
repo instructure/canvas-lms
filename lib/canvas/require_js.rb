@@ -165,6 +165,9 @@ module Canvas
             'bower/tinymce/tinymce' : {
               exports: 'tinymce'
             },
+            'bower/axios/dist/axios' : {
+              exports: 'axios'
+            },
             'bower/tinymce/themes/modern/theme' : {
               deps: ['bower/tinymce/tinymce'],
               exports: 'tinymce'
