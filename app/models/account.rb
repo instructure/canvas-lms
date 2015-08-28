@@ -288,7 +288,7 @@ class Account < ActiveRecord::Base
   end
 
   def canvas_authentication?
-    !!canvas_authentication_provider || !authentication_providers.active.exists?
+    !!canvas_authentication_provider
   end
 
   def enable_canvas_authentication
