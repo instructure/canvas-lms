@@ -19,6 +19,7 @@ describe "groups" do
       add_users_to_group(@students + [@user],@testgroup.first)
     end
 
+    #-------------------------------------------------------------------------------------------------------------------
     describe "home page" do
       it_behaves_like 'home_page', 'student'
 
@@ -29,12 +30,9 @@ describe "groups" do
       end
     end
 
+    #-------------------------------------------------------------------------------------------------------------------
     describe "announcements page" do
-      it "should center the add announcement button if no announcements are present", priority: "1", test_id: 273606 do
-        get announcements_page
-        expect(f('#content.container-fluid div')).to have_attribute(:style, 'text-align: center;')
-        expect(f('.btn.btn-large.btn-primary')).to be_displayed
-      end
+      it_behaves_like 'announcements_page', 'student'
 
       it "should allow any group member to create an announcement", priority: "1", test_id: 273607 do
         get announcements_page
@@ -52,29 +50,6 @@ describe "groups" do
         expect(ff('.discussion-topic').size).to eq 2
       end
 
-      it "should list all announcements", priority: "1", test_id: 273608 do
-        # Create 5 announcements in the group
-        announcements = []
-        5.times do |n|
-          announcements << @testgroup.first.announcements.create!(title: "Announcement #{n+1}", message: "Message #{n+1}",user: @teacher)
-        end
-
-        get announcements_page
-        expect(ff('.discussion-topic').size).to eq 5
-      end
-
-      it "should only list in-group announcements in the content right pane", priority: "1", test_id: 273621 do
-        # create group and course announcements
-        @testgroup.first.announcements.create!(title: 'Group Announcement', message: 'Group',user: @teacher)
-        @course.announcements.create!(title: 'Course Announcement', message: 'Course',user: @teacher)
-
-        get announcements_page
-        expect_new_page_load { f('.btn-primary').click }
-        fj(".ui-accordion-header a:contains('Announcements')").click
-        expect(fln('Group Announcement')).to be_displayed
-        expect(fln('Course Announcement')).to be_nil
-      end
-
       it "should allow all group members to see announcements", priority: "1", test_id: 273613 do
         @announcement = @testgroup.first.announcements.create!(title: 'Group Announcement', message: 'Group',user: @teacher)
         # Verifying with a few different group members should be enough to ensure all group members can see it
@@ -84,14 +59,6 @@ describe "groups" do
         verify_member_sees_announcement
       end
 
-      it "should only access group files in announcements right content pane", priority: "1", test_id: 273624 do
-        add_test_files
-        get announcements_page
-        expect_new_page_load { f('.btn-primary').click }
-        expand_files_on_content_pane
-        expect(ffj('.file .text:visible').size).to eq 1
-      end
-
       it "should only allow group members to access announcements", priority: "1", test_id: 315329 do
         get announcements_page
         expect(fj('.btn-primary:contains("Announcement")')).to be_displayed
@@ -99,7 +66,10 @@ describe "groups" do
       end
     end
 
+    #-------------------------------------------------------------------------------------------------------------------
     describe "people page" do
+      it_behaves_like 'people_page', 'student'
+
       it "should display and show a list of group members", priority: "1", test_id: 273614 do
         get people_page
         # Checks that all students and teachers created in setup are listed on page
@@ -114,7 +84,10 @@ describe "groups" do
       end
     end
 
+    #-------------------------------------------------------------------------------------------------------------------
     describe "discussions page" do
+      it_behaves_like 'discussions_page', 'student'
+
       it "should allow discussions to be created within a group", priority: "1", test_id: 273615 do
         get discussions_page
         expect_new_page_load { f('#new-discussion-btn').click }
@@ -140,28 +113,6 @@ describe "groups" do
         expect(f('#podcast_enabled')).to be_nil
       end
 
-      it "should only list in-group discussions in the content right pane", priority: "1", test_id: 273622 do
-        # create group and course announcements
-        group_dt = DiscussionTopic.create!(context: @testgroup.first, user: @teacher,
-                                           title: 'Group Discussion', message: 'Group')
-        course_dt = DiscussionTopic.create!(context: @course, user: @teacher,
-                                            title: 'Course Discussion', message: 'Course')
-
-        get discussions_page
-        expect_new_page_load { f('.btn-primary').click }
-        fj(".ui-accordion-header a:contains('Discussions')").click
-        expect(fln("#{group_dt.title}")).to be_displayed
-        expect(fln("#{course_dt.title}")).to be_nil
-      end
-
-      it "should only access group files in discussions right content pane", priority: "1", test_id: 303701 do
-        add_test_files
-        get discussions_page
-        expect_new_page_load { f('.btn-primary').click }
-        expand_files_on_content_pane
-        expect(ffj('.file .text:visible').size).to eq 1
-      end
-
       it "should only allow group members to access discussions", priority: "1", test_id: 315332 do
         get discussions_page
         expect(f('#new-discussion-btn')).to be_displayed
@@ -169,13 +120,9 @@ describe "groups" do
       end
     end
 
+    #-------------------------------------------------------------------------------------------------------------------
     describe "pages page" do
-      it "should load pages index and display all pages", priority: "1", test_id: 273610 do
-        @testgroup.first.wiki.wiki_pages.create!(title: "Page 1", user: @teacher)
-        @testgroup.first.wiki.wiki_pages.create!(title: "Page 2", user: @teacher)
-        get pages_page
-        expect(ff('.collectionViewItems .clickable').size).to eq 2
-      end
+      it_behaves_like 'pages_page', 'student'
 
       it "should allow group members to create a page", priority: "1", test_id: 273611 do
         get pages_page
@@ -191,30 +138,6 @@ describe "groups" do
         verify_member_sees_group_page
       end
 
-      it "should only list in-group pages in the content right pane", priority: "1", test_id: 273620 do
-        # create group and course announcements
-        group_page = @testgroup.first.wiki.wiki_pages.create!(user: @teacher,
-                                           title: 'Group Page', message: 'Group')
-        course_page = @course.wiki.wiki_pages.create!(user: @teacher,
-                                            title: 'Course Page', message: 'Course')
-
-        get pages_page
-        f('.btn-primary').click
-        wait_for_ajaximations
-        fj(".ui-accordion-header a:contains('Wiki Pages')").click
-        expect(fln("#{group_page.title}")).to be_displayed
-        expect(fln("#{course_page.title}")).to be_nil
-      end
-
-      it "should only access group files in pages right content pane", priority: "1", test_id: 303700 do
-        add_test_files
-        get pages_page
-        f('.btn-primary').click
-        wait_for_ajaximations
-        expand_files_on_content_pane
-        expect(ffj('.file .text:visible').size).to eq 1
-      end
-
       it "should only allow group members to access pages", priority: "1", test_id: 315331 do
         get pages_page
         expect(fj('.btn-primary:contains("Page")')).to be_displayed
@@ -222,6 +145,7 @@ describe "groups" do
       end
     end
 
+    #-------------------------------------------------------------------------------------------------------------------
     describe "Files page" do
       it_behaves_like 'files_page', 'student'
 
@@ -267,17 +191,6 @@ describe "groups" do
         move_file_to_folder('example.pdf','destination_folder')
       end
 
-      it "should search files only within the scope of a group", priority: "1", test_id: 273627 do
-        add_test_files
-        get files_page
-        f('input[type="search"]').send_keys 'example.pdf'
-        driver.action.send_keys(:return).perform
-        refresh_page
-        # This checks to make sure there is only one file and it is the group-level one
-        expect(get_all_files_folders.count).to eq 1
-        expect(ff('.media-body').first).to include_text('example.pdf')
-      end
-
       it "should allow group members to publish and unpublish a file", priority: "1", test_id: 273628 do
         add_test_files
         get files_page
@@ -295,6 +208,7 @@ describe "groups" do
       end
     end
 
+    #-------------------------------------------------------------------------------------------------------------------
     describe "conferences page" do
       before(:all) do
         PluginSetting.create!(name: "wimba", settings: {"domain" => "wimba.instructure.com"})

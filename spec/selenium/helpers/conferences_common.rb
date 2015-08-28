@@ -18,3 +18,13 @@ def create_conference(title = 'test conference')
   f('.ui-dialog .btn-primary').click
   wait_for_ajaximations
 end
+
+def conclude_conference(conf)
+  conf.close
+  conf.save!
+end
+
+def click_gear_menu(num)
+  ff('.icon-settings')[num].click
+  wait_for_ajaximations
+end

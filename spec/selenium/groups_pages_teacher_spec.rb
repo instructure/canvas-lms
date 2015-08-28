@@ -19,11 +19,15 @@ describe "groups" do
       add_users_to_group(@students,@testgroup.first)
     end
 
+    #-------------------------------------------------------------------------------------------------------------------
     describe "home page" do
       it_behaves_like 'home_page', 'teacher'
     end
 
+    #-------------------------------------------------------------------------------------------------------------------
     describe "announcements page" do
+      it_behaves_like 'announcements_page', 'teacher'
+
       it "should allow teachers to see announcements", priority: "1", test_id: 287049 do
         @announcement = @testgroup.first.announcements.create!(title: 'Group Announcement', message: 'Group',user: @students.first)
         verify_member_sees_announcement
@@ -40,7 +44,22 @@ describe "groups" do
       end
     end
 
+    #-------------------------------------------------------------------------------------------------------------------
+    describe "people page" do
+      it_behaves_like 'people_page', 'teacher'
+
+      it "should display and show a list of group members", priority: "2", test_id: 324929 do
+        get people_page
+        # Checks that all students and teachers created in setup are listed on page
+        expect(ff('.student_roster .user_name').size).to eq 4
+        expect(ff('.teacher_roster .user_name').size).to eq 2
+      end
+    end
+
+    #-------------------------------------------------------------------------------------------------------------------
     describe "discussions page" do
+      it_behaves_like 'discussions_page', 'teacher'
+
       it "should allow teachers to create discussions within a group", priority: "1", test_id: 285586 do
         get discussions_page
         expect_new_page_load { f('#new-discussion-btn').click }
@@ -66,7 +85,10 @@ describe "groups" do
       end
     end
 
+    #-------------------------------------------------------------------------------------------------------------------
     describe "pages page" do
+      it_behaves_like 'pages_page', 'teacher'
+
       it "should allow teachers to create a page", priority: "1", test_id: 289993 do
         get pages_page
         manually_create_wiki_page('stuff','it happens')
@@ -79,6 +101,7 @@ describe "groups" do
       end
     end
 
+    #-------------------------------------------------------------------------------------------------------------------
     describe "Files page" do
       it_behaves_like 'files_page', 'teacher'
 
@@ -133,6 +156,7 @@ describe "groups" do
       end
     end
 
+    #-------------------------------------------------------------------------------------------------------------------
     describe "conferences page" do
       before(:all) do
         PluginSetting.create!(name: "wimba", settings: {"domain" => "wimba.instructure.com"})

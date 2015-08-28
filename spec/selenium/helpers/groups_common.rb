@@ -48,15 +48,116 @@ shared_examples 'home_page' do |context|
   end
 end
 
-shared_examples 'conferences_page' do |context|
-  it "should allow group users to create a conference", priority: pick_priority(context,"1","2"),test_id: pick_test_id(context, 307624, 308534) do
-    title = 'test conference'
-    get conferences_page
-    create_conference(title)
-    expect(f('#new-conference-list .ig-title').text).to include(title)
+#-----------------------------------------------------------------------------------------------------------------------
+shared_examples 'announcements_page' do |context|
+  it "should center the add announcement button if no announcements are present", pick_priority(context,"1","2"), test_id: pick_test_id(context, 273606, 324936) do
+    get announcements_page
+    expect(f('#content.container-fluid div')).to have_attribute(:style, 'text-align: center;')
+    expect(f('.btn.btn-large.btn-primary')).to be_displayed
+  end
+
+  it "should list all announcements", pick_priority(context,"1","2"), test_id: pick_test_id(context, 273608, 324935) do
+    # Create 5 announcements in the group
+    announcements = []
+    5.times do |n|
+      announcements << @testgroup.first.announcements.create!(title: "Announcement #{n+1}", message: "Message #{n+1}",user: @teacher)
+    end
+
+    get announcements_page
+    expect(ff('.discussion-topic').size).to eq 5
+  end
+
+  it "should only list in-group announcements in the content right pane", pick_priority(context,"1","2"), test_id: pick_test_id(context, 273621, 324934) do
+    # create group and course announcements
+    @testgroup.first.announcements.create!(title: 'Group Announcement', message: 'Group',user: @teacher)
+    @course.announcements.create!(title: 'Course Announcement', message: 'Course',user: @teacher)
+
+    get announcements_page
+    expect_new_page_load { f('.btn-primary').click }
+    fj(".ui-accordion-header a:contains('Announcements')").click
+    expect(fln('Group Announcement')).to be_displayed
+    expect(fln('Course Announcement')).to be_nil
+  end
+
+  it "should only access group files in announcements right content pane", pick_priority(context,"1","2"), test_id: pick_test_id(context, 273624,324931) do
+    add_test_files
+    get announcements_page
+    expect_new_page_load { f('.btn-primary').click }
+    expand_files_on_content_pane
+    expect(ffj('.file .text:visible').size).to eq 1
   end
 end
 
+#-----------------------------------------------------------------------------------------------------------------------
+shared_examples 'pages_page' do |context|
+  it "should load pages index and display all pages", priority: pick_priority(context,"1","2"), test_id: pick_test_id(context, 273610, 324927) do
+    @testgroup.first.wiki.wiki_pages.create!(title: "Page 1", user: @teacher)
+    @testgroup.first.wiki.wiki_pages.create!(title: "Page 2", user: @teacher)
+    get pages_page
+    expect(ff('.collectionViewItems .clickable').size).to eq 2
+  end
+
+  it "should only list in-group pages in the content right pane", priority: pick_priority(context,"1","2"), test_id: pick_test_id(context, 273620,324928) do
+    # create group and course announcements
+    group_page = @testgroup.first.wiki.wiki_pages.create!(user: @teacher,
+                                                          title: 'Group Page', message: 'Group')
+    course_page = @course.wiki.wiki_pages.create!(user: @teacher,
+                                                  title: 'Course Page', message: 'Course')
+
+    get pages_page
+    f('.btn-primary').click
+    wait_for_ajaximations
+    fj(".ui-accordion-header a:contains('Wiki Pages')").click
+    expect(fln("#{group_page.title}")).to be_displayed
+    expect(fln("#{course_page.title}")).to be_nil
+  end
+
+  it "should only access group files in pages right content pane", priority: pick_priority(context,"1","2"), test_id: pick_test_id(context, 303700,324932) do
+    add_test_files
+    get pages_page
+    f('.btn-primary').click
+    wait_for_ajaximations
+    expand_files_on_content_pane
+    expect(ffj('.file .text:visible').size).to eq 1
+  end
+end
+
+#-----------------------------------------------------------------------------------------------------------------------
+shared_examples 'people_page' do |context|
+  it "should allow group users to see group registered services page", priority: pick_priority(context,"1","2"),test_id: pick_test_id(context, 323329, 324926) do
+    get people_page
+    expect_new_page_load { fln('View Registered Services').click }
+    # Checks that we are on the Registered Services page
+    expect(f('.btn.button-sidebar-wide')).to be_displayed
+  end
+end
+
+#-----------------------------------------------------------------------------------------------------------------------
+shared_examples 'discussions_page' do |context|
+  it "should only list in-group discussions in the content right pane", pick_priority(context,"1","2"), test_id: pick_test_id(context, 273622,324930) do
+    # create group and course announcements
+    group_dt = DiscussionTopic.create!(context: @testgroup.first, user: @teacher,
+                                       title: 'Group Discussion', message: 'Group')
+    course_dt = DiscussionTopic.create!(context: @course, user: @teacher,
+                                        title: 'Course Discussion', message: 'Course')
+
+    get discussions_page
+    expect_new_page_load { f('.btn-primary').click }
+    fj(".ui-accordion-header a:contains('Discussions')").click
+    expect(fln("#{group_dt.title}")).to be_displayed
+    expect(fln("#{course_dt.title}")).to be_nil
+  end
+
+  it "should only access group files in discussions right content pane", pick_priority(context,"1","2"), test_id: pick_test_id(context, 303701, 324933) do
+    add_test_files
+    get discussions_page
+    expect_new_page_load { f('.btn-primary').click }
+    expand_files_on_content_pane
+    expect(ffj('.file .text:visible').size).to eq 1
+  end
+end
+
+#-----------------------------------------------------------------------------------------------------------------------
 shared_examples 'files_page' do |context|
   it "should allow group users to rename a file", priority: "2", test_id: pick_test_id(context, 312869, 315577) do
     add_test_files
@@ -65,7 +166,47 @@ shared_examples 'files_page' do |context|
     wait_for_ajaximations
     expect(fln('cool new name')).to be_present
   end
+
+  it "should search files only within the scope of a group", pick_priority(context,"1","2"), test_id: pick_test_id(context, 273627, 324937) do
+    add_test_files
+    get files_page
+    f('input[type="search"]').send_keys 'example.pdf'
+    driver.action.send_keys(:return).perform
+    refresh_page
+    # This checks to make sure there is only one file and it is the group-level one
+    expect(get_all_files_folders.count).to eq 1
+    expect(ff('.media-body').first).to include_text('example.pdf')
+  end
 end
+
+#-----------------------------------------------------------------------------------------------------------------------
+shared_examples 'conferences_page' do |context|
+  it "should allow group users to create a conference", priority: pick_priority(context,"1","2"),test_id: pick_test_id(context, 307624, 308534) do
+    title = 'test conference'
+    get conferences_page
+    create_conference(title)
+    expect(f('#new-conference-list .ig-title').text).to include(title)
+  end
+
+  it "should allow group users to delete an active conference", priority: pick_priority(context,"1","2"),test_id: pick_test_id(context, 323557, 323558) do
+    WimbaConference.create!(title: "new conference", user: @user, context: @testgroup.first)
+    get conferences_page
+
+    click_gear_menu(0)
+    delete_conference
+    expect(f('#new-conference-list')).to include_text('There are no new conferences')
+  end
+
+  it "should allow group users to delete a concluded conference", priority: pick_priority(context,"1","2"),test_id: pick_test_id(context, 323559, 323560) do
+    cc = WimbaConference.create!(title: "cncluded conference", user: @user, context: @testgroup.first)
+    conclude_conference(cc)
+    get conferences_page
+    click_gear_menu(0)
+    delete_conference
+    expect(f('#concluded-conference-list')).to include_text('There are no concluded conferences')
+  end
+end
+
 # ======================================================================================================================
 # Helper Methods
 # ======================================================================================================================
