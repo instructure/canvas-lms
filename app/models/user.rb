@@ -1918,7 +1918,34 @@ class User < ActiveRecord::Base
     opts[:end_at] ||= 1.weeks.from_now
     opts[:limit] ||= 20
 
-    events = CalendarEvent.active.for_user_and_context_codes(self, context_codes).between(now, opts[:end_at]).limit(opts[:limit]).reject(&:hidden?)
+    # if we're looking through a lot of courses, we should probably not spend a lot of time
+    # computing which sections are visible or not before we make the db call;
+    # instead, i think we should pull for all the sections and filter after the fact
+    filter_after_db = !opts[:use_db_filter] &&
+      (context_codes.grep(/\Acourse_\d+\z/).count > Setting.get('filter_events_by_section_code_threshold', '25').to_i)
+
+    section_codes = self.section_context_codes(context_codes, filter_after_db)
+    limit = filter_after_db ? opts[:limit] * 2 : opts[:limit] # pull extra events just in case
+    events = CalendarEvent.active.for_user_and_context_codes(self, context_codes, section_codes).
+      between(now, opts[:end_at]).limit(limit).to_a.reject(&:hidden?)
+
+    if filter_after_db
+      original_count = events.count
+      if events.any?{|e| e.context_code.start_with?("course_section_")}
+        section_ids = events.map(&:context_code).grep(/\Acourse_section_\d+\z/).map{ |s| s.sub(/\Acourse_section_/, '').to_i }
+        section_course_codes = Course.joins(:course_sections).where(:course_sections => {:id => section_ids}).
+          pluck(:id).map{|id| "course_#{id}"}
+        visible_section_codes = self.section_context_codes(section_course_codes)
+        events.reject!{|e| e.context_code.start_with?("course_section_") && !visible_section_codes.include?(e.context_code)}
+        events = events.first(opts[:limit]) # strip down to the original limit
+      end
+
+      # if we've filtered too many (which should be unlikely), just fallback on the old behavior
+      if original_count >= opts[:limit] && events.count < opts[:limit]
+        return self.upcoming_events(opts.merge(:use_db_filter => true))
+      end
+    end
+
     events += select_available_assignments(
       select_upcoming_assignments(
         Assignment.published.
@@ -2134,19 +2161,23 @@ class User < ActiveRecord::Base
     end
   end
 
-  def section_context_codes(context_codes)
+  def section_context_codes(context_codes, skip_visibility_filter=false)
     course_ids = context_codes.grep(/\Acourse_\d+\z/).map{ |s| s.sub(/\Acourse_/, '').to_i }
     return [] unless course_ids.present?
 
     section_ids = []
-    full_course_ids = []
-    Course.where(id: course_ids).each do |course|
-      result = course.course_section_visibility(self)
-      case result
-      when Array
-        section_ids.concat(result)
-      when :all
-        full_course_ids << course.id
+    if skip_visibility_filter
+      full_course_ids = course_ids
+    else
+      full_course_ids = []
+      Course.where(id: course_ids).each do |course|
+        result = course.course_section_visibility(self)
+        case result
+        when Array
+          section_ids.concat(result)
+        when :all
+          full_course_ids << course.id
+        end
       end
     end
 
