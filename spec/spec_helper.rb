@@ -258,6 +258,7 @@ def truncate_all_tables
            SELECT CAST(objid::regclass AS VARCHAR) FROM pg_depend WHERE deptype='e'
          )
       SQL
+      table_names.delete('schema_migrations')
       connection.execute("TRUNCATE TABLE #{table_names.map { |t| connection.quote_table_name(t) }.join(',')}")
     else
       connection.tables.each { |model| truncate_table(model) }
