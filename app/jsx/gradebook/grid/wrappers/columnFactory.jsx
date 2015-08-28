@@ -10,6 +10,7 @@ define([
   '../components/column_types/assignmentPoints',
   '../components/column_types/totalColumn',
   '../components/column_types/assignmentGroupColumn',
+  '../components/column_types/customColumn',
   'i18n!gradebook',
   '../constants'
 ], function(
@@ -24,6 +25,7 @@ define([
   AssignmentPointsColumn,
   TotalColumn,
   AssignmentGroupColumn,
+  CustomColumn,
   I18n,
   GradebookConstants
 ) {
@@ -40,6 +42,7 @@ define([
   renderers[GradebookConstants.POINTS_COLUMN_ID]           = AssignmentPointsColumn;
   renderers[GradebookConstants.TOTAL_COLUMN_ID]            = TotalColumn;
   renderers[GradebookConstants.ASSIGNMENT_GROUP_COLUMN_ID] = AssignmentGroupColumn;
+  renderers[GradebookConstants.CUSTOM_COLUMN_ID]           = CustomColumn;
 
   function getRenderer (cellData, cellDataKey, rowData, rowIndex, columnData) {
     var Renderer = renderers[columnData.columnType];

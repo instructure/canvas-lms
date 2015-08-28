@@ -50,9 +50,9 @@ define([
   SubmissionsHelper
 ){
   var Table = FixedDataTable.Table,
-      Column = FixedDataTable.Column,
-      isColumnResizing = false,
-      spinner;
+    Column = FixedDataTable.Column,
+    isColumnResizing = false,
+    spinner;
 
   var Gradebook = React.createClass({
     mixins: [
@@ -71,6 +71,7 @@ define([
         });
       SectionsActions.load();
       CustomColumnsActions.loadTeacherNotes();
+      CustomColumnsActions.load();
     },
 
     componentDidMount() {
@@ -103,8 +104,8 @@ define([
 
     getColumnWidth(column) {
       var customWidths = this.state.settings.columnWidths,
-          defaultWidth = GradebookConstants.DEFAULT_LAYOUTS.headers.width,
-          width = (customWidths && customWidths[column]) || defaultWidth;
+        defaultWidth = GradebookConstants.DEFAULT_LAYOUTS.headers.width,
+        width = (customWidths && customWidths[column]) || defaultWidth;
 
       return parseInt(width);
     },
@@ -125,19 +126,20 @@ define([
              && this.state.toolbarOptions.totalColumnInFront;
     },
 
-    renderColumn(columnName, columnType, columnId, cellDataGetter, assignment) {
+    renderColumn(columnName, columnType, columnId, cellDataGetter, assignment, customColumnData) {
       var columnIdentifier = columnId || columnType,
-          columnWidth = this.getColumnWidth(columnIdentifier),
-          enrollments = this.state.tableData.students,
-          submissions = this.state.tableData.submissions,
-          columnData = {
-            columnType: columnType,
-            activeCell: this.state.keyboardNav.currentCellIndex,
-            setActiveCell: KeyboardNavigationActions.setActiveCell,
-            assignment: assignment,
-            enrollments: enrollments,
-            submissions: submissions
-          };
+        columnWidth = this.getColumnWidth(columnIdentifier),
+        enrollments = this.state.tableData.students,
+        submissions = this.state.tableData.submissions,
+        columnData = {
+          columnType: columnType,
+          activeCell: this.state.keyboardNav.currentCellIndex,
+          setActiveCell: KeyboardNavigationActions.setActiveCell,
+          assignment: assignment,
+          enrollments: enrollments,
+          submissions: submissions,
+          customColumnData: customColumnData
+        };
 
       return (
         <Column
@@ -216,8 +218,23 @@ define([
 
     renderNotesColumn() {
       if (!this.state.toolbarOptions.hideNotesColumn) {
-        return this.renderColumn(I18n.t('Notes'), GradebookConstants.NOTES_COLUMN_ID);
+        return this.renderColumn(I18n.t('Notes'), GradebookConstants.NOTES_COLUMN_ID, 'notesColumn');
       }
+    },
+
+    renderCustomColumns(customColumns) {
+      let customColumnData, mapFunction;
+
+      customColumnData = customColumns.customColumns.data;
+      mapFunction = function(customColumn) {
+        var columnId, columnData;
+
+        columnId = 'customColumn_' + customColumn.id;
+        columnData = this.state.tableData.customColumns.customColumns.columnData;
+        return this.renderColumn(customColumn.title, GradebookConstants.CUSTOM_COLUMN_ID, columnId, (columnId, rowData) => columnData[customColumn.id][rowData.student.user_id], null, customColumn);
+      };
+
+      return _.map(customColumnData, mapFunction.bind(this));
     },
 
     renderAllColumns() {
@@ -230,11 +247,13 @@ define([
       columns = [
         this.renderColumn(I18n.t('Student Name'), GradebookConstants.STUDENT_COLUMN_ID),
         this.renderNotesColumn(),
+        this.renderCustomColumns(this.state.tableData.customColumns),
         this.renderAssignmentColumns(_.flatten(_.values(this.state.tableData.assignments)).sort(comparator), this.state.tableData.submissions),
         this.renderAssignmentGroupColumns(this.state.tableData.assignmentGroups),
       ];
 
       (showTotalInFront) ? columns.splice(1, 0, total) : columns.push(total);
+
       return columns;
     },
 

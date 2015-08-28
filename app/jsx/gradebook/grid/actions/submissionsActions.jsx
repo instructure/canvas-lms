@@ -44,7 +44,7 @@ define([
       allResults = [];
 
       responses = arguments;
-      if (responses.length > 1 && responses[1] === "success") {
+      if (responses.length > 1 && responses[1] === 'success') {
         responses = [responses];
       }
       // Orders responses so they're in the same order as requested

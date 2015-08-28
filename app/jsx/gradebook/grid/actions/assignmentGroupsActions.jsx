@@ -1,7 +1,8 @@
 define([
   'bower/reflux/dist/reflux',
+  'jsx/gradebook/grid/constants',
   'jquery'
-], function (Reflux, $) {
+], function (Reflux, GradebookConstants, $) {
   var AssignmentGroupsActions = Reflux.createActions({
     load: { asyncResult: true },
     replaceAssignmentGroups: { asyncResult: false },
@@ -10,7 +11,7 @@ define([
 
   AssignmentGroupsActions.load.listen(function() {
     var self = this;
-    $.getJSON(ENV.GRADEBOOK_OPTIONS.assignment_groups_url)
+    $.getJSON(GradebookConstants.assignment_groups_url)
       .done((json) => self.completed(json))
       .fail((jqxhr, textStatus, error) => self.failed(error));
   });

@@ -100,6 +100,10 @@ define([
     },
 
     onCustomColumnsChanged(customColumnsData) {
+      if (customColumnsData.error) {
+        this.state.error = customColumnsData.error;
+      }
+
       this.state.customColumns = customColumnsData;
       this.constructTableData();
       this.trigger(this.state);

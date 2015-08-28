@@ -58,7 +58,7 @@ define([
 
     getTitle() {
       if (this.shouldDisplayAssignmentWarning()) {
-        return I18n.t("Assignments in this group have no points possible and cannot be included in grade calculation");
+        return I18n.t('Assignments in this group have no points possible and cannot be included in grade calculation');
       }
     },
 
@@ -74,11 +74,11 @@ define([
       label = this.props.label;
 
       if (assignment) {
-        var className = "assignment-name" + ((assignment.muted) ? ' muted' : '');
+        var className = 'assignment-name' + ((assignment.muted) ? ' muted' : '');
         return (
           <div title={label} className='gradebook-label' style={{width: this.getWidth()}}>
             <a className={className} href={assignment.html_url}>
-              { this.shouldDisplayAssignmentWarning() && <i ref="icon" title={this.getTitle()} className="icon-warning"></i> }
+              { this.shouldDisplayAssignmentWarning() && <i ref='icon' title={this.getTitle()} className='icon-warning'></i> }
               {label}
             </a>
           </div>
@@ -95,11 +95,12 @@ define([
     },
 
     renderDropdown(columnData) {
-      var columnType  = columnData.columnType,
-          assignment  = columnData.assignment,
-          enrollments = columnData.enrollments,
-          submissions = columnData.submissions,
-          key, dropdownOptionsId;
+      let columnType  = columnData.columnType,
+        assignment  = columnData.assignment,
+        enrollments = columnData.enrollments,
+        submissions = columnData.submissions,
+        key, dropdownOptionsId;
+
       if (assignment) {
         key = 'assignment-' + assignment.id;
         dropdownOptionsId = key + '-options';
@@ -107,6 +108,7 @@ define([
           <GradebookKyleMenu key={key} dropdownOptionsId={dropdownOptionsId}
             idToAppendTo='gradebook_grid' screenreaderText={I18n.t('Assignment Options')}
             defaultClassNames='gradebook-header-drop' options={{ noButton: true }}>
+
             <AssignmentHeaderDropdownOptions key={dropdownOptionsId}
               idAttribute={dropdownOptionsId} assignment={assignment}
               enrollments={enrollments} submissions={submissions}/>
@@ -124,9 +126,9 @@ define([
     },
 
     render() {
-      var columnData = this.props.columnData,
-          dueDate    = this.headerDate(columnData),
-          className  = (dueDate) ? '' : ' title';
+      let columnData = this.props.columnData,
+        dueDate    = this.headerDate(columnData),
+        className  = (dueDate) ? '' : ' title';
 
       return (
         <div style={{width: this.getWidth()}}
