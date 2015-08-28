@@ -23,7 +23,7 @@ class RubricAssessment < ActiveRecord::Base
   include TextHelper
   include HtmlTextHelper
 
-  attr_accessible :rubric, :rubric_association, :user, :score, :data, :comments, :assessor, :artifact, :assessment_type
+  attr_accessible :rubric, :rubric_association, :user, :score, :data, :assessor, :artifact, :assessment_type
   belongs_to :rubric
   belongs_to :rubric_association
   belongs_to :user
@@ -35,11 +35,10 @@ class RubricAssessment < ActiveRecord::Base
 
   simply_versioned
 
-  EXPORTABLE_ATTRIBUTES = [:id, :user_id, :rubric_id, :rubric_association_id, :score, :data, :comments, :created_at, :updated_at, :artifact_id, :artifact_type, :assessment_type, :assessor_id, :artifact_attempt]
+  EXPORTABLE_ATTRIBUTES = [:id, :user_id, :rubric_id, :rubric_association_id, :score, :data, :created_at, :updated_at, :artifact_id, :artifact_type, :assessment_type, :assessor_id, :artifact_attempt]
   EXPORTABLE_ASSOCIATIONS = [:rubric, :rubric_association, :user, :assessor, :artifact, :assessment_requests]
 
   validates_presence_of :assessment_type, :rubric_id, :artifact_id, :artifact_type, :assessor_id
-  validates_length_of :comments, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
 
   before_save :update_artifact_parameters
   before_save :htmlify_rating_comments

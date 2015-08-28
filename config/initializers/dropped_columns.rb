@@ -101,6 +101,7 @@ class ActiveRecord::Base
                        crypted_webdav_access_code
                        type).freeze,
     'role_overrides' => %w(context_code enrollment_type).freeze,
+    'rubric_assessments' => %w{comments}.freeze,
     'users' => %w(type
                   creation_unique_id
                   creation_sis_batch_id

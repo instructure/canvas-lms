@@ -310,7 +310,6 @@ class RubricAssociation < ActiveRecord::Base
       assessment ||= association.rubric_assessments.build(:assessor => opts[:assessor], :artifact => artifact, :user => artifact.student, :rubric => self.rubric, :assessment_type => params[:assessment_type])
       assessment.score = score if replace_ratings
       assessment.data = ratings if replace_ratings
-      assessment.comments = params[:comments] if params[:comments]
 
       assessment.save
       assessment_to_return = assessment if assessment.artifact == opts[:artifact]
