@@ -250,17 +250,14 @@ class AssignmentOverride < ActiveRecord::Base
   end
 
   def title_from_students(students)
-    sorted_students = (students || []).sort_by(&:name)
-    if sorted_students.count > 3
-      others_count = sorted_students.count - 2
-      first_two_students = sorted_students[0..1].map(&:name).join(", ")
-      I18n.t(
-        '%{first_two_students}, and %{others_count} others',
-        {first_two_students: first_two_students, others_count: others_count}
-      )
-    elsif sorted_students.any?
-      sorted_students.map(&:name).to_sentence
-    end
+    return t("No Students") if students.blank?
+    t(:student_count,
+      {
+        one: '%{count} student',
+        other: '%{count} students'
+      },
+      count: students.count
+     )
   end
 
   has_a_broadcast_policy
