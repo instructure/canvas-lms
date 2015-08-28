@@ -937,7 +937,7 @@ describe AssignmentsApiController, type: :request do
       expect(@adhoc_override.set).to eq [@student]
       expect(@adhoc_override.due_at_overridden).to be_truthy
       expect(@adhoc_override.due_at.to_i).to eq @adhoc_due_at.to_i
-      expect(@adhoc_override.title).to eq @student.name
+      expect(@adhoc_override.title).to eq "1 student"
 
       @section_override = @assignment.assignment_overrides.where(set_type: 'CourseSection').first
       expect(@section_override).not_to be_nil
