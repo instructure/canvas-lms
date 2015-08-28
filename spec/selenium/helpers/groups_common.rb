@@ -50,13 +50,13 @@ end
 
 #-----------------------------------------------------------------------------------------------------------------------
 shared_examples 'announcements_page' do |context|
-  it "should center the add announcement button if no announcements are present", pick_priority(context,"1","2"), test_id: pick_test_id(context, 273606, 324936) do
+  it "should center the add announcement button if no announcements are present", priority: pick_priority(context,"1","2"), test_id: pick_test_id(context, 273606, 324936) do
     get announcements_page
     expect(f('#content.container-fluid div')).to have_attribute(:style, 'text-align: center;')
     expect(f('.btn.btn-large.btn-primary')).to be_displayed
   end
 
-  it "should list all announcements", pick_priority(context,"1","2"), test_id: pick_test_id(context, 273608, 324935) do
+  it "should list all announcements", priority: pick_priority(context,"1","2"), test_id: pick_test_id(context, 273608, 324935) do
     # Create 5 announcements in the group
     announcements = []
     5.times do |n|
@@ -67,7 +67,7 @@ shared_examples 'announcements_page' do |context|
     expect(ff('.discussion-topic').size).to eq 5
   end
 
-  it "should only list in-group announcements in the content right pane", pick_priority(context,"1","2"), test_id: pick_test_id(context, 273621, 324934) do
+  it "should only list in-group announcements in the content right pane", priority: pick_priority(context,"1","2"), test_id: pick_test_id(context, 273621, 324934) do
     # create group and course announcements
     @testgroup.first.announcements.create!(title: 'Group Announcement', message: 'Group',user: @teacher)
     @course.announcements.create!(title: 'Course Announcement', message: 'Course',user: @teacher)
@@ -79,7 +79,7 @@ shared_examples 'announcements_page' do |context|
     expect(fln('Course Announcement')).to be_nil
   end
 
-  it "should only access group files in announcements right content pane", pick_priority(context,"1","2"), test_id: pick_test_id(context, 273624,324931) do
+  it "should only access group files in announcements right content pane", priority: pick_priority(context,"1","2"), test_id: pick_test_id(context, 273624, 324931) do
     add_test_files
     get announcements_page
     expect_new_page_load { f('.btn-primary').click }
@@ -134,7 +134,7 @@ end
 
 #-----------------------------------------------------------------------------------------------------------------------
 shared_examples 'discussions_page' do |context|
-  it "should only list in-group discussions in the content right pane", pick_priority(context,"1","2"), test_id: pick_test_id(context, 273622,324930) do
+  it "should only list in-group discussions in the content right pane", priority: pick_priority(context,"1","2"), test_id: pick_test_id(context, 273622,324930) do
     # create group and course announcements
     group_dt = DiscussionTopic.create!(context: @testgroup.first, user: @teacher,
                                        title: 'Group Discussion', message: 'Group')
@@ -148,7 +148,7 @@ shared_examples 'discussions_page' do |context|
     expect(fln("#{course_dt.title}")).to be_nil
   end
 
-  it "should only access group files in discussions right content pane", pick_priority(context,"1","2"), test_id: pick_test_id(context, 303701, 324933) do
+  it "should only access group files in discussions right content pane", priority: pick_priority(context,"1","2"), test_id: pick_test_id(context, 303701, 324933) do
     add_test_files
     get discussions_page
     expect_new_page_load { f('.btn-primary').click }
@@ -167,7 +167,7 @@ shared_examples 'files_page' do |context|
     expect(fln('cool new name')).to be_present
   end
 
-  it "should search files only within the scope of a group", pick_priority(context,"1","2"), test_id: pick_test_id(context, 273627, 324937) do
+  it "should search files only within the scope of a group", priority: pick_priority(context,"1","2"), test_id: pick_test_id(context, 273627, 324937) do
     add_test_files
     get files_page
     f('input[type="search"]').send_keys 'example.pdf'
@@ -586,4 +586,12 @@ def setup_group_page_urls
   let(:pages_page) {url + '/pages'}
   let(:files_page) {url + '/files'}
   let(:conferences_page) {url + '/conferences'}
+end
+
+def edit_group_announcement
+  get announcements_page
+  expect_new_page_load { ff('li.discussion-topic').first.click }
+  click_edit_btn
+  # edit also verifies it has been edited
+  edit('I edited it','My test message')
 end

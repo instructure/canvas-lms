@@ -42,6 +42,34 @@ describe "groups" do
         get announcements_page
         expect(ff('.discussion-topic').size).to eq 1
       end
+
+      it "should allow teachers to delete their own group announcements", priority: "1", test_id: 326522 do
+        @testgroup.first.announcements.create!(title: 'Student Announcement', message: 'test message', User: @teacher)
+
+        get announcements_page
+        expect(ff('.discussion-topic').size).to eq 1
+        delete_announcement_via_gear_menu
+        expect(ff('.discussion-topic').size).to eq 0
+      end
+
+      it "should allow teachers to delete group member announcements", priority: "1", test_id: 326523 do
+        @testgroup.first.announcements.create!(title: 'Student Announcement', message: 'test message', User: @students.first)
+
+        get announcements_page
+        expect(ff('.discussion-topic').size).to eq 1
+        delete_announcement_via_gear_menu
+        expect(ff('.discussion-topic').size).to eq 0
+      end
+
+      it "should let teachers edit their own announcements", priority: "1", test_id: 312865 do
+        @testgroup.first.announcements.create!(title: 'Test Announcement', message: 'test message', User: @teacher)
+        edit_group_announcement
+      end
+
+      it "should let teachers edit group member announcements", priority: "2", test_id: 323325 do
+        @testgroup.first.announcements.create!(title: 'Your Announcement', message: 'test message', User: @students.first)
+        edit_group_announcement
+      end
     end
 
     #-------------------------------------------------------------------------------------------------------------------
