@@ -5,8 +5,9 @@ define([
   'i18n!gradebook',
   'jsx/gradebook/grid/components/dropdown_components/headerDropdownOption',
   'jsx/gradebook/grid/constants',
-  'jsx/gradebook/grid/components/dropdown_components/setDefaultGradeOption'
-], function (React, _, I18n, HeaderDropdownOption, GradebookConstants, SetDefaultGradeOption) {
+  'jsx/gradebook/grid/components/dropdown_components/setDefaultGradeOption',
+  'jsx/gradebook/grid/components/dropdown_components/muteAssignmentOption'
+], function (React, _, I18n, HeaderDropdownOption, GradebookConstants, SetDefaultGradeOption, MuteAssignmentOption) {
 
   var AssignmentHeaderDropdownOptions = React.createClass({
 
@@ -46,9 +47,6 @@ define([
         dropdownOptions.splice(1, 0, speedGraderOption);
       }
 
-      muteAssignmentOption = { title: I18n.t('Mute Assignment'), action: 'toggleMuting' };
-      if (assignment.muted) muteAssignmentOption.title = I18n.t('Unmute Assignment');
-      dropdownOptions.push(muteAssignmentOption);
       return dropdownOptions;
     },
 
@@ -83,6 +81,10 @@ define([
               }
             })
           }
+
+          <MuteAssignmentOption
+            key={'muteAssignment-' + assignment.id}
+            assignment={assignment}/>
         </ul>
       );
     }

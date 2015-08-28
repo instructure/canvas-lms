@@ -70,10 +70,14 @@ define([
       label = this.props.label;
 
       if (assignment) {
-        var paddingAdjustment = GradebookConstants.DEFAULT_LAYOUTS.headers.paddingAdjustment;
+        var paddingAdjustment = GradebookConstants.DEFAULT_LAYOUTS.headers.paddingAdjustment,
+            className = "assignment-name" + ((assignment.muted) ? ' muted' : '');
+
         return (
           <div className='gradebook-label' style={{width: this.props.width - paddingAdjustment}}>
-            <a title={label} href={assignment.html_url}>
+            <a className={className}
+               title={label}
+               href={assignment.html_url}>
               { this.shouldDisplayAssignmentWarning() && <i ref="icon" title={this.getTitle()} className="icon-warning"></i> }
               {label}
             </a>

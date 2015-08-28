@@ -21,7 +21,8 @@ define([
   '../actions/submissionsActions',
   '../stores/keyboardNavigationStore',
   '../actions/keyboardNavigationActions',
-  '../helpers/columnArranger'
+  '../helpers/columnArranger',
+  'vendor/spin'
 ], function (
   React,
   FixedDataTable,
@@ -44,12 +45,14 @@ define([
   SubmissionsActions,
   KeyboardNavigationStore,
   KeyboardNavigationActions,
-  ColumnArranger
+  ColumnArranger,
+  Spinner
 ){
 
   var Table = FixedDataTable.Table,
       Column = FixedDataTable.Column,
-      isColumnResizing = false;
+      isColumnResizing = false,
+      spinner;
 
   var Gradebook = React.createClass({
     mixins: [
@@ -215,6 +218,15 @@ define([
              || this.state.submissions.error;
     },
 
+    renderSpinner() {
+      spinner = new Spinner();
+      $(spinner.spin().el).css({
+        opacity: 0.5,
+        top: '55px',
+        left: '50%'
+      }).addClass('use-css-transitions-for-show-hide').appendTo('#main');
+    },
+
     renderNotesColumn() {
       if (!this.state.toolbarOptions.hideNotesColumn) {
         return this.renderColumn(I18n.t('Notes'), GradebookConstants.NOTES_COLUMN_ID);
@@ -242,6 +254,9 @@ define([
       }
       else if (this.state.submissions.data && this.state.assignmentGroups.data
                && this.state.studentEnrollments.data) {
+
+        $(spinner.el).remove();
+
         return (
           <div id="react-gradebook-canvas"
                onKeyDown={this.handleKeyDown}
@@ -260,7 +275,11 @@ define([
           </div>
         );
       } else {
-        return (<h2>{I18n.t('Gradebook loading...replace this with a spinner?')}</h2>);
+        if (!spinner) {
+          this.renderSpinner();
+        }
+
+        return <div/>;
       }
     }
   });

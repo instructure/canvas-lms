@@ -4,7 +4,8 @@ define([
 ], function (Reflux, $) {
   var AssignmentGroupsActions = Reflux.createActions({
     load: { asyncResult: true },
-    replaceAssignmentGroups: { asyncResult: false }
+    replaceAssignmentGroups: { asyncResult: false },
+    replaceAssignment: {asyncResult: false}
   });
 
   AssignmentGroupsActions.load.listen(function() {

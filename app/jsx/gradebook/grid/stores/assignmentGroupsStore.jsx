@@ -44,6 +44,16 @@ define([
       });
     },
 
+    onReplaceAssignment(updatedAssignment) {
+      var assignmentGroups = this.assignmentGroups.data,
+          assignments = _.flatten(_.pluck(assignmentGroups, 'assignments')),
+          assignment = _.find(assignments, assignment => updatedAssignment.id === assignment.id);
+
+      assignment.muted = updatedAssignment.muted;
+      this.assignmentGroups.data = assignmentGroups;
+      this.trigger(this.assignmentGroups);
+    },
+
     formatAssignmentGroups(groups) {
       return _.map(groups, (group) => {
         group.assignments = _.map(
