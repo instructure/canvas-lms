@@ -183,7 +183,7 @@ class CourseLinkValidator
             result = :unreachable
           end
         end
-      rescue URI::InvalidURIError
+      rescue URI::Error
         result = :unparsable
       end
       result ||= :success
