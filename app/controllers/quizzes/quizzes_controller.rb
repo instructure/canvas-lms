@@ -869,9 +869,13 @@ class Quizzes::QuizzesController < ApplicationController
                                             remote_ip: request.remote_ip,
                                             access_code: params[:access_code])
 
-    reason = can_take.declined_reason_renders
-    render reason if reason
-    can_take.eligible?
+    if params[:take]
+      reason = can_take.declined_reason_renders
+      render reason if reason
+      can_take.eligible?
+    else
+      can_take.potentially_eligible?
+    end
   end
 
   def quiz_submission_active?

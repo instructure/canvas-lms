@@ -1479,7 +1479,10 @@ describe Quizzes::QuizzesController do
     context "when access code is required but does not match" do
       before do
         @quiz.stubs(:access_code).returns("trust me. *winks*")
-        subject.stubs(:params).returns({:access_code => "Don't trust me. *tips hat*"})
+        subject.stubs(:params).returns({
+          :access_code => "Don't trust me. *tips hat*",
+          :take => 1
+        })
       end
 
       it "renders access_code template" do
@@ -1503,6 +1506,7 @@ describe Quizzes::QuizzesController do
       before do
         @quiz.stubs(:ip_filter).returns(true)
         @quiz.stubs(:valid_ip?).returns(false)
+        subject.stubs(:params).returns({:take => 1})
       end
 
       it "renders invalid_ip" do
