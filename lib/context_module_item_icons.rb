@@ -85,6 +85,7 @@ module ContextModuleItemIcons
     return false unless module_item.content_type == 'Assignment' || module_item.content_type == 'Quizzes::Quiz'
 
     assignment = module_item.assignment
+    return false unless assignment
     submissions = assignment.submissions
     due_date = assignment.due_at
 
