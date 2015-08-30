@@ -137,6 +137,18 @@ SSO protocol.</p>
 </td>
 </tr>
 <tr>
+<td>authentication_provider_id</td>
+<td>text or integer</td>
+<td>
+<p>The authentication provider this login is associated with. Logins
+associated with a specific provider can only be used with that provider.
+Legacy providers (LDAP, CAS, SAML) will search for logins associated with
+them, or unassociated logins. New providers will only search for logins
+explicitly associated with them. This can be the integer ID of the
+provider, or the type of the provider (in which case, it will find the
+first matching provider).</p>
+</td>
+<tr>
 <td>first_name</td>
 <td>text</td>
 <td>Given name of the user.</td>
@@ -187,10 +199,10 @@ student to be able to log in but just not participate, leave the student
 Sample:
 
 <pre>
-user_id,login_id,password,first_name,last_name,short_name,email,status
-01103,bsmith01,,Bob,Smith,Bobby Smith,bob.smith@myschool.edu,active
-13834,jdoe03,,John,Doe,,john.doe@myschool.edu,active
-13aa3,psue01,,Peggy,Sue,,peggy.sue@myschool.edu,active
+user_id,login_id,authentication_provider_id,password,first_name,last_name,short_name,email,status
+01103,bsmith01,,,Bob,Smith,Bobby Smith,bob.smith@myschool.edu,active
+13834,jdoe03,google,,John,Doe,,john.doe@myschool.edu,active
+13aa3,psue01,7,,Peggy,Sue,,peggy.sue@myschool.edu,active
 </pre>
 
 accounts.csv

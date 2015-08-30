@@ -77,7 +77,7 @@ def test_selective_content(source_course=nil)
 end
 
 describe "content migrations", :non_parallel do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   context "common cartridge importing" do
     before :each do

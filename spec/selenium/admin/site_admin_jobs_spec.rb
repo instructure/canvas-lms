@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 
 describe "site admin jobs ui" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   module FlavorTags
     ALL = 'All'

@@ -68,7 +68,7 @@ def api_call(method, path, params, body_params = {}, headers = {}, opts = {})
 
   case params[:format]
   when 'json'
-    expect(CANVAS_RAILS3 ? response.header['content-type'] : response.header['Content-Type']).to eq 'application/json; charset=utf-8'
+    expect(response.header[content_type_key]).to eq 'application/json; charset=utf-8'
 
     body = response.body
     if body.respond_to?(:call)

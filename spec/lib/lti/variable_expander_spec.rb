@@ -193,6 +193,19 @@ module Lti
         expect(exp_hash[:test]).to eq 'cd45'
       end
 
+      it 'has substitution for $Canvas.root_account.global_id' do
+        root_account.stubs(:global_id).returns(10054321)
+        exp_hash = {test: '$Canvas.root_account.global_id'}
+        subject.expand_variables!(exp_hash)
+        expect(exp_hash[:test]).to eq 10054321
+      end
+
+      it 'has substitution for $Canvas.shard.id' do
+        exp_hash = {test: '$Canvas.shard.id'}
+        subject.expand_variables!(exp_hash)
+        expect(exp_hash[:test]).to eq 1
+      end
+
       context 'context is a course' do
         subject { described_class.new(root_account, course, controller, current_user: user) }
 

@@ -92,7 +92,8 @@
   margin-left: 1.5em;
 }
 
-#account_settings, .account_settings {
+#account_settings,
+.account_settings {
   .unbreakable {
     white-space: nowrap;
   }
@@ -120,6 +121,10 @@
     .remove_domain_link img {
       vertical-align: -3px;
     }
+  }
+  .account_settings__help-text {
+    font-size: 90%;
+    color: $ic-font-color--subdued;
   }
 }
 

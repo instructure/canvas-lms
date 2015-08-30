@@ -21,14 +21,13 @@ define([
   'timezone',
   'str/htmlEscape',
   'compiled/widget/DatetimeField',
-  'compiled/util/parseDatetime',
   'jsx/shared/render-datepicker-time',
   'jquery.keycodes' /* keycodes */,
   'vendor/date' /* Date.parse, Date.UTC, Date.today */,
   'jqueryui/datepicker' /* /\.datepicker/ */,
   'jqueryui/sortable' /* /\.sortable/ */,
   'jqueryui/widget' /* /\.widget/ */
-], function(I18n, $, tz, htmlEscape, DatetimeField, parseDatetime, renderDatepickerTime) {
+], function(I18n, $, tz, htmlEscape, DatetimeField, renderDatepickerTime) {
   // fudgeDateForProfileTimezone is used to apply an offset to the date which represents the
   // difference between the user's configured timezone in their profile, and the timezone
   // of the browser. We want to display times in the timezone of their profile. Use
@@ -95,28 +94,9 @@ define([
   $.datetimeString = function(datetime, options) {
     datetime = tz.parse(datetime);
     if (datetime == null) return "";
-    var localized = options && options.localized;
-    var timezone = options && options.timezone;
-    var format = options && options.format;
-    if (localized == false) {
-      // temporary unlocalized (which means avoiding tz.format)
-      // expansion of the other branch. intent of being able to call
-      // this with localized false, triggering this code, is if it's
-      // called to fill the value attribute of a datetime picker field,
-      // since the field will complain about localized dates. the real
-      // solution is to teach the datetime picker about parsing
-      // localized date strings (by using tz.parse).
-      //
-      // TODO: implement that real solution and remove this
-      var fudged = $.fudgeDateForProfileTimezone(datetime);
-      datePart = (format !== 'medium') && $.sameYear(datetime, new Date()) ? fudged.toString("MMM d") : fudged.toString("MMM d, yyyy");
-      timePart = fudged.toString("h:mmtt").toLowerCase();
-      return datePart + " at " + timePart;
-    } else {
-      var dateValue = $.dateString(datetime, options);
-      var timeValue = $.timeString(datetime, options);
-      return I18n.t('#time.event', '%{date} at %{time}', { date: dateValue, time: timeValue });
-    }
+    var dateValue = $.dateString(datetime, options);
+    var timeValue = $.timeString(datetime, options);
+    return I18n.t('#time.event', '%{date} at %{time}', { date: dateValue, time: timeValue });
   };
   // end batch
 
@@ -150,7 +130,16 @@ define([
 
   $.datepicker.oldParseDate = $.datepicker.parseDate;
   $.datepicker.parseDate = function(format, value, settings) {
-    return parseDatetime(value) || $.datepicker.oldParseDate(format, value, settings);
+    // try parsing with tz.parse first. if it can, its return is an unfudged
+    // value, but the datepicker expects a fudged one, so fudge it. if it can't
+    // parse it, fallback to the datepicker's original parseDate (which returns
+    // already fudged)
+    var datetime = tz.parse(value);
+    if (datetime) {
+      return $.fudgeDateForProfileTimezone(datetime);
+    } else {
+      return $.datepicker.oldParseDate(format, value, settings);
+    }
   };
   $.datepicker._generateDatepickerHTML = $.datepicker._generateHTML;
   $.datepicker._generateHTML = function(inst) {

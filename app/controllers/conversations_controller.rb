@@ -985,7 +985,7 @@ class ConversationsController < ApplicationController
     conversations = [conversations] unless multiple
     result = Hash.new(false)
     visible_conversations = @current_user.shard.activate do
-        @conversations_scope.select(:conversation_id).where(:conversation_id => conversations.map(&:conversation_id)).all
+        @conversations_scope.select(:conversation_id).where(:conversation_id => conversations.map(&:conversation_id)).to_a
       end
     visible_conversations.each { |c| result[c.conversation_id] = true }
     if !multiple

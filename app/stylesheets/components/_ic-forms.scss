@@ -423,7 +423,7 @@ At tablet screen-width, this form spreads out in a single row. Simply add ``.ic-
 <!-- Do not use this modal markup in production. See the docs below for React Modal! -->
 <div class="ReactModal__Content ReactModal__Content--canvas ReactModal__Content--demo-styleguide">
   <div class="ReactModal__Layout">
-    <div class="ReactModal__InnerSection ReactModal__Header">
+    <div class="ReactModal__Header">
       <div class="ReactModal__Header-Title">
         <h4>Add external tool</h4>
       </div>
@@ -434,7 +434,7 @@ At tablet screen-width, this form spreads out in a single row. Simply add ``.ic-
         </button>
       </div>
     </div>
-    <div class="ReactModal__InnerSection ReactModal__Body">
+    <div class="ReactModal__Body">
 <!-- end do not use markup -->
 
 <!-- You CAN use this markup to put a form into a React Modal body (or any modal) -->
@@ -503,7 +503,7 @@ At tablet screen-width, this form spreads out in a single row. Simply add ``.ic-
 
 <!-- Do not use this modal markup in production. See the docs below for React Modal! -->
     </div>
-    <div class="ReactModal__InnerSection ReactModal__Footer">
+    <div class="ReactModal__Footer">
       <div class="ReactModal__Footer-Actions">
         <button type="button" class="Button">Cancel</button>
         <button type="button" class="Button Button--primary">Submit</button>

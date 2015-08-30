@@ -72,7 +72,7 @@ module Mutable
       end
 
       outstanding = submissions.map{ |submission|
-        comments = submission.hidden_submission_comments.all
+        comments = submission.hidden_submission_comments.to_a
         next if comments.empty?
         [submission, comments.map(&:author_id).uniq.size == 1 ? [comments.last.author] : []]
       }.compact

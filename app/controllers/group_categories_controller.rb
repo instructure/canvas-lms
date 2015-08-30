@@ -472,6 +472,23 @@ class GroupCategoriesController < ApplicationController
     true
   end
 
+  def clone_with_name
+    if authorized_action(get_category_context, @current_user, :manage_groups)
+      GroupCategory.transaction do
+        group_category = GroupCategory.active.find(params[:id])
+        new_group_category = group_category.dup
+        new_group_category.name = params[:name]
+        begin
+          new_group_category.save!
+          group_category.clone_groups_and_memberships(new_group_category)
+          render :json => new_group_category
+        rescue ActiveRecord::RecordInvalid
+          render :json => new_group_category.errors, :status => :bad_request
+        end
+      end
+    end
+  end
+
   protected
   def get_category_context
     begin

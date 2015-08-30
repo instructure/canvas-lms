@@ -17,6 +17,7 @@ group :test do
   gem 'rspec-rails', '3.2.3'
   gem 'rspec-legacy_formatters', '1.0.0'
   gem 'rspec-collection_matchers', '1.1.2'
+  gem 'shoulda-matchers', '2.8.0'
 
   gem 'rubocop', require: false
   gem 'rubocop-rspec', require: false
@@ -29,6 +30,7 @@ group :test do
     gem 'childprocess', '0.5.0', require: false
     gem 'websocket', '1.0.7', require: false
   gem 'selinimum', '0.0.1', require: false, path: 'gems/selinimum'
+  gem 'appium_lib', '7.0.0', require: false
   gem 'test_after_commit', '0.4.0'
   gem 'test-unit', '~> 3.0', require: false, platform: :ruby_22
   gem 'webmock', '1.16.1', require: false

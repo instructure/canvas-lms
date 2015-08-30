@@ -1,6 +1,8 @@
 require 'active_support/callbacks/suspension'
 
 class ActiveRecord::Base
+  self.cache_timestamp_format = :usec unless CANVAS_RAILS3
+
   def write_attribute(attr_name, *args)
     if CANVAS_RAILS3
       column = column_for_attribute(attr_name)
@@ -53,8 +55,7 @@ class ActiveRecord::Base
 
   def self.all_models
     return @all_models if @all_models.present?
-    @all_models = (ActiveRecord::Base.send(:subclasses) +
-                   ActiveRecord::Base.models_from_files +
+    @all_models = (ActiveRecord::Base.models_from_files +
                    [Version]).compact.uniq.reject { |model|
       !(model.superclass == ActiveRecord::Base || model.superclass.abstract_class?) ||
       (model.respond_to?(:tableless?) && model.tableless?) ||
@@ -63,19 +64,17 @@ class ActiveRecord::Base
   end
 
   def self.models_from_files
-    @from_files ||= Dir[
-      "#{Rails.root}/app/models/**/*.rb",
-      "#{Rails.root}/vendor/plugins/*/app/models/**/*.rb",
-      "#{Rails.root}/gems/plugins/*/app/models/**/*.rb",
-    ].sort.collect { |file|
-      model = begin
-          file.sub(%r{.*/app/models/(.*)\.rb$}, '\1').camelize.constantize
-        rescue NameError, LoadError
-          next
-        end
-      next unless model < ActiveRecord::Base
-      model
-    }
+    @from_files ||= begin
+      Dir[
+        "#{Rails.root}/app/models/**/*.rb",
+        "#{Rails.root}/vendor/plugins/*/app/models/**/*.rb",
+        "#{Rails.root}/gems/plugins/*/app/models/**/*.rb",
+      ].sort.each do |file|
+        next if const_defined?(file.sub(%r{.*/app/models/(.*)\.rb$}, '\1').camelize)
+        ActiveSupport::Dependencies.require_or_load(file)
+      end
+      ActiveRecord::Base.descendants
+    end
   end
 
   def self.maximum_text_length
@@ -209,7 +208,7 @@ class ActiveRecord::Base
   def touch_context
     return if (@@skip_touch_context ||= false || @skip_touch_context ||= false)
     if self.respond_to?(:context_type) && self.respond_to?(:context_id) && self.context_type && self.context_id
-      self.context_type.constantize.update_all({ updated_at: Time.now.utc }, { id: self.context_id })
+      self.context_type.constantize.where(id: self.context_id).update_all(updated_at: Time.now.utc)
     end
   rescue
     Canvas::Errors.capture_exception(:touch_context, $ERROR_INFO)
@@ -218,10 +217,10 @@ class ActiveRecord::Base
   def touch_user
     if self.respond_to?(:user_id) && self.user_id
       shard = self.user.shard
-      User.update_all({ :updated_at => Time.now.utc }, { :id => self.user_id })
+      User.where(:id => self.user_id).update_all(:updated_at => Time.now.utc)
       User.connection.after_transaction_commit do
         shard.activate do
-          User.update_all({ :updated_at => Time.now.utc }, { :id => self.user_id })
+          User.where(:id => self.user_id).update_all(:updated_at => Time.now.utc)
         end if shard != Shard.current
         User.invalidate_cache(self.user_id)
       end
@@ -708,7 +707,7 @@ ActiveRecord::Relation.class_eval do
             old_proc = connection.raw_connection.set_notice_processor {}
             if pluck && pluck.any?{|p| p == primary_key.to_s}
               connection.add_index table, primary_key, name: index
-              index = primary_key
+              index = primary_key.to_s
             else
               pluck.unshift(index) if pluck
               connection.execute "ALTER TABLE #{table}
@@ -930,7 +929,7 @@ ActiveRecord::Relation.class_eval do
   def union(*scopes)
     uniq_identifier = "#{table_name}.#{primary_key}"
     scopes << self
-    sub_query = (scopes).map {|s| s.except(:select).select(uniq_identifier).to_sql}.join(" UNION ALL ")
+    sub_query = (scopes).map {|s| s.except(:select, :order).select(uniq_identifier).to_sql}.join(" UNION ALL ")
     engine.where("#{uniq_identifier} IN (#{sub_query})")
   end
 end
@@ -1082,7 +1081,7 @@ end
 
 ActiveRecord::Associations::HasOneAssociation.class_eval do
   def create_scope
-    scope = scoped.scope_for_create.stringify_keys
+    scope = (CANVAS_RAILS3 ? self.scoped : self.scope).scope_for_create.stringify_keys
     scope = scope.except(klass.primary_key) unless klass.primary_key.to_s == reflection.foreign_key.to_s
     scope
   end
@@ -1424,7 +1423,7 @@ end
 
 module UnscopeCallbacks
   def run_callbacks(kind)
-    scope = self.class.base_class.unscoped
+    scope = CANVAS_RAILS3 ? self.class.unscoped : self.class.base_class.unscoped
     scope.default_scoped = true
     scope.scoping { super }
   end

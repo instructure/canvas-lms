@@ -211,7 +211,7 @@ define([
 
             <div className="ReactModal__Layout">
 
-              <div className="ReactModal__InnerSection ReactModal__Header">
+              <div className="ReactModal__Header">
                 <div className="ReactModal__Header-Title">
                   <h4>{I18n.t('Add App')}</h4>
                 </div>
@@ -223,14 +223,14 @@ define([
                 </div>
               </div>
 
-              <div className="ReactModal__InnerSection ReactModal__Body">
+              <div className="ReactModal__Body">
                 {this.errorMessage()}
                 <form role="form">
                   {this.configOptions()}
                 </form>
               </div>
 
-              <div className="ReactModal__InnerSection ReactModal__Footer">
+              <div className="ReactModal__Footer">
                 <div className="ReactModal__Footer-Actions">
                   <button type="button" className="btn btn-default" onClick={this.closeModal}>{I18n.t('Close')}</button>
                   <button type="button" ref="addButton" className="btn btn-primary" onClick={this.submit}>{I18n.t('Add App')}</button>

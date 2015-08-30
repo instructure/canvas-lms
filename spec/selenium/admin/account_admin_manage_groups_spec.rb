@@ -2,7 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../helpers/manage_groups_com
 require 'thread'
 
 describe "account admin manage groups" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   def add_account_category (account, name)
     f(".add_category_link").click
@@ -140,7 +140,7 @@ describe "account admin manage groups" do
       confirm_dialog.accept
       wait_for_ajaximations
       expect(driver.find_elements(:css, ".left_side .group")).to be_empty
-      expect(@admin_account.group_categories.all.count).to eq 0
+      expect(@admin_account.group_categories.count).to eq 0
     end
 
     it "should edit an individual group" do

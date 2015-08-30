@@ -2,7 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/eportfolios_common')
 
 describe "add content box" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   before(:each) do
     course_with_student_logged_in

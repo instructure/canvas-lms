@@ -2,7 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/grading_schemes_common')
 
 describe "grading standards" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   context "without Multiple Grading Periods" do
 

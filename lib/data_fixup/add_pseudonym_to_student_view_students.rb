@@ -7,7 +7,7 @@ module DataFixup::AddPseudonymToStudentViewStudents
           uniq.
           joins("#{pseudonym_join} #{enrollment_join}").
           where(:pseudonyms => { :id => nil }).
-          limit(1000).all
+          limit(1000).to_a
       fake_students.each do |fake_student|
         fake_student.pseudonyms.create!(:unique_id => Canvas::Security.hmac_sha1("Test Student_#{fake_student.id}")) do |p|
           p.account_id = fake_student.read_attribute(:root_account_id)

@@ -116,14 +116,21 @@ class Auditors::Course
     end
   end
 
+  def self.remove_empty_changes(changes)
+    # courses may instantiate an empty hash for serialized attributes
+    changes.reject{|k, change| change.is_a?(Array) && change.all?(&:blank?) }
+  end
+
   def self.record_created(course, user, changes, opts = {})
     return unless course && changes
+    changes = self.remove_empty_changes(changes)
     return if changes.empty?
     self.record(course, user, "created", changes, opts)
   end
 
   def self.record_updated(course, user, changes, opts = {})
     return unless course && changes
+    changes = self.remove_empty_changes(changes)
     return if changes.empty?
     self.record(course, user, 'updated', changes, opts)
   end

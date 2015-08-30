@@ -32,7 +32,7 @@ define([
 
     render() {
       return (
-        <div className="ReactModal__InnerSection ReactModal__Body" style={{padding: '0px !important'}}>
+        <div className="ReactModal__Body" style={{padding: '0px !important'}}>
           <iframe src={this.getLaunchUrl()} style={{width: '100%', padding: 0, margin: 0, height: 500, border: 0}}/>
         </div>
       )

@@ -1,10 +1,9 @@
 require File.expand_path(File.dirname(__FILE__) + '/helpers/quizzes_common')
 
-describe "quizzes question with html answers" do
+describe 'quizzes question with html answers' do
+  include_context 'in-process server selenium tests'
 
-  include_examples "quizzes selenium tests"
-
-  before (:each) do
+  before(:each) do
     course_with_teacher_logged_in
     @last_quiz = start_quiz_question
   end
@@ -20,7 +19,7 @@ describe "quizzes question with html answers" do
     f('.edit_html_done').click
   end
 
-  it "should allow HTML answers for multiple choice" do
+  it 'allows HTML answers for multiple choice', priority: "1", test_id: 209356 do
     quiz_with_new_questions
     click_questions_tab
     edit_first_html_answer
@@ -36,7 +35,7 @@ describe "quizzes question with html answers" do
     expect(html).to eq '<p>HTML</p>'
   end
 
-  it "should set focus back to the edit button after editing" do
+  it 'sets focus back to the edit button after editing', priority: "1", test_id: 209357 do
     quiz_with_new_questions
     click_questions_tab
     edit_first_html_answer
@@ -50,7 +49,7 @@ describe "quizzes question with html answers" do
     expect(fj('.edit_html:visible')).to be_nil
   end
 
-  it "should not show the edit html button for question types besides multiple choice and multiple answers" do
+  it 'doesn\'t show the edit html button for question types besides multiple choice and multiple answers', priority: "1", test_id: 209358 do
     quiz_with_new_questions
     click_questions_tab
     edit_first_question
@@ -63,7 +62,7 @@ describe "quizzes question with html answers" do
     check_for_no_edit_button 'Numerical Answer'
   end
 
-  it "should restore normal input when html answer is empty" do
+  it 'restores normal input when html answer is empty', priority: "1", test_id: 209359 do
     quiz_with_new_questions
     click_questions_tab
     edit_first_html_answer
@@ -76,7 +75,7 @@ describe "quizzes question with html answers" do
     expect(input_length).to eq 1
   end
 
-  it "should populate the editor and input elements properly" do
+  it 'populates the editor and input elements properly', priority: "1", test_id: 209360 do
     quiz_with_new_questions
     click_questions_tab
 
@@ -100,7 +99,7 @@ describe "quizzes question with html answers" do
     expect(value).to eq ''
   end
 
-  it "should save open html answers when the question is submitted for multiple choice" do
+  it 'saves open html answers when the question is submitted for multiple choice', priority: "1", test_id: 209361 do
     quiz_with_new_questions
     click_questions_tab
     edit_first_html_answer
@@ -113,7 +112,7 @@ describe "quizzes question with html answers" do
     expect(html).to eq '<p>HTML</p>'
   end
 
-  it "should save open html answers when the question is submitted for multiple answers" do
+  it 'saves open html answers when the question is submitted for multiple answers', priority: "1", test_id: 209362 do
     quiz_with_new_questions
     click_questions_tab
     edit_first_html_answer 'Multiple Answers'
@@ -125,5 +124,4 @@ describe "quizzes question with html answers" do
     html = driver.execute_script "return $('.answer:eq(3) .answer_html').html()"
     expect(html).to eq '<p>HTML</p>'
   end
-
 end

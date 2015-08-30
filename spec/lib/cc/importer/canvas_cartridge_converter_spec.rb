@@ -577,6 +577,41 @@ describe "Canvas Cartridge importing" do
     expect(page_2.body).to eq body_with_link % ([ @copy_to.id, attachment_import.id ] * 4)
   end
 
+  it "should translate media file links on import" do
+    media_id = 'm_mystiry'
+    att = Attachment.create!(:filename => 'video.mp4',
+      :uploaded_data => StringIO.new('stuff'),
+      :folder => Folder.root_folders(@copy_to).first, :context => @copy_to)
+    att.migration_id = 'stuff'
+    att.content_type = "video/mp4"
+    att.save!
+
+    media_id = "m_mystiry"
+    Attachment.any_instance.stubs(:media_object).returns(stub(:media_id => media_id))
+
+    path = CGI.escape(att.full_path)
+    body_with_links = %{<p>Watup? <strong>eh?</strong>
+      <a href="%24IMS-CC-FILEBASE%24/#{path}" class="instructure_inline_media_comment">wroks</a>
+      <a href="%24IMS-CC-FILEBASE%24/#{path}">no wroks</a>
+      </p>}
+
+    hash = {
+      :migration_id => 'mig',
+      :title => 'title',
+      :text => body_with_links
+    }.with_indifferent_access
+    #import into new course
+    @migration.attachment_path_id_lookup = { att.full_path => att.migration_id }
+    Importers::WikiPageImporter.import_from_migration(hash, @copy_to, @migration)
+    @migration.resolve_content_links!
+
+    page_2 = @copy_to.wiki.wiki_pages.where(migration_id: hash[:migration_id]).first
+    links = Nokogiri::HTML::DocumentFragment.parse(page_2.body).css("a")
+    expect(links.count).to eq 2
+    expect(links.first['href']).to eq "/media_objects/#{media_id}"
+    expect(links.last['href']).to eq "/courses/#{@copy_to.id}/files/#{att.id}/preview"
+  end
+
   it "should import wiki pages" do
     # make sure that the wiki page we're linking to in the test below exists
     @copy_from.wiki.wiki_pages.create!(:title => "assignments", :body => "ohai")

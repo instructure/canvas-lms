@@ -60,16 +60,17 @@ module SIS
         @pseudos_to_set_sis_batch_ids = []
         @users_to_add_account_associations = []
         @users_to_update_account_associations = []
+        @authentication_providers = {}
       end
 
-      def add_user(user_id, login_id, status, first_name, last_name, email=nil, password=nil, ssha_password=nil, integration_id=nil, short_name=nil, full_name=nil, sortable_name=nil)
+      def add_user(user_id, login_id, status, first_name, last_name, email=nil, password=nil, ssha_password=nil, integration_id=nil, short_name=nil, full_name=nil, sortable_name=nil, authentication_provider_id=nil)
         @logger.debug("Processing User #{[user_id, login_id, status, first_name, last_name, email, password, ssha_password, integration_id, short_name, full_name, sortable_name].inspect}")
 
         raise ImportError, "No user_id given for a user" if user_id.blank?
         raise ImportError, "No login_id given for user #{user_id}" if login_id.blank?
         raise ImportError, "Improper status for user #{user_id}" unless status =~ /\A(active|deleted)/i
 
-        @batched_users << [user_id.to_s, login_id, status, first_name, last_name, email, password, ssha_password, integration_id, short_name, full_name, sortable_name]
+        @batched_users << [user_id.to_s, login_id, status, first_name, last_name, email, password, ssha_password, integration_id, short_name, full_name, sortable_name, authentication_provider_id]
         process_batch if @batched_users.size >= @updates_every
       end
 
@@ -86,7 +87,7 @@ module SIS
           while !@batched_users.empty? && tx_end_time > Time.now
             user_row = @batched_users.shift
             @logger.debug("Processing User #{user_row.inspect}")
-            user_id, login_id, status, first_name, last_name, email, password, ssha_password, integration_id, short_name, full_name, sortable_name = user_row
+            user_id, login_id, status, first_name, last_name, email, password, ssha_password, integration_id, short_name, full_name, sortable_name, authentication_provider_id = user_row
 
             pseudo = @root_account.pseudonyms.where(sis_user_id: user_id.to_s).first
             pseudo_by_login = @root_account.pseudonyms.active.by_unique_id(login_id).first
@@ -146,6 +147,22 @@ module SIS
 
             pseudo ||= Pseudonym.new
             pseudo.unique_id = login_id unless pseudo.stuck_sis_fields.include?(:unique_id)
+            if authentication_provider_id.present?
+              unless @authentication_providers.key?(authentication_provider_id)
+                begin
+                  @authentication_providers[authentication_provider_id] =
+                    @root_account.authentication_providers.active.find(authentication_provider_id)
+                rescue ActiveRecord::RecordNotFound
+                  @authentication_providers[authentication_provider_id] = nil
+                end
+              end
+              unless (pseudo.authentication_provider = @authentication_providers[authentication_provider_id])
+                @messages << "unrecognized authentication provider #{authentication_provider_id} for #{user_id}, skipping"
+                next
+              end
+            else
+              pseudo.authentication_provider = nil
+            end
             pseudo.sis_user_id = user_id
             pseudo.integration_id = integration_id
             pseudo.account = @root_account
@@ -201,7 +218,7 @@ module SIS
               else
                 ccs = user.communication_channels
               end
-              ccs = ccs.email.by_path(email).all
+              ccs = ccs.email.by_path(email).to_a
 
               # sis_cc could be set from the previous user, if we're not on a transaction boundary,
               # and the previous user had an sis communication channel, and this user doesn't have one

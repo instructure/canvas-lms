@@ -206,7 +206,7 @@ module Api::V1::DiscussionTopics
   # Returns a hash.
   def discussion_entry_subentries(entry, user, context, session, includes)
     return {} unless includes.include?(:subentries) && entry.root_entry_id.nil?
-    replies = entry.flattened_discussion_subentries.active.newest_first.limit(11).all
+    replies = entry.flattened_discussion_subentries.active.newest_first.limit(11).to_a
 
     if replies.empty?
       {}
@@ -226,17 +226,17 @@ module Api::V1::DiscussionTopics
 
   def entry_pagination_url(topic)
     if @context.is_a? Course
-      api_v1_course_discussion_entries_url(@context)
+      api_v1_course_discussion_entries_url(@context, topic)
     else
-      api_v1_group_discussion_entries_url(@context)
+      api_v1_group_discussion_entries_url(@context, topic)
     end
   end
 
-  def reply_pagination_url(entry)
+  def reply_pagination_url(topic, entry)
     if @context.is_a? Course
-      api_v1_course_discussion_replies_url(@context)
+      api_v1_course_discussion_replies_url(@context, topic, entry)
     else
-      api_v1_group_discussion_replies_url(@context)
+      api_v1_group_discussion_replies_url(@context, topic, entry)
     end
   end
 end

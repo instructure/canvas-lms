@@ -201,4 +201,23 @@ describe GradingPeriod do
     let(:period_two) { { title: 'an title', start_date: 2.weeks.from_now(now), end_date: 5.weeks.from_now(now) } }
     include_examples "soft deletion"
   end
+
+  describe ".in_date_range?" do
+    subject(:period) do
+      grading_period_group.grading_periods.create start_date: 1.week.ago,
+                                                  end_date:   2.weeks.from_now
+    end
+
+    it "returns true for a date in the period" do
+      expect(period.in_date_range? 1.day.from_now).to be true
+    end
+
+    it "returns false for a date before the period" do
+      expect(period.in_date_range? 8.days.ago).to be false
+    end
+
+    it "returns false for a date after the period" do
+      expect(period.in_date_range? 15.days.from_now).to be false
+    end
+  end
 end

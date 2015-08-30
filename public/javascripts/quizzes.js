@@ -937,9 +937,7 @@ define([
 
       $pickers.each(function() {
         var $field = $(this);
-        // remove the second 'false' argument once the pickers know how to
-        // parse localized datetimes
-        var formattedDate = Handlebars.helpers.datetimeFormatted($field.val() || '', false);
+        var formattedDate = Handlebars.helpers.datetimeFormatted($field.val() || '');
 
         $field.val(formattedDate);
         $field.datetime_field();

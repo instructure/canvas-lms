@@ -213,6 +213,8 @@
       delay_for: 0
     - name: Pseudonym Registration
       delay_for: 0
+    - name: Pseudonym Registration Done
+      delay_for: 0
     - name: Confirm Registration
       delay_for: 0
     - name: Forgot Password

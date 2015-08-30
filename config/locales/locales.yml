@@ -82,6 +82,11 @@ da:
   locales:
     da: Dansk
   qualified_locale: da-DK
+hy:
+  locales:
+    hy: Հայերեն (crowd-sourced)
+  qualified_locale: hy-AM
+  crowdsourced: true
 sv:
   locales:
     sv: Svenska

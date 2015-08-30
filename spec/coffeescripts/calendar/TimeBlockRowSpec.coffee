@@ -33,9 +33,11 @@ define [
   test "should init properly", ->
     me = new TimeBlockRow(@timeBlockList, {start, end})
     # make sure the <input> `value`s are right
-    equal me.$date.val().trim(),       start.toString("ddd MMM d, yyyy")
-    equal me.$start_time.val().trim(), start.toString("h:mm") + start.toString("tt").toLowerCase()
-    equal me.$end_time.val().trim(),     end.toString("h:mm") +   end.toString("tt").toLowerCase()
+    unfudged_start = $.unfudgeDateForProfileTimezone(start)
+    unfudged_end = $.unfudgeDateForProfileTimezone(end)
+    equal me.$date.val().trim(),       tz.format(unfudged_start, 'date.formats.medium_with_weekday')
+    equal me.$start_time.val().trim(), tz.format(unfudged_start, 'time.formats.tiny')
+    equal me.$end_time.val().trim(),   tz.format(unfudged_end, 'time.formats.tiny')
 
   test "delete link", ->
     me = @timeBlockList.addRow({start, end})

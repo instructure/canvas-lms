@@ -24,6 +24,7 @@ The currently supported `data-api-returntype` values are:
 * `File`
 * `Folder`
 * `Quiz`
+* `Module`
 * `SessionlessLaunchUrl`
 
 If the API returns a list of objects instead of a single object, the `data-api-returntype`

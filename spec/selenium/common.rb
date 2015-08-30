@@ -54,7 +54,7 @@ at_exit do
   end
 end
 
-shared_examples_for "in-process server selenium tests" do
+shared_context "in-process server selenium tests" do
   include SeleniumDriverSetup
   include CustomSeleniumRspecMatchers
   include OtherHelperMethods

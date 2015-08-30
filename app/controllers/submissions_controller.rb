@@ -539,7 +539,11 @@ class SubmissionsController < ApplicationController
     @submission = @assignment.submissions.where(user_id: params[:submission_id]).first
     @asset_string = params[:asset_string]
     if authorized_action(@submission, @current_user, :read)
-      url = @submission.turnitin_report_url(@asset_string, @current_user) rescue nil
+      if (report_url = @submission.turnitin_data[@asset_string] && @submission.turnitin_data[@asset_string][:report_url])
+        url = polymorphic_url([:retrieve, @context, :external_tools], url:report_url, display:'borderless')
+      else
+        url = @submission.turnitin_report_url(@asset_string, @current_user) rescue nil
+      end
       if url
         redirect_to url
       else

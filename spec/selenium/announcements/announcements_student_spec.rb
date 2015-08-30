@@ -2,7 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
 require File.expand_path(File.dirname(__FILE__) + '/../helpers/announcements_common')
 
 describe "announcements" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   it "should validate replies are not visible until after users post", priority: "1", test_id: 150533 do
     password = 'asdfasdf'

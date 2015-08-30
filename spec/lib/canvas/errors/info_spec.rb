@@ -11,7 +11,7 @@ module Canvas
       let(:request_context_id){ 'abcdefg1234567'}
       let(:account){ stub(global_id: 1122334455) }
       let(:user) { stub(global_id: 5544332211)}
-      let(:opts) { { request_context_id: request_context_id }}
+      let(:opts) { { request_context_id: request_context_id, type: 'core_meltdown' }}
 
       describe 'initialization' do
         it "grabs the request context id if not provided" do
@@ -30,6 +30,7 @@ module Canvas
         it 'digests request information' do
           request.stubs(:remote_ip).returns("123.456")
           expect(output[:tags][:account_id]).to eq(1122334455)
+          expect(output[:tags][:type]).to eq('core_meltdown')
           expect(output[:extra][:request_context_id]).to eq(request_context_id)
           expect(output[:extra]['REMOTE_ADDR']).to eq("123.456")
         end

@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "dashboard" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   shared_examples_for 'load events list' do
     it "should load events list sidebar", priority: "2", test_id: 210275 do
@@ -380,6 +380,8 @@ describe "dashboard" do
       assignment.reload
       assignment.submit_homework(student, {:submission_type => 'online_text_entry', :body => 'ABC'})
       assignment.reload
+
+      User.where(:id => @teacher).update_all(:updated_at => 1.day.ago) # ensure cache refresh
       enable_cache do
         get "/"
 

@@ -2,7 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/speed_grader_common'
 require File.expand_path(File.dirname(__FILE__) + '/helpers/gradebook2_common')
 
 describe "speed grader" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   before (:each) do
     stub_kaltura
@@ -144,17 +144,8 @@ describe "speed grader" do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 
       in_frame 'speedgrader_iframe' do
-        expect(f('.open_in_a_new_tab')).to include_text("User")
-      end
-
-      f("#settings_link").click
-      f('#hide_student_names').click
-
-      expect_new_page_load { fj('.ui-dialog-buttonset .ui-button:visible:last').click }
-      wait_for_ajaximations
-
-      in_frame 'speedgrader_iframe' do
-        expect(f('.open_in_a_new_tab')).to include_text("This Student")
+        expect(f('.not_external')).to include_text("instructure")
+        expect(f('.open_in_a_new_tab')).to include_text("View")
       end
     end
   end
@@ -825,73 +816,17 @@ describe "speed grader" do
   end
 
   context "Pass / Fail assignments" do
-    before do
+    it "displays correct options in the speedgrader dropdown" do
       course_with_teacher_logged_in
       course_with_student(course: @course, active_all: true)
 
       @assignment = @course.assignments.build
       @assignment.grading_type = 'pass_fail'
       @assignment.publish
-    end
 
-    it "displays correct options in the speedgrader dropdown" do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
       select_box_values = ff('#grading-box-extended option').map(&:text)
       expect(select_box_values).to eql(["---", "Complete", "Incomplete", "Excused"])
-    end
-
-    it 'Speedgrader can excuse complete/incomplete assignments', priority: "1", test_id: 209315 do
-      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-      dropdown = Selenium::WebDriver::Support::Select.new(f('#grading-box-extended'))
-      dropdown.select_by(:text, 'Excused')
-
-      get "/courses/#{@course.id}/grades"
-      dropped = f('#gradebook_grid .container_1 .slick-row :first-child')
-      expect(dropped.text).to eq 'EX'
-      expect(dropped).to have_class 'dropped'
-    end
-  end
-
-  context 'Excuse an Assignment' do
-    it 'excuses an assignment properly', priority: "1", test_id: 201949 do
-      init_course_with_students
-
-      a1 = @course.assignments.create! title: 'Excuse Me', points_possible: 20
-      a2 = @course.assignments.create! title: 'Don\'t Excuse Me', points_possible: 10
-      a1.grade_student(@students[0], {grade: 20})
-      a2.grade_student(@students[0], {grade: 5})
-
-      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{a2.id}"
-      replace_content f('#grading-box-extended'), "EX\n"
-
-      get "/courses/#{@course.id}/grades"
-      row = ff('#gradebook_grid .container_1 .slick-row .slick-cell')
-
-      expect(row[0].text).to eq '20'
-      # this should show 'EX' and have dropped class
-      expect(row[1].text).to eq('EX')
-      expect(row[1]).to have_class 'dropped'
-
-      # only one cell should have 'dropped' class
-      dropped = ff('#gradebook_grid .container_1 .slick-row .dropped')
-      expect(dropped.length).to eq 1
-
-      # 'EX' should only affect that one cell
-      expect(row[2].text).to eq '100%'
-    end
-
-    it 'indicates excused assignment as graded', priority: "1", test_id: 209316 do
-      course_with_teacher_logged_in
-      course_with_student(course: @course, active_all: true, name: 'Student')
-
-      assignment = @course.assignments.build
-      assignment.publish
-
-      assignment.grade_student(@student, {excuse: true})
-
-      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{assignment.id}"
-      expect(f('#combo_box_container .ui-selectmenu-item-icon i')).to have_class 'icon-check'
-      expect(f('#combo_box_container .ui-selectmenu-item-header').text).to eq 'Student'
     end
   end
 
@@ -925,5 +860,4 @@ describe "speed grader" do
       keep_trying_until { expect(driver.execute_script("return $('#question_#{@quest1.id} .question_input')[0].value")).to eq "2.67" }
     end
   end
-
 end

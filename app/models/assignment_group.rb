@@ -202,7 +202,7 @@ class AssignmentGroup < ActiveRecord::Base
   end
 
   def visible_assignments(user, includes=[])
-    AssignmentGroup.visible_assignments(user, self.context, [self], includes)
+    self.class.visible_assignments(user, self.context, [self], includes)
   end
 
   def self.visible_assignments(user, context, assignment_groups, includes = [])

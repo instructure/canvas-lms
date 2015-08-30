@@ -77,7 +77,7 @@ describe "BookmarkedCollection::MergeProxy" do
 
     it "should include the results" do
       @proxy.paginate(:per_page => 1).should == [@scope.first]
-      @proxy.paginate(:per_page => @scope.count).should == @scope.all
+      @proxy.paginate(:per_page => @scope.count).should == @scope.to_a
     end
 
     it "should set next_bookmark if the page wasn't the last" do

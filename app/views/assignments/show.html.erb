@@ -126,20 +126,20 @@
     <form class="form-horizontal bootstrap-form display-only" style="margin-top:18px;">
       <fieldset>
         <div class="control-group">
-          <label class="control-label"><%= t(:points, 'Points') %></label>
+          <div class="control-label"><%= t(:points, 'Points') %></div>
           <div class="controls">
             <span class="value points_possible"><%= @assignment.points_possible || t(:no_points, 'None') %></span>
           </div>
         </div>
         <div class="control-group">
-          <label class="control-label"><%= t :submitting, 'Submitting' %></label>
+          <div class="control-label"><%= t :submitting, 'Submitting' %></div>
           <div class="controls">
             <span class="value"><%= @assignment.readable_submission_types || t(:no_submission, 'Nothing') %></span>
           </div>
         </div>
         <% if @assignment.submission_types =~ /online_upload/ && !@assignment.allowed_extensions.blank? -%>
           <div class="control-group">
-            <label class="control-label"><%= t :submission_types, 'File Types' %></label>
+            <div class="control-label"><%= t :submission_types, 'File Types' %></div>
             <div class="controls">
               <span class="value"><%= @assignment.allowed_extensions.to_sentence %></span>
             </div>
@@ -147,7 +147,7 @@
         <% end -%>
         <% if @assignment.turnitin_enabled %>
           <div class="control-group">
-            <label class="control-label"><%= t :turnitin, 'Turnitin' %></label>
+            <div class="control-label"><%= t :turnitin, 'Turnitin' %></div>
             <div class="controls">
               <span class="value"><%= t :turnitin_enabled, 'Turnitin has been enabled for this assignment.' %></span>
             </div>

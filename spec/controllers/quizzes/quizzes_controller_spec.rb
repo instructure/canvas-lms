@@ -1167,7 +1167,7 @@ describe Quizzes::QuizzesController do
       @enrollment.conclude
       get 'statistics', :course_id => @course.id, :quiz_id => @quiz.id
       expect(response).to be_success
-      expect(response).to render_template('statistics')
+      expect(response).to render_template('statistics_cqs')
     end
 
     context "logged out submissions" do
@@ -1200,7 +1200,7 @@ describe Quizzes::QuizzesController do
 
         get 'statistics', :course_id => @course.id, :quiz_id => @quiz.id, :all_versions => '1'
         expect(response).to be_success
-        expect(response).to render_template('statistics')
+        expect(response).to render_template('statistics_cqs')
       end
     end
 
@@ -1211,25 +1211,6 @@ describe Quizzes::QuizzesController do
       course_quiz
       get 'statistics', :course_id => @course.id, :quiz_id => @quiz.id
       expect(response).to be_success
-      expect(response).to render_template('statistics')
-    end
-  end
-
-  describe "GET 'statistics' with new quiz stats feature flag enabled" do
-    before :each do
-      a = Account.default
-      a.enable_feature! :quiz_stats
-      a.save!
-
-      user_session(@teacher)
-      course_quiz
-    end
-
-    it "should redirect to the new quiz stats app" do
-      a = Account.default
-      expect(a.feature_enabled?(:quiz_stats)).to eql true
-      get 'statistics', :course_id => @course.id, :quiz_id => @quiz.id
-      assert_response :success
       expect(response).to render_template('statistics_cqs')
     end
   end
@@ -1461,15 +1442,20 @@ describe Quizzes::QuizzesController do
     # These specs are test-after, and highly coupled to the existing
     # implementation of the #can_take_quiz method, which is deeply entangled.
     # When possible I recommend extracting this into a PORO or Quizzes::Quiz.
-    let(:return_value) { subject.send :can_take_quiz? }
 
     before do
       subject.stubs(:authorized_action).returns(true)
-
-      @quiz = subject.instance_variable_set(:@quiz, Quizzes::Quiz.new)
+      course_with_teacher
+      course_quiz(active=true)
+      @quiz.save!
+      subject.instance_variable_set(:@quiz, @quiz)
       @quiz.stubs(:require_lockdown_browser?).returns(false)
       @quiz.stubs(:ip_filter).returns(false)
+      subject.instance_variable_set(:@course, @course)
+      subject.instance_variable_set(:@current_user, @student)
     end
+
+    let(:return_value) { subject.send :can_take_quiz? }
 
     it "returns false when locked" do
       subject.instance_variable_set(:@locked, true)
@@ -1493,7 +1479,10 @@ describe Quizzes::QuizzesController do
     context "when access code is required but does not match" do
       before do
         @quiz.stubs(:access_code).returns("trust me. *winks*")
-        subject.stubs(:params).returns({:access_code => "Don't trust me. *tips hat*"})
+        subject.stubs(:params).returns({
+          :access_code => "Don't trust me. *tips hat*",
+          :take => 1
+        })
       end
 
       it "renders access_code template" do
@@ -1517,6 +1506,7 @@ describe Quizzes::QuizzesController do
       before do
         @quiz.stubs(:ip_filter).returns(true)
         @quiz.stubs(:valid_ip?).returns(false)
+        subject.stubs(:params).returns({:take => 1})
       end
 
       it "renders invalid_ip" do
@@ -1528,50 +1518,6 @@ describe Quizzes::QuizzesController do
       it "returns false" do
         subject.stubs(:render)
         expect(return_value).to eq false
-      end
-    end
-
-    it "returns false when the section enrollments are restricted and the present is before the end date" do
-      section = mock
-      section.stubs(:restrict_enrollments_to_section_dates).returns(true)
-      section.stubs(:end_at).returns(2.days.ago)
-      subject.instance_variable_set(:@section, section)
-
-      expect(return_value).to eq false
-    end
-
-    context "when course enrollments are restricted or unrestricted" do
-      before do
-        @context = mock
-        @context.stubs(:restrict_enrollments_to_course_dates).returns(false)
-        subject.instance_variable_set(:@context, @context)
-      end
-
-      it "returns false when the course enrollments are restricted and the course is concluded" do
-        @context.stubs(:restrict_enrollments_to_course_dates).returns(true)
-        @context.stubs(:soft_concluded?).returns(true)
-
-        expect(return_value).to eq false
-      end
-
-      context "when the current user is active or inactive" do
-        before do
-          @current_user = subject.instance_variable_set(:@current_user, User.new)
-          @current_user.stubs(:id).returns(123)
-        end
-
-        it "returns false for inactive users" do
-          @context.stubs(:enrollments).returns(stub(:where => stub(:all? => true)))
-          @context.stubs(:grants_right?).with(@current_user, :read_as_admin).returns false
-
-          expect(return_value).to eq false
-        end
-
-        it "returns true for active users " do
-          @context.stubs(:enrollments).returns(stub(:where => stub(:all? => false)))
-
-          expect(return_value).to eq true
-        end
       end
     end
   end

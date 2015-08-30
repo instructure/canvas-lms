@@ -107,7 +107,7 @@
     "variable_name": "ic-brand-favicon",
     "type": "image",
     "accept": "image/vnd.microsoft.icon,image/x-icon,image/png,image/gif",
-    "default": "/favicon.ico"
+    "default": "/images/favicon.ico"
   },{
     "human_name": "Mobile Homescreen Icon",
     "helper_text": "The shortcut icon for iOS/Android devices. 180x180 png",

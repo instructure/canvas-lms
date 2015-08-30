@@ -815,19 +815,19 @@ describe Submission do
 
   describe "graded?" do
     it "is false before graded" do
-      s, _ = @assignment.find_or_create_submission(@user)
-      expect(s.graded?).to eql false
+      submission, _ = @assignment.find_or_create_submission(@user)
+      expect(submission).to_not be_graded
     end
 
     it "is true for graded assignments" do
-      s, _ = @assignment.grade_student(@user, grade: 1)
-      expect(s.graded?).to eql true
+      submission, _ = @assignment.grade_student(@user, grade: 1)
+      expect(submission).to be_graded
     end
 
     it "is also true for excused assignments" do
-      s, _ = @assignment.find_or_create_submission(@user)
-      s.excused = true
-      expect(s.graded?).to eql true
+      submission, _ = @assignment.find_or_create_submission(@user)
+      submission.excused = true
+      expect(submission).to be_graded
     end
   end
 
@@ -835,25 +835,22 @@ describe Submission do
     let(:submission) { Submission.new }
 
     it "returns false when its not autograded" do
-      assignment = stub(:muted? => false)
-      @submission = Submission.new
-      expect(@submission.autograded?).to eq false
+      submission = Submission.new
+      expect(submission).to_not be_autograded
 
-      @submission.grader_id = Shard.global_id_for(@user.id)
-      expect(@submission.autograded?).to eq false
+      submission.grader_id = Shard.global_id_for(@user.id)
+      expect(submission).to_not be_autograded
     end
 
     it "returns true when its autograded" do
-      assignment = stub(:muted? => false)
-      @submission = Submission.new
-      @submission.grader_id = -1
-      expect(@submission.autograded?).to eq true
+      submission = Submission.new
+      submission.grader_id = -1
+      expect(submission).to be_autograded
     end
   end
 
   describe "past_due" do
     before :once do
-      u1 = @user
       submission_spec_model
       @submission1 = @submission
 

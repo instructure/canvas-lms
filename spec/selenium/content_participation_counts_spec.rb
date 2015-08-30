@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "courses" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   before do
     course_with_student_logged_in(:active_all => true)

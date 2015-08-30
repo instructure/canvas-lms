@@ -1,3 +1,21 @@
+#
+# Copyright (C) 2015 Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+
 class GradingPeriod < ActiveRecord::Base
   include Canvas::SoftDeletable
 
@@ -35,13 +53,13 @@ class GradingPeriod < ActiveRecord::Base
       .grading_periods
   end
 
-  def self.context_find(context, id)
-    self.for(context).detect { |grading_period| grading_period.id == id.to_i }
-  end
-
-  def current?
-    now = Time.zone.now
-    start_date <= now && end_date >= now
+  # Takes a context and a grading_period_id and returns a grading period
+  # if it is in the for collection. Uses Enumberable#find to query
+  # collection.
+  def self.context_find(context, grading_period_id)
+    self.for(context).find do |grading_period|
+      grading_period.id == grading_period_id.to_i
+    end
   end
 
   def assignments(assignment_scope)
@@ -55,10 +73,17 @@ class GradingPeriod < ActiveRecord::Base
     end
   end
 
+  def current?
+    in_date_range?(Time.zone.now)
+  end
+
+  def in_date_range?(date)
+    start_date <= date && end_date >= date
+  end
+
   def is_closed?
     Time.now > end_date
   end
-
 
   def last?
     grading_period_group
@@ -68,12 +93,22 @@ class GradingPeriod < ActiveRecord::Base
       .last == self
   end
 
-
   def overlapping?
     overlaps.active.exists?
   end
 
   private
+  scope :overlaps, ->(from, to) do
+    # sourced: http://c2.com/cgi/wiki?TestIfDateRangesOverlap
+    where('((start_date < ?) and (end_date > ?))', to, from)
+  end
+
+  def not_overlapping
+    if overlapping?
+      errors.add(:base, t('errors.overlap_message',
+        "Grading period cannot overlap with existing grading periods in group"))
+    end
+  end
 
   def overlaps
     siblings.overlaps(start_date, end_date)
@@ -90,23 +125,10 @@ class GradingPeriod < ActiveRecord::Base
     end
   end
 
-  scope :overlaps, ->(from, to) do
-    # sourced: http://c2.com/cgi/wiki?TestIfDateRangesOverlap
-    where('((start_date < ?) and (end_date > ?))', to, from)
-  end
-
   def start_date_is_before_end_date
     if start_date && end_date && end_date < start_date
       errors.add(:end_date, t('errors.invalid_grading_period_end_date',
                               'Grading period end date precedes start date'))
     end
   end
-
-  def not_overlapping
-    if overlapping?
-      errors.add(:base, t('errors.overlap_message',
-        "Grading period cannot overlap with existing grading periods in group"))
-    end
-  end
-
 end

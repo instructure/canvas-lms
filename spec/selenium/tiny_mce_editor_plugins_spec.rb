@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/helpers/wiki_and_tiny_common')
 
 describe "Tiny MCE editor plugins" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   it "should load all folders for the image plugin" do
     course_with_teacher_logged_in

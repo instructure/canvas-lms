@@ -599,6 +599,27 @@ describe Quizzes::Quiz do
       expect(sub2.end_at).to eq deadline
     end
 
+    it "should set end_at to section end dates" do
+      # when course.end_at or term.end_at doesn't exist
+      deadline = 2.days.from_now
+      @course.restrict_enrollments_to_course_dates = true
+      @course.save!
+      @course.enrollment_term.end_at = 1.day.from_now
+      @course.enrollment_term.save!
+
+      # Create a special time extension section
+      section = @course.course_sections.create!(restrict_enrollments_to_section_dates: true, end_at: deadline)
+
+      # Create user and enroll them in our section
+      user = User.create!(:name => "Fred Colon")
+      enrollment = section.enroll_user(user, "StudentEnrollment")
+      enrollment.accept(:force)
+
+      q = @course.quizzes.create!(:title => "locked tomorrow")
+      sub2 = q.generate_submission(user)
+      expect(sub2.end_at).to eq deadline
+    end
+
     it "should shuffle submission questions" do
       u1 = User.create!(:name => "user 1")
       u2 = User.create!(:name => "user 2")

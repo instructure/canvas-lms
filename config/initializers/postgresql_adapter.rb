@@ -215,6 +215,76 @@ module PostgreSQLAdapterExtensions
   def extension_available?(extension)
     select_value("SELECT 1 FROM pg_available_extensions WHERE name='#{extension}'").to_i == 1
   end
+
+  private
+
+  OID = ActiveRecord::ConnectionAdapters::PostgreSQLAdapter::OID if Rails.version >= '4'
+
+  def initialize_type_map(*args)
+    return super if Rails.version >= '4.2'
+
+    known_type_names = OID::NAMES.keys.map { |n| "'#{n}'" }
+    sql = <<-SQL % [known_type_names.join(", "), known_type_names.join(", ")]
+    SELECT t.oid, t.typname, t.typelem, t.typdelim, t.typinput
+     FROM pg_type t
+     LEFT OUTER JOIN pg_type et ON t.typelem=et.oid
+     WHERE
+       t.typname IN (%s)
+       OR et.typname IN (%s)
+    SQL
+    result = execute(sql, 'SCHEMA')
+    leaves, nodes = result.partition { |row| row['typelem'] == '0' }
+
+    if Rails.version < '4.1'
+      # populate the leaf nodes
+      leaves.find_all { |row| OID.registered_type? row['typname'] }.each do |row|
+        OID::TYPE_MAP[row['oid'].to_i] = OID::NAMES[row['typname']]
+      end
+
+      arrays, nodes = nodes.partition { |row| row['typinput'] == 'array_in' }
+
+      # populate composite types
+      nodes.find_all { |row| OID::TYPE_MAP.key? row['typelem'].to_i }.each do |row|
+        if OID.registered_type? row['typname']
+          # this composite type is explicitly registered
+          vector = OID::NAMES[row['typname']]
+        else
+          # use the default for composite types
+          vector = OID::Vector.new row['typdelim'], OID::TYPE_MAP[row['typelem'].to_i]
+        end
+
+        OID::TYPE_MAP[row['oid'].to_i] = vector
+      end
+
+      # populate array types
+      arrays.find_all { |row| OID::TYPE_MAP.key? row['typelem'].to_i }.each do |row|
+        array = OID::Array.new  OID::TYPE_MAP[row['typelem'].to_i]
+        OID::TYPE_MAP[row['oid'].to_i] = array
+      end
+    else
+      type_map = args.first
+
+      # populate the leaf nodes
+      leaves.find_all { |row| OID.registered_type? row['typname'] }.each do |row|
+        type_map[row['oid'].to_i] = OID::NAMES[row['typname']]
+      end
+
+      records_by_oid = result.group_by { |row| row['oid'] }
+
+      arrays, nodes = nodes.partition { |row| row['typinput'] == 'array_in' }
+
+      # populate composite types
+      nodes.each do |row|
+        add_oid row, records_by_oid, type_map
+      end
+
+      # populate array types
+      arrays.find_all { |row| type_map.key? row['typelem'].to_i }.each do |row|
+        array = OID::Array.new  type_map[row['typelem'].to_i]
+        type_map[row['oid'].to_i] = array
+      end
+    end
+  end
 end
 
 ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.prepend(PostgreSQLAdapterExtensions)
