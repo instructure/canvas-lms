@@ -123,7 +123,7 @@ module ContextModulesHelper
   end
 
   def has_submissions?(content_tags)
-    content_tags.any? {|c| c.assignment.submissions.length > 0}
+    content_tags.any? {|c| c.assignment && c.assignment.submissions.exists?}
   end
 
   # This method creates a hash that is used to determine which icon is displayed for

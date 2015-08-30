@@ -860,6 +860,7 @@ class Quizzes::QuizzesController < ApplicationController
   def can_take_quiz?
     return true if  params[:preview] && can_do(@quiz, @current_user, :update)
     return false if params[:take] && !authorized_action(@quiz, @current_user, :submit)
+    return false if @submission && @submission.completed? && @submission.attempts_left == 0
     return false if @quiz.require_lockdown_browser? && !check_lockdown_browser(:highest, named_context_url(@context, 'context_quiz_take_url', @quiz.id))
     can_take = Quizzes::QuizEligibility.new(course: @context,
                                             quiz: @quiz,
@@ -868,9 +869,13 @@ class Quizzes::QuizzesController < ApplicationController
                                             remote_ip: request.remote_ip,
                                             access_code: params[:access_code])
 
-    reason = can_take.declined_reason_renders
-    render reason if reason
-    can_take.eligible?
+    if params[:take]
+      reason = can_take.declined_reason_renders
+      render reason if reason
+      can_take.eligible?
+    else
+      can_take.potentially_eligible?
+    end
   end
 
   def quiz_submission_active?

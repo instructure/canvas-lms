@@ -32,11 +32,15 @@ class Quizzes::QuizEligibility
     store_session_access_code(args[:access_code]) if args[:access_code]
   end
 
-  def eligible?
+  def potentially_eligible?
     return true if quiz.grants_right?(user, session, :manage)
     return false unless course
     return false if inactive_student_with_private_course?
     !(course_restrictions_apply? || user_restrictions_apply?)
+  end
+
+  def eligible?
+    potentially_eligible? && !quiz_restrictions_apply?
   end
 
   def declined_reason_renders
@@ -66,8 +70,11 @@ class Quizzes::QuizEligibility
   end
 
   def user_restrictions_apply?
-    return true if inactive_non_admin? || need_access_code? || invalid_ip?
-    !quiz.grants_right?(user, session, :submit)
+    inactive_non_admin? || !quiz.grants_right?(user, session, :submit)
+  end
+
+  def quiz_restrictions_apply?
+    need_access_code? || invalid_ip?
   end
 
   def restricted_by_date?

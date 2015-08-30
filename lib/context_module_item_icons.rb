@@ -57,7 +57,9 @@ module ContextModuleItemIcons
   def self.submission_status(context_module, module_item, highest_submission_score)
     return false unless min_score_requirement?(context_module, module_item)
     min_score = min_score_requirement(context_module, module_item)
-    submissions = module_item.assignment.submissions
+    assignment = module_item.assignment
+    return false unless assignment
+    submissions = assignment.submissions
 
     if highest_submission_score && highest_submission_score < min_score
       :fail
@@ -85,6 +87,7 @@ module ContextModuleItemIcons
     return false unless module_item.content_type == 'Assignment' || module_item.content_type == 'Quizzes::Quiz'
 
     assignment = module_item.assignment
+    return false unless assignment
     submissions = assignment.submissions
     due_date = assignment.due_at
 
