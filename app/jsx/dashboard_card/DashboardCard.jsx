@@ -138,7 +138,7 @@ define([
               <a className="ic-DashboardCard__link" href={this.props.href}>
                 <header className="ic-DashboardCard__header">
                   <h2 className="ic-DashboardCard__header-title">{this.props.shortName}</h2>
-                  <h3 className="ic-DashboardCard__header-subtitle">{this.props.courseCode}</h3>
+                  <p className="ic-DashboardCard__header-subtitle">{this.props.courseCode}</p>
                 </header>
               </a>
               <button className="Button Button--icon-action-rev ic-DashboardCard__header-button" onClick={this.settingsClick} ref="settingsToggle">
