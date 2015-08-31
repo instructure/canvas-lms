@@ -1,7 +1,7 @@
 class AddEmptyTags < ActiveRecord::Migration
   def self.up
-    execute "UPDATE conversations SET tags = '' WHERE tags IS NULL"
-    execute "UPDATE conversation_participants SET tags = '' WHERE tags IS NULL"
+    Conversation.where(tags: nil).update_all(tags: '')
+    ConversationParticipant.where(tags: nil).update_all(tags: '')
   end
 
   def self.down

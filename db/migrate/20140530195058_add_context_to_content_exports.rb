@@ -19,7 +19,7 @@ class AddContextToContentExports < ActiveRecord::Migration
         SQL_ACTIONS
       end
 
-      execute("ALTER TABLE content_exports ALTER context_type SET DEFAULT 'Course'")
+      execute("ALTER TABLE #{ContentExport.quoted_table_name} ALTER context_type SET DEFAULT 'Course'")
     end
 
     while ContentExport.where("context_id IS NULL AND course_id IS NOT NULL").limit(1000).

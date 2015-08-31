@@ -13,7 +13,7 @@ class AddDelayedJobsNextInStrand < ActiveRecord::Migration
     # create the new index
     case connection.adapter_name
     when 'PostgreSQL'
-      connection.execute("CREATE INDEX get_delayed_jobs_index ON delayed_jobs (priority, run_at) WHERE locked_at IS NULL AND queue = 'canvas_queue' AND next_in_strand = 't'")
+      connection.execute("CREATE INDEX get_delayed_jobs_index ON #{Delayed::Backend::ActiveRecord::Job.quoted_table_name} (priority, run_at) WHERE locked_at IS NULL AND queue = 'canvas_queue' AND next_in_strand = 't'")
     else
       add_index :delayed_jobs, %w(priority run_at locked_at queue next_in_strand), :name => 'get_delayed_jobs_index'
     end
@@ -94,11 +94,11 @@ class AddDelayedJobsNextInStrand < ActiveRecord::Migration
 
     if %w{MySQL Mysql2}.include?(connection.adapter_name)
       # use temp tables to work around subselect limitations in mysql
-      execute(%{CREATE TEMPORARY TABLE dj_20110831210257 (strand varchar(255), next_job_id bigint) SELECT strand, min(id) as next_job_id FROM delayed_jobs WHERE strand IS NOT NULL GROUP BY strand})
-      execute(%{UPDATE delayed_jobs SET next_in_strand = #{Delayed::Backend::ActiveRecord::Job.quote_value(false)} WHERE strand IS NOT NULL AND id <> (SELECT t.next_job_id FROM dj_20110831210257 t WHERE t.strand = delayed_jobs.strand)})
+      execute(%{CREATE TEMPORARY TABLE dj_20110831210257 (strand varchar(255), next_job_id bigint) SELECT strand, min(id) as next_job_id FROM #{Delayed::Backend::ActiveRecord::Job.quoted_table_name} WHERE strand IS NOT NULL GROUP BY strand})
+      update(%{UPDATE #{Delayed::Backend::ActiveRecord::Job.quoted_table_name} SET next_in_strand = #{Delayed::Backend::ActiveRecord::Job.quote_value(false)} WHERE strand IS NOT NULL AND id <> (SELECT t.next_job_id FROM dj_20110831210257 t WHERE t.strand = delayed_jobs.strand)})
       execute(%{DROP TABLE dj_20110831210257})
     else
-      execute(%{UPDATE delayed_jobs SET next_in_strand = #{Delayed::Backend::ActiveRecord::Job.quote_value(false)} WHERE strand IS NOT NULL AND id <> (SELECT id FROM delayed_jobs j2 WHERE j2.strand = delayed_jobs.strand ORDER BY j2.strand, j2.id ASC LIMIT 1)})
+      update(%{UPDATE #{Delayed::Backend::ActiveRecord::Job.quoted_table_name} SET next_in_strand = #{Delayed::Backend::ActiveRecord::Job.quote_value(false)} WHERE strand IS NOT NULL AND id <> (SELECT id FROM #{Delayed::Backend::ActiveRecord::Job.quoted_table_name} j2 WHERE j2.strand = delayed_jobs.strand ORDER BY j2.strand, j2.id ASC LIMIT 1)})
     end
   end
 

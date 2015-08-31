@@ -5,7 +5,7 @@ class RemoveExtraneousConversationTags < ActiveRecord::Migration
     # incidentally, when someone deletes all the messages from their CP, its
     # tags should get cleared out, but a bug prevented that from happening
     # (that's also fixed in this commit).
-    execute "UPDATE conversation_participants SET tags = '' WHERE last_message_at IS NULL AND message_count = 0 AND tags <> ''"
+    ConversationParticipant.where(last_message_at: nil, message_count: 0).where("tags<>''").update_all(tags: '')
   end
 
   def self.down
