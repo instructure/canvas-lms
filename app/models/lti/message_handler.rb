@@ -28,7 +28,7 @@ module Lti
 
     has_many :placements, class_name: 'Lti::ResourcePlacement', dependent: :destroy
 
-    has_many :context_module_tags, :as => :content, :class_name => 'ContentTag', :conditions => "content_tags.tag_type='context_module' AND content_tags.workflow_state<>'deleted'", :include => {:context_module => [:content_tags]}
+    has_many :context_module_tags, as: :content, class_name: 'ContentTag', conditions: "content_tags.tag_type='context_module' AND content_tags.workflow_state<>'deleted'", preload: { context_module: :content_tags }
 
     serialize :capabilities
     serialize :parameters

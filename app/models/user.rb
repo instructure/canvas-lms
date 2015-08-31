@@ -74,44 +74,42 @@ class User < ActiveRecord::Base
   has_many :user_observees, :class_name => 'UserObserver', :foreign_key => :observer_id, :dependent => :delete_all
   has_many :observed_users, :through => :user_observees, :source => :user
   has_many :all_courses, :source => :course, :through => :enrollments
-  has_many :group_memberships, :include => :group, :dependent => :destroy
+  has_many :group_memberships, preload: :group, dependent: :destroy
   has_many :groups, :through => :group_memberships
   has_many :polls, class_name: 'Polling::Poll'
 
-  has_many :current_group_memberships, :include => :group, :class_name => 'GroupMembership', :conditions => "group_memberships.workflow_state = 'accepted' AND groups.workflow_state <> 'deleted'"
+  has_many :current_group_memberships, eager_load: :group, class_name: 'GroupMembership', conditions: "group_memberships.workflow_state = 'accepted' AND groups.workflow_state<>'deleted'"
   has_many :current_groups, :through => :current_group_memberships, :source => :group
   has_many :user_account_associations
   has_many :associated_accounts, :source => :account, :through => :user_account_associations, :order => 'user_account_associations.depth'
   has_many :associated_root_accounts, :source => :account, :through => :user_account_associations, :order => 'user_account_associations.depth', :conditions => 'accounts.parent_account_id IS NULL'
   has_many :developer_keys
-  has_many :access_tokens, :include => :developer_key
+  has_many :access_tokens, preload: :developer_key
   has_many :context_external_tools, :as => :context, :dependent => :destroy, :order => 'name'
 
   has_many :student_enrollments
   has_many :ta_enrollments
   has_many :teacher_enrollments, :class_name => 'TeacherEnrollment', :conditions => ["enrollments.type = 'TeacherEnrollment'"]
-  has_many :submissions, :include => [:assignment, :submission_comments], :order => 'submissions.updated_at DESC', :dependent => :destroy
+  has_many :submissions, preload: [:assignment, :submission_comments], order: 'submissions.updated_at DESC', dependent: :destroy
   has_many :pseudonyms, :order => 'position', :dependent => :destroy
   has_many :active_pseudonyms, :class_name => 'Pseudonym', :conditions => ['pseudonyms.workflow_state != ?', 'deleted']
   has_many :pseudonym_accounts, :source => :account, :through => :pseudonyms
   has_one :pseudonym, :conditions => ['pseudonyms.workflow_state != ?', 'deleted'], :order => 'position'
   has_many :attachments, :as => 'context', :dependent => :destroy
-  has_many :active_images, :as => :context, :class_name => 'Attachment', :conditions => ["attachments.file_state != ? AND attachments.content_type LIKE 'image%'", 'deleted'], :order => 'attachments.display_name', :include => :thumbnail
+  has_many :active_images, as: :context, class_name: 'Attachment', conditions: ["attachments.file_state != ? AND attachments.content_type LIKE 'image%'", 'deleted'], order: 'attachments.display_name', preload: :thumbnail
   has_many :active_assignments, :as => :context, :class_name => 'Assignment', :conditions => ['assignments.workflow_state != ?', 'deleted']
   has_many :all_attachments, :as => 'context', :class_name => 'Attachment'
   has_many :assignment_student_visibilities
   has_many :quiz_student_visibilities, :class_name => 'Quizzes::QuizStudentVisibility'
   has_many :folders, :as => 'context', :order => 'folders.name'
   has_many :active_folders, :class_name => 'Folder', :as => :context, :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
-  has_many :active_folders_with_sub_folders, :class_name => 'Folder', :as => :context, :include => [:active_sub_folders], :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
-  has_many :active_folders_detailed, :class_name => 'Folder', :as => :context, :include => [:active_sub_folders, :active_file_attachments], :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
-  has_many :calendar_events, :as => 'context', :dependent => :destroy, :include => [:parent_event]
+  has_many :calendar_events, as: 'context', dependent: :destroy, preload: :parent_event
   has_many :eportfolios, :dependent => :destroy
   has_many :quiz_submissions, :dependent => :destroy, :class_name => 'Quizzes::QuizSubmission'
   has_many :dashboard_messages, :class_name => 'Message', :conditions => {:to => "dashboard", :workflow_state => 'dashboard'}, :order => 'created_at DESC', :dependent => :destroy
   has_many :collaborations, :order => 'created_at DESC'
   has_many :user_services, :order => 'created_at', :dependent => :destroy
-  has_many :rubric_associations, :as => :context, :include => :rubric, :order => 'rubric_associations.created_at DESC'
+  has_many :rubric_associations, as: :context, preload: :rubric, order: 'rubric_associations.created_at DESC'
   has_many :rubrics
   has_many :context_rubrics, :as => :context, :class_name => 'Rubric'
   has_many :grading_standards, :conditions => ['workflow_state != ?', 'deleted']
@@ -122,10 +120,10 @@ class User < ActiveRecord::Base
 
   has_many :inbox_items, :order => 'created_at DESC'
   has_many :submission_comment_participants
-  has_many :submission_comments, :through => :submission_comment_participants, :include => {:submission => {:assignment => {}, :user => {}} }
+  has_many :submission_comments, through: :submission_comment_participants, preload: { submission: [:assignment, :user] }
   has_many :collaborators
-  has_many :collaborations, :through => :collaborators, :include => [:user, :collaborators]
-  has_many :assigned_submission_assessments, :class_name => 'AssessmentRequest', :foreign_key => 'assessor_id', :include => {:user => {}, :submission => :assignment}
+  has_many :collaborations, through: :collaborators, preload: [:user, :collaborators]
+  has_many :assigned_submission_assessments, class_name: 'AssessmentRequest', foreign_key: 'assessor_id', preload: [:user, submission: :assignment]
   has_many :assigned_assessments, :class_name => 'AssessmentRequest', :foreign_key => 'assessor_id'
   has_many :web_conference_participants
   has_many :web_conferences, :through => :web_conference_participants
@@ -136,8 +134,8 @@ class User < ActiveRecord::Base
   has_many :user_notes
   has_many :account_reports
   has_many :stream_item_instances, :dependent => :delete_all
-  has_many :all_conversations, :class_name => 'ConversationParticipant', :include => :conversation
-  has_many :conversation_batches, :include => :root_conversation_message
+  has_many :all_conversations, class_name: 'ConversationParticipant', preload: :conversation
+  has_many :conversation_batches, preload: :root_conversation_message
   has_many :favorites
   has_many :zip_file_imports, :as => :context
   has_many :messages
@@ -1781,7 +1779,7 @@ class User < ActiveRecord::Base
 
         Shackles.activate(:slave) do
           submissions = []
-          submissions += self.submissions.after(opts[:start_at]).for_context_codes(context_codes).
+          submissions += self.submissions.after(opts[:start_at]).for_context_codes(context_codes).eager_load(:assignment).
             where("submissions.score IS NOT NULL AND assignments.workflow_state=? AND assignments.muted=?", 'published', false).
             order('submissions.created_at DESC').
             limit(opts[:limit]).to_a

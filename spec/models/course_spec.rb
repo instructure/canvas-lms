@@ -814,7 +814,7 @@ describe Course, "enroll" do
 
   it "should be able to enroll a designer" do
     @course.enroll_designer(@user)
-    @de = @course.designer_enrollments.first
+    @de = @course.enrollments.where(type: 'DesignerEnrollment').first
     expect(@de.user_id).to eql(@user.id)
     expect(@de.course_id).to eql(@course.id)
   end

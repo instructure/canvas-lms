@@ -50,7 +50,7 @@ class DiscussionTopic < ActiveRecord::Base
   has_many :discussion_entries, :order => :created_at, :dependent => :destroy
   has_many :rated_discussion_entries, :class_name => 'DiscussionEntry', :order =>
     ['COALESCE(parent_id, 0)', 'COALESCE(rating_sum, 0) DESC', :created_at]
-  has_many :root_discussion_entries, :class_name => 'DiscussionEntry', :include => [:user], :conditions => ['discussion_entries.parent_id IS NULL AND discussion_entries.workflow_state != ?', 'deleted']
+  has_many :root_discussion_entries, class_name: 'DiscussionEntry', preload: :user, conditions: ['discussion_entries.parent_id IS NULL AND discussion_entries.workflow_state != ?', 'deleted']
   has_one :external_feed_entry, :as => :asset
   belongs_to :external_feed
   belongs_to :context, :polymorphic => true

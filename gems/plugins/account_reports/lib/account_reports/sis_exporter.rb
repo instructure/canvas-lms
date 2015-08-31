@@ -85,7 +85,7 @@ module AccountReports
           headers << I18n.t('#account_reports.report_header_status', 'status')
         end
         csv << headers
-        users = root_account.pseudonyms.except(:includes).joins(:user).select(
+        users = root_account.pseudonyms.except(:preload).joins(:user).select(
           "pseudonyms.id, pseudonyms.sis_user_id, pseudonyms.user_id,
            pseudonyms.unique_id, pseudonyms.workflow_state, users.sortable_name,
            users.updated_at AS user_updated_at, users.name, users.short_name").

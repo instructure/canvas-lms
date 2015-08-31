@@ -506,7 +506,7 @@ class Conversation < ActiveRecord::Base
     return unless tags.empty?
     transaction do
       lock!
-      cps = conversation_participants(:include => :user).to_a
+      cps = conversation_participants.preload(:user).to_a
       update_attribute :tags, current_context_strings
       cps.each do |cp|
         next unless cp.user

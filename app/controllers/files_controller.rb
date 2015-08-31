@@ -196,7 +196,7 @@ class FilesController < ApplicationController
             file_structure = {
               :contexts => [@context.as_json(permissions: {user: @current_user})],
               :collaborations => [],
-              :folders => @context.active_folders_with_sub_folders.
+              :folders => @context.active_folders.preload(:active_sub_folders).
                 order("COALESCE(parent_folder_id, 0), COALESCE(position, 0), COALESCE(name, ''), created_at").map{ |f|
                 f.as_json(permissions: {user: @current_user}, methods: [:mime_class, :currently_locked])
               },

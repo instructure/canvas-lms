@@ -958,7 +958,7 @@ class Submission < ActiveRecord::Base
   end
 
   def comment_authors
-    visible_submission_comments(:include => :author).map(&:author)
+    visible_submission_comments.preload(:author).map(&:author)
   end
 
   def commenting_instructors
@@ -987,23 +987,21 @@ class Submission < ActiveRecord::Base
     self.readonly!
   end
 
-  alias_method :old_submission_comments, :submission_comments
   def submission_comments(*args)
     res = if @provisional_grade_filter
             @provisional_grade_filter.submission_comments
           else
-            old_submission_comments(*args)
+            super
           end
     res = res.select{|sc| sc.grants_right?(@comment_limiting_user, @comment_limiting_session, :read) } if @comment_limiting_user
     res
   end
 
-  alias_method :old_visible_submission_comments, :visible_submission_comments
   def visible_submission_comments(*args)
     res = if @provisional_grade_filter
             @provisional_grade_filter.submission_comments.where(hidden: false)
           else
-            old_visible_submission_comments(*args)
+            super
           end
     res = res.select{|sc| sc.grants_right?(@comment_limiting_user, @comment_limiting_session, :read) } if @comment_limiting_user
     res

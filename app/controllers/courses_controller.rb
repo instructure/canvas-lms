@@ -1461,7 +1461,7 @@ class CoursesController < ApplicationController
     end
 
     if @context && @current_user
-      @context_enrollment = @context.enrollments.where(user_id: @current_user).except(:includes).first
+      @context_enrollment = @context.enrollments.where(user_id: @current_user).except(:preload).first
       if @context_enrollment
         @context_enrollment.course = @context
         @context_enrollment.user = @current_user

@@ -200,12 +200,12 @@ module Canvas::Migration::Helpers
                 content_list << course_item_hash(type, item)
               end
             when 'discussion_topics'
-              source.discussion_topics.active.only_discussion_topics.select("id, title, user_id, assignment_id").except(:includes).each do |item|
+              source.discussion_topics.active.only_discussion_topics.select("id, title, user_id, assignment_id").except(:preload).each do |item|
                 content_list << course_item_hash(type, item)
               end
             else
               if source.respond_to?(type)
-                scope = source.send(type).select(:id).except(:includes)
+                scope = source.send(type).select(:id).except(:preload)
                 # We only need the id and name, so don't fetch everything from DB
 
                 scope = scope.select(:assignment_id) if type == 'quizzes'
@@ -242,7 +242,7 @@ module Canvas::Migration::Helpers
             elsif type == 'discussion_topics'
               count = source.discussion_topics.active.only_discussion_topics.count
             elsif source.respond_to?(type) && source.send(type).respond_to?(:count)
-              scope = source.send(type).except(:includes)
+              scope = source.send(type).except(:preload)
               if scope.klass.respond_to?(:not_deleted)
                 scope = scope.not_deleted
               elsif scope.klass.respond_to?(:active)
