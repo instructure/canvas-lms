@@ -45,7 +45,7 @@ def maintain_client_app_symlinks
 
   # create links
   links.each do |(target, source)|
-    unless File.symlink?(source) && File.readlink(source) == target
+    unless File.symlink?(source) && File.readlink(source) == target.to_s
       File.unlink(source) if File.exist?(source)
       File.symlink(target, source)
     end
