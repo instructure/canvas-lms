@@ -816,6 +816,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   delegate :assignment_id, :assignment, :to => :quiz
   delegate :graded_at, :to => :submission
   delegate :context, :to => :quiz
+  delegate :excused?, to: :submission, allow_nil: true
 
   # Determine whether the QS can be retried (ie, re-generated).
   #

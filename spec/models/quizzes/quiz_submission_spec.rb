@@ -1554,4 +1554,22 @@ describe Quizzes::QuizSubmission do
       end
     end
   end
+  
+  describe '#excused?' do
+    let(:submission) do
+      s=Submission.new
+      s.excused=true
+      s
+    end
+    let(:quiz_submission) do
+      Quizzes::QuizSubmission.new
+    end
+    it 'should return submission.excused?' do
+      quiz_submission.submission = submission
+      expect(quiz_submission.excused?).to eq submission.excused?
+    end
+    it 'should function without valid submission' do
+      expect(quiz_submission.excused?).to eq nil
+    end
+  end
 end
