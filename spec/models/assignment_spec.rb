@@ -104,6 +104,62 @@ describe Assignment do
     end
   end
 
+  describe '#grade_to_score' do
+    before(:once) { setup_assignment_without_submission }
+
+    let(:set_type_and_save) do
+      lambda do |type|
+        @assignment.grading_type = type
+        @assignment.save
+      end
+    end
+
+    # The test cases for grading_type of points, percent,
+    # letter_grade, and gpa_scale are covered by the tests of
+    # interpret_grade as that is doing the work.  The cases tested
+    # here are all contained solely within grade_to_score
+
+    it 'returns nil for a nil grade' do
+      expect(@assignment.grade_to_score(nil)).to be_nil
+    end
+
+    it 'returns nil for a not_graded assignment' do
+      set_type_and_save.call('not_graded')
+      expect(@assignment.grade_to_score("3")).to be_nil
+    end
+
+    it 'returns an exception for an unknown grading type' do
+      set_type_and_save.call("totally_fake_grading")
+      expect{@assignment.grade_to_score("3")}.to raise_error
+    end
+
+    context 'with a pass/fail assignment' do
+      before(:once) do
+        @assignment.grading_type = 'pass_fail'
+        @assignment.points_possible = 6.0
+        @assignment.save
+      end
+
+      let(:points_possible) { @assignment.points_possible }
+
+      it "returns points possible for maximum points" do
+        expect(@assignment.grade_to_score(points_possible.to_s)).to eql(points_possible)
+      end
+
+      it "returns nil for partial points" do
+        expect(@assignment.grade_to_score("3")).to be_nil
+      end
+
+      it "returns 0.0 for 0 points" do
+        expect(@assignment.grade_to_score("0")).to eql(0.0)
+      end
+
+      it "returns nil for an empty string" do
+        expect(@assignment.grade_to_score("")).to be_nil
+      end
+    end
+  end
+
   describe '#grade_student' do
     before(:once) { setup_assignment_without_submission }
 

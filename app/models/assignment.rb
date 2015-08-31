@@ -733,7 +733,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def grade_to_score(grade=nil)
-    return nil if grade.nil?
+    return nil if grade.blank?
     parsed_grade = interpret_grade(grade)
     case self.grading_type
     when "points", "percent", "letter_grade", "gpa_scale"

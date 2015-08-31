@@ -504,6 +504,67 @@ CSV
       end
     end
   end
+
+  describe "#translate_pass_fail" do
+    let(:account) { Account.default }
+    let(:course) { Course.create account: account }
+    let(:student) do
+      student = User.create
+      student.gradebook_importer_submissions = [{ "grade" => "",
+                                                  "original_grade" => ""}]
+      student
+    end
+    let(:assignment) do
+      course.assignments.create!(:name => 'Assignment 1',
+                                 :grading_type => "pass_fail",
+                                 :points_possible => 6)
+    end
+    let(:assignments) { [assignment] }
+    let(:students) { [student] }
+    let(:progress) { Progress.create tag: "test", context: student }
+    let(:importer) { GradebookImporter.new(course, "", student, progress) }
+    let(:submission) { student.gradebook_importer_submissions.first }
+
+    it "translates positive score in submission['grade'] to complete" do
+      submission['grade'] = "3"
+      importer.translate_pass_fail(assignments, students)
+
+      expect(submission['grade']).to eq "complete"
+    end
+
+    it "translates positive grade in submission['original_grade'] to complete" do
+      submission['original_grade'] = "3"
+      importer.translate_pass_fail(assignments, students)
+
+      expect(submission['original_grade']).to eq "complete"
+    end
+
+    it "translates 0 grade in submission['grade'] to incomplete" do
+      submission['grade'] = "0"
+      importer.translate_pass_fail(assignments, students)
+
+      expect(submission['grade']).to eq "incomplete"
+    end
+
+    it "translates 0 grade in submission['original_grade'] to incomplete" do
+      submission['original_grade'] = "0"
+      importer.translate_pass_fail(assignments, students)
+
+      expect(submission['original_grade']).to eq "incomplete"
+    end
+
+    it "doesn't change empty string grade in submission['grade']" do
+      importer.translate_pass_fail(assignments, students)
+
+      expect(submission['grade']).to eq ""
+    end
+
+    it "doesn't change empty string grade in submission['original_grade']" do
+      importer.translate_pass_fail(assignments, students)
+
+      expect(submission['grade']).to eq ""
+    end
+  end
 end
 
 def new_gradebook_importer(contents = valid_gradebook_contents)

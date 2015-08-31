@@ -1319,21 +1319,18 @@ class Submission < ActiveRecord::Base
             next
           end
 
-          if user_data[:posted_grade] || user_data.key?(:excuse)
-            submissions = assignment.grade_student(user, :grader => grader,
-                                                   :grade => user_data[:posted_grade],
-                                                   :excuse => Canvas::Plugin.value_to_boolean(user_data[:excuse]),
-                                                   :skip_grade_calc => true)
-            submissions.each { |s| graded_user_ids << s.user_id }
-            submission = submissions.first
-          else
-            submission = assignment.find_or_create_submission(user)
-          end
+          submissions =
+            assignment.grade_student(user, :grader => grader,
+                                     :grade => user_data[:posted_grade],
+                                     :excuse => Canvas::Plugin.value_to_boolean(user_data[:excuse]),
+                                     :skip_grade_calc => true)
+          submissions.each { |s| graded_user_ids << s.user_id }
+          submission = submissions.first
 
           assessment = user_data[:rubric_assessment]
           if assessment.is_a?(Hash) && assignment.rubric_association
-            # prepend each key with "criterion_", which is required by the current
-            # RubricAssociation#assess code.
+            # prepend each key with "criterion_", which is required by
+            # the current RubricAssociation#assess code.
             assessment.keys.each do |crit_name|
               assessment["criterion_#{crit_name}"] = assessment.delete(crit_name)
             end

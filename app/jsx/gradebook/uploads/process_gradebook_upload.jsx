@@ -55,7 +55,8 @@ define(['underscore', 'i18n!gradebok_upload', 'compiled/userSettings'], function
       });
     });
 
-    return $.ajaxJSON(ENV.bulk_update_path, "POST", {grade_data: bulkGradeData})
+    return $.ajaxJSON(ENV.bulk_update_path, "POST", JSON.stringify({grade_data: bulkGradeData}),
+                      null, null, {contentType: 'application/json'});
   };
 
 
