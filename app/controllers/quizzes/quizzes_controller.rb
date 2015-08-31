@@ -220,6 +220,7 @@ class Quizzes::QuizzesController < ApplicationController
       @quiz_menu_tools = external_tools_display_hashes(:quiz_menu)
       @can_take = can_take_quiz?
       if params[:take] && @can_take
+        return false if @quiz.require_lockdown_browser? && !check_lockdown_browser(:highest, named_context_url(@context, 'context_quiz_take_url', @quiz.id))
         # allow starting the quiz via a GET request, but only when using a lockdown browser
         if request.post? || (@quiz.require_lockdown_browser? && !quiz_submission_active?)
           start_quiz!
@@ -861,7 +862,6 @@ class Quizzes::QuizzesController < ApplicationController
     return true if  params[:preview] && can_do(@quiz, @current_user, :update)
     return false if params[:take] && !authorized_action(@quiz, @current_user, :submit)
     return false if @submission && @submission.completed? && @submission.attempts_left == 0
-    return false if @quiz.require_lockdown_browser? && !check_lockdown_browser(:highest, named_context_url(@context, 'context_quiz_take_url', @quiz.id))
     can_take = Quizzes::QuizEligibility.new(course: @context,
                                             quiz: @quiz,
                                             user: @current_user,
