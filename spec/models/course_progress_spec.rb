@@ -157,6 +157,17 @@ describe CourseProgress do
       expect(progress[:requirement_completed_count]).to eq 1
     end
 
+    it "returns progress even after enrollment end date has passed" do
+      e = Enrollment.last
+      e.update_attribute(:end_at, 2.days.ago)
+      e.update_attribute(:start_at, 5.days.ago)
+
+      progress = CourseProgress.new(@course, @user).to_json
+
+      expect(progress[:requirement_count]).to eq 5
+      expect(progress[:error]).to be_nil
+    end
+
     it "does not query destroyed ContentTags" do
       @tag.destroy
       progress = CourseProgress.new(@course, @user)
