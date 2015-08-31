@@ -68,10 +68,10 @@ class DeveloperKeysController < ApplicationController
 
   def set_keys
     if params[:account_id]
-      @keys = @context.developer_keys.order("id DESC").includes(:account)
+      @keys = @context.developer_keys.preload(:account).order("id DESC")
     else
       set_site_admin_context
-      @keys = DeveloperKey.order("id DESC").includes(:account)
+      @keys = DeveloperKey.preload(:account).order("id DESC")
     end
   end
 
