@@ -767,6 +767,7 @@ class ExternalToolsController < ApplicationController
     launch = lti_launch(tool)
     params = launch.params.reject {|p| p.starts_with?('oauth_')}
     params[:consumer_key] = tool.consumer_key
+    params[:iat] = Time.zone.now.to_i
 
     render json: {jwt_token: JWT.encode(params, tool.shared_secret)}
   end

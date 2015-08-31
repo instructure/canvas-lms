@@ -51,6 +51,8 @@ describe ExternalToolsController do
     before :once do
       require 'jwt'
 
+      @iat = Time.zone.now
+      Time.zone.stubs(:now).returns(@iat)
       @tool = new_valid_tool(@course)
       @tool.course_navigation = { message_type: 'ContentItemSelectionResponse' }
       @tool.save!
@@ -66,6 +68,7 @@ describe ExternalToolsController do
       expect(decoded_token['custom_canvas_user_id']).to eq @teacher.id.to_s
       expect(decoded_token['custom_canvas_course_id']).to eq @course.id.to_s
       expect(decoded_token['consumer_key']). to eq @tool.consumer_key
+      expect(decoded_token['iat']). to eq @iat.to_i
     end
 
     it "returns the correct JWT token when given using the tool_launch_url param" do
@@ -76,6 +79,7 @@ describe ExternalToolsController do
       expect(decoded_token['custom_canvas_user_id']).to eq @teacher.id.to_s
       expect(decoded_token['custom_canvas_course_id']).to eq @course.id.to_s
       expect(decoded_token['consumer_key']). to eq @tool.consumer_key
+      expect(decoded_token['iat']). to eq @iat.to_i
     end
 
     it "sets status code to 404 if the requested tool id does not exist" do
