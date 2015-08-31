@@ -1269,10 +1269,33 @@ describe 'Submissions API', type: :request do
         speedgrader_url = URI.parse(json.first['provisional_grades'].first['speedgrader_url'])
         expect(speedgrader_url.path).to eq "/courses/#{@course.id}/gradebook/speed_grader"
         expect(speedgrader_url.query).to eq "assignment_id=#{@assignment.id}"
-        expect(JSON.parse(URI.decode(speedgrader_url.fragment))).to eq({
-                                                                         "student_id" => @student.id,
-                                                                         "provisional_grade_id" => @provisional_grade.id
-                                                                       })
+        expect(JSON.parse(URI.decode(speedgrader_url.fragment))).to eq(
+          {
+            "student_id" => @student.id,
+            "provisional_grade_id" => @provisional_grade.id
+          }
+        )
+      end
+
+      it "can include users" do
+        json = api_call(:get,
+          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions.json",
+          {
+            controller: 'submissions_api',
+            action: 'index',
+            format: 'json',
+            course_id: @course.id,
+            assignment_id: @assignment.id,
+          },
+          {
+            include: ['user_summary']
+          }
+        )
+
+        user = json.first['user']
+        expect(user['display_name']).to eql @student.name
+        expect(user['avatar_image_url']).to eql "https://localhost/images/messages/avatar-50.png"
+        expect(user['html_url']).to eql polymorphic_url([@course, @student])
       end
     end
 

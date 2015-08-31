@@ -12,6 +12,8 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
   validates :scorer, presence: true
   validates :submission, presence: true
 
+  scope :scored_by, ->(scorer) { where(scorer_id: scorer) }
+
   def valid?(*)
     infer_grade
     set_graded_at if @force_save || grade_changed? || score_changed?
@@ -92,26 +94,5 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
 
   def set_graded_at
     self.graded_at = Time.zone.now
-  end
-end
-
-class ModeratedGrading::NullProvisionalGrade
-  def initialize(scorer_id)
-    @scorer_id = scorer_id
-  end
-
-  def grade_attributes
-    {
-      'provisional_grade_id' => nil,
-      'grade' => nil,
-      'score' => nil,
-      'graded_at' => nil,
-      'scorer_id' => @scorer_id,
-      'grade_matches_current_submission' => true
-    }
-  end
-
-  def submission_comments
-    SubmissionComment.none
   end
 end

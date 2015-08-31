@@ -25,40 +25,39 @@ module Api::V1::Submission
   include Api::V1::User
   include Api::V1::SubmissionComment
 
-  def submission_json(submission, assignment, user, session, context = nil, includes = [])
+  def submission_json(submission, assignment, current_user, session, context = nil, includes = [])
     context ||= assignment.context
-    hash = submission_attempt_json(submission, assignment, user, session, context)
+    hash = submission_attempt_json(submission, assignment, current_user, session, context)
 
     if includes.include?("submission_history")
       hash['submission_history'] = []
       submission.submission_history.each do |ver|
         ver.without_versioned_attachments do
-          hash['submission_history'] << submission_attempt_json(ver, assignment, user, session, context)
+          hash['submission_history'] << submission_attempt_json(ver, assignment, current_user, session, context)
         end
       end
     end
 
-    if user && includes.include?('provisional_grades') &&
-          assignment && assignment.context.is_a?(Course) && assignment.moderated_grading?
-      hash['provisional_grades'] = submission_provisional_grades_json(submission, assignment, user)
+    if current_user && assignment && includes.include?('provisional_grades') && assignment.moderated_grading?
+      hash['provisional_grades'] = submission_provisional_grades_json(submission, assignment, current_user)
     end
 
     if includes.include?("submission_comments")
-      hash['submission_comments'] = submission_comments_json(submission.comments_for(@current_user), user)
+      hash['submission_comments'] = submission_comments_json(submission.comments_for(@current_user), current_user)
     end
 
-    if includes.include?("rubric_assessment") && submission.rubric_assessment && submission.user_can_read_grade?(user)
+    if includes.include?("rubric_assessment") && submission.rubric_assessment && submission.user_can_read_grade?(current_user)
       ra = submission.rubric_assessment.data
       hash['rubric_assessment'] = {}
       ra.each { |rating| hash['rubric_assessment'][rating[:criterion_id]] = rating.slice(:points, :comments) }
     end
 
     if includes.include?("assignment")
-      hash['assignment'] = assignment_json(assignment, user, session)
+      hash['assignment'] = assignment_json(assignment, current_user, session)
     end
 
     if includes.include?("course")
-      hash['course'] = course_json(submission.context, user, session, ['html_url'], nil)
+      hash['course'] = course_json(submission.context, current_user, session, ['html_url'], nil)
     end
 
     if includes.include?("html_url")
@@ -67,6 +66,10 @@ module Api::V1::Submission
 
     if includes.include?("user")
       hash['user'] = user_json(submission.user, user, session, ['avatar_url'], submission.context, nil)
+    end
+
+    if assignment && includes.include?('user_summary')
+      hash['user'] = user_display_json(submission.user, assignment.context)
     end
 
     if includes.include?("visibility")
@@ -204,19 +207,28 @@ module Api::V1::Submission
     attachment
   end
 
+  private
+
   def submission_provisional_grades_json(submission, assignment, current_user)
     provisional_grades = submission.provisional_grades
     unless assignment.context.grants_right?(current_user, :moderate_grades)
-      provisional_grades = provisional_grades.where(scorer_id: current_user)
+      provisional_grades = provisional_grades.scored_by(current_user)
     end
-    provisional_grades.map do |pg|
-      pg.grade_attributes.merge({
-        speedgrader_url: speed_grader_course_gradebook_url(
-          :course_id => assignment.context.id,
-          :assignment_id => assignment.id,
-          :anchor => { student_id: submission.user_id, provisional_grade_id: pg.id }.to_json
-        )
-      })
+
+    provisional_grades.map do |provisional_grade|
+      speed_grader_url = speed_grader_url(submission, assignment, provisional_grade)
+      provisional_grade.grade_attributes.merge(speedgrader_url: speed_grader_url)
     end
+  end
+
+  def speed_grader_url(submission, assignment, provisional_grade)
+    speed_grader_course_gradebook_url(
+      :course_id => assignment.context.id,
+      :assignment_id => assignment.id,
+      :anchor => {
+        student_id: submission.user_id,
+        provisional_grade_id: provisional_grade.id
+      }.to_json
+    )
   end
 end
