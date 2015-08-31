@@ -4,11 +4,11 @@ define([
 ], function($) {
   var exists, Depaginator, depaginate;
 
-  depaginate = function(url) {
+  depaginate = function(url, data) {
     var deferred, depaginator;
 
     deferred = $.Deferred();
-    depaginator = new Depaginator(url, deferred);
+    depaginator = new Depaginator(url, deferred, data);
     depaginator.retrieve();
 
     return deferred.promise();
@@ -22,13 +22,14 @@ define([
     return !exists(object);
   }
 
-  Depaginator = function(url, deferred) {
+  Depaginator = function(url, deferred, data) {
     this.url = url;
     this.deferred = deferred;
+    this.data = data;
   };
 
   Depaginator.prototype.retrieve = function() {
-    return $.getJSON(this.url, 'GET')
+    return $.getJSON(this.url, this.data)
     .done(this.handleInitialRequest.bind(this));
   };
 

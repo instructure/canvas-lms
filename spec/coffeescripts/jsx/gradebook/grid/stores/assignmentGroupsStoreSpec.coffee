@@ -109,6 +109,7 @@ define [
       AssignmentGroupsStore.onLoadCompleted([@assignmentGroup])
     teardown: ->
       @assignment = undefined
+      AssignmentGroupsStore.assignmentGroups = undefined
 
   test 'converts a list of assignment ids to assignments', ->
     expected = [

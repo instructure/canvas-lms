@@ -15,12 +15,14 @@ define [
       {
         assignment_id: '1'
         submissions: [
+          user_id: '1'
           id: '1'
         ]
       }
       {
         assignment_id: '4'
         submissions: [
+          user_id: '1'
           id: '2'
         ]
       }
@@ -51,8 +53,10 @@ define [
     SubmissionsStore.state.data[0].submissions.length
 
   module 'ReactGradebook.submissionsStore',
-    teardown: ->
+    setup: ->
       SubmissionsStore.getInitialState()
+    teardown: ->
+      SubmissionsStore.submissions = undefined
 
   test '#getInitialState() should return an object with data, error, and selected attributes', ->
     initialState = SubmissionsStore.getInitialState()
@@ -112,14 +116,14 @@ define [
 
   test '#onUpdatedSubmissionsReceived updates existing submissions', ->
     submissions = [
-      { id: '1', grade: '100' },
-      { id: '2', grade: '50' }
+      { user_id: '1', id: '1', grade: '100' },
+      { user_id: '1', id: '2', grade: '50' }
     ]
     SubmissionsStore.onLoadCompleted(submissionData(submissions))
-    updatedSubmissions = [{ id: '2', grade: '95' }]
+    updatedSubmissions = [{ user_id: '1', id: '2', grade: '95' }]
     SubmissionsStore.onUpdatedSubmissionsReceived(updatedSubmissions)
     actual = SubmissionsStore.state.data[0].submissions
-    expected = [{ id: '1', grade: '100' }, { id: '2', grade: '95' }]
+    expected = [{ user_id: '1', id: '1', grade: '100' }, { user_id: '1', id: '2', grade: '95' }]
     propEqual actual, expected
 
   module 'SubmissionsStore#filterSubmissions',

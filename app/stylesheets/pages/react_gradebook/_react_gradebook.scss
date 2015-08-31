@@ -4,6 +4,26 @@ $gradebook_border-color: darken($ic-color-neutral, 7);
 $gradebook_late-color: saturate(darken($ic-bg-light-danger, 5), 20);
 $gradebook_resubmitted-color: desaturate(darken($ic-bg-light-alert, 7), 2);
 
+.react-gradebook {
+  .teacher-note {
+    height: 100%;
+  }
+}
+
+// pretty much everything in this file should eventually
+// go within .react-gradebook, but the notes styling is here
+// because the notes modal attaches to the 'application'
+// div outside of the .react-gradebook
+.notes-textarea {
+  width: 95%;
+  height: 60%;
+  resize: none;
+}
+
+.notes-body {
+  height: 200px;
+}
+
 a#accessibility_warning {
   color: #fff;
   background-color: #DC3F3F;

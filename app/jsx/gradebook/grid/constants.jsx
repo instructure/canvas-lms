@@ -43,6 +43,7 @@ define([
     ASSIGNMENT_DATES: ['created_at', 'updated_at', 'due_at', 'lock_at', 'unlock_at'],
     OVERRIDE_DATES: ['all_day_date', 'due_at', 'lock_at', 'unlock_at'],
     PAGINATION_COUNT: 50,
+    MAX_NOTE_LENGTH: 255,
     refresh: function() {
       // For testing
       _.extend(this, ENV.GRADEBOOK_OPTIONS);

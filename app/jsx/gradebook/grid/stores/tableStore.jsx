@@ -6,9 +6,11 @@ define([
   'jsx/gradebook/grid/stores/gradebookToolbarStore',
   'jsx/gradebook/grid/stores/assignmentGroupsStore',
   'jsx/gradebook/grid/stores/gradingPeriodsStore',
-  'jsx/gradebook/grid/stores/submissionsStore'
+  'jsx/gradebook/grid/stores/submissionsStore',
+  'jsx/gradebook/grid/stores/customColumnsStore'
 ], function (Reflux, _, GradebookConstants, StudentEnrollmentsStore, GradebookToolbarStore,
-             AssignmentGroupsStore, GradingPeriodsStore, SubmissionsStore) {
+             AssignmentGroupsStore, GradingPeriodsStore, SubmissionsStore,
+             CustomColumnsStore) {
   var tableStore = Reflux.createStore({
     init() {
       this.state = {
@@ -20,13 +22,15 @@ define([
         gradingPeriods: null,
         assignmentGroups: null,
         error: null,
-        rows: null
+        rows: null,
+        customColumns: null
       };
       this.listenTo(GradebookToolbarStore, this.onToolbarOptionsChanged);
       this.listenTo(StudentEnrollmentsStore, this.onEnrollmentsChanged);
       this.listenTo(AssignmentGroupsStore, this.onAssignmentGroupsChanged);
       this.listenTo(SubmissionsStore, this.onSubmissionsChanged);
-      this.listenTo(GradingPeriodsStore, this.onGradingPeriodsChanged, this.onGradingPeriodsChanged);
+      this.listenTo(GradingPeriodsStore, this.onGradingPeriodsChanged);
+      this.listenTo(CustomColumnsStore, this.onCustomColumnsChanged);
     },
 
     getInitialState() {
@@ -95,29 +99,41 @@ define([
       this.trigger(this.state);
     },
 
+    onCustomColumnsChanged(customColumnsData) {
+      this.state.customColumns = customColumnsData;
+      this.constructTableData();
+      this.trigger(this.state);
+    },
+
     constructTableData() {
-      var students, assignments, submissions, assignmentGroups;
+      var students, assignments, submissions, assignmentGroups, customColumns;
 
       students = this.state.students;
       assignments = this.state.assignments;
       submissions = this.state.submissions;
       assignmentGroups = this.state.assignmentGroups;
+      customColumns = this.state.customColumns;
 
-      if (students && assignments && submissions) {
+      if (students && assignments && submissions && customColumns) {
         this.state.rows = _.map(students, student => {
-          var displayName, rowData, userSubmissions;
+          var displayName, rowData, userSubmissions, teacherNote;
 
           displayName = GradebookConstants.list_students_by_sortable_name_enabled ?
             student.user.sortable_name : student.user.name;
 
           userSubmissions = _.flatten(_.map(submissions[student.id], s => s.submissions));
           userSubmissions = _.groupBy(userSubmissions, s => s.assignment_id);
+          teacherNote = _.find(
+            customColumns.teacherNotes,
+            note => note.user_id === student.user_id
+          );
 
           rowData = {
             studentName: displayName,
             submissions: userSubmissions,
             assignmentGroups: assignmentGroups,
-            student: student
+            student: student,
+            teacherNote: teacherNote ? teacherNote.content : ''
           }
 
           return rowData;

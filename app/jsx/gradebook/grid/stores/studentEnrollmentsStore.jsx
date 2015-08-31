@@ -21,7 +21,7 @@ define([
 
     getInitialState() {
       if (this.state === undefined) {
-        this.init()
+        this.init();
       }
 
       return this.state;
