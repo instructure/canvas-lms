@@ -635,6 +635,10 @@ ActiveRecord::Associations::Builder::HasOne.valid_options += [:preload, :eager_l
 end
 
 ActiveRecord::Relation.class_eval do
+  def includes(*args)
+    return super if args.empty? || args == [nil]
+    raise "Use preload or eager_load instead of includes"
+  end
 
   def select_values_necessitate_temp_table?
     return false unless select_values.present?
