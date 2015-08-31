@@ -676,6 +676,53 @@ class SubmissionsApiController < ApplicationController
     end
   end
 
+  # @API Publish provisional grades for an assignment
+  #
+  # Publish the selected provisional grade for all submissions to an assignment.
+  # Use the "Select provisional grade" endpoint to choose which provisional grade to publish
+  # for a particular submission.
+  #
+  # NOTE: The preceding paragraph is a lie, because provisional grade selection is not yet implemented.
+  # What will _actually_ happen is, we'll publish the first provisional grade for the submission
+  # (by graded_at date).
+  #
+  # WARNING: This is irreversible. This will overwrite any existing grades in the gradebook.
+  #
+  # @example_request
+  #
+  #   curl 'https://<canvas>/api/v1/courses/1/assignments/2/publish_provisional_grades' \
+  #        -X POST
+  #
+  # v-- that gap is there intentionally, because this isn't ready to be publicly documented
+
+  def publish_provisional_grades
+    if authorized_action(@context, @current_user, :moderate_grades)
+      @assignment = @context.assignments.active.find(params[:assignment_id])
+      unless @context.feature_enabled?(:moderated_grading) && @assignment.moderated_grading?
+        return render :json => { :message => "Assignment does not use moderated grading" }, :status => :bad_request
+      end
+      if @assignment.grades_published?
+        return render :json => { :message => "Assignment grades have already been published" }, :status => :bad_request
+      end
+
+      submissions = @assignment.submissions.includes(:all_submission_comments,
+                                                     { :provisional_grades => :rubric_assessments })
+      submissions.each do |submission|
+        # TODO M2 use an actual selection instead of just picking the first one
+        selected_provisional_grade = submission.provisional_grades
+          .select { |pg| pg.graded_at.present? }
+          .sort_by { |pg| pg.graded_at }
+          .first
+        if selected_provisional_grade
+          selected_provisional_grade.publish!
+        end
+      end
+
+      @assignment.update_attribute(:grades_published_at, Time.now.utc)
+      render :json => { :message => "OK" }
+    end
+  end
+
   # @API Grade or comment on multiple submissions
   #
   # Update the grading and comments on multiple student's assignment

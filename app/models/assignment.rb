@@ -1295,9 +1295,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def grades_published?
-    # TODO: this will, of course, change once grade publishing is implemented.
-    #       we will probably need to add a column for grade publishing status
-    !moderated_grading?
+    !moderated_grading? || grades_published_at.present?
   end
 
   def speed_grader_json(user, avatars: false, grading_role: :grader)

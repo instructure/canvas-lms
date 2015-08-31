@@ -17,6 +17,29 @@ describe "speed grader" do
     student_submission
   end
 
+  it "should create provisional grades and submission comments" do
+    @submission.find_or_create_provisional_grade!(scorer: @teacher, score: 7)
+    @submission.add_comment(commenter: @teacher, comment: 'wat', provisional: true)
+
+    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+    expect(f('#grading-box-extended')).to have_attribute('value', '7')
+    expect(f('#discussion span.comment').text).to be_include 'wat'
+
+    replace_content f('#grading-box-extended'), "8"
+    f('#grading-box-extended').send_keys "\t" # since it's saved on blur
+    wait_for_ajax_requests(250)
+    f('#speedgrader_comment_textarea').send_keys('srsly')
+    f('#add_a_comment button[type="submit"]').click
+    wait_for_ajaximations
+
+    @submission.reload
+    expect(@submission.score).to be_nil
+
+    pg = @submission.provisional_grade(@teacher)
+    expect(pg.score.to_i).to eql 8
+    expect(pg.submission_comments.map(&:comment)).to be_include 'srsly'
+  end
+
   it "should create rubric assessments for the provisional grade" do
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
     keep_trying_until do

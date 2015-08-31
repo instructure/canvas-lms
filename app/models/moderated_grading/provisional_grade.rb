@@ -13,6 +13,7 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
   validates :submission, presence: true
 
   def valid?(*)
+    infer_grade
     set_graded_at if @force_save || grade_changed? || score_changed?
     super
   end
@@ -38,6 +39,20 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
   def student
     self.submission.student
   end
+
+  def publish!
+    previously_graded = submission.grade.present? || submission.excused?
+    submission.grade = grade
+    submission.score = score
+    submission.grader_id = scorer_id
+    submission.graded_at = Time.now.utc
+    submission.grade_matches_current_submission = true
+    previously_graded ? submission.with_versioning(:explicit => true) { submission.save! } : submission.save!
+    publish_submission_comments!
+    publish_rubric_assessments!
+  end
+
+  private
 
   def publish_submission_comments!
     self.submission_comments.each do |prov_comment|
@@ -69,7 +84,12 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
     end
   end
 
-  private
+  def infer_grade
+    if self.score.present? && self.grade.nil?
+      self.grade = submission.assignment.score_to_grade(score)
+    end
+  end
+
   def set_graded_at
     self.graded_at = Time.zone.now
   end

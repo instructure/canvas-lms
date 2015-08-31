@@ -87,6 +87,18 @@ describe ModeratedGrading::ProvisionalGrade do
     end
   end
 
+  describe 'infer_grade' do
+    it 'infers a grade if only score is given' do
+      pg = submission.find_or_create_provisional_grade! scorer: user, score: 0
+      expect(pg.grade).not_to be_nil
+    end
+
+    it 'leaves grade nil if score is nil' do
+      pg = submission.find_or_create_provisional_grade! scorer: user
+      expect(pg.grade).to be_nil
+    end
+  end
+
   describe "publish_rubric_assessments!" do
     it "publishes rubric assessments to the submission" do
       @course = course
@@ -102,7 +114,7 @@ describe ModeratedGrading::ProvisionalGrade do
 
       expect(prov_assmt.score).to eq 3
 
-      pg.publish_rubric_assessments!
+      pg.send :publish_rubric_assessments!
 
       real_assmt = sub.rubric_assessments.first
       expect(real_assmt.score).to eq 3
@@ -119,15 +131,41 @@ describe ModeratedGrading::ProvisionalGrade do
       sub = assignment.submit_homework(student, :submission_type => 'online_text_entry', :body => 'hallo')
       pg = sub.find_or_create_provisional_grade! scorer: user, score: 1
       file = assignment.attachments.create! uploaded_data: default_uploaded_data
-      prov_comment = sub.add_comment(commenter: user, message: 'blah', attachments: [file])
+      prov_comment = sub.add_comment(commenter: user, message: 'blah', provisional: true, attachments: [file])
 
-      pg.publish_submission_comments!
+      pg.send :publish_submission_comments!
 
       real_comment = sub.submission_comments.first
       expect(real_comment.provisional_grade_id).to be_nil
       expect(real_comment.author).to eq user
       expect(real_comment.comment).to eq prov_comment.comment
       expect(real_comment.attachments.first).to eq prov_comment.attachments.first
+    end
+  end
+
+  describe "publish!" do
+    it "publishes a provisional grade" do
+      @course = course
+      sub = assignment.submit_homework(student, :submission_type => 'online_text_entry', :body => 'hallo')
+      pg = sub.find_or_create_provisional_grade! scorer: user, score: 80
+      sub.reload
+      expect(sub.workflow_state).to eq 'submitted'
+      expect(sub.graded_at).to be_nil
+      expect(sub.grader_id).to be_nil
+      expect(sub.score).to be_nil
+      expect(sub.grade).to be_nil
+
+      pg.expects(:publish_submission_comments!).once
+      pg.expects(:publish_rubric_assessments!).once
+      pg.publish!
+
+      sub.reload
+      expect(sub.grade_matches_current_submission).to eq true
+      expect(sub.workflow_state).to eq 'graded'
+      expect(sub.graded_at).not_to be_nil
+      expect(sub.grader_id).to eq user.id
+      expect(sub.score).to eq 80
+      expect(sub.grade).not_to be_nil
     end
   end
 end
