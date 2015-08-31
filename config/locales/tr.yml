@@ -7178,6 +7178,7 @@ tr:
     title_for_topics_category: "%{category} Başlıkları"
     warnings: 
       truncated_wiki_title: "Şu wiki sayfanın başlığı kesildi : %{title}"
+  inbox_bb245a60: "Gelen Kutusu"
   include_this_assignment_s_grades_when_posting_to_y_6bff3323: "Okulunuzun Öğrenc Bilgi Sistemine göderirken bu ödevin notlarını da dahil et"
   incorrect_username_and_or_password_2de73abb: "Yanlış kullanıcı adı ve/veya şifre"
   incremental_update_successfully_generated_against__db3f3f06: "Önceki ÖBS içeri aktarımına karşın artış içeren güncelleme başarıyla oluşturuldu."
@@ -7561,6 +7562,13 @@ tr:
         logout_response_redirect_from_idp: "IdP'den LogoutRequest Alındı"
         logout_response_redirect_to_idp: "IdP'ye LogoutResponse Gönderiliyor"
         redirect_from_idp: "IdP'den LoginResponse alındı"
+  login_6f3d6249: "Oturum Aç"
+  login_attribute_731a8181: "Oturum Açma Özelliği"
+  login_is_invalid_must_be_alphanumeric_or_an_email__ae4499b3: "Kullanıcı adı geçersiz: Alfa-sayısal karaktere ya da bir eposta adresi girmelisiniz."
+  login_is_too_long_25373f95: "Kullanıcı adı çok uzun"
+  login_label_1dea0f9d: "Oturum Açma Etiketi"
+  login_with_auth_type_a0aaa52a: "*%{auth_type}* ile oturum aç"
+  login_with_provider_3fd3998e: "%{provider} ile oturum aç"
   low_score_4eeb95b2: "En Düşük : %{score}"
   lower_limit_of_range_6ddd4983: "Aralık alt sınırı"
   lti: 
@@ -10204,6 +10212,10 @@ tr:
       primary_pad: "Primary Pad"
       sketchpad: SketchPad
       typewithme: TypeWith.me
+    facebook: 
+      description: "Facebook ile Giriş"
+    github: 
+      description: "Github Oturum Açma"
     google_docs: 
       description: "Google Docs belge paylaşımı"
       name: "Goolgle Docs"
