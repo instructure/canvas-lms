@@ -258,11 +258,12 @@
                 size             = 50
               >
 
+              <span class="screenreader-only" id="onlyUnreadAccessibleLabel"><%= t("Filter replies by unread") %></span>
               <input
                 type    = "checkbox"
                 id      = "onlyUnread"
-                aria-label = "<%= t("filter replies by unread") %>"
-              ><label aria-hidden="true" for="onlyUnread"><%= t('unread', 'Unread') %></label>
+                aria-labelledby="onlyUnreadAccessibleLabel"/>
+              <label for="onlyUnread" aria-hidden="true"><%= t('unread', 'Unread') %></label>
 
               &nbsp; &nbsp;
               <button id="collapseAll" class="btn disableWhileFiltering" title="<%= t('collapse_replies', 'Collapse replies') %>" aria-label="<%= t('collapse_replies', 'Collapse replies') %>">

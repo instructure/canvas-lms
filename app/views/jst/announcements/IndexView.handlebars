@@ -14,10 +14,12 @@
               value="{{searchTerm}}"
               type="search">
         <span id="discussionsFilter">
+          <span class="screenreader-only" id="onlyUnreadAccessibleLabel">{{t "filter announcements by unread"}}</span>
           <input type="checkbox"
                 id="onlyUnread"
-                aria-label="{{t "filter announcements by unread"}}"
-                {{#if onlyUnread}}checked{{/if}} /><label aria-hidden="true" for="onlyUnread">{{#t "unread"}}Unread{{/t}}</label>
+                aria-labelledby="onlyUnreadAccessibleLabel"
+                {{#if onlyUnread}}checked{{/if}} />
+          <label for="onlyUnread" aria-hidden="true">{{#t "unread"}}Unread{{/t}}</label>
         </span>
       </div>
     </div>
