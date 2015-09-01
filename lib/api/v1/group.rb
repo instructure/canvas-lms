@@ -33,7 +33,6 @@ module Api::V1::Group
 
   def group_json(group, user, session, options = {})
     includes = options[:include] || []
-
     permissions_to_include = API_PERMISSIONS_TO_INCLUDE if includes.include?('permissions')
 
     hash = api_json(group, user, session, API_GROUP_JSON_OPTS, permissions_to_include)
@@ -50,6 +49,9 @@ module Api::V1::Group
     end
     if includes.include?('group_category')
       hash['group_category'] = group.group_category && group_category_json(group.group_category, user, session)
+    end
+    if includes.include?('favorites')
+      hash['is_favorite'] = group.favorite_for_user?(user)
     end
     hash['html_url'] = group_url(group) if includes.include? 'html_url'
     hash['sis_group_id'] = group.sis_source_id if group.context_type == 'Account' && group.root_account.grants_any_right?(user, session, :read_sis, :manage_sis)

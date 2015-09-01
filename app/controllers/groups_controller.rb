@@ -197,6 +197,7 @@ class GroupsController < ApplicationController
   # @returns [Group]
   def index
     return context_index if @context
+    includes = {:include => params[:include]}
     groups_scope = @current_user.current_groups
     respond_to do |format|
       format.html do
@@ -219,7 +220,7 @@ class GroupsController < ApplicationController
           scope.preload(:group_category)
         end
         @groups = Api.paginate(@groups, self, api_v1_current_user_groups_url)
-        render :json => (@groups.map { |g| group_json(g, @current_user, session) })
+        render :json => (@groups.map { |g| group_json(g, @current_user, session,includes) })
       end
     end
   end

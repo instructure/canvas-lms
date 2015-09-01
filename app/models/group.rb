@@ -717,4 +717,10 @@ class Group < ActiveRecord::Base
   def sortable_name
     name
   end
+  ##
+  # Returns a boolean describing if the user passed in has marked this group
+  # as a favorite.
+  def favorite_for_user?(user)
+    user.favorites.where(:context_type => 'Group', :context_id => self).exists?
+  end
 end
