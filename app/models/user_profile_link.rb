@@ -20,7 +20,10 @@ class UserProfileLink < ActiveRecord::Base
 
   belongs_to :user_profile
 
-  EXPORTABLE_ATTRIBUTES = [:id, :url, :title, :user_profile_id, :created_at, :updated_at]
-  EXPORTABLE_ASSOCIATIONS = [:user_profile]
-  validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true
+  EXPORTABLE_ATTRIBUTES = [:id, :url, :title, :user_profile_id, :created_at, :updated_at].freeze
+  EXPORTABLE_ASSOCIATIONS = [:user_profile].freeze
+  validates :title, length: { maximum: maximum_string_length, allow_nil: true, allow_blank: true }
+  validates :url, length: { maximum: 4.kilobytes-1, allow_nil: false, allow_blank: true }
+  include CustomValidations
+  validates_as_url :url
 end
