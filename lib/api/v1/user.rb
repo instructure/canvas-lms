@@ -201,6 +201,7 @@ module Api::V1::User
         end
       end
       if @domain_root_account.grants_any_right?(@current_user, :read_sis, :manage_sis)
+        json[:sis_source_id] = enrollment.sis_source_id
         json[:sis_course_id] = enrollment.course.sis_source_id
         json[:course_integration_id] = enrollment.course.integration_id
         json[:sis_section_id] = enrollment.course_section.sis_source_id
