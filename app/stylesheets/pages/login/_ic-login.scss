@@ -284,9 +284,8 @@ body.body--login-confirmation {
   width: 400px;
   margin: $ic-sp*3 auto 0;
   width: 696px;
-  @include breakpoint(short) {
-    margin-top: $ic-sp;
-  }
+  @include breakpoint(short) { margin-top: $ic-sp; }
+  form { margin-bottom: 0; } //override default margin on forms
 }
 
 .ic-Login-confirmation__header {
@@ -305,4 +304,12 @@ body.body--login-confirmation {
   background: $ic-color-light;
   border-bottom-left-radius: $baseBorderRadius;
   border-bottom-right-radius: $baseBorderRadius;
+}
+
+.ic-Login-confirmation__auth-icon {
+  display: inline-block;
+  max-width: 72px;
+  height: auto;
+  vertical-align: middle;
+  margin-right: $ic-sp;
 }
