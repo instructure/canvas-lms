@@ -38,8 +38,9 @@ module Api::V1::Submission
       end
     end
 
-    if user && includes.include?('provisional_grades') && assignment.moderated_grading?
-      hash['provisional_grades'] = submission_provisional_grades_json(submission, user)
+    if user && includes.include?('provisional_grades') &&
+          assignment && assignment.context.is_a?(Course) && assignment.moderated_grading?
+      hash['provisional_grades'] = submission_provisional_grades_json(submission, assignment, user)
     end
 
     if includes.include?("submission_comments")
@@ -203,11 +204,19 @@ module Api::V1::Submission
     attachment
   end
 
-  def submission_provisional_grades_json(submission, user)
+  def submission_provisional_grades_json(submission, assignment, current_user)
     provisional_grades = submission.provisional_grades
-    unless submission.assignment.context.grants_right?(user, :moderate_grades)
-      provisional_grades = provisional_grades.where(scorer_id: user)
+    unless assignment.context.grants_right?(current_user, :moderate_grades)
+      provisional_grades = provisional_grades.where(scorer_id: current_user)
     end
-    provisional_grades.map(&:grade_attributes)
+    provisional_grades.map do |pg|
+      pg.grade_attributes.merge({
+        speedgrader_url: speed_grader_course_gradebook_url(
+          :course_id => assignment.context.id,
+          :assignment_id => assignment.id,
+          :anchor => { student_id: submission.user_id, provisional_grade_id: pg.id }.to_json
+        )
+      })
+    end
   end
 end

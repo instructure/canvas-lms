@@ -1266,6 +1266,13 @@ describe 'Submissions API', type: :request do
         )
 
         expect(json.first['provisional_grades']).to_not be_empty
+        speedgrader_url = URI.parse(json.first['provisional_grades'].first['speedgrader_url'])
+        expect(speedgrader_url.path).to eq "/courses/#{@course.id}/gradebook/speed_grader"
+        expect(speedgrader_url.query).to eq "assignment_id=#{@assignment.id}"
+        expect(JSON.parse(URI.decode(speedgrader_url.fragment))).to eq({
+                                                                         "student_id" => @student.id,
+                                                                         "provisional_grade_id" => @provisional_grade.id
+                                                                       })
       end
     end
 
