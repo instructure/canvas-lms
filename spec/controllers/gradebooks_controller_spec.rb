@@ -465,6 +465,39 @@ describe GradebooksController do
                          :user_id => s2.user_id }
       expect(flash[:error]).to eql 'Submission was unsuccessful: Submission Failed'
     end
+
+    it "creates a provisional grade" do
+      user_session(@teacher)
+      @assignment = @course.assignments.create!(:title => "some assignment")
+      @student = @course.enroll_student(User.create!(:name => "some user"), :enrollment_state => :active).user
+      submission = @assignment.submit_homework(@student, :body => "hello")
+      post 'update_submission',
+        :format => :json,
+        :course_id => @course.id,
+        :submission => { :score => 100,
+                         :comment => "provisional!",
+                         :assignment_id => @assignment.id,
+                         :user_id => @student.id,
+                         :provisional => true }
+
+      # confirm "real" grades/comments were not written
+      submission.reload
+      expect(submission.workflow_state).to eq 'submitted'
+      expect(submission.score).to be_nil
+      expect(submission.grade).to be_nil
+      expect(submission.submission_comments.first).to be_nil
+
+      # confirm "provisional" grades/comments were written
+      pg = submission.provisional_grade(@teacher)
+      expect(pg.score).to eq 100
+      expect(submission.provisional_grade(@teacher).submission_comments.first.comment).to eq 'provisional!'
+
+      # confirm the response JSON shows provisional information
+      json = JSON.parse response.body
+      expect(json[0]['submission']['score']).to eq 100
+      expect(json[0]['submission']['grade_matches_current_submission']).to eq true
+      expect(json[0]['submission']['submission_comments'].first['submission_comment']['comment']).to eq 'provisional!'
+    end
   end
 
   describe "GET 'speed_grader'" do

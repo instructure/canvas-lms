@@ -239,11 +239,33 @@ class ContextModuleProgression < ActiveRecord::Base
     if !requirement_met
       self.requirements_met.delete(requirement)
       self.mark_as_outdated
+      true
     elsif !self.requirements_met.include?(requirement)
       self.requirements_met.push(requirement)
       self.mark_as_outdated
+      true
+    else
+      false
     end
-    requirement
+  end
+
+  def update_requirement_met!(*args)
+    retry_count = 0
+    begin
+      if self.update_requirement_met(*args)
+        self.save!
+        self.send_later_if_production(:evaluate!)
+      end
+    rescue ActiveRecord::StaleObjectError
+      # retry up to five times, otherwise return current (stale) data
+      self.reload
+      retry_count += 1
+      if retry_count < 5
+        retry
+      else
+        raise
+      end
+    end
   end
 
   def mark_as_outdated
@@ -251,9 +273,14 @@ class ContextModuleProgression < ActiveRecord::Base
   end
 
   def mark_as_outdated!
-    self.mark_as_outdated
-    Shackles.activate(:master) do
-      self.save
+    if self.new_record?
+      mark_as_outdated
+      Shackles.activate(:master) do
+        self.save!
+      end
+    else
+      self.class.where(:id => self).update_all(:current => false)
+      self.touch_user
     end
   end
 

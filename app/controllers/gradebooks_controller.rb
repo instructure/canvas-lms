@@ -335,7 +335,6 @@ class GradebooksController < ApplicationController
                     else
                       [params[:submission]]
                     end
-
       valid_user_ids = Set.new(@context.students_visible_to(@current_user).pluck(:id))
       submissions.select! { |s| valid_user_ids.include? s[:user_id].to_i }
       users = @context.students.uniq.find(submissions.map { |s| s[:user_id] })
@@ -367,7 +366,13 @@ class GradebooksController < ApplicationController
           end
 
           submission[:dont_overwrite_grade] = value_to_boolean(params[:dont_overwrite_grades])
-          @submissions += @assignment.grade_student(@user, submission)
+          subs = @assignment.grade_student(@user, submission)
+          if submission[:provisional]
+            subs.each do |sub|
+              sub.apply_provisional_grade_filter!(sub.provisional_grade(@current_user))
+            end
+          end
+          @submissions += subs
         rescue Assignment::GradeError => e
           logger.info "GRADES: grade_student failed because '#{e.message}'"
           @error_message = e.to_s
@@ -431,6 +436,13 @@ class GradebooksController < ApplicationController
       return redirect_to polymorphic_url([@context, @assignment])
     end
 
+    grading_role = if @context.feature_enabled?(:moderated_grading) &&
+                      @assignment.moderated_grading? && !@assignment.grades_published?
+      @context.grants_right?(@current_user, :moderate_grades) ? :moderator : :provisional_grader
+    else
+      :grader
+    end
+
     respond_to do |format|
       format.html do
         @headers = false
@@ -439,6 +451,8 @@ class GradebooksController < ApplicationController
         env = {
           :CONTEXT_ACTION_SOURCE => :speed_grader,
           :settings_url => speed_grader_settings_course_gradebook_path,
+          :force_anonymous_grading => force_anonymous_grading?(@assignment),
+          :grading_role => grading_role
         }
         if @assignment.quiz
           env[:quiz_history_url] = course_quiz_history_path @context.id,
@@ -451,7 +465,9 @@ class GradebooksController < ApplicationController
       end
 
       format.json do
-        render :json => @assignment.speed_grader_json(@current_user, service_enabled?(:avatars))
+        render :json => @assignment.speed_grader_json(@current_user,
+                                                      avatars: service_enabled?(:avatars),
+                                                      grading_role: grading_role)
       end
     end
   end

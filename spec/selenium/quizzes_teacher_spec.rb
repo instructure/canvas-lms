@@ -1,5 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/helpers/quizzes_common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/assignment_overrides.rb')
+require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
 
 describe "quizzes" do
 
@@ -37,13 +38,6 @@ describe "quizzes" do
         # Check that the list of quizzes is also updated
         get "/courses/#{@course.id}/quizzes"
         expect(f("#summary_quiz_#{@quiz.id} .icon-publish")).to be_displayed
-      end
-
-      it "should not exist in a published quiz" do
-        @quiz = course_quiz true
-        get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
-
-        expect(f(".save_and_publish")).to be_nil
       end
     end
 
@@ -132,6 +126,19 @@ describe "quizzes" do
       get "/courses/#{@course.id}/quizzes/#{q.id}"
 
       expect(f('#main .description')).to include_text(test_text)
+    end
+
+    it "should insert multiple files using RCE in the quiz", priority: "1", test_id: 132545 do
+      txt_files = ["some test file", "b_file.txt"]
+      txt_files.map do |text_file|
+       file = @course.attachments.create!(display_name: text_file, uploaded_data: default_uploaded_data)
+       file.context = @course
+       file.save!
+      end
+      @quiz = course_quiz
+      get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
+      insert_file_from_rce(:quiz)
+      expect(fln("b_file.txt")).to be_displayed
     end
 
     it "should asynchronously load student quiz results", priority: "2", test_id: 210058 do
@@ -225,7 +232,7 @@ describe "quizzes" do
       keep_trying_until { expect(f("#quiz_display_points_possible .points_possible").text).to eq "2" }
     end
 
-    it "should not let you exceed the question limit", priority: "1", test_id: 210062 do
+    it "should not let you exceed the question limit", priority: "3", test_id: 210062 do
       get "/courses/#{@course.id}/quizzes/new"
 
       click_questions_tab

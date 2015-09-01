@@ -197,6 +197,7 @@ class ConferencesController < ApplicationController
       conference_type_details: conference_types_json(WebConference.conference_types),
       users: @users.map { |u| {:id => u.id, :name => u.last_name_first} },
     )
+    flash[:error] = t('Some conferences on this page are hidden because of errors while retrieving their status') if @errors
   end
   protected :web_index
 

@@ -190,6 +190,12 @@ $page-dark: #ebeff2;
         padding: $ic-sp/4 $ic-sp;
       }
     }
+    .post-grades-button-placeholder {
+      display: inline-block;
+      @if $use_new_styles == false {
+        button#post-grades-button, button#post_grades, button.external-tools-dialog { padding: $ic-sp/4 $ic-sp; }
+      }
+    }
     .section-button-placeholder {
       display: inline-block;
       @if $use_new_styles == false {

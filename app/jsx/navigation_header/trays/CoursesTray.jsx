@@ -30,7 +30,7 @@ define([
       var courses = this.props.courses.map((course) => {
         return <li key={course.id}><a href={`/courses/${course.id}`}>{course.name}</a></li>;
       });
-      courses.push(<li key='allCourseLink' className='ReactTray__feature-list-item'><a href='/courses'>All Courses</a></li>);
+      courses.push(<li key='allCourseLink' className='ReactTray__feature-list-item'><a href='/courses'>{I18n.t('All Courses')}</a></li>);
       return courses;
     },
 

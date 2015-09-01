@@ -36,10 +36,12 @@ class Submission < ActiveRecord::Base
   belongs_to :group
   belongs_to :media_object
   belongs_to :student, :class_name => 'User', :foreign_key => :user_id
+
   belongs_to :quiz_submission, :class_name => 'Quizzes::QuizSubmission'
-  has_many :submission_comments, :order => 'created_at', :dependent => :destroy
-  has_many :visible_submission_comments, :class_name => 'SubmissionComment', :order => 'created_at, id', :conditions => { :hidden => false }
-  has_many :hidden_submission_comments, :class_name => 'SubmissionComment', :order => 'created_at, id', :conditions => { :hidden => true }
+  has_many :all_submission_comments, :order => 'created_at', :class_name => 'SubmissionComment', :dependent => :destroy
+  has_many :submission_comments, :order => 'created_at', :conditions => { :provisional_grade_id => nil }
+  has_many :visible_submission_comments, :class_name => 'SubmissionComment', :order => 'created_at, id', :conditions => { :provisional_grade_id => nil, :hidden => false }
+  has_many :hidden_submission_comments, :class_name => 'SubmissionComment', :order => 'created_at, id', :conditions => { :provisional_grade_id => nil, :hidden => true }
   has_many :assessment_requests, :as => :asset
   has_many :assigned_assessments, :class_name => 'AssessmentRequest', :as => :assessor_asset
   has_many :rubric_assessments, :as => :artifact
@@ -903,9 +905,28 @@ class Submission < ActiveRecord::Base
     false
   end
 
+  def provisional_grade(scorer)
+    self.provisional_grades.where(scorer_id: scorer).first || ModeratedGrading::NullProvisionalGrade.new(scorer.id)
+  end
+
+  def find_or_create_provisional_grade!(scorer:, score: nil, grade: nil, force_save: false)
+    ModeratedGrading::ProvisionalGrade.unique_constraint_retry do
+      pg = self.provisional_grades.where(scorer_id: scorer).first
+      unless pg
+        pg = self.provisional_grades.build
+        pg.scorer_id = scorer.id
+      end
+      pg.grade = grade if grade
+      pg.score = score if score
+      pg.force_save = force_save
+      pg.save! if force_save || pg.new_record? || pg.changed?
+      pg
+    end
+  end
+
   def add_comment(opts={})
     opts = opts.symbolize_keys
-    opts[:author] = opts.delete(:commenter) || opts.delete(:author) || self.user
+    opts[:author] = opts.delete(:commenter) || opts.delete(:author) || opts.delete(:user) || self.user
     opts[:comment] = opts[:comment].try(:strip) || ""
     opts[:attachments] ||= opts.delete :comment_attachments
     if opts[:comment].empty?
@@ -915,10 +936,14 @@ class Submission < ActiveRecord::Base
         opts[:comment] = t('attached_files_comment', "See attached files.")
       end
     end
+    if opts.delete(:provisional)
+      pg = find_or_create_provisional_grade!(scorer: opts[:author])
+      opts[:provisional_grade_id] = pg.id
+    end
     self.save! if self.new_record?
     valid_keys = [:comment, :author, :media_comment_id, :media_comment_type,
                   :group_comment_id, :assessment_request, :attachments,
-                  :anonymous, :hidden, :recipient]
+                  :anonymous, :hidden, :recipient, :provisional_grade_id]
     if opts[:comment].present?
       comment = submission_comments.create!(opts.slice(*valid_keys))
     end
@@ -947,16 +972,33 @@ class Submission < ActiveRecord::Base
     @comment_limiting_session = session
   end
 
+  def apply_provisional_grade_filter!(provisional_grade)
+    @provisional_grade_filter = provisional_grade
+    self.grade = provisional_grade.grade
+    self.score = provisional_grade.score
+    self.graded_at = provisional_grade.graded_at
+    self.grade_matches_current_submission = provisional_grade.grade_matches_current_submission
+    self.readonly!
+  end
+
   alias_method :old_submission_comments, :submission_comments
   def submission_comments(*args)
-    res = old_submission_comments(*args)
+    res = if @provisional_grade_filter
+            @provisional_grade_filter.submission_comments
+          else
+            old_submission_comments(*args)
+          end
     res = res.select{|sc| sc.grants_right?(@comment_limiting_user, @comment_limiting_session, :read) } if @comment_limiting_user
     res
   end
 
   alias_method :old_visible_submission_comments, :visible_submission_comments
   def visible_submission_comments(*args)
-    res = old_visible_submission_comments(*args)
+    res = if @provisional_grade_filter
+            @provisional_grade_filter.submission_comments.where(hidden: false)
+          else
+            old_visible_submission_comments(*args)
+          end
     res = res.select{|sc| sc.grants_right?(@comment_limiting_user, @comment_limiting_session, :read) } if @comment_limiting_user
     res
   end
@@ -1016,6 +1058,7 @@ class Submission < ActiveRecord::Base
   #  * cached_due_date (Time)
   #  * submitted_at (Time)
   #  * score (Fixnum)
+  #  * excused (Boolean)
   #
   module Tardiness
     def past_due?
@@ -1045,7 +1088,7 @@ class Submission < ActiveRecord::Base
     # QUESTIONS FOR ME:
     #   * are we messing up graded / not graded counts???
     def graded?
-      excused? || (!!score && workflow_state == 'graded')
+      excused || (!!score && workflow_state == 'graded')
     end
   end
   include Tardiness

@@ -16,6 +16,15 @@ describe 'Global Navigation' do
         wait_for_ajaximations
         expect(f('.ReactTray__primary-content')).to be_displayed
       end
+
+      it 'should populate the courses tray when using the keyboard to open it' do
+        get "/"
+        driver.execute_script('$("#global_nav_courses_link").focus()')
+        f('#global_nav_courses_link').send_keys(:enter)
+        wait_for_ajaximations
+        links = ff('.ReactTray__link-list li')
+        expect(links.count).to eql 2
+      end
     end
 
     describe 'LTI Tools' do

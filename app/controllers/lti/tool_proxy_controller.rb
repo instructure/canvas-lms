@@ -45,8 +45,12 @@ module Lti
 
     def invalidate_nav_tabs_cache(tool_proxy)
       placements = Set.new
-      tool_proxy.resources.each { |rh| placements.merge(rh.placements.map(&:placement)) }
-      if (placements & [ResourcePlacement::COURSE_NAVIGATION, ResourcePlacement::ACCOUNT_NAVIGATION]).count > 0
+
+      tool_proxy.resources.each do |resource_handler|
+        placements.merge(resource_handler.placements.map(&:placement))
+      end
+
+      unless (placements & [ResourcePlacement::COURSE_NAVIGATION, ResourcePlacement::ACCOUNT_NAVIGATION]).blank?
         Lti::NavigationCache.new(@domain_root_account).invalidate_cache_key
       end
     end

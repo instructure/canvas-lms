@@ -87,8 +87,9 @@ class ContentParticipationCount < ActiveRecord::Base
             joins(:assignment, :submission_comments).
             where(submission_conditions).
             where(<<-SQL, user).pluck(:id)
-            (submission_comments.hidden IS NULL OR NOT submission_comments.hidden)
-            AND submission_comments.author_id <> ?
+              (submission_comments.hidden IS NULL OR NOT submission_comments.hidden)
+              AND submission_comments.provisional_grade_id IS NULL
+              AND submission_comments.author_id <> ?
             SQL
         potential_ids = (subs_with_grades + subs_with_comments).uniq
         already_read_count = ContentParticipation.where(

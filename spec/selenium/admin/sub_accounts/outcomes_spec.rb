@@ -39,12 +39,20 @@ describe "sub account outcomes" do
           should_validate_calculation_method_dropdown
         end
 
-        it "should validate decaying average", priority: "2", test_id: 250518 do
-          should_validate_decaying_average
+        it "should validate decaying average_above_range", priority: "2", test_id: 250518 do
+          should_validate_decaying_average_above_range
         end
 
-        it "should validate n mastery", priority: "2", test_id: 250519 do
-          should_validate_n_mastery
+        it "should validate decaying average_below_range", priority: "2", test_id: 303713 do
+          should_validate_decaying_average_below_range
+        end
+
+        it "should validate n mastery_above_range", priority: "2", test_id: 250519 do
+          should_validate_n_mastery_above_range
+        end
+
+        it "should validate n mastery_below_range", priority: "2", test_id: 303714 do
+          should_validate_n_mastery_below_range
         end
       end
 

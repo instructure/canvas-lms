@@ -4,7 +4,7 @@ define [
   'react'
   'react-router'
   'compiled/react/shared/utils/withReactElement'
-  './UploadButton'
+  'jsx/files/UploadButton'
   './UsageRightsDialog'
   '../utils/openMoveDialog'
   '../utils/downloadStuffAsAZip'

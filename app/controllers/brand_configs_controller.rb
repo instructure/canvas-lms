@@ -13,7 +13,7 @@ class BrandConfigsController < ApplicationController
     js_env brandConfig: brand_config.as_json(include_root: false),
            hasUnsavedChanges: session.key?(:brand_config_md5),
            variableSchema: BrandableCSS::BRANDABLE_VARIABLES,
-           sharedBrandConfigs: BrandConfig.select('md5, name').where(share: true).as_json(include_root: false),
+           sharedBrandConfigs: BrandConfig.shared(@domain_root_account).select('md5, name').as_json(include_root: false),
            allowGlobalIncludes: @domain_root_account.allow_global_includes?
     render text: '', layout: 'layouts/bare'
   end

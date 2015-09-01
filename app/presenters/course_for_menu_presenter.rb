@@ -34,7 +34,7 @@ class CourseForMenuPresenter
 
   private
   def role
-    Role.get_role_by_id(course.primary_enrollment_role_id) ||
+    Role.get_role_by_id(Shard.relative_id_for(course.primary_enrollment_role_id, course.shard, Shard.current)) ||
       Enrollment.get_built_in_role_for_type(course.primary_enrollment_type)
   end
 

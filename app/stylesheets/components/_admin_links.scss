@@ -129,6 +129,12 @@ For admin dropdowns that appear in main content areas, such as item groups, plea
       &[class^=icon-]:before { margin-right: 8px; }
     }
 
+    a.disabled.ui-state-focus {
+      border: solid;
+      border-width: 1px;
+      border-color: darken($ic-border-light, 15%);
+    }
+
     &:first-of-type a { 
       border-top-left-radius: 0; 
       border-top-right-radius: 0; 

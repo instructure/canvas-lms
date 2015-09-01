@@ -328,7 +328,7 @@ class AccountsController < ApplicationController
 
     @courses = Api.paginate(@courses, self, api_v1_account_courses_url)
 
-    ActiveRecord::Associations::Preloader.new(@courses, [:account, :root_account])
+    ActiveRecord::Associations::Preloader.new(@courses, [:account, :root_account]).run
     render :json => @courses.map { |c| course_json(c, @current_user, session, includes, nil) }
   end
 

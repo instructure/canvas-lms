@@ -98,6 +98,32 @@ require_relative "../common"
     expect(f(".points_possible").text).to eq @points_total.to_s
   end
 
+  def quiz_with_multiple_type_questions(goto_edit=true)
+    @context = @course
+    bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
+    @q = quiz_model
+    a = bank.assessment_questions.create!
+    b = bank.assessment_questions.create!
+    c = bank.assessment_questions.create!
+    answers = [ {'id' => 1}, {'id' => 2}, {'id' => 3} ]
+
+    @quest1 = @q.quiz_questions.create!(question_data:
+                                            {name: "first question", question_type: 'multiple_choice_question',
+                                             'answers' => answers, points_possible: 1}, assessment_question: a)
+    @quest2 = @q.quiz_questions.create!(question_data:
+                                            {name: "second question", question_text: 'What is 5+5?',
+                                             question_type: 'numerical_question',
+                                             'answers' => [], points_possible: 1}, assessment_question: b)
+    @quest3 = @q.quiz_questions.create!(question_data:
+                                            {name: "third question", question_type: 'essay_question',
+                                             'answers' => [], points_possible: 1}, assessment_question: c)
+    yield bank, @q if block_given?
+    @q.generate_quiz_data
+    @q.save!
+    get "/courses/#{@course.id}/quizzes/#{@q.id}/edit" if goto_edit
+    @q
+  end
+
   def quiz_with_new_questions(goto_edit=true)
     @context = @course
     bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
@@ -220,7 +246,29 @@ require_relative "../common"
 
     if submit
       driver.execute_script("$('#submit_quiz_form .btn-primary').click()")
+      keep_trying_until do
+        expect(f('.quiz-submission .quiz_score .score_value')).to be_displayed
+      end
+    end
+  end
 
+  def answer_questions_and_submit(quiz, num_questions, submit = true)
+    num_questions.times do |o|
+     question = quiz.stored_questions[o][:id]
+     case quiz.stored_questions[o][:question_type]
+     when "multiple_choice_question"
+       fj("input[type=radio][name= 'question_#{question}']").click
+       wait_for_js
+     when "essay_question"
+       type_in_tiny ".question:visible textarea[name = 'question_#{question}']", 'This is an essay question.'
+     when "numerical_question"
+       fj("input[type=text][name= 'question_#{question}']").send_keys('10')
+       wait_for_js
+     end
+    end
+
+    if submit
+      expect_new_page_load { f('#submit_quiz_button').click }
       keep_trying_until do
         expect(f('.quiz-submission .quiz_score .score_value')).to be_displayed
       end
@@ -456,4 +504,50 @@ def quiz_create(params={})
   @quiz.published_at = Time.now
   @quiz.save!
   @quiz
+end
+
+def seed_quiz_wth_submission(num=1)
+  quiz_data =
+      [
+          {
+              question_name: 'Multiple Choice',
+              points_possible: 10,
+              question_text: 'Pick wisely...',
+              answers: [
+                  {weight: 100, answer_text: 'Correct', id: 1},
+                  {weight: 0, answer_text: 'Wrong', id: 2},
+                  {weight: 0, answer_text: 'Wrong', id: 3}
+              ],
+              question_type: 'multiple_choice_question'
+          },
+          {
+              question_name: 'File Upload',
+              points_possible: 5,
+              question_text: 'Upload a file',
+              question_type: 'file_upload_question'
+          },
+          {
+              question_name: 'Short Essay',
+              points_possible: 20,
+              question_text: 'Write an essay',
+              question_type: 'essay_question'
+          }
+      ]
+
+  quiz = @course.quizzes.create title: 'Quiz Me!'
+
+  num.times do
+    quiz_data.each do |question|
+      quiz.quiz_questions.create! question_data: question
+    end
+  end
+
+  quiz.workflow_state = 'available'
+  quiz.save!
+
+  submission = quiz.generate_submission @students[0]
+  submission.workflow_state = 'complete'
+  submission.save!
+
+  quiz
 end

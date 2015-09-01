@@ -403,6 +403,129 @@ describe "new groups" do
       expect(f(".group[data-id=\"#{@testgroup[2].id}\"] .group-name")).to include_text('Test Group 3')
     end
 
+    it 'should add students via drag and drop', priority: "1", test_id: 94154 do
+      group_test_setup(2,1,2)
+      get "/courses/#{@course.id}/groups"
+
+      drag_item1 = '.group-user-name:contains("Test Student 1")'
+      drag_item2 = '.group-user-name:contains("Test Student 2")'
+      drop_target1 = '.group:contains("Test Group 1")'
+
+      drag_and_drop_element(fj(drag_item1), fj(drop_target1))
+      f(".group[data-id=\"#{@testgroup[0].id}\"] .toggle-group").click
+      wait_for_ajaximations
+
+      expect(f(".group[data-id=\"#{@testgroup[0].id}\"] .group-summary")).to include_text('1 student')
+
+      drag_and_drop_element(fj(drag_item2), fj(drop_target1))
+      wait_for_ajaximations
+
+      group_to_check = ff('.group .group-user .group-user-name')
+      expect(group_to_check[0]).to include_text('Test Student 1')
+      expect(group_to_check[1]).to include_text('Test Student 2')
+      expect(f(".group[data-id=\"#{@testgroup[0].id}\"] .group-summary")).to include_text('2 students')
+    end
+
+    it 'should move student using drag and drop', priority: "1", test_id: 94156 do
+      group_test_setup(2,1,2)
+      add_user_to_group(@students[0], @testgroup.first, false)
+      add_user_to_group(@students[1], @testgroup.last, false)
+
+      drag_item1 = '.group-user-name:contains("Test Student 2")'
+      drop_target1 = '.group:contains("Test Group 1")'
+
+      get "/courses/#{@course.id}/groups"
+      expect(f(".group[data-id=\"#{@testgroup[0].id}\"] .group-summary")).to include_text('1 student')
+      expect(f(".group[data-id=\"#{@testgroup[1].id}\"] .group-summary")).to include_text('1 student')
+
+      f(".group[data-id=\"#{@testgroup[0].id}\"] .toggle-group").click
+      f(".group[data-id=\"#{@testgroup[1].id}\"] .toggle-group").click
+      wait_for_ajaximations
+
+      drag_and_drop_element(fj(drag_item1), fj(drop_target1))
+      wait_for_ajaximations
+
+      expect(f(".group[data-id=\"#{@testgroup[0].id}\"] .group-summary")).to include_text('2 students')
+      expect(f(".group[data-id=\"#{@testgroup[1].id}\"] .group-summary")).to include_text('0 students')
+    end
+
+    it 'should remove student using drag and drop', priority: "1", test_id: 94159 do
+      group_test_setup(1,1,1)
+      add_user_to_group(@students[0], @testgroup.first, false)
+
+      drag_item1 = '.group-user-name:contains("Test Student 1")'
+      drop_target1 = '.ui-cnvs-scrollable'
+
+      get "/courses/#{@course.id}/groups"
+
+      expect(f(".group[data-id=\"#{@testgroup[0].id}\"] .group-summary")).to include_text('1 student')
+      expect(fj('.unassigned-users-heading.group-heading')).to include_text('Unassigned Students (0)')
+
+      f(".group[data-id=\"#{@testgroup[0].id}\"] .toggle-group").click
+      wait_for_ajaximations
+
+      drag_and_drop_element(fj(drag_item1), fj(drop_target1))
+      wait_for_ajaximations
+
+      expect(f(".group[data-id=\"#{@testgroup[0].id}\"] .group-summary")).to include_text('0 students')
+      expect(fj(drop_target1)).to include_text('Test Student 1')
+      expect(fj('.unassigned-users-heading.group-heading')).to include_text('Unassigned Students (1)')
+    end
+
+    it 'should change group limit status with student drag and drop', priority: "1", test_id: 94164 do
+      group_test_setup(5,1,1)
+      @group_category.first.update_attribute(:group_limit,5)
+      5.times do |n|
+        add_user_to_group(@students[n], @testgroup.first, false)
+      end
+
+      drag_item1 = '.group-user-name:contains("Test Student 3")'
+      drop_target1 = '.ui-cnvs-scrollable'
+
+      get "/courses/#{@course.id}/groups"
+
+      expect(f(".group[data-id=\"#{@testgroup[0].id}\"] .group-summary")).to include_text('5 / 5 students')
+      expect(f(".group[data-id=\"#{@testgroup[0].id}\"] span.show-group-full")).to be_displayed
+      expect(fj('.unassigned-users-heading.group-heading')).to include_text('Unassigned Students (0)')
+
+      f(".group[data-id=\"#{@testgroup[0].id}\"] .toggle-group").click
+      wait_for_ajaximations
+
+      drag_and_drop_element(fj(drag_item1), fj(drop_target1))
+      wait_for_ajaximations
+
+      expect(f(".group[data-id=\"#{@testgroup[0].id}\"] span.show-group-full").css_value 'display').to eq 'none'
+      expect(f(".group[data-id=\"#{@testgroup[0].id}\"] .group-summary")).to include_text('4 / 5 students')
+      expect(fj('.unassigned-users-heading.group-heading')).to include_text('Unassigned Students (1)')
+      expect(fj(drop_target1)).to include_text('Test Student 3')
+    end
+
+    it 'should move leader via drag and drop', priority: "1", test_id: 96022 do
+      group_test_setup(5,1,2)
+      2.times do |n|
+        add_user_to_group(@students[n], @testgroup.first, false)
+        add_user_to_group(@students[n+2], @testgroup.last, false)
+      end
+      add_user_to_group(@students[4], @testgroup.last, true)
+
+      get "/courses/#{@course.id}/groups"
+
+      drag_item1 = '.group-user-name:contains("Test Student 5")'
+      drop_target1 = ".group[data-id=\"#{@testgroup[0].id}\"]"
+
+      f(".group[data-id=\"#{@testgroup[0].id}\"] .toggle-group").click
+      f(".group[data-id=\"#{@testgroup[1].id}\"] .toggle-group").click
+      wait_for_ajaximations
+
+      expect(f('.icon-user.group-leader')).to be_displayed
+
+      drag_and_drop_element(fj(drag_item1), fj(drop_target1))
+      wait_for_ajaximations
+
+      expect(f('.icon-user.group-leader')).to be_nil
+      expect(fj(drop_target1)).to include_text('Test Student 5')
+    end
+
     context "using clone group set modal" do
       it "should clone a group set including its groups and memberships" do
         group_test_setup(2,1,2)

@@ -75,7 +75,7 @@ def outcome_with_rubric(opts={})
   @outcome_group.save!
 
   rubric_params = {
-      :title => 'My Rubric',
+      :title => opts[:title] || 'My Rubric',
       :hide_score_total => false,
       :criteria => {
           "0" => {

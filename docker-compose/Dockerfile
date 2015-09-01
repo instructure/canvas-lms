@@ -9,6 +9,7 @@ RUN  apt-get update -qq \
        nodejs \
        postgresql-client \
        libxmlsec1-dev \
+  && npm install -g gulp \
   && rm -rf /var/lib/apt/lists/*
 
 # Ensure UTF-8 locale

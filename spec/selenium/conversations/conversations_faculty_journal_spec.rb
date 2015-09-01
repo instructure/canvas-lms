@@ -77,6 +77,23 @@ describe "conversations new" do
       compose course: @course, to: [@teacher], body: 'hallo!', send: false
       expect(f(".user_note")).not_to be_displayed
     end
+
+    it "should send a message with faculty journal checked", priority: "1", test_id: 75433 do
+      get_conversations
+      # First verify teacher can send a message with faculty journal entry checked to one student
+      compose course: @course, to: [@s1], body: 'hallo!', send: false
+      f('.user_note').click
+      click_send
+      expect(flash_message_present?(:success, /Message sent!/)).to be_truthy
+      # Now verify adding another user while the faculty journal entry checkbox is checked doesn't uncheck it and
+      #   still lets teacher know it was sent successfully.
+      compose course: @course, to: [@s1], body: 'hallo!', send: false
+      f('.user_note').click
+      add_message_recipient(@s2)
+      expect(is_checked('.user_note')).to be_truthy
+      click_send
+      expect(flash_message_present?(:success, /Message sent!/)).to be_truthy
+    end
   end
 end
 

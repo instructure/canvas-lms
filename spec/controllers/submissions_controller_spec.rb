@@ -365,6 +365,22 @@ describe SubmissionsController do
       }
       expect(@submission.reload.student_entered_score).to eq 2.0
     end
+
+    it "should create a provisional comment" do
+      course_with_student(:active_all => true)
+      user_session @teacher
+      @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_url,online_upload")
+      @submission = @assignment.submit_homework(@user)
+      put 'update', :format => :json, :course_id => @course.id, :assignment_id => @assignment.id, :id => @user.id,
+          :submission => {:comment => "provisional!", :provisional => true}
+
+      @submission.reload
+      expect(@submission.submission_comments.first).to be_nil
+      expect(@submission.provisional_grade(@teacher).submission_comments.first.comment).to eq 'provisional!'
+
+      json = JSON.parse response.body
+      expect(json[0]['submission']['submission_comments'].first['submission_comment']['comment']).to eq 'provisional!'
+    end
   end
 
   def course_with_student_and_submitted_homework

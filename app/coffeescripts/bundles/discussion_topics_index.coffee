@@ -58,7 +58,7 @@ require [
     # Returns nothing.
     fetchDiscussions: ->
       pipeline = new DiscussionTopicsCollection
-      pipeline.fetch(data: {order_by: 'recent_activity', per_page: 50})
+      pipeline.fetch(data: {plain_messages: true, exclude_assignment_descriptions: true, order_by: 'recent_activity', per_page: 50})
       pipeline.on('fetch', @_onPipelineLoad)
       pipeline.on('fetched:last', @_onPipelineEnd)
 

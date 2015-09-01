@@ -15,6 +15,13 @@ describe ContentMigration do
                                        :lock_at => @old_start + 3.days,
                                        :peer_reviews_due_at => @old_start + 4.days
         )
+
+        att = Attachment.create!(:context => @copy_from, :filename => 'hi.txt',
+          :uploaded_data => StringIO.new("stuff"), :folder => Folder.unfiled_folder(@copy_from))
+        att.unlock_at = @old_start + 2.days
+        att.lock_at = @old_start + 3.days
+        att.save!
+
         @copy_from.quizzes.create!(:due_at => "05 Jul 2012 06:00:00 UTC +00:00",
                                    :unlock_at => @old_start + 1.days,
                                    :lock_at => @old_start + 5.days,
@@ -63,6 +70,10 @@ describe ContentMigration do
         expect(new_asmnt.lock_at.to_i).to eq (@new_start + 3.day).to_i
         expect(new_asmnt.peer_reviews_due_at.to_i).to eq (@new_start + 4.day).to_i
 
+        new_att = @copy_to.attachments.first
+        expect(new_att.unlock_at.to_i).to eq (@new_start + 2.day).to_i
+        expect(new_att.lock_at.to_i).to eq (@new_start + 3.day).to_i
+
         new_quiz = @copy_to.quizzes.first
         expect(new_quiz.due_at.to_i).to  eq (@new_start + 4.day).to_i
         expect(new_quiz.unlock_at.to_i).to eq (@new_start + 1.day).to_i
@@ -108,6 +119,10 @@ describe ContentMigration do
         expect(new_asmnt.unlock_at).to be_nil
         expect(new_asmnt.lock_at).to be_nil
         expect(new_asmnt.peer_reviews_due_at).to be_nil
+
+        new_att = @copy_to.attachments.first
+        expect(new_att.unlock_at).to be_nil
+        expect(new_att.lock_at).to be_nil
 
         new_quiz = @copy_to.quizzes.first
         expect(new_quiz.due_at).to be_nil

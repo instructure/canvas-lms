@@ -213,13 +213,21 @@ define([
         }
       }
       if(clumpedButtons.length) {
+        var handleClick = function(){
+          var items = ExternalTools.clumpedButtonMapping(clumpedButtons, buttonSelected);
+          ExternalTools.attachClumpedDropdown($("#" + this._id), items, ed);
+        }
+
         ed.addButton('instructure_external_button_clump', {
           title: TRANSLATIONS.more_external_tools,
           image: '/images/downtick.png',
-          onclick: function(){
-            var items = ExternalTools.clumpedButtonMapping(clumpedButtons, buttonSelected);
-            ExternalTools.attachClumpedDropdown($("#" + this._id), items, ed);
-          }
+          onkeyup: function(event){
+            if (event.keyCode === 32 || event.keyCode === 13) {
+              event.stopPropagation()
+              handleClick.call(this)
+            }
+          },
+          onclick: handleClick
         })
       }
     },

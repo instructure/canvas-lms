@@ -34,7 +34,7 @@ gem 'bcrypt-ruby', '3.0.1'
 gem 'canvas_connect', '0.3.8'
   gem 'adobe_connect', '1.0.3', require: false
 gem 'canvas_webex', '0.15'
-gem 'canvas-jobs', '0.9.13'
+gem 'canvas-jobs', '0.9.15'
   gem 'rufus-scheduler', '3.1.2', require: false
 gem 'ffi', '1.1.5', require: false
 gem 'hairtrigger', '0.2.12'
@@ -73,7 +73,7 @@ gem 'flamegraph', '0.1.0', require: false
   gem 'stackprof', '0.2.7', require: false
 gem 'rake', '10.4.2'
 gem 'rdoc', '3.12'
-gem 'ratom-nokogiri', '0.10.3', require: false
+gem 'ratom-nokogiri', '0.10.4', require: false
 gem 'rdiscount', '1.6.8', require: false
 gem 'ritex', '1.0.1', require: false
 

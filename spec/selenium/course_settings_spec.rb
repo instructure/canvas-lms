@@ -130,6 +130,18 @@ describe "course settings" do
       expect(@course.time_zone.name).to eq time_zone_value
     end
 
+    it "should disable from Course Navigation tab", priority: "1", test_id: 112172 do
+      get "/courses/#{@course.id}/settings#tab-navigation"
+      ff(".al-trigger")[0].click
+      ff(".icon-x")[0].click
+      wait_for_ajaximations
+      f('#nav_form > p:nth-of-type(2) > button.btn.btn-primary').click
+      wait_for_ajaximations
+      f('.student_view_button').click
+      wait_for_ajaximations
+      expect(fln("Home")).not_to be_present
+    end
+
     it "should add a section" do
       section_name = 'new section'
       get "/courses/#{@course.id}/settings#tab-sections"
@@ -187,7 +199,6 @@ describe "course settings" do
     it "should move a nav item to disabled" do
       skip('fragile')
       get "/courses/#{@course.id}/settings#tab-navigation"
-
       keep_trying_until do
         body = f('body')
         expect(body).to include_text('Drag and drop items to reorder them in the course navigation.')

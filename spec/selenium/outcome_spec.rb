@@ -68,8 +68,12 @@ describe "outcomes" do
                                                               " before a score is returned.")
         end
 
-        it "should validate calculation int out of range values", priority: "1", test_id: 261708 do
-          should_validate_decaying_average
+        it "should validate decaying average_above_range", priority: "2", test_id: 261708 do
+          should_validate_decaying_average_above_range
+        end
+
+        it "should validate decaying average_below_range", priority: "2", test_id: 303710 do
+          should_validate_decaying_average_below_range
         end
 
         it "should validate calculation int accepatble values", priority: "1", test_id: 261709 do
@@ -99,8 +103,12 @@ describe "outcomes" do
                                                               " to calculate final score")
         end
 
-        it "should validate calculation int out of range values", priority: "1", test_id: 261712 do
-          should_validate_n_mastery
+        it "should validate n mastery_above_range", priority: "2", test_id: 261712 do
+          should_validate_n_mastery_above_range
+        end
+
+        it "should validate n mastery_below_range", priority: "2", test_id: 303711 do
+          should_validate_n_mastery_below_range
         end
 
         it "should validate calculation int acceptable range values", priority: "1", test_id: 261713 do

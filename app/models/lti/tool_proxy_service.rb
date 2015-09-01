@@ -96,9 +96,7 @@ module Lti
       message_handler.parameters = create_json(mh.parameter.as_json)
       message_handler.resource_handler = resource
       message_handler.save!
-      unless (mh.enabled_capabilities & ResourcePlacement::PLACEMENT_LOOKUP.keys).blank?
-        create_placements(mh, message_handler)
-      end
+      create_placements(mh, message_handler)
       message_handler.save!
       message_handler
     end
@@ -142,33 +140,19 @@ module Lti
         rh.messages.each do |mh|
           create_message_handler(mh, tp.tool_profile.base_message_url, resource_handler)
         end
-        create_placements_rh(rh, resource_handler) if resource_handler.placements.blank?
       end
     end
 
     def create_placements(mh, message_handler)
+      unless (mh.enabled_capabilities & ResourcePlacement::PLACEMENT_LOOKUP.keys).blank?
         mh.enabled_capability.each do |p|
           if ResourcePlacement::PLACEMENT_LOOKUP[p]
-            message_handler.placements.create(placement: ResourcePlacement::PLACEMENT_LOOKUP[p],
-                                              message_handler: message_handler,
-                                              resource_handler: message_handler.resource_handler)
-          end
-        end
-    end
-
-    def create_placements_rh(rh, resource_handler)
-      if rh.ext_placements
-        rh.ext_placements.each do |p|
-          if ResourcePlacement::PLACEMENT_LOOKUP[p]
-            resource_handler.placements.create(placement: ResourcePlacement::PLACEMENT_LOOKUP[p],
-                                               message_handler: resource_handler.message_handlers.where(message_type: 'basic-lti-launch-request').first)
+            message_handler.placements.create(placement: ResourcePlacement::PLACEMENT_LOOKUP[p])
           end
         end
       else
         ResourcePlacement::DEFAULT_PLACEMENTS.each do |p|
-          resource_handler.placements.create(placement: p,
-                                             message_handler: resource_handler.message_handlers.
-                                                 where(message_type: 'basic-lti-launch-request').first)
+          message_handler.placements.create(placement: p)
         end
       end
     end

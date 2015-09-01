@@ -4,6 +4,7 @@
   border: solid $ic-brand-primary 1px;
   border-radius: 20px;
   margin-top: 10px;
+  overflow: hidden;
 
   &.almost-done {
     border: solid $ic-color-success 1px;
@@ -14,7 +15,6 @@
   background: $ic-brand-primary;
   border: none;
   height: 9px;
-  border-radius: 20px;
 
   &.almost-done {
     background: $ic-color-success;

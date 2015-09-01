@@ -1,5 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/public_courses_context')
+require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
 
 describe "course syllabus" do
   include_context "in-process server selenium tests"
@@ -49,6 +50,15 @@ describe "course syllabus" do
       submit_form(edit_form)
       wait_for_ajaximations
       expect(f('#course_syllabus').text).to eq new_description
+    end
+
+    it "should insert a file using RCE in the syllabus", priority: "1", test_id: 126672 do
+      file = @course.attachments.create!(display_name: 'some test file', uploaded_data: default_uploaded_data)
+      file.context = @course
+      file.save!
+      get "/courses/#{@course.id}/assignments/syllabus"
+      f('.edit_syllabus_link').click
+      insert_file_from_rce
     end
 
     it "should validate Jump to Today works on the mini calendar", priority:"1", test_id: 237017 do

@@ -20,7 +20,7 @@ module Api::V1::SisAssignment
   include Api::V1::Json
 
   API_SIS_ASSIGNMENT_JSON_OPTS = {
-    only: %i(id description created_at due_at points_possible integration_id integration_data).freeze,
+    only: %i(id created_at due_at points_possible integration_id integration_data).freeze,
     methods: %i(name).freeze
   }.freeze
 

@@ -21,6 +21,27 @@ describe "context modules" do
       @course.reload
     end
 
+    def module_with_two_items
+      modules = create_modules(1, true)
+      modules[0].add_item({id: @assignment.id, type: 'assignment'})
+      modules[0].add_item({id: @assignment2.id, type: 'assignment'})
+      get "/courses/#{@course.id}/modules"
+      ff(".icon-mini-arrow-down")[1].click
+    end
+
+    it "should show all module items", priority: "1", test_id: 126743 do
+      module_with_two_items
+      f(".icon-mini-arrow-right").click
+      wait_for_ajaximations
+      expect(f('.context_module .content')).to be_displayed
+    end
+
+    it "should hide module items", priority: "1", test_id: 280415 do
+      module_with_two_items
+      wait_for_ajaximations
+      expect(f('.context_module .content')).not_to be_displayed
+    end
+
     it "should rearrange child objects in same module", priority: "1", test_id: 126733  do
       modules = create_modules(1, true)
       #attach 1 assignment to module 1 and 2 assignments to module 2 and add completion reqs
@@ -351,15 +372,13 @@ describe "context modules" do
       expect(module_item).to include_text(header_text)
     end
 
-    it "should hide and show module contents", priority: "1", test_id: 126732 do
+    it "should always show module contents on empty module", priority: "1", test_id: 126732 do
       get "/courses/#{@course.id}/modules"
-      add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
+      add_module 'Test module'
       ff(".icon-mini-arrow-down")[1].click
       wait_for_ajaximations
-      expect(f('.context_module .content')).not_to be_displayed
-      f('.icon-mini-arrow-right').click
-      wait_for_ajaximations
       expect(f('.context_module .content')).to be_displayed
+      expect(ff(".icon-mini-arrow-down")[1]).to be_displayed
     end
 
     it "should allow adding an item twice" do
@@ -924,7 +943,7 @@ describe "context modules" do
       expect(mod.name).to eq 'New Module'
     end
 
-    it "publishes an unpublished module" do
+    it "publishes an unpublished module", priority: "1", test_id: 280195 do
       add_module('New Module')
       wait_for_ajaximations
       expect(f('.context_module')).to have_class('unpublished_module')
@@ -937,7 +956,7 @@ describe "context modules" do
       expect(f('#context_modules .publish-icon-published')).to be_displayed
     end
 
-    it "unpublishes a published module" do
+    it "unpublishes a published module", priority: "1", test_id: 280196 do
       add_module('New Module')
       mod = @course.context_modules.first
       publish_module
@@ -947,6 +966,8 @@ describe "context modules" do
       mod.reload
       expect(mod).to be_unpublished
     end
+
+
 
     it "should edit a module", priority: "1", test_id: 126738 do
       edit_text = 'Module Edited'
@@ -1003,6 +1024,25 @@ describe "context modules" do
       get "/courses/#{@course.id}/modules"
       add_new_external_item('External URL', 'www.google.com', 'Google')
       expect(fln('Google')).to be_displayed
+    end
+
+    it "should add an external tool item to a module from apps", priority: "1", test_id: 126706 do
+      get "/courses/#{@course.id}/settings"
+      make_full_screen
+      wait_for_ajaximations
+      f("#tab-tools-link").click
+      f(".add_tool_link.lm").click
+      f(".dropdown-toggle").click
+      fln("By URL").click
+      ff(".input-block-level")[2].send_keys("Khan Academy")
+      ff(".input-block-level")[3].send_keys("key")
+      ff(".input-block-level")[4].send_keys("secret")
+      ff(".input-block-level")[5].send_keys("https://www.eduappcenter.com/configurations/rt6spjamqrgkduhr.xml")
+      ff(".btn-primary")[6].click
+      get "/courses/#{@course.id}/modules"
+      add_new_external_item('External Tool', 'https://www.edu-apps.org/lti_public_resources/launch?driver=khan_academy&remote_id=y2-uaPiyoxc', 'Counting with small numbers')
+      expect(fln('Counting with small numbers')).to be_displayed
+      expect(f('span.publish-icon.unpublished.publish-icon-publish > i.icon-unpublished')).to be_displayed
     end
 
     it "should add an external tool item to a module" do
@@ -1139,9 +1179,8 @@ describe "context modules" do
       @file.save!
     end
 
-    it "should add a file item to a module" do
+    it "should add a file item to a module", priority: "1", test_id: 126728 do
       get "/courses/#{@course.id}/modules"
-
       add_existing_module_item('#attachments_select', 'File', FILE_NAME)
     end
 

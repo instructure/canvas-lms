@@ -52,6 +52,8 @@ define [
 
     showGradingSchemeDialog: (ev) =>
       # TODO: clean up. slightly dependent on grading_standards.js
+      # NOTE grading_standards.js is loaded in a course settings
+      # context while this coffeescript appears not to be.
       ev.preventDefault()
       $("#edit_letter_grades_form").dialog(
         title: I18n.t('titles.grading_scheme_info', "View/Edit Grading Scheme"),

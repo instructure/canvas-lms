@@ -525,6 +525,16 @@ describe Account do
     expect(a.grants_right?(@user, :create_courses)).to be_truthy
   end
 
+  it "does not allow create_courses even to admins on site admin and children" do
+    a = Account.site_admin
+    a.settings = { :no_enrollments_can_create_courses => true }
+    manual = a.manually_created_courses_account
+    user
+
+    expect(a.grants_right?(@user, :create_courses)).to eq false
+    expect(manual.grants_right?(@user, :create_courses)).to eq false
+  end
+
   it "should correctly return sub-accounts as options" do
     a = Account.default
     sub = Account.create!(:name => 'sub', :parent_account => a)
@@ -659,6 +669,16 @@ describe Account do
       expect(tabs.map{|t| t[:id] }).to be_include(Account::TAB_DEVELOPER_KEYS)
 
       tabs = Account.site_admin.tabs_available(nil)
+      expect(tabs.map{|t| t[:id] }).not_to be_include(Account::TAB_DEVELOPER_KEYS)
+    end
+
+    it "should include 'Developer Keys' for the admin users of an account" do
+      account = Account.create!
+      account_admin_user(:account => account)
+      tabs = account.tabs_available(@admin)
+      expect(tabs.map{|t| t[:id] }).to be_include(Account::TAB_DEVELOPER_KEYS)
+
+      tabs = account.tabs_available(nil)
       expect(tabs.map{|t| t[:id] }).not_to be_include(Account::TAB_DEVELOPER_KEYS)
     end
 
@@ -1292,18 +1312,19 @@ describe Account do
     it "should inherit from a parent account's default_storage_quota" do
       enable_cache do
         account = account_model
-        subaccount = account.sub_accounts.create!
 
         account.default_storage_quota = 10.megabytes
         account.save!
 
+        subaccount = account.sub_accounts.create!
         expect(subaccount.default_storage_quota).to eq 10.megabytes
 
         # should reload
-        account.default_group_storage_quota = 20.megabytes
+        account.default_storage_quota = 20.megabytes
         account.save!
 
-        expect(subaccount.default_storage_quota).to eq 10.megabytes
+        subaccount = Account.find(subaccount)
+        expect(subaccount.default_storage_quota).to eq 20.megabytes
       end
     end
   end

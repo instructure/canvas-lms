@@ -13,7 +13,7 @@ kinesis:
   build: ./docker-compose/kinesalite
   command: "--path /var/lib/kinesalite"
   volumes:
-    - "tmp/cache:/var/lib/kinesalite"
+    - "./tmp/cache:/var/lib/kinesalite"
   ports:
     - "4567:4567"
   environment:
@@ -48,14 +48,9 @@ jobs:
   environment:
     RACK_ENV: development
 
-# guard is turbo-slow because it relies on polling to see updates
-# (because the volume is shared over NFS, so no inotify stuff.)
-# This probably isn't a good solution for you if you're doing lots
-# of js/css development. It may take minutes for changes to be
-# reflected.
 guard:
   build: ./docker-compose
-  command: bundle exec guard -i -p
+  command: bundle exec guard -i
   ports:
     - "4000:4000"
   volumes:

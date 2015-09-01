@@ -19,7 +19,7 @@
 define([
   'underscore',
   'compiled/models/ModuleFile',
-  'compiled/react_files/components/PublishCloud',
+  'jsx/shared/PublishCloud',
   'react',
   'compiled/models/PublishableModuleItem',
   'compiled/views/PublishIconView',
@@ -667,12 +667,13 @@ define([
       updatePrerequisites($module, data.context_module.prerequisites);
 
       // Update requirement message pill
-      if (data.context_module.completion_requirements.length === 0) {
-        $module.find('.requirements_message').replaceWith("<div class='no-requirements'></div>");
-      } else {
-        newPillMessage($module, data.context_module.requirement_count);
+      if (ENV.MODULE_FILE_PERMISSIONS.module_progression_any_condition){
+        if (data.context_module.completion_requirements.length === 0) {
+          $module.find('.requirements_message').replaceWith("<div class='no-requirements'></div>");
+        } else {
+          newPillMessage($module, data.context_module.requirement_count);
+        }
       }
-
       $module.find(".context_module_items .context_module_item")
         .removeClass('progression_requirement')
         .removeClass('min_score_requirement')
@@ -852,7 +853,7 @@ define([
       $pre.slideDown();
       $(".require-sequential").children().show();
       $(".requirement-count-radio .ic-Radio").children().show();
-      $select.change().focus();
+      $('#context_module_requirement_count_').change().focus();
     });
     $("#completion_criterion_option .id").change(function() {
       var $option = $(this).parents(".completion_criterion_option");
@@ -1618,7 +1619,7 @@ define([
             // Makes sure the resulting item has focus.
             $module.find(".collapse_module_link").focus();
             $.screenReaderFlashMessage(I18n.t('Expanded'));
-            
+
           } else {
             $module.find(".footer .manage_module").css('display', ''); //'none');
             $module.toggleClass('collapsed_module', true);

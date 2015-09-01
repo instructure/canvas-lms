@@ -18,6 +18,8 @@
   }
 }
 
+.ic-notification + .recent-activity-header { margin-top: $ic-sp*2; }
+
 .recent_activity > li {
   position: relative;
   border-bottom: 1px solid #ddd;

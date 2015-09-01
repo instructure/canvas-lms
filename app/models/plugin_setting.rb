@@ -101,9 +101,8 @@ class PluginSetting < ActiveRecord::Base
 
   def self.cached_plugin_setting(name)
     plugin_setting = MultiCache.fetch(settings_cache_key(name)) do
-      PluginSetting.find_by_name(name.to_s) || :nil
+      PluginSetting.find_by_name(name.to_s)
     end
-    plugin_setting = nil if plugin_setting == :nil
     plugin_setting
   end
 
@@ -121,7 +120,7 @@ class PluginSetting < ActiveRecord::Base
   end
 
   def self.settings_cache_key(name)
-    ["settings_for_plugin2", name].cache_key
+    ["settings_for_plugin3", name].cache_key
   end
 
   def clear_cache

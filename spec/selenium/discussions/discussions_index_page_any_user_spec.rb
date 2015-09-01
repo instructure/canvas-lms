@@ -21,7 +21,7 @@ describe "discussions" do
 
       let(:topic) { somebody_topic }
 
-      it "should start a new topic", priority: "1", test_id: 270929 do
+      it "should start a new topic", priority: "1", test_id: 140669 do
         get url
         expect_new_page_load { f('.btn-primary').click }
         edit('new topic title', 'new topic')

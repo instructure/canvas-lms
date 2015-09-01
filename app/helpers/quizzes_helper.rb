@@ -661,7 +661,7 @@ module QuizzesHelper
     return user_answer[:points] unless user_answer[:correct] == 'undefined'
 
     if ["assignment", "practice_quiz"].include?(@quiz.quiz_type)
-      "--"
+      ""
     else
       question[:points_possible] || 0
     end

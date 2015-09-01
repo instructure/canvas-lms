@@ -90,7 +90,8 @@ class ActiveRecord::Base
     'failed_jobs' => %w(original_id).freeze,
     'gradebook_uploads' => %w(context_type context_id).freeze,
     'grading_periods' => %w(course_id account_id).freeze,
-    'groups' => %w(sis_name type groupable_id groupable_type).freeze,
+    'groups' => %w(sis_name type groupable_id groupable_type hashtag
+                   show_public_context_messages).freeze,
     'messages' => %w(cc bcc).freeze,
     'notification_policies' => %w(user_id broadcast).freeze,
     'page_views' => %w(contributed).freeze,
@@ -100,6 +101,7 @@ class ActiveRecord::Base
                        crypted_webdav_access_code
                        type).freeze,
     'role_overrides' => %w(context_code enrollment_type).freeze,
+    'rubric_assessments' => %w{comments}.freeze,
     'users' => %w(type
                   creation_unique_id
                   creation_sis_batch_id
@@ -111,7 +113,9 @@ class ActiveRecord::Base
     'stream_items' => %w(context_code item_asset_string).freeze,
     'stream_item_instances' => %w(context_code).freeze,
     'submissions' => %w(changed_since_publish late).freeze,
-    'wiki_pages' => %w(hide_from_students).freeze
+    'wiki_pages' => %w(hide_from_students).freeze,
+    'lti_resource_placements' => %w(resource_handler_id).freeze,
+    'moderated_grading_provisional_grades' => %w(position).freeze
   }.freeze
 
   def self.columns_with_remove_dropped_columns

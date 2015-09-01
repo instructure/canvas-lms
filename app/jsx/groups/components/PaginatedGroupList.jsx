@@ -2,7 +2,7 @@
 
 define([
   'i18n!student_groups',
-  'old_unsupported_dont_use_react',
+  'react',
   'jsx/groups/mixins/InfiniteScroll',
   'jsx/groups/components/Group'
 

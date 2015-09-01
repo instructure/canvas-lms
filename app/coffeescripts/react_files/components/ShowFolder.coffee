@@ -5,20 +5,19 @@ define [
   'i18n!react_files'
   'compiled/react/shared/utils/withReactElement'
   '../modules/filesEnv'
-  './ColumnHeaders'
-  './LoadingIndicator'
+  'jsx/files/ColumnHeaders'
+  'jsx/files/LoadingIndicator'
   './FolderChild'
   '../utils/getAllPages'
   '../utils/updateAPIQuerySortParams'
   'compiled/models/Folder'
-  './CurrentUploads'
-  './FilePreview'
+  'jsx/files/CurrentUploads'
+  'jsx/files/FilePreview'
   './UploadDropZone'
   '../utils/forceScreenreaderToReparse'
-], (React, Router, _, I18n, withReactElement, filesEnv, ColumnHeadersComponent, LoadingIndicatorComponent, FolderChildComponent, getAllPages, updateAPIQuerySortParams, Folder, CurrentUploadsComponent, FilePreviewComponent, UploadDropZoneComponent, forceScreenreaderToReparse) ->
+], (React, Router, _, I18n, withReactElement, filesEnv, ColumnHeadersComponent, LoadingIndicator, FolderChildComponent, getAllPages, updateAPIQuerySortParams, Folder, CurrentUploadsComponent, FilePreviewComponent, UploadDropZoneComponent, forceScreenreaderToReparse) ->
 
-  ColumnHeaders = React.createFactory ColumnHeadersComponent
-  LoadingIndicator = React.createFactory LoadingIndicatorComponent
+  ColumnHeaders = ColumnHeadersComponent
   FolderChild = React.createFactory FolderChildComponent
   CurrentUploads = React.createFactory CurrentUploadsComponent
   FilePreview = React.createFactory FilePreviewComponent

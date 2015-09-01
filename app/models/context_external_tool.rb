@@ -135,13 +135,18 @@ class ContextExternalTool < ActiveRecord::Base
   def label_for(key, lang=nil)
     lang = lang.to_s if lang
     labels = settings[key] && settings[key][:labels]
-    labels2 = settings[:labels]
     (labels && labels[lang]) ||
       (labels && lang && labels[lang.split('-').first]) ||
       (settings[key] && settings[key][:text]) ||
-      (labels2 && labels2[lang]) ||
-      (labels2 && lang && labels2[lang.split('-').first]) ||
-      settings[:text] || name || "External Tool"
+      default_label(lang)
+  end
+
+  def default_label(lang = nil)
+    lang = lang.to_s if lang
+    default_labels = settings[:labels]
+    (default_labels && default_labels[lang]) ||
+        (default_labels && lang && default_labels[lang.split('-').first]) ||
+        settings[:text] || name || "External Tool"
   end
 
   def check_for_xml_error
@@ -643,7 +648,7 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   def self.context_id_for(asset, shard)
-    str = asset.asset_string.to_s
+    str = asset.global_asset_string.to_s
     raise "Empty value" if str.blank?
     Canvas::Security.hmac_sha1(str, shard.settings[:encryption_key])
   end

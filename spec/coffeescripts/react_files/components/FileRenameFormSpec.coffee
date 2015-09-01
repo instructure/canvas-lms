@@ -1,7 +1,7 @@
 define [
   'react'
   'jquery'
-  'compiled/react_files/components/FileRenameForm'
+  'jsx/files/FileRenameForm'
   'compiled/models/Folder'
 ], (React, $, FileRenameForm, Folder) ->
 

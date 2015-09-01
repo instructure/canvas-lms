@@ -43,13 +43,14 @@ define([
                         // tiny can require it themselves or else we have
                         // build problems
   'INST', // for IE detection; need to handle links in a special way
+  'decode_string',
   'jqueryui/draggable' /* /\.draggable/ */,
   'jquery.instructure_misc_plugins' /* /\.indicate/ */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'vendor/jquery.ba-tinypubsub'
 ], function(I18nObj, $,
             EditorAccessibility, EditorBoxList, EditorConfig, EditorCommands,
-            Utils, INST) {
+            Utils, INST, decodeString) {
 
   var enableBookmarking = !!INST.browser.ie;
   $(document).ready(function() {
@@ -508,6 +509,8 @@ define([
     if(anchor.nodeName !== "A") { anchor = null; }
 
     var selectedContent = options.selectedContent || selection.getContent();
+    var selectedContent = decodeString(selectedContent)
+
     if($instructureEditorBoxList._getEditor(id).isHidden()) {
       selectionText = defaultText;
       var $div = $("<div><a/></div>");

@@ -15,6 +15,7 @@ describe "quizzes attempts" do
   end
 
   it "should be accesible for student in the main section", priority: "1", test_id: 114315, priority: "1"  do
+    skip('going to replace with better test coverage in subsequent commit')
     get "/courses/#{@course1.id}/quizzes"
     expect_new_page_load { f("#summary_quiz_#{@quiz.id}").click }
     due_at_time = @quiz.due_at.strftime('%b %-d at %-l:%M') << @quiz.due_at.strftime('%p').downcase

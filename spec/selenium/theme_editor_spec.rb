@@ -14,6 +14,7 @@ describe 'Theme Editor' do
     get "/accounts/#{Account.default.id}"
 
     fj('#right-side > div:nth-of-type(4) > a.btn.button-sidebar-wide').click
+    wait_for_ajaximations
     expect(fj('.Theme__editor-header_title').text).to include_text 'Theme Editor'
   end
 

@@ -1,0 +1,16 @@
+test:
+  host: "localhost"
+  port: 4444
+  browser: "firefox"
+  school_domain:
+    # URL to Canvas environment
+    # "twilson"
+  appium_host_url:
+    # setting path for test server
+    # "10.0.15.242"
+  # iOS device settings
+  ios_version: "8.4"
+  ios_device_name: "iPad"
+  ios_udid: "Put the unique device id here"
+  ios_type: "iPad"
+  ios_app_path: "Put the setting path for icanvas here"

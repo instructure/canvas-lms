@@ -214,7 +214,7 @@ module Api::V1::User
         lockedbysis &&= !enrollment.course.account.grants_right?(@current_user, session, :manage_account_settings)
         json[:locked] = lockedbysis
       end
-      if includes.include?('observed_users') && enrollment.observer? && enrollment.associated_user
+      if includes.include?('observed_users') && enrollment.observer? && enrollment.associated_user && !enrollment.associated_user.deleted?
         json[:observed_user] = user_json(enrollment.associated_user, user, session, user_includes, @context, enrollment.associated_user.not_ended_enrollments.all_student.shard(enrollment).where(:course_id => enrollment.course_id))
       end
     end

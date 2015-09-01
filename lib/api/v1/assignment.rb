@@ -43,6 +43,7 @@ module Api::V1::Assignment
       grade_group_students_individually
       group_category_id
       grading_standard_id
+      moderated_grading
     )
   }.freeze
 
@@ -138,7 +139,7 @@ module Api::V1::Assignment
     end
 
     if assignment.grants_right?(user, :grade)
-      query = Assignments::NeedsGradingCountQuery.new(assignment, user)
+      query = Assignments::NeedsGradingCountQuery.new(assignment, user, opts[:needs_grading_course_proxy])
       if opts[:needs_grading_count_by_section]
         hash['needs_grading_count_by_section'] = query.count_by_section
       end
@@ -195,7 +196,7 @@ module Api::V1::Assignment
         assignment.discussion_topic.context,
         user,
         session,
-        include_assignment: false)
+        include_assignment: false, exclude_messages: opts[:exclude_description])
     end
 
     if opts[:include_all_dates] && assignment.assignment_overrides
@@ -470,6 +471,10 @@ module Api::V1::Assignment
     post_to_sis = assignment_params.key?('post_to_sis') ? value_to_boolean(assignment_params['post_to_sis']) : nil
     unless post_to_sis.nil? || !Assignment.sis_grade_export_enabled?(assignment.context)
       assignment.post_to_sis = post_to_sis
+    end
+
+    if assignment.context.feature_enabled?(:moderated_grading) && assignment_params.key?('moderated_grading')
+      assignment.moderated_grading = value_to_boolean(assignment_params['moderated_grading'])
     end
 
     assignment.updating_user = user

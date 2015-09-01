@@ -41,7 +41,8 @@ class OutcomesController < ApplicationController
            :COMMON_CORE_GROUP_ID => common_core_group_id,
            :COMMON_CORE_GROUP_URL => common_core_group_url,
            :PERMISSIONS => {
-             :manage_outcomes => @context.grants_right?(@current_user, session, :manage_outcomes)
+             :manage_outcomes => @context.grants_right?(@current_user, session, :manage_outcomes),
+             :manage_rubrics => @context.grants_right?(@current_user, session, :manage_rubrics)
            })
   end
 

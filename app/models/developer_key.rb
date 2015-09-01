@@ -47,6 +47,12 @@ class DeveloperKey < ActiveRecord::Base
     get_special_key("User-Generated")
   end
 
+  def authorized_for_account?(target_account)
+    return true unless account_id
+    account_ids = target_account.account_chain.map{|acct| acct.global_id}
+    account_ids.include? account.global_id
+  end
+
   def account_name
     account.try(:name)
   end

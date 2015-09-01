@@ -3,7 +3,7 @@ define [
   'react-router'
   'jquery'
   'compiled/react_files/modules/filesEnv'
-  'compiled/react_files/components/Breadcrumbs'
+  'jsx/files/Breadcrumbs'
   'compiled/models/Folder'
   '../mockFilesENV'
   '../TestLocation'

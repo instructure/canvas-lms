@@ -98,6 +98,28 @@ describe GroupsController do
   end
 
   describe "GET index" do
+    it 'should split up current and previous groups' do
+      course1 = @course
+      group_with_user(group_context: course1, user: @student, active_all: true)
+      group1 = @group
+
+      course_with_teacher(active_all: true)
+      course2 = @course
+
+      course2.soft_conclude!
+      course2.save!
+
+      create_enrollments(course2, [@student])
+      group_with_user(group_context: course2, user: @student, active_all: true)
+      group2 = @group
+
+      user_session(@student)
+
+      get 'index'
+      expect(assigns[:current_groups]).to eq([group1])
+      expect(assigns[:previous_groups]).to eq([group2])
+    end
+
     describe 'pagination' do
       before :once do
         group_with_user(:group_context => @course, :user => @student, :active_all => true)
@@ -110,7 +132,7 @@ describe GroupsController do
 
       it "should not paginate non-json" do
         get 'index', :per_page => 1
-        expect(assigns[:groups]).to eq @student.current_groups.by_name
+        expect(assigns[:current_groups]).to eq @student.current_groups.by_name
         expect(response.headers['Link']).to be_nil
       end
 

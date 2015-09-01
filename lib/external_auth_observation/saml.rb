@@ -5,7 +5,7 @@ module ExternalAuthObservation
     def initialize(account, request, response)
       @request = request
       @response = response
-      @account_auth_config = account.account_authorization_configs.where(parent_registration: true).first
+      @account_auth_config = account.authentication_providers.where(parent_registration: true).first
       @saml_settings = account_auth_config.saml_settings(request.host_with_port)
     end
 

@@ -36,8 +36,7 @@ SECONDS_UNTIL_GIVING_UP = 20
 MAX_SERVER_START_TIME = 60
 
 #NEED BETTER variable handling
-THIS_ENV = ENV['TEST_ENV_NUMBER'].to_i
-THIS_ENV = 1 if ENV['TEST_ENV_NUMBER'].blank?
+THIS_ENV = ENV['TEST_ENV_NUMBER'].present? ? ENV['TEST_ENV_NUMBER'].to_i : 1
 WEBSERVER = (ENV['WEBSERVER'] || 'thin').freeze
 
 $server_port = nil

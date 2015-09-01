@@ -2,52 +2,6 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/gradebook2_common')
 describe "group weights" do
   include_context "in-process server selenium tests"
 
-  def get_group_points
-    group_points_holder = keep_trying_until do
-      group_points_holder = ff('div.assignment-points-possible')
-      group_points_holder
-    end
-    group_points_holder
-  end
-
-  def check_group_points(expected_weight_text)
-    for i in 2..3 do
-      expect(get_group_points[i].text).to eq expected_weight_text[i-2] + ' of grade'
-    end
-  end
-
-  def set_group_weight(assignment_group, weight_number)
-    f('#gradebook_settings').click
-    wait_for_ajaximations
-    f('[aria-controls="assignment_group_weights_dialog"]').click
-
-    dialog = f('#assignment_group_weights_dialog')
-    expect(dialog).to be_displayed
-
-    group_check = dialog.find_element(:id, 'group_weighting_scheme')
-    keep_trying_until do
-      group_check.click
-      expect(is_checked('#group_weighting_scheme')).to be_truthy
-    end
-    group_weight_input = f("#assignment_group_#{assignment_group.id}_weight")
-    set_value(group_weight_input, "")
-    set_value(group_weight_input, weight_number)
-    fj('.ui-button:contains("Save")').click
-    wait_for_ajaximations
-    expect(@course.reload.group_weighting_scheme).to eq 'percent'
-  end
-
-  def validate_group_weight_text(assignment_groups, weight_numbers)
-    assignment_groups.each_with_index do |ag, i|
-      heading = fj(".slick-column-name:contains('#{ag.name}') .assignment-points-possible")
-      expect(heading).to include_text("#{weight_numbers[i]}% of grade")
-    end
-  end
-
-  def validate_group_weight(assignment_group, weight_number)
-    expect(assignment_group.reload.group_weight).to eq weight_number
-  end
-
   before (:each) do
     course_with_teacher_logged_in
     student_in_course
@@ -102,5 +56,48 @@ describe "group weights" do
     f('#class_weighting_policy').click
     wait_for_ajaximations
     check_group_points('0%')
+  end
+
+  context "warning message" do
+    before (:each) do
+      course_with_teacher_logged_in
+      student_in_course
+      @course.update_attributes(:group_weighting_scheme => 'percent')
+      @group1 = @course.assignment_groups.create!(:name => 'first assignment group', :group_weight => 50)
+      @group2 = @course.assignment_groups.create!(:name => 'second assignment group', :group_weight => 50)
+      @assignment1 = assignment_model({
+                                          :course => @course,
+                                          :name => 'first assignment',
+                                          :due_at => Date.today,
+                                          :points_possible => 50,
+                                          :submission_types => 'online_text_entry',
+                                          :assignment_group => @group1
+                                      })
+      @assignment2 = assignment_model({
+                                          :course => @course,
+                                          :name => 'second assignment',
+                                          :due_at => Date.today,
+                                          :points_possible => 0,
+                                          :submission_types => 'online_text_entry',
+                                          :assignment_group => @group2
+                                      })
+      @course.reload
+    end
+
+    it 'should display trangle warnings for assignment groups with 0 points possible', priority: "1", test_id: 164013 do
+      get "/courses/#{@course.id}/gradebook"
+      refresh_page
+      expect(ff('.icon-warning').count).to eq(2)
+    end
+
+    it 'should remove trangle warnings if group weights are turned off in gradebook', priority: "1", test_id: 305579 do
+      get "/courses/#{@course.id}/gradebook"
+      f('#gradebook_settings').click
+      f('#ui-id-4').click
+      f('#group_weighting_scheme').click
+      submit_dialog('.ui-dialog-buttonset', '.ui-button')
+      refresh_page
+      expect(ff('.icon-warning').count).to eq(0)
+    end
   end
 end

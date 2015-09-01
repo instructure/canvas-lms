@@ -108,13 +108,11 @@ module Lti
         @mh1 = create_message_handler(rh1)
         @mh2 = create_message_handler(rh2)
         @mh3 = create_message_handler(rh3)
-        rh1.placements.create!(placement: ResourcePlacement::ACCOUNT_NAVIGATION, message_handler: @mh1)
-        rh1.placements.create!(placement: ResourcePlacement::COURSE_NAVIGATION, message_handler: @mh1)
-        rh2.placements.create!(placement: ResourcePlacement::ACCOUNT_NAVIGATION, message_handler: @mh2)
-        rh3.placements.create!(placement: ResourcePlacement::COURSE_NAVIGATION, message_handler: @mh3)
+        @mh1.placements.create!(placement: ResourcePlacement::ACCOUNT_NAVIGATION)
+        @mh1.placements.create!(placement: ResourcePlacement::COURSE_NAVIGATION)
+        @mh2.placements.create!(placement: ResourcePlacement::ACCOUNT_NAVIGATION)
+        @mh3.placements.create!(placement: ResourcePlacement::COURSE_NAVIGATION)
       end
-
-
 
       it 'filters on one placement type' do
         handlers = described_class.has_placements(ResourcePlacement::ACCOUNT_NAVIGATION)
@@ -144,10 +142,10 @@ module Lti
         @mh1 = create_message_handler(rh1)
         @mh2 = create_message_handler(rh2)
         @mh3 = create_message_handler(rh3)
-        rh1.placements.create(placement: ResourcePlacement::ACCOUNT_NAVIGATION, message_handler: @mh1)
-        rh1.placements.create(placement: ResourcePlacement::COURSE_NAVIGATION, message_handler: @mh1)
-        rh2.placements.create(placement: ResourcePlacement::ACCOUNT_NAVIGATION, message_handler: @mh2)
-        rh3.placements.create(placement: ResourcePlacement::COURSE_NAVIGATION, message_handler: @mh3)
+        @mh1.placements.create!(placement: ResourcePlacement::ACCOUNT_NAVIGATION)
+        @mh1.placements.create!(placement: ResourcePlacement::COURSE_NAVIGATION)
+        @mh2.placements.create!(placement: ResourcePlacement::ACCOUNT_NAVIGATION)
+        @mh3.placements.create!(placement: ResourcePlacement::COURSE_NAVIGATION)
       end
 
       it 'converts a message handler into json tab' do

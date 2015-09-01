@@ -89,7 +89,7 @@ module Lti
     end
 
     def self.lti2_placements(message_handler, placements)
-      resource_placements = message_handler.resource_handler.placements.pluck(:placement)
+      resource_placements = message_handler.placements.pluck(:placement)
       valid_placements = resource_placements.present? ? resource_placements & placements : ResourcePlacement::DEFAULT_PLACEMENTS
       valid_placements.each_with_object({}) { |p, hsh| hsh[p.to_sym] = lti2_placement(message_handler) }
     end

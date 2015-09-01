@@ -2,7 +2,7 @@ define [
   'jquery'
   'react'
   'compiled/models/File'
-  'compiled/react_files/components/DragFeedback'
+  'jsx/files/DragFeedback'
 ], ($, React, File, DragFeedback) ->
   TestUtils = React.addons.TestUtils
   DragFeedback = React.createFactory DragFeedback

@@ -191,6 +191,10 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly, RCEKeyboardSho
       @_attachEditorToDescription()
       $ @_initializeWikiSidebar
       @addTinyMCEKeyboardShortcuts()
+      if ENV?.HAS_GRADED_SUBMISSIONS
+        @$('#assignment_moderated_grading').prop("disabled", true).
+          parent().attr('data-tooltip', 'top').
+          attr('title', I18n.t("Moderated grading setting cannot be changed if graded submissions exist"))
       this
 
     toJSON: =>
@@ -198,6 +202,7 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly, RCEKeyboardSho
       _.extend data,
         kalturaEnabled: ENV?.KALTURA_ENABLED or false
         postToSISEnabled: ENV?.POST_TO_SIS or false
+        moderatedGradingEnabled: ENV?.MODERATED_GRADING or false
         isLargeRoster: ENV?.IS_LARGE_ROSTER or false
         submissionTypesFrozen: _.include(data.frozenAttributes, 'submission_types')
         differentiatedAssignmentsEnabled: @assignment.differentiatedAssignmentsEnabled()

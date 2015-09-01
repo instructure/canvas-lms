@@ -11,6 +11,7 @@ def create_notification(values = {})
 end
 
 def create_scribd_mime_type(ext, name)
+  ping
   ScribdMimeType.where(extension: ext, name: name).first_or_create
 end
 
@@ -38,55 +39,32 @@ namespace :db do
 
   desc "Make sure all scribd mime types are set up correctly"
   task :ensure_scribd_mime_types => :load_environment do
-    ping
     create_scribd_mime_type('doc', 'application/msword')
-    ping
     create_scribd_mime_type('ppt', 'application/vnd.ms-powerpoint')
-    ping
     create_scribd_mime_type('pdf', 'application/pdf')
-    ping
     create_scribd_mime_type('xls', 'application/vnd.ms-excel')
-    ping
     create_scribd_mime_type('ps', 'application/postscript')
-    ping
     create_scribd_mime_type('rtf', 'application/rtf')
-    ping
     create_scribd_mime_type('rtf', 'text/rtf')
-    ping
     create_scribd_mime_type('docx', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document')
-    ping
     create_scribd_mime_type('pptx', 'application/vnd.openxmlformats-officedocument.presentationml.presentation')
-    ping
     create_scribd_mime_type('xlsx', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-    ping
     create_scribd_mime_type('ppt', 'application/mspowerpoint')
-    ping
     create_scribd_mime_type('xls', 'application/excel')
-    ping
     create_scribd_mime_type('txt', 'text/plain')
-    ping
     create_scribd_mime_type('odt', 'application/vnd.oasis.opendocument.text')
-    ping
     create_scribd_mime_type('odp', 'application/vnd.oasis.opendocument.presentation')
-    ping
     create_scribd_mime_type('ods', 'application/vnd.oasis.opendocument.spreadsheet')
-    ping
     create_scribd_mime_type('sxw', 'application/vnd.sun.xml.writer')
-    ping
     create_scribd_mime_type('sxi', 'application/vnd.sun.xml.impress')
-    ping
     create_scribd_mime_type('sxc', 'application/vnd.sun.xml.calc')
-    ping
     create_scribd_mime_type('xltx', 'application/vnd.openxmlformats-officedocument.spreadsheetml.template')
-    ping
     create_scribd_mime_type('ppsx', 'application/vnd.openxmlformats-officedocument.presentationml.slideshow')
-    ping
     create_scribd_mime_type('potx', 'application/vnd.openxmlformats-officedocument.presentationml.template')
-    ping
     create_scribd_mime_type('dotx', 'application/vnd.openxmlformats-officedocument.wordprocessingml.template')
-    ping
     puts 'Scribd Mime Types added'
   end
+
   desc "Make sure all message templates have notifications in the db"
   task :evaluate_notification_templates => :load_environment do
     Dir.glob(Rails.root.join('app', 'messages', '*.erb')) do |filename|
@@ -258,5 +236,3 @@ namespace :db do
   end
 
 end # Namespace: db
-
-

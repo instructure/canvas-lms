@@ -4,7 +4,7 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/context_modules_comm
 describe "context modules" do
   include_context "in-process server selenium tests"
 
-  context "as a student", priority: "1" do
+  context "as a student, with multiple modules", priority: "1" do
     before(:each) do
       @locked_icon = 'icon-lock'
       @completed_icon = 'icon-check'
@@ -140,7 +140,7 @@ describe "context modules" do
       expect(f('#module_prerequisites_list')).to be_displayed
     end
 
-    it "should validate that a student can't get to an unpublished context module" do
+    it "should validate that a student can't get to an unpublished context module item" do
       @module_2.workflow_state = 'unpublished'
       @module_2.save!
 
@@ -593,5 +593,27 @@ describe "context modules" do
     wait_for_ajaximations
     expect(f("#module_prerequisites_list")).to be_displayed
     expect(f(".module_prerequisites_fallback")).to_not be_displayed
+  end
+
+  it "should validate that a student can see published and not see unpublished context module", priority: "1", test_id: 126744 do
+    course_with_teacher(active_all: true)
+    student_in_course(course: @course, active_all: true)
+    @module = @course.context_modules.create!(name: "module")
+    @module_1 = @course.context_modules.create!(name: "module_1")
+    @module_1.workflow_state = 'unpublished'
+    @module_1.save!
+    user_session(@student)
+    go_to_modules
+    expect(f("#context_modules").text).to eq "module"
+    expect(f("#context_modules").text).not_to include_text "module_1"
+  end
+
+  it "should unlock module after a given date", priority: "1", test_id: 126746 do
+    course_with_teacher(active_all: true)
+    student_in_course(course: @course, active_all: true)
+    mod_lock = @course.context_modules.create! name: 'a_locked_mod', unlock_at: 1.day.ago
+    user_session(@student)
+    go_to_modules
+    expect(fj("#context_module_content_#{mod_lock.id} .unlock_details").text).not_to include_text 'Will unlock'
   end
 end

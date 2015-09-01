@@ -43,10 +43,10 @@ describe "account_authorization_configs/index" do
   end
 
   it "should display the last_timeout_failure" do
-    timed_out_aac = account.account_authorization_configs.create!(auth_type: 'ldap')
+    timed_out_aac = account.authentication_providers.create!(auth_type: 'ldap')
     account.authentication_providers = [
       timed_out_aac,
-      account.account_authorization_configs.create!(auth_type: 'ldap')
+      account.authentication_providers.create!(auth_type: 'ldap')
     ]
     timed_out_aac.last_timeout_failure = 1.minute.ago
     timed_out_aac.save!

@@ -18,6 +18,14 @@ class BrandConfig < ActiveRecord::Base
 
   has_many :accounts, foreign_key: 'brand_config_md5'
 
+  scope :without_k12, lambda { where("md5 != ?", BrandConfig.k12_config) }
+
+  scope :shared, -> (account = nil) {
+    shared_scope = where(share: true)
+    shared_scope = shared_scope.without_k12 unless account && account.feature_enabled?(:k12)
+    shared_scope
+  }
+
   def self.for(variables:, js_overrides:, css_overrides:)
     if variables.blank? && js_overrides.blank? && css_overrides.blank?
       default
@@ -30,6 +38,10 @@ class BrandConfig < ActiveRecord::Base
 
   def self.default
     new
+  end
+
+  def self.k12_config
+    BrandConfig.where(name: 'K12 Theme', share: true).first
   end
 
   def default?

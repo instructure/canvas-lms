@@ -390,9 +390,9 @@ class ExternalToolsController < ApplicationController
   end
   protected :find_tool
 
-  def lti_launch(tool, selection_type)
+  def lti_launch(tool, selection_type = nil)
     @return_url ||= url_for(@context)
-    message_type = tool.extension_setting(selection_type, 'message_type')
+    message_type = tool.extension_setting(selection_type, 'message_type') if selection_type
     case message_type
       when 'ContentItemSelectionResponse', 'ContentItemSelection'
         #ContentItemSelectionResponse is deprecated, use ContentItemSelection instead
@@ -405,8 +405,8 @@ class ExternalToolsController < ApplicationController
   end
   protected :lti_launch
 
-  def basic_lti_launch_request(tool, selection_type)
-    lti_launch = @tool.settings['post_only'] ? Lti::Launch.new(post_only: true) : Lti::Launch.new
+  def basic_lti_launch_request(tool, selection_type = nil)
+    lti_launch = tool.settings['post_only'] ? Lti::Launch.new(post_only: true) : Lti::Launch.new
 
     opts = {
         resource_type: selection_type,
@@ -418,7 +418,7 @@ class ExternalToolsController < ApplicationController
     lti_launch.params = assignment ? adapter.generate_post_payload_for_homework_submission(assignment) : adapter.generate_post_payload
 
     lti_launch.resource_url = adapter.launch_url
-    lti_launch.link_text = tool.label_for(selection_type.to_sym, I18n.locale)
+    lti_launch.link_text = selection_type ? tool.label_for(selection_type.to_sym, I18n.locale) : tool.default_label
     lti_launch.analytics_id = tool.tool_id
     lti_launch
   end
@@ -751,6 +751,24 @@ class ExternalToolsController < ApplicationController
         end
       end
     end
+  end
+
+  def jwt_token
+    require 'jwt'
+
+    tool = ContextExternalTool.find(params['tool_id']) if params['tool_id']
+
+    if params['tool_launch_url'] && tool.nil?
+      tool = ContextExternalTool.find_external_tool(params['tool_launch_url'], @context)
+    end
+
+    raise ActiveRecord::RecordNotFound if tool.nil?
+
+    launch = lti_launch(tool)
+    params = launch.params.reject {|p| p.starts_with?('oauth_')}
+    params[:consumer_key] = tool.consumer_key
+
+    render json: {jwt_token: JWT.encode(params, tool.shared_secret)}
   end
 
   private

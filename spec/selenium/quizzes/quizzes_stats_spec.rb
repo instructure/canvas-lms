@@ -137,7 +137,7 @@ describe 'quizzes stats' do
           expect(ffj('ol.sighted-user-content.answer-drilldown.detail-section').size).to eq 0
         end
 
-        it 'should have a discrimination index pop up' do
+        it 'should have a discrimination index pop up', priority: "2", test_id: 140643 do
           fj('span.sighted-user-content > button.btn').click
           wait_for_ajaximations
           fj('i.chart-help-trigger.icon-question').click

@@ -1,6 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/wiki_and_tiny_common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/public_courses_context')
+require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
 
 describe "Wiki Pages" do
   include_context "in-process server selenium tests"
@@ -407,6 +408,14 @@ describe "Wiki Pages" do
         expect(driver.switch_to.alert.text).to be_present
         driver.switch_to.alert.accept
       end
+
+      it "should insert a file using RCE in the wiki page", priority: "1", test_id: 126673 do
+        file = @course.attachments.create!(display_name: 'some test file', uploaded_data: default_uploaded_data)
+        file.context = @course
+        file.save!
+        get "/courses/#{@course.id}/pages/bar/edit"
+        insert_file_from_rce
+      end
     end
   end
 
@@ -415,7 +424,7 @@ describe "Wiki Pages" do
       account_model
       course_with_student_logged_in account: @account
     end
-    
+
     it "should lock page based on module date", priority: "1", test_id: 126845 do
       locked = @course.wiki.wiki_pages.create! title: 'locked'
       mod2 = @course.context_modules.create! name: 'mod2', unlock_at: 1.day.from_now

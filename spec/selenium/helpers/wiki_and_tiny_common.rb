@@ -71,6 +71,16 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
     wiki_page
   end
 
+  def manually_create_wiki_page(title,body)
+    f('.btn-primary').click
+    wait_for_ajaximations
+    replace_content(f('#title'),title)
+    add_text_to_tiny(body)
+    expect_new_page_load { f('form.edit-form button.submit').click }
+    expect(f('.page-title')).to include_text(title)
+    expect(f('.show-content')).to include_text(body)
+  end
+
   def select_all_wiki
     tiny_controlling_element = "textarea.body"
     scr = "$(#{tiny_controlling_element.to_s.to_json}).editorBox('execute', 'selectAll')"

@@ -222,35 +222,26 @@
 
 
               <button class="btn btn-small btn-primary" type="submit"><%= t('buttons.submit_comment', "Submit Comment") %></button>
-              <ul class="attach_things">
-                <li class="prompt"><%= t(:attach, "Attach") %></li>
-                <li>
-                  <a data-tooltip title="<%= t('tooltips.file_attachment', "File Attachment") %>" id="add_attachment" href="#" class="btn btn-small">
-                    <i class="icon-paperclip"></i>
-                    <span class="screenreader-only"><%= t('icons.file_attachment', "File Attachment") %><span>
-                  </a>
-                </li>
+
+              <div class="attach_things" role="group" aria-labelledby="speedgrader_attach_things_label">
+                <span class="prompt" id="speedgrader_attach_things_label"><%= t(:attach, "Attach") %></span>
+                <button data-tooltip title="<%= t('tooltips.file_attachment', "File Attachment") %>" class="btn btn-small" id="add_attachment" aria-label="<%= t('tooltips.file_attachment', "File Attachment") %>" type="button">
+                  <i class="icon-paperclip" aria-hidden="true"></i>
+                </button>
                 <% if feature_enabled?(:kaltura) %>
-                  <li>
-                    <a data-tooltip title="<%= t('tooltips.media_comment', "Media Comment") %>" href="#" class="btn btn-small media_comment_link">
-                      <i class="icon-media"></i>
-                      <span class="screenreader-only">
-                        <%= t('icons.media_comment', 'Media Comment') %>
-                      </span>
-                    </a>
-                  </li>
+                  <button data-tooltip title="<%= t('tooltips.media_comment', "Media Comment") %>" class="btn btn-small media_comment_link" aria-label="<%= t('tooltips.media_comment', "Media Comment") %> " type="button">
+                    <i class="icon-media" aria-hidden="true"></i>
+                  </button>
                 <% end %>
-                <li style="display:none">
-                  <a data-tooltip title="<%= t('tooltips.speech_recognition', "Speech Recognition") %>" href="#" class="btn btn-small speech_recognition_link">
-                    <i class="icon-audio"></i>
-                    <span class="screenreader-only">
-                      <%= t('icons.speech_recognition', 'Speech Recognition') %>
-                    </span>
-                  </a>
-                </li>
-                <li style="clear:both;"></li>
-              </ul>
-              <div style="clear:both;"></div>
+              </div>
+              <div style="display:none">
+                <a data-tooltip title="<%= t('tooltips.speech_recognition', "Speech Recognition") %>" href="#" class="btn btn-small speech_recognition_link">
+                  <i class="icon-audio"></i>
+                  <span class="screenreader-only">
+                    <%= t('icons.speech_recognition', 'Speech Recognition') %>
+                  </span>
+                </a>
+              </div>
             </div>
           </form>
         <% end %>
@@ -269,11 +260,22 @@
       [t('sort_by.submitted_at', "the date they submitted the assignment"), "submitted_at"],
       [t('sort_by.status', "by submission status (needs grading, not submitted, etc)"), "submission_status"]], cookies[:eg_sort_by]) %>
   </p>
-  <p<% if @assignment.quiz && @assignment.quiz.survey? && @assignment.quiz.anonymous_submissions %> style="display: none;"<% end %>>
-    <input type="checkbox" id="hide_student_names" name="hide_student_names"/>
-    <label for="hide_student_names"><%= t('labels.hide_names', "Hide student names in the SpeedGrader") %></label>
-  </p>
 
+  <p>
+    <input type="checkbox" id="hide_student_names" name="hide_student_names"
+      <% if force_anonymous_grading?(@assignment) %>disabled<% end %>
+    />
+    <label for="hide_student_names"
+      <% if force_anonymous_grading?(@assignment) %>
+        data-tooltip='{"tooltipClass":"popover popover-padded", "position":"top"}'
+        title="<%= force_anonymous_grading_reason(@assignment) %>"
+      <% end %> >
+      <%= t('labels.hide_names', "Hide student names in the SpeedGrader") %>
+      <% if force_anonymous_grading?(@assignment) %>
+        <span class="screenreader-only"><%= force_anonymous_grading_reason(@assignment) %></span>
+      <% end %>
+    </label>
+  </p>
   <p <% unless @assignment.quiz %>class=hidden<% end %>>
     <%= check_box_tag :enable_speedgrader_grade_by_question, "1",
       @current_user.preferences[:enable_speedgrader_grade_by_question] %>
@@ -298,12 +300,6 @@
   </li>
 </ul>
 
-<% js_block do %>
-  <script>
-    window.anonymousAssignment = <%= @assignment.quiz && @assignment.quiz.survey? && @assignment.quiz.anonymous_submissions ? "true" : "false" %>;
-    window.visibleRubricAssessments = <%= raw((@assignment.visible_rubric_assessments_for(@current_user) || {}).to_json(:methods => [:assessor_name], :include_root => false)) %>;
-  </script>
-<% end %>
 <div id="current_context_code" style="display: none;"><%= @context.asset_string %></div>
 <span id="aria_name_alert" class="screenreader-only" aria-live="polite"></span>
 <% keyboard_navigation([

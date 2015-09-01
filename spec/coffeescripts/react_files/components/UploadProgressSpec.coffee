@@ -1,7 +1,7 @@
 define [
   'react'
   'jquery'
-  'compiled/react_files/components/UploadProgress'
+  'jsx/files/UploadProgress'
   'compiled/react_files/modules/FileUploader'
 ], (React, $, UploadProgress, FileUploader) ->
 

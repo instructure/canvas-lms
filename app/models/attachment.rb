@@ -994,7 +994,7 @@ class Attachment < ActiveRecord::Base
 
     given { |user, session|
       self.context.grants_right?(user, session, :read) &&
-      (self.context.grants_right?(user, session, :manage_files) || !self.locked_for?(user))
+      (self.context.grants_right?(user, session, :read_as_admin) || !self.locked_for?(user))
     }
     can :download
 
@@ -1034,7 +1034,7 @@ class Attachment < ActiveRecord::Base
   def locked_for?(user, opts={})
     return false if @skip_submission_attachment_lock_checks
     return false if opts[:check_policies] && self.grants_right?(user, :update)
-    return {:asset_string => self.asset_string, :manually_locked => true} if self.locked || (self.folder && self.folder.locked?)
+    return {:asset_string => self.asset_string, :manually_locked => true} if self.locked || Folder.is_locked?(self.folder_id)
     Rails.cache.fetch(locked_cache_key(user), :expires_in => 1.minute) do
       locked = false
       if (self.unlock_at && Time.now < self.unlock_at)

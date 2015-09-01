@@ -43,7 +43,7 @@ describe RubricAssessmentsController do
       end
     end
   end
-  
+
   describe "PUT 'update'" do
     it "should require authorization" do
       course_with_teacher(:active_all => true)
@@ -57,16 +57,8 @@ describe RubricAssessmentsController do
       put 'update', :course_id => @course.id, :rubric_association_id => @rubric_association.id, :id => @rubric_assessment.id, :rubric_assessment => {:user_id => @user.to_param, :assessment_type => "no_reason"}
       expect(response).to be_success
     end
-    it "should update the assessment" do
-      course_with_teacher_logged_in(:active_all => true)
-      rubric_assessment_model(:user => @user, :context => @course, :purpose => 'grading')
-      put 'update', :course_id => @course.id, :rubric_association_id => @rubric_association.id, :id => @rubric_assessment.id, :rubric_assessment => {:comments => "dude!", :user_id => @user.to_param, :assessment_type => "no_reason"}
-      expect(response).to be_success
-      expect(assigns[:assessment]).not_to be_nil
-      expect(assigns[:assessment].comments).to eql("dude!")
-    end
   end
-  
+
   describe "POST 'remind'" do
     before do
       course_with_teacher(:active_all => true)
@@ -106,7 +98,7 @@ describe RubricAssessmentsController do
       expect(assigns[:assessment]).to be_frozen
     end
   end
-  
+
   describe "Assignment assessments" do
     it "should follow: actions from two teachers should only create one assessment" do
       setup_course_assessment
@@ -119,7 +111,7 @@ describe RubricAssessmentsController do
       expect(response).to be_success
       expect(assigns[:assessment]).to eql(@assessment)
     end
-    
+
     it "should follow: multiple peer reviews for the same submission should work fine" do
       setup_course_assessment
       user_session(@student2)
@@ -127,18 +119,18 @@ describe RubricAssessmentsController do
       expect(response).to be_success
       @assessment = assigns[:assessment]
       expect(@assessment).not_to be_nil
-      
+
       user_session(@student3)
       post 'create', :course_id => @course.id, :rubric_association_id => @rubric_association.id, :rubric_assessment => {:user_id => @student1.to_param, :assessment_type => "peer_review"}
       expect(response).to be_success
       expect(assigns[:assessment]).not_to eql(@assessment)
-      
+
       user_session(@teacher2)
       post 'create', :course_id => @course.id, :rubric_association_id => @rubric_association.id, :rubric_assessment => {:user_id => @student1.to_param, :assessment_type => "peer_review"}
       expect(response).to be_success
       expect(assigns[:assessment]).not_to eql(@assessment)
     end
-    
+
     it "should follow: multiple peer reviews for the same submission should work fine, even with a teacher assessment in play" do
       setup_course_assessment
       user_session(@teacher2)
@@ -152,25 +144,25 @@ describe RubricAssessmentsController do
       expect(response).to be_success
       @assessment = assigns[:assessment]
       expect(@assessment).not_to be_nil
-      
+
       user_session(@student3)
       post 'create', :course_id => @course.id, :rubric_association_id => @rubric_association.id, :rubric_assessment => {:user_id => @student1.to_param, :assessment_type => "peer_review"}
       expect(response).to be_success
       expect(assigns[:assessment]).not_to eql(@assessment)
-      
+
       user_session(@teacher2)
       post 'create', :course_id => @course.id, :rubric_association_id => @rubric_association.id, :rubric_assessment => {:user_id => @student1.to_param, :assessment_type => "peer_review"}
       expect(response).to be_success
       expect(assigns[:assessment]).not_to eql(@assessment)
       expect(assigns[:assessment]).not_to eql(@grading_assessment)
     end
-        
+
     it "should not allow assessing fellow students for a submission" do
       setup_course_assessment
       user_session(@student1)
       post 'create', :course_id => @course.id, :rubric_association_id => @rubric_association.id, :rubric_assessment => {:user_id => @student2.to_param, :assessment_type => 'peer_review'}
       assert_unauthorized
-      
+
       @assignment.submit_homework(@student1, :url => "http://www.google.com")
       @assignment.submit_homework(@student2, :url => "http://www.google.com")
       @assignment.submit_homework(@student3, :url => "http://www.google.com")
@@ -180,7 +172,7 @@ describe RubricAssessmentsController do
       # two of the six possible combinations have already been created
       expect(res.length).to eql(4)
       expect(res.to_a.find{|r| r.assessor == @student1 && r.user == @student2}).not_to be_nil
-      
+
       post 'create', :course_id => @course.id, :rubric_association_id => @rubric_association.id, :rubric_assessment => {:user_id => @student2.to_param, :assessment_type => 'peer_review'}
       expect(response).to be_success
     end
