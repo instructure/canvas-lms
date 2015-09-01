@@ -13399,7 +13399,7 @@ sv:
         dashboard: Dashboard
         skip_to_content: "Hoppa över till innehåll"
     no_recent_activity: 
-      empty_stream_message: "Du har inga meddelanden att visa i din stream. När du börjar delta i kurser kommer du märka att den här streamen börjar fyllas med meddelanden från diskussioner, betygsuppdateringar, privatemeddelanden mellan dig och andra användare, osv."
+      empty_stream_message: "Du har inga meddelanden att visa i din ström. När du börjar delta i kurser kommer du märka att den här streamen börjar fyllas med meddelanden från diskussioner, betygsuppdateringar, privatemeddelanden mellan dig och andra användare, osv."
       no_recent_messages: "Inga nya meddelanden"
     pending_enrollment: 
       designer: "%{course} som en designer."
