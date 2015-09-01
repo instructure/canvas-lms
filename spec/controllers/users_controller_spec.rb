@@ -702,6 +702,16 @@ describe UsersController do
           expect(u.pseudonym).not_to be_password_auto_generated
         end
 
+        it "should not throw a 500 error without user params'" do
+          post 'create', :pseudonym => { :unique_id => 'jacob@instructure.com' }, account_id: account.id
+          expect(response).to be_success
+        end
+
+        it "should not throw a 500 error without pseudonym params'" do
+          post 'create', :user => { :name => 'Jacob Fugal' }, account_id: account.id
+          assert_status(400)
+          expect(response).not_to be_success
+        end
       end
 
       it "should not allow an admin to set the sis id when creating a user if they don't have privileges to manage sis" do
