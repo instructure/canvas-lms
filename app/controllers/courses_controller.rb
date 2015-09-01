@@ -420,7 +420,7 @@ class CoursesController < ApplicationController
         if value_to_boolean(params[:current_domain_only])
           enrollments = enrollments.select { |e| e.root_account_id == @domain_root_account.id }
         elsif params[:root_account_id]
-          root_account = api_find_all(Account, [params[:root_account_id]], { limit: 1 }).first
+          root_account = api_find_all(Account, [params[:root_account_id]]).first
           enrollments = root_account ? enrollments.select { |e| e.root_account_id == root_account.id } : []
         end
 

@@ -1309,10 +1309,7 @@ class Submission < ActiveRecord::Base
         user_grades.each do |user_id, user_data|
 
           user = preloaded_users.detect{|u| u.global_id == Shard.global_id_for(user_id)}
-          if !user && (params = Api.sis_find_params_for_collection(scope, [user_id], context.root_account)) && params != :not_found
-            params[:limit] = 1
-            user = scope.all(params).first
-          end
+          user ||= Api.sis_relation_for_collection(scope, [user_id], context.root_account).first
           unless user
             missing_ids << user_id
             next
