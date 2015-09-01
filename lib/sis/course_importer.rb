@@ -108,11 +108,13 @@ module SIS
           end
         end
 
-        course_dates_stuck = !(course.stuck_sis_fields & [:start_at, :conclude_at, :restrict_enrollments_to_course_dates]).empty?
+        course_dates_stuck = !(course.stuck_sis_fields & [:start_at, :conclude_at]).empty?
         if !course_dates_stuck
           course.start_at = start_date
           course.conclude_at = end_date
-          course.restrict_enrollments_to_course_dates = (course.start_at.present? || course.conclude_at.present?)
+          unless course.stuck_sis_fields.include?(:restrict_enrollments_to_course_dates)
+            course.restrict_enrollments_to_course_dates = (start_date.present? || end_date.present?)
+          end
         end
 
         abstract_course = nil
