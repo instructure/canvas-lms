@@ -172,20 +172,21 @@ class AssignmentsController < ApplicationController
   end
 
   def show_moderate
-    return unless @context.feature_enabled?(:moderated_grading)
+    raise ActiveRecord::RecordNotFound unless @context.feature_enabled?(:moderated_grading)
     @assignment ||= @context.assignments.find(params[:assignment_id])
 
-    raise ActiveRecord::RecordNotFound unless @assignment.moderated_grading?
+    raise ActiveRecord::RecordNotFound unless @assignment.moderated_grading? && @assignment.published?
 
-    if authorized_action(@context, @current_user, :moderate_grades) && @assignment.moderated_grading? && @assignment.published?
+    if authorized_action(@context, @current_user, :moderate_grades)
       add_crumb(@assignment.title, polymorphic_url([@context, @assignment]))
       add_crumb(t('Moderate'))
 
       js_env({
         :URLS => {
-          :student_submissions_url => polymorphic_url([:api_v1, @context, @assignment, :submissions]) + "?include[]=user_summary&include[]=provisional_grades"
+          :student_submissions_url => polymorphic_url([:api_v1, @context, @assignment, :submissions]) + "?include[]=user_summary&include[]=provisional_grades",
+          :publish_grades_url => api_v1_publish_provisional_grades_url({course_id: @context.id, assignment_id: @assignment.id})
         }})
-      polymorphic_url([@context, @assignment])
+
       respond_to do |format|
         format.html { render }
       end
