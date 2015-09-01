@@ -406,20 +406,32 @@ class OutcomeResultsController < ApplicationController
   end
 
   def require_outcomes
+    reject! "can't filter by both outcome_ids and outcome_group_id" if params[:outcome_ids] && params[:outcome_group_id]
+
     @outcome_groups = @context.learning_outcome_groups
     outcome_group_ids = @outcome_groups.pluck(:id)
-    @outcome_links = ContentTag.learning_outcome_links.active.where(associated_asset_id: outcome_group_ids).preload(:learning_outcome_content)
-    reject! "can't filter by both outcome_ids and outcome_group_id" if params[:outcome_ids] && params[:outcome_group_id]
-    if params[:outcome_ids]
-      outcome_ids = Api.value_to_array(params[:outcome_ids]).map(&:to_i).uniq
-      @outcomes = @outcome_links.map(&:learning_outcome_content).select{ |outcome| outcome_ids.include?(outcome.id) }
-      reject! "can only include id's of outcomes in the outcome context" if @outcomes.count != outcome_ids.count
-    elsif params[:outcome_group_id]
+
+    if params[:outcome_group_id]
       group_id = params[:outcome_group_id].to_i
       reject! "can only include an outcome group id in the outcome context" unless outcome_group_ids.include?(group_id)
-      @outcomes = @outcome_links.where(associated_asset_id: group_id).map(&:learning_outcome_content)
-    else
+      @outcome_links = ContentTag.learning_outcome_links.active.where(associated_asset_id: group_id).preload(:learning_outcome_content)
       @outcomes = @outcome_links.map(&:learning_outcome_content)
+    else
+      @outcome_links = []
+      outcome_group_ids.each_slice(100) do |outcome_group_ids_slice|
+        @outcome_links += ContentTag.learning_outcome_links.active.where(associated_asset_id: outcome_group_ids_slice)
+      end
+      @outcome_links.each_slice(100) do |outcome_links_slice|
+        ActiveRecord::Associations::Preloader.new(outcome_links_slice, :learning_outcome_content).run
+      end
+
+      if params[:outcome_ids]
+        outcome_ids = Api.value_to_array(params[:outcome_ids]).map(&:to_i).uniq
+        @outcomes = @outcome_links.map(&:learning_outcome_content).select{ |outcome| outcome_ids.include?(outcome.id) }
+        reject! "can only include id's of outcomes in the outcome context" if @outcomes.count != outcome_ids.count
+      else
+        @outcomes = @outcome_links.map(&:learning_outcome_content)
+      end
     end
   end
 
