@@ -1,7 +1,8 @@
 require [
   'react'
-  'jsx/theme_editor/ThemeEditor'
-], (React, ThemeEditor) ->
+  'jsx/theme_editor/ThemeEditor',
+  'underscore'
+], (React, ThemeEditor, _) ->
 
   # framebust out so we don't ever get themeditor inside theme editor
   if window.top.location isnt self.location

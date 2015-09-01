@@ -4,22 +4,18 @@ define([
   'i18n!theme_editor',
   'react',
   'jquery',
-  'react-modal',
   'underscore',
   'str/htmlEscape',
   'compiled/fn/preventDefault',
   'compiled/models/Progress',
-  'jsx/shared/ProgressBar',
   './PropTypes',
   './ThemeEditorAccordion',
   './SharedBrandConfigPicker',
-  './ThemeEditorFileUpload'
-], (I18n, React, $, Modal, _, htmlEscape, preventDefault, Progress, ProgressBar, customTypes, ThemeEditorAccordion, SharedBrandConfigPicker, ThemeEditorFileUpload) => {
+  './ThemeEditorFileUpload',
+  './ThemeEditorModal'
+], (I18n, React, $, _, htmlEscape, preventDefault, Progress, customTypes, ThemeEditorAccordion, SharedBrandConfigPicker, ThemeEditorFileUpload, ThemeEditorModal) => {
 
 /*eslint no-alert:0*/
-
-  Modal.setAppElement(document.body)
-
   var TABS = [
     {
       id: 'te-editor',
@@ -44,6 +40,12 @@ define([
         }
       }
     }
+  }
+
+  function filterCompleteProgresses (progresses) {
+    return _.select(progresses, (p) => {
+      return p.completion !== 100
+    })
   }
 
   function submitHtmlForm(action, method, md5) {
@@ -73,14 +75,10 @@ define([
       return {
         changedValues: {},
         showProgressModal: false,
-        progress: 0
+        progress: 0,
+        showSubAccountProgress: false,
+        activeSubAccountProgresses: []
       }
-    },
-
-    invalidForm() {
-      return Object.keys(this.state.changedValues).some((key) => {
-        return this.state.changedValues[key].invalid
-      })
     },
 
     changeSomething(variableName, newValue, isInvalid) {
@@ -91,8 +89,10 @@ define([
       })
     },
 
-    onProgress(data) {
-      this.setState({progress: data.completion})
+    invalidForm() {
+      return Object.keys(this.state.changedValues).some((key) => {
+        return this.state.changedValues[key].invalid
+      })
     },
 
     somethingHasChanged() {
@@ -141,10 +141,6 @@ define([
       return val
     },
 
-    saveToSession(md5) {
-      submitHtmlForm('/accounts/'+this.props.accountID+'/brand_configs/save_to_user_session', 'POST', md5)
-    },
-
     handleCancelClicked() {
       if (this.props.hasUnsavedChanges || this.somethingHasChanged()) {
         var msg = I18n.t('You are about to lose any changes that you have not yet applied to your account.\n\n' +
@@ -156,9 +152,8 @@ define([
       submitHtmlForm('/accounts/'+this.props.accountID+'/brand_configs', 'DELETE');
     },
 
-    handleApplyClicked() {
-      var msg = I18n.t('This will apply these changes to your entire account. Would you like to proceed?')
-      if (window.confirm(msg)) submitHtmlForm('/accounts/'+this.props.accountID+'/brand_configs/save_to_account', 'POST')
+    saveToSession(md5) {
+      submitHtmlForm('/accounts/'+this.props.accountID+'/brand_configs/save_to_user_session', 'POST', md5)
     },
 
     handleFormSubmit() {
@@ -185,6 +180,74 @@ define([
         window.alert(I18n.t('An error occurred trying to generate this theme, please try again.'))
         this.setState({showProgressModal: false})
       })
+    },
+
+    onProgress(data) {
+      this.setState({progress: data.completion})
+    },
+
+    handleApplyClicked() {
+      var msg = I18n.t('This will apply these changes to your entire account. Would you like to proceed?');
+      if (window.confirm(msg)) {
+        this.kickOffSubAcountCompilation();
+      }
+    },
+
+    redirectToAccount() {
+      window.location.replace("/accounts/"+this.props.accountID+"?theme_applied=1");
+    },
+
+    kickOffSubAcountCompilation() {
+      $.ajax({
+        url: '/accounts/'+this.props.accountID+'/brand_configs/save_to_account',
+        type: 'POST',
+        data: new FormData(this.refs.ThemeEditorForm.getDOMNode()),
+        processData: false,
+        contentType: false,
+        dataType: "json"
+      })
+      .pipe((resp) => {
+        if (!resp.subAccountProgresses || _.isEmpty(resp.subAccountProgresses)) {
+          this.redirectToAccount()
+        } else {
+          this.openSubAccountProgressModal();
+          this.filterAndSetActive(resp.subAccountProgresses)
+          return resp.subAccountProgresses.map( (prog) => {
+            return new Progress(prog).poll().progress(this.onSubAccountProgress)
+          })
+        }
+      })
+      .fail(() => {
+        window.alert(I18n.t('An error occurred trying to apply this theme, please try again.'))
+      })
+    },
+
+    onSubAccountProgress(data) {
+      var newSubAccountProgs = _.map(this.state.activeSubAccountProgresses, (progress) => {
+        return progress.tag == data.tag ?
+          data :
+          progress
+      })
+
+      this.filterAndSetActive(newSubAccountProgs)
+
+      if ( _.isEmpty(this.state.activeSubAccountProgresses)) {
+        this.closeSubAccountProgressModal();
+        this.redirectToAccount();
+      }
+    },
+
+    filterAndSetActive(progresses) {
+      var activeProgs = filterCompleteProgresses(progresses)
+      this.setState({activeSubAccountProgresses: activeProgs})
+    },
+
+    openSubAccountProgressModal() {
+      this.setState({ showSubAccountProgress: true });
+    },
+
+    closeSubAccountProgressModal() {
+      this.setState({ showSubAccountProgress: false });
     },
 
     renderTabInputs() {
@@ -353,20 +416,11 @@ define([
             <input type="hidden" name="_workaround_for_IE_10_and_11_formdata_bug" />
           </form>
 
-          <Modal
-            isOpen={this.state.showProgressModal}
-            className='ReactModal__Content--canvas ReactModal__Content--mini-modal'
-            overlayClassName='ReactModal__Overlay--Theme__editor_progress'>
-            <div className="Theme__editor_progress">
-              <h4>{I18n.t('Generating Preview...')}</h4>
-              <ProgressBar
-                progress={this.state.progress}
-                title={I18n.t('%{percent} complete', {
-                  percent: I18n.toPercentage(this.state.progress, {precision: 0})
-                })}
-              />
-            </div>
-          </Modal>
+          <ThemeEditorModal
+            showProgressModal={this.state.showProgressModal}
+            showSubAccountProgress={this.state.showSubAccountProgress}
+            activeSubAccountProgresses={this.state.activeSubAccountProgresses}
+            progress={this.state.progress} />
 
         </div>
       )
