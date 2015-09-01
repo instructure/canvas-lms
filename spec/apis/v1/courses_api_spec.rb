@@ -2140,7 +2140,8 @@ describe CoursesController, type: :request do
         'workflow_state' => @course1.workflow_state,
         'storage_quota_mb' => @course1.storage_quota_mb,
         'apply_assignment_group_weights' => false,
-        'enrollment_term_id' => @course.enrollment_term_id
+        'enrollment_term_id' => @course.enrollment_term_id,
+        'restrict_enrollments_to_course_dates' => false
       })
     end
 
