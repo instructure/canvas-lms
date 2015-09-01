@@ -625,8 +625,7 @@ class AssignmentsApiController < ApplicationController
   #   All dates associated with the assignment, if applicable
   # @returns Assignment
   def show
-    @assignment = @context.active_assignments.find(params[:id],
-        :include => [:assignment_group, :rubric_association, :rubric])
+    @assignment = @context.active_assignments.preload(:assignment_group, :rubric_association, :rubric).find(params[:id])
     if authorized_action(@assignment, @current_user, :read)
       return render_unauthorized_action unless @assignment.visible_to_user?(@current_user)
 
