@@ -50,9 +50,9 @@ da:
     bad_response_all: "Kunne ikke opdatere standarder."
     no_api_key: "En API nøgle er nødvendig for at kunne benytte Academic Benchmarks"
     no_authority: "Kunne ikke finde tilladelse for opdatering"
-    no_file: "Ingen resultat fil eller tilladelse er givet"
-    no_permissions: "Bruger har ikke ret til at rette i globale resultater"
-    no_perms: "Bruger har ikke ret til at rette i globale resultater"
+    no_file: "Ingen indlæringsmål-fil eller tilladelse er givet"
+    no_permissions: "Bruger har ikke ret til at rette i globale indlæringsmål"
+    no_perms: "Bruger har ikke ret til at rette i globale indlæringsmål"
     plugin_settings: 
       api_url_description: "(eks. %{url})"
       common_core_guid: "(eks. %{guid})"
@@ -85,7 +85,7 @@ da:
     tab_faculty_journal: Fakultetsjournal
     tab_grading_standards: Bedømmelse
     tab_jobs: Jobs
-    tab_outcomes: Resultater
+    tab_outcomes: Indlæringsmål
     tab_permissions: Tilladelser
     tab_plugins: Plugins
     tab_question_banks: Spørgsmålssamling
@@ -273,14 +273,14 @@ da:
     report_header_last_access_at: "sidste adgang"
     report_header_last_ip: "sidste ip"
     report_header_last_name: efter_navn
-    report_header_learning_outcome_id: "Indlæringsresultat id"
-    report_header_learning_outcome_name: indlæringsresultatnavn
+    report_header_learning_outcome_id: "Indlæringsmål id"
+    report_header_learning_outcome_name: indlæringsmålnavn
     report_header_login_id: login_id
     report_header_long__name: langt_navn
     report_header_long_name: "langt navn"
     report_header_name: navn
     report_header_nonxlist_course_id: nonxlist_kursus_id
-    report_header_outcome_score: resultatscore
+    report_header_outcome_score: indlæringsmålscore
     report_header_parent_account_id: forældre_konto_id
     report_header_role: rolle
     report_header_role_id: rolle_id
@@ -616,7 +616,7 @@ da:
       account_reports: 
         edison: 
           outcome: 
-            text: "resultat_id:"
+            text: "indlæringsmål_id:"
     date_picker_parameter: 
       account_reports: 
         default: 
@@ -682,7 +682,7 @@ da:
       account_reports: 
         outcomes: 
           description: 
-            text: "Denne rapport viser indlæringsresultater for alle studerende. Den resulterende cvs fil vil ahve en række pr. bruge-resultat par, og vil vis detaljerne af resultatet inklusiv den associerede opgave."
+            text: "Denne rapport viser indlæringsmål for alle studerende. Den resulterende cvs fil vil have en række pr. brugerindlæringsmålpar, og vil vis detaljerne af resultatet inklusiv den associerede opgave."
     outcome_results_csv_parameters: 
       account_reports: 
         outcomes: 
@@ -691,7 +691,7 @@ da:
           order: 
             label: Ordrer
           outcome: 
-            radio: Resultater
+            radio: Indlæringsmål
           user: 
             radio: Brugere
     ph_student_grades_csv_parameters: 
@@ -1107,7 +1107,7 @@ da:
       account_reports: 
         student_assignment_map: 
           description: 
-            text: "Denne rapport viser indlæringsresultater for alle studerende. Den resulterende cvs fil vil have en række pr. bruge-resultat par, og vil vise detaljerne af resultatet inklusiv den associerede opgave. Denne rapport vil kun vise resultater for opgaver og inkluderer ikke resultater forbundet til spørgsmålbanks."
+            text: "Denne rapport viser indlæringsmål for alle studerende. Den resulterende cvs fil vil have en række pr. brugerindlæringsmålpar, og vil vise detaljerne af resultatet inklusiv den associerede opgave. Denne rapport vil kun vise resultater for opgaver og inkluderer ikke resultater forbundet til spørgsmålbanker."
     student_grades_csv_parameters: 
       account_reports: 
         auburn: 
@@ -1287,7 +1287,7 @@ da:
   all_students_have_taken_the_survey_494f9f42: "Alle studerende der har besvaret spørgeundersøgelsen"
   allow_bulk_grade_export_to_sis_e11a6e66: "Tillad bulk bedømmelseseksport til SIS"
   allow_lor_tools: "Tillad brugerne at se og bruge eksterne værtøjer til konfigurering af LOR."
-  allow_opt_out_of_inbox: "Tillad brugere at fravælge konversationesinboksen. Dette vil bevirke at alle konversationsbeskeder og notifikationer sendes som ASAP notifikation til brugerens primære email, skjule konversationsindboksens ulæste besked mærke på indboksen og skjule konversationsnotifikation indstillinger."
+  allow_opt_out_of_inbox: "Tillad brugere at fravælge konversationesinbakken. Dette vil bevirke at alle konversationsbeskeder og notifikationer sendes som ASAP notifikation til brugerens primære email, skjule konversationsindbakkens ulæste besked mærke på indbakkken og skjule konversationsnotifikation indstillinger."
   allow_students_to_see_who_has_signed_up_for_time_s_497f4a46: "Tillad studerende at se hvem, der har tilmeldt sig til tidsplaceringer."
   allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "Tillader lærerne at vælge karakterdata for bulk eksport til SIS integrationer."
   always_3a59e701: Altid
@@ -1768,7 +1768,7 @@ da:
         gpa_scale: "GPS Scale"
         letter_grade: "Bogstav bedømmelse"
         not_graded: "Ikke bedømt"
-        pass_fail: Fuldstænding/ufuldstændig
+        pass_fail: "Godkendt/ikke godkendt"
         percent: Procent
         points: Points
       view_grading_scheme: "Se bedømmelsesskema"
@@ -2247,7 +2247,7 @@ da:
     apply: Ansøg
     authorize_google_docs: "Autoriser Google Docs adgang"
     authorize_google_drive: "Autoriser Google Drive adgang"
-    back_to_outcomes: "Tilbage til resultater"
+    back_to_outcomes: "Tilbage til indlæringsmål"
     cancel: Annuller
     choose_a_file: "Vælg en fil"
     delete: Slet
@@ -2722,7 +2722,7 @@ da:
   choose_usage_rights_33683854: "Vælg brugerrettigheder..."
   chosencolor_is_not_a_valid_color_5d542cc: "'%{chosenColor}' er ikke en gyldig farve."
   clear_2084585f: Ryd
-  click_for_more_details_on_this_outcome_8c018d2f: "Klik for flere detaljer for dette resultat"
+  click_for_more_details_on_this_outcome_8c018d2f: "Klik for flere detaljer for dette indlæringsmål"
   click_here_on_the_calendar_link_c9965631: "Klik her på *Kalender* link"
   click_to_enter_comments_if_the_student_chooses_thi_507c20f6: "Klik her for at indtaste kommentarer, hvis den studerende vælger dette svar"
   click_to_modify_89fa26aa: "Klik for at ændre"
@@ -2847,7 +2847,7 @@ da:
   collapse_list_of_group_members_for_groupname_d6c66fa0: "Sammenfold listen af gruppemedlemmer for %{groupName}"
   collapse_subdiscussion_89af1f5c: "Sammenfold under-diskussion"
   collapsed_510aa02a: Sammenfoldet
-  coming_up_4348b0bd: Kommende
+  coming_up_4348b0bd: "Kommende opgaver"
   comm_messages: 
     from_beginning: Begyndelsen
     to_now: nu
@@ -3270,7 +3270,7 @@ da:
         user_account_details: "Bruger Konto Detaljer"
         user_grades: "Karaktere for %{user}"
         user_only_view_section: "Begræns denne bruger til kun at kunne se samme sektionsbrugere"
-        user_outcomes: "Resultater for %{user}"
+        user_outcomes: "Indlæringsmål for %{user}"
         user_view_all_sections: "lad denne bruger se alle kursusbrugere"
       user_only_view_section: "denne bruger kan kun se studerende i deres tildelte kursussektion (-er)"
       user_view_all_sections: "denne bruger kan se studerende i enhver kursus sektion"
@@ -3336,7 +3336,7 @@ da:
         user_account_details: "Bruger Konto Detaljer"
         user_grades: Karakterer
         user_only_view_section: "Begræns denne bruger til kun at kunne se samme sektionsbrugere"
-        user_outcomes: Resultater
+        user_outcomes: Indlæringsmål
         user_view_all_sections: "lad denne bruger se alle kursusbrugere"
       no_messages: "Ingen Beskeder"
       no_services: "%{user} har endnu ikke forbundet nogle eksterne servicer til deres konto."
@@ -3455,7 +3455,7 @@ da:
       indent: 
         ? "n"
         : 
-          one: "Indryning 1 niveau"
+          one: "Indrykning 1 niveau"
           other: "Indrykning %{count} niveauer"
           zero: "Indryk ikke"
       labels: 
@@ -3902,7 +3902,7 @@ da:
       file_meta: "Eksport af file metadata mislykkedes"
       files: "Eksport af visse filer mislykkedes"
       grading_standards: "Eksport af bedømmelsesstandarder mislykkedes"
-      learning_outcomes: "Eksport af indlæringsresultater mislykkedes"
+      learning_outcomes: "Eksport af indlæringsmål mislykkedes"
       lti_links: "Eksport af nogle eksterne værktøjskonfigurationer mislykkedes"
       media_file: "Mediefil eksport mislykkedes"
       media_files: "Eksport af nogle mediafiler mislykkedes"
@@ -4070,7 +4070,7 @@ da:
     assignments_needing_grading: 
       headings: 
         grade: "Karakter %{assignment}"
-        to_do: "At gøre"
+        to_do: "Nuværende opgaver"
       links: 
         show_more: "%{count} flere..."
       need_grading_count: 
@@ -4440,7 +4440,7 @@ da:
       headings: 
         current_users: "Nuværende brugere"
       help: 
-        reset_course_content: "Nulstilling af kursusindhold vil permanent slette alle associerede opgaver, diskussioner, quizzer, moduler, instruktioner, sider, filer, indlæringsresultater, spørgsmålsbanker, samarbejder, konferencer eller enhvert andet indhold. Denne handling kan ikke fortrydes, og data *kan ikke* blive gendannet. Er du sikker på, at du ønsker at fortsætte?"
+        reset_course_content: "Nulstilling af kursusindhold vil permanent slette alle associerede opgaver, diskussioner, quizzer, moduler, instruktioner, sider, filer, indlæringsmål, spørgsmålsbanker, samarbejder, konferencer eller enhvert andet indhold. Denne handling kan ikke fortrydes, og data *kan ikke* blive gendannet. Er du sikker på, at du ønsker at fortsætte?"
       links: 
         calendar: Kursuskalender
         conclude: "Slut dette kursus"
@@ -4606,7 +4606,7 @@ da:
     media: medie
     messages: Beskeder
     modules: Moduler
-    outcomes: Resultater
+    outcomes: Indlæringsmål
     people: Folk
     plugins: Plugins
     prior_users: "Forrige brugere"
@@ -4732,7 +4732,7 @@ da:
     show_more_link: 
       show_less: "Vis mindre"
       show_more: "Vis mere"
-  dashboard_7f1dbf71: Instrumentbræt
+  dashboard_7f1dbf71: Oversigt
   data_exports: "data eksport"
   data_set_identifier_data_set_id_c228b5df: "Datasæt indentifikation: %{data_set_id}"
   date: 
@@ -5665,7 +5665,7 @@ da:
         show_comments: "Gør kommentarer offentlige"
         uploading_file: Uploading
       links: 
-        back: "Tilbage til Portfolio Dashboard"
+        back: "Tilbage til Portfolio Oversigt"
         choose_submission: "Kursus indsendelse"
         delete: "Slet denne ePortfolio"
         download_eportfolio: "Download indholdet af denne ePortfolio som zipfil"
@@ -5831,7 +5831,7 @@ da:
   excused_5877183c: Fritaget!
   excused_cf8792eb: Fritaget
   exit_theme_editor_9ddd41bb: "Gå ud af Theme Editor"
-  expand_collapse_title_outcome_group_239f0a9d: "udfold/sammenfold  %{title}  resultatgruppe"
+  expand_collapse_title_outcome_group_239f0a9d: "udfold/sammenfold  %{title}  indlæringsmålgruppe"
   expand_list_of_group_members_for_groupname_9ce9d2f7: "Udfold liste af gruppemedlemmer for %{groupName}"
   expand_or_collapse_calendars_9854b0d0: "Udfold eller sammenfold kalendere"
   expand_or_collapse_undated_items_b901de09: "Udfold eller sammenfold udaterede elementer"
@@ -6008,7 +6008,7 @@ da:
       no_features_available: "Ingen funktioner er for øjeblikket tilgængelige."
   feature_options_37a2c317: Funktionsvalg
   features: 
-    allow_opt_out_of_inbox: "Tillad brugere at fravælge indboks"
+    allow_opt_out_of_inbox: "Tillad brugere at fravælge indbakke"
     better_file_browsing: "Bedre fil browsing"
     differentiated_assignments: "Forskelligartede opgaver"
     differentiated_assignments_account_disable_warning: |-
@@ -6124,13 +6124,13 @@ da:
     search: Søg
   find_outcome: 
     errors: 
-      outcome_retrieval_failed: "Resultathentning mislykkedes. Prøv venligst igen."
+      outcome_retrieval_failed: "Indlæsning af indlæringsmål mislykkedes. Prøv venligst igen."
     messages: 
-      loading_outcomes: "Loading resultater..."
-      no_outcomes_found: "Ingen resultater fundet"
-      no_rubric_outcomes_found: "Ingen instruktion konfigurederesultater fundet"
+      loading_outcomes: "Indlæser indlæringsmål..."
+      no_outcomes_found: "Ingen indlæringsmål fundet"
+      no_rubric_outcomes_found: "Ingen konfigurede indlæringsmål fundet"
     titles: 
-      find_outcome: "Find resultat"
+      find_outcome: "Find indlæringsmål"
   first_two_students_and_others_count_others_bb0a212a: "%{first_two_students}, og %{others_count} andre"
   flash_6afbf65a: Flash
   folder: 
@@ -6305,7 +6305,7 @@ da:
       menu: m
       sort: s
       tooltip: t
-    learning_outcome: "Indlærings resultat"
+    learning_outcome: Indlæringsmål
     no_assignments_have_points_warning: "Kan ikke beregne score indtil en opgave har mulige points"
     notes: Noter
     outcome_gradebook: 
@@ -6424,7 +6424,7 @@ da:
       close_rubric: "Luk instruktion"
       close_score: Luk
       close_score_screenreader: "Luk scoredetailjer"
-      collapse: "Sammenfold alle indlæringsbeherskelse resultat gupper."
+      collapse: "Sammenfold alle resultatgrupper for beherskelse af indlæringsmål."
       collapse_title: Sammenfold
       comment_count: 
         one: "1 kommentar"
@@ -6432,7 +6432,7 @@ da:
       comment_count_screenreader: "Læs kommentarer"
       comments: Kommentarer
       disabled_for_student_view: "Test studerendes scores er ikke indkluderet i bedømmelsesstatistikkerne."
-      expand: "Udvid alle indlæringsbeherskelse resultat grupper."
+      expand: "Udvid alle resultatgrupper for beherskelse af  indlæringsmål."
       expand_title: Udvid
       for_course: "For kursus."
       grading_in_progress: "Instruktør arbejder på karaktere"
@@ -7069,7 +7069,7 @@ da:
     positive_group_count: "Skal indtaste et positivt gruppe antal"
     randomly_assigning_members: "Tilfældig tildeling af studernede"
     show: 
-      coming_up: Kommende
+      coming_up: "Kommende aktiviteter"
       edit_group: "Rediger gruppe"
       group_atom_feed: "Gruppe Atom nyhedskilde"
       new_announcement: "Ny Meddelelse"
@@ -7246,10 +7246,10 @@ da:
     due_dates_warning: "Kunne ikke justere forfaldsdatoer."
     file_import_warning: "Fil %{file} kunne ikke findes"
   importers/learning_outcome_group_importer: 
-    no_global_permission: "Du er ikke tilladt til at administrere globale resultater, kan ikke tilføje \"%{title}\""
+    no_global_permission: "Du er ikke tilladt til at administrere globale indlæringsmål; kan ikke tilføje \"%{title}\""
   importers/learning_outcome_importer: 
-    no_context_found: "Eksterne indlæringsresultater  kunne ikke findes for \"%{title}\", opretter en kopi"
-    no_global_permission: "Du er ikke tilladt til at administrere globale resultater, kan ikke tilføje \"%{title}\""
+    no_context_found: "Eksterne indlæringsmål  kunne ikke findes for \"%{title}\", opretter en kopi"
+    no_global_permission: "Du er ikke tilladt til at administrere globale indlæringsmål, kan ikke tilføje \"%{title}\""
   importers/rubric_importer: 
     no_context_found: "Ekstern instruktion kunne ikke findes for \"%{title}\", oprette en kopi."
   importers/wiki_page_importer: 
@@ -7260,7 +7260,7 @@ da:
   in_progress_646a8aef: Igangværende
   in_progress_9d1ce8b9: Igangværende
   in_progress_icon_6e69c998: igangværende-ikon
-  inbox_bb245a60: Indboks
+  inbox_bb245a60: Indbakke
   include_this_assignment_s_grades_when_posting_to_y_6bff3323: "Inkluder karakterene for denen opgave når du indtaster det i din uddannelsesinsstitutions Studenter Information System"
   include_unpublished_courses_7a0e7aab: "Inkluder ikke offentliggjorte kurser"
   incorrect_username_and_or_password_2de73abb: "Forkert brugernavn og/eller adgangskode"
@@ -7449,7 +7449,7 @@ da:
         close: "Tryk komma for at lukke denne dialog."
       links: 
         close: Luk
-        dashboard: "Mit Instrumentbræt"
+        dashboard: "Min Oversigt"
     fixed_bottom: 
       masquerading: 
         stop: "Stop maskering"
@@ -7469,7 +7469,7 @@ da:
       log_in_to_canvas: "Log in til Canvas"
   learning_mastery_gradebook_description: |-
       Learning Mastery Gradebook giver en måde for lærer til hurtigt at se studerende og kursus
-      fremskridt på kurusindlæringsresultater. Resultater er præsenteret i en Gradebook lignende
+      fremskridt på kurusindlæringsmål. Indlæringsmål er præsenteret i en Gradebook lignende
       format og studerendes fremskridt er vist både som et nummerisk score og som behersket/nær
       behersket/special.
   learning_outcome: 
@@ -7509,7 +7509,7 @@ da:
           fordi opgaven ikke har nogen mulige points.
       no_points_possible: "Opgave har ingen mulige points"
       no_score: "Ingen score ere givet"
-      no_submission_created: "Denne resultatanmodning mislykkedes med at oprette en ny hjemmearbejdeindsendelse."
+      no_submission_created: "Denne anmodning om indlæringsmål mislykkedes med oprettelsen en ny hjemmearbejdeindsendelse."
     canvas: 
       migration: 
         announcements: Meddelelser
@@ -7522,7 +7522,7 @@ da:
         discussion_topics: Diskussionsemner
         external_tools: "Eksterne Værktøjer"
         groups: Studiegrupper
-        learning_outcomes: "Indlærings resultater"
+        learning_outcomes: Indlæringsmål
         quizzes: Quiz
         rubrics: Instructions
         syllabus_body: Pensum
@@ -7535,7 +7535,7 @@ da:
     incoming_message_processor: 
       failure_message: 
         body: |-
-            Beskeden med titlen "%{subject}" kunne ikke leveres.  Beskeden blev sendt til en ukendt postboks adresse.  Hvis du forsøger at kontakte en person gennem Canvas, akn du forsøge at logge ind til din konto og sende dem en besked ved at benytte Indboks værktøj.
+            Beskeden med titlen "%{subject}" kunne ikke leveres.  Beskeden blev sendt til en ukendt postboksadresse.  Hvis du forsøger at kontakte en person gennem Canvas, kan du forsøge at logge ind til din konto og sende dem en besked.
             
                       Tak,
                       Canvas Support
@@ -7592,7 +7592,7 @@ da:
   linked_quiz_message: "linked med quiz '%{title}'"
   linkedin_5726caca: LinkedIn
   links: 
-    dashboard: "Mit Instrumentbræt"
+    dashboard: "Min Oversigt"
     errors: 
       4xx_feedback: "Klik her for at fortælle os om, hvad du var på udkig efter."
       feedback: "Klik her for at fortælle os, hvad der skete"
@@ -9499,7 +9499,7 @@ da:
     file_type: Fil
     grading_standard_type: Bedømmelsessystem
     group_type: Gruppe
-    learning_outcome_type: "Indlærings resultat"
+    learning_outcome_type: Indlæringsmål
     module_type: Modul
     quiz_question_type: "Quiz spørgsmål"
     quiz_type: Quiz
@@ -9684,8 +9684,8 @@ da:
   move_dialog_select: 
     move_to_end: "-- I bunden --"
   move_module_item_77754119: "Flyt modul/element"
-  move_outcome_ce497e6c: "Flyt resultat"
-  move_outcome_group_cfa1a505: "Flyt resultatgruppe"
+  move_outcome_ce497e6c: "Flyt indlæringsmål"
+  move_outcome_group_cfa1a505: "Flyt indlæringsmålgruppe"
   moving_a4d552df: Flytter...
   multi_factor_authentication_configured_865b1bde: "Multi-faktor bekræftelse konfigureret"
   must_achieve_mastery_at_least_count_times_scores_a_628db168: "Skal opnå behersekelse på mindst %{count} gange. Scores over beherskelse vil blive beregnet som gennemsnit og beregnet i den endelige score."
@@ -9707,7 +9707,7 @@ da:
     submission_comments: Indsendelseskommentarer
     sure_you_want_to_mute: "Er du sikker på, at du ønsker at afbryde denne opgave? Mens denne opgave er afbrudt, vil studerende ikke modtage nye notifikationer om eller være i stand til at se:"
   muted_283cfa0f: (afbrhudt)
-  my_dashboard_b724020: "Mit instrumentbræt"
+  my_dashboard_b724020: "Min Oversigt"
   n_554bc493: "n"
   n_a_d6f6c42f: N/A
   n_number_of_times_c2e78b72: "n antal gange"
@@ -9727,7 +9727,7 @@ da:
   new_file_135ae520: "[ Ny Fil ]"
   new_group_set_7241a581: "Nyt gruppesæt"
   new_module_4e9287e4: "Nyt modul"
-  new_outcome_7fba8c7d: "Nyt resultat"
+  new_outcome_7fba8c7d: "Nyt indlæringsmål"
   new_quiz_statistics_desc: "Aktiver ny quiz statistikside for et kursus."
   new_ui_487a624e: "Nyt UI"
   next_40e12421: Næste
@@ -9810,7 +9810,7 @@ da:
       submission_comment: Indsendelseskommentar
     conversation_created_description: "Du oprettede en konversation"
     conversation_created_display: "Konversation oprettet af mig"
-    conversation_message_description: "Ny indboks beskeder"
+    conversation_message_description: "Ny besked"
     conversation_message_display: Konversationsbesked
     course_content_description: |-
         Ændring af kursusindhold:
@@ -10095,15 +10095,15 @@ da:
   orbis_report_header_student_sis_id: "bruger sis"
   orbis_report_header_submission_score: indsendelsesscore
   outcome_groups: 
-    invalid_file: "Ugyldig resultatgruppe fil"
+    invalid_file: "Ugyldig indlæringsmålgruppe-fil"
   outcome_groups_api: 
-    account_group_description: "Kontoniveau resultatgruppe."
+    account_group_description: "Kontoniveau indlæringsmålgruppe."
   outcome_path_mastery_points: "%{path} beherskelsespoints"
   outcome_path_result: "%{path} resultat"
   outcome_results: 
-    outcomes_filename: Resultater
-  outcome_results_title: Resultat
-  outcome_title_has_a_status_of_statustooltip_82d1e6d9: "Resultat: %{title} har en status af %{statusTooltip}"
+    outcomes_filename: Indlæringsmål
+  outcome_results_title: Indlæringsmålresultater
+  outcome_title_has_a_status_of_statustooltip_82d1e6d9: "Indlæringsmål: %{title} har en status af %{statusTooltip}"
   outcomes: 
     account_standards: "Konto standarder"
     account_standards_description: "Til venstre vil du bemærke standarder som din institution har oprettet for dig til brug i dit kursus."
@@ -10113,13 +10113,13 @@ da:
         back: Tilbage
         find: Find
         new_group: "Ny gruppe"
-        new_outcome: "Nyt resultat"
+        new_outcome: "Nyt indlæringsmål"
     common_core: "Fælles kernestandarder"
     common_core_description: "Til venstre er den bekendte resultatmappestruktur for hver gruppering af Common Core State Standards. Dette vil tillade dig nemt at inkludere enhver Common Core Standards for bedømmelse indenfor dit kursus."
     confirm: 
       delete: "Er du sikker på, at du ønsker at slette?"
       import_group: "Importer gruppe \"%{group}\" to group \"%{target}\"?"
-      import_outcome: "Importer resultat \"%{outcome}\" to group \"%{target}\"?"
+      import_outcome: "Importer indlæringsmål \"%{outcome}\" to gruppe \"%{target}\"?"
     criteria: 
       does_not_meet_expectations: "Opfylder ikke forventningerne"
       exceeds_expectations: "Overskridere forventningerne"
@@ -10135,13 +10135,13 @@ da:
       pts: pts
       rating_description: Kriterievurderingbeskrivelse
     dont_import: "Denne gruppe kan ikke importeres."
-    failed_outcome_creation: "Resultatkriterie mislykkedes"
-    failed_outcome_update: "Resultatopdatering mislykkedes"
+    failed_outcome_creation: "Oprettelse af indlæringsmål mislykkedes"
+    failed_outcome_update: "Opdatering af indlæringsmål mislykkedes"
     find_instructions: 
       instructions: 
         find: 
-          description: "*Få adgang til resultater oprette af din institution, eller stat her. Blot synes om dit kurus, panelet til venstre vil tillade dig at navigere mellem eksisterende resultater. Når du har fundet det resultat eller den resultatgruppe du ønsker at benytte, klik import knappen nedenfor for at tilføje den til dit kursus.*"
-          title: "Finder resultater"
+          description: "*Få adgang til indlæringsmål oprette af din institution eller stat her. Blot synes om dit kurus, panelet til venstre vil tillade dig at navigere mellem eksisterende resultater. Når du har fundet det resultat eller den resultatgruppe du ønsker at benytte, klik import knappen nedenfor for at tilføje den til dit kursus.*"
+          title: "Finder indlæringsmål"
     flash: 
       addSuccess: "Oprettelse lykkedes"
       deleteError: "Noget gik galt. Ikke i stand til at slette på nuværnde tidspunkt."
@@ -10156,15 +10156,15 @@ da:
       instructions: 
         main: 
           manage: 
-            description: "*Resultater er oprettet her for at spore beherskelse af et kursus. For at komme i gang, tjek menubaren øverst oppe. Klik på ny knappen for at oprette et nyt resutlat, eller ny gruppe knappen for at oprette en ny gruppe at organisere dine resultater ind i. Find knappen vil tillade digat benytte resultater, der er blevet oprettet af din stat eller institution. Mens du opretter eller bruger resultater, vil du være i stand til at bruge panellet til venstre for at navigere gennem dine resultater. Du kan trække og droppe resultater mellem forskellige niveauer for at skabe struktur.* *Vigtigere, Canvas kan tillade dig at tilføje resultater til din bedømmelsesinstruktioner, så du kan evaluere beherskelse mens du bedømmer opgaver. Når du har sat op resulater, klik administrer instruktioner for a starte med at bruge dine resultater for bedømmelse.*"
-            title: "Opsætter resultater"
+            description: "*Indlæringsmål er oprettet her for at spore beherskelse af et kursus. For at komme i gang, tjek menubaren øverst oppe. Klik på ny knappen for at oprette et nyt resutlat, eller ny gruppe knappen for at oprette en ny gruppe at organisere dine resultater ind i. Find knappen vil tillade digat benytte resultater, der er blevet oprettet af din stat eller institution. Mens du opretter eller bruger indlæringsmål, vil du være i stand til at bruge panellet til venstre for at navigere gennem dine indlæringsmål. Du kan trække og droppe resultater mellem forskellige niveauer for at skabe struktur.* *Vigtigere, Canvas kan tillade dig at tilføje resultater til din bedømmelsesinstruktioner, så du kan evaluere beherskelse mens du bedømmer opgaver. Når du har sat op resulater, klik administrer instruktioner for a starte med at bruge dine indlæringsmål for bedømmelse.*"
+            title: "Opsætter indlæringsmål"
     mastery_error: "Skal være større end eller lig med 0"
-    missing_outcome: "Kunne ikke finde indlæringsresultater"
-    new_outcome_group: "Ny resultatgruppe"
+    missing_outcome: "Kunne ikke finde indlæringsmål"
+    new_outcome_group: "Ny indlæringsmålgruppe"
     outcome: 
       links: 
-        delete_outcome: "Slet resultat"
-        edit_outcome: "Rediger resultat"
+        delete_outcome: "Slet indlæringsmål"
+        edit_outcome: "Redige indlæringsmål"
       mastery_at_label: "Set beherskelse for envher score på eller over:"
       point_mastery: "Beherskelse: %{mastery_points} Points"
       points: 
@@ -10172,22 +10172,22 @@ da:
         total: "%{points_possible} Points"
       total_points: "Totale points"
       use_for_scoring: "Brug dette kriterie for scoring"
-    outcome_criterion: "Indlæringsresultat kriterie"
+    outcome_criterion: "Indlæringsmål kriterie"
     outcome_form: 
       calculation_method: Beregningsmetode
       criterion: "Vurderinger af kriterie"
-      criterion_dialog: "Indlæringsresultater kan blive inkluderet i opgaveinstruktioner, da det er en nem måde at bedømme beherskelse af resultater justeret til specifikke opgaver. Når du definere et indlæringsresultat, skal du også definere et kriterie, der kan blive brugt, når opgaverinstruktioner opbygges. Definer så mange instuktionskolonner, som du behøver og specificer en punktgrænse, der vil blive benyttet til at definere beherskelse af dette resultat."
+      criterion_dialog: "Indlæringsmål kan blive inkluderet i opgaveinstruktioner, da det er en nem måde at bedømme beherskelse af indlæringsmål justeret til specifikke opgaver. Når du definere et indlæringsmål, skal du også definere et kriterie, der kan blive brugt, når opgaverinstruktioner opbygges. Definer så mange instuktionskolonner, som du behøver og specificer en punktgrænse, der vil blive benyttet til at definere beherskelse af dette indlæringsmål."
       criterion_info_link: "Klik for at lære om vurderinger af kriterie"
-      description: "Beskriv dette resultat"
+      description: "Beskriv dette indlæringsmål"
       display_name: "Venligt navn (valgfrit)"
       mastery: "Beherskelse ved"
       points: "%{points_possible} Points"
-      title: "Benævn dette resultat"
+      title: "Benævn dette indæringsmål"
       total_points: "Totale points"
     outcome_group: 
       links: 
-        delete_outcome_group: "Slet resultatgruppe"
-        edit_outcome_group: "Rediger resultatgruppe"
+        delete_outcome_group: "Slet indlæringsmålgruppe"
+        edit_outcome_group: "Rediger indlæringsmålgruppe"
     outcome_group_form: 
       group_description: "Beskriv denne gruppe"
       title: "Benævn denne gruppe"
@@ -10195,7 +10195,7 @@ da:
       mastery_set_at: "Beherskelse sat ved"
       no_results: "(intet resultat)"
     outcome_result: 
-      all_outcomes: "all resultater for denne studerende"
+      all_outcomes: "all indlæringsmål for denne studerende"
       attempt_info: "forsøg #%{attempt_number}, %{attempt_date}"
       outcome_mastered: behersket
       scoring: "%{points} ud af %{possible_points}"
@@ -10204,12 +10204,12 @@ da:
       no_artifacts: "Ingen artefakt"
     state_standards: "Standard for stat"
     state_standards_description: "Til venstre vil du se en mappe for hver stat med deres updaterede standarder. Dette tillader dig nemt at inkludere stat standarder for bedømmelse indenfor dit kursus."
-    successful_outcome_creation: "Resultat oprettet succesfuldt!"
-    successful_outcome_delete: "Resultat slettet succesfuldt"
-    successful_outcome_removal: "Resultat fjernet succesfuldt"
-    successful_outcome_update: "Resutlat opdateret succesfuldt!"
+    successful_outcome_creation: "Indæringsmål oprettet succesfuldt!"
+    successful_outcome_delete: "Indlæringsmål slettet succesfuldt"
+    successful_outcome_removal: "Indlæringsmål fjernet succesfuldt"
+    successful_outcome_update: "Indlæringsmål opdateret succesfuldt!"
     titles: 
-      find_outcomes: "Find resultater"
+      find_outcomes: "Find indlæringsmål"
     top_level: "%{context} Top niveau"
     user_outcome_results: 
       artifacts: 
@@ -10223,13 +10223,13 @@ da:
         see_results: "Se %{user_name}'s resultater for"
       mastery: "Beherskelse efter sidste forsøg"
       no_mastery: "Ingen beherskelse efter sidste forsøg"
-      outcomes_for: "Resultater for %{user_name}"
+      outcomes_for: "Indlæringsmål for %{user_name}"
       score_out_of_possible: "%{score}* ud af %{possible}*"
       short_title: 
         attempts: Forsøg
         average_percent: "Gennemsnitlig procent"
         latest_score: "Sidste score"
-        outcome: Resultat
+        outcome: Indlæringsmål
   overrides: 
     blank_override: "Du skal have valgt en studerende eller sektion"
     everyone: Alle
@@ -10838,7 +10838,7 @@ da:
         change_password: "Ændre adgangskode"
         confirm_password: "Bekræft Kodeord"
         default_email: "Standard Email"
-        disable_inbox: "Deaktiver konversations-indboksens ulæste besked mærke og send alle konversationsbeskeder og notifikationer via email. ASAP. "
+        disable_inbox: "Deaktiver konversations-indbakkens ulæste besked mærke og send alle konversationsbeskeder og notifikationer via email. ASAP. "
         expires_at: Udløber
         headers: 
           approved_integrations: "Godgendte integrationer"
@@ -11112,7 +11112,7 @@ da:
   qualified_locale: da-DK
   question_answered: Besvaret
   question_bank: 
-    align_outcomes: "Juster resultater"
+    align_outcomes: "Juster indlæringsmål"
     already_bookmarked: "Allerede sat som bogmærke"
     bookmark_failed: "Bogmærkning mislykkedes"
     bookmarking: Bogmærkning...
@@ -11142,11 +11142,11 @@ da:
     move_questions: "Flyt spørgmsål"
     multiple_questions: "Flere spørgsmål"
     question_bank: Spørgsmålsbank
-    remove_outcome_from_bank: "Er du sikker på, at du ønsker at fjerne dette resultat fra banken?"
+    remove_outcome_from_bank: "Er du sikker på, at du ønsker at fjerne dette indlæringsmål fra banken?"
     title: 
       move_copy_questions: "Flyt/kopier spørgsmål"
-    update_outcomes_fail: "Opdatering af resultater mislykkedes"
-    updating_outcomes: "Opdaterer resultater..."
+    update_outcomes_fail: "Opdatering af indlæringsmål mislykkedes"
+    updating_outcomes: "Opdaterer indlæringsmål..."
   question_banks: 
     bank_fail: "Oprettelse af spørgsmålsbank mislykkedes."
     bank_success: "Sprøgsmålsbank oprettet succesfuldt!"
@@ -11190,14 +11190,14 @@ da:
         move_questions: "Flyt flere spørgsmål"
       edit_warning: "Husk, ændringer til spørgsmålsskabelon vil ikke automatisk opdatere quizzer, der allerede bruger de spørgsmål."
       headings: 
-        aligned_outcomes: "Juster resultater"
+        aligned_outcomes: "Juster indlæringsmål"
       labels: 
         keep_copy: "Behold en kopi af denne spørgsmålsbank"
         new_bank_name: "Nyt banknavn"
         new_question_bank: "Ny spørgsmålsbank"
         title: "Bank navn"
       links: 
-        align_outcome: "Juster resultater"
+        align_outcome: "Juster indlæringsmål"
         more_questions: "flere spørgsmål"
       loading_banks: "Loader banker..."
       mastery_threshold: "beherskelse ved %{threshold_percentage}"
@@ -12599,12 +12599,12 @@ da:
       manage_feature_flags: "Aktiver eller deaktiver funktioner på kontoniveau"
       manage_files: "Administrer ( tilføj / rediger / slet ) kursus filer"
       manage_frozen_assignment: "Administrer ( rediger / slet ) frosne opgaver"
-      manage_global_outcomes: "Administrer globale indlæringsresultater"
+      manage_global_outcomes: "Administrer globale indlæringsmål"
       manage_grades: "Rediger karaktere"
       manage_groups: "Administrer ( opret / rediger / slet )  grupper"
       manage_interaction_alerts: "Administrer notifikationer"
       manage_links: "Administrer rolle og hav tillid til link"
-      manage_outcomes: "Administrer indlæringsresultater"
+      manage_outcomes: "Administrer indlæringsmål"
       manage_role_overrides: "Administrer tilladelser"
       manage_rubrics: "Opret og rediger bedømmelsesinstruktioner"
       manage_sections: "Administrer ( tilføj / rediger / slet ) kursus sektioner"
@@ -12808,7 +12808,7 @@ da:
       header: 
         content_selection: Indholdsvælger
       outcome: 
-        select_outcome: "Vælg et resultat"
+        select_outcome: "Vælg et indlæringsmål"
       student: 
         select_student: "Vælg en studerende"
     grading: 
@@ -12827,7 +12827,7 @@ da:
     learning_mastery: 
       download_results: "Download resultater (.csv)"
       empty_student_selection: "Vælg en studerende for at se yderligere information her."
-      empty_submission_selection: "Vælg en studerende og et resultat for at se resultater."
+      empty_submission_selection: "Vælg en studerende og et indlæringsmål for at se resultater."
       hide_student_names_label: "Skjul studerendes navne"
       result: Resultat
       result_for: "Resultat for:"
@@ -12837,10 +12837,10 @@ da:
       student_info: "Information om studerende"
     outcome_information: 
       avg_score: "Gennemsnitlig karakter"
-      empty_outcome_selection: "Vælg et resultat for at se yderligere information her."
+      empty_outcome_selection: "Vælg et indlæringsmål for at se yderligere information her."
       high_score: "Høj score"
       low_score: "Lav score"
-      outcome_info: "Resultat information"
+      outcome_info: "Indlæringsmål information"
       result_sub_count: "Totale resultater:"
     screenreader_gradebook: 
       assignments: Opgaver
@@ -13019,7 +13019,7 @@ da:
       already_enrolled: "du er allerede tilmedlt til **%{course}**."
       buttons: 
         go_to_course: "Gå til kursus"
-        go_to_dashboard: "Gå til dit instrukentbræt"
+        go_to_dashboard: "Gå til din Oversigt"
     authenticate: 
       buttons: 
         enroll_in_course: "Tilmeld kursus"
@@ -13053,7 +13053,7 @@ da:
       already_enrolled: "Du har succesfuldt tilmeldt dig til **%{course}**"
       buttons: 
         go_to_course: "Gå til kursus"
-        go_to_dashboard: "Gå til dit instrukentbræt"
+        go_to_dashboard: "Gå til din Oversigt"
       not_available_yet: "Vi vil sende dig en e-mail kort før kuset starter."
   send_custom_fields_uncheck_unless_using_canvas_zen_67e83666: "Send tilpassede felter (afkryds ikke medmindre Canvas zendesk benyttes)"
   send_e3bd0ed0: Send
@@ -13271,7 +13271,7 @@ da:
         events: Begivenheder
     find_outcome: 
       buttons: 
-        add_outcome: "Tilføj resultat"
+        add_outcome: "Tilføj indlæringsmål"
       labels: 
         criterion_ratings: Vurderingskriterier
         master_level: "sæt beherskelse for enhver score på eller over"
@@ -13403,7 +13403,7 @@ da:
       start_a_new_course: "Start et nyt kursus"
     new_nav_header: 
       links: 
-        dashboard: Instrumentbræt
+        dashboard: Oversigt
         skip_to_content: "Skil til indhold"
     no_recent_activity: 
       empty_stream_message: "Du har endnu ikke nogen beskeder i din strøm. Når du begynder at deltage i dine kurser, vil du se denne strøm blive fyldt op med beskeder fra diskussioner, bedømmelsesopdateringer, private beskeder mellem dig og andre brugere etc. "
@@ -13486,7 +13486,7 @@ da:
         edit: "Rediger instruktioner"
         find_a_rubric: "Find en instruktion"
         find_another_rubric: "Find anden instruktion"
-        find_outcome: "Find resultat"
+        find_outcome: "Find indlæringsmål"
         find_rubric: "Find instruktion"
       messages: 
         locked: "Kan ikke ændre en instruktion, når du er begyndt at bruge den."
@@ -13528,7 +13528,7 @@ da:
       points_label: Points
       points_out_of2: "%{points} / %{total} pts"
       titles: 
-        linked_to_learning_outcome: "Dette kriterie er forbundet til indlæringsresultat"
+        linked_to_learning_outcome: "Dette kriterie er forbundet til indlæringsmål"
     rubric_criterion_dialog: 
       buttons: 
         update_comments: "Opdater kommentare"
@@ -13572,7 +13572,7 @@ da:
       out_of_points: "%{points}/%{total} pts"
       titles: 
         full_comments: "Klik for at se alle kommentarer"
-        linked_to_learning_outcome: "Dette kriterie er linked til indlæringsresultat"
+        linked_to_learning_outcome: "Dette kriterie er linked til indlæringsmål"
     select_content_dialog: 
       add_to_module: "Tilføj %{item} til *modul*"
       assignment_item: Besvarelse
@@ -13891,7 +13891,7 @@ da:
     media_recordin: Medieoptagelse
     next_object: "Næste %{type}"
     no_assignment: "Ingen opgave valgt"
-    no_outcome: "Intet resultat valgt"
+    no_outcome: "Intet indlæringsmål valgt"
     no_student: "Ingen studerende valgt"
     none: Ingen
     notes: Noter
@@ -13940,7 +13940,7 @@ da:
   student_must_complete_all_of_these_requirements_656771d6: "Studerende skal fuldføre alle af disse forudsætninger"
   student_must_complete_one_of_these_requirements_6046eb3a: "Studerende skal fuldføre en af disse forudsætninger"
   student_name: "Studerendes navn"
-  student_outcome_gradebook_description: "Studerendes indlæringsbeherskelses Gradebook giver en måde for den studrende til hurtigt at se fremskridt i kurus indlæringsresultater. Resultater er præsenteret i en karakterbogslignedne format og fremgang er vist både som en numerisk score og som behersket / næsten behersket / special."
+  student_outcome_gradebook_description: "Studerendes indlæringsbeherskelses Gradebook giver en måde for den studrende til hurtigt at se fremskridt i kurus indlæringsresultater. Indlæringsmål er præsenteret i en karakterbogslignedne format og fremgang er vist både som en numerisk score og som behersket / næsten behersket / special."
   student_summary: 
     student_summary_table_ascending: "Studerendes resume tabel sortet for stigende efter %{sortText}"
     student_summary_table_descending: "Studerendes resume tabel sortet for nedadgående efter %{sortText}"
@@ -14172,7 +14172,7 @@ da:
     logout: Logout
     modules: Moduler
     observees: Observerer
-    outcomes: Resultater
+    outcomes: Indlæringsmål
     pages: Sider
     people: Personer
     profile: Profil
@@ -14264,12 +14264,12 @@ da:
   the_material_is_licensed_under_creative_commons_3242cb5e: "Dette materiale er under Creative Commons licens"
   the_material_is_subject_to_fair_use_exception_41bc6a4b: "Dette materialer er underlagt fair bruger undtagelse"
   the_message_titled_subject_could_not_be_delivered__8c6cbbe3: |-
-      Beskeden ved navn "%{subject}" kunne ikke levers.  Beskeden var sendt fra en adresse, der er ikke forbundet med din Canvas konto.  Hvis du forsøger at kontakte en person gennem Canvas kan du forsøge at logge ind til din konto og sende en besked ved at benytte Indboksværktøjet.
+      Beskeden med titlen "%{subject}" kunne ikke leveres.  Beskeden blev sendt til en ukendt postboksadresse.  Hvis du forsøger at kontakte en person gennem Canvas, kan du forsøge at logge ind til din konto og sende dem en besked.
       
                 Tak ,
                 Canvas Support
   the_module_item_is_locked_27fe420b: "Dette modul er låst."
-  the_most_recent_scores_for_user_current_user_name__ea82f0b6: "De seneste scores for bruger %{current_user_name} and outcome %{outcome_name}."
+  the_most_recent_scores_for_user_current_user_name__ea82f0b6: "De seneste scores for bruger %{current_user_name} and indlæringsmål %{outcome_name}."
   the_profile_picture_has_been_reported_d609d6dd: "Profil billedet er blevet rapporteret"
   the_roles_held_by_the_reporting_user_student_teach_8fa5a269: "Rolle for rapporterende bruger (studerende, lærer, admin, etc.)"
   the_scheduler_tool_lets_you_set_up_time_slots_that_233345b1: "Planlægningsværktøjet lader dig oprette tidsrum for studerende (eller studiegrupper) så de kan tilmelde sig til. For at komme i gang, klik på nedenstående knap."
@@ -14302,7 +14302,7 @@ da:
   this_course_cannot_be_added_to_the_courses_menu_at_a3fbb11e: "Dette kursus kan for øjeblikket ikke blive tilføjet til kursusmenuen."
   this_course_is_claimed_and_ready_but_you_ll_need_t_25b95a0a: "Dette kursus er taget og parat, men du skal fuldføre registreringsprocessen før du kan offentliggøre kurset. Du bør have modtaget en e-mail fra Canvas med et link til at fuldføre denne proces. Sørg for at tjekke din spam boks."
   this_course_is_visible_only_to_teachers_until_it_i_ce972f0: "Dette kursus er kun synlig for lærerne indtil det er offentliggjort."
-  this_enables_an_updated_navigation_new_dashboard_a_8bd4cae: "Dette aktiverer en opdateret nagivation, nyt instrumentbræt og et simplere, mere moderne udseende og følelse."
+  this_enables_an_updated_navigation_new_dashboard_a_8bd4cae: "Dette aktiverer en opdateret nagivation, ny oversigt og et simplere, mere moderne udseende og følelse."
   this_field_is_required_fa58c4a: "Dette felt er nødvendigt"
   this_field_name_is_required_988caebc: "Dette felt \"%{name}\" er nødvendigt."
   this_field_name_is_required_b9196401: "Dette felt \"navn\" er nødvendigt."
@@ -14311,8 +14311,8 @@ da:
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "Dette er en kommasepareret liste af betroede URL'er. Tiltro til ethver URL på denne liste vil tilsidesætte CSRF token, når du er logget ind til Canvas."
   this_login_is_for_provider_6f17462: "Dette login er for %{provider}"
   this_most_likely_happened_because_you_imported_cou_a78ea880: "Dette skete mest sandsynligt fordi du importerede kususindhold unden dets associerede filer."
-  this_outcome_has_been_used_to_assess_a_student_and_376d5ba9: "Dette resultat er blevet brugt til at vurdere en studerende og kan ikke længere blive opdateret"
-  this_outcome_has_been_used_to_assess_a_student_and_5a925169: "Dette resultat er bleveet benyttet til at vurdere en studerende og kan ikke blive redigeret eller slettet"
+  this_outcome_has_been_used_to_assess_a_student_and_376d5ba9: "Dette indlæringsmål er blevet brugt til at vurdere en studerende og kan ikke længere blive opdateret"
+  this_outcome_has_been_used_to_assess_a_student_and_5a925169: "Dette indlæringsmål er bleveet benyttet til at vurdere en studerende og kan ikke blive redigeret eller slettet"
   this_quiz_has_been_excused_d89d2b74: "Denne quiz er blevet fritaget"
   this_quiz_is_unpublished_only_teachers_can_see_the_51d281b1: "*Denne quiz er ikke offentliggjort* Kun lærerer kan se quizzen indtil den er offentliggjort."
   this_student_wrote_f1a3f22d: "Denne studerende skrev:"
@@ -14518,9 +14518,9 @@ da:
     discussion: Diskussion
     discussions: Diskutioner
     error_reports: Fejlrapporter
-    learning_outcomes: "Indlærings resultater"
+    learning_outcomes: Indlæringsmål
     messages: Beskeder
-    outcome_artifacts: "Resultat artefakter"
+    outcome_artifacts: "Indlæringmsål artefakter"
     people: Personer
     view_in_separate_window: "Se i seperat vindue"
   to_35c6baa2: til
@@ -14811,7 +14811,7 @@ da:
         one: "1 deltager"
         other: "%{count} deltagere"
     dashboard_sidebar: 
-      coming_up: Kommende
+      coming_up: "Kommende opgaver"
       recent_feedback: "Nylig feedback"
       start_new_course: "Start et nyt kursus"
     delete: 
@@ -14976,7 +14976,7 @@ da:
       none_yet: "Ikke endnu."
       page_header_title: "Bruger profil"
       page_views: Sidevisninger
-      see_outcomes: "Se indlæringsresultater for  %{user}"
+      see_outcomes: "Se indlæringsmål for  %{user}"
     teacher_activity: 
       crumbs: 
         interaction_report: "Studerendes samarbejdsrapport"
@@ -15005,9 +15005,9 @@ da:
     twitter_added: "Twitter adgang tilladt!"
     twitter_fail_whale: "Twitter tilladelse mislykkedes. Prøv venligst igen"
     user_dashboard: 
-      dashboard: Instrumentbræt
+      dashboard: Oversigt
       user_atom_feed: "Bruger Atom nyhedskilde (alle kurser)"
-      user_dashboard: "Bruger instrumentbræt"
+      user_dashboard: Brugroversigt
     user_is_deleted: "%{user_name} er blevet slettet"
     user_merge_fail: "Bruger sammenlægning mislykkedes. Sørg venligst for at du har de rette tilladelser og prøv igen."
     user_merge_success: "Bruger sammenlægning fuldført! %{first_user} og %{second_user} er nu et og det samme."
@@ -15261,8 +15261,8 @@ da:
   you_do_not_have_access_to_the_requested_quiz_d3659e4b: "Du har ikke adgang til den anmodede quiz."
   you_have_changed_the_progression_requirements_for__6772bc89: "Du har ændret forudsætningerne for et aktivt kursus. Der er måske studerennd, der allerede er i gang med dette modul og andre, der afhænger af det."
   you_have_made_changes_to_the_questions_in_this_qui_1658361a: "*Du har foretaget ændringer til spørgsmål i denne quiz.* Disse ændringer vil ikke blive vist til de studerende indtil du har gemt quizzen."
-  you_have_no_outcomes_click_here_to_create_one_ebf262a3: "Du har ingen resultater. *Klik her* for at oprette dem."
-  you_have_no_outcomes_click_here_to_go_to_the_outco_574bd0af: "Du har ingen resultater. Klik her for at gå til resultatsiden."
+  you_have_no_outcomes_click_here_to_create_one_ebf262a3: "Du har ingen indlæringsmål. *Klik her* for at oprette dem."
+  you_have_no_outcomes_click_here_to_go_to_the_outco_574bd0af: "Du har ingen indlæringsmål. Klik her for at gå til resultatsiden."
   you_have_reached_the_maximum_webhooks_per_account__ae9a7f83: "Du har nået det maksimale antal webhooks pr. kontogrænse  (%{max})"
   you_have_reached_the_maximum_webhooks_per_user_lim_2af4b256: "Du har npet det makstimale antal webhooks pr. brugergrænse (%{max})"
   you_have_submitted_the_assignment_7ef8a51a: "Du har indsendt opgaven"
