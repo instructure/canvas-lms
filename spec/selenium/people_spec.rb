@@ -31,9 +31,10 @@ describe "people" do
     expect(f('#category_list')).to include_text(group_text)
   end
 
-  def enroll_student(student)
+  def enroll_student(student, sis_source_id: nil)
     e1 = @course.enroll_student(student)
     e1.workflow_state = 'active'
+    e1.sis_source_id = sis_source_id if sis_source_id
     e1.save!
     @course.reload
   end
@@ -57,6 +58,18 @@ describe "people" do
     enroll_student(student_4)
   end
 
+  def open_dropdown_menu(selector: nil, option: nil, displayed: true)
+    selector ||= ".rosterUser"
+    row = f(selector)
+    driver.action.move_to(row).perform
+    f("#{selector} .admin-links a.al-trigger").click
+    expect(f("#{selector} .admin-links ul.al-options")).to be_displayed
+    if option
+      to_be_or_not_to_be = displayed ? :to : :not_to
+      expect(element_exists("#{selector} .admin-links ul.al-options li a[data-event=#{option}]")).send to_be_or_not_to_be, be_truthy
+    end
+  end
+
   context "people as a teacher" do
 
     before (:each) do
@@ -67,12 +80,13 @@ describe "people" do
       Account.default.settings[:enable_manage_groups2] = false
       Account.default.save!
 
-      e1 = @course.enroll_student(@student_1)
-      e1.workflow_state = 'active'
-      e1.save!
-      @course.reload
+      enroll_student(@student_1)
 
-      #adding users for second selenium test to work correctly
+      #add second student as if enrolled via SIS
+      @sis_student = create_user('sis_student@test.com')
+      enroll_student(@sis_student, sis_source_id: 'oh hai')
+
+      #adding users for tests to work correctly
 
       #teacher user
       @test_teacher = create_user('teacher@test.com')
@@ -89,6 +103,18 @@ describe "people" do
 
     it "should have tabs" do
       expect(fj('.collectionViewItems>li:first').text).to match "Everyone"
+    end
+
+    it "should display a dropdown menu when item cog is clicked" do
+      open_dropdown_menu
+    end
+
+    it "should display the option to remove a student from a course if manually enrolled" do
+      open_dropdown_menu(option: 'removeFromCourse')
+    end
+
+    it "should not display the option to remove a student if enrolled via SIS" do
+      open_dropdown_menu(selector: '.rosterUser:nth-child(2)', option: 'removeFromCourse', displayed: false)
     end
 
     it "should display activity report on clicking Student Interaction button", priority: "1", test_id: 244446 do
