@@ -50,7 +50,7 @@ define [
     return '/api/v1/developer_keys'
 
   accountEndpoint = ->
-    return "/api/v1/accounts/#{ ENV.DOMAIN_ROOT_ACCOUNT_ID }/developer_keys"
+    return "/api/v1/accounts/self/developer_keys"
 
   isAccountAdminLevel = ->
     return window.location.pathname.indexOf('/accounts') == 0
