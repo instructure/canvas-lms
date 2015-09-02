@@ -120,8 +120,4 @@ Rails.configuration.after_initialize do
   Delayed::Periodic.cron 'Quizzes::QuizSubmissionEventPartitioner.process', '0 0 * * *' do
     with_each_shard_by_database(Quizzes::QuizSubmissionEventPartitioner, :process)
   end
-
-  Dir[Rails.root.join('vendor', 'plugins', '*', 'config', 'periodic_jobs.rb')].each do |plugin_periodic_jobs|
-    require plugin_periodic_jobs
-  end
 end
