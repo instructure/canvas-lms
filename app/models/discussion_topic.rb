@@ -816,7 +816,7 @@ class DiscussionTopic < ActiveRecord::Base
     given { |user| self.grants_right?(user, :read) }
     can :read_replies
 
-    given { |user| self.user && self.user == user && self.visible_for?(user) && !self.locked_for?(user, :check_policies => true) }
+    given { |user| self.user && self.user == user && self.visible_for?(user) && !self.locked_for?(user, :check_policies => true) && !context.concluded?}
     can :reply
 
     given { |user| self.user && self.user == user && self.available_for?(user) && context.user_can_manage_own_discussion_posts?(user) && context.grants_right?(user, :participate_as_student) }
