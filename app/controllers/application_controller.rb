@@ -345,14 +345,14 @@ class ApplicationController < ActionController::Base
       super
   end
 
-  def tab_enabled?(id)
+  def tab_enabled?(id, opts = {})
     return true unless @context && @context.respond_to?(:tabs_available)
     tabs = @context.tabs_available(@current_user,
                                    :session => session,
                                    :include_hidden_unused => true,
                                    :root_account => @domain_root_account)
     valid = tabs.any?{|t| t[:id] == id }
-    render_tab_disabled unless valid
+    render_tab_disabled unless valid || opts[:no_render]
     return valid
   end
 

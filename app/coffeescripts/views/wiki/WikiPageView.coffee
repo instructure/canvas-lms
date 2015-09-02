@@ -122,6 +122,7 @@ define [
       json.course_home = @course_home
       json.course_title = @course_title
       json.CAN =
+        VIEW_ALL_PAGES: !!@display_show_all_pages || !!@WIKI_RIGHTS.manage
         VIEW_PAGES: !!@WIKI_RIGHTS.read
         PUBLISH: !!@WIKI_RIGHTS.manage && json.contextName == 'courses'
         VIEW_UNPUBLISHED: !!@WIKI_RIGHTS.manage || !!@WIKI_RIGHTS.view_unpublished_items
