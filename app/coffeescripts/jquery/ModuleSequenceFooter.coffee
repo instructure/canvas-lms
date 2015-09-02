@@ -57,6 +57,9 @@ define [
           instanceNumber: @msfInstance.instanceNumber
           previous: @msfInstance.previous
           next: @msfInstance.next
+          current: @msfInstance.current
+          items_current_position: @msfInstance.items_current_position
+          items_count: @msfInstance.items_count
         )
         @msfAnimation(options.animation) if options?.animation != undefined
         @show()
@@ -130,6 +133,10 @@ define [
         # Show the buttons if they aren't null
         @buildNextData() if (@next.show = @item.next)
         @buildPreviousData() if (@previous.show = @item.prev)
+
+        # Make progress information available
+        @items_count = @modules[0].items_count
+        @items_current_position = @item.current?.position
 
       # Each button needs to build a data that the handlebars template can use. For example, data for
       # each button could look like this:
