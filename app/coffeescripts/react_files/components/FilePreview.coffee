@@ -62,7 +62,7 @@ define [
                 props.currentFolder.files.models
       folders = props.currentFolder.folders.models
 
-      items = _.extend files, folders
+      items = files.concat folders
       otherItems =  items.filter (item) ->
                       return true unless onlyIdsToPreview
                       item.id in onlyIdsToPreview
