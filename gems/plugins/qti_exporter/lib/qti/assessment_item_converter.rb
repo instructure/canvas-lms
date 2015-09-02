@@ -89,6 +89,7 @@ class AssessmentItemConverter
       unless ['fill_in_multiple_blanks_question', 'canvas_matching', 'matching_question',
               'multiple_dropdowns_question', 'respondus_matching'].include?(type)
         selectors << 'itemBody > choiceInteraction > prompt'
+        selectors << 'itemBody > extendedTextInteraction > prompt'
       end
 
       text_nodes = @doc.css(selectors.join(','))

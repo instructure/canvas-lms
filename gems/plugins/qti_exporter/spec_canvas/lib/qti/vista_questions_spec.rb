@@ -260,7 +260,7 @@ module VistaExpected
            :question_name=>"Essay Question"}.with_indifferent_access
 
   # removed ids on the answers
-  SHORT_ANSWER = {:question_text=>"We all live in what?<br>",
+  SHORT_ANSWER = {:question_text=>"We all live in what?<br>\n<br/>\n<div class=\"html\">1. </div>",
                   :incorrect_comments=>"",
                   :question_type=>"short_answer_question",
                   :answers=>

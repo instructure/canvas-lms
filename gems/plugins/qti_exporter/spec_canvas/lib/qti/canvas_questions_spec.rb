@@ -38,6 +38,12 @@ describe "Converting Canvas QTI" do
     expect(hash).to eq CanvasExpected::ESSAY
   end
 
+  it "should prefer extendedTextInteraction > prompt over empty div when convering essays" do
+    manifest_node=get_manifest_node('essay2')
+    hash = Qti::AssessmentItemConverter.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>CANVAS_FIXTURE_DIR)
+    expect(hash[:question_text]).to include "What is the difference between a tree?"
+  end
+
   it "should convert short answer" do
     manifest_node=get_manifest_node('short_answer')
     hash = Qti::AssessmentItemConverter.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>CANVAS_FIXTURE_DIR)
