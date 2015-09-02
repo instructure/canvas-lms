@@ -157,6 +157,7 @@ module Importers
           shift_options = self.shift_date_options(course, shift_options)
 
           migration.imported_migration_items_by_class(Assignment).each do |event|
+            event.reload # just in case
             event.due_at = shift_date(event.due_at, shift_options)
             event.lock_at = shift_date(event.lock_at, shift_options)
             event.unlock_at = shift_date(event.unlock_at, shift_options)
@@ -165,6 +166,7 @@ module Importers
           end
 
           migration.imported_migration_items_by_class(Announcement).each do |event|
+            event.reload
             event.delayed_post_at = shift_date(event.delayed_post_at, shift_options)
             event.save_without_broadcasting
           end
@@ -176,18 +178,21 @@ module Importers
           end
 
           migration.imported_migration_items_by_class(DiscussionTopic).each do |event|
+            event.reload
             event.delayed_post_at = shift_date(event.delayed_post_at, shift_options)
             event.lock_at = shift_date(event.lock_at, shift_options)
             event.save_without_broadcasting
           end
 
           migration.imported_migration_items_by_class(CalendarEvent).each do |event|
+            event.reload
             event.start_at = shift_date(event.start_at, shift_options)
             event.end_at = shift_date(event.end_at, shift_options)
             event.save_without_broadcasting
           end
 
           migration.imported_migration_items_by_class(Quizzes::Quiz).each do |event|
+            event.reload # have to reload the quiz_data to keep link resolution - the others are just in case
             event.due_at = shift_date(event.due_at, shift_options)
             event.lock_at = shift_date(event.lock_at, shift_options)
             event.unlock_at = shift_date(event.unlock_at, shift_options)
