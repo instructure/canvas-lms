@@ -1174,6 +1174,8 @@ class UsersController < ApplicationController
     # Look for an incomplete registration with this pseudonym
 
     sis_user_id = nil
+    params[:pseudonym] ||= {}
+
     if @context.grants_right?(@current_user, session, :manage_sis)
       sis_user_id = params[:pseudonym].delete(:sis_user_id)
     end
@@ -1249,7 +1251,7 @@ class UsersController < ApplicationController
       @user.attributes = params[:user]
     end
     @user.name ||= params[:pseudonym][:unique_id]
-    skip_registration = value_to_boolean(params[:user][:skip_registration])
+    skip_registration = value_to_boolean(params[:user].try(:[], :skip_registration))
     unless @user.registered?
       @user.workflow_state = if require_password || skip_registration
         # no email confirmation required (self_enrollment_code and password
