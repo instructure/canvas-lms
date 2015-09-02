@@ -42,6 +42,10 @@ define [
           json.event_type_present = I18n.t("event_type.reset_to", "Reset To")
         when "corrupted"
           json.event_type_present = I18n.t("event_type.corrupted", "Details Not Available")
+        when "claimed"
+          # This occurs when a teacher unpublishes a course, but they don't leave the course
+          # so we'll make this a bit more user friendly in the audit log UI
+          json.event_type_present = I18n.t('Unpublished')
         else
           json.event_type_present = json.event_type
 
