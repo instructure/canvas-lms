@@ -161,8 +161,8 @@
     "human_name": "Login Logo",
     "variable_name": "ic-brand-Login-logo",
     "type": "image",
-    "accept": "image/png,image/gif,image/jpeg",
-    "default": "/images/login/canvas-logo.png"
+    "accept": "image/png,image/gif,image/jpeg, image/svg",
+    "default": "/images/login/canvas-logo.svg"
   },
   {
     "human_name": "Top Box Background",
