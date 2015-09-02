@@ -191,9 +191,9 @@ $masquerade-link-color: $ic-color-alert;
       text-shadow: none;
       @if $use_new_styles == false {
         color: $course-dropdown-text-color;
-        border-top-color: darken($ic-brand-secondary, 12%);
-        border-left-color: darken($ic-brand-secondary, 12%);
-        border-right-color: darken($ic-brand-secondary, 12%);
+        border-top-color: $ic-border-color;
+        border-left-color: $ic-border-color;
+        border-right-color: $ic-border-color;
         background-color: $courses-dropdown-menu-bg;
       }
     }
