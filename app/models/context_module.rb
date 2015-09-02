@@ -549,7 +549,8 @@ class ContextModule < ActiveRecord::Base
       when 'must_submit'
         action == :scored || action == :submitted
       when 'min_score'
-        action == :scored
+        action == :scored ||
+          action == :submitted # to mark progress in the incomplete_requirements (moves from 'unlocked' to 'started')
       else
         false
       end
