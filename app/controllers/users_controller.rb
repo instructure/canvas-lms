@@ -280,7 +280,7 @@ class UsersController < ApplicationController
         return redirect_to(json['return_to_url'])
       rescue Google::APIClient::ClientError => e
         Canvas::Errors.capture_exception(:oauth, e)
-        
+
         flash[:error] = e.to_s
       end
       return redirect_to(user_profile_url(@current_user))
@@ -1105,6 +1105,8 @@ class UsersController < ApplicationController
   #   self-registration and this canvas instance requires users to accept
   #   the terms (on by default).
   #
+  #   If this is true, it will mark the user as having accepted the terms of use.
+  #
   # @argument user[skip_registration] [Boolean]
   #   Automatically mark the user as registered.
   #
@@ -1249,6 +1251,9 @@ class UsersController < ApplicationController
       end
 
       @user.attributes = params[:user]
+      accepted_terms = params[:user].delete(:terms_of_use)
+      @user.accept_terms if value_to_boolean(accepted_terms)
+      includes << "terms_of_use" unless accepted_terms.nil?
     end
     @user.name ||= params[:pseudonym][:unique_id]
     skip_registration = value_to_boolean(params[:user].try(:[], :skip_registration))

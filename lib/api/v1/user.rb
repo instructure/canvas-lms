@@ -96,6 +96,10 @@ module Api::V1::User
           :can_update_avatar => service_enabled?(:avatars)
         }
       end
+
+      if includes.include?('terms_of_use')
+        json[:terms_of_use] = !!user.preferences[:accepted_terms]
+      end
     end
   end
 
