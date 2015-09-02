@@ -15,7 +15,7 @@ module Turnitin
       attachment = create_attachment
       submission = @assignment.submit_homework(@user, attachments:[attachment], submission_type: 'online_upload')
       asset_string = attachment.asset_string
-      update_turnitin_data!(submission, asset_string, status: 'pending')
+      update_turnitin_data!(submission, asset_string, status: 'pending', outcome_response: @outcomes_response_json)
       self.send_later(:update_originality_data, submission, asset_string)
     end
     handle_asynchronously :process, max_attempts: 1, priority: Delayed::LOW_PRIORITY
@@ -43,6 +43,12 @@ module Turnitin
         update_turnitin_data!(submission, asset_string, turnitin_data)
       elsif attempt <= MAX_ATTEMPTS
         send_at(INTERVAL.from_now, :update_originality_data,  submission, asset_string, attempt + 1)
+      else
+        new_data = {
+            status: 'error',
+            public_error_message: I18n.t('turnitin.no_score_after_retries', 'Turnitin has not returned a score after %{max_tries} attempts to retrieve one.', max_tries: MAX_ATTEMPTS)
+        }
+        update_turnitin_data!(submission, asset_string, new_data)
       end
     end
 

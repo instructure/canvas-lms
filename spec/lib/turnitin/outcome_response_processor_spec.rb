@@ -31,6 +31,12 @@ module Turnitin
       assignment
     end
 
+    let(:attachment) do
+      Attachment.create! uploaded_data: StringIO.new('blah'),
+                         context: lti_course,
+                         filename: 'blah.txt'
+    end
+
     let(:outcome_response_json) do
       {
           "paperid" => 200505101,
@@ -67,6 +73,18 @@ module Turnitin
         expect(submission.turnitin_data[attachment.asset_string][:status]).to eq 'pending'
       end
 
+    end
+
+    describe "#update_originality_data" do
+      it 'sets an error message if max attempts are exceeded' do
+        mock_turnitin_client = mock('turnitin_client')
+        mock_turnitin_client.stubs(:scored?).returns(false)
+        subject.instance_variable_set(:@turnitin_client, mock_turnitin_client)
+        submission = lti_assignment.submit_homework(lti_student, attachments:[attachment], submission_type: 'online_upload')
+        subject.update_originality_data(submission, attachment.asset_string, (OutcomeResponseProcessor::MAX_ATTEMPTS+1))
+        expect(submission.turnitin_data[attachment.asset_string][:status]).to eq 'error'
+        expect(submission.turnitin_data[attachment.asset_string][:public_error_message]).to start_with "Turnitin has not"
+      end
     end
 
   end
