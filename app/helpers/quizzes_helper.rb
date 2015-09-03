@@ -672,4 +672,8 @@ module QuizzesHelper
     end
   end
 
+  def points_possible_display
+    @quiz.quiz_type == "survey" ? "" : @quiz.points_possible
+  end
+
 end
