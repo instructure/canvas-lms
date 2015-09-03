@@ -31,7 +31,7 @@ describe "/shared/terms_required" do
 
     it "should still include application stylesheet" do
       render template: "shared/terms_required", layout: "layouts/application"
-      expect(response).to match(%r{<link href="[^"]*bundles/login-[^"]*\.css"})
+      expect(response).to match(%r{<link href="[^"]*bundles/login_confirm-[^"]*\.css"})
     end
 
     it "should not include custom stylesheet" do
