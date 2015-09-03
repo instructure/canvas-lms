@@ -1,6 +1,26 @@
 @import "base/environment";
 
 .assignments{
+  .ColumnHeader{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #8495A0;
+    font-size: 11px;
+  }
+
+  .ColumnHeader__StudentName{
+    input[type='checkbox']{
+      margin: 0px;
+    }
+    strong{
+      margin-left: 10px;
+    }
+    width: 200px;
+    display: flex;
+    align-items: center;
+  }
 
   .AssignmentList{
     border-top: 1px solid #F0F0F0;

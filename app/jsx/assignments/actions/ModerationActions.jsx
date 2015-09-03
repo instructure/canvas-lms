@@ -17,6 +17,14 @@ define([
     PUBLISHED_GRADES: 'PUBLISHED_GRADES',
     PUBLISHED_GRADES_FAILED: 'PUBLISHED_GRADES_FAILED',
     GOT_STUDENTS: 'GOT_STUDENTS',
+    SORT_MARK_COLUMN: 'SORT_MARK_COLUMN',
+
+    sortMarkColumn (markColumnData) {
+      return {
+        type: this.SORT_MARK_COLUMN,
+        payload: markColumnData
+      }
+    },
 
     selectStudent (studentId) {
       return {

@@ -5,6 +5,17 @@ define [
 
   module "ModerationActions - Action Creators",
 
+  test 'creates the SORT_MARK_COLUMN action', ->
+    markColumnData =
+               markColumn: 2,
+               currentSortDirection: 'highest'
+    action = ModerationActions.sortMarkColumn(markColumnData)
+    expected =
+      type: ModerationActions.SORT_MARK_COLUMN
+      payload: markColumnData
+
+    deepEqual action, expected, "creates the action successfully"
+
   test "creates the SELECT_STUDENT action", ->
     action = ModerationActions.selectStudent(1)
     expected =
