@@ -46,13 +46,15 @@ set :deploy_to, '/var/canvas'
 # for core ruby config, like boot.rb when it sets RAILS_ROOT.  You'll get Rack loading
 # errors when it can't find files (e.g. lib/canvas_logger).  This is the reason that
 # configs are copied over in the copy_configs task.
-set :linked_dirs, %w{log tmp/pids public/system}
 
+set :linked_dirs, %w{log tmp/pids public/system}
 # Default value for default_env is {}
 # set :default_env, { path: "/opt/ruby/bin:$PATH" }
 
 # Default value for keep_releases is 5
-set :keep_releases, 3
+# Set it to 2 to free up space (1.6GB per release on an 8GB server)
+# and realistically, we won't go back more than one release.
+set :keep_releases, 2
 
 # set the locations that we will look for changed assets to determine whether to precompile
 set :assets_dependencies, %w(app/stylesheets app/coffeescripts public/javascripts public/stylesheets spec/javascripts spec/coffeescripts Gemfile.lock config/routes.rb)
@@ -98,6 +100,15 @@ namespace :deploy do
 
   before :updated, :copy_config
 
+  desc "Setup permissions on Canvas files in preparation for compile_assets, bundle install, and db:migrate"
+  task :setup_permissions do
+    on roles(:app) do
+      execute :sudo, 'chmod -R g+w', release_path.join('log') # Needed for rake canvas:compile_assets and db:migrate to work.  It tries to write to production.log
+    end
+  end
+
+  before :updated, :setup_permissions
+
   desc "Clone QTIMigrationTool so that course import and export works"
   task :clone_qtimigrationtool do
     on roles(:app) do
@@ -108,6 +119,16 @@ namespace :deploy do
     end
   end
 
+  desc "Clone data analytics package"
+  task :clone_data_analytics do
+    on roles(:app) do
+      within release_path do
+        execute :git, 'clone', 'https://github.com/beyond-z/analytics.git', 'gems/plugins/analytics'
+      end
+    end
+  end
+
+  before :updated, :clone_data_analytics
   before :updated, :clone_qtimigrationtool
 
   #desc "Migrate database"
@@ -156,7 +177,8 @@ namespace :deploy do
             execute(:sudo, 'cp -a', latest_release_path.join('public/javascripts'), release_path.join('public'))
             execute(:sudo, 'cp -a', latest_release_path.join('public/optimized'), release_path.join('public'))
             execute(:sudo, 'cp -a', latest_release_path.join('public/stylesheets_compiled'), release_path.join('public'))
-            #execute(:sudo, 'chmod -R g+w', release_path.join('public')) # For some reason, cp -a is not preserving symlinks in public/javascripts/client_apps.  Let the initializer that fixes it create those links.
+            execute(:sudo, 'chmod -R g+w', release_path.join('public')) # For some reason, cp -a is not preserving symlinks in public/javascripts/client_apps.  Let the initializer that fixes it create those links.
+                                                                        # Also, it db:migrate fails if it has to create new dirs.  E.g. public/plugins
 
           rescue PrecompileRequired
             # Note: this took me forever to get going because the "deploy" user that it runs as needs rwx permissions on many
@@ -165,7 +187,6 @@ namespace :deploy do
             # with their permissions set loosely enough on the group so that compile_assets will work since "deploy" is in the 
             # "canvasadmin" group.
             info("Compiling assets because a file in #{fetch(:assets_dependencies)} changed.")
-            execute :sudo, 'chmod -R g+w', release_path.join('log') # Needed for rake canvas:compile_assets to work.  It tries to write to production.log
             execute :npm, 'cache clear' # Was getting "npm ERR! cb() never called!".
             execute :npm, 'install', '--silent'
             #execute :npm, '-d install' # print debug log of npm install
@@ -225,7 +246,7 @@ namespace :deploy do
     end
   end
 
-  after :compile_assets, :fix_owner
+  after :migrate, :fix_owner # Note that migrate sometimes needs to update the Gemfile.lock which fails with permissions errors if we lock it down too soon.
 
   desc 'Restart application'
   task :restart do
