@@ -792,7 +792,7 @@ class CalendarEventsApiController < ApplicationController
     courses_to_not_filter = []
 
     # all assignments visible to an observers students should be visible to an observer
-    @current_user.observer_enrollments.each do |e|
+    @current_user.observer_enrollments.shard(@current_user).each do |e|
       course_student_ids = ObserverEnrollment.observed_student_ids(e.course, @current_user)
       if course_student_ids.any?
         student_ids.concat course_student_ids

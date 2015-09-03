@@ -656,7 +656,7 @@ class Course < ActiveRecord::Base
     RequestCache.cache('user_has_been_observer', self, user) do
       Rails.cache.fetch([self, user, "course_user_has_been_observer"].cache_key) do
         # active here is !deleted; it still includes concluded, etc.
-        self.observer_enrollments.active.where(user_id: user).exists?
+        self.observer_enrollments.shard(self).active.where(user_id: user).exists?
       end
     end
   end

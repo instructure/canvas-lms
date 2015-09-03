@@ -171,7 +171,7 @@ class UserObserveesController < ApplicationController
   end
 
   def remove_observee(observee)
-    user.observer_enrollments.where(:associated_user_id => observee).each do |enrollment|
+    user.observer_enrollments.shard(user).where(:associated_user_id => observee).each do |enrollment|
       enrollment.workflow_state = 'deleted'
       enrollment.save
     end
