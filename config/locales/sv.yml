@@ -572,7 +572,7 @@ sv:
       title: "Bekräfta radering %{user} från %{account}"
     course: 
       course_unpublished_title: "Denna kursen har inte publicerats ännu"
-      course_unpublished_tooltip: Opublicerad
+      course_unpublished_tooltip: Avpublicerad
       homepage_link: Hemsida
       more_count: 
         one: "1 mer"
@@ -1189,7 +1189,7 @@ sv:
         default: 
           zero_activity: 
             text: "Den här rapporten visa elever som är anmälda till kurser under en specifik termin. Den färdiga csv filen kommer ha en rad per användar-anmälan som inte besökt kursen sedan startdatumet."
-  achieve_mastery_count_times_8c9bbcec: "Uppnå mästare %{count} gånger"
+  achieve_mastery_count_times_8c9bbcec: "Uppnå mastery %{count} gånger"
   actions_efcde10d: Handling
   activerecord: 
     errors: 
@@ -2275,8 +2275,8 @@ sv:
     show_all_artifacts: "Visa alla föremålen"
     submit: "Lämna in"
     unmasquerade: "Stoppa maskering"
-    unpublish: Opublicera
-    unpublished: Opublicerad
+    unpublish: Avpublicera
+    unpublished: Avpublicerad
     update: Uppdatera
     view_account_roster: "Visa konot-roster"
     view_course_roster: "Visa kurs-roster"
@@ -3489,7 +3489,7 @@ sv:
         name: "%{module}"
       select_prerequisite: "Välj förutsättningstyp. Elever kan inte se modul innan alla förutsättningar är avklarade."
     context_module: 
-      unpublish: Opublicera
+      unpublish: Avpublicera
     context_module_next: 
       aria_labels: 
         add_item: "Lägg till innehåll"
@@ -3864,8 +3864,8 @@ sv:
       unknown_with_message: "Okänd status, %{status}: %{message}"
       unpublishable: Opublicerbar
       unpublishable_with_message: "Opublicerbar: %{message}"
-      unpublished: Opublicerad
-      unpublished_with_message: "Opublicerad: %{message}"
+      unpublished: Avpublicerad
+      unpublished_with_message: "Avpublicerad: %{message}"
     missing_name: "Ej namngiven kurs"
     student_summary: 
       not_sorted: "Elevsammafattningstabellen är inte sorterad"
@@ -4174,7 +4174,7 @@ sv:
       create_failed: "Skapande av kursen misslyckades"
       role_not_active: "Kan inte lägga till användare för icke-aktiva roller: '%{role}'"
       role_not_found: "Kunde inte hitta rol"
-      unpublish: "Kursen kan inte vara opublicerad om där finns elevinlämningar"
+      unpublish: "Kursen kan inte vara avpublicera om där finns elevinlämningar"
     group_list: 
       headings: 
         groups: Kursgrupper
@@ -4316,7 +4316,7 @@ sv:
         add_section: "Lägg till sektion"
         edit_section_name: "Redigera sektionsnamn"
         move_course: "Flytta kurs"
-        update_course: "Uppdatera kursdetaljer"
+        update_course: "Uppdatera inställningar"
       course_conclude_at_warning_message: "Kursen har ställts in att avslutas vid midnatt, det betyder att den föregående dagen är kursens sista aktiva dag."
       course_conclude_at_warning_title: "Kursen avslutas vid midnatt"
       course_open_enrollment: "Kursen har aktiverat öppen anmälan. Elever kan anmäla sig själva om du ger dem den här URL: *%{url}*. De kan också anmäla sig via *%{url2}* och använda följande kod för att ansluta sig: *%{code}*"
@@ -4425,7 +4425,7 @@ sv:
       titles: 
         edit_navigation: "Redigera kursnavigering"
       tooltips: 
-        cannot_unpublish_course: "Du kan inte opublicera kursen om där finns betygsatta elevinlämingar"
+        cannot_unpublish_course: "Du kan inte avpublicera kursen om där finns betygsatta elevinlämingar"
       transifex_message: "Anslut dig till [Canvas Translation Community](%{transifex_url})"
       turnitin: "de här kommentarerna kommer visas för elever när de lämnar in en Turnitin-aktiverad uppgift"
       view_grading_scheme: "visa betygsschema"
@@ -5037,7 +5037,7 @@ sv:
         other: "Det här är en betygssatt diskussion: *%{count} möjliga poäng*"
       show_due_dates: "Visa sista dag"
       until: Tills
-    cannot_unpublish_with_replies: "Kan inte opublicera om där finns svar från elever"
+    cannot_unpublish_with_replies: "Kan inte avpublicera om där finns svar från elever"
     confirm_delete_announcement: 
       one: "Är du säker på att du vill radera det här tillkännagivandet?"
       other: "Är du säker på att du vill radera de här %{count} tillkännagivandena?"
@@ -5824,7 +5824,7 @@ sv:
   example_https_example_com_config_xml_be5f36ac: "Exempel: https://example.com/config.xml"
   example_https_lti_tool_provider_example_herokuapp__e9802142: "Exempel: https://lti-tool-provider-example.herokuapp.com/register"
   example_item_scores_6726c689: "Exempel föremålspoäng"
-  exceeds_mastery_1f995dce: "Överstiger mästare"
+  exceeds_mastery_1f995dce: "Överstiger mastery"
   excuse_this_assignment_for_the_selected_student_af04e132: "Låt den valda eleven hoppa över uppgiften"
   excused_5877183c: Ursäktad!
   excused_cf8792eb: Ursäktad
@@ -6019,14 +6019,14 @@ sv:
     high_contrast: "Använd stilar med hög kontrast"
     html5_first_videos: "Föredra HTML5 för uppspelning av video"
     k12: "K-12 särskilda funktioner"
-    learning_mastery_gradebook: "Inlärningsmästare betygbok"
+    learning_mastery_gradebook: "Inlärnings mastery betygbok"
     lor: "LOR externa verktyg"
     multiple_grading_periods: "Flera betygsperioder"
     new_quiz_statistics: "Ny quizstatistik sida"
     post_grades: "Posta betyg till SIS"
     quiz_log_auditing: "Granskning av quizlogg"
     student_groups: "Ny elevgruppsida"
-    student_outcome_gradebook: "Elev inlärningsmästare betygbok"
+    student_outcome_gradebook: "Elev inlärnings mastery betygbok"
   field_name_31fff38e: Fältnamn
   file_list_updated_38e2a5ad: "Fil-lista uppdaterad"
   file_menu_cc0ca54: Filmeny
@@ -6065,7 +6065,7 @@ sv:
     hidden_status: "Dold. Tillgänglig via länk"
     published_status: Publiserad
     restricted_status: "Tillgänglig från  %{from_date} till %{until_date}"
-    unpublished_status: Opublicerad
+    unpublished_status: Avpublicerad
   filename_has_been_published_with_the_following_usa_fbd8b39f: "%{filename} har publicerats med följande nyttjanderrätt: %{usage_right}"
   files: 
     content_folder: 
@@ -6450,7 +6450,7 @@ sv:
         only_graded: "Uträkning endast baserat på betygsatta uppgifter"
         total: Total
         your_score: "Din poäng"
-      learning_outcomes: "Inlärning mästare"
+      learning_outcomes: "Inlärning mastery"
       links: 
         click_to_view: "klicka för att visa "
         download: "Ladda ner %{attachment}"
@@ -6487,7 +6487,7 @@ sv:
       hide_student_names: "Dölj elevers namn"
       include_ungraded: "Betrakta ej betygsatt som 0"
       individual_view: "Individuell vy"
-      learning_mastery: "Inlärning mästare"
+      learning_mastery: "Inlärning mastery"
       page_header_title: Betygbok
       publish_to_sis: "Publicera betyg till SIS"
       set_group_weights: "Ställ in gruppvikter"
@@ -7202,7 +7202,7 @@ sv:
   if_enabled_users_will_be_able_to_configure_lti_2_t_6293eebd: "Om aktiverat kommer användare kunna konfigurerar LTI 2 verktyg."
   if_you_change_an_assignment_s_points_possible_you__25a0edad: "Om du ändra en uppgifts möjliga poäng måste du omgradera uppgiften."
   if_you_configure_settings_that_cause_you_to_not_be_13d4cbbf: "Om du konfigurerar inställningar som gör så att du inte kan logga in kan du nå den vanliga Canvas-inloggningen från %{url}"
-  if_you_do_not_select_usage_rights_now_this_file_wi_40c42125: "Om du inte väljer användarättigheter nu kommer filen vara opublicerad efter att den laddats upp."
+  if_you_do_not_select_usage_rights_now_this_file_wi_40c42125: "Om du inte väljer användarättigheter nu kommer filen vara avpublicerad efter att den laddats upp."
   if_you_enable_this_feature_be_sure_that_your_sales_566967e6: "Om du aktiverar den här funktionen måste du se till att ditt salesforce konto har dessa fälten tillagda exakt med namnen från vänstra kolumnen i tabellen. "
   if_you_leave_the_zip_file_download_currently_being_c47c1dfb: "Om du lämnar kommer nedladdningen av zipfilen som just förbretts att avbrytas. "
   if_you_ve_been_using_another_course_management_sys_67edfab1: "Om du har använt ett annat system för kurshantering kommer du förmodligen ha saker där som du vill fytta över till Canvas. Vi kan vägleda dig genom processen så att du enkelt kan migrera ditt innehåll till Canvas."
@@ -7258,7 +7258,7 @@ sv:
   in_progress_icon_6e69c998: Pågår-ikon
   inbox_bb245a60: Inbox
   include_this_assignment_s_grades_when_posting_to_y_6bff3323: "Inkludera betyget på den här uppgiften när du postar till din skolas Elevinformationssystem"
-  include_unpublished_courses_7a0e7aab: "Inkludera opublicerade kurser"
+  include_unpublished_courses_7a0e7aab: "Inkludera avpublicerade kurser"
   incorrect_username_and_or_password_2de73abb: "Ogiltigt användarnamn och/eller lösenord"
   increase_indent_6af90f7c: "Öka indrag"
   incremental_update_successfully_generated_against__db3f3f06: "En ökad uppdatering genererades mot en tidigare SIS import."
@@ -7771,7 +7771,7 @@ sv:
   media_has_been_queued_for_conversion_please_try_ag_74343bbd: "Media står i kö för konvertering, vänligen försök igen om en lite stund."
   media_recordings_749aef6d: Mediainspelningar
   median_score_4657e907: "Median: %{score}"
-  meets_mastery_754e1c06: "Möter mästare"
+  meets_mastery_754e1c06: "Möter mastery"
   member_count_members_out_of_maximum_of_max_members_d3e9f575: "%{member_count} medlemmar av maximalt antal %{max_membership}"
   members_af25c21d: Medlemmar
   membership_by_invitation_only_9bc27199: "Medlemsskap genom inbjudan"
@@ -8338,7 +8338,7 @@ sv:
             Mer info på %{website}
       summary: 
         subject: "Betyg och kommentarer släppta för: %{title}, %{course}"
-    assignment_unpublished_module: "Den här uppgiften är en del av en opublicerad modul och är därför inte tillgänglig än."
+    assignment_unpublished_module: "Den här uppgiften är en del av en avpublicerad modul och är därför inte tillgänglig än."
     collaboration_invitation: 
       email: 
         body: |-
@@ -8433,7 +8433,7 @@ sv:
     content_locked_module: "Det här innehållet är en del av modulen *%{module}* och har ännu inte låsts upp."
     content_locked_until: "Det här innehållet är låst tills %{date}."
     content_module_time_locked: "Innehållet är en del av modulen *%{module}*, som är låst tills %{time}."
-    content_unpublished_module: "Det här innehållet är en del av en opublicerad modul och är därför inte tillgängligt än."
+    content_unpublished_module: "Det här innehållet är en del av en avpublicerad modul och är därför inte tillgängligt än."
     conversation_created: 
       email: 
         attached_files: "Bifigade filer:"
@@ -9162,7 +9162,7 @@ sv:
     page_locked_module: "Den här sidan är en del av modulen *%{module}* och har ännu inte låsts upp."
     page_locked_until: "Den här sidan är låst tills %{date}."
     page_module_time_locked: "Den här sidan är en del av modulen *%{module}*, som är låst tills %{time}."
-    page_unpublished_module: "Den här sidan är en del av en opublicerad modul och är därför inte tillgänglig än."
+    page_unpublished_module: "Den här sidan är en del av en avpublicerad modul och är därför inte tillgänglig än."
     peer_review_invitation: 
       email: 
         body: "Du har blivit inbjuden till att recensera %{reviewee}. Följ länken nedanför för att lämna dem en recension!"
@@ -9206,7 +9206,7 @@ sv:
         subject: "Quiz omgraderad: %{quiz}, %{context}"
       twitter: 
         body: "Canvaslarm - Quiz omgraderad: %{quiz}"
-    quiz_unpublished_module: "Den här quizen är en del av en opublicerad modul och är därför inte tillgänglig än."
+    quiz_unpublished_module: "Den här quizen är en del av en avpublicerad modul och är därför inte tillgänglig än."
     report_generated: 
       email: 
         html: 
@@ -9429,7 +9429,7 @@ sv:
     topic_locked_module: "Det här ämnet är en del av modulen *%{module}* och har ännu inte låsts upp."
     topic_locked_until: "Det här ämnet är låst tills %{date}."
     topic_module_time_locked: "Det här ämnet är den del av modulen *%{module}*, som är låst tills %{time}."
-    topic_unpublished_module: "Det här ämnet är en del av en opublicerad modul och är därför inte tillgänglig än."
+    topic_unpublished_module: "Det här ämnet är en del av en avpublicerad modul och är därför inte tillgänglig än."
     updated_wiki_page: 
       email: 
         body: "En sida har uppdaterats på wiki för %{title}, den kan gör ditt liv enklare. "
@@ -9683,7 +9683,7 @@ sv:
   move_outcome_group_cfa1a505: "Flytta bedömningsgrupp"
   moving_a4d552df: Flyttar...
   multi_factor_authentication_configured_865b1bde: "Flerstegs-bekräftelsen konfigurerad"
-  must_achieve_mastery_at_least_count_times_scores_a_628db168: "Måste nå mästarnivå minst %{count} gånger. Poäng över mästare kommer räknas in i det uträknade slutbetyget. "
+  must_achieve_mastery_at_least_count_times_scores_a_628db168: "Måste nå mästarnivå minst %{count} gånger. Poäng över mastery kommer räknas in i det uträknade slutbetyget. "
   must_mark_as_done_bf6cc563: "måste markeras som färdig"
   must_mark_assignment_as_done_e3e4af88: "Måste markera uppgiften som färdig"
   must_score_at_least_points_points_16a7548e: "Måste få minst %{points} poäng"
@@ -9715,7 +9715,7 @@ sv:
   name_is_currently_status_9065c996: "*namn* är för tillfället **status**"
   name_is_required_ba379522: "Namn krävs"
   name_only_5f56718e: "Endast namn"
-  near_mastery_f25174a4: "Nära mästare"
+  near_mastery_f25174a4: "Nära mastery"
   new_account_role_6e5c4964: "Ny kontoroll"
   new_conferences_a020a8a9: "Nya konferenser"
   new_course_role_6a7bb75f: "Ny kursroll"
@@ -10151,7 +10151,7 @@ sv:
       instructions: 
         main: 
           manage: 
-            description: "Resultat skapas här för att man ska kunna följa mästare i en kurs. För att sätta igång kan du ta en titt på menyn högst upp. Klicka på Ny-knappen för att skapa en ny bedömning, eller Ny Grupp-knappen för att skapa en ny grupp att organisera bedömningen i. Hitta-knappen låter dig använda bedömningar som har skapats av din stat eller institution. Medans du skapar och använder bedömningar kan du använda panelen till vänster för att navigera bland dina bedömningar. Du kan dra och släppa bedömningar mellan olika nivåer för att skapa en bättre struktur.* *Vad som är ännu viktigare är att Canvas låter dig lägga till bedömningar till dina betygsbedömningsmatriser så du kan räkna ut mästaren medans du betygsätter uppgifter. När du är färdig med dina resultat klickar du på Hantera bedömningsmatriser för att börja använda bedömningarna när du betygsätter.*"
+            description: "Resultat skapas här för att man ska kunna följa mastery i en kurs. För att sätta igång kan du ta en titt på menyn högst upp. Klicka på Ny-knappen för att skapa en ny bedömning, eller Ny Grupp-knappen för att skapa en ny grupp att organisera bedömningen i. Hitta-knappen låter dig använda bedömningar som har skapats av din stat eller institution. Medans du skapar och använder bedömningar kan du använda panelen till vänster för att navigera bland dina bedömningar. Du kan dra och släppa bedömningar mellan olika nivåer för att skapa en bättre struktur.* *Vad som är ännu viktigare är att Canvas låter dig lägga till bedömningar till dina betygsbedömningsmatriser så du kan räkna ut mastery medans du betygsätter uppgifter. När du är färdig med dina resultat klickar du på Hantera bedömningsmatriser för att börja använda bedömningarna när du betygsätter.*"
             title: "Ställer in bedömningar"
     mastery_error: "Måste vara högre eller samma som 0"
     missing_outcome: "Kunde inte hitta inlärningsbedömningar"
@@ -10160,8 +10160,8 @@ sv:
       links: 
         delete_outcome: "Radera bedömning"
         edit_outcome: "Redigera bedömning"
-      mastery_at_label: "Ställ in mästare för samma eller högre poäng:"
-      point_mastery: "Mästare: %{mastery_points} poäng"
+      mastery_at_label: "Ställ in mastery för samma eller högre poäng:"
+      point_mastery: "Mastery: %{mastery_points} poäng"
       points: 
         rating: "%{points} Poäng"
         total: "%{points_possible} Poäng"
@@ -10171,11 +10171,11 @@ sv:
     outcome_form: 
       calculation_method: Räkningsmetod
       criterion: "Kriterium värdering"
-      criterion_dialog: "Inlärningsbedömning kan inkluderas i en uppgiftsedömningsmatris för att enkelt ge tillgång till mästarbedömningen för specifika uppgifter. När du definierar en inlärningsbedömning bör du även definiera kriterierna som ska användas när du bygger uppgiftsbedömningsmatriser. Definera så många bedömningsmatriserkolumner du behöver, och specifiera en poänggräns som kommer användas för att definiera bedömningens mästare."
+      criterion_dialog: "Inlärningsbedömning kan inkluderas i en uppgiftsedömningsmatris för att enkelt ge tillgång till mästarbedömningen för specifika uppgifter. När du definierar en inlärningsbedömning bör du även definiera kriterierna som ska användas när du bygger uppgiftsbedömningsmatriser. Definera så många bedömningsmatriserkolumner du behöver, och specifiera en poänggräns som kommer användas för att definiera bedömningens mastery."
       criterion_info_link: "Klicka här för att lära dig mer om utvärderingskriterium"
       description: "Beskriv den här bedömningen"
       display_name: "Vänlig namn (valfritt)"
-      mastery: "Mästare vid"
+      mastery: "Mastery vid"
       points: "%{points_possible} poäng"
       title: "Namnge bedömningen"
       total_points: "Totalt antal poäng"
@@ -10187,7 +10187,7 @@ sv:
       group_description: "Beskriv gruppen"
       title: "Namnge gruppen"
     outcome_popover: 
-      mastery_set_at: "Mästare satt vid"
+      mastery_set_at: "Mastery satt vid"
       no_results: "(inga bedömningar)"
     outcome_result: 
       all_outcomes: "alla bedömningar för den här eleven"
@@ -10216,8 +10216,8 @@ sv:
       attempts_from_artifacts: "%{attempts} *från %{artifacts}*"
       labels: 
         see_results: "Se %{user_name} bedömningar för"
-      mastery: "Mästare på sista försöket"
-      no_mastery: "Ingen mästare på sista försöket"
+      mastery: "Mastery på sista försöket"
+      no_mastery: "Ingen mastery på sista försöket"
       outcomes_for: "Bedömningar för %{user_name}"
       score_out_of_possible: "%{score}* utav %{possible}*"
       short_title: 
@@ -10251,7 +10251,7 @@ sv:
   page_views_eb64cf53: Sidvisningar
   pages: 
     cancel_button: Avbryt
-    cannot_unpublish_front_page: "Kan inte opublicera från förstasidan"
+    cannot_unpublish_front_page: "Kan inte avpublicera från förstasidan"
     delete_button: Radera
     delete_confirmation: "Är du säker på att du vill radera den här wikisidan?"
     delete_dialog_title: "Radera wikisida"
@@ -11068,23 +11068,23 @@ sv:
   publish_btn_module: 
     buttons: 
       publish: Publicera
-      publish_desc: "Opublicerad. Klicka för att publicera."
+      publish_desc: "Avpublicerad. Klicka för att publicera."
       published: Publiserad
-      published_desc: "Publicerad. Klicka för att opublicera."
+      published_desc: "Publicerad. Klicka för att avpublicera."
       publishing: Publicera...
-      unpublish: Opublicera
-      unpublishing: Opublicerar...
+      unpublish: Avpublicera
+      unpublishing: Avpublicerar...
   publish_icon_component: 
     publish: Publicera
-    publish_click: "publicerad, klicka för att opublicera"
+    publish_click: "publicerad, klicka för att avpublicera"
     published: Publiserad
     publishing: Publicerar...
-    unpublish: Opublicera
-    unpublish_click: "opublicerad, klicka för att publicera"
-    unpublishing: Opublicerar...
+    unpublish: Avpublicera
+    unpublish_click: "avpublicerad, klicka för att publicera"
+    unpublishing: Avpublicerar...
   publish_the_course_f2f6ef80: "Publicera kursen"
   publishable: 
-    cant_unpublish: "Kan inte opublicera"
+    cant_unpublish: "Kan inte avpublicera"
   publishableModuleItem: 
     disabled: "Publicering har avaktiverats för det här föemålet"
     disabled_assignment: "Kan inte o-publisera om där finns elevinlämningar"
@@ -11192,7 +11192,7 @@ sv:
         align_outcome: "Tilldela bedömning"
         more_questions: "fler frågor"
       loading_banks: "Laddar banker..."
-      mastery_threshold: "mästare på %{threshold_percentage}"
+      mastery_threshold: "mastery på %{threshold_percentage}"
       move_copy: Flytta/kopiera
       select_bank: "Välj frågebank för frågan:"
       show_details: "Visa frågedetaljer"
@@ -12009,7 +12009,7 @@ sv:
           other: "%{count} quizzes har publicerats!"
         quizzes_unpublished: 
           one: "1 quiz har opublicerats!"
-          other: "%{count} quizzes har opublicerats!"
+          other: "%{count} quizzes har avpublicerats!"
         submission_doesnt_count: "Den här quizen kommer inte längre räknas in i ditt betyg."
       question_group: 
         buttons: 
@@ -12556,7 +12556,7 @@ sv:
       restrictedAccess: 
         description: "Begränsad åtkomst"
       unpublish: 
-        description: Opublicera
+        description: Avpublicera
     options_2: 
       description: "Schemalägg tillgänglighet för elev"
   resume_quiz_afeceb87: "Fortsätt quiz"
@@ -12836,7 +12836,7 @@ sv:
       result_sub_count: "Totala resultat:"
     screenreader_gradebook: 
       assignments: Uppgifter
-      learning_mastery: "Inlärning mästare"
+      learning_mastery: "Inlärning mastery"
     settings: 
       assignment_toggles_and_actions: 
         download_current_scores: "Ladda ner nuvarande poäng (.csv)"
@@ -13173,7 +13173,7 @@ sv:
       enrolled_as_teacher: "Anmäld som en lärare"
       favorited_tooltip: "Klicka för att ta bort från kursens meny."
       nonfavorited_tooltip: "Klicka för att lägga till i kursens meny."
-      unpublished_course: opublicerad
+      unpublished_course: avpublicerad
       unpublished_course_tooltip: "Kursen har inte publicerats. Elever bör kontakta kursintruktören för tillgång."
     custom_search_results: 
       links: 
@@ -13267,12 +13267,12 @@ sv:
         add_outcome: "Lägg till bedömning"
       labels: 
         criterion_ratings: "Kriterie bedömningar"
-        master_level: "ställ in mästare för poäng på eller över"
+        master_level: "ställ in mastery för poäng på eller över"
         use_for_scoring: "använd det här kriteriet för poängsättning"
       points: "%{points} pts"
       points_threshold: "tröskel: %{points} pts"
       titles: 
-        mastery_level: "procent över det som sätts som mästare"
+        mastery_level: "procent över det som sätts som mastery"
         select_and_add_criterion: "Välj och lägg till kritere"
     flash_notices: 
       close: Stäng
@@ -13936,10 +13936,10 @@ sv:
   student_must_complete_one_of_these_requirements_6046eb3a: "Elever måste slutföra ett utav dessa kraven"
   student_name: Elevnamn
   student_outcome_gradebook_description: |-
-      Elev Inlärning Mästare Betygboken erbjuder ett sätt för elever att snabbt se sin utveckling
+      Elev Inlärning Mastery Betygboken erbjuder ett sätt för elever att snabbt se sin utveckling
       för kurs inlärningsbedömning. Bedömningarna presenteras i ett Betygboks-liknande
       format och utvecklingen visas i både numeriska poäng och bemästrad/nära
-      mästare/stöd.
+      mastery/stöd.
   student_summary: 
     student_summary_table_ascending: "Elevens sammanfattningstabell är sorterad i stigande ordning efter %{sortText}"
     student_summary_table_descending: "Elevens sammanfattningstabell är sorterad i sjunkande ordning efter %{sortText}"
@@ -14313,7 +14313,7 @@ sv:
   this_outcome_has_been_used_to_assess_a_student_and_376d5ba9: "Den här bedömningen har används för att utvärdera en elev och kan inte längre uppdateras"
   this_outcome_has_been_used_to_assess_a_student_and_5a925169: "Den här bedömningen har använts för att utvärdera en elev och kan därför inte redigeras eller raderas."
   this_quiz_has_been_excused_d89d2b74: "Quizen har utförts."
-  this_quiz_is_unpublished_only_teachers_can_see_the_51d281b1: "*Den här quizen är opublicerad* endast lärar kan se quizen tills den är publicerad."
+  this_quiz_is_unpublished_only_teachers_can_see_the_51d281b1: "*Den här quizen är avpublicerad* endast lärar kan se quizen tills den är publicerad."
   this_sample_page_includes_common_ui_elements_in_ca_331f4ac4: "Denna sample-sidan inkluderar vanliga UI element i Canvas för att hjlpa dig bygga ditt eget märke. När du börjar ändra färgvärden och bilder i den vänstra menyn, kommer du se en *Förhandsvisa Dina Ändringar* -knapp. Klicka på den för att uppdatera sidan och se hur dina ändringar ser ut."
   this_student_wrote_f1a3f22d: "Eleven skrev:"
   this_will_allow_you_to_authenticate_canvas_for_pos_fdfca40: "Det här låter dig verifiera Canvas för att posta betyg på SIS"
@@ -14591,8 +14591,9 @@ sv:
   unlock_module_on_date_17144fbd: "Lås upp modul på datum"
   unprocessable_entity: "Ej bearbetningsbar enhet"
   unprocessable_entity_message: "Ogiltig signerad mötes id"
-  unpublished_click_to_modify_60f9051: "Opublicerad - Klicka för att ändra"
-  unpublished_courses_title: "Opublicerade kurser"
+  unpublished_8b6107d6: Avpublicera
+  unpublished_click_to_modify_60f9051: "Avpublicerad - Klicka för att ändra"
+  unpublished_courses_title: "Avpublicerade kurser"
   unread_e9c1b19c: Oläst
   unstarted_932f2990: "Ej startad"
   unsupported_package: "Innehållspaket som inte kan hanteras"
@@ -14831,7 +14832,7 @@ sv:
       roles_ta: "Anmäld som en Lärarassistent."
       roles_teacher: "Anmäld som en Lärare."
       unenrollr: Avanmäl
-      unpublished: Opublicerad
+      unpublished: Avpublicerad
     errors: 
       no_teacher_courses: "Inga kurser har delat mellan den här läraren och eleven"
       user_not_teacher: "Den användaren är inte en lärare i den här kursen"
@@ -15069,7 +15070,7 @@ sv:
   webct_name: "Blackboard Vista/Ce (WebCT)"
   welcome_to_the_canvas_theme_editor_73091d1: "Välkommen till Canvas Theme Editor"
   welcome_to_your_courses_to_customize_the_list_of_c_22de652e: "Välkommen till dina kuser! För att ändra listan av kurser, klickar du på \"Alla kurser\" länken och stjärnmarkerar de kurser du vill visa. "
-  well_below_mastery_37664bdc: "Lång under mästare"
+  well_below_mastery_37664bdc: "Lång under mastery"
   what_should_the_csv_file_look_like_985a59ac: "Hur ser CSV filen ut?"
   when_people_visit_the_course_this_is_the_page_they_de94acc2: "Det här är sidan personer kommer se när de besöker sidan. Du kan välja om den ska via en aktiv stream, en lista av kursmoduler, en kursplan eller en sidan som du skrivit själv. Det förinställda alternativet är kursens aktiva stream."
   where_would_you_like_to_move_title_fabd6e8f: "Vart vill du flytta %{title}?"
@@ -15176,8 +15177,8 @@ sv:
   wiki_page: 
     atom_author: Wikisida
     atom_entry_title: "Wikisida, %{course_or_group_name}: %{page_title}"
-    cannot_set_unpublished_front_page: "kunde inte ställas in som framsida eftersom den är opublicerad"
-    cannot_unpublish_front_page: "kan inte opublicera framsida"
+    cannot_set_unpublished_front_page: "kunde inte ställas in som framsida eftersom den är avpublicerad"
+    cannot_unpublish_front_page: "kan inte avpublicera framsida"
     defaults: 
       no_content: "inget innehåll"
     errors: 
@@ -15203,7 +15204,7 @@ sv:
       page_revisions_title: "%{title} granskningar: %{context_name}"
   wiki_pages_api: 
     cannot_delete_front_page: "Framsidan kan inte raderas"
-    cannot_have_unpublished_front_page: "Framsidan kan inte opubliceras"
+    cannot_have_unpublished_front_page: "Framsidan kan inte avpubliceras"
     cannot_update_editing_roles: "Du har får inte uppdatera den här wikisidans redigeringsroller"
     cannot_update_front_page: "Du får inte ändra wiki-framsidan"
     cannot_update_published: "Du får inte uppdatera den publicerade versionen av den här wikisidan"
@@ -15272,6 +15273,7 @@ sv:
   you_must_select_a_course_to_copy_content_from_e7bd9e09: "Du måste välja en kurs att kopiera innehåll från"
   you_must_set_it_to_a_number_greater_than_or_equal__eb1d9275: "Du måste ställa in det som ett nummer högre eller jämnvärdigt med %{min}"
   you_must_specify_a_usage_right_5eb57f87: "Du måste specifiera en användarättighet."
+  you_need_to_preview_your_changes_before_applying_t_468d56e4: "Du måste \"Förhandsvisa Dina Ändringar\" innan du kan tillämpa dem på alla andra."
   you_need_to_preview_your_changes_before_applying_t_cb048bed: "du måste \"Förhandsvisa dina ändringar\" innan du kan använda dem på alla"
   you_re_editing_your_canvas_theme_apply_or_cancel_c_1633384e: "Du redigerar ditt Canvas Thema! Tillämpa eller avbryt ändringar inom the *Theme Editor*."
   you_re_editing_your_canvas_theme_the_changes_have__c0ae1bd1: "Du redigerar ditt Canvasteam! Ändringarna används inte än."
