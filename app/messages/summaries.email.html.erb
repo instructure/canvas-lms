@@ -11,9 +11,11 @@
 <% end %>
 
 <% define_content :footer_link do %>
+<!--
   <a href="<%= content(:link) %>">
     <%= t 'click_to_preferences', "Click here to edit your notification preferences" %>
   </a>
+-->
 <% end %>
 
 <% m = (delayed_messages || []).find{|m| m.frequency == Notification::FREQ_WEEKLY} || delayed_messages.first %>
