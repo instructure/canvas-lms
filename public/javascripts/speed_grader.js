@@ -28,6 +28,7 @@ define([
   'compiled/userSettings',
   'str/htmlEscape',
   'rubric_assessment',
+  'speed_grader_select_menu',
   'jst/_turnitinInfo',
   'jst/_turnitinScore',
   'jqueryui/draggable' /* /\.draggable/ */,
@@ -50,7 +51,7 @@ define([
   'vendor/jquery.spin' /* /\.spin/ */,
   'vendor/spin' /* new Spinner */,
   'vendor/ui.selectmenu' /* /\.selectmenu/ */
-], function(submissionsDropdownTemplate, speechRecognitionTemplate, round, _, INST, I18n, $, tz, userSettings, htmlEscape, rubricAssessment, turnitinInfoTemplate, turnitinScoreTemplate) {
+], function(submissionsDropdownTemplate, speechRecognitionTemplate, round, _, INST, I18n, $, tz, userSettings, htmlEscape, rubricAssessment, SpeedgraderSelectMenu, turnitinInfoTemplate, turnitinScoreTemplate) {
 
   // fire off the request to get the jsonData
   window.jsonData = {};
@@ -286,31 +287,13 @@ define([
       return '<option value="' + s.id + '" class="' + htmlEscape(className.raw) + ' ui-selectmenu-hasIcon">' + htmlEscape(name) + MENU_PARTS_DELIMITER + htmlEscape(className.formatted) + MENU_PARTS_DELIMITER + htmlEscape(className.raw) + '</option>';
     }).join("");
 
-    $selectmenu = $("<select id='students_selectmenu'>" + optionsHtml + "</select>")
-      .appendTo("#combo_box_container")
-      .selectmenu({
-        style:'dropdown',
-        format: function(text){
-          var parts = text.split(MENU_PARTS_DELIMITER);
-          return getIcon(parts[2]) + '<span class="ui-selectmenu-item-header">' + htmlEscape(parts[0]) + '</span><span class="ui-selectmenu-item-footer">' + htmlEscape(parts[1]) + '</span>';
-        }
-      }).change(function(e){
-        EG.handleStudentChanged();
-      });
-
-    // xsslint safeString.function getIcon
-    function getIcon(helper_text){
-      var icon = "<span class='ui-selectmenu-item-icon speedgrader-selectmenu-icon'>";
-      if(helper_text == "graded" || helper_text == "not_gradeable"){
-        icon += "<i class='icon-check'></i>";
-      }else if(["not_graded", "resubmitted"].indexOf(helper_text) != -1){
-        icon += "&#9679;";
-      }
-      return icon.concat("</span>");
-    }
+    $selectmenu = new SpeedgraderSelectMenu(optionsHtml, MENU_PARTS_DELIMITER);
+    $selectmenu.appendTo("#combo_box_container", function(e){
+      EG.handleStudentChanged();
+    });
 
     if (jsonData.context.active_course_sections.length && jsonData.context.active_course_sections.length > 1 && !jsonData.GROUP_GRADING_MODE) {
-      var $selectmenu_list = $selectmenu.data('selectmenu').list,
+      var $selectmenu_list = $selectmenu.jquerySelectMenu().data('selectmenu').list,
           $menu = $("#section-menu");
 
 
@@ -343,7 +326,7 @@ define([
             .addClass('selected');
       }
 
-      $selectmenu.selectmenu( 'option', 'open', function(){
+	$selectmenu.jquerySelectMenu().selectmenu( 'option', 'open', function(){
         $selectmenu_list.find('li:first').css('margin-top', $selectmenu_list.find('li').height() + 'px');
         $menu.show().css({
           'left'   : $selectmenu_list.css('left'),
@@ -993,7 +976,7 @@ define([
       var hideStudentNames = utils.shouldHideStudentNames();
       var studentName = hideStudentNames ? I18n.t('student_index', "Student %{index}", { index: EG.currentIndex() + 1 }) : EG.currentStudent.name;
       var submissionStatus = classNameBasedOnStudent(EG.currentStudent);
-      return studentName + " " + submissionStatus.formatted;
+      return studentName + " - " + submissionStatus.formatted;
     },
 
     toggleFullRubric: function(force){
@@ -1058,10 +1041,10 @@ define([
       var student = jsonData.studentMap[student_id];
 
       if (student) {
-        $selectmenu.selectmenu("value", student.id);
+        $selectmenu.jquerySelectMenu().selectmenu("value", student.id);
         //this is lame but I have to manually tell $selectmenu to fire its 'change' event if has changed.
         if (!this.currentStudent || (this.currentStudent.id != student.id)) {
-          $selectmenu.change();
+          $selectmenu.jquerySelectMenu().change();
         }
         if (student.avatar_path && !hideStudentNames) {
           // If there's any kind of delay in loading the user's avatar, it's
@@ -1079,8 +1062,8 @@ define([
       return $.inArray(this.currentStudent, jsonData.studentsWithSubmissions);
     },
 
-    handleStudentChanged: function() {
-      var id = $selectmenu.val();
+    handleStudentChanged: function(){
+      var id = $selectmenu.jquerySelectMenu().val();
       this.currentStudent = jsonData.studentMap[id] || _.values(jsonData.studentsWithSubmissions)[0];
       document.location.hash = "#" + encodeURIComponent(JSON.stringify({
           "student_id": this.currentStudent.id
@@ -1825,12 +1808,12 @@ define([
       // this might be the wrong spot for this, it could be refactored into its own method and you could tell pass only certain students that you want to update
       // (ie the current student or all of the students in the group that just got graded)
       $.each(jsonData.studentsWithSubmissions, function(index, val) {
-        var $query = $selectmenu.data('selectmenu').list.find("li:eq("+ index +")"),
+        var $query = $selectmenu.jquerySelectMenu().data('selectmenu').list.find("li:eq("+ index +")"),
             className = classNameBasedOnStudent(this),
             submissionStates = 'not_graded not_submitted graded resubmitted';
 
         if (this == EG.currentStudent) {
-          $query = $query.add($selectmenu.data('selectmenu').newelement);
+          $query = $query.add($selectmenu.jquerySelectMenu().data('selectmenu').newelement);
         }
         $query
           .removeClass(submissionStates)
@@ -1844,16 +1827,16 @@ define([
 
         if(this == EG.currentStudent && (className.raw == "graded" || className.raw == "not_gradeable")){
           var studentInfo = EG.getStudentNameAndGrade()
+          $("#students_selectmenu > option[value=" + this.id + "]").text(studentInfo);
           $queryIcon.text("").append("<i class='icon-check'></i>");
           $status.addClass("graded");
           $statusIcon.text("").append("<i class='icon-check'></i>");
-          $("#aria_name_alert").text(studentInfo);
         }else if(className.raw == "not_graded" && this == EG.currentStudent){
-          var studentInfo = EG.getStudentNameAndGrade()
+          var studentInfo = EG.getStudentNameAndGrade();
+          $("#students_selectmenu > option[value=" + this.id + "]").text(studentInfo);
           $queryIcon.text("").append("&#9679;");
           $status.removeClass("graded");
           $statusIcon.text("").append("&#9679;");
-          $("#aria_name_alert").text(studentInfo);
         }else{
           $status.removeClass("graded");
         }
