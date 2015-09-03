@@ -248,12 +248,12 @@ class SisBatch < ActiveRecord::Base
     if import_finished
       remove_previous_imports if self.batch_mode?
       self.workflow_state = :imported
-      self.progress = 100
       self.workflow_state = :imported_with_messages if messages?
     else
       self.workflow_state = :failed
       self.workflow_state = :failed_with_messages if messages?
     end
+    self.progress = 100
     self.ended_at = Time.now.utc
     self.save
   end

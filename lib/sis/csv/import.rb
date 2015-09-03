@@ -220,6 +220,10 @@ module SIS
         @warnings << [ csv ? csv[:file] : "", message ]
       end
 
+      def calculate_progress
+        (((@current_row.to_f/@total_rows) * @progress_multiplier) + @progress_offset) * 100
+      end
+
       def update_progress
         @current_row += 1
         @current_row_for_pause_vars += 1
@@ -231,7 +235,7 @@ module SIS
               @batch.reload(select: 'data, progress', lock: :no_key_update)
               @current_row += @batch.data[:current_row]
               @batch.data[:current_row] = @current_row
-              @batch.progress = (((@current_row.to_f/@total_rows) * @progress_multiplier) + @progress_offset) * 100
+              @batch.progress = [calculate_progress, 99].min
               @batch.save
               @current_row = 0
             end
