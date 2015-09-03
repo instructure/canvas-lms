@@ -918,6 +918,29 @@ define([
     }
   }
 
+  ipFilterValidation = {
+    init: function() {
+      this.initValidators.apply(this);
+      $('#quiz_options_form').on('xhrError', this.onFormError);
+    },
+
+    initValidators: function() {
+      $('#quiz_ip_filter').on('invalid:ip_filter', function(e) {
+        $(this).errorBox(I18n.t('IP filter is not valid.'));
+      });
+    },
+
+    onFormError: function(e, resp) {
+      if (resp && resp.invalid_ip_filter) {
+        var event = 'invalid:ip_filter'
+        $("#quiz_ip_filter").triggerHandler(event);
+      }
+      // Prevent $.fn.formErrors from giving error box with cryptic message.
+      delete resp.invalid_ip_filter;
+     }
+  }
+
+
   correctAnswerVisibility = {
     $toggler: $(),
     $options: $(),
@@ -1393,6 +1416,7 @@ define([
     quiz.init().updateDisplayComments();
     correctAnswerVisibility.init();
     scoreValidation.init();
+    ipFilterValidation.init();
     renderDueDates();
 
     $('#quiz_tabs').tabs();
