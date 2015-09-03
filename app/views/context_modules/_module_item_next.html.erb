@@ -171,7 +171,7 @@
                   <li role="presentation" class="<%= menu_type %>">
                     <% tool_path = course_external_tool_path(@context, tool, launch_options) %>
                     <a class="menu_tool_link" href="<%= tool_path %>">
-                      <% if icon_url = tool.extension_setting(menu_type, :icon_url) %><img class="icon" alt="" src="<%= icon_url %>" /><% end %>
+                      <%= render(partial: 'external_tools/icon', locals: {tool: tool, settings_key: menu_type}) %>
                       <%= tool.label_for(menu_type, I18n.locale) %>
                     </a>
                   </li>

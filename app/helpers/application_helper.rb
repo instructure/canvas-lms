@@ -459,6 +459,7 @@ module ApplicationHelper
           :id => tool.id,
           :url => tool.editor_button(:url),
           :icon_url => tool.editor_button(:icon_url),
+          :canvas_icon_class => tool.editor_button(:canvas_icon_class),
           :width => tool.editor_button(:selection_width),
           :height => tool.editor_button(:selection_height)
         }

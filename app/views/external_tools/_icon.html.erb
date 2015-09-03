@@ -1,0 +1,10 @@
+<% if tool && settings_key %>
+  <% tool = external_tool_display_hash(tool, settings_key)  if tool.respond_to?(:extension_setting) %>
+
+  <% if tool[:canvas_icon_class] %>
+    <i class="<%= tool[:canvas_icon_class] %>"></i>
+  <% elsif tool[:icon_url] %>
+    <img class="icon" alt="" src="<%= tool[:icon_url] %>" />
+  <% end %>
+
+<% end %>

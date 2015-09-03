@@ -51,7 +51,7 @@
         <% @course_home_sub_navigation_tools.each do |tool| %>
           <a class="btn button-sidebar-wide course-home-sub-navigation-lti"
              href="<%= course_external_tool_path(@context, tool, launch_type: 'course_home_sub_navigation') %>">
-            <img class="icon" alt="" src="<%= tool.course_home_sub_navigation(:icon_url) %>" />
+            <%= render(partial: 'external_tools/icon', locals: {tool: tool, settings_key: :course_home_sub_navigation}) %>
             <%= tool.label_for(:course_home_sub_navigation, I18n.locale) %>
           </a>
         <% end %>
@@ -86,7 +86,7 @@
         <% @course_home_sub_navigation_tools.each do |tool| %>
           <a class="btn button-sidebar-wide course-home-sub-navigation-lti"
              href="<%= course_external_tool_path(@context, tool, launch_type: 'course_home_sub_navigation') %>">
-            <img class="icon" alt="" src="<%= tool.course_home_sub_navigation(:icon_url) %>" />
+            <%= render(partial: 'external_tools/icon', locals: {tool: tool, settings_key: :course_home_sub_navigation}) %>
             <%= tool.label_for(:course_home_sub_navigation, I18n.locale) %>
           </a>
         <% end %>

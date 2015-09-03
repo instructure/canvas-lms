@@ -151,21 +151,27 @@ class ApplicationController < ActionController::Base
     return [] if context.is_a?(Group)
 
     context = context.account if context.is_a?(User)
-    tools = ContextExternalTool.all_tools_for(context, {:type => type,
+    tools = ContextExternalTool.all_tools_for(context, {:placements => type,
       :root_account => @domain_root_account, :current_user => @current_user})
 
-    extension_settings = [:icon_url] + custom_settings
     tools.map do |tool|
-      hash = {
-          :title => tool.label_for(type, I18n.locale),
-          :base_url => named_context_url(context, :context_external_tool_path, tool, :launch_type => type)
-      }
-      extension_settings.each do |setting|
-        hash[setting] = tool.extension_setting(type, setting)
-      end
-      hash
+      external_tool_display_hash(tool, type, context, custom_settings)
     end
   end
+
+  def external_tool_display_hash(tool, type, context=@context, custom_settings=[])
+    hash = {
+      :title => tool.label_for(type, I18n.locale),
+      :base_url =>  polymorphic_url([context, :external_tool], id: tool.id, launch_type: type)
+    }
+
+    extension_settings = [:icon_url, :canvas_icon_class] | custom_settings
+    extension_settings.each do |setting|
+      hash[setting] = tool.extension_setting(type, setting)
+    end
+    hash
+  end
+  helper_method :external_tool_display_hash
 
   def k12?
     @domain_root_account && @domain_root_account.feature_enabled?(:k12)

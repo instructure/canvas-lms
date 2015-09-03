@@ -155,7 +155,7 @@
               <% tool_path = course_external_tool_path(@context, tool, launch_type: 'module_menu',
                                                   :modules => [context_module ? context_module.id : "{{ id }}"]) %>
               <a class="menu_tool_link" href="<%= tool_path %>">
-                <% if icon_url = tool.extension_setting(:module_menu, :icon_url) %><img class="icon" alt="" src="<%= icon_url %>" /><% end %>
+                <%= render(partial: 'external_tools/icon', locals: {tool: tool, settings_key: :module_menu}) %>
                 <%= tool.label_for(:module_menu, I18n.locale) %>
               </a>
             </li>

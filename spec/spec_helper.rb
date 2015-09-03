@@ -117,6 +117,7 @@ module RSpec::Rails
 
         real_controller = controller_class.new
         real_controller.instance_variable_set(:@_request, @controller.request)
+        real_controller.instance_variable_set(:@context, @controller.instance_variable_get(:@context))
         @controller.real_controller = real_controller
 
         # just calling "render 'path/to/view'" by default looks for a partial

@@ -128,7 +128,7 @@ class AssignmentsController < ApplicationController
       end
 
       if @assignment.submission_types.include?("online_upload") || @assignment.submission_types.include?("online_url")
-        @external_tools = ContextExternalTool.all_tools_for(@context, :user => @current_user, :type => :homework_submission)
+        @external_tools = ContextExternalTool.all_tools_for(@context, :user => @current_user, :placements => :homework_submission)
       else
         @external_tools = []
       end

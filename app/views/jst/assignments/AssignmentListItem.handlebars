@@ -106,14 +106,7 @@
               >{{#t "move"}}Move To…{{/t}}</a>
             </li>
             {{/if}}
-            {{#each menu_tools}}
-            <li role="presentation">
-              <a class="menu_tool_link" href="{{url}}">
-                {{#if icon_url}}<img class="icon" alt="" src="{{icon_url}}" />{{/if}}
-                {{title}}
-              </a>
-            </li>
-            {{/each}}
+            {{>ExternalTools/external_tools_menu menu_tools}}
           </ul>
         </div>
       </div>

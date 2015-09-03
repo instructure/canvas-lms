@@ -57,7 +57,7 @@
           <% @assignment_menu_tools.each do |tool_hash| %>
             <li role="presentation">
               <a class="menu_tool_link" href="<%= tool_hash[:base_url] %>&assignments[]=<%= @assignment.id %>" tabindex="-1" role="menuitem">
-                <% if tool_hash[:icon_url] %><img class="icon" alt="" src="<%= tool_hash[:icon_url] %>" /><% end %>
+                <%= render(partial: 'external_tools/icon', locals: {tool: tool_hash, settings_key: :assignment_menu}) %>
                 <%= tool_hash[:title] %>
               </a>
             </li>

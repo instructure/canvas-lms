@@ -643,14 +643,14 @@ class ExternalToolsController < ApplicationController
   #
   #   This would create a tool on this course with two custom fields and a course navigation tab
   #   curl 'https://<canvas>/api/v1/courses/<course_id>/external_tools' \
-  #        -H "Authorization: Bearer <token>" \ 
-  #        -F 'name=LTI Example' \ 
-  #        -F 'consumer_key=asdfg' \ 
-  #        -F 'shared_secret=lkjh' \ 
+  #        -H "Authorization: Bearer <token>" \
+  #        -F 'name=LTI Example' \
+  #        -F 'consumer_key=asdfg' \
+  #        -F 'shared_secret=lkjh' \
   #        -F 'url=https://example.com/ims/lti' \
-  #        -F 'privacy_level=name_only' \ 
-  #        -F 'custom_fields[key1]=value1' \ 
-  #        -F 'custom_fields[key2]=value2' \ 
+  #        -F 'privacy_level=name_only' \
+  #        -F 'custom_fields[key1]=value1' \
+  #        -F 'custom_fields[key2]=value2' \
   #        -F 'course_navigation[text]=Course Materials' \
   #        -F 'course_navigation[default]=false'
   #        -F 'course_navigation[enabled]=true'
@@ -659,12 +659,12 @@ class ExternalToolsController < ApplicationController
   #
   #   This would create a tool on the account with navigation for the user profile page
   #   curl 'https://<canvas>/api/v1/accounts/<account_id>/external_tools' \
-  #        -H "Authorization: Bearer <token>" \ 
-  #        -F 'name=LTI Example' \ 
-  #        -F 'consumer_key=asdfg' \ 
-  #        -F 'shared_secret=lkjh' \ 
+  #        -H "Authorization: Bearer <token>" \
+  #        -F 'name=LTI Example' \
+  #        -F 'consumer_key=asdfg' \
+  #        -F 'shared_secret=lkjh' \
   #        -F 'url=https://example.com/ims/lti' \
-  #        -F 'privacy_level=name_only' \ 
+  #        -F 'privacy_level=name_only' \
   #        -F 'user_navigation[url]=https://example.com/ims/lti/user_endpoint' \
   #        -F 'user_navigation[text]=Something Cool'
   #        -F 'user_navigation[enabled]=true'
@@ -673,11 +673,11 @@ class ExternalToolsController < ApplicationController
   #
   #   This would create a tool on the account with configuration pulled from an external URL
   #   curl 'https://<canvas>/api/v1/accounts/<account_id>/external_tools' \
-  #        -H "Authorization: Bearer <token>" \ 
-  #        -F 'name=LTI Example' \ 
-  #        -F 'consumer_key=asdfg' \ 
-  #        -F 'shared_secret=lkjh' \ 
-  #        -F 'config_type=by_url' \ 
+  #        -H "Authorization: Bearer <token>" \
+  #        -F 'name=LTI Example' \
+  #        -F 'consumer_key=asdfg' \
+  #        -F 'shared_secret=lkjh' \
+  #        -F 'config_type=by_url' \
   #        -F 'config_url=https://example.com/ims/lti/tool_config.xml'
   def create
     if authorized_action(@context, @current_user, :update)
@@ -705,8 +705,8 @@ class ExternalToolsController < ApplicationController
   #
   #   This would update the specified keys on this external tool
   #   curl -X PUT 'https://<canvas>/api/v1/courses/<course_id>/external_tools/<external_tool_id>' \
-  #        -H "Authorization: Bearer <token>" \ 
-  #        -F 'name=Public Example' \ 
+  #        -H "Authorization: Bearer <token>" \
+  #        -F 'name=Public Example' \
   #        -F 'privacy_level=public'
   def update
     @tool = @context.context_external_tools.active.find(params[:id] || params[:external_tool_id])
@@ -776,7 +776,7 @@ class ExternalToolsController < ApplicationController
 
   def set_tool_attributes(tool, params)
     attrs = ContextExternalTool::EXTENSION_TYPES
-    attrs += [:name, :description, :url, :icon_url, :domain, :privacy_level, :consumer_key, :shared_secret,
+    attrs += [:name, :description, :url, :icon_url, :canvas_icon_class, :domain, :privacy_level, :consumer_key, :shared_secret,
               :custom_fields, :custom_fields_string, :text, :config_type, :config_url, :config_xml, :not_selectable, :app_center_id]
     attrs.each do |prop|
       tool.send("#{prop}=", params[prop]) if params.has_key?(prop)
