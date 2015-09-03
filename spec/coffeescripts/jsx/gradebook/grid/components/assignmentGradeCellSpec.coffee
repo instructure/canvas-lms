@@ -1,10 +1,12 @@
 define [
   'react'
   'jsx/gradebook/grid/components/assignmentGradeCell'
-  'jquery'
-], (React, AssignmentGradeCell) ->
+  'underscore'
+  'jsx/gradebook/grid/constants'
+], (React, AssignmentGradeCell, _, GradebookConstants) ->
 
   TestUtils = React.addons.TestUtils
+  Simulate  = TestUtils.Simulate
   wrapper   = document.getElementById('fixtures')
 
   renderComponent = (data) ->
@@ -61,3 +63,39 @@ define [
   test 'should render media_recording icon when submission is not grade', ->
     component = buildComponentWithSubmission({}, 'media_recording')
     equal(getIconClassName(component), 'icon-media')
+
+  test 'has "active" class when cell isActive', ->
+    component = buildComponent(undefined, {activeCell: true})
+    classList = component.refs.detailsDialog.props.className
+    ok classList.indexOf('active') > -1
+
+  test 'does not have "active" class when cell is not active', ->
+    component = buildComponent()
+    classList = component.refs.detailsDialog.props.className
+    ok (classList.indexOf('active') == -1)
+
+  test 'opens dialog when clicking the submissions details link', ->
+    props =
+      rowData:
+        enrollment:
+          user:
+            name: "Hello"
+            id: "1"
+
+    component = buildComponent(undefined, props)
+    openDialogStub = @stub(component, 'openDialog', (->))
+    detailsDialogLink = component.refs.detailsDialog
+    Simulate.click(detailsDialogLink)
+    ok openDialogStub.calledOnce
+
+
+
+
+
+
+
+
+
+
+
+

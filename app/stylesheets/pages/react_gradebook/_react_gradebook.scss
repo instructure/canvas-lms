@@ -385,10 +385,9 @@ $cell_height: 33px;
   right: -1px;
   height: 12px;
   width: 12px;
-  visibility: hidden;
-  //needs to be above "normal but below tooltips"
   z-index: 2;
   overflow: hidden;
+  visibility: hidden;
 
   @if $use_high_contrast {
     background: url("/images/gradebook-comments-sprite3-high-contrast.png") no-repeat 100% 0;
@@ -414,29 +413,29 @@ $cell_height: 33px;
     }
   }
 
-
-  #gradebook_grid.editable &:hover,
-  #gradebook_grid.editable &:focus {
-    visibility: visible;
-    background-position: 100% -88px !important;
-    width: 17px;
-    height: 17px;
-  }
-  .slick-cell.with-comments & {
-    visibility: visible;
-  }
-  #gradebook_grid.editable .slick-cell.focus &,
-  #gradebook_grid.editable .slick-cell.hover &,
-  #gradebook_grid.editable .slick-cell.active & {
+  &.active {
     visibility: visible;
     background-position: 100% -41px;
     width: 25px;
     height: 25px;
-  }
 
-  .slick-cell.cannot_edit & {
-    display: none;
+    &:hover {
+      background-position: 100% -88px !important;
+      width: 25px;
+      height: 25px;
+    }
   }
+}
+
+.gradebook-cell:hover a.gradebook-cell-comment {
+  visibility: visible;
+  background-position: 100% -41px;
+  width: 25px;
+  height: 25px;
+
+}
+.gradebook-cell:hover a.gradebook-cell-comment:hover {
+  background-position: 100% -88px !important;
 }
 
 .gradebook-cell-comment-label {

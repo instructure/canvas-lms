@@ -1,8 +1,9 @@
 /** @jsx React.DOM */
 define([
-  'react'
-], function (React) {
-
+  'react',
+  'compiled/SubmissionDetailsDialog',
+  'jsx/gradebook/grid/constants'
+], function (React, SubmissionDetailsDialog, GradebookConstants) {
   const GRADED = 'graded',
         ICON_CLASS = 'icon-',
         LATE_CLASS = 'late',
@@ -37,6 +38,19 @@ define([
       return this.hasIconDefined() && !this.props.activeCell;
     },
 
+    openDialog(assignment, student) {
+      SubmissionDetailsDialog.open(assignment, student, GradebookConstants);
+    },
+
+    handleSubmissionCommentClick(event) {
+      var assignment = this.props.cellData,
+          enrollment = this.props.rowData.enrollment,
+          student = enrollment.user;
+
+      student["assignment_" + assignment.id] = this.props.submission;
+      this.openDialog(assignment, student);
+    },
+
     renderIcon() {
       var submissionType = this.props.submission.submission_type,
           className = ICON_CLASS + SUBMISSION_TYPES[submissionType];
@@ -53,7 +67,24 @@ define([
     },
 
     render() {
-      return this.shouldRenderIcon() ? this.renderIcon() : this.renderGradeCell();
+      var className = "gradebook-cell-comment";
+
+      if (this.props.activeCell) {
+        className += ' active';
+      }
+      return (
+        <div>
+          <a ref="detailsDialog"
+             href="#"
+             onClick={this.handleSubmissionCommentClick}
+             className={className}>
+            <span className="gradebook-cell-comment-label">
+              I18n.t('submission comments')
+            </span>
+          </a>
+          {this.shouldRenderIcon() ? this.renderIcon() : this.renderGradeCell()}
+        </div>
+      );
     }
   });
 
