@@ -2,9 +2,13 @@
 @import "components/ui.selectmenu";
 @import "vendor/_xflex.scss";
 
+
 #content {
   padding: 0;
 }
+
+// Get rid of all the new-style flexbox layout, so it doesn't break Speedgrader in IE11
+@include remove-nui-flex-layout;
 
 $gradebook_header_height: 52px;
 

@@ -21,29 +21,12 @@
     }
   }
   @else {
-    width: 100%;  
+    width: 100%;
   }
 }
 
 // Get rid of all the new-style flexbox layout for Conversations
-// To do: rebuild Conversations using flex
-@if $use_new_styles {
-  .ic-app-main-layout-vertical { display: block; }
-  .ic-app-main-layout-horizontal {
-    transition: none;
-    transform: none;
-    flex: none;
-    display: block;
-    position: static;
-    min-height: 100vh;
-    body.course-menu-expanded & { transform: none; }
-    @include breakpoint(wide) { display: block; }
-  }
-  .ic-app-main-content { 
-    flex: none;
-    display: block;
-  }
-}
+@include remove-nui-flex-layout;
 
 #footer {
   display: none;
