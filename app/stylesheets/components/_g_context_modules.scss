@@ -44,6 +44,10 @@ $context_module_bg_color: #f2f3f4;
     color: $ic-color-alert;
   }
 
+  .icon-info {
+    color: $ic-brand-primary;
+  }
+
   .icon-check {
     color: $ic-color-success;
   }
@@ -156,7 +160,7 @@ $context_module_bg_color: #f2f3f4;
       display: block;
     }
   }
-  &.completed {
+  &.completed.has_requirements {
     .completion_status {
       .complete_icon {
         display: inline;

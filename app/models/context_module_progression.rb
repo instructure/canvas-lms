@@ -62,11 +62,6 @@ class ContextModuleProgression < ActiveRecord::Base
     mark_as_outdated
   end
 
-  def highest_submission_score(tag)
-    subs = get_submissions(tag)
-    subs.map {|sub| get_submission_score(sub)}.max
-  end
-
   class CompletedRequirementCalculator
     attr_accessor :actions_done, :view_requirements, :met_requirement_count
 
@@ -175,14 +170,14 @@ class ContextModuleProgression < ActiveRecord::Base
         # must_contribute is handled by ContextModule#update_for
         calc.check_action!(req, false)
       elsif req[:type] == 'must_submit'
-        req_met = !!(subs && subs.any? do |sub|
+        req_met = !!(subs && subs.any?{ |sub|
           if sub.graded? && sub.attempt.nil?
             # is a manual grade - doesn't count for submission
             false
           elsif %w(submitted graded complete pending_review).include?(sub.workflow_state)
             true
           end
-        end)
+        })
 
         calc.check_action!(req, req_met)
       elsif req[:type] == 'min_score'

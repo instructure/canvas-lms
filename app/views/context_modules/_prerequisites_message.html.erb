@@ -12,7 +12,7 @@
   prereq_list = prerequisite_list(prerequisites)
 %>
 
-<div class="prerequisites ellipsis">
+<div class="prerequisites">
   <% if context_module %>
     <% prerequisites.each do |pre| %>
       <div class="prerequisite_criterion <%= pre[:type] %>_criterion" style="float: left;">
@@ -23,7 +23,7 @@
     <% end %>
   <% end %>
 
-  <div class="prerequisites_message ellipsis" title='<%= "#{t('Prerequisites:')} #{prereq_list}" %>' style="<%= hidden unless hide_footer%>">
+  <div class="prerequisites_message" title='<%= "#{t('Prerequisites:')} #{prereq_list}" %>' style="<%= hidden unless hide_footer%>">
     <%= before_label('prerequisites', %{Prerequisites}) %>
     <%= prereq_list %>
   </div>

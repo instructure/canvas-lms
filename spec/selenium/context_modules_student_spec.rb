@@ -493,10 +493,6 @@ describe "context modules" do
     end
 
     describe "module item icons" do
-      before(:each) do
-        @course.enable_feature!(:nc_or)
-      end
-
       def add_non_requirement
         @assignment_4 = @course.assignments.create!(:title => "assignment 4")
         @tag_4 = @module_1.add_item({:id => @assignment_4.id, :type => 'assignment'})
@@ -544,6 +540,14 @@ describe "context modules" do
         go_to_modules
 
         validate_context_module_item_icon(@tag_4.id, @in_progress_icon)
+      end
+
+      it "should show an info icon when module item is a min score requirement that has not yet been graded" do
+        add_min_score_assignment
+        @assignment_4.submit_homework(@user)
+        go_to_modules
+
+        validate_context_module_item_icon(@tag_4.id, 'icon-info')
       end
 
       it "should show a completed icon when module item is a min score requirement that met the score requirement" do

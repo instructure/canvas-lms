@@ -147,13 +147,14 @@ define([
             if (progression.user_id == window.ENV.current_user_id) {
               var $user_progression = $user_progression_list.find(".progression_" + progression.context_module_id)
 
-              if($user_progression.length === 0 && $user_progression_list.length > 0) {
+              if ($user_progression.length === 0 && $user_progression_list.length > 0) {
                 $user_progression = $user_progression_list.find(".progression_blank").clone(true);
                 $user_progression.removeClass('progression_blank').addClass('progression_' + progression.context_module_id);
                 $user_progression_list.append($user_progression);
               }
               if($user_progression.length > 0) {
                 progression.requirements_met = $.map(progression.requirements_met || [], function(r) { return r.id }).join(",");
+                $user_progression.data('incomplete_requirements', progression.incomplete_requirements);
                 $user_progression.fillTemplateData({data: progression});
               }
             }
@@ -179,6 +180,9 @@ define([
               data["points_possible_display"] = I18n.t('points_possible_short', '%{points} pts', { 'points': "" + info["points_possible"]});
             }
             if (info["due_date"] != null) {
+              if (info["past_due"] != null) {
+                $context_module_item.data('past_due', true);
+              }
               data["due_date_display"] = $.dateString(info["due_date"])
             } else if (info["vdd_tooltip"] != null) {
               info['vdd_tooltip']['link_href'] = $context_module_item.find('a.title').attr('href');
@@ -548,26 +552,70 @@ define([
         $module.addClass(progression_state);
 
         // Locked tooltip title is added in _context_module_next.html.erb
-        if (progression_state != 'locked' && progression_state != 'unlocked') $module.find('.completion_status i:visible').attr('title', progression_state_capitalized);
+        if (progression_state != 'locked' && progression_state != 'unlocked') {
+          $module.find('.completion_status i:visible').attr('title', progression_state_capitalized);
+        }
 
         if (progression_state == "completed" && !$module.find(".progression_requirement").length) {
           // this means that there were no requirements so even though the workflow_state says completed, dont show "completed" because there really wasnt anything to complete
           progression_state = "";
         }
         $module.fillTemplateData({data: {progression_state: progression_state}});
+
+        var reqs_met = [];
+        if (data.requirements_met) {
+          reqs_met = data.requirements_met.split(",");
+        }
+
+        var incomplete_reqs = $progression.data('incomplete_requirements');
+        if (incomplete_reqs == null) {
+          incomplete_reqs = [];
+        }
+
         $module.find(".context_module_item").each(function() {
-          var position = parseInt($(this).getTemplateData({textValues: ['position']}).position, 10);
-          if(data.current_position && position && data.current_position < position) {
-            $(this).addClass('after_current_position');
+          var $mod_item = $(this);
+          var position = parseInt($mod_item.getTemplateData({textValues: ['position']}).position, 10);
+          if (data.current_position && position && data.current_position < position) {
+            $mod_item.addClass('after_current_position');
+          }
+
+          // set the status icon
+          var $icon_container = $mod_item.find('.module-item-status-icon');
+          var mod_id = $mod_item.getTemplateData({textValues: ['id']}).id;
+
+          if ($.inArray(mod_id, reqs_met) != -1) {
+            $mod_item.addClass('completed_item');
+            addIcon($icon_container, 'icon-check', I18n.t('Completed'));
+          } else if (progression_state == 'completed') {
+            // if it's already completed then don't worry about warnings, etc
+            if ($mod_item.hasClass('progression_requirement')) {
+              addIcon($icon_container, 'no-icon', I18n.t('Not completed'));
+            }
+          } else if ($mod_item.data('past_due') != null) {
+            addIcon($icon_container, 'icon-minimize', I18n.t('This assignment is overdue'));
+          } else {
+            var incomplete_req = null;
+            for (var idx in incomplete_reqs) {
+              if (incomplete_reqs[idx].id == mod_id) {
+                incomplete_req = incomplete_reqs[idx];
+              }
+            }
+            if (incomplete_req) {
+              if (incomplete_req.score != null) {
+                // didn't score high enough
+                addIcon($icon_container, 'icon-minimize',
+                  I18n.t("You scored a %{score}.", {'score': incomplete_req.score}) + " " + criterionMessage($mod_item) + ".");
+              } else {
+                // hasn't been scored yet
+                addIcon($icon_container, 'icon-info', I18n.t("Your submission has not been graded yet"));
+              }
+            } else {
+              if ($mod_item.hasClass('progression_requirement')) {
+                addIcon($icon_container, 'icon-mark-as-read', criterionMessage($mod_item));
+              }
+            }
           }
         });
-        if(data.requirements_met) {
-          var reqs = data.requirements_met.split(",");
-          for(var idx in reqs) {
-            var req = reqs[idx];
-            $module.find("#context_module_item_" + req).addClass('completed_item');
-          }
-        }
         if(data.collapsed == 'true') {
           $module.addClass('collapsed_module');
         }
@@ -583,6 +631,29 @@ define([
       }
     };
   })();
+
+  var addIcon = function($icon_container, css_class, message) {
+    var $icon = $("<i data-tooltip><span class='screenreader-only'></span></i>");
+    $icon.attr('class', css_class).attr('title', message).attr('aria-label', message);
+    $icon.find('span').html(htmlEscape(message));
+    $icon_container.empty().append($icon);
+  }
+
+  var criterionMessage = function($mod_item) {
+    if ($mod_item.hasClass('must_submit_requirement')) {
+      return I18n.t('Must submit the assignment');
+    } else if ($mod_item.hasClass('must_mark_done_requirement')) {
+      return I18n.t('Must mark as done');
+    } else if ($mod_item.hasClass('must_view_requirement')) {
+      return I18n.t('Must view the page');
+    } else if ($mod_item.hasClass('min_contribute_requirement')) {
+      return I18n.t('Must contribute to the page');
+    } else if ($mod_item.hasClass('min_score_requirement')) {
+      return I18n.t('Must score at least a %{score}', { 'score': $mod_item.getTemplateData({textValues: ['min_score']}).min_score});
+    } else {
+      return I18n.t('Not yet completed')
+    }
+  }
 
   var updatePrerequisites = function($module, prereqs) {
     var $prerequisitesDiv = $module.find(".prerequisites");
@@ -610,15 +681,16 @@ define([
   }
 
   var newPillMessage = function($module, requirement_count) {
-    if ($module.find('.pill li').length === 0) {
-      $module.find('.no-requirements')
-        .replaceWith('<div class="requirements_message"><ul class="pill"><li></li></ul></div>');
-    }
+    var $message = $module.find('.requirements_message');
 
-    var $pillMessage = $module.find('.pill li');
-    var newPillMessageText = requirement_count === 1 ? I18n.t("Complete One Item") : I18n.t("Complete All Items");
-    $pillMessage.text(newPillMessageText);
-    $pillMessage.data("requirement-count", requirement_count);
+    if (requirement_count != 0) {
+      var $pill = $('<ul class="pill"><li></li></ul></div>');
+      $message.html($pill);
+      var $pillMessage = $message.find('.pill li');
+      var newPillMessageText = requirement_count === 1 ? I18n.t("Complete One Item") : I18n.t("Complete All Items");
+      $pillMessage.text(newPillMessageText);
+      $pillMessage.data("requirement-count", requirement_count);
+    }
   }
 
   modules.initModuleManagement = function() {
@@ -667,9 +739,9 @@ define([
       updatePrerequisites($module, data.context_module.prerequisites);
 
       // Update requirement message pill
-      if (ENV.MODULE_FILE_PERMISSIONS.module_progression_any_condition){
+      if (ENV.NC_OR_ENABLED) {
         if (data.context_module.completion_requirements.length === 0) {
-          $module.find('.requirements_message').replaceWith("<div class='no-requirements'></div>");
+          $module.find('.requirements_message').empty();
         } else {
           newPillMessage($module, data.context_module.requirement_count);
         }
@@ -1596,8 +1668,8 @@ define([
       setTimeout(modules.initModuleManagement, 1000);
     }
 
+    modules.updateAssignmentData(); // need the assignment data to check past due state
     modules.updateProgressions();
-    modules.updateAssignmentData();
 
     $(".context_module").find(".expand_module_link,.collapse_module_link").bind('click keyclick', function(event, goSlow) {
       event.preventDefault();
