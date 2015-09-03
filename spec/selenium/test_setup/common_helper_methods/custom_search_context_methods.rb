@@ -41,8 +41,4 @@ module Selenium::WebDriver::SearchContext
   def fftag(tag_name)
     find_elements(:tag_name, tag_name)
   end
-
-  def ftext(text)
-    find_element(:xpath, ".//div[contains(.,'#{text}')]")
-  end
 end
