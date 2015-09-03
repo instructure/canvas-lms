@@ -51,6 +51,7 @@ class SisApiController < ApplicationController
   #       "due_at": "2015-01-01T17:00:00Z",
   #       "points_possible": 100,
   #       "integration_id": "IA-100",
+  #       "submission_types": "["online_quiz"]",
   #       "integration_data": {
   #         "other_data": "values"
   #       },
