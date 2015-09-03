@@ -48,7 +48,7 @@
          <div>
            <span class=" field-with-fancyplaceholder">
              <label for="pseudonym_session_unique_id_forgot">
-               <%= login_handle_name %>
+               <%= t("Email") %>
              </label>
              <input aria-describedby="forgot_password_instructions" class="email_address text" type="text" name="pseudonym_session[unique_id_forgot]" value="<%= @unauthorized_user.email rescue '' %>" id="pseudonym_session_unique_id_forgot" />
            </span>
