@@ -6,16 +6,10 @@
   published_status = (module_item && module_item.published?) ? 'published' : 'unpublished'
   tag = module_item || nil; completion_criteria ||= nil; editable ||= false
 @module_item_image_tags ||= {
-  'min_score' => image_tag("flagged_question_dim.png", :class => "image not_blank", :alt => t('images.alt.min_score', "minimum score"), :title => t('images.title.min_score', "Students must reach the minimum score on this item before the module is considered complete"), :style => "vertical-align: top; padding-top: 2px;"),
-  'max_score' => image_tag("flagged_question_dim.png", :class => "image not_blank", :alt => t('images.alt.max_score', "maximum score"), :title => t('images.title.max_score', "Students must not exceed the maximum score on this item before the module is considered complete"), :style => "vertical-align: top; padding-top: 2px;"),
-  'must_view' => image_tag("preview_dim.png", :class => "image not_blank", :alt => t('images.alt.must_view', "must view"), :title => t('images.title.must_view', "Students must view this item before the module is considered complete"), :style => "vertical-align: top; padding-top: 2px;"),
-  'must_contribute' => image_tag("text_entry_dim.png", :class => "image not_blank", :alt => t('images.alt.must_contribute', "must contribute"), :title => t('images.title.must_contribute', "Students must contribute to this item before the module is considered complete"), :style => "vertical-align: top; padding-top: 2px;"),
-  'must_submit' => image_tag("text_entry_dim.png", :class => "image not_blank", :alt => t('images.alt.must_submit', "must submit"), :title => t('images.title.must_submit', "Students must submit this assignment before the module is considered complete"), :style => "vertical-align: top; padding-top: 2px;"),
   'indent' => "<i class='icon-arrow-right'></i>".html_safe,
   'outdent' => "<i class='icon-arrow-left'></i>".html_safe,
   'edit' => "<i class='icon-edit'></i>".html_safe,
   'delete' => "<i class='icon-end'></i>".html_safe,
-  'other' => image_tag("blank.png", :class => "image", :alt => '')
 }
 
  criterion = criterion(module_item, completion_criteria)
@@ -97,11 +91,6 @@
                 <% score_display = content_tag(:span, criterion && criterion[:min_score] || nbsp, class: 'min_score') %>
                 <span class="unfulfilled"><%= t 'min_score.unfulfilled', 'Score: %{score}', :score => score_display %></span>
                 <span class="fulfilled"><%= t 'min_score.fulfilled', 'Score: %{score}', :score => score_display %></span>
-              </span>
-              <span class="requirement_type max_score_requirement">
-                <% score_display = content_tag(:span, criterion && criterion[:max_score] || nbsp, class: 'min_score') %>
-                <span class="unfulfilled"><%= t 'Score: %{score}', :score => score_display %></span>
-                <span class="fulfilled"><%= t 'Score: %{score}', :score => score_display %></span>
               </span>
               <span class="requirement_type must_view_requirement">
                 <span class="unfulfilled"><%= t('View') %></span>

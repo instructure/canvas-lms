@@ -52,7 +52,7 @@ $context_module_bg_color: #f2f3f4;
     display: flex;
     align-items: center;
   }
-  .ig-details { 
+  .ig-details {
     .due_date_display {
       text-align: center;
       @include breakpoint(desktop) {
@@ -372,12 +372,6 @@ $context_module_bg_color: #f2f3f4;
   &.min_score_requirement {
     .completion_requirement,
     .min_score_requirement {
-      display: block;
-    }
-  }
-  &.max_score_requirement {
-    .completion_requirement,
-    .max_score_requirement {
       display: block;
     }
   }

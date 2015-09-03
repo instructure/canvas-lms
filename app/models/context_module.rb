@@ -332,7 +332,6 @@ class ContextModule < ActiveRecord::Base
         type: req[:type],
       }
       new_req[:min_score] = req[:min_score].to_f if req[:type] == 'min_score' && req[:min_score]
-      new_req[:max_score] = req[:max_score].to_f if req[:type] == 'max_score' && req[:max_score]
       new_req
     end
 
@@ -341,7 +340,7 @@ class ContextModule < ActiveRecord::Base
       if req[:id] && (tag = tags[req[:id]])
         if %w(must_view must_mark_done must_contribute).include?(req[:type])
           true
-        elsif %w(must_submit min_score max_score).include?(req[:type])
+        elsif %w(must_submit min_score).include?(req[:type])
           true if tag.scoreable?
         end
       end
@@ -551,8 +550,6 @@ class ContextModule < ActiveRecord::Base
         action == :scored || action == :submitted
       when 'min_score'
         action == :scored
-      when 'max_score'
-        action == :scored
       else
         false
       end
@@ -571,8 +568,6 @@ class ContextModule < ActiveRecord::Base
       t('requirements.must_submit', "must submit the assignment")
     when 'min_score'
       t('requirements.min_score', "must score at least a %{score}", :score => req[:min_score])
-    when 'max_score'
-      t('requirements.max_score', "must score no more than a %{score}", :score => req[:max_score])
     else
       nil
     end

@@ -82,7 +82,7 @@ class ContextModuleProgression < ActiveRecord::Base
       @orig_keys = sorted_action_keys
 
       self.view_requirements = []
-      self.actions_done.reject!{ |r| %w(min_score max_score).include?(r[:type]) }
+      self.actions_done.reject!{ |r| r[:type] == 'min_score' }
     end
 
     def sorted_action_keys
@@ -181,7 +181,7 @@ class ContextModuleProgression < ActiveRecord::Base
         end)
 
         calc.check_action!(req, req_met)
-      elsif req[:type] == 'min_score' || req[:type] == 'max_score'
+      elsif req[:type] == 'min_score'
         calc.check_action!(req, evaluate_score_requirement_met(req, subs))
       end
     end
@@ -216,13 +216,10 @@ class ContextModuleProgression < ActiveRecord::Base
   private :get_submission_score
 
   def evaluate_score_requirement_met(requirement, subs)
+    return unless requirement[:type] == "min_score"
     subs && subs.any? do |sub|
       score = get_submission_score(sub)
-      if requirement[:type] == "max_score"
-        score.present? && score <= requirement[:max_score].to_f
-      else
-        score.present? && score >= requirement[:min_score].to_f
-      end
+      score.present? && score >= requirement[:min_score].to_f
     end
   end
   private :evaluate_score_requirement_met
@@ -233,7 +230,6 @@ class ContextModuleProgression < ActiveRecord::Base
 
     requirement_met = true
     requirement_met = points && points >= requirement[:min_score].to_f if requirement[:type] == 'min_score'
-    requirement_met = points && points <= requirement[:max_score].to_f if requirement[:type] == 'max_score'
     requirement_met = false if requirement[:type] == 'must_submit' # calculate later; requires the submission
 
     if !requirement_met
