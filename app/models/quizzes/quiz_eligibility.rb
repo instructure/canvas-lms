@@ -53,12 +53,12 @@ class Quizzes::QuizEligibility
     !quiz.grants_right?(user, session, :update)
   end
 
-  def section_dates_apply?
+  def section_dates_currently_apply?
     section_restricted_by_date? && section_is_ongoing?
   end
 
   def course_section
-    @course_section ||= (assignment_overrides && student_sections).first || CourseSection.new
+    @course_section ||= (assignment_overrides | student_sections).first || CourseSection.new
   end
 
   private
@@ -130,7 +130,7 @@ class Quizzes::QuizEligibility
   end
 
   def assignment_overrides
-    AssignmentOverride.where(quiz_id: quiz.id).map(&:set)
+    AssignmentOverride.where(quiz_id: quiz.id, set_type: CourseSection).map(&:set)
   end
 
   def restricted_section_has_ended?
