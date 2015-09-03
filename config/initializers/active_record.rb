@@ -682,7 +682,7 @@ ActiveRecord::Relation.class_eval do
         sql = to_sql
         cursor = "#{table_name}_in_batches_cursor_#{sql.hash.abs.to_s(36)}"
         connection.execute("DECLARE #{cursor} CURSOR FOR #{sql}")
-        includes = includes_values
+        includes = includes_values + preload_values
         klass.unscoped do
           batch = connection.uncached { klass.find_by_sql("FETCH FORWARD #{batch_size} FROM #{cursor}") }
           while !batch.empty?
@@ -748,7 +748,7 @@ ActiveRecord::Relation.class_eval do
           raise "Temp tables not supported!"
       end
 
-      includes = includes_values
+      includes = includes_values + preload_values
       klass.unscoped do
         if pluck
           batch = klass.from(table).order(index).limit(batch_size).pluck(*pluck)
