@@ -1704,6 +1704,25 @@ describe Enrollment do
       se.accept
       expect(pe.reload).to be_deleted
     end
+
+    context "sharding" do
+      specs_require_sharding
+
+      it "allows enrolling a user that is observed from another shard" do
+        se = @shard1.activate do
+          account = Account.create!
+          User.any_instance.expects(:can_be_enrolled_in_course?).returns(true)
+          course_with_student(account: account, active_all: true, user: @student)
+        end
+        pe = @parent.observer_enrollments.shard(@shard1).first
+
+        expect(pe).not_to be_nil
+        expect(pe.course_id).to eql se.course_id
+        expect(pe.course_section_id).to eql se.course_section_id
+        expect(pe.workflow_state).to eql se.workflow_state
+        expect(pe.associated_user_id).to eql se.user_id
+      end
+    end
   end
 
   describe '#can_be_deleted_by' do
