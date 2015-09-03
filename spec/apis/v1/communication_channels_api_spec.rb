@@ -32,8 +32,8 @@ describe 'CommunicationChannels API', type: :request do
     end
 
     context 'an authorized user' do
-      it 'should list all channels' do
-        json = api_call(:get, @path, @path_options)
+      it 'should list all channels without bounce information for a user that is not a site admin' do
+        json = api_call_as_user(@someone, :get, @path, @path_options)
 
         cc = @someone.communication_channel
         expect(json).to eql [{
@@ -43,6 +43,24 @@ describe 'CommunicationChannels API', type: :request do
           'position' => cc.position,
           'workflow_state' => 'unconfirmed',
           'user_id'  => cc.user_id }]
+      end
+
+      it 'should list all channels with bounce information for a user that is a site admin' do
+        json = api_call_as_user(@admin, :get, @path, @path_options)
+
+        cc = @someone.communication_channel
+        expect(json).to eql [{
+          'id'       => cc.id,
+          'address'  => cc.path,
+          'type'     => cc.path_type,
+          'position' => cc.position,
+          'workflow_state' => 'unconfirmed',
+          'user_id'  => cc.user_id,
+          'last_bounce_at' => nil,
+          'last_bounce_summary' => nil,
+          'last_suppression_bounce_at' => nil,
+          'last_transient_bounce_at' => nil,
+          'last_transient_bounce_summary' => nil }]
       end
     end
 
@@ -93,7 +111,12 @@ describe 'CommunicationChannels API', type: :request do
         'type' => 'email',
         'workflow_state' => 'active',
         'user_id' => @someone.id,
-        'position' => 2
+        'position' => 2,
+        'last_bounce_at' => nil,
+        'last_bounce_summary' => nil,
+        'last_suppression_bounce_at' => nil,
+        'last_transient_bounce_at' => nil,
+        'last_transient_bounce_summary' => nil
       })
     end
 

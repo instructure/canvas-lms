@@ -123,6 +123,7 @@ class CommunicationChannel < ActiveRecord::Base
 
     given { |user| Account.site_admin.grants_right?(user, :read_messages) }
     can :reset_bounce_count
+    can :read_bounce_details
   end
 
   def pseudonym
@@ -468,6 +469,14 @@ class CommunicationChannel < ActiveRecord::Base
         channel.save!
       end
     end
+  end
+
+  def last_bounce_summary
+    last_bounce_details.try(:[], 'bouncedRecipients').try(:[], 0).try(:[], 'diagnosticCode')
+  end
+
+  def last_transient_bounce_summary
+    last_transient_bounce_details.try(:[], 'bouncedRecipients').try(:[], 0).try(:[], 'diagnosticCode')
   end
 
   def self.find_by_confirmation_code(code)
