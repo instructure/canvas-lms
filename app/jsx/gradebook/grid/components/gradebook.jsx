@@ -22,6 +22,7 @@ define([
   '../stores/keyboardNavigationStore',
   '../actions/keyboardNavigationActions',
   '../stores/tableStore',
+  '../actions/sectionsActions',
   '../helpers/columnArranger',
   'vendor/spin'
 ], function (
@@ -47,10 +48,10 @@ define([
   KeyboardNavigationStore,
   KeyboardNavigationActions,
   TableStore,
+  SectionsActions,
   ColumnArranger,
   Spinner
 ){
-
   var Table = FixedDataTable.Table,
       Column = FixedDataTable.Column,
       isColumnResizing = false,
@@ -67,10 +68,11 @@ define([
     componentWillMount() {
       AssignmentGroupsActions.load();
       StudentEnrollmentsActions.load()
-      .then((studentEnrollments) => {
-        var studentIds = _.pluck(studentEnrollments, 'user_id');
-        SubmissionsActions.load(studentIds);
-      });
+        .then((studentEnrollments) => {
+          var studentIds = _.pluck(studentEnrollments, 'user_id');
+          SubmissionsActions.load(studentIds);
+        });
+      SectionsActions.load();
     },
 
     componentDidMount() {
@@ -280,7 +282,9 @@ define([
               height={this.state.settings.height}
               width={this.state.settings.width}
               headerHeight={GradebookConstants.DEFAULT_LAYOUTS.headers.height}>
+
               {this.renderAllColumns()}
+
             </Table>
           </div>
         );

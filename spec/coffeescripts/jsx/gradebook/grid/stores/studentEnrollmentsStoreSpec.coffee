@@ -1,14 +1,18 @@
 define [
   'react'
   'jsx/gradebook/grid/stores/studentEnrollmentsStore'
-  'jsx/gradebook/grid/actions/studentEnrollmentsActions'
-], (React, StudentEnrollmentsStore) ->
+  'jsx/gradebook/grid/stores/sectionsStore'
+], (React, StudentEnrollmentsStore, SectionsStore) ->
   TestUtils = React.addons.TestUtils
 
   module 'ReactGradebook.studentEnrollmentStore',
     setup: ->
+      StudentEnrollmentsStore.state = undefined
       StudentEnrollmentsStore.getInitialState()
+      SectionsStore.getInitialState()
     teardown: ->
+      StudentEnrollmentsStore.state = undefined
+      SectionsStore.state = undefined
 
   test 'initial state values are set to null', () ->
     expected =
@@ -24,7 +28,7 @@ define [
     actual = null
     StudentEnrollmentsStore.listen (state) ->
       actual = state.data
-    StudentEnrollmentsStore.onLoadCompleted([1,2,3])
+    StudentEnrollmentsStore.onLoadCompleted(expected)
     deepEqual(actual, expected)
 
   test 'filters enrollments by name', () ->

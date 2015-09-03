@@ -283,6 +283,7 @@ class GradebooksController < ApplicationController
       :group_weighting_scheme => @context.group_weighting_scheme,
       :grading_standard =>  @context.grading_standard_enabled? && (@context.grading_standard.try(:data) || GradingStandard.default_grading_standard),
       :course_is_concluded => @context.completed?,
+      :course_name => @context.name,
       :gradebook_is_editable => @gradebook_is_editable,
       :setting_update_url => api_v1_course_settings_url(@context),
       :show_total_grade_as_points => @context.settings[:show_total_grade_as_points],
