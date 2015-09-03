@@ -106,10 +106,7 @@ class SubmissionComment < ActiveRecord::Base
     can :read and can :delete
 
     given { |user, session|
-      !self.anonymous? ||
-        self.author == user ||
-        self.submission.assignment.context.grants_right?(user, session, :view_all_grades) ||
-        self.submission.assignment.context.grants_right?(self.author, session, :view_all_grades)
+        self.can_read_author?(user, session)
     }
     can :read_author
   end
@@ -133,6 +130,13 @@ class SubmissionComment < ActiveRecord::Base
       record.provisional_grade_id.nil? &&
       record.submission.user_id == record.author_id
     }
+  end
+
+  def can_read_author?(user, session)
+    (!self.anonymous? && !self.submission.assignment.anonymous_peer_reviews?) ||
+        self.author == user ||
+        self.submission.assignment.context.grants_right?(user, session, :view_all_grades) ||
+        self.submission.assignment.context.grants_right?(self.author, session, :view_all_grades)
   end
 
   def update_participants

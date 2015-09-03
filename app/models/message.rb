@@ -33,8 +33,10 @@ class Message < ActiveRecord::Base
   include TextHelper
   include HtmlTextHelper
   include Workflow
+  include Messages::PeerReviewsHelper
 
   extend TextHelper
+
 
   # Associations
   belongs_to :asset_context, :polymorphic => true

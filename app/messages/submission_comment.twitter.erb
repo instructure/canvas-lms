@@ -1,8 +1,8 @@
 <% define_content :link do -%>
   <%= polymorphic_url([asset.submission.assignment.context, asset.submission.assignment, :submission], id: asset.submission.user) %>
 <% end -%>
-<%= t :tweet, "Canvas Alert - Comment: %{author} for %{assignment}, %{user}, %{context}.", 
-        :author => asset.author.short_name, 
-        :assignment => asset.submission.assignment.title, 
-        :user => asset.submission.user.short_name, 
+<%= t :tweet, "Canvas Alert - Comment: %{author} for %{assignment}, %{user}, %{context}.",
+        :author => submission_comment_author(asset, user),
+        :assignment => asset.submission.assignment.title,
+        :user => submission_comment_submittor(asset, user),
         :context => asset.submission.assignment.context.name %>

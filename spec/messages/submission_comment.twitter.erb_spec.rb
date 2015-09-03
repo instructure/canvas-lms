@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/messages_helper')
 
-describe 'submission_comment.email' do
+describe 'submission_comment.twitter' do
 
   before :each do
     submission_model
@@ -31,15 +31,15 @@ describe 'submission_comment.email' do
   end
 
   it "should render" do
-    message = generate_message(:submission_comment, :email, @object)
-    expect(message.html_body).to_not include('Anonymous User')
+    message = generate_message(:submission_comment, :twitter, @object)
+    expect(message.body).to_not include('Anonymous User')
   end
 
   it 'should show anonymous when anonymous peer review enabled' do
     @submission.assignment.update_attribute(:anonymous_peer_reviews, true)
     @object.reload
-    message = generate_message(:submission_comment, :email, @object)
-    expect(message.html_body).to include('Anonymous User')
+    message = generate_message(:submission_comment, :twitter, @object)
+    expect(message.body).to include('Anonymous User')
   end
 
 end

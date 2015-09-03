@@ -275,6 +275,12 @@ class Submission < ActiveRecord::Base
     end
   end
 
+  def can_read_submission_user_name?(user, session)
+    !self.assignment.anonymous_peer_reviews? ||
+        self.user_id == user.id ||
+        self.assignment.context.grants_right?(user, session, :view_all_grades)
+  end
+
   def update_final_score
     if score_changed? || excused_changed?
       if skip_grade_calc
