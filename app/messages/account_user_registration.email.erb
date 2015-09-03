@@ -3,7 +3,7 @@
 <% end %>
 
 <% define_content :subject do %>
-  <%= t :subject, "Canvas Account Admin Invitation" %>
+  <%= t :subject, "Braven Account Admin Invitation" %>
 <% end %>
 
 <%= t(:added_message, "You've been added as an %{role_type} to the account %{account} at %{website}.", :role_type => asset.readable_type, :account => asset.account.name, :website => HostUrl.context_host(asset.account)) %>
@@ -13,4 +13,4 @@
 <%= t(:email_info, "Email: %{email}", :email => email) %>
 <% if email != login %><%= t(:username_info, "Username: %{username}", :username => login) %><% end %>
 
-<%= t(:url_info, "You'll need to register with Canvas before you can participate as an account admin.  You can finish the registration process here:\n%{url}", :url => content(:link)) %>
+<%= t(:url_info, "You'll need to register with Braven before you can participate as an account admin.  You can finish the registration process here:\n%{url}", :url => content(:link)) %>
