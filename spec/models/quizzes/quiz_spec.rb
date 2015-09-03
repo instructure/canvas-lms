@@ -599,25 +599,41 @@ describe Quizzes::Quiz do
       expect(sub2.end_at).to eq deadline
     end
 
-    it "should set end_at to section end dates" do
-      # when course.end_at or term.end_at doesn't exist
-      deadline = 2.days.from_now
-      @course.restrict_enrollments_to_course_dates = true
-      @course.save!
-      @course.enrollment_term.end_at = 1.day.from_now
-      @course.enrollment_term.save!
+    describe 'section.end_at when section.restrict_enrollments_to_section_dates' do
+      before(:each) do
+        # when course.end_at or term.end_at doesn't exist
+        @deadline = 3.days.from_now
+        @course.restrict_enrollments_to_course_dates = true
+        @course.conclude_at = 2.days.from_now
+        @course.save!
+        @course.enrollment_term.end_at = 1.day.from_now
+        @course.enrollment_term.save!
 
-      # Create a special time extension section
-      section = @course.course_sections.create!(restrict_enrollments_to_section_dates: true, end_at: deadline)
+        # Create a special time extension section
+        section = @course.course_sections.create!(restrict_enrollments_to_section_dates: true, end_at: @deadline)
 
-      # Create user and enroll them in our section
-      user = User.create!(:name => "Fred Colon")
-      enrollment = section.enroll_user(user, "StudentEnrollment")
-      enrollment.accept(:force)
+        # Create user and enroll them in our section
+        @user = User.create!(:name => "Fred Colon")
+        @enrollment = section.enroll_user(@user, "StudentEnrollment")
+        @enrollment.accept(:force)
 
-      q = @course.quizzes.create!(:title => "locked tomorrow")
-      sub2 = q.generate_submission(user)
-      expect(sub2.end_at).to eq deadline
+        @q = @course.quizzes.create!(:title => "locked tomorrow")
+      end
+
+      it "should set end_at to section end dates" do
+        sub = @q.generate_submission(@user)
+        expect(sub.end_at).to eq @deadline
+      end
+
+      it 'should set end_at to time limit, if shorter than section.end_at dates' do
+          @q.time_limit = 1
+          @q.save!
+
+        Timecop.freeze do
+          sub = @q.generate_submission(@user)
+          expect(sub.end_at).to eq 1.minute.from_now
+        end
+      end
     end
 
     it "should shuffle submission questions" do
