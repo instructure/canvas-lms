@@ -1,0 +1,36 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.1//EN' 'http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd'>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=utf-8"/>
+  <title>Course Modules</title>
+</head>
+  <body>
+    <h1>Course Modules</h1>
+    <ol>
+      <% content[:modules].each do |course_module|%>
+        <li><a href="<%= "#module#{course_module[:migration_id]}" %>"><%= course_module[:title] %></a></li>
+      <% end %>
+    </ol>
+    <div style="page-break-before:always;"></div>
+    <% content[:modules].each do |course_module| %>
+      <h2 id="<%="module#{course_module[:migration_id]}"%>"><%= course_module[:title] %></h2>
+      <% if course_module[:items] %>
+        <ol>
+        <% course_module[:items].each do |item| %>
+          <li><a href="<%= "##{item[:linked_resource_id]}" %>"><%= item[:title] %></a></li>
+        <% end %>
+        </ol>
+        <a href="modules.xhtml">Back to Modules Index</a>
+        <div style="page-break-before:always;"></div>
+        <% course_module[:items].each do |item| %>
+          <%=build(module_item(item)) || "<div>#{item[:title]} is not currently supported</div><hr/>"%>
+          <a href="<%= "#module#{course_module[:migration_id]}" %>"><%="Back to #{course_module[:title]}"%></a>
+          <br/>
+          <a href="modules.xhtml">Back to Modules Index</a>
+          <div style="page-break-before:always;"></div>
+        <% end %>
+      <% end %>
+    <% end %>
+  </body>
+</html>

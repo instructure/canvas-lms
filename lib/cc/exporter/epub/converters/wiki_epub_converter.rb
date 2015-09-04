@@ -16,13 +16,13 @@ module CC::Exporter::Epub::Converters
     end
 
     def convert_wiki(doc, path)
-      wiki = {}
+      wiki = {"resource_type" => :wikis}
       wiki_name = File.basename(path, '.html')
       title, body, meta = get_html_title_and_body_and_meta_fields(doc)
       wiki[:title] = title
       wiki[:front_page] = meta['front_page'] == 'true'
       wiki[:text] = body
-      wiki[:url_name] = wiki_name
+      wiki[:identifier] = wiki_name
       wiki
     end
 

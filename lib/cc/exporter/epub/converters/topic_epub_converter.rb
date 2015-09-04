@@ -24,7 +24,7 @@ module CC::Exporter::Epub::Converters
     end
 
     def convert_topic(cc_doc, meta_doc)
-      topic = {}
+      topic = {"resource_type" => :topics}
       topic['description'] = get_node_val(cc_doc, 'text')
       topic['title'] = get_node_val(cc_doc, 'title')
       if meta_doc
@@ -35,6 +35,7 @@ module CC::Exporter::Epub::Converters
         topic['posted_at'] = get_time_val(meta_doc, 'posted_at')
         topic['lock_at'] = get_time_val(meta_doc, 'lock_at')
         topic['position'] = get_int_val(meta_doc, 'position')
+        topic['identifier'] = get_node_val(meta_doc, 'topic_id')
 
         if asmnt_node = meta_doc.at_css('assignment')
           topic['assignment'] = assignment_data(asmnt_node)

@@ -5,6 +5,7 @@ module CC::Exporter::Epub::Converters
     include AssignmentEpubConverter
     include TopicEpubConverter
     include QuizEpubConverter
+    include ModuleEpubConverter
 
     MANIFEST_FILE = "imsmanifest.xml"
 
@@ -34,9 +35,11 @@ module CC::Exporter::Epub::Converters
       set_progress(20)
       @course[:assignments] = convert_assignments
       set_progress(30)
-      @course[:discussion_topics] = convert_topics
+      @course[:topics] = convert_topics
       set_progress(40)
       @course[:quizzes] = convert_quizzes
+      set_progress(50)
+      @course[:modules] = convert_modules
 
       save_to_file
       set_progress(90)

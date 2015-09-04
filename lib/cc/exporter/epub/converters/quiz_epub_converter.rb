@@ -18,7 +18,7 @@ module CC::Exporter::Epub::Converters
     end
 
     def convert_quiz(quiz_meta_path)
-      quiz = {}
+      quiz = {"resource_type" => :quizzes}
       quiz_meta_link = File.join @unzipped_file_path, quiz_meta_path
       quiz_meta_data = open_file_xml(quiz_meta_link)
 
@@ -29,6 +29,7 @@ module CC::Exporter::Epub::Converters
       quiz[:unlock_at] = get_node_val(quiz_meta_data, "unlock_at")
       quiz[:allowed_attempts] = get_node_val(quiz_meta_data, "allowed_attempts")
       quiz[:points_possible] = get_node_val(quiz_meta_data, "points_possible")
+      quiz[:identifier] = get_node_att(quiz_meta_data, 'quiz', 'identifier')
       quiz
     end
   end

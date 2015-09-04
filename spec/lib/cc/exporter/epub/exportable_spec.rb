@@ -1,6 +1,5 @@
 # coding: utf-8
 require File.expand_path(File.dirname(__FILE__) + '/../../cc_spec_helper')
-require 'nokogiri'
 
 describe "Exportable" do
   class ExportableTest

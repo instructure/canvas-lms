@@ -22,7 +22,7 @@ module CC::Exporter::Epub::Converters
     end
 
     def assignment_data(meta_doc, html_doc=nil)
-      assignment = {}
+      assignment = {"resource_type" => :assignments}
 
       if html_doc
         _title, body = get_html_title_and_body(html_doc)
@@ -40,6 +40,7 @@ module CC::Exporter::Epub::Converters
         val = get_float_val(meta_doc, f_type)
         assignment[f_type] = val unless val.nil?
       end
+      assignment['identifier'] = get_node_att(meta_doc, 'assignment', 'identifier')
       assignment
     end
   end
