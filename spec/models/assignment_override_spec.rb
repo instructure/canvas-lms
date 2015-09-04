@@ -149,11 +149,6 @@ describe AssignmentOverride do
       expect(@override).not_to be_valid
     end
 
-    it "should reject an empty title with an adhoc set" do
-      @override.title = nil
-      expect(@override).not_to be_valid
-    end
-
     it "should reject an empty assignment" do
       @override.assignment = nil
       expect(@override).not_to be_valid

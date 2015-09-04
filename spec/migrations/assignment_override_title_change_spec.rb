@@ -32,4 +32,17 @@ describe "title" do
     @override.reload
     expect(@override.title).to eq '4 students'
   end
+  it "should set ADHOC's title of deleted assignments to reflect students" do
+    @override.title = "test"
+    @override.set_type = "ADHOC"
+    override_student = @override.assignment_override_students.build
+    override_student.user = student_in_course(course: @override.assignment.context, name: 'Edgar Jones').user
+    @override.workflow_state = "deleted"
+    override_student.save!
+    @override.valid? # trigger bookkeeping
+    expect(@override.title).to eq 'test'
+    DataFixup::AssignmentOverrideTitleChange.run
+    @override.reload
+    expect(@override.title).to eq '1 student'
+  end
 end
