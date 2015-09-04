@@ -787,17 +787,14 @@ class CoursesController < ApplicationController
         end
       end
       if includes.include?('enrollments')
-        # not_ended_enrollments for enrollment_json
-        # enrollments course for has_grade_permissions?
-        preload_scope = if CANVAS_RAILS3
-          {:conditions => ['enrollments.course_id = ?', @context.id]}
-        else
-          Enrollment.where(:course_id => @context)
-        end
-        ActiveRecord::Associations::Preloader.new(users, { :not_ended_enrollments => :course }, preload_scope).run
+        enrollments_by_user = @context.enrollments.
+            active_or_pending.
+            where(user_id: users).
+            preload(:course).
+            group_by(&:user_id)
       end
       render :json => users.map { |u|
-        enrollments = u.not_ended_enrollments if includes.include?('enrollments')
+        enrollments = enrollments_by_user[u.id] if includes.include?('enrollments')
         user_json(u, @current_user, session, includes, @context, enrollments)
       }
     end
