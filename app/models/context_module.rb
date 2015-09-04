@@ -608,17 +608,16 @@ class ContextModule < ActiveRecord::Base
     progression = nil
     self.shard.activate do
       Shackles.activate(:master) do
-        self.class.unique_constraint_retry do
-          progression = context_module_progressions.where(user_id: user).first
-          if !progression
-            # check if we should even be creating a progression for this user
-            return nil unless context.enrollments.except(:includes).where(user_id: user).exists?
-            progression = context_module_progressions.create!(user: user)
+        progression = context_module_progressions.where(user_id: user).first
+        if !progression && context.enrollments.except(:includes).where(user_id: user).exists? # check if we should even be creating a progression for this user
+          self.class.unique_constraint_retry do |retry_count|
+            progression = context_module_progressions.where(user_id: user).first if retry_count > 0
+            progression ||= context_module_progressions.create!(user: user)
           end
         end
       end
     end
-    progression.context_module = self
+    progression.context_module = self if progression
     progression
   end
 

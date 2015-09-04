@@ -518,15 +518,15 @@ class ActiveRecord::Base
     # transaction (savepoint) ensures we don't mess up things for the outer
     # transaction. useful for possible race conditions where we don't want to
     # take a lock (e.g. when we create a submission).
-    retries.times do
+    retries.times do |retry_count|
       begin
-        result = transaction(:requires_new => true) { uncached { yield } }
+        result = transaction(:requires_new => true) { uncached { yield(retry_count) } }
         connection.clear_query_cache
         return result
       rescue ActiveRecord::RecordNotUnique
       end
     end
-    result = transaction(:requires_new => true) { uncached { yield } }
+    result = transaction(:requires_new => true) { uncached { yield(retries) } }
     connection.clear_query_cache
     result
   end
