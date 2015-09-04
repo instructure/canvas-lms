@@ -468,7 +468,16 @@ define [
         return wrappedFn(a, b)
 
     rowFilter: (student) =>
-      !@sectionToShow || (@sectionToShow in student.sections)
+      matchingSection = !@sectionToShow || (@sectionToShow in student.sections)
+      matchingFilter = if @userFilterTerm == ""
+        true
+      else
+        propertiesToMatch = ['name', 'login_id', 'short_name', 'sortable_name']
+        pattern = new RegExp @userFilterTerm, 'i'
+        matched = _.any propertiesToMatch, (prop) ->
+          student[prop]?.match pattern
+
+      matchingSection and matchingFilter
 
     handleAssignmentMutingChange: (assignment) =>
       idx = @grid.getColumnIndex("assignment_#{assignment.id}")
@@ -1138,40 +1147,8 @@ define [
         new GradeDisplayWarningDialog(dialog_options)
 
     onUserFilterInput: (term) =>
-      # put rows back on the students for dropped assignments
-
-      data = @grid.getData()
-      _.each data, (student) ->
-        if student.beforeFilteredRow?
-          student.row = student.beforeFilteredRow
-          delete student.beforeFilteredRow
-
-      # put the removed items back in their proper order
-      _.each @userFilterRemovedRows.reverse(), (removedStudentItem) ->
-        data.splice removedStudentItem.index, 0, removedStudentItem.data
-      @userFilterRemovedRows = []
-
-      if term != ''
-        propertiesToMatch = ['name', 'login_id', 'short_name', 'sortable_name']
-        index = data.length
-        while index--
-          student = data[index]
-          matched = _.any propertiesToMatch, (prop) ->
-            student[prop]?.match new RegExp term, 'i'
-          if not matched
-            # remove the student, save the item and its index so we can put it
-            # back in order
-            item =
-              index: index
-              data: data.splice(index, 1)[0]
-            @userFilterRemovedRows.push item
-
-      for student, index in data
-        student.beforeFilteredRow = student.row
-        student.row = index
-
-      @grid.setData(data)
-      @grid.invalidate()
+      @userFilterTerm = term
+      @buildRows()
 
     getVisibleGradeGridColumns: ->
       res = [].concat @parentColumns, @customColumnDefinitions()
