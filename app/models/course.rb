@@ -2138,7 +2138,7 @@ class Course < ActiveRecord::Base
   def enrollment_visibility_level_for(user, visibilities = section_visibilities_for(user), require_message_permission = false)
     permissions = require_message_permission ?
       [:send_messages] :
-      [:manage_grades, :manage_students, :manage_admin_users, :read_roster, :view_all_grades]
+      [:manage_grades, :manage_students, :manage_admin_users, :read_roster, :view_all_grades, :read_as_admin]
     granted_permissions = self.granted_rights(user, *permissions)
     if granted_permissions.empty?
       :restricted # e.g. observer, can only see admins in the course
