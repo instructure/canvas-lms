@@ -240,12 +240,13 @@ class AssignmentOverride < ActiveRecord::Base
   end
 
   def set_title_if_needed
-    return if self.workflow_state == "deleted"
 
     if set_type != 'ADHOC' && set
       self.title = set.name
     elsif set_type == 'ADHOC' && set.any?
       self.title ||= title_from_students(set)
+    else
+      self.title ||= "No Title"
     end
   end
 
