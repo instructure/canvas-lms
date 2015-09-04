@@ -4747,13 +4747,13 @@ nb:
       - Des
     datepicker: 
       column_headings: 
+        - Sø
         - Ma
         - Ti
         - "On"
         - To
         - Fr
         - Lø
-        - Sø
     day_names: 
       - Søndag
       - Mandag
