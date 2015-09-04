@@ -59,7 +59,11 @@
   <div class="web_conference_member_user_settings"></div>
   <label class="checkbox" for="user_all">
     {{checkbox "user.all" class="all_users_checkbox" checked=inviteAll}}
-    {{#t "invite_all"}}Invite All Course Members{{/t}}
+    {{#if context_is_group }}
+      {{#t "invite_all.group"}}Invite All Group Members{{/t}}
+    {{else}}
+      {{#t "invite_all.course"}}Invite All Course Members{{/t}}
+    {{/if}}
   </label>
   <div>
     <ul id="members_list" style="border: 1px solid #333; padding: 10px; overflow-y: auto; max-height: 150px;">
