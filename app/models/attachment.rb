@@ -333,17 +333,21 @@ class Attachment < ActiveRecord::Base
     end
   end
 
+  TURNITINABLE_MIME_TYPES = %w[
+    application/msword
+    application/vnd.openxmlformats-officedocument.wordprocessingml.document
+    application/pdf
+    text/plain
+    text/html
+    application/rtf
+    text/richtext
+    application/vnd.wordperfect
+    application/vnd.ms-powerpoint
+    application/vnd.openxmlformats-officedocument.presentationml.presentation
+  ].to_set.freeze
+
   def turnitinable?
-    self.content_type && [
-      'application/msword',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-      'application/pdf',
-      'text/plain',
-      'text/html',
-      'application/rtf',
-      'text/richtext',
-      'application/vnd.wordperfect'
-    ].include?(self.content_type)
+    TURNITINABLE_MIME_TYPES.include?(content_type)
   end
 
   def flag_as_recently_created
