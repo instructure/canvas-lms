@@ -56,6 +56,11 @@ class Submission < ActiveRecord::Base
 
   has_many :content_participations, :as => :content
 
+  has_and_belongs_to_many :crocodoc_documents,
+    join_table: :canvadocs_submissions
+  has_and_belongs_to_many :canvadocs,
+    join_table: :canvadocs_submissions
+
   EXPORTABLE_ATTRIBUTES = [
     :id, :body, :url, :attachment_id, :grade, :score, :submitted_at,
     :assignment_id, :user_id, :submission_type, :workflow_state,
@@ -554,10 +559,12 @@ class Submission < ActiveRecord::Base
 
   def submit_attachments_to_canvadocs
     if attachment_ids_changed?
-      attachments.preload(:crocodoc_document).each do |a|
-        if Canvas::Crocodoc.enabled? && a.crocodocable?
-          # indicates a crocodoc preview is coming
-          a.crocodoc_document || a.create_crocodoc_document
+      attachments.preload(:crocodoc_document, :canvadoc).each do |a|
+        # associate previewable-document and submission for permission checks
+        if a.canvadocable? && Canvadocs.annotations_supported?
+          canvadocs << a.create_canvadoc unless a.canvadoc
+        elsif a.crocodocable?
+          crocodoc_documents << a.create_crocodoc_document unless a.crocodoc_document
         end
 
         a.send_later_enqueue_args :submit_to_canvadocs, {

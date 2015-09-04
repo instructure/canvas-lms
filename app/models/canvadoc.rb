@@ -21,6 +21,10 @@ class Canvadoc < ActiveRecord::Base
 
   belongs_to :attachment
 
+  has_and_belongs_to_many :submissions,
+    join_table: :canvadocs_submissions,
+    readonly: true
+
   def upload(opts = {})
     return if document_id.present?
 
@@ -64,10 +68,7 @@ class Canvadoc < ActiveRecord::Base
       user_filter: user.global_id,
     }
 
-    submissions = attachment.attachment_associations.
-      where(:context_type => 'Submission').
-      preload(context: [:assignment]).
-      map(&:context)
+    submissions = self.submissions.preload(:assignment)
 
     return opts if submissions.empty?
 

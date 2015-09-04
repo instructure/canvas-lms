@@ -178,6 +178,6 @@ module Canvadocs
   end
 
   def self.annotations_supported?
-    Canvas::Plugin.value_to_boolean config["annotations_supported"]
+    enabled? && Canvas::Plugin.value_to_boolean(config["annotations_supported"])
   end
 end

@@ -2955,7 +2955,7 @@ describe 'Submissions API', type: :request do
   end
 
   it "includes preview urls for attachments" do
-    Canvadocs.stubs(:enabled?).returns(true)
+    Canvadocs.stubs(:config).returns({a: 1})
 
     course_with_teacher_logged_in active_all: true
     student_in_course active_all: true
