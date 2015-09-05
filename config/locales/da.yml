@@ -89,7 +89,7 @@ da:
     tab_permissions: Tilladelser
     tab_plugins: Plugins
     tab_question_banks: Spørgsmålssamling
-    tab_rubrics: Instructions
+    tab_rubrics: Vurderingskriterier
     tab_settings: Indstillinger
     tab_sis_import: "SIS Import"
     tab_statistics: Statistikker
@@ -1885,7 +1885,7 @@ da:
       options: 
         select_student: "[ Vælg Student ]"
       overview: "Studerendes peer reviews vil blive anset for fuldendt, når de studrende har kommenteret mindst en gang på siden."
-      overview_with_rubric: "Studerendes peer reviews vil blive anset for fuldendt, når de studrende har kommenteret mindst en gang på siden og fyldt ud instruktionsformen for opgaven."
+      overview_with_rubric: "Studerendes peer reviews vil blive anset for fuldendt, når de studrende har kommenteret mindst en gang på siden og udfyldt vurderingskriterieformen for opgaven."
       page_title: "Peer Reviews"
       reviews_per_user: "%{count} evalueringer pr. bruger"
       submitted: indsendt
@@ -1928,8 +1928,8 @@ da:
       due_at: Forfalden
       for: For
       links: 
-        add_rubric: "Tilføj instruktioner"
-        assign_rubric: "Tildel instruktion"
+        add_rubric: "Tilføj vurderingskriterier"
+        assign_rubric: "Tildel vurderingskriterie"
         edit: Rediger
       manage: Administrer
       messages: 
@@ -1963,7 +1963,7 @@ da:
           view_original_page: "Se den originale side"
           view_quiz: "Se Quiz indsendelse"
           view_survey: "Se spørgeundersøgelsesindsendelse"
-        view_rubric_evaluation: "Se kategorievaluering"
+        view_rubric_evaluation: "Se evaluering af vurderingskriterie"
       messages: 
         no_comments: "Ingen Kommentarer"
         submission_late_timestamp: "%{submitted_at} (sen)"
@@ -2257,7 +2257,7 @@ da:
     find_user: "Find bruger"
     import: Importer
     login: Login
-    manage_rubrics: "Administrer instruktioner"
+    manage_rubrics: "Administrer vurderingskriterier"
     masquerade: "Masker som bruger"
     ok: OK
     okay: OK
@@ -2658,7 +2658,7 @@ da:
         create_assignment: "Ændre en ny opgave"
         delete: "Slette en begvienhed/opgave"
         new: "Oprette en ny begivenhed"
-  can_t_delete_alignments_based_on_rubric_associatio_d9fd10a3: "Kan ikke slette tilhøresforhold baseret på instruktionsassociation. For at fjerne disse associationer skal du fjerne rækken fra aktive instruktioner"
+  can_t_delete_alignments_based_on_rubric_associatio_d9fd10a3: "Kan ikke slette tilhøresforhold baseret på association af vurderingskriterie. For at fjerne disse associationer skal du fjerne rækken fra aktive vurderingskriterier"
   can_t_perform_diffing_against_more_than_one_file_o_44475c0d: "Can ikke udføre forskel mod flere end en fil af samme type"
   cancel_caeb1e68: Annuller
   cannot_be_nil_when_account_id_is_nil_be6d1d60: "Kan ikke være nul, når konto_id er nul"
@@ -2712,9 +2712,9 @@ da:
   change_groups_4e2ab6c3: "Ændre grupper"
   change_points_possible_to_match_rubric_dialog: 
     prompts: 
-      update_assignment_points: "Denne opgave har %{assignmentPoints} mulige points, ønsker du at ændre det til %{rubricPoints} mulige points for at matche denne instruktion?"
+      update_assignment_points: "Denne opgave har %{assignmentPoints} mulige points, ønsker du at ændre det til %{rubricPoints} mulige points for at matche dette vurderingskriterie?"
     titles: 
-      update_assignment_points: "Ændre mulige points for at matche instruktino?"
+      update_assignment_points: "Ændre mulige points for at matche vurderingskriterie?"
   child_s_username_dde3aa9: "Barns brugernavn"
   choose_a_course_home_page_8059c7b: "Vælg en kursushjemmeside"
   choose_a_csv_file_to_upload_9644480c: "Vælg en CVS fil at uploade:"
@@ -3914,7 +3914,7 @@ da:
       quiz_is_locked: "Quiz \"%{title}\" kunne ikke kopieres, fordi det er låst."
       quizzes: "Eksport af nogle quizzer mislykkedes"
       resources: "Mislykkedes at linke nogle resurser."
-      rubrics: "Eksport af instruktioner mislykkedes"
+      rubrics: "Eksport af vurderingskriterier mislykkedes"
       topic: "Diskussionsemne \"%{title}\" eksport mislykkedes"
       topic_is_locked: "Emnet \"%{title}\" kunne ikke blieve kopieret, fordi det er låst."
       topics: "Eksport af nolge emner mislykkedes"
@@ -4440,7 +4440,7 @@ da:
       headings: 
         current_users: "Nuværende brugere"
       help: 
-        reset_course_content: "Nulstilling af kursusindhold vil permanent slette alle associerede opgaver, diskussioner, quizzer, moduler, instruktioner, sider, filer, indlæringsmål, spørgsmålsbanker, samarbejder, konferencer eller enhvert andet indhold. Denne handling kan ikke fortrydes, og data *kan ikke* blive gendannet. Er du sikker på, at du ønsker at fortsætte?"
+        reset_course_content: "Nulstilling af kursusindhold vil permanent slette alle associerede opgaver, diskussioner, quizzer, moduler, vurderingskriterier, sider, filer, indlæringsmål, spørgsmålsbanker, samarbejder, konferencer eller enhvert andet indhold. Denne handling kan ikke fortrydes, og data *kan ikke* blive gendannet. Er du sikker på, at du ønsker at fortsætte?"
       links: 
         calendar: Kursuskalender
         conclude: "Slut dette kursus"
@@ -4509,11 +4509,11 @@ da:
       not_weighted: "Kursus opgaver er ikke vægtede."
     statistics: 
       active_students: "Aktive Studerende"
-      all_rubrics: "Alle instruktioner"
+      all_rubrics: "Alle vurderingskriterier"
       any: Alle
       assignment_groups: Opgavegrupper
       assignments: Opgaver
-      course_rubrics: Kursusinstruktioner
+      course_rubrics: Kursusvurderingskriterier
       discussion_posts: Diskussionsposter
       discussion_topic: Diskussionsemne
       discussions: Diskussioner
@@ -4614,7 +4614,7 @@ da:
     quizzes: Quiz
     registered_services: "Registrerede servicer"
     revisions: Revisioner
-    rubrics: Instructions
+    rubrics: Vurderingskriterier
     settings: Indstillinger
     site_admin: "Site Admin"
     stats: Statistikker
@@ -5171,7 +5171,7 @@ da:
       other: "%{count} svar."
       zero: "Ingen svar."
     show: 
-      add_rubric: "Tilføj instruktioner"
+      add_rubric: "Tilføj vurderingskriterier"
       announcement_closed: "Denne bekendtgørelse er lukket for kommentarer"
       announcement_locked: "Indholdet af denne bekendtgørelse vil ikke være synlig for brugere indtil %{date}"
       announcement_locked_until: "Denne bekendtgørelse er låst indtil %{time}"
@@ -5202,7 +5202,7 @@ da:
       reply_to_message: "Svar til nuværende besked"
       reply_to_topic: "Svar til emne"
       retrieved_from_feed: "Hentet fra %{feed}"
-      show_rubric: "Vis instruktion"
+      show_rubric: "Vis vurderingskriterie"
       speed_grader: SpeedGrader™
       topic: Emne
       topic_podcast_feed_link: "Emne Podcast nedhedskilde"
@@ -5374,24 +5374,24 @@ da:
   edit_role_1e96ad20: "Rediger rolle"
   edit_rubric: 
     buttons: 
-      create_rubric: "Opret instruktion"
-      update_rubric: "Opdater instruktion"
+      create_rubric: "Opret vurderingskriterie"
+      update_rubric: "Opdater vurderingskriterie"
     change: Ændre
     discussion_points_possible: 
       one: "%{count} point mulig"
       other: "%{count} mulige points"
     errors: 
-      load_rubrics_failed: "Loading af instruktioner mislykkedes, prøv venligst igen"
+      load_rubrics_failed: "Indlæsning af vurderingskriterier mislykkedes, prøv venligst igen"
     leave_different: "Efterlad forskellig"
     messages: 
-      loading_rubric_groups: "Loading instruktionsgrupper..."
-      loading_rubrics: "Loading instruktioner..."
+      loading_rubric_groups: "Indlæsning af vurderingskriteriegrupper..."
+      loading_rubrics: "Indlæsning af vurderingskriterier..."
     prompts: 
-      confirm_delete: "Er du sikker på, at du ønsker at slette denne instruktion?"
-      read_only_rubric: "Du kan ikke redigere denne instruktion, enten for di du ikke har tilladelse eller den bliver brugt mere end et sted. Enhver ændring du foretager vil resultere i en ny instruktion baseret på den gamle instruktion. Forsæt?"
+      confirm_delete: "Er du sikker på, at du ønsker at slette dette vurderingskriterie?"
+      read_only_rubric: "Du kan ikke redigere dette vurderingskriterie, enten fordi du ikke har tilladelse eller den bliver brugt mere end et sted. Enhver ændring du foretager vil resultere i et nyt vurderingskriterie baseret på det gamle vurderingskriterie. Forsæt?"
     titles: 
-      criterion_long_description: "Criteria lang beskrivelse"
-      find_existing_rubric: "Find eksisterende instruktion"
+      criterion_long_description: "Vurderingskriteria lang beskrivelse"
+      find_existing_rubric: "Find eksisterende vurderingskriterie"
   edit_survey_b0d6890d: "Rediger spørgeundersøgelse"
   edit_toolname_app_23cfbb8: "Rediger %{toolName} App"
   editor: 
@@ -6212,7 +6212,7 @@ da:
       aria_record: "Klik for at optage"
       aria_record_reset: "Kilk for at optage"
       aria_stop: "Klik \"Stop\" for at afslutte optagelse."
-    edit_view_rubric: "Se instruktion"
+    edit_view_rubric: "Se vurderingskriterie"
     errors: 
       select_an_option: "Vælg venligst en mulighed"
     graded: bedømt
@@ -6421,7 +6421,7 @@ da:
       click_to_change: "Klik for at teste en anden score"
       close_comments: Luk
       close_comments_label: "Luk kommentare"
-      close_rubric: "Luk instruktion"
+      close_rubric: "Luk vurderingskriterie"
       close_score: Luk
       close_score_screenreader: "Luk scoredetailjer"
       collapse: "Sammenfold alle resultatgrupper for beherskelse af indlæringsmål."
@@ -6464,8 +6464,8 @@ da:
       page_title: "Karakterer for %{student}"
       print_grades: "Udskriv karakterer"
       score_details: Scoredetaljer
-      see_rubric_results: "Se kategori resultater"
-      see_rubric_results_screenreader: "Se kategori resultater"
+      see_rubric_results: "Se vurderingskriterieresultater"
+      see_rubric_results_screenreader: "Se vurderingskriterieresultater"
       see_scoring_details: "Se scoringsdetaljer"
       see_scoring_details_screenreader: "Se scoringsdetaljer"
       see_turnitin_results: "Se Turnitin resultater"
@@ -6476,7 +6476,7 @@ da:
         enter_score: "Indtast en score for test"
         revert_score: "Vend tilbage til originale score"
         turnitin_score: "Turnitin similarity score -- mere information"
-        view_rubric_evaluation: "Se kategorievaluering"
+        view_rubric_evaluation: "Se evaluering af vurderingskriterie"
         view_scoring_details: "Se scoringsdetaljer"
       total: Total
     gradebook2: 
@@ -6563,7 +6563,7 @@ da:
         leave_comment: "Efterlad kommentar"
         next_student: "Næste studerende"
         previous_student: "Forrige studernede"
-        use_rubric: "Benyt kategori"
+        use_rubric: "Benyt vurderingskriterie"
       keycodes: 
         change_grade: g
         leave_comment: c
@@ -7251,7 +7251,7 @@ da:
     no_context_found: "Eksterne indlæringsmål  kunne ikke findes for \"%{title}\", opretter en kopi"
     no_global_permission: "Du er ikke tilladt til at administrere globale indlæringsmål, kan ikke tilføje \"%{title}\""
   importers/rubric_importer: 
-    no_context_found: "Ekstern instruktion kunne ikke findes for \"%{title}\", oprette en kopi."
+    no_context_found: "Ekstern vurderingskriterie kunne ikke findes for \"%{title}\", oprette en kopi."
   importers/wiki_page_importer: 
     title_for_topics_category: "%{category} emner"
     warnings: 
@@ -7524,7 +7524,7 @@ da:
         groups: Studiegrupper
         learning_outcomes: Indlæringsmål
         quizzes: Quiz
-        rubrics: Instructions
+        rubrics: Vurderingskriterier
         syllabus_body: Pensum
         wikis: "Wiki Sider"
     cc: 
@@ -9503,7 +9503,7 @@ da:
     module_type: Modul
     quiz_question_type: "Quiz spørgsmål"
     quiz_type: Quiz
-    rubric_type: Instruktion
+    rubric_type: Vurderingskriterie
     webct: 
       course_not_found: "Blackboard kursus ikke fundet."
     wiki_page_type: "Wiki Side"
@@ -9922,9 +9922,9 @@ da:
       pseudonym_registration: "Pseydonym registrering"
       report_generated: "Rapport genereret"
       report_generation_failed: "Rapport generering mislykkedes"
-      rubric_assessment_invitation: "Instruktion vurderings invitation"
-      rubric_assessment_submission_reminder: "Instruktion vurderings indsendelsesopmindelser"
-      rubric_association_created: "Instruktions associering oprettet"
+      rubric_assessment_invitation: Vurderingskriterieinvitation
+      rubric_assessment_submission_reminder: Vurderingskriterieindsendelsespåmindelse
+      rubric_association_created: "Vurderingskriterieassociering oprettet"
       submission_comment: Indsendelseskommentar
       submission_comment_for_teacher: "Indsendelseskommentar for lærer"
       submission_grade_changed: "Indsendelseskarakter ændret"
@@ -10156,7 +10156,7 @@ da:
       instructions: 
         main: 
           manage: 
-            description: "*Indlæringsmål er oprettet her for at spore beherskelse af et kursus. For at komme i gang, tjek menubaren øverst oppe. Klik på ny knappen for at oprette et nyt resutlat, eller ny gruppe knappen for at oprette en ny gruppe at organisere dine resultater ind i. Find knappen vil tillade digat benytte resultater, der er blevet oprettet af din stat eller institution. Mens du opretter eller bruger indlæringsmål, vil du være i stand til at bruge panellet til venstre for at navigere gennem dine indlæringsmål. Du kan trække og droppe resultater mellem forskellige niveauer for at skabe struktur.* *Vigtigere, Canvas kan tillade dig at tilføje resultater til din bedømmelsesinstruktioner, så du kan evaluere beherskelse mens du bedømmer opgaver. Når du har sat op resulater, klik administrer instruktioner for a starte med at bruge dine indlæringsmål for bedømmelse.*"
+            description: "*Indlæringsmål er oprettet her for at spore beherskelse af et kursus. For at komme i gang, tjek menubaren øverst oppe. Klik på ny knappen for at oprette et nyt resutlat, eller ny gruppe knappen for at oprette en ny gruppe at organisere dine resultater ind i. Find knappen vil tillade digat benytte resultater, der er blevet oprettet af din stat eller institution. Mens du opretter eller bruger indlæringsmål, vil du være i stand til at bruge panellet til venstre for at navigere gennem dine indlæringsmål. Du kan trække og droppe resultater mellem forskellige niveauer for at skabe struktur.* *Vigtigere, Canvas kan tillade dig at tilføje resultater til din bedømmelsesinstruktioner, så du kan evaluere beherskelse mens du bedømmer opgaver. Når du har sat op resulater, klik administrer vurderingskriterier for a starte med at bruge dine indlæringsmål for bedømmelse.*"
             title: "Opsætter indlæringsmål"
     mastery_error: "Skal være større end eller lig med 0"
     missing_outcome: "Kunne ikke finde indlæringsmål"
@@ -10176,7 +10176,7 @@ da:
     outcome_form: 
       calculation_method: Beregningsmetode
       criterion: "Vurderinger af kriterie"
-      criterion_dialog: "Indlæringsmål kan blive inkluderet i opgaveinstruktioner, da det er en nem måde at bedømme beherskelse af indlæringsmål justeret til specifikke opgaver. Når du definere et indlæringsmål, skal du også definere et kriterie, der kan blive brugt, når opgaverinstruktioner opbygges. Definer så mange instuktionskolonner, som du behøver og specificer en punktgrænse, der vil blive benyttet til at definere beherskelse af dette indlæringsmål."
+      criterion_dialog: "Indlæringsmål kan blive inkluderet i opgavevurderingskriterier, da det er en nem måde at bedømme beherskelse af indlæringsmål justeret til specifikke opgaver. Når du definere et indlæringsmål, skal du også definere et kriterie, der kan blive brugt, når opgaverinstruktioner opbygges. Definer så mange instuktionskolonner, som du behøver og specificer en punktgrænse, der vil blive benyttet til at definere beherskelse af dette indlæringsmål."
       criterion_info_link: "Klik for at lære om vurderinger af kriterie"
       description: "Beskriv dette indlæringsmål"
       display_name: "Venligt navn (valgfrit)"
@@ -11978,7 +11978,7 @@ da:
           find_questions: "Find spørgsmål"
           new_question: "Nyt spørgsmål"
           new_question_group: "Ny spørgsmålsgruppe"
-          show_assignment_rubric: "Vis instruktion"
+          show_assignment_rubric: "Vis vurderingskriterie"
         manage: Administrer
         minutes: Minutter
         new_assignment: "Ny opgave"
@@ -12209,7 +12209,7 @@ da:
           preview: Forhåndsvisning
           quiz_statistics: "Quiz statistikker"
           see_full_quiz: "Se hele quiz"
-          show_assignment_rubric: "Vis instruktion"
+          show_assignment_rubric: "Vis vurderingskriterie"
           show_student_quiz_results: "Vis studerendes quiz resultater"
           show_student_survey_results: "Vis studerendes spørgeundersøgelsesresultater"
           survey_statistics: Spørgeimdersøgelsesstatistikker
@@ -12306,9 +12306,9 @@ da:
           keep_editing_survey: "Forsæt med at redigere denne spørgeundersøgelse"
     retrieving_filters: "Henter filtre..."
     rubric: 
-      loading: Loading...
+      loading: Indlæsning...
       titles: 
-        details: "Opgave instruktionsdetaljer"
+        details: "Opgave vurderingskriteriedetaljer"
     show: 
       answers: 
         correct: Korrekt!
@@ -12606,7 +12606,7 @@ da:
       manage_links: "Administrer rolle og hav tillid til link"
       manage_outcomes: "Administrer indlæringsmål"
       manage_role_overrides: "Administrer tilladelser"
-      manage_rubrics: "Opret og rediger bedømmelsesinstruktioner"
+      manage_rubrics: "Opret og rediger vurderingskriterier"
       manage_sections: "Administrer ( tilføj / rediger / slet ) kursus sektioner"
       manage_sis: "Importer og administrer SIS data"
       manage_site_settings: "Administrer sidebredde og plugin indstillinger"
@@ -12717,7 +12717,7 @@ da:
     unknown_error: "Noget gik galt med din søgning, prøv venligst igen."
     updating: Opdaterer...
   rubric: 
-    context_name_rubric: "%{course_name} Instruktioner"
+    context_name_rubric: "%{course_name} Vurderingskriterie"
     no_description: "Ingen beskrivelse"
     unknown_details: "Ukendt detaljer"
   rubric_assessment: 
@@ -12731,43 +12731,43 @@ da:
     no_details: "Ingen detaljer"
   rubrics: 
     index: 
-      account_rubrics: "Konto instruktioner"
-      are_you_sure_prompt: "Er du sikker op, at du ønsker at slette denne instruktion? Ethvert kursus, der for øjeblikket er associeret med denne instruktion, vil stadig have adgang til den, men ingen nye kurser vil være i stand til at benytte den."
+      account_rubrics: "Konto vurderingskriterier"
+      are_you_sure_prompt: "Er du sikker op, at du ønsker at slette dette vurderingskriterie? Ethvert kursus, der for øjeblikket er associeret med denne instruktion, vil stadig have adgang til den, men ingen nye kurser vil være i stand til at benytte den."
       buttons: 
-        add_rubric: "Tilføj instruktioner"
-      course_rubrics: Kursusinstruktioner
-      delete_rubric: "Slet instruktioner"
-      edit_rubric: "Rediger instruktioner"
-      page_title: Instruktioner
+        add_rubric: "Tilføj vurderingskriterier"
+      course_rubrics: Kursusvurderingskriterier
+      delete_rubric: "Slet vurderingskriterier"
+      edit_rubric: "Rediger vurderingskriterier"
+      page_title: Vurderingskriterier
       points_possible: 
         one: "1 point mulig"
         other: "%{count} points mulig"
-      user_rubrics: Brugerinstruktioner
-    loading: Loading...
+      user_rubrics: Brugervurderingskriterier
+    loading: Indlæsning...
     show: 
       buttons: 
-        delete: "Slet instruktioner"
+        delete: "Slet vurderingskriterier"
       prompts: 
-        are_you_sure_delete: "Er du sikker op, at du ønsker at slette denne instruktion? Ethvert kursus, der for øjeblikket er associeret med denne instruktion, vil stadig have adgang til den, men ingen nye kurser vil være i stand til at benytte den."
-      rubric_can_not_modify: "Instruktioner can ikke blive modificeret, når først de er blevet benyttet i mere end et sted."
+        are_you_sure_delete: "Er du sikker op, at du ønsker at slette dette vurderingskriterie? Ethvert kursus, der for øjeblikket er associeret med dette vurderingskriterie, vil stadig have adgang til den, men ingen nye kurser vil være i stand til at benytte den."
+      rubric_can_not_modify: "Vurderingskriterier kan ikke ændres, når de er blevet benyttet mere end et sted."
       titles: 
-        edit_rubric: "Rediger instruktioner"
+        edit_rubric: "Rediger vurderingskriterie"
     titles: 
-      assignment_rubric_details: "Opgave instruktionsdetaljer"
+      assignment_rubric_details: Opgavevurderingskriteriedetaljer
     user_index: 
       buttons: 
-        add_rubric: "Tilføj instruktioner"
-      delete_rubric: "Slet instruktioner"
+        add_rubric: "Tilføj vurderingskriterie"
+      delete_rubric: "Slet vurderingskriterie"
       headings: 
-        user_rubrics: Brugerinstruktioner
-      page_title: Instruktioner
+        user_rubrics: Brugervurderingskriterier
+      page_title: Vurderingskriterier
       points_possible: 
         one: "point mulig"
         other: "points mulige"
       prompts: 
-        are_you_sure_delete: "Er du sikker op, at du ønsker at slette denne instruktion? Ethvert kursus, der for øjeblikket er associeret med denne instruktion, vil stadig have adgang til den, men ingen nye kurser vil være i stand til at benytte den."
-        are_you_sure_remove: "Er du sikker på, at du ønsker at fjerne denne instruktioner fra ind liste?"
-      remove_rubric: "Fjern denne instruktion fra min liste"
+        are_you_sure_delete: "Er du sikker op, at du ønsker at slette dette vurderingskriterie? Ethvert kursus, der for øjeblikket er associeret med dette vurderingskriterie, vil stadig have adgang til den, men ingen nye kurser vil være i stand til at benytte den."
+        are_you_sure_remove: "Er du sikker på, at du ønsker at fjerne dette vurderingskriterie fra din liste?"
+      remove_rubric: "Fjern dette vurderingskriterie fra min liste"
   salesforce_account_id_eb5c78ad: "Salesforce Account Id"
   salesforce_has_a_different_login_host_for_sanbox_a_2d878ae9: "Salesforce er en anden login host for sanbox konti end den har for produktionskonti, så hvis du bruger en Salesforce sanbox konto og du ikke tjekker denne boks, vil det ikke være i stand til at autencitere (og dette virker også omvendt, dvs. hvis du har en produktionskonto og tjekker denne boks, vil det ikek autencitere)"
   salesforce_ticketing_webtocase_connector_80f75716: "Salesforce Ticketing WebToCase Connector"
@@ -13123,7 +13123,7 @@ da:
         delete_assignment: Slet
         edit_assignment: Rediger
         submission_comments: Indsendelseskommentarer
-        view_rubric_evaluation: "Se kategorievaluering"
+        view_rubric_evaluation: "Se evaluering af vurderingskriterie"
       points_out_of: "%{points} ud af %{possible}"
       student_mute_notification: "Instruktør arbejder på karaktere"
       submitted_and_graded_count: "%{submitted_count} Indsendt, %{graded_count} Bedømt"
@@ -13150,8 +13150,8 @@ da:
         percent_of_final_grade: "Procent af endelig karakter"
     assignment_rubric_dialog: 
       links: 
-        add_rubric: "Tilføj instruktioner"
-        assign_rubric: "Tildel instruktion"
+        add_rubric: "Tilføj vurderingskriterie"
+        assign_rubric: "Tildel vurderingskriterie"
     available_dates: 
       headers: 
         available: Tilgængelig
@@ -13468,21 +13468,21 @@ da:
       sidebar_content: Sidepanelindhold
     rubric: 
       buttons: 
-        create: "Opret instruktion"
+        create: "Opret vurderingskriterie"
       defaults: 
-        rubric_title: "Nogen instruktion"
+        rubric_title: "Nogle vurderingskriterier"
       headers: 
         criteria: Kriterie
         points: Pts
         ratings: Vurderinger
       labels: 
         custom_rating: "Jeg vil skrive free-form kommentere, når jeg bedømmer studerende"
-        grading_rubric: "Benyt denne instruktion for opgavebedømmelse"
+        grading_rubric: "Benyt dette vurderingskriterie for opgavebedømmelse"
         total_points: "Totale points"
         totallying_rubric: "Skjul  total score for opgaveresultater"
       links: 
         add_criterion: "Tilføj kriterie"
-        delete: "Slet instruktioner"
+        delete: "Slet vurderingskriterier"
         edit: "Rediger instruktioner"
         find_a_rubric: "Find en instruktion"
         find_another_rubric: "Find anden instruktion"
@@ -13541,7 +13541,7 @@ da:
         use_this_rubric: "Brug denne instruktion"
       criterion_count: "%{count} kriteri"
       links: 
-        manage_rubrics: "Administrer instruktioner"
+        manage_rubrics: "Administrer vurderingskriterier"
       points_possible: "%{points} mulige points"
       titles: 
         find_a_rubric: "Find en instruktion"
