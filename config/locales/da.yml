@@ -10156,7 +10156,7 @@ da:
       instructions: 
         main: 
           manage: 
-            description: "*Indlæringsmål er oprettet her for at spore beherskelse af et kursus. For at komme i gang, tjek menubaren øverst oppe. Klik på ny knappen for at oprette et nyt resutlat, eller ny gruppe knappen for at oprette en ny gruppe at organisere dine resultater ind i. Find knappen vil tillade digat benytte resultater, der er blevet oprettet af din stat eller institution. Mens du opretter eller bruger indlæringsmål, vil du være i stand til at bruge panellet til venstre for at navigere gennem dine indlæringsmål. Du kan trække og droppe resultater mellem forskellige niveauer for at skabe struktur.* *Vigtigere, Canvas kan tillade dig at tilføje resultater til din bedømmelsesinstruktioner, så du kan evaluere beherskelse mens du bedømmer opgaver. Når du har sat op resulater, klik administrer vurderingskriterier for a starte med at bruge dine indlæringsmål for bedømmelse.*"
+            description: "*Indlæringsmål er oprettet her for at spore beherskelse af et kursus. For at komme i gang, tjek menubaren øverst oppe. Klik på ny knappen for at oprette et nyt resutlat, eller ny gruppe knappen for at oprette en ny gruppe at organisere dine resultater ind i. Find knappen vil tillade digat benytte resultater, der er blevet oprettet af din stat eller institution. Mens du opretter eller bruger indlæringsmål, vil du være i stand til at bruge panellet til venstre for at navigere gennem dine indlæringsmål. Du kan trække og droppe resultater mellem forskellige niveauer for at skabe struktur.* *Vigtigere, Canvas kan tillade dig at tilføje resultater til din vurderingskriterier, så du kan evaluere beherskelse mens du bedømmer opgaver. Når du har sat op resulater, klik administrer vurderingskriterier for a starte med at bruge dine indlæringsmål for bedømmelse.*"
             title: "Opsætter indlæringsmål"
     mastery_error: "Skal være større end eller lig med 0"
     missing_outcome: "Kunne ikke finde indlæringsmål"
@@ -10176,7 +10176,7 @@ da:
     outcome_form: 
       calculation_method: Beregningsmetode
       criterion: "Vurderinger af kriterie"
-      criterion_dialog: "Indlæringsmål kan blive inkluderet i opgavevurderingskriterier, da det er en nem måde at bedømme beherskelse af indlæringsmål justeret til specifikke opgaver. Når du definere et indlæringsmål, skal du også definere et kriterie, der kan blive brugt, når opgaverinstruktioner opbygges. Definer så mange instuktionskolonner, som du behøver og specificer en punktgrænse, der vil blive benyttet til at definere beherskelse af dette indlæringsmål."
+      criterion_dialog: "Indlæringsmål kan blive inkluderet i opgavevurderingskriterier, da det er en nem måde at bedømme beherskelse af indlæringsmål justeret til specifikke opgaver. Når du definere et indlæringsmål, skal du også definere et kriterie, der kan blive brugt, når opgavevurderingskriterier opbygges. Definer så mange instuktionskolonner, som du behøver og specificer en punktgrænse, der vil blive benyttet til at definere beherskelse af dette indlæringsmål."
       criterion_info_link: "Klik for at lære om vurderinger af kriterie"
       description: "Beskriv dette indlæringsmål"
       display_name: "Venligt navn (valgfrit)"
@@ -11488,9 +11488,9 @@ da:
       answer: 
         text: "Svartekst, rich text område"
       question: 
-        instructions: "Spørgsmålsinstruktioner, rich text område"
+        instructions: "Spørgsmålsvurderingskriterier, rich text område"
       quiz: 
-        instructions: "Spørgsmålsinstruktioner, rich text område"
+        instructions: "Spørgsmålsvurderingskriterier, rich text område"
     labels: 
       answer_text: Svartekst
       comments_on_answer: "Kommentarer, hvis bruger vælger dette svar"
@@ -12732,7 +12732,7 @@ da:
   rubrics: 
     index: 
       account_rubrics: "Konto vurderingskriterier"
-      are_you_sure_prompt: "Er du sikker op, at du ønsker at slette dette vurderingskriterie? Ethvert kursus, der for øjeblikket er associeret med denne instruktion, vil stadig have adgang til den, men ingen nye kurser vil være i stand til at benytte den."
+      are_you_sure_prompt: "Er du sikker op, at du ønsker at slette dette vurderingskriterie? Ethvert kursus, der for øjeblikket er associeret med dette vurderingskriterie, vil stadig have adgang til den, men ingen nye kurser vil være i stand til at benytte den."
       buttons: 
         add_rubric: "Tilføj vurderingskriterier"
       course_rubrics: Kursusvurderingskriterier
@@ -13483,27 +13483,27 @@ da:
       links: 
         add_criterion: "Tilføj kriterie"
         delete: "Slet vurderingskriterier"
-        edit: "Rediger instruktioner"
-        find_a_rubric: "Find en instruktion"
-        find_another_rubric: "Find anden instruktion"
+        edit: "Rediger vurderingskriterie"
+        find_a_rubric: "Find et vurderingskriterie"
+        find_another_rubric: "Find andet vurderingskriterie"
         find_outcome: "Find indlæringsmål"
-        find_rubric: "Find instruktion"
+        find_rubric: "Find vurderingskriterie"
       messages: 
-        locked: "Kan ikke ændre en instruktion, når du er begyndt at bruge den."
+        locked: "Kan ikke ændre et vurderingskriterie, når du er begyndt at bruge det."
         rubric_in_use: 
-          one: "Husk på at 1 studerende er allerede blevet bedømt med denne instruktion. Ændringer af den vil påvirke deres evaluering."
-          other: "Husk på at %{count} studerende er allerede blevet bedømt med denne instruktion. Ændringer af den vil påvirke deres evaluering."
-        rubric_in_use2: "Du har allerede bedømt studrende med denne instruktion. Enhver større ændring kan påvirke deres opgave resultater."
+          one: "Husk på at 1 studerende er allerede blevet bedømt med dette vurderingskriterien. Ændringer af den vil påvirke deres evaluering."
+          other: "Husk på at %{count} studerende er allerede blevet bedømt med dette vurderingskriterie. Ændringer af den vil påvirke deres evaluering."
+        rubric_in_use2: "Du har allerede bedømt studrende med dette vurderingskriterie. Enhver større ændring kan påvirke deres opgave resultater."
       out_of: "%{points} *ud af %{total}*"
-      rubric: Instruktion
+      rubric: Vurderingskriterie
       rubric_title: Titel
       title: "Titel:"
       titles: 
-        find_existing_rubric: "Find eksisterende instruktion"
+        find_existing_rubric: "Find eksisterende vurderingskriterie"
     rubric_criterion: 
       defaults: 
         description: "Beskrivelse af kriterie"
-      delete_criterion_row: "Slet kriteri række"
+      delete_criterion_row: "Slet kriterie række"
       description: 
         custom_comments_area: "Dette område vil blive benyttet af censor for kommentarer relateret til dette kriterie."
       full_marks: Topkarakter
@@ -13538,13 +13538,13 @@ da:
         long_description: "Lang beskrivelse"
     rubric_dialog: 
       buttons: 
-        use_this_rubric: "Brug denne instruktion"
+        use_this_rubric: "Brug dette vurderingskriterie"
       criterion_count: "%{count} kriteri"
       links: 
         manage_rubrics: "Administrer vurderingskriterier"
       points_possible: "%{points} mulige points"
       titles: 
-        find_a_rubric: "Find en instruktion"
+        find_a_rubric: "Find et vurderingskriterie"
     rubric_forms: 
       criteria_description_label: "Beskrivelse af kriterie"
       points: "%{points} pts"
@@ -13559,7 +13559,7 @@ da:
       labels: 
         total_points: "Totale points"
       points_out_of: "*%{points}* ud af **%{total}**"
-      rubric: Instruktion
+      rubric: Vurderingskriterie
     rubric_summary_criterion: 
       defaults: 
         description: "Beskrivelse af kriterie"
@@ -14022,7 +14022,7 @@ da:
     submitted: "Indsendt:"
     this_was_submitted_multiple_times_choose_a_submission_to_view: "Indsendt flere gange, vælg hvilken at se:"
     update_grade: "Opdater karakter"
-    view_rubric_assessment_in_the_speedgrader: "Se instruktionsvurdering i Speedgrader"
+    view_rubric_assessment_in_the_speedgrader: "Se evaluering af vurderingskriterie i Speedgrader"
   submissions: 
     assignment_submit_success: "Opgave succesfuldt indsendt."
     assignment_submitted: "Opgave indsendt."
@@ -14056,7 +14056,7 @@ da:
         save_comment: "Gem Kommentar"
       crumbs: 
         assignments: Opgaver
-      hide_rubric_button: "Skjul instruktioner"
+      hide_rubric_button: "Skjul vurderingskriterier"
       labels: 
         add_a_comment: "Tilføj en Kommentar"
         grade: Karakter
@@ -14074,10 +14074,10 @@ da:
       out_of_points: "ud af %{points_possible}"
       peer_review: "Peer Review"
       peer_review_not_done: "**Dette peer review er endnu ikke afsluttet.**  For at blive anset som afsluttet skal du efterlade mindst en kommentar."
-      peer_review_not_done_rubric: "**Dette peer review er endnu ikke afsluttet.**  For af blive anset som afsluttet skal du efterlade mindst en kommentar og udfylde formen til højre."
+      peer_review_not_done_rubric: "**Dette peer review er endnu ikke afsluttet.**  For af blive anset som afsluttet skal du efterlade mindst en kommentar og udfylde vurderingskriterieformen til højre."
       peer_review_steps_complete: "Du har afsluttet denødvendige trin for dette peer review."
       sent_to_whole_group: "Send Kommentar til Hele Gruppen"
-      show_rubric: "Vis instruktion"
+      show_rubric: "Vis vurderingskriterie"
       speedgrader: SpeedGrader™
       student_mute_notification: "Karaktere er utilgængelige fordi instruktøren arbejder på dem."
       submission_details: Indsendelsesdetaljer
