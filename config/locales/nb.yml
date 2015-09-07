@@ -62,6 +62,9 @@ nb:
         api_url: "API URL"
         common_core_guid: "Felles kjerne GUID (valgfritt)"
   access_token_is_valid_until_d2f048cf: "Tilgangstoken er gyldig frem til"
+  accordion_section_1_7888782d: "Accordion-seksjon 1"
+  accordion_section_2_e1812997: "Accordion-seksjon 2"
+  accordion_section_3_96861901: "Accordion-seksjon 3"
   account: 
     ask_canvas_network: "Spør Canvas Network Community"
     default_account_name: Standardkonto
@@ -875,6 +878,7 @@ nb:
         self_registration_type_observer: "Kun Observatør kontoer"
         show_scheduler: "Slå på planlegger"
         sis_app_token: "SIS Agent Token"
+        sis_app_url: "SIS App URL"
         sis_source_id: SIS-ID
         start_at: Starter
         students_can_create_courses: Studenter
@@ -1275,26 +1279,32 @@ nb:
       recipients_required: "Det må være minst én mottaker"
       threshold_should_be_numeric: "Dette skal være et positivt tall"
   all_4321c3a1: Alle
+  all_accounts_3bafc860: "Alle kontoer"
   all_changes_were_saved_f6f3ddcc: "Alle endringer ble lagret"
   all_configured_apps_a14eef0a: "Alle konfigurerte applikasjoner"
+  all_courses_a7dbb853: "Alle kurs"
   all_dates_fields_must_be_present_and_formatted_cor_3a0fe925: "Alle datafelt må være til stede og formatert riktig"
   all_finished_time_to_publish_your_course_click_the_b6f07217: "Alt ferdig? Tid for å publisere din kurset! Klikk på knappen under for å gjøre det offisielt! Publisering vil tillate brukerne til å begynne å delta på kurset."
   all_grading_periods_77974940: "Alle vurderingsperioder"
   all_grading_periods_must_have_a_title_a1a38d87: "Alle vurderingsperioder må ha en tittel"
+  all_groups_cea25817: "Alle grupper"
   all_start_dates_must_be_before_the_end_date_d949eca9: "Alle startdatoer må være før sluttdatoen"
   all_students_have_taken_the_quiz_b558f8b4: "Alle studentene har tatt prøven"
   all_students_have_taken_the_survey_494f9f42: "Alle studenter har tatt undersøkelsen"
+  allow_a_moderator_to_review_multiple_independent_g_752c4b90: "Tillat en moderator gjennomgå flere uavhengige vurderinger for valgte innleveringer"
   allow_bulk_grade_export_to_sis_e11a6e66: "Tillat gruppe-karaktereksport til SIS"
   allow_lor_tools: "Tillat brukere for å vise og bruke eksterne verktøy som er konfigurert for LOR."
   allow_opt_out_of_inbox: "Tillat brukere å trekke seg fra Samtalen innboks. Dette vil føre til at alle samtalemeldinger og varslinger som skal sendes som ASAP varsler til brukerens primære epost, skjule Samtale innboks uleste meldinger merket på innboksen, og skjule samtalen varslingsinnstillinger."
   allow_students_to_see_who_has_signed_up_for_time_s_497f4a46: "Tillat studenter å se hvem som har meldt seg for tidsluker"
   allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "Tillat lærere å markere karakterdata som til eksport i bulk til SIS-integrasjoner"
+  allows_the_scheduling_of_recurring_calendar_events_aac71007: "Tillater planlegging av gjentagende kalenderhendelser"
   always_3a59e701: Alltid
   an_error_occured_trying_to_generate_this_theme_ple_6ae581d: "Det oppstod en feil ved generering av denne malen, prøv igjen"
   an_error_occurred_please_post_your_reply_again_lat_b0220ac6: "*Det oppstod en feil*, vennligst publiser svaret ditt senere"
   an_error_occurred_trying_to_generate_this_theme_pl_b493e2e9: "Det oppstod en feil ved generering av denne malen, prøv igjen"
   an_error_occurred_trying_to_prepare_download_pleas_df6fa596: "Det oppstod en feil ved forbereding av nedlastingen, vennligst prøv igjen."
   an_error_occurred_when_setting_the_usage_right_for_d4ea78f5: "En feil oppstod ved innstilling av bruk rett for %{filename}"
+  an_item_named_name_already_exists_in_this_location_147b7312: "Et element som heter \"%{name}\" finnes allerede i denne plasseringen. Ønsker du å erstatte den eksisterende filen?"
   an_unknown_server_error_occurred_please_try_again_f517eaf3: "En ukjent server feil oppstod. Vennligst prøv igjen."
   analytics: 
     course: 
@@ -1367,6 +1377,7 @@ nb:
     podcast_feed_description_group: "Alle media filer knyttet til eller innebygd i kunngjøringer i gruppen \"%{group}\" vil være synlig i denne strømmen."
     podcast_feed_name: "%{course} Kunngjøringer som podkast-strøm"
   anonymous_e1b8ad27: Anonym
+  anonymous_grading_ccb5045c: "Anonym vurdering"
   anonymous_user: "Anonym bruker"
   anonymous_user_d984b9ce: "Anonym bruker"
   another_configuration_is_currently_selected_select_95b394e: "En annen konfigurasjon er valgt. Hvis du velger denne konfigurasjonen, fjerner du den andre."
@@ -2147,6 +2158,7 @@ nb:
   available_until_format_like_yyyy_mm_dd_hh_mm_622378d6: "Tilgjengelig til - format som DD-MM-ÅÅÅÅ tt:mm"
   available_until_lock_at_ab022445: "Tilgjengelig til %{lock_at}"
   average_49c63f9b: Gjennomsnittlig
+  back_2900f52a: Tilbake
   back_to_app_center_95420d83: "Tilbake til appsenteret"
   base_847aca7c: Grunnlag
   bb_display: "Blackboard Learn"
@@ -2480,6 +2492,7 @@ nb:
       buttons: 
         create: "Opprett hendelse"
         update: "Oppdater hendelse"
+      count: "Antall:"
       date: Dato
       delete: Slett
       different_date_for_each_section: "Benytt forskjellige datoer for hver klasse"
@@ -2490,6 +2503,7 @@ nb:
       location_address: "Adresse:"
       location_name: "Sted:"
       new_calendar_event_header: "Ny kalenderhendelse"
+      repeat: Gjenta
       start_time: Starttidspunkt
     edit_event: 
       tabs: 
@@ -2663,6 +2677,7 @@ nb:
   cannot_be_nil_when_course_id_is_nil_f539388: "kan ikke være null når course_id er null"
   cannot_be_present_when_account_id_is_present_f7d9b51f: "kan ikke være til stede når account_id er til stede"
   cannot_be_present_when_course_id_is_present_785e6a59: "kan ikke være til stede når course_id er til stede"
+  cannot_delete_a_file_that_has_been_submitted_as_pa_fda24c4: "Kan ikke slette en fil som har blitt sendt som en del av en innlevering"
   canvas: 
     migration: 
       errors: 
@@ -2706,8 +2721,11 @@ nb:
     public_domain: "Åpent område"
   certificate_fingerprint_b376df90: Sertifikat-fingeravtrykk
   change_beginning_date_to_39dbd06e: "Endre startdato ti"
+  change_dcaa253a: Endre
   change_ending_date_to_d2cebd54: "Endre sluttdato til"
   change_groups_4e2ab6c3: "Bytt grupper"
+  change_name_c8cce76c: "Endre navn"
+  change_name_to_568374c8: "Endre \"%{name}\" til"
   change_points_possible_to_match_rubric_dialog: 
     prompts: 
       update_assignment_points: "Denne oppgaven har %{assignmentPoints} oppnåelige poeng, ønsker du å endre den til å ha %{rubricPoints} oppnåelige poeng for å passe med denne vurderingen?"
@@ -2721,12 +2739,15 @@ nb:
   chosencolor_is_not_a_valid_color_5d542cc: "'%{chosenColor}' er ikke en gyldig farge."
   clear_2084585f: Tøm
   click_for_more_details_on_this_outcome_8c018d2f: "klikk for flere opplysninger om dette utfallet"
+  click_here_for_an_account_9536cb36: "Klikk her for en konto"
+  click_here_it_s_free_eeccb9cb: "Klikk her, det er gratis!"
   click_here_on_the_calendar_link_c9965631: "Klikk her på *Kalender* lenken"
   click_to_enter_comments_if_the_student_chooses_thi_507c20f6: "Klikk for å legge inn kommentarer, om eleven velger dette svaret"
   click_to_modify_89fa26aa: "Klikk for å modifisere"
   click_to_report_profile_picture_370f9625: "Klikk for å rapportere profilbilde"
   click_to_set_this_answer_as_correct_1326e3fd: "Klikk for å sette dette svaret som riktig"
   click_to_test_dropdown_b950974d: "Klikk for å teste dropdown"
+  clone_group_set_c2a40e15: "Klon gruppesett"
   close_and_return_to_canvas_80544344: "Lukk og retur til Canvas"
   close_d634289d: Lukk
   close_picker_256aca8a: "Lukk picker"
@@ -3767,6 +3788,7 @@ nb:
     unarchive: "Fjern arkivering"
     unstar: "Fjern stjernemerking"
     unstar_conversation: "Fjern stjernemerking fra samtalen"
+  copy_9748f9f: Kopier
   copy_to_folder_32ecc3c3: "Kopier til mappe"
   copying_628a9607: Kopierer…
   copyright_holder_66ee111: "Opphavsrett Innehaver:"
@@ -4796,7 +4818,9 @@ nb:
       - Oktober
       - November
       - Desember
+  date_created_87e265bc: "Dato opprettet"
   date_error_7b38f8ff: "Dato Feil"
+  date_modified_e1c8ac8f: "Dato redigert"
   datepicker: 
     errors: 
       not_a_date: "Det er ikke en dato!"
@@ -4848,6 +4872,7 @@ nb:
       month: Måned
       second: Sekund
       year: År
+  day_s_7cc1231f: Dag(er)
   decaying_average_8bf6a0dd: "Forfalne Gjennomsnittlig"
   decrease_indent_d9cf469d: "Reduser innrykk"
   deep_orange_4c7eea99: Mørkeoransje
@@ -5107,6 +5132,9 @@ nb:
     error_draft_state_with_posts: "Dette temaet kan ikke settes til kladdstatus fordi det inneholder poster."
     error_group_announcement: "Du kan ikke benytte gruppert diskusjon på en kunngjøring."
     error_group_change: "Du kan ikke endre gruppering for en diskusjon med eksisterende svar."
+    flash: 
+      fail: "Sletting av kunngjøring mislyktes."
+      removed: "Kunngjøring slettet."
     group_assignment_discussion_entry: 
       posts: 
         one: "1 innlegg"
@@ -5311,6 +5339,7 @@ nb:
   done_54e3d4b6: Ferdig
   done_8af51c9b: Ferdig.
   down_5831a426: Ned
+  download_c7ffdfb9: "Last ned"
   download_scores_generated_on_date_ff5b9cd2: "Last ned karakterer generert på %{date}"
   download_submissions_7454665f: "Last ned innleveringer"
   dropdown_option_1_e6ff2fc: "Dropdown-valg 1"
@@ -5381,6 +5410,7 @@ nb:
       find_existing_rubric: "Finner eksisterende vurderingsskjemaer"
   edit_survey_b0d6890d: "Rediger undersøkelse"
   edit_toolname_app_23cfbb8: "Rediger %{toolName} App"
+  editing_permissions_for_name_3503e235: "Redigerer rettigheter for: %{name}"
   editor: 
     alt_text: "Alternativ tekst:"
     button: 
@@ -5806,6 +5836,7 @@ nb:
   event_date_f05219e7: "Begivenhetsdato:"
   event_end_time_ef830e66: "Begivenhets sluttidspunkt"
   event_start_time_441b491f: "Begivenhets starttidspunkt"
+  every_665d821e: Hver
   everyone_854554dd: Alle
   everyone_else_6c6dc7b6: "Alle andre"
   example_84698b7d: Eksempel
@@ -6134,6 +6165,7 @@ nb:
     no_deleting_root: "Kan ikke slette rotmappen"
     only_one_folder: "Kan ikke sette mappesti og mappe-ID"
   for: før
+  for_974cbb84: For
   for_all_devices_1f603968: "For alle enheter"
   forgot_password_url_3f9c04b: "URL for glemt passord"
   from_fdd4956d: Fra
@@ -6472,7 +6504,7 @@ nb:
       grades: Karakterer
       hide_student_names: "Skjul studentnavn"
       include_ungraded: "Behandle ikke karaktersatt som 0"
-      individual_view: "Bytt til individuell visning"
+      individual_view: "Individuell visning"
       learning_mastery: "Mestringsbasert læring"
       page_header_title: Karakteroversikt
       publish_to_sis: "Overfør karakterer til SIS"
@@ -6890,6 +6922,7 @@ nb:
     groups_count: "Grupper (%{count})"
     index: 
       heading_current_groups: "Gjeldende grupper"
+      heading_previous_groups: "Forrige grupper"
       no_groups: "Ingen grupper"
     loading: "laster oversikt med gruppedeltagere..."
     manage: 
@@ -7152,6 +7185,7 @@ nb:
   here_are_your_assignments_listed_by_due_date_7d8e98e6: "Her er dine Oppgaver, listet etter forfallsdato."
   here_f44564ee: her.
   here_s_a_great_chance_to_get_to_know_the_calendar__187ce49: "Her er en flott mulighet til å bli kjent med kalenderen og legge til ikke-oppgave hendelser du kanskje har til kurset. Ikke bekymre deg, vi vil hjelpe deg gjennom det."
+  hidden_available_with_a_link_65ef2bda: "Skjult, tilgjengelig med en lenke"
   hidden_available_with_a_link_click_to_modify_184990e7: "Skjult. Tilgjengelig med en link - Klikk for å modifisere"
   hidden_files_inside_will_be_available_with_links_9bdf702b: "Skjult, filer inne vil være tilgjengelig med linker."
   hide_correct_answers_at_b1a59408: "Skjul riktige svar på"
