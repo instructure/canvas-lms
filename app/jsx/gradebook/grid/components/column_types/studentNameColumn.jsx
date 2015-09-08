@@ -17,9 +17,9 @@ define([
     },
 
     renderStudentName() {
-      var enrollment = this.props.rowData.enrollment,
-          displayName = GradebookConstants.list_students_by_sortable_name_enabled ?
-                          enrollment.user.sortable_name : enrollment.user.name;
+      var displayName, enrollment;
+      displayName = this.props.rowData.studentName;
+      enrollment = this.props.rowData.student;
 
       return <a title={displayName}
                 href={enrollment.html_url}>{displayName}</a>;

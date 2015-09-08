@@ -48,7 +48,7 @@ define [
     grade: '100'
 
   submissionsLength = () ->
-    SubmissionsStore.submissions.data[0].submissions.length
+    SubmissionsStore.state.data[0].submissions.length
 
   module 'ReactGradebook.submissionsStore',
     teardown: ->
@@ -72,7 +72,7 @@ define [
     triggerExpectation = triggerMock.expects('trigger').once()
     SubmissionsStore.onLoadCompleted(submissionData())
 
-    ok(SubmissionsStore.submissions.data)
+    ok(SubmissionsStore.state.data)
     ok(triggerExpectation.once())
     triggerMock.restore()
 
@@ -81,7 +81,7 @@ define [
     triggerExpectation = triggerMock.expects('trigger').once()
     SubmissionsStore.onLoadFailed('error')
 
-    ok(SubmissionsStore.submissions.error)
+    ok(SubmissionsStore.state.error)
     ok(triggerExpectation.once())
     triggerMock.restore()
 
@@ -118,7 +118,7 @@ define [
     SubmissionsStore.onLoadCompleted(submissionData(submissions))
     updatedSubmissions = [{ id: '2', grade: '95' }]
     SubmissionsStore.onUpdatedSubmissionsReceived(updatedSubmissions)
-    actual = SubmissionsStore.submissions.data[0].submissions
+    actual = SubmissionsStore.state.data[0].submissions
     expected = [{ id: '1', grade: '100' }, { id: '2', grade: '95' }]
     propEqual actual, expected
 
@@ -318,6 +318,6 @@ define [
       @assignmentGroups = undefined
 
   test 'retrieves the submissions in the current grading period', ->
-    expected = [@submissions[1]]
+    expected = [@submissions[0], @submissions[1]]
     actual = SubmissionsStore.submissionsInCurrentPeriod(@submissions)
     deepEqual(actual, expected)

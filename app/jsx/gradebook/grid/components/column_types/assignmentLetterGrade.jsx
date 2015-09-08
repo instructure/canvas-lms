@@ -22,7 +22,7 @@ define([
     ],
 
     renderViewGrade() {
-      var submission = this.state.submission;
+      var submission = this.props.cellData;
       if (submission && submission.grade) {
         var gradingType = this.props.cellData.grading_type;
             score = (gradingType == 'letter_grade') ? submission.score : ''

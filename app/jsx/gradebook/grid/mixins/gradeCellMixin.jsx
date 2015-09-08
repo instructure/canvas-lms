@@ -15,18 +15,18 @@ define([
     },
 
     getDisplayGrade() {
-      var submission = this.state.submission;
+      var submission = this.props.cellData;
       return (submission && submission.grade) ? submission.grade : '-';
     },
 
     isSubmissionGradedAsNull() {
-      return this.state.submission && _.isNull(this.state.submission.grade);
+      return this.props.cellData && _.isNull(this.props.cellData.grade);
     },
 
     sendSubmission() {
       var submission = {
-        userId: this.props.rowData.enrollment.user_id,
-        assignmentId: this.props.cellData.id,
+        userId: this.props.rowData.student.id,
+        assignmentId: this.props.columnData.assignment.id,
         postedGrade: this.state.gradeToPost
       };
 

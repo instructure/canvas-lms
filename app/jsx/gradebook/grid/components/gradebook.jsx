@@ -21,6 +21,7 @@ define([
   '../actions/submissionsActions',
   '../stores/keyboardNavigationStore',
   '../actions/keyboardNavigationActions',
+  '../stores/tableStore',
   '../helpers/columnArranger',
   'vendor/spin'
 ], function (
@@ -45,6 +46,7 @@ define([
   SubmissionsActions,
   KeyboardNavigationStore,
   KeyboardNavigationActions,
+  TableStore,
   ColumnArranger,
   Spinner
 ){
@@ -57,12 +59,9 @@ define([
   var Gradebook = React.createClass({
     mixins: [
       Reflux.connect(KeyboardNavigationStore, 'currentCellIndex'),
-      Reflux.connect(AssignmentGroupsStore, 'assignmentGroups'),
       Reflux.connect(SettingsStore, 'settings'),
-      Reflux.connect(StudentEnrollmentsStore, 'studentEnrollments'),
       Reflux.connect(GradebookToolbarStore, 'toolbarOptions'),
-      Reflux.connect(SubmissionsStore, 'submissions'),
-      Reflux.connect(GradingPeriodsStore, 'gradingPeriods')
+      Reflux.connect(TableStore, 'tableData')
     ],
 
     componentWillMount() {
@@ -118,10 +117,10 @@ define([
 
       arrangeBy = this.state.toolbarOptions.arrangeColumnsBy;
       comparator = ColumnArranger.getComparator(arrangeBy);
-      assignments = _.chain(this.state.assignmentGroups.data)
-        .map(assignmentGroup => assignmentGroup.assignments)
-        .flatten()
-        .filter(assignment => assignment.published)
+      assignments = _.chain(this.state.tableData.assignments.data)
+//        .map(assignmentGroup => assignmentGroup.assignments)
+//        .flatten()
+//        .filter(assignment => assignment.published)
         .filter(assignment =>
                 GradingPeriodsStore.assignmentIsInPeriod(assignment, GradingPeriodsStore.selected()))
         .value();
@@ -142,18 +141,7 @@ define([
     },
 
     rowGetter(index) {
-      var enrollmment, submissions;
-
-      enrollment = this.state.studentEnrollments.data[index];
-      submissions = _.find(this.state.submissions.data,
-        (submission) => submission.user_id === enrollment.user_id)
-        .submissions;
-
-      return {
-        enrollment: enrollment,
-        assignmentGroups: this.state.assignmentGroups.data,
-        submissions: submissions
-      };
+      return this.state.tableData.rows[index];
     },
 
     isColumnFixed(columnType) {
@@ -166,7 +154,7 @@ define([
     renderColumn(columnName, columnType, columnId, cellDataGetter, assignment) {
       var columnIdentifier = columnId || columnType,
           columnWidth = this.getColumnWidth(columnIdentifier),
-          enrollments = this.state.studentEnrollments.data,
+          enrollments = this.state.tableData.students,
           columnData = {
             columnType: columnType,
             activeCell: this.state.currentCellIndex,
@@ -192,9 +180,23 @@ define([
     },
 
     renderAssignmentGroupColumns(assignmentGroups) {
+      var cellDataGetter;
+
+      cellDataGetter = function(columnId, rowData) {
+        var assignmentGroups, assignmentGroup, submissions;
+
+        assignmentGroups = this.state.tableData.assignmentGroups;
+        assignmentGroup = _.find(assignmentGroups, group => group.columnId === columnId);
+        submissions = rowData.submissions;
+
+        return {
+          assignmentGroup: assignmentGroup,
+          submissions: submissions,
+          columnId: columnId
+        };
+      }.bind(this);
       return _.map(assignmentGroups, (assignmentGroup, index) => {
-        var columnId = 'assignment_group_' + assignmentGroup.id,
-          cellDataGetter = () => index;
+        var columnId = assignmentGroup.columnId;
 
 
         return this.renderColumn(assignmentGroup.name,
@@ -204,18 +206,29 @@ define([
     },
 
     renderAssignmentColumns(assignments) {
+      var cellDataGetter;
+      cellDataGetter = function(columnId, rowData) {
+        var submissions, submission;
+
+        submissions = rowData.submissions[columnId];
+        if (submissions && submissions.length > 0) {
+          submission = submissions[0];
+        }
+
+        return submission;
+      }.bind(this);
+
       return _.map(assignments, (assignment) => {
-        var columnId = 'assignment_' + assignment.id,
-            cellDataGetter = () => assignment;
+        var columnId = assignment.id;
 
         return this.renderColumn(assignment.name, assignment.grading_type, columnId, cellDataGetter, assignment);
       });
     },
 
     hasStoreErrorOccured() {
-      return this.state.assignmentGroups.error
-             || this.state.studentEnrollments.error
-             || this.state.submissions.error;
+      return //this.state.assignmentGroups.error
+             this.state.tableData.error;
+             //|| this.state.submissions.error;
     },
 
     renderSpinner() {
@@ -234,14 +247,18 @@ define([
     },
 
     renderAllColumns() {
-      var total = this.renderColumn(I18n.t('Total'), 'total'),
-          showTotalInFront = this.state.toolbarOptions.totalColumnInFront,
-          columns = [
-            this.renderColumn(I18n.t('Student Name'), GradebookConstants.STUDENT_COLUMN_ID),
-            this.renderNotesColumn(),
-            this.renderAssignmentColumns(this.assignments(), this.state.submissions),
-            this.renderAssignmentGroupColumns(this.state.assignmentGroups.data),
-          ];
+      var arrangeBy, columns, comparator, showTotalInFront, total;
+
+      arrangeBy = this.state.toolbarOptions.arrangeColumnsBy;
+      comparator = ColumnArranger.getComparator(arrangeBy);
+      total = this.renderColumn(I18n.t('Total'), 'total');
+      showTotalInFront = this.state.toolbarOptions.totalColumnInFront,
+      columns = [
+        this.renderColumn(I18n.t('Student Name'), GradebookConstants.STUDENT_COLUMN_ID),
+        this.renderNotesColumn(),
+        this.renderAssignmentColumns(_.flatten(_.values(this.state.tableData.assignments)).sort(comparator), this.state.tableData.submissions),
+        this.renderAssignmentGroupColumns(this.state.tableData.assignmentGroups),
+      ];
 
       (showTotalInFront) ? columns.splice(1, 0, total) : columns.push(total);
       return columns;
@@ -251,18 +268,15 @@ define([
       if (this.hasStoreErrorOccured()) {
         $.flashError(I18n.t('There was a problem loading the gradebook.'));
       }
-      else if (this.state.submissions.data && this.state.assignmentGroups.data
-               && this.state.studentEnrollments.data) {
-
+      else if (this.state.tableData.rows) {
         $(spinner.el).remove();
-
         return (
           <div id="react-gradebook-canvas"
                onKeyDown={this.handleKeyDown}
                tabIndex="0">
             <Table
               rowGetter={this.rowGetter}
-              rowsCount={this.state.studentEnrollments.data.length}
+              rowsCount={this.state.tableData.students.length}
               onColumnResizeEndCallback={this.handleColumnResize}
               isColumnResizing={isColumnResizing}
               rowHeight={GradebookConstants.DEFAULT_LAYOUTS.rows.height}

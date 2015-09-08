@@ -6,25 +6,27 @@ define([
   var StudentEnrollmentsStore = Reflux.createStore({
     listenables: [StudentEnrollmentsActions],
 
-    getInitialState() {
-      this.studentEnrollments = {
+    init() {
+      this.state = {
         data: null,
         error: null,
         all: null
-      };
+      }
+    },
 
-      return this.studentEnrollments;
+    getInitialState() {
+      return this.state;
     },
 
     onLoadFailed(error) {
-      this.studentEnrollments.error = error;
+      this.state.error = error;
       this.trigger(this.studentEnrollments);
     },
 
     onLoadCompleted(studentEnrollmentData) {
-      this.studentEnrollments.all = studentEnrollmentData;
-      this.studentEnrollments.data = studentEnrollmentData;
-      this.trigger(this.studentEnrollments);
+      this.state.all = studentEnrollmentData;
+      this.state.data = studentEnrollmentData;
+      this.trigger(this.state);
     },
 
     onSearch(searchTerm) {
@@ -35,8 +37,8 @@ define([
           (user.login_id && user.login_id.toLowerCase().match(pattern));
       };
 
-      this.studentEnrollments.data = _.filter(this.studentEnrollments.all, predicate);
-      this.trigger(this.studentEnrollments);
+      this.state.data = _.filter(this.state.all, predicate);
+      this.trigger(this.state);
     }
   });
 

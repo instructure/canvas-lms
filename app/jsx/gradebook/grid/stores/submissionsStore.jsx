@@ -13,18 +13,24 @@ define([
   var SubmissionsStore = Reflux.createStore({
     listenables: [SubmissionsActions],
 
-    getInitialState() {
-      this.submissions = {
+    init() {
+      this.state = {
         data: null,
         error: null,
         selected: null
       };
-      return this.submissions;
+    },
+
+    getInitialState() {
+      if (this.state === null || this.state === undefined) {
+        this.init();
+      }
+      return this.state;
     },
 
     onUpdateGradeCompleted(postedGrade, response) {
       var userSubmissions =
-        _.find(this.submissions.data, (s) => s.user_id === postedGrade.userId)
+        _.find(this.state.data, (s) => s.user_id === postedGrade.userId)
         .submissions;
 
       var submission = _.find(userSubmissions, (s) => s.id === response.id);
@@ -36,7 +42,7 @@ define([
         userSubmissions.push(response);
       }
 
-      this.trigger(this.submissions);
+      this.trigger(this.state);
     },
 
     onUpdateGradeFailed() {
@@ -44,13 +50,13 @@ define([
     },
 
     onLoadFailed(error) {
-      this.submissions.error = error;
-      this.trigger(this.submissions);
+      this.state.error = error;
+      this.trigger(this.state);
     },
 
     onLoadCompleted(submissions) {
-      this.submissions.data = submissions;
-      this.trigger(this.submissions);
+      this.state.data = submissions;
+      this.trigger(this.state);
     },
 
     updateSubmissions(currentSubs, updatedSubs) {
@@ -64,14 +70,14 @@ define([
     onUpdatedSubmissionsReceived(updatedSubs) {
       var subIds, updatedSubsForGroup;
 
-      this.submissions.data = _.map(this.submissions.data, (submissionGroup) => {
+      this.state.data = _.map(this.state.data, (submissionGroup) => {
         subIds = _.pluck(submissionGroup.submissions, 'id');
         updatedSubsForGroup = _.filter(updatedSubs, sub => _.contains(subIds, sub.id));
         submissionGroup.submissions = this.updateSubmissions(submissionGroup.submissions, updatedSubsForGroup);
         return submissionGroup;
       });
 
-      this.trigger(this.submissions);
+      this.trigger(this.state);
     },
 
     /*
@@ -115,6 +121,7 @@ define([
     */
     assignmentsForSubmissions(submissions) {
       var assignmentIds, allAssignments;
+
       assignmentIds = _.map(submissions, submission => submission.assignment_id);
       allAssignments = AssignmentGroupsStore.assignments(assignmentIds);
 

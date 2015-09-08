@@ -22,11 +22,12 @@ define([
       activeCell: React.PropTypes.bool.isRequired,
       rowData: React.PropTypes.object.isRequired,
       renderer: React.PropTypes.func.isRequired,
-      submission: React.PropTypes.object
+      columnData: React.PropTypes.object
     },
 
     hasIconDefined() {
-      var submission = this.props.submission;
+      var submission = this.props.cellData;
+
       if (!submission || submission.workflow_state === GRADED) {
         return false;
       }
@@ -43,16 +44,18 @@ define([
     },
 
     handleSubmissionCommentClick(event) {
-      var assignment = this.props.cellData,
-          enrollment = this.props.rowData.enrollment,
-          student = enrollment.user;
+      var assignment, submission, student;
 
-      student["assignment_" + assignment.id] = this.props.submission;
+      assignment = this.props.columnData.assignment;
+      student = this.props.rowData.student;
+      submission = this.props.cellData;
+
+      student["assignment_" + assignment.id] = submission;
       this.openDialog(assignment, student);
     },
 
     renderIcon() {
-      var submissionType = this.props.submission.submission_type,
+      var submissionType = this.props.cellData.submission_type,
           className = ICON_CLASS + SUBMISSION_TYPES[submissionType];
 
       return <i ref="icon" className={className}/>;
@@ -62,16 +65,21 @@ define([
       var Renderer = this.props.renderer;
       return <Renderer isActiveCell={this.props.activeCell}
                        cellData={this.props.cellData}
-                       submission={this.props.submission}
+                       submission={this.props.cellData}
+                       columnData={this.props.columnData}
                        rowData={this.props.rowData}/>;
     },
 
     render() {
-      var className = "gradebook-cell-comment";
+      var className, child;
+
+      className = "gradebook-cell-comment";
+      child = this.shouldRenderIcon() ? this.renderIcon() : this.renderGradeCell();
 
       if (this.props.activeCell) {
         className += ' active';
       }
+
       return (
         <div className="assignment-grade-cell">
           <a ref="detailsDialog"
@@ -82,7 +90,7 @@ define([
               I18n.t('submission comments')
             </span>
           </a>
-          {this.shouldRenderIcon() ? this.renderIcon() : this.renderGradeCell()}
+          {child}
         </div>
       );
     }

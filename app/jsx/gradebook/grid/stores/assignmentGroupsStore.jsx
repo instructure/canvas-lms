@@ -8,30 +8,36 @@ define([
   var AssignmentGroupsStore = Reflux.createStore({
     listenables: [AssignmentGroupsActions],
 
-    getInitialState() {
-      this.assignmentGroups = {
+    init() {
+      this.state = {
         data: null,
         error: null
       };
-      return this.assignmentGroups;
+    },
+
+    getInitialState() {
+      if (this.state === undefined) {
+        this.init();
+      }
+      return this.state;
     },
 
     onLoadFailed(error) {
-      this.assignmentGroups.error = error;
-      this.trigger(this.assignmentGroups);
+      this.state.error = error;
+      this.trigger(this.state);
     },
 
     onLoadCompleted(json) {
       var assignmentGroups;
       this.setNoPointsWarning(json);
       assignmentGroups = this.formatAssignmentGroups(json);
-      this.assignmentGroups.data = assignmentGroups;
-      this.trigger(this.assignmentGroups);
+      this.state.data = assignmentGroups;
+      this.trigger(this.state);
     },
 
     onReplaceAssignmentGroups(updatedAssignmentGroups) {
-      this.assignmentGroups.data = updatedAssignmentGroups;
-      this.trigger(this.assignmentGroups);
+      this.state.data = updatedAssignmentGroups;
+      this.trigger(this.state);
     },
 
     setNoPointsWarning(assignmentGroups) {
@@ -88,7 +94,7 @@ define([
     assignments(assignmentIds) {
       var assignmentGroups, assignments, allAssignments;
 
-      assignmentGroups = this.assignmentGroups.data;
+      assignmentGroups = this.state.data;
       allAssignments = _.map(assignmentGroups, group => group.assignments);
       allAssignments = _.flatten(allAssignments);
 

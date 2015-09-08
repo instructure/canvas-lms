@@ -28,27 +28,29 @@ define([
     render() {
       var assignmentGroupsIndex, submissions, assignmentGroups,
       assignmentGroupGradeData, assignmentGroup, gradeFormatter, toolbarOptions,
-      groupSums, relevantAssignmentGroups, currentAssignmentGroup;
+      groupSums, relevantAssignmentGroups, currentAssignmentGroup, assignmentGroupScore;
 
-      submissions = this.props.rowData.submissions;
+      submissions = this.props.cellData.submissions;
+      submissions = _.flatten(_.values(submissions));
       submissions = SubmissionsStore.submissionsInCurrentPeriod(submissions);
 
-      assignmentGroupsIndex = this.props.cellData;
+      assignmentGroupColumnId = this.props.cellData.columnId;
       assignmentGroups = this.props.rowData.assignmentGroups;
-      currentAssignmentGroup = assignmentGroups[assignmentGroupsIndex];
+      currentAssignmentGroup = this.props.cellData.assignmentGroup;
       relevantAssignmentGroups = SubmissionsStore.assignmentGroupsForSubmissions(submissions, assignmentGroups);
 
       toolbarOptions = this.state.toolbarOptions;
 
       if (this.groupIsInCurrentPeriod(currentAssignmentGroup, relevantAssignmentGroups)) {
         assignmentGroupGradeData = GradeCalculator.calculate(submissions, assignmentGroups);
-        groupSums = assignmentGroupGradeData.group_sums[assignmentGroupsIndex];
-        assignmentGroup = groupSums[currentOrFinal(toolbarOptions)];
+        groupSums = assignmentGroupGradeData.group_sums;
+        groupSums = _.find(groupSums, sum => sum.group.columnId === assignmentGroupColumnId);
+        assignmentGroupScore = groupSums[currentOrFinal(toolbarOptions)];
       } else {
-        assignmentGroup = {score: 0, possible: 0};
+        assignmentGroupScore = {score: 0, possible: 0};
       }
 
-      gradeFormatter = new GradeFormatter(assignmentGroup.score, assignmentGroup.possible, false);
+      gradeFormatter = new GradeFormatter(assignmentGroupScore.score, assignmentGroupScore.possible, false);
 
       return (
         <div title={this.formatTitle(assignmentGroup)} ref='cell'>

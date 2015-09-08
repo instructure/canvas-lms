@@ -18,7 +18,7 @@ define([
       }.bind(this));
     },
 
-    getInitialState() {
+    init() {
       var allPeriodsOption, activeGradingPeriods;
 
       allPeriodsOption = {
@@ -38,7 +38,14 @@ define([
       };
 
       this.gradingPeriods.selected = this.gradePeriodOnLoad();
-      this.trigger(this.gradingPeriods);
+    },
+
+    getInitialState() {
+      if (this.gradingPeriods === null || this.gradingPeriods === undefined) {
+        this.init();
+      }
+
+      return this.gradingPeriods;
     },
 
     // handler for selecting a grading period

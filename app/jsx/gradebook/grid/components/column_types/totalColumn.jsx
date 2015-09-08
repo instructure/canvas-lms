@@ -68,6 +68,7 @@ define([
           showPoints;
 
       submissions = this.props.rowData.submissions;
+      submissions = _.flatten(_.values(submissions));
       submissions = SubmissionsStore.submissionsInCurrentPeriod(submissions);
 
       assignmentGroups = this.props.rowData.assignmentGroups;

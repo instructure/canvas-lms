@@ -368,7 +368,7 @@ END
       description: -> { I18n.t('Performance enhancements for the Gradebook') },
       applies_to: 'Course',
       state: 'hidden',
-      development: true,
+      hidden_in_production: true,
       root_opt_in: true
     },
     'anonymous_grading' =>

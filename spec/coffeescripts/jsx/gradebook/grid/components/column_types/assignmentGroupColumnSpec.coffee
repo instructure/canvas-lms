@@ -22,16 +22,16 @@ define [
   submissions = ->
     [{ assignment_id: '3', id: '6', score: 25 }]
 
-  defaultProps = {
-    cellData: '0'
-    rowData: {
-      assignmentGroups: assignmentGroups(),
+  defaultProps = =>
+    groups = assignmentGroups()
+    cellData:
       submissions: submissions()
-    }
-  }
+      assignmentGroup: groups[0],
+    rowData:
+      assignmentGroups: groups
 
   buildComponent = (props) ->
-    cellData = props || defaultProps
+    cellData = props || defaultProps()
     renderComponent(cellData)
 
   renderComponent = (props) ->
@@ -60,9 +60,9 @@ define [
     ok(innerHTML(component).match(/%/))
 
   test 'displays "-" if points possible is 0', ->
-    props = defaultProps
-    props.rowData.assignmentGroups = [{assignments: []}]
-    props.rowData.submissions = []
+    props = defaultProps()
+    props.cellData.assignmentGroups = [{assignments: []}]
+    props.cellData.submissions = []
 
     component = buildComponent(props)
     ok(innerHTML(component).match(/-/))
