@@ -238,13 +238,12 @@ define([
           showTotalInFront = this.state.toolbarOptions.totalColumnInFront,
           columns = [
             this.renderColumn(I18n.t('Student Name'), GradebookConstants.STUDENT_COLUMN_ID),
-            this.renderColumn(I18n.t('Secondary ID'), GradebookConstants.SECONDARY_COLUMN_ID),
             this.renderNotesColumn(),
             this.renderAssignmentColumns(this.assignments(), this.state.submissions),
             this.renderAssignmentGroupColumns(this.state.assignmentGroups.data),
           ];
 
-      (showTotalInFront) ? columns.splice(2, 0, total) : columns.push(total);
+      (showTotalInFront) ? columns.splice(1, 0, total) : columns.push(total);
       return columns;
     },
 

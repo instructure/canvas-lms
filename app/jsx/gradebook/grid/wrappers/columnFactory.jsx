@@ -5,7 +5,6 @@ define([
   'underscore',
   '../components/gridCell',
   '../components/column_types/studentNameColumn',
-  '../components/column_types/secondaryIdentifierColumn',
   '../components/column_types/notesColumn',
   '../components/column_types/assignmentPercentage',
   '../components/column_types/assignmentPassFail',
@@ -20,7 +19,6 @@ define([
   _,
   GridCell,
   StudentNameColumn,
-  SecondaryIdentifierColumn,
   NotesColumn,
   AssignmentPercentColumn,
   AssignmentPassFailColumn,
@@ -36,7 +34,6 @@ define([
 
   var renderers = {};
   renderers[GradebookConstants.STUDENT_COLUMN_ID]          = StudentNameColumn;
-  renderers[GradebookConstants.SECONDARY_COLUMN_ID]        = SecondaryIdentifierColumn;
   renderers[GradebookConstants.NOTES_COLUMN_ID]            = NotesColumn;
   renderers[GradebookConstants.PERCENT_COLUMN_ID]          = AssignmentPercentColumn;
   renderers[GradebookConstants.PASS_FAIL_COLUMN_ID]        = AssignmentPassFailColumn;

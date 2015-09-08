@@ -3,7 +3,6 @@ define([
 ], function (_) {
   const GRADEBOOK_CONSTANTS = {
     STUDENT_COLUMN_ID: 'student',
-    SECONDARY_COLUMN_ID: 'secondary_identifier',
     NOTES_COLUMN_ID: 'notes',
     PERCENT_COLUMN_ID: 'percent',
     PASS_FAIL_COLUMN_ID: 'pass_fail',
