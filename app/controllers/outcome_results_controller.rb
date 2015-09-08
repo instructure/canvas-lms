@@ -372,7 +372,7 @@ class OutcomeResultsController < ApplicationController
     return true if @context.grants_any_right?(@current_user, session, :manage_grades, :view_all_grades)
     reject! "users not specified and no access to all grades", :forbidden unless params[:user_ids]
     user_id_params = Api.value_to_array(params[:user_ids])
-    user_ids = api_find_all(users_for_outcome_context, user_id_params).map(&:id).uniq
+    user_ids = Api.map_ids(user_id_params, users_for_outcome_context, @domain_root_account, @current_user)
     enrollments = @context.enrollments.where(user_id: user_ids)
     enrollment_user_ids = enrollments.map(&:user_id).uniq
     reject! "specified users not enrolled" unless enrollment_user_ids.length == user_ids.length

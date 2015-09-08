@@ -694,7 +694,7 @@ class SubmissionsApiController < ApplicationController
         return render :json => { :message => "Assignment grades have already been published" }, :status => :bad_request
       end
 
-      submissions = @assignment.submissions.includes(:all_submission_comments,
+      submissions = @assignment.submissions.preload(:all_submission_comments,
                                                      { :provisional_grades => :rubric_assessments })
       submissions.each do |submission|
         # TODO M2 use an actual selection instead of just picking the first one
