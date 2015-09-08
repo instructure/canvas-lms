@@ -117,7 +117,8 @@ class Quizzes::QuizzesController < ApplicationController
       },
       :PERMISSIONS => {
         create: can_do(@context.quizzes.scoped.new, @current_user, :create),
-        manage: can_manage
+        manage: can_manage,
+        read_question_banks: can_manage || can_do(@context, @current_user, :read_question_banks)
       },
       :FLAGS => {
         question_banks: feature_enabled?(:question_banks)

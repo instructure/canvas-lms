@@ -9,7 +9,7 @@
       <% not_yet_bookmarked = question_bank && !question_bank.bookmarked_for?(@current_user) %>
       <a href="<%= context_url(context, :context_question_bank_bookmark_url, question_bank ? question_bank.id : "{{ id }}") %>" class="bookmark_bank_link no-hover" title="<%= t('bookmark_bank', 'Bookmark this Question Bank') %>" style="<%= hidden unless not_yet_bookmarked %>"><%= image_tag "bookmark_gray.png" %></a>
       <a href="<%= context_url(context, :context_question_bank_bookmark_url, question_bank ? question_bank.id : "{{ id }}", :unbookmark => 1) %>" class="bookmark_bank_link no-hover" title="<%= t('unbookmark_bank', 'Unbookmark this Question Bank') %>" style="<%= hidden if not_yet_bookmarked %>"><%= image_tag "bookmark.png" %></a>
-      <% if context == @context %>
+      <% if context == @context && @context.grants_right?(@current_user, session, :manage_assignments) %>
         <% edit_bank_text = t('edit_bank', 'Edit this Question Bank') %>
         <% delete_bank_text = t('delete_bank', 'Delete this Question Bank') %>
         <span style="<%= hidden if question_bank && !can_do(question_bank, @current_user, :update) %>">

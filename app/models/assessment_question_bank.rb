@@ -39,8 +39,11 @@ class AssessmentQuestionBank < ActiveRecord::Base
   end
 
   set_policy do
-    given{|user, session| self.context.grants_right?(user, session, :manage_assignments) }
+    given{|user, session| self.context.grants_right?(user, session, :read_question_banks) && self.context.grants_right?(user, session, :manage_assignments) }
     can :read and can :create and can :update and can :delete and can :manage
+
+    given{|user, session| self.context.grants_right?(user, session, :read_question_banks) }
+    can :read
 
     given{|user| user && self.assessment_question_bank_users.where(:user_id => user).exists? }
     can :read

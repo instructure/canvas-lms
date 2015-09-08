@@ -36,7 +36,7 @@
               '#' => "<input name='quiz_group[question_points]' class='float_value' aria-label='#{h(t('labels.points_per_question', "Points per Question"))}' type='text' style='width: 20px;' value='\1'/>"
             }) %>
     </span>
-    <% if !group %>
+    <% if !group && @context.grants_right?(@current_user, :read_question_banks) %>
       <div class="group_edit">
         <a href="#" class="icon-search find_bank_link"><%= t('links.link_to_a_question_bank', "Link to a Question Bank") %></a>
       </div>
