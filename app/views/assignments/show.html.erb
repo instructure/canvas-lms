@@ -35,6 +35,7 @@
             <i class='icon-edit'></i> <%= t('links.edit', 'Edit') %>
           </a>
         <% end %>
+        <%= assignment_submission_button(@assignment, @current_user, @current_user_submission) %>
         <% if @assignment.moderated_grading? && @context.feature_enabled?(:moderated_grading) && can_do(@context, @current_user, :moderate_grades) %>
           <a
             href='<%= course_assignment_moderate_url(@context, @assignment) %>'
