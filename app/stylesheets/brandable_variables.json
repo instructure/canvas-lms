@@ -19,7 +19,7 @@
     "human_name": "Secondary Button",
     "variable_name": "ic-brand-button--secondary-bgd",
     "type": "color",
-    "default": "#34444f"
+    "default": "#333333"
   },{
     "human_name": "Secondary Button Text",
     "variable_name": "ic-brand-button--secondary-text",

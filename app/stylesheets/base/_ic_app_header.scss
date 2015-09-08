@@ -15,6 +15,7 @@
   $ic-global-nav-link-active:  darken($ic-brand-global-nav-bgd, 8%);
   $ic-masquerade-color: $ic-brand-primary;
   $ic-subnav-panel-bgd: $ic-color-light;
+  $ic-subnav-tray-bgd: darken($ic-brand-global-nav-bgd, 10%);
   $ic-logomark-url: url("/images/svg-icons/svg_canvas_logomark_only.svg");
 
   .ic-app-header {
@@ -248,7 +249,7 @@
   }
 
   .ReactTray__Overlay {
-    background: rgba( darken($ic-brand-secondary, 10%), 0.8 );
+    background: rgba( $ic-subnav-tray-bgd, 0.8 );
     opacity: 0;
     &.ReactTray__Overlay--after-open {
       transition: opacity 0.4s;
