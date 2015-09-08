@@ -139,6 +139,7 @@ define([
                 <header className="ic-DashboardCard__header">
                   <h2 className="ic-DashboardCard__header-title">{this.props.shortName}</h2>
                   <p className="ic-DashboardCard__header-subtitle">{this.props.courseCode}</p>
+                  {this.props.term ? ( <p className="ic-DashboardCard__header-term">{this.props.term}</p> ) : null}
                 </header>
               </a>
               <button className="Button Button--icon-action-rev ic-DashboardCard__header-button" onClick={this.settingsClick} ref="settingsToggle">

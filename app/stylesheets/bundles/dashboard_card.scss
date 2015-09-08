@@ -87,10 +87,12 @@ $ic-DashboardCard-action--active: $ic-brand-primary;
   line-height: normal;
   text-transform: uppercase;
   padding: 0;
-  margin: $ic-sp/2 0 0;
+  margin: $ic-sp/3 0 0;
   font-size: $baseFontSize - 1;
   @include breakpoint(wide) { font-size: $baseFontSize; }
 }
+
+.ic-DashboardCard__header-term { margin-bottom: 0; }
 
 .ic-DashboardCard__action-container {
   display: flex;
