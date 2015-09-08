@@ -35,7 +35,7 @@
             <i class='icon-edit'></i> <%= t('links.edit', 'Edit') %>
           </a>
         <% end %>
-
+        <%= assignment_submission_button(@assignment, @current_user, @current_user_submission) %>
         <% if @assignment_menu_tools.present? %>
           <a class="al-trigger btn" role="button" aria-haspopup="true" aria-owns="toolbar-1" href="#">
             <i class="icon-settings"></i>
