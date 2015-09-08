@@ -5,7 +5,7 @@
 <br/>
 ### tl;dr
 
-  - Item groups come either `item-group` or `item-group-condensed` styles  
+  - Item groups come either `item-group` or `item-group-condensed` styles
   - The `item-group` style is for draggable tiems and `item-group-condensed` is for items that are not draggable
 
 <br/>
@@ -180,8 +180,8 @@
   }
   @else {
     border: 1px solid darken($wellBackground, 7%);
-    background-color: $wellBackground; 
-    padding: 9px; 
+    background-color: $wellBackground;
+    padding: 9px;
     border-radius: 3px;
     margin-bottom: 20px;
   }
@@ -268,7 +268,7 @@
     background: $ic-color-light;
   }
   @else {
-    border: 1px solid #c1c7cf; 
+    border: 1px solid #c1c7cf;
     box-shadow: 0 1px 0 #dde0e4;
     background: #fff;
   }
@@ -369,7 +369,7 @@
 }
 
 .ig-list .icon-drag-handle {
-  color: $ic-brand-secondary;
+  color: $ic-font-color-dark;
 }
 
 .ig-details [class^=span] {
