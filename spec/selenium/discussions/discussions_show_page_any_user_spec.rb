@@ -30,7 +30,7 @@ describe "discussions" do
 
       context "marking as read" do
         # TODO: trim this
-        it "should automatically mark things as read" do
+        it "should automatically mark things as read", priority: "2", test_id: 345027 do
           resize_screen_to_default
 
           reply_count = 2
@@ -69,7 +69,7 @@ describe "discussions" do
           expect(ff(".discussion_entry.unread").size).to eq 1
         end
 
-        it "should mark all as read" do
+        it "should mark all as read", priority: "1", test_id: 150488 do
           reply_count = 8
           (reply_count / 2).times do |n|
             entry = topic.reply_from(:user => student, :text => "entry #{n}")
@@ -92,10 +92,21 @@ describe "discussions" do
           expect(ff('.discussion-entries .unread').length).to eq 0
           expect(ff('.discussion-entries .read').length).to eq reply_count
         end
+
+        it "should manually mark reply as read", priority: "1", test_id: 150483 do
+          topic.discussion_entries.create!(message: 'Lorem ipsum dolor sit amet', user: student)
+          topic.create_materialized_view
+          get url
+          expect(f('.new-and-total-badge .new-items').text).to eq('1')
+          f('.discussion-read-state').click
+          refresh_page
+          expect(f('.new-and-total-badge .new-items').text).to eq('')
+          expect(f('.new-and-total-badge .total-items').text).to eq('1')
+        end
       end
 
       context "topic subscription" do
-        it "should load with the correct status represented" do
+        it "should load with the correct status represented", priority: "2", test_id: 345028 do
           topic.subscribe(somebody)
           topic.create_materialized_view
 
@@ -111,7 +122,7 @@ describe "discussions" do
           expect(f('.topic-subscribe-button')).to be_displayed
         end
 
-        it "should unsubscribe from topic", priority: "1", test_id: 150474 do
+        it "should unsubscribe from topic", priority: "1", test_id: 345482 do
           topic.subscribe(somebody)
           topic.create_materialized_view
 
@@ -136,7 +147,7 @@ describe "discussions" do
         context "someone else's topic" do
           let(:topic) { student_topic }
 
-          it "should update subscribed button when user posts to a topic" do
+          it "should update subscribed button when user posts to a topic", priority: "2", test_id: 345483 do
             get url
             expect(f('.topic-subscribe-button')).to be_displayed
             add_reply "student posting"
@@ -145,7 +156,69 @@ describe "discussions" do
         end
       end
 
-      it "should embed user content in an iframe" do
+      context "collapse and filter replies" do
+        before :each do
+          @entry1 = topic.discussion_entries.create!(message: 'Lorem ipsum dolor sit amet', user: somebody)
+          @entry2 = topic.discussion_entries.create!(message: 'Reply by teacher', user: teacher)
+          topic.create_materialized_view
+          get url
+        end
+
+        it "should collapse and expand reply", priority: "1", test_id: 150486 do
+          f('.entry-content .entry-header').click
+          wait_for_ajaximations
+          expect(fj("#entry-#{@entry1.id} .discussion-entry-reply-area .discussion-reply-action:visible")).to be_nil
+          f('.entry-content .entry-header').click
+          wait_for_ajaximations
+          expect(fj("#entry-#{@entry1.id} .discussion-entry-reply-area .discussion-reply-action:visible")).to be_present
+        end
+
+        it "should show the appropriate replies from the search by option", priority: "1", test_id: 150487 do
+          expect(ffj('.discussion-entries .entry:visible').count).to eq(2)
+          expect(f('#discussion-search')).to be_present
+          replace_content(f('#discussion-search'), 'somebody')
+          wait_for_ajaximations
+          keep_trying_until do
+            expect(f("#filterResults .discussion-title").text).to include('somebody')
+            expect(ffj('.discussion-entries .entry:visible').count).to eq(1)
+          end
+          replace_content(f('#discussion-search'), 'Reply by')
+          wait_for_ajaximations
+          keep_trying_until do
+            expect(f("#filterResults .discussion-title").text).to include('teacher')
+            expect(ffj('.discussion-entries .entry:visible').count).to eq(1)
+          end
+        end
+
+        it "should show unread replies on clicking the unread button", priority: "1", test_id: 150489 do
+          expect(f('.new-and-total-badge .new-items').text).to eq('1')
+          expect(ffj('.discussion-entries .entry:visible').count).to eq(2)
+          f('.ui-button').click
+          wait_for_ajaximations
+          keep_trying_until do
+            expect(f("#filterResults .discussion-title").text).to include('teacher')
+            expect(ffj('.discussion-entries .entry:visible').count).to eq(1)
+          end
+          f('.ui-button').click
+          wait_for_ajaximations
+          keep_trying_until do
+            expect(ffj('.discussion-entries .entry:visible').count).to eq(2)
+          end
+        end
+
+        it "should collapse and expand multiple replies", priority: "1", test_id: 150490 do
+          f('#collapseAll').click
+          wait_for_ajaximations
+          expect(fj("#entry-#{@entry1.id} .discussion-entry-reply-area .discussion-reply-action:visible")).to be_nil
+          expect(fj("#entry-#{@entry2.id} .discussion-entry-reply-area .discussion-reply-action:visible")).to be_nil
+          f('#expandAll').click
+          wait_for_ajaximations
+          expect(fj("#entry-#{@entry1.id} .discussion-entry-reply-area .discussion-reply-action:visible")).to be_present
+          expect(fj("#entry-#{@entry2.id} .discussion-entry-reply-area .discussion-reply-action:visible")).to be_present
+        end
+      end
+
+      it "should embed user content in an iframe", priority: "2", test_id: 345484 do
         message = %{<p><object width="425" height="350" data="http://www.example.com/swf/software/flash/about/flash_animation.swf" type="application/x-shockwave-flash</object></p>"}
         topic.discussion_entries.create!(:user => nil, :message => message)
         get url
@@ -169,7 +242,7 @@ describe "discussions" do
         end
       end
 
-      it "should strip embed tags inside user content object tags" do
+      it "should strip embed tags inside user content object tags", priority: "2", test_id: 345485 do
         # this avoids the js translation of user content trying to embed the same content twice
         message = %{<object width="560" height="315"><param name="movie" value="http://www.youtube.com/v/VHRKdpR1E6Q?version=3&amp;hl=en_US"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/VHRKdpR1E6Q?version=3&amp;hl=en_US" type="application/x-shockwave-flash" width="560" height="315" allowscriptaccess="always" allowfullscreen="true"></embed></object>}
         topic.discussion_entries.create!(:user => nil, :message => message)
@@ -184,14 +257,14 @@ describe "discussions" do
         expect(form['target']).to eq iframe['name']
       end
 
-      it "should still show entries without users" do
+      it "should still show entries without users", priority: "1", test_id: 345486 do
         topic.discussion_entries.create!(:user => nil, :message => 'new entry from nobody')
         get url
         wait_for_ajax_requests
         expect(f('#content')).to include_text('new entry from nobody')
       end
 
-      it "should display the current username when adding a reply" do
+      it "should display the current username when adding a reply", priority: "1", test_id: 150485 do
         get url
         expect(get_all_replies.count).to eq 0
         add_reply
@@ -199,12 +272,7 @@ describe "discussions" do
         expect(@last_entry.find_element(:css, '.author').text).to eq somebody.name
       end
 
-      it "should not show discussion creation time" do
-        get url
-        expect(f("#discussion_topic time")).to be_nil
-      end
-
-      it "should show attachments after showing hidden replies" do
+      it "should show attachments after showing hidden replies", priority: "1", test_id: 345487 do
         entry = topic.discussion_entries.create!(:user => somebody, :message => 'blah')
         replies = []
         11.times do
@@ -224,7 +292,7 @@ describe "discussions" do
       context "side comments" do
         let(:topic) { side_comment_topic }
 
-        it "should add a side comment" do
+        it "should add a side comment", priority: "1", test_id: 345488 do
           side_comment_text = 'new side comment'
           get url
 
@@ -242,7 +310,7 @@ describe "discussions" do
           end
         end
 
-        it "should create multiple side comments but only show 10 and expand the rest" do
+        it "should create multiple side comments but only show 10 and expand the rest", priority: "1", test_id: 345489 do
           side_comment_number = 11
           side_comment_number.times { |i| topic.discussion_entries.create!(:user => student, :message => "new side comment #{i} from student", :parent_entry => entry) }
           get url
@@ -254,13 +322,13 @@ describe "discussions" do
           expect(ff('.discussion-entries .entry').count).to eq(side_comment_number + 2) # +1 because of the initial entry, +1 because of the parent entry
         end
 
-        it "should delete a side comment" do
+        it "should delete a side comment", priority: "1", test_id: 345490 do
           entry = topic.discussion_entries.create!(:user => somebody, :message => "new side comment from somebody", :parent_entry => entry)
           get url
           delete_entry(entry)
         end
 
-        it "should edit a side comment" do
+        it "should edit a side comment", priority: "1", test_id: 345491 do
           edit_text = 'this has been edited '
           text = "new side comment from somebody"
           entry = topic.discussion_entries.create!(:user => somebody, :message => text, :parent_entry => entry)
