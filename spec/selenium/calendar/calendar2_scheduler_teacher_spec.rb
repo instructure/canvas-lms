@@ -149,11 +149,11 @@ describe "scheduler" do
           expect(form).to be_displayed
           wait_for_ajaximations
 
-          set_value(form.f('.message_groups'), registration_status)
+          set_value(form.find('.message_groups'), registration_status)
           wait_for_ajaximations
 
-          expect(form.ff('.participant_list li')).not_to be_empty
-          set_value(form.f('#body'), 'hello')
+          expect(form.find_all('.participant_list li')).not_to be_empty
+          set_value(form.find('#body'), 'hello')
           submit_dialog(fj('.ui-dialog:visible'), '.ui-button')
           wait_for_ajaximations
           # using fj to avoid selenium caching
