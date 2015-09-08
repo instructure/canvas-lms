@@ -239,5 +239,12 @@ This text has a http://www.google.com link in it...
       }.to change(ContentParticipation, :count).by(0)
       expect(@submission.read?(@student)).to be_truthy
     end
+
+    it "should not set unread state when a provisional comment is made" do
+      expect {
+        @submission.add_comment(:author => @teacher, :comment => 'wat', :provisional => true)
+      }.to change(ContentParticipation, :count).by(0)
+      expect(@submission.read?(@student)).to eq true
+    end
   end
 end

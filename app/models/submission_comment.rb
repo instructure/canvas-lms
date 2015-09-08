@@ -252,6 +252,7 @@ class SubmissionComment < ActiveRecord::Base
     if id_changed? || (hidden_changed? && !hidden?)
       return if submission.user_id == author_id
       return if submission.assignment.deleted? || submission.assignment.muted?
+      return if provisional_grade_id.present?
 
       ContentParticipation.create_or_update({
         :content => submission,
