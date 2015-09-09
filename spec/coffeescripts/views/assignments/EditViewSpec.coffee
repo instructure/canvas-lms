@@ -136,6 +136,12 @@ define [
     errors = view._validateExternalTool(data, [])
     equal errors["external_tool_tag_attributes[url]"][0]['message'], 'External Tool URL cannot be left blank'
 
+  test 'does not validate allowed extensions if file uploads is not a submission type', ->
+    view = @editView()
+    data = submission_types: ["online_url"], allowed_extensions: []
+    errors = view._validateAllowedExtensions(data, [])
+    equal errors["allowed_extensions"], null
+
   test 'removes group_category_id if an external tool is selected', ->
     view = @editView()
     data = {
