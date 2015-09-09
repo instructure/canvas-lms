@@ -1,4 +1,5 @@
-# Uploading Files
+Uploading Files
+===============
 
 There are two ways to upload a file to Canvas: either by sending the
 file data in a POST request, or by sending Canvas a publicly
