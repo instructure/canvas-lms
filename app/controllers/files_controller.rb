@@ -1050,10 +1050,7 @@ class FilesController < ApplicationController
   #        -H 'Authorization: Bearer <token>'
   def destroy
     @attachment = Attachment.find(params[:id])
-    if Submission.where("attachment_ids like ?", "%#{@attachment.id}%").count > 0
-      return render :json => { :message => I18n.t('Cannot delete a file that has been submitted as part of an assignment') }, :status => :bad_request
-    end
-    if authorized_action(@attachment, @current_user, :delete) 
+    if authorized_action(@attachment, @current_user, :delete)
       @attachment.destroy
       respond_to do |format|
         format.html {

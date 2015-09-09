@@ -657,38 +657,20 @@ describe FilesController do
   end
 
   describe "DELETE 'destroy'" do
-    def submit_file
-      assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_upload")
-      @file = attachment_model(:context => @user, :uploaded_data => stub_file_data('test.txt', 'asdf', 'text/plain'))
-      assignment.submit_homework(@student, :attachments => [@file])
+    before :once do
+      course_file
     end
-    context "authorization" do
-      before :once do
-        course_file
-      end
 
-      it "should require authorization" do
-        delete 'destroy', :course_id => @course.id, :id => @file.id
-      end
-
-      it "should delete file" do
-        user_session(@teacher)
-        delete 'destroy', :course_id => @course.id, :id => @file.id
-        expect(response).to be_redirect
-        expect(assigns[:attachment]).to eql(@file)
-        expect(assigns[:attachment].file_state).to eq 'deleted'
-      end
+    it "should require authorization" do
+      delete 'destroy', :course_id => @course.id, :id => @file.id
     end
-    context "file that has been submitted" do
-      before :once do
-        user_session(@student)
-        submit_file
-      end
-      it "should not delete" do
-        delete 'destroy', :id => @file.id
-        expect(response.body).to eql("{\"message\":\"Cannot delete a file that has been submitted as part of an assignment\"}")
-        expect(assigns[:attachment].file_state).to eq 'available'
-      end
+
+    it "should delete file" do
+      user_session(@teacher)
+      delete 'destroy', :course_id => @course.id, :id => @file.id
+      expect(response).to be_redirect
+      expect(assigns[:attachment]).to eql(@file)
+      expect(assigns[:attachment].file_state).to eq 'deleted'
     end
   end
 
