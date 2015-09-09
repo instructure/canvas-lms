@@ -599,6 +599,58 @@ describe Quizzes::Quiz do
       expect(sub2.end_at).to eq deadline
     end
 
+    describe 'term.end_at when no enrollment_restrictions are present' do
+      before(:each) do
+        @deadline = 3.days.from_now
+        @course.conclude_at = 2.days.from_now
+        @course.save!
+        @course.enrollment_term.end_at = @deadline
+        @course.enrollment_term.save!
+
+        # Create a special time extension section
+        section = @course.course_sections.create!(end_at: 1.days.from_now)
+
+        # Create user and enroll them in our section
+        @user = User.create!(:name => "Fred Colon")
+        @enrollment = section.enroll_user(@user, "StudentEnrollment")
+        @enrollment.accept(:force)
+
+        @q = @course.quizzes.create!(:title => "locked tomorrow")
+      end
+
+      it "should set end_at to the term end dates" do
+        sub = @q.generate_submission(@user)
+        expect(sub.end_at).to eq @deadline
+      end
+    end
+
+    describe 'course.end_at when course.restrict_enrollments_to_course_dates' do
+      before(:each) do
+        @deadline = 3.days.from_now
+        @course.restrict_enrollments_to_course_dates = true
+        @course.conclude_at = @deadline
+        @course.save!
+        @term_deadline = 1.day.from_now
+        @course.enrollment_term.end_at = @term_deadline
+        @course.enrollment_term.save!
+
+        @q = @course.quizzes.create!(:title => "locked tomorrow")
+      end
+
+      it "should set end_at to the course end dates" do
+        sub = @q.generate_submission(@user)
+        expect(sub.end_at).to eq @deadline
+      end
+
+      it "should fall back onto the term end_dates if no course.end_at" do
+        @course.conclude_at = nil
+        @course.save!
+
+        sub = @q.generate_submission(@user)
+        expect(sub.end_at).to eq @term_deadline
+      end
+    end
+
     describe 'section.end_at when section.restrict_enrollments_to_section_dates' do
       before(:each) do
         # when course.end_at or term.end_at doesn't exist
