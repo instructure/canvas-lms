@@ -13,7 +13,7 @@ module Canvas::Oauth
     end
 
     def has_valid_key?
-      key.present?
+      key.present? && key.active?
     end
 
     def client_id_is_valid?
@@ -111,6 +111,6 @@ module Canvas::Oauth
       I18n.translate('pseudonym_sessions.default_app_name', 'Third-Party Application')
     end
 
-   
+
   end
 end

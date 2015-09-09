@@ -22,27 +22,40 @@ describe DeveloperKeysController, type: :request do
   describe "GET 'index'" do
     it 'should require authorization' do
       unauthorized_api_call(:get, "/api/v1/developer_keys.json",
-                      {:controller => 'developer_keys', :action => 'index', 
+                      {:controller => 'developer_keys', :action => 'index',
                        :format => 'json'})
     end
-    
+
+    it 'should have the default developer key' do
+      admin_session
+      json = api_call(:get, "/api/v1/developer_keys.json",
+                      {:controller => 'developer_keys', :action => 'index', :format => 'json'})
+
+      confirm_valid_key(json[0], DeveloperKey.default)
+    end
+
     it 'should return the list of developer keys' do
-      index_call
+      admin_session
+      key = DeveloperKey.create!
+      json = api_call(:get, "/api/v1/developer_keys.json",
+                      {:controller => 'developer_keys', :action => 'index', :format => 'json'})
+
+      confirm_valid_key(json[1], key)
     end
   end
-  
+
   describe "POST 'create'" do
     it 'should require authorization' do
       unauthorized_api_call(:post, "/api/v1/developer_keys.json",
-                      {:controller => 'developer_keys', :action => 'create', 
+                      {:controller => 'developer_keys', :action => 'create',
                        :format => 'json'}, {:developer_key => {}})
     end
-    
+
     it 'should create a new developer key' do
       create_call
     end
   end
-  
+
   describe "PUT 'update'" do
     it 'should require authorization' do
       key = DeveloperKey.create!
@@ -50,13 +63,13 @@ describe DeveloperKeysController, type: :request do
                       {:controller => 'developer_keys', :action => 'update', :id => key.id.to_s,
                        :format => 'json'}, {:developer_key => {}})
     end
-    
-    
+
+
     it 'should update an existing developer key' do
       update_call
     end
   end
-  
+
   describe "DELETE 'destroy'" do
     it 'should require authorization' do
       key = DeveloperKey.create!
@@ -64,7 +77,7 @@ describe DeveloperKeysController, type: :request do
                       {:controller => 'developer_keys', :action => 'destroy', :id => key.id.to_s,
                        :format => 'json'})
     end
-    
+
     it 'should delete an existing developer key' do
       destroy_call
     end
@@ -75,23 +88,16 @@ describe DeveloperKeysController, type: :request do
     account_admin_user(:account => Account.site_admin)
   end
 
-  def index_call
-    admin_session
-    key = DeveloperKey.create!
-    json = api_call(:get, "/api/v1/developer_keys.json",
-                    {:controller => 'developer_keys', :action => 'index', :format => 'json'})
-
-    confirm_valid_key(json[0], key)
-  end
-
   def create_call
     admin_session
     post_hash = {:developer_key => {'name' => 'cool tool', :tool_id => 'cool_tool', :icon_url => ''}}
+    # make sure this key is created
+    DeveloperKey.default
     json = api_call(:post, "/api/v1/developer_keys.json",
                     {:controller => 'developer_keys', :action => 'create', :format => 'json',
                      }, post_hash)
 
-    expect(DeveloperKey.count).to eq 1
+    expect(DeveloperKey.count).to eq 2
     confirm_valid_key(json, DeveloperKey.last)
   end
 
@@ -106,22 +112,22 @@ describe DeveloperKeysController, type: :request do
     key.reload
     confirm_valid_key(json, key)
   end
-  
+
   def destroy_call
     admin_session
-    key = DeveloperKey.create!
+    key = DeveloperKey.create!()
     api_call(:delete, "/api/v1/developer_keys/#{key.id}.json",
                     {:controller => 'developer_keys', :action => 'destroy', :format => 'json',
                      :id => key.id.to_s})
-    
-    expect(DeveloperKey.where(id: key)).not_to be_exists
+
+    expect(DeveloperKey.where(id: key).first).to be_deleted
   end
-  
+
   def unauthorized_api_call(*args)
     raw_api_call(*args)
     expect(response.code).to eq "401"
   end
-  
+
   def confirm_valid_key(hash, key)
     expect(hash['id']).to eq key.global_id
     expect(hash['tool_id']).to eq key.tool_id

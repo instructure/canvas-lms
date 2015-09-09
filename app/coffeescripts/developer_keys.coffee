@@ -16,6 +16,7 @@ define [
     key.created = $.datetimeString(key.created_at)
     key.last_auth = $.datetimeString(key.last_auth_at)
     key.last_access = $.datetimeString(key.last_access_at)
+    key.inactive = key.workflow_state == 'inactive'
     $key = $(developer_key(key));
     $key.data('key', key)
 
@@ -45,6 +46,13 @@ define [
         $("#edit_dialog button.submit").text(I18n.t('button.saving_failed', "Saving Key Failed"))
     })
     return $form
+
+  sendEvent = (event, $orig) ->
+    $.ajaxJSON(siteAdminEndpoint() + '/' + $orig.data('key').id, 'PUT', { developer_key: { event: event }},
+      (data) ->
+        $key = buildKey(data)
+        $orig.after($key).remove()
+    )
 
   siteAdminEndpoint = ->
     return '/api/v1/developer_keys'
@@ -92,6 +100,12 @@ define [
     key = $key.data('key')
     $form = buildForm(key, $key)
     $("#edit_dialog").empty().append($form).dialog('open')
+  ).on('click', '.deactivate_link', preventDefault ->
+    $key = $(this).closest(".key")
+    sendEvent('deactivate', $key)
+  ).on('click', '.activate_link', preventDefault ->
+    $key = $(this).closest(".key")
+    sendEvent('activate', $key)
   )
   $(".add_key").click((event) ->
     event.preventDefault()

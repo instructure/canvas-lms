@@ -10,6 +10,8 @@ class AccessToken < ActiveRecord::Base
 
   has_many :notification_endpoints, dependent: :destroy
 
+  before_validation -> { self.developer_key ||= DeveloperKey.default }
+
   # For user-generated tokens, purpose can be manually set.
   # For app-generated tokens, this should be generated based
   # on the scope defined in the auth process (scope has not
@@ -50,7 +52,7 @@ class AccessToken < ActiveRecord::Base
   end
 
   def usable?
-    user_id && !expired?
+    user_id && !expired? && developer_key.try(:active?)
   end
 
   def app_name

@@ -20,6 +20,7 @@ require 'aws-sdk'
 
 class DeveloperKey < ActiveRecord::Base
   include CustomValidations
+  include Workflow
 
   belongs_to :user
   belongs_to :account
@@ -27,12 +28,30 @@ class DeveloperKey < ActiveRecord::Base
   has_many :access_tokens
   has_many :context_external_tools, :primary_key => 'tool_id', :foreign_key => 'tool_id'
 
-  attr_accessible :api_key, :name, :user, :account, :icon_url, :redirect_uri, :tool_id, :email
+  attr_accessible :api_key, :name, :user, :account, :icon_url, :redirect_uri, :tool_id, :email, :event
 
   before_create :generate_api_key
   before_save :nullify_empty_tool_id
 
   validates_as_url :redirect_uri
+
+  scope :nondeleted, -> { where("workflow_state<>'deleted'") }
+
+  workflow do
+    state :active do
+      event :deactivate, transitions_to: :inactive
+    end
+    state :inactive do
+      event :activate, transitions_to: :active
+    end
+    state :deleted
+  end
+
+  alias_method :destroy!, :destroy
+  def destroy
+    self.workflow_state = 'deleted'
+    self.save
+  end
 
   def nullify_empty_tool_id
     self.tool_id = nil if tool_id.blank?
