@@ -152,7 +152,7 @@ class SubmissionsApiController < ApplicationController
   #
   # Get all existing submissions for an assignment.
   #
-  # @argument include[] [String, "submission_history"|"submission_comments"|"rubric_assessment"|"assignment"|"visibility"]
+  # @argument include[] [String, "submission_history"|"submission_comments"|"rubric_assessment"|"assignment"|"visibility"|"course"|"user"]
   #   Associations to include with the group.
   #
   # @response_field assignment_id The unique identifier for the assignment.
@@ -215,7 +215,7 @@ class SubmissionsApiController < ApplicationController
   #   The id of the grading period in which submissions are being requested
   #   (Requires the Multiple Grading Periods account feature turned on)
   #
-  # @argument include[] [String, "submission_history"|"submission_comments"|"rubric_assessment"|"assignment"|"total_scores"|"visibility"]
+  # @argument include[] [String, "submission_history"|"submission_comments"|"rubric_assessment"|"assignment"|"total_scores"|"visibility"|"course"|"user"]
   #   Associations to include with the group. `total_scores` requires the
   #   `grouped` argument.
   #
@@ -404,7 +404,7 @@ class SubmissionsApiController < ApplicationController
   #
   # Get a single submission, based on user id.
   #
-  # @argument include[] [String, "submission_history"|"submission_comments"|"rubric_assessment"|"visibility"]
+  # @argument include[] [String, "submission_history"|"submission_comments"|"rubric_assessment"|"visibility"|"course"|"user"]
   #   Associations to include with the group.
   def show
     @assignment = @context.assignments.active.find(params[:assignment_id])
