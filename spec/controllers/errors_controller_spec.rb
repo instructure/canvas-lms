@@ -2,9 +2,9 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe ErrorsController do
   def authenticate_user!
-    user = User.create!
-    Account.site_admin.account_users.create!(user: user)
-    user_session(user)
+    @user = User.create!
+    Account.site_admin.account_users.create!(user: @user)
+    user_session(@user)
   end
 
   describe 'index' do
@@ -75,6 +75,22 @@ describe ErrorsController do
       ErrorReport.expects(:where).once.raises("failed!")
       post 'create', error: { id: 1 }
       expect(ErrorReport.last.user_id).to eq user.id
+    end
+
+    it "records the real user if they are in student view" do
+      authenticate_user!
+      svs = course.student_view_student
+      session[:become_user_id] = svs.id
+      post 'create', error: {message: 'test message'}
+      expect(ErrorReport.order(:id).last.user_id).to eq @user.id
+    end
+
+    it "records the masqueradee user if not in student view" do
+      other_user = user_with_pseudonym(name: 'other', active_all: true)
+      authenticate_user! # reassigns @user
+      session[:become_user_id] = other_user.id
+      post 'create', eerror: {message: 'test message'}
+      expect(ErrorReport.order(:id).last.user_id).to eq other_user.id
     end
 
   end
