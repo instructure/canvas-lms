@@ -246,7 +246,7 @@ class ContextModule < ActiveRecord::Base
       return true
     end
 
-    progression = self.evaluate_for(user)
+    progression = self.find_or_create_progression(user)
     # if the progression is locked, then position in the progression doesn't
     # matter. we're not available.
 

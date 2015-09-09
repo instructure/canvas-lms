@@ -588,6 +588,10 @@ class AssignmentsApiController < ApplicationController
         Assignment.preload_can_unpublish(assignments)
       end
 
+      unless @context.grants_right?(@current_user, :read_as_admin)
+        Assignment.preload_context_module_tags(assignments) # running this again is fine
+      end
+
       hashes = []
       hashes = assignments.map do |assignment|
 

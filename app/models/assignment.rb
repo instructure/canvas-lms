@@ -827,6 +827,14 @@ class Assignment < ActiveRecord::Base
     read_attribute(:all_day) || (self.new_record? && self.due_at && (self.due_at.strftime("%H:%M") == '23:59' || self.due_at.strftime("%H:%M") == '00:00'))
   end
 
+  def self.preload_context_module_tags(assignments)
+    ActiveRecord::Associations::Preloader.new(assignments, [
+      :context_module_tags,
+      { :discussion_topic => :context_module_tags },
+      { :quiz => :context_module_tags }
+    ]).run
+  end
+
   def locked_for?(user, opts={})
     return false if opts[:check_policies] && context.grants_right?(user, :read_as_admin)
     Rails.cache.fetch(locked_cache_key(user), :expires_in => 1.minute) do

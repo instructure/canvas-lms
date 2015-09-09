@@ -117,9 +117,13 @@ module Api::V1::Assignment
                                              opts[:preloaded_user_content_attachments] || {})
     end
 
+    can_manage = assignment.context.grants_right?(user, :manage_assignments)
+
     hash['muted'] = assignment.muted?
     hash['html_url'] = course_assignment_url(assignment.context_id, assignment)
-    hash['has_overrides'] = assignment.has_overrides?
+    if can_manage
+      hash['has_overrides'] = assignment.has_overrides?
+    end
 
     if assignment.external_tool? && assignment.external_tool_tag.present?
       external_tool_tag = assignment.external_tool_tag
@@ -138,7 +142,7 @@ module Api::V1::Assignment
       hash['peer_reviews_assign_at'] = assignment.peer_reviews_assign_at
     end
 
-    if assignment.grants_right?(user, :grade)
+    if assignment.context.grants_right?(user, :manage_grades)
       query = Assignments::NeedsGradingCountQuery.new(assignment, user, opts[:needs_grading_course_proxy])
       if opts[:needs_grading_count_by_section]
         hash['needs_grading_count_by_section'] = query.count_by_section
@@ -161,32 +165,34 @@ module Api::V1::Assignment
       hash['allowed_extensions'] = assignment.allowed_extensions
     end
 
-    if assignment.rubric_association
-      hash['use_rubric_for_grading'] = !!assignment.rubric_association.use_for_grading
-      if assignment.rubric_association.rubric
-        hash['free_form_criterion_comments'] = !!assignment.rubric_association.rubric.free_form_criterion_comments
+    unless opts[:exclude_rubric]
+      if assignment.rubric_association
+        hash['use_rubric_for_grading'] = !!assignment.rubric_association.use_for_grading
+        if assignment.rubric_association.rubric
+          hash['free_form_criterion_comments'] = !!assignment.rubric_association.rubric.free_form_criterion_comments
+        end
       end
-    end
 
-    if assignment.rubric
-      rubric = assignment.rubric
-      hash['rubric'] = rubric.data.map do |row|
-        row_hash = row.slice(:id, :points, :description, :long_description)
-        row_hash["ratings"] = row[:ratings].map do |c|
-          c.slice(:id, :points, :description)
+      if assignment.rubric
+        rubric = assignment.rubric
+        hash['rubric'] = rubric.data.map do |row|
+          row_hash = row.slice(:id, :points, :description, :long_description)
+          row_hash["ratings"] = row[:ratings].map do |c|
+            c.slice(:id, :points, :description)
+          end
+          if row[:learning_outcome_id] && outcome = LearningOutcome.where(id: row[:learning_outcome_id]).first
+            row_hash["outcome_id"] = outcome.id
+            row_hash["vendor_guid"] = outcome.vendor_guid
+          end
+          row_hash
         end
-        if row[:learning_outcome_id] && outcome = LearningOutcome.where(id: row[:learning_outcome_id]).first
-          row_hash["outcome_id"] = outcome.id
-          row_hash["vendor_guid"] = outcome.vendor_guid
-        end
-        row_hash
+        hash['rubric_settings'] = {
+          'id' => rubric.id,
+          'title' => rubric.title,
+          'points_possible' => rubric.points_possible,
+          'free_form_criterion_comments' => !!rubric.free_form_criterion_comments
+        }
       end
-      hash['rubric_settings'] = {
-        'id' => rubric.id,
-        'title' => rubric.title,
-        'points_possible' => rubric.points_possible,
-        'free_form_criterion_comments' => !!rubric.free_form_criterion_comments
-      }
     end
 
     if opts[:include_discussion_topic] && assignment.discussion_topic
@@ -213,7 +219,7 @@ module Api::V1::Assignment
     end
 
     hash['published'] = ! assignment.unpublished?
-    if assignment.grants_right?(user, :update)
+    if can_manage
       hash['unpublishable'] = assignment.can_unpublish?
     end
 

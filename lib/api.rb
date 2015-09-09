@@ -407,7 +407,7 @@ module Api
                     else
                       context.attachments.where(id: attachment_ids)
                     end
-      attachments.index_by(&:id)
+      attachments.preload(:context).index_by(&:id)
     end
   end
 
@@ -422,6 +422,11 @@ module Api
     host, protocol = get_host_and_protocol_from_request
     # content is a json-encoded string; slashes are escaped
     content.gsub("#{PLACEHOLDER_PROTOCOL}:\\/\\/#{PLACEHOLDER_HOST}", "#{protocol}:\\/\\/#{host}")
+  end
+
+  def user_can_download_attachment?(attachment, context, user)
+    # checking on the context first can improve performance when checking many attachments for admins
+    (context && context.grants_any_right?(user, :manage_files, :read_as_admin)) || attachment.grants_right?(user, nil, :download)
   end
 
   def api_user_content(html, context = @context, user = @current_user, preloaded_attachments = {}, is_public=false)
@@ -451,7 +456,7 @@ module Api
                 end
       end
 
-      unless obj && ((is_public && !obj.locked_for?(user)) || obj.grants_right?(user, nil, :download))
+      unless obj && ((is_public && !obj.locked_for?(user)) || user_can_download_attachment?(obj, context, user))
         if obj && obj.previewable_media? && (uri = URI.parse(match.url) rescue nil)
           uri.query = (uri.query.to_s.split("&") + ["no_preview=1"]).join("&")
           next uri.to_s

@@ -231,7 +231,8 @@ class AssignmentGroupsController < ApplicationController
   end
 
   def assignment_includes
-    includes = [:context, :rubric, :quiz, :external_tool_tag, :rubric_association]
+    includes = [:context, :external_tool_tag, {:quiz => :context}]
+    includes += [:rubric, :rubric_association] unless params[:exclude_rubrics]
     includes << :discussion_topic if include_params.include?("discussion_topic")
     includes << :assignment_overrides if override_dates? || include_params.include?('all_dates') || include_params.include?('overrides')
     includes
@@ -330,13 +331,9 @@ class AssignmentGroupsController < ApplicationController
       # here rather than in assignments with multiple associations
       # referencing content_tags table and therefore aliased table names
       # the conditions on has_many :context_module_tags will break
-      if include_params.include?("module_ids")
-        module_includes = [
-          :context_module_tags,
-          { :discussion_topic => :context_module_tags },
-          { :quiz => :context_module_tags }
-        ]
-        ActiveRecord::Associations::Preloader.new(assignments, module_includes).run
+      if include_params.include?("module_ids") || !context.grants_right?(@current_user, session, :read_as_admin)
+        # loading the context module information here will improve performance for `locked_json` immensely
+        Assignment.preload_context_module_tags(assignments)
       end
 
       if assignment_includes.include?(:assignment_overrides)
