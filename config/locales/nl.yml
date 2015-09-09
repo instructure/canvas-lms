@@ -4066,8 +4066,8 @@ nl:
       links: 
         show_more: "%{count} meer..."
       need_grading_count: 
-        one: "Nog 1 sorteren"
-        other: "Nog %{count} te sorteren"
+        one: "Nog 1 na te kijken"
+        other: "Nog %{count} na te kijken"
       no_peer_review_due_date: "inleverdatum: Geen inleverdatum"
       peer_review_due_date: "inleveren op: %{peer_review_due_at}"
       points_possible: "van %{points_possible}"
