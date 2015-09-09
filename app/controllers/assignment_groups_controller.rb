@@ -336,6 +336,10 @@ class AssignmentGroupsController < ApplicationController
         Assignment.preload_context_module_tags(assignments)
       end
 
+      if AssignmentOverrideApplicator.should_preload_override_students?(assignments, @current_user, "assignment_groups_api")
+        AssignmentOverrideApplicator.preload_assignment_override_students(assignments, @current_user)
+      end
+
       if assignment_includes.include?(:assignment_overrides)
         assignments.each { |a| a.has_no_overrides = true if a.assignment_overrides.size == 0 }
       end

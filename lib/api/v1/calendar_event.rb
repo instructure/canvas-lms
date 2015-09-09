@@ -25,7 +25,7 @@ module Api::V1::CalendarEvent
   include Api::V1::Group
 
   def event_json(event, user, session, options={})
-    hash = if event.is_a?(CalendarEvent)
+    hash = if event.is_a?(::CalendarEvent)
       calendar_event_json(event, user, session, options)
     else
       assignment_event_json(event, user, session, options)

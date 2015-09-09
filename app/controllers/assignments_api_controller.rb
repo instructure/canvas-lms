@@ -573,6 +573,10 @@ class AssignmentsApiController < ApplicationController
         ActiveRecord::Associations::Preloader.new(assignments, :assignment_overrides).run
         assignments.select{ |a| a.assignment_overrides.size == 0 }.
           each { |a| a.has_no_overrides = true }
+
+        if AssignmentOverrideApplicator.should_preload_override_students?(assignments, @current_user, "assignments_api")
+          AssignmentOverrideApplicator.preload_assignment_override_students(assignments, @current_user)
+        end
       end
 
       include_visibility = include_params.include?('assignment_visibility') && @context.grants_any_right?(@current_user, :read_as_admin, :manage_grades, :manage_assignments)

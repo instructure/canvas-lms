@@ -263,7 +263,7 @@ describe AssignmentOverrideApplicator do
 
       describe 'for teachers' do
         it "works" do
-          teacher_in_course
+          teacher_in_course(:active_all => true)
           overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @teacher)
           expect(overrides).to eq [@override]
         end

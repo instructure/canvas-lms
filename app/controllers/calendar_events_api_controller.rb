@@ -309,8 +309,10 @@ class CalendarEventsApiController < ApplicationController
     scope = @type == :assignment ? assignment_scope : calendar_event_scope
     events = Api.paginate(scope, self, api_v1_calendar_events_url)
     ActiveRecord::Associations::Preloader.new(events, :child_events).run if @type == :event
-    events = apply_assignment_overrides(events) if @type == :assignment
-    mark_submitted_assignments(@current_user, events) if @type == :assignment
+    if @type == :assignment
+      events = apply_assignment_overrides(events)
+      mark_submitted_assignments(@current_user, events)
+    end
 
     if @errors.empty?
       render :json => events.map { |event| event_json(event, @current_user, session, {:excludes => params[:excludes]}) }
@@ -839,6 +841,19 @@ class CalendarEventsApiController < ApplicationController
 
   def apply_assignment_overrides(events)
     ActiveRecord::Associations::Preloader.new(events, [:context, :assignment_overrides]).run
+    events.each { |e| e.has_no_overrides = true if e.assignment_overrides.size == 0 }
+
+    if AssignmentOverrideApplicator.should_preload_override_students?(events, @current_user, "calendar_events_api")
+      AssignmentOverrideApplicator.preload_assignment_override_students(events, @current_user)
+    end
+
+    unless (params[:excludes] || []).include?('assignments')
+      ActiveRecord::Associations::Preloader.new(events, [:rubric, :rubric_association]).run
+      # improves locked_json performance
+
+      student_events = events.select{|e| !e.context.grants_right?(@current_user, session, :read_as_admin)}
+      Assignment.preload_context_module_tags(student_events) if student_events.any?
+    end
 
     events = events.inject([]) do |assignments, assignment|
 
