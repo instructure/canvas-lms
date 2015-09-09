@@ -1,12 +1,24 @@
 module CC::Exporter::Epub
   class Book
+    include CC::Exporter::Epub::Converters
+
     def initialize(content)
       @title = content.delete(:title)
+      @files = content.delete(:files)
       @content = content
     end
-    attr_reader :content, :title
+    attr_reader :content, :files, :title
+
+    def add_files
+      files.each do |file_data|
+        File.open(file_data[:full_path]) do |file|
+          epub.add_item(file_data[:local_path], file)
+        end
+      end
+    end
 
     def build
+      add_files
       content.each do |key, template|
         epub.add_ordered_item("#{key}.xhtml").
           add_content(StringIO.new(template.parse)).

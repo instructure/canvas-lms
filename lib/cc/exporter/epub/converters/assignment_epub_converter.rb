@@ -12,7 +12,7 @@ module CC::Exporter::Epub::Converters
         html_path = File.join @unzipped_file_path, res.at_css('file[href$="html"]')['href']
 
         meta_node = open_file_xml(meta_path)
-        html_node = open_file(html_path)
+        html_node = convert_media_from_node!(open_file(html_path))
 
         next unless html_node
 

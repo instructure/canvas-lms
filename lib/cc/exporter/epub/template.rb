@@ -1,6 +1,7 @@
 module CC::Exporter::Epub
   class Template
     include TextHelper
+
     def initialize(content, base_template)
       @content = content[:resources] || []
       @base_template = base_template
@@ -18,9 +19,7 @@ module CC::Exporter::Epub
     end
 
     def parse
-      Nokogiri::XML(build, &:noblanks).to_xml({
-        save_with: Nokogiri::XML::Node::SaveOptions::AS_XML | Nokogiri::XML::Node::SaveOptions::NO_DECLARATION
-      }).strip
+      Nokogiri::HTML(build, &:noblanks).to_xhtml.strip
     end
 
     def module_item(item)

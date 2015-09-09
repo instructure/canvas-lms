@@ -23,7 +23,7 @@ module CC::Exporter::Epub::Converters
       quiz_meta_data = open_file_xml(quiz_meta_link)
 
       quiz[:title] = get_node_val(quiz_meta_data, "title")
-      quiz[:description] = get_node_val(quiz_meta_data, "description")
+      quiz[:description] = convert_media_from_string!(get_node_val(quiz_meta_data, "description"))
       quiz[:due_at] = get_node_val(quiz_meta_data, "due_at")
       quiz[:lock_at] = get_node_val(quiz_meta_data, "lock_at")
       quiz[:unlock_at] = get_node_val(quiz_meta_data, "unlock_at")

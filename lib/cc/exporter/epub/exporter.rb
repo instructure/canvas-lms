@@ -30,7 +30,10 @@ module CC::Exporter::Epub
     end
 
     def templates
-      @_templates ||= {title: cartridge_json[:title]}.tap do |hash|
+      @_templates ||= {
+        title: cartridge_json[:title],
+        files: cartridge_json[:files]
+      }.tap do |hash|
         resources = sort_by_content ? [:assignments, :topics, :quizzes, :wikis] : [:modules]
         resources.each do |type|
           hash.merge!(type => create_template(type))
