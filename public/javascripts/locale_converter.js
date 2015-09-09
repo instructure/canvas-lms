@@ -13,6 +13,7 @@ define(['underscore'], function( _ ) {
       "hy_AM": "hy-am",
       "ja_JP": "ja",
       "ko_KR": "ko",
+      "mi_NZ": "mi-nz",
       "nb_NO": "nb",
       "nl_NL": "nl",
       "pl_PL": "pl",
