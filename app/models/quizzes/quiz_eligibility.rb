@@ -156,7 +156,11 @@ class Quizzes::QuizEligibility
   end
 
   def restricted_course_has_ended?
-    course.restrict_enrollments_to_course_dates ? course_has_ended? : false
+    if course.restrict_enrollments_to_course_dates
+      course.end_at ? course_has_ended? : term_has_ended?
+    else
+      false
+    end
   end
 
   def inactive_non_admin?

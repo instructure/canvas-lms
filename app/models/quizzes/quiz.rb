@@ -622,7 +622,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     elsif course.restrict_enrollments_to_course_dates
       course.end_at || course.enrollment_term.end_at
     else
-      course.enrollment_term.end_at || course.end_at
+      course.enrollment_term.end_at
     end
     
     # set to lock date
