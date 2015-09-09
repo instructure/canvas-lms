@@ -46,6 +46,10 @@ ja:
   locales:
     ja: 日本語
   qualified_locale: ja-JP
+mi:
+  locales:
+    mi: Reo Māori (Aotearoa)
+  qualified_locale: mi-NZ
 nl:
   locales:
     nl: Nederlands
