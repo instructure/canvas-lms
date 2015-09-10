@@ -12,17 +12,23 @@ body {
   margin: 10px 20px 0 220px;
   max-width: 800px;
 }
+
+#alert-header {
+  background-color: #ff0000;
+  padding: 4px 0;
+}
+
 #header {
   background-color: #6A7177;
   padding: 4px 0;
   border-bottom: 1px #aaa solid;
 }
-#header a {
+#header a, #alert-header a {
   text-decoration: none;
   color: #eee;
 }
 
-#header h1 {
+#header h1, #alert-header h1 {
   font-size: 16px;
   text-align: center;
   font-weight: normal;

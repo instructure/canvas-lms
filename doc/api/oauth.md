@@ -277,6 +277,7 @@ The response will be a JSON argument containing the access_token:
 <pre class="example_code">
 {
   access_token: "1/fFAGRNJru1FTz70BzhT3Zg",
+  expires_in: 3600
 }
 </pre>
 </p>
@@ -286,6 +287,12 @@ The response will be a JSON argument containing the access_token:
     <span class="name">access_token</span>
     <div class="inline">
       The OAuth2 access token.
+    </div>
+  </li>
+  <li>
+    <span class="name">expires_in</span>
+    <div class="inline">
+      Time in seconds until the access_token expires
     </div>
   </li>
 </ul>
@@ -420,6 +427,7 @@ The response will be a JSON argument containing the access_token:
 <pre class="example_code">
 {
   access_token: "1/fFAGRNJru1FTz70BzhT3Zg",
+  expires_in: 3600
 }
 </pre>
 </p>
@@ -430,6 +438,12 @@ The response will be a JSON argument containing the access_token:
     <div class="inline">
       The OAuth2 access token.
     </div>
+  </li>
+  <li>
+    <span class="name">expires_in</span>
+      <div class="inline">
+        Time in seconds until the access_token expires
+      </div>
   </li>
 </ul>
 

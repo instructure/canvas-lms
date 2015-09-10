@@ -148,9 +148,18 @@ module Canvas::Oauth
         expect(json['user']).to eq user.as_json(:only => [:id, :name], :include_root => false)
       end
 
-      it 'does not put anything else into the json' do
-        expect(json.keys.sort).to eq ['access_token', 'user']
+      it 'returns the expires_in parameter' do
+        Time.stubs(:now).returns(DateTime.parse('2015-07-10T09:29:00+00:00').utc.to_time)
+        access_token = token.access_token
+        access_token.expires_at = DateTime.parse('2015-07-10T10:29:00+00:00')
+        access_token.save!
+        expect(json['expires_in']).to eq 3600
       end
+
+      it 'does not put anything else into the json' do
+        expect(json.keys.sort).to match_array(['access_token', 'user', 'expires_in'])
+      end
+
     end
 
     describe '.generate_code_for' do
@@ -181,5 +190,26 @@ module Canvas::Oauth
         Token.generate_code_for(1, 1)
       end
     end
+
+    context "token expiration" do
+      context "interim June 30th 2016 expiration default" do
+        it "sets the default expiration for new tokens to be on June 30th 2016 before 2016-06-29T23:00:00+00:00" do
+          DateTime.stubs(:now).returns(DateTime.parse('2016-06-20T00:00:00+00:00'))
+          expect(token.access_token.expires_at.utc.iso8601).to eq('2016-06-30T00:00:00+00:00')
+        end
+
+        it "uses the curent hour and minute for setting the expiration on June 30th 2016" do
+          DateTime.stubs(:now).returns(DateTime.parse('2015-07-10T09:29:00+00:00'))
+          expect(token.access_token.expires_at.utc.iso8601).to eq('2016-06-30T09:29:00+00:00')
+        end
+
+        it "starts expiring tokens in 1 hour intervals at 2016-06-29T23:00:00+00:00" do
+          DateTime.stubs(:now).returns(DateTime.parse('2016-06-29T23:01:00+00:00'))
+          expect(token.access_token.expires_at.utc.iso8601).to eq('2016-06-30T00:01:00+00:00')
+        end
+
+      end
+    end
+
   end
 end
