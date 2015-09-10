@@ -390,14 +390,16 @@ module Api
   end
 
 
-  def api_bulk_load_user_content_attachments(htmls, context = @context, user = @current_user)
-    rewriter = UserContent::HtmlRewriter.new(context, user)
-    attachment_ids = []
-    rewriter.set_handler('files') do |m|
-      attachment_ids << m.obj_id if m.obj_id
-    end
+  def api_bulk_load_user_content_attachments(htmls, context = nil)
 
-    htmls.each { |html| rewriter.translate_content(html) }
+    regex = context ? %r{/#{context.class.name.tableize}/#{context.id}/files/(\d+)} : %r{/files/(\d+)}
+
+    attachment_ids = []
+    htmls.compact.each do |html|
+      html.scan(regex).each do |match|
+        attachment_ids << match.first
+      end
+    end
 
     if attachment_ids.blank?
       {}
@@ -407,6 +409,7 @@ module Api
                     else
                       context.attachments.where(id: attachment_ids)
                     end
+
       attachments.preload(:context).index_by(&:id)
     end
   end

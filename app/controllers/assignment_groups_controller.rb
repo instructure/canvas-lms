@@ -258,7 +258,7 @@ class AssignmentGroupsController < ApplicationController
     include_overrides = include_params.include?('overrides')
 
     assignments_by_group = assignments.group_by(&:assignment_group_id)
-    preloaded_attachments = user_content_attachments(assignments, context, current_user)
+    preloaded_attachments = user_content_attachments(assignments, context)
 
     groups.map do |group|
       group.context = context
@@ -296,11 +296,11 @@ class AssignmentGroupsController < ApplicationController
     value_to_boolean(params.fetch(:override_assignment_dates, true))
   end
 
-  def user_content_attachments(assignments, context, current_user)
+  def user_content_attachments(assignments, context)
     if params[:exclude_descriptions]
       {}
     else
-      api_bulk_load_user_content_attachments(assignments.map(&:description), context, current_user)
+      api_bulk_load_user_content_attachments(assignments.map(&:description), context)
     end
   end
 

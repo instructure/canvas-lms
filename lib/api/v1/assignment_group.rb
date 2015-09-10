@@ -39,11 +39,7 @@ module Api::V1::AssignmentGroup
 
       user_content_attachments = opts[:preloaded_user_content_attachments]
       unless opts[:exclude_descriptions]
-        user_content_attachments ||= api_bulk_load_user_content_attachments(
-          assignments.map(&:description),
-          group.context,
-          user
-        )
+        user_content_attachments ||= api_bulk_load_user_content_attachments(assignments.map(&:description), group.context)
       end
 
       needs_grading_course_proxy = group.context.grants_right?(user, session, :manage_grades) ?

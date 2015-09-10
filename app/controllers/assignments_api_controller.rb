@@ -596,6 +596,8 @@ class AssignmentsApiController < ApplicationController
         Assignment.preload_context_module_tags(assignments) # running this again is fine
       end
 
+      preloaded_attachments = api_bulk_load_user_content_attachments(assignments.map(&:description), @context)
+
       hashes = []
       hashes = assignments.map do |assignment|
 
@@ -613,7 +615,8 @@ class AssignmentsApiController < ApplicationController
                         needs_grading_course_proxy: needs_grading_course_proxy,
                         include_all_dates: include_all_dates,
                         bucket: params[:bucket],
-                        overrides: active_overrides
+                        overrides: active_overrides,
+                        preloaded_user_content_attachments: preloaded_attachments
                         )
       end
 

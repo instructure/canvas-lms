@@ -819,8 +819,8 @@ class Assignment < ActiveRecord::Base
     context_url_prefix
   end
 
-  def to_ics(in_own_calendar=true)
-    return CalendarEvent::IcalEvent.new(self).to_ics(in_own_calendar)
+  def to_ics(in_own_calendar=true, preloaded_attachments={})
+    return CalendarEvent::IcalEvent.new(self).to_ics(in_own_calendar, preloaded_attachments)
   end
 
   def all_day

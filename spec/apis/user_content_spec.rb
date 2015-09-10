@@ -490,8 +490,7 @@ describe UserContent, type: :request do
 
       expect(ApiClass.new.api_bulk_load_user_content_attachments(
         [html1, html2],
-        @course,
-        @teacher
+        @course
       )).to eq({a1.id => a1, a2.id => a2, a3.id => a3})
     end
   end

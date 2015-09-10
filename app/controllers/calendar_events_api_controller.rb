@@ -614,6 +614,8 @@ class CalendarEventsApiController < ApplicationController
     @contexts.each do |context|
       log_asset_access([ "calendar_feed", context ], "calendar", 'other')
     end
+    ActiveRecord::Associations::Preloader.new(@events, :context)
+
     respond_to do |format|
       format.ics do
         name = t('ics_title', "%{course_or_group_name} Calendar (Canvas)", :course_or_group_name => @context.name)
@@ -634,8 +636,10 @@ class CalendarEventsApiController < ApplicationController
         calendar.custom_property("X-WR-CALNAME", name)
         calendar.custom_property("X-WR-CALDESC", description)
 
+        # scan the descriptions for attachments
+        preloaded_attachments = api_bulk_load_user_content_attachments(@events.map(&:description))
         @events.each do |event|
-          ics_event = event.to_ics(false)
+          ics_event = event.to_ics(false, preloaded_attachments)
           calendar.add_event(ics_event) if ics_event
         end
 
@@ -743,10 +747,7 @@ class CalendarEventsApiController < ApplicationController
     @context_codes = selected_contexts.map(&:asset_string)
     @section_codes = []
     if @current_user
-      @section_codes = selected_contexts.inject([]) { |ary, context|
-        next ary unless context.is_a?(Course)
-        ary + context.sections_visible_to(@current_user).map(&:asset_string)
-      }
+      @section_codes = @current_user.section_context_codes(@context_codes)
     end
 
     if @type == :event && @start_date && @current_user
@@ -912,7 +913,7 @@ class CalendarEventsApiController < ApplicationController
     AppointmentGroup.
       manageable_by(@current_user, @context_codes).
       intersecting(@start_date, @end_date).
-      map(&:asset_string)
+      pluck(:id).map{|id| "appointment_group_#{id}"}
   end
 
   def duplicate(options = {})

@@ -2013,6 +2013,7 @@ class Course < ActiveRecord::Base
 
 
   def section_visibilities_for(user)
+    RequestCache.cache('section_visibilities_for', user, self) do
     shard.activate do
       Rails.cache.fetch(['section_visibilities_for', user, self].cache_key) do
         enrollments = Enrollment.select([:course_section_id, :limit_privileges_to_course_section, :type, :associated_user_id]).
@@ -2027,6 +2028,7 @@ class Course < ActiveRecord::Base
           }
         end
       end
+    end
     end
   end
 
