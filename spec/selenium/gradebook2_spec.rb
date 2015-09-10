@@ -416,6 +416,7 @@ describe "gradebook2" do
           message_form.find_element(:css, '#body').send_keys(message_text)
           submit_form(message_form)
           wait_for_ajax_requests
+          run_jobs
         }.to change(ConversationMessage, :count).by_at_least(2)
       end
 
@@ -439,6 +440,7 @@ describe "gradebook2" do
           message_form.find_element(:css, '#body').send_keys(message_text)
           submit_form(message_form)
           wait_for_ajax_requests
+          run_jobs
         }.to change { ConversationMessage.count(:conversation_id) }.by(2)
       end
 
@@ -455,6 +457,7 @@ describe "gradebook2" do
           message_form.find_element(:css, '#body').send_keys(message_text)
           submit_form(message_form)
           wait_for_ajax_requests
+          run_jobs
         }.to change(ConversationMessage, :count).by_at_least(2)
       end
 
@@ -493,6 +496,7 @@ describe "gradebook2" do
           message_form.find_element(:css, '#body').send_keys(message_text)
           submit_form(message_form)
           wait_for_ajax_requests
+          run_jobs
         }.to change(Conversation, :count).by_at_least(2)
       end
     end
