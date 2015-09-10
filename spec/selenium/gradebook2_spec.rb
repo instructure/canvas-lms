@@ -245,6 +245,7 @@ describe "gradebook2" do
       get "/courses/#{@course.id}/gradebook2"
       toggle_muting(@second_assignment)
       expect(fj(".container_1 .slick-header-column[id*='assignment_#{@second_assignment.id}'] .muted")).to be_displayed
+      expect(fj('.total-cell .icon-muted')).to be_displayed
       expect(@second_assignment.reload).to be_muted
 
       # reload the page and make sure it remembered the setting

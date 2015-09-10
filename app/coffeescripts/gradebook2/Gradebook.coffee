@@ -1431,41 +1431,48 @@ define [
       @totalGradeWarning = null
 
       if _.any(@assignments, (a) -> a.muted)
-        @totalGradeWarning = I18n.t "This grade differs from the student's view of the grade because some assignments are muted"
+        @totalGradeWarning =
+          warningText: I18n.t "This grade differs from the student's view of the grade because some assignments are muted"
+          icon: "icon-muted"
+      else
+        if @weightedGroups()
+          # assignment group has 0 points possible
+          invalidAssignmentGroups = _.filter @assignmentGroups, (ag) ->
+            pointsPossible = _.inject ag.assignments
+            , ((sum, a) -> sum + (a.points_possible || 0))
+            , 0
+            pointsPossible == 0
 
-      if @weightedGroups()
-        # assignment group has 0 points possible
-        invalidAssignmentGroups = _.filter @assignmentGroups, (ag) ->
-          pointsPossible = _.inject ag.assignments
+          for ag in invalidAssignmentGroups
+            for a in ag.assignments
+              a.invalid = true
+
+          if invalidAssignmentGroups.length > 0
+            groupNames = (ag.name for ag in invalidAssignmentGroups)
+            text = I18n.t 'invalid_assignment_groups_warning',
+              one: "Score does not include %{groups} because it has
+                    no points possible"
+              other: "Score does not include %{groups} because they have
+                      no points possible"
+            ,
+              groups: $.toSentence(groupNames)
+              count: groupNames.length
+            @totalGradeWarning =
+              warningText: text
+              icon: "icon-warning final-warning"
+
+        else
+          # no assignments have points possible
+          pointsPossible = _.inject @assignments
           , ((sum, a) -> sum + (a.points_possible || 0))
           , 0
-          pointsPossible == 0
 
-        for ag in invalidAssignmentGroups
-          for a in ag.assignments
-            a.invalid = true
-
-        if invalidAssignmentGroups.length > 0
-          groupNames = (ag.name for ag in invalidAssignmentGroups)
-          @totalGradeWarning = I18n.t 'invalid_assignment_groups_warning',
-            one: "Score does not include %{groups} because it has
-                  no points possible"
-            other: "Score does not include %{groups} because they have
-                    no points possible"
-          ,
-            groups: $.toSentence(groupNames)
-            count: groupNames.length
-
-      else
-        # no assignments have points possible
-        pointsPossible = _.inject @assignments
-        , ((sum, a) -> sum + (a.points_possible || 0))
-        , 0
-
-        if pointsPossible == 0
-          @totalGradeWarning = I18n.t 'no_assignments_have_points_warning'
-          , "Can't compute score until an assignment has points possible"
-
+          if pointsPossible == 0
+            text = I18n.t 'no_assignments_have_points_warning'
+            , "Can't compute score until an assignment has points possible"
+            @totalGradeWarning =
+              warningText: text
+              icon: "icon-warning final-warning"
     ###
     xsslint jqueryObject.identifier createLink
     xsslint jqueryObject.function showLink hideLink

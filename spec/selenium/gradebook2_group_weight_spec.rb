@@ -98,5 +98,22 @@ describe "group weights" do
       refresh_page
       expect(ff('.icon-warning').count).to eq(0)
     end
+
+    it 'should not display triangle warnings if an assignment is muted in both header and total column' do
+      get "/courses/#{@course.id}/gradebook2"
+      toggle_muting(@assignment2)
+      expect(fj('.total-cell .icon-warning')).to be_nil
+      expect(fj(".container_1 .slick-header-column[id*='assignment_#{@assignment2.id}'] .icon-warning")).to be_nil
+    end
+
+    it 'should display triangle warnings if an assignment is unmuted in both header and total column' do
+      @assignment2.muted = true
+      @assignment2.save!
+      get "/courses/#{@course.id}/gradebook2"
+      toggle_muting(@assignment2)
+      expect(fj('.total-cell .icon-warning')).to be_displayed
+      expect(fj(".container_1 .slick-header-column[id*='assignment_#{@assignment2.id}'] .icon-warning")).to be_displayed
+      expect(fj(".container_1 .slick-header-column[id*='assignment_#{@assignment2.id}'] .muted")).to be_nil
+    end
   end
 end
