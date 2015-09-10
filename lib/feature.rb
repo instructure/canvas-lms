@@ -362,6 +362,14 @@ END
       development: true,
       root_opt_in: true
     },
+      'gradebook_performance' => {
+      display_name: -> { I18n.t('Gradebook Performance') },
+      description: -> { I18n.t('Performance enhancements for the Gradebook') },
+      applies_to: 'Course',
+      state: 'hidden',
+      development: true,
+      root_opt_in: true
+    },
     'anonymous_grading' =>
     {
       display_name: -> { I18n.t('Anonymous Grading') },

@@ -153,9 +153,11 @@ class GradebooksController < ApplicationController
       set_current_grading_period if multiple_grading_periods?
       set_js_env
       @post_grades_tools = post_grades_tools
+      gradebook_version = @context.feature_enabled?(:gradebook_performance) ? :react_gradebook : :gradebook2
+
       case @current_user.preferred_gradebook_version
       when "2"
-        render :gradebook2
+        render gradebook_version
         return
       when "srgb"
         render :screenreader
@@ -302,7 +304,8 @@ class GradebooksController < ApplicationController
       :gradebook_column_size_settings => @current_user.preferences[:gradebook_column_size],
       :gradebook_column_size_settings_url => change_gradebook_column_size_course_gradebook_url,
       :gradebook_column_order_settings => @current_user.preferences[:gradebook_column_order].try(:[], @context.id),
-      :gradebook_column_order_settings_url => save_gradebook_column_order_course_gradebook_url
+      :gradebook_column_order_settings_url => save_gradebook_column_order_course_gradebook_url,
+      :gradebook_performance_enabled => @context.feature_enabled?(:gradebook_performance)
     }
   end
 
