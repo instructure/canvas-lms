@@ -4,16 +4,20 @@
   </div>
 </noscript>
 
-<% if session.has_key? :brand_config_md5 && !params[:previewing_from_themeeditor] %>
+<% unless params[:previewing_from_themeeditor] || !session.has_key?(:brand_config_md5) %>
   <div role="alert" class="ic-flash-static ic-flash-info ic-flash--Theme-Editor">
     <% if params[:editing_brand_config] %>
       <%= t("You're editing your Canvas Theme! The changes have not been applied yet.") %>
     <% else %>
+      <% current_account = ::Context.get_account(@context, @domain_root_account) %>
       <%= t do %>
-        You're editing your Canvas Theme! Apply or cancel changes from within the.
-        <%= link_to("Theme Editor", account_theme_editor_path(::Context.get_account(@context || @domain_root_account))) %>.
+        You're editing your Canvas Theme! Apply or cancel changes from within the
+        <%= link_to "Theme Editor", account_theme_editor_path(current_account), target: "_top" %>.
       <% end %>
-      <br /> <%= t do %> Note: sub-account themes are not active during this preview. <% end %>
+      <% if current_account.settings[:sub_account_includes] %>
+        <br />
+        <%= t "Note: sub-account themes are not active during this preview. " %>
+      <% end %>
     <% end %>
   </div>
 <% end %>
