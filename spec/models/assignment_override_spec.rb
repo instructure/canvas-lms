@@ -149,11 +149,6 @@ describe AssignmentOverride do
       expect(@override).not_to be_valid
     end
 
-    it "should reject an empty title with an adhoc set" do
-      @override.title = nil
-      expect(@override).not_to be_valid
-    end
-
     it "should reject an empty assignment" do
       @override.assignment = nil
       expect(@override).not_to be_valid
@@ -299,7 +294,7 @@ describe AssignmentOverride do
       override_student.user = student_in_course(course: @override.assignment.context, name: 'Edgar Jones').user
       override_student.save!
       @override.valid? # trigger bookkeeping
-      expect(@override.title).to eq 'Edgar Jones'
+      expect(@override.title).to eq '1 student'
     end
 
     it "should set ADHOC's name to reflect students (with many)" do
@@ -311,7 +306,7 @@ describe AssignmentOverride do
         override_student.save!
       end
       @override.valid? # trigger bookkeeping
-      expect(@override.title).to eq 'A Student, B Student, and 2 others'
+      expect(@override.title).to eq '4 students'
     end
   end
 

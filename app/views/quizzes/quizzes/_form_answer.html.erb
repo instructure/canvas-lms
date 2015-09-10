@@ -11,7 +11,7 @@
       </td><td>
         <div class="select_answer answer_type">
           <label for="answer_text"><b><%= t 'possible_answer', 'Possible Answer' %></b></label>
-          <input type="text" class="disabled_answer" style="width: 200px;" name="answer_text" maxlength="80" aria-label="<%= t 'possible_answer', 'Possible Answer' %>" placeholder="<%= t('Answer Text (80 character limit)') %>" />
+          <input type="text" class="disabled_answer" style="width: 200px;" name="answer_text" aria-label="<%= t 'possible_answer', 'Possible Answer' %>" placeholder="<%= t('Answer Text') %>" />
           <input type="hidden" name="answer_html"/>
           <span class="answer_html" style="display:inline-block;"></span>
         </div>
@@ -24,16 +24,16 @@
         </div>
         <div class="matching_answer answer_match answer_type">
           <div class="answer_match_left">
-            <% matching_left_text = t('Matching left side (80 character limit)') %>
-            <input type="text" style="width: 85%;" name="answer_match_left" maxlength="80" placeholder="<%= matching_left_text %>" aria-label="<%= matching_left_text %>"/>
+            <% matching_left_text = t('Matching left side') %>
+            <input type="text" style="width: 85%;" name="answer_match_left" placeholder="<%= matching_left_text %>" aria-label="<%= matching_left_text %>"/>
           </div>
           <input type="hidden" name="answer_match_left_html"/>
           <div class="answer_match_left_html"></div>
           <div class="answer_match_middle">&nbsp;
           </div>
           <div class="answer_match_right">
-            <% matching_right_text = t('Matching right side (80 character limit)') %>
-            <input type="text" style="width: 95%;" name="answer_match_right" maxlength="80" placeholder="<%= matching_right_text %>" aria-label="<%= matching_right_text %>"/>
+            <% matching_right_text = t('Matching right side') %>
+            <input type="text" style="width: 95%;" name="answer_match_right" placeholder="<%= matching_right_text %>" aria-label="<%= matching_right_text %>"/>
           </div>
           <div class="clear"></div>
         </div>

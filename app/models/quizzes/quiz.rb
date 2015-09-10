@@ -616,32 +616,24 @@ class Quizzes::Quiz < ActiveRecord::Base
     return end_at if user.is_a?(::User) && self.grants_right?(user, :grade)
 
     can_take = Quizzes::QuizEligibility.new(course: self.context, quiz: self, user: submission.user)
+    
+    fallback_end_at = if can_take.section_dates_currently_apply?
+      can_take.course_section.end_at
+    elsif course.restrict_enrollments_to_course_dates
+      course.end_at || course.enrollment_term.end_at
+    else
+      course.enrollment_term.end_at || course.end_at
+    end
+    
     # set to lock date
     if lock_at && !submission.manually_unlocked
       if !end_at || lock_at < end_at
         end_at = lock_at
       end
-
-    # set to course end
-    elsif course.end_at && course.restrict_enrollments_to_course_dates
-      if !end_at || course.end_at < end_at
-        end_at = course.end_at
-      end
-      # Section dates overrule
-      if can_take.section_dates_apply? && can_take.course_section.end_at > end_at
-        end_at = can_take.course_section.end_at
-      end
-
-    # set to enrollment term end
-    elsif course.enrollment_term.end_at
-      if !end_at || course.enrollment_term.end_at < end_at
-        end_at = course.enrollment_term.end_at
-      end
-      if can_take.section_dates_apply? && can_take.course_section.end_at > end_at
-        end_at = can_take.course_section.end_at
-      end
+    elsif !end_at || (fallback_end_at && fallback_end_at < end_at)
+      end_at = fallback_end_at
     end
-
+    
     end_at
   end
 
