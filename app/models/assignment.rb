@@ -75,6 +75,7 @@ class Assignment < ActiveRecord::Base
   has_one :rubric, :through => :rubric_association
   has_one :teacher_enrollment, class_name: 'TeacherEnrollment', foreign_key: 'course_id', primary_key: 'context_id', preload: :user, conditions: ["enrollments.workflow_state = 'active' AND enrollments.type = 'TeacherEnrollment'"]
   has_many :ignores, :as => :asset
+  has_many :moderated_grading_selections, class_name: 'ModeratedGrading::Selection'
   belongs_to :context, :polymorphic => true
   validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course']
   validates_length_of :title, :maximum => maximum_string_length, :allow_nil => false, :allow_blank => true

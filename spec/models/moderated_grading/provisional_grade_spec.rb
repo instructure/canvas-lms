@@ -14,6 +14,16 @@ describe ModeratedGrading::ProvisionalGrade do
   let(:now) { Time.zone.now }
 
   it { is_expected.to be_valid }
+
+  it do
+    is_expected.to have_one(:selection).
+      with_foreign_key(:selected_provisional_grade_id).
+      class_name('ModeratedGrading::Selection')
+  end
+  it { is_expected.to belong_to(:submission) }
+  it { is_expected.to belong_to(:scorer).class_name('User') }
+  it { is_expected.to have_many(:rubric_assessments) }
+
   it { is_expected.to validate_presence_of(:scorer) }
   it { is_expected.to validate_presence_of(:submission) }
 
@@ -21,13 +31,13 @@ describe ModeratedGrading::ProvisionalGrade do
     it "returns the proper format" do
       json = provisional_grade.grade_attributes
       expect(json).to eq({
-                           'provisional_grade_id' => provisional_grade.id,
-                           'grade' => 'A',
-                           'score' => 100.0,
-                           'graded_at' => nil,
-                           'scorer_id' => provisional_grade.scorer_id,
-                           'grade_matches_current_submission' => true
-                         })
+        'provisional_grade_id' => provisional_grade.id,
+        'grade' => 'A',
+        'score' => 100.0,
+        'graded_at' => nil,
+        'scorer_id' => provisional_grade.scorer_id,
+        'grade_matches_current_submission' => true
+      })
     end
   end
 
@@ -109,8 +119,8 @@ describe ModeratedGrading::ProvisionalGrade do
       pg = sub.find_or_create_provisional_grade! scorer: user, score: 1
 
       prov_assmt = association.assess(:user => student, :assessor => user, :artifact => pg,
-        :assessment => { :assessment_type => 'grading',
-          :"criterion_#{@rubric.criteria_object.first.id}" => { :points => 3, :comments => "good 4 u" } })
+                                      :assessment => { :assessment_type => 'grading',
+                                                       :"criterion_#{@rubric.criteria_object.first.id}" => { :points => 3, :comments => "good 4 u" } })
 
       expect(prov_assmt.score).to eq 3
 
@@ -174,13 +184,13 @@ describe ModeratedGrading::NullProvisionalGrade do
   describe 'grade_attributes' do
     it "returns the proper format" do
       expect(ModeratedGrading::NullProvisionalGrade.new(1).grade_attributes).to eq({
-          'provisional_grade_id' => nil,
-          'grade' => nil,
-          'score' => nil,
-          'graded_at' => nil,
-          'scorer_id' => 1,
-          'grade_matches_current_submission' => true
-        })
+        'provisional_grade_id' => nil,
+        'grade' => nil,
+        'score' => nil,
+        'graded_at' => nil,
+        'scorer_id' => 1,
+        'grade_matches_current_submission' => true
+      })
     end
   end
 end

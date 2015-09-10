@@ -7,7 +7,10 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
   belongs_to :submission
   belongs_to :scorer, class_name: 'User'
 
-  has_many :rubric_assessments, :as => :artifact
+  has_many :rubric_assessments, as: :artifact
+  has_one :selection,
+    class_name: 'ModeratedGrading::Selection',
+    foreign_key: :selected_provisional_grade_id
 
   validates :scorer, presence: true
   validates :submission, presence: true
