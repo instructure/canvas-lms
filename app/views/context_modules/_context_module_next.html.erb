@@ -8,7 +8,7 @@
   differentiated_assignments_on = @context.feature_enabled?(:differentiated_assignments)
   @modules ||= []
 %>
-<% cache_if_module(context_module, editable, differentiated_assignments_on, nc_or_on, @current_user, @context) do %>
+<% cache_if_module(context_module, editable, differentiated_assignments_on, @current_user, @context) do %>
 
 <div
   class="item-group-condensed context_module
@@ -69,19 +69,17 @@
 
     <%= render :partial => "context_modules/prerequisites_message", :locals => {:editable => editable, :context_module => context_module} %>
 
-    <% if nc_or_on %>
-      <div class="requirements_message">
-        <% if context_module && context_module.completion_requirements.present? %>
-          <ul class="pill">
-            <% count = context_module.requirement_count %>
-            <% completion_label = count == 1 ? t("Complete One Item") : t("Complete All Items") %>
-            <li aria-label="<%= completion_label %>" data-requirement-count="<%= count %>" tabindex="0">
-              <%= completion_label %>
-            </li>
-          </ul>
-        <% end %>
-      </div>
-    <% end %>
+    <div class="requirements_message">
+      <% if context_module && context_module.completion_requirements.present? %>
+        <ul class="pill">
+          <% count = context_module.requirement_count %>
+          <% completion_label = count == 1 ? t("Complete One Item") : t("Complete All Items") %>
+          <li aria-label="<%= completion_label %>" data-requirement-count="<%= count %>" tabindex="0">
+            <%= completion_label %>
+          </li>
+        </ul>
+      <% end %>
+    </div>
 
     <div class="ig-header-admin">
       <% unless editable %>

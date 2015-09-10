@@ -739,13 +739,12 @@ define([
       updatePrerequisites($module, data.context_module.prerequisites);
 
       // Update requirement message pill
-      if (ENV.NC_OR_ENABLED) {
-        if (data.context_module.completion_requirements.length === 0) {
-          $module.find('.requirements_message').empty();
-        } else {
-          newPillMessage($module, data.context_module.requirement_count);
-        }
+      if (data.context_module.completion_requirements.length === 0) {
+        $module.find('.requirements_message').empty();
+      } else {
+        newPillMessage($module, data.context_module.requirement_count);
       }
+
       $module.find(".context_module_items .context_module_item")
         .removeClass('progression_requirement')
         .removeClass('min_score_requirement')

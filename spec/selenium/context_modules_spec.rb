@@ -454,7 +454,6 @@ describe "context modules" do
     end
 
     it "should save the requirement count chosen in the Edit Module form" do
-      @course.enable_feature!(:nc_or)
       get "/courses/#{@course.id}/modules"
       add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
 

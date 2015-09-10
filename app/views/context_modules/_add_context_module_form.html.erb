@@ -50,18 +50,16 @@
 
     <div class="completion_entry form-section border border-t">
       <%= f.label :module_complete_when, "Requirements", class: "ic-Label form-element" %>
-      <% if @context.feature_enabled?(:nc_or) %>
-         <div class="ic-Form-control ic-Form-control--radio requirement-count-radio">
-          <div class="ic-Radio">
-          <%= f.radio_button :requirement_count, "" %>
-          <%= f.label :requirement_count, t("Student must complete all of these requirements"), class: "ic-Label", value: "" %>
-          </div>
-          <div class="ic-Radio">
-            <%= f.radio_button :requirement_count, 1  %>
-            <%= f.label :requirement_count, t("Student must complete one of these requirements"), class: "ic-Label", value: 1 %>
-          </div>
+       <div class="ic-Form-control ic-Form-control--radio requirement-count-radio">
+        <div class="ic-Radio">
+        <%= f.radio_button :requirement_count, "" %>
+        <%= f.label :requirement_count, t("Student must complete all of these requirements"), class: "ic-Label", value: "" %>
         </div>
-      <% end %>
+        <div class="ic-Radio">
+          <%= f.radio_button :requirement_count, 1  %>
+          <%= f.label :requirement_count, t("Student must complete one of these requirements"), class: "ic-Label", value: 1 %>
+        </div>
+      </div>
       <div class="no_items_message form-element" style="display: none;">
         <div class="alert alert-info">
           <%= t('No items in module') %>

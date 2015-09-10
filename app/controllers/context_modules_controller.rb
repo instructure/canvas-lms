@@ -53,8 +53,7 @@ class ContextModulesController < ApplicationController
         :MODULE_FILE_PERMISSIONS => {
            usage_rights_required: @context.feature_enabled?(:usage_rights_required),
            manage_files: @context.grants_right?(@current_user, session, :manage_files)
-        },
-        :NC_OR_ENABLED => @context.feature_enabled?(:nc_or)
+        }
     end
   end
   include ModuleIndexHelper
