@@ -122,18 +122,25 @@
     "default": "$ic-brand-primary"
   },{
     "human_name": "Windows Tile: Square",
-    "helper_text": "558x558 svg, png, jpg, gif (1.8x the standard tile size, so it can be scaled up or down as needed)",
+    "helper_text": "558x558 png, jpg, gif (1.8x the standard tile size, so it can be scaled up or down as needed)",
     "variable_name": "ic-brand-msapplication-tile-square",
     "type": "image",
     "accept": "image/png,image/gif,image/jpeg",
     "default": "/images/windows-tile.png"
   },{
     "human_name": "Windows Tile: Wide",
-    "helper_text": "558x270 svg, png, jpg, gif",
+    "helper_text": "558x270 png, jpg, gif",
     "variable_name": "ic-brand-msapplication-tile-wide",
     "type": "image",
     "accept": "image/png,image/gif,image/jpeg",
     "default": "/images/windows-tile-wide.png"
+  },{
+    "human_name": "Right Sidebar Logo",
+    "helper_text": "A full-size logo that appears in the right sidebar on the Canvas dashboard. Ideal size is 360 x 140 pixels. Accepted formats: svg, png, jpeg, gif",
+    "variable_name": "ic-brand-right-sidebar-logo",
+    "type": "image",
+    "accept": "image/svg,image/png,image/gif,image/jpeg",
+    "default": ""
   }
 ]},
 {

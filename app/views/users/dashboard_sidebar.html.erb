@@ -1,3 +1,10 @@
+<%# Customer-brandable dashboard right-sidebar logo %>
+<% if use_new_styles? && brand_variable("ic-brand-right-sidebar-logo") != "" %>
+<div class="ic-sidebar-logo">
+  <%= image_tag(brand_variable("ic-brand-right-sidebar-logo"), :class => "ic-sidebar-logo__image", :alt => "Canvas by Instructure") %>
+</div>
+<% end %>
+
 <%= render :partial => 'courses/assignments_needing_grading', :locals => {:contexts => nil} %>
 <% locals = {
     :title => t('coming_up', "Coming Up"),
