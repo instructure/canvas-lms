@@ -216,7 +216,7 @@ class Notification < ActiveRecord::Base
     when 'DiscussionEntry'
       FREQ_DAILY
     when 'Announcement Reply'
-        FREQ_NEVER
+      FREQ_NEVER
     when 'Due Date'
       FREQ_WEEKLY
     when 'Grading'
@@ -344,7 +344,7 @@ class Notification < ActiveRecord::Base
     t 'categories.student_appointment_signups', 'Student Appointment Signups'
     t 'categories.appointment_availability', 'Appointment Availability'
     t 'categories.appointment_signups', 'Appointment Signups'
-    t 'categories.appointment_cancelations', 'Appointment Cancelations'
+    t 'categories.appointment_cancelations', 'Appointment Cancellations'
     t 'categories.course_content', 'Course Content'
     t 'categories.discussion', 'Discussion'
     t 'categories.discussion_entry', 'DiscussionEntry'
@@ -405,7 +405,7 @@ class Notification < ActiveRecord::Base
     when 'Appointment Signups'
       t(:appointment_signups_display, 'Appointment Signups')
     when 'Appointment Cancelations'
-      t(:appointment_cancelations_display, 'Appointment Cancelations')
+      t(:appointment_cancelations_display, 'Appointment Cancellations')
     when 'Conversation Message'
       t(:conversation_message_display, 'Conversation Message')
     when 'Added To Conversation'
@@ -515,7 +515,7 @@ EOS
     when 'Appointment Signups'
       t(:appointment_signups_description, 'New appointment on your calendar')
     when 'Appointment Cancelations'
-      t(:appointment_cancelations_description, 'Appointment cancelation')
+      t(:appointment_cancelations_description, 'Appointment cancellation')
     when 'Conversation Message'
       t(:conversation_message_description, 'New Inbox messages')
     when 'Added To Conversation'
