@@ -115,6 +115,7 @@
     <% if editable || module_item.nil? %>
       <div class="ig-admin">
         <span
+          data-module-item-name="<%= tag && tag.title %>"
           data-module-type="<%= module_item && module_item.content_type_class %>"
           data-content-id="<%= module_item && module_item.content_id %>"
           data-id="<%= module_item_publishable_id(module_item) %>"
@@ -124,6 +125,8 @@
           data-published="<%= module_item && published_status == 'published' %>"
           data-publishable="<%= module_item_publishable?(module_item) %>"
           data-unpublishable="<%= module_item_unpublishable?(module_item) %>"
+          data-publish-message="<%= t('Unpublished. Click to publish %{item_name}.', {item_name: tag && tag.title ? tag.title : ''}) %>"
+          data-unpublish-message="<%= t('Published. Click to unpublish %{item_name}.', {item_name: tag && tag.title ? tag.title : ''}) %>"
           title=""
           data-tooltip
           class="publish-icon <%= published_status %>"
@@ -134,7 +137,7 @@
         <div class="inline-block cog-menu-container">
           <a class="al-trigger al-trigger-gray" role="button" tabindex="0" href="#">
             <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
-            <span class="screenreader-only"><%= t('settings', 'Settings') %></span>
+            <span class="screenreader-only"><%= t('Manage %{item_name}', {item_name: tag && tag.title ? tag.title : 'item'})  %></span>
           </a>
 
           <ul class="al-options">

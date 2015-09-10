@@ -16,6 +16,7 @@ define [
       togglePublishClassOn: React.PropTypes.object
       model: customPropTypes.filesystemObject
       userCanManageFilesForContext: React.PropTypes.bool.isRequired
+      fileName: React.PropTypes.string
 
     # == React Functions == #
     getInitialState: -> @extractStateFromModel( @props.model )

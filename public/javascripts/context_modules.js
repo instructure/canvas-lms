@@ -1323,6 +1323,7 @@ define([
       var publishData = {
         moduleType: data.type,
         id: data.publishable_id,
+        moduleItemName: data.moduleItemName,
         moduleId: data.context_module_id,
         courseId: data.context_id,
         published: data.published,
@@ -1376,7 +1377,8 @@ define([
           model: file,
           togglePublishClassOn: $el.parents('.ig-row')[0],
           userCanManageFilesForContext: ENV.MODULE_FILE_PERMISSIONS.manage_files,
-          usageRightsRequiredForContext: ENV.MODULE_FILE_PERMISSIONS.usage_rights_required
+          usageRightsRequiredForContext: ENV.MODULE_FILE_PERMISSIONS.usage_rights_required,
+          fileName: file.displayName()
         }
 
         React.render(PublishCloud(props), $el[0]);
@@ -1389,13 +1391,26 @@ define([
         id: data.id,
         module_id: data.moduleId,
         module_item_id: data.moduleItemId,
+        module_item_name: data.moduleItemName,
         course_id: data.courseId,
         published: data.published,
         publishable: data.publishable,
         unpublishable: data.unpublishable
       });
 
-      var view = new PublishIconView({model: model, el: $el[0]});
+      var viewOptions = {
+        model: model,
+        el: $el[0]
+      };
+
+      if (data.publishMessage) {
+        viewOptions.publishText = data.publishMessage;
+      }
+      if (data.unpublishMessage) {
+        viewOptions.unpublishText = data.unpublishMessage;
+      }
+
+      var view = new PublishIconView(viewOptions);
       var row = $el.closest('.ig-row');
 
       if (data.published) { row.addClass('ig-published'); }

@@ -16,6 +16,7 @@ define [
       published: true
       publishable: true
       unpublishable: true
+      module_item_name: null
 
     branch: (key) ->
       (@[key][@get('module_type')] or @[key].generic).call(this)
@@ -45,10 +46,24 @@ define [
       module: ->           module: @attributes
 
     disabledMessages:
-      generic:          -> I18n.t('disabled', 'Publishing is disabled for this item')
-      assignment:       -> I18n.t('disabled_assignment', "Can't unpublish if there are student submissions")
-      quiz:             -> I18n.t('disabled_quiz', "Can't unpublish if there are student submissions")
-      discussion_topic: -> I18n.t('disabled_discussion_topic', "Can't unpublish if there are student submissions")
+      generic:          -> if @get('module_item_name')
+                             I18n.t('Publishing %{item_name} is disabled', {item_name: @get('module_item_name')})
+                           else
+                             I18n.t('Publishing is disabled for this item')
+
+      assignment:       -> if @get('module_item_name')
+                             I18n.t("Can't unpublish %{item_name} if there are student submissions", {item_name: @get('module_item_name')})
+                           else
+                             I18n.t("Can't unpublish if there are student submissions")
+
+      quiz:             -> if @get('module_item_name')
+                             I18n.t("Can't unpublish %{item_name} if there are student submissions", {item_name: @get('module_item_name')})
+                           else
+                             I18n.t("Can't unpublish if there are student submissions")
+      discussion_topic: -> if @get('module_item_name')
+                             I18n.t("Can't unpublish %{item_name} if there are student submissions", {item_name: @get('module_item_name')})
+                           else
+                             I18n.t("Can't unpublish if there are student submissions")
 
     publish: ->
       @save 'published', yes

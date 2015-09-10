@@ -41,7 +41,7 @@ describe 'editing a quiz' do
         type_in_tiny('#quiz_description', 'changed description')
         click_save_settings_button
         wait_for_ajax_requests
-        expect(f('#quiz-publish-link').text.strip!).to eq 'Published'
+        expect(f('#quiz-publish-link .publish-text').text.strip!).to eq 'Published'
       end
 
       it 'deletes the quiz', priority: "1", test_id: 351921 do
@@ -54,7 +54,7 @@ describe 'editing a quiz' do
         end
         f('#quiz-publish-link').click
         wait_for_ajax_requests
-        expect(f('#quiz-publish-link').text.strip!).to eq 'Publish'
+        expect(f('#quiz-publish-link .publish-text').text.strip!).to eq 'Publish'
       end
     end
 
@@ -90,7 +90,7 @@ describe 'editing a quiz' do
         end
         f('#quiz-publish-link').click
         wait_for_ajax_requests
-        expect(f('#quiz-publish-link').text.strip!).to eq 'Unpublish'
+        expect(f('#quiz-publish-link .publish-text').text.strip!).to eq 'Unpublish'
       end
     end
 

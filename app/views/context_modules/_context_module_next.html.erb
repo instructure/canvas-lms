@@ -115,6 +115,8 @@
           data-course-id="<%= context_module && context_module.context_id %>"
           data-published="<%= published_status == 'published' %>"
           data-publishable="<%= true %>"
+          data-publish-message="<%= t('Unpublished. Click to publish %{module_name}.', {module_name: context_module ? context_module.name : 'module'}) %>"
+          data-unpublish-message="<%= t('Published. Click to unpublish %{module_name}.', {module_name: context_module ? context_module.name : 'module'}) %>"
           title=""
           data-tooltip
           class="publish-icon module <%= published_status %>"
@@ -123,10 +125,10 @@
         </span>
 
         <button
-          aria-label="<%= t('aria_labels.add_item', %{Add Content}) %>"
+          aria-label="<%= t('Add Content to %{module_name}', {module_name: context_module ? context_module.name : 'module'}) %>"
           rel="<%= context_url(@context, :context_url) %>/modules/<%= context_module ? context_module.id : "{{ id }}" %>/items"
-          class="add_module_item_link btn"><i class="icon-plus"></i><span class="screenreader-only"><%= t('links.add_item', %{Add Content}) %></span></button>
-        <button class="btn al-trigger" aria-label="<%= t("manager_module", "Manage module") %>">
+          class="add_module_item_link btn"><i class="icon-plus"></i><span class="screenreader-only"><%= t('Add Content to %{module_name}', {module_name: context_module ? context_module.name : 'module'}) %></span></button>
+        <button class="btn al-trigger" aria-label="<%= t('Manage %{module_name}', {module_name: context_module ? context_module.name : 'module'})  %>">
           <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
         </button>
         <ul class="al-options">
