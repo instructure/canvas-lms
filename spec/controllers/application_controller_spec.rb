@@ -563,6 +563,17 @@ describe ApplicationController do
         controller.instance_variable_set(:"@context", course)
         controller.send(:content_tag_redirect, course, content_tag, nil)
       end
+
+      it 'sets the resource_link_id correctly' do
+        controller.stubs(:named_context_url).returns('wrong_url')
+        controller.stubs(:render)
+        controller.stubs(js_env:[])
+        controller.instance_variable_set(:"@context", course)
+        content_tag.stubs(:id).returns(42)
+        controller.send(:content_tag_redirect, course, content_tag, nil)
+        expect(assigns[:lti_launch].params["resource_link_id"]).to eq 'e62d81a8a1587cdf9d3bbc3de0ef303d6bc70d78'
+      end
+
     end
 
   end
