@@ -1,7 +1,6 @@
 module BrandConfigHelpers
   def branding_allowed?
-    self.root_account.allow_global_includes? &&
-      (self.root_account? || self.root_account.sub_account_includes?)
+    self.root_account? || self.root_account.sub_account_includes?
   end
 
   def first_parent_brand_config
