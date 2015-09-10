@@ -665,7 +665,7 @@ class SubmissionsApiController < ApplicationController
     end
   end
 
-  # @API Publish provisional grades for an assignment
+  # undocumented @API Publish provisional grades for an assignment
   #
   # Publish the selected provisional grade for all submissions to an assignment.
   # Use the "Select provisional grade" endpoint to choose which provisional grade to publish
@@ -682,8 +682,6 @@ class SubmissionsApiController < ApplicationController
   #   curl 'https://<canvas>/api/v1/courses/1/assignments/2/publish_provisional_grades' \
   #        -X POST
   #
-  # v-- that gap is there intentionally, because this isn't ready to be publicly documented
-
   def publish_provisional_grades
     if authorized_action(@context, @current_user, :moderate_grades)
       @assignment = @context.assignments.active.find(params[:assignment_id])
