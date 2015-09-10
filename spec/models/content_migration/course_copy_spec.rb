@@ -35,6 +35,16 @@ describe ContentMigration do
       expect(@cm.progress).to eq 100
     end
 
+    it "should set started_at and finished_at" do
+      time = 5.minutes.ago
+      Timecop.freeze(time) do
+        run_course_copy
+      end
+      @cm.reload
+      expect(@cm.started_at.to_i).to eq time.to_i
+      expect(@cm.finished_at.to_i).to eq time.to_i
+    end
+
     it "should migrate syllabus links on copy" do
       course_model
 

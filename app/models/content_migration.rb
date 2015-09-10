@@ -32,6 +32,7 @@ class ContentMigration < ActiveRecord::Base
   has_one :job_progress, :class_name => 'Progress', :as => :context
   serialize :migration_settings
   cattr_accessor :export_file_path
+  before_save :set_started_at_and_finished_at
   after_save :handle_import_in_progress_notice
   DATE_FORMAT = "%m/%d/%Y"
 
@@ -59,6 +60,17 @@ class ContentMigration < ActiveRecord::Base
   set_policy do
     given { |user, session| self.context.grants_right?(user, session, :manage_files) }
     can :manage_files and can :read
+  end
+
+  def set_started_at_and_finished_at
+    if workflow_state_changed?
+      if pre_processing? || exporting? || importing?
+        self.started_at ||= Time.now.utc
+      end
+      if failed? || imported? || exported?
+        self.finished_at ||= Time.now.utc
+      end
+    end
   end
 
   # the stream item context is decided by calling asset.context(user), i guess
