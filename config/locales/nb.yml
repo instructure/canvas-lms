@@ -7286,6 +7286,7 @@ nb:
       start_a_group: "Start en gruppe"
     styleguide: 
       manage: Behandle
+  info_8f47054a: Info
   insert_math_equation_57c6e767: "Sett Matte Likning"
   insert_row_below_25187f89: "Sett inn rad under"
   installed_7b284a91: Installert
@@ -7365,6 +7366,7 @@ nb:
   it_looks_like_your_content_might_not_load_you_can__dfb85860: "Det ser ut som om ditt innhold muligens ikke blir lastet inn. Du kan benytte denne knappen for å forsøke å laste det i en ny fane."
   item_complete_d334fd43: "(Item Complete)"
   item_incomplete_d6a16040: "(Item Incomplete)"
+  item_past_due_dc6e776: "Elements frist utløpt"
   item_type_assignment_13a1132e: "Elementtype: Innlevering"
   item_type_discussion_e3ddae9b: "Elementtype: Diskusjon"
   item_type_document_493ac5b0: "Elementtype: Dokument"
@@ -7444,9 +7446,11 @@ nb:
       Funksjoner, innstillinger og stiler som gjør at mer fornuftig konkret i en K-12 miljø. For nå er, dette bare
       gjelder noen stil endringer, men flere K-12 spesifikke ting kan legges i fremtiden.
   k_2521301c: k
+  kind_7f0a88c4: Type
   labels: 
     lock_module_until: "Lås inntil"
   last_item_79583712: "Siste Element:"
+  last_modified_by_ca4bb5e1: "Sist redigert av"
   last_user_access_title: "Forrige brukertilgang"
   late_percent_b91d01b3: "Sent: %{percent}"
   latest_assessment_a85280ef: "Siste Vurdering"
@@ -7610,6 +7614,7 @@ nb:
   links_14b70841: Lenker
   loading_25990131: Laster…
   loading_bde52856: Laster
+  loading_more_results_def6df65: "Laster inn flere resultater…"
   locales: 
     nb: "Norwegian (Bokmål)"
   lock_date_cannot_be_after_course_end_a473158b: "Lås Datoen kan ikke være etter kurs sluttet"
@@ -7625,6 +7630,18 @@ nb:
   logged_out_user: "Avlogget bruker %{user_counter}"
   login: 
     canvas: 
+      forgot_password_link: 
+        dont_know_password: "Glemt passord?"
+      legacy_login_content: 
+        back_to_login: "Tilbake til innlogging"
+        browse_courses: "Bla gjennom kurs"
+        buttons: 
+          request_password: "Be om passord"
+        labels: 
+          password: Passord
+          remember_me: "Forbli innlogget"
+        log_in: "Logg på"
+        login_handle: "Skriv inn %{login_handle_name} og vi vil sende deg en lenke til gjenoppretting."
       mobile_login: 
         back_to_login: "Tilbake til innlogging"
         buttons: 
@@ -7648,6 +7665,18 @@ nb:
         login_handle: "Skriv inn %{login_handle_name}, så sender vi deg en lenke for å endre passordet."
         page_title: "Logg inn på Canvas"
         register_for_canvas: "*Trenger du en Canvas-konto?* **Klikk her, det er gratis.**"
+      new_login_content: 
+        ? "User Research"
+        : User-research
+        back_to_login: "Tilbake til innlogging"
+        browse_courses: "Bla gjennom kurs"
+        buttons: 
+          request_password: "Be om passord"
+        labels: 
+          password: Passord
+          remember_me: "Forbli innlogget"
+        log_in: "Logg på"
+        login_handle: "Skriv inn %{login_handle_name} og vi vil sende deg en lenke til gjenoppretting."
     logout_confirm: 
       cancel: Avbryt
       details: 
