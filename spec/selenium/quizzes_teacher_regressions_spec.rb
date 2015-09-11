@@ -117,7 +117,7 @@ describe 'quizzes regressions' do
   end
 
   it 'loads existing due date data into the form', priority: "1", test_id: 209961 do
-    @quiz = create_quiz_with_default_due_dates
+    @quiz = create_quiz_with_due_date
     get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
     wait_for_ajaximations
     compare_assignment_times(@quiz.reload)

@@ -42,7 +42,7 @@ describe "quizzes" do
     end
 
     it "should show a summary of due dates if there are multiple", priority: "1", test_id: 210054 do
-      create_quiz_with_default_due_dates
+      create_quiz_with_due_date
       get "/courses/#{@course.id}/quizzes"
       expect(f('.item-group-container .date-available')).not_to include_text "Multiple Dates"
       add_due_date_override(@quiz)
@@ -604,7 +604,7 @@ describe "quizzes" do
     end
 
     it "should create overrides", priority: "2", test_id: 210074 do
-      @quiz = create_quiz_with_default_due_dates
+      @quiz = create_quiz_with_due_date
       default_section = @course.course_sections.first
       other_section = @course.course_sections.create!(:name => "other section")
       default_section_due = Time.zone.now + 1.days

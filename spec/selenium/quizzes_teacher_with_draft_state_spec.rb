@@ -58,7 +58,7 @@ describe 'quizzes with draft state' do
   context 'when there are multiple due dates' do
 
     it 'shows a due date summary', priority: "2", test_id: 210053 do
-      create_quiz_with_default_due_dates
+      create_quiz_with_due_date
       get "/courses/#{@course.id}/quizzes"
       expect(f('.ig-details .date-due')).not_to include_text 'Multiple Dates'
       expect(f('.ig-details .date-available')).not_to include_text 'Multiple Dates'
