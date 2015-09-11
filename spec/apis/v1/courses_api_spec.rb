@@ -78,6 +78,17 @@ describe Api::V1::Course do
       expect(@test_api.course_json(@course1, @me, {}, [], []).has_key?("apply_assignment_group_weights")).to be_truthy
     end
 
+    it "should not show details if user is restricted from access by course dates" do
+      @student = student_in_course(:course => @course2).user
+      @course2.conclude_at = 2.weeks.ago
+      @course2.restrict_enrollments_to_course_dates = true
+      @course2.restrict_student_past_view = true
+      @course2.save!
+
+      json = @test_api.course_json(@course2, @student, {}, ['access_restricted_by_date'], @student.student_enrollments)
+      expect(json).to eq({"id" => @course2.id, "access_restricted_by_date" => true})
+    end
+
     it "should include course progress" do
       mod = @course2.context_modules.create!(:name => "some module", :require_sequential_progress => true)
       assignment = @course2.assignments.create!(:title => "some assignment")
@@ -1111,7 +1122,7 @@ describe CoursesController, type: :request do
 
   it "should include term name in course list if requested" do
     [@course1.enrollment_term, @course2.enrollment_term].each do |term|
-      term.start_at = 1.day.from_now
+      term.start_at = 1.day.ago
       term.end_at = 2.days.from_now
       term.save!
     end

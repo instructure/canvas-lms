@@ -262,6 +262,11 @@ require 'securerandom'
 #         "course_format": {
 #           "example": "online",
 #           "type": "string"
+#         },
+#         "access_restricted_by_date": {
+#           "description": "optional: this will be true if this user is currently prevented from viewing the course because of date restriction settings",
+#           "example": false,
+#           "type": "boolean"
 #         }
 #       }
 #     }
@@ -426,11 +431,13 @@ class CoursesController < ApplicationController
         end
 
         includes = Set.new(Array(params[:include]))
-
+        includes << 'access_restricted_by_date'
         # We only want to return the permissions for single courses and not lists of courses.
         includes.delete 'permissions'
 
         hash = []
+
+        Canvas::Builders::EnrollmentDateBuilder.preload(enrollments)
         enrollments_by_course = enrollments.group_by(&:course_id).values
         enrollments_by_course = Api.paginate(enrollments_by_course, self, api_v1_courses_url) if api_request?
         enrollments_by_course.each do |course_enrollments|
