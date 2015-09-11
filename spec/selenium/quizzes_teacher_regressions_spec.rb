@@ -12,17 +12,6 @@ describe 'quizzes regressions' do
     @course.reload
   end
 
-  it 'correctly hides form when cancelling quiz edit', priority: "1", test_id: 209956 do
-    get "/courses/#{@course.id}/quizzes/new"
-
-    wait_for_tiny f('#quiz_description')
-    click_questions_tab
-    click_new_question_button
-    expect(ff('.question_holder .question_form').length).to eq 1
-    f('.question_holder .question_form .cancel_link').click
-    expect(ff('.question_holder .question_form').length).to eq 0
-  end
-
   it 'calendar pops up on top of #main', priority: "1", test_id: 209957 do
     get "/courses/#{@course.id}/quizzes/new"
     wait_for_ajaximations
@@ -60,6 +49,7 @@ describe 'quizzes regressions' do
   end
 
   it 'marks questions as answered when the window loses focus', priority: "1", test_id: 209959 do
+    skip('This spec is fragile')
     @quiz = quiz_with_new_questions do |bank, quiz|
       aq1 = bank.assessment_questions.create!
       aq2 = bank.assessment_questions.create!
@@ -114,13 +104,6 @@ describe 'quizzes regressions' do
     end
 
     compare_assignment_times(Quizzes::Quiz.where(title: 'VDD Quiz').first)
-  end
-
-  it 'loads existing due date data into the form', priority: "1", test_id: 209961 do
-    @quiz = create_quiz_with_due_date
-    get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
-    wait_for_ajaximations
-    compare_assignment_times(@quiz.reload)
   end
 
   it 'doesn\'t show \'use for grading\' as an option in rubrics', priority: "2", test_id: 209962 do
