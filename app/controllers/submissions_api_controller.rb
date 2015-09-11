@@ -710,6 +710,45 @@ class SubmissionsApiController < ApplicationController
     end
   end
 
+  # @API List gradeable students
+  #
+  # List students eligible to submit the assignment. The caller must have permission to view grades.
+  #
+  # Section-limited instructors will only see students in their own sections.
+  #
+  # returns [UserDisplay]
+  def gradeable_students
+    if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
+      @assignment = @context.assignments.active.find(params[:assignment_id])
+      includes = Array(params[:include])
+      student_scope = context.students_visible_to(@current_user)
+      student_scope = @assignment.students_with_visibility(student_scope)
+      student_scope = student_scope.order(:id)
+      students = Api.paginate(student_scope, self, api_v1_course_assignment_gradeable_students_url(@context, @assignment))
+      if (include_pg = includes.include?('provisional_grades'))
+        return unless authorized_action(@context, @current_user, :moderate_grades)
+        submissions = @assignment.submissions.where(user_id: students).preload(:provisional_grades).index_by(&:user_id)
+        selections = @assignment.moderated_grading_selections.where(student_id: students).index_by(&:student_id)
+      end
+      render :json => students.map { |student|
+        json = user_display_json(student, @context)
+        if include_pg
+          selection = selections[student.id]
+          json.merge!(in_moderation_set: selection.present?,
+                      selected_provisional_grade_id: selection && selection.selected_provisional_grade_id)
+          sub = submissions[student.id]
+          pg_list = if sub
+            sub.provisional_grades.sort_by { |pg| pg.created_at }.map(&:grade_attributes)
+          else
+            []
+          end
+          json.merge!({ provisional_grades: pg_list })
+        end
+        json
+      }
+    end
+  end
+
   # @API Grade or comment on multiple submissions
   #
   # Update the grading and comments on multiple student's assignment

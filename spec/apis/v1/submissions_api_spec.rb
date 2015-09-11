@@ -3297,4 +3297,83 @@ describe 'Submissions API', type: :request do
       end
     end
   end
+
+  describe "list_gradeable_students" do
+    before(:once) do
+      course_with_teacher :active_all => true
+      ta_in_course :active_all => true
+      @student1 = student_in_course(:active_all => true).user
+      @student2 = student_in_course(:active_all => true).user
+      @course.root_account.allow_feature! :moderated_grading
+      @course.enable_feature! :moderated_grading
+      @assignment = @course.assignments.build
+      @assignment.moderated_grading = true
+      @assignment.save!
+      @assignment.submit_homework @student1, :body => 'EHLO'
+      @path = "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/gradeable_students"
+      @params = { :controller => 'submissions_api', :action => 'gradeable_students',
+                  :format => 'json', :course_id => @course.to_param, :assignment_id => @assignment.to_param }
+    end
+
+    it "should require grading rights" do
+      api_call_as_user(@student1, :get, @path, @params, {}, {}, { :expected_status => 401 })
+    end
+
+    it "should list students with and without submissions" do
+      json = api_call_as_user(@ta, :get, @path, @params)
+      expect(json.map { |el| el['id'] }).to match_array([@student1.id, @student2.id])
+    end
+
+    it "should paginate" do
+      json = api_call_as_user(@teacher, :get, @path + "?per_page=1", @params.merge(:per_page => '1'))
+      expect(json.size).to eq 1
+      expect(response.headers).to include 'Link'
+      expect(response.headers['Link']).to match(/rel="next"/)
+    end
+
+    describe "include[]=provisional_grades" do
+      before(:once) do
+        @path = "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/gradeable_students?include[]=provisional_grades"
+        @params = { :controller => 'submissions_api', :action => 'gradeable_students',
+                    :format => 'json', :course_id => @course.to_param, :assignment_id => @assignment.to_param,
+                    :include => [ 'provisional_grades' ] }
+      end
+
+      it "should require :moderate_grades permission" do
+        api_call_as_user(@ta, :get, @path, @params, {}, {}, { :expected_status => 401 })
+      end
+
+      it "should include provisional grades with selections" do
+        sub = @assignment.grade_student(@student1, :score => 90, :grader => @ta, :provisional => true).first
+        pg = sub.provisional_grades.first
+        sel = @assignment.moderated_grading_selections.build
+        sel.student_id = @student1.id
+        sel.selected_provisional_grade_id = pg.id
+        sel.save!
+        json = api_call_as_user(@teacher, :get, @path, @params)
+        expect(json).to match_array(
+          [{"id"=>@student1.id,
+            "display_name"=>"User",
+            "avatar_image_url"=>"https://localhost/images/messages/avatar-50.png",
+            "html_url"=>"http://www.example.com/courses/#{@course.id}/users/#{@student1.id}",
+            "in_moderation_set"=>true,
+            "selected_provisional_grade_id"=>pg.id,
+            "provisional_grades"=>
+              [{"grade"=>"90",
+                "score"=>90,
+                "graded_at"=>pg.graded_at.iso8601,
+                "scorer_id"=>@ta.id,
+                "provisional_grade_id"=>pg.id,
+                "grade_matches_current_submission"=>true}]},
+           {"id"=>@student2.id,
+            "display_name"=>"User",
+            "avatar_image_url"=>"https://localhost/images/messages/avatar-50.png",
+            "html_url"=>"http://www.example.com/courses/#{@course.id}/users/#{@student2.id}",
+            "in_moderation_set"=>false,
+            "selected_provisional_grade_id"=>nil,
+            "provisional_grades"=>[]}]
+        )
+      end
+    end
+  end
 end
