@@ -1198,16 +1198,27 @@ describe User do
       expect(User.name_parts('Cody Cutrer')).to eq ['Cody', 'Cutrer', nil]
       expect(User.name_parts('  Cody  Cutrer   ')).to eq ['Cody', 'Cutrer', nil]
       expect(User.name_parts('Cutrer, Cody')).to eq ['Cody', 'Cutrer', nil]
+      expect(User.name_parts('Cutrer, Cody',
+                             likely_already_surname_first: true)).to eq ['Cody', 'Cutrer', nil]
       expect(User.name_parts('Cutrer, Cody Houston')).to eq ['Cody Houston', 'Cutrer', nil]
+      expect(User.name_parts('Cutrer, Cody Houston',
+                             likely_already_surname_first: true)).to eq ['Cody Houston', 'Cutrer', nil]
       expect(User.name_parts('St. Clair, John')).to eq ['John', 'St. Clair', nil]
+      expect(User.name_parts('St. Clair, John',
+                             likely_already_surname_first: true)).to eq ['John', 'St. Clair', nil]
       # sorry, can't figure this out
       expect(User.name_parts('John St. Clair')).to eq ['John St.', 'Clair', nil]
       expect(User.name_parts('Jefferson Thomas Cutrer IV')).to eq ['Jefferson Thomas', 'Cutrer', 'IV']
       expect(User.name_parts('Jefferson Thomas Cutrer, IV')).to eq ['Jefferson Thomas', 'Cutrer', 'IV']
       expect(User.name_parts('Cutrer, Jefferson, IV')).to eq ['Jefferson', 'Cutrer', 'IV']
+      expect(User.name_parts('Cutrer, Jefferson, IV',
+                             likely_already_surname_first: true)).to eq ['Jefferson', 'Cutrer', 'IV']
       expect(User.name_parts('Cutrer, Jefferson IV')).to eq ['Jefferson', 'Cutrer', 'IV']
+      expect(User.name_parts('Cutrer, Jefferson IV',
+                             likely_already_surname_first: true)).to eq ['Jefferson', 'Cutrer', 'IV']
       expect(User.name_parts(nil)).to eq [nil, nil, nil]
       expect(User.name_parts('Bob')).to eq ['Bob', nil, nil]
+      expect(User.name_parts('Ho, Chi, Min')).to eq ['Chi Min', 'Ho', nil]
       expect(User.name_parts('Ho, Chi, Min')).to eq ['Chi Min', 'Ho', nil]
       # sorry, don't understand cultures that put the surname first
       # they should just manually specify their sort name
@@ -1215,10 +1226,17 @@ describe User do
       expect(User.name_parts('')).to eq [nil, nil, nil]
       expect(User.name_parts('John Doe')).to eq ['John', 'Doe', nil]
       expect(User.name_parts('Junior')).to eq ['Junior', nil, nil]
-      expect(User.name_parts('John St. Clair', 'St. Clair')).to eq ['John', 'St. Clair', nil]
-      expect(User.name_parts('John St. Clair', 'Cutrer')).to eq ['John St.', 'Clair', nil]
-      expect(User.name_parts('St. Clair', 'St. Clair')).to eq [nil, 'St. Clair', nil]
+      expect(User.name_parts('John St. Clair', prior_surname: 'St. Clair')).to eq ['John', 'St. Clair', nil]
+      expect(User.name_parts('John St. Clair', prior_surname: 'Cutrer')).to eq ['John St.', 'Clair', nil]
+      expect(User.name_parts('St. Clair', prior_surname: 'St. Clair')).to eq [nil, 'St. Clair', nil]
       expect(User.name_parts('St. Clair,')).to eq [nil, 'St. Clair', nil]
+      # don't get confused by given names that look like suffixes
+      expect(User.name_parts('Duing, Vi')).to eq ['Vi', 'Duing', nil]
+      # we can't be perfect. don't know what to do with this
+      expect(User.name_parts('Duing Chi Min, Vi')).to eq ['Duing Chi', 'Min', 'Vi']
+      # unless we thought it was already last name first
+      expect(User.name_parts('Duing Chi Min, Vi',
+                             likely_already_surname_first: true)).to eq ['Vi', 'Duing Chi Min', nil]
     end
 
     it "should keep the sortable_name up to date if all that changed is the name" do
