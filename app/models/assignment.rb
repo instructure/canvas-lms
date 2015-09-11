@@ -155,8 +155,16 @@ class Assignment < ActiveRecord::Base
     if moderated_grading_changed? && graded_submissions_exist?
       errors.add :moderated_grading, I18n.t("Moderated grading setting cannot be changed if graded submissions exist")
     end
-    if (moderated_grading_changed? || new_record?) && moderated_grading? && !graded?
-      errors.add :moderated_grading, I18n.t("Moderated grading setting cannot be enabled for ungraded assignments")
+    if (moderated_grading_changed? || new_record?) && moderated_grading?
+      if !graded?
+        errors.add :moderated_grading, I18n.t("Moderated grading setting cannot be enabled for ungraded assignments")
+      end
+      if has_group_category?
+        errors.add :moderated_grading, I18n.t("Moderated grading setting cannot be enabled for group assignments")
+      end
+      if peer_reviews
+        errors.add :moderated_grading, I18n.t("Moderated grading setting cannot be enabled for peer reviewed assignments")
+      end
     end
   end
 

@@ -3604,6 +3604,22 @@ describe Assignment do
       expect(@assignment.errors[:moderated_grading]).to be_present
     end
 
+    it "does not allow turning on if is also peer reviewed" do
+      assignment_model(course: @course)
+      @assignment.peer_reviews = true
+      @assignment.moderated_grading = true
+      expect(@assignment.save).to eq false
+      expect(@assignment.errors[:moderated_grading]).to be_present
+    end
+
+    it "does not allow turning on if also a group assignment" do
+      assignment_model(course: @course)
+      @assignment.group_category = @course.group_categories.create!(name: "groups")
+      @assignment.moderated_grading = true
+      expect(@assignment.save).to eq false
+      expect(@assignment.errors[:moderated_grading]).to be_present
+    end
+
     it "does not allow turning off if graded submissions exist" do
       assignment_model(course: @course, moderated_grading: true)
       expect(@assignment).to be_moderated_grading
