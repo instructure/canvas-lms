@@ -59,11 +59,6 @@ define [
     component = buildComponent()
     ok(innerHTML(component).match(/%/))
 
-  test 'is not editable', ->
-    component = buildComponent()
-    Simulate.click(component)
-    notOk(component.refs.cell.props.className.match(/editable/))
-
   test 'displays "-" if points possible is 0', ->
     props = defaultProps
     props.rowData.assignmentGroups = [{assignments: []}]

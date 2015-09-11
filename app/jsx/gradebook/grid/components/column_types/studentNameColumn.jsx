@@ -10,16 +10,28 @@ define([
 
   var StudentNameColumn = React.createClass({
     mixins: [Reflux.connect(GradebookToolbarStore, "toolbarOptions")],
+
+    renderHiddenName() {
+      var hiddenText = I18n.t('Hidden');
+      return <span title={hiddenText}>{hiddenText}</span>;
+    },
+
+    renderStudentName() {
+      var enrollment = this.props.rowData.enrollment,
+          displayName = GradebookConstants.list_students_by_sortable_name_enabled ?
+                          enrollment.user.sortable_name : enrollment.user.name;
+
+      return <a title={displayName}
+                href={enrollment.html_url}>{displayName}</a>;
+    },
+
     render() {
       var hideStudentNames = this.state.toolbarOptions.hideStudentNames;
-      if (hideStudentNames) {
-        return <span>{I18n.t('Hidden')}</span>;
-      } else {
-        var enrollment = this.props.rowData.enrollment;
-        var displayName = GradebookConstants.list_students_by_sortable_name_enabled ?
-          enrollment.user.sortable_name : enrollment.user.name;
-        return <a href={enrollment.html_url}>{displayName}</a>;
-      }
+      return (
+        <div className="student-name">
+          {(hideStudentNames) ? this.renderHiddenName() : this.renderStudentName()}
+        </div>
+      );
     }
   });
 

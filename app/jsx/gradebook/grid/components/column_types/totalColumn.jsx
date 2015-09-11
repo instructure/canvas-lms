@@ -82,7 +82,7 @@ define([
 
       gradeFormatter = new GradeFormatter(total.score, total.possible, showPoints);
       return (
-        <div className='gradebook-cell' ref="cell" title={TotalColumn.getWarning(assignmentGroups)}>
+        <div ref="cell" title={TotalColumn.getWarning(assignmentGroups)}>
           { TotalColumn.getWarning(assignmentGroups) && <i ref="icon" className='icon-warning final-warning' />}
           <span ref="totalGrade">{ gradeFormatter.toString() }</span>
         </div>

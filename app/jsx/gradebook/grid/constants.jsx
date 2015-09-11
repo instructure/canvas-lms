@@ -14,8 +14,8 @@ define([
     ASSIGNMENT_GROUP_COLUMN_ID: 'assignment_group',
     MOUNT_ELEMENT: document.getElementById('gradebook-grid-wrapper'),
     DEFAULT_LAYOUTS: {
-      headers: { width: 150, height: 50, flexGrow: 0, paddingAdjustment: 20 },
-      rows: { height: 38 }
+      headers: { width: 150, height: 40, flexGrow: 0, paddingAdjustment: 20 },
+      rows: { height: 36 }
     },
     SUBMISSION_RESPONSE_FIELDS: [
       'id',

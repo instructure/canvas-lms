@@ -63,6 +63,11 @@ define([
       }
     },
 
+    getWidth() {
+      var paddingAdjustment = GradebookConstants.DEFAULT_LAYOUTS.headers.paddingAdjustment;
+      return this.props.width - paddingAdjustment;
+    },
+
     label(columnData) {
       var assignment, label;
 
@@ -70,14 +75,10 @@ define([
       label = this.props.label;
 
       if (assignment) {
-        var paddingAdjustment = GradebookConstants.DEFAULT_LAYOUTS.headers.paddingAdjustment,
-            className = "assignment-name" + ((assignment.muted) ? ' muted' : '');
-
+        var className = "assignment-name" + ((assignment.muted) ? ' muted' : '');
         return (
-          <div className='gradebook-label' style={{width: this.props.width - paddingAdjustment}}>
-            <a className={className}
-               title={label}
-               href={assignment.html_url}>
+          <div className='gradebook-label' style={{width: this.getWidth()}}>
+            <a className={className} title={label} href={assignment.html_url}>
               { this.shouldDisplayAssignmentWarning() && <i ref="icon" title={this.getTitle()} className="icon-warning"></i> }
               {label}
             </a>
@@ -85,7 +86,7 @@ define([
         );
       }
 
-      return {label};
+      return label;
     },
 
     renderDropdown(columnData) {
@@ -117,12 +118,17 @@ define([
 
     render() {
       var columnData = this.props.columnData,
-          dueDate    = this.headerDate(columnData);
+          dueDate    = this.headerDate(columnData),
+          className  = (dueDate) ? '' : ' title',
+	  label = this.label(columnData);
+
       return (
-        <div className='gradebook-header-column'>
-          {this.label(columnData)}
+        <div style={{width: this.getWidth()}}
+	     title={label}
+	     className={'gradebook-label gradebook-header-column' + className}>
+          {label}
           {this.renderDropdown(columnData)}
-          <div className='assignment-due-date' ref='dueDate'>
+          <div title={dueDate} className='assignment-due-date' ref='dueDate'>
             {dueDate}
           </div>
         </div>

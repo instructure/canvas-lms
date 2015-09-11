@@ -73,7 +73,7 @@ define([
         className += ' active';
       }
       return (
-        <div>
+        <div className="assignment-grade-cell">
           <a ref="detailsDialog"
              href="#"
              onClick={this.handleSubmissionCommentClick}
