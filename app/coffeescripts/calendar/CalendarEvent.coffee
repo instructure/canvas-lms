@@ -13,7 +13,8 @@ define [
 
     _filterAttributes: (obj) ->
       filtered = _(obj).pick 'start_at', 'end_at', 'title', 'description',
-        'context_code', 'remove_child_events', 'location_name', 'location_address', 'duplicate'
+        'context_code', 'remove_child_events', 'location_name',
+        'location_address', 'duplicate', 'comments'
       if obj.use_section_dates && obj.child_event_data
         filtered.child_event_data = _.chain(obj.child_event_data)
           .compact()
@@ -71,4 +72,3 @@ define [
         section = _(sections).find (section) -> section.id == sectionId
         section.event = child
       eventData
-

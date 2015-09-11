@@ -42,7 +42,7 @@ module Api::V1::CalendarEvent
     duplicates = options[:duplicates] || []
     participant = nil
 
-    hash = api_json(event, user, session, :only => %w(id created_at updated_at start_at end_at all_day all_day_date title location_address location_name workflow_state))
+    hash = api_json(event, user, session, :only => %w(id created_at updated_at start_at end_at all_day all_day_date title location_address location_name workflow_state comments))
     if event.context_type == "CourseSection"
       hash['title'] += " (#{context.name})"
       hash['description'] = api_user_content(event.description, event.context.course) unless excludes.include?('description')
@@ -96,6 +96,7 @@ module Api::V1::CalendarEvent
         participant = context.participant_for(user)
         participant_child_events = event.child_events_for(participant)
         hash['reserved'] = (Array === participant_child_events ? participant_child_events.present? : participant_child_events.exists?)
+        hash['reserve_comments'] = participant_child_events.map(&:comments).compact.join(", ")
         hash['reserve_url'] = api_v1_calendar_event_reserve_url(event, participant)
       else
         hash['reserve_url'] = api_v1_calendar_event_reserve_url(event, '{{ id }}')

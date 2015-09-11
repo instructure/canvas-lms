@@ -553,6 +553,22 @@ describe CalendarEvent do
       expect(r1.reload).to be_deleted
     end
 
+    it "should save comments with appointment" do
+      ag = AppointmentGroup.create(:title => "test", :contexts => [@course],
+                                   :max_appointments_per_participant => 1,
+                                   :new_appointments => [['2012-01-01 12:00:00',
+                                                          '2012-01-01 13:00:00'],
+                                                         ['2012-01-01 13:00:00',
+                                                          '2012-01-01 14:00:00']
+                                                        ]
+                                  )
+      ag.publish!
+      appointment = ag.appointments.first
+      r1 = appointment.reserve_for(@student1, @student1, :comments => "my appointment notes")
+      r1.reload
+      expect(r1.comments).to eq("my appointment notes")
+    end
+
     it "should enforce the section" do
       ag = AppointmentGroup.create(:title => "test", :contexts => [@course.course_sections.create],
         :new_appointments => [['2012-01-01 12:00:00', '2012-01-01 13:00:00']]

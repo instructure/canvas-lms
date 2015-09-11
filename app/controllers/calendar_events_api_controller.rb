@@ -440,6 +440,9 @@ class CalendarEventsApiController < ApplicationController
   #   User or group id for whom you are making the reservation (depends on the
   #   participant type). Defaults to the current user (or user's candidate group).
   #
+  # @argument comments [String]
+  #  Comments to associate with this reservation
+  #
   # @argument cancel_existing [Boolean]
   #   Defaults to false. If true, cancel any previous reservation(s) for this
   #   participant and appointment group.
@@ -461,7 +464,10 @@ class CalendarEventsApiController < ApplicationController
           participant = nil if participant && params[:participant_id] && params[:participant_id].to_i != participant.id
         end
         raise CalendarEvent::ReservationError, "invalid participant" unless participant
-        reservation = @event.reserve_for(participant, @current_user, :cancel_existing => value_to_boolean(params[:cancel_existing]))
+        reservation = @event.reserve_for(participant, @current_user,
+                                          cancel_existing: value_to_boolean(params[:cancel_existing]),
+                                          comments: params['comments']
+                                        )
         render :json => event_json(reservation, @current_user, session)
       rescue CalendarEvent::ReservationError => err
         reservations = participant ? @event.appointment_group.reservations_for(participant) : []

@@ -29,13 +29,13 @@ class CalendarEvent < ActiveRecord::Base
   attr_accessible :title, :description, :start_at, :end_at, :location_name,
       :location_address, :time_zone_edited, :cancel_reason,
       :participants_per_appointment, :child_event_data,
-      :remove_child_events, :all_day
+      :remove_child_events, :all_day, :comments
   attr_accessor :cancel_reason, :imported
 
   EXPORTABLE_ATTRIBUTES = [
     :id, :title, :description, :location_name, :location_address, :start_at, :end_at, :context_id, :context_type, :workflow_state, :created_at, :updated_at,
     :user_id, :all_day, :all_day_date, :deleted_at, :cloned_item_id, :context_code, :time_zone_edited, :parent_calendar_event_id, :effective_context_code,
-    :participants_per_appointment, :override_participants_per_appointment
+    :participants_per_appointment, :override_participants_per_appointment, :comments
   ]
 
   EXPORTABLE_ASSOCIATIONS = [:context, :user, :child_events]
@@ -55,6 +55,7 @@ class CalendarEvent < ActiveRecord::Base
   validates_associated :context, :if => lambda { |record| record.validate_context }
   validates_length_of :description, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true
+  validates_length_of :comments, maximum: 255, allow_nil: true, allow_blank: true
   before_save :default_values
   after_save :touch_context
   after_save :replace_child_events
@@ -454,6 +455,7 @@ class CalendarEvent < ActiveRecord::Base
       event.updating_user = user
       event.context = participant
       event.workflow_state = :locked
+      event.comments = options[:comments]
       event.save!
       if active?
         self.workflow_state = 'locked'
@@ -656,4 +658,3 @@ class CalendarEvent < ActiveRecord::Base
     end
   end
 end
-
