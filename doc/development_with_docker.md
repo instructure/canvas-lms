@@ -29,7 +29,6 @@ is happy.
 
 Dinghy currently requires OS X Yosemite. Make sure you're using the most recent
 Dinghy release, or else you'll probably have a bad time.
-```
 
 #### Docker-Compose
 
