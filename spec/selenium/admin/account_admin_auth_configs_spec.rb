@@ -1,5 +1,5 @@
-require File.expand_path(File.dirname(__FILE__) + '/common')
-require File.expand_path(File.dirname(__FILE__) + '/helpers/accounts_auth_configs_common')
+require File.expand_path(File.dirname(__FILE__) + '/../common')
+require File.expand_path(File.dirname(__FILE__) + '/../helpers/accounts_auth_configs_common')
 
 describe 'account authentication' do
   include_context 'in-process server selenium tests'

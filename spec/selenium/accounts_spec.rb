@@ -7,15 +7,6 @@ describe "account" do
     course_with_admin_logged_in
   end
 
-  def add_auth_type(auth_type)
-    f("#add-authentication-provider button").click
-    driver.find_elements(:css, "#add-authentication-provider a").each do |link|
-      if link.text == auth_type
-        link.click
-      end
-    end
-  end
-
   describe "course and term create/update" do
 
     it "should show Login and Email fields in add user dialog for delegated auth accounts" do
