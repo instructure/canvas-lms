@@ -672,19 +672,24 @@ describe EnrollmentsApiController, type: :request do
       let(:now) { Time.zone.now }
 
       before :once do
-        @grading_period1 = grading_period_group.grading_periods.create!(
+        @first_grading_period = grading_period_group.grading_periods.create!(
           title: 'first',
           start_date: 2.months.ago(now),
           end_date: now
         )
-        @grading_period2 = grading_period_group.grading_periods.create!(
+        @last_grading_period = grading_period_group.grading_periods.create!(
           title: 'second',
           start_date: now,
           end_date: 2.months.from_now(now)
         )
-
-        @assignment1 = @course.assignments.create! due_at: 2.days.ago(now), points_possible: 10
-        @assignment2 = @course.assignments.create! due_at: 1.day.from_now(now), points_possible: 10
+        @assignment_in_first_period = @course.assignments.create!(
+          due_at: 2.days.ago(now),
+          points_possible: 10
+        )
+        @assignment_in_last_period = @course.assignments.create!(
+          due_at: 1.day.from_now(now),
+          points_possible: 10
+        )
       end
 
       context "multiple grading periods feature flag enabled" do
@@ -692,15 +697,79 @@ describe EnrollmentsApiController, type: :request do
           @course.root_account.enable_feature!(:multiple_grading_periods)
         end
 
-        it "doesn't work for users" do
-          @user_params[:grading_period_id] = @grading_period1.id
-          raw_api_call(:get, @user_path, @user_params)
-          expect(response.status).to eq 403
+        describe "user endpoint" do
+          let!(:enroll_student_in_the_course) do
+            student_in_course({course: @course, user: @user})
+          end
+
+          it "works for users" do
+            @user_params[:grading_period_id] = @first_grading_period.id
+            raw_api_call(:get, @user_path, @user_params)
+            expect(response).to be_ok
+          end
+
+          it "returns an error if the user is not in the grading period" do
+            course = Course.create!
+            grading_period_group = course.grading_period_groups.create!
+            grading_period = grading_period_group.grading_periods.create!(
+              title: "unconnected to the user's course",
+              start_date: 2.months.ago,
+              end_date: 2.months.from_now(now)
+            )
+
+            @user_params[:grading_period_id] = grading_period.id
+            raw_api_call(:get, @user_path, @user_params)
+            expect(response).to_not be_ok
+          end
+
+          describe "grade summary" do
+            let!(:grade_assignments) do
+              first     = @course.assignments.create! due_at: 1.month.ago
+              last      = @course.assignments.create! due_at: 1.month.from_now
+              no_due_at = @course.assignments.create!
+
+              first.grade_student @user, grade: 7
+              last.grade_student @user, grade: 10
+              no_due_at.grade_student @user, grade: 1
+            end
+
+            describe "provides a grade summary" do
+
+              it "for assignments due during the first grading period." do
+                @user_params[:grading_period_id] = @first_grading_period.id
+
+                raw_api_call(:get, @user_path, @user_params)
+                final_score = JSON.parse(response.body).first["grades"]["final_score"]
+                # ten times assignment's grade of 7
+                expect(final_score).to eq 70
+              end
+
+              it "for assignments due during the last grading period." do
+                @user_params[:grading_period_id] = @last_grading_period.id
+                raw_api_call(:get, @user_path, @user_params)
+                final_score = JSON.parse(response.body).first["grades"]["final_score"]
+
+                # ((10 + 1) / 1) * 10 => 110
+                # ((last + no_due_at) / number_of_grading_periods) * 10
+                expect(final_score).to eq 110
+              end
+
+              it "for all assignments when no grading period is specified." do
+                @user_params[:grading_period_id] = nil
+                raw_api_call(:get, @user_path, @user_params)
+                final_score = JSON.parse(response.body).first["grades"]["final_score"]
+
+                # ((7 + 10 + 1) / 2) * 10 => 60
+                # ((first + last + no_due_at) / number_of_grading_periods) * 10
+                expect(final_score).to eq 90
+              end
+            end
+          end
         end
 
         it "returns grades for the requested grading period for courses" do
-          @assignment1.grade_student(@student, grade: 10)
-          @assignment2.grade_student(@student, grade: 0)
+          @assignment_in_first_period.grade_student(@student, grade: 10)
+          @assignment_in_last_period.grade_student(@student, grade: 0)
 
           student_grade = lambda do |json|
             student_json = json.find { |e|
@@ -714,11 +783,11 @@ describe EnrollmentsApiController, type: :request do
           json = api_call(:get, @path, @params)
           expect(student_grade.(json)).to eq 50
 
-          @params[:grading_period_id] = @grading_period1.id
+          @params[:grading_period_id] = @first_grading_period.id
           json = api_call(:get, @path, @params)
           expect(student_grade.(json)).to eq 100
 
-          @params[:grading_period_id] = @grading_period2.id
+          @params[:grading_period_id] = @last_grading_period.id
           json =  api_call(:get, @path, @params)
           expect(student_grade.(json)).to eq 0
         end
@@ -726,7 +795,7 @@ describe EnrollmentsApiController, type: :request do
 
       context "multiple grading periods feature flag disabled" do
         it "should return an error message if the multiple grading periods flag is disabled" do
-          @user_params[:grading_period_id] = @grading_period1.id
+          @user_params[:grading_period_id] = @first_grading_period.id
 
           json = api_call(:get, @user_path, @user_params, {}, {}, { expected_status: 403 })
           expect(json['message']).to eq 'Multiple Grading Periods feature is disabled. Cannot filter by grading_period_id with this feature disabled'

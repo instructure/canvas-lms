@@ -245,20 +245,24 @@ class EnrollmentsApiController < ApplicationController
     enrollments = enrollments.joins(:course) if has_courses
     enrollments = enrollments.shard(@shard_scope) if @shard_scope
     if params[:grading_period_id].present?
-      if !multiple_grading_periods?
-        render_create_errors([@@errors[:multiple_grading_periods_disabled]])
-        return false
-      end
-
       if @context.is_a? User
-        render(
-          json: {message: "grading_period_id can't be specified for users"},
-          status: 403
-        )
-        return false
+        unless @context.account.feature_enabled?(:multiple_grading_periods)
+          render_create_errors([@@errors[:multiple_grading_periods_disabled]])
+          return false
+        end
+
+        grading_period = @context.courses.lazy.map do |course|
+          GradingPeriod.context_find(course, params[:grading_period_id])
+        end.detect(&:present?)
+      else
+        unless multiple_grading_periods?
+          render_create_errors([@@errors[:multiple_grading_periods_disabled]])
+          return false
+        end
+
+        grading_period = GradingPeriod.context_find(@context, params[:grading_period_id])
       end
 
-      grading_period = GradingPeriod.context_find(@context, params[:grading_period_id])
       unless grading_period
         render(:json => {error: "invalid grading_period_id"}, :status => :bad_request)
         return

@@ -194,8 +194,13 @@ module Api::V1::User
 
         if has_grade_permissions?(user, enrollment)
           if opts[:grading_period]
+            student_id = user.id
+            if enrollment.is_a? StudentEnrollment
+              student_id = enrollment.student.id
+            end
+
             course = enrollment.course
-            gc = GradeCalculator.new(user.id, course,
+            gc = GradeCalculator.new(student_id, course,
                                      grading_period: opts[:grading_period])
             ((current, _), (final, _)) = gc.compute_scores.first
             json[:grades][:current_score] = current[:grade]
