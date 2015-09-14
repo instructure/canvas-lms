@@ -2,15 +2,16 @@ require 'spec_helper'
 
 describe ModeratedGrading::ProvisionalGrade do
   subject(:provisional_grade) do
-    submission.provisional_grades.new(grade: 'A', score: 100.0, scorer: user).tap do |grade|
-      grade.scorer = user
+    submission.provisional_grades.new(grade: 'A', score: 100.0, scorer: scorer).tap do |grade|
+      grade.scorer = scorer
     end
   end
-  let(:submission) { assignment.submissions.create!(user: user) }
+  let(:submission) { assignment.submissions.create!(user: student) }
   let(:assignment) { course.assignments.create! submission_types: 'online_text_entry' }
-  let(:course) { Course.create! }
-  let(:user) { User.create! }
-  let(:student) { u = User.create!; course.enroll_student(u); u }
+  let(:account) { a = account_model; a.allow_feature!(:moderated_grading); a}
+  let(:course) { c = account.courses.create!; c.enable_feature!(:moderated_grading); c  }
+  let(:scorer) { user }
+  let(:student) { u = user(:active_user => true); course.enroll_student(u); u }
   let(:now) { Time.zone.now }
 
   it { is_expected.to be_valid }
@@ -36,8 +37,23 @@ describe ModeratedGrading::ProvisionalGrade do
         'score' => 100.0,
         'graded_at' => nil,
         'scorer_id' => provisional_grade.scorer_id,
+        'final' => false,
         'grade_matches_current_submission' => true
       })
+    end
+  end
+
+  describe "final" do
+    it "shares the final provisional grade among moderators" do
+      teacher1 = teacher_in_course(:course => course, :active_all => true).user
+      teacher2 = teacher_in_course(:course => course, :active_all => true).user
+      ta = ta_in_course(:course => course, :active_all => true).user
+
+      teacher1_pg = submission.find_or_create_provisional_grade!(scorer: teacher1, final: true)
+      expect(teacher1_pg.final).to be_truthy
+      teacher2_pg = submission.provisional_grade(teacher2, final: true)
+      expect(teacher2_pg).to eq teacher1_pg
+      expect(teacher1_pg).to eq submission.find_or_create_provisional_grade!(scorer: teacher2, final: true)
     end
   end
 
@@ -47,7 +63,7 @@ describe ModeratedGrading::ProvisionalGrade do
       Timecop.freeze(10.minutes.ago) do
         sub = assignment.submit_homework(student, :submission_type => 'online_text_entry', :body => 'hallo')
       end
-      pg = sub.find_or_create_provisional_grade! scorer: user, score: 1
+      pg = sub.find_or_create_provisional_grade! scorer: scorer, score: 1
       expect(pg.reload.grade_matches_current_submission).to eq true
     end
 
@@ -56,7 +72,7 @@ describe ModeratedGrading::ProvisionalGrade do
       pg = nil
       Timecop.freeze(10.minutes.ago) do
         sub = assignment.submit_homework(student, :submission_type => 'online_text_entry', :body => 'hallo')
-        pg = sub.find_or_create_provisional_grade! scorer: user, score: 1
+        pg = sub.find_or_create_provisional_grade! scorer: scorer, score: 1
       end
       assignment.submit_homework(student, :submission_type => 'online_text_entry', :body => 'resubmit')
       expect(pg.reload.grade_matches_current_submission).to eq false
@@ -66,10 +82,19 @@ describe ModeratedGrading::ProvisionalGrade do
   describe 'unique constraint' do
     it "disallows multiple provisional grades from the same user" do
       pg1 = submission.provisional_grades.build(score: 75)
-      pg1.scorer = user
+      pg1.scorer = scorer
       pg1.save!
       pg2 = submission.provisional_grades.build(score: 80)
-      pg2.scorer = user
+      pg2.scorer = scorer
+      expect { pg2.save! }.to raise_error(ActiveRecord::RecordNotUnique)
+    end
+
+    it "disallows multiple final provisional grades" do
+      pg1 = submission.provisional_grades.build(score: 75, final: true)
+      pg1.scorer = scorer
+      pg1.save!
+      pg2 = submission.provisional_grades.build(score: 80, final: true)
+      pg2.scorer = User.create!
       expect { pg2.save! }.to raise_error(ActiveRecord::RecordNotUnique)
     end
   end
@@ -99,12 +124,12 @@ describe ModeratedGrading::ProvisionalGrade do
 
   describe 'infer_grade' do
     it 'infers a grade if only score is given' do
-      pg = submission.find_or_create_provisional_grade! scorer: user, score: 0
+      pg = submission.find_or_create_provisional_grade! scorer: scorer, score: 0
       expect(pg.grade).not_to be_nil
     end
 
     it 'leaves grade nil if score is nil' do
-      pg = submission.find_or_create_provisional_grade! scorer: user
+      pg = submission.find_or_create_provisional_grade! scorer: scorer
       expect(pg.grade).to be_nil
     end
   end
@@ -116,11 +141,12 @@ describe ModeratedGrading::ProvisionalGrade do
       association = @rubric.associate_with(assignment, course, :purpose => 'grading', :use_for_grading => true)
 
       sub = assignment.submit_homework(student, :submission_type => 'online_text_entry', :body => 'hallo')
-      pg = sub.find_or_create_provisional_grade! scorer: user, score: 1
+      pg = sub.find_or_create_provisional_grade! scorer: scorer, score: 1
 
-      prov_assmt = association.assess(:user => student, :assessor => user, :artifact => pg,
-                                      :assessment => { :assessment_type => 'grading',
-                                                       :"criterion_#{@rubric.criteria_object.first.id}" => { :points => 3, :comments => "good 4 u" } })
+      prov_assmt = association.assess(:user => student, :assessor => scorer, :artifact => pg,
+        :assessment => { :assessment_type => 'grading',
+          :"criterion_#{@rubric.criteria_object.first.id}" => { :points => 3, :comments => "good 4 u" } })
+
 
       expect(prov_assmt.score).to eq 3
 
@@ -128,7 +154,7 @@ describe ModeratedGrading::ProvisionalGrade do
 
       real_assmt = sub.rubric_assessments.first
       expect(real_assmt.score).to eq 3
-      expect(real_assmt.assessor).to eq user
+      expect(real_assmt.assessor).to eq scorer
       expect(real_assmt.rubric_association).to eq association
       expect(real_assmt.data).to eq prov_assmt.data
     end
@@ -139,15 +165,15 @@ describe ModeratedGrading::ProvisionalGrade do
     it "publishes comments to the submission" do
       @course = course
       sub = assignment.submit_homework(student, :submission_type => 'online_text_entry', :body => 'hallo')
-      pg = sub.find_or_create_provisional_grade! scorer: user, score: 1
+      pg = sub.find_or_create_provisional_grade! scorer: scorer, score: 1
       file = assignment.attachments.create! uploaded_data: default_uploaded_data
-      prov_comment = sub.add_comment(commenter: user, message: 'blah', provisional: true, attachments: [file])
+      prov_comment = sub.add_comment(commenter: scorer, message: 'blah', provisional: true, attachments: [file])
 
       pg.send :publish_submission_comments!
 
       real_comment = sub.submission_comments.first
       expect(real_comment.provisional_grade_id).to be_nil
-      expect(real_comment.author).to eq user
+      expect(real_comment.author).to eq scorer
       expect(real_comment.comment).to eq prov_comment.comment
       expect(real_comment.attachments.first).to eq prov_comment.attachments.first
     end
@@ -157,7 +183,7 @@ describe ModeratedGrading::ProvisionalGrade do
     it "publishes a provisional grade" do
       @course = course
       sub = assignment.submit_homework(student, :submission_type => 'online_text_entry', :body => 'hallo')
-      pg = sub.find_or_create_provisional_grade! scorer: user, score: 80
+      pg = sub.find_or_create_provisional_grade! scorer: scorer, score: 80
       sub.reload
       expect(sub.workflow_state).to eq 'submitted'
       expect(sub.graded_at).to be_nil
@@ -173,7 +199,7 @@ describe ModeratedGrading::ProvisionalGrade do
       expect(sub.grade_matches_current_submission).to eq true
       expect(sub.workflow_state).to eq 'graded'
       expect(sub.graded_at).not_to be_nil
-      expect(sub.grader_id).to eq user.id
+      expect(sub.grader_id).to eq scorer.id
       expect(sub.score).to eq 80
       expect(sub.grade).not_to be_nil
     end
@@ -183,12 +209,23 @@ end
 describe ModeratedGrading::NullProvisionalGrade do
   describe 'grade_attributes' do
     it "returns the proper format" do
-      expect(ModeratedGrading::NullProvisionalGrade.new(1).grade_attributes).to eq({
+      expect(ModeratedGrading::NullProvisionalGrade.new(1, false).grade_attributes).to eq({
         'provisional_grade_id' => nil,
         'grade' => nil,
         'score' => nil,
         'graded_at' => nil,
         'scorer_id' => 1,
+        'final' => false,
+        'grade_matches_current_submission' => true
+      })
+
+      expect(ModeratedGrading::NullProvisionalGrade.new(2, true).grade_attributes).to eq({
+        'provisional_grade_id' => nil,
+        'grade' => nil,
+        'score' => nil,
+        'graded_at' => nil,
+        'scorer_id' => 2,
+        'final' => true,
         'grade_matches_current_submission' => true
       })
     end

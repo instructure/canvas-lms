@@ -366,20 +366,45 @@ describe SubmissionsController do
       expect(@submission.reload.student_entered_score).to eq 2.0
     end
 
-    it "should create a provisional comment" do
-      course_with_student(:active_all => true)
-      user_session @teacher
-      @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_url,online_upload")
-      @submission = @assignment.submit_homework(@user)
-      put 'update', :format => :json, :course_id => @course.id, :assignment_id => @assignment.id, :id => @user.id,
-          :submission => {:comment => "provisional!", :provisional => true}
+    context "moderated grading" do
+      before :once do
+        course_with_student(:active_all => true)
+        @course.root_account.allow_feature!(:moderated_grading)
+        @course.enable_feature!(:moderated_grading)
+        @assignment = @course.assignments.create!(:title => "some assignment",
+          :submission_types => "online_url,online_upload", :moderated_grading => true)
+        @submission = @assignment.submit_homework(@user)
+      end
 
-      @submission.reload
-      expect(@submission.submission_comments.first).to be_nil
-      expect(@submission.provisional_grade(@teacher).submission_comments.first.comment).to eq 'provisional!'
+      before :each do
+        user_session @teacher
+      end
 
-      json = JSON.parse response.body
-      expect(json[0]['submission']['submission_comments'].first['submission_comment']['comment']).to eq 'provisional!'
+      it "should create a provisional comment" do
+        put 'update', :format => :json, :course_id => @course.id, :assignment_id => @assignment.id, :id => @user.id,
+            :submission => {:comment => "provisional!", :provisional => true}
+
+        @submission.reload
+        expect(@submission.submission_comments.first).to be_nil
+        expect(@submission.provisional_grade(@teacher).submission_comments.first.comment).to eq 'provisional!'
+
+        json = JSON.parse response.body
+        expect(json[0]['submission']['submission_comments'].first['submission_comment']['comment']).to eq 'provisional!'
+      end
+
+      it "should create a final provisional comment" do
+        put 'update', :format => :json, :course_id => @course.id, :assignment_id => @assignment.id, :id => @user.id,
+          :submission => {:comment => "provisional!", :provisional => true, :final => true}
+
+        @submission.reload
+        expect(@submission.submission_comments.first).to be_nil
+        pg = @submission.provisional_grade(@teacher, true)
+        expect(pg.submission_comments.first.comment).to eq 'provisional!'
+        expect(pg.final).to be_truthy
+
+        json = JSON.parse response.body
+        expect(json[0]['submission']['submission_comments'].first['submission_comment']['comment']).to eq 'provisional!'
+      end
     end
   end
 

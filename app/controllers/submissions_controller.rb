@@ -579,7 +579,7 @@ class SubmissionsController < ApplicationController
     @assignment = @context.assignments.active.find(params[:assignment_id])
     @user = @context.all_students.find(params[:id])
     @submission = @assignment.find_or_create_submission(@user)
-    provisional = params[:submission][:provisional]
+    provisional = @assignment.moderated_grading? && params[:submission][:provisional]
 
     if params[:submission][:student_entered_score] && @submission.grants_right?(@current_user, session, :comment)
       update_student_entered_score(params[:submission][:student_entered_score])
@@ -609,7 +609,8 @@ class SubmissionsController < ApplicationController
           :assessment_request => @request,
           :group_comment => params[:submission][:group_comment],
           :hidden => @assignment.muted? && admin_in_context,
-          :provisional => provisional
+          :provisional => provisional,
+          :final => params[:submission][:final]
         }
       end
       begin
@@ -621,9 +622,10 @@ class SubmissionsController < ApplicationController
       respond_to do |format|
         if @submissions
           @submissions = @submissions.select{|s| s.grants_right?(@current_user, session, :read) }
+          is_final = provisional && params[:submission][:final] && @context.grants_right?(@current_user, :moderate_grades)
           @submissions.each do |s|
             s.limit_comments(@current_user, session) unless @submission.grants_right?(@current_user, session, :submit)
-            s.apply_provisional_grade_filter!(s.provisional_grade(@current_user)) if provisional
+            s.apply_provisional_grade_filter!(s.provisional_grade(@current_user, is_final)) if provisional
           end
 
           flash[:notice] = t('assignment_submitted', 'Assignment submitted.')

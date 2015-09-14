@@ -917,17 +917,24 @@ class Submission < ActiveRecord::Base
     false
   end
 
-  def provisional_grade(scorer)
-    self.provisional_grades.where(scorer_id: scorer).first || ModeratedGrading::NullProvisionalGrade.new(scorer.id)
+  def provisional_grade(scorer, final=false)
+    pg = if final
+      self.provisional_grades.final.first
+    else
+      self.provisional_grades.not_final.where(scorer_id: scorer).first
+    end
+    pg ||= ModeratedGrading::NullProvisionalGrade.new(scorer.id, final)
+    pg
   end
 
-  def find_or_create_provisional_grade!(scorer:, score: nil, grade: nil, force_save: false)
+  def find_or_create_provisional_grade!(scorer:, score: nil, grade: nil, force_save: false, final: false)
     ModeratedGrading::ProvisionalGrade.unique_constraint_retry do
-      pg = self.provisional_grades.where(scorer_id: scorer).first
+      pg = final ? self.provisional_grades.final.first : self.provisional_grades.not_final.where(scorer_id: scorer).first
       unless pg
         pg = self.provisional_grades.build
-        pg.scorer_id = scorer.id
       end
+      pg.scorer_id = scorer.id
+      pg.final = !!final
       pg.grade = grade if grade
       pg.score = score if score
       pg.force_save = force_save
@@ -949,7 +956,7 @@ class Submission < ActiveRecord::Base
       end
     end
     if opts.delete(:provisional)
-      pg = find_or_create_provisional_grade!(scorer: opts[:author])
+      pg = find_or_create_provisional_grade!(scorer: opts[:author], final: opts.delete(:final))
       opts[:provisional_grade_id] = pg.id
     end
     self.save! if self.new_record?

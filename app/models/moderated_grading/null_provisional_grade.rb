@@ -1,6 +1,7 @@
 class ModeratedGrading::NullProvisionalGrade
-  def initialize(scorer_id)
+  def initialize(scorer_id, final)
     @scorer_id = scorer_id
+    @final = final
   end
 
   def grade_attributes
@@ -10,6 +11,7 @@ class ModeratedGrading::NullProvisionalGrade
       'score' => nil,
       'graded_at' => nil,
       'scorer_id' => @scorer_id,
+      'final' => @final,
       'grade_matches_current_submission' => true
     }
   end

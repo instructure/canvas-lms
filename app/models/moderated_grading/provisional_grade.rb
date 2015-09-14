@@ -1,7 +1,7 @@
 class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
   include Canvas::GradeValidations
 
-  attr_accessible :grade, :score
+  attr_accessible :grade, :score, :final
   attr_writer :force_save
 
   belongs_to :submission
@@ -16,6 +16,8 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
   validates :submission, presence: true
 
   scope :scored_by, ->(scorer) { where(scorer_id: scorer) }
+  scope :final, -> { where(:final => true)}
+  scope :not_final, -> { where(:final => false)}
 
   def valid?(*)
     infer_grade
@@ -24,7 +26,7 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
   end
 
   def grade_attributes
-    self.as_json(:only => [:grade, :score, :graded_at, :scorer_id],
+    self.as_json(:only => [:grade, :score, :graded_at, :scorer_id, :final],
                  :methods => [:provisional_grade_id, :grade_matches_current_submission],
                  :include_root => false)
   end

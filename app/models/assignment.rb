@@ -41,7 +41,7 @@ class Assignment < ActiveRecord::Base
     :notify_of_update, :time_zone_edited, :turnitin_enabled,
     :turnitin_settings, :context, :position, :allowed_extensions,
     :external_tool_tag_attributes, :freeze_on_copy,
-    :only_visible_to_overrides, :post_to_sis, :integration_id, :integration_data
+    :only_visible_to_overrides, :post_to_sis, :integration_id, :integration_data, :moderated_grading
 
   EXPORTABLE_ATTRIBUTES = [
     :id, :title, :description, :due_at, :unlock_at, :lock_at, :points_possible, :min_score, :max_score, :mastery_score, :grading_type,
@@ -1044,6 +1044,7 @@ class Assignment < ActiveRecord::Base
       :hidden => muted?,
     }
     comment[:provisional] = true if opts[:provisional]
+    comment[:final] = true if opts[:final]
     comment[:group_comment_id] = CanvasSlug.generate_securish_uuid if group_comment && group
     submissions = []
 
@@ -1089,7 +1090,7 @@ class Assignment < ActiveRecord::Base
         previously_graded ? submission.with_versioning(:explicit => true) { submission.save! } : submission.save!
 
         if opts[:provisional]
-          submission.find_or_create_provisional_grade!(scorer: grader, grade: grade, score: score, force_save: true)
+          submission.find_or_create_provisional_grade!(scorer: grader, grade: grade, score: score, force_save: true, final: opts[:final])
         end
       end
       submission.add_comment(comment) if comment && (group_comment || student == original_student)
@@ -1440,7 +1441,7 @@ class Assignment < ActiveRecord::Base
                                    end
 
       if grading_role == :moderator
-        json['provisional_grades'] = sub.provisional_grades.where('scorer_id<>?', user.id).map do |pg|
+        json['provisional_grades'] = sub.provisional_grades.order(:id).map do |pg|
           pg.grade_attributes.tap do |json|
             json[:submission_comments] = pg.submission_comments.as_json(:include_root => false,
                                                                         :methods => avatar_methods,

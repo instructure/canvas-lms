@@ -357,6 +357,7 @@ class GradebooksController < ApplicationController
         @user = users[submission[:user_id].to_i]
         submission[:grader] = @current_user
         submission.delete :comment_attachments
+        submission.delete(:provisional) unless @assignment.moderated_grading?
         if params[:attachments]
           attachments = []
           params[:attachments].each do |idx, attachment|
@@ -376,8 +377,9 @@ class GradebooksController < ApplicationController
           submission[:dont_overwrite_grade] = value_to_boolean(params[:dont_overwrite_grades])
           subs = @assignment.grade_student(@user, submission)
           if submission[:provisional]
+            is_final = submission[:final] && @context.grants_right?(@current_user, :moderate_grades)
             subs.each do |sub|
-              sub.apply_provisional_grade_filter!(sub.provisional_grade(@current_user))
+              sub.apply_provisional_grade_filter!(sub.provisional_grade(@current_user, is_final))
             end
           end
           @submissions += subs

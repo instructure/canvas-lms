@@ -2898,6 +2898,7 @@ describe Assignment do
 
     describe "with moderated grading" do
       before(:once) do
+        Account.default.allow_feature!(:moderated_grading)
         course_with_ta :course => @course, :active_all => true
         assignment_model(:course => @course, :submission_types => 'online_text_entry')
         rubric_model
@@ -2970,11 +2971,11 @@ describe Assignment do
           expect(ras[0]['assessor_id']).to eq @teacher.id
         end
 
-        it "should list all other provisional grades" do
+        it "should list all provisional grades" do
           pgs = @json['submissions'][0]['provisional_grades']
-          expect(pgs.size).to eq 1
+          expect(pgs.size).to eq 2
           expect(pgs.map { |pg| [pg['score'], pg['scorer_id'], pg['submission_comments'][0]['comment']] }).to eq(
-            [[3.0, @ta.id, "other provisional comment"]]
+            [[2.0, @teacher.id, "provisional comment"], [3.0, @ta.id, "other provisional comment"]]
           )
         end
 
