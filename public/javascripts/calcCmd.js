@@ -205,7 +205,7 @@ define([
         } else if(item.token == 'divide') {
           var left = round2.pop();
           var right = round1[idx + 1];
-            round2.push(numberItem(+(compute(left) / compute(right)).toFixed(12)));
+            round2.push(numberItem(compute(left) / compute(right)));
         } else {
           round2.push(round1[idx]);
           round2.push(round1[idx + 1]);
