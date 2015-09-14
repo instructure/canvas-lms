@@ -284,7 +284,7 @@
 .ui-icon-grip-diagonal-se { background-position: -80px -224px; }
 
 .ui-icon-radio-off { background: none !important; }
-.ui-icon-radio-on { 
+.ui-icon-radio-on {
   background: url(/images/icon-checkmark.svg) 0 50% no-repeat !important;
   background-size: 14px;
 }
@@ -306,8 +306,8 @@
 .ui-corner-all, .ui-corner-bottom, .ui-corner-right, .ui-corner-br { border-bottom-right-radius: $baseBorderRadius; }
 
 /* Overlays */
-.ui-widget-overlay { 
-  background: rgba($ic-brand-secondary, 0.75);
+.ui-widget-overlay {
+  background: rgba($ic-color-dark, 0.75);
 }
 .ui-widget-shadow { margin: -8px 0 0 -8px; padding: 8px; background: $bgColorShadow; opacity: $opacityShadow; border-radius: $cornerRadiusShadow; }
 
