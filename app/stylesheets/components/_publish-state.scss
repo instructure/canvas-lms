@@ -70,9 +70,9 @@ The publish button has two states on click (publish and published) and a hover s
 .btn-published {
   &:focus {
     @include button-focus-dark;
-    background: darken($ic-color-success, 10%); 
-    color: $ic-color-light;  
-  } 
+    background: darken($ic-color-success, 10%);
+    color: $ic-color-light;
+  }
 }
 
 .btn-published.disabled,
@@ -98,7 +98,7 @@ The publish button has two states on click (publish and published) and a hover s
 
 .publish-icon {
   @include ic-focus-base;
-  display: inline-block;  
+  display: inline-block;
   color: $ic-color-icon-disabled;
   cursor: pointer;
   &:focus { @include ic-focus-variant; }
@@ -117,5 +117,15 @@ The publish button has two states on click (publish and published) and a hover s
   &.unpublished {
     font-weight: normal;
     color: $ic-color-icon-disabled;
+  }
+
+  &.hiddenState {
+    font-weight: normal;
+    color: $ic-color-alert;
+  }
+
+  &.restricted {
+    font-weight: normal;
+    color: $ic-color-alert;
   }
 }

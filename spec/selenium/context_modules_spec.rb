@@ -1039,7 +1039,7 @@ describe "context modules" do
       get "/courses/#{@course.id}/modules"
       add_new_external_item('External Tool', 'https://www.edu-apps.org/lti_public_resources/launch?driver=khan_academy&remote_id=y2-uaPiyoxc', 'Counting with small numbers')
       expect(fln('Counting with small numbers')).to be_displayed
-      expect(f('span.publish-icon.unpublished.publish-icon-publish > i.icon-unpublished')).to be_displayed
+      expect(f('span.publish-icon.unpublished.publish-icon-publish > i.icon-unpublish')).to be_displayed
     end
 
     it "should add an external tool item to a module" do
@@ -1063,7 +1063,7 @@ describe "context modules" do
       @mod.add_item(type: 'wiki_page', id: @unpub_page.id)
       go_to_modules
       verify_persistence('Unpublished Page')
-      expect(f('span.publish-icon.unpublished.publish-icon-publish > i.icon-unpublished')).to be_displayed
+      expect(f('span.publish-icon.unpublished.publish-icon-publish > i.icon-unpublish')).to be_displayed
      end
 
     it 'should add a published page to a module', priority: "1", test_id: 126710 do
@@ -1081,7 +1081,7 @@ describe "context modules" do
       @mod.add_item(type: 'quiz', id: @unpub_quiz.id)
       go_to_modules
       verify_persistence('Unpublished Quiz')
-      expect(f('span.publish-icon.unpublished.publish-icon-publish > i.icon-unpublished')).to be_displayed
+      expect(f('span.publish-icon.unpublished.publish-icon-publish > i.icon-unpublish')).to be_displayed
     end
 
     it 'should add a published quiz to a module', priority: "1", test_id: 126721 do
@@ -1099,7 +1099,7 @@ describe "context modules" do
       @mod.add_item(type: 'assignment', id: @unpub_assignment.id)
       go_to_modules
       verify_persistence('Unpublished Assignment')
-      expect(f('span.publish-icon.unpublished.publish-icon-publish > i.icon-unpublished')).to be_displayed
+      expect(f('span.publish-icon.unpublished.publish-icon-publish > i.icon-unpublish')).to be_displayed
     end
 
     it 'should add a published assignment to a module', priority: "1", test_id: 126725 do
@@ -1117,7 +1117,7 @@ describe "context modules" do
       @mod.add_item(type: 'discussion_topic', id: @unpub_ungraded_discussion.id)
       go_to_modules
       verify_persistence('Non-graded Unpublished Discussion')
-      expect(f('span.publish-icon.unpublished.publish-icon-publish > i.icon-unpublished')).to be_displayed
+      expect(f('span.publish-icon.unpublished.publish-icon-publish > i.icon-unpublish')).to be_displayed
     end
 
     it 'should add a non-graded published discussion to a module', priority: "1", test_id: 126713 do
@@ -1136,7 +1136,7 @@ describe "context modules" do
       @mod.add_item(type: 'discussion_topic', id: @unpub_graded_discussion.id)
       go_to_modules
       verify_persistence('Graded Unpublished Discussion')
-      expect(f('span.publish-icon.unpublished.publish-icon-publish > i.icon-unpublished')).to be_displayed
+      expect(f('span.publish-icon.unpublished.publish-icon-publish > i.icon-unpublish')).to be_displayed
       expect(f('.points_possible_display').text).to include_text "10 pts"
     end
 
