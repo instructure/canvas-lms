@@ -165,6 +165,11 @@ describe "AuthenticationProviders API", type: :request do
       call_create(@cas_hash)
       expect(@account.open_registration?).to be_falsey
     end
+
+    it "should not allow creation of duplicate singleton providers" do
+      call_create({ auth_type: 'facebook' })
+      call_create({ auth_type: 'facebook' }, 422)
+    end
   end
 
   context "/show" do
