@@ -186,6 +186,7 @@ describe "AuthenticationProviders API", type: :request do
       @saml_hash['login_attribute'] = 'nameid'
       @saml_hash['unknown_user_url'] = nil
       @saml_hash['parent_registration'] = false
+      @saml_hash['jit_provisioning'] = false
       expect(json).to eq @saml_hash
     end
 
@@ -200,6 +201,7 @@ describe "AuthenticationProviders API", type: :request do
       @ldap_hash['auth_over_tls'] = nil
       @ldap_hash['identifier_format'] = nil
       @ldap_hash['position'] = 1
+      @ldap_hash['jit_provisioning'] = false
       expect(json).to eq @ldap_hash
     end
 
@@ -211,6 +213,7 @@ describe "AuthenticationProviders API", type: :request do
       @cas_hash['id'] = aac.id
       @cas_hash['position'] = 1
       @cas_hash['unknown_user_url'] = nil
+      @cas_hash['jit_provisioning'] = false
       expect(json).to eq @cas_hash
     end
 

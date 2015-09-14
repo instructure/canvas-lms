@@ -111,6 +111,7 @@ class Login::SamlController < ApplicationController
         end
 
         pseudonym = @domain_root_account.pseudonyms.for_auth_configuration(unique_id, aac)
+        pseudonym ||= aac.provision_user(unique_id) if aac.jit_provisioning?
 
         if pseudonym
           # We have to reset the session again here -- it's possible to do a

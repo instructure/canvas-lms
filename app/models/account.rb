@@ -211,10 +211,6 @@ class Account < ActiveRecord::Base
   # be nice to be able to see the course first if you weren't expecting the
   # invitation.
   add_setting :allow_invitation_previews, :boolean => true, :root_only => true, :default => false
-  add_setting :self_registration, :boolean => true, :root_only => true, :default => false
-  # if self_registration_type is 'observer', then only observers (i.e. parents) can self register.
-  # if self_registration_type is 'all' or nil, any user type can self register.
-  add_setting :self_registration_type, :root_only => true
   add_setting :large_course_rosters, :boolean => true, :root_only => true, :default => false
   add_setting :edit_institution_email, :boolean => true, :root_only => true, :default => true
   add_setting :js_kaltura_uploader, :boolean => true, :root_only => true, :default => false
@@ -308,22 +304,21 @@ class Account < ActiveRecord::Base
   end
 
   def self_registration?
-    !!settings[:self_registration] && canvas_authentication?
+    canvas_authentication_provider.try(:jit_provisioning?)
   end
 
   def self_registration_type
-    settings[:self_registration_type]
+    canvas_authentication_provider.try(:self_registration)
   end
 
   def self_registration_allowed_for?(type)
     return false unless self_registration?
-    return false if self_registration_type && self_registration_type != 'all' && type != self_registration_type
+    return false if self_registration_type != 'all' && type != self_registration_type
     true
   end
 
   def enable_self_registration
-    settings[:self_registration] = true
-    save!
+    canvas_authentication_provider.update_attribute(:self_registration, true)
   end
 
   def terms_required?

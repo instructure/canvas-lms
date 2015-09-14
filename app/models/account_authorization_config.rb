@@ -153,7 +153,23 @@ class AccountAuthorizationConfig < ActiveRecord::Base
 
   def self.serialization_excludes; [:auth_crypted_password, :auth_password_salt]; end
 
+  def provision_user(unique_id)
+    User.transaction(requires_new: true) do
+      pseudonym = account.pseudonyms.build
+      pseudonym.user = User.create!(name: unique_id, workflow_state: 'registered')
+      pseudonym.authentication_provider = self
+      pseudonym.unique_id = unique_id
+      pseudonym.save!
+      pseudonym
+    end
+  rescue ActiveRecord::RecordNotUnique
+    uncached do
+      pseudonyms.active.by_unique_id(unique_id).first!
+    end
+  end
+
   private
+
   def soft_delete_pseudonyms
     pseudonyms.find_each(&:destroy)
   end

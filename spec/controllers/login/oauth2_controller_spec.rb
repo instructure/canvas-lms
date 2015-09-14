@@ -68,5 +68,20 @@ describe Login::Oauth2Controller do
       expect(response).to redirect_to(login_url)
       expect(flash[:delegated_message]).to_not be_blank
     end
+
+    it "provisions automatically when enabled" do
+      aac.update_attribute(:jit_provisioning, true)
+      aac.any_instantiation.expects(:get_token).returns('token')
+      aac.any_instantiation.expects(:unique_id).with('token').returns('user')
+
+      session[:oauth2_nonce] = 'bob'
+      jwt = Canvas::Security.create_jwt(aac_id: aac.global_id, nonce: 'bob')
+
+      expect(Account.default.pseudonyms.active.by_unique_id('user')).to_not be_exists
+      get :create, state: jwt
+      expect(response).to redirect_to(dashboard_url(login_success: 1))
+      p = Account.default.pseudonyms.active.by_unique_id('user').first!
+      expect(p.authentication_provider).to eq aac
+    end
   end
 end

@@ -1,0 +1,15 @@
+<div class="ic-Form-control ic-Form-control--radio" %>
+  <%= f.label :self_registration, t('Self Registration'), class: 'ic-Label' %>
+  <div class="ic-Radio">
+    <%= f.radio_button :self_registration, 'none', id: "self_registration_none_#{aac.id}", checked: aac.self_registration == 'none' %>
+    <%= f.label :self_registration, t('Disabled'), for: "self_registration_none_#{aac.id}", class: 'ic-Label' %>
+  </div>
+  <div class="ic-Radio">
+    <%= f.radio_button :self_registration, 'all', id: "self_registration_all_#{aac.id}", checked: aac.self_registration == 'all' %>
+    <%= f.label :self_registration, t('All Account Types'), for: "self_registration_all_#{aac.id}", class: 'ic-Label' %>
+  </div>
+  <div class="ic-Radio">
+    <%= f.radio_button :self_registration, 'observer', id: "self_registration_observers_#{aac.id}", checked: aac.self_registration == 'observer' %>
+    <%= f.label :self_registration, t('Observer Accounts Only'), for: "self_registration_observers_#{aac.id}", class: 'ic-Label' %>
+  </div>
+</div>

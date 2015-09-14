@@ -737,7 +737,7 @@ describe "Users API", type: :request do
       end
 
       it "should require an email pseudonym" do
-        @admin.account.settings[:self_registration] = true
+        @admin.account.canvas_authentication_provider.update_attribute(:self_registration, true)
         @admin.account.save!
         raw_api_call(:post, "/api/v1/accounts/#{@admin.account.id}/users",
           { :controller => 'users', :action => 'create', :format => 'json', :account_id => @admin.account.id.to_s },
@@ -750,7 +750,7 @@ describe "Users API", type: :request do
       end
 
       it "should require acceptance of the terms" do
-        @admin.account.settings[:self_registration] = true
+        @admin.account.canvas_authentication_provider.update_attribute(:self_registration, true)
         @admin.account.save!
         raw_api_call(:post, "/api/v1/accounts/#{@admin.account.id}/users",
           { :controller => 'users', :action => 'create', :format => 'json', :account_id => @admin.account.id.to_s },
@@ -763,7 +763,7 @@ describe "Users API", type: :request do
       end
 
       it "should let you create a user if you pass all the validations" do
-        @admin.account.settings[:self_registration] = true
+        @admin.account.canvas_authentication_provider.update_attribute(:self_registration, true)
         @admin.account.save!
         json = api_call(:post, "/api/v1/accounts/#{@admin.account.id}/users",
           { :controller => 'users', :action => 'create', :format => 'json', :account_id => @admin.account.id.to_s },
@@ -854,8 +854,7 @@ describe "Users API", type: :request do
       end
 
       it "should require an email pseudonym" do
-        @admin.account.settings[:self_registration] = true
-        @admin.account.save!
+        @admin.account.canvas_authentication_provider.update_attribute(:self_registration, true)
         raw_api_call(:post, "/api/v1/accounts/#{@admin.account.id}/self_registration",
                      { :controller => 'users', :action => 'create_self_registered_user', :format => 'json', :account_id => @admin.account.id.to_s },
                      {
@@ -867,8 +866,7 @@ describe "Users API", type: :request do
       end
 
       it "should require acceptance of the terms" do
-        @admin.account.settings[:self_registration] = true
-        @admin.account.save!
+        @admin.account.canvas_authentication_provider.update_attribute(:self_registration, true)
         raw_api_call(:post, "/api/v1/accounts/#{@admin.account.id}/self_registration",
                      { :controller => 'users', :action => 'create_self_registered_user', :format => 'json', :account_id => @admin.account.id.to_s },
                      {
@@ -880,8 +878,7 @@ describe "Users API", type: :request do
       end
 
       it "should let you create a user if you pass all the validations" do
-        @admin.account.settings[:self_registration] = true
-        @admin.account.save!
+        @admin.account.canvas_authentication_provider.update_attribute(:self_registration, true)
         json = api_call(:post, "/api/v1/accounts/#{@admin.account.id}/self_registration",
                         { :controller => 'users', :action => 'create_self_registered_user', :format => 'json', :account_id => @admin.account.id.to_s },
                         {
@@ -894,8 +891,7 @@ describe "Users API", type: :request do
     end
 
     it "should return a 400 error if the request doesn't include a unique id" do
-      @admin.account.settings[:self_registration] = true
-      @admin.account.save!
+      @admin.account.canvas_authentication_provider.update_attribute(:self_registration, true)
       raw_api_call(:post, "/api/v1/accounts/#{@admin.account.id}/self_registration",
                    { :controller => 'users',
                      :action => 'create_self_registered_user',
@@ -914,8 +910,7 @@ describe "Users API", type: :request do
     end
 
     it "should set user's email address via communication_channel[address]" do
-      @admin.account.settings[:self_registration] = true
-      @admin.account.save!
+      @admin.account.canvas_authentication_provider.update_attribute(:self_registration, true)
       api_call(:post, "/api/v1/accounts/#{@admin.account.id}/self_registration",
                { :controller => 'users',
                  :action => 'create_self_registered_user',

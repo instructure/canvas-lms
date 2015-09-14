@@ -191,9 +191,7 @@ describe "users" do
 
   context "registration" do
     before :each do
-      a = Account.default
-      a.settings = {:self_registration => true}
-      a.save!
+      Account.default.canvas_authentication_provider.update_attribute(:self_registration, true)
     end
 
     it "should not require terms if globally not configured to do so" do

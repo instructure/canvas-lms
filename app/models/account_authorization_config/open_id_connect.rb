@@ -26,7 +26,13 @@ class AccountAuthorizationConfig::OpenIDConnect < AccountAuthorizationConfig::Oa
   end
 
   def self.recognized_params
-    [ :client_id, :client_secret, :authorize_url, :token_url, :scope, :login_attribute ].freeze
+    [ :client_id,
+      :client_secret,
+      :authorize_url,
+      :token_url,
+      :scope,
+      :login_attribute,
+      :jit_provisioning ].freeze
   end
 
   def login_attribute

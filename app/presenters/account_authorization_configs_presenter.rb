@@ -117,12 +117,6 @@ class AccountAuthorizationConfigsPresenter
     account.parent_registration?
   end
 
-  def last_canvas_provider?(aac)
-    !aac.new_record? &&
-      aac.is_a?(AccountAuthorizationConfig::Canvas) &&
-      !account.authentication_providers.active.where("id<>?", aac).exists?
-  end
-
   private
   def ip_addresses_setting
     Setting.get('account_authorization_config_ip_addresses', nil)

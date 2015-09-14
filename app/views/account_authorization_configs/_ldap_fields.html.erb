@@ -64,3 +64,4 @@
   <%= f.label :auth_password, t('Password'), class: 'ic-Label' %>
   <%= f.password_field :auth_password, class: 'ic-Input' %>
 </div>
+<%= render partial: 'jit_provisioning_field', locals: { f: f, aac: aac } %>

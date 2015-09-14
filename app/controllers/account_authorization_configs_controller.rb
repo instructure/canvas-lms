@@ -115,6 +115,10 @@
 #           "description": "_Deprecated_[2015-05-08: This is moving to an account setting] Valid for SAML and CAS providers.",
 #           "example": "https://canvas.instructure.com/login",
 #           "type": "string"
+#         },
+#         "jit_provisioning": {
+#           "description": "Just In Time provisioning. Valid for all providers except Canvas (which has the similar in concept self_registration setting).",
+#           "type": "boolean"
 #         }
 #       }
 #     }
@@ -188,8 +192,8 @@ class AccountAuthorizationConfigsController < ApplicationController
   #
   # Each authentication provider is specified as a set of parameters as
   # described below. A provider specification must include an 'auth_type'
-  # parameter with a value of 'cas', 'facebook', 'github', 'google', 'ldap',
-  # 'linkedin', 'openid_connect', 'saml', or 'twitter'. The other recognized
+  # parameter with a value of 'canvas', 'cas', 'facebook', 'github', 'google',
+  # 'ldap', 'linkedin', 'openid_connect', 'saml', or 'twitter'. The other recognized
   # parameters depend on this auth_type; unrecognized parameters are discarded.
   # Provider specifications not specifying a valid auth_type are ignored.
   #
@@ -203,7 +207,14 @@ class AccountAuthorizationConfigsController < ApplicationController
   # _Deprecated_ [Use update_sso_settings instead]
   #
   # You can set the 'position' for any configuration. The config in the 1st position
-  # is considered the default.
+  # is considered the default. You can set 'jit_provisioning' for any configuration
+  # besides Canvas.
+  #
+  # For Canvas, the additional recognized parameter is:
+  #
+  # - self_registration
+  #
+  #   'all', 'none', or 'observer' - who is allowed to register as a new user
   #
   # For CAS, the additional recognized parameters are:
   #

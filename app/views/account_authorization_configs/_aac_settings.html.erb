@@ -34,24 +34,22 @@
           </div>
         <% end %>
 
-        <% unless presenter.last_canvas_provider?(aac) %>
-          <div class="ic-Form-actions">
-            <% if !aac.new_record? && @current_pseudonym.authentication_provider != aac %>
-                <%= link_to(account_authentication_provider_url(account, aac),
-                  method: "delete",
-                  rel: 'nofollow',
-                  id: "delete-aac-#{aac.id}",
-                  data: {
-                    confirm: t('Are you sure?'),
-                    disable_with: t('deleting...')
-                  },
-                  class: 'Button Button--danger') do %>
-                  <%= t("Delete") %>
-                <% end %>
-            <% end %>
-            <%= f.button t('Save'), class: "Button Button--primary" %>
-          </div>
-        <% end %>
+        <div class="ic-Form-actions">
+          <% if !aac.new_record? && @current_pseudonym.authentication_provider != aac %>
+              <%= link_to(account_authentication_provider_url(account, aac),
+                method: "delete",
+                rel: 'nofollow',
+                id: "delete-aac-#{aac.id}",
+                data: {
+                  confirm: t('Are you sure?'),
+                  disable_with: t('deleting...')
+                },
+                class: 'Button Button--danger') do %>
+                <%= t("Delete") %>
+              <% end %>
+          <% end %>
+          <%= f.button t('Save'), class: "Button Button--primary" %>
+        </div>
       <% end %>
     </div>
   </div>

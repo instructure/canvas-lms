@@ -64,13 +64,23 @@ class Login::CanvasController < ApplicationController
     @pseudonym_session.remote_ip = request.remote_ip
     found = @pseudonym_session.save
 
-    # look for LDAP pseudonyms where we get the unique_id back from LDAP
+    # look for LDAP pseudonyms where we get the unique_id back from LDAP, or if we're doing JIT provisioning
     if !found && !@pseudonym_session.attempted_record
       found = @domain_root_account.authentication_providers.active.where(auth_type: 'ldap').any? do |aac|
-        next unless aac.identifier_format.present?
+        next unless aac.identifier_format.present? || aac.jit_provisioning?
+
         res = aac.ldap_bind_result(params[:pseudonym_session][:unique_id], params[:pseudonym_session][:password])
-        unique_id = res.first[aac.identifier_format].first if res
-        next unless unique_id && (pseudonym = @domain_root_account.pseudonyms.active.by_unique_id(unique_id).first)
+        next unless res
+        unique_id = if aac.identifier_format.present?
+                      res.first[aac.identifier_format].first
+                    else
+                      params[:pseudonym_session][:unique_id]
+                    end
+        next unless unique_id
+
+        pseudonym = @domain_root_account.pseudonyms.active.by_unique_id(unique_id).first
+        pseudonym ||= aac.provision_user(unique_id) if aac.jit_provisioning?
+        next unless pseudonym
 
         pseudonym.instance_variable_set(:@ldap_result, res.first)
         @pseudonym_session = PseudonymSession.new(pseudonym, params[:pseudonym_session][:remember_me] == "1")
