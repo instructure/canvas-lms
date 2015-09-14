@@ -22,15 +22,23 @@ define([
     renderAccounts() {
       if (!this.props.hasLoaded) {
         return (
-          <li className="ReactTray__loading-list-item">
+          <li className="ReactTray-list-item ReactTray-list-item--loading-message">
             {I18n.t('Loading')} &hellip;
           </li>
         );
       }
       var accounts = this.props.accounts.map((account) => {
-        return <li key={account.id}><a href={`/accounts/${account.id}`}>{account.name}</a></li>;
+        return (
+          <li key={account.id} className='ReactTray-list-item'>
+            <a href={`/accounts/${account.id}`} className='ReactTray-list-item__link'>{account.name}</a>
+          </li>
+        );
       });
-      accounts.push(<li key='allAccountLink' className='ReactTray__feature-list-item'><a href='/accounts'>{I18n.t('All Accounts')}</a></li>);
+      accounts.push(
+        <li key='allAccountLink' className='ReactTray-list-item ReactTray-list-item--feature-item'>
+          <a href='/accounts'>{I18n.t('All Accounts')}</a>
+        </li>
+      );
       return accounts;
     },
 

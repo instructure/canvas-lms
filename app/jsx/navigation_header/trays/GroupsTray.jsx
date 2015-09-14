@@ -22,7 +22,7 @@ define([
     renderCurrentGroups() {
       if (!this.props.hasLoaded) {
         return (
-          <li className="ReactTray__loading-list-item">
+          <li className="ReactTray-list-item ReactTray-list-item--loading-message">
             {I18n.t('Loading')} &hellip;
           </li>
         );
@@ -32,7 +32,11 @@ define([
           return <li key={group.id}><a href={`/groups/${group.id}`}>{group.name}</a></li>;
         };
       });
-      groups.push(<li key='allGroupsLink' className='ReactTray__feature-list-item'><a href='/groups'>{I18n.t('All Groups')}</a></li>);
+      groups.push(
+        <li key='allGroupsLink' className='ReactTray-list-item ReactTray-list-item--feature-item'>
+          <a href='/groups' className='ReactTray-list-item__link'>{I18n.t('All Groups')}</a>
+        </li>
+      );
       return groups;
     },
 
