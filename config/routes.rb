@@ -961,6 +961,11 @@ CanvasRails::Application.routes.draw do
       get 'groups/:group_id/assignments/:assignment_id/override', action: :group_alias
     end
 
+    scope(controller: :moderation_set) do
+      get 'courses/:course_id/assignments/:assignment_id/moderated_students', action: :index, as: :moderated_students
+      post 'courses/:course_id/assignments/:assignment_id/moderated_students', action: :create
+    end
+
     scope(controller: :submissions_api) do
       [%w(course course), %w(section course_section)].each do |(context, path_prefix)|
         post "#{context.pluralize}/:#{context}_id/submissions/update_grades", action: :bulk_update
