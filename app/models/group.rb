@@ -565,7 +565,7 @@ class Group < ActiveRecord::Base
     if self.context.is_a?(Course)
       return self.context.enrollments.not_fake.except(:preload).where(:user_id => user.id).exists?
     elsif self.context.is_a?(Account)
-      return self.context.user_account_associations.where(:user_id => user.id).exists?
+      return self.context.root_account.user_account_associations.where(:user_id => user.id).exists?
     end
     return false
   end
