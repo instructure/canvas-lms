@@ -89,7 +89,14 @@ class GradebooksController < ApplicationController
 
   def light_weight_ags_json(assignment_groups, opts={})
     assignment_groups.map do |ag|
-      assignments = ag.visible_assignments(opts[:student] || @current_user).map do |a|
+      visible_assignments = ag.visible_assignments(opts[:student] || @current_user)
+
+      if multiple_grading_periods? && @current_grading_period_id && !view_all_grading_periods?
+        current_period = GradingPeriod.context_find(@context, @current_grading_period_id)
+        visible_assignments = current_period.assignments_for_student(visible_assignments, opts[:student])
+      end
+
+      visible_assignments.map! do |a|
         {
           :id => a.id,
           :submission_types => a.submission_types_array,
@@ -97,11 +104,12 @@ class GradebooksController < ApplicationController
           :due_at => a.due_at
         }
       end
+
       {
         :id           => ag.id,
         :rules        => ag.rules_hash({stringify_json_ids: true}),
         :group_weight => ag.group_weight,
-        :assignments  => assignments,
+        :assignments  => visible_assignments,
       }
     end
   end
@@ -226,8 +234,8 @@ class GradebooksController < ApplicationController
   def set_current_grading_period
     unless @current_grading_period_id = params[:grading_period_id].presence
       return if view_all_grading_periods?
-      return unless current = GradingPeriod.for(@context).find(&:current?)
-      @current_grading_period_id = current.id.to_s
+      current = GradingPeriod.for(@context).find(&:current?)
+      @current_grading_period_id = current ? current.id.to_s : '0'
     end
   end
 

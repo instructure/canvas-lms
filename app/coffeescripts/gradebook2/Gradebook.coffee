@@ -104,9 +104,6 @@ define [
 
       gotAllStudents = $.Deferred().done => @gotAllStudents()
 
-      # this method should be removed after a month in production
-      @alignCoursePreferencesWithLocalStorage()
-
       assignmentGroupsParams = {exclude_descriptions: true}
       if @mgpEnabled && @gradingPeriodToShow && @gradingPeriodToShow != '0' && @gradingPeriodToShow != ''
         $.extend(assignmentGroupsParams, {grading_period_id: @gradingPeriodToShow})
@@ -287,7 +284,6 @@ define [
           assignment.assignment_group = group
           assignment.due_at = tz.parse(assignment.due_at)
           @assignments[assignment.id] = assignment
-
       @postGradesStore.setGradeBookAssignments @assignments
 
     gotCourse: (course) =>
@@ -318,6 +314,9 @@ define [
 
     gotAllStudents: ->
       @withAllStudents (students) =>
+        if @mgpEnabled
+          gradingPeriods = @indexedGradingPeriods()
+          overrides = @indexedOverrides()
         for student_id, student of students
           student.computed_current_score ||= 0
           student.computed_final_score ||= 0
@@ -336,8 +335,10 @@ define [
           # fill in dummy submissions, so there's something there even if the
           # student didn't submit anything for that assignment
           for assignment_id, assignment of @assignments
-            student["assignment_#{assignment_id}"] ||= { assignment_id: assignment_id, user_id: student_id }
-
+            student["assignment_#{assignment_id}"] ?= { assignment_id: assignment_id, user_id: student_id }
+            submission = student["assignment_#{assignment_id}"]
+            if @submissionOutsideOfGradingPeriod(submission, student, gradingPeriods, overrides)
+              submission.hidden = true
           @rows.push(student)
 
     defaultSortType: 'assignment_group'
@@ -606,6 +607,9 @@ define [
       activeCell = @grid.getActiveCell()
       editing = $(@grid.getActiveCellNode()).hasClass('editable')
       columns = @grid.getColumns()
+      if @mgpEnabled
+        gradingPeriods = @indexedGradingPeriods()
+        overrides = @indexedOverrides()
       for submission in submissions
         student = @student(submission.user_id)
         idToMatch = "assignment_#{submission.assignment_id}"
@@ -616,6 +620,7 @@ define [
           activeCell.cell is cell
         #check for DA visible
         submission["hidden"] = !submission.assignment_visible if submission.assignment_visible?
+        submission.hidden = true if @submissionOutsideOfGradingPeriod(submission, student, gradingPeriods, overrides)
         @updateAssignmentVisibilities(submission) if submission["hidden"]
         @updateSubmission(submission)
         @calculateStudentGrade(student)
@@ -645,6 +650,73 @@ define [
             SubmissionCell.out_of.formatter(row, col, submission, assignment)
           else
             (SubmissionCell[assignment.grading_type] || SubmissionCell).formatter(row, col, submission, assignment, @grid)
+
+
+    indexedOverrides: ->
+      indexed = { studentOverrides: {}, sectionOverrides: {} }
+      _.each @assignments, (assignment) ->
+        if assignment.has_overrides
+          _.each assignment.overrides, (override) ->
+            if override.student_ids
+              indexed.studentOverrides[assignment.id] ?= {}
+              _.each override.student_ids, (studentId) ->
+                indexed.studentOverrides[assignment.id][studentId] = override
+            else if sectionId = override.course_section_id
+              indexed.sectionOverrides[assignment.id] ?= {}
+              indexed.sectionOverrides[assignment.id][sectionId] = override
+      indexed
+
+    indexedGradingPeriods: ->
+      _.indexBy @gradingPeriods, 'id'
+
+    submissionOutsideOfGradingPeriod: (submission, student, gradingPeriods, overrides) ->
+      return false unless @mgpEnabled
+      selectedPeriodId = @gradingPeriodToShow
+      return false if @isAllGradingPeriods(selectedPeriodId)
+
+      assignment = @assignments[submission.assignment_id]
+      gradingPeriod = gradingPeriods[selectedPeriodId]
+      effectiveDueAt = assignment.due_at
+
+      if assignment.has_overrides
+        # we'll eventually need to consider group overrides here
+        # (group overrides are not yet a feature but are planned)
+        sectionOverrides = []
+        sectionOverridesOnAssignment = overrides.sectionOverrides[assignment.id]
+        if sectionOverridesOnAssignment
+          _.each student.sections, (sectionId) ->
+            sectionOverride = sectionOverridesOnAssignment[sectionId]
+            sectionOverrides.push sectionOverride if sectionOverride
+
+        studentOverrides = []
+        studentOverridesOnAssignment = overrides.studentOverrides[assignment.id]
+        if studentOverridesOnAssignment
+          studentOverride = studentOverridesOnAssignment[student.id]
+          studentOverrides.push studentOverride if studentOverride
+
+        allOverridesForSubmission = sectionOverrides.concat studentOverrides
+        overrideDates = _.chain(allOverridesForSubmission)
+          .pluck('due_at')
+          .map((dateString) -> tz.parse(dateString))
+          .value()
+
+        if overrideDates.length > 0
+          nullDueAtsExist = _.any(overrideDates, (date) -> _.isNull(date))
+          effectiveDueAt = if nullDueAtsExist then null else _.max(overrideDates)
+        else
+          return true if assignment.only_visible_to_overrides
+
+      showSubmission = @lastGradingPeriodAndDueAtNull(gradingPeriod, effectiveDueAt) || @dateIsInGradingPeriod(gradingPeriod, effectiveDueAt)
+      !showSubmission
+
+    lastGradingPeriodAndDueAtNull: (gradingPeriod, dueAt) ->
+      gradingPeriod.is_last && _.isNull(dueAt)
+
+    dateIsInGradingPeriod: (gradingPeriod, date) ->
+      return false if _.isNull(date)
+      startDate = tz.parse(gradingPeriod.start_date)
+      endDate = tz.parse(gradingPeriod.end_date)
+      startDate < date && date <= endDate
 
     staticCellFormatter: (row, col, val) ->
       "<div class='cell-content gradebook-cell'>#{htmlEscape(val)}</div>"
@@ -1553,11 +1625,3 @@ define [
 
     isAllGradingPeriods: (currentPeriodId) ->
       currentPeriodId == "0"
-
-    # this method should be removed after a month in production
-    alignCoursePreferencesWithLocalStorage: () ->
-      local_storage_show_point_totals = userSettings.contextGet('show_point_totals')
-      if local_storage_show_point_totals and local_storage_show_point_totals != @options.show_total_grade_as_points
-        @options.show_total_grade_as_points = local_storage_show_point_totals
-        userSettings.contextRemove('show_point_totals')
-        $.ajaxJSON @options.setting_update_url, "PUT", show_total_grade_as_points: @options.show_total_grade_as_points
