@@ -283,8 +283,12 @@ class Account < ActiveRecord::Base
     authentication_providers.active.where("auth_type<>'canvas'").exists?
   end
 
+  def canvas_authentication_provider
+    @canvas_ap ||= authentication_providers.active.where(auth_type: 'canvas').first
+  end
+
   def canvas_authentication?
-    authentication_providers.active.where(auth_type: 'canvas').exists? || !authentication_providers.active.exists?
+    !!canvas_authentication_provider || !authentication_providers.active.exists?
   end
 
   def enable_canvas_authentication
