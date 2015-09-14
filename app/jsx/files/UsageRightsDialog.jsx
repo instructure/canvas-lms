@@ -3,10 +3,11 @@ define([
   'compiled/react_files/components/UsageRightsDialog',
   'i18n!usage_rights_modal',
   'jsx/files/UsageRightsSelectBox',
+  'jsx/files/RestrictedRadioButtons',
   'jsx/files/DialogPreview',
   'compiled/models/Folder',
   'str/htmlEscape'
-], function (React, UsageRightsDialog, I18n, UsageRightsSelectBox, DialogPreview, Folder, htmlEscape) {
+], function (React, UsageRightsDialog, I18n, UsageRightsSelectBox, RestrictedRadioButtons, DialogPreview, Folder, htmlEscape) {
 
   var MAX_THUMBNAILS_TO_SHOW = 5;
   var MAX_FOLDERS_TO_SHOW = 2;
@@ -123,10 +124,7 @@ define([
           </div>
         </div>
         <div className='ReactModal__Body'>
-          <div
-            className='form-dialog'
-            ref='form'
-          >
+          <div ref='form'>
             <div>
               <div className='UsageRightsDialog__paddingFix grid-row'>
                 <div className='UsageRightsDialog__previewColumn col-xs-3'>
@@ -144,6 +142,15 @@ define([
                     cc_value={this.cc_value}
                   >
                   </UsageRightsSelectBox>
+                  <hr />
+                  <div className='form-horizontal'>
+                  <p className="manage-access">{I18n.t("You can also manage access at this time:")}</p>
+                  <RestrictedRadioButtons
+                    ref='restrictedSelection'
+                    models={this.props.itemsToManage}
+                  >
+                  </RestrictedRadioButtons>
+                  </div>
                 </div>
               </div>
             </div>

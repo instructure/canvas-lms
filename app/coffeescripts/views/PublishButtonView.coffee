@@ -136,7 +136,7 @@ define [
         text:        I18n.t 'buttons.publish', 'Publish'
         label:       I18n.t 'buttons.publish_desc', 'Unpublished. Click to publish.'
         buttonClass: @publishClass
-        iconClass:   'icon-unpublished'
+        iconClass:   'icon-unpublish'
 
     renderPublished: ->
       @renderState
