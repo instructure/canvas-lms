@@ -755,6 +755,30 @@ class SubmissionsApiController < ApplicationController
     end
   end
 
+  # undocumented @API Select provisional grade
+  #
+  # Choose which provisional grade the student should receive for a submission.
+  # The caller must have :moderate_grades rights.
+  #
+  # @example_response
+  #   {
+  #     "assignment_id": 867,
+  #     "student_id": 5309,
+  #     "selected_provisional_grade_id": 53669
+  #   }
+  #
+  def select_provisional_grade
+    if authorized_action(@context, @current_user, :moderate_grades)
+      assignment = @context.assignments.active.find(params[:assignment_id])
+      pg = assignment.provisional_grades.find(params[:provisional_grade_id])
+      selection = assignment.moderated_grading_selections.where(student_id: pg.submission.user_id).first
+      return render :json => { :message => 'student not in moderation set' }, :status => :bad_request unless selection
+      selection.provisional_grade = pg
+      selection.save!
+      render :json => selection.as_json(:include_root => false, :only => %w(assignment_id student_id selected_provisional_grade_id))
+    end
+  end
+
   # @API Grade or comment on multiple submissions
   #
   # Update the grading and comments on multiple student's assignment

@@ -3395,4 +3395,49 @@ describe 'Submissions API', type: :request do
       end
     end
   end
+
+  describe "select_provisional_grade" do
+    before(:once) do
+      course_with_student :active_all => true
+      ta_in_course :active_all => true
+      @course.root_account.allow_feature! :moderated_grading
+      @course.enable_feature! :moderated_grading
+      @assignment = @course.assignments.build
+      @assignment.moderated_grading = true
+      @assignment.save!
+      subs = @assignment.grade_student @student, :grader => @ta, :score => 0, :provisional => true
+      @pg = subs.first.provisional_grade(@ta)
+      @path = "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/select_provisional_grade/#{@pg.id}"
+      @params = { :controller => 'submissions_api', :action => 'select_provisional_grade',
+                  :format => 'json', :course_id => @course.to_param, :assignment_id => @assignment.to_param,
+                  :provisional_grade_id => @pg.to_param }
+    end
+
+    it "should fail if the student isn't in the moderation set" do
+      json = api_call_as_user(@teacher, :put, @path, @params, {}, {}, { :expected_status => 400 })
+      expect(json['message']).to eq 'student not in moderation set'
+    end
+
+    context "with moderation set" do
+      before(:once) do
+        @selection = @assignment.moderated_grading_selections.build
+        @selection.student_id = @student.id
+        @selection.save!
+      end
+
+      it "should require :moderate_grades" do
+        api_call_as_user(@ta, :put, @path, @params, {}, {}, { :expected_status => 401 })
+      end
+
+      it "should select a provisional grade" do
+        json = api_call_as_user(@teacher, :put, @path, @params)
+        expect(json).to eq({
+                             'assignment_id' => @assignment.id,
+                             'student_id' => @student.id,
+                             'selected_provisional_grade_id' => @pg.id
+                           })
+        expect(@selection.reload.provisional_grade).to eq(@pg)
+      end
+    end
+  end
 end

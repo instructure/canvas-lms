@@ -65,6 +65,7 @@ class Assignment < ActiveRecord::Base
   attr_reader :assignment_changed
 
   has_many :submissions, :dependent => :destroy
+  has_many :provisional_grades, :through => :submissions
   has_many :attachments, :as => :context, :dependent => :destroy
   has_many :assignment_student_visibilities
   has_one :quiz, class_name: 'Quizzes::Quiz'
