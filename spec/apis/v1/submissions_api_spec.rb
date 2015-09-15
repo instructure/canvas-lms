@@ -3294,6 +3294,24 @@ describe 'Submissions API', type: :request do
           @student.reload
           expect(@student.messages.map(&:notification_name)).to be_include 'Submission Graded'
         end
+
+        it "publishes the selected provisional grade when the student is in the moderation set" do
+          @submission.provisional_grade(@ta).update_attribute(:graded_at, 1.minute.ago)
+
+          @other_ta = user :active_user => true
+          @course.enroll_ta @other_ta, :enrollment_state => 'active'
+          @assignment.grade_student(@student, { :grader => @other_ta, :score => 90, :provisional => true })
+          sel = @assignment.moderated_grading_selections.build
+          sel.student_id = @student.id
+          sel.selected_provisional_grade_id = @submission.provisional_grade(@other_ta).id
+          sel.save!
+
+          api_call_as_user(@teacher, :post, @path, @params)
+
+          expect(@submission.reload.workflow_state).to eq 'graded'
+          expect(@submission.grader).to eq @other_ta
+          expect(@submission.score).to eq 90
+        end
       end
     end
   end

@@ -671,9 +671,7 @@ class SubmissionsApiController < ApplicationController
   # Use the "Select provisional grade" endpoint to choose which provisional grade to publish
   # for a particular submission.
   #
-  # NOTE: The preceding paragraph is a lie, because provisional grade selection is not yet implemented.
-  # What will _actually_ happen is, we'll publish the first provisional grade for the submission
-  # (by graded_at date).
+  # Students not in the moderation set will have their one and only provisional grade published.
   #
   # WARNING: This is irreversible. This will overwrite any existing grades in the gradebook.
   #
@@ -694,12 +692,20 @@ class SubmissionsApiController < ApplicationController
 
       submissions = @assignment.submissions.preload(:all_submission_comments,
                                                      { :provisional_grades => :rubric_assessments })
+      selections = @assignment.moderated_grading_selections.index_by(&:student_id)
       submissions.each do |submission|
-        # TODO M2 use an actual selection instead of just picking the first one
-        selected_provisional_grade = submission.provisional_grades
-          .select { |pg| pg.graded_at.present? }
-          .sort_by { |pg| pg.graded_at }
-          .first
+        if (selection = selections[submission.user_id])
+          # student in moderation: choose the selected provisional grade
+          selected_provisional_grade = submission.provisional_grades
+            .detect { |pg| pg.id == selection.selected_provisional_grade_id }
+        else
+          # student not in moderation: choose the first one with a grade (there should only be one)
+          selected_provisional_grade = submission.provisional_grades
+            .select { |pg| pg.graded_at.present? }
+            .sort_by { |pg| pg.created_at }
+            .first
+        end
+
         if selected_provisional_grade
           selected_provisional_grade.publish!
         end
