@@ -265,44 +265,6 @@ describe "profile" do
       expect(is_checked('#account_services_avatars')).to be_truthy
     end
 
-    it 'should give option to change profile pic', priority: "1", test_id: 68936 do
-      course_with_teacher_logged_in
-
-      new_student = User.create!(name: 'newStudent@example.com')
-      @course.enroll_student(new_student)
-      new_admin = User.create!(name: 'newAdmin@example.com')
-      Account.site_admin.account_users.create!(user: new_admin)
-
-      user_list = [@teacher, new_student, new_admin]
-      user_list.each do |the_user|
-        user_session(the_user)
-        a = Account.default
-        a.enable_service('avatars')
-        a.settings[:enable_profiles] = true
-        a.save!
-
-        get "/profile/settings"
-        driver.mouse.move_to f('.avatar.profile_pic_link.none')
-        wait_for_ajaximations
-
-        # We want to make sure the tooltip is displayed,
-        # but are limited to assuming that with almost all popular browsers...
-        # "The information is most often shown as a tooltip text when the mouse moves over the element."
-        # ...as shown in HTML title attribute at http://www.w3schools.com/tags/att_global_title.asp
-        expect(f('.avatar.profile_pic_link.none').attribute('title')).to eq 'Click to change profile pic'
-
-        fln(the_user.name).click
-        wait_for_ajaximations
-
-        driver.mouse.move_to f('.avatar.profile-link')
-        wait_for_ajaximations
-
-        # We are checking the title in this tooltip like we do in the one above,
-        # given the same limitation.
-        expect(f('.avatar.profile-link').attribute('title')).to eq 'Click to change profile pic'
-      end
-    end
-
     it "should successfully upload profile pictures" do
       skip("intermittently fails")
       course_with_teacher_logged_in
