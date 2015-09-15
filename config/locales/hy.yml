@@ -9494,6 +9494,7 @@ hy:
   must_achieve_mastery_at_least_count_times_scores_a_628db168: "Պետք է անցողիկ միավորներ ապահովի առնվազն %{count} անգամ: Անցողիկից ավելի բարձր միավորները միջինացվելու են վերջնական միավորները հաշվարկելու համար:"
   must_mark_as_done_bf6cc563: "պետք է նշվի որպես կատարված"
   must_mark_assignment_as_done_e3e4af88: "Պետք է նշվի հանձնարարությունը որպես կատարված"
+  must_score_at_least_points_points_16a7548e: "Արդյունքը պետք է լինի առնվազն %{score} միավոր"
   must_submit_assignment_ae38221c: "Պետք է հանձնել հանձնարարությունը"
   must_submit_new_oauth2_request_e1fb00bb: "Պետք է ներկայացնել OAuth2  նոր հարցում"
   must_supply_file_ids_and_or_folder_ids_parameter_9d29448c: "Պետք է ավելացնել 'file_ids' և/կամ 'folder_ids' պարամետրը "
