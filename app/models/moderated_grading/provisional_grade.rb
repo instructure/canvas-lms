@@ -15,9 +15,15 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
   validates :scorer, presence: true
   validates :submission, presence: true
 
+  after_create :touch_graders # to update grading counts
+
   scope :scored_by, ->(scorer) { where(scorer_id: scorer) }
   scope :final, -> { where(:final => true)}
   scope :not_final, -> { where(:final => false)}
+
+  def touch_graders
+    submission.touch_graders
+  end
 
   def valid?(*)
     infer_grade

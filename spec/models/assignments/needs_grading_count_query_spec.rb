@@ -109,6 +109,49 @@ module Assignments
           expect(count[:needs_grading_count]).to eql(1)
         end
       end
+
+      context "moderated grading count" do
+        before do
+          @assignment = @course.assignments.create(:title => "some assignment",
+            :submission_types => ['online_text_entry'], :moderated_grading => true)
+          @students = []
+          3.times do
+            student = student_in_course(:course => @course, :active_all => true).user
+            @assignment.submit_homework(student, :submission_type => "online_text_entry", :body => "o hai")
+            @students << student
+          end
+
+          @ta1 = ta_in_course(:course => course, :active_all => true).user
+          @ta2 = ta_in_course(:course => course, :active_all => true).user
+        end
+
+        it "should only include students with no marks when unmoderated" do
+          querier = NeedsGradingCountQuery.new(@assignment, @teacher)
+          expect(querier.count).to eq 3
+
+          @students[0].submissions.first.find_or_create_provisional_grade!(scorer: @teacher)
+          expect(querier.count).to eq 2
+
+          @students[1].submissions.first.find_or_create_provisional_grade!(scorer: @ta1)
+          expect(querier.count).to eq 1
+        end
+
+        it "should only include students without two marks when moderated" do
+          @students.each{|s| @assignment.moderated_grading_selections.create!(:student => s)}
+
+          querier = NeedsGradingCountQuery.new(@assignment, @teacher)
+          expect(querier.count).to eq 3
+
+          @students[0].submissions.first.find_or_create_provisional_grade!(scorer: @teacher)
+          expect(querier.count).to eq 2 # should not show because @teacher graded it
+
+          @students[1].submissions.first.find_or_create_provisional_grade!(scorer: @ta1)
+          expect(querier.count).to eq 2 # should still count because it needs another mark
+
+          @students[1].submissions.first.find_or_create_provisional_grade!(scorer: @ta2)
+          expect(querier.count).to eq 1 # should not count because it has two marks now
+        end
+      end
     end
   end
 end

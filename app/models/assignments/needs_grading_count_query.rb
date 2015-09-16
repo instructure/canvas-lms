@@ -41,15 +41,47 @@ module Assignments
       assignment.shard.activate do
         # the needs_grading_count trigger should change assignment.updated_at, invalidating the cache
         Rails.cache.fetch(['assignment_user_grading_count', assignment, user].cache_key) do
-          case visibility_level
-          when :full, :limited
-            da_enabled? ? manual_count : assignment.needs_grading_count
-          when :sections
-            section_filtered_submissions.count(:id, distinct: true)
+          if assignment.moderated_grading? && !assignment.grades_published?
+            needs_moderated_grading_count
           else
-            0
+            case visibility_level
+            when :full, :limited
+              da_enabled? ? manual_count : assignment.needs_grading_count
+            when :sections
+              section_filtered_submissions.count(:id, distinct: true)
+            else
+              0
+            end
           end
         end
+      end
+    end
+
+    def needs_moderated_grading_count
+      level = visibility_level
+      return 0 unless [:full, :limited, :sections].include?(level)
+
+      # ignore submissions this user has graded
+      graded_sub_ids = assignment.submissions.joins(:provisional_grades).
+        where("moderated_grading_provisional_grades.final = ?", false).
+        where("moderated_grading_provisional_grades.scorer_id = ?", user.id).pluck(:id)
+
+      moderation_set_student_ids = assignment.moderated_grading_selections.pluck(:student_id)
+
+      # ignore submissions that are fully graded
+      pg_scope = assignment.submissions.joins(:provisional_grades).
+        where("moderated_grading_provisional_grades.final = ?", false).group("submissions.id", "submissions.user_id")
+      pg_scope = pg_scope.where("submissions.id NOT IN (?)", graded_sub_ids) if graded_sub_ids.any?
+      pg_scope.count.each do |key, count|
+        sub_id, user_id = key
+        graded_sub_ids << sub_id if count >= (moderation_set_student_ids.include?(user_id) ? 2 : 1)
+      end
+
+      scope = (level == :sections) ? section_filtered_submissions : all_submissions
+      if graded_sub_ids.any?
+        scope.where("submissions.id NOT IN (?)", graded_sub_ids).count(:id, distinct: true)
+      else
+        scope.count(:id, distinct: true)
       end
     end
 
