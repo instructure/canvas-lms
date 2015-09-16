@@ -117,6 +117,37 @@ describe EpubExport do
     end
   end
 
+  describe "#convert_to_epub" do
+    let_once(:cartridge_path) do
+      File.join(File.dirname(__FILE__), "/../fixtures/migration/unicode-filename-test-export.imscc")
+    end
+
+    let_once(:content_export) do
+      @course.content_exports.create({
+        user: @student
+      }).tap do |content_export|
+        content_export.create_attachment({
+          context: @course,
+          filename: File.basename(cartridge_path),
+          uploaded_data: File.open(cartridge_path)
+        })
+      end
+    end
+
+    let_once(:epub_export) do
+      @course.epub_exports.create({
+        user: @student,
+        content_export: content_export
+      })
+    end
+
+    it 'should create and associate an attachment' do
+      expect(epub_export.attachment).to be_nil, 'precondition'
+      expect{epub_export.convert_to_epub_without_send_later}.to change{Attachment.count}.by(1)
+      expect(epub_export.attachment).not_to be_nil
+    end
+  end
+
   describe "permissions" do
     describe ":create" do
       context "when user can :read_as_admin" do
