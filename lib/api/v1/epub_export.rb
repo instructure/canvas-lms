@@ -23,8 +23,8 @@ module Api::V1::EpubExport
     api_json(course, @current_user, session, {
       only: [ :name, :id ]
     }) do |attrs|
-      if course.epub_exports.any?
-        attrs.epub_export = epub_export_json(course.epub_exports.last)
+      if course.latest_epub_export.present?
+        attrs.epub_export = epub_export_json(course.latest_epub_export)
       end
     end
   end

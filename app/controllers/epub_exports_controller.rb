@@ -104,7 +104,9 @@ class EpubExportsController < ApplicationController
   #
   # @return [CourseEpubExport]
   def index
-    @courses = @current_user.current_and_concluded_courses.preload(:epub_exports)
+    @presenter = EpubExports::CourseEpubExportsPresenter.new(@current_user)
+    @courses = @presenter.courses
+
     respond_to do |format|
       format.html
       format.json do
@@ -130,10 +132,11 @@ class EpubExportsController < ApplicationController
   def create
     if authorized_action(EpubExport.new(course: @context), @current_user, :create)
       @course = Course.find(params[:course_id])
-      @epub_export_service = EpubExports::CreateService.new(@course, @current_user)
-      status = @epub_export_service.save ? 201 : 422
+      @service = EpubExports::CreateService.new(@course, @current_user)
+      status = @service.save ? 201 : 422
       respond_to do |format|
         format.json do
+          @course.latest_epub_export = @service.epub_export
           render({
             status: status, json: course_epub_export_json(@course)
           })
@@ -152,6 +155,7 @@ class EpubExportsController < ApplicationController
     @epub_export = @course.epub_exports.where(id: params[:id]).first
     if authorized_action(@epub_export, @current_user, :read)
       respond_to do |format|
+        @course.latest_epub_export = @epub_export
         format.json { render json: course_epub_export_json(@course) }
       end
     end
