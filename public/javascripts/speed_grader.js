@@ -77,6 +77,7 @@ define([
       assignmentUrl = $("#assignment_url").attr('href'),
       $full_height = $(".full_height"),
       $rightside_inner = $("#rightside_inner"),
+      $not_gradeable_message = $("#not_gradeable_message"),
       $comments = $("#comments"),
       $comment_blank = $("#comment_blank").removeAttr('id').detach(),
       $comment_attachment_blank = $("#comment_attachment_blank").removeAttr('id').detach(),
@@ -164,6 +165,8 @@ define([
       this.submission = $.grep(jsonData.submissions, function(submission, i){
         return submission.user_id === student.id;
       })[0];
+
+      this.submission_state = submissionState(this);
       jsonData.studentMap[student.id] = student;
     });
 
@@ -215,18 +218,26 @@ define([
         "not_graded": 1,
         "resubmitted": 2,
         "not_submitted": 3,
-        "graded": 4
+        "graded": 4,
+        "not_gradeable": 5
       };
       jsonData.studentsWithSubmissions.sort(compareBy(function(student){
+        debugger;
         return student &&
-          states[submissionStateName(student.submission)];
+          states[submissionState(student)];
       }));
     }
   }
 
-  function submissionStateName(submission) {
+  function submissionState(student) {
+    var submission = student.submission;
     if (submission && submission.workflow_state != 'unsubmitted' && (submission.submitted_at || !(typeof submission.grade == 'undefined'))) {
-      if (!submission.excused && (typeof submission.grade == 'undefined' || submission.grade === null || submission.workflow_state == 'pending_review')) {
+      // TODO: change this so it doesn't lock moderators out but instead changes it to pass in as final marks
+      if ((ENV.grading_role == 'provisional_grader' || ENV.grading_role == 'moderator')
+        && !student.needs_provisional_grade && submission.provisional_grade_id === null) {
+        // if we are a provisional grader and it doesn't need a grade (and we haven't given one already) then we shouldn't be able to grade it
+        return "not_gradeable";
+      } else if (!submission.excused && (typeof submission.grade == 'undefined' || submission.grade === null || submission.workflow_state == 'pending_review')) {
         return "not_graded";
       } else if (submission.grade_matches_current_submission) {
         return "graded";
@@ -238,12 +249,14 @@ define([
     }
   }
 
-  function formattedSubmissionStateName(raw, submission) {
+  function formattedsubmissionState(raw, submission) {
     switch(raw) {
       case "graded":
         return I18n.t('graded', "graded");
       case "not_graded":
         return I18n.t('not_graded', "not graded");
+      case "not_gradeable":
+        return I18n.t('graded', "graded");
       case "not_submitted":
         return I18n.t('not_submitted', 'not submitted');
       case "resubmitted":
@@ -252,9 +265,8 @@ define([
   }
 
   function classNameBasedOnStudent(student){
-    var raw = submissionStateName(student.submission);
-    var formatted = formattedSubmissionStateName(raw, student.submission);
-    return {raw: raw, formatted: formatted};
+    var formatted = formattedsubmissionState(student.submission_state, student.submission);
+    return {raw: student.submission_state, formatted: formatted};
   }
 
   // xsslint safeString.identifier MENU_PARTS_DELIMITER
@@ -1065,6 +1077,13 @@ define([
       }));
 
       $rightside_inner.scrollTo(0);
+      if (this.currentStudent.submission_state == 'not_gradeable') {
+        $rightside_inner.hide();
+        $not_gradeable_message.show();
+      } else {
+        $not_gradeable_message.hide();
+        $rightside_inner.show();
+      }
       this.showGrade();
       this.showDiscussion();
       this.showRubric();
@@ -1678,7 +1697,7 @@ define([
         $statusIcon = $status.find(".speedgrader-selectmenu-icon");
         $queryIcon = $query.find(".speedgrader-selectmenu-icon");
 
-        if(className.raw == "graded" && this == EG.currentStudent){
+        if(this == EG.currentStudent && (className.raw == "graded" || className.raw == "not_gradeable")){
           var studentInfo = EG.getStudentNameAndGrade()
           $queryIcon.text("").append("<i class='icon-check'></i>");
           $status.addClass("graded");

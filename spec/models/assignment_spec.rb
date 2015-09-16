@@ -2907,6 +2907,8 @@ describe Assignment do
         @submission = @assignment.submit_homework(@student, :submission_type => 'online_text_entry', :body => 'ahem')
         @assignment.grade_student(@student, :comment => 'real comment', :score => 1)
 
+        @assignment.moderated_grading_selections.create!(:student => @student)
+
         @submission.add_comment(:author => @teacher, :comment => 'provisional comment', :provisional => true)
         teacher_pg = @submission.provisional_grade(@teacher)
         teacher_pg.update_attribute(:score, 2)
@@ -2932,6 +2934,9 @@ describe Assignment do
               :comments => 'a comment',
             }
           })
+
+        @other_student = user(:active_all => true)
+        student_in_course(:course => @course, :user => @other_student, :active_all => true)
       end
 
       describe "for provisional grader" do
@@ -2952,6 +2957,11 @@ describe Assignment do
           ras = @json['context']['students'][0]['rubric_assessments']
           expect(ras.count).to eq 1
           expect(ras[0]['assessor_id']).to eq @ta.id
+        end
+
+        it "should determine whether the student needs a provisional grade" do
+          expect(@json['context']['students'][0]['needs_provisional_grade']).to be_falsey
+          expect(@json['context']['students'][1]['needs_provisional_grade']).to be_truthy # other student
         end
       end
 

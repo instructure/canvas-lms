@@ -398,7 +398,7 @@ describe SubmissionsController do
 
         @submission.reload
         expect(@submission.submission_comments.first).to be_nil
-        pg = @submission.provisional_grade(@teacher, true)
+        pg = @submission.provisional_grade(@teacher, final: true)
         expect(pg.submission_comments.first.comment).to eq 'provisional!'
         expect(pg.final).to be_truthy
 

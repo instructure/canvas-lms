@@ -4,4 +4,6 @@ class ModeratedGrading::Selection < ActiveRecord::Base
     class_name: 'ModeratedGrading::ProvisionalGrade'
   belongs_to :assignment
   belongs_to :student, class_name: 'User'
+
+  attr_accessible :student
 end

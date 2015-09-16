@@ -379,7 +379,7 @@ class GradebooksController < ApplicationController
           if submission[:provisional]
             is_final = submission[:final] && @context.grants_right?(@current_user, :moderate_grades)
             subs.each do |sub|
-              sub.apply_provisional_grade_filter!(sub.provisional_grade(@current_user, is_final))
+              sub.apply_provisional_grade_filter!(sub.provisional_grade(@current_user, final: is_final))
             end
           end
           @submissions += subs

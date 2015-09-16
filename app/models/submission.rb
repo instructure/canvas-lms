@@ -917,11 +917,20 @@ class Submission < ActiveRecord::Base
     false
   end
 
-  def provisional_grade(scorer, final=false)
-    pg = if final
-      self.provisional_grades.final.first
+  def provisional_grade(scorer, final: false, preloaded_grades: nil)
+    pg = if preloaded_grades
+      pgs = preloaded_grades[self.id] || []
+      if final
+        pgs.detect{|pg| pg.final}
+      else
+        pgs.detect{|pg| !pg.final && pg.scorer_id == scorer.id}
+      end
     else
-      self.provisional_grades.not_final.where(scorer_id: scorer).first
+      if final
+        self.provisional_grades.final.first
+      else
+        self.provisional_grades.not_final.where(scorer_id: scorer).first
+      end
     end
     pg ||= ModeratedGrading::NullProvisionalGrade.new(scorer.id, final)
     pg
@@ -931,6 +940,9 @@ class Submission < ActiveRecord::Base
     ModeratedGrading::ProvisionalGrade.unique_constraint_retry do
       pg = final ? self.provisional_grades.final.first : self.provisional_grades.not_final.where(scorer_id: scorer).first
       unless pg
+        unless final || self.assignment.student_needs_provisional_grade?(self.user)
+          raise Assignment::GradeError.new("Student already has the maximum number of provisional grades")
+        end
         pg = self.provisional_grades.build
       end
       pg.scorer_id = scorer.id

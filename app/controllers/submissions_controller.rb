@@ -625,7 +625,7 @@ class SubmissionsController < ApplicationController
           is_final = provisional && params[:submission][:final] && @context.grants_right?(@current_user, :moderate_grades)
           @submissions.each do |s|
             s.limit_comments(@current_user, session) unless @submission.grants_right?(@current_user, session, :submit)
-            s.apply_provisional_grade_filter!(s.provisional_grade(@current_user, is_final)) if provisional
+            s.apply_provisional_grade_filter!(s.provisional_grade(@current_user, final: is_final)) if provisional
           end
 
           flash[:notice] = t('assignment_submitted', 'Assignment submitted.')

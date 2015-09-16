@@ -307,6 +307,11 @@ $gradebook_header_height: 52px;
     @extend %flex-1;
     overflow-y: auto;
   }
+  #not_gradeable_message {
+    padding: 20px;
+    font-size: 1.2em;
+    display: none;
+  }
 }
 
 .right_side_content {
@@ -548,6 +553,10 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
   .resubmitted & {
     font-size: 1.7em;
     color: $orange;
+  }
+  .not_gradeable & {
+    font-size: 1.7em;
+    color: $grayLight;
   }
   .graded & {
     color: $green;

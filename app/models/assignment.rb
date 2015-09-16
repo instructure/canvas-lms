@@ -206,6 +206,8 @@ class Assignment < ActiveRecord::Base
     integration_data
     integration_id
     only_visible_to_overrides
+    moderated_grading
+    grades_published_at
   )
 
   def external_tool?
@@ -1326,6 +1328,20 @@ class Assignment < ActiveRecord::Base
     !moderated_grading? || grades_published_at.present?
   end
 
+  def student_needs_provisional_grade?(student, preloaded_counts=nil)
+    pg_count = if preloaded_counts
+      preloaded_counts[student.id.to_s] || 0
+    else
+      self.provisional_grades.not_final.where(:submissions => {:user_id => student}).count
+    end
+    in_moderation_set = if self.moderated_grading_selections.loaded?
+      self.moderated_grading_selections.detect{|s| s.student_id == student.id}.present?
+    else
+      self.moderated_grading_selections.where(:student_id => student).exists?
+    end
+    pg_count < (in_moderation_set ? 2 : 1)
+  end
+
   def speed_grader_json(user, avatars: false, grading_role: :grader, crocodoc_ids: nil)
     Attachment.skip_thumbnails = true
     submission_fields = [:user_id, :id, :submitted_at, :workflow_state,
@@ -1368,10 +1384,19 @@ class Assignment < ActiveRecord::Base
     all_provisional_rubric_assmnts = grading_role == :moderator &&
       (visible_rubric_assessments_for(user, :provisional_moderator => true) || [])
 
+    # if we're a provisional grader, calculate whether the student needs a grade
+    preloaded_pg_counts = is_provisional && self.provisional_grades.not_final.group("submissions.user_id").count
+    ActiveRecord::Associations::Preloader.new(self, :moderated_grading_selections).run if is_provisional # preload the association now
+
     res[:context][:students] = students.map do |u|
       json = u.as_json(:include_root => false,
                 :methods => avatar_methods,
                 :only => [:name, :id])
+
+      if preloaded_pg_counts
+        json[:needs_provisional_grade] = student_needs_provisional_grade?(u, preloaded_pg_counts)
+      end
+
       json[:rubric_assessments] = rubric_assmnts.select{|ra| ra.user_id == u.id}.
         as_json(:methods => [:assessor_name], :include_root => false)
 
@@ -1392,6 +1417,15 @@ class Assignment < ActiveRecord::Base
     includes << (grading_role == :grader ? :submission_comments : :all_submission_comments)
     submissions = self.submissions.where(:user_id => students).preload(*includes)
 
+    preloaded_prov_grades = case grading_role
+    when :moderator
+      self.provisional_grades.order(:id).to_a.group_by(&:submission_id)
+    when :provisional_grader
+      self.provisional_grades.where(:scorer_id => user).order(:id).to_a.group_by(&:submission_id)
+    else
+      {}
+    end
+
     res[:too_many_quiz_submissions] = too_many = too_many_qs_versions?(submissions)
     qs_versions = quiz_submission_versions(submissions, too_many)
 
@@ -1404,7 +1438,7 @@ class Assignment < ActiveRecord::Base
       ).merge("from_enrollment_type" => enrollment_types_by_id[sub.user_id])
 
       if grading_role == :provisional_grader || grading_role == :moderator
-        provisional_grade = sub.provisional_grade(user)
+        provisional_grade = sub.provisional_grade(user, preloaded_grades: preloaded_prov_grades)
         json.merge! provisional_grade.grade_attributes
       end
 
@@ -1450,7 +1484,7 @@ class Assignment < ActiveRecord::Base
                                    end
 
       if grading_role == :moderator
-        json['provisional_grades'] = sub.provisional_grades.order(:id).map do |pg|
+        json['provisional_grades'] = (preloaded_prov_grades[sub.id] || []).map do |pg|
           pg.grade_attributes.tap do |json|
             json[:submission_comments] = pg.submission_comments.as_json(:include_root => false,
                                                                         :methods => avatar_methods,
