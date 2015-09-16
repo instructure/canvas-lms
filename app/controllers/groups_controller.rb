@@ -268,7 +268,7 @@ class GroupsController < ApplicationController
         if @context.grants_right?(@current_user, session, :manage_groups)
           if @domain_root_account.enable_manage_groups2?
             categories_json = @categories.map{ |cat| group_category_json(cat, @current_user, session, include: ["progress_url", "unassigned_users_count", "groups_count"]) }
-            uncategorized = @context.groups.uncategorized.to_a
+            uncategorized = @context.groups.active.uncategorized.to_a
             if uncategorized.present?
               json = group_category_json(GroupCategory.uncategorized, @current_user, session)
               json["groups"] = uncategorized.map{ |group| group_json(group, @current_user, session) }
