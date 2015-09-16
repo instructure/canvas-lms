@@ -246,5 +246,10 @@ module CanvasRails
     config.before_initialize do
       config.action_controller.asset_host = Canvas::Cdn.method(:asset_host_for)
     end
+
+    if config.action_dispatch.rack_cache != false
+      config.action_dispatch.rack_cache[:ignore_headers] =
+        %w[Set-Cookie X-Request-Context-Id X-Canvas-User-Id X-Canvas-Meta]
+    end
   end
 end
