@@ -93,8 +93,10 @@ $ docker-compose run --rm web bundle exec rspec spec
 
 ### Selenium
 
-When selenium tests run, you can open a vnc window to the container
-running firefox with:
+The container used to run the selenium browser is commented out of the
+docker-compose file by default. To run selenium, just uncomment those lines,
+rerun `docker-compose build`, and when you run your tests you can watch
+the browser:
 
 ```
 $ open vnc://secret:secret@selenium.docker/

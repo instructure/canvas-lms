@@ -4,10 +4,13 @@ postgres:
 redis:
   image: redis:2.6
 
-selenium:
-  build: ./docker-compose/seleniumff
-  ports:
-    - "5900:5900"
+# Uncomment the below lines to run selenium tests locally. Don't forget the
+# line in the `web` section below too.
+#
+#selenium:
+#  build: ./docker-compose/seleniumff
+#  ports:
+#    - "5900:5900"
 
 kinesis:
   build: ./docker-compose/kinesalite
@@ -30,7 +33,7 @@ web:
   links:
     - postgres
     - redis
-    - selenium
+#    - selenium
     - kinesis
   environment:
     RACK_ENV: development
