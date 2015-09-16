@@ -1,17 +1,17 @@
 class ChangeSisBatchIdToInteger < ActiveRecord::Migration
   def self.up
     if connection.adapter_name == 'PostgreSQL'
-      execute("ALTER TABLE abstract_courses ALTER sis_batch_id TYPE bigint USING CAST(sis_batch_id AS bigint)")
-      execute("ALTER TABLE accounts ALTER sis_batch_id TYPE bigint USING CAST(sis_batch_id AS bigint)")
-      execute("ALTER TABLE accounts ALTER current_sis_batch_id TYPE bigint USING CAST(sis_batch_id AS bigint)")
-      execute("ALTER TABLE accounts ALTER last_successful_sis_batch_id TYPE bigint USING CAST(sis_batch_id AS bigint)")
-      execute("ALTER TABLE course_sections ALTER sis_batch_id TYPE bigint USING CAST(sis_batch_id AS bigint)")
-      execute("ALTER TABLE courses ALTER sis_batch_id TYPE bigint USING CAST(sis_batch_id AS bigint)")
-      execute("ALTER TABLE enrollment_terms ALTER sis_batch_id TYPE bigint USING CAST(sis_batch_id AS bigint)")
-      execute("ALTER TABLE enrollments ALTER sis_batch_id TYPE bigint USING CAST(sis_batch_id AS bigint)")
-      execute("ALTER TABLE group_memberships ALTER sis_batch_id TYPE bigint USING CAST(sis_batch_id AS bigint)")
-      execute("ALTER TABLE groups ALTER sis_batch_id TYPE bigint USING CAST(sis_batch_id AS bigint)")
-      execute("ALTER TABLE pseudonyms ALTER sis_batch_id TYPE bigint USING CAST(sis_batch_id AS bigint)")
+      execute("ALTER TABLE #{AbstractCourse.quoted_table_name} ALTER sis_batch_id TYPE bigint USING CAST(sis_batch_id AS bigint)")
+      execute("ALTER TABLE #{Account.quoted_table_name} ALTER sis_batch_id TYPE bigint USING CAST(sis_batch_id AS bigint)")
+      execute("ALTER TABLE #{Account.quoted_table_name} ALTER current_sis_batch_id TYPE bigint USING CAST(sis_batch_id AS bigint)")
+      execute("ALTER TABLE #{Account.quoted_table_name} ALTER last_successful_sis_batch_id TYPE bigint USING CAST(sis_batch_id AS bigint)")
+      execute("ALTER TABLE #{CourseSection.quoted_table_name} ALTER sis_batch_id TYPE bigint USING CAST(sis_batch_id AS bigint)")
+      execute("ALTER TABLE #{Course.quoted_table_name} ALTER sis_batch_id TYPE bigint USING CAST(sis_batch_id AS bigint)")
+      execute("ALTER TABLE #{EnrollmentTerm.quoted_table_name} ALTER sis_batch_id TYPE bigint USING CAST(sis_batch_id AS bigint)")
+      execute("ALTER TABLE #{Enrollment.quoted_table_name} ALTER sis_batch_id TYPE bigint USING CAST(sis_batch_id AS bigint)")
+      execute("ALTER TABLE #{GroupMembership.quoted_table_name} ALTER sis_batch_id TYPE bigint USING CAST(sis_batch_id AS bigint)")
+      execute("ALTER TABLE #{Group.quoted_table_name} ALTER sis_batch_id TYPE bigint USING CAST(sis_batch_id AS bigint)")
+      execute("ALTER TABLE #{Pseudonym.quoted_table_name} ALTER sis_batch_id TYPE bigint USING CAST(sis_batch_id AS bigint)")
     else
       change_column :abstract_courses, :sis_batch_id, :integer, :limit => 8
       change_column :accounts, :sis_batch_id, :integer, :limit => 8

@@ -2,7 +2,7 @@ module DataFixup::RemoveDuplicateGroupDiscussions
   def self.run
     bad_root_topics = DiscussionTopic.connection.select_rows(<<-SQL)
       SELECT context_id,context_type,root_topic_id
-      FROM discussion_topics
+      FROM #{DiscussionTopic.quoted_table_name}
       WHERE root_topic_id IS NOT NULL 
       GROUP BY context_id,context_type,root_topic_id
       HAVING COUNT(*) > 1

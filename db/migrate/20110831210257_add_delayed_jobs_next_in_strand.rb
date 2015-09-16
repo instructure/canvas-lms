@@ -22,7 +22,7 @@ class AddDelayedJobsNextInStrand < ActiveRecord::Migration
     case connection.adapter_name
     when 'PostgreSQL'
       execute(<<-CODE)
-      CREATE FUNCTION delayed_jobs_before_insert_row_tr_fn () RETURNS trigger AS $$
+      CREATE FUNCTION #{connection.quote_table_name('delayed_jobs_before_insert_row_tr_fn')} () RETURNS trigger AS $$
       BEGIN
         LOCK delayed_jobs IN SHARE ROW EXCLUSIVE MODE;
         IF (SELECT 1 FROM delayed_jobs WHERE strand = NEW.strand LIMIT 1) = 1 THEN
@@ -32,7 +32,7 @@ class AddDelayedJobsNextInStrand < ActiveRecord::Migration
       END;
       $$ LANGUAGE plpgsql;
       CODE
-      execute("CREATE TRIGGER delayed_jobs_before_insert_row_tr BEFORE INSERT ON delayed_jobs FOR EACH ROW WHEN (NEW.strand IS NOT NULL) EXECUTE PROCEDURE delayed_jobs_before_insert_row_tr_fn()")
+      execute("CREATE TRIGGER delayed_jobs_before_insert_row_tr BEFORE INSERT ON #{Delayed::Backend::ActiveRecord::Job.quoted_table_name} FOR EACH ROW WHEN (NEW.strand IS NOT NULL) EXECUTE PROCEDURE #{connection.quote_table_name('delayed_jobs_before_insert_row_tr_fn')}()")
     when 'MySQL', 'Mysql2'
       execute(<<-CODE)
       CREATE TRIGGER delayed_jobs_before_insert_row_tr BEFORE INSERT ON delayed_jobs
@@ -59,14 +59,14 @@ class AddDelayedJobsNextInStrand < ActiveRecord::Migration
     case connection.adapter_name
     when 'PostgreSQL'
       execute(<<-CODE)
-      CREATE FUNCTION delayed_jobs_after_delete_row_tr_fn () RETURNS trigger AS $$
+      CREATE FUNCTION #{connection.quote_table_name('delayed_jobs_after_delete_row_tr_fn')} () RETURNS trigger AS $$
       BEGIN
         UPDATE delayed_jobs SET next_in_strand = 't' WHERE id = (SELECT id FROM delayed_jobs j2 WHERE j2.strand = OLD.strand ORDER BY j2.strand, j2.id ASC LIMIT 1);
         RETURN OLD;
       END;
       $$ LANGUAGE plpgsql;
       CODE
-      execute("CREATE TRIGGER delayed_jobs_after_delete_row_tr AFTER DELETE ON delayed_jobs FOR EACH ROW WHEN (OLD.strand IS NOT NULL AND OLD.next_in_strand = 't') EXECUTE PROCEDURE delayed_jobs_after_delete_row_tr_fn()")
+      execute("CREATE TRIGGER delayed_jobs_after_delete_row_tr AFTER DELETE ON #{Delayed::Backend::ActiveRecord::Job.quoted_table_name} FOR EACH ROW WHEN (OLD.strand IS NOT NULL AND OLD.next_in_strand = 't') EXECUTE PROCEDURE #{connection.quote_table_name('delayed_jobs_after_delete_row_tr_fn')}()")
     when 'MySQL', 'Mysql2'
       # mysql doesn't support modifying the underlying table inside a trigger,
       # so we can't do this here -- we have to use a rails after_destroy

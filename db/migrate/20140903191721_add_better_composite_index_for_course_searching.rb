@@ -6,7 +6,7 @@ class AddBetterCompositeIndexForCourseSearching < ActiveRecord::Migration
     if is_postgres? && (schema = connection.extension_installed?(:pg_trgm))
       concurrently = " CONCURRENTLY" if connection.open_transactions == 0
       execute("CREATE INDEX#{concurrently} index_trgm_courses_composite_search ON
-        courses USING gist((
+        #{Course.quoted_table_name} USING gist((
           coalesce(lower(name), '') || ' ' ||
           coalesce(lower(sis_source_id), '') || ' ' ||
           coalesce(lower(course_code), '')

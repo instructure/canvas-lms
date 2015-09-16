@@ -575,7 +575,7 @@ class ActiveRecord::Base
       join_conditions = []
       joins_sql.strip.split('INNER JOIN')[1..-1].each do |join|
         # this could probably be improved
-        raise "PostgreSQL update_all/delete_all only supports INNER JOIN" unless join.strip =~ /([a-zA-Z0-9'"_]+(?:(?:\s+[aA][sS])?\s+[a-zA-Z0-9'"_]+)?)\s+ON\s+(.*)/
+        raise "PostgreSQL update_all/delete_all only supports INNER JOIN" unless join.strip =~ /([a-zA-Z0-9'"_\.]+(?:(?:\s+[aA][sS])?\s+[a-zA-Z0-9'"_]+)?)\s+ON\s+(.*)/
         tables << $1
         join_conditions << $2
       end
@@ -1335,7 +1335,8 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
     when 'PostgreSQL'
       foreign_key_name = foreign_key_name(from_table, column, options)
       query = supports_delayed_constraint_validation? ? 'convalidated' : 'conname'
-      value = select_value("SELECT #{query} FROM pg_constraint INNER JOIN pg_namespace ON pg_namespace.oid=connamespace WHERE conname='#{foreign_key_name}' AND nspname=current_schema()")
+      schema = @config[:use_qualified_names] ? quote(shard.name) : 'current_schema()'
+      value = select_value("SELECT #{query} FROM pg_constraint INNER JOIN pg_namespace ON pg_namespace.oid=connamespace WHERE conname='#{foreign_key_name}' AND nspname=#{schema}")
       if supports_delayed_constraint_validation? && value == 'f'
         execute("ALTER TABLE #{quote_table_name(from_table)} DROP CONSTRAINT #{quote_table_name(foreign_key_name)}")
       elsif value
@@ -1360,7 +1361,7 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
 
   # does a query first to make the actual constraint adding fast
   def change_column_null_with_less_locking(table, column)
-    execute("SELECT COUNT(*) FROM #{table} WHERE #{column} IS NULL") if open_transactions == 0
+    execute("SELECT COUNT(*) FROM #{quote_table_name(table)} WHERE #{column} IS NULL") if open_transactions == 0
     change_column_null table, column, false
   end
 

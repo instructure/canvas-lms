@@ -8,7 +8,7 @@ class AddSamlProperties < ActiveRecord::Migration
       update <<-SQL
         UPDATE #{AccountAuthorizationConfig.quoted_table_name} aac
         SET position =
-          CASE WHEN (SELECT count(*) FROM account_authorization_configs WHERE account_id = aac.account_id) > 1
+          CASE WHEN (SELECT count(*) FROM #{AccountAuthorizationConfig.quoted_table_name} WHERE account_id = aac.account_id) > 1
             THEN aac.id
             ELSE 1
           END;

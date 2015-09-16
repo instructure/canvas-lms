@@ -4,11 +4,11 @@ module DataFixup::RegenerateUserThumbnails
 
     Shackles.activate(:slave) do
       profile_pic_ids = Attachment.connection.select_all <<-SQL
-        SELECT DISTINCT at.id FROM users AS u
-        JOIN attachments AS at ON (at.context_type = 'User' and at.context_id = u.id)
-        JOIN folders AS f ON at.folder_id = f.id
-        JOIN pseudonyms AS p on u.id = p.user_id
-        JOIN accounts AS acc ON p.account_id = acc.id
+        SELECT DISTINCT at.id FROM #{User.quoted_table_name} AS u
+        JOIN #{Attachment.quoted_table_name} AS at ON (at.context_type = 'User' and at.context_id = u.id)
+        JOIN #{Folder.quoted_table_name} AS f ON at.folder_id = f.id
+        JOIN #{Pseudonym.quoted_table_name} AS p on u.id = p.user_id
+        JOIN #{Account.quoted_table_name} AS acc ON p.account_id = acc.id
         WHERE acc.workflow_state <> 'deleted'
           AND u.workflow_state not in ('deleted', 'rejected')
           AND at.file_state <> 'deleted'

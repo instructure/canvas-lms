@@ -12,11 +12,11 @@ class DropOldSortableNameIndex < ActiveRecord::Migration
     if collkey = connection.extension_installed?(:pg_collkey)
       execute <<-SQL
         CREATE INDEX CONCURRENTLY index_users_on_sortable_name_old
-        ON USERS (#{collkey}.collkey(sortable_name, 'root', true, 2, true));
+        ON #{User.quoted_table_name} (#{collkey}.collkey(sortable_name, 'root', true, 2, true));
 
         CREATE INDEX CONCURRENTLY
         index_attachments_on_folder_id_and_file_state_and_display_name2
-        ON attachments (folder_id, file_state,
+        ON #{Attachment.quoted_table_name} (folder_id, file_state,
                         #{collkey}.collkey(display_name, 'root', true, 2, true))
         WHERE folder_id IS NOT NULL")
       SQL

@@ -9,9 +9,9 @@ class RemoveIrrelevantSubmissionMessages < ActiveRecord::Migration
       asset_id IS NOT NULL
       AND id NOT IN (
         SELECT DISTINCT cm.id
-        FROM conversation_messages cm,
-          conversation_participants cp,
-          submission_comments sc
+        FROM #{ConversationMessage.quoted_table_name} cm,
+          #{ConversationParticipant.quoted_table_name} cp,
+          #{SubmissionComment.quoted_table_name} sc
         WHERE 
           cm.asset_id = sc.submission_id
           AND cp.conversation_id = cm.conversation_id
