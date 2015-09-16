@@ -306,7 +306,7 @@
             <% if user_answer && question_type.display_answers == "single" %>
               <div>
                 <% if question_type.entry_type == 'textarea' %>
-                  Your Answer:
+                  <%= t('Your Answer:') %>
                   <div class="user_content quiz_response_text"><%= hash_get(user_answer, :text).html_safe %></div>
                 <% else %>
                   <% matched_answer = hash_get(question, :answers, []).find{|a| hash_get(a, :text) == hash_get(user_answer, :text) || hash_get(a, :id) == hash_get(user_answer, :answer_id) } %>
