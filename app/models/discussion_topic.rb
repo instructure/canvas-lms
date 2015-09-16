@@ -641,9 +641,9 @@ class DiscussionTopic < ActiveRecord::Base
       if self.assignment
         !self.assignment.has_student_submissions?
       else
-        student_ids = opts[:student_ids] || self.context.all_real_students.pluck(:id)
+        student_ids = opts[:student_ids] || self.context.all_real_student_enrollments.select(:user_id)
         if self.for_group_discussion?
-          !(self.child_topics.any? { |child| child.discussion_entries.active.where(:user_id => student_ids).exists? })
+          !DiscussionEntry.active.where(user_id: student_ids, discussion_topic_id: child_topics).exists?
         else
           !self.discussion_entries.active.where(:user_id => student_ids).exists?
         end
@@ -656,8 +656,8 @@ class DiscussionTopic < ActiveRecord::Base
     return unless topics.any?
     assmnt_ids_with_subs ||= Assignment.assignment_ids_with_submissions(topics.map(&:assignment_id).compact)
 
-    student_ids = context.all_real_students.pluck(:id)
-    topic_ids_with_entries = DiscussionEntry.active.where(:discussion_topic_id => topics.map(&:id)).
+    student_ids = context.all_real_student_enrollments.select(:user_id)
+    topic_ids_with_entries = DiscussionEntry.active.where(discussion_topic_id: topics).
       where(:user_id => student_ids).uniq.pluck(:discussion_topic_id)
     topic_ids_with_entries += DiscussionTopic.where("root_topic_id IS NOT NULL").
       where(:id => topic_ids_with_entries).uniq.pluck(:root_topic_id)
@@ -671,8 +671,8 @@ class DiscussionTopic < ActiveRecord::Base
     end
   end
 
-  def can_group?
-    can_unpublish?
+  def can_group?(opts = {})
+    can_unpublish?(opts)
   end
 
   def should_send_to_stream

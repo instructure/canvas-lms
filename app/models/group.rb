@@ -125,8 +125,13 @@ class Group < ActiveRecord::Base
   end
 
   def all_real_students
-    return self.context.all_real_students.where("users.id IN (?)", self.users.pluck(:id)) if self.context.respond_to? "all_real_students"
+    return self.context.all_real_students.where(users: { id: group_memberships.select(:user_id) }) if self.context.respond_to? "all_real_students"
     self.users
+  end
+
+  def all_real_student_enrollments
+    return self.context.all_real_student_enrollments.where(user_id: group_memberships.select(:user_id)) if self.context.respond_to? "all_real_student_enrollments"
+    self.group_memberships
   end
 
   def wiki_with_create
