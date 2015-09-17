@@ -9,31 +9,21 @@ define([
   var MARK_THREE = 2;
 
   return React.createClass({
-    getInitialState () {
-      return (
-        {submissions: []}
-      );
+
+    propTypes: {
+      students: React.PropTypes.arrayOf(React.PropTypes.object).isRequired
     },
-    componentDidMount () {
-      this.props.store.addChangeListener(this.handleStoreChange);
-    },
-    handleStoreChange () {
-      this.setState({submissions: this.props.store.submissions});
-    },
-    displayName: 'ModeratedStudentList',
-    selectCheckbox (submission, event) {
-      // this.actions.updateSubmission(submission);
-    },
+
     renderSubmissionMark (submission, mark_number) {
-      if(submission.provisional_grades[mark_number]){
-        return(
+      if (submission.provisional_grades && submission.provisional_grades[mark_number]) {
+        return (
           <div className='AssignmentList__Mark'>
-            <input type='radio' name={"mark_" + submission.id} />
+            <input type='radio' name={`mark_${submission.id}`} />
             <span>{submission.provisional_grades[mark_number].score}</span>
           </div>
         );
-      }else{
-        return(
+      } else {
+        return (
           <div className='AssignmentList__Mark'>
             <span>Speed Grader</span>
           </div>
@@ -41,14 +31,14 @@ define([
       }
     },
     renderFinalGrade (submission) {
-      if (submission.grade){
-        return(
+      if (submission.grade) {
+        return (
           <span className='AssignmentList_Grade'>
             {submission.score}
           </span>
         );
-      }else{
-        return(
+      } else {
+        return (
           <span className='AssignmentList_Grade'>
             -
           </span>
@@ -56,16 +46,16 @@ define([
       }
     },
     render () {
-      return(
+      return (
         <ul className='AssignmentList'>
           {
-            this.state.submissions.map(function(submission) {
-              return(
+            this.props.students.map((submission) => {
+              return (
                 <li className='AssignmentList__Item'>
                   <div className='AssignmentList__StudentInfo'>
-                    <input checked={submission.isSelected} type="checkbox" onChange={this.selectCheckbox.bind(null, submission)} />
-                    <img className='img-circle AssignmentList_StudentPhoto' src={submission.user.avatar_image_url} />
-                    <span>{submission.user.display_name}</span>
+                    <input checked={submission.isSelected} type='checkbox' />
+                    <img className='img-circle AssignmentList_StudentPhoto' src={submission.avatar_image_url} />
+                    <span>{submission.display_name}</span>
                   </div>
                   {this.renderSubmissionMark(submission, MARK_ONE)}
                   {this.renderSubmissionMark(submission, MARK_TWO)}
@@ -73,7 +63,7 @@ define([
                   {this.renderFinalGrade(submission)}
                 </li>
                 );
-            }.bind(this))
+            })
           }
         </ul>
       );

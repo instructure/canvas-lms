@@ -2,10 +2,21 @@ require [
   'jquery'
   'react'
   'jsx/assignments/ModerationApp'
-], ($, React, ModerationApp) ->
+  'jsx/assignments/store/configureStore'
+], ($, React, ModerationApp, configureStore) ->
 
-  React.render(ModerationApp({
-    student_submissions_url: ENV.URLS.student_submissions_url
-    publish_grades_url: ENV.URLS.publish_grades_url
+  store = configureStore({
+    moderationStage: [],
+    students: [],
+    urls: window.ENV.URLS
+    flashMessage: {
+      time: Date.now(),
+      message: '',
+      error: false
+    },
+    assignment: {
+      published: window.ENV.GRADES_PUBLISHED
+    }
   })
-  , $('#assignment_moderation')[0])
+
+  React.render(ModerationApp(store: store), $('#assignment_moderation')[0])

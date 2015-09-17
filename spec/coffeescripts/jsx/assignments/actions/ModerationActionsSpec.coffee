@@ -1,29 +1,157 @@
 define [
-  "jsx/assignments/actions/ModerationActions"
-], (ModerationActions) ->
-  module "ModerationActions",
-  test "sets this.store in the constructor", ->
-    some_store = {data: true}
-    actions = new ModerationActions(some_store)
-    ok actions.store.data, "sets the store to true"
+  "when"
+  "jsx/assignments/actions/ModerationActions",
+], (whenJS, ModerationActions) ->
 
-  #module "ModerationActions#loadInitalSubmissions",
-    #setup: ->
-      #@server = sinon.fakeServer.create()
-    #teardown: ->
-      #@server.restore()
+  module "ModerationActions - Action Creators",
 
-  #test "fetches data from the submissions_url and sets store.addSubmissions with it", ->
-    #the_data = {}
-    #actions = new ModerationActions(some_store)
-    #submission_url = "/something"
-    #actions.loadInitialSubmissions(submission_url)
-    #expected = {some_thing: 'here'}
-    #@server.respond 'get',  submission_url,  [
-      #200
-      #'Content-Type': 'application/json'
-      #JSON.stringify expected
-    #]
+  test "creates the SELECT_STUDENT action", ->
+    action = ModerationActions.selectStudent(1)
+    expected =
+      type: ModerationActions.SELECT_STUDENT
+      payload:
+        studentId: 1
+
+    deepEqual action, expected, "creates the action successfully"
+
+  test "creates the GOT_STUDENTS action", ->
+    action = ModerationActions.gotStudents([1, 2, 3])
+    expected =
+      type: ModerationActions.GOT_STUDENTS
+      payload:
+        students: [1, 2, 3]
+
+    deepEqual action, expected, "creates the action successfully"
+
+  test "creates the PUBLISHED_GRADES action", ->
+    action = ModerationActions.publishedGrades('test')
+    expected =
+      type: ModerationActions.PUBLISHED_GRADES
+      payload:
+        message: 'test'
+        time: Date.now()
+
+    equal action.type, expected.type, "type matches"
+    equal action.payload.message, expected.payload.message, "message matches"
+    ok expected.payload.time - action.payload.time < 5, "time within 5 seconds"
+
+  test "creates the PUBLISHED_GRADES_FAILED action", ->
+    action = ModerationActions.publishGradesFailed('test')
+    expected =
+      type: ModerationActions.PUBLISHED_GRADES_FAILED
+      payload:
+        message: 'test'
+        time: Date.now()
+      error: true
+
+    equal action.type, expected.type, "type matches"
+    equal action.payload.message, expected.payload.message, "message matches"
+    ok action.error, "error flag is set"
+    ok expected.payload.time - action.payload.time < 5, "time within 5 seconds"
 
 
-    #equal the_data, expected, "gets data from the url"
+  module "ModerationActions#apiGetStudents",
+
+    setup: ->
+      @client = {
+        get: ->
+          dfd = whenJS.defer()
+          setTimeout ->
+            dfd.resolve('test')
+          , 100
+          dfd.promise()
+      }
+
+  test "returns a function", ->
+    ok typeof ModerationActions.apiGetStudents() == 'function'
+
+  asyncTest "dispatches gotStudents action", ->
+
+    getState = ->
+      urls:
+        list_gradeable_students: 'some_url'
+      students: []
+
+    fakeResponse = {data: ['test']}
+
+    gotStudentsAction =
+      type: ModerationActions.GOT_STUDENTS
+      payload:
+        students: ['test']
+
+    sinon.stub(@client, 'get').returns(whenJS(fakeResponse))
+    ModerationActions.apiGetStudents(@client)((action) ->
+      deepEqual action, gotStudentsAction
+      start()
+    , getState)
+
+  module "ModerationActions#publishGrades",
+    setup: ->
+      @client = {
+        post: ->
+          dfd = whenJS.defer()
+          setTimeout ->
+            dfd.resolve('test')
+          , 100
+          dfd.promise()
+      }
+
+  test "returns a function", ->
+    ok typeof ModerationActions.publishGrades() == 'function'
+
+  asyncTest "dispatches publishGrades action on success", ->
+    getState = ->
+      urls:
+        publish_grades_url: 'some_url'
+    fakeResponse = {status: 200}
+
+    publishGradesAction =
+      type: ModerationActions.PUBLISHED_GRADES
+      payload:
+        message: 'Success! Grades were published to the grade book.'
+
+    sinon.stub(@client, 'post').returns(whenJS(fakeResponse))
+    ModerationActions.publishGrades(@client)((action) ->
+      equal action.type, publishGradesAction.type, 'type matches'
+      equal action.payload.message, publishGradesAction.payload.message, 'has proper message'
+      start()
+    , getState)
+
+  asyncTest "dispatches publishGradesFailed action with already published message on 400 failure", ->
+    getState = ->
+      urls:
+        publish_grades_url: 'some_url'
+    fakeResponse =
+      status: 400
+
+    publishGradesAction =
+      type: ModerationActions.PUBLISHED_GRADES_FAILED
+      payload:
+        message: 'Assignment grades have already been published.'
+
+    sinon.stub(@client, 'post').returns(whenJS.reject(fakeResponse))
+    ModerationActions.publishGrades(@client)((action) ->
+      equal action.type, publishGradesAction.type, 'type matches'
+      equal action.payload.message, publishGradesAction.payload.message, 'has proper message'
+      start()
+    , getState)
+
+  asyncTest "dispatches publishGradesFailed action with generic error message on non-400 error", ->
+    getState = ->
+      urls:
+        publish_grades_url: 'some_url'
+    fakeResponse =
+      status: 500
+
+    publishGradesAction =
+      type: ModerationActions.PUBLISHED_GRADES_FAILED
+      payload:
+        message: 'An error occurred publishing grades.'
+
+    sinon.stub(@client, 'post').returns(whenJS.reject(fakeResponse))
+    ModerationActions.publishGrades(@client)((action) ->
+      equal action.type, publishGradesAction.type, 'type matches'
+      equal action.payload.message, publishGradesAction.payload.message, 'has proper message'
+      start()
+    , getState)
+

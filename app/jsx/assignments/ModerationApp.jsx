@@ -5,36 +5,39 @@ define([
   'i18n!moderated_grading',
   './ModeratedStudentList',
   './Header',
-  './stores/ModerationStore',
+  './FlashMessageHolder',
   './actions/ModerationActions'
-], function (React, I18n, ModeratedStudentList, Header, Store, Actions) {
+], function (React, I18n, ModeratedStudentList, Header, FlashMessageHolder, Actions) {
 
   return React.createClass({
     displayName: 'ModerationApp',
 
     propTypes: {
-      student_submissions_url: React.PropTypes.string.isRequired,
-      publish_grades_url: React.PropTypes.string.isRequired
+      store: React.PropTypes.object.isRequired
+    },
+
+    getInitialState () {
+      return this.props.store.getState();
     },
 
     componentDidMount () {
-      this.actions.loadInitialSubmissions(this.props.student_submissions_url);
+      this.props.store.subscribe(this.handleChange);
+      this.props.store.dispatch(Actions.apiGetStudents());
     },
 
-    componentWillMount () {
-      this.store = new Store();
-      this.actions = new Actions(this.store, {
-        publish_grades_url: this.props.publish_grades_url
-      });
+    handleChange () {
+      this.setState(this.props.store.getState());
     },
 
     render () {
       return (
         <div className='ModerationApp'>
+          <FlashMessageHolder store={this.props.store} />
           <h1 className='screenreader-only'>{I18n.t('Moderate %{assignment_name}', {assignment_name: 'TODO!!!!!!!!'})}</h1>
-          <Header actions={this.actions} />
-          <ModeratedStudentList actions={this.actions} store={this.store} />
+          <Header store={this.props.store} actions={Actions} />
+          <ModeratedStudentList {...this.state} />
         </div>
+
       );
     }
   });

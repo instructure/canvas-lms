@@ -1,51 +1,90 @@
 /** @jsx React.DOM */
 
 define([
-  'jquery',
-  'i18n!moderated_grading',
   'axios',
-  'compiled/jquery.rails_flash_notifications'
-], function ($, I18n, axios) {
-  class ModerationActions {
-    constructor (store, opts) {
-      this.store = store;
-      if (opts && opts.publish_grades_url) {
-        this.publish_grades_url = opts.publish_grades_url;
-      }
-    }
+  'i18n!moderated_grading'
+], function (axios, I18n) {
 
-    updateSubmission (submission) {
-      // Update the submission and then update the store
-    }
+  var ModerationActions = {
 
-    loadInitialSubmissions (submissions_url) {
-      axios.get(submissions_url)
-           .then(function (response) {
-             this.store.addSubmissions(response.data);
-           }.bind(this))
-           .catch(function (response) {
-             console.log('finished');
-           });
-    }
+    // Define 'constants' for types
+    SELECT_STUDENT: 'SELECT_STUDENT',
+    UNSELECT_STUDENT: 'UNSELECT_STUDENT',
+    SELECT_ALL_STUDENTS: 'SELECT_ALL_STUDENTS',
+    UNSELECT_ALL_STUDENTS: 'UNSELECT_ALL_STUDENTS',
+    SELECT_MARK: 'SELECT_MARK',
+    UPDATE_MODERATION_SET: 'UPDATE_MODERATION_SET',
+    PUBLISHED_GRADES: 'PUBLISHED_GRADES',
+    PUBLISHED_GRADES_FAILED: 'PUBLISHED_GRADES_FAILED',
+    GOT_STUDENTS: 'GOT_STUDENTS',
 
-    publishGrades () {
-      var axiosPostOptions = {
-        xsrfCookieName: '_csrf_token',
-        xsrfHeaderName: 'X-CSRF-Token'
+    selectStudent (studentId) {
+      return {
+        type: this.SELECT_STUDENT,
+        payload: { studentId }
       };
-      axios.post(this.publish_grades_url, {}, axiosPostOptions)
-           .then((response) => {
-             $.flashMessage(I18n.t('Success! Grades were published to the grade book.'));
-           })
-           .catch((response) => {
-             if ((response.status === 400) && (response.data.message)){
-               $.flashError(response.data.message);
-             } else {
-               $.flashError(I18n.t('Error! A problem happened publishing grades.'));
-             }
-           });
+    },
+
+    gotStudents (students) {
+      return {
+        type: this.GOT_STUDENTS,
+        payload: { students }
+      };
+    },
+
+    publishedGrades (message) {
+      return {
+        type: this.PUBLISHED_GRADES,
+        payload: {
+          message,
+          time: Date.now()
+        }
+      };
+    },
+
+    publishGradesFailed (message) {
+      return {
+        type: this.PUBLISHED_GRADES_FAILED,
+        payload: {
+          message,
+          time: Date.now()
+        },
+        error: true
+      };
+    },
+
+    publishGrades (ajaxLib) {
+      return (dispatch, getState) => {
+        var endpoint = getState().urls.publish_grades_url;
+        ajaxLib = ajaxLib || axios;
+        ajaxLib.post(endpoint)
+               .then((response) => {
+                 dispatch(this.publishedGrades(I18n.t('Success! Grades were published to the grade book.')));
+               })
+               .catch((response) => {
+                 if (response.status === 400) {
+                   dispatch(this.publishGradesFailed(I18n.t('Assignment grades have already been published.')));
+                 } else {
+                   dispatch(this.publishGradesFailed(I18n.t('An error occurred publishing grades.')));
+                 }
+               });
+      };
+    },
+
+    apiGetStudents (ajaxLib) {
+      return (dispatch, getState) => {
+        var endpoint = getState().urls.list_gradeable_students;
+        ajaxLib = ajaxLib || axios;
+        ajaxLib.get(endpoint)
+               .then((response) => {
+                 dispatch(this.gotStudents(response.data));
+               })
+               .catch((response) => {
+                 throw new Error(response);
+               });
+      };
     }
-  }
+  };
 
   return ModerationActions;
 });

@@ -12,11 +12,23 @@ define([
       actions: React.PropTypes.object.isRequired
     },
 
+    getInitialState () {
+      return this.props.store.getState().assignment;
+    },
+
+    componentDidMount () {
+      this.props.store.subscribe(this.handleChange);
+    },
+
+    handleChange () {
+      this.setState(this.props.store.getState().assignment);
+    },
+
     handlePublishClick () {
       // Make a better looking confirm one day
       var confirmMessage = I18n.t('Are you sure you want to do this? It cannot be undone and will override existing grades in the gradebook.')
       if (window.confirm(confirmMessage)) {
-        this.props.actions.publishGrades();
+        this.props.store.dispatch(this.props.actions.publishGrades());
       }
     },
 
@@ -32,6 +44,7 @@ define([
                 type='button'
                 className='ModeratedGrading__Header-PublishBtn Button Button--primary'
                 onClick={this.handlePublishClick}
+                disabled={this.state.published}
               >
                 {I18n.t('Publish')}
               </button>
