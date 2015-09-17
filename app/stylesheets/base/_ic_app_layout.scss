@@ -113,6 +113,10 @@ $ic-left-side-width: $ic-sp*15;
     flex: 0 0 $ic-sp*24;
     padding-left: $ic-sp*2;
   }
+
+  position: relative; // note: this is also set for #right-side-wrapper in _#right-side.scss
+  // prevent safari bug where content disappears on scroll
+  -webkit-transform: translate3d(0, 0, 0);
 }
 
 .ic-app-footer {
