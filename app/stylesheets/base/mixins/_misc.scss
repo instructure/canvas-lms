@@ -22,17 +22,38 @@
 
 @mixin unselectable { user-select: none; }
 
-@mixin firefox-white-space-bug-fix {
-  white-space: normal;
-  height: $baseLineHeight;
-  position: relative;
-  &:after {
-    content: "";
-    background: linear-gradient(to right, rgba(255,255,255,0) 0%,rgba(255,255,255,1) 75%);
-    position: absolute;
-    right: 0; top: 0;
-    height: $baseLineHeight; width: $ic-sp*2.5;
-    z-index: 1;
+
+// Firefox has a bug with white-space that breaks our ellipses CSS. This mixin
+// replaces the ellipses with a gradient fade-out. The mixin should be applied to
+// the parent of the ellipses or ellipsis class. There is an optional parameter
+// for hover states where the background color of the parent changes
+
+@mixin firefox-white-space-bug-fix-gradient($fade-out-color) {
+  background: linear-gradient(to right, rgba(255,255,255,0) 0%,$fade-out-color 75%);  
+}
+
+@mixin firefox-white-space-bug-fix($gradient-color: $ic-color-light, $gradient-color-hover: null) {
+  body.ff & {
+    .ellipses, .ellipsis {
+      white-space: normal;
+      height: $baseLineHeight;
+      position: relative;
+      &:after {
+        @include firefox-white-space-bug-fix-gradient($gradient-color);
+        content: "";
+        position: absolute;
+        right: 0; top: 0;
+        height: $baseLineHeight; width: $ic-sp*2.5;
+        z-index: 1;
+      }
+    }
+    @if ($gradient-color-hover) {
+      &:hover {
+        .ellipses, .ellipsis {
+          &:after { @include firefox-white-space-bug-fix-gradient($gradient-color-hover); }
+        }
+      }
+    }
   }
 }
 

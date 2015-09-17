@@ -278,7 +278,12 @@
     text-decoration: none;
   }
 
-  .ellipses { @include item-group-ellipses; }
+  .ellipses { 
+    @include item-group-ellipses;
+  }
+
+  // Handle Firefox white space bug that affects .ellipses class
+  @include firefox-white-space-bug-fix($ic-color-light, $ic-list-item-background--hover);
 
   &:hover {
     background-color: $ic-list-item-background--hover;
