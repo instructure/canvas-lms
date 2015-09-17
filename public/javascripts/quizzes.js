@@ -131,10 +131,12 @@ define([
       possibleAnswerLabel = I18n.t('labels.possible_answer', "Possible Answer");
 
   function togglePossibleCorrectAnswerLabel($answers) {
-    $answers.find('.select_answer label').text(possibleAnswerLabel);
-    $answers.find('.select_answer input[name=answer_text]').attr("aria-label", possibleAnswerLabel);
-    $answers.filter('.correct_answer').find(".select_answer label").text(correctAnswerLabel);
-    $answers.filter('.correct_answer').find(".select_answer  input[name=answer_text]").attr("aria-label", correctAnswerLabel);
+    if(!$("#questions").hasClass('survey_quiz')){
+      $answers.find('.select_answer label').text(possibleAnswerLabel);
+      $answers.find('.select_answer input[name=answer_text]').attr("aria-label", possibleAnswerLabel);
+      $answers.filter('.correct_answer').find(".select_answer label").text(correctAnswerLabel);
+      $answers.filter('.correct_answer').find(".select_answer  input[name=answer_text]").attr("aria-label", correctAnswerLabel);
+    }
   }
 
   function toggleSelectAnswerAltText($answers,type) {
