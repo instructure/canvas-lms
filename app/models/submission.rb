@@ -933,7 +933,6 @@ class Submission < ActiveRecord::Base
       end
     end
     pg ||= ModeratedGrading::NullProvisionalGrade.new(scorer.id, final)
-    pg
   end
 
   def find_or_create_provisional_grade!(scorer:, score: nil, grade: nil, force_save: false, final: false)

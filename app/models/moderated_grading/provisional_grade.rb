@@ -4,7 +4,7 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
   attr_accessible :grade, :score, :final
   attr_writer :force_save
 
-  belongs_to :submission
+  belongs_to :submission, inverse_of: :provisional_grades
   belongs_to :scorer, class_name: 'User'
 
   has_many :rubric_assessments, as: :artifact
@@ -46,7 +46,7 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
   end
 
   def submission_comments
-    submission.all_submission_comments.for_provisional_grade(self.id)
+    submission.all_submission_comments.select { |c| c.provisional_grade_id == id }
   end
 
   def student
