@@ -716,6 +716,37 @@ class SubmissionsApiController < ApplicationController
     end
   end
 
+  # undocumented @API Show provisional grade status for a student
+  #
+  # @argument student_id [Integer]
+  #   The id of the student to show the status for
+  #
+  # @example_request
+  #
+  #   curl 'https://<canvas>/api/v1/courses/1/assignments/2/provisional_status?student_id=1' \
+  #        -X POST
+  #
+  # @example_response
+  #
+  #       { "needs_provisional_grade": false }
+  #
+  def provisional_status
+    if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
+      @assignment = @context.assignments.active.find(params[:assignment_id])
+      unless @context.feature_enabled?(:moderated_grading) && @assignment.moderated_grading?
+        return render :json => { :message => "Assignment does not use moderated grading" }, :status => :bad_request
+      end
+      if @assignment.grades_published?
+        return render :json => { :message => "Assignment grades have already been published" }, :status => :bad_request
+      end
+
+      # in theory we could apply visibility here, but for now we would rather be performant
+      # e.g. @assignment.students_with_visibility(@context.students_visible_to(@current_user)).find(params[:student_id])
+      student = @context.students.find(params[:student_id])
+      render :json => { :needs_provisional_grade => @assignment.student_needs_provisional_grade?(student) }
+    end
+  end
+
   # @API List gradeable students
   #
   # List students eligible to submit the assignment. The caller must have permission to view grades.

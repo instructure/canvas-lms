@@ -301,7 +301,7 @@ define([
     // xsslint safeString.function getIcon
     function getIcon(helper_text){
       var icon = "<span class='ui-selectmenu-item-icon speedgrader-selectmenu-icon'>";
-      if(helper_text == "graded"){
+      if(helper_text == "graded" || helper_text == "not_gradeable"){
         icon += "<i class='icon-check'></i>";
       }else if(["not_graded", "resubmitted"].indexOf(helper_text) != -1){
         icon += "&#9679;";
@@ -1069,13 +1069,28 @@ define([
       return $.inArray(this.currentStudent, jsonData.studentsWithSubmissions);
     },
 
-    handleStudentChanged: function(){
+    handleStudentChanged: function() {
       var id = $selectmenu.val();
       this.currentStudent = jsonData.studentMap[id] || _.values(jsonData.studentsWithSubmissions)[0];
       document.location.hash = "#" + encodeURIComponent(JSON.stringify({
-        "student_id": this.currentStudent.id
-      }));
+          "student_id": this.currentStudent.id
+        }));
 
+      if ((ENV.grading_role == 'provisional_grader' || ENV.grading_role == 'moderator') &&
+        this.currentStudent.submission_state == 'not_graded') {
+        // hit the API to check whether we still can give a provisional grade
+        $full_width_container.disableWhileLoading(
+          $.getJSON(ENV.provisional_status_url + "?student_id=" + this.currentStudent.id, {}, function(data) {
+            EG.currentStudent.needs_provisional_grade = data.needs_provisional_grade;
+            EG.currentStudent.submission_state = submissionState(EG.currentStudent);
+            EG.showSubmission();
+          })
+        );
+      } else {
+        this.showSubmission();
+      }
+    },
+    showSubmission: function(){
       $rightside_inner.scrollTo(0);
       if (this.currentStudent.submission_state == 'not_gradeable') {
         $rightside_inner.hide();
@@ -1642,7 +1657,6 @@ define([
         EG.showGrade();
       });
     },
-
     showGrade: function(){
       var submission;
       var grade = EG.currentStudent.submission === undefined ?

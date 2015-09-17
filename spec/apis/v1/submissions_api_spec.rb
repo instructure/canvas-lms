@@ -3298,11 +3298,11 @@ describe 'Submissions API', type: :request do
         it "publishes the selected provisional grade when the student is in the moderation set" do
           @submission.provisional_grade(@ta).update_attribute(:graded_at, 1.minute.ago)
 
+          sel = @assignment.moderated_grading_selections.create!(:student => @student)
+
           @other_ta = user :active_user => true
           @course.enroll_ta @other_ta, :enrollment_state => 'active'
           @assignment.grade_student(@student, { :grader => @other_ta, :score => 90, :provisional => true })
-          sel = @assignment.moderated_grading_selections.build
-          sel.student_id = @student.id
           sel.selected_provisional_grade_id = @submission.provisional_grade(@other_ta).id
           sel.save!
 
@@ -3438,6 +3438,45 @@ describe 'Submissions API', type: :request do
                            })
         expect(@selection.reload.provisional_grade).to eq(@pg)
       end
+    end
+  end
+
+  describe "provisional_status" do
+    before(:once) do
+      course_with_teacher :active_all => true
+      ta_in_course :active_all => true
+      @student = student_in_course(:active_all => true).user
+      @course.root_account.allow_feature! :moderated_grading
+      @course.enable_feature! :moderated_grading
+      @assignment = @course.assignments.build
+      @assignment.moderated_grading = true
+      @assignment.save!
+      @submission = @assignment.submit_homework @student, :body => 'EHLO'
+      @path = "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/provisional_status"
+      @params = { :controller => 'submissions_api', :action => 'provisional_status',
+        :format => 'json', :course_id => @course.to_param, :assignment_id => @assignment.to_param,
+        :student_id => @student.to_param }
+    end
+
+    it "should require authorization" do
+      api_call_as_user(@student, :get, @path, @params, {}, {}, { :expected_status => 401 })
+    end
+
+    it "should return whether a student needs a provisional grade" do
+      json = api_call_as_user(@ta, :get, @path, @params)
+      expect(json['needs_provisional_grade']).to be_truthy
+
+      @submission.find_or_create_provisional_grade!(scorer: @teacher)
+      json = api_call_as_user(@ta, :get, @path, @params)
+      expect(json['needs_provisional_grade']).to be_falsey
+
+      @assignment.moderated_grading_selections.create!(:student => @student)
+      json = api_call_as_user(@ta, :get, @path, @params)
+      expect(json['needs_provisional_grade']).to be_truthy
+
+      @submission.find_or_create_provisional_grade!(scorer: @ta)
+      json = api_call_as_user(@ta, :get, @path, @params)
+      expect(json['needs_provisional_grade']).to be_falsey
     end
   end
 end

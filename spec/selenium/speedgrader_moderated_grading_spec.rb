@@ -104,6 +104,33 @@ describe "speed grader" do
       expect(f('#not_gradeable_message')).to be_displayed
     end
 
+    it "should lock a provisional grader out if graded by someone else while switching students" do
+      original_sub = @submission
+      student_submission
+
+      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+      keep_trying_until { f('#speedgrader_iframe') }
+      # not locked yet
+      expect(f('#grading-box-extended')).to be_displayed
+      expect(f('#not_gradeable_message')).to_not be_displayed
+
+      # go to next student
+      f('#gradebook_header a.next').click
+      wait_for_ajaximations
+
+      # create a mark for the first student
+      other_ta = course_with_ta(:course => @course, :active_all => true).user
+      original_sub.find_or_create_provisional_grade!(scorer: other_ta, score: 7)
+
+      # go back
+      f('#gradebook_header a.prev').click
+      wait_for_ajaximations
+
+      # should be locked now
+      expect(f('#grading-box-extended')).to_not be_displayed
+      expect(f('#not_gradeable_message')).to be_displayed
+    end
+
     it "should not lock a provisional grader out if someone else graded but the student is selected for moderation" do
       @assignment.moderated_grading_selections.create!(:student => @student)
       other_ta = course_with_ta(:course => @course, :active_all => true).user

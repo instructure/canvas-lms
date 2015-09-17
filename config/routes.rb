@@ -977,6 +977,7 @@ CanvasRails::Application.routes.draw do
       get "courses/:course_id/assignments/:assignment_id/gradeable_students", action: :gradeable_students, as: "course_assignment_gradeable_students"
       post "courses/:course_id/assignments/:assignment_id/publish_provisional_grades", action: :publish_provisional_grades, as: 'publish_provisional_grades'
       put "courses/:course_id/assignments/:assignment_id/select_provisional_grade/:provisional_grade_id", action: :select_provisional_grade
+      get "courses/:course_id/assignments/:assignment_id/provisional_status", action: :provisional_status, as: "course_assignment_provisional_status"
     end
 
     post '/courses/:course_id/assignments/:assignment_id/submissions/:user_id/comments/files', action: :create_file, controller: :submission_comments_api

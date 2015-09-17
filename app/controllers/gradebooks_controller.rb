@@ -470,6 +470,9 @@ class GradebooksController < ApplicationController
           :force_anonymous_grading => force_anonymous_grading?(@assignment),
           :grading_role => grading_role
         }
+        if [:moderator, :provisional_grader].include?(grading_role)
+          env[:provisional_status_url] = api_v1_course_assignment_provisional_status_path(@context.id, @assignment.id)
+        end
         if @assignment.quiz
           env[:quiz_history_url] = course_quiz_history_path @context.id,
                                                             @assignment.quiz.id,
