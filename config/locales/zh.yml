@@ -37,6 +37,7 @@ zh:
     cancel: 取消
     save: 保存
   _section_not_synced_yet_cd07d0dd: "-- 章节尚未同步"
+  _start_from_a_template__a03ea3b3: "-- 从模板开始 --"
   a_calculation_value_is_not_used_with_this_calculat_b1e854b4: 此计算方法未使用计算值
   a_file_named_itemname_already_exists_in_this_folde_b0dc7185: "一个文件名为 %{itemName} 已存在此文件夹中。"
   a_handy_key_value_dump_of_a_host_of_interesting_en_d0518dfe: 一台为用户报告有趣的环境信息的主机中的一个方便键/定值转储
@@ -846,6 +847,7 @@ zh:
         equella: Equella
         equella_endpoint: "Equella 端点"
         equella_teaser: "Equella 评论"
+        global_brand_includes: 在主题编辑器上传包括全局的CSS/JavaScript
         global_includes: "全局 CSS/JavaScript 包含"
         global_javascript: "全局 JavaScript URL"
         global_stylesheet: "全局 CSS URL"
@@ -1289,6 +1291,7 @@ zh:
   allow_students_to_see_who_has_signed_up_for_time_s_497f4a46: 允许学生查看已注册的时段。
   allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: 允许讲师标记已批量导出到SIS整合的评分数据。
   always_3a59e701: 始终
+  an_error_occured_trying_to_generate_this_theme_ple_6ae581d: 发生尝试生成此主题的错误，请再次尝试。
   an_error_occurred_please_post_your_reply_again_lat_b0220ac6: "*发生错误*，请稍候再次发表您的回复"
   an_error_occurred_trying_to_generate_this_theme_pl_b493e2e9: 出现了尝试生成此主题的错误，请再次尝试。
   an_error_occurred_trying_to_prepare_download_pleas_df6fa596: 发生尝试准备下载的错误，请再次尝试。
@@ -1417,6 +1420,7 @@ zh:
     wiki_front_page_default_content_course: 欢迎使用新课程维基！
     wiki_front_page_default_content_group: 欢迎使用新小组维基！
   apply_781a2546: 应用
+  apply_changes_b1dffc70: 应用更改
   appointment_group: 
     errors: 
       invalid_end_at: 约会结束时间早于开始时间
@@ -2172,6 +2176,12 @@ zh:
     default_title: 无标题
   breadcrumb_1_cb3c504: "面包屑 1"
   breadcrumb_2_95ba94be: "面包屑 2"
+  broccoli_cloud: 
+    hidden_title: 已隐藏。可通过链接提供
+    published_title: 已发布
+    title: 
+      permissions: "此人员的编辑权限：%{name}"
+    unpublished_title: 已取消发布
   broken_file_link_found_in_your_course_7cc24395: 在您的课程中发现断开的文件链接
   bucket_name_must_be_one_of_the_following_bucket_na_81c1be40: "桶的名称必须是下列情况之一: %{bucket_names}"
   bulk_course_migration: 
@@ -2723,6 +2733,7 @@ zh:
   clone_group_set_c2a40e15: 克隆组集
   close_and_return_to_canvas_80544344: "关闭并返回 Canvas"
   close_d634289d: 关闭
+  close_picker_256aca8a: 关闭选择器
   collaboration: 
     default_title: 未命名的协作
   collaboration_was_deleted_9cf9934b: 协作被删除
@@ -3404,6 +3415,7 @@ zh:
         add_requirement: 添加要求
       module_name: 单元名字
       must_complete_prerequisites: 必须完成
+      no_preprequisites: 没有制定先决条件
     buttons: 
       add: 添加单元
       add_item: 添加项目
@@ -3484,6 +3496,13 @@ zh:
     context_module_next: 
       aria_labels: 
         add_item: 添加内容
+      images: 
+        alt: 
+          incomplete: 未完成
+        title: 
+          complete: 单元已完成
+          incomplete: 单元未完成
+          locked: 单元已锁定
       links: 
         add_item: 添加内容
         text: 
@@ -3536,6 +3555,9 @@ zh:
         outdent_item: 减少缩进
         remove_item: 删除
         remove_item_from_module: 从单元删除此项目
+      max_score: 
+        fulfilled: "得分不超过 %{score}"
+        unfulfilled: "得分不得超过 %{score}"
       min_score: 
         fulfilled: "分数： %{score}"
         unfulfilled: "分数：%{score}"
@@ -3546,6 +3568,9 @@ zh:
       must_submit: 
         fulfilled: 已提交
         unfulfilled: 提交
+      must_view: 
+        fulfilled: 已查看页面
+        unfulfilled: 必须查看页面
       settings: 设置
     module_locked: 已锁定
     module_started: 正在进行
@@ -3808,6 +3833,19 @@ zh:
       on_campus: 校园中
       online: 在线
     course_not_found: 该课程未找到
+    csv: 
+      comments: 评论
+      current_score: 当前分数
+      final_grade: 最终评分
+      final_score: 最终分数
+      id: ID
+      points_possible: 满分
+      read_only_field: （只读）
+      root_account: 根帐户
+      section: 班级
+      sis_login_id: 登录名或学号
+      sis_user_id: 用户学号
+      student: 学生
     default_grading_scheme_name: 默认评分方案
     default_name: 我的课程
     default_short_name: 课程-101
@@ -4456,6 +4494,7 @@ zh:
       re_sending: 正在重新发送...
       send_done: 完成！收到消息可能需要几分钟。
       send_failed: 请求失败。请重试。
+      teachers_only: 在*发布*之前只有教师才能查看此课程
       titles: 
         drop_course: 放弃此课程
         recent_feedback: 最近反馈
@@ -4591,6 +4630,7 @@ zh:
     bottom: 
       student: 
         count: 落后学生人数
+    comments: 评论
     correct: 
       bottom: 
         student: 
@@ -4604,14 +4644,19 @@ zh:
       top: 
         student: 
           count: 正确的领先学生人数
+    current_score: 目前得分
     difficulty: 
       index: 难度索引
+    final_grade: 总成绩
+    final_score: 总得分
+    id: ID
     middle: 
       student: 
         count: 中间学生人数
     point: 
       biserial: 正确选项的点二列
       distractor: "错误选项 %{num} 的点二列 "
+    points_possible: 可能分值
     question: 
       id: "问题 ID"
       title: 问题标题
@@ -4619,8 +4664,13 @@ zh:
       question: 
         count: 测验问题数
     read_only_field: "( 只读 )"
+    root_account: 根账户
+    section: 部分、班级
+    sis_login_id: "SIS 登录 ID"
+    sis_user_id: "SIS 用户 ID"
     standard: 
       deviation: 标准偏差
+    student: "学生 "
     top: 
       student: 
         count: 领先学生人数
@@ -4950,6 +5000,10 @@ zh:
     cancel: 取消
     save_settings: 保存设置
     saving: 正在保存...
+  differentiated_assignments_description: |-
+      可区分作业是一个适用于为班级或个别学生选择作业所启用的功能。
+      没有分配作业的班级将不能在他们的课程内容中看见作业，以及这些分值将
+      不计入他们的总分。
   diigo_993c4646: Diigo
   disable_a5c05db3: 禁用
   disabled_18c33a73: （已禁用）
@@ -5778,6 +5832,7 @@ zh:
   excuse_this_assignment_for_the_selected_student_af04e132: 对选择的学生豁免作业
   excused_5877183c: 请原谅！
   excused_cf8792eb: 原谅
+  exit_theme_editor_9ddd41bb: 退出主题编辑器
   expand_collapse_title_outcome_group_239f0a9d: "展开/折叠 %{title} 结果组"
   expand_list_of_group_members_for_groupname_9ce9d2f7: "展开 %{groupName} 的组成员列表"
   expand_or_collapse_calendars_9854b0d0: 展开或折叠日历
@@ -5980,6 +6035,17 @@ zh:
   file_list_updated_38e2a5ad: 文件列表已更新
   file_menu_cc0ca54: 文件菜单
   file_not_found_9eec054c: 未找到文件
+  file_preview: 
+    file_preview_headerbutton_close: 关闭
+    file_preview_headerbutton_download: 下载
+    file_preview_headerbutton_info: 信息
+    file_preview_infotable_datecreated: 创建日期
+    file_preview_infotable_datemodified: 修改日期
+    file_preview_infotable_kind: 类型
+    file_preview_infotable_modifiedby: 最近的修改者
+    file_preview_infotable_name: 名称
+    file_preview_infotable_size: 大小
+    file_preview_infotable_status: 状态
   file_preview_eedb43f2: 文件预览
   file_previews: 
     lock_explanation: 
@@ -5990,6 +6056,15 @@ zh:
       file_previews: 
         download_file: "下载 *文件名*"
         no_preview_available: 没有预览可用于此文件。
+  file_rename_form: 
+    back: 返回
+    change: 更改
+    change_name: 更改名称
+    message: "名为 \"%{name}\" 的项目已在此位置存在。是否要替换现有文件？"
+    name: 名称
+    prompt: "将 \"%{name}\" 更改为"
+    rename_title: 复制
+    replace: 替换
   file_status: 
     hidden_status: 已隐藏。可通过链接提供
     published_status: 已发布
@@ -6482,6 +6557,8 @@ zh:
         submission: 此学生已经提交了作业
       icons: 
         delete_comment: 删除评论
+        file_attachment: 文件附件
+        media_comment: 媒体评论
         speech_recognition: 语音识别
       keycode_descriptions: 
         change_grade: 更改评分
@@ -7516,6 +7593,8 @@ zh:
   links_14b70841: 链接
   loading_25990131: 正在加载...
   loading_bde52856: 加载
+  locales: 
+    zh: 简体中文
   lock_date_cannot_be_after_course_end_a473158b: 锁定日期不能晚于课程结束日期
   lock_date_cannot_be_after_section_end_d37da70c: 锁定日期不能晚于章节结束日期
   lock_date_cannot_be_after_term_end_cf1a188f: 锁定日期不能晚于学期结束日期
@@ -7539,7 +7618,19 @@ zh:
         password: 密码
         sending: 正在发送...
       new: 
+        back_to_login: 返回登录
+        browse_courses: 浏览课程
+        buttons: 
+          request_password: 请求密码
+        coenrollment_banner: "*Canvas 的主用户?* **点击此处以获得帐户**"
+        dont_know_password: 不知道您的密码吗？
+        labels: 
+          password: 密码
+          remember_me: 保持登录状态
+        log_in: 登录
+        login_handle: "输入您的 %{login_handle_name}，我们将向您发送更改密码的链接。"
         page_title: "登录到 Canvas"
+        register_for_canvas: "*需要 一个Canvas 帐户吗?* **点击此处免费获取!**"
     logout_confirm: 
       cancel: 取消
       details: 
@@ -7618,6 +7709,7 @@ zh:
   mark_as_done_6fa48d2f: 标记为完成
   mark_as_done_779556d7: 标记为完成
   mark_done_9d81bcd9: 做记号
+  marked_done_8f61ebb8: 已标记为完成
   marked_done_9fd646f: 已做记号
   mastery_score_reflects_the_highest_score_of_a_grad_fd426d1e: 掌握得分体现了评分作业或测验的最高得分。
   mastery_score_reflects_the_most_recent_graded_assi_29fd2e00: 掌握分数反映最近评分的作业或测验。
@@ -10126,6 +10218,7 @@ zh:
         latest_score: 最新分数
         outcome: 成果
   overrides: 
+    blank_override: 您必须有学生或选择的班级
     everyone: 所有人
     everyone_else: 其他所有人
     overrides: 
@@ -10997,6 +11090,7 @@ zh:
   qti_img_matching_question: 导入的匹配问题在两端包含图像，这不受支持
   qti_img_matching_question_distractors: 导入的匹配问题在选项内包含图像，并且无法修复，因为它还包含错误选项
   qti_name: "QTI 转换器"
+  qualified_locale: zh-CN
   question_answered: 已回答
   question_bank: 
     align_outcomes: 调整成果
@@ -11625,13 +11719,22 @@ zh:
           add_new_question_group: 添加新问题组
       form_answer: 
         answer_in_range_accessible: "在 *范围开始* 和 #范围结束# 之间"
+        answer_text: 答案文本
+        answer_weight: 答案小部件
         exact_answer_with_error_margin_accessible: "*确切答案*，误差范围为 #误差范围#"
         labels: 
           answer_comments: 学生选择此答案时的评论
           answer_in_range: 在范围内回答
           exact_answer: 确切答案
+        matching_left: 匹配左侧
+        matching_right: 匹配右侧
         numerical_answer: 数值答案
         possible_answer: 可能的答案
+        titles: 
+          click_to_enter_answer_comments: 单击以输入学生选择此答案时的评论
+          click_to_set_as_correct: 单击以将此答案设置为正确答案
+          delete_answer: 删除此答案
+          edit_as_html: "将编辑答案文本切换为 HTML"
       form_question: 
         allow_tolerance: "允许的误差为 +/- %{tolerance}"
         buttons: 
@@ -12349,6 +12452,7 @@ zh:
     folder: 文件夹
     folder_browsing_tree: 文件夹浏览树
     folder_name: 文件夹名称
+    loading_more_results: 正在加载更多结果...
     modified_by: 修改者
     move: 移动
     move_question: 
@@ -12361,6 +12465,7 @@ zh:
     progress_message: "正在准备下载：%{percent}% 已完成"
     restrict_access: 限制访问
     results_count: "显示 %{num_results} 个搜索结果"
+    retry: 重试
     search_for_files: 搜索文件
     search_results_for: "\"%{search_term}\" 的搜索结果"
     select_all: 全选
@@ -12440,6 +12545,7 @@ zh:
   reply_to_comment_72d96728: 回复评论
   reply_to_main_discussion_29823888: 回复主要讨论
   require_usage_rights_for_uploaded_files_4507865b: 需要已上传文件的使用权限
+  reset_95a81614: 重置
   respondus_lockdown_browser_support_413352eb: "Respondus 锁定浏览器支持"
   respondus_soap_endpoint: 
     plugin_settings: 
@@ -13757,6 +13863,7 @@ zh:
     android_banner_price: 免费
     android_banner_title: "Canvas 由 Instructure 提供"
     android_banner_view_button: 查看
+  something_went_wrong_please_try_again_6d337b6c: 出事了，请重试。
   source_code_2395ca74: 源代码
   space_ec476863: 空格，空间
   speed_grader: 
@@ -13799,6 +13906,7 @@ zh:
   start_date_e937be8a: 开始日期
   start_date_field_for_styleguide_8a8ab1d6: 风格指南的起始栏目
   start_from_a_template_380d4e8: "从模板开始 ..."
+  start_from_a_template_theme_6c6e3dab: 从模板主题开始：
   start_from_a_theme_template_475c3d26: "从一个主题模板开始 ..."
   start_participating_f0c75256: 开始参加
   start_tls_26e4b0dc: "启动 TLS"
@@ -13986,6 +14094,7 @@ zh:
       discussion_submission_description: "此作业的提交文件在作业的讨论中发布。下面是 %{user} 的讨论发布，或者您可以*查看完整讨论*。"
       discussion_submission_description_without_link: "此作业的提交项是作业讨论中的帖子。下面是 %{user} 的讨论帖子。"
       entry_no_image: 请记住，此页面自最初进行提交后可能已更改。
+      entry_with_image: 我们包括了页面提交时所显示内容的快照。或者您可以单击以查看原始提交文件。
       external_url_submission: "此提交是指向外部页面的一个 URL。"
       group_discussion_submission_description: |-
           此作业的提交文件在该小组的作业讨论中发布。下面是 %{user} 的讨论帖
@@ -14006,6 +14115,7 @@ zh:
         external_link: 链接到外部网站。
       url_preview: "URL 预览"
       view_feedback_button: 查看反馈
+      view_original_submission: "查看 %{user} 的原始提交文件"
       view_preview_button: 预览
     still_zipping: 正在压缩文件...
     submission_download: 
@@ -14692,6 +14802,12 @@ zh:
         really_merge: 是否确实要合并用户帐户?
     birthdate_invalid: 生日的日期或日期时间无效
     cant_self_merge: 您不能将帐户与其自身合并。
+    cc_prefs: 
+      buttons: 
+        configure: 配置通信首选项
+      comm_preferences_instructions: "既然您已注册 Canvas，您可能会想要配置随着课程的进展将收到哪些通知。Canvas 足够灵活，可让您选择想要的通知方式和通知哪些事件。您的课程中有事情发生时，您可以选择立即、每天或每周发送电子邮件或文本到您的手机。"
+      titles: 
+        configure_com_prefs: 配置通信首选项
     confirms: 
       unenroll_user: 是否确定要取消注册此用户?
     could_not_find_url: "无法找到下载 URL"
@@ -14732,6 +14848,7 @@ zh:
     google_docs_added: "Google Docs 访问已授权！"
     google_docs_fail: "Google Docs 授权失败。请重试"
     google_drive_added: "已成功添加 Google Drive 帐户！"
+    google_drive_fail: "Google Drive 授权失败。请重试"
     grades: 
       average_grades: 
         one: "%{count} 个学生的平均分"
@@ -15127,6 +15244,9 @@ zh:
       由于还没有应用您的账户，您即将失去任何的更改。
       
       您仍想继续吗？
+  you_are_about_to_lose_any_unsaved_changes_would_yo_e255f393: |-
+      您将失去任何未保存的更改。
+      您仍想继续吗？
   you_are_logged_in_at_institution1_using_your_crede_3f5bb205: "您使用来自 %{institution2} 的凭据登录到 %{institution1}"
   you_are_subscribed_and_will_be_notified_of_new_com_60b5b62b: 您接受订阅，新的评论将通报。点击退订。
   you_are_the_group_leader_for_this_group_b8629b70: 您是此组的组长
@@ -15155,6 +15275,7 @@ zh:
   you_must_set_it_to_a_number_greater_than_or_equal__eb1d9275: "您必须将其设置为大于或等于 %{min} 的数值"
   you_must_specify_a_usage_right_5eb57f87: 您必须指定使用权限。
   you_need_to_preview_your_changes_before_applying_t_468d56e4: 在适用于每个人之前，您需要“预览更改”。
+  you_need_to_preview_your_changes_before_applying_t_cb048bed: 在应用于每个人之前，您需要"预览您的更改"
   you_re_editing_your_canvas_theme_apply_or_cancel_c_1633384e: 您正在编辑Canvas的主题！从*主题编辑器*内应用或取消更改。
   you_re_editing_your_canvas_theme_the_changes_have__c0ae1bd1: 您正编辑您的Canvas主题！更改还未应用。
   you_scored_d3e00111: 您得分

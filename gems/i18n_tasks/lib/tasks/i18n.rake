@@ -86,14 +86,6 @@ namespace :i18n do
     # LOCALES=hi,ja,pt,zh-hans rake i18n:generate_js
     locales += ENV['LOCALES'].split(',').map(&:to_sym) if ENV['LOCALES']
     all_translations = I18n.backend.direct_lookup
-
-    # copy "real" translations from deprecated locales
-    I18n.available_locales.each do |locale|
-      if (deprecated_for = I18n.backend.direct_lookup(locale.to_s, 'deprecated_for'))
-        all_translations[locale] = all_translations[deprecated_for.to_sym]
-      end
-    end
-
     flat_translations = all_translations.flatten_keys
 
     if locales.empty?

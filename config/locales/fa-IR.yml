@@ -712,6 +712,18 @@ fa-IR:
           section_id: 
             field: "شناسه بخش"
     settings: 
+      about_google_docs: "Google Docs Previews به کاربران امکان می دهد به جای اینکه\n\
+          مجبور باشند اسناد را بارگیری کنند و برنامه مرتبط (مثلاً ورد\n\
+          یا اکسل) را باز نمایند، آنها را در داخل کانواس مشاهده کنند.\n\n\
+          اگر Scribd روی این حساب فعال شده باشد، کانواس سعی\n\
+          می کند برای نشان دادن پیش نمایش از آن استفاده کند.\n\
+          اگر سند در Scribd قابل نمایش نباشد، یا اگر کاربر فلش\n\
+          پلیر نصب نکرده باشد (مثلاً آی پاد/آی فون)،\n\
+          در صورتی که Google Docs Previews فعال شده باشد، کانواس\n\
+          برای استفاده از آن به عقب برمی گردد. با استفاده از این خدمت،\n\
+          تأیید می کنید که [شرایط استفاده از خدمات Google Docs Viewer](%{terms_url})\n\
+          را مطالعه کرده و با آن موافق هستید.\n\
+          \x20"
       about_google_docs_tooltip: "درباره Google Docs Previews"
       account_admins_title: "مدیرهای حساب"
       account_quotas: 
@@ -2049,6 +2061,12 @@ fa-IR:
     no_manifest: "این Blackboard .zip هیچ فایل imsmanifest.xml در دایرکتوری ریشه ندارد."
   bookmark_service: 
     default_title: "عنوان موجود نیست"
+  broccoli_cloud: 
+    hidden_title: "مخفی. از طریق یک پیوند قابل دسترسی است"
+    published_title: "منتشر شده"
+    title: 
+      permissions: "مجوزهای ویرایش برای: %{name}"
+    unpublished_title: "منتشر نشده"
   broken_file_link_found_in_your_course_7cc24395: "پیوند خراب فایل در درس شما موجود است"
   bulk_course_migration: 
     export_failed: "در هنگام صدور درس با bb_lc٪ {id} از Blackboard خطایی رخ داد"
@@ -3241,6 +3259,13 @@ fa-IR:
     context_module_next: 
       aria_labels: 
         add_item: "افزودن محتوا"
+      images: 
+        alt: 
+          incomplete: ناقص
+        title: 
+          complete: "ماژول کامل شد"
+          incomplete: "ماژول ناقص است"
+          locked: "ماژول قفل شده است"
       links: 
         add_item: "افزودن محتوا"
         text: 
@@ -3293,7 +3318,22 @@ fa-IR:
         outdent_item: "کاهش تورفتگی"
         remove_item: حذف
         remove_item_from_module: "حذف این مورد از ماژول"
+      max_score: 
+        fulfilled: "نمره بیش از a%{score} نیست"
+        unfulfilled: "نمره باید بیشتر از %{score} نباشد"
+      min_score: 
+        fulfilled: "نمره حداقل %{score} است"
+        unfulfilled: "نمره باید حداقل %{score} باشد"
       modules_item_move_to: "انتقال به..."
+      must_contribute: 
+        fulfilled: "در محتوای صفحه مشارکت شد"
+        unfulfilled: "باید در محتوای صفحه مشارکت شود"
+      must_submit: 
+        fulfilled: "تکلیف ارسال شد"
+        unfulfilled: "تکلیف باید ارسال شود"
+      must_view: 
+        fulfilled: "این صفحه مشاهده شد"
+        unfulfilled: "این صفحه باید مشاهده شود"
       settings: تنظیمات
     module_locked: "قفل شده"
     module_started: "در حال پیشرفت"
@@ -3536,6 +3576,19 @@ fa-IR:
       on_campus: "در دانشگاه"
       online: آنلاین
     course_not_found: "درس مورد نظر یافت نشد"
+    csv: 
+      comments: نظرها
+      current_score: "نمره فعلی"
+      final_grade: "نمره نهایی"
+      final_score: "نمره نهایی"
+      id: شناسه
+      points_possible: "امتیاز ممکن"
+      read_only_field: "(فقط خواندنی)"
+      root_account: "حساب ریشه"
+      section: بخش
+      sis_login_id: "شناسه ورود به سامانه اطلاعات دانشجو"
+      sis_user_id: "شناسه کاربر در سامانه اطلاعات دانشجو"
+      student: دانشجو
     default_grading_scheme_name: "طرح پیش فرض نمره گذاری"
     default_name: "درس من"
     default_short_name: درس-101
@@ -4167,6 +4220,7 @@ fa-IR:
       re_sending: "در حال ارسال دوباره..."
       send_done: " انجام شد. ارسال پیام ممکن است چند دقیقه طول بکشد."
       send_failed: "درخواست انجام نشد. دوباره سعی کنید."
+      teachers_only: "بعد از اینکه این درس *منتشر شود*، فقط اساتید می توانند آن را ببینند"
       titles: 
         drop_course: "رها کردن این درس"
         recent_feedback: "بازخورد اخیر"
@@ -4256,6 +4310,7 @@ fa-IR:
   created_group_group_name_2097306b: "گروه %{group_name} ایجاد شد"
   creative_commons_714a065f: "کریتیو کامنز"
   creative_commons_license_725584ae: "مجوز کریتیو کامنز:"
+  crowdsourced: true
   crumbs: 
     access_report: "گزارش دسترسی"
     announcements: "اطلاعیه ها"
@@ -5550,6 +5605,17 @@ fa-IR:
     student_outcome_gradebook: "دفتر نمره تسلط یادگیری دانشجو"
   file_list_updated_38e2a5ad: "فهرست فایل بهنگام سازی شد"
   file_not_found_9eec054c: "فایل موجود نیست"
+  file_preview: 
+    file_preview_headerbutton_close: بستن
+    file_preview_headerbutton_download: بارگیری
+    file_preview_headerbutton_info: اطلاعات
+    file_preview_infotable_datecreated: "تاریخ ایجاد شد"
+    file_preview_infotable_datemodified: "تاریخ تغییر یافت"
+    file_preview_infotable_kind: نوع
+    file_preview_infotable_modifiedby: "آخرین تغییر توسط"
+    file_preview_infotable_name: نام
+    file_preview_infotable_size: اندازه
+    file_preview_infotable_status: وضعیت
   file_preview_eedb43f2: "پیش نمایش فایل"
   file_previews: 
     lock_explanation: 
@@ -5560,6 +5626,15 @@ fa-IR:
       file_previews: 
         download_file: "بارگیری *filename*"
         no_preview_available: "هیچ پیش نمایشی برای این فایل موجود نیست."
+  file_rename_form: 
+    back: بازگشت
+    change: تغییر
+    change_name: "تغییر اسم"
+    message: "یک مورد با عنوان \"%{name}\" در این محل موجود است. می خواهید با فایل موجود جایگزین شود؟"
+    name: نام
+    prompt: "تغییر \"%{name}\" به"
+    rename_title: "کپی کردن"
+    replace: "جایگزین کردن"
   file_status: 
     hidden_status: "مخفی. از طریق یک پیوند فایل دسترسی است"
     published_status: "منتشر شده"
@@ -5964,6 +6039,7 @@ fa-IR:
       grades: "نمره ها"
       hide_student_names: "مخفی کردن نام دانشجویان"
       include_ungraded: "در نظر گرفتن نمره گذاری نشده به عنوان 0"
+      individual_view: "تغییر دادن به نمای منفرد"
       learning_mastery: "تسلط یادگیری"
       page_header_title: "دفتر نمره"
       publish_to_sis: "انتشار نمره ها در سامانه اطلاعات دانشجو"
@@ -6029,6 +6105,8 @@ fa-IR:
         submission: "این دانشجو تکلیف را ارسال کرده است"
       icons: 
         delete_comment: "حذف نظر"
+        file_attachment: "پیوست فایل"
+        media_comment: "نظر رسانه ای"
         speech_recognition: "بازشناسی گفتار"
       keycode_descriptions: 
         change_grade: "تغییر دادن نمره"
@@ -6982,6 +7060,8 @@ fa-IR:
     show_me_where: "جای آن را به من نمایش بده"
   links_14b70841: پیوندها
   loading_25990131: "در حال بارگذاری..."
+  locales: 
+    fa-IR: "فارسی (crowd-sourced)"
   lock_date_cannot_be_after_course_end_a473158b: "تاریخ قفل کردن نمی تواند بعد از خاتمه درس باشد"
   lock_date_cannot_be_after_section_end_d37da70c: "تاریخ قفل کردن نمی تواند بعد از خاتمه بخش باشد"
   lock_date_cannot_be_after_term_end_cf1a188f: "تاریخ قفل کردن نمی تواند بعد از پایان نیمسال باشد"
@@ -7000,7 +7080,19 @@ fa-IR:
         password: "رمز عبور"
         sending: "در حال ارسال..."
       new: 
+        back_to_login: "بازگشت به صفحه ورود"
+        browse_courses: "مرور کردن درس ها"
+        buttons: 
+          request_password: "درخواست رمز عبور"
+        coenrollment_banner: "*والدین یک کاربر کانواس هستید؟* **برای یک حساب، اینجا کلیک کنید**"
+        dont_know_password: "رمز عبور خود را نمی دانید؟"
+        labels: 
+          password: "رمز عبور"
+          remember_me: "ماندن در حالت ورود"
+        log_in: ورود
+        login_handle: "%{login_handle_name} خود را وارد کنید تا برای شما پیوندی را ارسال کنیم که رمز عبور خود را تغییر دهید."
         page_title: "ورود به کانواس"
+        register_for_canvas: "*به حساب کانواس نیاز دارید؟* **اینجا کلیک کنید, رایگان است!**"
     logout_confirm: 
       cancel: لغو
       details: 
@@ -10241,6 +10333,7 @@ fa-IR:
   qti_img_matching_question: "پرسش نظیر وارد شده دارای تصاویری در هر دو طرف است که پشتیبانی نشده اند"
   qti_img_matching_question_distractors: "پرسش نظیر وارد شده دارای تصاویری در داخل گزینه هاست و نمی تواند ثابت شود، زیرا دارای گزینه های نادرست نیز هست"
   qti_name: "مبدل QTI"
+  qualified_locale: fa-IR
   question_answered: "پاسخ داده شده"
   question_bank: 
     align_outcomes: "تطبیق دادن نتایج"
@@ -10840,13 +10933,22 @@ fa-IR:
           add_new_question_group: "افزودن گروه جدید پرسش"
       form_answer: 
         answer_in_range_accessible: "بین *شروع بازه* و #range end#"
+        answer_text: "متن پاسخ"
+        answer_weight: "وزن پاسخ"
         exact_answer_with_error_margin_accessible: "*پاسخ دقیق* با حاشیه خطای #error margin#"
         labels: 
           answer_comments: "نظرها، اگر دانشجو این پاسخ را انتخاب کند"
           answer_in_range: "پاسخ در بازه "
           exact_answer: "پاسخ دقیق"
+        matching_left: "در حال انطباق سمت چپ"
+        matching_right: "در حال انطباق سمت راست"
         numerical_answer: "پاسخ عددی"
         possible_answer: "پاسخ ممکن"
+        titles: 
+          click_to_enter_answer_comments: "اگر دانشجو این پاسخ را انتخاب کند، برای وارد کردن نظر کلیک کنید"
+          click_to_set_as_correct: "برای تعیین این پاسخ به عنوان پاسخ درست، کلیک کنید"
+          delete_answer: "حذف این پاسخ"
+          edit_as_html: "تغییر ویرایش متن پاسخ به عنوان HTML"
       form_question: 
         allow_tolerance: "اجازه دادن به حاشیه خطای +/- %{tolerance}"
         buttons: 
@@ -11554,6 +11656,7 @@ fa-IR:
     folder: پوشه
     folder_browsing_tree: "درخت مرور پوشه"
     folder_name: "نام پوشه"
+    loading_more_results: "در حال بارگذاری نتایج بیشتر..."
     modified_by: "تغییر یافته بر اساس"
     move: انتقال
     move_question: 
@@ -11566,6 +11669,7 @@ fa-IR:
     progress_message: "در حال آماده سازی بارگیری: %{percent}% انجام شده است"
     restrict_access: "محدود کردن دسترسی"
     results_count: "در حال نمایش %{num_results} نتیجه جستجو"
+    retry: "تلاش دوباره"
     search_for_files: "جستجوی فایل ها"
     search_results_for: "جستجوی نتایج برای \"%{search_term}\""
     select_all: "انتخاب همه"
@@ -13102,6 +13206,7 @@ fa-IR:
       discussion_submission_description: "موردهای ارسالی برای این تکلیف، ارسال های موجود در بحث مربوط به تکلیف هستند. در زیر ارسال های مربوط به بحث برای %{user} آمده است یا می توانید *بحث کامل را مشاهده کنید*."
       discussion_submission_description_without_link: "موردهای ارسالی این تکلیف، ارسال های موجود در بحث تکلیف هستند. در قسمت زیر، ارسال های بحث مربوط به %{user} آمده است."
       entry_no_image: "به یاد داشته باشید که این صفحه از زمان ارسال اولیه، ممکن است تغییر یافته باشد."
+      entry_with_image: "یک تصویر کلی از ظاهر صفحه در هنگام ارسال را گنجانده ایم. یا اینکه می توانید برای مشاهده مورد ارسالی اصلی  کلیک کنید."
       external_url_submission: "این مورد ارسالی یک نشانی اینترنتی به یک صفحه بیرونی بود."
       group_discussion_submission_description: "موردهای ارسالی برای این تکلیف، ارسال های موجود در بحث مربوط به تکلیف هستند. در زیر ارسال های مربوط به بحث برای %{user} آمده است یا می توانید *بحث کامل گروه را مشاهده کنید*."
       group_discussion_submission_description_without_link: "موردهای ارسالی این تکلیف، ارسال های موجود در بحث تکلیف مربوط به این گروه هستند. در قسمت زیر، ارسال های بحث مربوط به %{user} آمده است."
@@ -13118,6 +13223,7 @@ fa-IR:
       show_entire_discussion: "نمایش کل بحث"
       url_preview: "پیش نمایش نشانی اینترنتی"
       view_feedback_button: "مشاهده بازخورد"
+      view_original_submission: "مشاهده مورد ارسالی اصلی برای %{user}"
       view_preview_button: پیش‌نمایش
     still_zipping: "فشرده سازی فایل هنوز در حال انجام است..."
     submission_download: 
@@ -13691,6 +13797,12 @@ fa-IR:
         really_merge: "مطمئنید که می خواهید حساب های کاربری ادغام شوند؟"
     birthdate_invalid: "تاریخ یا تاریخ و زمان برای تاریخ تولد معتبر نیست"
     cant_self_merge: "نمی توانید یک حساب را با خودش ادغام کنید."
+    cc_prefs: 
+      buttons: 
+        configure: "پیکربندی تنظیمات دلخواه ارتباط"
+      comm_preferences_instructions: "اکنون که در کانواس ثبت نام کرده اید، ممکن است بخواهید اطلاعیه هایی که در طول پیشرفت کلاس ها دریافت می کنید را پیکربندی کنید. کانواس به اندازه ی کافی قابلیت انعطاف پذیری دارد که به شما امکان دهد انتخاب کنید چگونه و برای چه رویدادهایی مایلید که برای شما اطلاعیه فرستاده شود. وقتی اتفاقاتی در درس های شما روی می دهد، می توانید انتخاب کنید که به طور روزانه یا هفتگی نامه الکترونیکی یا پیامک سریعا به تلفن همراه شما ارسال شود."
+      titles: 
+        configure_com_prefs: "پیکربندی تنظیمات دلخواه ارتباط"
     confirms: 
       unenroll_user: "مطمئنید که می خواهید ثبت نام این کاربر لغو شود؟"
     could_not_find_url: "نشانی اینترنتی بارگیری یافت نشد."

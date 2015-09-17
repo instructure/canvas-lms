@@ -8,21 +8,11 @@ else
   load_path << (Rails.root + "config/locales/locales.yml").to_s # add it at the end, to trump any weird/invalid stuff in locale-specific files
 end
 
-Rails.application.config.i18n.backend = I18nema::Backend.new
-Rails.application.config.i18n.enforce_available_locales = true
-Rails.application.config.i18n.fallbacks = true
+I18n.backend = I18nema::Backend.new
+I18nema::Backend.send(:include, I18n::Backend::Fallbacks)
+I18n.backend.init_translations
 
-module CalculateDeprecatedFallbacks
-  def reload!
-    super
-    I18n.available_locales.each do |locale|
-      if (deprecated_for = I18n.backend.direct_lookup(locale.to_s, 'deprecated_for'))
-        I18n.fallbacks[locale] = I18n.fallbacks[deprecated_for.to_sym]
-      end
-    end
-  end
-end
-I18n.singleton_class.prepend CalculateDeprecatedFallbacks
+I18n.enforce_available_locales = true
 
 I18nliner.infer_interpolation_values = false
 

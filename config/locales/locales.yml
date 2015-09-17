@@ -1,66 +1,39 @@
-ar:
-  locales:
-    ar: العربية
-  qualified_locale: ar-SA
-da:
-  locales:
-    da: Dansk
-  qualified_locale: da-DK
-de:
-  locales:
-    de: Deutsch
-  qualified_locale: de-DE
 en:
   locales:
     en: English (US)
   qualified_locale: en-US
-en-AU:
-  locales:
-    en-AU: English (Australia)
-  qualified_locale: en-AU
-en-GB:
-  locales:
-    en-GB: English (United Kingdom)
-  qualified_locale: en-GB
 es:
   locales:
     es: Español
   qualified_locale: es-ES
-fa:
+de:
   locales:
-    fa: فارسی (crowd-sourced)
-  qualified_locale: fa-IR
-  crowdsourced: true
-fa-IR:
-  qualified_locale: fa-IR
-  crowdsourced: true
-  deprecated_for: fa
+    de: Deutsch
+  qualified_locale: de-DE
+ru:
+  locales:
+    ru: pу́сский
+  qualified_locale: ru-RU
 fr:
   locales:
     fr: Français
   qualified_locale: fr-FR
-ja:
-  locales:
-    ja: 日本語
-  qualified_locale: ja-JP
-ko:
-  locales:
-    ko: 한국말 (crowd-sourced)
-  qualified_locale: ko-KR
-  crowdsourced: true
-nb:
-  locales:
-    nb: Norwegian (Bokmål)
-  qualified_locale: nb-NO
-nl:
-  locales:
-    nl: Nederlands
-  qualified_locale: nl-NL
-  crowdsourced: false
 pl:
   locales:
     pl: Polski
   qualified_locale: pl-PL
+zh:
+  locales:
+    zh: 简体中文
+  qualified_locale: zh-CN
+zh_Hant:
+  locales:
+    zh_Hant: 繁體中文
+  qualified_locale: zh-HK
+ar:
+  locales:
+    ar: العربية
+  qualified_locale: ar-SA
 pt:
   locales:
     pt: Português
@@ -69,35 +42,52 @@ pt-BR:
   locales:
     pt-BR: Português do Brasil
   qualified_locale: pt-BR
-ru:
+ja:
   locales:
-    ru: pу́сский
-  qualified_locale: ru-RU
-sv:
+    ja: 日本語
+  qualified_locale: ja-JP
+nl:
   locales:
-    sv: Svenska
-  qualified_locale: sv-SE
+    nl: Nederlands
+  qualified_locale: nl-NL
+  crowdsourced: false
+nb:
+  locales:
+    nb: Norwegian (Bokmål)
+  qualified_locale: nb-NO
+ko:
+  locales:
+    ko: 한국말 (crowd-sourced)
+  qualified_locale: ko-KR
+  crowdsourced: true
+en-GB:
+  locales:
+    en-GB: English (United Kingdom)
+  qualified_locale: en-GB
+en-AU:
+  locales:
+    en-AU: English (Australia)
+  qualified_locale: en-AU
 tr:
   locales:
     tr: Türkçe (crowd-sourced)
   qualified_locale: tr-TR
   crowdsourced: true
-zh-Hans:
+fa-IR:
   locales:
-   zh-Hans: 简体中文
-  qualified_locale: zh-CN
+    fa-IR: فارسی (crowd-sourced)
+  qualified_locale: fa-IR
+  crowdsourced: true
+da:
+  locales:
+    da: Dansk
+  qualified_locale: da-DK
 hy:
   locales:
     hy: Հայերեն (crowd-sourced)
   qualified_locale: hy-AM
   crowdsourced: true
-zh:
-  qualified_locale: zh-CN
-  deprecated_for: zh-Hans
-zh-Hant:
+sv:
   locales:
-    zh-Hant: 繁體中文
-  qualified_locale: zh-HK
-zh_Hant:
-  qualified_locale: zh-HK
-  deprecated_for: zh-Hant
+    sv: Svenska
+  qualified_locale: sv-SE
