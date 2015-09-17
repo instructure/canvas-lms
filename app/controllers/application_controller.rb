@@ -332,6 +332,8 @@ class ApplicationController < ActionController::Base
 
   def check_pending_otp
     if session[:pending_otp] && params[:controller] != 'login/otp'
+      return render text: "Please finish logging in", status: 403 if request.xhr?
+
       reset_session
       redirect_to login_url
     end
