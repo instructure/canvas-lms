@@ -82,7 +82,7 @@ describe 'developer keys' do
     driver.switch_to.alert.accept
     driver.switch_to.default_content
     keep_trying_until { ff("#keys tbody tr").length == 0 }
-    expect(Account.default.developer_keys.count).to eq 0
+    expect(Account.default.developer_keys.nondeleted.count).to eq 0
   end
 
   it "should be paginated", priority: "1", test_id: 344532 do
