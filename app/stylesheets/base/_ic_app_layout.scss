@@ -13,26 +13,45 @@ $ic-left-side-width: $ic-sp*15;
 .ic-app-main-layout-vertical {
   box-sizing: border-box;
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+
+  body:not(.full-width) & {
+    display: flex;
+    flex-direction: column;
+  }
 }
 
 .ic-app-main-layout-horizontal {
-  transition: all 0.1s ease-out;
-  transform: translate3d(0,0,0);
-  flex: 1 0 auto;
   position: relative;
-  body.course-menu-expanded & { transform: translate3d($ic-left-side-width,0,0); }
-  // Theme Editor watermark gets attached to this element as a background image
-  body:not(.no-headers) & { background: $ic-brand-watermark left bottom no-repeat; }
-  @include breakpoint(wide) {
-    display: flex;
-    position: static;
-    body.course-menu-expanded & {
+
+  body:not(.full-width) & {
+    transition: all 0.1s ease-out;
+    transform: translate3d(0,0,0);
+    flex: 1 0 auto;
+
+    @include breakpoint(wide) {
+      display: flex;
+      position: static;
+    }
+  }
+
+  body.course-menu-expanded & {
+    transform: translate3d($ic-left-side-width,0,0);
+
+    @include breakpoint(wide) {
       transform: none;
       transition: none;
     }
   }
+
+  // Theme Editor watermark gets attached to this element as a background image
+  body:not(.no-headers) & {
+    background: $ic-brand-watermark left bottom no-repeat;
+  }
+
+  body.full-width & {
+    min-height: 100vh;
+  }
+
   // HACK workaround for IE10 and IE11 flexbox bug
   // https://connect.microsoft.com/IE/feedback/details/802625/min-height-and-flexbox-flex-direction-column-dont-work-together-in-ie-10-11-preview
   @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) { min-height: 93.5vh; }
@@ -69,14 +88,18 @@ $ic-left-side-width: $ic-sp*15;
 }
 
 .ic-app-main-content {
-  box-sizing: border-box;
-  flex: 1;
-  @include breakpoint(desktop) { display: flex; }
+  body:not(.full-width) & {
+    box-sizing: border-box;
+    flex: 1;
+    @include breakpoint(desktop) { display: flex; }
+  }
 }
 
 .ic-app-main-content__primary {
   box-sizing: border-box;
-  @include breakpoint(desktop) { flex: 1; }
+  body:not(.full-width) & {
+    @include breakpoint(desktop) { flex: 1; }
+  }
 }
 
 .ic-app-main-content__secondary {

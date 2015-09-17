@@ -72,30 +72,3 @@
     }
   }
 }
-
-// Some layouts in Canvas (Speedgrader and Conversations)
-// are absolutely positioned full-screen, which can cause problems when
-// they are contained by the New UI flexbox-based layout.
-// This mixin removes the un-neeeded flex in the layout containers.
-@mixin remove-nui-flex-layout {
-  @if $use_new_styles {
-    .ic-app-main-layout-vertical { display: block; }
-    .ic-app-main-layout-horizontal {
-      transition: none;
-      transform: none;
-      flex: none;
-      display: block;
-      position: static;
-      min-height: 100vh;
-      body.course-menu-expanded & { transform: none; }
-      @include breakpoint(wide) { display: block; }
-    }
-    .ic-app-main-content {
-      flex: none;
-      display: block;
-    }
-    .ic-app-main-content__primary {
-      flex: none;
-    }
-  }
-}

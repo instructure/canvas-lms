@@ -7,26 +7,12 @@
 
 #main {
   position: absolute;
-  bottom: 0;
+  top: 0; bottom: 0;
   margin-bottom: 0;
   display: none;
   box-sizing: border-box;
-  @if $use_new_styles {
-    top: 0 !important; // need a more elegant way of doing this
-    left: $ic-header-primary-width - $ic-sp;
-    width: calc(100% - (#{$ic-header-primary-width} - #{$ic-sp}) );
-    @include breakpoint(wide) { 
-      left: $ic-header-primary-width;
-      width: calc(100% - #{$ic-header-primary-width});
-    }
-  }
-  @else {
-    width: 100%;
-  }
+  width: 100%;
 }
-
-// Get rid of all the new-style flexbox layout for Conversations
-@include remove-nui-flex-layout;
 
 #footer {
   display: none;
@@ -48,14 +34,14 @@
 .conversations .panel {
   box-sizing: border-box;
   height: 58px;
-  
+
   @if $use_new_styles {
     background: $lightBackground;
     border-bottom: 1px solid $ic-border-light;
     height: 112px;
     padding: $ic-sp;
-    @include breakpoint(wide) { 
-      height: 62px; 
+    @include breakpoint(wide) {
+      height: 62px;
       display: flex;
       align-items: center;
       padding-bottom: 0;
@@ -75,7 +61,7 @@
     }
     .panel__secondary {
       @include breakpoint(wide) { white-space: nowrap; }
-      > div { 
+      > div {
         display: inline-block;
         vertical-align: middle;
         white-space: nowrap;
@@ -116,7 +102,7 @@
 .filters {
   @if $use_new_styles { margin-right: $ic-sp; }
   @else { margin-right: 50px; }
-  
+
 
   /* TODO: make sure we still need this with the frd filters (may not be selects) */
   select {
@@ -224,13 +210,13 @@
   .list-header {
     color: darken($ic-color-neutral, 50);
     padding: 3px 12px;
-    @if $use_new_styles { 
+    @if $use_new_styles {
       background: $lightBackground;
       border-bottom: 1px solid $ic-border-light;
     }
     @else {
       background: #f3f3f3;
-      border-bottom: 1px solid #bfbfbf; 
+      border-bottom: 1px solid #bfbfbf;
     }
   }
 
@@ -241,7 +227,7 @@
   }
 
   .messages > li {
-    background: #fff;    
+    background: #fff;
     box-sizing: border-box;
     cursor: pointer;
     height: 100px;
@@ -485,7 +471,7 @@ h2.subject {
   }
 
   .message-content > li {
-    
+
     margin: 0 12px;
     padding: 24px 0;
     @if $use_new_styles { border-bottom: 1px solid $ic-border-light; }
