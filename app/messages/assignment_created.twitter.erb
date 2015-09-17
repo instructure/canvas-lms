@@ -1,7 +1,7 @@
 <% define_content :link do -%>
   <%= polymorphic_url([asset.context, asset]) %>
 <% end -%>
-<%= t('assignment_change', 'Canvas Alert - Change: %{assignment_name}, %{course_name}', :assignment_name => asset.title, :course_name => asset.context.name) %>
+<%= t('assignment_change', 'Braven Alert - Change: %{assignment_name}, %{course_name}', :assignment_name => asset.title, :course_name => asset.context.name) %>
 
 <% if asset.multiple_due_dates_apply_to?(user) -%>
 <%= t('multiple_due_dates', 'due: Multiple Dates') %>

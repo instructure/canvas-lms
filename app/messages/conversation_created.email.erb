@@ -7,7 +7,7 @@
 <% end %>
 
 <% define_content :subject do %>
-  <%= t :subject, "%{user_name}, you just sent a message in Canvas.", :user_name => content(:user_name) %>
+  <%= t :subject, "%{user_name}, you just sent a message in Braven.", :user_name => content(:user_name) %>
 <% end %>
 
 <% define_content :footer_link do %>
@@ -26,7 +26,7 @@
 <% if asset.has_media_objects? %>
 <%= t :audio_comment, "This message includes media comments. To listen or reply, click the link below:" %>
 <% else %>
-<%= t :reply_to_conversation_message, "You can reply to this message in Canvas by replying directly to this email." %>
+<%= t :reply_to_conversation_message, "You can reply to this message in Braven by replying directly to this email." %>
 <% end %>
 
 <%= content :link %>
