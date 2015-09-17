@@ -698,6 +698,13 @@ $gradebook_checkbox_width: 16px;
   }
 }
 
+.ui-dialog.post-grades-frame-dialog {
+  .ui-dialog-content {
+    padding: 0;
+    overflow: hidden;
+  }
+}
+
 #export_progress {
   background-color: gray;
   width: 100px;
