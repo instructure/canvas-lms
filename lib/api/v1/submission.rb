@@ -39,7 +39,7 @@ module Api::V1::Submission
     end
 
     if current_user && assignment && includes.include?('provisional_grades') && assignment.moderated_grading?
-      hash['provisional_grades'] = submission_provisional_grades_json(submission, assignment, current_user)
+      hash['provisional_grades'] = submission_provisional_grades_json(submission, assignment, current_user, includes)
     end
 
     if includes.include?("submission_comments")
@@ -47,9 +47,7 @@ module Api::V1::Submission
     end
 
     if includes.include?("rubric_assessment") && submission.rubric_assessment && submission.user_can_read_grade?(current_user)
-      ra = submission.rubric_assessment.data
-      hash['rubric_assessment'] = {}
-      ra.each { |rating| hash['rubric_assessment'][rating[:criterion_id]] = rating.slice(:points, :comments) }
+      hash['rubric_assessment'] = rubric_assessment_json(submission.rubric_assessment)
     end
 
     if includes.include?("assignment")
@@ -207,19 +205,40 @@ module Api::V1::Submission
     attachment
   end
 
-  private
+  def rubric_assessment_json(rubric_assessment)
+    hash = {}
+    rubric_assessment.data.each do |rating|
+      hash[rating[:criterion_id]] = rating.slice(:points, :comments)
+    end
+    hash
+  end
 
-  def submission_provisional_grades_json(submission, assignment, current_user)
+  def provisional_grade_json(provisional_grade, submission, assignment, current_user, includes = [])
+    json = provisional_grade.grade_attributes
+    json.merge!(speedgrader_url: speed_grader_url(submission, assignment, provisional_grade))
+    if includes.include?('submission_comments')
+      json['submission_comments'] = submission_comments_json(provisional_grade.submission_comments, current_user)
+    end
+    if includes.include?('rubric_assessment') && provisional_grade.rubric_assessments.any?
+      json['rubric_assessment'] = rubric_assessment_json(provisional_grade.rubric_assessments.first)
+    end
+    json
+  end
+
+  def submission_provisional_grades_json(submission, assignment, current_user, includes)
     provisional_grades = submission.provisional_grades
-    unless assignment.context.grants_right?(current_user, :moderate_grades)
-      provisional_grades = provisional_grades.scored_by(current_user)
+    if assignment.context.grants_right?(current_user, :moderate_grades)
+      provisional_grades = provisional_grades.sort_by { |pg| pg.final ? CanvasSort::Last : pg.created_at }
+    else
+      provisional_grades = provisional_grades.select { |pg| pg.scorer_id == current_user.id }
     end
 
     provisional_grades.map do |provisional_grade|
-      speed_grader_url = speed_grader_url(submission, assignment, provisional_grade)
-      provisional_grade.grade_attributes.merge(speedgrader_url: speed_grader_url)
+      provisional_grade_json(provisional_grade, submission, assignment, current_user, includes)
     end
   end
+
+  private
 
   def speed_grader_url(submission, assignment, provisional_grade)
     speed_grader_course_gradebook_url(

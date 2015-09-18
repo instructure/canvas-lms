@@ -204,6 +204,66 @@ describe ModeratedGrading::ProvisionalGrade do
       expect(sub.grade).not_to be_nil
     end
   end
+
+  describe "copy_to_final_mark!" do
+    before(:once) do
+      @course = course
+      @scorer = scorer
+      @moderator = teacher_in_course(:course => @course, :active_all => true).user
+      outcome_with_rubric
+      @association = @rubric.associate_with(assignment, course, :purpose => 'grading', :use_for_grading => true)
+      @sub = assignment.submit_homework(student, :submission_type => 'online_text_entry', :body => 'hallo')
+      @pg = @sub.find_or_create_provisional_grade! scorer: @scorer, score: 80
+      @prov_assmt = @association.assess(:user => student, :assessor => @scorer, :artifact => @pg,
+        :assessment => { :assessment_type => 'grading',
+                         :"criterion_#{@rubric.criteria_object.first.id}" => { :points => 3, :comments => "wat" } })
+      @prov_comment = @sub.add_comment(:commenter => @scorer, :comment => 'blah', :provisional => true)
+      expect(@prov_comment.provisional_grade_id).to eq @pg.id
+    end
+
+    def test_copy_to_final_mark
+      final_mark = ModeratedGrading::ProvisionalGrade.find(@pg.copy_to_final_mark!(@moderator))
+      expect(final_mark.id).not_to eq @pg.id
+
+      expect(final_mark.grade).to eq @pg.grade
+      expect(final_mark.score).to eq @pg.score
+      expect(final_mark.scorer).to eq @moderator
+      expect(final_mark.final).to eq true
+
+      expect(@sub.submission_comments.count).to eq 0
+      expect(final_mark.submission_comments.count).to eq 1
+      final_comment = final_mark.submission_comments.first
+      expect(final_comment.id).not_to eq @prov_comment.id
+      expect(final_comment.author).to eq @scorer
+      expect(final_comment.comment).to eq @prov_comment.comment
+
+      expect(@sub.rubric_assessments.count).to eq 0
+      expect(final_mark.rubric_assessments.count).to eq 1
+      final_assmt = final_mark.rubric_assessments.first
+      expect(final_assmt.score).to eq 3
+      expect(final_assmt.assessor).to eq @scorer
+      expect(final_assmt.rubric_association).to eq @association
+      expect(final_assmt.data).to eq @prov_assmt.data
+    end
+
+    it "copies grade, score, comments, and rubric assessments to a final mark" do
+      test_copy_to_final_mark
+    end
+
+    it "overwrites an existing final mark (including comments and rubric assessments)" do
+      final_mark = @sub.find_or_create_provisional_grade! scorer: @scorer, score: 90, final: true
+      fa = @association.assess(:user => student, :assessor => @scorer, :artifact => final_mark,
+         :assessment => { :assessment_type => 'grading',
+                          :"criterion_#{@rubric.criteria_object.first.id}" => { :points => 4, :comments => "srsly" } })
+      fc = @sub.add_comment(:commenter => @scorer, :comment => 'no rly deleteme', :provisional => true, :final => true)
+      expect(fc.provisional_grade_id).to eq final_mark.id
+
+      test_copy_to_final_mark
+
+      expect(RubricAssessment.find_by_id(fa)).to be_nil
+      expect(SubmissionComment.find_by_id(fc)).to be_nil
+    end
+  end
 end
 
 describe ModeratedGrading::NullProvisionalGrade do

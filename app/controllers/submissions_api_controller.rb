@@ -775,7 +775,7 @@ class SubmissionsApiController < ApplicationController
                       selected_provisional_grade_id: selection && selection.selected_provisional_grade_id)
           sub = submissions[student.id]
           pg_list = if sub
-            sub.provisional_grades.sort_by { |pg| pg.created_at }.map(&:grade_attributes)
+            submission_provisional_grades_json(sub, @assignment, @current_user, includes)
           else
             []
           end
