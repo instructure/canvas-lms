@@ -1001,7 +1001,15 @@ class ConversationsController < ApplicationController
       if recipient_ids.is_a?(String)
         params[:recipients] = recipient_ids = recipient_ids.split(/,/)
       end
-      @recipients = @current_user.load_messageable_users(MessageableUser.individual_recipients(recipient_ids), :conversation_id => params[:from_conversation_id])
+      if params[:context_code] && params[:context_code] =~ /\A(course|group|section)/
+        @recipients = @current_user.
+                      messageable_user_calculator.
+                      messageable_users_in_context_scope(params[:context_code]).
+                      try(:where, id: MessageableUser.individual_recipients(recipient_ids)).
+                      to_a
+      else
+        @recipients = @current_user.load_messageable_users(MessageableUser.individual_recipients(recipient_ids), :conversation_id => params[:from_conversation_id])
+      end
       MessageableUser.context_recipients(recipient_ids).map do |context|
         @recipients.concat @current_user.messageable_users_in_context(context)
       end

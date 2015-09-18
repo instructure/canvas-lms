@@ -259,6 +259,7 @@ describe ConversationsController do
         course2 = course(:active_all => true)
         course2.enroll_user(student2, "StudentEnrollment").accept!
         course2.enroll_user(student1, "StudentEnrollment").accept!
+        user_session(User.find(student1.id)) # clear process local enrollment cache
 
         post 'create', :recipients => [student2.id.to_s], :body => "yo again", :message => "you still suck", :group_conversation => true,
              :course => course2.asset_string, :context_code => course2.asset_string
