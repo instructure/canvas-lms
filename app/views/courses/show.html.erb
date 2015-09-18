@@ -48,13 +48,7 @@
 
     <% if @can_manage_content || @course_home_view != 'feed' || @course_home_sub_navigation_tools.present? %>
       <div class="course-options">
-        <% @course_home_sub_navigation_tools.each do |tool| %>
-          <a class="btn button-sidebar-wide course-home-sub-navigation-lti"
-             href="<%= course_external_tool_path(@context, tool, launch_type: 'course_home_sub_navigation') %>">
-            <%= render(partial: 'external_tools/icon', locals: {tool: tool, settings_key: :course_home_sub_navigation}) %>
-            <%= tool.label_for(:course_home_sub_navigation, I18n.locale) %>
-          </a>
-        <% end %>
+        <%= external_tools_menu_items(@course_home_sub_navigation_tools, {link_class: "btn button-sidebar-wide course-home-sub-navigation-lti", settings_key: :course_home_sub_navigation}) %>
         <% if @can_manage_content %>
           <a class="btn button-sidebar-wide element_toggler choose_home_page_link" aria-controls="edit_course_home_content_form" href="<%= context_url(@context, :context_details_url) %>">
             <i class="icon-target"></i>
@@ -83,12 +77,8 @@
     <% else %>
       <% if @can_manage_content || @course_home_sub_navigation_tools.present? %>
         <div class="secondary-button-group rs-margin-lr rs-margin-top rs-margin-bottom">
+          <%= external_tools_menu_items(@course_home_sub_navigation_tools, {link_class: "btn button-sidebar-wide course-home-sub-navigation-lti", settings_key: :course_home_sub_navigation}) %>
         <% @course_home_sub_navigation_tools.each do |tool| %>
-          <a class="btn button-sidebar-wide course-home-sub-navigation-lti"
-             href="<%= course_external_tool_path(@context, tool, launch_type: 'course_home_sub_navigation') %>">
-            <%= render(partial: 'external_tools/icon', locals: {tool: tool, settings_key: :course_home_sub_navigation}) %>
-            <%= tool.label_for(:course_home_sub_navigation, I18n.locale) %>
-          </a>
         <% end %>
         <% if @can_manage_content %>
             <% js_bundle :course_wizard %>

@@ -141,14 +141,7 @@
                 <% end %>
 
                 <% if can_do(@context, @current_user, :manage_content) %>
-                  <% (@discussion_topic_menu_tools || []).each do |tool_hash| %>
-                    <li>
-                      <a class="menu_tool_link" href="<%= tool_hash[:base_url] %>&discussion_topics[]=<%= @topic.id %>" tabindex="-1" role="menuitem">
-                        <%= render(partial: 'external_tools/icon', locals: {tool: tool_hash, settings_key: :discussion_topic_menu}) %>
-                        <%= tool_hash[:title] %>
-                      </a>
-                    </li>
-                  <% end %>
+                  <%= external_tools_menu_items((@discussion_topic_menu_tools || []), {link_class: "menu_tool_link", settings_key: :discussion_topic_menu, in_list: true, url_params: {:discussion_topics => [@topic.id]}}) %>
                 <% end %>
               </ul>
             </div>

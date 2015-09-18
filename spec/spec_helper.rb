@@ -520,6 +520,24 @@ RSpec.configure do |config|
     expect(flash[:warning]).to eq "You must be logged in to access this page"
   end
 
+  # Instead of directly comparing urls
+  # this will make sure urls match
+  # by parsing them, and comparing the results
+  # meaning these would match
+  #   http://test.dev/?foo=bar&other=1
+  #   http://test.dev/?other=1&foo=bar
+  def assert_url_parse_match(test_url, expected_url)
+    parsed_test = URI.parse(test_url)
+    parsed_expected = URI.parse(expected_url)
+
+    parsed_test_query = Rack::Utils.parse_nested_query(parsed_test.query)
+    parsed_expected_query = Rack::Utils.parse_nested_query(parsed_expected.query)
+
+    expect(parsed_test.scheme).to eq parsed_expected.scheme
+    expect(parsed_test.host).to eq parsed_expected.host
+    expect(parsed_test_query).to eq parsed_expected_query
+  end
+
   def fixture_file_upload(path, mime_type=nil, binary=false)
     Rack::Test::UploadedFile.new(File.join(ActionController::TestCase.fixture_path, path), mime_type, binary)
   end

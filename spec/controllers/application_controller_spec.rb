@@ -131,7 +131,6 @@ describe ApplicationController do
       settings_mock = mock()
       settings_mock.stubs(:settings).returns({})
       Canvas::Plugin.stubs(:find).returns(settings_mock)
-
     end
 
     it "uses @real_current_user first" do
@@ -601,7 +600,7 @@ describe ApplicationController do
       controller.stubs(:polymorphic_url).returns("http://example.com")
       external_tools = controller.external_tools_display_hashes(:account_navigation, @course)
 
-      expect(external_tools).to eq([{:title=>"bob", :base_url=>"http://example.com", :icon_url=>"http://example.com", :canvas_icon_class => 'icon-commons'}])
+      expect(external_tools).to eq([{:title=>"bob", :base_url=>"http://example.com", :is_new => false, :icon_url=>"http://example.com", :canvas_icon_class => 'icon-commons'}])
     end
   end
 
@@ -643,7 +642,13 @@ describe ApplicationController do
 
     it 'returns a hash' do
       hash = controller.external_tool_display_hash(@tool, :account_navigation)
-      left_over_keys = hash.keys - [:base_url, :title, :icon_url, :canvas_icon_class]
+      left_over_keys = hash.keys - [:is_new, :base_url, :title, :icon_url, :canvas_icon_class]
+      expect(left_over_keys).to eq []
+    end
+
+    it 'returns a hash' do
+      hash = controller.external_tool_display_hash(@tool, :account_navigation)
+      left_over_keys = hash.keys - [:is_new, :base_url, :title, :icon_url, :canvas_icon_class]
       expect(left_over_keys).to eq []
     end
 

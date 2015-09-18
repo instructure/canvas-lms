@@ -50,7 +50,8 @@ describe "assignments menu tools" do
       link = f("#assignment_#{quiz_assignment.id} li a.menu_tool_link")
       expect(link).to be_displayed
       expect(link.text).to match_ignoring_whitespace(@tool.label_for(:quiz_menu))
-      expect(link['href']).to eq course_external_tool_url(@course, @tool) + "?launch_type=quiz_menu&quizzes[]=#{quiz.id}"
+      assert_url_parse_match(link['href'], course_external_tool_url(@course, @tool) + "?launch_type=quiz_menu&quizzes[]=#{quiz.id}")
+
     end
 
     it "should show tool launch links in the gear for items on the show page", priority: "2", test_id: 210088 do
@@ -62,7 +63,8 @@ describe "assignments menu tools" do
       link = f("#assignment_show li a.menu_tool_link")
       expect(link).to be_displayed
       expect(link.text).to match_ignoring_whitespace(@tool.label_for(:assignment_menu))
-      expect(link['href']).to eq course_external_tool_url(@course, @tool) + "?launch_type=assignment_menu&assignments[]=#{@assignment.id}"
+      assert_url_parse_match(link['href'], course_external_tool_url(@course, @tool) + "?launch_type=assignment_menu&assignments[]=#{@assignment.id}")
     end
   end
+
 end

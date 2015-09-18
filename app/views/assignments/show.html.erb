@@ -54,14 +54,7 @@
             <span class="screenreader-only"><%= t('manage', 'Manage') %></span>
           </a>
           <ul id="toolbar-1" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false">
-          <% @assignment_menu_tools.each do |tool_hash| %>
-            <li role="presentation">
-              <a class="menu_tool_link" href="<%= tool_hash[:base_url] %>&assignments[]=<%= @assignment.id %>" tabindex="-1" role="menuitem">
-                <%= render(partial: 'external_tools/icon', locals: {tool: tool_hash, settings_key: :assignment_menu}) %>
-                <%= tool_hash[:title] %>
-              </a>
-            </li>
-          <% end %>
+            <%= external_tools_menu_items(@assignment_menu_tools, {link_class: "menu_tool_link", settings_key: :assignment_menu, in_list: true, url_params: {:assignments => [@assignment.id]}}) %>
           </ul>
         <% end %>
       </div>

@@ -155,14 +155,21 @@ class ApplicationController < ActionController::Base
       :root_account => @domain_root_account, :current_user => @current_user})
 
     tools.map do |tool|
-      external_tool_display_hash(tool, type, context, custom_settings)
+      external_tool_display_hash(tool, type, {}, context, custom_settings)
     end
   end
 
-  def external_tool_display_hash(tool, type, context=@context, custom_settings=[])
+  def external_tool_display_hash(tool, type, url_params={}, context=@context, custom_settings=[])
+
+    url_params = {
+      id: tool.id,
+      launch_type: type
+    }.merge(url_params)
+
     hash = {
       :title => tool.label_for(type, I18n.locale),
-      :base_url =>  polymorphic_url([context, :external_tool], id: tool.id, launch_type: type)
+      :base_url =>  polymorphic_url([context, :external_tool], url_params),
+      :is_new => tool.integration_type == 'lor'
     }
 
     extension_settings = [:icon_url, :canvas_icon_class] | custom_settings

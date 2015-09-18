@@ -160,22 +160,16 @@
             <% menu_type_to_class.each do |menu_type, content_class| %>
               <% if !tag || tag.content.is_a?(content_class) %>
                 <%
-                   launch_options = {launch_type: menu_type}
+                   launch_options = {}
                    if menu_type == :file_menu
                      launch_options[:files] = [tag ? tag.content_id : "{{ content_id }}"]
                    else
                      launch_options[:module_items] = [tag ? tag.id : "{{ id }}"]
                    end
                 %>
-                <% @menu_tools[menu_type].each do |tool| %>
-                  <li role="presentation" class="<%= menu_type %>">
-                    <% tool_path = course_external_tool_path(@context, tool, launch_options) %>
-                    <a class="menu_tool_link" href="<%= tool_path %>">
-                      <%= render(partial: 'external_tools/icon', locals: {tool: tool, settings_key: menu_type}) %>
-                      <%= tool.label_for(menu_type, I18n.locale) %>
-                    </a>
-                  </li>
-                <% end %>
+
+                <%= external_tools_menu_items(@menu_tools[menu_type], {link_class: "menu_tool_link", settings_key: menu_type, in_list: true, url_params: launch_options}) %>
+
               <% end %>
             <% end %>
           </ul>

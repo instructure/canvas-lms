@@ -281,6 +281,7 @@ require 'securerandom'
 #
 class CoursesController < ApplicationController
   include SearchHelper
+  include ContextExternalToolsHelper
 
   before_filter :require_user, :only => [:index]
   before_filter :require_context, :only => [:roster, :locks, :create_file, :ping]
