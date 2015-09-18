@@ -13,7 +13,8 @@ define([
     SELECT_ALL_STUDENTS: 'SELECT_ALL_STUDENTS',
     UNSELECT_ALL_STUDENTS: 'UNSELECT_ALL_STUDENTS',
     SELECT_MARK: 'SELECT_MARK',
-    UPDATE_MODERATION_SET: 'UPDATE_MODERATION_SET',
+    UPDATED_MODERATION_SET: 'UPDATED_MODERATION_SET',
+    UPDATE_MODERATION_SET_FAILED: 'UPDATE_MODERATION_SET_FAILED',
     PUBLISHED_GRADES: 'PUBLISHED_GRADES',
     PUBLISHED_GRADES_FAILED: 'PUBLISHED_GRADES_FAILED',
     GOT_STUDENTS: 'GOT_STUDENTS',
@@ -30,6 +31,35 @@ define([
       return {
         type: this.SELECT_STUDENT,
         payload: { studentId }
+      };
+    },
+
+    unselectStudent (studentId) {
+      return {
+        type: this.UNSELECT_STUDENT,
+        payload: { studentId }
+      };
+    },
+
+    moderationSetUpdated (students) {
+      return {
+        type: this.UPDATED_MODERATION_SET,
+        payload: {
+          students,
+          time: Date.now(),
+          message: I18n.t('Reviewers successfully added')
+        }
+      };
+    },
+
+    moderationSetUpdateFailed () {
+      return {
+        type: this.UPDATE_MODERATION_SET_FAILED,
+        payload: {
+          time: Date.now(),
+          message: I18n.t('A problem occurred adding reviewers.')
+        },
+        error: true
       };
     },
 
@@ -75,6 +105,22 @@ define([
                  } else {
                    dispatch(this.publishGradesFailed(I18n.t('An error occurred publishing grades.')));
                  }
+               });
+      };
+    },
+
+    addStudentToModerationSet (ajaxLib) {
+      return (dispatch, getState) => {
+        var endpoint = getState().urls.add_moderated_students;
+        ajaxLib = ajaxLib || axios;
+        ajaxLib.post(endpoint, {
+                  student_ids: getState().moderationStage
+               })
+               .then((response) => {
+                 dispatch(this.moderationSetUpdated(response.data));
+               })
+               .catch((response) => {
+                 dispatch(this.moderationSetUpdateFailed());
                });
       };
     },

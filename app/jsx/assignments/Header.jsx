@@ -9,7 +9,8 @@ define([
     displayName: 'Header',
 
     propTypes: {
-      actions: React.PropTypes.object.isRequired
+      actions: React.PropTypes.object.isRequired,
+      store: React.PropTypes.object.isRequired
     },
 
     getInitialState () {
@@ -33,7 +34,7 @@ define([
     },
 
     handleReviewerClick () {
-      window.alert('TODO: Fix once the API for this calms down.');
+      this.props.store.dispatch(this.props.actions.addStudentToModerationSet());
     },
 
     render () {

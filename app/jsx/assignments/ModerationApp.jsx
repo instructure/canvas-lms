@@ -49,7 +49,7 @@ define([
           <h1 className='screenreader-only'>{I18n.t('Moderate %{assignment_name}', {assignment_name: 'TODO!!!!!!!!'})}</h1>
           <Header store={this.props.store} actions={Actions} />
           <ModeratedColumnHeader handleSortByThisColumn={this.handleSortByThisColumn} currentSortDirection={this.state.markColumnSort.currentSortDirection} markColumn={this.state.markColumnSort.markColumn} />
-          <ModeratedStudentList {...this.state} />
+          <ModeratedStudentList store={this.props.store} {...this.state} />
         </div>
       );
     }

@@ -9,6 +9,9 @@ define([
 
   var { combineReducers } = Redux;
 
+  /**
+   * Student Handlers
+   */
   var studentHandlers = {};
 
   studentHandlers[ModerationActions.GOT_STUDENTS] = (state, action) => {
@@ -42,8 +45,23 @@ define([
     }
 
     return studentList;
+  }
+
+  studentHandlers[ModerationActions.UPDATED_MODERATION_SET] = (state, action) => {
+    var idsAdded = action.payload.students.map((student) => student.id);
+    return state.map((student) => {
+      if (_.contains(idsAdded, student.id)) {
+        student.in_moderation_set = true;
+        return student;
+      } else {
+        return student;
+      }
+    });
   };
 
+  /**
+   * Flash Message Handlers
+   */
   var flashHandlers = {};
 
   flashHandlers[ModerationActions.PUBLISHED_GRADES] = (state, action) => {
@@ -64,6 +82,44 @@ define([
     return newState;
   };
 
+  flashHandlers[ModerationActions.UPDATED_MODERATION_SET] = (state, action) => {
+    // Don't mutate the existing state.
+    var newState = _.extend({}, state);
+    newState.time = action.payload.time;
+    newState.message = action.payload.message;
+    newState.error = false;
+    return newState;
+  };
+
+  flashHandlers[ModerationActions.UPDATE_MODERATION_SET_FAILED] = (state, action) => {
+    // Don't mutate the existing state.
+    var newState = _.extend({}, state);
+    newState.time = action.payload.time;
+    newState.message = action.payload.message;
+    newState.error = true;
+    return newState;
+  };
+
+  /**
+   * Moderation Stage Handlers
+   */
+  var moderationStageHandlers = {};
+
+  moderationStageHandlers[ModerationActions.SELECT_STUDENT] = (state, action) => {
+    return _.union(state, [action.payload.studentId]);
+  };
+
+  moderationStageHandlers[ModerationActions.UNSELECT_STUDENT] = (state, action) => {
+    return _.without(state, action.payload.studentId);
+  };
+
+  moderationStageHandlers[ModerationActions.UPDATED_MODERATION_SET] = (state, action) => {
+    var idsAdded = action.payload.students.map((student) => student.id);
+    // Removing only the ids that were successfully added.
+    // This possibly could be reworked to remove everyone from the stage.
+    return _.difference(state, idsAdded);
+  };
+
   function urls (state, action) {
     return state || {};
   }
@@ -73,17 +129,6 @@ define([
     var handler = studentHandlers[action.type];
     if (handler) return handler(state, action);
     return state;
-  }
-
-  function addUserToModeration (state, action) {
-    // Don't mutate the existing state.
-    var newState = _.extend({}, state);
-    var { type, payload } = action;
-    if (type === ModerationActions.SELECT_STUDENT) {
-      newState.moderationStage.push(payload.studentId);
-      return newState;
-    }
-    return {moderationStage: []};
   }
 
   function flashMessage (state, action) {
@@ -101,6 +146,13 @@ define([
       newState.published = true;
       return newState;
     }
+    return state;
+  }
+
+  function moderationStage (state, action) {
+    state = state || [];
+    var handler = moderationStageHandlers[action.type]
+    if (handler) return handler(state, action);
     return state;
   }
 
@@ -127,6 +179,7 @@ define([
    urls,
    flashMessage,
    assignment,
+   moderationStage,
    markColumnSort
   });
 

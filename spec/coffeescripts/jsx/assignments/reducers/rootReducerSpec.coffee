@@ -72,7 +72,7 @@ define [
           'provisional_grades': []
         }
       ]
-  
+
 
   module "students reducer",
 
@@ -86,6 +86,18 @@ define [
     newState = rootReducer(initialState, gotStudentsAction)
     expected = ['one', 'two', 'three', 'four']
     deepEqual newState.students, expected, 'successfully concatenates'
+
+  test "updates the moderation set handling UPDATED_MODERATION_SET", ->
+    initialState =
+      students: [{id: 1},{id: 2}]
+    updatedModerationSetAction =
+      type: 'UPDATED_MODERATION_SET'
+      payload:
+        students: [{id: 1},{id: 2}]
+    newState = rootReducer(initialState, updatedModerationSetAction)
+    expected = [{id: 1, in_moderation_set: true},{id: 2, in_moderation_set: true}]
+
+    deepEqual newState.students, expected, 'successfully updates moderation set'
 
   module "urls reducer",
 
@@ -111,6 +123,56 @@ define [
         message: 'test'
     newState = rootReducer(initialState, publishedGradesAction)
     ok newState.assignment.published, 'successfully sets to publish'
+
+  module "moderationStage reducer",
+
+  test "adds student to the moderation stage on SELECT_STUDENT", ->
+    initialState =
+      moderationStage: [1, 2, 3]
+    selectStudentAction =
+      type: 'SELECT_STUDENT'
+      payload:
+        studentId: 10
+    newState = rootReducer(initialState, selectStudentAction)
+    expected = [1, 2, 3, 10]
+
+    deepEqual newState.moderationStage, expected, 'updates state'
+
+  test "removes student from the moderationStage on UNSELECT_STUDENT", ->
+    initialState =
+      moderationStage: [1, 2, 3]
+    unselectStudentActin =
+      type: 'UNSELECT_STUDENT'
+      payload:
+        studentId: 2
+    newState = rootReducer(initialState, unselectStudentActin)
+    expected = [1, 3]
+
+    deepEqual newState.moderationStage, expected, 'updates state'
+
+  test "clears the moderation stage on UPDATED_MODERATION_SET", ->
+    initialState =
+      moderationStage: [1, 2, 3]
+    updatedModerationSetAction =
+      type: 'UPDATED_MODERATION_SET'
+      payload:
+        students: [{id: 1}, {id: 2}, {id: 3}]
+    newState = rootReducer(initialState, updatedModerationSetAction)
+    expected = []
+
+    deepEqual newState.moderationStage, expected, 'updates state'
+
+  test "clears only the returned students from the moderation stage on UPDATED_MODERATION_SET", ->
+    initialState =
+      moderationStage: [1, 2, 3]
+    updatedModerationSetAction =
+      type: 'UPDATED_MODERATION_SET'
+      payload:
+        students: [{id: 2}, {id: 3}]
+    newState = rootReducer(initialState, updatedModerationSetAction)
+    expected = [1]
+
+    deepEqual newState.moderationStage, expected, 'updates state'
 
   module "flashMessage reducer",
 
@@ -144,6 +206,40 @@ define [
       message: 'failed to publish'
       error: true
     deepEqual newState.flashMessage, expected, 'updates state'
+
+  test "sets success message on UPDATED_MODERATION_SET", ->
+    initialState =
+      flashMessage: {}
+    updatedModerationSetAction =
+      type: 'UPDATED_MODERATION_SET'
+      payload:
+        time: 10
+        message: 'test success'
+        students: [{id: 1},{id: 2}]
+    newState = rootReducer(initialState, updatedModerationSetAction)
+    expected =
+      time: 10
+      message: 'test success'
+      error: false
+    deepEqual newState.flashMessage, expected, 'updates state'
+
+  test "sets failure message on UPDATE_MODERATION_SET_FAILED", ->
+    initialState =
+      flashMessage: {}
+    updatedModerationSetAction =
+      type: 'UPDATE_MODERATION_SET_FAILED'
+      payload:
+        time: 10
+        message: 'test failure'
+        students: [{id: 1},{id: 2}]
+    newState = rootReducer(initialState, updatedModerationSetAction)
+    expected =
+      time: 10
+      message: 'test failure'
+      error: true
+    deepEqual newState.flashMessage, expected, 'updates state'
+
+  module "sortMarkColumn reducer",
 
   test 'toggles currentSortDirection to HIGHEST by default on SORT_MARK_COLUMN ', ->
     initialState =
@@ -256,3 +352,5 @@ define [
     expectedStudentId = 2
     firstStudent = newState.students[0]
     equal firstStudent.id, expectedStudentId, 'sorts students it ascending order'
+
+

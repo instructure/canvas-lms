@@ -1,8 +1,9 @@
 /** @jsx React.DOM */
 
 define([
-  'react'
-], function (React) {
+  'react',
+  './actions/ModerationActions'
+], function (React, ModerationActions) {
 
   var MARK_ONE = 0;
   var MARK_TWO = 1;
@@ -14,12 +15,20 @@ define([
       students: React.PropTypes.arrayOf(React.PropTypes.object).isRequired
     },
 
-    renderSubmissionMark (submission, mark_number) {
-      if (submission.provisional_grades && submission.provisional_grades[mark_number]) {
+    handleCheckbox (student, event) {
+      if (event.target.checked) {
+        this.props.store.dispatch(ModerationActions.selectStudent(student.id));
+      } else {
+        this.props.store.dispatch(ModerationActions.unselectStudent(student.id));
+      }
+    },
+
+    renderStudentMark (student, mark_number) {
+      if (student.provisional_grades && student.provisional_grades[mark_number]) {
         return (
           <div className='AssignmentList__Mark'>
-            <input type='radio' name={`mark_${submission.id}`} />
-            <span>{submission.provisional_grades[mark_number].score}</span>
+            <input type='radio' name={`mark_${student.id}`} />
+            <span>{student.provisional_grades[mark_number].score}</span>
           </div>
         );
       } else {
@@ -30,6 +39,7 @@ define([
         );
       }
     },
+
     renderFinalGrade (submission) {
       if (submission.grade) {
         return (
@@ -45,22 +55,28 @@ define([
         );
       }
     },
+
     render () {
       return (
         <ul className='AssignmentList'>
           {
-            this.props.students.map((submission) => {
+            this.props.students.map((student) => {
               return (
                 <li className='AssignmentList__Item'>
                   <div className='AssignmentList__StudentInfo'>
-                    <input checked={submission.isSelected} type='checkbox' />
-                    <img className='img-circle AssignmentList_StudentPhoto' src={submission.avatar_image_url} />
-                    <span>{submission.display_name}</span>
+                    <input
+                      checked={student.in_moderation_set || student.isChecked}
+                      disabled={student.in_moderation_set}
+                      type='checkbox'
+                      onChange={this.handleCheckbox.bind(this, student)}
+                    />
+                    <img className='img-circle AssignmentList_StudentPhoto' src={student.avatar_image_url} />
+                    <span>{student.display_name}</span>
                   </div>
-                  {this.renderSubmissionMark(submission, MARK_ONE)}
-                  {this.renderSubmissionMark(submission, MARK_TWO)}
-                  {this.renderSubmissionMark(submission, MARK_THREE)}
-                  {this.renderFinalGrade(submission)}
+                  {this.renderStudentMark(student, MARK_ONE)}
+                  {this.renderStudentMark(student, MARK_TWO)}
+                  {this.renderStudentMark(student, MARK_THREE)}
+                  {this.renderFinalGrade(student)}
                 </li>
                 );
             })

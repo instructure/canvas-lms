@@ -25,6 +25,40 @@ define [
 
     deepEqual action, expected, "creates the action successfully"
 
+  test "creates the UNSELECT_STUDENT action", ->
+    action = ModerationActions.unselectStudent(1)
+    expected =
+      type: ModerationActions.UNSELECT_STUDENT
+      payload:
+        studentId: 1
+
+    deepEqual action, expected, "creates the action successfully"
+
+  test "creates the UPDATED_MODERATION_SET action", ->
+    action = ModerationActions.moderationSetUpdated([{a: 1}, {a: 2}])
+    expected =
+      type: ModerationActions.UPDATED_MODERATION_SET
+      payload:
+        message: 'Reviewers successfully added'
+        students: [{a: 1}, {a: 2}]
+        time: Date.now()
+
+    equal action.type, expected.type, "type matches"
+    equal action.payload.message, expected.payload.message, "message matches"
+    ok expected.payload.time - action.payload.time < 5, "time within 5 seconds"
+
+  test "creates the UPDATE_MODERATION_SET_FAILED action", ->
+    action = ModerationActions.moderationSetUpdateFailed()
+    expected =
+      type: ModerationActions.UPDATE_MODERATION_SET_FAILED
+      payload:
+        message: 'A problem occurred adding reviewers.'
+        time: Date.now()
+
+    equal action.type, expected.type, "type matches"
+    equal action.payload.message, expected.payload.message, "message matches"
+    ok expected.payload.time - action.payload.time < 5, "time within 5 seconds"
+
   test "creates the GOT_STUDENTS action", ->
     action = ModerationActions.gotStudents([1, 2, 3])
     expected =
@@ -166,3 +200,57 @@ define [
       start()
     , getState)
 
+  module "ModerationActions#addStudentToModerationSet",
+    setup: ->
+      @client = {
+        post: ->
+          dfd = whenJS.defer()
+          setTimeout ->
+            dfd.resolve('test')
+          , 100
+          dfd.promise()
+      }
+
+  test "returns a function", ->
+    ok typeof ModerationActions.addStudentToModerationSet() == 'function'
+
+  asyncTest "dispatches moderationSetUpdated on success", ->
+    getState = ->
+      urls:
+        add_moderated_students: 'some_url'
+      moderationStage: [1, 2]
+    fakeResponse =
+      status: 200
+      students: [{id: 1}, {id: 2}]
+
+    moderationSetUpdatedAction =
+      type: ModerationActions.UPDATED_MODERATION_SET
+      payload:
+        message: 'Reviewers successfully added'
+
+    sinon.stub(@client, 'post').returns(whenJS(fakeResponse))
+    ModerationActions.addStudentToModerationSet(@client)((action) ->
+      equal action.type, moderationSetUpdatedAction.type, 'type matches'
+      equal action.payload.message, moderationSetUpdatedAction.payload.message, 'has proper message'
+      start()
+    , getState)
+
+  asyncTest "dispatches moderationSetUpdateFailed on failure", ->
+    getState = ->
+      urls:
+        add_moderated_students: 'some_url'
+      moderationStage: [1, 2]
+    fakeResponse =
+      status: 500
+
+    moderationSetUpdateFailedAction =
+      type: ModerationActions.UPDATE_MODERATION_SET_FAILED
+      payload:
+        message: 'A problem occurred adding reviewers.'
+
+    sinon.stub(@client, 'post').returns(whenJS.reject(fakeResponse))
+    ModerationActions.addStudentToModerationSet(@client)((action) ->
+      equal action.type, moderationSetUpdateFailedAction.type, 'type matches'
+      equal action.payload.message, moderationSetUpdateFailedAction.payload.message, 'has proper message'
+      start()
+    , getState)

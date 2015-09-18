@@ -963,7 +963,7 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :moderation_set) do
       get 'courses/:course_id/assignments/:assignment_id/moderated_students', action: :index, as: :moderated_students
-      post 'courses/:course_id/assignments/:assignment_id/moderated_students', action: :create
+      post 'courses/:course_id/assignments/:assignment_id/moderated_students', action: :create, as: :add_moderated_students
     end
 
     scope(controller: :submissions_api) do
