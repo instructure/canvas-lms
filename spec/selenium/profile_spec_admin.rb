@@ -12,5 +12,7 @@ describe 'profile_pics' do
 
     it_behaves_like 'profile_user_about_page', 'admin'
 
+    it_behaves_like 'user settings page change pic window', 'admin'
+
   end
 end

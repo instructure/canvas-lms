@@ -13,5 +13,7 @@ describe 'profile_pics' do
 
     it_behaves_like 'profile_user_about_page', 'student'
 
+    it_behaves_like 'user settings page change pic window', 'student'
+
   end
 end
