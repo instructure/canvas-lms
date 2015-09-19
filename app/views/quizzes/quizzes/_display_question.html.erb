@@ -44,7 +44,7 @@
       <% if user_answer %>
         <div class="user_points" <%= hidden(true) if (assessing || assessment_results) && question_type && question_type.entry_type == "none" %>>
           <% if editable %>
-            <input type="number" class="question_input"
+            <input type="number" step="any" class="question_input"
               name="question_score_<%= hash_get(question, :id) %>" placeholder="--"
               value="<%= point_value_for_input(user_answer, question).is_a?(Float) &&
                 !point_value_for_input(user_answer, question).nan? &&
