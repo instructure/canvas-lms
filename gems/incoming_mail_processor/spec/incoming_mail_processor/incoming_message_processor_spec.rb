@@ -211,7 +211,7 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
       let (:message) { Mail.new(content_type: 'text/plain; charset=UTF-8', body: "hello") }
 
       it "increments the processed count" do
-        CanvasStatsd::Statsd.expects(:increment).with("incoming_mail_processor.incoming_message_processed").once
+        CanvasStatsd::Statsd.expects(:increment).with("incoming_mail_processor.incoming_message_processed.").once
         IncomingMessageProcessor.new(message_handler, error_reporter).process_single(message, '')
       end
 

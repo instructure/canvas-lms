@@ -276,9 +276,9 @@ module ApplicationHelper
 
   def css_url_for(bundle_name, plugin=false)
     bundle_path = "#{plugin ? "plugins/#{plugin}" : 'bundles'}/#{bundle_name}"
-    content_md5 = BrandableCSS.fingerprint_for(bundle_path, css_variant)
-    File.join('/dist', 'brandable_css', active_brand_config.try(:md5).to_s,
-              css_variant, "#{bundle_path}-#{content_md5}.css")
+    cache = BrandableCSS.cache_for(bundle_path, css_variant)
+    base_dir = cache[:includesNoVariables] ? 'no_variables' : File.join(active_brand_config.try(:md5).to_s, css_variant)
+    File.join('/dist', 'brandable_css', base_dir, "#{bundle_path}-#{cache[:combinedChecksum]}.css")
   end
 
   def brand_variable(variable_name)
@@ -611,25 +611,44 @@ module ApplicationHelper
     end
   end
 
-  def help_link
-    url = ((@domain_root_account && @domain_root_account.settings[:support_url]) || (Account.default && Account.default.settings[:support_url]))
-    show_feedback_link = Setting.get("show_feedback_link", "false") == "true"
+  def show_feedback_link?
+    Setting.get("show_feedback_link", "false") == "true"
+  end
+
+  def support_url
+    (@domain_root_account && @domain_root_account.settings[:support_url]) ||
+      (Account.default && Account.default.settings[:support_url])
+  end
+
+  def help_link_url
+    support_url || '#'
+  end
+
+  def show_help_link?
+    show_feedback_link? || support_url
+  end
+
+  def help_link_classes(additional_classes = [])
     css_classes = []
-    css_classes << "support_url" if url
-    css_classes << "help_dialog_trigger" if show_feedback_link
-    css_classes << 'ic-app-header__menu-list-link' if use_new_styles?
-    if url || show_feedback_link
-      link_content = if use_new_styles?
-                        '<div class="menu-item-icon-container" role="presentation">' +
-                        render(:partial => "shared/svg/svg_icon_help.svg") +
-                        '</div><div class="menu-item__text">' + t('Help') + '</div>'
-                     else
-                        t('Help')
-                     end
-      link_to link_content.html_safe, url || '#',
-        :class => css_classes.join(" "),
-        'data-track-category' => "help system",
-        'data-track-label' => 'help button'
+    css_classes << "support_url" if support_url
+    css_classes << "help_dialog_trigger" if show_feedback_link?
+    css_classes.concat(additional_classes) if additional_classes
+    css_classes.join(" ")
+  end
+
+  def help_link_data
+    {
+      :'track-category' => 'help system',
+      :'track-label' => 'help button'
+    }
+  end
+
+  def help_link
+    if show_help_link?
+      link_content = t('Help')
+      link_to link_content.html_safe, help_link_url,
+        :class => help_link_classes,
+        :data => help_link_data
     end
   end
 
@@ -670,7 +689,7 @@ module ApplicationHelper
 
   def include_account_js(options = {})
     return if params[:global_includes] == '0'
-    if use_new_styles? 
+    if use_new_styles?
       includes = []
       includes << brand_config_includes[:js] if brand_config_includes[:js].present?
     else
@@ -710,9 +729,9 @@ module ApplicationHelper
 
   def include_account_css
     return if disable_account_css?
-    if use_new_styles? 
-      includes = [] 
-      includes << brand_config_includes[:css] if  brand_config_includes[:css].present? 
+    if use_new_styles?
+      includes = []
+      includes << brand_config_includes[:css] if brand_config_includes[:css].present?
     else
       includes = get_global_includes.inject([]) do |css_includes, global_include|
         css_includes << global_include[:css] if global_include[:css].present?

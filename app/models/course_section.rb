@@ -53,12 +53,23 @@ class CourseSection < ActiveRecord::Base
 
   before_save :maybe_touch_all_enrollments
   after_save :update_account_associations_if_changed
+  after_save :delete_enrollments_later_if_deleted
 
   include StickySisFields
   are_sis_sticky :course_id, :name, :start_at, :end_at, :restrict_enrollments_to_section_dates
 
   def maybe_touch_all_enrollments
     self.touch_all_enrollments if self.start_at_changed? || self.end_at_changed? || self.restrict_enrollments_to_section_dates_changed? || self.course_id_changed?
+  end
+
+  def delete_enrollments_later_if_deleted
+    send_later_if_production(:delete_enrollments_if_deleted) if workflow_state == 'deleted' && workflow_state_changed?
+  end
+
+  def delete_enrollments_if_deleted
+    if workflow_state == 'deleted'
+      self.enrollments.active.find_each(&:destroy)
+    end
   end
 
   def participating_students

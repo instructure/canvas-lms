@@ -33,7 +33,7 @@ end
 Feature.register('differentiated_assignments' =>
   {
     display_name: -> { I18n.t('features.differentiated_assignments', 'Differentiated Assignments') },
-    description:  -> { I18n.t('differentiated_assignments_description', <<-END) },
+    description:  -> { I18n.t('features.differentiated_assignments_description', <<-END) },
 Differentiated Assignments is a feature that enables choosing which section(s) or individual student(s) an assignment applies to.
 Sections that are not given an assignment will not see it in their course content and their final grade will be
 calculated without those points.

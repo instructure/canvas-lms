@@ -227,6 +227,7 @@ CanvasRails::Application.routes.draw do
     get :locks
     concerns :discussions
     resources :assignments do
+      get 'moderate' => 'assignments#show_moderate'
       resources :submissions do
         post 'turnitin/resubmit' => 'submissions#resubmit_to_turnitin', as: :resubmit_to_turnitin
         get 'turnitin/:asset_string' => 'submissions#turnitin_report', as: :turnitin_report
@@ -507,6 +508,14 @@ CanvasRails::Application.routes.draw do
       end
     end
 
+    scope(controller: :brand_configs) do
+      get 'theme_editor', action: :new, as: :theme_editor
+      post 'brand_configs', action: :create
+      delete 'brand_configs', action: :destroy
+      post 'brand_configs/save_to_account', action: :save_to_account
+      post 'brand_configs/save_to_user_session', action: :save_to_user_session
+    end
+
     resources :role_overrides, only: [:index, :create] do
       collection do
         post :add_role
@@ -597,6 +606,7 @@ CanvasRails::Application.routes.draw do
     member do
       get :statistics
     end
+    resources :developer_keys, only: :index
   end
 
   get 'images/users/:user_id' => 'users#avatar_image', as: :avatar_image
@@ -810,14 +820,6 @@ CanvasRails::Application.routes.draw do
 
   resources :quiz_submissions do
     concerns :files
-  end
-
-  scope(controller: :brand_configs) do
-    get 'brand_configs/new', action: :new
-    post 'brand_configs', action: :create
-    delete 'brand_configs', action: :destroy
-    post 'brand_configs/save_to_account', action: :save_to_account
-    post 'brand_configs/save_to_user_session', action: :save_to_user_session
   end
 
   get 'courses/:course_id/outcome_rollups' => 'outcome_results#rollups', as: 'course_outcome_rollups'
@@ -1317,6 +1319,9 @@ CanvasRails::Application.routes.draw do
       delete 'developer_keys/:id', action: :destroy
       put 'developer_keys/:id', action: :update
       post 'developer_keys', action: :create
+
+      get 'accounts/:account_id/developer_keys', action: :index
+      post 'accounts/:account_id/developer_keys', action: :create
     end
 
     scope(controller: :search) do
@@ -1733,6 +1738,7 @@ CanvasRails::Application.routes.draw do
       prefix = "#{context}s/:#{context}_id"
       get  "#{prefix}/tool_consumer_profile/:tool_consumer_profile_id", controller: 'lti/ims/tool_consumer_profile', action: 'show', as: "#{context}_tool_consumer_profile"
       post "#{prefix}/tool_proxy", controller: 'lti/ims/tool_proxy', action: :create, as: "create_#{context}_lti_tool_proxy"
+      get "#{prefix}/jwt_token", controller: 'external_tools', action: :jwt_token
     end
     #Tool Setting Services
     get "tool_settings/:tool_setting_id",  controller: 'lti/ims/tool_setting', action: :show, as: 'show_lti_tool_settings'

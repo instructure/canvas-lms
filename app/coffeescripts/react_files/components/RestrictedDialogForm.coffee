@@ -7,13 +7,12 @@ define [
   '../modules/customPropTypes'
   '../utils/setUsageRights'
   '../utils/updateModelsUsageRights'
-  './DialogPreview'
+  'jsx/files/DialogPreview'
   './UsageRightsSelectBox'
   'jquery.instructure_date_and_time'
   'jquery.instructure_forms'
-], ($, React, withReactElement, I18n, Folder, customPropTypes, setUsageRights, updateModelsUsageRights, DialogPreviewComponent, UsageRightsSelectBoxComponent) ->
+], ($, React, withReactElement, I18n, Folder, customPropTypes, setUsageRights, updateModelsUsageRights, DialogPreview, UsageRightsSelectBoxComponent) ->
 
-  DialogPreview = React.createFactory DialogPreviewComponent
   UsageRightsSelectBox = React.createFactory UsageRightsSelectBoxComponent
 
   RestrictedDialogForm = React.createClass

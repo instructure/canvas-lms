@@ -1,7 +1,7 @@
 define [
   'react'
   'jquery'
-  'compiled/react_files/components/NoResults'
+  'jsx/files/NoResults'
 ], (React, $, NoResults) ->
   TestUtils = React.addons.TestUtils
 

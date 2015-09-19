@@ -1,6 +1,6 @@
 define [
   'react'
-  'compiled/react_files/components/ColumnHeaders'
+  'jsx/files/ColumnHeaders'
 ], (React, ColumnHeaders) ->
 
   module 'ColumnHeaders'

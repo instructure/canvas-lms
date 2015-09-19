@@ -27,8 +27,31 @@ describe "sub account grading schemes" do
       it "should delete a grading scheme", priority: "1", test_id: 238160 do
         should_delete_a_grading_scheme(account, url)
       end
-    end
 
+      it 'should disable add grading scheme button during update', priority: "2", test_id: 164232 do
+        simple_grading_standard(account)
+        get url
+        f('.edit_grading_standard_link').click
+        expect(f('#react_grading_tabs .add_standard_link')).to have_class('disabled')
+      end
+
+      it 'should disable other grading schemes from being edited', priority: "2", test_id: 307626 do
+        2.times do 
+          simple_grading_standard(account)
+        end
+        get url
+        f('.edit_grading_standard_link').click
+        expect(f('.disabled-links')).to be_truthy
+      end
+
+      it 'should allow all available grading schemes to be edited on page load', priority: "2", test_id: 310145 do
+        2.times do 
+          simple_grading_standard(account)
+        end
+        get url
+        expect(ff('.standard_title .links').count).to eq(2)
+      end
+    end
 
     describe "grading scheme items" do
 

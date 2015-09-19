@@ -43,6 +43,7 @@ class Account < ActiveRecord::Base
   INSTANCE_GUID_SUFFIX = 'canvas-lms'
 
   include Workflow
+  include BrandConfigHelpers
   belongs_to :parent_account, :class_name => 'Account'
   belongs_to :root_account, :class_name => 'Account'
   authenticates_many :pseudonym_sessions
@@ -73,16 +74,11 @@ class Account < ActiveRecord::Base
   has_many :active_folders, :class_name => 'Folder', :as => :context, :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
   has_many :active_folders_with_sub_folders, :class_name => 'Folder', :as => :context, :include => [:active_sub_folders], :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
   has_many :active_folders_detailed, :class_name => 'Folder', :as => :context, :include => [:active_sub_folders, :active_file_attachments], :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
-
+  has_many :developer_keys
   has_many :authentication_providers,
            order: "position",
            extend: AccountAuthorizationConfig::FindWithType,
            class_name: "AccountAuthorizationConfig"
-
-  # Shim until plugins can be updated to use "authentication_providers"
-  has_many :account_authorization_configs,
-           order: "position",
-           extend: AccountAuthorizationConfig::FindWithType
 
   has_many :account_reports
   has_many :grading_standards, :as => :context, :conditions => ['workflow_state != ?', 'deleted']
@@ -166,6 +162,7 @@ class Account < ActiveRecord::Base
   # these settings either are or could be easily added to
   # the account settings page
   add_setting :sis_app_token, :root_only => true
+  add_setting :sis_app_url, :root_only => true
   add_setting :global_includes, :root_only => true, :boolean => true, :default => false
   add_setting :global_javascript, :condition => :allow_global_includes
   add_setting :global_stylesheet, :condition => :allow_global_includes
@@ -534,16 +531,18 @@ class Account < ActiveRecord::Base
     @invalidations ||= []
     @invalidations += Account.inheritable_settings if @invalidate_settings_cache
     if @invalidations.present?
-      @invalidations.each do |key|
-        Rails.cache.delete([key, self.global_id].cache_key)
+      shard.activate do
+        @invalidations.each do |key|
+          Rails.cache.delete([key, id].cache_key)
+        end
+        Account.send_later_if_production(:invalidate_inherited_caches, self, @invalidations)
       end
-      Account.send_later_if_production(:invalidate_inherited_caches, self, @invalidations)
     end
   end
 
   def self.invalidate_inherited_caches(parent_account, keys)
     parent_account.shard.activate do
-      account_ids = Account.sub_account_ids_recursive(parent_account.id).map{|id| Shard.global_id_for(id)}
+      account_ids = Account.sub_account_ids_recursive(parent_account.id)
       account_ids.each do |id|
         keys.each do |key|
           Rails.cache.delete([key, id].cache_key)
@@ -552,19 +551,29 @@ class Account < ActiveRecord::Base
     end
   end
 
+  def self.default_storage_quota
+    Setting.get('account_default_quota', 500.megabytes.to_s).to_i
+  end
+
   def quota
-    Rails.cache.fetch(['current_quota', self.global_id].cache_key) do
-      read_attribute(:storage_quota) ||
-        (self.parent_account.default_storage_quota rescue nil) ||
-        Setting.get('account_default_quota', 500.megabytes.to_s).to_i
+    return storage_quota if read_attribute(:storage_quote)
+    return self.class.default_storage_quota if root_account?
+
+    shard.activate do
+      Rails.cache.fetch(['current_quota', id].cache_key) do
+        self.parent_account.default_storage_quota
+      end
     end
   end
 
   def default_storage_quota
-    Rails.cache.fetch(['default_storage_quota', self.global_id].cache_key) do
-      read_attribute(:default_storage_quota) ||
-        (self.parent_account.default_storage_quota rescue nil) ||
-        Setting.get('account_default_quota', 500.megabytes.to_s).to_i
+    return super if read_attribute(:default_storage_quota)
+    return self.class.default_storage_quota if root_account?
+
+    shard.activate do
+      @default_storage_quota ||= Rails.cache.fetch(['default_storage_quota', id].cache_key) do
+        parent_account.default_storage_quota
+      end
     end
   end
 
@@ -607,10 +616,13 @@ class Account < ActiveRecord::Base
   end
 
   def default_group_storage_quota
-    Rails.cache.fetch(['default_group_storage_quota', self.global_id].cache_key) do
-      read_attribute(:default_group_storage_quota) ||
-        (self.parent_account.default_group_storage_quota rescue nil) ||
-        Group.default_storage_quota
+    return super if read_attribute(:default_group_storage_quota)
+    return Group.default_storage_quota if root_account?
+
+    shard.activate do
+      Rails.cache.fetch(['default_group_storage_quota', self.id].cache_key) do
+        self.parent_account.default_group_storage_quota
+      end
     end
   end
 
@@ -911,7 +923,7 @@ class Account < ActiveRecord::Base
     given { |user|
       result = false
 
-      if !site_admin? && user
+      if !root_account.site_admin? && user
         scope = root_account.enrollments.active.where(user_id: user)
         result = root_account.teachers_can_create_courses? &&
             scope.where(:type => ['TeacherEnrollment', 'DesignerEnrollment']).exists?
@@ -1269,15 +1281,15 @@ class Account < ActiveRecord::Base
 
   def tabs_available(user=nil, opts={})
     manage_settings = user && self.grants_right?(user, :manage_account_settings)
-    if site_admin?
+    if root_account.site_admin?
       tabs = []
       tabs << { :id => TAB_USERS, :label => t('#account.tab_users', "Users"), :css_class => 'users', :href => :account_users_path } if user && self.grants_right?(user, :read_roster)
       tabs << { :id => TAB_PERMISSIONS, :label => t('#account.tab_permissions', "Permissions"), :css_class => 'permissions', :href => :account_permissions_path } if user && self.grants_right?(user, :manage_role_overrides)
       tabs << { :id => TAB_SUB_ACCOUNTS, :label => t('#account.tab_sub_accounts', "Sub-Accounts"), :css_class => 'sub_accounts', :href => :account_sub_accounts_path } if manage_settings
-      tabs << { :id => TAB_AUTHENTICATION, :label => t('#account.tab_authentication', "Authentication"), :css_class => 'authentication', :href => :account_authentication_providers_path } if manage_settings
-      tabs << { :id => TAB_PLUGINS, :label => t("#account.tab_plugins", "Plugins"), :css_class => "plugins", :href => :plugins_path, :no_args => true } if self.grants_right?(user, :manage_site_settings)
-      tabs << { :id => TAB_JOBS, :label => t("#account.tab_jobs", "Jobs"), :css_class => "jobs", :href => :jobs_path, :no_args => true } if self.grants_right?(user, :view_jobs)
-      tabs << { :id => TAB_DEVELOPER_KEYS, :label => t("#account.tab_developer_keys", "Developer Keys"), :css_class => "developer_keys", :href => :developer_keys_path, :no_args => true } if self.grants_right?(user, :manage_developer_keys)
+      tabs << { :id => TAB_AUTHENTICATION, :label => t('#account.tab_authentication', "Authentication"), :css_class => 'authentication', :href => :account_authentication_providers_path } if root_account? && manage_settings
+      tabs << { :id => TAB_PLUGINS, :label => t("#account.tab_plugins", "Plugins"), :css_class => "plugins", :href => :plugins_path, :no_args => true } if root_account? && self.grants_right?(user, :manage_site_settings)
+      tabs << { :id => TAB_JOBS, :label => t("#account.tab_jobs", "Jobs"), :css_class => "jobs", :href => :jobs_path, :no_args => true } if root_account? && self.grants_right?(user, :view_jobs)
+      tabs << { :id => TAB_DEVELOPER_KEYS, :label => t("#account.tab_developer_keys", "Developer Keys"), :css_class => "developer_keys", :href => :developer_keys_path, :no_args => true } if root_account? && self.grants_right?(user, :manage_developer_keys)
     else
       tabs = []
       tabs << { :id => TAB_COURSES, :label => t('#account.tab_courses', "Courses"), :css_class => 'courses', :href => :account_path } if user && self.grants_right?(user, :read_course_list)
@@ -1295,6 +1307,7 @@ class Account < ActiveRecord::Base
       tabs << { :id => TAB_TERMS, :label => t('#account.tab_terms', "Terms"), :css_class => 'terms', :href => :account_terms_path } if self.root_account? && manage_settings
       tabs << { :id => TAB_AUTHENTICATION, :label => t('#account.tab_authentication', "Authentication"), :css_class => 'authentication', :href => :account_authentication_providers_path } if self.root_account? && manage_settings
       tabs << { :id => TAB_SIS_IMPORT, :label => t('#account.tab_sis_import', "SIS Import"), :css_class => 'sis_import', :href => :account_sis_import_path } if self.root_account? && self.allow_sis_import && user && self.grants_right?(user, :manage_sis)
+      tabs << { :id => TAB_DEVELOPER_KEYS, :label => t("#account.tab_developer_keys", "Developer Keys"), :css_class => "developer_keys", :href => :account_developer_keys_path, account_id: root_account.id } if root_account? && root_account.grants_right?(user, :manage_developer_keys)
     end
     tabs += external_tool_tabs(opts)
     tabs += Lti::MessageHandler.lti_apps_tabs(self, [Lti::ResourcePlacement::ACCOUNT_NAVIGATION], opts)
@@ -1305,7 +1318,7 @@ class Account < ActiveRecord::Base
   end
 
   def can_see_admin_tools_tab?(user)
-    return false if !user || site_admin?
+    return false if !user || root_account.site_admin?
     admin_tool_permissions = RoleOverride.manageable_permissions(self).find_all{|p| p[1][:admin_tool]}
     admin_tool_permissions.any? do |p|
       self.grants_right?(user, p.first)
@@ -1510,7 +1523,7 @@ class Account < ActiveRecord::Base
   end
 
   def parent_registration?
-    self.account_authorization_configs.exists?(parent_registration: true)
+    authentication_providers.where(parent_registration: true).exists?
   end
 
   def parent_auth_type
@@ -1519,6 +1532,6 @@ class Account < ActiveRecord::Base
   end
 
   def parent_registration_aac
-    account_authorization_configs.where(parent_registration: true).first
+    authentication_providers.where(parent_registration: true).first
   end
 end

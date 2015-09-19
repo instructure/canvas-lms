@@ -994,7 +994,7 @@ class Attachment < ActiveRecord::Base
 
     given { |user, session|
       self.context.grants_right?(user, session, :read) &&
-      (self.context.grants_right?(user, session, :manage_files) || !self.locked_for?(user))
+      (self.context.grants_right?(user, session, :read_as_admin) || !self.locked_for?(user))
     }
     can :download
 
@@ -1034,7 +1034,7 @@ class Attachment < ActiveRecord::Base
   def locked_for?(user, opts={})
     return false if @skip_submission_attachment_lock_checks
     return false if opts[:check_policies] && self.grants_right?(user, :update)
-    return {:asset_string => self.asset_string, :manually_locked => true} if self.locked || (self.folder && self.folder.locked?)
+    return {:asset_string => self.asset_string, :manually_locked => true} if self.locked || Folder.is_locked?(self.folder_id)
     Rails.cache.fetch(locked_cache_key(user), :expires_in => 1.minute) do
       locked = false
       if (self.unlock_at && Time.now < self.unlock_at)
@@ -1198,7 +1198,10 @@ class Attachment < ActiveRecord::Base
     # ... or crocodoc (this will go away soon)
     return if Attachment.skip_3rd_party_submits?
 
-    if opts[:wants_annotation] && crocodocable?
+    submit_to_crocodoc_instead = opts[:wants_annotation] &&
+                                 crocodocable? &&
+                                 !Canvadocs.annotations_supported?
+    if submit_to_crocodoc_instead
       # get crocodoc off the canvadocs strand
       # (maybe :wants_annotation was a dumb idea)
       send_later_enqueue_args :submit_to_crocodoc, {
@@ -1208,12 +1211,12 @@ class Attachment < ActiveRecord::Base
       }, attempt
     elsif canvadocable?
       doc = canvadoc || create_canvadoc
-      doc.upload
+      doc.upload annotatable: opts[:wants_annotation]
       update_attribute(:workflow_state, 'processing')
     end
   rescue => e
     update_attribute(:workflow_state, 'errored')
-    Canvas::Errors.capture(e, type: :canvadocs, attachment_id: id)
+    Canvas::Errors.capture(e, type: :canvadocs, attachment_id: id, annotatable: opts[:wants_annotation])
 
     if attempt <= Setting.get('max_canvadocs_attempts', '5').to_i
       send_later_enqueue_args :submit_to_canvadocs, {

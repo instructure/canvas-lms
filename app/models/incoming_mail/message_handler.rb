@@ -98,6 +98,14 @@ module IncomingMail
       ndr_subject = ""
       ndr_body = ""
       case error
+        when IncomingMail::Errors::ReplyToDeletedDiscussion
+          ndr_subject = I18n.t("Message Reply Failed: %{subject}", :subject => subject)
+          ndr_body = I18n.t(<<-BODY, :subject => subject).gsub(/^ +/, '')
+          The message titled "%{subject}" could not be delivered because the discussion topic has been deleted. If you are trying to contact someone through Canvas you can try logging in to your account and sending them a message using the Inbox tool.
+
+          Thank you,
+          Canvas Support
+          BODY
         when IncomingMail::Errors::ReplyToLockedTopic
           ndr_subject = I18n.t('lib.incoming_message_processor.locked_topic.subject', "Message Reply Failed: %{subject}", :subject => subject)
           ndr_body = I18n.t('lib.incoming_message_processor.locked_topic.body', <<-BODY, :subject => subject).gsub(/^ +/, '')

@@ -4,7 +4,7 @@ define([
   'i18n!student_groups',
   'underscore',
   'jquery',
-  'old_unsupported_dont_use_react',
+  'react',
   'compiled/models/Group',
   'compiled/collections/UserCollection',
   'compiled/collections/ContextGroupCollection',

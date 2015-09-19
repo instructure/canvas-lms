@@ -204,7 +204,12 @@ class GroupsController < ApplicationController
         groups_scope = groups_scope.where(:context_type => params[:context_type]) if params[:context_type]
         groups_scope = groups_scope.includes(:group_category)
 
-        @groups = groups_scope.shard(@current_user).to_a
+        groups = groups_scope.shard(@current_user).to_a
+
+        # Split the groups out into those in concluded courses and those not in concluded courses
+        @current_groups, @previous_groups = groups.partition do |group|
+          group.context_type != 'Course' || !group.context.concluded?
+        end
       end
 
       format.json do

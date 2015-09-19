@@ -6,18 +6,15 @@ define [
   'compiled/react/shared/utils/withReactElement'
   'compiled/str/splitAssetString'
   './Toolbar'
-  './Breadcrumbs'
-  './FolderTree'
-  './FilesUsage'
+  'jsx/files/Breadcrumbs'
+  'jsx/files/FolderTree'
+  'jsx/files/FilesUsage'
   '../mixins/MultiselectableMixin'
   '../mixins/dndMixin'
   '../modules/filesEnv'
-], (React, ReactRouter, ReactModal, I18n, withReactElement, splitAssetString, ToolbarComponent, BreadcrumbsComponent, FolderTreeComponent, FilesUsageComponent, MultiselectableMixin, dndMixin, filesEnv) ->
+], (React, ReactRouter, ReactModal, I18n, withReactElement, splitAssetString, ToolbarComponent, Breadcrumbs, FolderTree, FilesUsage, MultiselectableMixin, dndMixin, filesEnv) ->
 
   Toolbar = React.createFactory ToolbarComponent
-  Breadcrumbs = React.createFactory BreadcrumbsComponent
-  FolderTree = React.createFactory FolderTreeComponent
-  FilesUsage = React.createFactory FilesUsageComponent
   RouteHandler = React.createFactory ReactRouter.RouteHandler
 
 

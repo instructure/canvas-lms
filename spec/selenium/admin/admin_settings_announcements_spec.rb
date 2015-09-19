@@ -29,12 +29,12 @@ describe "settings tabs" do
     notification = AccountNotification.first
     expect(notification.message).to include_text("this is a message")
     expect(notification.subject).to include_text(subject)
-    expect(f("#tab-announcements .user_content").text).to eq "this is a message"
+    expect(f("#tab-announcements .notification_message").text).to eq "this is a message"
     login_text = f("#header .user_name").text
     expect(f("#tab-announcements .announcement-details").text).to include_text(login_text)
-    expect(f("#tab-announcements .subject").text).to eq subject
+    expect(f("#tab-announcements .notification_subject").text).to eq subject
     expect(f("#tab-announcements .announcement-details").text.downcase).to include_text(start_end_message)
-    expect(f("#tab-announcements .user_content").text).to eq "this is a message"
+    expect(f("#tab-announcements .notification_message").text).to eq "this is a message"
   end
 
   context "announcements tab" do

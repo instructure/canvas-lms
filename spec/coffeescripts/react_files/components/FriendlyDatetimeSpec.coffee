@@ -1,6 +1,6 @@
 define [
   'react'
-  'compiled/react_files/components/FriendlyDatetime'
+  'jsx/files/FriendlyDatetime'
   'i18nObj'
   'helpers/I18nStubber'
 ], (React, FriendlyDatetime, I18n, I18nStubber) ->

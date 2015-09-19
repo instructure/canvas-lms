@@ -1450,6 +1450,11 @@ define [
 
     # show warnings for bad grading setups
     setAssignmentWarnings: =>
+      @totalGradeWarning = null
+
+      if _.any(@assignments, (a) -> a.muted)
+        @totalGradeWarning = I18n.t "This grade differs from the student's view of the grade because some assignments are muted"
+
       if @weightedGroups()
         # assignment group has 0 points possible
         invalidAssignmentGroups = _.filter @assignmentGroups, (ag) ->
@@ -1482,8 +1487,6 @@ define [
         if pointsPossible == 0
           @totalGradeWarning = I18n.t 'no_assignments_have_points_warning'
           , "Can't compute score until an assignment has points possible"
-        else
-          @totalGradeWarning = null
 
     ###
     xsslint jqueryObject.identifier createLink

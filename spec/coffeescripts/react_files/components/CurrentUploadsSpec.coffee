@@ -1,7 +1,7 @@
 define [
   'react'
   'jquery'
-  'compiled/react_files/components/CurrentUploads'
+  'jsx/files/CurrentUploads'
   'compiled/react_files/modules/FileUploader'
   'compiled/react_files/modules/UploadQueue'
 ], (React, $, CurrentUploads, FileUploader, UploadQueue) ->

@@ -692,6 +692,7 @@ define [
           user_id: student.id
           assignment_id: assignment.id
           hidden: !@differentiatedAssignmentVisibleToStudent(assignment, student.id)
+          grade_matches_current_submission: true
         }
     ).property('selectedStudent', 'selectedAssignment')
 

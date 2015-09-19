@@ -104,6 +104,15 @@ def ta_in_section(section, opts={})
   ta
 end
 
+def teacher_in_section(section, opts={})
+  teacher = opts.fetch(:user) { user }
+  enrollment = section.course.enroll_user(teacher, 'TeacherEnrollment', :section => section, :force_update => true)
+  teacher.save!
+  enrollment.workflow_state = 'active'
+  enrollment.save!
+  teacher
+end
+
 def teacher_in_course(opts={})
   opts[:course] = @course if @course && !opts[:course]
   course_with_teacher(opts)

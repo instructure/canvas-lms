@@ -10,7 +10,16 @@ describe "account admin outcomes" do
   let(:account) { Account.default }
   describe "course outcomes" do
     before (:each) do
+      RoleOverride.create!(:context => account, :permission => 'manage_courses',
+        :role => admin_role, :enabled => false) # should not manage_courses permission
       course_with_admin_logged_in
+    end
+
+    it "should be able to manage course rubrics" do
+      get "/courses/#{@course.id}/outcomes"
+      expect_new_page_load { f('.manage_rubrics').click }
+
+      expect(f('.add_rubric_link')).to be_displayed
     end
 
     context "create/edit/delete outcomes" do
@@ -39,12 +48,20 @@ describe "account admin outcomes" do
         should_validate_calculation_method_dropdown
       end
 
-      it "should validate decaying average", priority: "2", test_id: 250235 do
-        should_validate_decaying_average
+      it "should validate decaying average_above_range", priority: "2", test_id: 250235 do
+        should_validate_decaying_average_above_range
       end
 
-      it "should validate n mastery", priority: "2", test_id: 250236 do
-        should_validate_n_mastery
+      it "should validate decaying average_below_range", priority: "2", test_id: 299445 do
+         should_validate_decaying_average_below_range
+      end
+
+      it "should validate n mastery_above_range", priority: "2", test_id: 299447 do
+        should_validate_n_mastery_above_range
+      end
+
+      it "should validate n mastery_below_range", priority: "2", test_id: 250236 do
+        should_validate_n_mastery_below_range
       end
     end
 

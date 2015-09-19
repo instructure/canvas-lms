@@ -489,7 +489,7 @@ describe "courses" do
 
       create_session(@student.pseudonym)
       get "/courses/#{@course.id}"
-      f(".global-message .btn[name='accept'] ").click
+      f(".ic-notification button[name='accept'] ").click
       assert_flash_notice_message /Invitation accepted!/
     end
 
@@ -498,7 +498,7 @@ describe "courses" do
 
       create_session(@student.pseudonym)
       get "/courses/#{@course.id}"
-      f(".global-message .btn[name=reject]").click
+      f(".ic-notification button[name=reject]").click
       assert_flash_notice_message /Invitation canceled./
     end
 

@@ -600,6 +600,7 @@ describe Group do
         # should reload
         account.default_group_storage_quota = 20.megabytes
         account.save!
+        @group = Group.find(@group)
 
         expect(@group.quota).to eq 20.megabytes
       end

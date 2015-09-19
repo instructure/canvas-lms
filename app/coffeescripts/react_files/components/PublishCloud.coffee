@@ -11,7 +11,7 @@ define [
 
   RestrictedDialogForm = React.createFactory RestrictedDialogFormComponent
 
-  PublishCloud = React.createClass
+  PublishCloud =
     displayName: 'PublishCloud'
 
     propTypes:
@@ -68,81 +68,3 @@ define [
 
     togglePublishedState: ->
       @setState published: !@state.published, restricted: false, hidden: false
-
-    # Function Summary
-    # Create a blank dialog window via jQuery, then dump the RestrictedDialogForm into that
-    # dialog window. This allows us to do react things inside of this all ready rendered
-    # jQueryUI widget
-
-    openRestrictedDialog: ->
-      $dialog = $('<div>').dialog
-        title: I18n.t("title.permissions", "Editing permissions for: %{name}", {name: @props.model.displayName()})
-        width: 800
-        minHeight: 300
-        close: ->
-          React.unmountComponentAtNode this
-          $(this).remove()
-
-      React.render(RestrictedDialogForm({
-        usageRightsRequiredForContext: @props.usageRightsRequiredForContext
-        models: [@props.model]
-        closeDialog: -> $dialog.dialog('close')
-      }), $dialog[0])
-
-
-    render: withReactElement ->
-      if @props.userCanManageFilesForContext
-        if @state.published && @state.restricted
-          button
-            type: 'button'
-            'data-tooltip': 'left'
-            onClick: @openRestrictedDialog
-            ref: "publishCloud"
-            className:'btn-link published-status restricted'
-            title: @getRestrictedText()
-            'aria-label': @getRestrictedText() + ' - ' + I18n.t('Click to modify'),
-              i className:'icon-cloud-lock'
-        else if @state.published && @state.hidden
-          button
-            type: 'button'
-            'data-tooltip': 'left'
-            onClick: @openRestrictedDialog
-            ref: "publishCloud"
-            className:'btn-link published-status hiddenState'
-            title: I18n.t('hidden_title', 'Hidden. Available with a link')
-            'aria-label': I18n.t('Hidden. Available with a link - Click to modify'),
-              i className:'icon-cloud-lock'
-        else if @state.published
-          button
-            type: 'button'
-            'data-tooltip': 'left'
-            onClick: @openRestrictedDialog,
-            ref: "publishCloud",
-            className:'btn-link published-status published'
-            title: I18n.t('published_title', 'Published')
-            'aria-label': I18n.t('Published - Click to modify'),
-              i className:'icon-publish'
-        else
-          button
-            type: 'button'
-            'data-tooltip': 'left'
-            onClick: @openRestrictedDialog
-            ref: "publishCloud"
-            className:'btn-link published-status unpublished'
-            title: I18n.t('unpublished_title', 'Unpublished')
-            'aria-label': I18n.t('Unpublished - Click to modify'),
-              i className:'icon-unpublish'
-      else
-        if @state.published && @state.restricted
-          div
-            'style': {'margin-right': '12px'}
-            'data-tooltip': 'left'
-            ref: "publishCloud"
-            className:'published-status restricted'
-            title: @getRestrictedText()
-            'aria-label': @getRestrictedText(),
-              i className:'icon-calendar-day'
-        else
-          div
-            'style': {width: 28, height: 36}
-

@@ -1,8 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 require File.expand_path(File.dirname(__FILE__) + '/groups_common')
 
-
-
 def build_assignment_with_type(type, opts={})
   if opts[:assignment_group_id]
     assignment_group_id = opts[:assignment_group_id]
@@ -205,4 +203,9 @@ def click_cog_to_edit
   wait_for_ajaximations
   fj('.edit_assignment').click
   wait_for_ajaximations
+end
+
+def create_assignment_with_type(type, title = 'My Title')
+  @assignment = @course.assignments.create!(title: title, grading_type: type, points_possible: 20)
+  @assignment
 end

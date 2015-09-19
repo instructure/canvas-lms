@@ -26,7 +26,7 @@ def download_from_cog_icon(row_selected = 0)
 end
 
 def edit_name_from_cog_icon(file_name_new, row_selected = 0)
-  ff('.al-trigger')[row_selected].click
+  ff('.al-trigger-gray')[row_selected].click
   fln("Rename").click
   expect(f(".ef-edit-name-cancel")).to be_displayed
   file_name_textbox_el = f('.input-block-level')
@@ -241,4 +241,27 @@ end
 
 def get_all_files_folders
   new_folder = driver.find_elements(:class, 'ef-item-row')
+end
+
+def insert_file_from_rce(insert_into = nil)
+  if insert_into == :quiz
+    ff(".ui-tabs-anchor")[6].click
+  else
+    ff(".ui-tabs-anchor")[1].click
+  end
+  ff(".name.text")[0].click
+  ff(".name.text")[1].click
+  wait_for_ajaximations
+  ff(".name.text")[2].click
+  wait_for_ajaximations
+  if insert_into == :quiz
+    ff(".name.text")[3].click
+    ff(".btn-primary")[3].click
+  elsif insert_into == :discussion
+    ff(".btn-primary")[2].click
+  else
+    f(".btn-primary").click
+  end
+  wait_for_ajaximations
+  expect(fln("some test file")).to be_displayed
 end

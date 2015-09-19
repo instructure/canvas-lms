@@ -24,7 +24,6 @@ class AssetUserAccess < ActiveRecord::Base
   validates_inclusion_of :context_type, :allow_nil => true, :in => ['User', 'Group', 'Course']
   belongs_to :user
   has_many :page_views
-  has_many :asset_access_ranges
   before_save :infer_defaults
   attr_accessible :user, :asset_code
 

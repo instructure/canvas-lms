@@ -54,7 +54,7 @@ $ic-left-side-width: $ic-sp*15;
   position: absolute;
   top: 0; right: 100%;
   width: $ic-left-side-width;
-  padding: (($ic-sp*2) - 4) $ic-sp $ic-sp $ic-sp*2;
+  padding: $ic-sp*2 $ic-sp $ic-sp $ic-sp*2;
   opacity: 0;
   body.course-menu-expanded & {
     opacity: 1;
@@ -68,6 +68,7 @@ $ic-left-side-width: $ic-sp*15;
     transition: none;
     transform: none;
   }
+  @include breakpoint(short) { padding-top: $ic-sp; }
 }
 
 .ic-app-main-content {

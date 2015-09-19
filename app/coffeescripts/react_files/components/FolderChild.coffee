@@ -5,24 +5,22 @@ define [
   'react-router'
   '../mixins/BackboneMixin'
   'compiled/react/shared/utils/withReactElement'
-  './FriendlyDatetime'
+  'jsx/files/FriendlyDatetime'
   './ItemCog'
-  './FilesystemObjectThumbnail'
+  'jsx/files/FilesystemObjectThumbnail'
   'compiled/util/friendlyBytes'
   'compiled/models/Folder'
   'compiled/fn/preventDefault'
-  './PublishCloud'
+  'jsx/shared/PublishCloud'
   './UsageRightsIndicator'
   '../modules/FocusStore'
   'compiled/jquery.rails_flash_notifications'
-], (_, I18n, React, ReactRouter, BackboneMixin, withReactElement, FriendlyDatetimeComponent, ItemCogComponent, FilesystemObjectThumbnailComponent, friendlyBytes, Folder, preventDefault, PublishCloudComponent, UsageRightsIndicatorComponent, FocusStore) ->
+], (_, I18n, React, ReactRouter, BackboneMixin, withReactElement, FriendlyDatetimeComponent, ItemCogComponent, FilesystemObjectThumbnail, friendlyBytes, Folder, preventDefault, PublishCloud, UsageRightsIndicatorComponent, FocusStore) ->
 
   FriendlyDatetime = React.createFactory FriendlyDatetimeComponent
   ItemCog = React.createFactory ItemCogComponent
-  PublishCloud = React.createFactory PublishCloudComponent
   UsageRightsIndicator = React.createFactory  UsageRightsIndicatorComponent
   Link = React.createFactory ReactRouter.Link
-  FilesystemObjectThumbnail = React.createFactory FilesystemObjectThumbnailComponent
   classSet = React.addons.classSet
 
   FolderChild = React.createClass

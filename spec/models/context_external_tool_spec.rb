@@ -714,6 +714,22 @@ describe ContextExternalTool do
       expect(url).to eql(ContextExternalTool.standardize_url("www.google.com/?b=2&a=1"))
     end
   end
+
+  describe "default_label" do
+    append_before(:each) do
+      @tool = @root_account.context_external_tools.new(:consumer_key => '12345', :shared_secret => 'secret', :url => "http://example.com", :name => "tool name")
+    end
+
+    it "returns the default label if no language or name is specified" do
+      expect(@tool.default_label).to eq 'tool name'
+    end
+
+    it "returns the localized label if a locale is specified" do
+      @tool.settings = {:text => 'tool label', :url => "http://example.com", :text => 'course nav', :labels => {'en-US' => 'english nav'}}
+      @tool.save!
+      expect(@tool.default_label('en-US')).to eq 'english nav'
+    end
+  end
   
   describe "label_for" do
     append_before(:each) do

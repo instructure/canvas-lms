@@ -2,7 +2,7 @@
 define [
   'react'
   'jquery'
-  'compiled/react_files/components/FilesUsage'
+  'jsx/files/FilesUsage'
 ], (React, $, FilesUsage) ->
   TestUtils = React.addons.TestUtils
   Simulate = TestUtils.Simulate

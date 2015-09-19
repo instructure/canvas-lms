@@ -186,7 +186,7 @@ describe "calendar2" do
         details = f('.event-details')
         expect(details).not_to be_nil
         expect(details.text).to include(@course.default_section.name)
-        expect(details.find_element(:css, '.view_event_link')[:href]).to include "/calendar_events/#{e1.id}" # links to parent event
+        expect(details.f('.view_event_link')[:href]).to include "/calendar_events/#{e1.id}" # links to parent event
       end
 
       it "should have a working today button", priority: "1", test_id: 142041 do

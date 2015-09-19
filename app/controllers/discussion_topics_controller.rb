@@ -346,7 +346,9 @@ class DiscussionTopicsController < ApplicationController
       format.json do
         student_ids = user_can_moderate ? @context.all_real_students.pluck(:id) : nil
         render json: discussion_topics_api_json(@topics, @context, @current_user, session,
-                                                :student_ids => student_ids, :can_moderate => user_can_moderate)
+          :student_ids => student_ids, :can_moderate => user_can_moderate,
+          :plain_messages => value_to_boolean(params[:plain_messages]),
+          :exclude_assignment_description => value_to_boolean(params[:exclude_assignment_descriptions]))
       end
     end
   end

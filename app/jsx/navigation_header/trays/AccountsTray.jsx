@@ -27,9 +27,11 @@ define([
           </li>
         );
       }
-      return this.props.accounts.map((account) => {
+      var accounts = this.props.accounts.map((account) => {
         return <li key={account.id}><a href={`/accounts/${account.id}`}>{account.name}</a></li>;
       });
+      accounts.push(<li key='allAccountLink' className='ReactTray__feature-list-item'><a href='/accounts'>{I18n.t('All Accounts')}</a></li>);
+      return accounts;
     },
 
     render() {

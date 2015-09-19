@@ -1,4 +1,3 @@
-@import "pages/dashboard/dashboard_messages";
 @import "pages/dashboard/dashboard_activity";
 
 @if $use_new_styles {
@@ -19,8 +18,10 @@
     }
   }
 
-  // fix awkward spacing when a global message appears above the dashboard
-  .global-message + .ic-Dashboard-header { margin-top: $ic-sp; }
-  
+  // fix awkward spacing when a notification appears above the dashboard
+  .ic-notification {
+    + .ic-Dashboard-header { margin-top: $ic-sp*2; }
+  }
+
   .ic-Dashboard-Activity { padding: $ic-sp; }
 }

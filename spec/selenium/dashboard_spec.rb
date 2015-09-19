@@ -74,7 +74,7 @@ describe "dashboard" do
         announcement.destroy
 
         get "/"
-        expect(f('.no-recent-messages')).to include_text('No Recent Messages')
+        expect(f('.no_recent_messages')).to include_text('No Recent Messages')
       end
     end
 
@@ -146,7 +146,7 @@ describe "dashboard" do
                                                  :end_at => Date.today + 1.day)
 
       get "/"
-      messages = ffj("#dashboard .global-message .message.user_content")
+      messages = ffj("#dashboard .account_notification .notification_message")
       expect(messages.size).to eq 2
       expect(messages[0].text).to eq a1.message
       expect(messages[1].text).to eq a2.message
@@ -159,7 +159,7 @@ describe "dashboard" do
                                                            :end_at => Date.today + 1.day)
 
       get "/"
-      expect(fj("#dashboard .global-message .message.user_content").text).to eq announcement.message.gsub("{{ACCOUNT_DOMAIN}}", @course.account.domain)
+      expect(fj("#dashboard .account_notification .notification_message").text).to eq announcement.message.gsub("{{ACCOUNT_DOMAIN}}", @course.account.domain)
     end
 
     it "should interpolate the user's id in global notifications", priority: "1", test_id: 215584 do
@@ -168,7 +168,7 @@ describe "dashboard" do
                                                            :start_at => Date.today,
                                                            :end_at => Date.today + 1.day)
       get "/"
-      expect(fj("#dashboard .global-message .message.user_content").text).to eq announcement.message.gsub("{{CANVAS_USER_ID}}", @user.global_id.to_s)
+      expect(fj("#dashboard .account_notification .notification_message").text).to eq announcement.message.gsub("{{CANVAS_USER_ID}}", @user.global_id.to_s)
     end
 
     it "should show appointment stream items on the dashboard", priority: "2", test_id: 215585 do
@@ -271,7 +271,7 @@ describe "dashboard" do
       @conference.save!
 
       get "/courses/#{@course.to_param}"
-      expect(f('.conference .message')).to include_text(@conference.title)
+      expect(f('.conference .notification_message')).to include_text(@conference.title)
     end
 
     it "should end conferences from stream", priority: "1", test_id: 216355 do
@@ -315,10 +315,10 @@ describe "dashboard" do
       Enrollment.update_all(:created_at => 1.minute.ago) # need to make created_at and updated_at different
 
       get "/"
-      expect(f('.no-recent-messages')).to be_nil
+      expect(f('.no_recent_messages')).to be_nil
 
       get "/courses/#{@second_course.id}"
-      expect(f('.no-recent-messages')).to include_text('No Recent Messages')
+      expect(f('.no_recent_messages')).to include_text('No Recent Messages')
     end
 
     it "should validate the functionality of soft concluded courses in dropdown", priority: "1", test_id: 216372 do

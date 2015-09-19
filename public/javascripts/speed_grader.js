@@ -148,7 +148,7 @@ define([
       // this is for backwards compatability, we used to store the value as
       // strings "true" or "false", but now we store boolean true/false values.
       var settingVal = userSettings.get("eg_hide_student_names");
-      return settingVal === true || settingVal === "true" || window.anonymousAssignment;
+      return settingVal === true || settingVal === "true" || ENV.force_anonymous_grading;
     }
   };
 
@@ -164,13 +164,6 @@ define([
       this.submission = $.grep(jsonData.submissions, function(submission, i){
         return submission.user_id === student.id;
       })[0];
-      $.each(visibleRubricAssessments, function(i, rubricAssessment) {
-        rubricAssessment.user_id = rubricAssessment.user_id && String(rubricAssessment.user_id);
-        rubricAssessment.assessor_id = rubricAssessment.assessor_id && String(rubricAssessment.assessor_id);
-      });
-      this.rubric_assessments = $.grep(visibleRubricAssessments, function(rubricAssessment, i){
-        return rubricAssessment.user_id === student.id;
-      });
       jsonData.studentMap[student.id] = student;
     });
 
@@ -703,6 +696,9 @@ define([
     $(".save_rubric_button").click(function() {
       var $rubric = $(this).parents("#rubric_holder").find(".rubric");
       var data = rubricAssessment.assessmentData($rubric);
+      if (ENV.grading_role == 'moderator' || ENV.grading_role == 'provisional_grader') {
+        data['provisional'] = '1';
+      }
       var url = $(".update_rubric_assessment_url").attr('href');
       var method = "POST";
       EG.toggleFullRubric();
@@ -1557,6 +1553,9 @@ define([
           'submission[media_comment_id]': $("#media_media_recording").data('comment_id')
         });
       }
+      if (ENV.grading_role == 'moderator' || ENV.grading_role == 'provisional_grader') {
+        formData['submission[provisional]'] = true;
+      }
 
       function formSuccess(submissions) {
         $.each(submissions, function(){
@@ -1611,6 +1610,9 @@ define([
       } else {
         formData["submission[grade]"] = grade;
       }
+      if (ENV.grading_role == 'moderator' || ENV.grading_role == 'provisional_grader') {
+        formData['submission[provisional]'] = true;
+      }
 
       $.ajaxJSON(url, method, formData, function(submissions) {
         $.each(submissions, function(){
@@ -1624,9 +1626,9 @@ define([
 
     showGrade: function(){
       var submission;
-      var grade = EG.currentStudent.submission === undefined ? 
+      var grade = EG.currentStudent.submission === undefined ?
                   "" :
-                  EG.currentStudent.submission.grade; 
+                  EG.currentStudent.submission.grade;
 
       if ( EG.currentStudent.submission !== undefined ) {
         submission = EG.currentStudent.submission;

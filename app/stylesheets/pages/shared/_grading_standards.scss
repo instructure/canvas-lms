@@ -20,12 +20,6 @@
       font-weight: bold;
       font-size: 1.2em;
     }
-    .display_grading_standard {
-      .data_holder {
-        max-height: 175px;
-        margin-left: 20px;
-      }
-    }
   }
   &.react_grading_standards {
     .cancel_button {
@@ -35,11 +29,6 @@
 }
 
 .grading_standard {
-  .data_holder {
-    max-height: 175px;
-    overflow: auto;
-    padding-bottom: 10px;
-  }
   .read_only {
     display: none;
   }
@@ -67,9 +56,6 @@
     }
     tr.editing_box {
       display: table-row;
-    }
-    .data_holder {
-      max-height: 125px;
     }
     .standard_title div {
       float: left;

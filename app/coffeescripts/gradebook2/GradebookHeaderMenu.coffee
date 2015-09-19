@@ -59,7 +59,13 @@ define [
         )
         .popup('open')
 
-      new AssignmentMuter(@$menu.find("[data-action=toggleMuting]"), @assignment, "#{@gradebook.options.context_url}/assignments/#{@assignment.id}/mute")
+      new AssignmentMuter(@$menu.find("[data-action=toggleMuting]"),
+        @assignment,
+        "#{@gradebook.options.context_url}/assignments/#{@assignment.id}/mute",
+        (a, _z, status) =>
+          a.muted = status
+          @gradebook.setAssignmentWarnings()
+      )
 
     showAssignmentDetails: (opts={
       assignment:@assignment,

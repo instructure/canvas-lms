@@ -6,22 +6,20 @@ define [
   'compiled/models/Folder'
   'compiled/collections/FilesCollection'
   'compiled/react/shared/utils/withReactElement'
-  './ColumnHeaders'
-  './LoadingIndicator'
+  'jsx/files/ColumnHeaders'
+  'jsx/files/LoadingIndicator'
   './FolderChild'
   '../modules/customPropTypes'
   '../utils/updateAPIQuerySortParams'
   '../utils/getAllPages'
-  './FilePreview'
-  './NoResults'
+  'jsx/files/FilePreview'
+  'jsx/files/NoResults'
   '../utils/locationOrigin'
-], (_, I18n, React, ReactRouter, Folder, FilesCollection, withReactElement, ColumnHeadersComponent, LoadingIndicatorComponent, FolderChildComponent, customPropTypes, updateAPIQuerySortParams, getAllPages, FilePreviewComponent, NoResultsComponent) ->
+], (_, I18n, React, ReactRouter, Folder, FilesCollection, withReactElement, ColumnHeadersComponent, LoadingIndicator, FolderChildComponent, customPropTypes, updateAPIQuerySortParams, getAllPages, FilePreviewComponent, NoResults) ->
 
-  ColumnHeaders = React.createFactory ColumnHeadersComponent
-  LoadingIndicator = React.createFactory LoadingIndicatorComponent
+  ColumnHeaders = ColumnHeadersComponent
   FolderChild = React.createFactory FolderChildComponent
   FilePreview = React.createFactory FilePreviewComponent
-  NoResults = React.createFactory NoResultsComponent
 
   SearchResults = React.createClass
     displayName: 'SearchResults'

@@ -171,6 +171,12 @@ module Importers
             event.save_without_broadcasting
           end
 
+          migration.imported_migration_items_by_class(Attachment).each do |event|
+            event.lock_at = shift_date(event.lock_at, shift_options)
+            event.unlock_at = shift_date(event.unlock_at, shift_options)
+            event.save_without_broadcasting
+          end
+
           migration.imported_migration_items_by_class(DiscussionTopic).each do |event|
             event.reload
             event.delayed_post_at = shift_date(event.delayed_post_at, shift_options)

@@ -11,6 +11,19 @@ def create_rubric_with_criterion_points(points)
   wait_for_ajaximations
 end
 
+def assignment_with_rubric(points, title = 'new rubric')
+  @assignment = create_assignment_with_points(points)
+  rubric_model(title: title, data:
+                                      [{
+                                           description: "Some criterion",
+                                           points: points,
+                                           id: 'crit1',
+                                           ratings:
+                                               [{description: "Good", points: points, id: 'rat1', criterion_id: 'crit1'}]
+                                       }], description: 'new rubric description')
+  @association = @rubric.associate_with(@assignment, @course, purpose: 'grading', use_for_grading: false)
+end
+
 def edit_rubric_after_updating
   fj(".rubric .edit_rubric_link:visible").click
   driver.find_element(:tag_name, "body").click

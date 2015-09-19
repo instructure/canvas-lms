@@ -68,6 +68,8 @@ module Importers
         item.context = context
         item.migration_id = hash[:migration_id]
         item.locked = true if hash[:locked]
+        item.lock_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:lock_at]) if hash[:lock_at]
+        item.unlock_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:unlock_at]) if hash[:unlock_at]
         item.file_state = 'hidden' if hash[:hidden]
         item.display_name = hash[:display_name] if hash[:display_name]
         item.usage_rights_id = find_or_create_usage_rights(context, hash[:usage_rights], created_usage_rights_map) if hash[:usage_rights]

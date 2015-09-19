@@ -4,10 +4,9 @@ define [
   'compiled/models/Folder'
   '../modules/customPropTypes'
   'compiled/util/mimeClass'
-  'compiled/react/shared/utils/withReactElement'
-], (React, BackboneMixin, Folder, customPropTypes, mimeClass, withReactElement) ->
+], (React, BackboneMixin, Folder, customPropTypes, mimeClass) ->
 
-  FilesystemObjectThumbnail = React.createClass
+  FilesystemObjectThumbnail =
     displayName: 'FilesystemObjectThumbnail'
 
     propTypes:
@@ -51,16 +50,3 @@ define [
           @setState(thumbnail_url: response.thumbnail_url) if response?.thumbnail_url
         error: () ->
           clearTimeout(timeout)
-
-    render: withReactElement ->
-      if @state.thumbnail_url
-        span
-          className: "media-object ef-thumbnail FilesystemObjectThumbnail #{(@props.className if @props.className?)}"
-          style:
-            backgroundImage: "url('#{ @state.thumbnail_url }')"
-      else
-        className = if @props.model instanceof Folder
-          'folder'
-        else
-          mimeClass(@props.model.get('content-type'))
-        i className: "media-object ef-big-icon FilesystemObjectThumbnail mimeClass-#{className} #{@props.className if @props.className?}"

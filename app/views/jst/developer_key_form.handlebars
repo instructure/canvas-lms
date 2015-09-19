@@ -1,4 +1,4 @@
-<form action='/api/v1/developer_keys{{#if id}}/{{id}}{{/if}}' method='{{#if id}}PUT{{else}}POST{{/if}}' class="key_form">
+<form action='{{_formAction}}{{#if id}}/{{id}}{{/if}}' method='{{#if id}}PUT{{else}}POST{{/if}}' class="key_form">
 <table class='formtable'>
     <tr>
         <td><label for='key_name'>{{#t "key_name"}}Key Name:{{/t}}</label></td>

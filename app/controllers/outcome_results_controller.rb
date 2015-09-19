@@ -198,8 +198,9 @@ class OutcomeResultsController < ApplicationController
   #
   # @argument user_ids[] [Integer]
   #   If specified, only the users whose ids are given will be included in the
-  #   results. it is an error to specify an id for a user who is not a student in
-  #   the context
+  #   results. SIS ids can be used, prefixed by "sis_user_id:".
+  #   It is an error to specify an id for a user who is not a student in
+  #   the context.
   #
   # @argument outcome_ids[] [Integer]
   #   If specified, only the outcomes whose ids are given will be included in the
@@ -370,7 +371,8 @@ class OutcomeResultsController < ApplicationController
 
     return true if @context.grants_any_right?(@current_user, session, :manage_grades, :view_all_grades)
     reject! "users not specified and no access to all grades", :forbidden unless params[:user_ids]
-    user_ids = Api.value_to_array(params[:user_ids]).map(&:to_i).uniq
+    user_id_params = Api.value_to_array(params[:user_ids])
+    user_ids = api_find_all(users_for_outcome_context, user_id_params).map(&:id).uniq
     enrollments = @context.enrollments.where(user_id: user_ids)
     enrollment_user_ids = enrollments.map(&:user_id).uniq
     reject! "specified users not enrolled" unless enrollment_user_ids.length == user_ids.length
@@ -437,10 +439,9 @@ class OutcomeResultsController < ApplicationController
 
   def require_users
     reject! "cannot specify both user_ids and section_id" if params[:user_ids] && params[:section_id]
-
     if params[:user_ids]
-      user_ids = Api.value_to_array(params[:user_ids]).map(&:to_i).uniq
-      @users = users_for_outcome_context.where(id: user_ids).uniq
+      user_ids = Api.value_to_array(params[:user_ids]).uniq
+      @users = api_find_all(users_for_outcome_context, user_ids).uniq
       reject!( "can only include id's of users in the outcome context") if @users.count != user_ids.count
     elsif params[:section_id]
       @section = @context.course_sections.where(id: params[:section_id].to_i).first
@@ -448,7 +449,7 @@ class OutcomeResultsController < ApplicationController
       @users = @section.students
     end
     @users ||= users_for_outcome_context
-    @users = @users.order(:id)
+    @users.sort! {|a,b| a.id <=> b.id}
   end
 
   def users_for_outcome_context

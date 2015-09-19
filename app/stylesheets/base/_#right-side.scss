@@ -131,6 +131,17 @@
       padding-top: 6px;
     }
   }
+  .recent_feedback_icon {
+    background-position: 0 $ic-sp*.75;
+  }
+  .recent_feedback_title {
+    line-height: 1.3;
+    margin-bottom: $ic-sp/4;
+  }
+  .recent_feedback_comment {
+    color: $gray-light;
+    border: 0;
+  }
   .tooltip {
     .tooltip_wrap {
       left: -185px;

@@ -107,13 +107,24 @@
             <% end %>
           </ul>
         </div>
+        <% if show_help_link? %>
         <div role="navigation" class="ic-app-header__secondary-navigation">
           <ul role="menu" class="ic-app-header__menu-list">
             <li class="ic-app-header__menu-list-item">
-              <%= help_link %>
+              <%= link_to help_link_url,
+                    :class => help_link_classes(["ic-app-header__menu-list-link"]),
+                    :data => help_link_data do %>
+                <div class="menu-item-icon-container" role="presentation">
+                  <%= svg_icon :help %>
+                </div>
+                <div class="menu-item__text">
+                  <%= t('Help') %>
+                </div>
+              <% end %>
             </li>
           </ul>
         </div>
+        <% end %>
       </div>
     </div>
     <div id="global_nav_tray_container"></div>

@@ -10,7 +10,7 @@ define [
   'compiled/jquery.rails_flash_notifications'
 ], ($, I18n, React, Router, BBTreeBrowserView, RootFoldersFinder, customPropTypes, withReactElement) ->
 
-  FolderTree = React.createClass
+  FolderTree =
     displayName: 'FolderTree'
 
     propTypes:
@@ -77,7 +77,3 @@ define [
         folder.expand(false, {onlyShowSubtrees: true}).then ->
           expandFolder(folderIndex + 1)
       expandFolder(0)
-
-
-    render: withReactElement ->
-      div( {className:"ef-folder-list", ref: 'FolderTreeHolder'})

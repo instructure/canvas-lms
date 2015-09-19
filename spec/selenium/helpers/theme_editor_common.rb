@@ -4,8 +4,8 @@ def open_theme_editor_with_btn
   fj('.btn.button-sidebar-wide').click
 end
 
-def open_theme_editor
-  get '/brand_configs/new'
+def open_theme_editor(account_id)
+  get "/accounts/#{account_id}/theme_editor"
   wait_for_ajaximations
 end
 

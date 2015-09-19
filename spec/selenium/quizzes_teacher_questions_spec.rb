@@ -81,28 +81,6 @@ describe "quizzes questions" do
       expect(ff("#questions .question_holder option.missing_word").length).to eq 0
     end
 
-    it "should reorder questions with drag and drop", priority: "1", test_id: 209949 do
-      quiz_with_new_questions
-      click_questions_tab
-
-      # ensure they are in the right order
-      names = ff('.question_name')
-      expect(names[0].text).to eq 'first question'
-      expect(names[1].text).to eq 'second question'
-
-      load_simulate_js
-
-      # drag the second question up 100px (next slot)
-      driver.execute_script <<-JS
-      $('.draggable-handle:eq(1)').show().simulate('drag', {dx: 0, dy: -110});
-      JS
-
-      # verify they were swapped
-      names = ff('.question_name')
-      expect(names[0].text).to eq 'second question'
-      expect(names[1].text).to eq 'first question'
-    end
-
     it "should not show the display details for text questions", priority: "1", test_id: 209951 do
       quiz = start_quiz_question
 
@@ -164,7 +142,7 @@ describe "quizzes questions" do
       expect(quiz.quiz_questions.length).to eq @question_count
     end
 
-    it "should round published quiz points correctly on main quiz page", priority: "1", test_id: 209954 do
+    it "should round published quiz points correctly on main quiz page", priority: "2", test_id: 209954 do
       skip("bug 7402 - Quiz points not rounding correctly")
       q = @course.quizzes.create!(:title => "new quiz")
       75.times do

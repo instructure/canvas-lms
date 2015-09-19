@@ -319,8 +319,15 @@ TEXT
                     <div class="account_settings__help-text">
                       <%= t do %>
                         When enabled, global JS and CSS files can be uploaded in the
-                        <%= link_to t("Theme Editor"), brand_configs_new_path %>.
+                        <%= link_to t("Theme Editor"), account_theme_editor_path(@account) %>.
                       <% end %>
+                    </div>
+                    <div id="new_styles_sub_account_includes" style="<%= hidden unless @account.allow_global_includes? %>">
+                      <%= settings.check_box :sub_account_includes,
+                        id: :account_settings_new_sub_account_includes,
+                        checked: @account.settings[:sub_account_includes]
+                      %>
+                      <%= settings.label :new_sub_account_includes, :en => "Let sub-accounts customize themes and add additional includes" %>
                     </div>
                   <% end %>
                 </div>
@@ -330,7 +337,7 @@ TEXT
                 </div>
                 <div>
                   <%= settings.check_box :enable_profiles, :checked => @account.settings[:enable_profiles] %>
-                  <%= settings.label :enable_profiles, :en => "Enable Profiles" %>
+                  <%= settings.label :enable_profiles, :en => "Enable Profiles" %> 
                 </div>
                 <% if @account.non_canvas_auth_configured? %>
                   <div>
@@ -444,6 +451,10 @@ TEXT
                     <tr>
                       <td><%= settings.blabel :sis_app_token, :en => "SIS Agent Token" %></td>
                       <td><%= settings.text_field :sis_app_token, :value => @account.settings[:sis_app_token] %></td>
+                    </tr>
+                    <tr>
+                      <td><%= settings.blabel :sis_app_url, :en => "SIS App URL" %></td>
+                      <td><%= settings.text_field :sis_app_url, :value => @account.settings[:sis_app_url] %></td>
                     </tr>
                   </table>
               <% end %>
@@ -791,22 +802,25 @@ acknowledge that you have read and agreed to the
               <a href="#" rel="<%= context_url(@account, :context_account_notification_url, announcement) %>" class="delete_notification_link close" title="<%= t(:delete_announcement_tooltip, "Delete this Announcement") %>">×</a>
             <% end %>
 
-            <div class="global-message image-block">
-              <div class="image-block-image">
+            <div class="ic-notification ic-notification--admin-created ic-notification--<%= notification_container_classname(announcement) %>">
+              <div class="ic-notification__icon" role="presentation">
                 <i class="<%= notification_icon_classname(announcement) %>"></i>
-                <span class="hidden-inline-text">
+                <span class="screenreader-only">
                   <%= accessible_message_icon_text(notification_icon_type(announcement)) %>
                 </span>
               </div>
-              <div class="image-block-content">
-                <div class="subject title">
-                  <%= announcement.subject %>
-                </div>
-                <div class="message user_content">
-                  <%= user_content(announcement.message) %>
+              <div class="ic-notification__content">
+                <div class="ic-notification__message">
+                  <h4 class="ic-notification__title notification_subject">
+                    <%= announcement.subject %>
+                  </h4>
+                  <span class="notification_message">
+                    <%= user_content(announcement.message) %>
+                  </span>
                 </div>
               </div>
             </div>
+
             <div class="announcement-details">
               <span>
                 <%= t(:alert_timespan, "from %{start_at} to %{end_at}",
@@ -815,6 +829,7 @@ acknowledge that you have read and agreed to the
               </span>&nbsp;&nbsp;
               <%= link_to(context_user_name(@account, announcement.user_id), user_path(announcement.user_id)) %>
             </div>
+
             <% if announcement.required_account_service %>
               <div>
                 <%= AccountServices.allowable_services[announcement.required_account_service.to_sym].try(:[], :name) %>

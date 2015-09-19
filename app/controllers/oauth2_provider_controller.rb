@@ -35,6 +35,7 @@ class Oauth2ProviderController < ApplicationController
 
     return render(:status => 400, :json => { :message => "invalid client_id" }) unless provider.has_valid_key?
     return render(:status => 400, :json => { :message => "invalid redirect_uri" }) unless provider.has_valid_redirect?
+    return render(:status => 401, :json => { :message => "client not authorized for this account" }) unless provider.key.authorized_for_account?(@domain_root_account)
     session[:oauth2] = provider.session_hash
     session[:oauth2][:state] = params[:state] if params.key?(:state)
 

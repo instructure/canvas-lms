@@ -2,6 +2,7 @@ class AccessToken < ActiveRecord::Base
   attr_reader :full_token
   belongs_to :developer_key
   belongs_to :user
+  has_one :account, through: :developer_key
   attr_accessible :user, :purpose, :expires_at, :developer_key, :regenerate, :scopes, :remember_access
 
   serialize :scopes, Array
@@ -51,6 +52,11 @@ class AccessToken < ActiveRecord::Base
 
   def app_name
     developer_key.try(:name) || "No App"
+  end
+
+  def authorized_for_account?(target_account)
+    return true unless self.developer_key
+    self.developer_key.authorized_for_account?(target_account)
   end
 
   def record_last_used_threshold

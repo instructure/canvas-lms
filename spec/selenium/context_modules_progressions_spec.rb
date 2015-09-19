@@ -1,4 +1,5 @@
 require File.expand_path(File.dirname(__FILE__) + '/helpers/context_modules_common')
+require File.expand_path(File.dirname(__FILE__) + '/helpers/quizzes_common')
 
 describe "context modules" do
   include_context "in-process server selenium tests"
@@ -143,6 +144,176 @@ describe "context modules" do
       @course.save!
       get "/courses/#{@course.id}"
       expect(f('.module_progressions_link')).to be_nil
+    end
+  end
+
+  context "View Progress button" do
+    before(:each) do
+      course_with_teacher_logged_in
+      @module1 = @course.context_modules.create!(name: "module1")
+      @module1.save!
+      @module2 = @course.context_modules.create!(name: "module2")
+      @assignment_2 = @course.assignments.create!(title: "assignment 2")
+      @module2.add_item({id: @assignment_2.id, type: 'assignment'})
+      @module2.prerequisites = "module_#{@module1.id}"
+      @module2.save!
+      @student = User.create!(name: "student_1")
+      @course.enroll_student(@student).accept!
+    end
+
+    def validate_access_to_module
+      wait_for_ajaximations
+      user_session(@teacher)
+      get "/courses/#{@course.id}/modules/progressions"
+      keep_trying_until(15){
+        expect(ff(".completed")[0]).to be_displayed
+      }
+      expect(fln("student_1")).to be_displayed
+      user_session(@student)
+      get "/courses/#{@course.id}/modules/"
+      fln("assignment 2").click
+      expect(f(".assignment-title")).to be_displayed
+    end
+
+    def add_requirement(requirement = nil)
+      @module1.completion_requirements = requirement
+      @module1.save!
+      user_session(@student)
+      get "/courses/#{@course.id}/modules"
+      expect(ff(".locked_icon")[1]).to be_displayed
+    end
+
+    it "should show student progress once assignment-view requirement is met", priority: "1", test_id: 126690 do
+      @assignment_1 = @course.assignments.create!(name: "assignment 1", submission_types: ["online_text_entry"], :points_possible => 20)
+      tag = @module1.add_item({id: @assignment_1.id, type: 'assignment'})
+      add_requirement({tag.id => {type: 'must_view'}})
+      fln("assignment 1").click
+      validate_access_to_module
+    end
+
+    it "should show student progress once assignment-submit requirement is met", priority: "1", test_id: 126691 do
+      @assignment_1 = @course.assignments.create!(name: "assignment 1", submission_types: ["online_text_entry"], :points_possible => 20)
+      tag = @module1.add_item({id: @assignment_1.id, type: 'assignment'})
+      add_requirement({tag.id => {type: 'must_submit'}})
+      @assignment_1.submit_homework(@student, body: "done!")
+      validate_access_to_module
+    end
+
+    it "should show student progress once assignment-score atleast requirement is met", priority: "1", test_id: 126689 do
+      @assignment_1 = @course.assignments.create!(name: "assignment 1", submission_types: ["online_text_entry"], :points_possible => 20)
+      tag = @module1.add_item({id: @assignment_1.id, type: 'assignment'})
+      add_requirement({tag.id => {type:'min_score', min_score: 10}})
+      @assignment_1.submit_homework(@student, body: "done!")
+      @assignment_1.grade_student(@student, grade: 15)
+      validate_access_to_module
+    end
+
+    it "should show student progress once quiz-view requirement is met", priority: "1", test_id: 126697 do
+      @quiz_1 = @course.quizzes.create!(title: "some quiz")
+      @quiz_1.publish!
+      tag = @module1.add_item({id: @quiz_1.id, type: 'quiz'})
+      add_requirement({tag.id => {type: 'must_view'}})
+      fln("some quiz").click
+      validate_access_to_module
+    end
+
+    it "should show student progress once quiz-submit requirement is met", priority: "1", test_id: 126698 do
+      @quiz_1 = @course.quizzes.create!(title: "some quiz")
+      @quiz_1.publish!
+      tag = @module1.add_item({id: @quiz_1.id, type: 'quiz'})
+      add_requirement({tag.id => {type: 'must_submit'}})
+      fln("some quiz").click
+      wait_for_ajaximations
+      f(".btn-primary").click
+      f(".btn-secondary").click
+      validate_access_to_module
+    end
+
+    it "should show student progress once quiz-score atleast requirement is met", priority: "1", test_id: 126696 do
+      @quiz_1 = quiz_create
+      tag = @module1.add_item({id: @quiz_1.id, type: 'quiz'})
+      add_requirement({tag.id => {type:'min_score', min_score: 0.5}})
+      fln("Unnamed Quiz").click
+      wait_for_ajaximations
+      f(".btn-primary").click
+      ff(".question_input")[0].click
+      f(".btn-primary").click
+      validate_access_to_module
+    end
+
+    it "should show student progress once discussion-view requirement is met", priority: "1", test_id: 126694 do
+      @discussion_1 = @course.assignments.create!(name: "Discuss!", points_possible: "5", submission_types: "discussion_topic")
+      tag = @module1.add_item({id: @discussion_1.id, type: 'assignment'})
+      add_requirement({tag.id => {type: 'must_view'}})
+      wait_for_ajaximations
+      fln("Discuss!").click
+      validate_access_to_module
+    end
+
+    it "should show student progress once discussion-contribute requirement is met", priority: "1", test_id: 126693 do
+      @discussion_1 = @course.assignments.create!(name: "Discuss!", points_possible: "5", submission_types: "discussion_topic")
+      tag = @module1.add_item({id: @discussion_1.id, type: 'assignment'})
+      add_requirement({tag.id => {type: 'must_contribute'}})
+      wait_for_ajaximations
+      fln("Discuss!").click
+      wait_for_ajaximations
+      f('.discussion-reply-action').click
+      assignment_form = f('#submit_online_text_entry_form')
+      type_in_tiny 'textarea', 'something to submit'
+      submit_form(assignment_form)
+      validate_access_to_module
+    end
+
+    it "should show student progress once wiki page-view requirement is met", priority: "1", test_id: 126700 do
+      @wiki_page = @course.wiki.wiki_pages.create!(title: 'Wiki Page')
+      tag = @module1.add_item(id: @wiki_page.id, type: 'wiki_page')
+      add_requirement({tag.id => {type: 'must_view'}})
+      wait_for_ajaximations
+      fln("Wiki Page").click
+      validate_access_to_module
+    end
+
+    it "should show student progress once wiki page-contribute requirement is met", priority: "1", test_id: 126699 do
+      @wiki_page = @course.wiki.wiki_pages.create(title: "Wiki_page", editing_roles: "public", notify_of_update: true)
+      tag = @module1.add_item(id: @wiki_page.id, type: 'wiki_page')
+      add_requirement({tag.id => {type: 'must_contribute'}})
+      get "/courses/#{@course.id}/pages/#{@wiki_page.title}/edit"
+      type_in_tiny 'textarea', 'something to submit'
+      f(".btn-primary").click
+      validate_access_to_module
+    end
+
+    it "should show student progress once External tool-view requirement is met", priority: "1", test_id: 126701 do
+      @tool = @course.context_external_tools.create! name: 'WHAT', consumer_key: 'what', shared_secret: 'what', url: 'http://what.example.org'
+      tag = @module1.add_item(title: 'External_tool', type: 'external_tool', id: @tool.id, url: 'http://what.example.org/A')
+      get "/courses/#{@course.id}/modules/"
+      f(".publish-icon.unpublished.publish-icon-publish").click
+      wait_for_ajaximations
+      add_requirement({tag.id => {type: 'must_view'}})
+      wait_for_ajaximations
+      fln("External_tool").click
+      validate_access_to_module
+    end
+
+    it "should show student progress once External URL-view requirement is met", priority: "1", test_id: 126702 do
+      @external_url_tag = @module1.add_item(type: 'external_url', url: 'http://example.com/lolcats',
+                                            title: 'External_URL', indent: 1)
+      @external_url_tag.publish!
+      add_requirement({@external_url_tag.id => {type: 'must_view'}})
+      wait_for_ajaximations
+      fln("External_URL").click
+      validate_access_to_module
+    end
+
+    it "should show student progress once File-view requirement is met", priority: "1", test_id: 126703 do
+      @file = @course.attachments.create!(display_name: "file", uploaded_data: fixture_file_upload('files/a_file.txt', 'text/plain'))
+      @file.context = @course
+      @file.save!
+      tag = @module1.add_item({id: @file.id, type: 'attachment'})
+      add_requirement({tag.id => {type: 'must_view'}})
+      wait_for_ajaximations
+      fln("file").click
+      validate_access_to_module
     end
   end
 end

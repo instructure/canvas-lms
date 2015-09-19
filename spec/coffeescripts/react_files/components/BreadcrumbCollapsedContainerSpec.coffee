@@ -2,7 +2,7 @@ define [
   'jquery'
   'react'
   'react-router'
-  'compiled/react_files/components/BreadcrumbCollapsedContainer'
+  'jsx/files/BreadcrumbCollapsedContainer'
   'compiled/models/Folder'
   'compiled/react_files/modules/filesEnv'
   '../mockFilesENV'
@@ -41,17 +41,19 @@ define [
     $node = $(@bcc.getDOMNode())
     simulateNative.mouseOut(@bcc.getDOMNode())
     clock.tick(200)
-    equal $node.find('.undefined').length, 1, "should have class of undefined"
+    equal $node.find('.closed').length, 1, "should have class of closed"
 
     clock.restore()
 
   test 'BCC: closes breadcrumbs on blur', ->
     clock = sinon.useFakeTimers()
-    $node = $(@bcc.getDOMNode())
     simulate.blur(@bcc.getDOMNode())
     clock.tick(200)
 
-    equal $node.find('.undefined').length, 1, "should have class of undefined"
+    $node = $(@bcc.getDOMNode())
+    simulateNative.mouseOut(@bcc.getDOMNode())
+    clock.tick(200)
+    equal $node.find('.closed').length, 1, "should have class of closed"
 
     clock.restore()
 

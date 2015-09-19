@@ -278,10 +278,12 @@ class UsersController < ApplicationController
 
         flash[:notice] = t('google_drive_added', "Google Drive account successfully added!")
         return redirect_to(json['return_to_url'])
-      rescue => e
+      rescue Google::APIClient::ClientError => e
         Canvas::Errors.capture_exception(:oauth, e)
-        flash[:error] = t('google_drive_fail', "Google Drive authorization failed. Please try again")
+        
+        flash[:error] = e.to_s
       end
+      return redirect_to(user_profile_url(@current_user))
     end
 
     if !oauth_request || (request.host_with_port == oauth_request.original_host_with_port && oauth_request.user != @current_user)
@@ -530,7 +532,7 @@ class UsersController < ApplicationController
     Shackles.activate(:slave) do
       prepare_current_user_dashboard_items
 
-      if @show_recent_feedback = (@current_user.student_enrollments.active.present?)
+      if @show_recent_feedback = (@current_user.student_enrollments.active.exists?)
         @recent_feedback = (@current_user && @current_user.recent_feedback) || []
       end
     end

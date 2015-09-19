@@ -25,7 +25,7 @@ module Lti
 
       it 'requires a resource_handler' do
         subject.save
-        expect(subject.errors.first).to eq [:resource_handler, "can't be blank"]
+        expect(subject.errors.first).to eq [:message_handler, "can't be blank"]
       end
 
       it 'accepts types in PLACEMENT_LOOKUP' do

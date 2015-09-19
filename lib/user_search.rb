@@ -2,6 +2,7 @@ module UserSearch
 
   def self.for_user_in_context(search_term, context, searcher, session=nil, options = {})
     search_term = search_term.to_s
+    return User.none if search_term.strip.empty?
     base_scope = scope_for(context, searcher, options.slice(:enrollment_type, :enrollment_role, :enrollment_role_id, :exclude_groups, :enrollment_state))
     if search_term.to_s =~ Api::ID_REGEX
       db_id = Shard.relative_id_for(search_term, Shard.current, Shard.current)

@@ -5,5 +5,6 @@ module IncomingMail
     class UnknownAddress < ReplyFrom; end
     class UnknownSender < ReplyFrom; end
     class ReplyToLockedTopic < ReplyFrom; end
+    class ReplyToDeletedDiscussion < ReplyFrom; end
   end
 end

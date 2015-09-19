@@ -155,7 +155,7 @@ module AssignmentOverrideApplicator
 
   def self.section_overrides(assignment_or_quiz, user)
     context = assignment_or_quiz.context
-    section_ids = TempCache.cache(:visible_section_ids, context, user) do
+    section_ids = RequestCache.cache(:visible_section_ids, context, user) do
       context.sections_visible_to(user).map(&:id) +
       context.section_visibilities_for(user).select { |v|
         ['StudentEnrollment', 'ObserverEnrollment', 'StudentViewEnrollment'].include? v[:type]

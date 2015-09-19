@@ -127,7 +127,7 @@ module IncomingMailProcessor
     end
 
     def report_stats(incoming_message, mailbox_account)
-      CanvasStatsd::Statsd.increment("incoming_mail_processor.incoming_message_processed")
+      CanvasStatsd::Statsd.increment("incoming_mail_processor.incoming_message_processed.#{mailbox_account.escaped_address}")
 
       age = age(incoming_message)
       if age

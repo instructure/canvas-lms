@@ -610,7 +610,7 @@ class Course < ActiveRecord::Base
 
   def user_is_instructor?(user)
     return unless user
-    TempCache.cache('user_is_instructor', self, user) do
+    RequestCache.cache('user_is_instructor', self, user) do
       Rails.cache.fetch([self, user, "course_user_is_instructor"].cache_key) do
         user.cached_current_enrollments(preload_courses: true).any? { |e| e.course_id == self.id && e.participating_instructor? }
       end
@@ -619,7 +619,7 @@ class Course < ActiveRecord::Base
 
   def user_is_student?(user, opts = {})
     return unless user
-    TempCache.cache('user_is_student', self, user, opts) do
+    RequestCache.cache('user_is_student', self, user, opts) do
       Rails.cache.fetch([self, user, "course_user_is_student", opts[:include_future]].cache_key) do
         user.cached_current_enrollments(:preload_courses => true, :include_future => opts[:include_future]).any? { |e|
           e.course_id == self.id && (opts[:include_future] ? e.student? : e.participating_student?)
@@ -631,7 +631,7 @@ class Course < ActiveRecord::Base
   def user_has_been_instructor?(user)
     return unless user
     # enrollments should be on the course's shard
-    TempCache.cache('user_has_been_instructor', self, user) do
+    RequestCache.cache('user_has_been_instructor', self, user) do
       self.shard.activate do
         Rails.cache.fetch([self, user, "course_user_has_been_instructor"].cache_key) do
           # active here is !deleted; it still includes concluded, etc.
@@ -643,7 +643,7 @@ class Course < ActiveRecord::Base
 
   def user_has_been_admin?(user)
     return unless user
-    TempCache.cache('user_has_been_admin', self, user) do
+    RequestCache.cache('user_has_been_admin', self, user) do
       Rails.cache.fetch([self, user, "course_user_has_been_admin"].cache_key) do
         # active here is !deleted; it still includes concluded, etc.
         self.admin_enrollments.active.where(user_id: user).exists?
@@ -653,7 +653,7 @@ class Course < ActiveRecord::Base
 
   def user_has_been_observer?(user)
     return unless user
-    TempCache.cache('user_has_been_observer', self, user) do
+    RequestCache.cache('user_has_been_observer', self, user) do
       Rails.cache.fetch([self, user, "course_user_has_been_observer"].cache_key) do
         # active here is !deleted; it still includes concluded, etc.
         self.observer_enrollments.shard(self).active.where(user_id: user).exists?
@@ -663,7 +663,7 @@ class Course < ActiveRecord::Base
 
   def user_has_been_student?(user)
     return unless user
-    TempCache.cache('user_has_been_student', self, user) do
+    RequestCache.cache('user_has_been_student', self, user) do
       Rails.cache.fetch([self, user, "course_user_has_been_student"].cache_key) do
         self.all_student_enrollments.where(user_id: user).exists?
       end
@@ -672,7 +672,7 @@ class Course < ActiveRecord::Base
 
   def user_has_no_enrollments?(user)
     return unless user
-    TempCache.cache('user_has_no_enrollments', self, user) do
+    RequestCache.cache('user_has_no_enrollments', self, user) do
       Rails.cache.fetch([self, user, "course_user_has_no_enrollments"].cache_key) do
         !enrollments.where(user_id: user).exists?
       end
@@ -1957,6 +1957,7 @@ class Course < ActiveRecord::Base
             end
             new_file.folder_id = new_folder_id
             new_file.save_without_broadcasting!
+            cm.add_imported_item(new_file)
             map_merge(file, new_file)
           rescue
             cm.add_warning(t(:file_copy_error, "Couldn't copy file \"%{name}\"", :name => file.display_name || file.path_name), $!)
@@ -2092,21 +2093,32 @@ class Course < ActiveRecord::Base
     end
   end
 
-  def sections_visible_to(user, sections = active_course_sections)
+  # returns :all, :none, or an array of section ids
+  def course_section_visibility(user)
     visibilities = section_visibilities_for(user)
     visibility = enrollment_visibility_level_for(user, visibilities)
-    section_ids = visibilities.map{ |s| s[:course_section_id] }
-    is_scope = sections.respond_to?(:where)
-
     if [:full, :limited, :restricted, :sections].include?(visibility)
       if visibility == :sections || visibilities.all?{ |v| ['StudentEnrollment', 'StudentViewEnrollment', 'ObserverEnrollment'].include? v[:type] }
-        is_scope ? sections.where(:id => section_ids) : sections.select{|section| section_ids.include?(section.id)}
+        visibilities.map{ |s| s[:course_section_id] }
       else
-        sections
+        :all
       end
     else
+      :none
+    end
+  end
+
+  def sections_visible_to(user, sections = active_course_sections)
+    is_scope = sections.respond_to?(:where)
+    section_ids = course_section_visibility(user)
+    case section_ids
+    when :all
+      sections
+    when :none
       # return an empty set, but keep it as a scope for downstream consistency
       is_scope ? sections.none : []
+    when Array
+      is_scope ? sections.where(:id => section_ids) : sections.select{|section| section_ids.include?(section.id)}
     end
   end
 
@@ -2517,7 +2529,7 @@ class Course < ActiveRecord::Base
   end
 
   def filter_attributes_for_user(hash, user, session)
-    hash.delete('hide_final_grades') unless grants_right? user, :update
+    hash.delete('hide_final_grades') if hash.key?('hide_final_grades') && !grants_right?(user, :update)
     hash
   end
 
@@ -2557,7 +2569,7 @@ class Course < ActiveRecord::Base
       # get its id to move over sections and enrollments.  Setting this course to
       # deleted has to be last otherwise it would set all the enrollments to
       # deleted before they got moved
-      self.uuid = self.sis_source_id = self.sis_batch_id = nil;
+      self.uuid = self.sis_source_id = self.sis_batch_id = self.integration_id = nil;
       self.save!
       Course.process_as_sis { new_course.save! }
       self.course_sections.update_all(:course_id => new_course)

@@ -1,14 +1,11 @@
 define [
   'react'
-  'compiled/react/shared/utils/withReactElement'
   '../modules/UploadQueue'
-  './UploadProgress'
+  'jsx/files/UploadProgress'
   'compiled/jquery.rails_flash_notifications'
-], (React, withReactElement, UploadQueue, UploadProgressComponent) ->
+], (React, UploadQueue, UploadProgressComponent) ->
 
-  UploadProgress = React.createFactory UploadProgressComponent
-
-  CurrentUploads = React.createClass
+  CurrentUploads =
     displayName: 'CurrentUploads'
 
     getInitialState: ->
@@ -28,12 +25,3 @@ define [
       name = currentUploader.getFileName()
       percent = currentUploader.roundProgress()
       $.screenReaderFlashMessage "#{name} - #{percent}%"
-
-    render: withReactElement ->
-      div className: ('current_uploads' if @state.currentUploads.length),
-        if @state.currentUploads.length
-          div className: 'current_uploads__uploaders',
-            @state.currentUploads.map (uploader) ->
-              UploadProgress
-                uploader: uploader
-                key: uploader.getFileName()

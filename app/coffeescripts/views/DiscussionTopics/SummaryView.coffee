@@ -29,6 +29,8 @@ define [
     # Public: I18n translations.
     messages:
       confirm: I18n.t('Are you sure you want to delete this announcement?')
+      deleteSuccessful: I18n.t('flash.removed', 'Announcement successfully deleted.')
+      deleteFail: I18n.t('flash.fail', 'Announcement deletion failed.')
 
     initialize: ->
       super
@@ -85,8 +87,11 @@ define [
         @$gearButton.focus()
 
     delete: ->
-      @model.destroy()
-      @$el.remove()
+      @model.destroy
+        success : =>
+          $.flashMessage @messages.deleteSuccessful
+        error : =>
+          $.flashError @messages.deleteFail
 
     preservePrevItem: ->
       prevEl = @$el.prev()

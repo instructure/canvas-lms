@@ -200,6 +200,15 @@ END
       root_opt_in: true,
       beta: true
     },
+    'recurring_calendar_events' =>
+    {
+      display_name: -> { I18n.t('Recurring Calendar Events') },
+      description: -> { I18n.t("Allows the scheduling of recurring calendar events") },
+      applies_to: 'Course',
+      state: 'hidden',
+      root_opt_in: true,
+      beta: true
+    },
     'student_groups_next' =>
     {
       display_name: -> { I18n.t('features.student_groups', 'New Student Groups Page') },
@@ -361,7 +370,16 @@ END
       state: 'hidden',
       development: true,
       root_opt_in: true
-    }
+    },
+    'anonymous_grading' =>
+    {
+      display_name: -> { I18n.t('Anonymous Grading') },
+      description: -> { I18n.t("Anonymous grading forces student names to be hidden in SpeedGrader™") },
+      applies_to: 'Course',
+      state: 'hidden',
+      development: true,
+      root_opt_in: true,
+    },
   )
 
   def self.definitions

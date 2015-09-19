@@ -39,7 +39,6 @@
         </tr>
       </thead>
     </table>
-    <div class="data_holder">
     <table style="width: 100%; margin-bottom: 20px;" class="grading_standard_data">
       <caption class="screenreader-only">
         <%= t('grading_standard_summary', "A table that contains your grading scheme. The name of the value and the range are on the top. Each row contains a minimum and maximum percentage value.") %>
@@ -126,7 +125,6 @@
         </td>
       </tr>
     </table>
-    </div>
     <% unless grading_standard_list %>
       <div class="displaying" style="text-align: right;">
         <a href="<%= context_url(@context, :context_grading_standards_url) %>"><%= t('managing_grading_standards', 'manage grading schemes') %></a>
@@ -145,7 +143,6 @@
     </div>
     <table class="side_tabs_table grading_standards_holder" style="display: none;">
       <tr>
-      
         <td class="left">
           <ul class="grading_standards_select unstyled_list side_tabs">
             <li class="grading_standard_select blank" style="display: none;">

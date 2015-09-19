@@ -97,7 +97,8 @@ cache(safe_cache_key([@current_user, contexts, 'a_need_grading']), cache_opts) d
                 <%= t('no_peer_review_due_date', 'due: No Due Date') %>
               <% end %>
             </em>
-            <%= render :partial => 'shared/ignore_option_list', :locals => {:type => 'reviewing', :item => assessment_request} %>
+          </a>
+          <%= render :partial => 'shared/ignore_option_list', :locals => {:type => 'reviewing', :item => assessment_request} %>
         </li>
       <% end %>
     <% end %>

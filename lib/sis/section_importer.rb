@@ -22,22 +22,29 @@ module SIS
     def process
       start = Time.now
       importer = Work.new(@batch, @root_account, @logger)
-      Course.skip_updating_account_associations do
-        CourseSection.process_as_sis(@sis_options) do
-          yield importer
+      CourseSection.suspend_callbacks(:delete_enrollments_later_if_deleted) do
+        Course.skip_updating_account_associations do
+          CourseSection.process_as_sis(@sis_options) do
+            yield importer
+          end
         end
       end
       Course.update_account_associations(importer.course_ids_to_update_associations.to_a) unless importer.course_ids_to_update_associations.empty?
       importer.sections_to_update_sis_batch_ids.in_groups_of(1000, false) do |batch|
         CourseSection.where(:id => batch).update_all(:sis_batch_id => @batch)
       end if @batch
+      Enrollment.where(course_section_id: importer.deleted_section_ids.to_a).active.find_each(&:destroy)
       @logger.debug("Sections took #{Time.now - start} seconds")
       return importer.success_count
     end
 
-  private
     class Work
-      attr_accessor :success_count, :sections_to_update_sis_batch_ids, :course_ids_to_update_associations
+      attr_accessor(
+        :success_count,
+        :sections_to_update_sis_batch_ids,
+        :course_ids_to_update_associations,
+        :deleted_section_ids
+      )
 
       def initialize(batch, root_account, logger)
         @batch = batch
@@ -45,7 +52,8 @@ module SIS
         @logger = logger
         @success_count = 0
         @sections_to_update_sis_batch_ids = []
-        @course_ids_to_update_associations = [].to_set
+        @course_ids_to_update_associations = Set.new
+        @deleted_section_ids = Set.new
       end
 
       def add_section(section_id, course_id, name, status, start_date=nil, end_date=nil, integration_id=nil)
@@ -94,6 +102,7 @@ module SIS
           section.workflow_state = 'active'
         elsif status =~ /deleted/i
           section.workflow_state = 'deleted'
+          deleted_section_ids << section.id
         end
 
         if (section.stuck_sis_fields & [:start_at, :end_at]).empty?

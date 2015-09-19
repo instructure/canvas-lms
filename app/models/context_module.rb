@@ -19,7 +19,7 @@
 class ContextModule < ActiveRecord::Base
   include Workflow
   include SearchTermHelper
-  attr_accessible :context, :name, :unlock_at, :require_sequential_progress, 
+  attr_accessible :context, :name, :unlock_at, :require_sequential_progress,
                   :completion_requirements, :prerequisites, :publish_final_grade, :requirement_count
   belongs_to :context, :polymorphic => true
   validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course']
@@ -92,8 +92,10 @@ class ContextModule < ActiveRecord::Base
 
   def invalidate_progressions
     connection.after_transaction_commit do
-      context_module_progressions.update_all(current: false)
-      send_later_if_production_enqueue_args(:evaluate_all_progressions, {:strand => "module_reeval_#{self.global_context_id}"})
+      if context_module_progressions.where(current: true).update_all(current: false) > 0
+        # don't queue a job unless necessary
+        send_later_if_production_enqueue_args(:evaluate_all_progressions, {:strand => "module_reeval_#{self.global_context_id}"})
+      end
     end
   end
 
@@ -530,14 +532,7 @@ class ContextModule < ActiveRecord::Base
     return nil unless ContextModuleProgression.prerequisites_satisfied?(user, self)
     return nil unless progression = self.find_or_create_progression(user)
 
-    progression.requirements_met ||= []
-    if progression.update_requirement_met(action, tag, points)
-      # not sure if this save is necessary
-      # leaving it for now as it saves the default requirements_met (set above)
-      progression.save!
-      progression.send_later_if_production(:evaluate!)
-    end
-
+    progression.update_requirement_met!(action, tag, points)
     progression
   end
 

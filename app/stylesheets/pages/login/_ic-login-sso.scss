@@ -1,0 +1,83 @@
+///
+//// SSO Login Links
+///
+@mixin shared-sso($direction) {
+  content: "";
+  flex: 1;
+  height: 1px;
+  margin: 0 1em;
+  background: linear-gradient(to $direction, darken($ic-color-neutral, 10), transparent);
+}
+.ic-Login__sso {
+  clear: both;
+  text-align: center;
+}
+.ic-Login__sso-divider {
+  padding: 10px 0;
+  margin: 0;
+  line-height: normal;
+  font-size: 11px;
+  color: darken($ic-color-neutral, 10);
+  display: flex;
+  align-items: center;
+  @if $use_new_styles {
+    border-top: 1px solid $ic-border-color;
+  }
+  @else {
+    &:before {   @include shared-sso(left); }
+    &:after  {   @include shared-sso(right);}
+  }
+
+}
+.ic-Login__sso-list {
+  @if $use_new_styles {
+    padding: $ic-sp 0 0 0;
+    margin: $ic-sp*2 0 0 0;
+    border-top: 1px solid $ic-color-light;
+  }
+  @else {
+    padding: 0;
+    margin: 0;
+  }
+
+}
+.ic-Login__sso-list__item {
+  list-style: none;
+  display: inline-block;
+}
+.Button.ic-Login__sso-button {
+  padding: 10px 24px 10px 24px;
+  background: transparent;
+  color: $ic-color-light;
+  border: transparent;
+  &--has-text {
+    display: flex;
+    align-items: center;
+  }
+  &:focus { color: $ic-color-light; }
+  &:hover {
+    background: $ic-brand-primary;
+    color: $ic-color-light;
+    &.ui-state-hover {
+      background: $ic-brand-primary;
+      color: $ic-color-light;
+      border-color: darken($ic-brand-primary, 15%);
+    }
+  }
+  transition: all 0.5s;
+}
+.ic-Login__icon-sso {
+  padding-right: $ic-sp;
+}
+.ic-Login__icon-sso--icon-only {
+  padding-right: 0;
+}
+
+.ic-Login__sso-button__title {
+  color: $ic-color-light;
+  border-left: 1px solid $ic-color-light;
+  padding: 0 $ic-sp;
+}
+.ic-Login__sso-button__title-caps {
+  text-transform: capitalize;
+}

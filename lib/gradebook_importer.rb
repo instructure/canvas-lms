@@ -19,6 +19,7 @@
 require 'csv'
 
 class GradebookImporter
+  include GradebookTransformer
 
   class NegativeId
     class << self
@@ -100,7 +101,9 @@ class GradebookImporter
       process_submissions(row, @students.last)
     end
 
-    @assignments = select_in_current_grading_periods @assignments
+    memo = @assignments
+    @assignments = select_in_current_grading_periods @assignments, @context
+    @assignments_outside_current_periods = memo - @assignments
 
     @missing_assignments = []
     @missing_assignments = @all_assignments.values - @assignments if @missing_assignment
@@ -172,7 +175,6 @@ class GradebookImporter
   end
 
   def process_header(csv)
-
     row = csv.shift
     raise "Couldn't find header row" unless header?(row)
 
@@ -188,25 +190,6 @@ class GradebookImporter
     return false if last_student_info_column(row) !~ /Section/
 
     true
-  end
-
-  def select_in_current_grading_periods(assignments)
-    if @context.feature_enabled?(:multiple_grading_periods)
-      assignments, assignments_without_due_at = assignments.partition(&:due_at)
-      current_periods = GradingPeriod.for(@context).active.current
-
-      current, outside = assignments.partition do |assignment|
-        current_periods.any? do |period|
-          period.in_date_range? assignment.due_at
-        end
-      end
-
-      @assignments_outside_current_periods = outside
-      current + assignments_without_due_at
-    else
-      @assignments_outside_current_periods = []
-      assignments
-    end
   end
 
   def last_student_info_column(row)

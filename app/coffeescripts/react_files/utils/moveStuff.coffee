@@ -1,7 +1,7 @@
 define [
   'i18n!react_files'
   'jquery'
-  '../components/FileRenameForm'
+  'jsx/files/FileRenameForm'
   'react'
   '../modules/FileOptionsCollection'
 ], (I18n, $, FileRenameForm, React, FileOptionsCollection) ->

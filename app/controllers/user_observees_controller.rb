@@ -39,7 +39,7 @@ class UserObserveesController < ApplicationController
   #
   # @returns [User]
   def index
-    observed_users = user.observed_users.order_by_sortable_name
+    observed_users = user.observed_users.active.order_by_sortable_name
     observed_users = Api.paginate(observed_users, self, api_v1_user_observees_url)
     render json: users_json(observed_users, @current_user, session)
   end
@@ -152,24 +152,31 @@ class UserObserveesController < ApplicationController
   private
 
   def user
-    @user ||= params[:user_id].nil? ? @current_user : api_find(User, params[:user_id])
+    @user ||= params[:user_id].nil? ? @current_user : api_find(User.active, params[:user_id])
   end
 
   def observee
-    @observee ||= api_find(User, params[:observee_id])
+    @observee ||= api_find(User.active, params[:observee_id])
   end
 
   def add_observee(observee)
-    unless has_observee?(observee)
-      user.user_observees.create! do |uo|
-        uo.user_id = observee.id
+    UserObserver.unique_constraint_retry do
+      unless has_observee?(observee)
+        user.user_observees.create! do |uo|
+          uo.user_id = observee.id
+        end
+        user.touch
       end
-      user.touch
     end
   end
 
   def remove_observee(observee)
+    user.observer_enrollments.shard(user).where(:associated_user_id => observee).each do |enrollment|
+      enrollment.workflow_state = 'deleted'
+      enrollment.save
+    end
     user.user_observees.where(user_id: observee).destroy_all
+    user.update_account_associations
     user.touch
   end
 

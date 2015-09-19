@@ -20,11 +20,11 @@ describe "Alerts" do
     f('.add_alert_link').click
     wait_for_ajaximations
     alert = f('.alert.new')
-    (add_criterion = alert.find_element(:css, '.add_criterion_link')).click
+    (add_criterion = alert.f('.add_criterion_link')).click
     wait_for_ajaximations
-    alert.find_element(:css, '.add_recipient_link').click
+    alert.f('.add_recipient_link').click
     wait_for_ajaximations
-    (submit = alert.find_element(:css, '.submit_button')).click
+    (submit = alert.f('.submit_button')).click
     wait_for_ajaximations
     keep_trying_until do
       @alerts.reload
@@ -33,7 +33,7 @@ describe "Alerts" do
 
     expect(@alerts.first.criteria.length).to eq 1
 
-    (edit = alert.find_element(:css, '.edit_link')).click
+    (edit = alert.f('.edit_link')).click
     add_criterion.click
     wait_for_ajaximations
     submit.click
@@ -49,7 +49,7 @@ describe "Alerts" do
 
     wait_for_ajaximations
     edit.click
-    alert.find_element(:css, '.criteria .delete_item_link').click
+    alert.f('.criteria .delete_item_link').click
     wait_for_ajaximations
     keep_trying_until { ffj('.alert .criteria li').length == 1 }
     submit.click
@@ -64,7 +64,7 @@ describe "Alerts" do
     expect(@alerts.length).to eq 1
 
     wait_for_ajaximations
-    alert.find_element(:css, '.delete_link').click
+    alert.f('.delete_link').click
 
     wait_for_ajaximations
     expect(f('.alert')).not_to be_displayed
@@ -123,7 +123,7 @@ describe "Alerts" do
     f('.add_alert_link').click
     wait_for_ajaximations
     alert = f('.alert.new')
-    alert.find_element(:css, 'input[name="repetition"][value="value"]').click
+    alert.f('input[name="repetition"][value="value"]').click
     sleep 2 #need to wait for javascript to process
     wait_for_ajaximations
     keep_trying_until do
@@ -133,16 +133,16 @@ describe "Alerts" do
     end
 
     # clicking "do not repeat" should remove the number of days error
-    alert.find_element(:css, 'input[name="repetition"][value="none"]').click
+    alert.f('input[name="repetition"][value="none"]').click
     wait_for_ajaximations
     keep_trying_until { ffj('.error_box').length == 3 }
 
     # adding recipient and criterion make the errors go away
-    alert.find_element(:css, '.add_recipient_link').click
-    alert.find_element(:css, '.add_criterion_link').click
+    alert.f('.add_recipient_link').click
+    alert.f('.add_criterion_link').click
     keep_trying_until { ffj('.error_box').length == 1 }
 
-    alert.find_element(:css, '.criteria input[type="text"]').send_keys("abc")
+    alert.f('.criteria input[type="text"]').send_keys("abc")
     submit_form('#new_alert')
     keep_trying_until { ffj('.error_box').length == 2 }
   end
@@ -156,10 +156,10 @@ describe "Alerts" do
       f('.add_alert_link').click
       wait_for_ajaximations
       alert = f('.alert.new')
-      link = alert.find_element(:css, '.add_recipient_link')
+      link = alert.f('.add_recipient_link')
 
       keep_trying_until { ffj('.alert.new .add_recipients_line select option').length > 1 }
-      for i in 1..alert.find_elements(:css, '.add_recipients_line select option').length do
+      alert.ff('.add_recipients_line select option').each do
         link.click
         wait_for_ajaximations
       end
@@ -173,26 +173,26 @@ describe "Alerts" do
       f('#tab-alerts-link').click
       wait_for_ajaximations
       alertElement = f("#edit_alert_#{alert.id}")
-      alertElement.find_element(:css, ".edit_link").click
+      alertElement.f(".edit_link").click
       wait_for_ajaximations
       expect(fj("#edit_alert_#{alert.id} .add_recipient_link:visible")).to be_blank
 
       # Deleting a recipient should add it to the dropdown (which is now visible)
-      alertElement.find_element(:css, '.recipients .delete_item_link').click
+      alertElement.f('.recipients .delete_item_link').click
       wait_for_ajaximations
       expect(fj("#edit_alert_#{alert.id} .add_recipient_link")).to be_displayed
-      expect(alertElement.find_elements(:css, '.add_recipients_line select option').length).to eq 1
-      keep_trying_until { alertElement.find_elements(:css, '.recipients li').length == 2 }
+      expect(alertElement.ff('.add_recipients_line select option').length).to eq 1
+      keep_trying_until { alertElement.ff('.recipients li').length == 2 }
 
       # Do it again, with the same results
-      alertElement.find_element(:css, '.recipients .delete_item_link').click
+      alertElement.f('.recipients .delete_item_link').click
       expect(fj("#edit_alert_#{alert.id} .add_recipient_link")).to be_displayed
-      expect(alertElement.find_elements(:css, '.add_recipients_line select option').length).to eq 2
-      keep_trying_until { alertElement.find_elements(:css, '.recipients li').length == 1 }
+      expect(alertElement.ff('.add_recipients_line select option').length).to eq 2
+      keep_trying_until { alertElement.ff('.recipients li').length == 1 }
 
       # Clicking cancel should restore the LIs
-      alertElement.find_element(:css, '.cancel_button').click
-      expect(alertElement.find_elements(:css, '.recipients li').length).to eq 3
+      alertElement.f('.cancel_button').click
+      expect(alertElement.ff('.recipients li').length).to eq 3
     end
 
     it "should work with custom roles" do
@@ -205,7 +205,7 @@ describe "Alerts" do
       f('#tab-alerts-link').click
       wait_for_ajaximations
       alertElement = f("#edit_alert_#{alert.id}")
-      alertElement.find_element(:css, ".edit_link").click
+      alertElement.f(".edit_link").click
       wait_for_ajaximations
 
       recipients = ff("#edit_alert_#{alert.id} .recipients li")

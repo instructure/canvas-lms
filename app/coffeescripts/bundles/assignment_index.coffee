@@ -45,6 +45,7 @@ require [
     course: course
     params:
       include: includes
+      exclude_descriptions: true
       override_assignment_dates: !ENV.PERMISSIONS.manage
     courseSubmissionsURL: ENV.URLS.course_student_submissions_url
 

@@ -1,0 +1,263 @@
+// Shared between:
+// - bundles/login.scss
+// - bundles/otp_login.scss
+
+////////////////////////////////////////
+/// Theme Editor Variables & Customization
+//
+/// These are the variables we will be overriding in the
+/// Theme Editor. Note the ic-brand- prefix to denote
+/// which are customizable.
+////////////////////////////////////////
+// ic-brand-Login-body-bgd-color
+// ic-brand-Login-logo
+// ic-brand-Login-body-bgd-shadow-color
+// ic-brand-Login-body-bgd-image
+// ic-brand-Login-Content-bgd-color
+// ic-brand-Login-Content-border-color
+// ic-brand-Login-Content-inner-bgd
+// ic-brand-Login-Content-inner-border
+// ic-brand-Login-Content-inner-body-bgd
+// ic-brand-Login-Content-inner-body-border
+// ic-brand-Login-Content-label-text-color
+// ic-brand-Login-Content-password-text-color
+// ic-brand-Login-Content-button-bgd
+// ic-brand-Login-Content-button-text
+// ic-brand-Login-footer-link-color
+// ic-brand-Login-footer-link-color-hover
+// ic-brand-Login-instructure-logo
+
+$ic-Login-border-radius: 5px;
+$modal_box_width: 623px;
+$modal_box_padding: 20px;
+
+////////////////////////////////////////
+// New Login Styles
+////////////////////////////////////////
+#content {padding: 0;}
+body.ic-Login-Body { // apply the background to the body element so that you don't see white bg as you scroll
+  background-color: $ic-brand-Login-body-bgd-color;
+  background-image:
+    linear-gradient(transparent, transparent 80%, $ic-brand-Login-body-bgd-shadow-color),
+    $ic-brand-Login-body-bgd-image; // if there is a custom image
+  background-size: cover;
+  background-attachment: fixed;
+  height: 100vh; // enable full height
+}
+.ic-Login {
+  display: flex;
+  justify-content: center;
+  color: $ic-color-light;
+}
+.ic-Login__container {
+  margin-top: $ic-sp*2;
+}
+.ic-Login__content {
+  width: 400px;
+  margin: 0 auto;
+  background: $ic-brand-Login-Content-bgd-color;
+  border: 5px solid $ic-brand-Login-Content-border-color;
+  padding: $ic-sp;
+  border-radius: $ic-Login-border-radius;
+}
+.ic-Login__innerContent {
+  padding-top: $ic-sp*2;
+  background: $ic-brand-Login-Content-inner-bgd;
+  border: 2px solid $ic-brand-Login-Content-inner-border;
+  border-radius: $ic-Login-border-radius;
+}
+.ic-Login__title {
+  color: $ic-brand-Login-Content-label-text-color;
+}
+.ic-Login__text {
+  color: $ic-brand-Login-Content-label-text-color;
+}
+//////////
+// Login Body
+//////////
+.ic-Login__body {
+  background: $ic-brand-Login-Content-inner-body-bgd;
+  border: 2px solid $ic-brand-Login-Content-inner-body-border;
+  padding: $ic-sp*2 $ic-sp*2 $ic-sp $ic-sp*2;
+  margin-top: $ic-sp;
+}
+// these have !important because Canvas specificity on labels and
+// links will override these if we don't
+.ic-Form-control--login .ic-Label {
+  color: $ic-brand-Login-Content-label-text-color !important;
+}
+.ic-Login__link {
+  color: $ic-brand-Login-Content-label-text-color !important;
+}
+.ic-Login__body__error {
+  display: block;
+  position:relative;
+  top: auto;
+  left: auto;
+  max-width: 400px;
+}
+
+//////////
+// Login Header
+//////////
+.ic-Login__header {
+  padding: 0 $ic-sp*2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  .ic-Login__header__logo {
+    flex: 1;
+  }
+  .ic-Login__headerBrowse {
+    text-align: right;
+    padding-top: $ic-sp/2;
+  }
+}
+.ic-Login__actions {
+  display: flex;
+  align-items: center;
+  .ic-Login__actions-timeout {
+    flex: 1;
+    label {
+      color: $ic-brand-Login-Content-password-text-color;
+    }
+  }
+  .ic-Login__actions--right {
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
+  }
+  .ic-Login__actions--left {
+    flex: 1;
+    text-align: left;
+  }
+  .ic-Form-control {
+    margin-bottom: 0; // override to help vertical alignment
+  }
+  button.Button--login {
+    padding: $ic-sp/2 $ic-sp*3;
+    @include canvas-button($ic-brand-Login-Content-button-bgd,  $ic-brand-Login-Content-button-text);
+  }
+}
+//////////
+// Forgot Password
+//////////
+.ic-Login__forgot-text {
+  color: $ic-brand-Login-Content-password-text-color;
+  font-weight: 300;
+  font-size: 14px;
+  padding: 0 0 $ic-sp*2 0;
+  margin: 0;
+  line-height: $ic-sp*2;
+}
+//////////
+// Enrollment Links
+//////////
+.ic-Login_enroll {
+  text-align: center;
+  padding: $ic-sp 0;
+}
+//////////
+// Login Footer
+//////////
+// this hides the default application footer on
+// the login screen so we can have a different
+// placement for it
+body.ic-Login-Body #footer.ic-app-footer {
+  display: none !important;
+}
+body.ic-Login-Body #footer.ic-Login-footer {
+  display: block !important;
+}
+
+// end
+.ic-Login-footer {
+  .ic-Login-footer__logo-link {
+    display: block;
+    text-align: center;
+    .ic-Instructure-Logo {
+      fill: $ic-brand-Login-instructure-logo;
+    }
+  }
+  // hide icon that gets added thru jquery
+  span.ui-icon.ui-icon-extlink.ui-icon-inline {display: none;}
+  .ic-Login-footer__links {
+    padding: $ic-sp;
+    text-align: center;
+    a, .menu-item__text {
+      color: $ic-brand-Login-footer-link-color;
+      font-size: 11px;
+      padding: 0 $ic-sp/2;
+      white-space: nowrap;
+      @if not $use_high_contrast {
+        text-decoration: none;
+      }
+      &:hover {
+        background-color: none;
+        color: $ic-brand-Login-footer-link-color-hover;
+        text-decoration: underline;
+      }
+    }
+  }
+}
+//////////
+// Register Banner
+//////////
+.ic-Login__register-banner {
+  display: block;
+  text-align: right;
+  margin-left: $ic-sp;
+
+  .ic-Login__banner-title {
+    font-weight: 300;
+  }
+  .ic-Login__banner-subtitle {
+    font-weight: 700;
+  }
+}
+//////////
+// Unauthorized
+//////////
+#unauthorized_holder {
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 1);
+  margin: 30px auto 20px;
+  width: $modal_box_width + 2 * $modal_box_padding;
+  #modal-box.login-box {
+    margin: 0;
+    box-shadow: none;
+  }
+  #unauthorized_message {
+    margin: 0;
+    width: auto;
+    padding: 15px $modal_box_padding;
+    line-height: 1.2;
+    &.ui-state-error:before {
+      top: 15px;
+    }
+    h2, .h2 {
+      height: 41px;
+      margin: 0 0 -5px 0;
+      padding: 0 0 0 60px;
+      color: #000;
+    }
+    p {
+      padding: 0 0 0 60px;
+      margin: 0;
+      font-size: 1.25em;
+      font-weight: normal;
+    }
+  }
+}
+////
+// Logout
+////
+.Button--logout-confirm {
+  @include canvas-button($ic-brand-Login-Content-button-bgd,  $ic-brand-Login-Content-button-text);
+}
+.Button--logout-link {
+  color: $ic-brand-Login-footer-link-color;
+  &:hover {
+    color: $ic-brand-Login-footer-link-color-hover;
+  }
+}
+

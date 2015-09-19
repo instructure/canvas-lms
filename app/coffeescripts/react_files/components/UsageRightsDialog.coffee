@@ -10,14 +10,13 @@ define [
   '../modules/filesEnv'
   '../utils/setUsageRights'
   '../utils/updateModelsUsageRights'
-  './DialogPreview'
+  'jsx/files/DialogPreview'
   'compiled/react/shared/utils/withReactElement'
   'compiled/jquery.rails_flash_notifications'
   'jquery.instructure_forms'
-], ($, _, React, I18n, preventDefault, customPropTypes, Folder, UsageRightsSelectBoxComponent, filesEnv, setUsageRights, updateModelsUsageRights, DialogPreviewComponent, withReactElement) ->
+], ($, _, React, I18n, preventDefault, customPropTypes, Folder, UsageRightsSelectBoxComponent, filesEnv, setUsageRights, updateModelsUsageRights, DialogPreview, withReactElement) ->
 
   UsageRightsSelectBox = React.createFactory UsageRightsSelectBoxComponent
-  DialogPreview = React.createFactory DialogPreviewComponent
 
   MAX_THUMBNAILS_TO_SHOW = 5
   MAX_FOLDERS_TO_SHOW = 2

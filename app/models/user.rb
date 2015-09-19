@@ -236,8 +236,10 @@ class User < ActiveRecord::Base
   }
 
   def assignment_and_quiz_visibilities(context)
-     {assignment_ids: DifferentiableAssignment.scope_filter(context.assignments, self, context).pluck(:id),
-      quiz_ids: DifferentiableAssignment.scope_filter(context.quizzes, self, context).pluck(:id)}
+    RequestCache.cache("assignment_and_quiz_visibilities", self, context) do
+      {assignment_ids: DifferentiableAssignment.scope_filter(context.assignments, self, context).pluck(:id),
+        quiz_ids: DifferentiableAssignment.scope_filter(context.quizzes, self, context).pluck(:id)}
+    end
   end
 
   def self.order_by_sortable_name(options = {})
@@ -1804,7 +1806,7 @@ class User < ActiveRecord::Base
             order('last_updated_at_from_db DESC').
             limit(opts[:limit]).to_a
 
-          submissions = submissions.sort_by{|t| (t.last_updated_at_from_db.to_datetime.in_time_zone rescue nil) || t.created_at}.reverse
+          submissions = submissions.sort_by{|t| t['last_updated_at_from_db'] || t.created_at}.reverse
           submissions = submissions.uniq
           submissions.first(opts[:limit])
 
@@ -2137,9 +2139,27 @@ class User < ActiveRecord::Base
   def section_context_codes(context_codes)
     course_ids = context_codes.grep(/\Acourse_\d+\z/).map{ |s| s.sub(/\Acourse_/, '').to_i }
     return [] unless course_ids.present?
-    Course.where(id: course_ids).inject([]) do |ary, course|
-      ary.concat course.sections_visible_to(self).map(&:asset_string)
+
+    section_ids = []
+    full_course_ids = []
+    Course.where(id: course_ids).each do |course|
+      result = course.course_section_visibility(self)
+      case result
+      when Array
+        section_ids.concat(result)
+      when :all
+        full_course_ids << course.id
+      end
     end
+
+    if full_course_ids.any?
+      current_shard = Shard.current
+      Shard.partition_by_shard(full_course_ids) do |shard_course_ids|
+        section_ids.concat(CourseSection.active.where(:course_id => shard_course_ids).pluck(:id).
+            map{|id| Shard.relative_id_for(id, Shard.current, current_shard)})
+      end
+    end
+    section_ids.map{|id| "course_section_#{id}"}
   end
 
   def manageable_courses(include_concluded = false)
@@ -2368,9 +2388,15 @@ class User < ActiveRecord::Base
 
   def menu_courses(enrollment_uuid = nil)
     return @menu_courses if @menu_courses
+
     favorites = self.courses_with_primary_enrollment(:favorite_courses, enrollment_uuid)
-    return (@menu_courses = favorites) if favorites.length > 0
-    @menu_courses = self.courses_with_primary_enrollment(:current_and_invited_courses, enrollment_uuid).first(12)
+    if favorites.length > 0
+      @menu_courses = favorites
+    else
+      @menu_courses = self.courses_with_primary_enrollment(:current_and_invited_courses, enrollment_uuid).first(12)
+    end
+    ActiveRecord::Associations::Preloader.new(@menu_courses, :enrollment_term).run
+    @menu_courses
   end
 
   def user_can_edit_name?

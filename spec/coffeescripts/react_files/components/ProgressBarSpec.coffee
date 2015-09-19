@@ -1,7 +1,7 @@
 define [
   'react'
   'jquery'
-  'compiled/react_files/components/ProgressBar'
+  'jsx/shared/ProgressBar'
 ], (React, $, ProgressBar) ->
 
   module 'ProgressBar',

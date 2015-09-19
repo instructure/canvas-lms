@@ -21,13 +21,42 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require 'nokogiri'
 
 describe GradebooksHelper do
-  describe '#student_score_display_for(submission, can_manage_grades)' do
-    FakeAssignment = Struct.new(:grading_type).freeze
-    FakeSubmission = Struct.new(:assignment, :score, :grade, :submission_type,
-                                :workflow_state, :excused?).freeze
+  FakeAssignment = Struct.new(:grading_type, :quiz).freeze
+  FakeSubmission = Struct.new(:assignment, :score, :grade, :submission_type,
+                              :workflow_state, :excused?).freeze
+  FakeQuiz = Struct.new(:survey, :anonymous_submissions) do
+    def survey?
+      survey
+    end
+  end.freeze
 
-    let(:assignment) { FakeAssignment.new }
-    let(:submission) { FakeSubmission.new(assignment) }
+  let(:assignment) { FakeAssignment.new }
+  let(:submission) { FakeSubmission.new(assignment) }
+  let(:quiz) { assignment.quiz = FakeQuiz.new }
+
+  describe '#force_anonymous_grading?' do
+    it 'requires a quiz' do
+      expect(helper.force_anonymous_grading?(assignment)).to eq false
+    end
+
+    it 'is falsy with just a survey' do
+      quiz.survey = true
+      expect(helper.force_anonymous_grading?(assignment)).to eq false
+    end
+
+    it 'is falsy with just anonymous_submissions' do
+      quiz.anonymous_submissions = true
+      expect(helper.force_anonymous_grading?(assignment)).to eq false
+    end
+
+    it 'is truthy with an anonymous survey' do
+      quiz.survey = true
+      quiz.anonymous_submissions = true
+      expect(helper.force_anonymous_grading?(assignment)).to eq true
+    end
+  end
+
+  describe '#student_score_display_for(submission, can_manage_grades)' do
 
     let(:score_display) { helper.student_score_display_for(submission) }
     let(:parsed_display) { Nokogiri::HTML.parse(score_display) }

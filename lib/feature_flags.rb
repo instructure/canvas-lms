@@ -60,7 +60,7 @@ module FeatureFlags
   end
 
   def feature_flag_cache_key(feature)
-    ['feature_flag', self.class.name, self.global_id, feature.to_s].cache_key
+    ['feature_flag2', self.class.name, self.global_id, feature.to_s].cache_key
   end
 
   # return the feature flag for the given feature that is defined on this object, if any.
@@ -68,9 +68,8 @@ module FeatureFlags
   def feature_flag(feature)
     self.shard.activate do
       result = MultiCache.fetch(feature_flag_cache_key(feature)) do
-        self.feature_flags.where(feature: feature.to_s).first || :nil
+        self.feature_flags.where(feature: feature.to_s).first
       end
-      result = nil if result == :nil
       result
     end
   end

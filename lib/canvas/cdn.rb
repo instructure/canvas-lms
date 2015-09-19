@@ -12,10 +12,6 @@ module Canvas
         end
       end
 
-      def enabled?
-        config.enabled
-      end
-
       def should_be_in_bucket?(source)
         source.start_with?('/dist/brandable_css') || Canvas::Cdn::RevManifest.include?(source)
       end
@@ -27,7 +23,7 @@ module Canvas
       end
 
       def push_to_s3!(*args, &block)
-        return unless enabled?
+        return unless config.bucket
         uploader = Canvas::Cdn::S3Uploader.new(*args)
         uploader.upload!(&block)
       end

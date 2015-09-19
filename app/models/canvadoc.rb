@@ -21,17 +21,20 @@ class Canvadoc < ActiveRecord::Base
 
   belongs_to :attachment
 
-  def upload
+  def upload(opts = {})
     return if document_id.present?
 
     url = attachment.authenticated_s3_url(:expires => 1.day)
 
     response = Canvas.timeout_protection("canvadocs") {
-      canvadocs_api.upload(url)
+      canvadocs_api.upload(url, opts)
     }
 
     if response && response['id']
-      update_attributes document_id: response['id'], process_state: response['status']
+      self.document_id = response['id']
+      self.process_state = response['status']
+      self.has_annotations = opts[:annotatable]
+      self.save!
     elsif response.nil?
       raise "no response received (request timed out?)"
     else
@@ -39,12 +42,47 @@ class Canvadoc < ActiveRecord::Base
     end
   end
 
-  def session_url
+  def session_url(opts = {})
+    user = opts.delete(:user)
+    opts.merge! annotation_opts(user)
+
     Canvas.timeout_protection("canvadocs", raise_on_timeout: true) do
-      session = canvadocs_api.session(document_id)
+      session = canvadocs_api.session(document_id, opts)
       canvadocs_api.view(session["id"])
     end
   end
+
+  def annotation_opts(user)
+    return {} if !user || !has_annotations?
+
+    opts = {
+      annotation_context: "default",
+      permissions: "readwrite",
+      user_id: user.global_id,
+      user_name: user.short_name.gsub(",", ""),
+      user_role: "",
+      user_filter: user.global_id,
+    }
+
+    submissions = attachment.attachment_associations.
+      where(:context_type => 'Submission').
+      preload(context: [:assignment]).
+      map(&:context)
+
+    return opts if submissions.empty?
+
+    if submissions.any? { |s| s.grants_right? user, :read_grade }
+      opts.delete :user_filter
+    end
+
+    # no commenting when anonymous peer reviews are enabled
+    if submissions.map(&:assignment).any? { |a| a.peer_reviews? && a.anonymouis_peer_reviews? }
+      opts = {}
+    end
+
+    opts
+  end
+  private :annotation_opts
 
   def available?
     !!(document_id && process_state != 'error' && Canvadocs.enabled?)

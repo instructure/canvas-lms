@@ -134,14 +134,13 @@ class AssignmentOverride < ActiveRecord::Base
     read_attribute(:set_id)
   end
 
-  def set_with_adhoc
+  def set
     if self.set_type == 'ADHOC'
       assignment_override_students.includes(:user).map(&:user)
     else
-      set_without_adhoc
+      super
     end
   end
-  alias_method_chain :set, :adhoc
 
   def set_id=(id)
     if self.set_type == 'ADHOC'

@@ -109,7 +109,6 @@ class AssignmentsController < ApplicationController
         @current_user_submission = nil if @current_user_submission &&
           !@current_user_submission.graded? &&
           !@current_user_submission.submission_type
-        @current_user_rubric_assessment = @assignment.rubric_association.rubric_assessments.where(user_id: @current_user).first if @current_user && @assignment.rubric_association
         @current_user_submission.send_later(:context_module_action) if @current_user_submission
       end
 
@@ -168,6 +167,22 @@ class AssignmentsController < ApplicationController
       respond_to do |format|
         format.html { render }
         format.json { render :json => @assignment.as_json(:permissions => {:user => @current_user, :session => session}) }
+      end
+    end
+  end
+
+  def show_moderate
+    return unless @context.feature_enabled?(:moderated_grading)
+    @assignment ||= @context.assignments.find(params[:assignment_id])
+
+    raise ActiveRecord::RecordNotFound unless @assignment.moderated_grading?
+
+    if authorized_action(@context, @current_user, :moderate_grades) && @assignment.moderated_grading? && @assignment.published?
+      add_crumb(@assignment.title, polymorphic_url([@context, @assignment]))
+      add_crumb(t('Moderate'))
+
+      respond_to do |format|
+        format.html { render }
       end
     end
   end
@@ -403,6 +418,8 @@ class AssignmentsController < ApplicationController
         :GROUP_CATEGORIES => group_categories,
         :KALTURA_ENABLED => !!feature_enabled?(:kaltura),
         :POST_TO_SIS => Assignment.sis_grade_export_enabled?(@context),
+        :MODERATED_GRADING => @context.feature_enabled?(:moderated_grading),
+        :HAS_GRADED_SUBMISSIONS => @assignment.graded_submissions_exist?,
         :SECTION_LIST => (@context.course_sections.active.map { |section|
           {
             :id => section.id,

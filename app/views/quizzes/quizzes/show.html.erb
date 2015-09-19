@@ -270,7 +270,7 @@
                            method: :put do |f| %>
 
                 <%= hidden_field_tag 'quizzes[]', @quiz.id %>
-                <img src='/images/ajax-loader-black-on-white.gif' class='hidden loading' />
+                <img src='/images/ajax-loader-black-on-white.gif' class='hidden loading' alt=""/>
                 <%= f.submit 'Save It Now', class: 'btn btn-primary' %>
               <% end %>
 

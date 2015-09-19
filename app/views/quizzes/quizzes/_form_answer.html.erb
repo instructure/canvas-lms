@@ -57,8 +57,9 @@
           <div class="comment_top"></div>
           <% edit_comment_text = t("Click to enter comments, if the student chooses this answer") %>
           <a href="#" class="comment_focus" title="<%= edit_comment_text %>">
-            <span class="ellipsis">...</span>
-            <i class="icon-edit standalone-icon"><span class="screenreader-only"><%= edit_comment_text %></span></i>
+            <span class="ellipsis" aria-hidden="true">...</span>
+            <i class="icon-edit standalone-icon"></i>
+            <span class="screenreader-only"><%= edit_comment_text %></span>
           </a>
           <span id="comments_header" class="details"><%= before_label(:answer_comments, "Comments, if the student chooses this answer") %></span>
           <input type="hidden" name="answer_comment_html" />
@@ -73,8 +74,14 @@
         <div class="question_actions">
           <% edit_html_text = t("Toggle editing answer text as HTML") %>
           <% delete_html_text = t("Delete this Answer") %>
-          <a href="#" class="edit_html" title="<%= edit_html_text %>"><i class="icon-edit standalone-icon"><span class="screenreader-only"><%= edit_html_text %></span></i></a>
-          <a href="#" class="delete_answer_link" title="<%= delete_html_text %>"><i class="icon-trash standalone-icon"><span class="screenreader-only"><%= delete_html_text %></span></i></a>
+          <a href="#" class="edit_html" title="<%= edit_html_text %>">
+            <i class="icon-edit standalone-icon"></i>
+            <span class="screenreader-only"><%= edit_html_text %></span>
+          </a>
+          <a href="#" class="delete_answer_link" title="<%= delete_html_text %>">
+            <i class="icon-trash standalone-icon"></i>
+            <span class="screenreader-only"><%= delete_html_text %></span>
+          </a>
         </div>
       </td>
     </tr>
