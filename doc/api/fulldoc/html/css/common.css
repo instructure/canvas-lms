@@ -13,11 +13,6 @@ body {
   max-width: 800px;
 }
 
-#alert-header {
-  background-color: #ff0000;
-  padding: 4px 0;
-}
-
 #header {
   background-color: #6A7177;
   padding: 4px 0;
