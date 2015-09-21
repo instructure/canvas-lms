@@ -125,7 +125,8 @@ module OtherHelperMethods
       "c_file.txt" => File.read(File.expand_path(File.dirname(__FILE__) + '/../../../fixtures/files/c_file.txt')),
       "amazing_file.txt" => File.read(File.expand_path(File.dirname(__FILE__) + '/../../../fixtures/files/amazing_file.txt')),
       "Dog_file.txt" => File.read(File.expand_path(File.dirname(__FILE__) + '/../../../fixtures/files/Dog_file.txt')),
-      "cn-image.jpg" => File.read(File.expand_path(File.dirname(__FILE__) + '/../../../fixtures/files/cn_image.jpg'))
+      "cn-image.jpg" => File.read(File.expand_path(File.dirname(__FILE__) + '/../../../fixtures/files/cn_image.jpg')),
+      "empty_file.txt" => File.read(File.expand_path(File.dirname(__FILE__) + '/../../../fixtures/files/empty_file.txt')),
   }.freeze
 
   def get_file(filename, data = nil)
