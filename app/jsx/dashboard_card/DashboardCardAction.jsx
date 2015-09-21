@@ -3,48 +3,56 @@
 define([
   'jquery',
   'react',
-  'underscore',
   'i18n!dashcards',
   'bower/classnames/index'
-], function($, React, _, I18n, classnames) {
+], function($, React, I18n) {
   var DashboardCardAction = React.createClass({
     displayName: 'DashboardCardAction',
 
     propTypes: {
-      hasActivity: React.PropTypes.bool,
+      unreadCount: React.PropTypes.number,
       iconClass: React.PropTypes.string,
       path: React.PropTypes.string,
-      screenreader: React.PropTypes.string
+      actionType: React.PropTypes.string
     },
 
-    getDefaultProps: function () {
+    getDefaultProps: function() {
       return {
-        hasActivity: false
-      };
+        unreadCount: 0
+      }
     },
 
-    screenreaderTag: function() {
-      var screenreaderText = {};
-      if (_.isUndefined(this.props.screenreader)) {
-        return "";
-      };
-
-      screenreaderText[I18n.t("Unread")] = this.props.hasActivity;
-      screenreaderText[this.props.screenreader] = true;
+    unreadCountLimiter: function() {
+      var count = this.props.unreadCount
+      count = (count < 100) ? count : '99+'
       return (
-        <span className="screenreader-only">{classnames(screenreaderText)}</span>
-      );
+        <span className="unread_count">{count}</span>
+      )
     },
 
     render: function () {
-      var classes = classnames({
-        'ic-DashboardCard__action': true,
-        'ic-DashboardCard__action--active': this.props.hasActivity
-      });
       return (
-        <a href={this.props.path} className={classes}>
-          <i className={this.props.iconClass} />
-          {this.screenreaderTag()}
+        <a href={this.props.path} className="ic-DashboardCard__action">
+          { this.props.actionType ? (
+            <span className="screenreader-only">{
+              this.props.actionType
+            }</span>
+            ) : null
+          }
+
+          <div className="ic-DashboardCard__action-layout">
+            <i className={this.props.iconClass} />
+            {
+              (this.props.unreadCount > 0) ? (
+                <span className="ic-DashboardCard__action-badge">
+                  { this.unreadCountLimiter() }
+                  <span className="screenreader-only">{
+                    I18n.t("Unread")
+                  }</span>
+                </span>
+              ) : null
+            }
+          </div>
         </a>
       );
     }

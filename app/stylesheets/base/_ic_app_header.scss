@@ -18,6 +18,8 @@
   $ic-subnav-tray-bgd: darken($ic-brand-global-nav-bgd, 10%);
   $ic-logomark-url: url("/images/svg-icons/svg_canvas_logomark_only.svg");
 
+  @mixin primary-nav-badge-border($border-color) { box-shadow: 0 0 0 2px $border-color; }
+
   .ic-app-header {
     box-sizing: border-box;
     position: fixed;
@@ -56,7 +58,9 @@
         border-color: $ic-border-light;
         &.ic-avatar--fake-student { border-color: $ic-masquerade-color; }
       }
-      .menu-item-icon-container .menu-item__badge { border-color: $ic-color-light; }
+      .menu-item-icon-container .menu-item__badge { 
+        @include primary-nav-badge-border($ic-color-light);
+      }
     }
   }
 
@@ -91,7 +95,9 @@
         &.ic-avatar--fake-student { border-color: $ic-masquerade-color; }
       }
       &:active { .ic-icon-svg, .ic-avatar { transform: scale(1); } }
-      .menu-item__badge { border-color: $ic-global-nav-menu-item__badge-border; }
+      .menu-item__badge {
+        @include primary-nav-badge-border($ic-global-nav-menu-item__badge-border);
+      }
     }
 
     &:active {
@@ -176,11 +182,6 @@
     z-index: 1;
     width: $ic-sp*4;
     margin: 0 auto;
-    .menu-item__badge {
-      position: absolute;
-      top: -($ic-sp/2); right: 0;
-      border-color: $ic-brand-global-nav-bgd;
-    }
     .ic-avatar {
       transform: translate3d(0,0,0);
       width: $ic-sp*3; height: $ic-sp*3;
@@ -196,17 +197,13 @@
   }
 
   .menu-item__badge {
+    @include ic-badge-maker;
     transition: all 0.3s ease-out;
-    box-sizing: border-box;
-    width: $ic-sp*2; height: $ic-sp*2;
+    position: absolute;
+    top: -0.5em; right: 0;
     background: $ic-brand-global-nav-menu-item__badge-bgd;
     color: $ic-brand-global-nav-menu-item__text-color;
-    border-radius: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
-    border: 2px solid transparent;
+    @include primary-nav-badge-border($ic-brand-global-nav-bgd);
   }
 
   .ic-app-header__logomark-container {

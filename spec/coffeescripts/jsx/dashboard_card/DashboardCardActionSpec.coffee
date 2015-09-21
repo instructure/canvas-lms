@@ -25,40 +25,29 @@ define [
     equal $html.prop('tagName'), 'A', 'parent tag should be link'
     equal $html.find('i').attr('class'), @props.iconClass,
       'i tag should have provided iconClass'
-    equal $html.children('span.screenreader-only').length, 0,
+    equal $html.find('span.screenreader-only').length, 0,
       'should not have screenreader span'
-    ok !$html.attr('class').match(/active/), 'should not be marked active'
 
-  test 'should render span if screenreader text provided', ->
-    screenreader_text = 'Screenreader Text'
+  test 'should render actionType as screenreader text if provided', ->
+    action_type = 'Dashboard Action'
     component = TestUtils.renderIntoDocument(DashboardCardAction(
       _.extend(@props, {
-        screenreader: screenreader_text
+        actionType: action_type
       })
     ))
     $html = $(component.getDOMNode())
-    equal $html.children('span.screenreader-only').length, 1,
-      'should have screenreader span'
-    equal $html.children('span').text(), screenreader_text
-    ok $html.children('span').hasClass('screenreader-only')
-    React.unmountComponentAtNode(component.getDOMNode().parentNode)
+    equal $html.find('span.screenreader-only').text(), action_type
 
-    component = TestUtils.renderIntoDocument(DashboardCardAction(
-      _.extend(@props, {
-        screenreader: screenreader_text,
-        hasActivity: true
-      })
-    ))
-    $html = $(component.getDOMNode())
-    ok $html.children('span').text().match(/Unread/),
-      'should include Unread in text if icon has activity'
-    React.unmountComponentAtNode(component.getDOMNode().parentNode)
-
-  test 'should be marked active when hasActivity', ->
+  test 'should display unread count when it is greater than zero', ->
+    unread_count = 2
     @component = TestUtils.renderIntoDocument(DashboardCardAction(
       _.extend(@props, {
-        hasActivity: true
+        unreadCount: unread_count
       })
     ))
     $html = $(@component.getDOMNode())
-    ok $html.attr('class').match(/active/), 'should be marked active'
+    equal $html.find('span.unread_count').text(), unread_count,
+      'should display unread count'
+    equal $html.find('span.screenreader-only').text(), 'Unread',
+      'should display Unread as screenreader only text'
+

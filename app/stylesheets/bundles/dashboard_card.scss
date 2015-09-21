@@ -1,6 +1,7 @@
 // Styles for Dashboard Card Component
 
 @import "base/environment";
+@import "components/ic-badge";
 
 $ic-DashboardCard-border: $ic-border-light;
 $ic-DashboardCard-icon-color: $ic-icon-link-color;
@@ -9,6 +10,10 @@ $ic-DashboardCard-action-bgd: $ic-color-light;
 $ic-DashboardCard-action-hover-bgd: $ic-brand-primary;
 $ic-DashboardCard-action-hover-font-color: $ic-color-light;
 $ic-DashboardCard-action--active: $ic-brand-primary;
+
+@mixin dashboard-badge-border($border-color) {
+  box-shadow: 0 0 0 1px $border-color;
+}
 
 // Optional parent container padding
 .ic-DashboardCard_Box { padding: $ic-sp 0 0; }
@@ -94,13 +99,28 @@ $ic-DashboardCard-action--active: $ic-brand-primary;
 
 .ic-DashboardCard__header-term { margin-bottom: 0; }
 
+.ic-DashboardCard__action-layout {
+  position: relative;
+  display: inline-block;
+  width: $ic-sp*3;
+}
+
+.ic-DashboardCard__action-badge {
+  @include ic-badge-maker(18px, $ic-brand-primary, $ic-color-light);
+  @include dashboard-badge-border($ic-color-light); // 1px white border to separate from icons
+  transition: all 0.2s;
+  position: absolute;
+  top: -0.75em; right: -0.5em;
+  z-index: 1; // when dashcard links get squished, don't cut off badges
+}
+
 .ic-DashboardCard__action-container {
   display: flex;
   justify-content: space-around;
   align-items: center;
   .ic-DashboardCard__action {
     transition: background 0.2s, color 0.2s;
-    background-color: $ic-color-light;
+    background-color: $ic-color-light;;
     flex: 1;
     display: block; // fix for IE10
     position: relative; // for :after alignment
@@ -117,7 +137,7 @@ $ic-DashboardCard-action--active: $ic-brand-primary;
       bottom: 0;
       left: 0;
       width: 100%;
-      height: $ic-sp/3;
+      height: $ic-sp/4;
       background: $ic-DashboardCard-action--active;
     }
     .no-touch & {
@@ -126,6 +146,11 @@ $ic-DashboardCard-action--active: $ic-brand-primary;
         background: $ic-DashboardCard-action-hover-bgd;
         border-color: $ic-DashboardCard-action-hover-bgd;
         color: $ic-DashboardCard-action-hover-font-color;
+        .ic-DashboardCard__action-badge {
+          @include dashboard-badge-border($ic-DashboardCard-action-hover-bgd);
+          background: $ic-DashboardCard-action-hover-font-color;
+          color: $ic-DashboardCard-action-hover-bgd;
+        }
       }
     }
   }

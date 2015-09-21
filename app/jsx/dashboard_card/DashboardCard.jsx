@@ -5,9 +5,8 @@ define([
   'i18n!dashcards',
   './DashboardCardAction',
   './DashboardColorPicker',
-  './CourseActivitySummaryStore',
-  'compiled/backbone-ext/DefaultUrlMixin',
-], function(_, React, I18n, DashboardCardAction, DashboardColorPicker, CourseActivitySummaryStore, DefaultUrlMixin) {
+  './CourseActivitySummaryStore'
+], function(_, React, I18n, DashboardCardAction, DashboardColorPicker, CourseActivitySummaryStore) {
 
   var DashboardCard = React.createClass({
 
@@ -83,19 +82,22 @@ define([
     //    HELPERS
     // ===============
 
-    hasActivity: function(icon, stream){
+    unreadCount: function(icon, stream){
       var activityType = {
         'icon-announcement': 'Announcement',
         'icon-assignment': 'Message',
-        'icon-discussion': 'DiscussionTopic',
+        'icon-discussion': 'DiscussionTopic'
       }[icon];
 
-      var stream = stream || [];
+      stream = stream || [];
       var streamItem = _.find(stream, function(item) {
-        return item.type == activityType &&
-          (activityType != 'Message' || item.notification_category == I18n.t("Due Date"))
+        // only return 'Message' type if category is 'Due Date' (for assignments)
+        return item.type === activityType &&
+          (activityType !== 'Message' || item.notification_category === I18n.t('Due Date'))
       });
-      return streamItem && streamItem.unread_count > 0;
+
+      // TODO: unread count is always 0 for assignments (see CNVS-21227)
+      return (streamItem) ? streamItem.unread_count : 0;
     },
 
     // ===============
@@ -103,7 +105,7 @@ define([
     // ===============
 
     colorPickerIfEditing: function(){
-      if(this.state.editing){
+      if (this.state.editing) {
         return (
           <DashboardColorPicker
             parentNode        = {this.getDOMNode()}
@@ -117,17 +119,17 @@ define([
     },
 
     linksForCard: function(){
-      return _.map(this.props.links, function(link) {
+      return this.props.links.map(link => {
         if (!link.hidden) {
           return (
             <DashboardCardAction
-              hasActivity  = {this.hasActivity(link.icon, this.state.stream)}
+              unreadCount  = {this.unreadCount(link.icon, this.state.stream)}
               iconClass    = {link.icon}
               path         = {link.path}
-              screenreader = {link.screenreader} />
+              actionType   = {link.screenreader} />
           );
         }
-      }, this);
+      });
     },
 
     render: function () {
@@ -139,19 +141,31 @@ define([
                 <header className="ic-DashboardCard__header">
                   <h2 className="ic-DashboardCard__header-title">{this.props.shortName}</h2>
                   <p className="ic-DashboardCard__header-subtitle">{this.props.courseCode}</p>
-                  {this.props.term ? ( <p className="ic-DashboardCard__header-term">{this.props.term}</p> ) : null}
+                  {
+                    this.props.term ? (
+                      <p className="ic-DashboardCard__header-term">
+                        {this.props.term}
+                      </p>
+                    ) : null
+                  }
                 </header>
               </a>
-              <button className="Button Button--icon-action-rev ic-DashboardCard__header-button" onClick={this.settingsClick} ref="settingsToggle">
-                <span className="screenreader-only"> { I18n.t ("Choose a color for %{course}", { course:this.props.shortName})} </span>
-                <i className="icon-settings" />
+              <button
+                className="Button Button--icon-action-rev ic-DashboardCard__header-button"
+                onClick={this.settingsClick}
+                ref="settingsToggle"
+                >
+                  <i className="icon-settings" aria-hidden="true" />
+                  <span className="screenreader-only">
+                    { I18n.t("Choose a color for %{course}", { course: this.props.shortName}) }
+                  </span>
               </button>
             </div>
             <div className="ic-DashboardCard__action-container">
-              {this.linksForCard()}
+              { this.linksForCard() }
             </div>
           </div>
-          {this.colorPickerIfEditing()}
+          { this.colorPickerIfEditing() }
         </div>
       );
     }
