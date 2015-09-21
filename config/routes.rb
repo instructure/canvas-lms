@@ -49,6 +49,10 @@ CanvasRails::Application.routes.draw do
   get 'mr/:id' => 'info#message_redirect', as: :message_redirect
   get 'help_links' => 'info#help_links'
 
+  # These are just debug routes, but they make working on error pages easier,
+  # and it shouldn't matter if a client stumbles across them
+  get 'test_error' => 'info#test_error'
+
   concern :question_banks do
     resources :question_banks do
       post :bookmark
