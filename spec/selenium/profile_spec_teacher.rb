@@ -15,5 +15,7 @@ describe 'profile_pics' do
 
     it_behaves_like 'user settings page change pic window', 'teacher'
 
+    it_behaves_like 'user settings change pic cancel', 'teacher'
+
   end
 end

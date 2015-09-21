@@ -65,6 +65,21 @@ shared_examples 'user settings page change pic window' do |context|
   end
 end
 
+shared_examples 'user settings change pic cancel' do |context|
+  it 'closes window when cancel button is pressed', priority: "1", test_id: pick_test_id(context, 68939, 372132, 372133) do
+    enable_avatars
+    get '/profile/settings'
+
+    f('.avatar.profile_pic_link.none').click
+    wait_for_ajaximations
+    expect(f('.ui-dialog.ui-widget.ui-widget-content.ui-corner-all.ui-draggable.ui-dialog-buttons')).to be_truthy
+    expect(f('.ui-widget-overlay')).to be_truthy
+
+    fj('.ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-text-only :contains("Cancel")').click
+    wait_for_ajaximations
+    expect(f('.ui-widget-overlay')).to be_nil
+  end
+end
 
 
 # ======================================================================================================================
