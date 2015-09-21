@@ -456,9 +456,6 @@ class GradebooksController < ApplicationController
       :grader
     end
 
-    # TODO: Handle for moderator when behavior implemented
-    crocodoc_ids = [:provisional_grader].include?(grading_role) && [@current_user.crocodoc_id!]
-
     respond_to do |format|
       format.html do
         @headers = false
@@ -486,8 +483,7 @@ class GradebooksController < ApplicationController
       format.json do
         render :json => @assignment.speed_grader_json(@current_user,
                                                       avatars: service_enabled?(:avatars),
-                                                      grading_role: grading_role,
-                                                      crocodoc_ids: crocodoc_ids)
+                                                      grading_role: grading_role)
       end
     end
   end

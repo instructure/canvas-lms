@@ -2989,10 +2989,10 @@ describe Assignment do
           )
         end
 
-        it "should include all the other provisional rubric assessments" do
-          pras = @json['context']['students'][0]['provisional_rubric_assessments']
-          expect(pras.count).to eq 1
-          expect(pras[0]['assessor_id']).to eq @ta.id
+        it "should include all the other provisional rubric assessments in their respective grades" do
+          ta_pras = @json['submissions'][0]['provisional_grades'][1]['rubric_assessments']
+          expect(ta_pras.count).to eq 1
+          expect(ta_pras[0]['assessor_id']).to eq @ta.id
         end
       end
 

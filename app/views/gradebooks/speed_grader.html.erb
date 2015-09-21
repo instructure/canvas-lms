@@ -54,8 +54,24 @@
     </div>
   <% end %>
 </div></div>
-
-<div id="full_width_container" style="display:none;">
+<div id="moderation_tabs" class="ui-tabs-minimal">
+  <ul>
+    <li><a href="#dummy_container">
+      <span class="mark_title"><%= t('1st Mark') %></span>
+      <span class="mark_grade"></span>
+    </a></li>
+    <li><a href="#dummy_container">
+      <span class="mark_title"><%= t('2nd Mark') %></span>
+      <span class="mark_grade"></span>
+    </a></li>
+    <li><a href="#dummy_container">
+      <span>New Mark</span>
+    </a></li>
+    <%# TODO: Final Mark %>
+  </ul>
+  <div id="dummy_container"></div>
+</div>
+<div id="full_width_container" style="display:none">
   <div id="left_side" class="full_height">
     <div id="left_side_inner">
       <div id="no_annotation_warning" class="alert speedgrader_alert">

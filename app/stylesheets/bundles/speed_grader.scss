@@ -156,6 +156,9 @@ $gradebook_header_height: 52px;
   left: 0;
   right: 0;
   min-width: 960px;
+  &.with_moderation_tabs {
+    top: $gradebook_header_height * 2;
+  }
 }
 
 .full_width {
@@ -184,6 +187,36 @@ $gradebook_header_height: 52px;
   }
   #right_side {
     width: 329px;
+  }
+}
+
+#moderation_tabs {
+  display: none;
+  width: 100%;
+  border-bottom: 1px solid $ic-border-light;
+  #dummy_container {
+    background: #f2f2f2;
+  }
+  ul {
+    background: $white;
+    height: $gradebook_header_height - 1px;
+    li {
+      height: $gradebook_header_height;
+      &.ui-state-active {
+        background: #f2f2f2;
+      }
+      a {
+        padding: 14px 12px;
+        width: 300px;
+        text-decoration: none;
+        span {
+          padding: 0 8px;
+          &.mark_title {
+            font-weight: bold;
+          }
+        }
+      }
+    }
   }
 }
 
