@@ -160,6 +160,7 @@ module Importers
       end
 
       if hash[:has_group_category]
+        item.group_category = context.group_categories.active.where(:name => hash[:group_category]).first
         item.group_category ||= context.group_categories.active.where(:name => t("Project Groups")).first_or_create
       end
 
