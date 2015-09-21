@@ -27,7 +27,7 @@ module BrandConfigHelpers
       child_progress.user = user
       child_progress.reset!
       if config
-        config.save! if config.new_record?
+        config.save_unless_dup! if config.new_record?
         child_progress.process_job(
           config,
           :sync_to_s3_and_save_to_account!,
