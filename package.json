@@ -25,6 +25,7 @@
     "karma-qunit": "~0.1.1",
     "karma-requirejs": "^0.2.2",
     "lodash": "^2.4.1",
+    "qunitjs": "^1.14.0",
     "react-tools": "~0.13.3",
     "requirejs": "~2.1.10",
     "testem": "~0.7.1",
