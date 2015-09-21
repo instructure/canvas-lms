@@ -23,7 +23,7 @@
 # API for manipulating provisional grades
 #
 # Provisional grades are created by using the Submissions API endpoint "Grade or comment on a submission" with `provisional=true`.
-# They can be viewed by using "List assignment submissions" or "Get a single submission" with `include[]=provisional_grades`.
+# They can be viewed by using "List assignment submissions", "Get a single submission", or "List gradeable students" with `include[]=provisional_grades`.
 # This API performs other operations on provisional grades for use with the Moderated Grading feature.
 #
 # @model ProvisionalGrade
@@ -74,6 +74,59 @@ class ProvisionalGradesController < ApplicationController
 
   include Api::V1::Submission
 
+  # @API Show provisional grade status for a student
+  #
+  # @argument student_id [Integer]
+  #   The id of the student to show the status for
+  #
+  # @example_request
+  #
+  #   curl 'https://<canvas>/api/v1/courses/1/assignments/2/provisional_status?student_id=1' \
+  #        -X POST
+  #
+  # @example_response
+  #
+  #       { "needs_provisional_grade": false }
+  #
+  def status
+    if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
+      unless @context.feature_enabled?(:moderated_grading) && @assignment.moderated_grading?
+        return render :json => { :message => "Assignment does not use moderated grading" }, :status => :bad_request
+      end
+      if @assignment.grades_published?
+        return render :json => { :message => "Assignment grades have already been published" }, :status => :bad_request
+      end
+
+      # in theory we could apply visibility here, but for now we would rather be performant
+      # e.g. @assignment.students_with_visibility(@context.students_visible_to(@current_user)).find(params[:student_id])
+      student = @context.students.find(params[:student_id])
+      render :json => { :needs_provisional_grade => @assignment.student_needs_provisional_grade?(student) }
+    end
+  end
+
+  # @API Select provisional grade
+  #
+  # Choose which provisional grade the student should receive for a submission.
+  # The caller must have :moderate_grades rights.
+  #
+  # @example_response
+  #   {
+  #     "assignment_id": 867,
+  #     "student_id": 5309,
+  #     "selected_provisional_grade_id": 53669
+  #   }
+  #
+  def select
+    if authorized_action(@context, @current_user, :moderate_grades)
+      pg = @assignment.provisional_grades.find(params[:provisional_grade_id])
+      selection = @assignment.moderated_grading_selections.where(student_id: pg.submission.user_id).first
+      return render :json => { :message => 'student not in moderation set' }, :status => :bad_request unless selection
+      selection.provisional_grade = pg
+      selection.save!
+      render :json => selection.as_json(:include_root => false, :only => %w(assignment_id student_id selected_provisional_grade_id))
+    end
+  end
+
   # @API Copy provisional grade
   #
   # Given a provisional grade, copy the grade (and associated submission comments and rubric assessments)
@@ -98,10 +151,60 @@ class ProvisionalGradesController < ApplicationController
     end
   end
 
+  # @API Publish provisional grades for an assignment
+  #
+  # Publish the selected provisional grade for all submissions to an assignment.
+  # Use the "Select provisional grade" endpoint to choose which provisional grade to publish
+  # for a particular submission.
+  #
+  # Students not in the moderation set will have their one and only provisional grade published.
+  #
+  # WARNING: This is irreversible. This will overwrite existing grades in the gradebook.
+  #
+  # @example_request
+  #
+  #   curl 'https://<canvas>/api/v1/courses/1/assignments/2/provisional_grades/publish' \
+  #        -X POST
+  #
+  def publish
+    if authorized_action(@context, @current_user, :moderate_grades)
+      unless @context.feature_enabled?(:moderated_grading) && @assignment.moderated_grading?
+        return render :json => { :message => "Assignment does not use moderated grading" }, :status => :bad_request
+      end
+      if @assignment.grades_published?
+        return render :json => { :message => "Assignment grades have already been published" }, :status => :bad_request
+      end
+
+      submissions = @assignment.submissions.preload(:all_submission_comments,
+                                                    { :provisional_grades => :rubric_assessments })
+      selections = @assignment.moderated_grading_selections.index_by(&:student_id)
+      submissions.each do |submission|
+        if (selection = selections[submission.user_id])
+          # student in moderation: choose the selected provisional grade
+          selected_provisional_grade = submission.provisional_grades
+            .detect { |pg| pg.id == selection.selected_provisional_grade_id }
+        else
+          # student not in moderation: choose the first one with a grade (there should only be one)
+          selected_provisional_grade = submission.provisional_grades
+            .select { |pg| pg.graded_at.present? }
+            .sort_by { |pg| pg.created_at }
+            .first
+        end
+
+        if selected_provisional_grade
+          selected_provisional_grade.publish!
+        end
+      end
+
+      @assignment.update_attribute(:grades_published_at, Time.now.utc)
+      render :json => { :message => "OK" }
+    end
+  end
+
   private
 
   def load_assignment
     @context = api_find(Course, params[:course_id])
-    @assignment = @context.assignments.find(params[:assignment_id])
+    @assignment = @context.assignments.active.find(params[:assignment_id])
   end
 end

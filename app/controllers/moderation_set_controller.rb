@@ -17,19 +17,20 @@
 # <http://www.gnu.org/licenses/>.
 #
 
-# undocumented @API Moderated Grading API
+# @API Moderated Grading
+# @subtopic Moderation Set
+# @beta
 #
 # API for viewing and adding students to the list of people in moderation
 # for an assignment
 #
-
-
 class ModerationSetController < ApplicationController
   include Api::V1::User
 
   before_filter :load_assignment
 
-  # undocumented @API List students selected for moderation
+  # @API List students selected for moderation
+  #
   # @returns [User]
   def index
     if authorized_action(@context, @current_user, :moderate_grades)
@@ -45,7 +46,7 @@ class ModerationSetController < ApplicationController
     end
   end
 
-  # undocumented @API Select students for moderation
+  # @API Select students for moderation
   #
   # Returns an array of users that were selected for moderation
   #
