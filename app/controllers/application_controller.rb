@@ -418,6 +418,13 @@ class ApplicationController < ActionController::Base
       @headers = !!@current_user if @headers != false
       @files_domain = @account_domain && @account_domain.host_type == 'files'
       format.html {
+        if ms_office?
+          # Office will follow 302's internally, until it gets to a 200. _then_ it will pop it out
+          # to a web browser - but you've lost your cookies! This breaks not only store_location,
+          # but in the case of delegated authentication where the provider does an additional
+          # redirect storing important information in session, makes it impossible to log in at all
+          return render text: '', status: 200
+        end
         store_location
         return redirect_to login_url(params.slice(:authentication_provider)) if !@files_domain && !@current_user
 
@@ -1834,6 +1841,10 @@ class ApplicationController < ActionController::Base
 
   def mobile_device?
     params[:mobile] || request.user_agent.to_s =~ /ipod|iphone|ipad|Android/i
+  end
+
+  def ms_office?
+    request.user_agent.to_s =~ /ms-office/
   end
 
   def profile_data(profile, viewer, session, includes)
