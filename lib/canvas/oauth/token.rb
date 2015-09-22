@@ -57,6 +57,7 @@ module Canvas::Oauth
         @access_token = user.access_tokens.create!({:developer_key => key, :remember_access => remember_access?, :scopes => scopes, :purpose => purpose, expires_at: expiration_date})
 
         @access_token.clear_full_token! if @access_token.scoped_to?(['userinfo'])
+        @access_token.clear_plaintext_refresh_token! if @access_token.scoped_to?(['userinfo'])
       end
     end
 
@@ -76,6 +77,7 @@ module Canvas::Oauth
     def as_json(_options={})
       json = {
         'access_token' => access_token.full_token,
+        'refresh_token' => access_token.plaintext_refresh_token,
         'user' => user.as_json(:only => [:id, :name], :include_root => false)
       }
       json['expires_in'] = access_token.expires_at.utc.to_time.to_i - Time.now.utc.to_i if access_token.expires_at

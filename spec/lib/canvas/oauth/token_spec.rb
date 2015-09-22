@@ -157,7 +157,7 @@ module Canvas::Oauth
       end
 
       it 'does not put anything else into the json' do
-        expect(json.keys.sort).to match_array(['access_token', 'user', 'expires_in'])
+        expect(json.keys.sort).to eq ['access_token', 'expires_in', 'refresh_token', 'user']
       end
 
     end
