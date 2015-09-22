@@ -643,6 +643,30 @@ describe Quizzes::QuizSubmission do
       })
       expect(@quiz_submission.submission.workflow_state).to eql 'graded'
     end
+    
+    it "should mark a submission complete if all essay questions have been graded, even if a text_only_question is present" do
+      quiz_with_graded_submission([{:question_data => {:name => 'question 1', :points_possible => 1, 'question_type' => 'essay_question'}},
+                                   {:question_data => {:name => 'question 2', :points_possible => 1, 'question_type' => 'text_only_question'}}]) do
+        {
+          "text_after_answers"            => "",
+          "question_#{@questions[0].id}"  => "<p>Lorem ipsum answer 1.</p>",
+          "context_id"                    => "#{@course.id}",
+          "context_type"                  => "Course",
+          "user_id"                       => "#{@user.id}",
+          "quiz_id"                       => "#{@quiz.id}",
+          "course_id"                     => "#{@course.id}",
+          "question_text"                 => "Lorem ipsum question",
+        }
+      end
+      @quiz_submission.update_scores({
+        'context_id' => @course.id,
+        'override_scores' => true,
+        'context_type' => 'Course',
+        'submission_version_number' => '1',
+        "question_score_#{@questions[0].id}" => '1',
+      })
+      expect(@quiz_submission.submission.workflow_state).to eql 'graded'
+    end
   end
 
   context "update_assignment_submission" do
