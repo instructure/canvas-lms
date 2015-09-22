@@ -143,6 +143,7 @@ define([
                 </header>
               </a>
               <button className="Button Button--icon-action-rev ic-DashboardCard__header-button" onClick={this.settingsClick} ref="settingsToggle">
+                <span className="screenreader-only"> { I18n.t ("Choose a color for %{course}", { course:this.props.shortName})} </span>
                 <i className="icon-settings" />
               </button>
             </div>
