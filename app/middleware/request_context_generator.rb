@@ -65,6 +65,13 @@ class RequestContextGenerator
     meta_headers << "#{name}=#{value};"
   end
 
+  def self.store_interaction_seconds_update(token, interaction_seconds)
+    data = PageView.decode_token(token)
+    if data
+      self.add_meta_header("r", "#{data[:request_id]}|#{data[:created_at]}|#{interaction_seconds}")
+    end
+  end
+
   def self.store_request_meta(request, context)
     self.add_meta_header("o", request.path_parameters[:controller])
     self.add_meta_header("n", request.path_parameters[:action])
@@ -78,5 +85,6 @@ class RequestContextGenerator
     self.add_meta_header("x", page_view.interaction_seconds)
     self.add_meta_header("p", page_view.participated? ? "t" : "f")
     self.add_meta_header("e", page_view.asset_user_access_id)
+    self.add_meta_header("f", page_view.created_at.try(:utc).try(:iso8601, 2))
   end
 end

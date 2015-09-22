@@ -119,6 +119,7 @@ class ApplicationController < ActionController::Base
           open_registration: @domain_root_account.try(:open_registration?)
         }
       }
+      @js_env[:page_view_update_url] = page_view_path(@page_view.id, page_view_token: @page_view.token) if @page_view
       @js_env[:IS_LARGE_ROSTER] = true if !@js_env[:IS_LARGE_ROSTER] && @context.respond_to?(:large_roster?) && @context.large_roster?
       @js_env[:context_asset_string] = @context.try(:asset_string) if !@js_env[:context_asset_string]
       @js_env[:ping_url] = polymorphic_url([:api_v1, @context, :ping]) if @context.is_a?(Course)
@@ -988,10 +989,16 @@ class ApplicationController < ActionController::Base
     user = @current_user || (@accessed_asset && @accessed_asset[:user])
     if user && @log_page_views != false
       updated_fields = params.slice(:interaction_seconds)
-      if request.xhr? && params[:page_view_id] && !updated_fields.empty? && !(@page_view && @page_view.generated_by_hand)
-        @page_view = PageView.find_for_update(params[:page_view_id])
+      if request.xhr? && params[:page_view_token] && !updated_fields.empty? && !(@page_view && @page_view.generated_by_hand)
+        RequestContextGenerator.store_interaction_seconds_update(params[:page_view_token], updated_fields[:interaction_seconds])
+
+        page_view_info = PageView.decode_token(params[:page_view_token])
+        @page_view = PageView.find_for_update(page_view_info[:request_id])
         if @page_view
-          response.headers["X-Canvas-Page-View-Id"] = @page_view.id.to_s if @page_view.id
+          if @page_view.id
+            response.headers["X-Canvas-Page-View-Update-Url"] = page_view_path(
+              @page_view.id, page_view_token: @page_view.token)
+          end
           @page_view.do_update(updated_fields)
           @page_view_update = true
         end

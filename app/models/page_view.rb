@@ -84,6 +84,24 @@ class PageView < ActiveRecord::Base
     end
   end
 
+  def token
+    Canvas::Security.create_jwt({
+      i: request_id,
+      u: Shard.global_id_for(user_id),
+      c: created_at.try(:utc).try(:iso8601, 2)
+    })
+  end
+
+  def self.decode_token(token)
+    data = Canvas::Security.decode_jwt(token)
+    return nil unless data
+    return {
+      request_id: data[:i],
+      user_id: data[:u],
+      created_at: data[:c]
+    }
+  end
+
   def url
     url = read_attribute(:url)
     url && LoggingFilter.filter_uri(url)
