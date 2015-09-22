@@ -16,13 +16,16 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper.rb')
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe IncomingMail::MessageHandler do
+  specs_require_sharding
+
   let(:outgoing_from_address) { "no-reply@example.com" }
   let(:body) { "Hello" }
   let(:html_body) { "Hello" }
-  let(:original_message_id) { 1 }
+  let(:original_message_id) { Shard.short_id_for(@shard1.global_id_for(42)) }
   let(:secure_id) { "123abc" }
   let(:tag) { "#{secure_id}-#{original_message_id}" }
   let(:shard) do
@@ -118,11 +121,11 @@ describe IncomingMail::MessageHandler do
         end
 
         it "silently fails if the original message is missing" do
-          Message.expects(:where).with(id: 42).returns(stub(first: nil))
+          Message.expects(:where).with(id: original_message_id).returns(stub(first: nil))
           Message.any_instance.expects(:deliver).never
           Rails.cache.expects(:fetch).never
 
-          subject.handle(outgoing_from_address, body, html_body, incoming_message, "#{secure_id}-42")
+          subject.handle(outgoing_from_address, body, html_body, incoming_message, "#{secure_id}-#{original_message_id}")
         end
 
         it "silently fails if the address tag is invalid" do

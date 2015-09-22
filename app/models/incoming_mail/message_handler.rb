@@ -26,7 +26,7 @@ module IncomingMail
       # This prevents us from rebouncing users that have auto-replies setup -- only bounce something
       # that was sent out because of a notification.
       raise IncomingMail::Errors::SilentIgnore unless original_message && original_message.notification_id
-      raise IncomingMail::Errors::SilentIgnore unless valid_secure_id?(original_message, secure_id)
+      raise IncomingMail::Errors::SilentIgnore unless valid_secure_id?(original_message_id, secure_id)
 
       from_channel = nil
       original_message.shard.activate do
@@ -135,8 +135,8 @@ module IncomingMail
       [ndr_subject, ndr_body]
     end
 
-    def valid_secure_id?(original_message, secure_id)
-      Canvas::Security.verify_hmac_sha1(secure_id, original_message.global_id.to_s)
+    def valid_secure_id?(original_message_id, secure_id)
+      Canvas::Security.verify_hmac_sha1(secure_id, original_message_id)
     end
 
     def valid_user_and_context?(context, user)
@@ -157,8 +157,8 @@ module IncomingMail
     end
 
     def parse_tag(tag)
-      match = tag.match /^(\h+)-(\d+)$/
-      return match[1], match[2].to_i if match
+      match = tag.match /^(\h+)-([0-9~]+)$/
+      return match[1], match[2] if match
     end
   end
 end
