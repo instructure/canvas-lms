@@ -88,7 +88,7 @@ define([
       loadingState[`${type}Loading`] = true;
       this.setState(loadingState);
 
-      $.get(url, (data) => {
+      $.getJSON(url, (data) => {
         var newState = {};
         newState[type] = data;
         newState[`${type}Loading`] = false;
