@@ -300,14 +300,6 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
         expect(json['quiz_submissions'][0]['time_spent']).to eq 5.minutes
       end
 
-      it 'should include questions_regraded_since_last_attempt' do
-        @quiz_submission.save!
-
-        json = qs_api_show
-        expect(json.key?('quiz_submissions')).to be_truthy
-        expect(json['quiz_submissions'][0]['questions_regraded_since_last_attempt']).to eq 0
-      end
-
       it 'should include html_url' do
         json = qs_api_show
         expect(json.key?('quiz_submissions')).to be_truthy

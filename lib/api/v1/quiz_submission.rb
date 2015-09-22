@@ -48,7 +48,6 @@ module Api::V1::QuizSubmission
   QUIZ_SUBMISSION_JSON_FIELD_METHODS = %w[
     time_spent
     attempts_left
-    questions_regraded_since_last_attempt
     overdue_and_needs_submission
   ].freeze
 
