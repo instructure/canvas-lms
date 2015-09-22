@@ -53,7 +53,8 @@
       <%= image_tag "pending_review.png" %> <%= t(:quiz_submission_needs_review, "The quiz has changed significantly since this submission was made. This submission may need re-grading.") %><br/>
     <% end %>
     <% questions_needing_review = submission_data.find_all do |answer|
-         answer[:correct] == "undefined" && submission_questions_hash[answer[:question_id]]
+         question_data = submission_questions_hash[answer[:question_id]]
+         answer[:correct] == "undefined" && question_data && question_data[:question_type] != 'text_only_question'
        end %>
     <% if questions_needing_review.present? %>
       <div class="alert">
