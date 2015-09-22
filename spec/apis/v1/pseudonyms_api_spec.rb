@@ -176,6 +176,19 @@ describe PseudonymsController, type: :request do
         raw_api_call(:post, @path, @path_options)
         expect(response.code).to eql '400'
       end
+
+      it "returns 401 when trying to set a password on a non-Canvas login" do
+        @account.authentication_providers.create!(auth_type: 'cas')
+        raw_api_call(:post, @path, @path_options, {
+          user: { id: @student.id },
+          login: {
+            password: 'abc123',
+            unique_id: 'student@example.com',
+            authentication_provider_id: 'cas'
+          }
+        })
+        expect(response.code).to eql '400'
+      end
     end
 
     context "an unauthorized user" do

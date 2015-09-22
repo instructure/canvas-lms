@@ -367,6 +367,16 @@ class PseudonymsController < ApplicationController
       @pseudonym.sis_user_id = params[:pseudonym][:sis_user_id].presence
     end or return false
 
+    # give a 400 instead of a 401 if it doesn't make sense to change the password
+    if params[:pseudonym].key?(:password) && !@pseudonym.passwordable?
+      @pseudonym.errors.add(:password, 'password can only be set for Canvas authentication')
+      respond_to do |format|
+        format.html { render(params[:action] == 'edit' ? :edit : :new) }
+        format.json { render json: @pseudonym.errors, status: :bad_request }
+      end
+      return false
+    end
+
     has_right_if_requests_change(:password, :change_password) do
       @pseudonym.password = params[:pseudonym][:password]
       @pseudonym.password_confirmation = params[:pseudonym][:password_confirmation]
@@ -374,6 +384,7 @@ class PseudonymsController < ApplicationController
   end
 
   private
+
   def has_right_if_requests_change(key, right)
     return true unless params[:pseudonym].key?(key.to_sym)
 

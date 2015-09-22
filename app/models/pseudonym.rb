@@ -279,17 +279,17 @@ class Pseudonym < ActiveRecord::Base
     # and requires delegated authentication), there is no canvas password to
     # change.
     given do |user|
-      self.user_id == user.try(:id) &&
-      self.account.canvas_authentication?
+      user_id == user.try(:id) &&
+      passwordable?
     end
     can :change_password
 
     # an admin can set the initial canvas password (if there is one, see above)
     # on another user's new pseudonym.
     given do |user|
-      self.new_record? &&
-      self.account.canvas_authentication? &&
-      self.grants_right?(user, :create)
+      new_record? &&
+      passwordable? &&
+      grants_right?(user, :create)
     end
     can :change_password
 
@@ -297,9 +297,9 @@ class Pseudonym < ActiveRecord::Base
     # see above) on an existing pseudonym when :admins_can_change_passwords is
     # enabled.
     given do |user|
-      self.account.settings[:admins_can_change_passwords] &&
-      self.account.canvas_authentication? &&
-      self.grants_right?(user, :update)
+      account.settings[:admins_can_change_passwords] &&
+      passwordable? &&
+      grants_right?(user, :update)
     end
     can :change_password
 
@@ -379,18 +379,33 @@ class Pseudonym < ActiveRecord::Base
     user.sms
   end
 
+  # managed_password? and passwordable? differ in their treatment of pseudonyms
+  # not linked to an authentication_provider. They both err towards the
+  # "positive" case matching their name. I.e. if you have both Canvas and
+  # non-Canvas auth configured, they'll both return true for a pseudonym with an
+  # SIS ID not explicitly linked to an authentication provider.
   def managed_password?
-    !!(self.sis_user_id && account && account.non_canvas_auth_configured?)
+    if authentication_provider
+      # explicit provider we can be sure if it's managed or not
+      !authentication_provider.is_a?(AccountAuthorizationConfig::Canvas)
+    else
+      # otherwise we have to guess
+      !!(self.sis_user_id && account.non_canvas_auth_configured?)
+    end
+  end
+
+  def passwordable?
+    authentication_provider.is_a?(AccountAuthorizationConfig::Canvas) ||
+      (!authentication_provider && account.canvas_authentication?)
   end
 
   def valid_arbitrary_credentials?(plaintext_password)
     return false if self.deleted?
     return false if plaintext_password.blank?
     require 'net/ldap'
-    account = self.account || Account.default
     res = false
     res ||= valid_ldap_credentials?(plaintext_password)
-    if account.canvas_authentication?
+    if passwordable?
       # Only check SIS if they haven't changed their password
       res ||= valid_ssha?(plaintext_password) if password_auto_generated?
       res ||= valid_password?(plaintext_password)
