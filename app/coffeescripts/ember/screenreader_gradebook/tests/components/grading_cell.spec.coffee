@@ -2,7 +2,8 @@ define [
   'ember'
   '../start_app'
   '../shared_ajax_fixtures'
-], (Ember, startApp, fixtures) ->
+  'helpers/fakeENV'
+], (Ember, startApp, fixtures, fakeENV) ->
 
   {run} = Ember
 
@@ -20,6 +21,7 @@ define [
       @component.reopen
         changeGradeURL: ->
           "/api/v1/assignment/:assignment/:submission"
+      fakeENV.setup({ current_user_roles: [ "teacher" ] })
       run =>
         @submission = Ember.Object.create
           grade: 'A'
@@ -27,12 +29,14 @@ define [
           user_id: 1
         @assignment = Ember.Object.create
           grading_type: 'points'
+          due_at: new Date(2015, 6, 15)
         @component.setProperties
           'submission': @submission
           assignment: @assignment
         @component.append()
 
     teardown: ->
+      fakeENV.teardown()
       run =>
         @component.destroy()
         App.destroy()
@@ -67,6 +71,21 @@ define [
   test "isGpaScale", ->
     setType 'gpa_scale'
     ok @component.get('isGpaScale')
+
+  test "isInPastGradingPeriodAndNotAdmin returns true with defaults set in module above", ->
+    ok @component.get('isInPastGradingPeriodAndNotAdmin')
+
+  test "isInPastGradingPeriodAndNotAdmin returns false when multiple grading periods is disabled", ->
+    ENV.GRADEBOOK_OPTIONS.multiple_grading_periods_enabled = false
+    ok ! @component.get('isInPastGradingPeriodAndNotAdmin')
+
+  test "isInPastGradingPeriodAndNotAdmin returns false when user is an admin", ->
+    ENV.current_user_roles = ["teacher", "admin"]
+    ok ! @component.get('isInPastGradingPeriodAndNotAdmin')
+
+  test "isInPastGradingPeriodAndNotAdmin returns false when no past grading periods exist", ->
+    ENV.GRADEBOOK_OPTIONS.latest_end_date_of_admin_created_grading_periods_in_the_past = null
+    ok ! @component.get('isInPastGradingPeriodAndNotAdmin')
 
   asyncTest "focusOut", ->
     expect(1)
