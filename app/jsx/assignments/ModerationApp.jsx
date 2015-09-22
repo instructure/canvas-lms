@@ -1,6 +1,7 @@
 /** @jsx React.DOM */
 
 define([
+  'underscore',
   'react',
   'i18n!moderated_grading',
   './ModeratedStudentList',
@@ -8,7 +9,7 @@ define([
   './FlashMessageHolder',
   './actions/ModerationActions',
   './ModeratedColumnHeader'
-], function (React, I18n, ModeratedStudentList, Header, FlashMessageHolder, Actions, ModeratedColumnHeader) {
+], function (_, React, I18n, ModeratedStudentList, Header, FlashMessageHolder, Actions, ModeratedColumnHeader) {
 
   return React.createClass({
     displayName: 'ModerationApp',
@@ -29,6 +30,13 @@ define([
     handleChange () {
       this.setState(this.props.store.getState());
     },
+    handleCheckbox (student, event) {
+      if (event.target.checked) {
+        this.props.store.dispatch(Actions.selectStudent(student.id));
+      } else {
+        this.props.store.dispatch(Actions.unselectStudent(student.id));
+      }
+    },
 
     handleSortByThisColumn (mark, props) {
       this.props.store.dispatch(
@@ -41,15 +49,19 @@ define([
         )
       );
     },
-
+    isModerationSet (students) {
+      return (_.find(students, (student) => {
+        return student.in_moderation_set
+      }));
+    },
     render () {
       return (
         <div className='ModerationApp'>
           <FlashMessageHolder store={this.props.store} />
           <h1 className='screenreader-only'>{I18n.t('Moderate %{assignment_name}', {assignment_name: 'TODO!!!!!!!!'})}</h1>
           <Header store={this.props.store} actions={Actions} />
-          <ModeratedColumnHeader handleSortByThisColumn={this.handleSortByThisColumn} currentSortDirection={this.state.markColumnSort.currentSortDirection} markColumn={this.state.markColumnSort.markColumn} />
-          <ModeratedStudentList store={this.props.store} {...this.state} />
+          <ModeratedColumnHeader includeModerationSetHeaders={this.isModerationSet(this.state.students)} handleSortByThisColumn={this.handleSortByThisColumn} currentSortDirection={this.state.markColumnSort.currentSortDirection} markColumn={this.state.markColumnSort.markColumn} />
+          <ModeratedStudentList includeModerationSetColumns={this.isModerationSet(this.state.students)} handleCheckbox={this.handleCheckbox} {...this.state} />
         </div>
       );
     }

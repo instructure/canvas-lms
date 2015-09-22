@@ -9,7 +9,8 @@ define([
     propTypes:{
       markColumn: React.PropTypes.number,
       currentSortDirection: React.PropTypes.string,
-      handleSortByThisColumn: React.PropTypes.func.isRequired
+      handleSortByThisColumn: React.PropTypes.func.isRequired,
+      includeModerationSetHeaders: React.PropTypes.bool
     },
     renderLinkArrow (mark) {
       if (mark === this.props.markColumn){
@@ -18,6 +19,23 @@ define([
         }else{
           return(<i className='icon-mini-arrow-up'></i>);
         }
+      }
+    },
+    renderModerationSetColumnHeaders () {
+      if(this.props.includeModerationSetHeaders){
+        return (
+          <div className='ColumnHeader__ModerationSetContainer'>
+            <div className='ColumnHeader__ColumnItem'>
+              <a href='#' onClick={this.props.handleSortByThisColumn.bind(null, Constants.markColumn.MARK_TWO, this.props)}>2st Mark {this.renderLinkArrow(Constants.markColumn.MARK_TWO)}</a>
+            </div>
+            <div className='ColumnHeader__ColumnItem'>
+              <a href='#' onClick={this.props.handleSortByThisColumn.bind(null, Constants.markColumn.MARK_THREE, this.props)}>3st Mark {this.renderLinkArrow(Constants.markColumn.MARK_THREE)}</a>
+            </div>
+            <div className='ColumnHeader__ColumnItem'>
+              <span>Grade</span>
+            </div>
+          </div>
+        );
       }
     },
     render () {
@@ -30,15 +48,7 @@ define([
           <div className='ColumnHeader__ColumnItem'>
             <a href='#' onClick={this.props.handleSortByThisColumn.bind(null, Constants.markColumn.MARK_ONE, this.props)}>1st Mark {this.renderLinkArrow(Constants.markColumn.MARK_ONE)}</a>
           </div>
-          <div className='ColumnHeader__ColumnItem'>
-            <a href='#' onClick={this.props.handleSortByThisColumn.bind(null, Constants.markColumn.MARK_TWO, this.props)}>2st Mark {this.renderLinkArrow(Constants.markColumn.MARK_TWO)}</a>
-          </div>
-          <div className='ColumnHeader__ColumnItem'>
-            <a href='#' onClick={this.props.handleSortByThisColumn.bind(null, Constants.markColumn.MARK_THREE, this.props)}>3st Mark {this.renderLinkArrow(Constants.markColumn.MARK_THREE)}</a>
-          </div>
-          <div className='ColumnHeader__ColumnItem'>
-            <span>Grade</span>
-          </div>
+          {this.renderModerationSetColumnHeaders()}
         </div>
       );
     }
