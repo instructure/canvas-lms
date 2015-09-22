@@ -50,6 +50,7 @@ define([
               type='button'
               className='ModeratedGrading__Header-AddReviewerBtn Button'
               onClick={this.handleReviewerClick}
+              disabled={this.state.published}
             >
               <i className='icon-plus' />
               {I18n.t(' Reviewer')}

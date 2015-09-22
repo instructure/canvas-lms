@@ -12,7 +12,8 @@ define([
   return React.createClass({
 
     propTypes: {
-      students: React.PropTypes.arrayOf(React.PropTypes.object).isRequired
+      students: React.PropTypes.arrayOf(React.PropTypes.object).isRequired,
+      assignment: React.PropTypes.object.isRequired
     },
 
     handleCheckbox (student, event) {
@@ -27,7 +28,11 @@ define([
       if (student.provisional_grades && student.provisional_grades[mark_number]) {
         return (
           <div className='AssignmentList__Mark'>
-            <input type='radio' name={`mark_${student.id}`} />
+            <input
+               type='radio'
+               name={`mark_${student.id}`}
+               disabled={this.props.assignment.published}
+              />
             <span>{student.provisional_grades[mark_number].score}</span>
           </div>
         );
@@ -66,7 +71,7 @@ define([
                   <div className='AssignmentList__StudentInfo'>
                     <input
                       checked={student.in_moderation_set || student.isChecked}
-                      disabled={student.in_moderation_set}
+                      disabled={student.in_moderation_set || this.props.assignment.published}
                       type='checkbox'
                       onChange={this.handleCheckbox.bind(this, student)}
                     />
