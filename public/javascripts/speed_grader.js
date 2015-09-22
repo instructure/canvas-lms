@@ -1891,7 +1891,8 @@ define([
           method = $(".update_submission_grade_url").attr('title'),
           formData = {
             'submission[assignment_id]': jsonData.id,
-            'submission[user_id]':       EG.currentStudent.id
+            'submission[user_id]':       EG.currentStudent.id,
+            'submission[graded_anonymously]': utils.shouldHideStudentNames()
           };
       var grade = $grade.val();
       if (grade.toUpperCase() === "EX") {

@@ -65,7 +65,7 @@ class Submission < ActiveRecord::Base
     :media_comment_id, :media_comment_type, :quiz_submission_id,
     :submission_comments_count, :has_rubric_assessment, :attempt,
     :context_code, :media_object_id, :turnitin_data, :has_admin_comment,
-    :cached_due_date
+    :cached_due_date, :graded_anonymously
   ].freeze
 
   EXPORTABLE_ASSOCIATIONS = [
@@ -158,6 +158,7 @@ class Submission < ActiveRecord::Base
   before_save :validate_single_submission, :infer_values
   before_save :prep_for_submitting_to_turnitin
   before_save :check_url_changed
+  before_save :check_reset_graded_anonymously
   before_create :cache_due_date
   after_save :touch_user
   after_save :touch_graders
@@ -654,6 +655,18 @@ class Submission < ActiveRecord::Base
 
   def check_url_changed
     @url_changed = self.url && self.url_changed?
+    true
+  end
+
+  def graded_anonymously=(value)
+    @graded_anonymously_set = true
+    write_attribute :graded_anonymously, value
+  end
+
+  def check_reset_graded_anonymously
+    if grade_changed? && !@graded_anonymously_set
+      write_attribute :graded_anonymously, false
+    end
     true
   end
 

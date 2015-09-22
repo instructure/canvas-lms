@@ -235,6 +235,23 @@ describe Assignment do
         expect(@result.first.excused?).to eql true
       end
     end
+
+    context 'with anonymous grading' do
+      it 'explicitly sets anonymous grading if given' do
+        @assignment.grade_student(@user, :graded_anonymously => true, :grade => "10")
+        @assignment.reload
+        expect(@assignment.submissions.first.graded_anonymously).to be_truthy
+      end
+
+      it 'does not set anonymous grading if not given' do
+        @assignment.grade_student(@user, :graded_anonymously => true, :grade => "10")
+        @assignment.reload
+        @assignment.grade_student(@user, :grade => "10")
+        @assignment.reload
+        # should still true because grade didn't actually change
+        expect(@assignment.submissions.first.graded_anonymously).to be_truthy
+      end
+    end
   end
 
   it "should update a submission's graded_at when grading it" do

@@ -1080,6 +1080,7 @@ class Assignment < ActiveRecord::Base
           submission.grader = grader
           submission.grade = grade
           submission.score = score
+          submission.graded_anonymously = opts[:graded_anonymously] if opts.key?(:graded_anonymously)
           submission.excused = false if score.present?
           did_grade = true if score.present? || submission.excused?
         end
