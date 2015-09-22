@@ -986,11 +986,21 @@ class Attachment < ActiveRecord::Base
     }[content_type] || "file"
   end
 
-  set_policy do
-    given { |user, session| self.context.grants_right?(user, session, :manage_files) } #admins.include? user }
-    can :read and can :update and can :delete and can :create and can :download
+  def associated_with_submission?
+    @associated_with_submission ||= self.attachment_associations.where(context_type: 'Submission').exists?
+  end
 
-    given { |user| self.public? }
+  set_policy do
+    given { |user|
+      self.context.grants_right?(user, :manage_files) &&
+      !self.associated_with_submission?
+    }
+    can :delete
+
+    given { |user, session| self.context.grants_right?(user, session, :manage_files) } #admins.include? user }
+    can :read and can :update and can :create and can :download
+
+    given { self.public? }
     can :read and can :download
 
     given { |user, session| self.context.grants_right?(user, session, :read) } #students.include? user }
