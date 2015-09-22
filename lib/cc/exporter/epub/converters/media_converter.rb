@@ -16,6 +16,12 @@ module CC::Exporter::Epub::Converters
       convert_media_from_node!(html_node).to_s
     end
 
+    # Override on classes that include this module to return files that
+    # should not be converted to working media.
+    def unsupported_files
+      []
+    end
+
     # Find `<a>` or `<img>` tags and update the resource path attr (href or src)
     # to replace WEB_CONTENT_TOKEN with CC::Exporter::Epub::FILE_PATH.
     #
@@ -34,7 +40,7 @@ module CC::Exporter::Epub::Converters
         html_node.search(selector).each do |match|
           unescaped = CGI.unescape(match[attr]).gsub(/\?.*/, '')
 
-          if path_should_be_converted?(unescaped)
+          if should_convert_file?(unescaped)
             match[attr] = converted_media_path(unescaped)
           else
             match.replace(<<-SPAN_TAG)
@@ -50,10 +56,10 @@ module CC::Exporter::Epub::Converters
       end
     end
 
-    def path_should_be_converted?(path)
-      filename = File.basename(path).gsub(/#{File.extname(path)}/, '')
+    def should_convert_file?(unescaped)
+      filename = File.basename(unescaped).gsub(/#{File.extname(unescaped)}/, '')
 
-      @course[:files].any? do |file|
+      unsupported_files.none? do |file|
         file[:file_name].match(filename)
       end
     end

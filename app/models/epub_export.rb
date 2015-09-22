@@ -123,7 +123,7 @@ class EpubExport < ActiveRecord::Base
   def convert_to_epub
     begin
       file_paths = super
-    rescue
+    rescue => e
       mark_as_failed
       raise e
     end

@@ -23,22 +23,6 @@ module CC::Exporter::Epub::Converters
     end
     attr_reader :unsupported_files
 
-    def convert_placeholder_paths_from_string!(html_string)
-      html_node = Nokogiri::HTML::DocumentFragment.parse(html_string)
-      html_node.tap do |node|
-        convert_media_from_node!(node)
-        remove_empty_ids!(node)
-      end
-      html_node.to_s
-    end
-
-    def remove_empty_ids!(node)
-      node.search("a[id='']").each do |tag|
-        tag.remove_attribute('id')
-      end
-      node
-    end
-
     def update_syllabus(content)
       return unless content[:identifier]
       @course[:syllabus] << {
@@ -66,7 +50,7 @@ module CC::Exporter::Epub::Converters
       @course[:files], @unsupported_files = convert_files
 
       set_progress(10)
-      @course[:wikis] = convert_wikis
+      @course[:pages] = convert_wikis
       set_progress(20)
       @course[:assignments] = convert_assignments
       set_progress(30)

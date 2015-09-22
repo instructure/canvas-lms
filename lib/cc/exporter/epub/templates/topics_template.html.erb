@@ -1,5 +1,5 @@
 <h2 id="<%="#{item[:identifier]}"%>"><%= item[:title] %></h2>
-<p><%= item[:description] %></p>
+<p><%= convert_placeholder_paths_from_string!(item[:description]) %></p>
 <% if item[:assignment] %>
   <p>Discussion assignment details:</p>
   <% if item[:assignment][:due_at] %>

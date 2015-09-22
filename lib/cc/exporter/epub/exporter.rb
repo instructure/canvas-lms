@@ -9,14 +9,14 @@ module CC::Exporter::Epub
       assignments: "Assignments",
       topics: "Discussion Topics",
       quizzes: "Quizzes",
-      wikis: "Wiki Pages"
+      pages: "Wiki Pages"
     }.freeze
 
     LINKED_RESOURCE_KEY = {
       "Assignment" => :assignments,
       "DiscussionTopic" => :topics,
       "Quizzes::Quiz" => :quizzes,
-      "WikiPage" => :wikis
+      "WikiPage" => :pages
     }.freeze
 
     def initialize(cartridge, sort_by_content=false)
@@ -43,15 +43,26 @@ module CC::Exporter::Epub
       end
     end
 
+    def get_item(resource_type, identifier)
+      return {} unless cartridge_json[resource_type].present?
+      cartridge_json[resource_type].find(-> { return {} }) do |resource|
+        resource[:identifier] == identifier
+      end
+    end
+
+    def update_item(resource_type, identifier, updated_item)
+      get_item(resource_type, identifier).merge!(updated_item)
+    end
+
     def create_syllabus
       syllabus_content = cartridge_json[:syllabus]
       syllabus_template = Exporter.resource_template(:syllabus)
-      Template.new({resources: syllabus_content, reference: :syllabus}, syllabus_template)
+      Template.new({resources: syllabus_content, reference: :syllabus}, syllabus_template, self)
     end
 
     def create_template(resource)
       resource_items = sort_by_content ? cartridge_json[resource] : filter_content_to_module(resource)
-      Template.new({resources: resource_items, reference: resource}, base_template)
+      Template.new({resources: resource_items, reference: resource}, base_template, self)
     end
 
     def base_template
