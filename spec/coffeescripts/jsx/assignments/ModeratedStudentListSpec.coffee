@@ -33,6 +33,6 @@ define [
     React.unmountComponentAtNode(studentList.getDOMNode().parentNode)
   test 'show all columns when includeModerationSetHeaders is true', ->
     studentList = TestUtils.renderIntoDocument(ModeratedStudentList(urls: {assignment_speedgrader_url: 'blah'}, includeModerationSetColumns: true, students: fakeStudent, assignment: {published: false},handleCheckbox: () => 'stub' ))
-    columns = TestUtils.scryRenderedDOMComponentsWithClass(studentList, 'AssignmentList__Mark')
+    columns = TestUtils.scryRenderedDOMComponentsWithClass(studentList, 'ModeratedAssignmentList__Mark')
     equal columns.length, 3, 'show all columns'
     React.unmountComponentAtNode(studentList.getDOMNode().parentNode)

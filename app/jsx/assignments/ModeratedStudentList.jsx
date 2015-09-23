@@ -19,7 +19,7 @@ define([
       if (student.provisional_grades && student.provisional_grades[mark_number]) {
           if (this.props.includeModerationSetColumns){
             return (
-              <div className='AssignmentList__Mark'>
+              <div className='ModeratedAssignmentList__Mark'>
                   <input
                      type='radio'
                      name={`mark_${student.id}`}
@@ -31,13 +31,13 @@ define([
           }else{
             return(
               <div className='AssignmentList__Mark'>
-                <span>{student.provisional_grades[mark_number].score}</span>
+                <a href={student.provisional_grades[mark_number].speedgrader_url}>{student.provisional_grades[mark_number].score}</a>
               </div>
             );
           }
       } else {
         return (
-          <div className='AssignmentList__Mark'>
+          <div className='ModeratedAssignmentList__Mark'>
             <a href={this.generateSpeedgraderUrl(this.props.urls.assignment_speedgrader_url, student)}>Speed Grader</a>
           </div>
         );
@@ -63,46 +63,47 @@ define([
         );
       }
     },
-
-    renderStudentMarkColumns (student) {
-      if(this.props.includeModerationSetColumns){
-        return (
-          <div className="AssignmentList__ItemGroup">
-            {this.renderStudentMark(student, Constants.markColumn.MARK_ONE)}
-            {this.renderStudentMark(student, Constants.markColumn.MARK_TWO)}
-            {this.renderStudentMark(student, Constants.markColumn.MARK_THREE)}
-            {this.renderFinalGrade(student)}
-          </div>
-        );
-      }else
-      {
-        return(
-          <div className="AssignmentList__ItemGroup">
-            {this.renderStudentMark(student, Constants.markColumn.MARK_ONE)}
-          </div>
-        );
-      }
-    },
     render () {
       return (
-        <ul className='AssignmentList'>
+        <ul className='ModeratedAssignmentList'>
           {
             this.props.students.map((student) => {
-              return (
-                <li className='AssignmentList__Item'>
-                  <div className='AssignmentList__StudentInfo'>
-                    <input
-                      checked={student.on_moderation_stage || student.in_moderation_set || student.isChecked}
-                      disabled={student.in_moderation_set || this.props.assignment.published}
-                      type='checkbox'
-                      onChange={this.props.handleCheckbox.bind(this, student)}
-                    />
-                    <img className='img-circle AssignmentList_StudentPhoto' src={student.avatar_image_url} />
-                    <span>{student.display_name}</span>
-                  </div>
-                  {this.renderStudentMarkColumns(student)}
-                </li>
+              if(this.props.includeModerationSetColumns){
+                return (
+                  <li className='ModeratedAssignmentList__Item'>
+                    <div className='ModeratedAssignmentList__StudentInfo'>
+                      <input
+                        checked={student.on_moderation_stage || student.in_moderation_set || student.isChecked}
+                        disabled={student.in_moderation_set || this.props.assignment.published}
+                        type='checkbox'
+                        onChange={this.props.handleCheckbox.bind(this, student)}
+                      />
+                      <img className='img-circle AssignmentList_StudentPhoto' src={student.avatar_image_url} />
+                      <span>{student.display_name}</span>
+                    </div>
+                    {this.renderStudentMark(student, Constants.markColumn.MARK_ONE)}
+                    {this.renderStudentMark(student, Constants.markColumn.MARK_TWO)}
+                    {this.renderStudentMark(student, Constants.markColumn.MARK_THREE)}
+                    {this.renderFinalGrade(student)}
+                  </li>
+                 );
+              }else{
+                return(
+                  <li className='AssignmentList__Item'>
+                    <div className='AssignmentList__StudentInfo'>
+                      <input
+                        checked={student.on_moderation_stage || student.in_moderation_set || student.isChecked}
+                        disabled={student.in_moderation_set || this.props.assignment.published}
+                        type='checkbox'
+                        onChange={this.props.handleCheckbox.bind(this, student)}
+                      />
+                      <img className='img-circle AssignmentList_StudentPhoto' src={student.avatar_image_url} />
+                      <span>{student.display_name}</span>
+                    </div>
+                    {this.renderStudentMark(student, Constants.markColumn.MARK_ONE)}
+                  </li>
                 );
+              }
             })
           }
         </ul>

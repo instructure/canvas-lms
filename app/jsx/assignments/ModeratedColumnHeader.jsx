@@ -21,7 +21,6 @@ define([
       } else {
         this.props.store.dispatch(ModerationActions.unselectAllStudents());
       }
-
     },
 
     renderLinkArrow (mark) {
@@ -33,36 +32,46 @@ define([
         }
       }
     },
-    renderModerationSetColumnHeaders () {
+    render () {
       if(this.props.includeModerationSetHeaders){
-        return (
-          <div className='ColumnHeader__ModerationSetContainer'>
-            <div className='ColumnHeader__ColumnItem'>
+        return(
+          <div className='ModeratedColumnHeader'>
+            <div className='ModeratedColumnHeader__StudentName ColumnHeader__Item'>
+              <input type='checkbox' onChange={this.handleSelectAll} />
+              <span>Student</span>
+            </div>
+
+            <div className='ModeratedColumnHeader__Mark ColumnHeader__Item'>
+              <a href='#' onClick={this.props.handleSortByThisColumn.bind(null, Constants.markColumn.MARK_ONE, this.props)}>1st Mark {this.renderLinkArrow(Constants.markColumn.MARK_ONE)}</a>
+            </div>
+
+            <div className='ColumnHeader__Mark ColumnHeader__Item'>
               <a href='#' onClick={this.props.handleSortByThisColumn.bind(null, Constants.markColumn.MARK_TWO, this.props)}>2st Mark {this.renderLinkArrow(Constants.markColumn.MARK_TWO)}</a>
             </div>
-            <div className='ColumnHeader__ColumnItem'>
+
+            <div className='ColumnHeader__Mark ColumnHeader__Item'>
               <a href='#' onClick={this.props.handleSortByThisColumn.bind(null, Constants.markColumn.MARK_THREE, this.props)}>3st Mark {this.renderLinkArrow(Constants.markColumn.MARK_THREE)}</a>
             </div>
-            <div className='ColumnHeader__ColumnItem'>
+
+            <div className='ColumnHeader__FinalGrade ColumnHeader__Item'>
               <span>Grade</span>
             </div>
           </div>
         );
+      }else{
+        return(
+          <div className='ColumnHeader'>
+            <div className='ColumnHeader__StudentName ColumnHeader__Item'>
+              <input type='checkbox' onChange={this.handleSelectAll} />
+              <span>Student</span>
+            </div>
+
+            <div className='ColumnHeader__Mark ColumnHeader__Item'>
+              <a href='#' onClick={this.props.handleSortByThisColumn.bind(null, Constants.markColumn.MARK_ONE, this.props)}>1st Mark {this.renderLinkArrow(Constants.markColumn.MARK_ONE)}</a>
+            </div>
+          </div>
+        );
       }
-    },
-    render () {
-      return (
-        <div className='ColumnHeader'>
-          <div className='ColumnHeader__StudentName'>
-            <input type='checkbox' onChange={this.handleSelectAll} />
-            <strong>Student</strong>
-          </div>
-          <div className='ColumnHeader__ColumnItem'>
-            <a href='#' onClick={this.props.handleSortByThisColumn.bind(null, Constants.markColumn.MARK_ONE, this.props)}>1st Mark {this.renderLinkArrow(Constants.markColumn.MARK_ONE)}</a>
-          </div>
-          {this.renderModerationSetColumnHeaders()}
-        </div>
-      );
     }
   });
 
