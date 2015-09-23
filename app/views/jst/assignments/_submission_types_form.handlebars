@@ -41,6 +41,7 @@
           {{checkbox "acceptsOnlineTextEntries"
             id="assignment_text_entry"
             name="online_submission_types[online_text_entry]"
+            aria-label=(t "Online Submission Type - Text Entry")
             disabled=submissionTypesFrozen}}
           {{#t "labels.allow_text_entry"}}Text Entry{{/t}}
         </label>
@@ -49,6 +50,7 @@
           {{checkbox "acceptsOnlineURL"
             id="assignment_online_url"
             name="online_submission_types[online_url]"
+            aria-label=(t "Online Submission Type - Website URL")
             disabled=submissionTypesFrozen}}
           {{#t "labels.allow_url"}}Website URL{{/t}}
         </label>
@@ -57,6 +59,7 @@
             {{checkbox "acceptsMediaRecording"
               id="assignment_media_recording"
               name="online_submission_types[media_recording]"
+              aria-label=(t "Online Submission Type - Media Recordings")
               disabled=submissionTypesFrozen}}
             {{#t "labels.allow_media_recordings"}}Media Recordings{{/t}}
           </label>
@@ -66,6 +69,7 @@
             id="assignment_online_upload"
             name="online_submission_types[online_upload]"
             aria-controls="restrict_file_extensions_container"
+            aria-label=(t "Online Submission Type - File Uploads")
             disabled=submissionTypesFrozen}}
           {{#t "labels.allow_file_uploads"}}File Uploads{{/t}}
         </label>
@@ -81,6 +85,7 @@
               id="assignment_restrict_file_extensions"
               name="restrict_file_extensions"
               aria-controls="allowed_extensions_container"
+              aria-label=(t "Online Submission Type - File Uploads - Restrict Upload File Types")
               disabled=submissionTypesFrozen}}
             {{#t "labels.restrict_file_extensions"}}
               Restrict Upload File Types
@@ -101,9 +106,10 @@
               type="text"
               maxlength="254"
               placeholder="{{#t "labels.allowed_extensions"}}Allowed File Extensions{{/t}}"
+              aria-labelledby="explanation_nest"
               value="{{join allowedExtensions ","}}"
               {{disabledIfIncludes frozenAttributes "submission_types"}}/>
-            <div class="explanation nest">
+            <div id="explanation_nest" class="explanation nest">
               {{#t "descriptions.allowed_extensions"}}
                 Enter a list of accepted extensions, for example: doc,xls,txt
               {{/t}}
