@@ -542,7 +542,7 @@ class Account < ActiveRecord::Base
     if @invalidations.present?
       shard.activate do
         @invalidations.each do |key|
-          Rails.cache.delete([key, id].cache_key)
+          Rails.cache.delete([key, self.global_id].cache_key)
         end
         Account.send_later_if_production(:invalidate_inherited_caches, self, @invalidations)
       end
@@ -553,8 +553,9 @@ class Account < ActiveRecord::Base
     parent_account.shard.activate do
       account_ids = Account.sub_account_ids_recursive(parent_account.id)
       account_ids.each do |id|
+        global_id = Shard.global_id_for(id)
         keys.each do |key|
-          Rails.cache.delete([key, id].cache_key)
+          Rails.cache.delete([key, global_id].cache_key)
         end
       end
     end
@@ -569,7 +570,7 @@ class Account < ActiveRecord::Base
     return self.class.default_storage_quota if root_account?
 
     shard.activate do
-      Rails.cache.fetch(['current_quota', id].cache_key) do
+      Rails.cache.fetch(['current_quota', self.global_id].cache_key) do
         self.parent_account.default_storage_quota
       end
     end
@@ -580,7 +581,7 @@ class Account < ActiveRecord::Base
     return self.class.default_storage_quota if root_account?
 
     shard.activate do
-      @default_storage_quota ||= Rails.cache.fetch(['default_storage_quota', id].cache_key) do
+      @default_storage_quota ||= Rails.cache.fetch(['default_storage_quota', self.global_id].cache_key) do
         parent_account.default_storage_quota
       end
     end
@@ -629,7 +630,7 @@ class Account < ActiveRecord::Base
     return Group.default_storage_quota if root_account?
 
     shard.activate do
-      Rails.cache.fetch(['default_group_storage_quota', self.id].cache_key) do
+      Rails.cache.fetch(['default_group_storage_quota', self.global_id].cache_key) do
         self.parent_account.default_group_storage_quota
       end
     end

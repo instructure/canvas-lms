@@ -1304,9 +1304,12 @@ describe Account do
         subaccount = account.sub_accounts.create!
         expect(subaccount.default_storage_quota).to eq 10.megabytes
 
-        # should reload
         account.default_storage_quota = 20.megabytes
         account.save!
+
+        # should clear caches
+        account = Account.find(account.id)
+        expect(account.default_storage_quota).to eq 20.megabytes
 
         subaccount = Account.find(subaccount)
         expect(subaccount.default_storage_quota).to eq 20.megabytes
@@ -1357,6 +1360,27 @@ describe Account do
       @account.settings = settings
       @account.save!
       expect(@account.restrict_student_future_view).to eq({:locked => false, :value => true})
+    end
+
+    context "caching" do
+      specs_require_sharding
+      it "should clear cached values correctly" do
+        enable_cache do
+          [@account, @sub1, @sub2].each(&:restrict_student_future_view) # preload the cached values
+
+          @sub1.settings = @sub1.settings.merge(:restrict_student_future_view => {:locked => true, :value => true})
+          @sub1.save!
+
+          # hard reload
+          @account = Account.find(@account.id)
+          @sub1 = Account.find(@sub1.id)
+          @sub2 = Account.find(@sub2.id)
+
+          expect(@account.restrict_student_future_view).to eq({:locked => false, :value => false})
+          expect(@sub1.restrict_student_future_view).to eq({:locked => true, :value => true})
+          expect(@sub2.restrict_student_future_view).to eq({:locked => true, :value => true, :inherited => true})
+        end
+      end
     end
   end
 
