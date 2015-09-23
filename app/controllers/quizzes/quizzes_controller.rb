@@ -383,7 +383,6 @@ class Quizzes::QuizzesController < ApplicationController
 
             if params[:assignment] && Assignment.sis_grade_export_enabled?(@context)
               @quiz.assignment.post_to_sis = params[:assignment][:post_to_sis]
-              @quiz.assignment.save
             end
           end
 
@@ -401,6 +400,10 @@ class Quizzes::QuizzesController < ApplicationController
               @quiz.published_at = Time.now
             end
             @quiz.save!
+          end
+
+          if old_assignment
+            @quiz.assignment.save
           end
 
           batch_update_assignment_overrides(@quiz,overrides) unless overrides.nil?
