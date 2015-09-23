@@ -313,6 +313,11 @@ class Account < ActiveRecord::Base
     true
   end
 
+  def enable_self_registration
+    settings[:self_registration] = true
+    save!
+  end
+
   def terms_required?
     Setting.get('terms_required', 'true') == 'true' && root_account.account_terms_required?
   end
