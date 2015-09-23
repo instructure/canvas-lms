@@ -1358,6 +1358,7 @@ define([
         moduleItem.content_details = moduleItem.content_details || {};
 
         var file = new ModuleFile({
+            type: 'file',
             id: moduleItem.content_id || moduleItem.id,
             locked: moduleItem.content_details.locked,
             hidden: moduleItem.content_details.hidden,
@@ -1416,7 +1417,11 @@ define([
         for (i = 0; i < items.length; i++) {
           item = items[i];
           parsedAttrs = item.model.parse(attrs);
-          item.model.set({published: parsedAttrs.published});
+          if (parsedAttrs.type == 'File') {
+            item.model.set({locked: !parsedAttrs.published});
+          } else {
+            item.model.set({published: parsedAttrs.published});
+          }
         }
       }
     };

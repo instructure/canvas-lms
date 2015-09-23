@@ -1060,6 +1060,11 @@ class Attachment < ActiveRecord::Base
 
   def published?; !locked?; end
 
+  def publish!
+    self.locked = false
+    save!
+  end
+
   def just_hide
     self.file_state == 'hidden'
   end
