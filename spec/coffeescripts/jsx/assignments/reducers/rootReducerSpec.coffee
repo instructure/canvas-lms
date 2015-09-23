@@ -99,6 +99,53 @@ define [
 
     deepEqual newState.students, expected, 'successfully updates moderation set'
 
+  test "sets all the students on_moderation_stage property to true on SELECT_ALL_STUDENTS", ->
+    initialState =
+      students: [{id: 1},{id: 2}]
+    selectAllStudentsAction =
+      type: 'SELECT_ALL_STUDENTS'
+      payload:
+        students: [{id: 1},{id: 2}]
+    newState = rootReducer(initialState, selectAllStudentsAction)
+    expected = [{id: 1, on_moderation_stage: true},{id: 2, on_moderation_stage: true}]
+
+    deepEqual newState.students, expected, 'successfully updates all students on_moderation_stage property'
+
+  test "sets all the students on_moderation_stage property to false on UNSELECT_ALL_STUDENTS", ->
+    initialState =
+      students: [{id: 1, on_moderation_stage: true},{id: 2, on_moderation_stage: true}]
+    unselectAllStudentsAction =
+      type: 'UNSELECT_ALL_STUDENTS'
+    newState = rootReducer(initialState, unselectAllStudentsAction)
+    expected = [{id: 1, on_moderation_stage: false},{id: 2, on_moderation_stage: false}]
+
+    deepEqual newState.students, expected, 'successfully updates all students on_moderation_stage property'
+
+  test "sets on_moderation_stage property to true on SELECT_STUDENT", ->
+    initialState =
+      students: [{id: 1},{id: 2}]
+    selectStudentAction =
+      type: 'SELECT_STUDENT'
+      payload:
+        studentId: 2
+    newState = rootReducer(initialState, selectStudentAction)
+    expected = [{id: 1},{id: 2, on_moderation_stage: true}]
+
+    deepEqual newState.students, expected, 'successfully updates student on_moderation_stage property'
+
+
+  test "sets on_moderation_stage property to false on UNSELECT_STUDENT", ->
+    initialState =
+      students: [{id: 1, on_moderation_stage: true},{id: 2}]
+    unselectStudentAction =
+      type: 'UNSELECT_STUDENT'
+      payload:
+        studentId: 1
+    newState = rootReducer(initialState, unselectStudentAction)
+    expected = [{id: 1, on_moderation_stage: false},{id: 2}]
+
+    deepEqual newState.students, expected, 'successfully updates student on_moderation_stage property'
+
   module "urls reducer",
 
   test "passes through whatever the current state is", ->
@@ -128,6 +175,7 @@ define [
 
   test "adds student to the moderation stage on SELECT_STUDENT", ->
     initialState =
+      students: [{id: 1}, {id: 2}, {id: 3}, {id: 10}]
       moderationStage: [1, 2, 3]
     selectStudentAction =
       type: 'SELECT_STUDENT'
@@ -140,13 +188,37 @@ define [
 
   test "removes student from the moderationStage on UNSELECT_STUDENT", ->
     initialState =
+      students: [{id: 1}, {id: 2}, {id: 3}]
       moderationStage: [1, 2, 3]
-    unselectStudentActin =
+    unselectStudentAction =
       type: 'UNSELECT_STUDENT'
       payload:
         studentId: 2
-    newState = rootReducer(initialState, unselectStudentActin)
+    newState = rootReducer(initialState, unselectStudentAction)
     expected = [1, 3]
+
+    deepEqual newState.moderationStage, expected, 'updates state'
+
+  test "adds all students to the moderation stage on SELECT_ALL_STUDENTS", ->
+    initialState =
+      students: [{id: 1}, {id: 2}, {id: 3}, {id: 10}]
+      moderationStage: [1, 2, 3]
+    selectAllStudentsAction =
+      type: 'SELECT_ALL_STUDENTS'
+      payload:
+        students: [{id: 1}, {id: 2}, {id: 3}, {id: 10}]
+    newState = rootReducer(initialState, selectAllStudentsAction)
+    expected = [1, 2, 3, 10]
+
+    deepEqual newState.moderationStage, expected, 'updates state'
+
+  test "clears the moderation stage on UNSELECT_ALL_STUDENTS", ->
+    initialState =
+      moderationStage: [1, 2, 3]
+    unselectAllStudentsAction =
+      type: 'UNSELECT_ALL_STUDENTS'
+    newState = rootReducer(initialState, unselectAllStudentsAction)
+    expected = []
 
     deepEqual newState.moderationStage, expected, 'updates state'
 

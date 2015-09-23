@@ -47,6 +47,46 @@ define([
     return studentList;
   }
 
+  studentHandlers[ModerationActions.SELECT_ALL_STUDENTS] = (state, action) => {
+    return state.map((student) => {
+      student.on_moderation_stage = true;
+      return student;
+    });
+  };
+
+  studentHandlers[ModerationActions.UNSELECT_ALL_STUDENTS] = (state, action) => {
+    return state.map((student) => {
+      student.on_moderation_stage = false;
+      return student;
+    });
+  };
+
+  studentHandlers[ModerationActions.SELECT_STUDENT] = (state, action) => {
+    var newState = state.slice();
+    // For some odd stupid reason, our underscore/lodash doesn't have _.findIndex
+    var studentObj = _.find(newState, (student) => {
+      return student.id === action.payload.studentId;
+    });
+    var studentIndex = newState.indexOf(studentObj);
+    if (studentIndex > -1) {
+      newState[studentIndex].on_moderation_stage = true;
+    }
+    return newState;
+  };
+
+  studentHandlers[ModerationActions.UNSELECT_STUDENT] = (state, action) => {
+    var newState = state.slice();
+    // For some odd stupid reason, our underscore/lodash doesn't have _.findIndex
+    var studentObj = _.find(newState, (student) => {
+      return student.id === action.payload.studentId;
+    });
+    var studentIndex = newState.indexOf(studentObj);
+    if (studentIndex > -1) {
+      newState[studentIndex].on_moderation_stage = false;
+    }
+    return newState;
+  };
+
   studentHandlers[ModerationActions.UPDATED_MODERATION_SET] = (state, action) => {
     var idsAdded = action.payload.students.map((student) => student.id);
     return state.map((student) => {
@@ -111,6 +151,17 @@ define([
 
   moderationStageHandlers[ModerationActions.UNSELECT_STUDENT] = (state, action) => {
     return _.without(state, action.payload.studentId);
+  };
+
+  moderationStageHandlers[ModerationActions.SELECT_ALL_STUDENTS] = (state, action) => {
+    // Extract out just the studentIds
+    var ids = action.payload.students.map((student) => student.id);
+    // Make sure we don't have dulplicates hence the union
+    return _.union(state, ids);
+  };
+
+  moderationStageHandlers[ModerationActions.UNSELECT_ALL_STUDENTS] = (state, action) => {
+    return [];
   };
 
   moderationStageHandlers[ModerationActions.UPDATED_MODERATION_SET] = (state, action) => {

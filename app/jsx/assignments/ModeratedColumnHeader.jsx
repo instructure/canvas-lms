@@ -2,8 +2,9 @@
 
 define([
   'react',
-  './constants'
-], function (React, Constants) {
+  './constants',
+  './actions/ModerationActions'
+], function (React, Constants, ModerationActions) {
   var ModeratedColumnHeader = React.createClass({
     displayName: 'ModeratedColumnHeader',
     propTypes:{
@@ -12,6 +13,17 @@ define([
       handleSortByThisColumn: React.PropTypes.func.isRequired,
       includeModerationSetHeaders: React.PropTypes.bool
     },
+
+    handleSelectAll (event) {
+      if (event.target.checked) {
+        var allStudents = this.props.store.getState().students;
+        this.props.store.dispatch(ModerationActions.selectAllStudents(allStudents));
+      } else {
+        this.props.store.dispatch(ModerationActions.unselectAllStudents());
+      }
+
+    },
+
     renderLinkArrow (mark) {
       if (mark === this.props.markColumn){
         if (this.props.currentSortDirection === Constants.sortDirections.HIGHEST){
@@ -42,7 +54,7 @@ define([
       return (
         <div className='ColumnHeader'>
           <div className='ColumnHeader__StudentName'>
-            <input type='checkbox' />
+            <input type='checkbox' onChange={this.handleSelectAll} />
             <strong>Student</strong>
           </div>
           <div className='ColumnHeader__ColumnItem'>

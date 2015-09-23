@@ -92,7 +92,7 @@ define([
                 <li className='AssignmentList__Item'>
                   <div className='AssignmentList__StudentInfo'>
                     <input
-                      checked={student.in_moderation_set || student.isChecked}
+                      checked={student.on_moderation_stage || student.in_moderation_set || student.isChecked}
                       disabled={student.in_moderation_set || this.props.assignment.published}
                       type='checkbox'
                       onChange={this.props.handleCheckbox.bind(this, student)}

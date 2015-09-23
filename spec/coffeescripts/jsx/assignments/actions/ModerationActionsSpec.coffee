@@ -35,12 +35,12 @@ define [
     deepEqual action, expected, "creates the action successfully"
 
   test "creates the UPDATED_MODERATION_SET action", ->
-    action = ModerationActions.moderationSetUpdated([{a: 1}, {a: 2}])
+    action = ModerationActions.moderationSetUpdated([{a: 1}, {b: 2}])
     expected =
       type: ModerationActions.UPDATED_MODERATION_SET
       payload:
         message: 'Reviewers successfully added'
-        students: [{a: 1}, {a: 2}]
+        students: [{a: 1}, {b: 2}]
         time: Date.now()
 
     equal action.type, expected.type, "type matches"
@@ -93,6 +93,22 @@ define [
     equal action.payload.message, expected.payload.message, "message matches"
     ok action.error, "error flag is set"
     ok expected.payload.time - action.payload.time < 5, "time within 5 seconds"
+
+  test "creates the SELECT_ALL_STUDENTS action", ->
+    action = ModerationActions.selectAllStudents([{id: 1}, {id: 2}])
+    expected =
+      type: ModerationActions.SELECT_ALL_STUDENTS
+      payload:
+        students: [{id: 1}, {id: 2}]
+
+    deepEqual action, expected, "creates the action successfully"
+
+  test "creates the UNSELECT_ALL_STUDENTS action", ->
+    action = ModerationActions.unselectAllStudents()
+    expected =
+      type: ModerationActions.UNSELECT_ALL_STUDENTS
+
+    deepEqual action, expected, "creates the action successfully"
 
 
   module "ModerationActions#apiGetStudents",

@@ -24,7 +24,7 @@ define([
       return {
         type: this.SORT_MARK_COLUMN,
         payload: markColumnData
-      }
+      };
     },
 
     selectStudent (studentId) {
@@ -38,6 +38,19 @@ define([
       return {
         type: this.UNSELECT_STUDENT,
         payload: { studentId }
+      };
+    },
+
+    selectAllStudents (students) {
+      return {
+        type: this.SELECT_ALL_STUDENTS,
+        payload: { students }
+      };
+    },
+
+    unselectAllStudents () {
+      return {
+        type: this.UNSELECT_ALL_STUDENTS
       };
     },
 

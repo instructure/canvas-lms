@@ -60,8 +60,18 @@ define([
           <FlashMessageHolder store={this.props.store} />
           <h1 className='screenreader-only'>{I18n.t('Moderate %{assignment_name}', {assignment_name: 'TODO!!!!!!!!'})}</h1>
           <Header store={this.props.store} actions={Actions} />
-          <ModeratedColumnHeader includeModerationSetHeaders={this.isModerationSet(this.state.students)} handleSortByThisColumn={this.handleSortByThisColumn} currentSortDirection={this.state.markColumnSort.currentSortDirection} markColumn={this.state.markColumnSort.markColumn} />
-          <ModeratedStudentList includeModerationSetColumns={this.isModerationSet(this.state.students)} handleCheckbox={this.handleCheckbox} {...this.state} />
+          <ModeratedColumnHeader 
+            includeModerationSetHeaders={this.isModerationSet(this.state.students)}
+            handleSortByThisColumn={this.handleSortByThisColumn}
+            currentSortDirection={this.state.markColumnSort.currentSortDirection}
+            markColumn={this.state.markColumnSort.markColumn}
+            store={this.props.store}
+          />
+           <ModeratedStudentList 
+             includeModerationSetColumns={this.isModerationSet(this.state.students)}
+             handleCheckbox={this.handleCheckbox} 
+             {...this.state}
+           />
         </div>
       );
     }
