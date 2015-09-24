@@ -6,17 +6,22 @@ require [
 ], ($, React, ModerationApp, configureStore) ->
 
   store = configureStore({
-    moderationStage: [],
-    students: [],
-    urls: window.ENV.URLS
-    flashMessage: {
-      time: Date.now(),
-      message: '',
-      error: false
+    studentList: {
+      students: [],
+      sort: {
+        direction: 'asc',
+        column: 'student_name'
+      }
     },
     assignment: {
       published: window.ENV.GRADES_PUBLISHED
-    }
+    },
+    flashMessage: {
+      error: false,
+      message: '',
+      time: Date.now()
+    },
+    urls: window.ENV.URLS,
   })
 
   React.render(ModerationApp(store: store), $('#assignment_moderation')[0])

@@ -6,97 +6,135 @@ define([
   '../actions/ModerationActions',
   './../constants'
 ], function (_, Redux, ModerationActions, Constants) {
+  // CONSTANTS //
+  var ASCENDING = Constants.sortDirections.ASCENDING;
+  var DESCENDING = Constants.sortDirections.DESCENDING;
+  var MARK1 = Constants.markColumnNames.MARK_ONE;
+  var MARK2 = Constants.markColumnNames.MARK_TWO;
+  var MARK3 = Constants.markColumnNames.MARK_THREE;
+  var MARK1_PROVISIONAL_GRADE_INDEX = 0;
+  var MARK2_PROVISIONAL_GRADE_INDEX = 1;
+  var MARK3_PROVISIONAL_GRADE_INDEX = 2;
 
-  var { combineReducers } = Redux;
+  // PRIVATE FUNCTIONS //
+  function __sortMarkColumn(state, action, column, provisionalGradeIndex) {
+    var newState = _.extend({}, state);
 
-  /**
-   * Student Handlers
-   */
-  var studentHandlers = {};
-
-  studentHandlers[ModerationActions.GOT_STUDENTS] = (state, action) => {
-    return state.concat(action.payload.students);
-  };
-
-  studentHandlers[ModerationActions.SORT_MARK_COLUMN] = (state, action) => {
-    if(action.payload.markColumn == undefined){
-      return (state || []);
+    var previouslySortedAsDescending = state.sort.column === column && state.sort.direction === DESCENDING
+    if(previouslySortedAsDescending){
+      newState.students = __sortStudentsByMark(newState.students, ASCENDING, provisionalGradeIndex);
+      newState.sort.direction = ASCENDING;
+    }else{
+      newState.students = __sortStudentsByMark(newState.students, DESCENDING, provisionalGradeIndex);
+      newState.sort.direction = DESCENDING
     }
 
-    // We are just toggling the sort order from what it previously was. If there was no previous
-    // then we default to sorting by highest/ascending
-    var studentList = _.sortBy(state, (student) => {
-      var provisionalGrade = student.provisional_grades[action.payload.markColumn]
+    newState.sort.column = column;
+    return newState;
+  }
+
+  function __sortStudentsByMark(students, direction, provisionalGradeIndex) {
+    var studentList = _.sortBy(students, (student) => {
+      var provisionalGrade = student.provisional_grades[provisionalGradeIndex]
       if (provisionalGrade) {
         return provisionalGrade.score;
       }
 
       return 0; // no score is sorted down
-    })
+    });
 
-    // if no sort direction has been set, default to descending order
-    var sortToHighest = (
-      action.payload.currentSortDirection === Constants.sortDirections.LOWEST) ||
-      action.payload.currentSortDirection === undefined ||
-      action.payload.previousMarkColumn != action.payload.markColumn;
-
-    if (sortToHighest){
-      return studentList.reverse();
+    if(direction === DESCENDING){
+      studentList.reverse();
     }
 
     return studentList;
   }
 
+  var { combineReducers } = Redux;
+  /**
+   * Student Handlers
+   */
+  var studentHandlers = {};
+  studentHandlers[ModerationActions.GOT_STUDENTS] = (state, action) => {
+    var newState = _.extend({}, state);
+    newState.students = newState.students.concat(action.payload.students);
+    return newState;
+  };
+
+  studentHandlers[ModerationActions.SORT_MARK1_COLUMN] = (state, action) => {
+    return(__sortMarkColumn(state, action, MARK1, MARK1_PROVISIONAL_GRADE_INDEX));
+  }
+
+  studentHandlers[ModerationActions.SORT_MARK2_COLUMN] = (state, action) => {
+    return(__sortMarkColumn(state, action, MARK2, MARK2_PROVISIONAL_GRADE_INDEX));
+  }
+
+  studentHandlers[ModerationActions.SORT_MARK3_COLUMN] = (state, action) => {
+    return(__sortMarkColumn(state, action, MARK3, MARK3_PROVISIONAL_GRADE_INDEX));
+  }
+
   studentHandlers[ModerationActions.SELECT_ALL_STUDENTS] = (state, action) => {
-    return state.map((student) => {
+    var newState = _.extend({}, state);
+
+    newState.students = newState.students.map((student) => {
       student.on_moderation_stage = true;
       return student;
     });
+
+    return newState;
   };
 
   studentHandlers[ModerationActions.UNSELECT_ALL_STUDENTS] = (state, action) => {
-    return state.map((student) => {
+    var newState = _.extend({}, state);
+
+    newState.students = newState.students.map((student) => {
       student.on_moderation_stage = false;
       return student;
     });
+
+    return newState;
   };
 
   studentHandlers[ModerationActions.SELECT_STUDENT] = (state, action) => {
-    var newState = state.slice();
+    var newState = _.extend({}, state);
     // For some odd stupid reason, our underscore/lodash doesn't have _.findIndex
-    var studentObj = _.find(newState, (student) => {
+    var studentObj = _.find(newState.students, (student) => {
       return student.id === action.payload.studentId;
     });
-    var studentIndex = newState.indexOf(studentObj);
+    var studentIndex = newState.students.indexOf(studentObj);
     if (studentIndex > -1) {
-      newState[studentIndex].on_moderation_stage = true;
+      newState.students[studentIndex].on_moderation_stage = true;
     }
     return newState;
   };
 
   studentHandlers[ModerationActions.UNSELECT_STUDENT] = (state, action) => {
-    var newState = state.slice();
+    var newState = _.extend({}, state);
     // For some odd stupid reason, our underscore/lodash doesn't have _.findIndex
-    var studentObj = _.find(newState, (student) => {
+    var studentObj = _.find(newState.students, (student) => {
       return student.id === action.payload.studentId;
     });
-    var studentIndex = newState.indexOf(studentObj);
+    var studentIndex = newState.students.indexOf(studentObj);
     if (studentIndex > -1) {
-      newState[studentIndex].on_moderation_stage = false;
+      newState.students[studentIndex].on_moderation_stage = false;
     }
     return newState;
   };
 
   studentHandlers[ModerationActions.UPDATED_MODERATION_SET] = (state, action) => {
+    var newState = _.extend({}, state);
     var idsAdded = action.payload.students.map((student) => student.id);
-    return state.map((student) => {
+    newState.students = newState.students.map((student) => {
       if (_.contains(idsAdded, student.id)) {
         student.in_moderation_set = true;
+        student.on_moderation_stage = false;
         return student;
       } else {
         return student;
       }
     });
+
+    return newState;
   };
 
   /**
@@ -175,8 +213,15 @@ define([
     return state || {};
   }
 
-  function students (state, action) {
-    state = state || [];
+  function studentList (state, action) {
+    state = state || {
+      students: [],
+      sort: {
+        direction: '',
+        column: ''
+      }
+    };
+
     var handler = studentHandlers[action.type];
     if (handler) return handler(state, action);
     return state;
@@ -200,38 +245,11 @@ define([
     return state;
   }
 
-  function moderationStage (state, action) {
-    state = state || [];
-    var handler = moderationStageHandlers[action.type]
-    if (handler) return handler(state, action);
-    return state;
-  }
-
-  function markColumnSort (state, action) {
-    state = state || {}
-    if (action.type === ModerationActions.SORT_MARK_COLUMN) {
-      var newState = _.extend({}, state);
-
-      var togglingColumn = action.payload.markColumn === state.markColumn;
-      var sortDirectionIsHighest = action.payload.currentSortDirection === Constants.sortDirections.HIGHEST;
-      if(togglingColumn && sortDirectionIsHighest){
-        newState.currentSortDirection = Constants.sortDirections.LOWEST;
-      }else{
-        newState.currentSortDirection = Constants.sortDirections.HIGHEST;
-      }
-      newState.markColumn = action.payload.markColumn;
-      return newState;
-    }
-    return state;
-  }
-
   return combineReducers({
-   students,
+   studentList,
    urls,
    flashMessage,
-   assignment,
-   moderationStage,
-   markColumnSort
+   assignment
   });
 
 });

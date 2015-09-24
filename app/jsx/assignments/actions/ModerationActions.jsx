@@ -2,8 +2,9 @@
 
 define([
   'axios',
-  'i18n!moderated_grading'
-], function (axios, I18n) {
+  'i18n!moderated_grading',
+  'underscore'
+], function (axios, I18n, _) {
 
   var ModerationActions = {
 
@@ -18,12 +19,25 @@ define([
     PUBLISHED_GRADES: 'PUBLISHED_GRADES',
     PUBLISHED_GRADES_FAILED: 'PUBLISHED_GRADES_FAILED',
     GOT_STUDENTS: 'GOT_STUDENTS',
-    SORT_MARK_COLUMN: 'SORT_MARK_COLUMN',
+    SORT_MARK1_COLUMN: 'SORT_MARK1_COLUMN',
+    SORT_MARK2_COLUMN: 'SORT_MARK2_COLUMN',
+    SORT_MARK3_COLUMN: 'SORT_MARK3_COLUMN',
 
-    sortMarkColumn (markColumnData) {
+    sortMark1Column () {
       return {
-        type: this.SORT_MARK_COLUMN,
-        payload: markColumnData
+        type: this.SORT_MARK1_COLUMN
+      };
+    },
+
+    sortMark2Column () {
+      return {
+        type: this.SORT_MARK2_COLUMN
+      };
+    },
+
+    sortMark3Column () {
+      return {
+        type: this.SORT_MARK3_COLUMN
       };
     },
 
@@ -127,7 +141,12 @@ define([
         var endpoint = getState().urls.add_moderated_students;
         ajaxLib = ajaxLib || axios;
         ajaxLib.post(endpoint, {
-                  student_ids: getState().moderationStage
+          student_ids: _.reduce(getState().studentList.students, (ids, student) => {
+            if(student.on_moderation_stage){
+              ids.push(student.id);
+            }
+            return ids;
+          }, [])
                })
                .then((response) => {
                  dispatch(this.moderationSetUpdated(response.data));

@@ -6,17 +6,22 @@ define([
   './constants'
 ], function (React, ModerationActions, Constants) {
 
+  // CONSTANTS
+  var PG_ONE_INDEX = 0;
+  var PG_TWO_INDEX = 1;
+  var PG_THREE_INDEX = 2;
+
   return React.createClass({
 
     propTypes: {
-      students: React.PropTypes.arrayOf(React.PropTypes.object).isRequired,
+      studentList: React.PropTypes.object.isRequired,
       assignment: React.PropTypes.object.isRequired,
       handleCheckbox: React.PropTypes.func.isRequired,
       includeModerationSetColumns: React.PropTypes.bool
     },
 
-    renderStudentMark (student, mark_number) {
-      if (student.provisional_grades && student.provisional_grades[mark_number]) {
+    renderStudentMark (student, markIndex) {
+      if (student.provisional_grades && student.provisional_grades[markIndex]) {
           if (this.props.includeModerationSetColumns){
             return (
               <div className='ModeratedAssignmentList__Mark'>
@@ -25,13 +30,13 @@ define([
                      name={`mark_${student.id}`}
                      disabled={this.props.assignment.published}
                     />
-                <a href={student.provisional_grades[mark_number].speedgrader_url}>{student.provisional_grades[mark_number].score}</a>
+                <a href={student.provisional_grades[markIndex].speedgrader_url}>{student.provisional_grades[markIndex].score}</a>
               </div>
             );
           }else{
             return(
               <div className='AssignmentList__Mark'>
-                <a href={student.provisional_grades[mark_number].speedgrader_url}>{student.provisional_grades[mark_number].score}</a>
+                <a href={student.provisional_grades[markIndex].speedgrader_url}>{student.provisional_grades[markIndex].score}</a>
               </div>
             );
           }
@@ -67,7 +72,7 @@ define([
       return (
         <ul className='ModeratedAssignmentList'>
           {
-            this.props.students.map((student) => {
+            this.props.studentList.students.map((student) => {
               if(this.props.includeModerationSetColumns){
                 return (
                   <li className='ModeratedAssignmentList__Item'>
@@ -81,9 +86,9 @@ define([
                       <img className='img-circle AssignmentList_StudentPhoto' src={student.avatar_image_url} />
                       <span>{student.display_name}</span>
                     </div>
-                    {this.renderStudentMark(student, Constants.markColumn.MARK_ONE)}
-                    {this.renderStudentMark(student, Constants.markColumn.MARK_TWO)}
-                    {this.renderStudentMark(student, Constants.markColumn.MARK_THREE)}
+                    {this.renderStudentMark(student, PG_ONE_INDEX)}
+                    {this.renderStudentMark(student, PG_TWO_INDEX)}
+                    {this.renderStudentMark(student, PG_THREE_INDEX)}
                     {this.renderFinalGrade(student)}
                   </li>
                  );
@@ -100,7 +105,7 @@ define([
                       <img className='img-circle AssignmentList_StudentPhoto' src={student.avatar_image_url} />
                       <span>{student.display_name}</span>
                     </div>
-                    {this.renderStudentMark(student, Constants.markColumn.MARK_ONE)}
+                    {this.renderStudentMark(student, PG_ONE_INDEX)}
                   </li>
                 );
               }

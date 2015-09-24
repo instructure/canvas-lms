@@ -4,15 +4,24 @@ define [
 ], (whenJS, ModerationActions) ->
 
   module "ModerationActions - Action Creators",
-
-  test 'creates the SORT_MARK_COLUMN action', ->
-    markColumnData =
-               markColumn: 2,
-               currentSortDirection: 'highest'
-    action = ModerationActions.sortMarkColumn(markColumnData)
+  test 'creates the SORT_MARK1_COLUMN action', ->
+    action = ModerationActions.sortMark1Column()
     expected =
-      type: ModerationActions.SORT_MARK_COLUMN
-      payload: markColumnData
+      type: 'SORT_MARK1_COLUMN'
+
+    deepEqual action, expected, "creates the action successfully"
+
+  test 'creates the SORT_MARK2_COLUMN action', ->
+    action = ModerationActions.sortMark2Column()
+    expected =
+      type: 'SORT_MARK2_COLUMN'
+
+    deepEqual action, expected, "creates the action successfully"
+
+  test 'creates the SORT_MARK3_COLUMN action', ->
+    action = ModerationActions.sortMark3Column()
+    expected =
+      type: 'SORT_MARK3_COLUMN'
 
     deepEqual action, expected, "creates the action successfully"
 
@@ -231,10 +240,15 @@ define [
     ok typeof ModerationActions.addStudentToModerationSet() == 'function'
 
   asyncTest "dispatches moderationSetUpdated on success", ->
+    fakeUrl = 'some_url'
     getState = ->
       urls:
-        add_moderated_students: 'some_url'
-      moderationStage: [1, 2]
+        add_moderated_students: fakeUrl
+      studentList:
+        students: [
+          {id: 1, on_moderation_stage: true},
+          {id: 2, on_moderation_stage: true}
+        ]
     fakeResponse =
       status: 200
       students: [{id: 1}, {id: 2}]
@@ -244,8 +258,9 @@ define [
       payload:
         message: 'Reviewers successfully added'
 
-    sinon.stub(@client, 'post').returns(whenJS(fakeResponse))
+    fakePost = sinon.stub(@client, 'post').returns(whenJS(fakeResponse))
     ModerationActions.addStudentToModerationSet(@client)((action) ->
+      ok fakePost.calledWith(fakeUrl, {student_ids: [1, 2]}), 'called with the correct params'
       equal action.type, moderationSetUpdatedAction.type, 'type matches'
       equal action.payload.message, moderationSetUpdatedAction.payload.message, 'has proper message'
       start()
@@ -255,7 +270,11 @@ define [
     getState = ->
       urls:
         add_moderated_students: 'some_url'
-      moderationStage: [1, 2]
+      studentList:
+        students: [
+          {id: 1, on_moderation_stage: true},
+          {id: 2, on_moderation_stage: true}
+        ]
     fakeResponse =
       status: 500
 

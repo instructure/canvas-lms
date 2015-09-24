@@ -3,13 +3,13 @@
 define([], function () {
   return {
     sortDirections: {
-      HIGHEST: 'HIGHEST',
-      LOWEST: 'LOWEST'
+      ASCENDING: 'ASCENDING',
+      DESCENDING: 'DESCENDING'
     },
-    markColumn: {
-      MARK_ONE: 0,
-      MARK_TWO: 1,
-      MARK_THREE: 2
+    markColumnNames: {
+      MARK_ONE: 'MARK1',
+      MARK_TWO: 'MARK2',
+      MARK_THREE: 'MARK3'
     }
   }
 });

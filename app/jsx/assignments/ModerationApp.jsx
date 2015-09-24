@@ -37,18 +37,6 @@ define([
         this.props.store.dispatch(Actions.unselectStudent(student.id));
       }
     },
-
-    handleSortByThisColumn (mark, props) {
-      this.props.store.dispatch(
-        Actions.sortMarkColumn(
-          {
-            previousMarkColumn: props.markColumn,
-            markColumn: mark,
-            currentSortDirection: props.currentSortDirection
-          }
-        )
-      );
-    },
     isModerationSet (students) {
       return (_.find(students, (student) => {
         return student.in_moderation_set
@@ -65,15 +53,17 @@ define([
             published={this.state.assignment.published}
           />
           <ModeratedColumnHeader
-            includeModerationSetHeaders={this.isModerationSet(this.state.students)}
-            handleSortByThisColumn={this.handleSortByThisColumn}
-            currentSortDirection={this.state.markColumnSort.currentSortDirection}
-            markColumn={this.state.markColumnSort.markColumn}
+            includeModerationSetHeaders={this.isModerationSet(this.state.studentList.students)}
+            sortDirection={this.state.studentList.sort.direction}
+            markColumn={this.state.studentList.sort.column}
             store={this.props.store}
+            handleSortMark1={() => this.props.store.dispatch(Actions.sortMark1Column())}
+            handleSortMark2={() => this.props.store.dispatch(Actions.sortMark2Column())}
+            handleSortMark3={() => this.props.store.dispatch(Actions.sortMark3Column())}
           />
-           <ModeratedStudentList
-             includeModerationSetColumns={this.isModerationSet(this.state.students)}
-             handleCheckbox={this.handleCheckbox}
+           <ModeratedStudentList 
+             includeModerationSetColumns={this.isModerationSet(this.state.studentList.students)}
+             handleCheckbox={this.handleCheckbox} 
              {...this.state}
            />
         </div>

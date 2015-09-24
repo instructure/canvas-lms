@@ -1,8 +1,9 @@
 define [
+  'underscore'
   "jsx/assignments/reducers/rootReducer"
   "jsx/assignments/constants"
   "jsx/assignments/actions/ModerationActions"
-], (rootReducer, Constants, ModerationActions) ->
+], (_, rootReducer, Constants, ModerationActions) ->
   fakeStudents =
       [
         {
@@ -30,7 +31,28 @@ define [
             'provisional_grade_id': 10
             'grade_matches_current_submission': true
             'speedgrader_url': 'http://localhost:3000/courses/1/gradebook/speed_grader?assignment_id=1#%7B%22student_id%22:3,%22provisional_grade_id%22:10%7D'
-          } ]
+          }
+          {
+            'grade': '10'
+            'score': '10'
+            'graded_at': '2015-09-11T15:42:28Z'
+            'scorer_id': 1
+            'final': false
+            'provisional_grade_id': 10
+            'grade_matches_current_submission': true
+            'speedgrader_url': 'http://localhost:3000/courses/1/gradebook/speed_grader?assignment_id=1#%7B%22student_id%22:3,%22provisional_grade_id%22:10%7D'
+          }
+          {
+            'grade': '1'
+            'score': '1'
+            'graded_at': '2015-09-11T15:42:28Z'
+            'scorer_id': 1
+            'final': false
+            'provisional_grade_id': 10
+            'grade_matches_current_submission': true
+            'speedgrader_url': 'http://localhost:3000/courses/1/gradebook/speed_grader?assignment_id=1#%7B%22student_id%22:3,%22provisional_grade_id%22:10%7D'
+          }
+          ]
         }
         {
           'id': 4
@@ -60,48 +82,55 @@ define [
               'grade_matches_current_submission': true
               'speedgrader_url': 'http://localhost:3000/courses/1/gradebook/speed_grader?assignment_id=1#%7B%22student_id%22:4,%22provisional_grade_id%22:13%7D'
             }
+            {
+              'grade': '6'
+              'score': 6
+              'graded_at': '2015-09-21T17:23:43Z'
+              'scorer_id': 1
+              'final': true
+              'provisional_grade_id': 13
+              'grade_matches_current_submission': true
+              'speedgrader_url': 'http://localhost:3000/courses/1/gradebook/speed_grader?assignment_id=1#%7B%22student_id%22:4,%22provisional_grade_id%22:13%7D'
+            }
           ]
-        }
-        {
-          'id': 5
-          'display_name': 'c@example.edu'
-          'avatar_image_url': 'https://canvas.instructure.com/images/messages/avatar-50.png'
-          'html_url': 'http://localhost:3000/courses/1/users/5'
-          'in_moderation_set': false
-          'selected_provisional_grade_id': null
-          'provisional_grades': []
         }
       ]
 
 
   module "students reducer",
 
-  test "concatenates students handling GOT_STUDENTS", ->
+  test "concatenates students on GOT_STUDENTS", ->
     initialState =
-      students: ['one', 'two']
+      studentList: {
+        students: [{'one': 1}, {'two': 2}]
+      }
     gotStudentsAction =
       type: 'GOT_STUDENTS'
       payload:
-        students: ['three', 'four']
+        students: [{'three': 3}, {'four': 4}]
     newState = rootReducer(initialState, gotStudentsAction)
-    expected = ['one', 'two', 'three', 'four']
-    deepEqual newState.students, expected, 'successfully concatenates'
+    expected = [{'one': 1}, {'two': 2}, {'three': 3}, {'four': 4}]
+    deepEqual newState.studentList.students, expected, 'successfully concatenates'
 
   test "updates the moderation set handling UPDATED_MODERATION_SET", ->
     initialState =
-      students: [{id: 1},{id: 2}]
+      studentList: {
+        students: [{id: 1},{id: 2}]
+      }
     updatedModerationSetAction =
       type: 'UPDATED_MODERATION_SET'
       payload:
         students: [{id: 1},{id: 2}]
     newState = rootReducer(initialState, updatedModerationSetAction)
-    expected = [{id: 1, in_moderation_set: true},{id: 2, in_moderation_set: true}]
+    expected = [{id: 1, in_moderation_set: true, on_moderation_stage: false},{id: 2, in_moderation_set: true, on_moderation_stage: false}]
 
-    deepEqual newState.students, expected, 'successfully updates moderation set'
+    deepEqual newState.studentList.students, expected, 'successfully updates moderation set'
 
   test "sets all the students on_moderation_stage property to true on SELECT_ALL_STUDENTS", ->
     initialState =
-      students: [{id: 1},{id: 2}]
+      studentList: {
+        students: [{id: 1},{id: 2}]
+      }
     selectAllStudentsAction =
       type: 'SELECT_ALL_STUDENTS'
       payload:
@@ -109,21 +138,23 @@ define [
     newState = rootReducer(initialState, selectAllStudentsAction)
     expected = [{id: 1, on_moderation_stage: true},{id: 2, on_moderation_stage: true}]
 
-    deepEqual newState.students, expected, 'successfully updates all students on_moderation_stage property'
+    deepEqual newState.studentList.students, expected, 'successfully updates all students on_moderation_stage property'
 
   test "sets all the students on_moderation_stage property to false on UNSELECT_ALL_STUDENTS", ->
     initialState =
-      students: [{id: 1, on_moderation_stage: true},{id: 2, on_moderation_stage: true}]
+      studentList:
+        students: [{id: 1, on_moderation_stage: true},{id: 2, on_moderation_stage: true}]
     unselectAllStudentsAction =
       type: 'UNSELECT_ALL_STUDENTS'
     newState = rootReducer(initialState, unselectAllStudentsAction)
     expected = [{id: 1, on_moderation_stage: false},{id: 2, on_moderation_stage: false}]
 
-    deepEqual newState.students, expected, 'successfully updates all students on_moderation_stage property'
+    deepEqual newState.studentList.students, expected, 'successfully updates all students on_moderation_stage property'
 
   test "sets on_moderation_stage property to true on SELECT_STUDENT", ->
     initialState =
-      students: [{id: 1},{id: 2}]
+      studentList:
+        students: [{id: 1},{id: 2}]
     selectStudentAction =
       type: 'SELECT_STUDENT'
       payload:
@@ -131,12 +162,13 @@ define [
     newState = rootReducer(initialState, selectStudentAction)
     expected = [{id: 1},{id: 2, on_moderation_stage: true}]
 
-    deepEqual newState.students, expected, 'successfully updates student on_moderation_stage property'
+    deepEqual newState.studentList.students, expected, 'successfully updates student on_moderation_stage property'
 
 
   test "sets on_moderation_stage property to false on UNSELECT_STUDENT", ->
     initialState =
-      students: [{id: 1, on_moderation_stage: true},{id: 2}]
+      studentList:
+        students: [{id: 1, on_moderation_stage: true},{id: 2}]
     unselectStudentAction =
       type: 'UNSELECT_STUDENT'
       payload:
@@ -144,7 +176,21 @@ define [
     newState = rootReducer(initialState, unselectStudentAction)
     expected = [{id: 1, on_moderation_stage: false},{id: 2}]
 
-    deepEqual newState.students, expected, 'successfully updates student on_moderation_stage property'
+    deepEqual newState.studentList.students, expected, 'successfully updates student on_moderation_stage property'
+
+  test "set the on_moderation_stage to false from all students on UPDATED_MODERATION_SET", ->
+    initialState =
+      studentList:
+        students: [{id: 1, on_moderation_stage: true},{id: 2, on_moderation_stage: true}]
+    updatedModerationSetAction =
+      type: 'UPDATED_MODERATION_SET'
+      payload:
+        students: [{id: 1}, {id: 2}, {id: 3}]
+    newState = rootReducer(initialState, updatedModerationSetAction)
+
+    studentsInSet = _.find(newState.studentList.students, (student) => student.on_moderation_stage)
+
+    ok !studentsInSet, 'updates state'
 
   module "urls reducer",
 
@@ -171,80 +217,6 @@ define [
     newState = rootReducer(initialState, publishedGradesAction)
     ok newState.assignment.published, 'successfully sets to publish'
 
-  module "moderationStage reducer",
-
-  test "adds student to the moderation stage on SELECT_STUDENT", ->
-    initialState =
-      students: [{id: 1}, {id: 2}, {id: 3}, {id: 10}]
-      moderationStage: [1, 2, 3]
-    selectStudentAction =
-      type: 'SELECT_STUDENT'
-      payload:
-        studentId: 10
-    newState = rootReducer(initialState, selectStudentAction)
-    expected = [1, 2, 3, 10]
-
-    deepEqual newState.moderationStage, expected, 'updates state'
-
-  test "removes student from the moderationStage on UNSELECT_STUDENT", ->
-    initialState =
-      students: [{id: 1}, {id: 2}, {id: 3}]
-      moderationStage: [1, 2, 3]
-    unselectStudentAction =
-      type: 'UNSELECT_STUDENT'
-      payload:
-        studentId: 2
-    newState = rootReducer(initialState, unselectStudentAction)
-    expected = [1, 3]
-
-    deepEqual newState.moderationStage, expected, 'updates state'
-
-  test "adds all students to the moderation stage on SELECT_ALL_STUDENTS", ->
-    initialState =
-      students: [{id: 1}, {id: 2}, {id: 3}, {id: 10}]
-      moderationStage: [1, 2, 3]
-    selectAllStudentsAction =
-      type: 'SELECT_ALL_STUDENTS'
-      payload:
-        students: [{id: 1}, {id: 2}, {id: 3}, {id: 10}]
-    newState = rootReducer(initialState, selectAllStudentsAction)
-    expected = [1, 2, 3, 10]
-
-    deepEqual newState.moderationStage, expected, 'updates state'
-
-  test "clears the moderation stage on UNSELECT_ALL_STUDENTS", ->
-    initialState =
-      moderationStage: [1, 2, 3]
-    unselectAllStudentsAction =
-      type: 'UNSELECT_ALL_STUDENTS'
-    newState = rootReducer(initialState, unselectAllStudentsAction)
-    expected = []
-
-    deepEqual newState.moderationStage, expected, 'updates state'
-
-  test "clears the moderation stage on UPDATED_MODERATION_SET", ->
-    initialState =
-      moderationStage: [1, 2, 3]
-    updatedModerationSetAction =
-      type: 'UPDATED_MODERATION_SET'
-      payload:
-        students: [{id: 1}, {id: 2}, {id: 3}]
-    newState = rootReducer(initialState, updatedModerationSetAction)
-    expected = []
-
-    deepEqual newState.moderationStage, expected, 'updates state'
-
-  test "clears only the returned students from the moderation stage on UPDATED_MODERATION_SET", ->
-    initialState =
-      moderationStage: [1, 2, 3]
-    updatedModerationSetAction =
-      type: 'UPDATED_MODERATION_SET'
-      payload:
-        students: [{id: 2}, {id: 3}]
-    newState = rootReducer(initialState, updatedModerationSetAction)
-    expected = [1]
-
-    deepEqual newState.moderationStage, expected, 'updates state'
 
   module "flashMessage reducer",
 
@@ -282,6 +254,8 @@ define [
   test "sets success message on UPDATED_MODERATION_SET", ->
     initialState =
       flashMessage: {}
+      studentList:
+        students: []
     updatedModerationSetAction =
       type: 'UPDATED_MODERATION_SET'
       payload:
@@ -311,118 +285,134 @@ define [
       error: true
     deepEqual newState.flashMessage, expected, 'updates state'
 
-  module "sortMarkColumn reducer",
-
-  test 'toggles currentSortDirection to HIGHEST by default on SORT_MARK_COLUMN ', ->
+  module "sorting mark1 column on SORT_MARK1_COLUMN",
+  test 'default to descending order when clicking on a new column', ->
     initialState =
-      markColumnSort:
-        markColumn: 0
-        currentSortDirection: undefined
+      studentList:
+        students: fakeStudents
+        sort:
+          column: undefined
+          direction: undefined
 
-    sortColumnAction =
-      type: ModerationActions.SORT_MARK_COLUMN
-      payload:
-        markColumn: 0,
-        currentSortDirection: undefined
+    updatedModerationSetAction =
+      type: ModerationActions.SORT_MARK1_COLUMN
+    newState = rootReducer(initialState, updatedModerationSetAction)
 
-    newState = rootReducer(initialState, sortColumnAction)
-    expected =
-      markColumn: 0
-      currentSortDirection: Constants.sortDirections.HIGHEST
-    deepEqual newState.markColumnSort, expected, 'updates state'
+    deepEqual newState.studentList.students[0].id, 4, 'sorts the right student to the top'
 
-  test 'toggles currentSortDirection from HIGHEST to LOWEST on SORT_MARK_COLUMN ', ->
+  test 'sorts students to descending order when previously ascending', ->
     initialState =
-      markColumnSort:
-        markColumn: 0
-        currentSortDirection: Constants.sortDirections.HIGHEST
+      studentList:
+        students: fakeStudents
+        sort:
+          column: Constants.markColumnNames.MARK_ONE
+          direction: Constants.sortDirections.ASCENDING
 
-    sortColumnAction =
-      type: ModerationActions.SORT_MARK_COLUMN
-      payload:
-        markColumn: 0,
-        currentSortDirection: Constants.sortDirections.HIGHEST
+    updatedModerationSetAction =
+      type: ModerationActions.SORT_MARK1_COLUMN
+    newState = rootReducer(initialState, updatedModerationSetAction)
 
-    newState = rootReducer(initialState, sortColumnAction)
-    expected =
-      markColumn: 0
-      currentSortDirection: Constants.sortDirections.LOWEST
-    deepEqual newState.markColumnSort, expected, 'updates state'
+    deepEqual newState.studentList.students[0].id, 4, 'sorts the right student to the top'
 
-  test 'sort in descending order if new column selected default on SORT_MARK_COLUMN ', ->
+  test 'sorts students to ascending order when previously descending', ->
     initialState =
-      students: fakeStudents
-      markColumnSort:
-        previousMarkColumn: undefined
-        markColumn: 0
-        currentSortDirection: Constants.sortDirections.HIGHEST
+      studentList:
+        students: fakeStudents
+        sort:
+          column: Constants.markColumnNames.MARK_ONE
+          direction: Constants.sortDirections.DESCENDING
 
-    sortColumnAction =
-      type: ModerationActions.SORT_MARK_COLUMN
-      payload:
-        previousMarkColumn: 1
-        markColumn: 0
-        currentSortDirection: Constants.sortDirections.HIGHEST
+    updatedModerationSetAction =
+      type: ModerationActions.SORT_MARK1_COLUMN
+    newState = rootReducer(initialState, updatedModerationSetAction)
 
-    newState = rootReducer(initialState, sortColumnAction)
-    expectedStudentId = 4
-    firstStudent = newState.students[0]
-    equal firstStudent.id, expectedStudentId, 'sorts students it descending order'
+    equal newState.studentList.sort.direction, Constants.sortDirections.ASCENDING, 'sets the right direction'
+    deepEqual newState.studentList.students[0].id, 2, 'sorts the right student to the top'
 
-  test 'sorting students in descending order by default on SORT_MARK_COLUMN ', ->
+  module "sorting mark2 column on SORT_MARK2_COLUMN",
+  test 'default to descending order when clicking on a new column', ->
     initialState =
-      students: fakeStudents
-      markColumnSort:
-        markColumn: 0
-        currentSortDirection: undefined
+      studentList:
+        students: fakeStudents
+        sort:
+          column: undefined
+          direction: undefined
 
-    sortColumnAction =
-      type: ModerationActions.SORT_MARK_COLUMN
-      payload:
-        markColumn: 0,
-        currentSortDirection: undefined
+    updatedModerationSetAction =
+      type: ModerationActions.SORT_MARK2_COLUMN
+    newState = rootReducer(initialState, updatedModerationSetAction)
 
-    newState = rootReducer(initialState, sortColumnAction)
-    expectedStudentId = 4
-    firstStudent = newState.students[0]
-    equal firstStudent.id, expectedStudentId, 'sorts students it descending order'
+    deepEqual newState.studentList.students[0].id, 3, 'sorts the right student to the top'
 
-  test 'sorting students in descending order by when currentSortDirection is LOWEST on SORT_MARK_COLUMN ', ->
+  test 'sorts students to descending order when previously ascending', ->
     initialState =
-      students: fakeStudents
-      markColumnSort:
-        markColumn: 0
-        currentSortDirection: Constants.sortDirections.LOWEST
+      studentList:
+        students: fakeStudents
+        sort:
+          column: Constants.markColumnNames.MARK_TWO
+          direction: Constants.sortDirections.ASCENDING
 
-    sortColumnAction =
-      type: ModerationActions.SORT_MARK_COLUMN
-      payload:
-        markColumn: 0,
-        currentSortDirection: Constants.sortDirections.LOWEST
+    updatedModerationSetAction =
+      type: ModerationActions.SORT_MARK2_COLUMN
+    newState = rootReducer(initialState, updatedModerationSetAction)
 
-    newState = rootReducer(initialState, sortColumnAction)
-    expectedStudentId = 4
-    firstStudent = newState.students[0]
-    equal firstStudent.id, expectedStudentId, 'sorts students it descending order'
+    deepEqual newState.studentList.students[0].id, 3, 'sorts the right student to the top'
 
-  test 'sorting students in ascending order by when currentSortDirection is HIGHEST on SORT_MARK_COLUMN ', ->
+  test 'sorts students to ascending order when previously descending', ->
     initialState =
-      students: fakeStudents
-      markColumnSort:
-        previousMarkColumn: 0
-        markColumn: 0
-        currentSortDirection: Constants.sortDirections.HIGHEST
+      studentList:
+        students: fakeStudents
+        sort:
+          column: Constants.markColumnNames.MARK_TWO
+          direction: Constants.sortDirections.DESCENDING
 
-    sortColumnAction =
-      type: ModerationActions.SORT_MARK_COLUMN
-      payload:
-        previousMarkColumn: 0
-        markColumn: 0,
-        currentSortDirection: Constants.sortDirections.HIGHEST
+    updatedModerationSetAction =
+      type: ModerationActions.SORT_MARK2_COLUMN
+    newState = rootReducer(initialState, updatedModerationSetAction)
 
-    newState = rootReducer(initialState, sortColumnAction)
-    expectedStudentId = 2
-    firstStudent = newState.students[0]
-    equal firstStudent.id, expectedStudentId, 'sorts students it ascending order'
+    equal newState.studentList.sort.direction, Constants.sortDirections.ASCENDING, 'sets the right direction'
+    deepEqual newState.studentList.students[0].id, 2, 'sorts the right student to the top'
 
+  module "sorting mark3 column on SORT_MARK3_COLUMN",
+  test 'default to descending order when clicking on a new column', ->
+    initialState =
+      studentList:
+        students: fakeStudents
+        sort:
+          column: undefined
+          direction: undefined
 
+    updatedModerationSetAction =
+      type: ModerationActions.SORT_MARK3_COLUMN
+    newState = rootReducer(initialState, updatedModerationSetAction)
+
+    deepEqual newState.studentList.students[0].id, 4, 'sorts the right student to the top'
+
+  test 'sorts students to descending order when previously ascending', ->
+    initialState =
+      studentList:
+        students: fakeStudents
+        sort:
+          column: Constants.markColumnNames.MARK_THREE
+          direction: Constants.sortDirections.ASCENDING
+
+    updatedModerationSetAction =
+      type: ModerationActions.SORT_MARK3_COLUMN
+    newState = rootReducer(initialState, updatedModerationSetAction)
+
+    deepEqual newState.studentList.students[0].id, 4, 'sorts the right student to the top'
+
+  test 'sorts students to ascending order when previously descending', ->
+    initialState =
+      studentList:
+        students: fakeStudents
+        sort:
+          column: Constants.markColumnNames.MARK_THREE
+          direction: Constants.sortDirections.DESCENDING
+
+    updatedModerationSetAction =
+      type: ModerationActions.SORT_MARK3_COLUMN
+    newState = rootReducer(initialState, updatedModerationSetAction)
+
+    equal newState.studentList.sort.direction, Constants.sortDirections.ASCENDING, 'sets the right direction'
+    deepEqual newState.studentList.students[0].id, 2, 'sorts the right student to the top'

@@ -4,7 +4,8 @@ define [
   'jsx/assignments/constants'
 ], (React, ModeratedStudentList, Constants) ->
   TestUtils = React.addons.TestUtils
-  fakeStudent = [
+  fakeStudentList = {students:
+    [
       {
         'id': 3
         'display_name': 'a@example.edu'
@@ -23,16 +24,18 @@ define [
           'speedgrader_url': 'http://localhost:3000/courses/1/gradebook/speed_grader?assignment_id=1#%7B%22student_id%22:3,%22provisional_grade_id%22:10%7D'
         } ]
       }
-  ]
+    ]
+  }
 
   module 'ModeratedColumnHeader',
   test 'only shows one column when includeModerationSetHeaders is false', ->
-    studentList = TestUtils.renderIntoDocument(ModeratedStudentList(urls: {assignment_speedgrader_url: 'blah'}, includeModerationSetColumns: false, students: fakeStudent, assignment: {published: false},handleCheckbox: () => 'stub' ))
+    studentList = TestUtils.renderIntoDocument(ModeratedStudentList(urls: {assignment_speedgrader_url: 'blah'}, includeModerationSetColumns: false, studentList: fakeStudentList, assignment: {published: false},handleCheckbox: () => 'stub' ))
     columns = TestUtils.scryRenderedDOMComponentsWithClass(studentList, 'AssignmentList__Mark')
     equal columns.length, 1, 'only show one column'
     React.unmountComponentAtNode(studentList.getDOMNode().parentNode)
+
   test 'show all columns when includeModerationSetHeaders is true', ->
-    studentList = TestUtils.renderIntoDocument(ModeratedStudentList(urls: {assignment_speedgrader_url: 'blah'}, includeModerationSetColumns: true, students: fakeStudent, assignment: {published: false},handleCheckbox: () => 'stub' ))
+    studentList = TestUtils.renderIntoDocument(ModeratedStudentList(urls: {assignment_speedgrader_url: 'blah'}, includeModerationSetColumns: true, studentList: fakeStudentList, assignment: {published: false},handleCheckbox: () => 'stub' ))
     columns = TestUtils.scryRenderedDOMComponentsWithClass(studentList, 'ModeratedAssignmentList__Mark')
     equal columns.length, 3, 'show all columns'
     React.unmountComponentAtNode(studentList.getDOMNode().parentNode)

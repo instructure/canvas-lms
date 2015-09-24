@@ -3,15 +3,18 @@
 define([
   'react',
   './constants',
-  './actions/ModerationActions'
-], function (React, Constants, ModerationActions) {
+  './actions/ModerationActions',
+  'i18n!moderated_grading'
+], function (React, Constants, ModerationActions, I18n) {
   var ModeratedColumnHeader = React.createClass({
     displayName: 'ModeratedColumnHeader',
     propTypes:{
       markColumn: React.PropTypes.number,
-      currentSortDirection: React.PropTypes.string,
-      handleSortByThisColumn: React.PropTypes.func.isRequired,
-      includeModerationSetHeaders: React.PropTypes.bool
+      sortDirection: React.PropTypes.string,
+      includeModerationSetHeaders: React.PropTypes.bool,
+      handleSortMark1: React.PropTypes.func.isRequired,
+      handleSortMark2: React.PropTypes.func.isRequired,
+      handleSortMark3: React.PropTypes.func.isRequired
     },
 
     handleSelectAll (event) {
@@ -25,7 +28,7 @@ define([
 
     renderLinkArrow (mark) {
       if (mark === this.props.markColumn){
-        if (this.props.currentSortDirection === Constants.sortDirections.HIGHEST){
+        if (this.props.sortDirection === Constants.sortDirections.DESCENDING){
           return(<i className='icon-mini-arrow-down'></i>);
         }else{
           return(<i className='icon-mini-arrow-up'></i>);
@@ -38,23 +41,23 @@ define([
           <div className='ModeratedColumnHeader'>
             <div className='ModeratedColumnHeader__StudentName ColumnHeader__Item'>
               <input type='checkbox' onChange={this.handleSelectAll} />
-              <span>Student</span>
+              <span>{I18n.t('Student')}</span>
             </div>
 
             <div className='ModeratedColumnHeader__Mark ColumnHeader__Item'>
-              <a href='#' onClick={this.props.handleSortByThisColumn.bind(null, Constants.markColumn.MARK_ONE, this.props)}>1st Mark {this.renderLinkArrow(Constants.markColumn.MARK_ONE)}</a>
+              <a href='#' onClick={this.props.handleSortMark1}>{I18n.t('1st Mark')} {this.renderLinkArrow(Constants.markColumnNames.MARK_ONE)}</a>
             </div>
 
             <div className='ColumnHeader__Mark ColumnHeader__Item'>
-              <a href='#' onClick={this.props.handleSortByThisColumn.bind(null, Constants.markColumn.MARK_TWO, this.props)}>2st Mark {this.renderLinkArrow(Constants.markColumn.MARK_TWO)}</a>
+              <a href='#' onClick={this.props.handleSortMark2}>{I18n.t('2nd Mark')} {this.renderLinkArrow(Constants.markColumnNames.MARK_TWO)}</a>
             </div>
 
             <div className='ColumnHeader__Mark ColumnHeader__Item'>
-              <a href='#' onClick={this.props.handleSortByThisColumn.bind(null, Constants.markColumn.MARK_THREE, this.props)}>3st Mark {this.renderLinkArrow(Constants.markColumn.MARK_THREE)}</a>
+              <a href='#' onClick={this.props.handleSortMark3}>{I18n.t('3rd Mark')} {this.renderLinkArrow(Constants.markColumnNames.MARK_THREE)}</a>
             </div>
 
             <div className='ColumnHeader__FinalGrade ColumnHeader__Item'>
-              <span>Grade</span>
+              <span>{I18n.t('Grade')}</span>
             </div>
           </div>
         );
@@ -63,11 +66,11 @@ define([
           <div className='ColumnHeader'>
             <div className='ColumnHeader__StudentName ColumnHeader__Item'>
               <input type='checkbox' onChange={this.handleSelectAll} />
-              <span>Student</span>
+              <span>{I18n.t('Student')}</span>
             </div>
 
             <div className='ColumnHeader__Mark ColumnHeader__Item'>
-              <a href='#' onClick={this.props.handleSortByThisColumn.bind(null, Constants.markColumn.MARK_ONE, this.props)}>1st Mark {this.renderLinkArrow(Constants.markColumn.MARK_ONE)}</a>
+              <a href='#' onClick={this.props.handleSortMark1}>{I18n.t('1st Mark')} {this.renderLinkArrow(Constants.markColumnNames.MARK_ONE)}</a>
             </div>
           </div>
         );
