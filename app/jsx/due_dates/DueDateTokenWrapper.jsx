@@ -261,6 +261,7 @@ define([
              data-row-identifier = {this.rowIdentifier()}
              onKeyDown           = {this.suppressKeys}>
           <div className  = "ic-Label"
+               tabIndex   = '0'
                title      = 'Assign to'
                aria-label = 'Assign to'>
              {I18n.t("Assign to")}
