@@ -168,23 +168,27 @@ define([
       $(this).closest('.rubric_assessments, .comments').hide();
     });
 
-    $('.student_assignment.editable .assignment_score').click(function(event) {
-      if ($('#grades_summary.editable').length === 0 || $(this).find('#grade_entry').length > 0 || $(event.target).closest('.revert_score_link').length > 0) {
-        return;
-      }
-      // Store the original score so that we can restore it after "What-If" calculations
-      if (!$(this).find('.grade').data('originalValue')){
-        $(this).find('.grade').data('originalValue', $(this).find('.grade').html());
-      }
-      var $screenreader_link_clone = $(this).find('.screenreader-only').clone(true);
-      $(this).find('.grade').data("screenreader_link", $screenreader_link_clone);
-      $(this).find('.grade').empty().append($("#grade_entry"));
-      $(this).find('.score_value').hide();
+    var editWhatifGrade = function(event) {
+      if (event.type === "click" || event.keyCode === 13) {
+        if ($('#grades_summary.editable').length === 0 || $(this).find('#grade_entry').length > 0 || $(event.target).closest('.revert_score_link').length > 0) {
+          return;
+        }
+        // Store the original score so that we can restore it after "What-If" calculations
+        if (!$(this).find('.grade').data('originalValue')){
+          $(this).find('.grade').data('originalValue', $(this).find('.grade').html());
+        }
+        var $screenreader_link_clone = $(this).find('.screenreader-only').clone(true);
+        $(this).find('.grade').data("screenreader_link", $screenreader_link_clone);
+        $(this).find('.grade').empty().append($("#grade_entry"));
+        $(this).find('.score_value').hide();
 
-      // Get the current shown score (possibly a "What-If" score) and use it as the default value in the text entry field
-      var val = $(this).parents('.student_assignment').find('.what_if_score').text();
-      $('#grade_entry').val(parseFloat(val) || '0').show().focus().select();
-    });
+        // Get the current shown score (possibly a "What-If" score) and use it as the default value in the text entry field
+        var val = $(this).parents('.student_assignment').find('.what_if_score').text();
+        $('#grade_entry').val(parseFloat(val) || '0').show().focus().select();
+      };
+    };
+
+    $('.student_assignment.editable .assignment_score').on("click keypress", editWhatifGrade);
 
     $("#grade_entry").keydown(function(event) {
       if(event.keyCode == 13) {
