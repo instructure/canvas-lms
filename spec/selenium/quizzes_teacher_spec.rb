@@ -24,23 +24,6 @@ describe "quizzes" do
       @course.reload
     end
 
-    context "save and publish button" do
-
-      it "should save and publish a quiz", priority: "1", test_id: 193785 do
-        @quiz = course_quiz
-        get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
-
-        expect(f("#quiz-draft-state")).to be_displayed
-
-        expect_new_page_load {f(".save_and_publish").click}
-        expect(f("#quiz-publish-link.btn-published")).to be_displayed
-
-        # Check that the list of quizzes is also updated
-        get "/courses/#{@course.id}/quizzes"
-        expect(f("#summary_quiz_#{@quiz.id} .icon-publish")).to be_displayed
-      end
-    end
-
     it "should show a summary of due dates if there are multiple", priority: "1", test_id: 210054 do
       create_quiz_with_due_date
       get "/courses/#{@course.id}/quizzes"
@@ -54,68 +37,6 @@ describe "quizzes" do
       tooltip = fj('.ui-tooltip:visible')
       expect(tooltip).to include_text 'New Section'
       expect(tooltip).to include_text 'Everyone else'
-    end
-
-    it "should allow a teacher to create a quiz from the quizzes tab directly", priority: "1", test_id: 210055 do
-      get "/courses/#{@course.id}/quizzes"
-      expect_new_page_load { f(".new-quiz-link").click }
-      expect_new_page_load do
-        click_save_settings_button
-        wait_for_ajax_requests
-      end
-      expect(f('#quiz_title')).to include_text "Unnamed Quiz"
-    end
-
-    it "should create and preview a new quiz", priority: "1", test_id: 210056 do
-      get "/courses/#{@course.id}/quizzes"
-      expect_new_page_load do
-        f('.new-quiz-link').click
-        wait_for_ajaximations
-      end
-      #check url
-      expect(driver.current_url).to match %r{/courses/\d+/quizzes/(\d+)\/edit}
-      driver.current_url =~ %r{/courses/\d+/quizzes/(\d+)\/edit}
-      quiz_id = $1.to_i
-      expect(quiz_id).to be > 0
-
-      #input name and description then save quiz
-      replace_content(f('#quiz_title'), 'new quiz')
-      test_text = "new description"
-      keep_trying_until { expect(f('#quiz_description_ifr')).to be_displayed }
-      type_in_tiny '#quiz_description', test_text
-      in_frame "quiz_description_ifr" do
-        expect(f('#tinymce')).to include_text(test_text)
-      end
-
-      #add a question
-      click_questions_tab
-      click_new_question_button
-      submit_form('.question_form')
-      wait_for_ajaximations
-
-      #save the quiz
-      expect_new_page_load {
-        click_save_settings_button
-        wait_for_ajaximations
-      }
-      wait_for_ajaximations
-
-      #check quiz preview
-      f('#preview_quiz_button').click
-      expect(f('#questions')).to be_present
-    end
-
-    it "should insert multiple files using RCE in the quiz", priority: "1", test_id: 132545 do
-      txt_files = ["some test file", "b_file.txt"]
-      txt_files.map do |text_file|
-       file = @course.attachments.create!(display_name: text_file, uploaded_data: default_uploaded_data)
-       file.context = @course
-       file.save!
-      end
-      @quiz = course_quiz
-      get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
-      insert_file_from_rce(:quiz)
-      expect(fln("b_file.txt")).to be_displayed
     end
 
     it "should asynchronously load student quiz results", priority: "2", test_id: 210058 do

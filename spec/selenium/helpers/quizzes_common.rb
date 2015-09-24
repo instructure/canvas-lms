@@ -13,6 +13,25 @@ require_relative "../common"
     @quiz
   end
 
+  # The default time for a quiz due date is 11:59pm
+  def default_time_for_due_date(date)
+    date.change({ hour: 23, min: 59 })
+  end
+
+  # The default time for a quiz lock date is 11:59pm
+  def default_time_for_lock_date(date)
+    date.change({ hour: 23, min: 59 })
+  end
+
+  # The default time for a quiz unlock date is 12am
+  def default_time_for_unlock_date(date)
+    date.change({ hour: 0, min: 0 })
+  end
+
+  def assign_quiz_to_no_one
+    f('.ContainerDueDate .ic-token-delete-button').click
+  end
+
   def create_multiple_choice_question
     question = fj(".question_form:visible")
     click_option('.question_form:visible .question_type', 'Multiple Choice')
