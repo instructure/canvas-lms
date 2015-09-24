@@ -62,7 +62,7 @@ define(function(require) {
 
             {isLoading && <Spinner />}
 
-            <div className="pull-right">
+            <div className="pull-right inline">
               <SectionSelect />
               {this.props.quizReports.map(this.renderReport)}
             </div>
