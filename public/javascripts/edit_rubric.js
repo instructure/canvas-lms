@@ -609,8 +609,8 @@ define([
       if(limitToOneRubric && $("#rubrics .rubric:visible").length > 0) { return; }
       var $rubric = rubricEditing.addRubric();
       $("#rubrics").append($rubric.show());
-      $rubric.find(":text:first").focus().select();
-        $(".add_rubric_link").hide();
+      $rubric.find('.find_rubric_link:visible:first').focus();
+      $(".add_rubric_link").hide();
     });
 
     $("#rubric_dialog")
