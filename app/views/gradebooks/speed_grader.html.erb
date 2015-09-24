@@ -9,7 +9,7 @@
   })
   @show_left_side = false
   @show_embedded_chat = false
-  @body_classes << 'full-width'
+  @body_classes << 'ic-no-flex-layout full-width'
   @can_edit_anything = !@context.completed?
 %>
 <% content_for :page_title, t(:page_title, "%{assignment_name}, SpeedGrader, %{course_name}", :assignment_name => @assignment.title, :course_name => @context.name) %>

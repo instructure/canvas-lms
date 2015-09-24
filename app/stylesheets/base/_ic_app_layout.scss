@@ -14,7 +14,7 @@ $ic-left-side-width: $ic-sp*15;
   box-sizing: border-box;
   min-height: 100vh;
 
-  body:not(.full-width) & {
+  body:not(.ic-no-flex-layout) & {
     display: flex;
     flex-direction: column;
   }
@@ -23,7 +23,7 @@ $ic-left-side-width: $ic-sp*15;
 .ic-app-main-layout-horizontal {
   position: relative;
 
-  body:not(.full-width) & {
+  body:not(.ic-no-flex-layout) & {
     transition: all 0.1s ease-out;
     transform: translate3d(0,0,0);
     flex: 1 0 auto;
@@ -34,7 +34,7 @@ $ic-left-side-width: $ic-sp*15;
     }
   }
 
-  body.course-menu-expanded & {
+  body.course-menu-expanded:not(.ic-no-flex-layout) & {
     transform: translate3d($ic-left-side-width,0,0);
 
     @include breakpoint(wide) {
@@ -48,7 +48,7 @@ $ic-left-side-width: $ic-sp*15;
     background: $ic-brand-watermark left bottom no-repeat;
   }
 
-  body.full-width & {
+  body.ic-no-flex-layout & {
     min-height: 100vh;
   }
 
@@ -88,7 +88,7 @@ $ic-left-side-width: $ic-sp*15;
 }
 
 .ic-app-main-content {
-  body:not(.full-width) & {
+  body:not(.ic-no-flex-layout) & {
     box-sizing: border-box;
     flex: 1;
     @include breakpoint(desktop) { display: flex; }
@@ -97,8 +97,8 @@ $ic-left-side-width: $ic-sp*15;
 
 .ic-app-main-content__primary {
   box-sizing: border-box;
-  body:not(.full-width) & {
-    @include breakpoint(desktop) { flex: 1; }
+  @include breakpoint(desktop) {
+    body:not(.ic-no-flex-layout) & { flex: 1; }
   }
 }
 
