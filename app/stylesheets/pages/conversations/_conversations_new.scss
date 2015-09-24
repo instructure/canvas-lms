@@ -322,7 +322,7 @@ h2.subject {
   position: absolute;
   right: 13px;
   top: 43%;
-  background-color: $ic-brand-secondary;
+  background-color: $ic-color-dark;
   text-shadow: none;
 }
 
@@ -340,7 +340,7 @@ h2.subject {
   }
 
   .read-state {
-    background: $ic-brand-secondary;
+    background: $ic-color-dark;
     border-radius: 5px;
     box-sizing: border-box;
     display: inline-block;
