@@ -4,10 +4,7 @@
 
   .report-generator {
     position: relative;
-
-    &+ .report-generator {
-      margin-left: $whitespace;
-    }
+    margin-left: $whitespace;
   }
 
   table {

@@ -13,7 +13,7 @@ define(function(require) {
     render: function() {
       return (
         <li role="presentation" onClick={this.handleClick}>
-          <a href="#" id="toolbar-2" tabindex="-1" role="menuitem">{this.props.name}</a>
+          <a href="#" id="toolbar-2" role="menuitem">{this.props.name}</a>
         </li>
       );
     }
@@ -35,9 +35,6 @@ define(function(require) {
     },
 
     render: function() {
-      var divStyles = {
-        marginBottom: '24'
-      };
       var sectionTitle = I18n.t('Section Filter')
       if(config.section_ids && config.section_ids != 'all'){
         sectionTitle = $.grep(this.state.sections, function(e){
@@ -51,18 +48,16 @@ define(function(require) {
       });
 
       return(
-        <div>
-          <div style={divStyles} className="al-dropdown__container">
-            <a className="al-trigger btn" role="button" href="#">
-              {sectionTitle}
-              <i className="icon-mini-arrow-down" aria-hidden="true"></i>
-              <span className="screenreader-only">{I18n.t('Section Filter')}</span>
-            </a>
-            <ul id="toolbar-1" className="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="toolbar-2">
-              <SectionLink key={'all'} sectionId={'all'} name={'All Sections'} />
+        <div className="section_selector inline al-dropdown__container">
+          <a className="al-trigger btn" role="button" href="#">
+            {sectionTitle}
+             <i className="icon-mini-arrow-down" aria-hidden="true"></i>
+             <span className="screenreader-only">{I18n.t('Section Filter')}</span>
+           </a>
+           <ul id="toolbar-1" className="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="toolbar-2">
+            <SectionLink key={'all'} sectionId={'all'} name={'All Sections'} />
               {sectionNodes}
-            </ul>
-          </div>
+           </ul>
         </div>
       );
     }
