@@ -4402,16 +4402,16 @@ mi:
       tomorrow: apopo
       yesterday: Inanahi
     formats: 
-      date_at_time: "% b% -d i% l:% M% P"
-      default: "% Y-% m-% d"
-      full: "% b% -d,% Y% -l:% M% P"
+      date_at_time: "%b %-d i %l:%M%P"
+      default: "%Y-%m-%d"
+      full: "%b %-d,%Y %-l:%M%P"
       full_with_weekday: "%a %b %-d, %Y %-l:%M%P"
       long: "%B %-d, %Y"
       long_with_weekday: "%A, %B %-d"
       medium: "%b %-d, %Y"
       medium_month: "%b %Y"
       medium_with_weekday: "%a %b %-d, %Y"
-      short: "% b% -d"
+      short: "%b %-d"
       short_month: "%b"
       short_weekday: "%a"
       short_with_weekday: "%a, %b %-d"
@@ -12512,11 +12512,11 @@ mi:
     count_minutes_ago: 
       one: "{count} meneti% i mua "
     formats: 
-      default: "% te,% d% b% Y% H:% M:%% z S"
-      long: "% B% d,% Y% H:% M"
-      short: "% d% b% H:% M"
-      tiny: "% l:% M% P"
-      tiny_on_the_hour: "% l% P"
+      default: "%a te, %d %b %Y %H:%M:%S %z"
+      long: "%B %d, %Y %H:% M"
+      short: "%d %b %H:%M"
+      tiny: "%l:%M%P"
+      tiny_on_the_hour: "%l%P"
     less_than_a_minute_ago: "iti iho i te i te meneti i mua"
     pm: pm
   time_2b5aac58: Wā
