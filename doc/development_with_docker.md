@@ -11,17 +11,14 @@ On OS X, make sure you have the following installed:
 
 #### VMWare Fusion
 
-Preferred over VirtualBox for performance reasons.
-
-#### Vagrant (with VMWare Fusion plugin)
-
-Required for Dinghy to work with VMWare Fusion.
+Preferred over VirtualBox for performance reasons. (although Virtualbox 5 is
+pretty close, about 90% of VMWare fusion in basic testing)
 
 #### Dinghy
 
 ```
 $ brew install https://github.com/codekitchen/dinghy/raw/latest/dinghy.rb
-$ dinghy up --memory=4096 --cpus=4 --provider=vmware_fusion --proxy
+$ dinghy create --memory=4096 --cpus=4 --provider=vmware_fusion
 ```
 
 Type `docker ps` in your terminal to make sure your Docker environment
