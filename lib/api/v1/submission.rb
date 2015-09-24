@@ -65,7 +65,7 @@ module Api::V1::Submission
     end
 
     if includes.include?("user")
-      hash['user'] = user_json(submission.user, user, session, ['avatar_url'], submission.context, nil)
+      hash['user'] = user_json(submission.user, current_user, session, ['avatar_url'], submission.context, nil)
     end
 
     if assignment && includes.include?('user_summary')
