@@ -107,6 +107,15 @@ describe "discussions" do
           expect(assignment.points_possible).to eq 123
         end
 
+        it "should return focus to add attachment when removed" do
+          get url
+          add_attachment_and_validate
+          get url
+          f('.removeAttachment').click
+          wait_for_ajaximations
+          check_element_has_focus(f('input[name=attachment]'))
+        end
+
         it "should warn user when leaving page unsaved", priority: "1", test_id: 270919 do
           title = 'new title'
           get url

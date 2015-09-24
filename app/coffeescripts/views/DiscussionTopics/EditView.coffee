@@ -239,7 +239,7 @@ htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, Missin
       @model.set 'attachments', []
       @$el.append '<input type="hidden" name="remove_attachment" >'
       @$('.attachmentRow').remove()
-      @$('[name="attachment"]').show()
+      @$('[name="attachment"]').show().focus()
 
     submit: (event) =>
       event.preventDefault()
