@@ -212,7 +212,7 @@ module SIS
             @users_to_add_account_associations << user.id if should_add_account_associations
             @users_to_update_account_associations << user.id if should_update_account_associations
 
-            if email.present?
+            if email.present? && EmailAddressValidator.valid?(email)
               # find all CCs for this user, and active conflicting CCs for all users
               # unless we're deleting this user, then only find CCs for this user
               if status_is_active
@@ -263,6 +263,8 @@ module SIS
                   cc.send_merge_notification!
                 end
               end
+            elsif email.present? && EmailAddressValidator.valid?(email) == false
+              @messages << "The email address associated with user '#{user_id}' is invalid (email: '#{email}')"
             end
 
             if pseudo.changed?
