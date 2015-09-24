@@ -10,27 +10,27 @@ define([
   var FlashMessageHolder = React.createClass({
     displayName: 'FlashMessageHolder',
 
-    getInitialState () {
-      return this.props.store.getState().flashMessage;
-    },
-
-    componentDidMount () {
-      this.props.store.subscribe(this.handleChange);
-    },
-
-    handleChange () {
-      this.setState(this.props.store.getState().flashMessage);
+    propTypes: {
+      time: React.PropTypes.number.isRequired,
+      message: React.PropTypes.string.isRequired,
+      error: React.PropTypes.bool,
+      onError: React.PropTypes.func,
+      onSuccess: React.PropTypes.func
     },
 
     shouldComponentUpdate (nextProps, nextState) {
-      return nextState.time > this.state.time;
+      return nextProps.time > this.props.time;
     },
 
     componentWillUpdate (nextProps, nextState) {
-      if (nextState.error) {
-        $.flashError(nextState.message);
+      if (nextProps.error) {
+        (nextProps.onError) ?
+        nextProps.onError(nextProps.message) :
+        $.flashError(nextProps.message);
       } else {
-        $.flashMessage(nextState.message);
+        (nextProps.onSuccess) ?
+        nextProps.onSuccess(nextProps.message) :
+        $.flashMessage(nextProps.message);
       }
     },
 

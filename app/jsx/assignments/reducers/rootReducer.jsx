@@ -147,7 +147,7 @@ define([
     var newState = _.extend({}, state);
     newState.time = action.payload.time;
     newState.message = action.payload.message;
-    newState.error = false;
+    newState.error = action.payload.error || false;
     return newState;
   };
 
@@ -156,7 +156,7 @@ define([
     var newState = _.extend({}, state);
     newState.time = action.payload.time;
     newState.message = action.payload.message;
-    newState.error = true;
+    newState.error = action.payload.error || true;
     return newState;
   };
 
