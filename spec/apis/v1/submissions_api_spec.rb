@@ -126,6 +126,18 @@ describe 'Submissions API', type: :request do
       expect(json.size).to eq 1
     end
 
+    it "should include user" do
+      json = api_call(:get,
+        "/api/v1/sections/#{@section.id}/assignments/#{@a1.id}/submissions.json",
+        { :controller => 'submissions_api', :action => 'index',
+          :format => 'json', :section_id => @section.id.to_s,
+          :assignment_id => @a1.id.to_s },
+        { :include => %w(user) })
+      expect(json.size).to eq 1
+      expect(json[0]['user']).not_to be_nil
+      expect(json[0]['user']['id']).to eq(@student1.id)
+    end
+
     it "should return assignment_visible" do
       @course.enable_feature!(:differentiated_assignments)
       json = api_call(:get,
