@@ -55,11 +55,11 @@ describe Quizzes::QuizSubmissionsController do
       user_session(@student)
       @quiz.access_code = "Testing Testing 123"
       @quiz.save!
-      access_code_key = @quiz.access_code_key_for_user(@student)
-      session[access_code_key] = true
+      session[:quiz_access_code] = {}
+      Hash(session[:quiz_access_code])[@quiz.id] =  @quiz.access_code
       @submission = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(@student)
       post 'create', :course_id => @quiz.context_id, :quiz_id => @quiz.id, :question_123 => 'hi', :validation_token => @submission.validation_token
-      expect(session.has_key?(access_code_key)).to eq false
+      expect(session[:quiz_access_code]).to be_empty
     end
 
     it "should reject a submission when the validation token does not match" do
