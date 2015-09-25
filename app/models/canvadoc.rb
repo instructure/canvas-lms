@@ -76,7 +76,7 @@ class Canvadoc < ActiveRecord::Base
     end
 
     # no commenting when anonymous peer reviews are enabled
-    if submissions.map(&:assignment).any? { |a| a.peer_reviews? && a.anonymouis_peer_reviews? }
+    if submissions.map(&:assignment).any? { |a| a.peer_reviews? && a.anonymous_peer_reviews? }
       opts = {}
     end
 
