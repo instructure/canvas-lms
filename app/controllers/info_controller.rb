@@ -55,4 +55,9 @@ class InfoController < ApplicationController
     expires_in 10.minutes, public: true
   end
 
+  def theme_preview
+    if params[:account_id]
+      @account = Account.find_cached(params[:account_id])
+    end
+  end
 end
