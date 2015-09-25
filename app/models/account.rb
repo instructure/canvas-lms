@@ -523,7 +523,9 @@ class Account < ActiveRecord::Base
   end
 
   def self.invalidate_cache(id)
-    Rails.cache.delete(account_lookup_cache_key(id)) if id
+    Shard.birth.activate do
+      Rails.cache.delete(account_lookup_cache_key(id)) if id
+    end
   rescue
     nil
   end
