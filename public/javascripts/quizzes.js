@@ -237,7 +237,7 @@ define([
         togglePossibleCorrectAnswerLabel($answers);
       }
 
-      $answer.find(".numerical_answer_type").change();
+      numericalAnswerTypeChange($answer.find(".numerical_answer_type"))
 
       var templateData = {
         answer_text: answer.answer_text,
@@ -2058,11 +2058,8 @@ define([
 
     });
 
-    $(document).delegate(".numerical_answer_type", 'change', function() {
-      var val = $(this).val();
-      var $answer = $(this).parents(".numerical_answer");
-      $answer.find(".numerical_answer_text").hide();
-      $answer.find("." + val).show();
+    $(document).delegate(".numerical_answer_type", 'change', function(){
+      numericalAnswerTypeChange($(this))
     }).change();
 
     $(document).delegate(".select_answer_link", 'click', function(event) {
@@ -3964,6 +3961,13 @@ define([
       $question.find(".supercalc").superCalc('recalculate', true);
       $question.triggerHandler('settings_change', false);
     }).change();
+  }
+
+  function numericalAnswerTypeChange($el) {
+    var val = $el.val();
+    var $answer = $el.parents(".numerical_answer");
+    $answer.find(".numerical_answer_text").hide();
+    $answer.find("." + val).show();
   }
 
   // attach HTML answers but only when they click the button
