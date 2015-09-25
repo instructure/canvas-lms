@@ -88,7 +88,7 @@ body.ic-Login-Body { // apply the background to the body element so that you don
   color: $ic-brand-Login-Content-label-text-color !important;
 }
 .ic-Login__link {
-  color: $ic-brand-Login-Content-label-text-color !important;
+  color: $ic-brand-Login-Content-password-text-color !important;
 }
 .ic-Login__body__error {
   display: block;
@@ -120,7 +120,7 @@ body.ic-Login-Body { // apply the background to the body element so that you don
   .ic-Login__actions-timeout {
     flex: 1;
     label {
-      color: $ic-brand-Login-Content-password-text-color;
+      color: $ic-brand-Login-Content-label-text-color;
     }
   }
   .ic-Login__actions--right {
