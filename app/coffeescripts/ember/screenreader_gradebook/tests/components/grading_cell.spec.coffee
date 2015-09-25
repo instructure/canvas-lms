@@ -69,6 +69,7 @@ define [
     ok @component.get('isGpaScale')
 
   asyncTest "focusOut", ->
+    expect(1)
     stub = sinon.stub @component, 'boundUpdateSuccess'
     submissions = []
 
@@ -81,8 +82,6 @@ define [
     run =>
       @component.set('value', 'ohai')
       @component.send('focusOut', {target: {id: 'student_and_assignment_grade'}})
-
       start()
-      setTimeout =>
-        ok stub.called
 
+    ok stub.called
