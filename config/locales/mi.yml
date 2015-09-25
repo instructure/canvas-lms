@@ -4404,7 +4404,7 @@ mi:
     formats: 
       date_at_time: "%b %-d i %l:%M%P"
       default: "%Y-%m-%d"
-      full: "%b %-d,%Y %-l:%M%P"
+      full: "%b %-d, %Y %-l:%M%P"
       full_with_weekday: "%a %b %-d, %Y %-l:%M%P"
       long: "%B %-d, %Y"
       long_with_weekday: "%A, %B %-d"
