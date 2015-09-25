@@ -25,7 +25,7 @@ module CC::Exporter::Epub::Converters
 
     def convert_topic(cc_doc, meta_doc)
       topic = {"resource_type" => :topics}
-      topic['description'] = convert_media_from_string!(get_node_val(cc_doc, 'text'))
+      topic['description'] = convert_placeholder_paths_from_string!(get_node_val(cc_doc, 'text'))
       topic['title'] = get_node_val(cc_doc, 'title')
       if meta_doc
         topic['title'] = get_node_val(meta_doc, 'title')

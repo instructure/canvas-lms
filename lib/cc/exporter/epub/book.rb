@@ -12,7 +12,9 @@ module CC::Exporter::Epub
     def add_files
       files.each do |file_data|
         File.open(file_data[:full_path]) do |file|
-          epub.add_item(file_data[:local_path], file)
+          epub.add_item(file_data[:local_path], file, file_data[:migration_id], {
+            'media-type' => file_data[:media_type]
+          })
         end
       end
     end
@@ -35,7 +37,8 @@ module CC::Exporter::Epub
 
     def epub
       @_epub ||= GEPUB::Book.new.tap do |b|
-        b.add_identifier('http:/example.jp/bookid_in_url', 'BookID', 'URL')
+        b.set_primary_identifier(pub_id)
+        b.language = I18n.locale
         b.add_title(title, nil, GEPUB::TITLE_TYPE::MAIN) do |title|
           title.file_as = "#{title} Epub"
           title.display_seq = 1
@@ -46,8 +49,12 @@ module CC::Exporter::Epub
       end
     end
 
+    def pub_id
+      @_pub_id ||= SecureRandom.uuid
+    end
+
     def filename
-      "#{SecureRandom.uuid}.#{title}.epub"
+      "#{pub_id}.#{title}.epub"
     end
   end
 end

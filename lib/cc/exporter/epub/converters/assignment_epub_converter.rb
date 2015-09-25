@@ -13,6 +13,7 @@ module CC::Exporter::Epub::Converters
 
         meta_node = open_file_xml(meta_path)
         html_node = convert_media_from_node!(open_file(html_path))
+        html_node = remove_empty_ids!(html_node)
 
         next unless html_node
 
@@ -26,7 +27,7 @@ module CC::Exporter::Epub::Converters
 
       if html_doc
         _title, body = get_html_title_and_body(html_doc)
-        assignment['description'] = body
+        assignment['description'] = convert_placeholder_paths_from_string!(body)
       end
       ['title', "allowed_extensions", "grading_type", "submission_types"].each do |string_type|
         val = get_node_val(meta_doc, string_type)

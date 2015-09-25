@@ -20,6 +20,22 @@ module CC::Exporter::Epub::Converters
       @resource_nodes_for_flat_manifest = {}
     end
 
+    def convert_placeholder_paths_from_string!(html_string)
+      html_node = Nokogiri::HTML::DocumentFragment.parse(html_string)
+      html_node.tap do |node|
+        convert_media_paths!(node)
+        remove_empty_ids!(node)
+      end
+      html_node.to_s
+    end
+
+    def remove_empty_ids!(node)
+      node.search("a[id='']").each do |tag|
+        tag.remove_attribute('id')
+      end
+      node
+    end
+
     # exports the package into the intermediary json
     def export
       unzip_archive
