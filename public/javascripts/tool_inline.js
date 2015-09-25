@@ -61,10 +61,7 @@ switch($toolForm.data('tool-launch-type')){
     } catch(e){}
 
     $("#tool_content").bind("load", function(){
-      if (ENV.use_new_styles) {
-        $("#content").addClass('horizontal-padding');
-      }
-      else {
+      if (!ENV.use_new_styles) {
         $("#content").addClass('padless');
       }
       $('#insecure_content_msg').hide();
@@ -101,15 +98,21 @@ var resize_tool_content_wrapper = function(height) {
 $(function() {
   var $window = $(window);
   $tool_content_wrapper = $('.tool_content_wrapper');
+
+  // for new UI, full-screen LTI iframe will always be 100%,
+  // so no need to calculate it
   if (ENV.use_new_styles) {
-    canvas_chrome_height = $tool_content_wrapper.offset().top + $('#footer').outerHeight(true);
+    if ( !$('body').hasClass('ic-full-screen-lti-tool') ) {
+      canvas_chrome_height = $tool_content_wrapper.offset().top + $('#footer').outerHeight(true);
+    }
   }
   else {
     min_tool_height = $('#main').height();
-    canvas_chrome_height = $tool_content_wrapper.offset().top + $('#wrapper').height() - $('#main').height(); 
+    canvas_chrome_height = $tool_content_wrapper.offset().top + $('#wrapper').height() - $('#main').height();
   }
-
-  if ($tool_content_wrapper.length) {
+  // Only calculate height on resize if body does not have
+  // .ic-full-screen-lti-tool class
+  if ( $tool_content_wrapper.length && !$('body').hasClass('ic-full-screen-lti-tool') ) {
     $window.resize(function () {
       if (!$tool_content_wrapper.data('height_overridden')) {
         resize_tool_content_wrapper($window.height() - canvas_chrome_height);
