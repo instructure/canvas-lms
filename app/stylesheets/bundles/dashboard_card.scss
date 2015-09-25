@@ -35,7 +35,7 @@ $ic-DashboardCard-action--active: $ic-brand-primary;
   color: $ic-DashboardCard-font-color;
   display: flex;
   align-items: flex-end;
-  height: $ic-sp*14;
+  height: $ic-sp*16;
   padding: $ic-sp;
   @include breakpoint(short) { height: $ic-sp*13; }
   .no-touch & {

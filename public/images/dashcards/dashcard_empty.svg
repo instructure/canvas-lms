@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" viewBox="0 0 260 215">
+  <title>Empty Card</title>
+  <g transform="translate(0 -1)" fill="none" fill-rule="evenodd">
+    <path fill="#FFF" d="M0 148h66v70H0z"/>
+    <path fill="#FFF" d="M65 148h66v70H65z"/>
+    <path fill="#FFF" d="M130 148h66v70h-66z"/>
+    <path fill="#FFF" d="M195 148h66v70h-66z"/>
+    <path fill="#E6E6E6" d="M65 148h1v70h-1zM130 148h1v70h-1zM195 148h1v70h-1z"/>
+    <circle fill="#ECEEEF" cx="163" cy="182" r="8"/>
+    <circle fill="#ECEEEF" cx="98" cy="182" r="8"/>
+    <circle fill="#ECEEEF" cx="33" cy="182" r="8"/>
+    <circle fill="#ECEEEF" cx="228" cy="182" r="8"/>
+    <path fill-opacity=".6" fill="#ECEEEF" d="M0 1h261v147H0z"/>
+    <path fill="#FFF" d="M21 84h184v16H21zM21 110h106v9H21zM21 127h106v9H21z"/>
+  </g>
+</svg>

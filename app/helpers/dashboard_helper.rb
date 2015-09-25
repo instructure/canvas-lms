@@ -17,6 +17,10 @@
 #
 
 module DashboardHelper
+  def show_recent_activity?
+    @current_user.preferences[:recent_activity_dashboard].present?
+  end
+
   def show_welcome_message?
     @current_user.present? &&
       @current_user.cached_current_enrollments(:include_enrollment_uuid => session[:enrollment_uuid], :preload_courses => true).select(&:active?).empty?
@@ -129,7 +133,6 @@ module DashboardHelper
     activity_symbol = activity_type.to_sym
 
     (activity_symbol == :grading) ? 'al-trigger disable_item_link' : 'disable_item_link disable-todo-item-link'
-
   end
 
 end
