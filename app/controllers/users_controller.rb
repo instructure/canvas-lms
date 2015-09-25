@@ -159,7 +159,8 @@ class UsersController < ApplicationController
     :create_user_service]
   before_filter :reject_student_view_student, :only => [:delete_user_service,
     :create_user_service, :merge, :user_dashboard, :masquerade]
-  before_filter :require_self_registration, :only => [:new, :create]
+  skip_before_filter :load_user, :only => [:create_self_registered_user]
+  before_filter :require_self_registration, :only => [:new, :create, :create_self_registered_user]
 
   def grades
     @user = User.where(id: params[:user_id]).first if params[:user_id].present?
@@ -1185,186 +1186,51 @@ class UsersController < ApplicationController
   #
   # @returns User
   def create
-    run_login_hooks
-    # Look for an incomplete registration with this pseudonym
+    create_user
+  end
 
-    sis_user_id = nil
-    params[:pseudonym] ||= {}
-
-    if @context.grants_right?(@current_user, session, :manage_sis)
-      sis_user_id = params[:pseudonym].delete(:sis_user_id)
-    end
-
-    @pseudonym = nil
-    @user = nil
-    if sis_user_id && value_to_boolean(params[:enable_sis_reactivation])
-      @pseudonym = @context.pseudonyms.where(:sis_user_id => sis_user_id, :workflow_state => 'deleted').first
-      if @pseudonym
-        @pseudonym.workflow_state = 'active'
-        @pseudonym.save!
-        @user = @pseudonym.user
-        @user.workflow_state = 'registered'
-        @user.update_account_associations
-      end
-    end
-
-    if @pseudonym.nil?
-      @pseudonym = @context.pseudonyms.active.by_unique_id(params[:pseudonym][:unique_id]).first
-      # Setting it to nil will cause us to try and create a new one, and give user the login already exists error
-      @pseudonym = nil if @pseudonym && !['creation_pending', 'pending_approval'].include?(@pseudonym.user.workflow_state)
-    end
-
-    @user ||= @pseudonym && @pseudonym.user
-    @user ||= User.new
-
-    force_validations = value_to_boolean(params[:force_validations])
-    manage_user_logins = @context.grants_right?(@current_user, session, :manage_user_logins)
-    self_enrollment = params[:self_enrollment].present?
-    allow_non_email_pseudonyms = !force_validations && manage_user_logins || self_enrollment && params[:pseudonym_type] == 'username'
-    require_password = self_enrollment && allow_non_email_pseudonyms
-    allow_password = require_password || manage_user_logins
-
-    notify_policy = Users::CreationNotifyPolicy.new(manage_user_logins, params[:pseudonym])
-
-    includes = %w{locale}
-
-    cc_params = params[:communication_channel]
-
-    if cc_params
-      cc_type = cc_params[:type] || CommunicationChannel::TYPE_EMAIL
-      cc_addr = cc_params[:address] || params[:pseudonym][:unique_id]
-
-      can_manage_students = [Account.site_admin, @context].any? do |role|
-        role.grants_right?(@current_user, :manage_students)
-      end
-
-      if can_manage_students
-        skip_confirmation = value_to_boolean(cc_params[:skip_confirmation])
-      end
-
-      if can_manage_students && cc_type == CommunicationChannel::TYPE_EMAIL
-        includes << 'confirmation_url' if value_to_boolean(cc_params[:confirmation_url])
-      end
-
-    else
-      cc_type = CommunicationChannel::TYPE_EMAIL
-      cc_addr = params[:pseudonym].delete(:path) || params[:pseudonym][:unique_id]
-    end
-
-    if params[:user]
-      if self_enrollment && params[:user][:self_enrollment_code]
-        params[:user][:self_enrollment_code].strip!
-      else
-        params[:user].delete(:self_enrollment_code)
-      end
-      if params[:user][:birthdate].present? && params[:user][:birthdate] !~ Api::ISO8601_REGEX &&
-          params[:user][:birthdate] !~ Api::DATE_REGEX
-        return render(:json => {:errors => {:birthdate => t(:birthdate_invalid,
-          'Invalid date or invalid datetime for birthdate')}}, :status => 400)
-      end
-
-      @user.attributes = params[:user]
-      accepted_terms = params[:user].delete(:terms_of_use)
-      @user.accept_terms if value_to_boolean(accepted_terms)
-      includes << "terms_of_use" unless accepted_terms.nil?
-    end
-    @user.name ||= params[:pseudonym][:unique_id]
-    skip_registration = value_to_boolean(params[:user].try(:[], :skip_registration))
-    unless @user.registered?
-      @user.workflow_state = if require_password || skip_registration
-        # no email confirmation required (self_enrollment_code and password
-        # validations will ensure everything is legit)
-        'registered'
-      elsif notify_policy.is_self_registration? && @user.registration_approval_required?
-        'pending_approval'
-      else
-        'pre_registered'
-      end
-    end
-    if force_validations || !manage_user_logins
-      @user.require_acceptance_of_terms = @domain_root_account.terms_required?
-      @user.require_presence_of_name = true
-      @user.require_self_enrollment_code = self_enrollment
-      @user.validation_root_account = @domain_root_account
-    end
-
-    @invalid_observee_creds = nil
-    if @user.initial_enrollment_type == 'observer'
-      if (observee_pseudonym = authenticate_observee)
-        @observee = observee_pseudonym.user
-      else
-        @invalid_observee_creds = Pseudonym.new
-        @invalid_observee_creds.errors.add('unique_id', 'bad_credentials')
-      end
-    end
-
-    @pseudonym ||= @user.pseudonyms.build(:account => @context)
-    @pseudonym.account.email_pseudonyms = !allow_non_email_pseudonyms
-    @pseudonym.require_password = require_password
-    # pre-populate the reverse association
-    @pseudonym.user = @user
-    # don't require password_confirmation on api calls
-    params[:pseudonym][:password_confirmation] = params[:pseudonym][:password] if api_request?
-    # don't allow password setting for new users that are not self-enrolling
-    # in a course (they need to go the email route)
-    unless allow_password
-      params[:pseudonym].delete(:password)
-      params[:pseudonym].delete(:password_confirmation)
-    end
-    if params[:pseudonym][:authentication_provider_id]
-      @pseudonym.authentication_provider = @context.
-          authentication_providers.active.
-          find(params[:pseudonym][:authentication_provider_id])
-    end
-    @pseudonym.attributes = params[:pseudonym]
-    @pseudonym.sis_user_id = sis_user_id
-
-    @pseudonym.account = @context
-    @pseudonym.workflow_state = 'active'
-    @cc =
-      @user.communication_channels.where(:path_type => cc_type).by_path(cc_addr).first ||
-      @user.communication_channels.build(:path_type => cc_type, :path => cc_addr)
-    @cc.user = @user
-    @cc.workflow_state = skip_confirmation ? 'active' : 'unconfirmed' unless @cc.workflow_state == 'confirmed'
-
-    if @user.valid? && @pseudonym.valid? && @invalid_observee_creds.nil?
-      # saving the user takes care of the @pseudonym and @cc, so we can't call
-      # save_without_session_maintenance directly. we don't want to auto-log-in
-      # unless the user is registered/pre_registered (if the latter, he still
-      # needs to confirm his email and set a password, otherwise he can't get
-      # back in once his session expires)
-      if !@current_user # automagically logged in
-        PseudonymSession.new(@pseudonym).save unless @pseudonym.new_record?
-      else
-        @pseudonym.send(:skip_session_maintenance=, true)
-      end
-      @user.save!
-      if @observee && !@user.user_observees.where(user_id: @observee).exists?
-        @user.user_observees << @user.user_observees.create!{ |uo| uo.user_id = @observee.id }
-      end
-
-      if notify_policy.is_self_registration?
-        registration_params = params.fetch(:user, {}).merge(remote_ip: request.remote_ip, cookies: cookies)
-        @user.new_registration(registration_params)
-      end
-      message_sent = notify_policy.dispatch!(@user, @pseudonym, @cc)
-
-      data = { :user => @user, :pseudonym => @pseudonym, :channel => @cc, :message_sent => message_sent, :course => @user.self_enrollment_course }
-      if api_request?
-        render(:json => user_json(@user, @current_user, session, includes))
-      else
-        render(:json => data)
-      end
-    else
-      errors = {
-        :errors => {
-          :user => @user.errors.as_json[:errors],
-          :pseudonym => @pseudonym ? @pseudonym.errors.as_json[:errors] : {},
-          :observee => @invalid_observee_creds ? @invalid_observee_creds.errors.as_json[:errors] : {}
-        }
-      }
-      render :json => errors, :status => :bad_request
-    end
+  # @API Self register a user
+  # Self register and return a new user and pseudonym for an account.
+  #
+  # If self-registration is enabled on the account, you can use this
+  # endpoint to self register new users.
+  #
+  # @argument user[name] [Required, String]
+  #   The full name of the user. This name will be used by teacher for grading.
+  #
+  #
+  # @argument user[short_name] [String]
+  #   User's name as it will be displayed in discussions, messages, and comments.
+  #
+  # @argument user[sortable_name] [String]
+  #   User's name as used to sort alphabetically in lists.
+  #
+  # @argument user[time_zone] [String]
+  #   The time zone for the user. Allowed time zones are
+  #   {http://www.iana.org/time-zones IANA time zones} or friendlier
+  #   {http://api.rubyonrails.org/classes/ActiveSupport/TimeZone.html Ruby on Rails time zones}.
+  #
+  # @argument user[locale] [String]
+  #   The user's preferred language as a two-letter ISO 639-1 code.
+  #
+  # @argument user[birthdate] [Date]
+  #   The user's birth date.
+  #
+  # @argument user[terms_of_use] [Required, Boolean]
+  #   Whether the user accepts the terms of use.
+  #
+  # @argument pseudonym[unique_id] [Required, String]
+  #   User's login ID. Must be a valid email address.
+  #
+  # @argument communication_channel[type] [String]
+  #   The communication channel type, e.g. 'email' or 'sms'.
+  #
+  # @argument communication_channel[address] [String]
+  #   The communication channel address, e.g. the user's email address.
+  #
+  # @returns User
+  def create_self_registered_user
+    create_user
   end
 
   # @API Update user settings.
@@ -2019,5 +1885,190 @@ class UsersController < ApplicationController
   def authenticate_observee
     Pseudonym.authenticate(params[:observee] || {},
                            [@domain_root_account.id] + @domain_root_account.trusted_account_ids)
+  end
+
+  private
+
+  def create_user
+    run_login_hooks
+    # Look for an incomplete registration with this pseudonym
+
+    sis_user_id = nil
+    params[:pseudonym] ||= {}
+
+    if @context.grants_right?(@current_user, session, :manage_sis)
+      sis_user_id = params[:pseudonym].delete(:sis_user_id)
+    end
+
+    @pseudonym = nil
+    @user = nil
+    if sis_user_id && value_to_boolean(params[:enable_sis_reactivation])
+      @pseudonym = @context.pseudonyms.where(:sis_user_id => sis_user_id, :workflow_state => 'deleted').first
+      if @pseudonym
+        @pseudonym.workflow_state = 'active'
+        @pseudonym.save!
+        @user = @pseudonym.user
+        @user.workflow_state = 'registered'
+        @user.update_account_associations
+      end
+    end
+
+    if @pseudonym.nil?
+      @pseudonym = @context.pseudonyms.active.by_unique_id(params[:pseudonym][:unique_id]).first
+      # Setting it to nil will cause us to try and create a new one, and give user the login already exists error
+      @pseudonym = nil if @pseudonym && !['creation_pending', 'pending_approval'].include?(@pseudonym.user.workflow_state)
+    end
+
+    @user ||= @pseudonym && @pseudonym.user
+    @user ||= User.new
+
+    force_validations = value_to_boolean(params[:force_validations])
+    manage_user_logins = @context.grants_right?(@current_user, session, :manage_user_logins)
+    self_enrollment = params[:self_enrollment].present?
+    allow_non_email_pseudonyms = !force_validations && manage_user_logins || self_enrollment && params[:pseudonym_type] == 'username'
+    require_password = self_enrollment && allow_non_email_pseudonyms
+    allow_password = require_password || manage_user_logins
+
+    notify_policy = Users::CreationNotifyPolicy.new(manage_user_logins, params[:pseudonym])
+
+    includes = %w{locale}
+
+    cc_params = params[:communication_channel]
+
+    if cc_params
+      cc_type = cc_params[:type] || CommunicationChannel::TYPE_EMAIL
+      cc_addr = cc_params[:address] || params[:pseudonym][:unique_id]
+
+      can_manage_students = [Account.site_admin, @context].any? do |role|
+        role.grants_right?(@current_user, :manage_students)
+      end
+
+      if can_manage_students
+        skip_confirmation = value_to_boolean(cc_params[:skip_confirmation])
+      end
+
+      if can_manage_students && cc_type == CommunicationChannel::TYPE_EMAIL
+        includes << 'confirmation_url' if value_to_boolean(cc_params[:confirmation_url])
+      end
+
+    else
+      cc_type = CommunicationChannel::TYPE_EMAIL
+      cc_addr = params[:pseudonym].delete(:path) || params[:pseudonym][:unique_id]
+    end
+
+    if params[:user]
+      if self_enrollment && params[:user][:self_enrollment_code]
+        params[:user][:self_enrollment_code].strip!
+      else
+        params[:user].delete(:self_enrollment_code)
+      end
+      if params[:user][:birthdate].present? && params[:user][:birthdate] !~ Api::ISO8601_REGEX &&
+          params[:user][:birthdate] !~ Api::DATE_REGEX
+        return render(:json => {:errors => {:birthdate => t(:birthdate_invalid,
+                                                            'Invalid date or invalid datetime for birthdate')}}, :status => 400)
+      end
+
+      @user.attributes = params[:user]
+      accepted_terms = params[:user].delete(:terms_of_use)
+      @user.accept_terms if value_to_boolean(accepted_terms)
+      includes << "terms_of_use" unless accepted_terms.nil?
+    end
+    @user.name ||= params[:pseudonym][:unique_id]
+    skip_registration = value_to_boolean(params[:user].try(:[], :skip_registration))
+    unless @user.registered?
+      @user.workflow_state = if require_password || skip_registration
+                               # no email confirmation required (self_enrollment_code and password
+                               # validations will ensure everything is legit)
+                               'registered'
+                             elsif notify_policy.is_self_registration? && @user.registration_approval_required?
+                               'pending_approval'
+                             else
+                               'pre_registered'
+                             end
+    end
+    if force_validations || !manage_user_logins
+      @user.require_acceptance_of_terms = @domain_root_account.terms_required?
+      @user.require_presence_of_name = true
+      @user.require_self_enrollment_code = self_enrollment
+      @user.validation_root_account = @domain_root_account
+    end
+
+    @invalid_observee_creds = nil
+    if @user.initial_enrollment_type == 'observer'
+      if (observee_pseudonym = authenticate_observee)
+        @observee = observee_pseudonym.user
+      else
+        @invalid_observee_creds = Pseudonym.new
+        @invalid_observee_creds.errors.add('unique_id', 'bad_credentials')
+      end
+    end
+
+    @pseudonym ||= @user.pseudonyms.build(:account => @context)
+    @pseudonym.account.email_pseudonyms = !allow_non_email_pseudonyms
+    @pseudonym.require_password = require_password
+    # pre-populate the reverse association
+    @pseudonym.user = @user
+    # don't require password_confirmation on api calls
+    params[:pseudonym][:password_confirmation] = params[:pseudonym][:password] if api_request?
+    # don't allow password setting for new users that are not self-enrolling
+    # in a course (they need to go the email route)
+    unless allow_password
+      params[:pseudonym].delete(:password)
+      params[:pseudonym].delete(:password_confirmation)
+    end
+    if params[:pseudonym][:authentication_provider_id]
+      @pseudonym.authentication_provider = @context.
+          authentication_providers.active.
+          find(params[:pseudonym][:authentication_provider_id])
+    end
+    @pseudonym.attributes = params[:pseudonym]
+    @pseudonym.sis_user_id = sis_user_id
+
+    @pseudonym.account = @context
+    @pseudonym.workflow_state = 'active'
+    @cc =
+        @user.communication_channels.where(:path_type => cc_type).by_path(cc_addr).first ||
+            @user.communication_channels.build(:path_type => cc_type, :path => cc_addr)
+    @cc.user = @user
+    @cc.workflow_state = skip_confirmation ? 'active' : 'unconfirmed' unless @cc.workflow_state == 'confirmed'
+
+    if @user.valid? && @pseudonym.valid? && @invalid_observee_creds.nil?
+      # saving the user takes care of the @pseudonym and @cc, so we can't call
+      # save_without_session_maintenance directly. we don't want to auto-log-in
+      # unless the user is registered/pre_registered (if the latter, he still
+      # needs to confirm his email and set a password, otherwise he can't get
+      # back in once his session expires)
+      if !@current_user # automagically logged in
+        PseudonymSession.new(@pseudonym).save unless @pseudonym.new_record?
+      else
+        @pseudonym.send(:skip_session_maintenance=, true)
+      end
+      @user.save!
+      if @observee && !@user.user_observees.where(user_id: @observee).exists?
+        @user.user_observees << @user.user_observees.create!{ |uo| uo.user_id = @observee.id }
+      end
+
+      if notify_policy.is_self_registration?
+        registration_params = params.fetch(:user, {}).merge(remote_ip: request.remote_ip, cookies: cookies)
+        @user.new_registration(registration_params)
+      end
+      message_sent = notify_policy.dispatch!(@user, @pseudonym, @cc)
+
+      data = { :user => @user, :pseudonym => @pseudonym, :channel => @cc, :message_sent => message_sent, :course => @user.self_enrollment_course }
+      if api_request?
+        render(:json => user_json(@user, @current_user, session, includes))
+      else
+        render(:json => data)
+      end
+    else
+      errors = {
+          :errors => {
+              :user => @user.errors.as_json[:errors],
+              :pseudonym => @pseudonym ? @pseudonym.errors.as_json[:errors] : {},
+              :observee => @invalid_observee_creds ? @invalid_observee_creds.errors.as_json[:errors] : {}
+          }
+      }
+      render :json => errors, :status => :bad_request
+    end
   end
 end

@@ -832,6 +832,112 @@ describe "Users API", type: :request do
       expect(email.path).to eq "test@example.com"
       expect(email.path_type).to eq 'email'
     end
+
+    context "as an anonymous user" do
+      before :each do
+        user(active_all: true)
+        @user = nil
+      end
+
+      it "should not let you create a user if self_registration is off" do
+        raw_api_call(:post, "/api/v1/accounts/#{@admin.account.id}/self_registration",
+                     { :controller => 'users', :action => 'create_self_registered_user', :format => 'json', :account_id => @admin.account.id.to_s },
+                     {
+                         :user      => { :name => "Test User" },
+                         :pseudonym => { :unique_id => "test@example.com" }
+                     }
+                    )
+        assert_status(403)
+      end
+
+      it "should require an email pseudonym" do
+        @admin.account.settings[:self_registration] = true
+        @admin.account.save!
+        raw_api_call(:post, "/api/v1/accounts/#{@admin.account.id}/self_registration",
+                     { :controller => 'users', :action => 'create_self_registered_user', :format => 'json', :account_id => @admin.account.id.to_s },
+                     {
+                         :user      => { :name => "Test User", :terms_of_use => "1" },
+                         :pseudonym => { :unique_id => "invalid" }
+                     }
+                    )
+        assert_status(400)
+      end
+
+      it "should require acceptance of the terms" do
+        @admin.account.settings[:self_registration] = true
+        @admin.account.save!
+        raw_api_call(:post, "/api/v1/accounts/#{@admin.account.id}/self_registration",
+                     { :controller => 'users', :action => 'create_self_registered_user', :format => 'json', :account_id => @admin.account.id.to_s },
+                     {
+                         :user      => { :name => "Test User" },
+                         :pseudonym => { :unique_id => "test@example.com" }
+                     }
+                    )
+        assert_status(400)
+      end
+
+      it "should let you create a user if you pass all the validations" do
+        @admin.account.settings[:self_registration] = true
+        @admin.account.save!
+        json = api_call(:post, "/api/v1/accounts/#{@admin.account.id}/self_registration",
+                        { :controller => 'users', :action => 'create_self_registered_user', :format => 'json', :account_id => @admin.account.id.to_s },
+                        {
+                            :user      => { :name => "Test User", :terms_of_use => "1" },
+                            :pseudonym => { :unique_id => "test@example.com" }
+                        }
+                       )
+        expect(json['name']).to eq 'Test User'
+      end
+    end
+
+    it "should return a 400 error if the request doesn't include a unique id" do
+      @admin.account.settings[:self_registration] = true
+      @admin.account.save!
+      raw_api_call(:post, "/api/v1/accounts/#{@admin.account.id}/self_registration",
+                   { :controller => 'users',
+                     :action => 'create_self_registered_user',
+                     :format => 'json',
+                     :account_id => @admin.account.id.to_s
+                   },
+                   {
+                       :user      => { :name => "Test User", :terms_of_use => "1"  },
+                       :pseudonym => { :password => "password123" }
+                   }
+                  )
+      assert_status(400)
+      errors = JSON.parse(response.body)['errors']
+      expect(errors['pseudonym']).to be_present
+      expect(errors['pseudonym']['unique_id']).to be_present
+    end
+
+    it "should set user's email address via communication_channel[address]" do
+      @admin.account.settings[:self_registration] = true
+      @admin.account.save!
+      api_call(:post, "/api/v1/accounts/#{@admin.account.id}/self_registration",
+               { :controller => 'users',
+                 :action => 'create_self_registered_user',
+                 :format => 'json',
+                 :account_id => @admin.account.id.to_s
+               },
+               {
+                   :user      => { :name => "Test User", :terms_of_use => "1" },
+                   :pseudonym => {
+                       :unique_id         => "test@test.com",
+                       :password          => "password123"
+                   },
+                   :communication_channel => {
+                       :address           => "test@example.com"
+                   }
+               }
+              )
+      expect(response).to be_success
+      users = User.where(name: "Test User").to_a
+      expect(users.size).to eq 1
+      expect(users.first.pseudonyms.first.unique_id).to eq "test@test.com"
+      email = users.first.communication_channels.email.first
+      expect(email.path).to eq "test@example.com"
+      expect(email.path_type).to eq 'email'
+    end
   end
 
   describe "user account updates" do
