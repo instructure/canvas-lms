@@ -794,7 +794,7 @@ $wizard-highlight-color: $ic-brand-primary;
       i[class^=icon-] {
         width: ($wizard-icon-size + $ic-sp * 4) / 2;
         height: ($wizard-icon-size + $ic-sp * 4) / 2;
-        background: $ic-brand-secondary;
+        background: $wizard-bg-color;
         border-radius: 100%;
         font-size: $wizard-icon-size / 2;
         &:before {
