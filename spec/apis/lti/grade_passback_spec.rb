@@ -291,13 +291,17 @@ XML
       expect(xml.at_css('imsx_description').content).to eq "Assignment has no points possible."
     end
 
-    it "should fail if assignment has 0 points possible" do
+    it "should pass if assignment has 0 points possible" do
       @assignment.update_attributes(:points_possible => 0, :grading_type => 'percent')
       make_call('body' => replace_result(score: '0.75', sourceid: nil))
-      expect(response).to be_success
-      xml = Nokogiri::XML.parse(response.body)
-      expect(xml.at_css('imsx_codeMajor').content).to eq 'failure'
-      expect(xml.at_css('imsx_description').content).to eq "Assignment has no points possible."
+      check_success
+
+      submission = @assignment.submissions.where(user_id: @student).first
+      expect(submission).to be_present
+      expect(submission).to be_graded
+      expect(submission).to be_submitted_at
+      expect(submission.submission_type).to eql 'external_tool'
+      expect(submission.score).to eq 0
     end
 
 
@@ -314,21 +318,6 @@ An external tool attempted to grade this assignment as 75%, but was unable
 to because the assignment has no points possible.
       NO_POINTS
     end
-
-    it "should notify users if it fails because the assignment has 0 points" do
-      @assignment.update_attributes(:points_possible => 0, :grading_type => 'percent')
-      make_call('body' => replace_result(score: '0.75', sourceid: nil))
-      expect(response).to be_success
-      submissions = @assignment.submissions.where(user_id: @student).to_a
-      comments    = submissions.first.submission_comments
-      expect(submissions.count).to eq 1
-      expect(comments.count).to eq 1
-      expect(comments.first.comment).to eq <<-NO_POINTS.strip
-An external tool attempted to grade this assignment as 75%, but was unable
-to because the assignment has no points possible.
-      NO_POINTS
-    end
-
 
     it "should reject out of bound scores" do
       expect(@assignment.submissions.where(user_id: @student)).not_to be_exists
@@ -358,6 +347,22 @@ to because the assignment has no points possible.
 
     context "pass_fail zero point assignments" do
       it "should succeed with incomplete grade when score < 1" do
+        @assignment.update_attributes(:points_possible => 10, :grading_type => 'pass_fail')
+        make_call('body' => replace_result(score: '0.75', sourceid: nil))
+        check_success
+
+        verify_xml(response)
+
+        submission = @assignment.submissions.where(user_id: @student).first
+        expect(submission).to be_present
+        expect(submission).to be_graded
+        expect(submission).to be_submitted_at
+        expect(submission.submission_type).to eql 'external_tool'
+        expect(submission.score).to eq 0
+        expect(submission.grade).to eq 'incomplete'
+      end
+
+      it "should succeed with incomplete grade when score < 1 for a 0 point assignment" do
         @assignment.update_attributes(:points_possible => 0, :grading_type => 'pass_fail')
         make_call('body' => replace_result(score: '0.75', sourceid: nil))
         check_success
