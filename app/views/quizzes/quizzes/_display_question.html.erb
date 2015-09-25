@@ -316,8 +316,15 @@
                     # question types
                     break if hash_get(question, :question_type) == 'file_upload_question'
                     val = hash_get(user_answer, :text).to_f
+                    # Duplicates logic from app/models/quizzes/quiz_question/numerical_question.rb:46
                     matched_answer = a if hash_get(a, :numerical_answer_type) == 'exact_answer' && val <= (hash_get(a, :exact) + hash_get(a, :margin, 0)) && val >= (hash_get(a, :exact) - hash_get(a, :margin, 0))
                     matched_answer = a if hash_get(a, :numerical_answer_type) == 'range_answer' && val <= hash_get(a, :end) && val >= hash_get(a, :start)
+                    if hash_get(a, :numerical_answer_type) == 'precision_answer'
+                      submission = BigDecimal.new(val, 16).split
+                      expected = BigDecimal.new(a[:approximate].to_s, 16).split
+                      precision = a[:precision].to_i
+                      matched_answer = a if submission[0] == expected[0] && submission[1][0, precision] == expected[1][0, precision] && submission[3] == expected[3]
+                    end
                   end %>
                   <% answer_classes = ['selected_answer']
                     if display_correct_answers && hash_get(question,:question_type) != 'file_upload_question'

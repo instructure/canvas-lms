@@ -117,11 +117,17 @@
     </div>
     <% if show_correct_answers %>
       <% number_type = nil %>
+      <% number_type = "range" if answer_type == "numerical_answer" %>
       <% number_type = "exact" if answer_type == "numerical_answer" && hash_get(answer, :numerical_answer_type) == "exact_answer" %>
-      <% number_type = "range" if answer_type == "numerical_answer" && hash_get(answer, :numerical_answer_type) != "exact_answer" %>
+      <% number_type = "precision" if answer_type == "numerical_answer" && hash_get(answer, :numerical_answer_type) == "precision_answer" %>
       <% number_type = "equation" if answer_type == "numerical_answer" && hash_get(answer, :variables) %>
       <div class="numerical_exact_answer answer_type" <%= hidden(true) unless number_type == 'exact' %>>
         <span class="answer_exact"><%= hash_get(answer, :exact, "0") %></span> (<%= before_label :answer_with_margin, 'with margin' %> <span class="answer_error_margin"><%= hash_get(answer, :margin, "0") %></span>)
+      </div>
+      <div class="numerical_precision_answer answer_type" <%= hidden(true) unless number_type == 'precision' %>>
+        <span class="answer_approximate">
+          <%= "%.#{hash_get(answer, :precision, 10)}g" % hash_get(answer, :approximate, "0") %>
+        </span> (<%= before_label :answer_with_precision, 'with precision' %> <span class="answer_precision"><%= hash_get(answer, :precision, "0") %></span>)
       </div>
       <div class="numerical_range_answer answer_type" <%= hidden(true) unless number_type == 'range' %>>
         <%= t(:range_answer, "Between %{lower_bound} and %{upper_bound}",

@@ -152,7 +152,8 @@ def numerical_question_data
     {"exact"=>4, "comments"=>"", "numerical_answer_type"=>"exact_answer", "margin"=>0, "weight"=>100, "text"=>"", "id"=>9222},
     {"exact"=>-4, "comments"=>"", "numerical_answer_type"=>"exact_answer", "margin"=>0, "weight"=>100, "text"=>"", "id"=>997},
     {"comments"=>"", "numerical_answer_type"=>"range_answer", "weight"=>100, "text"=>"", "id"=>9370, "end"=>4.1, "start"=>3.9},
-    {"exact"=>-4, "comments"=>"", "numerical_answer_type"=>"exact_answer", "margin"=>0.1, "weight"=>100, "text"=>"", "id"=>5450}
+    {"exact"=>-4, "comments"=>"", "numerical_answer_type"=>"exact_answer", "margin"=>0.1, "weight"=>100, "text"=>"", "id"=>5450},
+    {"numerical_answer_type"=>"precision_answer", "approximate"=>"1.23456e+21", "precision"=>"6", "comments"=>"", "weight"=>100, "text"=>"", "id"=>123}
   ], "question_text"=>"<p>abs(x) = 4</p>", "id" => 1}.with_indifferent_access
 end
 

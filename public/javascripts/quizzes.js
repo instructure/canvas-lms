@@ -721,7 +721,7 @@ define([
       } else if (question_type == 'numerical_question') {
         $formQuestion.removeClass('selectable');
         result.answer_type = "numerical_answer";
-        result.textValues = ['numerical_answer_type', 'answer_exact', 'answer_error_margin', 'answer_range_start', 'answer_range_end'];
+        result.textValues = ['numerical_answer_type', 'answer_exact', 'answer_error_margin', 'answer_range_start', 'answer_range_end', 'answer_approximate', 'answer_precision'];
         result.html_values = [];
       } else if (question_type == 'calculated_question') {
         $formQuestion.removeClass('selectable');
@@ -830,19 +830,54 @@ define([
 
     parseInput: function($input, type) {
       if ($input.val() == "") { return; }
+
       var val = $input.val().replace(/,/g, '');
+
       if (type == "int") {
         val = parseInt(val, 10);
         if (isNaN(val)) { val = 0; }
-        $input.val(val);
       } else if (type == "float") {
         val = Math.round(parseFloat(val) * 100.0) / 100.0;
         if (isNaN(val)) { val = 0.0; }
-        $input.val(val);
       } else if (type == "float_long") {
         val = Math.round(parseFloat(val) * 10000.0) / 10000.0;
         if (isNaN(val)) { val = 0.0; }
-        $input.val(val);
+      } else if (type == "precision") {
+        // Parse value and force NaN to 0
+        val = parseFloat(val)
+        if (isNaN(val)) { val = 0.0; }
+
+        // Round to precision 16 to handle floating point error
+        val = val.toPrecision(16);
+
+        // Truncate to specified precision
+        var precision = arguments[2] || 10;
+        if (precision < 16) {
+          var precision_shift = Math.pow(10, precision - Math.floor(Math.log(val) / Math.LN10) - 1);
+          val = Math.floor(val * precision_shift) / precision_shift;
+
+          // Format
+          val = val.toPrecision(precision)
+        }
+      }
+
+      $input.val(val);
+    },
+
+    /*****
+      Wrap parseInput with inforced range.
+
+      Value of $input must be between min and max inclusive, if value falls out
+      of the range it will be replaced with min or max respectively
+    *****/
+    parseInputRange: function($input, type, min, max) {
+      this.parseInput($input, type);
+      var val = $input.val();
+      if (val < min) {
+        $input.val(min);
+      }
+      if (val > max) {
+        $input.val(max);
       }
     },
 
@@ -868,7 +903,9 @@ define([
       answer_exact: "",
       answer_error_margin: "",
       answer_range_start: "",
-      answer_range_end: ""
+      answer_range_end: "",
+      answer_approximate: "",
+      answer_precision: "10"
     }
   };
 
@@ -1169,6 +1206,8 @@ define([
     data.answer_error_margin = data.answer_error_margin || data.margin;
     data.answer_range_start = data.start || data.answer_range_start;
     data.answer_range_end = data.end || data.answer_range_end;
+    data.answer_approximate = data.approximate || data.answer_approximate;
+    data.answer_precision = data.precision || data.answer_precision;
 
     var answer = $.extend({}, quiz.defaultAnswerData, data);
     var $answer = $("#answer_template").clone(true).attr('id', '');
@@ -1259,7 +1298,7 @@ define([
         $question.find(".text > .answers .answer").each(function() {
           var $answer = $(this);
           var answerData = $answer.getTemplateData({
-            textValues: ['answer_exact', 'answer_error_margin', 'answer_range_start', 'answer_range_end', 'answer_weight', 'numerical_answer_type', 'blank_id', 'id', 'match_id', 'answer_text', 'answer_match_left', 'answer_match_right', 'answer_comment'],
+            textValues: ['answer_exact', 'answer_error_margin', 'answer_range_start', 'answer_range_end', 'answer_approximate', 'answer_precision', 'answer_weight', 'numerical_answer_type', 'blank_id', 'id', 'match_id', 'answer_text', 'answer_match_left', 'answer_match_right', 'answer_comment'],
             htmlValues: ['answer_html', 'answer_match_left_html', 'answer_comment_html']
           });
           var answer = $.extend({}, quiz.defaultAnswerData, answerData);
@@ -2672,6 +2711,7 @@ define([
           numerical_answer_type: "exact_answer",
           answer_exact: "#",
           answer_error_margin: "#",
+          answer_precision: "10",
           comments: I18n.t('default_answer_comments_on_match', "Response if the student matches this answer")
         }];
         answer_type = "numerical_answer";
@@ -2952,11 +2992,30 @@ define([
     });
 
     $(document).delegate("input.float_value", 'keydown', function(event) {
-      if (event.keyCode > 57 && event.keyCode < 91) {
+      if (event.keyCode > 57 && event.keyCode < 91 && event.keyCode != 69) {
         event.preventDefault();
       }
     }).delegate('input.float_value', 'change blur focus', function(event) {
-      quiz.parseInput($(this), $(this).hasClass('long') ? 'float_long' : 'float');
+      var $el = $(this)
+
+      if ($el.hasClass('long')) {
+        quiz.parseInput($el, 'float_long');
+      } else if ($el.hasClass('precision')) {
+        quiz.parseInput($el, 'precision', $el.siblings('.precision_value').val());
+      } else {
+        quiz.parseInput($el, 'float');
+      }
+    });
+
+    $(document).delegate("input.precision_value", 'keydown', function(event) {
+      // unless movement key || '0' through '9' || '-' || '+'
+      if (event.keyCode > 57 && event.keyCode != 189 && event.keyCode != 187) {
+        event.preventDefault();
+      }
+    }).delegate('input.precision_value', 'change blur focus', function(event) {
+      var $el = $(this);
+      quiz.parseInputRange($el, 'int', 1, 16);
+      $el.siblings('.float_value.precision').change();
     });
 
     $(document).delegate("input.combination_answer_tolerance", 'keydown', function(event) {

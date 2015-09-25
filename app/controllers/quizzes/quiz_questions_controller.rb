@@ -133,7 +133,7 @@
 #         "type": "string"
 #       },
 #       "numerical_answer_type": {
-#         "description": "Used in numerical questions.  Values can be 'exact_answer' or 'range_answer'.",
+#         "description": "Used in numerical questions.  Values can be 'exact_answer', 'range_answer', or 'precision_answer'.",
 #         "example": "exact_answer",
 #         "type": "string"
 #       },
@@ -145,6 +145,18 @@
 #       },
 #       "margin": {
 #         "description": "Used in numerical questions of type 'exact_answer'. The margin of error allowed for the student's answer.",
+#         "example": 4,
+#         "type": "integer",
+#         "format": "int64"
+#       },
+#       "approximate": {
+#         "description": "Used in numerical questions of type 'precision_answer'.  The value the answer should equal.",
+#         "example": 1.2346e+9,
+#         "type": "float",
+#         "format": "float64"
+#       },
+#       "precision": {
+#         "description": "Used in numerical questions of type 'precision_answer'. The numerical precision that will be used when comparing the student's answer.",
 #         "example": 4,
 #         "type": "integer",
 #         "format": "int64"
