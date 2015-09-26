@@ -5722,7 +5722,7 @@ sv:
             
             * Visa arbeten som du är stolt över eller om du vill att fler än instruktören ska se dem
             * Prata om alla tankar och det arbete som du lagt ner på dina klassinlämningar
-            * Samla en överskit över din fullständiga undervisningsupplevelse
+            * Samla en översikt över din fullständiga undervisningsupplevelse
             * Dela ditt arbete med vänner, framtida chefer, etc.
             
             ePortfolios kan vara offentliga för alla, eller privata för de du väljer
@@ -9834,7 +9834,7 @@ sv:
         Markera 'Inkludera poäng vid meddelande om betygsändringar' om du vill se dina betyg bland aviseringarna.
         Om din e-post inte är en institutions-epost betyder det att känsligt innehåll kommer skickas utanför institutionen.
     grading_display: Betygsättning
-    grading_notify_include_grade: "nkludera poäng vid meddelande om betygsändringar."
+    grading_notify_include_grade: "Inkludera poäng vid meddelande om betygsändringar."
     grading_policies_description: "Ändra kursens betygspolicy "
     grading_policies_display: Betygspolicies
     invitation_description: |-
