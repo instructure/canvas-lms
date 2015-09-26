@@ -867,6 +867,7 @@ pl:
         message: Wiadomość
         mfa_settings: "Wieloskładnikowe uwierzytelnianie"
         name: "Nazwa konta"
+        new_sub_account_includes: "Pozwól subkontom dostosować motywy i dołączać dodatkowe pliki CSS"
         no_enrollments_can_create_courses: "Użytkownicy niezapisani na kursy"
         open_registration: "Otwarta rejestracja"
         outgoing_email_default_name_option_custom: "Niestandardowa nazwa „Od”"
@@ -882,6 +883,7 @@ pl:
         self_registration_type_observer: "Jedynie konta obserwatorów"
         show_scheduler: "Uaktywnij planer"
         sis_app_token: "Token agenta SIS"
+        sis_app_url: "Adres URL aplikacji SIS"
         sis_source_id: "Identyfikator systemu SIS"
         start_at: Rozpoczęcie
         students_can_create_courses: Uczestnicy
@@ -1198,6 +1200,7 @@ pl:
             text: "W tym raporcie uwzględniono wszystkich uczestników zapisanych do jakiegokolwiek kursu w danym semestrze. Wynikowy plik csv będzie zawierał jeden rząd na zapis użytkownika, który nie odwiedził kursu od określonej daty."
   achieve_mastery_count_times_8c9bbcec: "Osiągnij biegłość %{count} razy"
   actions_efcde10d: Akcje
+  activate_this_key_6cd98f4b: "Aktywuj ten klucz"
   activerecord: 
     errors: 
       messages: 
@@ -1227,6 +1230,7 @@ pl:
   add_students_to_the_course_874be8fb: "Dodaj uczestników do kursu"
   add_tas_to_the_course_2aac6e02: "Dodaj asystentów do kursu"
   add_your_assignments_you_can_just_make_a_long_list_8a7862dd: "Dodaj swoje zadania. Możesz po prostu utworzyć długą listę albo podzielić je na grupy, a nawet określić wagi dla każdej grupy zadań."
+  add_your_zendesk_instance_s_custom_field_id_for_ea_3aeb75f4: "Dodaj swój identyfikator pola dla Zendesk Instance dla każdego poniższego pola (pola, które nie zawierają identyfikatora nie będą logowane):"
   admin_4d3ba42f: Administrator
   after_date_981cd41b: "Po %{date}"
   after_last_attempt_c9168da2: "Po ostatniej próbie"
