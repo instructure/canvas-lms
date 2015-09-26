@@ -354,6 +354,14 @@ module Helpers
   end
 end
 
+if CANVAS_RAILS3
+  ActionController::TestSession.class_eval do
+    def destroy
+      clear
+    end
+  end
+end
+
 RSpec.configure do |config|
   # If you're not using ActiveRecord you should remove these
   # lines, delete config/database.yml and disable :active_record

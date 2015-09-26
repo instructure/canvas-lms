@@ -19,3 +19,12 @@ ActionController::DataStreaming.class_eval do
   end
   alias_method_chain :send_data, :content_length
 end
+
+if CANVAS_RAILS3
+  ActionDispatch::Request.class_eval do
+    def reset_session
+      session.destroy if session && session.respond_to?(:destroy)
+      @env['action_dispatch.request.flash_hash'] = nil
+    end
+  end
+end
