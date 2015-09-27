@@ -861,6 +861,7 @@ sv:
         message: Meddelande
         mfa_settings: Fler-faktorsverifiering
         name: Kontonamn
+        new_sub_account_includes: "Låt underkonton ändra sina teman och lägga till extra innehåll"
         no_enrollments_can_create_courses: "Användare utan anmälningar"
         open_registration: "Öppen anmälan"
         outgoing_email_default_name_option_custom: "Valfritt \"Från\" namn"
@@ -876,6 +877,7 @@ sv:
         self_registration_type_observer: "Obervera endast konton"
         show_scheduler: "Akriver schemaläggare"
         sis_app_token: "SIS Agent Token"
+        sis_app_url: "SIS App URL"
         sis_source_id: "SIS ID"
         start_at: Börjar
         students_can_create_courses: Elever
@@ -1191,6 +1193,7 @@ sv:
             text: "Den här rapporten visa elever som är anmälda till kurser under en specifik termin. Den färdiga csv filen kommer ha en rad per användar-anmälan som inte besökt kursen sedan startdatumet."
   achieve_mastery_count_times_8c9bbcec: "Uppnå mastery %{count} gånger"
   actions_efcde10d: Handling
+  activate_this_key_6cd98f4b: "Aktivera den här nyckeln"
   activerecord: 
     errors: 
       messages: 
@@ -1220,6 +1223,7 @@ sv:
   add_students_to_the_course_874be8fb: "Lägg till elever till kursen"
   add_tas_to_the_course_2aac6e02: "Lägg till TAs till kursen"
   add_your_assignments_you_can_just_make_a_long_list_8a7862dd: "Lägg till dina uppgifter. Du kan antingen göra en lång lista eller dela upp dem i grupper - och specifiera vikten med varje uppgiftsgrupps"
+  add_your_zendesk_instance_s_custom_field_id_for_ea_3aeb75f4: "Lägg till ditt Zendesk custom filed ID för varje av följande (filer som inte har ID kommer inte sparas):"
   admin_4d3ba42f: Administratör
   after_date_981cd41b: "Efter %{date}"
   after_last_attempt_c9168da2: "Efter senaste försöket"
@@ -1276,20 +1280,27 @@ sv:
       recipients_required: "Det krävs åtminstonde en mottagare"
       threshold_should_be_numeric: "Det här ska vara ett positivt nummer"
   all_4321c3a1: Alla
+  all_accounts_3bafc860: "Alla konton"
   all_changes_were_saved_f6f3ddcc: "Alla ändringar sparades"
   all_configured_apps_a14eef0a: "Alla konfigurerade appar"
+  all_courses_a7dbb853: "Alla kurser"
   all_dates_fields_must_be_present_and_formatted_cor_3a0fe925: "Alla datumfält måste presenteras och formaters korrekt"
   all_finished_time_to_publish_your_course_click_the_b6f07217: "Helt färdig? Då där det dags att publisera din kurs! Klicka på knappen nedan för att göra det officiellt! Efter publisering kommer användare kunna medverka  i kursen."
   all_grading_periods_77974940: "Alla betygsperioder"
   all_grading_periods_must_have_a_title_a1a38d87: "Alla betygsperioder måste ha en titel"
+  all_groups_cea25817: "Alla grupper"
+  all_my_files_a0213441: "Alla mina filer"
   all_start_dates_must_be_before_the_end_date_d949eca9: "Alla startdatum måste vara före slutdatum"
   all_students_have_taken_the_quiz_b558f8b4: "Alla eleverna har tagit quizen"
   all_students_have_taken_the_survey_494f9f42: "Alla stundenterna har gjort undersökningen"
+  allow_a_moderator_to_review_multiple_independent_g_752c4b90: "TIllåter att moderatorn ser över flera olika oberonder betyg väljs för inlämning"
   allow_bulk_grade_export_to_sis_e11a6e66: "Tillåt grupp-exportering av betyg till SIS"
   allow_lor_tools: "Tillåt användare att visa och använda externa verktyg som konfigurerats för LOR."
   allow_opt_out_of_inbox: "Tillåt användare att välja om de vill ut ur Konversations-inboxen. Det kommer leda till att alla konversationsmeddelanden och aviseringar skickas som ASAP-aviseringar till användarens e-post, dölj Konversations-inboxens märke för olästa meddelanden, och dölj Konversations-inboxens aviseringspreferenser. "
   allow_students_to_see_who_has_signed_up_for_time_s_497f4a46: "Tillåt elever att se vem som har bokat in sig för tidsluckorna."
   allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "Tillåt elever att markera betygsdata som ska ecporteras i grupp till SIS integreringar."
+  allows_the_scheduling_of_recurring_calendar_events_aac71007: "TIllåt schemaläggning av återkommerande kalenderevent"
+  allows_users_with_international_phone_numbers_to_r_f90f8522: "Tillåt användare med internationella telefonnummer att ta emot meddelanden från Canvas."
   always_3a59e701: Alltid
   an_error_occured_trying_to_generate_this_theme_ple_6ae581d: "Ett fel uppstod när temat genererades, vänligen försök igen."
   an_error_occurred_please_post_your_reply_again_lat_b0220ac6: "*Ett fell upptod*, vänligen skicka in ditt svar igen senare."
