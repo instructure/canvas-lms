@@ -29,7 +29,7 @@ class NotificationEndpoint < ActiveRecord::Base
   after_destroy :delete_platform_endpoint
 
   def push_json(json)
-    return false unless endpoint_exists? && own_endpoint? && endpoint_enabled?
+    return false unless endpoint_exists? && own_endpoint? && endpoint_enabled? && !token_changed?
     sns_client.publish(target_arn: self.arn, message: json, message_structure: 'json')
   end
 
@@ -63,6 +63,10 @@ class NotificationEndpoint < ActiveRecord::Base
 
   def endpoint_enabled?
     endpoint_attributes['Enabled'] == 'true'
+  end
+
+  def token_changed?
+    self.token != endpoint_attributes['Token']
   end
 
   def create_platform_endpoint
