@@ -64,8 +64,10 @@ switch($toolForm.data('tool-launch-type')){
       if (!ENV.use_new_styles) {
         $("#content").addClass('padless');
       }
-      $('#insecure_content_msg').hide();
-      $toolForm.hide();
+      if(document.location.protocol !== "https:" || $("#tool_form")[0].action.indexOf("https:") > -1) {
+        $('#insecure_content_msg').hide();
+        $toolForm.hide();
+      }
     });
     setTimeout(function(){
       if($('#insecure_content_msg').is(":visible")){
