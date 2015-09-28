@@ -46,7 +46,11 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
   end
 
   def submission_comments
-    submission.all_submission_comments.select { |c| c.provisional_grade_id == id }
+    if submission.all_submission_comments.loaded?
+      submission.all_submission_comments.select { |c| c.provisional_grade_id == id }
+    else
+      submission.all_submission_comments.where(provisional_grade_id: id)
+    end
   end
 
   def student
