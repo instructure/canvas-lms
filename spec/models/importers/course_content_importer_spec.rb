@@ -19,221 +19,238 @@
 require File.expand_path(File.dirname(__FILE__) + '../../../import_helper')
 
 describe Course do
-  it "should import a whole json file" do
-    # TODO: pull this out into smaller tests... right now I'm using
-    # the whole example JSON from Bracken because the formatting is
-    # somewhat in flux
-    json = File.open(File.join(IMPORT_JSON_DIR, 'import_from_migration.json')).read
-    data = JSON.parse(json).with_indifferent_access
-    data['all_files_export'] = {
-      'file_path'  => File.join(IMPORT_JSON_DIR, 'import_from_migration_small.zip')
-    }
-    course = course_model
-    migration = ContentMigration.create!(:context => course)
-    file_count = 0
-    # data['file_map'].each do |id, file|
-      # if !file['is_folder']
-        # file_count += 1
-        # from_file_path(file['path_name'], course)
-      # end
-    # end
-    migration.migration_ids_to_import = {:copy => {
-      :topics => {'1864019689002' => true, '1865116155002' => true},
-      :announcements => {'4488523052421' => true},
-      :files => {'1865116527002' => true, '1865116044002' => true, '1864019880002' => true, '1864019921002' => true},
-      :rubrics => {'4469882249231' => true},
-      :events => {},
-      :modules => {'1864019977002' => true, '1865116190002' => true},
-      :assignments => {'1865116014002' => true, '1865116155002' => true, '4407365899221' => true, '4469882339231' => true},
-      :outline_folders => {'1865116206002' => true, '1865116207002' => true},
-      :quizzes => {'1865116175002' => true},
-      :all_groups => true,
-      :shift_dates=>"1",
-      :old_start_date=>"Jan 23, 2009",
-      :old_end_date=>"Apr 10, 2009",
-      :new_start_date=>"Jan 3, 2011",
-      :new_end_date=>"Apr 13, 2011"
-    }}.with_indifferent_access
-
-    Importers::CourseContentImporter.import_content(course, data, migration.migration_settings[:migration_ids_to_import], migration)
-    course.reload
-
-    # discussion topic tests
-    expect(course.discussion_topics.length).to eql(3)
-    migration_ids = ["1864019689002", "1865116155002", "4488523052421"].sort
-    added_migration_ids = course.discussion_topics.map(&:migration_id).uniq.sort
-    expect(added_migration_ids).to eql(migration_ids)
-    topic = course.discussion_topics.where(migration_id: "1864019689002").first
-    expect(topic).not_to be_nil
-    expect(topic.title).to eql("Post here for group events, etc.")
-    expect(topic.discussion_entries).to be_empty
-    topic = course.discussion_topics.where(migration_id: "1865116155002").first
-    expect(topic).not_to be_nil
-    expect(topic.assignment).not_to be_nil
-
-    # quizzes
-    expect(course.quizzes.length).to eql(1)
-    quiz = course.quizzes.first
-    quiz.migration_id = '1865116175002'
-    expect(quiz.title).to eql("Orientation Quiz")
-
-    # wiki pages tests
-    migration_ids = ["1865116206002", "1865116207002"].sort
-    added_migration_ids = course.wiki.wiki_pages.map(&:migration_id).uniq.sort
-    expect(added_migration_ids).to eql(migration_ids)
-    expect(course.wiki.wiki_pages.length).to eql(migration_ids.length)
-    # front page
-    page = course.wiki.front_page
-    expect(page).not_to be_nil
-    expect(page.migration_id).to eql("1865116206002")
-    expect(page.body).not_to be_nil
-    expect(page.body.scan(/<li>/).length).to eql(4)
-    expect(page.body).to match(/Orientation/)
-    expect(page.body).to match(/Orientation Quiz/)
-    file = course.attachments.where(migration_id: "1865116527002").first
-    expect(file).not_to be_nil
-    re = Regexp.new("\\/courses\\/#{course.id}\\/files\\/#{file.id}\\/preview")
-    expect(page.body).to match(re) #)
-
-    # assignment tests
-    course.reload
-    expect(course.assignments.length).to eq 4
-    expect(course.assignments.map(&:migration_id).sort).to eql(['1865116155002', '1865116014002', '4407365899221', '4469882339231'].sort)
-    # assignment with due date
-    assignment = course.assignments.where(migration_id: "1865116014002").first
-    expect(assignment).not_to be_nil
-    expect(assignment.title).to eql("Concert Review Assignment")
-    expect(assignment.description).to match(Regexp.new("USE THE TEXT BOX!  DO NOT ATTACH YOUR ASSIGNMENT!!"))
-    # The old due date (Fri Mar 27 23:55:00 -0600 2009) should have been adjusted to new time frame
-    expect(assignment.due_at.year).to eq 2011
-
-    # discussion topic assignment
-    assignment = course.assignments.where(migration_id: "1865116155002").first
-    expect(assignment).not_to be_nil
-    expect(assignment.title).to eql("Introduce yourself!")
-    expect(assignment.points_possible).to eql(10.0)
-    expect(assignment.discussion_topic).not_to be_nil
-    # assignment with rubric
-    assignment = course.assignments.where(migration_id: "4469882339231").first
-    expect(assignment).not_to be_nil
-    expect(assignment.title).to eql("Rubric assignment")
-    expect(assignment.rubric).not_to be_nil
-    expect(assignment.rubric.migration_id).to eql("4469882249231")
-    # assignment with file
-    assignment = course.assignments.where(migration_id: "4407365899221").first
-    expect(assignment).not_to be_nil
-    expect(assignment.title).to eql("new assignment")
-    file = course.attachments.where(migration_id: "1865116527002").first
-    expect(file).not_to be_nil
-    expect(assignment.description).to match(Regexp.new("/files/#{file.id}/download"))
-
-    # calendar events
-    expect(course.calendar_events).to be_empty
-
-    # rubrics
-    expect(course.rubrics.length).to eql(1)
-    rubric = course.rubrics.first
-    expect(rubric.data.length).to eql(3)
-    # Spelling
-    criterion = rubric.data[0].with_indifferent_access
-    expect(criterion["description"]).to eql("Spelling")
-    expect(criterion["points"]).to eql(15.0)
-    expect(criterion["ratings"].length).to eql(3)
-    expect(criterion["ratings"][0]["points"]).to eql(15.0)
-    expect(criterion["ratings"][0]["description"]).to eql("Exceptional - fff")
-    expect(criterion["ratings"][1]["points"]).to eql(10.0)
-    expect(criterion["ratings"][1]["description"]).to eql("Meet Expectations - asdf")
-    expect(criterion["ratings"][2]["points"]).to eql(5.0)
-    expect(criterion["ratings"][2]["description"]).to eql("Need Improvement - rubric entry text")
-
-    # Grammar
-    criterion = rubric.data[1]
-    expect(criterion["description"]).to eql("Grammar")
-    expect(criterion["points"]).to eql(15.0)
-    expect(criterion["ratings"].length).to eql(3)
-    expect(criterion["ratings"][0]["points"]).to eql(15.0)
-    expect(criterion["ratings"][0]["description"]).to eql("Exceptional")
-    expect(criterion["ratings"][1]["points"]).to eql(10.0)
-    expect(criterion["ratings"][1]["description"]).to eql("Meet Expectations")
-    expect(criterion["ratings"][2]["points"]).to eql(5.0)
-    expect(criterion["ratings"][2]["description"]).to eql("Need Improvement - you smell")
-
-    # Style
-    criterion = rubric.data[2]
-    expect(criterion["description"]).to eql("Style")
-    expect(criterion["points"]).to eql(15.0)
-    expect(criterion["ratings"].length).to eql(3)
-    expect(criterion["ratings"][0]["points"]).to eql(15.0)
-    expect(criterion["ratings"][0]["description"]).to eql("Exceptional")
-    expect(criterion["ratings"][1]["points"]).to eql(10.0)
-    expect(criterion["ratings"][1]["description"]).to eql("Meet Expectations")
-    expect(criterion["ratings"][2]["points"]).to eql(5.0)
-    expect(criterion["ratings"][2]["description"]).to eql("Need Improvement")
-
-    #groups
-    expect(course.groups.length).to eql(2)
-
-    # files
-    expect(course.attachments.length).to eql(4)
-    course.attachments.each do |file|
-      expect(File).to be_exist(file.full_filename)
+  describe "import_content" do
+    before(:once) do
+      @course = course()
     end
-    file = course.attachments.where(migration_id: "1865116044002").first
-    expect(file).not_to be_nil
-    expect(file.filename).to eql("theatre_example.htm")
-    expect(file.folder.full_name).to eql("course files/Writing Assignments/Examples")
-    file = course.attachments.where(migration_id: "1864019880002").first
-    expect(file).not_to be_nil
-    expect(file.filename).to eql("dropbox.zip")
-    expect(file.folder.full_name).to eql("course files/Course Content/Orientation/WebCT specific and old stuff")
-  end
 
-  it "should not duplicate assessment questions in question banks" do
-    course
+    it "should import a whole json file" do
+      # TODO: pull this out into smaller tests... right now I'm using
+      # the whole example JSON from Bracken because the formatting is
+      # somewhat in flux
+      json = File.open(File.join(IMPORT_JSON_DIR, 'import_from_migration.json')).read
+      data = JSON.parse(json).with_indifferent_access
+      data['all_files_export'] = {
+        'file_path' => File.join(IMPORT_JSON_DIR, 'import_from_migration_small.zip')
+      }
+      migration = ContentMigration.create!(:context => @course)
 
-    json = File.open(File.join(IMPORT_JSON_DIR, 'assessments.json')).read
-    data = JSON.parse(json).with_indifferent_access
+      params = {:copy => {
+        :topics => {'1864019689002' => true, '1865116155002' => true},
+        :announcements => {'4488523052421' => true},
+        :files => {'1865116527002' => true, '1865116044002' => true, '1864019880002' => true, '1864019921002' => true},
+        :rubrics => {'4469882249231' => true},
+        :events => {},
+        :modules => {'1864019977002' => true, '1865116190002' => true},
+        :assignments => {
+          '1865116014002' => true,
+          '1865116155002' => true,
+          '4407365899221' => true,
+          '4469882339231' => true
+        },
+        :outline_folders => {'1865116206002' => true, '1865116207002' => true},
+        :quizzes => {'1865116175002' => true},
+        :all_groups => true,
+        :shift_dates=>"1",
+        :old_start_date=>"Jan 23, 2009",
+        :old_end_date=>"Apr 10, 2009",
+        :new_start_date=>"Jan 3, 2011",
+        :new_end_date=>"Apr 13, 2011"
+      }}.with_indifferent_access
+      migration.migration_ids_to_import = params
 
-    params = {:copy => {"everything" => true}}
-    migration = ContentMigration.create!(:context => @course)
-    migration.migration_settings[:migration_ids_to_import] = params
-    migration.save!
+      Importers::CourseContentImporter.import_content(@course, data, params, migration)
+      @course.reload
 
-    Importers::CourseContentImporter.import_content(@course, data, params, migration)
+      # discussion topic tests
+      expect(@course.discussion_topics.length).to eql(3)
+      migration_ids = ["1864019689002", "1865116155002", "4488523052421"].sort
+      added_migration_ids = @course.discussion_topics.map(&:migration_id).uniq.sort
+      expect(added_migration_ids).to eql(migration_ids)
+      topic = @course.discussion_topics.where(migration_id: "1864019689002").first
+      expect(topic).not_to be_nil
+      expect(topic.title).to eql("Post here for group events, etc.")
+      expect(topic.discussion_entries).to be_empty
+      topic = @course.discussion_topics.where(migration_id: "1865116155002").first
+      expect(topic).not_to be_nil
+      expect(topic.assignment).not_to be_nil
 
-    aqb1 = @course.assessment_question_banks.where(migration_id: "i05dab0b3d55dae214bd0c4787bd6d20f").first
-    expect(aqb1.assessment_questions.count).to eq 3
-    aqb2 = @course.assessment_question_banks.where(migration_id: "iaac763df0de1199ef143b2ab8f237e76").first
-    expect(aqb2.assessment_questions.count).to eq 2
-  end
+      # quizzes
+      expect(@course.quizzes.length).to eql(1)
+      quiz = @course.quizzes.first
+      quiz.migration_id = '1865116175002'
+      expect(quiz.title).to eql("Orientation Quiz")
 
-  it "should not create assessment question banks if they are not selected" do
-    course
+      # wiki pages tests
+      migration_ids = ["1865116206002", "1865116207002"].sort
+      added_migration_ids = @course.wiki.wiki_pages.map(&:migration_id).uniq.sort
+      expect(added_migration_ids).to eql(migration_ids)
+      expect(@course.wiki.wiki_pages.length).to eql(migration_ids.length)
+      # front page
+      page = @course.wiki.front_page
+      expect(page).not_to be_nil
+      expect(page.migration_id).to eql("1865116206002")
+      expect(page.body).not_to be_nil
+      expect(page.body.scan(/<li>/).length).to eql(4)
+      expect(page.body).to match(/Orientation/)
+      expect(page.body).to match(/Orientation Quiz/)
+      file = @course.attachments.where(migration_id: "1865116527002").first
+      expect(file).not_to be_nil
+      re = Regexp.new("\\/courses\\/#{@course.id}\\/files\\/#{file.id}\\/preview")
+      expect(page.body).to match(re)
 
-    json = File.open(File.join(IMPORT_JSON_DIR, 'assessments.json')).read
-    data = JSON.parse(json).with_indifferent_access
+      # assignment tests
+      @course.reload
+      expect(@course.assignments.length).to eq 4
+      expect(@course.assignments.map(&:migration_id).sort).to(
+        eql(['1865116155002', '1865116014002', '4407365899221', '4469882339231'].sort))
+      # assignment with due date
+      assignment = @course.assignments.where(migration_id: "1865116014002").first
+      expect(assignment).not_to be_nil
+      expect(assignment.title).to eql("Concert Review Assignment")
+      expect(assignment.description).to match(Regexp.new("USE THE TEXT BOX!  DO NOT ATTACH YOUR ASSIGNMENT!!"))
+      # The old due date (Fri Mar 27 23:55:00 -0600 2009) should have been adjusted to new time frame
+      expect(assignment.due_at.year).to eq 2011
 
-    params = {"copy" => {"assessment_question_banks" => {"i05dab0b3d55dae214bd0c4787bd6d20f" => true},
-                         "quizzes" => {"i7ed12d5eade40d9ee8ecb5300b8e02b2" => true,
-                                       "ife86eb19e30869506ee219b17a6a1d4e" => true}}}
+      # discussion topic assignment
+      assignment = @course.assignments.where(migration_id: "1865116155002").first
+      expect(assignment).not_to be_nil
+      expect(assignment.title).to eql("Introduce yourself!")
+      expect(assignment.points_possible).to eql(10.0)
+      expect(assignment.discussion_topic).not_to be_nil
+      # assignment with rubric
+      assignment = @course.assignments.where(migration_id: "4469882339231").first
+      expect(assignment).not_to be_nil
+      expect(assignment.title).to eql("Rubric assignment")
+      expect(assignment.rubric).not_to be_nil
+      expect(assignment.rubric.migration_id).to eql("4469882249231")
+      # assignment with file
+      assignment = @course.assignments.where(migration_id: "4407365899221").first
+      expect(assignment).not_to be_nil
+      expect(assignment.title).to eql("new assignment")
+      file = @course.attachments.where(migration_id: "1865116527002").first
+      expect(file).not_to be_nil
+      expect(assignment.description).to match(Regexp.new("/files/#{file.id}/download"))
 
-    migration = ContentMigration.create!(:context => @course)
-    migration.migration_settings[:migration_ids_to_import] = params
-    migration.save!
+      # calendar events
+      expect(@course.calendar_events).to be_empty
 
-    Importers::CourseContentImporter.import_content(@course, data, params, migration)
+      # rubrics
+      expect(@course.rubrics.length).to eql(1)
+      rubric = @course.rubrics.first
+      expect(rubric.data.length).to eql(3)
+      # Spelling
+      criterion = rubric.data[0].with_indifferent_access
+      expect(criterion["description"]).to eql("Spelling")
+      expect(criterion["points"]).to eql(15.0)
+      expect(criterion["ratings"].length).to eql(3)
+      expect(criterion["ratings"][0]["points"]).to eql(15.0)
+      expect(criterion["ratings"][0]["description"]).to eql("Exceptional - fff")
+      expect(criterion["ratings"][1]["points"]).to eql(10.0)
+      expect(criterion["ratings"][1]["description"]).to eql("Meet Expectations - asdf")
+      expect(criterion["ratings"][2]["points"]).to eql(5.0)
+      expect(criterion["ratings"][2]["description"]).to eql("Need Improvement - rubric entry text")
 
-    expect(@course.assessment_question_banks.count).to eq 1
-    aqb1 = @course.assessment_question_banks.where(migration_id: "i05dab0b3d55dae214bd0c4787bd6d20f").first
-    expect(aqb1.assessment_questions.count).to eq 3
-    expect(@course.assessment_questions.count).to eq 3
+      # Grammar
+      criterion = rubric.data[1]
+      expect(criterion["description"]).to eql("Grammar")
+      expect(criterion["points"]).to eql(15.0)
+      expect(criterion["ratings"].length).to eql(3)
+      expect(criterion["ratings"][0]["points"]).to eql(15.0)
+      expect(criterion["ratings"][0]["description"]).to eql("Exceptional")
+      expect(criterion["ratings"][1]["points"]).to eql(10.0)
+      expect(criterion["ratings"][1]["description"]).to eql("Meet Expectations")
+      expect(criterion["ratings"][2]["points"]).to eql(5.0)
+      expect(criterion["ratings"][2]["description"]).to eql("Need Improvement - you smell")
 
-    expect(@course.quizzes.count).to eq 2
-    quiz1 = @course.quizzes.where(migration_id: "i7ed12d5eade40d9ee8ecb5300b8e02b2").first
-    quiz1.quiz_questions.each{|qq| expect(qq.assessment_question).not_to be_nil }
+      # Style
+      criterion = rubric.data[2]
+      expect(criterion["description"]).to eql("Style")
+      expect(criterion["points"]).to eql(15.0)
+      expect(criterion["ratings"].length).to eql(3)
+      expect(criterion["ratings"][0]["points"]).to eql(15.0)
+      expect(criterion["ratings"][0]["description"]).to eql("Exceptional")
+      expect(criterion["ratings"][1]["points"]).to eql(10.0)
+      expect(criterion["ratings"][1]["description"]).to eql("Meet Expectations")
+      expect(criterion["ratings"][2]["points"]).to eql(5.0)
+      expect(criterion["ratings"][2]["description"]).to eql("Need Improvement")
 
-    quiz2 = @course.quizzes.where(migration_id: "ife86eb19e30869506ee219b17a6a1d4e").first
-    quiz2.quiz_questions.each{|qq| expect(qq.assessment_question).to be_nil } # since the bank wasn't brought in
+      # groups
+      expect(@course.groups.length).to eql(2)
+
+      # files
+      expect(@course.attachments.length).to eql(4)
+      @course.attachments.each do |f|
+        expect(File).to be_exist(f.full_filename)
+      end
+      file = @course.attachments.where(migration_id: "1865116044002").first
+      expect(file).not_to be_nil
+      expect(file.filename).to eql("theatre_example.htm")
+      expect(file.folder.full_name).to eql("course files/Writing Assignments/Examples")
+      file = @course.attachments.where(migration_id: "1864019880002").first
+      expect(file).not_to be_nil
+      expect(file.filename).to eql("dropbox.zip")
+      expect(file.folder.full_name).to eql("course files/Course Content/Orientation/WebCT specific and old stuff")
+    end
+
+    def setup_import(import_course, filename, params, copy_options={})
+      json = File.open(File.join(IMPORT_JSON_DIR, filename)).read
+      data = JSON.parse(json).with_indifferent_access
+
+      migration = ContentMigration.create!(:context => import_course)
+      migration.migration_settings[:migration_ids_to_import] = params
+      migration.migration_settings[:copy_options] = copy_options
+      migration.save!
+
+      Importers::CourseContentImporter.import_content(import_course, data, params, migration)
+    end
+
+    it "should not duplicate assessment questions in question banks" do
+      params = {:copy => {"everything" => true}}
+      setup_import(@course, 'assessments.json', params)
+
+      aqb1 = @course.assessment_question_banks.where(migration_id: "i05dab0b3d55dae214bd0c4787bd6d20f").first
+      expect(aqb1.assessment_questions.count).to eq 3
+      aqb2 = @course.assessment_question_banks.where(migration_id: "iaac763df0de1199ef143b2ab8f237e76").first
+      expect(aqb2.assessment_questions.count).to eq 2
+    end
+
+    it "should not create assessment question banks if they are not selected" do
+      params = {"copy" => {"assessment_question_banks" => {"i05dab0b3d55dae214bd0c4787bd6d20f" => true},
+                           "quizzes" => {"i7ed12d5eade40d9ee8ecb5300b8e02b2" => true,
+                                         "ife86eb19e30869506ee219b17a6a1d4e" => true}}}
+      setup_import(@course, 'assessments.json', params)
+
+      expect(@course.assessment_question_banks.count).to eq 1
+      aqb1 = @course.assessment_question_banks.where(migration_id: "i05dab0b3d55dae214bd0c4787bd6d20f").first
+      expect(aqb1.assessment_questions.count).to eq 3
+      expect(@course.assessment_questions.count).to eq 3
+
+      expect(@course.quizzes.count).to eq 2
+      quiz1 = @course.quizzes.where(migration_id: "i7ed12d5eade40d9ee8ecb5300b8e02b2").first
+      quiz1.quiz_questions.each{|qq| expect(qq.assessment_question).not_to be_nil }
+
+      quiz2 = @course.quizzes.where(migration_id: "ife86eb19e30869506ee219b17a6a1d4e").first
+      quiz2.quiz_questions.each{|qq| expect(qq.assessment_question).to be_nil } # since the bank wasn't brought in
+    end
+
+    it "should lock announcements if 'lock_all_annoucements' setting is true" do
+      @course.update_attribute(:lock_all_announcements, true)
+      params = {"copy" => {"announcements" => {"4488523052421" => true}}}
+      setup_import(@course, 'announcements.json', params, all_course_settings: true)
+
+      ann = @course.announcements.first
+      expect(ann).to be_locked
+    end
+
+    it "should not lock announcements if 'lock_all_annoucements' setting is false" do
+      @course.update_attribute(:lock_all_announcements, false)
+      params = {"copy" => {"announcements" => {"4488523052421" => true}}}
+      setup_import(@course, 'announcements.json', params, all_course_settings: true)
+
+      ann = @course.announcements.first
+      expect(ann).to_not be_locked
+    end
   end
 
   describe "shift_date_options" do

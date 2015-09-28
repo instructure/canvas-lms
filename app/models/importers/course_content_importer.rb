@@ -283,6 +283,9 @@ module Importers
           end
         end
       end
+      if settings[:lock_all_announcements]
+        Announcement.lock_from_course(course)
+      end
     end
 
     def self.shift_date_options(course, options={})
