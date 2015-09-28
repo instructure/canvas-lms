@@ -187,7 +187,8 @@ class AssignmentsController < ApplicationController
           :publish_grades_url => api_v1_publish_provisional_grades_url({course_id: @context.id, assignment_id: @assignment.id}),
           :list_gradeable_students => api_v1_course_assignment_gradeable_students_url({course_id: @context.id, assignment_id: @assignment.id}) + "?include[]=provisional_grades&per_page=50",
           :add_moderated_students => api_v1_add_moderated_students_url({course_id: @context.id, assignment_id: @assignment.id}),
-          :assignment_speedgrader_url => speed_grader_course_gradebook_url({course_id: @context.id, assignment_id: @assignment.id})
+          :assignment_speedgrader_url => speed_grader_course_gradebook_url({course_id: @context.id, assignment_id: @assignment.id}),
+          :provisional_grades_base_url => polymorphic_url([:api_v1, @context, @assignment]) + "/provisional_grades"
         }})
       js_env(:GRADES_PUBLISHED => @assignment.grades_published?)
 

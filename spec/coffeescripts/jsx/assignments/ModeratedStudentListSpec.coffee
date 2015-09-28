@@ -27,7 +27,7 @@ define [
     ]
   }
 
-  module 'ModeratedColumnHeader',
+  module 'ModeratedStudentList',
   test 'only shows one column when includeModerationSetHeaders is false', ->
     studentList = TestUtils.renderIntoDocument(ModeratedStudentList(
         urls: {assignment_speedgrader_url: 'blah'},
@@ -73,3 +73,13 @@ define [
     equal gradeColumns[0].props.children, 4
 
     fakeStudentList.students[0].selected_provisional_grade_id = null
+
+  module 'Persist provisional grades',
+  test 'selecting provisional grade triggers handleSelectProvisionalGrade handler', ->
+    callback = sinon.spy()
+    studentList = TestUtils.renderIntoDocument(ModeratedStudentList(onSelectProvisionalGrade: callback, urls: {provisional_grades_base_url: 'blah'}, includeModerationSetColumns: true, studentList: fakeStudentList, assignment: {published: false},handleCheckbox: () => 'stub' ))
+    mark1Radio = TestUtils.scryRenderedDOMComponentsWithClass(studentList, 'ModeratedAssignmentList__Mark')
+    radio = TestUtils.scryRenderedDOMComponentsWithTag(mark1Radio[0], 'input')
+    TestUtils.Simulate.change(radio[0].getDOMNode())
+    ok callback.called, 'called selectProvisionalGrade'
+    React.unmountComponentAtNode(studentList.getDOMNode().parentNode)

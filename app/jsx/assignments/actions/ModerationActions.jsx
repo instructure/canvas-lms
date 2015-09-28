@@ -22,6 +22,7 @@ define([
     SORT_MARK1_COLUMN: 'SORT_MARK1_COLUMN',
     SORT_MARK2_COLUMN: 'SORT_MARK2_COLUMN',
     SORT_MARK3_COLUMN: 'SORT_MARK3_COLUMN',
+    SELECTING_PROVISIONAL_GRADES_FAILED: 'SELECTING_PROVISIONAL_GRADES_FAILED',
 
     sortMark1Column () {
       return {
@@ -118,7 +119,17 @@ define([
       };
     },
 
-    selectProvisionalGrade (studentId, selectedProvisionalId) {
+    selectingProvisionalGradesFailed (message) {
+      var error = new Error(message);
+      error.time = Date.now();
+      return {
+        type: this.SELECTING_PROVISIONAL_GRADES_FAILED,
+        payload: error,
+        error: true
+      };
+    },
+
+    selectedProvisionalGrade (studentId, selectedProvisionalId) {
       return {
         type: this.SELECT_MARK,
         payload: {
@@ -126,6 +137,21 @@ define([
           selectedProvisionalId
         }
       };
+    },
+
+    selectProvisionalGrade (selectedProvisionalId, ajaxLib) {
+      return (dispatch, getState) => {
+        var endpoint = getState().urls.provisional_grades_base_url + "/" + selectedProvisionalId + "/select"
+        ajaxLib = ajaxLib || axios;
+        ajaxLib.put(endpoint)
+               .then((response) => {
+                 dispatch(this.selectedProvisionalGrade(response.data.student_id, response.data.selected_provisional_grade_id));
+               })
+               .catch((response) => {
+                 dispatch(this.selectingProvisionalGradesFailed(I18n.t('An error accurred selecting provisional grades')));
+               });
+      };
+
     },
 
     publishGrades (ajaxLib) {

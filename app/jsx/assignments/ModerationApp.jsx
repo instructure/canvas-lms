@@ -39,12 +39,6 @@ define([
       }
     },
 
-    handleSelectProvisionalGrade (studentId, selectedProvisionalId, event) {
-      this.props.store.dispatch(
-        Actions.selectProvisionalGrade(studentId, selectedProvisionalId)
-      );
-    },
-
     isModerationSet (students) {
       return (_.find(students, (student) => {
         return student.in_moderation_set
@@ -73,7 +67,7 @@ define([
           <ModeratedStudentList
             includeModerationSetColumns={this.isModerationSet(this.state.studentList.students)}
             handleCheckbox={this.handleCheckbox}
-            onSelectProvisionalGrade={this.handleSelectProvisionalGrade}
+            onSelectProvisionalGrade={(provisionalGradeId) => this.props.store.dispatch(Actions.selectProvisionalGrade(provisionalGradeId))}
             studentList={this.state.studentList}
             assignment={this.state.assignment}
             urls={this.state.urls}

@@ -120,7 +120,7 @@ define [
     deepEqual action, expected, "creates the action successfully"
 
   test "creates the SELECT_MARK action", ->
-    action = ModerationActions.selectProvisionalGrade(1, 2)
+    action = ModerationActions.selectedProvisionalGrade(1, 2)
     expected =
       type: ModerationActions.SELECT_MARK
       payload:
@@ -297,5 +297,65 @@ define [
     ModerationActions.addStudentToModerationSet(@client)((action) ->
       equal action.type, moderationSetUpdateFailedAction.type, 'type matches'
       equal action.payload.message, moderationSetUpdateFailedAction.payload.message, 'has proper message'
+      start()
+    , getState)
+
+  module "ModerationActions#selectProvisionalGrade",
+    setup: ->
+      @client = {
+        put: ->
+          dfd = whenJS.defer()
+          setTimeout ->
+            dfd.resolve('test')
+          , 100
+          dfd.promise()
+      }
+
+  test "returns a function", ->
+    ok typeof ModerationActions.selectProvisionalGrade(1) == 'function'
+
+  asyncTest "dispatches selectProvisionalGrade on success", ->
+    fakeUrl = 'base_url'
+    getState = ->
+      urls:
+        provisional_grades_base_url: fakeUrl
+      studentList:
+        students: [
+          {id: 1, provisional_grades: [{provisional_grade_id: 42}], selected_provisional_grade_id: undefined},
+        ]
+    fakeResponse =
+      status: 200
+      data:
+        student_id: 1
+        selected_provisional_grade_id: 42
+
+    fakePost = sinon.stub(@client, 'put').returns(whenJS(fakeResponse))
+    ModerationActions.selectProvisionalGrade(42, @client)((action) ->
+      ok fakePost.calledWith(fakeUrl+"/"+ "42"+"/select"), 'called with the correct params'
+      equal action.type, ModerationActions.SELECT_MARK, 'type matches'
+      equal action.payload.studentId, 1, 'has correct payload'
+      equal action.payload.selectedProvisionalId, 42, 'has correct payload'
+      start()
+    , getState)
+
+  asyncTest "dispatches displayErrorMessage on failure", ->
+    fakeUrl = 'base_url'
+    getState = ->
+      urls:
+        provisional_grades_base_url: fakeUrl
+      studentList:
+        students: [
+          {id: 1, provisional_grades: [{provisional_grade_id: 42}], selected_provisional_grade_id: undefined},
+        ]
+    fakeResponse =
+      status: 404
+
+    fakePost = sinon.stub(@client, 'put').returns(whenJS(fakeResponse))
+    ModerationActions.selectProvisionalGrade(42, @client)((action) ->
+      ok fakePost.calledWith(fakeUrl+"/"+ "42"+"/select"), 'called with the correct params'
+      equal action.type, ModerationActions.SELECTING_PROVISIONAL_GRADES_FAILED, 'type matches'
+      equal action.payload.message,'An error accurred selecting provisional grades' , 'has correct payload'
+      ok action.payload instanceof Error, "is an error object"
+      equal action.error, true, 'has correct payload'
       start()
     , getState)

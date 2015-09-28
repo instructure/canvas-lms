@@ -24,16 +24,25 @@ define([
       onSelectProvisionalGrade: React.PropTypes.func.isRequired
     },
 
+    generateSpeedgraderUrl (baseSpeedgraderUrl, student) {
+      return (`${baseSpeedgraderUrl}&student_id=${student.id}`);
+    },
+
+    isProvisionalGradeChecked (provisionalGradeId, student) {
+      return student.selected_provisional_grade_id === provisionalGradeId
+    },
     renderStudentMark (student, markIndex) {
       if (student.provisional_grades && student.provisional_grades[markIndex]) {
         if (this.props.includeModerationSetColumns) {
+          var provisionalGradeId = student.provisional_grades[markIndex].provisional_grade_id;
           return (
             <div className='ModeratedAssignmentList__Mark'>
               <input
                 type='radio'
                 name={`mark_${student.id}`}
                 disabled={this.props.assignment.published}
-                onChange={this.props.onSelectProvisionalGrade.bind(this, student.id, student.provisional_grades[markIndex].provisional_grade_id)}
+                onChange={this.props.onSelectProvisionalGrade.bind(this, provisionalGradeId)}
+                checked={this.isProvisionalGradeChecked(provisionalGradeId, student)}
               />
                 <a target='_blank' href={student.provisional_grades[markIndex].speedgrader_url}>{student.provisional_grades[markIndex].score}</a>
             </div>
@@ -52,10 +61,6 @@ define([
           </div>
         );
       }
-    },
-
-    generateSpeedgraderUrl (baseSpeedgraderUrl, student) {
-      return (`${baseSpeedgraderUrl}&student_id=${student.id}`);
     },
 
     renderFinalGrade (student) {

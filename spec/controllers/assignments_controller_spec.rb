@@ -86,6 +86,7 @@ describe AssignmentsController do
 
       get 'show_moderate', :course_id => @course.id, :assignment_id => assignment.id
       expect(assigns[:js_env][:URLS][:student_submissions_url]).to eq "http://test.host/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/submissions?include[]=user_summary&include[]=provisional_grades"
+      expect(assigns[:js_env][:URLS][:provisional_grades_base_url]).to eq "http://test.host/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/provisional_grades"
     end
   end
 

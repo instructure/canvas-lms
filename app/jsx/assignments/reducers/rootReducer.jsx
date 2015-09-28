@@ -191,6 +191,15 @@ define([
     return newState;
   };
 
+  flashHandlers[ModerationActions.SELECTING_PROVISIONAL_GRADES_FAILED] = (state, action) => {
+    // Don't mutate the existing state.
+    var newState = _.extend({}, state);
+    newState.time = action.payload.time;
+    newState.message = action.payload.message;
+    newState.error = action.error;
+    return newState;
+  };
+
   /**
    * Moderation Stage Handlers
    */

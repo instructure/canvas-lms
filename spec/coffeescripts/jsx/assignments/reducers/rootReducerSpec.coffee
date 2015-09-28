@@ -312,6 +312,25 @@ define [
       error: true
     deepEqual newState.flashMessage, expected, 'updates state'
 
+
+  test "sets message and error on SELECTING_PROVISIONAL_GRADES_FAILED", ->
+    message = 'some error message'
+    error = new Error(message)
+    error.time = Date.now()
+
+    initialState =
+      flashMessage: {}
+    updatedModerationSetAction =
+      type: 'SELECTING_PROVISIONAL_GRADES_FAILED'
+      payload: error
+      error: true
+    newState = rootReducer(initialState, updatedModerationSetAction)
+    expected =
+      time: error.time
+      message: message
+      error: true
+    deepEqual newState.flashMessage, expected, 'updates state'
+
   module "sorting mark1 column on SORT_MARK1_COLUMN",
   test 'default to descending order when clicking on a new column', ->
     initialState =
