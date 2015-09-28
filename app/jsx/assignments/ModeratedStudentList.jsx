@@ -30,20 +30,20 @@ define([
                      name={`mark_${student.id}`}
                      disabled={this.props.assignment.published}
                     />
-                <a href={student.provisional_grades[markIndex].speedgrader_url}>{student.provisional_grades[markIndex].score}</a>
+                <a target='_blank' href={student.provisional_grades[markIndex].speedgrader_url}>{student.provisional_grades[markIndex].score}</a>
               </div>
             );
           }else{
             return(
               <div className='AssignmentList__Mark'>
-                <a href={student.provisional_grades[markIndex].speedgrader_url}>{student.provisional_grades[markIndex].score}</a>
+                <a target='_blank' href={student.provisional_grades[markIndex].speedgrader_url}>{student.provisional_grades[markIndex].score}</a>
               </div>
             );
           }
       } else {
         return (
           <div className='ModeratedAssignmentList__Mark'>
-            <a href={this.generateSpeedgraderUrl(this.props.urls.assignment_speedgrader_url, student)}>Speed Grader</a>
+            <a target='_blank' href={this.generateSpeedgraderUrl(this.props.urls.assignment_speedgrader_url, student)}>Speed Grader</a>
           </div>
         );
       }
