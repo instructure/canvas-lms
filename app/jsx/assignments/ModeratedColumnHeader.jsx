@@ -3,9 +3,8 @@
 define([
   'react',
   './constants',
-  './actions/ModerationActions',
   'i18n!moderated_grading'
-], function (React, Constants, ModerationActions, I18n) {
+], function (React, Constants, I18n) {
   var ModeratedColumnHeader = React.createClass({
     displayName: 'ModeratedColumnHeader',
 
@@ -15,16 +14,8 @@ define([
       includeModerationSetHeaders: React.PropTypes.bool,
       handleSortMark1: React.PropTypes.func.isRequired,
       handleSortMark2: React.PropTypes.func.isRequired,
-      handleSortMark3: React.PropTypes.func.isRequired
-    },
-
-    handleSelectAll (event) {
-      if (event.target.checked) {
-        var allStudents = this.props.store.getState().students;
-        this.props.store.dispatch(ModerationActions.selectAllStudents(allStudents));
-      } else {
-        this.props.store.dispatch(ModerationActions.unselectAllStudents());
-      }
+      handleSortMark3: React.PropTypes.func.isRequired,
+      handleSelectAll: React.PropTypes.func.isRequired
     },
 
     renderLinkArrow (mark) {
@@ -41,7 +32,7 @@ define([
         return(
           <div className='ModeratedColumnHeader'>
             <div className='ModeratedColumnHeader__StudentName ColumnHeader__Item'>
-              <input type='checkbox' onChange={this.handleSelectAll} />
+              <input type='checkbox' onChange={this.props.handleSelectAll} />
               <span>{I18n.t('Student')}</span>
             </div>
 
@@ -66,7 +57,7 @@ define([
         return(
           <div className='ColumnHeader'>
             <div className='ColumnHeader__StudentName ColumnHeader__Item'>
-              <input type='checkbox' onChange={this.handleSelectAll} />
+              <input type='checkbox' onChange={this.props.handleSelectAll} />
               <span>{I18n.t('Student')}</span>
             </div>
 

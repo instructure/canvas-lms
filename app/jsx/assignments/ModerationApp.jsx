@@ -44,7 +44,14 @@ define([
         return student.in_moderation_set;
       }));
     },
-
+    handleSelectAll (event) {
+      if (event.target.checked) {
+        var allStudents = this.props.store.getState().students;
+        this.props.store.dispatch(Actions.selectAllStudents(allStudents));
+      } else {
+        this.props.store.dispatch(Actions.unselectAllStudents());
+      }
+    },
     render () {
       return (
         <div className='ModerationApp'>
@@ -59,10 +66,10 @@ define([
             includeModerationSetHeaders={this.isModerationSet(this.state.studentList.students)}
             sortDirection={this.state.studentList.sort.direction}
             markColumn={this.state.studentList.sort.column}
-            store={this.props.store}
             handleSortMark1={() => this.props.store.dispatch(Actions.sortMark1Column())}
             handleSortMark2={() => this.props.store.dispatch(Actions.sortMark2Column())}
             handleSortMark3={() => this.props.store.dispatch(Actions.sortMark3Column())}
+            handleSelectAll={this.handleSelectAll}
           />
           <ModeratedStudentList
             includeModerationSetColumns={this.isModerationSet(this.state.studentList.students)}
