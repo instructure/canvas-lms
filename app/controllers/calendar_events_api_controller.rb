@@ -967,8 +967,8 @@ class CalendarEventsApiController < ApplicationController
              end
 
     params[:calendar_event][:title] = "#{options[:title]} #{options[:iterator] + 1}" if options[:add_count]
-    params[:calendar_event][:start_at] = Time.iso8601(options[:start_at]) + offset unless options[:start_at].blank?
-    params[:calendar_event][:end_at] = Time.iso8601(options[:end_at]) + offset unless options[:end_at].blank?
+    params[:calendar_event][:start_at] = Time.zone.parse(options[:start_at]) + offset unless options[:start_at].blank?
+    params[:calendar_event][:end_at] = Time.zone.parse(options[:end_at]) + offset unless options[:end_at].blank?
     params
   end
 end
