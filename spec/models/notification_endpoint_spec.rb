@@ -59,6 +59,14 @@ describe NotificationEndpoint do
       ne = @at.notification_endpoints.new(token: 'token')
       expect(ne.push_json('json')).to be_falsey
     end
+
+    it "returns false if the token has changed" do
+      sns_client = mock()
+      sns_client.expects(:get_endpoint_attributes).returns(attributes: {'Enabled' => 'true', 'CustomUserData' => @at.global_id.to_s, 'Token' => 'token2'})
+      NotificationEndpoint.any_instance.expects(:sns_client).returns(sns_client)
+      ne = @at.notification_endpoints.new(token: 'token')
+      expect(ne.push_json('json')).to be_falsey
+    end
   end
 
   describe "#destroy" do
