@@ -81,6 +81,7 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
     final_mark.rubric_assessments.destroy_all
     copy_rubric_assessments!(final_mark)
 
+    final_mark.reload
     final_mark
   end
 

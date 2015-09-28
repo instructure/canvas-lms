@@ -54,7 +54,7 @@
     </div>
   <% end %>
 </div></div>
-<div id="moderation_tabs" class="ui-tabs-minimal">
+<span id="moderation_tabs" class="ui-tabs-minimal">
   <ul>
     <li><a href="#dummy_container">
       <span class="mark_title"><%= t('1st Mark') %></span>
@@ -65,9 +65,29 @@
       <span class="mark_grade"></span>
     </a></li>
     <li><a href="#dummy_container">
-      <span>New Mark</span>
+      <span class="mark_title"><%= t('Final Mark') %></span>
+      <span class="mark_grade"></span>
     </a></li>
-    <%# TODO: Final Mark %>
+    <li id="new_mark_container">
+      <a id="new_mark_dropdown_link" href="#dummy_container" class="al-trigger" data-append-to-body="true">
+        <%= t('New Mark') %>
+        <i class="icon-mini-arrow-down"></i>
+      </a>
+      <ul id="new_mark_dropdown" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="new_mark_dropdown_link1">
+        <li role="presentation">
+          <a href="#" id="new_mark_link" tabindex="-1" role="menuitem"><%= t('Create 2nd Mark') %></a>
+        </li>
+        <li role="presentation">
+          <a href="#" id="new_mark_copy_link1" tabindex="-1" role="menuitem"><%= t('Copy 1st Mark to Final') %></a>
+        </li>
+        <li role="presentation">
+          <a href="#" id="new_mark_copy_link2" tabindex="-1" role="menuitem"><%= t('Copy 2nd Mark to Final') %></a>
+        </li>
+        <li role="presentation">
+          <a href="#" id="new_mark_final_link" tabindex="-1" role="menuitem"><%= t('New Final Mark') %></a>
+        </li>
+      </ul>
+    </li>
   </ul>
   <div id="dummy_container"></div>
 </div>

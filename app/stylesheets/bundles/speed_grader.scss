@@ -217,6 +217,13 @@ $gradebook_header_height: 52px;
         }
       }
     }
+    #new_mark_container {
+      height: $gradebook_header_height - 2px;
+      border: none;
+    }
+    #new_mark_dropdown_link {
+      width: 150px;
+    }
   }
 }
 

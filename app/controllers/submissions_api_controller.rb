@@ -589,6 +589,7 @@ class SubmissionsApiController < ApplicationController
         submission[:grade] = params[:submission].delete(:posted_grade)
         submission[:excuse] = params[:submission].delete(:excuse)
         submission[:provisional] = value_to_boolean(params[:submission][:provisional])
+        submission[:final] = value_to_boolean(params[:submission][:final]) && @context.grants_right?(@current_user, :moderate_grades)
       end
       if submission[:grade] || submission[:excuse]
         @submissions = @assignment.grade_student(@user, submission)

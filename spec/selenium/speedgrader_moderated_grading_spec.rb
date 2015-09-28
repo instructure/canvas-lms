@@ -79,6 +79,7 @@ describe "speed grader" do
   context "as a moderator" do
     before do
       course_with_teacher_logged_in(:course => @course, :active_all => true)
+      @moderator = @teacher
       @is_moderator = true
     end
 
@@ -127,7 +128,10 @@ describe "speed grader" do
       expect(tab).to include_text("2nd Mark")
       expect(tab).to include_text("6/8")
 
-      expect(f('#moderation_tabs')).to_not include_text("New Mark")
+      #open dropdown, make sure that the "Create 2nd Mark" link is not shown
+      f('#moderation_tabs #new_mark_dropdown_link').click
+      wait_for_ajaximations
+      expect(f('#new_mark_link')).to_not be_displayed
 
       grade = f('#grading-box-extended')
       expect(grade['disabled']).to be_present
@@ -153,10 +157,16 @@ describe "speed grader" do
       @assignment.moderated_grading_selections.create!(:student => @student)
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-      new_mark_tab = ff('#moderation_tabs li').last
-      expect(new_mark_tab).to be_displayed
-      expect(new_mark_tab).to include_text("New Mark")
-      new_mark_tab.click()
+      new_mark_dd = f('#moderation_tabs #new_mark_dropdown_link')
+      expect(new_mark_dd).to include_text("New Mark")
+      new_mark_dd.click
+      wait_for_ajaximations
+
+      new_mark_link = f('#new_mark_link')
+      expect(new_mark_link).to be_displayed
+      expect(new_mark_link).to include_text("Create 2nd Mark")
+      new_mark_link.click
+
       wait_for_ajaximations
 
       # should be editable now
@@ -198,8 +208,9 @@ describe "speed grader" do
       @assignment.moderated_grading_selections.create!(:student => @student)
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-      new_mark_tab = ff('#moderation_tabs li').last
-      new_mark_tab.click()
+      f('#moderation_tabs #new_mark_dropdown_link').click
+      wait_for_ajaximations
+      f('#new_mark_link').click
       wait_for_ajaximations
 
       comment = "some silly comment"
@@ -227,6 +238,197 @@ describe "speed grader" do
       expect(grade['disabled']).to be_nil
       expect(grade['value']).to eq "2"
       expect(f('#rubric_summary_container')).to include_text(comment)
+    end
+
+    it "should be able to see and edit a final mark given by another teacher" do
+      other_ta = course_with_ta(:course => @course, :active_all => true).user
+      @submission.find_or_create_provisional_grade!(scorer: other_ta, score: 7)
+      @assignment.moderated_grading_selections.create!(:student => @student)
+
+      other_teacher = course_with_teacher(:course => @course, :active_all => true).user
+      final_pg = @submission.find_or_create_provisional_grade!(scorer: other_teacher, score: 3, final: true)
+
+      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+      tabs = ff('#moderation_tabs > ul > li')
+      expect(tabs[1]).to_not be_displayed # no second mark
+      final_tab = tabs[2]
+      expect(final_tab).to be_displayed
+      expect(final_tab).to include_text("Final Mark")
+      expect(final_tab).to include_text("3/8")
+      final_tab.click
+      wait_for_ajaximations
+
+      grade = f('#grading-box-extended')
+      expect(grade['disabled']).to be_nil
+      expect(grade['value']).to eq "3"
+
+      replace_content f('#grading-box-extended'), "8"
+      driver.execute_script '$("#grading-box-extended").change()'
+
+      wait_for_ajax_requests(500)
+      f('#speedgrader_comment_textarea').send_keys('srsly')
+      f('#add_a_comment button[type="submit"]').click
+      wait_for_ajaximations
+
+      @submission.reload
+      expect(@submission.score).to be_nil
+
+      # shouldn't have created a prov grade for teacher
+      expect(@submission.provisional_grade(@moderator)).to be_a(ModeratedGrading::NullProvisionalGrade)
+
+      final_pg.reload
+      expect(final_pg.score.to_i).to eql 8
+      expect(final_pg.submission_comments.map(&:comment)).to be_include 'srsly'
+      expect(final_tab).to include_text("8/8") # should sync tab state
+    end
+
+    it "should be able to add a rubric assessment to a final mark given by another teacher" do
+      other_ta = course_with_ta(:course => @course, :active_all => true).user
+      @submission.find_or_create_provisional_grade!(scorer: other_ta, score: 7)
+      @assignment.moderated_grading_selections.create!(:student => @student)
+
+      other_teacher = course_with_teacher(:course => @course, :active_all => true).user
+      final_pg = @submission.find_or_create_provisional_grade!(scorer: other_teacher, score: 2, final: true)
+
+      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+      tabs = ff('#moderation_tabs > ul > li')
+      final_tab = tabs[2]
+      final_tab.click
+      wait_for_ajaximations
+
+      comment = "some silly comment"
+      add_rubric_assessment(3, comment)
+
+      @submission.reload
+      expect(@submission.score).to be_nil
+
+      # shouldn't have created a prov grade for teacher
+      expect(@submission.provisional_grade(@moderator)).to be_a(ModeratedGrading::NullProvisionalGrade)
+
+      final_pg.reload
+      expect(final_pg.score.to_i).to eql 3
+      expect(final_tab).to include_text("3/8") # should sync tab state
+
+      ra = @association.rubric_assessments.first
+      expect(ra.artifact).to eq final_pg
+      expect(ra.data[0][:comments]).to eq comment
+    end
+
+    it "should be able to create a new final mark" do
+      other_ta = course_with_ta(:course => @course, :active_all => true).user
+      @submission.find_or_create_provisional_grade!(scorer: other_ta, score: 7)
+      @assignment.moderated_grading_selections.create!(:student => @student)
+
+      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+      f('#moderation_tabs #new_mark_dropdown_link').click
+      wait_for_ajaximations
+      new_mark_final = f('#new_mark_final_link')
+      expect(new_mark_final).to be_displayed
+      new_mark_final.click
+      wait_for_ajaximations
+
+      comment = "some silly comment"
+      add_rubric_assessment(3, comment)
+
+      @submission.reload
+      expect(@submission.score).to be_nil
+
+      # shouldn't have created a prov grade for teacher
+      expect(@submission.provisional_grade(@moderator)).to be_a(ModeratedGrading::NullProvisionalGrade)
+
+      final_pg = @submission.find_or_create_provisional_grade!(scorer: @moderator, final: true)
+      expect(final_pg.score.to_i).to eql 3
+      expect(ff('#moderation_tabs > ul > li')[2]).to include_text("3/8") # should sync tab state
+
+      ra = @association.rubric_assessments.first
+      expect(ra.artifact).to eq final_pg
+      expect(ra.data[0][:comments]).to eq comment
+    end
+
+    it "should be able to copy a 1st mark to the final mark" do
+      other_ta = course_with_ta(:course => @course, :active_all => true).user
+      @submission.find_or_create_provisional_grade!(scorer: other_ta, score: 7)
+      @assignment.moderated_grading_selections.create!(:student => @student)
+
+      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+      f('#moderation_tabs #new_mark_dropdown_link').click
+      wait_for_ajaximations
+      expect(f('#new_mark_copy_link2')).to_not be_displayed # since there is no 2nd mark to copy yet
+      copy_link = f('#new_mark_copy_link1')
+      expect(copy_link).to be_displayed
+      copy_link.click
+      wait_for_ajaximations
+
+      @submission.reload
+      expect(@submission.score).to be_nil
+      expect(@submission.provisional_grade(@moderator)).to be_a(ModeratedGrading::NullProvisionalGrade)
+
+      final_pg = @submission.find_or_create_provisional_grade!(scorer: @moderator, final: true)
+      expect(final_pg.score.to_i).to eql 7
+      expect(ff('#moderation_tabs > ul > li')[2]).to include_text("7/8")
+    end
+
+    it "should be able to copy a 2nd mark to the final mark" do
+      other_ta = course_with_ta(:course => @course, :active_all => true).user
+      @submission.find_or_create_provisional_grade!(scorer: other_ta, score: 7)
+      @assignment.moderated_grading_selections.create!(:student => @student)
+
+      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+      f('#moderation_tabs #new_mark_dropdown_link').click
+      wait_for_ajaximations
+      # make a 2nd mark to copy with a rubric assessment and comments - make sure they get copied
+      f('#new_mark_link').click
+      wait_for_ajaximations
+
+      comment = "some silly comment"
+      add_rubric_assessment(3, comment)
+
+      f('#speedgrader_comment_textarea').send_keys('srsly')
+      f('#add_a_comment button[type="submit"]').click
+      wait_for_ajaximations
+
+      f('#moderation_tabs #new_mark_dropdown_link').click
+      wait_for_ajaximations
+      f('#new_mark_copy_link2').click
+      wait_for_ajaximations
+
+      final_tab = f('#moderation_tabs li.ui-state-active') # should be active tab
+      expect(final_tab).to include_text("Final Mark")
+      expect(final_tab).to include_text("3/8") # should sync tab state
+
+      expect(f('#rubric_summary_container')).to include_text(@rubric.title)
+      expect(f('#rubric_summary_container')).to include_text(comment)
+
+      final_pg = @submission.find_or_create_provisional_grade!(scorer: @moderator, final: true)
+      expect(final_pg.score.to_i).to eql 3
+      expect(final_pg.submission_comments.map(&:comment)).to be_include 'srsly'
+
+      ra = @association.rubric_assessments.detect{|ra| ra.artifact == final_pg}
+      expect(ra.data[0][:comments]).to eq comment
+    end
+
+    it "should be able to re-copy a mark to the final mark" do
+      other_ta = course_with_ta(:course => @course, :active_all => true).user
+      @submission.find_or_create_provisional_grade!(scorer: other_ta, score: 7)
+      @assignment.moderated_grading_selections.create!(:student => @student)
+
+      other_teacher = course_with_teacher(:course => @course, :active_all => true).user
+      final_pg = @submission.find_or_create_provisional_grade!(scorer: other_teacher, score: 2, final: true)
+
+      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+      f('#moderation_tabs #new_mark_dropdown_link').click
+      wait_for_ajaximations
+      f('#new_mark_copy_link1').click
+      driver.switch_to.alert.accept # should get a warning that it will overwrite the current final mark
+      wait_for_ajaximations
+
+      @submission.reload
+      expect(@submission.score).to be_nil
+      expect(@submission.provisional_grade(@moderator)).to be_a(ModeratedGrading::NullProvisionalGrade)
+
+      final_pg.reload
+      expect(final_pg.score.to_i).to eql 7
+      expect(ff('#moderation_tabs > ul > li')[2]).to include_text("7/8")
     end
   end
 
@@ -256,6 +458,7 @@ describe "speed grader" do
     end
 
     it "should lock a provisional grader out if graded by someone else while switching students" do
+      other_ta = course_with_ta(:course => @course, :active_all => true).user
       original_sub = @submission
       student_submission
 
@@ -270,7 +473,6 @@ describe "speed grader" do
       wait_for_ajaximations
 
       # create a mark for the first student
-      other_ta = course_with_ta(:course => @course, :active_all => true).user
       original_sub.find_or_create_provisional_grade!(scorer: other_ta, score: 7)
 
       # go back

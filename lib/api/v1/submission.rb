@@ -219,8 +219,8 @@ module Api::V1::Submission
     if includes.include?('submission_comments')
       json['submission_comments'] = submission_comments_json(provisional_grade.submission_comments, current_user)
     end
-    if includes.include?('rubric_assessment') && provisional_grade.rubric_assessments.any?
-      json['rubric_assessment'] = rubric_assessment_json(provisional_grade.rubric_assessments.first)
+    if includes.include?('rubric_assessment')
+      json['rubric_assessments'] = provisional_grade.rubric_assessments.map{|ra| ra.as_json(:methods => [:assessor_name], :include_root => false)}
     end
     json
   end

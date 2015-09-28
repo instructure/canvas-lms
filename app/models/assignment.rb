@@ -1178,7 +1178,7 @@ class Assignment < ActiveRecord::Base
       if user
         sub = self.find_or_create_submission(user)
         if opts[:provisional_grader]
-          [sub.find_or_create_provisional_grade!(:scorer => opts[:provisional_grader]), user]
+          [sub.find_or_create_provisional_grade!(:scorer => opts[:provisional_grader], :final => opts[:final]), user]
         else
           [sub, user]
         end
@@ -1417,7 +1417,7 @@ class Assignment < ActiveRecord::Base
     when :moderator
       self.provisional_grades.order(:id).to_a.group_by(&:submission_id)
     when :provisional_grader
-      self.provisional_grades.where(:scorer_id => user).order(:id).to_a.group_by(&:submission_id)
+      self.provisional_grades.not_final.where(:scorer_id => user).order(:id).to_a.group_by(&:submission_id)
     else
       {}
     end
@@ -1489,8 +1489,9 @@ class Assignment < ActiveRecord::Base
       if grading_role == :moderator
         pgs = preloaded_prov_grades[sub.id] || []
         unless pgs.count == 0 || (pgs.count == 1 && pgs.first.scorer_id == user.id)
-          json['provisional_grades'] = pgs.map do |pg|
-            pg.grade_attributes.tap do |json|
+          json['provisional_grades'] = []
+          pgs.each do |pg|
+            pg_json = pg.grade_attributes.tap do |json|
               json[:rubric_assessments] = all_provisional_rubric_assmnts.select{|ra| ra.artifact_id == pg.id}.
                 as_json(:methods => [:assessor_name], :include_root => false)
 
@@ -1504,6 +1505,12 @@ class Assignment < ActiveRecord::Base
               json[:submission_comments] = pg.submission_comments.as_json(:include_root => false,
                                                                           :methods => avatar_methods,
                                                                           :only => comment_fields)
+            end
+
+            if pg.final
+              json['final_provisional_grade'] = pg_json
+            else
+              json['provisional_grades'] << pg_json
             end
           end
         end

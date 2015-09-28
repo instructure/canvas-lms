@@ -536,6 +536,9 @@ describe GradebooksController do
 
       it "creates a final provisional grade" do
         submission = @assignment.submit_homework(@student, :body => "hello")
+        other_teacher = teacher_in_course(:course => @course, :active_all => true).user
+        pg = submission.find_or_create_provisional_grade!(scorer: other_teacher) # create one so we can make a final
+
         post 'update_submission',
           :format => :json,
           :course_id => @course.id,
@@ -546,6 +549,7 @@ describe GradebooksController do
             :provisional => true,
             :final => true
           }
+        expect(response).to be_success
 
         # confirm "real" grades/comments were not written
         submission.reload
@@ -563,6 +567,7 @@ describe GradebooksController do
         # confirm the response JSON shows provisional information
         json = JSON.parse response.body
         expect(json[0]['submission']['score']).to eq 100
+        expect(json[0]['submission']['provisional_grade_id']).to eq pg.id
         expect(json[0]['submission']['grade_matches_current_submission']).to eq true
         expect(json[0]['submission']['submission_comments'].first['submission_comment']['comment']).to eq 'provisional!'
       end

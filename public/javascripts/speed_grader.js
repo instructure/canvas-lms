@@ -79,7 +79,14 @@ define([
       $full_height = $(".full_height"),
       $rightside_inner = $("#rightside_inner"),
       $moderation_tabs_div = $("#moderation_tabs"),
-      $moderation_tabs = $("#moderation_tabs").find('li'),
+      $moderation_tabs = $("#moderation_tabs > ul > li"),
+      $moderation_tab_2nd = $moderation_tabs.eq(1),
+      $moderation_tab_final = $moderation_tabs.eq(2),
+      $new_mark_container = $("#new_mark_container"),
+      $new_mark_link = $("#new_mark_link"),
+      $new_mark_copy_link1 = $("#new_mark_copy_link1"),
+      $new_mark_copy_link2 = $("#new_mark_copy_link2"),
+      $new_mark_final_link = $("#new_mark_final_link"),
       $not_gradeable_message = $("#not_gradeable_message"),
       $comments = $("#comments"),
       $comment_blank = $("#comment_blank").removeAttr('id').detach(),
@@ -238,7 +245,8 @@ define([
         && !student.needs_provisional_grade && submission.provisional_grade_id === null) {
         // if we are a provisional grader and it doesn't need a grade (and we haven't given one already) then we shouldn't be able to grade it
         return "not_gradeable";
-      } else if (!submission.excused && (typeof submission.grade == 'undefined' || submission.grade === null || submission.workflow_state == 'pending_review')) {
+      } else if (!(submission.final_provisional_grade && submission.final_provisional_grade.grade) && !submission.excused &&
+        (typeof submission.grade == 'undefined' || submission.grade === null || submission.workflow_state == 'pending_review')) {
         return "not_graded";
       } else if (submission.grade_matches_current_submission) {
         return "graded";
@@ -693,6 +701,9 @@ define([
       var data = rubricAssessment.assessmentData($rubric);
       if (ENV.grading_role == 'moderator' || ENV.grading_role == 'provisional_grader') {
         data['provisional'] = '1';
+        if (ENV.grading_role == 'moderator' && EG.current_prov_grade_index == 'final') {
+          data['final'] = '1';
+        }
       }
       var url = $(".update_rubric_assessment_url").attr('href');
       var method = "POST";
@@ -834,10 +845,20 @@ define([
     domReady: function(){
       $moderation_tabs_div.tabs();
       $moderation_tabs.each(function(index) {
-        $(this).find('a').click(function() {
-          EG.showProvisionalGrade(index);
-        });
+        if (index == 2) index = "final"; // this will make it easier to identify the final mark
+        if (index == 3) { // don't show for the cog menu
+          $(this).find('a').off('click');
+        } else {
+          $(this).find('a').click(function(e) {
+            e.preventDefault();
+            EG.showProvisionalGrade(index);
+          });
+        }
       });
+      $new_mark_link.click(function(e){ e.preventDefault(); EG.newProvisionalGrade('new', 1)} );
+      $new_mark_final_link.click(function(e){ e.preventDefault(); EG.newProvisionalGrade('new', 'final')} );
+      $new_mark_copy_link1.click(function(e){ e.preventDefault(); EG.newProvisionalGrade('copy', 0)} );
+      $new_mark_copy_link2.click(function(e){ e.preventDefault(); EG.newProvisionalGrade('copy', 1)} );
 
       function makeFullWidth(){
         $full_width_container.addClass("full_width");
@@ -1071,7 +1092,15 @@ define([
 
       if ((ENV.grading_role == 'provisional_grader' || ENV.grading_role == 'moderator') &&
         this.currentStudent.submission_state == 'not_graded') {
+
+        $(".speedgrader_alert").hide();
+        $submission_not_newest_notice.hide();
+        $submission_late_notice.hide();
+
         $grade.attr('disabled', true); // disabling now will keep it from getting undisabled unintentionally by disableWhileLoading
+        if (ENV.grading_role == 'moderator') {
+          this.currentStudent.submission.grade = null; // otherwise it may be tricked into showing the wrong submission_state
+        }
 
         // hit the API to check whether we still can give a provisional grade
         $full_width_container.disableWhileLoading(
@@ -1110,18 +1139,40 @@ define([
       this.refreshFullRubric();
     },
     handleModerationTabs: function(index_to_load) {
-      var prov_grades = this.currentStudent.submission.provisional_grades;
+      var prov_grades = this.currentStudent.submission && this.currentStudent.submission.provisional_grades;
       if (prov_grades && prov_grades.length > 0) {
+        var final_grade = this.currentStudent.submission.final_provisional_grade;
         if (prov_grades.length == 1) {
-          $moderation_tabs.eq(1).hide(); // hide 2nd mark
-          if (this.currentStudent.needs_provisional_grade) {
-            $moderation_tabs.eq(2).show();
+          $moderation_tab_2nd.hide(); // hide 2nd mark
+
+          if (this.currentStudent.needs_provisional_grade || final_grade) {
+            $new_mark_container.show();
+            $new_mark_copy_link2.hide(); // hide copy 2nd mark
+            if (final_grade) {
+              $new_mark_link.hide();
+            } else {
+              $new_mark_link.show();
+            }
           } else {
-            $moderation_tabs.eq(2).hide(); // hide new mark tab if we don't need it
+            $new_mark_container.hide(); // hide new mark dropdown if not selected for moderation
           }
         } else if (prov_grades.length == 2) {
-          $moderation_tabs.eq(1).show();
-          $moderation_tabs.eq(2).hide();
+          $moderation_tab_2nd.show();
+          $new_mark_container.show();
+          $new_mark_link.hide();
+          if (prov_grades[1].provisional_grade_id) {
+            $new_mark_copy_link2.show(); // show copy 2nd mark
+          } else {
+            $new_mark_copy_link2.hide(); // don't show if it's a new unsaved mark
+          }
+        }
+
+        if (final_grade) {
+          $moderation_tab_final.show();
+          $new_mark_final_link.hide();
+        } else {
+          $moderation_tab_final.hide();
+          $new_mark_final_link.show();
         }
 
         $full_width_container.addClass("with_moderation_tabs");
@@ -1130,15 +1181,25 @@ define([
         if (this.selected_provisional_grade_id) {
           var selected_id = this.selected_provisional_grade_id;
           // load provisional grade id from anchor hash
-          $.each(prov_grades, function(idx, pg) {
-            if (pg.provisional_grade_id == selected_id) {
-              index_to_load = idx;
-            }
-          });
+
+          if (final_grade && final_grade.provisional_grade_id == selected_id) {
+            index_to_load = 'final'; // final mark
+          } else {
+            $.each(prov_grades, function (idx, pg) {
+              if (pg.provisional_grade_id == selected_id) {
+                index_to_load = idx;
+              }
+            });
+          }
+
           this.selected_provisional_grade_id = null; // don't load it again
         }
 
-        $moderation_tabs.eq(index_to_load).find('a').click(); // show a grade
+        if (index_to_load == 'final') {
+          $moderation_tab_final.find('a').click();
+        } else {
+          $moderation_tabs.eq(index_to_load).find('a').click(); // show a grade
+        }
       } else {
         $full_width_container.removeClass("with_moderation_tabs");
         $moderation_tabs_div.hide();
@@ -1147,7 +1208,7 @@ define([
       }
     },
     updateModerationTabScores: function() {
-      if (!jsonData.points_possible) return;
+      if (!jsonData.points_possible || !this.currentStudent.submission) return;
       var prov_grades = this.currentStudent.submission.provisional_grades;
 
       for (var i = 0; i < 2; i++) { // loop over first two marks
@@ -1159,11 +1220,42 @@ define([
           $mark_grade.empty();
         }
       }
+
+      var final_grade = this.currentStudent.submission.final_provisional_grade;
+      if (final_grade) {
+        var $mark_grade = $moderation_tab_final.find('.mark_grade');
+        if (final_grade && final_grade.score) {
+          $mark_grade.html(htmlEscape(final_grade.score + "/" + jsonData.points_possible));
+        } else {
+          $mark_grade.empty();
+        }
+      }
+
     },
     showProvisionalGrade: function(idx) {
-      if (idx == 2) {
-        // new mark - create a null provisional grade
-        this.currentStudent.submission.provisional_grades.push({
+      if (this.current_prov_grade_index != idx) {
+        this.current_prov_grade_index = idx;
+        var prov_grade;
+        if (idx == 'final') {
+          prov_grade = this.currentStudent.submission.final_provisional_grade;
+        } else {
+          prov_grade = this.currentStudent.submission.provisional_grades[idx];
+        }
+
+        // merge in the provisional attributes
+        $.extend(this.currentStudent.submission, prov_grade);
+
+        this.currentStudent.rubric_assessments = prov_grade.rubric_assessments;
+        this.currentStudent.provisional_crocodoc_urls = prov_grade.crocodoc_urls;
+        this.showSubmission();
+
+        // set read-only if needed
+        this.setReadOnly(prov_grade.readonly);
+      }
+    },
+    newProvisionalGrade: function(type, index) {
+      if (type == 'new')  {
+        var new_mark = {
           'grade': null,
           'score': null,
           'graded_at': null,
@@ -1171,22 +1263,26 @@ define([
           'grade_matches_current_submission': true,
           'scorer_id': ENV.current_user_id,
           'rubric_assessments': []
-        });
-        this.handleModerationTabs(1);
-      } else {
-        if (this.current_prov_grade_index != idx) {
-          this.current_prov_grade_index = idx;
-          var prov_grade = this.currentStudent.submission.provisional_grades[idx];
-
-          // merge in the provisional attributes
-          $.extend(this.currentStudent.submission, prov_grade);
-
-          this.currentStudent.rubric_assessments = prov_grade.rubric_assessments;
-          this.currentStudent.provisional_crocodoc_urls = prov_grade.crocodoc_urls;
-          this.showSubmission();
-
-          // set read-only if needed
-          this.setReadOnly(prov_grade.readonly);
+        };
+        if (index == 1) {
+          this.currentStudent.submission.provisional_grades.push(new_mark);
+          this.handleModerationTabs(1);
+        } else if (index == 'final') {
+          this.currentStudent.submission.final_provisional_grade = new_mark;
+          this.handleModerationTabs('final');
+        }
+      } else if (type == 'copy') {
+        if (!this.currentStudent.submission.final_provisional_grade ||
+          confirm(I18n.t("Are you sure you want to copy to the final mark? This will overwrite the existing mark."))) {
+          var grade_to_copy = this.currentStudent.submission.provisional_grades[index];
+          $full_width_container.disableWhileLoading(
+            $.ajaxJSON($.replaceTags(ENV.provisional_copy_url, {provisional_grade_id: grade_to_copy.provisional_grade_id}), "POST",  {}, function(data) {
+              EG.currentStudent.submission.final_provisional_grade = data;
+              EG.currentStudent.submission_state = submissionState(EG.currentStudent);
+              EG.current_prov_grade_index = null;
+              EG.handleModerationTabs('final');
+            })
+          );
         }
       }
     },
@@ -1627,7 +1723,7 @@ define([
           if (comment.media_comment_type && comment.media_comment_id) {
             $comment.find(".play_comment_link").data(comment).show();
           }
-          $.each((comment.cached_attachments || comment.attachments), function(){
+          $.each((comment.cached_attachments || comment.attachments || []), function(){
             var attachment = this.attachment || this;
             attachment.comment_id = comment.id;
             attachment.submitter_id = EG.currentStudent.id;
@@ -1687,6 +1783,9 @@ define([
       }
       if (ENV.grading_role == 'moderator' || ENV.grading_role == 'provisional_grader') {
         formData['submission[provisional]'] = true;
+        if (ENV.grading_role == 'moderator' && EG.current_prov_grade_index == 'final') { // final mark
+          formData['submission[final]'] = true;
+        }
       }
 
       function formSuccess(submissions) {
@@ -1728,10 +1827,22 @@ define([
 
       $.extend(true, student.submission, submission);
 
+      student.submission_state = submissionState(student);
       if (ENV.grading_role == "moderator") {
         // sync with current provisional grade
-        var prov_grade = student.submission.provisional_grades && student.submission.provisional_grades[this.current_prov_grade_index];
+        var prov_grade;
+        if (this.current_prov_grade_index == 'final') {
+          prov_grade = student.submission.final_provisional_grade;
+        } else {
+          prov_grade = student.submission.provisional_grades && student.submission.provisional_grades[this.current_prov_grade_index];
+        }
         if (prov_grade) {
+          if (!prov_grade.provisional_grade_id) {
+            prov_grade.provisional_grade_id = submission.provisional_grade_id // populate a new prov_grade's id
+            if (this.current_prov_grade_index == 1) {
+              $new_mark_copy_link2.show(); // show the copy link now
+            }
+          }
           prov_grade.score = submission.score;
           prov_grade.grade = submission.grade;
           prov_grade.rubric_assessments = student.rubric_assessments;
@@ -1756,6 +1867,9 @@ define([
       }
       if (ENV.grading_role == 'moderator' || ENV.grading_role == 'provisional_grader') {
         formData['submission[provisional]'] = true;
+        if (ENV.grading_role == 'moderator' && EG.current_prov_grade_index == 'final') {
+          formData['submission[final]'] = true;
+        }
       }
 
       $.ajaxJSON(url, method, formData, function(submissions) {

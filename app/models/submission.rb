@@ -937,10 +937,17 @@ class Submission < ActiveRecord::Base
 
   def find_or_create_provisional_grade!(scorer:, score: nil, grade: nil, force_save: false, final: false)
     ModeratedGrading::ProvisionalGrade.unique_constraint_retry do
+      if final && !self.assignment.context.grants_right?(scorer, :moderate_grades)
+        raise Assignment::GradeError.new("User not authorized to give final provisional grades")
+      end
+
       pg = final ? self.provisional_grades.final.first : self.provisional_grades.not_final.where(scorer_id: scorer).first
       unless pg
         unless final || self.assignment.student_needs_provisional_grade?(self.user)
           raise Assignment::GradeError.new("Student already has the maximum number of provisional grades")
+        end
+        if final &&  !self.provisional_grades.not_final.exists?
+          raise Assignment::GradeError.new("Cannot give a final mark for a student with no other provisional grades")
         end
         pg = self.provisional_grades.build
       end
@@ -1009,6 +1016,10 @@ class Submission < ActiveRecord::Base
     self.graded_at = provisional_grade.graded_at
     self.grade_matches_current_submission = provisional_grade.grade_matches_current_submission
     self.readonly!
+  end
+
+  def provisional_grade_id
+    @provisional_grade_filter ? @provisional_grade_filter.id : nil
   end
 
   def submission_comments(*args)
