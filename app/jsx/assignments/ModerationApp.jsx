@@ -5,7 +5,7 @@ define([
   'react',
   'i18n!moderated_grading',
   './ModeratedStudentList',
-  './Header',
+  './ModerationHeader',
   './FlashMessageHolder',
   './actions/ModerationActions',
   './ModeratedColumnHeader'
@@ -59,17 +59,21 @@ define([
         <div className='ModerationApp'>
           <FlashMessageHolder store={this.props.store} />
           <h1 className='screenreader-only'>{I18n.t('Moderate %{assignment_name}', {assignment_name: 'TODO!!!!!!!!'})}</h1>
-          <Header store={this.props.store} actions={Actions} />
-          <ModeratedColumnHeader 
+          <Header
+            onPublishClick={() => this.props.store.dispatch(Actions.publishGrades())}
+            onReviewClick={() => this.props.store.dispatch(Actions.addStudentToModerationSet())}
+            published={this.state.assignment.published}
+          />
+          <ModeratedColumnHeader
             includeModerationSetHeaders={this.isModerationSet(this.state.students)}
             handleSortByThisColumn={this.handleSortByThisColumn}
             currentSortDirection={this.state.markColumnSort.currentSortDirection}
             markColumn={this.state.markColumnSort.markColumn}
             store={this.props.store}
           />
-           <ModeratedStudentList 
+           <ModeratedStudentList
              includeModerationSetColumns={this.isModerationSet(this.state.students)}
-             handleCheckbox={this.handleCheckbox} 
+             handleCheckbox={this.handleCheckbox}
              {...this.state}
            />
         </div>

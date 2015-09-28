@@ -9,32 +9,17 @@ define([
     displayName: 'Header',
 
     propTypes: {
-      actions: React.PropTypes.object.isRequired,
-      store: React.PropTypes.object.isRequired
-    },
-
-    getInitialState () {
-      return this.props.store.getState().assignment;
-    },
-
-    componentDidMount () {
-      this.props.store.subscribe(this.handleChange);
-    },
-
-    handleChange () {
-      this.setState(this.props.store.getState().assignment);
+      onPublishClick: React.PropTypes.func.isRequired,
+      onReviewClick: React.PropTypes.func.isRequired,
+      published: React.PropTypes.bool.isRequired
     },
 
     handlePublishClick () {
       // TODO: Make a better looking confirm one day
       var confirmMessage = I18n.t('Are you sure you want to do this? It cannot be undone and will override existing grades in the gradebook.')
       if (window.confirm(confirmMessage)) {
-        this.props.store.dispatch(this.props.actions.publishGrades());
+        this.props.onPublishClick();
       }
-    },
-
-    handleReviewerClick () {
-      this.props.store.dispatch(this.props.actions.addStudentToModerationSet());
     },
 
     render () {
@@ -47,19 +32,21 @@ define([
           </div>
           <div className='ic-Action-header__Secondary ModeratedGrading__Header-Buttons '>
             <button
+              ref='addReviewerBtn'
               type='button'
               className='ModeratedGrading__Header-AddReviewerBtn Button'
-              onClick={this.handleReviewerClick}
-              disabled={this.state.published}
+              onClick={this.props.onReviewClick}
+              disabled={this.props.published}
             >
               <i className='icon-plus' />
               {I18n.t(' Reviewer')}
             </button>
             <button
+              ref='publishBtn'
               type='button'
               className='ModeratedGrading__Header-PublishBtn Button Button--primary'
               onClick={this.handlePublishClick}
-              disabled={this.state.published}
+              disabled={this.props.published}
             >
               {I18n.t('Publish')}
             </button>
@@ -71,6 +58,5 @@ define([
   });
 
   return Header;
-
 
 });
