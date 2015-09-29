@@ -24,7 +24,7 @@ module CC::Exporter::Epub::Converters
     end
 
     def convert_audio_tags!(html_node)
-      html_node.search('a.instructure_audio_link').each do |audio_link|
+      html_node.search('a.instructure_audio_link, a.audio_comment').each do |audio_link|
         audio_link.replace(<<-AUDIO_TAG)
           <audio src="#{audio_link['href']}" controls="controls" />
         AUDIO_TAG
@@ -32,7 +32,7 @@ module CC::Exporter::Epub::Converters
     end
 
     def convert_video_tags!(html_node)
-      html_node.search('a.instructure_video_link').each do |video_link|
+      html_node.search('a.instructure_video_link, a.video_comment').each do |video_link|
         video_link.replace(<<-VIDEO_TAG)
           <video src="#{video_link['href']}" controls="controls" />
         VIDEO_TAG

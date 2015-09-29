@@ -52,46 +52,94 @@ describe "MediaConverter" do
   end
 
   describe "#convert_audio_tags!" do
-    let(:doc) do
-      Nokogiri::HTML::DocumentFragment.parse(<<-HTML)
-        <a href="#{CC::Exporter::Epub::FILE_PATH}/path/to/audio.mp3"
-          class="instructure_audio_link">
-          Audio Link
-        </a>
-      HTML
+    context "for links with class instructure_audio_link" do
+      let(:doc) do
+        Nokogiri::HTML::DocumentFragment.parse(<<-HTML)
+          <a href="#{CC::Exporter::Epub::FILE_PATH}/path/to/audio.mp3"
+            class="instructure_audio_link">
+            Audio Link
+          </a>
+        HTML
+      end
+      subject(:test_instance) { MediaConverterTest.new }
+
+      it "should change a tags to audio tags" do
+        expect(doc.search('a').any?).to be_truthy, 'precondition'
+        expect(doc.search('audio').empty?).to be_truthy, 'precondition'
+
+        test_instance.convert_audio_tags!(doc)
+
+        expect(doc.search('a').empty?).to be_truthy
+        expect(doc.search('audio').any?).to be_truthy
+      end
     end
-    subject(:test_instance) { MediaConverterTest.new }
 
-    it "should change a tags to audio tags" do
-      expect(doc.search('a').any?).to be_truthy, 'precondition'
-      expect(doc.search('audio').empty?).to be_truthy, 'precondition'
+    context "for links with class audio_comment" do
+      let(:doc) do
+        Nokogiri::HTML::DocumentFragment.parse(<<-HTML)
+          <a href="#{CC::Exporter::Epub::FILE_PATH}/path/to/audio.mp3"
+            class="audio_comment">
+            Audio Link
+          </a>
+        HTML
+      end
+      subject(:test_instance) { MediaConverterTest.new }
 
-      test_instance.convert_audio_tags!(doc)
+      it "should change a tags to audio tags" do
+        expect(doc.search('a').any?).to be_truthy, 'precondition'
+        expect(doc.search('audio').empty?).to be_truthy, 'precondition'
 
-      expect(doc.search('a').empty?).to be_truthy
-      expect(doc.search('audio').any?).to be_truthy
+        test_instance.convert_audio_tags!(doc)
+
+        expect(doc.search('a').empty?).to be_truthy
+        expect(doc.search('audio').any?).to be_truthy
+      end
     end
   end
 
   describe "#convert_video_tags!" do
-    let(:doc) do
-      Nokogiri::HTML::DocumentFragment.parse(<<-HTML)
-        <a href="#{CC::Exporter::Epub::FILE_PATH}/path/to/audio.mp3"
-          class="instructure_video_link">
-          Video Link
-        </a>
-      HTML
+    context "for links with class instructure_video_link" do
+      let(:doc) do
+        Nokogiri::HTML::DocumentFragment.parse(<<-HTML)
+          <a href="#{CC::Exporter::Epub::FILE_PATH}/path/to/audio.mp3"
+            class="instructure_video_link">
+            Video Link
+          </a>
+        HTML
+      end
+      subject(:test_instance) { MediaConverterTest.new }
+
+      it "should change a tags to audio tags" do
+        expect(doc.search('a').any?).to be_truthy, 'precondition'
+        expect(doc.search('video').empty?).to be_truthy, 'precondition'
+
+        test_instance.convert_video_tags!(doc)
+
+        expect(doc.search('a').empty?).to be_truthy
+        expect(doc.search('video').any?).to be_truthy
+      end
     end
-    subject(:test_instance) { MediaConverterTest.new }
 
-    it "should change a tags to audio tags" do
-      expect(doc.search('a').any?).to be_truthy, 'precondition'
-      expect(doc.search('video').empty?).to be_truthy, 'precondition'
+    context "for links with class video_comment" do
+      let(:doc) do
+        Nokogiri::HTML::DocumentFragment.parse(<<-HTML)
+          <a href="#{CC::Exporter::Epub::FILE_PATH}/path/to/audio.mp3"
+            class="video_comment">
+            Video Link
+          </a>
+        HTML
+      end
+      subject(:test_instance) { MediaConverterTest.new }
 
-      test_instance.convert_video_tags!(doc)
+      it "should change a tags to audio tags" do
+        expect(doc.search('a').any?).to be_truthy, 'precondition'
+        expect(doc.search('video').empty?).to be_truthy, 'precondition'
 
-      expect(doc.search('a').empty?).to be_truthy
-      expect(doc.search('video').any?).to be_truthy
+        test_instance.convert_video_tags!(doc)
+
+        expect(doc.search('a').empty?).to be_truthy
+        expect(doc.search('video').any?).to be_truthy
+      end
     end
   end
 end
