@@ -61,23 +61,30 @@ describe UserObserveesController, type: :request do
   let(:params) { { controller: 'user_observees', format: 'json' } }
 
   def index_call(opts={})
+    json = raw_index_call(opts)
+    return nil if opts[:expected_status]
+    json.map{|o| o['id'] }.sort
+  end
+  def raw_index_call(opts={})
     params[:user_id] = opts[:user_id] || parent.id
     if opts[:page]
       params.merge!(per_page: 1, page: opts[:page])
       page = "?per_page=1&page=#{opts[:page]}"
     end
 
+    if(opts[:avatars])
+      params.merge!(include: ["avatar_url"])
+    end
     json = api_call_as_user(
-      opts[:api_user] || allowed_admin,
-      :get,
-      "/api/v1/users/#{params[:user_id]}/observees#{page}",
-      params.merge(action: 'index'),
-      {},
-      {},
-      { expected_status: opts[:expected_status] || 200, domain_root_account: opts[:domain_root_account] || Account.default },
+        opts[:api_user] || allowed_admin,
+        :get,
+        "/api/v1/users/#{params[:user_id]}/observees#{page}",
+        params.merge(action: 'index'),
+        {},
+        {},
+        { expected_status: opts[:expected_status] || 200, domain_root_account: opts[:domain_root_account] || Account.default },
     )
-    return nil if opts[:expected_status]
-    json.map{|o| o['id'] }.sort
+    json
   end
 
   def create_call(data, opts={})
@@ -148,6 +155,7 @@ describe UserObserveesController, type: :request do
   end
 
   context 'GET #index' do
+    specs_require_sharding
     it 'should list observees' do
       parent.observed_users << student
       expect(index_call).to eq [student.id]
@@ -183,6 +191,37 @@ describe UserObserveesController, type: :request do
 
     it 'should not allow unauthorized admins' do
       index_call(api_user: disallowed_admin, expected_status: 401)
+    end
+
+    it 'should return avatar if avatar service enabled on account' do
+      student.account.set_service_availability(:avatars, true)
+      student.account.save!
+      student.avatar_image_source = 'attachment'
+      student.avatar_image_url = "/relative/canvas/path"
+      student.save!
+      parent.observed_users << student
+      opts = {:avatars=>true}
+      json = raw_index_call(opts )
+      expect(json.map{|o| o['id'] }).to eq [student.id]
+      expect(json.map{|o| o["avatar_url"]}).to eq ["http://www.example.com/relative/canvas/path"]
+    end
+
+    it 'should return avatar if avatar service enabled on account when called from shard with avatars disabled' do
+      @shard2.activate do
+        student= User.create
+        student.account.set_service_availability(:avatars, true)
+        student.account.save!
+        student.save!
+      end
+      student.avatar_image_source = 'attachment'
+      student.avatar_image_url = "/relative/canvas/path"
+      student.save!
+      parent.observed_users << student
+      parent.account.set_service_availability(:avatars, false)
+      opts = {:avatars=>true}
+      json = raw_index_call(opts )
+      expect(json.map{|o| o['id'] }).to eq [student.id]
+      expect(json.map{|o| o["avatar_url"]}).to eq ["http://www.example.com/relative/canvas/path"]
     end
   end
 

@@ -32,6 +32,9 @@ class UserObserveesController < ApplicationController
   # *Note:* all users are allowed to list their own observees. Administrators can list
   # other users' observees.
   #
+  # @argument include[] [String, "avatar_url"]
+  #   - "avatar_url": Optionally include avatar_url.
+  #
   # @example_request
   #     curl https://<canvas>/api/v1/users/<user_id>/observees \
   #          -X GET \
@@ -39,9 +42,10 @@ class UserObserveesController < ApplicationController
   #
   # @returns [User]
   def index
+    includes = params[:include] || []
     observed_users = user.observed_users.active.order_by_sortable_name
     observed_users = Api.paginate(observed_users, self, api_v1_user_observees_url)
-    render json: users_json(observed_users, @current_user, session)
+    render json: users_json(observed_users, @current_user, session,includes )
   end
 
   # @API Add an observee with credentials
