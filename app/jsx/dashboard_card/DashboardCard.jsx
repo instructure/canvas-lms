@@ -123,10 +123,11 @@ define([
         if (!link.hidden) {
           return (
             <DashboardCardAction
-              unreadCount  = {this.unreadCount(link.icon, this.state.stream)}
-              iconClass    = {link.icon}
-              path         = {link.path}
-              actionType   = {link.screenreader} />
+              unreadCount       = {this.unreadCount(link.icon, this.state.stream)}
+              iconClass         = {link.icon}
+              linkClass         = {link.css_class}
+              path              = {link.path}
+              screenReaderLabel = {link.screenreader} />
           );
         }
       });

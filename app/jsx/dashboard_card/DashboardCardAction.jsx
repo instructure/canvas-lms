@@ -5,15 +5,16 @@ define([
   'react',
   'i18n!dashcards',
   'bower/classnames/index'
-], function($, React, I18n) {
+], function($, React, I18n, classnames) {
   var DashboardCardAction = React.createClass({
     displayName: 'DashboardCardAction',
 
     propTypes: {
       unreadCount: React.PropTypes.number,
       iconClass: React.PropTypes.string,
+      linkClass: React.PropTypes.string,
       path: React.PropTypes.string,
-      actionType: React.PropTypes.string
+      screenReaderLabel: React.PropTypes.string
     },
 
     getDefaultProps: function() {
@@ -32,10 +33,10 @@ define([
 
     render: function () {
       return (
-        <a href={this.props.path} className="ic-DashboardCard__action">
-          { this.props.actionType ? (
+        <a href={this.props.path} className={classnames('ic-DashboardCard__action', this.props.linkClass)}>
+          { this.props.screenReaderLabel ? (
             <span className="screenreader-only">{
-              this.props.actionType
+              this.props.screenReaderLabel
             }</span>
             ) : null
           }

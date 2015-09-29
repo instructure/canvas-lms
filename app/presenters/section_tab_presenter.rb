@@ -29,7 +29,7 @@ class SectionTabPresenter
   end
 
   def to_h
-    { icon: tab.icon, hidden: hide?, path: path }.tap do |h|
+    { css_class: tab.css_class, icon: tab.icon, hidden: hide?, path: path }.tap do |h|
       h[:screenreader] = tab.screenreader if screenreader?
     end
   end

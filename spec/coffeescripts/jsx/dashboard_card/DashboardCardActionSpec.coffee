@@ -29,14 +29,14 @@ define [
       'should not have screenreader span'
 
   test 'should render actionType as screenreader text if provided', ->
-    action_type = 'Dashboard Action'
+    screen_reader_label = 'Dashboard Action'
     component = TestUtils.renderIntoDocument(DashboardCardAction(
       _.extend(@props, {
-        actionType: action_type
+        screenReaderLabel: screen_reader_label
       })
     ))
     $html = $(component.getDOMNode())
-    equal $html.find('span.screenreader-only').text(), action_type
+    equal $html.find('span.screenreader-only').text(), screen_reader_label
 
   test 'should display unread count when it is greater than zero', ->
     unread_count = 2
