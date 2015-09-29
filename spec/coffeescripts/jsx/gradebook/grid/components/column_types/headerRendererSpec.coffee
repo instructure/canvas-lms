@@ -54,7 +54,8 @@ define [
     deepEqual displayedDueDate(component), 'No due date'
 
   test 'displays the override due date if the assignment has no due date and one' +
-  'override with a due date', ->
+  ' override with a due date', ->
+    @stub($, 'sameYear').returns(true)
     props = defaultProps()
     props.columnData.assignment.due_at = null
     props.columnData.assignment.overrides = [

@@ -21,7 +21,8 @@ define([
   'jsx/gradebook/grid/stores/tableStore',
   'jsx/gradebook/grid/actions/sectionsActions',
   'jsx/gradebook/grid/helpers/columnArranger',
-  'vendor/spin'
+  'vendor/spin',
+  'jsx/gradebook/grid/helpers/submissionsHelper'
 ], function (
   React,
   FixedDataTable,
@@ -45,7 +46,8 @@ define([
   TableStore,
   SectionsActions,
   ColumnArranger,
-  Spinner
+  Spinner,
+  SubmissionsHelper
 ){
   var Table = FixedDataTable.Table,
       Column = FixedDataTable.Column,
@@ -150,12 +152,14 @@ define([
       var columnIdentifier = columnId || columnType,
           columnWidth = this.getColumnWidth(columnIdentifier),
           enrollments = this.state.tableData.students,
+          submissions = this.state.tableData.submissions,
           columnData = {
             columnType: columnType,
             activeCell: this.state.currentCellIndex,
             setActiveCell: KeyboardNavigationActions.setActiveCell,
             assignment: assignment,
-            enrollments: enrollments
+            enrollments: enrollments,
+            submissions: submissions
           };
 
       return (

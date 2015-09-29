@@ -10,12 +10,13 @@ define [
   'jst/re_upload_submissions_form'
   'underscore'
   'compiled/behaviors/authenticity_token'
+  'jsx/gradebook/grid/helpers/messageStudentsWhoHelper'
   'jquery.instructure_forms'
   'jqueryui/dialog'
   'jquery.instructure_misc_helpers'
   'jquery.instructure_misc_plugins'
   'compiled/jquery.kylemenu'
-], (I18n, $, messageStudents, AssignmentDetailsDialog, AssignmentMuter, SetDefaultGradeDialog, CurveGradesDialog, gradebookHeaderMenuTemplate, re_upload_submissions_form, _, authenticity_token) ->
+], (I18n, $, messageStudents, AssignmentDetailsDialog, AssignmentMuter, SetDefaultGradeDialog, CurveGradesDialog, gradebookHeaderMenuTemplate, re_upload_submissions_form, _, authenticity_token, MessageStudentsWhoHelper) ->
 
   class GradebookHeaderMenu
     constructor: (@assignment, @$trigger, @gradebook) ->
@@ -85,48 +86,8 @@ define [
         score: sub?.score
         submitted_at: sub?.submitted_at
 
-      submissionTypes = assignment.submission_types
-      hasSubmission = true
-      if submissionTypes.length == 0
-        hasSubmission = false
-      else if submissionTypes.length == 1
-        hasSubmission = not _.include(["none", "on_paper"], submissionTypes[0])
-      options = [
-        {text: I18n.t("students_who.havent_submitted_yet", "Haven't submitted yet")}
-        {text: I18n.t("students_who.havent_been_graded", "Haven't been graded")}
-        {text: I18n.t("students_who.scored_less_than", "Scored less than"), cutoff: true}
-        {text: I18n.t("students_who.scored_more_than", "Scored more than"), cutoff: true}
-      ]
-      options.splice 0, 1 unless hasSubmission
-
-      window.messageStudents
-        options: options
-        title: assignment.name
-        points_possible: assignment.points_possible
-        students: students
-        context_code: "course_"+assignment.course_id
-        callback: (selected, cutoff, students) ->
-          students = $.grep students, ($student, idx) ->
-            student = $student.user_data
-            if selected == I18n.t("students_who.havent_submitted_yet", "Haven't submitted yet")
-              !student.submitted_at
-            else if selected == I18n.t("students_who.havent_been_graded", "Haven't been graded")
-              !student.score?
-            else if selected == I18n.t("students_who.scored_less_than", "Scored less than")
-              student.score? and student.score != "" and cutoff? and student.score < cutoff
-            else if selected == I18n.t("students_who.scored_more_than", "Scored more than")
-              student.score? and student.score != "" and cutoff? and student.score > cutoff
-          $.map students, (student) -> student.user_data.id
-        subjectCallback: (selected, cutoff) =>
-          cutoff = cutoff || ''
-          if selected == I18n.t('students_who.not_submitted_yet', "Haven't submitted yet")
-            I18n.t('students_who.no_submission_for', 'No submission for %{assignment}', assignment: assignment.name)
-          else if selected == I18n.t("students_who.havent_been_graded", "Haven't been graded")
-            I18n.t('students_who.no_grade_for', 'No grade for %{assignment}', assignment: assignment.name)
-          else if selected == I18n.t('students_who.scored_less_than', "Scored less than")
-            I18n.t('students_who.scored_less_than_on', 'Scored less than %{cutoff} on %{assignment}', assignment: assignment.name, cutoff: cutoff)
-          else if selected == I18n.t('students_who.scored_more_than', "Scored more than")
-            I18n.t('students_who.scored_more_than_on', 'Scored more than %{cutoff} on %{assignment}', assignment: assignment.name, cutoff: cutoff)
+      settings = MessageStudentsWhoHelper.settings(assignment, students)
+      messageStudents(settings)
 
     setDefaultGrade: (opts={
       assignment:@assignment,

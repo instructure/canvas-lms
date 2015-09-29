@@ -5,13 +5,15 @@ define([
   'jsx/gradebook/grid/components/dropdown_components/headerDropdownOption',
   'jsx/gradebook/grid/constants',
   'jsx/gradebook/grid/components/dropdown_components/setDefaultGradeOption',
-  'jsx/gradebook/grid/components/dropdown_components/muteAssignmentOption'
-], function (React, _, I18n, HeaderDropdownOption, GradebookConstants, SetDefaultGradeOption, MuteAssignmentOption) {
+  'jsx/gradebook/grid/components/dropdown_components/muteAssignmentOption',
+  'jsx/gradebook/grid/components/dropdown_components/messageStudentsWhoOption'
+], function (React, _, I18n, HeaderDropdownOption, GradebookConstants, SetDefaultGradeOption, MuteAssignmentOption, MessageStudentsWhoOption) {
 
   var AssignmentHeaderDropdownOptions = React.createClass({
 
     propTypes: {
       assignment: React.PropTypes.object.isRequired,
+      submissions: React.PropTypes.object.isRequired,
       idAttribute: React.PropTypes.string.isRequired,
       enrollments: React.PropTypes.array.isRequired
     },
@@ -35,7 +37,7 @@ define([
         dropdownOptions.push(downloadSubmissionsOption);
       }
 
-      if (GradebookConstants.gradebook_is_editable &&assignment.submissions_downloads > 0 ) {
+      if (GradebookConstants.gradebook_is_editable && assignment.submissions_downloads > 0 ) {
        reuploadSubmissionsOption = { title: I18n.t('Re-Upload Submissions'), action: 'reuploadSubmissions' };
        dropdownOptions.push(reuploadSubmissionsOption);
       }
@@ -53,6 +55,7 @@ define([
       var options     = this.getDropdownOptions(),
           assignment  = this.props.assignment,
           enrollments = this.props.enrollments,
+          submissions = this.props.submissions,
           key;
       return (
         <ul id={this.props.idAttribute} className="gradebook-header-menu">
@@ -69,6 +72,12 @@ define([
                     assignment={assignment}
                     enrollments={enrollments}
                     contextId={GradebookConstants.context_id}/>
+                );
+              } else if (listItem.action === 'messageStudentsWho') {
+                return (
+                  <MessageStudentsWhoOption
+                    key={key} title={listItem.title} assignment={assignment}
+                      enrollments={enrollments} submissions={submissions}/>
                 );
               } else {
                 return(
