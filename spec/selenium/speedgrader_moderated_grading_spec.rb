@@ -62,6 +62,8 @@ describe "speed grader" do
 
       comment = "some silly comment"
       add_rubric_assessment(3, comment)
+      expect(f('#rubric_summary_container')).to include_text(@rubric.title)
+      expect(f('#rubric_summary_container')).to include_text(comment)
 
       ra = @association.rubric_assessments.first
       expect(ra.artifact).to be_a(ModeratedGrading::ProvisionalGrade)
