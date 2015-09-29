@@ -62,16 +62,16 @@ define([
   };
 
   studentHandlers[ModerationActions.SORT_MARK1_COLUMN] = (state, action) => {
-    return(__sortMarkColumn(state, action, MARK1, MARK1_PROVISIONAL_GRADE_INDEX));
-  }
+    return (__sortMarkColumn(state, action, MARK1, MARK1_PROVISIONAL_GRADE_INDEX));
+  };
 
   studentHandlers[ModerationActions.SORT_MARK2_COLUMN] = (state, action) => {
-    return(__sortMarkColumn(state, action, MARK2, MARK2_PROVISIONAL_GRADE_INDEX));
-  }
+    return (__sortMarkColumn(state, action, MARK2, MARK2_PROVISIONAL_GRADE_INDEX));
+  };
 
   studentHandlers[ModerationActions.SORT_MARK3_COLUMN] = (state, action) => {
-    return(__sortMarkColumn(state, action, MARK3, MARK3_PROVISIONAL_GRADE_INDEX));
-  }
+    return (__sortMarkColumn(state, action, MARK3, MARK3_PROVISIONAL_GRADE_INDEX));
+  };
 
   studentHandlers[ModerationActions.SELECT_ALL_STUDENTS] = (state, action) => {
     var newState = _.extend({}, state);
@@ -134,6 +134,19 @@ define([
       }
     });
 
+    return newState;
+  };
+
+  studentHandlers[ModerationActions.SELECT_MARK] = (state, action) => {
+    var newState = _.extend({}, state);
+    // For some odd stupid reason, our underscore/lodash doesn't have _.findIndex
+    var studentObj = _.find(newState.students, (student) => {
+      return student.id === action.payload.studentId;
+    });
+    var studentIndex = newState.students.indexOf(studentObj);
+    if (studentIndex > -1) {
+      newState.students[studentIndex].selected_provisional_grade_id = action.payload.selectedProvisionalId
+    }
     return newState;
   };
 

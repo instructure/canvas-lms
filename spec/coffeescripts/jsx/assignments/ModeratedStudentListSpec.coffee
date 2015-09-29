@@ -29,13 +29,47 @@ define [
 
   module 'ModeratedColumnHeader',
   test 'only shows one column when includeModerationSetHeaders is false', ->
-    studentList = TestUtils.renderIntoDocument(ModeratedStudentList(urls: {assignment_speedgrader_url: 'blah'}, includeModerationSetColumns: false, studentList: fakeStudentList, assignment: {published: false},handleCheckbox: () => 'stub' ))
+    studentList = TestUtils.renderIntoDocument(ModeratedStudentList(
+        urls: {assignment_speedgrader_url: 'blah'},
+        includeModerationSetColumns: false,
+        studentList: fakeStudentList,
+        assignment: {published: false},
+        handleCheckbox: () => 'stub',
+        onSelectProvisionalGrade: () => 'stub'
+      )
+    )
     columns = TestUtils.scryRenderedDOMComponentsWithClass(studentList, 'AssignmentList__Mark')
     equal columns.length, 1, 'only show one column'
     React.unmountComponentAtNode(studentList.getDOMNode().parentNode)
 
   test 'show all columns when includeModerationSetHeaders is true', ->
-    studentList = TestUtils.renderIntoDocument(ModeratedStudentList(urls: {assignment_speedgrader_url: 'blah'}, includeModerationSetColumns: true, studentList: fakeStudentList, assignment: {published: false},handleCheckbox: () => 'stub' ))
+    studentList = TestUtils.renderIntoDocument(ModeratedStudentList(
+        urls: {assignment_speedgrader_url: 'blah'},
+        includeModerationSetColumns: true,
+        studentList: fakeStudentList,
+        assignment: {published: false},
+        handleCheckbox: () => 'stub',
+        onSelectProvisionalGrade: () => 'stub'
+      )
+    )
     columns = TestUtils.scryRenderedDOMComponentsWithClass(studentList, 'ModeratedAssignmentList__Mark')
     equal columns.length, 3, 'show all columns'
     React.unmountComponentAtNode(studentList.getDOMNode().parentNode)
+
+  test 'shows the final grade column when the selected_provisional_grade_id is not null', ->
+    fakeStudentList.students[0].selected_provisional_grade_id = 10
+    studentList = TestUtils.renderIntoDocument(ModeratedStudentList(
+        urls: {assignment_speedgrader_url: 'blah'},
+        includeModerationSetColumns: true,
+        studentList: fakeStudentList,
+        assignment: {published: false},
+        handleCheckbox: () => 'stub'
+        onSelectProvisionalGrade: () => 'stub'
+      )
+    )
+
+    gradeColumns = TestUtils.scryRenderedDOMComponentsWithClass(studentList, 'AssignmentList_Grade')
+
+    equal gradeColumns[0].props.children, 4
+
+    fakeStudentList.students[0].selected_provisional_grade_id = null

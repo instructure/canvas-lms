@@ -192,6 +192,33 @@ define [
 
     ok !studentsInSet, 'updates state'
 
+  test "sets the selected_provisional_grade_id for a student on SELECT_MARK", ->
+    initialState =
+      studentList:
+        students: [
+          id: 1
+          selected_provisional_grade_id: null
+          provisional_grades: [
+            provisional_grade_id: 10
+          ]
+        ]
+    selectMarkAction =
+      type: 'SELECT_MARK'
+      payload:
+        studentId: 1
+        selectedProvisionalId: 10
+
+    newState = rootReducer(initialState, selectMarkAction)
+    expected = [
+          id: 1
+          selected_provisional_grade_id: 10
+          provisional_grades: [
+            provisional_grade_id: 10
+          ]
+        ]
+
+    deepEqual newState.studentList.students, expected, 'student received updated selected_provisional_grade_id property'
+
   module "urls reducer",
 
   test "passes through whatever the current state is", ->

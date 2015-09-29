@@ -118,6 +118,16 @@ define([
       };
     },
 
+    selectProvisionalGrade (studentId, selectedProvisionalId) {
+      return {
+        type: this.SELECT_MARK,
+        payload: {
+          studentId,
+          selectedProvisionalId
+        }
+      };
+    },
+
     publishGrades (ajaxLib) {
       return (dispatch, getState) => {
         var endpoint = getState().urls.publish_grades_url;

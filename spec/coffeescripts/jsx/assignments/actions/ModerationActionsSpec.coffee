@@ -119,6 +119,16 @@ define [
 
     deepEqual action, expected, "creates the action successfully"
 
+  test "creates the SELECT_MARK action", ->
+    action = ModerationActions.selectProvisionalGrade(1, 2)
+    expected =
+      type: ModerationActions.SELECT_MARK
+      payload:
+        studentId: 1
+        selectedProvisionalId: 2
+
+    deepEqual action, expected, "creates the action successfully"
+
 
   module "ModerationActions#apiGetStudents",
 

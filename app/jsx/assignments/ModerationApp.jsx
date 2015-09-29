@@ -30,6 +30,7 @@ define([
     handleChange () {
       this.setState(this.props.store.getState());
     },
+
     handleCheckbox (student, event) {
       if (event.target.checked) {
         this.props.store.dispatch(Actions.selectStudent(student.id));
@@ -37,11 +38,19 @@ define([
         this.props.store.dispatch(Actions.unselectStudent(student.id));
       }
     },
+
+    handleSelectProvisionalGrade (studentId, selectedProvisionalId, event) {
+      this.props.store.dispatch(
+        Actions.selectProvisionalGrade(studentId, selectedProvisionalId)
+      );
+    },
+
     isModerationSet (students) {
       return (_.find(students, (student) => {
         return student.in_moderation_set
       }));
     },
+
     render () {
       return (
         <div className='ModerationApp'>
@@ -61,11 +70,14 @@ define([
             handleSortMark2={() => this.props.store.dispatch(Actions.sortMark2Column())}
             handleSortMark3={() => this.props.store.dispatch(Actions.sortMark3Column())}
           />
-           <ModeratedStudentList 
-             includeModerationSetColumns={this.isModerationSet(this.state.studentList.students)}
-             handleCheckbox={this.handleCheckbox} 
-             {...this.state}
-           />
+          <ModeratedStudentList
+            includeModerationSetColumns={this.isModerationSet(this.state.studentList.students)}
+            handleCheckbox={this.handleCheckbox}
+            onSelectProvisionalGrade={this.handleSelectProvisionalGrade}
+            studentList={this.state.studentList}
+            assignment={this.state.assignment}
+            urls={this.state.urls}
+          />
         </div>
       );
     }

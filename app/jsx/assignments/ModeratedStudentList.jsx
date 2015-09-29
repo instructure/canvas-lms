@@ -1,10 +1,11 @@
 /** @jsx React.DOM */
 
 define([
+  'underscore',
   'react',
   './actions/ModerationActions',
   './constants'
-], function (React, ModerationActions, Constants) {
+], function (_, React, ModerationActions, Constants) {
 
   // CONSTANTS
   var PG_ONE_INDEX = 0;
@@ -12,34 +13,38 @@ define([
   var PG_THREE_INDEX = 2;
 
   return React.createClass({
+    displayName: 'ModeratedStudentList',
 
     propTypes: {
       studentList: React.PropTypes.object.isRequired,
       assignment: React.PropTypes.object.isRequired,
       handleCheckbox: React.PropTypes.func.isRequired,
-      includeModerationSetColumns: React.PropTypes.bool
+      includeModerationSetColumns: React.PropTypes.bool,
+      urls: React.PropTypes.object.isRequired,
+      onSelectProvisionalGrade: React.PropTypes.func.isRequired
     },
 
     renderStudentMark (student, markIndex) {
       if (student.provisional_grades && student.provisional_grades[markIndex]) {
-          if (this.props.includeModerationSetColumns){
-            return (
-              <div className='ModeratedAssignmentList__Mark'>
-                  <input
-                     type='radio'
-                     name={`mark_${student.id}`}
-                     disabled={this.props.assignment.published}
-                    />
+        if (this.props.includeModerationSetColumns) {
+          return (
+            <div className='ModeratedAssignmentList__Mark'>
+              <input
+                type='radio'
+                name={`mark_${student.id}`}
+                disabled={this.props.assignment.published}
+                onChange={this.props.onSelectProvisionalGrade.bind(this, student.id, student.provisional_grades[markIndex].provisional_grade_id)}
+              />
                 <a target='_blank' href={student.provisional_grades[markIndex].speedgrader_url}>{student.provisional_grades[markIndex].score}</a>
-              </div>
-            );
-          }else{
-            return(
-              <div className='AssignmentList__Mark'>
-                <a target='_blank' href={student.provisional_grades[markIndex].speedgrader_url}>{student.provisional_grades[markIndex].score}</a>
-              </div>
-            );
-          }
+            </div>
+          );
+        } else {
+          return (
+            <div className='AssignmentList__Mark'>
+              <a  target='_blank' href={student.provisional_grades[markIndex].speedgrader_url}>{student.provisional_grades[markIndex].score}</a>
+            </div>
+          );
+        }
       } else {
         return (
           <div className='ModeratedAssignmentList__Mark'>
@@ -50,14 +55,17 @@ define([
     },
 
     generateSpeedgraderUrl (baseSpeedgraderUrl, student) {
-      return(baseSpeedgraderUrl + "&student_id=" + student.id);
+      return (`${baseSpeedgraderUrl}&student_id=${student.id}`);
     },
 
-    renderFinalGrade (submission) {
-      if (submission.grade) {
+    renderFinalGrade (student) {
+      if (student.selected_provisional_grade_id) {
+        var grade = _.find(student.provisional_grades, (pg) => {
+          return pg.provisional_grade_id === student.selected_provisional_grade_id;
+        });
         return (
           <span className='AssignmentList_Grade'>
-            {submission.score}
+            {grade.score}
           </span>
         );
       } else {
@@ -73,7 +81,7 @@ define([
         <ul className='ModeratedAssignmentList'>
           {
             this.props.studentList.students.map((student) => {
-              if(this.props.includeModerationSetColumns){
+              if (this.props.includeModerationSetColumns) {
                 return (
                   <li className='ModeratedAssignmentList__Item'>
                     <div className='ModeratedAssignmentList__StudentInfo'>
@@ -92,8 +100,8 @@ define([
                     {this.renderFinalGrade(student)}
                   </li>
                  );
-              }else{
-                return(
+              } else {
+                return (
                   <li className='AssignmentList__Item'>
                     <div className='AssignmentList__StudentInfo'>
                       <input
