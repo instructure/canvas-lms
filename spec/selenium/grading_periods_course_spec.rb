@@ -103,7 +103,7 @@ describe 'Course Grading Periods' do
 
       replace_content f('#period_title_new2'), grading_period_title
       replace_content f('#period_start_date_new2'), 'Feb 12, 2015 at 12:00am'
-      replace_content f('#period_end_date_new2'), 'Feb 22, 2015 at 12:00am'
+      replace_content f('#period_end_date_new2'), 'Feb 22, 2015 at 11:59pm'
       f('.grading-period').click
       f('#update-button').click
       wait_for_ajax_requests
@@ -211,7 +211,7 @@ describe 'Course Grading Periods Inheritance' do
           # check UI
           expect(f("#period_title_#{new_id}")).to have_value(title)
           expect(f("#period_start_date_#{new_id}")).to have_value("#{start_date}, #{Time.zone.now.year} at 12:00am")
-          expect(f("#period_end_date_#{new_id}")).to have_value("#{end_date}, #{Time.zone.now.year} at 12:00am")
+          expect(f("#period_end_date_#{new_id}")).to have_value("#{end_date}, #{Time.zone.now.year} at 11:59pm")
         end
       end # as admin
 
@@ -244,7 +244,7 @@ describe 'Course Grading Periods Inheritance' do
           # check UI
           expect(f("#period_title_#{new_id}")).to have_value(title)
           expect(f("#period_start_date_#{new_id}")).to have_value("#{start_date}, #{Time.zone.now.year} at 12:00am")
-          expect(f("#period_end_date_#{new_id}")).to have_value("#{end_date}, #{Time.zone.now.year} at 12:00am")
+          expect(f("#period_end_date_#{new_id}")).to have_value("#{end_date}, #{Time.zone.now.year} at 11:59pm")
         end
       end # as sub-admin
 

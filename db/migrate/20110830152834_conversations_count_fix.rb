@@ -1,12 +1,12 @@
 class ConversationsCountFix < ActiveRecord::Migration
   def self.up
-    execute "UPDATE conversation_participants SET workflow_state = 'read' WHERE workflow_state = 'unread' AND last_message_at IS NULL"
+    update "UPDATE #{ConversationParticipant.quoted_table_name} SET workflow_state = 'read' WHERE workflow_state = 'unread' AND last_message_at IS NULL"
 
-    execute <<-SQL
-    UPDATE users
+    update <<-SQL
+    UPDATE #{User.quoted_table_name}
     SET unread_conversations_count = (
       SELECT COUNT(*)
-      FROM conversation_participants
+      FROM #{ConversationParticipant.quoted_table_name}
       WHERE workflow_state = 'unread'
         AND last_message_at IS NOT NULL
         AND user_id = users.id

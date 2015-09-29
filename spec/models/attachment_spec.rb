@@ -69,12 +69,42 @@ describe Attachment do
     Crocodoc::API.any_instance.stubs(:upload).returns 'uuid' => '1234567890'
   end
 
+  def configure_canvadocs(opts = {})
+    ps = PluginSetting.where(name: "canvadocs").first_or_create
+    ps.update_attribute :settings, {
+      "api_key" => "blahblahblahblahblah",
+      "base_url" => "http://example.com",
+      "annotations_supported" => true
+    }.merge(opts)
+  end
+
   context "crocodoc" do
+    include HmacHelper
+    let_once(:user) { user_model }
+    let_once(:course) { course_model }
+    let_once(:student) do
+      course.enroll_student(user_model).accept
+      @user
+    end
     before { configure_crocodoc }
 
     it "crocodocable?" do
       crocodocable_attachment_model
       expect(@attachment).to be_crocodocable
+    end
+
+    it "should include a whitelist of crocodoc_ids in the url blob" do
+      crocodocable_attachment_model
+      crocodoc_ids = [user.crocodoc_id!, student.crocodoc_id!]
+      @attachment.submit_to_crocodoc
+
+      url = Rack::Utils.parse_nested_query(@attachment.crocodoc_url(user, crocodoc_ids).sub(/^.*\?{1}/, ""))
+      blob = extract_blob(url["hmac"], url["blob"],
+                          "user_id" => user.id,
+                          "type" => "crocodoc")
+
+      expect(blob["crocodoc_ids"]).to be_present
+      expect(blob["crocodoc_ids"]).to eq(crocodoc_ids & blob["crocodoc_ids"])
     end
 
     it "should submit to crocodoc" do
@@ -127,9 +157,7 @@ describe Attachment do
 
   context "canvadocs" do
     before :once do
-      PluginSetting.create! :name => 'canvadocs',
-        :settings => {"api_key" => "blahblahblahblahblah",
-                      "base_url" => "http://example.com"}
+      configure_canvadocs
     end
 
     before :each do
@@ -162,8 +190,16 @@ describe Attachment do
         }
       end
 
-      it "prefers crocodoc when annotation is requested" do
+      it "sends annotatable documents to canvadocs if supported" do
         configure_crocodoc
+        a = crocodocable_attachment_model
+        a.submit_to_canvadocs 1, wants_annotation: true
+        expect(a.canvadoc).not_to be_nil
+      end
+
+      it "prefers crocodoc when annotation is requested and canvadocs can't annotate" do
+        configure_crocodoc
+        configure_canvadocs "annotations_supported" => false
         Setting.set('canvadoc_mime_types',
                     (Canvadoc.mime_types << "application/blah").to_json)
 

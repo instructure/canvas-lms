@@ -39,12 +39,12 @@ class CourseForMenuPresenter
   end
 
   def subtitle
-    args = if course.primary_enrollment_state == 'invited'
-      ['#shared.menu_enrollment.labels.invited_as', 'invited as']
+    label = if course.primary_enrollment_state == 'invited'
+      before_label('#shared.menu_enrollment.labels.invited_as', 'invited as')
     else
-      ['#shared.menu_enrollment.labels.enrolled_as', 'enrolled as']
+      before_label('#shared.menu_enrollment.labels.enrolled_as', 'enrolled as')
     end
-    [ before_label(*args), role.try(:label) ].join(' ')
+    [ label, role.try(:label) ].join(' ')
   end
 
   def term

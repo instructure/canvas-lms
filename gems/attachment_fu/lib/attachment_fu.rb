@@ -401,6 +401,7 @@ module AttachmentFu # :nodoc:
       self.shard.activate do
         if self.md5.present? && ns = self.infer_namespace
           scope = Attachment.where(:md5 => md5, :namespace => ns, :root_attachment_id => nil, :content_type => content_type)
+          scope = scope.where("filename IS NOT NULL")
           scope = scope.where("id<>?", self) unless new_record?
           scope.detect { |a| a.store.exists? }
         end
@@ -481,7 +482,7 @@ module AttachmentFu # :nodoc:
     protected
       # Generates a unique filename for a Tempfile.
       def random_tempfile_filename
-        "#{rand Time.now.to_i}#{filename || 'attachment'}"
+        "#{rand Time.now.to_i}#{filename && filename.last(50) || 'attachment'}"
       end
 
       def sanitize_filename(filename)

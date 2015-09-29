@@ -96,13 +96,13 @@ module UserSearch
       (EXISTS (SELECT 1 FROM #{Pseudonym.quoted_table_name}
          WHERE #{like_condition('pseudonyms.sis_user_id')} 
            AND pseudonyms.user_id = users.id 
-           AND (pseudonyms.workflow_state IS NULL 
-             OR pseudonyms.workflow_state != 'deleted'))
-           OR (#{like_condition('users.name')}) 
-             OR EXISTS (SELECT 1 FROM #{CommunicationChannel.quoted_table_name}
-               WHERE communication_channels.user_id = users.id 
-                 AND (communication_channels.path_type = ? 
-                 AND #{like_condition('communication_channels.path')})))
+           AND pseudonyms.workflow_state='active')
+       OR (#{like_condition('users.name')})
+       OR EXISTS (SELECT 1 FROM #{CommunicationChannel.quoted_table_name}
+         WHERE communication_channels.user_id = users.id
+           AND communication_channels.path_type = ?
+           AND #{like_condition('communication_channels.path')}
+           AND communication_channels.workflow_state='active'))
     SQL
   end
 

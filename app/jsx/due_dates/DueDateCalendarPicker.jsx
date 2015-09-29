@@ -5,10 +5,11 @@ define([
   'react',
   'jsx/due_dates/DueDateTokenWrapper',
   'jsx/due_dates/DueDateCalendarPicker',
+  'timezone',
   'i18n!assignments',
   'jquery',
   'jquery.instructure_forms'
-], (_ , React, DueDateTokenWrapper ,DueDateCalendarPicker ,I18n, $) => {
+], (_, React, DueDateTokenWrapper, DueDateCalendarPicker, tz, I18n, $) => {
 
   var cx = React.addons.classSet;
   var DueDateCalendarPicker = React.createClass({
@@ -29,16 +30,11 @@ define([
 
       $(dateInput).datetime_field().change( (e) => {
         var trimmedInput = $.trim(e.target.value)
-        var localizedDate = $(dateInput).data('date')
 
-        var newDate = (trimmedInput === "") ?
-          null :
-          localizedDate
+        var newDate = $(dateInput).data('unfudged-date')
+        newDate     = (trimmedInput === "") ? null : newDate
+        newDate     = this.changeToFancyMidnightIfNeeded(newDate)
 
-        if(this.fancyMidnightNeeded(trimmedInput, newDate)){
-          var newDate = this.changeToFancyMidnight(newDate)
-        }
-        var newDate = $.unfudgeDateForProfileTimezone(newDate)
         this.props.handleUpdate(newDate)
       })
     },
@@ -49,24 +45,14 @@ define([
       $(dateInput).val(this.formattedDate())
     },
 
-    // --------------------
-    //    Fancy Midnight
-    // --------------------
-
-    fancyMidnightNeeded(userInput, localizedDate){
-      return localizedDate && !(this.props.dateType == "unlock_at") && this.isMidnight(localizedDate)
+    changeToFancyMidnightIfNeeded(date) {
+      if( !(this.props.dateType == "unlock_at") &&
+          tz.isMidnight(date, { timezone: ENV.CONTEXT_TIMEZONE }) ) {
+        return tz.changeToTheSecondBeforeMidnight(date);
+      } else {
+        return date;
+      }
     },
-
-    isMidnight(date){
-      return date.getHours() === 0 && date.getMinutes() === 0
-    },
-
-    changeToFancyMidnight(date){
-      date.setHours(23)
-      date.setMinutes(59)
-      return date
-    },
-
     // ---------------
     //    Rendering
     // ---------------

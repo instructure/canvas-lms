@@ -10,7 +10,6 @@ module GlobalNavigationHelper
         }
       end
     end
-    js_env(HELP_LINK: help_link, GLOBAL_NAV_MENU_ITEMS: @mapped_tools)
   end
 
   # When k12 flag is on, replaces global navigation icon with a different one

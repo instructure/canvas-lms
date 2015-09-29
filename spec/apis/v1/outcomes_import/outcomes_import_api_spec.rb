@@ -127,9 +127,19 @@ describe "Outcomes Import API", type: :request do
           expect(request.call(type: request_type)["error"]).to match(/needs api_key and api_url/i)
         end
 
-        it "requires the AcademicBenchmark config api_key to be set" do
-          stub_ab_config_with({ "api_url" => "http://a.real.url.com" })
-          expect(request.call(type: request_type)["error"]).to match(/needs api_key/i)
+        context "requires the AcademicBenchmark config api_key to be set" do
+          it "rejects a missing/nil key" do
+            stub_ab_config_with({ "api_url" => "http://a.real.url.com" })
+            expect(request.call(type: request_type)["error"]).to match(/needs api_key/i)
+          end
+
+          it "rejects a key that is the empty string" do
+            stub_ab_config_with({
+              "api_url" => "http://a.real.url.com",
+              "api_key" => ""
+            })
+            expect(request.call(type: request_type)["error"]).to match(/needs api_key/i)
+          end
         end
 
         it "requires the AcademicBenchmark config to be set" do

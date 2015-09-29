@@ -167,7 +167,7 @@
     <div class="control-group">
       <%= label :communication_channel, :address, t('labels.email_address', 'Email Address'), :class => 'control-label' %>
       <div class="controls">
-        <%= email_field :communication_channel, :address %>
+        <input type="email" name="communication_channel_email" id="communication_channel_email"/>
       </div>
     </div>
 
@@ -188,17 +188,32 @@
 <% end %>
 <%= form_tag communication_channels_url, {:id => "register_sms_number", :class => 'form-horizontal'} do %>
     <input type="hidden" name="communication_channel[type]" value="sms"/>
+
+    <% if @user.account.feature_enabled?(:international_sms) %>
+      <div class="control-group">
+        <label for="communication_channel_sms_country" class='control-label'><%=t('labels.country', 'Country') %></label>
+        <div class="controls">
+          <select class="user_selected country" id="communication_channel_sms_country" name="communication_channel_sms_country">
+            <option value="undecided">[Select Country]</option>
+            <% CommunicationChannel.country_codes.each do |(numeric_code, name, use_email)| %>
+              <option value="<%= numeric_code %>" data-use-email="<%= use_email %>"><%= name %> (+<%= numeric_code %>)</option>
+            <% end %>
+          </select>
+        </div>
+      </div>
+    <% end %>
+
     <div class="control-group">
       <label for='communication_channel_sms_number' class='control-label'><%= t('labels.cell_number', 'Cell Number') %></label>
       <div class="controls">
-        <input type="text" id='communication_channel_sms_number' class="user_selected sms_number" aria-describedby="communication_channel_sms_number_description" /><br/>
+        <input type="tel" name="communication_channel_sms_number" id='communication_channel_sms_number' class="user_selected sms_number" aria-describedby="communication_channel_sms_number_description" /><br/>
         <span style="font-size: 0.8em; color: #a44" id='communication_channel_sms_number_description' class="should_be_10_digits">
           <%= t('validations.should_be_10_digits', "should be 10-digit number") %>
         </span>
       </div>
     </div>
 
-    <div class="control-group">
+    <div class="control-group sms_email_group">
       <label for='communication_channel_carrier' class='control-label'><%= t('labels.carrier', 'Carrier') %></label>
       <div class="controls">
         <select class="user_selected carrier" id='communication_channel_carrier'>
@@ -211,10 +226,10 @@
       </div>
     </div>
 
-    <div class="control-group">
+    <div class="control-group sms_email_group">
       <label for='communication_channel_sms_email' class='control-label'><%= t('labels.sms_email', 'SMS Email') %></label>
       <div class="controls">
-        <%= email_field :communication_channel, :address, :id => 'communication_channel_sms_email', :class => 'sms_email' %>
+        <input type="email" name="communication_channel_sms_email" class="sms_email" id="communication_channel_sms_email" />
       </div>
     </div>
 

@@ -1,17 +1,19 @@
 define [
   'jquery'
   'Backbone'
+  'compiled/collections/PaginatedCollection'
   'compiled/models/AssignmentGroup'
   'underscore'
   'i18n!assignments'
   'compiled/collections/SubmissionCollection'
   'compiled/collections/ModuleCollection'
-], ($, Backbone, AssignmentGroup, _, I18n, SubmissionCollection, ModuleCollection) ->
+], ($, Backbone, PaginatedCollection, AssignmentGroup, _, I18n, SubmissionCollection, ModuleCollection) ->
 
   PER_PAGE_LIMIT = 50
 
-  class AssignmentGroupCollection extends Backbone.Collection
+  class AssignmentGroupCollection extends PaginatedCollection
 
+    loadAll: true
     model: AssignmentGroup
 
     @optionProperty 'course'

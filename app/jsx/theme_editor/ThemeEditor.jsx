@@ -65,7 +65,8 @@ define([
       hasUnsavedChanges: React.PropTypes.bool.isRequired,
       variableSchema: customTypes.variableSchema,
       sharedBrandConfigs: customTypes.sharedBrandConfigs,
-      allowGlobalIncludes: React.PropTypes.bool
+      allowGlobalIncludes: React.PropTypes.bool,
+      accountID: React.PropTypes.string
     },
 
     getInitialState() {
@@ -141,7 +142,7 @@ define([
     },
 
     saveToSession(md5) {
-      submitHtmlForm('/brand_configs/save_to_user_session', 'POST', md5)
+      submitHtmlForm('/accounts/'+this.props.accountID+'/brand_configs/save_to_user_session', 'POST', md5)
     },
 
     handleCancelClicked() {
@@ -152,12 +153,12 @@ define([
           return;
         }
       }
-      submitHtmlForm('/brand_configs', 'DELETE');
+      submitHtmlForm('/accounts/'+this.props.accountID+'/brand_configs', 'DELETE');
     },
 
     handleApplyClicked() {
       var msg = I18n.t('This will apply these changes to your entire account. Would you like to proceed?')
-      if (window.confirm(msg)) submitHtmlForm('/brand_configs/save_to_account', 'POST')
+      if (window.confirm(msg)) submitHtmlForm('/accounts/'+this.props.accountID+'/brand_configs/save_to_account', 'POST')
     },
 
     handleFormSubmit() {
@@ -166,7 +167,7 @@ define([
       this.setState({showProgressModal: true})
 
       $.ajax({
-        url: '/brand_configs',
+        url: '/accounts/'+this.props.accountID+'/brand_configs',
         type: 'POST',
         data: new FormData(this.refs.ThemeEditorForm.getDOMNode()),
         processData: false,
@@ -222,7 +223,7 @@ define([
             onSubmit={preventDefault(this.handleFormSubmit)}
             encType="multipart/form-data"
             acceptCharset="UTF-8"
-            action="/brand_configs"
+            action="'/accounts/'+this.props.accountID+'/brand_configs"
             method="POST"
             className="Theme__container">
             <input name="utf8" type="hidden" value="✓" />
@@ -321,6 +322,34 @@ define([
 
                         </div>
                       </div>
+                      <div className="Theme__editor-upload-overrides">
+
+                        <div className="Theme__editor-upload-overrides_header">
+                          { I18n.t('CSS and JavaScript to load when user content is displayed in the canvas iOS or Android native apps') }
+                        </div>
+
+                        <div className="Theme__editor-upload-overrides_form">
+
+                          <ThemeEditorFileUpload
+                            label={I18n.t('Upload a CSS file...')}
+                            accept=".css"
+                            name="mobile_css_overrides"
+                            currentValue={this.props.brandConfig.mobile_css_overrides}
+                            userInput={this.state.changedValues.mobile_css_overrides}
+                            onChange={this.changeSomething.bind(null, 'mobile_css_overrides')}
+                          />
+
+                          <ThemeEditorFileUpload
+                            label={I18n.t('Upload a JS file...')}
+                            accept=".js"
+                            name="mobile_js_overrides"
+                            currentValue={this.props.brandConfig.mobile_js_overrides}
+                            userInput={this.state.changedValues.mobile_js_overrides}
+                            onChange={this.changeSomething.bind(null, 'mobile_js_overrides')}
+                          />
+
+                        </div>
+                      </div>
                     </div>
                   : null}
 
@@ -342,7 +371,7 @@ define([
                     </button>
                   </div>
                 : null }
-                <iframe ref="previewIframe" src="/theme-preview/?editing_brand_config=1" />
+                <iframe id="previewIframe" ref="previewIframe" src="/theme-preview/?editing_brand_config=1" />
               </div>
 
             </div>

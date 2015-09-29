@@ -1,13 +1,12 @@
 require_relative "../common"
 
-  def create_quiz_with_default_due_dates
-    due_at = Time.zone.now
+  def create_quiz_with_due_date(due_date=Time.zone.now)
     unlock_at = Time.zone.now.advance(days:-2)
     lock_at = Time.zone.now.advance(days:4)
     @context = @course
     @quiz = quiz_model
     @quiz.generate_quiz_data
-    @quiz.due_at = due_at
+    @quiz.due_at = due_date
     @quiz.lock_at = lock_at
     @quiz.unlock_at = unlock_at
     @quiz.save!

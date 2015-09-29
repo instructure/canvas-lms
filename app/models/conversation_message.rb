@@ -31,7 +31,6 @@ class ConversationMessage < ActiveRecord::Base
   validates_inclusion_of :context_type, :allow_nil => true, :in => ['Account']
   has_many :conversation_message_participants
   has_many :attachment_associations, :as => :context
-  has_many :attachments, :through => :attachment_associations, :order => 'attachments.created_at, attachments.id'
   # we used to attach submission comments to conversations via this asset
   # TODO: remove this column when we're sure we don't want this relation anymore
   belongs_to :asset, :polymorphic => true, :types => :submission
@@ -48,6 +47,7 @@ class ConversationMessage < ActiveRecord::Base
   EXPORTABLE_ASSOCIATIONS = [:conversation, :author, :context, :conversation_message_participants, :attachment_associations, :attachments, :asset]
 
   after_create :generate_user_note!
+  after_save :update_attachment_associations
 
   scope :human, -> { where("NOT generated") }
   scope :with_attachments, -> { where("attachment_ids<>'' OR has_attachments") } # TODO: simplify post-migration
@@ -145,18 +145,30 @@ class ConversationMessage < ActiveRecord::Base
 
   # override AR association magic
   def attachment_ids
-    read_attribute :attachment_ids
+    (read_attribute(:attachment_ids) || "").split(',').map(&:to_i)
   end
 
   def attachment_ids=(ids)
-    self.attachments = author.conversation_attachments_folder.attachments.where(id: ids.map(&:to_i)).to_a
-    write_attribute(:attachment_ids, attachments.map(&:id).join(','))
+    ids = author.conversation_attachments_folder.attachments.where(id: ids.map(&:to_i)).pluck(:id) unless ids.empty?
+    write_attribute(:attachment_ids, ids.join(','))
   end
 
-  def clone
-    copy = super
-    copy.attachments = attachments
-    copy
+  def attachments
+    self.attachment_associations.map(&:attachment)
+  end
+
+  def update_attachment_associations
+    previous_attachment_ids = self.attachment_associations.pluck(:attachment_id)
+    deleted_attachment_ids = previous_attachment_ids - attachment_ids
+    new_attachment_ids = attachment_ids - previous_attachment_ids
+    self.attachment_associations.where(attachment_id: deleted_attachment_ids).find_each do |association|
+      association.destroy
+    end
+    if new_attachment_ids.any?
+      author.conversation_attachments_folder.attachments.where(id: new_attachment_ids).find_each do |attachment|
+        self.attachment_associations.create!(attachment: attachment)
+      end
+    end
   end
 
   def delete_from_participants

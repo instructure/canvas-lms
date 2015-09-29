@@ -99,8 +99,9 @@ describe CommunicationChannelsController do
         expect(response).to redirect_to(login_url(:pseudonym_session => { :unique_id => @pseudonym.unique_id }, :expected_user_id => @pseudonym.user_id))
       end
 
-      it "should not confirm an already-confirmed CC" do
+      it "should not confirm an already-confirmed CC with a registered user" do
         user_with_pseudonym
+        @user.register
         user_session(@user, @pseudonym)
         code = @cc.confirmation_code
         @cc.confirm
@@ -109,6 +110,25 @@ describe CommunicationChannelsController do
         expect(response).to render_template("confirm_failed")
         @cc.reload
         expect(@cc).to be_active
+      end
+
+      it "does not confirm invalid email addresses" do
+        user_with_pseudonym(:active_user => 1, :username => 'not-an-email')
+        user_session(@user, @pseudonym)
+        get 'confirm', :nonce => @cc.confirmation_code
+        expect(response).not_to be_success
+        expect(response).to render_template("confirm_failed")
+      end
+
+      it "should confirm an already-confirmed CC with a pre-registered user" do
+        user_with_pseudonym
+        user_session(@user, @pseudonym)
+        code = @cc.confirmation_code
+        @cc.confirm
+        get 'confirm', :nonce => code
+        expect(response).to be_redirect
+        @user.reload
+        expect(@user).to be_registered
       end
     end
 
@@ -514,6 +534,7 @@ describe CommunicationChannelsController do
 
       it "should not show users that can't have a pseudonym created for the correct account" do
         Pseudonym.any_instance.stubs(:works_for_account?).returns(false)
+        @account1.authentication_providers.scoped.delete_all
         @account1.authentication_providers.create!(:auth_type => 'cas')
         user_with_pseudonym(:active_all => 1, :account => @account1, :username => 'jt@instructure.com')
 

@@ -47,7 +47,7 @@ class GroupMembership < ActiveRecord::Base
 
   has_a_broadcast_policy
 
-  scope :include_user, -> { includes(:user) }
+  scope :include_user, -> { preload(:user) }
 
   scope :active, -> { where("group_memberships.workflow_state<>'deleted'") }
   scope :moderators, -> { where(:moderator => true) }

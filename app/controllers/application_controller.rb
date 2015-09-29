@@ -109,7 +109,7 @@ class ApplicationController < ActionController::Base
     unless @js_env
       editor_css = view_context.stylesheet_path(css_url_for('what_gets_loaded_inside_the_tinymce_editor'))
       @js_env = {
-        ASSET_HOST: asset_host,
+        ASSET_HOST: Canvas::Cdn.config.host,
         active_brand_config: active_brand_config.try(:md5),
         url_to_what_gets_loaded_inside_the_tinymce_editor_css: editor_css,
         current_user_id: @current_user.try(:id),
@@ -326,6 +326,8 @@ class ApplicationController < ActionController::Base
 
   def check_pending_otp
     if session[:pending_otp] && params[:controller] != 'login/otp'
+      return render text: "Please finish logging in", status: 403 if request.xhr?
+
       reset_session
       redirect_to login_url
     end
@@ -1672,30 +1674,38 @@ class ApplicationController < ActionController::Base
     super
   end
 
-  def active_brand_config
+  def active_brand_config(opts={})
     return @active_brand_config if defined? @active_brand_config
     @active_brand_config = begin
       if !use_new_styles? || (@current_user && @current_user.prefers_high_contrast?)
         nil
       elsif session.key?(:brand_config_md5)
         BrandConfig.where(md5: session[:brand_config_md5]).first
-      elsif @domain_root_account.brand_config
-        @domain_root_account.brand_config
-      elsif k12?
-        BrandConfig.k12_config
+      else
+        brand_config_for_account(opts)
       end
     end
   end
   helper_method :active_brand_config
 
-  def brand_config_includes
-    return @brand_config_includes if defined? @brand_config_includes
-    includes = {}
-    if @domain_root_account.allow_global_includes? && active_brand_config.present?
-      includes[:js] = active_brand_config[:js_overrides] if active_brand_config[:js_overrides].present?
-      includes[:css] = active_brand_config[:css_overrides] if active_brand_config[:css_overrides].present?
+  def brand_config_for_account(opts)
+    account = @account || Context.get_account(@context, @domain_root_account)
+    if account.brand_config && account.branding_allowed?
+      account.brand_config
+    elsif !opts[:ignore_parents] && account.first_parent_brand_config
+      account.first_parent_brand_config
+    elsif k12?
+      BrandConfig.k12_config
     end
-    includes
+  end
+  private :brand_config_for_account
+
+  def brand_config_includes
+    return {} unless @domain_root_account.allow_global_includes?
+    @brand_config_includes ||= BrandConfig::OVERRIDE_TYPES.each_with_object({}) do |override_type, hsh|
+      url = active_brand_config.presence.try(override_type)
+      hsh[override_type] = url if url.present?
+    end
   end
   helper_method :brand_config_includes
 

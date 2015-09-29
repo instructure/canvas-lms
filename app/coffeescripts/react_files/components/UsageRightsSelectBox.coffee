@@ -29,7 +29,7 @@ define [
         value: 'creative_commons'
     }]
 
-  UsageRightsSelectBox = React.createClass
+  UsageRightsSelectBox =
     displayName: 'UsageRightsSelectBox'
 
     propTypes:
@@ -83,72 +83,3 @@ define [
         @setState({
           usageRightSelectionValue: event.target.value
         }, @handleChange(event))
-
-
-    renderContentOptions: ->
-      contentOptions.map (contentOption) ->
-        option {
-          value: contentOption.value
-        },
-          contentOption.display
-
-    renderCreativeCommonsOptions: ->
-      onlyCC = @state.licenseOptions.filter (license) ->
-        license.id.indexOf('cc') == 0
-
-      onlyCC.map (license) ->
-        option {value: license.id},
-          license.name
-
-    render: withReactElement ->
-      div {className: 'UsageRightsSelectBox__container'},
-        div {className: 'control-group'},
-          label {
-            className: 'control-label'
-            htmlFor: 'usageRightSelector'
-          },
-            I18n.t('Usage Right:')
-          div {className: 'controls'},
-            select {
-              id: 'usageRightSelector'
-              className: 'UsageRightsSelectBox__select',
-              onChange: @handleChange,
-              onKeyUp : @handleChooseKeyPress
-              ref: 'usageRightSelection'
-              value: @state.usageRightSelectionValue
-            },
-              @renderContentOptions()
-        if @state.showCreativeCommonsOptions
-          div {className: 'control-group'},
-            label {
-              className: 'control-label',
-              htmlFor: 'creativeCommonsSelection'
-            },
-              I18n.t('Creative Commons License:')
-            div {className: 'controls'},
-              select {
-                id: 'creativeCommonsSelection',
-                className: 'UsageRightsSelectBox__creativeCommons',
-                ref: 'creativeCommons',
-                defaultValue: @props.cc_value
-              },
-                @renderCreativeCommonsOptions()
-        div {className: 'control-group'},
-          label {
-            className: 'control-label',
-            htmlFor: 'copyrightHolder'
-          },
-            I18n.t('Copyright Holder:')
-          div {className: 'controls'},
-            input {
-              id: 'copyrightHolder',
-              type: 'text',
-              ref: 'copyright',
-              defaultValue: @props.copyright if @props.copyright?
-              placeholder: I18n.t('(c) 2001 Acme Inc.')
-            }
-        if @state.showMessage
-          div {ref:'showMessageAlert', className: 'alert'},
-            span {},
-              i {className: 'icon-warning'}, null
-              span {style: {paddingLeft: "10px"}}, I18n.t("If you do not select usage rights now, this file will be unpublished after it's uploaded.")

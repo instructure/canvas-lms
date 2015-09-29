@@ -116,8 +116,8 @@ module Api::V1::StreamItem
 
   def api_render_stream(opts)
     items = @current_user.shard.activate do
-      scope = @current_user.visible_stream_item_instances(opts).includes(:stream_item)
-      scope = scope.joins(:stream_item).where("stream_items.asset_type=?", opts[:asset_type]) if opts.has_key?(:asset_type)
+      scope = @current_user.visible_stream_item_instances(opts).preload(:stream_item)
+      scope = scope.eager_load(:stream_item).where("stream_items.asset_type=?", opts[:asset_type]) if opts.has_key?(:asset_type)
       if opts.has_key?(:submission_user_id) || opts[:asset_type] == 'Submission'
         scope = scope.joins("INNER JOIN #{Submission.quoted_table_name} ON submissions.id=asset_id")
         # just because there are comments doesn't mean the user can see them.

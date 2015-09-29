@@ -84,7 +84,7 @@ define([
                   </div>
                   <div className="ic-wizard-box__main">
                     <div className="ic-wizard-box__close">
-                      <div className="ic-Expand-link ic-Expand-link--Secondary ic-Expand-link--from-right">
+                      <div className="ic-Expand-link ic-Expand-link--from-right">
                         <a ref="closeLink" href="#" className="ic-Expand-link__trigger" onClick={this.closeModal}>
                           <div className="ic-Expand-link__layout">
                             <i className="icon-x ic-Expand-link__icon"></i>

@@ -185,20 +185,6 @@ describe AccountAuthorizationConfigsPresenter do
     end
   end
 
-  describe "#canvas_auth_only?" do
-    it "is true if no auth provider exists" do
-      account = stub(non_canvas_auth_configured?: false)
-      presenter = described_class.new(account)
-      expect(presenter.canvas_auth_only?).to eq(true)
-    end
-
-    it "is false if an auth provider exists" do
-      account = stub(non_canvas_auth_configured?: true)
-      presenter = described_class.new(account)
-      expect(presenter.canvas_auth_only?).to eq(false)
-    end
-  end
-
   describe "#login_placeholder" do
     it "wraps AAC.default_delegated_login_handle_name" do
       expect(described_class.new(stub).login_placeholder).to eq(

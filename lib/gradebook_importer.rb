@@ -136,6 +136,8 @@ class GradebookImporter
       end
     end
 
+    translate_pass_fail(@assignments, @students)
+
     unless @missing_student
       # weed out assignments with no changes
       indexes_to_delete = []
@@ -172,6 +174,24 @@ class GradebookImporter
     @upload.gradebook = self.as_json
 
     @upload.save!
+  end
+
+  def translate_pass_fail(assignments, students)
+    assignments.each_with_index do |assignment, idx|
+      next unless assignment.grading_type == "pass_fail"
+      students.each do |student|
+        submission = student.gradebook_importer_submissions[idx]
+        if submission['grade'].present?
+          submission['grade'] = assignment.score_to_grade(submission['grade'],
+                                                          submission['grade'])
+        end
+        if submission['original_grade'].present?
+          submission['original_grade'] =
+            assignment.score_to_grade(submission['original_grade'],
+                                      submission['original_grade'])
+        end
+      end
+    end
   end
 
   def process_header(csv)

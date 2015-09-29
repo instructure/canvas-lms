@@ -18,7 +18,7 @@ See Forms section.
 @mixin super-toggle-designer (
   $toggle-width: $ic-sp*5,
   $toggle-color-switch: $ic-color-light,
-  $toggle-background-OFF: $ic-brand-secondary,
+  $toggle-background-OFF: $ic-color-dark,
   $toggle-background-ON: $ic-brand-primary,
   $toggle-color-left-unchecked: $ic-color-light,
   $toggle-color-left-checked: $ic-color-light,
@@ -240,8 +240,8 @@ See Forms section.
   @include super-toggle-designer(
     $ic-sp*5, // width
     $ic-color-light, // switch bg color
-    $ic-brand-secondary, // background color when checkbox is unchecked
-    $ic-brand-secondary, // background color when checkbox is checked
+    $ic-color-dark, // background color when checkbox is unchecked
+    $ic-color-dark, // background color when checkbox is checked
     $ic-brand-primary, // left unchecked
     $ic-icon-link-color, // left checked
     $ic-icon-link-color, // right unchecked

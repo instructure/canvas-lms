@@ -105,10 +105,7 @@
           class='btn quiz-publish-button <%= "disabled" unless @quiz.can_unpublish? %>'
           <%= 'data-tooltip' unless @quiz.can_unpublish? %>>
         </button>
-
-        <%= link_to context_url(@context, :context_quiz_take_url, @quiz, :preview => 1), :method => :post, :class => 'btn',role: "button", :id => 'preview_quiz_button' do %>
-          <%= t('links.preview', "Preview") %>
-        <% end %>
+	<%= link_to_preview_quiz('class' => "btn", 'id' => "preview_quiz_button", 'preview' => 1) %>
       </div>
 
       <% if can_do(@quiz, @current_user, :update) || can_do(@quiz, @current_user, :grade) || can_do(@quiz, @current_user, :review_grades) %>

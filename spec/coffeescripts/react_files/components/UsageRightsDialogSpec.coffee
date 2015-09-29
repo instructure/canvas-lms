@@ -2,13 +2,12 @@
 define [
   'react'
   'jquery'
-  'compiled/react_files/components/UsageRightsDialog'
+  'jsx/files/UsageRightsDialog'
   'compiled/models/File'
   'compiled/models/Folder'
 ], (React, $, UsageRightsDialog, File, Folder) ->
 
   TestUtils = React.addons.TestUtils
-  UsageRightsDialog = React.createFactory(UsageRightsDialog)
 
   module 'UploadProgress',
 
@@ -135,7 +134,7 @@ define [
 
     uRD = TestUtils.renderIntoDocument(UsageRightsDialog(props))
 
-    equal uRD.refs.folderTooltip.getDOMNode().getAttribute('title'), "hello<br />hello", "sets title for multple folders"
+    equal uRD.refs.folderTooltip.getDOMNode().getAttribute('data-html-tooltip-title'), "hello<br />hello", "sets title for multple folders"
     equal uRD.refs.folderTooltip.props.children[0], "and 2 more…", "sets count text"
 
     React.unmountComponentAtNode(uRD.getDOMNode().parentNode)

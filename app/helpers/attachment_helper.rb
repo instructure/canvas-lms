@@ -21,7 +21,7 @@ module AttachmentHelper
   def doc_preview_attributes(attachment, attrs={})
     if attachment.crocodoc_available?
       begin
-        attrs[:crocodoc_session_url] = attachment.crocodoc_url(@current_user)
+        attrs[:crocodoc_session_url] = attachment.crocodoc_url(@current_user, attrs[:crocodoc_ids])
       rescue => e
         Canvas::Errors.capture_exception(:crocodoc, e)
       end

@@ -82,6 +82,7 @@ define [
       $.publish "CommonEvent/eventSaved", @event
 
     reserveEvent: (params={}) =>
+      params['comments'] = $('#appointment-comment').val()
       $.publish "CommonEvent/eventSaving", @event
       $.ajaxJSON @event.object.reserve_url, 'POST', params, @reserveSuccessCB, @reserveErrorCB
 
@@ -143,6 +144,7 @@ define [
             id: e.user?.id or e.group.id
             name: e.user?.short_name or e.group.name
             event_url: e.url
+            comments: e.comments
           (params.reservations ?= []).push reservation
           if e.user
             (params.reserved_users ?= []).push reservation
@@ -155,6 +157,7 @@ define [
       else if @event.object?.available_slots > 0
         params.availableSlotsText = @event.object.available_slots
 
+      params.reserve_comments = @event.object.reserve_comments ?= @event.object.comments
       params.showEventLink   = params.fullDetailsURL()
       params.showEventLink or= params.isAppointmentGroupEvent()
       @popover = new Popover(jsEvent, eventDetailsTemplate(params))

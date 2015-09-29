@@ -468,7 +468,16 @@ define [
         return wrappedFn(a, b)
 
     rowFilter: (student) =>
-      !@sectionToShow || (@sectionToShow in student.sections)
+      matchingSection = !@sectionToShow || (@sectionToShow in student.sections)
+      matchingFilter = if @userFilterTerm == ""
+        true
+      else
+        propertiesToMatch = ['name', 'login_id', 'short_name', 'sortable_name']
+        pattern = new RegExp @userFilterTerm, 'i'
+        matched = _.any propertiesToMatch, (prop) ->
+          student[prop]?.match pattern
+
+      matchingSection and matchingFilter
 
     handleAssignmentMutingChange: (assignment) =>
       idx = @grid.getColumnIndex("assignment_#{assignment.id}")
@@ -545,6 +554,7 @@ define [
           params =
             student_ids: (student.id for student in students)
             response_fields: ['id', 'user_id', 'url', 'score', 'grade', 'submission_type', 'submitted_at', 'assignment_id', 'grade_matches_current_submission', 'attachments', 'late', 'workflow_state', 'excused']
+            exclude_response_fields: ['preview_url']
           params['grading_period_id'] = @gradingPeriodToShow if @mgpEnabled && @gradingPeriodToShow && @gradingPeriodToShow != '0' && @gradingPeriodToShow != ''
           $.ajaxJSON(@options.submissions_url, "GET", params, @gotSubmissionsChunk)
           @submissionChunkCount++
@@ -901,14 +911,14 @@ define [
         showSisSync: @options.post_grades_feature_enabled,
         currentSection: @sectionToShow)
       @sectionMenu.render()
-      @togglePostGrades(not @sectionToShow?)
+      @togglePostGrades(not @sectionToShow? or @sectionList().length is 1)
 
     updateCurrentSection: (section, author) =>
       @sectionToShow = section
       @postGradesStore.setSelectedSection @sectionToShow
       userSettings[if @sectionToShow then 'contextSet' else 'contextRemove']('grading_show_only_section', @sectionToShow)
       @buildRows() if @grid
-      @togglePostGrades(not @sectionToShow?)
+      @togglePostGrades(not @sectionToShow? or @sectionList().length is 1)
 
     showSections: ->
       if @sections_enabled && @options.post_grades_feature_enabled
@@ -1137,40 +1147,8 @@ define [
         new GradeDisplayWarningDialog(dialog_options)
 
     onUserFilterInput: (term) =>
-      # put rows back on the students for dropped assignments
-
-      data = @grid.getData()
-      _.each data, (student) ->
-        if student.beforeFilteredRow?
-          student.row = student.beforeFilteredRow
-          delete student.beforeFilteredRow
-
-      # put the removed items back in their proper order
-      _.each @userFilterRemovedRows.reverse(), (removedStudentItem) ->
-        data.splice removedStudentItem.index, 0, removedStudentItem.data
-      @userFilterRemovedRows = []
-
-      if term != ''
-        propertiesToMatch = ['name', 'login_id', 'short_name', 'sortable_name']
-        index = data.length
-        while index--
-          student = data[index]
-          matched = _.any propertiesToMatch, (prop) ->
-            student[prop]?.match new RegExp term, 'i'
-          if not matched
-            # remove the student, save the item and its index so we can put it
-            # back in order
-            item =
-              index: index
-              data: data.splice(index, 1)[0]
-            @userFilterRemovedRows.push item
-
-      for student, index in data
-        student.beforeFilteredRow = student.row
-        student.row = index
-
-      @grid.setData(data)
-      @grid.invalidate()
+      @userFilterTerm = term
+      @buildRows()
 
     getVisibleGradeGridColumns: ->
       res = [].concat @parentColumns, @customColumnDefinitions()
@@ -1453,41 +1431,48 @@ define [
       @totalGradeWarning = null
 
       if _.any(@assignments, (a) -> a.muted)
-        @totalGradeWarning = I18n.t "This grade differs from the student's view of the grade because some assignments are muted"
+        @totalGradeWarning =
+          warningText: I18n.t "This grade differs from the student's view of the grade because some assignments are muted"
+          icon: "icon-muted"
+      else
+        if @weightedGroups()
+          # assignment group has 0 points possible
+          invalidAssignmentGroups = _.filter @assignmentGroups, (ag) ->
+            pointsPossible = _.inject ag.assignments
+            , ((sum, a) -> sum + (a.points_possible || 0))
+            , 0
+            pointsPossible == 0
 
-      if @weightedGroups()
-        # assignment group has 0 points possible
-        invalidAssignmentGroups = _.filter @assignmentGroups, (ag) ->
-          pointsPossible = _.inject ag.assignments
+          for ag in invalidAssignmentGroups
+            for a in ag.assignments
+              a.invalid = true
+
+          if invalidAssignmentGroups.length > 0
+            groupNames = (ag.name for ag in invalidAssignmentGroups)
+            text = I18n.t 'invalid_assignment_groups_warning',
+              one: "Score does not include %{groups} because it has
+                    no points possible"
+              other: "Score does not include %{groups} because they have
+                      no points possible"
+            ,
+              groups: $.toSentence(groupNames)
+              count: groupNames.length
+            @totalGradeWarning =
+              warningText: text
+              icon: "icon-warning final-warning"
+
+        else
+          # no assignments have points possible
+          pointsPossible = _.inject @assignments
           , ((sum, a) -> sum + (a.points_possible || 0))
           , 0
-          pointsPossible == 0
 
-        for ag in invalidAssignmentGroups
-          for a in ag.assignments
-            a.invalid = true
-
-        if invalidAssignmentGroups.length > 0
-          groupNames = (ag.name for ag in invalidAssignmentGroups)
-          @totalGradeWarning = I18n.t 'invalid_assignment_groups_warning',
-            one: "Score does not include %{groups} because it has
-                  no points possible"
-            other: "Score does not include %{groups} because they have
-                    no points possible"
-          ,
-            groups: $.toSentence(groupNames)
-            count: groupNames.length
-
-      else
-        # no assignments have points possible
-        pointsPossible = _.inject @assignments
-        , ((sum, a) -> sum + (a.points_possible || 0))
-        , 0
-
-        if pointsPossible == 0
-          @totalGradeWarning = I18n.t 'no_assignments_have_points_warning'
-          , "Can't compute score until an assignment has points possible"
-
+          if pointsPossible == 0
+            text = I18n.t 'no_assignments_have_points_warning'
+            , "Can't compute score until an assignment has points possible"
+            @totalGradeWarning =
+              warningText: text
+              icon: "icon-warning final-warning"
     ###
     xsslint jqueryObject.identifier createLink
     xsslint jqueryObject.function showLink hideLink

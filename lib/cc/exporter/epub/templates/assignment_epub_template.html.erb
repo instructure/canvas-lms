@@ -1,0 +1,36 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.1//EN' 'http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd'>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=utf-8"/>
+  <title>Assignments</title>
+  <!-- embedded styling will be inserted here -->
+</head>
+  <body>
+    <h1 id="assignment_TOC">Assignment Index</h1>
+    <ol>
+    <% content.each_with_index do |item, index| %>
+      <li><a href="<%= "#assignment#{index}" %>"><%= item[:title] %></a></li>
+    <% end %>
+    </ol>
+    <div style="page-break-before:always;"></div>
+    <% content.each_with_index do |item, index| %>
+      <h2 id="<%="assignment#{index}"%>"><%= item[:title] %></h2>
+      <p><%= item[:description] %></p>
+      <% if item[:due_at] %>
+        <p>Due at: <%= datetime_string(Date.parse(item[:due_at])) %></p>
+      <% end %>
+      <% if item[:unlock_at] %>
+        <p>Unlock at: <%= datetime_string(Date.parse(item[:unlock_at])) %></p>
+      <% end %>
+      <% if item[:lock_at] %>
+        <p>Lock at: <%= datetime_string(Date.parse(item[:lock_at])) %></p>
+      <% end %>
+      <p>Grading Type: <%= item[:grading_type] %></p>
+      <p>Points: <%= item[:points_possible ]%></p>
+      <hr/>
+      <a href="assignments.xhtml">Back to Assignment Index</a>
+      <div style="page-break-before:always;"></div>
+    <% end %>
+  </body>
+</html>

@@ -27,7 +27,7 @@ See `app/jsx/styleguide/ReactModalExample.jsx` for complete example usage.
 
 ## Mini Canvas modal
 
-For small dialogs like Confirms, the default Canvas modal width might seem too much. 
+For small dialogs like Confirms, the default Canvas modal width might seem too much.
 
 The `.ReactModal__Content--mini-modal` class can be appended to the `.ReactModal__Content--canvas` class to render a less wide modal dialog.
 
@@ -59,7 +59,7 @@ See `app/jsx/examples/ReactModalExample.jsx` for complete example usage.
   transition: opacity 0.2s ease-out;
   overflow-x: hidden;
   overflow-y: auto;
-  background: rgba($ic-brand-secondary, 0.75);
+  background: rgba($ic-color-dark, 0.75);
   z-index: 150;
   opacity: 0;
 
@@ -98,9 +98,9 @@ See `app/jsx/examples/ReactModalExample.jsx` for complete example usage.
 
     .ReactModal__Layout {
       border-radius: $baseBorderRadius;
-      box-shadow: 0 1px 4px 1px rgba($ic-brand-secondary, 0.95);
+      box-shadow: 0 1px 4px 1px rgba($ic-color-dark, 0.95);
 
-      @include breakpoint(tablet) { 
+      @include breakpoint(tablet) {
         width: 696px;
         transition: all 0.5s $ic-transition;
         opacity: 0;
@@ -173,7 +173,7 @@ See `app/jsx/examples/ReactModalExample.jsx` for complete example usage.
         display: flex;
         justify-content: flex-end;
       }
-      .Button, .btn { 
+      .Button, .btn {
         margin-left: $ic-sp/3;
         &:first-of-type { margin-left: 0; }
       }

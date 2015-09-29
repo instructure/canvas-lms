@@ -326,7 +326,7 @@ module Turnitin
         params[:ctl] = course.name
       end
       if assignment
-        params[:assign] = assignment.title
+        params[:assign] = "#{assignment.title} - #{assignment.id}"
         params[:assignid] = id(assignment)
       end
       params[:diagnostic] = "1" if @testing

@@ -273,7 +273,7 @@ describe ApplicationController do
 
     it "sets the contextual timezone from the context" do
       Time.zone = "Mountain Time (US & Canada)"
-      controller.instance_variable_set(:@context, stub(time_zone: Time.zone, asset_string: ""))
+      controller.instance_variable_set(:@context, stub(time_zone: Time.zone, asset_string: "", class_name: nil))
       controller.js_env({})
       expect(controller.js_env[:CONTEXT_TIMEZONE]).to eq 'America/Denver'
     end

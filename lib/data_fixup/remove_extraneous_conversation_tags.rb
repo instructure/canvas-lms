@@ -6,7 +6,7 @@ module DataFixup::RemoveExtraneousConversationTags
     conditions = <<-COND
       private_hash IS NOT NULL AND (
         SELECT COUNT(DISTINCT tags)
-        FROM conversation_participants
+        FROM #{ConversationParticipant.quoted_table_name}
         WHERE conversation_id = conversations.id
       ) > 1
     COND

@@ -56,7 +56,7 @@ module AccountReports
         :account_id => account.id,
         :root_account_id => root_account.id
       }
-      students = root_account.pseudonyms.except(:includes).
+      students = root_account.pseudonyms.except(:preload).
         select(%{
           pseudonyms.id,
           u.sortable_name        AS "student name",

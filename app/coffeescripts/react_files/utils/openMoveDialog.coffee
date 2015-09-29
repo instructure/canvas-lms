@@ -1,7 +1,7 @@
 define [
   'underscore'
   'react'
-  '../components/MoveDialog'
+  'jsx/files/MoveDialog'
   '../modules/filesEnv'
   'jquery'
 ], (_, React, MoveDialogComponent, filesEnv, $) ->

@@ -1,0 +1,52 @@
+@import "base/environment";
+
+.assignments{
+
+  .AssignmentList{
+    border-top: 1px solid #F0F0F0;
+    margin: 0px;
+    list-style: none;
+  }
+
+  .AssignmentList__Item{
+    border-bottom: 1px solid #F0F0F0;
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    padding-top: 15px;
+    padding-bottom: 15px;
+  }
+
+  .AssignmentList__StudentInfo{
+    display: flex;
+    align-items: center;
+    width: 200px;
+  }
+
+  .AssignmentList__StudentInfo input[type='checkbox']{
+    margin: 0px;
+  }
+
+  .AssignmentList_StudentPhoto{
+    margin-left: 10px;
+    margin-right: 10px;
+    width: 20px;
+  }
+
+  .AssignmentList__Mark{
+    display: flex;
+    align-items: center;
+  }
+  .AssignmentList__Mark input[type='radio']{
+    margin: 0px 5px 0px 5px;
+  }
+  .AssignmentList_Grade{
+    width: 50px;
+    display: flex;
+    justify-content: center;
+  }
+}
+
+.ModeratedGrading__Header-Instructions {
+  font-size: 20px;
+}

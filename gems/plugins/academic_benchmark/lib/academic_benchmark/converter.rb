@@ -23,7 +23,7 @@ module AcademicBenchmark
       if @archive_file
         convert_file
       elsif @settings[:authorities] || @settings[:guids] || @settings[:refresh_all_standards]
-        if @api_key
+        if @api_key && !@api_key.empty?
           if @settings[:refresh_all_standards]
             refresh_all_outcomes
           else
@@ -55,8 +55,14 @@ module AcademicBenchmark
     def convert_file
       data = @api.parse_ab_data(@archive_file.read)
       process_json_data(data)
-    rescue APIError
-      add_warning(I18n.t("academic_benchmark.bad_ab_file", "The provided Academic Benchmark file has an error."), $!)
+    rescue APIError => e
+      add_error(
+        I18n.t("The provided Academic Benchmark file has an error"),
+        {
+          exception: e,
+          error_message: e.message
+        }
+      )
     end
 
     def convert_authorities(authorities=[])
@@ -74,8 +80,17 @@ module AcademicBenchmark
     def refresh_outcomes(opts)
       res = build_full_auth_hash(opts)
       process_json_data(res)
-    rescue EOFError, APIError
-      add_warning(I18n.t("academic_benchmark.api_error", "Couldn't update standards for authority %{auth}.", :auth => opts[:authority] || opts[:guid]), $!)
+    rescue EOFError, APIError => e
+      add_error(
+        I18n.t(
+          "Couldn't update standards for authority %{auth}",
+          :auth => opts[:authority] || opts[:guid]
+        ),
+        {
+          exception: e,
+          error_message: e.message
+        }
+      )
     end
 
     # get a shallow tree for the authority then process the leaves
@@ -126,8 +141,14 @@ module AcademicBenchmark
       end
 
       set_progress(95)
-    rescue APIError
-      add_warning(I18n.t("academic_benchmark.bad_response_all", "Couldn't update the standards."), $!)
+    rescue APIError => e
+      add_error(
+        I18n.t("Previously unhandled error encountered while refreshing outcomes"),
+        {
+          exception: e,
+          error_message: e.message
+        }
+      )
     end
 
     def process_json_data(data)
@@ -135,7 +156,10 @@ module AcademicBenchmark
         outcomes = Standard.new(data).build_outcomes
         @course[:learning_outcomes] << outcomes
       else
-        add_warning(I18n.t("academic_benchmark.no_authority", "Couldn't find an authority to update"))
+        err_msg = I18n.t("Couldn't find an authority to update")
+        add_error(
+          err_msg, { exception: nil, error_message: err_msg }
+        )
       end
     end
 

@@ -21,7 +21,7 @@ module Api::V1::SisAssignment
 
   API_SIS_ASSIGNMENT_JSON_OPTS = {
     only: %i(id created_at due_at points_possible integration_id integration_data).freeze,
-    methods: %i(name).freeze
+    methods: %i(name submission_types_array).freeze
   }.freeze
 
   API_SIS_ASSIGNMENT_GROUP_JSON_OPTS = {
@@ -47,6 +47,7 @@ module Api::V1::SisAssignment
   def sis_assignment_json(assignment)
     json = api_json(assignment, nil, nil, API_SIS_ASSIGNMENT_JSON_OPTS)
     json[:course_id] = assignment.context_id if assignment.context_type == 'Course'
+    json[:submission_types] = json.delete(:submission_types_array)
     add_sis_assignment_group_json(assignment, json)
     add_sis_course_sections_json(assignment, json)
     json

@@ -5,21 +5,19 @@ define [
   'react-router'
   'compiled/react/shared/utils/withReactElement'
   'jsx/files/UploadButton'
-  './UsageRightsDialog'
+  'jsx/files/UsageRightsDialog'
   '../utils/openMoveDialog'
   '../utils/downloadStuffAsAZip'
   '../utils/deleteStuff'
   '../modules/customPropTypes'
-  './RestrictedDialogForm'
+  'jsx/files/RestrictedDialogForm'
   'compiled/fn/preventDefault'
   '../modules/FocusStore'
   'jquery'
   'compiled/jquery.rails_flash_notifications'
-], (_, I18n, React, Router, withReactElement, UploadButtonComponent, UsageRightsDialogComponent, openMoveDialog, downloadStuffAsAZip, deleteStuff, customPropTypes, RestrictedDialogFormComponent, preventDefault, FocusStore, $) ->
+], (_, I18n, React, Router, withReactElement, UploadButtonComponent, UsageRightsDialog, openMoveDialog, downloadStuffAsAZip, deleteStuff, customPropTypes, RestrictedDialogForm, preventDefault, FocusStore, $) ->
 
   UploadButton = React.createFactory UploadButtonComponent
-  UsageRightsDialog = React.createFactory UsageRightsDialogComponent
-  RestrictedDialogForm = React.createFactory RestrictedDialogFormComponent
   Link = React.createFactory Router.Link
 
 
@@ -111,11 +109,11 @@ define [
         'aria-label': I18n.t('files_toolbar', 'Files Toolbar')
       },
         form {
-          className: 
+          className:
             if showingButtons
               "ic-Input-group ef-search-form ef-search-form--showing-buttons"
             else
-              "ic-Input-group ef-search-form" 
+              "ic-Input-group ef-search-form"
           onSubmit: @onSubmitSearch
         },
           input {

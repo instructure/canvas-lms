@@ -1,6 +1,6 @@
 module DataFixup::AddLtiMessageHandlerIdToLtiResourcePlacements
   def self.run
-    scope = Lti::ResourceHandler.where('EXISTS (SELECT 1 FROM lti_resource_placements WHERE resource_handler_id=lti_resource_handlers.id AND message_handler_id IS NULL)')
+    scope = Lti::ResourceHandler.where("EXISTS (SELECT 1 FROM #{Lti::ResourcePlacement.quoted_table_name} WHERE resource_handler_id=lti_resource_handlers.id AND message_handler_id IS NULL)")
     while scope.exists?
       scope.find_each do |resource_handler|
         message_handler_id = resource_handler.message_handlers.

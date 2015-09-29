@@ -3,7 +3,7 @@ module DataFixup::RemoveDuplicateNotificationPolicies
     while true
       ccs = NotificationPolicy.connection.select_rows("
           SELECT communication_channel_id
-          FROM notification_policies
+          FROM #{NotificationPolicy.quoted_table_name}
           WHERE notification_id IS NULL
             AND frequency='daily'
           GROUP BY communication_channel_id

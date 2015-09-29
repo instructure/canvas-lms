@@ -1,16 +1,19 @@
 <a
   {{#if assignment.muted}}
     title="{{#t "this_assignment_is_muted"}}This assignment is muted{{/t}}"
-  {{/if}}
-  {{#if assignment.invalid}}
-    title="{{#t "zero_point_assignment"}}Assignments in this group have no points possible and cannot be included in grade calculation{{/t}}"
+  {{else}}
+    {{#if assignment.invalid}}
+      title="{{#t "zero_point_assignment"}}Assignments in this group have no points possible and cannot be included in grade calculation{{/t}}"
+    {{/if}}
   {{/if}}
   class="assignment-name {{#if assignment.muted}}muted{{/if}}"
   href="{{href}}"
 >
-  {{#if assignment.invalid}}
-    <i class="icon-warning"></i>
-  {{/if}}
+  {{#unless assignment.muted}}
+    {{#if assignment.invalid}}
+      <i class="icon-warning"></i>
+    {{/if}}
+  {{/unless}}
   {{{assignment.name}}}
 </a>
 <a class="gradebook-header-drop assignment_header_drop" data-assignment-id="{{assignment.id}}" href="#" role="button">

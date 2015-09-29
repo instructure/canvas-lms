@@ -125,11 +125,11 @@ describe ActiveRecord::Base do
       expect(es.sort).to eq [@e1.id, @e2.id, @e3.id, @e4.id, @e5.id, @e6.id].sort
     end
 
-    it "should honor includes when using a cursor" do
+    it "should honor preload when using a cursor" do
       skip "needs PostgreSQL" unless Account.connection.adapter_name == 'PostgreSQL'
       Account.default.courses.create!
       Account.transaction do
-        Account.where(:id => Account.default).includes(:courses).find_each do |a|
+        Account.where(:id => Account.default).preload(:courses).find_each do |a|
           expect(a.courses.loaded?).to be_truthy
         end
       end
@@ -139,8 +139,7 @@ describe ActiveRecord::Base do
       skip "needs PostgreSQL" unless Account.connection.adapter_name == 'PostgreSQL'
       Account.transaction do
         Account.expects(:find_in_batches_with_cursor).never
-        Account.where(:id => Account.default).includes(:courses).find_each(start: 0) do |a|
-          expect(a.courses.loaded?).to be_truthy
+        Account.where(:id => Account.default).find_each(start: 0) do
         end
       end
     end

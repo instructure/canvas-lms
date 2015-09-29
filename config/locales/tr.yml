@@ -748,17 +748,13 @@ tr:
             field: "Bölüm Numarası"
     settings: 
       about_google_docs: |-
-          Google Docs Önizleme kullanıcıların dosyaları indirip ilgili 
+          Google Docs Önizleme kullanıcıların dosyaları indirip ilgili
           programlarda (Word veya Excel gibi) açmaları yerine Canvas
-          içinde bu belgelerin izlenmesini sağlar.
+          içinde bu belgelerin görüntülenmesini sağlar.
           
-          Bu hesap için Scribd etkinleştirilmişse Canvas önizleme için
-          bunu kullanmaya çalılşacaktır. Belgenin Scribd'de önizlemesi
-          yapılamazsa veya kullanıcının cihazında Flash oynatıcı yoksa
-          (Ipad/Iphone gibi), etkinleştirilmiş olması şartıyla Canvas Google
-          Docs Önizlemesini kullanacaktır. Bu hizmeti kullanarak buradaki
-          [Google Docs Viewer Terms of Service](%{terms_url}) kullanım
-          sözleşmesini okuyup kabul etmiş sayılırsınız.
+          Google Docs Önizleme ayrıca Canvas belge önizleyiciler tarafından desteeklenmeyen dosya türlerini de dönüştürür.
+          
+          Bu hizmeti kullanarak buradaki [Google Drive Viewer Terms of Service](%{terms_url}) kullanım sözleşmesini okuyup kabul etmiş sayılırsınız.
       about_google_docs_tooltip: "Google Docs Önizlemeleri Hakkında"
       account_admins_title: "Hesap Yöneticileri"
       account_quotas: 
@@ -875,6 +871,7 @@ tr:
         self_registration_type_observer: "Yalnızca Gözlemci Hesapları"
         show_scheduler: "Zamanlayıcıyı Etkinleştir"
         sis_app_token: "ÖBS Agent Token"
+        sis_app_url: "ÖBS App URL"
         sis_source_id: "ÖBS ID"
         start_at: Başlangıç
         students_can_create_courses: Öğrenciler
@@ -1191,6 +1188,7 @@ tr:
             text: "Bu rapor, belirli bir dönemde, herhangi bir derste kayıtlı tüm öğrencileri gösterir. Oluşturulan csv dosyasında dersi başladığından beri ziyaret etmeyen her öğrenci kaydı için bir satır bulunmaktadır."
   achieve_mastery_count_times_8c9bbcec: "%{count} defa yeterlilik sağlayın"
   actions_efcde10d: Eylemler
+  activate_this_key_6cd98f4b: "Bu anahtarı etkinleştir"
   activerecord: 
     errors: 
       messages: 
@@ -1276,25 +1274,32 @@ tr:
       recipients_required: "En az bir alıcı gereklidir"
       threshold_should_be_numeric: "Pozitif bir sayı olmalıdır"
   all_4321c3a1: Tümü
+  all_accounts_3bafc860: "Tüm Hesaplar"
   all_changes_were_saved_f6f3ddcc: "Tüm değişiklikler kaydedildi"
   all_configured_apps_a14eef0a: "Tüm Yapılandırılmış Uygulamalar"
+  all_courses_a7dbb853: "Tüm Dersler"
   all_dates_fields_must_be_present_and_formatted_cor_3a0fe925: "Tüm tarih alanları olmalı ve doğru biçimlendirilmeli"
   all_finished_time_to_publish_your_course_click_the_b6f07217: "Her şey tamam mı? Dersinizi yayınlama zamanı! Yayınlamak için aşağıdaki butona tıklayın! Dersi yayınladığınızda kullanıcılar derse katılmaya başlayacaklar."
   all_grading_periods_77974940: "Tüm Notlandırma Periyotları"
   all_grading_periods_must_have_a_title_a1a38d87: "Tüm notlandırma peryodlarının bir başlığı olmalı"
+  all_groups_cea25817: "Tüm Gruplar"
+  all_my_files_a0213441: "Tüm Dosyalarım"
   all_start_dates_must_be_before_the_end_date_d949eca9: "Tüm başlangıç tarihleri son tarihten önce olmalı"
   all_students_have_taken_the_quiz_b558f8b4: "Tüm öğrenciler bu kısa sınavı aldı"
   all_students_have_taken_the_survey_494f9f42: "Tüm öğrenciler bu anketi aldı"
+  allow_a_moderator_to_review_multiple_independent_g_752c4b90: "Bir moderatör seçili gönderiler için çoklu bağımsız notları inceleyebilsin"
   allow_bulk_grade_export_to_sis_e11a6e66: "ÖBS'ye Toplu Not Aktarımına İzin Ver"
   allow_lor_tools: "Kullanıcılar LOR için yapılandırılmış harici araçları görüp kullanabilsinler."
   allow_opt_out_of_inbox: "Kullanıcıların Karşılıklı Konuşma Gelen Kutusun'dan çıkmalarına izin ver. Bu duurmda tüm karşılıklı konuşma mesajları ve bildirimler ACİL bildirimler olarak kullanıcının birincil eposta adresine gönderilecek; Gelen Kutusunda okunmamış mesaj rozeti ve Karşılıklı Konuşma bildirim tercihleri gizlenecektir."
   allow_students_to_see_who_has_signed_up_for_time_s_497f4a46: "Zaman aralıklarına kimlerin kaydolduğunu öğrenciler görebilsin."
   allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "ÖBS entegrasyonunda öğretmenler aktarılacak not verilerini toplu olarak   işaretleyebilsin."
+  allows_the_scheduling_of_recurring_calendar_events_aac71007: "Yinelenen takvim olaylarının zamanlaması ayarlanabilsin"
   always_3a59e701: "Her zaman"
   an_error_occurred_please_post_your_reply_again_lat_b0220ac6: "*Bir hata oluştu*, lütfen cevabınızı daha sonra tekrar gönderin"
   an_error_occurred_trying_to_generate_this_theme_pl_b493e2e9: "Bu temayı oluşturmaya çalışırken bir hata oluştu, lütfen tekrar deneyin."
   an_error_occurred_trying_to_prepare_download_pleas_df6fa596: "İndirmeye hazırlanırken bir hata oluştu, lütfen tekrar deneyin."
   an_error_occurred_when_setting_the_usage_right_for_d4ea78f5: "%{filename} dosyası için kullanıcı haklarını ayarlarken bir hata oluştu"
+  an_item_named_name_already_exists_in_this_location_147b7312: "\"%{name}\" adına bir öğe zaten bu konumda mevcut. Var olan dosyayı değiştirmek ister misiniz?"
   an_unknown_server_error_occurred_please_try_again_f517eaf3: "Bilinmeyen sunucu hatası oluştu. Lütfen tekrar deneyin."
   analytics: 
     course: 
@@ -1367,6 +1372,8 @@ tr:
     podcast_feed_description_group: "\"%{group}\" grubu içindeki duyurularda gömülü olan ya da bağlantı verilen ortam dosyaları bu beslemede görülecektir."
     podcast_feed_name: "%{course} Duyurularına Ait Podcast Akışı"
   anonymous_e1b8ad27: Anonim
+  anonymous_grading_ccb5045c: "İsimsiz Notlandırma"
+  anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: "İsimsiz notlandırma, SpeedGrader™ da öğrencilerin isimlerini gizler"
   anonymous_user: "İsimsiz Kullanıcı"
   anonymous_user_d984b9ce: "İsimsiz Kullanıcı"
   another_configuration_is_currently_selected_select_95b394e: "Şu anda başka bir yapılandırma seçili. Bu yapılandırmayı seçerseniz diğerinin seçimi kaldırılır."
@@ -1377,6 +1384,8 @@ tr:
   api_url_3ee7cb0a: "API URL"
   app_center_will_appear_in_the_apps_tab_on_the_sett_1b9eb936: "Bir dersin veya Hesabın ayarlar sayfasındaki \"Uygulamalar\" sekmesinde Uygulama Merkezi görülecektir. Aşağıdaki URL geçerli bir Uygulama Merkezine yönlenmelidir (örneğin %{url} -- sondaki kesme işaretini yazmayın"
   app_placements_6d877225: "Uygulama Yerleştirmeleri"
+  appends_a_number_to_the_end_of_each_event_title_e__bca98abd: "Her olay başlığının sonuna bir numara verir (örn. Olay1, Olay2, vb)"
+  appends_a_number_to_the_end_of_each_event_title_e__e9573bf8: "Her olay başlığının sonuna bir numara verir (örn. Olay1, Olay2, vb)\" for=\"append_iterator"
   application: 
     errors: 
       feed_not_found: "Akış bulunamadı."
@@ -1498,6 +1507,7 @@ tr:
   assignment_comments_e43ed898: "Ödev Yorumları"
   assignment_details: 
     no_graded_submissions: "Notlandırılmış gönderi yok"
+  assignment_details_bc488179: "Ödev Ayrıntıları"
   assignment_details_dialog: 
     average_score: "Ortalama Puan:"
     count_of_submissions: "%{cnt} gönderi"
@@ -1538,6 +1548,11 @@ tr:
     unmute_dialog: "Bu ödev şu anda bekletiliyor. Öğrenciler notlarını ve geribildirimleri göremezler. Şimdi açmak ister misiniz?"
     unmuting_assignment: "Ödev beklemeden çıkarılıyor..."
   assignment_name_b2d87383: "Ödev Adı"
+  assignment_options_1e5b7074: "Ödev Seçenekleri"
+  assignment_override: 
+    student_count: 
+      one: "%{count} öğrenci"
+      other: "%{count} öğrenci"
   assignment_selection_6bff05c4: "Ödev Seçimi"
   assignment_was_deleted_8320d26d: "Ödev silindi"
   assignments: 
@@ -2149,6 +2164,7 @@ tr:
   available_until_format_like_yyyy_mm_dd_hh_mm_622378d6: "Şu Tarihe Kadar Etkin - YYYY-MM-DD hh:mm Gibi Format"
   available_until_lock_at_ab022445: "%{lock_at} tarihine kadar geçerli"
   average_49c63f9b: Ortalama
+  back_2900f52a: Geri
   back_to_app_center_95420d83: "Uygulama Merkezine Geri Dön"
   base_847aca7c: Temel
   bb_display: "Blackboard Learn"
@@ -2481,6 +2497,7 @@ tr:
       buttons: 
         create: "Olay Oluştur"
         update: "Olayı Güncelle"
+      count: "Sayı:"
       date: "Tarih:"
       delete: Sil
       different_date_for_each_section: "Her bölüm için farklı tarihler kullanın"
@@ -2491,6 +2508,7 @@ tr:
       location_address: "Adres:"
       location_name: "Konum:"
       new_calendar_event_header: "Yeni Takvim Olayı"
+      repeat: Tekrar
       start_time: "Başlangıç Zamanı"
     edit_event: 
       tabs: 
@@ -2664,6 +2682,7 @@ tr:
   cannot_be_nil_when_course_id_is_nil_f539388: "course_id sıfır olduğunda bu değer sıfır olamaz"
   cannot_be_present_when_account_id_is_present_f7d9b51f: "account_id var olduğunda bu değer var olamaz"
   cannot_be_present_when_course_id_is_present_785e6a59: "course_id var olduğunda bu değer var olamaz"
+  cannot_delete_a_file_that_has_been_submitted_as_pa_fda24c4: "Bir ödevin parçası olarak gönderilen dosya silinemez"
   canvas: 
     migration: 
       errors: 
@@ -2706,8 +2725,11 @@ tr:
     public_domain: "Herkese Açık"
   certificate_fingerprint_b376df90: "Sertifika Takip Bilgisi"
   change_beginning_date_to_39dbd06e: "Başlangıç tarihini değiştir"
+  change_dcaa253a: Değiştir
   change_ending_date_to_d2cebd54: "Bitiş tarihini değiştir"
   change_groups_4e2ab6c3: "Grupları Değiştir"
+  change_name_c8cce76c: "İsmi Değiştir"
+  change_name_to_568374c8: "\"%{name}\"i şuna değiştir"
   change_points_possible_to_match_rubric_dialog: 
     prompts: 
       update_assignment_points: "Bu ödev için şu puanlar kullanılabilir: %{assignmentPoints}. Bu yönergeye uyumlu olması için bu puanları şu puanlarla  %{rubricPoints} değiştirmek ister misiniz?"
@@ -6075,6 +6097,7 @@ tr:
     text_show: 
       page_title: "Dosya Ön izleme"
   files_and_folder_contents_only_available_to_studen_944f9166: "Öğrenciler dosyalar ve klasör içeriklerine yalnızca bu bağlantı ile erişebilirler. Öğrenci dosyalarında görülmez."
+  files_c300e900: Dosyalar
   files_uploaded_519844ed: "Gönderilen Dosyalar"
   fill_in_the_blank_read_surrounding_text_1a6c73c7: "Çevreleyen metni okuyun , boşluğu doldurun"
   filter_announcements_by_unread_495eeeb3: "filtrelenmiş okunmamış duyurular"
@@ -7496,6 +7519,14 @@ tr:
   logged_out_user: "Oturum Kapatan Kullanıcı %{user_counter}"
   login: 
     canvas: 
+      legacy_login_content: 
+        back_to_login: "Oturum Aç'a dön"
+        buttons: 
+          request_password: "Şifremi Gönder"
+        labels: 
+          remember_me: "Oturumunuz açık kalsın"
+        log_in: "Oturum Aç"
+        login_handle: "%{login_handle_name}'nızı girerseniz şifrenizi değiştirebileceğiniz bağlantıyı size gönderelim."
       mobile_login: 
         back_to_login: "Oturum Aç'a dön"
         buttons: 
@@ -7519,6 +7550,14 @@ tr:
         login_handle: "%{login_handle_name}'nızı girerseniz şifrenizi değiştirebileceğiniz bağlantıyı size gönderelim."
         page_title: "Canvas'ta Oturum Aç"
         register_for_canvas: "*Hesap Oluşturmak İçin* **Buraya Tıklayın, Ücretsizdir!**"
+      new_login_content: 
+        back_to_login: "Oturum Aç'a dön"
+        buttons: 
+          request_password: "Şifremi Gönder"
+        labels: 
+          remember_me: "Oturumunuz açık kalsın"
+        log_in: "Oturum Aç"
+        login_handle: "%{login_handle_name}'nızı girerseniz şifrenizi değiştirebileceğiniz bağlantıyı size gönderelim."
     logout_confirm: 
       cancel: İptal
       details: 
@@ -7569,6 +7608,7 @@ tr:
   login_label_1dea0f9d: "Oturum Açma Etiketi"
   login_with_auth_type_a0aaa52a: "*%{auth_type}* ile oturum aç"
   login_with_provider_3fd3998e: "%{provider} ile oturum aç"
+  logout_a9312e35: "Oturumu Kapat"
   low_score_4eeb95b2: "En Düşük : %{score}"
   lower_limit_of_range_6ddd4983: "Aralık alt sınırı"
   lti: 
@@ -9803,6 +9843,7 @@ tr:
       other: Diğer
       parent: "Ana E-Posta"
       scheduling: Zamanlanıyor
+  notifications_cbfa7704: Bildirimler
   now_click_the_agenda_button_607fb40e: "Şimdi *Gündem* butonuna tıklayın"
   now_that_your_course_is_set_up_and_available_you_p_c0c8635c: "Dersiniz hazır olduğuna göre muhtemelen artık bu denetim listesine ihtiyacınız olmayacak. Fakat daha sonra yeni bir şeyler denemek istersiniz diye veya dersinizin içeriğinde değişiklikler yaparken biraz yardıma ihtiyacınız olabilir diye hazır tutacağız."
   num_messages_c1949bbc: 
@@ -12766,6 +12807,7 @@ tr:
       labels: 
         recaptcha_private_key: "ReCAPTCHA Özel Anahtarı"
         recaptcha_public_key: "ReCAPTCHA Genel Anahtarı"
+  settings_5aa0fd0c: Ayarlar
   setup_checklist_eb8b00b8: "Ayarlama Kontrol Listesi"
   shared: 
     account_notification: 

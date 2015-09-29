@@ -7,7 +7,7 @@ module Messages
     let(:user){ stub("User", short_name: "User Name") }
     let(:asset){ stub("Asset", user: user, author: author) }
 
-    def asset_for(notification_name)
+    def asset_for(notification_name, asset = asset)
       AssetContext.new(asset, notification_name)
     end
 
@@ -36,6 +36,11 @@ module Messages
 
       it 'uses the user name for messages belonging to users' do
         expect(asset_for("Assignment Resubmitted").from_name).to eq "User Name"
+      end
+
+      it 'returns Anonymous User' do
+        asset2 = stub("Asset", user: user, author: author, recipient: user, can_read_author?: false)
+        expect(asset_for("Submission Comment", asset2).from_name).to eq "Anonymous User"
       end
     end
   end

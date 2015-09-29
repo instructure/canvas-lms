@@ -26,6 +26,8 @@
     "react-select-box": "https://github.com/instructure-react/react-select-box.git#b1ddd39223d48793fbe3dc4e87aca00d57197b5f",
     "react-tray": "~0.1.2",
     "classnames": "~2.1.2",
+    "moment": "~2.10.3",
+    "reflux": "~0.2.7",
     "moment": "~2.10.6",
     "axios": "~0.5.4"
   }

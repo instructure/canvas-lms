@@ -518,15 +518,15 @@ class ActiveRecord::Base
     # transaction (savepoint) ensures we don't mess up things for the outer
     # transaction. useful for possible race conditions where we don't want to
     # take a lock (e.g. when we create a submission).
-    retries.times do
+    retries.times do |retry_count|
       begin
-        result = transaction(:requires_new => true) { uncached { yield } }
+        result = transaction(:requires_new => true) { uncached { yield(retry_count) } }
         connection.clear_query_cache
         return result
       rescue ActiveRecord::RecordNotUnique
       end
     end
-    result = transaction(:requires_new => true) { uncached { yield } }
+    result = transaction(:requires_new => true) { uncached { yield(retries) } }
     connection.clear_query_cache
     result
   end
@@ -575,7 +575,7 @@ class ActiveRecord::Base
       join_conditions = []
       joins_sql.strip.split('INNER JOIN')[1..-1].each do |join|
         # this could probably be improved
-        raise "PostgreSQL update_all/delete_all only supports INNER JOIN" unless join.strip =~ /([a-zA-Z0-9'"_]+(?:(?:\s+[aA][sS])?\s+[a-zA-Z0-9'"_]+)?)\s+ON\s+(.*)/
+        raise "PostgreSQL update_all/delete_all only supports INNER JOIN" unless join.strip =~ /([a-zA-Z0-9'"_\.]+(?:(?:\s+[aA][sS])?\s+[a-zA-Z0-9'"_]+)?)\s+ON\s+(.*)/
         tables << $1
         join_conditions << $2
       end
@@ -613,7 +613,32 @@ unless defined? OpenDataExport
   end
 end
 
+module PreloadAndEagerLoadOnAssociation
+  def scope
+    result = super
+    result = result.preload(options[:preload]) if options[:preload]
+    result = result.eager_load(options[:eager_load]) if options[:eager_load]
+    result
+  end
+end
+
+ActiveRecord::Associations::AssociationScope.prepend(PreloadAndEagerLoadOnAssociation)
+
+ActiveRecord::Associations::Builder::Association.valid_options += [:preload, :eager_load]
+if CANVAS_RAILS3
+ActiveRecord::Associations::Builder::CollectionAssociation.valid_options += [:preload, :eager_load]
+ActiveRecord::Associations::Builder::SingularAssociation.valid_options += [:preload, :eager_load]
+ActiveRecord::Associations::Builder::BelongsTo.valid_options += [:preload, :eager_load]
+ActiveRecord::Associations::Builder::HasAndBelongsToMany.valid_options += [:preload, :eager_load]
+ActiveRecord::Associations::Builder::HasMany.valid_options += [:preload, :eager_load]
+ActiveRecord::Associations::Builder::HasOne.valid_options += [:preload, :eager_load]
+end
+
 ActiveRecord::Relation.class_eval do
+  def includes(*args)
+    return super if args.empty? || args == [nil]
+    raise "Use preload or eager_load instead of includes"
+  end
 
   def select_values_necessitate_temp_table?
     return false unless select_values.present?
@@ -661,7 +686,7 @@ ActiveRecord::Relation.class_eval do
         sql = to_sql
         cursor = "#{table_name}_in_batches_cursor_#{sql.hash.abs.to_s(36)}"
         connection.execute("DECLARE #{cursor} CURSOR FOR #{sql}")
-        includes = includes_values
+        includes = includes_values + preload_values
         klass.unscoped do
           batch = connection.uncached { klass.find_by_sql("FETCH FORWARD #{batch_size} FROM #{cursor}") }
           while !batch.empty?
@@ -727,7 +752,7 @@ ActiveRecord::Relation.class_eval do
           raise "Temp tables not supported!"
       end
 
-      includes = includes_values
+      includes = includes_values + preload_values
       klass.unscoped do
         if pluck
           batch = klass.from(table).order(index).limit(batch_size).pluck(*pluck)
@@ -1310,7 +1335,8 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
     when 'PostgreSQL'
       foreign_key_name = foreign_key_name(from_table, column, options)
       query = supports_delayed_constraint_validation? ? 'convalidated' : 'conname'
-      value = select_value("SELECT #{query} FROM pg_constraint INNER JOIN pg_namespace ON pg_namespace.oid=connamespace WHERE conname='#{foreign_key_name}' AND nspname=current_schema()")
+      schema = @config[:use_qualified_names] ? quote(shard.name) : 'current_schema()'
+      value = select_value("SELECT #{query} FROM pg_constraint INNER JOIN pg_namespace ON pg_namespace.oid=connamespace WHERE conname='#{foreign_key_name}' AND nspname=#{schema}")
       if supports_delayed_constraint_validation? && value == 'f'
         execute("ALTER TABLE #{quote_table_name(from_table)} DROP CONSTRAINT #{quote_table_name(foreign_key_name)}")
       elsif value
@@ -1335,7 +1361,7 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
 
   # does a query first to make the actual constraint adding fast
   def change_column_null_with_less_locking(table, column)
-    execute("SELECT COUNT(*) FROM #{table} WHERE #{column} IS NULL") if open_transactions == 0
+    execute("SELECT COUNT(*) FROM #{quote_table_name(table)} WHERE #{column} IS NULL") if open_transactions == 0
     change_column_null table, column, false
   end
 

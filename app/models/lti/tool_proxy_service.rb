@@ -20,6 +20,8 @@ require 'ims/lti'
 module Lti
   class ToolProxyService
 
+    attr_reader :tc_half_secret
+
     class InvalidToolProxyError < RuntimeError
 
       def initialize(message = nil, json = {})
@@ -52,11 +54,21 @@ module Lti
 
     private
 
+    def create_secret(tp)
+      security_contract = tp.security_contract
+      if (tp_half_secret = tp.enabled_capabilities.include?('OAuth.splitSecret') && security_contract.tp_half_shared_secret)
+        @tc_half_secret = SecureRandom.hex(64)
+        tc_half_secret + tp_half_secret
+      else
+        security_contract.shared_secret
+      end
+    end
+
     def create_tool_proxy(tp, context, product_family)
       tool_proxy = ToolProxy.new
       tool_proxy.product_family = product_family
       tool_proxy.guid = tp.tool_proxy_guid
-      tool_proxy.shared_secret = tp.security_contract.shared_secret
+      tool_proxy.shared_secret = create_secret(tp)
       tool_proxy.product_version = tp.tool_profile.product_instance.product_info.product_version
       tool_proxy.lti_version = tp.tool_profile.lti_version
       tool_proxy.name = tp.tool_profile.product_instance.product_info.default_name
@@ -207,7 +219,9 @@ module Lti
 
     def validate_security_contract(tp)
       invalid_fields = []
-      invalid_fields << :shared_secret if tp.security_contract.shared_secret.blank?
+      has_split_secret = tp.enabled_capabilities.include?('OAuth.splitSecret') && tp.security_contract.tp_half_shared_secret.present?
+      invalid_fields << :shared_secret if tp.security_contract.shared_secret.blank? && !has_split_secret
+
       ['SecurityContract', invalid_security_contract: invalid_fields] unless invalid_fields.empty?
     end
 

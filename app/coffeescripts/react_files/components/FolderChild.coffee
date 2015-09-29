@@ -6,20 +6,17 @@ define [
   '../mixins/BackboneMixin'
   'compiled/react/shared/utils/withReactElement'
   'jsx/files/FriendlyDatetime'
-  './ItemCog'
+  'jsx/files/ItemCog'
   'jsx/files/FilesystemObjectThumbnail'
   'compiled/util/friendlyBytes'
   'compiled/models/Folder'
   'compiled/fn/preventDefault'
   'jsx/shared/PublishCloud'
-  './UsageRightsIndicator'
+  'jsx/files/UsageRightsIndicator'
   '../modules/FocusStore'
   'compiled/jquery.rails_flash_notifications'
-], (_, I18n, React, ReactRouter, BackboneMixin, withReactElement, FriendlyDatetimeComponent, ItemCogComponent, FilesystemObjectThumbnail, friendlyBytes, Folder, preventDefault, PublishCloud, UsageRightsIndicatorComponent, FocusStore) ->
+], (_, I18n, React, ReactRouter, BackboneMixin, withReactElement, FriendlyDatetime, ItemCog, FilesystemObjectThumbnail, friendlyBytes, Folder, preventDefault, PublishCloud, UsageRightsIndicator, FocusStore) ->
 
-  FriendlyDatetime = React.createFactory FriendlyDatetimeComponent
-  ItemCog = React.createFactory ItemCogComponent
-  UsageRightsIndicator = React.createFactory  UsageRightsIndicatorComponent
   Link = React.createFactory ReactRouter.Link
   classSet = React.addons.classSet
 

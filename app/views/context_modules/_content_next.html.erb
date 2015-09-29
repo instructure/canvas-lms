@@ -63,8 +63,9 @@ TEXT
   >
     <% editable = can_do(@context, @current_user, :manage_content) %>
     <% differentiated_assignments_on = @context.feature_enabled?(:differentiated_assignments) %>
+    <% nc_or_on = @context.feature_enabled?(:nc_or) %>
     <% visible_assignments = differentiated_assignments_on ? @current_user.try(:assignment_and_quiz_visibilities, @context) : true %>
-    <% cache_key_items = [@context.cache_key, editable, 'all_context_modules_draft_6', collection_cache_key(@modules), Time.zone]%>
+    <% cache_key_items = [@context.cache_key, editable, 'all_context_modules_draft_7', nc_or_on, collection_cache_key(@modules), Time.zone]%>
     <% cache_key_items << Digest::MD5.hexdigest(visible_assignments.to_s) if differentiated_assignments_on %>
     <% cache_key = cache_key_items.join('/') %>
     <% cache_key = add_menu_tools_to_cache_key(cache_key) %>
@@ -72,14 +73,14 @@ TEXT
       <% ActiveRecord::Associations::Preloader.new(@modules, :content_tags => :content).run %>
       <% preload_can_unpublish(@context, @modules) %>
       <% @modules.each do |m| %>
-        <%= render :partial => 'context_modules/context_module_next', :object => m, :locals => {:editable => editable } %>
+        <%= render :partial => 'context_modules/context_module_next', :object => m, :locals => {:editable => editable, :nc_or_on => nc_or_on} %>
       <% end %>
     <% end %>
   </div>
 </div>
 
-<%= render :partial => 'context_modules/context_module_next', :object => nil %>
-<%= render :partial => 'context_modules/module_item_next', :object => nil, :locals => {:editable => editable} %>
+<%= render :partial => 'context_modules/context_module_next', :object => nil, :locals => {:nc_or_on => nc_or_on} %>
+<%= render :partial => 'context_modules/module_item_next', :object => nil, :locals => {:editable => editable, :nc_or_on => nc_or_on } %>
 
 <% if can_do(@context, @current_user, :manage_content) %>
   <form id="move_context_module_form" style="display:none" class="form-dialog" title="Move Module">
@@ -136,7 +137,7 @@ TEXT
       <button type="button" class="btn button-secondary cancel_button"><%= t('#buttons.cancel', %{Cancel}) %></button>
     </div>
   </div>
-  
+
   <%= render :partial => "shared/select_content_dialog", :locals => {:for_modules => true, lti_app_placements: [Lti::ResourcePlacement::LINK_SELECTION, Lti::ResourcePlacement::RESOURCE_SELECTION] }  %>
   <div id="edit_item_dialog" style="display: none;">
     <%= form_for :content_tag, :url => "", :html => {:id => "edit_item_form", :method => :put, :style => "margin: 20px 10px;"} do |f| %>

@@ -24,7 +24,7 @@
 module ContextModuleItem
   # set up the association for the AR class that included this module
   def self.included(klass)
-    klass.has_many :context_module_tags, :as => :content, :class_name => 'ContentTag', :conditions => ['content_tags.tag_type = ? AND content_tags.workflow_state != ?', 'context_module', 'deleted'], :include => {:context_module => [:content_tags]}
+    klass.has_many :context_module_tags, as: :content, class_name: 'ContentTag', conditions: ['content_tags.tag_type = ? AND content_tags.workflow_state != ?', 'context_module', 'deleted'], preload: {context_module: :content_tags}
   end
 
   # Check if this item is locked for the given user.

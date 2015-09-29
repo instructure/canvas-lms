@@ -38,7 +38,7 @@ describe Api::V1::GradebookHistory do
   let(:yesterday) { (now - 24.hours).in_time_zone }
 
   before do
-    Submission.any_instance.stubs(:grants_right?).with(user, :read_grade).returns(true)
+    Submission.any_instance.stubs(:user_can_read_grade?).with(user, session).returns(true)
   end
 
   def submit(assignment, student, day, grader)

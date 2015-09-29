@@ -21,16 +21,14 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 require 'csv'
 
 describe GradebookExporter do
-  describe ".initialize" do
-    it "raises an error without a course argument" do
-      expect { subject.new }.to raise_error ArgumentError
-    end
+  before(:once) do
+    teacher_in_course active_all: true
   end
 
   describe "#to_csv" do
-    let(:course)    { Course.create }
+    let(:course)    { @course }
     describe "default output with blank course" do
-      let(:exporter)  { GradebookExporter.new(course) }
+      let(:exporter)  { GradebookExporter.new(course, @teacher) }
       subject(:csv)   { exporter.to_csv }
 
       it "produces a String" do
@@ -74,7 +72,7 @@ describe GradebookExporter do
         assignments.create due_at: 8.weeks.from_now, title: "future"
       end
 
-      let(:csv)     { GradebookExporter.new(course).to_csv }
+      let(:csv)     { GradebookExporter.new(course, @teacher).to_csv }
       let(:headers) { CSV.parse(csv, headers: true).headers }
 
       describe "when multiple grading periods is on" do

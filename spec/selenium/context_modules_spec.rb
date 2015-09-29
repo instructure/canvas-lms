@@ -460,6 +460,8 @@ describe "context modules" do
 
       @course.reload
 
+      expect(fj('.requirements_message').text).to be_blank
+
       # add completion criterion
       f('.ig-header-admin .al-trigger').click
       wait_for_ajaximations

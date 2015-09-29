@@ -47,7 +47,7 @@ describe "quizzes questions" do
       expect(question.find_elements(:css, '.answers .answer').length).to eq 3
     end
 
-    it "should ignore html added in the quiz description", priority: "1", test_id: 209947 do
+    it "should sanitize any html added to the quiz question description", priority: "1", test_id: 209947 do
       bad_html = '<div id="question_16740547_question_text" class="question_text user_content enhanced">
                     <p>For Mead, what is the "essence" of the self?</p>
                   </div>
@@ -65,6 +65,8 @@ describe "quizzes questions" do
       submit_form(question)
 
       hover_and_click(".edit_question_link")
+
+      # verify that the HTML added to the description didn't effectively create a third possible answer
       expect(ffj(".question_form:visible .form_answers .answer").size).to eq 2
     end
 

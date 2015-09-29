@@ -75,7 +75,7 @@ class ContentParticipationCount < ActiveRecord::Base
           submissions.user_id = ? AND
           assignments.context_type = ? AND
           assignments.context_id = ? AND
-          assignments.workflow_state <> 'deleted' AND
+          assignments.workflow_state NOT IN ('deleted', 'unpublished') AND
           (assignments.muted IS NULL OR NOT assignments.muted)
         SQL
         subs_with_grades = Submission.graded.

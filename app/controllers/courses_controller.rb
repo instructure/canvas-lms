@@ -402,7 +402,7 @@ class CoursesController < ApplicationController
           conditions = states.map{ |state|
             Enrollment::QueryBuilder.new(nil, course_workflow_state: state, enforce_course_workflow_state: true).conditions
           }.compact.join(" OR ")
-          enrollments = @current_user.enrollments.joins(:course).includes(:course).where(conditions).shard(@current_user)
+          enrollments = @current_user.enrollments.eager_load(:course).where(conditions).shard(@current_user)
         else
           enrollments = @current_user.cached_current_enrollments(preload_courses: true)
         end
@@ -420,7 +420,7 @@ class CoursesController < ApplicationController
         if value_to_boolean(params[:current_domain_only])
           enrollments = enrollments.select { |e| e.root_account_id == @domain_root_account.id }
         elsif params[:root_account_id]
-          root_account = api_find_all(Account, [params[:root_account_id]], { limit: 1 }).first
+          root_account = api_find_all(Account, [params[:root_account_id]]).first
           enrollments = root_account ? enrollments.select { |e| e.root_account_id == root_account.id } : []
         end
 
@@ -703,7 +703,7 @@ class CoursesController < ApplicationController
   # @argument search_term [String]
   #   The partial name or full ID of the users to match and return in the results list.
   #
-  # @argument enrollment_type [String, "teacher"|"student"|"ta"|"observer"|"designer"]
+  # @argument enrollment_type[] [String, "teacher"|"student"|"ta"|"observer"|"designer"]
   #   When set, only return users where the user is enrolled as this type.
   #   This argument is ignored if enrollment_role is given.
   #
@@ -787,17 +787,14 @@ class CoursesController < ApplicationController
         end
       end
       if includes.include?('enrollments')
-        # not_ended_enrollments for enrollment_json
-        # enrollments course for has_grade_permissions?
-        preload_scope = if CANVAS_RAILS3
-          {:conditions => ['enrollments.course_id = ?', @context.id]}
-        else
-          Enrollment.where(:course_id => @context)
-        end
-        ActiveRecord::Associations::Preloader.new(users, { :not_ended_enrollments => :course }, preload_scope).run
+        enrollments_by_user = @context.enrollments.
+            active_or_pending.
+            where(user_id: users).
+            preload(:course).
+            group_by(&:user_id)
       end
       render :json => users.map { |u|
-        enrollments = u.not_ended_enrollments if includes.include?('enrollments')
+        enrollments = enrollments_by_user[u.id] if includes.include?('enrollments')
         user_json(u, @current_user, session, includes, @context, enrollments)
       }
     end
@@ -1464,7 +1461,7 @@ class CoursesController < ApplicationController
     end
 
     if @context && @current_user
-      @context_enrollment = @context.enrollments.where(user_id: @current_user).except(:includes).first
+      @context_enrollment = @context.enrollments.where(user_id: @current_user).except(:preload).first
       if @context_enrollment
         @context_enrollment.course = @context
         @context_enrollment.user = @current_user
@@ -1796,7 +1793,7 @@ class CoursesController < ApplicationController
         enrollment_term_id = params[:course].delete(:term_id).presence || params[:course].delete(:enrollment_term_id).presence
         args[:enrollment_term] = root_account.enrollment_terms.where(id: enrollment_term_id).first if enrollment_term_id
       end
-      args[:enrollment_term] ||= @context.enrollment_term
+      args[:enrollment_term] ||= @context.enrollment_term if @context.grants_right?(@current_user, session, :manage) # this will be false for teachers in concluded courses
       args[:abstract_course] = @context.abstract_course
       args[:account] = account
       @course = @context.account.courses.new

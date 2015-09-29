@@ -35,6 +35,7 @@ def account_with_cas(opts={})
   config.auth_base = cas_url
   config.log_in_url = opts[:cas_log_in_url] if opts[:cas_log_in_url]
   @account.authentication_providers << config
+  @account.authentication_providers.first.move_to_bottom
   @account
 end
 
@@ -47,6 +48,7 @@ def account_with_saml(opts={})
   config.log_in_url = opts[:saml_log_in_url] if opts[:saml_log_in_url]
   config.log_out_url = opts[:saml_log_out_url] if opts[:saml_log_out_url]
   @account.authentication_providers << config
+  @account.authentication_providers.first.move_to_bottom
   @account
 end
 

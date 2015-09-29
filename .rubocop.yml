@@ -94,6 +94,8 @@ Style/AlignParameters:
   Enabled: false
 Style/Lambda:
   Enabled: false
+Style/ParallelAssignment:
+  Enabled: false
 Style/WhileUntilModifier:
   Enabled: false
 

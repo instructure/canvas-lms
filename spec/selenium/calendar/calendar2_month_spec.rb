@@ -20,12 +20,12 @@ describe "calendar2" do
 
       it "should remember the selected calendar view" do
         get "/calendar2"
-        expect(f("#month")).to have_class('active')
-        f('#agenda').click
+        expect(find("#month")).to have_class('active')
+        find('#agenda').click
         wait_for_ajaximations
 
         get "/calendar2"
-        expect(f('#agenda')).to have_class('active')
+        expect(find('#agenda')).to have_class('active')
       end
 
       it "should create an event through clicking on a calendar day", priority: "1", test_id: 138638 do
@@ -34,13 +34,13 @@ describe "calendar2" do
 
       it "should show scheduler button if it is enabled" do
         get "/calendar2"
-        expect(f("#scheduler")).not_to be_nil
+        expect(find("#scheduler")).not_to be_nil
       end
 
       it "should not show scheduler button if it is disabled" do
         account = Account.default.tap { |a| a.settings[:show_scheduler] = false; a.save! }
         get "/calendar2"
-        ff('.calendar_view_buttons .ui-button').each do |button|
+        find_all('.calendar_view_buttons .btn').each do |button|
           expect(button.text).not_to match(/scheduler/i)
         end
       end
@@ -48,9 +48,9 @@ describe "calendar2" do
       it "should drag and drop an event" do
         skip('drag and drop not working correctly')
         create_middle_day_event
-        driver.action.drag_and_drop(f('.calendar .fc-event'), f('.calendar .fc-week:nth-child(2) .fc-last')).perform
+        driver.action.drag_and_drop(find('.calendar .fc-event'), find('.calendar .fc-week:nth-child(2) .fc-last')).perform
         wait_for_ajaximations
-        expect(CalendarEvent.last.start_at.strftime('%d')).to eq f('.calendar .fc-week:nth-child(2) .fc-last .fc-day-number').text
+        expect(CalendarEvent.last.start_at.strftime('%d')).to eq find('.calendar .fc-week:nth-child(2) .fc-last .fc-day-number').text
       end
 
       it "should create an assignment by clicking on a calendar day" do
@@ -59,12 +59,12 @@ describe "calendar2" do
 
       it "more options link should go to calendar event edit page" do
         create_middle_day_event
-        f('.fc-event').click
+        find('.fc-event').click
         expect(fj('.popover-links-holder:visible')).not_to be_nil
         driver.execute_script("$('.edit_event_link').hover().click()")
         expect_new_page_load { driver.execute_script("$('#edit_calendar_event_form .more_options_link').hover().click()") }
-        expect(f('#editCalendarEventFull .btn-primary').text).to eq "Update Event"
-        expect(f('#breadcrumbs').text).to include 'Calendar Events'
+        expect(find('#editCalendarEventFull .btn-primary').text).to eq "Update Event"
+        expect(find('#breadcrumbs').text).to include 'Calendar Events'
       end
 
       it "should go to assignment page when clicking assignment title" do
@@ -79,7 +79,7 @@ describe "calendar2" do
           fj('h1.title').displayed?
         end
 
-        expect(f('h1.title').text).to include(name)
+        expect(find('h1.title').text).to include(name)
       end
 
       it "more options link on assignments should go to assignment edit page" do
@@ -88,7 +88,7 @@ describe "calendar2" do
         fj('.fc-event.assignment').click
         driver.execute_script("$('.edit_event_link').hover().click()")
         expect_new_page_load { driver.execute_script("$('.more_options_link').hover().click()") }
-        expect(f('#assignment_name').attribute(:value)).to include(name)
+        expect(find('#assignment_name').attribute(:value)).to include(name)
       end
 
       it "should publish a new assignment when toggle is clicked" do
@@ -97,7 +97,7 @@ describe "calendar2" do
         fj('.fc-event.assignment').click
         driver.execute_script("$('.edit_event_link').hover().click()")
         driver.execute_script("$('.more_options_link').hover().click()")
-        expect(f('#assignment-draft-state')).not_to include_text("Not Published")
+        expect(find('#assignment-draft-state')).not_to include_text("Not Published")
       end
 
       it "should delete an event" do
@@ -143,7 +143,7 @@ describe "calendar2" do
         get("/calendar2")
         fj('.fc-event:visible').click
         wait_for_ajaximations
-        expect(f('.delete_event_link')).to be_nil
+        expect(not_found('.delete_event_link')).to be
       end
 
       it "should change the month" do
@@ -160,10 +160,10 @@ describe "calendar2" do
         make_event(start: eventStart)
 
         get "/calendar2"
-        expect(f('.fc-event')).to be_nil
+        expect(not_found('.fc-event')).to be
         eventStartText = eventStart.strftime("%Y %m %d")
         quick_jump_to_date(eventStartText)
-        expect(f('.fc-event')).not_to be_nil
+        expect(find('.fc-event')).to be
       end
 
       it "should show section-level events, but not the parent event" do
@@ -183,10 +183,10 @@ describe "calendar2" do
         expect(events.size).to eq 2
         events.first.click
 
-        details = f('.event-details')
-        expect(details).not_to be_nil
+        details = find('.event-details')
+        expect(details).to be
         expect(details.text).to include(@course.default_section.name)
-        expect(details.f('.view_event_link')[:href]).to include "/calendar_events/#{e1.id}" # links to parent event
+        expect(details.find('.view_event_link')[:href]).to include "/calendar_events/#{e1.id}" # links to parent event
       end
 
       it "should have a working today button", priority: "1", test_id: 142041 do
@@ -196,15 +196,15 @@ describe "calendar2" do
         # Check for highlight to be present on this month
         # this class is also present on the mini calendar so we need to make
         #   sure that they are both present
-        expect(ff(".fc-state-highlight").size).to eq 2
+        expect(find_all(".fc-state-highlight").size).to eq 2
 
         # Switch the month and verify that there is no highlighted day
         2.times { change_calendar }
-        expect(ff(".fc-state-highlight").size).to eq 0
+        expect(find_all(".fc-state-highlight").size).to eq 0
 
         # Go back to the present month. Verify that there is a highlighted day
         change_calendar(:today)
-        expect(ff(".fc-state-highlight").size).to eq 2
+        expect(find_all(".fc-state-highlight").size).to eq 2
         # Check the date in the second instance which is the main calendar
         expect(ffj(".fc-state-highlight")[1].text).to include(date)
       end
@@ -216,23 +216,23 @@ describe "calendar2" do
         load_month_view
 
         #Click calendar item to bring up event summary
-        f(".fc-event-title").click
+        find(".fc-event-title").click
 
         #expect to find the location name and address
-        expect(f('.event-details-content').text).to include_text(location_name)
-        expect(f('.event-details-content').text).to include_text(location_address)
+        expect(find('.event-details-content').text).to include_text(location_name)
+        expect(find('.event-details-content').text).to include_text(location_address)
       end
 
       it "should bring up a calendar date picker when clicking on the month" do
         load_month_view
 
         #Click on the month header
-        f('.navigation_title').click
+        find('.navigation_title').click
 
         # Expect that a the event picker is present
         # Check various elements to verify that the calendar looks good
-        expect(f('.ui-datepicker-header').text).to include_text(Time.now.utc.strftime("%B"))
-        expect(f('.ui-datepicker-calendar').text).to include_text("Mo")
+        expect(find('.ui-datepicker-header').text).to include_text(Time.now.utc.strftime("%B"))
+        expect(find('.ui-datepicker-calendar').text).to include_text("Mo")
       end
     end
   end

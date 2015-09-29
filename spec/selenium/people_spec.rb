@@ -31,10 +31,16 @@ describe "people" do
     expect(f('#category_list')).to include_text(group_text)
   end
 
-  def enroll_student(student, sis_source_id: nil)
+  def enroll_student(student)
     e1 = @course.enroll_student(student)
     e1.workflow_state = 'active'
-    e1.sis_source_id = sis_source_id if sis_source_id
+    e1.save!
+    @course.reload
+  end
+
+  def enroll_ta(ta)
+    e1 = @course.enroll_ta(ta)
+    e1.workflow_state = 'active'
     e1.save!
     @course.reload
   end
@@ -82,10 +88,6 @@ describe "people" do
 
       enroll_student(@student_1)
 
-      #add second student as if enrolled via SIS
-      @sis_student = create_user('sis_student@test.com')
-      enroll_student(@sis_student, sis_source_id: 'oh hai')
-
       #adding users for tests to work correctly
 
       #teacher user
@@ -96,6 +98,8 @@ describe "people" do
       @test_ta = create_user('ta@test.com')
       #observer user
       @test_observer = create_user('observer@test.com')
+
+      enroll_ta(@test_ta)
 
       get "/courses/#{@course.id}/users"
       wait_for_ajaximations
@@ -113,8 +117,8 @@ describe "people" do
       open_dropdown_menu(option: 'removeFromCourse')
     end
 
-    it "should not display the option to remove a student if enrolled via SIS" do
-      open_dropdown_menu(selector: '.rosterUser:nth-child(2)', option: 'removeFromCourse', displayed: false)
+    it "should display the option to remove a ta from the course" do
+      open_dropdown_menu(option: 'removeFromCourse', selector: '.rosterUser:nth-child(3)')
     end
 
     it "should display activity report on clicking Student Interaction button", priority: "1", test_id: 244446 do

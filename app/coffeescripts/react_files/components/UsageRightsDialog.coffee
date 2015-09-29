@@ -6,7 +6,7 @@ define [
   'compiled/fn/preventDefault'
   '../modules/customPropTypes'
   'compiled/models/Folder'
-  './UsageRightsSelectBox'
+  'jsx/files/UsageRightsSelectBox'
   '../modules/filesEnv'
   '../utils/setUsageRights'
   '../utils/updateModelsUsageRights'
@@ -14,14 +14,9 @@ define [
   'compiled/react/shared/utils/withReactElement'
   'compiled/jquery.rails_flash_notifications'
   'jquery.instructure_forms'
-], ($, _, React, I18n, preventDefault, customPropTypes, Folder, UsageRightsSelectBoxComponent, filesEnv, setUsageRights, updateModelsUsageRights, DialogPreview, withReactElement) ->
+], ($, _, React, I18n, preventDefault, customPropTypes, Folder, UsageRightsSelectBox, filesEnv, setUsageRights, updateModelsUsageRights, DialogPreview, withReactElement) ->
 
-  UsageRightsSelectBox = React.createFactory UsageRightsSelectBoxComponent
-
-  MAX_THUMBNAILS_TO_SHOW = 5
-  MAX_FOLDERS_TO_SHOW = 2
-
-  ManageUsageRightsModal = React.createClass
+  ManageUsageRightsModal =
     displayName: 'ManageUsageRightsModal'
 
     propTypes:
@@ -82,94 +77,3 @@ define [
         @props.itemsToManage[0].get('usage_rights')?.license
       else
         null
-
-    renderFileName: ->
-      textToShow = if @props.itemsToManage.length > 1
-        I18n.t("%{items} items selected", {items: @props.itemsToManage.length})
-      else @props.itemsToManage[0]?.displayName()
-
-      span {ref: "fileName" ,className: 'UsageRightsDialog__fileName'},
-        textToShow
-
-    renderFolderMessage: ->
-      folders = @props.itemsToManage.filter (item) ->
-        item instanceof Folder
-      foldersToShow = folders.slice(0, MAX_FOLDERS_TO_SHOW)
-      toolTipFolders = folders.slice(MAX_FOLDERS_TO_SHOW)
-      div {},
-        if (folders.length)
-          div {},
-            span {},
-              I18n.t("Usage rights will be set for all of the files contained in:")
-            ul {ref: "folderBulletList", className: 'UsageRightsDialog__folderBulletList'},
-              foldersToShow.map (item) ->
-                li {},
-                  item?.displayName()
-        if (toolTipFolders.length)
-          displayNames = toolTipFolders.map (item) -> item?.displayName()
-          # Doing it this way so commas, don't show up when rendering the list out in the tooltip.
-          renderedNames = displayNames.join('<br />')
-          span {
-            className: 'UsageRightsDialog__andMore'
-            tabIndex: '0'
-            ref: 'folderTooltip'
-            title: renderedNames
-            'data-tooltip': 'right'
-            'data-tooltip-class': 'UsageRightsDialog__tooltip'
-          },
-            I18n.t("and %{count} more…", {count: toolTipFolders.length})
-            span {className: 'screenreader-only'},
-              ul {},
-                displayNames.map (item) ->
-                  li {ref: 'displayNameTooltip-screenreader'},
-                    item
-        hr {}
-
-    renderDifferentRightsMessage: ->
-      span {ref: 'differentRightsMessage', className: 'UsageRightsDialog__differentRightsMessage alert'},
-        i {className: 'icon-warning UsageRightsDialog__warning'}
-        I18n.t('Items selected have different usage rights.')
-
-    render: withReactElement ->
-      div {className: 'ReactModal__Layout'},
-        div {className: 'ReactModal__Header'},
-          div {className: 'ReactModal__Header-Title'},
-            h4 {},
-              I18n.t('Manage Usage Rights')
-          div {className: 'ReactModal__Header-Actions'},
-            button {ref: 'cancelXButton', className: 'Button Button--icon-action', type: 'button', onClick: @props.closeModal},
-              i {className: 'icon-x'},
-                span {className: 'screenreader-only'},
-                  I18n.t('Close')
-        div {className: 'ReactModal__Body'},
-          div { ref: 'form', className: 'form-dialog'},
-            div {},
-              div {className: 'UsageRightsDialog__paddingFix grid-row'},
-                div {className: 'UsageRightsDialog__previewColumn col-xs-3'},
-                  DialogPreview(itemsToShow: @props.itemsToManage)
-                div {className: 'UsageRightsDialog__contentColumn off-xs-1 col-xs-8'},
-                  @renderDifferentRightsMessage() if ((@copyright == '' || @usageRight == 'choose') && @props.itemsToManage.length > 1 && @copyright != "undefined")
-                  @renderFileName()
-                  @renderFolderMessage()
-                  UsageRightsSelectBox {
-                    ref: 'usageSelection'
-                    use_justification: @use_justification
-                    copyright: @copyright
-                    cc_value: @cc_value
-                  }
-        div {className: 'ReactModal__Footer'},
-          div {className: 'ReactModal__Footer-Actions'},
-            button {
-              ref: 'cancelButton'
-              type: 'button'
-              className: 'btn'
-              onClick: @props.closeModal
-            },
-              I18n.t('Cancel')
-            button {
-              ref: "saveButton"
-              type: 'button'
-              onClick: @submit
-              className: 'btn btn-primary'
-            },
-              I18n.t('Save')

@@ -2,7 +2,7 @@ class AddGroupRootAccount < ActiveRecord::Migration
   def self.up
     add_column :groups, :root_account_id, :integer, :limit => 8
 
-    Group.connection.execute("UPDATE groups SET root_account_id = (SELECT COALESCE(accounts.root_account_id, accounts.id) FROM accounts WHERE groups.account_id = accounts.id)")
+    update("UPDATE #{Group.quoted_table_name} SET root_account_id = (SELECT COALESCE(accounts.root_account_id, accounts.id) FROM #{Account.quoted_table_name} WHERE groups.account_id = accounts.id)")
   end
 
   def self.down

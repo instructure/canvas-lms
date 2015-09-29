@@ -405,14 +405,14 @@ describe AssignmentOverridesController, type: :request do
           student_ids = @students[0..1].map(&:id)
           api_create_override(@course, @assignment, :assignment_override => { :student_ids => student_ids})
           @override = @assignment.assignment_overrides(true).first
-          expect(@override.title).to eq("Adam Aardvark and Ben Banana")
+          expect(@override.title).to eq("2 students")
         end
 
         it "should add an others count if there are more than 4" do
           student_ids = @students.map(&:id)
           api_create_override(@course, @assignment, :assignment_override => { :student_ids => student_ids})
           @override = @assignment.assignment_overrides(true).first
-          expect(@override.title).to eq("Adam Aardvark, Ben Banana, and 4 others")
+          expect(@override.title).to eq("6 students")
         end
 
         it "should alphabetize the students names" do
@@ -421,7 +421,7 @@ describe AssignmentOverridesController, type: :request do
           api_create_override(@course, @assignment, :assignment_override => { :student_ids => reversed_student_ids})
           @override = @assignment.assignment_overrides(true).first
 
-          expect(@override.title).to eq("Adam Aardvark, Ben Banana, and 4 others")
+          expect(@override.title).to eq("6 students")
         end
 
         it "should prefer a given title" do

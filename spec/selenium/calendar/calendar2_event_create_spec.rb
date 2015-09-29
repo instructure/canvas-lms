@@ -40,8 +40,8 @@ describe "calendar2" do
         find_middle_day.click
         edit_event_dialog = f('#edit_event_tabs')
         expect(edit_event_dialog).to be_displayed
-        edit_event_form = edit_event_dialog.f('#edit_calendar_event_form')
-        title = edit_event_form.f('#calendar_event_title')
+        edit_event_form = edit_event_dialog.find('#edit_calendar_event_form')
+        title = edit_event_form.find('#calendar_event_title')
         keep_trying_until { title.displayed? }
         replace_content(title, event_title)
         expect_new_page_load { f('.more_options_link').click }

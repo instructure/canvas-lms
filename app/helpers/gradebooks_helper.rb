@@ -17,18 +17,28 @@
 #
 
 module GradebooksHelper
-  def force_anonymous_grading?(assignment)
+  def anonymous_assignment?(assignment)
     anonymous_assignment =
       assignment.quiz &&
       assignment.quiz.survey? &&
       assignment.quiz.anonymous_submissions
-
     !!anonymous_assignment
   end
 
+  def anonymous_grading_required?(assignment)
+    course = assignment.context
+    course.feature_enabled?(:anonymous_grading)
+  end
+
+  def force_anonymous_grading?(assignment)
+    anonymous_assignment?(assignment) || anonymous_grading_required?(assignment)
+  end
+
   def force_anonymous_grading_reason(assignment)
-    if (force_anonymous_grading?(assignment))
+    if anonymous_assignment?(assignment)
       I18n.t("Student names must be hidden because this is an anonymous survey.")
+    elsif anonymous_grading_required?(assignment)
+      I18n.t("Student names must be hidden because anonymous grading is required.")
     else
       ""
     end

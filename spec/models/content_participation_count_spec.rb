@@ -125,6 +125,12 @@ describe ContentParticipationCount do
       expect(ContentParticipationCount.unread_submission_count_for(@course, @student)).to eq 1
     end
 
+    it "should not be unread if the assignment is unpublished after the submission is graded" do
+      @submission = @assignment.grade_student(@student, { :grade => 3 }).first
+      @assignment.update_attribute(:workflow_state, 'unpublished')
+      expect(ContentParticipationCount.unread_submission_count_for(@course, @student)).to eq 0
+    end
+
     it "should be read after viewing the graded assignment" do
       @submission = @assignment.grade_student(@student, { :grade => 3 }).first
       @submission.change_read_state("read", @student)

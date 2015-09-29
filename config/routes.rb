@@ -508,6 +508,14 @@ CanvasRails::Application.routes.draw do
       end
     end
 
+    scope(controller: :brand_configs) do
+      get 'theme_editor', action: :new, as: :theme_editor
+      post 'brand_configs', action: :create
+      delete 'brand_configs', action: :destroy
+      post 'brand_configs/save_to_account', action: :save_to_account
+      post 'brand_configs/save_to_user_session', action: :save_to_user_session
+    end
+
     resources :role_overrides, only: [:index, :create] do
       collection do
         post :add_role
@@ -814,14 +822,6 @@ CanvasRails::Application.routes.draw do
     concerns :files
   end
 
-  scope(controller: :brand_configs) do
-    get 'brand_configs/new', action: :new
-    post 'brand_configs', action: :create
-    delete 'brand_configs', action: :destroy
-    post 'brand_configs/save_to_account', action: :save_to_account
-    post 'brand_configs/save_to_user_session', action: :save_to_user_session
-  end
-
   get 'courses/:course_id/outcome_rollups' => 'outcome_results#rollups', as: 'course_outcome_rollups'
 
   get 'terms_of_use' => 'legal_information#terms_of_use', as: 'terms_of_use_redirect'
@@ -974,6 +974,9 @@ CanvasRails::Application.routes.draw do
         put "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:user_id", action: :update
         post "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/update_grades", action: :bulk_update
       end
+      get "courses/:course_id/assignments/:assignment_id/gradeable_students", action: :gradeable_students, as: "course_assignment_gradeable_students"
+      post "courses/:course_id/assignments/:assignment_id/publish_provisional_grades", action: :publish_provisional_grades, as: 'publish_provisional_grades'
+      put "courses/:course_id/assignments/:assignment_id/select_provisional_grade/:provisional_grade_id", action: :select_provisional_grade
     end
 
     post '/courses/:course_id/assignments/:assignment_id/submissions/:user_id/comments/files', action: :create_file, controller: :submission_comments_api
@@ -1365,6 +1368,10 @@ CanvasRails::Application.routes.draw do
       post "users/self/favorites/courses/:id", action: :add_favorite_course, as: :add_favorite_course
       delete "users/self/favorites/courses/:id", action: :remove_favorite_course, as: :remove_favorite_course
       delete "users/self/favorites/courses", action: :reset_course_favorites
+      get "users/self/favorites/groups", action: :list_favorite_groups, as: :list_favorite_groups
+      post "users/self/favorites/groups/:id", action: :add_favorite_groups, as: :add_favorite_groups
+      delete "users/self/favorites/groups/:id", action: :remove_favorite_groups, as: :remove_favorite_groups
+      delete "users/self/favorites/groups", action: :reset_groups_favorites
     end
 
     scope(controller: :wiki_pages_api) do

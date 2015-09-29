@@ -23,8 +23,9 @@ define([
       $("#edit_letter_grades_form").dialog({
         title: I18n.t('titles.grading_scheme_info', "View/Edit Grading Scheme"),
         width: 600,
-        dialogClass: 'form-inline',
+        dialogClass: 'form-inline grading-standard-dialog',
         resizable: false,
+        open: function () { $('.grading-standard-dialog').find('.ui-dialog-titlebar-close')[0].focus() },
         close: function() { $(event.target).focus() }
       });
     });
@@ -218,7 +219,9 @@ define([
       var $link = $standard.find(".insert_grading_standard:first").clone(true);
       var $row = $standard.find(".grading_standard_row:first").clone(true).removeClass('blank');
       var $table = $standard.find(".grading_standard_data");
+      var $thead = $table.find('thead');
       $table.empty();
+      $table.append($thead);
       $table.append($link.clone(true).show());
       for(var idx in standard.data) {
         var $row_instance = $row.clone(true);

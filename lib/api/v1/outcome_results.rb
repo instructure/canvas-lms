@@ -60,10 +60,13 @@ module Api::V1::OutcomeResults
   #
   # Returns a Hash containing serialized outcomes.
   def outcome_results_include_outcomes_json(outcomes)
-    ActiveRecord::Associations::Preloader.new(outcomes, [:context, :alignments]).run
-    assessed_outcomes = LearningOutcomeResult.uniq
-      .where(learning_outcome_id: outcomes.map(&:id))
-      .pluck(:learning_outcome_id)
+    outcomes.each_slice(50).each do |outcomes_slice|
+      ActiveRecord::Associations::Preloader.new(outcomes_slice, [:context, :alignments]).run
+    end
+    assessed_outcomes = []
+    outcomes.map(&:id).each_slice(100) do |outcome_ids|
+      assessed_outcomes += LearningOutcomeResult.uniq.where(learning_outcome_id: outcome_ids).pluck(:learning_outcome_id)
+    end
     outcomes.map do |o|
       hash = outcome_json(o, @current_user, session, assessed_outcomes: assessed_outcomes)
       hash.merge!(alignments: o.alignments.map(&:content_asset_string))

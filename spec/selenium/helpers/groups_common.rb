@@ -86,6 +86,17 @@ shared_examples 'announcements_page' do |context|
     expand_files_on_content_pane
     expect(ffj('.file .text:visible').size).to eq 1
   end
+
+  it "should have an Add External Feed link on announcements", priority: "2", test_id: pick_test_id(context, 329628, 329629) do
+    get announcements_page
+    expect(fln('Add External Feed')).to be_displayed
+  end
+
+  it "should have an RSS feed button on announcements", priority: "2", test_id: pick_test_id(context, 329630, 329631) do
+    @testgroup.first.announcements.create!(title: 'Group Announcement', message: 'Group',user: @teacher)
+    get announcements_page
+    expect(f('.btn[title="RSS feed"]')).to be_displayed
+  end
 end
 
 #-----------------------------------------------------------------------------------------------------------------------
@@ -154,6 +165,20 @@ shared_examples 'discussions_page' do |context|
     expect_new_page_load { f('.btn-primary').click }
     expand_files_on_content_pane
     expect(ffj('.file .text:visible').size).to eq 1
+  end
+
+  it "should allow group users to reply to group discussions", priority: pick_priority(context,"1","2"), test_id: pick_test_id(context, 312868, 312870) do
+    DiscussionTopic.create!(context: @testgroup.first, user: @teacher,
+                            title: 'Group Discussion', message: 'Group')
+    get discussions_page
+    fln('Group Discussion').click
+    wait_for_ajaximations
+    f('.discussion-reply-action').click
+    type_in_tiny('textarea', 'Good discussion')
+    fj('.btn-primary:contains("Post Reply")').click
+    wait_for_ajaximations
+    expect(f('.entry')).to be_present
+    expect(ff('.message.user_content')[1]).to include_text 'Good discussion'
   end
 end
 

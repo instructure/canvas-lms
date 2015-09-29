@@ -14,12 +14,12 @@ class CreateAccessTokens < ActiveRecord::Migration
     # developer_key.user_id was a string instead of an integer
     add_column :developer_keys, :user_id_int, :integer, :limit => 8
     if connection.adapter_name =~ /\Apostgres/i
-      execute <<-SQL
-        UPDATE developer_keys SET user_id_int = CAST(user_id AS INTEGER) WHERE user_id IS NOT NULL
+      update <<-SQL
+        UPDATE #{DeveloperKey.quoted_table_name} SET user_id_int = CAST(user_id AS INTEGER) WHERE user_id IS NOT NULL
       SQL
     else
-      execute <<-SQL
-        UPDATE developer_keys SET user_id_int = CAST(user_id AS UNSIGNED) WHERE user_id IS NOT NULL
+      update <<-SQL
+        UPDATE #{DeveloperKey.quoted_table_name} SET user_id_int = CAST(user_id AS UNSIGNED) WHERE user_id IS NOT NULL
       SQL
     end
     remove_column :developer_keys, :user_id

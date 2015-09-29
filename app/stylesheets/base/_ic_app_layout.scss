@@ -22,12 +22,9 @@ $ic-left-side-width: $ic-sp*15;
   transform: translate3d(0,0,0);
   flex: 1 0 auto;
   position: relative;
-  background:
-    transparent
-    0 100%
-    no-repeat;
-  background-image: $ic-brand-watermark;
   body.course-menu-expanded & { transform: translate3d($ic-left-side-width,0,0); }
+  // Theme Editor watermark gets attached to this element as a background image
+  body:not(.no-headers) & { background: $ic-brand-watermark left bottom no-repeat; }
   @include breakpoint(wide) {
     display: flex;
     position: static;

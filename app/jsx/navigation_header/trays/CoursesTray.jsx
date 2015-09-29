@@ -22,15 +22,24 @@ define([
     renderCourses() {
       if (!this.props.hasLoaded) {
         return (
-          <li className="ReactTray__loading-list-item">
+          <li className="ReactTray-list-item ReactTray-list-item--loading-message">
             {I18n.t('Loading')} &hellip;
           </li>
         );
       }
       var courses = this.props.courses.map((course) => {
-        return <li key={course.id}><a href={`/courses/${course.id}`}>{course.name}</a></li>;
+        return (
+          <li key={course.id} className='ReactTray-list-item'>
+            <a href={`/courses/${course.id}`} className='ReactTray-list-item__link'>{course.name}</a>
+            { course.enrollment_term_id > 1 ? ( <div className='ReactTray-list-item__helper-text'>{course.term.name}</div> ) : null }
+          </li>
+        );
       });
-      courses.push(<li key='allCourseLink' className='ReactTray__feature-list-item'><a href='/courses'>{I18n.t('All Courses')}</a></li>);
+      courses.push(
+        <li key='allCourseLink' className='ReactTray-list-item ReactTray-list-item--feature-item'>
+          <a href='/courses'>{I18n.t('All Courses')}</a>
+        </li>
+      );
       return courses;
     },
 

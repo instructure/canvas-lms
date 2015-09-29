@@ -265,3 +265,23 @@ def insert_file_from_rce(insert_into = nil)
   wait_for_ajaximations
   expect(fln("some test file")).to be_displayed
 end
+
+def notorious_set_values
+  make_full_screen
+  fln("Kaltura").click
+  wait_for_ajaximations
+  f('#plugin_setting_disabled').click
+  wait_for_ajaximations
+  f('#settings_domain').send_keys 'nv-beta.instructuremedia.com'
+  f('#settings_resource_domain').send_keys 'nv-beta.instructuremedia.com'
+  f('#settings_rtmp_domain').send_keys 'fms-beta.instructuremedia.com'
+  f('#settings_partner_id').send_keys '2'
+  f('#settings_subpartner_id').send_keys '0'
+  f('#settings_secret_key').send_keys 'adminsekrit'
+  f('#settings_user_secret_key').send_keys 'usersekrit'
+  f('#settings_player_ui_conf').send_keys '0'
+  f('#settings_kcw_ui_conf').send_keys '0'
+  f('#settings_upload_ui_conf').send_keys '0'
+  f('#settings_js_uploader').click
+  f('.save_button').click
+end

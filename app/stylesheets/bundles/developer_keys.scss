@@ -6,12 +6,22 @@
   tr:hover {
     td {
       background-color: #eee;
-      &.links {
+      &.links i {
         opacity: 1;
       }
       .api_key {
         visibility: visible;
       }
+    }
+  }
+  tr.inactive {
+    td {
+      background-color: #fee;
+    }
+  }
+  tr.inactive:hover {
+    td {
+      background-color: #fcc;
     }
   }
   td, th {
@@ -24,11 +34,11 @@
   td {
     border-bottom: 1px dotted #ccc;
     vertical-align: middle;
-    &.name {
+    span.name {
       font-weight: bold;
       font-size: 14px;
     }
-    &.links {
+    &.links i {
       opacity: 0.4;
     }
     .api_key {

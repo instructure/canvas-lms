@@ -119,9 +119,22 @@ module Importers
       subbed = false
       links.each do |link|
         new_value = link[:new_value] || link[:old_value]
-        if html.sub!(link[:placeholder], new_value)
+        if html.gsub!(link[:placeholder], new_value)
           subbed = true
         end
+      end
+      subbed
+    end
+
+    def recursively_sub_placeholders!(object, links)
+      subbed = false
+      case object
+      when Hash
+        object.values.each { |o| subbed = true if recursively_sub_placeholders!(o, links) }
+      when Array
+        object.each { |o| subbed = true if recursively_sub_placeholders!(o, links) }
+      when String
+        subbed = sub_placeholders!(object, links)
       end
       subbed
     end
@@ -150,18 +163,16 @@ module Importers
       # we have to do a little bit more here because the question_data can get copied all over
       quiz_ids = []
       Quizzes::QuizQuestion.where(:assessment_question_id => aq.id).find_each do |qq|
-        qq_yaml = qq['question_data'].to_yaml
-        if sub_placeholders!(qq_yaml, links)
-          Quizzes::QuizQuestion.where(:id => qq.id).update_all(:question_data => qq_yaml)
+        if recursively_sub_placeholders!(qq['question_data'], links)
+          Quizzes::QuizQuestion.where(:id => qq.id).update_all(:question_data => qq['question_data'].to_yaml)
           quiz_ids << qq.quiz_id
         end
       end
 
       if quiz_ids.any?
         Quizzes::Quiz.where(:id => quiz_ids.uniq).where("quiz_data IS NOT NULL").find_each do |quiz|
-          quiz_yaml = quiz['quiz_data'].to_yaml
-          if sub_placeholders!(quiz_yaml, links)
-            Quizzes::Quiz.where(:id => quiz.id).update_all(:quiz_data => quiz_yaml)
+          if recursively_sub_placeholders!(quiz['quiz_data'], links)
+            Quizzes::Quiz.where(:id => quiz.id).update_all(:quiz_data => quiz['quiz_data'].to_yaml)
           end
         end
       end
@@ -174,23 +185,20 @@ module Importers
         link[:new_value] = aq.translate_file_link(link[:new_value])
       end
 
-      aq_yaml = aq['question_data'].to_yaml
-      if sub_placeholders!(aq_yaml, links)
-        AssessmentQuestion.where(:id => aq.id).update_all(:question_data => aq_yaml)
+      if recursively_sub_placeholders!(aq['question_data'], links)
+        AssessmentQuestion.where(:id => aq.id).update_all(:question_data => aq['question_data'].to_yaml)
       end
     end
 
     def process_quiz_question!(qq, links)
-      qq_yaml = qq['question_data'].to_yaml
-      if sub_placeholders!(qq_yaml, links)
-        Quizzes::QuizQuestion.where(:id => qq.id).update_all(:question_data => qq_yaml)
+      if recursively_sub_placeholders!(qq['question_data'], links)
+        Quizzes::QuizQuestion.where(:id => qq.id).update_all(:question_data => qq['question_data'].to_yaml)
       end
 
       quiz = Quizzes::Quiz.where(:id => qq.quiz_id).where("quiz_data IS NOT NULL").first
       if quiz
-        quiz_yaml = quiz['quiz_data'].to_yaml
-        if sub_placeholders!(quiz_yaml, links)
-          Quizzes::Quiz.where(:id => quiz.id).update_all(:quiz_data => quiz_yaml)
+        if recursively_sub_placeholders!(quiz['quiz_data'], links)
+          Quizzes::Quiz.where(:id => quiz.id).update_all(:quiz_data => quiz['quiz_data'].to_yaml)
         end
       end
     end

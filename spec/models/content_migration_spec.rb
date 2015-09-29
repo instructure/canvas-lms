@@ -397,4 +397,35 @@ describe ContentMigration do
 
     expect(cm.migration_issues).to be_empty
   end
+
+  it "should correclty handle media comment resolution in quizzes" do
+    course_with_teacher
+    cm = ContentMigration.new(:context => @course, :user => @user)
+    cm.migration_type = 'canvas_cartridge_importer'
+    cm.migration_settings['import_immediately'] = true
+    cm.save!
+
+    package_path = File.join(File.dirname(__FILE__) + "/../fixtures/migration/canvas_quiz_media_comment.zip")
+    attachment = Attachment.new
+    attachment.context = cm
+    attachment.uploaded_data = File.open(package_path, 'rb')
+    attachment.filename = 'file.zip'
+    attachment.save!
+
+    cm.attachment = attachment
+    cm.save!
+
+    cm.queue_migration
+    run_jobs
+
+    expect(cm.migration_issues).to be_empty
+    quiz = @course.quizzes.available.first
+    expect(quiz.quiz_data).to be_present
+    expect(quiz.quiz_data.to_yaml).to include("/media_objects/m-5U5Jww6HL7zG35CgyaYGyA5bhzsremxY")
+
+    qq = quiz.quiz_questions.first
+    expect(qq.question_data).to be_present
+    expect(qq.question_data.to_yaml).to include("/media_objects/m-5U5Jww6HL7zG35CgyaYGyA5bhzsremxY")
+
+  end
 end

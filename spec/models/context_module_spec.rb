@@ -320,6 +320,33 @@ describe ContextModule do
       expect(@progression).to be_completed
     end
 
+    it "should set progression to complete for a module with 'Complete One Item' requirement when one item complete" do
+      course_module
+      @module.requirement_count = 1
+      @quiz = @course.quizzes.build(:title => "some quiz", :quiz_type => "assignment",
+                                    :scoring_policy => 'keep_highest')
+      @quiz.workflow_state = 'available'
+      @quiz.save!
+      @assignment = @course.assignments.create!(:title => "some assignment")
+
+      @tag = @module.add_item({:id => @quiz.id, :type => 'quiz'})
+      @tag2 = @module.add_item({:id => @assignment.id, :type => 'assignment'})
+      @module.completion_requirements = {@tag.id => {:type => 'min_score', :min_score => 90},
+                                         @tag2.id => {:type=> 'must_view'}}
+      @module.save!
+
+      @user = User.create!(:name => "some name")
+      @course.enroll_student(@user)
+
+      @progression = @module.evaluate_for(@user)
+      expect(@progression).to be_unlocked
+
+      @module.update_for(@user, :read, @tag2)
+      @progression = @module.evaluate_for(@user)
+      expect(@progression).to be_completed
+
+    end
+
     it "should trigger completion events" do
       course_module
       @module.completion_events = [:publish_final_grade]
@@ -508,6 +535,40 @@ describe ContextModule do
       expect(@progression).to be_completed
     end
 
+    it "should update progression status to started if submitted for a min_score" do
+      course_module
+      @assignment = @course.assignments.create!(:title => "some assignment",  :submission_types => "online_text_entry")
+      @tag = @module.add_item({:id => @assignment.id, :type => 'assignment'})
+      @module.completion_requirements = {@tag.id => {:type => 'min_score', :min_score => 5.0}}
+      @module.save!
+      @teacher = User.create!(:name => "some teacher")
+      @course.enroll_teacher(@teacher)
+      @user = User.create!(:name => "some name")
+      @course.enroll_student(@user)
+
+      expect(@module.evaluate_for(@user)).to be_unlocked
+      expect(@assignment.locked_for?(@user)).to eql(false)
+
+      @assignment.submit_homework @user, :submission_type => "online_text_entry", :body => "stuff"
+
+      prog = @module.evaluate_for(@user)
+      expect(prog).to be_started
+      incomplete_req = prog.incomplete_requirements.detect{|r| r[:id] == @tag.id}
+      expect(incomplete_req).to be_present
+      expect(incomplete_req[:score]).to be_nil
+
+      @assignment.grade_student(@user, :grade => "4", :grader => @teacher)
+
+      prog = @module.evaluate_for(@user)
+      expect(prog).to be_started
+      incomplete_req = prog.incomplete_requirements.detect{|r| r[:id] == @tag.id}
+      expect(incomplete_req).to be_present
+      expect(incomplete_req[:score]).to eq 4
+
+      @assignment.grade_student(@user, :grade => "6", :grader => @teacher)
+      expect(@module.evaluate_for(@user)).to be_completed
+    end
+
     it "should update progression status on grading and view events" do
       course_module
       @assignment = @course.assignments.create!(:title => "some assignment")
@@ -558,7 +619,7 @@ describe ContextModule do
       expect(@module2.evaluate_for(@user)).to be_completed
       @module.relock_progressions
       expect(@module2.evaluate_for(@user)).to be_locked
-      expect(@module.evaluate_for(@user)).to be_unlocked
+      expect(@module.evaluate_for(@user)).to be_started
 
       @submissions[0].score = 10
       @submissions[0].save!
@@ -844,7 +905,7 @@ describe ContextModule do
       expect(@module2.evaluate_for(@user)).to be_locked
 
       @progression = @module.evaluate_for(@user)
-      expect(@progression).to be_unlocked
+      expect(@progression).to be_started
       expect(@progression.current_position).to eql(@tag.position)
 
       @submissions[0].score = 10

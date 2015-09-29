@@ -333,17 +333,21 @@ class Attachment < ActiveRecord::Base
     end
   end
 
+  TURNITINABLE_MIME_TYPES = %w[
+    application/msword
+    application/vnd.openxmlformats-officedocument.wordprocessingml.document
+    application/pdf
+    text/plain
+    text/html
+    application/rtf
+    text/richtext
+    application/vnd.wordperfect
+    application/vnd.ms-powerpoint
+    application/vnd.openxmlformats-officedocument.presentationml.presentation
+  ].to_set.freeze
+
   def turnitinable?
-    self.content_type && [
-      'application/msword',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-      'application/pdf',
-      'text/plain',
-      'text/html',
-      'application/rtf',
-      'text/richtext',
-      'application/vnd.wordperfect'
-    ].include?(self.content_type)
+    TURNITINABLE_MIME_TYPES.include?(content_type)
   end
 
   def flag_as_recently_created
@@ -1198,7 +1202,10 @@ class Attachment < ActiveRecord::Base
     # ... or crocodoc (this will go away soon)
     return if Attachment.skip_3rd_party_submits?
 
-    if opts[:wants_annotation] && crocodocable?
+    submit_to_crocodoc_instead = opts[:wants_annotation] &&
+                                 crocodocable? &&
+                                 !Canvadocs.annotations_supported?
+    if submit_to_crocodoc_instead
       # get crocodoc off the canvadocs strand
       # (maybe :wants_annotation was a dumb idea)
       send_later_enqueue_args :submit_to_crocodoc, {
@@ -1208,12 +1215,12 @@ class Attachment < ActiveRecord::Base
       }, attempt
     elsif canvadocable?
       doc = canvadoc || create_canvadoc
-      doc.upload
+      doc.upload annotatable: opts[:wants_annotation]
       update_attribute(:workflow_state, 'processing')
     end
   rescue => e
     update_attribute(:workflow_state, 'errored')
-    Canvas::Errors.capture(e, type: :canvadocs, attachment_id: id)
+    Canvas::Errors.capture(e, type: :canvadocs, attachment_id: id, annotatable: opts[:wants_annotation])
 
     if attempt <= Setting.get('max_canvadocs_attempts', '5').to_i
       send_later_enqueue_args :submit_to_canvadocs, {
@@ -1441,20 +1448,21 @@ class Attachment < ActiveRecord::Base
     "/api/v1/canvadoc_session?#{preview_params(user, "canvadoc")}"
   end
 
-  def crocodoc_url(user)
+  def crocodoc_url(user, crocodoc_ids = nil)
     return unless crocodoc_available?
-    "/api/v1/crocodoc_session?#{preview_params(user, "crocodoc")}"
+    "/api/v1/crocodoc_session?#{preview_params(user, "crocodoc", crocodoc_ids)}"
   end
 
   def previewable_media?
     self.content_type && self.content_type.match(/\A(video|audio)/)
   end
 
-  def preview_params(user, type)
+  def preview_params(user, type, crocodoc_ids = nil)
     blob = {
       user_id: user.try(:global_id),
       attachment_id: id,
       type: type,
+      crocodoc_ids: crocodoc_ids
     }.to_json
     hmac = Canvas::Security.hmac_sha1(blob)
     "blob=#{URI.encode blob}&hmac=#{URI.encode hmac}"

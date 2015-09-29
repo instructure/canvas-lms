@@ -26,7 +26,7 @@ def traverse_nested_outcomes(outcome)
   end
 end
 
-def goto_state_outcomes
+def goto_state_outcomes(outcome_url = "/accounts/#{Account.default.id}/outcomes")
   get outcome_url
   wait_for_ajaximations
   f('.find_outcome').click
@@ -75,6 +75,13 @@ def valid_outcome_data
           {:points => 0, :description => "Lame"}
       ]
   }
+end
+
+def state_outcome
+    state_outcome = ['NGA Center/CCSSO', 'Common Core State Standards',
+                     'College- and Career-Readiness Standards and K-12 Mathematics', 'First Grade',
+                      '1.DD - zééééééééééééééééééééééééééééééééééééééééééééééééé', 'Something else']
+    state_outcome
 end
 
 def course_bulk_outcome_groups_course(num_of_groups, num_of_outcomes)

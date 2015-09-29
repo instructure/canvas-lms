@@ -249,6 +249,42 @@ define [
     tz.changeLocale(french, 'fr_FR')
     ok !tz.hasMeridian()
 
+  test "isMidnight() is false when no argument given.", ->
+    ok !tz.isMidnight()
+
+  test "isMidnight() is false when invalid date is given.", ->
+    date = new Date("invalid date")
+    ok !tz.isMidnight(date)
+
+  test "isMidnight() is true when date given is at midnight.", ->
+    ok tz.isMidnight(epoch)
+
+  test "isMidnight() is false when date given isn't at midnight.", ->
+    ok !tz.isMidnight(moonwalk)
+
+  test "isMidnight() is false when date is midnight in a different zone.", ->
+    tz.changeZone(detroit, 'America/Detroit')
+    ok !tz.isMidnight(epoch)
+
+  test "isMidnight() is true when date is midnight adjusted for zone.", ->
+    tz.changeZone(detroit, 'America/Detroit')
+    date = tz.parse('2012-09-02 00:00:00')
+    ok tz.isMidnight(date, { timezone: 'America/Detroit' })
+
+  test "isMidnight() is false when date is not midnight adjusted for zone.", ->
+    ok !tz.isMidnight(epoch, { timezone: 'America/Detroit' })
+
+  test "changeToTheSecondBeforeMidnight() returns null when no argument given.", ->
+    equal tz.changeToTheSecondBeforeMidnight(), null
+
+  test "changeToTheSecondBeforeMidnight() returns null when invalid date is given.", ->
+    date = new Date("invalid date")
+    equal tz.changeToTheSecondBeforeMidnight(date), null
+
+  test "changeToTheSecondBeforeMidnight() returns fancy midnight when a valid date is given.", ->
+    fancyMidnight = tz.changeToTheSecondBeforeMidnight(epoch)
+    equal fancyMidnight.toGMTString(), "Thu, 01 Jan 1970 23:59:59 GMT"
+
   module 'english tz',
     setup: ->
       @snapshot = tz.snapshot()

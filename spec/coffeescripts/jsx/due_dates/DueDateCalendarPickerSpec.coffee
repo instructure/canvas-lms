@@ -69,9 +69,9 @@ define [
     ok update.calledWith(null)
 
   test 'does not convert to fancy midnight (because it is unlock_at)', ->
-    d = new Date()
-    d.setHours(0,0,0,0)
-    ok !@dueDateCalendarPicker.fancyMidnightNeeded("tomorrow", d)
+    # This date will be set to midnight in the time zone of the app.
+    date = tz.parse('2015-08-31T00:00:00')
+    equal @dueDateCalendarPicker.changeToFancyMidnightIfNeeded(date), date
 
   module 'due_at DueDateCalendarPicker',
     setup: ->
@@ -97,7 +97,8 @@ define [
     equal "DueDateInput__Container", classes
 
   test 'converts to fancy midnight (because it is due_at)', ->
-    d = new Date()
-    d.setHours(0,0,0,0)
-    ok @dueDateCalendarPicker.fancyMidnightNeeded("tomorrow", d)
-    equal @dueDateCalendarPicker.changeToFancyMidnight(d, 0).getMinutes(), 59
+    # This date will be set to midnight in the time zone of the app.
+    date = tz.parse('2015-08-31T00:00:00')
+    date = @dueDateCalendarPicker.changeToFancyMidnightIfNeeded(date)
+
+    equal date.getMinutes(), 59

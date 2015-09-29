@@ -2,7 +2,7 @@
   {{#unless hideTooltip}}
     <div class="gradebook-tooltip {{#if lastColumn}}gradebook-tooltip-last{{/if}}">
       {{#if warning}}
-        {{warning}}
+        {{warning.warningText}}
       {{else}}
         {{#unless showPointsNotPercent}}
           {{score}} / {{possible}}
@@ -18,9 +18,8 @@
   {{/unless}}
   <span class="percentage">
     {{#if warning}}
-      <i class="icon-warning final-warning"></i>
+      <i class="{{warning.icon}}"></i>
     {{/if}}
-
     {{#if showPointsNotPercent}}
       {{score}}
     {{else}}

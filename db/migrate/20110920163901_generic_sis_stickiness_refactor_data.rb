@@ -1,8 +1,8 @@
 class GenericSisStickinessRefactorData < ActiveRecord::Migration
 
   def self.up
-    execute <<-SQL
-      UPDATE abstract_courses SET stuck_sis_fields =
+    update <<-SQL
+      UPDATE #{AbstractCourse.quoted_table_name} SET stuck_sis_fields =
           (CASE WHEN sis_name <> name THEN
             (CASE WHEN sis_course_code <> short_name THEN
               'name,short_name'
@@ -15,8 +15,8 @@ class GenericSisStickinessRefactorData < ActiveRecord::Migration
             NULL
           END);
     SQL
-    execute <<-SQL
-      UPDATE courses SET stuck_sis_fields =
+    update <<-SQL
+      UPDATE #{Course.quoted_table_name} SET stuck_sis_fields =
           (CASE WHEN sis_name <> name THEN
             (CASE WHEN sis_course_code <> course_code THEN
               'name,course_code'
@@ -29,8 +29,8 @@ class GenericSisStickinessRefactorData < ActiveRecord::Migration
             NULL
           END);
     SQL
-    execute <<-SQL
-      UPDATE course_sections SET stuck_sis_fields =
+    update <<-SQL
+      UPDATE #{CourseSection.quoted_table_name} SET stuck_sis_fields =
           (CASE WHEN sis_name <> name THEN
             (CASE WHEN sticky_xlist THEN
               'course_id,name'
@@ -43,10 +43,10 @@ class GenericSisStickinessRefactorData < ActiveRecord::Migration
             NULL
           END);
     SQL
-    execute("UPDATE accounts SET stuck_sis_fields = 'name' WHERE sis_name <> name;")
-    execute("UPDATE groups SET stuck_sis_fields = 'name' WHERE sis_name <> name;")
-    execute("UPDATE enrollment_terms SET stuck_sis_fields = 'name' WHERE sis_name <> name;")
-    execute("UPDATE users SET stuck_sis_fields = 'name' WHERE sis_name <> name;")
+    Account.where("sis_name<>name").update_all(stuck_sis_fields: 'name')
+    Group.where("sis_name<>name").update_all(stuck_sis_fields: 'name')
+    EnrollmentTerm.where("sis_name<>name").update_all(stuck_sis_fields: 'name')
+    User.where("sis_name<>name").update_all(stuck_sis_fields: 'name')
   end
 
   def self.down

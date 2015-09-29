@@ -556,7 +556,7 @@ class FoldersController < ApplicationController
     @context = @folder.context
     @attachment = Attachment.new(:context => @context)
     if authorized_action(@attachment, @current_user, :create)
-      api_attachment_preflight(@context, request, :check_quota => true)
+      api_attachment_preflight(@context, request, params: params, check_quota: true)
     end
   end
 

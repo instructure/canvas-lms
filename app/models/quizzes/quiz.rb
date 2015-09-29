@@ -616,32 +616,24 @@ class Quizzes::Quiz < ActiveRecord::Base
     return end_at if user.is_a?(::User) && self.grants_right?(user, :grade)
 
     can_take = Quizzes::QuizEligibility.new(course: self.context, quiz: self, user: submission.user)
+    
+    fallback_end_at = if can_take.section_dates_currently_apply?
+      can_take.course_section.end_at
+    elsif course.restrict_enrollments_to_course_dates
+      course.end_at || course.enrollment_term.end_at
+    else
+      course.enrollment_term.end_at
+    end
+    
     # set to lock date
     if lock_at && !submission.manually_unlocked
       if !end_at || lock_at < end_at
         end_at = lock_at
       end
-
-    # set to course end
-    elsif course.end_at && course.restrict_enrollments_to_course_dates
-      if !end_at || course.end_at < end_at
-        end_at = course.end_at
-      end
-      # Section dates overrule
-      if can_take.section_dates_apply? && can_take.course_section.end_at > end_at
-        end_at = can_take.course_section.end_at
-      end
-
-    # set to enrollment term end
-    elsif course.enrollment_term.end_at
-      if !end_at || course.enrollment_term.end_at < end_at
-        end_at = course.enrollment_term.end_at
-      end
-      if can_take.section_dates_apply? && can_take.course_section.end_at > end_at
-        end_at = can_take.course_section.end_at
-      end
+    elsif !end_at || (fallback_end_at && fallback_end_at < end_at)
+      end_at = fallback_end_at
     end
-
+    
     end_at
   end
 
@@ -1043,7 +1035,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     can :view_answer_audits
   end
 
-  scope :include_assignment, -> { includes(:assignment) }
+  scope :include_assignment, -> { preload(:assignment) }
   scope :before, lambda { |date| where("quizzes.created_at<?", date) }
   scope :active, -> { where("quizzes.workflow_state<>'deleted'") }
   scope :not_for_assignment, -> { where(:assignment_id => nil) }
@@ -1218,7 +1210,8 @@ class Quizzes::Quiz < ActiveRecord::Base
   def current_regrade
     Quizzes::QuizRegrade.where(quiz_id: id, quiz_version: version_number).
       where("quiz_question_regrades.regrade_option != 'disabled'").
-      includes(:quiz_question_regrades => :quiz_question).first
+      eager_load(:quiz_question_regrades).
+      preload(quiz_question_regrades: :quiz_question).first
   end
 
   def current_quiz_question_regrades
@@ -1228,7 +1221,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   def questions_regraded_since(created_at)
     question_regrades = Set.new
     quiz_regrades.where("quiz_regrades.created_at > ? AND quiz_question_regrades.regrade_option != 'disabled'", created_at)
-                 .includes(:quiz_question_regrades).each do |regrade|
+                 .eager_load(:quiz_question_regrades).each do |regrade|
       ids = regrade.quiz_question_regrades.map { |qqr| qqr.quiz_question_id }
       question_regrades.merge(ids)
     end

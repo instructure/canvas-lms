@@ -278,7 +278,7 @@ define [
         disableWhileLoading: true
         required: ['body']
         property_validations:
-          token_capture: => I18n.t('errors.field_is_required', "This field is required") if @recipientView and !@recipientView.tokens.length
+          token_capture: => I18n.t("Invalid recipient name.") if @recipientView and !@recipientView.tokens.length
         handle_files: (attachments, data) ->
           data.attachment_ids = (a.attachment.id for a in attachments)
           data

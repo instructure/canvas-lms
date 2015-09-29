@@ -32,9 +32,9 @@ module Api::V1::Section
     if includes.include?('students')
       proxy = section.enrollments
       if user_json_is_admin?
-        proxy = proxy.includes(:user => :pseudonyms)
+        proxy = proxy.preload(user: :pseudonyms)
       else
-        proxy = proxy.includes(:user)
+        proxy = proxy.preload(:user)
       end
       include_enrollments = includes.include?('enrollments')
       res['students'] = proxy.where(:type => 'StudentEnrollment').

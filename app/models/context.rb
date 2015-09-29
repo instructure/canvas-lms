@@ -116,7 +116,7 @@ module Context
         res[:conferences] = self.respond_to?(:web_conferences) && self.web_conferences.active.exists?
         res[:announcements] = self.respond_to?(:announcements) && self.announcements.active.exists?
         res[:outcomes] = self.respond_to?(:has_outcomes?) && self.has_outcomes?
-        res[:discussions] = self.respond_to?(:discussion_topics) && self.discussion_topics.only_discussion_topics.except(:includes).exists?
+        res[:discussions] = self.respond_to?(:discussion_topics) && self.discussion_topics.only_discussion_topics.except(:preload).exists?
       end
       res
     end
@@ -188,6 +188,14 @@ module Context
     nil
   end
 
+  def self.get_account(context, fallback)
+    return fallback unless context
+    case context.class_name
+    when "Account" then context
+    when "Course", "Group" then Account.find_cached(context.account_id)
+    end || fallback
+  end
+
   def is_a_context?
     true
   end
@@ -201,7 +209,7 @@ module Context
   # (note: include Context _before_ FeatureFlags)
   #
   # Returns false
-  def feature_enabled?(feature)
+  def feature_enabled?(_feature)
     false
   end
 end

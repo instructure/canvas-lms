@@ -134,7 +134,7 @@ class GradeSummaryPresenter
   def submissions
     @submissions ||= begin
       ss = @context.submissions
-      .includes(:visible_submission_comments,
+      .preload(:visible_submission_comments,
                 {:rubric_assessments => [:rubric, :rubric_association]},
                 :content_participations)
       .where("assignments.workflow_state != 'deleted'")

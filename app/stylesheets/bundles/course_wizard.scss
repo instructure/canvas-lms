@@ -1,5 +1,10 @@
 @import "base/environment";
 
+//============================
+// Layout Functional Variables
+//============================
+$ic-wizard-color-dark-neutral: $ic-color-dark;
+
 .ReactModal__Overlay.CourseWizard__modalOverlay {
   transition: none;
   background: transparent;
@@ -9,7 +14,7 @@
   transition: all 1s $ic-transition;
   width: 100%;
   height: 100%;
-  background: $ic-brand-secondary;
+  background: $ic-wizard-color-dark-neutral;
   position: fixed;
   bottom: 0; left: 0;
   box-sizing: border-box;
@@ -34,16 +39,16 @@
   display: flex;
   flex-direction: column;
   order: 1;
-  @if $use_high_contrast { background: $ic-brand-secondary; }
-  @else { background: rgba($ic-brand-secondary, 0.9); }
+  @if $use_high_contrast { background: $ic-wizard-color-dark-neutral; }
+  @else { background: rgba($ic-wizard-color-dark-neutral, 0.9); }
 
   @include breakpoint(mini-tablet) {
-    flex-direction: row; 
+    flex-direction: row;
   }
-  @include breakpoint(desktop) { 
+  @include breakpoint(desktop) {
     flex: 1;
     order: 0;
-    flex-direction: column; 
+    flex-direction: column;
   }
 }
 
@@ -57,20 +62,20 @@
     border-color: $ic-brand-primary;
     background-color: rgba($ic-color-light, 0.1);
   }
-  @include breakpoint(mini-tablet) { 
+  @include breakpoint(mini-tablet) {
     flex: 1;
   }
   @include breakpoint(tablet) {
-    background-size: 144px 34px;  
+    background-size: 144px 34px;
   }
   @include breakpoint(desktop) {
     flex: 0 0 $ic-sp*9;
     @include breakpoint(short) {
       flex: 0 0 $ic-sp*6;
       background-size: 114px 27px;
-    }  
+    }
   }
-  
+
 }
 
 .ic-wizard-box__nav {
@@ -94,14 +99,14 @@
   background-size: 18px 18px;
   font-weight: 300;
 
-  @if $use_high_contrast { 
+  @if $use_high_contrast {
     color: $ic-color-light;
     &:hover, &:focus, &.ic-wizard-box__content-trigger--active {
       background-color: $ic-brand-primary;
       color: canvas-light;
     }
   }
-  @else { 
+  @else {
     color: rgba($ic-color-light, 0.9);
     &:hover, &:focus, &.ic-wizard-box__content-trigger--active {
       background-color: rgba($ic-color-light, 0.1);
@@ -126,9 +131,9 @@
   flex: 2;
   display: flex;
   flex-direction: column;
-  
-  @if $use_high_contrast { background: rgba( $ic-brand-secondary, 0.9); }
-  @else { background: linear-gradient(to bottom, rgba($ic-brand-secondary, 0.75) 0%,rgba(0,0,0,0) 100%); }
+
+  @if $use_high_contrast { background: rgba( $ic-wizard-color-dark-neutral, 0.9); }
+  @else { background: linear-gradient(to bottom, rgba($ic-wizard-color-dark-neutral, 0.75) 0%,rgba(0,0,0,0) 100%); }
 }
 
 .ic-wizard-box__content {
@@ -187,14 +192,14 @@
 
 .ic-wizard-box__message-icon {
   display: none;
-  
+
   @include breakpoint(mini-tablet) {
     transition: all 1s $ic-transition;
     opacity: 0;
     transform: scale(0) translate3d(0,50%,0);
 
     display: block;
-    background: $ic-brand-secondary;
+    background: $ic-wizard-color-dark-neutral;
     width: 72px; height: 72px;
     border-radius: 100%;
     position: absolute;
@@ -204,7 +209,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    
+
     &.ic-wizard-box__message-icon--is-fired {
       opacity: 1;
       transform: scale(1) translate3d(0,0,0);
@@ -219,7 +224,7 @@
         top: 0;
       }
     }
-    
+
   }
 
   @include breakpoint(tablet) {
@@ -252,7 +257,7 @@
     opacity: 1;
     transform: translate3d(0,0,0);
   }
-  
+
   @if $use_high_contrast { background: $ic-color-light; }
   @else { background: rgba($ic-color-light, 0.9); }
 
@@ -270,7 +275,7 @@
 .ic-wizard-box__message-text {
   font-weight: 300;
   margin-bottom: 0;
-  
+
   @include breakpoint(desktop) {
     font-size: 15px;
     line-height: 1.6;
@@ -278,7 +283,7 @@
     @include breakpoint(short) {
       font-size: 14px;
       line-height: 1.3;
-    }  
+    }
   }
 }
 

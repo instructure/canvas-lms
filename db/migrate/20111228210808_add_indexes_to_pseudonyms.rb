@@ -2,7 +2,7 @@ class AddIndexesToPseudonyms < ActiveRecord::Migration
   def self.up
     if connection.adapter_name == 'PostgreSQL'
       remove_index :pseudonyms, :unique_id
-      connection.execute("CREATE INDEX index_pseudonyms_on_unique_id ON pseudonyms (LOWER(unique_id))")
+      connection.execute("CREATE INDEX index_pseudonyms_on_unique_id ON #{Pseudonym.quoted_table_name} (LOWER(unique_id))")
     end
     add_index :pseudonyms, :sis_user_id
   end

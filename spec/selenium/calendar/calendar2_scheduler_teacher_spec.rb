@@ -149,11 +149,11 @@ describe "scheduler" do
           expect(form).to be_displayed
           wait_for_ajaximations
 
-          set_value(form.f('.message_groups'), registration_status)
+          set_value(form.find('.message_groups'), registration_status)
           wait_for_ajaximations
 
-          expect(form.ff('.participant_list li')).not_to be_empty
-          set_value(form.f('#body'), 'hello')
+          expect(form.find_all('.participant_list li')).not_to be_empty
+          set_value(form.find('#body'), 'hello')
           submit_dialog(fj('.ui-dialog:visible'), '.ui-button')
           wait_for_ajaximations
           # using fj to avoid selenium caching
@@ -187,6 +187,26 @@ describe "scheduler" do
       expect(get_value('[name="max_appointments_per_participant"]').to_i).to be > 0
     end
 
+    it "should show appointment notes",:priority => "1", test_id: 140195 do
+      create_appointment_group
+      ag = AppointmentGroup.first
+      student_in_course(:course => @course, :active_all => true)
+      ag.appointments.first.reserve_for(@user, @user, comments: 'this is important')
+
+      get "/calendar2"
+      click_scheduler_link
+      f(".appointment-group-item:nth-child(1) .view_calendar_link").click
+      wait_for_ajaximations
+
+      fj('.fc-event:visible').click
+
+      wait_for_ajaximations
+
+      keep_trying_until { expect(ffj('#attendees li').size).to eq 1 }
+
+      expect(f('.event-details-content')).to include_text "this is important"
+    end
+
     it "should allow removing individual appointment users",:priority  => "1", test_id: 140196 do
       #set_native_events("false")
       # user appointment group
@@ -194,7 +214,7 @@ describe "scheduler" do
       ag = AppointmentGroup.first
       2.times do
         student_in_course(:course => @course, :active_all => true)
-        ag.appointments.first.reserve_for(@user, @user)
+        ag.appointments.first.reserve_for(@user, @user, comments: 'this is important')
       end
 
       get "/calendar2"

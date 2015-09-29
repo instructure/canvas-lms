@@ -688,7 +688,10 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
         answer["points"] = 0
         answer["correct"] = "undefined"
       end
-      self.workflow_state = "pending_review" if answer["correct"] == "undefined"
+      if answer["correct"] == "undefined"
+        question = quiz_data.find {|h| h[:id] == answer["question_id"] }
+        self.workflow_state = "pending_review" if question && question["question_type"] != "text_only_question"
+      end
       res << answer
       tally += answer["points"].to_f rescue 0
     end
@@ -851,5 +854,13 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   def ensure_question_reference_integrity!
     fixer = ::Quizzes::QuizSubmission::QuestionReferenceDataFixer.new
     fixer.run!(self)
+  end
+
+  # TODO: Extract? conceptually similar to Submission::Tardiness#late?
+  def late?
+    return false if finished_at.blank?
+    return false if quiz.due_at.blank?
+
+    finished_at > quiz.due_at
   end
 end

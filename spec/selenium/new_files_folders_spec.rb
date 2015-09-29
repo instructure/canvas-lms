@@ -48,6 +48,7 @@ describe "better_file_browsing, folders" do
       wait_for_ajaximations
       add_folder("test folder")
       move("test folder", 0, :cog_icon)
+      wait_for_ajaximations
       expect(f("#flash_message_holder").text).to eq "test folder moved to course files\nClose"
       expect(ff(".treeLabel span")[2].text).to eq "test folder"
     end

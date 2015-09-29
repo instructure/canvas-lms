@@ -3,7 +3,7 @@ define [
   'react'
   'react-router'
   'react-modal'
-  'compiled/react_files/components/FilesApp'
+  'jsx/files/FilesApp'
   'compiled/react_files/modules/filesEnv'
   'jsx/files/FilePreview'
   'compiled/models/Folder'

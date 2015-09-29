@@ -46,6 +46,32 @@ describe "better_file_browsing" do
         set_item_permissions(:restricted_access, :available_with_link)
         verify_hidden_item_not_searchable_as_student("a_fi")
       end
+
+      it "should not see upload file, add folder buttons and cloud icon", priority: "1", test_id: 327118 do
+        student_goto_files
+        expect(f('.btn-upload')).not_to be_present
+        expect(f('.btn-add-folder')).not_to be_present
+        expect(f('.btn-link.published-status')).not_to be_present
+      end
+
+      it "should only see Download option on cog icon", priority: "1", test_id: 133105 do
+        student_goto_files
+        ff('.al-trigger-gray')[0].click
+        expect(fln("Download")).to be_displayed
+        expect(fln("Rename")).not_to be_present
+        expect(fln("Move")).not_to be_present
+        expect(fln("Delete")).not_to be_present
+      end
+
+      it "should only see View and Download options on toolbar menu", priority: "1", test_id: 133109 do
+        student_goto_files
+        ff('.ef-item-row')[0].click
+        expect(f('.btn-download')).to be_displayed
+        expect(f('.btn-view')).to be_displayed
+        expect(f('.btn-move')).not_to be_present
+        expect(f('.btn-restrict')).not_to be_present
+        expect(f('.btn-delete')).not_to be_present
+      end
     end
 
     context "in course with folders" do

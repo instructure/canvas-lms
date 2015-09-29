@@ -258,7 +258,7 @@ class ConversationsController < ApplicationController
 
       if hash[:NOTES_ENABLED] && !hash[:CAN_ADD_NOTES_FOR_ACCOUNT]
         course_note_permissions = {}
-        @current_user.enrollments.active.of_instructor_type.includes(:course).each do |enrollment|
+        @current_user.enrollments.active.of_instructor_type.preload(:course).each do |enrollment|
           course_note_permissions[enrollment.course_id] = true if enrollment.has_permission_to?(:manage_user_notes)
         end
         hash[:CAN_ADD_NOTES_FOR_COURSES] = course_note_permissions
@@ -373,7 +373,7 @@ class ConversationsController < ApplicationController
       end
 
       # reload and preload stuff
-      conversations = ConversationParticipant.where(:id => batch.conversations).includes(:conversation).order("visible_last_authored_at DESC, last_message_at DESC, id DESC")
+      conversations = ConversationParticipant.where(:id => batch.conversations).preload(:conversation).order("visible_last_authored_at DESC, last_message_at DESC, id DESC")
       Conversation.preload_participants(conversations.map(&:conversation))
       ConversationParticipant.preload_latest_messages(conversations, @current_user)
       visibility_map = infer_visibility(conversations)

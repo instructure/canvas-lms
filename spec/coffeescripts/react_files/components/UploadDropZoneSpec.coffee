@@ -1,9 +1,10 @@
 define [
   'react'
-  'compiled/react_files/components/UploadDropZone'
+  'jsx/files/UploadDropZone'
 ], (React, UploadDropZone) ->
 
   Simulate = React.addons.TestUtils.Simulate
+  UploadDropZone = React.createFactory(UploadDropZone)
 
   node = document.querySelector('#fixtures')
 

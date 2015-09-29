@@ -60,9 +60,9 @@ define [
                 props.collection.models
               else
                 props.currentFolder.files.models
-      folders = props.currentFolder.folders.models
+      folders = props.currentFolder?.folders?.models or []
 
-      items = _.extend files, folders
+      items = files.concat folders
       otherItems =  items.filter (item) ->
                       return true unless onlyIdsToPreview
                       item.id in onlyIdsToPreview

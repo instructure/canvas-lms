@@ -3,7 +3,7 @@ define([
   'react',
   'i18n!publish_cloud',
   'compiled/react_files/components/PublishCloud',
-  'compiled/react_files/components/RestrictedDialogForm'
+  'jsx/files/RestrictedDialogForm'
 ], function ($, React, I18n, PublishCloud, RestrictedDialogForm) {
 
   // Function Summary

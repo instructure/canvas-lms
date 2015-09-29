@@ -25,7 +25,7 @@ module Api::V1::DeveloperKey
 
   def developer_key_json(key, user, session, context=nil)
     context ||= Account.site_admin
-    api_json(key, user, session, :only => %w(name created_at email user_id user_name icon_url tool_id)).tap do |hash|
+    api_json(key, user, session, :only => %w(name created_at email user_id user_name icon_url tool_id workflow_state)).tap do |hash|
       if context.grants_right?(user, session, :manage_developer_keys) || user.try(:id) == key.user_id
         hash['api_key'] = key.api_key
         hash['redirect_uri'] = key.redirect_uri
@@ -35,4 +35,3 @@ module Api::V1::DeveloperKey
     end
   end
 end
-

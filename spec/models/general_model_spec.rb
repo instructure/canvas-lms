@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 class ProtectAttributes
   def matches?(target)
     @target = target
-    !(@target.accessible_attributes.nil? && @target.protected_attributes.nil?)
+    !(@target.accessible_attributes.empty? && @target.protected_attributes.empty?)
   end
 
   def failure_message
@@ -42,16 +42,25 @@ describe 'Models' do
         Delayed::Backend::ActiveRecord::Job::Failed,
         Version,
       ]
-    (ignore_classes << ActiveRecord::SessionStore::Session) rescue nil
-    (ignore_classes << AddThumbnailUuid::Thumbnail) rescue nil
-    (ignore_classes << Story) rescue nil
-    (ignore_classes << CustomField) rescue nil
-    (ignore_classes << CustomFieldValue) rescue nil
-    (ignore_classes << RemoveQuizDataIds::QuizQuestion) rescue nil
-    (ignore_classes << Woozel) rescue nil
-    ActiveRecord::Base.send(:subclasses).each do |subclass|
+    if Object.const_defined?('ActiveRecord::SessionStore::Session')
+      ignore_classes << ActiveRecord::SessionStore::Session
+    end
+    ignore_classes << AddThumbnailUuid::Thumbnail if Object.const_defined?('AddThumbnailUuid::Thumbnail')
+    ignore_classes << Story if Object.const_defined?('Story')
+    ignore_classes << CustomField if Object.const_defined?('CustomField')
+    ignore_classes << CustomFieldValue if Object.const_defined?('CustomFieldValue')
+    ignore_classes << RemoveQuizDataIds::QuizQuestion if Object.const_defined?('RemoveQuizDataIds::QuizQuestion')
+    ignore_classes << Woozel if Object.const_defined?('Woozel')
+    ActiveRecord::Base.all_models.each do |subclass|
       next unless subclass.name # unnamed class, probably from specs
       expect(subclass).to protect_attributes unless ignore_classes.include?(subclass)
     end
+  end
+
+  it "raises when you forget to use strong_params with a strong_params model" do
+
+    expect { AccountAuthorizationConfig.new(WeakParameters.new(secret: 'ldap')) }.to(
+      raise_error(ActiveModel::ForbiddenAttributesError)
+    )
   end
 end

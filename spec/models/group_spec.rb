@@ -669,4 +669,24 @@ describe Group do
       expect(@group.includes_user?(@user)).to be_falsey
     end
   end
+
+  describe '#favorite_for_user?' do
+    before :each do
+      context = course_model
+      @group_fave = Group.create!(:name=>"group1", :context=>context)
+      @group_not_fave = Group.create!(:name=>"group2", :context=>context)
+      @group_fave.add_user(@user)
+      @group_not_fave.add_user(@user)
+      @user.favorites.build(:context => @group_fave)
+      @user.save
+    end
+
+    it "should return true if a user has a course set as a favorite" do
+      expect(@group_fave.favorite_for_user?(@user)).to eql(true)
+    end
+
+    it "should return false if a user has not set a group to be a favorite" do
+      expect(@group_not_fave.favorite_for_user?(@user)).to eql(false)
+    end
+  end
 end

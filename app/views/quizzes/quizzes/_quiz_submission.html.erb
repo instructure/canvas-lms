@@ -53,7 +53,8 @@
       <%= image_tag "pending_review.png" %> <%= t(:quiz_submission_needs_review, "The quiz has changed significantly since this submission was made. This submission may need re-grading.") %><br/>
     <% end %>
     <% questions_needing_review = submission_data.find_all do |answer|
-         answer[:correct] == "undefined" && submission_questions_hash[answer[:question_id]]
+         question_data = submission_questions_hash[answer[:question_id]]
+         answer[:correct] == "undefined" && question_data && question_data[:question_type] != 'text_only_question'
        end %>
     <% if questions_needing_review.present? %>
       <div class="alert">
@@ -122,7 +123,7 @@
   <div class="update_scores_fudge">
     <label for="fudge_points_entry"><%= before_label(:fudge_points, "Fudge Points") %></label>
     <input type="hidden" name="fudge_points" value="<%= @submission.fudge_points || 0 %>">
-    <input id="fudge_points_entry" type="number" name="fudge_points" value="<%= (!@submission.fudge_points || @submission.fudge_points == 0 ? '' : @submission.fudge_points) %>" placeholder="--" autocomplete='off' />
+    <input id="fudge_points_entry" type="number" step="any" name="fudge_points" value="<%= (!@submission.fudge_points || @submission.fudge_points == 0 ? '' : @submission.fudge_points) %>" placeholder="--" autocomplete='off' />
     <%
       fudge_text = begin
         if @submission.quiz_points_possible == @quiz.points_possible || !@submission.quiz_points_possible || !@quiz.points_possible
