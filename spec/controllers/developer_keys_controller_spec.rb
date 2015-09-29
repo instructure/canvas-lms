@@ -55,6 +55,34 @@ describe DeveloperKeysController do
         expect(assigns[:keys]).to be_include(dk)
       end
     end
+
+    describe "POST 'create'" do
+      it 'should return the list of developer keys' do
+        user_session(@admin)
+
+        post "create", developer_key: {
+                       redirect_uri: "http://example.com/sdf"
+                     }
+        expect(response).to be_success
+        json_data = JSON.parse(response.body)
+
+        key = DeveloperKey.find(json_data['id'])
+        expect(key.account).to be nil
+      end
+
+      it 'should return the list of developer keys' do
+        user_session(@admin)
+
+        post "create", account_id: Account.site_admin.id, developer_key: {
+                       redirect_uri: "http://example.com/sdf"
+                     }
+        expect(response).to be_success
+        json_data = JSON.parse(response.body)
+
+        key = DeveloperKey.find(json_data['id'])
+        expect(key.account).to be nil
+      end
+    end
   end
 
 

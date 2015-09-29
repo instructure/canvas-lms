@@ -23,12 +23,10 @@ define [
   buildForm = (key, $orig) ->
     key = key || {}
 
-    if !key.id && isAccountAdminLevel
+    if !key.id && isAccountAdminLevel()
       key._formAction = accountEndpoint()
     else
       key._formAction = siteAdminEndpoint()
-
-
 
     $form = $(developerKeyFormTemplate(key))
     $form.formSubmit({
