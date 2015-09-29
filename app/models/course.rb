@@ -1133,7 +1133,7 @@ class Course < ActiveRecord::Base
     can [:read, :read_as_admin, :read_roster, :read_prior_roster, :read_forum, :use_student_view, :read_outcomes, :view_unpublished_items]
 
     # overrideable permissions for concluded admins
-    [:read_question_banks].each do |permission|
+    [:read_question_banks, :view_all_grades].each do |permission|
       given do |user|
         !self.deleted? && user &&
           (prior_enrollments.for_user(user).any?{|e| e.admin? && e.has_permission_to?(permission)} ||
@@ -1144,16 +1144,6 @@ class Course < ActiveRecord::Base
       end
       can permission
     end
-
-    given do |user|
-      !self.deleted? && user &&
-        (prior_enrollments.for_user(user).any?{|e| e.instructor? } ||
-          user.cached_not_ended_enrollments.any? do |e|
-            e.course_id == self.id && e.instructor? && e.completed?
-          end
-        )
-    end
-    can :view_all_grades
 
     # Teacher or Designer of a concluded course
     given do |user|
