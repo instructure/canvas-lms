@@ -1428,10 +1428,11 @@ class CoursesController < ApplicationController
   #
   # Accepts the same include[] parameters as the list action plus:
   #
-  # @argument include[] [String, "all_courses"|"permissions"]
+  # @argument include[] [String, "all_courses"|"permissions"|"observed_users"]
   #   - "all_courses": Also search recently deleted courses.
   #   - "permissions": Include permissions the current user has
   #     for the course.
+  #   - "observed_users": include observed users in the enrollments
   #
   # @returns Course
   def show
@@ -1452,6 +1453,13 @@ class CoursesController < ApplicationController
 
       if authorized_action(@course, @current_user, :read)
         enrollments = @course.current_enrollments.where(:user_id => @current_user).to_a
+        if includes.include?("observed_users") &&
+            enrollments.any?(&:assigned_observer?)
+          observees = ObserverEnrollment.observed_students(@course,
+                                                           @current_user)
+          observees.values.each { |v| enrollments.concat(v) }
+        end
+
         includes << :hide_final_grades
         render :json => course_json(@course, @current_user, session, includes, enrollments)
       end

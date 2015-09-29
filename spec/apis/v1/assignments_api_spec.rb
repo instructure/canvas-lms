@@ -2522,6 +2522,84 @@ describe AssignmentsApiController, type: :request do
       expect(comment.reload.hidden?).to eql false
     end
   end
+
+  context "as an observer viewing assignments" do
+    before :once do
+      @observer_enrollment = course_with_observer(active_all: true)
+      @observer = @user
+      @observer_course = @course
+      @observed_student = create_users(1, return_type: :record).first
+      @student_enrollment =
+        @observer_course.enroll_student(@observed_student,
+                                        :enrollment_state => 'active')
+      @assigned_observer_enrollment =
+        @observer_course.enroll_user(@observer, "ObserverEnrollment",
+                                     :associated_user_id => @observed_student.id)
+      @assigned_observer_enrollment.accept
+
+      @assignment, @submission = create_submitted_assignment_with_user(@observed_student)
+    end
+
+    it "should include submissions for observed users when requested with all assignments" do
+      json = api_call_as_user(@observer, :get,
+                              "/api/v1/courses/#{@observer_course.id}/assignments?include[]=observed_users&include[]=submission",
+                              { :controller => 'assignments_api',
+                                :action => 'index', :format => 'json',
+                                :course_id => @observer_course.id,
+                                :include => [ "observed_users", "submission" ]})
+
+      expect(json.first['submission']).to eq [{
+         "assignment_id" => @assignment.id,
+         "attempt" => nil,
+         "body" => nil,
+         "excused" => nil,
+         "grade" => "99",
+         "grade_matches_current_submission" => true,
+         "graded_at" => nil,
+         "grader_id" => nil,
+         "id" => @submission.id,
+         "score" => 99,
+         "submission_type" => nil,
+         "submitted_at" => nil,
+         "url" => nil,
+         "user_id" => @observed_student.id,
+         "workflow_state" => "submitted",
+         "late" => false,
+         "preview_url" =>
+         "http://www.example.com/courses/#{@observer_course.id}/assignments/#{@assignment.id}/submissions/#{@observed_student.id}?preview=1&version=0"
+       }]
+    end
+
+    it "should insoclude submissions for observed users when requested with a single assignment" do
+      json = api_call_as_user(@observer, :get,
+                              "/api/v1/courses/#{@observer_course.id}/assignments/#{@assignment.id}?include[]=observed_users&include[]=submission",
+                              { :controller => 'assignments_api',
+                                :action => 'show', :format => 'json',
+                                :id => @assignment.id,
+                                :course_id => @observer_course.id,
+                                :include => [ "observed_users", "submission" ]})
+      expect(json['submission']).to eq [{
+         "assignment_id" => @assignment.id,
+         "attempt" => nil,
+         "body" => nil,
+         "excused" => nil,
+         "grade" => "99",
+         "grade_matches_current_submission" => true,
+         "graded_at" => nil,
+         "grader_id" => nil,
+         "id" => @submission.id,
+         "score" => 99,
+         "submission_type" => nil,
+         "submitted_at" => nil,
+         "url" => nil,
+         "user_id" => @observed_student.id,
+         "workflow_state" => "submitted",
+         "late" => false,
+         "preview_url" =>
+         "http://www.example.com/courses/#{@observer_course.id}/assignments/#{@assignment.id}/submissions/#{@observed_student.id}?preview=1&version=0"
+       }]
+    end
+  end
 end
 
 def api_get_assignments_index_from_course(course)

@@ -530,9 +530,10 @@ class AssignmentsApiController < ApplicationController
 
   # @API List assignments
   # Returns the list of assignments for the current context.
-  # @argument include[] [String, "submission"|"assignment_visibility"|"all_dates"|"overrides"]
+  # @argument include[] [String, "submission"|"assignment_visibility"|"all_dates"|"overrides"|"observed_users"]
   #   Associations to include with the assignment. The "assignment_visibility" option
-  #   requires that the Differentiated Assignments course feature be turned on.
+  #   requires that the Differentiated Assignments course feature be turned on. If
+  #   "observed_users" is passed, submissions for observed users will also be included as an array.
   # @argument search_term [String]
   #   The partial title of the assignments to match and return.
   # @argument override_assignment_dates [Boolean]
@@ -552,15 +553,19 @@ class AssignmentsApiController < ApplicationController
       scope = Assignment.search_by_attribute(scope, :title, params[:search_term])
       da_enabled = @context.feature_enabled?(:differentiated_assignments)
 
+      include_params = Array(params[:include])
+
       if params[:bucket]
         return invalid_bucket_error unless SortsAssignments::VALID_BUCKETS.include?(params[:bucket].to_sym)
 
-        submissions_for_user = scope.with_submissions_for_user(@current_user).flat_map(&:submissions)
+        users = current_user_and_observed(
+                    include_observed: include_params.include?("observed_users"))
+        submissions_for_user = scope.with_submissions_for_user(users).flat_map(&:submissions)
         scope = SortsAssignments.bucket_filter(scope, params[:bucket], session, @current_user, @context, submissions_for_user)
       end
 
       assignments = Api.paginate(scope, self, api_v1_course_assignments_url(@context))
-      include_params = Array(params[:include])
+
 
       submissions = submissions_hash(include_params, assignments, submissions_for_user)
 
@@ -626,9 +631,10 @@ class AssignmentsApiController < ApplicationController
 
   # @API Get a single assignment
   # Returns the assignment with the given id.
-  # @argument include[] [String, "submission"|"assignment_visibility"|"overrides"]
+  # @argument include[] [String, "submission"|"assignment_visibility"|"overrides"|"observed_users"]
   #   Associations to include with the assignment. The "assignment_visibility" option
-  #   requires that the Differentiated Assignments course feature be turned on.
+  #   requires that the Differentiated Assignments course feature be turned on. If
+  #  "observed_users" is passed, submissions for observed users will also be included.
   # @argument override_assignment_dates [Boolean]
   #   Apply assignment overrides to the assignment, defaults to true.
   # @argument needs_grading_count_by_section [Boolean]
@@ -643,7 +649,8 @@ class AssignmentsApiController < ApplicationController
 
       included_params = Array(params[:include])
       if included_params.include?('submission')
-        submission = @assignment.submissions.for_user(@current_user).first
+        submissions =
+          submissions_hash(included_params, [@assignment])[@assignment.id]
       end
 
       include_visibility = included_params.include?('assignment_visibility') && @context.grants_any_right?(@current_user, :read_as_admin, :manage_grades, :manage_assignments)
@@ -661,7 +668,7 @@ class AssignmentsApiController < ApplicationController
 
       @assignment.context_module_action(@current_user, :read) unless @assignment.locked_for?(@current_user, :check_policies => true)
       render :json => assignment_json(@assignment, @current_user, session,
-                  submission: submission,
+                  submission: submissions,
                   override_dates: override_dates,
                   include_visibility: include_visibility,
                   needs_grading_count_by_section: needs_grading_count_by_section,
@@ -978,21 +985,34 @@ class AssignmentsApiController < ApplicationController
     end
   end
 
-  private
-
   def submissions_hash(include_params, assignments, submissions_for_user=nil)
     return {} unless include_params.include?('submission')
+    has_observed_users = include_params.include?("observed_users")
+
     subs_list = if submissions_for_user
       assignment_ids = assignments.map(&:id).to_set
       submissions_for_user.select{ |s|
         assignment_ids.include?(s.assignment_id)
       }
     else
+      users = current_user_and_observed(include_observed: has_observed_users)
       @context.submissions.
         where(:assignment_id => assignments).
-        for_user(@current_user)
+        for_user(users)
     end
-    Hash[subs_list.map{|s| [s.assignment_id, s]}]
+
+    if has_observed_users
+      # assignment id -> array. even if <2 results for a given
+      # assignment, we want to consistently return an array when
+      # include[]=observed_users was supplied
+      hash = Hash.new { |h,k| h[k] = [] }
+      subs_list.each { |s| hash[s.assignment_id] << s }
+    else
+      # assignment id -> specific submission. never return an array when
+      # include[]=observed_users was _not_ supplied
+      hash = Hash[subs_list.map{|s| [s.assignment_id, s]}]
+    end
+    hash
   end
 
   def invalid_bucket_error
@@ -1000,4 +1020,16 @@ class AssignmentsApiController < ApplicationController
     @context.errors.add('bucket', err_msg, :att_name => 'bucket')
     return render :json => @context.errors, :status => :bad_request
   end
+
+  # Returns an array containing the current user.  If
+  # include_observed: true is passed also returns any observees if
+  # the current user is an observer
+  def current_user_and_observed(opts = { include_observed: false })
+    user_and_observees = Array(@current_user)
+    if opts[:include_observed] && @context_enrollment.observer?
+      user_and_observees.concat(ObserverEnrollment.observed_students(@context, @current_user).keys)
+    end
+    user_and_observees
+  end
+
 end

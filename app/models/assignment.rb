@@ -1820,7 +1820,7 @@ class Assignment < ActiveRecord::Base
   scope :with_submissions, -> { preload(:submissions) }
 
   scope :with_submissions_for_user, lambda { |user|
-    eager_load(:submissions).where("submissions.user_id = ?", user.id)
+    eager_load(:submissions).where(submissions: {user_id: user})
   }
 
   scope :for_context_codes, lambda { |codes| where(:context_code => codes) }
