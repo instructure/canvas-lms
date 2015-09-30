@@ -1096,6 +1096,9 @@ class Assignment < ActiveRecord::Base
             submission.grade_matches_current_submission) &&
             ((submission.score && submission.grade) || submission.excused?)
           submission.workflow_state = "graded"
+          if submission.quiz_submission
+            submission.quiz_submission.complete
+          end
         end
         submission.group = group
         submission.graded_at = Time.zone.now if did_grade
