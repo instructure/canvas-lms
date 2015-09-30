@@ -24,9 +24,10 @@
     </div>
 
     <% if @associated_courses_count > 0 %>
+      <% js_bundle :account_search %>
       <h2 id="course_name_label"><%= t(:filter_label, "Find a Course") %></h2>
       <div class="rs-margin-lr rs-margin-bottom">
-        <%= form_for :course, :url => account_courses_path(@account), :html => {:id => "new_course", :class => "ic-Form-control", :method => :get} do |f| -%>
+        <%= form_for :course, :url => account_courses_path(@account), :html => {:id => "new_course", :class => "ic-Form-control account_search_form", :method => :get} do |f| -%>
           <div class="ic-Input-group">
             <input id="course_name"
                    type="text"
