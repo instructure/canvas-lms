@@ -77,8 +77,8 @@ define([
       if (assignment) {
         var className = "assignment-name" + ((assignment.muted) ? ' muted' : '');
         return (
-          <div className='gradebook-label' style={{width: this.getWidth()}}>
-            <a className={className} title={label} href={assignment.html_url}>
+          <div title={label} className='gradebook-label' style={{width: this.getWidth()}}>
+            <a className={className} href={assignment.html_url}>
               { this.shouldDisplayAssignmentWarning() && <i ref="icon" title={this.getTitle()} className="icon-warning"></i> }
               {label}
             </a>
@@ -119,14 +119,13 @@ define([
     render() {
       var columnData = this.props.columnData,
           dueDate    = this.headerDate(columnData),
-          className  = (dueDate) ? '' : ' title',
-	  label = this.label(columnData);
+          className  = (dueDate) ? '' : ' title';
 
       return (
         <div style={{width: this.getWidth()}}
-	     title={label}
-	     className={'gradebook-label gradebook-header-column' + className}>
-          {label}
+             title={this.props.label}
+             className={'gradebook-label gradebook-header-column' + className}>
+          {this.label(columnData)}
           {this.renderDropdown(columnData)}
           <div title={dueDate} className='assignment-due-date' ref='dueDate'>
             {dueDate}
