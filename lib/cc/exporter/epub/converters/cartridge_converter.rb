@@ -23,7 +23,7 @@ module CC::Exporter::Epub::Converters
     def convert_placeholder_paths_from_string!(html_string)
       html_node = Nokogiri::HTML::DocumentFragment.parse(html_string)
       html_node.tap do |node|
-        convert_media_paths!(node)
+        convert_media_from_node!(node)
         remove_empty_ids!(node)
       end
       html_node.to_s
