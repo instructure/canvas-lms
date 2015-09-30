@@ -14,7 +14,7 @@
             class="ic-app-header__menu-list"
             aria-label="<%= t('Main Navigation') %>"
           >
-            <li class="ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if active_path?('/') && request.path.length == 1 %>">
+            <li class="ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if current_page?(dashboard_url) %>">
               <a id="global_nav_dashboard_link" href="<%= dashboard_url %>" class="ic-app-header__menu-list-link">
                 <div class="menu-item-icon-container" aria-hidden="true">
                     <%= svg_icon :dashboard %>
@@ -22,7 +22,7 @@
                 <div class="menu-item__text"><%= t('Dashboard') %></div>
               </a>
             </li>
-            <li class="menu-item ic-app-header__menu-list-item <%= 'ic-app-header__menu-list-item--active' if active_path?('courses') %>">
+            <li class="menu-item ic-app-header__menu-list-item <%= 'ic-app-header__menu-list-item--active' if active_path?('/courses') %>">
               <a id="global_nav_courses_link" href="<%= courses_path %>" class="ic-app-header__menu-list-link">
                 <div class="menu-item-icon-container" aria-hidden="true">
                   <%= svg_icon :courses_new_styles %>
@@ -33,7 +33,7 @@
               </a>
             </li>
             <% if @current_user && @current_user.current_groups.count > 0 %>
-              <li class="menu-item ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if active_path?('groups') %>">
+              <li class="menu-item ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if active_path?('/groups') %>">
                 <a id="global_nav_groups_link" href="/groups" class="ic-app-header__menu-list-link">
                   <div class="menu-item-icon-container" aria-hidden="true">
                     <%= svg_icon :groups_new_styles %>
@@ -45,7 +45,7 @@
               </li>
             <% end %>
             <% if @current_user && @current_user.all_accounts.count > 0 %>
-              <li class="menu-item ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if active_path?('accounts') %>">
+              <li class="menu-item ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if active_path?('/accounts') %>">
                 <a id="global_nav_accounts_link" href="/accounts" class="ic-app-header__menu-list-link">
                   <div class="menu-item-icon-container" aria-hidden="true">
                     <%= render(:partial => "shared/svg/svg_icon_accounts_new_styles.svg") %>
@@ -56,7 +56,7 @@
                 </a>
               </li>
             <% end %>
-            <li class="menu-item ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if active_path?('calendar') %>">
+            <li class="menu-item ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if active_path?('/calendar') %>">
               <a id="global_nav_calendar_link" href="/calendar" class="ic-app-header__menu-list-link">
                 <div class="menu-item-icon-container" aria-hidden="true">
                   <%= svg_icon :calendar_new_styles %>
@@ -66,7 +66,7 @@
                 </div>
               </a>
             </li>
-            <li class="menu-item ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if active_path?('conversations') %>">
+            <li class="menu-item ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if active_path?('/conversations') %>">
               <a id="global_nav_conversations_link" href="/conversations" class="ic-app-header__menu-list-link">
                 <div class="menu-item-icon-container" aria-hidden="true">
                   <%= svg_icon :inbox %>
@@ -81,7 +81,7 @@
               <%= render(:partial => 'external_tools/global_nav_menu_items') %>
             <% end %>
             <% if @current_user %>
-            <li class="menu-item ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if active_path?('profile') %>">
+            <li class="menu-item ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if active_path?('/profile') %>">
               <a id="global_nav_profile_link" href="/profile" class="ic-app-header__menu-list-link">
                 <div class="menu-item-icon-container" aria-hidden="true">
                   <div class="ic-avatar <% if @real_current_user && @real_current_user != @current_user %>ic-avatar--fake-student<% end %>">
