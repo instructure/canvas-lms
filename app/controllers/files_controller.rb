@@ -321,7 +321,7 @@ class FilesController < ApplicationController
   end
 
   def react_files
-    if authorized_action(@context, @current_user, :read) && tab_enabled?(@context.class::TAB_FILES)
+    if authorized_action(@context, @current_user, [:read, :manage_files]) && tab_enabled?(@context.class::TAB_FILES)
       @contexts = [@context]
       get_all_pertinent_contexts(include_groups: true) if @context == @current_user
       files_contexts = @contexts.map do |context|
