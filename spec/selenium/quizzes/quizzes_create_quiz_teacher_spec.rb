@@ -87,58 +87,62 @@ describe 'creating a quiz' do
       expect(f("#summary_quiz_#{@quiz.id} .icon-publish")).to be_displayed
     end
 
-    it 'creates a quiz directly from the index page', priority: "1", test_id: 210055 do
-      get "/courses/#{@course.id}/quizzes"
-      expect_new_page_load { f('.new-quiz-link').click }
-      expect_new_page_load do
-        click_save_settings_button
-        wait_for_ajax_requests
+    context 'when on the quizzes index page' do
+      before(:each) do
+        get "/courses/#{@course.id}/quizzes"
+        expect_new_page_load do
+          f('.new-quiz-link').click
+          wait_for_ajaximations
+        end
       end
-      expect(f('#quiz_title')).to include_text 'Unnamed Quiz'
-    end
 
-    it 'creates and previews a new quiz', priority: "1", test_id: 210056 do
-      get "/courses/#{@course.id}/quizzes"
-      expect_new_page_load do
-        f('.new-quiz-link').click
+      it 'creates a quiz directly from the index page', priority: "1", test_id: 210055 do
+        expect_new_page_load do
+          click_save_settings_button
+          wait_for_ajax_requests
+        end
+        expect(f('#quiz_title')).to include_text 'Unnamed Quiz'
+      end
+
+      it 'redirects to the correct quiz edit form', priority: "2", test_id: 399887 do
+        # check url
+        expect(driver.current_url).to match %r{/courses/\d+/quizzes/\d+\/edit}
+
+        # check quiz id
+        # The =~ operator compares the regex with the string.
+        # The (?<quiz_id>(\d+)) part of the regex tells the =~ to assign
+        # the value of the number found therein to the variable, quiz_id.
+        %r courses/\d+/quizzes/(?<quiz_id>(\d+))/edit =~ driver.current_url
+        expect(quiz_id.to_i).to be > 0
+      end
+
+      it 'creates and previews a new quiz', priority: "1", test_id: 210056 do
+        # input name and description then save quiz
+        replace_content(f('#quiz_title'), 'new quiz')
+        description_text = 'new description'
+        keep_trying_until { expect(f('#quiz_description_ifr')).to be_displayed }
+        type_in_tiny '#quiz_description', description_text
+        in_frame 'quiz_description_ifr' do
+          expect(f('#tinymce')).to include_text(description_text)
+        end
+
+        # add a question
+        click_questions_tab
+        click_new_question_button
+        submit_form('.question_form')
         wait_for_ajaximations
-      end
 
-      # check url
-      expect(driver.current_url).to match %r{/courses/\d+/quizzes/(\d+)\/edit}
-
-      # check quiz id
-      # The =~ operator compares the regex with the string.
-      # The (?<quiz_id>(\d+)) part of the regex tells the =~ to assign
-      # the value of the number found therein to the variable, quiz_id.
-      %r courses/\d+/quizzes/(?<quiz_id>(\d+))/edit =~ driver.current_url
-      expect(quiz_id.to_i).to be > 0
-
-      # input name and description then save quiz
-      replace_content(f('#quiz_title'), 'new quiz')
-      test_text = 'new description'
-      keep_trying_until { expect(f('#quiz_description_ifr')).to be_displayed }
-      type_in_tiny '#quiz_description', test_text
-      in_frame 'quiz_description_ifr' do
-        expect(f('#tinymce')).to include_text(test_text)
-      end
-
-      # add a question
-      click_questions_tab
-      click_new_question_button
-      submit_form('.question_form')
-      wait_for_ajaximations
-
-      # save the quiz
-      expect_new_page_load do
-        click_save_settings_button
+        # save the quiz
+        expect_new_page_load do
+          click_save_settings_button
+          wait_for_ajaximations
+        end
         wait_for_ajaximations
-      end
-      wait_for_ajaximations
 
-      # check quiz preview
-      f('#preview_quiz_button').click
-      expect(f('#questions')).to be_present
+        # check quiz preview
+        f('#preview_quiz_button').click
+        expect(f('#questions')).to be_present
+      end
     end
 
     it 'inserts files using the rich content editor', priority: "1", test_id: 132545 do
@@ -153,6 +157,5 @@ describe 'creating a quiz' do
       insert_file_from_rce(:quiz)
       expect(fln('b_file.txt')).to be_displayed
     end
-
   end
 end

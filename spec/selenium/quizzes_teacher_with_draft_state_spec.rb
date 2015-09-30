@@ -12,27 +12,6 @@ describe 'quizzes with draft state' do
     @course.reload
   end
 
-  it 'clicking the publish button publishes a quiz', priority: "1", test_id: 210051 do
-    @context = @course
-    q = quiz_model
-    q.unpublish!
-
-    get "/courses/#{@course.id}/quizzes/#{q.id}"
-    expect(f('#quiz-publish-link')).not_to include_text('Published')
-    expect(f('#quiz-publish-link')).to include_text('Publish')
-
-    expect_new_page_load do
-      f('.quiz-publish-button').click
-      wait_for_ajaximations
-    end
-
-    # move mouse to not be hover over the button
-    driver.mouse.move_to f('#footer')
-    keep_trying_until {
-      expect(f('#quiz-publish-link')).to include_text('Published')
-    }
-  end
-
   it 'clicking the unpublish button unpublishes a quiz', priority: "1", test_id: 210052 do
     @context = @course
     q = quiz_model

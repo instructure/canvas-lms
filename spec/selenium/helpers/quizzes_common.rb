@@ -32,11 +32,12 @@ require_relative "../common"
     f('.ContainerDueDate .ic-token-delete-button').click
   end
 
-  def create_multiple_choice_question
+  def create_multiple_choice_question(opts={})
     question = fj(".question_form:visible")
     click_option('.question_form:visible .question_type', 'Multiple Choice')
 
-    type_in_tiny ".question_form:visible textarea.question_content", 'Hi, this is a multiple choice question.'
+    question_description = opts.fetch(:description, 'Hi, this is a multiple choice question.')
+    type_in_tiny ".question_form:visible textarea.question_content", question_description
 
     answers = question.find_elements(:css, ".form_answers > .answer")
     expect(answers.length).to eq 4
@@ -335,6 +336,13 @@ require_relative "../common"
       wait_for_ajaximations
       f('.quiz-edit-button').click
     }
+  end
+
+  def cancel_quiz_edit
+    expect_new_page_load do
+      fj('#cancel_button', 'div#quiz_edit_actions').click
+      wait_for_ajaximations
+    end
   end
 
   def edit_first_multiple_choice_answer(text)
