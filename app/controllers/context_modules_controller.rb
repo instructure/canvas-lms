@@ -424,7 +424,14 @@ class ContextModulesController < ApplicationController
         elsif @context.grants_right?(@current_user, session, :participate_as_student)
           @progressions = @context.context_modules.active.order(:id).map{|m| m.evaluate_for(@current_user) }
         else
-          @progressions = []
+          # module progressions don't apply, but unlock_at still does
+          @progressions = @context.context_modules.active.order(:id).map do |m|
+            { :context_module_progression =>
+                { :context_module_id => m.id,
+                  :workflow_state => (m.to_be_unlocked ? 'locked' : 'unlocked'),
+                  :requirements_met => [],
+                  :incomplete_requirements => [] } }
+          end
         end
         render :json => @progressions
       elsif !@context.grants_right?(@current_user, session, :view_all_grades)
