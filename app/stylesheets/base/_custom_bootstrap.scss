@@ -16,22 +16,16 @@
 @import "vendor/bootstrap/tables";
 
 // Components: common
-//@import "vendor/bootstrap/sprites"; //we do our own icons
 @import "vendor/bootstrap/dropdowns";
 @import "vendor/bootstrap/wells";
 @import "vendor/bootstrap/component-animations";
 @import "vendor/bootstrap/close";
-
-// Components: Alerts
-@import "vendor/bootstrap/alerts";
 
 // Components: Nav
 @import "vendor/bootstrap/navs";
 @import "vendor/bootstrap/pagination";
 
 // Components: Popovers
-//@import "vendor/bootstrap/modals"; // use jqueryUI instead
-//@import "vendor/bootstrap/tooltip"; // we do our own
 @import "vendor/bootstrap/popovers";
 
 // Components: Misc
