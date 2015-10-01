@@ -119,6 +119,7 @@ define([
     },
 
     render() {
+      var colorInputValue = (this.props.placeholder !== "none") ? this.props.placeholder : null;
       return (
         <section className="Theme__editor-accordion_element Theme__editor-color ic-Form-control">
           <div className="Theme__editor-form--color">
@@ -139,7 +140,7 @@ define([
                   className="Theme__editor-color-block_input-sample Theme__editor-color-block_input"
                   type="color"
                   ref="colorpicker"
-                  value={this.props.placeholder}
+                  value={colorInputValue}
                   role="presentation-only"
                   onChange={event => this.inputChange(event.target.value) } />
               </label>

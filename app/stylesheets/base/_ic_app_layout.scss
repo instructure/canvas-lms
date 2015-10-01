@@ -45,7 +45,17 @@ $ic-left-side-width: $ic-sp*15;
 
   // Theme Editor watermark gets attached to this element as a background image
   body:not(.no-headers) & {
-    background: $ic-brand-watermark left bottom no-repeat;
+    z-index: 1;
+
+    &:before {
+      content: "";
+      bottom: 0; left: 0;
+      width: 100%; height: 100%;
+      position: absolute;
+      z-index: -1;
+      opacity: $ic-brand-watermark-opacity;
+      background: transparent $ic-brand-watermark left bottom no-repeat;
+    }
   }
 
   body.ic-no-flex-layout & {
