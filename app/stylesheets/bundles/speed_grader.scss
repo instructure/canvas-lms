@@ -202,12 +202,25 @@ $gradebook_header_height: 52px;
     height: $gradebook_header_height - 1px;
     li {
       height: $gradebook_header_height;
+      min-width: 275px;
       &.ui-state-active {
         background: #f2f2f2;
+        button {
+          float: right;
+          margin: 6px 14px;
+          display: inline-block;
+        }
+        &.selected button, &.pending button {
+          display: none;
+        }
+      }
+      &.selected .selected_icon {
+        display: inline-block;
+        color: $ic-brand-primary;
+        padding-right: 6px;
       }
       a {
         padding: 14px 12px;
-        width: 300px;
         text-decoration: none;
         span {
           padding: 0 8px;
@@ -215,6 +228,9 @@ $gradebook_header_height: 52px;
             font-weight: bold;
           }
         }
+      }
+      .selected_icon, button {
+        display: none;
       }
     }
     #new_mark_container {

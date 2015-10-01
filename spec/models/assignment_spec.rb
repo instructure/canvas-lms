@@ -2907,7 +2907,7 @@ describe Assignment do
         @submission = @assignment.submit_homework(@student, :submission_type => 'online_text_entry', :body => 'ahem')
         @assignment.grade_student(@student, :comment => 'real comment', :score => 1)
 
-        @assignment.moderated_grading_selections.create!(:student => @student)
+        selection = @assignment.moderated_grading_selections.create!(:student => @student)
 
         @submission.add_comment(:author => @teacher, :comment => 'provisional comment', :provisional => true)
         teacher_pg = @submission.provisional_grade(@teacher)
@@ -2921,6 +2921,9 @@ describe Assignment do
               :comments => 'a comment',
             }
           })
+
+        selection.provisional_grade = teacher_pg
+        selection.save!
 
         @submission.add_comment(:author => @ta, :comment => 'other provisional comment', :provisional => true)
         ta_pg = @submission.provisional_grade(@ta)
@@ -2993,6 +2996,11 @@ describe Assignment do
           ta_pras = @json['submissions'][0]['provisional_grades'][1]['rubric_assessments']
           expect(ta_pras.count).to eq 1
           expect(ta_pras[0]['assessor_id']).to eq @ta.id
+        end
+
+        it "should include whether the provisional grade is selected" do
+          expect(@json['submissions'][0]['provisional_grades'][0]['selected']).to be_truthy
+          expect(@json['submissions'][0]['provisional_grades'][1]['selected']).to be_falsey
         end
       end
 

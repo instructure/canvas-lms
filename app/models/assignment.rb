@@ -1422,6 +1422,8 @@ class Assignment < ActiveRecord::Base
       {}
     end
 
+    preloaded_prov_selections = grading_role == :moderator ? self.moderated_grading_selections.index_by(&:student_id) : []
+
     res[:too_many_quiz_submissions] = too_many = too_many_qs_versions?(submissions)
     qs_versions = quiz_submission_versions(submissions, too_many)
 
@@ -1488,12 +1490,15 @@ class Assignment < ActiveRecord::Base
 
       if grading_role == :moderator
         pgs = preloaded_prov_grades[sub.id] || []
+        selection = preloaded_prov_selections[sub.user.id]
         unless pgs.count == 0 || (pgs.count == 1 && pgs.first.scorer_id == user.id)
           json['provisional_grades'] = []
           pgs.each do |pg|
             pg_json = pg.grade_attributes.tap do |json|
               json[:rubric_assessments] = all_provisional_rubric_assmnts.select{|ra| ra.artifact_id == pg.id}.
                 as_json(:methods => [:assessor_name], :include_root => false)
+
+              json[:selected] = !!(selection && selection.selected_provisional_grade_id == pg.id)
 
               crocodoc_urls = []
               sub_attachments.each do |a|

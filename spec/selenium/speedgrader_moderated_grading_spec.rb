@@ -430,6 +430,114 @@ describe "speed grader" do
       expect(final_pg.score.to_i).to eql 7
       expect(ff('#moderation_tabs > ul > li')[2]).to include_text("7/8")
     end
+
+    context "moderated grade selection" do
+      before :once do
+        @other_ta = course_with_ta(:course => @course, :active_all => true).user
+        @pg1 = @submission.find_or_create_provisional_grade!(scorer: @other_ta, score: 7)
+        @selection = @assignment.moderated_grading_selections.create!(:student => @student)
+      end
+
+      it "should be able to select a provisional grade" do
+        @other_ta2 = course_with_ta(:course => @course, :active_all => true).user
+        @pg2 = @submission.find_or_create_provisional_grade!(scorer: @other_ta2, score: 6)
+
+        @final_pg = @submission.find_or_create_provisional_grade!(scorer: @moderator, score: 2, final: true)
+
+        @selection.provisional_grade = @pg1
+        @selection.save!
+
+        get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+
+        tabs = ff('#moderation_tabs > ul > li')
+        icons = ff('#moderation_tabs .selected_icon')
+        buttons = ff('#moderation_tabs button')
+
+        # should show the 1st mark as selected on load
+        expect(icons[0]).to be_displayed
+        expect(icons[1]).to_not be_displayed
+        expect(icons[2]).to_not be_displayed
+
+        expect(buttons[0]).to_not be_displayed # don't show the select button if already selected
+        expect(buttons[1]).to_not be_displayed
+
+        tabs[2].click # show the final mark
+        wait_for_ajaximations
+
+        expect(buttons[2]).to be_displayed
+        buttons[2].click
+        wait_for_ajaximations
+
+        expect(buttons[2]).to_not be_displayed
+        expect(icons[0]).to_not be_displayed
+        expect(icons[2]).to be_displayed # should show the final mark as selected
+
+        @selection.reload
+        expect(@selection.provisional_grade).to eq @final_pg # should actually be selected
+
+        # now repeat for the 2nd mark
+        tabs[1].click
+        wait_for_ajaximations
+
+        expect(buttons[1]).to be_displayed
+        buttons[1].click
+        wait_for_ajaximations
+
+        expect(buttons[1]).to_not be_displayed
+        expect(icons[0]).to_not be_displayed
+        expect(icons[1]).to be_displayed
+        expect(icons[2]).to_not be_displayed
+
+        @selection.reload
+        expect(@selection.provisional_grade).to eq @pg2 # should actually be selected
+      end
+
+      it "should be able to select a newly created provisional grade (once it's saved)" do
+        get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+        f('#moderation_tabs #new_mark_dropdown_link').click
+        wait_for_ajaximations
+        f('#new_mark_link').click
+        wait_for_ajaximations
+
+        # should not show the select button until we have a real provisional grade
+        mark_tab2 = ff('#moderation_tabs > ul > li')[1]
+        mark_tab2_button = mark_tab2.find('button')
+        expect(mark_tab2_button).to_not be_displayed
+
+        replace_content f('#grading-box-extended'), "8"
+        driver.execute_script '$("#grading-box-extended").change()'
+        wait_for_ajaximations
+
+        expect(mark_tab2_button).to be_displayed
+        mark_tab2_button.click # select the provisional grade
+        wait_for_ajaximations
+
+        expect(mark_tab2_button).to_not be_displayed
+        expect(mark_tab2.find('.selected_icon')).to be_displayed
+
+        @selection.reload
+        expect(@selection.provisional_grade).to eq @submission.provisional_grade(@moderator)
+      end
+
+      it "should automatically select the copied final grade" do
+        @selection.provisional_grade = @pg1
+        @selection.save!
+
+        get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+
+        f('#moderation_tabs #new_mark_dropdown_link').click
+        wait_for_ajaximations
+        f('#new_mark_copy_link1').click
+        wait_for_ajaximations
+
+        @selection.reload
+        expect(@selection.provisional_grade).to eq @submission.provisional_grade(@moderator, final: true)
+
+        icons = ff('#moderation_tabs .selected_icon')
+        expect(icons[0]).to_not be_displayed
+        expect(icons[2]).to be_displayed
+      end
+    end
   end
 
   context "as a provisional grader" do

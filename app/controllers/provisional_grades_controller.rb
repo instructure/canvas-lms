@@ -147,7 +147,7 @@ class ProvisionalGradesController < ApplicationController
       final_mark = pg.copy_to_final_mark!(@current_user)
       selection.provisional_grade = final_mark
       selection.save!
-      render :json => provisional_grade_json(final_mark, pg.submission, @assignment, @current_user, %w(submission_comments rubric_assessment))
+      render :json => provisional_grade_json(final_mark, pg.submission, @assignment, @current_user, %w(submission_comments rubric_assessment)).merge(:selected => true)
     end
   end
 
