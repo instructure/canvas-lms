@@ -9,9 +9,14 @@ module Canvas::Oauth
     PURPOSE_KEY = 'purpose'
     REMEMBER_ACCESS = 'remember_access'
 
-    def initialize(key, code)
+    def initialize(key, code, access_token=nil)
       @key = key
-      @code = code
+      @code = code if code
+      if access_token
+        @access_token = access_token
+        @user = @access_token.user
+      end
+
     end
 
     def is_for_valid_code?

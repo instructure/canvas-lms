@@ -96,7 +96,7 @@ describe Oauth2ProviderController do
     end
   end
 
-  describe 'GET token' do
+  describe 'POST token' do
     let_once(:key) { DeveloperKey.create! }
     let_once(:user) { User.create! }
     let(:valid_code) {"thecode"}
@@ -110,20 +110,20 @@ describe Oauth2ProviderController do
     end
 
     it 'renders a 400 if theres no client_id' do
-      get :token
+      post :token
       assert_status(400)
       expect(response.body).to match /invalid client_id/
     end
 
     it 'renders a 400 if the secret is invalid' do
-      get :token, :client_id => key.id, :client_secret => key.api_key + "123"
+      post :token, :client_id => key.id, :client_secret => key.api_key + "123"
       assert_status(400)
       expect(response.body).to match /invalid client_secret/
     end
 
     it 'renders a 400 if the provided code does not match a token' do
       Canvas.stubs(:redis => redis)
-      get :token, :client_id => key.id, :client_secret => key.api_key, :code => "NotALegitCode"
+      post :token, :client_id => key.id, :client_secret => key.api_key, :code => "NotALegitCode"
       assert_status(400)
       expect(response.body).to match /invalid code/
     end
@@ -131,15 +131,24 @@ describe Oauth2ProviderController do
     it 'outputs the token json if everything checks out' do
       redis.expects(:del).with(valid_code_redis_key).at_least_once
       Canvas.stubs(:redis => redis)
-      get :token, :client_id => key.id, :client_secret => key.api_key, :code => valid_code
+      post :token, client_id: key.id, client_secret: key.api_key, grant_type: 'authorization_code', code: valid_code
       expect(response).to be_success
       expect(JSON.parse(response.body).keys.sort).to match_array(['access_token',  'refresh_token', 'user'])
+    end
+
+    it 'default grant_type to authorization_code if none is supplied and code is present' do
+      redis.expects(:del).with(valid_code_redis_key).at_least_once
+      Canvas.stubs(:redis => redis)
+      post :token, :client_id => key.id, :client_secret => key.api_key, :code => valid_code
+      expect(response).to be_success
+      json = JSON.parse(response.body)
+      expect(json.keys.sort).to eq ['access_token', 'refresh_token', 'user']
     end
 
     it 'deletes existing tokens for the same key when replace_tokens=1' do
       old_token = user.access_tokens.create! :developer_key => key
       Canvas.stubs(:redis => redis)
-      get :token, :client_id => key.id, :client_secret => key.api_key, :code => valid_code, :replace_tokens => '1'
+      post :token, :client_id => key.id, :client_secret => key.api_key, :code => valid_code, :replace_tokens => '1'
       expect(response).to be_success
       expect(AccessToken.exists?(old_token.id)).to be(false)
     end
@@ -147,9 +156,63 @@ describe Oauth2ProviderController do
     it 'does not delete existing tokens without replace_tokens' do
       old_token = user.access_tokens.create! :developer_key => key
       Canvas.stubs(:redis => redis)
-      get :token, :client_id => key.id, :client_secret => key.api_key, :code => valid_code
+      post :token, :client_id => key.id, :client_secret => key.api_key, :code => valid_code
       expect(response).to be_success
       expect(AccessToken.exists?(old_token.id)).to be(true)
+    end
+
+    context 'grant_type refresh_token' do
+      it 'must specify grant_type' do
+        post :token, client_id: key.id, client_secret: key.api_key, refresh_token: "SAFASDFASDF"
+        assert_status(400)
+        json = JSON.parse(response.body)
+        expect(json['error']).to eq "unsupported_grant_type"
+      end
+
+      it 'should not generate a new access_token with an invalid refresh_token' do
+        old_token = user.access_tokens.create! :developer_key => key
+        refresh_token = old_token.plaintext_refresh_token
+
+        post :token, client_id: key.id, client_secret: key.api_key, grant_type: "refresh_token", refresh_token: refresh_token + "ASDAS"
+        assert_status(400)
+        json = JSON.parse(response.body)
+        expect(json['error']).to eq "invalid_request"
+        expect(json['error_description']).to eq "refresh_token not found"
+      end
+
+      it 'should generate a new access_token' do
+        old_token = user.access_tokens.create! :developer_key => key
+        refresh_token = old_token.plaintext_refresh_token
+        access_token = old_token.full_token
+
+        post :token, client_id: key.id, client_secret: key.api_key, grant_type: "refresh_token", refresh_token: refresh_token
+        json = JSON.parse(response.body)
+        expect(json['access_token']).to_not eq access_token
+      end
+
+      it 'should be able to regenerate access_token multiple times' do
+        old_token = user.access_tokens.create! :developer_key => key
+        refresh_token = old_token.plaintext_refresh_token
+        access_token = old_token.full_token
+
+        post :token, client_id: key.id, client_secret: key.api_key, grant_type: "refresh_token", refresh_token: refresh_token
+        json = JSON.parse(response.body)
+        expect(json['access_token']).to_not eq access_token
+
+        access_token = json['access_token']
+        post :token, client_id: key.id, client_secret: key.api_key, grant_type: "refresh_token", refresh_token: refresh_token
+        json = JSON.parse(response.body)
+        expect(json['access_token']).to_not eq access_token
+      end
+    end
+
+    context 'unsupported grant_type' do
+      it 'returns a 400' do
+        post :token, :client_id => key.id, :client_secret => key.api_key, :grant_type => "client_credentials"
+        assert_status(400)
+        json = JSON.parse(response.body)
+        expect(json['error']).to eq "unsupported_grant_type"
+      end
     end
   end
 
