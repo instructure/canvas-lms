@@ -50,7 +50,7 @@ define([
           }
         } else {
           var assignments = _.flatten(_.pluck(assignmentGroups, 'assignments')),
-              pointsPossible = _.inject(assignments, (sum, a) => (a.points_possible || 0), 0);
+              pointsPossible = _.inject(assignments, (sum, a) => sum + (a.points_possible || 0), 0);
 
           if (pointsPossible === 0) {
             TotalColumn.displayWarning = I18n.t("Can't compute score until an assignment has points possible");

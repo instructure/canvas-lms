@@ -580,6 +580,21 @@ describe "gradebook2" do
       expect(f('#gradebook_grid .container_1 .slick-row:nth-child(1) .total-cell .percentage')).to include_text('100%') # otherwise 108%
     end
 
+    it "should not show assignment mute warning in total column for 'not_graded', muted assignments" do
+      assignment = @course.assignments.create!({
+                                                title: 'Non Graded Assignment',
+                                                due_at: (Time.now + 1.week),
+                                                points_possible: 10,
+                                                submission_types: 'not_graded'
+                                             })
+
+      assignment.mute!
+      get "/courses/#{@course.id}/gradebook2"
+      wait_for_ajaximations
+
+      expect(ff(".total-cell .icon-muted")).to be_empty
+    end
+
     it "should hide and show student names" do
 
       def toggle_hiding_students

@@ -118,9 +118,6 @@ define([
       arrangeBy = this.state.toolbarOptions.arrangeColumnsBy;
       comparator = ColumnArranger.getComparator(arrangeBy);
       assignments = _.chain(this.state.tableData.assignments.data)
-//        .map(assignmentGroup => assignmentGroup.assignments)
-//        .flatten()
-//        .filter(assignment => assignment.published)
         .filter(assignment =>
                 GradingPeriodsStore.assignmentIsInPeriod(assignment, GradingPeriodsStore.selected()))
         .value();

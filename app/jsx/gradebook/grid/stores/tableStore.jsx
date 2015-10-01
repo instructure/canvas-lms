@@ -48,6 +48,7 @@ define([
       assignments = _.chain(assignmentGroupData.data)
         .map(assignmentGroup => assignmentGroup.assignments)
         .flatten()
+        .reject(assignment => _.contains(assignment.submission_types, 'attendence'))
         .filter(assignment => assignment.published)
         .value();
 

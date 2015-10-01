@@ -62,10 +62,10 @@ define([
 
     formatAssignmentGroups(groups) {
       return _.map(groups, (group) => {
-        group.assignments = _.map(
-          group.assignments,
-          assignment => this.formatAssignment(assignment, group)
-        );
+        group.assignments = _.chain(group.assignments)
+          .reject(assignment => _.contains(assignment.submission_types, 'not_graded'))
+          .map(assignment => this.formatAssignment(assignment, group))
+          .value();
 
         return group;
       });

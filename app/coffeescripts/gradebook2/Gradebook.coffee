@@ -1502,7 +1502,10 @@ define [
     setAssignmentWarnings: =>
       @totalGradeWarning = null
 
-      if _.any(@assignments, (a) -> a.muted)
+      gradebookVisibleAssignments = _.reject @assignments, (assignment) ->
+        _.contains(assignment.submission_types, 'not_graded')
+
+      if _.any(gradebookVisibleAssignments, (a) -> a.muted)
         @totalGradeWarning =
           warningText: I18n.t "This grade differs from the student's view of the grade because some assignments are muted"
           icon: "icon-muted"
