@@ -1,10 +1,11 @@
 define [
   'jquery'
   'underscore'
+  'compiled/util/fcUtil'
   'compiled/calendar/commonEventFactory'
   'jquery.ajaxJSON'
   'vendor/jquery.ba-tinypubsub'
-], ($, _, commonEventFactory) ->
+], ($, _, fcUtil, commonEventFactory) ->
 
   class
     constructor: (contexts) ->
@@ -222,8 +223,8 @@ define [
 
         {
           context_codes: contexts
-          start_date: $.unfudgeDateForProfileTimezone(startDay).toISOString()
-          end_date: $.unfudgeDateForProfileTimezone(endDay).toISOString()
+          start_date: fcUtil.unwrap(startDay).toISOString()
+          end_date: fcUtil.unwrap(endDay).toISOString()
         }
 
       paramsForUndatedEvents = (contexts) =>
@@ -274,7 +275,7 @@ define [
           for key, requestResult of requestResults
             if requestResult.next && requestResult.maxDate < nextPageDate
               nextPageDate = requestResult.maxDate
-        nextPageDate.setHours(0, 0, 0) if nextPageDate
+        nextPageDate.hours(0) if nextPageDate
 
         lastKnownDate = start
         for key, requestResult of requestResults

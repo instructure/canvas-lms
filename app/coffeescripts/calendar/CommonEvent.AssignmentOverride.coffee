@@ -2,9 +2,10 @@ define [
   'i18n!calendar'
   'jquery'
   'compiled/calendar/CommonEvent'
+  'compiled/util/fcUtil'
   'jquery.instructure_date_and_time'
   'jquery.instructure_misc_helpers'
-], (I18n, $, CommonEvent) ->
+], (I18n, $, CommonEvent, fcUtil) ->
 
   deleteConfirmation = I18n.t('prompts.delete_override', 'Are you sure you want to delete this assignment override?')
 
@@ -44,15 +45,15 @@ define [
       @assignment.html_url
 
     parseStartDate: () ->
-      if @assignment.due_at then $.fudgeDateForProfileTimezone(@assignment.due_at) else null
+      fcUtil.wrap(@assignment.due_at) if @assignment.due_at
 
     displayTimeString: () ->
-      unless datetime = @originalStart
-        return "No Date" # TODO: i18n
-
-      # TODO: i18n
-      datetime = $.unfudgeDateForProfileTimezone(datetime)
-      "Due: <time datetime='#{datetime.toISOString()}'>#{$.datetimeString(datetime)}</time>"
+      datetime = @originalStart
+      if datetime
+        # TODO: i18n
+        "Due: #{@formatTime(datetime)}"
+      else
+        I18n.t('No Date')
 
     readableType: () ->
       @readableTypes[@assignmentType()]
@@ -63,7 +64,7 @@ define [
       @title = "#{title} #{titleContext}"
 
     saveDates: (success, error) =>
-      @save { 'assignment_override[due_at]': if @start then $.unfudgeDateForProfileTimezone(@start).toISOString() else ''}, success, error
+      @save { 'assignment_override[due_at]': if @start then fcUtil.unwrap(@start).toISOString() else ''}, success, error
 
     methodAndURLForSave: () ->
       url = $.replaceTags(@contextInfo.assignment_override_url,

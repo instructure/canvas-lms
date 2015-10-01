@@ -21,6 +21,11 @@ define [
   class ShowEventDetailsDialog
     constructor: (event, @dataSource) ->
       @event = event
+
+      # temporary fix until root cause is found
+      @event._start = event.start
+      @event._end = event.end
+
       @contexts = event.contexts
 
     showEditDialog:() =>

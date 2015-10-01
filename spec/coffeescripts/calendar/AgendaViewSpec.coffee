@@ -2,6 +2,7 @@ define [
   'jquery'
   'underscore'
   'timezone'
+  'compiled/util/fcUtil'
   'vendor/timezone/America/Denver'
   'vendor/timezone/America/Juneau'
   'vendor/timezone/fr_FR'
@@ -10,7 +11,7 @@ define [
   'helpers/ajax_mocks/api/v1/calendarEvents'
   'helpers/ajax_mocks/api/v1/calendarAssignments'
   'helpers/I18nStubber'
-], ($, _, tz, denver, juneau, french, AgendaView, EventDataSource, eventResponse, assignmentResponse, I18nStubber) ->
+], ($, _, tz, fcUtil, denver, juneau, french, AgendaView, EventDataSource, eventResponse, assignmentResponse, I18nStubber) ->
   loadEventPage = (server, includeNext = false) ->
     sendCustomEvents(server, eventResponse, assignmentResponse, includeNext)
 
@@ -25,8 +26,8 @@ define [
       @container = $('<div />', id: 'agenda-wrapper').appendTo('#fixtures')
       @contexts = [{"asset_string":"user_1"}, {"asset_string":"course_2"}, {"asset_string":"group_3"}]
       @contextCodes = ["user_1", "course_2", "group_3"]
-      @startDate = new Date()
-      @startDate.setYear(2001)
+      @startDate = fcUtil.now()
+      @startDate.year(2001)
       @dataSource = new EventDataSource(@contexts)
       @server = sinon.fakeServer.create()
       @snapshot = tz.snapshot()

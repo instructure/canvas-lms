@@ -92,7 +92,7 @@ define [
 
     _dateFieldSelect: ->
       data = @_enterKeyData || @_currentSelectedDate()
-      @_triggerDate data.date unless data.invalid or data.blank
+      @_triggerDate data['unfudged-date'] unless data.invalid or data.blank
       @hidePicker()
 
     _triggerPrev: (event) ->

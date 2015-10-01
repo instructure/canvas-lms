@@ -75,7 +75,7 @@ describe "calendar2" do
         get "/groups/#{@group.id}"
         expect_new_page_load { f('.event-list-view-calendar').click }
         event_name = 'some name'
-        create_calendar_event(event_name, true, false, false)
+        create_calendar_event(event_name, false, false, false)
 
         event = @group.calendar_events.last
         expect(event.title).to eq event_name

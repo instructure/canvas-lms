@@ -19,7 +19,7 @@ define [
     fudged = $.fudgeDateForProfileTimezone(@original)
     equal fudged.toString('yyyy-MM-dd HH:mm:ss'), tz.format(@original, '%F %T')
 
-  test 'should parse dates before the year 1000', ->
+  test 'should parse dates before the year 1000', -> 
     # using specific string (and specific timezone to guarantee it) since tz.format has a bug pre-1000
     tz.changeZone(detroit, 'America Detroit')
     oldDate = new Date(Date.UTC(900, 1, 1, 0, 0, 0))

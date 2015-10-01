@@ -1,9 +1,10 @@
 define [
   'i18n!calendar'
   'jquery'
+  'compiled/util/fcUtil'
   'jquery.ajaxJSON'
   'vendor/jquery.ba-tinypubsub'
-], (I18n, $) ->
+], (I18n, $, fcUtil) ->
 
   class
     readableTypes:
@@ -22,19 +23,19 @@ define [
 
       @copyDataFromObject(data)
 
-    isNewEvent: () =>
+    isNewEvent: () ->
       @eventType == 'generic' || !@object?.id
 
-    isAppointmentGroupFilledEvent: () =>
+    isAppointmentGroupFilledEvent: () ->
       @object?.child_events?.length > 0
 
-    isAppointmentGroupEvent: () =>
+    isAppointmentGroupEvent: () ->
       @object?.appointment_group_url
 
-    contextCode: () =>
+    contextCode: () ->
       @object?.effective_context_code || @object?.context_code || @contextInfo?.asset_string
 
-    isUndated: () =>
+    isUndated: () ->
       @start == null
 
     isCompleted: -> false
@@ -49,7 +50,7 @@ define [
 
     possibleContexts: () -> @allPossibleContexts || [ @contextInfo ]
 
-    addClass: (newClass) =>
+    addClass: (newClass) ->
       found = false
       for c in @className
         if c == newClass
@@ -57,7 +58,7 @@ define [
           break
       if !found then @className.push newClass
 
-    removeClass: (rmClass) =>
+    removeClass: (rmClass) ->
       idx = 0
       for c in @className
         if c == rmClass
@@ -65,13 +66,14 @@ define [
         else
           idx += 1
 
-    save: (params, success, error) =>
+    save: (params, success, error) ->
       onSuccess = (data) =>
         @copyDataFromObject(data)
         $.publish "CommonEvent/eventSaved", this
         success?()
 
       onError = (data) =>
+        @copyDataFromObject(data)
         $.publish "CommonEvent/eventSaveFailed", this
         error?()
 
@@ -82,29 +84,33 @@ define [
       $.ajaxJSON url, method, params, onSuccess, onError
 
     isDueAtMidnight: () ->
-      @start && (@midnightFudged || (@start.getHours() == 23 && @start.getMinutes() > 30))
+      @start && (@midnightFudged || (@start.hours() == 23 && @start.minutes() > 30) || (@start.hours() == 0 && @start.minutes() == 0))
 
     isPast: () ->
-      now = $.fudgeDateForProfileTimezone(new Date)
+      now = $.fullCalendar.moment()
       @start && @start < now
 
     copyDataFromObject: (data) ->
-      @originalStart = (new Date(@start) if @start)
+      @originalStart = fcUtil.clone(@start) if @start
       @midnightFudged = false # clear out cached value because now we have new data
       if @isDueAtMidnight()
         @midnightFudged = true
-        @start.setMinutes(30)
-        @start.setSeconds(0)
-        @end = new Date(@start.getTime()) unless @end
+        @start.minutes(30)
+        @start.seconds(0)
+        @end = fcUtil.clone(@start) unless @end
       else
         # minimum duration should only be enforced if not due at midnight
         @forceMinimumDuration()
 
+    formatTime: (datetime) ->
+      datetime = fcUtil.unwrap(datetime)
+      "<time datetime='#{datetime.toISOString()}'>#{$.datetimeString(datetime)}</time>"
+
     forceMinimumDuration: () ->
       minimumDuration = 30 * 60 * 1000 # 30 minutes
-      if @start && @end && (@end.getTime() - @start.getTime()) < minimumDuration
+      if @start && @end && (@end - @start) < minimumDuration
         # new date so we don't mutate the original
-        @end = new Date(@start.getTime() + minimumDuration)
+        @end = fcUtil.clone(@start).add(minimumDuration, "milliseconds")
 
     assignmentType: () ->
       return if !@assignment

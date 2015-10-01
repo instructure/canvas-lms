@@ -4,8 +4,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../helpers/quizzes_common')
 
 describe "calendar2" do
   include_context "in-process server selenium tests"
-
-  before (:each) do
+  before(:each) do
     Account.default.tap do |a|
       a.settings[:show_scheduler]   = true
       a.save!
@@ -74,7 +73,7 @@ describe "calendar2" do
         event = make_event(start: yesterday)
         load_agenda_view
         expect(ffj('.ig-row').length).to eq 0
-        f('.fc-button-prev').click
+        f('.fc-prev-button').click
         f('#right-side .fc-day-number').click
         wait_for_ajaximations
         keep_trying_until { expect(ffj('.ig-row').length).to eq 1 }
@@ -233,7 +232,7 @@ describe "calendar2" do
 
       it "show quizes on agenda view", priority: "1", test_id: 138850 do
         create_quiz
-
+  
         load_agenda_view
         expect(f(".agenda-event")).to include_text('Test Quiz')
       end

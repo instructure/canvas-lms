@@ -2,7 +2,8 @@ define [
   'jquery'
   'i18n!calendar'
   'jst/calendar/TimeBlockRow'
-], ($, I18n, timeBlockRowTemplate) ->
+  'compiled/util/fcUtil'
+], ($, I18n, timeBlockRowTemplate, fcUtil) ->
 
   class TimeBlockRow
     constructor: (@TimeBlockList, data={}) ->
@@ -81,27 +82,23 @@ define [
 
     timeToDate: (date, time) ->
       return unless date and time
-      date = $.fudgeDateForProfileTimezone(date)
-      time = $.fudgeDateForProfileTimezone(time)
 
       # set all three values at once to handle potential
       # conflicts in how month rollover happens
-      time.setFullYear(
-        date.getFullYear(),
-        date.getMonth(),
-        date.getDate()
-      )
+      time.year(date.year())
+      time.month(date.month())
+      time.date(date.date())
 
       return time
 
     startAt: ->
-      date = @$date.data('unfudged-date')
-      time = @$start_time.data('unfudged-date')
+      date = fcUtil.wrap(@$date.data("unfudged-date"))
+      time = fcUtil.wrap(@$start_time.data("unfudged-date"))
       @timeToDate(date, time)
 
     endAt: ->
-      date = @$date.data('unfudged-date')
-      time = @$end_time.data('unfudged-date')
+      date = fcUtil.wrap(@$date.data("unfudged-date"))
+      time = fcUtil.wrap(@$end_time.data("unfudged-date"))
       @timeToDate(date, time)
 
     getData: ->

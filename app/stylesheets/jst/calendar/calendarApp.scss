@@ -9,29 +9,24 @@
   position: relative;
 }
 
-#calendar_event_location_info {
-  #calendar_event_location_name {
-    width: 185px;
-    margin: 10px 0 10px 15px;
-  }
-  #calendar_event_location_address {
-    width: 250px;
-    margin-left: 17px;
-  }
-}
-
 .calendar, #calendar-drag-and-drop-container {
-  .fc-content {
+  .fc-view-container {
     background-color: white;
   }
-  .fc-view-month .fc-widget-header {
+  .fc-month-view .fc-widget-header {
     font-size: 14px;
     background-color: #f6f7f9;
     line-height: 35px;
     color: $ic-font-color--subdued;
     font-weight: 500;
   }
-  .fc-view-agendaWeek thead .fc-widget-header {
+  .fc-month-view .fc-widget-content .fc-row {
+    min-height: 12em;
+  }
+  .fc-row .fc-content-skeleton td, .fc-row .fc-helper-skeleton td {
+    border-color: inherit;
+  }
+  .fc-head thead .fc-widget-header {
     color: $ic-font-color--subdued;
     font-weight: bold;
     padding: 10px 0;
@@ -39,48 +34,6 @@
   }
   .fc-widget-header, .fc-widget-content {
     border-color: #dadada;
-  }
-  .fc-header {
-    h2, .h2 {
-      font-size: 18px;
-      padding: 0 16px;
-      line-height: 32px;
-    }
-  }
-  .fc-other-month {
-    color: #b4b3b3;
-    background-color: #f8f9f9;
-  }
-  .fc-state-highlight {
-    background-color: #ecf3f6;
-    box-shadow: inset 0px 0px 5px rgba(0, 0, 0, 0.3);
-  }
-  .fc-event-inner {
-    border-color: inherit;
-    width: auto;
-    @if $use_new_styles {
-      padding: $ic-sp/4;
-      line-height: 1.3;
-    }
-    @else { padding-left: 3px; }
-  }
-  .fc-event-time {
-    font-weight: bold;
-    display: inline-block;
-  }
-  .fc-agenda {
-    .fc-agenda-slots .fc-agenda-axis {
-      border-top-color: transparent;
-    }
-    .fc-widget-header {
-      background-color: #f6f7f9;
-    }
-    .scheduler-reserved {
-      font-weight: bold;
-    }
-    .scheduler-full {
-      background-color: #eeeeee !important;
-    }
   }
 }
 
@@ -190,7 +143,6 @@
   @include name_bubbles;
 }
 
-/*replicate button styles to work for fullcalendar */
 .calendar .fc-button {
   @include user-select(none);
   padding: $buttonPadding;
@@ -245,15 +197,8 @@
   margin-left: 3px;
 }
 
-.fc-grid .fc-day-number {
-  float: left;
-}
-
-// Make adjustment to calendar modal tab styles to accommodate updated tab design
-#edit_event .ui-tabs-nav {
-  li { 
-    //a { color: $ic-color-light; }
-  }
+.fc-month-view .fc-widget-content .fc-day-number {
+  text-align: left;
 }
 
 .fc-event-title { line-height: 1.3; }

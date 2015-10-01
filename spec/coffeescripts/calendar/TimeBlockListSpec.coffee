@@ -2,19 +2,23 @@
 define [
   'jquery'
   'compiled/calendar/TimeBlockList'
-], ($, TimeBlockList) ->
+  'moment'
+], ($, TimeBlockList, moment) ->
 
   module "TimeBlockList",
     setup: ->
+      wrappedDate = (str) ->
+        moment( new Date(str))
+
       @$holder = $('<table>').appendTo("#fixtures")
       @$splitter = $('<a>').appendTo("#fixtures")
       # make all of these dates in next year to gaurentee the are in the future
       nextYear = new Date().getFullYear() + 1
       @blocks = [
-        [new Date("2/3/#{nextYear} 5:32"), new Date("2/3/#{nextYear} 10:32") ]
+        [wrappedDate("2/3/#{nextYear} 5:32"), wrappedDate("2/3/#{nextYear} 10:32") ]
         # a locked one
-        [new Date("2/3/#{nextYear} 11:15"), new Date("2/3/#{nextYear} 15:01"), true ]
-        [new Date("2/3/#{nextYear} 16:00"), new Date("2/3/#{nextYear} 19:00")]
+        [wrappedDate("2/3/#{nextYear} 11:15"), wrappedDate("2/3/#{nextYear} 15:01"), true]
+        [wrappedDate("2/3/#{nextYear} 16:00"), wrappedDate("2/3/#{nextYear} 19:00")]
       ]
       @me = new TimeBlockList(@$holder, @$splitter, @blocks)
 

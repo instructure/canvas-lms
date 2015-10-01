@@ -117,17 +117,17 @@ describe "calendar2" do
       it "should delete an assignment" do
         create_middle_day_assignment
         keep_trying_until do
-          fj('.fc-event-inner').click()
+          fj('.fc-event').click()
           driver.execute_script("$('.delete_event_link').hover().click()")
           fj('.ui-dialog .ui-dialog-buttonset').displayed?
         end
         wait_for_ajaximations
         driver.execute_script("$('.ui-dialog:visible .btn-primary').hover().click()")
         wait_for_ajaximations
-        expect(fj('.fc-event-inner')).to be_nil
+        expect(fj('.fc-event')).to be_nil
         # make sure it was actually deleted and not just removed from the interface
         get("/calendar2")
-        expect(fj('.fc-event-inner')).to be_nil
+        expect(fj('.fc-event')).to be_nil
       end
 
       it "should not have a delete link for a frozen assignment" do
@@ -153,12 +153,12 @@ describe "calendar2" do
 
         # Verify known dates in calendar header and grid
         expect(get_header_text).to include_text('February 2012')
-        first_wednesday = '.calendar .fc-first .fc-day.fc-wed'
-        expect(f(first_wednesday + ' .fc-day-number').text).to eq('1')
-        expect(f(first_wednesday).attribute('data-date')).to eq('2012-02-01')
-        last_thursday = '.calendar .fc-last .fc-day.fc-thu'
-        expect(f(last_thursday + ' .fc-day-number').text).to eq('1')
-        expect(f(last_thursday).attribute('data-date')).to eq('2012-03-01')
+        first_wednesday = '.fc-day-number.fc-wed:first'
+        expect(fj(first_wednesday).text).to eq('1')
+        expect(fj(first_wednesday).attribute('data-date')).to eq('2012-02-01')
+        last_thursday = '.fc-day-number.fc-thu:last'
+        expect(fj(last_thursday).text).to eq('1')
+        expect(fj(last_thursday).attribute('data-date')).to eq('2012-03-01')
       end
 
       it "should correctly display previous month on arrow press", priority: "1", test_id: 419290 do
@@ -168,12 +168,20 @@ describe "calendar2" do
 
         # Verify known dates in calendar header and grid
         expect(get_header_text).to include_text('December 2011')
-        first_thursday = '.calendar .fc-first .fc-day.fc-thu'
-        expect(f(first_thursday + ' .fc-day-number').text).to eq('1')
-        expect(f(first_thursday).attribute('data-date')).to eq('2011-12-01')
-        last_saturday = '.calendar .fc-last .fc-day.fc-sat'
-        expect(f(last_saturday + ' .fc-day-number').text).to eq('31')
-        expect(f(last_saturday).attribute('data-date')).to eq('2011-12-31')
+        first_thursday = '.fc-day-number.fc-thu:first'
+        expect(fj(first_thursday).text).to eq('1')
+        expect(fj(first_thursday).attribute('data-date')).to eq('2011-12-01')
+        last_saturday = '.fc-day-number.fc-sat:last'
+        expect(fj(last_saturday).text).to eq('31')
+        expect(fj(last_saturday).attribute('data-date')).to eq('2011-12-31')
+      end
+
+      it "should change the month" do
+        get "/calendar2"
+        old_header_title = get_header_text
+        change_calendar
+        new_header_title = get_header_text
+        expect(old_header_title).not_to eq new_header_title
       end
 
       it "should navigate with jump-to-date control" do
@@ -219,7 +227,7 @@ describe "calendar2" do
         # Check for highlight to be present on this month
         # this class is also present on the mini calendar so we need to make
         #   sure that they are both present
-        expect(find_all(".fc-state-highlight").size).to eq 2
+        expect(find_all(".fc-state-highlight").size).to eq 4
 
         # Switch the month and verify that there is no highlighted day
         2.times { change_calendar }
@@ -227,7 +235,7 @@ describe "calendar2" do
 
         # Go back to the present month. Verify that there is a highlighted day
         change_calendar(:today)
-        expect(find_all(".fc-state-highlight").size).to eq 2
+        expect(find_all(".fc-state-highlight").size).to eq 4
         # Check the date in the second instance which is the main calendar
         expect(ffj(".fc-state-highlight")[1].text).to include(date)
       end
@@ -239,7 +247,7 @@ describe "calendar2" do
         load_month_view
 
         #Click calendar item to bring up event summary
-        find(".fc-event-title").click
+        find(".fc-event").click
 
         #expect to find the location name and address
         expect(find('.event-details-content').text).to include_text(location_name)

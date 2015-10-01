@@ -2,9 +2,10 @@ define [
   'i18n!calendar'
   'jquery'
   'compiled/calendar/CommonEvent'
+  'compiled/util/fcUtil'
   'jquery.instructure_date_and_time'
   'jquery.instructure_misc_helpers'
-], (I18n, $, CommonEvent) ->
+], (I18n, $, CommonEvent, fcUtil) ->
 
   deleteConfirmation = I18n.t('prompts.delete_assignment', "Are you sure you want to delete this assignment?")
 
@@ -16,7 +17,7 @@ define [
       @deleteURL = contextInfo.assignment_url
       @addClass 'assignment'
 
-    copyDataFromObject: (data) =>
+    copyDataFromObject: (data) ->
       data = data.assignment if data.assignment
       @object = @assignment = data
       @id = "assignment_#{data.id}" if data.id
@@ -33,24 +34,31 @@ define [
       @assignment.html_url
 
     parseStartDate: () ->
-      if @assignment.due_at then $.fudgeDateForProfileTimezone(@assignment.due_at) else null
+      fcUtil.wrap(@assignment.due_at) if @assignment.due_at
 
     displayTimeString: () ->
-      unless datetime = @originalStart
-        return "No Date" # TODO: i18n
-
-      # TODO: i18n
-      datetime = $.unfudgeDateForProfileTimezone(datetime)
-      "Due: <time datetime='#{datetime.toISOString()}'>#{$.datetimeString(datetime)}</time>"
-
+      datetime = @originalStart
+      if datetime
+        # TODO: i18n
+        "Due: #{@formatTime(datetime)}"
+      else
+        I18n.t('No Date')
     readableType: () ->
       @readableTypes[@assignmentType()]
 
-    saveDates: (success, error) =>
-      @save { 'assignment[due_at]': if @start then $.unfudgeDateForProfileTimezone(@start).toISOString() else '' }, success, error
+    saveDates: (success, error) ->
+      # temporary fix for dragging undated onto cal
+      # underlying issue should be found (similar hack
+      # in ShowEventDetailsDialog)
+      @_start = @start
+      @_end = @end
+      @_startDate = @startDate
+      @_end = @end
 
-    save: (params, success, error) =>
-      $.publish('CommonEvent/assignmentSaved', this)
+      @save { 'assignment[due_at]': if @start then fcUtil.unwrap(@start).toISOString() else '' }, success, error
+
+    save: (params, success, error) ->
+      $.publish('CommonEvent/assignmentSaved', @)
       super(params, success, error)
 
     methodAndURLForSave: () ->

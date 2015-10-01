@@ -1,14 +1,15 @@
 define [
   'jquery'
+  'compiled/util/fcUtil'
   'compiled/calendar/TimeBlockList'
   'compiled/calendar/TimeBlockRow'
   'timezone'
   'vendor/timezone/America/Detroit'
-], ($, TimeBlockList, TimeBlockRow, tz, detroit) ->
+], ($, fcUtil, TimeBlockList, TimeBlockRow, tz, detroit) ->
 
   nextYear = new Date().getFullYear() + 1
-  start    = tz.parse("#{nextYear}-02-03T12:32:00Z")
-  end      = tz.parse("#{nextYear}-02-03T17:32:00Z")
+  start    = fcUtil.wrap(tz.parse("#{nextYear}-02-03T12:32:00Z"))
+  end      = fcUtil.wrap(tz.parse("#{nextYear}-02-03T17:32:00Z"))
 
   module "TimeBlockRow",
     setup: ->
@@ -33,11 +34,11 @@ define [
   test "should init properly", ->
     me = new TimeBlockRow(@timeBlockList, {start, end})
     # make sure the <input> `value`s are right
-    unfudged_start = $.unfudgeDateForProfileTimezone(start)
-    unfudged_end = $.unfudgeDateForProfileTimezone(end)
-    equal me.$date.val().trim(),       tz.format(unfudged_start, 'date.formats.medium_with_weekday')
-    equal me.$start_time.val().trim(), tz.format(unfudged_start, 'time.formats.tiny')
-    equal me.$end_time.val().trim(),   tz.format(unfudged_end, 'time.formats.tiny')
+    unfudged_start = fcUtil.clone($.unfudgeDateForProfileTimezone(start))
+    unfudged_end = fcUtil.clone($.unfudgeDateForProfileTimezone(end))
+    equal me.$date.val().trim(),       tz.format(unfudged_start.toDate(), 'date.formats.medium_with_weekday')
+    equal me.$start_time.val().trim(), tz.format(unfudged_start.toDate(), 'time.formats.tiny')
+    equal me.$end_time.val().trim(),   tz.format(unfudged_end.toDate(), 'time.formats.tiny')
 
   test "delete link", ->
     me = @timeBlockList.addRow({start, end})
@@ -72,10 +73,10 @@ define [
     ok me.$end_time.data('associated_error_box')?.is(':visible'), 'error box is visible'
 
   test 'validate: just time in past', ->
-    fudgedNow = $.fudgeDateForProfileTimezone(new Date())
-    fudgedMidnight = new Date(fudgedNow.toDateString())
-    fudgedEnd = new Date(fudgedMidnight)
-    fudgedEnd.setMinutes(1)
+    fudgedNow = fcUtil.now()
+    fudgedMidnight = fcUtil.clone(fudgedNow)
+    fudgedEnd = fcUtil.clone(fudgedMidnight)
+    fudgedEnd.minutes(1)
 
     me = new TimeBlockRow(@timeBlockList, {start: fudgedMidnight, end: fudgedEnd})
     ok !me.validate(), 'not valid if time in past'
@@ -95,7 +96,9 @@ define [
   test 'getData', ->
     me = new TimeBlockRow(@timeBlockList, {start, end})
     me.validate()
-    deepEqual me.getData(), [start, end, false]
+    equal +me.getData()[0], +start
+    equal +me.getData()[1], +end
+    equal +me.getData()[2], false
 
   test 'incomplete: false if whole row blank', ->
     me = new TimeBlockRow(@timeBlockList)
