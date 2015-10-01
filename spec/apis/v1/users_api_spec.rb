@@ -978,6 +978,7 @@ describe "Users API", type: :request do
           'short_name' => 'Tobias',
           'integration_id' => nil,
           'login_id' => 'student@example.com',
+          'email' => 'student@example.com',
           'sis_login_id' => 'student@example.com',
           'locale' => 'en'
         })

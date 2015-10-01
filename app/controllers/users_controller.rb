@@ -1398,6 +1398,9 @@ class UsersController < ApplicationController
   #   {http://www.iana.org/time-zones IANA time zones} or friendlier
   #   {http://api.rubyonrails.org/classes/ActiveSupport/TimeZone.html Ruby on Rails time zones}.
   #
+  # @argument user[email] [String]
+  #   The default email address of the user.
+  #
   # @argument user[locale] [String]
   #   The user's preferred language as a two-letter ISO 639-1 code.
   #
@@ -1437,9 +1440,12 @@ class UsersController < ApplicationController
       @default_pseudonym.move_to_top
     end
 
+    update_email = @user.grants_right?(@current_user, :manage_user_details) && params[:user][:email]
     managed_attributes = []
     managed_attributes.concat [:name, :short_name, :sortable_name, :birthdate] if @user.grants_right?(@current_user, :rename)
     managed_attributes << :terms_of_use if @user == (@real_current_user || @current_user)
+    managed_attributes << :email if update_email
+
     if @user.grants_right?(@current_user, :manage_user_details)
       managed_attributes.concat([:time_zone, :locale])
     end
@@ -1487,10 +1493,9 @@ class UsersController < ApplicationController
 
       respond_to do |format|
         if @user.update_attributes(user_params)
-          if admin_avatar_update
-            @user.avatar_state = (old_avatar_state == :locked ? old_avatar_state : 'approved')
-            @user.save
-          end
+          @user.avatar_state = (old_avatar_state == :locked ? old_avatar_state : 'approved') if admin_avatar_update
+          @user.email = user_params[:email] if update_email
+          @user.save if admin_avatar_update || update_email
           session.delete(:require_terms)
           flash[:notice] = t('user_updated', 'User was successfully updated.')
           unless params[:redirect_to_previous].blank?
@@ -1498,7 +1503,7 @@ class UsersController < ApplicationController
           end
           format.html { redirect_to user_url(@user) }
           format.json {
-            render :json => user_json(@user, @current_user, session, %w{locale avatar_url},
+            render :json => user_json(@user, @current_user, session, %w{locale avatar_url email},
               @current_user.pseudonym.account) }
         else
           format.html { render :edit }
