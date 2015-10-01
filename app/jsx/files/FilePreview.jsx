@@ -18,6 +18,7 @@ define([
                    CollectionHandler.getPreviousInRelationTo(this.state.otherItems, this.state.displayedItem) :
                    CollectionHandler.getNextInRelationTo(this.state.otherItems, this.state.displayedItem);
 
+    var linkText = (direction === 'left') ? I18n.t('View previous file') : I18n.t('View next file')
     return (
       <div className='col-xs-1 ef-file-arrow_container'>
         <Link
@@ -27,6 +28,7 @@ define([
           className='ef-file-preview-container-arrow-link'
         >
           <div className='ef-file-preview-arrow-link'>
+            <span className='screenreader-only'>{linkText}</span>
             <i className={`icon-arrow-open-${direction}`} />
           </div>
         </Link>
@@ -69,7 +71,7 @@ define([
 
     return (
       <ReactModal
-        isOpen={true}
+        isOpen={this.props.isOpen}
         onRequestClose={this.closeModal}
         className='ReactModal__Content--ef-file-preview'
         overlayClassName='ReactModal__Overlay--ef-file-preview'

@@ -33,14 +33,16 @@ define [
       query: React.PropTypes.object
       collection: React.PropTypes.object
       params: React.PropTypes.object
+      isOpen: React.PropTypes.bool
 
     getInitialState: ->
       showInfoPanel: false
       displayedItem: null
 
     componentWillMount: ->
-      items = @getItemsToView @props, (items) =>
-        @setState @stateProperties(items, @props)
+      if(@props.isOpen)
+        items = @getItemsToView @props, (items) =>
+          @setState @stateProperties(items, @props)
 
     componentDidMount: ->
       $('.ReactModal__Overlay').on 'keydown', @handleKeyboardNavigation
@@ -49,8 +51,9 @@ define [
       $('.ReactModal__Overlay').off 'keydown', @handleKeyboardNavigation
 
     componentWillReceiveProps: (newProps) ->
-      items = @getItemsToView newProps, (items) =>
-        @setState @stateProperties(items, newProps)
+      if(newProps.isOpen)
+        items = @getItemsToView newProps, (items) =>
+          @setState @stateProperties(items, newProps)
 
     getItemsToView: (props, cb) ->
       # Sets up our collection that we will be using.
@@ -125,6 +128,13 @@ define [
       @transitionTo(@getRouteIdentifier(), @getParams(), @getNavigationParams(id: nextItem.id))
 
     closeModal: ->
+
+      # TODO Remove this jQuery line once react modal is upgraded. It should clean
+      # itself up after unmounting but it doesn't so using this quick fix for now
+      # until everything is upgraded.
+      $('#application').removeAttr('aria-hidden')
+      ############## kill me #####################
+
       @transitionTo(@getRouteIdentifier(), @getParams(), @getNavigationParams(except: 'only_preview'))
       FocusStore.setFocusToItem()
 

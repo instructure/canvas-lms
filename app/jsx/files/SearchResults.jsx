@@ -44,6 +44,7 @@ define([
          * As long as ?preview is present in the url.
          */
         <FilePreview
+          isOpen={true}
           params={this.getParams()}
           query={this.getQuery()}
           collection={this.state.collection}

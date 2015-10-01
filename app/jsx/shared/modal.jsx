@@ -8,7 +8,6 @@ define([
   './modal-buttons',
 ], function (React, $, _, preventDefault,  ReactModal, ModalContent, ModalButtons) {
 
-  ReactModal.setAppElement(document.body)
   ReactModal.injectCSS()
   ReactModal = React.createFactory(ReactModal)
 
@@ -82,6 +81,7 @@ define([
       return (
         <div className="canvasModal">
           <ReactModal
+                 ariaHideApp={this.state.modalIsOpen}
                  isOpen={this.state.modalIsOpen}
                  onRequestClose={this.closeModal}
                  className={this.props.className}

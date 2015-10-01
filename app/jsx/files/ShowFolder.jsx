@@ -18,6 +18,7 @@ define([
     if (this.getQuery().preview != null){
       return (
         <FilePreview
+          isOpen={true}
           usageRightsRequiredForContext={this.props.usageRightsRequiredForContext}
           currentFolder={this.props.currentFolder}
           params={this.getParams()}

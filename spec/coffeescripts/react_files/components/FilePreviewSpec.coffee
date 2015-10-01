@@ -74,6 +74,7 @@ define [
       Modal.setAppElement(@div)
 
       properties =
+        isOpen: true
         currentFolder: @currentFolder
         collection: @filesCollection
         query: {}
