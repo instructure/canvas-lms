@@ -58,7 +58,7 @@
         border-color: $ic-border-light;
         &.ic-avatar--fake-student { border-color: $ic-masquerade-color; }
       }
-      .menu-item-icon-container .menu-item__badge { 
+      .menu-item-icon-container .menu-item__badge {
         @include primary-nav-badge-border($ic-color-light);
       }
     }
@@ -77,7 +77,7 @@
     text-align: center;
     display: block;
     position: relative;
-
+    color: $ic-brand-global-nav-menu-item__text-color;
     @include breakpoint(short) {
       padding-top: $ic-sp/2;
       padding-bottom: $ic-sp/2;
