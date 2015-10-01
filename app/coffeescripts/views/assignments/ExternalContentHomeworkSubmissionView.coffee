@@ -1,6 +1,7 @@
 define [
   'jquery'
-], ($) ->
+  'Backbone'
+], ($, Backbone) ->
 
   class ExternalContentHomeworkSubmissionView extends Backbone.View
     @optionProperty 'externalTool'

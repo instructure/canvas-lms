@@ -229,6 +229,14 @@ module ApplicationHelper
     end
   end
 
+  def use_webpack?
+    if ENV['USE_WEBPACK'].present? && ENV['USE_WEBPACK'] != 'false'
+      !(params[:require_js])
+    else
+      params[:webpack]
+    end
+  end
+
   # Determines the location from which to load JavaScript assets
   #
   # uses optimized:
@@ -240,16 +248,30 @@ module ApplicationHelper
   #   * when ENV['USE_OPTIMIZED_JS'] is false
   #   * or when ?debug_assets=true is present in the url
   def js_base_url
-    use_optimized_js? ? '/optimized' : '/javascripts'
+    if use_webpack?
+      use_optimized_js? ? "/webpack-dist-optimized" : "/webpack-dist"
+    else
+      use_optimized_js? ? '/optimized' : '/javascripts'
+    end
   end
 
   # Returns a <script> tag for each registered js_bundle
   def include_js_bundles
-    paths = js_bundles.inject([]) do |ary, (bundle, plugin)|
-      base_url = "#{js_base_url}"
-      base_url += "/plugins/#{plugin}" if plugin
-      ary.concat(Canvas::RequireJs.extensions_for(bundle, 'plugins/')) unless use_optimized_js?
-      ary << "#{base_url}/compiled/bundles/#{bundle}.js"
+    base_url = "#{js_base_url}"
+    common_bundles = []
+    common_bundles = ["#{base_url}/vendor.bundle.js", "#{base_url}/instructure-common.bundle.js"] if use_webpack?
+    paths = js_bundles.inject(common_bundles) do |ary, (bundle, plugin)|
+      if use_webpack?
+        if plugin
+          ary << "#{base_url}/#{plugin}-#{bundle}.bundle.js"
+        else
+          ary << "#{base_url}/#{bundle}.bundle.js"
+        end
+      else
+        base_url += "/plugins/#{plugin}" if plugin
+        ary.concat(Canvas::RequireJs.extensions_for(bundle, 'plugins/')) unless use_optimized_js?
+        ary << "#{base_url}/compiled/bundles/#{bundle}.js"
+      end
     end
     javascript_include_tag(*paths)
   end

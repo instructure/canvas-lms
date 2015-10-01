@@ -276,6 +276,20 @@ namespace :js do
     threads.each(&:join)
   end
 
+  desc "build webpack js for production"
+  task :webpack do
+    if ENV['USE_WEBPACK'].present? && ENV['USE_WEBPACK'] != 'false'
+      if ENV['RAILS_ENV'] == 'production'
+        puts "--> Building PRODUCTION webpack bundles"
+        `npm run webpack-production`
+      else
+        puts "--> Building DEVELOPMENT webpack bundles"
+        `npm run webpack-development`
+      end
+      raise "Error running js:webpack: \nABORTING" if $?.exitstatus != 0
+    end
+  end
+
   desc "optimize and build js for production"
   task :build do
     require 'config/initializers/plugin_symlinks'

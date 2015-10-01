@@ -145,5 +145,3 @@ define([
 
   return tableStore;
 });
-
-

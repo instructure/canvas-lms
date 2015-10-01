@@ -5,9 +5,9 @@ require [
   'compiled/collections/DiscussionTopicsCollection'
   'compiled/views/DiscussionTopics/DiscussionListView'
   'compiled/views/DiscussionTopics/IndexView'
-], (I18n, _, {Router}, DiscussionTopicsCollection, DiscussionListView, IndexView) ->
+], (I18n, _, Backbone, DiscussionTopicsCollection, DiscussionListView, IndexView) ->
 
-  class DiscussionIndexRouter extends Router
+  class DiscussionIndexRouter extends Backbone.Router
 
     # Public: I18n strings.
     messages:

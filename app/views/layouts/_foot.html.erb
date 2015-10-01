@@ -2,56 +2,67 @@
   INST = <%= raw(inst_env.to_json) %>;
   ENV = <%= raw Api.recursively_stringify_json_ids(js_env.clone).to_json %>;
 
-  // TODO: move this out when we have a single require call
-  require = {
-    translate: <%= include_js_translations? %>,
-    <%-
-      # Purposely not using action_controller.asset_host here, since
-      # any scripts require.js loads dynamically don't know about the
-      # md5 fingerprints to use. Since they don't have a fingerprint
-      # it would be unsafe to rely on serving them from an s3 bucket--
-      # deploys would overwrite what's there and you'd run into a case
-      # where a user talking to a server running old code gets a newer
-      # js file than they were expecting.
-      # By serving it from the same hostname they loaded the page from, it will
-      # have the same version of static assets as the code that host is running.
-    %>
-    baseUrl: '<%= js_base_url %>',
-    paths: <%= raw Canvas::RequireJs.paths(true) %>,
-    packages : <%= raw Canvas::RequireJs.packages %>,
-    shim: <%= raw Canvas::RequireJs.shims %>,
-    map: <%= raw Canvas::RequireJs.map %>,
-    waitSeconds: 60
-  };
+  <% unless use_webpack? %>
+    // TODO: move this out when we have a single require call
+    require = {
+      translate: <%= include_js_translations? %>,
+      <%-
+        # Purposely not using action_controller.asset_host here, since
+        # any scripts require.js loads dynamically don't know about the
+        # md5 fingerprints to use. Since they don't have a fingerprint
+        # it would be unsafe to rely on serving them from an s3 bucket--
+        # deploys would overwrite what's there and you'd run into a case
+        # where a user talking to a server running old code gets a newer
+        # js file than they were expecting.
+        # By serving it from the same hostname they loaded the page from, it will
+        # have the same version of static assets as the code that host is running.
+      %>
+      baseUrl: '<%= js_base_url %>',
+      paths: <%= raw Canvas::RequireJs.paths(true) %>,
+      packages : <%= raw Canvas::RequireJs.packages %>,
+      shim: <%= raw Canvas::RequireJs.shims %>,
+      map: <%= raw Canvas::RequireJs.map %>,
+      waitSeconds: 60
+    };
+  <% end %>
 </script>
 
-<%= javascript_include_tag "#{js_base_url}/vendor/require.js" %>
-<% js_bundles.unshift([:common]) if include_common_bundle %>
+<% unless use_webpack? %>
+  <%= javascript_include_tag "#{js_base_url}/vendor/require.js" %>
+  <% js_bundles.unshift([:common]) if include_common_bundle %>
+<% end %>
 
 <%= include_js_bundles %>
 <%= include_account_js %>
 <%= render_js_blocks %>
 <%= render_hidden_dialogs %>
 
-<script>
-// Determines if the scripts are loaded.
-// When we get everything out of the views, and have a single top-level
-// `require`, this becomes meaningless and will be abandoned.
-(function() {
-  var attempts = 0;
-  var timeout = 10;
-  var check = function() {
-    attempts++;
-    var done = !window.requirejs.s.contexts._.defQueue.length
-    var giveup = attempts === 100; // 1 second
-    if (done || giveup) {
-      var className = document.documentElement.className;
-      document.documentElement.className = className.replace(/scripts-not-loaded/, '');
-      return;
-    }
-    setTimeout(check, timeout);
-  };
+<% if use_webpack? %>
+  <script>
+    var className = document.documentElement.className;
+    document.documentElement.className = className.replace(/scripts-not-loaded/, '');
+  </script>
+<% else %>
+  <script>
+  // Determines if the scripts are loaded.
+  // When we get everything out of the views, and have a single top-level
+  // `require`, this becomes meaningless and will be abandoned.
+  (function() {
+    var attempts = 0;
+    var timeout = 10;
+    var check = function() {
+      attempts++;
+      var done = !window.requirejs.s.contexts._.defQueue.length
+      var giveup = attempts === 100; // 1 second
+      if (done || giveup) {
+        var className = document.documentElement.className;
+        document.documentElement.className = className.replace(/scripts-not-loaded/, '');
+        return;
+      }
+      setTimeout(check, timeout);
+    };
 
-  check();
-}).call(this);
-</script>
+    check();
+  }).call(this);
+  </script>
+<% end %>

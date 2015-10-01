@@ -1,7 +1,8 @@
 define [
   'jquery',
+  'Backbone',
   'jst/ExternalTools/ExternalContentReturnView'
-], ($, template) ->
+], ($, Backbone, template) ->
 
   class ExternalContentReturnView extends Backbone.View
     template: template

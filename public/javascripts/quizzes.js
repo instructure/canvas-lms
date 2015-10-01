@@ -28,6 +28,7 @@ define([
   'str/htmlEscape',
   'str/pluralize',
   'wikiSidebar',
+  'compiled/handlebars_helpers',
   'compiled/views/assignments/DueDateOverride',
   'compiled/models/Quiz',
   'compiled/models/DueDateList',
@@ -57,7 +58,7 @@ define([
   'jqueryui/sortable' /* /\.sortable/ */,
   'jqueryui/tabs' /* /\.tabs/ */
 ], function(regradeTemplate, I18n,_,$,calcCmd, htmlEscape, pluralize,
-            wikiSidebar, DueDateOverrideView, Quiz,
+            wikiSidebar, Handlebars, DueDateOverrideView, Quiz,
             DueDateList,SectionList,
             MissingDateDialog,MultipleChoiceToggle,EditorToggle,TextHelper,
             RCEKeyboardShortcuts, INST, QuizFormulaSolution){

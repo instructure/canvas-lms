@@ -67,7 +67,6 @@ define [
     equal @DueDateTokenWrapper.optionsForMenu().length, 10
 
     @DueDateTokenWrapper.handleInput("scipio")
-    @clock.tick(2000)
     # 0 sections, 1 student, 1 header = 2
     equal @DueDateTokenWrapper.optionsForMenu().length, 2
 

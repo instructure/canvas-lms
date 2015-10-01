@@ -6,12 +6,13 @@ require [
   'compiled/views/PublishButtonView'
   'compiled/views/PublishIconView'
   'jsx/styleguide/ReactModalExample'
+  'Backbone'
   'jqueryui/accordion'
   'jqueryui/tabs'
   'jqueryui/button'
   'jqueryui/tooltip'
   'jquery.instructure_date_and_time'
-], ($, _, React, preventDefault, PublishButtonView, PublishIconView, ReactModalExample) ->
+], ($, _, React, preventDefault, PublishButtonView, PublishIconView, ReactModalExample, Backbone) ->
 
   do ->
     dialog = $('#dialog-buttons-dialog').dialog({
@@ -149,7 +150,7 @@ require [
   $("#repeat").buttonset()
 
   $(".styleguide-datetime_field-example").datetime_field()
-  
+
   #Global Navigation Hide/Show Subnav
   selectCategory = (event) ->
     event.preventDefault()
@@ -157,12 +158,6 @@ require [
     $(".Sg-header__Subnavigation section").addClass("isHidden")
     $(".Sg-header__Subnavigation section." + SgNavType).removeClass("isHidden")
     $(".Sg-header__Navigation a").removeClass('active')
-    $(this).addClass('active') 
+    $(this).addClass('active')
 
   $('.Sg-header__Navigation a').on('click', selectCategory);
-      
-
-
-    
-
-
