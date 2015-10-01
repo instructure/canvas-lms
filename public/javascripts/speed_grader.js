@@ -562,8 +562,8 @@ define([
           })
         return false;
       })
-        // show the li that contains the button because it is hidden from browsers that dont support speech
-      .closest('li').show();
+        // show the div that contains the button because it is hidden from browsers that dont support speech
+      .closest('div.speech-recognition').show();
 
       function processSpeech($this){
         if ($('#record_button').attr("recording") == "true"){
