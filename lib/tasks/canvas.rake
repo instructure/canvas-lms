@@ -113,7 +113,9 @@ namespace :canvas do
     compile_css = truthy_values.include?(args[:compile_css])
     build_js = truthy_values.include?(args[:build_js])
 
-    log_time('Making sure node_modules are up to date') { `npm install` }
+    log_time('Making sure node_modules are up to date') {
+      raise 'error running npm install' unless `npm install`
+    }
 
     # public/dist/brandable_css/brandable_css_bundles_with_deps.json needs
     # to exist before we run handlebars stuff, so we have to do this first
