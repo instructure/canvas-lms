@@ -108,6 +108,7 @@ body.ic-Login-Body { // apply the background to the body element so that you don
   justify-content: center;
   .ic-Login__header__logo {
     flex: 1;
+    img { max-width: 190px; }
   }
   .ic-Login__headerBrowse {
     text-align: right;
