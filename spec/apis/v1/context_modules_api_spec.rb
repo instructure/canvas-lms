@@ -834,6 +834,43 @@ describe "Modules API", type: :request do
     end
   end
 
+  context "differentiated assignments" do
+    before(:once) do
+      @course.enable_feature!(:differentiated_assignments)
+      @assignment.only_visible_to_overrides = true; @assignment.save!
+      @other_section = @course.course_sections.create! name: "other section"
+      create_section_override_for_assignment(@assignment, {course_section: @other_section})
+    end
+
+    it "should exclude unassigned assignments" do
+      student_in_course(:active_all => true)
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/modules?include[]=items",
+               { :controller => "context_modules_api", :action => "index", :format => "json",
+                 :course_id => "#{@course.id}", :include => ['items'] })
+      mod1_items = json.find { |m| m['id'] == @module1.id }['items'].map { |item| item['id'] }
+      expect(mod1_items).not_to include(@assignment_tag.id)
+    end
+
+    it "should include override assignments" do
+      student_in_course(:active_all => true, :section => @other_section)
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/modules?include[]=items",
+                      { :controller => "context_modules_api", :action => "index", :format => "json",
+                        :course_id => "#{@course.id}", :include => ['items'] })
+      mod1_items = json.find { |m| m['id'] == @module1.id }['items'].map { |item| item['id'] }
+      expect(mod1_items).to include(@assignment_tag.id)
+    end
+
+    it "should include observed students' assigned assignment items" do
+      student_in_course(:active_all => true, :section => @other_section)
+      course_with_observer(:course => @course, :associated_user_id => @student.id)
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/modules?include[]=items",
+                      { :controller => "context_modules_api", :action => "index", :format => "json",
+                        :course_id => "#{@course.id}", :include => ['items'] })
+      mod1_items = json.find { |m| m['id'] == @module1.id }['items'].map { |item| item['id'] }
+      expect(mod1_items).to include(@assignment_tag.id)
+    end
+  end
+
   context "unauthorized user" do
     before do
       user
