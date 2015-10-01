@@ -758,6 +758,9 @@ define([
         $answers = $formQuestion.find(".form_answers .answer");
       }
       if (result.answer_selection_type == "any_answer") {
+        if (question_type == "short_answer_question") {
+          $answers.addClass('fill_in_blank_answer');
+        }
         $answers.addClass('correct_answer');
       } else if (result.answer_selection_type == "matching") {
         $answers.removeClass('correct_answer');
