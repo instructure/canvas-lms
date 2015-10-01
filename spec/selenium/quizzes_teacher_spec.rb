@@ -197,21 +197,17 @@ describe "quizzes" do
         input.send_keys('asdf')
         wait_for_ajaximations
         expect(error_displayed?).to be_truthy
-        input.send_keys(:tab)
+        driver.execute_script('$(".numerical_question_input").change()')
         wait_for_ajaximations
-        keep_trying_until {
-          expect(input[:value]).to be_blank
-        }
+        expect(input[:value]).to be_blank
 
         input.click
         input.send_keys('1')
         wait_for_ajaximations
         expect(error_displayed?).to be_falsey
-        input.send_keys(:tab)
+        driver.execute_script('$(".numerical_question_input").change()')
         wait_for_ajaximations
-        keep_trying_until {
-          expect(input).to have_attribute(:value, "1.0000")
-        }
+        expect(input).to have_attribute(:value, "1.0000")
       end
     end
 
