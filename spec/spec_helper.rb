@@ -29,23 +29,18 @@ RSpec.configure do |c|
   c.color = true
 
   c.around(:each) do |example|
-    attempts = 0
-    begin
-      Timeout::timeout(180) {
-        example.run
-      }
-      if ENV['AUTORERUN']
-        e = @example.instance_variable_get('@exception')
-        if !e.nil? && (attempts += 1) < 2 && !example.metadata[:no_retry]
-          puts "FAILURE: #{@example.description} \n #{e}".red
-          puts "RETRYING: #{@example.description}".yellow
-          @example.instance_variable_set('@exception', nil)
-          redo
-        elsif e.nil? && attempts != 0
-          puts "SUCCESS: retry passed for \n #{@example.description}".green
+    Timeout::timeout(180) do
+      example.run
+      case example.example.exception
+      when EOFError, Errno::ECONNREFUSED
+        if $selenium_driver
+          puts "SELENIUM: webdriver socket closed the connection.  Will try to re-initialize."
+          # this will cause the selenium driver to get re-initialized if it
+          # crashes for some reason
+          $selenium_driver = nil
         end
       end
-    end until true
+    end
   end
 end
 

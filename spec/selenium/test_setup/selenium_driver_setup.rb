@@ -140,8 +140,8 @@ module SeleniumDriverSetup
     driver
   end
 
-  def selenium_driver;
-    $selenium_driver
+  def selenium_driver
+    $selenium_driver ||= setup_selenium
   end
 
   alias_method :driver, :selenium_driver
