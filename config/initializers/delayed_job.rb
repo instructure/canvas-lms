@@ -79,11 +79,12 @@ Delayed::Worker.lifecycle.around(:perform) do |worker, job, &block|
     ending_mem = Canvas.sample_memory()
     user_cpu = ending_cpu.utime - starting_cpu.utime
     system_cpu = ending_cpu.stime - starting_cpu.stime
-    Thread.current[:context] = nil
 
     LiveEvents.clear_context!
 
     Rails.logger.info "[STAT] #{starting_mem} #{ending_mem} #{ending_mem - starting_mem} #{user_cpu} #{system_cpu}"
+
+    Thread.current[:context] = nil
   end
 end
 
