@@ -53,7 +53,7 @@ define([
             </div>
 
             <div className='ColumnHeader__Mark ColumnHeader__Item'>
-              <a href='#' onClick={this.props.handleSortMark3}>{I18n.t('3rd Mark')} {this.renderLinkArrow(Constants.markColumnNames.MARK_THREE)}</a>
+              <a href='#' onClick={this.props.handleSortMark3}>{I18n.t('Final Mark')} {this.renderLinkArrow(Constants.markColumnNames.MARK_THREE)}</a>
             </div>
 
             <div className='ColumnHeader__FinalGrade ColumnHeader__Item'>
