@@ -27,7 +27,7 @@ define [
   'compiled/util/deparam'
   'str/htmlEscape'
 
-  'bower/fullcalendar/dist/fullcalendar'
+  'fullcalendar-with-lang-all'
   'jquery.instructure_misc_helpers'
   'jquery.instructure_misc_plugins'
   'vendor/jquery.ba-tinypubsub'
