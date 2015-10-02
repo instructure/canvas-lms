@@ -414,7 +414,10 @@ class Quizzes::QuizzesController < ApplicationController
             @quiz.assignment.do_notifications!(old_assignment, notify_of_update)
           end
           @quiz.reload
-          @quiz.update_quiz_submission_end_at_times if params[:quiz][:time_limit].present?
+
+          if params[:quiz][:time_limit].present?
+            @quiz.send_later_if_production_enqueue_args(:update_quiz_submission_end_at_times, { :priority => Delayed::HIGH_PRIORITY } )
+          end
 
           @quiz.publish! if params[:publish]
         end
