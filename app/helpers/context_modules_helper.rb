@@ -20,7 +20,7 @@ module ContextModulesHelper
   def cache_if_module(context_module, editable, differentiated_assignments, user, context, &block)
     if context_module
       visible_assignments = (differentiated_assignments && user) ? user.assignment_and_quiz_visibilities(context) : []
-      cache_key_items = ['context_module_render_13_', context_module.cache_key, editable, true, Time.zone]
+      cache_key_items = ['context_module_render_14_', context_module.cache_key, editable, true, Time.zone]
       cache_key_items << Digest::MD5.hexdigest(visible_assignments.to_s) if differentiated_assignments
       cache_key = cache_key_items.join('/')
       cache_key = add_menu_tools_to_cache_key(cache_key)
@@ -55,7 +55,7 @@ module ContextModulesHelper
     if item.nil?
       ''
     elsif (item.content_type == 'WikiPage')
-      "page_id:#{item.content.id}"
+      item.content.url
     else
       (item.content && item.content.respond_to?(:published?) ? item.content.id : item.id)
     end
