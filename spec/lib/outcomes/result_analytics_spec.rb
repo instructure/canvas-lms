@@ -28,8 +28,8 @@ describe Outcomes::ResultAnalytics do
   # ResultAnalytics only uses a few fields, so use some mock stuff to avoid all
   # the surrounding database logic
   MockUser = Struct.new(:id, :name)
-  MockOutcome = Struct.new(:id, :calculation_method, :calculation_int)
-  class MockOutcomeResult < Struct.new(:user, :learning_outcome, :score, :title, :submitted_at, :assessed_at)
+  MockOutcome = Struct.new(:id, :calculation_method, :calculation_int, :rubric_criterion)
+  class MockOutcomeResult < Struct.new(:user, :learning_outcome, :score, :title, :submitted_at, :assessed_at, :artifact_type, :percent)
     def learning_outcome_id
       learning_outcome.id
     end

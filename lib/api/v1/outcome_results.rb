@@ -35,7 +35,7 @@ module Api::V1::OutcomeResults
   def outcome_result_json(result)
     hash = api_json(result, @current_user, session, {
       methods: :submitted_or_assessed_at,
-      only: %w(id score)
+      only: %w(id score mastery possible)
     })
     hash[:links] = {
       user: result.user.id.to_s,
