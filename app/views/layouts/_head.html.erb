@@ -37,7 +37,7 @@
   <script>
     window.bz_custom_css_url = <%= custom_css_url.to_json.html_safe %>;
     try {
-      if(window.location.pathname != '/' && window.location.pathname.indexOf('/login') != 0) {
+      if(window.location.pathname != '/' && window.location.pathname.indexOf('/login') != 0 && !window.location.pathname.match(/courses\/[0-9]+$/)) {
         var message = "";
         message += 'last_url=' + encodeURIComponent(window.location.href) + "&";
         message += 'last_url_title=' + encodeURIComponent(document.title);

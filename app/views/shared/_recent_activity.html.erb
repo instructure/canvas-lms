@@ -8,30 +8,7 @@
 
 <ul class="recent_activity unstyled_list">
 
-	<% if @current_user && @current_user.last_url %>
-	<!-- This is the last left off area, styled like the stuff below, but special as it is a BZ addition with custom data source and click destination -->
-  <li class="stream-category" onclick="window.location.href = <%= @current_user.last_url.to_json %>;">
-    <div class="stream_header">
-      <div class="image-block">
-        <div class=image-block-image>
-          <i class="icon-import-content"></i>
-        </div>
-        <div class=image-block-content>
-          <div class=title>
-            Pick up where you left off
-          </div>
-
-          <div class="links">
-            <a href="<%= @current_user.last_url %>"><%= @current_user.last_url_title %></a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </li>
-	<!-- End last left off. -->
-	<% end %>
-
-
+<%= render :partial => 'shared/last_left_off' %>
 
 <% categorized_items = categorize_stream_items(@stream_items) %>
 <% %w(Announcement Conversation Assignment DiscussionTopic AssessmentRequest).each do |category| %>
