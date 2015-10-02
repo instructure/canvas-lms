@@ -42,6 +42,7 @@ module CC::Exporter::Epub::Converters
         assignment[f_type] = val unless val.nil?
       end
       assignment['identifier'] = get_node_att(meta_doc, 'assignment', 'identifier')
+      update_syllabus(assignment)
       assignment
     end
   end

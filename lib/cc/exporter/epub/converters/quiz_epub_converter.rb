@@ -30,6 +30,7 @@ module CC::Exporter::Epub::Converters
       quiz[:allowed_attempts] = get_node_val(quiz_meta_data, "allowed_attempts")
       quiz[:points_possible] = get_node_val(quiz_meta_data, "points_possible")
       quiz[:identifier] = get_node_att(quiz_meta_data, 'quiz', 'identifier')
+      update_syllabus(quiz)
       quiz
     end
   end

@@ -49,6 +49,12 @@ describe "Exporter" do
     it "should fall back to sorting by content type" do
       expect(exporter.templates.key?(:modules)).to be_falsey
     end
+
+    it "should contain a syllabus for assignments and quizzes in modules" do
+      # currently only checking for the existence of the key, we'll need a more
+      # robust example here once we have an .imscc example with complex content
+      expect(exporter.templates.key?(:syllabus)).to be_truthy
+    end
   end
 
   context "create ePub with content type sorting" do
@@ -62,6 +68,12 @@ describe "Exporter" do
 
     it "should not contain a top-level templates key for module content" do
       expect(exporter.templates.key?(:modules)).to be_falsey
+    end
+
+    it "should contain a syllabus entry for all assignments and quizzes" do
+      # currently only checking for the existence of the key, we'll need a more
+      # robust example here once we have an .imscc example with complex content
+      expect(exporter.templates.key?(:syllabus)).to be_truthy
     end
   end
 end

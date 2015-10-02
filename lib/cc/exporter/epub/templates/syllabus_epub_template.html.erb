@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=utf-8"/>
+  <title>Syllabus</title>
+  <!-- embedded styling will be inserted here -->
+</head>
+  <body>
+    <h1>Syllabus</h1>
+    <ul>
+      <% content.each do |item| %>
+        <li>
+          <a href="<%= "#{item[:href]}##{item[:identifier]}" %>">
+            <%= item[:title] %>
+          </a>
+          <% if item[:due_at] %>
+            <span>: Due at <%= friendly_date(item[:due_at])%></span>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+    <div style="page-break-before:always;"></div>
+  </body>
+</html>
+

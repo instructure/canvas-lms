@@ -17,6 +17,7 @@ module CC::Exporter::Epub::Converters
       super(settings, "cc")
       @course = @course.with_indifferent_access
       @resources = {}
+      @course[:syllabus] = []
       @resource_nodes_for_flat_manifest = {}
     end
 
@@ -34,6 +35,22 @@ module CC::Exporter::Epub::Converters
         tag.remove_attribute('id')
       end
       node
+    end
+
+    def update_syllabus(content)
+      return unless content['identifier']
+      @course[:syllabus] << {
+        resource_type: content['resource_type'],
+        title: content['title'],
+        identifier: content['identifier'],
+        due_at: content['due_at'],
+        href: "#{content['resource_type']}.xhtml"
+      }
+    end
+
+    def organize_syllabus
+      due_anytime, has_due_date = @course[:syllabus].partition { |item| item[:due_at].nil? }
+      @course[:syllabus] = has_due_date.sort_by{|item| item[:due_at]} + due_anytime
     end
 
     # exports the package into the intermediary json
@@ -57,9 +74,10 @@ module CC::Exporter::Epub::Converters
       @course[:quizzes] = convert_quizzes
       set_progress(50)
       @course[:modules] = convert_modules
+      set_progress(60)
 
-      # close up shop
       save_to_file
+      organize_syllabus
       set_progress(90)
       delete_unzipped_archive
       @course

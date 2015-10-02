@@ -55,11 +55,12 @@ module CC::Exporter::Epub::Converters
             linked_resource_type: get_node_val(item_node, 'content_type'),
             linked_resource_global_id: get_node_val(item_node, 'global_identifierref')
           }
-          item[:linked_resource_id] = if item[:linked_resource_type] == "WikiPage"
+          item[:linked_resource_id] = if item.value?("WikiPage")
                                         item[:title].parameterize
                                       else
                                         get_node_val(item_node, 'identifierref')
                                       end
+          item[:for_syllabus] = item.value?("Assignment") || item.value?("Quizzes::Quiz")
           item
         end
 

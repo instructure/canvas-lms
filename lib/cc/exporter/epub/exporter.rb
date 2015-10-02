@@ -2,6 +2,7 @@ module CC::Exporter::Epub
   class Exporter
 
     RESOURCE_TEMPLATES = {
+      syllabus: "../templates/syllabus_epub_template.html.erb",
       modules: "../templates/module_epub_template.html.erb",
       assignments: "../templates/assignment_epub_template.html.erb",
       topics: "../templates/topic_epub_template.html.erb",
@@ -10,6 +11,7 @@ module CC::Exporter::Epub
     }.freeze
 
     RESOURCE_TITLES = {
+      syllabus: "Syllabus",
       modules: "Modules",
       assignments: "Assignments",
       topics: "Discussion Topics",
@@ -34,7 +36,8 @@ module CC::Exporter::Epub
         title: cartridge_json[:title],
         files: cartridge_json[:files]
       }.tap do |hash|
-        resources = sort_by_content ? [:assignments, :topics, :quizzes, :wikis] : [:modules]
+        resources = filter_syllabus_for_modules ? [:modules] : [:assignments, :topics, :quizzes, :wikis]
+        hash.merge!(:syllabus => create_syllabus)
         resources.each do |type|
           hash.merge!(type => create_template(type))
         end
@@ -43,6 +46,7 @@ module CC::Exporter::Epub
 
     def module_hash(cartridge_json)
       {
+        syllabus: cartridge_json[:syllabus],
         modules: cartridge_json[:modules],
         course_content: cartridge_json.except(:modules),
         linked_resource_key: {
@@ -52,6 +56,29 @@ module CC::Exporter::Epub
           "WikiPage" => :wikis
         }
       }
+    end
+
+    def filter_syllabus_for_modules
+      return false if sort_by_content
+      filtered_ids = []
+      cartridge_json[:modules].each do |mod|
+        filtered_ids << mod[:items].map{|item| item["linked_resource_id"] if item["for_syllabus"]}.compact
+      end
+      cartridge_json[:syllabus].map! do |item|
+        if filtered_ids.flatten.include?(item[:identifier])
+          item[:href] = "modules.xhtml"
+          item
+        end
+      end
+      cartridge_json[:syllabus].compact!
+      # need this because compact! returns nil
+      true
+    end
+
+    def create_syllabus
+      syllabus_content = cartridge_json[:syllabus]
+      syllabus_template = RESOURCE_TEMPLATES[:syllabus]
+      Template.new({resources: syllabus_content, type: :syllabus}, syllabus_template)
     end
 
     def create_template(resource_type)
