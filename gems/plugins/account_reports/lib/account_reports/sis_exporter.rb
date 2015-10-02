@@ -431,6 +431,7 @@ module AccountReports
                        WHEN enrollments.workflow_state = 'creation_pending' THEN 'invited'
                        WHEN enrollments.workflow_state = 'active' THEN 'active'
                        WHEN enrollments.workflow_state = 'completed' THEN 'concluded'
+                       WHEN enrollments.workflow_state = 'inactive' THEN 'inactive'
                        WHEN enrollments.workflow_state = 'deleted' THEN 'deleted'
                        WHEN enrollments.workflow_state = 'rejected' THEN 'rejected' END AS enroll_state").
           joins("INNER JOIN #{CourseSection.quoted_table_name} cs ON cs.id = enrollments.course_section_id
