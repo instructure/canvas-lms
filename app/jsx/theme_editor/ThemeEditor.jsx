@@ -336,7 +336,9 @@ define([
 
                   { this.renderTabInputs() }
 
-                  { this.renderTabLabels() }
+                  <div className="Theme__editor-tab-label-layout">
+                    { this.renderTabLabels() }
+                  </div>
 
                   <div id="te-editor-panel" className="Theme__editor-tabs_panel">
                     <SharedBrandConfigPicker

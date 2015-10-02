@@ -167,12 +167,10 @@ $te-width: 300px;
   .Theme__editor-tabs_item {
     color: $te-tab-text-color;
     padding: $ic-sp;
-    display: inline-block;
     font-size: 14px;
     margin: 0;
     cursor: pointer;
     font-weight: normal;
-    vertical-align: 0;
 
     &:hover, &:focus {
       color: $te-tab-text-color-hover;
@@ -185,12 +183,8 @@ $te-width: 300px;
     top: 0; left: 0;
   }
 
-  .Theme__editor-tabs_panel {
-    border-top: 1px solid $te-border-color;
-  }
-
-  #te-editor:checked ~ #te-editor-tab,
-  #te-upload:checked ~ #te-upload-tab {
+  #te-editor:checked ~ .Theme__editor-tab-label-layout #te-editor-tab,
+  #te-upload:checked ~ .Theme__editor-tab-label-layout #te-upload-tab {
      position: relative;
      cursor: default;
 
@@ -200,7 +194,7 @@ $te-width: 300px;
       width: 0; height: 0;
       border-bottom-color: lighten($ic-color-dark, 20);
       position: absolute;
-      bottom: 0;
+      bottom: -1px;
       left: 0; right: 0;
       margin: 0 auto;
     }
@@ -210,7 +204,7 @@ $te-width: 300px;
     }
   }
 
-  #te-upload:checked ~ #te-upload-tab:before {
+  #te-upload:checked ~ .Theme__editor-tab-label-layout #te-upload-tab:before {
     border-bottom-color: $te-bgd;
   }
 
@@ -222,6 +216,11 @@ $te-width: 300px;
   .Theme__editor-tabs_item ~ .Theme__editor-tabs_panel {
     border: none;
   }
+}
+
+.Theme__editor-tab-label-layout {
+  display: flex;
+  justify-content: space-around;
 }
 
 
