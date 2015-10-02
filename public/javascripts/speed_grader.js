@@ -426,8 +426,12 @@ define([
 
     submitSettingsForm: function(e){
       e.preventDefault();
+
       userSettings.set('eg_sort_by', $('#eg_sort_by').val());
-      userSettings.set('eg_hide_student_names', $("#hide_student_names").prop('checked'));
+      if (!ENV.force_anonymous_grading) {
+        userSettings.set('eg_hide_student_names', $("#hide_student_names").prop('checked'));
+      }
+
       $(e.target).find(".submit_button").attr('disabled', true).text(I18n.t('buttons.saving_settings', "Saving Settings..."));
       var gradeByQuestion = $("#enable_speedgrader_grade_by_question").prop('checked');
       $.post(ENV.settings_url, {
