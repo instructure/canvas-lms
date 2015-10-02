@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 class RollupScore
+  include RollupScoreAggregatorHelper
+
   attr_reader :outcome_results, :outcome, :score, :count, :title, :submitted_at
   def initialize(outcome_results, opts={})
     @outcome_results = outcome_results
@@ -23,30 +25,30 @@ class RollupScore
     @count = @outcome_results.size
     @calculation_method = @outcome.calculation_method || "highest"
     @calculation_int = @outcome.calculation_int
-    @score = opts[:aggregate_score] ? get_aggregate_score : calculate_results
-    get_latest_result unless opts[:aggregate_score]
+    @score = opts[:aggregate_score] ? aggregate_score : calculate_results
+    latest_result unless opts[:aggregate_score]
   end
 
-#todo - do send(@calculation_method) instead of the case to streamline this more
+  # TODO - do send(@calculation_method) instead of the case to streamline this more
   def calculate_results
     # decaying average is default for new outcomes
     case @calculation_method
-      when 'decaying_average'
-        return nil if @outcome_results.length < 2
-        decaying_average
-      when 'n_mastery'
-        return nil if @outcome_results.length < @calculation_int
-        n_mastery
-      when 'latest'
-        @outcome_results.max_by{|result| result_time(result) }.score
-      when 'highest'
-        @outcome_results.max_by{|result| result.score}.score
+    when 'decaying_average'
+      return nil if @outcome_results.length < 2
+      decaying_average
+    when 'n_mastery'
+      return nil if @outcome_results.length < @calculation_int
+      n_mastery
+    when 'latest'
+      scores.first
+    when 'highest'
+      scores.max
     end
   end
 
   def n_mastery
-    scores = @outcome_results.map(&:score).sort.last(@calculation_int)
-    (scores.sum.to_f / scores.size).round(2)
+    n_scores = scores.sort.last(@calculation_int)
+    (n_scores.sum.to_f / n_scores.size).round(2)
   end
 
   def decaying_average
@@ -58,24 +60,11 @@ class RollupScore
 
     #default grading method with weight of 65 if none selected.
     weight = @calculation_int || 65
-    scores = @outcome_results.sort_by{|result| result_time(result) }.map(&:score)
-    latestWeighted = scores.pop * (0.01 * weight)
-    olderAvgWeighted = (scores.sum / scores.length) * (0.01 * (100 - weight))
-    (latestWeighted + olderAvgWeighted).round(2)
+    tmp_scores = scores
+    latest_weighted = tmp_scores.pop * (0.01 * weight)
+    older_avg_weighted = (tmp_scores.sum / tmp_scores.length) * (0.01 * (100 - weight))
+    (latest_weighted + older_avg_weighted).round(2)
   end
 
-  def get_latest_result
-    latest_result = @outcome_results.max_by{|result| result_time(result) }
-    @submitted_at = latest_result.submitted_at || latest_result.assessed_at
-    @title = @submitted_at ? latest_result.title.split(", ")[1] : nil
-  end
 
-  def get_aggregate_score
-    scores = @outcome_results.map(&:score)
-    (scores.sum.to_f / scores.size).round(2)
-  end
-
-  def result_time(result)
-    (result.submitted_at || result.assessed_at).to_i
-  end
 end

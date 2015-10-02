@@ -28,8 +28,8 @@ describe Outcomes::ResultAnalytics do
   # ResultAnalytics only uses a few fields, so use some mock stuff to avoid all
   # the surrounding database logic
   MockUser = Struct.new(:id, :name)
-  MockOutcome = Struct.new(:id, :calculation_method, :calculation_int)
-  class MockOutcomeResult < Struct.new(:user, :learning_outcome, :score, :title, :submitted_at, :assessed_at)
+  MockOutcome = Struct.new(:id, :calculation_method, :calculation_int, :rubric_criterion)
+  class MockOutcomeResult < Struct.new(:user, :learning_outcome, :score, :title, :submitted_at, :assessed_at, :artifact_type, :percent)
     def learning_outcome_id
       learning_outcome.id
     end
@@ -206,6 +206,23 @@ describe Outcomes::ResultAnalytics do
       expect(aggregate_result.scores.map(&:score)).to eq [2.5, 6.0]
       expect(aggregate_result.scores[0].outcome_results.size).to eq 4
       expect(aggregate_result.scores[1].outcome_results.size).to eq 3
+    end
+  end
+
+  describe "handling quiz outcome results objects" do
+    it "scales quiz scores to rubric score" do
+      results = [
+        #first outcome
+        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[80, 'decaying_average', 65, {points_possible: 5}], 7.0, "name, o1", nil, time, "Quizzes::QuizSubmission", 0.4],
+        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[80, 'decaying_average', 65, {points_possible: 5}], 12.0, "name, o1", nil, time - 1.day, "Quizzes::QuizSubmission", 0.9],
+        #second outcome
+        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[81, 'n_mastery', 3, {points_possible: 5}], 30.0, "name, o2", nil, nil, "Quizzes::QuizSubmission", 0.2],
+        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[81, 'n_mastery', 3, {points_possible: 5}], 75.0, "name, o2", nil, nil, "Quizzes::QuizSubmission", 0.5],
+        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[81, 'n_mastery', 3, {points_possible: 5}], 120.0, "name, o2", nil, nil, "Quizzes::QuizSubmission", 0.8],
+      ]
+      rollups = ra.rollup_user_results(results)
+      expect(rollups.size).to eq 2
+      expect(rollups.map(&:score)).to eq [2.88, 2.5]
     end
   end
 
