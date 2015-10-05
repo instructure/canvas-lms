@@ -1150,7 +1150,7 @@ class CoursesController < ApplicationController
   def re_send_invitations
     get_context
     if authorized_action(@context, @current_user, [:manage_students, :manage_admin_users])
-      @context.send_later_if_production(:re_send_invitations!)
+      @context.send_later_if_production(:re_send_invitations!, @current_user)
 
       respond_to do |format|
         format.html { redirect_to course_settings_url }

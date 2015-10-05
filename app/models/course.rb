@@ -2736,8 +2736,8 @@ class Course < ActiveRecord::Base
     progress
   end
 
-  def re_send_invitations!
-    self.enrollments.invited.except(:preload).preload(user: :communication_channels).find_each do |e|
+  def re_send_invitations!(from_user)
+    self.enrollments_visible_to(from_user).invited.except(:preload).preload(user: :communication_channels).find_each do |e|
       e.re_send_confirmation! if e.invited?
     end
   end
