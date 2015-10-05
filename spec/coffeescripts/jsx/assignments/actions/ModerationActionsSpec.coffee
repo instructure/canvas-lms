@@ -165,6 +165,26 @@ define [
       start()
     , getState)
 
+  asyncTest "calls itself again if headers indicate more pages", ->
+
+    getState = ->
+      urls:
+        list_gradeable_students: 'some_url'
+      students: []
+
+    fakeHeaders =
+      link: '<http://some_url/>; rel="current",<http://some_url/?page=2>; rel="next",<http://some_url>; rel="first",<http://some_url>; rel="last"'
+    fakeResponse = {data: ['test'], headers: fakeHeaders}
+
+    callCount = 0
+    sinon.stub(@client, 'get').returns(whenJS(fakeResponse))
+    ModerationActions.apiGetStudents(@client)((action) ->
+      callCount++
+      if callCount >= 2
+        ok callCount == 2
+        start()
+    , getState)
+
   module "ModerationActions#publishGrades",
     setup: ->
       @client = {

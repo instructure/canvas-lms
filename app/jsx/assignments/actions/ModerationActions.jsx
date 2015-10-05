@@ -2,9 +2,10 @@
 
 define([
   'axios',
+  'jsx/shared/helpers/parseLinkHeader',
   'i18n!moderated_grading',
   'underscore'
-], function (axios, I18n, _) {
+], function (axios, parseLinkHeader, I18n, _) {
 
   var ModerationActions = {
 
@@ -193,12 +194,16 @@ define([
       };
     },
 
-    apiGetStudents (ajaxLib) {
+    apiGetStudents (ajaxLib, endpoint) {
       return (dispatch, getState) => {
-        var endpoint = getState().urls.list_gradeable_students;
+        endpoint = endpoint || getState().urls.list_gradeable_students;
         ajaxLib = ajaxLib || axios;
         ajaxLib.get(endpoint)
                .then((response) => {
+                 var linkHeaders = parseLinkHeader(response);
+                 if (linkHeaders.next) {
+                   dispatch(this.apiGetStudents(ajaxLib, linkHeaders.next));
+                 }
                  dispatch(this.gotStudents(response.data));
                })
                .catch((response) => {
