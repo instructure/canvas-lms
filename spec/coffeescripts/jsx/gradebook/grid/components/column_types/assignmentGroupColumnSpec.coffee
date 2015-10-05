@@ -68,6 +68,6 @@ define [
     ok(innerHTML(component).match(/-/))
 
   test 'has title attribute for assignment group cells', ->
-    component = buildComponent(defaultProps)
+    component = buildComponent(defaultProps())
     title = component.refs.cell.props.title
-    equal("0 / 0", title)
+    equal("25 / 25", title)

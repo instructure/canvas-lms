@@ -21,8 +21,8 @@ define([
       Reflux.connect(GradebookToolbarStore, 'toolbarOptions')
     ],
 
-    formatTitle(assignmentGroup) {
-      return assignmentGroup.score + " / " + assignmentGroup.possible;
+    formatTitle(assignmentGroupScore) {
+      return assignmentGroupScore.score + " / " + assignmentGroupScore.possible;
     },
 
     render() {
@@ -53,7 +53,7 @@ define([
       gradeFormatter = new GradeFormatter(assignmentGroupScore.score, assignmentGroupScore.possible, false);
 
       return (
-        <div title={this.formatTitle(assignmentGroup)} ref='cell'>
+        <div title={this.formatTitle(assignmentGroupScore)} ref='cell'>
           { gradeFormatter.toString() }
         </div>
       );
