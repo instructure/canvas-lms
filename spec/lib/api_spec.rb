@@ -54,6 +54,16 @@ describe Api do
       expect(@api.api_find(User, "sis_login_id:sis_user_1@example.com")).to eq @user
     end
 
+    it 'looks for login ids case insensitively' do
+      @user = user_with_pseudonym :username => "sis_user_1@example.com"
+      expect(@api.api_find(User, "sis_login_id:SIS_USER_1@example.com")).to eq @user
+    end
+
+    it 'properly quotes login ids' do
+      @user = user_with_pseudonym :username => "user 'a'"
+      expect(@api.api_find(User, "sis_login_id:user 'a'")).to eq @user
+    end
+
     it 'should not find record from other account' do
       account = Account.create(name: 'new')
       @user = user_with_pseudonym username: "sis_user_1@example.com", account: account
@@ -64,7 +74,7 @@ describe Api do
       account = Account.create(name: 'new')
       @user = user_with_pseudonym username: "sis_user_1@example.com", account: account
       Api.expects(:sis_parse_id).with("root_account:school:sis_login_id:sis_user_1@example.com", anything, anything).
-          returns(['pseudonyms.unique_id', ["sis_user_1@example.com", account]])
+          returns(['LOWER(pseudonyms.unique_id)', [QuotedValue.new("LOWER('sis_user_1@example.com')"), account]])
       expect(@api.api_find(User, "root_account:school:sis_login_id:sis_user_1@example.com")).to eq @user
     end
 
@@ -374,7 +384,7 @@ describe Api do
     end
 
     it 'should handle hex_encoded sis_fields' do
-      expect(Api.sis_parse_id("hex:sis_login_id:7369737573657233406578616d706c652e636f6d", @lookups)).to eq ["pseudonyms.unique_id", "sisuser3@example.com"]
+      expect(Api.sis_parse_id("hex:sis_login_id:7369737573657233406578616d706c652e636f6d", @lookups)).to eq ["LOWER(pseudonyms.unique_id)", "LOWER('sisuser3@example.com')"]
       expect(Api.sis_parse_id("hex:sis_user_id:7369737573657234406578616d706c652e636f6d", @lookups)).to eq ["pseudonyms.sis_user_id", "sisuser4@example.com"]
     end
 
@@ -389,7 +399,7 @@ describe Api do
     end
 
     it 'should handle plain sis_fields' do
-      expect(Api.sis_parse_id("sis_login_id:sisuser3@example.com", @lookups)).to eq ["pseudonyms.unique_id", "sisuser3@example.com"]
+      expect(Api.sis_parse_id("sis_login_id:sisuser3@example.com", @lookups)).to eq ["LOWER(pseudonyms.unique_id)", "LOWER('sisuser3@example.com')"]
       expect(Api.sis_parse_id("sis_user_id:sisuser4", @lookups)).to eq ["pseudonyms.sis_user_id", "sisuser4"]
     end
 
@@ -407,8 +417,8 @@ describe Api do
     it 'should handle surrounding whitespace' do
       expect(Api.sis_parse_id("\t10  ", @lookups)).to eq ["users.id", 10]
       expect(Api.sis_parse_id("\t10\n", @lookups)).to eq ["users.id", 10]
-      expect(Api.sis_parse_id("  hex:sis_login_id:7369737573657233406578616d706c652e636f6d     ", @lookups)).to eq ["pseudonyms.unique_id", "sisuser3@example.com"]
-      expect(Api.sis_parse_id("  sis_login_id:sisuser3@example.com\t", @lookups)).to eq ["pseudonyms.unique_id", "sisuser3@example.com"]
+      expect(Api.sis_parse_id("  hex:sis_login_id:7369737573657233406578616d706c652e636f6d     ", @lookups)).to eq ["LOWER(pseudonyms.unique_id)", "LOWER('sisuser3@example.com')"]
+      expect(Api.sis_parse_id("  sis_login_id:sisuser3@example.com\t", @lookups)).to eq ["LOWER(pseudonyms.unique_id)", "LOWER('sisuser3@example.com')"]
     end
   end
 
@@ -434,7 +444,7 @@ describe Api do
     end
 
     it 'should work with mixed sis id types' do
-      expect(Api.sis_parse_ids([1,2,"sis_user_id:U1",3,"sis_user_id:U2","sis_user_id:U3","sis_login_id:A1"], @lookups)).to eq({ "users.id" => [1, 2, 3], "pseudonyms.sis_user_id" => ["U1", "U2", "U3"], "pseudonyms.unique_id" => ["A1"] })
+      expect(Api.sis_parse_ids([1,2,"sis_user_id:U1",3,"sis_user_id:U2","sis_user_id:U3","sis_login_id:A1"], @lookups)).to eq({ "users.id" => [1, 2, 3], "pseudonyms.sis_user_id" => ["U1", "U2", "U3"], "LOWER(pseudonyms.unique_id)" => ["LOWER('A1')"] })
     end
 
     it 'should skip invalid things' do
@@ -532,7 +542,7 @@ describe Api do
     it 'should correctly capture user lookups' do
       lookups = Api.sis_find_sis_mapping_for_collection(User)[:lookups]
       expect(Api.sis_parse_id("sis_user_id:1", lookups)).to eq ["pseudonyms.sis_user_id", "1"]
-      expect(Api.sis_parse_id("sis_login_id:1", lookups)).to eq ["pseudonyms.unique_id", "1"]
+      expect(Api.sis_parse_id("sis_login_id:1", lookups)).to eq ["LOWER(pseudonyms.unique_id)", "LOWER('1')"]
       expect(Api.sis_parse_id("sis_course_id:1", lookups)).to eq [nil, nil]
       expect(Api.sis_parse_id("sis_term_id:1", lookups)).to eq [nil, nil]
       expect(Api.sis_parse_id("sis_account_id:1", lookups)).to eq [nil, nil]
