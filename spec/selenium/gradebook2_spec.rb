@@ -259,6 +259,25 @@ describe "gradebook2" do
       expect(@second_assignment.reload).not_to be_muted
     end
 
+    context 'pass/fail assignment grading' do
+      before :each do
+        init_course_with_students 1
+        @assignment = @course.assignments.create!(grading_type: 'pass_fail', points_possible: 0)
+        @assignment.grade_student(@students[0], grade: 'pass')
+      end
+
+      it 'should allow pass grade on assignments worth 0 points', priority: "1", test_id: 330310 do
+        get "/courses/#{@course.id}/gradebook2"
+        expect(fj('a.gradebook-checkbox.gradebook-checkbox-pass')).to include_text('pass')
+      end
+
+      it 'should display pass/fail correctly when total points possible is changed', priority: "1", test_id: 419288 do
+        @assignment.update_attributes(points_possible: 1)
+        get "/courses/#{@course.id}/gradebook2"
+        expect(fj('a.gradebook-checkbox.gradebook-checkbox-pass')).to include_text('pass')
+      end
+    end
+
     context "unpublished course" do
       before do
         @course.claim!

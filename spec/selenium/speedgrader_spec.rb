@@ -110,6 +110,27 @@ describe 'Speedgrader' do
       clear_grade_and_validate
     end
 
+    context 'pass/fail assignment grading' do
+      before :each do
+        init_course_with_students 1
+        @assignment = @course.assignments.create!(grading_type: 'pass_fail', points_possible: 0)
+        @assignment.grade_student(@students[0], grade: 'pass')
+      end
+
+      it 'should allow pass grade on assignments worth 0 points', priority: "1", test_id: 400127 do
+        get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#"
+        expect(f('#grading-box-extended')['value']).to eq('complete')
+        expect(fj('#grade_container label').text()).to include_text('(0 / 0)')
+      end
+
+      it 'should display pass/fail correctly when total points possible is changed', priority: "1", test_id: 419289 do
+        @assignment.update_attributes(points_possible: 1)
+        get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#"
+        expect(f('#grading-box-extended')['value']).to eq('complete')
+        expect(fj('#grade_container label').text()).to include_text('(1 / 1)')
+      end
+    end
+
     context 'Using a rubric saves grades' do
       before do
         init_course_with_students
