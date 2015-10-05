@@ -12,7 +12,7 @@ module Login::Shared
 
   def successful_login(user, pseudonym, otp_passed = false)
     CanvasBreachMitigation::MaskingSecrets.reset_authenticity_token!(cookies)
-    Auditors::Authentication.record(@current_pseudonym, 'login')
+    Auditors::Authentication.record(pseudonym, 'login')
 
     # Since the user just logged in, we'll reset the context to include their info.
     setup_live_events_context
