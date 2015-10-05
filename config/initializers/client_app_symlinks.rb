@@ -33,6 +33,8 @@ def maintain_client_app_symlinks
       dir = dir.dirname
     end
   end
+  # compressing assets can generate .gz versions of files; don't remove them
+  valid_files.merge(valid_files.map { |f| Pathname.new(f.to_s + '.gz') })
 
   # remove any unnecessary links
   Pathname.glob("public/javascripts/client_apps/**/*").each do |file|
