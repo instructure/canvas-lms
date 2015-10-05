@@ -1035,6 +1035,12 @@ class Attachment < ActiveRecord::Base
   # submission attachments
   attr_writer :skip_submission_attachment_lock_checks
 
+  # prevent an access attempt shortly before unlock_at from caching permissions beyond that time
+  def touch_on_unlock
+    send_later_enqueue_args(:touch, { :run_at => unlock_at,
+                                      :singleton => "touch_on_unlock_attachment_#{global_id}" })
+  end
+
   def locked_for?(user, opts={})
     return false if @skip_submission_attachment_lock_checks
     return false if opts[:check_policies] && self.grants_right?(user, :update)
@@ -1042,6 +1048,7 @@ class Attachment < ActiveRecord::Base
     Rails.cache.fetch(locked_cache_key(user), :expires_in => 1.minute) do
       locked = false
       if (self.unlock_at && Time.now < self.unlock_at)
+        touch_on_unlock if Time.now + 1.hour >= self.unlock_at
         locked = {:asset_string => self.asset_string, :unlock_at => self.unlock_at}
       elsif (self.lock_at && Time.now > self.lock_at)
         locked = {:asset_string => self.asset_string, :lock_at => self.lock_at}
