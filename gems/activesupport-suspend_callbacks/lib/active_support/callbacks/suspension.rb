@@ -72,9 +72,10 @@ module ActiveSupport::Callbacks
     #   end
     #
     def suspended_callback?(callback, kind, type=nil)
-      suspended_callbacks.include?(callback, kind, type) ||
+      instance_variable_defined?(:@suspended_callbacks) &&
+        suspended_callbacks.include?(callback, kind, type) ||
       suspended_callback_ancestor &&
-      suspended_callback_ancestor.suspended_callback?(callback, kind, type)
+        suspended_callback_ancestor.suspended_callback?(callback, kind, type)
     end
 
     def suspended_callback_ancestor
@@ -96,22 +97,40 @@ module ActiveSupport::Callbacks
       if ActiveSupport::VERSION::STRING < '4'
         # [ActiveSupport 3]
         def run_callbacks(kind, key=nil)
-          cbs = send("_#{kind}_callbacks").dup
-          cbs.delete_if{ |cb| suspended_callback?(cb.filter, kind, cb.kind) }
-          runner = cbs.compile(key, self)
-          # provided block (if any) is executed by yields statements in the
-          # compiled runner
-          instance_eval(runner, __FILE__)
+          cbs = send("_#{kind}_callbacks")
+          if cbs.empty?
+            yield if block_given?
+          else
+            if cbs.detect{ |cb| suspended_callback?(cb.filter, kind, cb.kind) }
+              cbs = cbs.dup
+              cbs.delete_if{ |cb| suspended_callback?(cb.filter, kind, cb.kind) }
+              runner = cbs.compile(key, self)
+              # provided block (if any) is executed by yields statements in the
+              # compiled runner
+              instance_eval(runner, __FILE__)
+            else
+              super
+            end
+          end
         end
       elsif ActiveSupport::VERSION::STRING < '4.1'
         # [ActiveSupport 4.0]
         def run_callbacks(kind)
-          cbs = send("_#{kind}_callbacks").dup
-          cbs.delete_if{ |cb| suspended_callback?(cb.filter, kind, cb.kind) }
-          runner = cbs.compile
-          # provided block (if any) is executed by yields statements in the
-          # compiled runner
-          instance_eval(runner, __FILE__)
+          cbs = send("_#{kind}_callbacks")
+          if cbs.empty?
+            yield if block_given?
+          else
+            if cbs.detect{ |cb| suspended_callback?(cb.filter, kind, cb.kind) }
+              cbs = cbs.dup
+              cbs.delete_if{ |cb| suspended_callback?(cb.filter, kind, cb.kind) }
+              runner = cbs.compile
+              # provided block (if any) is executed by yields statements in the
+              # compiled runner
+              instance_eval(runner, __FILE__)
+            else
+              super
+            end
+          end
         end
       else
         # [ActiveSupport 4.1]
