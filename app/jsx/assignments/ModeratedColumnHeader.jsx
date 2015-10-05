@@ -8,8 +8,9 @@ define([
 ], function (React, Constants, ModerationActions, I18n) {
   var ModeratedColumnHeader = React.createClass({
     displayName: 'ModeratedColumnHeader',
-    propTypes:{
-      markColumn: React.PropTypes.number,
+
+    propTypes: {
+      markColumn: React.PropTypes.string,
       sortDirection: React.PropTypes.string,
       includeModerationSetHeaders: React.PropTypes.bool,
       handleSortMark1: React.PropTypes.func.isRequired,

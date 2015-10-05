@@ -5,6 +5,8 @@ require [
   'jsx/assignments/store/configureStore'
 ], ($, React, ModerationApp, configureStore) ->
 
+  ModerationAppFactory = React.createFactory ModerationApp
+
   store = configureStore({
     studentList: {
       students: [],
@@ -24,4 +26,4 @@ require [
     urls: window.ENV.URLS,
   })
 
-  React.render(ModerationApp(store: store), $('#assignment_moderation')[0])
+  React.render(ModerationAppFactory(store: store), $('#assignment_moderation')[0])

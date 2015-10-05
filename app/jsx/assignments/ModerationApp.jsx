@@ -40,8 +40,8 @@ define([
     },
 
     isModerationSet (students) {
-      return (_.find(students, (student) => {
-        return student.in_moderation_set
+      return !!(_.find(students, (student) => {
+        return student.in_moderation_set;
       }));
     },
 

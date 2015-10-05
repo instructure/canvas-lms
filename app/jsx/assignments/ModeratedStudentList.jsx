@@ -88,13 +88,13 @@ define([
             this.props.studentList.students.map((student) => {
               if (this.props.includeModerationSetColumns) {
                 return (
-                  <li className='ModeratedAssignmentList__Item'>
+                  <li key={student.id} className='ModeratedAssignmentList__Item'>
                     <div className='ModeratedAssignmentList__StudentInfo'>
                       <input
                         checked={student.on_moderation_stage || student.in_moderation_set || student.isChecked}
                         disabled={student.in_moderation_set || this.props.assignment.published}
                         type='checkbox'
-                        onChange={this.props.handleCheckbox.bind(this, student)}
+                        onChange={this.props.handleCheckbox.bind(null, student)}
                       />
                       <img className='img-circle AssignmentList_StudentPhoto' src={student.avatar_image_url} />
                       <span>{student.display_name}</span>
@@ -107,13 +107,13 @@ define([
                  );
               } else {
                 return (
-                  <li className='AssignmentList__Item'>
+                  <li key={student.id} className='AssignmentList__Item'>
                     <div className='AssignmentList__StudentInfo'>
                       <input
                         checked={student.on_moderation_stage || student.in_moderation_set || student.isChecked}
                         disabled={student.in_moderation_set || this.props.assignment.published}
                         type='checkbox'
-                        onChange={this.props.handleCheckbox.bind(this, student)}
+                        onChange={this.props.handleCheckbox.bind(null, student)}
                       />
                       <img className='img-circle AssignmentList_StudentPhoto' src={student.avatar_image_url} />
                       <span>{student.display_name}</span>
