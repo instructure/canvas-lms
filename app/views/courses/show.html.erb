@@ -222,6 +222,7 @@
 <div id="course_home_content">
 
   <% if @course_home_view == 'wiki' %>
+    <%= render :partial => 'shared/last_left_off' %>
     <% js_bundle :wiki_page_show %>
     <div id="wiki_page_show"></div>
   <% elsif @course_home_view == 'modules' %>
