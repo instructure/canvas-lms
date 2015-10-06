@@ -1,12 +1,25 @@
-<%= t('new_assignment', 'New assignment for %{course_name}', :course_name => asset.context.name) %>
+<%= I18n.t("New assignment for %{course_name}", :course_name => asset.context.name) %>
 <%= asset.title %>
 
+<%
+  multiple_dates_text = I18n.t("due: Multiple Dates")
+  display_text = I18n.t("due: No Due Date")
+%>
+
 <% if asset.multiple_due_dates_apply_to?(user) %>
-  <%= t('multiple_due_dates', 'due: Multiple Dates') %>
+  <% display_text = multiple_dates_text %>
 <% elsif asset.due_at %>
-  <%= t('due_at', 'due: %{assignment_due_date_time}', :assignment_due_date_time => datetime_string(force_zone(asset.due_at))) %>
+  <% display_text = I18n.t("due: %{assignment_due_date_time}", :assignment_due_date_time => datetime_string(force_zone(asset.due_at))) %>
 <% else %>
-  <%= t('no_due_date', 'due: No Due Date') %>
+  <% if asset.context.grants_right?(user, :manage_grades) %>
+    <% if asset.all_due_dates.length > 1 %>
+      <% display_text = multiple_dates_text %>
+    <% elsif (asset_due_at = asset.teacher_due_date_for_display(user)) %>
+      <% display_text = I18n.t("due: %{assignment_due_date_time}", :assignment_due_date_time => datetime_string(force_zone(asset_due_at))) %>
+    <% end %>
+  <% end %>
 <% end %>
 
-<%= t('more_info', 'More info at %{course_name}', :course_name => HostUrl.context_host(asset.context)) %>
+<%= display_text %>
+
+<%= I18n.t("More info at %{course_name}", :course_name => HostUrl.context_host(asset.context)) %>

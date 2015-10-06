@@ -112,6 +112,11 @@ module DatesOverridable
     end
   end
 
+  def teacher_due_date_for_display(user)
+    ao = overridden_for user
+    due_at || ao.due_at || all_due_dates.first[:due_at]
+  end
+
   def formatted_dates_hash(dates)
     return [] unless dates.present?
 
