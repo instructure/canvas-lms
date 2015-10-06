@@ -75,7 +75,7 @@ class Enrollment < ActiveRecord::Base
   after_save :touch_graders_if_needed
   after_save :reset_notifications_cache
 
-  attr_accessor :already_enrolled
+  attr_accessor :already_enrolled, :available_at
   attr_accessible :user, :course, :workflow_state, :course_section, :limit_privileges_to_course_section, :already_enrolled, :start_at, :end_at
 
   scope :current, -> { joins(:course).where(QueryBuilder.new(:active).conditions).readonly(false) }
@@ -661,9 +661,17 @@ class Enrollment < ActiveRecord::Base
     return state unless global_start_at = ranges.map(&:compact).map(&:min).compact.min
     if global_start_at < now
       self.restrict_past_view? ? :inactive : :completed
-    # Allow student view students to use the course before the term starts
-    elsif self.fake_student? || (state == :invited && !self.restrict_future_view?)
+    elsif self.fake_student? # Allow student view students to use the course before the term starts
       state
+    elsif !self.restrict_future_view?
+      self.available_at = global_start_at
+      if state == :active
+        # an accepted enrollment state means they still can't participate yet,
+        # but should be able to view just like an invited enrollment
+        :accepted
+      else
+        state
+      end
     else
       :inactive
     end
@@ -695,6 +703,10 @@ class Enrollment < ActiveRecord::Base
 
   def invited?
     state_based_on_date == :invited
+  end
+
+  def accepted?
+    state_based_on_date == :accepted
   end
 
   def completed?
@@ -780,10 +792,6 @@ class Enrollment < ActiveRecord::Base
 
   def pending?
     self.invited? || self.creation_pending?
-  end
-
-  def active_or_pending?
-    self.active? || self.inactive? || self.pending?
   end
 
   def email

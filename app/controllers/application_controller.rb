@@ -512,17 +512,9 @@ class ApplicationController < ActionController::Base
         @context = api_find(Course.active, params[:course_id])
         params[:context_id] = params[:course_id]
         params[:context_type] = "Course"
-        if @context && session[:enrollment_uuid_course_id] == @context.id
-          session[:enrollment_uuid_count] ||= 0
-          if session[:enrollment_uuid_count] > 4
-            session[:enrollment_uuid_count] = 0
-            self.extend(TextHelper)
-            flash[:html_notice] = mt "#application.notices.need_to_accept_enrollment", "You'll need to [accept the enrollment invitation](%{url}) before you can fully participate in this course.", :url => course_url(@context)
-          end
-          session[:enrollment_uuid_count] += 1
-        end
         @context_enrollment = @context.enrollments.where(user_id: @current_user).sort_by{|e| [e.state_sortable, e.rank_sortable, e.id] }.first if @context && @current_user
         @context_membership = @context_enrollment
+        check_for_readonly_enrollment_state
       elsif params[:account_id] || (self.is_a?(AccountsController) && params[:account_id] = params[:id])
         @context = api_find(Account, params[:account_id])
         params[:context_id] = @context.id
@@ -638,6 +630,25 @@ class ApplicationController < ActionController::Base
     Course.require_assignment_groups(@contexts)
     @context_enrollment = @context.membership_for_user(@current_user) if @context.respond_to?(:membership_for_user)
     @context_membership = @context_enrollment
+  end
+
+  def check_for_readonly_enrollment_state
+    if @context_enrollment && @context_enrollment.is_a?(Enrollment) && ['invited', 'active'].include?(@context_enrollment.workflow_state) && action_name != "enrollment_invitation"
+      state = @context_enrollment.state_based_on_date
+      case state
+      when :invited
+        if @context_enrollment.available_at
+          flash[:html_notice] = mt "#application.notices.need_to_accept_future_enrollment",
+            "You'll need to [accept the enrollment invitation](%{url}) before you can fully participate in this course, starting on %{date}.",
+            :url => course_url(@context),:date => datetime_string(@context_enrollment.available_at)
+        else
+          flash[:html_notice] = mt "#application.notices.need_to_accept_enrollment",
+            "You'll need to [accept the enrollment invitation](%{url}) before you can fully participate in this course.", :url => course_url(@context)
+        end
+      when :accepted
+        flash[:html_notice] = t("This course hasn’t started yet. You will not be able to participate in this course until %{date}.", :date => datetime_string(@context_enrollment.available_at))
+      end
+    end
   end
 
   def set_badge_counts_for(context, user, enrollment=nil)

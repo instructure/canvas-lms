@@ -1192,11 +1192,7 @@ class CoursesController < ApplicationController
       session[:accepted_enrollment_uuid] = enrollment.uuid
 
       if params[:action] != 'show'
-        if @context.restrict_enrollments_to_course_dates?
-          redirect_to courses_url
-        else
-          redirect_to course_url(@context.id)
-        end
+        redirect_to course_url(@context.id)
       else
         @context_enrollment = enrollment
         enrollment = nil
@@ -1502,6 +1498,8 @@ class CoursesController < ApplicationController
 
     @context_enrollment ||= @pending_enrollment
     if @context.grants_right?(@current_user, session, :read)
+      check_for_readonly_enrollment_state
+
       log_asset_access([ "home", @context ], "home", "other")
 
       check_incomplete_registration

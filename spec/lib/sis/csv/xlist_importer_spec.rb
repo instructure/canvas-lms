@@ -147,7 +147,7 @@ describe SIS::CSV::XlistImporter do
       )
       course = Course.where(sis_source_id: "C001").first
       expect(course.enrollments.length).to eq 1
-      expect(course.enrollments.first.state_based_on_date).to eq :inactive
+      expect(course.enrollments.first.state_based_on_date).to eq :accepted
     end
 
     it "should allow enrollments on crosslisted sections' original course" do

@@ -511,6 +511,8 @@ describe User do
       @course5.enroll_user(@user, 'TeacherEnrollment')
 
       @course6 = course(:course_name => "active but date restricted", :active_course => true)
+      @course6.restrict_student_future_view = true
+      @course6.save!
       e = @course6.enroll_user(@user, 'StudentEnrollment')
       e.accept!
       e.start_at = 1.day.from_now
@@ -523,7 +525,6 @@ describe User do
       e.start_at = 2.days.ago
       e.end_at = 1.day.ago
       e.save!
-
 
       # only four, in the right order (type, then name), and with the top type per course
       expect(@user.courses_with_primary_enrollment.map{|c| [c.id, c.primary_enrollment_type]}).to eql [
