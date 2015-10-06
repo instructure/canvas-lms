@@ -21,48 +21,62 @@ define([
     renderLinkArrow (mark) {
       if (mark === this.props.markColumn){
         if (this.props.sortDirection === Constants.sortDirections.DESCENDING){
-          return(<i className='icon-mini-arrow-down'></i>);
-        }else{
-          return(<i className='icon-mini-arrow-up'></i>);
+          return (<i className='icon-mini-arrow-down'></i>);
+        } else {
+          return (<i className='icon-mini-arrow-up'></i>);
         }
       }
     },
     render () {
-      if(this.props.includeModerationSetHeaders){
-        return(
-          <div className='ModeratedColumnHeader'>
-            <div className='ModeratedColumnHeader__StudentName ColumnHeader__Item'>
-              <input type='checkbox' onChange={this.props.handleSelectAll} />
-              <span>{I18n.t('Student')}</span>
+      if (this.props.includeModerationSetHeaders) {
+        return (
+          <div className='grid-row ModeratedColumnHeader'>
+            <div className='col-xs-4'>
+              <div className='ModeratedColumnHeader__StudentName ColumnHeader__Item'>
+                <input type='checkbox' onChange={this.handleSelectAll} />
+                <span>{I18n.t('Student')}</span>
+              </div>
             </div>
 
-            <div className='ModeratedColumnHeader__Mark ColumnHeader__Item'>
-              <a href='#' onClick={this.props.handleSortMark1}>{I18n.t('1st Mark')} {this.renderLinkArrow(Constants.markColumnNames.MARK_ONE)}</a>
+            <div className='col-xs-2'>
+              <div className='ModeratedColumnHeader__Mark ColumnHeader__Item'>
+                <a href='#' onClick={this.props.handleSortMark1}>{I18n.t('1st Mark')} {this.renderLinkArrow(Constants.markColumnNames.MARK_ONE)}</a>
+              </div>
             </div>
 
-            <div className='ColumnHeader__Mark ColumnHeader__Item'>
-              <a href='#' onClick={this.props.handleSortMark2}>{I18n.t('2nd Mark')} {this.renderLinkArrow(Constants.markColumnNames.MARK_TWO)}</a>
+            <div className='col-xs-2'>
+              <div className='ColumnHeader__Mark ColumnHeader__Item'>
+                <a href='#' onClick={this.props.handleSortMark2}>{I18n.t('2nd Mark')} {this.renderLinkArrow(Constants.markColumnNames.MARK_TWO)}</a>
+              </div>
             </div>
 
-            <div className='ColumnHeader__Mark ColumnHeader__Item'>
-              <a href='#' onClick={this.props.handleSortMark3}>{I18n.t('Final Mark')} {this.renderLinkArrow(Constants.markColumnNames.MARK_THREE)}</a>
+            <div className='col-xs-2'>
+              <div className='ColumnHeader__Mark ColumnHeader__Item'>
+                <a href='#' onClick={this.props.handleSortMark3}>{I18n.t('Final Mark')} {this.renderLinkArrow(Constants.markColumnNames.MARK_THREE)}</a>
+              </div>
             </div>
 
-            <div className='ColumnHeader__FinalGrade ColumnHeader__Item'>
-              <span>{I18n.t('Grade')}</span>
+            <div className='col-xs-2'>
+              <div className='ColumnHeader__FinalGrade ColumnHeader__Item'>
+                <span>{I18n.t('Grade')}</span>
+              </div>
             </div>
           </div>
         );
-      }else{
-        return(
-          <div className='ColumnHeader'>
-            <div className='ColumnHeader__StudentName ColumnHeader__Item'>
-              <input type='checkbox' onChange={this.props.handleSelectAll} />
-              <span>{I18n.t('Student')}</span>
+      } else {
+        return (
+          <div className='grid-row ColumnHeader'>
+            <div className='col-xs-4'>
+              <div className='ColumnHeader__StudentName ColumnHeader__Item'>
+                <input type='checkbox' onChange={this.handleSelectAll} />
+                <span>{I18n.t('Student')}</span>
+              </div>
             </div>
 
-            <div className='ColumnHeader__Mark ColumnHeader__Item'>
-              <a href='#' onClick={this.props.handleSortMark1}>{I18n.t('1st Mark')} {this.renderLinkArrow(Constants.markColumnNames.MARK_ONE)}</a>
+            <div className='col-xs-2'>
+              <div className='ColumnHeader__Mark ColumnHeader__Item'>
+                <a href='#' onClick={this.props.handleSortMark1}>{I18n.t('1st Mark')} {this.renderLinkArrow(Constants.markColumnNames.MARK_ONE)}</a>
+              </div>
             </div>
           </div>
         );

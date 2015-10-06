@@ -62,23 +62,31 @@ define([
             onReviewClick={() => this.props.store.dispatch(Actions.addStudentToModerationSet())}
             published={this.state.assignment.published}
           />
-          <ModeratedColumnHeader
-            includeModerationSetHeaders={this.isModerationSet(this.state.studentList.students)}
-            sortDirection={this.state.studentList.sort.direction}
-            markColumn={this.state.studentList.sort.column}
-            handleSortMark1={() => this.props.store.dispatch(Actions.sortMark1Column())}
-            handleSortMark2={() => this.props.store.dispatch(Actions.sortMark2Column())}
-            handleSortMark3={() => this.props.store.dispatch(Actions.sortMark3Column())}
-            handleSelectAll={this.handleSelectAll}
-          />
-          <ModeratedStudentList
-            includeModerationSetColumns={this.isModerationSet(this.state.studentList.students)}
-            handleCheckbox={this.handleCheckbox}
-            onSelectProvisionalGrade={(provisionalGradeId) => this.props.store.dispatch(Actions.selectProvisionalGrade(provisionalGradeId))}
-            studentList={this.state.studentList}
-            assignment={this.state.assignment}
-            urls={this.state.urls}
-          />
+          <div className='grid-row'>
+            <div className='col-xs-12'>
+              <ModeratedColumnHeader
+                includeModerationSetHeaders={this.isModerationSet(this.state.studentList.students)}
+                sortDirection={this.state.studentList.sort.direction}
+                markColumn={this.state.studentList.sort.column}
+                store={this.props.store}
+                handleSortMark1={() => this.props.store.dispatch(Actions.sortMark1Column())}
+                handleSortMark2={() => this.props.store.dispatch(Actions.sortMark2Column())}
+                handleSortMark3={() => this.props.store.dispatch(Actions.sortMark3Column())}
+              />
+            </div>
+          </div>
+            <div className='grid-row'>
+              <div className='col-xs-12'>
+                <ModeratedStudentList
+                  includeModerationSetColumns={this.isModerationSet(this.state.studentList.students)}
+                  handleCheckbox={this.handleCheckbox}
+                  onSelectProvisionalGrade={(provisionalGradeId) => this.props.store.dispatch(Actions.selectProvisionalGrade(provisionalGradeId))}
+                  studentList={this.state.studentList}
+                  assignment={this.state.assignment}
+                  urls={this.state.urls}
+                />
+            </div>
+          </div>
         </div>
       );
     }

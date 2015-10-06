@@ -2,9 +2,6 @@
 
 .assignments{
   .ModeratedColumnHeader{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
     padding-bottom: 5px;
     border-bottom: 1px solid #8495A0;
     font-size: 11px;
@@ -27,21 +24,9 @@
     span{
       margin-left: 10px;
     }
-    width: 200px;
-    display: flex;
-    align-items: center;
-  }
-
-  .ModeratedColumnHeader__Mark{
-  }
-
-  .ModeratedColumnHeader__FinalGrade{
   }
 
   .ColumnHeader{
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
     padding-bottom: 5px;
     border-bottom: 1px solid #8495A0;
     font-size: 11px;
@@ -64,13 +49,7 @@
       margin-left: 10px;
     }
     width: 200px;
-    display: flex;
-    align-items: center;
     margin-right: 40px;
-  }
-
-  .ColumnHeader__Mark{
-
   }
 
   .ModeratedAssignmentList{
@@ -81,17 +60,8 @@
 
   .ModeratedAssignmentList__Item{
     border-bottom: 1px solid #F0F0F0;
-    align-items: center;
-    display: flex;
-    justify-content: space-between;
     padding-top: 15px;
     padding-bottom: 15px;
-  }
-
-  .ModeratedAssignmentList__StudentInfo{
-    display: flex;
-    align-items: center;
-    width: 200px;
   }
 
   .ModeratedAssignmentList__StudentInfo input[type='checkbox']{
@@ -104,17 +74,11 @@
     width: 20px;
   }
 
-  .ModeratedAssignmentList__Mark{
-    display: flex;
-    align-items: center;
-  }
   .ModeratedAssignmentList__Mark input[type='radio']{
     margin: 0px 5px 0px 5px;
   }
   .ModeratedAssignmentList_Grade{
     width: 50px;
-    display: flex;
-    justify-content: center;
   }
 
   .AssignmentList{
@@ -125,17 +89,11 @@
 
   .AssignmentList__Item{
     border-bottom: 1px solid #F0F0F0;
-    align-items: center;
-    display: flex;
-    justify-content: flex-start;
     padding-top: 15px;
     padding-bottom: 15px;
   }
 
   .AssignmentList__StudentInfo{
-    display: flex;
-    align-items: center;
-    width: 200px;
     margin-right: 40px;
   }
 
@@ -149,17 +107,11 @@
     width: 20px;
   }
 
-  .AssignmentList__Mark{
-    display: flex;
-    align-items: center;
-  }
   .AssignmentList__Mark input[type='radio']{
     margin: 0px 5px 0px 5px;
   }
   .AssignmentList_Grade{
     width: 50px;
-    display: flex;
-    justify-content: center;
   }
 }
 

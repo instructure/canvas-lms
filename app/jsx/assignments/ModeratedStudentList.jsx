@@ -38,28 +38,34 @@ define([
         if (this.props.includeModerationSetColumns) {
           var provisionalGradeId = student.provisional_grades[markIndex].provisional_grade_id;
           return (
-            <div className='ModeratedAssignmentList__Mark'>
-              <input
-                type='radio'
-                name={`mark_${student.id}`}
-                disabled={this.props.assignment.published}
-                onChange={this.props.onSelectProvisionalGrade.bind(this, provisionalGradeId)}
-                checked={this.isProvisionalGradeChecked(provisionalGradeId, student)}
-              />
-                <a target='_blank' href={student.provisional_grades[markIndex].speedgrader_url}>{student.provisional_grades[markIndex].score}</a>
+            <div className='col-xs-2'>
+              <div className='ModeratedAssignmentList__Mark'>
+                <input
+                  type='radio'
+                  name={`mark_${student.id}`}
+                  disabled={this.props.assignment.published}
+                  onChange={this.props.onSelectProvisionalGrade.bind(this, provisionalGradeId)}
+                  checked={this.isProvisionalGradeChecked(provisionalGradeId, student)}
+                />
+                  <a target='_blank' href={student.provisional_grades[markIndex].speedgrader_url}>{student.provisional_grades[markIndex].score}</a>
+              </div>
             </div>
           );
         } else {
           return (
-            <div className='AssignmentList__Mark'>
-              <a  target='_blank' href={student.provisional_grades[markIndex].speedgrader_url}>{student.provisional_grades[markIndex].score}</a>
+            <div className='col-xs-2'>
+              <div className='AssignmentList__Mark'>
+                <a  target='_blank' href={student.provisional_grades[markIndex].speedgrader_url}>{student.provisional_grades[markIndex].score}</a>
+              </div>
             </div>
           );
         }
       } else {
         return (
-          <div className='ModeratedAssignmentList__Mark'>
-            <a target='_blank' href={this.generateSpeedgraderUrl(this.props.urls.assignment_speedgrader_url, student)}>Speed Grader</a>
+          <div className='col-xs-2'>
+            <div className='ModeratedAssignmentList__Mark'>
+              <a target='_blank' href={this.generateSpeedgraderUrl(this.props.urls.assignment_speedgrader_url, student)}>Speed Grader</a>
+            </div>
           </div>
         );
       }
@@ -71,15 +77,19 @@ define([
           return pg.provisional_grade_id === student.selected_provisional_grade_id;
         });
         return (
-          <span className='AssignmentList_Grade'>
-            {grade.score}
-          </span>
+          <div className='col-xs-2'>
+            <span className='AssignmentList_Grade'>
+              {grade.score}
+            </span>
+          </div>
         );
       } else {
         return (
-          <span className='AssignmentList_Grade'>
-            -
-          </span>
+          <div className='col-xs-2'>
+            <span className='AssignmentList_Grade'>
+              -
+            </span>
+          </div>
         );
       }
     },
@@ -91,36 +101,44 @@ define([
               if (this.props.includeModerationSetColumns) {
                 return (
                   <li key={student.id} className='ModeratedAssignmentList__Item'>
-                    <div className='ModeratedAssignmentList__StudentInfo'>
-                      <input
-                        checked={student.on_moderation_stage || student.in_moderation_set || student.isChecked}
-                        disabled={student.in_moderation_set || this.props.assignment.published}
-                        type='checkbox'
-                        onChange={this.props.handleCheckbox.bind(null, student)}
-                      />
-                      <img className='img-circle AssignmentList_StudentPhoto' src={student.avatar_image_url} />
-                      <span>{student.display_name}</span>
+                    <div className='grid-row'>
+                      <div className='col-xs-4'>
+                        <div className='ModeratedAssignmentList__StudentInfo'>
+                          <input
+                            checked={student.on_moderation_stage || student.in_moderation_set || student.isChecked}
+                            disabled={student.in_moderation_set || this.props.assignment.published}
+                            type='checkbox'
+                            onChange={this.props.handleCheckbox.bind(null, student)}
+                          />
+                          <img className='img-circle AssignmentList_StudentPhoto' src={student.avatar_image_url} />
+                          <span>{student.display_name}</span>
+                        </div>
+                      </div>
+                      {this.renderStudentMark(student, PG_ONE_INDEX)}
+                      {this.renderStudentMark(student, PG_TWO_INDEX)}
+                      {this.renderStudentMark(student, PG_THREE_INDEX)}
+                      {this.renderFinalGrade(student)}
                     </div>
-                    {this.renderStudentMark(student, PG_ONE_INDEX)}
-                    {this.renderStudentMark(student, PG_TWO_INDEX)}
-                    {this.renderStudentMark(student, PG_THREE_INDEX)}
-                    {this.renderFinalGrade(student)}
                   </li>
                  );
               } else {
                 return (
                   <li key={student.id} className='AssignmentList__Item'>
-                    <div className='AssignmentList__StudentInfo'>
-                      <input
-                        checked={student.on_moderation_stage || student.in_moderation_set || student.isChecked}
-                        disabled={student.in_moderation_set || this.props.assignment.published}
-                        type='checkbox'
-                        onChange={this.props.handleCheckbox.bind(null, student)}
-                      />
-                      <img className='img-circle AssignmentList_StudentPhoto' src={student.avatar_image_url} />
-                      <span>{student.display_name}</span>
+                    <div className='grid-row'>
+                      <div className='col-xs-4'>
+                        <div className='AssignmentList__StudentInfo'>
+                          <input
+                            checked={student.on_moderation_stage || student.in_moderation_set || student.isChecked}
+                            disabled={student.in_moderation_set || this.props.assignment.published}
+                            type='checkbox'
+                            onChange={this.props.handleCheckbox.bind(null, student)}
+                          />
+                          <img className='img-circle AssignmentList_StudentPhoto' src={student.avatar_image_url} />
+                          <span>{student.display_name}</span>
+                        </div>
+                      </div>
+                      {this.renderStudentMark(student, PG_ONE_INDEX)}
                     </div>
-                    {this.renderStudentMark(student, PG_ONE_INDEX)}
                   </li>
                 );
               }
