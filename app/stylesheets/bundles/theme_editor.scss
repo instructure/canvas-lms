@@ -239,7 +239,6 @@ $te-width: 300px;
 
   .Theme__editor-upload-overrides_form {
     background: $te-content-bgd;
-    color: $ic-color-light;
   }
 }
 
@@ -281,6 +280,12 @@ $te-width: 300px;
   }
 
   @if $use_high_contrast == false { outline: none; }
+}
+
+
+.ThemeEditorFileUpload__view-file {
+  float: right;
+  font-weight: normal;
 }
 
 //// Accordion styles for Theme Editor

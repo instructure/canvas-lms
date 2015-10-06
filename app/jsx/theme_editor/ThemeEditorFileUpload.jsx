@@ -61,7 +61,7 @@ define([
       } else if (this.props.userInput.val) {
         return this.state.selectedFileName
       } else { // no saved value and no unsaved value
-        return this.props.label
+        return ''
       }
     },
 
@@ -93,40 +93,53 @@ define([
       }
     },
 
+   viewFileLink() {
+      return (!this.hasUserInput() && this.props.currentValue) ? (
+        <a href={this.props.currentValue} target="_blank" className="ThemeEditorFileUpload__view-file">
+          { I18n.t('View File') }
+        </a>
+      ) : null;
+    },
+
     render() {
       return (
-        <div className="ThemeEditorFileUpload ic-Input-group">
-          <button
-            disabled={!this.hasSomethingToReset()}
-            type="button"
-            className="ic-Input-group__add-on Button ThemeEditorFileUpload__reset-button"
-            onClick={this.handleResetClicked}
-          >
-            { this.resetButtonLabel() }
-          </button>
-          <input
-            type="hidden"
-            name={!this.props.userInput.val && this.props.name}
-            value={(this.props.userInput.val === '') ? '' : this.props.currentValue}
-          />
-          <label className="ThemeEditorFileUpload__file-chooser">
-            <div className="screenreader-only">
-              { this.props.label }
-            </div>
+        <div className="ThemeEditorFileUpload">
+          <div className="ThemeEditorFileUpload__label ic-Label">
+            {this.props.label} {this.viewFileLink()}
+          </div>
+          <div className="ic-Input-group">
+            <button
+              disabled={!this.hasSomethingToReset()}
+              type="button"
+              className="ic-Input-group__add-on Button ThemeEditorFileUpload__reset-button"
+              onClick={this.handleResetClicked}
+            >
+              { this.resetButtonLabel() }
+            </button>
             <input
-              type="file"
-              name={this.props.userInput.val && this.props.name}
-              accept={this.props.accept}
-              onChange={this.handleFileChanged}
-              ref="fileInput"
+              type="hidden"
+              name={!this.props.userInput.val && this.props.name}
+              value={(this.props.userInput.val === '') ? '' : this.props.currentValue}
             />
-            <div className="ThemeEditorFileUpload__fake-input uneditable-input ic-Input" aria-hidden="true">
-              { this.displayValue() }
-            </div>
-            <div className="Button" aria-hidden="true">
-              {I18n.t('Select')}
-            </div>
-          </label>
+            <label className="ThemeEditorFileUpload__file-chooser">
+              <div className="screenreader-only">
+                { this.props.label }
+              </div>
+              <input
+                type="file"
+                name={this.props.userInput.val && this.props.name}
+                accept={this.props.accept}
+                onChange={this.handleFileChanged}
+                ref="fileInput"
+              />
+              <div className="ThemeEditorFileUpload__fake-input uneditable-input ic-Input" aria-hidden="true">
+                { this.displayValue() }
+              </div>
+              <div className="Button" aria-hidden="true">
+                { I18n.t('Select') }
+              </div>
+            </label>
+          </div>
         </div>
       )
     }

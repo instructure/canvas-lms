@@ -366,7 +366,7 @@ define([
                         <div className="Theme__editor-upload-overrides_form">
 
                           <ThemeEditorFileUpload
-                            label={I18n.t('Upload a CSS file...')}
+                            label={I18n.t('CSS')}
                             accept=".css"
                             name="css_overrides"
                             currentValue={this.props.brandConfig.css_overrides}
@@ -375,7 +375,7 @@ define([
                           />
 
                           <ThemeEditorFileUpload
-                            label={I18n.t('Upload a JS file...')}
+                            label={I18n.t('JavaScript')}
                             accept=".js"
                             name="js_overrides"
                             currentValue={this.props.brandConfig.js_overrides}
@@ -394,7 +394,7 @@ define([
                         <div className="Theme__editor-upload-overrides_form">
 
                           <ThemeEditorFileUpload
-                            label={I18n.t('Upload a CSS file...')}
+                            label={I18n.t('CSS')}
                             accept=".css"
                             name="mobile_css_overrides"
                             currentValue={this.props.brandConfig.mobile_css_overrides}
@@ -403,7 +403,7 @@ define([
                           />
 
                           <ThemeEditorFileUpload
-                            label={I18n.t('Upload a JS file...')}
+                            label={I18n.t('JavaScript')}
                             accept=".js"
                             name="mobile_js_overrides"
                             currentValue={this.props.brandConfig.mobile_js_overrides}
