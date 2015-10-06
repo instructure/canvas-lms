@@ -1,4 +1,4 @@
-require File.expand_path(File.dirname(__FILE__) + '/helpers/profile_common')
+require File.expand_path(File.dirname(__FILE__) + '/profile_common')
 
 
 describe 'profile_pics' do
@@ -16,6 +16,8 @@ describe 'profile_pics' do
     it_behaves_like 'user settings page change pic window', 'student'
 
     it_behaves_like 'user settings change pic cancel', 'student'
+
+    it_behaves_like 'user settings profile pic gravatar link', 'student'
 
   end
 end
