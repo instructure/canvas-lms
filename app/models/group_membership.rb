@@ -25,13 +25,13 @@ class GroupMembership < ActiveRecord::Base
 
   attr_accessible :group, :user, :workflow_state, :moderator
 
-  before_save :assign_uuid
-  before_save :auto_join
-  before_save :capture_old_group_id
-
-  validates_presence_of :group_id, :user_id, :workflow_state
+  validates :group_id, :user_id, :workflow_state, :uuid, presence: true
+  before_validation :assign_uuid
   before_validation :verify_section_homogeneity_if_necessary
   validate :validate_within_group_limit
+
+  before_save :auto_join
+  before_save :capture_old_group_id
 
   after_save :ensure_mutually_exclusive_membership
   after_save :touch_groups
