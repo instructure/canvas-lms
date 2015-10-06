@@ -1,12 +1,13 @@
-<header class="entry-header discussion-section admin-link-hover-area clearfix {{#if collapsable}}collapsable{{/if}}" {{#if collapsable}}data-event="toggleCollapsed"{{/if}}>
+<header class="entry-header discussion-section admin-link-hover-area clearfix">
 {{#if collapsable}}
-<a href="#"
-    id="collapse-discussion"
-    class="collapsable"
+<a
+    href="#"
+    class="collapsable collapse-discussion pad-box-mini"
     role="button"
-    title="{{#t "collapsible_subdiscussion"}}Collapse Subdiscussion{{/t}}"
+    tabindex="0"
+    title="{{t "Collapse Subdiscussion"}}"
     data-event="toggleCollapsed">
-    <span class="screenreader-only"></span>
+    <span class="screenreader-only">{{t "Collapse Subdiscussion"}}</span>
 </a>
 {{/if}}
   {{#unless hiddenName}}
