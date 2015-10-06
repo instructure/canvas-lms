@@ -63,16 +63,18 @@ define(['i18n!quizzes.show', 'jquery'], function(I18n, $) {
     creditNoneTpl.text(I18n.t('answers.incorrect', 'Incorrect'));
     surveyAnswerTpl.text(I18n.t('answers.you_answered', 'You Answered'));
 
-    rightAnswers.prepend(rightTpl);
-    wrongAnswers.prepend(wrongTpl);
-    correctAnswers.prepend(correctTpl);
-    editableMatches.parent().before(correctTpl);
-    readOnlyMatches.prepend(correctTpl);
-    shortAnswers.prepend(shortTpl);
+    if(!ENV.IS_SURVEY){
+      rightAnswers.prepend(rightTpl);
+      wrongAnswers.prepend(wrongTpl);
+      correctAnswers.prepend(correctTpl);
+      editableMatches.parent().before(correctTpl);
+      readOnlyMatches.prepend(correctTpl);
+      shortAnswers.prepend(shortTpl);
+      creditPartial.prepend(creditPartialTpl);
+      creditFull.prepend(creditFullTpl);
+      creditNone.prepend(creditNoneTpl);
+    }
     unansweredQ.prepend(unansweredTpl);
-    creditPartial.prepend(creditPartialTpl);
-    creditFull.prepend(creditFullTpl);
-    creditNone.prepend(creditNoneTpl);
     surveyAnswers.prepend(surveyAnswerTpl);
 
     // adjust these down a little so they align better w/ answers.
