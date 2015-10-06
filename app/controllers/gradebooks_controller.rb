@@ -463,7 +463,12 @@ class GradebooksController < ApplicationController
                          'SpeedGrader is enabled only for published content.')
       return redirect_to polymorphic_url([@context, @assignment])
     end
-
+    if Canvadocs.enabled? &&
+       Canvadocs.annotations_supported? &&
+       @assignment.submission_types.include?('online_upload') &&
+       request.user_agent.to_s =~ /Firefox/
+        flash[:notice] = t("Warning: Crocodoc has limitations when used in Firefox. Comments will not always be saved.")
+    end
     grading_role = if moderated_grading_enabled_and_no_grades_published
       if @context.grants_right?(@current_user, :moderate_grades)
         :moderator
