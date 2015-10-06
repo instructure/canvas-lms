@@ -314,11 +314,11 @@ TEXT
                 <% end %>
                 <div>
                   <%= settings.check_box :global_includes, :checked => @account.settings[:global_includes] %>
-                  <%= settings.label :global_includes, :en => "Global CSS/JavaScript includes" %>
+                  <%= settings.label :global_includes, :en => "Global CSS/JavaScript overrides" %>
                   <% if use_new_styles? %>
                     <div class="account_settings__help-text">
                       <%= t do %>
-                        When enabled, global JS and CSS files can be uploaded in the
+                        When enabled, global JavaScript and CSS files can be uploaded in the
                         <%= link_to t("Theme Editor"), account_theme_editor_path(@account) %>.
                       <% end %>
                     </div>
@@ -327,7 +327,7 @@ TEXT
                         id: :account_settings_new_sub_account_includes,
                         checked: @account.settings[:sub_account_includes]
                       %>
-                      <%= settings.label :new_sub_account_includes, :en => "Let sub-accounts customize themes and add additional includes" %>
+                      <%= settings.label :new_sub_account_includes, :en => "Let sub-accounts use the Theme Editor to customize their own branding" %>
                     </div>
                   <% end %>
                 </div>
