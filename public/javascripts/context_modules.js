@@ -333,14 +333,11 @@ define([
           isNew = true;
           $form.attr('action', $form.find(".add_context_module_url").attr('href'));
           $form.find(".completion_entry").hide();
-          $form.find(".require-sequential").children().hide();
           $form.attr('method', 'POST');
           $form.find(".submit_button").text(I18n.t('buttons.add', "Add Module"));
         } else {
           $form.attr('action', $module.find(".edit_module_link").attr('href'));
           $form.find(".completion_entry").show();
-          $form.find(".require-sequential").children().hide().end()
-          $form.find(".requirement-count-radio .ic-Radio").children().hide().end()
           $form.attr('method', 'PUT');
           $form.find(".submit_button").text(I18n.t('buttons.update', "Update Module"));
         }
@@ -382,14 +379,20 @@ define([
         // Set no items or criteria message plus diasable elements if there are no items or no requirements
         if (no_items) {
           $form.find(".completion_entry .no_items_message").show();
-
-        } else if ($module.find(".content .context_module_item .criterion.defined").length !== 0) {
-          $(".require-sequential").children().show();
-          $(".requirement-count-radio .ic-Radio").children().show();
+        }
+        if ($module.find(".content .context_module_item .criterion.defined").length !== 0) {
+          $(".requirement-count-radio").children().show();
+        } else {
+          $(".requirement-count-radio").children().hide();
         }
 
         var $requirementCount = $module.find('.pill li').data("requirement-count");
-        $requirementCount == 1 ? $('#context_module_requirement_count_1').prop('checked', true) : $('#context_module_requirement_count').prop('checked', true);
+        if ($requirementCount == 1) {
+          $('#context_module_requirement_count_1').prop('checked', true).change();
+        } else {
+          $('#context_module_requirement_count_').prop('checked', true).change();
+        }
+
 
         $module.fadeIn('fast', function() {
         });
@@ -922,8 +925,7 @@ define([
       $option.slideDown();
       $form.find(".completion_entry .criteria_list").append($pre).show();
       $pre.slideDown();
-      $(".require-sequential").children().show();
-      $(".requirement-count-radio .ic-Radio").children().show();
+      $(".requirement-count-radio").children().show();
       $('#context_module_requirement_count_').change().focus();
     });
     $("#completion_criterion_option .id").change(function() {
@@ -953,6 +955,16 @@ define([
         $option.find(".points_possible_parent").hide();
       }
     });
+
+    $("#add_context_module_form .requirement-count-radio .ic-Radio input").change(function() {
+      if ($('#context_module_requirement_count_').prop('checked')) {
+        $('.require-sequential').show();
+      } else {
+        $('.require-sequential').hide();
+        $('#require_sequential_progress').prop('checked', false)
+      }
+    });
+
     $("#add_context_module_form .delete_criterion_link").click(function(event) {
       event.preventDefault();
       var $elem = $(this).closest(".criteria_list");
@@ -961,8 +973,7 @@ define([
         $(this).remove();
         // Hides radio button and checkbox if there are no requirements
         if ($elem.html().length === 0 && $requirement.length !== 0) {
-          $(".require-sequential").children().fadeOut("fast");
-          $(".requirement-count-radio .ic-Radio").children().fadeOut("fast");
+          $(".requirement-count-radio").children().fadeOut("fast");
         }
       })
     });

@@ -52,12 +52,16 @@
       <%= f.label :module_complete_when, "Requirements", class: "ic-Label form-element" %>
        <div class="ic-Form-control ic-Form-control--radio requirement-count-radio">
         <div class="ic-Radio">
-        <%= f.radio_button :requirement_count, "" %>
-        <%= f.label :requirement_count, t("Student must complete all of these requirements"), class: "ic-Label", value: "" %>
+          <%= f.radio_button :requirement_count, "" %>
+          <%= f.label :requirement_count, t("Students must complete all of these requirements"), class: "ic-Label", value: "" %>
+        </div>
+        <div class="form-element require-sequential ic-Form-control ic-Form-control--checkbox">
+          <%= f.check_box :require_sequential_progress, :id => "require_sequential_progress" %>
+          <%= f.label :require_sequential_progress, :en => "Students must move through requirements in sequential order", :for => "require_sequential_progress", class: 'ic-Label' %>
         </div>
         <div class="ic-Radio">
           <%= f.radio_button :requirement_count, 1  %>
-          <%= f.label :requirement_count, t("Student must complete one of these requirements"), class: "ic-Label", value: 1 %>
+          <%= f.label :requirement_count, t("Students must complete one of these requirements"), class: "ic-Label", value: 1 %>
         </div>
       </div>
       <div class="no_items_message form-element" style="display: none;">
@@ -90,11 +94,6 @@
         <%= f.label :publish_final_grade, :en => "Publish final grade for the student when this module is completed", :for => "publish_final_grade" %>
       </div>
     <% end %>
-
-    <div class="form-element require-sequential ic-Form-control ic-Form-control--checkbox">
-      <%= f.check_box :require_sequential_progress, :id => "require_sequential_progress" %>
-      <%= f.label :require_sequential_progress, :en => "Students must move through requirements in this module in sequential order", :for => "require_sequential_progress", class: 'ic-Label' %>
-    </div>
 
     <div class="button-container">
       <button type="button" class="btn cancel_button"><%= t('#buttons.cancel', %{Cancel}) %></button>
