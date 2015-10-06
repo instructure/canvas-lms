@@ -25,12 +25,14 @@ define([
     },
 
     generateSpeedgraderUrl (baseSpeedgraderUrl, student) {
-      return (`${baseSpeedgraderUrl}&student_id=${student.id}`);
+      var encoded = window.encodeURI(`{"student_id":${student.id}}`);
+      return (`${baseSpeedgraderUrl}#${encoded}`);
     },
 
     isProvisionalGradeChecked (provisionalGradeId, student) {
       return student.selected_provisional_grade_id === provisionalGradeId
     },
+
     renderStudentMark (student, markIndex) {
       if (student.provisional_grades && student.provisional_grades[markIndex]) {
         if (this.props.includeModerationSetColumns) {
