@@ -6,7 +6,11 @@ describe "Exporter" do
 
   before(:once) do
     def cartridge_path
-      File.join(File.dirname(__FILE__), "/../../../../fixtures/migration/unicode-filename-test-export.imscc")
+      File.join(File.dirname(__FILE__), "/../../../../fixtures/exporter/cc-with-modules-export.imscc")
+    end
+
+    def cartridge_without_modules_path
+      File.join(File.dirname(__FILE__), "/../../../../fixtures/exporter/cc-without-modules-export.imscc")
     end
 
     @attachment = Attachment.create({
@@ -14,6 +18,13 @@ describe "Exporter" do
       filename: 'exortable-test-file',
       uploaded_data: File.open(cartridge_path)
     })
+
+    @attachment_without_modules = Attachment.create({
+      context: course,
+      filename: 'exortable-test-file',
+      uploaded_data: File.open(cartridge_without_modules_path)
+    })
+
   end
 
   context "create ePub default settings" do
@@ -27,6 +38,16 @@ describe "Exporter" do
 
     it "should contain a top-level templates key for module content" do
       expect(exporter.templates.key?(:modules)).to be_truthy
+    end
+  end
+
+  context "default settings with no modules present" do
+    let(:exporter) do
+      CC::Exporter::Epub::Exporter.new(@attachment_without_modules.open)
+    end
+
+    it "should fall back to sorting by content type" do
+      expect(exporter.templates.key?(:modules)).to be_falsey
     end
   end
 

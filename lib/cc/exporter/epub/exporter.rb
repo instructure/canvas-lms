@@ -19,7 +19,7 @@ module CC::Exporter::Epub
 
     def initialize(cartridge, sort_by_content=false)
       @cartridge = cartridge
-      @sort_by_content = sort_by_content
+      @sort_by_content = sort_by_content || cartridge_json[:modules].empty?
     end
     attr_reader :cartridge, :sort_by_content
 
