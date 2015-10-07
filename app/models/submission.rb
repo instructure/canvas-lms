@@ -995,7 +995,11 @@ class Submission < ActiveRecord::Base
       pg = find_or_create_provisional_grade!(scorer: opts[:author], final: opts.delete(:final))
       opts[:provisional_grade_id] = pg.id
     end
-    self.save! if self.new_record?
+    if self.new_record?
+      self.save!
+    else
+      self.touch
+    end
     valid_keys = [:comment, :author, :media_comment_id, :media_comment_type,
                   :group_comment_id, :assessment_request, :attachments,
                   :anonymous, :hidden, :recipient, :provisional_grade_id]
@@ -1003,6 +1007,7 @@ class Submission < ActiveRecord::Base
       comment = submission_comments.create!(opts.slice(*valid_keys))
     end
     opts[:assessment_request].comment_added(comment) if opts[:assessment_request] && comment
+
     comment
   end
 

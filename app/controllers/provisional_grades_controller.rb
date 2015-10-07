@@ -100,7 +100,33 @@ class ProvisionalGradesController < ApplicationController
       # in theory we could apply visibility here, but for now we would rather be performant
       # e.g. @assignment.students_with_visibility(@context.students_visible_to(@current_user)).find(params[:student_id])
       student = @context.students.find(params[:student_id])
-      render :json => { :needs_provisional_grade => @assignment.student_needs_provisional_grade?(student) }
+      json = {:needs_provisional_grade => @assignment.student_needs_provisional_grade?(student)}
+
+
+      if params[:last_updated_at] # check to see if the submission has been updated
+        last_updated = Time.zone.parse(params[:last_updated_at]) # this will be nil if there was originally no submission, so it should match a nil submission
+        submission = @assignment.submissions.where(:user_id => student).first
+
+        if ((submission && submission.updated_at).to_i != last_updated.to_i)
+          if authorized_action(@context, @current_user, :moderate_grades) # only do the permission check if it has changed
+            selection = @assignment.moderated_grading_selections.where(:student_id => student).first
+
+            json[:provisional_grades] = []
+            submission.provisional_grades.order(:id).each do |pg|
+              pg_json = provisional_grade_json(pg, submission, @assignment, @current_user, %w(submission_comments rubric_assessment))
+              pg_json[:selected] = !!(selection && selection.selected_provisional_grade_id == pg.id)
+              pg_json[:readonly] = !pg.final && (pg.scorer_id != @current_user.id)
+              if pg.final
+                json[:final_provisional_grade] = pg_json
+              else
+                json[:provisional_grades] << pg_json
+              end
+            end
+          end
+        end
+      end
+
+      render :json => json
     end
   end
 
@@ -123,6 +149,7 @@ class ProvisionalGradesController < ApplicationController
       return render :json => { :message => 'student not in moderation set' }, :status => :bad_request unless selection
       selection.provisional_grade = pg
       selection.save!
+      pg.submission.touch # so the selection is reloaded for other moderators
       render :json => selection.as_json(:include_root => false, :only => %w(assignment_id student_id selected_provisional_grade_id))
     end
   end

@@ -1352,7 +1352,7 @@ class Assignment < ActiveRecord::Base
     submission_fields = [:user_id, :id, :submitted_at, :workflow_state,
                          :grade, :grade_matches_current_submission,
                          :graded_at, :turnitin_data, :submission_type, :score,
-                         :assignment_id, :submission_comments, :excused].freeze
+                         :assignment_id, :submission_comments, :excused, :updated_at].freeze
 
     comment_fields = [:comment, :id, :author_name, :created_at, :author_id,
                       :media_comment_type, :media_comment_id,

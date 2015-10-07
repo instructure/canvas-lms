@@ -41,13 +41,23 @@ describe "speed grader" do
       expect(f('#grading-box-extended')).to have_attribute('value', '7')
       expect(f('#discussion span.comment').text).to be_include 'wat'
 
-      replace_content f('#grading-box-extended'), "8"
-      driver.execute_script '$("#grading-box-extended").change()'
-      wait_for_ajaximations
+      time = 5.minutes.from_now
+      Timecop.freeze(time) do
+        replace_content f('#grading-box-extended'), "8"
+        driver.execute_script '$("#grading-box-extended").change()'
+        wait_for_ajaximations
+      end
+      @submission.reload
+      expect(@submission.updated_at.to_i).to eq time.to_i # should get touched
 
-      f('#speedgrader_comment_textarea').send_keys('srsly')
-      f('#add_a_comment button[type="submit"]').click
-      wait_for_ajaximations
+      time2 = 10.minutes.from_now
+      Timecop.freeze(time2) do
+        f('#speedgrader_comment_textarea').send_keys('srsly')
+        f('#add_a_comment button[type="submit"]').click
+        wait_for_ajaximations
+      end
+      @submission.reload
+      expect(@submission.updated_at.to_i).to eq time2.to_i
 
       @submission.reload
       expect(@submission.score).to be_nil
@@ -61,9 +71,15 @@ describe "speed grader" do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 
       comment = "some silly comment"
-      add_rubric_assessment(3, comment)
-      expect(f('#rubric_summary_container')).to include_text(@rubric.title)
-      expect(f('#rubric_summary_container')).to include_text(comment)
+      time = 5.minutes.from_now
+      Timecop.freeze(time) do
+        add_rubric_assessment(3, comment)
+        expect(f('#rubric_summary_container')).to include_text(@rubric.title)
+        expect(f('#rubric_summary_container')).to include_text(comment)
+      end
+
+      @submission.reload
+      expect(@submission.updated_at.to_i).to eq time.to_i # should get touched
 
       ra = @association.rubric_assessments.first
       expect(ra.artifact).to be_a(ModeratedGrading::ProvisionalGrade)
@@ -429,6 +445,123 @@ describe "speed grader" do
       final_pg.reload
       expect(final_pg.score.to_i).to eql 7
       expect(ff('#moderation_tabs > ul > li')[2]).to include_text("7/8")
+    end
+
+    context "grade reloading" do
+      it "should load the current provisional grades while switching students if it changed in the background" do
+        other_ta = course_with_ta(:course => @course, :active_all => true).user
+        original_sub = @submission
+        student_submission
+
+        get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+        keep_trying_until { f('#speedgrader_iframe') }
+
+        # doesn't show any tabs because there are no marks
+        expect(f('#moderation_tabs')).to_not be_displayed
+
+        # go to next student
+        f('#gradebook_header a.next').click
+        wait_for_ajaximations
+
+        Timecop.freeze(original_sub.updated_at) do
+          # create a mark for the first student, but don't cause the submission's updated_at to change just yet
+          original_sub.find_or_create_provisional_grade!(scorer: other_ta, score: 7)
+        end
+
+        # go back
+        f('#gradebook_header a.prev').click
+        wait_for_ajaximations
+
+        # should still not have loaded the new provisional grades
+        expect(f('#moderation_tabs')).to_not be_displayed
+
+        f('#gradebook_header a.next').click
+        wait_for_ajaximations
+
+        Timecop.freeze(5.minutes.from_now) do
+          original_sub.touch # now touch the submission as it would have been in the first place
+        end
+
+        f('#gradebook_header a.prev').click
+        wait_for_ajaximations
+
+        expect(f('#moderation_tabs')).to be_displayed
+
+        tab = f('#moderation_tabs li.ui-state-active')
+        expect(tab).to include_text("1st Mark")
+        expect(tab).to include_text("7/8")
+
+        grade = f('#grading-box-extended')
+        expect(grade['disabled']).to be_present
+        expect(grade['value']).to eq "7"
+      end
+
+      it "should load the current provisional grades selection while switching students if it changed in the background" do
+        @other_ta = course_with_ta(:course => @course, :active_all => true).user
+        @pg1 = @submission.find_or_create_provisional_grade!(scorer: @other_ta, score: 7)
+        @selection = @assignment.moderated_grading_selections.create!(:student => @student)
+
+        @other_ta2 = course_with_ta(:course => @course, :active_all => true).user
+        @pg2 = @submission.find_or_create_provisional_grade!(scorer: @other_ta2, score: 6)
+
+        @final_pg = @submission.find_or_create_provisional_grade!(scorer: @moderator, score: 2, final: true)
+
+        @selection.provisional_grade = @pg1
+        @selection.save!
+
+        original_sub = @submission
+        student_submission
+
+        get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+        keep_trying_until { f('#speedgrader_iframe') }
+
+        icons = ff('#moderation_tabs .selected_icon')
+        expect(icons[0]).to be_displayed
+        expect(icons[1]).to_not be_displayed
+        expect(icons[2]).to_not be_displayed
+
+        f('#gradebook_header a.next').click
+        wait_for_ajaximations
+
+        Timecop.freeze(5.minutes.from_now) do
+          @selection.provisional_grade = @pg2
+          @selection.save!
+          original_sub.touch
+        end
+
+        f('#gradebook_header a.prev').click
+        wait_for_ajaximations
+
+        expect(icons[0]).to_not be_displayed
+        expect(icons[1]).to be_displayed
+        expect(icons[2]).to_not be_displayed
+      end
+
+      it "should load the current provisional grade while switching students even if its from the same moderator" do
+        # why am I doing this... I guess just because I can
+        other_student = course_with_student(:course => @course, :active_all => true).user
+
+        get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+        keep_trying_until { f('#speedgrader_iframe') }
+
+        f('#gradebook_header a.next').click
+        wait_for_ajaximations
+
+        expect(f('#this_student_does_not_have_a_submission')).to be_displayed
+
+        f('#gradebook_header a.prev').click
+        wait_for_ajaximations
+
+        @assignment.grade_student(other_student, grade: 5, grader: @moderator, provisional: true)
+
+        f('#gradebook_header a.next').click
+        wait_for_ajaximations
+
+        expect(f('#moderation_tabs')).to_not be_displayed # still should not show any tabs, since they own the one grade
+        grade = f('#grading-box-extended')
+        expect(grade['disabled']).to be_blank
+        expect(grade['value']).to eq "5"
+      end
     end
 
     context "moderated grade selection" do

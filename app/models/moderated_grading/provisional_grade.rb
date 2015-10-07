@@ -16,6 +16,7 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
   validates :submission, presence: true
 
   after_create :touch_graders # to update grading counts
+  after_save :touch_submission
   after_save :remove_moderation_ignores
 
   scope :scored_by, ->(scorer) { where(scorer_id: scorer) }
@@ -24,6 +25,10 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
 
   def touch_graders
     submission.touch_graders
+  end
+
+  def touch_submission
+    submission.touch
   end
 
   def remove_moderation_ignores

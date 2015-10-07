@@ -1098,22 +1098,36 @@ define([
           "student_id": this.currentStudent.id
         }));
 
-      if ((ENV.grading_role == 'provisional_grader' || ENV.grading_role == 'moderator') &&
-        this.currentStudent.submission_state == 'not_graded') {
+      if ((ENV.grading_role == 'provisional_grader' && this.currentStudent.submission_state == 'not_graded')
+        || ENV.grading_role == 'moderator') {
 
         $(".speedgrader_alert").hide();
         $submission_not_newest_notice.hide();
         $submission_late_notice.hide();
 
         $grade.attr('disabled', true); // disabling now will keep it from getting undisabled unintentionally by disableWhileLoading
-        if (ENV.grading_role == 'moderator') {
+        if (ENV.grading_role == 'moderator' && this.currentStudent.submission_state == 'not_graded') {
           this.currentStudent.submission.grade = null; // otherwise it may be tricked into showing the wrong submission_state
+        }
+
+        var status_url = ENV.provisional_status_url + "?student_id=" + this.currentStudent.id;
+        if (ENV.grading_role == 'moderator') {
+          status_url += "&last_updated_at="
+          if (this.currentStudent.submission) status_url += this.currentStudent.submission.updated_at;
         }
 
         // hit the API to check whether we still can give a provisional grade
         $full_width_container.disableWhileLoading(
-          $.getJSON(ENV.provisional_status_url + "?student_id=" + this.currentStudent.id, {}, function(data) {
+          $.getJSON(status_url, {}, function(data) {
             EG.currentStudent.needs_provisional_grade = data.needs_provisional_grade;
+
+            if (ENV.grading_role == 'moderator' && data.provisional_grades) {
+              if (!EG.currentStudent.submission) EG.currentStudent.submission = {}
+              EG.currentStudent.submission.provisional_grades = data.provisional_grades;
+              EG.currentStudent.submission.updated_at = data.updated_at;
+              EG.currentStudent.submission.final_provisional_grade = data.final_provisional_grade;
+            }
+
             EG.currentStudent.submission_state = submissionState(EG.currentStudent);
             EG.showStudent();
           })
@@ -1148,8 +1162,13 @@ define([
     },
     handleModerationTabs: function(index_to_load) {
       var prov_grades = this.currentStudent.submission && this.currentStudent.submission.provisional_grades;
-      if (prov_grades && prov_grades.length > 0) {
-        var final_grade = this.currentStudent.submission.final_provisional_grade;
+      var final_grade = this.currentStudent.submission && this.currentStudent.submission.final_provisional_grade;
+
+      if (prov_grades && prov_grades.length == 1 && !final_grade && !prov_grades[0].readonly) {
+        $full_width_container.removeClass("with_moderation_tabs");
+        $moderation_tabs_div.hide();
+        EG.showProvisionalGrade(0);
+      } else if (prov_grades && prov_grades.length > 0) {
         if (prov_grades.length == 1) {
           $moderation_tab_2nd.hide(); // hide 2nd mark
 
