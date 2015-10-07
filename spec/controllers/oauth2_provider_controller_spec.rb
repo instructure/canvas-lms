@@ -133,7 +133,7 @@ describe Oauth2ProviderController do
       Canvas.stubs(:redis => redis)
       get :token, :client_id => key.id, :client_secret => key.api_key, :code => valid_code
       expect(response).to be_success
-      expect(JSON.parse(response.body).keys.sort).to eq ['access_token',  'expires_in', 'refresh_token', 'user']
+      expect(JSON.parse(response.body).keys.sort).to match_array(['access_token',  'refresh_token', 'user'])
     end
 
     it 'deletes existing tokens for the same key when replace_tokens=1' do

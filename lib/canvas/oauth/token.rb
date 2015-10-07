@@ -54,7 +54,7 @@ module Canvas::Oauth
         user.access_tokens.where(developer_key_id: key).destroy_all if replace_tokens || key.replace_tokens
 
         # Then create a new one
-        @access_token = user.access_tokens.create!({:developer_key => key, :remember_access => remember_access?, :scopes => scopes, :purpose => purpose, expires_at: expiration_date})
+        @access_token = user.access_tokens.create!({:developer_key => key, :remember_access => remember_access?, :scopes => scopes, :purpose => purpose})
 
         @access_token.clear_full_token! if @access_token.scoped_to?(['userinfo'])
         @access_token.clear_plaintext_refresh_token! if @access_token.scoped_to?(['userinfo'])
@@ -80,7 +80,6 @@ module Canvas::Oauth
         'refresh_token' => access_token.plaintext_refresh_token,
         'user' => user.as_json(:only => [:id, :name], :include_root => false)
       }
-      json['expires_in'] = access_token.expires_at.utc.to_time.to_i - Time.now.utc.to_i if access_token.expires_at
       json
     end
 
@@ -110,21 +109,6 @@ module Canvas::Oauth
 
     def self.expire_code(code)
       Canvas.redis.del "#{REDIS_PREFIX}#{code}"
-    end
-
-    private
-
-    # This is a temporary measure to start letting developers know that they will need to start using refresh tokens on
-    # June 30th 2016. It will short circuit starting June 29th 2016 at 23:00 UTC. It should be removed after that
-    # date, and have tokens expire an hour after generation.
-    def expiration_date
-      now = DateTime.now
-      if now > DateTime.parse('2016-06-29T00:00:00+00:00')  #This should be the default behaviour after June 30th 2016
-        now + 1.hour
-      else
-        expires_at = DateTime.parse('2016-06-30T00:00:00+00:00')
-        expires_at.change(hour: now.hour, min: now.minute)
-      end
     end
 
   end
