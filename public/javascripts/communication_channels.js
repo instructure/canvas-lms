@@ -214,6 +214,14 @@ $(document).ready(function() {
       }
     });
   });
+  $(".channel_list .channel .reset_bounce_count_link").click(function(event) {
+    event.preventDefault();
+    $.ajaxJSON($(this).attr('href'), 'POST', {}, function(data) {
+      $(this).parents('.channel').find('.bouncing-channel').remove();
+      $(this).remove();
+      $.flashMessage(I18n.t('Bounce count reset!'))
+    }.bind(this));
+  });
   $("#confirm_communication_channel .cancel_button").click(function(event) {
     $("#confirm_communication_channel").dialog('close');
   });
