@@ -85,7 +85,9 @@ describe "dashboard" do
 
         f('.to-do-list .disable_item_link').click
         wait_for_ajaximations
-        f('#ignore_until_submission').click
+        ignore_link = f('#ignore_until_submission')
+        expect(ignore_link).to include_text("Ignore Until New Submission")
+        ignore_link.click
         wait_for_ajaximations
         expect(f('.to-do-list > li')).to be_nil
 
@@ -104,6 +106,75 @@ describe "dashboard" do
 
       end
 
+    end
+
+    context "moderation to do" do
+      before do
+        @teacher = @user
+        @course.account.allow_feature!(:moderated_grading)
+        @course.enable_feature!(:moderated_grading)
+        @student = student_in_course(:course => @course, :active_all => true).user
+        @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => ['online_text_entry'], :moderated_grading => true)
+        @assignment.submit_homework(@student, :body => "submission")
+      end
+
+      it "should show assignments needing moderation" do
+        enable_cache do
+          Timecop.freeze(1.minute.from_now) do
+            get "/"
+            expect(f('.to-do-list')).to_not include_text("Moderate #{@assignment.title}")
+          end
+
+          Timecop.freeze(2.minutes.from_now) do
+            # create a provisional grade
+            @assignment.grade_student(@student, :grade => "1", :grader => @teacher, :provisional => true)
+
+            run_jobs # touching admins is done in a delayed job
+
+            get "/"
+            expect(f('.to-do-list')).to include_text("Moderate #{@assignment.title}")
+          end
+
+          Timecop.freeze(3.minutes.from_now) do
+            @assignment.update_attribute(:grades_published_at, Time.now.utc)
+            @teacher.touch # would be done by the publishing endpoint
+
+            get "/"
+            expect(f('.to-do-list')).to_not include_text("Moderate #{@assignment.title}")
+          end
+        end
+      end
+
+      it "should be able to ignore assignments needing moderation until next provisional grade change" do
+        @assignment.grade_student(@student, :grade => "1", :grader => @teacher, :provisional => true)
+        pg = @assignment.provisional_grades.first
+
+        enable_cache do
+          get "/"
+
+          ff('.to-do-list .disable_item_link').each do |link|
+            link.click
+            wait_for_ajaximations
+            ignore_link = f('#ignore_until_submission')
+            expect(ignore_link).to include_text("Ignore Until New Mark")
+            ignore_link.click
+            wait_for_ajaximations
+          end
+
+          expect(f('.to-do-list > li')).to be_nil
+
+          get "/"
+
+          expect(f('.to-do-list')).to be_nil
+        end
+
+        pg.save! # reload
+
+        enable_cache do
+          get "/"
+          expect(f('.to-do-list')).to include_text("Moderate #{@assignment.title}")
+        end
+      end
     end
 
     describe "Todo Ignore Options Focus Management" do

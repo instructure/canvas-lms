@@ -2787,6 +2787,14 @@ class Course < ActiveRecord::Base
     end
   end
 
+  def touch_admins_later
+    send_later_enqueue_args(:touch_admins, { :run_at => 15.seconds.from_now, :singleton => "course_touch_admins_#{global_id}" })
+  end
+
+  def touch_admins
+    User.where(id: self.admins).touch_all
+  end
+
   def list_students_by_sortable_name?
     feature_enabled?(:gradebook_list_students_by_sortable_name)
   end

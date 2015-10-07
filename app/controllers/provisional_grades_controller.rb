@@ -196,6 +196,7 @@ class ProvisionalGradesController < ApplicationController
         end
       end
 
+      @context.touch_admins_later # just in case nothing got published
       @assignment.update_attribute(:grades_published_at, Time.now.utc)
       render :json => { :message => "OK" }
     end

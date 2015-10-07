@@ -1427,75 +1427,70 @@ class User < ActiveRecord::Base
     published_visible_assignments
   end
 
-  def assignments_needing_submitting(opts={})
+  def assignments_needing(purpose, participation_type, expires_in, opts={})
     shard.activate do
       course_ids = Shackles.activate(:slave) do
-        if opts[:contexts]
-          (Array(opts[:contexts]).map(&:id) &
-           participating_student_course_ids)
-        else
+        case participation_type
+        when :student
           participating_student_course_ids
+        when :instructor
+          participating_instructor_course_ids
         end
       end
-
+      if opts[:contexts]
+        course_ids = Array(opts[:contexts]).map(&:id) & course_ids
+      end
       opts = {limit: 15}.merge(opts.slice(:due_after, :limit))
 
-      Rails.cache.fetch([self, 'assignments_needing_submitting', course_ids, opts].cache_key, expires_in: 15.minutes) do
-        Shackles.activate(:slave) do
-          limit = opts[:limit]
-          due_after = opts[:due_after] || 4.weeks.ago
-
-          result = Shard.partition_by_shard(course_ids) do |shard_course_ids|
-            courses = Course.find(shard_course_ids)
-            courses_with_da = courses.select{|c| c.feature_enabled?(:differentiated_assignments)}
-            assignments = Assignment.for_course(shard_course_ids).
-              filter_by_visibilities_in_given_courses(self.id, courses_with_da.map(&:id)).
-              published.
-              due_between_with_overrides(due_after,1.week.from_now).
-              not_ignored_by(self, 'submitting').
-              expecting_submission.
-              need_submitting_info(id, limit).
-              not_locked
-            select_available_assignments(assignments)
+      Rails.cache.fetch([self, "assignments_needing_#{purpose}", course_ids, opts].cache_key, :expires_in => expires_in) do
+        result = Shackles.activate(:slave) do
+          Shard.partition_by_shard(course_ids) do |shard_course_ids|
+            scope = Assignment.for_course(shard_course_ids).not_ignored_by(self, purpose)
+            yield(scope, opts.merge(:shard_course_ids => shard_course_ids))
           end
-          # outer limit, since there could be limit * n_shards results
-          result = result[0...limit] if limit
-          result
         end
+        result = result[0...opts[:limit]] if opts[:limit]
+        result
       end
     end
   end
 
+  def assignments_needing_submitting(opts={})
+    assignments_needing('submitting', :student, 15.minutes, opts) do |assignment_scope, opts|
+      due_after = opts[:due_after] || 4.weeks.ago
+
+      courses = Course.find(opts[:shard_course_ids])
+      courses_with_da = courses.select{|c| c.feature_enabled?(:differentiated_assignments)}
+      assignments = assignment_scope.
+        filter_by_visibilities_in_given_courses(self.id, courses_with_da.map(&:id)).
+        published.
+        due_between_with_overrides(due_after, 1.week.from_now).
+        expecting_submission.
+        need_submitting_info(id, opts[:limit]).
+        not_locked
+      select_available_assignments(assignments)
+    end
+  end
+
   def assignments_needing_grading(opts={})
-    shard.activate do
-      course_ids = Shackles.activate(:slave) do
-        if opts[:contexts]
-          (Array(opts[:contexts]).map(&:id) &
-          participating_instructor_course_ids)
-        else
-          participating_instructor_course_ids
-        end
-      end
+    # not really any harm in extending the expires_in since we touch the user anyway when grades change
+    assignments_needing('grading', :instructor, 120.minutes, opts) do |assignment_scope, opts|
+      as = assignment_scope.active.
+        expecting_submission.
+        need_grading_info(opts[:limit])
+      ActiveRecord::Associations::Preloader.new(as, :context).run
+      as.reject{|a| Assignments::NeedsGradingCountQuery.new(a, self).count == 0 }
+    end
+  end
 
-      opts = {limit: 15}.merge(opts.slice(:limit))
-
-      Rails.cache.fetch([self, 'assignments_needing_grading', course_ids, opts].cache_key, expires_in: 15.minutes) do
-        Shackles.activate(:slave) do
-          limit = opts[:limit]
-
-          result = Shard.partition_by_shard(course_ids) do |shard_course_ids|
-            as = Assignment.for_course(shard_course_ids).active.
-              expecting_submission.
-              not_ignored_by(self, 'grading').
-              need_grading_info(limit)
-            ActiveRecord::Associations::Preloader.new(as, :context).run
-            as.reject{|a| Assignments::NeedsGradingCountQuery.new(a, self).count == 0 }
-          end
-          # outer limit, since there could be limit * n_shards results
-          result = result[0...limit] if limit
-          result
-        end
-      end
+  def assignments_needing_moderation(opts={})
+    assignments_needing('moderation', :instructor, 120.minutes, opts) do |assignment_scope, opts|
+      assignment_scope.active.
+        expecting_submission.
+        where(:moderated_grading => true).
+        where("assignments.grades_published_at IS NULL").
+        joins(:provisional_grades).uniq.
+        need_grading_info(opts[:limit])
     end
   end
 
@@ -1508,7 +1503,6 @@ class User < ActiveRecord::Base
         participating_student_course_ids
       end
     end
-
     opts = {limit: 15}.merge(opts.slice(:limit))
 
     shard.activate do

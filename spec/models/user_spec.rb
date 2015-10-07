@@ -2407,6 +2407,27 @@ describe User do
         expect(@teacher.assignments_needing_grading.length).to eq 3
       end
     end
+
+    context "#assignments_needing_moderation" do
+      before :once do
+        @course2.account.allow_feature!(:moderated_grading)
+        @course2.enable_feature!(:moderated_grading)
+        @course2.assignments.first.update_attribute(:moderated_grading, true)
+      end
+
+      it "should not count assignments with no provisional grades" do
+        expect(@teacher.assignments_needing_moderation.length).to eq 0
+      end
+
+      it "should count assignments needing moderation" do
+        assmt = @course2.assignments.first
+        assmt.grade_student(@studentA, :grade => "1", :grader => @teacher, :provisional => true)
+        expect(@teacher.assignments_needing_moderation.length).to eq 1
+
+        assmt.update_attribute(:grades_published_at, Time.now.utc)
+        expect(@teacher.assignments_needing_moderation.length).to eq 0 # should not count anymore once grades are published
+      end
+    end
   end
 
   describe ".initial_enrollment_type_from_type" do
