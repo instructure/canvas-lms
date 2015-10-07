@@ -172,7 +172,7 @@ describe "context modules" do
       expect(edit_form).to be_displayed
       f('.completion_entry .delete_criterion_link', edit_form).click
       wait_for_ajaximations
-      ff('.cancel_button.ui-button', dialog_for(edit_form)).last.click
+      ff('.cancel_button', dialog_for(edit_form)).last.click
       wait_for_ajaximations
 
       # now delete the criterion frd
@@ -457,7 +457,7 @@ describe "context modules" do
       option = first_selected_option(prereq_select)
       expect(option.text).to eq first_module_name
 
-      ff('.cancel_button.ui-button', dialog_for(add_form)).last.click
+      ff('.cancel_button', dialog_for(add_form)).last.click
       wait_for_ajaximations
       mod3.publish!
 
@@ -589,7 +589,7 @@ describe "context modules" do
 
       it "should return focus to the cog menu when closing the edit dialog for an item" do
         hover_and_click("#context_module_item_#{@tag.id} .edit_item_link")
-        keep_trying_until { ff('.cancel_button.ui-button')[2] }.click
+        keep_trying_until { ff('.cancel_button.ui-button')[1] }.click
         check_element_has_focus(fj("#context_module_item_#{@tag.id} .al-trigger"))
       end
 

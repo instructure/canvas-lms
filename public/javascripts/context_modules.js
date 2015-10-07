@@ -400,17 +400,20 @@ define([
         });
         $module.addClass('dont_remove');
         $form.find(".module_name").toggleClass('lonely_entry', isNew);
+
         $form.dialog({
           autoOpen: false,
           modal: true,
+          title: (isNew ? I18n.t('titles.add', "Add Module") : I18n.t('titles.edit', "Edit Module Settings")),
           width: 600,
+          height: (isNew ? 400 : 600),
           close: function() {
             modules.hideEditModule(true);
           },
           open: function(){
             $(this).find('input[type=text],textarea,select').first().focus();
           }
-        }).fixDialogButtons().dialog('option', {title: (isNew ? I18n.t('titles.add', "Add Module") : I18n.t('titles.edit', "Edit Module Settings")), width: (isNew ? 'auto' : 600)}).dialog('open'); //show();
+        }).dialog('open');
         $module.removeClass('dont_remove');
       },
       hideEditModule: function(remove) {
