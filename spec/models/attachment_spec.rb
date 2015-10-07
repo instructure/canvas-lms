@@ -61,6 +61,15 @@ describe Attachment do
       attachment_with_context(@course)
       expect(@attachment.authenticated_s3_url(:secure => true)).to match(/^https:\/\//)
     end
+
+    context "for a quiz submission upload" do
+      it "should return a routable url", :type => :routing do
+        quiz = @course.quizzes.create
+        submission = Quizzes::SubmissionManager.new(quiz).find_or_create_submission(user_model)
+        attachment = attachment_with_context(submission)
+        expect(get(attachment.authenticated_s3_url)).to be_routable
+      end
+    end
   end
 
   def configure_crocodoc
