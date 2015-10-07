@@ -93,6 +93,10 @@ Now you can run the docker command without root or sudo.
 Note that you _will_ need to log out and back in for the group
 addition to take effect.
 
+NOTE: Adding non-privileged users to the docker group can be
+a security risk.  Don't add users to this group that shouldn't
+have root privileges.  Dev responsibly my friends.
+
 #### Docker-Compose
 
 ##### OS X
