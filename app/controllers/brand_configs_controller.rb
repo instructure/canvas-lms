@@ -26,7 +26,7 @@ class BrandConfigsController < ApplicationController
   def default_schema
     parent_config = @account.first_parent_brand_config || BrandConfig.new
     variables = parent_config.effective_variables
-    overridden_schema = BrandableCSS::BRANDABLE_VARIABLES.map(&:deep_dup)
+    overridden_schema = duped_brandable_vars
     overridden_schema.each do |group|
       group["variables"].each do |var|
         if variables.keys.include?(var["variable_name"])
@@ -37,6 +37,14 @@ class BrandConfigsController < ApplicationController
     overridden_schema
   end
   private :default_schema
+
+  def duped_brandable_vars
+    BrandableCSS::BRANDABLE_VARIABLES.map do |group|
+      new_group = group.deep_dup
+      new_group["variables"] = new_group["variables"].map(&:deep_dup)
+      new_group
+    end
+  end
 
   # Preview/Create New BrandConfig
   # This is what is called when the user hits 'preview changes' in the theme editor.
