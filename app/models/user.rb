@@ -188,6 +188,7 @@ class User < ActiveRecord::Base
     end
   }
   scope :name_like, lambda { |name|
+    next none if name.strip.empty?
     scopes = []
     scopes << unscoped.where(wildcard('users.name', name))
     scopes << unscoped.where(wildcard('users.short_name', name))
