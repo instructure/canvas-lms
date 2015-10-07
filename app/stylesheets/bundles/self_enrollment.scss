@@ -1,0 +1,11 @@
+@import "base/environment";
+
+@if $use_new_styles {
+  body {
+    min-width: 0;
+  }
+
+  #main {
+    position: initial;
+  }
+}
