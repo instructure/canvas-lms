@@ -347,22 +347,10 @@ describe "people" do
     end
   end
 
-  def add_a_section
-    section_name = 'section2'
-    get "/courses/#{@course.id}/settings#tab-sections"
-
-    section_input = f('#course_section_name')
-    keep_trying_until { expect(section_input).to be_displayed }
-    replace_content(section_input, section_name)
-    submit_form('#add_section_form')
-    wait_for_ajaximations
-    expect(ff('#sections > .section')[1]).to include_text(section_name)
-  end
-
   context "course with multiple sections", priority: "2" do
     before (:each) do
-      course_with_admin_logged_in
-      add_a_section
+      course_with_teacher_logged_in
+      @section2 = @course.course_sections.create!(name: 'section2')
     end
 
     it "should save add people form data" do
@@ -408,11 +396,9 @@ describe "people" do
     end
 
     it "should remove a student from a section", priority: "1", test_id: 296461 do
-     sec1 = @course.course_sections.create!(name: "section1")
-     sec2 = @course.course_sections.create!(name: "section2")
      @student = user
-     @course.enroll_student(@student, section: sec1, allow_multiple_enrollments: true)
-     @course.enroll_student(@student, section: sec2, allow_multiple_enrollments: true)
+     @course.enroll_student(@student, allow_multiple_enrollments: true)
+     @course.enroll_student(@student, section: @section2, allow_multiple_enrollments: true)
      get "/courses/#{@course.id}/users"
      ff(".icon-settings")[1].click
      fln("Edit Sections").click
@@ -420,6 +406,30 @@ describe "people" do
      ff('.ui-button-text')[1].click
      wait_for_ajaximations
      expect(ff(".StudentEnrollment")[0].text).not_to include_text("section2")
+    end
+
+    it "should gray out sections the user doesn't have permission to remove" do
+      @student = user_with_pseudonym
+      @course.enroll_student(@student, allow_multiple_enrollments: true).update_attribute(:sis_source_id, 'E001')
+      get "/courses/#{@course.id}/users"
+      ff(".icon-settings")[1].click
+      fln("Edit Sections").click
+      expect(f('#user_sections li.cannot_remove').text).to include @course.default_section.name
+
+      # add another section (not via SIS) and ensure it remains editable
+      f(".token_input.browsable").click
+      section_input_element = driver.find_element(:name, "token_capture")
+      section_input_element.send_keys("section2")
+      f('.last.context').click
+      wait_for_ajaximations
+      expect(f("a[title='Remove user from section2']")).not_to be_nil
+      f('.ui-dialog-buttonset .btn-primary').click
+      wait_for_ajaximations
+
+      ff(".icon-settings")[1].click
+      fln("Edit Sections").click
+      expect(f('#user_sections li.cannot_remove').text).to include @course.default_section.name
+      expect(f("a[title='Remove user from section2']")).not_to be_nil
     end
   end
 
