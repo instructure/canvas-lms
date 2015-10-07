@@ -61,7 +61,7 @@ define [
 
   test 'it should edit an existing assignment group', ->
     view = createView()
-    save_spy = @spy(view.model, "save")
+    save_spy = @stub(view.model, "save", -> $.Deferred().resolve())
     view.render()
     view.open()
     #the selector uses 'new' for id because this model hasn't been saved yet
@@ -78,7 +78,7 @@ define [
 
   test 'it should not save drop rules when none are given', ->
     view = createView()
-    save_spy = @spy(view.model, "save")
+    save_spy = @stub(view.model, "save", -> $.Deferred().resolve())
     view.render()
     view.open()
     view.$("#ag_new_drop_lowest").val("")
@@ -139,3 +139,16 @@ define [
     @stub(view, 'render')
     view.onSaveSuccess()
     equal view.render.callCount, 1
+
+  test 'it shows a success message', ->
+    @stub(CreateGroupView.prototype, 'close', -> )
+    @spy($, 'flashMessage')
+    clock = sinon.useFakeTimers()
+
+    view = createView(false)
+    view.render()
+    view.onSaveSuccess()
+    clock.tick(101)
+
+    equal $.flashMessage.callCount, 1
+    clock.restore()
