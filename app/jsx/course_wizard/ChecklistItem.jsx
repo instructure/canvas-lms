@@ -6,6 +6,15 @@ define([
   var ChecklistItem = React.createClass({
       displayName: 'ChecklistItem',
 
+      propTypes: {
+        onClick: React.PropTypes.func.isRequired,
+        stepKey: React.PropTypes.string.isRequired,
+        title: React.PropTypes.string.isRequired,
+        complete: React.PropTypes.bool.isRequired,
+        isSelected: React.PropTypes.bool.isRequired,
+        id: React.PropTypes.string.isRequired
+      },
+
       classNameString: '',
 
       getInitialState: function () {
@@ -22,15 +31,15 @@ define([
 
       handleClick: function (event) {
         event.preventDefault();
-        this.props.onClick(this.props.stepKey)
+        this.props.onClick(this.props.stepKey);
       },
 
       setClassName: function (props) {
         this.setState({
           classNameString: React.addons.classSet({
-            "ic-wizard-box__content-trigger": true,
-            "ic-wizard-box__content-trigger--checked": props.complete,
-            "ic-wizard-box__content-trigger--active": props.isSelected
+            'ic-wizard-box__content-trigger': true,
+            'ic-wizard-box__content-trigger--checked': props.complete,
+            'ic-wizard-box__content-trigger--active': props.isSelected
           })
         });
       },
@@ -38,14 +47,16 @@ define([
       render: function () {
           var completionMessage = (this.props.complete) ? I18n.t('(Item Complete)') : I18n.t('(Item Incomplete)');
 
-          return (
-              <a href="#" id={this.props.id} className={this.state.classNameString} onClick={this.handleClick}>
-                <span>
-                  {this.props.title}
-                  <span className="screenreader-only">{completionMessage}</span>
-                </span>
-              </a>
-          );
+        return (
+          <li>
+            <a href='#' id={this.props.id} className={this.state.classNameString} onClick={this.handleClick}>
+              <span>
+                {this.props.title}
+                <span className='screenreader-only'>{completionMessage}</span>
+              </span>
+            </a>
+          </li>
+        );
       }
 
   });

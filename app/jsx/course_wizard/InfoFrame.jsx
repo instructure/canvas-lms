@@ -20,6 +20,11 @@ define([
   var InfoFrame = React.createClass({
       displayName: 'InfoFrame',
 
+      propTypes: {
+        closeModal: React.PropTypes.func.isRequired,
+        className: React.PropTypes.string
+      },
+
       getInitialState: function () {
         return {
           itemShown: courseNotSetUpItem,
@@ -27,7 +32,7 @@ define([
       },
 
       componentWillMount: function () {
-        if (ENV.COURSE_WIZARD.checklist_states.publish_step) {
+        if (window.ENV.COURSE_WIZARD.checklist_states.publish_step) {
           this.setState({
             itemShown: checklistComplete
           });
@@ -44,8 +49,8 @@ define([
         this.setState({
           itemShown: item
         }, function () {
-          $messageBox = $(this.refs.messageBox.getDOMNode());
-          $messageIcon = $(this.refs.messageIcon.getDOMNode());
+          var $messageBox = $(this.refs.messageBox.getDOMNode());
+          var $messageIcon = $(this.refs.messageIcon.getDOMNode());
 
           // I would use .toggle, but it has too much potential to get all out
           // of whack having to be called twice to force the animation.
@@ -55,7 +60,7 @@ define([
           $messageIcon.removeClass('ic-wizard-box__message-icon--is-fired');
 
           // Add them back
-          setTimeout(function() {
+          setTimeout(function () {
             $messageBox.addClass('ic-wizard-box__message-inner--is-fired');
             $messageIcon.addClass('ic-wizard-box__message-icon--is-fired');
           }, 100);
@@ -92,17 +97,17 @@ define([
           );
         }
         if (this.state.itemShown.key === 'publish_course') {
-          if (ENV.COURSE_WIZARD.permisssions.can_change_course_state) {
-          return (
-            <form accept-charset="UTF-8" action={ENV.COURSE_WIZARD.publish_course} method="post">
-              <input name="utf8" type="hidden" value="✓" />
-              <input name="_method" type="hidden" value="put" />
-              <input name="authenticity_token" type="hidden" value={$.cookie('_csrf_token')} />
-              <input type="hidden" name="course[event]" value="offer"/>
-              <button ref="callToAction" type="submit" className="Button Button--success">{this.state.itemShown.title}</button>
-            </form>
-          );
-         } else {
+          if (window.ENV.COURSE_WIZARD.permisssions.can_change_course_state) {
+            return (
+              <form acceptCharset='UTF-8' action={window.ENV.COURSE_WIZARD.publish_course} method='post'>
+                <input name='utf8' type='hidden' value='✓' />
+                <input name='_method' type='hidden' value='put' />
+                <input name='authenticity_token' type='hidden' value={$.cookie('_csrf_token')} />
+                <input type='hidden' name='course[event]' value='offer'/>
+                <button ref='callToAction' type='submit' className='Button Button--success'>{this.state.itemShown.title}</button>
+              </form>
+            );
+          } else {
             return (
                 <b>{I18n.t("You do not have permission to publish this course.")}</b>
             );
@@ -124,28 +129,28 @@ define([
       },
 
       render: function () {
-          return (
-              <div className={this.props.className}>
-                <h1 className="ic-wizard-box__headline">
-                   {I18n.t("Next Steps")}
-                </h1>
-                <div className="ic-wizard-box__message">
-                  <div className="ic-wizard-box__message-layout">
-                    <div ref="messageIcon" className="ic-wizard-box__message-icon ic-wizard-box__message-icon--is-fired">
-                      <i className={this.state.itemShown.iconClass}></i>
-                    </div>
-                    <div ref="messageBox" tabIndex="-1" className="ic-wizard-box__message-inner ic-wizard-box__message-inner--is-fired">
-                      <p className="ic-wizard-box__message-text">
-                        {this.state.itemShown.text}
-                      </p>
-                      <div className="ic-wizard-box__message-button">
-                        {this.renderButton()}
-                      </div>
-                    </div>
+        return (
+          <div className={this.props.className}>
+            <h1 className='ic-wizard-box__headline'>
+               {I18n.t('Next Steps')}
+            </h1>
+            <div className='ic-wizard-box__message'>
+              <div className='ic-wizard-box__message-layout'>
+                <div ref='messageIcon' className='ic-wizard-box__message-icon ic-wizard-box__message-icon--is-fired'>
+                  <i className={this.state.itemShown.iconClass}></i>
+                </div>
+                <div ref='messageBox' tabIndex='-1' className='ic-wizard-box__message-inner ic-wizard-box__message-inner--is-fired'>
+                  <p className='ic-wizard-box__message-text'>
+                    {this.state.itemShown.text}
+                  </p>
+                  <div className='ic-wizard-box__message-button'>
+                    {this.renderButton()}
                   </div>
                 </div>
               </div>
-          );
+            </div>
+          </div>
+        );
       }
   });
 
