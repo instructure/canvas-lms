@@ -577,27 +577,27 @@ describe Enrollment do
           course_with_student(:active_all => true)
         end
 
-        it "should accept into the right state based on availability dates on enrollment" do
+        it "accepts into the right state based on availability dates on enrollment" do
           enrollment_availability_test
         end
 
-        it "should accept into the right state based on availability dates on course_section" do
+        it "accepts into the right state based on availability dates on course_section" do
           course_section_availability_test
         end
 
-        it "should accept into the right state based on availability dates on course" do
+        it "accepts into the right state based on availability dates on course" do
           course_availability_test(:completed)
         end
 
-        it "should accept into the right state based on availability dates on enrollment_term" do
+        it "accepts into the right state based on availability dates on enrollment_term" do
           enrollment_term_availability_test
         end
 
-        it "should accept into the right state based on availability dates on enrollment_dates_override" do
+        it "accepts into the right state based on availability dates on enrollment_dates_override" do
           enrollment_dates_override_test
         end
 
-        it "should have the correct state for a half-open past course" do
+        it "has the correct state for a half-open past course" do
           @term = @course.enrollment_term
           expect(@term).not_to be_nil
           @term.start_at = nil
@@ -609,6 +609,13 @@ describe Enrollment do
           expect(@enrollment.reload.state).to eq :invited
           expect(@enrollment.state_based_on_date).to eq :completed
         end
+
+        it "recomputes scores for the student" do
+          Enrollment.expects(:recompute_final_score).with([@enrollment.user_id], @enrollment.course_id)
+          @enrollment.workflow_state = 'invited'
+          @enrollment.save!
+          @enrollment.accept
+        end
       end
 
       context "as a teacher" do
@@ -616,24 +623,31 @@ describe Enrollment do
           course_with_teacher(:active_all => true)
         end
 
-        it "should accept into the right state based on availability dates on enrollment" do
+        it "accepts into the right state based on availability dates on enrollment" do
           enrollment_availability_test
         end
 
-        it "should accept into the right state based on availability dates on course_section" do
+        it "accepts into the right state based on availability dates on course_section" do
           course_section_availability_test(true)
         end
 
-        it "should accept into the right state based on availability dates on course" do
+        it "accepts into the right state based on availability dates on course" do
           course_availability_test(:active)
         end
 
-        it "should accept into the right state based on availability dates on enrollment_term" do
+        it "accepts into the right state based on availability dates on enrollment_term" do
           enrollment_term_availability_test
         end
 
-        it "should accept into the right state based on availability dates on enrollment_dates_override" do
+        it "accepts into the right state based on availability dates on enrollment_dates_override" do
           enrollment_dates_override_test
+        end
+
+        it "does not attempt to recompute scores since the user is not a student" do
+          Enrollment.expects(:recompute_final_score).never
+          @enrollment.workflow_state = 'invited'
+          @enrollment.save!
+          @enrollment.accept
         end
       end
     end
