@@ -4,8 +4,9 @@ define([
   'underscore',
   'react',
   './actions/ModerationActions',
-  './constants'
-], function (_, React, ModerationActions, Constants) {
+  './constants',
+  'i18n!moderated_grading'
+], function (_, React, ModerationActions, Constants, I18n) {
 
   // CONSTANTS
   var PG_ONE_INDEX = 0;
@@ -64,7 +65,7 @@ define([
         return (
           <div className='col-xs-2'>
             <div className='ModeratedAssignmentList__Mark'>
-              <a target='_blank' href={this.generateSpeedgraderUrl(this.props.urls.assignment_speedgrader_url, student)}>Speed Grader</a>
+              <a target='_blank' href={this.generateSpeedgraderUrl(this.props.urls.assignment_speedgrader_url, student)}>{I18n.t('SpeedGrader™')}</a>
             </div>
           </div>
         );

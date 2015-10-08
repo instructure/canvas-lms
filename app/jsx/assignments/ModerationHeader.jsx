@@ -27,7 +27,7 @@ define([
         <div className='ModeratedGrading__Header ic-Action-header'>
           <div className='ic-Action-header__Primary'>
             <div className='ic-Action-header__Heading ModeratedGrading__Header-Instructions'>
-              {I18n.t('Select assignments for review')}
+              {I18n.t('Select students for review')}
             </div>
           </div>
           <div className='ic-Action-header__Secondary ModeratedGrading__Header-Buttons '>

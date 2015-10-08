@@ -40,19 +40,19 @@ define([
 
             <div className='col-xs-2'>
               <div className='ModeratedColumnHeader__Mark ColumnHeader__Item'>
-                <a href='#' onClick={this.props.handleSortMark1}>{I18n.t('1st Mark')} {this.renderLinkArrow(Constants.markColumnNames.MARK_ONE)}</a>
+                <a href='#' onClick={this.props.handleSortMark1}>{I18n.t('1st Reviewer')} {this.renderLinkArrow(Constants.markColumnNames.MARK_ONE)}</a>
               </div>
             </div>
 
             <div className='col-xs-2'>
               <div className='ColumnHeader__Mark ColumnHeader__Item'>
-                <a href='#' onClick={this.props.handleSortMark2}>{I18n.t('2nd Mark')} {this.renderLinkArrow(Constants.markColumnNames.MARK_TWO)}</a>
+                <a href='#' onClick={this.props.handleSortMark2}>{I18n.t('2nd Reviewer')} {this.renderLinkArrow(Constants.markColumnNames.MARK_TWO)}</a>
               </div>
             </div>
 
             <div className='col-xs-2'>
               <div className='ColumnHeader__Mark ColumnHeader__Item'>
-                <a href='#' onClick={this.props.handleSortMark3}>{I18n.t('Final Mark')} {this.renderLinkArrow(Constants.markColumnNames.MARK_THREE)}</a>
+                <a href='#' onClick={this.props.handleSortMark3}>{I18n.t('Moderator')} {this.renderLinkArrow(Constants.markColumnNames.MARK_THREE)}</a>
               </div>
             </div>
 
@@ -75,7 +75,7 @@ define([
 
             <div className='col-xs-2'>
               <div className='ColumnHeader__Mark ColumnHeader__Item'>
-                <a href='#' onClick={this.props.handleSortMark1}>{I18n.t('1st Mark')} {this.renderLinkArrow(Constants.markColumnNames.MARK_ONE)}</a>
+                <a href='#' onClick={this.props.handleSortMark1}>{I18n.t('1st Reviewer')} {this.renderLinkArrow(Constants.markColumnNames.MARK_ONE)}</a>
               </div>
             </div>
           </div>
