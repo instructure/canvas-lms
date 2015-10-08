@@ -53,6 +53,7 @@ class Account < ActiveRecord::Base
   has_many :all_group_categories, :class_name => 'GroupCategory', :as => :context
   has_many :groups, :as => :context
   has_many :all_groups, :class_name => 'Group', :foreign_key => 'root_account_id'
+  has_many :all_group_memberships, source: 'group_memberships', through: :all_groups
   has_many :enrollment_terms, :foreign_key => 'root_account_id'
   has_many :enrollments, :foreign_key => 'root_account_id', :conditions => ["enrollments.type != 'StudentViewEnrollment'"]
   has_many :all_enrollments, :class_name => 'Enrollment', :foreign_key => 'root_account_id'
