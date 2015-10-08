@@ -105,7 +105,7 @@ define([
     },
 
     setInputColor (event) {
-      var value = event.target.value;
+      var value = event.target.value || event.srcElement.value;
       if (value.indexOf('#') < 0) {
         value = '#' + value;
       }
