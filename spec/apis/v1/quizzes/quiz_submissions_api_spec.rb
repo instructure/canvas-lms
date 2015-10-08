@@ -424,6 +424,51 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
         expect(response.status.to_i).to eq 409
       end
     end
+
+    context "unpublished module quiz" do
+      before do
+        student_in_course(active_all: true)
+        @quiz = @course.quizzes.create! title: "Test Quiz w/ Module"
+        @quiz.quiz_questions.create!(
+          {question_data:
+            {name: 'question', points_possible: 1, question_type: 'multiple_choice_question',
+              'answers' => [{'answer_text' => '1', 'weight' => '100'}, {'answer_text' => '2'}, {'answer_text' => '3'}, {'answer_text' => '4'}]
+            }
+        })
+        @quiz.published_at = Time.now
+        @quiz.workflow_state = 'available'
+        @quiz.save!
+        @pre_module = @course.context_modules.create!(:name => 'pre_module')
+        # No meaning in this URL
+        @tag = @pre_module.add_item(:type => 'external_url', :url => 'http://example.com', :title => 'example')
+        @tag.publish! if @tag.unpublished?
+        @pre_module.completion_requirements = { @tag.id => { :type => 'must_view' } }
+        @pre_module.save!
+
+        locked_module = @course.context_modules.create!(:name => 'locked_module', :require_sequential_progress => true)
+        item_tag = locked_module.add_item(:id => @quiz.id, :type => 'quiz')
+        locked_module.prerequisites = "module_#{@pre_module.id}"
+        locked_module.save!
+      end
+
+      it "shouldn't allow access to quiz until module is completed" do
+        expect(@quiz.grants_right?(@student, :submit)).to be_truthy # precondition
+        json = api_call(:post, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions",
+          {controller: "quizzes/quiz_submissions_api", action: "create", format: "json", course_id: "#{@course.id}", quiz_id: "#{@quiz.id}"}, {},
+          {'Accept' => 'application/vnd.api+json'}, {expected_status: 400})
+        expect(json['status']).to eq "bad_request"
+      end
+
+      it "should allow access to quiz once module is completed" do
+        @course.context_modules.first.update_for(@student, :read, @tag)
+        @course.context_modules.first.update_downstreams
+        expect(@quiz.grants_right?(@student, :submit)).to be_truthy # precondition
+        json = api_call(:post, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions",
+          {controller: "quizzes/quiz_submissions_api", action: "create", format: "json", course_id: "#{@course.id}", quiz_id: "#{@quiz.id}"}, {},
+          {'Accept' => 'application/vnd.api+json'})
+        expect(json['quiz_submissions'][0]['user_id']).to eq @student.id
+      end
+    end
   end
 
   describe 'POST /courses/:course_id/quizzes/:quiz_id/submissions/:id/complete [complete]' do
