@@ -48,7 +48,7 @@ define([
               onClick={this.handlePublishClick}
               disabled={this.props.published}
             >
-              {I18n.t('Publish')}
+              {I18n.t('Post')}
             </button>
           </div>
         </div>
