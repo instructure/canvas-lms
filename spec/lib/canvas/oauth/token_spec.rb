@@ -148,8 +148,16 @@ module Canvas::Oauth
         expect(json['user']).to eq user.as_json(:only => [:id, :name], :include_root => false)
       end
 
+      it 'returns the expires_in parameter' do
+        Time.stubs(:now).returns(DateTime.parse('2015-07-10T09:29:00+00:00').utc.to_time)
+        access_token = token.access_token
+        access_token.expires_at = DateTime.parse('2015-07-10T10:29:00+00:00')
+        access_token.save!
+        expect(json['expires_in']).to eq 3600
+      end
+
       it 'does not put anything else into the json' do
-        expect(json.keys.sort).to match_array(['access_token', 'refresh_token', 'user'])
+        expect(json.keys.sort).to match_array(['access_token', 'refresh_token', 'user', 'expires_in'])
       end
 
     end
@@ -181,6 +189,23 @@ module Canvas::Oauth
         Canvas.stubs(:redis => redis)
         Token.generate_code_for(1, 1)
       end
+    end
+
+    context "token expiration" do
+
+      it "starts expiring tokens in 1 hour" do
+        DateTime.stubs(:now).returns(DateTime.parse('2016-06-29T23:01:00+00:00'))
+        expect(token.access_token.expires_at.utc.iso8601).to eq('2016-06-30T00:01:00+00:00')
+      end
+
+      it 'doesn\'t set an expiration if the dev key has auto_expire_tokens set to false' do
+        key = token.key
+        key.auto_expire_tokens = false
+        key.save!
+        expect(token.access_token.expires_at).to be_nil
+      end
+
+
     end
 
   end

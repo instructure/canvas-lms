@@ -1,6 +1,7 @@
 OAuth2
 ======
 <a name="top"></a>
+<div class="warning-message"> We have started rolling out short lived access tokens. You will need to start using <a href="file.oauth.html#using-refresh-tokens">refresh tokens</a> to generate new access tokens.</div>
 
 [OAuth2](http://oauth.net/2/) is a protocol designed to let third-party applications
 authenticate to perform actions as a user, without getting the user's

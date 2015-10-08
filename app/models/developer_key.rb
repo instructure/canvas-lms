@@ -28,9 +28,10 @@ class DeveloperKey < ActiveRecord::Base
   has_many :access_tokens
   has_many :context_external_tools, :primary_key => 'tool_id', :foreign_key => 'tool_id'
 
-  attr_accessible :api_key, :name, :user, :account, :icon_url, :redirect_uri, :tool_id, :email, :event
+  attr_accessible :api_key, :name, :user, :account, :icon_url, :redirect_uri, :tool_id, :email, :event, :auto_expire_tokens
 
   before_create :generate_api_key
+  before_create :set_auto_expire_tokens
   before_save :nullify_empty_tool_id
 
   validates_as_url :redirect_uri
@@ -60,6 +61,10 @@ class DeveloperKey < ActiveRecord::Base
 
   def generate_api_key(overwrite=false)
     self.api_key = CanvasSlug.generate(nil, 64) if overwrite || !self.api_key
+  end
+
+  def set_auto_expire_tokens
+    self.auto_expire_tokens = true if self.respond_to?(:auto_expire_tokens=)
   end
 
   def self.default

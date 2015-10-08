@@ -1,6 +1,8 @@
 OAuth2 Endpoints
 ================
 
+<div class="warning-message"> We have started rolling out short lived access tokens. You will need to start using <a href="file.oauth.html#using-refresh-tokens">refresh tokens</a> to generate new access tokens.</div>
+
 - [GET login/oauth2/auth](#get-login-oauth2-auth)
 - [POST login/oauth2/token](#post-login-oauth2-token)
 - [DELETE login/oauth2/token](#delete-login-oauth2-token)

@@ -29,6 +29,11 @@ describe DeveloperKey do
         end
       end
 
+      it 'sets new developer keys to auto expire tokens' do
+        key = DeveloperKey.create!(:redirect_uri => "http://example.com/a/b")
+        expect(key.auto_expire_tokens).to be_truthy
+      end
+
       it 'uses integer special keys properly because the query does not like strings' do
         # this test mirrors what happens in production when retrieving keys, but does not test it
         # directly because there's a short circuit clause in 'get_special_key' that pops out with a
