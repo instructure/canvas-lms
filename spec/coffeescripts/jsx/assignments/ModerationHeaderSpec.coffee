@@ -34,3 +34,10 @@ define [
     TestUtils.Simulate.click(header.refs.addReviewerBtn.getDOMNode())
     ok called, 'onReviewClick was called'
 
+  test 'show information message when published', ->
+    @props.published = true
+    header = TestUtils.renderIntoDocument(Header(@props))
+    message = TestUtils.findRenderedDOMComponentWithClass(header, 'ic-notification')
+    ok message, 'found the flash messge'
+    React.unmountComponentAtNode(header.getDOMNode().parentNode)
+

@@ -19,37 +19,61 @@ define([
         this.props.onPublishClick();
       }
     },
+    renderPublishedMessage () {
+      if (this.props.published) {
+        return (
 
-    render () {
-      return (
-        <div className='ModeratedGrading__Header ic-Action-header'>
-          <div className='ic-Action-header__Primary'>
-            <div className='ic-Action-header__Heading ModeratedGrading__Header-Instructions'>
-              {I18n.t('Select students for review')}
+          <div className="ic-notification">
+            <div className="ic-notification__icon" role="presentation">
+              <i className="icon-info"></i>
+            </div>
+            <div className="ic-notification__content">
+              <div className="ic-notification__message">
+                <div className="ic-notification__title">
+                  {I18n.t('Attention!')}
+                </div>
+                <span className="notification_message">
+                  {I18n.t('This page cannot be modified because grades have already been posted.')}
+                </span>
+              </div>
             </div>
           </div>
-          <div className='ic-Action-header__Secondary ModeratedGrading__Header-Buttons '>
-            <button
-              ref='addReviewerBtn'
-              type='button'
-              className='ModeratedGrading__Header-AddReviewerBtn Button'
-              onClick={this.props.onReviewClick}
-              disabled={this.props.published}
-            >
-              <i className='icon-plus' />
-              {I18n.t(' Reviewer')}
-            </button>
-            <button
-              ref='publishBtn'
-              type='button'
-              className='ModeratedGrading__Header-PublishBtn Button Button--primary'
-              onClick={this.handlePublishClick}
-              disabled={this.props.published}
-            >
-              {I18n.t('Post')}
-            </button>
+        );
+      }
+    },
+    render () {
+      return (
+        <div>
+          {this.renderPublishedMessage()}
+          <div className='ModeratedGrading__Header ic-Action-header'>
+            <div className='ic-Action-header__Primary'>
+              <div className='ic-Action-header__Heading ModeratedGrading__Header-Instructions'>
+                {I18n.t('Select assignments for review')}
+              </div>
+            </div>
+            <div className='ic-Action-header__Secondary ModeratedGrading__Header-Buttons '>
+              <button
+                ref='addReviewerBtn'
+                type='button'
+                className='ModeratedGrading__Header-AddReviewerBtn Button'
+                onClick={this.props.onReviewClick}
+                disabled={this.props.published}
+              >
+                <i className='icon-plus' />
+                {I18n.t(' Reviewer')}
+              </button>
+              <button
+                ref='publishBtn'
+                type='button'
+                className='ModeratedGrading__Header-PublishBtn Button Button--primary'
+                onClick={this.handlePublishClick}
+                disabled={this.props.published}
+              >
+                {I18n.t('Post')}
+              </button>
+            </div>
           </div>
-        </div>
+      </div>
       );
     }
 
