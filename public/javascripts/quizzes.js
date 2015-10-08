@@ -2987,9 +2987,9 @@ define([
         // after save process completed. Used in quizzes_bundle.coffee
         $displayQuestion.trigger('saved');
         $("#unpublished_changes_message").slideDown();
-        if (question) {
-          REGRADE_OPTIONS[question.id] = question.regrade_option;
-          delete REGRADE_DATA['question_' + question.id];
+        if (question && questionData && questionData.id) {
+          REGRADE_OPTIONS[questionData.id] = question.regrade_option;
+          delete REGRADE_DATA['question_' + questionData.id];
         }
       }, function(data) {
         $displayQuestion.formErrors(data);
