@@ -10,11 +10,14 @@
       <li><a href="#<%= "#{item[:identifier]}" %>"><%= item[:title] %></a></li>
     <% end %>
     </ol>
+    <hr/>
+    <a href="toc.xhtml"><%= I18n.t("Back to Table of Contents") %></a>
     <div style="page-break-before:always;"></div>
     <% content.each do |item| %>
       <%=build(item)%>
       <hr/>
-      <a href="<%= "##{reference}.xhtml" %>"><%="Back to #{title}"%></a>
+      <p><a href="<%= "##{reference}.xhtml" %>"><%="Back to #{title}"%></a></p>
+      <p><a href="toc.xhtml"><%= I18n.t("Back to Table of Contents") %></a></p>
       <div style="page-break-before:always;"></div>
     <% end %>
   </body>

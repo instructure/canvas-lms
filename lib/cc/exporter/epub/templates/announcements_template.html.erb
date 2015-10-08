@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Announcements</title>
+  <title><%= I18n.t("Announcements") %></title>
 </head>
   <body>
-    <h1>Announcements</h1>
+    <h1><%= I18n.t("Announcements") %></h1>
     <ol>
     <% if content.length == 0 %>
       <p><%= I18n.t("There are no announcements for this course.") %></p>

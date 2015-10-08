@@ -29,8 +29,9 @@ module CC::Exporter::Epub::Converters
       quiz[:unlock_at] = get_node_val(quiz_meta_data, "unlock_at")
       quiz[:allowed_attempts] = get_node_val(quiz_meta_data, "allowed_attempts")
       quiz[:points_possible] = get_node_val(quiz_meta_data, "points_possible")
+      quiz[:position] = get_node_val(quiz_meta_data, 'position')
       quiz[:identifier] = get_node_att(quiz_meta_data, 'quiz', 'identifier')
-      quiz[:href] = "quizzes.xhtml##{quiz['identifier']}"
+      quiz[:href] = "quizzes.xhtml##{quiz[:identifier]}"
       update_syllabus(quiz)
       quiz
     end

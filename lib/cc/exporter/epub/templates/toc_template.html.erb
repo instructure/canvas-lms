@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title><%= I18n.t("Table of Contents") %></title>
+</head>
+  <body>
+    <h1 id="#main_nav"><%= I18n.t("Table of Contents") %></h1>
+    <% content.each do |resource| %>
+      <h3><a href="<%= "#{resource[:reference]}.xhtml" %>"><%= "#{resource[:title]}" %></a></h3>
+      <ol>
+        <% resource[:resource_content].each do |resource_item| %>
+          <li><a href="<%= "#{resource_item[:href]}" %>"><%= "#{resource_item[:title]}" %></a></li>
+        <% end %>
+      </ol>
+    <% end %>
+    <div style="page-break-before:always;"></div>
+  </body>
+</html>

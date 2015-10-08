@@ -10,11 +10,14 @@
       <li><a href="#<%= "#{item[:linked_resource_id]}" %>"><%= item[:title] %></a></li>
     <% end %>
     </ol>
+    <hr/>
+    <a href="toc.xhtml"><%= I18n.t("Back to Table of Contents") %></a>
     <div style="page-break-before:always;"></div>
     <% content[:items].each do |item| %>
-      <%=build(item) || "<div>#{item[:title]} is not currently supported</div>"%>
+      <%=build(item) || "<div>" + I18n.t("%{item_name} is not currently supported", { item_name: item[:title] }) + "</div>"%>
       <hr/>
-      <a href="<%= "##{reference}.xhtml" %>"><%="Back to #{title}"%></a>
+      <p><a href="<%= "##{reference}.xhtml" %>"><%="Back to #{title}"%></a></p>
+      <p><a href="toc.xhtml"><%= I18n.t("Back to Table of Contents") %></a></p>
       <div style="page-break-before:always;"></div>
     <% end %>
   </body>

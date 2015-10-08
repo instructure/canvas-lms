@@ -42,6 +42,24 @@ describe "Exporter" do
       content_keys = CC::Exporter::Epub::Exporter::LINKED_RESOURCE_KEY.except("Attachment").values
       expect(content_keys.any? {|k| exporter.templates.key?(k)}).to be_falsey
     end
+
+    it "should contain a syllabus for assignments and quizzes in modules" do
+      # currently only checking for the existence of the key, we'll need a more
+      # robust example here once we have an .imscc example with complex content
+      expect(exporter.templates.key?(:syllabus)).to be_truthy
+    end
+
+    it "should contain a section for announcements" do
+      # currently only checking for the existence of the key, we'll need a more
+      # robust example here once we have an .imscc example with complex content
+      expect(exporter.templates.key?(:announcements)).to be_truthy
+    end
+
+    it "should contain a table of contents for items in modules" do
+      # currently only checking for the existence of the key, we'll need a more
+      # robust example here once we have an .imscc example with complex content
+      expect(exporter.templates.key?(:toc)).to be_truthy
+    end
   end
 
   context "default settings with no modules present" do
@@ -51,12 +69,6 @@ describe "Exporter" do
 
     it "should fall back to sorting by content type" do
       expect(exporter.templates.key?(:modules)).to be_falsey
-    end
-
-    it "should contain a syllabus for assignments and quizzes in modules" do
-      # currently only checking for the existence of the key, we'll need a more
-      # robust example here once we have an .imscc example with complex content
-      expect(exporter.templates.key?(:syllabus)).to be_truthy
     end
   end
 
@@ -77,6 +89,18 @@ describe "Exporter" do
       # currently only checking for the existence of the key, we'll need a more
       # robust example here once we have an .imscc example with complex content
       expect(exporter.templates.key?(:syllabus)).to be_truthy
+    end
+
+    it "should contain a section for announcements" do
+      # currently only checking for the existence of the key, we'll need a more
+      # robust example here once we have an .imscc example with complex content
+      expect(exporter.templates.key?(:announcements)).to be_truthy
+    end
+
+    it "should contain a table of contents for all items" do
+      # currently only checking for the existence of the key, we'll need a more
+      # robust example here once we have an .imscc example with complex content
+      expect(exporter.templates.key?(:toc)).to be_truthy
     end
   end
 end

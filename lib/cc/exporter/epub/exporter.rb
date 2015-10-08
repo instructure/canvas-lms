@@ -4,14 +4,15 @@ module CC::Exporter::Epub
     include CC::Exporter::Epub::ModuleSorter
 
     RESOURCE_TITLES = {
-      syllabus: "Syllabus",
-      modules: "Modules",
-      assignments: "Assignments",
-      announcements: "Announcements",
-      topics: "Discussion Topics",
-      quizzes: "Quizzes",
-      pages: "Wiki Pages",
-      files: "Files"
+      toc: I18n.t("Table Of Contents"),
+      syllabus: I18n.t("Syllabus"),
+      modules: I18n.t("Modules"),
+      assignments: I18n.t("Assignments"),
+      announcements: I18n.t("Announcements"),
+      topics: I18n.t("Discussion Topics"),
+      quizzes: I18n.t("Quizzes"),
+      pages: I18n.t("Wiki Pages"),
+      files: I18n.t("Files")
     }.freeze
 
     LINKED_RESOURCE_KEY = {
@@ -38,8 +39,10 @@ module CC::Exporter::Epub
         title: cartridge_json[:title],
         files: cartridge_json[:files],
       }.tap do |hash|
-        resources = filter_syllabus_for_modules ? module_ids : LINKED_RESOURCE_KEY.values
+        resources = filter_syllabus_for_modules ? module_ids : LINKED_RESOURCE_KEY.except("Attachment").values
+        @_toc = create_universal_template(:toc)
         hash.merge!(
+          :toc => @_toc,
           :syllabus => create_universal_template(:syllabus),
           :announcements => create_universal_template(:announcements)
         )
@@ -61,14 +64,23 @@ module CC::Exporter::Epub
     end
 
     def create_universal_template(resource)
-      template_content = cartridge_json[resource]
+      template_content = cartridge_json[resource] || []
       template = Exporter.resource_template(resource)
       Template.new({resources: template_content, reference: resource}, template, self)
     end
 
     def create_content_template(resource)
-      resource_items = sort_by_content ? cartridge_json[resource] : filter_content_to_module(resource)
-      Template.new({resources: resource_items, reference: resource}, base_template, self)
+      resource_content = sort_by_content ? cartridge_json[resource] : filter_content_to_module(resource)
+      update_table_of_contents(resource, resource_content)
+      Template.new({resources: resource_content, reference: resource}, base_template, self)
+    end
+
+    def update_table_of_contents(resource, resource_content)
+      @_toc.content << {
+        reference: resource,
+        title: RESOURCE_TITLES[resource] || resource_content[:title],
+        resource_content: sort_by_content ? resource_content : resource_content[:items]
+      }
     end
 
     def base_template

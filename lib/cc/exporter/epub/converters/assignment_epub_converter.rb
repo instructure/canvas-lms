@@ -40,6 +40,7 @@ module CC::Exporter::Epub::Converters
         val = get_float_val(meta_doc, f_type)
         assignment[f_type] = val unless val.nil?
       end
+      assignment[:position] = get_node_val(meta_doc, 'position')
       assignment[:identifier] = get_node_att(meta_doc, 'assignment', 'identifier')
       assignment[:href] = "assignments.xhtml##{assignment[:identifier]}"
       update_syllabus(assignment)

@@ -23,7 +23,7 @@ module CC::Exporter::Epub::Converters
       wiki[:front_page] = meta['front_page'] == 'true'
       wiki[:text] = body
       wiki[:identifier] = wiki_name
-      wiki[:href] = "wikis.xhtml##{wiki[:identifier]}"
+      wiki[:href] = "pages.xhtml##{wiki[:identifier]}"
       wiki
     end
 
