@@ -244,6 +244,10 @@ class Quizzes::QuizSubmissionsApiController < ApplicationController
   #    "quiz_submissions": [QuizSubmission]
   #  }
   def create
+    if module_locked?
+      raise RequestError.new("you are not allowed to participate in this quiz", 400)
+    end
+
     quiz_submission = if previewing?
       @service.create_preview(@quiz, session)
     else
@@ -395,6 +399,11 @@ class Quizzes::QuizSubmissionsApiController < ApplicationController
 
 
   private
+
+  def module_locked?
+    @locked_reason = @quiz.locked_for?(@current_user, :check_policies => true, :deep_check_if_needed => true)
+    @locked_reason && !@quiz.grants_right?(@current_user, session, :update)
+  end
 
   def previewing?
     !!params[:preview]
