@@ -62,13 +62,23 @@ define([
           );
         }
       } else {
-        return (
-          <div className='col-xs-2'>
-            <div className='ModeratedAssignmentList__Mark'>
-              <a target='_blank' href={this.generateSpeedgraderUrl(this.props.urls.assignment_speedgrader_url, student)}>{I18n.t('SpeedGrader™')}</a>
-            </div>
-          </div>
-        );
+          if (student.in_moderation_set) {
+            return (
+              <div className='col-xs-2'>
+                <div className='ModeratedAssignmentList__Mark'>
+                  <a target='_blank' href={this.generateSpeedgraderUrl(this.props.urls.assignment_speedgrader_url, student)}>{I18n.t('SpeedGrader™')}</a>
+                </div>
+              </div>
+            );
+          } else {
+            return (
+              <div className='col-xs-2'>
+                <span className='AssignmentList__Mark'>
+                  -
+                </span>
+              </div>
+            );
+          }
       }
     },
 
