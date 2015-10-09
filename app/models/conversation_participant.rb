@@ -249,24 +249,18 @@ class ConversationParticipant < ActiveRecord::Base
     }.merge(options)
 
     shard.activate do
-      if !options[:include_indirect_participants] && !options[:include_participant_contexts]
-        # this is cached in the conversation model
-        conversation.participants
-      else
-        # use a user specific cache record for the modified participant list
-        Rails.cache.fetch([conversation, user, 'participants', options].cache_key) do
-          participants = conversation.participants
-          if options[:include_indirect_participants]
-            user_ids = messages.map(&:all_forwarded_messages).flatten.map(&:author_id)
-            user_ids -= participants.map(&:id)
-            participants += Shackles.activate(:slave) { MessageableUser.available.where(:id => user_ids).to_a }
-          end
-          if options[:include_participant_contexts]
-            # we do this to find out the contexts they share with the user
-            user.load_messageable_users(participants, :strict_checks => false)
-          else
-            participants
-          end
+      Rails.cache.fetch([conversation, user, 'participants', options].cache_key) do
+        participants = conversation.participants
+        if options[:include_indirect_participants]
+          user_ids = messages.map(&:all_forwarded_messages).flatten.map(&:author_id)
+          user_ids -= participants.map(&:id)
+          participants += Shackles.activate(:slave) { MessageableUser.available.where(:id => user_ids).to_a }
+        end
+        if options[:include_participant_contexts]
+          # we do this to find out the contexts they share with the user
+          user.load_messageable_users(participants, :strict_checks => false)
+        else
+          participants
         end
       end
     end
