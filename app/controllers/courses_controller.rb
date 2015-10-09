@@ -289,6 +289,7 @@ class CoursesController < ApplicationController
   include ContextExternalToolsHelper
 
   before_filter :require_user, :only => [:index]
+  before_filter :require_user_or_observer, :only=>[:user_index]
   before_filter :require_context, :only => [:roster, :locks, :create_file, :ping]
   skip_after_filter :update_enrollment_last_activity_at, only: [:enrollment_invitation]
 
@@ -402,50 +403,69 @@ class CoursesController < ApplicationController
       }
 
       format.json {
-        if params[:state]
-          states = Array(params[:state])
-          states += %w(created claimed) if states.include?('unpublished')
-          conditions = states.map{ |state|
-            Enrollment::QueryBuilder.new(nil, course_workflow_state: state, enforce_course_workflow_state: true).conditions
-          }.compact.join(" OR ")
-          enrollments = @current_user.enrollments.eager_load(:course).where(conditions).shard(@current_user)
-        else
-          enrollments = @current_user.cached_current_enrollments(preload_courses: true)
-        end
+        render json: courses_for_user(@current_user)
 
-        # TODO: preload roles after enrollment#role shim is taken out
-        if params[:enrollment_role]
-          enrollments = enrollments.reject { |e| e.role.name != params[:enrollment_role] }
-        elsif params[:enrollment_role_id]
-          enrollments = enrollments.reject { |e| e.role.id.to_s != params[:enrollment_role_id].to_s }
-        elsif params[:enrollment_type]
-          e_type = "#{params[:enrollment_type].capitalize}Enrollment"
-          enrollments = enrollments.reject { |e| e.class.name != e_type }
-        end
-
-        if value_to_boolean(params[:current_domain_only])
-          enrollments = enrollments.select { |e| e.root_account_id == @domain_root_account.id }
-        elsif params[:root_account_id]
-          root_account = api_find_all(Account, [params[:root_account_id]]).first
-          enrollments = root_account ? enrollments.select { |e| e.root_account_id == root_account.id } : []
-        end
-
-        includes = Set.new(Array(params[:include]))
-        includes << 'access_restricted_by_date'
-        # We only want to return the permissions for single courses and not lists of courses.
-        includes.delete 'permissions'
-
-        hash = []
-
-        Canvas::Builders::EnrollmentDateBuilder.preload(enrollments)
-        enrollments_by_course = enrollments.group_by(&:course_id).values
-        enrollments_by_course = Api.paginate(enrollments_by_course, self, api_v1_courses_url) if api_request?
-        enrollments_by_course.each do |course_enrollments|
-          course = course_enrollments.first.course
-          hash << course_json(course, @current_user, session, includes, course_enrollments)
-        end
-        render :json => hash
       }
+    end
+  end
+
+  # @API List courses for a user
+  # Returns a list of active courses for this user. To view the course list for a user other than yourself, you must be either an observer of that user or an administrator.
+  #
+  # @argument include[] [String, "needs_grading_count"|"syllabus_body"|"total_scores"|"term"|"course_progress"|"sections"|"storage_quota_used_mb"|"total_students"|"favorites"]
+  #   - "needs_grading_count": Optional information to include with each Course.
+  #     When needs_grading_count is given, and the current user has grading
+  #     rights, the total number of submissions needing grading for all
+  #     assignments is returned.
+  #   - "syllabus_body": Optional information to include with each Course.
+  #     When syllabus_body is given the user-generated html for the course
+  #     syllabus is returned.
+  #   - "total_scores": Optional information to include with each Course.
+  #     When total_scores is given, any enrollments with type 'student' will also
+  #     include the fields 'calculated_current_score', 'calculated_final_score',
+  #     'calculated_current_grade', and 'calculated_final_grade'.
+  #     calculated_current_score is the student's score in the course, ignoring
+  #     ungraded assignments. calculated_final_score is the student's score in
+  #     the course including ungraded assignments with a score of 0.
+  #     calculated_current_grade is the letter grade equivalent of
+  #     calculated_current_score (if available). calculated_final_grade is the
+  #     letter grade equivalent of calculated_final_score (if available). This
+  #     argument is ignored if the course is configured to hide final grades.
+  #   - "term": Optional information to include with each Course. When
+  #     term is given, the information for the enrollment term for each course
+  #     is returned.
+  #   - "course_progress": Optional information to include with each Course.
+  #     When course_progress is given, each course will include a
+  #     'course_progress' object with the fields: 'requirement_count', an integer
+  #     specifying the total number of requirements in the course,
+  #     'requirement_completed_count', an integer specifying the total number of
+  #     requirements in this course that have been completed, and
+  #     'next_requirement_url', a string url to the next requirement item, and
+  #     'completed_at', the date the course was completed (null if incomplete).
+  #     'next_requirement_url' will be null if all requirements have been
+  #     completed or the current module does not require sequential progress.
+  #     "course_progress" will return an error message if the course is not
+  #     module based or the user is not enrolled as a student in the course.
+  #   - "sections": Section enrollment information to include with each Course.
+  #     Returns an array of hashes containing the section ID (id), section name
+  #     (name), start and end dates (start_at, end_at), as well as the enrollment
+  #     type (enrollment_role, e.g. 'StudentEnrollment').
+  #   - "storage_quota_used_mb": The amount of storage space used by the files in this course
+  #   - "total_students": Optional information to include with each Course.
+  #     Returns an integer for the total amount of active and invited students.
+  #   - "passback_status": Include the grade passback_status
+  #   - "favorites": Optional information to include with each Course.
+  #     Indicates if the user has marked the course as a favorite course.
+  #
+  # @argument state[] [String, "unpublished"|"available"|"completed"|"deleted"]
+  #   If set, only return courses that are in the given state(s).
+  #   By default, "available" is returned for students and observers, and
+  #   anything except "deleted", for all other enrollment types
+  #
+  # @returns [Course]
+  def user_index
+    @user.shard.activate do
+      render json: courses_for_user(@user)
     end
   end
 
@@ -2338,5 +2358,57 @@ class CoursesController < ApplicationController
 
     CourseLinkValidator.queue_course(@context)
     render :json => {:success => true}
+  end
+
+  def courses_for_user(user)
+    if params[:state]
+      states = Array(params[:state])
+      states += %w(created claimed) if states.include?('unpublished')
+      conditions = states.map do |state|
+        Enrollment::QueryBuilder.new(nil, course_workflow_state: state, enforce_course_workflow_state: true).conditions
+      end.compact.join(" OR ")
+      enrollments = user.enrollments.eager_load(:course).where(conditions).shard(user)
+    else
+      enrollments = user.cached_current_enrollments(preload_courses: true)
+    end
+
+    # TODO: preload roles after enrollment#role shim is taken out
+    if params[:enrollment_role]
+      enrollments = enrollments.reject { |e| e.role.name != params[:enrollment_role] }
+    elsif params[:enrollment_role_id]
+      enrollments = enrollments.reject { |e| e.role.id.to_s != params[:enrollment_role_id].to_s }
+    elsif params[:enrollment_type]
+      e_type = "#{params[:enrollment_type].capitalize}Enrollment"
+      enrollments = enrollments.reject { |e| e.class.name != e_type }
+    end
+
+    if value_to_boolean(params[:current_domain_only])
+      enrollments = enrollments.select { |e| e.root_account_id == @domain_root_account.id }
+    elsif params[:root_account_id]
+      root_account = api_find_all(Account, [params[:root_account_id]]).first
+      enrollments = root_account ? enrollments.select { |e| e.root_account_id == root_account.id } : []
+    end
+
+    includes = Set.new(Array(params[:include]))
+    includes << 'access_restricted_by_date'
+    # We only want to return the permissions for single courses and not lists of courses.
+    includes.delete 'permissions'
+
+    hash = []
+
+    Canvas::Builders::EnrollmentDateBuilder.preload(enrollments)
+    enrollments_by_course = enrollments.group_by(&:course_id).values
+    enrollments_by_course = Api.paginate(enrollments_by_course, self, api_v1_courses_url) if api_request?
+    enrollments_by_course.each do |course_enrollments|
+      course = course_enrollments.first.course
+      hash << course_json(course, user, session, includes, course_enrollments)
+    end
+    hash
+  end
+
+  def require_user_or_observer
+    return render_unauthorized_action unless @current_user.present?
+    @user = params[:user_id]=="self" ? @current_user : api_find(User,params[:user_id])
+    authorized_action(@user,@current_user,:read)
   end
 end

@@ -1071,6 +1071,9 @@ class User < ActiveRecord::Base
       (self != user && self.pseudonyms.shard(self).all?{ |p| p.grants_right?(user, :update) })
     end
     can :reset_mfa
+
+    given { |user| user && user.user_observees.detect { |uo| uo.user == self }}
+    can :read
   end
 
   def can_masquerade?(masquerader, account)

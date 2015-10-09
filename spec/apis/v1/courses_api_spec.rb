@@ -322,6 +322,71 @@ describe CoursesController, type: :request do
     expect(courses.length).to eq 2
   end
 
+  describe "user index" do
+    specs_require_sharding
+    before :once do
+      account_admin_user
+    end
+    it "should return a course list for an observed students" do
+      parent = User.create
+      parent.user_observees.create! do |uo|
+        uo.user_id = @me.id
+      end
+      json = api_call_as_user(parent,:get,"/api/v1/users/#{@me.id}/courses",
+                              { :user_id => @me.id, :controller => 'courses', :action => 'user_index',
+                                :format => 'json' })
+      course_ids= json.select{ |c| c["id"]}
+      expect(course_ids.length).to eq 2
+    end
+
+    it "should fail if trying to view courses for student that is not observee" do
+      # test to make sure it doesn't crash if user has not observees
+      parent = User.create
+      expect(parent.user_observees).to eq []
+
+      api_call_as_user(parent,:get,"/api/v1/users/#{@me.id}/courses",
+                      { :user_id => @me.id, :controller => 'courses', :action => 'user_index',
+                        :format => 'json' }, {}, {}, {:expected_status => 401})
+
+    end
+
+    it "should return courses from observed user's shard if different than observer" do
+      parent = nil
+      @shard2.activate do
+        parent = User.create
+        parent.account.id = (@me.account.id + 1)
+        parent.user_observees.create! do |uo|
+          uo.user_id = @me.id
+        end
+        parent.save!
+      end
+      expect(@me.account.id).not_to eq parent.account.id
+      json = api_call_as_user(parent,:get,"/api/v1/users/#{@me.id}/courses",
+                              { :user_id => @me.id, :controller => 'courses', :action => 'user_index',
+                                :format => 'json' })
+      course_ids = json.select{ |c| c["id"]}
+      expect(course_ids.length).to eq 2
+    end
+
+    it "should return courses for a user if requestor is administrator" do
+      json = api_call(:get, "/api/v1/users/#{@me.id}/courses",
+                     {:user_id => @me.id, :controller => 'courses', :action => 'user_index',
+                      :format => 'json' })
+      course_ids = json.select{ |c| c["id"]}
+      expect(course_ids.length).to eq 2
+    end
+
+    it "should return courses for self" do
+      json = api_call_as_user(@me, :get, "/api/v1/users/self/courses",
+                              { :user_id => "self", :controller => 'courses', :action => 'user_index',
+                                  :format => 'json' })
+      course_ids = json.select{ |c| c["id"]}
+      expect(course_ids.length).to eq 2
+    end
+
+  end
+
+
   it 'should paginate the course list' do
     json = api_call(:get, "/api/v1/courses.json?per_page=1",
             { :controller => 'courses', :action => 'index', :format => 'json', :per_page => '1' })
