@@ -74,7 +74,7 @@ describe 'quizzes' do
           q.save!
 
           get "/courses/#{@course.id}/quizzes/#{q.id}/take?user_id=#{@student.id}"
-          f('#take_quiz_link').click
+          expect_new_page_load { f('#take_quiz_link').click }
           answer_one = f("#question_#{question.id}_answer_1")
 
           # force a save to create a submission
