@@ -170,7 +170,7 @@ class GoogleDocsCollaboration < Collaboration
       service && [service.token, service.secret]
     end
     raise GoogleDocs::NoTokenError unless refresh_token && access_token
-    GoogleDocs::DriveConnection.new(refresh_token, access_token)
+    GoogleDocs::DriveConnection.new(refresh_token, access_token, ApplicationController.google_drive_timeout)
   end
 
   def google_adapter_for_user

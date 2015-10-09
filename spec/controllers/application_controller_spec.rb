@@ -143,7 +143,7 @@ describe ApplicationController do
 
       Rails.cache.expects(:fetch).with(['google_drive_tokens', mock_real_current_user].cache_key).returns(["real_current_user_token", "real_current_user_secret"])
 
-      GoogleDocs::DriveConnection.expects(:new).with("real_current_user_token", "real_current_user_secret")
+      GoogleDocs::DriveConnection.expects(:new).with("real_current_user_token", "real_current_user_secret", 30)
 
       controller.send(:google_drive_connection)
     end
@@ -157,7 +157,7 @@ describe ApplicationController do
 
       Rails.cache.expects(:fetch).with(['google_drive_tokens', mock_current_user].cache_key).returns(["current_user_token", "current_user_secret"])
 
-      GoogleDocs::DriveConnection.expects(:new).with("current_user_token", "current_user_secret")
+      GoogleDocs::DriveConnection.expects(:new).with("current_user_token", "current_user_secret", 30)
       controller.send(:google_drive_connection)
     end
 
@@ -172,7 +172,7 @@ describe ApplicationController do
       mock_current_user.expects(:user_services).returns(mock_user_services)
       mock_user_services.expects(:where).with(service: "google_drive").returns(stub(first: mock(token: "user_service_token", secret: "user_service_secret")))
 
-      GoogleDocs::DriveConnection.expects(:new).with("user_service_token", "user_service_secret")
+      GoogleDocs::DriveConnection.expects(:new).with("user_service_token", "user_service_secret", 30)
       controller.send(:google_drive_connection)
     end
 
@@ -182,7 +182,7 @@ describe ApplicationController do
       session[:oauth_gdrive_refresh_token] = "session_token"
       session[:oauth_gdrive_access_token] = "sesion_secret"
 
-      GoogleDocs::DriveConnection.expects(:new).with("session_token", "sesion_secret")
+      GoogleDocs::DriveConnection.expects(:new).with("session_token", "sesion_secret", 30)
 
       controller.send(:google_drive_connection)
     end

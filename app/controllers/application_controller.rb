@@ -1957,6 +1957,10 @@ class ApplicationController < ActionController::Base
     google_docs
   end
 
+  def self.google_drive_timeout
+    Setting.get('google_drive_timeout', 30).to_i
+  end
+
   def google_drive_connection
     return unless Canvas::Plugin.find(:google_drive).try(:settings)
     ## @real_current_user first ensures that a masquerading user never sees the
@@ -1972,7 +1976,7 @@ class ApplicationController < ActionController::Base
       access_token = session[:oauth_gdrive_access_token]
     end
 
-    GoogleDocs::DriveConnection.new(refresh_token, access_token) if refresh_token && access_token
+    GoogleDocs::DriveConnection.new(refresh_token, access_token, ApplicationController.google_drive_timeout) if refresh_token && access_token
   end
 
   def google_service_connection
