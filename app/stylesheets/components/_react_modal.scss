@@ -152,6 +152,10 @@ See `app/jsx/examples/ReactModalExample.jsx` for complete example usage.
       border-top-left-radius: $baseBorderRadius;
       border-top-right-radius: $baseBorderRadius;
       @include breakpoint(desktop) { padding: $ic-sp*1.5; }
+      &:last-child {
+        border-bottom-left-radius: $baseBorderRadius;
+        border-bottom-right-radius: $baseBorderRadius;
+      }
       &.ReactModal__Body--force-no-padding { padding: 0; }
     }
 

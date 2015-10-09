@@ -34,40 +34,60 @@ define([
 
     previewGenerationModalContent() {
       return (
-        <div className="Theme__editor_progress">
-          <h4>{I18n.t('Generating Preview...')}</h4>
-          <ProgressBar
-            progress={this.props.progress}
-            title={I18n.t('%{percent} complete', {
-              percent: I18n.toPercentage(this.props.progress, {precision: 0})
-            })}
-          />
+        <div className="ReactModal__Layout">
+          <header className="ReactModal__Header">
+            <div className="ReactModal__Header-Title">
+              <h3>{I18n.t('Generating preview...')}</h3>
+            </div>
+          </header>
+          <div className="ReactModal__Body">
+            <ProgressBar
+              progress={this.props.progress}
+              title={I18n.t('%{percent} complete', {
+                percent: I18n.toPercentage(this.props.progress, {precision: 0})
+              })}
+            />
+          </div>
         </div>
       )
     },
 
     subAccountModalContent(){
       return (
-        <div className="Theme__editor_progress">
-          <h4>{I18n.t('Applying changes to subaccounts.')}</h4>
-          <h5>{I18n.t('(changes will still apply if you leave this page)')}</h5>
-          {this.props.activeSubAccountProgresses.map(this.subAccountProgressBar)}
+        <div className="ReactModal__Layout">
+          <header className="ReactModal__Header">
+            <div className="ReactModal__Header-Title">
+              <h3>{I18n.t('Applying new styles to subaccounts')}</h3>
+            </div>
+          </header>
+          <div className="ReactModal__Body">
+            <p>
+              {I18n.t('Changes will still apply if you leave this page.')}
+            </p>
+            <ul className="unstyled_list">
+              {this.props.activeSubAccountProgresses.map(this.subAccountProgressBar)}
+            </ul>
+          </div>
         </div>
       );
     },
 
     subAccountProgressBar(progress){
       return (
-        <div>
-          <h5>{I18n.t('Progress for %{account_name}', {account_name: this.messageToName(progress.message)} )}</h5>
-          <ProgressBar
-            progress={progress.completion}
-            title={I18n.t('Progress for %{account_name}', {
-              account_name: this.messageToName(progress.message)
-              })
-            }
-          />
-        </div>
+        <li className="Theme-editor-progress-list-item">
+          <div className="Theme-editor-progress-list-item__title">
+            {I18n.t('%{account_name}', {account_name: this.messageToName(progress.message)} )}
+          </div>
+          <div className="Theme-editor-progress-list-item__bar">
+            <ProgressBar
+              progress={progress.completion}
+              title={I18n.t('Progress for %{account_name}', {
+                account_name: this.messageToName(progress.message)
+                })
+              }
+            />
+          </div>
+        </li>
       );
     },
 
@@ -81,8 +101,10 @@ define([
       return (
         <Modal
           isOpen={this.modalOpen()}
-          className='ReactModal__Content--canvas ReactModal__Content--mini-modal'
-          overlayClassName='ReactModal__Overlay--Theme__editor_progress'>
+          className={ 
+            (this.props.showProgressModal ? 'ReactModal__Content--canvas ReactModal__Content--mini-modal' : 'ReactModal__Content--canvas') 
+          }
+        >
           {this.modalContent()}
         </Modal>
       )
