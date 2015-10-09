@@ -38,7 +38,10 @@
 
 <%= render :partial => 'shared/profile' %>
 
-<% if can_do(@context, @current_user, :manage_students) && !@context.is_a?(Group)%>
+<% can_manage_students = can_do(@context, @current_user, :manage_students) %>
+<% can_manage_admins = can_do(@context, @current_user, :manage_admin_users) %>
+
+<% if !@context.is_a?(Group) && (can_manage_students || can_manage_admins) %>
 <div class="more_user_information">
   <% if @context.is_a?(Course) %>
     <fieldset>
@@ -59,7 +62,7 @@
               <% end %>
               <div style="font-size: 0.8em; padding-left: 20px; <%= hidden unless enrollment.completed? %>" class="completed_at_holder"><%= t 'completed_enrollment', "completed *%{completed_at}*", :completed_at => datetime_string(enrollment.completed_at), :wrapper => '<span class="completed_at">\1</span>' %></div>
             </td>
-            <% if !enrollment.admin? || (can_do(@context, @current_user, :manage_admin_users) && enrollment.user_id != @current_user.id) %>
+            <% if enrollment.admin? ? (can_manage_admins && enrollment.user_id != @current_user.id) : can_manage_students %>
               <td style="vertical-align: top; padding: 5px; font-size: 0.8em;">
                 <div class="conclude_enrollment_link_holder" style="margin-bottom: 5px; <%= hidden if enrollment.completed? %>">
                   <a class="conclude_enrollment_link" href="<%= context_url(@context, :controller => :courses, :action => :conclude_user, :id => enrollment.id) %>"><%= t('links.conclude_enrollment', %{Conclude this Enrollment}) %></a>
