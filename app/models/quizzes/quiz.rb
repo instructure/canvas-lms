@@ -352,9 +352,8 @@ class Quizzes::Quiz < ActiveRecord::Base
 
     return false unless self.show_correct_answers
 
-    quiz_submission = user.present? && user.quiz_submissions.where(quiz_id: self.id).first
-    if self.show_correct_answers_last_attempt && quiz_submission
-      return quiz_submission.attempts_left == 0 && quiz_submission.completed?
+    if self.show_correct_answers_last_attempt && submission
+      return submission.attempts_left == 0 && submission.completed?
     end
 
     # If we're showing the results only one time, and are letting students
@@ -616,7 +615,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     return end_at if user.is_a?(::User) && self.grants_right?(user, :grade)
 
     can_take = Quizzes::QuizEligibility.new(course: self.context, quiz: self, user: submission.user)
-    
+
     fallback_end_at = if can_take.section_dates_currently_apply?
       can_take.course_section.end_at
     elsif course.restrict_enrollments_to_course_dates
@@ -624,7 +623,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     else
       course.enrollment_term.end_at
     end
-    
+
     # set to lock date
     if lock_at && !submission.manually_unlocked
       if !end_at || lock_at < end_at
@@ -633,7 +632,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     elsif !end_at || (fallback_end_at && fallback_end_at < end_at)
       end_at = fallback_end_at
     end
-    
+
     end_at
   end
 

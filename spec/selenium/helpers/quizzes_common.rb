@@ -250,7 +250,8 @@ require_relative "../common"
   #   answer will be chosen.
   def take_and_answer_quiz(submit=true)
     get "/courses/#{@course.id}/quizzes/#{@quiz.id}/take?user_id=#{@user.id}"
-    expect_new_page_load { fln('Take the Quiz').click }
+
+    expect_new_page_load { f('#take_quiz_link').click }
 
     answer = if block_given?
       yield(@quiz.stored_questions[0][:answers])
@@ -264,7 +265,8 @@ require_relative "../common"
     end
 
     if submit
-      driver.execute_script("$('#submit_quiz_form .btn-primary').click()")
+      expect_new_page_load { driver.execute_script("$('#submit_quiz_form .btn-primary').click()") }
+
       keep_trying_until do
         expect(f('.quiz-submission .quiz_score .score_value')).to be_displayed
       end

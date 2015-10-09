@@ -236,24 +236,19 @@ describe 'quizzes' do
   end
 
   context 'when the \'show correct answers\' setting is on' do
-
     before(:each) do
       prepare_quiz
+      @quiz.update_attributes(show_correct_answers: true)
+      @quiz.save!
     end
 
     it 'highlights correct answers', priority: "1", test_id: 209417 do
-      @quiz.update_attributes(show_correct_answers: true)
-      @quiz.save!
-
       take_and_answer_quiz
 
       expect(ff('.correct_answer').length).to be > 0
     end
 
     it 'always highlights incorrect answers', priority: "1", test_id: 209418 do
-      @quiz.update_attributes(show_correct_answers: true)
-      @quiz.save!
-
       take_and_answer_quiz do |answers|
         answers[1][:id] # don't answer
       end
@@ -262,25 +257,51 @@ describe 'quizzes' do
     end
   end
 
+  context "when 'show correct answers after last attempt setting' is on" do
+    before(:each) do
+      prepare_quiz
+      @quiz.update_attributes(:show_correct_answers => true,
+        :show_correct_answers_last_attempt => true, :allowed_attempts => 2)
+      @quiz.save!
+    end
+
+    it "should not show correct answers on first attempt" do
+      @student = @user
+      @observer = user
+      @course.enroll_user(@observer, 'ObserverEnrollment', :enrollment_state => 'active', :associated_user_id => @student.id)
+
+      take_and_answer_quiz
+      expect(ff('.correct_answer').length).to eq 0
+
+      # shouldn't show to an observer either
+      user_session(@observer)
+      sub = @quiz.quiz_submissions.where(:user_id => @student).first
+      get "/courses/#{@course.id}/quizzes/#{@quiz.id}/history?quiz_submission_id=#{sub.id}"
+
+      expect(ff('.correct_answer').length).to eq 0
+
+      # attempt two
+      user_session(@student)
+      take_and_answer_quiz
+      expect(ff('.correct_answer').length).to be > 0
+    end
+  end
+
   context 'when the \'show correct answers\' setting is off' do
 
     before(:each) do
       prepare_quiz
+      @quiz.update_attributes(show_correct_answers: false)
+      @quiz.save!
     end
 
     it 'doesn\'t highlight correct answers', priority: "1", test_id: 209416 do
-      @quiz.update_attributes(show_correct_answers: false)
-      @quiz.save!
-
       take_and_answer_quiz
 
       expect(ff('.correct_answer').length).to eq 0
     end
 
     it 'always highlights incorrect answers', priority: "1", test_id: 209480 do
-      @quiz.update_attributes(show_correct_answers: false)
-      @quiz.save!
-
       take_and_answer_quiz do |answers|
         answers[1][:id] # don't answer
       end
