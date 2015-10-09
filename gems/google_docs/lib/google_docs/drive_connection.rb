@@ -23,9 +23,10 @@ module GoogleDocs
   end
 
   class DriveConnection
-    def initialize(refresh_token, access_token)
+    def initialize(refresh_token, access_token, timeout = nil)
       @refresh_token = refresh_token
       @access_token = access_token
+      @timeout = timeout
     end
 
     def retrieve_access_token
@@ -37,7 +38,7 @@ module GoogleDocs
     end
 
     def with_timeout_protection
-      Timeout.timeout(30) { yield }
+      Timeout.timeout(@timeout || 30) { yield }
     rescue Timeout::Error
       raise DriveConnectionException, "Google Drive connection timed out"
     end
