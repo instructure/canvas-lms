@@ -109,10 +109,10 @@ describe "speed grader" do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
       tab = f('#moderation_tabs li')
       expect(tab).to be_displayed
-      expect(tab).to include_text("1st Mark")
+      expect(tab).to include_text("1st Reviewer")
       expect(tab).to include_text("7/8")
 
-      expect(f('#moderation_tabs')).to_not include_text("New Mark")
+      expect(f('#moderation_tabs')).to_not include_text("Add Review")
 
       grade = f('#grading-box-extended')
       expect(grade['disabled']).to be_present
@@ -141,7 +141,7 @@ describe "speed grader" do
 
       tab = f('#moderation_tabs li.ui-state-active')
       expect(tab).to be_displayed
-      expect(tab).to include_text("2nd Mark")
+      expect(tab).to include_text("2nd Reviewer")
       expect(tab).to include_text("6/8")
 
       #open dropdown, make sure that the "Create 2nd Mark" link is not shown
@@ -159,7 +159,7 @@ describe "speed grader" do
       wait_for_ajaximations
       tab = f('#moderation_tabs li.ui-state-active')
       expect(tab).to be_displayed
-      expect(tab).to include_text("1st Mark")
+      expect(tab).to include_text("1st Reviewer")
       expect(tab).to include_text("7/8")
 
       expect(grade['value']).to eq "7"
@@ -174,13 +174,13 @@ describe "speed grader" do
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
       new_mark_dd = f('#moderation_tabs #new_mark_dropdown_link')
-      expect(new_mark_dd).to include_text("New Mark")
+      expect(new_mark_dd).to include_text("Add Review")
       new_mark_dd.click
       wait_for_ajaximations
 
       new_mark_link = f('#new_mark_link')
       expect(new_mark_link).to be_displayed
-      expect(new_mark_link).to include_text("Create 2nd Mark")
+      expect(new_mark_link).to include_text("Add 2nd Review")
       new_mark_link.click
 
       wait_for_ajaximations
@@ -205,7 +205,7 @@ describe "speed grader" do
       expect(pg.submission_comments.map(&:comment)).to be_include 'srsly'
 
       tab = f('#moderation_tabs li.ui-state-active')
-      expect(tab).to include_text("2nd Mark")
+      expect(tab).to include_text("2nd Reviewer")
       expect(tab).to include_text("8/8") # should sync tab state
 
       ff('#moderation_tabs li')[0].click # switch from 1st to 2nd mark - should preserve new comments + grade
@@ -241,7 +241,7 @@ describe "speed grader" do
       expect(pg.score.to_i).to eql 2
 
       tab = f('#moderation_tabs li.ui-state-active')
-      expect(tab).to include_text("2nd Mark")
+      expect(tab).to include_text("2nd Reviewer")
       expect(tab).to include_text("2/8") # should sync tab state
 
       ff('#moderation_tabs li')[0].click # switch from 1st to 2nd mark - should preserve new comments + grade
@@ -269,7 +269,7 @@ describe "speed grader" do
       expect(tabs[1]).to_not be_displayed # no second mark
       final_tab = tabs[2]
       expect(final_tab).to be_displayed
-      expect(final_tab).to include_text("Final Mark")
+      expect(final_tab).to include_text("Moderator")
       expect(final_tab).to include_text("3/8")
       final_tab.click
       wait_for_ajaximations
@@ -409,7 +409,7 @@ describe "speed grader" do
       wait_for_ajaximations
 
       final_tab = f('#moderation_tabs li.ui-state-active') # should be active tab
-      expect(final_tab).to include_text("Final Mark")
+      expect(final_tab).to include_text("Moderator")
       expect(final_tab).to include_text("3/8") # should sync tab state
 
       expect(f('#rubric_summary_container')).to include_text(@rubric.title)
@@ -488,7 +488,7 @@ describe "speed grader" do
         expect(f('#moderation_tabs')).to be_displayed
 
         tab = f('#moderation_tabs li.ui-state-active')
-        expect(tab).to include_text("1st Mark")
+        expect(tab).to include_text("1st Reviewer")
         expect(tab).to include_text("7/8")
 
         grade = f('#grading-box-extended')
