@@ -1,3 +1,73 @@
+.label {
+  display: inline-block;
+  padding: 1px 4px;
+  margin: 0 2px;
+  font-style: italic;
+  background: #f2dede;
+  color: #000;
+}
+
+.label.required::before {
+  content: "REQUIRED"
+}
+
+.label.optional {
+  background: #d9edf7;
+}
+
+.label.optional::before {
+  content: "OPTIONAL"
+}
+
+.label.required-for {
+  background: #fcf8e3;
+}
+
+.label.required-for::before {
+  content: "REQUIRED FOR: "
+}
+
+.mono {
+  white-space: pre;
+  font-family: monospace;
+}
+
+h1 a:link, h1 a:visited,
+h2 a:link, h2 a:visited,
+h3 a:link, h3 a:visited,
+h4 a:link, h4 a:visited,
+h5 a:link, h5 a:visited {
+  color: #333;
+  text-decoration: none;
+}
+
+h1 a:hover, h1 a:active,
+h2 a:hover, h2 a:active,
+h3 a:hover, h3 a:active,
+h4 a:hover, h4 a:active,
+h5 a:hover, h5 a:active {
+  color: #3C7DEE;
+  text-decoration: none;
+}
+
+a:link {
+  color: #2266dd;
+}
+
+a:visited {
+  color: #5090f0;
+}
+
+
+a:hover {
+  color: #2f6fdf;
+}
+
+a:active {
+  color: #2060d0;
+}
+
+
 body {
   margin:0; padding:0;
   font-family: "Helvetica Neue", Arial, sans-serif;

@@ -1,32 +1,31 @@
-OAuth
-=====
+OAuth2
+======
+<a name="top"></a>
 
-OAuth2 is a protocol designed to let third-party applications
+[OAuth2](http://oauth.net/2/) is a protocol designed to let third-party applications
 authenticate to perform actions as a user, without getting the user's
-password. Canvas uses OAuth2 for authentication and
-authorization of the Canvas API.
+password. Canvas uses OAuth2 (specifically [RFC-6749](http://tools.ietf.org/html/rfc6749))
+for authentication and authorization of the Canvas API.
+<a name="top"></a>
+- [Storing Tokens](#storing-access-tokens)
+- [Manual Token Generation](#manual-token-generation)
+- [Oauth2 Flow](#oauth2-flow)
+  - [Getting OAuth2 Client ID/Secret](#oauth2-flow-0)
+  - [Step 1: Redirect users to request Canvas access](#oauth2-flow-1)
+  - [Step 2: Redirect back to the request\_uri, or out-of-band redirect](#oauth2-flow-2)
+    - [Note for native apps](#oauth2-flow-2.1)
+  - [Step 3: Exchange the code for the final access token](#oauth2-flow-3)
+- [Using an Access Token to authenticate requests](#using-access-tokens)
+- [Using a Refresh Token to get a new Access Token](#using-refresh-tokens)
+- [Logging Out](file.oauth_endpoints.html#delete-login-oauth2-token)
+- [Endpoints](file.oauth_endpoints.html)
+  - [GET login/oauth2/auth](file.oauth_endpoints.html#get-login-oauth2-auth)
+  - [POST login/oauth2/token](file.oauth_endpoints.html#post-login-oauth2-token)
+  - [DELETE login/oauth2/token](file.oauth_endpoints.html#delete-login-oauth2-token)
 
-Authenticating a Request
-------------------------
-
-Once you have an OAuth access token, you can use it to make API
-requests. If possible, using the HTTP Authorization header is
-recommended.
-
-OAuth2 Token sent in header:
-
-    curl -H "Authorization: Bearer <ACCESS-TOKEN>" https://canvas.instructure.com/api/v1/courses
-
-Sending the access token in the query string or POST
-parameters is also supported, but discouraged as it increases the
-chances of the token being logged or leaked in transit.
-
-OAuth2 Token sent in query string:
-
-    curl https://canvas.instructure.com/api/v1/courses?access_token=<ACCESS-TOKEN>
-
-Storing Tokens
---------------
+<a name="storing-access-tokens"></a>
+## [Storing Tokens](#storing-access-tokens)
+<small><a href="#top">Back to Top</a></small>
 
 When appropriate, applications should store the token locally, rather
 than requesting a new token for the same user each time the user uses the
@@ -51,15 +50,17 @@ including but not limited to:
   * For native applications, take advantage of user keychain stores and
     other operating system functionality for securely storing passwords.
 
-Manual Token Generation
------------------------
+
+<a name="manual-token-generation"></a>
+## [Manual Token Generation](#manual-token-generation)
+<small><a href="#top">Back to Top</a></small>
 
 For testing your application before you've implemented OAuth, the
 simplest option is to generate an access token on your user's profile
 page. Note that asking any other user to manually generate a token and
 enter it into your application is a violation of Canvas' terms of
-service. Applications in use by multiple users *must* use OAuth to obtain
-tokens.
+service. *Applications in use by multiple users **MUST** use OAuth to obtain
+tokens*.
 
 To manually generate a token for testing:
 
@@ -71,34 +72,11 @@ To manually generate a token for testing:
      have to generate a new token if you forget it. Remember that access
      tokens are password equivalent, so keep it secret.
 
-Logging Out
------------
 
-<div class="method_details">
+<a name="oauth2-flow"></a>
+## [Oauth2 Flow](#oauth2-flow)
+<small><a href="#top">Back to Top</a></small>
 
-If your application supports logout functionality, you can revoke your own
-access token. This is useful for security reasons, as well as removing your
-application from the list of tokens on the user's profile page. Simply make
-an authenticated request to the following endpoint:
-
-<h3 class="endpoint">DELETE /login/oauth2/token</h3>
-
-<h4>Parameters</h4>
-
-<ul class="argument">
-  <li>
-    <span class="name">expire_sessions</span>
-    <div class="inline">
-      optional.  Set this to '1' if you want to end all of the user's
-Canvas web sessions.  Without this argument, the endpoint will leave web sessions intact.
-    </div>
-  </li>
-</ul>
-
-</div>
-
-Oauth2 Based Identity Service
------------------------------
 Your application can rely on canvas for a user's identity.  During step 1 of
 the web application flow below, specify the optional scopes parameter as
 scopes=/auth/userinfo.  When the user is asked to grant your application
@@ -109,9 +87,8 @@ the authorization, Canvas will skip step 2 of the request flow for future reques
 Canvas will not give a token back as part of a userinfo request.  It will only
 provide the current user's name and id.
 
-
-OAuth2 Token Request Flow
--------------------------
+<a name="oauth2-flow-0"></a>
+### [Getting OAuth2 Client ID/Secret](#oauth2-flow-0)
 
 If your application will be used by others, you will need to implement
 the full OAuth2 token request workflow, so that you can request an access
@@ -128,93 +105,28 @@ For open source Canvas users, you can generate a client ID and secret in
 the Site Admin account of your Canvas install. There will be a
 "Developer Keys" tab on the left navigation sidebar.
 
-Web Application Flow
---------------------
+<a name="oauth2-flow-1"></a>
+### [Step 1: Redirect users to request Canvas access](#oauth2-flow-1)
+<small><a href="#top">Back to Top</a></small>
 
-This is the OAuth flow for third-party web applications.
-
-### Step 1: Redirect users to request Canvas access
+A basic request looks like:
 
 <div class="method_details">
-
 <h3 class="endpoint">GET https://&lt;canvas-install-url&gt;/login/oauth2/auth?client_id=XXX&response_type=code&redirect_uri=https://example.com/oauth_complete&state=YYY</h3>
-
-<h4>Parameters</h4>
-
-<ul class="argument">
-  <li>
-    <span class="name">client_id</span>
-    <div class="inline">
-      required. The client id for your registered application.
-    </div>
-  </li>
-  <li>
-    <span class="name">response_type</span>
-    <div class="inline">
-      required. The type of OAuth2 response requested. The only
-currently supported value is <code>code</code>.
-    </div>
-  </li>
-  <li>
-    <span class="name">redirect_uri</span>
-    <div class="inline">
-      required. The URL where the user will be redirected after
-authorization. The domain of this URL must match the domain of the
-redirect_uri stored on the developer key, or it must be a subdomain of
-that domain.
-    </div>
-  </li>
-  <li>
-    <span class="name">state</span>
-    <div class="inline">
-      optional. Your application can pass Canvas an arbitrary piece of
-state in this parameter, which will be passed back to your application
-in Step 2. It's strongly encouraged that your application pass a unique
-identifier in the state parameter, and then verify in Step 2 that the
-state you receive back from Canvas is the same expected value. Failing
-to do this opens your application to the possibility of logging the
-wrong person in, as <a href="http://homakov.blogspot.com/2012/07/saferweb-most-common-oauth2.html">described here</a>.
-    </div>
-  </li>
-  <li>
-    <span class="name">scopes</span>
-    <div class="inline">
-      optional. This can be used to specify what information the access token
-      will provide access to.  By default an access token will have access to
-      all api calls that a user can make.  The only other accepted value
-      for this at present is '/auth/userinfo', which can be used to obtain
-      the current canvas user's identity
-    </div>
-  </li>
-  <li>
-    <span class="name">purpose</span>
-    <div class="inline">
-      optional. This can be used to help the user identify which instance
-      of an application this token is for. For example, a mobile device
-      application could provide the name of the device.
-    </div>
-  </li>
-  <li>
-    <span class="name">force_login</span>
-    <div class="inline">
-      optional. Set to '1' if you want to force the user to enter their
-      credentials, even if they're already logged into Canvas. By default,
-      if a user already has an active Canvas web session, they will not be
-      asked to re-enter their credentials.
-    </div>
-  </li>
-</ul>
-
 </div>
 
-### Step 2: Redirect back to the request\_uri, or out-of-band redirect
+See [GET login/oauth2/auth](file.oauth_endpoints.html#get-login-oauth2-auth) for details.
+
+<a name="oauth2-flow-2"></a>
+### [Step 2: Redirect back to the request\_uri, or out-of-band redirect](#oauth2-flow-2)
+<small><a href="#top">Back to Top</a></small>
 
 If the user accepts your request, Canvas redirects back to your
 request\_uri with a specific query string, containing the OAuth2
 response:
 
 <div class="method_details">
-<h3>http://www.example.com/oauth2response?code=XXX&state=YYY</h3>
+<h3 class="endpoint">http://www.example.com/oauth2response?code=XXX&state=YYY</h3>
 </div>
 
 The app can then extract the code, and use it along with the
@@ -228,142 +140,25 @@ If the user doesn't accept the request for access, or if another error
 occurs, Canvas redirects back to your request\_uri with an `error`
 parameter, rather than a `code` parameter, in the query string.
 
+If the user doesn't accept the request for access, or if another error
+occurs, Canvas will add an `error`
+parameter, rather than a `code` parameter, to the query string.
+
 <div class="method_details">
-<h3>http://www.example.com/oauth2response?error=access_denied</h3>
+<h3 class="endpoint">http://www.example.com/oauth2response?error=access_denied</h3>
 </div>
 
 `access_denied` is the only currently implemented error code.
 
-### Step 3: Exchange the code for the final access token
+<a name="oauth2-flow-2.1"></a>
+#### [Note for native apps](#oauth2-flow-2.1)
+<small><a href="#top">Back to Top</a></small>
 
-<div class="method_details">
+Canvas redirects to a page on canvas with a specific query string, containing parameters from the OAuth2 response:
 
-<h3 class="endpoint">POST /login/oauth2/token</h3>
-
-<h4>Parameters</h4>
-
-<ul class="argument">
-  <li>
-    <span class="name">client_id</span>
-    <div class="inline">
-      required. The client id for your registered application.
-    </div>
-  </li>
-  <li>
-    <span class="name">redirect_uri</span>
-    <div class="inline">
-      optional. If a redirect_uri was passed to the initial request in
-      step 1, the same redirect_uri must be given here.
-    </div>
-  </li>
-  <li>
-    <span class="name">client_secret</span>
-    <div class="inline">
-      required. The client secret for your registered application.
-    </div>
-  </li>
-  <li>
-    <span class="name">code</span>
-    <div class="inline">
-      required. The code you received as a response to Step 2.
-    </div>
-  </li>
-</ul>
-
-<h4>Response</h4>
-
-<p>
-The response will be a JSON argument containing the access_token:
 <pre class="example_code">
-{
-  access_token: "1/fFAGRNJru1FTz70BzhT3Zg",
-  expires_in: 3600
-}
+/login/oauth2/auth?code=&lt;code&gt;
 </pre>
-</p>
-
-<ul class="argument">
-  <li>
-    <span class="name">access_token</span>
-    <div class="inline">
-      The OAuth2 access token.
-    </div>
-  </li>
-  <li>
-    <span class="name">expires_in</span>
-    <div class="inline">
-      Time in seconds until the access_token expires
-    </div>
-  </li>
-</ul>
-
-</div>
-
-Native Application Flow
------------------------
-
-This is the OAuth flow for desktop client and mobile applications. The
-application will need to embed a web browser view in order to detect and
-read the out-of-band code response.
-
-### Step 1: Redirect users to request Canvas access
-
-<div class="method_details">
-
-<h3 class="endpoint">GET https://&lt;canvas-install-url&gt;/login/oauth2/auth</h3>
-
-<h4>Parameters</h4>
-
-<ul class="argument">
-  <li>
-    <span class="name">client_id</span>
-    <div class="inline">
-      required. The client id for your registered application.
-    </div>
-  </li>
-  <li>
-    <span class="name">response_type</span>
-    <div class="inline">
-      required. The type of OAuth2 response requested. The only
-currently supported value is <code>code</code>.
-    </div>
-  </li>
-  <li>
-    <span class="name">redirect_uri</span>
-    <div class="inline">
-      required. For native applications, currently the only supported value is
-<code>urn:ietf:wg:oauth:2.0:oob</code>, signifying that the credentials will be
-retrieved out-of-band using an embedded browser or other functionality.
-    </div>
-  </li>
-  <li>
-    <span class="name">scopes</span>
-    <div class="inline">
-      optional. This can be used to specify what information the access token
-      will provide access to.  By default an access token will have access to
-      all api calls that a user can make.  The only other accepted value
-      for this at present is '/auth/userinfo', which can be used to obtain
-      the current canvas user's identity
-    </div>
-  </li>
-  <li>
-    <span class="name">purpose</span>
-    <div class="inline">
-      optional. This can be used to help the user identify which instance
-      of an application this token is for. For example, a mobile device
-      application could provide the name of the device.
-    </div>
-  </li>
-</ul>
-
-</div>
-
-### Step 2: Redirect back to the request\_uri, or out-of-band redirect
-
-If the user accepts your request, Canvas redirects back to your
-request\_uri (not yet implemented), or for out-of-band redirecting, to a
-page on canvas with a specific query string, containing the OAuth2
-response:
 
 <div class="method_details">
 <h3>/login/oauth2/auth?code=&lt;code&gt;</h3>
@@ -374,77 +169,100 @@ changed to contain <code>code=&lt;code&gt;</code> somewhere in the query
 string. The app can then extract the code, and use it along with the
 client_id and client_secret to obtain the final access_key.
 
-If the user doesn't accept the request for access, or if another error
-occurs, Canvas will add an `error`
-parameter, rather than a `code` parameter, to the query string.
+<a name="oauth2-flow-3"></a>
+### [Step 3: Exchange the code for the final access token](#oauth2-flow-3)
+<small><a href="#top">Back to Top</a></small>
 
-<div class="method_details">
-<h3>/login/oauth2/auth?error=access_denied</h3>
-</div>
-
-`access_denied` is the only currently implemented error code.
-
-### Step 3: Exchange the code for the final access token
-
-<div class="method_details">
-
-<h3 class="endpoint">POST /login/oauth2/token</h3>
+To get a code, send a [POST request to login/oauth2/token](file.oauth_endpoints.html#post-login-oauth2-token)
 
 <h4>Parameters</h4>
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Value</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td class="mono">grant_type</td>
+      <td>authorization_code</td>
+    </tr>
+    <tr>
+      <td class="mono">client_id</td>
+      <td><span class="label">Your client_id</span></td>
+    </tr>
+    <tr>
+      <td class="mono">client_secret</td>
+      <td><span class="label">Your client_secret</span></td>
+    </tr>
+    <tr>
+      <td class="mono">redirect_uri</td>
+      <td>If a redirect_uri was passed to the initial request in
+      step 1, the same redirect_uri must be given here.</td>
+    </tr>
+    <tr>
+      <td class="mono">code</td>
+      <td><span class="label">code from canvas</span></td>
+    </tr>
+  </tbody>
+</table>
 
-<ul class="argument">
-  <li>
-    <span class="name">client_id</span>
-    <div class="inline">
-      required. The client id for your registered application.
-    </div>
-  </li>
-  <li>
-    <span class="name">redirect_uri</span>
-    <div class="inline">
-      optional. If a redirect_uri was passed to the initial request in
-      step 1, the same redirect_uri must be given here.
-    </div>
-  </li>
-  <li>
-    <span class="name">client_secret</span>
-    <div class="inline">
-      required. The client secret for your registered application.
-    </div>
-  </li>
-  <li>
-    <span class="name">code</span>
-    <div class="inline">
-      required. The code you received as a response to Step 2.
-    </div>
-  </li>
-</ul>
+<a name="using-access-tokens"></a>
+## [Using an Access Token to authenticate requests](#using-access-tokens)
+<small><a href="#top">Back to Top</a></small>
 
-<h4>Response</h4>
+Once you have an OAuth access token, you can use it to make API
+requests. If possible, using the HTTP Authorization header is
+recommended.
 
-<p>
-The response will be a JSON argument containing the access_token:
-<pre class="example_code">
-{
-  access_token: "1/fFAGRNJru1FTz70BzhT3Zg",
-  expires_in: 3600
-}
-</pre>
-</p>
+OAuth2 Token sent in header:
 
-<ul class="argument">
-  <li>
-    <span class="name">access_token</span>
-    <div class="inline">
-      The OAuth2 access token.
-    </div>
-  </li>
-  <li>
-    <span class="name">expires_in</span>
-      <div class="inline">
-        Time in seconds until the access_token expires
-      </div>
-  </li>
-</ul>
+    curl -H "Authorization: Bearer <ACCESS-TOKEN>" https://canvas.instructure.com/api/v1/courses
 
-</div>
+Sending the access token in the query string or POST
+parameters is also supported, but discouraged as it increases the
+chances of the token being logged or leaked in transit.
+
+OAuth2 Token sent in query string:
+
+    curl https://canvas.instructure.com/api/v1/courses?access_token=<ACCESS-TOKEN>
+
+<a name="using-refresh-tokens"></a>
+## [Using a Refresh Token to get a new Access Token](#using-refresh-tokens)
+<small><a href="#top">Back to Top</a></small>
+
+To get a code, send a [POST request to login/oauth2/token](file.oauth_endpoints.html#post-login-oauth2-token)
+
+<h4>Parameters</h4>
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Value</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td class="mono">grant_type</td>
+      <td>refresh_token</td>
+    </tr>
+    <tr>
+      <td class="mono">client_id</td>
+      <td><span class="label">Your client_id</span></td>
+    </tr>
+    <tr>
+      <td class="mono">client_secret</td>
+      <td><span class="label">Your client_secret</span></td>
+    </tr>
+    <tr>
+      <td class="mono">refresh_token</td>
+      <td><span class="label">refresh_token from initial access_token request</span></td>
+    </tr>
+  </tbody>
+</table>
+
+## [Logging Out](file.oauth_endpoints.html#delete-login-oauth2-token)
+<small><a href="#top">Back to Top</a></small>
+
+To logout, simply send a [DELETE request to login/oauth2/token](file.oauth_endpoints.html#delete-login-oauth2-token)
