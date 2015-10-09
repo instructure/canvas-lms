@@ -93,7 +93,7 @@ define([
       $comment_attachment_blank = $("#comment_attachment_blank").removeAttr('id').detach(),
       $comment_media_blank = $("#comment_media_blank").removeAttr('id').detach(),
       $add_a_comment = $("#add_a_comment"),
-      $add_a_comment_submit_button = $add_a_comment.find("button"),
+      $add_a_comment_submit_button = $add_a_comment.find("button:submit"),
       $add_a_comment_textarea = $add_a_comment.find("textarea"),
       $group_comment_wrapper = $("#group_comment_wrapper"),
       $comment_attachment_input_blank = $("#comment_attachment_input_blank").detach(),
