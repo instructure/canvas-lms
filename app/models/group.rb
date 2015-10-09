@@ -527,6 +527,7 @@ class Group < ActiveRecord::Base
       can :delete and
       can :manage and
       can :manage_admin_users and
+      can :manage_calendar and
       can :manage_content and
       can :manage_files and
       can :manage_students and
