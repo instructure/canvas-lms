@@ -779,7 +779,7 @@ define [
         percentage: percentage
       if columnDef.type == 'total_grade'
         templateOpts.warning = @totalGradeWarning
-        templateOpts.lastColumn = true
+        templateOpts.lastColumn = !@totalColumnInFront
         templateOpts.showPointsNotPercent = @displayPointTotals()
         templateOpts.hideTooltip = @weightedGroups() and not @totalGradeWarning
       groupTotalCellTemplate templateOpts
@@ -930,6 +930,14 @@ define [
     fixMaxHeaderWidth: ->
       @$grid.find('.slick-header-columns').width(1000000)
 
+    # This is because of the default behaviour of slickgrid.  When it
+    # initialized itself, it writes CSS directly to its elements.  For
+    # our frozen columns, it was casuing the tooltips to be buried and
+    # cut off.
+    fixOverflowVisiblity: ->
+      @$grid.find('.slick-viewport').css("overflow", "visible")
+      @$grid.find('.container_0').css("overflow", "visible")
+
     # SlickGrid doesn't have a blur event for the grid, so this mimics it in
     # conjunction with a click listener on <body />. When we 'blur' the grid
     # by clicking outside of it, save the current field.
@@ -994,6 +1002,8 @@ define [
             @minimizeColumn($columnHeader) unless columnDef.minimized
           else if columnDef.minimized
             @unminimizeColumn($columnHeader)
+
+      @fixOverflowVisiblity()
 
       @keyboardNav = new GradebookKeyboardNav(@grid, @$grid)
       @keyboardNav.init()
