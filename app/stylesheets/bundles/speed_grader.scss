@@ -177,6 +177,11 @@ $gradebook_header_height: 52px;
   }
 }
 
+.full_height {
+  height: 100%;
+  overflow: scroll;
+}
+
 .media_comments_visible {
   #left_side {
     width: 100%;
@@ -383,14 +388,14 @@ $gradebook_header_height: 52px;
 }
 
 #rubric_full {
+  background-color: $ic-color-light;
+  border-bottom: 7px solid #bbb;
+  border-bottom-left-radius: 5px;
+  border-left: 7px solid #bbb;
   position: absolute;
   right: 1px;
   top: 0px;
-  border-left: 7px solid #bbb;
-  border-bottom: 7px solid #bbb;
-  border-bottom-left-radius: 5px;
-  z-index: 1000;
-  background-color: $ic-color-light;
+  width: 100%;
   .content_box {
     padding-right: 24px;
   }

@@ -295,6 +295,7 @@ describe "speed grader" do
       final_pg.reload
       expect(final_pg.score.to_i).to eql 8
       expect(final_pg.submission_comments.map(&:comment)).to be_include 'srsly'
+      wait_for_ajax_requests(150)
       expect(final_tab).to include_text("8/8") # should sync tab state
     end
 
