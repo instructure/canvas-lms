@@ -102,15 +102,18 @@ define [
       else
         'students_url'
 
-      gotAllStudents = $.Deferred().done => @gotAllStudents()
+      @gotAllAssignmentGroupsPromise = $.Deferred().done => @gotAllAssignmentGroups()
+      gotAllStudents = $.Deferred().done(()=>
+        @gotAllAssignmentGroupsPromise.then(()=> @gotAllStudents())
+      )
 
-      assignmentGroupsParams = {exclude_descriptions: true}
+      @assignmentGroupsParams = {exclude_descriptions: true}
       if @mgpEnabled && @gradingPeriodToShow && @gradingPeriodToShow != '0' && @gradingPeriodToShow != ''
-        $.extend(assignmentGroupsParams, {grading_period_id: @gradingPeriodToShow})
+        $.extend(@assignmentGroupsParams, {grading_period_id: @gradingPeriodToShow})
 
       ajax_calls = [
         $.ajaxJSON(@options[enrollmentsUrl], "GET")
-      , $.ajaxJSON(@options.assignment_groups_url, "GET", assignmentGroupsParams, @gotAssignmentGroups)
+      , $.ajaxJSON(@options.assignment_groups_url, "GET", @assignmentGroupsParams, @gotAssignmentGroups)
       , $.ajaxJSON( @options.sections_url, "GET", {}, @gotSections)
       ]
 
@@ -152,7 +155,7 @@ define [
           gotAllStudents.resolve()
 
       gotCustomColumns = @getCustomColumns()
-      @gotAllData = $.when(gotCustomColumns, gotAllStudents)
+      @gotAllData = $.when(gotCustomColumns, gotAllStudents, @gotAllAssignmentGroupsPromise)
 
       @allSubmissionsLoaded.done =>
         for c in @customColumns
@@ -268,7 +271,8 @@ define [
       @getSubmissionsChunks()
       @initHeader()
 
-    gotAssignmentGroups: (assignmentGroups) =>
+    gotAllAssignmentGroups: () =>
+      assignmentGroups = @allAssignmentGroups;
       @assignmentGroups = {}
       @assignments      = {}
 
@@ -285,6 +289,39 @@ define [
           assignment.due_at = tz.parse(assignment.due_at)
           @assignments[assignment.id] = assignment
       @postGradesStore.setGradeBookAssignments @assignments
+
+
+    gotAssignmentGroups: (assignmentGroups, xhr) =>
+      @allAssignmentGroups = [];
+
+      gotAssignmentGroupsChunk = (groups) =>
+        for group in groups
+          @allAssignmentGroups.push(group)
+
+      gotAssignmentGroupsChunk(assignmentGroups)
+
+
+      paginationLinks = xhr.getResponseHeader('Link')
+      lastLink = paginationLinks.match(/<[^>]+>; *rel="last"/)
+      unless lastLink?
+        @gotAllAssignmentGroupsPromise.resolve()
+        return
+      lastPage = lastLink[0].match(/page=(\d+)/)[1]
+      lastPage = parseInt lastPage, 10
+      if lastPage == 1
+        @gotAllAssignmentGroupsPromise.resolve()
+        return
+      agParams = @assignmentGroupsParams
+      fetchAssignmentGroupsChunk = (page) =>
+        $.ajaxJSON @options.assignment_groups_url, "GET", $.extend(agParams, {page})
+      dfds = (fetchAssignmentGroupsChunk(page) for page in [2..lastPage])
+      $.when(dfds...).then (responses...) =>
+        if dfds.length == 1
+          gotAssignmentGroupsChunk(responses[0])
+        else
+          gotAssignmentGroupsChunk(groups) for [groups, x, y] in responses
+        @gotAllAssignmentGroupsPromise.resolve()
+
 
     gotCourse: (course) =>
       @course = course
@@ -317,6 +354,8 @@ define [
         if @mgpEnabled
           gradingPeriods = @indexedGradingPeriods()
           overrides = @indexedOverrides()
+        #empty the array so this is idempotent, you can end up with too many rows
+        @rows.length = 0
         for student_id, student of students
           student.computed_current_score ||= 0
           student.computed_final_score ||= 0
