@@ -491,7 +491,7 @@ class ContentTag < ActiveRecord::Base
   end
 
   def self.order_by_outcome_title
-    includes(:learning_outcome_content).order(outcome_title_order_by_clause)
+    eager_load(:learning_outcome_content).order(outcome_title_order_by_clause)
   end
 
   def visible_to_user?(user, opts=nil)

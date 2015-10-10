@@ -27,7 +27,6 @@ class SubmissionComment < ActiveRecord::Base
   belongs_to :context, :polymorphic => true
   belongs_to :provisional_grade, :class_name => 'ModeratedGrading::ProvisionalGrade'
   validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course']
-  has_many :associated_attachments, :class_name => 'Attachment', :as => :context
   has_many :submission_comment_participants, :dependent => :destroy
   has_many :messages, :as => :context, :dependent => :destroy
 
@@ -37,8 +36,7 @@ class SubmissionComment < ActiveRecord::Base
     :context_type, :cached_attachments, :anonymous, :teacher_only_comment, :hidden
   ].freeze
   EXPORTABLE_ASSOCIATIONS = [
-    :submission, :author, :recipient, :assessment_request, :context, :associated_attachments,
-    :submission_comment_participants
+    :submission, :author, :recipient, :assessment_request, :context, :submission_comment_participants
   ].freeze
 
   validates_length_of :comment, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
@@ -98,7 +96,7 @@ class SubmissionComment < ActiveRecord::Base
   end
 
   set_policy do
-    given {|user,session| !self.teacher_only_comment && self.submission.grants_right?(user, session, :read_grade) && !self.hidden? }
+    given {|user,session| !self.teacher_only_comment && self.submission.user_can_read_grade?(user, session) && !self.hidden? }
     can :read
 
     given {|user| self.author == user}
@@ -108,10 +106,7 @@ class SubmissionComment < ActiveRecord::Base
     can :read and can :delete
 
     given { |user, session|
-      !self.anonymous? ||
-        self.author == user ||
-        self.submission.assignment.context.grants_right?(user, session, :view_all_grades) ||
-        self.submission.assignment.context.grants_right?(self.author, session, :view_all_grades)
+        self.can_read_author?(user, session)
     }
     can :read_author
   end
@@ -135,6 +130,13 @@ class SubmissionComment < ActiveRecord::Base
       record.provisional_grade_id.nil? &&
       record.submission.user_id == record.author_id
     }
+  end
+
+  def can_read_author?(user, session)
+    (!self.anonymous? && !self.submission.assignment.anonymous_peer_reviews?) ||
+        self.author == user ||
+        self.submission.assignment.context.grants_right?(user, session, :view_all_grades) ||
+        self.submission.assignment.context.grants_right?(self.author, session, :view_all_grades)
   end
 
   def update_participants
@@ -202,14 +204,13 @@ class SubmissionComment < ActiveRecord::Base
   end
 
   def attachments
-    ids = Set.new((attachment_ids || "").split(",").map { |id| id.to_i})
-    attachments = associated_attachments
-    attachments += submission.assignment.attachments rescue []
-    attachments.select { |a| ids.include?(a.id) }
+    return Attachment.none unless attachment_ids.present?
+    ids = attachment_ids.split(",").map(&:to_i)
+    attachments = submission.assignment.attachments.where(id: ids)
   end
 
   def self.preload_attachments(comments)
-    ActiveRecord::Associations::Preloader.new(comments, [:associated_attachments, :submission]).run
+    ActiveRecord::Associations::Preloader.new(comments, [:submission]).run
     submissions = comments.map(&:submission).uniq
     ActiveRecord::Associations::Preloader.new(submissions, :assignment => :attachments).run
   end
@@ -255,6 +256,7 @@ class SubmissionComment < ActiveRecord::Base
     if id_changed? || (hidden_changed? && !hidden?)
       return if submission.user_id == author_id
       return if submission.assignment.deleted? || submission.assignment.muted?
+      return if provisional_grade_id.present?
 
       ContentParticipation.create_or_update({
         :content => submission,

@@ -8,7 +8,7 @@ class CleanupDelayedJobsIndexes < ActiveRecord::Migration
     when 'PostgreSQL'
       # "nulls first" syntax is postgresql specific, and allows for more
       # efficient querying for the next job
-      connection.execute("CREATE INDEX get_delayed_jobs_index ON delayed_jobs (priority, run_at, failed_at nulls first, locked_at nulls first, queue)")
+      connection.execute("CREATE INDEX get_delayed_jobs_index ON #{Delayed::Backend::ActiveRecord::Job.quoted_table_name} (priority, run_at, failed_at nulls first, locked_at nulls first, queue)")
     else
       add_index :delayed_jobs, %w(priority run_at locked_at failed_at queue), :name => 'get_delayed_jobs_index'
     end

@@ -4,6 +4,18 @@ module CustomSeleniumActions
     skip("skipping test, fails in IE : " + additional_error_text) if driver.browser == :internet_explorer
   end
 
+  def find(css)
+    driver.find(css)
+  end
+
+  def find_all(css)
+    driver.find_all(css)
+  end
+
+  def not_found(css)
+    driver.not_found(css)
+  end
+
   # f means "find" this is a shortcut to finding elements
   def f(selector, scope = nil)
     (scope || driver).find_element :css, selector

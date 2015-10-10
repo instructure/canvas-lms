@@ -3,7 +3,7 @@
 <% end %>
 
 <% define_content :subject do %>
-  <%= t('#messages.peer_review_invitation.email.subject', "Assigned peer review for %{reviewee}", :reviewee => asset.asset.user.name)%>
+  <%= t('#messages.peer_review_invitation.email.subject', "Assigned peer review for %{reviewee}", :reviewee => reviewee_name(asset, user))%>
 <% end %>
 
-<%= t('#messages.peer_review_invitation.email.body', "You've been invited to peer review %{reviewee}. Follow the link below to review them!", :reviewee => asset.asset.user.name)%>
+<%= t('#messages.peer_review_invitation.email.body', "You've been invited to peer review %{reviewee}. Follow the link below to review them!", :reviewee => reviewee_name(asset, user))%>

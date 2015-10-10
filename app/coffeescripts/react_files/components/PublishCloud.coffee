@@ -4,12 +4,10 @@ define [
   'compiled/react/shared/utils/withReactElement'
   'i18n!broccoli_cloud'
   'compiled/models/FilesystemObject'
-  './RestrictedDialogForm'
+  'jsx/files/RestrictedDialogForm'
   '../modules/customPropTypes'
   'compiled/jquery.rails_flash_notifications'
-], ($, React, withReactElement, I18n, FilesystemObject, RestrictedDialogFormComponent, customPropTypes) ->
-
-  RestrictedDialogForm = React.createFactory RestrictedDialogFormComponent
+], ($, React, withReactElement, I18n, FilesystemObject, RestrictedDialogForm, customPropTypes) ->
 
   PublishCloud =
     displayName: 'PublishCloud'

@@ -4,8 +4,8 @@ module DataFixup
       return unless DiscussionTopic.connection.adapter_name == 'PostgreSQL'
 
       ActiveRecord::Base.connection.execute(<<-SQL)
-        UPDATE discussion_topics SET assignment_id = old_assignment_id, updated_at = NOW()
-        FROM assignments
+        UPDATE #{DiscussionTopic.quoted_table_name} SET assignment_id = old_assignment_id, updated_at = NOW()
+        FROM #{Assignment.quoted_table_name}
         WHERE discussion_topics.old_assignment_id = assignments.id
         AND discussion_topics.assignment_id IS NULL
         AND discussion_topics.context_id = assignments.context_id

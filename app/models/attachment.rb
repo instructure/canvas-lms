@@ -333,17 +333,21 @@ class Attachment < ActiveRecord::Base
     end
   end
 
+  TURNITINABLE_MIME_TYPES = %w[
+    application/msword
+    application/vnd.openxmlformats-officedocument.wordprocessingml.document
+    application/pdf
+    text/plain
+    text/html
+    application/rtf
+    text/richtext
+    application/vnd.wordperfect
+    application/vnd.ms-powerpoint
+    application/vnd.openxmlformats-officedocument.presentationml.presentation
+  ].to_set.freeze
+
   def turnitinable?
-    self.content_type && [
-      'application/msword',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-      'application/pdf',
-      'text/plain',
-      'text/html',
-      'application/rtf',
-      'text/richtext',
-      'application/vnd.wordperfect'
-    ].include?(self.content_type)
+    TURNITINABLE_MIME_TYPES.include?(content_type)
   end
 
   def flag_as_recently_created
@@ -1056,6 +1060,11 @@ class Attachment < ActiveRecord::Base
 
   def published?; !locked?; end
 
+  def publish!
+    self.locked = false
+    save!
+  end
+
   def just_hide
     self.file_state == 'hidden'
   end
@@ -1444,20 +1453,21 @@ class Attachment < ActiveRecord::Base
     "/api/v1/canvadoc_session?#{preview_params(user, "canvadoc")}"
   end
 
-  def crocodoc_url(user)
+  def crocodoc_url(user, crocodoc_ids = nil)
     return unless crocodoc_available?
-    "/api/v1/crocodoc_session?#{preview_params(user, "crocodoc")}"
+    "/api/v1/crocodoc_session?#{preview_params(user, "crocodoc", crocodoc_ids)}"
   end
 
   def previewable_media?
     self.content_type && self.content_type.match(/\A(video|audio)/)
   end
 
-  def preview_params(user, type)
+  def preview_params(user, type, crocodoc_ids = nil)
     blob = {
       user_id: user.try(:global_id),
       attachment_id: id,
       type: type,
+      crocodoc_ids: crocodoc_ids
     }.to_json
     hmac = Canvas::Security.hmac_sha1(blob)
     "blob=#{URI.encode blob}&hmac=#{URI.encode hmac}"

@@ -75,6 +75,8 @@ class Feature
   #     enable_at: Date.new(2014, 1, 1),  # estimated release date shown in UI
   #     beta: false,          # 'beta' tag shown in UI
   #     development: false,   # whether the feature is restricted to development / test / beta instances
+  #                           # setting `development: true` prevents the flag from being registered on production,
+  #                           # which means `context.feature_enabled?` calls for the feature will always return false.
   #     release_notes_url: 'http://example.com/',
   #
   #     # optional: you can supply a Proc to attach warning messages to and/or forbid certain transitions
@@ -231,16 +233,6 @@ END
       applies_to: 'Course',
       state: 'on'
     },
-    'modules_next' =>
-    {
-      display_name: -> { I18n.t('features.ember_modules', 'Ember Modules') },
-      description: -> { I18n.t('ember_modules_description', <<END) },
-Modules rewritten in Ember. Uses the native drag and drop API to allow dragging from external locations.
-END
-      applies_to: 'Course',
-      state: 'hidden',
-      root_opt_in: true
-    },
     'allow_opt_out_of_inbox' =>
     {
       display_name: -> { I18n.t('features.allow_opt_out_of_inbox', "Allow Users to Opt-out of the Inbox") },
@@ -350,8 +342,8 @@ END
             display_name: -> { I18n.t('Enable "OR" Condition for Modules') },
             description:  -> { I18n.t('If enabled, modules will have the option to be marked as complete when only one of the requirements is met.') },
             applies_to: 'Course',
-            state: 'hidden',
-            development: true,
+            state: 'hidden_in_prod',
+            development: false,
             root_opt_in: true
         },
     'use_new_tree' =>
@@ -371,6 +363,14 @@ END
       development: true,
       root_opt_in: true
     },
+      'gradebook_performance' => {
+      display_name: -> { I18n.t('Gradebook Performance') },
+      description: -> { I18n.t('Performance enhancements for the Gradebook') },
+      applies_to: 'Course',
+      state: 'hidden',
+      development: true,
+      root_opt_in: true
+    },
     'anonymous_grading' =>
     {
       display_name: -> { I18n.t('Anonymous Grading') },
@@ -380,6 +380,14 @@ END
       development: true,
       root_opt_in: true,
     },
+    'international_sms' => {
+      display_name: -> { I18n.t('International SMS') },
+      description: -> { I18n.t('Allows users with international phone numbers to receive text messages from Canvas.') },
+      applies_to: 'RootAccount',
+      state: 'hidden',
+      root_opt_in: true,
+      development: true
+    }
   )
 
   def self.definitions

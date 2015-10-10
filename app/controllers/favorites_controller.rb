@@ -49,6 +49,7 @@ class FavoritesController < ApplicationController
 
   include Api::V1::Favorite
   include Api::V1::Course
+  include Api::V1::Group
 
   # @API List favorite courses
   # Retrieve the list of favorite courses for the current user. If the user has not chosen
@@ -70,6 +71,29 @@ class FavoritesController < ApplicationController
     }
   end
 
+  # @API List favorite groups
+  # Retrieve the list of favorite groups for the current user. If the user has not chosen
+  # any favorites, then a selection of groups that the user is a member of will be returned.
+  #
+  #
+  #
+  # @returns [Group]
+  # @example_request
+  #     curl https://<canvas>/api/v1/users/self/favorites/groups \
+  #       -H 'Authorization: Bearer <ACCESS_TOKEN>'
+  #
+  def list_favorite_groups
+    fave_group_memberships = nil
+
+    @current_user.shard.activate do
+      fave_group_memberships = @current_user.groups.active.shard(@current_user).where(id: @current_user.favorite_context_ids("Group"))
+    end
+    if fave_group_memberships.any?
+      render :json => fave_group_memberships.map{ |g| group_json(g, @current_user,session)}
+    else
+      render :json => @current_user.groups.active.shard(@current_user).map{ |g| group_json(g, @current_user,session)}
+    end
+  end
   # @API Add course to favorites
   # Add a course to the current user's favorites.  If the course is already
   # in the user's favorites, nothing happens.
@@ -94,6 +118,36 @@ class FavoritesController < ApplicationController
       Favorite.unique_constraint_retry do
         fave = @current_user.favorites.where(:context_type => 'Course', :context_id => course).first
         fave ||= @current_user.favorites.create!(:context => course)
+      end
+    end
+
+    render :json => favorite_json(fave, @current_user, session)
+  end
+
+  # @API Add group to favorites
+  # Add a group to the current user's favorites.  If the group is already
+  # in the user's favorites, nothing happens.
+  #
+  # @argument id [Required, String]
+  #   The ID or SIS ID of the group to add.  The current user must be
+  #   a member of the group.
+  #
+  # @returns Favorite
+  #
+  # @example_request
+  #     curl https://<canvas>/api/v1/users/self/favorites/group/1170 \
+  #       -X POST \
+  #       -H 'Authorization: Bearer <ACCESS_TOKEN>' \
+  #       -H 'Content-Length: 0'
+  #
+  def add_favorite_groups
+    group = api_find(Group, params[:id])
+    fave = nil
+
+    @current_user.shard.activate do
+      Favorite.unique_constraint_retry do
+        fave = @current_user.favorites.where(:context_type => 'Group', :context_id => group).first
+        fave ||= @current_user.favorites.create!(:context => group)
       end
     end
 
@@ -131,6 +185,36 @@ class FavoritesController < ApplicationController
     end
   end
 
+  # @API Remove group from favorites
+  # Remove a group from the current user's favorites.
+  #
+  # @argument id [Required, String]
+  #   the ID or SIS ID of the group to remove
+  #
+  # @returns Favorite
+  #
+  # @example_request
+  #     curl https://<canvas>/api/v1/users/self/favorites/groups/1170 \
+  #       -X DELETE \
+  #       -H 'Authorization: Bearer <ACCESS_TOKEN>'
+  #
+  def remove_favorite_groups
+    group = api_find_all(Group, [params[:id]])
+    group_id= Shard.relative_id_for(group.any? ? group.first.id : params[:id], Shard.current, @current_user.shard)
+    fave = @current_user.favorites.where(:context_type => 'Group', :context_id => group_id).first
+    if fave
+      result = favorite_json(fave, @current_user, session)
+      fave.destroy
+      render :json => result
+    else
+      # can't really return a 404 here without making browsers freak out
+      # in the Group UI (it's easy for the client's state to get out of
+      # sync with the server's, especially with multiple browsers open)
+      render :json => {}
+    end
+  end
+
+
   # @API Reset course favorites
   # Reset the current user's course favorites to the default
   # automatically generated list of enrolled courses
@@ -145,6 +229,19 @@ class FavoritesController < ApplicationController
     render :json => { :status => 'ok' }
   end
 
+  # @API Reset group favorites
+  # Reset the current user's group favorites to the default
+  # automatically generated list of enrolled group
+  #
+  # @example_request
+  #     curl https://<canvas>/api/v1/users/self/favorites/group \
+  #       -X DELETE \
+  #       -H 'Authorization: Bearer <ACCESS_TOKEN>'
+  #
+  def reset_groups_favorites
+    @current_user.favorites.by('Group').destroy_all
+    render :json => { :status => 'ok' }
+  end
 
   protected
 

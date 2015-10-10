@@ -40,7 +40,7 @@
           <a
             href='<%= course_assignment_moderate_url(@context, @assignment) %>'
             id="moderated_grading_button"
-            class='Button Button--primary'
+            class='Button'
             style='<%= "display:none" unless @assignment.published? %>'
           >
             <%= t('Moderate') %>

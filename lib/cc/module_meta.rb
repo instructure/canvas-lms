@@ -19,7 +19,7 @@ module CC
   module ModuleMeta
     def create_module_meta(document=nil)
       return nil unless @course.context_modules.not_deleted.count > 0
-      
+
       if document
         meta_file = nil
         rel_path = nil
@@ -28,7 +28,7 @@ module CC
         rel_path = File.join(CCHelper::COURSE_SETTINGS_DIR, CCHelper::MODULE_META)
         document = Builder::XmlMarkup.new(:target=>meta_file, :indent=>2)
       end
-      
+
       module_id_map = {}
       document.instruct!
       document.modules(
@@ -51,7 +51,7 @@ module CC
           # context modules are in order and a pre-req can only reference
           # a previous module, so just adding as we go is okay
           module_id_map[cm.id] = mod_migration_id
-          
+
           mods_node.module(:identifier=>mod_migration_id) do |m_node|
             m_node.title cm.name
             m_node.workflow_state cm.workflow_state
@@ -60,7 +60,7 @@ module CC
             m_node.start_at CCHelper::ims_datetime(cm.start_at) if cm.start_at
             m_node.end_at CCHelper::ims_datetime(cm.end_at) if cm.end_at
             m_node.require_sequential_progress cm.require_sequential_progress.to_s unless cm.require_sequential_progress.nil?
-            
+
             if cm.prerequisites && !cm.prerequisites.empty?
               m_node.prerequisites do |pre_reqs|
                 cm.prerequisites.each do |pre_req|
@@ -71,7 +71,7 @@ module CC
                 end
               end
             end
-            
+
             ct_id_map = {}
             m_node.items do |items_node|
               cm.content_tags.not_deleted.each do |ct|
@@ -98,19 +98,18 @@ module CC
                 end
               end
             end
-            
+
             if cm.completion_requirements && !cm.completion_requirements.empty?
               m_node.completionRequirements do |crs_node|
                 cm.completion_requirements.each do |c_req|
                   crs_node.completionRequirement(:type=>c_req[:type]) do |cr_node|
                     cr_node.min_score c_req[:min_score] unless c_req[:min_score].blank?
-                    cr_node.max_score c_req[:max_score] unless c_req[:max_score].blank?
                     cr_node.identifierref ct_id_map[c_req[:id]]
                   end
                 end
               end
             end
-            
+
           end
         end
       end

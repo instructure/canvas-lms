@@ -1,0 +1,40 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.1//EN' 'http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd'>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=utf-8"/>
+  <title>Discussion Topics</title>
+</head>
+  <body>
+    <h1>Discussion Topics</h1>
+    <ol>
+    <% content.each_with_index do |item, index| %>
+      <li><a href="<%= "#topic#{index}" %>"><%= item[:title] %></a></li>
+    <% end %>
+    </ol>
+    <div style="page-break-before:always;"></div>
+    <% content.each_with_index do |item, index| %>
+      <h2 id="<%="topic#{index}"%>"><%= item[:title] %></h2>
+
+      <p><%= item[:description] %></p>
+
+      <% if item[:assignment] %>
+        <p>Discussion assignment details:</p>
+        <% if item[:assignment][:due_at] %>
+          <p>Due at: <%= datetime_string(Date.parse(item[:assignment][:due_at])) %></p>
+        <% end %>
+        <% if item[:assignment][:unlock_at] %>
+          <p>Unlock at: <%= datetime_string(Date.parse(item[:assignment][:unlock_at])) %></p>
+        <% end %>
+        <% if item[:assignment][:lock_at] %>
+          <p>Lock at: <%= datetime_string(Date.parse(item[:assignment][:lock_at])) %></p>
+        <% end %>
+        <p>Grading Type: <%= item[:assignment][:grading_type] %></p>
+        <p>Points: <%= item[:assignment][:points_possible ]%></p>
+      <% end %>
+      <hr/>
+      <a href="topics.xhtml">Back to Discussion Topic Index</a>
+      <div style="page-break-before:always;"></div>
+    <% end %>
+  </body>
+</html>

@@ -788,6 +788,14 @@ describe "MessageableUser::Calculator" do
         expect(@calculator.load_messageable_users([@student]).first.common_groups).to be_empty
       end
 
+      it "includes user who are admins of the account with no enrollments" do
+        new_admin = user
+        tie_user_to_account(@viewing_user, role: admin_role)
+        tie_user_to_account(new_admin, role: admin_role)
+        messageable_users = @calculator.load_messageable_users([new_admin.id])
+        expect(messageable_users.map(&:id)).to include(new_admin.id)
+      end
+
       context "creation pending users" do
         before do
           course_with_teacher(:user => @viewing_user, :active_all => true)

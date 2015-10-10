@@ -145,11 +145,13 @@ describe ContentMigration do
       root_folder = Folder.root_folders(@copy_from).first
       folder1 = root_folder.sub_folders.create!(:context => @copy_from, :name => "mol&eacute; ? i'm silly")
       att1 = Attachment.create!(:filename => "first.txt", :uploaded_data => StringIO.new('ohai'), :folder => folder1, :context => @copy_from)
+      img = Attachment.create!(:filename => "img.png", :uploaded_data => stub_png_data, :folder => folder1, :context => @copy_from)
       folder2 = root_folder.sub_folders.create!(:context => @copy_from, :name => "olé")
       att2 = Attachment.create!(:filename => "first.txt", :uploaded_data => StringIO.new('ohai'), :folder => folder2, :context => @copy_from)
 
       body = "<a class='instructure_file_link' href='/courses/#{@copy_from.id}/files/#{att1.id}/download'>link</a>"
       body += "<a class='instructure_file_link' href='/courses/#{@copy_from.id}/files/#{att2.id}/download'>link</a>"
+      body += "<img src='/courses/#{@copy_from.id}/files/#{img.id}/preview'>"
       dt = @copy_from.discussion_topics.create!(:message => body, :title => "discussion title")
       page = @copy_from.wiki.wiki_pages.create!(:title => "some page", :body => body)
 
@@ -157,14 +159,17 @@ describe ContentMigration do
 
       att_to1 = @copy_to.attachments.where(migration_id: mig_id(att1)).first
       att_to2 = @copy_to.attachments.where(migration_id: mig_id(att2)).first
+      img_to = @copy_to.attachments.where(migration_id: mig_id(img)).first
 
       page_to = @copy_to.wiki.wiki_pages.where(migration_id: mig_id(page)).first
-      expect(page_to.body.include?("/courses/#{@copy_to.id}/files/#{att_to1.id}/download")).to be_truthy
-      expect(page_to.body.include?("/courses/#{@copy_to.id}/files/#{att_to2.id}/download")).to be_truthy
+      expect(page_to.body).to include "/courses/#{@copy_to.id}/files/#{att_to1.id}/download"
+      expect(page_to.body).to include "/courses/#{@copy_to.id}/files/#{att_to2.id}/download"
+      expect(page_to.body).to include "/courses/#{@copy_to.id}/files/#{img_to.id}/preview"
 
       dt_to = @copy_to.discussion_topics.where(migration_id: mig_id(dt)).first
-      expect(dt_to.message.include?("/courses/#{@copy_to.id}/files/#{att_to1.id}/download")).to be_truthy
-      expect(dt_to.message.include?("/courses/#{@copy_to.id}/files/#{att_to2.id}/download")).to be_truthy
+      expect(dt_to.message).to include "/courses/#{@copy_to.id}/files/#{att_to1.id}/download"
+      expect(dt_to.message).to include "/courses/#{@copy_to.id}/files/#{att_to2.id}/download"
+      expect(dt_to.message).to include "/courses/#{@copy_to.id}/files/#{img_to.id}/preview"
     end
 
     it "should selectively copy items" do

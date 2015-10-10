@@ -2,8 +2,6 @@ class SetDevloperKeysAccountIdNil < ActiveRecord::Migration
   tag :postdeploy
 
   def up
-    execute <<-SQL
-    UPDATE developer_keys SET account_id = NULL WHERE account_id IS NOT NULL
-    SQL
+    DeveloperKey.where("account_id IS NOT NULL").update_all(account_id: nil)
   end
 end

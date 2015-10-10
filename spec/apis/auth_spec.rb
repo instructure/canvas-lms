@@ -558,6 +558,13 @@ describe "API Authentication", type: :request do
       expect(response['WWW-Authenticate']).to eq %{Bearer realm="canvas-lms"}
     end
 
+    it "should error if the developer key is inactive" do
+      @token.developer_key.deactivate!
+      get "/api/v1/courses", nil, { 'HTTP_AUTHORIZATION' => "Bearer #{@token.full_token}" }
+      assert_status(401)
+      expect(response['WWW-Authenticate']).to eq %{Bearer realm="canvas-lms"}
+    end
+
     it "should require an active pseudonym for the access token user" do
       @user.pseudonym.destroy
       get "/api/v1/courses", nil, { 'HTTP_AUTHORIZATION' => "Bearer #{@token.full_token}" }

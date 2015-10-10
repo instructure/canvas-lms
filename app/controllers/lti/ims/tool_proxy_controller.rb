@@ -40,13 +40,15 @@ module Lti
       def create
         secret = RegistrationRequestService.retrieve_registration_password(context, oauth_consumer_key)
         if oauth_authenticated_request?(secret)
-          tool_proxy = ToolProxyService.new.process_tool_proxy_json(request.body.read, context, oauth_consumer_key)
+          tp_service = ToolProxyService.new
+          tool_proxy = tp_service.process_tool_proxy_json(request.body.read, context, oauth_consumer_key)
           json = {
             "@context" => "http://purl.imsglobal.org/ctx/lti/v2/ToolProxyId",
             "@type" => "ToolProxy",
             "@id" => nil,
             "tool_proxy_guid" => tool_proxy.guid
           }
+          json["tc_half_shared_secret"] = tp_service.tc_half_secret if tp_service.tc_half_secret
           render json: json, status: :created, content_type: 'application/vnd.ims.lti.v2.toolproxy.id+json'
         else
           render json: {error: 'unauthorized'}, status: :unauthorized

@@ -2126,6 +2126,7 @@ describe AssignmentsApiController, type: :request do
       end
 
       it "returns has_overrides correctly" do
+        @user = @teacher
         @assignment = @course.assignments.create!(:title => "Test Assignment",:description => "foo")
         json = api_get_assignment_in_course(@assignment, @course)
         expect(json['has_overrides']).to eq false
@@ -2134,6 +2135,10 @@ describe AssignmentsApiController, type: :request do
         create_override_for_assignment
         json = api_get_assignment_in_course(@assignment, @course)
         expect(json['has_overrides']).to eq true
+
+        @user = @student # don't show has_overrides to students
+        json = api_get_assignment_in_course(@assignment, @course)
+        expect(json['has_overrides']).to be_nil
       end
 
       it "returns all_dates when requested" do

@@ -22,6 +22,7 @@ describe "AuthenticationProviders API", type: :request do
   before :once do
     @account = account_model(:name => 'root')
     user_with_pseudonym(:active_all => true, :account => @account)
+    @account.authentication_providers.scoped.delete_all
     @account.account_users.create!(user: @user)
     @cas_hash = {"auth_type" => "cas", "auth_base" => "127.0.0.1"}
     @saml_hash = {'auth_type' => 'saml', 'idp_entity_id' => 'http://example.com/saml1', 'log_in_url' => 'http://example.com/saml1/sli', 'log_out_url' => 'http://example.com/saml1/slo', 'certificate_fingerprint' => '111222', 'identifier_format' => 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress'}

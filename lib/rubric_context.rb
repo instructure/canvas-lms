@@ -2,7 +2,7 @@ module RubricContext
   def self.included(klass)
     if klass < ActiveRecord::Base
       klass.has_many :rubrics, :as => :context
-      klass.has_many :rubric_associations, :as => :context, :include => :rubric, :dependent => :destroy
+      klass.has_many :rubric_associations, as: :context, preload: :rubric, dependent: :destroy
       klass.send :include, InstanceMethods
     end
   end

@@ -120,7 +120,8 @@ describe TokensController do
     it "should not include token for protected tokens" do
       user(:active_user => true)
       user_session(@user)
-      token = @user.access_tokens.create!
+      key = DeveloperKey.create!
+      token = @user.access_tokens.create!(developer_key: key)
       expect(token.user_id).to eq @user.id
       expect(token.protected_token?).to eq true
       get 'show', :id => token.id
@@ -186,8 +187,8 @@ describe TokensController do
     it "should not allow regenerating a protected token" do
       user(:active_user => true)
       user_session(@user)
-      token = @user.access_tokens.new
-      token.save!
+      key = DeveloperKey.create!
+      token = @user.access_tokens.create!(developer_key: key)
       expect(token.user_id).to eq @user.id
       expect(token.protected_token?).to eq true
       put 'update', :id => token.id, :access_token => {:regenerate => '1'}

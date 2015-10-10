@@ -23,7 +23,7 @@ module AccountAuthorizationConfig::PluginSettings
     end
 
     def globally_configured?
-      Canvas::Plugin.find(plugin).enabled?
+      ::Canvas::Plugin.find(plugin).enabled?
     end
 
     def recognized_params
@@ -68,6 +68,6 @@ module AccountAuthorizationConfig::PluginSettings
   end
 
   def settings_from_plugin
-    Canvas::Plugin.find(self.class.plugin).settings
+    ::Canvas::Plugin.find(self.class.plugin).settings
   end
 end

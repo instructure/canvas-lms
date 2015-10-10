@@ -33,7 +33,7 @@ module Quizzes
 
     def self.grade_by_course(course)
       Quizzes::QuizSubmission.where('quizzes.context_id =?', course.id)
-        .includes(:quiz)
+        .eager_load(:quiz)
         .needs_grading
         .each do |quiz_submission|
           Quizzes::SubmissionGrader.new(quiz_submission).grade_submission({
@@ -56,7 +56,7 @@ module Quizzes
       outstanding_qs = []
       outstanding_qs = Quizzes::QuizSubmission.where("quiz_id = ?", @quiz.id)
         .needs_grading
-        .includes(:user)
+        .preload(:user)
       outstanding_qs
     end
   end

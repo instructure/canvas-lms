@@ -16,7 +16,7 @@
       <%= f.hidden_field :auth_type, value: aac.auth_type %>
       <%= f.hidden_field :id %>
         <h3><%= aac.class.display_name %></h3>
-        <% if aac.account.multi_auth? && !aac.new_record? %>
+        <% if !aac.new_record? %>
           <p><%= mt "You can log in directly with this provider by going to %{url}",
                     url: url_for(presenter.login_url_options(aac)) %></p>
         <% end %>
@@ -34,22 +34,24 @@
           </div>
         <% end %>
 
-        <div class="ic-Form-actions">
-          <% unless aac.new_record? %>
-              <%= link_to(account_authentication_provider_url(account, aac),
-                method: "delete",
-                rel: 'nofollow',
-                id: "delete-aac-#{aac.id}",
-                data: {
-                  confirm: t('Are you sure?'),
-                  disable_with: t('deleting...')
-                },
-                class: 'Button Button--danger') do %>
-                <%= t("Delete") %>
-              <% end %>
-          <% end %>
-          <%= f.button t('Save'), class: "Button Button--primary" %>
-        </div>
+        <% unless presenter.last_canvas_provider?(aac) %>
+          <div class="ic-Form-actions">
+            <% unless aac.new_record? %>
+                <%= link_to(account_authentication_provider_url(account, aac),
+                  method: "delete",
+                  rel: 'nofollow',
+                  id: "delete-aac-#{aac.id}",
+                  data: {
+                    confirm: t('Are you sure?'),
+                    disable_with: t('deleting...')
+                  },
+                  class: 'Button Button--danger') do %>
+                  <%= t("Delete") %>
+                <% end %>
+            <% end %>
+            <%= f.button t('Save'), class: "Button Button--primary" %>
+          </div>
+        <% end %>
       <% end %>
     </div>
   </div>

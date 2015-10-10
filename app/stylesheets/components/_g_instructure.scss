@@ -638,7 +638,7 @@ ul.group_list {
 }
 
 $wizard-icon-size: 120px;
-$wizard-bg-color: $ic-brand-secondary;
+$wizard-bg-color: $ic-color-dark;
 $wizard-highlight-color: $ic-brand-primary;
 
 @keyframes icon-slide-down {
@@ -1122,7 +1122,7 @@ $wizard-highlight-color: $ic-brand-primary;
         font-size: 1em;
         font-weight: bold;
         // :color #444
-     
+
       }
       .sub_title {
         margin-left: 30px;
@@ -2036,7 +2036,7 @@ form.user_content_post_form {
   margin: 4px 0;
 }
 
-.with-fixed-bottom #wrapper-container { 
+.with-fixed-bottom #wrapper-container {
   padding-bottom: 60px;
   @if $use_new_styles { box-sizing: border-box; }
 }

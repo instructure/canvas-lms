@@ -10,6 +10,8 @@ class AccessToken < ActiveRecord::Base
 
   has_many :notification_endpoints, dependent: :destroy
 
+  before_validation -> { self.developer_key ||= DeveloperKey.default }
+
   # For user-generated tokens, purpose can be manually set.
   # For app-generated tokens, this should be generated based
   # on the scope defined in the auth process (scope has not
@@ -24,9 +26,12 @@ class AccessToken < ActiveRecord::Base
   before_create :generate_token
 
   def self.authenticate(token_string)
+    # hash the user supplied token with all of our known keys
+    # attempt to find a token that matches one of the hashes
     hashed_tokens = all_hashed_tokens(token_string)
     token = self.where(:crypted_token => hashed_tokens).first
     if token && token.crypted_token != hashed_tokens.first
+      # we found the token but, its hashed using an old key. save the updated hash
       token.crypted_token = hashed_tokens.first
       token.save!
     end
@@ -43,11 +48,11 @@ class AccessToken < ActiveRecord::Base
   end
 
   def self.all_hashed_tokens(token)
-    Canvas::Security.encryption_keys.map { |key| Canvas::Security.hmac_sha1(token) }
+    Canvas::Security.encryption_keys.map { |key| Canvas::Security.hmac_sha1(token, key) }
   end
 
   def usable?
-    user_id && !expired?
+    user_id && !expired? && developer_key.try(:active?)
   end
 
   def app_name

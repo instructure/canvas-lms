@@ -59,7 +59,7 @@ class Conversation < ActiveRecord::Base
   end
 
   def self.find_all_private_conversations(user, other_users)
-    user.all_conversations.includes(:conversation).where(:private_hash => other_users.map { |u| private_hash_for([user, u]) }).
+    user.all_conversations.preload(:conversation).where(:private_hash => other_users.map { |u| private_hash_for([user, u]) }).
       map(&:conversation)
   end
 
@@ -506,7 +506,7 @@ class Conversation < ActiveRecord::Base
     return unless tags.empty?
     transaction do
       lock!
-      cps = conversation_participants(:include => :user).to_a
+      cps = conversation_participants.preload(:user).to_a
       update_attribute :tags, current_context_strings
       cps.each do |cp|
         next unless cp.user

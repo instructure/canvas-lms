@@ -468,6 +468,16 @@ describe UsersController do
         expect(p.user.communication_channels.first).to be_unconfirmed
         expect(p.user.communication_channels.first.path).to eq 'jacob@instructure.com'
         expect(p.user.associated_accounts).to eq [Account.default]
+        expect(p.user.preferences[:accepted_terms]).to be_truthy
+      end
+
+      it "should mark user as having accepted the terms of use if specified" do
+        post 'create', :pseudonym => { :unique_id => 'jacob@instructure.com' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1' }
+        json = JSON.parse(response.body)
+        accepted_terms = json["user"]["user"]["preferences"]["accepted_terms"]
+        expect(response).to be_success
+        expect(accepted_terms).to be_present
+        expect(Time.parse(accepted_terms)).to be_within(1.minute).of(Time.now.utc)
       end
 
       it "should create a registered user if the skip_registration flag is passed in" do

@@ -197,12 +197,13 @@ class GroupsController < ApplicationController
   # @returns [Group]
   def index
     return context_index if @context
+    includes = {:include => params[:include]}
     groups_scope = @current_user.current_groups
     respond_to do |format|
       format.html do
         groups_scope = groups_scope.by_name
         groups_scope = groups_scope.where(:context_type => params[:context_type]) if params[:context_type]
-        groups_scope = groups_scope.includes(:group_category)
+        groups_scope = groups_scope.preload(:group_category)
 
         groups = groups_scope.shard(@current_user).to_a
 
@@ -216,10 +217,10 @@ class GroupsController < ApplicationController
         @groups = ShardedBookmarkedCollection.build(Group::Bookmarker, groups_scope) do |scope|
           scope = scope.scoped
           scope = scope.where(:context_type => params[:context_type]) if params[:context_type]
-          scope.includes(:group_category)
+          scope.preload(:group_category)
         end
         @groups = Api.paginate(@groups, self, api_v1_current_user_groups_url)
-        render :json => (@groups.map { |g| group_json(g, @current_user, session) })
+        render :json => (@groups.map { |g| group_json(g, @current_user, session,includes) })
       end
     end
   end
@@ -240,7 +241,7 @@ class GroupsController < ApplicationController
     return unless authorized_action(@context, @current_user, :read_roster)
     @groups      = all_groups = @context.groups.active
                                   .order(GroupCategory::Bookmarker.order_by, Group::Bookmarker.order_by)
-                                  .includes(:group_category)
+                                  .eager_load(:group_category)
 
     unless api_request?
       if @context.is_a?(Account)
@@ -267,7 +268,7 @@ class GroupsController < ApplicationController
         if @context.grants_right?(@current_user, session, :manage_groups)
           if @domain_root_account.enable_manage_groups2?
             categories_json = @categories.map{ |cat| group_category_json(cat, @current_user, session, include: ["progress_url", "unassigned_users_count", "groups_count"]) }
-            uncategorized = @context.groups.uncategorized.to_a
+            uncategorized = @context.groups.active.uncategorized.to_a
             if uncategorized.present?
               json = group_category_json(GroupCategory.uncategorized, @current_user, session)
               json["groups"] = uncategorized.map{ |group| group_json(group, @current_user, session) }

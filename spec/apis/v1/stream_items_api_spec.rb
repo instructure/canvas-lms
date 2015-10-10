@@ -403,7 +403,8 @@ describe UsersController, type: :request do
         'is_public' => @course.is_public,
         'is_public_to_auth_users' => @course.is_public_to_auth_users,
         'storage_quota_mb' => @course.storage_quota_mb,
-        'apply_assignment_group_weights' => false
+        'apply_assignment_group_weights' => false,
+        'restrict_enrollments_to_course_dates' => false
       },
 
       'user' => {
@@ -510,7 +511,8 @@ describe UsersController, type: :request do
         'is_public' => @course.is_public,
         'is_public_to_auth_users' => @course.is_public_to_auth_users,
         'storage_quota_mb' => @course.storage_quota_mb,
-        'apply_assignment_group_weights' => false
+        'apply_assignment_group_weights' => false,
+        'restrict_enrollments_to_course_dates' => false
       },
 
       'user' => {

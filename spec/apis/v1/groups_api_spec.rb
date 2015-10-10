@@ -206,6 +206,15 @@ describe "Groups API", type: :request do
     expect(json).to eq group_json(@community)
   end
 
+  it "should allow a member to retrieve a favorite group" do
+    @user = @member
+    json = api_call(:get, "#{@community_path}.json?include[]=favorites",
+                    @category_path_options.merge(:group_id => @community.to_param, :action => "show",
+                                                 :include => [ "favorites" ]))
+    expect(json.key?("is_favorite")).to be_truthy
+  end
+
+
   it "should include the group category" do
     @user = @member
     json = api_call(:get, "#{@community_path}.json?include[]=group_category", @category_path_options.merge(:group_id => @community.to_param, :action => "show", :include => [ "group_category" ]))

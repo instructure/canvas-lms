@@ -1,6 +1,29 @@
+require 'httparty'
+
 module AcademicBenchmark
 
 class CliTools
+
+  def self.whitelisted_ips
+    HTTParty.get("#{api_url}maintainAccess?api_key=#{api_key}")
+  end
+
+  def self.whitelist_ip(ip, note)
+    HTTParty.get(
+      "#{api_url}maintainAccess?api_key=#{api_key}&op=add&addr=#{ip}&note=#{note}"
+    )
+  end
+
+  def self.remove_from_whitelist(ip)
+    HTTParty.get(
+      "#{api_url}maintainAccess?api_key=#{api_key}&op=remove&addr=#{ip}"
+    )
+  end
+
+  def self.whitelisted?(ip)
+    ips = whitelisted_ips
+    ips["ab_rsp"] && ips["ab_rsp"]["access"].any?{ |i| i["addr"] == ip }
+  end
 
   def self.delete_imported_outcomes(parent_group_title, no_prompt: false, override_shard_restriction: false)
     unless no_prompt
@@ -69,6 +92,17 @@ class CliTools
       item.destroy!
     end
   end
+
+  private
+  def self.api_key
+    AcademicBenchmark.config["api_key"]
+  end
+
+  private
+  def self.api_url
+    AcademicBenchmark.config["api_url"]
+  end
+
 end # class CliTools
 
 end # module AcademicBenchmark

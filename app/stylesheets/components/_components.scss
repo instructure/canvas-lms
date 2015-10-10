@@ -31,7 +31,7 @@ $ic-brand-course-nav-link--active: $ic-brand-primary;
       margin-top: 0;
       padding: 8px 7px;
       font-weight: bold;
-      color: darken($ic-brand-secondary, 10%);
+      color: $gray-dark;
       // oldskool overrides
       font-size: $baseFontSize;
       margin-bottom: 0;

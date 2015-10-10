@@ -60,7 +60,7 @@ define [
                 props.collection.models
               else
                 props.currentFolder.files.models
-      folders = props.currentFolder.folders.models
+      folders = props.currentFolder?.folders?.models or []
 
       items = files.concat folders
       otherItems =  items.filter (item) ->

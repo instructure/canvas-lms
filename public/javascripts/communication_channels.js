@@ -16,11 +16,12 @@ $(document).ready(function() {
   $("#communication_channels").tabs();
   $("#communication_channels").bind('tabsshow', function(event) {
     if($(this).css('display') != 'none') {
+      // TODO: This is always undefined - where did this come from?
       var idx = $(this).data('selected.tabs');
       if(idx == 0) {
         $("#register_email_address").find(":text:first").focus().select();
       } else {
-        $("#register_sms_number").find(":text:first").focus().select();
+        $("#register_sms_number").find("input[type=tel]:first").focus().select();
       }
     }
   });
@@ -59,29 +60,86 @@ $(document).ready(function() {
   $("#register_sms_number .user_selected").bind('change blur keyup focus', function() {
     var $form = $(this).parents("#register_sms_number");
     var sms_number = $form.find(".sms_number").val().replace(/[^\d]/g, "");
-    $form.find(".should_be_10_digits").showIf(sms_number && sms_number.length != 10);
-    var email = $form.find(".carrier").val();
-    $form.find(".sms_email").attr('disabled', email != 'other');
-    if(email == "other") { return; }
-    email = email.replace("#", sms_number);
-    $form.find(".sms_email").val(email);
+
+    var useEmail = !ENV.INTERNATIONAL_SMS_ENABLED || $form.find(".country option:selected").data('useEmail');
+
+    // Don't show the 10-digit warning if we're not expecting a U.S. number
+    $form.find(".should_be_10_digits").showIf(useEmail && sms_number && sms_number.length != 10);
+
+    if (useEmail) {
+      $form.find('.sms_email_group').show();
+      var email = $form.find(".carrier").val();
+      $form.find(".sms_email").attr('disabled', email != 'other');
+      if(email == "other") { return; }
+      email = email.replace("#", sms_number);
+      $form.find(".sms_email").val(email);
+    } else {
+      $form.find('.sms_email_group').hide();
+    }
   });
 
   $("#register_sms_number,#register_email_address").formSubmit({
     object_name: 'communication_channel',
-    required: ['address'],
-    property_validations: {
-      address: function (value) {
-        var match = value.match(/^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/);
-        return !match && !(match && match.length !== value.length) && !(value.length === 0) && I18n.t("Email is invalid!");
+    processData: function(data) {
+      var address;
+      var type;
+      if (data['communication_channel[type]'] === 'email') {
+        // Email channel
+        type = 'email';
+        address = data.communication_channel_email;
+      } else if (ENV.INTERNATIONAL_SMS_ENABLED && $('#communication_channel_sms_country').val() === 'undecided') {
+        // Haven't selected a country yet
+        $(this).formErrors({communication_channel_sms_country: I18n.t("Country is required")});
+        return false;
+      } else if (!ENV.INTERNATIONAL_SMS_ENABLED || $('#communication_channel_sms_country option:selected').data('useEmail')) {
+        // SMS channel using an email address
+        type = 'sms_email';
+        address = data.communication_channel_sms_email;
+      } else {
+        // SMS channel using a phone number
+        type = 'sms_number';
+        address = '+' + data.communication_channel_sms_country + data.communication_channel_sms_number;
       }
+
+      delete data.communication_channel_sms_country;
+
+      if (type == 'email' || type == 'sms_email') {
+        // Make sure it's a valid email address
+        var match = address.match(/^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/);
+        if (!match) {
+          // Not a valid email address. Show a message on the relevant field, then bail.
+          var errorMessage = address === "" ? I18n.t("Email is required") : I18n.t("Email is invalid!");
+          if (type == 'email') {
+            $(this).formErrors({communication_channel_email: errorMessage});
+          } else {
+            $(this).formErrors({communication_channel_sms_email: errorMessage});
+          }
+          return false;
+        }
+      } else {
+        // Make sure it's a valid phone number. Validate the phone number they typed instead of the address because
+        // the address will already have the country code prepended, and this will result in blank phone numbers
+        // valid to our fairly naive regex. (libphonenumber plz)
+        var match = data.communication_channel_sms_number.match(/^[0-9]+$/);
+        if (!match) {
+          var errorMessage = data.communication_channel_sms_number === "" ? I18n.t("Cell Number is required") : I18n.t("Cell Number is invalid!");
+          $(this).formErrors({communication_channel_sms_number: errorMessage});
+          return false;
+        }
+      }
+
+      // Don't need these anymore
+      delete data.communication_channel_sms_number;
+      delete data.communication_channel_sms_email;
+
+      data['communication_channel[address]'] = address;
     },
     beforeSubmit: function(data) {
       var $list = $(".email_channels");
       if($(this).attr('id') == "register_sms_number") {
         $list = $(".other_channels");
       }
-      var path = $(this).getFormData({object_name: 'communication_channel'}).address;
+      var path = data['communication_channel[address]'];
       $(this).data('email', path);
       $list.find(".channel .path").each(function() {
         if($(this).text() == path) { path = ""; }

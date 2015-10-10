@@ -1,7 +1,7 @@
 <li class="<%= 'unpublished' if enrollment.course.created? || enrollment.course.claimed? %> <%= enrollment.state_based_on_date %> clearfix">
 
-  <a href="<%= course_user_path(enrollment.course_id, enrollment.user_id) %>" style="float: left;">
-    <span class="name ellipsis" title="<%= enrollment.long_name %>">
+  <a href="<%= course_user_path(enrollment.course_id, enrollment.user_id) %>" style="float: left; max-width: 800px;">
+    <span class="name" title="<%= enrollment.long_name %>">
       <%= enrollment.long_name %>
       <% if enrollment.course.created? || enrollment.course.claimed? %>
         <%= image_tag "hammer.png", :title => t('course_not_published', "This course hasn't been published yet"), :alt => t('unpublished', "Unpublished"), :class => "unpublished_icon" %>

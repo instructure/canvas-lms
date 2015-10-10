@@ -8,9 +8,9 @@ class UpdateIcuSortableNameIndex < ActiveRecord::Migration
       concurrently = "CONCURRENTLY" if connection.open_transactions == 0
       rename_index :users, 'index_users_on_sortable_name', 'index_users_on_sortable_name_old'
       rename_index :attachments, 'index_attachments_on_folder_id_and_file_state_and_display_name', 'index_attachments_on_folder_id_and_file_state_and_display_name2'
-      execute("CREATE INDEX #{concurrently} index_users_on_sortable_name ON USERS (#{collkey}.collkey(sortable_name, 'root', false, 0, true))")
+      execute("CREATE INDEX #{concurrently} index_users_on_sortable_name ON #{User.quoted_table_name} (#{collkey}.collkey(sortable_name, 'root', false, 0, true))")
       execute("CREATE INDEX #{concurrently} index_attachments_on_folder_id_and_file_state_and_display_name
-        ON attachments (folder_id, file_state,
+        ON #{Attachment.quoted_table_name} (folder_id, file_state,
                         #{collkey}.collkey(display_name, 'root', false, 0, true))
         WHERE folder_id IS NOT NULL")
     end

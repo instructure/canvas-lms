@@ -150,17 +150,17 @@ module AssignmentOverridesSeleniumHelper
     @new_section = new_section
   end
 
-  def prepare_multiple_due_dates_scenario
+  def prepare_vdd_scenario
     @course = course_model
-    @course.name = 'Test Course'
+    @course.name = 'VDD Course'
     @course.offer!
 
     # must have two sections: A and B
     @section_a = @course.course_sections.create!(name: 'Section A')
     @section_b = @course.course_sections.create!(name: 'Section B')
 
-    # must have a published quiz with multiple due dates
-    create_quiz_with_multiple_due_dates
+    # must have a published quiz with variable due dates
+    create_quiz_with_vdd
   end
 
   def enroll_section_a_student
@@ -174,7 +174,7 @@ module AssignmentOverridesSeleniumHelper
   end
 
   def prepare_vdd_scenario_for_first_observer
-    prepare_multiple_due_dates_scenario
+    prepare_vdd_scenario
 
     enroll_section_a_student
     enroll_section_b_student
@@ -200,7 +200,7 @@ module AssignmentOverridesSeleniumHelper
   end
 
   def prepare_vdd_scenario_for_second_observer
-    prepare_multiple_due_dates_scenario
+    prepare_vdd_scenario
 
     enroll_section_b_student
 
@@ -215,33 +215,51 @@ module AssignmentOverridesSeleniumHelper
     )
   end
 
-  def prepare_multiple_due_dates_scenario_for_teacher
-    prepare_multiple_due_dates_scenario
+  def prepare_vdd_scenario_for_first_student
+    prepare_vdd_scenario
+    enroll_section_a_student
+  end
+
+  def prepare_vdd_scenario_for_second_student
+    prepare_vdd_scenario
+    enroll_section_b_student
+  end
+
+  def prepare_vdd_scenario_for_teacher
+    prepare_vdd_scenario
 
     @teacher1 = user_with_pseudonym(username: 'teacher1@example.com', active_all: 1)
     @course.enroll_teacher(@teacher1, section: @section_a)
     @course.enroll_teacher(@teacher1, section: @section_b)
   end
 
-  def prepare_multiple_due_dates_scenario_for_ta
-    prepare_multiple_due_dates_scenario
+  def prepare_vdd_scenario_for_ta
+    prepare_vdd_scenario
 
     @ta1 = user_with_pseudonym(username: 'ta1@example.com', active_all: 1)
     @course.enroll_ta(@ta1, section: @section_a)
     @course.enroll_ta(@ta1, section: @section_b)
   end
 
-  def create_quiz_with_multiple_due_dates
+  def create_quiz_with_vdd
+    assignment_quiz([], course: @course)
+    set_quiz_dates_for_section_a
+    set_quiz_dates_for_section_b
+  end
+
+  def set_quiz_dates_for_section_a
     now = Time.zone.now
     @due_at_a = now.advance(days: 2)
     @unlock_at_a = now
     @lock_at_a = now.advance(days: 3)
 
-    assignment_quiz([], course: @course)
     @quiz.update_attribute(:due_at, @due_at_a)
     @quiz.update_attribute(:unlock_at, @unlock_at_a)
     @quiz.update_attribute(:lock_at, @lock_at_a)
+  end
 
+  def set_quiz_dates_for_section_b
+    now = Time.zone.now
     @due_at_b = now.advance(days: 4)
     @unlock_at_b = now.advance(days: 1)
     @lock_at_b = now.advance(days: 4)
@@ -253,23 +271,32 @@ module AssignmentOverridesSeleniumHelper
       unlock_at: @unlock_at_b,
       lock_at: @lock_at_b
     )
-    @quiz
   end
 
+  # Formatted output: Mmm d, e.g. 'Jan 1'
   def format_date_for_view(date)
     date.strftime('%b %-d')
   end
 
+  # Formatted output: Mmm d at h, e.g. 'Jan 1 at 1:01pm'
+  # Note: Removes on-the-hour minutes, e.g. '5:00pm' becomes '5pm'
   def format_time_for_view(time)
-    time.strftime('%b %-d at %-l:%M') << time.strftime('%p').downcase
+    formatter = '%b %-d at %-l'
+    formatted_time = time.strftime(formatter)
+
+    on_the_hour = true if time.strftime(':%M') == ':00'
+    formatted_time << time.strftime(':%M') unless on_the_hour
+
+    # append 'am' or 'pm'
+    formatted_time << time.strftime('%p').downcase
   end
 
   def obtain_due_date(section)
     case section
     when @section_a
-      date = obtain_date_from_quiz_summary(1, 1)
+      date = obtain_date_from_quiz_show_page(1, 1)
     when @section_b
-      date = obtain_date_from_quiz_summary(2, 1)
+      date = obtain_date_from_quiz_show_page(2, 1)
     end
     date
   end
@@ -277,9 +304,9 @@ module AssignmentOverridesSeleniumHelper
   def obtain_availability_start_date(section)
     case section
     when @section_a
-      date = obtain_date_from_quiz_summary(1, 3)
+      date = obtain_date_from_quiz_show_page(1, 3)
     when @section_b
-      date = obtain_date_from_quiz_summary(2, 3)
+      date = obtain_date_from_quiz_show_page(2, 3)
     end
     date
   end
@@ -287,14 +314,14 @@ module AssignmentOverridesSeleniumHelper
   def obtain_availability_end_date(section)
     case section
     when @section_a
-      date = obtain_date_from_quiz_summary(1, 4)
+      date = obtain_date_from_quiz_show_page(1, 4)
     when @section_b
-      date = obtain_date_from_quiz_summary(2, 4)
+      date = obtain_date_from_quiz_show_page(2, 4)
     end
     date
   end
 
-  def obtain_date_from_quiz_summary(row_number, cell_number, load_page=false)
+  def obtain_date_from_quiz_show_page(row_number, cell_number, load_page=false)
     get "/accounts/#{@account.id}/courses/#{@course.id}/quizzes/#{@quiz.id}" if load_page
     fj("tr:nth-child(#{row_number}) td:nth-child(#{cell_number}) .screenreader-only", f('.assignment-dates'))
   end
@@ -303,7 +330,7 @@ module AssignmentOverridesSeleniumHelper
     expect(f('#quiz_show').text).to include_text("#{message}")
   end
 
-  def validate_quiz_dates(context_selector, message)
+  def validate_vdd_quiz_tooltip_dates(context_selector, message)
     keep_trying_until(2) do
       driver.mouse.move_to fln('Multiple Dates', f("#{context_selector}"))
       expect(fj('.ui-tooltip')).to include_text("#{message}")

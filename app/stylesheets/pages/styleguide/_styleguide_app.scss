@@ -12,12 +12,12 @@
   // This is a workaround to account for the padding around
   // the gutters of flexgrid. It's a known problem and there's
   // currently an issue reported. If things change we'll fix it.
-  // 
-  overflow-x:hidden;  
+  //
+  overflow-x:hidden;
 }
 .Sg-Section {
   padding-bottom: 100px; // adds some padding between our sections and headers
-  
+
 }
 $sg-Header-height: 85px;
 .Sg-Header {
@@ -25,8 +25,8 @@ $sg-Header-height: 85px;
 }
 .Sg-Anchor {
   display: block;
-  height: $sg-Header-height; 
-  margin-top: -$sg-Header-height; 
+  height: $sg-Header-height;
+  margin-top: -$sg-Header-height;
   visibility: hidden;
 }
 .Sg-header__Subnavigation-item {
@@ -45,13 +45,13 @@ $sg-Header-height: 85px;
 .Sg-Main .highlight {
   &:after {
     content: 'Code';
-  } 
+  }
 }
 .Sg-Main .codeBlock,
 .Sg-Main .highlight {
   &:after {
     content: 'Code';
-  } 
+  }
 }
 // For hiding sections from nav
 .isHidden {display: none;}
@@ -72,13 +72,13 @@ $sg-Header-height: 85px;
 /////
 ////// Styles for Colors
 /////
-.Colorguide-color {    
+.Colorguide-color {
   justify-content: space-between;
   padding: 145px 0 0 0;
-  flex: 1 140px;
+  flex: 1 170px;
   margin: 5px;
-} 
-.Colorguide-var {  
+}
+.Colorguide-var {
   display: block;
   background: $ic-color-light;
   padding: 10px;
@@ -107,7 +107,7 @@ $sg-Header-height: 85px;
   .Colorguide-color--danger     {@include colorguide(#a03536);}
   .Colorguide-color--alert      {@include colorguide(#9e6b05);}
   .Colorguide-color--light      {@include colorguide(#ffffff);}
-  .Colorguide-color--dark       {@include colorguide(#333333);}  
+  .Colorguide-color--dark       {@include colorguide(#333333);}
 }
 
 .sg-bg-color-example {

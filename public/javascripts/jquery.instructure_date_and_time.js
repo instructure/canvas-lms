@@ -62,13 +62,7 @@ define([
     return tz.format(d1, '%F') == tz.format(d2, '%F');
   };
   $.midnight = function(date, options) {
-    if (date == null) return false;
-    var timezone = options && options.timezone;
-    if (typeof timezone == 'string' || timezone instanceof String) {
-      return tz.format(date, '%R', timezone) == '00:00';
-    } else {
-      return tz.format(date, '%R') == '00:00';
-    }
+    return tz.isMidnight(date, options);
   };
   $.dateString = function(date, options) {
     if (date == null) return "";

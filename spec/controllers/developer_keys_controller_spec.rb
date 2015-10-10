@@ -36,6 +36,24 @@ describe DeveloperKeysController do
         get 'index'
         expect(response).to be_success
       end
+
+      it 'should not include deleted keys' do
+        user_session(@admin)
+        dk = DeveloperKey.create!
+        dk.destroy
+        get 'index'
+        expect(response).to be_success
+        expect(assigns[:keys]).to_not be_include(dk)
+      end
+
+      it 'should include inactive keys' do
+        user_session(@admin)
+        dk = DeveloperKey.create!
+        dk.deactivate!
+        get 'index'
+        expect(response).to be_success
+        expect(assigns[:keys]).to be_include(dk)
+      end
     end
   end
 
@@ -136,6 +154,43 @@ describe DeveloperKeysController do
         expect(flash[:error]).to eq "You don't have permission to access that page"
       end
 
+    end
+  end
+
+  context "workflow" do
+    before :once do
+      account_admin_user(:account => Account.site_admin)
+    end
+    describe "PUT 'update'" do
+      it "should deactivate a key" do
+        user_session(@admin)
+
+        dk = DeveloperKey.create!
+        put 'update', id: dk.id, developer_key: { event: :deactivate }
+        expect(response).to be_success
+        expect(dk.reload.state).to eq :inactive
+      end
+
+      it "should reactivate a key" do
+        user_session(@admin)
+
+        dk = DeveloperKey.create!
+        dk.deactivate!
+        put 'update', id: dk.id, developer_key: { event: :activate }
+        expect(response).to be_success
+        expect(dk.reload.state).to eq :active
+      end
+    end
+
+    describe "DELETE 'destroy'" do
+      it "should soft delete a key" do
+        user_session(@admin)
+
+        dk = DeveloperKey.create!
+        delete 'destroy', id: dk.id
+        expect(response).to be_success
+        expect(dk.reload.state).to eq :deleted
+      end
     end
   end
 end

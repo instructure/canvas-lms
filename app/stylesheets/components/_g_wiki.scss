@@ -31,7 +31,7 @@ $darkened-text-color: #4d4d4d;
 @else {
   $pages-border: 1px solid #c1c7cf;
   $pages-dashed-border: 1px dashed #c1c7cf;
-  $pages-inner-border: 1px solid #e1e3e4;  
+  $pages-inner-border: 1px solid #e1e3e4;
 }
 
 @if $use_new_styles {
@@ -40,7 +40,7 @@ $darkened-text-color: #4d4d4d;
 }
 @else {
   $index-background: #e8ecef;
-  $item-background: #ffffff;  
+  $item-background: #ffffff;
 }
 
 $shadow: 0 1px 0 rgba(0, 0, 0, 0.15);
@@ -51,7 +51,7 @@ $revision-sidebar-background-color: $ic-body-background-color;
 $revision-sidebar-selected-color: #ffffff;
 $revision-sidebar-hover-color: lighten($ic-color-neutral, 10);
 $revision-sidebar-dimmed-color: $ic-dim-helper-text;
-$revision-button-color: $ic-brand-secondary;
+$revision-button-color: $ic-color-dark;
 $revision-button-hover-color: $ic-brand-primary;
 
 .pages .sticky-toolbar .sticky {
@@ -276,7 +276,7 @@ $revision-button-hover-color: $ic-brand-primary;
         font-size: 11px;
         color: $subdued-text-color;
         border-top: $pages-inner-border;
-        @if $use_new_styles { 
+        @if $use_new_styles {
           vertical-align: middle;
           line-height: 1.5;
         }
@@ -360,9 +360,9 @@ $revision-button-hover-color: $ic-brand-primary;
     overflow-x: auto;
     @if $use_new_styles {
       padding: 0 $ic-sp;
-      @include breakpoint(desktop) { padding: 0 $ic-sp*3 0 $ic-sp*2; } 
+      @include breakpoint(desktop) { padding: 0 $ic-sp*3 0 $ic-sp*2; }
     }
-    @else { 
+    @else {
       padding: 15px 25px;
     }
   }
@@ -428,11 +428,11 @@ $revision-button-hover-color: $ic-brand-primary;
     position: relative;
     @if $use_new_styles {
       @include breakpoint(desktop) {
-        min-height: 502px;  
+        min-height: 502px;
       }
     }
-    @else { 
-      min-height: 502px; 
+    @else {
+      min-height: 502px;
       display: flex;
     }
   }
@@ -465,10 +465,10 @@ $revision-button-hover-color: $ic-brand-primary;
           padding-top: $ic-sp*2;
         }
       }
-      @include breakpoint(wide) { 
+      @include breakpoint(wide) {
         width: $revision-sidebar-width;
         aside { width: $revision-sidebar-width; }
-      }  
+      }
     }
     @else {
       flex: 1 1 0%;
@@ -483,7 +483,7 @@ $revision-button-hover-color: $ic-brand-primary;
         position: fixed;
       }
     }
-    
+
     .revision-history {
       position: relative;
       @if $use_new_styles {
@@ -500,8 +500,8 @@ $revision-button-hover-color: $ic-brand-primary;
         margin-top: -1px;
         margin-left: -1px;
         border-bottom: none;
-        color: $subdued-text-color;  
-      }  
+        color: $subdued-text-color;
+      }
     }
     .revision-history .close-button {
       position: absolute;
@@ -538,7 +538,7 @@ $revision-button-hover-color: $ic-brand-primary;
     // height and transitions
     height: 34px;
     transition: height 400ms;
-    
+
     @if $use_new_styles {
       border-left: 2px solid transparent;
     }
@@ -550,7 +550,7 @@ $revision-button-hover-color: $ic-brand-primary;
       border-top: 1px solid transparent;
       border-bottom: 1px solid transparent;
     }
-    
+
     &.selected, &.latest {
       height: 56px;
       transition: height 400ms;
@@ -584,9 +584,9 @@ $revision-button-hover-color: $ic-brand-primary;
       cursor: pointer;
     }
     &.selected {
-      @if $use_new_styles { 
+      @if $use_new_styles {
         border-left-color: $ic-link-color;
-        background: $ic-bg-light-primary; 
+        background: $ic-bg-light-primary;
       }
       @else { background-color: $revision-sidebar-selected-color; }
     }
@@ -600,9 +600,9 @@ $revision-button-hover-color: $ic-brand-primary;
       padding: 0;
       height: 40px;
       margin-top: 14px;
-      border-top: $pages-inner-border;  
+      border-top: $pages-inner-border;
     }
-    
+
     a {
       user-select: none;
       text-transform: uppercase;
@@ -631,7 +631,7 @@ $revision-button-hover-color: $ic-brand-primary;
       @else {
         left: 3px;
         top: 3px;
-        padding: 7px 10px 7px 5px;  
+        padding: 7px 10px 7px 5px;
       }
     }
     .next-button {

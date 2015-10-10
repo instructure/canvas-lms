@@ -101,10 +101,6 @@ class AccountAuthorizationConfigsPresenter
     AccountAuthorizationConfig::SAML.enabled?
   end
 
-  def canvas_auth_only?
-    !account.non_canvas_auth_configured?
-  end
-
   def login_placeholder
     AccountAuthorizationConfig.default_delegated_login_handle_name
   end
@@ -119,6 +115,12 @@ class AccountAuthorizationConfigsPresenter
 
   def parent_reg_selected
     account.parent_registration?
+  end
+
+  def last_canvas_provider?(aac)
+    !aac.new_record? &&
+      aac.is_a?(AccountAuthorizationConfig::Canvas) &&
+      !account.authentication_providers.active.where("id<>?", aac).exists?
   end
 
   private

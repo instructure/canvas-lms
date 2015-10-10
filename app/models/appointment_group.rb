@@ -21,14 +21,14 @@ class AppointmentGroup < ActiveRecord::Base
   include TextHelper
   include HtmlTextHelper
 
-  has_many :appointments, opts = {:class_name => 'CalendarEvent', :as => :context, :order => :start_at, :include => :child_events, :conditions => "calendar_events.workflow_state <> 'deleted'", :inverse_of => :context }
+  has_many :appointments, opts = { class_name: 'CalendarEvent', as: :context, order: :start_at, preload: :child_events, conditions: "calendar_events.workflow_state <> 'deleted'", inverse_of: :context }
   # has_many :through on the same table does not alias columns in condition
   # strings, just hashes. we create this helper association to ensure
   # appointments_participants conditions have the correct table alias
   has_many :_appointments, opts.merge(:conditions => opts[:conditions].gsub(/calendar_events\./, '_appointments_appointments_participants_join.'))
   has_many :appointments_participants, :through => :_appointments, :source => :child_events, :conditions => "calendar_events.workflow_state <> 'deleted'", :order => :start_at
   has_many :appointment_group_contexts
-  has_many :appointment_group_sub_contexts, :include => :sub_context
+  has_many :appointment_group_sub_contexts, preload: :sub_context
 
   EXPORTABLE_ATTRIBUTES = [
     :id, :title, :description, :location_name, :location_address, :context_id, :context_type, :context_code, :sub_context_id, :sub_context_type,

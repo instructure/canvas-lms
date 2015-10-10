@@ -2,11 +2,11 @@ class AddUngradedCountToAssignments < ActiveRecord::Migration
   def self.up
     add_column :assignments, :needs_grading_count, :integer, :default => 0
 
-    execute <<-SQL
-      UPDATE assignments SET needs_grading_count = COALESCE((
+    update <<-SQL
+      UPDATE #{Assignment.quoted_table_name} SET needs_grading_count = COALESCE((
         SELECT COUNT(*)
-        FROM submissions s
-        INNER JOIN enrollments e ON e.user_id = s.user_id AND e.workflow_state = 'active'
+        FROM #{Submission.quoted_table_name} s
+        INNER JOIN #{Enrollment.quoted_table_name} e ON e.user_id = s.user_id AND e.workflow_state = 'active'
         WHERE s.assignment_id = assignments.id
           AND e.course_id = assignments.context_id
           AND (s.score IS NULL

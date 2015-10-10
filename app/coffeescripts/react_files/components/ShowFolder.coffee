@@ -13,7 +13,7 @@ define [
   'compiled/models/Folder'
   'jsx/files/CurrentUploads'
   'jsx/files/FilePreview'
-  './UploadDropZone'
+  'jsx/files/UploadDropZone'
   '../utils/forceScreenreaderToReparse'
 ], (React, Router, _, I18n, withReactElement, filesEnv, ColumnHeadersComponent, LoadingIndicator, FolderChildComponent, getAllPages, updateAPIQuerySortParams, Folder, CurrentUploadsComponent, FilePreviewComponent, UploadDropZoneComponent, forceScreenreaderToReparse) ->
 

@@ -135,9 +135,17 @@ module Canvas
             'bower/handlebars/handlebars.runtime': {
               exports: 'Handlebars'
             },
+            'bower/reflux/dist/reflux.js': {
+              deps: ['react'],
+              exports: 'Reflux'
+            },
             'vendor/FileAPI/FileAPI.min': {
               deps: ['jquery', 'vendor/FileAPI/config'],
               exports: 'FileAPI'
+            },
+            'fixed-data-table': {
+              deps: ['object_assign', 'react'],
+              exports: 'fixed-data-table'
             },
             'vendor/bootstrap-select/bootstrap-select' : {
               deps: ['jquery'],

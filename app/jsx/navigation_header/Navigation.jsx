@@ -21,7 +21,7 @@ define([
   var UNREAD_COUNT_POLL_INTERVAL = 30000 // 30 seconds
 
   var TYPE_URL_MAP = {
-    courses: '/api/v1/users/self/favorites/courses',
+    courses: '/api/v1/users/self/favorites/courses?include=term',
     groups: '/api/v1/users/self/groups',
     accounts: '/api/v1/accounts'
   };
@@ -88,7 +88,7 @@ define([
       loadingState[`${type}Loading`] = true;
       this.setState(loadingState);
 
-      $.get(url, (data) => {
+      $.getJSON(url, (data) => {
         var newState = {};
         newState[type] = data;
         newState[`${type}Loading`] = false;

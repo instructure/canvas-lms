@@ -425,8 +425,8 @@ The SCSS above would give you the toggle below.
       $ic-Toggle-offset: 2px
     );
     @include ic-Toggle-branding (
-      $ic-brand-secondary, // off state color
-      $ic-brand-secondary, // on state color
+      $ic-color-dark, // off state color
+      $ic-color-dark, // on state color
       $ic-color-light, // inactive text color
       cubic-bezier(0,1,0.5,1) // transition timing function
     );

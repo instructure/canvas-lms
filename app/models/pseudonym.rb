@@ -489,7 +489,7 @@ class Pseudonym < ActiveRecord::Base
       active.
         by_unique_id(credentials[:unique_id]).
         where(:account_id => account_ids).
-        includes(:user).
+        preload(:user).
         select { |p|
           valid = p.valid_arbitrary_credentials?(credentials[:password])
           too_many_attempts = true if p.audit_login(remote_ip, valid) == :too_many_attempts

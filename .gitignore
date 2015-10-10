@@ -38,7 +38,9 @@ Gemfile.lock4
 /public/javascripts/jst/
 /public/javascripts/jsx/
 /public/javascripts/translations/
+/public/javascripts/**/*.gz
 /public/optimized/
+/public/vendor/tinymce_themes/**/*.gz
 /spec/javascripts/compiled/
 /spec/javascripts/requirejs_config.js
 /spec/javascripts/runner.html

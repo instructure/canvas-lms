@@ -24,9 +24,15 @@ module Canvas::Oauth
     end
 
     describe '#has_valid_key?' do
-      it 'is true when there is a key' do
-        stub_dev_key(stub)
+
+      it 'is true when there is a key and the key is active' do
+        stub_dev_key(stub(active?: true))
         expect(provider.has_valid_key?).to be_truthy
+      end
+
+      it 'is false when there is a key that is not active' do
+        stub_dev_key(stub(active?: false))
+        expect(provider.has_valid_key?).to be_falsey
       end
 
       it 'is false when there is no key' do

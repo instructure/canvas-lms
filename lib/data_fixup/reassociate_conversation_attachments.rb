@@ -14,14 +14,14 @@ module DataFixup::ReassociateConversationAttachments
       conn.execute <<-SQL
         CREATE TEMPORARY TABLE _conversation_message_attachments #{temp_table_options}
         SELECT context_id AS conversation_message_id,
-          (SELECT author_id FROM conversation_messages WHERE id = a.context_id) AS author_id,
+          (SELECT author_id FROM #{ConversationMessage.quoted_table_name} WHERE id = a.context_id) AS author_id,
           id AS attachment_id
         FROM #{Attachment.quoted_table_name} a
         WHERE context_type = 'ConversationMessage'
       SQL
       unless ['MySQL', 'Mysql2'].include?(conn.adapter_name)
-        conn.add_index :_conversation_message_attachments, :conversation_message_id, :name => '_cma_cmid_index'
-        conn.add_index :_conversation_message_attachments, :attachment_id, :name => '_cma_aid_index'
+        conn.execute("CREATE INDEX _cma_cmid_index ON _conversation_message_attachments(conversation_message_id)")
+        conn.execute("CREATE INDEX _cma_aid_index ON _conversation_message_attachments(attachment_id)")
       end
       conn.execute "ANALYZE _conversation_message_attachments" if conn.adapter_name == 'PostgreSQL'
   
@@ -35,7 +35,7 @@ module DataFixup::ReassociateConversationAttachments
   
       # and conversation attachment folders
       conn.execute <<-SQL
-        INSERT INTO folders(context_id, context_type, name, full_name, workflow_state, parent_folder_id)
+        INSERT INTO #{Folder.quoted_table_name}(context_id, context_type, name, full_name, workflow_state, parent_folder_id)
         SELECT DISTINCT author_id, 'User', 'conversation attachments', 'conversation attachments', 'visible', folders.id
         FROM _conversation_message_attachments, #{Folder.quoted_table_name}
         WHERE folders.context_id = author_id AND folders.context_type = 'User'

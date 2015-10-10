@@ -20,11 +20,24 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/messages_helper')
 
 describe 'peer_review_invitation.email' do
-  it "should render" do
+
+  before :each do
     assessment_request_model
     @object = @assessment_request
     @object.reload
     expect(@object.context).not_to be_nil
-    generate_message(:peer_review_invitation, :email, @object)
+  end
+
+  it "should render" do
+    message = generate_message(:peer_review_invitation, :email, @object)
+    expect(message.html_body).to_not include('Anonymous User')
+  end
+
+  it 'should show anonymous when anonymous peer review enabled' do
+    assignment = @assessment_request.asset.assignment
+    assignment.update_attribute(:anonymous_peer_reviews, true)
+    @object.reload
+    message = generate_message(:peer_review_invitation, :email, @object)
+    expect(message.html_body).to include('Anonymous User')
   end
 end

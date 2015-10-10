@@ -64,7 +64,7 @@ class Account < ActiveRecord::Base
   has_many :abstract_courses, :class_name => 'AbstractCourse', :foreign_key => 'account_id'
   has_many :root_abstract_courses, :class_name => 'AbstractCourse', :foreign_key => 'root_account_id'
   has_many :users, :through => :account_users
-  has_many :pseudonyms, :include => :user
+  has_many :pseudonyms, preload: :user
   has_many :role_overrides, :as => :context
   has_many :course_account_associations
   has_many :child_courses, :through => :course_account_associations, :source => :course, :conditions => ['course_account_associations.depth = 0']
@@ -72,8 +72,6 @@ class Account < ActiveRecord::Base
   has_many :active_assignments, :as => :context, :class_name => 'Assignment', :conditions => ['assignments.workflow_state != ?', 'deleted']
   has_many :folders, :as => :context, :dependent => :destroy, :order => 'folders.name'
   has_many :active_folders, :class_name => 'Folder', :as => :context, :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
-  has_many :active_folders_with_sub_folders, :class_name => 'Folder', :as => :context, :include => [:active_sub_folders], :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
-  has_many :active_folders_detailed, :class_name => 'Folder', :as => :context, :include => [:active_sub_folders, :active_file_attachments], :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
   has_many :developer_keys
   has_many :authentication_providers,
            order: "position",
@@ -83,7 +81,7 @@ class Account < ActiveRecord::Base
   has_many :account_reports
   has_many :grading_standards, :as => :context, :conditions => ['workflow_state != ?', 'deleted']
   has_many :assessment_questions, :through => :assessment_question_banks
-  has_many :assessment_question_banks, :as => :context, :include => [:assessment_questions, :assessment_question_bank_users]
+  has_many :assessment_question_banks, as: :context, preload: [:assessment_questions, :assessment_question_bank_users]
   has_many :roles
   has_many :all_roles, :class_name => 'Role', :foreign_key => 'root_account_id'
   has_many :progresses, :as => :context
@@ -110,7 +108,7 @@ class Account < ActiveRecord::Base
   has_many :context_external_tools, :as => :context, :dependent => :destroy, :order => 'name'
   has_many :error_reports
   has_many :announcements, :class_name => 'AccountNotification'
-  has_many :alerts, :as => :context, :include => :criteria
+  has_many :alerts, as: :context, preload: :criteria
   has_many :user_account_associations
   has_many :report_snapshots
   has_many :external_integration_keys, :as => :context, :dependent => :destroy
@@ -124,6 +122,7 @@ class Account < ActiveRecord::Base
   after_save :invalidate_caches_if_changed
 
   after_create :default_enrollment_term
+  after_create :enable_canvas_authentication
 
   serialize :settings, Hash
   include TimeZoneHelper
@@ -195,7 +194,6 @@ class Account < ActiveRecord::Base
   add_setting :enable_profiles, :boolean => true, :root_only => true, :default => false
   add_setting :enable_manage_groups2, :boolean => true, :root_only => true, :default => true
   add_setting :mfa_settings, :root_only => true
-  add_setting :canvas_authentication, :boolean => true, :root_only => true
   add_setting :admins_can_change_passwords, :boolean => true, :root_only => true, :default => false
   add_setting :admins_can_view_notifications, :boolean => true, :root_only => true, :default => false
   add_setting :outgoing_email_default_name
@@ -282,17 +280,19 @@ class Account < ActiveRecord::Base
   end
 
   def non_canvas_auth_configured?
-    authentication_providers.active.exists?
+    authentication_providers.active.where("auth_type<>'canvas'").exists?
   end
 
   def canvas_authentication?
-    settings[:canvas_authentication] != false || !non_canvas_auth_configured?
+    authentication_providers.active.where(auth_type: 'canvas').exists? || !authentication_providers.active.exists?
   end
 
   def enable_canvas_authentication
-    return if settings[:canvas_authentication]
-    settings[:canvas_authentication] = true
-    self.save!
+    return unless root_account?
+    # for migrations creating a new db
+    return unless AccountAuthorizationConfig.columns_hash.key?('workflow_state')
+    return if authentication_providers.active.where(auth_type: 'canvas').exists?
+    authentication_providers.create!(auth_type: 'canvas')
   end
 
   def open_registration?
@@ -514,7 +514,9 @@ class Account < ActiveRecord::Base
   end
 
   def self.invalidate_cache(id)
-    Rails.cache.delete(account_lookup_cache_key(id)) if id
+    Shard.birth.activate do
+      Rails.cache.delete(account_lookup_cache_key(id)) if id
+    end
   rescue
     nil
   end
@@ -533,7 +535,7 @@ class Account < ActiveRecord::Base
     if @invalidations.present?
       shard.activate do
         @invalidations.each do |key|
-          Rails.cache.delete([key, id].cache_key)
+          Rails.cache.delete([key, self.global_id].cache_key)
         end
         Account.send_later_if_production(:invalidate_inherited_caches, self, @invalidations)
       end
@@ -544,8 +546,9 @@ class Account < ActiveRecord::Base
     parent_account.shard.activate do
       account_ids = Account.sub_account_ids_recursive(parent_account.id)
       account_ids.each do |id|
+        global_id = Shard.global_id_for(id)
         keys.each do |key|
-          Rails.cache.delete([key, id].cache_key)
+          Rails.cache.delete([key, global_id].cache_key)
         end
       end
     end
@@ -560,7 +563,7 @@ class Account < ActiveRecord::Base
     return self.class.default_storage_quota if root_account?
 
     shard.activate do
-      Rails.cache.fetch(['current_quota', id].cache_key) do
+      Rails.cache.fetch(['current_quota', self.global_id].cache_key) do
         self.parent_account.default_storage_quota
       end
     end
@@ -571,7 +574,7 @@ class Account < ActiveRecord::Base
     return self.class.default_storage_quota if root_account?
 
     shard.activate do
-      @default_storage_quota ||= Rails.cache.fetch(['default_storage_quota', id].cache_key) do
+      @default_storage_quota ||= Rails.cache.fetch(['default_storage_quota', self.global_id].cache_key) do
         parent_account.default_storage_quota
       end
     end
@@ -620,7 +623,7 @@ class Account < ActiveRecord::Base
     return Group.default_storage_quota if root_account?
 
     shard.activate do
-      Rails.cache.fetch(['default_group_storage_quota', self.id].cache_key) do
+      Rails.cache.fetch(['default_group_storage_quota', self.global_id].cache_key) do
         self.parent_account.default_group_storage_quota
       end
     end
@@ -895,7 +898,7 @@ class Account < ActiveRecord::Base
     raise "must be a root account" unless self.root_account?
     Shard.partition_by_shard([self, Account.site_admin].uniq) do |accounts|
       next unless user.associated_shards.include?(Shard.current)
-      AccountUser.includes(:account).joins(:account).where("user_id=? AND (root_account_id IN (?) OR account_id IN (?))", user, accounts, accounts)
+      AccountUser.eager_load(:account).where("user_id=? AND (root_account_id IN (?) OR account_id IN (?))", user, accounts, accounts)
     end
   end
 
@@ -995,10 +998,6 @@ class Account < ActiveRecord::Base
 
   def forgot_password_external_url
     self.change_password_url
-  end
-
-  def multi_auth?
-    self.authentication_providers.active.count > 1
   end
 
   def auth_discovery_url=(url)

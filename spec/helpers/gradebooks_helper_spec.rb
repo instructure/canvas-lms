@@ -33,26 +33,96 @@ describe GradebooksHelper do
   let(:assignment) { FakeAssignment.new }
   let(:submission) { FakeSubmission.new(assignment) }
   let(:quiz) { assignment.quiz = FakeQuiz.new }
+  let(:anonymous_survey) { assignment.quiz = FakeQuiz.new(true, true) }
 
-  describe '#force_anonymous_grading?' do
+  describe '#anonymous_assignment?' do
     it 'requires a quiz' do
-      expect(helper.force_anonymous_grading?(assignment)).to eq false
+      expect(helper.anonymous_assignment?(assignment)).to eq false
     end
 
     it 'is falsy with just a survey' do
       quiz.survey = true
-      expect(helper.force_anonymous_grading?(assignment)).to eq false
+      expect(helper.anonymous_assignment?(assignment)).to eq false
     end
 
     it 'is falsy with just anonymous_submissions' do
       quiz.anonymous_submissions = true
-      expect(helper.force_anonymous_grading?(assignment)).to eq false
+      expect(helper.anonymous_assignment?(assignment)).to eq false
     end
 
     it 'is truthy with an anonymous survey' do
-      quiz.survey = true
-      quiz.anonymous_submissions = true
+      anonymous_survey
+      expect(helper.anonymous_assignment?(assignment)).to eq true
+    end
+  end
+
+  describe '#anonymous_grading_required?' do
+    it 'returns false by default' do
+      assignment = assignment_model
+      expect(helper.anonymous_grading_required?(assignment)).to eq false
+    end
+
+    it 'returns true if course setting is on' do
+      assignment = assignment_model
+      assignment.context.enable_feature!(:anonymous_grading)
+      expect(helper.anonymous_grading_required?(assignment)).to eq true
+    end
+
+    it 'returns true if sub-account setting is on' do
+      root_account = Account.default
+      sub_account = root_account.sub_accounts.create!
+      sub_account.enable_feature!(:anonymous_grading)
+      sub_account_course = course_model(account: sub_account)
+      assignment = assignment_model(course: sub_account_course)
+      expect(helper.anonymous_grading_required?(assignment)).to eq true
+    end
+
+    it 'returns true if root account setting is on' do
+      root_account = Account.default
+      root_account.enable_feature!(:anonymous_grading)
+      sub_account = root_account.sub_accounts.create!
+      sub_account_course = course_model(account: sub_account)
+      assignment = assignment_model(course: sub_account_course)
+      expect(helper.anonymous_grading_required?(assignment)).to eq true
+    end
+
+    it 'returns true if site admin setting is on' do
+      site_admin_account = Account.site_admin
+      site_admin_account.enable_feature!(:anonymous_grading)
+      assignment = assignment_model
+      expect(helper.anonymous_grading_required?(assignment)).to eq true
+    end
+  end
+
+  describe '#force_anonymous_grading?' do
+    it 'returns false by default' do
+      expect(helper.force_anonymous_grading?(assignment_model)).to eq false
+    end
+
+    it 'returns true if anonymous quiz' do
+      anonymous_survey
       expect(helper.force_anonymous_grading?(assignment)).to eq true
+    end
+
+    it 'returns true if anonymous grading flag set' do
+      Account.default.enable_feature!(:anonymous_grading)
+      expect(helper.force_anonymous_grading?(assignment_model)).to eq true
+    end
+  end
+
+  describe '#force_anonymous_grading_reason' do
+    it 'returns nothing if anonymous grading is not forced' do
+      expect(helper.force_anonymous_grading_reason(assignment_model)).to eq ''
+    end
+
+    it 'returns anonymous survey reason' do
+      anonymous_survey
+      expect(helper.force_anonymous_grading_reason(assignment)).to match(/anonymous survey/)
+    end
+
+    it 'returns anonymous grading' do
+      Account.default.enable_feature!(:anonymous_grading)
+      expect(helper.force_anonymous_grading_reason(assignment_model)).to match(/anonymous grading/)
     end
   end
 

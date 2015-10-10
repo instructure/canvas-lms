@@ -6,7 +6,7 @@ class IndexCleanupPt1 < ActiveRecord::Migration
       # we *do* query by (context_type, context_id, file_state where root_attachment_id = null),
       # but that uses the context index.
       # so, we'll restrict this index to just non-null root_attachment_ids.
-      execute %{create index index_attachments_on_root_attachment_id_not_null on attachments (root_attachment_id) where root_attachment_id is not null}
+      execute %{create index index_attachments_on_root_attachment_id_not_null on #{Attachment.quoted_table_name} (root_attachment_id) where root_attachment_id is not null}
       remove_index "attachments", :name => "index_attachments_on_root_attachment_id"
     end
 

@@ -8,7 +8,7 @@ class AddUniqueIndexOnRoleName < ActiveRecord::Migration
     #         same name and different base role types; that can't be cleaned up automatically
     #         (but should not happen because an existing validation prevents this case)
     # note 2: the extra subquery is necessary to avoid error 1093 on mysql
-    Role.where("id NOT IN (SELECT * FROM (SELECT MAX(id) FROM roles GROUP BY account_id, name, base_role_type) x)").delete_all
+    Role.where("id NOT IN (SELECT * FROM (SELECT MAX(id) FROM #{Role.quoted_table_name} GROUP BY account_id, name, base_role_type) x)").delete_all
     add_index :roles, [:account_id, :name], :unique => true, :name => "index_roles_unique_account_name"
   end
 

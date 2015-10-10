@@ -5,11 +5,9 @@ describe 'viewing a quiz with variable due dates on the quiz show page' do
   include AssignmentOverridesSeleniumHelper
   include_context 'in-process server selenium tests'
 
-  before(:all) do
-    prepare_multiple_due_dates_scenario_for_ta
-  end
+  context 'as a TA in both sections' do
+    before(:all) { prepare_vdd_scenario_for_ta }
 
-  context 'with a TA in both sections' do
     before(:each) do
       user_session(@ta1)
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}"

@@ -856,6 +856,7 @@ tr:
         message: Mesaj
         mfa_settings: "Çoklu Kimlik Doğrulama"
         name: "Hesap Adı"
+        new_sub_account_includes: "Alt hesaplar temalarını düzenleyip ek içerik tanımlayabilsin"
         no_enrollments_can_create_courses: "Hiçbir kayıtlı olmayan kullanıcılar"
         open_registration: "Açık Kayıt"
         outgoing_email_default_name_option_custom: "Varsayılan \"Kimden\" İsmi"
@@ -1188,6 +1189,7 @@ tr:
             text: "Bu rapor, belirli bir dönemde, herhangi bir derste kayıtlı tüm öğrencileri gösterir. Oluşturulan csv dosyasında dersi başladığından beri ziyaret etmeyen her öğrenci kaydı için bir satır bulunmaktadır."
   achieve_mastery_count_times_8c9bbcec: "%{count} defa yeterlilik sağlayın"
   actions_efcde10d: Eylemler
+  activate_this_key_6cd98f4b: "Bu anahtarı etkinleştir"
   activerecord: 
     errors: 
       messages: 
@@ -1282,6 +1284,7 @@ tr:
   all_grading_periods_77974940: "Tüm Notlandırma Periyotları"
   all_grading_periods_must_have_a_title_a1a38d87: "Tüm notlandırma peryodlarının bir başlığı olmalı"
   all_groups_cea25817: "Tüm Gruplar"
+  all_my_files_a0213441: "Tüm Dosyalarım"
   all_start_dates_must_be_before_the_end_date_d949eca9: "Tüm başlangıç tarihleri son tarihten önce olmalı"
   all_students_have_taken_the_quiz_b558f8b4: "Tüm öğrenciler bu kısa sınavı aldı"
   all_students_have_taken_the_survey_494f9f42: "Tüm öğrenciler bu anketi aldı"
@@ -1453,6 +1456,8 @@ tr:
   are_you_sure_you_want_to_remove_this_grading_perio_e3251c09: "Bu notlandırma peryodunu silmek istediğinize emin misiniz?"
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "Bu aracı kaldırmak istediğinize emin misiniz?"
   are_you_sure_you_want_to_report_this_profile_pictu_e22c2210: "Bu profil resmini rapor etmek istediğnize emin misiniz?"
+  arrange_columns_by_assignment_group_33acdf03: "Sütunları Ödev Grubuna göre düzenle"
+  arrange_columns_by_due_date_888f2551: "Sütunları Son Teslim Tarihine göre Düzenle"
   as_you_type_in_this_field_the_list_of_groups_will__16688a5f: "Bu alanı doldururken girdiğiniz harflere uyan isimlere göre grup adları otomatikl olarak filtrelencektir."
   as_you_type_in_this_field_the_list_of_results_will_c1a1a3e4: "Bu alanı doldururken sonuçlar listesi otomatik olarak güncellenecektir."
   assessment_by_name_7b879a2c: "Ödevi yapan %{name}"
@@ -1505,6 +1510,7 @@ tr:
   assignment_comments_e43ed898: "Ödev Yorumları"
   assignment_details: 
     no_graded_submissions: "Notlandırılmış gönderi yok"
+  assignment_details_bc488179: "Ödev Ayrıntıları"
   assignment_details_dialog: 
     average_score: "Ortalama Puan:"
     count_of_submissions: "%{cnt} gönderi"
@@ -1545,6 +1551,11 @@ tr:
     unmute_dialog: "Bu ödev şu anda bekletiliyor. Öğrenciler notlarını ve geribildirimleri göremezler. Şimdi açmak ister misiniz?"
     unmuting_assignment: "Ödev beklemeden çıkarılıyor..."
   assignment_name_b2d87383: "Ödev Adı"
+  assignment_options_1e5b7074: "Ödev Seçenekleri"
+  assignment_override: 
+    student_count: 
+      one: "%{count} öğrenci"
+      other: "%{count} öğrenci"
   assignment_selection_6bff05c4: "Ödev Seçimi"
   assignment_was_deleted_8320d26d: "Ödev silindi"
   assignments: 
@@ -2111,6 +2122,7 @@ tr:
   assignments_api: 
     invalid_date_time: "%{attribute} için geçersiz tarih"
     invalid_submission_types: "Geçersiz gönderim türü"
+  assignments_in_this_group_have_no_points_possible__3cd35922: "Bu gruptaki ödevlerin olası puanları yok ve not hesaplamasına dahil edilemezler"
   attachment: 
     default_filename: Dosya
     errors: 
@@ -2141,6 +2153,7 @@ tr:
     corrupted: "Ayrıntılar Bulunamadı"
     login: "OTURUM AÇ"
     logout: "OTURUMU KAPAT"
+  authorize_e3f25bb4: Yetkilendir
   available_after_unlock_at_b5682224: "%{unlock_at} tarihinden sonra geçerli"
   available_after_unlock_at_until_lock_at_499e8092: "%{unlock_at} tarihinden sonra %{lock_at} tarihine kadar geçerli"
   available_from_587ce92f: "Etkin Olduğu Tarih"
@@ -2167,6 +2180,7 @@ tr:
   before_publishing_you_must_set_usage_rights_on_you_dcd7b567: "Yayınlamadan önce dosyalarınızdaki kullanım haklarını ayarlamalısınız."
   beginning_date_2d2a29ac: "Başlama tarihi"
   below_this_search_field_is_a_list_of_content_type__58aaa03f: "Bu arama alanının altında %{content_type} listesi vardır. Siz yazarken liste sorgu eşleşmesine göre filtrelenecektir.  Karşılıklı yapılan mesajlaşmalar belirlediğiniz seçeneğe göre filtrelenir."
+  beta_url_3c7b88ec: "Beta URL:"
   better_file_browsing_description: |-
       Yeni, daha basit ve kullanımı kolay dosya arama arayüzü. Bu özelliği ders düzeyinde etkinleştirirseniz,
       dersteki tüm kullanıcılar yeni arayüzü görebilirler. Kullanıcılar kişisel dosya sayfasına ('/files') gittiklerinde
@@ -6089,6 +6103,7 @@ tr:
     text_show: 
       page_title: "Dosya Ön izleme"
   files_and_folder_contents_only_available_to_studen_944f9166: "Öğrenciler dosyalar ve klasör içeriklerine yalnızca bu bağlantı ile erişebilirler. Öğrenci dosyalarında görülmez."
+  files_c300e900: Dosyalar
   files_uploaded_519844ed: "Gönderilen Dosyalar"
   fill_in_the_blank_read_surrounding_text_1a6c73c7: "Çevreleyen metni okuyun , boşluğu doldurun"
   filter_announcements_by_unread_495eeeb3: "filtrelenmiş okunmamış duyurular"
@@ -7510,6 +7525,14 @@ tr:
   logged_out_user: "Oturum Kapatan Kullanıcı %{user_counter}"
   login: 
     canvas: 
+      legacy_login_content: 
+        back_to_login: "Oturum Aç'a dön"
+        buttons: 
+          request_password: "Şifremi Gönder"
+        labels: 
+          remember_me: "Oturumunuz açık kalsın"
+        log_in: "Oturum Aç"
+        login_handle: "%{login_handle_name}'nızı girerseniz şifrenizi değiştirebileceğiniz bağlantıyı size gönderelim."
       mobile_login: 
         back_to_login: "Oturum Aç'a dön"
         buttons: 
@@ -7533,6 +7556,14 @@ tr:
         login_handle: "%{login_handle_name}'nızı girerseniz şifrenizi değiştirebileceğiniz bağlantıyı size gönderelim."
         page_title: "Canvas'ta Oturum Aç"
         register_for_canvas: "*Hesap Oluşturmak İçin* **Buraya Tıklayın, Ücretsizdir!**"
+      new_login_content: 
+        back_to_login: "Oturum Aç'a dön"
+        buttons: 
+          request_password: "Şifremi Gönder"
+        labels: 
+          remember_me: "Oturumunuz açık kalsın"
+        log_in: "Oturum Aç"
+        login_handle: "%{login_handle_name}'nızı girerseniz şifrenizi değiştirebileceğiniz bağlantıyı size gönderelim."
     logout_confirm: 
       cancel: İptal
       details: 
@@ -7583,6 +7614,7 @@ tr:
   login_label_1dea0f9d: "Oturum Açma Etiketi"
   login_with_auth_type_a0aaa52a: "*%{auth_type}* ile oturum aç"
   login_with_provider_3fd3998e: "%{provider} ile oturum aç"
+  logout_a9312e35: "Oturumu Kapat"
   low_score_4eeb95b2: "En Düşük : %{score}"
   lower_limit_of_range_6ddd4983: "Aralık alt sınırı"
   lti: 
@@ -9817,6 +9849,7 @@ tr:
       other: Diğer
       parent: "Ana E-Posta"
       scheduling: Zamanlanıyor
+  notifications_cbfa7704: Bildirimler
   now_click_the_agenda_button_607fb40e: "Şimdi *Gündem* butonuna tıklayın"
   now_that_your_course_is_set_up_and_available_you_p_c0c8635c: "Dersiniz hazır olduğuna göre muhtemelen artık bu denetim listesine ihtiyacınız olmayacak. Fakat daha sonra yeni bir şeyler denemek istersiniz diye veya dersinizin içeriğinde değişiklikler yaparken biraz yardıma ihtiyacınız olabilir diye hazır tutacağız."
   num_messages_c1949bbc: 
@@ -9870,6 +9903,7 @@ tr:
         remember_access: "Bu servis için yetkilendirmemi hatırla"
       page_title: "Uygulama İçin Oturum Aç"
     confirm_mobile: 
+      authorize: Yetkilendir
       cancel: İptal
       details: 
         allow_application: "%{app_name} hesabınıza erişmek istiyor."
@@ -12780,6 +12814,7 @@ tr:
       labels: 
         recaptcha_private_key: "ReCAPTCHA Özel Anahtarı"
         recaptcha_public_key: "ReCAPTCHA Genel Anahtarı"
+  settings_5aa0fd0c: Ayarlar
   setup_checklist_eb8b00b8: "Ayarlama Kontrol Listesi"
   shared: 
     account_notification: 

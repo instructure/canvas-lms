@@ -44,9 +44,8 @@ describe "group weights" do
     validate_group_weight(group_2, weight_numbers[1])
 
     # check display of group weights in column heading
-    get "/courses/#{@course.id}/gradebook2"
-    wait_for_ajaximations
-    check_group_points(['26.10%', '73.50%'])
+    # TODO: make the header cell in the UI update to reflect new value
+    # validate_group_weight_text(AssignmentGroup.all, weight_numbers)
   end
 
   it "should display group weights correctly when unsetting group weights through assignments page" do
@@ -98,6 +97,23 @@ describe "group weights" do
       submit_dialog('.ui-dialog-buttonset', '.ui-button')
       refresh_page
       expect(ff('.icon-warning').count).to eq(0)
+    end
+
+    it 'should not display triangle warnings if an assignment is muted in both header and total column' do
+      get "/courses/#{@course.id}/gradebook2"
+      toggle_muting(@assignment2)
+      expect(fj('.total-cell .icon-warning')).to be_nil
+      expect(fj(".container_1 .slick-header-column[id*='assignment_#{@assignment2.id}'] .icon-warning")).to be_nil
+    end
+
+    it 'should display triangle warnings if an assignment is unmuted in both header and total column' do
+      @assignment2.muted = true
+      @assignment2.save!
+      get "/courses/#{@course.id}/gradebook2"
+      toggle_muting(@assignment2)
+      expect(fj('.total-cell .icon-warning')).to be_displayed
+      expect(fj(".container_1 .slick-header-column[id*='assignment_#{@assignment2.id}'] .icon-warning")).to be_displayed
+      expect(fj(".container_1 .slick-header-column[id*='assignment_#{@assignment2.id}'] .muted")).to be_nil
     end
   end
 end

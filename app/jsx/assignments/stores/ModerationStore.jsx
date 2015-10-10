@@ -5,7 +5,7 @@ define(['underscore', 'Backbone'], function(_){
   class ModerationStore {
     constructor () {
       this.events = _.extend({}, Backbone.Events);
-      this.students = [];
+      this.submissions = [];
     }
 
     /**
@@ -25,12 +25,12 @@ define(['underscore', 'Backbone'], function(_){
     }
 
     /**
-     * Add students to the store
+     * Add submissions to the store
      *
-     * @param {Array} students An array of student objects
+     * @param {Array} submission An array of submission objects
      */
-    addStudents (students) {
-      this.students = this._mergeArraysById(this.students, students);
+    addSubmissions (submissions) {
+      this.submissions = this._mergeArraysById(this.submissions, submissions);
       this.events.trigger('change');
     }
 

@@ -13,7 +13,7 @@ class CreateBrandConfigs < ActiveRecord::Migration
       t.datetime :created_at, null: false
     end
     # because we didn't use the rails default `id` int primary key, we have to add it manually
-    execute %{ ALTER TABLE brand_configs ADD PRIMARY KEY (md5); }
+    execute %{ ALTER TABLE #{BrandConfig.quoted_table_name} ADD PRIMARY KEY (md5); }
     add_index :brand_configs, :share
 
     add_column      :accounts, :brand_config_md5, :string, limit: LENGTH_OF_AN_MD5_HASH

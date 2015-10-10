@@ -43,7 +43,7 @@ module PostgreSQLAdapterExtensions
       # it as fast as possible. Note that a NOT EXISTS would be faster, but this is
       # the query postgres does for the VALIDATE CONSTRAINT, so we want exactly this
       # query to be warm
-      execute("SELECT fk.#{column} FROM #{from_table} fk LEFT OUTER JOIN #{to_table} pk ON fk.#{column}=pk.id WHERE pk.id IS NULL AND fk.#{column} IS NOT NULL LIMIT 1")
+      execute("SELECT fk.#{column} FROM #{quote_table_name(from_table)} fk LEFT OUTER JOIN #{quote_table_name(to_table)} pk ON fk.#{column}=pk.id WHERE pk.id IS NULL AND fk.#{column} IS NOT NULL LIMIT 1")
     end
 
     super(from_table, to_table, options)
@@ -52,7 +52,7 @@ module PostgreSQLAdapterExtensions
   end
 
   def rename_index(table_name, old_name, new_name)
-    return execute "ALTER INDEX #{quote_column_name(old_name)} RENAME TO #{quote_table_name(new_name)}";
+    return execute "ALTER INDEX #{quote_table_name(old_name)} RENAME TO #{quote_column_name(new_name)}";
   end
 
   # have to replace the entire method to support concurrent
@@ -139,6 +139,8 @@ module PostgreSQLAdapterExtensions
   # (for instance when using functions like LOWER)
   # this will lead to problems if we try to remove the index (index_exists? will return false)
   def indexes(table_name)
+    schema = shard.name if @config[:use_qualified_names]
+
     result = query(<<-SQL, 'SCHEMA')
          SELECT distinct i.relname, d.indisunique, d.indkey, pg_get_indexdef(d.indexrelid), t.oid
          FROM pg_class t
@@ -147,7 +149,7 @@ module PostgreSQLAdapterExtensions
          WHERE i.relkind = 'i'
            AND d.indisprimary = 'f'
            AND t.relname = '#{table_name}'
-           AND i.relnamespace IN (SELECT oid FROM pg_namespace WHERE nspname = ANY (current_schemas(false)) )
+           AND i.relnamespace IN (SELECT oid FROM pg_namespace WHERE nspname = #{schema ? "'#{schema}'" : 'ANY (current_schemas(false))'} )
         ORDER BY i.relname
     SQL
 

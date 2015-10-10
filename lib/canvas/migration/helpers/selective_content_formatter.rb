@@ -200,12 +200,12 @@ module Canvas::Migration::Helpers
                 content_list << course_item_hash(type, item)
               end
             when 'discussion_topics'
-              source.discussion_topics.active.only_discussion_topics.select("id, title, user_id, assignment_id").except(:includes).each do |item|
+              source.discussion_topics.active.only_discussion_topics.select("id, title, user_id, assignment_id").except(:preload).each do |item|
                 content_list << course_item_hash(type, item)
               end
             else
               if source.respond_to?(type)
-                scope = source.send(type).select(:id).except(:includes)
+                scope = source.send(type).select(:id).except(:preload)
                 # We only need the id and name, so don't fetch everything from DB
 
                 scope = scope.select(:assignment_id) if type == 'quizzes'
@@ -242,7 +242,7 @@ module Canvas::Migration::Helpers
             elsif type == 'discussion_topics'
               count = source.discussion_topics.active.only_discussion_topics.count
             elsif source.respond_to?(type) && source.send(type).respond_to?(:count)
-              scope = source.send(type).except(:includes)
+              scope = source.send(type).except(:preload)
               if scope.klass.respond_to?(:not_deleted)
                 scope = scope.not_deleted
               elsif scope.klass.respond_to?(:active)
@@ -316,7 +316,7 @@ module Canvas::Migration::Helpers
     end
 
     def course_assignment_data(content_list, source_course)
-      source_course.assignment_groups.active.includes(:assignments).select("id, name").each do |group|
+      source_course.assignment_groups.active.preload(:assignments).select("id, name").each do |group|
         item = course_item_hash('assignment_groups', group)
         content_list << item
         group.assignments.active.select(:id).select(:title).each do |asmnt|
@@ -327,7 +327,7 @@ module Canvas::Migration::Helpers
     end
 
     def course_attachments_data(content_list, source_course)
-      Canvas::ICU.collate_by(source_course.folders.active.select('id, full_name, name').includes(:active_file_attachments), &:full_name).each do |folder|
+      Canvas::ICU.collate_by(source_course.folders.active.select('id, full_name, name').preload(:active_file_attachments), &:full_name).each do |folder|
         next if folder.active_file_attachments.length == 0
 
         item = course_item_hash('folders', folder)

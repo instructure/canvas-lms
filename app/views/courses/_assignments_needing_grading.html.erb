@@ -53,7 +53,7 @@ cache(safe_cache_key([@current_user, contexts, 'a_need_grading']), cache_opts) d
     <% needs_submitting.each_with_index do |assignment, i| %>
       <li style="<%= hidden if i >= visible_limit %>">
         <a
-          class="item icon-grading-gray tooltip"
+          class="item icon-grading-gray tooltip todo-tooltip"
           href="<%= course_assignment_path( assignment.context_id, assignment.id ) %>#submit"
           data-track-category="dashboard"
           data-track-label="todo needs submitting"
@@ -63,7 +63,7 @@ cache(safe_cache_key([@current_user, contexts, 'a_need_grading']), cache_opts) d
               <span class='tooltip-carat'></span>
               <span class="tooltip_text">
                 <% if assignment.points_possible %>
-                  <span style="display: block; font-size: 0.8em;"><%= t 'points_possible', 'out of %{points_possible}', :points_possible => assignment.points_possible %></span>
+                  <span class="screenreader_points_possible" aria-live="true" style="display: block; font-size: 0.8em;"><%= t 'points_possible', 'out of %{points_possible}', :points_possible => assignment.points_possible %></span>
                 <% end %>
                 <% if show_context %>
                   <span style="display: block; font-size: 0.8em;"><%= assignment.context.short_name %></span>

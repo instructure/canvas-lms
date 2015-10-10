@@ -49,7 +49,7 @@ describe AccountAuthorizationConfig do
 
     it "enables canvas_authentication if deleting the last aac" do
       account.authentication_providers.destroy_all
-      expect(account.reload.settings[:canvas_authentication]).to be_truthy
+      expect(account.reload.canvas_authentication?).to eq true
     end
 
   end
@@ -131,6 +131,9 @@ describe AccountAuthorizationConfig do
   describe "list-i-ness" do
     let!(:aac1){ account.authentication_providers.create!(auth_type: 'facebook') }
     let!(:aac2){ account.authentication_providers.create!(auth_type: 'github') }
+    before do
+      account.authentication_providers.where(auth_type: 'canvas').first.destroy
+    end
 
     it "manages positions automatically within an account" do
       expect(aac1.reload.position).to eq(1)

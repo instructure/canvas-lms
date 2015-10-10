@@ -1675,33 +1675,37 @@ class ApplicationController < ActionController::Base
   end
 
   def active_brand_config(opts={})
-    @account ||= Context.get_account(@context, @domain_root_account)
-
     return @active_brand_config if defined? @active_brand_config
     @active_brand_config = begin
       if !use_new_styles? || (@current_user && @current_user.prefers_high_contrast?)
         nil
       elsif session.key?(:brand_config_md5)
         BrandConfig.where(md5: session[:brand_config_md5]).first
-      elsif @account.brand_config && @account.branding_allowed?
-        @account.brand_config
-      elsif !opts[:ignore_parents] && @account.first_parent_brand_config
-        @account.first_parent_brand_config
-      elsif k12?
-        BrandConfig.k12_config
+      else
+        brand_config_for_account(opts)
       end
     end
   end
   helper_method :active_brand_config
 
-  def brand_config_includes
-    return @brand_config_includes if defined? @brand_config_includes
-    includes = {}
-    if @domain_root_account.allow_global_includes? && active_brand_config.present?
-      includes[:js] = active_brand_config[:js_overrides] if active_brand_config[:js_overrides].present?
-      includes[:css] = active_brand_config[:css_overrides] if active_brand_config[:css_overrides].present?
+  def brand_config_for_account(opts)
+    account = @account || Context.get_account(@context, @domain_root_account)
+    if account.brand_config && account.branding_allowed?
+      account.brand_config
+    elsif !opts[:ignore_parents] && account.first_parent_brand_config
+      account.first_parent_brand_config
+    elsif k12?
+      BrandConfig.k12_config
     end
-    includes
+  end
+  private :brand_config_for_account
+
+  def brand_config_includes
+    return {} unless @domain_root_account.allow_global_includes?
+    @brand_config_includes ||= BrandConfig::OVERRIDE_TYPES.each_with_object({}) do |override_type, hsh|
+      url = active_brand_config.presence.try(override_type)
+      hsh[override_type] = url if url.present?
+    end
   end
   helper_method :brand_config_includes
 
@@ -1929,6 +1933,10 @@ class ApplicationController < ActionController::Base
     google_docs
   end
 
+  def self.google_drive_timeout
+    Setting.get('google_drive_timeout', 30).to_i
+  end
+
   def google_drive_connection
     return unless Canvas::Plugin.find(:google_drive).try(:settings)
     ## @real_current_user first ensures that a masquerading user never sees the
@@ -1944,7 +1952,7 @@ class ApplicationController < ActionController::Base
       access_token = session[:oauth_gdrive_access_token]
     end
 
-    GoogleDocs::DriveConnection.new(refresh_token, access_token) if refresh_token && access_token
+    GoogleDocs::DriveConnection.new(refresh_token, access_token, ApplicationController.google_drive_timeout) if refresh_token && access_token
   end
 
   def google_service_connection

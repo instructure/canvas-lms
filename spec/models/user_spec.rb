@@ -1460,6 +1460,7 @@ describe User do
       @account1.pseudonyms.create!(:user => user2, :unique_id => 'preferred@example.com', :password => 'abcdef', :password_confirmation => 'abcdef')
       @user.pseudonyms.detect { |p| p.account == Account.site_admin }.update_attribute(:password_auto_generated, true)
       Account.default.authentication_providers.create!(:auth_type => 'cas')
+      Account.default.authentication_providers.first.move_to_bottom
       new_pseudonym = @user.find_or_initialize_pseudonym_for_account(@account1, @account3)
       expect(new_pseudonym).not_to be_nil
       expect(new_pseudonym).to be_new_record
@@ -1479,6 +1480,7 @@ describe User do
 
       # delegated auth
       @account3.authentication_providers.create!(:auth_type => 'cas')
+      @account3.authentication_providers.first.move_to_bottom
       expect(@account3).to be_delegated_authentication
       @user.pseudonyms.create!(:account => @account3, :unique_id => 'jacob@instructure.com', :password => 'abcdef', :password_confirmation => 'abcdef')
       expect(@user.find_or_initialize_pseudonym_for_account(@account1)).to be_nil
@@ -1639,6 +1641,41 @@ describe User do
         expect(events.first).to eq assignment2
       end
 
+      context "after db section context_code filtering" do
+        before do
+          course_with_teacher(:active_all => true)
+          @student = user(:active_user => true)
+          @sections = []
+          @events = []
+          3.times { @sections << @course.course_sections.create! }
+          start_at = 1.day.from_now
+          # create three sections and three child events that will be retrieved in the same order
+          data = {}
+          @sections.each_with_index do |section, i|
+            data[i] = {:start_at => start_at, :end_at => start_at + 1.day, :context_code => section.asset_string}
+            start_at += 1.day
+          end
+          event = @course.calendar_events.build(:title => 'event', :child_event_data => data)
+          event.updating_user = @teacher
+          event.save!
+          @events = event.child_events.sort_by(&:context_code)
+        end
+
+        it "should be able to filter section events after fetching" do
+          # trigger the after db filtering
+          Setting.stubs(:get).with('filter_events_by_section_code_threshold', anything).returns(0)
+          @course.enroll_student(@student, :section => @sections[1], :enrollment_state => 'active', :allow_multiple_enrollments => true)
+          expect(@student.upcoming_events(:limit => 1)).to eq [@events[1]]
+        end
+
+        it "should use the old behavior as a fallback" do
+          Setting.stubs(:get).with('filter_events_by_section_code_threshold', anything).returns(0)
+          # the optimized call will retrieve the first two events, and then filter them out
+          # since it didn't retrieve enough events it will use the old code as a fallback
+          @course.enroll_student(@student, :section => @sections[2], :enrollment_state => 'active', :allow_multiple_enrollments => true)
+          expect(@student.upcoming_events(:limit => 1)).to eq [@events[2]]
+        end
+      end
     end
   end
 

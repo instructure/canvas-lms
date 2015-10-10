@@ -2,8 +2,7 @@ class ConversationDataUpdate < ActiveRecord::Migration
   tag :postdeploy
 
   def self.up
-    SubmissionComment.connection.select_all("SELECT DISTINCT submission_id AS id FROM submission_comments WHERE NOT hidden").
-    map{ |r| r["id"] }.each_slice(1000) do |ids|
+    SubmissionComment.where("NOT hidden").uniq.pluck(:submission_id).each_slice(1000) do |ids|
       Submission.send_later_if_production_enqueue_args(:batch_migrate_conversations!, {
         :priority => Delayed::LOWER_PRIORITY,
         :max_attempts => 1,
@@ -11,8 +10,7 @@ class ConversationDataUpdate < ActiveRecord::Migration
       }, ids)
     end
 
-    Conversation.connection.select_all("SELECT id FROM conversations").
-    map{ |r| r["id"] }.each_slice(1000) do |ids|
+    Conversation.pluck(:id).each_slice(1000) do |ids|
       Conversation.send_later_if_production_enqueue_args(:batch_migrate_context_tags!, {
         :priority => Delayed::LOWER_PRIORITY,
         :max_attempts => 1,

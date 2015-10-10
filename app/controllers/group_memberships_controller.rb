@@ -101,7 +101,7 @@ class GroupMembershipsController < ApplicationController
       only_states = ALLOWED_MEMBERSHIP_FILTER
       only_states = only_states & params[:filter_states] if params[:filter_states]
       scope = scope.where(:workflow_state => only_states)
-      scope = scope.includes(:group => :root_account)
+      scope = scope.preload(group: :root_account)
 
       @memberships = Api.paginate(scope, self, memberships_route)
       render :json => @memberships.map{ |gm| group_membership_json(gm, @current_user, session) }

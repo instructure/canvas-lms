@@ -48,6 +48,18 @@ describe "conversations new" do
     expect(fj('.btn-primary.send-message:visible')).to be_displayed
   end
 
+  it "should not show an XSS alert when XSS script is typed into a new conversation's message subject and body", priority: "1", test_id: 201426 do
+    get_conversations
+    script = "<IMG SRC=j&#X41vascript:alert('test2')> or <script>alert('xss');</script>"
+    compose course: @course, to: [@s[0], @s[1]], subject: script, body: script
+    wait_for_ajaximations
+    expect(alert_present?).to be_falsey
+    select_view('sent')
+    expect(alert_present?).to be_falsey
+    click_message(0)
+    expect(alert_present?).to be_falsey
+  end
+
   describe "message list" do
     before(:each) do
       @participant = conversation(@teacher, @s[0], @s[1], body: 'hi there', workflow_state: 'unread')

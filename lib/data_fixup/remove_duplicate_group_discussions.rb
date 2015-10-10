@@ -2,7 +2,7 @@ module DataFixup::RemoveDuplicateGroupDiscussions
   def self.run
     bad_root_topics = DiscussionTopic.connection.select_rows(<<-SQL)
       SELECT context_id,context_type,root_topic_id
-      FROM discussion_topics
+      FROM #{DiscussionTopic.quoted_table_name}
       WHERE root_topic_id IS NOT NULL 
       GROUP BY context_id,context_type,root_topic_id
       HAVING COUNT(*) > 1
@@ -12,7 +12,7 @@ module DataFixup::RemoveDuplicateGroupDiscussions
     bad_root_topics.each do |context_id, context_type, root_topic_id|
       children = DiscussionTopic.
         where(:context_id => context_id, :context_type => context_type, :root_topic_id => root_topic_id).
-        includes(:discussion_entries).
+        preload(:discussion_entries).
         sort_by{ |dt| dt.discussion_entries.length }
 
       # keep the active topic with the most entries

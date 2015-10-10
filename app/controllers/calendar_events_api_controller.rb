@@ -309,8 +309,10 @@ class CalendarEventsApiController < ApplicationController
     scope = @type == :assignment ? assignment_scope : calendar_event_scope
     events = Api.paginate(scope, self, api_v1_calendar_events_url)
     ActiveRecord::Associations::Preloader.new(events, :child_events).run if @type == :event
-    events = apply_assignment_overrides(events) if @type == :assignment
-    mark_submitted_assignments(@current_user, events) if @type == :assignment
+    if @type == :assignment
+      events = apply_assignment_overrides(events)
+      mark_submitted_assignments(@current_user, events)
+    end
 
     if @errors.empty?
       render :json => events.map { |event| event_json(event, @current_user, session, {:excludes => params[:excludes]}) }
@@ -440,6 +442,9 @@ class CalendarEventsApiController < ApplicationController
   #   User or group id for whom you are making the reservation (depends on the
   #   participant type). Defaults to the current user (or user's candidate group).
   #
+  # @argument comments [String]
+  #  Comments to associate with this reservation
+  #
   # @argument cancel_existing [Boolean]
   #   Defaults to false. If true, cancel any previous reservation(s) for this
   #   participant and appointment group.
@@ -461,7 +466,10 @@ class CalendarEventsApiController < ApplicationController
           participant = nil if participant && params[:participant_id] && params[:participant_id].to_i != participant.id
         end
         raise CalendarEvent::ReservationError, "invalid participant" unless participant
-        reservation = @event.reserve_for(participant, @current_user, :cancel_existing => value_to_boolean(params[:cancel_existing]))
+        reservation = @event.reserve_for(participant, @current_user,
+                                          cancel_existing: value_to_boolean(params[:cancel_existing]),
+                                          comments: params['comments']
+                                        )
         render :json => event_json(reservation, @current_user, session)
       rescue CalendarEvent::ReservationError => err
         reservations = participant ? @event.appointment_group.reservations_for(participant) : []
@@ -606,6 +614,8 @@ class CalendarEventsApiController < ApplicationController
     @contexts.each do |context|
       log_asset_access([ "calendar_feed", context ], "calendar", 'other')
     end
+    ActiveRecord::Associations::Preloader.new(@events, :context)
+
     respond_to do |format|
       format.ics do
         name = t('ics_title', "%{course_or_group_name} Calendar (Canvas)", :course_or_group_name => @context.name)
@@ -626,8 +636,10 @@ class CalendarEventsApiController < ApplicationController
         calendar.custom_property("X-WR-CALNAME", name)
         calendar.custom_property("X-WR-CALDESC", description)
 
+        # scan the descriptions for attachments
+        preloaded_attachments = api_bulk_load_user_content_attachments(@events.map(&:description))
         @events.each do |event|
-          ics_event = event.to_ics(false)
+          ics_event = event.to_ics(false, preloaded_attachments)
           calendar.add_event(ics_event) if ics_event
         end
 
@@ -735,10 +747,7 @@ class CalendarEventsApiController < ApplicationController
     @context_codes = selected_contexts.map(&:asset_string)
     @section_codes = []
     if @current_user
-      @section_codes = selected_contexts.inject([]) { |ary, context|
-        next ary unless context.is_a?(Course)
-        ary + context.sections_visible_to(@current_user).map(&:asset_string)
-      }
+      @section_codes = @current_user.section_context_codes(@context_codes)
     end
 
     if @type == :event && @start_date && @current_user
@@ -833,6 +842,19 @@ class CalendarEventsApiController < ApplicationController
 
   def apply_assignment_overrides(events)
     ActiveRecord::Associations::Preloader.new(events, [:context, :assignment_overrides]).run
+    events.each { |e| e.has_no_overrides = true if e.assignment_overrides.size == 0 }
+
+    if AssignmentOverrideApplicator.should_preload_override_students?(events, @current_user, "calendar_events_api")
+      AssignmentOverrideApplicator.preload_assignment_override_students(events, @current_user)
+    end
+
+    unless (params[:excludes] || []).include?('assignments')
+      ActiveRecord::Associations::Preloader.new(events, [:rubric, :rubric_association]).run
+      # improves locked_json performance
+
+      student_events = events.select{|e| !e.context.grants_right?(@current_user, session, :read_as_admin)}
+      Assignment.preload_context_module_tags(student_events) if student_events.any?
+    end
 
     events = events.inject([]) do |assignments, assignment|
 
@@ -891,7 +913,7 @@ class CalendarEventsApiController < ApplicationController
     AppointmentGroup.
       manageable_by(@current_user, @context_codes).
       intersecting(@start_date, @end_date).
-      map(&:asset_string)
+      pluck(:id).map{|id| "appointment_group_#{id}"}
   end
 
   def duplicate(options = {})

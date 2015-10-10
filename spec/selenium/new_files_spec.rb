@@ -77,7 +77,7 @@ describe "better_file_browsing" do
       end
     end
 
-    context "preview" do
+    context "accessibility tests for preview" do
       before do
         fln("example.pdf").click
       end
@@ -99,7 +99,7 @@ describe "better_file_browsing" do
       end
     end
 
-    context "Toolbar Previews" do
+    context "accessibility tests for Toolbar Previews" do
       it "returns focus to the preview toolbar button when closed", priority: "1", test_id: 193819 do
         ff('.ef-item-row')[0].click
         f('.btn-view').click

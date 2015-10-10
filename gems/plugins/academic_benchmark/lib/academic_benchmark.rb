@@ -17,13 +17,13 @@ module AcademicBenchmark
   class APIError < StandardError; end
 
   def self.import(guid_or_guids)
-    unless AcademicBenchmark.config[:api_key]
+    if !AcademicBenchmark.config[:api_key] || AcademicBenchmark.config[:api_key].empty?
       raise Canvas::Migration::Error.new("Not importing academic benchmark data because no API key is set")
     end
 
     # need a user with global outcome management rights
     user_id = Setting.get("academic_benchmark_migration_user_id", nil)
-    unless user_id
+    if !user_id || user_id.empty?
       raise Canvas::Migration::Error.new("Not importing academic benchmark data because no user id set")
     end
 

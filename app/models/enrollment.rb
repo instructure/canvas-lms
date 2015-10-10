@@ -224,7 +224,7 @@ class Enrollment < ActiveRecord::Base
         where(:type => 'StudentEnrollment', :workflow_state => 'active', :courses => { :workflow_state => ['available', 'claimed'] }) }
 
   scope :all_student, -> {
-    includes(:course).
+    eager_load(:course).
         where("(enrollments.type = 'StudentEnrollment'
               AND enrollments.workflow_state IN ('invited', 'active', 'completed')
               AND courses.workflow_state IN ('available', 'completed')) OR
@@ -331,7 +331,7 @@ class Enrollment < ActiveRecord::Base
     section = CourseSection.find(self.course_section_id_was)
 
     # ok, consider groups the user is in from the abandoned section's course
-    self.user.groups.includes(:group_category).where(
+    self.user.groups.preload(:group_category).where(
       :context_type => 'Course', :context_id => section.course_id).each do |group|
 
       # check group deletion criteria if either enrollment is not a deletion
@@ -888,7 +888,7 @@ class Enrollment < ActiveRecord::Base
 
   def self.recompute_final_score_if_stale(course, user=nil)
     Rails.cache.fetch(['recompute_final_scores', course.id, user].cache_key, :expires_in => Setting.get('recompute_grades_window', 600).to_i.seconds) do
-      recompute_final_score user ? user.id : course.student_enrollments.except(:includes).select(:user_id).uniq.map(&:user_id), course.id
+      recompute_final_score user ? user.id : course.student_enrollments.except(:preload).select(:user_id).uniq.map(&:user_id), course.id
       yield if block_given?
       true
     end

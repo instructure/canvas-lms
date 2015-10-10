@@ -60,7 +60,7 @@ module AccountReports
     # - enrollment status
 
     def grade_export()
-      students = root_account.pseudonyms.except(:includes).
+      students = root_account.pseudonyms.except(:preload).
         select("pseudonyms.id, u.name AS user_name, e.user_id, e.course_id,
                 pseudonyms.sis_user_id, c.name AS course_name,
                 c.sis_source_id AS course_sis_id, s.name AS section_name,

@@ -44,7 +44,7 @@ describe WikiPages::ScopedToUser do
       expect(@course.grants_right?(@teacher, :view_unpublished_items)).to be_truthy, 'precondition'
       expect(unpublished.workflow_state).to eq('unpublished'), 'precondition'
       expect(published.workflow_state).to eq('active'), 'precondition'
-      scope = @course.wiki.wiki_pages.select(WikiPage.column_names - ['body']).includes(:user)
+      scope = @course.wiki.wiki_pages.select(WikiPage.column_names - ['body']).preload(:user)
       scope_filter = WikiPages::ScopedToUser.new(@course, @teacher, scope)
       expect(scope_filter.scope).to include(unpublished, published)
     end
@@ -53,7 +53,7 @@ describe WikiPages::ScopedToUser do
       expect(@course.grants_right?(@student, :view_unpublished_items)).to be_falsey, 'precondition'
       expect(unpublished.workflow_state).to eq('unpublished'), 'precondition'
       expect(published.workflow_state).to eq('active'), 'precondition'
-      scope = @course.wiki.wiki_pages.select(WikiPage.column_names - ['body']).includes(:user)
+      scope = @course.wiki.wiki_pages.select(WikiPage.column_names - ['body']).preload(:user)
       scope_filter = WikiPages::ScopedToUser.new(@course, @student, scope)
       expect(scope_filter.scope).not_to include(unpublished)
       expect(scope_filter.scope).to include(published)

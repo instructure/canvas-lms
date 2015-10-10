@@ -99,6 +99,10 @@ module Lti
           expect(subject.create.capability_offered).to include 'ToolConsumerProfile.url'
         end
 
+        it 'adds the OAuth.splitSecret capability' do
+          expect(subject.create.capability_offered).to include 'OAuth.splitSecret'
+        end
+
       end
 
 

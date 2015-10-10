@@ -200,7 +200,7 @@ class AddRoleIdColumns < ActiveRecord::Migration
 
     while AccountNotificationRole.where("role_id IS NULL AND role_type <> 'NilEnrollment'").limit(1000).delete_all > 0; end
 
-    roleless_enrollments = Enrollment.connection.select_rows("SELECT DISTINCT ON (type, role_name) type, role_name FROM enrollments
+    roleless_enrollments = Enrollment.connection.select_rows("SELECT DISTINCT ON (type, role_name) type, role_name FROM #{Enrollment.quoted_table_name}
       WHERE role_id IS NULL AND role_name IS NOT NULL")
     roleless_enrollments.each do |type, role_name|
       role = Role.new(:name => role_name)

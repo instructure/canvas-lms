@@ -1,11 +1,11 @@
 class UnreadCounts < ActiveRecord::Migration
   def self.up
     add_column :users, :unread_conversations_count, :int, :default => 0
-    execute <<-SQL
-    UPDATE users
+    update <<-SQL
+    UPDATE #{User.quoted_table_name}
     SET unread_conversations_count = (
       SELECT COUNT(*)
-      FROM conversation_participants
+      FROM #{ConversationParticipant.quoted_table_name}
       WHERE workflow_state = 'unread'
         AND last_message_at IS NOT NULL
         AND user_id = users.id

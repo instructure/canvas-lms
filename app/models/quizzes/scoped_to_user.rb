@@ -15,15 +15,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-# Outstanding Quiz Submissions Manager
-#
-# API for accessing quiz submissions which we term "outstanding" in that they are
-# unsubmitted, started, and overdue.
-#
-# These submissions can be found by #find_by_quiz, at the
-# API level, and graded internally by #grade_by_course
-# or at the API by #grade_by_ids
-#
 module Quizzes
   class ScopedToUser < ScopeFilter
     def scope

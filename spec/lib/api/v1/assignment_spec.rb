@@ -33,14 +33,14 @@ describe "Api::V1::Assignment" do
     let(:session) { Object.new }
 
     it "returns json" do
-      assignment.stubs(:grants_right?).returns(true)
+      assignment.context.stubs(:grants_right?).returns(true)
       json = api.assignment_json(assignment, user, session, {override_dates: false})
       expect(json["needs_grading_count"]).to eq(0)
       expect(json["needs_grading_count_by_section"]).to be_nil
     end
 
     it "includes section-based counts when grading flag is passed" do
-      assignment.stubs(:grants_right?).returns(true)
+      assignment.context.stubs(:grants_right?).returns(true)
       json = api.assignment_json(assignment, user, session,
                                  {override_dates: false, needs_grading_count_by_section: true})
       expect(json["needs_grading_count"]).to eq(0)

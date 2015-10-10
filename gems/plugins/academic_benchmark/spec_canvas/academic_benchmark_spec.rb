@@ -184,6 +184,17 @@ describe AcademicBenchmark::Converter do
       expect(@cm.workflow_state).to eq 'failed'
     end
 
+    it "should fail with an empty string API key" do
+      @plugin.settings['api_key'] = ""
+      @cm.export_content
+      run_jobs
+      @cm.reload
+
+      expect(@cm.migration_issues.count).to eq 1
+      expect(@cm.migration_issues.first.description).to eq "An API key is required to use Academic Benchmarks"
+      expect(@cm.workflow_state).to eq 'failed'
+    end
+
     it "should use the API to get the set data with an authority short code" do
       response = Object.new
       response.stubs(:body).returns(File.read(@level_0_browse))
@@ -224,8 +235,6 @@ describe AcademicBenchmark::Converter do
       run_jobs
       @cm.reload
 
-      er = ErrorReport.last
-      expect(@cm.old_warnings_format).to eq [["Couldn't update standards for authority CC.", "ErrorReport:#{er.id}"]]
       expect(@cm.migration_settings[:last_error]).to be_nil
       expect(@cm.workflow_state).to eq 'imported'
     end

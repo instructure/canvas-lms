@@ -876,6 +876,7 @@ pt-BR:
         self_registration_type_observer: "Contas de observador somente"
         show_scheduler: "Ativar agendador"
         sis_app_token: "Token de agente SIS"
+        sis_app_url: "URL de Aplicativo SIS"
         sis_source_id: "ID do SIS"
         start_at: "Inicia em"
         students_can_create_courses: Alunos
@@ -1191,6 +1192,7 @@ pt-BR:
             text: "Este relatório mostra todos os estudantes inscritos em qualquer curso em um dado período. O arquivo CSV resultante terá uma linha por inscrição de usuário que não visitou o curso desde a data."
   achieve_mastery_count_times_8c9bbcec: "Alcançar domínio %{count} vezes"
   actions_efcde10d: Ações
+  activate_this_key_6cd98f4b: "Ativar esta chave"
   activerecord: 
     errors: 
       messages: 

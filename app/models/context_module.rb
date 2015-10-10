@@ -101,7 +101,7 @@ class ContextModule < ActiveRecord::Base
 
   def evaluate_all_progressions
     current_column = 'context_module_progressions.current'
-    current_scope = context_module_progressions.where("#{current_column} IS NULL OR #{current_column} = ?", false).includes(:user)
+    current_scope = context_module_progressions.where("#{current_column} IS NULL OR #{current_column} = ?", false).preload(:user)
 
     current_scope.find_in_batches(batch_size: 100) do |progressions|
       cache_visibilities_for_students(progressions.map(&:user_id)) if differentiated_assignments_enabled?
@@ -246,7 +246,7 @@ class ContextModule < ActiveRecord::Base
       return true
     end
 
-    progression = self.evaluate_for(user)
+    progression = self.find_or_create_progression(user)
     # if the progression is locked, then position in the progression doesn't
     # matter. we're not available.
 
@@ -332,7 +332,6 @@ class ContextModule < ActiveRecord::Base
         type: req[:type],
       }
       new_req[:min_score] = req[:min_score].to_f if req[:type] == 'min_score' && req[:min_score]
-      new_req[:max_score] = req[:max_score].to_f if req[:type] == 'max_score' && req[:max_score]
       new_req
     end
 
@@ -341,7 +340,7 @@ class ContextModule < ActiveRecord::Base
       if req[:id] && (tag = tags[req[:id]])
         if %w(must_view must_mark_done must_contribute).include?(req[:type])
           true
-        elsif %w(must_submit min_score max_score).include?(req[:type])
+        elsif %w(must_submit min_score).include?(req[:type])
           true if tag.scoreable?
         end
       end
@@ -550,9 +549,8 @@ class ContextModule < ActiveRecord::Base
       when 'must_submit'
         action == :scored || action == :submitted
       when 'min_score'
-        action == :scored
-      when 'max_score'
-        action == :scored
+        action == :scored ||
+          action == :submitted # to mark progress in the incomplete_requirements (moves from 'unlocked' to 'started')
       else
         false
       end
@@ -571,8 +569,6 @@ class ContextModule < ActiveRecord::Base
       t('requirements.must_submit', "must submit the assignment")
     when 'min_score'
       t('requirements.min_score', "must score at least a %{score}", :score => req[:min_score])
-    when 'max_score'
-      t('requirements.max_score', "must score no more than a %{score}", :score => req[:max_score])
     else
       nil
     end
@@ -612,17 +608,16 @@ class ContextModule < ActiveRecord::Base
     progression = nil
     self.shard.activate do
       Shackles.activate(:master) do
-        self.class.unique_constraint_retry do
-          progression = context_module_progressions.where(user_id: user).first
-          if !progression
-            # check if we should even be creating a progression for this user
-            return nil unless context.enrollments.except(:includes).where(user_id: user).exists?
-            progression = context_module_progressions.create!(user: user)
+        progression = context_module_progressions.where(user_id: user).first
+        if !progression && context.enrollments.except(:preload).where(user_id: user).exists? # check if we should even be creating a progression for this user
+          self.class.unique_constraint_retry do |retry_count|
+            progression = context_module_progressions.where(user_id: user).first if retry_count > 0
+            progression ||= context_module_progressions.create!(user: user)
           end
         end
       end
     end
-    progression.context_module = self
+    progression.context_module = self if progression
     progression
   end
 

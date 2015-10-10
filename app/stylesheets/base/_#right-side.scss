@@ -250,5 +250,21 @@
   @else {
     position: absolute;
     bottom: 0;
-  } 
+  }
+}
+
+@if $use_new_styles {
+  .ic-sidebar-logo {
+    display: none;
+    margin-bottom: $ic-sp*2;
+    text-align: center;
+    @include breakpoint(desktop) {
+      display: block;
+    }
+  }
+  .ic-sidebar-logo__image {
+    max-width: 180px;
+    max-height: 70px;
+    display: inline-block;
+  }
 }

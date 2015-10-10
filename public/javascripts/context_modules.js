@@ -147,13 +147,14 @@ define([
             if (progression.user_id == window.ENV.current_user_id) {
               var $user_progression = $user_progression_list.find(".progression_" + progression.context_module_id)
 
-              if($user_progression.length === 0 && $user_progression_list.length > 0) {
+              if ($user_progression.length === 0 && $user_progression_list.length > 0) {
                 $user_progression = $user_progression_list.find(".progression_blank").clone(true);
                 $user_progression.removeClass('progression_blank').addClass('progression_' + progression.context_module_id);
                 $user_progression_list.append($user_progression);
               }
               if($user_progression.length > 0) {
                 progression.requirements_met = $.map(progression.requirements_met || [], function(r) { return r.id }).join(",");
+                $user_progression.data('incomplete_requirements', progression.incomplete_requirements);
                 $user_progression.fillTemplateData({data: progression});
               }
             }
@@ -179,6 +180,9 @@ define([
               data["points_possible_display"] = I18n.t('points_possible_short', '%{points} pts', { 'points': "" + info["points_possible"]});
             }
             if (info["due_date"] != null) {
+              if (info["past_due"] != null) {
+                $context_module_item.data('past_due', true);
+              }
               data["due_date_display"] = $.dateString(info["due_date"])
             } else if (info["vdd_tooltip"] != null) {
               info['vdd_tooltip']['link_href'] = $context_module_item.find('a.title').attr('href');
@@ -329,7 +333,7 @@ define([
           isNew = true;
           $form.attr('action', $form.find(".add_context_module_url").attr('href'));
           $form.find(".completion_entry").hide();
-          $form.find(".require-sequential").hide();
+          $form.find(".require-sequential").children().hide();
           $form.attr('method', 'POST');
           $form.find(".submit_button").text(I18n.t('buttons.add', "Add Module"));
         } else {
@@ -368,8 +372,7 @@ define([
         });
         var no_prereqs = $("#context_modules .context_module").length == 1;
         var no_items = $module.find(".content .context_module_item").length === 0;
-        $form.find(".prerequisites_list .no_prerequisites_message").showIf(prerequisites.length === 0).end()
-          .find(".prerequisites_list .criteria_list").showIf(prerequisites.length != 0).end()
+        $form.find(".prerequisites_list .criteria_list").showIf(prerequisites.length != 0).end()
           .find(".add_prerequisite_link").showIf(!no_prereqs).end()
           .find(".completion_entry .criteria_list").showIf(!no_items).end()
 
@@ -543,28 +546,76 @@ define([
         var $progression = $("#current_user_progression_list .progression_" + id);
         var data = $progression.getTemplateData({textValues: ['context_module_id', 'workflow_state', 'requirements_met', 'collapsed', 'current_position']});
         var $module = $("#context_module_" + data.context_module_id);
-        $module.toggleClass('completed', data.workflow_state == 'completed');
         var progression_state = data.workflow_state
-        if(progression_state == "unlocked" || progression_state == "started") { progression_state = "in progress"; }
+        var progression_state_capitalized = progression_state && progression_state.charAt(0).toUpperCase() + progression_state.substring(1);
+
+        $module.addClass(progression_state);
+
+        // Locked tooltip title is added in _context_module_next.html.erb
+        if (progression_state != 'locked' && progression_state != 'unlocked') {
+          $module.find('.completion_status i:visible').attr('title', progression_state_capitalized);
+        }
+
         if (progression_state == "completed" && !$module.find(".progression_requirement").length) {
           // this means that there were no requirements so even though the workflow_state says completed, dont show "completed" because there really wasnt anything to complete
           progression_state = "";
         }
         $module.fillTemplateData({data: {progression_state: progression_state}});
-        $module.toggleClass('locked_module', data.workflow_state == 'locked' && !$module.hasClass('editable_context_module'));
+
+        var reqs_met = [];
+        if (data.requirements_met) {
+          reqs_met = data.requirements_met.split(",");
+        }
+
+        var incomplete_reqs = $progression.data('incomplete_requirements');
+        if (incomplete_reqs == null) {
+          incomplete_reqs = [];
+        }
+
         $module.find(".context_module_item").each(function() {
-          var position = parseInt($(this).getTemplateData({textValues: ['position']}).position, 10);
-          if(data.current_position && position && data.current_position < position) {
-            $(this).addClass('after_current_position');
+          var $mod_item = $(this);
+          var position = parseInt($mod_item.getTemplateData({textValues: ['position']}).position, 10);
+          if (data.current_position && position && data.current_position < position) {
+            $mod_item.addClass('after_current_position');
+          }
+
+          // set the status icon
+          var $icon_container = $mod_item.find('.module-item-status-icon');
+          var mod_id = $mod_item.getTemplateData({textValues: ['id']}).id;
+
+          if ($.inArray(mod_id, reqs_met) != -1) {
+            $mod_item.addClass('completed_item');
+            addIcon($icon_container, 'icon-check', I18n.t('Completed'));
+          } else if (progression_state == 'completed') {
+            // if it's already completed then don't worry about warnings, etc
+            if ($mod_item.hasClass('progression_requirement')) {
+              addIcon($icon_container, 'no-icon', I18n.t('Not completed'));
+            }
+          } else if ($mod_item.data('past_due') != null) {
+            addIcon($icon_container, 'icon-minimize', I18n.t('This assignment is overdue'));
+          } else {
+            var incomplete_req = null;
+            for (var idx in incomplete_reqs) {
+              if (incomplete_reqs[idx].id == mod_id) {
+                incomplete_req = incomplete_reqs[idx];
+              }
+            }
+            if (incomplete_req) {
+              if (incomplete_req.score != null) {
+                // didn't score high enough
+                addIcon($icon_container, 'icon-minimize',
+                  I18n.t("You scored a %{score}.", {'score': incomplete_req.score}) + " " + criterionMessage($mod_item) + ".");
+              } else {
+                // hasn't been scored yet
+                addIcon($icon_container, 'icon-info', I18n.t("Your submission has not been graded yet"));
+              }
+            } else {
+              if ($mod_item.hasClass('progression_requirement')) {
+                addIcon($icon_container, 'icon-mark-as-read', criterionMessage($mod_item));
+              }
+            }
           }
         });
-        if(data.requirements_met) {
-          var reqs = data.requirements_met.split(",");
-          for(var idx in reqs) {
-            var req = reqs[idx];
-            $module.find("#context_module_item_" + req).addClass('completed_item');
-          }
-        }
         if(data.collapsed == 'true') {
           $module.addClass('collapsed_module');
         }
@@ -580,6 +631,29 @@ define([
       }
     };
   })();
+
+  var addIcon = function($icon_container, css_class, message) {
+    var $icon = $("<i data-tooltip><span class='screenreader-only'></span></i>");
+    $icon.attr('class', css_class).attr('title', message).attr('aria-label', message);
+    $icon.find('span').html(htmlEscape(message));
+    $icon_container.empty().append($icon);
+  }
+
+  var criterionMessage = function($mod_item) {
+    if ($mod_item.hasClass('must_submit_requirement')) {
+      return I18n.t('Must submit the assignment');
+    } else if ($mod_item.hasClass('must_mark_done_requirement')) {
+      return I18n.t('Must mark as done');
+    } else if ($mod_item.hasClass('must_view_requirement')) {
+      return I18n.t('Must view the page');
+    } else if ($mod_item.hasClass('min_contribute_requirement')) {
+      return I18n.t('Must contribute to the page');
+    } else if ($mod_item.hasClass('min_score_requirement')) {
+      return I18n.t('Must score at least a %{score}', { 'score': $mod_item.getTemplateData({textValues: ['min_score']}).min_score});
+    } else {
+      return I18n.t('Not yet completed')
+    }
+  }
 
   var updatePrerequisites = function($module, prereqs) {
     var $prerequisitesDiv = $module.find(".prerequisites");
@@ -603,6 +677,19 @@ define([
       var $prerequisitesMessage = $('<div />', {text: 'Prerequisites: ' + htmlEscape(prereqsList),'class': 'prerequisites_message'});
       $prerequisitesDiv.append($prerequisitesMessage);
 
+    }
+  }
+
+  var newPillMessage = function($module, requirement_count) {
+    var $message = $module.find('.requirements_message');
+
+    if (requirement_count != 0) {
+      var $pill = $('<ul class="pill"><li></li></ul></div>');
+      $message.html($pill);
+      var $pillMessage = $message.find('.pill li');
+      var newPillMessageText = requirement_count === 1 ? I18n.t("Complete One Item") : I18n.t("Complete All Items");
+      $pillMessage.text(newPillMessageText);
+      $pillMessage.data("requirement-count", requirement_count);
     }
   }
 
@@ -652,13 +739,13 @@ define([
       updatePrerequisites($module, data.context_module.prerequisites);
 
       // Update requirement message pill
-      if (ENV.MODULE_FILE_PERMISSIONS.module_progression_any_condition){
-      var $pillMessage = $module.find('.pill li');
-      var newPillMessage = data.context_module.requirement_count ? I18n.t("Complete One Item") : I18n.t("Complete All Items");
-      $pillMessage.text(newPillMessage);
-      $pillMessage.data("requirement-count", data.context_module.requirement_count);
+      if (ENV.NC_OR_ENABLED) {
+        if (data.context_module.completion_requirements.length === 0) {
+          $module.find('.requirements_message').empty();
+        } else {
+          newPillMessage($module, data.context_module.requirement_count);
+        }
       }
-
       $module.find(".context_module_items .context_module_item")
         .removeClass('progression_requirement')
         .removeClass('min_score_requirement')
@@ -679,10 +766,10 @@ define([
         $item.find(".criterion").fillTemplateData({data: req});
         $item.find(".completion_requirement").fillTemplateData({data: req});
         $item.find(".criterion").addClass('defined');
+        $item.find(".module-item-status-icon").show();
         $item.addClass(req.type + "_requirement").addClass('progression_requirement');
       }
 
-      $module.find(".prerequisites_footer").showIf(data.context_module.prerequisites && data.context_module.prerequisites.length > 0);
       modules.refreshModuleList();
     });
 
@@ -697,16 +784,20 @@ define([
             prereqs.push("module_" + id);
           }
         });
-        var requirementCount = $('input[name="context_module[requirement_count]"]:checked').val();
-        data['context_module[requirement_count]'] = requirementCount;
 
         data['context_module[prerequisites]'] = prereqs.join(",");
         data['context_module[completion_requirements][none]'] = "none";
-        $(this).find(".criteria_list .criterion").each(function() {
+
+        var $requirementsList = $(this).find(".completion_entry .criteria_list .criterion");
+        $requirementsList.each(function() {
           var id = $(this).find(".id").val();
           data["context_module[completion_requirements][" + id + "][type]"] = $(this).find(".type").val();
           data["context_module[completion_requirements][" + id + "][min_score]"] = $(this).find(".min_score").val();
         });
+
+        var requirementCount = $('input[name="context_module[requirement_count]"]:checked').val();
+        data['context_module[requirement_count]'] = requirementCount;
+
         return data;
       },
       beforeSubmit: function(data) {
@@ -787,7 +878,6 @@ define([
       $pre.find(".option").empty().append($select.show());
       $form.find(".prerequisites_list .criteria_list").append($pre).show();
       $pre.slideDown();
-      $form.find(".no_prerequisites_message").hide();
       $select.focus();
     });
 
@@ -867,11 +957,11 @@ define([
     $("#add_context_module_form .delete_criterion_link").click(function(event) {
       event.preventDefault();
       var $elem = $(this).closest(".criteria_list");
-
+      var $requirement = $(this).parents('.completion_entry');
       $(this).parents(".criterion").slideUp(function() {
         $(this).remove();
         // Hides radio button and checkbox if there are no requirements
-        if ($elem.html().length === 0) {
+        if ($elem.html().length === 0 && $requirement.length !== 0) {
           $(".require-sequential").children().fadeOut("fast");
           $(".requirement-count-radio .ic-Radio").children().fadeOut("fast");
         }
@@ -1268,6 +1358,7 @@ define([
         moduleItem.content_details = moduleItem.content_details || {};
 
         var file = new ModuleFile({
+            type: 'file',
             id: moduleItem.content_id || moduleItem.id,
             locked: moduleItem.content_details.locked,
             hidden: moduleItem.content_details.hidden,
@@ -1326,7 +1417,11 @@ define([
         for (i = 0; i < items.length; i++) {
           item = items[i];
           parsedAttrs = item.model.parse(attrs);
-          item.model.set({published: parsedAttrs.published});
+          if (parsedAttrs.type == 'File') {
+            item.model.set({locked: !parsedAttrs.published});
+          } else {
+            item.model.set({published: parsedAttrs.published});
+          }
         }
       }
     };
@@ -1578,8 +1673,8 @@ define([
       setTimeout(modules.initModuleManagement, 1000);
     }
 
+    modules.updateAssignmentData(); // need the assignment data to check past due state
     modules.updateProgressions();
-    modules.updateAssignmentData();
 
     $(".context_module").find(".expand_module_link,.collapse_module_link").bind('click keyclick', function(event, goSlow) {
       event.preventDefault();

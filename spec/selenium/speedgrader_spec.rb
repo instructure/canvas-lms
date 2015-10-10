@@ -161,7 +161,31 @@ describe 'Speedgrader' do
 
         expect(f("#student_grading_#{@assignment.id}").attribute 'value').to eq '10'
       end
+    end
+    context 'Using a rubric to grade' do
+      it 'should display correct grades from a student perspective', priority: "1", test_id: 164205 do
+        course_with_student_logged_in(active_all: true)
+        rubric_model
+        @assignment = @course.assignments.create!(name: 'assignment with rubric', points_possible: 10)
+        @association = @rubric.associate_with(@assignment, @course, purpose: 'grading', use_for_grading: true)
+        @submission = Submission.create!(user: @student, assignment: @assignment, submission_type: "online_text_entry", has_rubric_assessment: true)
+        @assessment = @association.assess(
+                                            user: @student, 
+                                            assessor: @teacher, 
+                                            artifact: @submission, 
+                                            assessment: {
+                                              assessment_type: 'grading',
+                                              criterion_crit1: {
+                                                  points: 5
+                                              }
+                                            }
+                                          )
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}"
+        f('a.assess_submission_link').click
 
+        expect(f('#rating_rat2')).to have_class('selected')
+        expect(f('#rating_rat2 .points').text).to eq('5')
+      end
     end
   end
 

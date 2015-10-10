@@ -41,6 +41,10 @@ define([
       QuizLogAuditingEventDumper(true);
     }
 
+    $('#preview_quiz_button').click(function(e){
+      $('#js-sequential-warning-dialogue div a').attr('href',$('#preview_quiz_button').attr('href'));
+    });
+
     function ensureStudentsLoaded(callback) {
       if ($('#quiz_details').length) {
         return callback();

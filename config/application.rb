@@ -192,6 +192,7 @@ module CanvasRails
       tag:ruby.yaml.org,2002:object:URI::HTTP
       tag:ruby.yaml.org,2002:object:URI::HTTPS
       tag:ruby.yaml.org,2002:object:OpenObject
+      tag:yaml.org,2002:map:WeakParameters
     ])
     YAML.whitelist.add('tag:ruby.yaml.org,2002:object:Class') { |classname| Canvas::Migration.valid_converter_classes.include?(classname) }
 
@@ -244,6 +245,11 @@ module CanvasRails
 
     config.before_initialize do
       config.action_controller.asset_host = Canvas::Cdn.method(:asset_host_for)
+    end
+
+    if config.action_dispatch.rack_cache != false
+      config.action_dispatch.rack_cache[:ignore_headers] =
+        %w[Set-Cookie X-Request-Context-Id X-Canvas-User-Id X-Canvas-Meta]
     end
   end
 end

@@ -34,11 +34,11 @@
       <% if @assignment.muted? %>
         <p style="width: 200px"><%= t(:student_mute_notification, "Grades are unavailable because the instructor is working on them.") %></p>
       <% end %>
-      <% if can_do(@submission, @current_user, :read_grade) && !@assignment.muted? %>
+      <% if @submission.user_can_read_grade?(@user, session) && !@assignment.muted? %>
         <%= before_label('grade', 'Grade') %>
           <% if can_do(@assignment, @current_user, :grade) %>
             <%= render :partial => "gradebooks/grading_box", :object => @assignment, :locals => {:submission => @submission} %>
-          <% elsif can_do(@submission, @current_user, :read_grade) %>
+          <% elsif @submission.user_can_read_grade?(@user, session) %>
             <span class="published_grade">
               <% if @submission.excused? %>
                 <%= t "Excused" %>
@@ -50,7 +50,7 @@
           <br/>
         <% if can_do(@assignment, @current_user, :grade) %>
                <span class="published_score" style="<%= hidden if @assignment.grading_type == 'points' %>"><% if @submission.published_score? %><%= @submission.published_score.round(2)%><% end %></span>
-        <% elsif can_do(@submission, @current_user, :read_grade) %>
+        <% elsif @submission.user_can_read_grade?(@user, session) %>
           <span class="score" style="<%= hidden if @assignment.grading_type == 'points' %>"><% if @submission.score? %><%=@submission.score.round(2) %><% end %></span>
         <% end %>
         <% if @submission.assignment.points_possible %>
@@ -67,7 +67,7 @@
           <% end %>
         <% end %>
       <% end %>
-      <% if @rubric_association && (can_do(@submission, @current_user, :read_grade) || can_do(@rubric_association, @current_user, :assess)) %>
+      <% if @rubric_association && (@submission.user_can_read_grade?(@user, session) || can_do(@rubric_association, @current_user, :assess)) %>
         <a href="#" class="assess_submission_link rubric" style="font-size: 0.8em;" tabindex='0'><%= t('show_rubric', 'Show Rubric') %></a>
       <% end %>
     </div>
@@ -164,7 +164,7 @@
         <div class="comments" style="border-left: 2px solid #ccc; height: 300px; overflow: auto; background-color: #f0f0f0;">
           <button type="button" class="btn button-secondary cancel_comment_button" style="display: none; float: right; margin-right:0 !important;"><%= image_tag("delete_circle.png") %></button>
           <div class="comment_list" aria-live="polite" style="padding: 10px; clear:right;">
-            <% unless can_do(@submission, @current_user, :read_grade) %>
+            <% unless @submission.user_can_read_grade?(@user, session) %>
               <% if @assignment.muted? %>
                 <i><%= t('only_see_your_own_comments_muted', "You may not see all comments right now because the assignment is currently being graded") %></i>
               <% else %>

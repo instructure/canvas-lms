@@ -85,7 +85,7 @@ module AccountReports
           headers << I18n.t('#account_reports.report_header_status', 'status')
         end
         csv << headers
-        users = root_account.pseudonyms.except(:includes).joins(:user).select(
+        users = root_account.pseudonyms.except(:preload).joins(:user).select(
           "pseudonyms.id, pseudonyms.sis_user_id, pseudonyms.user_id,
            pseudonyms.unique_id, pseudonyms.workflow_state, users.sortable_name,
            users.updated_at AS user_updated_at, users.name, users.short_name").
@@ -259,7 +259,7 @@ module AccountReports
         end
 
         csv << headers
-        courses = root_account.all_courses.includes(:account, :enrollment_term)
+        courses = root_account.all_courses.preload(:account, :enrollment_term)
         courses = courses.where("courses.sis_source_id IS NOT NULL") if @sis_format
 
         if @include_deleted
@@ -431,6 +431,7 @@ module AccountReports
                        WHEN enrollments.workflow_state = 'creation_pending' THEN 'invited'
                        WHEN enrollments.workflow_state = 'active' THEN 'active'
                        WHEN enrollments.workflow_state = 'completed' THEN 'concluded'
+                       WHEN enrollments.workflow_state = 'inactive' THEN 'inactive'
                        WHEN enrollments.workflow_state = 'deleted' THEN 'deleted'
                        WHEN enrollments.workflow_state = 'rejected' THEN 'rejected' END AS enroll_state").
           joins("INNER JOIN #{CourseSection.quoted_table_name} cs ON cs.id = enrollments.course_section_id

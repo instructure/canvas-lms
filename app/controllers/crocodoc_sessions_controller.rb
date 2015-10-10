@@ -33,7 +33,8 @@ class CrocodocSessionsController < ApplicationController
 
       crocodoc = attachment.crocodoc_document
       url = crocodoc.session_url(:user => @current_user,
-                                 :annotations => annotations)
+                                 :annotations => annotations,
+                                 :crocodoc_ids => blob["crocodoc_ids"])
       redirect_to url
     else
       render :text => "Not found", :status => :not_found

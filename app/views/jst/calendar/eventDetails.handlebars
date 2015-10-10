@@ -71,6 +71,27 @@
           <td>{{availableSlotsText}}</td>
         </tr>
       {{/if}}
+      {{#if reserve_comments}}
+        <tr>
+          <th scope="row">{{#t}}Comments{{/t}}</th>
+          <td>{{reserve_comments}}</td>
+        </tr>
+      {{else}}
+        {{#if reservations}}
+          <tr>
+            <th scope="row">{{#t}}Comments{{/t}}</th>
+            <td>
+              <ul>
+                {{#each reservations}}
+                  {{#if comments}}
+                    <li><em>{{name}}</em>: {{comments}}</li>
+                  {{/if}}
+                {{/each}}
+              </ul>
+            </td>
+          </tr>
+        {{/if}}
+      {{/if}}
     </table>
     <div class="details_description lock_explanation">{{{lock_explanation}}}</div>
     {{#if available_slots_text}}
@@ -90,6 +111,10 @@
     </div>
     <div class="event-details-links">
       {{#if can_reserve }}
+        <p>
+          <label for="appointment-comment"><b>{{#t}}Comments{{/t}}</b></label><br />
+          <textarea id="appointment-comment" maxlength="255" name="appointment-comment"/>
+        </p>
         <a href="#" class="reserve_event_link"><strong>{{#t "links.reserve"}}Reserve{{/t}}</strong></a>
       {{/if}}
       {{#if can_unreserve }}

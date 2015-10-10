@@ -38,6 +38,13 @@ describe "people" do
     @course.reload
   end
 
+  def enroll_ta(ta)
+    e1 = @course.enroll_ta(ta)
+    e1.workflow_state = 'active'
+    e1.save!
+    @course.reload
+  end
+
   def create_user(student_name)
     user = User.create!(:name => student_name)
     user.register!
@@ -92,6 +99,8 @@ describe "people" do
       #observer user
       @test_observer = create_user('observer@test.com')
 
+      enroll_ta(@test_ta)
+
       get "/courses/#{@course.id}/users"
       wait_for_ajaximations
     end
@@ -106,6 +115,10 @@ describe "people" do
 
     it "should display the option to remove a student from a course if manually enrolled" do
       open_dropdown_menu(option: 'removeFromCourse')
+    end
+
+    it "should display the option to remove a ta from the course" do
+      open_dropdown_menu(option: 'removeFromCourse', selector: '.rosterUser:nth-child(3)')
     end
 
     it "should display activity report on clicking Student Interaction button", priority: "1", test_id: 244446 do

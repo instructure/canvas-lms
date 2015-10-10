@@ -2,7 +2,7 @@ define [
   'jquery'
   'underscore'
   'react'
-  'compiled/react_files/components/UsageRightsSelectBox'
+  'jsx/files/UsageRightsSelectBox'
   ], ($, _, React, UsageRightsSelectBox ) ->
 
     UsageRightsSelectBox = React.createFactory(UsageRightsSelectBox)
@@ -28,9 +28,9 @@ define [
 
       server.respond 'GET', "", [200, {
         'Content-Type': 'application/json'
-      }, JSON.stringify({dataHere: "catfish"})]
+      }, JSON.stringify([{id: 'cc_some_option', name: 'CreativeCommonsOption' }])]
 
-      equal uRSB.state.licenseOptions.dataHere, "catfish", 'sets data just fine'
+      equal uRSB.state.licenseOptions[0].id, "cc_some_option", 'sets data just fine'
 
       server.restore()
       React.unmountComponentAtNode(uRSB.getDOMNode().parentNode)
@@ -57,9 +57,9 @@ define [
       uRSB = TestUtils.renderIntoDocument(UsageRightsSelectBox(props))
       server.respond 'GET', "", [200, {
         'Content-Type': 'application/json'
-      }, JSON.stringify([{id: ['cc'], name: 'CreativeCommonsOption' }])]
+      }, JSON.stringify([{id: 'cc_some_option', name: 'CreativeCommonsOption' }])]
 
-      equal uRSB.refs.creativeCommons.getDOMNode().value, "cc", "shows creative commons option"
+      equal uRSB.refs.creativeCommons.getDOMNode().value, "cc_some_option", "shows creative commons option"
 
       server.restore()
       React.unmountComponentAtNode(uRSB.getDOMNode().parentNode)

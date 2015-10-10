@@ -33,6 +33,7 @@ describe 'CrocodocDocument' do
     before :once do
       teacher_in_course(:active_all => true)
       student_in_course
+      ta_in_course
       @submitter = @student
       student_in_course
       @other_student = @student
@@ -49,6 +50,14 @@ describe 'CrocodocDocument' do
     it "should let the teacher view all annotations" do
       expect(@crocodoc.permissions_for_user(@teacher)).to eq({
         :filter => 'all',
+        :admin => true,
+        :editable => true,
+      })
+    end
+
+    it "should only include ids specified in the whitelist" do
+      expect(@crocodoc.permissions_for_user(@teacher, [@teacher.crocodoc_id!, @submitter.crocodoc_id!])).to eq({
+        :filter => "#{@teacher.crocodoc_id!},#{@submitter.crocodoc_id!}",
         :admin => true,
         :editable => true,
       })

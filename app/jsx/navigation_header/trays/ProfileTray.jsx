@@ -24,27 +24,30 @@ define([
             </button>
           </div>
           <ul className="ReactTray__link-list">
-            <li>
-              <a href="/profile">{I18n.t('Profile')}</a>
+            <li className="ReactTray-list-item">
+              <a href="/profile" className="ReactTray-list-item__link">{I18n.t('Profile')}</a>
             </li>
-            <li>
-              <a href="/profile/settings">{I18n.t('Settings')}</a>
+            <li className="ReactTray-list-item">
+              <a href="/profile/settings" className="ReactTray-list-item__link">{I18n.t('Settings')}</a>
             </li>
-            <li>
-              <a href="/profile/communication">{I18n.t('Notifications')}</a>
+            <li className="ReactTray-list-item">
+              <a href="/profile/communication" className="ReactTray-list-item__link">{I18n.t('Notifications')}</a>
             </li>
-            <li>
-              <a href="/files">{I18n.t('Files')}</a>
+            <li className="ReactTray-list-item">
+              <a href="/files" className="ReactTray-list-item__link">{I18n.t('Files')}</a>
             </li>
-            <li>
-              <a href="/dashboard/eportfolios">{I18n.t('ePortfolios')}</a>
+            <li className="ReactTray-list-item">
+              <a href="/dashboard/eportfolios" className="ReactTray-list-item__link">{I18n.t('ePortfolios')}</a>
             </li>
-            <li className="ReactTray__feature-list-item">
+            <li className="ReactTray-list-item ReactTray-list-item--feature-item">
               <form ref="logoutForm" action="/logout" method="post">
                 <input name="utf8" value="✓" type="hidden"/>
                 <input name="_method" value="delete" type="hidden"/>
                 <input name="authenticity_token" value={$.cookie('_csrf_token')} type="hidden"/>
-                <a href="/logout" onClick={PreventDefault(() => this.refs.logoutForm.getDOMNode().submit())}>
+                <a 
+                  href="/logout"
+                  className="ReactTray-list-item__link"
+                  onClick={PreventDefault(() => this.refs.logoutForm.getDOMNode().submit())}>
                   <i className="icon-off"></i>
                   {I18n.t('Logout')}
                 </a>

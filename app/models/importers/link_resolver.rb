@@ -105,11 +105,18 @@ module Importers
     end
 
     def resolve_relative_file_url(rel_path)
-      new_url = nil
       split = rel_path.split('?')
       qs = split.pop if split.length > 1
-      rel_path = split.join('?')
+      path = split.join('?')
 
+      # since we can't be sure whether a ? is part of a filename or query string, try it both ways
+      new_url = resolve_relative_file_url_with_qs(path, qs)
+      new_url ||= resolve_relative_file_url_with_qs(rel_path, '') if qs.present?
+      new_url
+    end
+
+    def resolve_relative_file_url_with_qs(rel_path, qs)
+      new_url = nil
       rel_path_parts = Pathname.new(rel_path).each_filename.to_a
 
       # e.g. start with "a/b/c.txt" then try "b/c.txt" then try "c.txt"

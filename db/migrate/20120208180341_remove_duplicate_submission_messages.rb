@@ -7,7 +7,7 @@ class RemoveDuplicateSubmissionMessages < ActiveRecord::Migration
       asset_id IS NOT NULL
       AND id NOT IN (
         SELECT MIN(id)
-        FROM conversation_messages
+        FROM #{ConversationMessage.quoted_table_name}
         WHERE asset_id IS NOT NULL
         GROUP BY conversation_id, asset_id
       )

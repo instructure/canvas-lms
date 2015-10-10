@@ -1,6 +1,6 @@
 module DatesOverridable
   attr_accessor :applied_overrides, :overridden_for_user, :overridden,
-    :has_no_overrides
+    :has_no_overrides, :preloaded_override_students
   attr_writer :without_overrides
   include DifferentiableAssignment
 

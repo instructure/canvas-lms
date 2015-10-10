@@ -62,6 +62,44 @@ class CommunicationChannel < ActiveRecord::Base
 
   RETIRE_THRESHOLD = 3
 
+  # TODO: Will need to be internationalized. Also, do we want to allow this to be specified in a config file?
+  def self.country_codes
+    # [country code, name, true if email should be used instead of Twilio]
+    @country_codes ||= [
+      ['54', 'Argentina', false],
+      ['61', 'Australia', false],
+      ['32', 'Belgium', false],
+      ['55', 'Brazil', false],
+      ['1', 'Canada', false],
+      ['56', 'Chile', false],
+      ['57', 'Colombia', false],
+      ['45', 'Denmark', false],
+      ['358', 'Finland', false],
+      ['49', 'Germany', false],
+      ['504', 'Honduras', false],
+      ['852', 'Hong Kong', false],
+      ['353', 'Ireland', false],
+      ['352', 'Luxembourg', false],
+      ['60', 'Malaysia', false],
+      ['52', 'Mexico', false],
+      ['31', 'Netherlands', false],
+      ['64', 'New Zealand', false],
+      ['47', 'Norway', false],
+      ['507', 'Panama', false],
+      ['51', 'Peru', false],
+      ['63', 'Philippines', false],
+      ['974', 'Qatar', false],
+      ['966', 'Saudi Arabia', false],
+      ['65', 'Singapore', false],
+      ['34', 'Spain', false],
+      ['46', 'Sweden', false],
+      ['41', 'Switzerland', false],
+      ['971', 'United Arab Emirates', false],
+      ['44', 'United Kingdom', false],
+      ['1', 'United States', true]
+    ]
+  end
+
   def self.sms_carriers
     @sms_carriers ||= Canvas::ICU.collate_by((ConfigFile.load('sms', false) ||
         { 'AT&T' => 'txt.att.net',
@@ -228,7 +266,7 @@ class CommunicationChannel < ActiveRecord::Base
     when User
       where(:user_id => context)
     when Notification
-      includes(:notification_policies).where(:notification_policies => { :notification_id => context })
+      eager_load(:notification_policies).where(:notification_policies => { :notification_id => context })
     else
       scoped
     end
@@ -271,7 +309,7 @@ class CommunicationChannel < ActiveRecord::Base
       order("#{self.rank_sql(rank_order, 'communication_channels.path_type')} ASC, communication_channels.position asc").to_a
   end
 
-  scope :include_policies, -> { includes(:notification_policies) }
+  scope :include_policies, -> { preload(:notification_policies) }
 
   scope :in_state, lambda { |state| where(:workflow_state => state.to_s) }
   scope :of_type, lambda { |type| where(:path_type => type) }
@@ -350,13 +388,14 @@ class CommunicationChannel < ActiveRecord::Base
   end
 
   def merge_candidates(break_on_first_found = false)
+    return [] if path_type == 'push'
     shards = self.class.associated_shards(self.path) if Enrollment.cross_shard_invitations?
     shards ||= [self.shard]
     scope = CommunicationChannel.active.by_path(self.path).of_type(self.path_type)
     merge_candidates = {}
     Shard.with_each_shard(shards) do
       scope = scope.shard(Shard.current)
-      scope.where("user_id<>?", self.user_id).includes(:user).map(&:user).select do |u|
+      scope.where("user_id<>?", self.user_id).preload(:user).map(&:user).select do |u|
         result = merge_candidates.fetch(u.global_id) do
           merge_candidates[u.global_id] = (u.all_active_pseudonyms.length != 0)
         end

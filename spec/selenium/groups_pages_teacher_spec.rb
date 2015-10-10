@@ -111,6 +111,18 @@ describe "groups" do
         expect_new_page_load { f('.discussion-title').click }
         expect(f('.message.user_content')).to include_text(dt.message)
       end
+
+      it "should allow teachers to delete their group discussions", priority: "1", test_id: 329627 do
+        DiscussionTopic.create!(context: @testgroup.first, user: @teacher,
+                                title: 'Group Discussion', message: 'Group')
+        get discussions_page
+        f('.al-trigger-gray').click
+        wait_for_ajaximations
+        f('.icon-trash.ui-corner-all').click
+        driver.switch_to.alert.accept
+        wait_for_animations
+        expect(fln('Group Discussion')).to be_nil
+      end
     end
 
     #-------------------------------------------------------------------------------------------------------------------

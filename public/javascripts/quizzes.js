@@ -3871,7 +3871,7 @@ define([
       var val = (Math.random() * data.range) + data.min;
       val = Math.round(val * data.rounder) / (data.rounder);
       $variable.attr('data-value', val);
-      if (!options || options.template) {
+      if (!options || options.template || options.recompute) {
         $variable.find(".value").text(val);
       }
       if (!options || options.recompute) {

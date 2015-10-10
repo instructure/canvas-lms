@@ -42,6 +42,7 @@ class DeveloperKeysController < ApplicationController
   end
 
   def update
+    @key.process_event!(params[:developer_key].delete(:event)) if params[:developer_key].key?(:event)
     @key.attributes = params[:developer_key]
     if @key.save
       render :json => developer_key_json(@key, @current_user, session, account_context)
@@ -63,15 +64,15 @@ class DeveloperKeysController < ApplicationController
 
   private
   def set_key
-    @key = DeveloperKey.find(params[:id])
+    @key = DeveloperKey.nondeleted.find(params[:id])
   end
 
   def set_keys
     if params[:account_id]
-      @keys = @context.developer_keys.preload(:account).order("id DESC")
+      @keys = @context.developer_keys.nondeleted.preload(:account).order("id DESC")
     else
       set_site_admin_context
-      @keys = DeveloperKey.preload(:account).order("id DESC")
+      @keys = DeveloperKey.nondeleted.preload(:account).order("id DESC")
     end
   end
 

@@ -136,6 +136,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
       s.submission_data.each do |a|
         q_id = a[:question_id]
         a[:user_id] = s.user_id || s.temporary_user_code
+        a[:user_name] = s.user.name
         responses_for_question[q_id] ||= []
         responses_for_question[q_id] << a
       end
@@ -322,7 +323,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
   end
 
   def prep_submissions(submissions)
-    subs = submissions.includes(:versions).map do |qs|
+    subs = submissions.preload(:versions).map do |qs|
       includes_all_versions? ? qs.attempts.version_models : qs.attempts.kept
     end
     subs = subs.flatten.compact.select do |s|

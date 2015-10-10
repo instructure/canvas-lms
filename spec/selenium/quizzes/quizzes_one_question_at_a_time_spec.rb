@@ -127,12 +127,18 @@ describe 'taking a quiz one question at a time' do
         @quiz.update_attribute(:cant_go_back, true)
         preview_the_quiz
       end
-
+      
       it 'prevents going back to previous questions', priority: "1", test_id: 209374 do
+        it_should_show_cant_go_back_warning
+        accept_cant_go_back_warning
+
         check_if_cant_go_back
       end
 
       it 'saves answers to questions', priority: "1", test_id: 209375 do
+        it_should_show_cant_go_back_warning
+        accept_cant_go_back_warning
+
         answers_flow
       end
     end

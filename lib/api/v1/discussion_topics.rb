@@ -42,6 +42,7 @@ module Api::V1::DiscussionTopics
   #
   # Returns an array of hashes.
   def discussion_topics_api_json(topics, context, user, session, opts={})
+    DiscussionTopic.preload_can_unpublish(context, topics)
     topics.inject([]) do |result, topic|
       if topic.visible_for?(user)
         result << discussion_topic_api_json(topic, context, user, session, opts)
@@ -111,7 +112,7 @@ module Api::V1::DiscussionTopics
       locked: topic.locked?, can_lock: topic.can_lock?,
       author: user_display_json(topic.user, topic.context),
       html_url: html_url, url: html_url, pinned: !!topic.pinned,
-      group_category_id: topic.group_category_id, can_group: topic.can_group? }
+      group_category_id: topic.group_category_id, can_group: topic.can_group?(opts) }
     unless opts[:exclude_messages]
       if opts[:plain_messages]
         fields[:message] = topic.message # used for searching by body on index

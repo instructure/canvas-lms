@@ -1035,7 +1035,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     can :view_answer_audits
   end
 
-  scope :include_assignment, -> { includes(:assignment) }
+  scope :include_assignment, -> { preload(:assignment) }
   scope :before, lambda { |date| where("quizzes.created_at<?", date) }
   scope :active, -> { where("quizzes.workflow_state<>'deleted'") }
   scope :not_for_assignment, -> { where(:assignment_id => nil) }
@@ -1210,7 +1210,8 @@ class Quizzes::Quiz < ActiveRecord::Base
   def current_regrade
     Quizzes::QuizRegrade.where(quiz_id: id, quiz_version: version_number).
       where("quiz_question_regrades.regrade_option != 'disabled'").
-      includes(:quiz_question_regrades => :quiz_question).first
+      eager_load(:quiz_question_regrades).
+      preload(quiz_question_regrades: :quiz_question).first
   end
 
   def current_quiz_question_regrades
@@ -1220,7 +1221,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   def questions_regraded_since(created_at)
     question_regrades = Set.new
     quiz_regrades.where("quiz_regrades.created_at > ? AND quiz_question_regrades.regrade_option != 'disabled'", created_at)
-                 .includes(:quiz_question_regrades).each do |regrade|
+                 .eager_load(:quiz_question_regrades).each do |regrade|
       ids = regrade.quiz_question_regrades.map { |qqr| qqr.quiz_question_id }
       question_regrades.merge(ids)
     end
