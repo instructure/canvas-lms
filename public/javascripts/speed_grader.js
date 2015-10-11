@@ -1613,6 +1613,7 @@ define([
       }
 
       $.extend(true, student.submission, submission);
+      student.submission_state = submissionState(student);
       return student;
     },
 
