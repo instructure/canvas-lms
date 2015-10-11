@@ -1435,8 +1435,6 @@ class Assignment < ActiveRecord::Base
 
     enrollment_types_by_id = enrollments.inject({}){ |h, e| h[e.user_id] ||= e.type; h }
 
-    crocodoc_user_id = is_provisional && user.crocodoc_id!
-
     res[:submissions] = submissions.map do |sub|
       json = sub.as_json(:include_root => false,
         :methods => [:submission_history, :late],
@@ -1458,6 +1456,12 @@ class Assignment < ActiveRecord::Base
 
       sub_attachments = []
 
+      crocodoc_user_ids = if is_provisional
+        [sub.user.crocodoc_id!, user.crocodoc_id!]
+      else
+        sub.crocodoc_whitelist
+      end
+
       json['submission_history'] = if json['submission_history'] && (quiz.nil? || too_many)
                                      json['submission_history'].map do |version|
                                        version.as_json(
@@ -1474,7 +1478,7 @@ class Assignment < ActiveRecord::Base
                                                :methods => [:view_inline_ping_url]
                                              ).tap { |json|
                                                json[:attachment][:canvadoc_url] = a.canvadoc_url(user)
-                                               json[:attachment][:crocodoc_url] =  a.crocodoc_url(user, [crocodoc_user_id])
+                                               json[:attachment][:crocodoc_url] =  a.crocodoc_url(user, crocodoc_user_ids)
                                                json[:attachment][:submitted_to_crocodoc] = a.crocodoc_document.present?
                                              }
                                            end
@@ -1505,13 +1509,7 @@ class Assignment < ActiveRecord::Base
                 as_json(:methods => [:assessor_name], :include_root => false)
 
               json[:selected] = !!(selection && selection.selected_provisional_grade_id == pg.id)
-
-              crocodoc_urls = []
-              sub_attachments.each do |a|
-                crocodoc_urls << {:attachment_id => a.id,
-                  :crocodoc_url => a.crocodoc_available? && a.crocodoc_url(user, [pg.scorer.crocodoc_id!]) }
-              end
-              json[:crocodoc_urls] = crocodoc_urls
+              json[:crocodoc_urls] = sub_attachments.map { |a| pg.crocodoc_attachment_info(user, a) }
               json[:readonly] = !pg.final && (pg.scorer_id != user.id)
               json[:submission_comments] = pg.submission_comments.as_json(:include_root => false,
                                                                           :methods => avatar_methods,

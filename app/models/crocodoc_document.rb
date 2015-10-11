@@ -114,7 +114,31 @@ class CrocodocDocument < ActiveRecord::Base
       opts[:filter] = 'none'
     end
 
+    apply_whitelist(user, opts, whitelist) if whitelist
+
     opts
+  end
+
+  def apply_whitelist(user, opts, whitelist)
+    whitelisted_users = case opts[:filter]
+    when 'all'
+      whitelist
+    when 'none'
+      []
+    else
+      opts[:filter].to_s.split(',').map(&:to_i) & whitelist
+    end
+
+    unless whitelisted_users.include?(user.crocodoc_id!)
+      opts[:admin] = false
+      opts[:editable] = false
+    end
+
+    opts[:filter] = if whitelisted_users.empty?
+      'none'
+    else
+      whitelisted_users.join(',')
+    end
   end
 
   def available?

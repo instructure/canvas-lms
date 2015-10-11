@@ -953,7 +953,7 @@ class Submission < ActiveRecord::Base
     pg ||= ModeratedGrading::NullProvisionalGrade.new(scorer.id, final)
   end
 
-  def find_or_create_provisional_grade!(scorer:, score: nil, grade: nil, force_save: false, final: false)
+  def find_or_create_provisional_grade!(scorer:, score: nil, grade: nil, force_save: false, final: false, source_provisional_grade: nil)
     ModeratedGrading::ProvisionalGrade.unique_constraint_retry do
       if final && !self.assignment.context.grants_right?(scorer, :moderate_grades)
         raise Assignment::GradeError.new("User not authorized to give final provisional grades")
@@ -974,8 +974,33 @@ class Submission < ActiveRecord::Base
       pg.grade = grade if grade
       pg.score = score if score
       pg.force_save = force_save
+      pg.source_provisional_grade = source_provisional_grade
       pg.save! if force_save || pg.new_record? || pg.changed?
       pg
+    end
+  end
+
+  def crocodoc_whitelist
+    if assignment.moderated_grading?
+      if assignment.grades_published?
+        sel = assignment.moderated_grading_selections.where(student_id: self.user).first
+        if sel && (pg = sel.provisional_grade)
+          # include the student, the final grader, and the source grader (if a moderator copied a mark)
+          annotators = [self.user, pg.scorer]
+          annotators << pg.source_provisional_grade.scorer if pg.source_provisional_grade
+          annotators.map(&:crocodoc_id!)
+        else
+          # student not in moderation set: no filter
+          nil
+        end
+      else
+        # grades not yet published: students see only their own annotations
+        # (speedgrader overrides this for provisional graders)
+        [self.user.crocodoc_id!]
+      end
+    else
+      # not a moderated assignment: no filter
+      nil
     end
   end
 

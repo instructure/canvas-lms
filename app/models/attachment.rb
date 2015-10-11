@@ -1467,12 +1467,13 @@ class Attachment < ActiveRecord::Base
   end
 
   def preview_params(user, type, crocodoc_ids = nil)
-    blob = {
+    h = {
       user_id: user.try(:global_id),
       attachment_id: id,
-      type: type,
-      crocodoc_ids: crocodoc_ids
-    }.to_json
+      type: type
+    }
+    h.merge!(crocodoc_ids: crocodoc_ids) if crocodoc_ids.present?
+    blob = h.to_json
     hmac = Canvas::Security.hmac_sha1(blob)
     "blob=#{URI.encode blob}&hmac=#{URI.encode hmac}"
   end

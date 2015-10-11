@@ -1470,4 +1470,12 @@ describe Attachment do
     end
   end
 
+  describe "preview_params" do
+    it "includes crocodoc_ids only when a whitelist is given" do
+      course :active_all => true
+      att = attachment_model
+      expect(att.send :preview_params, @teacher, 'document/msword').not_to include 'crocodoc_ids'
+      expect(att.send :preview_params, @teacher, 'document/msword', [1]).to include 'crocodoc_ids'
+    end
+  end
 end

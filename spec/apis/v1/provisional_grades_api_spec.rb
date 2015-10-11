@@ -146,6 +146,7 @@ describe 'Provisional Grades API', type: :request do
 
       expect(json['score']).to eq 80
       expect(json['submission_comments'].first['comment']).to eq 'huttah!'
+      expect(json['crocodoc_urls']).to eq([])
     end
   end
 

@@ -128,9 +128,7 @@ class SubmissionsController < ApplicationController
     @submission = @assignment.submissions.where(user_id: @user).first
     @submission ||= @assignment.submissions.build(:user => @user)
     if @context.feature_enabled?(:moderated_grading) && @assignment.moderated_grading?
-      student   = User.where(id: @submission.user_id).first
-      grader = User.where(id: @submission.grader_id).first
-      @crocodoc_ids = [student, grader].compact.map(&:crocodoc_id!)
+      @crocodoc_ids = @submission.crocodoc_whitelist
     end
     @rubric_association = @assignment.rubric_association
     @rubric_association.assessing_user_id = @submission.user_id if @rubric_association
