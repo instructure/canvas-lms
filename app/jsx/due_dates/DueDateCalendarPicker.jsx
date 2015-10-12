@@ -3,11 +3,13 @@ define([
   'react',
   'jsx/due_dates/DueDateTokenWrapper',
   'jsx/due_dates/DueDateCalendarPicker',
+  'jsx/shared/helpers/accessibleDateFormat',
   'timezone',
   'i18n!assignments',
   'jquery',
   'jquery.instructure_forms'
-], (_, React, DueDateTokenWrapper, DueDateCalendarPicker, tz, I18n, $) => {
+], (_, React, DueDateTokenWrapper, DueDateCalendarPicker, accessibleDateFormat,
+    tz, I18n, $) => {
 
   var cx = React.addons.classSet;
   var DueDateCalendarPicker = React.createClass({
@@ -79,6 +81,8 @@ define([
         <div ref="datePickerWrapper" className={this.wrapperClassName()}>
           <input type            = "text"
                  ref             = "dateInput"
+                 title           = {accessibleDateFormat()}
+                 data-tooltip    = ""
                  className       = {this.inputClasses()}
                  aria-labelledby = {this.props.labelledBy}
                  data-row-key    = {this.props.rowKey}
