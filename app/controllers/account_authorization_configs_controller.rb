@@ -282,6 +282,11 @@ class AccountAuthorizationConfigsController < ApplicationController
   #   The Google application's Client Secret. Not available if configured
   #   globally for Canvas.
   #
+  # - hosted_domain [Optional]
+  #
+  #   A Google Apps domain to restrict logins to. See
+  #   https://developers.google.com/identity/protocols/OpenIDConnect?hl=en#hd-param
+  #
   # - login_attribute [Optional]
   #
   #   The attribute to use to look up the user's login in Canvas. Either

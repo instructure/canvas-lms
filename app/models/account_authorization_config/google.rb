@@ -21,12 +21,25 @@ class AccountAuthorizationConfig::Google < AccountAuthorizationConfig::OpenIDCon
   self.plugin = :google_drive
   plugin_settings :client_id, client_secret: :client_secret_dec
 
+  def self.singleton?
+    false
+  end
+
   def login_button?
     true
   end
 
   def self.recognized_params
-    [ :login_attribute, :jit_provisioning ].freeze
+    [ :login_attribute, :jit_provisioning, :hosted_domain ].freeze
+  end
+
+  # Rename db field
+  def hosted_domain=(val)
+    self.auth_filter = val.presence
+  end
+
+  def hosted_domain
+    auth_filter
   end
 
   def self.login_attributes
@@ -34,10 +47,27 @@ class AccountAuthorizationConfig::Google < AccountAuthorizationConfig::OpenIDCon
   end
   validates :login_attribute, inclusion: login_attributes
 
+  def unique_id(token)
+    id_token = JWT.decode(token.params['id_token'], nil, false).first
+    if hosted_domain && id_token['hd'] != hosted_domain
+      # didn't make a "nice" exception for this, cause it should never happen.
+      # either we got MITM'ed (on the server side), or Google's docs lied;
+      # this check is just an extra precaution
+      raise "Non-matching hosted domain: #{id_token['hd'].inspect}"
+    end
+    super
+  end
+
   protected
 
+  def authorize_options
+    result = { scope: scope_for_options }
+    result[:hd] = hosted_domain if hosted_domain
+    result
+  end
+
   def scope
-    'email'.freeze if login_attribute == 'email'.freeze
+    'email'.freeze if login_attribute == 'email'.freeze || hosted_domain
   end
 
   def authorize_url
