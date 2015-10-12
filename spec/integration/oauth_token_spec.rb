@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
 
 %w{ Twitter GoogleDocs LinkedIn }.each do |integration|
 describe integration do
@@ -60,6 +60,21 @@ describe integration do
     expect(oreq.secret).to eq "test_secret"
     expect(oreq.user).to eq @user
     expect(oreq.return_url).to eq user_profile_url(@user)
+  end
+
+  context "cross-shard" do
+    specs_require_sharding
+
+    it "should work for cross-shard users" do
+      @shard1.activate do
+        user
+      end
+      user_session(@user)
+
+      oauth_start(integration)
+      expect(response).to redirect_to("http://oauth.example.com/start")
+      expect(OauthRequest.last.user).to eq @user
+    end
   end
 
   describe "oauth_success" do

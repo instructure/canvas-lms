@@ -20,6 +20,14 @@ class OauthRequest < ActiveRecord::Base
   belongs_to :user
 
   attr_accessible :service, :token, :secret, :user_secret, :return_url, :user, :original_host_with_port
-  
+
+  before_create :associate_user_with_shard
+
+  def associate_user_with_shard
+    if self.user
+      self.user.associate_with_shard(self.shard, :shadow)
+    end
+  end
+
   def self.serialization_excludes; [:secret, :user_secret]; end
 end
