@@ -1720,14 +1720,7 @@ class ApplicationController < ActionController::Base
   end
   private :brand_config_for_account
 
-  def brand_config_includes
-    return {} unless @domain_root_account.allow_global_includes?
-    @brand_config_includes ||= BrandConfig::OVERRIDE_TYPES.each_with_object({}) do |override_type, hsh|
-      url = active_brand_config.presence.try(override_type)
-      hsh[override_type] = url if url.present?
-    end
-  end
-  helper_method :brand_config_includes
+
 
   def css_bundles
     @css_bundles ||= []
