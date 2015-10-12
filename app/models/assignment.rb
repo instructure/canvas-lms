@@ -1728,9 +1728,9 @@ class Assignment < ActiveRecord::Base
 
     # we track existing assessment requests, and the ones we create here, so
     # that we don't have to constantly re-query the db.
-    assessment_request_counts = {}
+    assessor_id_map = {}
     submissions.each do |s|
-      assessment_request_counts[s.id] = s.assessment_requests.size
+      assessor_id_map[s.id] = s.assessment_requests.map(&:assessor_asset_id)
     end
     res = []
 
@@ -1752,8 +1752,13 @@ class Assignment < ActiveRecord::Base
         candidate_set.include?(c.id)
       }.sort_by { |c|
         [
-          # prefer those who still need more reviews done.
-          assessment_request_counts[c.id] < self.peer_review_count ? CanvasSort::First : CanvasSort::Last,
+          # prefer those who need reviews done
+          assessor_id_map[c.id].count < self.peer_review_count ? CanvasSort::First : CanvasSort::Last,
+          # then prefer those who are not reviewing this submission
+          assessor_id_map[submission.id].include?(c.id) ? CanvasSort::Last : CanvasSort::First,
+          # then prefer those who need the most reviews done (that way we don't run the risk of
+          # getting stuck with a submission needing more reviews than there are available reviewers left)
+          assessor_id_map[c.id].count,
           # then prefer those who are assigned fewer reviews at this point --
           # this helps avoid loops where everybody is reviewing those who are
           # reviewing them, leaving the final assignee out in the cold.
@@ -1773,7 +1778,7 @@ class Assignment < ActiveRecord::Base
       assessees.each do |to_assess|
         # make the assignment
         res << to_assess.assign_assessor(submission)
-        assessment_request_counts[to_assess.id] += 1
+        assessor_id_map[to_assess.id] << submission.id
       end
     end
 

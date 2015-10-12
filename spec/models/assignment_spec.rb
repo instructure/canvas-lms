@@ -1087,21 +1087,21 @@ describe Assignment do
     it "should assign multiple peer reviews" do
       @a.reload
       @submissions = []
-      users = create_users_in_course(@course, 3.times.map{ |i| {name: "user #{i}"} }, return_type: :record)
+      users = create_users_in_course(@course, 30.times.map{ |i| {name: "user #{i}"} }, return_type: :record)
       users.each do |u|
         @submissions << @a.submit_homework(u, :submission_type => "online_url", :url => "http://www.google.com")
       end
-      @a.peer_review_count = 2
+      @a.peer_review_count = 5
       res = @a.assign_peer_reviews
-      expect(res.length).to eql(@submissions.length * 2)
+      expect(res.length).to eql(@submissions.length * @a.peer_review_count)
       @submissions.each do |s|
         assets = res.select{|a| a.asset == s}
-        expect(assets.length).to be > 0 #eql(2)
+        expect(assets.length).to eql(@a.peer_review_count)
         expect(assets.map{|a| a.assessor_id}.uniq.length).to eql(assets.length)
 
         assessors = res.select{|a| a.assessor_asset == s}
-        expect(assessors.length).to eql(2)
-        expect(assessors[0].asset_id).not_to eql(assessors[1].asset_id)
+        expect(assessors.length).to eql(@a.peer_review_count)
+        expect(assessors.map(&:asset_id).uniq.length).to eq @a.peer_review_count
       end
     end
 
