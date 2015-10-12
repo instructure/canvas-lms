@@ -5,17 +5,17 @@ define([
   './assignmentGradeCell'
 ], function (React, _, AssignmentGradeCell) {
 
-  const GRADEBOOK_CELL_CLASS = 'gradebook-cell',
-        ACTIVE_CLASS = ' active',
-        LATE_CLASS = ' late',
-        RESUBMIITED_CLASS = ' resubmitted',
-        ASSIGNMENT_TYPES = [
-          'percent',
-          'pass_fail',
-          'letter_grade',
-          'points',
-          'gpa_scale',
-        ];
+  var GRADEBOOK_CELL_CLASS = 'gradebook-cell',
+      ACTIVE_CLASS = ' active',
+      LATE_CLASS = ' late',
+      RESUBMIITED_CLASS = ' resubmitted',
+      ASSIGNMENT_TYPES = [
+        'percent',
+        'pass_fail',
+        'letter_grade',
+        'points',
+        'gpa_scale',
+      ];
 
   var GridCell = React.createClass({
     propTypes: {

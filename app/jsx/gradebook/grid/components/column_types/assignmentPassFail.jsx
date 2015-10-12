@@ -6,8 +6,8 @@ define([
   '../../actions/submissionsActions'
 ], function (React, _, GradeCellMixin, SubmissionsActions) {
 
-  const GRADEBOOK_CHECKBOX_CLASS = 'gradebook-checkbox';
-  const NEXT_GRADE_TYPE = {
+  var GRADEBOOK_CHECKBOX_CLASS = 'gradebook-checkbox';
+  var NEXT_GRADE_TYPE = {
     ''          : 'complete',
     'complete'  : 'incomplete',
     'incomplete': ''

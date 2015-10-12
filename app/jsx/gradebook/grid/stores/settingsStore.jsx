@@ -3,10 +3,10 @@ define([
   'jquery',
   '../actions/settingsActions'
 ], function (Reflux, $, SettingsActions) {
-  const MOUNT_ELEMENT = document.getElementById('gradebook-grid-wrapper'),
-        PADDING = 20,
-        TOOLBAR_HEIGHT = $('#gradebook-toolbar').height(),
-        TOOLBAR_OFFSET = $('#gradebook-toolbar').offset().top;
+  var MOUNT_ELEMENT = document.getElementById('gradebook-grid-wrapper'),
+      PADDING = 20,
+      TOOLBAR_HEIGHT = $('#gradebook-toolbar').height(),
+      TOOLBAR_OFFSET = $('#gradebook-toolbar').offset().top;
 
   var SettingsStore = Reflux.createStore({
     listenables: [SettingsActions],
