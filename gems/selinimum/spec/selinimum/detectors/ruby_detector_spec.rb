@@ -1,4 +1,4 @@
-require "spec_helper"
+require "selinimum/detectors/ruby_detector"
 
 describe Selinimum::Detectors::RubyDetector do
   describe "#can_process?" do

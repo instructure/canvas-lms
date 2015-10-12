@@ -28,6 +28,7 @@
     "qunitjs": "^1.14.0",
     "react-tools": "~0.13.3",
     "requirejs": "~2.1.10",
+    "sass-graph": "^2.0.1",
     "testem": "~0.7.1",
     "uglify-js": "~2.4.12",
     "vinyl-fs": "0.3.7",

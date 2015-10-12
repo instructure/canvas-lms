@@ -1,3 +1,7 @@
 require_relative "detectors/whitelist_detector"
 require_relative "detectors/ruby_detector"
 require_relative "detectors/js_detector"
+require_relative "detectors/jsx_detector"
+require_relative "detectors/css_detector"
+require_relative "detectors/coffee_detector"
+require_relative "detectors/handlebars_detector"
