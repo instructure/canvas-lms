@@ -1,5 +1,3 @@
-@import "base/environment";
-
 @if $use_new_styles {
   body {
     min-width: 0;
@@ -8,4 +6,8 @@
   #main {
     position: initial;
   }
+} @else {
+  /* this file is intentionally blank
+   * since we only need to do things here if
+   * new_styles is turned on */
 }
