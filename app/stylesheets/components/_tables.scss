@@ -247,14 +247,18 @@ $sp-table: 14px; // Will replace this with global spacing variable, when it hits
     &.ic-Table__row--bg-alert { background-color: $ic-bg-light-alert; }
     &.ic-Table__row--bg-danger { background-color: $ic-bg-light-danger; }
   }
-  
+
   th {
     border-bottom-color: $ic-border-dark;
     padding-bottom: $sp-table/2;
     font-weight: bold;
+    // If you need to use headers for the row in order to kick in the bold font for the first cell of the row
+    &.ic-Table--header-row {
+      border-bottom-color: $ic-border-light;
+    }
   }
-  
-  td { 
+
+  td {
     border-bottom-color: $ic-border-light;
     // If you need to add admin links to the far-right cell, enclose them in .ic-Table--actions
     .ic-Table__actions {
@@ -262,18 +266,18 @@ $sp-table: 14px; // Will replace this with global spacing variable, when it hits
       text-align: right;
     }
   }
-  
+
   &.ic-Table--condensed {
     th, td { padding: $sp-table/2; }
     th { padding-bottom: $sp-table/4; }
   }
-  
+
   &.ic-Table--striped {
     tbody {
       tr:nth-child(odd) { background-color: $ic-bg-light-neutral; }
     }
   }
-  
+
   &.ic-Table--hover-row {
     tbody {
       // High contrast UI uses left and right borders to show row hover state
@@ -285,7 +289,7 @@ $sp-table: 14px; // Will replace this with global spacing variable, when it hits
           &:hover { border-color: $ic-brand-primary; }
         }
       }
-      
+
       // Regular UI uses zebra stripes
       @else {
         tr { transition: background-color 0.3s; }
@@ -297,7 +301,7 @@ $sp-table: 14px; // Will replace this with global spacing variable, when it hits
           &:hover { background-color: $ic-bg-light-primary; }
         }
       }
-    
-    }  
+
+    }
   }
 }

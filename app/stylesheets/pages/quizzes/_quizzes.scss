@@ -118,22 +118,24 @@ li.quiz {
     }
   }
   .assignment_dates {
-    border-collapse: collapse;
-    width: 100%;
-    margin-bottom: 1em;
-    thead{
-      background-color: transparent;
-    }
-    tr {
-      th {
-        font-weight: bold;
-        font-size: 14px;
-        padding: 0.5em;
+    @if $use_new_styles == false {
+      border-collapse: collapse;
+      width: 100%;
+      margin-bottom: 1em;
+      thead{
+        background-color: transparent;
       }
-      td {
-        border-top: 1px solid #BBB;
-        border-bottom: 1px solid #BBB;
-        padding: 0.5em;
+      tr {
+        th {
+          font-weight: bold;
+          font-size: 14px;
+          padding: 0.5em;
+        }
+        td {
+          border-top: 1px solid #BBB;
+          border-bottom: 1px solid #BBB;
+          padding: 0.5em;
+        }
       }
     }
   }
@@ -2102,34 +2104,7 @@ ul#quiz_versions {
 #quiz-submission-version-table {
   margin: 30px 0 20px 0;
   @include clearfix;
-  .desc {
-    width: 22%;
-    float: left;
-    margin-right: 2%;
-    text-align: right;
-    font-size: 110%;
-    color: #555;
-  }
-  table {
-    width: 65%;
-    float: left;
-    margin-bottom: 10px;
-    border-color: #a7acb3;
-  }
-  td {
-    padding: 4px 8px;
-    border-color: #a7acb3;
-  }
-  thead td.regraded {
-    color: white;
-    background-color: #f89508;
-    text-shadow: 0 -1px 0 #cf9b47;
-    border-top: none;
-  }
-  td.regraded {
-    border-top: 1px solid #C4AE90;
-    background-color: $warningBackground;
-  }
+
   .submission-pending-review {
     width: 65%;
     float: left;
