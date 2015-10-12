@@ -1490,8 +1490,9 @@ class User < ActiveRecord::Base
         expecting_submission.
         where(:moderated_grading => true).
         where("assignments.grades_published_at IS NULL").
-        joins(:provisional_grades).uniq.
-        need_grading_info(opts[:limit])
+        joins(:provisional_grades).uniq.preload(:context).
+        need_grading_info(opts[:limit]).
+        select{|a| a.context.grants_right?(self, :moderate_grades)}
     end
   end
 

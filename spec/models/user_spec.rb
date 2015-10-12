@@ -2427,6 +2427,13 @@ describe User do
         assmt.update_attribute(:grades_published_at, Time.now.utc)
         expect(@teacher.assignments_needing_moderation.length).to eq 0 # should not count anymore once grades are published
       end
+
+      it "should not give a count for non-moderators" do
+        assmt = @course2.assignments.first
+        assmt.grade_student(@studentA, :grade => "1", :grader => @teacher, :provisional => true)
+        ta = ta_in_course(:course => @course, :active_all => true).user
+        expect(ta.assignments_needing_moderation.length).to eq 0
+      end
     end
   end
 
