@@ -4,18 +4,18 @@ define([
   'compiled/SubmissionDetailsDialog',
   'jsx/gradebook/grid/constants'
 ], function (React, SubmissionDetailsDialog, GradebookConstants) {
-  const GRADED = 'graded',
-        ICON_CLASS = 'icon-',
-        LATE_CLASS = 'late',
-        RESUBMITTED_CLASS = 'resubmiited',
-        SUBMISSION_TYPES = {
-          discussion_topic: 'discussion',
-          online_url: 'link',
-          online_text_entry: 'text',
-          online_upload: 'document',
-          online_quiz: 'quiz',
-          media_recording: 'media'
-        };
+  var GRADED = 'graded',
+      ICON_CLASS = 'icon-',
+      LATE_CLASS = 'late',
+      RESUBMITTED_CLASS = 'resubmiited',
+      SUBMISSION_TYPES = {
+        discussion_topic: 'discussion',
+        online_url: 'link',
+        online_text_entry: 'text',
+        online_upload: 'document',
+        online_quiz: 'quiz',
+        media_recording: 'media'
+      };
 
   var AssignmentGradeCell = React.createClass({
     propTypes: {

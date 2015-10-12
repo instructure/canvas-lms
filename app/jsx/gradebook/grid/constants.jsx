@@ -1,7 +1,7 @@
 define([
   'underscore'
 ], function (_) {
-  const GRADEBOOK_CONSTANTS = {
+  var GRADEBOOK_CONSTANTS = {
     STUDENT_COLUMN_ID: 'student',
     NOTES_COLUMN_ID: 'notes',
     PERCENT_COLUMN_ID: 'percent',
@@ -49,7 +49,7 @@ define([
     }
   };
 
-  const CONSTANTS = _.extend({}, GRADEBOOK_CONSTANTS, ENV.GRADEBOOK_OPTIONS);
+  var CONSTANTS = _.extend({}, GRADEBOOK_CONSTANTS, ENV.GRADEBOOK_OPTIONS);
 
   return CONSTANTS;
 });

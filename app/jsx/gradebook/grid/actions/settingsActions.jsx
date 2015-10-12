@@ -3,7 +3,7 @@ define([
   'jquery',
   'jsx/gradebook/grid/constants'
 ], function (Reflux, $, GradebookConstants) {
-  const SAVE_COLUMN_SIZE_URL = GradebookConstants.gradebook_column_size_settings_url;
+  var SAVE_COLUMN_SIZE_URL = GradebookConstants.gradebook_column_size_settings_url;
 
   var SettingsActions = Reflux.createActions([
     'resize',
