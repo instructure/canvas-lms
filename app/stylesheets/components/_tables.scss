@@ -268,8 +268,8 @@ $sp-table: 14px; // Will replace this with global spacing variable, when it hits
   }
 
   &.ic-Table--condensed {
-    th, td { padding: $sp-table/2; }
-    th { padding-bottom: $sp-table/4; }
+    td { padding: $sp-table/2; font-size: $baseFontSize - 2;}
+    th { padding: $sp-table/2; padding-bottom: $sp-table/4; }
   }
 
   &.ic-Table--striped {
