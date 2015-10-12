@@ -2,7 +2,7 @@ define([
   'bower/reflux/dist/reflux',
   'jquery'
 ], function (Reflux, $) {
-  const SAVE_COLUMN_SIZE_URL = ENV.GRADEBOOK_OPTIONS.gradebook_column_size_settings_url;
+  var SAVE_COLUMN_SIZE_URL = ENV.GRADEBOOK_OPTIONS.gradebook_column_size_settings_url;
 
   var SettingsActions = Reflux.createActions([
     'resize',
