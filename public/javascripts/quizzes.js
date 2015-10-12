@@ -654,12 +654,19 @@ define([
       result.textValues = ['answer_weight', 'answer_text', 'answer_comment', 'blank_id', 'id', 'match_id'];
       result.htmlValues = ['answer_html', 'answer_match_left_html', 'answer_comment_html'];
       result.question_type = question_type;
-      $formQuestion.find(".explanation").hide().filter("." + question_type + "_explanation").show();
+
+      var is_survey_quiz = $("#questions").hasClass('survey_quiz');
+      if (is_survey_quiz && $formQuestion.find("." + question_type + "_survey_quiz_explanation").length > 0) {
+        $formQuestion.find(".explanation").hide().filter("." + question_type + "_survey_quiz_explanation").show();
+      } else {
+        $formQuestion.find(".explanation").hide().filter("." + question_type + "_explanation").show();
+      }
+
       $formQuestion.attr('class', 'question').addClass('selectable');
       $formQuestion.find(".missing_word_after_answer").hide().end()
         .find(".matching_answer_incorrect_matches_holder").hide().end()
         .find(".question_comment").css('display', '').end();
-      if ($("#questions").hasClass('survey_quiz')) {
+      if (is_survey_quiz) {
         $formQuestion.find(".question_comment").css('display', 'none').end()
           .find(".question_neutral_comment").css('display', '');
       }

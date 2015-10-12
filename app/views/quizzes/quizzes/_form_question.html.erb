@@ -29,6 +29,29 @@
   </div>
   <div class="clear"></div>
   <div class="text">
+    <%# explanations for ungraded quizzes - basically the same sans references to "correct" answers %>
+    <div tabindex="0" class="multiple_choice_question_survey_quiz_explanation explanation subheader">
+      <%= t("Enter your question and multiple answers.") %>
+    </div>
+    <div tabindex="0" class="true_false_question_survey_quiz_explanation explanation subheader">
+      <%= t("Enter your question text.") %>
+    </div>
+    <div tabindex="0" class="short_answer_question_survey_quiz_explanation explanation subheader">
+      <%= t("Enter your question text.  \nStudents will see the question followed by a small text box to type their answer.") %>
+    </div>
+    <div tabindex="0" class="fill_in_multiple_blanks_question_survey_quiz_explanation explanation subheader">
+      <%= t("Enter your question, specifying where each blank should go. Students must type answers into text boxes at each blank.") %>
+    </div>
+    <div tabindex="0" class="multiple_answers_question_survey_quiz_explanation explanation subheader">
+      <%= t("This question will show a checkbox next to each answer.") %>
+    </div>
+    <div tabindex="0" class="multiple_dropdowns_question_survey_quiz_explanation explanation subheader">
+      <%= t("Enter your question, specifying where each dropdown should go.  Then define possible answers for each dropdown.") %>
+    </div>
+    <div tabindex="0" class="missing_word_question_survey_quiz_explanation explanation subheader">
+      <%= t("Define text to go before and after the dropdown and build a set of possible answers.") %>
+    </div>
+
     <div tabindex="0" class="multiple_choice_question_explanation explanation subheader">
       <%= t('explanations.multiple_choice', "Enter your question and multiple answers, then select the one correct answer.") %>
     </div>
