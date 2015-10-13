@@ -67,7 +67,9 @@ module Api::V1::QuizQuestion
     end
 
     user ||= @current_user
-    hsh = add_verifiers_to_question(hsh, @context, user)
+    unless includes.include?(:plain_html)
+      hsh = add_verifiers_to_question(hsh, @context, user)
+    end
 
     if opts[:shuffle_answers] && Quizzes::Quiz.shuffleable_question_type?(hsh[:question_type])
       hsh["answers"].shuffle!
@@ -102,8 +104,8 @@ module Api::V1::QuizQuestion
     end
 
     question_hash["answers"].each do |a|
-      next unless a["text"].present?
-      a["text"] = api_user_content(a["text"], context, user)
+      next unless a["html"].present?
+      a["html"] = api_user_content(a["html"], context, user)
     end
 
     question_hash
