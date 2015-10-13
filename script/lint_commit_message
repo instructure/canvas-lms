@@ -1,0 +1,102 @@
+#!/usr/bin/env ruby
+
+require 'shellwords'
+require 'json'
+
+def comment(severity, line, message, link_to_guidelines = false)
+  $stderr.puts "line #{line}: [#{severity}]: #{message}"
+  if ENV['GERRIT_REFSPEC']
+    message += "\n\nHere are some guidelines to keep our git log pretty and useful: http://chris.beams.io/posts/git-commit/" if link_to_guidelines
+
+    # NOTE: add 6 to all line numbers, cuz parent/author/commit/dates/etc
+    payload = {path: "/COMMIT_MSG", position: line + 6, severity: severity, message: message}
+    `gergich comment #{Shellwords.escape(payload.to_json)}`
+  end
+end
+
+commit_message = ARGV[0] == "--stdin" ? STDIN.read : `git show --pretty=format:%B -s`
+
+exit if commit_message =~ /\A\[?wip($|[\] :-])/i
+lines = commit_message.split(/\n/)
+subject = lines.shift
+
+if lines.shift != ""
+  comment "error", 2, "add a blank line after the subject line", true
+end
+
+SUBJECT_MAX_LINE_LEN = 75
+SUBJECT_IDEAL_LINE_LEN = 65
+
+if subject.size > SUBJECT_MAX_LINE_LEN
+  comment "error", 1, "subject line can't exceed #{SUBJECT_MAX_LINE_LEN} chars (ideally keep it well under #{SUBJECT_IDEAL_LINE_LEN})", true
+elsif subject.size > SUBJECT_IDEAL_LINE_LEN
+  comment "warn", 1, "subject line shouldn't exceed #{SUBJECT_IDEAL_LINE_LEN} chars", true
+end
+
+# not perfect (won't get irregular verbs, only checks first word), but
+# close enough... does the right thing on most existing commits
+maybe_wrong_tense_regex = /\A(spec: )?[a-z]+([^e]ed|[^aijoqsu]s|ing) /i
+actually_ok_rejex = /\A
+  (spec: )?
+  (
+    # *ing words
+    (brand|br|[^ ]*learn|masquerad|upcom|shard|word|grad)ing |
+
+    # *ed words
+    (brand|fail|batch|emb|persist|enrich|(un)?publish|moderat|mut|grad)ed |
+
+    # *s words
+    (.*(ion|ment)|observer|alway|outcome|rail|user|spec|student|quizze|alert|plugin|term)s
+  )
+/xi
+
+maybe_start_with_wrong_tense = subject =~ maybe_wrong_tense_regex &&
+                               subject !~ actually_ok_rejex
+if maybe_start_with_wrong_tense
+  comment "warn", 1, "make sure your commit message has an imperative verb (e.g. \"add\" instead of \"adds\", \"added\", or \"adding\")", true
+end
+
+has_the_word_i = subject =~ /(\A| )i('m)? /i
+if has_the_word_i
+  comment "warn", 1, "just say what the commit does, and not in the first person :P", true
+end
+
+
+BODY_IDEAL_LINE_LENGTH = 75
+
+long_lines = lines.each_with_index.select do |line, i|
+  line.size > BODY_IDEAL_LINE_LENGTH
+end
+
+if long_lines.size > 0
+  comment "warn", long_lines.first[1] + 3,
+    "try to keep all lines under #{BODY_IDEAL_LINE_LENGTH} characters" +
+    (long_lines.size > 1 ? " (note that #{long_lines.size - 1} other long lines follow this one)" : ""), true
+end
+
+
+starts_with_spec = subject =~ /\Aspec: /i
+exit if starts_with_spec # we're trusting you here, don't be evil
+
+commit_files = `git show --pretty=format:"" --name-only`.split("\n")
+only_affects_specs = commit_files.all? { |f| f =~ %r{\Aspec/} }
+if only_affects_specs
+  comment "warn", 1, "since your commit only affects specs, please prefix your commit message with \"spec: \""
+  exit
+end
+
+jira_hook_words = %w[refs closes fixes issueid references]
+refs_a_ticket = commit_message =~ /(#{jira_hook_words.join("|")}) [a-z]+-[0-9]+/i
+unless refs_a_ticket
+  parts = commit_message.split(/(ref|close|fix) [a-z]+[0-9]+|CNVS-[0-9]+/)
+  if parts.size > 1
+    comment "warn", parts.first.count("\n") + 1, "the jira hooks won't link this commit unless you use one of the following keywords: #{jira_hook_words.join(", ")}"
+  else
+    comment "warn", 3, "you should really reference a ticket ლ(ٱ٥ٱლ)"
+  end
+end
+
+has_a_test_plan = commit_message =~ /test plan/i
+unless has_a_test_plan
+  comment "warn", 3, "y u no add test plan? ლ(ಠ益ಠლ)"
+end
