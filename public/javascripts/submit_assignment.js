@@ -310,10 +310,14 @@ define([
 
     // Post message for anybody to listen to //
     if (window.opener) {
-      window.opener.postMessage({
-        "type": "event",
-        "payload": "done"
-      }, window.opener.location.toString());
+      try {
+        window.opener.postMessage({
+          "type": "event",
+          "payload": "done"
+        }, window.opener.location.toString());
+      } catch (e) {
+        console.error(e);
+      }
     }
 
 
