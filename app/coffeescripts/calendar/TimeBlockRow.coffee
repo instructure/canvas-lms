@@ -22,6 +22,9 @@ define [
       @$start_time.time_field().change(@validate)
       @$end_time.time_field().change(@validate)
 
+      if @locked
+        @$row.find('button').attr('disabled', true)
+
       @$row.find('.delete-block-link').click(@remove)
 
     remove: (event) =>
