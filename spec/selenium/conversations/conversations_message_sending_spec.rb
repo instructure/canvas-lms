@@ -14,6 +14,15 @@ describe "conversations new" do
   end
 
   describe "message sending" do
+    it "should show error messages when no recipient is entered", priority: "1", test_id: 351236 do
+      get '/conversations'
+      f('.icon-compose').click
+      click_send
+      errors = ff('.error_text')
+      expect(errors[2].text).to include('Invalid recipient name.')
+      expect(errors[1].text).to include('Required field')
+    end
+
     it "should start a group conversation when there is only one recipient", priority: "2", test_id: 201499 do
       get_conversations
       compose course: @course, to: [@s1], subject: 'single recipient', body: 'hallo!'
