@@ -1274,6 +1274,8 @@ class Submission < ActiveRecord::Base
     return if assignment.deleted? || assignment.muted?
     return unless self.user_id
 
+    return unless self.context.grants_right?(self.user, :participate_as_student)
+
     if score_changed? || grade_changed? || excused_changed?
       ContentParticipation.create_or_update({
         :content => self,

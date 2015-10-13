@@ -309,4 +309,10 @@ describe 'quizzes' do
       expect(ff('.incorrect.answer_arrow').length).to be > 0
     end
   end
+
+  it "should show badge counts after completion" do
+    prepare_quiz
+    take_and_answer_quiz
+    expect(f("#section-tabs .grades .nav-badge").text).to eq "1"
+  end
 end
