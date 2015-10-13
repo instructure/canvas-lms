@@ -96,6 +96,7 @@ describe AuthenticationMethods do
 end
 
 class RSpec::MockController
+  include Canvas::RequestForgeryProtection
   include AuthenticationMethods
 
   attr_reader :redirects, :params, :session, :request

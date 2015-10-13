@@ -78,17 +78,7 @@ describe "API Authentication", type: :request do
         post "/api/v1/courses/#{@course.id}/assignments.json",
              { :assignment => { :name => 'test assignment', :points_possible => '5.3', :grading_type => 'points' },
                :authenticity_token => 'asdf' }
-          expect(response.response_code).to eq 401
-      end
-
-      it "should allow post with old authenticity token in application session" do
-        session[:_csrf_token] = SecureRandom.base64(32)
-        CanvasBreachMitigation::MaskingSecrets.stubs(:valid_authenticity_token?).returns(true)
-        post "/api/v1/courses/#{@course.id}/assignments.json",
-             { :assignment => { :name => 'test assignment', :points_possible => '5.3', :grading_type => 'points' },
-               :authenticity_token => 'mock csrf token' }
-        expect(response).to be_success
-        expect(@course.assignments.count).to eq 1
+          expect(response.response_code).to eq 422
       end
 
       it "should allow post with cookie authenticity token in application session" do
@@ -103,7 +93,7 @@ describe "API Authentication", type: :request do
       it "should not allow replacing the authenticity token with api_key without basic auth" do
         post "/api/v1/courses/#{@course.id}/assignments.json?api_key=#{@key.api_key}",
              { :assignment => { :name => 'test assignment', :points_possible => '5.3', :grading_type => 'points' } }
-        expect(response.response_code).to eq 401
+        expect(response.response_code).to eq 422
       end
     end
 

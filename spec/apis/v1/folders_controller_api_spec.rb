@@ -634,6 +634,8 @@ describe "Folders API", type: :request do
 
     it "should omit verifier in-app" do
       FoldersController.any_instance.stubs(:in_app?).returns(true)
+      FoldersController.any_instance.stubs(:verified_request?).returns(true)
+
       @dest_context.enroll_teacher @user, enrollment_state: 'active'
       json = api_call(:post, "/api/v1/folders/#{@dest_folder.id}/copy_file?source_file_id=#{@source_file.id}",
                       @params_hash.merge(dest_folder_id: @dest_folder.to_param, source_file_id: @source_file.to_param))

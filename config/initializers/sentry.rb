@@ -15,7 +15,10 @@ if settings.present?
     config.tags = settings.fetch(:tags, {}).merge('canvas_revision' => Canvas.revision)
     config.sanitize_fields += Rails.application.config.filter_parameters.map(&:to_s)
     config.sanitize_credit_cards = false
-    config.excluded_exceptions += %w{AuthenticationMethods::AccessTokenError}
+    config.excluded_exceptions += %w{
+      AuthenticationMethods::AccessTokenError
+      ActionController::InvalidAuthenticityToken
+    }
   end
 
   Rails.configuration.to_prepare do
