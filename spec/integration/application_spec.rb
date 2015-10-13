@@ -144,8 +144,8 @@ describe "site-wide" do
     end
   end
 
-  it "should use the real user's timezone and locale setting when masquerading" do
-    @fake_user = user_with_pseudonym(:active_all => true)
+  it "should use the real user's timezone and locale setting when masquerading as a fake student" do
+    @fake_user = course(:active_all => true).student_view_student
 
     user_with_pseudonym(:active_all => true)
     account_admin_user(:user => @user)
@@ -156,6 +156,24 @@ describe "site-wide" do
     user_session(@user)
 
     post "/users/#{@fake_user.id}/masquerade"
+    get "/"
+
+    expect(assigns[:real_current_user]).to eq @user
+    expect(Time.zone.name).to eq "Hawaii"
+    expect(I18n.locale).to eq :es
+  end
+
+  it "should use the masqueree's timezone and locale setting when masquerading" do
+    @other_user = user_with_pseudonym(:active_all => true)
+    @other_user.time_zone = "Hawaii"
+    @other_user.locale = "es"
+    @other_user.save!
+
+    user_with_pseudonym(:active_all => true)
+    account_admin_user(:user => @user)
+    user_session(@user)
+
+    post "/users/#{@other_user.id}/masquerade"
     get "/"
 
     expect(assigns[:real_current_user]).to eq @user

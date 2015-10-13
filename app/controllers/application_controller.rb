@@ -219,6 +219,10 @@ class ApplicationController < ActionController::Base
     @real_current_user || @current_user
   end
 
+  def not_fake_student_user
+    @current_user && @current_user.fake_student? ? logged_in_user : @current_user
+  end
+
   def rescue_action_dispatch_exception
     rescue_action_in_public(request.env['action_dispatch.exception'])
   end
@@ -260,7 +264,7 @@ class ApplicationController < ActionController::Base
   def assign_localizer
     I18n.localizer = lambda {
       infer_locale :context => @context,
-                   :user => logged_in_user,
+                   :user => not_fake_student_user,
                    :root_account => @domain_root_account,
                    :session_locale => session[:locale],
                    :accept_language => request.headers['Accept-Language']
@@ -304,7 +308,7 @@ class ApplicationController < ActionController::Base
 
   # scopes all time objects to the user's specified time zone
   def set_time_zone
-    user = logged_in_user
+    user = not_fake_student_user
     if user && !user.time_zone.blank?
       Time.zone = user.time_zone
       if Time.zone && Time.zone.name == "UTC" && user.time_zone && user.time_zone.name.match(/\s/)
