@@ -36,7 +36,7 @@ define([
     var ignoreUngradedSubmissions = $("#only_consider_graded_assignments").attr('checked');
     var currentOrFinal = ignoreUngradedSubmissions ? 'current' : 'final';
     var groupWeightingScheme = ENV.group_weighting_scheme;
-    var showTotalGradeAsPoints = ENV.show_total_grade_as_points;
+    var includeTotal = !ENV.exclude_total;
 
     var calculatedGrades = GradeCalculator.calculate(
       ENV.submissions,
@@ -57,6 +57,14 @@ define([
     var droppedMessage = I18n.t('This assignment is dropped and will not be considered in the total calculation');
     $('.dropped').attr('aria-label', droppedMessage);
     $('.dropped').attr('title', droppedMessage);
+
+    if (includeTotal) {
+      calculateTotals(calculatedGrades, currentOrFinal, groupWeightingScheme);
+    }
+  }
+
+  var calculateTotals = function(calculatedGrades, currentOrFinal, groupWeightingScheme) {
+    var showTotalGradeAsPoints = ENV.show_total_grade_as_points;
 
     var calculateGrade = function(score, possible) {
       if (possible === 0 || isNaN(score)) {
@@ -103,7 +111,7 @@ define([
     }
 
     $(".revert_all_scores").showIf($("#grades_summary .revert_score_link").length > 0);
-  }
+  };
 
 
   $(document).ready(function() {
@@ -367,7 +375,7 @@ define([
   }
 
 
-  $(document).on('change', '#grading_periods_selector', function(e){
+  $(document).on('change', '.grading_periods_selector', function(e){
     var newGP = $(this).val();
     if (matches = location.href.match(/grading_period_id=\d*/)) {
       location.href = location.href.replace(matches[0], "grading_period_id=" + newGP);

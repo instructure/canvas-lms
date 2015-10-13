@@ -1112,6 +1112,9 @@ define [
       unless (_.detect @assignments, (a) -> (''+a.submission_types) == "attendance")
         $settingsMenu.find('#show_attendance').closest('li').hide()
 
+      if @hideAggregateColumns()
+        $settingsMenu.find('#include-ungraded-list-item').hide()
+
       @$columnArrangementTogglers = $('#gradebook-toolbar [data-arrange-columns-by]').bind 'click', (event) =>
         event.preventDefault()
         newSortOrder = { sortType: $(event.currentTarget).data('arrangeColumnsBy') }
@@ -1370,53 +1373,55 @@ define [
               .unbind('gridready.render')
               .bind('gridready.render', => @grid.invalidate() )
         columnDef
+      if @hideAggregateColumns()
+        @aggregateColumns = []
+      else
+        @aggregateColumns = for id, group of @assignmentGroups
+          fieldName = "assignment_group_#{id}"
 
-      @aggregateColumns = for id, group of @assignmentGroups
-        fieldName = "assignment_group_#{id}"
+          aggregateWidth = testWidth(group.name, columnWidths.assignmentGroup.min, columnWidths.assignmentGroup.default_max)
+          if @gradebookColumnSizeSettings && @gradebookColumnSizeSettings[fieldName]
+            aggregateWidth = parseInt(@gradebookColumnSizeSettings[fieldName])
 
-        aggregateWidth = testWidth(group.name, columnWidths.assignmentGroup.min, columnWidths.assignmentGroup.default_max)
-        if @gradebookColumnSizeSettings && @gradebookColumnSizeSettings[fieldName]
-          aggregateWidth = parseInt(@gradebookColumnSizeSettings[fieldName])
+          {
+            id: fieldName
+            field: fieldName
+            formatter: @groupTotalFormatter
+            name: @assignmentGroupHtml(group.name, group.group_weight)
+            toolTip: group.name
+            object: group
+            minWidth: columnWidths.assignmentGroup.min,
+            maxWidth: columnWidths.assignmentGroup.max,
+            width: aggregateWidth
+            cssClass: "meta-cell assignment-group-cell",
+            sortable: true
+            type: 'assignment_group'
+          }
 
-        {
-          id: fieldName
-          field: fieldName
+        total = I18n.t "total", "Total"
+
+        totalWidth = testWidth("Total", columnWidths.total.min, columnWidths.total.max)
+        if @gradebookColumnSizeSettings && @gradebookColumnSizeSettings['total_grade']
+          totalWidth = parseInt(@gradebookColumnSizeSettings['total_grade'])
+
+        total_column =
+          id: "total_grade"
+          field: "total_grade"
           formatter: @groupTotalFormatter
-          name: @assignmentGroupHtml(group.name, group.group_weight)
-          toolTip: group.name
-          object: group
-          minWidth: columnWidths.assignmentGroup.min,
-          maxWidth: columnWidths.assignmentGroup.max,
-          width: aggregateWidth
-          cssClass: "meta-cell assignment-group-cell",
+          name: """
+            #{htmlEscape total}
+            <div id=total_column_header></div>
+          """
+          toolTip: total
+          minWidth: columnWidths.total.min
+          maxWidth: columnWidths.total.max
+          width: totalWidth
+          cssClass: if @totalColumnInFront then 'meta-cell' else 'total-cell'
           sortable: true
-          type: 'assignment_group'
-        }
+          type: 'total_grade'
 
-      total = I18n.t "total", "Total"
-
-      totalWidth = testWidth("Total", columnWidths.total.min, columnWidths.total.max)
-      if @gradebookColumnSizeSettings && @gradebookColumnSizeSettings['total_grade']
-        totalWidth = parseInt(@gradebookColumnSizeSettings['total_grade'])
-
-      total_column =
-        id: "total_grade"
-        field: "total_grade"
-        formatter: @groupTotalFormatter
-        name: """
-          #{htmlEscape total}
-          <div id=total_column_header></div>
-        """
-        toolTip: total
-        minWidth: columnWidths.total.min
-        maxWidth: columnWidths.total.max
-        width: totalWidth
-        cssClass: if @totalColumnInFront then 'meta-cell' else 'total-cell'
-        sortable: true
-        type: 'total_grade'
-
-      (if @totalColumnInFront then @parentColumns else
-        @aggregateColumns).push total_column
+        (if @totalColumnInFront then @parentColumns else
+          @aggregateColumns).push total_column
 
       $widthTester.remove()
 
@@ -1671,3 +1676,9 @@ define [
 
     isAllGradingPeriods: (currentPeriodId) ->
       currentPeriodId == "0"
+
+    hideAggregateColumns: ->
+      return false unless @mgpEnabled
+      return false if @options.all_grading_periods_totals
+      selectedPeriodId = @getGradingPeriodToShow()
+      @isAllGradingPeriods(selectedPeriodId)

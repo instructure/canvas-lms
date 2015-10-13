@@ -618,6 +618,7 @@ CanvasRails::Application.routes.draw do
   put 'images/users/:user_id' => 'users#update_avatar_image', as: :update_avatar_image
   get 'all_menu_courses' => 'users#all_menu_courses'
   get 'grades' => 'users#grades'
+  get 'grades_for_student' => 'users#grades_for_student'
 
   get 'login' => 'login#new'
   delete 'logout' => 'login#destroy'
