@@ -6,11 +6,9 @@ define([
   'jsx/gradebook/grid/stores/gradebookToolbarStore',
   'jsx/gradebook/grid/stores/assignmentGroupsStore',
   'jsx/gradebook/grid/stores/gradingPeriodsStore',
-  'jsx/gradebook/grid/stores/submissionsStore',
-  'jsx/gradebook/grid/stores/gradingPeriodsStore'
+  'jsx/gradebook/grid/stores/submissionsStore'
 ], function (Reflux, _, GradebookConstants, StudentEnrollmentsStore, GradebookToolbarStore,
-             AssignmentGroupsStore, GradingPeriodsStore, SubmissionsStore,
-             GradingPeriodsStore) {
+             AssignmentGroupsStore, GradingPeriodsStore, SubmissionsStore) {
   var tableStore = Reflux.createStore({
     init() {
       this.state = {
