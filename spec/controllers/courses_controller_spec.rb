@@ -1347,6 +1347,19 @@ describe CoursesController do
       end
     end
 
+    it "should let admins without course edit rights update only the syllabus body" do
+      role = custom_account_role('grade viewer', :account => Account.default)
+      account_admin_user_with_role_changes(:role => role, :role_changes => {:manage_content => true})
+      user_session(@user)
+
+      name = "some name"
+      body = "some body"
+      put 'update', :id => @course.id, :course => { :name => name, :syllabus_body => body }
+
+      @course.reload
+      expect(@course.name).to_not eq name
+      expect(@course.syllabus_body).to eq body
+    end
   end
 
   describe "POST 'unconclude'" do
