@@ -1850,6 +1850,9 @@ class CoursesController < ApplicationController
   #
   # Arguments are the same as Courses#create, with a few exceptions (enroll_me).
   #
+  # If a user has content management rights, but not full course editing rights, the only attribute
+  # editable through this endpoint will be "syllabus_body"
+  #
   # @argument course[account_id] [Integer]
   #   The unique ID of the account to create to course under.
   #
@@ -1955,9 +1958,13 @@ class CoursesController < ApplicationController
     old_settings = @course.settings
     logging_source = api_request? ? :api : :manual
 
-    if authorized_action(@course, @current_user, :update)
+    if authorized_action(@course, @current_user, [:update, :manage_content])
       return render_update_success if params[:for_reload]
+
       params[:course] ||= {}
+      unless @course.grants_right?(@current_user, :update)
+        params[:course] = params[:course].slice(:syllabus_body) # let users with :manage_content only update the body
+      end
       if params[:course].has_key?(:syllabus_body)
         params[:course][:syllabus_body] = process_incoming_html_content(params[:course][:syllabus_body])
       end
