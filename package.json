@@ -6,7 +6,7 @@
     "node": ">=0.12.5"
   },
   "dependencies": {
-    "brandable_css": "0.0.52"
+    "brandable_css": "0.0.55"
   },
   "devDependencies": {
     "babel": "^5.8.23",
