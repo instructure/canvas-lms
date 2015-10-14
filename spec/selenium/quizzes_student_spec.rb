@@ -73,8 +73,8 @@ describe 'quizzes' do
           q.lock_at = Time.now.utc + 5.seconds
           q.save!
 
-          get "/courses/#{@course.id}/quizzes/#{q.id}/take?user_id=#{@student.id}"
-          expect_new_page_load { f('#take_quiz_link').click }
+          expect_new_page_load(3) { get "/courses/#{@course.id}/quizzes/#{q.id}/take?user_id=#{@student.id}" }
+          expect_new_page_load(3) { f('#take_quiz_link').click }
           answer_one = f("#question_#{question.id}_answer_1")
 
           # force a save to create a submission
