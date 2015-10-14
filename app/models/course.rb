@@ -776,22 +776,31 @@ class Course < ActiveRecord::Base
   end
 
   def update_enrolled_users
-    if self.completed?
-      Enrollment.where(:course_id => self, :workflow_state => ['active', 'invited']).update_all(:workflow_state => 'completed')
-      appointment_participants.active.current.update_all(:workflow_state => 'deleted')
-      appointment_groups.each(&:clear_cached_available_slots!)
-    elsif self.deleted?
-      Enrollment.where("course_id=? AND workflow_state<>'deleted'", self).update_all(:workflow_state => 'deleted')
-    end
+    self.shard.activate do
+      if self.workflow_state_changed?
+        if self.completed?
+          Enrollment.where(:course_id => self, :workflow_state => ['active', 'invited']).update_all(:workflow_state => 'completed')
+          appointment_participants.active.current.update_all(:workflow_state => 'deleted')
+          appointment_groups.each(&:clear_cached_available_slots!)
+        elsif self.deleted?
+          enroll_scope = Enrollment.where("course_id=? AND workflow_state<>'deleted'", self)
+          user_ids = enroll_scope.group(:user_id).pluck(:user_id).uniq
+          if user_ids.any?
+            enroll_scope.update_all(:workflow_state => 'deleted')
+            User.send_later_if_production(:update_account_associations, user_ids)
+          end
+        end
+      end
 
-    if self.root_account_id_changed?
-      CourseSection.where(:course_id => self).update_all(:root_account_id => self.root_account_id)
-      Enrollment.where(:course_id => self).update_all(:root_account_id => self.root_account_id)
-    end
+      if self.root_account_id_changed?
+        CourseSection.where(:course_id => self).update_all(:root_account_id => self.root_account_id)
+        Enrollment.where(:course_id => self).update_all(:root_account_id => self.root_account_id)
+      end
 
-    Enrollment.where(:course_id => self).update_all(:updated_at => Time.now.utc)
-    User.where("id IN (SELECT user_id FROM enrollments WHERE course_id=?)", self).
-        update_all(updated_at: Time.now.utc)
+      Enrollment.where(:course_id => self).update_all(:updated_at => Time.now.utc)
+      User.where("id IN (SELECT user_id FROM enrollments WHERE course_id=?)", self).
+          update_all(updated_at: Time.now.utc)
+    end
   end
 
   def self_enrollment_allowed?

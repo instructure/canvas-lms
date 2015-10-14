@@ -4295,3 +4295,13 @@ describe Course, '#module_items_visible_to' do
     expect(@course.module_items_visible_to(@teacher).map(&:title)).to match_array %w(published unpublished)
   end
 end
+
+describe Course, '#update_enrolled_users' do
+  it "should update user associations when deleted" do
+    course_with_student(:active_all => true)
+    expect(@user.associated_accounts).to be_present
+    @course.destroy
+    @user.reload
+    expect(@user.associated_accounts).to be_blank
+  end
+end
