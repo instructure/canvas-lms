@@ -86,7 +86,7 @@ if only_affects_specs
 end
 
 jira_hook_words = %w[refs closes fixes issueid references]
-refs_a_ticket = commit_message =~ /(#{jira_hook_words.join("|")}) [a-z]+-[0-9]+/i
+refs_a_ticket = commit_message =~ /(#{jira_hook_words.join("|")})[\s:]+[a-z]+-[0-9]+/i
 unless refs_a_ticket
   parts = commit_message.split(/(ref|close|fix) [a-z]+[0-9]+|CNVS-[0-9]+/)
   if parts.size > 1
