@@ -1009,9 +1009,19 @@ class User < ActiveRecord::Base
     )
   end
 
+  def check_accounts_right?(user, sought_right)
+    # check if the user we are given is an admin in one of this user's accounts
+    user && (
+      Account.site_admin.grants_right?(user, sought_right) ||
+      self.associated_accounts.any?{|a| a.grants_right?(user, sought_right) }
+    )
+  end
+
   set_policy do
     given { |user| user == self }
-    can :read and can :read_profile and can :read_as_admin and can :manage and can :manage_content and can :manage_files and can :manage_calendar and can :send_messages and can :update_avatar and can :manage_feature_flags
+    can :read and can :read_grades and can :read_profile and can :read_as_admin and can :manage and
+      can :manage_content and can :manage_files and can :manage_calendar and can :send_messages and
+      can :update_avatar and can :manage_feature_flags
 
     given { |user| user == self && user.user_can_edit_name? }
     can :rename
@@ -1028,45 +1038,24 @@ class User < ActiveRecord::Base
     given { |user| self.check_courses_right?(user, :manage_user_notes) }
     can :create_user_notes and can :read_user_notes
 
-    given do |user|
-      user && (
-        self.associated_accounts.any?{|a| a.grants_right?(user, :manage_user_notes)}
-      )
-    end
+    given {|user| self.check_accounts_right?(user, :manage_user_notes) }
     can :create_user_notes and can :read_user_notes and can :delete_user_notes
 
-    given do |user|
-      user && (
-      Account.site_admin.grants_right?(user, :view_statistics) ||
-          self.associated_accounts.any?{|a| a.grants_right?(user, :view_statistics)  }
-      )
-    end
+    given {|user| self.check_accounts_right?(user, :view_statistics) }
     can :view_statistics
 
-    given do |user|
-      user && (
-        # or, if the user we are given is an admin in one of this user's accounts
-        Account.site_admin.grants_right?(user, :manage_students) ||
-        self.associated_accounts.any? {|a| a.grants_right?(user, :manage_students) }
-      )
-    end
-    can :manage_user_details and can :update_avatar and can :remove_avatar and can :rename and can :read_profile and can :view_statistics and can :read and can :read_reports and can :manage_feature_flags
+    given {|user| self.check_accounts_right?(user, :manage_students) }
+    can :manage_user_details and can :update_avatar and can :remove_avatar and can :rename and can :read_profile and
+      can :view_statistics and can :read and can :read_reports and can :manage_feature_flags and can :read_grades
 
-    given do |user|
-      user && (
-        Account.site_admin.grants_right?(user, :manage_user_logins) ||
-        self.associated_accounts.any?{|a| a.grants_right?(user, :manage_user_logins)  }
-      )
-    end
+    given {|user| self.check_accounts_right?(user, :manage_user_logins) }
     can :view_statistics and can :read and can :read_reports
 
+    given {|user| self.check_accounts_right?(user, :view_all_grades) }
+    can :read_grades
+
     given do |user|
-      user && (
-        # or, if the user we are given is an admin in one of this user's accounts
-        Account.site_admin.grants_right?(user, :manage_user_logins) ||
-        (self.associated_accounts.any?{|a| a.grants_right?(user, :manage_user_logins) } &&
-         self.all_accounts.select(&:root_account?).all? {|a| has_subset_of_account_permissions?(user, a) } )
-      )
+      self.check_accounts_right?(user, :manage_user_logins) && self.all_accounts.select(&:root_account?).all? {|a| has_subset_of_account_permissions?(user, a) }
     end
     can :manage_user_details and can :rename and can :read_profile
 
