@@ -107,14 +107,14 @@ describe "calendar2" do
       end
     end
 
-    it "should change the week" do
-      get "/calendar2"
-      header_buttons = ff('.btn-group .btn')
-      header_buttons[0].click
-      wait_for_ajaximations
-      old_header_title = get_header_text
-      change_calendar(:prev)
-      expect(old_header_title).not_to eq get_header_text
+    it "should display correct dates after navigation arrow", priority: "1", test_id: 417600 do
+      load_week_view
+      quick_jump_to_date('Jan 1, 2012')
+      change_calendar(:next)
+
+      # Verify Week and Day labels are correct
+      expect(get_header_text).to include_text('Jan 8 – 14, 2012')
+      expect(f('.fc-sun')).to include_text('SUN 1/8')
     end
 
     it "should create event by clicking on week calendar", priority: "1", test_id: 138862 do
