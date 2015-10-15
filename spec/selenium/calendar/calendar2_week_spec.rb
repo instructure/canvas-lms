@@ -189,5 +189,16 @@ describe "calendar2" do
       expect(f('.ui-datepicker-header').text).to include_text(Time.now.utc.strftime("%B"))
       expect(f('.ui-datepicker-calendar').text).to include_text("Mo")
     end
+
+    it "should extend event time with dragging", priority: "1", test_id: 138864 do
+      # Create event on current day at 1:00 AM in current time zone
+      start_time = Time.zone.now.beginning_of_day + 1.hour
+      make_event(:start => start_time)
+      load_week_view
+
+      # Drag and drop to "Slot 11", which will result in event end at 6:00 AM
+      drag_and_drop_element(fj('.ui-resizable-handle'), fj('.fc-slot11'))
+      expect(fj('.fc-event-time')).to include_text('1:00 - 6:00')
+    end
   end
 end
