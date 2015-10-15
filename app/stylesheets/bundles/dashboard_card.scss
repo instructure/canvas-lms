@@ -43,7 +43,7 @@ $ic-DashboardCard-action--active: $ic-brand-primary;
       outline: none;
       color: $ic-DashboardCard-font-color;
       background: rgba(black, 0.15);
-      .ic-DashboardCard__header-title { transform: translate3d(0,-($ic-sp/2),0); }
+      .ic-DashboardCard__header-title { transition: text-shadow 0.2s; text-shadow: 0 0 5px #000;}
     }
   }
   // if NOT high contrast, do not show ugly underline on :hover, but DO show it on :focus
