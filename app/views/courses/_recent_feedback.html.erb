@@ -1,3 +1,5 @@
+<li style="<%= hidden if is_hidden %>" class="event">
+
 <%
   recent_feedback ||= nil
   show_context ||= false
@@ -5,7 +7,7 @@
   grade = nil
   score = nil
 
-  cache(['recent_feedback_render', recent_feedback || 'blank_feedback', Time.zone.utc_offset].cache_key) do
+  cache(['recent_feedback_render2', recent_feedback || 'blank_feedback', Time.zone.utc_offset].cache_key) do
     context = recent_feedback.context
     assignment = recent_feedback.assignment
     url = context_url(context, :context_assignment_submission_url, :assignment_id => recent_feedback.assignment_id, :id=>@current_user.id)
@@ -19,7 +21,7 @@
                                              :submission => recent_feedback,
                                              :student_only => true)
   %>
-<li style="<%= hidden if is_hidden %>" class="event">
+
   <a
     data-track-category="dashboard"
     data-track-label="recent feedback"
@@ -82,6 +84,7 @@
     <div class="clear"></div>
   </a>
   <div class="clear"></div>
-</li>
 
 <% end %>
+
+</li>
