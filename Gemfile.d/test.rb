@@ -39,4 +39,5 @@ group :test do
   gem 'yard', '0.8.7.6'
   gem 'yard-appendix', '>=0.1.8'
   gem 'timecop', '0.6.3'
+  gem 'jira_ref_parser', '1.0.0'
 end

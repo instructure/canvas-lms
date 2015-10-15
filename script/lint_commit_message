@@ -2,6 +2,7 @@
 
 require 'shellwords'
 require 'json'
+require 'jira_ref_parser'
 
 def comment(severity, line, message, link_to_guidelines = false)
   $stderr.puts "line #{line}: [#{severity}]: #{message}"
@@ -85,12 +86,12 @@ if only_affects_specs
   exit
 end
 
-jira_hook_words = %w[refs closes fixes issueid references]
-refs_a_ticket = commit_message =~ /(#{jira_hook_words.join("|")})[\s:]+[a-z]+-[0-9]+/i
-unless refs_a_ticket
-  parts = commit_message.split(/(ref|close|fix) [a-z]+[0-9]+|CNVS-[0-9]+/)
+issue_ids = JiraRefParser.scan_message_for_issue_ids(commit_message)
+if issue_ids.empty?
+  parts = commit_message.split(/([A-Z]+-[0-9]+)/)
   if parts.size > 1
-    comment "warn", parts.first.count("\n") + 1, "the jira hooks won't link this commit unless you use one of the following keywords: #{jira_hook_words.join(", ")}"
+    jira_hook_words = JiraRefParser::RefKeywords + JiraRefParser::FixKeywords
+    comment "warn", parts.first.count("\n") + 1, "the jira hooks won't link this commit to #{parts[1]} unless you use one of the following keywords: #{jira_hook_words.join(", ")}"
   else
     comment "warn", 3, "you should really reference a ticket ლ(ٱ٥ٱლ)"
   end
