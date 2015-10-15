@@ -34,6 +34,16 @@ describe "groups" do
     describe "announcements page" do
       it_behaves_like 'announcements_page', 'student'
 
+      it "should allow group members to delete their own announcements", priority: "1", test_id: 326521 do
+        get announcements_page
+        create_group_announcement_manually("Announcement by #{@students.first.name}",'yo ho, yo ho')
+        wait_for_ajaximations
+        get announcements_page
+        expect(ff('.discussion-topic').size).to eq 1
+        delete_announcement_via_gear_menu
+        expect(ff('.discussion-topic').size).to eq 0
+      end
+
       it "should allow any group member to create an announcement", priority: "1", test_id: 273607 do
         get announcements_page
 
