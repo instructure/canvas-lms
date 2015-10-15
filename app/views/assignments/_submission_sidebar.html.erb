@@ -54,17 +54,18 @@
 
     <div class="module">
       <% if @current_user_submission.grade && !@assignment.muted? %>
-        <span>
-          <% if @current_user_submission.excused? %>
-            <%= t "This assignment has been excused." %>
-          <% else %>
-            <%= t 'labels.grade', "Grade: %{grade} *(%{points_possible} pts possible)*", {
-              :grade => @current_user_submission.grade,
-              :points_possible => @assignment.points_possible,
-              :wrapper => '<span style="font-size: 0.8em;">\1</span>'
-            } %>
-          <% end %>
-        </span>
+        <% if @current_user_submission.excused? %>
+          <span><%= t "This assignment has been excused." %></span>
+        <% else %>
+          <div><%= t 'labels.grade', "Grade: %{grade} *(%{points_possible} pts possible)*", {
+            :grade => @current_user_submission.grade,
+            :points_possible => @assignment.points_possible,
+            :wrapper => '<span style="font-size: 0.8em;">\1</span>'
+          } %></div>
+          <div><%= t 'labels.graded_anonymously', "Graded Anonymously: %{value}", {
+            :value => @current_user_submission.graded_anonymously ? t('labels.yes', "yes") : t('labels.no', "no")
+          } %></div>
+        <% end %>
       <% end %>
 
       <% if @current_user_submission.rubric_assessment %>
