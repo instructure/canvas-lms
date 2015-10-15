@@ -155,6 +155,9 @@ class SubmissionsApiController < ApplicationController
   # @argument include[] [String, "submission_history"|"submission_comments"|"rubric_assessment"|"assignment"|"visibility"|"course"|"user"]
   #   Associations to include with the group.
   #
+  # @argument grouped [Boolean]
+  #   If this argument is true, the response will be grouped by student groups.
+  #
   # @response_field assignment_id The unique identifier for the assignment.
   # @response_field user_id The id of the user who submitted the assignment.
   # @response_field grader_id The id of the user who graded the assignment.
@@ -176,6 +179,12 @@ class SubmissionsApiController < ApplicationController
       visible_student_ids = @context.apply_enrollment_visibility(@context.student_enrollments, @current_user, section_ids).pluck(:user_id)
       submissions = @assignment.submissions.where(:user_id => visible_student_ids)
       includes = Array.wrap(params[:include])
+
+      # this provides one assignment object(and submission object within), per user group
+      if value_to_boolean(params[:grouped])
+        user_groups_ids = @assignment.representatives(@current_user).map(&:id)
+        submissions = Submission.where(user_id: user_groups_ids, assignment_id: @assignment.id)
+      end
 
       if includes.include?("visibility") && @context.feature_enabled?(:differentiated_assignments)
         json = bulk_process_submissions_for_visibility(submissions, includes)

@@ -3318,4 +3318,57 @@ describe 'Submissions API', type: :request do
       end
     end
   end
+  describe '#index' do
+    context 'grouped_submissions' do
+      let(:test_course) { course() }
+      let(:teacher)   { user(active_all: true) }
+      let(:student1)  { user(active_all: true) }
+      let(:student2)  { user(active_all: true) }
+      let(:group) do
+        group_category = test_course.group_categories.create(name: 'Engineering')
+        test_course.groups.create(name: 'Group1', group_category: group_category)
+      end
+      let(:assignment) do
+        test_course.assignments.create!(
+          title: 'group assignment',
+          grading_type: 'points',
+          points_possible: 10,
+          submission_types: 'online_text_entry',
+          group_category: group.group_category
+        )
+      end
+
+      let!(:enroll_teacher_and_students) do
+        test_course.enroll_teacher(teacher).accept!
+        test_course.enroll_student(student1, enrollment_state: 'active')
+        test_course.enroll_student(student2, enrollment_state: 'active')
+      end
+      let!(:add_students_to_group) do
+        group.add_user(student1)
+        group.add_user(student2)
+      end
+      let!(:submit_homework) { assignment.submit_homework(student1) }
+
+      let(:path) { "/api/v1/courses/#{test_course.id}/assignments/#{assignment.id}/submissions" }
+      let(:params) do
+        {
+          controller: 'submissions_api', action: 'index',
+          format: 'json', course_id: test_course.id.to_s,
+          assignment_id: assignment.id.to_s
+        }
+      end
+
+      it 'should return two assignment and submission objects for a user group' do
+        params[:grouped] = false
+        json = api_call_as_user(teacher, :get, path, params)
+        expect(json.size).to eq 2
+      end
+
+      it 'should return a single assignment and submission object per user group' do
+        params[:grouped] = true
+        json = api_call_as_user(teacher, :get, path, params)
+        expect(json.size).to eq 1
+      end
+    end
+  end
 end
