@@ -257,8 +257,19 @@ module SIS
               pseudo.sis_communication_channel_id = pseudo.communication_channel_id = cc.id
 
               if newly_active
-                other_ccs = ccs.reject { |other_cc| other_cc.user_id == user.id || other_cc.user.nil? || other_cc.user.pseudonyms.active.count == 0 ||
-                  !other_cc.user.pseudonyms.active.where("account_id=? AND sis_user_id IS NOT NULL", @root_account).empty? }
+                user_ids = ccs.map(&:user_id)
+                pseudo_scope = Pseudonym.active.where(user_id: user_ids).group(:user_id)
+                active_pseudo_counts = pseudo_scope.count
+                sis_pseudo_counts = pseudo_scope.where('account_id = ? AND sis_user_id IS NOT NULL', @root_account).count
+
+                other_ccs = ccs.reject { |other_cc|
+                  cc_user_id = other_cc.user_id
+                  same_user = cc_user_id == user.id
+                  no_active_pseudos = active_pseudo_counts.fetch(cc_user_id, 0) == 0
+                  active_sis_pseudos = sis_pseudo_counts.fetch(cc_user_id, 0) != 0
+
+                  same_user || no_active_pseudos || active_sis_pseudos
+                }
                 unless other_ccs.empty?
                   cc.send_merge_notification!
                 end
