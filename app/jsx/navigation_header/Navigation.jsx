@@ -131,7 +131,7 @@ define([
 
     handleMenuClick (type) {
       // Make sure data is loaded up
-      if (!this.state[`${type}AreLoaded`] && !this.state[`${type}Loading`]) {
+      if (TYPE_URL_MAP[type] && !this.state[`${type}AreLoaded`] && !this.state[`${type}Loading`]) {
         this.getResource(TYPE_URL_MAP[type], type);
       }
       if (this.state.isTrayOpen && (this.state.activeItem === type)) {
