@@ -23,6 +23,13 @@ class GradeSummaryAssignmentPresenter
       !assignment.muted?
   end
 
+  def graded_anonymously_status
+    return '' if submission.blank?
+    submission.graded_anonymously ?
+      I18n.t('#grade_summary.yes', "yes") :
+      I18n.t('#grade_summary.no', "no")
+  end
+
   def is_letter_graded?
     assignment.grading_type == 'letter_grade'
   end
