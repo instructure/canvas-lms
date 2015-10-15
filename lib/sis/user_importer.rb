@@ -282,7 +282,6 @@ module SIS
               pseudo.sis_batch_id = @batch.id if @batch
               if pseudo.valid?
                 pseudo.save_without_broadcasting
-                @success_count += 1
               else
                 msg = "A user did not pass validation "
                 msg += "(" + "user: #{user_id}, error: "
@@ -291,8 +290,8 @@ module SIS
               end
             elsif @batch && pseudo.sis_batch_id != @batch.id
               @pseudos_to_set_sis_batch_ids << pseudo.id
-              @success_count += 1
             end
+            @success_count += 1
 
           end
         end

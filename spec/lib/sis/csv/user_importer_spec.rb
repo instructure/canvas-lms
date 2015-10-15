@@ -484,6 +484,20 @@ describe SIS::CSV::UserImporter do
     expect(Pseudonym.where(account_id: @account, sis_user_id: "user_1").first.user.last_name).to eq "Uno-Dos"
   end
 
+  it "should have the correct count when the pseudonym doesn't change" do
+    importer =  process_csv_data(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,user1,User,Uno,user1@example.com,active"
+    )
+    expect(importer.counts[:users]).to eq 1
+
+    importer = process_csv_data(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,user1,User,Uno-Dos,user1@example.com,active"
+    )
+    expect(importer.counts[:users]).to eq 1
+  end
+
   it "should allow a user to update display name specifically" do
     process_csv_data_cleanly(
         "user_id,login_id,first_name,last_name,short_name,email,status",
