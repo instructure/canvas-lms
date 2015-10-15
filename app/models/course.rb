@@ -2815,4 +2815,10 @@ class Course < ActiveRecord::Base
   def favorite_for_user?(user)
     user.favorites.where(:context_type => 'Course', :context_id => self).exists?
   end
+
+  def nickname_for(user, fallback = :name)
+    nickname = user && user.course_nickname(self)
+    nickname ||= self.send(fallback) if fallback
+    nickname
+  end
 end

@@ -113,7 +113,9 @@ define([
                        hidePrompt       = {true}
                        nonModal         = {true}
                        hideOnScroll     = {false}
-                       currentColor     = {this.props.backgroundColor} />
+                       currentColor     = {this.props.backgroundColor}
+                       nicknameInfo     = {this.props.nicknameInfo}
+          />
         </div>
       )
     }

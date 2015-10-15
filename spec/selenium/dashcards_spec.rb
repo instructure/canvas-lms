@@ -122,6 +122,14 @@ describe 'dashcards' do
           end
         end
       end
+
+      it 'sets course nickname' do
+        replace_content(fj('#NicknameInput'), 'course nickname!')
+        f('.ColorPicker__Container .Button--primary').click
+        wait_for_ajaximations
+        expect(f('.ic-DashboardCard__header-title').text).to include 'course nickname!'
+        expect(@student.reload.course_nickname(@course)).to eq 'course nickname!'
+      end
     end
   end
 

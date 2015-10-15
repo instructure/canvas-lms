@@ -1738,6 +1738,14 @@ CanvasRails::Application.routes.draw do
       put 'users/self/bookmarks/:id', action: :update
     end
 
+    scope(controller: :course_nicknames) do
+      get 'users/self/course_nicknames', action: :index, as: :course_nicknames
+      get 'users/self/course_nicknames/:course_id', action: :show
+      put 'users/self/course_nicknames/:course_id', action: :update
+      delete 'users/self/course_nicknames/:course_id', action: :delete
+      delete 'users/self/course_nicknames', action: :clear
+    end
+
     scope(controller: :errors) do
       post "error_reports", action: :create
     end

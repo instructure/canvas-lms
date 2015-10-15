@@ -570,7 +570,7 @@ class ApplicationController < ActionController::Base
 
         if @context && @context.respond_to?(:short_name)
           crumb_url = named_context_url(@context, :context_url) if @context.grants_right?(@current_user, session, :read)
-          add_crumb(@context.short_name, crumb_url)
+          add_crumb(@context.nickname_for(@current_user, :short_name), crumb_url)
         end
 
         @set_badge_counts = true

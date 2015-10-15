@@ -1356,6 +1356,16 @@ class User < ActiveRecord::Base
     preferences[:custom_colors] ||= {}
   end
 
+  def course_nicknames
+    preferences[:course_nicknames] ||= {}
+  end
+
+  def course_nickname(course)
+    shard.activate do
+      course_nicknames[course.id]
+    end
+  end
+
   def watched_conversations_intro?
     preferences[:watched_conversations_intro] == true
   end

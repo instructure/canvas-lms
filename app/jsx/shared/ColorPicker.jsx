@@ -4,8 +4,9 @@ define([
   'jquery',
   'react',
   'react-modal',
-  'i18n!calendar_color_picker'
-], function($, React, ReactModal, I18n) {
+  'i18n!calendar_color_picker',
+  'jsx/shared/CourseNicknameEdit'
+], function($, React, ReactModal, I18n, CourseNicknameEdit) {
 
   var PREDEFINED_COLORS = [
     {hexcode: '#EF4437', name: I18n.t('Red')},
@@ -42,7 +43,8 @@ define([
       positions: React.PropTypes.object,
       nonModal: React.PropTypes.bool,
       hidePrompt: React.PropTypes.bool,
-      currentColor: React.PropTypes.string
+      currentColor: React.PropTypes.string,
+      nicknameInfo: React.PropTypes.object
     },
 
     // ===============
@@ -142,6 +144,13 @@ define([
       });
     },
 
+    onApply (color, event) {
+      this.setColorForCalendar(color, event);
+      if (this.refs.courseNicknameEdit) {
+        this.refs.courseNicknameEdit.setCourseNickname();
+      }
+    },
+
     // ===============
     //    RENDERING
     // ===============
@@ -175,6 +184,14 @@ define([
       });
     },
 
+    nicknameEdit () {
+      if (this.props.nicknameInfo) {
+        return (
+          <CourseNicknameEdit ref='courseNicknameEdit' nicknameInfo={this.props.nicknameInfo} />
+        );
+      }
+    },
+
     prompt () {
       if (!this.props.hidePrompt) {
         return (
@@ -197,6 +214,7 @@ define([
       return (
         <div className="ColorPicker__Container">
           {this.prompt()}
+          {this.nicknameEdit()}
           <div className="ColorPicker__ColorContainer">
             {this.renderColorRows()}
           </div>
@@ -228,7 +246,7 @@ define([
             </button>
             <span>&nbsp;</span>
             <button className="Button Button--primary"
-              onClick = {this.setColorForCalendar.bind(null, this.state.currentColor)}>
+              onClick = {this.onApply.bind(null, this.state.currentColor)}>
               {I18n.t('Apply')}
             </button>
           </div>

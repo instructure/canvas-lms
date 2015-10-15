@@ -52,6 +52,7 @@ define([
         return (
           <div className="col-xs-6 col-lg-4 card">
             <DashboardCard shortName={card.shortName}
+              originalName={card.originalName}
               courseCode={card.courseCode}
               id={card.id}
               href={card.href}

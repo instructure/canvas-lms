@@ -7,8 +7,9 @@ class CourseForMenuPresenter
     Course::TAB_ANNOUNCEMENTS, Course::TAB_FILES
   ].freeze
 
-  def initialize(course, available_section_tabs)
+  def initialize(course, available_section_tabs, user = nil)
     @course = course
+    @user = user
     @available_section_tabs = (available_section_tabs || []).select do |tab|
       DASHBOARD_CARD_TABS.include?(tab[:id])
     end
@@ -18,7 +19,8 @@ class CourseForMenuPresenter
   def to_h
     {
       longName: "#{course.name} - #{course.short_name}",
-      shortName: course.name,
+      shortName: course.nickname_for(@user),
+      originalName: course.name,
       courseCode: course.course_code,
       assetString: course.asset_string,
       href: course_path(course, :invitation => course.read_attribute(:invitation)),

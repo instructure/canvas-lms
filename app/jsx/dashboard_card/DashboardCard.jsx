@@ -19,6 +19,7 @@ define([
     propTypes: {
       courseId: React.PropTypes.string,
       shortName: React.PropTypes.string,
+      originalName: React.PropTypes.string,
       courseCode: React.PropTypes.string,
       assetString: React.PropTypes.string,
       term: React.PropTypes.string,
@@ -32,12 +33,26 @@ define([
       };
     },
 
+    nicknameInfo: function(nickname) {
+      return {
+        nickname: nickname,
+        originalName: this.props.originalName,
+        courseId: this.props.id,
+        onNicknameChange: this.handleNicknameChange
+      }
+    },
+
     // ===============
     //    LIFECYCLE
     // ===============
 
+    handleNicknameChange: function(nickname){
+      this.setState({ nicknameInfo: this.nicknameInfo(nickname) })
+    },
+
     getInitialState: function() {
-      return CourseActivitySummaryStore.getStateForCourse(this.props.id)
+      return _.extend({ nicknameInfo: this.nicknameInfo(this.props.shortName) },
+        CourseActivitySummaryStore.getStateForCourse(this.props.id))
     },
 
     componentDidMount: function() {
@@ -114,6 +129,7 @@ define([
             assetString       = {this.props.assetString}
             settingsToggle    = {this.refs.settingsToggle}
             backgroundColor   = {this.props.backgroundColor}
+            nicknameInfo      = {this.state.nicknameInfo}
           />
         );
       }
@@ -142,7 +158,9 @@ define([
             <div className="ic-DashboardCard__background" style={{backgroundColor: this.props.backgroundColor}}>
               <a className="ic-DashboardCard__link" href={this.props.href}>
                 <header className="ic-DashboardCard__header">
-                  <h2 className="ic-DashboardCard__header-title">{this.props.shortName}</h2>
+                  <h2 className="ic-DashboardCard__header-title" title={this.props.originalName}>
+                    {this.state.nicknameInfo.nickname}
+                  </h2>
                   <p className="ic-DashboardCard__header-subtitle">{this.props.courseCode}</p>
                   {
                     this.props.term ? (
@@ -160,7 +178,7 @@ define([
                 >
                   <i className="icon-settings" aria-hidden="true" />
                   <span className="screenreader-only">
-                    { I18n.t("Choose a color for %{course}", { course: this.props.shortName}) }
+                    { I18n.t("Choose a color or course nickname for %{course}", { course: this.state.nicknameInfo.nickname}) }
                   </span>
               </button>
             </div>

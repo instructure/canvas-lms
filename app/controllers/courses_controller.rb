@@ -1503,7 +1503,7 @@ class CoursesController < ApplicationController
 
       check_incomplete_registration
 
-      add_crumb(@context.short_name, url_for(@context), :id => "crumb_#{@context.asset_string}")
+      add_crumb(@context.nickname_for(@current_user, :short_name), url_for(@context), :id => "crumb_#{@context.asset_string}")
       set_badge_counts_for(@context, @current_user, @current_enrollment)
 
       @course_home_view = (params[:view] == "feed" && 'feed') || @context.default_view || 'feed'

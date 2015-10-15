@@ -532,7 +532,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   def course_name
-    self.course.name || t('#enrollment.default_course_name', "Course")
+    self.course.nickname_for(self.user) || t('#enrollment.default_course_name', "Course")
   end
 
   def short_name(length=nil)
@@ -546,7 +546,7 @@ class Enrollment < ActiveRecord::Base
   def long_name
     return @long_name if @long_name
     @long_name = self.course_name
-    @long_name = t('#enrollment.with_section', "%{course_name}, %{section_name}", :course_name => @long_name, :section_name => self.course_section.display_name) if self.course_section && self.course_section.display_name && self.course_section.display_name != self.course.name
+    @long_name = t('#enrollment.with_section', "%{course_name}, %{section_name}", :course_name => @long_name, :section_name => self.course_section.display_name) if self.course_section && self.course_section.display_name && self.course_section.display_name != self.course_name
     @long_name
   end
 

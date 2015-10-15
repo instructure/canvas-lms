@@ -130,6 +130,13 @@ describe Api::V1::Course do
       expect(json['total_students']).to eq 1
     end
 
+    it "includes the course nickname if one is set" do
+      @me.course_nicknames[@course1.id] = 'nickname'
+      json = @test_api.course_json(@course1, @me, {}, [], [])
+      expect(json['name']).to eq 'nickname'
+      expect(json['original_name']).to eq @course1.name
+    end
+
     context "total_scores" do
       before do
         @enrollment.computed_current_score = 95.0;
