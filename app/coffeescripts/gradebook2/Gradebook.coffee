@@ -102,10 +102,14 @@ define [
       else
         'students_url'
 
-      @gotAllAssignmentGroupsPromise = $.Deferred().done => @gotAllAssignmentGroups()
-      gotAllStudents = $.Deferred().done(()=>
-        @gotAllAssignmentGroupsPromise.then(()=> @gotAllStudents())
-      )
+      gotAllStudentsPromise = $.Deferred()
+      @gotAllAssignmentGroupsPromise = $.Deferred()
+      gotAllStudentsAndAssignmentsPromise = $.Deferred()
+
+      $.when(gotAllStudentsPromise, @gotAllAssignmentGroupsPromise).then =>
+        @gotAllAssignmentGroups()
+        @gotAllStudents()
+        gotAllStudentsAndAssignmentsPromise.resolve()
 
       @assignmentGroupsParams = {exclude_descriptions: true}
       if @mgpEnabled && @gradingPeriodToShow && @gradingPeriodToShow != '0' && @gradingPeriodToShow != ''
@@ -136,12 +140,12 @@ define [
         paginationLinks = xhr.getResponseHeader('Link')
         lastLink = paginationLinks.match(/<[^>]+>; *rel="last"/)
         unless lastLink?
-          gotAllStudents.resolve()
+          gotAllStudentsPromise.resolve()
           return
         lastPage = lastLink[0].match(/page=(\d+)/)[1]
         lastPage = parseInt lastPage, 10
         if lastPage == 1
-          gotAllStudents.resolve()
+          gotAllStudentsPromise.resolve()
           return
 
         fetchEnrollments = (page) =>
@@ -152,10 +156,10 @@ define [
             @gotChunkOfStudents responses[0]
           else
             @gotChunkOfStudents(students) for [students, x, y] in responses
-          gotAllStudents.resolve()
+          gotAllStudentsPromise.resolve()
 
       gotCustomColumns = @getCustomColumns()
-      @gotAllData = $.when(gotCustomColumns, gotAllStudents, @gotAllAssignmentGroupsPromise)
+      @gotAllData = $.when(gotCustomColumns, gotAllStudentsAndAssignmentsPromise)
 
       @allSubmissionsLoaded.done =>
         for c in @customColumns
