@@ -528,8 +528,8 @@ class ContextModule < ActiveRecord::Base
   def update_for(user, action, tag, points=nil)
     retry_count = 0
     return nil unless self.context.users.include?(user)
-    return nil unless ContextModuleProgression.prerequisites_satisfied?(user, self)
-    return nil unless progression = self.find_or_create_progression(user)
+    return nil unless progression = self.evaluate_for(user)
+    return nil if progression.locked?
 
     progression.update_requirement_met!(action, tag, points)
     progression

@@ -62,18 +62,19 @@ class GradingPeriod < ActiveRecord::Base
     end
   end
 
-  def assignments(assignment_scope)
-    assignments, without_due_at = assignment_scope.partition(&:due_at)
+  def assignments_for_student(assignments, student)
+    Assignment::FilterWithOverridesByDueAtForStudent.new(
+      assignments: assignments,
+      grading_period: self,
+      student: student
+    ).filter_assignments
+  end
 
-    # Change to millisecond zero is necessary as past versions of fancy
-    # midnight set seconds to 59.999999.
-    assignments.select! { |a| in_date_range?(a.due_at.change usec: 0) }
-
-    if last?
-      assignments + without_due_at
-    else
-      assignments
-    end
+  def assignments(assignments)
+    Assignment::FilterWithOverridesByDueAtForClass.new(
+      assignments: assignments,
+      grading_period: self
+    ).filter_assignments
   end
 
   def current?

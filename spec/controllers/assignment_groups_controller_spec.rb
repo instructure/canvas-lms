@@ -24,7 +24,7 @@ describe AssignmentGroupsController do
   end
 
   describe 'GET index' do
-    describe 'filteing by grading period and overrides' do
+    describe 'filtering by grading period and overrides' do
       let!(:assignment) { course.assignments.create!(due_at: Date.new(2015, 1, 15)) }
       let!(:assignment_with_override) { course.assignments.create!(due_at: Date.new(2015, 1, 15)) }
       let!(:feb_override) do

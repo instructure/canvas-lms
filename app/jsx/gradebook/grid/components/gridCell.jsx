@@ -5,7 +5,7 @@ define([
   './assignmentGradeCell'
 ], function (React, _, AssignmentGradeCell) {
 
-  const GRADEBOOK_CELL_CLASS = 'gradebook-cell',
+  var GRADEBOOK_CELL_CLASS = 'gradebook-cell',
         ACTIVE_CLASS = ' active',
         LATE_CLASS = ' late',
         RESUBMIITED_CLASS = ' resubmitted';

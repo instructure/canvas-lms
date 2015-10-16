@@ -8,8 +8,8 @@ define([
   'jsx/gradebook/grid/actions/gradebookToolbarActions'
 ], function (React, Reflux, I18n, HeaderDropdownOption, GradebookToolbarStore, GradebookToolbarActions) {
 
-  const TO_END = I18n.t("Move to end"),
-        TO_FRONT = I18n.t("Move to front");
+  var TO_END = I18n.t("Move to end"),
+      TO_FRONT = I18n.t("Move to front");
 
   var MoveTotalColumnToggle = React.createClass({
     mixins: [
