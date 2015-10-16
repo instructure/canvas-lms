@@ -2,30 +2,28 @@ define [
   'jquery'
   'compiled/models/Assignment'
   'compiled/SubmissionDetailsDialog'
-  'helpers/fakeENV'
   'jst/SubmissionDetailsDialog'
-], ($, Assignment, SubmissionDetailsDialog, fakeENV) ->
+], ($, Assignment, SubmissionDetailsDialog) ->
 
   module 'SubmissionDetailsDialog',
+
     setup: ->
-      fakeENV.setup({ current_user_roles: [ "teacher" ] })
       @assignment = new Assignment(id: 1)
       @user       = { assignment_1: {}, id: 1, name: 'Test student' }
       @options    = { speed_grader_enabled: true, change_grade_url: 'magic' }
 
     teardown: ->
-      fakeENV.teardown()
       $('.submission_details_dialog').remove()
 
   test 'speed_grader_enabled sets speedgrader url', ->
-    dialog = new SubmissionDetailsDialog(@assignment, @user, {speed_grader_enabled: true, change_grade_url: ':assignment/:student'})
+    dialog = new SubmissionDetailsDialog(@assignment, @user, speed_grader_enabled: true, change_grade_url: ':assignment/:student')
     ok dialog.submission.speedGraderUrl
     dialog.open()
 
     equal dialog.dialog.find('.more-details-link').length, 1
 
   test 'speed_grader_enabled as false does not set speedgrader url', ->
-    dialog = new SubmissionDetailsDialog(@assignment, @user, { speed_grader_enabled: false, change_grade_url: ':assignment/:student' })
+    dialog = new SubmissionDetailsDialog(@assignment, @user, speed_grader_enabled: false, change_grade_url: ':assignment/:student')
     equal dialog.submission.speedGraderUrl, null
     dialog.open()
 
@@ -42,24 +40,22 @@ define [
   module '_submission_detail',
 
     setup: ->
-      fakeENV.setup({ current_user_roles: [ "teacher" ] })
       @assignment = new Assignment(id: 1)
       @options    = { speed_grader_enabled: true, change_grade_url: 'magic'}
 
     teardown: ->
-      fakeENV.teardown()
       $('.submission_details_dialog').remove()
 
   test 'partial correctly makes url field if submission type is url', ->
     @user       = { assignment_1: { submission_history: [{ submission_type: "online_url", url: "www.cnn.com" }] }, id: 1, name: 'Test student' }
-    dialog = new SubmissionDetailsDialog(@assignment, @user, {speed_grader_enabled: true, change_grade_url: ':assignment/:student'})
+    dialog = new SubmissionDetailsDialog(@assignment, @user, speed_grader_enabled: true, change_grade_url: ':assignment/:student')
     dialog.open()
 
     equal dialog.dialog.find('.url-submission').length, 1
 
   test 'partial correctly makes attachment fields if submission included attachments', ->
     @user       = { assignment_1: { submission_history: [{ submission_type: "online_url", attachments: [{},{},{}] }] }, id: 1, name: 'Test student' }
-    dialog = new SubmissionDetailsDialog(@assignment, @user, {speed_grader_enabled: true, change_grade_url: ':assignment/:student'})
+    dialog = new SubmissionDetailsDialog(@assignment, @user, speed_grader_enabled: true, change_grade_url: ':assignment/:student')
     dialog.open()
 
     equal dialog.dialog.find('.submisison-attachment').length, 3
@@ -67,12 +63,10 @@ define [
   module '_grading_box',
 
     setup: ->
-      fakeENV.setup({ current_user_roles: [ "teacher" ] })
       @assignment = new Assignment(id: 1, name: 'Test assignment', due_at: "2014-04-14T00:00:00Z")
       @user       = { assignment_1: { submitted_at: "2014-04-20T00:00:00Z" }, id: 1, name: 'Test student' }
       @options    = { speed_grader_enabled: false, change_grade_url: ':assignment/:student' }
     teardown: ->
-      fakeENV.teardown()
       $('.submission_details_dialog').remove()
 
   test "displays the grade as 'EX' if the submission is excused", ->

@@ -189,7 +189,7 @@ define [
       closedAdminGradingPeriods = @getClosedAdminGradingPeriods()
 
       if closedAdminGradingPeriods.length > 0
-        assignments = @getAssignmentsInClosedGradingPeriods()
+        assignments = @getAssignmentsInClosedGradingPeriods(closedAdminGradingPeriods)
         @disabledAssignments = assignments.map (a) ->
           a.id
 
@@ -217,8 +217,10 @@ define [
       else
         ENV.GRADEBOOK_OPTIONS.current_grading_period_id
 
-    getAssignmentsInClosedGradingPeriods: () ->
-      latestEndDate = new Date(ENV.GRADEBOOK_OPTIONS.latest_end_date_of_admin_created_grading_periods_in_the_past)
+    getAssignmentsInClosedGradingPeriods: (gradingPeriods) ->
+      latestEndDate = new Date(gradingPeriods[0]?.end_date)
+      for gradingPeriod in gradingPeriods
+        latestEndDate = new Date(gradingPeriod.end_date) if latestEndDate < new Date(gradingPeriod.end_date)
       #return assignments whose end date is within the latest closed's end date
       _.select @assignments, (a) =>
         @assignmentIsDueBeforeEndDate(a, latestEndDate)

@@ -4,9 +4,7 @@
           class="grading_value grading_box"
           id="student_grading_{{assignment.id}}"
           aria-labelledby="default_grade_points"
-          aria-describedby="default_grade_description"
-          {{ disabledIf isInPastGradingPeriodAndNotAdmin }}
-          />
+          aria-describedby="default_grade_description"/>
 {{/if}}
 {{#if assignment_grading_type_is_percent}}
   <span name="{{inputName}}" class="grading_box" id="student_grading_{{assignment.id}}">
@@ -16,9 +14,7 @@
             value="{{ grade }}"
             class="grading_value"
             aria-labelledby="default_grade_points"
-            aria-describedby="default_grade_description"
-            {{ disabledIf isInPastGradingPeriodAndNotAdmin }}
-            />
+            aria-describedby="default_grade_description"/>
   </span>
 {{/if}}
 {{#if assignment_grading_type_is_letter_grade}}
@@ -28,9 +24,7 @@
           class="grading_value grading_box score_value"
           id="student_grading_{{assignment.id}}"
           aria-labelledby="default_grade_points"
-          aria-describedby="default_grade_description"
-          {{ disabledIf isInPastGradingPeriodAndNotAdmin }}
-          />
+          aria-describedby="default_grade_description"/>
 {{/if}}
 {{#if assignment_grading_type_is_gpa_scale}}
   <input  name="{{inputName}}"
@@ -39,16 +33,10 @@
           class="grading_value grading_box score_value"
           id="student_grading_{{assignment.id}}"
           aria-labelledby="default_grade_points"
-          aria-describedby="default_grade_description"
-          {{ disabledIf isInPastGradingPeriodAndNotAdmin }}
-          />
+          aria-describedby="default_grade_description"/>
 {{/if}}
 {{#if assignment_grading_type_is_pass_fail}}
-  <select name="{{inputName}}"
-          class="grading_value grading_box pass_fail"
-          id="student_grading_{{assignment.id}}"
-          {{ disabledIf isInPastGradingPeriodAndNotAdmin }}
-          >
+  <select name="{{inputName}}" class="grading_value grading_box pass_fail" id="student_grading_{{assignment.id}} %>">
     <option value="">---</option>
     <option value="complete" {{selectedIf grade "complete"}}>{{#t "#gradebooks.grades.complete"}}Complete{{/t}}</option>
     <option value="incomplete" {{selectedIf grade "incomplete"}}>{{#t "#gradebooks.grades.incomplete"}}Incomplete{{/t}}</option>
