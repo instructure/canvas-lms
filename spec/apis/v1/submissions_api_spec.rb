@@ -3238,96 +3238,6 @@ describe 'Submissions API', type: :request do
     end
   end
 
-  describe "publish_provisional_grades" do
-    before :once do
-      course_with_student :active_all => true
-      course_with_ta :course => @course, :active_all => true
-      @course.root_account.allow_feature! :moderated_grading
-      @assignment = @course.assignments.create!
-      @path = "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/publish_provisional_grades"
-      @params = { :controller => 'submissions_api', :action => 'publish_provisional_grades',
-                  :format => 'json', :course_id => @course.to_param, :assignment_id => @assignment.to_param }
-    end
-
-    it "requires moderated grading" do
-      @assignment.update_attribute :moderated_grading, true
-      json = api_call_as_user(@teacher, :post, @path, @params, {}, {}, { :expected_status => 400 })
-      expect(json['message']).to eq 'Assignment does not use moderated grading'
-    end
-
-    it "requires a moderated assignment" do
-      @course.enable_feature! :moderated_grading
-      json = api_call_as_user(@teacher, :post, @path, @params, {}, {}, { :expected_status => 400 })
-      expect(json['message']).to eq 'Assignment does not use moderated grading'
-    end
-
-    context "with moderated assignment" do
-      before(:once) do
-        @course.enable_feature! :moderated_grading
-        @assignment.update_attribute :moderated_grading, true
-      end
-
-      it "requires moderate_grades permissions" do
-        api_call_as_user(@ta, :post, @path, @params, {}, {}, { :expected_status => 401 })
-      end
-
-      it "fails if grades were already published" do
-        @assignment.update_attribute :grades_published_at, Time.now.utc
-        json = api_call_as_user(@teacher, :post, @path, @params, {}, {}, { :expected_status => 400 })
-        expect(json['message']).to eq 'Assignment grades have already been published'
-      end
-
-      context "with provisional grades" do
-        before(:once) do
-          @submission = @assignment.submit_homework(@student, :body => "hello")
-          @assignment.grade_student(@student, { :grader => @ta, :score => 100, :provisional => true })
-        end
-
-        it "publishes provisional grades" do
-          @student.communication_channels.create(:path => 'student@example.edu', :path_type => 'email').confirm
-          n = Notification.create!(:name => 'Submission Graded', :category => 'TestImmediately')
-          NotificationPolicy.create!(:notification => n,
-                                     :communication_channel => @student.communication_channel,
-                                     :frequency => 'immediately')
-
-          expect(@submission.workflow_state).to eq 'submitted'
-          expect(@submission.score).to be_nil
-          expect(@student.messages).to be_empty
-
-          api_call_as_user(@teacher, :post, @path, @params)
-
-          expect(@submission.reload.workflow_state).to eq 'graded'
-          expect(@submission.grader).to eq @ta
-          expect(@submission.score).to eq 100
-
-          @assignment.reload
-          expect(@assignment.grades_published_at).to be_within(1.minute).of(Time.now.utc)
-
-          @student.reload
-          expect(@student.messages.map(&:notification_name)).to be_include 'Submission Graded'
-        end
-
-        it "publishes the selected provisional grade when the student is in the moderation set" do
-          @submission.provisional_grade(@ta).update_attribute(:graded_at, 1.minute.ago)
-
-          @other_ta = user :active_user => true
-          @course.enroll_ta @other_ta, :enrollment_state => 'active'
-          @assignment.grade_student(@student, { :grader => @other_ta, :score => 90, :provisional => true })
-          sel = @assignment.moderated_grading_selections.build
-          sel.student_id = @student.id
-          sel.selected_provisional_grade_id = @submission.provisional_grade(@other_ta).id
-          sel.save!
-
-          api_call_as_user(@teacher, :post, @path, @params)
-
-          expect(@submission.reload.workflow_state).to eq 'graded'
-          expect(@submission.grader).to eq @other_ta
-          expect(@submission.score).to eq 90
-        end
-      end
-    end
-  end
-
   describe "list_gradeable_students" do
     before(:once) do
       course_with_teacher :active_all => true
@@ -3395,7 +3305,8 @@ describe 'Submissions API', type: :request do
                 "scorer_id"=>@ta.id,
                 "provisional_grade_id"=>pg.id,
                 "grade_matches_current_submission"=>true,
-                "final"=>false}]},
+                "final"=>false,
+                "speedgrader_url"=>"http://www.example.com/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#%7B%22student_id%22:#{@student1.id},%22provisional_grade_id%22:#{pg.id}%7D"}]},
            {"id"=>@student2.id,
             "display_name"=>"User",
             "avatar_image_url"=>"https://localhost/images/messages/avatar-50.png",
@@ -3404,51 +3315,6 @@ describe 'Submissions API', type: :request do
             "selected_provisional_grade_id"=>nil,
             "provisional_grades"=>[]}]
         )
-      end
-    end
-  end
-
-  describe "select_provisional_grade" do
-    before(:once) do
-      course_with_student :active_all => true
-      ta_in_course :active_all => true
-      @course.root_account.allow_feature! :moderated_grading
-      @course.enable_feature! :moderated_grading
-      @assignment = @course.assignments.build
-      @assignment.moderated_grading = true
-      @assignment.save!
-      subs = @assignment.grade_student @student, :grader => @ta, :score => 0, :provisional => true
-      @pg = subs.first.provisional_grade(@ta)
-      @path = "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/select_provisional_grade/#{@pg.id}"
-      @params = { :controller => 'submissions_api', :action => 'select_provisional_grade',
-                  :format => 'json', :course_id => @course.to_param, :assignment_id => @assignment.to_param,
-                  :provisional_grade_id => @pg.to_param }
-    end
-
-    it "should fail if the student isn't in the moderation set" do
-      json = api_call_as_user(@teacher, :put, @path, @params, {}, {}, { :expected_status => 400 })
-      expect(json['message']).to eq 'student not in moderation set'
-    end
-
-    context "with moderation set" do
-      before(:once) do
-        @selection = @assignment.moderated_grading_selections.build
-        @selection.student_id = @student.id
-        @selection.save!
-      end
-
-      it "should require :moderate_grades" do
-        api_call_as_user(@ta, :put, @path, @params, {}, {}, { :expected_status => 401 })
-      end
-
-      it "should select a provisional grade" do
-        json = api_call_as_user(@teacher, :put, @path, @params)
-        expect(json).to eq({
-                             'assignment_id' => @assignment.id,
-                             'student_id' => @student.id,
-                             'selected_provisional_grade_id' => @pg.id
-                           })
-        expect(@selection.reload.provisional_grade).to eq(@pg)
       end
     end
   end

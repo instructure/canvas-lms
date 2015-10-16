@@ -258,15 +258,21 @@ class Quizzes::QuizStatisticsController < ApplicationController
     if authorized_action(@quiz, @current_user, :read_statistics)
       scope = @quiz.quiz_submissions.not_settings_only.completed
       updated = scope.order('updated_at DESC').limit(1).pluck(:updated_at).first
-      cache_key = ['quiz_statistics', @quiz.id, @quiz.updated_at, updated,
-                   params[:all_versions]].cache_key
+      cache_key = [
+        'quiz_statistics',
+        @quiz.id,
+        @quiz.updated_at,
+        updated,
+        params[:all_versions],
+        params[:section_ids]
+      ].cache_key
 
       if Quizzes::QuizStatistics.large_quiz?(@quiz)
         head :no_content  #operation not available for large quizzes
       else
         json = Rails.cache.fetch(cache_key) do
           all_versions = value_to_boolean(params[:all_versions])
-          statistics = @service.generate_aggregate_statistics(all_versions)
+          statistics = @service.generate_aggregate_statistics(all_versions, {section_ids: params[:section_ids]})
           serialize(statistics)
         end
 

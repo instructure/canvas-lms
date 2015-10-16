@@ -4,8 +4,8 @@ module CC::Exporter::Epub
       self.attachment
     end
 
-    def convert_to_epub
-      exporter = CC::Exporter::Epub::Exporter.new(content_cartridge.open)
+    def convert_to_epub(opts={})
+      exporter = CC::Exporter::Epub::Exporter.new(content_cartridge.open, opts[:sort_by_content])
       epub = CC::Exporter::Epub::Book.new(exporter.templates)
       epub.create
     end

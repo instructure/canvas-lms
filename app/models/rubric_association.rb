@@ -312,6 +312,9 @@ class RubricAssociation < ActiveRecord::Base
       assessment.data = ratings if replace_ratings
 
       assessment.save
+      if artifact.is_a?(ModeratedGrading::ProvisionalGrade)
+        artifact.submission.touch
+      end
       assessment_to_return = assessment if assessment.artifact == opts[:artifact]
     end
     assessment_to_return

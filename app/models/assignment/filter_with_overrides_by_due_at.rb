@@ -1,97 +1,57 @@
-# API Filter Assignments by due_at and respect overrides
 #
-# Returns a list of assignments that have been filtered by assignment
-# due_at and assignment_overrides due_at fields. For example: if any
-# due_at fields fall within the date range then then corresponding
-# assignment is included.
+# Copyright (C) 2015 Instructure, Inc.
 #
-# @argument assignments [ActiveRecord::Relation]
+# This file is part of Canvas.
 #
-# @argument start_date [DateTime]
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+module Assignment::FilterWithOverridesByDueAt
 
-# @argument end_date [DateTime]
-#
-# @argument differentiated_assignments [Boolean]
-#
-# @public assignments
-#
-# @return [ Assignment ] assignments An array of assignments
-#
-# @example
-#   Assignment::FilterWithoutOverridesByDueAt.new(
-#     assignments: @context.assignments,
-#     grading_period: grading_period
-#     differentiated_assignments: @context.feature_enabled?(:differentiated_assignments)
-#   )
-#
-
-class Assignment::FilterWithOverridesByDueAt
-  def initialize(assignments:, grading_period:, differentiated_assignments:)
-    @assignments = assignments
-    @differentiated_assignments = differentiated_assignments
-    @grading_period = grading_period
-  end
-
-  # @returns [Assignments]
   def filter_assignments
-    assignments.select do |assignment|
-      filter_criteria(assignment).any?
-    end
+    assignments.select { |assignment| in_grading_period?(assignment) }
   end
 
   private
-  attr_reader :assignments, :grading_period
-
-  def filter_criteria(assignment)
-    [
-      differentiated_assignments_and_any_assignment_overrides?(assignment) &&
-        last_grading_period_and_any_overrides_with_due_at_nil?(assignment),
-
-      differentiated_assignments_and_any_assignment_overrides?(assignment) &&
-        any_overrides_in_date_range?(assignment),
-
-      last_grading_period_and_assignment_due_at_nil?(assignment),
-
-      in_date_range_end_inclusive?(assignment)
-    ]
+  def in_date_range_end_inclusive?(due_at)
+    !due_at.nil? && grading_period.in_date_range?(due_at)
   end
 
-  def differentiated_assignments_and_any_assignment_overrides?(assignment)
-    differentiated_assignments? && assignment.assignment_overrides.any?
+  def in_date_range_of_grading_period?(assignment)
+    due_at = find_due_at(assignment)
+    in_date_range_end_inclusive?(due_at)
   end
 
-  def last_grading_period_and_any_overrides_with_due_at_nil?(assignment)
-    last_grading_period? && any_overrides_with_due_at_nil?(assignment)
+  def in_grading_period?(assignment)
+    due_at_nil_and_last_grading_period?(assignment) ||
+      in_date_range_of_grading_period?(assignment)
   end
 
-  def last_grading_period_and_assignment_due_at_nil?(assignment)
-    last_grading_period? && assignment.due_at.nil?
+  def milliseconds_to_zero(due_at)
+    due_at.change(usec: 0) if due_at
   end
 
-  def in_date_range_end_inclusive?(assignment_or_override)
-    return false if assignment_or_override.due_at.nil?
-
-    grading_period.start_date < assignment_or_override.due_at &&
-      assignment_or_override.due_at <= grading_period.end_date
+  def active_overrides(assignment)
+    # using 'select' instead of calling the 'active' scope
+    # because we have assignment_overrides eager loaded and
+    # we don't want to make additional AR calls.
+    @active_assignment_overrides ||= {}
+    @active_assignment_overrides[assignment.id] ||=
+      assignment.assignment_overrides.select do |override|
+        override.workflow_state == 'active'
+      end
   end
 
-  def differentiated_assignments?
-    @differentiated_assignments
-  end
-
-  def last_grading_period?
-    @grading_period.last?
-  end
-
-  def any_overrides_in_date_range?(assignment)
-    assignment.assignment_overrides.any? do |override|
-      in_date_range_end_inclusive?(override)
-    end
-  end
-
-  def any_overrides_with_due_at_nil?(assignment)
-    assignment.assignment_overrides.any? do |override|
-      override.due_at.nil?
-    end
+  def no_active_overrides?(assignment)
+    active_overrides(assignment).none?
   end
 end

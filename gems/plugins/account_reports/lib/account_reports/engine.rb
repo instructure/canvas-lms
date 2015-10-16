@@ -58,6 +58,21 @@ module AccountReports
             }
           }
         },
+        'last_enrollment_activity_csv' => {
+          :title => proc { I18n.t('Last Enrollment Activity') },
+          :description_partial => true,
+          :parameters_partial => 'term_selector_parameters',
+          :parameters => {
+            :enrollment_term_id => {
+              :required => false,
+              :description => 'The canvas id of the term\'s courses to get activity from'
+            },
+            :course_id => {
+              :required => false,
+              :description => 'The course\'s enrollments to report on'
+            }
+          }
+        },
         'outcome_results_csv' => {
           :title => proc { I18n.t(:outcome_results_title, 'Outcome Results') },
           :parameters_partial => true,

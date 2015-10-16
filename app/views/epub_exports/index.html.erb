@@ -1,0 +1,26 @@
+<% add_crumb t("Download Course Context") %>
+<% css_bundle :epub_exports -%>
+<% js_bundle :epub_exports -%>
+<% content_for :page_title do %><%= t("Download Course Content")  %><% end %>
+
+<div>
+  <h1><%= t("Download Course Content")  %></h1>
+  <p>
+  <%= t("Downloading course content allows access to content while offline. \
+         Content may include files, pages, assignments, discussion topics or \
+         quizzes. Click \"Generate ePub\" for each course and open with any \
+         eReader software to view.") %>
+  </p>
+
+  <div class="item-group-container">
+    <div class="item-group-condensed">
+      <div class="ig-header">
+        <h2 class="ig-header-title">
+          <%= t("Current Courses") %>
+        </h2>
+      </div>
+
+      <div class="course-epub-exports-app"></div>
+    </div>
+  </div>
+</div>

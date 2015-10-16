@@ -72,10 +72,7 @@ define([
         $(`#global_nav_${type}_link`).on('click', preventDefault(this.handleMenuClick.bind(this, type)));
       });
 
-      //////////////////////////////////
-      /// Other Events
-      //////////////////////////////////
-      if (window.ENV.current_user_id) {
+      if (window.ENV.current_user_id && this.unreadCountElement().length != 0) {
         this.pollUnreadCount();
       }
     },
@@ -88,7 +85,7 @@ define([
       loadingState[`${type}Loading`] = true;
       this.setState(loadingState);
 
-      $.get(url, (data) => {
+      $.getJSON(url, (data) => {
         var newState = {};
         newState[type] = data;
         newState[`${type}Loading`] = false;
@@ -104,11 +101,14 @@ define([
         .always(() => setTimeout(this.pollUnreadCount, UNREAD_COUNT_POLL_INTERVAL));
     },
 
+    unreadCountElement () {
+      return this.$unreadCount || (this.$unreadCount = $('#global_nav_conversations_link').find('.menu-item__badge'))
+    },
+
     updateUnreadCount (count) {
       count = parseInt(count, 10);
-      this.$unreadCount || (this.$unreadCount = $('#global_nav_conversations_link').find('.menu-item__badge'))
-      this.$unreadCount.text(count);
-      this.$unreadCount.toggle(count > 0);
+      this.unreadCountElement().text(count);
+      this.unreadCountElement().toggle(count > 0);
     },
 
     componentWillUpdate (newProps, newState) {

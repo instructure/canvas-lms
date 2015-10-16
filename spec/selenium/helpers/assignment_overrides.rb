@@ -336,4 +336,11 @@ module AssignmentOverridesSeleniumHelper
       expect(fj('.ui-tooltip')).to include_text("#{message}")
     end
   end
+
+  def create_assignment_override(assignment, section, due_date)
+    override = assignment.assignment_overrides.build
+    override.set = section
+    override.due_at = due_date.days.from_now
+    override.save!
+  end
 end

@@ -176,6 +176,10 @@ EOS
       th.html_to_text('<script>script script script</script>text<link rel="stuff">').should == "text"
     end
 
+    it "should strip unclosed tags" do
+      th.html_to_text('<iframe src="javascript:alert(document.domain)"<h1>text</h1>').should == "text"
+    end
+
     it "should strip other tags but leave their text" do
       th.html_to_text("text<span>span text</span>").should == "textspan text"
     end

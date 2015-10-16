@@ -40,7 +40,7 @@ class IncomingMail::ReplyToAddress
     return message.from if message.context_type == 'ErrorReport'
 
     address, domain = self.class.address_from_pool(message).split('@')
-    "#{address}+#{secure_id}-#{message.global_id}@#{domain}"
+    "#{address}+#{secure_id}-#{Shard.short_id_for(message.global_id)}@#{domain}"
   end
 
   alias :to_s :address
@@ -49,7 +49,8 @@ class IncomingMail::ReplyToAddress
   #
   # Returns a secure ID string.
   def secure_id
-    Canvas::Security.hmac_sha1(message.global_id.to_s)
+    gid = message.global_id
+    Canvas::Security.hmac_sha1(Shard.short_id_for(gid))
   end
 
   class << self

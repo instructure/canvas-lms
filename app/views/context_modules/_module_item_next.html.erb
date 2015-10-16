@@ -115,6 +115,7 @@
     <% if editable || module_item.nil? %>
       <div class="ig-admin">
         <span
+          data-module-item-name="<%= tag && tag.title %>"
           data-module-type="<%= module_item && module_item.content_type_class %>"
           data-content-id="<%= module_item && module_item.content_id %>"
           data-id="<%= module_item_publishable_id(module_item) %>"
@@ -124,6 +125,8 @@
           data-published="<%= module_item && published_status == 'published' %>"
           data-publishable="<%= module_item_publishable?(module_item) %>"
           data-unpublishable="<%= module_item_unpublishable?(module_item) %>"
+          data-publish-message="<%= t('Unpublished. Click to publish %{item_name}.', {item_name: tag && tag.title ? tag.title : ''}) %>"
+          data-unpublish-message="<%= t('Published. Click to unpublish %{item_name}.', {item_name: tag && tag.title ? tag.title : ''}) %>"
           title=""
           data-tooltip
           class="publish-icon <%= published_status %>"
@@ -134,7 +137,7 @@
         <div class="inline-block cog-menu-container">
           <a class="al-trigger al-trigger-gray" role="button" tabindex="0" href="#">
             <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
-            <span class="screenreader-only"><%= t('settings', 'Settings') %></span>
+            <span class="screenreader-only"><%= t('Manage %{item_name}', {item_name: tag && tag.title ? tag.title : 'item'})  %></span>
           </a>
 
           <ul class="al-options">
@@ -160,22 +163,16 @@
             <% menu_type_to_class.each do |menu_type, content_class| %>
               <% if !tag || tag.content.is_a?(content_class) %>
                 <%
-                   launch_options = {launch_type: menu_type}
+                   launch_options = {}
                    if menu_type == :file_menu
                      launch_options[:files] = [tag ? tag.content_id : "{{ content_id }}"]
                    else
                      launch_options[:module_items] = [tag ? tag.id : "{{ id }}"]
                    end
                 %>
-                <% @menu_tools[menu_type].each do |tool| %>
-                  <li role="presentation" class="<%= menu_type %>">
-                    <% tool_path = course_external_tool_path(@context, tool, launch_options) %>
-                    <a class="menu_tool_link" href="<%= tool_path %>">
-                      <% if icon_url = tool.extension_setting(menu_type, :icon_url) %><img class="icon" alt="" src="<%= icon_url %>" /><% end %>
-                      <%= tool.label_for(menu_type, I18n.locale) %>
-                    </a>
-                  </li>
-                <% end %>
+
+                <%= external_tools_menu_items(@menu_tools[menu_type], {link_class: "menu_tool_link", settings_key: menu_type, in_list: true, url_params: launch_options}) %>
+
               <% end %>
             <% end %>
           </ul>

@@ -21,6 +21,7 @@ define([
   'vendor/jquery.ba-tinypubsub',
   'jquery' /* $ */,
   'str/htmlEscape',
+  'jst/MediaComments',
   'compiled/media_comments/js_uploader',
   'compiled/jquery/mediaComment' /* $.fn.mediaComment */,
   'jquery.ajaxJSON' /* ajaxJSON */,
@@ -29,8 +30,7 @@ define([
   'jquery.instructure_misc_plugins' /* .dim, /\.log\(/ */,
   'jqueryui/progressbar' /* /\.progressbar/ */,
   'jqueryui/tabs' /* /\.tabs/ */
-], function(I18n, _, pubsub, $, htmlEscape, JsUploader) {
-
+], function(I18n, _, pubsub, $, htmlEscape, mediaCommentsTemplate, JsUploader) {
 
   $.mediaComment = function(command, arg1, arg2) {
     var $container = $("<div/>")
@@ -517,21 +517,19 @@ define([
       // **********************************************************************
       // Load dialog html
       // **********************************************************************
-      $.get("/partials/_media_comments.html", function(html) {
-        var checkForKS = function() {
-          if($div.data('ks')) {
-            $div.html(html);
-            $div.find("#media_record_tabs").tabs({activate: $.mediaComment.video_delegate.expectReady});
-            mediaCommentReady();
-          } else if($div.data('ks-error')) {
-            $div.html($div.data('ks-error'));
-          } else {
-            setTimeout(checkForKS, 500);
-          }
+      var checkForKS = function() {
+        if($div.data('ks')) {
+          $div.html(mediaCommentsTemplate());
+          $div.find("#media_record_tabs").tabs({activate: $.mediaComment.video_delegate.expectReady});
+          mediaCommentReady();
+        } else if($div.data('ks-error')) {
+          $div.html($div.data('ks-error'));
+        } else {
+          setTimeout(checkForKS, 500);
         }
-        checkForKS();
-        $dialog = $("#media_comment_dialog");
-      });
+      }
+      checkForKS();
+      $dialog = $("#media_comment_dialog");
       $dialog = $div;
     } else if (!INST.kalturaSettings.js_uploader) {
       // only call mediaCommentReady if we are not doing js uploader

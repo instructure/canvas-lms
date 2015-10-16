@@ -97,6 +97,7 @@ class WikiPagesController < ApplicationController
       log_asset_access(@page, 'wiki', @wiki)
 
       js_env :wiki_page_menu_tools => external_tools_display_hashes(:wiki_page_menu)
+      js_env :DISPLAY_SHOW_ALL_LINK => tab_enabled?(@context.class::TAB_PAGES, {no_render: true})
 
       @mark_done = MarkDonePresenter.new(self, @context, params["module_item_id"], @current_user)
       @padless = true
@@ -135,6 +136,6 @@ class WikiPagesController < ApplicationController
   end
 
   def revisions_redirect
-    redirect_to polymorphic_url([@context, @page, :revisions]), status: :moved_permanently 
+    redirect_to polymorphic_url([@context, @page, :revisions]), status: :moved_permanently
   end
 end

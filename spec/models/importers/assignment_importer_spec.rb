@@ -65,6 +65,19 @@ describe "Importing assignments" do
     expect(a.points_possible).to eq rubric.points_possible
   end
 
+  it "should import group category into existing group with same name when marked as a group assignment" do
+    file_data = get_import_data('', 'assignment')
+    context = get_import_context('')
+    assignment_hash = file_data.find{|h| h['migration_id'] == '4469882339232'}.with_indifferent_access
+    migration = context.content_migrations.create!
+    context.group_categories.create! name: assignment_hash[:group_category]
+
+    Importers::AssignmentImporter.import_from_migration(assignment_hash, context, migration)
+    a = Assignment.where(migration_id: assignment_hash[:migration_id]).first
+    expect(a).to be_has_group_category
+    expect(a.group_category.name).to eq assignment_hash[:group_category]
+  end
+
   it "should infer the default name when importing a nameless assignment" do
     course_model
     migration = @course.content_migrations.create!

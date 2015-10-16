@@ -49,6 +49,52 @@
 
 */
 
+// Alerts
+////////////////////////
+
+
+// Base styles
+
+.alert {
+  padding: $ic-sp $ic-sp*3 $ic-sp $ic-sp;
+  background-color: $ic-bg-light-alert;
+  color: $ic-color-alert;
+  border-radius: $ic-border-radius;
+}
+.alert h4 {
+  margin: 0;
+}
+
+// Adjust close link position
+
+.alert .close {
+  position: relative;
+  top: -2px;
+  right: -21px;
+  line-height: $baseLineHeight;
+}
+
+// Alternate State Colors
+
+.alert-success {
+  background-color: $ic-bg-light-success;
+  color: $successText;
+}
+.alert-danger,
+.alert-error {
+  background-color: $ic-bg-light-danger;
+  color: $ic-color-danger;
+}
+.alert-info {
+  background-color: $ic-bg-light-primary;
+  color: $ic-brand-primary;
+}
+
+//// end Alerts
+
+//// Flash Notifications
+////////////////////////
+
 .ic-flash-info, .ic-flash-success, .ic-flash-warning, .ic-flash-error {
   position: relative;
 

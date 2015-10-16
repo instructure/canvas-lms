@@ -247,6 +247,20 @@ define [
         return fn(this) if arg
       inverse(this)
 
+    # runs block if the argument is null or undefined
+    # usage:
+    # {{#ifNull arg}}
+    #   arg was null
+    # {{else}}
+    #   arg is not null
+    # {{/ifNull}}
+    ifNull: ->
+      [args..., {fn, inverse}] = arguments
+      arg = args[0]
+      if arg?
+        return inverse(this)
+      fn(this)
+
     # {{#eachWithIndex records}}
     #   <li class="legend_item{{_index}}"><span></span>{{Name}}</li>
     # {{/each_with_index}}

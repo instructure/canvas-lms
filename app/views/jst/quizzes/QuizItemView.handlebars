@@ -39,14 +39,7 @@
           <li role="presentation">
             <a href="{{url}}" id="ui-id-{{id}}-3" class="delete-item icon-trash" tabindex="-1" role="menuitem" title='{{#t "title_delete"}}Delete Quiz{{/t}}'>{{#t "links.delete"}}Delete{{/t}}</a>
           </li>
-          {{#each quiz_menu_tools}}
-            <li role="presentation">
-              <a class="menu_tool_link" href="{{url}}">
-                {{#if icon_url}}<img class="icon" alt="" src="{{icon_url}}" />{{/if}}
-                {{title}}
-              </a>
-            </li>
-          {{/each}}
+          {{>ExternalTools/external_tools_menu quiz_menu_tools}}
         </ul>
       </div>
     </div>

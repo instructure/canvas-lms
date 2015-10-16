@@ -21,6 +21,7 @@ require 'net_ldap_extensions'
 
 class AccountAuthorizationConfig < ActiveRecord::Base
   include Workflow
+  validates :auth_filter, length: {maximum: maximum_text_length, allow_nil: true, allow_blank: true}
 
   strong_params
 

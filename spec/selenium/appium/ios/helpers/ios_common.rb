@@ -22,13 +22,24 @@ def enter_school
   wait_true(timeout: 10, interval: 0.100){ tag('UIASecureTextField') }
 end
 
-def provide_credentials(username, password)
+def enter_username(username)
   email = tag('UIATextField')
   email.click
   email.send_keys(username)
+end
+
+def enter_password(password)
   pw = tag('UIASecureTextField')
   pw.click
+  # bug found in iOS Instruments / Appium: when using Simulator, *send_keys* has undefined behavior
+  #   *send_keys* may clear out the previously selected text field
+  sleep(1) # <--- Waiting to send keys after element is selected appears to be a stable temporary fix
   pw.send_keys(password)
+end
+
+def provide_credentials(username, password)
+  enter_username(username)
+  enter_password(password)
   button_exact('Log In').click
 end
 

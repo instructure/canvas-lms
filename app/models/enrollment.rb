@@ -586,6 +586,9 @@ class Enrollment < ActiveRecord::Base
     ids = self.user.dashboard_messages.where(:context_id => self, :context_type => 'Enrollment').pluck(:id) if self.user
     Message.where(:id => ids).delete_all if ids.present?
     update_attribute(:workflow_state, 'active')
+    if self.type == 'StudentEnrollment'
+      Enrollment.recompute_final_score([self.user_id], self.course_id)
+    end
     touch_user
   end
 
@@ -877,6 +880,10 @@ class Enrollment < ActiveRecord::Base
   #   associated course are recomputed.
   #
   # * An assignment is deleted/undeleted
+  #
+  # * An enrollment is accepted (to address the scenario where a student
+  #   is transferred from one section to another, and final grades need
+  #   to be transferred)
   #
   # If some new feature comes up that affects calculation of a user's score,
   # please add appropriate calls to this so that the cached values don't get

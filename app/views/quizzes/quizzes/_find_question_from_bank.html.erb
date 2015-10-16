@@ -3,7 +3,7 @@
   <a href="/<%= @quiz.context_url_prefix %>/question_banks/{{ question_bank_id }}/questions?inherited=1" class="question_bank_questions_url" style="display: none;">&nbsp;</a>
   <a href="<%= context_url(@context, :context_quiz_quiz_questions_url, @quiz.id) %>" class="add_questions_url" style="display: none;">&nbsp;</a>
   <div style="float: right; padding-right: 5px; line-height: 2.5em;">
-    <a href="<%= context_url(@context, :context_question_banks_url) %>"><%= t('links.manage_question_banks', "Manage Course Question Banks") %></a>
+    <a href="<%= context_url(@context, :context_question_banks_url) %>"><%= t('links.view_question_banks', "View Course Question Banks") %></a>
   </div>
   <div class="clear"></div>
   <div class="message" style="display: none;"></div>
@@ -28,7 +28,7 @@
         <div class="side_tabs_content">
           <div class="question_message"></div>
           <div class="question_list_holder" style="display: none;">
-            <a href="#" class="select_all_link"><%= t('links.select_all_banks', "Select All") %></a> | 
+            <a href="#" class="select_all_link"><%= t('links.select_all_banks', "Select All") %></a> |
             <a href="#" class="clear_all_link"><%= t('links.clear_all_banks', "Clear All") %></a>
             <ul class="question_list unstyled_list">
               <li class="found_question blank" style="display: none;">
@@ -59,7 +59,7 @@
 <div id="find_bank_dialog" style="display: none;">
   <a href="<%= context_url(@context, :context_question_banks_url, :include_bookmarked => '1', :inherited => '1') %>" class="find_question_banks_url" style="display: none;">&nbsp;</a>
   <div style="float: right; padding-right: 5px; line-height: 2.5em;">
-    <a href="<%= context_url(@context, :context_question_banks_url) %>"><%= t('links.manage_question_banks', "Manage Course Question Banks") %></a>
+    <a href="<%= context_url(@context, :context_question_banks_url) %>"><%= t('links.view_question_banks', "View Course Question Banks") %></a>
   </div>
   <div class="clear"></div>
   <div class="message" style="display: none;"></div>

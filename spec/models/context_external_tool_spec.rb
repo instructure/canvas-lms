@@ -864,6 +864,16 @@ describe ContextExternalTool do
       @course.reload
       expect(@course.lti_context_id).to eq 'dummy_context_id'
     end
+
+    it 'should use the global_asset_id for new assets that are stored in the db' do
+      expect(@course.lti_context_id).to eq nil
+      @tool = @course.context_external_tools.create!(:name => "a", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
+      context_id = Lti::Asset.global_context_id_for(@course)
+      @tool.opaque_identifier_for(@course)
+      @course.reload
+      expect(@course.lti_context_id).to eq context_id
+    end
+
   end
 
   describe "global navigation" do

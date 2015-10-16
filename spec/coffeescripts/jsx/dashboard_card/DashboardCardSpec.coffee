@@ -46,11 +46,9 @@ define [
     })
     ok renderSpy.called, 'should re-render on state update'
 
-  test 'hasActivity', ->
+  test 'unreadCount', ->
     @component = TestUtils.renderIntoDocument(DashboardCard(@props))
-    ok !@component.hasActivity('icon-discussion', []),
+    ok !@component.unreadCount('icon-discussion', []),
       'should not blow up without a stream'
-    ok @component.hasActivity('icon-discussion', @stream),
-      'should be active if stream item corresponding to icon has unread count'
-    ok !@component.hasActivity('icon-announcement', @stream),
-      'should not be active if stream item corresponding to icon has no unread count'
+    equal @component.unreadCount('icon-discussion', @stream), 2,
+      'should pass down unread count if stream item corresponding to icon has unread count'

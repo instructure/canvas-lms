@@ -2,12 +2,14 @@
 
 define([
   'react',
+  'i18n!theme_editor',
   './ThemeEditorColorRow',
   './ThemeEditorImageRow',
+  './RangeInput',
   './PropTypes',
   'jquery',
   'jqueryui/accordion'
-], (React, ThemeEditorColorRow, ThemeEditorImageRow, customTypes, $) => {
+], (React, I18n, ThemeEditorColorRow, ThemeEditorImageRow, RangeInput, customTypes, $) => {
 
   return React.createClass({
 
@@ -44,8 +46,31 @@ define([
         onChange: this.props.changeSomething.bind(null, varDef.variable_name),
         placeholder: this.props.getDisplayValue(varDef.variable_name),
         varDef: varDef
+      };
+
+      if (varDef.type === 'color') {
+        return (
+          <ThemeEditorColorRow {...props} />
+        );
+      } else if (varDef.type === 'image') {
+        return (
+          <ThemeEditorImageRow {...props} />
+        );
+      } else if (varDef.type === 'percentage') {
+        var defaultValue = props.currentValue || props.placeholder;
+        return (
+            <RangeInput labelText={varDef.human_name}
+                        min={0}
+                        max={1}
+                        step={0.1}
+                        defaultValue={defaultValue ? parseFloat(defaultValue) : 0.5}
+                        name={'brand_config[variables][' + varDef.variable_name + ']'}
+                        onChange={value => props.onChange(value)}
+                        formatValue={value => I18n.toPercentage(value * 100, {precision: 0})} />
+        );
+      } else {
+        return null;
       }
-      return varDef.type === 'color' ? ThemeEditorColorRow(props) : ThemeEditorImageRow(props)
     },
 
     render() {

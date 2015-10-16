@@ -8,7 +8,10 @@ define [
 
   module 'ReactGradebook.gradebookToolbarStore',
     setup: ->
-      fakeENV.setup()
+      env = {
+        GRADEBOOK_OPTIONS: {}
+      }
+      fakeENV.setup(env)
       @defaultOptions =
         hideStudentNames: false
         hideNotesColumn: true
@@ -18,7 +21,6 @@ define [
         totalColumnInFront: false
         warnedAboutTotalsDisplay: false
         showTotalGradeAsPoints: false
-      ENV.GRADEBOOK_OPTIONS = {}
     teardown: ->
       fakeENV.teardown()
       GradebookToolbarStore.toolbarOptions = null

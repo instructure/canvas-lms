@@ -20,6 +20,7 @@ define [
   'jsx/gradebook/grid/actions/studentEnrollmentsActions'
   'jsx/gradebook/grid/stores/assignmentGroupsStore'
   'jsx/gradebook/grid/actions/assignmentGroupsActions'
+  'compiled/gradebook2/AssignmentGroupWeightsDialog'
   'jst/_avatar' #needed by row_student_name
   'jquery.ajaxJSON'
   'jquery.instructure_date_and_time'
@@ -38,7 +39,7 @@ define [
   userSettings, Spinner, htmlEscape, PostGradesStore, PostGradesApp,
   columnHeaderTemplate, SectionMenuView, GradingPeriodMenuView,
   GradebookConstants, GradebookToolbarActions, StudentEnrollmentsActions,
-  AssignmentGroupsStore, AssignmentGroupActions) ->
+  AssignmentGroupsStore, AssignmentGroupActions, AssignmentGroupWeightsDialog) ->
 
   class Gradebook
     constructor: (@options) ->

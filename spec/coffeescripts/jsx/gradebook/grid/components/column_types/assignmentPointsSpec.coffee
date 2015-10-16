@@ -9,21 +9,21 @@ define [
     React.render(componentFactory(data), wrapper)
 
   buildComponent = (props, additionalProps) ->
-    cellData = props || {cellData: {id: '1', points_possible: 10}}
+    cellData = props || columnData: {assignment: {id: '1', points_possible: 10}}
     $.extend(cellData, additionalProps)
     renderComponent(cellData)
 
   buildComponentWithSubmission = (additionalProps, grade) ->
-    cellData =
-      cellData: {id: '1', points_possible: 100}
-      submission: {id: '1', grade: grade, score: '10',assignment_id: '1'}
-    $.extend(cellData, additionalProps)
-    buildComponent(cellData)
+    props =
+      cellData:  {id: '1', grade: grade, score: '10', assignment_id: '1'}
+      columnData: {assignment: {id: '1', points_possible: 100}}
+    $.extend(props, additionalProps)
+    buildComponent(props)
 
   TestUtils = React.addons.TestUtils
   wrapper   = document.getElementById('fixtures')
 
-  module 'ReactGradebook.assignmentLetterGradeComponent',
+  module 'ReactGradebook.assignmentPointsComponent',
     teardown: ->
       React.unmountComponentAtNode(wrapper)
 

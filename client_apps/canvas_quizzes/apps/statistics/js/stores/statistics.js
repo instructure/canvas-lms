@@ -14,7 +14,7 @@ define(function(require) {
     getInitialState: function() {
       return {
         loading: false,
-        stats_can_load: true
+        stats_can_load: true,
       };
     },
 
@@ -105,6 +105,24 @@ define(function(require) {
       if (stats) {
         return stats.questionStatistics;
       }
+    },
+
+    filterForSection: function(sectionId) {
+      if(sectionId == 'all') {
+        quizStats.url = config.quizStatisticsUrl;
+      } else {
+        quizStats.url = config.quizStatisticsUrl + '?section_ids=' + sectionId;
+      }
+
+      config.section_ids = sectionId;
+      this.setState({ loading: true });
+
+      return quizStats.fetch({
+        success: this.checkForStatsNoLoad.bind(this),
+      }).then(function onLoad(payload) {
+        this.populate(payload);
+        this.setState({ loading: false });
+      }.bind(this));
     },
 
     actions: {

@@ -12,7 +12,8 @@ module CC::Exporter::Epub::Converters
         html_path = File.join @unzipped_file_path, res.at_css('file[href$="html"]')['href']
 
         meta_node = open_file_xml(meta_path)
-        html_node = open_file(html_path)
+        html_node = convert_media_from_node!(open_file(html_path))
+        html_node = remove_empty_ids!(html_node)
 
         next unless html_node
 
@@ -22,11 +23,11 @@ module CC::Exporter::Epub::Converters
     end
 
     def assignment_data(meta_doc, html_doc=nil)
-      assignment = {}
+      assignment = {"resource_type" => :assignments}
 
       if html_doc
         _title, body = get_html_title_and_body(html_doc)
-        assignment['description'] = body
+        assignment['description'] = convert_placeholder_paths_from_string!(body)
       end
       ['title', "allowed_extensions", "grading_type", "submission_types"].each do |string_type|
         val = get_node_val(meta_doc, string_type)
@@ -40,6 +41,7 @@ module CC::Exporter::Epub::Converters
         val = get_float_val(meta_doc, f_type)
         assignment[f_type] = val unless val.nil?
       end
+      assignment['identifier'] = get_node_att(meta_doc, 'assignment', 'identifier')
       assignment
     end
   end

@@ -117,6 +117,7 @@ module RSpec::Rails
 
         real_controller = controller_class.new
         real_controller.instance_variable_set(:@_request, @controller.request)
+        real_controller.instance_variable_set(:@context, @controller.instance_variable_get(:@context))
         @controller.real_controller = real_controller
 
         # just calling "render 'path/to/view'" by default looks for a partial
@@ -353,6 +354,14 @@ module Helpers
   end
 end
 
+if CANVAS_RAILS3
+  ActionController::TestSession.class_eval do
+    def destroy
+      clear
+    end
+  end
+end
+
 RSpec.configure do |config|
   # If you're not using ActiveRecord you should remove these
   # lines, delete config/database.yml and disable :active_record
@@ -517,6 +526,24 @@ RSpec.configure do |config|
   def assert_require_login
     expect(response).to be_redirect
     expect(flash[:warning]).to eq "You must be logged in to access this page"
+  end
+
+  # Instead of directly comparing urls
+  # this will make sure urls match
+  # by parsing them, and comparing the results
+  # meaning these would match
+  #   http://test.dev/?foo=bar&other=1
+  #   http://test.dev/?other=1&foo=bar
+  def assert_url_parse_match(test_url, expected_url)
+    parsed_test = URI.parse(test_url)
+    parsed_expected = URI.parse(expected_url)
+
+    parsed_test_query = Rack::Utils.parse_nested_query(parsed_test.query)
+    parsed_expected_query = Rack::Utils.parse_nested_query(parsed_expected.query)
+
+    expect(parsed_test.scheme).to eq parsed_expected.scheme
+    expect(parsed_test.host).to eq parsed_expected.host
+    expect(parsed_test_query).to eq parsed_expected_query
   end
 
   def fixture_file_upload(path, mime_type=nil, binary=false)

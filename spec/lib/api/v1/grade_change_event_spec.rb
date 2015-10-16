@@ -86,7 +86,7 @@ describe Api::V1::GradeChangeEvent do
     @events << Auditors::GradeChange.record(@submission)
     @previous_grade = @submission.grade
 
-    @submission = @assignment.grade_student(@student, grade: 6, grader: @teacher).first
+    @submission = @assignment.grade_student(@student, grade: 6, grader: @teacher, graded_anonymously: true).first
     @event = Auditors::GradeChange.record(@submission)
     @events << @event
   end
@@ -100,6 +100,7 @@ describe Api::V1::GradeChangeEvent do
     expect(event[:grade_before]).to eq @previous_grade
     expect(event[:grade_after]).to eq @submission.grade
     expect(event[:version_number]).to eq @submission.version_number
+    expect(event[:graded_anonymously]).to eq @submission.graded_anonymously
     expect(event[:links][:assignment]).to eq Shard.relative_id_for(@assignment, Shard.current, Shard.current)
     expect(event[:links][:course]).to eq Shard.relative_id_for(@course, Shard.current, Shard.current)
     expect(event[:links][:student]).to eq Shard.relative_id_for(@student, Shard.current, Shard.current)

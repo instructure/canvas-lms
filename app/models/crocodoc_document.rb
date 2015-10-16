@@ -114,18 +114,6 @@ class CrocodocDocument < ActiveRecord::Base
       opts[:filter] = 'none'
     end
 
-    if whitelist
-      opts[:filter] = case opts[:filter]
-                        when "all"
-                          whitelist.join(",")
-                        when "none"
-                          "none"
-                        else
-                          ids = whitelist.map(&:to_i) & [opts[:filter].to_i]
-                          ids.any? && ids.join(",") || "none"
-                      end
-    end
-
     opts
   end
 

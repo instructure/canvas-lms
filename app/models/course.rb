@@ -26,6 +26,7 @@ class Course < ActiveRecord::Base
   include HtmlTextHelper
   include TimeZoneHelper
   include ContentLicenses
+  include TurnitinID
 
   attr_accessor :teacher_names
   attr_writer :student_count, :primary_enrollment_type, :primary_enrollment_role_id, :primary_enrollment_rank, :primary_enrollment_state, :invitation
@@ -75,7 +76,8 @@ class Course < ActiveRecord::Base
                   :lock_all_announcements,
                   :public_syllabus,
                   :course_format,
-                  :time_zone
+                  :time_zone,
+                  :organize_epub_by_content_type
 
   EXPORTABLE_ATTRIBUTES = [
     :id, :name, :account_id, :group_weighting_scheme, :workflow_state, :uuid, :start_at, :conclude_at, :grading_standard_id, :is_public, :allow_student_wiki_edits,
@@ -202,6 +204,7 @@ class Course < ActiveRecord::Base
   has_many :role_overrides, :as => :context
   has_many :content_migrations, :as => :context
   has_many :content_exports, :as => :context
+  has_many :epub_exports, order: :created_at
   has_many :course_imports
   has_many :alerts, as: :context, preload: :criteria
   has_many :appointment_group_contexts, :as => :context
@@ -1130,15 +1133,18 @@ class Course < ActiveRecord::Base
     end
     can [:read, :read_as_admin, :read_roster, :read_prior_roster, :read_forum, :use_student_view, :read_outcomes, :view_unpublished_items]
 
-    given do |user|
-      !self.deleted? && user &&
-        (prior_enrollments.for_user(user).any?{|e| e.instructor? } ||
-          user.cached_not_ended_enrollments.any? do |e|
-            e.course_id == self.id && e.instructor? && e.completed?
-          end
-        )
+    # overrideable permissions for concluded admins
+    [:read_question_banks, :view_all_grades].each do |permission|
+      given do |user|
+        !self.deleted? && user &&
+          (prior_enrollments.for_user(user).any?{|e| e.admin? && e.has_permission_to?(permission)} ||
+            user.cached_not_ended_enrollments.any? do |e|
+              e.course_id == self.id && e.admin? && e.completed? && e.has_permission_to?(permission)
+            end
+          )
+      end
+      can permission
     end
-    can :view_all_grades
 
     # Teacher or Designer of a concluded course
     given do |user|
@@ -1164,7 +1170,7 @@ class Course < ActiveRecord::Base
 
     # Admin
     given { |user| self.account_membership_allows(user) }
-    can :read_as_admin
+    can :read_as_admin and can :view_unpublished_items
 
     given { |user| self.account_membership_allows(user, :manage_courses) }
     can :read_as_admin and can :manage and can :update and can :delete and can :use_student_view and can :reset_content and can :view_unpublished_items and can :manage_feature_flags
@@ -1787,14 +1793,6 @@ class Course < ActiveRecord::Base
     !!self.turnitin_settings
   end
 
-  def generate_turnitin_id!
-    # the reason we don't just use the global_id all the time is so that the
-    # turnitin_id is preserved when shard splits/etc. occur
-    unless turnitin_id
-      update_attribute(:turnitin_id, global_id)
-    end
-  end
-
   def self.migrate_content_links(html, from_context, to_context, supported_types=nil, user_to_check_for_permission=nil)
     return html unless html.present? && to_context
 
@@ -1977,7 +1975,8 @@ class Course < ActiveRecord::Base
       :storage_quota, :tab_configuration, :allow_wiki_comments,
       :turnitin_comments, :self_enrollment, :license, :indexed, :locale,
       :hide_final_grade, :hide_distribution_graphs,
-      :allow_student_discussion_topics, :allow_student_discussion_editing, :lock_all_announcements ]
+      :allow_student_discussion_topics, :allow_student_discussion_editing, :lock_all_announcements,
+      :organize_epub_by_content_type ]
   end
 
   def set_course_dates_if_blank(shift_options)
@@ -2519,6 +2518,7 @@ class Course < ActiveRecord::Base
   add_setting :large_roster, :boolean => true, :default => lambda { |c| c.root_account.large_course_rosters? }
   add_setting :public_syllabus, :boolean => true, :default => false
   add_setting :course_format
+  add_setting :organize_epub_by_content_type, :boolean => true, :default => false
   add_setting :is_public_to_auth_users, :boolean => true, :default => false
 
   add_setting :restrict_student_future_view, :boolean => true, :inherited => true
@@ -2736,8 +2736,8 @@ class Course < ActiveRecord::Base
     progress
   end
 
-  def re_send_invitations!
-    self.enrollments.invited.except(:preload).preload(user: :communication_channels).find_each do |e|
+  def re_send_invitations!(from_user)
+    self.enrollments_visible_to(from_user).invited.except(:preload).preload(user: :communication_channels).find_each do |e|
       e.re_send_confirmation! if e.invited?
     end
   end
@@ -2785,6 +2785,14 @@ class Course < ActiveRecord::Base
       self.wiki.touch
       self.wiki.wiki_pages.update_all(:updated_at => Time.now.utc)
     end
+  end
+
+  def touch_admins_later
+    send_later_enqueue_args(:touch_admins, { :run_at => 15.seconds.from_now, :singleton => "course_touch_admins_#{global_id}" })
+  end
+
+  def touch_admins
+    User.where(id: self.admins).touch_all
   end
 
   def list_students_by_sortable_name?

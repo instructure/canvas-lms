@@ -637,6 +637,7 @@ class SubmissionsController < ApplicationController
             :except => [:quiz_submission,:submission_history],
             :comments => admin_in_context ? :submission_comments : :visible_submission_comments
           }).merge(:permissions => { :user => @current_user, :session => session, :include_permissions => false })
+          json_args[:methods] << :provisional_grade_id if provisional
           format.json {
             render :json => @submissions.map{ |s| s.as_json(json_args) }, :status => :created, :location => course_gradebook_url(@submission.assignment.context)
           }

@@ -6,8 +6,8 @@ define([
   '../../actions/submissionsActions'
 ], function (React, _, GradeCellMixin, SubmissionsActions) {
 
-  const GRADEBOOK_CHECKBOX_CLASS = 'gradebook-checkbox';
-  const NEXT_GRADE_TYPE = {
+  var GRADEBOOK_CHECKBOX_CLASS = 'gradebook-checkbox';
+  var NEXT_GRADE_TYPE = {
     ''          : 'complete',
     'complete'  : 'incomplete',
     'incomplete': ''
@@ -17,7 +17,7 @@ define([
     mixins: [GradeCellMixin],
 
     getCurrentGrade() {
-      var previousGrade = (this.state.submission) ? this.state.submission.grade : null,
+      var previousGrade = (this.props.cellData) ? this.props.cellData.grade : null,
           grade;
 
       if (this.state.gradeToPost || this.state.gradeToPost === "") {
@@ -54,7 +54,7 @@ define([
     },
 
     render() {
-      var cellContent = !this.state.submission ||  this.isSubmissionGradedAsNull() ? '-' : ''
+      var cellContent = !this.props.cellData ||  this.isSubmissionGradedAsNull() ? '-' : ''
       return (
         <div style={{width: '100%', height: '100%'}} onClick={this.handleClick}>
           <div ref="grade" className={this.getClassName()}>

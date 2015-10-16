@@ -393,9 +393,11 @@ describe SubmissionsController do
       end
 
       it "should create a final provisional comment" do
+        @submission.find_or_create_provisional_grade!(scorer: @teacher)
         put 'update', :format => :json, :course_id => @course.id, :assignment_id => @assignment.id, :id => @user.id,
           :submission => {:comment => "provisional!", :provisional => true, :final => true}
 
+        expect(response).to be_success
         @submission.reload
         expect(@submission.submission_comments.first).to be_nil
         pg = @submission.provisional_grade(@teacher, final: true)

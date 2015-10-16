@@ -1194,6 +1194,7 @@ nb:
             text: "Denne rapporten viser alle studenter som er påmeldt kurs i et gitt semester. Den resulterende CSV-filen vil ha én rad per brukerpåmelding som ikke har besøkt kurset siden datoen."
   achieve_mastery_count_times_8c9bbcec: "Oppnå mestring %{count} ganger"
   actions_efcde10d: Aksjoner
+  activate_this_key_6cd98f4b: "Aktiver denne nøkkelen"
   activerecord: 
     errors: 
       messages: 

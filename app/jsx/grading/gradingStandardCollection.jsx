@@ -17,7 +17,7 @@ function(React, GradingStandard, $, I18n, _) {
     },
 
     componentWillMount: function() {
-      $.getJSON(ENV.GRADING_STANDARDS_URL)
+      $.getJSON(ENV.GRADING_STANDARDS_URL + ".json")
       .done(this.gotStandards)
     },
 

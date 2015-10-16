@@ -89,7 +89,14 @@ class GradebooksController < ApplicationController
 
   def light_weight_ags_json(assignment_groups, opts={})
     assignment_groups.map do |ag|
-      assignments = ag.visible_assignments(opts[:student] || @current_user).map do |a|
+      visible_assignments = ag.visible_assignments(opts[:student] || @current_user)
+
+      if multiple_grading_periods? && @current_grading_period_id && !view_all_grading_periods?
+        current_period = GradingPeriod.context_find(@context, @current_grading_period_id)
+        visible_assignments = current_period.assignments_for_student(visible_assignments, opts[:student])
+      end
+
+      visible_assignments.map! do |a|
         {
           :id => a.id,
           :submission_types => a.submission_types_array,
@@ -97,11 +104,12 @@ class GradebooksController < ApplicationController
           :due_at => a.due_at
         }
       end
+
       {
         :id           => ag.id,
         :rules        => ag.rules_hash({stringify_json_ids: true}),
         :group_weight => ag.group_weight,
-        :assignments  => assignments,
+        :assignments  => visible_assignments,
       }
     end
   end
@@ -226,8 +234,8 @@ class GradebooksController < ApplicationController
   def set_current_grading_period
     unless @current_grading_period_id = params[:grading_period_id].presence
       return if view_all_grading_periods?
-      return unless current = GradingPeriod.for(@context).find(&:current?)
-      @current_grading_period_id = current.id.to_s
+      current = GradingPeriod.for(@context).find(&:current?)
+      @current_grading_period_id = current ? current.id.to_s : '0'
     end
   end
 
@@ -375,11 +383,11 @@ class GradebooksController < ApplicationController
           end
 
           submission[:dont_overwrite_grade] = value_to_boolean(params[:dont_overwrite_grades])
+          submission.delete(:final) if submission[:final] && !@context.grants_right?(@current_user, :moderate_grades)
           subs = @assignment.grade_student(@user, submission)
           if submission[:provisional]
-            is_final = submission[:final] && @context.grants_right?(@current_user, :moderate_grades)
             subs.each do |sub|
-              sub.apply_provisional_grade_filter!(sub.provisional_grade(@current_user, final: is_final))
+              sub.apply_provisional_grade_filter!(sub.provisional_grade(@current_user, final: submission[:final]))
             end
           end
           @submissions += subs
@@ -396,10 +404,10 @@ class GradebooksController < ApplicationController
           flash[:notice] = t('notices.updated', 'Assignment submission was successfully updated.')
           format.html { redirect_to course_gradebook_url(@assignment.context) }
           format.json {
-            render :json => @submissions.map{ |s| s.as_json(Submission.json_serialization_full_parameters) }, :status => :created, :location => course_gradebook_url(@assignment.context)
+            render :json => submissions_json, :status => :created, :location => course_gradebook_url(@assignment.context)
           }
           format.text {
-            render :json => @submissions.map{ |s| s.as_json(Submission.json_serialization_full_parameters) }, :status => :created, :location => course_gradebook_url(@assignment.context),
+            render :json => submissions_json, :status => :created, :location => course_gradebook_url(@assignment.context),
                    :as_text => true
           }
         else
@@ -409,6 +417,16 @@ class GradebooksController < ApplicationController
           format.text { render :json => {:errors => {:base => @error_message}}, :status => :bad_request }
         end
       end
+    end
+  end
+
+  def submissions_json
+    @submissions.map do |s|
+      json = s.as_json(Submission.json_serialization_full_parameters)
+      if pg_id = s.provisional_grade_id
+        json['submission']['provisional_grade_id'] = pg_id
+      end
+      json
     end
   end
 
@@ -456,9 +474,6 @@ class GradebooksController < ApplicationController
       :grader
     end
 
-    # TODO: Handle for moderator when behavior implemented
-    crocodoc_ids = [:provisional_grader].include?(grading_role) && [@current_user.crocodoc_id!]
-
     respond_to do |format|
       format.html do
         @headers = false
@@ -470,6 +485,13 @@ class GradebooksController < ApplicationController
           :force_anonymous_grading => force_anonymous_grading?(@assignment),
           :grading_role => grading_role
         }
+        if [:moderator, :provisional_grader].include?(grading_role)
+          env[:provisional_status_url] = api_v1_course_assignment_provisional_status_path(@context.id, @assignment.id)
+        end
+        if grading_role == :moderator
+          env[:provisional_copy_url] = api_v1_copy_to_final_mark_path(@context.id, @assignment.id, "{{provisional_grade_id}}")
+          env[:provisional_select_url] = api_v1_select_provisional_grade_path(@context.id, @assignment.id, "{{provisional_grade_id}}")
+        end
         if @assignment.quiz
           env[:quiz_history_url] = course_quiz_history_path @context.id,
                                                             @assignment.quiz.id,
@@ -483,8 +505,7 @@ class GradebooksController < ApplicationController
       format.json do
         render :json => @assignment.speed_grader_json(@current_user,
                                                       avatars: service_enabled?(:avatars),
-                                                      grading_role: grading_role,
-                                                      crocodoc_ids: crocodoc_ids)
+                                                      grading_role: grading_role)
       end
     end
   end

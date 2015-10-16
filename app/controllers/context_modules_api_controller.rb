@@ -372,7 +372,7 @@ class ContextModulesApiController < ApplicationController
       end
 
       if @context.feature_enabled?(:differentiated_assignments) && includes.include?('items')
-        user_ids = (@student || @current_user).id
+        user_ids = [(@student || @current_user).id]
 
         if @context.user_has_been_observer?(@student || @current_user)
           opts[:observed_student_ids] = ObserverEnrollment.observed_student_ids(self.context, (@student || @current_user) )

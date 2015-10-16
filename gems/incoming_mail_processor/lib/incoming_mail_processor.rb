@@ -9,6 +9,7 @@ module IncomingMailProcessor
   require "incoming_mail_processor/deprecated_settings"
   require "incoming_mail_processor/directory_mailbox"
   require "incoming_mail_processor/imap_mailbox"
+  require "incoming_mail_processor/sqs_mailbox"
   require "incoming_mail_processor/incoming_message_processor"
   require "incoming_mail_processor/mailbox_account"
   require "incoming_mail_processor/settings"

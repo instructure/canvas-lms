@@ -2,7 +2,7 @@ module DataFixup::ExcludeDeletedEntriesFromUnreadCount
   def self.run
     # Deleted all partipant entries for deleted discussion entries
     DiscussionEntryParticipant.
-        eager_load(:discussion_entry).
+        joins(:discussion_entry).preload(:discussion_entry).readonly(false).
         where(:discussion_entries => { :workflow_state => 'deleted' }).
         destroy_all
 

@@ -1086,25 +1086,64 @@ Reduce the width of your screen to see how the example components below both sca
 
 ```html
 <div class="grid-row">
-  <div class="col-xs-12 col-md-6">
-
-    <!-- Begin sample forms markup -->
-    <div class="ic-Form-control ic-Form-control--has-warning">
-      <div class="ic-Toggle">
-        <input id="demo-states-18" type="checkbox" checked>
-        <label for="demo-states-18">
-          <div class="ic-Toggle__label-text">Publish assignment immediately</div>
-          <div class="ic-Toggle__switch" data-checked="Yes" data-unchecked="No"></div>
+  <div class="col-md-6">
+    
+    <div class="ic-Form-group">
+      <div class="ic-Form-control ic-Form-control--has-warning">
+        <!-- start super toggle -->
+        <label class="ic-Super-toggle--on-off" for="ic-toggle-error-demo-1">
+          <div class="ic-Label">Publish assignment immediately</div>
+          <input type="checkbox" id="ic-toggle-error-demo-1" class="ic-Super-toggle__input" checked>
+          <div class="ic-Super-toggle__container" aria-hidden="true" data-checked="Yes" data-unchecked="No">
+            <div class="ic-Super-toggle__switch">
+              <div class="ic-Super-toggle__option--LEFT">
+                <svg xmlns="http://www.w3.org/2000/svg" version="1.1" x="0" y="0" width="548.9" height="548.9" viewBox="0 0 548.9 548.9" xml:space="preserve"><polygon points="449.3 48 195.5 301.8 99.5 205.9 0 305.4 95.9 401.4 195.5 500.9 295 401.4 548.9 147.5 "/></svg>
+              </div>
+              <div class="ic-Super-toggle__option--RIGHT">
+                <svg xmlns="http://www.w3.org/2000/svg" version="1.1" x="0" y="0" viewBox="0 0 28 28" xml:space="preserve"><polygon points="28 22.4 19.6 14 28 5.6 22.4 0 14 8.4 5.6 0 0 5.6 8.4 14 0 22.4 5.6 28 14 19.6 22.4 28 " fill="#030104"/></svg>
+              </div>
+            </div>
+          </div>
         </label>
-      </div>
-      <div class="ic-Form-message ic-Form-message--warning">
-        <div class="ic-Form-message__Layout">
-          <i class="icon-warning" role="presentation"></i>
-          Are you sure you want to do this?
+        <!-- end super toggle -->
+        <div class="ic-Form-message ic-Form-message--warning">
+          <div class="ic-Form-message__Layout">
+            <i class="icon-warning" role="presentation"></i>
+            Are you sure you want to do this?
+          </div>
         </div>
       </div>
     </div>
-    <!-- End sample forms markup -->
+
+  </div>
+  <div class="col-md-6">
+    
+    <div class="ic-Form-group ic-Form-group--horizontal">
+      <div class="ic-Form-control ic-Form-control--has-error">
+        <!-- start super toggle -->
+        <label class="ic-Super-toggle--on-off" for="ic-toggle-error-demo-2">
+          <div class="ic-Label">Publish assignment immediately</div>
+          <input type="checkbox" id="ic-toggle-error-demo-2" class="ic-Super-toggle__input" checked>
+          <div class="ic-Super-toggle__container" aria-hidden="true" data-checked="Published" data-unchecked="Unpublished">
+            <div class="ic-Super-toggle__switch">
+              <div class="ic-Super-toggle__option--LEFT">
+                <svg xmlns="http://www.w3.org/2000/svg" version="1.1" x="0" y="0" width="548.9" height="548.9" viewBox="0 0 548.9 548.9" xml:space="preserve"><polygon points="449.3 48 195.5 301.8 99.5 205.9 0 305.4 95.9 401.4 195.5 500.9 295 401.4 548.9 147.5 "/></svg>
+              </div>
+              <div class="ic-Super-toggle__option--RIGHT">
+                <svg xmlns="http://www.w3.org/2000/svg" version="1.1" x="0" y="0" viewBox="0 0 28 28" xml:space="preserve"><polygon points="28 22.4 19.6 14 28 5.6 22.4 0 14 8.4 5.6 0 0 5.6 8.4 14 0 22.4 5.6 28 14 19.6 22.4 28 " fill="#030104"/></svg>
+              </div>
+            </div>
+          </div>
+        </label>
+        <!-- end super toggle -->
+        <div class="ic-Form-message ic-Form-message--error">
+          <div class="ic-Form-message__Layout">
+            <i class="icon-warning" role="presentation"></i>
+            This course cannot be published without content
+          </div>
+        </div>
+      </div>
+    </div>
 
   </div>
 </div>
@@ -1252,8 +1291,6 @@ select.ic-Input {
         .ic-Form-message { margin-left: 0; }
       }
 
-      .ic-Toggle label .ic-Toggle__label-text { flex: 0 1 auto; }
-
     }
   }
 
@@ -1279,24 +1316,6 @@ select.ic-Input {
         .ic-Input,
         .ic-Input-group,
         .ic-Multi-input { flex: 1; }
-
-        .ic-Toggle {
-          label {
-            .ic-Toggle__label-text {
-              @include breakpoint(tablet) {
-                flex: 0 0 $ic-horizontal-form-offset;
-                text-align: right;
-                padding-right: $ic-sp*2;
-              }
-            }
-          }
-
-          + .ic-Form-message {
-            margin-top: $ic-sp/3;
-            .ic-Form-message__Layout { margin-left: $ic-sp*2; }
-          }
-
-        }
 
         .ic-Form-message {
           display: block;
@@ -1338,7 +1357,13 @@ select.ic-Input {
   &.ic-Form-message--warning { @include form-message-variant($ic-color-alert); }
 }
 
-.ic-Toggle + .ic-Form-message,
+// Make error message styles work with ic-Super-toggle
+.ic-Form-group:not(.ic-Form-group--horizontal) [class^="ic-Super-toggle--"] + .ic-Form-message {
+  display: block;
+  margin-left: 0;
+  .ic-Form-message__Layout { display: inline-flex; }
+}
+
 .ic-Input-group + .ic-Form-message { margin-left: 0; }
 
 .ic-Form-message__Layout {
@@ -1417,20 +1442,23 @@ form.ic-Form-group { margin: 0; }
 
   &.ic-Form-control--has-error {
     .ic-Label,
-    .ic-Input-group__add-on,
-    .ic-Toggle__label-text { color: $ic-color-danger; }
+    .ic-Input-group__add-on {
+      color: $ic-color-danger;
+    }
   }
 
   &.ic-Form-control--has-warning {
     .ic-Label,
-    .ic-Input-group__add-on,
-    .ic-Toggle__label-text { color: $ic-color-alert; }
+    .ic-Input-group__add-on {
+      color: $ic-color-alert;
+    }
   }
 
   &.ic-Form-control--has-success {
     .ic-Label,
-    .ic-Input-group__add-on,
-    .ic-Toggle__label-text { color: $ic-color-success; }
+    .ic-Input-group__add-on {
+      color: $ic-color-success;
+    }
   }
 }
 
@@ -1757,13 +1785,8 @@ form.ic-Form-group { margin: 0; }
   align-items: center;
   box-sizing: border-box;
   margin-bottom: $ic-sp*2;
-
-  @include breakpoint(desktop) {
-    margin-bottom: $ic-sp;
-    .ic-Toggle label .ic-Toggle__label-text {
-      flex: 0 1 auto;
-    }
-  }
+  @include breakpoint(desktop) { margin-bottom: $ic-sp; }
+  
   .ic-Form-control {
     margin-bottom: $ic-sp/2;
     @include breakpoint(desktop) {
@@ -1773,6 +1796,7 @@ form.ic-Form-group { margin: 0; }
       &:last-of-type { margin-right: 0; }
     }
   }
+
 }
 
 .ic-Form-action-box__Form {

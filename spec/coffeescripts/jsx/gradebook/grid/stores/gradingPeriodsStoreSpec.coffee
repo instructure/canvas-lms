@@ -28,8 +28,12 @@ define [
 
   baseSetup = ->
     fakeENV.setup gradingPeriodsData()
-    GradingPeriodsStore.getInitialState()
+    GradingPeriodsStore.init()
     GradebookConstants.refresh()
+
+  baseTeardown = ->
+    fakeENV.teardown()
+    GradingPeriodsStore.gradingPeriods = null
 
   module 'GradingPeriodsStore#assignmentIsInPeriod',
     setup: ->
@@ -40,7 +44,7 @@ define [
     teardown: ->
       @assignment = undefined
       @gradingPeriod = undefined
-      fakeENV.teardown()
+      baseTeardown()
 
   test 'knows when an assignment is in a grading period', ->
     gradingPeriod = getGradingPeriod 0
@@ -59,13 +63,13 @@ define [
       fakeENV.teardown()
 
   test 'knows if a period is active', ->
-    periodId = '3'
-    result = GradingPeriodsStore.periodIsActive(periodId)
+    periodData = '3'
+    result = GradingPeriodsStore.periodIsActive(periodData)
     ok(result)
 
   test 'knows if a period is not active', ->
-    periodId = '5'
-    result = GradingPeriodsStore.periodIsActive(periodId)
+    periodData = {id: '5'}
+    result = GradingPeriodsStore.periodIsActive(periodData)
     notOk(result)
 
   module 'GradingPeriodsStore#lastPeriod',

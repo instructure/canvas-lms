@@ -1,6 +1,85 @@
 @import "base/environment";
 
 .assignments{
+  .ModeratedColumnHeader{
+    padding-bottom: 5px;
+    border-bottom: 1px solid #8495A0;
+    font-size: 11px;
+    font-weight: bold;
+
+    a:link {
+      color: black;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: none;
+    }
+
+  }
+
+  .ModeratedColumnHeader__StudentName{
+    input[type='checkbox']{
+      margin: 0px;
+    }
+    span{
+      margin-left: 10px;
+    }
+  }
+
+  .ColumnHeader{
+    padding-bottom: 5px;
+    border-bottom: 1px solid #8495A0;
+    font-size: 11px;
+    font-weight: bold;
+
+    a:link {
+      color: black;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: none;
+    }
+  }
+
+  .ColumnHeader__StudentName{
+    input[type='checkbox']{
+      margin: 0px;
+    }
+    span{
+      margin-left: 10px;
+    }
+    width: 200px;
+    margin-right: 40px;
+  }
+
+  .ModeratedAssignmentList{
+    border-top: 1px solid #F0F0F0;
+    margin: 0px;
+    list-style: none;
+  }
+
+  .ModeratedAssignmentList__Item{
+    border-bottom: 1px solid #F0F0F0;
+    padding-top: 15px;
+    padding-bottom: 15px;
+  }
+
+  .ModeratedAssignmentList__StudentInfo input[type='checkbox']{
+    margin: 0px;
+  }
+
+  .ModeratedAssignmentList_StudentPhoto{
+    margin-left: 10px;
+    margin-right: 10px;
+    width: 20px;
+  }
+
+  .ModeratedAssignmentList__Mark input[type='radio']{
+    margin: 0px 5px 0px 5px;
+  }
+  .ModeratedAssignmentList_Grade{
+    width: 50px;
+  }
 
   .AssignmentList{
     border-top: 1px solid #F0F0F0;
@@ -10,17 +89,12 @@
 
   .AssignmentList__Item{
     border-bottom: 1px solid #F0F0F0;
-    align-items: center;
-    display: flex;
-    justify-content: space-between;
     padding-top: 15px;
     padding-bottom: 15px;
   }
 
   .AssignmentList__StudentInfo{
-    display: flex;
-    align-items: center;
-    width: 200px;
+    margin-right: 40px;
   }
 
   .AssignmentList__StudentInfo input[type='checkbox']{
@@ -33,20 +107,18 @@
     width: 20px;
   }
 
-  .AssignmentList__Mark{
-    display: flex;
-    align-items: center;
-  }
   .AssignmentList__Mark input[type='radio']{
     margin: 0px 5px 0px 5px;
   }
   .AssignmentList_Grade{
     width: 50px;
-    display: flex;
-    justify-content: center;
   }
 }
 
 .ModeratedGrading__Header-Instructions {
   font-size: 20px;
+}
+
+.ModeratedGrading__Header-PublishBtn {
+  margin-left: 5px;
 }

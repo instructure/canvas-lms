@@ -113,7 +113,7 @@ module Assignments
       context "moderated grading count" do
         before do
           @assignment = @course.assignments.create(:title => "some assignment",
-            :submission_types => ['online_text_entry'], :moderated_grading => true)
+            :submission_types => ['online_text_entry'], :moderated_grading => true, :points_possible => 3)
           @students = []
           3.times do
             student = student_in_course(:course => @course, :active_all => true).user
@@ -130,6 +130,9 @@ module Assignments
           expect(querier.count).to eq 3
 
           @students[0].submissions.first.find_or_create_provisional_grade!(scorer: @teacher)
+          expect(querier.count).to eq 3 # should only update when they add a score
+
+          @students[0].submissions.first.find_or_create_provisional_grade!(scorer: @teacher, score: 3)
           expect(querier.count).to eq 2
 
           @students[1].submissions.first.find_or_create_provisional_grade!(scorer: @ta1)
@@ -142,7 +145,7 @@ module Assignments
           querier = NeedsGradingCountQuery.new(@assignment, @teacher)
           expect(querier.count).to eq 3
 
-          @students[0].submissions.first.find_or_create_provisional_grade!(scorer: @teacher)
+          @students[0].submissions.first.find_or_create_provisional_grade!(scorer: @teacher, score: 2)
           expect(querier.count).to eq 2 # should not show because @teacher graded it
 
           @students[1].submissions.first.find_or_create_provisional_grade!(scorer: @ta1)

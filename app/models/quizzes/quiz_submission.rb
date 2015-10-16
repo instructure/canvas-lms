@@ -198,6 +198,11 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     end
   end
 
+  def results_visible_for_user?(user)
+    return true if user && self.quiz.grants_right?(user, :grade)
+    results_visible?
+  end
+
   def last_attempt_completed?
     completed? && quiz.allowed_attempts && attempt >= quiz.allowed_attempts
   end
@@ -819,6 +824,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   delegate :assignment_id, :assignment, :to => :quiz
   delegate :graded_at, :to => :submission
   delegate :context, :to => :quiz
+  delegate :excused?, to: :submission, allow_nil: true
 
   # Determine whether the QS can be retried (ie, re-generated).
   #

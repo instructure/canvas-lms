@@ -236,7 +236,7 @@ class Pseudonym < ActiveRecord::Base
 
   def validate_unique_id
     if (!self.account || self.account.email_pseudonyms) && !self.deleted?
-      unless self.unique_id.match(/\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i)
+      unless self.unique_id.present? && self.unique_id.match(/\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i)
         self.errors.add(:unique_id, "not_email")
         return false
       end

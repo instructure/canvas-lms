@@ -65,6 +65,7 @@ class Collaboration < ActiveRecord::Base
 
   set_policy do
     given { |user|
+      user &&
       !self.new_record? &&
         (self.user_id == user.id ||
          self.users.include?(user) ||

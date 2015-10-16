@@ -476,4 +476,83 @@ describe 'Student reports' do
       expect(parsed.length).to eq 3
     end
   end
+
+  describe 'last enrollment activity report' do
+    before(:each) do
+      @type = 'last_enrollment_activity_csv'
+      @later_activity = 1.week.ago
+      @earlier_activity = 8.days.ago
+      # user 1
+      @e1.last_activity_at = @later_activity
+      @e3.last_activity_at = @earlier_activity
+      # user 2
+      @e2.last_activity_at = @later_activity
+      @e4.last_activity_at = @earlier_activity
+      [@e1,@e2,@e3,@e4].each(&:save!)
+    end
+
+    it 'should show the lastest activity for each user' do
+      report = run_report(@type)
+      parsed = parse_report(report, {order: 1})
+
+      expect(parsed[0]).to eq [@user2.id.to_s, 'Bolton, Michael', @later_activity.iso8601]
+      expect(parsed[1]).to eq [@user1.id.to_s,'Clair, John St.', @later_activity.iso8601]
+      expect(parsed.length).to eq 2
+    end
+
+    it 'should scope by course if param given' do
+      # course1 is e1 and e4
+      parameters = {}
+      parameters['course'] = @course1.id
+      report = run_report(@type, {params: parameters})
+      parsed = parse_report(report)
+
+      # Bolton will show earlier time if restricted to course 1
+      expect(parsed[0]).to eq [@user1.id.to_s,'Clair, John St.', @later_activity.iso8601]
+      expect(parsed[1]).to eq [@user2.id.to_s, 'Bolton, Michael', @earlier_activity.iso8601]
+      expect(parsed.length).to eq 2
+    end
+
+    it 'should scope by term if param given' do
+      @term1 = @account.enrollment_terms.create(:name => 'Fall')
+      @term1.save!
+      @course1.enrollment_term = @term1
+      @course1.save
+
+      parameters = {}
+      parameters['enrollment_term'] = @term1.id
+      report = run_report(@type, {params: parameters})
+      parsed = parse_report(report)
+
+      # Bolton will show earlier time if restricted to course 1 (via term restriction)
+      expect(parsed[0]).to eq [@user1.id.to_s,'Clair, John St.', @later_activity.iso8601]
+      expect(parsed[1]).to eq [@user2.id.to_s, 'Bolton, Michael', @earlier_activity.iso8601]
+      expect(parsed.length).to eq 2
+    end
+
+    it 'should show data for users in other accounts with enrollments on this account' do
+      @different_account = Account.create(name: 'New Account', default_time_zone: 'UTC')
+
+      @course3 = course(:course_name => 'English 101', :account => @account, :active_course => true)
+      @course3.save!
+      @course3.offer
+
+      @different_account_user = user_with_managed_pseudonym(
+        :active_all => true, :account => @different_account, :name => 'Diego Renault',
+        :sortable_name => 'Renault, Diego', :username => 'diegor@diff_account.com')
+
+      e3 = @course3.enroll_user(@different_account_user, 'StudentEnrollment', {:enrollment_state => 'active'})
+      @very_recent_acivity = 1.minute.ago
+      e3.last_activity_at = @very_recent_acivity
+      e3.save!
+
+      report = run_report(@type, account: @account)
+      parsed = parse_report(report, {order: 1})
+
+      expect(parsed[0]).to eq [@user2.id.to_s, 'Bolton, Michael', @later_activity.iso8601]
+      expect(parsed[1]).to eq [@user1.id.to_s,'Clair, John St.', @later_activity.iso8601]
+      expect(parsed[2]).to eq [@different_account_user.id.to_s,'Renault, Diego', @very_recent_acivity.iso8601]
+      expect(parsed.length).to eq 3
+    end
+  end
 end

@@ -496,6 +496,10 @@ define([
           var val = parseFloat($this.val().replace(/,/g, ''));
           $this.val(isNaN(val) ? "" : val.toFixed(4));
         }
+        if ($this.hasClass('precision_question_input')) {
+          var val = parseFloat($this.val().replace(/,/g, ''));
+          $this.val(isNaN(val) ? "" : val.toPrecision(16).replace(/\.?0+(e.*)?$/,"$1"));
+        }
         if (update !== false) {
           quizSubmission.updateSubmission();
         }

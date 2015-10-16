@@ -424,10 +424,6 @@ describe "context modules" do
     end
 
     describe "module header icons" do
-      before(:each) do
-        @course.enable_feature!(:nc_or)
-      end
-
       def create_additional_assignment_for_module_1
         @assignment_4 = @course.assignments.create!(:title => "assignment 4")
         @tag_4 = @module_1.add_item({:id => @assignment_4.id, :type => 'assignment'})

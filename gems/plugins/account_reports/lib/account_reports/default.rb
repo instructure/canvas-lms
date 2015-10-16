@@ -67,5 +67,8 @@ module AccountReports
       StudentReports.new(account_report).last_user_access
     end
 
+    def self.last_enrollment_activity_csv(account_report)
+      StudentReports.new(account_report).last_enrollment_activity
+    end
   end
 end

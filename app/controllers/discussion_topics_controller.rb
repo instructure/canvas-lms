@@ -426,7 +426,7 @@ class DiscussionTopicsController < ApplicationController
         }
         js_hash['VALID_DATE_RANGE'] = CourseDateRange.new(@context)
       end
-
+      js_hash[:CANCEL_REDIRECT_URL] = cancel_redirect_url
       append_sis_data(js_hash)
       js_env(js_hash)
       render :edit
@@ -464,7 +464,7 @@ class DiscussionTopicsController < ApplicationController
       @unlock_at = @topic.available_from_for(@current_user)
       @topic.change_read_state('read', @current_user) unless @locked
       if @topic.for_group_discussion?
-        @groups = @topic.group_category.groups.active.select{ |g| g.grants_right?(@current_user, session, :post_to_forum) }
+        @groups = @topic.group_category.groups.active.select{ |g| g.grants_right?(@current_user, session, :post_to_forum) }.sort! {|a, b| a.id <=> b.id}
         topics = @topic.child_topics.to_a
         topics = topics.select{|t| @groups.include?(t.context) } unless @topic.grants_right?(@current_user, session, :update)
         @group_topics = @groups.map do |group|
@@ -633,12 +633,17 @@ class DiscussionTopicsController < ApplicationController
   # @argument sort_by_rating [Boolean]
   #   If true, entries will be sorted by rating.
   #
+  # @argument attachment [File]
+  #   A multipart/form-data form-field-style attachment.
+  #   Attachments larger than 1 kilobyte are subject to quota restrictions.
+  #
   # @example_request
   #     curl https://<canvas>/api/v1/courses/<course_id>/discussion_topics \
   #         -F title='my topic' \
   #         -F message='initial message' \
   #         -F podcast_enabled=1 \
   #         -H 'Authorization: Bearer <token>'
+  #         -F 'attachment=@<filename>' \
   #
   # @example_request
   #     curl https://<canvas>/api/v1/courses/<course_id>/discussion_topics \
@@ -798,6 +803,11 @@ class DiscussionTopicsController < ApplicationController
   end
 
   protected
+
+  def cancel_redirect_url
+    topic_type = @topic.is_announcement ? :announcements : :discussion_topics
+    @topic.new_record? ? polymorphic_url([@context, topic_type]) : polymorphic_url([@context, @topic])
+  end
 
   def pinned_topics
     @context.active_discussion_topics.only_discussion_topics.where(pinned: true)

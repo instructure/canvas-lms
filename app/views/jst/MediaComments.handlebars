@@ -1,0 +1,127 @@
+<div id="media_record_tabs">
+  <ul>
+    <li><a href="#record_media_tab">{{#t}}Record Media{{/t}}</a></li>
+    <li><a href="#upload_media_tab">{{#t}}Upload Media{{/t}}</a></li>
+  </ul>
+  <div id="record_media_tab" class="clearfix media_tab">
+    <div id="media_record_option_holder">
+      <a id="video_record_option"
+         class="record_option tooltip"
+         href="#"
+         title="{{#t}}Record with Webcam{{/t}}">
+        <img src="/images/webcam.png" alt="{{#t}}Record with Webcam{{/t}}" />
+      </a>
+      <a id="audio_record_option"
+         class="record_option tooltip"
+         href="#"
+         title="{{#t}}Record with Microphone Only{{/t}}">
+        <img src="/images/microphone.png" alt="{{#t}}Record with Microphone Only{{/t}}" />
+      </a>
+    </div>
+    <div id="video_record_holder_holder">
+      <div id="video_record_holder_message">
+        <div class="recorder_message">{{#t}}Saving Recording...{{/t}}</div>
+      </div>
+      <div style="margin-bottom: 1px; margin-left: 10px;">
+        <label for="video_record_title">{{#t}}Title:{{/t}}</label>
+        <input id="video_record_title"
+               type="text"
+               style="width: 250px;"
+               maxlength="255" />
+      </div>
+      <div id="video_record_holder">
+        <div id="video_record_meter" class="volume_meter">
+          <img src="/images/blank.png" class="audio_level level_9" alt=""/>
+          <img src="/images/blank.png" class="audio_level level_8" alt=""/>
+          <img src="/images/blank.png" class="audio_level level_7" alt=""/>
+          <img src="/images/blank.png" class="audio_level level_6" alt=""/>
+          <img src="/images/blank.png" class="audio_level level_5" alt=""/>
+          <img src="/images/blank.png" class="audio_level level_4" alt=""/>
+          <img src="/images/blank.png" class="audio_level level_3" alt=""/>
+          <img src="/images/blank.png" class="audio_level level_2" alt=""/>
+          <img src="/images/blank.png" class="audio_level level_1" alt=""/>
+          <img src="/images/blank.png" class="audio_level level_0" alt=""/>
+        </div>
+        <div id="video_record">
+        </div>
+      </div>
+    </div>
+    <div id="audio_record_holder_holder">
+      <div id="audio_record_holder_message">
+        <div class="recorder_message">{{#t}}Saving Recording...{{/t}}</div>
+      </div>
+      <div style="margin-bottom: 1px; margin-left: 10px;">
+        <label for="audio_record_title">{{#t}}Title:{{/t}}</label>
+        <input id="audio_record_title"
+               type="text"
+               style="width: 250px;"
+               maxlength="255" />
+      </div>
+      <div id="audio_record_holder">
+        <div id="audio_record_meter" class="volume_meter">
+          <img src="/images/blank.png" class="audio_level level_9" alt="9"/>
+          <img src="/images/blank.png" class="audio_level level_8" alt="8"/>
+          <img src="/images/blank.png" class="audio_level level_7" alt="7"/>
+          <img src="/images/blank.png" class="audio_level level_6" alt="6"/>
+          <img src="/images/blank.png" class="audio_level level_5" alt="5"/>
+          <img src="/images/blank.png" class="audio_level level_4" alt="4"/>
+          <img src="/images/blank.png" class="audio_level level_3" alt="3"/>
+          <img src="/images/blank.png" class="audio_level level_2" alt="2"/>
+          <img src="/images/blank.png" class="audio_level level_1" alt="1"/>
+          <img src="/images/blank.png" class="audio_level level_0" alt="0"/>
+        </div>
+        <div id="audio_record">
+        </div>
+      </div>
+    </div>
+    <div class="clear"></div>
+  </div>
+  <div id="upload_media_tab" class="clearfix media_tab">
+    <div id="media_upload_holder">
+      <div id="audio_upload_holder" style="float: left;">
+        <div id="audio_upload">
+        </div>
+        <div id="audio_upload_under" style="margin-bottom: 20px;">
+          <button class="btn" type="button">
+            <img src="/images/audio.png" alt=""/>
+            {{#t}}Select Audio File{{/t}}
+          </button>
+        </div>
+      </div>
+      <div id="video_upload_holder" style="float: left;">
+        <div id="video_upload">
+        </div>
+        <div id="video_upload_under" style="margin-bottom: 20px;">
+          <button class="btn" type="button">
+            <img src="/images/video.png" alt=""/>
+            {{#t}}Select Video File{{/t}}
+          </button>
+        </div>
+      </div>
+      <div class="clear"></div>
+      <div id="media_upload_settings" style="visibility: hidden;">
+        <label for="media_upload_title">{{#t}}Title:{{/t}}</label>
+        <input id="media_upload_title" type="text" />
+        <div class="content">
+          <img src="/images/file.png" alt="" class="icon"/>
+          <span id="media_upload_display_title">&nbsp;</span>
+          <span id="media_upload_file_size">&nbsp;</span>
+          <br />
+          <div id="media_upload_feedback" style="visibility: hidden; margin-top: 5px;">
+            <img src="/images/warning.png" alt="" />
+            <span id="media_upload_feedback_text"></span>
+          </div>
+        </div>
+        <div class="content" id="media_upload_progress" style="visibility: hidden; margin-top: 20px;"></div>
+        <div class="content" id="media_upload_errors" style="visibility: hidden; margin-top: 20px;"></div>
+        <div class="content">
+          <button class="btn disabled"
+                  disabled="true"
+                  type="button"
+                  id="media_upload_submit"
+          >{{#t}}Submit Media File{{/t}}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

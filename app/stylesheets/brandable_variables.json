@@ -1,3 +1,4 @@
+
 [{
   "group_name": "Global Branding",
   "variables": [{
@@ -102,6 +103,12 @@
     "accept": "image/png,image/svg,image/gif,image/jpeg",
     "default": ""
   },{
+    "human_name": "Watermark Opacity",
+    "helper_text": "Specify the transparency of the watermark background image.",
+    "variable_name": "ic-brand-watermark-opacity",
+    "type": "percentage",
+    "default": "1.0"
+  },{
     "human_name": "Favicon",
     "helper_text": "You can use a single 16x16, 32x32, 48x48 ico file.",
     "variable_name": "ic-brand-favicon",
@@ -155,6 +162,7 @@
     "human_name": "Background Image",
     "variable_name": "ic-brand-Login-body-bgd-image",
     "type": "image",
+    "accept": "image/png,image/svg,image/gif,image/jpeg",
     "default": ""
   },
   {

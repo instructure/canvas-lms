@@ -50,7 +50,7 @@ define([
           }
         } else {
           var assignments = _.flatten(_.pluck(assignmentGroups, 'assignments')),
-              pointsPossible = _.inject(assignments, (sum, a) => (a.points_possible || 0), 0);
+              pointsPossible = _.inject(assignments, (sum, a) => sum + (a.points_possible || 0), 0);
 
           if (pointsPossible === 0) {
             TotalColumn.displayWarning = I18n.t("Can't compute score until an assignment has points possible");
@@ -68,6 +68,7 @@ define([
           showPoints;
 
       submissions = this.props.rowData.submissions;
+      submissions = _.flatten(_.values(submissions));
       submissions = SubmissionsStore.submissionsInCurrentPeriod(submissions);
 
       assignmentGroups = this.props.rowData.assignmentGroups;
@@ -82,7 +83,7 @@ define([
 
       gradeFormatter = new GradeFormatter(total.score, total.possible, showPoints);
       return (
-        <div className='gradebook-cell' ref="cell" title={TotalColumn.getWarning(assignmentGroups)}>
+        <div ref="cell" title={TotalColumn.getWarning(assignmentGroups)}>
           { TotalColumn.getWarning(assignmentGroups) && <i ref="icon" className='icon-warning final-warning' />}
           <span ref="totalGrade">{ gradeFormatter.toString() }</span>
         </div>

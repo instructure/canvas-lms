@@ -517,6 +517,31 @@ describe ContextModulesController do
   end
   
   describe "GET progressions" do
+    context "unauthenticated user in public course" do
+      before(:once) do
+        course(:is_public => true, :active_all => true)
+        @user = nil
+        @mod1 = @course.context_modules.create!(:name => 'unlocked')
+        @mod2 = @course.context_modules.create!(:name => 'locked', :unlock_at => 1.week.from_now)
+      end
+
+      it "returns 'locked' progressions for modules locked by date" do
+        get 'progressions', :course_id => @course.id, :format => 'json'
+        json = JSON.parse response.body.gsub("while(1);",'')
+        expect(json).to match_array(
+                [{"context_module_progression"=>
+                   {"context_module_id"=>@mod1.id,
+                    "workflow_state"=>"unlocked",
+                    "requirements_met"=>[],
+                    "incomplete_requirements"=>[]}},
+                 {"context_module_progression"=>
+                   {"context_module_id"=>@mod2.id,
+                    "workflow_state"=>"locked",
+                    "requirements_met"=>[],
+                    "incomplete_requirements"=>[]}}])
+      end
+    end
+
     before :once do
       course_with_teacher(:active_all => true)
       student_in_course(:active_all => true)

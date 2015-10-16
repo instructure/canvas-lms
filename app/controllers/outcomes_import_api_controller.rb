@@ -129,7 +129,7 @@ class OutcomesImportApiController < ApplicationController
     authorities.sort{ |a, b| a["title"] <=> b["title"] }
   end
 
-  def extract_common_core_and_ngss(api, nat_stds_guid)
+  def extract_nat_stds(api, nat_stds_guid)
     api.browse_guid(nat_stds_guid).first["itm"].first["itm"]
   end
 
@@ -141,8 +141,9 @@ class OutcomesImportApiController < ApplicationController
     api = api_connection
     auth_list = retrieve_authorities(api)
 
-    # prepend the common core and next gen science standards to the list
-    auth_list.unshift(extract_common_core_and_ngss(api, nat_stds_guid(auth_list)))
+    # prepend the common core, next gen science standards,
+    # and the ISTE (NETS) standards to the list
+    auth_list.unshift(extract_nat_stds(api, nat_stds_guid(auth_list)))
 
     # append the UK standards to the end of the list and flatten it down
     auth_list.push(uk_guid(api)).flatten

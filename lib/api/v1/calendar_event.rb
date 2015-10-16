@@ -43,6 +43,7 @@ module Api::V1::CalendarEvent
     participant = nil
 
     hash = api_json(event, user, session, :only => %w(id created_at updated_at start_at end_at all_day all_day_date title location_address location_name workflow_state comments))
+    hash['type'] = 'event'
     if event.context_type == "CourseSection"
       hash['title'] += " (#{context.name})"
       hash['description'] = api_user_content(event.description, event.context.course) unless excludes.include?('description')
@@ -146,6 +147,8 @@ module Api::V1::CalendarEvent
     hash = api_json(assignment, user, session, :only => %w(created_at updated_at title all_day all_day_date workflow_state))
     hash['description'] = api_user_content(assignment.description, assignment.context) unless excludes.include?('description')
     hash['id'] = "assignment_#{assignment.id}"
+    hash['type'] = 'assignment'
+
     if excludes.include?('assignment')
       hash['html_url'] = course_assignment_url(assignment.context_id, assignment)
     else

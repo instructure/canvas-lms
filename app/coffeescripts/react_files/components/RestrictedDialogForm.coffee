@@ -24,49 +24,17 @@ define [
       usageRightsRequiredForContext: React.PropTypes.bool.isRequired
 
     getInitialState: ->
-      permissionAttributes = ['hidden', 'locked', 'lock_at', 'unlock_at']
-      initialState = {}
-
-      allAreEqual = @props.models.every (model) =>
-        permissionAttributes.every (attribute) =>
-          @props.models[0].get(attribute) is model.get(attribute) || ( !@props.models[0].get(attribute) && !model.get(attribute) )
-
-      if allAreEqual
-        initialState = @props.models[0].pick(permissionAttributes)
-        initialState.selectedOption = if initialState.locked
-          'unpublished'
-        else if initialState.hidden
-          'link_only'
-        else if initialState.lock_at || initialState.unlock_at
-          'date_range'
-        else
-          'published'
-
-      initialState
+      submitable: false
 
     componentDidMount: ->
-      $([@refs.unlock_at.getDOMNode(), @refs.lock_at.getDOMNode()]).datetime_field()
+      @updateSubmitable()
       $('.ui-dialog-titlebar-close').focus()
 
+    updateSubmitable: ->
+      if @refs.restrictedSelection.state && @refs.restrictedSelection.state.selectedOption
+        @setState({submitable: true})
+
     # === Custom Functions === #
-
-    # Function Summary
-    #
-    # Extracts data from the form and converts it into an object.
-    #
-    # Refactoring Notes:
-    #   This function should be refactored so no refs are used. This could
-    #   be accomplished by storing form values to send in state and binding
-    #   from the inputs themselves when things change.
-    #
-    # Returns an object representing data the api expects.
-
-    extractFormValues: ->
-      hidden   : @state.selectedOption is 'link_only'
-      unlock_at: @state.selectedOption is 'date_range' && $(@refs.unlock_at.getDOMNode()).data('unfudged-date') or ''
-      lock_at  : @state.selectedOption is 'date_range' && $(@refs.lock_at.getDOMNode()).data('unfudged-date') or ''
-      locked: @state.selectedOption is 'unpublished'
-
     # Function Summary
     #
     # Event though you can technically set each of these fields independently, since we
@@ -97,7 +65,7 @@ define [
         @setRestrictedAccess()
 
     setRestrictedAccess: ->
-      attributes = @extractFormValues()
+      attributes = @refs.restrictedSelection.extractFormValues()
       promises = @props.models.map (item) ->
         # Calling .save like this (passing data as the 'attrs' property on
         # the 'options' argument instead of as the first argument) is so that we just send
@@ -130,3 +98,8 @@ define [
     ###
     anyFolders: ->
       @props.models.filter((model) -> model instanceof Folder).length
+
+    # callback function passed to RestrictedRadioButtons as props
+    # for disabling/enabling of the Update Button
+    radioStateChange: ->
+      @setState({submitable: true})

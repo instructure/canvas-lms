@@ -1062,6 +1062,33 @@ describe SIS::CSV::UserImporter do
     expect(@account.courses.where(sis_source_id: "test_2").first.students.map(&:name).include?("User Uno")).to be_falsey
   end
 
+  it 'should remove group_memberships when a user is deleted' do
+    process_csv_data_cleanly(
+      "course_id,short_name,long_name,account_id,term_id,status",
+      "test_1,TC 101,Test Course 101,,,active"
+    )
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,user1,User,Uno,user@example.com,active"
+    )
+    process_csv_data_cleanly(
+      "course_id,user_id,role,section_id,status,associated_user_id,start_date,end_date",
+      "test_1,user_1,student,,active,,,"
+    )
+    c = @account.courses.where(sis_source_id: "test_1").first
+    g =c.groups.create(name: 'group1')
+    u = Pseudonym.where(sis_user_id: 'user_1').first.user
+    gm = g.group_memberships.create(user: u, workflow_state: 'accepted')
+    expect(gm.workflow_state).to eq 'accepted'
+
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,user1,User,Uno,user@example.com,deleted"
+    )
+    gm.reload
+    expect(gm.workflow_state).to eq 'deleted'
+  end
+
   context 'account associations' do
     before(:each) do
       process_csv_data_cleanly(

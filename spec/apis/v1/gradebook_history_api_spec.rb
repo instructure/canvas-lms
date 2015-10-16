@@ -70,7 +70,7 @@ describe GradebookHistoryApiController, type: :request do
 
   describe 'GET /courses/:course_id/gradebook_history/:date/graders/:grader_id/assignments/:assignment_id/submissions' do
     let(:date) { Time.now.in_time_zone }
-    let(:date_string) { date.strftime('%Y-%m-%d') }
+    let(:date_str) { date.strftime('%Y-%m-%d') }
 
     before :once do
       course_with_teacher(:active_all => true)
@@ -85,13 +85,13 @@ describe GradebookHistoryApiController, type: :request do
       @submission.update_attributes!(:graded_at => date, :grader_id => grader.id, :score => 100)
 
       json = api_call_as_user(@teacher, :get,
-            "/api/v1/courses/#{@course.id}/gradebook_history/#{date_string}/graders/#{grader.id}/assignments/#{@assignment.id}/submissions.json",
+            "/api/v1/courses/#{@course.id}/gradebook_history/#{date_str}/graders/#{grader.id}/assignments/#{@assignment.id}/submissions.json",
             {
               :controller => 'gradebook_history_api',
               :action => 'submissions',
               :format => 'json',
               :course_id => @course.id.to_s,
-              :date => date_string,
+              :date => date_str,
               :grader_id => grader.id.to_s,
               :assignment_id => @assignment.id.to_s
             })
@@ -103,13 +103,13 @@ describe GradebookHistoryApiController, type: :request do
       @submission.update_attributes!(:graded_at => date, :grader_id => -50, :score => 100)
 
       json = api_call_as_user(@teacher, :get,
-            "/api/v1/courses/#{@course.id}/gradebook_history/#{date_string}/graders/0/assignments/#{@assignment.id}/submissions.json",
+            "/api/v1/courses/#{@course.id}/gradebook_history/#{date_str}/graders/0/assignments/#{@assignment.id}/submissions.json",
             {
               :controller => 'gradebook_history_api',
               :action => 'submissions',
               :format => 'json',
               :course_id => @course.id.to_s,
-              :date => date_string,
+              :date => date_str,
               :grader_id => '0',
               :assignment_id => @assignment.id.to_s
             })

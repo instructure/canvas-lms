@@ -459,6 +459,7 @@ module ApplicationHelper
           :id => tool.id,
           :url => tool.editor_button(:url),
           :icon_url => tool.editor_button(:icon_url),
+          :canvas_icon_class => tool.editor_button(:canvas_icon_class),
           :width => tool.editor_button(:selection_width),
           :height => tool.editor_button(:selection_height)
         }
@@ -662,6 +663,14 @@ module ApplicationHelper
     end
   end
 
+  def brand_config_includes
+    return {} unless @domain_root_account.allow_global_includes?
+    @brand_config_includes ||= BrandConfig::OVERRIDE_TYPES.each_with_object({}) do |override_type, hsh|
+      url = active_brand_config.presence.try(override_type)
+      hsh[override_type] = url if url.present?
+    end
+  end
+
   def get_global_includes
     return @global_includes if defined?(@global_includes)
     @global_includes = [Account.site_admin.global_includes_hash]
@@ -730,7 +739,7 @@ module ApplicationHelper
     return if disable_account_css?
     if use_new_styles?
       includes = []
-      includes << brand_config_includes[:css] if brand_config_includes[:css].present?
+      includes << brand_config_includes[:css_overrides] if brand_config_includes[:css_overrides].present?
     else
       includes = get_global_includes.inject([]) do |css_includes, global_include|
         css_includes << global_include[:css] if global_include[:css].present?
@@ -880,21 +889,14 @@ module ApplicationHelper
     end
   end
 
-  # Returns true if the given value is in the current path.
+  # Returns true if the current_path starts with the given value
   def active_path?(to_test)
     # Make sure to not include account external tools
-    if account_external_tool_path?(request.fullpath)
+    if controller.controller_name == 'external_tools' && Account === @context
       false
     else
-      request.fullpath.include?(to_test)
+      request.fullpath.start_with?(to_test)
     end
-  end
-
-  # Returns true if the active path is an account external tool (like Commons)
-  def account_external_tool_path?(to_test)
-    ext_tools_regex = /^\/accounts\/[^\/]*\/(external_tools)/
-    first_match_location = ext_tools_regex =~ to_test
-    !first_match_location.nil?
   end
 
   def link_to_parent_signup(auth_type)

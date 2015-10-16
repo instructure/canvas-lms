@@ -21,12 +21,13 @@ module BrandConfigHelpers
     )
 
     new_configs_by_account_id.map do |account_id, config|
+      account_name = name_for_child_account_by_id(account_id)
       tag_name = "brand_config_save_and_sync_to_s3_for_account_#{account_id}"
-      child_progress = Progress.new(context: user, tag: tag_name.to_sym)
+      child_progress = Progress.new(context: user, tag: tag_name.to_sym, message: "Syncing for #{account_name}")
       child_progress.user = user
       child_progress.reset!
       if config
-        config.save! if config.new_record?
+        config.save_unless_dup! if config.new_record?
         child_progress.process_job(
           config,
           :sync_to_s3_and_save_to_account!,
@@ -55,7 +56,20 @@ module BrandConfigHelpers
   end
 
   def child_accounts_with_config
-    self.sub_accounts.preload(:brand_config).where('brand_config_md5 IS NOT NULL')
+    @child_accounts_with_config ||= self.
+      sub_accounts.
+      preload(:brand_config).
+      where('brand_config_md5 IS NOT NULL')
+  end
+
+  def name_for_child_account_by_id(account_id)
+    # child_accounts_with_config will be loaded on all children already, so
+    # no extra DB hits needed
+    child_accounts_with_config.detect{ |account| account.id == account_id }.try(:name) ||
+      child_accounts_with_config.reduce(nil) do |name, child_account|
+        name ||= child_account.name_for_child_account_by_id(account_id)
+        name
+      end
   end
 
   def new_brand_config(new_parent_md5)

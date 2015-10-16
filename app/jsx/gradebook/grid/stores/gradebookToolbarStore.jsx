@@ -15,10 +15,7 @@ define([
     var GradebookToolbarStore = Reflux.createStore({
       listenables: [GradebookToolbarActions],
 
-      getInitialState() {
-        if (this.toolbarOptions) {
-          return this.toolbarOptions;
-        }
+      init() {
         var storedSortOrder = GradebookConstants.gradebook_column_order_settings ||
           { sortType: 'assignment_group' };
 
@@ -34,6 +31,13 @@ define([
         };
 
         this.toolbarOptions = _.defaults(savedOptions, GradebookConstants.DEFAULT_TOOLBAR_PREFERENCES);
+      },
+
+      getInitialState() {
+        if (this.toolbarOptions === null || this.toolbarOptions === undefined) {
+          this.init();
+        }
+
         return this.toolbarOptions;
       },
 

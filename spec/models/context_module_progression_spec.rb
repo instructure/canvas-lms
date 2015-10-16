@@ -220,6 +220,7 @@ describe ContextModuleProgression do
   describe "#uncomplete_requirement" do
     it "should uncomplete the requirement" do
       setup_modules
+      @module.publish!
       progression = @tag.context_module_action(@user, :read)
       progression.uncomplete_requirement(@tag.id)
       expect(progression.requirements_met.length).to be(0)
@@ -228,6 +229,7 @@ describe ContextModuleProgression do
 
     it "should not change anything when given an ID that does not exist" do
       setup_modules
+      @module.publish!
       progression = @tag.context_module_action(@user, :read)
       progression.uncomplete_requirement(-1)
       expect(progression.requirements_met.length).to be(1)

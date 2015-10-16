@@ -984,6 +984,28 @@ describe Quizzes::QuizSubmission do
     end
   end
 
+  describe '#results_visible_for_user' do
+    before(:once) do
+      course_with_teacher(active_all: true)
+      course_quiz(course: @course)
+      student_in_course(course: @course)
+    end
+
+    it "returns true if quiz restricts answers for concluded courses and the user is a grader" do
+      @quiz.stubs(:restrict_answers_for_concluded_course? => true)
+      qs = Quizzes::QuizSubmission.new(:quiz => @quiz)
+
+      expect(qs.results_visible_for_user?(@teacher)).to be_truthy
+    end
+
+    it "returns false if quiz restricts answers for concluded courses and the user is not a grader" do
+      @quiz.stubs(:restrict_answers_for_concluded_course? => true)
+      qs = Quizzes::QuizSubmission.new(:quiz => @quiz)
+
+      expect(qs.results_visible_for_user?(@student)).to be_falsey
+    end
+  end
+
   describe "#update_submission_version" do
     let_once(:submission) { @quiz.quiz_submissions.create! }
 
@@ -1576,6 +1598,24 @@ describe Quizzes::QuizSubmission do
 
         expect(submission.late?).to eq true
       end
+    end
+  end
+  
+  describe '#excused?' do
+    let(:submission) do
+      s=Submission.new
+      s.excused=true
+      s
+    end
+    let(:quiz_submission) do
+      Quizzes::QuizSubmission.new
+    end
+    it 'should return submission.excused?' do
+      quiz_submission.submission = submission
+      expect(quiz_submission.excused?).to eq submission.excused?
+    end
+    it 'should function without valid submission' do
+      expect(quiz_submission.excused?).to eq nil
     end
   end
 end

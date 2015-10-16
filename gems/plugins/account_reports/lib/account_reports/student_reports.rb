@@ -296,5 +296,50 @@ module AccountReports
       send_report(file)
     end
 
+
+    # shows last_activity_at on enrollments for users with
+    # enrollments in this account
+
+    # note: activity on other root accounts' enrollments will not show
+    def last_enrollment_activity
+      report_extra_text
+      file = AccountReports.generate_file(@account_report)
+      CSV.open(file, "w") do |csv|
+
+        headers = []
+        headers << I18n.t('#account_reports.report_header_user_id', 'user id')
+        headers << I18n.t('#account_reports.report_header_user_name', 'user name')
+        headers << I18n.t('#account_reports.report_header_last_activity_at', 'last activity at')
+
+        csv << headers
+
+        students = User.joins(:enrollments).
+          select(["users.id", :last_activity_at, :sortable_name]).
+          order("users.id, sortable_name, last_activity_at DESC").
+          distinct_on("users.id, sortable_name")
+
+        students = add_user_sub_account_scope(students)
+
+        potential_courses = Course.where(root_account_id: @domain_root_account)
+        potential_courses = potential_courses.where(enrollment_term_id: term) if term
+        potential_courses = potential_courses.where(id: course) if course
+        potential_courses = potential_courses.
+          joins(:course_account_associations).
+          where(course_account_associations: {account_id: account})
+
+        students = students.where(enrollments: {course_id: potential_courses})
+
+        students.find_in_batches do |batch|
+          batch.each do |u|
+            row = []
+            row << u.id
+            row << u.sortable_name
+            row << default_timezone_format(u.last_activity_at)
+            csv << row
+          end
+        end
+      end
+      send_report(file)
+    end
   end
 end

@@ -94,6 +94,7 @@ define([
           );
         }
         if (this.state.itemShown.key === 'publish_course') {
+          if (ENV.COURSE_WIZARD.permisssions.can_change_course_state) {
           return (
             <form accept-charset="UTF-8" action={ENV.COURSE_WIZARD.publish_course} method="post">
               <input name="utf8" type="hidden" value="✓" />
@@ -103,6 +104,11 @@ define([
               <button ref="callToAction" type="submit" className="Button Button--success">{this.state.itemShown.title}</button>
             </form>
           );
+         } else {
+            return (
+                <b>{I18n.t("You do not have permission to publish this course.")}</b>
+            );
+          }
         }
         if (this.state.itemShown.hasOwnProperty('title')) {
           return (

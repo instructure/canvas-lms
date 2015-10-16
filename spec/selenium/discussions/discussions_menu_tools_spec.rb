@@ -26,7 +26,7 @@ describe "discussions" do
       link = fj("##{@topic.id}_discussion_content li a.menu_tool_link")
       expect(link).to be_displayed
       expect(link.text).to match_ignoring_whitespace(@tool.label_for(:discussion_topic_menu))
-      expect(link['href']).to eq course_external_tool_url(@course, @tool) + "?launch_type=discussion_topic_menu&discussion_topics[]=#{@topic.id}"
+      assert_url_parse_match(link['href'], course_external_tool_url(@course, @tool) + "?launch_type=discussion_topic_menu&discussion_topics[]=#{@topic.id}")
     end
 
     it "should show tool launch links in the gear for items on the show page", priority: "1", test_id: 298758 do
@@ -37,7 +37,7 @@ describe "discussions" do
       link = f("#discussion-managebar li a.menu_tool_link")
       expect(link).to be_displayed
       expect(link.text).to match_ignoring_whitespace(@tool.label_for(:discussion_topic_menu))
-      expect(link['href']).to eq course_external_tool_url(@course, @tool) + "?launch_type=discussion_topic_menu&discussion_topics[]=#{@topic.id}"
+      assert_url_parse_match(link['href'], course_external_tool_url(@course, @tool) + "?launch_type=discussion_topic_menu&discussion_topics[]=#{@topic.id}")
     end
   end
 end

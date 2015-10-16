@@ -1,11 +1,27 @@
 ///
   /// How to update Icons
   //
-  // Add your new svg(s) to app/icons/
-  // Edit the template file. Important!! Edit file in public/fonts/_canvas-icons.scss
-  // Compile your fonts. In your project in terminal run: bundle exec rake icons:compile
-  // Check the styleguide to make sure they're pulling in /styleguide
-  // Done!
+  // TL;DR
+  //
+  // Add your new svg(s) to "public/fonts/icons/"
+  // Add your new icon markup to this template public/fonts/icons/_canvas-icons.scss
+  // Rebuild icon font with `bundle exec rake icons:compile`
+  //
+  // Details
+  //
+  // Help! I cant see my icon in "/styleguide"!
+  //  make sure you updated the template above
+  //
+  // I can see my entry in "/styleguide", but it looks like an unsupported unicode character (an empty rectangle or a square with hex in it)
+  //  Try doing a clean, rebuild, then restart your server
+  //  `bundle exec rake brand_configs:clean canvas:compile_assets`
+  //
+  // I can see my entry in "/styleguide", but it is completely empty where the icon should be
+  //  Your stylesheet isn't being loaded properly.
+  //  make sure your svg should 512x512
+  //  clear your browser cache
+  //
+  // More info can be found at <https://gollum.instructure.com/frontend-basics/canvas-icon-font>
 ///
 
 /* @styleguide Icons
@@ -287,6 +303,7 @@ Either use `<a>` with icon desired icon class added or insert `<i>` inside `<but
   <span class="span3"><i class="icon-export"></i> icon-export</span>
   <span class="span3"><i class="icon-equella"></i> icon-equella</span>
   <span class="span3"><i class="icon-equation"></i> icon-equation</span>
+  <span class="span3"><i class="icon-commons"></i> icon-commons</span>
 </div>
 */
 

@@ -47,21 +47,20 @@
 <div id="application" <% if use_new_styles? %>class="ic-app"<% end %>>
 
   <% if use_new_styles? %>
-    <%= render(:partial => 'shared/new_nav_header') %>
-
-  <%# Begin default Canvas header %>
+    <%= render(:partial => 'shared/new_nav_header') unless @headers == false %>
   <% else %>
-  <div id="header" class="no-print <%= 'no-user' unless @current_user %>">
-    <div id="header-inner">
-      <a href="#content" id="skip_navigation_link"><%= t 'Skip To Content' %></a>
-      <a id="header-logo" href="<%= dashboard_url %>"><%= t 'links.dashboard', "My Dashboard" %></a>
-      <b id="header-logo-secondary"></b>
-      <%= render(:partial => "shared/user_header_navigation") %>
-      <%= render(:partial => "shared/keyboard_navigation_hint") if keyboard_navigation %>
-      <%= render(:partial => "shared/primary_header_navigation") %>
+    <%# Begin default Canvas header %>
+    <div id="header" class="no-print <%= 'no-user' unless @current_user %>">
+      <div id="header-inner">
+        <a href="#content" id="skip_navigation_link"><%= t 'Skip To Content' %></a>
+        <a id="header-logo" href="<%= dashboard_url %>"><%= t 'links.dashboard', "My Dashboard" %></a>
+        <b id="header-logo-secondary"></b>
+        <%= render(:partial => "shared/user_header_navigation") %>
+        <%= render(:partial => "shared/keyboard_navigation_hint") if keyboard_navigation %>
+        <%= render(:partial => "shared/primary_header_navigation") %>
+      </div>
     </div>
-  </div>
-  <%# End default Canvas header %>
+    <%# End default Canvas header %>
   <% end %>
 
   <div id="instructure_ajax_error_box">

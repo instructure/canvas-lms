@@ -1,5 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/helpers/speed_grader_common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/gradebook2_common')
+require File.expand_path(File.dirname(__FILE__) + '/helpers/quizzes_common')
 
 describe "speed grader" do
   include_context "in-process server selenium tests"
@@ -858,5 +859,22 @@ describe "speed grader" do
       # sometimes jquery likes to be slow to load, so we do a keep trying so it can try again if $ is undefined
       keep_trying_until { expect(driver.execute_script("return $('#question_#{@quest1.id} .question_input')[0].value")).to eq "2.67" }
     end
+  end
+
+  it 'should let you enter in a float for a quiz question point value', priority: "1", test_id: 369250 do
+    init_course_with_students
+    quiz = seed_quiz_wth_submission
+    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{quiz.assignment_id}"
+    # In the left panel modify the grade to 0.5
+    driver.switch_to.frame f('#speedgrader_iframe')
+    points_input = ff('#questions .user_points input')
+    driver.execute_script("$('#questions .user_points input').focus()")
+    replace_content(points_input[1], '.5')
+    f('.update_scores button[type="submit"]').click
+    wait_for_ajaximations
+    # Switch to the right panel
+    # Verify that the grade is .5
+    driver.switch_to.default_content
+    expect(f('#grading-box-extended')['value']).to eq('0.5')
   end
 end

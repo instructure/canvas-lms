@@ -92,6 +92,11 @@
 #           "example": "8",
 #           "type": "string"
 #         },
+#         "graded_anonymously": {
+#           "description": "Boolean indicating whether the student name was visible when the grade was given. Could be null if the grade change record was created before this feature existed.",
+#           "example": true,
+#           "type": "boolean"
+#         },
 #         "version_number": {
 #           "description": "Version Number of the grade change submission.",
 #           "example": "1",

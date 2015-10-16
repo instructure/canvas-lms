@@ -235,6 +235,23 @@ describe Assignment do
         expect(@result.first.excused?).to eql true
       end
     end
+
+    context 'with anonymous grading' do
+      it 'explicitly sets anonymous grading if given' do
+        @assignment.grade_student(@user, :graded_anonymously => true, :grade => "10")
+        @assignment.reload
+        expect(@assignment.submissions.first.graded_anonymously).to be_truthy
+      end
+
+      it 'does not set anonymous grading if not given' do
+        @assignment.grade_student(@user, :graded_anonymously => true, :grade => "10")
+        @assignment.reload
+        @assignment.grade_student(@user, :grade => "10")
+        @assignment.reload
+        # should still true because grade didn't actually change
+        expect(@assignment.submissions.first.graded_anonymously).to be_truthy
+      end
+    end
   end
 
   it "should update a submission's graded_at when grading it" do
@@ -2907,7 +2924,7 @@ describe Assignment do
         @submission = @assignment.submit_homework(@student, :submission_type => 'online_text_entry', :body => 'ahem')
         @assignment.grade_student(@student, :comment => 'real comment', :score => 1)
 
-        @assignment.moderated_grading_selections.create!(:student => @student)
+        selection = @assignment.moderated_grading_selections.create!(:student => @student)
 
         @submission.add_comment(:author => @teacher, :comment => 'provisional comment', :provisional => true)
         teacher_pg = @submission.provisional_grade(@teacher)
@@ -2921,6 +2938,9 @@ describe Assignment do
               :comments => 'a comment',
             }
           })
+
+        selection.provisional_grade = teacher_pg
+        selection.save!
 
         @submission.add_comment(:author => @ta, :comment => 'other provisional comment', :provisional => true)
         ta_pg = @submission.provisional_grade(@ta)
@@ -2989,10 +3009,15 @@ describe Assignment do
           )
         end
 
-        it "should include all the other provisional rubric assessments" do
-          pras = @json['context']['students'][0]['provisional_rubric_assessments']
-          expect(pras.count).to eq 1
-          expect(pras[0]['assessor_id']).to eq @ta.id
+        it "should include all the other provisional rubric assessments in their respective grades" do
+          ta_pras = @json['submissions'][0]['provisional_grades'][1]['rubric_assessments']
+          expect(ta_pras.count).to eq 1
+          expect(ta_pras[0]['assessor_id']).to eq @ta.id
+        end
+
+        it "should include whether the provisional grade is selected" do
+          expect(@json['submissions'][0]['provisional_grades'][0]['selected']).to be_truthy
+          expect(@json['submissions'][0]['provisional_grades'][1]['selected']).to be_falsey
         end
       end
 

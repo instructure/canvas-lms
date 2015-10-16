@@ -234,8 +234,24 @@ class AssignmentGroupsController < ApplicationController
     includes = [:context, :external_tool_tag, {:quiz => :context}]
     includes += [:rubric, :rubric_association] unless params[:exclude_rubrics]
     includes << :discussion_topic if include_params.include?("discussion_topic")
-    includes << :assignment_overrides if override_dates? || include_params.include?('all_dates') || include_params.include?('overrides')
+    includes << :assignment_overrides if include_overrides?
     includes
+  end
+
+  def filter_by_grading_period?
+    return false if all_grading_periods_selected?
+    params[:grading_period_id].present? && multiple_grading_periods?
+  end
+
+  def all_grading_periods_selected?
+    params[:grading_period_id] == '0'
+  end
+
+  def include_overrides?
+    override_dates? ||
+      include_params.include?('all_dates') ||
+      include_params.include?('overrides') ||
+      filter_by_grading_period?
   end
 
   def assignment_visibilities(course, assignments)
@@ -305,48 +321,41 @@ class AssignmentGroupsController < ApplicationController
   end
 
   def visible_assignments(context, current_user, groups)
-    if include_params.include?('assignments')
-      # TODO: possible keyword arguments refactor
-      assignments = AssignmentGroup.visible_assignments(
-        current_user,
+    return Assignment.none unless include_params.include?('assignments')
+    # TODO: possible keyword arguments refactor
+    assignments = AssignmentGroup.visible_assignments(
+      current_user,
+      context,
+      groups,
+      assignment_includes
+    ).with_student_submission_count
+
+    if params[:grading_period_id].present? && multiple_grading_periods?
+      grading_period = GradingPeriod.context_find(
         context,
-        groups,
-        assignment_includes
-      ).with_student_submission_count
+        params.fetch(:grading_period_id)
+      )
 
-      if params[:grading_period_id].present? && multiple_grading_periods?
-        grading_period = GradingPeriod.context_find(
-          context,
-          params.fetch(:grading_period_id)
-        )
-
-        assignments = Assignment::FilterWithOverridesByDueAt.new(
-          assignments: assignments,
-          grading_period: grading_period,
-          differentiated_assignments: differentiated_assignments?
-        ).filter_assignments
-      end
-
-      # because of a bug with including content_tags, we are preloading
-      # here rather than in assignments with multiple associations
-      # referencing content_tags table and therefore aliased table names
-      # the conditions on has_many :context_module_tags will break
-      if include_params.include?("module_ids") || !context.grants_right?(@current_user, session, :read_as_admin)
-        # loading the context module information here will improve performance for `locked_json` immensely
-        Assignment.preload_context_module_tags(assignments)
-      end
-
-      if AssignmentOverrideApplicator.should_preload_override_students?(assignments, @current_user, "assignment_groups_api")
-        AssignmentOverrideApplicator.preload_assignment_override_students(assignments, @current_user)
-      end
-
-      if assignment_includes.include?(:assignment_overrides)
-        assignments.each { |a| a.has_no_overrides = true if a.assignment_overrides.size == 0 }
-      end
-
-      assignments
-    else
-      Assignment.none
+      assignments = grading_period.assignments(assignments) if grading_period
     end
+
+    # because of a bug with including content_tags, we are preloading
+    # here rather than in assignments with multiple associations
+    # referencing content_tags table and therefore aliased table names
+    # the conditions on has_many :context_module_tags will break
+    if include_params.include?("module_ids") || !context.grants_right?(@current_user, session, :read_as_admin)
+      # loading the context module information here will improve performance for `locked_json` immensely
+      Assignment.preload_context_module_tags(assignments)
+    end
+
+    if AssignmentOverrideApplicator.should_preload_override_students?(assignments, @current_user, "assignment_groups_api")
+      AssignmentOverrideApplicator.preload_assignment_override_students(assignments, @current_user)
+    end
+
+    if assignment_includes.include?(:assignment_overrides)
+      assignments.each { |a| a.has_no_overrides = true if a.assignment_overrides.size == 0 }
+    end
+
+    assignments
   end
 end

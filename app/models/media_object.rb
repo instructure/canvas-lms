@@ -141,7 +141,7 @@ class MediaObject < ActiveRecord::Base
     client = CanvasKaltura::ClientV3.new
     client.startSession(CanvasKaltura::SessionType::ADMIN)
     res = client.bulkUploadGet(bulk_upload_id)
-    if !res[:ready]
+    if !res || !res[:ready]
       if attempt < Setting.get('media_object_bulk_refresh_max_attempts', '5').to_i
         wait_period = Setting.get('media_object_bulk_refresh_wait_period', '30').to_i
         MediaObject.send_later_enqueue_args(:refresh_media_files, {:run_at => wait_period.minutes.from_now, :priority => Delayed::LOW_PRIORITY}, bulk_upload_id, attachment_ids, root_account_id, attempt + 1)
@@ -159,7 +159,7 @@ class MediaObject < ActiveRecord::Base
     client = CanvasKaltura::ClientV3.new
     client.startSession(CanvasKaltura::SessionType::ADMIN)
     info = client.mediaGet(media_id)
-    return !!info[:id]
+    !!(info && info[:id])
   end
 
   def self.ensure_media_object(media_id, create_opts = {})
@@ -179,7 +179,7 @@ class MediaObject < ActiveRecord::Base
     client = CanvasKaltura::ClientV3.new
     client.startSession(CanvasKaltura::SessionType::ADMIN)
     res = client.mediaUpdate(self.media_id, :name => self.user_entered_title)
-    if !res[:error]
+    if res && !res[:error]
       self.title = self.user_entered_title
       self.save
     end

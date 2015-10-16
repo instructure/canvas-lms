@@ -856,6 +856,7 @@ tr:
         message: Mesaj
         mfa_settings: "Çoklu Kimlik Doğrulama"
         name: "Hesap Adı"
+        new_sub_account_includes: "Alt hesaplar temalarını düzenleyip ek içerik tanımlayabilsin"
         no_enrollments_can_create_courses: "Hiçbir kayıtlı olmayan kullanıcılar"
         open_registration: "Açık Kayıt"
         outgoing_email_default_name_option_custom: "Varsayılan \"Kimden\" İsmi"
@@ -1455,6 +1456,8 @@ tr:
   are_you_sure_you_want_to_remove_this_grading_perio_e3251c09: "Bu notlandırma peryodunu silmek istediğinize emin misiniz?"
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "Bu aracı kaldırmak istediğinize emin misiniz?"
   are_you_sure_you_want_to_report_this_profile_pictu_e22c2210: "Bu profil resmini rapor etmek istediğnize emin misiniz?"
+  arrange_columns_by_assignment_group_33acdf03: "Sütunları Ödev Grubuna göre düzenle"
+  arrange_columns_by_due_date_888f2551: "Sütunları Son Teslim Tarihine göre Düzenle"
   as_you_type_in_this_field_the_list_of_groups_will__16688a5f: "Bu alanı doldururken girdiğiniz harflere uyan isimlere göre grup adları otomatikl olarak filtrelencektir."
   as_you_type_in_this_field_the_list_of_results_will_c1a1a3e4: "Bu alanı doldururken sonuçlar listesi otomatik olarak güncellenecektir."
   assessment_by_name_7b879a2c: "Ödevi yapan %{name}"
@@ -2119,6 +2122,7 @@ tr:
   assignments_api: 
     invalid_date_time: "%{attribute} için geçersiz tarih"
     invalid_submission_types: "Geçersiz gönderim türü"
+  assignments_in_this_group_have_no_points_possible__3cd35922: "Bu gruptaki ödevlerin olası puanları yok ve not hesaplamasına dahil edilemezler"
   attachment: 
     default_filename: Dosya
     errors: 
@@ -2149,6 +2153,7 @@ tr:
     corrupted: "Ayrıntılar Bulunamadı"
     login: "OTURUM AÇ"
     logout: "OTURUMU KAPAT"
+  authorize_e3f25bb4: Yetkilendir
   available_after_unlock_at_b5682224: "%{unlock_at} tarihinden sonra geçerli"
   available_after_unlock_at_until_lock_at_499e8092: "%{unlock_at} tarihinden sonra %{lock_at} tarihine kadar geçerli"
   available_from_587ce92f: "Etkin Olduğu Tarih"
@@ -2175,6 +2180,7 @@ tr:
   before_publishing_you_must_set_usage_rights_on_you_dcd7b567: "Yayınlamadan önce dosyalarınızdaki kullanım haklarını ayarlamalısınız."
   beginning_date_2d2a29ac: "Başlama tarihi"
   below_this_search_field_is_a_list_of_content_type__58aaa03f: "Bu arama alanının altında %{content_type} listesi vardır. Siz yazarken liste sorgu eşleşmesine göre filtrelenecektir.  Karşılıklı yapılan mesajlaşmalar belirlediğiniz seçeneğe göre filtrelenir."
+  beta_url_3c7b88ec: "Beta URL:"
   better_file_browsing_description: |-
       Yeni, daha basit ve kullanımı kolay dosya arama arayüzü. Bu özelliği ders düzeyinde etkinleştirirseniz,
       dersteki tüm kullanıcılar yeni arayüzü görebilirler. Kullanıcılar kişisel dosya sayfasına ('/files') gittiklerinde
@@ -9897,6 +9903,7 @@ tr:
         remember_access: "Bu servis için yetkilendirmemi hatırla"
       page_title: "Uygulama İçin Oturum Aç"
     confirm_mobile: 
+      authorize: Yetkilendir
       cancel: İptal
       details: 
         allow_application: "%{app_name} hesabınıza erişmek istiyor."

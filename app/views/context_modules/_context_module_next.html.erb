@@ -8,7 +8,7 @@
   differentiated_assignments_on = @context.feature_enabled?(:differentiated_assignments)
   @modules ||= []
 %>
-<% cache_if_module(context_module, editable, differentiated_assignments_on, nc_or_on, @current_user, @context) do %>
+<% cache_if_module(context_module, editable, differentiated_assignments_on, @current_user, @context) do %>
 
 <div
   class="item-group-condensed context_module
@@ -69,19 +69,17 @@
 
     <%= render :partial => "context_modules/prerequisites_message", :locals => {:editable => editable, :context_module => context_module} %>
 
-    <% if nc_or_on %>
-      <div class="requirements_message">
-        <% if context_module && context_module.completion_requirements.present? %>
-          <ul class="pill">
-            <% count = context_module.requirement_count %>
-            <% completion_label = count == 1 ? t("Complete One Item") : t("Complete All Items") %>
-            <li aria-label="<%= completion_label %>" data-requirement-count="<%= count %>" tabindex="0">
-              <%= completion_label %>
-            </li>
-          </ul>
-        <% end %>
-      </div>
-    <% end %>
+    <div class="requirements_message">
+      <% if context_module && context_module.completion_requirements.present? %>
+        <ul class="pill">
+          <% count = context_module.requirement_count %>
+          <% completion_label = count == 1 ? t("Complete One Item") : t("Complete All Items") %>
+          <li aria-label="<%= completion_label %>" data-requirement-count="<%= count %>" tabindex="0">
+            <%= completion_label %>
+          </li>
+        </ul>
+      <% end %>
+    </div>
 
     <div class="ig-header-admin">
       <% unless editable %>
@@ -117,6 +115,8 @@
           data-course-id="<%= context_module && context_module.context_id %>"
           data-published="<%= published_status == 'published' %>"
           data-publishable="<%= true %>"
+          data-publish-message="<%= t('Unpublished. Click to publish %{module_name}.', {module_name: context_module ? context_module.name : 'module'}) %>"
+          data-unpublish-message="<%= t('Published. Click to unpublish %{module_name}.', {module_name: context_module ? context_module.name : 'module'}) %>"
           title=""
           data-tooltip
           class="publish-icon module <%= published_status %>"
@@ -125,10 +125,10 @@
         </span>
 
         <button
-          aria-label="<%= t('aria_labels.add_item', %{Add Content}) %>"
+          aria-label="<%= t('Add Content to %{module_name}', {module_name: context_module ? context_module.name : 'module'}) %>"
           rel="<%= context_url(@context, :context_url) %>/modules/<%= context_module ? context_module.id : "{{ id }}" %>/items"
-          class="add_module_item_link btn"><i class="icon-plus"></i><span class="screenreader-only"><%= t('links.add_item', %{Add Content}) %></span></button>
-        <button class="btn al-trigger" aria-label="<%= t("manager_module", "Manage module") %>">
+          class="add_module_item_link btn"><i class="icon-plus"></i><span class="screenreader-only"><%= t('Add Content to %{module_name}', {module_name: context_module ? context_module.name : 'module'}) %></span></button>
+        <button class="btn al-trigger" aria-label="<%= t('Manage %{module_name}', {module_name: context_module ? context_module.name : 'module'})  %>">
           <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
         </button>
         <ul class="al-options">
@@ -150,16 +150,7 @@
               class="delete_module_link icon-trash"
               title="<%= t('links.title.delete_module', %{Delete this module}) %>"><%= t('links.text.delete_module', %{Delete}) %></a>
           </li>
-          <% @menu_tools[:module_menu].each do |tool| %>
-            <li>
-              <% tool_path = course_external_tool_path(@context, tool, launch_type: 'module_menu',
-                                                  :modules => [context_module ? context_module.id : "{{ id }}"]) %>
-              <a class="menu_tool_link" href="<%= tool_path %>">
-                <% if icon_url = tool.extension_setting(:module_menu, :icon_url) %><img class="icon" alt="" src="<%= icon_url %>" /><% end %>
-                <%= tool.label_for(:module_menu, I18n.locale) %>
-              </a>
-            </li>
-          <% end %>
+          <%= external_tools_menu_items(@menu_tools[:module_menu], {link_class: "menu_tool_link", settings_key: :module_menu, in_list: true, url_params: {:modules => [context_module ? context_module.id : "{{ id }}"]}}) %>
         </ul>
       <% end %>
       <span style="display: none;">

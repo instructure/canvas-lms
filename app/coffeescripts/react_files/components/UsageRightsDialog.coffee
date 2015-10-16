@@ -51,11 +51,16 @@ define [
         if success
           updateModelsUsageRights(data, @props.itemsToManage)
           $.flashMessage(I18n.t('Usage rights have been set.'))
+          @setRestrictedAccess(@refs.restrictedSelection.extractFormValues())
         else
           $.flashError(I18n.t('There was an error setting usage rights.'))
         @props.closeModal()
 
       setUsageRights(@props.itemsToManage, usageRightValue, afterSet)
+
+    setRestrictedAccess: (attributes) ->
+      @props.itemsToManage.every (item) ->
+        item.save({}, {attrs: attributes})
 
     # Determines the default usage right to be selected
     defaultSelectedRight: ->

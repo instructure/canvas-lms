@@ -3,10 +3,9 @@
 define([
   'jquery',
   'react',
-  'underscore',
   './DashboardCard',
   './DashboardCardBackgroundStore'
-], function($, React, _, DashboardCard, DashboardCardBackgroundStore) {
+], function($, React, DashboardCard, DashboardCardBackgroundStore) {
   var DashboardCardBox = React.createClass({
 
     displayName: 'DashboardCardBox',
@@ -37,7 +36,7 @@ define([
     },
 
     allCourseAssetStrings: function(){
-      return _.map(this.props.courseCards, (card) => card.assetString);
+      return this.props.courseCards.map(card => card.assetString);
     },
 
     colorForCard: function(assetString){
@@ -49,7 +48,7 @@ define([
     },
 
     render: function () {
-      var cards = this.props.courseCards.map(function(card) {
+      var cards = this.props.courseCards.map(card => {
         return (
           <div className="col-xs-6 col-lg-4 card">
             <DashboardCard shortName={card.shortName}
@@ -64,7 +63,7 @@ define([
             />
           </div>
         );
-      }, this);
+      });
       return (
         <div className="ic-DashboardCard_Box grid-row">
           {cards}

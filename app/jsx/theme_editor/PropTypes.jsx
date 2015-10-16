@@ -26,10 +26,15 @@ define([
   types.image = React.PropTypes.shape(_.extend({
     type: React.PropTypes.oneOf(['image']).isRequired,
     accept: React.PropTypes.string.isRequired,
-    helper_text: React.PropTypes.string.isRequired
+    helper_text: React.PropTypes.string
   }, baseVarDef))
 
-  types.varDef = React.PropTypes.oneOfType([types.image, types.color])
+  types.percentage = React.PropTypes.shape(_.extend({
+    type: React.PropTypes.oneOf(['percentage']).isRequired,
+    helper_text: React.PropTypes.string
+  }, baseVarDef))
+
+  types.varDef = React.PropTypes.oneOfType([types.image, types.color, types.percentage])
 
   types.brandConfig = React.PropTypes.shape({
     md5: types.md5,

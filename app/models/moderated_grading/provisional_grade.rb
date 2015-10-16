@@ -4,7 +4,7 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
   attr_accessible :grade, :score, :final
   attr_writer :force_save
 
-  belongs_to :submission
+  belongs_to :submission, inverse_of: :provisional_grades
   belongs_to :scorer, class_name: 'User'
 
   has_many :rubric_assessments, as: :artifact
@@ -16,6 +16,8 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
   validates :submission, presence: true
 
   after_create :touch_graders # to update grading counts
+  after_save :touch_submission
+  after_save :remove_moderation_ignores
 
   scope :scored_by, ->(scorer) { where(scorer_id: scorer) }
   scope :final, -> { where(:final => true)}
@@ -23,6 +25,14 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
 
   def touch_graders
     submission.touch_graders
+  end
+
+  def touch_submission
+    submission.touch
+  end
+
+  def remove_moderation_ignores
+    submission.assignment.ignores.where(:purpose => 'moderation', :permanent => false).delete_all
   end
 
   def valid?(*)
@@ -46,7 +56,11 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
   end
 
   def submission_comments
-    submission.all_submission_comments.for_provisional_grade(self.id)
+    if submission.all_submission_comments.loaded?
+      submission.all_submission_comments.select { |c| c.provisional_grade_id == id }
+    else
+      submission.all_submission_comments.where(provisional_grade_id: id)
+    end
   end
 
   def student
@@ -65,31 +79,57 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
     publish_rubric_assessments!
   end
 
+  def copy_to_final_mark!(scorer)
+    final_mark = submission.find_or_create_provisional_grade!(scorer: scorer,
+                                                              score: self.score,
+                                                              grade: grade,
+                                                              force_save: true,
+                                                              final: true)
+    final_mark.submission_comments.destroy_all
+    copy_submission_comments!(final_mark)
+
+    final_mark.rubric_assessments.destroy_all
+    copy_rubric_assessments!(final_mark)
+
+    final_mark.reload
+    final_mark
+  end
+
   private
 
   def publish_submission_comments!
+    copy_submission_comments!(nil)
+  end
+
+  def copy_submission_comments!(dest_provisional_grade)
     self.submission_comments.each do |prov_comment|
       pub_comment = prov_comment.dup
-      pub_comment.provisional_grade_id = nil
+      pub_comment.provisional_grade_id = dest_provisional_grade && dest_provisional_grade.id
       pub_comment.save!
     end
   end
 
   def publish_rubric_assessments!
+    copy_rubric_assessments!(submission)
+  end
+
+  def copy_rubric_assessments!(dest_artifact)
     self.rubric_assessments.each do |prov_assmt|
       assoc = prov_assmt.rubric_association
 
       pub_assmt = nil
       # see RubricAssociation#assess
-      if assoc.assessments_unique_per_asset?(prov_assmt.assessment_type)
-        pub_assmt = assoc.rubric_assessments.where(artifact_id: self.submission_id, artifact_type: 'Submission',
-          assessment_type: prov_assmt.assessment_type).first
-      else
-        pub_assmt = assoc.rubric_assessments.where(artifact_id: self.submission_id, artifact_type: 'Submission',
-          assessment_type: prov_assmt.assessment_type, assessor_id: prov_assmt.assessor).first
+      if dest_artifact.is_a?(Submission)
+        if assoc.assessments_unique_per_asset?(prov_assmt.assessment_type)
+          pub_assmt = assoc.rubric_assessments.where(artifact_id: dest_artifact.id, artifact_type: dest_artifact.class_name,
+                                                     assessment_type: prov_assmt.assessment_type).first
+        else
+          pub_assmt = assoc.rubric_assessments.where(artifact_id: dest_artifact.id, artifact_type: dest_artifact.class_name,
+                                                     assessment_type: prov_assmt.assessment_type, assessor_id: prov_assmt.assessor).first
+        end
       end
-      pub_assmt ||= assoc.rubric_assessments.build(:assessor => prov_assmt.assessor, :artifact => self.submission,
-        :user => self.student, :rubric => assoc.rubric, :assessment_type => prov_assmt.assessment_type)
+      pub_assmt ||= assoc.rubric_assessments.build(:assessor => prov_assmt.assessor, :artifact => dest_artifact,
+                                                   :user => self.student, :rubric => assoc.rubric, :assessment_type => prov_assmt.assessment_type)
       pub_assmt.score = prov_assmt.score
       pub_assmt.data = prov_assmt.data
 

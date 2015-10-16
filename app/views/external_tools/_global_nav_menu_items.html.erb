@@ -3,10 +3,12 @@
 
   <% cache([ContextExternalTool.global_navigation_menu_cache_key(@domain_root_account, visibility), use_new_styles?]) do %>
     <% tools = ContextExternalTool.global_navigation_tools(@domain_root_account, visibility) %>
-    <% tools.each do |tool| %>
-      <li id="<%= tool.asset_string %>_menu_item" class="menu-item <% if use_new_styles? %>ic-app-header__menu-list-item<% end %><% if account_external_tool_path?(request.fullpath)%> ic-app-header__menu-list-item--active<% end %>">
+    <% tools.each do |tool|
+        tool_path = account_external_tool_path(@domain_root_account, tool, :launch_type => 'global_navigation')
+    %>
+      <li id="<%= tool.asset_string %>_menu_item" class="menu-item <% if use_new_styles? %>ic-app-header__menu-list-item<% end %><% if current_page?(tool_path)%> ic-app-header__menu-list-item--active<% end %>">
       <% if use_new_styles? %>
-        <a class='ic-app-header__menu-list-link' href="<%= account_external_tool_path(@domain_root_account, tool, :launch_type => 'global_navigation') %>">
+        <a class='ic-app-header__menu-list-link' href="<%= tool_path %>">
           <%# TODO: Make it so individual tool logos show up (rather than all as Commons) once LTI has a decent way of doing logos %>
           <%= render(:partial => 'shared/svg/svg_commons_logo.svg') %>
           <div class="menu-item__text">

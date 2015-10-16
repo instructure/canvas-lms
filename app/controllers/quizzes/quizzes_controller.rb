@@ -117,7 +117,8 @@ class Quizzes::QuizzesController < ApplicationController
       },
       :PERMISSIONS => {
         create: can_do(@context.quizzes.scoped.new, @current_user, :create),
-        manage: can_manage
+        manage: can_manage,
+        read_question_banks: can_manage || can_do(@context, @current_user, :read_question_banks)
       },
       :FLAGS => {
         question_banks: feature_enabled?(:question_banks)
@@ -197,7 +198,7 @@ class Quizzes::QuizzesController < ApplicationController
         upload_url = api_v1_quiz_submission_files_path(:course_id => @context.id, :quiz_id => @quiz.id)
         js_env :UPLOAD_URL => upload_url
         js_env :SUBMISSION_VERSIONS_URL => course_quiz_submission_versions_url(@context, @quiz) unless @quiz.muted?
-        if !@submission.preview? && !@js_env[:QUIZ_SUBMISSION_EVENTS_URL]
+        if !@submission.preview? && (!@js_env || !@js_env[:QUIZ_SUBMISSION_EVENTS_URL])
           events_url = api_v1_course_quiz_submission_events_url(@context, @quiz, @submission)
           js_env QUIZ_SUBMISSION_EVENTS_URL: events_url
         end
@@ -527,6 +528,7 @@ class Quizzes::QuizzesController < ApplicationController
           js_env({
             quiz_url: api_v1_course_quiz_url(@context, @quiz),
             quiz_statistics_url: api_v1_course_quiz_statistics_url(@context, @quiz),
+            course_sections_url: api_v1_course_sections_url(@context),
             quiz_reports_url: api_v1_course_quiz_reports_url(@context, @quiz),
           })
 
@@ -843,7 +845,7 @@ class Quizzes::QuizzesController < ApplicationController
       redirect_to course_quiz_url(@context, @quiz) and return
     end
 
-    if !@submission.preview? && !@js_env[:QUIZ_SUBMISSION_EVENTS_URL]
+    if !@submission.preview? && (!@js_env || !@js_env[:QUIZ_SUBMISSION_EVENTS_URL])
       events_url = api_v1_course_quiz_submission_events_url(@context, @quiz, @submission)
       js_env QUIZ_SUBMISSION_EVENTS_URL: events_url
     end

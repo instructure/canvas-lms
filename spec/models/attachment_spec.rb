@@ -1441,4 +1441,16 @@ describe Attachment do
     tag1 = mod.add_item(:id => att.id, :type => 'attachment')
     expect(tag1).not_to be_nil
   end
+
+  it "should unlock files at the right time even if they're accessed shortly before" do
+    enable_cache do
+      course_with_student :active_all => true
+      attachment_model uploaded_data: default_uploaded_data, unlock_at: 30.seconds.from_now
+      expect(@attachment.grants_right?(@student, :download)).to eq false # prime cache
+      Timecop.freeze(@attachment.unlock_at + 1.second) do
+        run_jobs
+        expect(Attachment.find(@attachment).grants_right?(@student, :download)).to eq true
+      end
+    end
+  end
 end

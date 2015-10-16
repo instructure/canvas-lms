@@ -15,13 +15,15 @@
              value="{{searchTerm}}"
              type="search">
       <span id="discussionsFilter">
+        <span class="screenreader-only" id="onlyUnreadAccessibleLabel">{{t "filter discussions by unread"}}</span>
         <input type="checkbox"
                id="onlyUnread"
-               aria-label="{{t "filter discussions by unread"}}"
+               aria-labelledby="onlyUnreadAccessibleLabel"
                {{#if onlyUnread}}checked{{/if}} /><label aria-hidden="true" for="onlyUnread">{{#t "unread"}}Unread{{/t}}</label>
+        <span class="screenreader-only" id="onlyGradedAccessibleLabel">{{t "filter discussions by assignments"}}</span>
         <input type="checkbox"
                id="onlyGraded"
-               aria-label="{{t "filter discussions by assignments"}}"
+               aria-labelledby="onlyGradedAccessibleLabel"
                {{#if onlyGraded}}checked{{/if}}/><label aria-hidden="true" for="onlyGraded">{{#t "assignments"}}Assignments{{/t}}</label>
       </span>
     </div>

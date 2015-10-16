@@ -20,7 +20,7 @@ describe 'dashcards' do
       create_announcement
       get '/'
 
-      f('.icon-announcement').click
+      f('a.announcements').click
       expect(driver.current_url).to include("/courses/#{@course.id}/announcements")
     end
 
@@ -29,7 +29,7 @@ describe 'dashcards' do
       @course.assignments.create!(title: 'assignment 1', name: 'assignment 1')
       get '/'
 
-      f('.icon-assignment').click
+      f('a.assignments').click
       expect(driver.current_url).to include("/courses/#{@course.id}/assignments")
     end
 
@@ -38,7 +38,7 @@ describe 'dashcards' do
       @course.discussion_topics.create!(title: 'discussion 1', message: 'This is a message.')
       get '/'
 
-      f('.icon-discussion').click
+      f('a.discussions').click
       expect(driver.current_url).to include("/courses/#{@course.id}/discussion_topics")
     end
 
@@ -47,13 +47,13 @@ describe 'dashcards' do
       add_file(fixture_file_upload('files/example.pdf', 'application/pdf'), @course, 'example.pdf')
       get '/'
 
-      f('.icon-folder').click
+      f('a.files').click
       expect(driver.current_url).to include("/courses/#{@course.id}/files")
     end
 
     it 'should display color picker', priority: "1", test_id: 249122 do
       get '/'
-      f('.icon-settings').click
+      f('.ic-DashboardCard__header-button').click
       expect(f('.ColorPicker__Container')).to be_displayed
     end
 
@@ -61,11 +61,13 @@ describe 'dashcards' do
       hex = random_hex_color
       get '/'
 
-      f('.icon-settings').click
+      f('.ic-DashboardCard__header-button').click
+
       expect(f('.ColorPicker__Container')).to be_displayed
 
       replace_content(fj('#ColorPickerCustomInput'), hex)
-      f('button.Button.Button--primary').click
+
+      f('.ColorPicker__Container .Button--primary').click
 
       keep_trying_until(5) do
         if fj('.ic-DashboardCard__background').attribute(:style).include?('rgb')

@@ -124,6 +124,12 @@ class Group < ActiveRecord::Base
       participating_users_association
   end
 
+  def participating_users_in_context(user_ids = nil)
+    users = participating_users(user_ids)
+    return users unless self.context.is_a? Course
+    context.participating_users(users.pluck(:id))
+  end
+
   def all_real_students
     return self.context.all_real_students.where(users: { id: group_memberships.select(:user_id) }) if self.context.respond_to? "all_real_students"
     self.users
@@ -521,6 +527,7 @@ class Group < ActiveRecord::Base
       can :delete and
       can :manage and
       can :manage_admin_users and
+      can :manage_calendar and
       can :manage_content and
       can :manage_files and
       can :manage_students and

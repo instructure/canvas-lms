@@ -124,7 +124,7 @@ module AccountReports
               row << u.sis_user_id
               row << u.unique_id
               row << nil if @sis_format
-              name_parts = User.name_parts(u.sortable_name)
+              name_parts = User.name_parts(u.sortable_name, likely_already_surname_first: true)
               row << name_parts[0] || '' # first name
               row << name_parts[1] || '' # last name
               row << u.name
@@ -431,6 +431,7 @@ module AccountReports
                        WHEN enrollments.workflow_state = 'creation_pending' THEN 'invited'
                        WHEN enrollments.workflow_state = 'active' THEN 'active'
                        WHEN enrollments.workflow_state = 'completed' THEN 'concluded'
+                       WHEN enrollments.workflow_state = 'inactive' THEN 'inactive'
                        WHEN enrollments.workflow_state = 'deleted' THEN 'deleted'
                        WHEN enrollments.workflow_state = 'rejected' THEN 'rejected' END AS enroll_state").
           joins("INNER JOIN #{CourseSection.quoted_table_name} cs ON cs.id = enrollments.course_section_id

@@ -35,6 +35,16 @@ describe ContentMigration do
       expect(@cm.progress).to eq 100
     end
 
+    it "should set started_at and finished_at" do
+      time = 5.minutes.ago
+      Timecop.freeze(time) do
+        run_course_copy
+      end
+      @cm.reload
+      expect(@cm.started_at.to_i).to eq time.to_i
+      expect(@cm.finished_at.to_i).to eq time.to_i
+    end
+
     it "should migrate syllabus links on copy" do
       course_model
 
@@ -396,6 +406,31 @@ describe ContentMigration do
       expect(tag2_to.url).to eq tag2.url.sub("http://derp.derp", "https://derp.derp")
 
       expect(@copy_to.syllabus_body).to eq @copy_from.syllabus_body.sub("http://derp.derp", "https://derp.derp")
+    end
+
+    it "should copy module settings" do
+      mod1 = @copy_from.context_modules.create!(:name => "some module")
+      tag = mod1.add_item({ :title => 'Example 1', :type => 'external_url', :url => 'http://derp.derp/something' })
+      mod1.completion_requirements = {tag.id => {:type => 'must_view'}}
+      mod1.require_sequential_progress = true
+      mod1.requirement_count = 1
+      mod1.save!
+
+      mod2 = @copy_from.context_modules.create!(:name => "some module 2")
+      mod2.prerequisites = "module_#{mod1.id}"
+      mod2.save!
+
+      run_course_copy
+
+      mod1_to = @copy_to.context_modules.where(:migration_id => mig_id(mod1)).first
+      tag_to = mod1_to.content_tags.first
+      expect(mod1_to.completion_requirements).to eq [{:id => tag_to.id, :type => 'must_view'}]
+      expect(mod1_to.require_sequential_progress).to be_truthy
+      expect(mod1_to.requirement_count).to be_truthy
+      mod2_to = @copy_to.context_modules.where(:migration_id => mig_id(mod2)).first
+
+      expect(mod2_to.prerequisites.count).to eq 1
+      expect(mod2_to.prerequisites.first[:id]).to eq mod1_to.id
     end
 
     it "should preserve media comment links" do

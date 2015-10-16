@@ -230,7 +230,7 @@ class ProfileController < ApplicationController
         json[:category]             = category.category.underscore.gsub(/\s/, '_')
         json[:display_name]         = category.category_display_name
         json[:category_description] = category.category_description
-        json[:option]               = category.related_user_setting(@user)
+        json[:option]               = category.related_user_setting(@user, @domain_root_account)
       end
     end
 

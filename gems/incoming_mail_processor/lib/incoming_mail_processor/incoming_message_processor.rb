@@ -29,6 +29,7 @@ module IncomingMailProcessor
       :imap => IncomingMailProcessor::ImapMailbox,
       :directory => IncomingMailProcessor::DirectoryMailbox,
       :pop3 => IncomingMailProcessor::Pop3Mailbox,
+      :sqs => IncomingMailProcessor::SqsMailbox,
     }.freeze
 
     ImportantHeaders = %w(To From Subject Content-Type)
