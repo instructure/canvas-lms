@@ -922,14 +922,23 @@ class DiscussionTopic < ActiveRecord::Base
     self.assignment.submit_homework(user, :submission_type => 'discussion_topic')
   end
 
+  def send_notification_for_context?
+    notification_context =
+      if self.context.is_a?(Group) && self.context.context.is_a?(Course)
+        self.context.context # we need to go deeper
+      else
+        self.context
+      end
+    notification_context.available? && !notification_context.concluded?
+  end
+
   has_a_broadcast_policy
 
   set_broadcast_policy do |p|
     p.dispatch :new_discussion_topic
     p.to { active_participants_with_visibility - [user] }
     p.whenever { |record|
-      record.context.available? and
-        !record.context.concluded? and
+      record.send_notification_for_context? and
       ((record.just_created && record.active?) || record.changed_state(:active, !record.is_announcement ? :unpublished : :post_delayed))
     }
   end

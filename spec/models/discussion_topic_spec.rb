@@ -1721,4 +1721,42 @@ describe DiscussionTopic do
       end
     end
   end
+
+  context "notifications" do
+    before :once do
+      user_with_pseudonym(:active_all => true)
+      course_with_teacher(:user => @user, :active_enrollment => true)
+      n = Notification.create!(:name => "New Discussion Topic", :category => "TestImmediately")
+      NotificationPolicy.create!(:notification => n, :communication_channel => @user.communication_channel, :frequency => "immediately")
+    end
+
+    it "should send a message for a published course" do
+      @course.offer!
+      topic = @course.discussion_topics.create!(:title => "title")
+      expect(topic.messages_sent["New Discussion Topic"].map(&:user)).to be_include(@user)
+    end
+
+    it "should not send a message for an unpublished course" do
+      topic = @course.discussion_topics.create!(:title => "title")
+      expect(topic.messages_sent["New Discussion Topic"]).to be_blank
+    end
+
+    context "group discussions" do
+      before :once do
+        group_model(:context => @course)
+        @group.add_user(@user)
+      end
+
+      it "should send a message for a group discussion in a published course" do
+        @course.offer!
+        topic = @group.discussion_topics.create!(:title => "title")
+        expect(topic.messages_sent["New Discussion Topic"].map(&:user)).to be_include(@user)
+      end
+
+      it "should not send a message for a group discussion in an unpublished course" do
+        topic = @group.discussion_topics.create!(:title => "title")
+        expect(topic.messages_sent["New Discussion Topic"]).to be_blank
+      end
+    end
+  end
 end
