@@ -24,14 +24,15 @@ describe "calendar2" do
         account.save!
       end
 
-      it "should create a new event" do
+      it "should create a new event via plus button", priority: "1", test_id: 250293 do
         load_agenda_view
 
+        # Clicks plus button, saves event, and verifies a row has been added
         expect(fj('.agenda-wrapper:visible')).to be_present
         f('#create_new_event_link').click
         fj('.ui-dialog:visible .btn-primary').click
         wait_for_ajaximations
-        expect(ffj('.ig-row').length).to eq 1 #expects there to be one new event on Agenda index page
+        expect(ffj('.ig-row').length).to eq 1
       end
 
       it "should display agenda events" do
