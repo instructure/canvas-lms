@@ -1527,8 +1527,9 @@ describe DiscussionTopic do
 
       @topic.reload.assignment.expects(:restore).with(:discussion_topic).once
       @topic.restore
-      expect(@topic.reload).to be_active
-      @topic.child_topics.each { |ct| expect(ct.reload).to be_active }
+      expect(@topic.reload).to be_unpublished
+      @topic.child_topics.each { |ct| expect(ct.reload).to be_unpublished }
+      expect(@topic.assignment).to be_unpublished
     end
 
     it "should restore to unpublished state if draft mode is enabled" do
@@ -1536,8 +1537,9 @@ describe DiscussionTopic do
 
       @topic.reload.assignment.expects(:restore).with(:discussion_topic).once
       @topic.restore
-      expect(@topic.reload).to be_post_delayed
-      @topic.child_topics.each { |ct| expect(ct.reload).to be_post_delayed }
+      expect(@topic.reload).to be_unpublished
+      @topic.child_topics.each { |ct| expect(ct.reload).to be_unpublished }
+      expect(@topic.assignment).to be_unpublished
     end
   end
 
