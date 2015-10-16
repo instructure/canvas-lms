@@ -709,6 +709,7 @@ define([
           data['final'] = '1';
         }
       }
+      data['graded_anonymously'] = utils.shouldHideStudentNames();
       var url = $(".update_rubric_assessment_url").attr('href');
       var method = "POST";
       EG.toggleFullRubric();

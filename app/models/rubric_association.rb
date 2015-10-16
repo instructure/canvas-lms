@@ -311,6 +311,7 @@ class RubricAssociation < ActiveRecord::Base
       assessment.score = score if replace_ratings
       assessment.data = ratings if replace_ratings
 
+      assessment.set_graded_anonymously if opts[:graded_anonymously]
       assessment.save
       if artifact.is_a?(ModeratedGrading::ProvisionalGrade)
         artifact.submission.touch
