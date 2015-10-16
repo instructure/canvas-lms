@@ -30,6 +30,7 @@
     "moment": "~2.10.6",
     "reflux": "~0.2.7",
     "axios": "~0.5.4",
-    "when": "~3.7.3"
+    "when": "~3.7.3",
+    "react-tabs": "https://github.com/rackt/react-tabs.git#1ad1031ec4a50784225a05611c4959d15745fc3d"
   }
 }

@@ -1,0 +1,50 @@
+@import "base/environment";
+
+.padding-none {
+  padding: 0;
+}
+
+.margin-none {
+  margin: 0;
+}
+
+.react-tabs ul[role=tablist] {
+  padding-left: 10px;
+  margin-bottom: 20px;
+  border-color: $ic-border-light;
+
+  li[role=tab] {
+    padding: 10px 25px;
+    font-size: 1.1em;
+    color: $ic-link-color;
+
+    &[selected] {
+      font-weight: bold;
+      color: $ic-color-dark;
+      border-color: $ic-border-light;
+    }
+  }
+}
+
+.button-group {
+  margin-right: 10px;
+  &:last-of-type {
+    margin-right: 0;
+  }
+}
+
+.courses-list td {
+  vertical-align: top;
+}
+.courses-list__published-icon {
+  color: $ic-color-success;
+}
+
+.ReactModalPortal .ReactModal__Content {
+  background: transparent;
+  border: none;
+}
+
+.flex-grow-2 {
+  flex-grow: 2;
+}

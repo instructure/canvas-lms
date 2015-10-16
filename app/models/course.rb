@@ -536,6 +536,10 @@ class Course < ActiveRecord::Base
   scope :with_enrollments, -> {
     where("EXISTS (?)", Enrollment.active.where("enrollments.course_id=courses.id"))
   }
+  scope :with_enrollment_types, -> (types) {
+    types = types.map { |type| "#{type.capitalize}Enrollment" }
+    where("EXISTS (?)", Enrollment.active.where("enrollments.course_id=courses.id").where(type: types))
+  }
   scope :without_enrollments, -> {
     where("NOT EXISTS (?)", Enrollment.active.where("enrollments.course_id=courses.id"))
   }

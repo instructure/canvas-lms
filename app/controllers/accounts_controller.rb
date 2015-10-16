@@ -167,6 +167,7 @@ class AccountsController < ApplicationController
     return unless authorized_action(@account, @current_user, :read)
     respond_to do |format|
       format.html do
+        return course_user_search if @account.feature_enabled?(:course_user_search)
         if value_to_boolean(params[:theme_applied])
           flash[:notice] = t("Your custom theme has been successfully applied.")
         end
@@ -180,6 +181,22 @@ class AccountsController < ApplicationController
       format.json { render :json => account_json(@account, @current_user, session, params[:includes] || [],
                                                  !@account.grants_right?(@current_user, session, :manage)) }
     end
+  end
+
+  def course_user_search
+    can_read_course_list = @account.grants_right?(@current_user, session, :read_course_list)
+    can_read_roster = @account.grants_right?(@current_user, session, :read_roster)
+
+    unless can_read_course_list || can_read_roster
+      return render_unauthorized_action
+    end
+
+    @permissions = {
+      theme_editor: use_new_styles? && can_do(@account, @current_user, :manage_account_settings) && @account.branding_allowed?,
+      can_read_course_list: can_read_course_list,
+      can_read_roster: can_read_roster
+    }
+    render template: "accounts/course_user_search"
   end
 
   # @API Get the sub-accounts of an account
@@ -232,6 +249,10 @@ class AccountsController < ApplicationController
   #   include only courses with no enrollments.  If not present, do not filter
   #   on course enrollment status.
   #
+  # @argument enrollment_type[] [String, "teacher"|"student"|"ta"|"observer"|"designer"]
+  #   If set, only return courses that have at least one user enrolled in
+  #   in the course with one of the specified enrollment types.
+  #
   # @argument published [Boolean]
   #   If true, include only published courses.  If false, exclude published
   #   courses.  If not present, do not filter on published status.
@@ -263,7 +284,7 @@ class AccountsController < ApplicationController
   # @argument search_term [String]
   #   The partial course name, code, or full ID to match and return in the results list. Must be at least 3 characters.
   #
-  # @argument include[] [String, "syllabus_body"|"term"|"course_progress"|"storage_quota_used_mb"]
+  # @argument include[] [String, "syllabus_body"|"term"|"course_progress"|"storage_quota_used_mb"|"total_students"|"teachers"]
   #   - All explanations can be seen in the {api:CoursesController#index Course API index documentation}
   #   - "sections", "needs_grading_count" and "total_scores" are not valid options at the account level
   #
@@ -284,6 +305,10 @@ class AccountsController < ApplicationController
       @courses = @courses.with_enrollments
     elsif !params[:with_enrollments].nil? && !value_to_boolean(params[:with_enrollments])
       @courses = @courses.without_enrollments
+    end
+
+    if params[:enrollment_type].is_a?(Array)
+      @courses = @courses.with_enrollment_types(params[:enrollment_type])
     end
 
     if value_to_boolean(params[:completed])
@@ -332,6 +357,7 @@ class AccountsController < ApplicationController
     @courses = Api.paginate(@courses, self, api_v1_account_courses_url)
 
     ActiveRecord::Associations::Preloader.new(@courses, [:account, :root_account]).run
+    ActiveRecord::Associations::Preloader.new(@courses, [:teachers]).run if includes.include?("teachers")
     render :json => @courses.map { |c| course_json(c, @current_user, session, includes, nil) }
   end
 

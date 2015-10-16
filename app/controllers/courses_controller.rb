@@ -318,7 +318,7 @@ class CoursesController < ApplicationController
   #   'StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'ObserverEnrollment',
   #   or 'DesignerEnrollment'.
   #
-  # @argument include[] [String, "needs_grading_count"|"syllabus_body"|"total_scores"|"term"|"course_progress"|"sections"|"storage_quota_used_mb"|"total_students"|"favorites"]
+  # @argument include[] [String, "needs_grading_count"|"syllabus_body"|"total_scores"|"term"|"course_progress"|"sections"|"storage_quota_used_mb"|"total_students"|"favorites"|"teachers"]
   #   - "needs_grading_count": Optional information to include with each Course.
   #     When needs_grading_count is given, and the current user has grading
   #     rights, the total number of submissions needing grading for all
@@ -362,6 +362,9 @@ class CoursesController < ApplicationController
   #   - "passback_status": Include the grade passback_status
   #   - "favorites": Optional information to include with each Course.
   #     Indicates if the user has marked the course as a favorite course.
+  #   - "teachers": Teacher information to include with each Course.
+  #     Returns an array of hashes containing the {{api:Users:UserDisplay UserDisplay} information
+  #     for each teacher in the course.
   #
   # @argument state[] [String, "unpublished"|"available"|"completed"|"deleted"]
   #   If set, only return courses that are in the given state(s).
@@ -404,7 +407,6 @@ class CoursesController < ApplicationController
 
       format.json {
         render json: courses_for_user(@current_user)
-
       }
     end
   end
@@ -2413,6 +2415,10 @@ class CoursesController < ApplicationController
     Canvas::Builders::EnrollmentDateBuilder.preload(enrollments)
     enrollments_by_course = enrollments.group_by(&:course_id).values
     enrollments_by_course = Api.paginate(enrollments_by_course, self, api_v1_courses_url) if api_request?
+    if includes.include?("teachers")
+      courses = enrollments_by_course.map(&:first).map(&:course)
+      ActiveRecord::Associations::Preloader.new(courses, :teachers).run
+    end
     enrollments_by_course.each do |course_enrollments|
       course = course_enrollments.first.course
       hash << course_json(course, user, session, includes, course_enrollments)

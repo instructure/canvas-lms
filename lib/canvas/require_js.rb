@@ -70,7 +70,11 @@ module Canvas
       end
 
       def map
-        @map ||= Canvas::RequireJs::ClientAppExtension.map.to_json
+        @map ||= Canvas::RequireJs::ClientAppExtension.map.merge({
+          '*' => {
+            React: "react" # for misbehaving UMD like react-tabs
+          }
+        }).to_json
       end
 
       def bundles

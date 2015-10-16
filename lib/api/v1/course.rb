@@ -21,6 +21,7 @@ module Api::V1::Course
   include Api::V1::EnrollmentTerm
   include Api::V1::SectionEnrollments
   include Api::V1::PostGradesStatus
+  include Api::V1::User
 
   def course_settings_json(course)
     settings = {}
@@ -84,6 +85,7 @@ module Api::V1::Course
       hash['total_students'] = course.students.count if includes.include?('total_students')
       hash['passback_status'] = post_grades_status_json(course) if includes.include?('passback_status')
       hash['is_favorite'] = course.favorite_for_user?(user) if includes.include?('favorites')
+      hash['teachers'] = course.teachers.map { |teacher| user_display_json(teacher) } if includes.include?('teachers')
       add_helper_dependant_entries(hash, course, builder)
       apply_nickname(hash, course, user) if user
     end

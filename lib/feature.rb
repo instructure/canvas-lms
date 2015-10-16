@@ -404,6 +404,14 @@ END
       applies_to: 'Course',
       state: 'allowed',
       root_opt_in: true
+    },
+    'course_user_search' => {
+      display_name: -> { I18n.t('Course and User Search') },
+      description: -> { I18n.t('Updated UI for searching and displaying users and courses within an account.') },
+      applies_to: 'Account',
+      state: 'hidden',
+      development: true,
+      root_opt_in: true
     }
   )
 
