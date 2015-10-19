@@ -128,6 +128,14 @@ describe "groups" do
         expect(f('#new-discussion-btn')).to be_displayed
         verify_no_course_user_access(discussions_page)
       end
+
+      it "should allow discussions to be deleted by their creator", priority: "1", test_id: 329626 do
+        DiscussionTopic.create!(context: @testgroup.first, user: @user, title: 'Delete Me', message: 'Discussion text')
+        get discussions_page
+        expect(ff('.discussion-title-block').size).to eq 1
+        delete_announcement_via_gear_menu
+        expect(ff('.discussion-title-block').size).to eq 0
+      end
     end
 
     #-------------------------------------------------------------------------------------------------------------------
