@@ -216,20 +216,6 @@ define([
       }
     });
 
-    $(".custom_search_results_link").click(function(event) {
-      event.preventDefault();
-      var $dialog = $("#custom_search_results_dialog");
-      $dialog.dialog({
-        title: I18n.t('titles.search_for_open_resources', "Search for Open Resources"),
-        width: 600,
-        height: 400
-      });
-      var control = $dialog.data('searchControl');
-      if(control) {
-        control.execute($("title").text());
-      }
-    });
-
     $("a.equella_content_link").live('click', function(event) {
       event.preventDefault();
       var $dialog = $("#equella_preview_dialog");
