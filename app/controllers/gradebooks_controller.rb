@@ -53,7 +53,7 @@ class GradebooksController < ApplicationController
         gp_id = nil
         if multiple_grading_periods?
           set_current_grading_period
-          @grading_periods = get_active_grading_periods
+          @grading_periods = active_grading_periods
           gp_id = @current_grading_period_id unless view_all_grading_periods?
         end
 
@@ -250,13 +250,25 @@ class GradebooksController < ApplicationController
     @current_grading_period_id == 0
   end
 
-  def get_active_grading_periods
-    GradingPeriod.for(@context).map do |gp|
+  def active_grading_periods
+    @active_grading_periods ||= GradingPeriod.for(@context).map do |gp|
       json = gp.as_json(only: [:id, :title, :start_date, :end_date], permissions: {user: @current_user})
       json[:grading_period][:is_last] = gp.last?
       json[:grading_period]
     end
   end
+
+  def latest_end_date_of_admin_created_grading_periods_in_the_past
+    periods = active_grading_periods.select do |period|
+      # false if current user is an admin
+      admin_created = period["permissions"]["manage"] == false
+      in_the_past = period["end_date"] <= Time.zone.now
+
+      admin_created && in_the_past
+    end
+    periods.map { |period| period["end_date"] }.compact.sort.last
+  end
+  private :latest_end_date_of_admin_created_grading_periods_in_the_past
 
   def set_js_env
     @gradebook_is_editable = @context.grants_right?(@current_user, session, :manage_grades)
@@ -299,7 +311,8 @@ class GradebooksController < ApplicationController
       :speed_grader_enabled => @context.allows_speed_grader?,
       :differentiated_assignments_enabled => @context.feature_enabled?(:differentiated_assignments),
       :multiple_grading_periods_enabled => multiple_grading_periods?,
-      :active_grading_periods => get_active_grading_periods,
+      :active_grading_periods => active_grading_periods,
+      :latest_end_date_of_admin_created_grading_periods_in_the_past => latest_end_date_of_admin_created_grading_periods_in_the_past,
       :current_grading_period_id => @current_grading_period_id,
       :outcome_gradebook_enabled => @context.feature_enabled?(:outcome_gradebook),
       :custom_columns_url => api_v1_course_custom_gradebook_columns_url(@context),

@@ -21,6 +21,18 @@ define [
       else
         null
 
+      isInPastGradingPeriodAndNotAdmin = ((assignment) ->
+        return false unless ENV.GRADEBOOK_OPTIONS.multiple_grading_periods_enabled
+        return false unless ENV.GRADEBOOK_OPTIONS.latest_end_date_of_admin_created_grading_periods_in_the_past
+
+        return false unless ENV.current_user_roles
+        return false unless typeof ENV.current_user_roles.find == 'function'
+        return false if ENV.current_user_roles.find (elem) -> elem == 'admin'
+
+        latest_end_date = new Date(ENV.GRADEBOOK_OPTIONS.latest_end_date_of_admin_created_grading_periods_in_the_past)
+        assignment.due_at <= latest_end_date
+      )(@assignment)
+
       @url = @options.change_grade_url.replace(":assignment", @assignment.id).replace(":submission", @student.id)
       @submission = $.extend {}, @student["assignment_#{@assignment.id}"],
         label: "student_grading_#{@assignment.id}"
@@ -30,6 +42,7 @@ define [
         loading: true
         showPointsPossible: (@assignment.points_possible || @assignment.points_possible == '0') && @assignment.grading_type != "gpa_scale"
         shouldShowExcusedOption: true
+        isInPastGradingPeriodAndNotAdmin: isInPastGradingPeriodAndNotAdmin
       @submission["assignment_grading_type_is_#{@assignment.grading_type}"] = true
       @submission.grade = "EX" if @submission.excused
       @$el = $('<div class="use-css-transitions-for-show-hide" style="padding:0;"/>')
@@ -91,4 +104,4 @@ define [
       @scrollCommentsToBottom()
 
     @open: (assignment, student, options) ->
-      new SubmissionDetailsDialog(assignment, student, options).open()
+      new SubmissionDetailsDialog(assignment, student, options, ENV).open()
