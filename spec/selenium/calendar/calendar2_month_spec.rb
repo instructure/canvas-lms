@@ -146,11 +146,34 @@ describe "calendar2" do
         expect(not_found('.delete_event_link')).to be
       end
 
-      it "should change the month" do
-        get "/calendar2"
-        old_header_title = get_header_text
-        change_calendar
-        expect(old_header_title).not_to eq get_header_text
+      it "should correctly display next month on arrow press", priority: "1", test_id: 197555 do
+        load_month_view
+        quick_jump_to_date('Jan 1, 2012')
+        change_calendar(:next)
+
+        # Verify known dates in calendar header and grid
+        expect(get_header_text).to include_text('February 2012')
+        first_wednesday = '.calendar .fc-first .fc-day.fc-wed'
+        expect(f(first_wednesday + ' .fc-day-number').text).to eq('1')
+        expect(f(first_wednesday).attribute('data-date')).to eq('2012-02-01')
+        last_thursday = '.calendar .fc-last .fc-day.fc-thu'
+        expect(f(last_thursday + ' .fc-day-number').text).to eq('1')
+        expect(f(last_thursday).attribute('data-date')).to eq('2012-03-01')
+      end
+
+      it "should correctly display previous month on arrow press", priority: "1", test_id: 419290 do
+        load_month_view
+        quick_jump_to_date('Jan 1, 2012')
+        change_calendar(:prev)
+
+        # Verify known dates in calendar header and grid
+        expect(get_header_text).to include_text('December 2011')
+        first_thursday = '.calendar .fc-first .fc-day.fc-thu'
+        expect(f(first_thursday + ' .fc-day-number').text).to eq('1')
+        expect(f(first_thursday).attribute('data-date')).to eq('2011-12-01')
+        last_saturday = '.calendar .fc-last .fc-day.fc-sat'
+        expect(f(last_saturday + ' .fc-day-number').text).to eq('31')
+        expect(f(last_saturday).attribute('data-date')).to eq('2011-12-31')
       end
 
       it "should navigate with jump-to-date control" do
