@@ -28,6 +28,7 @@ class GradebookCsvsController < ApplicationController
 
       csv_options = {
         include_sis_id: @context.grants_any_right?(@current_user, session, :read_sis, :manage_sis),
+        grading_period_id: params[:grading_period_id],
         include_priors: Canvas::Plugin.value_to_boolean(params[:include_priors])
       }
 
