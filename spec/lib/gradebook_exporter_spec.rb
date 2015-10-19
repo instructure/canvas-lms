@@ -72,43 +72,78 @@ describe GradebookExporter do
         assignments.create due_at: 8.weeks.from_now, title: "future"
       end
 
-      let(:csv)     { GradebookExporter.new(course, @teacher).to_csv }
+      let!(:group) do
+        course.grading_period_groups.create!
+      end
+
+      let!(:first_period) do
+        args = {
+          start_date: 6.weeks.ago,
+          end_date: 3.weeks.ago,
+          title: "past grading period"
+        }
+
+        group.grading_periods.create! args
+
+      end
+
+      let!(:last_period) do
+        args = {
+          start_date: 3.weeks.ago,
+          end_date: 3.weeks.from_now,
+          title: "present day, present time"
+        }
+
+        group.grading_periods.create! args
+      end
+
+      let(:csv)     { GradebookExporter.new(course, @teacher, grading_period_id: last_period.id).to_csv }
       let(:headers) { CSV.parse(csv, headers: true).headers }
 
+      let(:csv_id_0)     { GradebookExporter.new(course, @teacher, grading_period_id: "0").to_csv }
+      let(:headers_id_0) { CSV.parse(csv_id_0, headers: true).headers }
+
+      let(:csv_first_period) { GradebookExporter.new(course, @teacher, grading_period_id: first_period.id).to_csv }
+      let(:headers_first_period) {CSV.parse(csv_first_period, headers: true).headers }
+
       describe "when multiple grading periods is on" do
-        describe "only current assignments are exported" do
+        describe "assignments in the selected grading period are exported" do
           let!(:enable_mgp) do
             course.enable_feature!(:multiple_grading_periods)
           end
 
-          let!(:period) do
-            group = course.grading_period_groups.create!
-            args = {
-              start_date: 3.weeks.ago,
-              end_date: 3.weeks.from_now,
-              title: "present day, present time"
-            }
-
-            group.grading_periods.create! args
+          it "exports selected grading period's assignments" do
+            expect(headers).to include no_due_date_assignment.title_with_id,
+                                       current_assignment.title_with_id
           end
 
-          it "exports current assignments" do
-            expect(headers).to include no_due_date_assignment.title_with_id
+          it "exports assignments without due dates if exporting last grading period" do
+            expect(headers).to include current_assignment.title_with_id,
+                                       no_due_date_assignment.title_with_id
           end
 
-          it "exports assignments without due dates" do
-            expect(headers).to include current_assignment.title_with_id
+          it "does not export assignments without due date" do
+            expect(headers_first_period).to_not include no_due_date_assignment.title_with_id
           end
 
-          it "does not export past assignments" do
-            expect(headers).to_not include past_assignment.title_with_id
+          it "does not export assignments in other grading periods" do
+            expect(headers).to_not include past_assignment.title_with_id,
+                                           future_assignment.title_with_id
           end
 
           it "does not export future assignments" do
             expect(headers).to_not include future_assignment.title_with_id
           end
+
+          it "exports the entire gradebook when grading_period_id is 0" do
+            expect(headers_id_0).to include past_assignment.title_with_id,
+                                            current_assignment.title_with_id,
+                                            future_assignment.title_with_id,
+                                            no_due_date_assignment.title_with_id
+          end
         end
       end
+
 
       describe "when multiple grading periods is off" do
         describe "all assignments are exported" do

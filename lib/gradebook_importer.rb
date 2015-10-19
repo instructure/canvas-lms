@@ -101,9 +101,18 @@ class GradebookImporter
       process_submissions(row, @students.last)
     end
 
-    memo = @assignments
-    @assignments = select_in_current_grading_periods @assignments, @context
-    @assignments_outside_current_periods = memo - @assignments
+
+    @assignments_outside_current_periods = []
+    if @context.feature_enabled? :multiple_grading_periods
+      memo = @assignments
+      current_grading_period = GradingPeriod.for(@context).current
+
+      unless current_grading_period.empty?
+        @assignments = select_in_grading_period @assignments, @context, current_grading_period.first.id
+      end
+
+      @assignments_outside_current_periods = memo - @assignments
+    end
 
     @missing_assignments = []
     @missing_assignments = @all_assignments.values - @assignments if @missing_assignment

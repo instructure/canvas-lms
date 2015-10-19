@@ -1148,14 +1148,19 @@ define [
 
         @pollProgressForCSVExport(loading_interval, attachment_progress)
 
-      $('.generate_new_csv').click ->
+      $('.generate_new_csv').click =>
         $('#download_csv').prop('disabled', true)
         loading_interval = self.exportingGradebookStatus()
         include_priors = $('#show_concluded_enrollments').prop('checked')
+
+        params =
+          include_priors: include_priors
+          grading_period_id: @getGradingPeriodToShow()
+
         $.ajaxJSON(
             ENV.GRADEBOOK_OPTIONS.export_gradebook_csv_url,
             'GET',
-            { "include_priors": include_priors }
+            params
         ).then((attachment_progress) ->
           self.pollProgressForCSVExport(loading_interval, attachment_progress)
         )
