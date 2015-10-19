@@ -62,13 +62,13 @@ define([
     toggleEditing: function(){
       var currentState = !!this.state.editing;
 
-      if (this.isMounted()){
+      if (this.isMounted()) {
         this.setState({editing: !currentState});
       }
     },
 
     doneEditing: function(){
-      if(this.isMounted()){
+      if(this.isMounted()) {
         this.setState({editing: false})
       }
     },
@@ -113,7 +113,8 @@ define([
             handleColorChange = {this.handleColorChange}
             assetString       = {this.props.assetString}
             settingsToggle    = {this.refs.settingsToggle}
-            backgroundColor   = {this.props.backgroundColor} />
+            backgroundColor   = {this.props.backgroundColor}
+          />
         );
       }
     },
@@ -127,7 +128,8 @@ define([
               iconClass         = {link.icon}
               linkClass         = {link.css_class}
               path              = {link.path}
-              screenReaderLabel = {link.screenreader} />
+              screenReaderLabel = {link.screenreader}
+            />
           );
         }
       });

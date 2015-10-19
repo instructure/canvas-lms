@@ -2,9 +2,10 @@
 define([
   'underscore',
   'react',
+  'jquery',
   'i18n!dashcards',
-  'jsx/shared/ColorPicker',
-], function(_, React, I18n, ColorPickerComponent) {
+  'jsx/shared/ColorPicker'
+], function(_, React, $, I18n, ColorPickerComponent) {
 
   // ================
   //   COLOR PICKER
@@ -64,7 +65,7 @@ define([
     },
 
     leftPlusElement: function(){
-      var parentWidth = $(this.props.parentNode).width();
+      var parentWidth = $(this.props.parentNode).outerWidth();
       return $(this.props.parentNode).offset().left + parentWidth;
     },
 
@@ -75,7 +76,7 @@ define([
     },
 
     topPosition: function(){
-      return $(this.props.parentNode).offset().top - $(window).scrollTop() - 6;
+      return $(this.props.parentNode).position().top - 6;
     },
 
     leftPosition: function(){
@@ -102,7 +103,7 @@ define([
         'horizontal': true
       });
 
-      return(
+      return (
         <div className = {classes}
              style     = {this.pickerToolTipStyle()} >
           <ColorPicker isOpen           = {true}
@@ -111,6 +112,7 @@ define([
                        afterUpdateColor = {this.props.handleColorChange}
                        hidePrompt       = {true}
                        nonModal         = {true}
+                       hideOnScroll     = {false}
                        currentColor     = {this.props.backgroundColor} />
         </div>
       )

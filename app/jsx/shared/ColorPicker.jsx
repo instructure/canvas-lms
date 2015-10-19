@@ -4,28 +4,26 @@ define([
   'jquery',
   'react',
   'react-modal',
-  'i18n!calendar_color_picker',
+  'i18n!calendar_color_picker'
 ], function($, React, ReactModal, I18n) {
 
   var PREDEFINED_COLORS = [
-    {hexcode:'#EF4437', name: I18n.t('Red')},
-    {hexcode:'#E71F63', name: I18n.t('Pink')},
-    {hexcode:'#8F3E97', name: I18n.t('Purple')},
-    {hexcode:'#65499D', name: I18n.t('Deep Purple')},
-    {hexcode:'#4554A4', name: I18n.t('Indigo')},
-    {hexcode:'#2083C5', name: I18n.t('Blue')},
-    {hexcode:'#35A4DC', name: I18n.t('Light Blue')},
-    {hexcode:'#09BCD3', name: I18n.t('Cyan')},
-    {hexcode:'#009688', name: I18n.t('Teal')},
-    {hexcode:'#43A047', name: I18n.t('Green')},
-    {hexcode:'#8BC34A', name: I18n.t('Light Green')},
-    {hexcode:'#FDC010', name: I18n.t('Yellow')},
-    {hexcode:'#F8971C', name: I18n.t('Orange')},
-    {hexcode:'#F0592B', name: I18n.t('Deep Orange')},
-    {hexcode:'#F06291', name: I18n.t('Light Pink')}
+    {hexcode: '#EF4437', name: I18n.t('Red')},
+    {hexcode: '#E71F63', name: I18n.t('Pink')},
+    {hexcode: '#8F3E97', name: I18n.t('Purple')},
+    {hexcode: '#65499D', name: I18n.t('Deep Purple')},
+    {hexcode: '#4554A4', name: I18n.t('Indigo')},
+    {hexcode: '#2083C5', name: I18n.t('Blue')},
+    {hexcode: '#35A4DC', name: I18n.t('Light Blue')},
+    {hexcode: '#09BCD3', name: I18n.t('Cyan')},
+    {hexcode: '#009688', name: I18n.t('Teal')},
+    {hexcode: '#43A047', name: I18n.t('Green')},
+    {hexcode: '#8BC34A', name: I18n.t('Light Green')},
+    {hexcode: '#FDC010', name: I18n.t('Yellow')},
+    {hexcode: '#F8971C', name: I18n.t('Orange')},
+    {hexcode: '#F0592B', name: I18n.t('Deep Orange')},
+    {hexcode: '#F06291', name: I18n.t('Light Pink')}
   ];
-
-  var SWATCHES_PER_ROW = 5;
 
   var ColorPicker = React.createClass({
 
@@ -40,6 +38,7 @@ define([
       afterUpdateColor: React.PropTypes.func,
       afterClose: React.PropTypes.func,
       assetString: React.PropTypes.string.isRequired,
+      hideOnScroll: React.PropTypes.bool,
       positions: React.PropTypes.object,
       nonModal: React.PropTypes.bool,
       hidePrompt: React.PropTypes.bool,
@@ -59,7 +58,8 @@ define([
 
     getDefaultProps () {
       return {
-        currentColor: "#efefef"
+        currentColor: "#efefef",
+        hideOnScroll: true
       }
     },
 
@@ -67,11 +67,15 @@ define([
       if (this.refs.hexInput) {
         this.refs.hexInput.getDOMNode().focus();
       }
-      $(window).on('scroll', this.closeModal);
+      if (this.props.hideOnScroll) {
+        $(window).on('scroll', this.closeModal);
+      }
     },
 
     componentWillUnmount () {
-      $(window).off('scroll', this.closeModal);
+      if (this.props.hideOnScroll) {
+        $(window).off('scroll', this.closeModal);
+      }
     },
 
     componentWillReceiveProps (nextProps) {
@@ -89,13 +93,16 @@ define([
     // ===============
 
     closeModal () {
-      this.setState({
-        isOpen: false
-      });
+      if (this.isMounted()){
+        this.setState({
+          isOpen: false
+        });
 
-      if (this.props.afterClose) {
-        this.props.afterClose()
-      };
+
+        if (this.props.afterClose) {
+          this.props.afterClose()
+        }
+      }
     },
 
     setCurrentColor (color) {
@@ -113,12 +120,12 @@ define([
       this.setCurrentColor(value);
     },
 
-    setColorForCalendar (color, event) {
+    setColorForCalendar (color) {
       // Remove the hex if needed
-      var color = color.replace('#', '');
+      color = color.replace('#', '');
 
       $.ajax({
-        url: '/api/v1/users/' + ENV.current_user_id + '/colors/' + this.props.assetString,
+        url: '/api/v1/users/' + window.ENV.current_user_id + '/colors/' + this.props.assetString,
         type: 'PUT',
         data: {
           hexcode: color
@@ -148,7 +155,7 @@ define([
     },
 
     renderColorRows () {
-      return PREDEFINED_COLORS.map( (color, idx) => {
+      return PREDEFINED_COLORS.map( (color) => {
         var colorSwatchStyle = {
           borderColor: color.hexcode,
           backgroundColor: color.hexcode
@@ -236,7 +243,7 @@ define([
         top: this.props.positions.top - 124
       };
 
-      return(
+      return (
         <ReactModal
           ref = 'reactModal'
           style = {styleObj}
