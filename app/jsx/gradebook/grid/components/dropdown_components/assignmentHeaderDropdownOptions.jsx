@@ -36,7 +36,7 @@ define([
         dropdownOptions.push(downloadSubmissionsOption);
       }
 
-      if (assignment.submissions_downloads > 0 ) {
+      if (GradebookConstants.gradebook_is_editable &&assignment.submissions_downloads > 0 ) {
        reuploadSubmissionsOption = { title: I18n.t('Re-Upload Submissions'), action: 'reuploadSubmissions' };
        dropdownOptions.push(reuploadSubmissionsOption);
       }

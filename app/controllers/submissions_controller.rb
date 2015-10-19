@@ -93,13 +93,12 @@ class SubmissionsController < ApplicationController
 
   def index
     @assignment = @context.assignments.active.find(params[:assignment_id])
-    if authorized_action(@assignment, @current_user, :grade)
-      if params[:zip]
-        generate_submission_zip(@assignment, @context)
-      else
-        respond_to do |format|
-          format.html { redirect_to named_context_url(@context, :context_assignment_url, @assignment.id) }
-        end
+    return render_unauthorized_action unless @assignment.user_can_read_grades?(@current_user, session)
+    if params[:zip]
+      generate_submission_zip(@assignment, @context)
+    else
+      respond_to do |format|
+        format.html { redirect_to named_context_url(@context, :context_assignment_url, @assignment.id) }
       end
     end
   end

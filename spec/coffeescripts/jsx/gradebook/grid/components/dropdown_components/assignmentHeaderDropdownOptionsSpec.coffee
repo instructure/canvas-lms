@@ -28,7 +28,7 @@ define [
 
   module 'AssignmentHeaderDropdownOptions -- speedgrader enabled',
     setup: ->
-      fakeENV.setup({ GRADEBOOK_OPTIONS: { context_id: '1', speed_grader_enabled: true } })
+      fakeENV.setup({ GRADEBOOK_OPTIONS: { context_id: '1', speed_grader_enabled: true, gradebook_is_editable: true } })
       GradebookConstants.refresh()
     teardown: ->
       React.unmountComponentAtNode wrapper
