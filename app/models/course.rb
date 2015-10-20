@@ -2821,4 +2821,8 @@ class Course < ActiveRecord::Base
     nickname ||= self.send(fallback) if fallback
     nickname
   end
+
+  def refresh_content_participation_counts(_progress)
+    content_participation_counts.each(&:refresh_unread_count)
+  end
 end

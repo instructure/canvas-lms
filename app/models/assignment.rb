@@ -613,6 +613,13 @@ class Assignment < ActiveRecord::Base
 
     self.discussion_topic.destroy if self.discussion_topic && !self.discussion_topic.deleted?
     self.quiz.destroy if self.quiz && !self.quiz.deleted?
+    refresh_course_content_participation_counts
+  end
+
+  def refresh_course_content_participation_counts
+    progress = self.context.progresses.build(tag: 'refresh_content_participation_counts')
+    progress.save!
+    progress.process_job(self.context, :refresh_content_participation_counts)
   end
 
   def time_zone_edited
@@ -624,6 +631,7 @@ class Assignment < ActiveRecord::Base
     self.save
     self.discussion_topic.restore(:assignment) if from != :discussion_topic && self.discussion_topic
     self.quiz.restore(:assignment) if from != :quiz && self.quiz
+    refresh_course_content_participation_counts
   end
 
   def participants_with_overridden_due_at

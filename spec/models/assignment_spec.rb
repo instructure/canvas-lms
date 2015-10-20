@@ -2650,21 +2650,28 @@ describe Assignment do
       group_discussion_assignment
     end
 
-    it "should destroy the associated discussion topic" do
+    it "destroys the associated discussion topic" do
       @assignment.destroy
       expect(@topic.reload).to be_deleted
       expect(@assignment.reload).to be_deleted
     end
 
-    it "should not revive the discussion if touched after destroyed" do
+    it "does not revive the discussion if touched after destroyed" do
       @assignment.destroy
       expect(@topic.reload).to be_deleted
       @assignment.touch
       expect(@topic.reload).to be_deleted
     end
-    it 'should raise an error on validation error' do
+
+    it 'raises an error on validation error' do
       assignment = Assignment.new
       expect {assignment.destroy}.to raise_error(ActiveRecord::RecordInvalid)
+    end
+
+    it 'refreshes the course participation counts' do
+      Progress.any_instance.expects(:process_job)
+        .with(@assignment.context, :refresh_content_participation_counts)
+      @assignment.destroy
     end
   end
 
@@ -3383,18 +3390,26 @@ describe Assignment do
   end
 
   describe "#restore" do
-    it "should restore to unpublished if draft state w/ no submissions" do
+    it "restores to unpublished if draft state w/ no submissions" do
       assignment_model course: @course
       @a.destroy
       @a.restore
       expect(@a.reload).to be_unpublished
     end
 
-    it "should restore to published if draft state w/ submissions" do
+    it "restores to published if draft state w/ submissions" do
       setup_assignment_with_homework
       @assignment.destroy
       @assignment.restore
       expect(@assignment.reload).to be_published
+    end
+
+    it 'refreshes the course participation counts' do
+      assignment = assignment_model(course: @course)
+      assignment.destroy
+      Progress.any_instance.expects(:process_job)
+        .with(assignment.context, :refresh_content_participation_counts).once
+      assignment.restore
     end
   end
 
