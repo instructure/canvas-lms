@@ -148,6 +148,7 @@ describe "context modules" do
       expect(edit_form).to be_displayed
       f('.add_completion_criterion_link', edit_form).click
       wait_for_ajaximations
+      expect(f('#add_context_module_form .assignment_requirement_picker option[value=must_contribute]').attribute('disabled')).to be_present
       click_option('#add_context_module_form .assignment_picker', @assignment.title, :text)
       click_option('#add_context_module_form .assignment_requirement_picker', 'must_submit', :value)
 

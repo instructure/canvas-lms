@@ -923,6 +923,7 @@ define([
       });
       $pre.find(".option").empty().append($option);
       $option.slideDown();
+      $option.find(".id").change();
       $form.find(".completion_entry .criteria_list").append($pre).show();
       $pre.slideDown();
       $(".requirement-count-radio").children().show();
