@@ -758,18 +758,6 @@ class Attachment < ActiveRecord::Base
     end
   end
 
-  alias_method :original_sanitize_filename, :sanitize_filename
-  def sanitize_filename(filename)
-    if self.root_attachment && self.root_attachment.filename
-      filename = self.root_attachment.filename
-    else
-      filename = Attachment.truncate_filename(filename, 255) do |component, len|
-        CanvasTextHelper.cgi_escape_truncate(component, len)
-      end
-    end
-    filename
-  end
-
   def save_without_broadcasting
     begin
       @skip_broadcasts = true
