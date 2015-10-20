@@ -77,6 +77,161 @@ describe 'dashcards' do
       expect(f('.ColorPicker__Container')).to be_displayed
     end
 
+    it 'should display dashcard icons for course contents', priority: "1", test_id: 222508 do
+      # create discussion, announcement, discussion and files as these 4 icons need to be displayed
+      @course.discussion_topics.create!(title: 'discussion 1', message: 'This is a message.')
+      @course.assignments.create!(title: 'assignment 1', name: 'assignment 1')
+      create_announcement
+      add_file(fixture_file_upload('files/example.pdf', 'application/pdf'), @course, 'example.pdf')
+      get '/'
+
+      expect(f('a.announcements')).to be_present
+      expect(f('a.assignments')).to be_present
+      expect(f('a.discussions')).to be_present
+      expect(f('a.files')).to be_present
+    end
+
+    it 'should show announcement created notifications in dashcard', priority: "1", test_id: 238411 do
+      create_announcement('New Announcement')
+      get '/'
+      expect(f('a.announcements .unread_count').text).to include('1')
+      # The notifications should go away after visiting the show page of announcements
+      expect_new_page_load{f('a.announcements').click}
+      expect_new_page_load{fln('New Announcement').click}
+      get '/'
+      expect(f('a.announcements .unread_count')).to be_nil
+    end
+
+    it 'should show discussions created notifications in dashcard', priority: "1", test_id: 240009 do
+      @course.discussion_topics.create!(title: 'discussion 1', message: 'This is a message.')
+      get '/'
+      expect(f('a.discussions .unread_count').text).to include('1')
+      # The notifications should go away after visiting the show page of discussions
+      expect_new_page_load{f('a.discussions').click}
+      expect_new_page_load{fln('discussion 1').click}
+      get '/'
+      expect(f('a.discussions .unread_count')).to be_nil
+    end
+
+    it 'should show assignments created notifications in dashcard', priority: "1", test_id: 238413 do
+      skip('Notifications does not work for assignments as of now in dashcards')
+      @course.assignments.create!(title: 'assignment 1', name: 'assignment 1')
+      get '/'
+      expect(f('a.assignments .unread_count').text).to include('1')
+      # The notifications should go away after visiting the show page of assignments
+      expect_new_page_load{f('a.assignments').click}
+      expect_new_page_load{fln('assignment 1').click}
+      get '/'
+      expect(f('a.assignments .unread_count')).to be_nil
+    end
+
+    it 'should show files created notifications in dashcard', priority: "1", test_id: 238414 do
+      skip('Notifications does not work for files as of now in dashcards')
+      add_file(fixture_file_upload('files/example.pdf', 'application/pdf'), @course, 'example.pdf')
+      get '/'
+      expect(f('a.files .unread_count').text).to include('1')
+      # The notifications should go away after visiting the show page of files
+      expect_new_page_load{f('a.files').click}
+      expect_new_page_load{fln('example.pdf').click}
+      get '/'
+      expect(f('a.files .unread_count')).to be_nil
+    end
+
+    context "course name and code display" do
+      before :each do
+        @course1 = course_model
+        @course1.offer!
+        @course1.save!
+        enrollment = student_in_course(course: @course1, user: @student)
+        enrollment.accept!
+      end
+
+      it 'should not display course code if the name is too long', priority: "1", test_id: 238191 do
+        @course1.name = 'Test Course Test Course Test Course Test Course Test Course Test Course Test Course Test' \
+                        'Course Test Course Test Course Test Course Test Course Test Course Test Course Test Course'\
+                        'Test Course Test Course Test Course Test Course Te'
+        @course1.course_code = '001'
+        @course1.save!
+        get '/'
+        expect(f('.ic-DashboardCard__header-subtitle').text).to be_blank
+      end
+
+      it 'should display special characters in a course title', priority: "1", test_id: 238192 do
+        @course1.name = '(/*-+_@&$#%)"Course 1"æøåñó?äçíì[{c}]<strong>stuff</strong> )'
+        @course1.save!
+        get '/'
+        expect(f('.ic-DashboardCard__header-title').text).to eq(@course1.name)
+      end
+
+      it 'should display special characters in course code', priority: "1", test_id: 240008 do
+        # code is not displayed if the course name is too long
+        @course1.name = 'test'
+        @course1.course_code = '(/*-+_@&$#%)"Course 1"[{c}]<strong>stuff</strong> )'
+        @course1.save!
+        get '/'
+        # as course codes are always displayed in upper case
+        expect(f('.ic-DashboardCard__header-subtitle').text).to eq(@course1.course_code.upcase)
+      end
+    end
+
+    context "dashcard custom color calendar" do
+      before :each do
+        # create another course to ensure the color matches to the right course
+        @course1 = course_model
+        @course1.name = 'Test Course'
+        @course1.offer!
+        @course1.save!
+        enrollment = student_in_course(course: @course1, user: @student)
+        enrollment.accept!
+      end
+
+      it 'should customize color by selecting from color palet in the calendar page', priority: "1", test_id: 239994 do
+        select_color_pallet_from_calendar_page
+
+        old_color = fj('.ColorPicker__CustomInputContainer .ColorPicker__ColorPreview').attribute(:title)
+
+        expect(f('.ColorPicker__Container')).to be_displayed
+        f('.ColorPicker__Container .ColorPicker__ColorBlock:nth-of-type(7)').click
+        wait_for_ajaximations
+        new_color =  fj('.ColorPicker__CustomInputContainer .ColorPicker__ColorPreview').attribute(:title)
+
+        # make sure that we choose a new color for background
+        if old_color == new_color
+          f('.ColorPicker__Container .ColorPicker__ColorBlock:nth-of-type(8)').click
+          wait_for_ajaximations
+        end
+
+        f('.ColorPicker__Container .Button--primary').click
+        rgb = convert_hex_to_rgb_color(new_color)
+        get '/'
+        keep_trying_until(5) do
+          expect(fj('.ic-DashboardCard__background').attribute(:style)).to include_text(rgb)
+          refresh_page
+          expect(fj('.ic-DashboardCard__background').attribute(:style)).to include_text(rgb)
+          expect(f('.ic-DashboardCard__header-title').text).to include(@course1.name)
+        end
+      end
+
+      it 'should customize color by using hex code in calendar page', priority: "1", test_id: 239993 do
+        select_color_pallet_from_calendar_page
+
+        hex = random_hex_color
+        replace_content(fj("#ColorPickerCustomInput-#{@course1.asset_string}"), hex)
+        f('.ColorPicker__Container .Button--primary').click
+        wait_for_ajaximations
+        get '/'
+        keep_trying_until(5) do
+          if fj('.ic-DashboardCard__background').attribute(:style).include?('rgb')
+            rgb = convert_hex_to_rgb_color(hex)
+            expect(fj('.ic-DashboardCard__background').attribute(:style)).to include_text(rgb)
+          else
+            expect(fj('.ic-DashboardCard__background').attribute(:style)).to include_text(hex)
+          end
+          expect(f('.ic-DashboardCard__header-title').text).to include(@course1.name)
+        end
+      end
+    end
+
     context "dashcard color picker" do
       before :each do
         get '/'
@@ -108,10 +263,14 @@ describe 'dashcards' do
         end
       end
 
+      it 'should initially focus the nickname input' do
+        check_element_has_focus(f('#NicknameInput'))
+      end
+
       it 'should customize dashcard color', priority: "1", test_id: 239991 do
         hex = random_hex_color
         expect(f('.ColorPicker__Container')).to be_displayed
-        replace_content(fj('#ColorPickerCustomInput'), hex)
+        replace_content(fj("#ColorPickerCustomInput-#{@course.asset_string}"), hex)
         f('.ColorPicker__Container .Button--primary').click
         keep_trying_until(5) do
           if fj('.ic-DashboardCard__background').attribute(:style).include?('rgb')
@@ -133,7 +292,7 @@ describe 'dashcards' do
 
       it 'sets both dashcard color and course nickname at once' do
         replace_content(fj('#NicknameInput'), 'course nickname frd!')
-        replace_content(fj('#ColorPickerCustomInput'), '#000000')
+        replace_content(fj("#ColorPickerCustomInput-#{@course.asset_string}"), '#000000')
         f('.ColorPicker__Container .Button--primary').click
         wait_for_ajaximations
         expect(@student.reload.course_nickname(@course)).to eq 'course nickname frd!'

@@ -103,7 +103,8 @@ define([
       });
 
       return (
-        <div className = {classes}
+        <div id        = {this.props.elementID}
+             className = {classes}
              style     = {this.pickerToolTipStyle()} >
           <ColorPicker isOpen           = {true}
                        assetString      = {this.props.assetString}
