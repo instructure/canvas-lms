@@ -75,6 +75,12 @@ describe "better_file_browsing" do
         expect(f('.btn-link.published-status.restricted')).to be_displayed
         expect(driver.find_element(:class => 'restricted')).to be_displayed
       end
+
+      it "should disable the file preview button when a folder is selected" do
+        add_folder('Testing')
+        fj('.ef-item-row:contains("Testing")').click
+        expect(f('.Toolbar__ViewBtn--onlyfolders')).to be_displayed
+      end
     end
 
     context "accessibility tests for preview" do

@@ -49,13 +49,6 @@ define([
           className={iFrameClasses}
         />
       );
-    } else if (this.state.displayedItem instanceof Folder) {
-      return (
-        <div className='ef-file-not-found ef-file-preview-frame'>
-          <i className='media-object ef-not-found-icon FilesystemObjectThumbnail mimeClass-folder' />
-          {this.state.displayedItem.attributes.name}
-        </div>
-      );
     } else {
       return (
         <div className='ef-file-not-found ef-file-preview-frame'>

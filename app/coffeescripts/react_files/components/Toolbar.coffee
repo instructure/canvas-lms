@@ -13,9 +13,11 @@ define [
   'jsx/files/RestrictedDialogForm'
   'compiled/fn/preventDefault'
   '../modules/FocusStore'
+  'compiled/models/Folder'
+  'classnames'
   'jquery'
   'compiled/jquery.rails_flash_notifications'
-], (_, I18n, React, Router, withReactElement, UploadButtonComponent, UsageRightsDialog, openMoveDialog, downloadStuffAsAZip, deleteStuff, customPropTypes, RestrictedDialogForm, preventDefault, FocusStore, $) ->
+], (_, I18n, React, Router, withReactElement, UploadButtonComponent, UsageRightsDialog, openMoveDialog, downloadStuffAsAZip, deleteStuff, customPropTypes, RestrictedDialogForm, preventDefault, FocusStore, Folder, classnames, $) ->
 
   UploadButton = React.createFactory UploadButtonComponent
   Link = React.createFactory Router.Link
@@ -103,6 +105,15 @@ define [
       else
         I18n.t('download_as_zip', 'Download as Zip')
 
+      # Handles if the selected item(s) is/are folder(s)
+      selectedItemIsFolder = @props.selectedItems.every((item) -> item instanceof Folder)
+
+      viewBtnClasses = classnames({
+        'ui-button': true,
+        'btn-view': true,
+        'Toolbar__ViewBtn--onlyfolders': selectedItemIsFolder
+      })
+
       header {
         className:'ef-header'
         role: 'region'
@@ -138,15 +149,15 @@ define [
             a {
                 ref: 'previewLink'
                 href: '#'
-                onClick: preventDefault(@openPreview)
-                className: 'ui-button btn-view'
-                title: I18n.t('view', 'View')
+                onClick: if (selectedItemIsFolder) then (-> return false) else preventDefault(@openPreview)
+                className: viewBtnClasses
+                title: if (selectedItemIsFolder) then I18n.t('Viewing folders is not available') else I18n.t('View')
                 role: 'button'
-                'aria-label': I18n.t('view', 'View')
+                'aria-label': if (selectedItemIsFolder) then I18n.t('Viewing folders is not available') else I18n.t('View')
                 'data-tooltip': ''
-                'aria-disabled': !showingButtons
-                disabled: !showingButtons
-                tabIndex: -1 unless showingButtons # This is to make it okay for keyboard-nav when hidden.
+                'aria-disabled': !showingButtons || selectedItemIsFolder
+                disabled: !showingButtons || selectedItemIsFolder
+                tabIndex: -1 unless showingButtons || !selectedItemIsFolder # This is to make it okay for keyboard-nav when hidden.
               },
               i className: 'icon-eye'
 

@@ -60,27 +60,21 @@ define [
                 props.collection.models
               else
                 props.currentFolder.files.models
-      folders = props.currentFolder?.folders?.models or []
 
-      items = files.concat folders
-      otherItems =  items.filter (item) ->
+      otherItems =  files.filter (file) ->
                       return true unless onlyIdsToPreview
-                      item.id in onlyIdsToPreview
+                      file.id in onlyIdsToPreview
 
       visibleFile = @getQuery().preview and _.findWhere(files, {id: @getQuery().preview})
-      visibleFolder = @getQuery().preview and _.findWhere(folders, {id: @getQuery().preview})
 
-      if !visibleFile and !visibleFolder
+      if !visibleFile
         responseDataRequested = ["enhanced_preview_url"]
         responseDataRequested.push("usage_rights") if props.usageRightsRequiredForContext
         new File({id: @getQuery().preview}, {preflightUrl: 'no/url/needed'}).fetch(data: $.param({"include": responseDataRequested})).success (file) ->
           initialItem = new FilesystemObject(file)
           cb?({initialItem, otherItems})
       else
-        if visibleFile
-          initialItem = visibleFile or (files[0] if files.length)
-        else if visibleFolder
-          initialItem = visibleFolder or (folders[0] if folder.length)
+        initialItem = visibleFile or (files[0] if files.length)
 
         cb?({initialItem, otherItems})
 
