@@ -1,5 +1,3 @@
-/** @jsx React.DOM */
-
 define([
   'i18n!external_tools',
   'underscore',
@@ -157,7 +155,7 @@ define([
       newTool.set('app_center_id', this.props.app.short_name);
 
       $(e.target).attr('disabled', 'disabled');
-      
+
       newTool.save();
     },
 

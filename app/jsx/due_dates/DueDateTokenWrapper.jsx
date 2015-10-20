@@ -1,5 +1,3 @@
-/** @jsx React.DOM */
-
 define([
   'underscore',
   'react',
@@ -13,6 +11,12 @@ define([
 
   var ComboboxOption = React.createFactory(TokenInput.Option)
   var TokenInput = React.createFactory(TokenInput)
+  var DueDateWrapperConsts = {
+    MINIMUM_SEARCH_LENGTH: 3,
+    MAXIMUM_STUDENTS_TO_SHOW: 7,
+    MAXIMUM_SECTIONS_TO_SHOW: 3,
+    MS_TO_DEBOUNCE_SEARCH: 800,
+  }
 
   var DueDateTokenWrapper = React.createClass({
 
@@ -27,10 +31,16 @@ define([
       allStudentsFetched: React.PropTypes.bool.isRequired
     },
 
-    MINIMUM_SEARCH_LENGTH: 3,
-    MAXIMUM_STUDENTS_TO_SHOW: 7,
-    MAXIMUM_SECTIONS_TO_SHOW: 3,
-    MS_TO_DEBOUNCE_SEARCH: 800,
+    MINIMUM_SEARCH_LENGTH: DueDateWrapperConsts.MINIMUM_SEARCH_LENGTH,
+    MAXIMUM_STUDENTS_TO_SHOW: DueDateWrapperConsts.MAXIMUM_STUDENTS_TO_SHOW,
+    MAXIMUM_SECTIONS_TO_SHOW: DueDateWrapperConsts.MAXIMUM_SECTIONS_TO_SHOW,
+    MS_TO_DEBOUNCE_SEARCH: DueDateWrapperConsts.MS_TO_DEBOUNCE_SEARCH,
+
+    // This is useful for testing to make it so the debounce is not used
+    // during testing or any other time when that might be a problem.
+    removeTimingSafeties(){
+      this.safetiesOff = true;
+    },
 
     // -------------------
     //      Lifecycle
@@ -49,20 +59,30 @@ define([
 
     handleInput(userInput) {
       this.setState(
-        { userInput: userInput, currentlyTyping: true },
-        this.fetchStudents
+        { userInput: userInput, currentlyTyping: true },function(){
+          if(this.safetiesOff){
+            this.fetchStudents()
+          } else {
+            this.safeFetchStudents()
+          }
+        }
+
       )
     },
 
-    fetchStudents: _.debounce( function() {
-        if( this.isMounted() ){
-          this.setState({currentlyTyping: false})
-        }
-        if ($.trim(this.state.userInput) !== '' && this.state.userInput.length >= this.MINIMUM_SEARCH_LENGTH) {
-          OverrideStudentStore.fetchStudentsByName($.trim(this.state.userInput))
-        }
-      }, this.MS_TO_DEBOUNCE_SEARCH
+    safeFetchStudents: _.debounce( function() {
+        this.fetchStudents()
+      }, DueDateWrapperConsts.MS_TO_DEBOUNCE_SEARCH
     ),
+
+    fetchStudents(){
+      if( this.isMounted() ){
+        this.setState({currentlyTyping: false})
+      }
+      if ($.trim(this.state.userInput) !== '' && this.state.userInput.length >= this.MINIMUM_SEARCH_LENGTH) {
+        OverrideStudentStore.fetchStudentsByName($.trim(this.state.userInput))
+      }
+    },
 
     handleTokenAdd(value) {
       var token = this.findMatchingOption(value)

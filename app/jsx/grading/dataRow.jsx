@@ -1,5 +1,3 @@
-/** @jsx React.DOM */
-
 define([
   'react',
   'i18n!external_tools'

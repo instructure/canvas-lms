@@ -18,7 +18,7 @@ define([
     return object !== null && object !== undefined;
   };
 
-  notExists = function(object) {
+  let notExists = function(object) {
     return !exists(object);
   }
 
@@ -38,7 +38,7 @@ define([
     paginationLinks = xhr.getResponseHeader('Link');
     lastLink = paginationLinks.match(/<[^>]+>; *rel="last"/);
     lastLink = lastLink[0].match(/<[^>]+>;/);
-    currentLink = paginationLinks.match(/<[^>]+>; *rel="current"/);
+    let currentLink = paginationLinks.match(/<[^>]+>; *rel="current"/);
     currentLink = currentLink[0].match(/<[^>]+>;/);
 
     if (notExists(lastLink) || lastLink[0] === currentLink[0]) {

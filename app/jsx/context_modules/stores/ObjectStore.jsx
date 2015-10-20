@@ -1,5 +1,3 @@
-/** @jsx */
-
 define([
   'jquery',
   'underscore',

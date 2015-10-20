@@ -1,5 +1,3 @@
-/** @jsx React.DOM */
-
 define([
   'react-router',
   'jsx/external_apps/components/Root',

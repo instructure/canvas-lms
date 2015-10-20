@@ -308,10 +308,9 @@ namespace :js do
     source = Rails.root + 'app/jsx'
     dest = Rails.root + 'public/javascripts/jsx'
     if Rails.env == 'development'
-      #npm_run "jsx -x jsx --source-map-inline --harmony #{source} #{dest} 2>&1 >/dev/null"
-      msg = `node_modules/react-tools/bin/jsx -x jsx --source-map-inline --harmony #{source} #{dest} 2>&1 >/dev/null`
+      msg = `node_modules/.bin/babel #{source} --out-dir #{dest} --source-maps inline 2>&1 >/dev/null`
     else
-      msg = `node_modules/react-tools/bin/jsx -x jsx --harmony #{source} #{dest} 2>&1 >/dev/null`
+      msg = `node_modules/.bin/babel #{source} --out-dir #{dest} 2>&1 >/dev/null`
     end
 
     unless $?.success?

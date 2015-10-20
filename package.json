@@ -6,11 +6,11 @@
     "node": ">=0.12.5"
   },
   "dependencies": {
+    "babel": "^5.8.23",
+    "babel-core": "^5.8.25",
     "brandable_css": "0.0.52"
   },
   "devDependencies": {
-    "babel": "^5.6.23",
-    "babel-core": "^5.7.2",
     "coffee-script": "1.6.2",
     "compute-cluster": "0.0.9",
     "fleck": "~0.5.1",
@@ -26,13 +26,12 @@
     "karma-requirejs": "^0.2.2",
     "lodash": "^2.4.1",
     "qunitjs": "^1.14.0",
-    "react-tools": "~0.13.3",
     "requirejs": "~2.1.10",
     "sass-graph": "^2.0.1",
     "testem": "~0.7.1",
     "uglify-js": "~2.4.12",
     "vinyl-fs": "0.3.7",
-    "xsslint": "0.1.0"
+    "xsslint": "0.1.1"
   },
   "repository": "instructure/canvas-lms",
   "scripts": {

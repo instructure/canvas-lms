@@ -1,5 +1,3 @@
-/** @jsx React.DOM */
-
 define([
   'i18n!student_groups',
   'underscore',

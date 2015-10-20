@@ -1,5 +1,3 @@
-/** @jsx React.DOM */
-
 define([
   'underscore',
   'compiled/models/AssignmentOverride'
@@ -104,7 +102,7 @@ define([
       }
 
       this.newOverrideForRow = function(attributes){
-        all_attrs = _.extend(date_attrs, attributes)
+        let all_attrs = _.extend(date_attrs, attributes)
         return new AssignmentOverride(all_attrs)
       }
     },

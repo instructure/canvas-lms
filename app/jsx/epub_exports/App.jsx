@@ -1,5 +1,3 @@
-/** @jsx React.DOM */
-
 define([
   'react',
   'jsx/epub_exports/CourseStore',

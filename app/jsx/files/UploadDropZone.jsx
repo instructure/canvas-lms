@@ -1,5 +1,3 @@
-/** @jsx React.DOM */
-
 define([
   'underscore',
   'react',
@@ -24,12 +22,7 @@ define([
         document.addEventListener('dragover', this.killWindowDropDisplay);
         document.addEventListener('drop', this.killWindowDrop);
       },
-      componentDidMount: function() {
-        this.getParent().addEventListener('dragenter', this.onParentDragEnter);
-        document.addEventListener('dragenter', this.killWindowDropDisplay);
-        document.addEventListener('dragover', this.killWindowDropDisplay);
-        document.addEventListener('drop', this.killWindowDrop);
-      },
+
       componentWillUnmount: function() {
         this.getParent().removeEventListener('dragenter', this.onParentDragEnter);
         document.removeEventListener('dragenter', this.killWindowDropDisplay);

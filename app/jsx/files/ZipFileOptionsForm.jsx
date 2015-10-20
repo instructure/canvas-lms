@@ -1,5 +1,3 @@
-/** @jsx React.DOM */
-
 define([
   'i18n!zip_file_options_form',
   'react',

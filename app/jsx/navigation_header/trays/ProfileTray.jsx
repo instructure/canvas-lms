@@ -1,5 +1,3 @@
-/** @jsx React.DOM */
-
 define([
   'i18n!new_nav',
   'react',
@@ -44,7 +42,7 @@ define([
                 <input name="utf8" value="✓" type="hidden"/>
                 <input name="_method" value="delete" type="hidden"/>
                 <input name="authenticity_token" value={$.cookie('_csrf_token')} type="hidden"/>
-                <a 
+                <a
                   href="/logout"
                   className="ReactTray-list-item__link"
                   onClick={PreventDefault(() => this.refs.logoutForm.getDOMNode().submit())}>

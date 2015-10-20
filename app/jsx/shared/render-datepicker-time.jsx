@@ -1,5 +1,3 @@
-/** @jsx React.DOM */
-
 define(['i18n!instructure', 'timezone', 'react'], function(I18n, tz, React) {
   var STRINGS = {
     timeLabel: I18n.beforeLabel(I18n.t('Time')),

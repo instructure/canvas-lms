@@ -1,5 +1,3 @@
-/** @jsx */
-
 define(function() {
   var classMunger = function(staticClassName, conditionalClassNames) {
     var classNames = [];

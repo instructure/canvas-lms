@@ -1,5 +1,3 @@
-/** @jsx React.DOM */
-
 define([
   'jquery',
   'underscore',
@@ -7,7 +5,7 @@ define([
   'jsx/shared/helpers/createStore'
 ], ($, _, createStore) => {
 
-  assignmentUtils = {
+  let assignmentUtils = {
     copyFromGradebook (assignment) {
       var a = _.pick(assignment, [
         "id",
