@@ -26,10 +26,11 @@ $ic-DashboardCard-action--active: $ic-brand-primary;
 }
 
 .ic-DashboardCard__background {
-  position: relative;
+  position: relative; // used to keep color picker cog positioning in place
 }
 
-.ic-DashboardCard__link {
+.ic-DashboardCard__header {
+  cursor: pointer;
   transition: background 0.2s;
   box-sizing: border-box;
   color: $ic-DashboardCard-font-color;
@@ -37,7 +38,26 @@ $ic-DashboardCard-action--active: $ic-brand-primary;
   align-items: flex-end;
   height: $ic-sp*16;
   padding: $ic-sp;
-  @include breakpoint(short) { height: $ic-sp*13; }
+}
+
+.ic-DashboardCard__header_content {
+  // in the very unlikely event that the course name is larger than the card, handle it by cutting off overflow
+  overflow: hidden;
+  box-sizing: border-box;
+  padding-top: $ic-sp;
+  max-height: $ic-sp*10;
+  flex: 1;
+  @include breakpoint(short) { max-height: $ic-sp*9; }
+}
+
+.ic-DashboardCard__link {
+  color: $ic-DashboardCard-font-color;
+  @if not $use_high_contrast {
+    // if NOT high contrast, do not show ugly underline on :hover
+    &:hover {
+      text-decoration: none;
+    }
+  }
   .no-touch & {
     &:hover, &:focus {
       outline: none;
@@ -46,20 +66,10 @@ $ic-DashboardCard-action--active: $ic-brand-primary;
       .ic-DashboardCard__header-title { transition: text-shadow 0.2s; text-shadow: 0 0 5px #000;}
     }
   }
-  // if NOT high contrast, do not show ugly underline on :hover, but DO show it on :focus
-  @if $use_high_contrast == false {
-    &:hover { text-decoration: none; }
-  }
 }
 
-.ic-DashboardCard__header {
-  // in the very unlikely event that the course name is larger than the card, handle it by cutting off overflow
-  overflow: hidden;
-  box-sizing: border-box;
-  padding-top: $ic-sp;
-  max-height: $ic-sp*10;
-  flex: 1;
-  @include breakpoint(short) { max-height: $ic-sp*9; }
+.ic-DashboardCard__link:focus {
+  color: $ic-DashboardCard-font-color;
 }
 
 .ic-DashboardCard__header-button {

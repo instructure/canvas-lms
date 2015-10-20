@@ -216,7 +216,7 @@ describe 'dashcards' do
         select_color_pallet_from_calendar_page
 
         hex = random_hex_color
-        replace_content(fj('#ColorPickerCustomInput'), hex)
+        replace_content(fj("#ColorPickerCustomInput-#{@course1.asset_string}"), hex)
         f('.ColorPicker__Container .Button--primary').click
         wait_for_ajaximations
         get '/'
@@ -263,10 +263,14 @@ describe 'dashcards' do
         end
       end
 
+      it 'should initially focus the nickname input' do
+        check_element_has_focus(f('#NicknameInput'))
+      end
+
       it 'should customize dashcard color', priority: "1", test_id: 239991 do
         hex = random_hex_color
         expect(f('.ColorPicker__Container')).to be_displayed
-        replace_content(fj('#ColorPickerCustomInput'), hex)
+        replace_content(fj("#ColorPickerCustomInput-#{@course.asset_string}"), hex)
         f('.ColorPicker__Container .Button--primary').click
         keep_trying_until(5) do
           if fj('.ic-DashboardCard__background').attribute(:style).include?('rgb')
@@ -288,7 +292,7 @@ describe 'dashcards' do
 
       it 'sets both dashcard color and course nickname at once' do
         replace_content(fj('#NicknameInput'), 'course nickname frd!')
-        replace_content(fj('#ColorPickerCustomInput'), '#000000')
+        replace_content(fj("#ColorPickerCustomInput-#{@course.asset_string}"), '#000000')
         f('.ColorPicker__Container .Button--primary').click
         wait_for_ajaximations
         expect(@student.reload.course_nickname(@course)).to eq 'course nickname frd!'

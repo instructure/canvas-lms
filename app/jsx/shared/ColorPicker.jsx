@@ -65,8 +65,12 @@ define([
     },
 
     componentDidMount () {
-      if (this.refs.hexInput) {
-        this.refs.hexInput.getDOMNode().focus();
+      // focus course nickname input first if it's there, otherwise the first
+      // color swatch
+      if (this.refs.courseNicknameEdit) {
+        this.refs.courseNicknameEdit.focus();
+      } else if (this.refs.colorSwatch0) {
+        this.refs.colorSwatch0.getDOMNode().focus();
       }
       if (this.props.hideOnScroll) {
         $(window).on('scroll', this.closeModal);
@@ -84,7 +88,7 @@ define([
         isOpen: nextProps.isOpen
       }, () => {
         if (this.state.isOpen) {
-          this.refs.hexInput.getDOMNode().focus();
+          this.refs.colorSwatch0.getDOMNode().focus();
         }
       });
     },
@@ -171,15 +175,19 @@ define([
     },
 
     renderColorRows () {
-      return PREDEFINED_COLORS.map( (color) => {
+      return PREDEFINED_COLORS.map( (color, idx) => {
         var colorSwatchStyle = {
           borderColor: color.hexcode,
           backgroundColor: color.hexcode
         };
 
         var title = color.name + ' (' + color.hexcode + ')';
+        var ref = "colorSwatch" + idx;
         return (
           <button className = "ColorPicker__ColorBlock"
+                  ref = {ref}
+                  role = "radio"
+                  aria-checked = {this.state.currentColor === color.hexcode}
                   style = {colorSwatchStyle}
                   title = {title}
                   onClick = {this.setCurrentColor.bind(null, color.hexcode)}
@@ -218,17 +226,17 @@ define([
         backgroundColor: this.state.currentColor
       };
 
+      var inputId = "ColorPickerCustomInput-" + this.props.assetString;
+
       return (
         <div className="ColorPicker__Container">
           {this.prompt()}
           {this.nicknameEdit()}
-          <div className="ColorPicker__ColorContainer">
+          <div className  = "ColorPicker__ColorContainer"
+               role       = "radiogroup"
+               aria-label = {I18n.t('Select a predefined color.')} >
             {this.renderColorRows()}
           </div>
-
-          <label className="screenreader-only" htmlFor="ColorPickerCustomInput">
-            {I18n.t('Enter a hexcode here to use a custom color.')}
-          </label>
 
           <div className="ColorPicker__CustomInputContainer ic-Input-group">
             <div className = "ic-Input-group__add-on ColorPicker__ColorPreview"
@@ -238,8 +246,12 @@ define([
                  aria-hidden = "true"
                  tabIndex = "-1" />
 
+            <label className="screenreader-only" htmlFor={inputId}>
+              {I18n.t('Enter a hexcode here to use a custom color.')}
+            </label>
+
             <input className = "ic-Input ColorPicker__CustomInput"
-                   id = "ColorPickerCustomInput"
+                   id = {inputId}
                    placeholder = {this.state.currentColor}
                    type = 'text'
                    maxLength = "7"

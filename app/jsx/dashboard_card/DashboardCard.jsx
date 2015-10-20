@@ -81,6 +81,11 @@ define([
       }
     },
 
+    headerClick: function(e) {
+      if (e) { e.preventDefault(); }
+      window.location = this.props.href;
+    },
+
     doneEditing: function(){
       if(this.isMounted()) {
         this.setState({editing: false})
@@ -118,10 +123,15 @@ define([
     //    RENDERING
     // ===============
 
+    colorPickerID: function(){
+      return "DashboardColorPicker-" + this.props.assetString;
+    },
+
     colorPickerIfEditing: function(){
       if (this.state.editing) {
         return (
           <DashboardColorPicker
+            elementID         = {this.colorPickerID()}
             parentNode        = {this.getDOMNode()}
             doneEditing       = {this.doneEditing}
             handleColorChange = {this.handleColorChange}
@@ -155,11 +165,13 @@ define([
         <div className="ic-DashboardCard" ref="cardDiv">
           <div>
             <div className="ic-DashboardCard__background" style={{backgroundColor: this.props.backgroundColor}}>
-              <a className="ic-DashboardCard__link" href={this.props.href}>
-                <header className="ic-DashboardCard__header">
-                  <h2 className="ic-DashboardCard__header-title" title={this.props.originalName}>
-                    {this.state.nicknameInfo.nickname}
-                  </h2>
+              <div className="ic-DashboardCard__header" onClick={this.headerClick}>
+                <div className="ic-DashboardCard__header_content">
+                  <a className="ic-DashboardCard__link" href="#">
+                    <h2 className="ic-DashboardCard__header-title" title={this.props.originalName}>
+                      {this.state.nicknameInfo.nickname}
+                    </h2>
+                  </a>
                   <p className="ic-DashboardCard__header-subtitle">{this.props.courseCode}</p>
                   {
                     this.props.term ? (
@@ -168,9 +180,11 @@ define([
                       </p>
                     ) : null
                   }
-                </header>
-              </a>
+                </div>
+              </div>
               <button
+                aria-expanded = {this.state.editing}
+                aria-controls = {this.colorPickerID()}
                 className="Button Button--icon-action-rev ic-DashboardCard__header-button"
                 onClick={this.settingsClick}
                 ref="settingsToggle"

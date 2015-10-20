@@ -52,6 +52,12 @@ define([
       }
     },
 
+    focus () {
+      if (this.refs.nicknameInput) {
+        this.refs.nicknameInput.getDOMNode().focus();
+      }
+    },
+
     // ===============
     //    RENDERING
     // ===============
