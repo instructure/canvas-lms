@@ -1030,28 +1030,31 @@ class CoursesController < ApplicationController
 
       @invited_count = @context.invited_count_visible_to(@current_user)
 
-      js_env(:COURSE_ID => @context.id,
-             :USERS_URL => "/api/v1/courses/#{ @context.id }/users",
-             :ALL_ROLES => @all_roles,
-             :COURSE_ROOT_URL => "/courses/#{ @context.id }",
-             :SEARCH_URL => search_recipients_url,
-             :CONTEXTS => @contexts,
-             :USER_PARAMS => {:include => ['email', 'enrollments', 'locked', 'observed_users']},
-             :PERMISSIONS => {
-               :manage_students => @context.grants_right?(@current_user, session, :manage_students),
-               :manage_admin_users => @context.grants_right?(@current_user, session, :manage_admin_users),
-               :manage_account_settings => @context.account.grants_right?(@current_user, session, :manage_account_settings),
-             })
+      @publishing_enabled = @context.allows_grade_publishing_by(@current_user) &&
+        can_do(@context, @current_user, :manage_grades)
 
       @alerts = @context.alerts
       add_crumb(t('#crumbs.settings', "Settings"), named_context_url(@context, :context_details_url))
       js_env({
-        :APP_CENTER => {
+        COURSE_ID: @context.id,
+        USERS_URL: "/api/v1/courses/#{@context.id}/users",
+        ALL_ROLES: @all_roles,
+        COURSE_ROOT_URL: "/courses/#{@context.id}",
+        SEARCH_URL: search_recipients_url,
+        CONTEXTS: @contexts,
+        USER_PARAMS: {:include => ['email', 'enrollments', 'locked', 'observed_users']},
+        PERMISSIONS: {
+          :manage_students => @context.grants_right?(@current_user, session, :manage_students),
+          :manage_admin_users => @context.grants_right?(@current_user, session, :manage_admin_users),
+          :manage_account_settings => @context.account.grants_right?(@current_user, session, :manage_account_settings),
+        },
+        APP_CENTER: {
           enabled: Canvas::Plugin.find(:app_center).enabled?
         },
         ENABLE_LTI2: @domain_root_account.feature_enabled?(:lti2_ui),
         LTI_LAUNCH_URL: course_tool_proxy_registration_path(@context),
-        CONTEXT_BASE_URL: "/courses/#{@context.id}"
+        CONTEXT_BASE_URL: "/courses/#{@context.id}",
+        PUBLISHING_ENABLED: @publishing_enabled
       })
 
       @course_settings_sub_navigation_tools = ContextExternalTool.all_tools_for(@context, :type => :course_settings_sub_navigation, :root_account => @domain_root_account, :current_user => @current_user)
