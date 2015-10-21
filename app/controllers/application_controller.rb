@@ -1069,13 +1069,19 @@ class ApplicationController < ActionController::Base
       type = nil
       type = '404' if status == '404 Not Found'
 
+      # TODO: get rid of exceptions that implement this "skip_error_report?" thing, instead
+      # use the initializer in config/initializers/errors.rb to configure
+      # exceptions we want skipped
       unless exception.respond_to?(:skip_error_report?) && exception.skip_error_report?
         opts = {type: type}
         info = Canvas::Errors::Info.new(request, @domain_root_account, @current_user, opts)
         error_info = info.to_h
         error_info[:tags][:response_code] = response_code
         capture_outputs = Canvas::Errors.capture(exception, error_info)
-        error = ErrorReport.find(capture_outputs[:error_report])
+        error = nil
+        if capture_outputs[:error_report]
+          error = ErrorReport.find(capture_outputs[:error_report])
+        end
       end
 
       if api_request?

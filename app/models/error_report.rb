@@ -91,6 +91,15 @@ class ErrorReport < ActiveRecord::Base
     end
   end
 
+  def self.configure_to_ignore(error_classes)
+    @classes_to_ignore ||= []
+    @classes_to_ignore += error_classes
+  end
+
+  def self.configured_to_ignore?(class_name)
+    (@classes_to_ignore || []).include?(class_name)
+  end
+
   # returns the new error report
   def self.log_error(category, opts = {})
     Reporter.new.log_error(category, opts)
@@ -111,6 +120,7 @@ class ErrorReport < ActiveRecord::Base
   end
 
   def self.log_exception_from_canvas_errors(exception, data)
+    return nil if configured_to_ignore?(exception.class.to_s)
     tags = data.fetch(:tags, {})
     extras = data.fetch(:extra, {})
     account_id = tags[:account_id]
