@@ -72,7 +72,7 @@ define([
         $(`#global_nav_${type}_link`).on('click', preventDefault(this.handleMenuClick.bind(this, type)));
       });
 
-      if (window.ENV.current_user_id && this.unreadCountElement().length != 0) {
+      if (window.ENV.current_user_id && this.unreadCountElement().length != 0 && !(window.ENV.current_user && window.ENV.current_user.fake_student)) {
         this.pollUnreadCount();
       }
     },
