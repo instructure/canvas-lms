@@ -121,10 +121,6 @@
   white-space: nowrap;
 }
 
-#grades_summary tr > .assignment_score:hover .grade {
-  font-weight: bold;
-}
-
 #grades_summary tr > .assignment_score .grade.changed {
   color: #800;
   font-weight: bold;
