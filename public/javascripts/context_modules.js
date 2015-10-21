@@ -381,9 +381,9 @@ define([
           $form.find(".completion_entry .no_items_message").show();
         }
         if ($module.find(".content .context_module_item .criterion.defined").length !== 0) {
-          $(".requirement-count-radio").children().show();
+          $(".requirement-count-radio").show();
         } else {
-          $(".requirement-count-radio").children().hide();
+          $(".requirement-count-radio").hide();
         }
 
         var $requirementCount = $module.find('.pill li').data("requirement-count");
@@ -926,7 +926,7 @@ define([
       $option.find(".id").change();
       $form.find(".completion_entry .criteria_list").append($pre).show();
       $pre.slideDown();
-      $(".requirement-count-radio").children().show();
+      $(".requirement-count-radio").show();
       $('#context_module_requirement_count_').change().focus();
     });
     $("#completion_criterion_option .id").change(function() {
@@ -974,7 +974,7 @@ define([
         $(this).remove();
         // Hides radio button and checkbox if there are no requirements
         if ($elem.html().length === 0 && $requirement.length !== 0) {
-          $(".requirement-count-radio").children().fadeOut("fast");
+          $(".requirement-count-radio").fadeOut("fast");
         }
       })
     });
