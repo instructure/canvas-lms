@@ -28,11 +28,9 @@
   <div id="content">
     <a name="skip_navigation"></a>
     <h2><%= @page.name %></h2>
-    <% idx = 1 %>
     <div id="page_content">
-      <% @page.content_sections.each do |c| %>
+      <% @page.content_sections.each_with_index do |c, idx| %>
         <%= render :partial => "eportfolios/page_section_static", :object => c, :locals => {:idx => idx, :read_only => true} %>
-        <% idx = idx + 1 %>
       <% end %>
     </div>
     <% if !@page.page_comments.empty? %>

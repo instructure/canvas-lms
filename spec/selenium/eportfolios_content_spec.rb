@@ -57,7 +57,7 @@ describe "add content box" do
       @html_content="<b>student</b>"
       f(".add_html_link").click
       wait_for_ajaximations
-      f("#edit_page_section_1").send_keys(@html_content)
+      f("#edit_page_section_0").send_keys(@html_content)
     end
 
     def add_html
@@ -98,13 +98,13 @@ describe "add content box" do
     it "should delete the html content" do
       add_html
       f("#right-side .edit_content_link").click
-      hover_and_click("#page_section_1 .delete_page_section_link")
+      hover_and_click("#page_section_0 .delete_page_section_link")
       accept_alert
       wait_for_ajaximations
       submit_form(".form_content")
       wait_for_ajaximations
       expect(@eportfolio.eportfolio_entries.first.content[0]).to eq "No Content Added Yet"
-      expect(f("#edit_page_section_1")).to be_nil
+      expect(f("#edit_page_section_0")).to be_nil
     end
 
     it "should delete html comment" do

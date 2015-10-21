@@ -3,6 +3,7 @@
   js_bundle :eportfolio
   css_bundle :tinymce
   @no_left_side_list_view = true
+  js_env({ SECTION_COUNT_IDX: @page.content_sections.count })
 %>
 
 <% content_for :auto_discovery do %>
@@ -205,16 +206,14 @@
   <div style="float: right; display: none;"><a href="#" class="edit_content_link icon-edit"><%= edit_link_text %></a></div>
   <% end %>
   <h2 id="eportfolio_entry_<%= @page.id %>"><span class="name"><%= @page.name %></span></h2>
-  <% idx = 1 %>
   <%= form_for @page, :url => eportfolio_entry_url(@portfolio, @page), :html => {:id => "edit_page_form" } do |f| %>
   <div class="form_content">
     <%= f.label :name, before_label(:page_name, "Page Name") %>
     <%= f.text_field :name %>
   </div>
   <div id="page_content">
-    <% @page.content_sections.each do |c| %>
+    <% @page.content_sections.each_with_index do |c, idx| %>
       <%= render :partial => "eportfolios/page_section", :object => c, :locals => {:idx => idx} %>
-      <% idx = idx + 1 %>
     <% end %>
   </div>
   <div class="form_content">
@@ -249,11 +248,6 @@
   </table>
   <% end %>
   <%= render :partial => "eportfolios/page_section", :object => nil, :locals => {:idx => "blank"} %>
-  <% js_block do %>
-  <script>
-  var sectionCountIdx = <%= idx %>;
-  </script>
-  <% end %>
   <% if can_do(@portfolio, @current_user, :manage) %>
   <div id="edit_content_templates" style="display: none;">
     <div class="edit_rich_text_content form_content" style="display: none;">

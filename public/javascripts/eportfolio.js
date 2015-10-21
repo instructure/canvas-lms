@@ -235,9 +235,9 @@ define([
     $("#edit_page_sidebar .add_content_link").click(function(event) {
       event.preventDefault();
       $("#edit_page_form .keep_editing_button:first").click();
-      var $section = $("#page_section_blank").clone(true).attr('id', 'page_section_' + sectionCountIdx);
+      var $section = $("#page_section_blank").clone(true).attr('id', 'page_section_' + ENV.SECTION_COUNT_IDX);
       $section.addClass('unsaved');
-      $section.attr('id', 'page_section_' + sectionCountIdx++);
+      $section.attr('id', 'page_section_' + ENV.SECTION_COUNT_IDX++);
       $("#page_content").append($section);
       var section_type = "rich_text";
       var section_type_name = I18n.t('#eportfolios._page_section.section_types.rich_text', "Rich Text Content")
