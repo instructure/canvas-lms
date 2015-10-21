@@ -136,6 +136,16 @@ describe "groups" do
         delete_announcement_via_gear_menu
         expect(ff('.discussion-title-block').size).to eq 0
       end
+
+      it "should not be able to delete a discussion by a different creator", priority: "1", test_id: 420009 do
+        DiscussionTopic.create!(context: @testgroup.first,
+                                user: @students.first,
+                                title: 'Back to the Future day',
+                                message: 'There are no hover boards!')
+        get discussions_page
+        expect(ff('.discussion-title-block').size).to eq 1
+        expect(f('#manage_link')).to be_nil
+      end
     end
 
     #-------------------------------------------------------------------------------------------------------------------
