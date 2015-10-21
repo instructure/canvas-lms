@@ -2432,6 +2432,17 @@ describe Assignment do
       expect(@assignment.instance_variable_get(:@ignored_files)).to eq [ignore_file]
     end
 
+    it "should ignore when assignment.id does not belog to the user" do
+      create_and_submit
+      false_attachment = @attachment
+      student_in_course(active_all: true, user_name: "other user")
+      create_and_submit
+      ignore_file = [@user.last_name_first, @user.id, false_attachment.id, @attachment.display_name].join("_")
+      @assignment.instance_variable_set :@ignored_files, []
+      expect(@assignment.send(:infer_comment_context_from_filename, ignore_file)).to be_nil
+      expect(@assignment.instance_variable_get(:@ignored_files)).to eq [ignore_file]
+    end
+
     it "should mark comments as hidden for submission zip uploads" do
       @assignment = @course.assignments.create! name: "Mute Comment Test",
                                                 submission_types: %w(online_upload)

@@ -2041,7 +2041,9 @@ class Assignment < ActiveRecord::Base
     end
     attachment = Attachment.where(id: attachment_id).first if attachment_id
 
-    if !attachment || !submission
+    if !attachment || !submission ||
+       !attachment.grants_right?(user, :read) ||
+       !submission.attachments.where(:id => attachment_id).exists?
       @ignored_files << fullpath
       return nil
     end
