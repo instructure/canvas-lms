@@ -53,7 +53,7 @@ define [
       json.canRemoveUsers = _.all @model.get('enrollments'), (e) -> e.can_be_removed
       json.canEditSections = not _.isEmpty @model.sectionEditableEnrollments()
       json.canLinkStudents = json.isObserver && !ENV.course.concluded
-      json.canViewLoginIdColumn = ENV.permissions.manage_admin_users or ENV.permissions.manage_students
+      json.canViewLoginIdColumn = ENV.permissions.manage_admin_users || ENV.permissions.manage_students || ENV.permissions.read_sis
       json.canViewLoginId =
       json.canManage =
         if _.any(['TeacherEnrollment', 'DesignerEnrollment', 'TaEnrollment'], (et) => @model.hasEnrollmentType(et))
@@ -61,6 +61,9 @@ define [
         else
           ENV.permissions.manage_students
 
+      if !json.canViewLoginId && ENV.permissions.read_sis
+        json.canViewLoginId = true
+        json.login_id = json.sis_login_id
 
     observerJSON: (json) ->
       if json.isObserver

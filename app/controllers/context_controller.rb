@@ -205,6 +205,7 @@ class ContextController < ApplicationController
         :CONTEXTS => @contexts,
         :resend_invitations_url => course_re_send_invitations_url(@context),
         :permissions => {
+          :read_sis => @context.grants_any_right?(@current_user, session, :read_sis, :manage_sis),
           :manage_students => (manage_students = @context.grants_right?(@current_user, session, :manage_students)),
           :manage_admin_users => (manage_admins = @context.grants_right?(@current_user, session, :manage_admin_users)),
           :add_users => manage_students || manage_admins,
