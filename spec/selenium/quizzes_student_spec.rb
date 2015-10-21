@@ -83,7 +83,7 @@ describe 'quizzes' do
 
           keep_trying_until do
             Quizzes::QuizSubmission.last
-            expect(fj('#times_up_dialog:visible')).to be_present
+            expect(fj('#times_up_dialog:visible')).to include_text 'Time\'s Up!'
           end
         end
       end

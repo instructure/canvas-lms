@@ -6,7 +6,7 @@ shared_context "public course as a logged out user" do
   end
 
   def validate_selector_displayed(selector)
-    expect(f(selector)).to be_displayed
+    expect(f(selector)).to be_truthy
   end
 
   let!(:public_course) do

@@ -27,13 +27,13 @@ describe 'quizzes with draft state' do
       it 'shows an error', priority: "1", test_id: 209419 do
         get "/courses/#{@course.id}/quizzes/#{@q.id}"
         wait_for_ajaximations
-        expect(f('#unauthorized_holder')).to be_displayed
+        expect(f('.ui-state-error')).to include_text 'Unauthorized'
       end
 
       it 'can\'t take an unpublished quiz', priority: "1", test_id: 209420 do
         get "/courses/#{@course.id}/quizzes/#{@q.id}/take"
         wait_for_ajaximations
-        expect(f('#unauthorized_holder')).to be_displayed
+        expect(f('.ui-state-error')).to include_text 'Unauthorized'
       end
     end
 
@@ -47,7 +47,7 @@ describe 'quizzes with draft state' do
       it 'shows an error', priority: "1", test_id: 209421 do
         get "/courses/#{@course.id}/quizzes/#{@q.id}/"
         wait_for_ajaximations
-        expect(f('.lock_explanation')).to be_displayed
+        expect(f('.lock_explanation')).to include_text 'This quiz is locked'
       end
     end
   end

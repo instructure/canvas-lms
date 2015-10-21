@@ -4,6 +4,11 @@ require File.expand_path(File.dirname(__FILE__) + '/../helpers/quizzes_common')
 describe 'quiz restrictions as a student' do
   include_context 'in-process server selenium tests'
 
+  def begin_taking_quiz
+    get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
+    expect_new_page_load { f('#take_quiz_link').click }
+  end
+
   context 'restrict access code' do
     before do
       course_with_student_logged_in
@@ -14,27 +19,20 @@ describe 'quiz restrictions as a student' do
       @quiz.save!
     end
 
-    it 'should allow you to enter in a correct access token password to view the quiz' do
-      get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
-      f('#take_quiz_link').click
-      wait_for_ajaximations
+    def submit_quiz_access_code(access_code)
+      begin_taking_quiz
+      f('#quiz_access_code').send_keys(access_code)
+      expect_new_page_load { f('button.btn').click }
+    end
 
-      f('#quiz_access_code').send_keys(@password)
-      f('button.btn').click
-      wait_for_ajaximations
-      expect(f('h2')).to include_text('Quiz Instructions')
+    it 'should allow you to enter in a correct access token password to view the quiz' do
+      submit_quiz_access_code(@password)
+      expect(f('.quiz-header')).to include_text 'Quiz Instructions'
     end
 
     it 'should not allow you to enter in a incorrect access token password to view the quiz' do
-      get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
-      f('#take_quiz_link').click
-      wait_for_ajaximations
-
-      f('#quiz_access_code').send_keys('lechuck')
-      f('button.btn').click
-      wait_for_ajaximations
-
-      expect(f('#quiz_access_code')).to be
+      submit_quiz_access_code('lechuck')
+      expect(f('#quiz_access_code').text).to eq ''
     end
   end
 
@@ -49,10 +47,8 @@ describe 'quiz restrictions as a student' do
     end
 
     it 'should not be accessible from invalid ip address' do
-      get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
-      f('#take_quiz_link').click
-      wait_for_ajaximations
-      expect(f('#content')).to include_text('This quiz is protected and is only available from certain locations')
+      begin_taking_quiz
+      expect(f('#content')).to include_text 'This quiz is protected and is only available from certain locations'
     end
   end
 end
