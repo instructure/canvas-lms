@@ -483,6 +483,9 @@ class Message < ActiveRecord::Base
     user_time_zone     = self.user.try(:time_zone) || original_time_zone
     Time.zone          = user_time_zone
 
+    # (temporarily) override course name with user's nickname for the course
+    hacked_course = apply_course_nickname_to_asset(self.context, self.user)
+
     # Ensure we have a path_type
     path_type = 'dashboard' if to == 'summary'
     unless path_type
@@ -517,6 +520,8 @@ class Message < ActiveRecord::Base
   ensure
     # Set the timezone back to what it originally was
     Time.zone = original_time_zone if original_time_zone.present?
+
+    hacked_course.apply_nickname_for!(nil) if hacked_course
 
     @i18n_scope = nil
   end
@@ -816,6 +821,18 @@ class Message < ActiveRecord::Base
 
   def message_context
     @_message_context ||= Messages::AssetContext.new(context, notification_name)
+  end
+
+  def apply_course_nickname_to_asset(asset, user)
+    hacked_course = if asset.is_a?(Course)
+      asset
+    elsif asset.respond_to?(:context) && asset.context.is_a?(Course)
+      asset.context
+    elsif asset.respond_to?(:course) && asset.course.is_a?(Course)
+      asset.course
+    end
+    hacked_course.apply_nickname_for!(user) if hacked_course
+    hacked_course
   end
 
 end

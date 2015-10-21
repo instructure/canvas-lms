@@ -4305,3 +4305,25 @@ describe Course, '#update_enrolled_users' do
     expect(@user.associated_accounts).to be_blank
   end
 end
+
+describe Course, "#apply_nickname_for!" do
+  before(:once) do
+    @course = Course.create! :name => 'some terrible name'
+    @user = User.new
+    @user.course_nicknames[@course.id] = 'nickname'
+    @user.save!
+  end
+
+  it "sets name to user's nickname (non-persistently)" do
+    @course.apply_nickname_for!(@user)
+    expect(@course.name).to eq 'nickname'
+    @course.save!
+    expect(Course.find(@course).name).to eq 'some terrible name'
+  end
+
+  it "undoes the change with nil user" do
+    @course.apply_nickname_for!(@user)
+    @course.apply_nickname_for!(nil)
+    expect(@course.name).to eq 'some terrible name'
+  end
+end

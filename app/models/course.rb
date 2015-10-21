@@ -2825,4 +2825,13 @@ class Course < ActiveRecord::Base
   def refresh_content_participation_counts(_progress)
     content_participation_counts.each(&:refresh_unread_count)
   end
+
+  def name
+    return @nickname if @nickname
+    read_attribute(:name)
+  end
+
+  def apply_nickname_for!(user)
+    @nickname = nickname_for(user, nil)
+  end
 end

@@ -99,6 +99,37 @@ describe Message do
       msg = generate_message(:account_user_notification, :email, @au)
       expect(msg.html_body).to include('awesomelogo.jpg')
     end
+
+    describe "course nicknames" do
+      before(:once) do
+        course_with_student(:active_all => true, :course_name => 'badly-named-course')
+        @student.course_nicknames[@course.id] = 'student-course-nick'
+        @student.save!
+      end
+
+      def check_message(message, asset)
+        msg = generate_message(message, :email, asset, :user => @student)
+        expect(msg.html_body).not_to include 'badly-named-course'
+        expect(msg.html_body).to include 'student-course-nick'
+        expect(@course.name).to eq 'badly-named-course'
+        
+        msg = generate_message(message, :email, asset, :user => @teacher)
+        expect(msg.html_body).to include 'badly-named-course'
+        expect(msg.html_body).not_to include 'student-course-nick'
+      end
+
+      it "applies nickname to asset" do
+        check_message(:grade_weight_changed, @course)
+      end
+
+      it "applies nickname to asset.course" do
+        check_message(:enrollment_registration, @student.enrollments.first)
+      end
+
+      it "applies nickname to asset.context" do
+        check_message(:assignment_changed, @course.assignments.create!)
+      end
+    end
   end
 
   context "named scopes" do
