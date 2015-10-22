@@ -36,8 +36,11 @@ describe "Exporter" do
       expect(exporter.base_template).to eq "../templates/module_sorting_template.html.erb"
     end
 
-    it "should contain a top-level templates key for module content" do
-      expect(exporter.templates.key?(:modules)).to be_truthy
+    it "should not contain content type keys" do
+      # once we have a more robust imscc we should add another test to check
+      # that the keys reflect the module migration ids
+      content_keys = CC::Exporter::Epub::Exporter::LINKED_RESOURCE_KEY.values
+      expect(content_keys.any? {|k| exporter.templates.key?(k)}).to be_falsey
     end
   end
 

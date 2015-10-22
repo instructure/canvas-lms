@@ -44,7 +44,7 @@ module CC::Exporter::Epub::Converters
         title: content['title'],
         identifier: content['identifier'],
         due_at: content['due_at'],
-        href: "#{content['resource_type']}.xhtml"
+        href: "#{content['resource_type']}.xhtml##{content['identifier']}"
       }
     end
 
