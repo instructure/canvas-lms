@@ -19,7 +19,8 @@ describe "quizzes section hierarchy" do
     @new_section.save!
 
     # create a quiz and assign it to the section with due dae after course end date
-    @quiz = quiz_with_multiple_type_questions(!:goto_edit)
+    @quiz = quiz_with_multiple_type_questions(false)
+    @quiz.reload
     @override = @quiz.assignment_overrides.build
     @override.set = @new_section
     @override.due_at = Time.zone.now.advance(days:3)
@@ -43,6 +44,7 @@ describe "quizzes section hierarchy" do
     # make sure it does not create a blank submissions
     expect(f(' .quiz_score')).not_to be_present
     expect(f(' .quiz_duration')).not_to be_present
+    expect_new_page_load(true) { f('#section-tabs .quizzes').click }
   end
 
   context "section overrides course and term hierarchy" do

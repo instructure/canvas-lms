@@ -289,7 +289,7 @@ require_relative "../common"
     end
 
     if submit
-      expect_new_page_load { f('#submit_quiz_button').click }
+      expect_new_page_load(true) { f('#submit_quiz_button').click }
       keep_trying_until do
         expect(f('.quiz-submission .quiz_score .score_value')).to be_displayed
       end

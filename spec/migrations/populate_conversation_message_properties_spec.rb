@@ -64,26 +64,26 @@ describe 'DataFixup::PopulateConversationMessageProperties' do
       expect(c1.has_media_objects?).to be_falsey
       expect(m1.read_attribute(:has_attachments)).to be_falsey
       expect(m1.read_attribute(:has_media_objects)).to be_falsey
-      expect(m1.attachment_ids).to be_nil
-      expect(m1.media_comment).to be_nil
+      expect(m1.attachment_ids).to be_blank
+      expect(m1.media_comment).to be_blank
 
       expect(c2.has_attachments?).to be_truthy
       expect(c2.has_media_objects?).to be_falsey
       expect(m2.read_attribute(:has_attachments)).to be_truthy
       expect(m2.read_attribute(:has_media_objects)).to be_falsey
-      expect(m2.attachment_ids).to eql a.id.to_s
+      expect(m2.attachment_ids).to eql [a.id]
 
       expect(c3.has_attachments?).to be_truthy
       expect(c3.has_media_objects?).to be_falsey
       expect(m3.read_attribute(:has_attachments)).to be_truthy
       expect(m3.read_attribute(:has_media_objects)).to be_falsey
-      expect(m3.attachment_ids).to be_nil # it's on the forwarded message
+      expect(m3.attachment_ids).to be_blank # it's on the forwarded message
 
       expect(c4.has_attachments?).to be_truthy
       expect(c4.has_media_objects?).to be_falsey
       expect(m4.read_attribute(:has_attachments)).to be_truthy
       expect(m4.read_attribute(:has_media_objects)).to be_falsey
-      expect(m4.attachment_ids).to be_nil
+      expect(m4.attachment_ids).to be_blank
 
       expect(c5.has_attachments?).to be_falsey
       expect(c5.has_media_objects?).to be_truthy
@@ -95,13 +95,13 @@ describe 'DataFixup::PopulateConversationMessageProperties' do
       expect(c6.has_media_objects?).to be_truthy
       expect(m6.read_attribute(:has_attachments)).to be_falsey
       expect(m6.read_attribute(:has_media_objects)).to be_truthy
-      expect(m6.media_comment).to be_nil
+      expect(m6.media_comment).to be_blank
 
       expect(c7.has_attachments?).to be_falsey
       expect(c7.has_media_objects?).to be_truthy
       expect(m7.read_attribute(:has_attachments)).to be_falsey
       expect(m7.read_attribute(:has_media_objects)).to be_truthy
-      expect(m7.media_comment).to be_nil
+      expect(m7.media_comment).to be_blank
     end
   end
 end

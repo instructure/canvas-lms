@@ -27,21 +27,22 @@ describe Canvas::LiveEvents do
       @page = @course.wiki.wiki_pages.create(:title => "old title", :body => "old body")
     end
 
-    it "should not set old_title or old_body if they don't change" do
-      @page.save
+    def wiki_page_updated
+      Canvas::LiveEvents.wiki_page_updated(@page, @page.title_changed? ? @page.title_was : nil, @page.body_changed? ? @page.body_was : nil)
+    end
 
+    it "should not set old_title or old_body if they don't change" do
       LiveEvents.expects(:post_event).with('wiki_page_updated', {
         wiki_page_id: @page.global_id,
         title: "old title",
         body: "old body"
       })
 
-      Canvas::LiveEvents.wiki_page_updated(@page)
+      wiki_page_updated
     end
 
     it "should set old_title if the title changed" do
       @page.title = "new title"
-      @page.save
 
       LiveEvents.expects(:post_event).with('wiki_page_updated', {
         wiki_page_id: @page.global_id,
@@ -50,12 +51,11 @@ describe Canvas::LiveEvents do
         body: "old body"
       })
 
-      Canvas::LiveEvents.wiki_page_updated(@page)
+      wiki_page_updated
     end
 
     it "should set old_body if the body changed" do
       @page.body = "new body"
-      @page.save
 
       LiveEvents.expects(:post_event).with('wiki_page_updated', {
         wiki_page_id: @page.global_id,
@@ -64,7 +64,7 @@ describe Canvas::LiveEvents do
         old_body: "old body"
       })
 
-      Canvas::LiveEvents.wiki_page_updated(@page)
+      wiki_page_updated
     end
   end
 

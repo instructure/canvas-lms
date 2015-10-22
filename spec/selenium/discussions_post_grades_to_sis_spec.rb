@@ -12,8 +12,7 @@ describe "post grades to sis" do
   end
 
   it "should create a discussion with the post grades to sis box checked", priority: "1", test_id: 150520 do
-    get "/courses/#{@course.id}/discussion_topics"
-    expect_new_page_load{f('#new-discussion-btn').click}
+    get "/courses/#{@course.id}/discussion_topics/new"
     f('#discussion-title').send_keys('New Discussion Title')
     type_in_tiny('textarea[name=message]', 'Discussion topic message body')
     f('#use_for_grading').click
@@ -26,8 +25,7 @@ describe "post grades to sis" do
 
   it "should not have Post grades to SIS checkbox present when the feature is not configured", priority: "1", test_id: 246614 do
     Account.default.set_feature_flag!('post_grades', 'off')
-    get "/courses/#{@course.id}/discussion_topics"
-    expect_new_page_load{f('#new-discussion-btn').click}
+    get "/courses/#{@course.id}/discussion_topics/new"
     f('#use_for_grading').click
     expect(f('#assignment_post_to_sis')).not_to be_present
   end
@@ -39,7 +37,7 @@ describe "post grades to sis" do
     end
 
     def get_post_grades_dialog
-      get "/courses/#{@course.id}/gradebook2"
+      get "/courses/#{@course.id}/gradebook"
       expect(f('.post-grades-placeholder > button')).to be_displayed
       f('.post-grades-placeholder > button').click
       wait_for_ajaximations
