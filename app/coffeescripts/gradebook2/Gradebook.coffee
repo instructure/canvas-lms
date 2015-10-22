@@ -543,7 +543,7 @@ define [
 
     renderTotalHeader: () =>
       @totalHeader = new TotalColumnHeaderView
-        showingPoints: @displayPointTotals
+        showingPoints: @displayPointTotals()
         toggleShowingPoints: @togglePointsOrPercentTotals.bind(this)
         weightedGroups: @weightedGroups
         totalColumnInFront: @totalColumnInFront
@@ -833,6 +833,7 @@ define [
     # this is a workaroud to make it so only assignments are sortable but at the same time
     # so that the total and final grade columns don't dissapear after reordering columns
     fixColumnReordering: =>
+      @renderTotalHeader()
       $headers = $('#gradebook_grid .container_1').find('.slick-header-columns')
       originalItemsSelector = $headers.sortable 'option', 'items'
       onlyAssignmentColsSelector = '> *:not([id*="assignment_group"]):not([id*="total_grade"])'
@@ -1126,7 +1127,6 @@ define [
       @userFilter = new InputFilterView el: '.gradebook_filter input'
       @userFilter.on 'input', @onUserFilterInput
 
-      @renderTotalHeader()
       @initGradebookExporter()
 
     initGradebookExporter: () =>
