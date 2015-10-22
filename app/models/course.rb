@@ -798,7 +798,7 @@ class Course < ActiveRecord::Base
       end
 
       Enrollment.where(:course_id => self).update_all(:updated_at => Time.now.utc)
-      User.where("id IN (SELECT user_id FROM enrollments WHERE course_id=?)", self).
+      User.where(id: Enrollment.where(course_id: self).select(:user_id)).
           update_all(updated_at: Time.now.utc)
     end
   end
