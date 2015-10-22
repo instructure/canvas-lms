@@ -113,10 +113,10 @@ describe "discussions overrides" do
 
       it "should list the discussions in course and main dashboard page", priority: "2", test_id: 114322 do
         get "/courses/#{@course.id}"
-        expect(f('.events_list .event .icon-grading-gray').text).to eq("#{@discussion_topic.title}\nMultiple Due Dates")
+        expect(f('.coming_up .event a').text).to eq("#{@discussion_topic.title}\nMultiple Due Dates")
         course_with_admin_logged_in(course: @course)
         get ""
-        expect(f('.events_list .event .icon-grading-gray').text).to eq("#{@discussion_topic.title}\nMultiple Due Dates")
+        expect(f('.coming_up .event a').text).to eq("#{@discussion_topic.title}\nMultiple Due Dates")
       end
     end
   end

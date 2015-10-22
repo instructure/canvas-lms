@@ -297,6 +297,23 @@
       }
     }
   }
+  .events_list, .to-do-list {
+    li.event, li.todo {
+      i[class*=icon-], i[class^=icon-] {
+        color: lighten( $grayDark, 15% );
+        vertical-align: top;
+        margin-top: 8px;
+      }
+      i.icon-check {
+        @if $use_new_styles { color: $ic-color-success; }
+        @else { color: #33802a; }
+      }
+    }
+    div.event-details, div.todo-details {
+      display: inline-block;
+      margin-left: 5px;
+    }
+  }
   .events_list {
     @if $use_new_styles { margin-bottom: $ic-sp*2; }
     @else { margin-bottom: 20px; }
