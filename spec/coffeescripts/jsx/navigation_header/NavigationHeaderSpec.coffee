@@ -9,7 +9,8 @@ define [
   componentHolder = document.getElementById('holder')
 
   renderComponent = ->
-    React.render(Navigation(), componentHolder)
+    Nav = React.createElement(Navigation)
+    React.render(Nav, componentHolder)
 
   module 'GlobalNavigation',
     setup: ->
