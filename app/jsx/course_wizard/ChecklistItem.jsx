@@ -1,7 +1,8 @@
 define([
   'react',
-  'i18n!course_wizard'
-], function(React, I18n) {
+  'i18n!course_wizard',
+  'classnames'
+], function(React, I18n, classnames) {
 
   var ChecklistItem = React.createClass({
       displayName: 'ChecklistItem',
@@ -36,10 +37,10 @@ define([
 
       setClassName: function (props) {
         this.setState({
-          classNameString: React.addons.classSet({
-            'ic-wizard-box__content-trigger': true,
-            'ic-wizard-box__content-trigger--checked': props.complete,
-            'ic-wizard-box__content-trigger--active': props.isSelected
+          classNameString: classnames({
+            "ic-wizard-box__content-trigger": true,
+            "ic-wizard-box__content-trigger--checked": props.complete,
+            "ic-wizard-box__content-trigger--active": props.isSelected
           })
         });
       },
