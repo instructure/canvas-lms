@@ -18,7 +18,7 @@ define [
         React.unmountComponentAtNode(@component.getDOMNode().parentNode)
 
   test 'should render link & i', ->
-    @component = TestUtils.renderIntoDocument(DashboardCardAction(
+    @component = TestUtils.renderIntoDocument(React.createElement(DashboardCardAction,
       @props
     ))
     $html = $(@component.getDOMNode())
@@ -30,7 +30,7 @@ define [
 
   test 'should render actionType as screenreader text if provided', ->
     screen_reader_label = 'Dashboard Action'
-    component = TestUtils.renderIntoDocument(DashboardCardAction(
+    component = TestUtils.renderIntoDocument(React.createElement(DashboardCardAction,
       _.extend(@props, {
         screenReaderLabel: screen_reader_label
       })
@@ -40,7 +40,7 @@ define [
 
   test 'should display unread count when it is greater than zero', ->
     unread_count = 2
-    @component = TestUtils.renderIntoDocument(DashboardCardAction(
+    @component = TestUtils.renderIntoDocument(React.createElement(DashboardCardAction,
       _.extend(@props, {
         unreadCount: unread_count
       })

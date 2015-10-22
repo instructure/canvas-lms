@@ -46,9 +46,9 @@ define([
     },
 
     render: function () {
-      var cards = this.props.courseCards.map(card => {
+      var cards = this.props.courseCards.map((card) => {
         return (
-          <div className="col-xs-6 col-lg-4 card">
+          <div className="col-xs-6 col-lg-4 card" key={card.id}>
             <DashboardCard shortName={card.shortName}
               originalName={card.originalName}
               courseCode={card.courseCode}

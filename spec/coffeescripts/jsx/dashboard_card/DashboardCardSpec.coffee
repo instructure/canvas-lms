@@ -31,7 +31,8 @@ define [
       React.unmountComponentAtNode(@component.getDOMNode().parentNode)
 
   test 'render', ->
-    @component = TestUtils.renderIntoDocument(DashboardCard(@props))
+    DashCard = React.createElement(DashboardCard, @props)
+    @component = TestUtils.renderIntoDocument(DashCard)
     $html = $(@component.getDOMNode())
     ok $html.attr('class').match(/DashboardCard/)
 
@@ -47,7 +48,8 @@ define [
     ok renderSpy.called, 'should re-render on state update'
 
   test 'unreadCount', ->
-    @component = TestUtils.renderIntoDocument(DashboardCard(@props))
+    DashCard = React.createElement(DashboardCard, @props)
+    @component = TestUtils.renderIntoDocument(DashCard)
     ok !@component.unreadCount('icon-discussion', []),
       'should not blow up without a stream'
     equal @component.unreadCount('icon-discussion', @stream), 2,

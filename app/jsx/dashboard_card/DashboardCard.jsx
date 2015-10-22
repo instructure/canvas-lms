@@ -60,7 +60,9 @@ define([
 
     componentDidMount: function() {
       CourseActivitySummaryStore.addChangeListener(this.handleStoreChange)
+      this.parentNode = this.getDOMNode();
     },
+
 
     // ===============
     //    ACTIONS
@@ -136,7 +138,7 @@ define([
         return (
           <DashboardColorPicker
             elementID         = {this.colorPickerID()}
-            parentNode        = {this.getDOMNode()}
+            parentNode        = {this.parentNode}
             doneEditing       = {this.doneEditing}
             handleColorChange = {this.handleColorChange}
             assetString       = {this.props.assetString}
@@ -149,7 +151,7 @@ define([
     },
 
     linksForCard: function(){
-      return this.props.links.map(link => {
+      return this.props.links.map((link) => {
         if (!link.hidden) {
           return (
             <DashboardCardAction
@@ -158,6 +160,7 @@ define([
               linkClass         = {link.css_class}
               path              = {link.path}
               screenReaderLabel = {link.screenreader}
+              key               = {link.path}
             />
           );
         }

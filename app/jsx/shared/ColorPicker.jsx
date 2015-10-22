@@ -191,6 +191,7 @@ define([
                   style = {colorSwatchStyle}
                   title = {title}
                   onClick = {this.setCurrentColor.bind(null, color.hexcode)}
+                  key={color.hexcode}
           >
             {this.checkMarkIfMatchingColor(color.hexcode)}
             <span className="screenreader-only">{title}</span>

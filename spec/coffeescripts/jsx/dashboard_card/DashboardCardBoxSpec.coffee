@@ -24,9 +24,10 @@ define [
         React.unmountComponentAtNode(@component.getDOMNode().parentNode)
 
   test 'should render div.card per provided courseCard', ->
-    @component = TestUtils.renderIntoDocument(DashboardCardBox({
+    CardBox = React.createElement(DashboardCardBox, {
       courseCards: @courseCards
-    }))
+    })
+    @component = TestUtils.renderIntoDocument(CardBox)
     $html = $(@component.getDOMNode())
     ok $html.attr('class').match(/Box/)
     equal $html.children('div.card').length, @courseCards.length

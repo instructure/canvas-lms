@@ -3,14 +3,13 @@ define([
   'react',
   'jquery',
   'i18n!dashcards',
-  'jsx/shared/ColorPicker'
-], function(_, React, $, I18n, ColorPickerComponent) {
+  'jsx/shared/ColorPicker',
+  'classnames'
+], function(_, React, $, I18n, ColorPicker, cx) {
 
   // ================
   //   COLOR PICKER
   // ================
-
-  var ColorPicker = React.createFactory(ColorPickerComponent);
 
   var SPACE_NEEDED_FOR_TOOLTIP = 300;
 
@@ -94,8 +93,6 @@ define([
     },
 
     render: function () {
-      var cx = React.addons.classSet;
-
       var classes = cx({
         'ic-DashboardCardColorPicker': true,
         'right': !this.tooltipOnRight(),
