@@ -171,8 +171,8 @@ define([
           if(callback) { callback(); }
         });
       },
-      updateAssignmentData: function() {
-        $.ajaxJSON($(".assignment_info_url").attr('href'), 'GET', {}, function(data) {
+      updateAssignmentData: function(callback) {
+        return $.ajaxJSON($(".assignment_info_url").attr('href'), 'GET', {}, function(data) {
           $.each(data, function(id, info) {
             $context_module_item = $("#context_module_item_" + id);
             var data = {};
@@ -191,7 +191,9 @@ define([
             $context_module_item.fillTemplateData({data: data, htmlValues: ['points_possible_display']})
           });
           vddTooltip();
+          if (callback) { callback(); }
         }, function() {
+          if (callback) { callback(); }
         });
       },
       itemClass: function(content_tag) {
@@ -581,7 +583,6 @@ define([
           if (data.current_position && position && data.current_position < position) {
             $mod_item.addClass('after_current_position');
           }
-
           // set the status icon
           var $icon_container = $mod_item.find('.module-item-status-icon');
           var mod_id = $mod_item.getTemplateData({textValues: ['id']}).id;
@@ -1698,8 +1699,10 @@ define([
       setTimeout(modules.initModuleManagement, 1000);
     }
 
-    modules.updateAssignmentData(); // need the assignment data to check past due state
-    modules.updateProgressions();
+    // need the assignment data to check past due state
+    modules.updateAssignmentData(function() {
+      modules.updateProgressions();
+    });
 
     $(".context_module").find(".expand_module_link,.collapse_module_link").bind('click keyclick', function(event, goSlow) {
       event.preventDefault();

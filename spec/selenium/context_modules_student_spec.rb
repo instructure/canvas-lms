@@ -505,6 +505,7 @@ describe "context modules" do
       end
 
       def make_past_due
+        @assignment_4.submission_types = 'online_text_entry'
         @assignment_4.due_at = '2015-01-01'
         @assignment_4.save!
       end

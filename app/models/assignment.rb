@@ -518,7 +518,12 @@ class Assignment < ActiveRecord::Base
     if self.multiple_due_dates_apply_to?(user)
       tag_info[:vdd_tooltip] = OverrideTooltipPresenter.new(self, user).as_json
     else
-      tag_info[:due_date] = self.overridden_for(user).due_at.utc.iso8601 rescue nil
+      due_date = self.overridden_for(user).due_at
+      if due_date
+        tag_info[:due_date] = due_date.utc.iso8601
+        tag_info[:past_due] = true if expects_submission? && due_date < Time.now &&
+                                      !submission_for_student(user).has_submission?
+      end
     end
     tag_info
   end

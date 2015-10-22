@@ -3704,6 +3704,38 @@ describe Assignment do
       expect(a).not_to be_valid
     end
   end
+
+  describe "context_module_tag_info" do
+    before(:once) do
+      @assignment = @course.assignments.create!(:due_at => 1.week.ago,
+                                               :points_possible => 100,
+                                               :submission_types => 'online_text_entry')
+    end
+
+    it "returns past_due if an assignment is due in the past and no submission exists" do
+      info = @assignment.context_module_tag_info(@student, @course)
+      expect(info[:past_due]).to be_truthy
+    end
+
+    it "does not return past_due for assignments that don't expect submissions" do
+      @assignment.submission_types = ''
+      @assignment.save!
+      info = @assignment.context_module_tag_info(@student, @course)
+      expect(info[:past_due]).to be_falsey
+    end
+
+    it "does not return past_due for assignments that were turned in on time" do
+      Timecop.freeze(2.weeks.ago) { @assignment.submit_homework(@student, :submission_type => 'online_text_entry', :body => 'blah') }
+      info = @assignment.context_module_tag_info(@student, @course)
+      expect(info[:past_due]).to be_falsey
+    end
+
+    it "does not return past_due for assignments that were turned in late" do
+      @assignment.submit_homework(@student, :submission_type => 'online_text_entry', :body => 'blah')
+      info = @assignment.context_module_tag_info(@student, @course)
+      expect(info[:past_due]).to be_falsey
+    end
+  end
 end
 
 def setup_assignment_with_group
