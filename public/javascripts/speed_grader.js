@@ -1405,13 +1405,21 @@ define([
 
     handleSubmissionSelectionChange: function(){
       clearInterval(crocodocSessionTimer);
-      var $submission_to_view = $("#submission_to_view");
-      var submissionToViewVal = $submission_to_view.val(),
-          currentSelectedIndex = Number(submissionToViewVal) ||
-                                ( this.currentStudent &&
-                                  this.currentStudent.submission &&
-                                  this.currentStudent.submission.currentSelectedIndex )
-                                || 0,
+
+      function currentIndex (context, submissionToViewVal) {
+        if (submissionToViewVal) {
+          return Number(submissionToViewVal) - 1
+        } else if (context.currentStudent && context.currentStudent.submission &&
+                   context.currentStudent.submission.currentSelectedIndex ) {
+          return context.currentStudent.submission.currentSelectedIndex - 1
+        } else {
+          return 0
+        }
+      };
+
+      var $submission_to_view = $("#submission_to_view"),
+          submissionToViewVal = $submission_to_view.val(),
+          currentSelectedIndex = currentIndex(this, submissionToViewVal),
           isMostRecent = this.currentStudent &&
                          this.currentStudent.submission &&
                          this.currentStudent.submission.submission_history &&
