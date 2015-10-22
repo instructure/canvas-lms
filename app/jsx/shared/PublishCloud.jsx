@@ -21,11 +21,14 @@ define([
       }
     });
 
-    React.render(RestrictedDialogForm({
-      usageRightsRequiredForContext: this.props.usageRightsRequiredForContext,
-      models: [this.props.model],
-      closeDialog: function () { $dialog.dialog('close'); }
-    }), $dialog[0]);
+    React.render(
+      <RestrictedDialogForm
+        usageRightsRequiredForContext={this.props.usageRightsRequiredForContext}
+        models={[this.props.model]}
+        closeDialog={() => { $dialog.dialog('close'); }}
+      />
+    , $dialog[0]
+    );
 
   };
 
