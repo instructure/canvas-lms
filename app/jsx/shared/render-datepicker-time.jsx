@@ -46,7 +46,6 @@ define(['i18n!instructure', 'timezone', 'react'], function(I18n, tz, React) {
     return React.renderToStaticMarkup(
       <div className='ui-datepicker-time ui-corner-bottom'>
         {label} {hourInput}:{minuteInput} {meridianSelect}
-        &nbsp;&nbsp;&nbsp;
         <button type='button' className='btn btn-mini ui-datepicker-ok'>{STRINGS.doneButton}</button>
       </div>
     );
