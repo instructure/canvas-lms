@@ -106,7 +106,7 @@
            context_url(course, :context_grades_url)
          end
       %>
-      <option value="<%= url %>" <%= 'selected' if course == @context %>><%= course.name %></option>
+      <option value="<%= url %>" <%= 'selected' if course == @context %>><%= course.nickname_for(@current_user) %></option>
     <% end %>
   </select>
   </div>
