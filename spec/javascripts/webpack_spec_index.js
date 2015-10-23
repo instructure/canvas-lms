@@ -363,6 +363,8 @@ require(__dirname + "/../coffeescripts/views/wiki/WikiPageViewSpec.coffee")
 require(__dirname + "/../coffeescripts/widgets/assignmentRubricDialogSpec.coffee")
 require(__dirname + "/../coffeescripts/widgets/DatetimeFieldSpec.coffee")
 require(__dirname + "/../coffeescripts/xhr/remoteSelectSpec.coffee")
+require(__dirname + "/../coffeescripts/jsx/shared/rce/rceStoreSpec.coffee")
+require(__dirname + "/../coffeescripts/jsx/shared/rce/loadRCESpec.coffee")
 
 
 //var testsContext = require.context(__dirname + "/../coffeescripts", true, /Spec.coffee$/);
