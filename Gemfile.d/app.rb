@@ -53,6 +53,7 @@ gem 'ims-lti', '2.0.0.beta.27'
 gem 'json', '1.8.2'
 gem 'oj', '2.5.5'
 gem 'jwt', '1.2.1', require: false
+gem 'json-jwt', '1.5.1', require: false
 gem 'twilio-ruby', '4.2.1'
 
 gem 'mail', '2.5.4', require: false

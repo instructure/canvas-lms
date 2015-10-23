@@ -49,8 +49,6 @@ describe ExternalToolsController do
   describe "GET 'jwt_token'" do
 
     before :each do
-      require 'jwt'
-
       @iat = Time.zone.now
       Time.zone.class.any_instance.stubs(:now).returns(@iat)
       @tool = new_valid_tool(@course)
@@ -63,7 +61,8 @@ describe ExternalToolsController do
     it "returns the correct JWT token when given using the tool_id param" do
       user_session(@teacher)
       response = get :jwt_token, {course_id: @course.id, tool_id: @tool.id}
-      decoded_token = JWT.decode(JSON.parse(response.body[9..-1])['jwt_token'], nil, false)[0]
+      jwt = JSON.parse(response.body[9..-1])['jwt_token']
+      decoded_token = Canvas::Security.decode_jwt(jwt, [:skip_verification])
 
       expect(decoded_token['custom_canvas_user_id']).to eq @teacher.id.to_s
       expect(decoded_token['custom_canvas_course_id']).to eq @course.id.to_s
@@ -74,7 +73,7 @@ describe ExternalToolsController do
     it "returns the correct JWT token when given using the tool_launch_url param" do
       user_session(@teacher)
       response = get :jwt_token, {course_id: @course.id, tool_launch_url: @tool.url}
-      decoded_token = JWT.decode(JSON.parse(response.body[9..-1])['jwt_token'], nil, false)[0]
+      decoded_token = Canvas::Security.decode_jwt(JSON.parse(response.body[9..-1])['jwt_token'], [:skip_verification])
 
       expect(decoded_token['custom_canvas_user_id']).to eq @teacher.id.to_s
       expect(decoded_token['custom_canvas_course_id']).to eq @course.id.to_s

@@ -34,7 +34,9 @@ class AccountAuthorizationConfig::OpenIDConnect < AccountAuthorizationConfig::Oa
   end
 
   def unique_id(token)
-    JWT.decode(token.params['id_token'.freeze], nil, false).first[login_attribute]
+    jwt_string = token.params['id_token'.freeze]
+    jwt = ::Canvas::Security.decode_jwt(jwt_string, [:skip_verification])
+    jwt[login_attribute]
   end
 
   protected
