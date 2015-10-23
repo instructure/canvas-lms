@@ -55,7 +55,8 @@ module Lti
         enabled: true,
         tool_configuration: external_tool.tool_configuration,
         context: external_tool.context_type,
-        context_id: external_tool.context.id
+        context_id: external_tool.context.id,
+        reregistration: false
       }
     end
 
@@ -69,8 +70,18 @@ module Lti
         enabled: tool_proxy.workflow_state == 'active',
         tool_configuration: nil,
         context: tool_proxy.context_type,
-        context_id: tool_proxy.context.id
+        context_id: tool_proxy.context.id,
+        reregistration: root_account.feature_enabled?(:lti2_rereg)
+
       }
+    end
+
+    def root_account
+      if @context.respond_to?(:root_account)
+        @context.root_account
+      else
+        @context.account.root_account
+      end
     end
 
 

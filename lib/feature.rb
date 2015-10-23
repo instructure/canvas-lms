@@ -319,6 +319,14 @@ END
         state: 'hidden',
         beta: true
       },
+    'lti2_rereg' =>
+    {
+        display_name: -> {I18n.t('LTI 2 Reregistration')},
+        description: -> { I18n.t('Enable reregistration for LTI 2 ')},
+        applies_to:'RootAccount',
+        state: 'hidden',
+        beta: true
+    },
     'quizzes_lti' =>
       {
         display_name: -> { I18n.t('Quiz LTI plugin') },
