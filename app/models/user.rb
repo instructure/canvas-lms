@@ -1795,7 +1795,7 @@ class User < ActiveRecord::Base
             joins(self.class.send(:sanitize_sql_array, [<<-SQL, opts[:start_at], 'submitter', self.id, self.id])).
               INNER JOIN (
                 SELECT MAX(submission_comments.created_at) AS last_updated_at_from_db, submission_id
-                FROM submission_comments, submission_comment_participants
+                FROM #{SubmissionComment.quoted_table_name}, #{SubmissionCommentParticipant.quoted_table_name}
                 WHERE submission_comments.id = submission_comment_id
                   AND (submission_comments.created_at > ?)
                   AND (submission_comment_participants.participation_type = ?)
@@ -1803,7 +1803,7 @@ class User < ActiveRecord::Base
                   AND (submission_comments.author_id <> ?)
                 GROUP BY submission_id
               ) AS relevant_submission_comments ON submissions.id = submission_id
-              INNER JOIN assignments ON assignments.id = submissions.assignment_id
+              INNER JOIN #{Assignment.quoted_table_name} ON assignments.id = submissions.assignment_id
             SQL
             where(assignments: {muted: false, workflow_state: 'published'}).
             order('last_updated_at_from_db DESC').

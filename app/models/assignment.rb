@@ -1854,7 +1854,7 @@ class Assignment < ActiveRecord::Base
       user_ids = Array.wrap(user_ids).join(',')
       course_ids = Array.wrap(course_ids_that_have_da_enabled).join(',')
       scope = joins(sanitize_sql([<<-SQL, course_ids, user_ids]))
-        LEFT OUTER JOIN assignment_student_visibilities ON (
+        LEFT OUTER JOIN #{AssignmentStudentVisibility.quoted_table_name} ON (
          assignment_student_visibilities.assignment_id = assignments.id
          AND assignment_student_visibilities.course_id IN (%s)
          AND assignment_student_visibilities.user_id IN (%s))
@@ -1909,7 +1909,7 @@ class Assignment < ActiveRecord::Base
   # This should only be used in the course drop down to show assignments needing a submission
   scope :need_submitting_info, lambda { |user_id, limit|
     chain = api_needed_fields.
-      where("(SELECT COUNT(id) FROM submissions
+      where("(SELECT COUNT(id) FROM #{Submission.quoted_table_name}
             WHERE assignment_id = assignments.id
             AND submission_type IS NOT NULL
             AND user_id = ?) = 0", user_id).

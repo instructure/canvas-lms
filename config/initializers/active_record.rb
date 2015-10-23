@@ -927,7 +927,7 @@ ActiveRecord::Relation.class_eval do
   def distinct_on(*args)
     args.map! do |column_name|
       if column_name.is_a?(Symbol) && column_names.include?(column_name.to_s)
-        "#{connection.quote_table_name(table_name)}.#{connection.quote_column_name(column_name)}"
+        "#{connection.quote_local_table_name(table_name)}.#{connection.quote_column_name(column_name)}"
       else
         column_name.to_s
       end
