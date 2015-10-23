@@ -795,7 +795,8 @@ ActiveRecord::Relation.class_eval do
           stmt = Arel::UpdateManager.new(arel.engine)
 
           stmt.set Arel.sql(@klass.send(:sanitize_sql_for_assignment, updates))
-          stmt.table(table)
+          from = CANVAS_RAILS3 ? from_value : from_value.try(:first)
+          stmt.table(from ? Arel::Nodes::SqlLiteral.new(from) : table)
           stmt.key = table[primary_key]
 
           sql = stmt.to_sql
