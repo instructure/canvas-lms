@@ -26,6 +26,8 @@ class GradebookExporter
   end
 
   def to_csv
+    collection = @options[:include_priors] ? @course.all_student_enrollments : @course.student_enrollments
+    enrollments_scope = @course.apply_enrollment_visibility(collection, @user)
     student_enrollments = enrollments_for_csv(enrollments_scope, @options)
 
     student_section_names = {}
@@ -168,11 +170,6 @@ class GradebookExporter
 
     enrollments = scope.preload(includes).eager_load(:user).order_by_sortable_name.to_a
     enrollments.partition { |e| e.type != "StudentViewEnrollment" }.flatten
-  end
-
-  def enrollments_scope
-    enrollment_opts = @options.slice(:include_priors)
-    @course.enrollments_visible_to(@user, enrollment_opts)
   end
 
   def name_method

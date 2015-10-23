@@ -503,7 +503,7 @@ class EnrollmentsApiController < ApplicationController
     end
 
     if authorized_action(@context, @current_user, [:read_roster, :view_all_grades, :manage_grades])
-      scope = @context.enrollments_visible_to(@current_user, :type => :all, :include_priors => true).where(enrollment_index_conditions)
+      scope = @context.apply_enrollment_visibility(@context.all_enrollments, @current_user).where(enrollment_index_conditions)
       unless params[:state].present?
         scope = scope.active_or_pending
       end

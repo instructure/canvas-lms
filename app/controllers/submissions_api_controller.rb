@@ -173,7 +173,8 @@ class SubmissionsApiController < ApplicationController
   def index
     if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
       @assignment = @context.assignments.active.find(params[:assignment_id])
-      submissions = @assignment.submissions.where(:user_id => visible_user_ids)
+      visible_student_ids = @context.apply_enrollment_visibility(@context.student_enrollments, @current_user, section_ids).pluck(:user_id)
+      submissions = @assignment.submissions.where(:user_id => visible_student_ids)
       includes = Array.wrap(params[:include])
 
       if includes.include?("visibility") && @context.feature_enabled?(:differentiated_assignments)
@@ -247,14 +248,11 @@ class SubmissionsApiController < ApplicationController
 
     can_view_all = @context.grants_any_right?(@current_user, session, :manage_grades, :view_all_grades)
     if all && can_view_all
-      opts = { include_priors: true }
-      if @section
-        opts[:section_ids] = [@section.id]
-      end
       # this is a scope, and will generate subqueries
-      student_ids = @context.enrollments_visible_to(@current_user, opts).select(:user_id)
+      student_ids = @context.apply_enrollment_visibility(@context.all_student_enrollments, @current_user, section_ids).select(:user_id)
     elsif can_view_all
-      inaccessible_students = student_ids - visible_user_ids(:include_priors => true)
+      visible_student_ids = @context.apply_enrollment_visibility(@context.all_student_enrollments, @current_user, section_ids).pluck(:user_id)
+      inaccessible_students = student_ids - visible_student_ids
       if !inaccessible_students.empty?
         return render_unauthorized_action
       end
@@ -830,12 +828,8 @@ class SubmissionsApiController < ApplicationController
     api_find(students, user_id)
   end
 
-  def visible_user_ids(opts = {})
-    if @section
-      opts[:section_ids] = [@section.id]
-    end
-    scope = @context.enrollments_visible_to(@current_user, opts)
-    scope.pluck(:user_id)
+  def section_ids
+    @section ? [@section.id] : nil
   end
 
   def bulk_load_attachments_and_previews(submissions)

@@ -2047,11 +2047,12 @@ class Course < ActiveRecord::Base
 
   # returns a scope, not an array of users/enrollments
   def students_visible_to(user, include_priors=false)
-    enrollments_visible_to(user, :include_priors => include_priors, :return_users => true)
+    scope = include_priors ? self.all_students : self.students
+    self.apply_enrollment_visibility(scope, user)
   end
 
-  def enrollments_visible_to(user, opts = {})
-    visibilities = section_visibilities_for(user)
+  def enrollments_visible_to(user, opts={})
+    # because of course it's used in a plugin
     relation = []
     relation << 'all' if opts[:include_priors]
     if opts[:type] == :all
@@ -2066,15 +2067,23 @@ class Course < ActiveRecord::Base
     end
     relation = relation.join('_')
     # our relations don't all follow the same pattern
-    relation = case relation
-                 when 'all_enrollments'; 'enrollments'
-                 when 'enrollments'; 'current_enrollments'
-                 else; relation
-               end
-    scope = self.send(relation.to_sym)
-    if opts[:section_ids]
-      scope = scope.where('enrollments.course_section_id' => opts[:section_ids].to_a)
+    unless opts[:include_deleted]
+      relation = case relation
+                   when 'all_enrollments'; 'enrollments'
+                   when 'enrollments'; 'current_enrollments'
+                   else; relation
+                 end
     end
+    self.apply_enrollment_visibility(self.send(relation.to_sym), user, opts[:section_ids])
+  end
+
+  # can apply to user scopes as well if through enrollments (e.g. students, teachers)
+  def apply_enrollment_visibility(scope, user, section_ids=nil)
+    if section_ids
+      scope = scope.where('enrollments.course_section_id' => section_ids.to_a)
+    end
+
+    visibilities = section_visibilities_for(user)
     visibility_level = enrollment_visibility_level_for(user, visibilities)
     account_admin = visibility_level == :full && visibilities.empty?
     # teachers, account admins, and student view students can see student view students
@@ -2747,7 +2756,7 @@ class Course < ActiveRecord::Base
   end
 
   def re_send_invitations!(from_user)
-    self.enrollments_visible_to(from_user).invited.except(:preload).preload(user: :communication_channels).find_each do |e|
+    self.apply_enrollment_visibility(self.student_enrollments, from_user).invited.except(:preload).preload(user: :communication_channels).find_each do |e|
       e.re_send_confirmation! if e.invited?
     end
   end

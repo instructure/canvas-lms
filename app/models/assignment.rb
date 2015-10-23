@@ -1394,7 +1394,7 @@ class Assignment < ActiveRecord::Base
       }
     end
 
-    enrollments = context.enrollments_visible_to(user)
+    enrollments = context.apply_enrollment_visibility(context.student_enrollments, user)
 
     is_provisional = grading_role == :provisional_grader || grading_role == :moderator
     rubric_assmnts = visible_rubric_assessments_for(user, :provisional_grader => is_provisional) || []

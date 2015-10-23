@@ -143,7 +143,7 @@ class AssignmentsController < ApplicationController
       @can_view_grades = @context.grants_right?(@current_user, session, :view_all_grades)
       @can_grade = @assignment.grants_right?(@current_user, session, :grade)
       if @can_view_grades || @can_grade
-        visible_student_ids = @context.enrollments_visible_to(@current_user, :include_priors => true).pluck(:user_id)
+        visible_student_ids = @context.apply_enrollment_visibility(@context.all_student_enrollments, @current_user).pluck(:user_id)
         @current_student_submissions = @assignment.submissions.where("submissions.submission_type IS NOT NULL").where(:user_id => visible_student_ids).to_a
       end
 

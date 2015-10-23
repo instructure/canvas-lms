@@ -1737,8 +1737,8 @@ class UsersController < ApplicationController
         enrollments = student.student_enrollments.active.preload(:course).shard(student).to_a
         enrollments.each do |enrollment|
           should_include = enrollment.course.user_has_been_instructor?(@teacher) &&
-                           enrollment.course.enrollments_visible_to(@teacher, :include_priors => true).where(id: enrollment).first &&
-                           enrollment.course.grants_right?(@current_user, :read_reports)
+                           enrollment.course.grants_right?(@current_user, :read_reports) &&
+                           enrollment.course.apply_enrollment_visibility(enrollment.course.all_student_enrollments, @teacher).where(id: enrollment).first
           if should_include
             Enrollment.recompute_final_score_if_stale(enrollment.course, student) { enrollment.reload }
             @courses[enrollment.course] = teacher_activity_report(@teacher, enrollment.course, [enrollment])
@@ -1757,7 +1757,8 @@ class UsersController < ApplicationController
           redirect_to_referrer_or_default(root_url)
         elsif authorized_action(course, @current_user, :read_reports)
           Enrollment.recompute_final_score_if_stale(course)
-          @courses[course] = teacher_activity_report(@teacher, course, course.enrollments_visible_to(@teacher, :include_priors => true))
+          enrollments = course.apply_enrollment_visibility(course.all_student_enrollments, @teacher)
+          @courses[course] = teacher_activity_report(@teacher, course, enrollments)
         end
       end
 

@@ -3178,11 +3178,13 @@ describe Course, "section_visibility" do
     it "should return student view students to account admins" do
       @course.student_view_student
       @admin = account_admin_user
-      expect(@course.enrollments_visible_to(@admin).map(&:user)).to be_include(@course.student_view_student)
+      visible_enrollments = @course.apply_enrollment_visibility(@course.student_enrollments, @admin)
+      expect(visible_enrollments.map(&:user)).to be_include(@course.student_view_student)
     end
 
     it "should return student view students to student view students" do
-      expect(@course.enrollments_visible_to(@course.student_view_student).map(&:user)).to be_include(@course.student_view_student)
+      visible_enrollments = @course.apply_enrollment_visibility(@course.student_enrollments, @course.student_view_student)
+      expect(visible_enrollments.map(&:user)).to be_include(@course.student_view_student)
     end
   end
 
@@ -3196,7 +3198,7 @@ describe Course, "section_visibility" do
     end
 
     it "should return non-limited admins from other sections" do
-      expect(@course.enrollments_visible_to(@ta, :type => :teacher, :return_users => true)).to eq [@teacher]
+      expect(@course.apply_enrollment_visibility(@course.teachers, @ta)).to eq [@teacher]
     end
   end
 

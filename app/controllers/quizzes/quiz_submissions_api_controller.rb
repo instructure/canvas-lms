@@ -167,7 +167,8 @@ class Quizzes::QuizSubmissionsApiController < ApplicationController
   def index
     quiz_submissions = if @context.grants_any_right?(@current_user, session, :manage_grades, :view_all_grades)
       # teachers have access to all student submissions
-      Api.paginate @quiz.quiz_submissions.where(:user_id => visible_user_ids),
+      visible_student_ids = @context.apply_enrollment_visibility(@context.student_enrollments, @current_user).pluck(:user_id)
+      Api.paginate @quiz.quiz_submissions.where(:user_id => visible_student_ids),
         self,
         api_v1_course_quiz_submissions_url(@context, @quiz)
     elsif @quiz.grants_right?(@current_user, session, :submit)
@@ -407,11 +408,6 @@ class Quizzes::QuizSubmissionsApiController < ApplicationController
 
   def previewing?
     !!params[:preview]
-  end
-
-  def visible_user_ids(opts = {})
-    scope = @context.enrollments_visible_to(@current_user, opts)
-    scope.pluck(:user_id)
   end
 
   def serialize_and_render(quiz_submissions)
