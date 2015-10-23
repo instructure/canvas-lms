@@ -6,9 +6,12 @@
    end
   if group
     roles_stuff = %Q|role="region" aria-label="#{t('Question Group')}"|
+    question_count = question_bank ? question_bank.assessment_question_count : hash_get(group, :questions, []).count
   end
 %>
-<div <%= roles_stuff ? roles_stuff : nil %> class="quiz_sortable group_top <%= 'question_bank_top' if question_bank %>" style="<%= "display: none;" unless group %>" id="group_top_<%= hash_get(group, :id, 'template') %>">
+<div <%= roles_stuff ? roles_stuff : nil %> class="quiz_sortable group_top <%= 'question_bank_top' if question_bank %>" style="<%= "display: none;" unless group %>" id="group_top_<%= hash_get(group, :id, 'template') %>"
+  <% if question_bank %>data-bank_question_count="<%= question_count %>"<% end %>
+>
   <%= form_for :quiz_group, :url => context_url(@context, :context_quiz_quiz_groups_url, @quiz.id), :html => {:class => "quiz_group_form"} do |f| %>
     <% if can_do(@quiz, @current_user, :update) %>
     <%= render partial: "quizzes/quizzes/move_handle" %>
@@ -73,6 +76,10 @@
     <span class="bank_name" style="font-weight: bold; <%= hidden if question_bank %>"><%= question_bank.try(:title) %></span>
   </div>
 <% end %>
+<div class="insufficient_count_warning" id="insufficient_count_warning_<%= hash_get(group, :id, 'template') %>"  style="<%= hidden %>">
+  <i class="icon-warning"></i>
+  <%= t('This question group is set to pick more questions than are available.') %>
+</div>
 <% hash_get(group, :questions, []).each do |question| %>
   <%= render :partial => "display_question", :object => question, :locals => {:in_group => true, :editing => true, :asset_string => "quiz_question_#{question['id']}", :group_id => group["id"]} %>
 <% end %>

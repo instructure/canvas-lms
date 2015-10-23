@@ -125,6 +125,83 @@ describe "quizzes" do
       expect(pick_count_field).to have_attribute(:value, "999")
     end
 
+    describe "insufficient count warnings" do
+      it "should show a warning for groups picking too many questions" do
+        get "/courses/#{@course.id}/quizzes/new"
+        click_questions_tab
+        f('.add_question_group_link').click
+        submit_form('.quiz_group_form')
+        wait_for_ajaximations
+
+        expect(f(".insufficient_count_warning")).to be_displayed
+
+        add_question_to_group
+        wait_for_ajaximations
+
+        expect(f(".insufficient_count_warning")).to_not be_displayed
+
+        f('#questions .edit_group_link').click
+        replace_content(f('#questions .group_top input[name="quiz_group[pick_count]"]'), '2')
+        submit_form('.quiz_group_form')
+        wait_for_ajaximations
+        expect(f(".insufficient_count_warning")).to be_displayed
+
+        # save and reload
+        expect_new_page_load{ f('.save_quiz_button').click }
+        quiz = @course.quizzes.last
+        get "/courses/#{@course.id}/quizzes/#{quiz.id}/edit"
+
+        click_questions_tab
+        wait_for_ajaximations
+
+        expect(f(".insufficient_count_warning")).to be_displayed
+
+        add_question_to_group
+        wait_for_ajaximations
+
+        expect(f(".insufficient_count_warning")).to_not be_displayed
+      end
+
+      it "should show a warning for groups picking too many questions from a bank" do
+        bank = @course.assessment_question_banks.create!
+        assessment_question_model(bank: bank)
+
+        get "/courses/#{@course.id}/quizzes/new"
+        click_questions_tab
+        f('.add_question_group_link').click
+
+        f('.find_bank_link').click
+        keep_trying_until { fj('#find_bank_dialog .bank:visible') }.click
+        submit_dialog('#find_bank_dialog', '.submit_button')
+        submit_form('.quiz_group_form')
+        wait_for_ajaximations
+
+        expect(f(".insufficient_count_warning")).to_not be_displayed
+
+        f('#questions .edit_group_link').click
+        replace_content(f('#questions .group_top input[name="quiz_group[pick_count]"]'), '2')
+        submit_form('.quiz_group_form')
+        wait_for_ajaximations
+        expect(f(".insufficient_count_warning")).to be_displayed
+
+        # save and reload
+        expect_new_page_load{ f('.save_quiz_button').click }
+        quiz = @course.quizzes.last
+        get "/courses/#{@course.id}/quizzes/#{quiz.id}/edit"
+
+        click_questions_tab
+        wait_for_ajaximations
+
+        expect(f(".insufficient_count_warning")).to be_displayed
+
+        f('#questions .edit_group_link').click
+        replace_content(f('#questions .group_top input[name="quiz_group[pick_count]"]'), '1')
+        submit_form('.quiz_group_form')
+        wait_for_ajaximations
+        expect(f(".insufficient_count_warning")).to_not be_displayed
+      end
+    end
+
     describe "moderation" do
 
       before do

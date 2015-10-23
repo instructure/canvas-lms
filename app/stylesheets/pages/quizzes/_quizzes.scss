@@ -504,7 +504,7 @@ li.quiz {
       -moz-border-radius: 5px;
     }
   }
-  .assessment_question_bank, .question_holder.group {
+  .assessment_question_bank, .question_holder.group, .insufficient_count_warning {
     border-left: 1px solid #aaa;
     border-right: 1px solid #aaa;
     border-top: 0;
@@ -513,6 +513,13 @@ li.quiz {
     padding-top: 1em;
     -moz-border-radius: 0;
   }
+
+  .insufficient_count_warning {
+    i.icon-warning {
+      color: $ic-color-alert;
+    }
+  }
+
   .question_holder.group {
     padding-bottom: 10px;
     .question {

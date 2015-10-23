@@ -814,6 +814,13 @@ define([
         var groupId = this.id.replace("group_top_","")
         questionCount = $(this.parentElement).find("[data-group-id='" + groupId + "']").length
 
+        var $warning = $('#insufficient_count_warning_' + groupId);
+        if (pickCount > ($(this).data('bank_question_count') || questionCount)) {
+          $warning.show();
+        } else {
+          $warning.hide();
+        }
+
         // unless it is a question bank, make sure
         // enough questions are in the group
         if(!$(this).hasClass("question_bank_top")){
@@ -2396,7 +2403,7 @@ define([
       $findBankDialog.find(".submit_button").attr('disabled', false);
     }).delegate('.submit_button', 'click', function() {
       var $bank = $findBankDialog.find(".bank.selected:first");
-      var bank = $bank.getTemplateData({textValues: ['title'], dataValues: ['id', 'context_id', 'context_type']});
+      var bank = $bank.data('bank_data');
       var $form = $findBankDialog.data('form');
       $form.find(".bank_id").val(bank.id);
       bank.bank_name = bank.title;
@@ -3128,6 +3135,7 @@ define([
           hrefValues: ['id']
         });
         $group.toggleClass('question_bank_top', !!group.assessment_question_bank_id);
+
         var $bank = $group.next('.assessment_question_bank');
         if (!group.assessment_question_bank_id) {
           $bank.remove();
@@ -3135,15 +3143,23 @@ define([
           var bank = $bank.data('bank_data');
           bank.bank_id = bank.id;
           bank.context_type_string = pluralize($.underscore(bank.context_type));
+          $group.data('bank_question_count', bank.assessment_question_count);
           $group.next(".assessment_question_bank").fillTemplateData({data: bank, hrefValues: ['bank_id', 'context_type_string', 'context_id']})
             .find(".bank_name").hide().filter(".bank_name_link").show();
         }
+
         $group.find(".find_bank_link").hide();
         $group.fillFormData(data, {object_name: 'quiz_group'});
         var $bottom = $group.next();
         while($bottom.length > 0 && !$bottom.hasClass('group_bottom')) {
           $bottom = $bottom.next();
         }
+
+        if ($('#insufficient_count_warning_' + group.id).length == 0) {
+          var $warning = $("#insufficient_count_warning_template").clone(true).attr('id', ('insufficient_count_warning_' + group.id));
+          $bottom.before($warning);
+        }
+
         $("#unpublished_changes_message").slideDown();
         $bottom.attr('id', 'group_bottom_' + group.id);
         quiz.updateDisplayComments();
