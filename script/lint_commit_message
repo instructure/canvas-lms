@@ -110,7 +110,7 @@ if issue_ids.empty?
   end
 end
 
-has_a_test_plan = commit_message =~ /test plan/i
+has_a_test_plan = commit_message =~ /test[ -]plan/i
 unless has_a_test_plan
   comment "warn", 3, "y u no add test plan? ლ(ಠ益ಠლ)"
 end
