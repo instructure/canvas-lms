@@ -5,7 +5,17 @@ class EpubExport < ActiveRecord::Base
   belongs_to :content_export
   belongs_to :course
   belongs_to :user
-  has_one :attachment, as: :context, dependent: :destroy
+  with_options({
+    as: :context, class_name: 'Attachment', order: 'created_at DESC'
+  }) do |association|
+    association.has_many :attachments, dependent: :destroy
+    association.has_one :epub_attachment, conditions: {
+      content_type: 'application/epub+zip'
+    }
+    association.has_one :zip_attachment, conditions: {
+      content_type: 'application/zip'
+    }
+  end
   has_one :job_progress, as: :context, class_name: 'Progress'
   validates :course_id, :workflow_state, presence: true
 
@@ -111,21 +121,28 @@ class EpubExport < ActiveRecord::Base
   end
 
   def convert_to_epub
-    epub_path = super
+    file_paths = super
 
-    begin
-      file = File.open(epub_path)
-      create_attachment({
-        filename: File.basename(epub_path),
-        uploaded_data: file
-      })
-      mark_as_generated
-    rescue Errno::ENOENT => e
-      mark_as_failed
-      raise e
-    ensure
-      file.close if file
+    file_paths.each do |file_path|
+      begin
+        mime_type = MIME::Types.type_for(file_path).first
+        file = Rack::Multipart::UploadedFile.new(
+          file_path,
+          mime_type.try(:content_type)
+        )
+        self.attachments.create({
+          filename: File.basename(file_path),
+          uploaded_data: file
+        })
+      rescue Errno::ENOENT => e
+        mark_as_failed
+        raise e
+      ensure
+        file.close if file
+      end
     end
+    mark_as_generated
+    file_paths
   end
   handle_asynchronously :convert_to_epub, priority: Delayed::LOW_PRIORITY, max_attempts: 1
 

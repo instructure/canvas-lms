@@ -36,10 +36,12 @@ module Api::V1::EpubExport
       attrs.progress_id = epub_export.job_progress.id
       attrs.progress_url = polymorphic_url([:api_v1, epub_export.job_progress])
 
-      if epub_export.attachment
-        attrs.attachment = attachment_json(epub_export.attachment, @current_user, {}, {
-          can_view_hidden_files: true
-        })
+      [ :epub_attachment, :zip_attachment ].each do |attachment_type|
+        if epub_export.send(attachment_type).present?
+          attrs[attachment_type] = attachment_json(epub_export.send(attachment_type), @current_user, {}, {
+            can_view_hidden_files: true
+          })
+        end
       end
     end
   end

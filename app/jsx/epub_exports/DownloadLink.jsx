@@ -22,20 +22,28 @@ define([
     // Rendering
     //
 
-    render() {
-      var url;
-
-      if (!this.showDownloadLink())
+    downloadLink (attachment, message) {
+      if (_.isObject(attachment)) {
+        return (
+          <a href={attachment.url} className="icon-download">
+            {message}
+          </a>
+        );
+      } else {
         return null;
+      };
+    },
 
-      if (_.isObject(this.epubExport().attachment)) {
-        url = this.epubExport().attachment.url;
+    render() {
+      if (!this.showDownloadLink()) {
+        return null;
       };
 
       return (
-        <a href={url} className="icon-download">
-          {I18n.t("Download")}
-        </a>
+        <span>
+          {this.downloadLink(this.epubExport().epub_attachment, I18n.t("Download ePub"))}
+          {this.downloadLink(this.epubExport().zip_attachment, I18n.t("Download Associated Files"))}
+        </span>
       );
     }
   });

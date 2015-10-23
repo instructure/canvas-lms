@@ -25,7 +25,8 @@ module EpubExports
         course_id: courses_without_epub_exports,
         user_id: current_user
       }).select("DISTINCT ON (epub_exports.course_id) epub_exports.*").
-      order("course_id, created_at DESC").preload(:attachment, :job_progress)
+      order("course_id, created_at DESC").
+      preload(:epub_attachment, :job_progress, :zip_attachment)
     end
   end
 end

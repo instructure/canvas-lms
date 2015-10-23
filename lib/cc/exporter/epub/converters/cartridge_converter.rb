@@ -19,7 +19,9 @@ module CC::Exporter::Epub::Converters
       @resources = {}
       @course[:syllabus] = []
       @resource_nodes_for_flat_manifest = {}
+      @unsupported_files = []
     end
+    attr_reader :unsupported_files
 
     def convert_placeholder_paths_from_string!(html_string)
       html_node = Nokogiri::HTML::DocumentFragment.parse(html_string)
@@ -62,7 +64,7 @@ module CC::Exporter::Epub::Converters
       get_all_resources(@manifest)
 
       @course[:title] = get_node_val(@manifest, "string")
-      @course[:files] = convert_files
+      @course[:files], @unsupported_files = convert_files
 
       set_progress(10)
       @course[:wikis] = convert_wikis

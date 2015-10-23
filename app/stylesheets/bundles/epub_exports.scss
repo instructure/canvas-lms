@@ -1,2 +1,10 @@
 @import "base/environment";
 @import "components/ProgressBar";
+
+.epub-exports-admin-controls {
+  a {
+    font-size: 14px;
+    line-height: 20px;
+    padding: 8px 14px;
+  }
+}

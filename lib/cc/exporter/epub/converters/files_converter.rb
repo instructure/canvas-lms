@@ -137,13 +137,11 @@ module CC::Exporter::Epub::Converters
         FilePresenter.new(original_path, res).to_h
       end
 
-      # Unsupported file types will end up with a `nil` media_type, and they should
-      # not be included in the final files hash. The reason we do not filter them out
-      # initially is because we attempt to manipulate certainly unsupported files types,
-      # namely flvs, and we do not want to remove them from the collection until we're
-      # sure there is nothing that can be done.
-      all_files.reject do |file|
-        file[:media_type].nil?
+      # Unsupported file types will end up with a `nil` media_type, and they
+      # should be returned as a separate collection, as the ePub exporter
+      # handles unsupported file types differently.
+      all_files.partition do |file|
+        file[:media_type].present?
       end
     end
   end

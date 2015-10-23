@@ -39,9 +39,10 @@ module CC::Exporter::Epub::Converters
           else
             match.replace(<<-SPAN_TAG)
               <span>
-                #{I18n.t("File %{filename} could not be included in the ePub document.", {
-                  filename: File.basename(unescaped)
-                })}
+                #{I18n.t(<<-TEXT, filename: File.basename(unescaped))
+                  File %{filename} could not be included in the ePub document. Please see separate zip file for access.
+                TEXT
+                }
               </span>
             SPAN_TAG
           end

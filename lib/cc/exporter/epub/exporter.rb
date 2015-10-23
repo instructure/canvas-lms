@@ -24,11 +24,10 @@ module CC::Exporter::Epub
       @sort_by_content = sort_by_content || cartridge_json[:modules].empty?
     end
     attr_reader :cartridge, :sort_by_content
+    delegate :unsupported_files, to: :cartridge_converter, allow_nil: true
 
     def cartridge_json
-      @_cartridge_json ||= Converters::CartridgeConverter.new({
-        archive_file: cartridge
-      }).export
+      @_cartridge_json ||= cartridge_converter.export
     end
 
     def templates
@@ -67,5 +66,11 @@ module CC::Exporter::Epub
       "../templates/#{resource}_template.html.erb"
     end
 
+    private
+    def cartridge_converter
+      @_cartridge_converter ||= Converters::CartridgeConverter.new({
+        archive_file: cartridge
+      })
+    end
   end
 end
