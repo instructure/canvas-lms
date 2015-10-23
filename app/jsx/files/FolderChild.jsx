@@ -53,6 +53,7 @@ define([
             placeholder= {I18n.t('name', 'Name')}
             ariaLabel= {I18n.t('folder_name', 'Folder Name')}
             defaultValue= {this.props.model.displayName()}
+            maxLength='255'
             onKeyUp= {function (event){ if (event.keyCode === 27) {this.cancelEditingName()} }.bind(this)}
           />
           <button

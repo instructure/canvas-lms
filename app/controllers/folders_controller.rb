@@ -488,7 +488,7 @@ class FoldersController < ApplicationController
           end
         else
           format.html { render :new }
-          format.json { render :json => @folder.errors }
+          format.json { render :json => @folder.errors, :status => :bad_request }
         end
       end
     end
