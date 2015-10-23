@@ -6,7 +6,7 @@ define([
   'jsx/shared/ApiProgressBar',
   'jsx/epub_exports/CourseStore',
   'i18n!epub_exports',
-  'jsx/files/FriendlyDatetime',
+  'jsx/shared/FriendlyDatetime',
   'bower/classnames/index'
 ], function(React, _, GenerateLink, DownloadLink, ApiProgressBar, CourseEpubExportStore, I18n, FriendlyDatetime, classnames) {
   var CourseListItem = React.createClass({
@@ -50,7 +50,7 @@ define([
       };
       timestamp = this.epubExport().updated_at;
 
-      return <FriendlyDatetime datetime={timestamp} />;
+      return <FriendlyDatetime dateTime={timestamp} />;
     },
 
     render() {

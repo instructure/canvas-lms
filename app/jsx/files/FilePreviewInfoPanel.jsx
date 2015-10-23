@@ -1,7 +1,7 @@
 define([
   'react',
   'i18n!file_preview',
-  'jsx/files/FriendlyDatetime',
+  'jsx/shared/FriendlyDatetime',
   'compiled/util/friendlyBytes',
   'compiled/react_files/modules/customPropTypes',
   'compiled/react_files/utils/getFileStatus',

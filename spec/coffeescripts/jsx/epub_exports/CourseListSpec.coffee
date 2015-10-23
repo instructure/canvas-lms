@@ -19,12 +19,14 @@ define [
       }
 
   test 'render', ->
-    component = TestUtils.renderIntoDocument(CourseList(courses: {}))
+    CourseListElement = React.createElement(CourseList, courses: {})
+    component = TestUtils.renderIntoDocument(CourseListElement)
     node = component.getDOMNode()
     equal node.querySelectorAll('li').length, 0, 'should not render list items'
     React.unmountComponentAtNode(node.parentNode)
 
-    component = TestUtils.renderIntoDocument(CourseList(courses: @props))
+    CourseListElement = React.createElement(CourseList, courses: @props)
+    component = TestUtils.renderIntoDocument(CourseListElement)
     node = component.getDOMNode()
     equal node.querySelectorAll('li').length, Object.keys(@props).length,
       'should have an li element per course in @props'

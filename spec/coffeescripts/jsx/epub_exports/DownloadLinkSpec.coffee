@@ -16,7 +16,8 @@ define [
       }
 
   test 'state showDownloadLink', ->
-    component = TestUtils.renderIntoDocument(DownloadLink(@props))
+    DownloadLinkElement = React.createElement(DownloadLink, @props)
+    component = TestUtils.renderIntoDocument(DownloadLinkElement)
     ok !component.showDownloadLink(), 'should be false without epub_export object'
 
     @props.course.epub_export = {
@@ -24,7 +25,8 @@ define [
         download: false
       }
     }
-    component = TestUtils.renderIntoDocument(DownloadLink(@props))
+    DownloadLinkElement = React.createElement(DownloadLink, @props)
+    component = TestUtils.renderIntoDocument(DownloadLinkElement)
     ok !component.showDownloadLink(), 'should be false without permissions to download'
 
     @props.course.epub_export = {
@@ -35,12 +37,14 @@ define [
         download: true
       }
     }
-    component = TestUtils.renderIntoDocument(DownloadLink(@props))
+    DownloadLinkElement = React.createElement(DownloadLink, @props)
+    component = TestUtils.renderIntoDocument(DownloadLinkElement)
     ok component.showDownloadLink(), 'should be true with permissions to download'
     React.unmountComponentAtNode(component.getDOMNode().parentNode)
 
   test 'render', ->
-    component = TestUtils.renderIntoDocument(DownloadLink(@props))
+    DownloadLinkElement = React.createElement(DownloadLink, @props)
+    component = TestUtils.renderIntoDocument(DownloadLinkElement)
     node = component.getDOMNode()
     ok _.isNull(node)
 
@@ -52,7 +56,8 @@ define [
         download: true
       }
     }
-    component = TestUtils.renderIntoDocument(DownloadLink(@props))
+    DownloadLinkElement = React.createElement(DownloadLink, @props)
+    component = TestUtils.renderIntoDocument(DownloadLinkElement)
     node = component.getDOMNode()
     link = node.querySelectorAll('a')[0]
     equal link.tagName, 'A', 'tag should be link'

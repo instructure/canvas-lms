@@ -7,7 +7,7 @@ define [
   '../modules/customPropTypes'
   'Backbone'
   'i18n!file_preview'
-  'jsx/files/FriendlyDatetime'
+  'jsx/shared/FriendlyDatetime'
   'compiled/util/friendlyBytes'
   'compiled/models/Folder'
   'compiled/models/File'

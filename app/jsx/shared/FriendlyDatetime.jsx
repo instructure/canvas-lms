@@ -3,14 +3,13 @@ define ([
   'react',
   'timezone',
   'underscore',
-  'compiled/object/assign',
   'jquery',
   'jquery.instructure_date_and_time'
-], function (I18n, React, tz, _, ObjectAssign, $) {
+], function (I18n, React, tz, _, $) {
 
 
   var slowRender = function () {
-    var datetime = this.props.datetime;
+    var datetime = this.props.dateTime;
     if (!datetime) {
       return (<time></time>);
     }
@@ -20,7 +19,7 @@ define ([
     var fudged = $.fudgeDateForProfileTimezone(datetime);
     var friendly = $.friendlyDatetime(fudged);
 
-    var timeProps = ObjectAssign(this.props, {
+    var timeProps = _.extend({}, this.props, {
       title: $.datetimeString(datetime),
       dateTime: datetime.toISOString()
     });
@@ -45,10 +44,10 @@ define ([
     displayName: 'FriendlyDatetime',
 
     propTypes: {
-      datetime: React.PropTypes.oneOfType([
+      dateTime: React.PropTypes.oneOfType([
         React.PropTypes.string,
         React.PropTypes.instanceOf(Date)
-      ])
+      ]).isRequired
     },
 
     // The original render function is really slow because of all
@@ -56,7 +55,7 @@ define ([
     // As long as @props.datetime stays same, we don't have to recompute our output.
     // memoizing like this beat React.addons.PureRenderMixin 3x
     render: _.memoize(slowRender, function () {
-      return this.props.datetime;
+      return this.props.dateTime;
     })
 
   });
