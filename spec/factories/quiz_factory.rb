@@ -241,16 +241,18 @@ def assignment_quiz(questions, opts={})
   course = opts[:course] || course(:active_course => true)
   user = opts[:user] || user(:active_user => true)
   course.enroll_student(user, :enrollment_state => 'active') unless user.enrollments.any? { |e| e.course_id == course.id }
-  @assignment = course.assignments.create(:title => "Test Assignment")
+  @assignment = course.assignments.create(title: opts.fetch(:title, "Test Assignment"))
   @assignment.workflow_state = "published"
   @assignment.submission_types = "online_quiz"
   @assignment.save
   @quiz = Quizzes::Quiz.where(assignment_id: @assignment).first
   @questions = questions.map { |q| @quiz.quiz_questions.create!(q) }
   @quiz.generate_quiz_data
-  @quiz.published_at = Time.now
+  @quiz.due_at = opts.fetch(:due_at, Time.zone.now.advance(days: 7))
+  @quiz.published_at = Time.zone.now
   @quiz.workflow_state = "available"
   @quiz.save!
+  @quiz
 end
 
 # The block should return the submission_data. A block is used so

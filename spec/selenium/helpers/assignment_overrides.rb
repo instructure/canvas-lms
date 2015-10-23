@@ -278,7 +278,7 @@ module AssignmentOverridesSeleniumHelper
     date.strftime('%b %-d')
   end
 
-  # Formatted output: Mmm d at h, e.g. 'Jan 1 at 1:01pm'
+  # Formatted output: Mmm d at h:mm, e.g. 'Jan 1 at 1:01pm'
   # Note: Removes on-the-hour minutes, e.g. '5:00pm' becomes '5pm'
   def format_time_for_view(time)
     formatter = '%b %-d at %-l'
