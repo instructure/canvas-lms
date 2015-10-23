@@ -1085,10 +1085,12 @@ class User < ActiveRecord::Base
   def has_subset_of_account_permissions?(user, account)
     return true if user == self
     return false unless account.root_account?
-    account_users = account.all_account_users_for(self)
-    return true if account_users.empty?
-    account_users.all? do |account_user|
-      account_user.is_subset_of?(user)
+
+    Rails.cache.fetch(['has_subset_of_account_permissions', self, user, account].cache_key, :expires_in => 60.minutes) do
+      account_users = account.all_account_users_for(self)
+      account_users.all? do |account_user|
+        account_user.is_subset_of?(user)
+      end
     end
   end
 
