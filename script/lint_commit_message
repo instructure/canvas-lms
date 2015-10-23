@@ -3,6 +3,7 @@
 require 'shellwords'
 require 'json'
 require 'jira_ref_parser'
+require 'yaml'
 
 def comment(severity, line, message, link_to_guidelines = false)
   $stderr.puts "line #{line}: [#{severity}]: #{message}"
@@ -75,6 +76,18 @@ if long_lines.size > 0
     (long_lines.size > 1 ? " (note that #{long_lines.size - 1} other long lines follow this one)" : ""), true
 end
 
+is_a_selinimum_test = commit_message.split("[selinimum:ignore_intermediate_commits]")
+if is_a_selinimum_test.size > 1
+  line = is_a_selinimum_test[0].count("\n") + 1
+  comment "error", line, "since you're telling selinimum to ignore intermediate commits, this commit may not be safe to merge"
+end
+
+user_config_file = File.expand_path("../../gems/rubocop-canvas/config/gergich_user_config.yml", __FILE__)
+if File.exists?(user_config_file)
+  config = YAML.load_file(user_config_file) || {}
+  user_list = config['only_report_errors'] || []
+  exit if user_list.include?(ENV['GERRIT_EVENT_ACCOUNT_EMAIL'])
+end
 
 starts_with_spec = subject =~ /\Aspec: /i
 exit if starts_with_spec # we're trusting you here, don't be evil
@@ -100,10 +113,4 @@ end
 has_a_test_plan = commit_message =~ /test plan/i
 unless has_a_test_plan
   comment "warn", 3, "y u no add test plan? ლ(ಠ益ಠლ)"
-end
-
-is_a_selinimum_test = commit_message.split("[selinimum:ignore_intermediate_commits]")
-if is_a_selinimum_test.size > 1
-  line = is_a_selinimum_test[0].count("\n") + 1
-  comment "error", line, "since you're telling selinimum to ignore intermediate commits, this commit may not be safe to merge"
 end
