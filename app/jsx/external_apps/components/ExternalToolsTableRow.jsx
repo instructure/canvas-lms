@@ -31,7 +31,7 @@ define([
                 <i className={"icon-mini-arrow-down"}></i>
                 <span className={"screenreader-only"}>{ this.props.tool.name + ' ' + I18n.t('Settings') }</span>
               </a>
-              <ul className={"al-options"} role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" >
+              <ul className={"al-options"} role="menu" tabIndex="0" aria-hidden="true" aria-expanded="false" >
                 {configureButton}
                 <EditExternalToolButton ref="editExternalToolButton" tool={this.props.tool} />
                 <ExternalToolPlacementButton ref="externalToolPlacementButton" tool={this.props.tool} />

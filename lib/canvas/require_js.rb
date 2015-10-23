@@ -112,7 +112,7 @@ module Canvas
       def shims
         <<-JS.gsub(%r{\A +|^ {8}}, '')
           {
-            'bower/react-router/dist/react-router': {
+            'bower/react-router/build/umd/ReactRouter': {
               deps: ['react'],
               exports: 'ReactRouter'
             },

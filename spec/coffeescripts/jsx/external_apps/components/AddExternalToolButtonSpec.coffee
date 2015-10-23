@@ -10,10 +10,10 @@ define [
 
 
   createElement = ->
-    AddExternalToolButton({})
+    React.createElement(AddExternalToolButton)
 
   renderComponent = ->
-    React.renderComponent(createElement(), wrapper)
+    React.render(createElement(), wrapper)
 
   getDOMNodes = ->
     component = renderComponent()

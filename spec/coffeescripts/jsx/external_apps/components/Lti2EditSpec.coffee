@@ -8,7 +8,7 @@ define [
   wrapper = document.getElementById('fixtures')
 
   createElement = (data) ->
-    Lti2Edit({
+    React.createElement(Lti2Edit, {
       tool: data.tool
       handleActivateLti2: data.handleActivateLti2
       handleDeactivateLti2: data.handleDeactivateLti2
@@ -16,7 +16,7 @@ define [
     })
 
   renderComponent = (data) ->
-    React.renderComponent(createElement(data), wrapper)
+    React.render(createElement(data), wrapper)
 
   module 'ExternalApps.Lti2Edit',
     teardown: ->

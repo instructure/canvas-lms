@@ -14,13 +14,13 @@ define [
     ok true, 'handleToolInstalled called successfully'
 
   createElement = (data) ->
-    AddApp({
+    React.createElement(AddApp, {
       handleToolInstalled: data.handleToolInstalled
       app: data.app
     })
 
   renderComponent = (data) ->
-    React.renderComponent(createElement(data), wrapper)
+    React.render(createElement(data), wrapper)
 
   getDOMNodes = (data) ->
     component = renderComponent(data)

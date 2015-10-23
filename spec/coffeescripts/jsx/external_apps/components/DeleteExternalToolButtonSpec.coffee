@@ -12,12 +12,12 @@ define [
   Modal.setAppElement(wrapper)
 
   createElement = (data) ->
-    DeleteExternalToolButton({
+    React.createElement(DeleteExternalToolButton, {
       tool: data.tool
     })
 
   renderComponent = (data) ->
-    React.renderComponent(createElement(data), wrapper)
+    React.render(createElement(data), wrapper)
 
   getDOMNodes = (data) ->
     component        = renderComponent(data)
