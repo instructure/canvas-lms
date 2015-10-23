@@ -28,7 +28,8 @@ define [
         handleTokenRemove: ->
         replaceDate: ->
 
-      @dueDateRow = React.render(DueDateRow(props), $('<div>').appendTo('body')[0])
+      DueDateRowElement = React.createElement(DueDateRow, props)
+      @dueDateRow = React.render(DueDateRowElement, $('<div>').appendTo('body')[0])
 
     teardown: ->
       fakeENV.teardown()
@@ -64,7 +65,8 @@ define [
         handleTokenRemove: ->
         replaceDate: ->
 
-      @dueDateRow = React.render(DueDateRow(props), $('<div>').appendTo('body')[0])
+      DueDateRowElement = React.createElement(DueDateRow, props)
+      @dueDateRow = React.render(DueDateRowElement, $('<div>').appendTo('body')[0])
 
     teardown: ->
       fakeENV.teardown()

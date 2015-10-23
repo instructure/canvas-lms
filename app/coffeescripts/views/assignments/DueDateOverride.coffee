@@ -20,14 +20,14 @@ define [
       div = @$el[0]
       return unless div
 
-      DueDates = React.createFactory(DueDates)
-      React.render(
-        DueDates(
-          overrides: @model.overrides.models,
-          syncWithBackbone: @setNewOverridesCollection,
-          sections: @model.sections.models,
-          defaultSectionId: @model.defaultDueDateSectionId
-        ), div)
+      DueDatesElement = React.createElement(DueDates, {
+        overrides: @model.overrides.models,
+        syncWithBackbone: @setNewOverridesCollection,
+        sections: @model.sections.models,
+        defaultSectionId: @model.defaultDueDateSectionId
+      })
+
+      React.render(DueDatesElement, div)
 
     validateBeforeSave: (data, errors) =>
       return errors unless data

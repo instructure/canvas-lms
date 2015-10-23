@@ -19,14 +19,15 @@ define [
 
       props =
         overrides: [@override1, @override2, @override3]
-        defaultSectionId: 0
+        defaultSectionId: '0'
         sections: [{attributes: {id: 1, name: "Plebs"}},{attributes: {id: 2, name: "Patricians"}}]
         students: {1:{id: "1", name: "Scipio Africanus"}, 2: {id: "2", name: "Cato The Elder"}, 3:{id: 3, name: "Publius Publicoa"}}
         overrideModel: AssignmentOverride
         syncWithBackbone: ->
 
       @syncWithBackboneStub = @stub(props, 'syncWithBackbone')
-      @dueDates = React.render(DueDates(props), $('<div>').appendTo('body')[0])
+      DueDatesElement = React.createElement(DueDates, props)
+      @dueDates = React.render(DueDatesElement, $('<div>').appendTo('body')[0])
 
     teardown: ->
       React.unmountComponentAtNode(@dueDates.getDOMNode().parentNode)
@@ -78,11 +79,11 @@ define [
     equal @dueDates.sortedRowKeys().length, 1
 
   test 'defaultSection namer shows Everyone if no token is selected', ->
-    equal @dueDates.defaultSectionNamer(0), "Everyone Else"
+    equal @dueDates.defaultSectionNamer('0'), "Everyone Else"
 
   test 'defaultSection namer shows Everyone Else if a section or student is selected', ->
     @dueDates.setState(rows: {})
-    equal @dueDates.defaultSectionNamer(0), "Everyone"
+    equal @dueDates.defaultSectionNamer('0'), "Everyone"
 
   test 'can replace the dates of a row properly', ->
     initialDueAts = _.map @dueDates.state.rows, (row) ->

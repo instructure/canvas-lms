@@ -24,7 +24,8 @@ define [
         rowKey: "nullnullnull"
         labelledBy: "foo"
 
-      @dueDateCalendarPicker = React.render(DueDateCalendarPicker(props), $('<div>').appendTo('body')[0])
+      DueDateCalendarPickerElement = React.createElement(DueDateCalendarPicker, props)
+      @dueDateCalendarPicker = React.render(DueDateCalendarPickerElement, $('<div>').appendTo('body')[0])
 
     teardown: ->
       fakeENV.teardown()
@@ -85,7 +86,8 @@ define [
         rowKey: "nullnullnull"
         labelledBy: "foo"
 
-      @dueDateCalendarPicker = React.render(DueDateCalendarPicker(props), $('<div>').appendTo('body')[0])
+      DueDateCalendarPickerElement = React.createElement(DueDateCalendarPicker, props)
+      @dueDateCalendarPicker = React.render(DueDateCalendarPickerElement, $('<div>').appendTo('body')[0])
 
     teardown: ->
       fakeENV.teardown()

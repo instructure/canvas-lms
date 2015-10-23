@@ -37,7 +37,8 @@ define [
         currentlySearching: false
         rowKey: "nullnullnull"
 
-      @DueDateTokenWrapper = React.render(DueDateTokenWrapper(props), $('<div>').appendTo('body')[0])
+      DueDateTokenWrapperElement = React.createElement(DueDateTokenWrapper, props)
+      @DueDateTokenWrapper = React.render(DueDateTokenWrapperElement, $('<div>').appendTo('body')[0])
       @TokenInput = @DueDateTokenWrapper.refs.TokenInput
 
     teardown: ->

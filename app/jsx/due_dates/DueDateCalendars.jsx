@@ -5,8 +5,6 @@ define([
   'i18n!assignments',
 ], (_ , React, DueDateCalendarPicker, I18n) => {
 
-  var DueDateCalendarPicker = React.createFactory(DueDateCalendarPicker)
-
   var DueDateCalendars = React.createClass({
 
     propTypes: {
