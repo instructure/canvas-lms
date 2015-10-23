@@ -4,9 +4,8 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/discussions_common')
 describe "discussion assignments" do
   include_context "in-process server selenium tests"
 
-  before :all do
-    Account.default
-    course_with_teacher_logged_in
+  before :once do
+    course_with_teacher(:active_all => true)
     @course.assignment_groups.create!(:name => "Assignment Group")
     @category1 = @course.group_categories.create!(:name => "category 1")
     @category1.configure_self_signup(true, false)
@@ -15,9 +14,12 @@ describe "discussion assignments" do
     @g1.save!
   end
 
+  before :each do
+    user_session(@teacher)
+  end
+
   context "create group discussion" do
     before do
-      user_session(@teacher)
       get "/courses/#{@course.id}/discussion_topics"
       expect_new_page_load{f("#new-discussion-btn").click}
       f("#discussion-title").send_keys("New Discussion Title")
@@ -59,7 +61,6 @@ describe "discussion assignments" do
     end
 
     it "should allow the student to reply and teacher to see the unread count", priority: "1", test_id: 150519 do
-      user_session(@teacher)
       get "/courses/#{@course.id}/discussion_topics/#{@discussion_topic.id}"
       expect(f('.new-and-total-badge .new-items').text).to include ""
       user_session(@student1)

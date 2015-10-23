@@ -198,7 +198,7 @@ describe "groups" do
 
     #-------------------------------------------------------------------------------------------------------------------
     describe "conferences page" do
-      before(:all) do
+      before(:once) do
         PluginSetting.create!(name: "wimba", settings: {"domain" => "wimba.instructure.com"})
       end
 

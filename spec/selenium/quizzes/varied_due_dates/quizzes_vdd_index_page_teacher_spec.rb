@@ -6,7 +6,7 @@ describe 'viewing a quiz with variable due dates on the quizzes index page' do
   include_context 'in-process server selenium tests'
 
   context 'as a teacher in both sections' do
-    before(:all) { prepare_vdd_scenario_for_teacher }
+    before(:once) { prepare_vdd_scenario_for_teacher }
 
     before(:each) do
       user_session(@teacher1)

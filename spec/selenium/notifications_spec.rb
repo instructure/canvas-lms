@@ -6,10 +6,13 @@ describe "Notifications" do
   include_context "in-process server selenium tests"
 
   context "admin" do
-    before(:all) do
+    before(:once) do
       course_with_student(active_all: true)
-      site_admin_logged_in
       setup_comm_channel(@student)
+    end
+
+    before :each do
+      site_admin_logged_in
     end
 
     it "should send a notification to users that appointment groups are available", priority: "1", test_id: 186566 do

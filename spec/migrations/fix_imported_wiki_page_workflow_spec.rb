@@ -2,7 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 require 'db/migrate/20130617152008_fix_imported_wiki_page_workflow.rb'
 
 describe 'DataFixup::FixImportedWikiPageWorkflow' do
-  before :all do
+  before :once do
     course
     @wiki_pages = []
     5.times do |n|

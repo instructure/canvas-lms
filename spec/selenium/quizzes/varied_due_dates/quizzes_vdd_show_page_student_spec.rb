@@ -6,7 +6,7 @@ describe 'viewing a quiz with variable due dates on the quiz show page' do
   include_context 'in-process server selenium tests'
 
   context 'as a student in Section A' do
-    before(:all) { prepare_vdd_scenario_for_first_student }
+    before(:once) { prepare_vdd_scenario_for_first_student }
 
     before(:each) do
       user_session(@student1)
@@ -28,7 +28,7 @@ describe 'viewing a quiz with variable due dates on the quiz show page' do
   end
 
   context 'as a student in Section B' do
-    before(:all) { prepare_vdd_scenario_for_second_student }
+    before(:once) { prepare_vdd_scenario_for_second_student }
 
     before(:each) do
       user_session(@student2)
