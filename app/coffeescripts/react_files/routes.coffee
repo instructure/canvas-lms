@@ -3,7 +3,7 @@ define [
   'compiled/react_files/modules/filesEnv'
   'jsx/files/FilesApp'
   'jsx/files/ShowFolder'
-  'compiled/react_files/components/SearchResults'
+  'jsx/files/SearchResults'
 ], (ReactRouter, filesEnv, FilesApp, ShowFolder, SearchResults) ->
 
   {Route, Redirect} = ReactRouter
