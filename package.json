@@ -6,11 +6,11 @@
     "node": ">=0.12.5"
   },
   "dependencies": {
-    "babel": "^5.8.23",
-    "babel-core": "^5.8.25",
     "brandable_css": "0.0.52"
   },
   "devDependencies": {
+    "babel": "^5.8.23",
+    "babel-core": "^5.8.25",
     "coffee-script": "1.6.2",
     "compute-cluster": "0.0.9",
     "fleck": "~0.5.1",
