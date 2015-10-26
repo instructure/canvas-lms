@@ -61,7 +61,7 @@ class CommunicationChannel < ActiveRecord::Base
   TYPE_PUSH     = 'push'
   TYPE_YO       = 'yo'
 
-  RETIRE_THRESHOLD = 3
+  RETIRE_THRESHOLD = 1
 
   # TODO: Will need to be internationalized. Also, do we want to allow this to be specified in a config file?
   def self.country_codes

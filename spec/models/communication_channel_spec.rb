@@ -293,7 +293,7 @@ describe CommunicationChannel do
         @cc1 = communication_channel_model(path: 'not_as_bouncy@example.edu')
         @cc2 = communication_channel_model(path: 'bouncy@example.edu')
 
-        %w{bouncy@example.edu Bouncy@example.edu bOuNcY@Example.edu bouncy@example.edu not_as_bouncy@example.edu bouncy@example.edu}.each do |path|
+        %w{bouncy@example.edu Bouncy@example.edu bOuNcY@Example.edu bouncy@example.edu bouncy@example.edu}.each do |path|
           CommunicationChannel.bounce_for_path(
             path: path,
             timestamp: nil,
@@ -304,7 +304,7 @@ describe CommunicationChannel do
         end
 
         @cc1.reload
-        expect(@cc1.bounce_count).to eq 1
+        expect(@cc1.bounce_count).to eq 0
         expect(@cc1.bouncing?).to be_falsey
 
         @cc2.reload
@@ -473,7 +473,7 @@ describe CommunicationChannel do
             @cc3 = communication_channel_model(path: 'BOUNCY@example.edu')
           end
 
-          %w{bouncy@example.edu Bouncy@example.edu bOuNcY@Example.edu bouncy@example.edu not_as_bouncy@example.edu bouncy@example.edu}.each do |path|
+          %w{bouncy@example.edu Bouncy@example.edu bOuNcY@Example.edu bouncy@example.edu bouncy@example.edu}.each do |path|
             CommunicationChannel.bounce_for_path(
               path: path,
               timestamp: nil,
@@ -484,7 +484,7 @@ describe CommunicationChannel do
           end
 
           @cc1.reload
-          expect(@cc1.bounce_count).to eq 1
+          expect(@cc1.bounce_count).to eq 0
           expect(@cc1.bouncing?).to be_falsey
 
           @cc2.reload
