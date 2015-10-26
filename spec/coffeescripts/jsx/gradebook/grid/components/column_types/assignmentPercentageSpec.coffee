@@ -9,8 +9,8 @@ define [
   wrapper   = document.getElementById('fixtures')
 
   renderComponent = (data) ->
-    componentFactory = React.createFactory(AssignmentPercentage)
-    React.render(componentFactory(data), wrapper)
+    element = React.createElement(AssignmentPercentage, data)
+    React.render(element, wrapper)
 
   buildComponent = (props, additionalProps) ->
     cellData = props || {submission: {}, cellData: {id: '1'}, rowData: {enrollment: {}}}

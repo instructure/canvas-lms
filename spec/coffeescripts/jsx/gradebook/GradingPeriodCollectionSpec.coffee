@@ -47,7 +47,9 @@ define [
       @server.respondWith "GET", ENV.GRADING_PERIODS_URL, [200, {"Content-Type":"application/json"}, JSON.stringify @indexData]
       @server.respondWith "POST", ENV.GRADING_PERIODS_URL, [200, {"Content-Type":"application/json"}, JSON.stringify @createdPeriodData]
       @server.respondWith "DELETE", ENV.GRADING_PERIODS_URL + "/1", [204, {}, ""]
-      @gradingPeriodCollection = TestUtils.renderIntoDocument(GradingPeriodCollection())
+
+      GradingPeriodCollectionElement = React.createElement(GradingPeriodCollection)
+      @gradingPeriodCollection = TestUtils.renderIntoDocument(GradingPeriodCollectionElement)
       @server.respond()
     teardown: ->
       React.unmountComponentAtNode(@gradingPeriodCollection.getDOMNode().parentNode)
@@ -191,7 +193,8 @@ define [
       @server.respondWith "GET", ENV.GRADING_PERIODS_URL, [200, {"Content-Type":"application/json"}, JSON.stringify @indexData]
       @server.respondWith "POST", ENV.GRADING_PERIODS_URL, [200, {"Content-Type":"application/json"}, JSON.stringify @createdPeriodData ]
       @server.respondWith "DELETE", ENV.GRADING_PERIODS_URL + "/1", [204, {}, ""]
-      @gradingPeriodCollection = TestUtils.renderIntoDocument(GradingPeriodCollection())
+      GradingPeriodCollectionElement = React.createElement(GradingPeriodCollection)
+      @gradingPeriodCollection = TestUtils.renderIntoDocument(GradingPeriodCollectionElement)
       @server.respond()
     teardown: ->
       React.unmountComponentAtNode(@gradingPeriodCollection.getDOMNode().parentNode)

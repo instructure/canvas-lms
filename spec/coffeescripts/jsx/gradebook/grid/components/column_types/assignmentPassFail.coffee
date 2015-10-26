@@ -15,8 +15,8 @@ define [
       submission: submission
       rowData: {enrollment: {}}
       isActiveCell: true
-    componentFactory = React.createFactory(AssignmentPassFail)
-    React.render(componentFactory(data), wrapper)
+    element = React.createElement(AssignmentPassFail, data)
+    React.render(element, wrapper)
 
   createSubmission = (score) =>
     id: 2

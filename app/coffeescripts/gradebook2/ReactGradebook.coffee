@@ -102,6 +102,12 @@ define [
       @initNotesColumnOption(preferences)
       @attachSettingsDropdownEventHandlers(preferences)
 
+    sectionList: ->
+      _.map @sections, (section, id) =>
+        if(section.passback_status)
+          date = new Date(section.passback_status.sis_post_grades_status.grades_posted_at)
+        { name: section.name, id: id, passback_status: section.passback_status, date: date, checked: @sectionToShow == id }
+
     drawSectionSelectButton: (sections) ->
       @sectionMenu = new SectionMenuView(
         el: $('.section-button-placeholder'),

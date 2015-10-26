@@ -20,8 +20,8 @@ define [
     { assignment: assignmentAttributes, idAttribute: 'assignmentOptions', enrollments: [] }
 
   renderComponent = (data) ->
-    componentFactory = React.createFactory(DropdownOptions)
-    React.render(componentFactory(data), wrapper)
+    element = React.createElement(DropdownOptions, data)
+    React.render(element, wrapper)
 
   buildComponent = (props) ->
     renderComponent(generateProps(props))

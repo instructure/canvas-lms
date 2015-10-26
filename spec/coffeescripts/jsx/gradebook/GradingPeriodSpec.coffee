@@ -42,9 +42,11 @@ define [
           manage: true
         cannotDelete: -> false
         onDeleteGradingPeriod: ->
-        updateGradingPeriodCollection: ->
+        updateGradingPeriodCollection: sinon.spy()
         isOverlapping: ->
-      @gradingPeriod = TestUtils.renderIntoDocument(GradingPeriod(@props))
+
+      GradingPeriodElement = React.createElement(GradingPeriod, @props)
+      @gradingPeriod = TestUtils.renderIntoDocument(GradingPeriodElement)
       @server.respond()
     teardown: ->
       React.unmountComponentAtNode(@gradingPeriod.getDOMNode().parentNode)
@@ -77,9 +79,8 @@ define [
 
   test 'handleDateChange calls updateGradingPeriodCollection', ->
     fakeEvent = { target: { name: "startDate", value: "Feb 20, 2015 2:55 am" } }
-    update = @stub(@gradingPeriod.props, 'updateGradingPeriodCollection')
     @gradingPeriod.handleDateChange(fakeEvent)
-    ok update.calledOnce
+    ok @gradingPeriod.props.updateGradingPeriodCollection.calledOnce
 
   test 'isNewGradingPeriod returns false if the id does not contain "new"', ->
     ok !@gradingPeriod.isNewGradingPeriod()
@@ -95,9 +96,8 @@ define [
 
   test 'handleTitleChange calls updateGradingPeriodCollection', ->
     fakeEvent = { target: { name: "title", value: "MXP: Most Xtreme Primate" } }
-    update = @stub(@gradingPeriod.props, 'updateGradingPeriodCollection')
     @gradingPeriod.handleTitleChange(fakeEvent)
-    ok update.calledOnce
+    ok @gradingPeriod.props.updateGradingPeriodCollection.calledOnce
 
   test 'replaceInputWithDate calls formatDateForDisplay', ->
     formatDate = @stub(@gradingPeriod, 'formatDateForDisplay')

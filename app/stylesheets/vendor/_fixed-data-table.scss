@@ -1,5 +1,5 @@
 /**
- * FixedDataTable v0.1.2 
+ * FixedDataTable v0.3.0 
  *
  * Copyright (c) 2015, Facebook, Inc.
  * All rights reserved.
@@ -139,6 +139,7 @@
 
 .public_fixedDataTable_main {
   border: solid 1px #d3d3d3;
+  box-sizing: border-box;
   overflow: hidden;
   position: relative;
 }
@@ -146,6 +147,10 @@
 .public_fixedDataTable_header,
 .fixedDataTable_hasBottomBorder {
   border-bottom: solid 1px #d3d3d3;
+}
+
+.public_fixedDataTableRow_main.fixedDataTable_hasBottomBorder {
+  box-sizing: content-box;
 }
 
 .public_fixedDataTable_header .public_fixedDataTableCell_main {
@@ -213,7 +218,7 @@
   box-sizing: border-box;
   display: block;
   overflow: hidden;
-  position: relative;
+  position: absolute;
   white-space: normal;
 }
 
@@ -235,7 +240,6 @@
 
 .public_fixedDataTableCell_wrap1 {
   display: table;
-  overflow: hidden;
 }
 
 .public_fixedDataTableCell_wrap2 {
