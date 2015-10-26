@@ -129,27 +129,35 @@ class EpubExport < ActiveRecord::Base
     end
 
     file_paths.each do |file_path|
-      begin
-        mime_type = MIME::Types.type_for(file_path).first
-        file = Rack::Multipart::UploadedFile.new(
-          file_path,
-          mime_type.try(:content_type)
-        )
-        self.attachments.create({
-          filename: File.basename(file_path),
-          uploaded_data: file
-        })
-      rescue Errno::ENOENT => e
-        mark_as_failed
-        raise e
-      ensure
-        file.close if file
-      end
+      create_attachment_from_path!(file_path)
     end
     mark_as_generated
-    file_paths
+    file_paths.each {|file_path| cleanup_file_path!(file_path) }
   end
   handle_asynchronously :convert_to_epub, priority: Delayed::LOW_PRIORITY, max_attempts: 1
+
+  def create_attachment_from_path!(file_path)
+    begin
+      mime_type = MIME::Types.type_for(file_path).first
+      file = Rack::Multipart::UploadedFile.new(
+        file_path,
+        mime_type.try(:content_type)
+      )
+      self.attachments.create({
+        filename: File.basename(file_path),
+        uploaded_data: file
+      })
+    rescue Errno::ENOENT => e
+      mark_as_failed
+      raise e
+    ensure
+      file.try(:close)
+    end
+  end
+
+  def cleanup_file_path!(file_path)
+    FileUtils.rm_rf(file_path, secure: true) if File.exist?(file_path)
+  end
 
   def sort_by_content_type?
     self.course.organize_epub_by_content_type
