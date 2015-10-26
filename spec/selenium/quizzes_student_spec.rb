@@ -70,18 +70,17 @@ describe 'quizzes' do
           )
 
           q.generate_quiz_data
-          q.lock_at = Time.now.utc + 5.seconds
+          q.lock_at = Time.now.utc + 10.seconds
           q.save!
 
-          expect_new_page_load(3) { get "/courses/#{@course.id}/quizzes/#{q.id}/take?user_id=#{@student.id}" }
-          expect_new_page_load(3) { f('#take_quiz_link').click }
+          expect_new_page_load { get "/courses/#{@course.id}/quizzes/#{q.id}/take?user_id=#{@student.id}" }
+          expect_new_page_load { f('#take_quiz_link').click }
           answer_one = f("#question_#{question.id}_answer_1")
 
           # force a save to create a submission
           answer_one.click
-          wait_for_ajaximations
 
-          keep_trying_until do
+          keep_trying_until(10) do
             Quizzes::QuizSubmission.last
             expect(fj('#times_up_dialog:visible')).to include_text 'Time\'s Up!'
           end
