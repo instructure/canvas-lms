@@ -523,8 +523,8 @@ class Course < ActiveRecord::Base
     workflow_states = (args[1].present? ? %w{'active' 'completed'} : %w{'active'}).join(', ')
     uniq.joins("INNER JOIN (
          SELECT caa.course_id, au.user_id FROM #{CourseAccountAssociation.quoted_table_name} AS caa
-         INNER JOIN accounts AS a ON a.id = caa.account_id AND a.workflow_state = 'active'
-         INNER JOIN account_users AS au ON au.account_id = a.id AND au.user_id = #{user_id.to_i}
+         INNER JOIN #{Account.quoted_table_name} AS a ON a.id = caa.account_id AND a.workflow_state = 'active'
+         INNER JOIN #{AccountUser.quoted_table_name} AS au ON au.account_id = a.id AND au.user_id = #{user_id.to_i}
        UNION SELECT courses.id AS course_id, e.user_id FROM #{Course.quoted_table_name}
          INNER JOIN #{Enrollment.quoted_table_name} AS e ON e.course_id = courses.id AND e.user_id = #{user_id.to_i}
            AND e.workflow_state IN(#{workflow_states}) AND e.type IN ('TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment')
@@ -2588,7 +2588,7 @@ class Course < ActiveRecord::Base
       # we also want to bring along prior enrollments, so don't use the enrollments
       # association
       Enrollment.where(:course_id => self).update_all(:course_id => new_course, :updated_at => Time.now.utc)
-      User.where("id IN (SELECT user_id FROM enrollments WHERE course_id=?)", new_course).
+      User.where(id: new_course.all_enrollments.select(:user_id)).
           update_all(updated_at: Time.now.utc)
       self.replacement_course_id = new_course.id
       self.workflow_state = 'deleted'
