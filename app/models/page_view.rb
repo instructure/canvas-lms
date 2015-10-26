@@ -148,6 +148,12 @@ class PageView < ActiveRecord::Base
       entry_proc lambda{ |page_view| page_view.user }
       key_proc lambda{ |user| user.global_asset_string }
     end
+
+    self.raise_on_error = Rails.env.test?
+
+    on_error do |operation, record, exception|
+      Canvas::EventStreamLogger.error('PAGEVIEW', identifier, operation, record.to_json, exception.message.to_s)
+    end
   end
 
   def self.find(ids, options={})
