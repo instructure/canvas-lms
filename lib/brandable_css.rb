@@ -10,6 +10,68 @@ module BrandableCSS
   use_compressed = (defined?(Rails) && Rails.env.production?) || (ENV['RAILS_ENV'] == 'production')
   SASS_STYLE = ENV['SASS_STYLE'] || ((use_compressed ? 'compressed' : 'nested')).freeze
 
+  VARIABLE_HUMAN_NAMES = {
+    "ic-brand-primary" => lambda { I18n.t("Primary Color") },
+    "ic-brand-button--primary-bgd" => lambda { I18n.t("Primary Button") },
+    "ic-brand-button--primary-text" => lambda { I18n.t("Primary Button Text") },
+    "ic-brand-button--secondary-bgd" => lambda { I18n.t("Secondary Button") },
+    "ic-brand-button--secondary-text" => lambda { I18n.t("Secondary Button Text") },
+    "ic-link-color" => lambda { I18n.t("Link") },
+    "ic-brand-global-nav-bgd" => lambda { I18n.t("Nav Background") },
+    "ic-brand-global-nav-ic-icon-svg-fill" => lambda { I18n.t("Nav Icon") },
+    "ic-brand-global-nav-ic-icon-svg-fill--active" => lambda { I18n.t("Nav Icon Active") },
+    "ic-brand-global-nav-menu-item__text-color" => lambda { I18n.t("Nav Text") },
+    "ic-brand-global-nav-menu-item__text-color--active" => lambda { I18n.t("Nav Text Active") },
+    "ic-brand-global-nav-avatar-border" => lambda { I18n.t("Nav Avatar Border") },
+    "ic-brand-global-nav-menu-item__badge-bgd" => lambda { I18n.t("Nav Badge") },
+    "ic-brand-global-nav-logo-bgd" => lambda { I18n.t("Nav Logo Background") },
+    "ic-brand-header-image" => lambda { I18n.t("Nav Logo") },
+    "ic-brand-watermark" => lambda { I18n.t("Watermark") },
+    "ic-brand-watermark-opacity" => lambda { I18n.t("Watermark Opacity") },
+    "ic-brand-favicon" => lambda { I18n.t("Favicon") },
+    "ic-brand-apple-touch-icon" => lambda { I18n.t("Mobile Homescreen Icon") },
+    "ic-brand-msapplication-tile-color" => lambda { I18n.t("Windows Tile Color") },
+    "ic-brand-msapplication-tile-square" => lambda { I18n.t("Windows Tile: Square") },
+    "ic-brand-msapplication-tile-wide" => lambda { I18n.t("Windows Tile: Wide") },
+    "ic-brand-right-sidebar-logo" => lambda { I18n.t("Right Sidebar Logo") },
+    "ic-brand-Login-body-bgd-color" => lambda { I18n.t("Background Color") },
+    "ic-brand-Login-body-bgd-image" => lambda { I18n.t("Background Image") },
+    "ic-brand-Login-body-bgd-shadow-color" => lambda { I18n.t("Body Shadow") },
+    "ic-brand-Login-logo" => lambda { I18n.t("Login Logo") },
+    "ic-brand-Login-Content-bgd-color" => lambda { I18n.t("Top Box Background") },
+    "ic-brand-Login-Content-border-color" => lambda { I18n.t("Top Box Border") },
+    "ic-brand-Login-Content-inner-bgd" => lambda { I18n.t("Inner Box Background") },
+    "ic-brand-Login-Content-inner-border" => lambda { I18n.t("Inner Box Border") },
+    "ic-brand-Login-Content-inner-body-bgd" => lambda { I18n.t("Form Background") },
+    "ic-brand-Login-Content-inner-body-border" => lambda { I18n.t("Form Border") },
+    "ic-brand-Login-Content-label-text-color" => lambda { I18n.t("Login Label") },
+    "ic-brand-Login-Content-password-text-color" => lambda { I18n.t("Login Link Color") },
+    "ic-brand-Login-Content-button-bgd" => lambda { I18n.t("Login Button") },
+    "ic-brand-Login-Content-button-text" => lambda { I18n.t("Login Button Text") },
+    "ic-brand-Login-footer-link-color" => lambda { I18n.t("Login Footer Link") },
+    "ic-brand-Login-footer-link-color-hover" => lambda { I18n.t("Login Footer Link Hover") },
+    "ic-brand-Login-instructure-logo" => lambda { I18n.t("Login Instructure Logo") }
+  }.freeze
+
+  GROUP_NAMES = {
+    "global_branding" => lambda { I18n.t("Global Branding") },
+    "global_navigation" => lambda { I18n.t("Global Navigation") },
+    "watermarks" => lambda { I18n.t("Watermarks & Other Images") },
+    "login" => lambda { I18n.t("Login Screen") }
+  }.freeze
+
+  HELPER_TEXTS = {
+    "ic-brand-header-image" => lambda { I18n.t("Accepted formats: svg, png, jpg, gif") },
+    "ic-brand-watermark" => lambda { I18n.t("This image appears as a background watermark to your page. Accepted formats: png, svg, gif, jpeg") },
+    "ic-brand-watermark-opacity" => lambda { I18n.t("Specify the transparency of the watermark background image.") },
+    "ic-brand-favicon" => lambda { I18n.t("You can use a single 16x16, 32x32, 48x48 ico file.") },
+    "ic-brand-apple-touch-icon" => lambda { I18n.t("The shortcut icon for iOS/Android devices. 180x180 png") },
+    "ic-brand-msapplication-tile-square" => lambda { I18n.t("558x558 png, jpg, gif (1.8x the standard tile size, so it can be scaled up or down as needed)") },
+    "ic-brand-msapplication-tile-wide" => lambda { I18n.t("558x270 png, jpg, gif") },
+    "ic-brand-right-sidebar-logo" => lambda { I18n.t("A full-size logo that appears in the right sidebar on the Canvas dashboard. Ideal size is 360 x 140 pixels. Accepted formats: svg, png, jpeg, gif") },
+    "ic-brand-Login-body-bgd-shadow-color" => lambda { I18n.t("accepted formats: hex, rgba, rgb, hsl") }
+  }.freeze
+
   class << self
     def variables_map
       @variables_map ||= BRANDABLE_VARIABLES.each_with_object({}) do |variable_group, memo|
