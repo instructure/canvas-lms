@@ -81,16 +81,6 @@ def verify_member_sees_announcement(count = 1)
   expect(f('.discussion-title')).to include_text("#{@announcement.title}")
 end
 
-def delete_announcement_via_gear_menu(num = 0)
-  # Clicks the gear menu for announcement num
-  ff('.al-trigger-gray')[num].click
-  wait_for_ajaximations
-  # Clicks delete menu item
-  f('.icon-trash.ui-corner-all').click
-  driver.switch_to.alert.accept
-  wait_for_animations
-end
-
 # Clicks edit button on Announcement show page
 def click_edit_btn
   f('.edit-btn').click

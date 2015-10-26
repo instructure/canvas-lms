@@ -5,6 +5,7 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/discussions_common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/wiki_and_tiny_common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/conferences_common')
+require File.expand_path(File.dirname(__FILE__) + '/helpers/course_common')
 
 describe "groups" do
   include_context "in-process server selenium tests"
@@ -48,7 +49,7 @@ describe "groups" do
 
         get announcements_page
         expect(ff('.discussion-topic').size).to eq 1
-        delete_announcement_via_gear_menu
+        delete_via_gear_menu
         expect(ff('.discussion-topic').size).to eq 0
       end
 
@@ -57,7 +58,7 @@ describe "groups" do
 
         get announcements_page
         expect(ff('.discussion-topic').size).to eq 1
-        delete_announcement_via_gear_menu
+        delete_via_gear_menu
         expect(ff('.discussion-topic').size).to eq 0
       end
 
