@@ -100,7 +100,7 @@ class CourseSection < ActiveRecord::Base
   def touch_all_enrollments
     return if new_record?
     self.enrollments.update_all(:updated_at => Time.now.utc)
-    User.where("id IN (SELECT user_id FROM enrollments WHERE course_section_id=?)", self).
+    User.where(id: all_enrollments.select(:user_id)).
         update_all(updated_at: Time.now.utc)
   end
 
