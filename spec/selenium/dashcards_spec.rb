@@ -130,6 +130,15 @@ describe 'dashcards' do
         expect(f('.ic-DashboardCard__header-title').text).to include 'course nickname!'
         expect(@student.reload.course_nickname(@course)).to eq 'course nickname!'
       end
+
+      it 'sets both dashcard color and course nickname at once' do
+        replace_content(fj('#NicknameInput'), 'course nickname frd!')
+        replace_content(fj('#ColorPickerCustomInput'), '#000000')
+        f('.ColorPicker__Container .Button--primary').click
+        wait_for_ajaximations
+        expect(@student.reload.course_nickname(@course)).to eq 'course nickname frd!'
+        expect(@student.custom_colors[@course.asset_string]).to eq '#000000'
+      end
     end
   end
 

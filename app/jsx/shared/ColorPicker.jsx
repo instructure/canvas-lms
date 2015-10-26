@@ -52,7 +52,8 @@ define([
     getInitialState () {
       return {
         isOpen: this.props.isOpen,
-        currentColor: this.props.currentColor
+        currentColor: this.props.currentColor,
+        saveInProgress: false
       };
     },
 
@@ -124,29 +125,37 @@ define([
       // Remove the hex if needed
       color = color.replace('#', '');
 
-      $.ajax({
-        url: '/api/v1/users/' + window.ENV.current_user_id + '/colors/' + this.props.assetString,
-        type: 'PUT',
-        data: {
-          hexcode: color
-        },
-        success: () => {
-          this.props.afterUpdateColor(color);
-        },
-        error: () => {
-          console.log('Error setting color');
-        },
-        complete: () => {
-          this.closeModal();
-        }
-      });
+      if (color !== this.props.currentColor.replace('#', '')) {
+        return $.ajax({
+          url: '/api/v1/users/' + window.ENV.current_user_id + '/colors/' + this.props.assetString,
+          type: 'PUT',
+          data: {
+            hexcode: color
+          },
+          success: () => {
+            this.props.afterUpdateColor(color);
+          },
+          error: () => {
+            console.log('Error setting color');
+          }
+        });
+      }
+    },
+
+    setCourseNickname() {
+      if (this.refs.courseNicknameEdit) {
+        return this.refs.courseNicknameEdit.setCourseNickname();
+      }
     },
 
     onApply (color, event) {
-      this.setColorForCalendar(color, event);
-      if (this.refs.courseNicknameEdit) {
-        this.refs.courseNicknameEdit.setCourseNickname();
-      }
+      this.setState({ saveInProgress: true });
+      // both API calls update the same User model and thus need to be performed serially
+      $.when(this.setColorForCalendar(color)).then(() => {
+        $.when(this.setCourseNickname()).then(() => {
+          this.closeModal();
+        });
+      });
     },
 
     // ===============
@@ -244,7 +253,8 @@ define([
             </button>
             <span>&nbsp;</span>
             <button className="Button Button--primary"
-              onClick = {this.onApply.bind(null, this.state.currentColor)}>
+              onClick = {this.onApply.bind(null, this.state.currentColor)}
+              disabled = {this.state.saveInProgress}>
               {I18n.t('Apply')}
             </button>
           </div>

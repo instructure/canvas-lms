@@ -36,7 +36,7 @@ define([
 
     setCourseNickname () {
       if (this.state.originalNickname != this.state.nickname) {
-        $.ajax({
+        return $.ajax({
             url: '/api/v1/users/self/course_nicknames/' + this.props.nicknameInfo.courseId,
             type: (this.state.nickname.length > 0) ? 'PUT' : 'DELETE',
             data: {
@@ -66,6 +66,7 @@ define([
                  type='text'
                  ref='nicknameInput'
                  className='ic-Input'
+                 maxLength='59'
                  placeholder={this.props.nicknameInfo.originalName}
                  value={this.state.nickname}
                  onChange={this.handleChange}
