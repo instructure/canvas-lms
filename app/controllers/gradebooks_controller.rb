@@ -70,12 +70,18 @@ class GradebooksController < ApplicationController
           @presenter.assignment_stats
         end
 
-        submissions_json = @presenter.submissions.map { |s|
+        display_score_to_user = ->(submission) do
+          return false if submission.assignment.quiz? && submission.pending_review?
+          submission.user_can_read_grade?(@current_user)
+        end
+
+        submissions_json = @presenter.submissions.map do |submission|
           {
-            'assignment_id' => s.assignment_id,
-            'score' => s.user_can_read_grade?(@current_user) ? s.score  : nil
+            'assignment_id' => submission.assignment_id,
+            'score' => display_score_to_user.call(submission) ? submission.score : "ungraded assignment"
           }
-        }
+        end
+
         ags_json = light_weight_ags_json(@presenter.groups, {student: @presenter.student})
         js_env submissions: submissions_json,
                assignment_groups: ags_json,
