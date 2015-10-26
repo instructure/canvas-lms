@@ -84,13 +84,6 @@ if is_a_selinimum_test.size > 1
   comment "error", line, "since you're telling selinimum to ignore intermediate commits, this commit may not be safe to merge"
 end
 
-user_config_file = File.expand_path("../../gems/rubocop-canvas/config/gergich_user_config.yml", __FILE__)
-if File.exists?(user_config_file)
-  config = YAML.load_file(user_config_file) || {}
-  user_list = config['only_report_errors'] || []
-  exit if user_list.include?(ENV['GERRIT_EVENT_ACCOUNT_EMAIL'])
-end
-
 starts_with_spec = subject =~ /\Aspec: /i
 exit if starts_with_spec # we're trusting you here, don't be evil
 
@@ -99,6 +92,13 @@ only_affects_specs = commit_files.all? { |f| f =~ %r{\Aspec/} }
 if only_affects_specs
   comment "warn", 1, "since your commit only affects specs, please prefix your commit message with \"spec: \""
   exit
+end
+
+user_config_file = File.expand_path("../../gems/rubocop-canvas/config/gergich_user_config.yml", __FILE__)
+if File.exists?(user_config_file)
+  config = YAML.load_file(user_config_file) || {}
+  user_list = config['only_report_errors'] || []
+  exit if user_list.include?(ENV['GERRIT_EVENT_ACCOUNT_EMAIL'])
 end
 
 issue_ids = JiraRefParser.scan_message_for_issue_ids(commit_message)
