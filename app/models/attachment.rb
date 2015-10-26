@@ -668,7 +668,7 @@ class Attachment < ActiveRecord::Base
   protected :assign_uuid
 
   def inline_content?
-    self.content_type.match(/\Atext/) || self.extension == '.html' || self.extension == '.htm' || self.extension == '.swf'
+    (self.content_type.match(/\Atext/) && !self.canvadocable?) || self.extension == '.html' || self.extension == '.htm' || self.extension == '.swf'
   end
 
   def self.shared_secret
@@ -690,6 +690,11 @@ class Attachment < ActiveRecord::Base
 
   def content_type_with_encoding
     encoding.blank? ? content_type : "#{content_type}; charset=#{encoding}"
+  end
+
+  def content_type_with_text_match
+    # treats all text/X files as text/plain
+    content_type.to_s.match(/^text\/.*/) ? "text/plain" : content_type
   end
 
   # Returns an IO-like object containing the contents of the attachment file.
@@ -1180,7 +1185,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def canvadocable?
-    Canvadocs.enabled? && Canvadoc.mime_types.include?(content_type)
+    Canvadocs.enabled? && Canvadoc.mime_types.include?(content_type_with_text_match)
   end
 
   def self.submit_to_canvadocs(ids)
