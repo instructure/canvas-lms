@@ -211,7 +211,7 @@ class GradebooksController < ApplicationController
       case launch_definition[:definition_type]
       when 'ContextExternalTool'
         url = external_tool_url_for_lti1(launch_definition)
-      when 'MessageHandler'
+      when 'Lti::MessageHandler'
         url = external_tool_url_for_lti2(launch_definition)
       end
       launch_definition[:placements][:post_grades][:canvas_launch_url] = url

@@ -19,19 +19,21 @@
 module Lti
   class ResourcePlacement < ActiveRecord::Base
 
-    RESOURCE_SELECTION = 'resource_selection'
-    ASSIGNMENT_SELECTION = 'assignment_selection'
-    LINK_SELECTION = 'link_selection'
     ACCOUNT_NAVIGATION = 'account_navigation'
+    ASSIGNMENT_SELECTION = 'assignment_selection'
     COURSE_NAVIGATION = 'course_navigation'
+    LINK_SELECTION = 'link_selection'
+    POST_GRADES = 'post_grades'
+    RESOURCE_SELECTION = 'resource_selection'
 
-    DEFAULT_PLACEMENTS = [ASSIGNMENT_SELECTION, LINK_SELECTION]
+    DEFAULT_PLACEMENTS = [ASSIGNMENT_SELECTION, LINK_SELECTION].freeze
 
     PLACEMENT_LOOKUP = {
       'Canvas.placements.accountNavigation' => ACCOUNT_NAVIGATION,
+      'Canvas.placements.assignmentSelection' => ASSIGNMENT_SELECTION,
       'Canvas.placements.courseNavigation' => COURSE_NAVIGATION,
       'Canvas.placements.linkSelection' => LINK_SELECTION,
-      'Canvas.placements.assignmentSelection' => ASSIGNMENT_SELECTION,
+      'Canvas.placements.postGrades' => POST_GRADES,
     }.freeze
 
     attr_accessible :placement, :message_handler, :resource_handler

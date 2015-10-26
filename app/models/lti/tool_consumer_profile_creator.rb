@@ -14,6 +14,7 @@ module Lti
           Canvas.placements.courseNavigation
           Canvas.placements.assignmentSelection
           Canvas.placements.linkSelection
+          Canvas.placements.postGrades
           User.username
           Person.email.primary
           Person.name.given
