@@ -73,6 +73,7 @@ define([
           query={this.getQuery()}
           selectedItems={this.state.selectedItems}
           clearSelectedItems={this.clearSelectedItems}
+          onMove={this.onMove}
           contextType={contextType}
           contextId={contextId}
           userCanManageFilesForContext={userCanManageFilesForContext}
@@ -126,6 +127,7 @@ define([
               usageRightsRequiredForContext={usageRightsRequiredForContext}
               externalToolsForContext={externalToolsForContext}
               previewItem={this.previewItem}
+              onMove={this.onMove}
               modalOptions={{
                 openModal: this.openModal,
                 closeModal: this.closeModal

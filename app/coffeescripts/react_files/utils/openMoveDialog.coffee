@@ -8,7 +8,7 @@ define [
 
   MoveDialog = React.createFactory MoveDialogComponent
 
-  openMoveDialog = (thingsToMove, {contextType, contextId, returnFocusTo, clearSelectedItems}) ->
+  openMoveDialog = (thingsToMove, {contextType, contextId, returnFocusTo, clearSelectedItems, onMove}) ->
 
     rootFolderToShow = _.find filesEnv.rootFolders, (folder) ->
       (folder.get('context_type').toLowerCase() + 's' is contextType) and (''+folder.get('context_id') is ''+contextId)
@@ -21,5 +21,6 @@ define [
         React.unmountComponentAtNode this
         $moveDialog.remove()
         $(returnFocusTo).focus()
-      onMove: clearSelectedItems
+      onMove: (models) ->
+        onMove(models) && clearSelectedItems()
     }), $moveDialog[0])

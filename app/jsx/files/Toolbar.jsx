@@ -90,7 +90,8 @@ define([
               contextType: this.props.contextType,
               contextId: this.props.contextId,
               returnFocusTo: event.target,
-              clearSelectedItems: this.props.clearSelectedItems
+              clearSelectedItems: this.props.clearSelectedItems,
+              onMove: this.props.onMove
             })
           }.bind(this)}
           title= {I18n.t('Move')}

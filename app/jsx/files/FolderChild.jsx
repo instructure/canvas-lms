@@ -25,6 +25,7 @@ define([
           externalToolsForContext= {this.props.externalToolsForContext}
           modalOptions= {this.props.modalOptions}
           clearSelectedItems= {this.props.clearSelectedItems}
+          onMove={this.props.onMove}
         />
       );
     }

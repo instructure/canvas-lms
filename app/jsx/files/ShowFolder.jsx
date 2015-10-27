@@ -51,6 +51,7 @@ define([
               dndOptions={this.props.dndOptions}
               modalOptions={this.props.modalOptions}
               clearSelectedItems={this.props.clearSelectedItems}
+              onMove={this.props.onMove}
             />
           );
         })

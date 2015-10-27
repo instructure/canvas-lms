@@ -49,14 +49,15 @@ define [
       @state.collection.url = "#{window.location.origin}/api/v1/#{@props.contextType}/#{@props.contextId}/files"
       updateAPIQuerySortParams(@state.collection, @getQuery())
 
-      return if @state.collection.url is oldUrl # if you doesn't search for the same thing twice
+      return if @state.collection.url is oldUrl and @state.collection.models.length > 0 # doesn't search for the same thing twice
       @setState({collection: @state.collection})
 
       # Refactor this when given time. Maybe even use setState instead of forceUpdate
       unless @state.collection.loadedAll and _.isEqual(@getQuery().search_term, props.query?.search_term?)
         forceUpdate = =>
-          @setState({errors: null})
-          @forceUpdate() if @isMounted()
+          if @isMounted()
+            @setState({errors: null})
+            @forceUpdate()
           $.screenReaderFlashMessageExclusive I18n.t('results_count', "Showing %{num_results} search results", {num_results: @state.collection.length})
         @state.collection.fetch({data: props.query, error: @onFetchError}).then(forceUpdate)
           # TODO: use scroll position to only fetch the pages we need

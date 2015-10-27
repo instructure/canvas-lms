@@ -198,7 +198,45 @@ describe "better_file_browsing" do
       end
     end
 
+    context "Search Results" do
+      def search_and_move(file_name:  "", destination: "My Files")
+        f("input[type='search']").send_keys file_name
+        driver.action.send_keys(:return).perform
+        # Unable to find matching line from backtrace error is encountered if refresh_page is not used
+        refresh_page
+        expect(get_all_files_folders.count).to eq 1
+        move(file_name, 0, :cog_icon, destination)
+        wait_for_ajaximations
+        final_destination = destination.split('/').pop
+        expect(f("#flash_message_holder").text).to eq "#{file_name} moved to #{final_destination}\nClose"
+        wait_for_ajaximations
+        fj("a.treeLabel span:contains('#{final_destination}')").click
+        wait_for_ajaximations
+        expect(fln(file_name)).to be_displayed
+      end
+      before(:each) do
+        course_with_teacher_logged_in
+        user_files = ["a_file.txt", "b_file.txt"]
+        user_files.map { |text_file| add_file(fixture_file_upload("files/#{text_file}", 'text/plain'), @teacher, text_file) }
+        # Course file
+        add_file(fixture_file_upload("files/c_file.txt", 'text/plain'), @course, "c_file.txt")
+      end
 
+      it "should move a file to a destination if contexts are different" do
+        get "/courses/#{@course.id}/files"
+        folder_name = "destination_folder"
+        add_folder(folder_name)
+        get "/files"
+        search_and_move(file_name: "a_file.txt", destination: "#{@course.name}/#{folder_name}")
+      end
+
+      it "should move a file to a destination if the contexts are the same" do
+        get "/files"
+        folder_name = "destination_folder"
+        add_folder(folder_name)
+        search_and_move(file_name: "a_file.txt", destination: "My Files/#{folder_name}")
+      end
+    end
   end
 
   context "File Downloads" do

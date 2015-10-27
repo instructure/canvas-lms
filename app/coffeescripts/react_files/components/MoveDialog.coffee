@@ -5,7 +5,8 @@ define [
   'compiled/fn/preventDefault'
   '../modules/customPropTypes'
   '../utils/moveStuff'
-], (I18n, $, React, preventDefault,  customPropTypes, moveStuff) ->
+  'compiled/str/splitAssetString'
+], (I18n, $, React, preventDefault,  customPropTypes, moveStuff, splitAssetString) ->
 
   MoveDialog =
     displayName: 'MoveDialog'
@@ -21,20 +22,26 @@ define [
       isOpen: true
 
     contextsAreEqual: (destination = {}, sources = []) ->
-      differentContexts = sources.filter (source) ->
-        source.collection.parentFolder.get("context_type") is destination.get("context_type") and
-        source.collection.parentFolder.get("context_id")?.toString() is destination.get("context_id")?.toString()
+      contextsAreEqual = sources.filter (source) ->
+        [contextType, contextId] = if assetString = source.get("context_asset_string")
+                                     splitAssetString(assetString, false)
+                                   else
+                                     [source.collection.parentFolder?.get("context_type"), source.collection.parentFolder?.get("context_id")?.toString()]
 
-      !!differentContexts.length
+        contextType.toLowerCase() is destination.get("context_type").toLowerCase() and
+        contextId is destination.get("context_id")?.toString()
+
+      !!contextsAreEqual.length
 
     onSelectFolder: (event, folder) ->
       event.preventDefault()
       @setState(destinationFolder: folder, isCopyingFile: !@contextsAreEqual(folder, @props.thingsToMove))
 
     submit: () ->
-      promise = moveStuff(@props.thingsToMove, @state.destinationFolder)
+      modelsBeingMoved = @props.thingsToMove
+      promise = moveStuff(modelsBeingMoved, @state.destinationFolder)
       promise.then =>
-        @props.onMove()
+        @props.onMove(modelsBeingMoved)
         @closeDialog()
 
     closeDialog: ->

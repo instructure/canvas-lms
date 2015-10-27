@@ -91,7 +91,7 @@ define([
         // Rename Link
         menuItems.push(<li><a href='#' onClick={preventDefault(this.props.startEditingName)} ref='editName'>{I18n.t('Rename')}</a></li>);
         // Move Link
-        menuItems.push(<li><a href='#' onClick={wrap(openMoveDialog, {clearSelectedItems: this.props.clearSelectedItems})} ref='move'>{I18n.t('Move')}</a></li>);
+        menuItems.push(<li><a href='#' onClick={wrap(openMoveDialog, {clearSelectedItems: this.props.clearSelectedItems, onMove: this.props.onMove})} ref='move'>{I18n.t('Move')}</a></li>);
 
         if (this.props.usageRightsRequiredForContext) {
           // Manage Usage Rights Link

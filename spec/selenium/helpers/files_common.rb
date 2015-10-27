@@ -51,7 +51,7 @@ def delete(row_selected = 0, delete_using = :cog_icon)
   confirm_delete_on_dialog
 end
 
-def move(file_name, row_selected = 0, move_using = :cog_icon)
+def move(file_name, row_selected = 0, move_using = :cog_icon, destination = nil)
   if move_using == :cog_icon
     ff('.al-trigger')[row_selected].click
     fln("Move").click
@@ -61,7 +61,14 @@ def move(file_name, row_selected = 0, move_using = :cog_icon)
   end
   wait_for_ajaximations
   expect(f(".ReactModal__Header-Title h4").text).to eq "Where would you like to move #{file_name}?"
-  ff(".treeLabel span")[3].click
+  if destination.present?
+    folders = destination.split('/')
+    folders.each do |folder|
+      fj(".ReactModal__Body .treeLabel span:contains('#{folder}')").click
+    end
+  else
+    ff(".treeLabel span")[3].click
+  end
   driver.action.send_keys(:return).perform
   wait_for_ajaximations
   ff(".btn-primary")[1].click

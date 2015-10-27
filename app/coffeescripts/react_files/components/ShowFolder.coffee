@@ -96,4 +96,3 @@ define [
         setTimeout(=>
           @transitionTo filesEnv.baseUrl, {}, @getQuery()
         , 0)
-

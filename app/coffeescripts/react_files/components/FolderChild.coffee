@@ -108,4 +108,3 @@ define [
     handleFileLinkClick: ->
       FocusStore.setItemToFocus @refs.nameLink.getDOMNode()
       @props.previewItem()
-
