@@ -56,7 +56,7 @@ define([
 
   var Gradebook = React.createClass({
     mixins: [
-      Reflux.connect(KeyboardNavigationStore, 'currentCellIndex'),
+      Reflux.connect(KeyboardNavigationStore, 'keyboardNav'),
       Reflux.connect(SettingsStore, 'settings'),
       Reflux.connect(GradebookToolbarStore, 'toolbarOptions'),
       Reflux.connect(TableStore, 'tableData')
@@ -80,34 +80,11 @@ define([
 
     handleKeyDown(event) {
       var reactGradebook = document.getElementById('react-gradebook-canvas');
-      var handled = true;
-
-      if (event.keyCode === 9) {
-        if (event.shiftKey) {
-          KeyboardNavigationActions.previous();
-        } else {
-          KeyboardNavigationActions.next();
-        }
-      } else if (event.keyCode === 13) {
-        if (event.shiftKey) {
-          KeyboardNavigationActions.up();
-        } else {
-          KeyboardNavigationActions.down();
-        }
-      } else if (event.keyCode === 37) {
-        KeyboardNavigationActions.previous();
-      } else if (event.keyCode === 38) {
-        KeyboardNavigationActions.up();
-      } else if (event.keyCode === 39) {
-        KeyboardNavigationActions.next();
-      } else if (event.keyCode === 40) {
-        KeyboardNavigationActions.down();
-      } else {
-        handled = false;
-      }
-
-      if (handled) {
+      var knownCodes = GradebookConstants.RECOGNIZED_KEYBOARD_CODES;
+      if (_.contains(knownCodes, event.keyCode)) {
         event.nativeEvent.preventDefault();
+        event.persist();
+        KeyboardNavigationActions.handleKeyboardEvent(event);
         $(reactGradebook).focus();
       }
     },
@@ -155,7 +132,7 @@ define([
           submissions = this.state.tableData.submissions,
           columnData = {
             columnType: columnType,
-            activeCell: this.state.currentCellIndex,
+            activeCell: this.state.keyboardNav.currentCellIndex,
             setActiveCell: KeyboardNavigationActions.setActiveCell,
             assignment: assignment,
             enrollments: enrollments,
@@ -225,9 +202,7 @@ define([
     },
 
     hasStoreErrorOccured() {
-      return //this.state.assignmentGroups.error
-             this.state.tableData.error;
-             //|| this.state.submissions.error;
+      return this.state.tableData.error;
     },
 
     renderSpinner() {
@@ -276,6 +251,8 @@ define([
             <Table
               rowGetter={this.rowGetter}
               rowsCount={this.state.tableData.students.length}
+              scrollToColumn={this.state.keyboardNav.currentColumnIndex}
+              scrollToRow={this.state.keyboardNav.currentRowIndex}
               onColumnResizeEndCallback={this.handleColumnResize}
               isColumnResizing={isColumnResizing}
               rowHeight={GradebookConstants.DEFAULT_LAYOUTS.rows.height}
@@ -284,6 +261,7 @@ define([
               headerHeight={GradebookConstants.DEFAULT_LAYOUTS.headers.height}>
 
               {this.renderAllColumns()}
+              {KeyboardNavigationActions.constructKeyboardNavManager()}
 
             </Table>
           </div>

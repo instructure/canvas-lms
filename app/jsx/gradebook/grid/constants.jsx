@@ -43,6 +43,8 @@ define([
     OVERRIDE_DATES: ['all_day_date', 'due_at', 'lock_at', 'unlock_at'],
     PAGINATION_COUNT: 50,
     MAX_NOTE_LENGTH: 255,
+    // keyboard codes: tab, enter, left arrow, up arrow, right arrow, down arrow
+    RECOGNIZED_KEYBOARD_CODES: [9,13,37,38,39,40],
     refresh: function() {
       // For testing
       _.extend(this, ENV.GRADEBOOK_OPTIONS);

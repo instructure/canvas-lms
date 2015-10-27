@@ -83,6 +83,12 @@ define([
             </a>
           </div>
         );
+      } else {
+        return (
+          <div title={label} className='gradebook-label' style={{width: this.getWidth()}}>
+            {label}
+          </div>
+        );
       }
 
       return label;
