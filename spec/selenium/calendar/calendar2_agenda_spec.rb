@@ -236,6 +236,32 @@ describe "calendar2" do
         load_agenda_view
         expect(f(".agenda-event")).to include_text('Test Quiz')
       end
+
+      it "should show assignment due dates for different sections", priority: "1", test_id: 138848 do
+        assignment = @course.assignments.create!(name: 'Test Title', due_at: 1.day.from_now)
+
+        # Create Sections and Differentiated Assignment
+        s1 = @course.course_sections.create!(name: 'Section1')
+        s2 = @course.course_sections.create!(name: 'Section2')
+        s1_date = rand(2...9).day.from_now
+        s2_date = s1_date + 1.days
+        @course.enable_feature!(:differentiated_assignments)
+        @override = create_section_override_for_assignment(assignment, course_section: s1, due_at: s1_date)
+        @override = create_section_override_for_assignment(assignment, course_section: s2, due_at: s2_date)
+
+        load_agenda_view
+        keep_trying_until { expect(ffj('.ig-row').length).to eq 3 }
+
+        # Verify Titles include section name
+        agenda_array = ffj('.ig-row')
+        expect(fj('.ig-title', agenda_array[1]).text).to include_text('Section1')
+        expect(fj('.ig-title', agenda_array[2]).text).to include_text('Section2')
+
+        # Verify Dates
+        date_array = ffj('.agenda-day')
+        expect(fj('.agenda-date', date_array[1]).text).to include_text(s1_date.strftime('%a, %b %-d'))
+        expect(fj('.agenda-date', date_array[2]).text).to include_text(s2_date.strftime('%a, %b %-d'))
+      end
     end
   end
 
