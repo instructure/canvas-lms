@@ -1334,6 +1334,7 @@ define([
         moduleType: data.type,
         id: data.publishable_id,
         moduleItemName: data.moduleItemName,
+        moduleItemId: data.id,
         moduleId: data.context_module_id,
         courseId: data.context_id,
         published: data.published,
