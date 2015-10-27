@@ -1,6 +1,10 @@
 class SetSearchPathsOnFunctions < ActiveRecord::Migration
   tag :predeploy
 
+  def self.connection
+    Delayed::Backend::ActiveRecord::Job.connection
+  end
+
   def set_search_path_on_function(function, args, search_path = Shard.current.name)
     execute("ALTER FUNCTION #{connection.quote_table_name(function)}#{args} SET search_path TO #{search_path}")
   end
