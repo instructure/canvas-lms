@@ -2261,12 +2261,13 @@ class User < ActiveRecord::Base
   def roles(root_account)
     return @roles if @roles
     @roles = ['user']
-    valid_types = %w[StudentEnrollment StudentViewEnrollment TeacherEnrollment TaEnrollment DesignerEnrollment]
+    valid_types = %w[StudentEnrollment StudentViewEnrollment TeacherEnrollment TaEnrollment DesignerEnrollment ObserverEnrollment]
 
     # except where in order to include StudentViewEnrollment's
     enrollment_types = root_account.all_enrollments.where(type: valid_types, user_id: self, workflow_state: 'active').uniq.pluck(:type)
     @roles << 'student' unless (enrollment_types & %w[StudentEnrollment StudentViewEnrollment]).empty?
     @roles << 'teacher' unless (enrollment_types & %w[TeacherEnrollment TaEnrollment DesignerEnrollment]).empty?
+    @roles << 'observer' unless (enrollment_types & %w[ObserverEnrollment]).empty?
     @roles << 'admin' unless root_account.all_account_users_for(self).empty?
     @roles
   end

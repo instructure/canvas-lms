@@ -2910,6 +2910,11 @@ describe User do
       expect(@user.roles(@account)).to eq %w[user teacher]
     end
 
+    it "includes 'observer' if the user has an observer enrollment" do
+      @enrollment = @course.enroll_user(@user, 'ObserverEnrollment', enrollment_state: 'active')
+      expect(@user.roles(@account)).to eq %w[user observer]
+    end
+
     it "includes 'admin' if the user has an admin user record" do
       @account.account_users.create!(:user => @user, :role => admin_role)
       expect(@user.roles(@account)).to eq %w[user admin]
