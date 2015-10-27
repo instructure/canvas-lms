@@ -32,6 +32,34 @@ describe LtiApiController, type: :request do
     tag.save!
   end
 
+  def check_error_response(message, check_generated_sig=true)
+    expect(response.body.strip).to_not be_empty, "Should not have an empty response body"
+
+    json = JSON.parse response.body
+    expect(json["errors"][0]["message"]).to eq message
+    expect(json["error_report_id"]).to be > 0
+
+    data = error_data(json)
+
+    expect(data.key?('oauth_signature')).to be true
+    expect(data.key?('oauth_signature_method')).to be true
+    expect(data.key?('oauth_nonce')).to be true
+    expect(data.key?('oauth_timestamp')).to be true
+    expect(data.key?('generated_signature')).to be true if check_generated_sig
+
+    expect(data['oauth_signature']).to_not be_empty
+    expect(data['oauth_signature_method']).to_not be_empty
+    expect(data['oauth_nonce']).to_not be_empty
+    expect(data['oauth_timestamp']).to_not be_empty
+    expect(data['generated_signature']).to_not be_empty if check_generated_sig
+  end
+
+  def error_data(json=nil)
+    json ||= JSON.parse response.body
+    error_report = ErrorReport.find json["error_report_id"]
+    error_report.data
+  end
+
   def make_call(opts = {})
     opts['path'] ||= "/api/lti/v1/tools/#{@tool.id}/grade_passback"
     opts['key'] ||= @tool.consumer_key
@@ -39,10 +67,17 @@ describe LtiApiController, type: :request do
     opts['content-type'] ||= 'application/xml'
     consumer = OAuth::Consumer.new(opts['key'], opts['secret'], :site => "https://www.example.com", :signature_method => "HMAC-SHA1")
     req = consumer.create_signed_request(:post, opts['path'], nil, :scheme => 'header', :timestamp => opts['timestamp'], :nonce => opts['nonce'])
+
+    auth = req['Authorization']
+    if opts['override_signature_method']
+      auth.gsub! "HMAC-SHA1", opts['override_signature_method']
+    end
+
     req.body = opts['body'] if opts['body']
     post "https://www.example.com#{req.path}",
       req.body,
-      { "CONTENT_TYPE" => opts['content-type'], "HTTP_AUTHORIZATION" => req['Authorization'] }
+      { "CONTENT_TYPE" => opts['content-type'], "HTTP_AUTHORIZATION" => auth }
+
   end
 
   def source_id
@@ -63,9 +98,48 @@ describe LtiApiController, type: :request do
     assert_status(415)
   end
 
-  it "should require the correct shared secret" do
-    make_call('secret' => 'bad secret is bad')
-    assert_status(401)
+  context "OAuth Requests" do
+    it "should fail on invalid signature method" do
+      make_call('override_signature_method' => 'BawkBawk256')
+      check_error_response("Invalid authorization header", false)
+      data = error_data
+
+      expect(data['error_class']).to eq "OAuth::Signature::UnknownSignatureMethod"
+      assert_status(401)
+    end
+
+    it "should require the correct shared secret" do
+      make_call('secret' => 'bad secret is bad')
+      check_error_response("Invalid authorization header")
+
+      data = error_data
+      expect(data['error_class']).to eq "OAuth::Unauthorized"
+
+      assert_status(401)
+    end
+
+    if Canvas.redis_enabled?
+      it "should not allow the same nonce to be used more than once" do
+        make_call('nonce' => 'not_so_random', 'content-type' => 'none')
+        assert_status(415)
+        make_call('nonce' => 'not_so_random', 'content-type' => 'none')
+        assert_status(401)
+        check_error_response("Duplicate nonce detected")
+      end
+    end
+
+    it "should block timestamps more than 90 minutes old" do
+      # the 90 minutes value is suggested by the LTI spec
+      make_call('timestamp' => 2.hours.ago.utc.to_i, 'content-type' => 'none')
+      assert_status(401)
+      expect(response.body).to match(/expired/i)
+      check_error_response("Timestamp too old or too far in the future, request has expired")
+    end
+
+    context "Error reports" do
+      context "Oauth 1" do
+      end
+    end
   end
 
   def replace_result(opts={})
@@ -519,23 +593,6 @@ to because the assignment has no points possible.
   it "should verify the sourcedid is correct for this tool launch" do
     make_call('body' => replace_result(score: '0.6', sourceid: 'BAD SOURCE ID'))
     check_failure('failure', 'Invalid sourcedid')
-  end
-
-  if Canvas.redis_enabled?
-    it "should not allow the same nonce to be used more than once" do
-      make_call('nonce' => 'not_so_random', 'content-type' => 'none')
-      assert_status(415)
-      make_call('nonce' => 'not_so_random', 'content-type' => 'none')
-      assert_status(401)
-      expect(response.body).to match(/nonce/i)
-    end
-  end
-
-  it "should block timestamps more than 90 minutes old" do
-    # the 90 minutes value is suggested by the LTI spec
-    make_call('timestamp' => 2.hours.ago.utc.to_i, 'content-type' => 'none')
-    assert_status(401)
-    expect(response.body).to match(/expired/i)
   end
 
   it "fails if course is deleted" do

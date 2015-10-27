@@ -20,10 +20,20 @@ require 'nokogiri'
 
 module BasicLTI
   module BasicOutcomes
-    class Unauthorized < Exception;
+    class Unauthorized < StandardError
+      def response_status
+        401
+      end
     end
 
-    class InvalidSourceId < Exception;
+
+    class InvalidRequest < StandardError
+      def response_status
+        415
+      end
+    end
+
+    class InvalidSourceId < StandardError
     end
 
     SOURCE_ID_REGEX = %r{^(\d+)-(\d+)-(\d+)-(\d+)-(\w+)$}

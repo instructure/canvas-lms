@@ -540,6 +540,12 @@ RSpec.configure do |config|
     expect(parsed_test_query).to eq parsed_expected_query
   end
 
+  def assert_hash_contains(test_hash, expected_hash)
+    expected_hash.each do |key, expected_value|
+      expect(test_hash[key]).to eq expected_value
+    end
+  end
+
   def fixture_file_upload(path, mime_type=nil, binary=false)
     Rack::Test::UploadedFile.new(File.join(ActionController::TestCase.fixture_path, path), mime_type, binary)
   end

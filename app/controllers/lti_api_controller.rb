@@ -30,16 +30,13 @@ class LtiApiController < ApplicationController
     verify_oauth
 
     if request.content_type != "application/xml"
-      return render :text => '', :status => 415
+      raise BasicLTI::BasicOutcomes::InvalidRequest, "Content-Type must be 'application/xml'"
     end
 
     xml = Nokogiri::XML.parse(request.body)
 
     lti_response = BasicLTI::BasicOutcomes.process_request(@tool, xml)
     render :text => lti_response.to_xml, :content_type => 'application/xml'
-
-  rescue BasicLTI::BasicOutcomes::Unauthorized => e
-    render :text => e.to_s, :status => 401
   end
 
   # this similar API implements the older work-in-process BLTI 0.0.4 outcome
@@ -50,9 +47,6 @@ class LtiApiController < ApplicationController
 
     lti_response = BasicLTI::BasicOutcomes.process_legacy_request(@tool, params)
     render :text => lti_response.to_xml, :content_type => 'application/xml'
-
-  rescue BasicLTI::BasicOutcomes::Unauthorized => e
-    render :text => e.to_s, :status => 401
   end
 
   # examples: https://github.com/adlnet/xAPI-Spec/blob/master/xAPI.md#AppendixA
@@ -92,8 +86,6 @@ class LtiApiController < ApplicationController
     Lti::XapiService.log_page_view(token, params)
 
     return render :text => '', :status => 200
-  rescue BasicLTI::BasicOutcomes::Unauthorized => e
-    return render :text => e, :status => 401
   end
 
   #
@@ -130,8 +122,6 @@ class LtiApiController < ApplicationController
     Lti::CaliperService.log_page_view(token, params)
 
     return render :text => '', :status => 200
-  rescue BasicLTI::BasicOutcomes::Unauthorized => e
-    return render :text => e, :status => 401
   end
 
   def logout_service
@@ -139,8 +129,6 @@ class LtiApiController < ApplicationController
     verify_oauth(token.tool)
     Lti::LogoutService.register_logout_callback(token, params[:callback])
     return render :text => '', :status => 200
-  rescue BasicLTI::BasicOutcomes::Unauthorized => e
-    return render :text => e, :status => 401
   end
 
   def turnitin_outcomes_placement
@@ -151,8 +139,6 @@ class LtiApiController < ApplicationController
     turnitin_processor = Turnitin::OutcomeResponseProcessor.new(@tool, assignment, user, JSON.parse(request.body.read))
     turnitin_processor.process
     render json: {}, status: 200
-  rescue BasicLTI::BasicOutcomes::Unauthorized => e
-    return render :text => e, status:401
   end
 
 
@@ -166,21 +152,28 @@ class LtiApiController < ApplicationController
     begin
       @signature = OAuth::Signature.build(request, :consumer_secret => @tool.shared_secret)
       @signature.verify() or raise OAuth::Unauthorized
-    rescue OAuth::Signature::UnknownSignatureMethod,
-           OAuth::Unauthorized
-      raise BasicLTI::BasicOutcomes::Unauthorized, "Invalid authorization header"
+
+    rescue OAuth::Signature::UnknownSignatureMethod, OAuth::Unauthorized => e
+      Canvas::Errors::Reporter.raise_canvas_error(BasicLTI::BasicOutcomes::Unauthorized, "Invalid authorization header", oauth_error_info.merge({error_class: e.class.name}))
     end
 
     timestamp = Time.zone.at(@signature.request.timestamp.to_i)
     # 90 minutes is suggested by the LTI spec
     allowed_delta = Setting.get('oauth.allowed_timestamp_delta', 90.minutes.to_s).to_i
     if timestamp < allowed_delta.ago || timestamp > allowed_delta.from_now
-      raise BasicLTI::BasicOutcomes::Unauthorized, "Timestamp too old or too far in the future, request has expired"
+      Canvas::Errors::Reporter.raise_canvas_error(BasicLTI::BasicOutcomes::Unauthorized, "Timestamp too old or too far in the future, request has expired", oauth_error_info)
     end
 
     nonce = @signature.request.nonce
     unless Canvas::Redis.lock("nonce:#{@tool.asset_string}:#{nonce}", allowed_delta)
-      raise BasicLTI::BasicOutcomes::Unauthorized, "Duplicate nonce detected"
+      Canvas::Errors::Reporter.raise_canvas_error(BasicLTI::BasicOutcomes::Unauthorized, "Duplicate nonce detected", oauth_error_info)
     end
+  end
+
+  def oauth_error_info
+    return {} unless @signature
+    {
+      generated_signature: @signature.signature
+    }
   end
 end

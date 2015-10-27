@@ -5,10 +5,11 @@ module Canvas
       let(:request) do
         stub(env: {}, remote_ip: "", query_parameters: {},
              request_parameters: {}, path_parameters: {}, url: '',
-             request_method_symbol: '', format: 'HTML', headers: {})
+             request_method_symbol: '', format: 'HTML', headers: {}, authorization: nil)
       end
 
       let(:request_context_id){ 'abcdefg1234567'}
+      let(:auth_header){ "OAuth oauth_body_hash=\"2jmj7l5rSw0yVb%2FvlWAYkK%2FYBwk%3D\", oauth_consumer_key=\"test_key\", oauth_nonce=\"QFOhAwKHz0UATQSdycHdNkMZYpkhkzU1lYpwvIF3Q8\", oauth_signature=\"QUfER7WBKsq0nzIjJ8Y7iTcDaq0%3D\", oauth_signature_method=\"HMAC-SHA1\", oauth_timestamp=\"1445980405\", oauth_version=\"1.0\"" }
       let(:account){ stub(global_id: 1122334455) }
       let(:user) { stub(global_id: 5544332211)}
       let(:opts) { { request_context_id: request_context_id, type: 'core_meltdown' }}
@@ -53,6 +54,11 @@ module Canvas
           request.stubs(:headers).returns({'User-Agent'=>'the-agent'})
           expect(output[:extra][:user_agent]).to eq('the-agent')
         end
+
+        it 'passes oauth header info' do
+          request.stubs(:authorization).returns(auth_header)
+          check_oauth(output[:extra])
+        end
       end
 
       describe ".useful_http_env_stuff_from_request" do
@@ -72,6 +78,34 @@ module Canvas
         end
       end
 
+
+      describe ".useful_http_headers" do
+        it "returns some oauth header info" do
+          req = stub(authorization: auth_header, headers: {})
+          oauth_info = described_class.useful_http_headers(req)
+          check_oauth(oauth_info)
+        end
+
+        it "returns user agent" do
+          req = stub(headers: {'User-Agent'=>'the-agent'}, authorization: nil)
+          output = described_class.useful_http_headers(req)
+
+          expect(output[:user_agent]).to eq('the-agent')
+        end
+      end
+
+      def check_oauth(oauth_info)
+        expected_info = {
+          "oauth_body_hash"=>"2jmj7l5rSw0yVb/vlWAYkK/YBwk=",
+          "oauth_consumer_key"=>"test_key",
+          "oauth_nonce"=>"QFOhAwKHz0UATQSdycHdNkMZYpkhkzU1lYpwvIF3Q8",
+          "oauth_signature"=>"QUfER7WBKsq0nzIjJ8Y7iTcDaq0=",
+          "oauth_signature_method"=>"HMAC-SHA1",
+          "oauth_timestamp"=>"1445980405",
+          "oauth_version"=>"1.0"
+        }
+        assert_hash_contains(oauth_info, expected_info)
+      end
     end
   end
 end

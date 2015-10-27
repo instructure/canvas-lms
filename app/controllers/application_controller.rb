@@ -1085,6 +1085,7 @@ class ApplicationController < ActionController::Base
       # exceptions we want skipped
       unless exception.respond_to?(:skip_error_report?) && exception.skip_error_report?
         opts = {type: type}
+        opts[:canvas_error_info] = exception.canvas_error_info if exception.respond_to?(:canvas_error_info)
         info = Canvas::Errors::Info.new(request, @domain_root_account, @current_user, opts)
         error_info = info.to_h
         error_info[:tags][:response_code] = response_code
@@ -1177,6 +1178,9 @@ class ApplicationController < ActionController::Base
       data = { errors: [{message: 'Invalid access token.'}] }
     when ActionController::ParameterMissing
       data = { errors: [{message: "#{exception.param} is missing"}] }
+    when BasicLTI::BasicOutcomes::Unauthorized,
+        BasicLTI::BasicOutcomes::InvalidRequest
+      data = { errors: [{message: exception.message}] }
     else
       if status_code.is_a?(Symbol)
         status_code_string = status_code.to_s
