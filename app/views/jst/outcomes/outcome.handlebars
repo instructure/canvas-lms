@@ -64,20 +64,22 @@
   </div>
 {{/if}}
 
-{{#unless readOnly}}
+{{#if can_move}}
   <a href="#" style="float:right" class="move_button ui-button ui-widget ui-state-default ui-corner-all" role="button">
     {{#t}}Move Outcome{{/t}}
   </a>
 
-  {{#if native}}
+  {{#if can_edit}}
     <a href="#" style="float:right" class="edit_button ui-button ui-widget ui-state-default ui-corner-all" role="button"
       {{#if assessedInContext}} disabled tabindex="-1" aria-hidden="true" {{/if}}>
       {{#t "links.edit_outcome"}}Edit Outcome{{/t}}
     </a>
   {{/if}}
 
-  <a href="#" style="float:right" class="delete_button ui-button ui-widget ui-state-default ui-corner-all" role="button"
-    {{#if assessedInContext}} disabled tabindex="-1" aria-hidden="true" {{/if}}>
-    {{#t "links.delete_outcome"}}Delete Outcome{{/t}}
-  </a>
-{{/unless}}
+  {{#if can_remove}}
+    <a href="#" style="float:right" class="delete_button ui-button ui-widget ui-state-default ui-corner-all" role="button"
+      {{#if assessedInContext}} disabled tabindex="-1" aria-hidden="true" {{/if}}>
+      {{#t "links.delete_outcome"}}Delete Outcome{{/t}}
+    </a>
+  {{/if}}
+{{/if}}
