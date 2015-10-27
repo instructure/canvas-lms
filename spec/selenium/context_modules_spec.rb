@@ -288,6 +288,18 @@ describe "context modules" do
       expect(page.reload).to be_published
     end
 
+    it "publishes a newly created item" do
+      get "/courses/#{@course.id}/modules"
+      add_new_module_item('#wiki_pages_select', 'Content Page', '[ New Page ]', 'New Page Title')
+
+      tag = ContentTag.last
+      item = f("#context_module_item_#{tag.id}")
+      item.find_element(:css, '.publish-icon').click
+      wait_for_ajax_requests
+
+      expect(tag.reload).to be_published
+    end
+
     it "should add the 'with-completion-requirements' class to rows that have requirements" do
       mod = @course.context_modules.create! name: 'TestModule'
       tag = mod.add_item({:id => @assignment.id, :type => 'assignment'})
