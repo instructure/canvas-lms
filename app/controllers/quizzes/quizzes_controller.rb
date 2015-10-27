@@ -402,7 +402,7 @@ class Quizzes::QuizzesController < ApplicationController
             @quiz.save!
           end
 
-          if old_assignment
+          if old_assignment && @quiz.assignment.present?
             @quiz.assignment.save
           end
 
