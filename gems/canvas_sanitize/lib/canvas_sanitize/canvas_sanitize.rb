@@ -79,7 +79,7 @@ module CanvasSanitize #:nodoc:
           'hr', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'h7', 'h8',
           'del', 'ins', 'iframe', 'font',
           'colgroup', 'dd', 'div', 'dl', 'dt', 'em', 'figure', 'figcaption', 'i', 'img', 'li', 'ol', 'p', 'pre',
-          'q', 'small', 'span', 'strike', 'strong', 'sub', 'sup', 'table', 'tbody', 'td',
+          'q', 'small', 'source', 'span', 'strike', 'strong', 'sub', 'sup', 'table', 'tbody', 'td',
           'tfoot', 'th', 'thead', 'tr', 'u', 'ul', 'object', 'embed', 'param', 'video', 'audio'],
 
       :attributes => {
@@ -144,8 +144,9 @@ module CanvasSanitize #:nodoc:
           'ul' => ['type'],
           'param' => ['name', 'value'],
           'object' => ['width', 'height', 'style', 'data', 'type', 'classid', 'codebase'],
+          'source' => ['src', 'type'],
           'embed' => ['name', 'src', 'type', 'allowfullscreen', 'pluginspage', 'wmode', 'allowscriptaccess', 'width', 'height'],
-          'video' => ['name', 'src', 'allowfullscreen', 'muted', 'poster', 'width', 'height'],
+          'video' => ['name', 'src', 'allowfullscreen', 'muted', 'poster', 'width', 'height', 'controls'],
           'audio' => ['name', 'src', 'muted'],
           'font' => ['face', 'color', 'size'],
       },
