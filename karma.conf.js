@@ -3,7 +3,7 @@ var usingWebpack = (process.env.USE_WEBPACK == 'True' || process.env.USE_WEBPACK
 // If we're using webpack, we don't want to load all the requirejs stuff;
 if(usingWebpack){
   karmaFiles = [
-    'spec/javascripts/support/sinon/sinon-1.7.3.js',
+    'spec/javascripts/support/sinon/sinon-1.17.2.js',
     'spec/javascripts/support/sinon/sinon-qunit-1.0.0.js',
     {pattern: 'spec/javascripts/webpack/*.bundle.test.js', included: true, served: true}
   ];
@@ -13,7 +13,7 @@ if(usingWebpack){
     'spec/javascripts/tests.js',
     'public/javascripts/vendor/require.js',
     'node_modules/karma-requirejs/lib/adapter.js',
-    'spec/javascripts/support/sinon/sinon-1.7.3.js',
+    'spec/javascripts/support/sinon/sinon-1.17.2.js',
     'spec/javascripts/support/sinon/sinon-qunit-1.0.0.js',
     {pattern: 'public/javascripts/*.js', included: false, served: true},
     {pattern: 'spec/javascripts/fixtures/*.html', included: false, served: true},
