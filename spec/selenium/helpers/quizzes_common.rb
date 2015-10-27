@@ -557,6 +557,11 @@ def seed_quiz_wth_submission(num=1)
               points_possible: 20,
               question_text: 'Write an essay',
               question_type: 'essay_question'
+          },
+          {
+              question_name: 'Text (no question)',
+              question_text: 'This is just text',
+              question_type: 'text_only_question'
           }
       ]
 

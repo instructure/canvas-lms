@@ -110,6 +110,31 @@ describe 'Speedgrader' do
       clear_grade_and_validate
     end
 
+    context 'quizzes' do
+      before(:each) do
+        init_course_with_students
+        quiz = seed_quiz_wth_submission
+
+        user_session(@teacher)
+        get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{quiz.assignment_id}"
+        driver.switch_to.frame f('#speedgrader_iframe')
+      end
+
+      it 'should display needs review alert on non-autograde questions', priority: "1", test_id: 441360 do
+        expect(ff('#update_history_form .alert')[0].text).to include_text('The following questions need review:')
+      end
+
+      it 'should only display needs review for file_upload and essay questions', priority: "2", test_id: 452539 do
+        questions_to_grade = ff('#questions_needing_review li a')
+        expect(questions_to_grade[0].text).to include_text('Question 2')
+        expect(questions_to_grade[1].text).to include_text('Question 3')
+      end
+
+      it 'should not display review warning on text only quiz questions', priority: "1", test_id: 377664 do
+        expect(ff('#update_history_form .alert')[0].text).not_to include_text('Question 4')
+      end
+    end
+
     context 'pass/fail assignment grading' do
       before :each do
         init_course_with_students 1
@@ -278,7 +303,7 @@ describe 'Speedgrader' do
       expect(f('header.quiz-header').text).to include quiz.title
       expect(f('#quiz-nav-inner-wrapper')).to be_displayed
       nav = ff('.quiz-nav-li')
-      expect(nav.length).to eq 3
+      expect(nav.length).to eq 4
     end
 
     it 'scrolls nav bar and to questions', priority: "1", test_id: 164020 do
@@ -296,7 +321,7 @@ describe 'Speedgrader' do
       expect(f('header.quiz-header').text).to include quiz.title
 
       expect(wrapper).to be_displayed
-      expect(ff('.quiz-nav-li').length).to eq 30
+      expect(ff('.quiz-nav-li').length).to eq 40
 
       # check scrolling
       first_left = wrapper.css_value('left')
@@ -308,7 +333,7 @@ describe 'Speedgrader' do
       # check anchors
       anchors = ff('#quiz-nav-inner-wrapper li a')
 
-      [17, 5, 25].each do |index|
+      [17, 25, 33].each do |index|
         data_id = anchors[index].attribute 'data-id'
         anchors[index].click
         wait_for_animations
