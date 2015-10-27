@@ -1013,6 +1013,22 @@ describe "context modules" do
       expect(fln('New Assignment Title')).to be_displayed
     end
 
+    it "should add a assignment item to a module, publish new assignment refresh page and verify", priority: "2", test_id: 441358 do
+      # this test basically verifies that the published icon is accurate after a page refresh
+      add_new_module_item('#assignments_select', 'Assignment', '[ New Assignment ]', 'New Assignment 2')
+      tag = ContentTag.last
+      item = f("#context_module_item_#{tag.id}")
+      expect(f('span.publish-icon.unpublished.publish-icon-publish > i.icon-unpublish')).to be_displayed
+      # publish assignment item
+      item.find_element(:css, '.publish-icon').click
+      wait_for_ajax_requests
+      expect(tag.reload).to be_published
+      # refreshes page and checks again
+      refresh_page
+      driver.mouse.move_to f('i.icon-unpublish')
+      expect(f('span.publish-icon.published.publish-icon-published')).to be_displayed
+      expect(tag).to be_published
+    end
 
     it "should add a quiz to a module", priority: "1", test_id: 126719 do
       add_new_module_item('#quizs_select', 'Quiz', '[ New Quiz ]', 'New Quiz Title')
@@ -1022,6 +1038,17 @@ describe "context modules" do
     it "should add a content page item to a module", priority: "1", test_id: 126708 do
       add_new_module_item('#wiki_pages_select', 'Content Page', '[ New Page ]', 'New Page Title')
       verify_persistence('New Page Title')
+    end
+
+    it "should add a content page item to a module and publish new page", priority: "2", test_id: 441357 do
+      add_new_module_item('#wiki_pages_select', 'Content Page', '[ New Page ]', 'PAGE 2')
+      tag = ContentTag.last
+      item = f("#context_module_item_#{tag.id}")
+      expect(f('span.publish-icon.unpublished.publish-icon-publish > i.icon-unpublish')).to be_displayed
+      # publish new page module item
+      item.find_element(:css, '.publish-icon').click
+      wait_for_ajax_requests
+      expect(tag.reload).to be_published
     end
 
     it "should add a discussion item to a module", priority: "1", test_id: 126711 do
