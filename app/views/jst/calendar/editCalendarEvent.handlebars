@@ -60,6 +60,13 @@
         </td>
       </tr>
       <tr>
+        <td></td>
+        <td><a href="#" onclick="jQuery.post('/bz/video_link', '', function(obj) {
+          var e = document.getElementById('calendar_event_location_name');
+          e.value = obj.link;
+         } ); return false;">Use Google Hangout as location</a></td>
+      </tr>
+      <tr>
         <td style="vertical-align: top;"><label for="calendar_event_location_name">{{#t "location"}}Location:{{/t}}</label></td>
         <td><input id="calendar_event_location_name" name="location_name" size="30" maxlength="255" style="width: 185px;" type="text" value="{{location_name}}"/></td>
       </tr>
