@@ -501,6 +501,7 @@ define [
       @calendar.fullCalendar('removeEvents', event.id)
 
     eventSaving: (event) =>
+      event.prepForSave()
       return unless event.start # undated events can't be rendered
       event.addClass 'event_pending'
       if event.isNewEvent()

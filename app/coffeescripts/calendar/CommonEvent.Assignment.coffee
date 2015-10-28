@@ -47,14 +47,7 @@ define [
       @readableTypes[@assignmentType()]
 
     saveDates: (success, error) ->
-      # temporary fix for dragging undated onto cal
-      # underlying issue should be found (similar hack
-      # in ShowEventDetailsDialog)
-      @_start = @start
-      @_end = @end
-      @_startDate = @startDate
-      @_end = @end
-
+      @prepForSave()
       @save { 'assignment[due_at]': if @start then fcUtil.unwrap(@start).toISOString() else '' }, success, error
 
     save: (params, success, error) ->
