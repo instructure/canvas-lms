@@ -117,6 +117,19 @@ describe "people" do
       open_dropdown_menu(option: 'removeFromCourse')
     end
 
+    it "should display the option to remove a student from a course has a SIS ID", priority: "1", test_id: 336018 do
+      @course.sis_source_id = 'xyz'
+      @course.save
+      enroll_student(@student_2)
+      # need to hit /users page again to show enrollment of 2nd student
+      get "/courses/#{@course.id}/users"
+      wait_for_ajaximations
+      # check 1st student
+      open_dropdown_menu(option: 'removeFromCourse', selector: '.rosterUser:nth-child(2)')
+      # check 2nd student
+      open_dropdown_menu(option: 'removeFromCourse', selector: '.rosterUser:nth-child(3)')
+    end
+
     it "should display the option to remove a ta from the course" do
       open_dropdown_menu(option: 'removeFromCourse', selector: '.rosterUser:nth-child(3)')
     end
