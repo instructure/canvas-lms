@@ -7,7 +7,6 @@ define [
   '../modules/customPropTypes'
   'Backbone'
   'i18n!file_preview'
-  'jsx/shared/FriendlyDatetime'
   'compiled/util/friendlyBytes'
   'compiled/models/Folder'
   'compiled/models/File'
@@ -17,10 +16,7 @@ define [
   'jsx/files/FilePreviewInfoPanel'
   '../modules/filesEnv'
   '../modules/FocusStore'
-], ($, _, React, ReactRouter, ReactModal, customPropTypes, Backbone, I18n, FriendlyDatetimeComponent, friendlyBytes, Folder, File, FilesystemObject, preventDefault, collectionHandler, FilePreviewInfoPanel, filesEnv, FocusStore) ->
-
-  FriendlyDatetime = React.createFactory FriendlyDatetimeComponent
-  Link = React.createFactory ReactRouter.Link
+], ($, _, React, ReactRouter, ReactModal, customPropTypes, Backbone, I18n, friendlyBytes, Folder, File, FilesystemObject, preventDefault, collectionHandler, FilePreviewInfoPanel, filesEnv, FocusStore) ->
 
   FilePreview =
 

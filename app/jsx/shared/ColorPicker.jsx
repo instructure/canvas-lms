@@ -276,10 +276,18 @@ define([
     },
 
     modalWrapping (body) {
+      // TODO: The non-computed styles below could possibly moved out to the
+      //       proper stylesheets in the future.
       var styleObj = {
-        position: 'absolute',
-        left: this.props.positions.left - 254,
-        top: this.props.positions.top - 124
+        content: {
+          position: 'absolute',
+          left: this.props.positions.left - 254,
+          top: this.props.positions.top - 124,
+          right: 0,
+          bottom: 0,
+          overflow: 'visible',
+          padding: 0
+        }
       };
 
       return (

@@ -1,9 +1,8 @@
 define [
   'i18n!react_files'
   'react'
-  'compiled/react/shared/utils/withReactElement'
   '../modules/FileUploader'
-], (I18n, React, withReactElement, FileUploader) ->
+], (I18n, React, FileUploader) ->
 
 
   UploadProgress =

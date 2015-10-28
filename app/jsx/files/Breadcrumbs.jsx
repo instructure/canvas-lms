@@ -18,7 +18,7 @@ define([
     var isContextRoot = !!(folder && (folder.get("context_type") || "").toLowerCase() === contextType && (folder.get("context_id") || -1).toString() === contextId);
     var name = (isRootCrumb  && isContextRoot) ? I18n.t('files', 'Files') : folder && (folder.get('custom_name') || folder.get('name'));
     return (
-      <li>
+      <li key={name}>
         <Link
           to={(isRootCrumb) ? 'rootFolder' : 'folder'}
           params={{splat: (isRootCrumb) ? null : folder.urlPath()}}
@@ -41,7 +41,7 @@ define([
     if (this.props.showingSearchResults) {
       return [
         this.renderSingleCrumb(null, !'isLastCrumb', !!'isRootCrumb'),
-        <li>
+        <li key='searchLink'>
           <Link
             to='search'
             query={this.getQuery()}

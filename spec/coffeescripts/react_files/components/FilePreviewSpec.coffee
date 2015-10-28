@@ -85,7 +85,7 @@ define [
         new TestLocation([ path ])
 
       routes = [
-        Router.Route path: filesEnv.baseUrl, handler: FilePreviewComponent, name: 'rootFolder'
+        React.createElement(Router.Route, path: filesEnv.baseUrl, handler: FilePreviewComponent, name: 'rootFolder')
       ]
 
       @runRouter = () ->
@@ -96,7 +96,7 @@ define [
           callback = arguments[0]
 
         Router.run routes, location(path), (Handler) =>
-          React.render Handler(properties), @div, ->
+          React.render React.createElement(Handler, properties), @div, ->
             callback.call(null)
 
 

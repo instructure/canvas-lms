@@ -18,7 +18,7 @@ define([
       error_message = errors.map(function (error) {
         return (
           <li>
-            error.message
+            {error.message}
           </li>
         )
       })

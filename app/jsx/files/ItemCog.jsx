@@ -8,7 +8,7 @@ define([
   'compiled/models/Folder',
   'jsx/files/UsageRightsDialog',
   'jsx/files/RestrictedDialogForm',
-  'compiled/react_files/utils/openMoveDialog',
+  'jsx/files/utils/openMoveDialog',
   'compiled/react_files/utils/downloadStuffAsAZip',
   'compiled/react_files/utils/deleteStuff',
   'jquery'
@@ -44,14 +44,14 @@ define([
         externalToolMenuItems = this.props.externalToolsForContext.map((tool) => {
           if (this.props.model.externalToolEnabled(tool)) {
             return (
-              <li>
+              <li key={tool.title}>
                 <a href={`${tool.base_url}&files[]=${this.props.model.id}`}>
                   {tool.title}
                 </a>
               </li>
             );
           } else {
-            return (<li><a href='#' className='disabled'>{tool.title}</a></li>);
+            return (<li key={tool.title}><a href='#' className='disabled'>{tool.title}</a></li>);
           }
         });
       } else {
@@ -82,24 +82,24 @@ define([
 
       // Download Link
       if (this.props.model instanceof Folder) {
-        menuItems.push(<li><a href='#' onClick={wrap(downloadStuffAsAZip)} ref='download'>{I18n.t('Download')}</a></li>);
+        menuItems.push(<li key='folderDownload'><a href='#' onClick={wrap(downloadStuffAsAZip)} ref='download'>{I18n.t('Download')}</a></li>);
       } else {
-        menuItems.push(<li><a href={this.props.model.get('url')} ref='download'>{I18n.t('Download')}</a></li>);
+        menuItems.push(<li key='download'><a href={this.props.model.get('url')} ref='download'>{I18n.t('Download')}</a></li>);
       }
 
       if (this.props.userCanManageFilesForContext) {
         // Rename Link
-        menuItems.push(<li><a href='#' onClick={preventDefault(this.props.startEditingName)} ref='editName'>{I18n.t('Rename')}</a></li>);
+        menuItems.push(<li key='rename'><a href='#' onClick={preventDefault(this.props.startEditingName)} ref='editName'>{I18n.t('Rename')}</a></li>);
         // Move Link
-        menuItems.push(<li><a href='#' onClick={wrap(openMoveDialog, {clearSelectedItems: this.props.clearSelectedItems, onMove: this.props.onMove})} ref='move'>{I18n.t('Move')}</a></li>);
+        menuItems.push(<li key='move'><a href='#' onClick={wrap(openMoveDialog, {clearSelectedItems: this.props.clearSelectedItems, onMove: this.props.onMove})} ref='move'>{I18n.t('Move')}</a></li>);
 
         if (this.props.usageRightsRequiredForContext) {
           // Manage Usage Rights Link
-          menuItems.push(<li className='ItemCog__OpenUsageRights'><a href='#' onClick={preventDefault(this.openUsageRightsDialog)} ref='usageRights'>{I18n.t('Manage Usage Rights')}</a></li>);
+          menuItems.push(<li key='manageUsageRights' className='ItemCog__OpenUsageRights'><a href='#' onClick={preventDefault(this.openUsageRightsDialog)} ref='usageRights'>{I18n.t('Manage Usage Rights')}</a></li>);
         }
 
         // Delete Link
-        menuItems.push(<li><a href='#' onClick={wrap(deleteStuff)} ref='deleteLink'>{I18n.t('Delete')}</a></li>);
+        menuItems.push(<li key='delete'><a href='#' onClick={wrap(deleteStuff)} ref='deleteLink'>{I18n.t('Delete')}</a></li>);
       }
 
       return (

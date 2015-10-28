@@ -39,7 +39,7 @@ define([
               </tr>
               <tr>
                 <th scope='row'>{I18n.t('Date Modified')}</th>
-                <td id='dateModified' ref='dateModified'><FriendlyDatetime datetime={this.props.displayedItem.get('updated_at')} /></td>
+                <td id='dateModified' ref='dateModified'><FriendlyDatetime dateTime={this.props.displayedItem.get('updated_at')} /></td>
               </tr>
               {this.props.displayedItem.get('user') && (
                 <tr>
@@ -51,7 +51,7 @@ define([
               )}
               <tr>
                 <th scope='row'>{I18n.t('Date Created')}</th>
-                <td id= 'dateCreated'><FriendlyDatetime datetime={this.props.displayedItem.get('created_at')} /></td>
+                <td id= 'dateCreated'><FriendlyDatetime dateTime={this.props.displayedItem.get('created_at')} /></td>
               </tr>
               {this.props.usageRightsRequiredForContext && (
                 <tr className='FilePreviewInfoPanel__usageRights'>

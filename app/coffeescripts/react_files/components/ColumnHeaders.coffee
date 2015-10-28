@@ -3,12 +3,8 @@ define [
   'underscore'
   'react'
   'react-router'
-  'compiled/react/shared/utils/withReactElement'
   'compiled/fn/preventDefault'
-], (I18n, _, React, ReactRouter, withReactElement, preventDefault) ->
-
-  classSet = React.addons.classSet
-  Link = React.createFactory ReactRouter.Link
+], (I18n, _, React, ReactRouter, preventDefault) ->
 
   columns = [
     displayName: I18n.t('name', 'Name')

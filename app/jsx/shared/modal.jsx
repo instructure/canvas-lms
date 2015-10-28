@@ -8,7 +8,7 @@ define([
   './modal-buttons',
 ], function (React, $, _, preventDefault,  ReactModal, ModalContent, ModalButtons) {
 
-  ReactModal.injectCSS()
+  ReactModal.setAppElement(document.body)
 
   var Modal = React.createClass({
 

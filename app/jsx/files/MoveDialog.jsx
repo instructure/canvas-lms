@@ -38,6 +38,7 @@ define([
     return (
       <Modal
         className='ReactModal__Content--canvas ReactModal__Content--mini-modal'
+        overlayClassName='ReactModal__Overlay--canvas'
         ref='canvasModal'
         isOpen={this.state.isOpen}
         title={this.getTitle()}

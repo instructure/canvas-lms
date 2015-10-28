@@ -6,15 +6,12 @@ define [
   'compiled/fn/preventDefault'
   '../modules/customPropTypes'
   'compiled/models/Folder'
-  'jsx/files/UsageRightsSelectBox'
   '../modules/filesEnv'
   '../utils/setUsageRights'
   '../utils/updateModelsUsageRights'
-  'jsx/files/DialogPreview'
-  'compiled/react/shared/utils/withReactElement'
   'compiled/jquery.rails_flash_notifications'
   'jquery.instructure_forms'
-], ($, _, React, I18n, preventDefault, customPropTypes, Folder, UsageRightsSelectBox, filesEnv, setUsageRights, updateModelsUsageRights, DialogPreview, withReactElement) ->
+], ($, _, React, I18n, preventDefault, customPropTypes, Folder, filesEnv, setUsageRights, updateModelsUsageRights) ->
 
   ManageUsageRightsModal =
     displayName: 'ManageUsageRightsModal'

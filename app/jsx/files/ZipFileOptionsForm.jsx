@@ -7,10 +7,6 @@ define([
   'jsx/shared/modal-buttons'
   ], function(I18n, React, withReactElement, Modal, ModalContent, ModalButtons) {
 
-  var Modal = React.createFactory(Modal);
-
-
-
   var ZipFileOptionsForm = React.createClass({
     displayName: 'ZipFileOptionsForm',
     propTypes: {
@@ -34,7 +30,7 @@ define([
       return (
         <Modal
           className='ReactModal__Content--canvas ReactModal__Content--mini-modal'
-          isOpen={this.props.fileOptions}
+          isOpen={!!this.props.fileOptions}
           ref='canvasModal'
           title= { I18n.t('zip_options', 'Zip file options') }
           onRequestClose = {this.props.onClose}

@@ -45,8 +45,9 @@ define [
         @closeDialog()
 
     closeDialog: ->
-      @props.onClose()
-      @setState isOpen: false
+      @setState(isOpen: false, ->
+        @props.onClose()
+      )
 
     getTitle: ->
       I18n.t('move_question', {

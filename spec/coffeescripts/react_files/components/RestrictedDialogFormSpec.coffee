@@ -12,7 +12,7 @@ define [
       props =
         models: [new Folder(id: 1000, hidden: false), new Folder(id: 999, hidden: true)]
 
-      @restrictedDialogForm = React.render(RestrictedDialogForm(props), $('<div>').appendTo('#fixtures')[0])
+      @restrictedDialogForm = React.render(React.createElement(RestrictedDialogForm, props), $('<div>').appendTo('#fixtures')[0])
 
     teardown: ->
       React.unmountComponentAtNode(@restrictedDialogForm.getDOMNode().parentNode)
@@ -31,7 +31,7 @@ define [
       props =
         models: [new Folder(id: 999, hidden: true, lock_at: undefined, unlock_at: undefined)]
 
-      @restrictedDialogForm = React.render(RestrictedDialogForm(props), $('<div>').appendTo('#fixtures')[0])
+      @restrictedDialogForm = React.render(React.createElement(RestrictedDialogForm, props), $('<div>').appendTo('#fixtures')[0])
     teardown: ->
       React.unmountComponentAtNode(@restrictedDialogForm.getDOMNode().parentNode)
       $("#fixtures").empty()

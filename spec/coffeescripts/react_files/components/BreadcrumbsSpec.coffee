@@ -33,12 +33,12 @@ define [
 
     location = new TestLocation([ '/courses/1/files/folder/test_folder_name' ])
     routes = [
-      Route path: "#{filesEnv.baseUrl}/folder/*", name: "folder", handler: BreadcrumbsComponent
-      Route path: "#{filesEnv.baseUrl}/?", name: "rootFolder", handler: BreadcrumbsComponent
+      React.createElement(Route, path: "#{filesEnv.baseUrl}/folder/*", name: "folder", handler: BreadcrumbsComponent)
+      React.createElement(Route, path: "#{filesEnv.baseUrl}/?", name: "rootFolder", handler: BreadcrumbsComponent)
     ]
 
     Router.run routes, location, (Handler) =>
-      React.render Handler(sampleProps), @div, ->
+      React.render React.createElement(Handler, sampleProps), @div, ->
         start()
         $breadcrumbs = $('#breadcrumbs')
         equal $breadcrumbs.find('.home a')?.attr('href'), '/', 'correct home url'

@@ -10,7 +10,7 @@ define([
   'jsx/files/UsageRightsIndicator',
   'compiled/models/Folder',
   'compiled/fn/preventDefault',
-  'jsx/files/FriendlyDatetime',
+  'jsx/shared/FriendlyDatetime',
   'compiled/util/friendlyBytes'
 ], function(I18n, React, ReactRouter, FolderChild, classnames, ItemCog, PublishCloud, FilesystemObjectThumbnail, UsageRightsIndicator, Folder, preventDefault, FriendlyDatetime, friendlyBytes) {
   var Link = ReactRouter.Link
@@ -151,11 +151,13 @@ define([
         </div>
 
         <div className='ef-date-created-col' role= 'gridcell'>
-          <FriendlyDatetime datetime= {this.props.model.get('created_at')} />
+          <FriendlyDatetime dateTime={this.props.model.get('created_at')} />
         </div>
 
         <div className='ef-date-modified-col' role= 'gridcell'>
-          <FriendlyDatetime datetime= {this.props.model.get('modified_at')} />
+          {!(this.props.model instanceof Folder) && (
+            <FriendlyDatetime dateTime={this.props.model.get('modified_at')} />
+          )}
         </div>
 
         <div className='ef-modified-by-col ellipsis' role= 'gridcell'>

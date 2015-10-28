@@ -260,16 +260,29 @@ var ModalPortal = module.exports = React.createClass({
   },
 
   render: function() {
+    /**
+     * The logic here for contentStyles and overlayStyles is a custom implementation,
+     * yes I understand I have modified vendor code in place.  I'm hoping that this
+     * is a completly temporary move.  When we upgrade to React 0.14 this code will
+     * be completely overriden.  I'm hoping that https://github.com/rackt/react-modal/pull/100
+     * gets merged upstream.  If it doesn't then Instructure will fork react-modal
+     * with these changes in place.
+     *
+     * In any case, this code is temporary for now and WILL be gone soon.
+     */
+    var contentStyles = (this.props.className) ? {} : defaultStyles.content;
+    var overlayStyles = (this.props.overlayClassName) ? {} : defaultStyles.overlay;
+
     return this.shouldBeClosed() ? div() : (
       div({
         ref: "overlay",
         className: this.buildClassName('overlay', this.props.overlayClassName),
-        style: Assign({}, defaultStyles.overlay, this.props.style.overlay || {}),
+        style: Assign({}, overlayStyles, this.props.style.overlay || {}),
         onClick: this.handleOverlayClick
       },
         div({
           ref: "content",
-          style: Assign({}, defaultStyles.content, this.props.style.content || {}),
+          style: Assign({}, contentStyles, this.props.style.content || {}),
           className: this.buildClassName('content', this.props.className),
           tabIndex: "-1",
           onClick: stopPropagation,

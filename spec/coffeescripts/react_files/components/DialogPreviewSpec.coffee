@@ -14,8 +14,8 @@ define [
   test 'DP: single item rendered with FilesystemObjectThumbnail', ->
     file = new File(name: 'Test File', thumbnail_url: 'blah')
     file.url = -> "some_url"
-    fsObjStub = @stub(FilesystemObjectThumbnail.type.prototype, 'render').returns(React.createElement('div'))
-    dialogPreview = TestUtils.renderIntoDocument(DialogPreview(itemsToShow: [file]))
+    fsObjStub = @stub(FilesystemObjectThumbnail.prototype, 'render').returns(React.createElement('div'))
+    dialogPreview = TestUtils.renderIntoDocument(React.createElement(DialogPreview, itemsToShow: [file]))
 
     ok fsObjStub.calledOnce
     React.unmountComponentAtNode(dialogPreview.getDOMNode().parentNode)
@@ -28,7 +28,7 @@ define [
     file.url = url
     file2.url = url
 
-    dialogPreview = TestUtils.renderIntoDocument(DialogPreview(itemsToShow: [file, file2]))
+    dialogPreview = TestUtils.renderIntoDocument(React.createElement(DialogPreview, itemsToShow: [file, file2]))
 
     equal dialogPreview.getDOMNode().getElementsByTagName('i').length, 2, "there are two files rendered"
 

@@ -2,7 +2,7 @@ define([
   'i18n!react_files',
   'react',
   'compiled/react_files/components/Toolbar',
-  'compiled/react_files/utils/openMoveDialog',
+  'jsx/files/utils/openMoveDialog',
   'compiled/react_files/utils/deleteStuff',
   'jsx/files/UploadButton',
   'classnames',

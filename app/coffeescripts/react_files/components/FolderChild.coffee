@@ -93,7 +93,7 @@ define [
         attrs.onDrop = (event) =>
           @props.dndOptions.onItemDrop(event, @props.model, ({success, event}) =>
             toggleActive(false)
-            React.unmountComponentAtNode(@refs.FolderChild.parentNode) if success
+            React.unmountComponentAtNode(@refs.FolderChild.getDOMNode().parentNode) if success
           )
       attrs
 

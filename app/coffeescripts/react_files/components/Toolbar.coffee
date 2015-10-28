@@ -4,7 +4,6 @@ define [
   'react'
   'react-router'
   'jsx/files/UsageRightsDialog'
-  '../utils/openMoveDialog'
   '../utils/downloadStuffAsAZip'
   '../utils/deleteStuff'
   '../modules/customPropTypes'
@@ -15,7 +14,7 @@ define [
   'classnames'
   'jquery'
   'compiled/jquery.rails_flash_notifications'
-], (_, I18n, React, Router, UsageRightsDialog, openMoveDialog, downloadStuffAsAZip, deleteStuff, customPropTypes, RestrictedDialogForm, preventDefault, FocusStore, Folder, classnames, $) ->
+], (_, I18n, React, Router, UsageRightsDialog, downloadStuffAsAZip, deleteStuff, customPropTypes, RestrictedDialogForm, preventDefault, FocusStore, Folder, classnames, $) ->
 
   Toolbar =
     displayName: 'Toolbar'
@@ -79,7 +78,8 @@ define [
           React.unmountComponentAtNode this
           $(this).remove()
 
-      React.render(RestrictedDialogForm({
+      # This should technically be in JSX land, but ¯\_(ツ)_/¯
+      React.render(React.createElement(RestrictedDialogForm, {
         models: @props.selectedItems
         usageRightsRequiredForContext: @props.usageRightsRequiredForContext
         closeDialog: -> $dialog.dialog('close')
@@ -88,10 +88,11 @@ define [
     openUsageRightsDialog: (event)->
       event.preventDefault()
 
-      contents = UsageRightsDialog(
-        closeModal: @props.modalOptions.closeModal
-        itemsToManage: @props.selectedItems
-      )
+      # This should technically be in JSX land, but ¯\_(ツ)_/¯
+      contents = React.createElement(UsageRightsDialog, {
+          closeModal: @props.modalOptions.closeModal
+          itemsToManage: @props.selectedItems
+      })
 
       @props.modalOptions.openModal(contents, => @refs.usageRightsBtn.getDOMNode().focus())
 
