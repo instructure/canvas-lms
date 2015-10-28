@@ -10,11 +10,13 @@ module CC::Exporter::Epub
       announcements: "Announcements",
       topics: "Discussion Topics",
       quizzes: "Quizzes",
-      pages: "Wiki Pages"
+      pages: "Wiki Pages",
+      files: "Files"
     }.freeze
 
     LINKED_RESOURCE_KEY = {
       "Assignment" => :assignments,
+      "Attachment" => :files,
       "DiscussionTopic" => :topics,
       "Quizzes::Quiz" => :quizzes,
       "WikiPage" => :pages
@@ -34,7 +36,7 @@ module CC::Exporter::Epub
     def templates
       @_templates ||= {
         title: cartridge_json[:title],
-        files: cartridge_json[:files]
+        files: cartridge_json[:files],
       }.tap do |hash|
         resources = filter_syllabus_for_modules ? module_ids : LINKED_RESOURCE_KEY.values
         hash.merge!(
@@ -42,7 +44,7 @@ module CC::Exporter::Epub
           :announcements => create_universal_template(:announcements)
         )
         resources.each do |resource_type|
-          hash.merge!(resource_type => create_content_template(resource_type))
+          hash.reverse_merge!(resource_type => create_content_template(resource_type))
         end
       end
     end

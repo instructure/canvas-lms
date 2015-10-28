@@ -7,7 +7,7 @@
     <h1 id="<%= content[:migration_id]%>"><%= title %></h1>
     <ol>
     <% content[:items].each do |item| %>
-      <li><a href="#<%= "#{item[:identifier]}" %>"><%= item[:title] %></a></li>
+      <li><a href="#<%= "#{item[:linked_resource_id]}" %>"><%= item[:title] %></a></li>
     <% end %>
     </ol>
     <div style="page-break-before:always;"></div>

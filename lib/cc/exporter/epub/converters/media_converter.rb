@@ -97,7 +97,12 @@ module CC::Exporter::Epub::Converters
     #
     # <audio src='media/audio.mp3' controls='controls' />
     def convert_audio_tags!(html_node)
-      html_node.search('a.instructure_audio_link, a.audio_comment').each do |audio_link|
+      selector = [
+        "a.instructure_audio_link",
+        "a.audio_comment",
+        "a[href$='mp3']"
+      ].join(',')
+      html_node.search(selector).each do |audio_link|
         audio_link.replace(<<-AUDIO_TAG)
           <audio src="#{audio_link['href']}" controls="controls">
             #{I18n.t('Audio content is not supported by your device or app.')}
@@ -117,7 +122,13 @@ module CC::Exporter::Epub::Converters
     #
     # <video src='media/video.mp4' controls='controls' />
     def convert_video_tags!(html_node)
-      html_node.search('a.instructure_video_link, a.video_comment').each do |video_link|
+      selector = [
+        "a.instructure_video_link",
+        "a.video_comment",
+        "a[href$='m4v']",
+        "a[href$='mp4']"
+      ].join(',')
+      html_node.search(selector).each do |video_link|
         video_link.replace(<<-VIDEO_TAG)
           <video src="#{video_link['href']}" controls="controls">
             #{I18n.t('Video content is not supported by your device or app.')}

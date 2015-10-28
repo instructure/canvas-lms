@@ -57,7 +57,7 @@ module CC::Exporter::Epub::Converters
 
       def to_h
         return {
-          migration_id: data['identifier'],
+          identifier: data['identifier'],
           local_path: local_path,
           file_name: File.basename(local_path),
           path_to_file: path_to_file,

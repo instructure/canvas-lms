@@ -39,7 +39,7 @@ describe "Exporter" do
     it "should not contain content type keys" do
       # once we have a more robust imscc we should add another test to check
       # that the keys reflect the module migration ids
-      content_keys = CC::Exporter::Epub::Exporter::LINKED_RESOURCE_KEY.values
+      content_keys = CC::Exporter::Epub::Exporter::LINKED_RESOURCE_KEY.except("Attachment").values
       expect(content_keys.any? {|k| exporter.templates.key?(k)}).to be_falsey
     end
   end

@@ -35,7 +35,7 @@ module CC::Exporter::Epub::Converters
     end
 
     def object_path_selector
-      selector = [
+      return [
         "a", [
           "[href*='#{OBJECT_TOKEN.gsub('$', '')}']",
           "[href*='#{WIKI_TOKEN.gsub('$', '')}']"
