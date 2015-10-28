@@ -113,9 +113,13 @@ define [
         # minimum duration should only be enforced if not due at midnight
         @forceMinimumDuration()
 
-    formatTime: (datetime) ->
+    formatTime: (datetime, allDay=false) ->
       datetime = fcUtil.unwrap(datetime)
-      "<time datetime='#{datetime.toISOString()}'>#{$.datetimeString(datetime)}</time>"
+      if allDay
+        formattedHtml = $.dateString(datetime)
+      else
+        formattedHtml = $.datetimeString(datetime)
+      "<time datetime='#{datetime.toISOString()}'>#{formattedHtml}</time>"
 
     forceMinimumDuration: () ->
       minimumDuration = 30 * 60 * 1000 # 30 minutes

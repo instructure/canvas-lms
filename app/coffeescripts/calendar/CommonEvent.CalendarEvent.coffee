@@ -62,7 +62,7 @@ define [
 
     displayTimeString: () ->
         if @calendarEvent.all_day
-          "{@formatTime(@startDate())}"
+          @formatTime(@startDate(), true)
         else
           semanticDateRange(@calendarEvent.start_at, @calendarEvent.end_at)
 
