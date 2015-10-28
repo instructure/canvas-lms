@@ -18,10 +18,11 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../../lti_spec_helper.rb')
+require 'webmock'
 
 module Lti
   describe ToolProxyController, type: :request do
-    let (:account) { Account.create }
+    let(:account) { Account.create }
 
     describe "#destroy" do
 
@@ -105,7 +106,168 @@ module Lti
           assert_status(401)
           expect(tp.reload.workflow_state).to eq 'active'
         end
+      end
 
+      context 'reregistration' do
+
+        include WebMock::API
+
+        # Bad ack request/response
+        # Bad Transaction
+        # --
+
+        describe '#accept_update' do
+          it 'updates properly' do
+            course_with_teacher(active_all: true, user: user_with_pseudonym, account: account)
+            tp = create_tool_proxy(context: @course)
+
+            fixture_file = File.join(Rails.root, 'spec', 'fixtures', 'lti', 'tool_proxy.json')
+            tool_proxy_fixture = JSON.parse(File.read(fixture_file))
+            tool_proxy_fixture[:tool_proxy_guid] = tp.guid
+
+            tp.update_attribute(:update_payload, {
+              acknowledgement_url: 'http://awesome.dev/face.html',
+              payload: tool_proxy_fixture
+            })
+
+            stub_request(:put, "http://awesome.dev/face.html").
+                to_return(:status => 200, :body => "", :headers => {})
+
+            api_call(:put, "/api/v1/courses/#{@course.id}/tool_proxies/#{tp.id}/update",
+                     {
+                       controller: 'lti/tool_proxy',
+                       action: 'accept_update',
+                       format: 'json',
+                       course_id: @course.id.to_s,
+                       tool_proxy_id: tp.id
+                     })
+
+            tp.reload
+
+            assert_status(200)
+            expect(tp.update_payload).to be nil
+            expect(tp.product_version).to eq '10.3'
+            assert_requested :put, "http://awesome.dev/face.html"
+
+
+            WebMock.reset!
+          end
+
+          it 'rolls back if ack response != 200' do
+            course_with_teacher(active_all: true, user: user_with_pseudonym, account: account)
+            tp = create_tool_proxy(context: @course)
+
+            fixture_file = File.join(Rails.root, 'spec', 'fixtures', 'lti', 'tool_proxy.json')
+            tool_proxy_fixture = JSON.parse(File.read(fixture_file))
+            tool_proxy_fixture[:tool_proxy_guid] = tp.guid
+
+            tp.update_attribute(:update_payload, {
+                acknowledgement_url: 'http://awesome.dev/face.html',
+                payload: tool_proxy_fixture
+            })
+
+
+            stub_request(:put, "http://awesome.dev/face.html").
+                to_return(:status => 406, :body => "", :headers => {})
+
+
+            tp.reload
+            last_updated_at = tp.updated_at
+
+            raw_api_call(:put, "/api/v1/courses/#{@course.id}/tool_proxies/#{tp.id}/update", {
+                controller: 'lti/tool_proxy',
+                action: 'accept_update',
+                format: 'json',
+                course_id: @course.id.to_s,
+                tool_proxy_id: tp.id
+            })
+
+            tp.reload
+
+            assert_status(424)
+            expect(tp.updated_at).to eq last_updated_at
+            expect(tp.product_version).to eq '1.0beta'
+            assert_requested :put, "http://awesome.dev/face.html"
+
+            WebMock.reset!
+          end
+
+          # this should never happen
+          # we already validate the proxy before we save the update_payload
+          # if this does happen, We want the 500 error and the error report created
+          it 'rolls back if our update fails' do
+            course_with_teacher(active_all: true, user: user_with_pseudonym, account: account)
+            tp = create_tool_proxy(context: @course)
+
+            tool_proxy_fixture = {}
+            tool_proxy_fixture[:tool_proxy_guid] = tp.guid
+
+            tp.update_attribute(:update_payload, {
+                acknowledgement_url: 'http://awesome.dev/face.html',
+                payload: tool_proxy_fixture
+            })
+
+
+            tp.reload
+            last_updated_at = tp.updated_at
+            raw_api_call(:put, "/api/v1/courses/#{@course.id}/tool_proxies/#{tp.id}/update", {
+                controller: 'lti/tool_proxy',
+                action: 'accept_update',
+                format: 'json',
+                course_id: @course.id.to_s,
+                tool_proxy_id: tp.id
+            })
+
+            tp.reload
+
+            assert_status(500)
+            expect(tp.updated_at).to eq last_updated_at
+            expect(tp.product_version).to eq '1.0beta'
+            assert_not_requested :put, "http://awesome.dev/face.html"
+
+            WebMock.reset!
+          end
+        end
+
+
+        describe '#dismiss_update' do
+          it 'dismiss properly' do
+            course_with_teacher(active_all: true, user: user_with_pseudonym, account: account)
+            tp = create_tool_proxy(context: @course)
+
+
+            fixture_file = File.join(Rails.root, 'spec', 'fixtures', 'lti', 'tool_proxy.json')
+            tool_proxy_fixture = JSON.parse(File.read(fixture_file))
+            tool_proxy_fixture[:tool_proxy_guid] = tp.guid
+
+            tp.update_attribute(:update_payload, {
+                acknowledgement_url: 'http://awesome.dev/face.html',
+                payload: tool_proxy_fixture
+            })
+
+            stub_request(:delete, "http://awesome.dev/face.html").
+                to_return(:status => 200, :body => "", :headers => {})
+
+            api_call(:delete, "/api/v1/courses/#{@course.id}/tool_proxies/#{tp.id}/update",
+                     {
+                       controller: 'lti/tool_proxy',
+                       action: 'dismiss_update',
+                       format: 'json',
+                       course_id: @course.id.to_s,
+                       tool_proxy_id: tp.id
+                     })
+
+            tp.reload
+
+            assert_status(200)
+            expect(tp.update_payload).to be nil
+            expect(tp.product_version).to eq '1.0beta'
+            assert_requested :delete, "http://awesome.dev/face.html"
+
+
+            WebMock.reset!
+          end
+        end
       end
 
       context "navigation tabs caching" do
@@ -143,6 +305,5 @@ module Lti
         end
       end
     end
-
   end
 end

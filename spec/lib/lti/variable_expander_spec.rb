@@ -46,6 +46,7 @@ module Lti
       m.stubs(:request).returns(request_mock)
       m.stubs(:logged_in_user).returns(user)
       m.stubs(:named_context_url).returns('url')
+      m.stubs(:polymorphic_url).returns('url')
       view_context_mock = mock('view_context')
       view_context_mock.stubs(:stylesheet_path)
                        .returns(URI.parse(request_mock.url).merge(m.css_url_for(:common)).to_s)

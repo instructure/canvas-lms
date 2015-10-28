@@ -19,7 +19,8 @@
 module Lti
   class MessageHandler < ActiveRecord::Base
 
-    BASIC_LTI_LAUNCH_REQUEST = 'basic-lti-launch-request'
+    BASIC_LTI_LAUNCH_REQUEST = 'basic-lti-launch-request'.freeze
+    TOOL_PROXY_REREGISTRATION_REQUEST = 'ToolProxyRegistrationRequest'.freeze
 
     attr_accessible :message_type, :placements, :launch_path, :capabilities, :parameters, :resource_handler, :links
     attr_readonly :created_at

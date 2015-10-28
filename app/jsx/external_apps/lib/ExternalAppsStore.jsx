@@ -106,6 +106,37 @@ define([
     });
   };
 
+  function handleToolUpdate (tool, dismiss=false) {
+    if (tool.app_type === 'ContextExternalTool') {
+      // we dont support LTI 1
+      return;
+    }
+
+    var url = '/api/v1' + ENV.CONTEXT_BASE_URL + '/tool_proxies/' + tool.app_id + '/update',
+        errorHandler = dismiss ? this._dismissUpdateErrorHandler : this._acceptUpdateErrorHandler;
+    tool.has_update = false;
+    this.setState({ externalTools: sort(this.getState().externalTools) });
+
+    $.ajax({
+      url: url,
+      type: dismiss ? 'DELETE' : 'PUT',
+      success: this._genericSuccessHandler.bind(this),
+      error: errorHandler.bind(this)
+    });
+  }
+
+  store.acceptUpdate = function(tool) {
+    handleToolUpdate.call(this, tool);
+  };
+
+  store.dismissUpdate = function(tool) {
+    handleToolUpdate.call(this, tool, true);
+  };
+
+  store.triggerUpdate = function () {
+    this.setState({ externalTools: sort(this.getState().externalTools) });
+  }
+
   store.activate = function(tool, success, error) {
     var url = '/api/v1' + ENV.CONTEXT_BASE_URL + '/tool_proxies/' + tool.app_id;
     var tools = _.map(this.getState().externalTools, function(t) {
@@ -218,12 +249,22 @@ define([
     });
   };
 
-  store._deleteSuccessHandler = function() {
+  store._genericSuccessHandler = store._deleteSuccessHandler = function() {
     // noop
   };
 
   store._deleteErrorHandler = function() {
     $.flashError(I18n.t('Unable to remove app'));
+    this.fetch({ force: true });
+  };
+
+  store._acceptUpdateErrorHandler = function() {
+    $.flashError(I18n.t('Unable to accept update'));
+    this.fetch({ force: true });
+  };
+
+  store._dismissUpdateErrorHandler = function() {
+    $.flashError(I18n.t('Unable to dismiss update'));
     this.fetch({ force: true });
   };
 

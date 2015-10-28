@@ -12,6 +12,18 @@ module CanvasHttp
   end
   class RelativeUriError < ArgumentError; end
 
+  def self.put(*args)
+    CanvasHttp.request(Net::HTTP::Put, *args)
+  end
+
+  def self.delete(*args)
+    CanvasHttp.request(Net::HTTP::Delete, *args)
+  end
+
+  def self.get(*args)
+    CanvasHttp.request(Net::HTTP::Get, *args)
+  end
+
   # Use this helper method to do HTTP GET requests. It knows how to handle
   # HTTPS urls, and follows redirects to a given depth.
   #
@@ -25,7 +37,7 @@ module CanvasHttp
   # TODO: this doesn't yet handle relative redirects (relative Location HTTP
   # header), which actually isn't even technically allowed by the HTTP spec.
   # But everybody allows and handles it.
-  def self.get(url_str, other_headers = {}, redirect_limit = 3)
+  def self.request(request_class, url_str, other_headers = {}, redirect_limit = 3)
     last_scheme = nil
     last_host = nil
 
@@ -34,7 +46,7 @@ module CanvasHttp
 
       _, uri = CanvasHttp.validate_url(url_str, last_host, last_scheme) # uses the last host and scheme for relative redirects
       http = CanvasHttp.connection_for_uri(uri)
-      request = Net::HTTP::Get.new(uri.request_uri, other_headers)
+      request = request_class.new(uri.request_uri, other_headers)
       http.verify_mode = OpenSSL::SSL::VERIFY_NONE
       http.request(request) do |response|
         case response

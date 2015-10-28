@@ -7,6 +7,7 @@ module Lti
       mock('root account') do
         stubs(:lti_guid).returns('my_guid')
         stubs(:name).returns('root_account_name')
+        stubs(:feature_enabled?).returns(false)
       end
     end
     let(:account) { mock('account', id: 3, root_account: root_account) }
@@ -17,7 +18,7 @@ module Lti
 
       it 'creates the tool consumer profile' do
         profile = subject.create
-        expect(profile.lti_version).to eq 'LTI-2p0'
+        expect(profile.lti_version).to eq 'LTI-2p1'
         expect(profile.product_instance).to be_an_instance_of IMS::LTI::Models::ProductInstance
         expect(profile.guid).to eq '339b6700-e4cb-47c5-a54f-3ee0064921a9' #Hard coded until we start persisting the tcp
       end
@@ -101,6 +102,13 @@ module Lti
 
         it 'adds the OAuth.splitSecret capability' do
           expect(subject.create.capability_offered).to include 'OAuth.splitSecret'
+        end
+
+        it 'adds the ToolProxyReregistrationRequest capability if the feature flag is on' do
+          root_account.stubs(:feature_enabled?).returns(true)
+
+          expected_capability = IMS::LTI::Models::Messages::ToolProxyReregistrationRequest::MESSAGE_TYPE
+          expect(subject.create.capability_offered).to include expected_capability
         end
 
       end

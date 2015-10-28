@@ -3,12 +3,14 @@ define([
   'i18n!external_tools',
   'react',
   'jsx/external_apps/components/EditExternalToolButton',
+  'jsx/external_apps/components/ManageUpdateExternalToolButton',
   'jsx/external_apps/components/ExternalToolPlacementButton',
   'jsx/external_apps/components/DeleteExternalToolButton',
   'jsx/external_apps/components/ConfigureExternalToolButton',
+  'jsx/external_apps/components/ReregisterExternalToolButton',
   'jsx/external_apps/lib/classMunger',
   'jquery.instructure_misc_helpers'
-], function(_, I18n, React, EditExternalToolButton, ExternalToolPlacementButton, DeleteExternalToolButton, ConfigureExternalToolButton, classMunger) {
+], function(_, I18n, React, EditExternalToolButton, ManageUpdateExternalToolButton, ExternalToolPlacementButton, DeleteExternalToolButton, ConfigureExternalToolButton, ReregisterExternalToolButton, classMunger) {
 
   return React.createClass({
     displayName: 'ExternalToolsTableRow',
@@ -19,12 +21,23 @@ define([
 
     renderButtons() {
       if (this.props.tool.installed_locally) {
-        var configureButton = null;
+        var configureButton, updateBadge, updateOption, dimissUpdateOption = null;
+        var reregistrationButton = null;
+
         if (this.props.tool.tool_configuration) {
           configureButton = <ConfigureExternalToolButton ref="configureExternalToolButton" tool={this.props.tool} />;
         }
+
+        if(this.props.tool.has_update) {
+          var badgeAriaLabel = I18n.t('An update is available for %{toolName}', { toolName: this.props.tool.name });
+
+
+          updateBadge = <i className="icon-upload tool-update-badge" aria-label={badgeAriaLabel}></i>;
+        }
+
         return (
           <td className="links text-right" nowrap="nowrap">
+            {updateBadge}
             <div className={"al-dropdown__container"} >
               <a className={"al-trigger btn"} role="button" href="#">
                 <i className={"icon-settings"}></i>
@@ -33,8 +46,10 @@ define([
               </a>
               <ul className={"al-options"} role="menu" tabIndex="0" aria-hidden="true" aria-expanded="false" >
                 {configureButton}
+                <ManageUpdateExternalToolButton ref="editExternalToolButton" tool={this.props.tool} />
                 <EditExternalToolButton ref="editExternalToolButton" tool={this.props.tool} />
                 <ExternalToolPlacementButton ref="externalToolPlacementButton" tool={this.props.tool} />
+                <ReregisterExternalToolButton ref="reregisterExternalToolButton" tool={this.props.tool}/>
                 <DeleteExternalToolButton ref="deleteExternalToolButton" tool={this.props.tool} />
               </ul>
             </div>

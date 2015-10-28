@@ -37,35 +37,42 @@ module Lti
 
     end
 
-    def process_tool_proxy_json(json, context, guid)
+    def process_tool_proxy_json(json, context, guid, tool_proxy_to_update = nil, tc_half_shared_secret = nil)
+      @tc_half_secret = tc_half_shared_secret
+
       tp = IMS::LTI::Models::ToolProxy.new.from_json(json)
       tp.tool_proxy_guid = guid
-      validate_proxy!(tp)
+
+      validate_proxy!(tp, context)
       tool_proxy = nil
       ToolProxy.transaction do
         product_family = create_product_family(tp, context.root_account)
-        tool_proxy = create_tool_proxy(tp, context, product_family)
+        tool_proxy = create_tool_proxy(tp, context, product_family, tool_proxy_to_update)
         process_resources(tp, tool_proxy)
         create_proxy_binding(tool_proxy, context)
         create_tool_settings(tp, tool_proxy)
       end
-      tool_proxy
+
+      tool_proxy.reload
     end
 
-    private
 
     def create_secret(tp)
       security_contract = tp.security_contract
       if (tp_half_secret = tp.enabled_capabilities.include?('OAuth.splitSecret') && security_contract.tp_half_shared_secret)
-        @tc_half_secret = SecureRandom.hex(64)
+        @tc_half_secret ||= SecureRandom.hex(64)
         tc_half_secret + tp_half_secret
       else
         security_contract.shared_secret
       end
     end
 
-    def create_tool_proxy(tp, context, product_family)
-      tool_proxy = ToolProxy.new
+    private
+    def create_tool_proxy(tp, context, product_family, tool_proxy=nil)
+      # make sure the guid never changes
+      raise InvalidToolProxyError if tool_proxy && tp.tool_proxy_guid != tool_proxy.guid
+
+      tool_proxy ||= ToolProxy.new
       tool_proxy.product_family = product_family
       tool_proxy.guid = tp.tool_proxy_guid
       tool_proxy.shared_secret = create_secret(tp)
@@ -74,8 +81,9 @@ module Lti
       tool_proxy.name = tp.tool_profile.product_instance.product_info.default_name
       tool_proxy.description = tp.tool_profile.product_instance.product_info.default_description
       tool_proxy.context = context
-      tool_proxy.workflow_state = 'disabled'
+      tool_proxy.workflow_state ||= 'disabled'
       tool_proxy.raw_data = tp.as_json
+      tool_proxy.update_payload = nil
       tool_proxy.save!
       tool_proxy
     end
@@ -101,37 +109,27 @@ module Lti
     end
 
     def create_message_handler(mh, base_path, resource)
-      message_handler = MessageHandler.new
-      message_handler.message_type = mh.message_type
-      message_handler.launch_path = "#{base_path}#{mh.path}"
-      message_handler.capabilities = create_json(mh.enabled_capability)
-      message_handler.parameters = create_json(mh.parameter.as_json)
-      message_handler.resource_handler = resource
-      message_handler.save!
+      message_handler = resource.message_handlers.where(message_type: mh.message_type).first_or_create! do |m|
+        m.launch_path = "#{base_path}#{mh.path}"
+        m.capabilities = create_json(mh.enabled_capability)
+        m.parameters = create_json(mh.parameter.as_json)
+      end
       create_placements(mh, message_handler)
-      message_handler.save!
-      message_handler
     end
 
     def create_resource_handler(rh, tool_proxy)
-      resource_handler = ResourceHandler.new
-      resource_handler.resource_type_code = rh.resource_type.code
-      resource_handler.name = rh.default_name
-      resource_handler.description = rh.default_description
-      resource_handler.icon_info = create_json(rh.icon_info)
-      resource_handler.tool_proxy = tool_proxy
-      resource_handler.save!
-
-      resource_handler
+      tool_proxy.resources.where(resource_type_code: rh.resource_type.code).first_or_create! do |r|
+        r.name = rh.default_name
+        r.description = rh.default_description
+        r.icon_info = create_json(rh.icon_info)
+      end
     end
 
     def create_proxy_binding(tool_proxy, context)
-      binding = ToolProxyBinding.new
-      binding.context = context
-      binding.tool_proxy = tool_proxy
-      binding.save!
-      binding
+      ToolProxyBinding.where(context_id: context, context_type: context.class.to_s,
+                             tool_proxy_id: tool_proxy).first_or_create!
     end
+
 
     def process_resources(tp, tool_proxy)
       resource_handlers = tp.tool_profile.resource_handlers
@@ -147,8 +145,19 @@ module Lti
         resource_handlers << r
       end
 
+      resource_type_codes = resource_handlers.map { |s| s.resource_type.code }
+      tool_proxy.resources.each do |resource|
+        resource.destroy unless resource_type_codes.include? resource.resource_type_code
+      end
+
       resource_handlers.each do |rh|
         resource_handler = create_resource_handler(rh, tool_proxy)
+
+        message_types = rh.messages.map(&:message_type)
+        resource_handler.message_handlers.each do |message|
+          message.destroy unless message_types.include? message.message_type
+        end
+
         rh.messages.each do |mh|
           create_message_handler(mh, tp.tool_profile.base_message_url, resource_handler)
         end
@@ -156,15 +165,24 @@ module Lti
     end
 
     def create_placements(mh, message_handler)
-      unless (mh.enabled_capabilities & ResourcePlacement::PLACEMENT_LOOKUP.keys).blank?
-        mh.enabled_capability.each do |p|
-          if ResourcePlacement::PLACEMENT_LOOKUP[p]
-            message_handler.placements.create(placement: ResourcePlacement::PLACEMENT_LOOKUP[p])
-          end
+
+      message_handler.placements.each do |placement|
+        placement.destroy unless ResourcePlacement::DEFAULT_PLACEMENTS.include? placement.placement
+      end
+
+      if (mh.enabled_capabilities & ResourcePlacement::PLACEMENT_LOOKUP.keys).blank?
+        ResourcePlacement::DEFAULT_PLACEMENTS.each do |p|
+          message_handler.placements.where(placement: p).first_or_create!
         end
       else
-        ResourcePlacement::DEFAULT_PLACEMENTS.each do |p|
-          message_handler.placements.create(placement: p)
+
+        mhp = mh.enabled_capability.map {|p| ResourcePlacement::PLACEMENT_LOOKUP[p]}
+        message_handler.placements.each do |placement|
+          placement.destroy unless mhp.include? placement.placement
+        end
+
+        mhp.each do |p|
+          message_handler.placements.where(placement: p).first_or_create! if p
         end
       end
     end
@@ -177,53 +195,54 @@ module Lti
       obj.kind_of?(Array) ? obj.map(&:as_json) : obj.as_json
     end
 
-    def validate_proxy!(tp)
-      tp_errors = [validate_services(tp), validate_capabilities(tp), validate_security_contract(tp)].compact
-      unless tp_errors.flatten.compact.empty?
+    def validate_proxy!(tp, context)
+
+      profile = Lti::ToolConsumerProfileCreator.new(context, tp.tool_consumer_profile).create
+      tp_validator = IMS::LTI::Services::ToolProxyValidator.new(tp)
+      tp_validator.tool_consumer_profile = profile
+
+      unless tp_validator.valid?
         json = {}
         messages = []
-        tp_errors.each do |e|
-          messages << e[0]
-          json.merge! e[1]
+
+        if tp_validator.errors[:invalid_services]
+          messages << 'Invalid Services'
+          json.merge!({ :invalid_services => invalid_services_formatter(tp_validator) })
         end
+
+        if tp_validator.errors[:invalid_message_handlers]
+          messages << 'Invalid Capabilities'
+          json.merge!({ :invalid_capabilities => invalid_message_handler_formatter(tp_validator) })
+        end
+
+        if tp_validator.errors[:invalid_security_contract]
+          messages << 'Invalid SecurityContract'
+          json.merge!({ :invalid_security_contract => tp_validator.errors[:invalid_security_contract].values })
+        end
+
         last_message = messages.pop if messages.size > 1
-        message = "Invalid #{messages.join(', ')}"
+        message = messages.join(', ')
         message + " and #{last_message}" if last_message
-        raise InvalidToolProxyError.new(message, json)
-      end
 
+        raise InvalidToolProxyError.new message, json
+      end
     end
 
-    def validate_services(tp)
-      allowed_services = ToolConsumerProfileCreator::SERVICES.each_with_object({}) { |s, h| h[s[:id]] = s[:action] }
-      invalid_services = []
-      tp.security_contract.services.each do |service|
-        id = service.service.split('#').last
-        invalid_actions = service.actions - (allowed_services[id] || [])
-        invalid_services << {id: id, actions: invalid_actions} if invalid_actions.present?
-      end
-      ['Services', invalid_services: invalid_services] unless invalid_services.empty?
-    end
-
-    def validate_capabilities(tp)
-      requested_caps = []
-      tp.tool_profile.resource_handlers.each do |rh|
-        rh.messages.each do |mh|
-          requested_caps.push(*mh.enabled_capabilities)
-          mh.parameters.each { |p| requested_caps << p.variable unless p.fixed? }
+    def invalid_message_handler_formatter(tp_validator)
+      tp_validator.errors[:invalid_message_handlers][:resource_handlers].map do |rh|
+        rh[:messages].map do |message|
+          message[:invalid_capabilities] || message[:invalid_parameters].map {|param| param[:variable] }
         end
+      end.flatten
+    end
+
+    def invalid_services_formatter(tp_validator)
+      tp_validator.errors[:invalid_services].map do |key, value|
+        {
+          id: key,
+          actions: value
+        }
       end
-      invalid_capabilites = requested_caps - ToolConsumerProfileCreator::CAPABILITIES
-      ['Capabilities', invalid_capabilities: invalid_capabilites] unless invalid_capabilites.empty?
     end
-
-    def validate_security_contract(tp)
-      invalid_fields = []
-      has_split_secret = tp.enabled_capabilities.include?('OAuth.splitSecret') && tp.security_contract.tp_half_shared_secret.present?
-      invalid_fields << :shared_secret if tp.security_contract.shared_secret.blank? && !has_split_secret
-
-      ['SecurityContract', invalid_security_contract: invalid_fields] unless invalid_fields.empty?
-    end
-
   end
 end
