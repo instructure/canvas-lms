@@ -32,7 +32,7 @@ define [
     month = $sibling.data('month')
     year = $sibling.data('year')
     day = $sibling.text()
-    expectedDate = new Date(year, month, day)
+    expectedDate = $.unfudgeDateForProfileTimezone(new Date(year, month, day))
 
     # check that we got the expected value to the callback
     equal +handler.getCall(0).args[0], +expectedDate
@@ -49,5 +49,5 @@ define [
     $dateField.trigger($.Event('keydown', keyCode: 13))
 
     # check that we got the expected value to the callback
-    expectedDate = new Date(2015, 6, 4)
+    expectedDate = $.unfudgeDateForProfileTimezone(new Date(2015, 6, 4))
     equal +handler.getCall(0).args[0], +expectedDate
