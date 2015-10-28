@@ -9,7 +9,6 @@ define([
 ], function (React, $, _, preventDefault,  ReactModal, ModalContent, ModalButtons) {
 
   ReactModal.injectCSS()
-  ReactModal = React.createFactory(ReactModal)
 
   var Modal = React.createClass({
 
@@ -49,10 +48,10 @@ define([
       var buttons = null;
 
       React.Children.forEach(props.children, function(child){
-        if(child.type == ModalContent.type){
+        if(child.type == ModalContent){
           content = child;
         }
-        if(child.type == ModalButtons.type){
+        if(child.type == ModalButtons){
           buttons = child;
         }
       });

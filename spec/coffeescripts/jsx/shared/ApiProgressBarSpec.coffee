@@ -30,7 +30,8 @@ define [
       @clock.restore()
 
   test 'shouldComponentUpdate', ->
-    component = TestUtils.renderIntoDocument(ApiProgressBar())
+    ApiProgressBarElement = React.createElement(ApiProgressBar)
+    component = TestUtils.renderIntoDocument(ApiProgressBarElement)
 
     ok component.shouldComponentUpdate({
       progress_id: @progress_id
@@ -51,10 +52,11 @@ define [
 
   test 'componentDidUpdate', ->
     onCompleteSpy = sinon.spy()
-    component = TestUtils.renderIntoDocument(ApiProgressBar({
+    ApiProgressBarElement = React.createElement(ApiProgressBar, {
       onComplete: onCompleteSpy,
       progress_id: @progress_id
-    }))
+    })
+    component = TestUtils.renderIntoDocument(ApiProgressBarElement)
     @clock.tick(component.props.delay + 5)
     ok !_.isNull(component.intervalID), 'should have interval id'
 
@@ -68,9 +70,10 @@ define [
     ok onCompleteSpy.called, 'should call callback on update if complete'
 
   test 'handleStoreChange', ->
-    component = TestUtils.renderIntoDocument(ApiProgressBar({
+    ApiProgressBarElement = React.createElement(ApiProgressBar, {
       progress_id: @progress_id
-    }))
+    })
+    component = TestUtils.renderIntoDocument(ApiProgressBarElement)
     @clock.tick(component.props.delay + 5)
 
     _.each [ 'completion', 'workflow_state' ], (stateName) =>
@@ -88,9 +91,10 @@ define [
     React.unmountComponentAtNode(component.getDOMNode().parentNode)
 
   test 'isComplete', ->
-    component = TestUtils.renderIntoDocument(ApiProgressBar({
+    ApiProgressBarElement = React.createElement(ApiProgressBar, {
       progress_id: @progress_id
-    }))
+    })
+    component = TestUtils.renderIntoDocument(ApiProgressBarElement)
     @clock.tick(component.props.delay + 5)
 
     ok !component.isComplete(), 'is not complete if state is queued'
@@ -104,9 +108,10 @@ define [
     ok component.isComplete(), 'is complete if state is completed'
 
   test 'isInProgress', ->
-    component = TestUtils.renderIntoDocument(ApiProgressBar({
+    ApiProgressBarElement = React.createElement(ApiProgressBar, {
       progress_id: @progress_id
-    }))
+    })
+    component = TestUtils.renderIntoDocument(ApiProgressBarElement)
     @clock.tick(component.props.delay + 5)
 
     ok component.isInProgress(), 'is in progress if state is queued'
@@ -120,7 +125,8 @@ define [
     ok !component.isInProgress(), 'is not in progress if state is completed'
 
   test 'poll', ->
-    component = TestUtils.renderIntoDocument(ApiProgressBar())
+    ApiProgressBarElement = React.createElement(ApiProgressBar)
+    component = TestUtils.renderIntoDocument(ApiProgressBarElement)
     component.poll()
     ok !@storeSpy.called,
       'should not fetch from progress store without progress id'
@@ -132,9 +138,10 @@ define [
     React.unmountComponentAtNode(component.getDOMNode().parentNode)
 
   test 'render', ->
-    component = TestUtils.renderIntoDocument(ApiProgressBar({
+    ApiProgressBarElement = React.createElement(ApiProgressBar, {
       progress_id: @progress_id
-    }))
+    })
+    component = TestUtils.renderIntoDocument(ApiProgressBarElement)
     ok _.isNull(component.getDOMNode()),
       'should not render to DOM if is not in progress'
 
