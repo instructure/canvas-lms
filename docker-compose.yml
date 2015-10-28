@@ -38,6 +38,8 @@ web:
   environment:
     RACK_ENV: development
     VIRTUAL_HOST: .canvas.docker
+    ECOSYSTEM_SECRET: 7hZoK4DZyrH+A7nxLhC=fVeRQq79oCqq]QK92M?LGPh/tKQv]Q
+    ECOSYSTEM_KEY: +h+oJTJ)(AcfUxGNUy7Pk2zRTwPaTeqA;&MQ3Gx6936VfvHumn
 
 jobs:
   build: ./docker-compose

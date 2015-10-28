@@ -109,6 +109,26 @@ module Canvas::Security
     raw_jwt.sign(key || encryption_key, :HS256).to_s
   end
 
+  # Creates an encrypted JWT token string
+  #
+  # This is a token that will be used for identifying the user to
+  # canvas on API calls and to other canvas-ecosystem services.
+  #
+  # user_global_id (int) - The globally unique id of the user this token represents
+  # signing_secret (big string) - The shared secret for signing
+  # encryption_secret (big string) - The shared key for symmetric key encryption.
+  #
+  # Returns the token as a string.
+  def self.create_services_jwt(user_global_id, signing_secret=nil, encryption_secret=nil)
+    signing_secret ||= ENV['ECOSYSTEM_SECRET']
+    encryption_secret ||= ENV['ECOSYSTEM_KEY']
+    payload = jwt_payload_for_user(user_global_id, encryption_secret)
+    jwt = JSON::JWT.new(payload)
+    jws = jwt.sign(signing_secret, :HS256)
+    jwe = jws.encrypt(encryption_secret, 'dir', :A256GCM)
+    jwe.to_s
+  end
+
   # Verifies and decodes a JWT token
   #
   # token (String) - The token to decode
@@ -125,12 +145,7 @@ module Canvas::Security
     keys.each do |key|
       begin
         body = JSON::JWT.decode(token, key)
-        if body[:exp].present?
-          if ((body[:exp].is_a?(Time) && body[:exp] <= Time.zone.now) ||
-            body[:exp] <= Time.zone.now.to_i)
-            raise Canvas::Security::TokenExpired
-          end
-        end
+        verify_jwt(body)
         return body.with_indifferent_access
       rescue JSON::JWS::VerificationFailed
         # Keep looping, to try all the keys. If none succeed,
@@ -139,6 +154,28 @@ module Canvas::Security
     end
 
     raise Canvas::Security::InvalidToken
+  end
+
+  def self.decrypt_services_jwt(token, signing_secret=nil, encryption_secret=nil)
+    signing_secret ||= ENV['ECOSYSTEM_SECRET']
+    encryption_secret ||= ENV['ECOSYSTEM_KEY']
+    begin
+      signed_coded_jwt = JSON::JWT.decode(token, encryption_secret)
+      raw_jwt = JSON::JWT.decode(signed_coded_jwt.plain_text, signing_secret)
+      verify_jwt(raw_jwt)
+      raw_jwt.with_indifferent_access
+    rescue JSON::JWS::VerificationFailed
+      raise Canvas::Security::InvalidToken
+    end
+  end
+
+  def self.base64_encode(token_string)
+    Base64.encode64(token_string).encode('utf-8').delete("\n")
+  end
+
+  def self.base64_decode(token_string)
+    utf8_string = token_string.force_encoding(Encoding::UTF_8)
+    Base64.decode64(utf8_string.encode('ascii-8bit'))
   end
 
   def self.validate_encryption_key(overwrite = false)
@@ -264,5 +301,34 @@ module Canvas::Security
 
   def self.login_attempts_key(pseudonym)
     "login_attempts:#{pseudonym.global_id}"
+  end
+
+  private
+  def self.jwt_payload_for_user(user_global_id, encryption_secret)
+    timestamp = Time.zone.now.to_i
+    jti_input_string = [encryption_secret, timestamp, user_global_id].join(":")
+    jti = Digest::MD5.hexdigest(jti_input_string)
+    {
+      iss: "Canvas",
+      aud: ["Instructure"],
+      exp: timestamp + 3600, # token is good for 1 hour
+      nbf: timestamp - 30,   # don't accept the token in the past
+      iat: timestamp,        # tell when the token was issued
+      jti: jti,              # unique identifier
+      sub: user_global_id
+    }
+  end
+
+  def self.verify_jwt(body)
+    if body[:exp].present?
+      if timestamp_is_exipred?(body[:exp])
+        raise Canvas::Security::TokenExpired
+      end
+    end
+  end
+
+  def self.timestamp_is_exipred?(exp_val)
+    now = Time.zone.now
+    (exp_val.is_a?(Time) && exp_val <= now) || exp_val <= now.to_i
   end
 end

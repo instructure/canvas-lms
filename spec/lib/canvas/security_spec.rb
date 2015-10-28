@@ -25,30 +25,69 @@ describe Canvas::Security do
         Timecop.return
       end
 
-      it "should generate a token with an expiration" do
-        Timecop.freeze(Time.utc(2013,3,13,9,12))
-        expires = 1.hour.from_now
-        token = Canvas::Security.create_jwt({ a: 1 }, expires)
-        expect(token).to eq "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhIjoxLCJleHAiOjEzNjMxNjk1MjB9.VwDKl46gfjFLPAIDwlkVPze1UwC6H_ApdyWYoUXFT8M"
+      describe ".create_jwt" do
+        it "should generate a token with an expiration" do
+          Timecop.freeze(Time.utc(2013,3,13,9,12))
+          expires = 1.hour.from_now
+          token = Canvas::Security.create_jwt({ a: 1 }, expires)
+          expected_token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9."\
+                           "eyJhIjoxLCJleHAiOjEzNjMxNjk1MjB9."\
+                           "VwDKl46gfjFLPAIDwlkVPze1UwC6H_ApdyWYoUXFT8M"
+          expect(token).to eq(expected_token)
+        end
+
+        it "should generate a token without expiration" do
+          token = Canvas::Security.create_jwt({ a: 1 })
+          expected_token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9."\
+                           "eyJhIjoxfQ."\
+                           "Pr4RQfnytL0LMwQ0pJXiKoHmEGAYw2OW3pYJTQM4d9I"
+          expect(token).to eq(expected_token)
+        end
+
+        it "should encode with configured encryption key" do
+          jwt = stub
+          jwt.expects(:sign).with(Canvas::Security.encryption_key, :HS256).returns("sometoken")
+          JSON::JWT.stubs(new: jwt)
+          Canvas::Security.create_jwt({ a: 1 })
+        end
+
+        it "should encode with the supplied key" do
+          jwt = stub
+          jwt.expects(:sign).with("mykey", :HS256).returns("sometoken")
+          JSON::JWT.stubs(new: jwt)
+          Canvas::Security.create_jwt({ a: 1 }, nil, "mykey")
+        end
       end
 
-      it "should generate a token without expiration" do
-        token = Canvas::Security.create_jwt({ a: 1 })
-        expect(token).to eq "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhIjoxfQ.Pr4RQfnytL0LMwQ0pJXiKoHmEGAYw2OW3pYJTQM4d9I"
-      end
+      describe ".create_services_jwt" do
+        include_context "JWT setup"
 
-      it "should encode with configured encryption key" do
-        jwt = stub
-        jwt.expects(:sign).with(Canvas::Security.encryption_key, :HS256).returns("sometoken")
-        JSON::JWT.stubs(new: jwt)
-        Canvas::Security.create_jwt({ a: 1 })
-      end
+        it "builds up an encrypted token" do
+          jwt = Canvas::Security.create_services_jwt(1, signing_secret, encryption_secret)
+          expect(jwt.length).to eq(435)
+        end
 
-      it "should encode with the supplied key" do
-        jwt = stub
-        jwt.expects(:sign).with("mykey", :HS256).returns("sometoken")
-        JSON::JWT.stubs(new: jwt)
-        Canvas::Security.create_jwt({ a: 1 }, nil, "mykey")
+        it "builds up a token from env vars if no secrets passed" do
+          env_var_jwt = Canvas::Security.create_services_jwt(1)
+          expect(env_var_jwt.length).to eq(435)
+        end
+
+        it "expires in an hour" do
+          jwt = Canvas::Security.create_services_jwt(1, signing_secret, encryption_secret)
+          jwt_body = Canvas::Security.decrypt_services_jwt(jwt, signing_secret, encryption_secret)
+          expect(jwt_body[:exp]).to eq(1363169520)
+        end
+      end
+    end
+
+    describe ".base64_encode" do
+      it "trims off newlines" do
+        input = "SuperSuperSuperSuperSuperSuperSuperSuper"\
+                 "SuperSuperSuperSuperSuperSuperSuperSuperLongString"
+        output = "U3VwZXJTdXBlclN1cGVyU3VwZXJTdXBlclN1cGVy"\
+                 "U3VwZXJTdXBlclN1cGVyU3VwZXJTdXBlclN1cGVy"\
+                 "U3VwZXJTdXBlclN1cGVyU3VwZXJMb25nU3RyaW5n"
+        expect(Canvas::Security.base64_encode(input)).to eq(output)
       end
     end
 
