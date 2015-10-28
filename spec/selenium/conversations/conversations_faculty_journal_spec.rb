@@ -4,6 +4,7 @@ describe "conversations new" do
   include_context "in-process server selenium tests"
   let(:account) { Account.default }
   let(:account_settings_url) { "/accounts/#{account.id}/settings" }
+  let(:user_notes_url) { "/courses/#{@course.id}/user_notes"}
 
   before do
     conversation_setup
@@ -31,6 +32,11 @@ describe "conversations new" do
       @course.account.update_attribute(:enable_user_notes, true)
       user_session(@teacher)
       get_conversations
+    end
+
+    it "should go to the user_notes page", priority: "1", test_id: 133090 do
+      get user_notes_url
+      expect(f('#breadcrumbs')).to include_text('Faculty Journal')
     end
 
     it "should be allowed on new private conversations with students", priority: "1", test_id: 207094 do
