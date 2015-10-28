@@ -817,12 +817,30 @@ class Quizzes::Quiz < ActiveRecord::Base
   end
 
   def check_if_submissions_need_review
-    self.quiz_submissions.each { |s| s.update_if_needs_review(self) }
+    self.connection.after_transaction_commit do
+      version_num = self.version_number
+      submissions_to_update = []
+      self.quiz_submissions.each do |sub|
+        next unless sub.completed?
+
+        next if sub.quiz_version && sub.quiz_version >= version_num
+
+        if self.changed_significantly_since?(sub.quiz_version)
+          submissions_to_update << sub
+        end
+      end
+
+      if submissions_to_update.any?
+        self.shard.activate do
+          Quizzes::QuizSubmission.where(:id => submissions_to_update).update_all(:workflow_state => 'pending_review', :updated_at => Time.now.utc)
+        end
+      end
+    end
   end
 
   def changed_significantly_since?(version_number)
     @significant_version ||= {}
-    return @significant_version[version_number] if @significant_version[version_number]
+    return @significant_version[version_number] if @significant_version.has_key?(version_number)
     old_version = self.versions.get(version_number).model
 
     needs_review = false

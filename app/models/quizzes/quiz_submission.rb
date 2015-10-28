@@ -642,18 +642,6 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     end
   end
 
-  def update_if_needs_review(quiz=nil)
-    quiz = self.quiz if !quiz || quiz.id != self.quiz_id
-    return false unless self.completed?
-    return false if self.quiz_version && self.quiz_version >= quiz.version_number
-    if quiz.changed_significantly_since?(self.quiz_version)
-      self.workflow_state = 'pending_review'
-      self.save
-      return true
-    end
-    false
-  end
-
   def update_scores(params)
     params = (params || {}).with_indifferent_access
     self.manually_scored = false

@@ -156,7 +156,7 @@ describe Quizzes::QuizzesController do
       it "should display message about the quiz changing significantly" do
         Quizzes::Quiz.any_instance.stubs(:changed_significantly_since?).returns(true)
         mkquiz
-        @quiz_submission.update_if_needs_review
+        @quiz.check_if_submissions_need_review
         @quiz_submission.submission_data.each { |q| q[:correct] = "false" }
         @quiz_submission.save
         get "courses/#{@course.id}/quizzes/#{@quiz.id}/history?quiz_submission_id=#{@quiz_submission.id}"
