@@ -161,6 +161,38 @@ describe "conversations new" do
         expect(bulk_cb.attribute('disabled')).to be_blank
         expect(is_checked(selector)).to be_truthy # should still be checked
       end
+
+      it "can compose a message to a single user", priority: "1", test_id: 117958 do
+        get_conversations
+        fln('Inbox').click
+
+        find('.icon-compose').click
+        fj('.btn.dropdown-toggle :contains("Select course")').click
+        wait_for_ajaximations
+
+        expect(find('.dropdown-menu.open')).to be_truthy
+
+        fj('.message-header-input .text:contains("Unnamed Course")').click
+        wait_for_ajaximations
+
+        # check for auto complete to fill in 'first student'
+        find('.ac-input-cell .ac-input').send_keys('first st')
+        wait_for_ajaximations
+        keep_trying_until(5) do
+          expect(find('.result-name')).to include_text('first student')
+        end
+
+        find('.result-name').click
+        wait_for_ajaximations
+
+        expect(find('.ac-token')).to include_text('first student')
+
+        find('#compose-message-subject').send_keys('Hello out there all you happy people')
+        find('.message-body textarea').send_keys("I'll pay you Tuesday for a hamburger today")
+        click_send
+
+        expect(flash_message_present?(:success, /Message sent!/)).to be_truthy
+      end
     end
   end
 end
