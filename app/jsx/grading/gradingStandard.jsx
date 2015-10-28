@@ -310,9 +310,9 @@ function(React, DataRow, $, I18n, _) {
                   </tr>
                   <tr>
                     <th scope="col" className="insert_row_container"/>
-                    <th scope="col" className="name_header">{I18n.t("Name:")}</th>
+                    <th scope="col" className="name_header">{I18n.t("Name")}</th>
                     <th scope="col" className="range_container" colSpan="2">
-                      <div className="range_label">{I18n.t("Range:")}</div>
+                      <div className="range_label">{I18n.t("Range")}</div>
                       <div className="clear"></div>
                     </th>
                   </tr>
