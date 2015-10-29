@@ -229,9 +229,6 @@ def truncate_table(model)
       begin
         old_proc = model.connection.raw_connection.set_notice_processor {}
         model.connection.execute("TRUNCATE TABLE #{model.connection.quote_table_name(model.table_name)} CASCADE")
-
-        # mobile verify expects specific id seq for developer key, this forces the sequence to always start at 101
-        model.connection.execute("SELECT setval('developer_keys_id_seq', 100);") if model == DeveloperKey
       ensure
         model.connection.raw_connection.set_notice_processor(&old_proc)
       end
