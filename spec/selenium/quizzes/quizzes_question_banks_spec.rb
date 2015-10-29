@@ -240,7 +240,7 @@ describe 'quizzes question banks' do
       expect(f("#question_#{@quest1.id}")).to include_text new_question_text
     end
 
-    it "should let teachers view question banks in a soft-concluded course (but not edit)" do
+    it "should let teachers view question banks in a soft-concluded course (but not edit)", priority: "2", test_id: 456150 do
       term = Account.default.enrollment_terms.create!
       term.set_overrides(Account.default, 'TeacherEnrollment' => {:end_at => 3.days.ago})
       @course.enrollment_term = term
@@ -264,7 +264,7 @@ describe 'quizzes question banks' do
       expect_new_page_load { view_bank_link.click }
     end
 
-    it "should let account admins view question banks without :manage_assignments (but not edit)" do
+    it "should let account admins view question banks without :manage_assignments (but not edit)", priority: "2", test_id: 456162 do
       user(:active_all => true)
       user_session(@user)
       @role = custom_account_role 'weakling', :account => @course.account
@@ -291,7 +291,7 @@ describe 'quizzes question banks' do
       expect_new_page_load { view_bank_link.click }
     end
 
-    it "should lock out teachers when :read_question_banks is disabled" do
+    it "should lock out teachers when :read_question_banks is disabled", priority: "2", test_id: 456163 do
       term = Account.default.enrollment_terms.create!
       term.set_overrides(Account.default, 'TeacherEnrollment' => {:end_at => 3.days.ago})
       @course.enrollment_term = term

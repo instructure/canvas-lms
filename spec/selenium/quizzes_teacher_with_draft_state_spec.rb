@@ -14,7 +14,7 @@ describe 'quizzes with draft state' do
   end
 
   context 'when there is a single due date' do
-    it 'doesn\'t display "Multiple Dates"' do
+    it 'doesn\'t display "Multiple Dates"', priority: "1", test_id: 474291 do
       get "/courses/#{@course.id}/quizzes"
       expect(f('.ig-details .date-due')).not_to include_text 'Multiple Dates'
       expect(f('.ig-details .date-available')).not_to include_text 'Multiple Dates'

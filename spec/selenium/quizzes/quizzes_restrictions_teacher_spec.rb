@@ -9,19 +9,19 @@ describe 'quiz restrictions as a teacher' do
   end
 
   context 'restrict access code' do
-    it 'should have a checkbox on the quiz creation page' do
+    it 'should have a checkbox on the quiz creation page', priority: "1", test_id: 474273 do
       get "/courses/#{@course.id}/quizzes/new"
       expect('#enable_quiz_access_code').to be
     end
 
-    it 'should show a password field when checking the checkbox' do
+    it 'should show a password field when checking the checkbox', priority: "1", test_id: 474274 do
       get "/courses/#{@course.id}/quizzes/new"
       expect(f('#quiz_access_code').attribute('tabindex')).to include_text('-1')
       f('#enable_quiz_access_code').click
       expect(f('#quiz_access_code').attribute('tabindex')).to include_text('0')
     end
 
-    it 'should not allow a blank restrict access code password' do
+    it 'should not allow a blank restrict access code password', priority: "1", test_id: 474275 do
       get "/courses/#{@course.id}/quizzes/new"
       f('#enable_quiz_access_code').click
       wait_for_ajaximations
@@ -32,7 +32,7 @@ describe 'quiz restrictions as a teacher' do
       expect(ffj('.error_text')[1]).to include_text('You must enter an access code')
     end
 
-    it 'should accept a valid password when creating a quiz' do
+    it 'should accept a valid password when creating a quiz', priority: "1", test_id: 474276 do
       get "/courses/#{@course.id}/quizzes/new"
       f('#enable_quiz_access_code').click
       wait_for_ajaximations
@@ -44,7 +44,7 @@ describe 'quiz restrictions as a teacher' do
       expect(f('.unpublished_quiz_warning')).to include_text('This quiz is unpublished')
     end
 
-    it 'should show the access code on the show page' do
+    it 'should show the access code on the show page', priority: "1", test_id: 474277 do
       @quiz = course_quiz
       @quiz.access_code = 'threepwood'
       @quiz.save!
@@ -56,19 +56,19 @@ describe 'quiz restrictions as a teacher' do
   end
 
   context 'filter ip addresses' do
-    it 'should have a checkbox on the quiz creation page' do
+    it 'should have a checkbox on the quiz creation page', priority: "1", test_id: 474278 do
       get "/courses/#{@course.id}/quizzes/new"
       expect('#enable_quiz_ip_filter').to be
     end
 
-    it 'should show a password field when checking the checkbox' do
+    it 'should show a password field when checking the checkbox', priority: "1", test_id: 474279 do
       get "/courses/#{@course.id}/quizzes/new"
       expect(f('#quiz_ip_filter').attribute('tabindex')).to include_text('-1')
       f('#enable_quiz_ip_filter').click
       expect(f('#quiz_ip_filter').attribute('tabindex')).to include_text('0')
     end
 
-    it 'should not allow a blank ip address' do
+    it 'should not allow a blank ip address', priority: "1", test_id: 474280 do
       get "/courses/#{@course.id}/quizzes/new"
       f('#enable_quiz_ip_filter').click
       wait_for_ajaximations
@@ -79,7 +79,7 @@ describe 'quiz restrictions as a teacher' do
       expect(ffj('.error_text')[1]).to include_text('You must enter a valid IP Address')
     end
 
-    it 'should accept a valid ipv4 address when creating a quiz' do
+    it 'should accept a valid ipv4 address when creating a quiz', priority: "1", test_id: 474281 do
       get "/courses/#{@course.id}/quizzes/new"
       f('#enable_quiz_ip_filter').click
       wait_for_ajaximations
@@ -92,7 +92,7 @@ describe 'quiz restrictions as a teacher' do
       expect(f('.unpublished_quiz_warning')).to include_text('This quiz is unpublished')
     end
 
-    it 'should accept a valid ipv4 address with subnet mask when creating a quiz' do
+    it 'should accept a valid ipv4 address with subnet mask when creating a quiz', priority: "1", test_id: 474282 do
       get "/courses/#{@course.id}/quizzes/new"
       f('#enable_quiz_ip_filter').click
       wait_for_ajaximations
@@ -105,7 +105,7 @@ describe 'quiz restrictions as a teacher' do
       expect(f('.unpublished_quiz_warning')).to include_text('This quiz is unpublished')
     end
 
-    it 'should accept a valid ipv6 address when creating a quiz' do
+    it 'should accept a valid ipv6 address when creating a quiz', priority: "1", test_id: 474283 do
       get "/courses/#{@course.id}/quizzes/new"
       f('#enable_quiz_ip_filter').click
       wait_for_ajaximations
@@ -118,7 +118,7 @@ describe 'quiz restrictions as a teacher' do
       expect(f('.unpublished_quiz_warning')).to include_text('This quiz is unpublished')
     end
 
-    it 'should not accept an invalid ip address when creating a quiz' do
+    it 'should not accept an invalid ip address when creating a quiz', priority: "1", test_id: 474284 do
       get "/courses/#{@course.id}/quizzes/new"
       f('#enable_quiz_ip_filter').click
       wait_for_ajaximations
@@ -129,7 +129,7 @@ describe 'quiz restrictions as a teacher' do
       expect(ffj('.error_text')[1]).to include_text('IP filter is not valid')
     end
 
-    it 'should have a working link to help with ip address filtering' do
+    it 'should have a working link to help with ip address filtering', priority: "1", test_id: 474285 do
       get "/courses/#{@course.id}/quizzes/new"
       f('#enable_quiz_ip_filter').click
       wait_for_ajaximations
@@ -140,7 +140,7 @@ describe 'quiz restrictions as a teacher' do
       expect(f('#ip_filters_dialog')).to be_displayed
     end
 
-    it 'should show filtered ip address on the show page' do
+    it 'should show filtered ip address on the show page', priority: "1", test_id: 474286 do
       # makes an assumption that your ip address is not '64.233.160.0' (google)
       @quiz = course_quiz
       @quiz.ip_filter = '64.233.160.0'

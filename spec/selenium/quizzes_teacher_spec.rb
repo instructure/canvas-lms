@@ -446,7 +446,7 @@ describe "quizzes" do
       expect(f('#right-side')).to include_text('Quiz Statistics')
     end
 
-    it "should not increment badge counts when taking a quiz as a teacher" do
+    it "should not increment badge counts when taking a quiz as a teacher", priority: "2", test_id: 474290 do
       @quiz = quiz_model({ course: @course, time_limit: 5 })
       @quiz.quiz_questions.create!(question_data: multiple_choice_question_data)
       @quiz.generate_quiz_data

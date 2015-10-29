@@ -25,12 +25,12 @@ describe 'quiz restrictions as a student' do
       expect_new_page_load { f('button.btn').click }
     end
 
-    it 'should allow you to enter in a correct access token password to view the quiz' do
+    it 'should allow you to enter in a correct access token password to view the quiz', priority: "1", test_id: 345734 do
       submit_quiz_access_code(@password)
       expect(f('.quiz-header')).to include_text 'Quiz Instructions'
     end
 
-    it 'should not allow you to enter in a incorrect access token password to view the quiz' do
+    it 'should not allow you to enter in a incorrect access token password to view the quiz', priority: "1", test_id: 338079 do
       submit_quiz_access_code('lechuck')
       expect(f('#quiz_access_code').text).to eq ''
     end
@@ -46,7 +46,7 @@ describe 'quiz restrictions as a student' do
       @quiz.save!
     end
 
-    it 'should not be accessible from invalid ip address' do
+    it 'should not be accessible from invalid ip address', priority: "1", test_id: 338081 do
       begin_taking_quiz
       expect(f('#content')).to include_text 'This quiz is protected and is only available from certain locations'
     end
