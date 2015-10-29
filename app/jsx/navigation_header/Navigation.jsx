@@ -16,7 +16,7 @@ define([
   var ACTIVE_ROUTE_REGEX = /^\/(courses|groups|accounts|grades|calendar|conversations|profile)/;
   var ACTIVE_CLASS = 'ic-app-header__menu-list-item--active';
 
-  var UNREAD_COUNT_POLL_INTERVAL = 30000 // 30 seconds
+  var UNREAD_COUNT_POLL_INTERVAL = 60000 // 60 seconds
 
   var TYPE_URL_MAP = {
     courses: '/api/v1/users/self/favorites/courses?include=term',
@@ -33,6 +33,7 @@ define([
         accounts: [],
         courses: [],
         unread_count: 0,
+        unread_count_attempts: 0,
         isTrayOpen: false,
         type: null,
         coursesLoading: false,
@@ -69,9 +70,13 @@ define([
       ['courses', 'groups', 'accounts', 'profile'].forEach((type) => {
         $(`#global_nav_${type}_link`).on('click', preventDefault(this.handleMenuClick.bind(this, type)));
       });
+    },
 
-      if (window.ENV.current_user_id && this.unreadCountElement().length != 0 && !(window.ENV.current_user && window.ENV.current_user.fake_student)) {
-        this.pollUnreadCount();
+    componentDidMount () {
+      if (this.state.unread_count_attempts == 0) {
+        if (window.ENV.current_user_id && this.unreadCountElement().length != 0 && !(window.ENV.current_user && window.ENV.current_user.fake_student)) {
+          this.pollUnreadCount();
+        }
       }
     },
 
@@ -93,10 +98,14 @@ define([
     },
 
     pollUnreadCount () {
-      $.ajax('/api/v1/conversations/unread_count')
-        .then((data) => this.updateUnreadCount(data.unread_count))
-        .then(null, console.log.bind(console, 'something went wrong updating unread count'))
-        .always(() => setTimeout(this.pollUnreadCount, UNREAD_COUNT_POLL_INTERVAL));
+      this.setState({unread_count_attempts: this.state.unread_count_attempts + 1}, function () {
+        if (this.state.unread_count_attempts <= 5) {
+          $.ajax('/api/v1/conversations/unread_count')
+            .then((data) => this.updateUnreadCount(data.unread_count))
+            .then(null, console.log.bind(console, 'something went wrong updating unread count'))
+            .always(() => setTimeout(this.pollUnreadCount, this.state.unread_count_attempts * UNREAD_COUNT_POLL_INTERVAL));
+        }
+      });
     },
 
     unreadCountElement () {
