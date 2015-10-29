@@ -66,6 +66,7 @@ module BasicLTI
 
       unless res.handle_request(tool)
         res.code_major = 'unsupported'
+        res.description = 'Request could not be handled. ¯\_(ツ)_/¯'
       end
       return res
     end
@@ -75,6 +76,7 @@ module BasicLTI
 
       unless res.handle_request(tool)
         res.code_major = 'unsupported'
+        res.description = 'Legacy request could not be handled. ¯\_(ツ)_/¯'
       end
       return res
     end

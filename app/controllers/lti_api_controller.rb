@@ -35,7 +35,7 @@ class LtiApiController < ApplicationController
 
     xml = Nokogiri::XML.parse(request.body)
 
-    lti_response = BasicLTI::BasicOutcomes.process_request(@tool, xml)
+    lti_response = check_outcome BasicLTI::BasicOutcomes.process_request(@tool, xml)
     render :text => lti_response.to_xml, :content_type => 'application/xml'
   end
 
@@ -45,7 +45,7 @@ class LtiApiController < ApplicationController
   def legacy_grade_passback
     verify_oauth
 
-    lti_response = BasicLTI::BasicOutcomes.process_legacy_request(@tool, params)
+    lti_response = check_outcome BasicLTI::BasicOutcomes.process_legacy_request(@tool, params)
     render :text => lti_response.to_xml, :content_type => 'application/xml'
   end
 
@@ -175,5 +175,16 @@ class LtiApiController < ApplicationController
     {
       generated_signature: @signature.signature
     }
+  end
+
+  def check_outcome(outcome)
+    if ['unsupported', 'failure'].include? outcome.code_major
+      opts = {type: :grade_passback}
+      error_info = Canvas::Errors::Info.new(request, @domain_root_account, @current_user, opts).to_h
+      capture_outputs = Canvas::Errors.capture("Grade pass back #{outcome.code_major}", error_info)
+      outcome.description += "\n[EID_#{capture_outputs[:error_report]}]"
+    end
+
+    outcome
   end
 end
