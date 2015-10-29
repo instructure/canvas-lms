@@ -488,7 +488,7 @@ describe "admin settings tab" do
     end
   end
 
-  it "should test SIS Agent Token Authentication", priority: "1", test_id: 132577 do
+  it "should test SIS Agent Token Authentication", priority: "2", test_id: 132577 do
     course_with_admin_logged_in(:account => Account.site_admin)
     sis_token = "canvas"
     go_to_feature_options(Account.site_admin.id)
