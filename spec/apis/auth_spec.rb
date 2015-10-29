@@ -508,6 +508,71 @@ describe "API Authentication", type: :request do
     end
   end
 
+  describe "services JWT" do
+    let(:signing_secret){ "asdfasdfasdfasdfasdfasdfasdfasdf" }
+    let(:encryption_secret){ "jkl;jkl;jkl;jkl;jkl;jkl;jkl;jkl;" }
+
+    before :once do
+      user_params = {
+        active_user: true,
+        username: 'test1@example.com',
+        password: 'test123'
+      }
+      user_obj = user_with_pseudonym(user_params)
+      course_with_teacher(user: user_obj)
+    end
+
+    before(:each) do
+      @preexisting_signing_secret = ENV['ECOSYSTEM_SECRET']
+      @preexisting_encryption_secret = ENV['ECOSYSTEM_KEY']
+      ENV['ECOSYSTEM_SECRET'] = signing_secret
+      ENV['ECOSYSTEM_KEY'] = encryption_secret
+    end
+
+    after(:each) do
+      ENV['ECOSYSTEM_SECRET'] = @preexisting_signing_secret
+      ENV['ECOSYSTEM_KEY'] = @preexisting_encryption_secret
+    end
+
+    def wrapped_jwt_from_service
+      services_jwt = Canvas::Security.create_services_jwt(@user.global_id)
+      payload = {
+        iss: "some other service",
+        user_token: services_jwt
+      }
+      wrapped_jwt = Canvas::Security.create_jwt(payload, nil, signing_secret)
+      Canvas::Security.base64_encode(wrapped_jwt)
+    end
+
+    it "allows API access with a wrapped JWT" do
+      get "/api/v1/courses", nil, {
+        'HTTP_AUTHORIZATION' => "Bearer #{wrapped_jwt_from_service}"
+      }
+      expect(JSON.parse(response.body).size).to eq 1
+    end
+
+    it "errors if the JWT is expired" do
+      expired_services_jwt = nil
+      Timecop.travel(3.days.ago) do
+        expired_services_jwt = wrapped_jwt_from_service
+      end
+      auth_header = { 'HTTP_AUTHORIZATION' => "Bearer #{expired_services_jwt}" }
+      get "/api/v1/courses", nil, auth_header
+      assert_status(401)
+      expect(response['WWW-Authenticate']).to eq %{Bearer realm="canvas-lms"}
+    end
+
+    it "requires an active pseudonym" do
+      @user.pseudonym.destroy
+      get "/api/v1/courses", nil, {
+        'HTTP_AUTHORIZATION' => "Bearer #{wrapped_jwt_from_service}"
+      }
+      assert_status(401)
+      expect(response.body).to match(/Invalid access token/)
+    end
+
+  end
+
   describe "access token" do
     before :once do
       user_with_pseudonym(:active_user => true, :username => 'test1@example.com', :password => 'test123')

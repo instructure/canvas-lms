@@ -1756,6 +1756,10 @@ CanvasRails::Application.routes.draw do
     scope(controller: :errors) do
       post "error_reports", action: :create
     end
+
+    scope(controller: :jwts) do
+      post 'jwts', action: :create
+    end
   end
 
   # this is not a "normal" api endpoint in the sense that it is not documented
@@ -1770,8 +1774,6 @@ CanvasRails::Application.routes.draw do
   post 'login/oauth2/accept' => 'oauth2_provider#accept', as: :oauth2_auth_accept
   get 'login/oauth2/deny' => 'oauth2_provider#deny', as: :oauth2_auth_deny
   delete 'login/oauth2/token' => 'oauth2_provider#destroy', as: :oauth2_logout
-
-  get 'jwts/generate' => 'jwts#generate'
 
   ApiRouteSet.draw(self, "/api/lti/v1") do
     post "tools/:tool_id/grade_passback", controller: :lti_api, action: :grade_passback, as: "lti_grade_passback_api"

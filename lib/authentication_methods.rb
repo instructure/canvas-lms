@@ -64,6 +64,24 @@ module AuthenticationMethods
     request.session[:user_id]
   end
 
+  def load_pseudonym_from_jwt
+    return unless api_request?
+    token_string = AuthenticationMethods.access_token(request)
+    return unless token_string.present?
+    begin
+      services_jwt = Canvas::Security::ServicesJwt.new(token_string)
+      @current_user = User.find(services_jwt.user_global_id)
+      @current_pseudonym = @current_user.find_pseudonym_for_account(@domain_root_account, true)
+      unless @current_user && @current_pseudonym
+        raise AccessTokenError
+      end
+      @authenticated_with_jwt = true
+    rescue JSON::JWT::InvalidFormat, Canvas::Security::TokenExpired
+      # could still be a regular access token
+      return
+    end
+  end
+
   def load_pseudonym_from_access_token
     return unless api_request? || (params[:controller] == 'oauth2_provider' && params[:action] == 'destroy')
 
@@ -105,7 +123,11 @@ module AuthenticationMethods
 
     masked_authenticity_token # ensure that the cookie is set
 
-    load_pseudonym_from_access_token
+    load_pseudonym_from_jwt
+
+    unless @current_pseudonym.present?
+      load_pseudonym_from_access_token
+    end
 
     if !@current_pseudonym
       if @policy_pseudonym_id
