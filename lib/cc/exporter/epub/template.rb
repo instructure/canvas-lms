@@ -24,11 +24,15 @@ module CC::Exporter::Epub
 
     def template(item)
       return unless item
-      Exporter.resource_template(item[:resource_type])
+      Exporter.resource_template(resource_type(item))
     end
 
     def friendly_date(date)
       datetime_string(Date.parse(date))
+    end
+
+    def resource_type(item)
+      Exporter::LINKED_RESOURCE_KEY[item[:linked_resource_type]] || @reference
     end
   end
 end

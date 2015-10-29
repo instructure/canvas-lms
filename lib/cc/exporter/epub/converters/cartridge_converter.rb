@@ -42,11 +42,10 @@ module CC::Exporter::Epub::Converters
     def update_syllabus(content)
       return unless content['identifier']
       @course[:syllabus] << {
-        resource_type: content['resource_type'],
         title: content['title'],
         identifier: content['identifier'],
         due_at: content['due_at'],
-        href: "#{content['resource_type']}.xhtml##{content['identifier']}"
+        href: content['href']
       }
     end
 

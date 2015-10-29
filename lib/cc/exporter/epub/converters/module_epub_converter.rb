@@ -61,6 +61,7 @@ module CC::Exporter::Epub::Converters
                                         get_node_val(item_node, 'identifierref')
                                       end
           item[:for_syllabus] = item.value?("Assignment") || item.value?("Quizzes::Quiz")
+          item['href'] = "#{mod[:migration_id]}.xhtml##{item[:linked_resource_id]}"
           item
         end
 

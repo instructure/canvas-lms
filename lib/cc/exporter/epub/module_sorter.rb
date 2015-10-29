@@ -16,7 +16,7 @@ module CC::Exporter::Epub
           item[:identifier] == module_syllabus_resource(mod_item)
         end
         if syllabus_item
-          syllabus_item[:href] = "#{mod[:migration_id]}.xhtml##{mod_item[:linked_resource_id]}"
+          syllabus_item[:href] = mod_item[:href]
           syllabus_item[:in_module] = true
         end
       end
@@ -25,7 +25,7 @@ module CC::Exporter::Epub
     def filter_content_to_module(module_id)
       current_mod = cartridge_json[:modules].find{|mod| mod["migration_id"] == module_id}
       current_mod[:items].map do |item|
-        item.merge!(full_item_data(item))
+        item.merge!(full_item_data(item).except(:href))
       end
       current_mod
     end
