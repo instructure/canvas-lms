@@ -6,8 +6,9 @@ define([
   'jsx/shared/ApiProgressBar',
   'jsx/epub_exports/CourseStore',
   'i18n!epub_exports',
-  'jsx/files/FriendlyDatetime'
-], function(React, _, GenerateLink, DownloadLink, ApiProgressBar, CourseEpubExportStore, I18n, FriendlyDatetime) {
+  'jsx/files/FriendlyDatetime',
+  'bower/classnames/index'
+], function(React, _, GenerateLink, DownloadLink, ApiProgressBar, CourseEpubExportStore, I18n, FriendlyDatetime, classnames) {
   var CourseListItem = React.createClass({
     displayName: 'CourseListItem',
     propTypes: {
@@ -53,11 +54,15 @@ define([
     },
 
     render() {
-      var course = this.props.course;
+      var course = this.props.course,
+        classes = {
+          'ig-row': true
+      };
+      classes[this.epubExport().workflow_state] = !_.isEmpty(this.epubExport());
 
       return (
         <li>
-          <div className="ig-row">
+          <div className={classnames(classes)}>
             <div className="ig-row__layout">
               <span className="ig-title">
                 {course.name}

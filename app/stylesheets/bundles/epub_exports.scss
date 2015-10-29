@@ -1,6 +1,12 @@
 @import "base/environment";
 @import "components/ProgressBar";
 
+.course-epub-exports-app {
+  .failed {
+    color: $ic-color-danger;
+  }
+}
+
 .epub-exports-admin-controls {
   a {
     font-size: 14px;
