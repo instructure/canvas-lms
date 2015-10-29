@@ -613,7 +613,7 @@ class Course < ActiveRecord::Base
     return unless user
     RequestCache.cache('user_is_instructor', self, user) do
       Rails.cache.fetch([self, user, "course_user_is_instructor"].cache_key) do
-        user.cached_current_enrollments(preload_courses: true).any? { |e| e.course_id == self.id && e.participating_instructor? }
+        user.cached_current_enrollments(preload_dates: true).any? { |e| e.course_id == self.id && e.participating_instructor? }
       end
     end
   end
@@ -622,7 +622,7 @@ class Course < ActiveRecord::Base
     return unless user
     RequestCache.cache('user_is_student', self, user, opts) do
       Rails.cache.fetch([self, user, "course_user_is_student", opts[:include_future]].cache_key) do
-        user.cached_current_enrollments(:preload_courses => true, :include_future => opts[:include_future]).any? { |e|
+        user.cached_current_enrollments(:preload_dates => true, :include_future => opts[:include_future]).any? { |e|
           e.course_id == self.id && (opts[:include_future] ? e.student? : e.participating_student?)
         }
       end
@@ -1093,13 +1093,13 @@ class Course < ActiveRecord::Base
     given { |user, session| session && session[:enrollment_uuid] && (hash = Enrollment.course_user_state(self, session[:enrollment_uuid]) || {}) && (hash[:enrollment_state] == "invited" || hash[:enrollment_state] == "active" && hash[:user_state].to_s == "pre_registered") && (self.available? || self.completed? || self.claimed? && hash[:is_admin]) }
     can :read and can :read_outcomes
 
-    given { |user| (self.available? || self.completed?) && user && user.cached_current_enrollments(preload_courses: true).any?{|e| e.course_id == self.id && [:active, :invited, :accepted, :completed].include?(e.state_based_on_date) } }
+    given { |user| (self.available? || self.completed?) && user && user.cached_current_enrollments(preload_dates: true).any?{|e| e.course_id == self.id && [:active, :invited, :accepted, :completed].include?(e.state_based_on_date) } }
     can :read and can :read_outcomes
 
     # Active students
     given { |user|
       available?  && user &&
-        user.cached_current_enrollments(preload_courses: true).any? { |e|
+        user.cached_current_enrollments(preload_dates: true).any? { |e|
         e.course_id == id && e.participating_student?
       }
     }

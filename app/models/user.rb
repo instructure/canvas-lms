@@ -1731,7 +1731,10 @@ class User < ActiveRecord::Base
         end
         res
       end + temporary_invitations
-      if opts[:preload_courses]
+
+      if opts[:preload_dates]
+        Canvas::Builders::EnrollmentDateBuilder.preload(enrollments)
+      elsif opts[:preload_courses]
         ActiveRecord::Associations::Preloader.new(enrollments, :course).run
       end
       enrollments
@@ -1771,7 +1774,7 @@ class User < ActiveRecord::Base
   def participating_enrollments
     @participating_enrollments ||= self.shard.activate do
       Rails.cache.fetch([self, 'participating_enrollments'].cache_key) do
-        self.cached_current_enrollments.select(&:participating?)
+        self.cached_current_enrollments(:preload_dates => true).select(&:participating?)
       end
     end
   end
@@ -1820,9 +1823,6 @@ class User < ActiveRecord::Base
         end
       end
     end
-  end
-
-  def uncached_submissions_for_context_codes(context_codes, opts)
   end
 
   # This is only feedback for student contexts (unless specific contexts are passed in)
@@ -1953,14 +1953,20 @@ class User < ActiveRecord::Base
       end
     end
 
-    events += select_available_assignments(
-      select_upcoming_assignments(
-        Assignment.published.
-        for_context_codes(context_codes).
-        due_between_with_overrides(now, opts[:end_at]).
-        include_submitted_count.
-        map {|a| a.overridden_for(self)},opts.merge(:time => now)).
-      first(opts[:limit]))
+    assignments = Assignment.published.
+      for_context_codes(context_codes).
+      due_between_with_overrides(now, opts[:end_at]).
+      include_submitted_count
+
+    if assignments.any?
+      if AssignmentOverrideApplicator.should_preload_override_students?(assignments, self, "upcoming_events")
+        AssignmentOverrideApplicator.preload_assignment_override_students(assignments, self)
+      end
+
+      events += select_available_assignments(
+        select_upcoming_assignments(assignments.map {|a| a.overridden_for(self)}, opts.merge(:time => now)).
+        first(opts[:limit]))
+    end
     events.sort_by{|e| [e.start_at ? 0: 1,e.start_at || 0, Canvas::ICU.collation_key(e.title)] }.uniq.first(opts[:limit])
   end
 
@@ -2053,7 +2059,7 @@ class User < ActiveRecord::Base
   def appointment_context_codes
     @appointment_context_codes ||= Rails.cache.fetch([self, 'cached_appointment_codes', ApplicationController.region ].cache_key) do
       ret = {:primary => [], :secondary => []}
-      cached_current_enrollments(preload_courses: true).each do |e|
+      cached_current_enrollments(preload_dates: true).each do |e|
         next unless e.student? && e.active?
         ret[:primary] << "course_#{e.course_id}"
         ret[:secondary] << "course_section_#{e.course_section_id}"
@@ -2066,7 +2072,7 @@ class User < ActiveRecord::Base
   def manageable_appointment_context_codes
     @manageable_appointment_context_codes ||= Rails.cache.fetch([self, 'cached_manageable_appointment_codes', ApplicationController.region ].cache_key) do
       ret = {:full => [], :limited => [], :secondary => []}
-      cached_current_enrollments(preload_courses: true).each do |e|
+      cached_current_enrollments(preload_dates: true).each do |e|
         next unless e.course.grants_right?(self, :manage_calendar)
         if e.course.visibility_limited_to_course_sections?(self)
           ret[:limited] << "course_#{e.course_id}"
@@ -2359,7 +2365,7 @@ class User < ActiveRecord::Base
     return @menu_data if @menu_data
     coalesced_enrollments = []
 
-    cached_enrollments = self.cached_current_enrollments(:include_enrollment_uuid => enrollment_uuid, :preload_courses => true)
+    cached_enrollments = self.cached_current_enrollments(:include_enrollment_uuid => enrollment_uuid, :preload_dates => true)
     cached_enrollments.each do |e|
 
       next if e.state_based_on_date == :inactive
