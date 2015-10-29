@@ -58,6 +58,26 @@ Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
 
 ActionView::TestCase::TestController.view_paths = ApplicationController.view_paths
 
+module RSpec::Core::Hooks
+class AfterContextHook < Hook
+  def run(example)
+    exception_class = if defined?(RSpec::Support::AllExceptionsExceptOnesWeMustNotRescue)
+                        RSpec::Support::AllExceptionsExceptOnesWeMustNotRescue
+                      else
+                        Exception
+                      end
+    example.instance_exec(example, &block)
+  rescue exception_class => e
+    # TODO: Come up with a better solution for this.
+    RSpec.configuration.reporter.message <<-EOS
+An error occurred in an `after(:context)` hook.
+  #{e.class}: #{e.message}
+  occurred at #{e.backtrace.join("\n")}
+    EOS
+  end
+end
+end
+
 unless CANVAS_RAILS3
   Time.class_eval do
     def compare_with_round(other)
