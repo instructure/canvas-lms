@@ -163,27 +163,30 @@ class Enrollment < ActiveRecord::Base
     p.dispatch :enrollment_invitation
     p.to { self.user }
     p.whenever { |record|
-      !record.self_enrolled and
-      record.course and
-      record.user.registered? and
+      !record.self_enrolled &&
+      record.course &&
+      record.user.registered? &&
+      !record.observer? &&
       ((record.just_created && record.invited?) || record.changed_state(:invited) || @re_send_confirmation)
     }
 
     p.dispatch :enrollment_registration
     p.to { self.user.communication_channel }
     p.whenever { |record|
-      !record.self_enrolled and
-      record.course and
-      !record.user.registered? and
+      !record.self_enrolled &&
+      record.course &&
+      !record.user.registered? &&
+      !record.observer? &&
       ((record.just_created && record.invited?) || record.changed_state(:invited) || @re_send_confirmation)
     }
 
     p.dispatch :enrollment_notification
     p.to { self.user }
     p.whenever { |record|
-      !record.self_enrolled and
+      !record.self_enrolled &&
       record.course &&
       !record.course.created? &&
+      !record.observer? &&
       record.just_created && record.active?
     }
 
@@ -191,6 +194,7 @@ class Enrollment < ActiveRecord::Base
     p.to {self.course.admins - [self.user] }
     p.whenever { |record|
       record.course &&
+      !record.observer? &&
       !record.just_created && (record.changed_state(:active, :invited) || record.changed_state(:active, :creation_pending))
     }
   end

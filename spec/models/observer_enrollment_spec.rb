@@ -41,4 +41,13 @@ describe ObserverEnrollment do
       expect(ObserverEnrollment.observed_student_ids_by_observer_id(@course, [@observer.id,@observer_two.id])).to eq({@observer.id => [@student.id], @observer_two.id => []})
     end
   end
+
+  context "notifications" do
+    it "doesn't send enrollment notifications" do
+      Notification.create!(:name => "Enrollment Notification")
+      user_with_pseudonym
+      e = @course.enroll_user(@user, 'ObserverEnrollment')
+      expect(e.messages_sent).to be_empty
+    end
+  end
 end
