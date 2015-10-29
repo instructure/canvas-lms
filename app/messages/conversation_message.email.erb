@@ -24,12 +24,10 @@
 <%= asset.body %>
 
 <% if asset.has_media_objects? %>
-<%= t :audio_comment, "This message includes media comments. To listen or reply, click the link below:" %>
+  <%= t("This message includes media comments. To listen or reply, click this link: %{link}.", link: content(:link)) %>
 <% else %>
-<%= t :reply_to_conversation_message, "You can reply to this message in Canvas by replying directly to this email." %>
+  <%= t("You can reply to this message in Canvas by replying directly to this email, or by clicking this link: %{link}.", link: content(:link)) %>
 <% end %>
-
-<%= content :link %>
 
 <% unless asset.attachments.empty? %>
   <%= t :attached_files, "Attached Files:" %>

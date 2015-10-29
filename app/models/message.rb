@@ -651,13 +651,15 @@ class Message < ActiveRecord::Base
   # options - An options hash passed to translate (default: {}).
   #
   # Returns a translated string.
-  def translate(key, default, options={})
+  def translate(*args)
+    key, options = I18nliner::CallHelpers.infer_arguments(args)
+
     # Add scope if it's present in the model and missing from the key.
-    if @i18n_scope && key !~ /\A#/
+    if !options[:i18nliner_inferred_key] && @i18n_scope && key !~ /\A#/
       key = "##{@i18n_scope}.#{key}"
     end
 
-    super(key, default, options)
+    super(key, options)
   end
   alias :t :translate
 

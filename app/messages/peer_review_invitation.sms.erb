@@ -1,4 +1,3 @@
-
-<%= t('#messages.peer_review_invitation.summary.body', "You've been invited to peer review %{reviewee}. Follow the link below to review them!", :reviewee => reviewee_name(asset, user))%>
+<%= t("You've been invited to peer review %{reviewee}.", reviewee: reviewee_name(asset, user)) %>
 
 <%= t :more_info, "More info at %{url}", :url => HostUrl.context_host(asset.context) %>
