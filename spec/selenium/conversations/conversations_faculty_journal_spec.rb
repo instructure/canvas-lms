@@ -1,10 +1,13 @@
 require File.expand_path(File.dirname(__FILE__) + '/../helpers/conversations_common')
+require File.expand_path(File.dirname(__FILE__) + '/../helpers/assignment_overrides')
 
 describe "conversations new" do
+  include AssignmentOverridesSeleniumHelper
   include_context "in-process server selenium tests"
   let(:account) { Account.default }
   let(:account_settings_url) { "/accounts/#{account.id}/settings" }
   let(:user_notes_url) { "/courses/#{@course.id}/user_notes"}
+  let(:student_user_notes_url) {"/users/#{@s1.id}/user_notes"}
 
   before do
     conversation_setup
@@ -17,13 +20,43 @@ describe "conversations new" do
   end
 
   context "Course with Faculty Journal not enabled" do
-    it "should allow a site admin to enable faculty journal", priority: "2", test_id: 75005 do
+    before(:each) do
       site_admin_logged_in
+    end
+
+    it "should allow a site admin to enable faculty journal", priority: "2", test_id: 75005 do
       get account_settings_url
       f('#account_enable_user_notes').click
       f('.btn.btn-primary[type="submit"]').click
       wait_for_ajaximations
       expect(is_checked('#account_enable_user_notes')).to be_truthy
+    end
+
+    it "should allow a new entry by an admin", priority: "1", test_id: 75702 do
+      @course.account.update_attribute(:enable_user_notes, true)
+      get student_user_notes_url
+      f('#new_user_note_button').click
+      replace_content(f('#user_note_title'),'FJ Title 2')
+      replace_content(f('textarea'),'FJ Body text 2')
+      f('.send_button').click
+      time = format_time_for_view(Time.zone.now)
+      get student_user_notes_url
+      expect(f('.subject').text).to eq 'FJ Title 2'
+      expect(f('.user_content').text).to eq 'FJ Body text 2'
+      expect(f('.creator_name').text).to include_text(time)
+    end
+
+    it "should clear the subject and body when cancel is clicked", priority: "1", test_id: 458518 do
+      skip # This is currently broken CNVS-12522
+      @course.account.update_attribute(:enable_user_notes, true)
+      get student_user_notes_url
+      f('#new_user_note_button').click
+      replace_content(f('#user_note_title'),'FJ Title')
+      replace_content(f('textarea'),'FJ Body text')
+      f('.cancel_button').click
+      f('#new_user_note_button').click
+      expect(f('#user_note_title').text).to eq ''
+      expect(f('textarea').text).to eq ''
     end
   end
 
