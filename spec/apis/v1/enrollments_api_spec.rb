@@ -116,7 +116,37 @@ describe EnrollmentsApiController, type: :request do
               :limit_privileges_to_course_section => true
             }
           }
-        expect(Enrollment.find(json['id'])).to be_an_instance_of TeacherEnrollment
+        enrollment = Enrollment.find(json['id'])
+        expect(enrollment).to be_an_instance_of TeacherEnrollment
+        expect(enrollment.workflow_state).to eq 'active'
+        expect(enrollment.course_section).to eq @section
+        expect(enrollment.limit_privileges_to_course_section).to eq true
+      end
+
+      it "interprets 'false' correctly" do
+        json = api_call :post, @path, @path_options,
+          {
+            :enrollment => {
+              :user_id => @unenrolled_user.id,
+              :type    => 'TeacherEnrollment',
+              :limit_privileges_to_course_section => 'false'
+            }
+          }
+        expect(Enrollment.find(json['id']).limit_privileges_to_course_section).to eq false
+      end
+
+      it "adds a section limitation after the fact" do
+        enrollment = @course.enroll_teacher @unenrolled_user
+        json = api_call :post, @path, @path_options,
+          {
+            :enrollment => {
+              :user_id => @unenrolled_user.id,
+              :type => 'TeacherEnrollment',
+              :limit_privileges_to_course_section => 'true'
+            }
+          }
+        expect(json['id']).to eq enrollment.id
+        expect(enrollment.reload.limit_privileges_to_course_section).to eq true
       end
 
       it "should create a new ta enrollment" do

@@ -99,7 +99,7 @@
 #             "type": "string"
 #           },
 #           "limit_privileges_to_course_section": {
-#             "description": "User can only access his or her own course section.",
+#             "description": "User can only access his or her own course section. Applies to Teacher and TA enrollments.",
 #             "example": true,
 #             "type": "boolean"
 #           },
@@ -423,6 +423,9 @@ class EnrollmentsApiController < ApplicationController
         return render_create_errors([@@errors[:concluded_course]])
       end
     end
+
+    params[:enrollment][:limit_privileges_to_course_section] = value_to_boolean(params[:enrollment][:limit_privileges_to_course_section]) if params[:enrollment].has_key?(:limit_privileges_to_course_section)
+    params[:enrollment].slice!(:enrollment_state, :section, :limit_privileges_to_course_section, :associated_user_id, :role, :start_at, :end_at, :self_enrolled, :no_notify)
 
     @enrollment = @context.enroll_user(user, type, params[:enrollment].merge(:allow_multiple_enrollments => true))
     @enrollment.valid? ?
