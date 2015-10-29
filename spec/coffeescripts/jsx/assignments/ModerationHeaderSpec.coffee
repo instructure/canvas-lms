@@ -31,7 +31,9 @@ define [
 
   test 'calls onReviewClick prop when review button is clicked', ->
     called = false
-    @props.onReviewClick = -> called = true
+    @props.onReviewClick = ->
+      called = true
+      return
     HeaderElement = React.createElement(Header, @props)
     header = TestUtils.renderIntoDocument(HeaderElement)
     TestUtils.Simulate.click(header.refs.addReviewerBtn.getDOMNode())
@@ -44,4 +46,3 @@ define [
     message = TestUtils.findRenderedDOMComponentWithClass(header, 'ic-notification')
     ok message, 'found the flash messge'
     React.unmountComponentAtNode(header.getDOMNode().parentNode)
-

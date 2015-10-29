@@ -1,10 +1,11 @@
 define [
+  'react'
   'jsx/gradebook/grid/components/dropdown_components/gradebookKyleMenu'
   'jsx/gradebook/grid/components/dropdown_components/totalHeaderDropdownOptions'
   'underscore'
   'jquery'
   'compiled/jquery.kylemenu'
-], (GradebookKyleMenu, DropdownOptions, _, $) ->
+], (React, GradebookKyleMenu, DropdownOptions, _, $) ->
 
   wrapper = document.getElementById('fixtures')
   Simulate = React.addons.TestUtils.Simulate

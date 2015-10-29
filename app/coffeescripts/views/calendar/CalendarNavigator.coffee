@@ -3,7 +3,8 @@ define [
   'jquery'
   'underscore'
   'Backbone',
-  'jst/calendar/calendarNavigator'
+  'jst/calendar/calendarNavigator',
+  'jquery.instructure_date_and_time' # $.date_field
 ], (I18n, $, _, Backbone, template) ->
 
   class CalendarNavigator extends Backbone.View

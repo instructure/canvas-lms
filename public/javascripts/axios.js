@@ -1,7 +1,6 @@
 define(['bower/axios/dist/axios'], function (axios) {
   // Here we define some interceptors for requests to make Canvas happy when
   // we are making requests with axios
-
   // Add CSRF stuffs
   axios.interceptors.request.use(function (config) {
     // If the config already has one, use it.

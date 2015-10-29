@@ -1,4 +1,5 @@
 define [
+  '../mockFilesENV'
   'jquery'
   'react'
   'react-router'
@@ -10,11 +11,10 @@ define [
   'compiled/models/File'
   'compiled/collections/FilesCollection'
   'compiled/collections/FoldersCollection'
-  '../mockFilesENV'
   '../TestLocation'
   '../../helpers/stubRouterContext'
   'vendor/date'
-], ($, React, Router, Modal, FilesApp, filesEnv, FilePreviewComponent, Folder, File, FilesCollection, FoldersCollection, mockFilesENV, TestLocation, stubRouterContext) ->
+], (mockFilesENV, $, React, Router, Modal, FilesApp, filesEnv, FilePreviewComponent, Folder, File, FilesCollection, FoldersCollection, TestLocation, stubRouterContext) ->
   Simulate = React.addons.TestUtils.Simulate
   wrapper = null
 

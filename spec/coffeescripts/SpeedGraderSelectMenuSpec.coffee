@@ -1,6 +1,7 @@
 define [
+  'jquery',
   'speed_grader_select_menu'
-], (SpeedgraderSelectMenu)->
+], ($, SpeedgraderSelectMenu)->
 
   module "SpeedGraderSelectMenu",
     setup: ->
@@ -12,6 +13,7 @@ define [
 
     teardown: ->
       @fixtureNode.innerHTML = ""
+      $(".ui-selectmenu-menu").remove()
 
   test "Properly changes the a and select tags", ->
     @testArea.innerHTML = '<select id="students_selectmenu" style="foo" aria-disabled="true"></select><a class="ui-selectmenu" role="presentation" aria-haspopup="true" aria-owns="true"></a>'

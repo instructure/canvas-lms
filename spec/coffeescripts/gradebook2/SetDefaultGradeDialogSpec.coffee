@@ -11,6 +11,8 @@ define [
       @assignment = new Assignment(id: 1, points_possible: 10)
 
     teardown: ->
+      $(".ui-dialog").remove()
+      $(".use-css-transitions-for-show-hide").remove()
       $('#set_default_grade_form').remove()
 
   test '#gradeIsExcused returns true if grade is EX', ->

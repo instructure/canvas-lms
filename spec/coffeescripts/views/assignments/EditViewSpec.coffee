@@ -60,6 +60,9 @@ define [
       ENV.VALID_DATE_RANGE = {}
     teardown: ->
       fakeENV.teardown()
+      $(".ui-dialog").remove()
+      $("ul[id^=ui-id-]").remove()
+      $(".form-dialog").remove()
     editView: ->
       editView.apply(this, arguments)
 

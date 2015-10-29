@@ -163,6 +163,9 @@ module Canvas
               deps: ['jquery'],
               exports: '$'
             },
+            'vendor/md5': {
+              exports: 'CryptoJS'
+            },
             'handlebars': {
               deps: ['bower/handlebars/handlebars.runtime.amd'],
               exports: 'Handlebars'

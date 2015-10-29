@@ -1,8 +1,8 @@
-
 define [
+  'react'
   'jsx/gradebook/grid/components/dropdown_components/moveTotalColumnToggle',
   'jsx/gradebook/grid/actions/gradebookToolbarActions'
-], (MoveTotalColumnToggle, GradebookToolbarActions) ->
+], (React, MoveTotalColumnToggle, GradebookToolbarActions) ->
 
   wrapper = document.getElementById('fixtures')
   Simulate = React.addons.TestUtils.Simulate

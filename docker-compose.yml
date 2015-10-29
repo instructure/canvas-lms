@@ -64,10 +64,10 @@ guard:
     RACK_ENV: development
 
 # Uncomment this entry to run qunit tests built from webpack
-#js-tests:
-#  build: ./docker-compose/karma
-#  volumes:
-#    - ".:/app"
-#  environment:
-#    NODE_ENV: CI
-#    USE_WEBPACK: true
+js-tests:
+  build: ./docker-compose/karma
+  volumes:
+    - ".:/app"
+  environment:
+    NODE_ENV: CI
+    USE_WEBPACK: true

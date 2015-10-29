@@ -1,7 +1,8 @@
 define [
+  'react'
   'jsx/gradebook/grid/components/dropdown_components/setDefaultGradeOption',
   'compiled/gradebook2/SetDefaultGradeDialog'
-], (SetDefaultGradeOption, SetDefaultGradeDialog) ->
+], (React, SetDefaultGradeOption, SetDefaultGradeDialog) ->
 
   wrapper = document.getElementById('fixtures')
 
@@ -23,6 +24,10 @@ define [
     setup: ->
       @component = renderComponent()
     teardown: ->
+      $(".ui-dialog").remove()
+      $("#set_default_grade_form").remove()
+      $("noscript:empty").remove()
+      $("div:empty:not([id])").remove()
       React.unmountComponentAtNode wrapper
 
   test 'mounts on build', ->

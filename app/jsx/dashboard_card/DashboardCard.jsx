@@ -63,6 +63,9 @@ define([
       this.parentNode = this.getDOMNode();
     },
 
+    componentWillUnmount: function() {
+      CourseActivitySummaryStore.removeChangeListener(this.handleStoreChange)
+    },
 
     // ===============
     //    ACTIONS

@@ -1,9 +1,10 @@
 define [
+  'react'
   'jsx/gradebook/grid/components/dropdown_components/pointsOrPercentageToggle',
   'jsx/gradebook/grid/actions/gradebookToolbarActions',
   'compiled/gradebook2/GradeDisplayWarningDialog',
   'jquery'
-], (PointsOrPercentageToggle, GradebookToolbarActions, GradeDisplayWarningDialog, $) ->
+], (React, PointsOrPercentageToggle, GradebookToolbarActions, GradeDisplayWarningDialog, $) ->
 
   wrapper = document.getElementById('fixtures')
   Simulate = React.addons.TestUtils.Simulate

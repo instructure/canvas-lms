@@ -13,6 +13,7 @@ define [
       window.INST.kalturaSettings = null
       @server.restore()
       @$holder.remove()
+      $("#fixtures").empty()
 
   mockServerResponse = (server, id, type="video") =>
     resp = {

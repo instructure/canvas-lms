@@ -28,7 +28,11 @@ define [
     new DeleteGroupView
       model: ag_group
 
-  module 'DeleteGroupView'
+  module 'DeleteGroupView',
+    setup: ->
+    teardown: ->
+      $("#fixtures").empty()
+      $("form.dialogFormView").remove()
 
   test 'it should delete a group without assignments', ->
     @stub(window, "confirm", -> true )

@@ -30,7 +30,7 @@ define [
     teardown: ->
       fakeENV.teardown()
       React.unmountComponentAtNode(@dueDateCalendarPicker.getDOMNode().parentNode)
-      @clock = sinon.restore()
+      @clock.restore()
 
   test 'renders', ->
     ok @dueDateCalendarPicker.isMounted()
@@ -92,7 +92,7 @@ define [
     teardown: ->
       fakeENV.teardown()
       React.unmountComponentAtNode(@dueDateCalendarPicker.getDOMNode().parentNode)
-      @clock = sinon.restore()
+      @clock.restore()
 
   test 'recieved proper class depending on dateType', ->
     classes = @dueDateCalendarPicker.refs.datePickerWrapper.props.className

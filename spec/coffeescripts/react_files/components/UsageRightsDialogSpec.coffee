@@ -10,6 +10,11 @@ define [
   TestUtils = React.addons.TestUtils
 
   module 'UploadProgress',
+    setup: ->
+    teardown: ->
+      $("#ui-datepicker-div").empty()
+      $(".ui-dialog").remove()
+      $("div[id^=ui-id-]").remove()
 
   test 'clicking cancelXButton closes modal', ->
     usage_rights = {

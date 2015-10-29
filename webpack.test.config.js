@@ -12,18 +12,27 @@ testWebpackConfig.entry = {
 }
 testWebpackConfig.devtool = undefined;
 testWebpackConfig.output.path = __dirname + '/spec/javascripts/webpack';
+testWebpackConfig.output.pathinfo = true;
 testWebpackConfig.output.filename = "[name].bundle.test.js";
 testWebpackConfig.plugins = [
   new I18nPlugin(),
   new ShimmedAmdPlugin(),
   new ClientAppsPlugin(),
-  new CompiledReferencePlugin()
+  new CompiledReferencePlugin(),
+  new webpack.IgnorePlugin(/\.md$/),
+  new webpack.IgnorePlugin(/(CHANGELOG|LICENSE|README)$/),
+  new webpack.IgnorePlugin(/package.json/)
 ];
 
 testWebpackConfig.resolve.alias.qunit = "qunitjs/qunit/qunit.js";
+testWebpackConfig.resolve.modulesDirectories.push('spec/coffeescripts');
+testWebpackConfig.resolve.modulesDirectories.push('spec/javascripts/support');
 testWebpackConfig.module.loaders.push({
   test: /\/spec\/coffeescripts\//,
   loaders: ["qunitDependencyLoader"]
 });
+testWebpackConfig.module.noParse = [
+  /\/sinon-1.17.2.js/
+]
 
 module.exports = testWebpackConfig;

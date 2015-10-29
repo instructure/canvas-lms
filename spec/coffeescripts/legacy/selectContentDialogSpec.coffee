@@ -7,6 +7,7 @@ define [
       $("#fixtures").html("<div id='select_context_content_dialog'></div>")
 
     teardown: ->
+      $(".ui-dialog").remove()
       $("#fixtures").html("")
 
   test "opens a dialog with the width option", ->

@@ -36,6 +36,9 @@ define [
       helpDialog.dialogInited = false
       helpDialog.teacherFeedbackInited = false
       window.INST.browser = originalBrowser
+      $(".ui-dialog").remove()
+      $('[id^=ui-id-]').remove()
+      $("#help-dialog").remove()
       $("#fixtures").empty()
 
   test 'init', ->

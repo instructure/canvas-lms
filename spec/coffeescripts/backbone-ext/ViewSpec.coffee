@@ -2,7 +2,7 @@ define [
   'Backbone'
   'compiled/util/mixin'
   'helpers/fakeENV'
-], ({View}, mixing, fakeENV) ->
+], (Backbone, mixing, fakeENV) ->
   module 'View',
     setup: ->
       fakeENV.setup()
@@ -45,16 +45,16 @@ define [
     equal view.children.length, 1, "Creates an array of children view stored on .children"
 
   test 'template optionProperty', ->
-    view = new View
+    view = new Backbone.View
       template: -> "hi"
     view.render()
     equal view.$el.html(), "hi",
       "template rendered with view as option"
 
   test 'child views', ->
-    class ChildView extends View
+    class ChildView extends Backbone.View
       template: -> "hi"
-    class ParentView extends View
+    class ParentView extends Backbone.View
       @optionProperty this, 'fart'
       @child 'childView', '#child'
       template: ->
@@ -135,7 +135,7 @@ define [
     mixin2 =
       events: 'click .bar': 'bar'
       bar: -> ok true, 'called mixin2.bar'
-    class SomeView extends View
+    class SomeView extends Backbone.View
       events: 'click .baz': 'baz'
       baz: -> ok true, 'called prototype method baz'
       @mixin mixin1, mixin2
@@ -160,7 +160,7 @@ define [
       initialize: @spy()
       attach: @spy()
       afterRender: @spy()
-    class SomeView extends View
+    class SomeView extends Backbone.View
       @mixin mixin1, mixin2
     view = new SomeView
     view.render()
@@ -173,9 +173,9 @@ define [
 
   test 'View.mixin does not merge into parent class', ->
     mixin = defaults: foo: 'bar'
-    class Foo extends View
+    class Foo extends Backbone.View
       @mixin mixin
-    equal View::defaults.foo, undefined, 'View::defaults was not appended'
+    equal Backbone.View::defaults.foo, undefined, 'View::defaults was not appended'
     equal Foo::defaults.foo, 'bar', 'Foo::defaults was appended'
 
   test 'View.mixin with compound mixins', ->
@@ -186,7 +186,7 @@ define [
     afterRender3 = @spy()
     mixin3 = afterRender: afterRender3
     afterRenderFoo = @spy()
-    class Foo extends View
+    class Foo extends Backbone.View
       @mixin mixin2, mixin3
       afterRender: -> super and afterRenderFoo()
     window.Foo = Foo
@@ -205,7 +205,7 @@ define [
     mixin5 = mixing {}, mixin4, afterRender: afterRender5
     mixin6 = afterRender: afterRender6
     afterRenderBar = @spy()
-    class Bar extends View
+    class Bar extends Backbone.View
       @mixin mixin6, mixin5
       afterRender: -> super and afterRenderBar()
     window.Bar = Bar

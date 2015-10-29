@@ -23,7 +23,8 @@ module.exports = {
       qtip: "jquery.qtip",
       realTinymce: "bower/tinymce/tinymce",
       'ic-ajax': "bower/ic-ajax/dist/amd/main",
-      'ic-tabs': "bower/ic-tabs/dist/amd/main"
+      'ic-tabs': "bower/ic-tabs/dist/amd/main",
+      'bower/axios/dist/axios': 'bower/axios/dist/axios.amd'
     },
     modulesDirectories: [
       'app',
@@ -97,6 +98,10 @@ module.exports = {
       {
         test: /bower\/handlebars\/handlebars\.runtime/,
         loader: "exports-loader?Handlebars"
+      },
+      {
+        test: /vendor\/md5/,
+        loader: "exports-loader?CryptoJS"
       }
     ]
   },

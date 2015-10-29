@@ -278,7 +278,7 @@ namespace :js do
 
   desc "build webpack js for production"
   task :webpack do
-    if ENV['USE_WEBPACK'].present? && ENV['USE_WEBPACK'] != 'false'
+    if ENV['USE_WEBPACK'].present? && ENV['USE_WEBPACK'] != 'false' && ENV['USE_WEBPACK'] != 'False'
       if ENV['RAILS_ENV'] == 'production'
         puts "--> Building PRODUCTION webpack bundles"
         `npm run webpack-production`

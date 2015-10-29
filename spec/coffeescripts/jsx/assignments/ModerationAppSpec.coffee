@@ -17,10 +17,14 @@ define [
             students: []
             sort: 'asc'
           },
-          flashMessage: {},
+          flashMessage: {
+            message: "",
+            time: 0
+          },
           assignment: {
             published: false
-          }
+          },
+          urls: {}
         }
 
       @moderationApp = TestUtils.renderIntoDocument(React.createElement(ModerationApp, store: @store))
