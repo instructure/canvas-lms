@@ -31,7 +31,7 @@ define([
           <div className='grid-row ModeratedColumnHeader'>
             <div className='col-xs-4'>
               <div className='ModeratedColumnHeader__StudentName ColumnHeader__Item'>
-                <input type='checkbox' onChange={this.handleSelectAll} />
+                <input type='checkbox' onChange={this.props.handleSelectAll} />
                 <span>{I18n.t('Student')}</span>
               </div>
             </div>
@@ -66,7 +66,7 @@ define([
           <div className='grid-row ColumnHeader'>
             <div className='col-xs-4'>
               <div className='ColumnHeader__StudentName ColumnHeader__Item'>
-                <input type='checkbox' onChange={this.handleSelectAll} />
+                <input type='checkbox' onChange={this.props.handleSelectAll} />
                 <span>{I18n.t('Student')}</span>
               </div>
             </div>

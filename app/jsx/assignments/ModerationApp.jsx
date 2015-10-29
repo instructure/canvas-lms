@@ -70,6 +70,7 @@ define([
                 handleSortMark1={() => this.props.store.dispatch(Actions.sortMark1Column())}
                 handleSortMark2={() => this.props.store.dispatch(Actions.sortMark2Column())}
                 handleSortMark3={() => this.props.store.dispatch(Actions.sortMark3Column())}
+                handleSelectAll={this.handleSelectAll}
               />
             </div>
           </div>
