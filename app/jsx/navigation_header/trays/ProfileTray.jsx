@@ -11,6 +11,18 @@ define([
       closeTray: React.PropTypes.func.isRequired
     },
 
+    getInitialState () {
+      return {
+        logoutFormSubmitted: false
+      };
+    },
+
+    submitLogoutForm() {
+      if (!this.state.logoutFormSubmitted) {
+        this.setState({logoutFormSubmitted: true}, () => this.refs.logoutForm.getDOMNode().submit());
+      }
+    },
+
     render() {
       return (
         <div>
@@ -45,7 +57,7 @@ define([
                 <a
                   href="/logout"
                   className="ReactTray-list-item__link"
-                  onClick={PreventDefault(() => this.refs.logoutForm.getDOMNode().submit())}>
+                  onClick={PreventDefault(this.submitLogoutForm)}>
                   <i className="icon-off"></i>
                   {I18n.t('Logout')}
                 </a>
