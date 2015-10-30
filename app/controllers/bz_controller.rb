@@ -23,7 +23,7 @@ class BzController < ApplicationController
 
     client = Google::APIClient.new(:application_name => 'Braven Canvas')
 
-    file_store = Google::APIClient::FileStore.new(File.join(Rails.root, "config", "calendar-ruby-quickstart.json"))
+    file_store = Google::APIClient::FileStore.new(File.join(Rails.root, "config", "google_calendar_auth.json"))
     storage = Google::APIClient::Storage.new(file_store)
     client.authorization = storage.authorize
     calendar_api = client.discovered_api('calendar', 'v3')
