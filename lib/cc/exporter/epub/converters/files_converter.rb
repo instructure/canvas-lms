@@ -61,7 +61,8 @@ module CC::Exporter::Epub::Converters
           local_path: local_path,
           file_name: File.basename(local_path),
           path_to_file: path_to_file,
-          media_type: media_type
+          media_type: media_type,
+          exists: File.exist?(path_to_file)
         }
       end
 
@@ -141,7 +142,7 @@ module CC::Exporter::Epub::Converters
       # should be returned as a separate collection, as the ePub exporter
       # handles unsupported file types differently.
       all_files.partition do |file|
-        file[:media_type].present?
+        file[:media_type].present? && file[:exists]
       end
     end
   end

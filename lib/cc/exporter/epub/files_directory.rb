@@ -7,6 +7,7 @@ module CC::Exporter::Epub
 
     def add_files
       files.each do |file_data|
+        next unless file_data[:exists]
         File.open(file_data[:path_to_file]) do |file|
           zip_file.add(file_data[:local_path], file)
         end
