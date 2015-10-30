@@ -1292,6 +1292,7 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :calendar_events_api) do
       get 'calendar_events', action: :index, as: 'calendar_events'
+      get 'users/:user_id/calendar_events', action: :user_index, as: 'user_calendar_events'
       post 'calendar_events', action: :create
       get 'calendar_events/:id', action: :show, as: 'calendar_event'
       put 'calendar_events/:id', action: :update

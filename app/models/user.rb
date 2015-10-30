@@ -1084,7 +1084,7 @@ class User < ActiveRecord::Base
     end
     can :reset_mfa
 
-    given { |user| user && user.user_observees.detect { |uo| uo.user == self }}
+    given { |user| user && user.user_observees.where(user_id: self.id).exists? }
     can :read and can :read_as_parent
   end
 

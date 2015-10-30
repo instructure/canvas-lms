@@ -1712,6 +1712,37 @@ describe CalendarEventsApiController, type: :request do
     end
   end
 
+  context "user index" do
+    before :once do
+      @student = user(active_all: true, active_state: 'active')
+      @course.enroll_student(@student, enrollment_state: 'active')
+      @observer = user(active_all: true, active_state: 'active')
+      @course.enroll_user(
+        @observer,
+        'ObserverEnrollment',
+        enrollment_state: 'active',
+        associated_user_id: @student.id
+      )
+      @observer.user_observees.create do |uo|
+        uo.user_id = @student.id
+      end
+    end
+
+    it "should return observee's calendar events" do
+      contexts = [@course.asset_string]
+      3.times do |idx|
+        @course.calendar_events.create(title: "event #{idx}", workflow_state: 'active')
+      end
+      ctx_str = contexts.join("&context_codes[]=")
+      @me = @observer
+      json = api_call(:get,
+        "/api/v1/users/#{@student.id}/calendar_events?all_events=true&context_codes[]=#{ctx_str}", {
+        controller: 'calendar_events_api', action: 'user_index', format: 'json',
+        context_codes: contexts, all_events: true, user_id: @student.id})
+      expect(json.size).to eql 3
+    end
+  end
+
   context "calendar feed" do
     before :once do
       time = Time.utc(Time.now.year, Time.now.month, Time.now.day, 4, 20)
