@@ -156,8 +156,8 @@ define [
                 disabled: !showingButtons
                 className: 'ui-button btn-restrict',
                 onClick: @openRestrictedDialog
-                title: I18n.t('restrict_access', 'Restrict Access')
-                'aria-label': I18n.t('restrict_access', 'Restrict Access')
+                title: I18n.t('restrict_access', 'Manage Access')
+                'aria-label': I18n.t('restrict_access', 'Manage Access')
                 'data-tooltip': ''
               },
                 i className: 'icon-cloud-lock'
