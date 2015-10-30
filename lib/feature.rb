@@ -131,12 +131,14 @@ END
     },
     'epub_export' =>
     {
-      display_name: -> { I18n.t('ePub Export') },
+      display_name: -> { I18n.t('ePub Exporting') },
       description: -> { I18n.t(<<END) },
       This enables users to generate and download course ePub.
 END
-      applies_to: 'User',
-      state: 'hidden'
+      applies_to: 'Course',
+      state: 'hidden',
+      root_opt_in: true,
+      beta: true
     },
     'html5_first_videos' =>
     {
