@@ -176,3 +176,9 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
   def wiki_page_editor_id
     f('textarea.body')['id']
   end
+
+  def click_tiny_button(button_aria)
+    focus = :shift
+    f("div[aria-label=\'#{button_aria}\'] button").send_keys(focus) # no content but gives the italic button focus
+    f("div[aria-label=\'#{button_aria}\'] button").click
+  end
