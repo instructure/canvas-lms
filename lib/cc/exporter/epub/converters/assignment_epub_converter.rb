@@ -27,22 +27,22 @@ module CC::Exporter::Epub::Converters
 
       if html_doc
         _title, body = get_html_title_and_body(html_doc)
-        assignment['description'] = convert_placeholder_paths_from_string!(body)
+        assignment[:description] = convert_placeholder_paths_from_string!(body)
       end
-      ['title', "allowed_extensions", "grading_type", "submission_types"].each do |string_type|
+      [:title, :allowed_extensions, :grading_type, :submission_types].each do |string_type|
         val = get_node_val(meta_doc, string_type)
         assignment[string_type] = val unless val.nil?
       end
-      ['due_at', 'lock_at', 'unlock_at'].each do |date_type|
+      [:due_at, :lock_at, :unlock_at].each do |date_type|
         val = get_node_val(meta_doc, date_type)
         assignment[date_type] = val unless val.nil?
       end
-      ['points_possible'].each do |f_type|
+      [:points_possible].each do |f_type|
         val = get_float_val(meta_doc, f_type)
         assignment[f_type] = val unless val.nil?
       end
-      assignment['identifier'] = get_node_att(meta_doc, 'assignment', 'identifier')
-      assignment['href'] = "assignments.xhtml##{assignment['identifier']}"
+      assignment[:identifier] = get_node_att(meta_doc, 'assignment', 'identifier')
+      assignment[:href] = "assignments.xhtml##{assignment[:identifier]}"
       update_syllabus(assignment)
       assignment
     end

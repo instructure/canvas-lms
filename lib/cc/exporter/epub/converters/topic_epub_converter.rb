@@ -25,21 +25,21 @@ module CC::Exporter::Epub::Converters
 
     def convert_topic(cc_doc, meta_doc)
       topic = {}
-      topic['description'] = convert_placeholder_paths_from_string!(get_node_val(cc_doc, 'text'))
-      topic['title'] = get_node_val(cc_doc, 'title')
+      topic[:description] = convert_placeholder_paths_from_string!(get_node_val(cc_doc, 'text'))
+      topic[:title] = get_node_val(cc_doc, 'title')
       if meta_doc
-        topic['title'] = get_node_val(meta_doc, 'title')
-        topic['type'] = get_node_val(meta_doc, 'type')
-        topic['discussion_type'] = get_node_val(meta_doc, 'discussion_type')
-        topic['pinned'] = get_bool_val(meta_doc, 'pinned')
-        topic['posted_at'] = get_time_val(meta_doc, 'posted_at')
-        topic['lock_at'] = get_time_val(meta_doc, 'lock_at')
-        topic['position'] = get_int_val(meta_doc, 'position')
-        topic['identifier'] = get_node_val(meta_doc, 'topic_id')
-        topic['href'] = "topics.xhtml##{topic['identifier']}"
+        topic[:title] = get_node_val(meta_doc, 'title')
+        topic[:type] = get_node_val(meta_doc, 'type')
+        topic[:discussion_type] = get_node_val(meta_doc, 'discussion_type')
+        topic[:pinned] = get_bool_val(meta_doc, 'pinned')
+        topic[:posted_at] = get_time_val(meta_doc, 'posted_at')
+        topic[:lock_at] = get_time_val(meta_doc, 'lock_at')
+        topic[:position] = get_int_val(meta_doc, 'position')
+        topic[:identifier] = get_node_val(meta_doc, 'topic_id')
+        topic[:href] = "topics.xhtml##{topic[:identifier]}"
 
         if asmnt_node = meta_doc.at_css('assignment')
-          topic['assignment'] = assignment_data(asmnt_node)
+          topic[:assignment] = assignment_data(asmnt_node)
         end
       end
 
