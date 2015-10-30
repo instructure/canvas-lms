@@ -1163,7 +1163,7 @@ class Submission < ActiveRecord::Base
 
     def missing?
       return false if !past_due? || submitted_at.present?
-      assignment.expects_submission? || !(self.graded? && self.score > 0)
+      assignment.expects_submission? || !(self.excused || (self.graded? && self.score > 0))
     end
     alias_method :missing, :missing?
 
