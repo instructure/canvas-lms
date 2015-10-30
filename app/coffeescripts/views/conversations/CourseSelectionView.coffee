@@ -91,7 +91,7 @@ define [
         view.clearSearch()
 
     getAriaLabel: ->
-      return if _.include(ENV.current_user_roles, 'admin')
+      return if ENV.CONVERSATIONS.CAN_MESSAGE_ACCOUNT_CONTEXT
       label = @getCurrentContext().name || I18n.t("Select course: a selection is required before recipients field will become available")
       @$picker.find('button').attr("aria-label", label)
 

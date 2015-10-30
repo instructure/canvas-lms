@@ -658,7 +658,7 @@ define [
     # Returns nothing.
     setContext: (context, disable = false) ->
       context = null unless context.id
-      if disable and !_.include(ENV.current_user_roles, 'admin') and !@disabled
+      if disable and !ENV.CONVERSATIONS.CAN_MESSAGE_ACCOUNT_CONTEXT and !@disabled
         @disable(!context)
       return if context?.id == @currentContext?.id
       @currentContext     = context

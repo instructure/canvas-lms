@@ -40,7 +40,7 @@ describe "conversations new" do
       expect(c.conversation_participants.collect(&:user_id).sort).to eq([@teacher, @s1, @s2].collect(&:id).sort)
     end
 
-    it "should allow admins to send a message without picking a context", priority: "1", test_id: 138677 do
+    it "should allow admins with read_roster permission to send a message without picking a context", priority: "1", test_id: 138677 do
       user = account_admin_user
       user_logged_in({:user => user})
       get_conversations
@@ -48,6 +48,16 @@ describe "conversations new" do
       c = @s1.conversations.last.conversation
       expect(c.subject).to eq 'context-free'
       expect(c.context).to eq Account.default
+    end
+
+    it "should not allow admins without read_roster permission to send a message without picking a context", priority: "1" do
+      user = account_admin_user
+      RoleOverride.manage_role_override(Account.default, Role.get_built_in_role('AccountAdmin'), 'read_roster', override: false, locked: false)
+      user_logged_in({:user => user})
+      get_conversations
+      fj('#compose-btn').click
+      wait_for_animations
+      expect(fj('#recipient-row')).to have_attribute(:style, 'display: none;')
     end
 
     it "should not allow non-admins to send a message without picking a context", priority: "1", test_id: 138678 do
