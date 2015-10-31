@@ -76,7 +76,8 @@ class Course < ActiveRecord::Base
                   :lock_all_announcements,
                   :public_syllabus,
                   :course_format,
-                  :time_zone
+                  :time_zone,
+                  :organize_epub_by_content_type
 
   EXPORTABLE_ATTRIBUTES = [
     :id, :name, :account_id, :group_weighting_scheme, :workflow_state, :uuid, :start_at, :conclude_at, :grading_standard_id, :is_public, :allow_student_wiki_edits,
@@ -203,6 +204,8 @@ class Course < ActiveRecord::Base
   has_many :role_overrides, :as => :context
   has_many :content_migrations, :as => :context
   has_many :content_exports, :as => :context
+  has_many :epub_exports, order: "created_at DESC"
+  attr_accessor :latest_epub_export
   has_many :course_imports
   has_many :alerts, as: :context, preload: :criteria
   has_many :appointment_group_contexts, :as => :context
@@ -1168,7 +1171,7 @@ class Course < ActiveRecord::Base
 
     # Admin
     given { |user| self.account_membership_allows(user) }
-    can :read_as_admin
+    can :read_as_admin and can :view_unpublished_items
 
     given { |user| self.account_membership_allows(user, :manage_courses) }
     can :read_as_admin and can :manage and can :update and can :delete and can :use_student_view and can :reset_content and can :view_unpublished_items and can :manage_feature_flags
@@ -1973,7 +1976,8 @@ class Course < ActiveRecord::Base
       :storage_quota, :tab_configuration, :allow_wiki_comments,
       :turnitin_comments, :self_enrollment, :license, :indexed, :locale,
       :hide_final_grade, :hide_distribution_graphs,
-      :allow_student_discussion_topics, :allow_student_discussion_editing, :lock_all_announcements ]
+      :allow_student_discussion_topics, :allow_student_discussion_editing, :lock_all_announcements,
+      :organize_epub_by_content_type ]
   end
 
   def set_course_dates_if_blank(shift_options)
@@ -2515,6 +2519,7 @@ class Course < ActiveRecord::Base
   add_setting :large_roster, :boolean => true, :default => lambda { |c| c.root_account.large_course_rosters? }
   add_setting :public_syllabus, :boolean => true, :default => false
   add_setting :course_format
+  add_setting :organize_epub_by_content_type, :boolean => true, :default => false
   add_setting :is_public_to_auth_users, :boolean => true, :default => false
 
   add_setting :restrict_student_future_view, :boolean => true, :inherited => true
@@ -2732,8 +2737,8 @@ class Course < ActiveRecord::Base
     progress
   end
 
-  def re_send_invitations!
-    self.enrollments.invited.except(:preload).preload(user: :communication_channels).find_each do |e|
+  def re_send_invitations!(from_user)
+    self.enrollments_visible_to(from_user).invited.except(:preload).preload(user: :communication_channels).find_each do |e|
       e.re_send_confirmation! if e.invited?
     end
   end
@@ -2781,6 +2786,14 @@ class Course < ActiveRecord::Base
       self.wiki.touch
       self.wiki.wiki_pages.update_all(:updated_at => Time.now.utc)
     end
+  end
+
+  def touch_admins_later
+    send_later_enqueue_args(:touch_admins, { :run_at => 15.seconds.from_now, :singleton => "course_touch_admins_#{global_id}" })
+  end
+
+  def touch_admins
+    User.where(id: self.admins).touch_all
   end
 
   def list_students_by_sortable_name?

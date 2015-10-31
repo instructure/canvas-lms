@@ -1,10 +1,12 @@
 <% grading_standard ||= nil %>
 <% grading_standard_title = grading_standard.try(:title) %>
 <% grading_standard_list ||= false %>
+<% read_only ||= false %>
 <% data = grading_standard.data rescue GradingStandard.default_grading_standard %>
 <div class="grading_standard" id="grading_standard_<%= grading_standard ? grading_standard.id : 'blank' %>">
   <div class="display_grading_standard">
     <div class="standard_title text-center">
+      <% if !read_only %>
       <div style="float: right;" class="displaying links">
         <% if !grading_standard_list %>
           <a href="#"
@@ -36,6 +38,7 @@
           </a>
         <% end %>
       </div>
+      <% end %>
       <strong class="displaying title"><%= grading_standard_title %></strong>
       <div class="editing_box">
         <label for="grading_standard_title"><%= before_label('scheme_name', 'Scheme Name') %></label>
@@ -144,7 +147,9 @@
     </table>
     <% unless grading_standard_list %>
       <div class="displaying" style="text-align: right;">
-        <a href="<%= context_url(@context, :context_grading_standards_url) %>"><%= t('managing_grading_standards', 'manage grading schemes') %></a>
+        <% if !read_only %>
+          <a href="<%= context_url(@context, :context_grading_standards_url) %>"><%= t('managing_grading_standards', 'manage grading schemes') %></a>
+        <% end %>
         <button type="button" class="done_button btn"><%= t('buttons.done', 'Done') %></button>
       </div>
     <% end %>

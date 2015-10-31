@@ -71,6 +71,10 @@ module Api::V1::Course
   #   }
   #
   def course_json(course, user, session, includes, enrollments)
+    if includes.include?('access_restricted_by_date') && enrollments && enrollments.all?(&:inactive?)
+      return {'id' => course.id, 'access_restricted_by_date' => true}
+    end
+
     Api::V1::CourseJson.to_hash(course, user, includes, enrollments) do |builder, allowed_attributes, methods, permissions_to_include|
       hash = api_json(course, user, session, { :only => allowed_attributes, :methods => methods }, permissions_to_include)
       hash['term'] = enrollment_term_json(course.enrollment_term, user, session, enrollments, []) if includes.include?('term')

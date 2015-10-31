@@ -9,19 +9,20 @@ define [
   Simulate  = TestUtils.Simulate
   wrapper   = document.getElementById('fixtures')
 
-  renderComponent = (data) ->
+  renderComponent = (props) ->
     componentFactory = React.createFactory(AssignmentGradeCell)
-    React.render(componentFactory(data), wrapper)
+    React.render(componentFactory(props), wrapper)
 
   buildComponent = (props, additionalProps) ->
-    cellData = props || {cellData: {id: '1', points_possible: 10}, renderer: $.noop}
+    cellData = props || {columnData: {assignment: {id: '1', points_possible: 10}}, renderer: $.noop}
     $.extend(cellData, additionalProps)
     renderComponent(cellData)
 
   buildComponentWithSubmission = (additionalProps, submissionType) ->
     cellData =
-      cellData: {id: '1', points_possible: 100}
-      submission:
+      columnData: 
+        assignment: {id: '1', points_possible: 100}
+      cellData:
         id: '1'
         submission_type: submissionType || 'discussion_topic'
         assignment_id: '1'
@@ -40,9 +41,16 @@ define [
   test 'should mount', ->
     ok(buildComponentWithSubmission().isMounted())
 
+  module 'ReactGradebook.assignmentGradeCellComponent icons',
+    setup: ->
+      @component = buildComponentWithSubmission()
+    teardown: ->
+      React.unmountComponentAtNode(wrapper)
+
   test 'should render discussion icon when submission is not graded', ->
-    component = buildComponentWithSubmission()
-    equal(getIconClassName(component), 'icon-discussion')
+    expected = 'icon-discussion'
+    actual = getIconClassName(@component)
+    equal(actual, expected)
 
   test 'should render online-url icon when submission is not graded', ->
     component = buildComponentWithSubmission({}, 'online_url')
@@ -52,15 +60,15 @@ define [
     component = buildComponentWithSubmission({}, 'online_text_entry')
     equal(getIconClassName(component), 'icon-text')
 
-  test 'should render online-upload icon when submission is not grade', ->
+  test 'should render online-upload icon when submission is not graded', ->
     component = buildComponentWithSubmission({}, 'online_upload')
     equal(getIconClassName(component), 'icon-document')
 
-  test 'should render online-quiz icon when submission is not grade', ->
+  test 'should render online-quiz icon when submission is not graded', ->
     component = buildComponentWithSubmission({}, 'online_quiz')
     equal(getIconClassName(component), 'icon-quiz')
 
-  test 'should render media_recording icon when submission is not grade', ->
+  test 'should render media_recording icon when submission is not graded', ->
     component = buildComponentWithSubmission({}, 'media_recording')
     equal(getIconClassName(component), 'icon-media')
 
@@ -77,7 +85,7 @@ define [
   test 'opens dialog when clicking the submissions details link', ->
     props =
       rowData:
-        enrollment:
+        student:
           user:
             name: "Hello"
             id: "1"
@@ -87,15 +95,3 @@ define [
     detailsDialogLink = component.refs.detailsDialog
     Simulate.click(detailsDialogLink)
     ok openDialogStub.calledOnce
-
-
-
-
-
-
-
-
-
-
-
-

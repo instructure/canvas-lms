@@ -41,7 +41,7 @@ describe 'editing a quiz' do
         type_in_tiny('#quiz_description', 'changed description')
         click_save_settings_button
         wait_for_ajax_requests
-        expect(f('#quiz-publish-link').text.strip!).to eq 'Published'
+        expect(f('#quiz-publish-link .publish-text').text.strip!).to eq 'Published'
       end
 
       it 'deletes the quiz', priority: "1", test_id: 351921 do
@@ -54,7 +54,40 @@ describe 'editing a quiz' do
         end
         f('#quiz-publish-link').click
         wait_for_ajax_requests
-        expect(f('#quiz-publish-link').text.strip!).to eq 'Publish'
+        expect(f('#quiz-publish-link .publish-text').text.strip!).to eq 'Publish'
+      end
+
+      it 'saves question changes with the |Save it now| button', priority: "1", test_id: 140647 do
+        course_with_student(course: @course)
+
+        # add new question without saving changes
+        click_questions_tab
+        click_new_question_button
+        question_description = 'New Test Question'
+        create_multiple_choice_question(description: question_description)
+        cancel_quiz_edit
+
+        # verify alert
+        alert_box = fj('.unpublished_warning', '.alert')
+        expect(alert_box.text).to \
+          eq "You have made changes to the questions in this quiz.\nThese "\
+            "changes will not appear for students until you save the quiz."
+
+        # verify button
+        save_it_now_button = fj('.btn.btn-primary', '.edit_quizzes_quiz')
+        expect(save_it_now_button).to be_displayed
+
+        # verify the alert disappears after clicking the button
+        save_it_now_button.click
+        wait_for_ajaximations
+        expect(alert_box).not_to be_displayed
+
+        # verify the student sees the changes
+        @user = @student
+        take_quiz do
+          expect(fj('.display_question.question.multiple_choice_question').text).to \
+            include_text question_description
+        end
       end
     end
 
@@ -90,7 +123,7 @@ describe 'editing a quiz' do
         end
         f('#quiz-publish-link').click
         wait_for_ajax_requests
-        expect(f('#quiz-publish-link').text.strip!).to eq 'Unpublish'
+        expect(f('#quiz-publish-link .publish-text').text.strip!).to eq 'Unpublish'
       end
     end
 
@@ -164,7 +197,7 @@ describe 'editing a quiz' do
 
       it 'flashes a warning message', priority: "1", test_id: 140609 do
         message = 'Keep in mind, some students have already taken or started taking this quiz'
-        expect(f('#flash_message_holder')).to include_text message
+        keep_trying_until(3) { expect(f('#flash_message_holder')).to include_text message }
       end
 
       it 'deletes the quiz', priority: "1", test_id: 210073 do

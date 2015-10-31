@@ -14,6 +14,7 @@ thead th {
   thead {
     tr:first-child th:first-child {
       border-top-left-radius: 0 !important;
+      min-width: 165px;
     }
     tr:first-child th:last-child {
       border-top-right-radius: 0 !important;
@@ -40,7 +41,7 @@ thead th {
     }
   }
   .channel-name, .channel-addr {
-    text-indent: 0;
+    opacity: 100;
   }
 }
 
@@ -62,7 +63,7 @@ thead th {
 }
 
 .channel-name, .channel-addr {
-  text-indent: -9999px;
+  opacity: 0;
 }
 
 /* Column striping */

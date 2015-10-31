@@ -53,6 +53,7 @@ class Account < ActiveRecord::Base
   has_many :all_group_categories, :class_name => 'GroupCategory', :as => :context
   has_many :groups, :as => :context
   has_many :all_groups, :class_name => 'Group', :foreign_key => 'root_account_id'
+  has_many :all_group_memberships, source: 'group_memberships', through: :all_groups
   has_many :enrollment_terms, :foreign_key => 'root_account_id'
   has_many :enrollments, :foreign_key => 'root_account_id', :conditions => ["enrollments.type != 'StudentViewEnrollment'"]
   has_many :all_enrollments, :class_name => 'Enrollment', :foreign_key => 'root_account_id'
@@ -283,8 +284,12 @@ class Account < ActiveRecord::Base
     authentication_providers.active.where("auth_type<>'canvas'").exists?
   end
 
+  def canvas_authentication_provider
+    @canvas_ap ||= authentication_providers.active.where(auth_type: 'canvas').first
+  end
+
   def canvas_authentication?
-    authentication_providers.active.where(auth_type: 'canvas').exists? || !authentication_providers.active.exists?
+    !!canvas_authentication_provider
   end
 
   def enable_canvas_authentication
@@ -311,6 +316,11 @@ class Account < ActiveRecord::Base
     return false unless self_registration?
     return false if self_registration_type && self_registration_type != 'all' && type != self_registration_type
     true
+  end
+
+  def enable_self_registration
+    settings[:self_registration] = true
+    save!
   end
 
   def terms_required?

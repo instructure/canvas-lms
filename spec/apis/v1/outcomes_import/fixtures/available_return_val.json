@@ -18,6 +18,24 @@
     "chld": "1"
   },
   {
+    "title": "NETS for Administrators",
+    "guid": "923ce7ba",
+    "type": "document",
+    "chld": "1"
+  },
+  {
+    "title": "NETS for Teachers",
+    "guid": "923ce7bb",
+    "type": "document",
+    "chld": "1"
+  },
+  {
+    "title": "NETS for Students",
+    "guid": "923ce7bc",
+    "type": "document",
+    "chld": "1"
+  },
+  {
     "title": "Alabama",
     "guid": "46bb3879",
     "type": "authority",

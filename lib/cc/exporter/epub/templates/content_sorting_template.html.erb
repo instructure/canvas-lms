@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title><%= title %></title>
+  <!-- embedded styling will be inserted here -->
+</head>
+  <body>
+    <h1 id="<%="#{title}_TOC"%>"><%="#{title} List"%></h1>
+    <ol>
+    <% content.each do |item| %>
+      <li><a href="#<%= "#{item[:identifier]}" %>"><%= item[:title] %></a></li>
+    <% end %>
+    </ol>
+    <div style="page-break-before:always;"></div>
+    <% content.each do |item| %>
+      <%=build(item)%>
+      <div style="page-break-before:always;"></div>
+    <% end %>
+  </body>
+</html>

@@ -31,7 +31,7 @@ describe DeveloperKeysController, type: :request do
       json = api_call(:get, "/api/v1/developer_keys.json",
                       {:controller => 'developer_keys', :action => 'index', :format => 'json'})
 
-      confirm_valid_key(json[0], DeveloperKey.default)
+      confirm_valid_key_in_json(json, DeveloperKey.default)
     end
 
     it 'should return the list of developer keys' do
@@ -40,7 +40,7 @@ describe DeveloperKeysController, type: :request do
       json = api_call(:get, "/api/v1/developer_keys.json",
                       {:controller => 'developer_keys', :action => 'index', :format => 'json'})
 
-      confirm_valid_key(json[1], key)
+      confirm_valid_key_in_json(json, key)
     end
   end
 
@@ -98,7 +98,7 @@ describe DeveloperKeysController, type: :request do
                      }, post_hash)
 
     expect(DeveloperKey.count).to eq 2
-    confirm_valid_key(json, DeveloperKey.last)
+    confirm_valid_key_in_json([json], DeveloperKey.last)
   end
 
   def update_call
@@ -110,7 +110,7 @@ describe DeveloperKeysController, type: :request do
                      :id => key.id.to_s}, post_hash)
 
     key.reload
-    confirm_valid_key(json, key)
+    confirm_valid_key_in_json([json], key)
   end
 
   def destroy_call
@@ -128,10 +128,21 @@ describe DeveloperKeysController, type: :request do
     expect(response.code).to eq "401"
   end
 
-  def confirm_valid_key(hash, key)
-    expect(hash['id']).to eq key.global_id
-    expect(hash['tool_id']).to eq key.tool_id
-    expect(hash['icon_url']).to eq key.icon_url
-    expect(hash['name']).to eq key.name
+  def confirm_valid_key_in_json(json, key)
+    json.map! do |hash|
+      hash.keep_if {|k, v| ['id', 'tool_id', 'icon_url', 'name'].include?(k)}
+    end
+
+    expect(json.include?(key_to_hash(key))).to be true
+
+  end
+
+  def key_to_hash(key)
+    {
+      'id' => key.global_id,
+      'tool_id' => key.tool_id,
+      'icon_url' => key.icon_url,
+      'name' => key.name
+    }
   end
 end

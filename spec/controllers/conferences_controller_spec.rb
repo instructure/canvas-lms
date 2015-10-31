@@ -102,6 +102,38 @@ describe ConferencesController do
       post 'create', :course_id => @course.id, :web_conference => {:title => "My Conference", :conference_type => 'Wimba'}, :format => 'json'
       expect(response).to be_success
     end
+
+    context 'with concluded students in context' do
+      context "with a course context" do
+        it 'should not invite students with a concluded enrollment' do
+          user_session(@teacher)
+          enrollment = student_in_course(active_all: true, user: user_with_pseudonym(active_all: true))
+          enrollment.conclude
+          post 'create', :course_id => @course.id, :web_conference => {:title => "My Conference", :conference_type => 'Wimba'}, :format => 'json'
+          conference = WebConference.last
+          expect(conference.invitees).not_to include(enrollment.user)
+        end
+      end
+
+      context 'with a group context' do
+        it 'should not invite students with a concluded enrollment' do
+          user_session(@teacher)
+          concluded_enrollment = student_in_course(active_all: true, user: user_with_pseudonym(active_all: true))
+          concluded_enrollment.conclude
+
+          enrollment = student_in_course(active_all: true, user: user_with_pseudonym(active_all: true))
+          group_category = @course.group_categories.create(:name => "category 1")
+          group = @course.groups.create(:name => "some group", :group_category => group_category)
+          group.add_user enrollment.user, 'accepted'
+          group.add_user concluded_enrollment.user 'accepted'
+
+          post 'create', :group_id => group.id, :web_conference => {:title => "My Conference", :conference_type => 'Wimba'}, :format => 'json'
+          conference = WebConference.last
+          expect(conference.invitees).not_to include(concluded_enrollment.user)
+          expect(conference.invitees).to include(enrollment.user)
+        end
+      end
+    end
   end
 
   describe "POST 'update'" do
@@ -191,9 +223,7 @@ describe ConferencesController do
           expect(page_view.url).to match %r{^http://test\.host/courses/\d+/conferences/\d+/join}
           expect(page_view.participated).to be_truthy
         end
-
       end
     end
-
   end
 end

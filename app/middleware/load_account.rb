@@ -15,7 +15,7 @@ class LoadAccount
   def self.default_domain_root_account; Account.default; end
 
   def clear_caches
-    Account.clear_special_account_cache!(::LoadAccount.force_special_account_reload)
+    ::Account.clear_special_account_cache!(::LoadAccount.force_special_account_reload)
     ::LoadAccount.clear_shard_cache
   end
 

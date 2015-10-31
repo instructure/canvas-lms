@@ -68,6 +68,18 @@ describe "calendar2" do
         keep_trying_until(5) {expect(fj('.event-details-header:visible')).to be_displayed}
         expect(f('.view_event_link')).to include_text(event_title)
       end
+
+      it "should be able to create an event for a group" do
+        group(:context => @course)
+
+        get "/groups/#{@group.id}"
+        expect_new_page_load { f('.event-list-view-calendar').click }
+        event_name = 'some name'
+        create_calendar_event(event_name, true, false, false)
+
+        event = @group.calendar_events.last
+        expect(event.title).to eq event_name
+      end
     end
   end
 end

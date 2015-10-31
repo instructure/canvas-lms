@@ -64,12 +64,20 @@ define([
      *   complete with title, cmd, image, and classes
      */
     buttonConfig: function(button){
-      return {
+      var config = {
         title: button.name,
         cmd: 'instructureExternalButton' + button.id,
-        image: button.icon_url,
         classes: 'widget btn instructure_external_tool_button'
       };
+
+      if (button.canvas_icon_class) {
+        config.icon = 'hack-to-avoid-mce-prefix ' + button.canvas_icon_class;
+      } else {
+        // default to image
+        config.image = button.icon_url;
+      }
+
+      return config;
     },
 
     /**
@@ -93,8 +101,16 @@ define([
      */
     clumpedButtonMapping: function(clumpedButtons, onClickHandler){
       return clumpedButtons.reduce(function(items, button){
-        var key = "<img src='" + htmlEscape(button.icon_url) +
-          "'/>&nbsp;" + htmlEscape(button.name);
+        var key;
+
+        // added  data-tool-id='"+ button.id +"' to make elements unique when the have the same name
+        if (button.canvas_icon_class) {
+          key = "<i class='"+ htmlEscape(button.canvas_icon_class) +"' data-tool-id='"+ button.id +"'></i>";
+        } else {
+          // icon_url is implied
+          key = "<img src='"+ htmlEscape(button.icon_url) +"' data-tool-id='"+ button.id +"'/>";
+        }
+        key += "&nbsp;" + htmlEscape(button.name);
         items[key] = function() { onClickHandler(button); };
         return items;
       }, {});

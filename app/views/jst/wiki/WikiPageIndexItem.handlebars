@@ -20,14 +20,7 @@
         {{#unless front_page}}
           <li><a href="#" class="icon-document use-as-front-page-menu-item{{#unless published}} disabled{{/unless}}" title="{{#t 'menu.use_front_page'}}Use as Front Page{{/t}}" {{#unless published}}aria-disabled="true"{{/unless}}>{{#t 'menu.use_front_page'}}Use as Front Page{{/t}}</a></li>
         {{/unless}}
-        {{#each wiki_page_menu_tools}}
-        <li>
-          <a class="menu_tool_link" href="{{url}}">
-            {{#if icon_url}}<img class="icon" alt="" src="{{icon_url}}" />{{/if}}
-            {{title}}
-          </a>
-        </li>
-        {{/each}}
+        {{>ExternalTools/external_tools_menu wiki_page_menu_tools}}
       </ul>
     </div>
   </td>

@@ -1,0 +1,47 @@
+define [
+  'react'
+  'jsx/assignments/ModerationApp'
+  'jsx/assignments/actions/ModerationActions'
+], (React, ModerationApp, Actions) ->
+
+  TestUtils = React.addons.TestUtils
+
+
+  module 'ModerationApp',
+    setup: ->
+      @store =
+        subscribe: sinon.spy()
+        dispatch: sinon.spy()
+        getState: -> {
+          studentList: {
+            students: []
+            sort: 'asc'
+          },
+          flashMessage: {},
+          assignment: {
+            published: false
+          }
+        }
+
+      @moderationApp = TestUtils.renderIntoDocument(ModerationApp(store: @store))
+
+
+    teardown: ->
+      @store = null
+      React.unmountComponentAtNode(@moderationApp.getDOMNode().parentNode)
+
+  test 'it subscribes to the store when mounted', ->
+    # TODO: Once the rest of the components get dumbed down, this could be
+    #       changed to be .calledOnce
+    ok @store.subscribe.called, 'subscribe was called'
+
+  test 'it dispatches a single call to apiGetStudents when mounted', ->
+    ok @store.dispatch.calledOnce, 'dispatch was called once'
+
+  test 'it updates state when a change event happens', ->
+    @store.getState = -> {
+      newState: true
+    }
+    @moderationApp.handleChange()
+
+    ok @moderationApp.state.newState, 'state was updated'

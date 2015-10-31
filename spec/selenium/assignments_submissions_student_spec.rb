@@ -119,6 +119,28 @@ describe "submissions" do
       driver.switch_to.default_content
     end
 
+
+    it "should not allow a user to submit a file-submission assignment with an empty file", priority: "1" do
+      @assignment.submission_types = 'online_upload'
+      @assignment.save!
+      filename, fullpath, data = get_file("empty_file.txt")
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+
+      f('.submit_assignment_link').click
+      wait_for_ajaximations
+      f('.submission_attachment input').send_keys(fullpath)
+      f('#submit_file_button').click
+      wait_for_ajaximations
+      expect(flash_message_present?(:error)).to be_truthy
+
+      # navigate off the page and dismiss the alert box to avoid problems
+      # with other selenium tests
+      f('#section-tabs .home').click
+      driver.switch_to.alert.accept
+      driver.switch_to.default_content
+    end
+
     it "should not allow a user to submit a file-submission assignment with an illegal file extension", priority: "1", test_id: 237024 do
       @assignment.submission_types = 'online_upload'
       @assignment.allowed_extensions = ['bash']
@@ -154,7 +176,7 @@ describe "submissions" do
       expect(f('.submit_assignment_link').text).to eq "Submit Assignment"
     end
 
-    it "should not show as turned in or not turned in when assignment doesnt expect a submission", priority: "1", test_id: 237025 do
+    it "should not show as turned in or not turned in when assignment doesn't expect a submission", priority: "1", test_id: 237025 do
       # given
       @assignment.update_attributes(:submission_types => "on_paper")
       @assignment.grade_student(@student, :grade => "0")

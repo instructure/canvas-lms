@@ -48,6 +48,11 @@ define(['underscore', 'Backbone'], function(_, Backbone) {
         return state;
       },
 
+      clearState() {
+        state = {};
+        this.emitChange()
+      },
+
       addChangeListener  (listener) {
         events.on('change', listener);
       },

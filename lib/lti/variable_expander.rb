@@ -306,15 +306,15 @@ module Lti
 
     register_expansion 'Canvas.assignment.unlockAt.iso8601', [],
                        -> { @assignment.unlock_at.utc.iso8601 },
-                       ASSIGNMENT_GUARD
+                       -> {@assignment && @assignment.unlock_at.present?}
 
     register_expansion 'Canvas.assignment.lockAt.iso8601', [],
                        -> { @assignment.lock_at.utc.iso8601 },
-                       ASSIGNMENT_GUARD
+                       -> {@assignment && @assignment.lock_at.present?}
 
     register_expansion 'Canvas.assignment.dueAt.iso8601', [],
                        -> { @assignment.due_at.utc.iso8601 },
-                       ASSIGNMENT_GUARD
+                       -> {@assignment && @assignment.due_at.present?}
 
     register_expansion 'LtiLink.custom.url', [],
                        -> { @controller.show_lti_tool_settings_url(@tool_setting_link_id) },

@@ -193,7 +193,7 @@ class FoldersController < ApplicationController
   #
   # @returns [Folder]
   def resolve_path
-    if authorized_action(@context, @current_user, :read)
+    if authorized_action(@context, @current_user, [:read, :manage_files])
       can_view_hidden_files = can_view_hidden_files?(@context, @current_user, session)
       folders = Folder.resolve_path(@context, params[:full_path], can_view_hidden_files)
       raise ActiveRecord::RecordNotFound if folders.blank?

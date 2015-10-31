@@ -15,9 +15,30 @@ class CliTools
   end
 
   def self.remove_from_whitelist(ip)
+    if self.is_ip_address(ip)
+      self.remove_ip_from_whitelist(ip)
+    else
+      self.remove_note_from_whitelist(ip)
+    end
+  end
+
+  def self.remove_ip_from_whitelist(ip)
     HTTParty.get(
       "#{api_url}maintainAccess?api_key=#{api_key}&op=remove&addr=#{ip}"
     )
+  end
+
+  def self.remove_note_from_whitelist(note)
+    ips = self.whitelisted_ips
+
+    if ips["ab_rsp"] && ips["ab_rsp"]["access"]
+      ips["ab_rsp"]["access"].each do |entry|
+        return remove_ip_from_whitelist(entry["addr"]) if entry["note"] == note
+      end
+      puts "There were no whitelisted IP addresses with a note matching '#{note}'"
+    else
+      puts "Error retrieving list of whitelisted IP addresses: #{ips.to_json}"
+    end
   end
 
   def self.whitelisted?(ip)
@@ -101,6 +122,12 @@ class CliTools
   private
   def self.api_url
     AcademicBenchmark.config["api_url"]
+  end
+
+  private
+  def self.is_ip_address(ip)
+    # this simple and brief regex matches IP addresses strictly
+    ip =~ %r{\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b}
   end
 
 end # class CliTools

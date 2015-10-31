@@ -143,7 +143,8 @@ def appium_init_ios
     udid: device[:udid],
     app: device[:app],
     autoAcceptAlerts: true,
-    sendKeysStrategy: 'setValue'
+    # sendKeysStrategy: 'setValue',
+    waitForAppScript: '$.delay(7500); $.acceptAlert();' # auto-accepts device alerts when app launches, and prompts
   }
 end
 
@@ -164,6 +165,20 @@ end
 # ======================================================================================================================
 # Scrolling
 # ======================================================================================================================
+
+def scroll_within_y_coordinates(direction, top, bottom)
+  x = window_size.width / 2
+  if direction == 'up'
+    start_y = top * 1.2
+    end_y = bottom * 0.9
+  else
+    start_y = bottom * 0.9
+    end_y = top * 1.2
+  end
+
+  action = Appium::TouchAction.new.press(x: x, y: start_y).wait(2000).move_to(x: x, y: end_y).release
+  action.perform
+end
 
 def scroll_to_element(opts)
   count = 0
@@ -199,10 +214,20 @@ def scroll_vertically_in_view(scroll_view, time, direction)
     start_y = scroll_view.location.y + (0.9 * scroll_view.size.height)
     end_y = scroll_view.location.y + (0.1 * scroll_view.size.height)
   end
+
   action = Appium::TouchAction.new.press(x: x, y: start_y).wait(time).move_to(x: x, y: end_y).release
   action.perform
 end
 
 def refresh_view(view)
   scroll_vertically_in_view(view, 2, 'up')
+end
+
+# ======================================================================================================================
+# Regex
+# ======================================================================================================================
+
+# returns regex which matches 12 and 24 hours time formats
+def time_format
+  /(([1]{1}[0-2]{1}|[0-9]{1}):[0-5]{1}[0-9]{1}\s(AM|PM))|(([1-2]{1}[0-9]{1}|[0]?[0-9]{1}):[0-5]{1}[0-9]{1})/
 end

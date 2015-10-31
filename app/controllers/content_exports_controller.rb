@@ -27,16 +27,13 @@ class ContentExportsController < ApplicationController
   end
 
   def index
-    @exports = @context.content_exports_visible_to(@current_user).active.not_for_copy.order('created_at DESC')
-
-    @current_export_id = nil
-    if export = @context.content_exports_visible_to(@current_user).running.first
-      @current_export_id = export.id
-    end
+    scope = @context.content_exports_visible_to(@current_user).without_epub
+    @exports = scope.active.not_for_copy.order('content_exports.created_at DESC')
+    @current_export_id = scope.running.first.try(:id)
   end
 
   def show
-    if params[:id].present? && export = @context.content_exports_visible_to(@current_user).where(id: params[:id]).first
+    if params[:id].present? && (export = @context.content_exports_visible_to(@current_user).where(id: params[:id]).first)
       render_export(export)
     else
       render :json => {:errors => {:base => t('errors.not_found', "Export does not exist")}}, :status => :not_found

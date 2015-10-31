@@ -33,6 +33,7 @@ module CC::Importer::Canvas
         mod[:end_at] = get_time_val(r_node, 'end_at')
         mod[:unlock_at] = get_time_val(r_node, 'unlock_at')
         mod[:require_sequential_progress] = get_bool_val(r_node, 'require_sequential_progress')
+        mod[:requirement_count] = get_int_val(r_node, 'requirement_count')
 
         mod[:items] = []
         r_node.css('item').each do |item_node|

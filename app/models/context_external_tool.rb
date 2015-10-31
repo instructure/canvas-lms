@@ -80,7 +80,7 @@ class ContextExternalTool < ActiveRecord::Base
     hash[:enabled] = Canvas::Plugin.value_to_boolean(hash[:enabled]) if hash[:enabled]
     settings[type] = {}.with_indifferent_access
 
-    extension_keys = [:custom_fields, :default, :display_type, :enabled, :icon_url,
+    extension_keys = [:custom_fields, :default, :display_type, :enabled, :icon_url, :canvas_icon_class,
                       :selection_height, :selection_width, :text, :url, :message_type]
     if custom_keys = CUSTOM_EXTENSION_KEYS[type]
       extension_keys += custom_keys
@@ -275,6 +275,13 @@ class ContextExternalTool < ActiveRecord::Base
   def icon_url
     settings[:icon_url]
   end
+  def canvas_icon_class=(i_url)
+    settings[:canvas_icon_class] = i_url
+  end
+
+  def canvas_icon_class
+    settings[:canvas_icon_class]
+  end
 
   def text=(val)
     settings[:text] = val
@@ -349,7 +356,7 @@ class ContextExternalTool < ActiveRecord::Base
       end
     end
 
-    settings.delete(:editor_button) if !editor_button(:icon_url)
+    settings.delete(:editor_button) unless editor_button(:icon_url) || editor_button(:canvas_icon_class)
 
     sync_placements!(EXTENSION_TYPES.select{|type| !!settings[type]}.map(&:to_s))
     true
@@ -624,28 +631,11 @@ class ContextExternalTool < ActiveRecord::Base
   def self.opaque_identifier_for(asset, shard)
     shard.activate do
       lti_context_id = context_id_for(asset, shard)
-      set_asset_context_id(asset, lti_context_id)
+      Lti::Asset.set_asset_context_id(asset, lti_context_id)
     end
   end
 
   private
-
-  def self.set_asset_context_id(asset, context_id)
-    lti_context_id = context_id
-    if asset.respond_to?('lti_context_id')
-      if asset.new_record?
-        asset.lti_context_id = context_id
-      else
-        asset.reload unless asset.lti_context_id?
-        unless asset.lti_context_id
-          asset.lti_context_id = context_id
-          asset.save!
-        end
-        lti_context_id = asset.lti_context_id
-      end
-    end
-    lti_context_id
-  end
 
   def self.context_id_for(asset, shard)
     str = asset.asset_string.to_s

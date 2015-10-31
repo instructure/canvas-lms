@@ -50,8 +50,13 @@ class RubricAssessmentsController < ApplicationController
     if @assessment && !authorized_action(@assessment, @current_user, :update)
       return
     elsif @assessment || authorized_action(@association, @current_user, :assess)
-      @asset, @user = @association_object.find_asset_for_assessment(@association, @assessment ? @assessment.user_id : user_id,
-        :provisional_grader => value_to_boolean(params[:provisional]) && @current_user)
+      opts = {}
+      if value_to_boolean(params[:provisional])
+        opts[:provisional_grader] = @current_user
+        opts[:final] = true if value_to_boolean(params[:final]) && @context.grants_right?(@current_user, :moderate_grades)
+      end
+
+      @asset, @user = @association_object.find_asset_for_assessment(@association, @assessment ? @assessment.user_id : user_id, opts)
       @assessment = @association.assess(:assessor => @current_user, :user => @user, :artifact => @asset, :assessment => params[:rubric_assessment])
       @asset.reload
       artifact_includes =
@@ -65,7 +70,7 @@ class RubricAssessmentsController < ApplicationController
         end
       json = @assessment.as_json(:methods => [:ratings, :assessor_name, :related_group_submissions_and_assessments],
         :include => artifact_includes, :include_root => false)
-      
+
       if @asset.is_a?(ModeratedGrading::ProvisionalGrade)
         json[:artifact] = @asset.submission.
           as_json(Submission.json_serialization_full_parameters(:include_root => false)).

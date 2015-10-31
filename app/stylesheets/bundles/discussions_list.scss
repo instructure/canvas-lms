@@ -23,9 +23,8 @@ $announcements_disscussion-summary-color: $ic-color-dark;
       background-color: $ic-color-light;
       display: flex;
       align-items: center;
-      body.ff & {
-        .ellipsis { @include firefox-white-space-bug-fix; }  
-      } 
+      // Handle Firefox white space bug that affects .ellipsis class
+      @include firefox-white-space-bug-fix;
     }
     @else {
       background-color: white;
@@ -39,7 +38,7 @@ $announcements_disscussion-summary-color: $ic-color-dark;
         @if $use_new_styles { 
           background-color: $lightBackground;
           body.ff & {
-            .ellipsis::after { background: linear-gradient(to right, rgba(255,255,255,0) 0%,$lightBackground 75%); }  
+            .ellipsis::after { @include firefox-white-space-bug-fix-gradient($lightBackground); }  
           }
         }
         @else { background-color: $tableBackgroundAccent; }

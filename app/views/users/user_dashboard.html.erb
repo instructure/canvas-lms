@@ -18,7 +18,7 @@
   <% end %>
 <% end -%>
 
-<div id="dashboard">
+<div id="dashboard" class="ic-Dashboard-container">
   <%= render :partial => 'shared/dashboard_invitation', :collection => @pending_invitations %>
   <%= render :partial => 'shared/dashboard_messages' %>
 
@@ -33,14 +33,10 @@
       </div>
       </div>
     </div>
-
-    <% if @current_user.preferences[:recent_activity_dashboard].present? %>
-      <div class="ic-Dashboard-Activity">
-        <%= render :partial => 'shared/recent_activity' %>
-      </div>
-    <% else %>
-      <%= render :partial => 'shared/dashboard_card' %>
-    <% end %>
+    <div id="dashboard-activity" class="ic-Dashboard-Activity" style="display: <%= show_recent_activity? ? 'block' : 'none' %>">
+      <%= render :partial => 'shared/recent_activity' %>
+    </div>
+    <%= render :partial => 'shared/dashboard_card' %>
   <% else %>
     <%= render :partial => 'shared/recent_activity' %>
   <% end %>

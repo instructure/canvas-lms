@@ -4045,10 +4045,27 @@ describe Course do
       dm_count = DelayedMessage.count
       expect(DelayedMessage.where(:communication_channel_id => user1.communication_channels.first).count).to eq 0
       Notification.create!(:name => 'Enrollment Invitation')
-      @course.re_send_invitations!
+      @course.re_send_invitations!(@teacher)
 
       expect(DelayedMessage.count).to eq dm_count + 1
       expect(DelayedMessage.where(:communication_channel_id => user1.communication_channels.first).count).to eq 1
+    end
+
+    it "should respect section restrictions" do
+      course(:active_all => true)
+      section2 = @course.course_sections.create! :name => 'section2'
+      user1 = user_with_pseudonym(:active_all => true)
+      user2 = user_with_pseudonym(:active_all => true)
+      ta = user_with_pseudonym(:active_all => true)
+      @course.enroll_student(user1)
+      @course.enroll_student(user2, :section => section2)
+      @course.enroll_ta(ta, :active_all => true, :section => section2, :limit_privileges_to_course_section => true)
+
+      Notification.create!(:name => 'Enrollment Invitation')
+      @course.re_send_invitations!(ta)
+
+      expect(DelayedMessage.where(:communication_channel_id => user1.communication_channel).count).to eq 0
+      expect(DelayedMessage.where(:communication_channel_id => user2.communication_channel).count).to eq 1
     end
   end
 

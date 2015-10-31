@@ -60,6 +60,12 @@ module Canvas::Oauth
       Token.new(key, code)
     end
 
+    def token_for_refresh_token(refresh_token)
+      access_token = AccessToken.authenticate_refresh_token(refresh_token)
+      return nil unless access_token
+      Token.new(key, nil, access_token)
+    end
+
     def app_name
       key.name.presence || key.user_name.presence || key.email.presence || default_app_name
     end

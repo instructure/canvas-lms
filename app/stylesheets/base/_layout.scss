@@ -145,12 +145,15 @@ body {
 // **********************************************************************************
 // all of the following are classes that should be applied to 'body' when appropriate
 
-@if $use_new_styles == false {
-  .padless-content #content,
-  #content.padless { padding: 0; }
+@if $use_new_styles {
+  body.ic-framed-lti-tool #content { padding: 0 $ic-sp*2; }
+  body.ic-full-screen-lti-tool #content { padding: 0; }
 }
 
-#content.horizontal-padding { padding: 0 $ic-sp*2; }
+@else {
+  .padless-content #content,
+  #content.padless { padding: 0; } 
+}
 
 .with-left-side {
   #left-side { display: block; }

@@ -62,9 +62,13 @@ define [
       super
       @itemViewOptions = course: @course
       @collection.on 'render', @render
-      @collection.on 'add', @render
+      @collection.on 'add', @renderIfLoaded
       @collection.on 'remove', @render
       @collection.on 'change:groupWeights', @render
+
+    renderIfLoaded: =>
+      if @collection.loadedAll
+        @render()
 
     renderOnReset: =>
       @firstResetLanded = true

@@ -416,7 +416,7 @@
           <i class="icon-add"><span class="screenreader-only"><%= new_question_group_title %></span></i>
           <%= new_question_group_title %>
         </a>
-        <% if feature_enabled?(:question_banks) %>
+        <% if feature_enabled?(:question_banks) && @context.grants_right?(@current_user, :read_question_banks) %>
           <% find_questions_title = t('links.find_questions', "Find Questions") %>
           <a href="#" class="find_question_link btn">
             <i class="icon-search"><span class="screenreader-only"><%= find_questions_title %></span></i>

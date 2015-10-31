@@ -63,6 +63,7 @@ define [
       $.flashError(GRADEBOOK_TRANSLATIONS.submission_update_error)
 
     isValueChanged: () ->
+      return true if @submission_type? && @submission_type == "online_quiz"
       @val != @$input.val()
 
     validate: () ->
@@ -145,6 +146,7 @@ define [
   class SubmissionCell.out_of extends SubmissionCell
     init: () ->
       submission = @opts.item[@opts.column.field]
+      @submission_type = submission.submission_type
       @$wrapper = $(@cellWrapper("""
         <div class="overflow-wrapper">
           <div class="grade-and-outof-wrapper">

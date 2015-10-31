@@ -17,6 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper.rb')
 
 describe UserObserveesController, type: :request do
   let_once(:parent)             { user_with_pseudonym(name: 'Parent Smith', active_all: true) }
@@ -408,4 +409,36 @@ describe UserObserveesController, type: :request do
       expect(parent.reload.observed_users).to eq [student]
     end
   end
+
+    context "Add observer by token" do
+      shared_examples "handle_observees_by_auth_token" do
+        it 'should add an observee, given a valid access token' do
+          expect(create_call({access_token: access_token_for_user(@token_student)})).to eq @token_student.id
+          expect(parent.reload.observed_users).to eq [@token_student]
+        end
+
+        it 'should not add an observee, given an invalid access token' do
+          create_call({access_token: "Not A Valid Token"}, expected_status: 422)
+          expect(parent.reload.observed_users).to eq []
+        end
+      end
+
+      context "with sharding" do
+        specs_require_sharding
+        before :each do
+          @shard2.activate do
+            @token_student = user_with_pseudonym(name: "Sharded Student", active_all: true)
+          end
+        end
+        include_examples "handle_observees_by_auth_token"
+      end
+
+      context "without sharding" do
+        before :once do
+          @token_student = user_with_pseudonym(name: "Sameshard Student", active_all: true)
+        end
+        include_examples "handle_observees_by_auth_token"
+      end
+    end
+
 end

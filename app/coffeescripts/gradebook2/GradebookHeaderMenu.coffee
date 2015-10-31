@@ -109,7 +109,7 @@ define [
           students = $.grep students, ($student, idx) ->
             student = $student.user_data
             if selected == I18n.t("students_who.havent_submitted_yet", "Haven't submitted yet")
-              !student.submitted_at and !student.score?
+              !student.submitted_at
             else if selected == I18n.t("students_who.havent_been_graded", "Haven't been graded")
               !student.score?
             else if selected == I18n.t("students_who.scored_less_than", "Scored less than")

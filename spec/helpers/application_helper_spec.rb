@@ -687,22 +687,22 @@ describe ApplicationHelper do
       @course = course_model
       @group = @course.groups.create!(:name => "some group")
       tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "test", :shared_secret => "secret", :url => "http://example.com")
-      tool.editor_button = {:url => "http://example.com", :icon_url => "http://example.com"}
+      tool.editor_button = {:url => "http://example.com", :icon_url => "http://example.com", :canvas_icon_class => 'icon-commons'}
       tool.save!
       @context = @group
 
-      expect(editor_buttons).to eq([{:name=>"bob", :id=>tool.id, :url=>"http://example.com", :icon_url=>"http://example.com", :width=>800, :height=>400}])
+      expect(editor_buttons).to eq([{:name=>"bob", :id=>tool.id, :url=>"http://example.com", :icon_url=>"http://example.com", :canvas_icon_class => 'icon-commons', :width=>800, :height=>400}])
     end
 
     it "should return hash of tools if in course" do
       @course = course_model
       tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "test", :shared_secret => "secret", :url => "http://example.com")
-      tool.editor_button = {:url => "http://example.com", :icon_url => "http://example.com"}
+      tool.editor_button = {:url => "http://example.com", :icon_url => "http://example.com", :canvas_icon_class => 'icon-commons'}
       tool.save!
       controller.stubs(:group_external_tool_path).returns('http://dummy')
       @context = @course
 
-      expect(editor_buttons).to eq([{:name=>"bob", :id=>tool.id, :url=>"http://example.com", :icon_url=>"http://example.com", :width=>800, :height=>400}])
+      expect(editor_buttons).to eq([{:name=>"bob", :id=>tool.id, :url=>"http://example.com", :icon_url=>"http://example.com", :canvas_icon_class => 'icon-commons', :width=>800, :height=>400}])
     end
 
     it "should not include tools from the domain_root_account for users" do
@@ -724,27 +724,46 @@ describe ApplicationHelper do
 
   describe "UI path checking" do
     describe "#active_path?" do
-      let(:request){ stub('request', :fullpath => '/courses/2')}
+      context "when the request path is the course show page" do
+        let(:request){ stub('request', :fullpath => '/courses/2')}
 
-      it "recognizes the active path" do
-        expect(active_path?('courses')).to be_truthy
+        it "returns true for paths that match" do
+          expect(active_path?('/courses')).to be_truthy
+        end
+
+        it "returns false for paths that don't match" do
+          expect(active_path?('/grades')).to be_falsey
+        end
+
+        it "returns false for paths that don't start the same" do
+          expect(active_path?('/accounts/courses')).to be_falsey
+        end
       end
 
-      it "rejects paths that don't match" do
-        expect(active_path?('grades')).to be_falsey
+      context "when the request path is the account external tools path" do
+        let(:request){ stub('request', :fullpath => '/accounts/2/external_tools/27')}
+
+        before :each do
+          @context = Account.default
+          controller.stubs(:controller_name).returns('external_tools')
+        end
+
+        it "it doesn't return true for '/accounts'" do
+          expect(active_path?('/accounts')).to be_falsey
+        end
       end
-    end
 
-    describe "#account_external_tool_path?" do
-      account_ext_tool_path = "/accounts/2/external_tools/27"
-      course_ext_tool_path = "/courses/2/external_tools/27"
+      context "when the request path is the course external tools path" do
+        let(:request){ stub('request', :fullpath => '/courses/2/external_tools/27')}
 
-      it "recognizes the account external tool path" do
-        expect(account_external_tool_path?(account_ext_tool_path)).to be_truthy
-      end
+        before :each do
+          @context = Account.default.courses.create!
+          controller.stubs(:controller_name).returns('external_tools')
+        end
 
-      it "rejects paths that don't match" do
-        expect(account_external_tool_path?(course_ext_tool_path)).to be_falsey
+        it "returns true for '/courses'" do
+          expect(active_path?('/courses')).to be_truthy
+        end
       end
     end
   end

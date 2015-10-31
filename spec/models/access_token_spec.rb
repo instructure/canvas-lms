@@ -23,6 +23,7 @@ describe AccessToken do
     before :once do
       @at = AccessToken.create!(:user => user_model, :developer_key => DeveloperKey.default)
       @token_string = @at.full_token
+      @refresh_token_string = @at.plaintext_refresh_token
     end
 
     it "should only store the encrypted token" do
@@ -38,6 +39,15 @@ describe AccessToken do
     it "should not authenticate expired tokens" do
       @at.update_attribute(:expires_at, 2.hours.ago)
       expect(AccessToken.authenticate(@token_string)).to be_nil
+    end
+
+    it "should authenticate via crypted_token" do
+      expect(AccessToken.authenticate_refresh_token(@refresh_token_string)).to eq @at
+    end
+
+    it "should authenticate expired tokens by the refresh token" do
+      @at.update_attribute(:expires_at, 2.hours.ago)
+      expect(AccessToken.authenticate_refresh_token(@refresh_token_string)).to eq @at
     end
   end
 

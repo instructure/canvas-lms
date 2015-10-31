@@ -162,7 +162,7 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly, RCEKeyboardSho
             setting_from_cache = userSettings.contextGet('new_assignment_settings')[setting]
             if setting_from_cache == "1" || setting_from_cache == "0"
               setting_from_cache = parseInt setting_from_cache
-            if setting_from_cache && (!@assignment.get(setting) || @assignment.get(setting)?.length == 0)
+            if setting_from_cache && (!@assignment.get(setting)? || @assignment.get(setting)?.length == 0)
               @assignment.set(setting, setting_from_cache)
           )
         else
@@ -389,7 +389,7 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly, RCEKeyboardSho
       errors
 
     _validateAllowedExtensions: (data, errors) =>
-      if data.allowed_extensions and data.allowed_extensions.length == 0
+      if (data.allowed_extensions and _.contains(data.submission_types, "online_upload")) and data.allowed_extensions.length == 0
         errors["allowed_extensions"] = [
           message: I18n.t 'at_least_one_file_type', 'Please specify at least one allowed file type'
         ]

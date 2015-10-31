@@ -95,17 +95,31 @@ module SeleniumDriverSetup
   end
 
   def ruby_firefox_driver(options)
-    driver = nil
-    begin
-      tries ||= 3
-      puts "Thread: provisioning selenium ruby firefox driver"
-      driver = Selenium::WebDriver.for(:firefox, options)
-    rescue StandardError => e
-      puts "Thread #{THIS_ENV}\n try ##{tries}\nError attempting to start remote webdriver: #{e}"
+    try ||= 1
+    puts "Thread: provisioning selenium ruby firefox driver (#{options.inspect})"
+    # dup is necessary for retries because selenium deletes out of the options
+    # TODO: we could try a random port here instead of relying on the default for retries
+    # (or killing firefox may be the best move)
+    driver = Selenium::WebDriver.for(:firefox, options.dup)
+  rescue StandardError => e
+    puts <<-ERROR
+    Thread #{THIS_ENV}
+     try ##{try}
+    Error attempting to start remote webdriver: #{e}
+    ERROR
+
+    # according to https://code.google.com/p/selenium/issues/detail?id=6760,
+    # this could maybe be fixed by killing stale firefoxes?
+    system("ps aux")
+
+    if try <= 3
+      try += 1
       sleep 2
-      retry unless (tries -= 1).zero?
+      retry
+    else
+      puts "GIVING UP"
+      raise
     end
-    driver
   end
 
   def stand_alone_server_firefox_driver(caps)

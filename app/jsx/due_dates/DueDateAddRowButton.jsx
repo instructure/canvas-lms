@@ -20,8 +20,9 @@ define([
                 className = "Button Button--add-row"
                 onClick   = {this.props.handleAdd}
                 type      = "button" >
-          <i className="icon-plus" aria-label={I18n.t("Add new set of due dates")} />
-          {I18n.t("Add")}
+          <i className="icon-plus" />
+          <span className="screenreader-only">{I18n.t("Add new set of due dates")}</span>
+          <span aria-hidden="true">{I18n.t("Add")}</span>
         </button>
       )
     }

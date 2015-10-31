@@ -34,7 +34,7 @@ class User < ActiveRecord::Base
   attr_accessor :previous_id, :menu_data, :gradebook_importer_submissions, :prior_enrollment
 
   EXPORTABLE_ATTRIBUTES = [
-    :id, :name, :sortable_name, :workflow_state, :time_zone, :uuid, :created_at, :updated_at, :visibility, :avatar_image_url, :avatar_image_source, :avatar_image_updated_at,
+    :id, :name, :sortable_name, :email, :workflow_state, :time_zone, :uuid, :created_at, :updated_at, :visibility, :avatar_image_url, :avatar_image_source, :avatar_image_updated_at,
     :phone, :school_name, :school_position, :short_name, :deleted_at, :show_user_services, :gender, :page_views_count, :reminder_time_for_due_dates,
     :reminder_time_for_grading, :storage_quota, :visible_inbox_types, :last_user_note, :subscribe_to_emails, :features_used, :preferences, :avatar_state, :locale, :browser_locale,
     :unread_conversations_count, :public, :birthdate, :otp_communication_channel_id, :initial_enrollment_type, :crocodoc_id, :last_logged_out, :lti_context_id
@@ -188,6 +188,7 @@ class User < ActiveRecord::Base
     end
   }
   scope :name_like, lambda { |name|
+    next none if name.strip.empty?
     scopes = []
     scopes << unscoped.where(wildcard('users.name', name))
     scopes << unscoped.where(wildcard('users.short_name', name))
@@ -652,18 +653,18 @@ class User < ActiveRecord::Base
   end
 
   def first_name
-    User.name_parts(self.sortable_name)[0] || ''
+    User.name_parts(self.sortable_name, likely_already_surname_first: true)[0] || ''
   end
 
   def last_name
-    User.name_parts(self.sortable_name)[1] || ''
+    User.name_parts(self.sortable_name, likely_already_surname_first: true)[1] || ''
   end
 
   # Feel free to add, but the "authoritative" list (http://en.wikipedia.org/wiki/Title_(name)) is quite large
   SUFFIXES = /^(Sn?r\.?|Senior|Jn?r\.?|Junior|II|III|IV|V|VI|Esq\.?|Esquire)$/i
 
   # see also user_sortable_name.js
-  def self.name_parts(name, prior_surname = nil)
+  def self.name_parts(name, prior_surname: nil, likely_already_surname_first: false)
     return [nil, nil, nil] unless name
     surname, given, suffix = name.strip.split(/\s*,\s*/, 3)
 
@@ -676,7 +677,7 @@ class User < ActiveRecord::Base
 
     if given
       # John Doe, Sr.
-      if !suffix && given =~ SUFFIXES
+      if !likely_already_surname_first && !suffix && surname =~ /\s/ && given =~ SUFFIXES
         suffix = given
         given = surname
         surname = nil
@@ -701,8 +702,9 @@ class User < ActiveRecord::Base
     [ given_parts.empty? ? nil : given_parts.join(' '), surname, suffix ]
   end
 
-  def self.last_name_first(name, name_was = nil)
-    given, surname, suffix = name_parts(name, name_parts(name_was)[1])
+  def self.last_name_first(name, name_was = nil, likely_already_surname_first:)
+    previous_surname = name_parts(name_was, likely_already_surname_first: likely_already_surname_first)[1]
+    given, surname, suffix = name_parts(name, prior_surname: previous_surname)
     given = [given, suffix].compact.join(' ')
     surname ? "#{surname}, #{given}".strip : given
   end
@@ -724,8 +726,12 @@ class User < ActiveRecord::Base
     self.short_name ||= self.name
     self.sortable_name = nil if self.sortable_name == ""
     # recalculate the sortable name if the name changed, but the sortable name didn't, and the sortable_name matches the old name
-    self.sortable_name = nil if !self.sortable_name_changed? && self.name_changed? && User.name_parts(self.sortable_name).compact.join(' ') == self.name_was
-    self.sortable_name = User.last_name_first(self.name, self.sortable_name_was) unless read_attribute(:sortable_name)
+    self.sortable_name = nil if !self.sortable_name_changed? &&
+        self.name_changed? &&
+        User.name_parts(self.sortable_name, likely_already_surname_first: true).compact.join(' ') == self.name_was
+    unless read_attribute(:sortable_name)
+      self.sortable_name = User.last_name_first(self.name, self.sortable_name_was, likely_already_surname_first: true)
+    end
     self.reminder_time_for_due_dates ||= 48.hours.to_i
     self.reminder_time_for_grading ||= 0
     self.initial_enrollment_type = nil unless ['student', 'teacher', 'ta', 'observer'].include?(initial_enrollment_type)
@@ -734,7 +740,8 @@ class User < ActiveRecord::Base
   end
 
   def sortable_name
-    self.sortable_name = read_attribute(:sortable_name) || User.last_name_first(self.name)
+    self.sortable_name = read_attribute(:sortable_name) ||
+        User.last_name_first(self.name, likely_already_surname_first: false)
   end
 
   def primary_pseudonym
@@ -1421,75 +1428,70 @@ class User < ActiveRecord::Base
     published_visible_assignments
   end
 
-  def assignments_needing_submitting(opts={})
+  def assignments_needing(purpose, participation_type, expires_in, opts={})
     shard.activate do
       course_ids = Shackles.activate(:slave) do
-        if opts[:contexts]
-          (Array(opts[:contexts]).map(&:id) &
-           participating_student_course_ids)
-        else
+        case participation_type
+        when :student
           participating_student_course_ids
+        when :instructor
+          participating_instructor_course_ids
         end
       end
-
+      if opts[:contexts]
+        course_ids = Array(opts[:contexts]).map(&:id) & course_ids
+      end
       opts = {limit: 15}.merge(opts.slice(:due_after, :limit))
 
-      Rails.cache.fetch([self, 'assignments_needing_submitting', course_ids, opts].cache_key, expires_in: 15.minutes) do
-        Shackles.activate(:slave) do
-          limit = opts[:limit]
-          due_after = opts[:due_after] || 4.weeks.ago
-
-          result = Shard.partition_by_shard(course_ids) do |shard_course_ids|
-            courses = Course.find(shard_course_ids)
-            courses_with_da = courses.select{|c| c.feature_enabled?(:differentiated_assignments)}
-            assignments = Assignment.for_course(shard_course_ids).
-              filter_by_visibilities_in_given_courses(self.id, courses_with_da.map(&:id)).
-              published.
-              due_between_with_overrides(due_after,1.week.from_now).
-              not_ignored_by(self, 'submitting').
-              expecting_submission.
-              need_submitting_info(id, limit).
-              not_locked
-            select_available_assignments(assignments)
+      Rails.cache.fetch([self, "assignments_needing_#{purpose}", course_ids, opts].cache_key, :expires_in => expires_in) do
+        result = Shackles.activate(:slave) do
+          Shard.partition_by_shard(course_ids) do |shard_course_ids|
+            scope = Assignment.for_course(shard_course_ids).not_ignored_by(self, purpose)
+            yield(scope, opts.merge(:shard_course_ids => shard_course_ids))
           end
-          # outer limit, since there could be limit * n_shards results
-          result = result[0...limit] if limit
-          result
         end
+        result = result[0...opts[:limit]] if opts[:limit]
+        result
       end
     end
   end
 
+  def assignments_needing_submitting(opts={})
+    assignments_needing('submitting', :student, 15.minutes, opts) do |assignment_scope, opts|
+      due_after = opts[:due_after] || 4.weeks.ago
+
+      courses = Course.find(opts[:shard_course_ids])
+      courses_with_da = courses.select{|c| c.feature_enabled?(:differentiated_assignments)}
+      assignments = assignment_scope.
+        filter_by_visibilities_in_given_courses(self.id, courses_with_da.map(&:id)).
+        published.
+        due_between_with_overrides(due_after, 1.week.from_now).
+        expecting_submission.
+        need_submitting_info(id, opts[:limit]).
+        not_locked
+      select_available_assignments(assignments)
+    end
+  end
+
   def assignments_needing_grading(opts={})
-    shard.activate do
-      course_ids = Shackles.activate(:slave) do
-        if opts[:contexts]
-          (Array(opts[:contexts]).map(&:id) &
-          participating_instructor_course_ids)
-        else
-          participating_instructor_course_ids
-        end
-      end
+    # not really any harm in extending the expires_in since we touch the user anyway when grades change
+    assignments_needing('grading', :instructor, 120.minutes, opts) do |assignment_scope, opts|
+      as = assignment_scope.active.
+        expecting_submission.
+        need_grading_info(opts[:limit])
+      ActiveRecord::Associations::Preloader.new(as, :context).run
+      as.reject{|a| Assignments::NeedsGradingCountQuery.new(a, self).count == 0 }
+    end
+  end
 
-      opts = {limit: 15}.merge(opts.slice(:limit))
-
-      Rails.cache.fetch([self, 'assignments_needing_grading', course_ids, opts].cache_key, expires_in: 15.minutes) do
-        Shackles.activate(:slave) do
-          limit = opts[:limit]
-
-          result = Shard.partition_by_shard(course_ids) do |shard_course_ids|
-            as = Assignment.for_course(shard_course_ids).active.
-              expecting_submission.
-              not_ignored_by(self, 'grading').
-              need_grading_info(limit)
-            ActiveRecord::Associations::Preloader.new(as, :context).run
-            as.reject{|a| Assignments::NeedsGradingCountQuery.new(a, self).count == 0 }
-          end
-          # outer limit, since there could be limit * n_shards results
-          result = result[0...limit] if limit
-          result
-        end
-      end
+  def assignments_needing_moderation(opts={})
+    assignments_needing('moderation', :instructor, 120.minutes, opts) do |assignment_scope, opts|
+      assignment_scope.active.
+        expecting_submission.
+        where(:moderated_grading => true).
+        where("assignments.grades_published_at IS NULL").
+        joins(:provisional_grades).uniq.
+        need_grading_info(opts[:limit])
     end
   end
 
@@ -1502,7 +1504,6 @@ class User < ActiveRecord::Base
         participating_student_course_ids
       end
     end
-
     opts = {limit: 15}.merge(opts.slice(:limit))
 
     shard.activate do

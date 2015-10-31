@@ -61,6 +61,14 @@ class Announcement < DiscussionTopic
   end
   protected :respect_context_lock_rules
 
+  def self.lock_from_course(course)
+    Announcement.where(
+      :context_type => 'Course',
+      :context_id => course,
+      :workflow_state => 'active'
+    ).update_all(:locked => true)
+  end
+
   set_broadcast_policy! do
     dispatch :new_announcement
     to { active_participants(true) - [user] }

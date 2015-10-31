@@ -75,6 +75,7 @@ describe "courses/_settings_sidebar.html.erb" do
     before do
       view_context(@course, @user)
       assigns[:current_user] = @user
+      @controller.instance_variable_set(:@context, @course)
     end
 
     it "should display all configured tools" do

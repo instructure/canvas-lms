@@ -21,6 +21,7 @@ define [
         resizable: false
         width: 800
         height: 600
+        dialogClass: 'post-grades-frame-dialog'
 
       # other init
       if @baseUrl

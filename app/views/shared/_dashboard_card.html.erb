@@ -3,4 +3,14 @@
 
 <% js_env :DASHBOARD_COURSES => map_courses_for_menu(@current_user.menu_courses, :include_section_tabs => true) %>
 
-<div id="DashboardCard_Container"></div>
+<div id="DashboardCard_Container" style="display: <%= show_recent_activity? ? 'none' : 'block' %>">
+  <div class="ic-DashboardCard_Box grid-row">
+    <% for i in 0..5 do %>
+      <div class="col-xs-6 col-lg-4 card">
+        <div class="ic-DashboardCard">
+          <%= image_tag('dashcards/dashcard_empty.svg', :alt => '') %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

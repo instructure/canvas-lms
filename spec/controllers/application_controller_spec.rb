@@ -131,7 +131,6 @@ describe ApplicationController do
       settings_mock = mock()
       settings_mock.stubs(:settings).returns({})
       Canvas::Plugin.stubs(:find).returns(settings_mock)
-
     end
 
     it "uses @real_current_user first" do
@@ -563,6 +562,17 @@ describe ApplicationController do
         controller.instance_variable_set(:"@context", course)
         controller.send(:content_tag_redirect, course, content_tag, nil)
       end
+
+      it 'sets the resource_link_id correctly' do
+        controller.stubs(:named_context_url).returns('wrong_url')
+        controller.stubs(:render)
+        controller.stubs(js_env:[])
+        controller.instance_variable_set(:"@context", course)
+        content_tag.stubs(:id).returns(42)
+        controller.send(:content_tag_redirect, course, content_tag, nil)
+        expect(assigns[:lti_launch].params["resource_link_id"]).to eq 'e62d81a8a1587cdf9d3bbc3de0ef303d6bc70d78'
+      end
+
     end
 
   end
@@ -575,23 +585,93 @@ describe ApplicationController do
       tool.account_navigation = {:url => "http://example.com", :icon_url => "http://example.com", :enabled => true}
       tool.save!
 
-      controller.stubs(:named_context_url).returns("http://example.com")
+      controller.stubs(:polymorphic_url).returns("http://example.com")
       external_tools = controller.external_tools_display_hashes(:account_navigation, @group)
 
       expect(external_tools).to eq([])
     end
+
+    it 'returns array of tools if context is not group' do
+      @course = course_model
+      tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "test", :shared_secret => "secret", :url => "http://example.com")
+      tool.account_navigation = {:url => "http://example.com", :icon_url => "http://example.com", :enabled => true, :canvas_icon_class => 'icon-commons'}
+      tool.save!
+
+      controller.stubs(:polymorphic_url).returns("http://example.com")
+      external_tools = controller.external_tools_display_hashes(:account_navigation, @course)
+
+      expect(external_tools).to eq([{:title=>"bob", :base_url=>"http://example.com", :is_new => false, :icon_url=>"http://example.com", :canvas_icon_class => 'icon-commons'}])
+    end
   end
 
-  it 'returns array of tools if context is not group' do
-    @course = course_model
-    tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "test", :shared_secret => "secret", :url => "http://example.com")
-    tool.account_navigation = {:url => "http://example.com", :icon_url => "http://example.com", :enabled => true}
-    tool.save!
+  describe 'external_tool_display_hash' do
+    def tool_settings(setting, include_class=false)
+      settings_hash = {
+        url: "http://example.com/?#{setting.to_s}",
+        icon_url: "http://example.com/icon.png?#{setting.to_s}",
+        enabled: true
+      }
 
-    controller.stubs(:named_context_url).returns("http://example.com")
-    external_tools = controller.external_tools_display_hashes(:account_navigation, @course)
+      settings_hash[:canvas_icon_class] = "icon-#{setting.to_s}" if include_class
+      settings_hash
+    end
 
-    expect(external_tools).to eq([{:title=>"bob", :base_url=>"http://example.com", :icon_url=>"http://example.com"}])
+    before :once do
+      @course = course_model
+      @group = @course.groups.create!(:name => "some group")
+      @tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "test", :shared_secret => "secret", :url => "http://example.com")
+
+      @tool_settings = [
+        :user_navigation, :course_navigation, :account_navigation, :resource_selection,
+        :editor_button, :homework_submission, :migration_selection, :course_home_sub_navigation,
+        :course_settings_sub_navigation, :global_navigation,
+        :assignment_menu, :file_menu, :discussion_topic_menu, :module_menu, :quiz_menu, :wiki_page_menu,
+        :tool_configuration, :link_selection, :assignment_selection, :post_grades
+      ]
+
+      @tool_settings.each do |setting|
+        @tool.send("#{setting}=", tool_settings(setting))
+      end
+      @tool.save!
+    end
+
+    before :each do
+      controller.stubs(:request).returns(ActionDispatch::TestRequest.new)
+      controller.instance_variable_set(:@context, @course)
+    end
+
+    it 'returns a hash' do
+      hash = controller.external_tool_display_hash(@tool, :account_navigation)
+      left_over_keys = hash.keys - [:is_new, :base_url, :title, :icon_url, :canvas_icon_class]
+      expect(left_over_keys).to eq []
+    end
+
+    it 'returns a hash' do
+      hash = controller.external_tool_display_hash(@tool, :account_navigation)
+      left_over_keys = hash.keys - [:is_new, :base_url, :title, :icon_url, :canvas_icon_class]
+      expect(left_over_keys).to eq []
+    end
+
+    it 'all settings are correct' do
+      @tool_settings.each do |setting|
+        hash = controller.external_tool_display_hash(@tool, setting)
+        expect(hash[:base_url]).to eq "http://test.host/courses/#{@course.id}/external_tools/#{@tool.id}?launch_type=#{setting.to_s}"
+        expect(hash[:icon_url]).to eq "http://example.com/icon.png?#{setting.to_s}"
+        expect(hash[:canvas_icon_class]).to be nil
+      end
+    end
+
+    it 'all settings return canvas_icon_class if set' do
+      @tool_settings.each do |setting|
+        @tool.send("#{setting}=", tool_settings(setting, true))
+        @tool.save!
+
+        hash = controller.external_tool_display_hash(@tool, setting)
+        expect(hash[:base_url]).to eq "http://test.host/courses/#{@course.id}/external_tools/#{@tool.id}?launch_type=#{setting.to_s}"
+        expect(hash[:icon_url]).to eq "http://example.com/icon.png?#{setting.to_s}"
+        expect(hash[:canvas_icon_class]).to eq "icon-#{setting.to_s}"
+      end
+    end
   end
 end
 

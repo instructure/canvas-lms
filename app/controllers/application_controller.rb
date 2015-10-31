@@ -151,21 +151,34 @@ class ApplicationController < ActionController::Base
     return [] if context.is_a?(Group)
 
     context = context.account if context.is_a?(User)
-    tools = ContextExternalTool.all_tools_for(context, {:type => type,
+    tools = ContextExternalTool.all_tools_for(context, {:placements => type,
       :root_account => @domain_root_account, :current_user => @current_user})
 
-    extension_settings = [:icon_url] + custom_settings
     tools.map do |tool|
-      hash = {
-          :title => tool.label_for(type, I18n.locale),
-          :base_url => named_context_url(context, :context_external_tool_path, tool, :launch_type => type)
-      }
-      extension_settings.each do |setting|
-        hash[setting] = tool.extension_setting(type, setting)
-      end
-      hash
+      external_tool_display_hash(tool, type, {}, context, custom_settings)
     end
   end
+
+  def external_tool_display_hash(tool, type, url_params={}, context=@context, custom_settings=[])
+
+    url_params = {
+      id: tool.id,
+      launch_type: type
+    }.merge(url_params)
+
+    hash = {
+      :title => tool.label_for(type, I18n.locale),
+      :base_url =>  polymorphic_url([context, :external_tool], url_params),
+      :is_new => tool.integration_type == 'lor'
+    }
+
+    extension_settings = [:icon_url, :canvas_icon_class] | custom_settings
+    extension_settings.each do |setting|
+      hash[setting] = tool.extension_setting(type, setting)
+    end
+    hash
+  end
+  helper_method :external_tool_display_hash
 
   def k12?
     @domain_root_account && @domain_root_account.feature_enabled?(:k12)
@@ -339,14 +352,14 @@ class ApplicationController < ActionController::Base
       super
   end
 
-  def tab_enabled?(id)
+  def tab_enabled?(id, opts = {})
     return true unless @context && @context.respond_to?(:tabs_available)
     tabs = @context.tabs_available(@current_user,
                                    :session => session,
                                    :include_hidden_unused => true,
                                    :root_account => @domain_root_account)
     valid = tabs.any?{|t| t[:id] == id }
-    render_tab_disabled unless valid
+    render_tab_disabled unless valid || opts[:no_render]
     return valid
   end
 
@@ -412,6 +425,13 @@ class ApplicationController < ActionController::Base
       @headers = !!@current_user if @headers != false
       @files_domain = @account_domain && @account_domain.host_type == 'files'
       format.html {
+        if ms_office?
+          # Office will follow 302's internally, until it gets to a 200. _then_ it will pop it out
+          # to a web browser - but you've lost your cookies! This breaks not only store_location,
+          # but in the case of delegated authentication where the provider does an additional
+          # redirect storing important information in session, makes it impossible to log in at all
+          return render text: '', status: 200
+        end
         store_location
         return redirect_to login_url(params.slice(:authentication_provider)) if !@files_domain && !@current_user
 
@@ -1819,6 +1839,10 @@ class ApplicationController < ActionController::Base
 
   def mobile_device?
     params[:mobile] || request.user_agent.to_s =~ /ipod|iphone|ipad|Android/i
+  end
+
+  def ms_office?
+    request.user_agent.to_s =~ /ms-office/
   end
 
   def profile_data(profile, viewer, session, includes)

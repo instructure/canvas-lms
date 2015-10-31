@@ -262,6 +262,11 @@ require 'securerandom'
 #         "course_format": {
 #           "example": "online",
 #           "type": "string"
+#         },
+#         "access_restricted_by_date": {
+#           "description": "optional: this will be true if this user is currently prevented from viewing the course because of date restriction settings",
+#           "example": false,
+#           "type": "boolean"
 #         }
 #       }
 #     }
@@ -281,6 +286,7 @@ require 'securerandom'
 #
 class CoursesController < ApplicationController
   include SearchHelper
+  include ContextExternalToolsHelper
 
   before_filter :require_user, :only => [:index]
   before_filter :require_context, :only => [:roster, :locks, :create_file, :ping]
@@ -425,11 +431,13 @@ class CoursesController < ApplicationController
         end
 
         includes = Set.new(Array(params[:include]))
-
+        includes << 'access_restricted_by_date'
         # We only want to return the permissions for single courses and not lists of courses.
         includes.delete 'permissions'
 
         hash = []
+
+        Canvas::Builders::EnrollmentDateBuilder.preload(enrollments)
         enrollments_by_course = enrollments.group_by(&:course_id).values
         enrollments_by_course = Api.paginate(enrollments_by_course, self, api_v1_courses_url) if api_request?
         enrollments_by_course.each do |course_enrollments|
@@ -1142,7 +1150,7 @@ class CoursesController < ApplicationController
   def re_send_invitations
     get_context
     if authorized_action(@context, @current_user, [:manage_students, :manage_admin_users])
-      @context.send_later_if_production(:re_send_invitations!)
+      @context.send_later_if_production(:re_send_invitations!, @current_user)
 
       respond_to do |format|
         format.html { redirect_to course_settings_url }
@@ -1573,7 +1581,7 @@ class CoursesController < ApplicationController
         @recent_feedback = (@current_user && @current_user.recent_feedback(:contexts => @contexts)) || []
       end
 
-      @course_home_sub_navigation_tools = ContextExternalTool.all_tools_for(@context, :type => :course_home_sub_navigation, :root_account => @domain_root_account, :current_user => @current_user)
+      @course_home_sub_navigation_tools = ContextExternalTool.all_tools_for(@context, :placements => :course_home_sub_navigation, :root_account => @domain_root_account, :current_user => @current_user)
       unless @context.grants_right?(@current_user, session, :manage_content)
         @course_home_sub_navigation_tools.reject! { |tool| tool.course_home_sub_navigation(:visibility) == 'admins' }
       end
@@ -1834,6 +1842,9 @@ class CoursesController < ApplicationController
   #
   # Arguments are the same as Courses#create, with a few exceptions (enroll_me).
   #
+  # If a user has content management rights, but not full course editing rights, the only attribute
+  # editable through this endpoint will be "syllabus_body"
+  #
   # @argument course[account_id] [Integer]
   #   The unique ID of the account to create to course under.
   #
@@ -1939,9 +1950,13 @@ class CoursesController < ApplicationController
     old_settings = @course.settings
     logging_source = api_request? ? :api : :manual
 
-    if authorized_action(@course, @current_user, :update)
+    if authorized_action(@course, @current_user, [:update, :manage_content])
       return render_update_success if params[:for_reload]
+
       params[:course] ||= {}
+      unless @course.grants_right?(@current_user, :update)
+        params[:course] = params[:course].slice(:syllabus_body) # let users with :manage_content only update the body
+      end
       if params[:course].has_key?(:syllabus_body)
         params[:course][:syllabus_body] = process_incoming_html_content(params[:course][:syllabus_body])
       end
@@ -2009,8 +2024,7 @@ class CoursesController < ApplicationController
       unless lock_announcements.nil?
         if value_to_boolean(lock_announcements)
           @course.lock_all_announcements = true
-          Announcement.where(:context_type => 'Course', :context_id => @course, :workflow_state => 'active').
-              update_all(:locked => true)
+          Announcement.lock_from_course(@course)
         elsif @course.lock_all_announcements
           @course.lock_all_announcements = false
         end

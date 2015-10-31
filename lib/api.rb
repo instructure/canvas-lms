@@ -104,7 +104,10 @@ module Api
         :scope => 'root_account_id' }.freeze,
     'users' =>
       { :lookups => { 'sis_user_id' => 'pseudonyms.sis_user_id',
-                      'sis_login_id' => 'pseudonyms.unique_id',
+                      'sis_login_id' => {
+                          column: 'LOWER(pseudonyms.unique_id)',
+                          transform: ->(id) { QuotedValue.new("LOWER(#{Pseudonym.connection.quote(id)})") }
+                      },
                       'id' => 'users.id',
                       'sis_integration_id' => 'pseudonyms.integration_id',
                       'lti_context_id' => 'users.lti_context_id',
@@ -156,6 +159,10 @@ module Api
 
     column = lookups[sis_column]
     return nil, nil unless column
+    if column.is_a?(Hash)
+      sis_id = column[:transform].call(sis_id)
+      column = column[:column]
+    end
     return column, sis_id
   end
 

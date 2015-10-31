@@ -420,7 +420,7 @@ describe "gradebook2" do
           message_form.find_element(:css, '#body').send_keys(message_text)
           submit_form(message_form)
           wait_for_ajax_requests
-        }.to change { ConversationMessage.count(:conversation_id) }.by(1)
+        }.to change { ConversationMessage.count(:conversation_id) }.by(2)
       end
 
       it "should send messages when Scored more than X points" do
@@ -453,8 +453,8 @@ describe "gradebook2" do
         # expect dialog to show 1 more student with the "Haven't been graded" option
         f('[data-action="messageStudentsWho"]').click
         visible_students = ffj('.student_list li:visible')
-        expect(visible_students.size).to eq 1
-        expect(visible_students[0].text.strip).to eq @student_name_3
+        expect(visible_students.size).to eq 2
+        expect(visible_students[0].text.strip).to eq @student_name_1
         click_option('#message_assignment_recipients .message_types', "Haven't been graded")
         visible_students = ffj('.student_list li:visible')
         expect(visible_students.size).to eq 2
@@ -578,6 +578,21 @@ describe "gradebook2" do
       wait_for_ajaximations
       expect(f('#gradebook_grid .container_1 .slick-row:nth-child(1) .assignment-group-cell .percentage')).to include_text('100%') # otherwise 108%
       expect(f('#gradebook_grid .container_1 .slick-row:nth-child(1) .total-cell .percentage')).to include_text('100%') # otherwise 108%
+    end
+
+    it "should not show assignment mute warning in total column for 'not_graded', muted assignments" do
+      assignment = @course.assignments.create!({
+                                                title: 'Non Graded Assignment',
+                                                due_at: (Time.now + 1.week),
+                                                points_possible: 10,
+                                                submission_types: 'not_graded'
+                                             })
+
+      assignment.mute!
+      get "/courses/#{@course.id}/gradebook2"
+      wait_for_ajaximations
+
+      expect(ff(".total-cell .icon-muted")).to be_empty
     end
 
     it "should hide and show student names" do

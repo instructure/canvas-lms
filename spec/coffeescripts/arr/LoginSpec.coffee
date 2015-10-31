@@ -10,6 +10,12 @@ define [
   test 'its ok with emails to long domains', ->
     ok(loginUtils.validResetEmail('user@example.asdf.qwerty.com'))
 
+  test 'it supports capital letters', ->
+    ok(loginUtils.validResetEmail('UsErGuY@eXaMpLe.CoM'))
+
+  test 'it supports numbers', ->
+    ok(loginUtils.validResetEmail('user42@example42.com'))
+
   test 'it fails blank strings', ->
     ok(!loginUtils.validResetEmail(''))
 

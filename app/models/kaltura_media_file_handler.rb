@@ -75,7 +75,8 @@ class KalturaMediaFileHandler
             break
           end
           sleep(1.minute.to_i)
-          res = client.bulkUploadGet(bulk_upload_id)
+          # fall back to original res in case bulkUploadGet returns nil
+          res = client.bulkUploadGet(bulk_upload_id) || res
         end
       else
         refresh_later(res[:id], attachments, root_account_id)

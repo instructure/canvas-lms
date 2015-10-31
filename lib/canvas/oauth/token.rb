@@ -9,9 +9,14 @@ module Canvas::Oauth
     PURPOSE_KEY = 'purpose'
     REMEMBER_ACCESS = 'remember_access'
 
-    def initialize(key, code)
+    def initialize(key, code, access_token=nil)
       @key = key
-      @code = code
+      @code = code if code
+      if access_token
+        @access_token = access_token
+        @user = @access_token.user
+      end
+
     end
 
     def is_for_valid_code?
@@ -57,6 +62,7 @@ module Canvas::Oauth
         @access_token = user.access_tokens.create!({:developer_key => key, :remember_access => remember_access?, :scopes => scopes, :purpose => purpose})
 
         @access_token.clear_full_token! if @access_token.scoped_to?(['userinfo'])
+        @access_token.clear_plaintext_refresh_token! if @access_token.scoped_to?(['userinfo'])
       end
     end
 
@@ -73,11 +79,13 @@ module Canvas::Oauth
       end
     end
 
-    def as_json(options={})
-      {
+    def as_json(_options={})
+      json = {
         'access_token' => access_token.full_token,
-        'user' => user.as_json(:only => [:id, :name], :include_root => false),
+        'refresh_token' => access_token.plaintext_refresh_token,
+        'user' => user.as_json(:only => [:id, :name], :include_root => false)
       }
+      json
     end
 
     def self.find_userinfo_access_token(user, developer_key, purpose)
@@ -107,5 +115,6 @@ module Canvas::Oauth
     def self.expire_code(code)
       Canvas.redis.del "#{REDIS_PREFIX}#{code}"
     end
+
   end
 end

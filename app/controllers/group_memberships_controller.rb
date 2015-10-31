@@ -225,11 +225,12 @@ class GroupMembershipsController < ApplicationController
 
   def find_membership
     if (params[:membership_id] && params[:membership_id] == 'self') || (params[:user_id] && params[:user_id] == 'self')
-      @membership = @group.group_memberships.where(:user_id => @current_user).first || not_found
+      @membership = @group.group_memberships.where(:user_id => @current_user).first!
     elsif params[:membership_id]
       @membership = @group.group_memberships.find(params[:membership_id])
     else
-      @membership = @group.group_memberships.where(:user_id => params[:user_id]).first || not_found
+      user_id = Api.map_ids([params[:user_id]], @group.users, @domain_root_account, @current_user).first
+      @membership = @group.group_memberships.where(user_id: user_id).first!
     end
   end
 end

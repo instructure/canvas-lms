@@ -9,10 +9,6 @@ shared_examples 'login credentials for candroid and speedgrader' do |app_name|
     user_with_pseudonym(username: 'teacher1', password: 'teacher')
   end
 
-  after(:all) do
-    logout(false)
-  end
-
   context 'user provides bad credentials' do
     before(:each) do
       enter_school

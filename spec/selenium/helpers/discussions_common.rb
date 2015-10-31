@@ -36,6 +36,11 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
     validate_entry_text(entry, text)
   end
 
+  def check_edit_entry(entry)
+    wait_for_ajaximations
+    check_entry_option(entry, '.al-options:visible li:eq(1) a')
+  end
+
   def delete_entry(entry)
     wait_for_ajaximations
     click_entry_option(entry, '.al-options:visible li:last-child a')
@@ -44,6 +49,11 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
     wait_for_ajax_requests
     entry.reload
     expect(entry.workflow_state).to eq 'deleted'
+  end
+
+  def check_delete_entry(entry)
+    wait_for_ajaximations
+    check_entry_option(entry, '.al-options:visible li:eq(2) a')
   end
 
   def add_reply(message = 'message!', attachment = nil)
@@ -75,6 +85,16 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
     keep_trying_until do
       f("#entry-#{discussion_entry.id}").text.to_s.include?(text)
     end
+  end
+
+  def check_entry_option(discussion_entry, menu_item_selector)
+    li_selector = "#entry-#{discussion_entry.id}"
+    expect(fj(li_selector)).to be_displayed
+    expect(fj("#{li_selector} .al-trigger")).to be_displayed
+    fj("#{li_selector} .al-trigger").click
+    wait_for_ajaximations
+    menu_item = fj(menu_item_selector)
+    expect(menu_item).to be_nil
   end
 
   def click_entry_option(discussion_entry, menu_item_selector)

@@ -25,7 +25,16 @@ class RequestContextGenerator
 
   def call(env)
     request_id = SecureRandom.uuid
-    session_id = (env['rack.session.options'] || {})[:id]
+
+    # rack.session.options (where the session_id is saved by our session
+    # store) isn't availalbe at this point in the middleware stack. It is
+    # lazily loaded the first time the session is accessed, so we won't get
+    # session_ids in the log on the very first request (usually loading the
+    # login page).  It is written out to a cookie so that we can pick it up for
+    # logs in subsequent requests. See RequestContextSession, we can't write it
+    # to a cookie in this middleware because the cookie header has already been
+    # written by the time this app.call returns.
+    session_id = ActionDispatch::Request.new(env).cookie_jar[:log_session_id]
     meta_headers = ""
     Thread.current[:context] = {
       request_id:   request_id,

@@ -11,12 +11,13 @@ cache(safe_cache_key([@current_user, contexts, 'a_need_grading']), cache_opts) d
  show_context = !contexts || contexts.length > 1
  visible_limit = 5
  needs_grading = @current_user ? @current_user.assignments_needing_grading(:contexts => contexts, :limit => 100) : []
+ needs_moderation = @current_user ? @current_user.assignments_needing_moderation(:contexts => contexts, :limit => 100) : []
  needs_submitting = @current_user ? @current_user.assignments_needing_submitting(:contexts => contexts, :limit => 100) : []
  needs_reviewing = @current_user ? @current_user.submissions_needing_peer_review(:contexts => contexts, :limit => 100) : []
  hidden_todos = 0
 %>
 
-<% if @current_user && needs_grading.present? || needs_submitting.present? || needs_reviewing.present? %>
+<% if @current_user && needs_grading.present? || needs_moderation.present? || needs_submitting.present? || needs_reviewing.present? %>
   <h2><%= t('headings.to_do', %{To Do}) %></h2>
   <ul class="right-side-list to-do-list">
     <% needs_grading.each_with_index do |assignment, i| %>
@@ -48,6 +49,33 @@ cache(safe_cache_key([@current_user, contexts, 'a_need_grading']), cache_opts) d
           </em>
         </a>
         <%= render :partial => 'shared/ignore_option_list', :locals => {:type => 'grading', :item => assignment } %>
+      </li>
+    <% end %>
+    <% needs_moderation.each_with_index do |assignment, i| %>
+      <li style="<%= hidden if i >= visible_limit %>">
+        <a
+        class="item icon-grading-gray tooltip"
+        href="<%= course_assignment_moderate_path(assignment.context_id, assignment) %>"
+        data-track-category="dashboard"
+        data-track-label="todo needs moderation"
+        >
+          <% if assignment.due_at || assignment.points_possible || show_context %>
+            <span class="tooltip_wrap">
+              <span class='tooltip-carat'></span>
+              <span class="tooltip_text">
+                <span style="display: block;"><%= translated_due_date(assignment) %></span>
+                <% if assignment.points_possible %>
+                  <span style="display: block; font-size: 0.8em;"><%= t 'points_possible', 'out of %{points_possible}', :points_possible => assignment.points_possible %></span>
+                <% end %>
+                <% if show_context %>
+                  <span style="display: block; font-size: 0.8em;"><%= assignment.context.short_name %></span>
+                <% end %>
+              </span>
+            </span>
+          <% end %>
+          <b><%= t 'headings.moderate', 'Moderate %{assignment}', :assignment => assignment.title %></b>
+        </a>
+        <%= render :partial => 'shared/ignore_option_list', :locals => {:type => 'moderation', :item => assignment } %>
       </li>
     <% end %>
     <% needs_submitting.each_with_index do |assignment, i| %>

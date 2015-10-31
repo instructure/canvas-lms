@@ -162,6 +162,16 @@ describe "Outcomes Import API", type: :request do
         expect(available_json.any?{|j| j["title"] =~ /common core/i}).to be_truthy
       end
 
+      it "includes the NGSS standards" do
+        expect(available_json.any?{|j| j["title"] =~ /ngss/i}).to be_truthy
+      end
+
+      %w[Administrators Teachers Students].each do |group|
+        it "includes the ISTE standards for #{group}" do
+          expect(available_json.any?{|j| j["title"] == "NETS for #{group}"}).to be_truthy
+        end
+      end
+
       it "requires the user to have manage_global_outcomes permissions" do
         revoke_permission(@account_user, :manage_global_outcomes)
         available_json(expected_status: 401)

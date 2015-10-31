@@ -29,7 +29,7 @@ describe CalendarEventsApiController, type: :request do
       'all_day', 'all_day_date', 'child_events', 'child_events_count', 'comments',
       'context_code', 'created_at', 'description', 'duplicates', 'end_at', 'hidden', 'html_url',
       'id', 'location_address', 'location_name', 'parent_event_id', 'start_at',
-      'title', 'updated_at', 'url', 'workflow_state'
+      'title', 'type', 'updated_at', 'url', 'workflow_state'
     ]
     expected_slot_fields = (expected_fields + ['appointment_group_id', 'appointment_group_url', 'available_slots', 'participants_per_appointment', 'reserve_url', 'effective_context_code']).sort
     expected_reservation_event_fields = (expected_fields + ['appointment_group_id', 'appointment_group_url', 'effective_context_code']).sort
@@ -818,7 +818,7 @@ describe CalendarEventsApiController, type: :request do
   context 'assignments' do
     expected_fields = [
       'all_day', 'all_day_date', 'assignment', 'context_code', 'created_at',
-      'description', 'end_at', 'html_url', 'id', 'start_at', 'title', 'updated_at',
+      'description', 'end_at', 'html_url', 'id', 'start_at', 'title', 'type', 'updated_at',
       'url', 'workflow_state'
     ]
 

@@ -61,6 +61,7 @@ define([
     });
 
     submissionForm.submit(function(event) {
+      var self = this;
       var $turnitin = $(this).find(".turnitin_pledge");
       if($("#external_tool_submission_type").val() == "online_url_to_file") {
         event.preventDefault();
@@ -88,13 +89,31 @@ define([
         var fileElements = $(this).find('input[type=file]:visible').filter(function() {
           return $(this).val() !== '';
         });
+
+        var emptyFiles = $(this).find('input[type=file]:visible').filter(function() {
+          return this.files[0] && this.files[0].size === 0;
+        });
+
         var uploadedAttachmentIds = $(this).find('#submission_attachment_ids').val();
+
+        var reenableSubmitButton = function () {
+          $(self).find('button[type=submit]')
+              .text(I18n.t('#button.submit_assignment', 'Submit Assignment'))
+              .prop('disabled', false);
+        };
+
         // warn user if they haven't uploaded any files
         if (fileElements.length === 0 && uploadedAttachmentIds === '') {
           $.flashError(I18n.t('#errors.no_attached_file', 'You must attach at least one file to this assignment'));
-          $(this).find('button[type=submit]')
-            .text(I18n.t('#button.submit_assignment', 'Submit Assignment'))
-            .prop('disabled', false);
+          reenableSubmitButton();
+          return false;
+        }
+
+        // throw error if the user tries to upload an empty file
+        // to prevent S3 from erroring
+        if (emptyFiles.length) {
+          $.flashError(I18n.t('Attached files must be greater than 0 bytes'));
+          reenableSubmitButton();
           return false;
         }
 

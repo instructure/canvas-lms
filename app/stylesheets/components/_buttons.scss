@@ -301,6 +301,10 @@ input[type="button"] {
     color: $textColor;
     background: transparent;
   }
+
+  i[class*=icon-], i[class^=icon-] {
+    margin-right: 3px;
+  }
 }
 
 // Icon "action" buttons

@@ -41,6 +41,7 @@
           <select style="font-weight: bold;" class="numerical_answer_type" name="numerical_answer_type" aria-label="<%= t 'numerical_answer', 'Numerical Answer' %>">
             <option value="exact_answer"><%= before_label(:exact_answer, "Exact Answer") %></option>
             <option value="range_answer"><%= before_label(:answer_in_range, "Answer in the Range") %></option>
+            <option value="precision_answer"><%= before_label(:answer_with_precision, "Answer with Precision") %></option>
           </select>
           <span class="exact_answer numerical_answer_text">
             <%= t(:exact_answer_with_error_margin_accessible, "*exact answer* with error margin #error margin#", :wrapper => {
@@ -51,6 +52,11 @@
             <%= t(:answer_in_range_accessible, "between *range start* and #range end#", :wrapper => {
                   '*' => '<input class="float_value long" type="text" style="width: 50px;" name="answer_range_start" aria-label="\1"/>',
                   '#' => '<input class="float_value long" type="text" style="width: 50px;" name="answer_range_end" aria-label="\1"/>' }) %>
+          </span>
+          <span class="precision_answer numerical_answer_text">
+            <%= t(:answer_with_precision_accessible, "*exact answer* with precision #precision#", :wrapper => {
+                  '*' => '<input class="float_value precision" type="text" style="width: 50px;" name="answer_approximate" aria-label="\1"/>',
+                  '#' => '<input class="precision_value" type="text" style="width: 50px;" name="answer_precision" aria-label="\1" title="' + t('number between 1 and 16 inclusive') + '"/>' }) %>
           </span>
         </div>
         <div class="answer_comments comment empty">

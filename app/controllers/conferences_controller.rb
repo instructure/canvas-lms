@@ -356,15 +356,22 @@ class ConferencesController < ApplicationController
 
   def get_new_members
     members = [@current_user]
+
     if params[:user] && params[:user][:all] != '1'
       ids = []
       params[:user].each do |id, val|
         ids << id.to_i if val == '1'
       end
-      members += @context.users.where(id: ids)
     else
-      members += @context.users.to_a
+      ids = @context.user_ids
     end
+
+    if @context.is_a? Course
+      members += @context.participating_users(ids).to_a
+    else
+      members += @context.participating_users_in_context(ids).to_a
+    end
+
     members - @conference.invitees
   end
 

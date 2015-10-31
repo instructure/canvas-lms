@@ -64,11 +64,6 @@ define [
     component = buildComponent(props)
     deepEqual(getGrade(component), '100%')
 
-  test 'is not editable', ->
-    component = buildComponent()
-    Simulate.click(component)
-    notOk(component.refs.cell.props.className.match(/editable/))
-
   test 'displays warning icon if assignment group has 0 points possible', ->
     cellData =
       rowData:

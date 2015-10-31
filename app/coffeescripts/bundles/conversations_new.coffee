@@ -269,10 +269,13 @@ require [
       $(window).keydown(@onKeyDown)
 
     onPageLoad: (e) ->
-      # we add the top style here instead of in the css because
-      # we want to accomodate custom css that changes the height
-      # of the header.
-      $('#main').css(display: 'block', top: $('#header').height())
+      if window.ENV.use_new_styles
+         $('#main').css(display: 'block')
+      else
+        # we add the top style here instead of in the css because
+        # we want to accomodate custom css that changes the height
+        # of the header.
+        $('#main').css(display: 'block', top: $('#header').height())
 
     onSubmit: (dfd) =>
       @_incrementSending(1)

@@ -51,4 +51,15 @@
     {{#t "blank_placeholder"}}-{{/t}}
   {{/if}}
 </td>
+<td>
+  {{#ifNull graded_anonymously}}
+    {{#t "blank_placeholder"}}-{{/t}}
+  {{else}}
+    {{#if graded_anonymously}}
+      {{#t "yes-abbreviation"}}y{{/t}}
+    {{else}}
+      {{#t "no-abbreviation"}}n{{/t}}
+    {{/if}}
+  {{/ifNull}}
+</td>
 {{/ifEqual}}

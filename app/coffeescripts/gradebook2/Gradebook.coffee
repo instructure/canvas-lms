@@ -102,10 +102,14 @@ define [
       else
         'students_url'
 
-      @gotAllAssignmentGroupsPromise = $.Deferred().done => @gotAllAssignmentGroups()
-      gotAllStudents = $.Deferred().done(()=>
-        @gotAllAssignmentGroupsPromise.then(()=> @gotAllStudents())
-      )
+      gotAllStudentsPromise = $.Deferred()
+      @gotAllAssignmentGroupsPromise = $.Deferred()
+      gotAllStudentsAndAssignmentsPromise = $.Deferred()
+
+      $.when(gotAllStudentsPromise, @gotAllAssignmentGroupsPromise).then =>
+        @gotAllAssignmentGroups()
+        @gotAllStudents()
+        gotAllStudentsAndAssignmentsPromise.resolve()
 
       @assignmentGroupsParams = {exclude_descriptions: true}
       if @mgpEnabled && @gradingPeriodToShow && @gradingPeriodToShow != '0' && @gradingPeriodToShow != ''
@@ -136,12 +140,12 @@ define [
         paginationLinks = xhr.getResponseHeader('Link')
         lastLink = paginationLinks.match(/<[^>]+>; *rel="last"/)
         unless lastLink?
-          gotAllStudents.resolve()
+          gotAllStudentsPromise.resolve()
           return
         lastPage = lastLink[0].match(/page=(\d+)/)[1]
         lastPage = parseInt lastPage, 10
         if lastPage == 1
-          gotAllStudents.resolve()
+          gotAllStudentsPromise.resolve()
           return
 
         fetchEnrollments = (page) =>
@@ -152,10 +156,10 @@ define [
             @gotChunkOfStudents responses[0]
           else
             @gotChunkOfStudents(students) for [students, x, y] in responses
-          gotAllStudents.resolve()
+          gotAllStudentsPromise.resolve()
 
       gotCustomColumns = @getCustomColumns()
-      @gotAllData = $.when(gotCustomColumns, gotAllStudents, @gotAllAssignmentGroupsPromise)
+      @gotAllData = $.when(gotCustomColumns, gotAllStudentsAndAssignmentsPromise)
 
       @allSubmissionsLoaded.done =>
         for c in @customColumns
@@ -351,11 +355,11 @@ define [
 
     gotAllStudents: ->
       @withAllStudents (students) =>
-        #empty the array so this is idempotent, you can end up with too many rows
-        @rows.length = 0
         if @mgpEnabled
           gradingPeriods = @indexedGradingPeriods()
           overrides = @indexedOverrides()
+        #empty the array so this is idempotent, you can end up with too many rows
+        @rows.length = 0
         for student_id, student of students
           student.computed_current_score ||= 0
           student.computed_final_score ||= 0
@@ -1172,7 +1176,7 @@ define [
 
                   updated_date = $.datetimeString(response.created_at)
                   updated_previous_report = "#{I18n.t('Previous (%{timestamp})', timestamp: updated_date)}"
-                  $previous_link = $('#csv_export_options').children('li').last().children('a')
+                  $previous_link = $('#csv_export_options .open_in_a_new_tab')
                   $previous_link.text(updated_previous_report)
                   $previous_link.attr('href', response.url)
                   $('#csv_export_options').children('li').last().css('display', 'block')
@@ -1541,7 +1545,10 @@ define [
     setAssignmentWarnings: =>
       @totalGradeWarning = null
 
-      if _.any(@assignments, (a) -> a.muted)
+      gradebookVisibleAssignments = _.reject @assignments, (assignment) ->
+        _.contains(assignment.submission_types, 'not_graded')
+
+      if _.any(gradebookVisibleAssignments, (a) -> a.muted)
         @totalGradeWarning =
           warningText: I18n.t "This grade differs from the student's view of the grade because some assignments are muted"
           icon: "icon-muted"

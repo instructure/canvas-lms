@@ -35,7 +35,7 @@ describe 'quizzes' do
     link = f("#summary_quiz_#{@quiz.id} li a.menu_tool_link")
     expect(link).to be_displayed
     expect(link.text).to match_ignoring_whitespace(@tool.label_for(:quiz_menu))
-    expect(link['href']).to eq "#{course_external_tool_url(@course, @tool)}?launch_type=quiz_menu&quizzes[]=#{@quiz.id}"
+    assert_url_parse_match(link['href'], "#{course_external_tool_url(@course, @tool)}?launch_type=quiz_menu&quizzes[]=#{@quiz.id}")
   end
 
   it 'shows tool launch links in the gear for items on the show page', priority: "1", test_id: 209943 do
@@ -48,6 +48,6 @@ describe 'quizzes' do
     link = f('#quiz_show li a.menu_tool_link')
     expect(link).to be_displayed
     expect(link.text).to match_ignoring_whitespace(@tool.label_for(:quiz_menu))
-    expect(link['href']).to eq "#{course_external_tool_url(@course, @tool)}?launch_type=quiz_menu&quizzes[]=#{@quiz.id}"
+    assert_url_parse_match(link['href'], "#{course_external_tool_url(@course, @tool)}?launch_type=quiz_menu&quizzes[]=#{@quiz.id}")
   end
 end

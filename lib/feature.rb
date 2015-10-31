@@ -129,6 +129,15 @@ END
       root_opt_in: true,
       beta: true
     },
+    'epub_export' =>
+    {
+      display_name: -> { I18n.t('ePub Export') },
+      description: -> { I18n.t(<<END) },
+      This enables users to generate and download course ePub.
+END
+      applies_to: 'User',
+      state: 'hidden'
+    },
     'html5_first_videos' =>
     {
       display_name: -> { I18n.t('features.html5_first_videos', 'Prefer HTML5 for video playback') },
@@ -337,15 +346,6 @@ END
           root_opt_in: true,
           beta: true
       },
-    'nc_or' =>
-        {
-            display_name: -> { I18n.t('Enable "OR" Condition for Modules') },
-            description:  -> { I18n.t('If enabled, modules will have the option to be marked as complete when only one of the requirements is met.') },
-            applies_to: 'Course',
-            state: 'hidden_in_prod',
-            development: false,
-            root_opt_in: true
-        },
     'use_new_tree' =>
     {
       display_name: -> { I18n.t('Use new folder tree in Files')},
@@ -368,7 +368,7 @@ END
       description: -> { I18n.t('Performance enhancements for the Gradebook') },
       applies_to: 'Course',
       state: 'hidden',
-      development: true,
+      hidden_in_production: true,
       root_opt_in: true
     },
     'anonymous_grading' =>

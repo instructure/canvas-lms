@@ -1,5 +1,6 @@
 require 'pathname'
 require 'yaml'
+require 'open3'
 
 module BrandableCSS
   APP_ROOT = defined?(Rails) && Rails.root || Pathname.pwd
@@ -97,25 +98,27 @@ module BrandableCSS
       # so their scss files can be picked up and compiled with everything else
       require 'config/initializers/plugin_symlinks'
 
-      command = [cli].push(*args).shelljoin + ' 2>&1'
+      command = [cli].push(*args).shelljoin
       msg = "running BrandableCSS CLI: #{command}"
       Rails.logger.try(:debug, msg) if defined?(Rails)
 
       percent_complete = 0
-      IO.popen(command).each do |line|
-        puts line.chomp!
+      Open3.popen2e(command) do |_stdin, stdout_and_stderr, wait_thr|
+        stdout_and_stderr.each do |line|
+          puts line.chomp!
 
-        # This is a good-enough-for-now approximation to show the progress
-        # bar in the UI.  Since we don't know exactly how many files there are,
-        # it will progress towards 100% but never quite hit it until it is complete.
-        # Each tick it will cut 4% of the remaining percentage. Meaning it will look like
-        # it goes fast at first but then slows down, but will always keep moving.
-        if opts && opts[:on_progress] && line.starts_with?('compiled ')
-          percent_complete = percent_complete + ((100.0 - percent_complete) * 0.04)
-          opts[:on_progress].call(percent_complete)
+          # This is a good-enough-for-now approximation to show the progress
+          # bar in the UI.  Since we don't know exactly how many files there are,
+          # it will progress towards 100% but never quite hit it until it is complete.
+          # Each tick it will cut 4% of the remaining percentage. Meaning it will look like
+          # it goes fast at first but then slows down, but will always keep moving.
+          if opts && opts[:on_progress] && line.starts_with?('compiled ')
+            percent_complete += (100.0 - percent_complete) * 0.04
+            opts[:on_progress].call(percent_complete)
+          end
         end
+        raise("Error #{msg}") unless wait_thr.value.success?
       end
-      raise("Error #{msg}") unless $?.success?
     end
   end
 

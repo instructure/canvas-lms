@@ -1,51 +1,217 @@
 /** @jsx React.DOM */
 
 define([
-  'jquery',
-  'i18n!moderated_grading',
   'axios',
-  'compiled/jquery.rails_flash_notifications'
-], function ($, I18n, axios) {
-  class ModerationActions {
-    constructor (store, opts) {
-      this.store = store;
-      if (opts && opts.publish_grades_url) {
-        this.publish_grades_url = opts.publish_grades_url;
-      }
-    }
+  'jsx/shared/helpers/parseLinkHeader',
+  'i18n!moderated_grading',
+  'underscore'
+], function (axios, parseLinkHeader, I18n, _) {
 
-    updateSubmission (submission) {
-      // Update the submission and then update the store
-    }
+  var ModerationActions = {
 
-    loadInitialSubmissions (submissions_url) {
-      axios.get(submissions_url)
-           .then(function (response) {
-             this.store.addSubmissions(response.data);
-           }.bind(this))
-           .catch(function (response) {
-             console.log('finished');
-           });
-    }
+    // Define 'constants' for types
+    SELECT_STUDENT: 'SELECT_STUDENT',
+    UNSELECT_STUDENT: 'UNSELECT_STUDENT',
+    SELECT_ALL_STUDENTS: 'SELECT_ALL_STUDENTS',
+    UNSELECT_ALL_STUDENTS: 'UNSELECT_ALL_STUDENTS',
+    SELECT_MARK: 'SELECT_MARK',
+    UPDATED_MODERATION_SET: 'UPDATED_MODERATION_SET',
+    UPDATE_MODERATION_SET_FAILED: 'UPDATE_MODERATION_SET_FAILED',
+    PUBLISHED_GRADES: 'PUBLISHED_GRADES',
+    PUBLISHED_GRADES_FAILED: 'PUBLISHED_GRADES_FAILED',
+    GOT_STUDENTS: 'GOT_STUDENTS',
+    SORT_MARK1_COLUMN: 'SORT_MARK1_COLUMN',
+    SORT_MARK2_COLUMN: 'SORT_MARK2_COLUMN',
+    SORT_MARK3_COLUMN: 'SORT_MARK3_COLUMN',
+    SELECTING_PROVISIONAL_GRADES_FAILED: 'SELECTING_PROVISIONAL_GRADES_FAILED',
 
-    publishGrades () {
-      var axiosPostOptions = {
-        xsrfCookieName: '_csrf_token',
-        xsrfHeaderName: 'X-CSRF-Token'
+    sortMark1Column () {
+      return {
+        type: this.SORT_MARK1_COLUMN
       };
-      axios.post(this.publish_grades_url, {}, axiosPostOptions)
-           .then((response) => {
-             $.flashMessage(I18n.t('Success! Grades were published to the grade book.'));
-           })
-           .catch((response) => {
-             if ((response.status === 400) && (response.data.message)){
-               $.flashError(response.data.message);
-             } else {
-               $.flashError(I18n.t('Error! A problem happened publishing grades.'));
-             }
-           });
+    },
+
+    sortMark2Column () {
+      return {
+        type: this.SORT_MARK2_COLUMN
+      };
+    },
+
+    sortMark3Column () {
+      return {
+        type: this.SORT_MARK3_COLUMN
+      };
+    },
+
+    selectStudent (studentId) {
+      return {
+        type: this.SELECT_STUDENT,
+        payload: { studentId }
+      };
+    },
+
+    unselectStudent (studentId) {
+      return {
+        type: this.UNSELECT_STUDENT,
+        payload: { studentId }
+      };
+    },
+
+    selectAllStudents (students) {
+      return {
+        type: this.SELECT_ALL_STUDENTS,
+        payload: { students }
+      };
+    },
+
+    unselectAllStudents () {
+      return {
+        type: this.UNSELECT_ALL_STUDENTS
+      };
+    },
+
+    moderationSetUpdated (students) {
+      return {
+        type: this.UPDATED_MODERATION_SET,
+        payload: {
+          students,
+          time: Date.now(),
+          message: I18n.t('Reviewers successfully added')
+        }
+      };
+    },
+
+    moderationSetUpdateFailed () {
+      return {
+        type: this.UPDATE_MODERATION_SET_FAILED,
+        payload: {
+          time: Date.now(),
+          message: I18n.t('A problem occurred adding reviewers.')
+        },
+        error: true
+      };
+    },
+
+    gotStudents (students) {
+      return {
+        type: this.GOT_STUDENTS,
+        payload: { students }
+      };
+    },
+
+    publishedGrades (message) {
+      return {
+        type: this.PUBLISHED_GRADES,
+        payload: {
+          message,
+          time: Date.now()
+        }
+      };
+    },
+
+    publishGradesFailed (message) {
+      return {
+        type: this.PUBLISHED_GRADES_FAILED,
+        payload: {
+          message,
+          time: Date.now()
+        },
+        error: true
+      };
+    },
+
+    selectingProvisionalGradesFailed (message) {
+      var error = new Error(message);
+      error.time = Date.now();
+      return {
+        type: this.SELECTING_PROVISIONAL_GRADES_FAILED,
+        payload: error,
+        error: true
+      };
+    },
+
+    selectedProvisionalGrade (studentId, selectedProvisionalId) {
+      return {
+        type: this.SELECT_MARK,
+        payload: {
+          studentId,
+          selectedProvisionalId
+        }
+      };
+    },
+
+    selectProvisionalGrade (selectedProvisionalId, ajaxLib) {
+      return (dispatch, getState) => {
+        var endpoint = getState().urls.provisional_grades_base_url + "/" + selectedProvisionalId + "/select"
+        ajaxLib = ajaxLib || axios;
+        ajaxLib.put(endpoint)
+               .then((response) => {
+                 dispatch(this.selectedProvisionalGrade(response.data.student_id, response.data.selected_provisional_grade_id));
+               })
+               .catch((response) => {
+                 dispatch(this.selectingProvisionalGradesFailed(I18n.t('An error accurred selecting provisional grades')));
+               });
+      };
+
+    },
+
+    publishGrades (ajaxLib) {
+      return (dispatch, getState) => {
+        var endpoint = getState().urls.publish_grades_url;
+        ajaxLib = ajaxLib || axios;
+        ajaxLib.post(endpoint)
+               .then((response) => {
+                 dispatch(this.publishedGrades(I18n.t('Success! Grades were published to the grade book.')));
+               })
+               .catch((response) => {
+                 if (response.status === 400) {
+                   dispatch(this.publishGradesFailed(I18n.t('Assignment grades have already been published.')));
+                 } else {
+                   dispatch(this.publishGradesFailed(I18n.t('An error occurred publishing grades.')));
+                 }
+               });
+      };
+    },
+
+    addStudentToModerationSet (ajaxLib) {
+      return (dispatch, getState) => {
+        var endpoint = getState().urls.add_moderated_students;
+        ajaxLib = ajaxLib || axios;
+        ajaxLib.post(endpoint, {
+          student_ids: _.reduce(getState().studentList.students, (ids, student) => {
+            if(student.on_moderation_stage){
+              ids.push(student.id);
+            }
+            return ids;
+          }, [])
+               })
+               .then((response) => {
+                 dispatch(this.moderationSetUpdated(response.data));
+               })
+               .catch((response) => {
+                 dispatch(this.moderationSetUpdateFailed());
+               });
+      };
+    },
+
+    apiGetStudents (ajaxLib, endpoint) {
+      return (dispatch, getState) => {
+        endpoint = endpoint || getState().urls.list_gradeable_students;
+        ajaxLib = ajaxLib || axios;
+        ajaxLib.get(endpoint)
+               .then((response) => {
+                 var linkHeaders = parseLinkHeader(response);
+                 if (linkHeaders.next) {
+                   dispatch(this.apiGetStudents(ajaxLib, linkHeaders.next));
+                 }
+                 dispatch(this.gotStudents(response.data));
+               })
+               .catch((response) => {
+                 throw new Error(response);
+               });
+      };
     }
-  }
+  };
 
   return ModerationActions;
 });

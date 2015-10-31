@@ -133,6 +133,7 @@ class ErrorsController < ApplicationController
     # get quickly rate limited if hit repeatedly.
     increment_request_cost(200)
 
+    reporter = @current_user.try(:fake_student?) ? @real_current_user : @current_user
     error = params[:error] || {}
     error[:user_agent] = request.headers['User-Agent']
     begin
@@ -141,7 +142,7 @@ class ErrorsController < ApplicationController
       report ||= ErrorReport.where(id: session.delete(:last_error_id)).first if session[:last_error_id].present?
       report ||= ErrorReport.new
       error.delete(:category) if report.category.present?
-      report.user = @current_user
+      report.user = reporter
       report.account ||= @domain_root_account
       backtrace = error.fetch(:backtrace, "")
       if report.backtrace
@@ -160,7 +161,7 @@ class ErrorsController < ApplicationController
         e,
         message: "Error Report Creation failed",
         user_email: error[:email],
-        user_id: @current_user.try(:id)
+        user_id: reporter.try(:id)
       )
     end
     respond_to do |format|

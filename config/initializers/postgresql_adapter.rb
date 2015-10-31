@@ -1,3 +1,6 @@
+class QuotedValue < String
+end
+
 module PostgreSQLAdapterExtensions
   def readonly?(table = nil, column = nil)
     return @readonly unless @readonly.nil?
@@ -181,6 +184,8 @@ module PostgreSQLAdapterExtensions
   # BigDecimals, Times, etc.) into those representations. Raise
   # ActiveRecord::StatementInvalid for any other non-integer things.
   def quote(value, column = nil)
+    return value if value.is_a?(QuotedValue)
+
     if column && column.type == :integer && !value.respond_to?(:quoted_id)
       case value
         when String, ActiveSupport::Multibyte::Chars, nil, true, false

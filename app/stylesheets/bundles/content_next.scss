@@ -71,6 +71,12 @@
     max-width: 350px;
 
     .prerequisites_message {
+      overflow-wrap: break-word;
+      word-wrap: break-word;
+      word-break: break-all;
+      word-break: break-word;
+      hyphens: auto;
+
       display: flex;
       align-items: center;
       font-size: 12px;
@@ -259,4 +265,8 @@ input.move-module-label-spacer {
   width:1px;
   height:1px;
   overflow:hidden;
+}
+
+.require-sequential {
+  margin-left: 20px;
 }

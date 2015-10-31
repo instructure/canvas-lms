@@ -274,4 +274,20 @@ describe "course settings" do
 
     expect(is_checked('#course_restrict_student_future_view')).to be_truthy
   end
+
+  it "should disable editing settings if :manage rights are not granted" do
+    user(:active_all => true)
+    user_session(@user)
+    role = custom_account_role('role', :account => @account)
+    @account.role_overrides.create!(:permission => 'read_course_content', :role => role, :enabled => true)
+    @account.role_overrides.create!(:permission => 'manage_content', :role => role, :enabled => false)
+    @course.account.account_users.create!(:user => @user, :role => role)
+
+    get "/courses/#{@course.id}/settings"
+
+    ffj("#tab-details input:visible").each do |input|
+      expect(input.attribute('disabled')).to be_present
+    end
+    expect(f(".course_form button[type='submit']")).to be_nil
+  end
 end

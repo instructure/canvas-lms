@@ -96,7 +96,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
       @quiz.anonymous_submissions = false
       @quiz.quiz_type = "survey"
 
-      #make questions
+      # make questions
       questions = [{:question_data => { :name => "test 1" }},
         {:question_data => { :name => "test 2" }},
         {:question_data => { :name => "test 3" }},
@@ -143,7 +143,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     end
 
     it 'should have sections in quiz statistics_csv' do
-      #enroll user in multiple sections
+      # enroll user in multiple sections
       pseudonym(@student)
       @student.pseudonym.sis_user_id = "user_sis_id_01"
       @student.pseudonym.save!
@@ -158,7 +158,6 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
       # one complete submission
       qs = @quiz.generate_submission(@student)
       Quizzes::SubmissionGrader.new(qs).grade_submission
-
       stats = CSV.parse(csv(:include_all_versions => true))
       expect(stats.last[0]).to eq "nobody@example.com"
       expect(stats.last[1]).to eq @student.id.to_s
@@ -176,6 +175,42 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
       section_sis_ids = splitter.call(stats.last[5])
       expect(section_sis_ids).to include("SISSection02")
       expect(section_sis_ids).to include("SISSection01")
+    end
+
+    it 'should use sections in quiz statistics generate' do
+      # enroll user in multiple sections
+      pseudonym(@student)
+      @student.pseudonym.sis_user_id = "user_sis_id_01"
+      @student.pseudonym.save!
+      section1 = @course.course_sections.first
+      section1.sis_source_id = 'SISSection01'
+      section1.save!
+      section2 = CourseSection.new(:course => @course, :name => "section2")
+      section2.sis_source_id = 'SISSection02'
+      section2.save!
+      @course.enroll_user(@student, "StudentEnrollment", :enrollment_state => 'active',
+                          :allow_multiple_enrollments => true, :section => section2)
+      @student.save!
+
+      question = @quiz.quiz_questions.create!({
+                                              question_data: {
+                                                name: 'q1',
+                                                points_possible: 30,
+                                                question_type: 'essay_question',
+                                                question_text: 'ohai mark'
+                                              }
+                                             })
+      @quiz.generate_quiz_data
+      @quiz.save!
+
+      # one complete submission
+      qs = @quiz.generate_submission(@student)
+      Quizzes::SubmissionGrader.new(qs).grade_submission
+      stats = @quiz.quiz_statistics.build(
+        :report_type => 'student_analysis',
+        :includes_all_versions => true
+        ).report.generate(true, {:section_ids=> section2.id})
+      expect(stats[:questions][0][1]["answers"][0]["responses"]).to eq 1
     end
 
     it 'should deal with incomplete fill-in-multiple-blanks questions' do

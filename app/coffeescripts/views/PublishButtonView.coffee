@@ -13,6 +13,10 @@ define [
     publishedClass: 'btn-published'
     unpublishClass: 'btn-unpublish'
 
+    # These values allow the default text to be overridden if necessary
+    @optionProperty 'publishText'
+    @optionProperty 'unpublishText'
+
     tagName:   'button'
     className: 'btn'
 
@@ -55,7 +59,7 @@ define [
 
     addAriaLabel: (label) ->
       $label = @$el.find('span.screenreader-only.accessible_label')
-      $('<span class="screenreader-only accessible_label"></span>').appendTo(@$el) unless $label.length
+      $label = $('<span class="screenreader-only accessible_label"></span>').appendTo(@$el) unless $label.length
 
       $label.text label
       @$el.attr 'aria-label', label
@@ -134,14 +138,14 @@ define [
     renderPublish: ->
       @renderState
         text:        I18n.t 'buttons.publish', 'Publish'
-        label:       I18n.t 'buttons.publish_desc', 'Unpublished. Click to publish.'
+        label:       @publishText || I18n.t 'Unpublished. Click to publish.'
         buttonClass: @publishClass
         iconClass:   'icon-unpublish'
 
     renderPublished: ->
       @renderState
         text:        I18n.t 'buttons.published', 'Published'
-        label:       I18n.t 'buttons.published_desc', 'Published. Click to unpublish.'
+        label:       @unpublishText || I18n.t 'Published. Click to unpublish.'
         buttonClass: @publishedClass
         iconClass:   'icon-publish'
 

@@ -65,7 +65,7 @@ class Submission < ActiveRecord::Base
     :media_comment_id, :media_comment_type, :quiz_submission_id,
     :submission_comments_count, :has_rubric_assessment, :attempt,
     :context_code, :media_object_id, :turnitin_data, :has_admin_comment,
-    :cached_due_date
+    :cached_due_date, :graded_anonymously
   ].freeze
 
   EXPORTABLE_ASSOCIATIONS = [
@@ -158,6 +158,7 @@ class Submission < ActiveRecord::Base
   before_save :validate_single_submission, :infer_values
   before_save :prep_for_submitting_to_turnitin
   before_save :check_url_changed
+  before_save :check_reset_graded_anonymously
   before_create :cache_due_date
   after_save :touch_user
   after_save :touch_graders
@@ -486,7 +487,7 @@ class Submission < ActiveRecord::Base
   def touch_graders
     if self.assignment && self.user && self.assignment.context.is_a?(Course)
       connection.after_transaction_commit do
-        User.where(id: self.assignment.context.admins).touch_all
+        self.assignment.context.touch_admins_later
       end
     end
   end
@@ -577,7 +578,12 @@ class Submission < ActiveRecord::Base
     self.quiz_submission.reload if self.quiz_submission_id
     self.workflow_state = 'unsubmitted' if self.submitted? && !self.has_submission?
     self.workflow_state = 'graded' if self.grade && self.score && self.grade_matches_current_submission
-    self.workflow_state = 'pending_review' if self.submission_type == 'online_quiz' && self.quiz_submission.try(:latest_submitted_attempt).try(:pending_review?)
+
+    if self.submission_type == 'online_quiz' &&
+       self.quiz_submission.try(:latest_submitted_attempt).try(:pending_review?)
+      self.workflow_state = 'pending_review'
+    end
+
     if self.workflow_state_changed? && self.graded?
       self.graded_at = Time.now
     end
@@ -654,6 +660,18 @@ class Submission < ActiveRecord::Base
 
   def check_url_changed
     @url_changed = self.url && self.url_changed?
+    true
+  end
+
+  def graded_anonymously=(value)
+    @graded_anonymously_set = true
+    write_attribute :graded_anonymously, value
+  end
+
+  def check_reset_graded_anonymously
+    if grade_changed? && !@graded_anonymously_set
+      write_attribute :graded_anonymously, false
+    end
     true
   end
 
@@ -933,15 +951,21 @@ class Submission < ActiveRecord::Base
       end
     end
     pg ||= ModeratedGrading::NullProvisionalGrade.new(scorer.id, final)
-    pg
   end
 
   def find_or_create_provisional_grade!(scorer:, score: nil, grade: nil, force_save: false, final: false)
     ModeratedGrading::ProvisionalGrade.unique_constraint_retry do
+      if final && !self.assignment.context.grants_right?(scorer, :moderate_grades)
+        raise Assignment::GradeError.new("User not authorized to give final provisional grades")
+      end
+
       pg = final ? self.provisional_grades.final.first : self.provisional_grades.not_final.where(scorer_id: scorer).first
       unless pg
         unless final || self.assignment.student_needs_provisional_grade?(self.user)
           raise Assignment::GradeError.new("Student already has the maximum number of provisional grades")
+        end
+        if final &&  !self.provisional_grades.not_final.exists?
+          raise Assignment::GradeError.new("Cannot give a final mark for a student with no other provisional grades")
         end
         pg = self.provisional_grades.build
       end
@@ -971,7 +995,11 @@ class Submission < ActiveRecord::Base
       pg = find_or_create_provisional_grade!(scorer: opts[:author], final: opts.delete(:final))
       opts[:provisional_grade_id] = pg.id
     end
-    self.save! if self.new_record?
+    if self.new_record?
+      self.save!
+    else
+      self.touch
+    end
     valid_keys = [:comment, :author, :media_comment_id, :media_comment_type,
                   :group_comment_id, :assessment_request, :attachments,
                   :anonymous, :hidden, :recipient, :provisional_grade_id]
@@ -979,6 +1007,7 @@ class Submission < ActiveRecord::Base
       comment = submission_comments.create!(opts.slice(*valid_keys))
     end
     opts[:assessment_request].comment_added(comment) if opts[:assessment_request] && comment
+
     comment
   end
 
@@ -1010,6 +1039,10 @@ class Submission < ActiveRecord::Base
     self.graded_at = provisional_grade.graded_at
     self.grade_matches_current_submission = provisional_grade.grade_matches_current_submission
     self.readonly!
+  end
+
+  def provisional_grade_id
+    @provisional_grade_filter ? @provisional_grade_filter.id : nil
   end
 
   def submission_comments(*args)

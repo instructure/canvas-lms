@@ -333,14 +333,11 @@ define([
           isNew = true;
           $form.attr('action', $form.find(".add_context_module_url").attr('href'));
           $form.find(".completion_entry").hide();
-          $form.find(".require-sequential").children().hide();
           $form.attr('method', 'POST');
           $form.find(".submit_button").text(I18n.t('buttons.add', "Add Module"));
         } else {
           $form.attr('action', $module.find(".edit_module_link").attr('href'));
           $form.find(".completion_entry").show();
-          $form.find(".require-sequential").children().hide().end()
-          $form.find(".requirement-count-radio .ic-Radio").children().hide().end()
           $form.attr('method', 'PUT');
           $form.find(".submit_button").text(I18n.t('buttons.update', "Update Module"));
         }
@@ -382,14 +379,20 @@ define([
         // Set no items or criteria message plus diasable elements if there are no items or no requirements
         if (no_items) {
           $form.find(".completion_entry .no_items_message").show();
-
-        } else if ($module.find(".content .context_module_item .criterion.defined").length !== 0) {
-          $(".require-sequential").children().show();
-          $(".requirement-count-radio .ic-Radio").children().show();
+        }
+        if ($module.find(".content .context_module_item .criterion.defined").length !== 0) {
+          $(".requirement-count-radio").show();
+        } else {
+          $(".requirement-count-radio").hide();
         }
 
         var $requirementCount = $module.find('.pill li').data("requirement-count");
-        $requirementCount == 1 ? $('#context_module_requirement_count_1').prop('checked', true) : $('#context_module_requirement_count').prop('checked', true);
+        if ($requirementCount == 1) {
+          $('#context_module_requirement_count_1').prop('checked', true).change();
+        } else {
+          $('#context_module_requirement_count_').prop('checked', true).change();
+        }
+
 
         $module.fadeIn('fast', function() {
         });
@@ -739,13 +742,12 @@ define([
       updatePrerequisites($module, data.context_module.prerequisites);
 
       // Update requirement message pill
-      if (ENV.NC_OR_ENABLED) {
-        if (data.context_module.completion_requirements.length === 0) {
-          $module.find('.requirements_message').empty();
-        } else {
-          newPillMessage($module, data.context_module.requirement_count);
-        }
+      if (data.context_module.completion_requirements.length === 0) {
+        $module.find('.requirements_message').empty();
+      } else {
+        newPillMessage($module, data.context_module.requirement_count);
       }
+
       $module.find(".context_module_items .context_module_item")
         .removeClass('progression_requirement')
         .removeClass('min_score_requirement')
@@ -923,8 +925,7 @@ define([
       $option.slideDown();
       $form.find(".completion_entry .criteria_list").append($pre).show();
       $pre.slideDown();
-      $(".require-sequential").children().show();
-      $(".requirement-count-radio .ic-Radio").children().show();
+      $(".requirement-count-radio").show();
       $('#context_module_requirement_count_').change().focus();
     });
     $("#completion_criterion_option .id").change(function() {
@@ -954,6 +955,16 @@ define([
         $option.find(".points_possible_parent").hide();
       }
     });
+
+    $("#add_context_module_form .requirement-count-radio .ic-Radio input").change(function() {
+      if ($('#context_module_requirement_count_').prop('checked')) {
+        $('.require-sequential').show();
+      } else {
+        $('.require-sequential').hide();
+        $('#require_sequential_progress').prop('checked', false)
+      }
+    });
+
     $("#add_context_module_form .delete_criterion_link").click(function(event) {
       event.preventDefault();
       var $elem = $(this).closest(".criteria_list");
@@ -962,8 +973,7 @@ define([
         $(this).remove();
         // Hides radio button and checkbox if there are no requirements
         if ($elem.html().length === 0 && $requirement.length !== 0) {
-          $(".require-sequential").children().fadeOut("fast");
-          $(".requirement-count-radio .ic-Radio").children().fadeOut("fast");
+          $(".requirement-count-radio").fadeOut("fast");
         }
       })
     });
@@ -1312,7 +1322,6 @@ define([
       $("#context_modules").sortable({
         handle: '.reorder_module_link',
         helper: 'clone',
-        containment: '#context_modules_sortable_container',
         axis: 'y',
         update: modules.updateModulePositions
       });
@@ -1324,6 +1333,8 @@ define([
       var publishData = {
         moduleType: data.type,
         id: data.publishable_id,
+        moduleItemName: data.moduleItemName,
+        moduleItemId: data.id,
         moduleId: data.context_module_id,
         courseId: data.context_id,
         published: data.published,
@@ -1377,7 +1388,8 @@ define([
           model: file,
           togglePublishClassOn: $el.parents('.ig-row')[0],
           userCanManageFilesForContext: ENV.MODULE_FILE_PERMISSIONS.manage_files,
-          usageRightsRequiredForContext: ENV.MODULE_FILE_PERMISSIONS.usage_rights_required
+          usageRightsRequiredForContext: ENV.MODULE_FILE_PERMISSIONS.usage_rights_required,
+          fileName: file.displayName()
         }
 
         React.render(PublishCloud(props), $el[0]);
@@ -1390,13 +1402,26 @@ define([
         id: data.id,
         module_id: data.moduleId,
         module_item_id: data.moduleItemId,
+        module_item_name: data.moduleItemName,
         course_id: data.courseId,
         published: data.published,
         publishable: data.publishable,
         unpublishable: data.unpublishable
       });
 
-      var view = new PublishIconView({model: model, el: $el[0]});
+      var viewOptions = {
+        model: model,
+        el: $el[0]
+      };
+
+      if (data.publishMessage) {
+        viewOptions.publishText = data.publishMessage;
+      }
+      if (data.unpublishMessage) {
+        viewOptions.unpublishText = data.unpublishMessage;
+      }
+
+      var view = new PublishIconView(viewOptions);
       var row = $el.closest('.ig-row');
 
       if (data.published) { row.addClass('ig-published'); }

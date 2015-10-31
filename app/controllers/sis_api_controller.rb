@@ -10,10 +10,12 @@ class SisApiController < ApplicationController
   before_filter :require_published_course, only: [:sis_assignments]
 
   GRADE_EXPORT_NOT_ENABLED_ERROR = {
+    code: 'not_enabled',
     error: 'A SIS integration is not configured and the bulk SIS Grade Export feature is not enabled'.freeze
   }.freeze
 
   COURSE_NOT_PUBLISHED_ERROR = {
+    code: 'unpublished_course',
     error: 'Grade data is not available for non-published courses'.freeze
   }.freeze
 

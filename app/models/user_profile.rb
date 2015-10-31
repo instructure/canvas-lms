@@ -60,7 +60,7 @@ class UserProfile < ActiveRecord::Base
         opts[:root_account].context_external_tools.active.having_setting('user_navigation').each do |tool|
           @tabs << {
             :id => tool.asset_string,
-            :label => tool.label_for(:user_navigation, opts[:language]),
+            :label => tool.label_for(:user_navigation, opts[:language] || I18n.locale),
             :css_class => tool.asset_string,
             :href => :user_external_tool_path,
             :args => [user.id, tool.id]

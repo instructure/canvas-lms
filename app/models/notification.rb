@@ -176,16 +176,15 @@ class Notification < ActiveRecord::Base
   end
 
   # Return a hash with information for a related user option if one exists.
-  def related_user_setting(user)
-    case self.category
-      when 'Grading'
-        setting = {:name => :send_scores_in_emails, :value => user.preferences[:send_scores_in_emails],
-                   :label => t(:grading_notify_include_grade, 'Include scores when alerting about grade changes.')}
-      else
-        nil
+  def related_user_setting(user, root_account)
+    if self.category == 'Grading' && root_account.settings[:allow_sending_scores_in_emails] != false
+      {
+        name: :send_scores_in_emails,
+        value: user.preferences[:send_scores_in_emails],
+        label: t('Include scores when alerting about grade changes.'),
+        id: "cat_#{self.id}_option",
+      }
     end
-    setting[:id] = "cat_#{self.id}_option" if setting
-    setting
   end
 
   def default_frequency(_user = nil)

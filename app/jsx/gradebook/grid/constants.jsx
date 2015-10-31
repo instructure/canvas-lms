@@ -3,7 +3,6 @@ define([
 ], function (_) {
   var GRADEBOOK_CONSTANTS = {
     STUDENT_COLUMN_ID: 'student',
-    SECONDARY_COLUMN_ID: 'secondary_identifier',
     NOTES_COLUMN_ID: 'notes',
     PERCENT_COLUMN_ID: 'percent',
     PASS_FAIL_COLUMN_ID: 'pass_fail',
@@ -14,8 +13,8 @@ define([
     ASSIGNMENT_GROUP_COLUMN_ID: 'assignment_group',
     MOUNT_ELEMENT: document.getElementById('gradebook-grid-wrapper'),
     DEFAULT_LAYOUTS: {
-      headers: { width: 150, height: 50, flexGrow: 0, paddingAdjustment: 20 },
-      rows: { height: 38 }
+      headers: { width: 150, height: 40, flexGrow: 0, paddingAdjustment: 20 },
+      rows: { height: 36 }
     },
     SUBMISSION_RESPONSE_FIELDS: [
       'id',

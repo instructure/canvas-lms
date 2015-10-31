@@ -154,23 +154,13 @@ describe 'quizzes question banks' do
       get "/courses/#{@course.id}/quizzes/#{quiz.id}/edit"
       click_questions_tab
 
-      keep_trying_until do
-        f('.find_question_link').click
-        wait_for_ajaximations
-        expect(f('#find_question_dialog')).to be_displayed
-        expect(f('.select_all_link')).to be_displayed
-      end
-      expect(ffj('#find_question_dialog .bank:visible').size).to eq 1
+      expect(f('.find_question_link')).to be_nil
 
-      close_visible_dialog
       keep_trying_until do
         f('.add_question_group_link').click
         wait_for_ajaximations
-        expect(f('.find_bank_link')).to be_displayed
+        expect(f('.find_bank_link')).to be_nil
       end
-      f('.find_bank_link').click
-      wait_for_ajaximations
-      expect(ffj('#find_bank_dialog .bank:visible').size).to eq 1
     end
 
     it 'should create a question group from a question bank', priority: "1", test_id: 319907 do
@@ -248,6 +238,77 @@ describe 'quizzes question banks' do
 
       expect(f("#question_#{@quest1.id}")).to include_text new_name
       expect(f("#question_#{@quest1.id}")).to include_text new_question_text
+    end
+
+    it "should let teachers view question banks in a soft-concluded course (but not edit)" do
+      term = Account.default.enrollment_terms.create!
+      term.set_overrides(Account.default, 'TeacherEnrollment' => {:end_at => 3.days.ago})
+      @course.enrollment_term = term
+      @course.save!
+      @bank = @course.assessment_question_banks.create!(title: 'Test Bank')
+
+      get "/courses/#{@course.id}/quizzes"
+
+      view_banks_link = f('.view_question_banks')
+      expect(view_banks_link).to be_displayed
+
+      expect_new_page_load { view_banks_link.click }
+
+      expect(f('.add_bank_link')).to be_nil
+      expect(f('.edit_bank_link')).to be_nil
+      expect(f('.delete_bank_link')).to be_nil
+
+      view_bank_link = f("#question_bank_#{@bank.id} a.title")
+      expect(view_bank_link).to be_displayed
+
+      expect_new_page_load { view_bank_link.click }
+    end
+
+    it "should let account admins view question banks without :manage_assignments (but not edit)" do
+      user(:active_all => true)
+      user_session(@user)
+      @role = custom_account_role 'weakling', :account => @course.account
+      @course.account.role_overrides.create!(:permission => 'read_course_content', :enabled => true, :role => @role)
+      @course.account.role_overrides.create!(:permission => 'read_question_banks', :enabled => true, :role => @role)
+      @course.account.account_users.create!(user: @user, role: @role)
+
+      @bank = @course.assessment_question_banks.create!(title: 'Test Bank')
+
+      get "/courses/#{@course.id}/quizzes"
+
+      view_banks_link = f('.view_question_banks')
+      expect(view_banks_link).to be_displayed
+
+      expect_new_page_load { view_banks_link.click }
+
+      expect(f('.add_bank_link')).to be_nil
+      expect(f('.edit_bank_link')).to be_nil
+      expect(f('.delete_bank_link')).to be_nil
+
+      view_bank_link = f("#question_bank_#{@bank.id} a.title")
+      expect(view_bank_link).to be_displayed
+
+      expect_new_page_load { view_bank_link.click }
+    end
+
+    it "should lock out teachers when :read_question_banks is disabled" do
+      term = Account.default.enrollment_terms.create!
+      term.set_overrides(Account.default, 'TeacherEnrollment' => {:end_at => 3.days.ago})
+      @course.enrollment_term = term
+      @course.save!
+
+      @bank = @course.assessment_question_banks.create!(title: 'Test Bank')
+
+      Account.default.role_overrides.create(:permission => 'read_question_banks', :role => teacher_role, :enabled => false)
+
+      get "/courses/#{@course.id}/quizzes"
+      expect(f('.view_question_banks')).to be_nil
+
+      get "/courses/#{@course.id}/question_banks"
+      expect(f('#unauthorized_message')).to be_displayed
+
+      get "/courses/#{@course.id}/question_banks/#{@bank.id}"
+      expect(f('#unauthorized_message')).to be_displayed
     end
   end
 end

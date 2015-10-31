@@ -121,6 +121,39 @@ describe Submission do
     @submission.save!
   end
 
+  context "#graded_anonymously" do
+    it "saves when grade changed and set explicitly" do
+      submission_spec_model
+      expect(@submission.graded_anonymously).to be_falsey
+      @submission.score = 42
+      @submission.graded_anonymously = true
+      @submission.save!
+      expect(@submission.graded_anonymously).to be_truthy
+      @submission.reload
+      expect(@submission.graded_anonymously).to be_truthy
+    end
+
+    it "retains its value when grade does not change" do
+      submission_spec_model(graded_anonymously: true, score: 3, grade: "3")
+      @submission = Submission.find(@submission.id) # need new model object
+      expect(@submission.graded_anonymously).to be_truthy
+      @submission.body = 'test body'
+      @submission.save!
+      @submission.reload
+      expect(@submission.graded_anonymously).to be_truthy
+    end
+
+    it "resets when grade changed and not set explicitly" do
+      submission_spec_model(graded_anonymously: true, score: 3, grade: "3")
+      @submission = Submission.find(@submission.id) # need new model object
+      expect(@submission.graded_anonymously).to be_truthy
+      @submission.score = 42
+      @submission.save!
+      @submission.reload
+      expect(@submission.graded_anonymously).to be_falsey
+    end
+  end
+
   context "Discussion Topic" do
     it "should use correct date for its submitted_at value" do
       course_with_student_logged_in(:active_all => true)

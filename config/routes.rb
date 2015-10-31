@@ -8,6 +8,8 @@ Dir["{gems,vendor}/plugins/*/config/pre_routes.rb"].each { |pre_routes|
 CanvasRails::Application.routes.draw do
   resources :submission_comments, only: :destroy
 
+  resources :epub_exports, only: [:index]
+
   get 'inbox' => 'context#inbox'
   get 'oauth/redirect_proxy' => 'oauth_proxy#redirect_proxy'
 
@@ -961,6 +963,11 @@ CanvasRails::Application.routes.draw do
       get 'groups/:group_id/assignments/:assignment_id/override', action: :group_alias
     end
 
+    scope(controller: :moderation_set) do
+      get 'courses/:course_id/assignments/:assignment_id/moderated_students', action: :index, as: :moderated_students
+      post 'courses/:course_id/assignments/:assignment_id/moderated_students', action: :create, as: :add_moderated_students
+    end
+
     scope(controller: :submissions_api) do
       [%w(course course), %w(section course_section)].each do |(context, path_prefix)|
         post "#{context.pluralize}/:#{context}_id/submissions/update_grades", action: :bulk_update
@@ -975,8 +982,13 @@ CanvasRails::Application.routes.draw do
         post "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/update_grades", action: :bulk_update
       end
       get "courses/:course_id/assignments/:assignment_id/gradeable_students", action: :gradeable_students, as: "course_assignment_gradeable_students"
-      post "courses/:course_id/assignments/:assignment_id/publish_provisional_grades", action: :publish_provisional_grades, as: 'publish_provisional_grades'
-      put "courses/:course_id/assignments/:assignment_id/select_provisional_grade/:provisional_grade_id", action: :select_provisional_grade
+    end
+
+    scope(controller: :provisional_grades) do
+      get "courses/:course_id/assignments/:assignment_id/provisional_grades/status", action: :status, as: "course_assignment_provisional_status"
+      post "courses/:course_id/assignments/:assignment_id/provisional_grades/publish", action: :publish, as: 'publish_provisional_grades'
+      put "courses/:course_id/assignments/:assignment_id/provisional_grades/:provisional_grade_id/select", action: :select, as: 'select_provisional_grade'
+      post "courses/:course_id/assignments/:assignment_id/provisional_grades/:provisional_grade_id/copy_to_final_mark", action: :copy_to_final_mark, as: 'copy_to_final_mark'
     end
 
     post '/courses/:course_id/assignments/:assignment_id/submissions/:user_id/comments/files', action: :create_file, controller: :submission_comments_api
@@ -1107,6 +1119,7 @@ CanvasRails::Application.routes.draw do
 
       delete 'users/self/todo/:asset_string/:purpose', action: :ignore_item, as: 'users_todo_ignore'
       post 'accounts/:account_id/users', action: :create
+      post 'accounts/:account_id/self_registration', action: :create_self_registered_user
       get 'accounts/:account_id/users', action: :index, as: 'account_users'
 
       get 'users/:id', action: :api_show
@@ -1670,6 +1683,18 @@ CanvasRails::Application.routes.draw do
         get "#{prefix}/:id", action: :show
       end
       get "courses/:course_id/content_list", action: :content_list, as: "course_content_list"
+    end
+
+    scope(controller: :epub_exports) do
+      get 'courses/:course_id/epub_exports/:id', {
+        action: :show
+      }
+      get 'epub_exports', {
+        action: :index
+      }
+      post 'courses/:course_id/epub_exports', {
+        action: :create
+      }
     end
 
     scope(controller: :grading_standards_api) do

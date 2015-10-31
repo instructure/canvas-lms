@@ -1081,6 +1081,7 @@ class Assignment < ActiveRecord::Base
           submission.grader = grader
           submission.grade = grade
           submission.score = score
+          submission.graded_anonymously = opts[:graded_anonymously] if opts.key?(:graded_anonymously)
           submission.excused = false if score.present?
           did_grade = true if score.present? || submission.excused?
         end
@@ -1096,6 +1097,9 @@ class Assignment < ActiveRecord::Base
             submission.grade_matches_current_submission) &&
             ((submission.score && submission.grade) || submission.excused?)
           submission.workflow_state = "graded"
+          if submission.quiz_submission
+            submission.quiz_submission.complete
+          end
         end
         submission.group = group
         submission.graded_at = Time.zone.now if did_grade
@@ -1179,7 +1183,7 @@ class Assignment < ActiveRecord::Base
       if user
         sub = self.find_or_create_submission(user)
         if opts[:provisional_grader]
-          [sub.find_or_create_provisional_grade!(:scorer => opts[:provisional_grader]), user]
+          [sub.find_or_create_provisional_grade!(:scorer => opts[:provisional_grader], :final => opts[:final]), user]
         else
           [sub, user]
         end
@@ -1343,12 +1347,12 @@ class Assignment < ActiveRecord::Base
     pg_count < (in_moderation_set ? 2 : 1)
   end
 
-  def speed_grader_json(user, avatars: false, grading_role: :grader, crocodoc_ids: nil)
+  def speed_grader_json(user, avatars: false, grading_role: :grader)
     Attachment.skip_thumbnails = true
     submission_fields = [:user_id, :id, :submitted_at, :workflow_state,
                          :grade, :grade_matches_current_submission,
                          :graded_at, :turnitin_data, :submission_type, :score,
-                         :assignment_id, :submission_comments, :excused].freeze
+                         :assignment_id, :submission_comments, :excused, :updated_at].freeze
 
     comment_fields = [:comment, :id, :author_name, :created_at, :author_id,
                       :media_comment_type, :media_comment_id,
@@ -1401,10 +1405,6 @@ class Assignment < ActiveRecord::Base
       json[:rubric_assessments] = rubric_assmnts.select{|ra| ra.user_id == u.id}.
         as_json(:methods => [:assessor_name], :include_root => false)
 
-      if all_provisional_rubric_assmnts
-        json[:provisional_rubric_assessments] = all_provisional_rubric_assmnts.select{|ra| ra.user_id == u.id}.
-          as_json(:methods => [:assessor_name], :include_root => false)
-      end
       json
     end
 
@@ -1422,15 +1422,19 @@ class Assignment < ActiveRecord::Base
     when :moderator
       self.provisional_grades.order(:id).to_a.group_by(&:submission_id)
     when :provisional_grader
-      self.provisional_grades.where(:scorer_id => user).order(:id).to_a.group_by(&:submission_id)
+      self.provisional_grades.not_final.where(:scorer_id => user).order(:id).to_a.group_by(&:submission_id)
     else
       {}
     end
+
+    preloaded_prov_selections = grading_role == :moderator ? self.moderated_grading_selections.index_by(&:student_id) : []
 
     res[:too_many_quiz_submissions] = too_many = too_many_qs_versions?(submissions)
     qs_versions = quiz_submission_versions(submissions, too_many)
 
     enrollment_types_by_id = enrollments.inject({}){ |h, e| h[e.user_id] ||= e.type; h }
+
+    crocodoc_user_id = is_provisional && user.crocodoc_id!
 
     res[:submissions] = submissions.map do |sub|
       json = sub.as_json(:include_root => false,
@@ -1451,6 +1455,8 @@ class Assignment < ActiveRecord::Base
           :only => [:mime_class, :comment_id, :id, :submitter_id ]
       )}
 
+      sub_attachments = []
+
       json['submission_history'] = if json['submission_history'] && (quiz.nil? || too_many)
                                      json['submission_history'].map do |version|
                                        version.as_json(
@@ -1459,12 +1465,15 @@ class Assignment < ActiveRecord::Base
                                        ).tap do |version_json|
                                          if version_json['submission'] && version_json['submission']['versioned_attachments']
                                            version_json['submission']['versioned_attachments'].map! do |a|
+                                             if grading_role == :moderator
+                                                sub_attachments << a # we'll use to create custom crocodoc urls for each prov grade
+                                             end
                                              a.as_json(
                                                :only => attachment_fields,
                                                :methods => [:view_inline_ping_url]
                                              ).tap { |json|
                                                json[:attachment][:canvadoc_url] = a.canvadoc_url(user)
-                                               json[:attachment][:crocodoc_url] = a.crocodoc_url(user, crocodoc_ids)
+                                               json[:attachment][:crocodoc_url] =  a.crocodoc_url(user, [crocodoc_user_id])
                                                json[:attachment][:submitted_to_crocodoc] = a.crocodoc_document.present?
                                              }
                                            end
@@ -1485,11 +1494,34 @@ class Assignment < ActiveRecord::Base
                                    end
 
       if grading_role == :moderator
-        json['provisional_grades'] = (preloaded_prov_grades[sub.id] || []).map do |pg|
-          pg.grade_attributes.tap do |json|
-            json[:submission_comments] = pg.submission_comments.as_json(:include_root => false,
-                                                                        :methods => avatar_methods,
-                                                                        :only => comment_fields)
+        pgs = preloaded_prov_grades[sub.id] || []
+        selection = preloaded_prov_selections[sub.user.id]
+        unless pgs.count == 0 || (pgs.count == 1 && pgs.first.scorer_id == user.id)
+          json['provisional_grades'] = []
+          pgs.each do |pg|
+            pg_json = pg.grade_attributes.tap do |json|
+              json[:rubric_assessments] = all_provisional_rubric_assmnts.select{|ra| ra.artifact_id == pg.id}.
+                as_json(:methods => [:assessor_name], :include_root => false)
+
+              json[:selected] = !!(selection && selection.selected_provisional_grade_id == pg.id)
+
+              crocodoc_urls = []
+              sub_attachments.each do |a|
+                crocodoc_urls << {:attachment_id => a.id,
+                  :crocodoc_url => a.crocodoc_available? && a.crocodoc_url(user, [pg.scorer.crocodoc_id!]) }
+              end
+              json[:crocodoc_urls] = crocodoc_urls
+              json[:readonly] = !pg.final && (pg.scorer_id != user.id)
+              json[:submission_comments] = pg.submission_comments.as_json(:include_root => false,
+                                                                          :methods => avatar_methods,
+                                                                          :only => comment_fields)
+            end
+
+            if pg.final
+              json['final_provisional_grade'] = pg_json
+            else
+              json['provisional_grades'] << pg_json
+            end
           end
         end
       end
@@ -1616,7 +1648,7 @@ class Assignment < ActiveRecord::Base
     if opts[:provisional_grader]
       scope = scope.for_provisional_grades.where(:assessor_id => user.id)
     elsif opts[:provisional_moderator]
-      scope = scope.for_provisional_grades.where('assessor_id <> ?', user.id)
+      scope = scope.for_provisional_grades
     else
       scope = scope.for_submissions
       unless self.rubric_association.grants_any_right?(user, :manage, :view_rubric_assessments)

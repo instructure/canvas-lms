@@ -17,7 +17,7 @@ describe "plugins ui" do
 
     multiple_accounts_select
     expect_new_page_load { submit_form("#new_plugin_setting") }
-    expect(PluginSetting.all.count).to eq 1
+    expect(PluginSetting.all.map(&:name)).to eq(["etherpad"])
     PluginSetting.first.tap do |ps|
       expect(ps.name).to eq "etherpad"
       expect(ps.disabled).to be_truthy
@@ -32,7 +32,7 @@ describe "plugins ui" do
     multiple_accounts_select
     f('#plugin_setting_disabled').click
     expect_new_page_load { submit_form("#new_plugin_setting") }
-    expect(PluginSetting.all.count).to eq 1
+    expect(PluginSetting.all.map(&:name)).to eq(["etherpad"])
     PluginSetting.first.tap do |ps|
       expect(ps.name).to eq "etherpad"
       expect(ps.disabled).to be_falsey

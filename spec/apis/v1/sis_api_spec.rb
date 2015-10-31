@@ -55,6 +55,7 @@ describe SisApiController, type: :request do
       it 'requires :bulk_sis_grade_export feature to be enabled or post_grades tool to be installed' do
         get "/api/sis/accounts/#{context.id}/assignments", account_id: context.id
         expect(response.status).to eq 400
+        expect(json_parse).to include('code' => 'not_enabled')
       end
 
       shared_examples 'account sis assignments api' do
@@ -169,6 +170,43 @@ describe SisApiController, type: :request do
       end
     end
 
+    context 'for an unpublished course' do
+      before :once do
+        course
+        account_admin_user(account: @course.root_account, active_all: true)
+      end
+
+      let(:context) { @course }
+
+      before do
+        user_session(@user)
+      end
+
+      shared_examples 'unpublished course sis assignments api' do
+        it 'requires the course to be published' do
+          get "/api/sis/courses/#{@course.id}/assignments", course_id: @course.id
+          expect(response.status).to eq 400
+          expect(json_parse).to include('code' => 'unpublished_course')
+        end
+      end
+
+      context 'with :bulk_sis_grade_export feature enabled' do
+        before do
+          enable_bulk_grade_export
+        end
+
+        include_examples 'unpublished course sis assignments api'
+      end
+
+      context 'with a post_grades tool installed' do
+        before do
+          install_post_grades_tool
+        end
+
+        include_examples 'unpublished course sis assignments api'
+      end
+    end
+
     context 'for a published course' do
       before :once do
         course(active_all: true)
@@ -220,6 +258,7 @@ describe SisApiController, type: :request do
       it 'requires :bulk_sis_grade_export feature to be enabled or post_grades tool to be installed' do
         get "/api/sis/courses/#{@course.id}/assignments", course_id: @course.id
         expect(response.status).to eq 400
+        expect(json_parse).to include('code' => 'not_enabled')
       end
 
       shared_examples 'course sis assignments api' do

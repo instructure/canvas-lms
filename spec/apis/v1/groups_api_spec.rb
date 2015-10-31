@@ -678,6 +678,14 @@ describe "Groups API", type: :request do
       expect(@membership.workflow_state).to eq "deleted"
     end
 
+    it "should allow leaving a group using sis id using users/:user_id endpoint" do
+      @user = @member
+      @member.pseudonyms.first.update_attribute(:sis_user_id, 'my_sis_id')
+      api_call(:delete, "#{@alternate_memberships_path}/sis_user_id:my_sis_id", @memberships_path_options.merge(:group_id => @community.to_param, :user_id => 'sis_user_id:my_sis_id', :action => "destroy"))
+      @membership = GroupMembership.where(:user_id => @user, :group_id => @community).first
+      expect(@membership.workflow_state).to eq "deleted"
+    end
+
     it "should allow a moderator to invite people to a group" do
       @user = @moderator
       invitees = { :invitees => ["leonard@example.com", "sheldon@example.com"] }

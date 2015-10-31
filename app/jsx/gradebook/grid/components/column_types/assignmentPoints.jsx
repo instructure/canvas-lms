@@ -3,8 +3,10 @@ define([
   'react',
   '../../mixins/gradeCellMixin',
   '../../mixins/standardRenderMixin',
+  '../../mixins/standardGradeInputMixin',
   '../../mixins/standardCellFocusMixin'
-], function (React, GradeCellMixin, StandardRenderMixin, StandardCellFocusMixin) {
+], function (React, GradeCellMixin, StandardRenderMixin, StandardGradeInputMixin,
+             StandardCellFocusMixin) {
   var AssignmentPoints = React.createClass({
     mixins: [
       GradeCellMixin,
@@ -14,14 +16,6 @@ define([
 
     handleOnChange(event) {
       this.setState({gradeToPost: event.target.value});
-    },
-
-    renderViewGrade() {
-      return (
-        <div ref="grade">
-          {this.getDisplayGrade()}
-        </div>
-      );
     },
 
     renderEditGrade() {
@@ -38,12 +32,21 @@ define([
           <div className="out-of-float out-of-points">
             <span className="divider">/</span>
             <span ref="pointsPossible">
-              {this.props.cellData.points_possible}
+              {this.props.columnData.assignment.points_possible}
             </span>
           </div>
         </div>
       );
+    },
+
+    renderViewGrade() {
+      return (
+        <div ref="grade">
+          {this.getDisplayGrade()}
+        </div>
+      );
     }
+
   });
 
   return AssignmentPoints;

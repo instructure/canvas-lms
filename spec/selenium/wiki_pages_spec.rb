@@ -455,6 +455,17 @@ describe "Wiki Pages" do
       expect(lock_explanation).to include "This page is part of the module the_mod and hasn't been unlocked yet"
       expect(lock_explanation).to match /foo\s+must view the page/
     end
+
+    it "should not show the show all pages link if the pages tab is disabled" do
+      @course.tab_configuration = [ { :id => Course::TAB_PAGES, :hidden => true } ]
+      @course.save!
+
+      foo = @course.wiki.wiki_pages.create! title: 'foo'
+      get "/courses/#{@course.id}/pages/foo"
+
+      expect(f('.view_all_pages')).to be_nil
+
+    end
   end
 
   context "Permissions" do

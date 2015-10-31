@@ -32,8 +32,8 @@ class Quizzes::QuizStatistics::ItemAnalysis < Quizzes::QuizStatistics::Report
     "quiz-item-analysis-#{Time.now.to_i}.csv"
   end
 
-  def generate(_legacy=true)
-    stats = summary_stats_for_quiz
+  def generate(_legacy=true, options ={})
+    stats = summary_stats_for_quiz(options)
     stats.map do |item|
       question_item_analysis = {
         question_id: item.question[:id],
@@ -131,7 +131,7 @@ class Quizzes::QuizStatistics::ItemAnalysis < Quizzes::QuizStatistics::Report
 
   private
 
-  def summary_stats_for_quiz
-    @summary_stats ||= Quizzes::QuizStatistics::ItemAnalysis::Summary.new(quiz)
+  def summary_stats_for_quiz(options = {})
+    @summary_stats ||= Quizzes::QuizStatistics::ItemAnalysis::Summary.new(quiz, {}, options)
   end
 end

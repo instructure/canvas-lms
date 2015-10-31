@@ -23,11 +23,15 @@ def enter_school
   wait_true(timeout: 10, interval: 0.250){ button_exact('Log In') }
 end
 
-def login_mobile(username, password)
-  # 1st login view
+def provide_credentials(username, password)
   first_textfield.send_keys(username)
   last_textfield.send_keys(password)
-  button('Log In').click
+  button('Log in').click
+end
+
+def login_mobile(username, password)
+  # 1st login view
+  provide_credentials(username, password)
 
   # blocks until 2nd login view loads
   wait_true(timeout: 10, interval: 0.250){ find_ele_by_attr('tags', 'android.view.View', 'name', /Cancel/) }
