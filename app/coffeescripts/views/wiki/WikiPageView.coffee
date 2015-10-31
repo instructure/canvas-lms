@@ -38,6 +38,7 @@ define [
     @optionProperty 'course_id'
     @optionProperty 'course_home'
     @optionProperty 'course_title'
+    @optionProperty 'display_show_all_pages'
 
     initialize: ->
       @model.on 'change', => @render()
