@@ -761,7 +761,13 @@ class Message < ActiveRecord::Base
           raise "International SMS is currently disabled for this user's account"
         end
 
-        Canvas::Twilio.deliver(to, body) if Canvas::Twilio.enabled?
+        if Canvas::Twilio.enabled?
+          Canvas::Twilio.deliver(
+            to,
+            body,
+            from_recipient_country: user.account.feature_enabled?(:international_sms_from_recipient_country)
+          )
+        end
       rescue StandardError => e
         logger.error "Exception: #{e.class}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
         Canvas::Errors.capture(
