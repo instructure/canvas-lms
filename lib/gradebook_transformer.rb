@@ -18,9 +18,8 @@
 
 module GradebookTransformer
   private
-  def select_in_grading_period(assignments, course, grading_period_id)
-    if course.feature_enabled?(:multiple_grading_periods) && grading_period_id != "0"
-      grading_period = GradingPeriod.context_find course, grading_period_id
+  def select_in_grading_period(assignments, course, grading_period)
+    if grading_period && course.feature_enabled?(:multiple_grading_periods)
       grading_period.assignments(assignments)
     else
       assignments
