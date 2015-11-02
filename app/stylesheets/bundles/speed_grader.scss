@@ -714,6 +714,14 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
         right: 1px;
         text-indent: -9999px;
       }
+      a.display_name {
+        display: block;
+        margin-right: 40px;
+        overflow-wrap: break-word;
+        word-wrap: break-word;
+        word-break: break-all;
+        word-break: break-word;
+      }
       &:hover {
         background-color: #DCECFB;
         .submission-file-download {
