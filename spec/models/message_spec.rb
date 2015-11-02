@@ -112,7 +112,7 @@ describe Message do
         expect(msg.html_body).not_to include 'badly-named-course'
         expect(msg.html_body).to include 'student-course-nick'
         expect(@course.name).to eq 'badly-named-course'
-        
+
         msg = generate_message(message, :email, asset, :user => @teacher)
         expect(msg.html_body).to include 'badly-named-course'
         expect(msg.html_body).not_to include 'student-course-nick'
@@ -264,7 +264,7 @@ describe Message do
           path_type: 'sms',
           user: @user
         )
-        Canvas::Twilio.expects(:deliver).with('+18015550100', @message.body)
+        Canvas::Twilio.expects(:deliver).with('+18015550100', @message.body, from_recipient_country: false)
         @message.expects(:deliver_via_email).never
         @message.deliver
       end
@@ -325,6 +325,37 @@ describe Message do
         @message.deliver
         @message.reload
         expect(@message.workflow_state).to eq('cancelled')
+      end
+
+      it 'sends from recipient country when the :international_sms_from_recipient_country feature flag is enabled' do
+        @user.account.enable_feature!(:international_sms_from_recipient_country)
+        message_model(
+          dispatch_at: Time.now,
+          workflow_state: 'staged',
+          to: '+18015550100',
+          updated_at: Time.now.utc - 11.minutes,
+          path_type: 'sms',
+          user: @user
+        )
+        Canvas::Twilio.expects(:deliver).with('+18015550100', anything, from_recipient_country: true)
+        @message.deliver
+        @message.reload
+        expect(@message.workflow_state).to eq('sent')
+      end
+
+      it 'does not send from recipient country when the :international_sms_from_recipient_country feature flag is disabled' do
+        message_model(
+          dispatch_at: Time.now,
+          workflow_state: 'staged',
+          to: '+18015550100',
+          updated_at: Time.now.utc - 11.minutes,
+          path_type: 'sms',
+          user: @user
+        )
+        Canvas::Twilio.expects(:deliver).with('+18015550100', anything, from_recipient_country: false)
+        @message.deliver
+        @message.reload
+        expect(@message.workflow_state).to eq('sent')
       end
 
       it "doesn't send when the :international_sms feature flag is disabled" do
