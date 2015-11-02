@@ -15,7 +15,7 @@ describe 'dashcards' do
       Account.default.enable_feature! :use_new_styles
     end
 
-    it "should show the toggle button for dashcard in new UI", priority: "1", test_id: 222506 do
+    it 'should show the toggle button for dashcard in new UI', priority: "1", test_id: 222506 do
       get '/'
       # verify features of new UI
       expect(f('#application.ic-app')).to be_present
@@ -24,7 +24,7 @@ describe 'dashcards' do
       expect(f('.ic-Super-toggle__switch')).to be_present
     end
 
-    it "should toggle dashboard based on the toggle switch", priority: "1", test_id: 222507 do
+    it 'should toggle dashboard based on the toggle switch', priority: "1", test_id: 222507 do
       get '/'
       expect(f('.ic-Super-toggle__switch')).to be_present
       # toggle switch to right
@@ -75,6 +75,115 @@ describe 'dashcards' do
       get '/'
       f('.ic-DashboardCard__header-button').click
       expect(f('.ColorPicker__Container')).to be_displayed
+    end
+
+    it 'should display dashcard icons for course contents', priority: "1", test_id: 222508 do
+      # create discussion, announcement, discussion and files as these 4 icons need to be displayed
+      @course.discussion_topics.create!(title: 'discussion 1', message: 'This is a message.')
+      @course.assignments.create!(title: 'assignment 1', name: 'assignment 1')
+      create_announcement
+      add_file(fixture_file_upload('files/example.pdf', 'application/pdf'), @course, 'example.pdf')
+      get '/'
+
+      expect(f('a.announcements')).to be_present
+      expect(f('a.assignments')).to be_present
+      expect(f('a.discussions')).to be_present
+      expect(f('a.files')).to be_present
+    end
+
+    context "course name and code display" do
+      before :each do
+        @course1 = course_model
+        @course1.name = 'Test Course Test Course Test Course Test Course Test Course Test Course Test Course Test' \
+                        'Course Test Course Test Course Test Course Test Course Test Course Test Course Test Course'\
+                        'Test Course Test Course Test Course Test Course Te'
+        @course1.offer!
+        @course1.save!
+        enrollment = student_in_course(course: @course1, user: @student)
+        enrollment.accept!
+      end
+
+      it 'should not display course code if the name is too long', priority: "1", test_id: 238191 do
+        @course1.course_code = '001'
+        @course1.save!
+        get '/'
+        expect(f('.ic-DashboardCard__header-subtitle').text).to be_blank
+      end
+
+      it 'should display special characters in a course title', priority: "1", test_id: 238192 do
+        @course1.name = '(/*-+_@&$#%)"Course 1"æøåñó?äçíì[{c}]<strong>stuff</strong> )'
+        @course1.save!
+        get '/'
+        expect(f('.ic-DashboardCard__header-title').text).to eq(@course1.name)
+      end
+
+      it 'should display special characters in course code', priority: "1", test_id: 240008 do
+        # code is not displayed if the course name is too long
+        @course1.name = 'test'
+        @course1.course_code = '(/*-+_@&$#%)"Course 1"[{c}]<strong>stuff</strong> )'
+        @course1.save!
+        get '/'
+        # as course codes are always displayed in upper case
+        expect(f('.ic-DashboardCard__header-subtitle').text).to eq(@course1.course_code.upcase)
+      end
+    end
+
+    context "dashcard custom color calendar" do
+      before :each do
+        # create another course to ensure the color matches to the right course
+        @course1 = course_model
+        @course1.name = 'Test Course'
+        @course1.offer!
+        @course1.save!
+        enrollment = student_in_course(course: @course1, user: @student)
+        enrollment.accept!
+      end
+
+      it 'should customize color by selecting from color palet in the calendar page', priority: "1", test_id: 239994 do
+        select_color_pallet_from_calendar_page
+
+        old_color = fj('.ColorPicker__CustomInputContainer .ColorPicker__ColorPreview').attribute(:title)
+
+        expect(f('.ColorPicker__Container')).to be_displayed
+        f('.ColorPicker__Container .ColorPicker__ColorBlock:nth-of-type(7)').click
+        wait_for_ajaximations
+        new_color =  fj('.ColorPicker__CustomInputContainer .ColorPicker__ColorPreview').attribute(:title)
+
+        # make sure that we choose a new color for background
+        if old_color == new_color
+          f('.ColorPicker__Container .ColorPicker__ColorBlock:nth-of-type(8)').click
+          wait_for_ajaximations
+        end
+
+        f('.ColorPicker__Container .Button--primary').click
+        rgb = convert_hex_to_rgb_color(new_color)
+        get '/'
+        keep_trying_until(5) do
+          expect(fj('.ic-DashboardCard__background').attribute(:style)).to include_text(rgb)
+          refresh_page
+          expect(fj('.ic-DashboardCard__background').attribute(:style)).to include_text(rgb)
+          expect(f('.ic-DashboardCard__header-title').text).to include(@course1.name)
+        end
+      end
+
+      it 'should customize color by using hex code in calendar page', priority: "1", test_id: 239993 do
+        select_color_pallet_from_calendar_page
+
+        hex = random_hex_color
+        replace_content(fj('#ColorPickerCustomInput'), hex)
+        f('.ColorPicker__Container .Button--primary').click
+        wait_for_ajaximations
+        get '/'
+        keep_trying_until(5) do
+          if fj('.ic-DashboardCard__background').attribute(:style).include?('rgb')
+            rgb = convert_hex_to_rgb_color(hex)
+            expect(fj('.ic-DashboardCard__background').attribute(:style)).to include_text(rgb)
+          else
+            expect(fj('.ic-DashboardCard__background').attribute(:style)).to include_text(hex)
+          end
+          expect(f('.ic-DashboardCard__header-title').text).to include(@course1.name)
+        end
+      end
     end
 
     context "dashcard color picker" do
@@ -173,5 +282,13 @@ describe 'dashcards' do
       # need not check for announcements, assignments and files as we have not created any
       expect(f(".ic-DashboardCard__action-container .discussions")).to be_nil
     end
+  end
+
+  def select_color_pallet_from_calendar_page
+    get '/calendar'
+    fail 'Not the right course' unless f('#context-list li:nth-of-type(2)').text.include? @course1.name
+    f('#context-list li:nth-of-type(2) .ContextList__MoreBtn').click
+    wait_for_ajaximations
+    expect(f('.ColorPicker__Container')).to be_displayed
   end
 end
