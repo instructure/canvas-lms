@@ -289,6 +289,7 @@ describe "calendar2" do
         end
 
         it "should allow editing via More Options", priority: "1", test_id: 420724 do
+          skip('final load_agenda_view is fragile, needs analysis')
           test_date = 2.days.from_now
           test_title = 'Test Title'
           test_description = 'New Description'
