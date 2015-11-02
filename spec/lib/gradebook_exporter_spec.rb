@@ -27,8 +27,12 @@ describe GradebookExporter do
 
   describe "#to_csv" do
     let(:course)    { @course }
+
+    def exporter(opts = {})
+      GradebookExporter.new(course, @teacher, opts)
+    end
+
     describe "default output with blank course" do
-      let(:exporter)  { GradebookExporter.new(course, @teacher) }
       subject(:csv)   { exporter.to_csv }
 
       it "produces a String" do
@@ -57,20 +61,31 @@ describe GradebookExporter do
     end
 
     context "a course has assignments with due dates" do
+      before(:once) do
+        @no_due_date_assignment = assignments.create! title: "no due date",
+          points_possible: 10
+
+        @past_assignment = assignments.create! due_at: 5.weeks.ago,
+          title: "past",
+          points_possible: 10
+
+        @current_assignment = assignments.create! due_at: 1.weeks.from_now,
+          title: "current",
+          points_possible: 10
+
+        @future_assignment = assignments.create! due_at: 8.weeks.from_now,
+          title: "future",
+          points_possible: 10
+
+        student_in_course active_all: true
+
+        @no_due_date_assignment.grade_student @student, grade: 1
+        @past_assignment.grade_student @student, grade: 2
+        @current_assignment.grade_student @student, grade: 3
+        @future_assignment.grade_student @student, grade: 4
+      end
+
       let(:assignments) { course.assignments }
-
-      let!(:no_due_date_assignment) { assignments.create title: "no due date" }
-      let!(:past_assignment) do
-        assignments.create due_at: 5.weeks.ago, title: "past"
-      end
-
-      let!(:current_assignment) do
-        assignments.create due_at: 1.weeks.from_now, title: "current"
-      end
-
-      let!(:future_assignment) do
-        assignments.create due_at: 8.weeks.from_now, title: "future"
-      end
 
       let!(:group) do
         course.grading_period_groups.create!
@@ -84,7 +99,6 @@ describe GradebookExporter do
         }
 
         group.grading_periods.create! args
-
       end
 
       let!(:last_period) do
@@ -97,49 +111,53 @@ describe GradebookExporter do
         group.grading_periods.create! args
       end
 
-      let(:csv)     { GradebookExporter.new(course, @teacher, grading_period_id: last_period.id).to_csv }
-      let(:headers) { CSV.parse(csv, headers: true).headers }
-
-      let(:csv_id_0)     { GradebookExporter.new(course, @teacher, grading_period_id: "0").to_csv }
-      let(:headers_id_0) { CSV.parse(csv_id_0, headers: true).headers }
-
-      let(:csv_first_period) { GradebookExporter.new(course, @teacher, grading_period_id: first_period.id).to_csv }
-      let(:headers_first_period) {CSV.parse(csv_first_period, headers: true).headers }
+      let(:csv)     { exporter(grading_period_id: @grading_period_id).to_csv }
+      let(:rows)    { CSV.parse(csv, headers: true) }
+      let(:headers) { rows.headers }
 
       describe "when multiple grading periods is on" do
+        before { @grading_period_id = last_period.id }
+
         describe "assignments in the selected grading period are exported" do
           let!(:enable_mgp) do
             course.enable_feature!(:multiple_grading_periods)
           end
 
           it "exports selected grading period's assignments" do
-            expect(headers).to include no_due_date_assignment.title_with_id,
-                                       current_assignment.title_with_id
+            expect(headers).to include @no_due_date_assignment.title_with_id,
+                                       @current_assignment.title_with_id
+            final_grade = rows[1]["Final Score"].try(:to_f)
+            expect(final_grade).to eq 20
           end
 
           it "exports assignments without due dates if exporting last grading period" do
-            expect(headers).to include current_assignment.title_with_id,
-                                       no_due_date_assignment.title_with_id
+            expect(headers).to include @current_assignment.title_with_id,
+                                       @no_due_date_assignment.title_with_id
+            final_grade = rows[1]["Final Score"].try(:to_f)
+            expect(final_grade).to eq 20
           end
 
           it "does not export assignments without due date" do
-            expect(headers_first_period).to_not include no_due_date_assignment.title_with_id
+            @grading_period_id = first_period.id
+            expect(headers).to_not include @no_due_date_assignment.title_with_id
           end
 
           it "does not export assignments in other grading periods" do
-            expect(headers).to_not include past_assignment.title_with_id,
-                                           future_assignment.title_with_id
+            expect(headers).to_not include @past_assignment.title_with_id,
+                                           @future_assignment.title_with_id
           end
 
           it "does not export future assignments" do
-            expect(headers).to_not include future_assignment.title_with_id
+            expect(headers).to_not include @future_assignment.title_with_id
           end
 
           it "exports the entire gradebook when grading_period_id is 0" do
-            expect(headers_id_0).to include past_assignment.title_with_id,
-                                            current_assignment.title_with_id,
-                                            future_assignment.title_with_id,
-                                            no_due_date_assignment.title_with_id
+            @grading_period_id = 0
+            expect(headers).to include @past_assignment.title_with_id,
+                                       @current_assignment.title_with_id,
+                                       @future_assignment.title_with_id,
+                                       @no_due_date_assignment.title_with_id
+            expect(headers).not_to include "Final Score"
           end
         end
       end
@@ -151,20 +169,13 @@ describe GradebookExporter do
             course.disable_feature!(:multiple_grading_periods)
           end
 
-          it "exports current assignments" do
-            expect(headers).to include no_due_date_assignment.title_with_id
-          end
-
-          it "exports assignments without due dates" do
-            expect(headers).to include current_assignment.title_with_id
-          end
-
-          it "exports past assignments" do
-            expect(headers).to include past_assignment.title_with_id
-          end
-
-          it "exports future assignments" do
-            expect(headers).to include future_assignment.title_with_id
+          it "includes all assignments" do
+            expect(headers).to include @no_due_date_assignment.title_with_id,
+                                       @current_assignment.title_with_id,
+                                       @past_assignment.title_with_id,
+                                       @future_assignment.title_with_id
+            final_grade = rows[1]["Final Score"].try(:to_f)
+            expect(final_grade).to eq 25
           end
         end
       end

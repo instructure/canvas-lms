@@ -108,7 +108,7 @@ class GradebookImporter
       current_grading_period = GradingPeriod.for(@context).current
 
       unless current_grading_period.empty?
-        @assignments = select_in_grading_period @assignments, @context, current_grading_period.first.id
+        @assignments = select_in_grading_period @assignments, @context, current_grading_period.first
       end
 
       @assignments_outside_current_periods = memo - @assignments

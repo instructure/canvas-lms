@@ -39,13 +39,20 @@ class GradebookExporter
     # remove duplicate enrollments for students enrolled in multiple sections
     student_enrollments = student_enrollments.uniq(&:user_id)
 
-    calc = GradeCalculator.new(student_enrollments.map(&:user_id), @course, :ignore_muted => false)
+    # grading_period_id == 0 means no grading period selected
+    unless @options[:grading_period_id].try(:to_i) == 0
+      grading_period = GradingPeriod.context_find @course, @options[:grading_period_id]
+    end
+
+    calc = GradeCalculator.new(student_enrollments.map(&:user_id), @course,
+                               ignore_muted: false,
+                               grading_period: grading_period)
     grades = calc.compute_scores
 
     submissions = {}
     calc.submissions.each { |s| submissions[[s.user_id, s.assignment_id]] = s }
 
-    assignments = select_in_grading_period calc.assignments, @course, @options[:grading_period_id]
+    assignments = select_in_grading_period calc.assignments, @course, grading_period
 
     assignments = assignments.sort_by do |a|
       [a.assignment_group_id, a.position, a.due_at || CanvasSort::Last, a.title]
@@ -189,7 +196,7 @@ class GradebookExporter
 
   def show_totals?
     return true if !@course.feature_enabled?(:multiple_grading_periods)
-    return true if @options[:grading_period_id] != "0"
+    return true if @options[:grading_period_id].try(:to_i) != 0
     @course.feature_enabled?(:all_grading_periods_totals)
   end
 
