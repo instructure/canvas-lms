@@ -488,6 +488,13 @@ describe Attachment do
       expect(a.unencoded_filename).to eql("\u2603" * 28)
     end
 
+    it "should truncate thumbnail names" do
+      a = attachment_model(:filename => "#{"a" * 251}.png")
+      thumbname = a.thumbnail_name_for("thumb")
+      expect(thumbname.length).to eq 255
+      expect(thumbname).to eq "#{"a" * 245}_thumb.png"
+    end
+
     it "should not double-escape a root attachment's filename" do
       a = attachment_model(:filename => 'something with spaces.txt')
       expect(a.filename).to eq 'something+with+spaces.txt'
