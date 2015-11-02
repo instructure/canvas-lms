@@ -1847,7 +1847,8 @@ body.padless-content #content, #content.padless {
 }
 
 #sequence_footer {
-  padding-top: 15px;
+  @if $use_new_styles { padding-top: $ic-sp*2; }
+  @else { padding-top: 15px; }
   .next, .prev {
     width: 150px;
     overflow: hidden;
