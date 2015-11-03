@@ -155,7 +155,6 @@ define [
       $('#student_names_toggle').click(@studentNamesToggle)
       $('#arrange_by_toggle').click(@arrangeByToggle)
       $('#notes_toggle').click(@notesToggle)
-      $('#show_attendance').change -> GradebookToolbarActions.toggleShowAttendanceColumns(@checked)
       $('#show_concluded_enrollments').change(@concludedEnrollmentsChange)
 
     attachSetWeightsDialogHandlers: () ->
@@ -222,9 +221,6 @@ define [
     initHeader: ->
       @gradingPeriodToShow = @getGradingPeriodToShow()
       @drawGradingPeriodSelectButton() if @options.multiple_grading_periods_enabled
-      # don't show the "show attendance" link in the dropdown if there's no attendance assignments
-      unless (_.detect @assignments, (a) -> (''+a.submission_types) == 'attendance')
-        $('#show_attendance').closest('li').hide()
 
       $('#gradebook_settings').kyleMenu()
       $('#download_csv').kyleMenu()

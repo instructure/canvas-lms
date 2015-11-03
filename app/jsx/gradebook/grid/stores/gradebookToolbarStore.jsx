@@ -20,7 +20,6 @@ define([
         hideNotesColumn: !GradebookConstants.teacher_notes || GradebookConstants.teacher_notes.hidden,
         arrangeColumnsBy: storedSortOrder.sortType,
         treatUngradedAsZero: userSettings.contextGet('treatUngradedAsZero'),
-        showAttendanceColumns: userSettings.contextGet('showAttendanceColumns'),
         totalColumnInFront: userSettings.contextGet('total_column_in_front'),
         warnedAboutTotalsDisplay: userSettings.contextGet('warned_about_totals_display'),
         showTotalGradeAsPoints: GradebookConstants.show_total_grade_as_points
@@ -54,11 +53,6 @@ define([
 
     onToggleTreatUngradedAsZero(treatUngradedAsZero) {
       this.toolbarOptions.treatUngradedAsZero = treatUngradedAsZero;
-      this.trigger(this.toolbarOptions);
-    },
-
-    onToggleShowAttendanceColumns(showAttendanceColumns) {
-      this.toolbarOptions.showAttendanceColumns = showAttendanceColumns;
       this.trigger(this.toolbarOptions);
     },
 

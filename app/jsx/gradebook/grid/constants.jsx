@@ -34,7 +34,6 @@ define([
       hideStudentNames: false,
       hideNotesColumn: true,
       treatUngradedAsZero: false,
-      showAttendanceColumns: false,
       totalColumnInFront: false,
       arrangeColumnsBy: 'assignment_group',
       warnedAboutTotalsDisplay: false,
