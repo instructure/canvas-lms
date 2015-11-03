@@ -7,9 +7,9 @@
 <h1 class="screenreader-only"><%= t(:page_title, "Grades for %{student}", :student => @presenter.student_name) %></h1>
 
 <% content_for :right_side do %>
-  <div class="rs-margin-all">
+  <div id="student-grades-right-content" class="rs-margin-all">
     <% if @exclude_total %>
-      <div class="student_assignment final_grade" style="font-size: 1.2em;">
+      <div id="student-grades-final" class="student_assignment final_grade" style="font-size: 1.2em;">
         <%= t('labels.final_grade_hidden', "Calculation of totals has been disabled") %>
       </div>
     <% else %>
@@ -23,18 +23,18 @@
       </div>
     <% end %>
     <% if @presenter.editable? %>
-        <div class="show_guess_grades" style="display: none; margin-bottom: 10px; font-size: 0.8em;">
+        <div id="student-grades-whatif" class="show_guess_grades" style="display: none; margin-bottom: 10px; font-size: 0.8em;">
           <button type="button" class="btn button-sidebar-wide show_guess_grades_link"> <i class="icon-check-plus"></i> <%= t('buttons.show_what_if', "Show Saved \"What-If\" Scores") %></button>
         </div>
-        <div class="revert_all_scores" style="font-size: 0.8em; padding-left: 10px; display: none;">
+        <div id="student-grades-revert" class="revert_all_scores" style="font-size: 0.8em; padding-left: 10px; display: none;">
           <%= t(:not_official, "*NOTE*: This is NOT your official score.") %><br/>
           <a href="#" class="btn revert_all_scores_link"><i class="icon-reply-2"></i> <%= t('links.revert_score', "Revert to Actual Score") %></a>
         </div>
     <% end %>
-    <div class="show_all_details" style="font-size: 0.8em; margin-top: 10px;">
+    <div id="student-grades-show-all" class="show_all_details" style="font-size: 0.8em; margin-top: 10px;">
       <a href="#" class="btn" id="show_all_details_link"><%= t('links.show_details', "Show All Details") %></a>
     </div>
-    <div style="margin-top: 10px;">
+    <div id="assignments-not-weighted" style="margin-top: 10px;">
       <%= render :partial => "courses/sidebar_weighting", :object => @presenter.groups %>
       <% unless @presenter.no_calculations? %>
         <div id="only_consider_graded_assignments_wrapper">
@@ -45,22 +45,22 @@
       <% end %>
     </div>
     <% if @presenter.editable? %>
-      <div style="margin-top: 10px;">
+      <div id="whatif-score-description" style="margin-top: 10px;">
         <%= t(:change_score_instructions, "Click any score and enter a new value to see how the change will affect your total.") %>
       </div>
     <% end %>
   </div>
 <% end %>
 
-<div class="grid-row middle-xs between-xs">
+<div id="print-grades-container" class="grid-row middle-xs between-xs">
   <div class="col-xs-6" >
     <% if multiple_grading_periods? %>
       <%= render partial: "shared/grading_periods_selector", locals: {selected_period_id: @current_grading_period_id, grading_periods: @grading_periods, enrollment_id: @presenter.student_enrollment.id, all_grading_periods_option: true} %>
     <% end %>
   </div>
 
-  <div class="col-md-6 col-lg-3" >
-    <a class="btn print-grades icon-printer" href="javascript:window.print()">
+  <div id="print-grades-button-container" class="col-md-6 col-lg-3" >
+    <a id="print-grades-button" class="btn print-grades icon-printer" href="javascript:window.print()">
       <%= t :print_grades, "Print grades" %>
     </a>
   </div>
@@ -82,7 +82,7 @@
 </h2>
 
 <% if @presenter.has_courses_with_grades? %>
-  <div style="margin-left: 10px;" class="course_selector">
+  <div id="course-selector-dropdown" style="margin-left: 10px;" class="course_selector">
   <%= t(:for_course, "For the course,") %>
   <select id="course_url">
     <% @presenter.selectable_courses.each do |course| %>
