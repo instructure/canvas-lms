@@ -107,7 +107,7 @@ module IncomingMailProcessor
         text_body = self.class.utf8ify(text_part.body.decoded, text_part.charset) if text_part
       else
         case incoming_message.mime_type
-        when 'text/plain'
+        when 'text/plain', nil
           text_body = self.class.utf8ify(incoming_message.body.decoded, incoming_message.charset)
         when 'text/html'
           html_body = self.class.utf8ify(incoming_message.body.decoded, incoming_message.charset)

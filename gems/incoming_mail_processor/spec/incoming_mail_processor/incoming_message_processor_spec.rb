@@ -207,6 +207,15 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
       message = test_message('no_image.eml')
     end
 
+    it "assumes text/plain when no content-type header is present" do
+      IncomingMessageProcessor.new(message_handler, error_reporter).process_single(Mail.new {
+          content_type nil
+          body "hello" }, '')
+
+      message_handler.body.should == "hello"
+      message_handler.html_body.should == "hello"
+    end
+
     context "reporting stats" do
       let (:message) { Mail.new(content_type: 'text/plain; charset=UTF-8', body: "hello") }
 
