@@ -1,24 +1,28 @@
 {{#if collection.length}}
 
-<table class="roster table table-hover table-striped table-condensed table-vertically-center">
-  <thead>
-    <tr>
-      <th scope="col"><span class="screenreader-only">Profile Picture</span></th>
-      <th scope="col">{{#t "name"}}Name{{/t}}</th>
-      {{#if canViewLoginIdColumn}}
-      <th scope="col">{{#t "login_name_or_sis_id"}}Login / SIS ID{{/t}}</th>
-      {{/if}}
-      <th scope="col">{{#t "section"}}Section{{/t}}</th>
-      <th scope="col">{{#t "role"}}Role{{/t}}</th>
-      {{#if ENV.permissions.read_reports}}
-      <th scope="col">{{#t "last_activity"}}Last Activity{{/t}}</th>
-      <th scope="col">{{#t "total_activity"}}Total Activity{{/t}}</th>
-      {{/if}}
-      <th scope="col"><span class="screenreader-only">Administrative Links</span></th>
-    </tr>
-  </thead>
-  <tbody class="collectionViewItems"></tbody>
-</table>
+{{#if ENV.use_new_styles}}
+  <table class="roster ic-Table ic-Table--hover-row ic-Table--condensed ic-Table--striped">
+{{else}}
+  <table class="roster table table-hover table-striped table-condensed table-vertically-center">
+{{/if}}
+    <thead>
+      <tr>
+        <th scope="col"><span class="screenreader-only">Profile Picture</span></th>
+        <th scope="col">{{#t "name"}}Name{{/t}}</th>
+        {{#if canViewLoginIdColumn}}
+        <th scope="col">{{#t "login_name_or_sis_id"}}Login / SIS ID{{/t}}</th>
+        {{/if}}
+        <th scope="col">{{#t "section"}}Section{{/t}}</th>
+        <th scope="col">{{#t "role"}}Role{{/t}}</th>
+        {{#if ENV.permissions.read_reports}}
+        <th scope="col">{{#t "last_activity"}}Last Activity{{/t}}</th>
+        <th scope="col">{{#t "total_activity"}}Total Activity{{/t}}</th>
+        {{/if}}
+        <th scope="col"><span class="screenreader-only">Administrative Links</span></th>
+      </tr>
+    </thead>
+    <tbody class="collectionViewItems"></tbody>
+  </table>
 <div class="paginatedLoadingIndicator"></div>
 
 {{else}}
