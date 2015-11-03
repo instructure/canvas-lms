@@ -514,20 +514,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   def infer_privileges
-    # limit_privileges_to_course_section affects whether this user can see
-    # users from other sections (for any purpose - messaging, roster, grading)
-    # admins (teacher, ta, designer) that have this flag are also visible TO
-    # users from any section (but not students/observers).
-    # currently, this flag is actually only configurable for teachers and
-    # TAs; designers are always course-wide, and so are students.
-    # In the future, we should probably allow configuring it for students,
-    # possibly section-wide (i.e. "Students in this section can see students
-    # from all other sections")
-    if self.is_a?(TeacherEnrollment) || self.is_a?(TaEnrollment)
-      self.limit_privileges_to_course_section = false if self.limit_privileges_to_course_section.nil?
-    else
-      self.limit_privileges_to_course_section = false
-    end
+    self.limit_privileges_to_course_section = false if self.limit_privileges_to_course_section.nil?
     true
   end
 

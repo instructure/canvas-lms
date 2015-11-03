@@ -326,8 +326,13 @@ class EnrollmentsApiController < ApplicationController
   #   ignored.
   #
   # @argument enrollment[limit_privileges_to_course_section] [Boolean]
-  #   If a teacher or TA enrollment, teacher/TA will be restricted to the
-  #   section given by course_section_id.
+  #   If set, the enrollment will only allow the user to see and interact with
+  #   users enrolled in the section given by course_section_id.
+  #   * For teachers and TAs, this includes grading privileges.
+  #   * Section-limited students will not see any users (including teachers
+  #     and TAs) not enrolled in their sections.
+  #   * Users may have other enrollments that grant privileges to
+  #     multiple sections in the same course.
   #
   # @argument enrollment[notify] [Boolean]
   #   If true, a notification will be sent to the enrolled user.

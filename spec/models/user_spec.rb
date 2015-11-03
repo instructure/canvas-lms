@@ -811,9 +811,7 @@ describe User do
     end
 
     it "should not include users from other sections if visibility is limited to sections" do
-      enrollment = @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active', :limit_privileges_to_course_section => true)
-      # we currently force limit_privileges_to_course_section to be false for students; override it in the db
-      Enrollment.where(:id => enrollment).update_all(:limit_privileges_to_course_section => true)
+      @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active', :limit_privileges_to_course_section => true)
       messageable_users = search_messageable_users(@student).map(&:id)
       expect(messageable_users).to include @this_section_user.id
       expect(messageable_users).not_to include @other_section_user.id
@@ -882,9 +880,7 @@ describe User do
     end
 
     it "should respect section visibility when returning users for a specified group" do
-      enrollment = @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active', :limit_privileges_to_course_section => true)
-      # we currently force limit_privileges_to_course_section to be false for students; override it in the db
-      Enrollment.where(:id => enrollment).update_all(:limit_privileges_to_course_section => true)
+      @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active', :limit_privileges_to_course_section => true)
 
       @group.users << @other_section_user
 

@@ -52,7 +52,7 @@ describe EnrollmentsApiController, type: :request do
           'id'                                 => new_enrollment.id,
           'user_id'                            => @unenrolled_user.id,
           'course_section_id'                  => @section.id,
-          'limit_privileges_to_course_section' => false,
+          'limit_privileges_to_course_section' => true,
           'enrollment_state'                   => 'active',
           'course_id'                          => @course.id,
           'sis_import_id'                       => nil,
@@ -83,6 +83,7 @@ describe EnrollmentsApiController, type: :request do
         expect(new_enrollment.root_account_id).to eql @course.account.id
         expect(new_enrollment.user_id).to eql @unenrolled_user.id
         expect(new_enrollment.course_section_id).to eql @section.id
+        expect(new_enrollment.limit_privileges_to_course_section).to eql true
         expect(new_enrollment.workflow_state).to eql 'active'
         expect(new_enrollment.course_id).to eql @course.id
         expect(new_enrollment.self_enrolled).to eq nil
@@ -524,7 +525,7 @@ describe EnrollmentsApiController, type: :request do
           'id'                                 => new_enrollment.id,
           'user_id'                            => @unenrolled_user.id,
           'course_section_id'                  => @section.id,
-          'limit_privileges_to_course_section' => false,
+          'limit_privileges_to_course_section' => true,
           'enrollment_state'                   => 'active',
           'course_id'                          => @course.id,
           'type'                               => 'StudentEnrollment',
@@ -554,6 +555,7 @@ describe EnrollmentsApiController, type: :request do
         expect(new_enrollment.root_account_id).to eql @course.account.id
         expect(new_enrollment.user_id).to eql @unenrolled_user.id
         expect(new_enrollment.course_section_id).to eql @section.id
+        expect(new_enrollment.limit_privileges_to_course_section).to eql true
         expect(new_enrollment.workflow_state).to eql 'active'
         expect(new_enrollment.course_id).to eql @course.id
         expect(new_enrollment).to be_an_instance_of StudentEnrollment
