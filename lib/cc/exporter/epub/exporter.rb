@@ -7,6 +7,7 @@ module CC::Exporter::Epub
       syllabus: "Syllabus",
       modules: "Modules",
       assignments: "Assignments",
+      announcements: "Announcements",
       topics: "Discussion Topics",
       quizzes: "Quizzes",
       pages: "Wiki Pages"
@@ -36,9 +37,12 @@ module CC::Exporter::Epub
         files: cartridge_json[:files]
       }.tap do |hash|
         resources = filter_syllabus_for_modules ? module_ids : LINKED_RESOURCE_KEY.values
-        hash.merge!(:syllabus => create_syllabus)
+        hash.merge!(
+          :syllabus => create_universal_template(:syllabus),
+          :announcements => create_universal_template(:announcements)
+        )
         resources.each do |resource_type|
-          hash.merge!(resource_type => create_template(resource_type))
+          hash.merge!(resource_type => create_content_template(resource_type))
         end
       end
     end
@@ -54,13 +58,13 @@ module CC::Exporter::Epub
       get_item(resource_type, identifier).merge!(updated_item)
     end
 
-    def create_syllabus
-      syllabus_content = cartridge_json[:syllabus]
-      syllabus_template = Exporter.resource_template(:syllabus)
-      Template.new({resources: syllabus_content, reference: :syllabus}, syllabus_template, self)
+    def create_universal_template(resource)
+      template_content = cartridge_json[resource]
+      template = Exporter.resource_template(resource)
+      Template.new({resources: template_content, reference: resource}, template, self)
     end
 
-    def create_template(resource)
+    def create_content_template(resource)
       resource_items = sort_by_content ? cartridge_json[resource] : filter_content_to_module(resource)
       Template.new({resources: resource_items, reference: resource}, base_template, self)
     end

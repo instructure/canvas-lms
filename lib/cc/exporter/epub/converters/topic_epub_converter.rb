@@ -4,6 +4,7 @@ module CC::Exporter::Epub::Converters
 
     def convert_topics
       topics = []
+      announcements = []
 
       @manifest.css('resource[type=imsdt_xmlv1p1]').each do |res|
         cc_path = File.join @unzipped_file_path, res.at_css('file')['href']
@@ -17,10 +18,14 @@ module CC::Exporter::Epub::Converters
         end
         cc_doc = open_file_xml(cc_path)
 
-        topics << convert_topic(cc_doc, meta_node)
+        if get_node_val(meta_node, 'type') != "announcement"
+          topics << convert_topic(cc_doc, meta_node)
+        else
+          announcements << convert_announcement(cc_doc, meta_node)
+        end
       end
 
-      topics
+      [topics, announcements]
     end
 
     def convert_topic(cc_doc, meta_doc)
@@ -29,7 +34,6 @@ module CC::Exporter::Epub::Converters
       topic[:title] = get_node_val(cc_doc, 'title')
       if meta_doc
         topic[:title] = get_node_val(meta_doc, 'title')
-        topic[:type] = get_node_val(meta_doc, 'type')
         topic[:discussion_type] = get_node_val(meta_doc, 'discussion_type')
         topic[:pinned] = get_bool_val(meta_doc, 'pinned')
         topic[:posted_at] = get_time_val(meta_doc, 'posted_at')
@@ -44,6 +48,19 @@ module CC::Exporter::Epub::Converters
       end
 
       topic
+    end
+
+    def convert_announcement(cc_doc, meta_doc)
+      announcement = {}
+      announcement[:description] = get_node_val(cc_doc, 'text')
+      announcement[:title] = get_node_val(cc_doc, 'title')
+      if meta_doc
+        announcement[:posted_at] = get_time_val(meta_doc, 'posted_at')
+        announcement[:identifier] = get_node_val(meta_doc, 'topic_id')
+        announcement[:href] = "announcements.xhtml##{announcement[:identifier]}"
+      end
+
+      announcement
     end
   end
 end

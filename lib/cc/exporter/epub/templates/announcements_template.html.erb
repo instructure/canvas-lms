@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Announcements</title>
+</head>
+  <body>
+    <h1>Announcements</h1>
+    <ol>
+    <% if content.length == 0 %>
+      <p><%= I18n.t("There are no announcements for this course.") %></p>
+    <% else %>
+      <% content.each do |item| %>
+        <li><a href="#<%= "#{item[:identifier]}" %>"><%= item[:title] %></a></li>
+      <% end %>
+      </ol>
+      <div style="page-break-before:always;"></div>
+      <% content.each do |item| %>
+        <h2 id="<%="#{item[:identifier]}"%>"><%= item[:title] %></h2>
+        <p><%= convert_placeholder_paths_from_string!(item[:description]) %></p>
+        <hr/>
+        <a href="announcements.xhtml"><%="Back to Announcements"%></a>
+        <div style="page-break-before:always;"></div>
+      <% end %>
+    <% end %>
+  </body>
+</html>

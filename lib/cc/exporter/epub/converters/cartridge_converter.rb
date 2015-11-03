@@ -54,7 +54,7 @@ module CC::Exporter::Epub::Converters
       set_progress(20)
       @course[:assignments] = convert_assignments
       set_progress(30)
-      @course[:topics] = convert_topics
+      @course[:topics], @course[:announcements] = convert_topics
       set_progress(40)
       @course[:quizzes] = convert_quizzes
       set_progress(50)
