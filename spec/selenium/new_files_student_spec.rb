@@ -96,6 +96,23 @@ describe "better_file_browsing" do
         set_item_permissions(:unpublish)
         verify_hidden_item_not_searchable_as_student("example")
       end
+
+      it "should let student access files in restricted folder hidden by link", priority: "1", test_id: 134750 do
+        set_item_permissions(:restricted_access, :available_with_link)
+        f('.media-body').click
+        wait_for_ajaximations
+        f('.media-body').click
+        wait_for_ajaximations
+        file_preview_url = (driver.current_url).match(/\/files.*/)[0]
+        student_goto_files
+        expect(fln("restricted_folder")).not_to be_present
+        get "/courses/#{@course.id}/files/folder/restricted_folder"
+        expect(fln("example.pdf")).not_to be_present
+        get "/courses/#{@course.id}"+file_preview_url
+        refresh_page
+        wait_for_ajaximations
+        expect(f('.ef-file-preview-header')).to be_present
+      end
     end
   end
 end

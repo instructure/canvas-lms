@@ -1210,6 +1210,7 @@ describe "context modules" do
 
     before(:each) do
       course_with_teacher_logged_in
+      Account.default.enable_feature!(:usage_rights_required)
       #adding file to course
       @file = @course.attachments.create!(:display_name => FILE_NAME, :uploaded_data => default_uploaded_data)
       @file.context = @course
@@ -1233,6 +1234,21 @@ describe "context modules" do
       Attachment.last.handle_duplicates(:overwrite)
       refresh_page
       expect(f('.context_module_item')).to include_text(FILE_NAME)
+    end
+
+    it "should set usage rights on a file in a module", priority: "1", test_id: 369251 do
+      get "/courses/#{@course.id}/modules"
+      make_full_screen
+      add_existing_module_item('#attachments_select', 'File', FILE_NAME)
+      ff('.icon-publish')[0].click
+      wait_for_ajaximations
+      set_value f('.UsageRightsSelectBox__select'), 'own_copyright'
+      set_value f('#copyrightHolder'), 'Test User'
+      f(".form-horizontal.form-dialog.permissions-dialog-form > div.form-controls > button.btn.btn-primary").click
+      wait_for_ajaximations
+      get "/courses/#{@course.id}/files/folder/unfiled"
+      icon_class = 'icon-files-copyright'
+      expect(f(".UsageRightsIndicator__openModal i.#{icon_class}")).to be_displayed
     end
   end
 
