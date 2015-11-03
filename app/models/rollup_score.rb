@@ -50,6 +50,12 @@ class RollupScore
   end
 
   def decaying_average
+    # The term "decaying average" can mean different things depending on the user.
+    # There are multiple, reasonable, accurate interpretations.  We have chosen
+    # to go with one that is more mathematically a "weighted average", but is
+    # typically what is meant when a "decaying average" is wanted.  A true
+    # decaying average may be added in the future.
+
     #default grading method with weight of 65 if none selected.
     weight = @calculation_int || 65
     scores = @outcome_results.sort_by{|result| result_time(result) }.map(&:score)
