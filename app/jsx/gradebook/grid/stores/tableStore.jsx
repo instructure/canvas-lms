@@ -121,7 +121,7 @@ define([
           displayName = GradebookConstants.list_students_by_sortable_name_enabled ?
             student.user.sortable_name : student.user.name;
 
-          userSubmissions = _.flatten(_.map(submissions[student.id], s => s.submissions));
+          userSubmissions = _.flatten(_.map(submissions[student.user_id], s => s.submissions));
           userSubmissions = _.groupBy(userSubmissions, s => s.assignment_id);
           teacherNote = _.find(
             customColumns.teacherNotes,
