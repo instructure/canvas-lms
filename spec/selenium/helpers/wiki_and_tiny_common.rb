@@ -178,7 +178,12 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
   end
 
   def click_tiny_button(button_aria)
-    focus = :shift
-    f("div[aria-label=\'#{button_aria}\'] button").send_keys(focus) # no content but gives the italic button focus
+    f("div[aria-label=\'#{button_aria}\'] button").send_keys(:shift) # no content but gives the italic button focus
     f("div[aria-label=\'#{button_aria}\'] button").click
+  end
+
+  def click_tiny_dropdown(button_aria, mce_color)
+    f("[aria-label=\'#{button_aria}\'] .mce-open").send_keys(:shift) # no content but gives the italic button focus
+    f("[aria-label=\'#{button_aria}\'] .mce-open").click
+    f("div[data-mce-color=\'#{mce_color}\']").click
   end

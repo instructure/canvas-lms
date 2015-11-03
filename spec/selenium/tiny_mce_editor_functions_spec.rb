@@ -13,7 +13,6 @@ describe "Tiny MCE editor functions" do
     it "should bold text on wiki description", priority: "1", test_id: 285128 do
       p = create_wiki_page("test_page", false, "public")
       get "/courses/#{@course.id}/pages/#{p.title}/edit"
-      wait_for_ajaximations
 
       click_tiny_button('Bold')
       type_in_tiny('textarea.body', "this should be typed in as bold")
@@ -30,7 +29,6 @@ describe "Tiny MCE editor functions" do
       p.body = "<p><strong>this should get unbolded</strong></p>"
       p.save!
       get "/courses/#{@course.id}/pages/#{p.title}/edit"
-      wait_for_ajaximations
 
       select_all_wiki
       click_tiny_button('Bold')
@@ -45,7 +43,6 @@ describe "Tiny MCE editor functions" do
     it "should italicize text on wiki description", priority: "1", test_id: 285129 do
       p = create_wiki_page("test_page", false, "public")
       get "/courses/#{@course.id}/pages/#{p.title}/edit"
-      wait_for_ajaximations
 
       click_tiny_button('Italic')
       type_in_tiny('textarea.body', "this should be typed in italics")
@@ -62,7 +59,6 @@ describe "Tiny MCE editor functions" do
       p.body = "<p><em>this should get unitalicized</em></p>"
       p.save!
       get "/courses/#{@course.id}/pages/#{p.title}/edit"
-      wait_for_ajaximations
 
       select_all_wiki
       click_tiny_button('Italic')
@@ -77,7 +73,6 @@ describe "Tiny MCE editor functions" do
     it "should underline text on wiki description", priority: "1", test_id: 285356 do
       p = create_wiki_page("test_page", false, "public")
       get "/courses/#{@course.id}/pages/#{p.title}/edit"
-      wait_for_ajaximations
 
       click_tiny_button('Underline')
       type_in_tiny('textarea.body', "this should be typed with underline")
@@ -94,7 +89,6 @@ describe "Tiny MCE editor functions" do
       p.body = "<p><span style=\"text-decoration: underline;\">the underline should be removed</span></p>"
       p.save!
       get "/courses/#{@course.id}/pages/#{p.title}/edit"
-      wait_for_ajaximations
 
       select_all_wiki
       click_tiny_button('Underline')
@@ -104,6 +98,36 @@ describe "Tiny MCE editor functions" do
       p.reload
       # To avoid fragility of extra formatting characters being added, I just want the first 38 characters
       expect(p.body[0..37]).to eq "<p>the underline should be removed</p>"
+    end
+
+    it "should change text color on wiki description", priority: "1", test_id: 285357 do
+      p = create_wiki_page("test_page", false, "public")
+      get "/courses/#{@course.id}/pages/#{p.title}/edit"
+
+      click_tiny_dropdown('Text Color, press down to select', '#800080')
+      type_in_tiny('textarea.body', "this should be typed in purple")
+      f("form.edit-form button.submit").click
+      wait_for_ajaximations
+
+      p.reload
+      # To avoid fragility of extra formatting characters being added, I just want the first 76 characters
+      expect(p.body[0..75]).to eq "<p><span style=\"color: #800080;\">this should be typed in purple</span></p>"
+    end
+
+    it "should remove text color on wiki description", priority: "1", test_id: 469876 do
+      p = create_wiki_page("test_page", false, "public")
+      p.body = "<p><span style=\"color: #800080;\">the purple should be changed to black</span></p>"
+      p.save!
+      get "/courses/#{@course.id}/pages/#{p.title}/edit"
+
+      select_all_wiki
+      click_tiny_dropdown('Text Color, press down to select', 'transparent')
+      f("form.edit-form button.submit").click
+      wait_for_ajaximations
+
+      p.reload
+      # To avoid fragility of extra formatting characters being added, I just want the first 44 characters
+      expect(p.body[0..43]).to eq "<p>the purple should be changed to black</p>"
     end
   end
 end
