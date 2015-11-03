@@ -1,8 +1,9 @@
 define([
   'i18n!modules',
   'react',
-  'jsx/gradebook/SISGradePassback/PostGradesDialog'
-], (I18n, React, PostGradesDialog) => {
+  'jsx/gradebook/SISGradePassback/PostGradesDialog',
+  'classnames'
+], (I18n, React, PostGradesDialog, classnames) => {
 
   // The PostGradesApp mounts a single "Post Grades" button, which pops up
   // the PostGradesDialog when clicked.
@@ -15,7 +16,7 @@ define([
     componentWillUnmount () { this.props.store.removeChangeListener(this.boundForceUpdate) },
 
     render () {
-      var navClass = React.addons.classSet({
+      var navClass = classnames({
         "hidden": !this.props.store.isEnabled() || !this.props.store.hasAssignments(),
         "ui-button": this.props.renderAsButton
       });
@@ -64,7 +65,7 @@ define([
       }
 
       this.props.store.reset()
-      React.renderComponent(<PostGradesDialog store={this.props.store} closeDialog={closeDialog} />, $dialog[0]);
+      React.render(<PostGradesDialog store={this.props.store} closeDialog={closeDialog} />, $dialog[0]);
     },
   });
 

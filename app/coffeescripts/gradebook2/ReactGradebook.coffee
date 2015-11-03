@@ -89,10 +89,10 @@ define [
       @postGradesStore.setSelectedSection @sectionToShow
 
     showPostGradesButton: ->
-      app = new PostGradesApp store: @postGradesStore
+      app = React.createElement(PostGradesApp, store: @postGradesStore)
       $placeholder = $('.post-grades-placeholder')
       if ($placeholder.length > 0)
-        React.renderComponent(app, $placeholder[0])
+        React.render(app, $placeholder[0])
 
     initSettingsDropdown: () ->
       preferences = @getInitialToolbarPreferences()

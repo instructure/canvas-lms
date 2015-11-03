@@ -1067,12 +1067,13 @@ define [
     showPostGradesButton: ->
       $placeholder = $('.post-grades-placeholder')
       if $placeholder.length > 0
-        app = new PostGradesApp
+        app = React.createElement(PostGradesApp, {
           store: @postGradesStore
           renderAsButton: !$placeholder.hasClass('in-menu')
           labelText: if $placeholder.hasClass('in-menu') then I18n.t 'PowerSchool' else I18n.t 'Post Grades',
           returnFocusTo: $('#post_grades')
-        React.renderComponent(app, $placeholder[0])
+        })
+        React.render(app, $placeholder[0])
 
     togglePostGrades: (visible) =>
       # hide external tools elements
