@@ -2051,32 +2051,6 @@ class Course < ActiveRecord::Base
     self.apply_enrollment_visibility(scope, user)
   end
 
-  def enrollments_visible_to(user, opts={})
-    # because of course it's used in a plugin
-    relation = []
-    relation << 'all' if opts[:include_priors]
-    if opts[:type] == :all
-      relation << 'user' if opts[:return_users]
-    else
-      relation << (opts[:type].try(:to_s) || 'student')
-    end
-    if opts[:return_users]
-      relation.last << 's'
-    else
-      relation << 'enrollments'
-    end
-    relation = relation.join('_')
-    # our relations don't all follow the same pattern
-    unless opts[:include_deleted]
-      relation = case relation
-                   when 'all_enrollments'; 'enrollments'
-                   when 'enrollments'; 'current_enrollments'
-                   else; relation
-                 end
-    end
-    self.apply_enrollment_visibility(self.send(relation.to_sym), user, opts[:section_ids])
-  end
-
   # can apply to user scopes as well if through enrollments (e.g. students, teachers)
   def apply_enrollment_visibility(scope, user, section_ids=nil)
     if section_ids
