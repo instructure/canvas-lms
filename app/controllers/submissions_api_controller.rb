@@ -183,7 +183,7 @@ class SubmissionsApiController < ApplicationController
       # this provides one assignment object(and submission object within), per user group
       if value_to_boolean(params[:grouped])
         user_groups_ids = @assignment.representatives(@current_user).map(&:id)
-        submissions = Submission.where(user_id: user_groups_ids, assignment_id: @assignment.id)
+        submissions = @assignment.submissions.where(user_id: user_groups_ids)
       end
 
       if includes.include?("visibility") && @context.feature_enabled?(:differentiated_assignments)
