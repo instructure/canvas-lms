@@ -14,6 +14,33 @@ describe "conversations new" do
   end
 
   describe "message sending" do
+    it "should show error messages when no recipient is entered", priority: "1", test_id: 351236 do
+      get '/conversations'
+      f('.icon-compose').click
+      click_send
+      errors = ff('.error_text')
+      expect(errors[2].text).to include('Invalid recipient name.')
+      expect(errors[1].text).to include('Required field')
+    end
+
+    it "should not show courses that are date restricted" do
+      user = @s1
+      user_logged_in({:user => user})
+
+      get '/conversations'
+      f('.icon-compose').click
+      expect(element_exists("#compose-message-course option[data-code='Unnamed']"))
+
+      @course.conclude_at = 2.weeks.ago
+      @course.restrict_enrollments_to_course_dates = true
+      @course.restrict_student_past_view = true
+      @course.save!
+
+      get '/conversations'
+      f('.icon-compose').click
+      expect(!element_exists("#compose-message-course option[data-code='Unnamed']"))
+    end
+
     it "should start a group conversation when there is only one recipient", priority: "2", test_id: 201499 do
       get_conversations
       compose course: @course, to: [@s1], subject: 'single recipient', body: 'hallo!'
