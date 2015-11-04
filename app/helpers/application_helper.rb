@@ -252,28 +252,22 @@ module ApplicationHelper
       use_optimized_js? ? "/webpack-dist-optimized" : "/webpack-dist"
     else
       use_optimized_js? ? '/optimized' : '/javascripts'
-    end
+    end.freeze
   end
 
   # Returns a <script> tag for each registered js_bundle
   def include_js_bundles
-    base_url = "#{js_base_url}"
     common_bundles = []
-    common_bundles = ["#{base_url}/vendor.bundle.js", "#{base_url}/instructure-common.bundle.js"] if use_webpack?
+    common_bundles = ["#{js_base_url}/vendor.bundle.js", "#{js_base_url}/instructure-common.bundle.js"] if use_webpack?
     paths = js_bundles.inject(common_bundles) do |ary, (bundle, plugin)|
       if use_webpack?
-        if plugin
-          ary << "#{base_url}/#{plugin}-#{bundle}.bundle.js"
-        else
-          ary << "#{base_url}/#{bundle}.bundle.js"
-        end
+        ary << "#{js_base_url}/#{plugin ? "#{plugin}-" : ''}#{bundle}.bundle.js"
       else
-        base_url += "/plugins/#{plugin}" if plugin
         ary.concat(Canvas::RequireJs.extensions_for(bundle, 'plugins/')) unless use_optimized_js?
-        ary << "#{base_url}/compiled/bundles/#{bundle}.js"
+        ary << "#{js_base_url}#{plugin ? "/plugins/#{plugin}" : ''}/compiled/bundles/#{bundle}.js"
       end
     end
-    javascript_include_tag(*paths)
+    javascript_include_tag(*paths, type: nil)
   end
 
   def include_css_bundles
