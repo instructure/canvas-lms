@@ -336,7 +336,7 @@ module AssignmentOverrideApplicator
     # preloads the override students for a particular user for many objects at once, instead of doing separate queries for each
     quizzes, assignments = items.partition{|i| i.is_a?(Quizzes::Quiz)}
 
-    ActiveRecord::Associations::Preloader.new(assignments, :quiz).run
+    ActiveRecord::Associations::Preloader.new(assignments, [:quiz, :assignment_overrides]).run
 
     if assignments.any?
       override_students = AssignmentOverrideStudent.where(:assignment_id => assignments, :user_id => user).index_by(&:assignment_id)
