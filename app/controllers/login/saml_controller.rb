@@ -184,48 +184,6 @@ class Login::SamlController < ApplicationController
       return render status: :bad_request, text: "SAMLRequest or SAMLResponse required"
     end
 
-    # for parent using self-registration to observe a student
-    # following saml validation of student
-    # resume registration process
-    if session[:parent_registration]
-      session[:parent_registration][:logged_out] = true
-      if session[:parent_registration][:unique_id_match]
-        if session[:parent_registration][:observee_only].present?
-          # TODO: a race condition exists where the observee unique_id is
-          # already checked during pre-login form submit, but might have gone
-          # away during login. this should be very rare, and we don't have a
-          # mechanism for displaying and correcting the error yet.
-
-          # create the observee relationship, then send them back to that index
-          complete_observee_addition(session[:parent_registration])
-          redirect_to observees_profile_path
-        else
-          # TODO: a race condition exists where the observer unique_id and
-          # observee unique_id are already checked during pre-login form
-          # submit, but the former might have been taken or the latter gone
-          # away during login. this should be very rare, and we don't have a
-          # mechanism for displaying and correcting the error yet.
-
-          # create the observer user connected to the observee
-          pseudonym = complete_parent_registration(session[:parent_registration])
-
-          # log the new user in and send them to the dashboard
-          PseudonymSession.new(pseudonym).save
-          redirect_to dashboard_path(registration_success: 1)
-        end
-      else
-        flash[:error] = t("We're sorry, a login error has occurred, please check your child's credentials and try again.")
-        if session[:parent_registration][:observee_only].present?
-          redirect_to observees_profile_path
-          session.delete(:parent_registration)
-        else
-          redirect_to canvas_login_path
-          session.delete(:parent_registration)
-        end
-      end
-      return
-    end
-
     if params[:SAMLResponse]
       increment_saml_stat("logout_response_received")
       saml_response = Onelogin::Saml::LogoutResponse.parse(params[:SAMLResponse])
@@ -242,6 +200,41 @@ class Login::SamlController < ApplicationController
         aac.debug_set(:idp_logout_response_in_response_to, saml_response.in_response_to)
         aac.debug_set(:idp_logout_response_destination, saml_response.destination)
         aac.debug_set(:debugging, t('debug.logout_response_redirect_from_idp', "Received LogoutResponse from IdP"))
+      end
+
+      # for parent using self-registration to observe a student
+      # following saml validation of student
+      # resume registration process
+      if data = session.delete(:parent_registration)
+        if data[:unique_id_match]
+          if data[:observee_only].present?
+            # TODO: a race condition exists where the observee unique_id is
+            # already checked during pre-login form submit, but might have gone
+            # away during login. this should be very rare, and we don't have a
+            # mechanism for displaying and correcting the error yet.
+
+            # create the observee relationship, then send them back to that index
+            complete_observee_addition(data)
+            redirect_to observees_profile_path
+          else
+            # TODO: a race condition exists where the observer unique_id and
+            # observee unique_id are already checked during pre-login form
+            # submit, but the former might have been taken or the latter gone
+            # away during login. this should be very rare, and we don't have a
+            # mechanism for displaying and correcting the error yet.
+
+            # create the observer user connected to the observee
+            pseudonym = complete_parent_registration(data)
+
+            # log the new user in and send them to the dashboard
+            PseudonymSession.new(pseudonym).save
+            redirect_to dashboard_path(registration_success: 1)
+          end
+        else
+          flash[:error] = t("We're sorry, a login error has occurred, please check your child's credentials and try again.")
+          redirect_to data[:observee_only].present? ? observees_profile_path : canvas_login_path
+        end
+        return
       end
 
       redirect_to saml_login_url(id: aac.id)
