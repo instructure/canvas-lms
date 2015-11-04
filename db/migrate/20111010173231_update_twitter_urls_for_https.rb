@@ -1,4 +1,6 @@
 class UpdateTwitterUrlsForHttps < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     while true
       users = User.where("avatar_image_source='twitter' AND avatar_image_url NOT LIKE 'https%'").limit(500).each do |u|

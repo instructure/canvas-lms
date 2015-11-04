@@ -1,4 +1,6 @@
 class PopulateVisibleLastAuthoredAt < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     update <<-SQL
       UPDATE #{ConversationParticipant.quoted_table_name}

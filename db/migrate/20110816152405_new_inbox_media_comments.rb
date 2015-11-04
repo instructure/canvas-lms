@@ -1,4 +1,6 @@
 class NewInboxMediaComments < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     add_column :conversation_messages, :media_comment_id, :string
     add_column :conversation_messages, :media_comment_type, :string

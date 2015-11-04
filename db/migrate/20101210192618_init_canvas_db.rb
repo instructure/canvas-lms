@@ -18,6 +18,8 @@
 
 # rubocop:disable Migration/PrimaryKey
 class InitCanvasDb < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     create_table "abstract_courses", :force => true do |t|
       t.string   "sis_source_id"

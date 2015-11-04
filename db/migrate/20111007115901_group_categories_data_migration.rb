@@ -1,4 +1,6 @@
 class GroupCategoriesDataMigration < ActiveRecord::Migration
+  tag :predeploy
+
   def self.uncached_group_category_id_for(context, name)
     if !context.is_a?(Account) && name == "Student Groups"
       GroupCategory.student_organized_for(context).id

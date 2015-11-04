@@ -1,4 +1,6 @@
 class ConversationsCountFix < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     update "UPDATE #{ConversationParticipant.quoted_table_name} SET workflow_state = 'read' WHERE workflow_state = 'unread' AND last_message_at IS NULL"
 

@@ -1,4 +1,6 @@
 class DropCachedS3Url < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     remove_column :attachments, :cached_s3_url
     remove_column :attachments, :s3_url_cached_at

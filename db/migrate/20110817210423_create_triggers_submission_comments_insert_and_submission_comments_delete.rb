@@ -3,6 +3,8 @@
 # will be undone by the next auto-generated trigger migration.
 
 class CreateTriggersSubmissionCommentsInsertAndSubmissionCommentsDelete < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     create_trigger("submission_comments_after_insert_row_tr", :generated => true, :compatibility => 1).
         on("submission_comments").

@@ -1,4 +1,6 @@
 class SubmissionPointsPossibleFixData < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     case connection.adapter_name
       when 'MySQL', 'Mysql2'

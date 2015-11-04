@@ -1,4 +1,6 @@
 class GenericSisStickinessRefactorData < ActiveRecord::Migration
+  tag :predeploy
+
 
   def self.up
     update <<-SQL

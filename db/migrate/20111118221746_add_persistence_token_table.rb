@@ -1,4 +1,6 @@
 class AddPersistenceTokenTable < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     create_table :session_persistence_tokens do |t|
       t.string :token_salt

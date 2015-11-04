@@ -1,6 +1,5 @@
 class AddForeignKeys2 < ActiveRecord::Migration
-  disable_ddl_transaction!
-  tag :postdeploy
+  tag :predeploy
 
   def self.up
     add_foreign_key_if_not_exists :assessment_requests, :rubric_associations, :delay_validation => true

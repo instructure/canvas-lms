@@ -1,4 +1,6 @@
 class CreateAccessTokens < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     create_table :access_tokens do |t|
       t.integer :developer_key_id, :limit => 8

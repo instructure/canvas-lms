@@ -1,4 +1,6 @@
 class AddEmptyTags < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     Conversation.where(tags: nil).update_all(tags: '')
     ConversationParticipant.where(tags: nil).update_all(tags: '')

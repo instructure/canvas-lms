@@ -1,4 +1,6 @@
 class AddUngradedCountToAssignments < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     add_column :assignments, :needs_grading_count, :integer, :default => 0
 

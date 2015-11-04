@@ -1,4 +1,6 @@
 class ContextToConversationNotificationPreferences < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     if message = Notification.where(category: "Message", name: "Teacher Context Message").first
       if conversation_message = Notification.where(category: "Conversation Message").first

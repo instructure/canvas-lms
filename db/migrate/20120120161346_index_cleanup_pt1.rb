@@ -1,4 +1,6 @@
 class IndexCleanupPt1 < ActiveRecord::Migration
+  tag :predeploy
+
   # cleaning up unused and inefficient indexes
   def self.up
     if connection.adapter_name =~ /postgres/i

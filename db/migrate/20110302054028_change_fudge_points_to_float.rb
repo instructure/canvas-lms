@@ -1,4 +1,6 @@
 class ChangeFudgePointsToFloat < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     change_column :quiz_submissions, :fudge_points, :float
   end

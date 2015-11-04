@@ -1,4 +1,6 @@
 class SubmissionHasAdminComment < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     add_column :submissions, :has_admin_comment, :boolean, :default => false, :null => false
     update <<-SQL

@@ -1,4 +1,6 @@
 class ClearSisWhitespace < ActiveRecord::Migration
+  tag :predeploy
+
   
   def self.clear(table, *cols)
     cols = cols.map{|col|" #{col} = TRIM(#{col})"}.join(',')

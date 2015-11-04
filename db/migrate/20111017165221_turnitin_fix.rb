@@ -1,4 +1,6 @@
 class TurnitinFix < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     Assignment.record_timestamps = false
     Assignment.where("turnitin_enabled AND EXISTS (?)",

@@ -1,4 +1,6 @@
 class DropOldStreamItemIndexes < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     remove_index "stream_item_instances", :name => "index_stream_item_instances_with_context_code"
   end

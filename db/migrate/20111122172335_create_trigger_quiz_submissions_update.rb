@@ -3,6 +3,8 @@
 # will be undone by the next auto-generated trigger migration.
 
 class CreateTriggerQuizSubmissionsUpdate < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     create_trigger("quiz_submissions_after_update_row_when_new_submission_id_is__tr", :generated => true, :compatibility => 1).
         on("quiz_submissions").

@@ -1,4 +1,6 @@
 class DropMovedInAccountStructure < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     remove_index :users, :moved_in_account_structure
     remove_column :users, :moved_in_account_structure
