@@ -420,6 +420,18 @@ class ApplicationController < ActionController::Base
   end
   alias :authorized_action? :authorized_action
 
+  def fix_ms_office_redirects
+    if ms_office?
+      # Office will follow 302's internally, until it gets to a 200. _then_ it will pop it out
+      # to a web browser - but you've lost your cookies! This breaks not only store_location,
+      # but in the case of delegated authentication where the provider does an additional
+      # redirect storing important information in session, makes it impossible to log in at all
+      render text: '', status: 200
+      return false
+    end
+    true
+  end
+
   def render_unauthorized_action
     respond_to do |format|
       @show_left_side = false
@@ -429,13 +441,7 @@ class ApplicationController < ActionController::Base
       @headers = !!@current_user if @headers != false
       @files_domain = @account_domain && @account_domain.host_type == 'files'
       format.html {
-        if ms_office?
-          # Office will follow 302's internally, until it gets to a 200. _then_ it will pop it out
-          # to a web browser - but you've lost your cookies! This breaks not only store_location,
-          # but in the case of delegated authentication where the provider does an additional
-          # redirect storing important information in session, makes it impossible to log in at all
-          return render text: '', status: 200
-        end
+        return unless fix_ms_office_redirects
         store_location
         return redirect_to login_url(params.slice(:authentication_provider)) if !@files_domain && !@current_user
 

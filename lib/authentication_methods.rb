@@ -274,6 +274,7 @@ module AuthenticationMethods
   end
 
   def redirect_to_login
+    return unless fix_ms_office_redirects
     respond_to do |format|
       format.html {
         store_location
