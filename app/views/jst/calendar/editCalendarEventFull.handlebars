@@ -94,6 +94,12 @@
     <table id="calendar_event_location_info">
       <tbody>
         <tr>
+          <td style="text-align: right;"><a href="#" onclick="jQuery.post('/bz/video_link', '', function(obj) {
+            var e = document.getElementById('calendar_event_location_name');
+            e.value = obj.link;
+           } ); return false;">Use Google Hangout as location</a></td>
+        </tr>
+        <tr>
           <td>
             <label for="calendar_event_location_name">{{#t "location_name"}}Location:{{/t}}</label>
             <input id="calendar_event_location_name" name="location_name" size="30" maxlength="255" type="text" value="{{location_name}}"/>
