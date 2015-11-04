@@ -1011,10 +1011,13 @@ class User < ActiveRecord::Base
 
   def check_accounts_right?(user, sought_right)
     # check if the user we are given is an admin in one of this user's accounts
-    user && (
-      Account.site_admin.grants_right?(user, sought_right) ||
-      self.associated_accounts.any?{|a| a.grants_right?(user, sought_right) }
-    )
+    return false unless user
+    return true if Account.site_admin.grants_right?(user, sought_right)
+    # what shards do the seeker and target share? only check accounts on those
+    # shards, to avoid too many queries.
+    shards = self.associated_shards & user.associated_shards
+    return false if shards.empty?
+    return self.associated_accounts.shard(shards).any?{|a| a.grants_right?(user, sought_right) }
   end
 
   set_policy do

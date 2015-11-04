@@ -2700,6 +2700,25 @@ describe User do
     end
   end
 
+  describe "check_accounts_right?" do
+    describe "sharding" do
+      specs_require_sharding
+
+      it "should check for associated accounts on shards the user shares with the seeker" do
+        # create target user on defualt shard
+        target = user()
+        # create account on another shard
+        account = @shard1.activate{ Account.create! }
+        # associate target user with that account
+        account_admin_user(user: target, account: account, role: Role.get_built_in_role('AccountMembership'))
+        # create seeking user as admin on that account
+        seeker = account_admin_user(account: account, role: Role.get_built_in_role('AccountAdmin'))
+        # ensure seeking user gets permissions it should on target user
+        expect(target.grants_right?(seeker, :view_statistics)).to be_truthy
+      end
+    end
+  end
+
   describe "#conversation_context_codes" do
     before :once do
       @user = user(:active_all => true)
