@@ -12,6 +12,7 @@ RSpec.shared_context "JWT setup" do
   after do
     ENV['ECOSYSTEM_SECRET'] = @preexisting_signing_secret
     ENV['ECOSYSTEM_KEY'] = @preexisting_encryption_secret
+    Timecop.return
   end
 
   around do |example|

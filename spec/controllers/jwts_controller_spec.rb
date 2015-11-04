@@ -23,9 +23,8 @@ describe JwtsController do
 
     it "doesn't allow using a token to gen a token" do
       token_user = user(active_user: true)
-      token = Canvas::Security.create_services_jwt(token_user.global_id)
-      utf8_crypted_token = Canvas::Security.base64_encode(token)
-      post 'create', {format: 'json'}, {'Authorization' => "Bearer #{utf8_crypted_token}"}
+      token = Canvas::Security::ServicesJwt.generate(token_user.global_id)
+      get 'create', {format: 'json'}, {'Authorization' => "Bearer #{token}"}
       expect(response.status).to_not eq(200)
     end
   end

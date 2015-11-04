@@ -59,23 +59,14 @@ describe Canvas::Security do
         end
       end
 
-      describe ".create_services_jwt" do
-        include_context "JWT setup"
+      describe ".create_encrypted_jwt" do
+        let(:signing_secret){ "asdfasdfasdfasdfasdfasdfasdfasdf" }
+        let(:encryption_secret){ "jkl;jkl;jkl;jkl;jkl;jkl;jkl;jkl;" }
 
         it "builds up an encrypted token" do
-          jwt = Canvas::Security.create_services_jwt(1, signing_secret, encryption_secret)
-          expect(jwt.length).to eq(435)
-        end
-
-        it "builds up a token from env vars if no secrets passed" do
-          env_var_jwt = Canvas::Security.create_services_jwt(1)
-          expect(env_var_jwt.length).to eq(435)
-        end
-
-        it "expires in an hour" do
-          jwt = Canvas::Security.create_services_jwt(1, signing_secret, encryption_secret)
-          jwt_body = Canvas::Security.decrypt_services_jwt(jwt, signing_secret, encryption_secret)
-          expect(jwt_body[:exp]).to eq(1363169520)
+          payload = {arbitrary: "data"}
+          jwt = Canvas::Security.create_encrypted_jwt(payload, signing_secret, encryption_secret)
+          expect(jwt.length).to eq(225)
         end
       end
     end

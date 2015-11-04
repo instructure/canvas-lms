@@ -509,8 +509,7 @@ describe "API Authentication", type: :request do
   end
 
   describe "services JWT" do
-    let(:signing_secret){ "asdfasdfasdfasdfasdfasdfasdfasdf" }
-    let(:encryption_secret){ "jkl;jkl;jkl;jkl;jkl;jkl;jkl;jkl;" }
+    include_context "JWT setup"
 
     before :once do
       user_params = {
@@ -522,20 +521,8 @@ describe "API Authentication", type: :request do
       course_with_teacher(user: user_obj)
     end
 
-    before(:each) do
-      @preexisting_signing_secret = ENV['ECOSYSTEM_SECRET']
-      @preexisting_encryption_secret = ENV['ECOSYSTEM_KEY']
-      ENV['ECOSYSTEM_SECRET'] = signing_secret
-      ENV['ECOSYSTEM_KEY'] = encryption_secret
-    end
-
-    after(:each) do
-      ENV['ECOSYSTEM_SECRET'] = @preexisting_signing_secret
-      ENV['ECOSYSTEM_KEY'] = @preexisting_encryption_secret
-    end
-
     def wrapped_jwt_from_service
-      services_jwt = Canvas::Security.create_services_jwt(@user.global_id)
+      services_jwt = Canvas::Security::ServicesJwt.generate(@user.global_id, false)
       payload = {
         iss: "some other service",
         user_token: services_jwt

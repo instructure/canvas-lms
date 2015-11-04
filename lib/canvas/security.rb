@@ -114,15 +114,12 @@ module Canvas::Security
   # This is a token that will be used for identifying the user to
   # canvas on API calls and to other canvas-ecosystem services.
   #
-  # user_global_id (int) - The globally unique id of the user this token represents
+  # payload (hash) - The data you want in the token
   # signing_secret (big string) - The shared secret for signing
   # encryption_secret (big string) - The shared key for symmetric key encryption.
   #
   # Returns the token as a string.
-  def self.create_services_jwt(user_global_id, signing_secret=nil, encryption_secret=nil)
-    signing_secret ||= ENV['ECOSYSTEM_SECRET']
-    encryption_secret ||= ENV['ECOSYSTEM_KEY']
-    payload = jwt_payload_for_user(user_global_id, encryption_secret)
+  def self.create_encrypted_jwt(payload, signing_secret, encryption_secret)
     jwt = JSON::JWT.new(payload)
     jws = jwt.sign(signing_secret, :HS256)
     jwe = jws.encrypt(encryption_secret, 'dir', :A256GCM)
@@ -304,20 +301,6 @@ module Canvas::Security
   end
 
   private
-  def self.jwt_payload_for_user(user_global_id, encryption_secret)
-    timestamp = Time.zone.now.to_i
-    jti_input_string = [encryption_secret, timestamp, user_global_id].join(":")
-    jti = Digest::MD5.hexdigest(jti_input_string)
-    {
-      iss: "Canvas",
-      aud: ["Instructure"],
-      exp: timestamp + 3600, # token is good for 1 hour
-      nbf: timestamp - 30,   # don't accept the token in the past
-      iat: timestamp,        # tell when the token was issued
-      jti: jti,              # unique identifier
-      sub: user_global_id
-    }
-  end
 
   def self.verify_jwt(body)
     if body[:exp].present?

@@ -1,9 +1,10 @@
 module Canvas
   module Security
     class ServicesJwt
-      attr_reader :token_string
+      attr_reader :token_string, :is_wrapped
 
-      def initialize(raw_token_string)
+      def initialize(raw_token_string, wrapped=true)
+        @is_wrapped = wrapped
         if raw_token_string.nil?
           raise ArgumentError, "Cannot decode nil token string"
         end
@@ -11,22 +12,68 @@ module Canvas
       end
 
       def wrapper_token
+        return {} unless is_wrapped
         raw_wrapper_token = Canvas::Security.base64_decode(token_string)
-        Canvas::Security.decode_jwt(raw_wrapper_token, [ENV['ECOSYSTEM_SECRET']])
+        Canvas::Security.decode_jwt(raw_wrapper_token, [signing_secret])
       end
 
       def original_token
-        original_crypted_token = wrapper_token[:user_token]
+        original_crypted_token = if is_wrapped
+          wrapper_token[:user_token]
+        else
+          Canvas::Security.base64_decode(token_string)
+        end
         Canvas::Security.decrypt_services_jwt(original_crypted_token)
+      end
+
+      def id
+        original_token[:jti]
       end
 
       def user_global_id
         original_token[:sub]
       end
 
-      def self.generate(global_user_id)
-        crypted_token = Canvas::Security.create_services_jwt(global_user_id)
+      def expires_at
+        original_token[:exp]
+      end
+
+      def self.generate(global_user_id, base64=true)
+        payload = create_payload(global_user_id)
+        crypted_token = Canvas::Security.create_encrypted_jwt(payload, signing_secret, encryption_secret)
+        return crypted_token unless base64
         Canvas::Security.base64_encode(crypted_token)
+      end
+
+      private
+
+      def self.create_payload(global_user_id)
+        timestamp = Time.zone.now.to_i
+        {
+          iss: "Canvas",
+          aud: ["Instructure"],
+          exp: timestamp + 3600,  # token is good for 1 hour
+          nbf: timestamp - 30,    # don't accept the token in the past
+          iat: timestamp,         # tell when the token was issued
+          jti: SecureRandom.uuid, # unique identifier
+          sub: global_user_id
+        }
+      end
+
+      def encryption_secret
+        self.class.encryption_secret
+      end
+
+      def signing_secret
+        self.class.signing_secret
+      end
+
+      def self.encryption_secret
+        ENV['ECOSYSTEM_KEY']
+      end
+
+      def self.signing_secret
+        ENV['ECOSYSTEM_SECRET']
       end
     end
   end
