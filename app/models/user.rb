@@ -1485,9 +1485,9 @@ class User < ActiveRecord::Base
     assignments_needing('grading', :instructor, 120.minutes, opts) do |assignment_scope, opts|
       as = assignment_scope.active.
         expecting_submission.
-        need_grading_info(opts[:limit])
+        need_grading_info
       ActiveRecord::Associations::Preloader.new(as, :context).run
-      as.reject{|a| Assignments::NeedsGradingCountQuery.new(a, self).count == 0 }
+      as.lazy.select{|a| Assignments::NeedsGradingCountQuery.new(a, self).count != 0 }.take(opts[:limit]).to_a
     end
   end
 
@@ -1498,8 +1498,8 @@ class User < ActiveRecord::Base
         where(:moderated_grading => true).
         where("assignments.grades_published_at IS NULL").
         joins(:provisional_grades).uniq.preload(:context).
-        need_grading_info(opts[:limit]).
-        select{|a| a.context.grants_right?(self, :moderate_grades)}
+        need_grading_info.
+        lazy.select{|a| a.context.grants_right?(self, :moderate_grades)}.take(opts[:limit]).to_a
     end
   end
 
