@@ -1117,4 +1117,28 @@ describe AssignmentOverrideApplicator do
     @overridden_assignment = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @student)
     expect(@overridden_assignment.due_at).to eq @section_override.due_at
   end
+
+  it "should not cache incorrect overrides through due_between_with_overrides" do
+    course_with_student(:active_all => true)
+    @assignment = create_assignment(:course => @course, :submission_types => "online_upload")
+
+    so = assignment_override_model(:assignment => @assignment)
+    so.set = @course.default_section
+    so.override_due_at(30.days.from_now) # set it outside of the default upcoming events range
+    so.save!
+
+    other_so = assignment_override_model(:assignment => @assignment)
+    other_so.set = @course.course_sections.create!
+    other_so.override_due_at(5.days.from_now) # set it so it would be included in the upcoming events query
+    other_so.save!
+
+    Timecop.freeze(5.seconds.from_now) do
+      enable_cache do
+        @student.upcoming_events # prime the cache
+
+        @assignment.reload
+        expect(@assignment.overridden_for(@student).due_at).to eq so.due_at # should have cached correctly
+      end
+    end
+  end
 end

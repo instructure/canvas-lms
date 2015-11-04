@@ -1885,10 +1885,12 @@ class Assignment < ActiveRecord::Base
   # Return all assignments and their active overrides where either the
   # assignment or one of its overrides is due between start and ending.
   scope :due_between_with_overrides, lambda { |start, ending|
-    eager_load(:assignment_overrides).
-        where('assignments.due_at BETWEEN ? AND ?
-              OR assignment_overrides.due_at_overridden AND
-              assignment_overrides.due_at BETWEEN ? AND ?', start, ending, start, ending)
+    joins("LEFT OUTER JOIN #{AssignmentOverride.quoted_table_name} assignment_overrides
+          ON assignment_overrides.assignment_id = assignments.id").
+    group("assignments.id").
+    where('assignments.due_at BETWEEN ? AND ?
+          OR assignment_overrides.due_at_overridden AND
+          assignment_overrides.due_at BETWEEN ? AND ?', start, ending, start, ending)
   }
 
   scope :updated_after, lambda { |*args|
