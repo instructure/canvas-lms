@@ -211,6 +211,71 @@ describe "conversations new" do
 
         expect(flash_message_present?(:success, /Message sent!/)).to be_truthy
       end
+
+      context "Message Address Book" do
+        before(:each) do
+          @t1_name = 'teacher1'
+          @t2_name = 'teacher2'
+          @t1 = user(name: @t1_name, active_user: true)
+          @t2 = user(name: @t2_name, active_user: true)
+          [@t1, @t2].each { |s| @course.enroll_teacher(s) }
+
+          get_conversations
+          fln('Inbox').click
+
+          find('.icon-compose').click
+          fj('.btn.dropdown-toggle :contains("Select course")').click
+          wait_for_ajaximations
+
+          expect(find('.dropdown-menu.open')).to be_truthy
+
+          fj('.message-header-input .text:contains("Unnamed Course")').click
+          wait_for_ajaximations
+
+          find('.message-header-input .icon-address-book').click
+          wait_for_ajaximations
+        end
+
+        it "contains categories for teachers, students, and groups", priority: "1", test_id: 138899 do
+          assert_result_names(true, ['Teachers', 'Students', 'Student Groups'])
+        end
+
+        it "categorizes enrolled teachers", priority: "1", test_id: 476933 do
+          assert_categories('Teachers')
+          assert_result_names(true, [@t1_name, @t2_name])
+          assert_result_names(false, [@s1.name, @s2.name])
+        end
+
+        it "categorizes enrolled students", priority: "1", test_id: 476934 do
+          assert_categories('Students')
+          assert_result_names(false, [@t1_name, @t2_name])
+          assert_result_names(true, [@s1.name, @s2.name])
+        end
+
+        it "categorizes enrolled students in groups", priority: "1", test_id: 476935 do
+          assert_categories('Student Groups')
+          assert_categories('the group')
+          assert_result_names(false, [@t1_name, @t2_name])
+          assert_result_names(true, [@s1.name, @s2.name])
+        end
+      end
     end
   end
+
+  def assert_result_names(tf, names)
+    names.each do |name|
+      keep_trying_until(9) do
+        if tf
+          expect(fj(".ac-result-container .result-name:contains(#{name})")).to be_truthy
+        else
+          expect(fj(".ac-result-container .result-name:contains(#{name})")).to be_falsey
+        end
+      end
+    end
+  end
+
+  def assert_categories(container)
+    keep_trying_until(9) { fj(".ac-result-container .result-name:contains(#{container})").click }
+  end
+
 end
