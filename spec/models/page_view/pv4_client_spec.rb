@@ -1,0 +1,99 @@
+#
+# Copyright (C) 2015 Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+
+require_relative '../../spec_helper.rb'
+
+describe PageView::Pv4Client do
+  let(:pv4_object) do
+    { "Z" => "canvas",
+      "action" => "show",
+      "agent" => "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_1) AppleWebKit/601.2.7 (KHTML, like Gecko) Version/9.0.1 Safari/601.2.7",
+      "app_server" => "app1234",
+      "bytes" => "11441",
+      "canvas_context_id" => "120000000000002",
+      "canvas_context_type" => "Account",
+      "client_ip" => "192.168.0.1",
+      "controller" => "users",
+      "e" => "1135368",
+      "http_method" => "GET",
+      "http_request" => "/accounts/2/users/1",
+      "http_status" => "200",
+      "interaction_seconds" => "5",
+      "microseconds" => "6367549",
+      "participated" => false,
+      "request_id" => "2c2955f3-d114-4ac0-8101-b7e0138a1685",
+      "root_account_id" => "120000000000002",
+      "sessionid" => "c73d248f3e4cec530261c95232ba63fg",
+      "timestamp" => "2015-11-05T17:01:20.306Z",
+      "user_id" => "31410000000000028",
+      "vhost" => "canvas.instructure.com"
+    }.freeze
+  end
+  let(:client) { PageView::Pv4Client.new('http://pv4/', 'token') }
+
+  def stub_http_request(response)
+    stub = stub(body: response.to_json)
+    CanvasHttp.stubs(:get).returns(stub)
+  end
+
+  describe "#fetch" do
+    it "returns page view objects" do
+      stub_http_request('page_views' => [pv4_object])
+
+      response = client.fetch(1)
+      expect(response.length).to eq 1
+      expect(response.first).to be_a PageView
+      pv = response.first
+      expect(pv.url).to eq 'http://canvas.instructure.com/accounts/2/users/1'
+      expect(pv.created_at).to eq Time.zone.parse("2015-11-05T17:01:20.306Z")
+      expect(pv.session_id).to eq 'c73d248f3e4cec530261c95232ba63fg'
+      expect(pv.context_id).to eq 120000000000002
+      expect(pv.context_type).to eq 'Account'
+      expect(pv.user_agent).to be_include('Safari')
+      expect(pv.account_id).to eq 120000000000002
+      expect(pv.user_id).to eq 31410000000000028
+      expect(pv.remote_ip).to eq '192.168.0.1'
+      expect(pv.render_time).to eq 6.367549
+    end
+  end
+
+  describe "#for_user" do
+    it "returns a paginatable object" do
+      stub_http_request('page_views' => [pv4_object])
+
+      result = client.for_user(1).paginate(per_page: 10)
+      expect(result).to be_a(Array)
+      expect(result.length).to eq 1
+    end
+
+    it "sends last_page_view_id when paginating" do
+      stub_http_request('page_views' => [pv4_object])
+
+      now = Time.now.utc
+      result = client.for_user(1).paginate(per_page: 10)
+
+      stub = stub(body: '{ "page_views": [] }')
+      CanvasHttp.unstub(:get)
+      CanvasHttp.expects(:get).with(
+        "http://pv4/users/1/page_views?start_time=#{now.iso8601(PageView::Pv4Client::PRECISION)}&end_time=#{pv4_object['timestamp']}&last_page_view_id=#{pv4_object['request_id']}&limit=10",
+        "Authorization" => "Bearer token").returns(stub)
+      client.for_user(1, start_time: now, end_time: now).
+          paginate(page: result.next_page, per_page: 10)
+    end
+  end
+end
