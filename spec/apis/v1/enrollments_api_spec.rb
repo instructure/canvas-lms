@@ -170,12 +170,29 @@ describe EnrollmentsApiController, type: :request do
             :enrollment => {
               :user_id => @unenrolled_user.id,
               :type    => 'ObserverEnrollment',
-              :enrollment_state => 'active',
+              :enrollment_state => 'invited',
               :course_section_id => @section.id,
               :limit_privileges_to_course_section => true
             }
           }
-        expect(Enrollment.find(json['id'])).to be_an_instance_of ObserverEnrollment
+        enrollment = Enrollment.find(json['id'])
+        expect(enrollment).to be_an_instance_of ObserverEnrollment
+        expect(enrollment.workflow_state).to eq 'invited'
+      end
+
+      it "should default observer enrollments to 'active' state" do
+        json = api_call :post, @path, @path_options,
+          {
+            :enrollment => {
+              :user_id => @unenrolled_user.id,
+              :type    => 'ObserverEnrollment',
+              :course_section_id => @section.id,
+              :limit_privileges_to_course_section => true
+            }
+          }
+        enrollment = Enrollment.find(json['id'])
+        expect(enrollment).to be_an_instance_of ObserverEnrollment
+        expect(enrollment.workflow_state).to eq 'active'
       end
 
       it "should not create a new observer enrollment for self" do

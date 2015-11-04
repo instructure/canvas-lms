@@ -2186,9 +2186,9 @@ describe CoursesController, type: :request do
       observer1 = user
       observer2 = user
 
-      @course1.enroll_user(observer1, "ObserverEnrollment", :associated_user_id => @student1.id).accept!
-      @course1.enroll_user(observer2, "ObserverEnrollment", :associated_user_id => @student2.id).accept!
-      @course1.enroll_user(observer1, "ObserverEnrollment", :allow_multiple_enrollments => true, :associated_user_id => @student2.id).accept!
+      @course1.enroll_user(observer1, "ObserverEnrollment", :associated_user_id => @student1.id)
+      @course1.enroll_user(observer2, "ObserverEnrollment", :associated_user_id => @student2.id)
+      @course1.enroll_user(observer1, "ObserverEnrollment", :allow_multiple_enrollments => true, :associated_user_id => @student2.id)
 
       @user = @me
       json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",

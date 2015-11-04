@@ -1848,8 +1848,8 @@ describe 'Submissions API', type: :request do
     context "observers" do
       before :once do
         @observer = user :active_all => true
-        @course.enroll_user(@observer, 'ObserverEnrollment', :associated_user_id => @student1.id).accept!
-        @course.enroll_user(@observer, 'ObserverEnrollment', :allow_multiple_enrollments => true, :associated_user_id => @student2.id).accept!
+        @course.enroll_user(@observer, 'ObserverEnrollment', :associated_user_id => @student1.id)
+        @course.enroll_user(@observer, 'ObserverEnrollment', :allow_multiple_enrollments => true, :associated_user_id => @student2.id)
       end
 
       it "should allow an observer to view observed students' submissions" do

@@ -415,7 +415,11 @@ class Enrollment < ActiveRecord::Base
 
   def update_from(other, skip_broadcasts=false)
     self.course_id = other.course_id
-    self.workflow_state = other.workflow_state
+    if self.type == 'ObserverEnrollment' && other.workflow_state == 'invited'
+      self.workflow_state = 'active'
+    else
+      self.workflow_state = other.workflow_state
+    end
     self.start_at = other.start_at
     self.end_at = other.end_at
     self.course_section_id = other.course_section_id
