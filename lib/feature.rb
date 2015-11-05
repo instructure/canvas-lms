@@ -426,6 +426,16 @@ END
       state: 'hidden',
       development: true,
       root_opt_in: true
+    },
+    'rich_content_service' =>
+    {
+      display_name: -> { I18n.t('Use remote version of Rich Content Editor') },
+      description: -> { I18n.t('In cases where it is available, load the RCE from a canvas rich content service') },
+      applies_to: 'RootAccount',
+      state: 'hidden',
+      beta: true,
+      development: true,
+      root_opt_in: false
     }
   )
 
@@ -498,4 +508,3 @@ end
 
 # load feature definitions
 Dir.glob("#{Rails.root}/lib/features/*.rb").each { |file| require_dependency file }
-

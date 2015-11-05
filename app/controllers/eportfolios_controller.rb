@@ -23,6 +23,7 @@ class EportfoliosController < ApplicationController
   include EportfolioPage
   before_filter :require_user, :only => [:index, :user_index]
   before_filter :reject_student_view_student
+  before_filter :rich_content_service_config
 
   def index
     user_index
@@ -209,5 +210,10 @@ class EportfoliosController < ApplicationController
     else
       authorized_action(nil, nil, :bad_permission)
     end
+  end
+
+  protected
+  def rich_content_service_config
+    js_env(Services::RichContent.env_for(@domain_root_account))
   end
 end

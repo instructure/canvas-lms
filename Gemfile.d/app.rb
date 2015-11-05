@@ -99,6 +99,7 @@ gem 'crocodoc-ruby', '0.0.1', require: false
 gem 'hey', '1.3.0', require: false
 gem 'sentry-raven', '0.13.2', require: false
 gem 'canvas_statsd', '1.0.3'
+gem 'diplomat', '0.14.0', require: false
 
 gem 'active_polymorph', path: 'gems/active_polymorph'
 gem 'activesupport-suspend_callbacks', path: 'gems/activesupport-suspend_callbacks'
