@@ -58,6 +58,11 @@ module CC::Exporter::Epub::Converters
       @course[:syllabus] = has_due_date.sort_by{|item| item[:due_at]} + due_anytime
     end
 
+    def include_item?(meta_node, workflow_state='published')
+      get_node_val(meta_node, 'workflow_state') == workflow_state &&
+      !get_bool_val(meta_node, 'module_locked')
+    end
+
     # exports the package into the intermediary json
     def export
       unzip_archive

@@ -123,6 +123,7 @@ module CC
       doc.require_initial_post 'true' if topic.require_initial_post
       doc.has_group_category topic.has_group_category?
       doc.workflow_state topic.workflow_state
+      doc.module_locked topic.locked_by_module_item?(@user, true).present?
       if topic.assignment && !topic.assignment.deleted?
         assignment_migration_id = CCHelper.create_key(topic.assignment)
         doc.assignment(:identifier=>assignment_migration_id) do |a|

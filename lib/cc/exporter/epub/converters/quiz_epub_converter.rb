@@ -11,16 +11,19 @@ module CC::Exporter::Epub::Converters
         ident = get_node_att(meta_node, "assessment", "ident")
 
         quiz_meta_path = "#{ident}/assessment_meta.xml"
+        quiz_meta_link = File.join @unzipped_file_path, quiz_meta_path
+        quiz_meta_data = open_file_xml(quiz_meta_link)
 
-        quizzes << convert_quiz(quiz_meta_path)
+        quiz = convert_quiz(quiz_meta_data)
+        next unless get_bool_val(quiz_meta_data, 'available') &&
+          !get_bool_val(quiz_meta_data, 'module_locked')
+        quizzes << quiz
       end
       quizzes
     end
 
-    def convert_quiz(quiz_meta_path)
+    def convert_quiz(quiz_meta_data)
       quiz = {}
-      quiz_meta_link = File.join @unzipped_file_path, quiz_meta_path
-      quiz_meta_data = open_file_xml(quiz_meta_link)
 
       quiz[:title] = get_node_val(quiz_meta_data, "title")
       quiz[:description] = get_node_val(quiz_meta_data, "description")
@@ -32,7 +35,7 @@ module CC::Exporter::Epub::Converters
       quiz[:position] = get_node_val(quiz_meta_data, 'position')
       quiz[:identifier] = get_node_att(quiz_meta_data, 'quiz', 'identifier')
       quiz[:href] = "quizzes.xhtml##{quiz[:identifier]}"
-      update_syllabus(quiz)
+      update_syllabus(quiz) if get_node_val(quiz_meta_data, 'assignment').present?
       quiz
     end
   end

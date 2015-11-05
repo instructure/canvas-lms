@@ -38,18 +38,20 @@ module CC::Exporter::Epub
       @_templates ||= {
         title: cartridge_json[:title],
         files: cartridge_json[:files],
+        toc: toc,
+        syllabus: create_universal_template(:syllabus),
+        announcements: create_universal_template(:announcements)
       }.tap do |hash|
-        resources = filter_syllabus_for_modules ? module_ids : LINKED_RESOURCE_KEY.except("Attachment").values
-        @_toc = create_universal_template(:toc)
-        hash.merge!(
-          :toc => @_toc,
-          :syllabus => create_universal_template(:syllabus),
-          :announcements => create_universal_template(:announcements)
-        )
+        resources = sort_by_content ? LINKED_RESOURCE_KEY.except("Attachment").values : module_ids
+        remove_hidden_content_from_syllabus!
         resources.each do |resource_type|
           hash.reverse_merge!(resource_type => create_content_template(resource_type))
         end
       end
+    end
+
+    def toc
+      @_toc ||= create_universal_template(:toc)
     end
 
     def get_item(resource_type, identifier)
@@ -61,6 +63,22 @@ module CC::Exporter::Epub
 
     def update_item(resource_type, identifier, updated_item)
       get_item(resource_type, identifier).merge!(updated_item)
+    end
+
+    def item_ids
+      @_item_ids ||= cartridge_json.values_at(*LINKED_RESOURCE_KEY.values).flatten.map do |item|
+        item[:identifier]
+      end
+    end
+
+    def get_syllabus_item(identifier)
+      cartridge_json[:syllabus].find(-> {{}}) do |syllabus_item|
+        syllabus_item[:identifier] == identifier
+      end
+    end
+
+    def update_syllabus_item(identifier, updated_item)
+      get_syllabus_item(identifier).merge!(updated_item)
     end
 
     def create_universal_template(resource)

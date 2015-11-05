@@ -61,6 +61,7 @@ module CC
             m_node.end_at CCHelper::ims_datetime(cm.end_at) if cm.end_at
             m_node.require_sequential_progress cm.require_sequential_progress.to_s unless cm.require_sequential_progress.nil?
             m_node.requirement_count cm.requirement_count if cm.requirement_count
+            m_node.locked cm.locked_for?(@user).present?
 
             if cm.prerequisites && !cm.prerequisites.empty?
               m_node.prerequisites do |pre_reqs|

@@ -8,7 +8,10 @@ module CC::Exporter::Epub::Converters
 
       wiki_dir = File.join(@unzipped_file_path, 'wiki_content')
       Dir["#{wiki_dir}/**/**"].each do |path|
-        doc = open_file(path)
+        doc = open_file_xml(path)
+        workflow_state = get_node_val(doc, 'meta[name=workflow_state] @content')
+        module_locked = get_bool_val(doc, 'meta[name=module_locked] @content')
+        next unless workflow_state == 'active' && !module_locked
         wikis << convert_wiki(doc, path)
       end
 

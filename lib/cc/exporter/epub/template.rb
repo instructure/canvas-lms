@@ -1,5 +1,6 @@
 module CC::Exporter::Epub
   class Template
+    include ActionView::Helpers::TagHelper
     include CC::Exporter::Epub::Converters::MediaConverter
     include CC::Exporter::Epub::Converters::ObjectPathConverter
     include TextHelper
@@ -33,6 +34,18 @@ module CC::Exporter::Epub
       Exporter.resource_template(resource_type(item))
     end
 
+    def remove_empty_ids!(node)
+      node.search("a[id='']").each do |tag|
+        tag.remove_attribute('id')
+      end
+      node
+    end
+
+    def resource_type(item)
+      Exporter::LINKED_RESOURCE_KEY[item[:linked_resource_type]] || @reference
+    end
+
+    # View helpers
     def convert_placeholder_paths_from_string!(html_string)
       html_node = Nokogiri::HTML::DocumentFragment.parse(html_string)
       html_node.tap do |node|
@@ -43,11 +56,8 @@ module CC::Exporter::Epub
       html_node.to_s
     end
 
-    def remove_empty_ids!(node)
-      node.search("a[id='']").each do |tag|
-        tag.remove_attribute('id')
-      end
-      node
+    def display_prerequisites(prerequisites)
+      prerequisites.map {|prerequisite| prerequisite[:title] }.join(', ')
     end
 
     def friendly_date(date)
@@ -55,8 +65,14 @@ module CC::Exporter::Epub
       datetime_string(Date.parse(date))
     end
 
-    def resource_type(item)
-      Exporter::LINKED_RESOURCE_KEY[item[:linked_resource_type]] || @reference
+    def link_to_content_item(item)
+      content = item[:title]
+
+      if item[:href].present?
+        content_tag(:a, content, href: item[:href])
+      else
+        content
+      end
     end
   end
 end

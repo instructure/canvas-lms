@@ -14,9 +14,9 @@ module CC::Exporter::Epub::Converters
         meta_node = open_file_xml(meta_path)
         html_node = open_file(html_path)
 
-        next unless html_node
-
-        assignments << assignment_data(meta_node, html_node)
+        assignment = assignment_data(meta_node, html_node)
+        next unless include_item?(meta_node)
+        assignments << assignment
       end
       assignments
     end

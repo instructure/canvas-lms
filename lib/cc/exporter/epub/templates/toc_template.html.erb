@@ -14,7 +14,9 @@
       <h3><a href="<%= "#{resource[:reference]}.xhtml" %>"><%= "#{resource[:title]}" %></a></h3>
       <ol>
         <% resource[:resource_content].each do |resource_item| %>
-          <li><a href="<%= "#{resource_item[:href]}" %>"><%= "#{resource_item[:title]}" %></a></li>
+          <li>
+            <%= link_to_content_item(resource_item) %>
+          </li>
         <% end %>
       </ol>
     <% end %>
