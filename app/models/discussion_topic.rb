@@ -141,8 +141,15 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def set_schedule_delayed_transitions
-    @should_schedule_delayed_post = self.delayed_post_at? && self.delayed_post_at_changed?
-    @should_schedule_lock_at = self.lock_at && self.lock_at_changed?
+    if self.delayed_post_at? && self.delayed_post_at_changed?
+      @should_schedule_delayed_post = true
+      self.workflow_state = 'post_delayed' if [:migration, :after_migration].include?(self.saved_by) && self.delayed_post_at > Time.now
+    end
+    if self.lock_at && self.lock_at_changed?
+      @should_schedule_lock_at = true
+      self.locked = false if [:migration, :after_migration].include?(self.saved_by) && self.lock_at > Time.now
+    end
+
     true
   end
 
@@ -806,7 +813,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   def initialize_last_reply_at
     self.posted_at ||= Time.now.utc
-    self.last_reply_at ||= Time.now.utc unless self.saved_by == :migration
+    self.last_reply_at ||= Time.now.utc unless [:migration, :after_migration].include?(self.saved_by)
   end
 
   set_policy do
