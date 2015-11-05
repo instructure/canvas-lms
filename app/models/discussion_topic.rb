@@ -19,6 +19,9 @@
 
 require 'atom'
 
+# Force loaded so that it will be in ActiveRecord::Base.descendants for switchman to use
+require_dependency 'assignment_student_visibility'
+
 class DiscussionTopic < ActiveRecord::Base
 
   include Workflow
@@ -64,6 +67,9 @@ class DiscussionTopic < ActiveRecord::Base
   has_many :child_topics, :class_name => 'DiscussionTopic', :foreign_key => :root_topic_id, :dependent => :destroy
   has_many :discussion_topic_participants, :dependent => :destroy
   has_many :discussion_entry_participants, :through => :discussion_entries
+
+  has_many :assignment_student_visibilities, :through => :assignment
+
   belongs_to :user
 
   EXPORTABLE_ATTRIBUTES = [
@@ -508,15 +514,8 @@ class DiscussionTopic < ActiveRecord::Base
   }
 
   scope :joins_assignment_student_visibilities, lambda { |user_ids, course_ids|
-    user_ids = Array.wrap(user_ids).join(',')
-    course_ids = Array.wrap(course_ids).join(',')
-    joins(sanitize_sql([<<-SQL, user_ids, course_ids]))
-      JOIN assignment_student_visibilities
-        ON (assignment_student_visibilities.assignment_id = discussion_topics.assignment_id
-          AND assignment_student_visibilities.user_id IN (%s)
-          AND assignment_student_visibilities.course_id IN (%s)
-        )
-    SQL
+    joins(:assignment_student_visibilities)
+      .where(assignment_student_visibilities: { user_id: user_ids, course_id: course_ids })
   }
 
   alias_attribute :available_from, :delayed_post_at
