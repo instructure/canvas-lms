@@ -152,7 +152,9 @@ module Turnitin
 
     def createOrUpdateAssignment(assignment, settings)
       course = assignment.context
-      today = (Time.now.utc - 1.day).to_date # buffer by a day until we figure out what turnitin is doing with timezones
+      # turnitin generally expects the timezone to be set the same as
+      # the Turnitin account is set up as.
+      today = course.time_zone.today
       settings = Turnitin::Client.normalize_assignment_turnitin_settings(settings)
       # institution_check   - 1/0, check institution
       # submit_papers_to    - 0=none, 1=standard, 2=institution
