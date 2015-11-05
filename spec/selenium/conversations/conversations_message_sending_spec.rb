@@ -23,24 +23,6 @@ describe "conversations new" do
       expect(errors[1].text).to include('Required field')
     end
 
-    it "should not show courses that are date restricted" do
-      user = @s1
-      user_logged_in({:user => user})
-
-      get '/conversations'
-      f('.icon-compose').click
-      expect(element_exists("#compose-message-course option[data-code='Unnamed']"))
-
-      @course.conclude_at = 2.weeks.ago
-      @course.restrict_enrollments_to_course_dates = true
-      @course.restrict_student_past_view = true
-      @course.save!
-
-      get '/conversations'
-      f('.icon-compose').click
-      expect(!element_exists("#compose-message-course option[data-code='Unnamed']"))
-    end
-
     it "should start a group conversation when there is only one recipient", priority: "2", test_id: 201499 do
       get_conversations
       compose course: @course, to: [@s1], subject: 'single recipient', body: 'hallo!'
@@ -150,6 +132,46 @@ describe "conversations new" do
       get_message_body_input.send_keys(:enter)
       driver.action.key_up(:shift).perform
       expect(fj('#compose-new-message:visible')).not_to be_nil
+    end
+
+    context "with date-restricted course" do
+      before(:each) do
+        @course.restrict_enrollments_to_course_dates = true
+        @course.restrict_student_past_view = true
+        @course.restrict_student_future_view = true
+        @course.save!
+        user_logged_in(user: @s1)
+      end
+
+      it "should show course when in valid dates", priority: "1", test_id: 478993 do
+        @course.conclude_at = 1.day.from_now
+        @course.start_at = 1.day.ago
+        @course.save!
+
+        get '/conversations'
+        f('.icon-compose').click
+        expect(fj("#compose-message-course option:contains('#{@course.name}')")).to be
+      end
+
+      it "should not show course before begin date", priority: "1", test_id: 478994 do
+        @course.conclude_at = 2.days.from_now
+        @course.start_at = 1.day.from_now
+        @course.save!
+
+        get '/conversations'
+        f('.icon-compose').click
+        expect(fj("#compose-message-course option:contains('#{@course.name}')")).not_to be
+      end
+
+      it "should not show course after end date", priority: "1", test_id: 478995 do
+        @course.conclude_at = 1.day.ago
+        @course.start_at = 2.days.ago
+        @course.save!
+
+        get '/conversations'
+        f('.icon-compose').click
+        expect(fj("#compose-message-course option:contains('#{@course.name}')")).not_to be
+      end
     end
 
     #
