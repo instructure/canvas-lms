@@ -110,7 +110,6 @@ span.agendaView--no-assignments {
 
     &:hover, &:focus {
       background-color: #F2F4F6;
-      outline: none;
     }
   }
   @include breakpoint(desktop) {
