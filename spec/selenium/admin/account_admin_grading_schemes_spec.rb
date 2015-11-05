@@ -60,3 +60,17 @@ describe "account admin grading schemes" do
     end
   end
 end
+
+describe "course grading schemes as account admin" do
+  include_context "in-process server selenium tests"
+
+  before(:once) do
+    course_with_admin_logged_in
+    simple_grading_standard(@course.account)
+  end
+
+  it "disallows editing but links to the account grading standards page" do
+    get "/courses/#{@course.id}/grading_standards"
+    expect(f("#grading_standard_#{@standard.id} a.cannot-manage-notification")).to be_displayed
+  end
+end
