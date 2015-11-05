@@ -91,12 +91,55 @@ describe 'dashcards' do
       expect(f('a.files')).to be_present
     end
 
+    it 'should show announcement created notifications in dashcard', priority: "1", test_id: 238411 do
+      create_announcement('New Announcement')
+      get '/'
+      expect(f('a.announcements .unread_count').text).to include('1')
+      # The notifications should go away after visiting the show page of announcements
+      expect_new_page_load{f('a.announcements').click}
+      expect_new_page_load{fln('New Announcement').click}
+      get '/'
+      expect(f('a.announcements .unread_count')).to be_nil
+    end
+
+    it 'should show discussions created notifications in dashcard', priority: "1", test_id: 240009 do
+      @course.discussion_topics.create!(title: 'discussion 1', message: 'This is a message.')
+      get '/'
+      expect(f('a.discussions .unread_count').text).to include('1')
+      # The notifications should go away after visiting the show page of discussions
+      expect_new_page_load{f('a.discussions').click}
+      expect_new_page_load{fln('discussion 1').click}
+      get '/'
+      expect(f('a.discussions .unread_count')).to be_nil
+    end
+
+    it 'should show assignments created notifications in dashcard', priority: "1", test_id: 238413 do
+      skip('Notifications does not work for assignments as of now in dashcards')
+      @course.assignments.create!(title: 'assignment 1', name: 'assignment 1')
+      get '/'
+      expect(f('a.assignments .unread_count').text).to include('1')
+      # The notifications should go away after visiting the show page of assignments
+      expect_new_page_load{f('a.assignments').click}
+      expect_new_page_load{fln('assignment 1').click}
+      get '/'
+      expect(f('a.assignments .unread_count')).to be_nil
+    end
+
+    it 'should show files created notifications in dashcard', priority: "1", test_id: 238414 do
+      skip('Notifications does not work for files as of now in dashcards')
+      add_file(fixture_file_upload('files/example.pdf', 'application/pdf'), @course, 'example.pdf')
+      get '/'
+      expect(f('a.files .unread_count').text).to include('1')
+      # The notifications should go away after visiting the show page of files
+      expect_new_page_load{f('a.files').click}
+      expect_new_page_load{fln('example.pdf').click}
+      get '/'
+      expect(f('a.files .unread_count')).to be_nil
+    end
+
     context "course name and code display" do
       before :each do
         @course1 = course_model
-        @course1.name = 'Test Course Test Course Test Course Test Course Test Course Test Course Test Course Test' \
-                        'Course Test Course Test Course Test Course Test Course Test Course Test Course Test Course'\
-                        'Test Course Test Course Test Course Test Course Te'
         @course1.offer!
         @course1.save!
         enrollment = student_in_course(course: @course1, user: @student)
@@ -104,6 +147,9 @@ describe 'dashcards' do
       end
 
       it 'should not display course code if the name is too long', priority: "1", test_id: 238191 do
+        @course1.name = 'Test Course Test Course Test Course Test Course Test Course Test Course Test Course Test' \
+                        'Course Test Course Test Course Test Course Test Course Test Course Test Course Test Course'\
+                        'Test Course Test Course Test Course Test Course Te'
         @course1.course_code = '001'
         @course1.save!
         get '/'
