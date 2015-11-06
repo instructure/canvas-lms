@@ -261,13 +261,15 @@ define [
           status = I18n.t('Reserved')
         $element.find('.fc-title').text(status)
 
-      # TODO: i18n
       startDate = event.startDate()
       endDate = event.endDate()
       timeString = if !endDate || +startDate == +endDate
-          startDate.format("h:mm a")
+          startDate.locale(calendarDefaults.lang)
+          startDate.format("LT")
         else
-          $.fullCalendar.formatRange(startDate, endDate, "h:mm a")
+          startDate.locale(calendarDefaults.lang)
+          endDate.locale(calendarDefaults.lang)
+          $.fullCalendar.formatRange(startDate, endDate, "LT")
 
       screenReaderTitleHint = if event.eventType.match(/assignment/)
           I18n.t('event_assignment_title', 'Assignment Title:')

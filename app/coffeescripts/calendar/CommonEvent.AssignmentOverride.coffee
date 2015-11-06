@@ -50,8 +50,7 @@ define [
     displayTimeString: () ->
       datetime = @originalStart
       if datetime
-        # TODO: i18n
-        "Due: #{@formatTime(datetime)}"
+        I18n.t('Due: %{dueAt}', dueAt: @formatTime(datetime))
       else
         I18n.t('No Date')
 
