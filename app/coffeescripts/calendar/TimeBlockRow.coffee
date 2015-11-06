@@ -68,7 +68,7 @@ define [
         startValid = false
 
       # and end is in the future
-      if end and end < $.fudgeDateForProfileTimezone(new Date())
+      if end and end < fcUtil.now()
         @$end_time.errorBox(I18n.t 'ends_in_past_error', 'You cannot create an appointment slot that ends in the past')
         endValid = false
 

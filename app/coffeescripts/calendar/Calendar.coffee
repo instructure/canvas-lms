@@ -411,11 +411,9 @@ define [
       })
 
     isSameWeek: (date1, date2) ->
-      weekStart = fcUtil.clone(date1)
-      weekStart.weekday(0)
-      weekStart.hour(0)
-      weekStart.minutes(0)
-      +weekStart <= +date2 <= +weekStart.add(7, 'days')
+      week1 = fcUtil.clone(date1).weekday(0).stripTime()
+      week2 = fcUtil.clone(date2).weekday(0).stripTime()
+      +week1 == +week2
 
     drawNowLine: =>
       return unless @currentView == 'week'
@@ -663,21 +661,21 @@ define [
       date = @getCurrentDate()
       @agendaViewFetch(date)
 
+    formatDate: (date, format) ->
+      tz.format(fcUtil.unwrap(date), format)
+
     agendaViewFetch: (start) ->
-      start.hours(0)
-      start.minutes(0)
-      start.seconds(0)
-      @setDateTitle(tz.format(fcUtil.unwrap(start), 'date.formats.medium'))
+      @setDateTitle(@formatDate(start, 'date.formats.medium'))
       @agenda.fetch(@visibleContextList, start)
 
     renderDateRange: (start, end) =>
-      @setDateTitle(I18n.l('#date.formats.medium', start.toDate())+' – '+I18n.l('#date.formats.medium', end.toDate()))
+      @setDateTitle(@formatDate(start, 'date.formats.medium')+' – '+@formatDate(end, 'date.formats.medium'))
       # for "load more" with voiceover, we want the alert to happen later so
       # the focus change doesn't interrupt it.
       window.setTimeout =>
         $.screenReaderFlashMessage I18n.t('agenda_view_displaying_start_end', "Now displaying %{start} through %{end}",
-          start: I18n.l('#date.formats.long', start.toDate())
-          end:   I18n.l('#date.formats.long', end.toDate())
+          start: @formatDate(start, 'date.formats.long')
+          end:   @formatDate(end, 'date.formats.long')
         )
       , 500
 

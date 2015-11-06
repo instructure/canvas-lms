@@ -87,8 +87,7 @@ define [
       @start && (@midnightFudged || (@start.hours() == 23 && @start.minutes() > 30) || (@start.hours() == 0 && @start.minutes() == 0))
 
     isPast: () ->
-      now = $.fullCalendar.moment()
-      @start && @start < now
+      @start && @start < fcUtil.now()
 
     # note: this is a hacky solution to deal with
     # an underlying binding issue - if possible try
@@ -122,10 +121,9 @@ define [
       "<time datetime='#{datetime.toISOString()}'>#{formattedHtml}</time>"
 
     forceMinimumDuration: () ->
-      minimumDuration = 30 * 60 * 1000 # 30 minutes
-      if @start && @end && (@end - @start) < minimumDuration
-        # new date so we don't mutate the original
-        @end = fcUtil.clone(@start).add(minimumDuration, "milliseconds")
+      if @start && @end
+        minimumEnd = fcUtil.clone(@start).add(30, "minutes")
+        @end = minimumEnd if minimumEnd > @end
 
     assignmentType: () ->
       return if !@assignment

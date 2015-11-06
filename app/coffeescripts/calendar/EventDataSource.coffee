@@ -81,9 +81,9 @@ define [
         return [ start, end ]
 
       for range in ranges
-        if range[0] <= start && start <= range[1]
+        if range[0] <= start < range[1]
           start = range[1]
-        if range[0] <= end && end <= range[1]
+        if range[0] < end <= range[1]
           end = range[0]
 
       [ start, end ]
@@ -117,8 +117,18 @@ define [
 
       events = []
       for id, event of contextInfo.events
-        if !event.originalStart && !start || event.originalStart >= start && event.originalStart <= end
+        if !event.originalStart && !start
+          # want undated, have undated, include it
           events.push event
+        else if !event.originalStart || !start
+          # want undated, have dated (or vice versa), skip it
+          continue
+        else
+          # want dated, have dated. but when comparing to the range, remember
+          # that we made start/end be unwrapped values (down in getEvents), so
+          # unwrap event.originalStart too before comparing
+          if start <= fcUtil.unwrap(event.originalStart) < end
+            events.push event
 
       events
 
@@ -215,16 +225,28 @@ define [
         @pendingRequests.push([@getEvents, arguments, 'default'])
         return
 
+      # start/end as they come from fullcalendar or AgendaView may be
+      # ambiguously-timed and/or ambiguously-zoned. that's just way too much
+      # confusion. instead, let's always works with unwrapped datetimes, so we
+      # know we're interpreting times in the context of the profile timezone,
+      # and particularly ambiguously-timed dates as midnight in the profile
+      # timezone.
+      start = fcUtil.unwrap(start) if start
+      end = fcUtil.unwrap(end) if end
+
       paramsForDatedEvents = (start, end, contexts) =>
         [ startDay, endDay ] = @requiredDateRangeForContexts(start, end, contexts)
 
         if startDay >= endDay
           return null
 
+        # we treat end as an exclusive upper bound. the API treats it as
+        # inclusive, so we may get back some events we didn't intend. but
+        # addEventToCache handles the duplicate fine, so it's ok
         {
           context_codes: contexts
-          start_date: fcUtil.unwrap(startDay).toISOString()
-          end_date: fcUtil.unwrap(endDay).toISOString()
+          start_date: startDay.toISOString()
+          end_date: endDay.toISOString()
         }
 
       paramsForUndatedEvents = (contexts) =>
@@ -259,42 +281,48 @@ define [
           event = commonEventFactory(e, @contexts)
           if event && event.object.workflow_state != 'deleted'
             requestResult.events.push(event)
-        requestResult.maxDate = _.max(requestResult.events, (e) -> e.originalStart).originalStart
         requestResults[key] = requestResult
 
       doneCB = () =>
+        # TODO: there's a rare problem in this implementation. if a full page
+        # or more of events have the same start time, then the first time one
+        # or more show up in a response, that date will be the nextPageDate. as
+        # such, all events for that date will be excluded. but then on the
+        # followup, the nextPageDate will _still_ be that date, and zero events
+        # will be included. it will then loop indefinitely in this state.
+
         # If any request had a next page, the combined results are valid
-        # only through the earliest page end date.
-        incomplete = false
+        # only through the earliest page end date. note that it's an exclusive
+        # upper bound, just as we treated end earlier. (this is so that it can
+        # be an inclusive lower bound on the next request)
+        upperBounds = []
         for key, requestResult of requestResults
-          if requestResult.next
-            incomplete = true
-
-        nextPageDate = end
-        if incomplete
-          for key, requestResult of requestResults
-            if requestResult.next && requestResult.maxDate < nextPageDate
-              nextPageDate = requestResult.maxDate
-        nextPageDate.hours(0) if nextPageDate
-
-        lastKnownDate = start
-        for key, requestResult of requestResults
+          dates = []
           for event in requestResult.events
-            if !incomplete || event.originalStart < nextPageDate
-              @addEventToCache event
-              lastKnownDate = event.originalStart if event.originalStart > lastKnownDate
-        lastKnownDate = end if !incomplete
+            @addEventToCache event
+            if requestResult.next && event.originalStart
+              dates.push(event.originalStart)
+          if !_.isEmpty(dates)
+            upperBounds.push(_.max(dates))
+
+        # consumer of list.nextPageDate is going to expect to just be able to
+        # pass it back to getEvents as the start, so it need to be wrapped
+        # (which it is, if set, based on the events' originalStart). but for
+        # use in place of end, it needs to be unwrapped
+        if !_.isEmpty(upperBounds)
+          nextPageDate = fcUtil.clone(_.min(upperBounds))
+          end = fcUtil.unwrap(nextPageDate)
 
         for context in contexts
           contextInfo = @cache.contexts[context]
           if contextInfo
             if start
-              contextInfo.fetchedRanges.push([start, lastKnownDate])
+              contextInfo.fetchedRanges.push([start, end])
             else
               contextInfo.fetchedUndated = true
 
-        list = @getEventsFromCache(start, lastKnownDate, contexts)
-        list.nextPageDate = if incomplete then nextPageDate else null
+        list = @getEventsFromCache(start, end, contexts)
+        list.nextPageDate = nextPageDate
         list.requestID = options.requestID
         cb list
 

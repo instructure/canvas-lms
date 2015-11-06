@@ -81,7 +81,7 @@ define [
     _.each serialized.days, (d) ->
       ok d.events.length, 'every day has events'
 
-  test 'should omit days on page breaks', ->
+  test 'should only include days on page breaks once', ->
     view = new AgendaView(el: @container, dataSource: @dataSource)
     window.view = view
     view.fetch(@contextCodes, @startDate)
@@ -101,7 +101,7 @@ define [
       addEvents(events, date)
     sendCustomEvents(@server, JSON.stringify(events), JSON.stringify([]), true)
 
-    ok @container.find('.ig-row').length == 40, 'finds 40 ig-rows'
+    ok @container.find('.ig-row').length, 40, 'finds 40 ig-rows'
     ok @container.find('.agenda-load-btn').length
     view.loadMore({preventDefault: $.noop})
 
@@ -111,7 +111,7 @@ define [
       date.setFullYear(date.getFullYear()+1)
     sendCustomEvents(@server, JSON.stringify(events), JSON.stringify([]), false, 2)
 
-    ok @container.find('.ig-row').length == 60, 'finds 60 ig-rows'
+    equal @container.find('.ig-row').length, 70, 'finds 70 ig-rows'
 
   test 'renders non-assignment events with locale-appropriate format string', ->
     tz.changeLocale(french, 'fr_FR')
