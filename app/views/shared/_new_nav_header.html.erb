@@ -5,11 +5,13 @@
       <div class="ic-app-header__primary">
       <a href="#content" id="skip_navigation_link"><%= t 'links.skip_to_content', "Skip To Content" %></a>
         <div role="navigation" class="ic-app-header__main-navigation">
+        <% unless @current_user.try(:prefers_high_contrast?) %>
           <div class="ic-app-header__logomark-container">
             <a href="<%= dashboard_url %>" class="ic-app-header__logomark">
               <span class="screenreader-only"><%= t 'links.dashboard', "Dashboard" %></span>
             </a>
           </div>
+        <% end %>
           <ul role="menu" id="menu"
             class="ic-app-header__menu-list"
             aria-label="<%= t('Main Navigation') %>"
