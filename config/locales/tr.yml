@@ -3,12 +3,16 @@
 --- 
 tr: 
   1_item_scores_5512cd03: "1- Öğe puanları"
+  1st_reviewer_3c1d0119: "1. Gözden Geçiren"
   2_final_score_7b0fd15e: "2- Final puanı"
+  2nd_reviewer_94fdbcd: "2. Gözden Geçiren"
   451_message: 
     description: "Birleşik Devletler ticari sınırlılıkları uygulanan bir ülkede bulunduğunuz için bu siteye erişme yetkiniz yok."
     headings: 
       page: "Yetki Yok"
     title: "Yetki Yok"
+  558x270_png_jpg_gif_c3faa839: "558x270 png, jpg, gif"
+  558x558_png_jpg_gif_1_8x_the_standard_tile_size_so_c56cc472: "558x558 png, jpg, gif  (1.8x standart desen boyutu, bu sayede istenildiği gibi büyültülüp küçültülebilir)"
   EditAppointmentGroupDetails: 
     affect_reservations: "Bu durum rezervasyonları nasıl etkileyecek?"
     and_n_contexts: "ve diğer %{n}"
@@ -41,6 +45,7 @@ tr:
   a_file_named_itemname_already_exists_in_this_folde_b0dc7185: "%{itemName} adlı bir dosya bu klasörde zaten var."
   a_handy_key_value_dump_of_a_host_of_interesting_en_d0518dfe: "Raporlayan kullanıcı için ilgi çekici ortam bilgisi barındırmada kullanışlı bir anahtar/değer yığını "
   a_message_is_required_129e1814: "Bir mesaj gerekli"
+  a_problem_occurred_adding_reviewers_57b083d9: "Gözlemci eklenirken hata oluştu."
   a_table_containing_the_name_of_the_grading_scheme__2c25dc3: "Notlandırma şemaları, şemayı düzenleme ya da silme ikonlarının adlarını içeren tablo"
   a_table_that_contains_the_grading_scheme_data_each_d461c205: "Notlandırma şema verisini içeren tablo. Her satırda bir isim, maksimum yüzde ve minimum yüzde vardır. Ayrıca, her satırda bir alt satır eklemek ve mevcut satırı silmek için bir simge vardır."
   academic_benchmark: 
@@ -1291,7 +1296,7 @@ tr:
   allow_a_moderator_to_review_multiple_independent_g_752c4b90: "Bir moderatör seçili gönderiler için çoklu bağımsız notları inceleyebilsin"
   allow_bulk_grade_export_to_sis_e11a6e66: "ÖBS'ye Toplu Not Aktarımına İzin Ver"
   allow_lor_tools: "Kullanıcılar LOR için yapılandırılmış harici araçları görüp kullanabilsinler."
-  allow_opt_out_of_inbox: "Kullanıcıların Karşılıklı Konuşma Gelen Kutusun'dan çıkmalarına izin ver. Bu duurmda tüm karşılıklı konuşma mesajları ve bildirimler ACİL bildirimler olarak kullanıcının birincil eposta adresine gönderilecek; Gelen Kutusunda okunmamış mesaj rozeti ve Karşılıklı Konuşma bildirim tercihleri gizlenecektir."
+  allow_opt_out_of_inbox: "Kullanıcıların Gelen Kutusun'dan çıkmalarına izin ver. Bu durumda tüm mesajlar ve bildirimler ACİL bildirimler olarak kullanıcının birincil eposta adresine gönderilecek; Gelen Kutusunda okunmamış mesaj rozeti ve Mesajlaşma bildirim tercihleri gizlenecektir."
   allow_students_to_see_who_has_signed_up_for_time_s_497f4a46: "Zaman aralıklarına kimlerin kaydolduğunu öğrenciler görebilsin."
   allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "ÖBS entegrasyonunda öğretmenler aktarılacak not verilerini toplu olarak   işaretleyebilsin."
   allows_the_scheduling_of_recurring_calendar_events_aac71007: "Yinelenen takvim olaylarının zamanlaması ayarlanabilsin"
@@ -3628,9 +3633,9 @@ tr:
       other: "%{list_of_users}, %{current_user} tarafından tartışmaya eklendi"
   conversation_participant: 
     batch_update_message: 
-      one: "1 karşılıklı konuşma işlendi"
-      other: "%{count} karşılıklı konuşma işlendi"
-    not_participating: "Kullanıcı bu karşılık konuşmaya dahil değildir"
+      one: "1 mesajlaşma işlendi"
+      other: "%{count} mesajlaşma işlendi"
+    not_participating: "Kullanıcı bu mesajlaşmaya dahil değildir"
   conversations: 
     add_attachment: 
       titles: 
@@ -3643,7 +3648,7 @@ tr:
       group_people: "Kişi : %{people}"
       no_results: "Sonuç yok"
     back: Geri
-    cannot_add_to_private: "Özel olan karşılıklı konuşmaya kişi eklenemiyor."
+    cannot_add_to_private: "Özel olan mesajlaşmaya kişi ekleyemezseniz."
     cannot_be_empty: "Mesaj boş olamaz"
     compose_button_bar: 
       titles: 
@@ -3653,7 +3658,7 @@ tr:
       buttons: 
         close: kapat
     confirm: 
-      delete_conversation: "Bu karşılıklı konuşmanın sizdeki kopyasını silmek istediğinize emin misiniz? Bu eylem geri alınamaz."
+      delete_conversation: "Bu mesajlaşmanın sizdeki kopyasını silmek istediğinize emin misiniz? Bu eylem geri alınamaz."
       delete_message: "Bu mesajın sizdeki kopyasını silmek istediğinize emin misiniz? Bu eylem geri alınamaz."
     context_message: 
       delete_message: "Mesajı sil"
@@ -3696,7 +3701,7 @@ tr:
       mark_as_read: "Okundu olarak işaretle"
       mark_as_unread: "Okunmadı olarak işaretle"
       more_options: "Daha fazla seçenek"
-      page_title_header: "Karşılıklı Konuşmalar"
+      page_title_header: Mesajlaşmalar
       reply: Yanıtla
       reply_all: "Hepsini yanıtla"
       search_for_recipients: "Alıcılar içinde ara"
@@ -3707,7 +3712,7 @@ tr:
       starred: "Yıldız konulmuş"
       submission_comments: "Gönderi Yorumları"
       titles: 
-        conversations: "Karşılıklı Konuşmalar"
+        conversations: Mesajlaşmalar
       unread: Okunmamış
     mark_as_read: "Okundu olarak işaretle"
     mark_as_unread: "Okunmadı olarak işaretle"
@@ -3770,8 +3775,8 @@ tr:
       sending_message: "*%{message_preview}*, *%{num_people}* kişiye gönderiliyor"
     more_participants: "+%{total} daha fazla"
     no_message: 
-      batch_selected: "Çoklu Karşılıklı Konuşma Seçildi"
-      no_conversations_selected: "Karşılıklı Konuşma Seçilmedi"
+      batch_selected: "Çoklu Mesajlaşma Seçildi"
+      no_conversations_selected: "Seçilen Mesajlaşma Yok"
     no_recipients_choose_another_group: "Bu grupta alıcılar bulunamadı. Lütfen farklı bir grup seçiniz."
     no_results_found: "Sonuç bulunamadı"
     other: 
@@ -3786,7 +3791,7 @@ tr:
     submission_comment_form_dialog: 
       body: Gövde
     titles: 
-      rss_feed: "Karşılıklı Konuşma Beslemesi"
+      rss_feed: "Mesaj Beslemesi"
     unarchive: Arşivlenmemiş
     unstar: "Yıldız Al"
     unstar_conversation: "Tartışmadan yıldızı kaldır"
@@ -4728,11 +4733,11 @@ tr:
           
           Tekrar açamayacaksınız.
     conversations_collapse: 
-      one: "%{count} karşılıklı konuşmayı daralt"
-      other: "%{count} karşılıklı konuşmayı daralt"
+      one: "%{count} mesajlaşmayı daralt"
+      other: "%{count} mesajlaşmayı daralt"
     conversations_expand: 
-      one: "%{count} karşılıklı konuşmayı genişlet"
-      other: "%{count} karşılıklı konuşmayı genişlet"
+      one: "%{count} mesajlaşmayı genişlet"
+      other: "%{count} mesajlaşmayı genişlet"
     discussions_collapse: 
       one: "%{count} tartışmayı daralt"
       other: "%{count} tartışmayı daralt"
@@ -7104,8 +7109,8 @@ tr:
       announcement_label: "Ders Duyurularını Ziyaret Et"
       assignment_details: "Ödev Ayrıntıları"
       assignment_label: "Ders Ödevlerini Ziyaret Et"
-      conversation_details: "Karşılıklı Konuşma Ayrıntıları"
-      conversation_label: "Konuşmaları Ziyaret Et"
+      conversation_details: "Mesajlaşma Ayrıntıları"
+      conversation_label: "Mesajları Ziyaret Et"
       discussion_details: "Tartışma Ayrıntıları"
       discussion_label: "Ders Tartışmalarını Ziyaret Et"
       peer_review_details: "Akran Değerlendirme Detayları"
@@ -7118,8 +7123,8 @@ tr:
         one: "*1* Ödev Bildirimi"
         other: "*%{count}* Ödev Bildirimi"
       x_new_in_conversations: 
-        one: "*1* Karşılıklı Konuşma Mesajı"
-        other: "*%{count}* Karşılıklı Konuşma Mesajları"
+        one: "*1* Mesaj"
+        other: "*%{count}* Mesaj"
       x_new_in_discussions: 
         one: "*1* Tartışma"
         other: "*%{count}* Tartışma"
@@ -7748,7 +7753,7 @@ tr:
         body: "%{user_name} size Canvas'ta tartışmaya ekledi. Tartışmayı görmek için aşağıdaki bağlantıya tıklayın:"
         html: 
           body: "%{user_name} size Canvas'ta tartışmaya ekledi."
-          link_text: "Karşılıklı Konuşmaları Görüntüle"
+          link_text: "Mesajlaşmaları Görüntüle"
           subject: "%{user_name} size Canvas'ta tartışmaya ekledi."
           unknown_user: "Bilinmeyen Kullanıcı"
         subject: "%{user_name} size Canvas'ta tartışmaya ekledi."
@@ -8363,11 +8368,11 @@ tr:
           reply_to_conversation_message: "Bu epostaya doğrudan cevap yazarak Canvas içinde bu mesajı yanıtlayabilirsiniz."
           subject: "%{user_name}, Canvas üzerinden bir mesaj gönderdiniz."
           unknown_user: "Bilinmeyen Kullanıcı"
-          view_message: "Bu mesajı karşılıklı konuşmalarda gör"
+          view_message: "Bu mesajı Mesajlarda gör"
         reply_to_conversation_message: "Bu epostaya doğrudan cevap yazarak Canvas içinde bu mesajı yanıtlayabilirsiniz."
         subject: "%{user_name}, Canvas üzerinden bir mesaj gönderdiniz."
         unknown_user: "Bilinmeyen Kullanıcı"
-        view_message: "Bu mesajı karşılıklı konuşmalarda gör"
+        view_message: "Bu mesajı Mesajlarda gör"
       sms: 
         body: "%{user_name}, Canvas üzerinden bir mesaj gönderdiniz."
         more_info: "Daha fazla bilgi için %{url}"
@@ -8389,11 +8394,11 @@ tr:
           reply_to_conversation_message: "Bu epostaya doğrudan cevap yazarak Canvas içinde bu mesajı yanıtlayabilirsiniz."
           subject: "%{user_name} kullanıcısı Canvas'ta sizlere mesaj yolladı."
           unknown_user: "Bilinmeyen Kullanıcı"
-          view_message: "Bu mesajı karşılıklı konuşmalarda gör"
+          view_message: "Bu mesajı Mesajlarda gör"
         reply_to_conversation_message: "Bu epostaya doğrudan cevap yazarak Canvas içinde bu mesajı yanıtlayabilirsiniz."
         subject: "%{user_name} kullanıcısı Canvas'ta sizlere mesaj yolladı."
         unknown_user: "Bilinmeyen Kullanıcı"
-        view_message: "Bu mesajı karşılıklı konuşmalarda gör"
+        view_message: "Bu mesajı Mesajlarda gör"
       sms: 
         body: "%{user_name} kullanıcısı Canvas'ta sizlere mesaj yolladı:"
         more_info: "Daha fazla bilgi için %{url}"
@@ -8941,7 +8946,7 @@ tr:
         html: 
           body: "%{course} dersindeki %{discussion_topic} başlığına %{user} yeni bir yorum yazdı:"
           discussion_entry_reply_message: "Aşağıdaki bağlantıyı kullanarak tatrışmaya katılın veya bu mesajı yanıtlayarak yorum yapın."
-          link: "Bu konuşmaya katılmak için tıklayınız"
+          link: "Bu mesajlaşmaya katılmak için tıklayınız"
           subject: "Yeni Yorum %{discussion_topic}: %{course}"
         subject: "Yeni Yorum %{discussion_topic}: %{course}"
       sms: 
@@ -8959,7 +8964,7 @@ tr:
           attached_file: "Ekli Dosya"
           body: "İlginizi çekebilecek yeni bir tartışma başlatıldı:"
           download: indir
-          link: "Bu konuşmaya katılmak için tıklayınız"
+          link: "Bu mesajlaşmaya katılmak için tıklayınız"
           subject: "Yeni Tartışma - %{discussion_topic}: %{course}"
         labels: 
           file_included: "Dosya Dahil Edildi"
@@ -9628,8 +9633,8 @@ tr:
   note_students_have_submitted_work_for_these_assign_7bc34e28: "NOT: Öğrenciler bu ödevler için notlandırılmamış çalışmalar gönderdiler. Bu notları şimdi gönderirseniz, öğrencilerin en son gönderilerini notlandırdıktan sonra puanlarını yeniden göndermeniz gerekecek."
   note_this_login_s_account_uses_delegated_authentic_89227914: "Not: Bu oturum hesabı yetkilendirilmiş kimlik doğrulama kullanıyor fakat yedek Canvas şifre doğrulamaya izin veriyor. Bu formdaki şifre alanları yedek Canvas şifresini günceller, yetkilendirilmiş kimlik doğrulamakini *değil*."
   notification: 
-    added_to_conversation_description: "Karşılıklı konuşmaya eklendiniz"
-    added_to_conversation_display: "Karşılıklı Konuşmalara Eklendi"
+    added_to_conversation_description: "Bu mesajlaşmaya eklendiniz"
+    added_to_conversation_display: "Mesajlaşmalara Eklendi"
     all_submissions_description: |-
         *Sadece Eğitmen ve Yönetici* 
         
@@ -9677,7 +9682,7 @@ tr:
       student_appointment_signups: "Öğrenci Randevu Oturumları"
       submission_comment: "Gönderi Yorumu"
     conversation_created_description: "Bir sohbet oluşturdunuz"
-    conversation_created_display: "Tarafımdan Oluşturulan Konuşmalar"
+    conversation_created_display: "Tarafımdan Oluşturulan Mesajlar"
     conversation_message_description: "Yeni Gelen Mesajlar"
     conversation_message_display: "Sohbet Mesajları"
     course_content_description: |-
@@ -9735,7 +9740,7 @@ tr:
     names: 
       account_user_notification: "Kullanıcı Hesabı Bildirimi"
       account_user_registration: "Kullanıcı Hesabı Kayıdı"
-      added_to_conversation: "Karşılıklı Konuşmalara Eklendi"
+      added_to_conversation: "Mesajlaşmalara Eklendi"
       alert: Uyarı
       announcement_created_by_you: "Tarafınızdan Oluşturulan Duyurular"
       announcement_reply: "Duyuru Cevabı"
@@ -9760,7 +9765,7 @@ tr:
       confirm_sms_communication_channel: "Sms İletişim Kanalı Onayı"
       content_export_failed: "İçeriği Dışarı Aktarma Başarısız"
       content_export_finished: "İçeriği Dışarı Aktarma Tamamlandı"
-      conversation_created: "Konuşma Oluşturuldu"
+      conversation_created: Mesajlaşma
       conversation_message: "Sohbet Mesajları"
       enrollment_accepted: "Kayıt Gerçekleşti"
       enrollment_invitation: "Kayıt Daveti"
@@ -10340,7 +10345,7 @@ tr:
         domain_settings: "Alan Adı Ayarları"
         misc_settings: "Karışık Ayarlar"
         ui_conf_ids: "UI Conf ID'leri"
-      hide_rte_button_note: "(karşılıklı konuşma/SpeedGrader/Medya Kayıtları ev ödevi gönderileri için hala orada)"
+      hide_rte_button_note: "(mesajlaşma/SpeedGrader/Medya Kayıtları ev ödevi gönderileri için hala orada)"
       hints: 
         domain: "Barındırılan hesaplar için \"www.kaltura.com\"'u kullan"
         resource_domain: "Barındırılan hesaplar için \"cdn.kaltura.com\"'u kullan"
@@ -10608,7 +10613,7 @@ tr:
         change_password: "Şifre Değiştir"
         confirm_password: "Şifre Onayla"
         default_email: "Varsayılan E-Posta"
-        disable_inbox: "Konuşmaların Gelen Kutusundaki okunmamış mesaj rozetini devre dışı bırakıp DERHAL mesajları ve bildirimleri eposta yoluyla gönder."
+        disable_inbox: "Gelen Kutusundaki okunmamış mesaj rozetini devre dışı bırakıp DERHAL mesajları ve bildirimleri eposta yoluyla gönder."
         expires_at: "Sona Erme"
         headers: 
           approved_integrations: "Onaylı Entegrasyonlar"
