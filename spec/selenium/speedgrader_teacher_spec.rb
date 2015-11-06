@@ -863,7 +863,7 @@ describe "speed grader" do
 
   it 'should let you enter in a float for a quiz question point value', priority: "1", test_id: 369250 do
     init_course_with_students
-    quiz = seed_quiz_wth_submission
+    quiz = seed_quiz_with_submission
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{quiz.assignment_id}"
     # In the left panel modify the grade to 0.5
     driver.switch_to.frame f('#speedgrader_iframe')

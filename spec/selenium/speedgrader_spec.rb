@@ -113,7 +113,7 @@ describe 'Speedgrader' do
     context 'quizzes' do
       before(:each) do
         init_course_with_students
-        quiz = seed_quiz_wth_submission
+        quiz = seed_quiz_with_submission
 
         user_session(@teacher)
         get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{quiz.assignment_id}"
@@ -216,16 +216,14 @@ describe 'Speedgrader' do
         @association = @rubric.associate_with(@assignment, @course, purpose: 'grading', use_for_grading: true)
         @submission = Submission.create!(user: @student, assignment: @assignment, submission_type: "online_text_entry", has_rubric_assessment: true)
         @assessment = @association.assess(
-                                            user: @student, 
-                                            assessor: @teacher, 
-                                            artifact: @submission, 
-                                            assessment: {
-                                              assessment_type: 'grading',
-                                              criterion_crit1: {
-                                                  points: 5
-                                              }
-                                            }
-                                          )
+          user: @student,
+          assessor: @teacher,
+          artifact: @submission,
+          assessment: {
+            assessment_type: 'grading',
+            criterion_crit1: { points: 5 }
+          }
+        )
         get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}"
         f('a.assess_submission_link').click
 
@@ -286,8 +284,7 @@ describe 'Speedgrader' do
     it 'displays question navigation bar when setting is enabled', priority: "1", test_id: 164019 do
       init_course_with_students
 
-      quiz = seed_quiz_wth_submission
-
+      quiz = seed_quiz_with_submission
       user_session(@teacher)
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{quiz.assignment_id}"
 
@@ -309,7 +306,7 @@ describe 'Speedgrader' do
     it 'scrolls nav bar and to questions', priority: "1", test_id: 164020 do
       init_course_with_students
 
-      quiz = seed_quiz_wth_submission 10
+      quiz = seed_quiz_with_submission(10)
 
       @teacher.preferences[:enable_speedgrader_grade_by_question] = true
       @teacher.save!

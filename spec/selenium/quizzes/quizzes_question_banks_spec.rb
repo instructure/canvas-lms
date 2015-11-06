@@ -5,14 +5,13 @@ describe 'quizzes question banks' do
 
   include_context 'in-process server selenium tests'
 
-  context 'when logged in as a teacher' do
+  context 'as a teacher' do
 
     before(:each) do
       course_with_teacher_logged_in
     end
 
     it 'should be able to create question bank', priority: "1", test_id: 140667 do
-      # report_test(72402) do
       get "/courses/#{@course.id}/question_banks"
       question_bank_title = keep_trying_until do
         f('.add_bank_link').click
@@ -31,8 +30,7 @@ describe 'quizzes question banks' do
       question_bank
     end
 
-    it 'should be able to create quiz questions', priority: "1", test_id: 140668 do
-      # report_test(72403) do
+    it 'adds a basic multiple choice question to a question bank', priority: "1", test_id: 140668 do
       bank = AssessmentQuestionBank.create!(context: @course)
       get "/courses/#{@course.id}/question_banks/#{bank.id}"
 
@@ -174,6 +172,38 @@ describe 'quizzes question banks' do
       replace_content(group_form.find_element(:name, 'quiz_group[question_points]'), '2')
       submit_form(group_form)
       expect(f('#questions .group_top .group_display.name')).to include_text('new group')
+    end
+
+    it 'creates a question group from a question bank from within the Find Quiz Question modal', priority: "1", test_id: 140590 do
+      assessment_question_model(bank: AssessmentQuestionBank.create!(context: @course))
+
+      get "/courses/#{@course.id}/quizzes/new"
+      click_questions_tab
+      wait_for_ajaximations
+
+      # open Find Question dialogue
+      f('.find_question_link').click
+      wait_for_ajaximations
+
+      # select questions from question bank
+      f('.select_all_link').click
+      wait_for_ajaximations
+
+      # create new quiz question group from selected questions
+      question_group_name = 'Quiz Question Group A'
+      click_option(ffj('.quiz_group_select'), '[ New Group ]')
+      fj('#found_question_group_name').send_keys question_group_name
+      fj('#found_question_group_pick').send_keys '1'
+      fj('#found_question_group_points').send_keys '1'
+      submit_dialog(f('#add_question_group_dialog'), '.submit_button')
+      wait_for_ajaximations
+
+      # submit Find Question dialogue
+      submit_dialog(f('#find_question_dialog'), '.submit_button')
+      wait_for_ajaximations
+
+      expect(f('.quiz_group_form')).to include_text question_group_name
+      expect(f('#question_new_question_text').text).to match 'does [a] equal [b] ?'
     end
 
     it 'deleting AJAX-loaded questions should work', priority: "2", test_id: 201938 do

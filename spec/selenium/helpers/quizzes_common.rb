@@ -532,7 +532,7 @@ def quiz_create(params={})
   @quiz
 end
 
-def seed_quiz_wth_submission(num=1)
+def seed_quiz_with_submission(num=1, opts={})
   quiz_data =
       [
           {
@@ -576,7 +576,7 @@ def seed_quiz_wth_submission(num=1)
   quiz.workflow_state = 'available'
   quiz.save!
 
-  submission = quiz.generate_submission @students[0]
+  submission = quiz.generate_submission opts[:student] || @students[0]
   submission.workflow_state = 'complete'
   submission.save!
 
