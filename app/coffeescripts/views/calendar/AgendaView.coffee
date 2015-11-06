@@ -45,23 +45,16 @@ define [
         "CalendarHeader/createNewEvent" : @handleNewEvent
 
     fetch: (contexts, start) ->
-      start = fcUtil.now() unless start
       @$el.empty()
       @$el.addClass('active')
 
       @contexts = contexts
+      @startDate = fcUtil.clone(start).stripTime()
 
-      start.hours(0)
-      start.minutes(0)
-      start.seconds(0)
-
-      @startDate = start
-
-      @_fetch(start, @handleEvents)
+      @_fetch(@startDate, @handleEvents)
 
     _fetch: (start, callback) ->
-      end = fcUtil.now()
-      end.year(3000)
+      end = fcUtil.clone(start).year(3000)
       @lastRequestID = $.guid++
       @dataSource.getEvents start, end, @contexts, callback, {singlePage: true, requestID: @lastRequestID}
 

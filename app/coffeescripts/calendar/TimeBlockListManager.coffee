@@ -35,15 +35,13 @@ define ['jquery', 'moment', 'compiled/util/fcUtil', 'bower/fullcalendar/dist/ful
     split: (minutes) ->
       @consolidate()
 
-      splitBlockLength = minutes * 60 * 1000
-
       for block in @blocks
         continue if block.locked
-        while moment.duration(block.end.diff(block.start)).asMilliseconds() > minutes * 60 * 1000
-          oldStart = fcUtil.clone(block.start)
-          newStart = fcUtil.clone(oldStart).add(splitBlockLength, "millisecond")
-          block.start = fcUtil.clone(newStart)
-          @add(oldStart, newStart)
+        nextBreak = fcUtil.clone(block.start).add(minutes, 'minutes')
+        while block.end > nextBreak
+          @add(block.start, fcUtil.clone(nextBreak))
+          block.start = fcUtil.clone(nextBreak)
+          nextBreak.add(minutes, 'minutes')
 
       @sort()
 
