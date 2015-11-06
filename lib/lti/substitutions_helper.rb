@@ -28,6 +28,7 @@ module Lti
         'teacher' => LtiOutbound::LTIRoles::Institution::INSTRUCTOR,
         'student' => LtiOutbound::LTIRoles::Institution::STUDENT,
         'admin' => LtiOutbound::LTIRoles::Institution::ADMIN,
+        'observer' => LtiOutbound::LTIRoles::Context::OBSERVER,
         AccountUser => LtiOutbound::LTIRoles::Institution::ADMIN,
 
         StudentEnrollment => LtiOutbound::LTIRoles::Context::LEARNER,
@@ -95,7 +96,7 @@ module Lti
         if Account.site_admin.account_users_for(@user).present?
           institution_roles << role_map['siteadmin']
         end
-        (context_roles + institution_roles).uniq.sort.join(',')
+        (context_roles + institution_roles).compact.uniq.sort.join(',')
       else
         [role_none]
       end
