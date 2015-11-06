@@ -95,7 +95,7 @@ module CanvasKaltura
 
       unless sources
         startSession(CanvasKaltura::SessionType::ADMIN)
-        assets = flavorAssetGetByEntryId(entryId) || []
+        assets = flavorAssetGetByEntryId(entryId)
         sources = []
         all_assets_are_done_converting = true
         assets.each do |asset|
@@ -289,9 +289,8 @@ module CanvasKaltura
       files.each do |file|
         filename = (file[:name] || "Media File").gsub(/,/, "")
         description = (file[:description] || "no description").gsub(/,/, "")
-        partner_data = (file[:partner_data] || '').gsub(/"/, "\"\"")
         url = file[:url]
-        rows << [filename, description, file[:tags] || "", url, file[:media_type] || "video", '', '', '' ,'' ,'' ,'' , partner_data] if file[:url]
+        rows << [filename, description, file[:tags] || "", url, file[:media_type] || "video", '', '', '' ,'' ,'' ,'' ,file[:partner_data] || ''] if file[:url]
       end
       res = CSV.generate do |csv|
         rows.each do |row|
@@ -320,7 +319,7 @@ module CanvasKaltura
     # returns the original flavor of the asset, or the first flavor if for some
     # reason the original can't be found.
     def flavorAssetGetOriginalAsset(entryId)
-      flavors = flavorAssetGetByEntryId(entryId) || []
+      flavors = flavorAssetGetByEntryId(entryId)
       flavors.find { |f| f[:isOriginal] == 1 } || flavors.first
     end
 
