@@ -3,12 +3,16 @@
 --- 
 hy: 
   1_item_scores_5512cd03: "1- Տարրերի գնահատականները՝"
+  1st_reviewer_3c1d0119: "1-ին խմբագրիչ"
   2_final_score_7b0fd15e: "2- Ամփոփիչ գնահատականը՝"
+  2nd_reviewer_94fdbcd: "2-րդ խմբագրիչ"
   451_message: 
     description: "Ձեզ չի թույլատրվում մուտք գործել այս կայքը, քանի որ դուք գտնվում եք մի երկրում, որի նկատմամբ ԱՄՆ-ն սահմանել է առևտրային սահմանափակումներ:"
     headings: 
       page: "Չի թույլատրվում"
     title: "Չի թույլատրվում"
+  558x270_png_jpg_gif_c3faa839: "558x270 png, jpg, gif"
+  558x558_png_jpg_gif_1_8x_the_standard_tile_size_so_c56cc472: "558x558 png, jpg, gif (1.8x պատուհանի ստանդարտ չափը, ուստի այն կարող է մեծանալ կամ փոքրանալ անհրաժեշտության դեպքում)"
   EditAppointmentGroupDetails: 
     affect_reservations: "Ինչպե՞ս սա կազդի նախապես ամրագրված հանդիպումների վրա:"
     and_n_contexts: "և %{n} մյուսները"
@@ -39,6 +43,7 @@ hy:
   a_file_named_itemname_already_exists_in_this_folde_b0dc7185: "%{itemName} անվանմամբ ֆայլը արդեն գոյություն ունի սույն թղթապանակում:"
   a_handy_key_value_dump_of_a_host_of_interesting_en_d0518dfe: "Հետարքիր տեղեկությունների հոստի հարմար բանալին/դեմփ արժեքը զեկուցող օգտագործողի համար "
   a_message_is_required_129e1814: "Պահանջվում է հաղորդագրություն"
+  a_problem_occurred_adding_reviewers_57b083d9: "Խմբագրիչներին ավելացնելու ընթացքում խնդիր է առաջացել:"
   a_table_containing_the_name_of_the_grading_scheme__2c25dc3: "Աղյուսակ, որը պարունակում է գնահատականների սխեմայի անվանումը և սխեման խմբագրելու կամ ջնջելու նշանները:"
   a_table_that_contains_the_grading_scheme_data_each_d461c205: "Աղյուսակ, որը պարունակում է գնահատականների սխեմայի տվյալները: Յուրաքանչյուր տող պարունակում է անուն, ազգանունը, առավելագույն և նվազագույն տոկոսները: Ի լրումն, յուրաքանչյուր տող ունի նշան՝ անմիջապես դրանից ներքև նոր տող ավելացնելու և տվյալ տողը ջնջելու համար:"
   academic_benchmark: 
@@ -57,6 +62,8 @@ hy:
         api_key: "API բանալի"
         api_url: "Api Url"
         common_core_guid: "Ընդհանուր հանգուցային GUID (ոչ պարտադիր)"
+  accepted_formats_hex_rgba_rgb_hsl_42a37ef7: "ընդունված ֆորմատներ․ hex, rgba, rgb, hsl"
+  accepted_formats_svg_png_jpg_gif_f793e4bc: "Ընդունված ֆորմատներ․ svg, png, jpg, gif"
   access_token_is_valid_until_d2f048cf: "Մուտքի թոքենը ուժի մեջ է մինչև"
   accordion_section_1_7888782d: "Accordion Բաժին 1"
   accordion_section_2_e1812997: "Accordion Բաժին 2"
@@ -200,6 +207,7 @@ hy:
       discovery_url_description: "Եթե սահմանված է discovery URL-հասցեն, Canvas բոլոր օգտագործողներին կուղարկի URL այդ հասցեով, երբ նրանք կարիք ունենան իսկության ստուգման: Այդ էջը կօգնի օգտագործողներին հասկանալ, ուր պետք է նրանք գնան համակարգ մուտք գործելու համար: Եթե ոչ մի discovery URL կարգաբերված չէ, առաջին կոնֆիգուրացիան պետք է օգտագործվի փորձելու համար ստուգել օգտագործողի իսկությունը: "
       login_handle_name_description: "Տարբերանիշն օգտագործվում է մուտքի յուրօրինակ նույնականացուցիչների համար: Օրինակ՝ Մուտք, Օգտագործողի անուն, Ուսանողի նույնականացուցիչ և այլն"
       unknown_user_url_description: "Url-հասցե վերահասցեագրելու համար, երբ իսկությունը հաստատված օգտագործողը չի գտնվել canvas-ում:"
+  account_name_13ed649: "%{account_name}"
   account_navigation_80bbefd4: "Հաշվի նավարկում"
   account_notification: 
     errors: 
@@ -266,6 +274,7 @@ hy:
     report_header_group_id: group_id
     report_header_id: նույնականացուցիչ
     report_header_last_access_at: "վերջին մուտքը ժամը՝"
+    report_header_last_activity_at: "վերջին ակտիվությունը"
     report_header_last_ip: "վերջին ip"
     report_header_last_name: last_name
     report_header_learning_outcome_id: "սովորելու արդյունքների նույնականացուցիչ"
@@ -482,7 +491,10 @@ hy:
         blank_placeholder: "-"
         event_type: 
           corrupted: "Մանրամասները հասանելի չեն"
+        no-abbreviation: "n"
+        yes-abbreviation: "y"
       grade_change_logging_results: 
+        Anonymous: Անանուն
         Assignment: Հանձնարարություն
         Course: Դասընթաց
         Grader: "Գնահատման միջոց"
@@ -648,6 +660,11 @@ hy:
       page_title: Հաշիվներ
       title: "Հաշիվներ, որոնց ես կառավարում եմ"
     integer_required: "Պահանջվում է մուտքագրել ամբողջ թիվ"
+    last_enrollment_activity_csv_description: 
+      account_reports: 
+        default: 
+          last_enrollment_activity: 
+            text: "Այս հաշվետվության մեջ ցույց է տրվում վերջին ակտիվությունը օգտագործողների գրանցումներում։"
     last_user_access_csv_description: 
       account_reports: 
         default: 
@@ -832,7 +849,7 @@ hy:
         equella_endpoint: "Equella վերջնակետ"
         equella_teaser: "Equella մեկնաբանություններ"
         global_brand_includes: "Բեռնել global CSS/JavaScript includes Թեմաների Խմբագրի մեջ"
-        global_includes: "Global CSS/JavaScript includes"
+        global_includes: "Global CSS/JavaScript փոխարինում"
         global_javascript: "Global JavaScript-ի URL հասցեն"
         global_stylesheet: "Global CSS-ի URL հասցեն"
         help_link_available_to: "Հասանելի է"
@@ -845,6 +862,7 @@ hy:
         message: Հաղորդագրություն
         mfa_settings: "Իսկության բազմաֆակտորային ստուգում"
         name: "Հաշվի անվանումը"
+        new_sub_account_includes: "Թույլատրել ենթահաշիվների օգտագործումը Թեմայի խմբագրին հարմարեցնել իր սեփական բրենդինգին"
         no_enrollments_can_create_courses: "Օգտագործողներ առանց գրանցման "
         open_registration: "Բացել գրանցումը"
         outgoing_email_default_name_option_custom: "\"Ումից\" օգտագործողի անուն"
@@ -860,6 +878,7 @@ hy:
         self_registration_type_observer: "Միայն դիտորդի հաշիվները"
         show_scheduler: "Միացնել \"Պլանավորիչը\""
         sis_app_token: "SIS-ագենտի  թոքեն"
+        sis_app_url: "SIS հավելված URL"
         sis_source_id: "SIS նույնականացուցիչ"
         start_at: Սկիզբ
         students_can_create_courses: Ուսանողներ
@@ -1169,6 +1188,7 @@ hy:
             text: "Այս հաշվետվությունը ներկայացնում է այն բոլոր ուսանողներին, որոնք գրանցվել են տվյալ սեմեստրոմ անցկացվող ցանկացած դասընթացներում: Վերջնական csv ֆայլում մեկ տող հատկացված է գրանցված այն ուսանողներին, ովքեր տվյալ ամսաթվից հետո չեն հաճախել դասընթացին:"
   achieve_mastery_count_times_8c9bbcec: "Յուրացումը հաջողվել է %{count} անգամ"
   actions_efcde10d: Գործողություններ
+  activate_this_key_6cd98f4b: "Ակտիվացնել այս բանալին"
   activerecord: 
     errors: 
       messages: 
@@ -1177,6 +1197,7 @@ hy:
   activity_13915493: Գործողություն
   activity_by_category_9c2033d1: "Գործողություն ըստ կատեգորիաների"
   activity_by_date_878c5b49: "Գործողություն ըստ ամսաթվերի"
+  add_2nd_review_ea988088: "Ավելացնել 2-րդ վերանայումը"
   add_8523c19b: Ավելացնել
   add_an_identity_provider_to_this_account_c2644478: "Այս հաշվին ավելացնել նույնականացման տեղեկություններ տրամադրողին՝IdP "
   add_app_baf540f: "Ավելացնել հավելված"
@@ -6036,6 +6057,7 @@ hy:
   get_the_following_from_your_salesforce_connected_a_881fc9a3: "Ստանալ հետևյալը ձեր Salesforce Connected App հավելվածից:"
   get_your_users_error_reports_posted_to_salesforce__76f57839: "Խնդրեք ձեր օգտագործողներին սխալների մասին  հաշվետվությունները տեղադրեն Salesforce Service Cloud-ում:"
   get_your_users_error_reports_posted_to_salesforce_dfb1a6c2: "Խնդրեք ձեր օգտագործողներին սխալների մասին  հաշվետվությունները տեղադրեն Salesforce-ում:"
+  global_branding_df1cae12: "Ընդհանուր բրենդինգ"
   global_message_icons: 
     announcement: հայտարարություն
     calendar: Օրացույց
