@@ -2,6 +2,7 @@
 <html>
 <head>
   <title><%= title %></title>
+  <%= style %>
 </head>
   <body>
     <h1 id="<%="#{title}_TOC"%>"><%="#{title}"%></h1>
@@ -16,7 +17,7 @@
     <% content.each do |item| %>
       <%=build(item)%>
       <hr/>
-      <p><a href="<%= "##{reference}.xhtml" %>"><%="Back to #{title}"%></a></p>
+      <p><a href="<%= "##{reference}.xhtml" %>"><%= I18n.t("Back to %{ref_title}", {ref_title: title}) %></a></p>
       <p><a href="toc.xhtml"><%= I18n.t("Back to Table of Contents") %></a></p>
       <div style="page-break-before:always;"></div>
     <% end %>

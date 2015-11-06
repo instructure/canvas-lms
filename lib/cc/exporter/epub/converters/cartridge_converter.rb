@@ -12,6 +12,26 @@ module CC::Exporter::Epub::Converters
 
     MANIFEST_FILE = "imsmanifest.xml"
 
+    ALLOWED_GRADING_TYPES = {
+      "pass_fail" => I18n.t("Pass/Fail"),
+      "percent" => I18n.t("Percentage"),
+      "letter_grade" => I18n.t("Letter Grade"),
+      "gpa_scale" => I18n.t("GPA Scale"),
+      "points" => I18n.t("Points"),
+      "not_graded" => I18n.t("Not Graded")
+    }.freeze
+
+    SUBMISSION_TYPES = {
+      "online_quiz" => I18n.t("Quiz"),
+      "online_upload" => I18n.t("Online Upload"),
+      "online_text_entry" => I18n.t("Online Text Entry"),
+      "online_url" => I18n.t("Online URL"),
+      "discussion_topic" => I18n.t("Discussion Topic"),
+      "media_recording" => I18n.t("Media Recording"),
+      "on_paper" => I18n.t("On Paper"),
+      "external_tool" => I18n.t("External Tool")
+    }.freeze
+
     # settings will use these keys: :course_name, :base_download_dir
     def initialize(settings)
       super(settings, "cc")

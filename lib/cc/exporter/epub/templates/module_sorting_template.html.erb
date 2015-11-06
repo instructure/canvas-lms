@@ -2,6 +2,7 @@
 <html>
 <head>
   <title><%= title %></title>
+  <%= style %>
 </head>
   <body>
     <h1 id="<%= content[:migration_id]%>"><%= title %></h1>
@@ -16,7 +17,7 @@
     <% content[:items].each do |item| %>
       <%=build(item) || "<div>" + I18n.t("%{item_name} is not currently supported", { item_name: item[:title] }) + "</div>"%>
       <hr/>
-      <p><a href="<%= "##{reference}.xhtml" %>"><%="Back to #{title}"%></a></p>
+      <p><a href="<%= "##{reference}.xhtml" %>"><%= I18n.t("Back to %{ref_title}", {ref_title: title}) %></a></p>
       <p><a href="toc.xhtml"><%= I18n.t("Back to Table of Contents") %></a></p>
       <div style="page-break-before:always;"></div>
     <% end %>

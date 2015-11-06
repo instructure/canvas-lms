@@ -2,6 +2,7 @@
 <html>
 <head>
   <title><%= I18n.t("Announcements") %></title>
+  <%= style %>
 </head>
   <body>
     <h1><%= I18n.t("Announcements") %></h1>
@@ -18,7 +19,7 @@
         <h2 id="<%="#{item[:identifier]}"%>"><%= item[:title] %></h2>
         <p><%= convert_placeholder_paths_from_string!(item[:description]) %></p>
         <hr/>
-        <a href="announcements.xhtml"><%="Back to Announcements"%></a>
+        <a href="announcements.xhtml"><%= I18n.t("Back to Announcements") %></a>
         <div style="page-break-before:always;"></div>
       <% end %>
     <% end %>

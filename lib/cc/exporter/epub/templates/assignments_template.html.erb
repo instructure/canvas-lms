@@ -1,13 +1,12 @@
 <h2 id="<%="#{item[:identifier]}"%>"><%= item[:title] %></h2>
 <p><%= convert_placeholder_paths_from_string!(item[:description]) %></p>
-<% if item[:due_at] %>
-  <p>Due at: <%= friendly_date(item[:due_at]) %></p>
-<% end %>
-<% if item[:unlock_at] %>
-  <p>Unlock at: <%= friendly_date(item[:unlock_at]) %></p>
-<% end %>
-<% if item[:lock_at] %>
-  <p>Lock at: <%= friendly_date(item[:lock_at]) %></p>
-<% end %>
-<p>Grading Type: <%= item[:grading_type] %></p>
-<p>Points: <%= item[:points_possible ]%></p>
+<div class="item_details">
+  <p><%= item[:due_at] ? I18n.t("Due at: %{time}",{time: friendly_date(item[:due_at])}) : nil%></p>
+  <p><%= item[:unlock_at] ? I18n.t("Unlock at: %{time}",{time: friendly_date(item[:unlock_at])}) : nil %></p>
+  <p><%= item[:lock_at] ? I18n.t("Lock at: %{time}",{time: friendly_date(item[:lock_at])}) : nil %></p>
+  <p><%= item[:grading_type] ? I18n.t("Grading Type: %{type}",{type: item[:grading_type]}) : nil %></p>
+  <p><%= item[:points_possible] ? I18n.t("Points: %{points}",{points: item[:points_possible]}) : nil %></p>
+  <% if item[:submission_types].any? %>
+    <p><%= I18n.t("Submitting: %{types}", { types: item[:submission_types].join(', ') }) %></p>
+  <% end %>
+</div>

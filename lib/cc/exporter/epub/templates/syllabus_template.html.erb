@@ -2,19 +2,20 @@
 <html>
 <head>
   <title><%= I18n.t("Syllabus") %></title>
+  <%= style %>
 </head>
   <body>
     <h1><%= I18n.t("Syllabus") %></h1>
     <ul>
-      <% content.each do |item| %>
-        <li>
-          <a href="<%= "#{item[:href]}" %>">
-            <%= item[:title] %>
-          </a>
-          <% if item[:due_at] %>
-            <span>: Due at <%= friendly_date(item[:due_at])%></span>
-          <% end %>
-        </li>
+      <% content.group_by {|item| item['due_at']}.each do |due_date, item_group| %>
+        <h4><%= due_date.present? ? I18n.t("Due %{time}",{time: friendly_date(due_date)}) : "No due date" %></h4>
+        <% item_group.each do |item| %>
+          <li>
+            <a href="<%= "#{item[:href]}" %>">
+              <%= item[:title] %>
+            </a>
+          </li>
+        <% end %>
       <% end %>
     </ul>
     <div style="page-break-before:always;"></div>
