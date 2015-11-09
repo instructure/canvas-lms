@@ -17,7 +17,8 @@
 #
 
 class Feature
-  ATTRS = [:feature, :display_name, :description, :applies_to, :state, :root_opt_in, :enable_at, :beta, :development, :release_notes_url, :custom_transition_proc, :after_state_change_proc]
+  ATTRS = [:feature, :display_name, :description, :applies_to, :state, :root_opt_in, :enable_at, :beta, :development,
+    :release_notes_url, :custom_transition_proc, :after_state_change_proc, :autoexpand]
   attr_reader *ATTRS
 
   def initialize(opts = {})
@@ -153,14 +154,15 @@ END
     },
     'high_contrast' =>
     {
-      display_name: -> { I18n.t('features.high_contrast', 'Use High Contrast Styles') },
+      display_name: -> { I18n.t('features.high_contrast', 'High Contrast UI') },
       description: -> { I18n.t('high_contrast_description', <<-END) },
-If you would prefer a higher-contrast version of the Canvas user interface, enable this.
-This might be useful for people with impaired vision or difficulty reading.
+High Contrast enhances the color contrast of the UI (text, buttons, etc.), making those items more
+distinct and easier to identify. Note: Institution branding will be disabled.
 END
       applies_to: 'User',
       state: 'allowed',
-      beta: true
+      beta: true,
+      autoexpand: true
     },
     'outcome_gradebook' =>
     {
