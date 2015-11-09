@@ -16,7 +16,8 @@ require [
       }
     },
     assignment: {
-      published: window.ENV.GRADES_PUBLISHED
+      published: window.ENV.GRADES_PUBLISHED,
+      title: window.ENV.ASSIGNMENT_TITLE
     },
     flashMessage: {
       error: false,

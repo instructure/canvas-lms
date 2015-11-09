@@ -88,6 +88,18 @@ describe AssignmentsController do
       expect(assigns[:js_env][:URLS][:student_submissions_url]).to eq "http://test.host/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/submissions?include[]=user_summary&include[]=provisional_grades"
       expect(assigns[:js_env][:URLS][:provisional_grades_base_url]).to eq "http://test.host/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/provisional_grades"
     end
+
+    it "should set the js_env for ASSIGNMENT_TITLE" do
+      @course.account.enable_feature!(:moderated_grading)
+      user_session(@teacher)
+      assignment = @course.assignments.create(:title => "some assignment")
+      assignment.workflow_state = 'published'
+      assignment.moderated_grading = true
+      assignment.save!
+
+      get 'show_moderate', :course_id => @course.id, :assignment_id => assignment.id
+      expect(assigns[:js_env][:ASSIGNMENT_TITLE]).to eq "some assignment"
+    end
   end
 
   describe "GET 'show'" do

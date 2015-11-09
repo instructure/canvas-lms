@@ -54,7 +54,7 @@ define([
       return (
         <div className='ModerationApp'>
           <FlashMessageHolder {...this.state.flashMessage} />
-          <h1 className='screenreader-only'>{I18n.t('Moderate %{assignment_name}', {assignment_name: 'TODO!!!!!!!!'})}</h1>
+          <h1 className='screenreader-only'>{I18n.t('Moderate %{assignment_name}', {assignment_name: this.state.assignment.title})}</h1>
           <Header
             onPublishClick={() => this.props.store.dispatch(Actions.publishGrades())}
             onReviewClick={() => this.props.store.dispatch(Actions.addStudentToModerationSet())}
