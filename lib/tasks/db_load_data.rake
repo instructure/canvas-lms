@@ -98,6 +98,12 @@ namespace :db do
   task :create_default_accounts => :environment do
     Account.default(true)
     Account.site_admin(true)
+
+    # This happens by default for all root accounts, but currently happens too
+    # early in the migration run (in GrandfatherDefaultAccountInvitationPreviews)
+    # to take effect.
+    Account.default.enable_canvas_authentication
+    Account.site_admin.enable_canvas_authentication
   end
 
   desc "Create an administrator user"
