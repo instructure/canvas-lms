@@ -1979,10 +1979,19 @@ class CoursesController < ApplicationController
     old_settings = @course.settings
     logging_source = api_request? ? :api : :manual
 
+    params[:course] ||= {}
+    params[:course][:event] = :offer if params[:offer].present?
+
+    if params[:course][:event] && params[:course].size == 1
+      if authorized_action(@course, @current_user, :change_course_state) && process_course_event
+        render_update_success
+      end
+      return
+    end
+
     if authorized_action(@course, @current_user, [:update, :manage_content])
       return render_update_success if params[:for_reload]
 
-      params[:course] ||= {}
       unless @course.grants_right?(@current_user, :update)
         params[:course] = params[:course].slice(:syllabus_body) # let users with :manage_content only update the body
       end
@@ -2047,7 +2056,6 @@ class CoursesController < ApplicationController
       if params[:course].has_key?(:apply_assignment_group_weights)
         @course.apply_assignment_group_weights = value_to_boolean params[:course].delete(:apply_assignment_group_weights)
       end
-      params[:course][:event] = :offer if params[:offer].present?
 
       lock_announcements = params[:course].delete(:lock_all_announcements)
       unless lock_announcements.nil?
@@ -2064,19 +2072,7 @@ class CoursesController < ApplicationController
       end
 
       if params[:course][:event] && @course.grants_right?(@current_user, session, :change_course_state)
-        event = params[:course].delete(:event)
-        event = event.to_sym
-        if event == :claim && !@course.unpublishable?
-          flash[:error] = t('errors.unpublish', 'Course cannot be unpublished if student submissions exist.')
-          redirect_to(course_url(@course)) and return
-        else
-          @course.process_event(event)
-          if event == :offer
-            Auditors::Course.record_published(@course, @current_user, source: logging_source)
-          elsif event == :claim
-            Auditors::Course.record_claimed(@course, @current_user, source: logging_source)
-          end
-        end
+        return unless process_course_event
       end
 
       params[:course][:conclude_at] = params[:course].delete(:end_at) if api_request? && params[:course].has_key?(:end_at)
@@ -2099,6 +2095,24 @@ class CoursesController < ApplicationController
           format.html { render :edit }
           format.json { render :json => @course.errors, :status => :bad_request }
         end
+      end
+    end
+  end
+
+  def process_course_event
+    event = params[:course].delete(:event)
+    event = event.to_sym
+    if event == :claim && !@course.unpublishable?
+      flash[:error] = t('errors.unpublish', 'Course cannot be unpublished if student submissions exist.')
+      redirect_to(course_url(@course))
+      return false
+    else
+      @course.process_event(event)
+      logging_source = api_request? ? :api : :manual
+      if event == :offer
+        Auditors::Course.record_published(@course, @current_user, source: logging_source)
+      elsif event == :claim
+        Auditors::Course.record_claimed(@course, @current_user, source: logging_source)
       end
     end
   end
