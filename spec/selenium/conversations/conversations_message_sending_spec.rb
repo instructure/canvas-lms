@@ -98,6 +98,26 @@ describe "conversations new" do
       add_message_recipient @s2
     end
 
+    it "should allow messages to be sent individually for account-level groups", priority: "2", test_id: 201506 do
+      @group = Account.default.groups.create(:name => "the group")
+      @group.add_user(@s1)
+      @group.add_user(@s2)
+      @group.save
+      user_logged_in({:user => @s1})
+      get_conversations
+      fj('#compose-btn').click
+      wait_for_ajaximations
+      select_message_course(@group, true)
+      add_message_recipient @s2
+      f("#bulk_message").click
+      set_message_subject('blah')
+      set_message_body('bluh')
+      click_send
+      run_jobs
+      conv = @s2.conversations.last.conversation
+      expect(conv.subject).to eq 'blah'
+    end
+
     it "should allow admins to message users from their profiles", priority: "2", test_id: 201940 do
       user = account_admin_user
       user_logged_in({:user => user})
@@ -150,7 +170,7 @@ describe "conversations new" do
 
         selector = "#bulk_message"
         bulk_cb = f(selector)
-        
+
         expect(bulk_cb.attribute('disabled')).to be_present
         expect(is_checked(selector)).to be_truthy
 
