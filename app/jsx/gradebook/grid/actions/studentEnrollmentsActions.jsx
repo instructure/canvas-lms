@@ -10,9 +10,11 @@ define([
   })
 
   StudentEnrollmentsActions.load.listen(function() {
-    var showConcludedEnrollments = UserSettings.contextGet('show_concluded_enrollments'),
-      self = this,
-      studentsUrl;
+    var self = this,
+      studentsUrl, showConcludedEnrollments;
+
+    showConcludedEnrollments = UserSettings.contextGet('showConcludedEnrollments') ||
+      GradebookConstants.course_is_concluded;
 
     studentsUrl = showConcludedEnrollments ?
       GradebookConstants.students_url_with_concluded_enrollments :

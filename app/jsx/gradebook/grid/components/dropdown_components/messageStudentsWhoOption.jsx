@@ -19,7 +19,6 @@ define([
     openDialog() {
       var submissions = SubmissionsHelper.
         submissionsForAssignment(this.props.submissions, this.props.assignment.id);
-
       var students = _.map(submissions, (submission) => {
         submission.submitted_at = tz.parse(submission.submitted_at);
         var enrollment = _.find(

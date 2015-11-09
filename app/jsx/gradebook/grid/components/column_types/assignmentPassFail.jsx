@@ -29,9 +29,9 @@ define([
     },
 
     getClassName() {
-      var className = '';
+      var className = 'grade';
       if (this.getCurrentGrade() || this.getCurrentGrade() === '' || this.props.isActiveCell) {
-        className = GRADEBOOK_CHECKBOX_CLASS + ' '
+        className += ' ' + GRADEBOOK_CHECKBOX_CLASS + ' '
                   + GRADEBOOK_CHECKBOX_CLASS + '-'
                   + this.getCurrentGrade();
       }

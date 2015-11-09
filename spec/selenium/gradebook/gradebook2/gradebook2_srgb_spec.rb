@@ -1,4 +1,4 @@
-require File.expand_path(File.dirname(__FILE__) + '/helpers/gradebook2_common')
+require_relative '../../helpers/gradebook2_common'
 
 describe "screenreader gradebook" do
   include_context "in-process server selenium tests"

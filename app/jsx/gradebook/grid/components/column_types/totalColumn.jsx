@@ -84,7 +84,7 @@ define([
       return (
         <div ref="cell" title={TotalColumn.getWarning(assignmentGroups)}>
           { TotalColumn.getWarning(assignmentGroups) && <i ref="icon" className='icon-warning final-warning' />}
-          <span ref="totalGrade">{ gradeFormatter.toString() }</span>
+          <span className="total-grade" ref="totalGrade">{ gradeFormatter.toString() }</span>
         </div>
       );
     }

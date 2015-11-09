@@ -1,5 +1,5 @@
-require File.expand_path(File.dirname(__FILE__) + '/helpers/gradebook2_common')
-require File.expand_path(File.dirname(__FILE__) + '/helpers/assignment_overrides')
+require_relative '../../helpers/gradebook2_common'
+require_relative '../../helpers/assignment_overrides'
 
 describe "assignment column headers" do
   include_context "in-process server selenium tests"
