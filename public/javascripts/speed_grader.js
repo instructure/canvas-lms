@@ -202,26 +202,43 @@ define([
     //by defaut the list is sorted alphbetically by student last name so we dont have to do any more work here,
     // if the cookie to sort it by submitted_at is set we need to sort by submitted_at.
     var hideStudentNames = utils.shouldHideStudentNames();
-    var compareBy = function(f) {
-      return function(a, b) {
-        a = f(a);
-        b = f(b);
-        if ((!a && !b) || a === b) { return 0; }
-        if (!a || a > b) { return +1; }
+    var compareStudentsBy = function(f) {
+      return function(studentA, studentB) {
+        var a = f(studentA);
+        var b = f(studentB);
+
+        if ((!a && !b) || a === b) {
+          // chrome / safari sort isn't stable, so we need to sort by name in
+          // case of tie
+          if (studentA.name > studentB.name) {
+            return -1;
+          } else if (studentB.name > studentA.name) {
+            return 1;
+          } else {
+            return 0;
+          }
+        }
+        else if (!a || a > b) { return 1; }
         else { return -1; }
       };
     };
     if(hideStudentNames) {
-      jsonData.studentsWithSubmissions.sort(compareBy(function(student) {
+      jsonData.studentsWithSubmissions.sort(compareStudentsBy(function(student) {
         return student &&
           student.submission &&
           student.submission.id;
       }));
     } else if (userSettings.get("eg_sort_by") == "submitted_at") {
-      jsonData.studentsWithSubmissions.sort(compareBy(function(student){
-        return student &&
-          student.submission &&
-          +tz.parse(student.submission.submitted_at);
+      jsonData.studentsWithSubmissions.sort(compareStudentsBy(function(student){
+        var submittedAt = student &&
+                          student.submission &&
+                          student.submission.submitted_at;
+        if (submittedAt) {
+          return +tz.parse(submittedAt);
+        } else {
+          // puts the unsubmitted assignments at the bottom
+          return Number.NaN;
+        }
       }));
     } else if (userSettings.get("eg_sort_by") == "submission_status") {
       var states = {
@@ -231,7 +248,7 @@ define([
         "graded": 4,
         "not_gradeable": 5
       };
-      jsonData.studentsWithSubmissions.sort(compareBy(function(student){
+      jsonData.studentsWithSubmissions.sort(compareStudentsBy(function(student){
         return student &&
           states[submissionState(student)];
       }));
