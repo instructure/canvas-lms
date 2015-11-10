@@ -228,16 +228,11 @@ require_relative "../common"
 
   def take_quiz
     @quiz ||= quiz_with_new_questions(!:goto_edit)
-
-    get "/courses/#{@course.id}/quizzes/#{@quiz.id}/take?user_id=#{@user.id}"
-    expect_new_page_load { f("#take_quiz_link").click }
-
-    # sleep because display is updated on timer, not ajax callback
-    sleep 1
+    begin_quiz
 
     yield
   ensure
-    #This step is to prevent selenium from freezing when the dialog appears when leaving the page
+    # This step is to prevent selenium from freezing when the dialog appears when leaving the page
     fln('Quizzes').click
     driver.switch_to.alert.accept
   end
@@ -246,10 +241,8 @@ require_relative "../common"
   #   You can pass a block to specify which answer to choose, the block will
   #   receive the set of possible answers. If you don't, the first (and correct)
   #   answer will be chosen.
-  def take_and_answer_quiz(submit=true)
-    get "/courses/#{@course.id}/quizzes/#{@quiz.id}/take?user_id=#{@user.id}"
-
-    expect_new_page_load { f('#take_quiz_link').click }
+  def take_and_answer_quiz(submit=true, access_code=nil)
+    begin_quiz(access_code)
 
     answer = if block_given?
       yield(@quiz.stored_questions[0][:answers])
@@ -262,12 +255,28 @@ require_relative "../common"
       wait_for_js
     end
 
-    if submit
-      expect_new_page_load { driver.execute_script("$('#submit_quiz_form .btn-primary').click()") }
+    submit_quiz if submit
+  end
 
-      keep_trying_until do
-        expect(f('.quiz-submission .quiz_score .score_value')).to be_displayed
-      end
+  def begin_quiz(access_code=nil)
+    get "/courses/#{@course.id}/quizzes/#{@quiz.id}/take?user_id=#{@user.id}"
+
+    if access_code.nil?
+      expect_new_page_load { f('#take_quiz_link').click }
+    else
+      f('#quiz_access_code').send_keys(access_code)
+      expect_new_page_load { fj('.btn', '#main').click }
+    end
+
+    # sleep because display is updated on timer, not ajax callback
+    sleep 1
+  end
+
+  def submit_quiz
+    expect_new_page_load(true) { f('#submit_quiz_button').click }
+
+    keep_trying_until do
+      expect(f('.quiz-submission .quiz_score .score_value')).to be_truthy
     end
   end
 
@@ -286,12 +295,7 @@ require_relative "../common"
      end
     end
 
-    if submit
-      expect_new_page_load(true) { f('#submit_quiz_button').click }
-      keep_trying_until do
-        expect(f('.quiz-submission .quiz_score .score_value')).to be_displayed
-      end
-    end
+    submit_quiz if submit
   end
 
   def set_answer_comment(answer_num, text)
