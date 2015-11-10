@@ -51,7 +51,8 @@ $mini-cal-highlight-border: #fa0;
   }
 
   .fc-view-container {
-    padding: 6px;
+    @if $use_new_styles { padding: 3px; }
+    @else { padding: 6px; }
     table {
       border-spacing: 8px 2px;
     }
@@ -59,8 +60,6 @@ $mini-cal-highlight-border: #fa0;
 
   .fc-widget-content {
     background: none;
-    background-radius: 3px;
-    border-radius: 3px;
     border: 1px solid #fff;
     div {
       min-height: 0 !important;
@@ -68,29 +67,29 @@ $mini-cal-highlight-border: #fa0;
   }
 
   .fc-day-number {
-    line-height: 20px;
+    line-height: 1;
   }
 
   .fc-other-month {
     background-image: none;
   }
 
-  .fc-state-highlight {
-    background: none;
-    color: #666;
-    border-color: $mini-cal-highlight-border;
-    border-bottom: 1px solid $mini-cal-highlight-border; // override for bottom border to show
-    font-weight: bold;
-    box-shadow: none;
-    text-shadow: none;
+  .fc-bg .fc-state-highlight {
+    background: $ic-bg-light-alert;
   }
+
+  .fc-content-skeleton .fc-state-highlight {
+    @if $use_new_styles { font-weight: 500; }
+    @else { font-weight: bold; }
+  }
+
+  .fc-basic-view td.fc-day-number { padding: 5px 0 0; }
 
   .event {
     @if $use_new_styles {
-      background-color: $lightBackground;
-      border: 1px solid $ic-border-light;
+      background-color: $ic-bg-light-neutral;
     }
     @else { background-color: #e4e8ed; }
-    .fc-day-content { display:none; }
+    .fc-day-content { display: none; }
   }
 }
