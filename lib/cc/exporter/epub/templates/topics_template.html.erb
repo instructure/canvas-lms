@@ -1,6 +1,6 @@
 <h2 id="<%="#{item[:identifier]}"%>"><%= item[:title] %></h2>
 <p><%= convert_placeholder_paths_from_string!(item[:description]) %></p>
-<% if item[:assignment] %>
+<% if item[:assignment] && item_details_present?(item[:assignment]) %>
   <div class="item_details">
     <p><%= item[:assignment][:due_at] ? I18n.t("Due at: %{time}",{time: friendly_date(item[:assignment][:due_at])}) : nil%></p>
     <p><%= item[:assignment][:unlock_at] ? I18n.t("Unlock at: %{time}",{time: friendly_date(item[:assignment][:unlock_at])}) : nil %></p>

@@ -1,7 +1,10 @@
 <h2 id="<%="#{item[:identifier]}"%>"><%= item[:title] %></h2>
 <p><%= convert_placeholder_paths_from_string!(item[:description]) %></p>
-<div class="item_details">
-  <p><%= item[:due_at] ? I18n.t("Due at: %{time}",{time: friendly_date(item[:due_at])}) : nil%></p>
-  <p><%= item[:unlock_at] ? I18n.t("Unlock at: %{time}",{time: friendly_date(item[:unlock_at])}) : nil %></p>
-  <p><%= item[:lock_at] ? I18n.t("Lock at: %{time}",{time: friendly_date(item[:lock_at])}) : nil %></p>
-</div>
+<% if item_details_present?(item) %>
+  <div class="item_details">
+    <p><%= item[:due_at] ? I18n.t("Due at: %{time}",{time: friendly_date(item[:due_at])}) : nil%></p>
+    <p><%= item[:unlock_at] ? I18n.t("Unlock at: %{time}",{time: friendly_date(item[:unlock_at])}) : nil %></p>
+    <p><%= item[:lock_at] ? I18n.t("Lock at: %{time}",{time: friendly_date(item[:lock_at])}) : nil %></p>
+    <p><%= item[:points_possible] ? I18n.t("Points: %{points}",{points: item[:points_possible]}) : nil %></p>
+  </div>
+<% end %>
