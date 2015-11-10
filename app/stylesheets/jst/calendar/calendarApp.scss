@@ -24,7 +24,7 @@
     min-height: 12em;
   }
   .fc-row .fc-content-skeleton td, .fc-row .fc-helper-skeleton td {
-    border-color: inherit;
+    border-color: $ic-border-light;
   }
   .fc-head thead .fc-widget-header {
     color: $ic-font-color--subdued;
