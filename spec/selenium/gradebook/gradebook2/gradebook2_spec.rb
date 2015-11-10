@@ -277,4 +277,87 @@ describe "gradebook2" do
     f('.gradebook-header-drop').click
     expect(f('.gradebook-header-menu').text).not_to match(/SpeedGrader/)
   end
+
+  context 'grading quiz submissions' do
+    # set up course and users
+    let(:test_course) { course() }
+    let(:teacher)     { user(active_all: true) }
+    let(:student)     { user(active_all: true) }
+    let!(:enroll_teacher_and_students) do
+      test_course.enroll_user(teacher, 'TeacherEnrollment', enrollment_state: 'active')
+      test_course.enroll_user(student, 'StudentEnrollment', enrollment_state: 'active')
+    end
+    # create quiz with essay question
+    let(:essay_quiz_question) do
+      {
+        question_name: 'Short Essay',
+        points_possible: 10,
+        question_text: 'Write an essay',
+        question_type: 'essay_question'
+      }
+    end
+    let(:essay_quiz) { test_course.quizzes.create(title: 'Essay Quiz') }
+    let(:essay_question) do
+      essay_quiz.quiz_questions.create!(question_data: essay_quiz_question)
+      essay_quiz.workflow_state = 'available'
+      essay_quiz.save!
+      essay_quiz
+    end
+    #create quiz with file upload question
+    let(:file_upload_question) do
+      {
+        question_name: 'File Upload',
+        points_possible: 5,
+        question_text: 'Upload a file',
+        question_type: 'file_upload_question'
+      }
+    end
+    let(:file_upload_quiz) { test_course.quizzes.create(title: 'File Upload Quiz') }
+    let(:file_question) do
+      file_upload_quiz.quiz_questions.create!(question_data: file_upload_question)
+      file_upload_quiz.workflow_state = 'available'
+      file_upload_quiz.save!
+      file_upload_quiz
+    end
+    # generate submissions
+    let(:essay_submission) { essay_question.generate_submission(student) }
+    let(:essay_text) { {"question_#{essay_question.id}" => "Essay Response!"} }
+    let(:file_submission) { file_question.generate_submission(student) }
+
+    it 'should display the quiz icon for essay questions', priority: "1", test_id: 229430 do
+      essay_submission.complete!(essay_text)
+      user_session(teacher)
+
+      get "/courses/#{test_course.id}/gradebook"
+      expect(fj('#gradebook_grid .icon-quiz')).to be_truthy
+    end
+
+    it 'should display the quiz icon for file_upload questions', priority: "1", test_id: 498844 do
+      file_submission.attachments.create!({
+        :filename => "doc.doc",
+        :display_name => "doc.doc", :user => @user,
+        :uploaded_data => dummy_io
+      })
+      file_submission.complete!
+      user_session(teacher)
+
+      get "/courses/#{test_course.id}/gradebook"
+      expect(fj('#gradebook_grid .icon-quiz')).to be_truthy
+    end
+
+    it 'should remove the quiz icon when graded manually', priority: "1", test_id: 491040 do
+      essay_submission.complete!(essay_text)
+      user_session(teacher)
+
+      get "/courses/#{test_course.id}/gradebook"
+      # in order to get into edit mode with an icon in the way, a total of 3 clicks are needed
+      f('#gradebook_grid .icon-quiz').click
+      double_click('.online_quiz')
+
+      replace_value('#gradebook_grid input.grade', '10')
+      f('#gradebook_grid input.grade').send_keys(:enter)
+      wait_for_ajaximations
+      expect(element_exists('#gradebook_grid .icon-quiz')).not_to be_truthy
+    end
+  end
 end

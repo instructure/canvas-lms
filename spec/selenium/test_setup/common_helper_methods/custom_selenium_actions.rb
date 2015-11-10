@@ -273,4 +273,13 @@ module CustomSeleniumActions
     # after it fades out, it's still visible, just off the screen
     driver.execute_script("return $('.error_text:visible').filter(function(){ return $(this).offset().left >= 0 }).length > 0")
   end
+
+  def double_click(selector)
+    el = driver.find_element :css, selector
+    driver.action.double_click(el).perform
+  end
+
+  def replace_value(selector, value)
+    driver.execute_script("$('#{selector}').val(#{value})")
+  end
 end
