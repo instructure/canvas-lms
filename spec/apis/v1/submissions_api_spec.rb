@@ -591,6 +591,31 @@ describe 'Submissions API', type: :request do
     expect(response.body).to match(/Redirecting to quiz page/)
   end
 
+  it "should return a correct submission_history for quiz submissions" do
+    student1 = user(:active_all => true)
+    course_with_teacher_logged_in(:active_all => true) # need to be logged in to view the preview url below
+    @course.enroll_student(student1).accept!
+    quiz = Quizzes::Quiz.create!(:title => 'quiz1', :context => @course)
+    quiz.did_edit!
+    quiz.offer!
+    qs = quiz.generate_submission(student1)
+    qs.mark_completed
+    Quizzes::SubmissionGrader.new(qs).grade_submission
+    qs.reload
+    qs.attempt = 2
+    qs.with_versioning(true, &:save)
+
+    json = api_call(:get,
+          "/api/v1/courses/#{@course.id}/assignments/#{quiz.assignment.id}/submissions.json",
+          { :controller => 'submissions_api', :action => 'index',
+            :format => 'json', :course_id => @course.id.to_s,
+            :assignment_id => quiz.assignment.id.to_s },
+          { :include => %w(submission_history) })
+
+    expect(json.first['submission_history'].count).to eq 2
+    expect(json.first['submission_history'].first.include? "submission_data").to be_truthy
+  end
+
   it "should allow students to retrieve their own submission" do
     student1 = user(:active_all => true)
     student2 = user(:active_all => true)
