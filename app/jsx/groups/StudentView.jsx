@@ -174,7 +174,7 @@ define([
     },
 
     _filter(group) {
-      filter = this.state.filter.toLowerCase();
+      var filter = this.state.filter.toLowerCase();
       return (!filter ||
               group.name.toLowerCase().indexOf(filter) > -1 ||
               group.users.some(u => u.name.toLowerCase().indexOf(filter) > -1));
