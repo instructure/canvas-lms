@@ -27,11 +27,7 @@ module AccountReports
     def initialize(account_report)
       @account_report = account_report
       extra_text_term(@account_report)
-      if @account_report.has_parameter? "include_deleted"
-        @include_deleted = @account_report.parameters["include_deleted"]
-        add_extra_text(I18n.t('account_reports.grades.deleted',
-                              'Include Deleted Objects: true;'))
-      end
+      include_deleted_objects
     end
 
     # retrieve the list of students for all active courses
