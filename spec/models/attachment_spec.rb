@@ -1253,6 +1253,21 @@ describe Attachment do
       quota = Attachment.get_quota(@course)
       expect(quota[:quota_used]).to eq Attachment.minimum_size_for_quota
     end
+
+    it "should not count attachments a student has used for submissions towards the quota" do
+      course_with_student(:active_all => true)
+      attachment_model(:context => @user, :uploaded_data => stub_png_data, :filename => "homework.png")
+      @attachment.update_attribute(:size, 1.megabyte)
+
+      @assignment = @course.assignments.create!
+      sub = @assignment.submit_homework(@user, attachments: [@attachment])
+
+      attachment_model(:context => @user, :uploaded_data => stub_png_data, :filename => "otherfile.png")
+      @attachment.update_attribute(:size, 1.megabyte)
+
+      quota = Attachment.get_quota(@user)
+      expect(quota[:quota_used]).to eq 1.megabyte
+    end
   end
 
   context "#open" do
