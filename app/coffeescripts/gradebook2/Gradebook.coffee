@@ -374,6 +374,7 @@ define [
             submission = student["assignment_#{assignment_id}"]
             if @submissionOutsideOfGradingPeriod(submission, student, gradingPeriods, overrides)
               submission.hidden = true
+              submission.outsideOfGradingPeriod = true
           @rows.push(student)
 
     defaultSortType: 'assignment_group'
@@ -651,9 +652,16 @@ define [
           activeCell.row is student.row and
           activeCell.cell is cell
         #check for DA visible
-        submission["hidden"] = !submission.assignment_visible if submission.assignment_visible?
-        submission.hidden = true if @submissionOutsideOfGradingPeriod(submission, student, gradingPeriods, overrides)
-        @updateAssignmentVisibilities(submission) if submission["hidden"]
+        if submission.assignment_visible?
+          submission.hidden = !submission.assignment_visible
+
+        if @submissionOutsideOfGradingPeriod(submission, student, gradingPeriods, overrides)
+          submission.hidden = true
+          submission.outsideOfGradingPeriod = true
+
+        if submission.hidden
+          @updateAssignmentVisibilities(submission)
+
         @updateSubmission(submission)
         @calculateStudentGrade(student)
         @grid.updateCell student.row, cell unless thisCellIsActive
@@ -667,6 +675,8 @@ define [
     cellFormatter: (row, col, submission) =>
       if !@rows[row].loaded
         @staticCellFormatter(row, col, '')
+      else if submission.outsideOfGradingPeriod
+        @uneditableCellOutsideOfGradingPeriodFormatter(row, col)
       else if submission.hidden
         @uneditableCellFormatter(row, col)
       else if !submission?
@@ -752,6 +762,14 @@ define [
 
     staticCellFormatter: (row, col, val) ->
       "<div class='cell-content gradebook-cell'>#{htmlEscape(val)}</div>"
+
+    uneditableCellOutsideOfGradingPeriodFormatter: (row, col) ->
+      """
+        <div class='gradebook-tooltip'>
+          #{htmlEscape(I18n.t("Submission in another grading period"))}
+        </div>
+        <div class='cell-content gradebook-cell grayed-out cannot_edit'></div>
+      """
 
     uneditableCellFormatter: (row, col) ->
       "<div class='cell-content gradebook-cell grayed-out cannot_edit'></div>"
