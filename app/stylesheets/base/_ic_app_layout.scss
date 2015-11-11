@@ -1,5 +1,21 @@
 $ic-left-side-width: $ic-sp*15;
 
+::-webkit-scrollbar {
+  -webkit-appearance: none;
+  width: $ic-sp*0.75; height: $ic-sp*0.75;
+}
+
+::-webkit-scrollbar-track {
+  -webkit-appearance: none;
+  background: $ic-color-light;
+}
+::-webkit-scrollbar-thumb {
+  -webkit-appearance: none;
+  box-shadow: inset 0 0 0 2px $ic-color-light;
+  @if $use_high_contrast { background: darken($ic-border-dark, 15%); }
+  @else { background: $ic-border-dark; }
+}
+
 .ic-app {
   box-sizing: border-box;
   min-height: 100vh;

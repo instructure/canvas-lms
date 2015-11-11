@@ -21,23 +21,6 @@
 //// Suppress scroll on the body for Theme Editor
 body { overflow: hidden; }
 
-//// Fancypants webkit scrollbars that take up less space
-///////
-::-webkit-scrollbar {
-  -webkit-appearance: none;
-  width: $ic-sp*0.75;
-}
-
-::-webkit-scrollbar-track {
-  -webkit-appearance: none;
-  background: $ic-color-light;
-}
-::-webkit-scrollbar-thumb {
-  -webkit-appearance: none;
-  background: $ic-border-dark;
-  box-shadow: inset 0 0 0 2px $ic-color-light;
-}
-
 #main {
   max-width: 100% !important;
   height: 100%;
