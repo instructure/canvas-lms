@@ -170,12 +170,12 @@ describe UsersController do
       assert_status(401)
     end
 
-    it "should show user to account users that have the view_statistics permission" do
+    it "should show user to account users that have the read_roster permission" do
       account_model
       student_in_course(:account => @account)
 
       role = custom_account_role('custom', :account => @account)
-      RoleOverride.create!(:context => @account, :permission => 'view_statistics',
+      RoleOverride.create!(:context => @account, :permission => 'read_roster',
                            :role => role, :enabled => true)
       @account.account_users.create!(user: user, role: role)
       user_session(@user)

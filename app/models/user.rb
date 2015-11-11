@@ -1052,7 +1052,10 @@ class User < ActiveRecord::Base
       can :view_statistics and can :read and can :read_reports and can :manage_feature_flags and can :read_grades
 
     given {|user| self.check_accounts_right?(user, :manage_user_logins) }
-    can :view_statistics and can :read and can :read_reports
+    can :read and can :read_reports
+
+    given {|user| self.check_accounts_right?(user, :read_roster) }
+    can :read_full_profile
 
     given {|user| self.check_accounts_right?(user, :view_all_grades) }
     can :read_grades

@@ -1,3 +1,4 @@
+<% if can_do(@user, @current_user, :manage, :manage_user_details) %>
   <% css_bundle :user_logins %>
   <% js_bundle :user_logins %>
   <% js_env :PASSWORD_POLICY => (@domain_root_account.try(:password_policy) || {}) %>
@@ -136,3 +137,4 @@
       <button type="submit" class="btn btn-primary submit_button"><%= t('buttons.update_login', 'Update Login') %></button>
     </div>
   <% end %>
+<% end %>
