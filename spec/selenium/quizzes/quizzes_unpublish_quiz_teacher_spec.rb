@@ -1,7 +1,9 @@
-require File.expand_path(File.dirname(__FILE__) + '/../helpers/quizzes_common')
+require_relative "../common"
+require_relative "../helpers/quizzes_common"
 
 describe 'unpublishing a quiz on the quiz show page' do
-  include_context 'in-process server selenium tests'
+  include_context "in-process server selenium tests"
+  include_context "quizzes selenium tests"
 
   def unpublish_quiz_via_ui(opts={})
     get "/courses/#{@course.id}/quizzes/#{@quiz.id}"

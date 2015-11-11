@@ -1,7 +1,9 @@
-require File.expand_path(File.dirname(__FILE__) + '/../helpers/quiz_questions_common')
+require_relative "../common"
+require_relative "../helpers/quiz_questions_common"
 
 describe 'taking a quiz one question at a time' do
-  include_examples 'quiz question selenium tests'
+  include_context 'in-process server selenium tests'
+  include_context 'quiz question selenium tests'
 
   before(:each) do
     create_oqaat_quiz(publish: true)

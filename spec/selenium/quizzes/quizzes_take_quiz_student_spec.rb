@@ -1,7 +1,9 @@
-require File.expand_path(File.dirname(__FILE__) + '/../helpers/quizzes_common')
+require_relative "../common"
+require_relative "../helpers/quizzes_common"
 
 describe 'taking a quiz' do
-  include_context 'in-process server selenium tests'
+  include_context "in-process server selenium tests"
+  include_context "quizzes selenium tests"
 
   context 'as a student' do
     before(:once) { course_with_student(active_all: 1) }

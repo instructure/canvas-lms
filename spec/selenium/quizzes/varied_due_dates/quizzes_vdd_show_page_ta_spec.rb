@@ -1,9 +1,11 @@
-require File.expand_path(File.dirname(__FILE__) + '/../../helpers/quizzes_common')
-require File.expand_path(File.dirname(__FILE__) + '/../../helpers/assignment_overrides')
+require_relative "../../common"
+require_relative "../../helpers/quizzes_common"
+require_relative "../../helpers/assignment_overrides"
 
 describe 'viewing a quiz with variable due dates on the quiz show page' do
+  include_context "in-process server selenium tests"
+  include_context "quizzes selenium tests"
   include AssignmentOverridesSeleniumHelper
-  include_context 'in-process server selenium tests'
 
   context 'as a TA in both sections' do
     before(:once) { prepare_vdd_scenario_for_ta }

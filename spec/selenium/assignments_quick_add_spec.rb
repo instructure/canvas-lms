@@ -1,11 +1,12 @@
-require File.expand_path(File.dirname(__FILE__) + '/common')
-require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
-require File.expand_path(File.dirname(__FILE__) + '/helpers/submissions_common')
-require File.expand_path(File.dirname(__FILE__) + '/helpers/assignments_common')
-require File.expand_path(File.dirname(__FILE__) + '/helpers/quizzes_common')
+require_relative "common"
+require_relative "helpers/files_common"
+require_relative "helpers/submissions_common"
+require_relative "helpers/assignments_common"
+require_relative "helpers/quizzes_common"
 
 describe 'assignments' do
   include_context 'in-process server selenium tests'
+  include_context "quizzes selenium tests"
 
   before do
     course_with_teacher_logged_in

@@ -1,8 +1,9 @@
-require File.expand_path(File.dirname(__FILE__) + '/../common')
-require File.expand_path(File.dirname(__FILE__) + '/../helpers/quizzes_common')
+require_relative "../common"
+require_relative "../helpers/quizzes_common"
 
 describe 'quiz restrictions as a teacher' do
-  include_context 'in-process server selenium tests'
+  include_context "in-process server selenium tests"
+  include_context "quizzes selenium tests"
 
   before do
     course_with_teacher_logged_in

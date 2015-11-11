@@ -1,4 +1,4 @@
-require_relative "../common"
+shared_context "quizzes selenium tests" do
 
   def create_quiz_with_due_date(opts={})
     @context = opts.fetch(:course, @course)
@@ -508,81 +508,82 @@ require_relative "../common"
     js_drag_and_drop source, target
   end
 
-def quiz_create(params={})
+  def quiz_create(params={})
 
-  @quiz = @course.quizzes.create
+    @quiz = @course.quizzes.create
 
-  default_params = {
-      quiz_name: 'bender',
-      question_name: 'shiny',
-  }
-  params = default_params.merge(params)
+    default_params = {
+        quiz_name: 'bender',
+        question_name: 'shiny',
+    }
+    params = default_params.merge(params)
 
-  answers = [
-      {weight: 100, answer_text: 'A', answer_comments: '', id: 1490},
-      {weight: 0, answer_text: 'B', answer_comments: '', id: 1020},
-      {weight: 0, answer_text: 'C', answer_comments: '', id: 7051}
-  ]
-  data = { question_name:params[:quiz_name], points_possible: 1, question_text: params[:question_name],
-           answers: answers, question_type: 'multiple_choice_question'
-  }
+    answers = [
+        {weight: 100, answer_text: 'A', answer_comments: '', id: 1490},
+        {weight: 0, answer_text: 'B', answer_comments: '', id: 1020},
+        {weight: 0, answer_text: 'C', answer_comments: '', id: 7051}
+    ]
+    data = { question_name:params[:quiz_name], points_possible: 1, question_text: params[:question_name],
+             answers: answers, question_type: 'multiple_choice_question'
+    }
 
-  @quiz.quiz_questions.create!(question_data: data)
+    @quiz.quiz_questions.create!(question_data: data)
 
-  @quiz.workflow_state = "available"
-  @quiz.generate_quiz_data
-  @quiz.published_at = Time.now
-  @quiz.save!
-  @quiz
-end
-
-def seed_quiz_with_submission(num=1, opts={})
-  quiz_data =
-      [
-          {
-              question_name: 'Multiple Choice',
-              points_possible: 10,
-              question_text: 'Pick wisely...',
-              answers: [
-                  {weight: 100, answer_text: 'Correct', id: 1},
-                  {weight: 0, answer_text: 'Wrong', id: 2},
-                  {weight: 0, answer_text: 'Wrong', id: 3}
-              ],
-              question_type: 'multiple_choice_question'
-          },
-          {
-              question_name: 'File Upload',
-              points_possible: 5,
-              question_text: 'Upload a file',
-              question_type: 'file_upload_question'
-          },
-          {
-              question_name: 'Short Essay',
-              points_possible: 20,
-              question_text: 'Write an essay',
-              question_type: 'essay_question'
-          },
-          {
-              question_name: 'Text (no question)',
-              question_text: 'This is just text',
-              question_type: 'text_only_question'
-          }
-      ]
-
-  quiz = @course.quizzes.create title: 'Quiz Me!'
-
-  num.times do
-    quiz_data.each do |question|
-      quiz.quiz_questions.create! question_data: question
-    end
+    @quiz.workflow_state = "available"
+    @quiz.generate_quiz_data
+    @quiz.published_at = Time.now
+    @quiz.save!
+    @quiz
   end
 
-  quiz.workflow_state = 'available'
-  quiz.save!
+  def seed_quiz_with_submission(num=1, opts={})
+    quiz_data =
+        [
+            {
+                question_name: 'Multiple Choice',
+                points_possible: 10,
+                question_text: 'Pick wisely...',
+                answers: [
+                    {weight: 100, answer_text: 'Correct', id: 1},
+                    {weight: 0, answer_text: 'Wrong', id: 2},
+                    {weight: 0, answer_text: 'Wrong', id: 3}
+                ],
+                question_type: 'multiple_choice_question'
+            },
+            {
+                question_name: 'File Upload',
+                points_possible: 5,
+                question_text: 'Upload a file',
+                question_type: 'file_upload_question'
+            },
+            {
+                question_name: 'Short Essay',
+                points_possible: 20,
+                question_text: 'Write an essay',
+                question_type: 'essay_question'
+            },
+            {
+                question_name: 'Text (no question)',
+                question_text: 'This is just text',
+                question_type: 'text_only_question'
+            }
+        ]
 
-  submission = quiz.generate_submission opts[:student] || @students[0]
-  submission.workflow_state = 'complete'
-  submission.save!
+    quiz = @course.quizzes.create title: 'Quiz Me!'
 
-  quiz
+    num.times do
+      quiz_data.each do |question|
+        quiz.quiz_questions.create! question_data: question
+      end
+    end
+
+    quiz.workflow_state = 'available'
+    quiz.save!
+
+    submission = quiz.generate_submission opts[:student] || @students[0]
+    submission.workflow_state = 'complete'
+    submission.save!
+
+    quiz
+  end
 end

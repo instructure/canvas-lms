@@ -1,9 +1,11 @@
-require File.expand_path(File.dirname(__FILE__) + '/../common')
-require File.expand_path(File.dirname(__FILE__) + '/../helpers/calendar2_common')
-require File.expand_path(File.dirname(__FILE__) + '/../helpers/quizzes_common')
+require_relative "../common"
+require_relative "../helpers/calendar2_common"
+require_relative "../helpers/quizzes_common"
 
 describe "calendar2" do
   include_context "in-process server selenium tests"
+  include_context "quizzes selenium tests"
+
   before(:each) do
     Account.default.tap do |a|
       a.settings[:show_scheduler]   = true

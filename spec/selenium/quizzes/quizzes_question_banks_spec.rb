@@ -1,9 +1,10 @@
-require File.expand_path(File.dirname(__FILE__) + '/../helpers/quizzes_common')
-require File.expand_path(File.dirname(__FILE__) + '/../helpers/testrail_report')
+require_relative "../common"
+require_relative "../helpers/quizzes_common"
+require_relative "../helpers/testrail_report"
 
 describe 'quizzes question banks' do
-
-  include_context 'in-process server selenium tests'
+  include_context "in-process server selenium tests"
+  include_context "quizzes selenium tests"
 
   context 'as a teacher' do
 

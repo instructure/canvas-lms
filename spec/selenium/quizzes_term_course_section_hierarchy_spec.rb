@@ -1,9 +1,9 @@
-require File.expand_path(File.dirname(__FILE__) + '/helpers/quizzes_common')
-require File.expand_path(File.dirname(__FILE__) + '/helpers/assignment_overrides.rb')
+require_relative "common"
+require_relative "helpers/quizzes_common"
 
 describe "quizzes section hierarchy" do
-
-  include_examples 'in-process server selenium tests'
+  include_context "in-process server selenium tests"
+  include_context "quizzes selenium tests"
 
   before :each do
     course_with_teacher_logged_in

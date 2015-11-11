@@ -1,9 +1,11 @@
-require File.expand_path(File.dirname(__FILE__) + '/../helpers/quizzes_common')
-require File.expand_path(File.dirname(__FILE__) + '/../helpers/assignment_overrides.rb')
+require_relative "../common"
+require_relative "../helpers/quizzes_common"
+require_relative "../helpers/assignment_overrides"
 
 describe 'editing a quiz' do
+  include_context "in-process server selenium tests"
+  include_context "quizzes selenium tests"
   include AssignmentOverridesSeleniumHelper
-  include_context 'in-process server selenium tests'
 
   def delete_quiz
     expect_new_page_load do

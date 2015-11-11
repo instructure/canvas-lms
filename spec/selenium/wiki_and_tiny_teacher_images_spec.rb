@@ -1,8 +1,10 @@
-require File.expand_path(File.dirname(__FILE__) + '/helpers/wiki_and_tiny_common')
-require File.expand_path(File.dirname(__FILE__) + '/helpers/quizzes_common')
+require_relative "common"
+require_relative "helpers/wiki_and_tiny_common"
+require_relative "helpers/quizzes_common"
 
 describe "Wiki pages and Tiny WYSIWYG editor Images" do
   include_context "in-process server selenium tests"
+  include_context "quizzes selenium tests"
 
   context "wiki and tiny images as a teacher" do
 
