@@ -91,9 +91,9 @@ class AssignmentGroupsController < ApplicationController
   # Returns the list of assignment groups for the current context. The returned
   # groups are sorted by their position field.
   #
-  # @argument include[] [String, "assignments"|"discussion_topic"|"all_dates"|"assignment_visibility"|"overrides"]
+  # @argument include[] [String, "assignments"|"discussion_topic"|"all_dates"|"assignment_visibility"|"overrides"|"submission"]
   #  Associations to include with the group. "discussion_topic", "all_dates"
-  #  "assignment_visibility" are only valid are only valid if "assignments" is also included.
+  #  "assignment_visibility" & "submission" are only valid are only valid if "assignments" is also included.
   #  The "assignment_visibility" option additionally requires that the Differentiated Assignments course feature be turned on.
   #
   # @argument override_assignment_dates [Boolean]
@@ -114,9 +114,13 @@ class AssignmentGroupsController < ApplicationController
         []
       end
 
+      if assignments.any? && include_params.include?('submission')
+        submissions = submissions_hash(['submission'], assignments)
+      end
+
       respond_to do |format|
         format.json do
-          render json: index_groups_json(@context, @current_user, groups, assignments)
+          render json: index_groups_json(@context, @current_user, groups, assignments, submissions)
         end
       end
     end
@@ -270,7 +274,7 @@ class AssignmentGroupsController < ApplicationController
     @context.feature_enabled?(:differentiated_assignments)
   end
 
-  def index_groups_json(context, current_user, groups, assignments)
+  def index_groups_json(context, current_user, groups, assignments, submissions = [])
     include_overrides = include_params.include?('overrides')
 
     assignments_by_group = assignments.group_by(&:assignment_group_id)
@@ -298,7 +302,8 @@ class AssignmentGroupsController < ApplicationController
           assignment_visibilities: assignment_visibilities(context, assignments),
           differentiated_assignments_enabled: differentiated_assignments?,
           exclude_descriptions: !!params[:exclude_descriptions],
-          overrides: group_overrides
+          overrides: group_overrides,
+          submissions: submissions
         }
       )
     end
@@ -328,7 +333,7 @@ class AssignmentGroupsController < ApplicationController
       context,
       groups,
       assignment_includes
-    ).with_student_submission_count
+    ).with_student_submission_count.all
 
     if params[:grading_period_id].present? && multiple_grading_periods?
       grading_period = GradingPeriod.context_find(
