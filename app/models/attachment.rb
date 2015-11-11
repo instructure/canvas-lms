@@ -599,11 +599,21 @@ class Attachment < ActiveRecord::Base
     context = context.quota_context if context.respond_to?(:quota_context) && context.quota_context
     if context
       Shackles.activate(:slave) do
-        quota = Setting.get('context_default_quota', 50.megabytes.to_s).to_i
-        quota = context.quota if (context.respond_to?("quota") && context.quota)
-        min = self.minimum_size_for_quota
-        # translated to ruby this is [size, min].max || 0
-        quota_used = context.attachments.active.where(root_attachment_id: nil).sum("COALESCE(CASE when size < #{min} THEN #{min} ELSE size END, 0)").to_i
+        context.shard.activate do
+          quota = Setting.get('context_default_quota', 50.megabytes.to_s).to_i
+          quota = context.quota if (context.respond_to?("quota") && context.quota)
+
+          attachment_scope = context.attachments.active.where(root_attachment_id: nil)
+
+          if context.is_a?(User)
+            excluded_attachment_ids = context.attachments.joins(:attachment_associations).where("attachment_associations.context_type = ?", "Submission").pluck(:id)
+            attachment_scope = attachment_scope.where("id NOT IN (?)", excluded_attachment_ids)
+          end
+
+          min = self.minimum_size_for_quota
+          # translated to ruby this is [size, min].max || 0
+          quota_used = attachment_scope.sum("COALESCE(CASE when size < #{min} THEN #{min} ELSE size END, 0)").to_i
+        end
       end
     end
     {:quota => quota, :quota_used => quota_used}
