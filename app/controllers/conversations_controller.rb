@@ -634,7 +634,7 @@ class ConversationsController < ApplicationController
   #       -X DELETE \
   #       -H 'Authorization: Bearer <token>'
   def delete_for_all
-    return unless authorized_action(Account.site_admin, @current_user, :become_user)
+    return unless authorized_action(Account.site_admin, @current_user, :manage_students)
 
     Conversation.find(params[:id]).delete_for_all
 
