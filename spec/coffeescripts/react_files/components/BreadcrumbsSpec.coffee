@@ -1,13 +1,13 @@
 define [
+  '../mockFilesENV'
   'react'
   'react-router'
   'jquery'
   'compiled/react_files/modules/filesEnv'
   'jsx/files/Breadcrumbs'
   'compiled/models/Folder'
-  '../mockFilesENV'
   '../TestLocation'
-], (React, Router, $, filesEnv, BreadcrumbsComponent, Folder, mockFilesENV, TestLocation) ->
+], (mockFilesENV, React, Router, $, filesEnv, BreadcrumbsComponent, Folder, TestLocation) ->
 
   Simulate = React.addons.TestUtils.Simulate
   {Route} = Router

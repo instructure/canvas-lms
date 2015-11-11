@@ -4,8 +4,9 @@ define([
   'classnames',
   'react-router',
   'compiled/react_files/components/Breadcrumbs',
-  'jsx/files/BreadcrumbCollapsedContainer'
-], function(React, I18n, classnames, ReactRouter, Breadcrumbs, BreadcrumbCollapsedContainer) {
+  'jsx/files/BreadcrumbCollapsedContainer',
+  'compiled/str/splitAssetString'
+], function(React, I18n, classnames, ReactRouter, Breadcrumbs, BreadcrumbCollapsedContainer, splitAssetString) {
 
   var MAX_CRUMB_WIDTH = 500
   var MIN_CRUMB_WIDTH = (window.ENV.use_new_styles) ? 80 : 40;
@@ -13,7 +14,9 @@ define([
   var Link = ReactRouter.Link;
 
   Breadcrumbs.renderSingleCrumb = function (folder, isLastCrumb, isRootCrumb) {
-    var name = (isRootCrumb) ? I18n.t('files', 'Files') : folder.get('name');
+    var [contextType, contextId] = splitAssetString(window.ENV.context_asset_string, false);
+    var isContextRoot = !!(folder && (folder.get("context_type") || "").toLowerCase() === contextType && (folder.get("context_id") || -1).toString() === contextId);
+    var name = (isRootCrumb  && isContextRoot) ? I18n.t('files', 'Files') : folder && (folder.get('custom_name') || folder.get('name'));
     return (
       <li>
         <Link

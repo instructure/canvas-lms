@@ -42,7 +42,7 @@ define([
             {I18n.t('Files')}
           </h1>
         </header>
-        {ENV.use_new_styles && contextType === 'courses' && (
+        {ENV.use_new_styles && (
           <div className='ic-app-nav-toggle-and-crumbs ic-app-nav-toggle-and-crumbs--files'>
             <button
               className='Button Button--link Button--small ic-app-course-nav-toggle'
@@ -62,7 +62,7 @@ define([
           </div>
         )}
 
-        {(!ENV.use_new_styles || contextType !== 'courses') && (
+        {(!ENV.use_new_styles) && (
           <Breadcrumbs
             rootTillCurrentFolder={this.state.rootTillCurrentFolder}
             showingSearchResults={this.state.showingSearchResults}

@@ -26,7 +26,7 @@ define [
         [contextType, contextId] = if assetString = source.get("context_asset_string")
                                      splitAssetString(assetString, false)
                                    else
-                                     [source.collection.parentFolder?.get("context_type"), source.collection.parentFolder?.get("context_id")?.toString()]
+                                     [(source.collection?.parentFolder?.get("context_type") || source.get("context_type")), (source.collection?.parentFolder?.get("context_id")?.toString() || source.get("context_id").toString())]
 
         contextType.toLowerCase() is destination.get("context_type").toLowerCase() and
         contextId is destination.get("context_id")?.toString()
