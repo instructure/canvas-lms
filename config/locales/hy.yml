@@ -278,7 +278,7 @@ hy:
     report_header_last_ip: "վերջին ip"
     report_header_last_name: last_name
     report_header_learning_outcome_id: "սովորելու արդյունքների նույնականացուցիչ"
-    report_header_learning_outcome_name: "սովորելու արդյունքների անվանում"
+    report_header_learning_outcome_name: "ուսուցման արդյունքների անվանումը"
     report_header_login_id: login_id
     report_header_long__name: long_name
     report_header_long_name: "երկար անուն"
@@ -372,7 +372,7 @@ hy:
         path: Էլ.փոստ
         send_confirmation: "Էլ.փոստի միջոցով օգտագործողին տեղեկացրեք այս հաշվի ստեղծման մասին:"
         short_name: "Ցույց տալ անունը"
-        sis_user_id: "SIS նույնականացուցիչ"
+        sis_user_id: "Համակարգի ID"
         sortable_name: "Սորտավորվող անուն"
       sortable_name_help: "Այս անունը հայտնվում է սորտավորված ցուցակում"
       unique_id_label_1: "%{label}:"
@@ -585,7 +585,7 @@ hy:
         other: "%{count} ավելի"
       none: Չկա
       settings_link: Կարգաբերումներ
-      sis_id_label: "SIS նույնականացուցիչ"
+      sis_id_label: "Համակարգի ID"
       statistics_link: Վիճակագրություն
       student_count: 
         one: "1 ուսանող"
@@ -675,7 +675,7 @@ hy:
         samuel_merrit_university: 
           course: 
             sis: 
-              text: "SIS դասընթացի նույնականացուցիչը"
+              text: "Համակարգի դասընթացի ID"
             text: "Դասընթացի նույնականացուցիչ"
           parameters: 
             note1: "Դասընթացի նույնականացուցչի դաշտը  կարելի է դատարկ թողնել սեմեստրում բոլոր դասընթացների հաշվետվությունը կազմելու նպատակով: "
@@ -733,7 +733,7 @@ hy:
     retry_login: "Կրկին փորձեք մուտք գործել համակարգ"
     root_accounts: 
       labels: 
-        name: "Հաշվի անվանումը"
+        name: "Հաշվի անունը"
     safety_drill_csv_parameters: 
       account_reports: 
         newark: 
@@ -813,7 +813,7 @@ hy:
       google_docs_domain: "Google Docs թույլատրելի դոմեն"
       headers: 
         report_last_run: "Վերջին գործարկումը"
-        report_name: Անվանումը
+        report_name: Անուն
       headings: 
         quotas: "Հաշվի քվոտաները"
         sections: Հաշվետվություններ
@@ -826,7 +826,7 @@ hy:
       interpolate_account_domain: "Մուտքագրեք \"{{ACCOUNT_DOMAIN}}\" օգտագործողի հաշվի՝ հասանելիության առավելագույն իրավունքներով դոմենի փոխարինման համար"
       interpolate_user_id: "Մուտքագրեք \"{{CANVAS_USER_ID}}\" փոխարինելու համար օգտագործողի եզակի Canvas նույնականացուցչին"
       ip_filter_filter_label: Ֆիլտր
-      ip_filter_name_label: Անվանումը
+      ip_filter_name_label: Անուն
       labels: 
         account_notification_icon: Նշան
         admins_can_change_passwords: "Ադմինիստրատոների կողմից գաղտնաբառերի սահմանում"
@@ -861,7 +861,7 @@ hy:
         login_handle_name: "Մուտք գործելու տարբերանիշ"
         message: Հաղորդագրություն
         mfa_settings: "Իսկության բազմաֆակտորային ստուգում"
-        name: "Հաշվի անվանումը"
+        name: "Հաշվի անունը"
         new_sub_account_includes: "Թույլատրել ենթահաշիվների օգտագործումը Թեմայի խմբագրին հարմարեցնել իր սեփական բրենդինգին"
         no_enrollments_can_create_courses: "Օգտագործողներ առանց գրանցման "
         open_registration: "Բացել գրանցումը"
@@ -879,7 +879,7 @@ hy:
         show_scheduler: "Միացնել \"Պլանավորիչը\""
         sis_app_token: "SIS-ագենտի  թոքեն"
         sis_app_url: "SIS հավելված URL"
-        sis_source_id: "SIS նույնականացուցիչ"
+        sis_source_id: "Համակարգի ID"
         start_at: Սկիզբ
         students_can_create_courses: Ունկնդիրներ
         sub_account_includes: "Թույլ տվեք ենթահաշիվներին որոշել լրացուցիչ միացումները"
@@ -1178,7 +1178,7 @@ hy:
             day_drop: "Ամենից քիչ այցելված դասընթացի տարրերը:"
     users_list: 
       login_name_or_sis_id: "Մուտքային անուն/ SIS նույնականացուցիչ "
-      name: Անվանումը
+      name: Անուն
       no_people_found: "Ոչ մի օգտագործող չի գտնվել"
       you_can_search_by: "Դուք կարող եք փնտրել՝"
     zero_activity_csv_description: 
@@ -1475,6 +1475,7 @@ hy:
     labels: 
       due: Մինչև
     name_is_required: "Նշել անունը:"
+    name_too_long: "Անունը չափազանց երկար է"
     points_possible_number: "Հնարավոր միավորները պետք է թիվ լինեն:"
     select_external_tool_dialog_title: "Արտաքին գործիքների կարգաբերում"
     submission_action_take_quiz: "Օգտագործել %{title}"
@@ -1544,7 +1545,7 @@ hy:
     assignment_group_create_dialog: 
       assignment_group: 
         labels: 
-          name: Անվանումը
+          name: Անուն
       buttons: 
         add_group: "Ավելացնել խումբ"
         cancel: "Չեղյալ համարել"
@@ -1624,7 +1625,7 @@ hy:
     create_assignment: 
       assignment: Հանձնարարություն
       assignment_due_at: Մինչև
-      assignment_name: Անուն
+      assignment_name: Անուն․
       assignment_points: Միավորներ
       assignment_type: Տեսակ
       buttons: 
@@ -1644,7 +1645,7 @@ hy:
       drop_highest: "Ամենաբարձր գնահատականները՝"
       drop_lowest: "Ամենացածր գնահատականները՝"
       example_group_name: "օր.՝ ռեֆերատի խումբ 1"
-      group_name: "Խմբի անվանում"
+      group_name: "Խմբի անունը․"
       never_drop: "Երբեք բաց չթողնել"
       percent_of_total: "ընդհանուր գնահատականի %"
       save: Պահպանել
@@ -2201,7 +2202,7 @@ hy:
       buttons: 
         add_credentials: "Ավելացնել նույնականացման տվյալները"
         migrate_courses: "Տեղափոխել դասընթացները"
-      column_name: "Սյունակի անվանումը"
+      column_name: "Սյունակի անունը"
       course_id_description: "Canvas-ի դասընթացի նույնականացուցիչ, ուր պետք է կատարվի ներմուծումը"
       credential_description: "Այս գործիքը կօգնի ձեզ միաժամանակ Blackboard Vista/CE համակարգից տեղափոխել մի քանի դասընթացներ:  Ձեր դասընթացները տեղափոխելու համար ավելացրեք ձեր Blackboard համակարգի նույնականացման տվյալները, հետո տրված CSV շաբլոնին ավելացրեք Canvas-ի դասընթացի նույնականացուցիչները:"
       csv_description: "Կարելի է ավելացնել այլ սյունակներ, սակայն դրանք կանտեսվեն: Ստորև տրվում է 3 դասընթացի համար պարզ CSV ֆայլի օրինակ \"greg\"  անվամբ օգտագործողի համար:"
@@ -2431,7 +2432,7 @@ hy:
       group_category: "Խմբի կատեգորիան"
       group_signup: "Ուսանողներին գրանցել խմբերում"
       location: "Գտնվելու վայրը"
-      name: Անվանումը
+      name: Անուն
       time_range: "Ժամանակային տիրույթ"
     edit_appt_calendar_event: 
       description: Նկարագրություն
@@ -2640,6 +2641,7 @@ hy:
   can_t_delete_alignments_based_on_rubric_associatio_d9fd10a3: "Հնարավոր չէ ջնջել բաժինների հետ կապված համապատասխանությունները: Այդ կապերը հանելու համար դուք պետք է ակտիվների բաժնից տողը հանեք:"
   can_t_perform_diffing_against_more_than_one_file_o_44475c0d: "Հնարավոր չէ կատարել տարբերությունների սահմանում նույն տեսակի մի քանի ֆայլի համար:"
   can_t_unpublish_if_there_are_student_submissions_2d7cd742: "Հնարավոր չէ չեղարկել հրապարակումը, եթե առկա են ունկնդիրների ներկայացրած աշխատանքները:"
+  can_t_unpublish_item_name_if_there_are_student_sub_b83c7a9f: "Հնարավոր չէ չեղարկել %{item_name} հրապարակումը, եթե առկա են ունկնդիրների ներկայացրած աշխատանքները"
   cancel_caeb1e68: "Չեղյալ համարել"
   cannot_be_nil_when_account_id_is_nil_be6d1d60: "չի կարող զրո լինել, եթե account_id զրո է"
   cannot_be_nil_when_course_id_is_nil_f539388: "չի կարող զրո լինել, եթե course_id զրո է"
@@ -2908,7 +2910,7 @@ hy:
       invite_all: "Հրավիրել դասընթացի բոլոր անդամներին"
       long_running: "Ժամանակային սահմանափակումներ չկան (երկարատև կոնֆերանսների համար)"
       members: Անդամներ
-      name: Անվանումը
+      name: Անուն
       options: Պարամետրեր
     general_error: "Կոնֆերանսին միանալու ժամանակ սխալ է տեղի ունեցել:"
     general_error_with_message: "Կոնֆերանսին միանալու ժամանակ սխալ է տեղի ունեցել: Հաղորդագրություն՝ %{message}"
@@ -4312,7 +4314,7 @@ hy:
         restrict_student_past_view: "Ավարտման ամսաթվից հետո սահմանափակել ունկնդիրների կողմից դասընթացի դիտումը"
         root_account: "Հասանելիության առավելագույն իրավունքներով հաշիվ"
         root_account_id: "Հասանելիության առավելագույն իրավունքներով հաշիվ"
-        sis_source_id: "SIS նույնականացուցիչ"
+        sis_source_id: "Համակարգի ID"
         start_at: Սկիզբը
         storage_quota: "Ֆայլի պահպանում"
         time_zone: "Ժամային գոտի"
@@ -4340,7 +4342,7 @@ hy:
       self_enrollment: "Թույլ տվեք ունկնդիրներին ինքնուրույն գրանցվել, տրամադրելով նրանց գաղտնի URL-հասցեն  կամ կոդը:"
       self_enrollment_without_code: "Թույլ տվեք ունկնդիրներին ինքնուրույն գրանցվել, տրամադրելով նրանց գաղտնի URL-հասցեն:"
       set_grading_scheme: "սահմանել գնահատման սխեման"
-      sis_source_id: "SIS նույնականացուցիչ"
+      sis_source_id: "Համակարգի ID"
       tab_cant_disable: "Այս էջը հնարավոր չէ անջատել, այլ միայն թաքցնել"
       tab_disabled: "Էջն անջատված է, անցնել դասընթացի տնային էջին"
       tab_hidden_if_disabled: "Էջն անջատված է, չի երևա նավարկման ժամանակ"
@@ -11255,7 +11257,7 @@ hy:
       question: 
         instructions: "Հարցի առթիվ հրահանգներ, ֆորմատավորված տեքստի դաշտ"
       quiz: 
-        instructions: "Թեստի շուրջ հրահանգներ, ֆորմատավորված տեքստի դաշտ"
+        instructions: "Թեստի վերաբերյալ ցուցումներ, ֆորմատավորված տեքստի դաշտ"
     labels: 
       answer_text: "Պատասխանի տեքստը"
       comments_on_answer: "Մեկնաբանություններ, եթե օգտագործողը ընտրում է այս պատասխանը"
@@ -11719,7 +11721,7 @@ hy:
           ip_addresses: "Ֆիլտրել ըստ IP հասցեների"
           ip_filter: "Ֆիլտրել IP-հասցեները"
           never_hide_results: "Թույլ տալ ուսանողներին տեսնել իրենց ստուգողական աշխատանքների պատասխանները"
-          quiz_instructions: "Թեստի հրահանգներ"
+          quiz_instructions: "Ցուցումներ թեստի վերաբերյալ"
           quiz_notify: "Տեղեկացնել օգտագործողներին այս թեստի փոփոխությունների մասին"
           quiz_score: Գնահատական
           require_access_code: "Պահանջվում է մուտքի կոդ"
@@ -11935,7 +11937,7 @@ hy:
           quiz_details: "Թեստի մանրամասներ"
         labels: 
           question_details: "Ցույց տալ հարցերի մանրամասները"
-          quiz_instructions: "Թեստի հրահանգներ"
+          quiz_instructions: "Ցուցումներ թեստի վերաբերյալ"
         links: 
           back_to_quiz_page: "Վերադառնալ թեստի էջ"
       refresh_quiz_after_popup: 
@@ -12041,7 +12043,7 @@ hy:
         logged_out_of_canvas: "*Դուք դուրս եք եկել Canvas-ից:* Շարունակելու համար մուտք գործեք համակարգ"
         login_required: "Պահանջվում է մուտք գործել"
         not_saved: "Չի պահպանվել"
-        quiz_instructions: "Թեստի հրահանգներ"
+        quiz_instructions: "Ցուցումներ թեստի վերաբերյալ"
       take_quiz_in_popup: 
         headers: 
           loading_in_lockdown: "Թեստի բեռնումը Respondus LockDown բրաուզերում"
@@ -12712,11 +12714,11 @@ hy:
         labels: 
           account: "Հաշվի գրառում"
           selected_course: "Ընտրված դասընթաց"
-          sis_id: "SIS նույնականացուցիչ"
+          sis_id: "Համակարգի ID"
         name: "Բաժնի անվանում"
         search_for_course: "Դասընթացի որոնում"
-        sis_id: "SIS նույնականացուցիչ"
-        sis_source_id: "SIS նույնականացուցիչ"
+        sis_id: "Համակարգի ID"
+        sis_source_id: "Համակարգի ID"
         start_at: Սկիզբ
       override_settings: "Սա կրկին կսահմանի սեմեստրների կամ դասընթացի ամսաթվերի կարգաբերումները:"
       pending_enrollment: 
@@ -13951,12 +13953,12 @@ hy:
         other: "%{count} դասընթաց"
       labels: 
         designers_can_access_from: "**Դիզայներները** կարող են մուտք գործել սկսած"
-        sis_id: "SIS նույնականացուցիչ"
+        sis_id: "Համակարգի ID"
         students_can_access_from: "**Ուսանողները** կարող են մուտք գործել սկսած"
         tas_can_access_from: "**Ասիստենտները** կարող են մուտք գործել սկսած"
         teachers_can_access_from: "**Դասավանդողները** կարող են մուտք գործել սկսած"
       name: "Սեմեստրի անվանում՝"
-      sis_source_id: "SIS նույնականացուցիչ"
+      sis_source_id: "Համակարգի ID․"
       term_runs_from: "**Սեմեստրը սկսվում է ** սկսած"
       titles: 
         term_ends: "Սեմեստրը ավարտվում է "
@@ -14622,8 +14624,8 @@ hy:
         last_login: "Վերջին մուտքանունը"
         last_request: "Վերջին հարցումը"
         password: Գաղտնաբառ
-        sis_id: "SIS նույնականացուցիչ"
-        sis_user_id: "SIS նույնականացուցիչ"
+        sis_id: "Համակարգի ID"
+        sis_user_id: "Համակարգի ID"
         unique_id: "Մուտք համակարգ"
       more: "ավելի շատ..."
       never: երբեք
