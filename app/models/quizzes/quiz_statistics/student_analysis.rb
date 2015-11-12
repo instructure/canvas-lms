@@ -28,7 +28,6 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
     question_text
     position
   ].map(&:to_sym).freeze
-
   include HtmlTextHelper
 
   def readable_type
@@ -297,7 +296,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
           else
             row << ((answer_item && answer_item[:text]) || '')
           end
-          row.push(strip_tags(row.pop.to_s))
+          row.push(html_to_text(row.pop.to_s))
           row << (answer ? answer[:points] : "")
         end
         row << submission.submission_data.select { |a| a[:correct] }.length

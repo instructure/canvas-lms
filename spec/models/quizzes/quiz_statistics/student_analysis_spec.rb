@@ -353,6 +353,23 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     expect(stats.last[9]).to eq "lolcats,lolrus"
   end
 
+  it 'should not strip things that look like tags from essay questions' do
+    student_in_course(:active_all => true)
+    q = @course.quizzes.create!
+    q.update_attribute(:published_at, Time.zone.now)
+    q.quiz_questions.create!(question_data: essay_question_data)
+    q.generate_quiz_data
+    q.save
+    qs = q.generate_submission(@student)
+    qs.submission_data = {
+      "question_#{q.quiz_data[0][:id]}" => "<p class=\"p1\"><span class=\"s1\">&lt;&gt; &lt; &gt; WHERE rental_duration &gt;= 6 AND rating &lt;&gt; 'R' 1 &lt; 3 &gt; 2</span></p>"
+    }
+    Quizzes::SubmissionGrader.new(qs).grade_submission
+
+    stats = CSV.parse(csv({}, q))
+    expect(stats.last[7]).to eq "<> < > WHERE rental_duration >= 6 AND rating <> 'R' 1 < 3 > 2"
+  end
+
   it 'should strip tags from all student-provided answers' do
     student_in_course(:active_all => true)
     q = @course.quizzes.create!
