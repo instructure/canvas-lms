@@ -23,13 +23,13 @@ define([
         currentEnrollmentList   = new PaginatedList($('#current-enrollment-list'), {
           presenter: sectionEnrollmentPresenter,
           template: enrollmentTemplate,
-          url: '/api/v1/sections/' + section_id + '/enrollments'
+          url: '/api/v1/sections/' + section_id + '/enrollments?include[]=can_be_removed'
         }),
         completedEnrollmentList = new PaginatedList($('#completed-enrollment-list'), {
           presenter: sectionEnrollmentPresenter,
           requestParams: { state: 'completed', page: 1, per_page: 25 },
           template: enrollmentTemplate,
-          url: '/api/v1/sections/' + section_id + '/enrollments'
+          url: '/api/v1/sections/' + section_id + '/enrollments?include[]=can_be_removed'
         });
 
     $edit_section_form.formSubmit({
