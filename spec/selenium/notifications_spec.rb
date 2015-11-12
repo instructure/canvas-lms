@@ -1,5 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/notifications_common')
+include NotificationsCommon
 require File.expand_path(File.dirname(__FILE__) + '/helpers/calendar2_common')
 
 describe "Notifications" do
@@ -9,7 +10,7 @@ describe "Notifications" do
   context "admin" do
     before :once do
       course_with_student(active_all: true)
-      setup_comm_channel(@student, 'student@example.com')
+      NotificationsCommon.setup_comm_channel(@student, 'student@example.com')
       @teacher = user_with_pseudonym(username: 'teacher@example.com', active_all: 1)
       enrollment = teacher_in_course(course: @course, user: @teacher)
       enrollment.accept!
@@ -19,16 +20,43 @@ describe "Notifications" do
       site_admin_logged_in
     end
 
-    it "should send a notification to users that appointment groups are available", priority: "1", test_id: 186566 do
-      note_name = 'Appointment Group Published'
-      setup_notification(@student, name: note_name)
-      create_appointment_group
+    context "with all notifications loaded" do
+      before :once do
+        NotificationsCommon.load_all_notifications
+      end
 
-      get "/users/#{@student.id}/messages"
+      context "with appointment group created" do
+        before(:each) do
+          create_appointment_group
+          @appt_grp = AppointmentGroup.last
+        end
 
-      # Checks that the notification is there and has the correct "Notification Name" field
-      fj('.ui-tabs-anchor:contains("Meta Data")').click
-      expect(ff('.table-condensed.grid td').last).to include_text(note_name)
+        it "should send a notification that appointment group is available", priority: "1", test_id: 186566 do
+          expected_notification = 'Appointment Group Published'
+
+          expect(Message.last.notification_name).to eql(expected_notification)
+          expect(Message.last.subject).to include_text("Appointment \"#{@appt_grp.title}\" is available for signup")
+          expect(Message.last.to).to eql(@student.email)
+        end
+
+        it "should send a notification when appointment group is updated", priority: "1", test_id: 193138 do
+          expected_notification = 'Appointment Group Updated'
+          @appt_grp.update_attributes(new_appointments: [[Time.zone.today + 2, Time.zone.today + 3]])
+
+          expect(Message.last.notification_name).to eql(expected_notification)
+          expect(Message.last.subject).to include_text("Appointment \"#{@appt_grp.title}\" has been updated")
+          expect(Message.last.to).to eql(@student.email)
+        end
+
+        it "should send a notification when appointment group is deleted", priority: "1", test_id: 193137 do
+          expected_notification = 'Appointment Group Deleted'
+          @appt_grp.destroy
+
+          expect(Message.last.notification_name).to eql(expected_notification)
+          expect(Message.last.subject).to include_text("Appointments for #{@appt_grp.title} have been canceled")
+          expect(Message.last.to).to eql(@student.email)
+        end
+      end
     end
 
     context "Assignment notifications" do
