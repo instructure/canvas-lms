@@ -36,6 +36,17 @@ describe AccessToken do
       expect(AccessToken.authenticate(@token_string)).to eq @at
     end
 
+    it "shouldn't auth old tokens after regeneration" do
+      expect(AccessToken.authenticate(@token_string)).to eq @at
+      @at.regenerate_access_token
+      new_token_string = @at.full_token
+
+      expect(new_token_string).to_not eq @token_string
+      expect(AccessToken.authenticate(new_token_string)).to eq @at
+
+      expect(AccessToken.authenticate(@token_string)).to_not eq @at
+    end
+
     it "should not authenticate expired tokens" do
       @at.update_attribute(:expires_at, 2.hours.ago)
       expect(AccessToken.authenticate(@token_string)).to be_nil
@@ -48,6 +59,59 @@ describe AccessToken do
     it "should authenticate expired tokens by the refresh token" do
       @at.update_attribute(:expires_at, 2.hours.ago)
       expect(AccessToken.authenticate_refresh_token(@refresh_token_string)).to eq @at
+    end
+  end
+
+  describe "usable?" do
+    before :once do
+      @at = AccessToken.create!(:user => user_model, :developer_key => DeveloperKey.default)
+      @token_string = @at.full_token
+      @refresh_token_string = @at.plaintext_refresh_token
+    end
+
+
+    it "shouldn't be usable without proper fields" do
+      token = AccessToken.new
+      expect(token.usable?).to eq false
+    end
+
+    it "Should be usable" do
+      expect(@at.usable?).to eq true
+    end
+
+    it "Should be usable without dev key" do
+      @at.developer_key_id = nil
+      expect(@at.usable?).to eq true
+    end
+
+    it "Shouldn't be usable if expired" do
+      @at.update_attribute(:expires_at, 2.hours.ago)
+      expect(@at.usable?).to eq false
+    end
+
+    it "Should be usable if expired, but requesting with a refresh_token" do
+      @at.update_attribute(:expires_at, 2.hours.ago)
+      expect(@at.usable?(:crypted_refresh_token)).to eq true
+    end
+
+    it "Shouldn't be usable if dev key isn't active" do
+
+      dk = DeveloperKey.create!(account: account_model)
+      dk.deactivate
+      @at.developer_key = dk
+      @at.save
+
+      expect(@at.usable?).to eq false
+    end
+
+    it "Shouldn't be usable if dev key isn't active, even if we request with a refresh token" do
+
+      dk = DeveloperKey.create!(account: account_model)
+      dk.deactivate
+      @at.developer_key = dk
+      @at.save
+
+      expect(@at.usable?(:crypted_refresh_token)).to eq false
     end
   end
 
