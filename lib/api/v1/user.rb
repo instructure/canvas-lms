@@ -27,6 +27,9 @@ module Api::V1::User
   }
 
   def user_json_preloads(users, preload_email=false)
+    # for User#account
+    ActiveRecord::Associations::Preloader.new(users, :pseudonym => :account).run
+
     # pseudonyms for User#sis_pseudoym_for and User#find_pseudonym_for_account
     # pseudonyms account for Pseudonym#works_for_account?
     ActiveRecord::Associations::Preloader.new(users, pseudonyms: :account).run if user_json_is_admin?

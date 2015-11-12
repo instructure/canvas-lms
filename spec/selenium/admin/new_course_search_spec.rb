@@ -22,7 +22,7 @@ describe "new account course search" do
 
     get "/accounts/#{@account.id}"
 
-    expect(".react-tabs > ul").to_not include_text("Courses")
+    expect(f(".react-tabs > ul")).to_not include_text("Courses")
   end
 
   it "should hide courses without enrollments if checked" do
@@ -53,11 +53,11 @@ describe "new account course search" do
 
     expect(get_rows.count).to eq 10
 
-    f(".load_more_courses").click
+    f(".load_more").click
     wait_for_ajaximations
 
     expect(get_rows.count).to eq 11
-    expect(f(".load_more_courses")).to be_nil
+    expect(f(".load_more")).to be_nil
   end
 
   it "should search by term" do

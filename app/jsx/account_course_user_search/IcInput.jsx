@@ -19,6 +19,7 @@ define([
     propTypes: {
       error: string,
       label: string,
+      hint: string,
       elementType: any,
       controlClassName: string,
       appendLabel: bool,
@@ -36,7 +37,7 @@ define([
     },
 
     render() {
-      var { error, label, elementType, appendLabel, controlClassName, noClassName } = this.props;
+      var { error, label, hint, elementType, appendLabel, controlClassName, noClassName } = this.props;
       var inputProps = _.extend({}, _.omit(this.props, ["error", "label", "elementType"]), {id: this.id});
       if (elementType === "input" && !this.props.type) {
         inputProps.type = "text";
@@ -48,11 +49,14 @@ define([
       var labelElement = label &&
         <label htmlFor={this.id} className="ic-Label">{label}</label>;
 
+      var hintElement = !!hint && <div className="input-hint">{hint}</div>
+
       return (
         <div className={classnames("ic-Form-control", controlClassName, {"ic-Form-control--has-error": error})}>
           {!!label && !appendLabel && labelElement}
           {React.createElement(elementType, inputProps)}
           {!!label && appendLabel && labelElement}
+          {!!hint && hintElement}
           {!!error &&
             <div className="ic-Form-message ic-Form-message--error" style={{position: "absolute"}}>
               <div className="ic-Form-message__Layout">

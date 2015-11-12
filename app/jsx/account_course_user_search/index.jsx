@@ -4,15 +4,17 @@ define([
   "bower/react-tabs/dist/react-tabs",
   "underscore",
   "./CoursesPane",
+  "./UsersPane",
   "./CoursesStore",
   "./TermsStore",
-  "./AccountsTreeStore"
-], function(React, I18n, ReactTabs, _, CoursesPane, CoursesStore, TermsStore, AccountsTreeStore) {
+  "./AccountsTreeStore",
+  "./UsersStore"
+], function(React, I18n, ReactTabs, _, CoursesPane, UsersPane, CoursesStore, TermsStore, AccountsTreeStore, UsersStore) {
 
   var { Tab, Tabs, TabList, TabPanel } = ReactTabs;
   var { string, bool, shape } = React.PropTypes;
 
-  var stores = [CoursesStore, TermsStore, AccountsTreeStore];
+  var stores = [CoursesStore, TermsStore, AccountsTreeStore, UsersStore];
 
   var App = React.createClass({
     propTypes: {
@@ -53,7 +55,7 @@ define([
         tabs.push(<Tab>{I18n.t("People")}</Tab>);
         panels.push(
           <TabPanel>
-            TODO People Search
+            <UsersPane accountId={accountId}/>
           </TabPanel>
         );
       }

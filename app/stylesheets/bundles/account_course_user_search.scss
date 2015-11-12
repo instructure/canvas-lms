@@ -45,6 +45,11 @@
   border: none;
 }
 
+.input-hint {
+  font-size: 10px;
+  color: $ic-hint-text;
+}
+
 .flex-grow-2 {
   flex-grow: 2;
 }

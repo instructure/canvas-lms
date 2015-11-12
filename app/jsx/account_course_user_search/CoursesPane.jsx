@@ -7,7 +7,8 @@ define([
   "./AccountsTreeStore",
   "./CoursesList",
   "./CoursesToolbar",
-], function(React, I18n, _, CoursesStore, TermsStore, AccountsTreeStore, CoursesList, CoursesToolbar) {
+  "./renderSearchMessage"
+], function(React, I18n, _, CoursesStore, TermsStore, AccountsTreeStore, CoursesList, CoursesToolbar, renderSearchMessage) {
 
   var MIN_SEARCH_LENGTH = 3;
 
@@ -70,45 +71,6 @@ define([
       this.forceUpdate();
     },
 
-    renderCourseMessage(courses) {
-      if (!courses || courses.loading) {
-        return (
-          <div className="text-center pad-box">
-            {I18n.t("Loading...")}
-          </div>
-        );
-      } else if (courses.error) {
-        return (
-          <div className="text-center pad-box">
-            <div className="alert alert-error">
-              {I18n.t("There was an error with your query; please try a different search")}
-            </div>
-          </div>
-        );
-      } else if (!courses.data.length) {
-        return (
-          <div className="text-center pad-box">
-            <div className="alert alert-info">
-              {I18n.t("No courses found")}
-            </div>
-          </div>
-        );
-      } else if (courses.next) {
-        return (
-          <div className="text-center pad-box">
-            <button
-              className="Button--link load_more_courses"
-              onClick={this.fetchMoreCourses}
-            >
-              <i className="icon-refresh" />
-              {" "}
-              {I18n.t("Load more...")}
-            </button>
-          </div>
-        );
-      }
-    },
-
     render() {
       var { filters, draftFilters, errors } = this.state;
       var courses = CoursesStore.get(filters);
@@ -132,7 +94,7 @@ define([
             <CoursesList courses={courses.data} />
           }
 
-          {this.renderCourseMessage(courses)}
+          {renderSearchMessage(courses, this.fetchMoreCourses, I18n.t("No courses found"))}
         </div>
       );
     }

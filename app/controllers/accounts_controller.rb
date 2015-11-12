@@ -194,7 +194,9 @@ class AccountsController < ApplicationController
     @permissions = {
       theme_editor: use_new_styles? && can_do(@account, @current_user, :manage_account_settings) && @account.branding_allowed?,
       can_read_course_list: can_read_course_list,
-      can_read_roster: can_read_roster
+      can_read_roster: can_read_roster,
+      can_create_courses: @account.grants_right?(@current_user, session, :manage_courses),
+      can_create_users: @account.root_account? && @account.grants_right?(@current_user, session, :manage_user_logins)
     }
     render template: "accounts/course_user_search"
   end

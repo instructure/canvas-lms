@@ -274,6 +274,12 @@ class User < ActiveRecord::Base
 
   scope :enrolled_in_course_between, lambda { |course_ids, start_at, end_at| joins(:enrollments).where(:enrollments => { :course_id => course_ids, :created_at => start_at..end_at }) }
 
+  scope :with_last_login, lambda {
+    select("users.*, MAX(current_login_at) as last_login").
+      joins("LEFT OUTER JOIN pseudonyms ON pseudonyms.user_id = users.id").
+      group("users.id")
+  }
+
   scope :for_course_with_last_login, lambda { |course, root_account_id, enrollment_type|
     # add a field to each user that is the aggregated max from current_login_at and last_login_at from their pseudonyms
     scope = select("users.*, MAX(current_login_at) as last_login, MAX(current_login_at) IS NULL as login_info_exists").

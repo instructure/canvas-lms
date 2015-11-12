@@ -66,8 +66,8 @@ class SisPseudonym
   end
 
   def pick_user_pseudonym(account_ids)
-    user.active_pseudonyms.order(:unique_id).detect do |p|
-      p.sis_user_id && account_ids.include?(p.account_id)
+    user.pseudonyms.sort_by(&:unique_id).detect do |p|
+      p.workflow_state != 'deleted' && p.sis_user_id && account_ids.include?(p.account_id)
     end
   end
 end

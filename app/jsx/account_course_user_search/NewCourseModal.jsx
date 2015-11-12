@@ -57,10 +57,14 @@ define([
       }
 
       // TODO: error handling
+      var promise = $.Deferred();
       CoursesStore.create({course: data}).then(() => {
         this.closeModal();
         $.flashMessage(I18n.t("%{course_name} successfully added!", {course_name: data.name}));
+        promise.resolve();
       });
+
+      return promise;
     },
 
     renderAccountOptions(accounts, result, depth) {
@@ -147,9 +151,8 @@ define([
             </button>
 
             <button
-              type="button"
+              type="submit"
               className="btn btn-primary"
-              onClick={this.onSubmit}
             >
               {I18n.t("Add Course")}
             </button>

@@ -59,6 +59,17 @@ define([
     render() {
       var { terms, accounts, onUpdateFilters, isLoading, with_students, search_term, enrollment_term_id, errors } = this.props;
 
+      var addCourseButton;
+      if (window.ENV.PERMISSIONS.can_create_courses) {
+        addCourseButton = <div className="ic-Form-actions">
+          <button className="btn" type="button" onClick={this.addCourse}>
+            <i className="icon-plus"/>
+            {" "}
+            {I18n.t("Course")}
+          </button>
+        </div>;
+      }
+
       return (
         <div>
           <form
@@ -94,13 +105,7 @@ define([
               label={I18n.t("Hide courses without enrollments")}
             />
 
-            <div className="ic-Form-actions">
-              <button className="btn" type="button" onClick={this.addCourse}>
-                <i className="icon-plus" />
-                {" "}
-                {I18n.t("Course")}
-              </button>
-            </div>
+            {addCourseButton}
           </form>
 
           <NewCourseModal
