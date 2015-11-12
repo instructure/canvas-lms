@@ -1335,7 +1335,7 @@ describe Assignment do
 
     it ".to_ics should not return data for null due dates" do
       assignment_model(:due_at => "", :course => @course)
-      res = @assignment.to_ics(false)
+      res = @assignment.to_ics(in_own_calendar: false)
       expect(res).to be_nil
     end
 
@@ -1368,7 +1368,7 @@ describe Assignment do
       assignment_model(:due_at => "Sep 3 2008 11:55am", :course => @course)
       # force known value so we can check serialization
       @assignment.updated_at = Time.at(1220443500) # 3 Sep 2008 12:05pm (UTC)
-      res = @assignment.to_ics(false)
+      res = @assignment.to_ics(in_own_calendar: false)
       expect(res).not_to be_nil
       expect(res.start.icalendar_tzid).to eq 'UTC'
       expect(res.start.strftime('%Y-%m-%dT%H:%M:%S')).to eq Time.zone.parse("Sep 3 2008 11:55am").in_time_zone('UTC').strftime('%Y-%m-%dT%H:%M:00')
@@ -1383,7 +1383,7 @@ describe Assignment do
       assignment_model(:due_at => "Sep 3 2008 11:55am", :course => @course)
       # force known value so we can check serialization
       @assignment.updated_at = Time.at(1220472300) # 3 Sep 2008 12:05pm (AKDT)
-      res = @assignment.to_ics(false)
+      res = @assignment.to_ics(in_own_calendar: false)
       expect(res).not_to be_nil
       expect(res.start.icalendar_tzid).to eq 'UTC'
       expect(res.start.strftime('%Y-%m-%dT%H:%M:%S')).to eq Time.zone.parse("Sep 3 2008 11:55am").in_time_zone('UTC').strftime('%Y-%m-%dT%H:%M:00')
@@ -1402,32 +1402,10 @@ describe Assignment do
       expect(res.match(/DTEND;VALUE=DATE:20080903/)).not_to be_nil
     end
 
-    it ".to_ics should return a plain-text description and alt html description" do
-      html = %{<div>
-        This assignment is due December 16th. Plz discuss the reading.
-        <p> </p>
-        <p>Test.</p>
-      </div>}
-      assignment_model(:due_at => "Sep 3 2008 12:00am", :description => html, :course => @course)
-      ev = @assignment.to_ics(false)
-      skip("assignment description disabled")
-      expect(ev.description).to eq "This assignment is due December 16th. Plz discuss the reading.\n  \n\n\n Test."
-      expect(ev.x_alt_desc).to eq html.strip
-    end
-
-    it ".to_ics should run the description through api_user_content to translate links" do
-      html = %{<a href="/calendar">Click!</a>}
-      assignment_model(:due_at => "Sep 3 2008 12:00am", :description => html, :course => @course)
-      ev = @assignment.to_ics(false)
-      skip("assignment description disabled")
-      expect(ev.description).to eq "[Click!](http://localhost/calendar)"
-      expect(ev.x_alt_desc).to eq %{<a href="http://localhost/calendar">Click!</a>}
-    end
-
     it ".to_ics should populate uid and summary fields" do
       Time.zone = 'UTC'
       assignment_model(:due_at => "Sep 3 2008 11:55am", :title => "assignment title", :course => @course)
-      ev = @a.to_ics(false)
+      ev = @a.to_ics(in_own_calendar: false)
       expect(ev.uid).to eq "event-assignment-#{@a.id}"
       expect(ev.summary).to eq "#{@a.title} [#{@a.context.course_code}]"
       # TODO: ev.url.should == ?
@@ -1442,7 +1420,7 @@ describe Assignment do
       @override.save!
 
       assignment = AssignmentOverrideApplicator.assignment_with_overrides(@a, [@override])
-      ev = assignment.to_ics(false)
+      ev = assignment.to_ics(in_own_calendar: false)
       expect(ev.uid).to eq "event-assignment-override-#{@override.id}"
       expect(ev.summary).to eq "#{@a.title} (#{@override.title}) [#{assignment.context.course_code}]"
       #TODO: ev.url.should == ?
@@ -1457,7 +1435,7 @@ describe Assignment do
       @override.save!
 
       assignment = AssignmentOverrideApplicator.assignment_with_overrides(@a, [@override])
-      ev = assignment.to_ics(false)
+      ev = assignment.to_ics(in_own_calendar: false)
       expect(ev.uid).to eq "event-assignment-#{@a.id}"
       expect(ev.summary).to eq "#{@a.title} [#{@a.context.course_code}]"
     end

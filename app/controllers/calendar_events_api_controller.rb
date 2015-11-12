@@ -639,7 +639,7 @@ class CalendarEventsApiController < ApplicationController
         # scan the descriptions for attachments
         preloaded_attachments = api_bulk_load_user_content_attachments(@events.map(&:description))
         @events.each do |event|
-          ics_event = event.to_ics(false, preloaded_attachments)
+          ics_event = event.to_ics(in_own_calendar: false, preloaded_attachments: preloaded_attachments, user: @current_user)
           calendar.add_event(ics_event) if ics_event
         end
 

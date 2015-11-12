@@ -740,7 +740,7 @@ describe CalendarEventsApiController, type: :request do
       end
     end
 
-    it "should omit assignment description in ics" do
+    it "should omit assignment description in ics feed for a course" do
       HostUrl.stubs(:default_host).returns('www.example.com')
       assignment_model(description: "secret stuff here")
       get "/feeds/calendars/#{@course.feed_code}.ics"
