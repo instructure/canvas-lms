@@ -291,8 +291,9 @@ define([
   }
 
   function classNameBasedOnStudent(student){
+    var raw       = submissionState(student);
     var formatted = formattedsubmissionState(student.submission_state, student.submission);
-    return {raw: student.submission_state, formatted: formatted};
+    return {raw: raw, formatted: formatted};
   }
 
   // xsslint safeString.identifier MENU_PARTS_DELIMITER
