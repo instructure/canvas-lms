@@ -95,7 +95,7 @@ class Oauth2ProviderController < ApplicationController
       token = provider.token_for_refresh_token(params[:refresh_token])
       # token = AccessToken.authenticate_refresh_token(params[:refresh_token])
       raise Canvas::Oauth::RequestError, :invalid_refresh_token unless token
-      token.access_token.generate_token(true)
+      token.access_token.regenerate_access_token
     else
       raise Canvas::Oauth::RequestError, :unsupported_grant_type
     end

@@ -37,7 +37,7 @@ class AccessToken < ActiveRecord::Base
       token.send("#{token_key}=", hashed_tokens.first)
       token.save!
     end
-    token = nil unless token.try(:usable?) || token_key == :crypted_refresh_token
+    token = nil unless token.try(:usable?, token_key)
     token
   end
 
@@ -57,8 +57,23 @@ class AccessToken < ActiveRecord::Base
     Canvas::Security.encryption_keys.map { |key| Canvas::Security.hmac_sha1(token, key) }
   end
 
-  def usable?
-    user_id && !expired? && developer_key.try(:active?)
+  def usable?(token_key = :crypted_token)
+    # true if
+    # developer key is active AND
+    # there is a user id AND
+    # its not expired OR Its a refresh token
+    # since you need a refresh token to
+    # refresh expired tokens
+
+    if !developer_key_id || developer_key.try(:active?)
+      # we are a stand alone token, or a token with an active developer key
+      # make sure we
+      #   - have a user id
+      #   - its a refresh token
+      #     - If we aren't a refresh token. make sure we aren't expired
+      return true if user_id && (token_key == :crypted_refresh_token || !expired?)
+    end
+    false
   end
 
   def app_name
@@ -130,6 +145,11 @@ class AccessToken < ActiveRecord::Base
     if val == '1' && !protected_token?
       generate_token(true)
     end
+  end
+
+  def regenerate_access_token
+    generate_token(true)
+    save
   end
 
   def visible_token
