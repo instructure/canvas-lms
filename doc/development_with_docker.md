@@ -196,3 +196,39 @@ the browser:
 ```
 $ open vnc://secret:secret@selenium.docker/
 ```
+
+## Troubleshooting
+
+If you are having trouble running the `web` or `kinesis` containers, make sure that permissions on the directory are permissive.  You can try the owner change (less disruptive):
+
+```
+chown -R 1000:1000 canvas-lms
+```
+
+Or the permissions change (which will make docker work, but causes the git working directory to become filthy):
+
+```
+chmod a+rwx -R canvas-lms
+```
+
+If your distro is equipped with selinux, make sure it is not interfering.
+
+```
+$ sestatus
+...
+Current mode:                   disabled
+...
+
+```
+
+If so, it can be disabled temporarily with:
+
+```
+sudo setenforce 0
+```
+
+Or it can be disabled permanently by editing `/etc/selinux/config` thusly:
+
+```
+SELINUX=disabled
+```
