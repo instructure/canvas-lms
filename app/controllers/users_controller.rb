@@ -441,14 +441,15 @@ class UsersController < ApplicationController
 
         if api_request?
           search_term = params[:search_term].presence
-
+          page_opts = {}
           if search_term
             users = UserSearch.for_user_in_context(search_term, @context, @current_user, session)
+            page_opts[:total_entries] = nil # doesn't calculate a total count
           else
             users = UserSearch.scope_for(@context, @current_user)
           end
 
-          users = Api.paginate(users, self, api_v1_account_users_url)
+          users = Api.paginate(users, self, api_v1_account_users_url, page_opts)
           user_json_preloads(users)
           return render :json => users.map { |u| user_json(u, @current_user, session) }
         else

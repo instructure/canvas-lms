@@ -345,7 +345,14 @@ class AccountsController < ApplicationController
 
         name = ActiveRecord::Base.wildcard('courses.name', search_term)
         code = ActiveRecord::Base.wildcard('courses.course_code', search_term)
-        @courses = @courses.where("#{name} OR #{code}")
+
+        if @account.root_account.grants_any_right?(@current_user, :read_sis, :manage_sis)
+          sis_source = ActiveRecord::Base.wildcard('courses.sis_source_id', search_term)
+          @courses = @courses.where("#{name} OR #{code} OR #{sis_source}")
+        else
+          @courses = @courses.where("#{name} OR #{code}")
+        end
+
       end
     end
 
@@ -354,10 +361,19 @@ class AccountsController < ApplicationController
     # sections, needs_grading_count, and total_score not valid as enrollments are needed
     includes -= ['permissions', 'sections', 'needs_grading_count', 'total_scores']
 
-    @courses = Api.paginate(@courses, self, api_v1_account_courses_url)
+    page_opts = {}
+    page_opts[:total_entries] = nil if params[:search_term] # doesn't calculate a total count
+    @courses = Api.paginate(@courses, self, api_v1_account_courses_url, page_opts)
 
     ActiveRecord::Associations::Preloader.new(@courses, [:account, :root_account]).run
     ActiveRecord::Associations::Preloader.new(@courses, [:teachers]).run if includes.include?("teachers")
+
+    if includes.include?("total_students")
+      student_counts = StudentEnrollment.where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive')").
+        where(:course_id => @courses).group(:course_id).count(:user_id, :distinct => true)
+      @courses.each {|c| c.student_count = student_counts[c.id] || 0 }
+    end
+
     render :json => @courses.map { |c| course_json(c, @current_user, session, includes, nil) }
   end
 
