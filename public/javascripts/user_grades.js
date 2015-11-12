@@ -31,7 +31,7 @@ define([
     $('.grading_periods_selector').on('change', function(e) {
       var selector = $(this),
           gradingPeriodId = selector.val(),
-          enrollmentId = selector.data('enrollment-id');
+          enrollmentId = selector.attr('data-enrollment-id');
 
       $.ajaxJSON(
         ENV.grades_for_student_url,
