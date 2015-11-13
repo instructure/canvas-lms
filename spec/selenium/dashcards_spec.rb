@@ -1,11 +1,11 @@
-require File.expand_path(File.dirname(__FILE__) + '/common')
-require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
-require File.expand_path(File.dirname(__FILE__) + '/helpers/announcements_common')
-require File.expand_path(File.dirname(__FILE__) + '/helpers/color_common')
-
+require_relative 'common'
+require_relative 'helpers/files_common'
+require_relative 'helpers/announcements_common'
+require_relative 'helpers/color_common'
 
 describe 'dashcards' do
   include_context 'in-process server selenium tests'
+  include AnnouncementsCommon
 
   context 'as a student' do
 

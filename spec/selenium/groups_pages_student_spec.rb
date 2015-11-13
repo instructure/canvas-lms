@@ -1,14 +1,15 @@
-require File.expand_path(File.dirname(__FILE__) + '/common')
-require File.expand_path(File.dirname(__FILE__) + '/helpers/groups_common')
-require File.expand_path(File.dirname(__FILE__) + '/helpers/announcements_common')
-require File.expand_path(File.dirname(__FILE__) + '/helpers/discussions_common')
-require File.expand_path(File.dirname(__FILE__) + '/helpers/wiki_and_tiny_common')
-require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
-require File.expand_path(File.dirname(__FILE__) + '/helpers/conferences_common')
-require File.expand_path(File.dirname(__FILE__) + '/helpers/course_common')
+require_relative 'common'
+require_relative 'helpers/groups_common'
+require_relative 'helpers/announcements_common'
+require_relative 'helpers/discussions_common'
+require_relative 'helpers/wiki_and_tiny_common'
+require_relative 'helpers/files_common'
+require_relative 'helpers/conferences_common'
+require_relative 'helpers/course_common'
 
 describe "groups" do
   include_context "in-process server selenium tests"
+  include AnnouncementsCommon
 
   setup_group_page_urls
 
