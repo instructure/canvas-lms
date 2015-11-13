@@ -199,7 +199,7 @@ shared_examples 'files_page' do |context|
     driver.action.send_keys(:return).perform
     refresh_page
     # This checks to make sure there is only one file and it is the group-level one
-    expect(get_all_files_folders.count).to eq 1
+    expect(all_files_folders.count).to eq 1
     expect(ff('.media-body').first).to include_text('example.pdf')
   end
 end

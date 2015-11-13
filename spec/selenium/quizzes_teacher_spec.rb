@@ -7,6 +7,7 @@ describe "quizzes" do
   include_context "in-process server selenium tests"
   include QuizzesCommon
   include AssignmentOverridesSeleniumHelper
+  include FilesCommon
 
   def add_question_to_group
     f('.add_question_link').click

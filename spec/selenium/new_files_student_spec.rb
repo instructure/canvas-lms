@@ -3,6 +3,8 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
 
 describe "better_file_browsing" do
   include_context "in-process server selenium tests"
+  include FilesCommon
+
   context "as a student" do
     def student_goto_files
       user_session(@student)
@@ -14,7 +16,7 @@ describe "better_file_browsing" do
       f("input[type='search']").send_keys "#{search_text}"
       driver.action.send_keys(:return).perform
       refresh_page
-      expect(get_all_files_folders.count).to eq 0
+      expect(all_files_folders.count).to eq 0
     end
 
     context "in course with files" do
@@ -32,7 +34,7 @@ describe "better_file_browsing" do
         f("input[type='search']").send_keys "b_fi"
         driver.action.send_keys(:return).perform
         refresh_page
-        expect(get_all_files_folders.count).to eq 1
+        expect(all_files_folders.count).to eq 1
       end
 
       it "should not return unpublished files in search results", priority: "1", test_id: 238870 do

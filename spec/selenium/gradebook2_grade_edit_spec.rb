@@ -1,8 +1,10 @@
 require File.expand_path(File.dirname(__FILE__) + '/helpers/gradebook2_common')
+
 describe "editing grades" do
   include_context "in-process server selenium tests"
+  include Gradebook2Common
 
-  before (:each) do
+  before(:each) do
     gradebook_data_setup
   end
 

@@ -2,6 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../helpers/conversations_com
 
 describe "conversations new" do
   include_context "in-process server selenium tests"
+  include ConversationsCommon
 
   before do
     conversation_setup
@@ -24,7 +25,7 @@ describe "conversations new" do
     end
 
     it "should start a group conversation when there is only one recipient", priority: "2", test_id: 201499 do
-      get_conversations
+      conversations
       compose course: @course, to: [@s1], subject: 'single recipient', body: 'hallo!'
       c = @s1.conversations.last.conversation
       expect(c.subject).to eq('single recipient')
@@ -32,7 +33,7 @@ describe "conversations new" do
     end
 
     it "should start a group conversation when there is more than one recipient", priority: "2", test_id: 201500 do
-      get_conversations
+      conversations
       compose course: @course, to: [@s1, @s2], subject: 'multiple recipients', body: 'hallo!'
       c = @s1.conversations.last.conversation
       expect(c.subject).to eq('multiple recipients')
@@ -43,7 +44,7 @@ describe "conversations new" do
     it "should allow admins with read_roster permission to send a message without picking a context", priority: "1", test_id: 138677 do
       user = account_admin_user
       user_logged_in({:user => user})
-      get_conversations
+      conversations
       compose to: [@s1], subject: 'context-free', body: 'hallo!'
       c = @s1.conversations.last.conversation
       expect(c.subject).to eq 'context-free'
@@ -54,14 +55,14 @@ describe "conversations new" do
       user = account_admin_user
       RoleOverride.manage_role_override(Account.default, Role.get_built_in_role('AccountAdmin'), 'read_roster', override: false, locked: false)
       user_logged_in({:user => user})
-      get_conversations
+      conversations
       fj('#compose-btn').click
       wait_for_animations
       expect(fj('#recipient-row')).to have_attribute(:style, 'display: none;')
     end
 
     it "should not allow non-admins to send a message without picking a context", priority: "1", test_id: 138678 do
-      get_conversations
+      conversations
       fj('#compose-btn').click
       wait_for_animations
       expect(fj('#recipient-row')).to have_attribute(:style, 'display: none;')
@@ -73,7 +74,7 @@ describe "conversations new" do
       @group.add_user(@s2)
       @group.save
       user_logged_in({:user => @s1})
-      get_conversations
+      conversations
       fj('#compose-btn').click
       wait_for_ajaximations
       select_message_course(@group, true)
@@ -86,14 +87,14 @@ describe "conversations new" do
       @group.add_user(@s2)
       @group.save
       user_logged_in({:user => @s1})
-      get_conversations
+      conversations
       fj('#compose-btn').click
       wait_for_ajaximations
       select_message_course(@group, true)
       add_message_recipient @s2
       f("#bulk_message").click
-      set_message_subject('blah')
-      set_message_body('bluh')
+      write_message_subject('blah')
+      write_message_body('bluh')
       click_send
       run_jobs
       conv = @s2.conversations.last.conversation
@@ -113,11 +114,11 @@ describe "conversations new" do
     end
 
     it "should allow selecting multiple recipients in one search", priority: "2", test_id: 201941 do
-      get_conversations
+      conversations
       fj('#compose-btn').click
       wait_for_ajaximations
       select_message_course(@course)
-      get_message_recipients_input.send_keys('student')
+      message_recipients_input.send_keys('student')
       driver.action.key_down(modifier).perform
       keep_trying_until { fj(".ac-result:contains('first student')") }.click
       driver.action.key_up(modifier).perform
@@ -126,10 +127,10 @@ describe "conversations new" do
     end
 
     it "should not send the message on shift-enter", priority: "1", test_id: 206019 do
-      get_conversations
+      conversations
       compose course: @course, to: [@s1], subject: 'context-free', body: 'hallo!', send: false
       driver.action.key_down(:shift).perform
-      get_message_body_input.send_keys(:enter)
+      message_body_input.send_keys(:enter)
       driver.action.key_up(:shift).perform
       expect(fj('#compose-new-message:visible')).not_to be_nil
     end
@@ -182,7 +183,7 @@ describe "conversations new" do
       end
 
       it "should check and lock the bulk_message checkbox when over the max size", priority: "2", test_id: 206022 do
-        get_conversations
+        conversations
         compose course: @course, subject: 'lockme', body: 'hallo!', send: false
 
         f("#recipient-search-btn").click
@@ -204,7 +205,7 @@ describe "conversations new" do
       end
 
       it "should leave the value the same as before after unlocking", priority: "2", test_id: 206023 do
-        get_conversations
+        conversations
         compose course: @course, subject: 'lockme', body: 'hallo!', send: false
 
         selector = "#bulk_message"
@@ -223,7 +224,7 @@ describe "conversations new" do
       end
 
       it "can compose a message to a single user", priority: "1", test_id: 117958 do
-        get_conversations
+        conversations
         fln('Inbox').click
 
         find('.icon-compose').click
@@ -262,7 +263,7 @@ describe "conversations new" do
           @t2 = user(name: @t2_name, active_user: true)
           [@t1, @t2].each { |s| @course.enroll_teacher(s) }
 
-          get_conversations
+          conversations
           fln('Inbox').click
 
           find('.icon-compose').click

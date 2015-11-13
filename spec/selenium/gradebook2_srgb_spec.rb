@@ -2,6 +2,8 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/gradebook2_common')
 
 describe "screenreader gradebook" do
   include_context "in-process server selenium tests"
+  include Gradebook2Common
+
   let(:srgb) {"/courses/#{@course.id}/gradebook/change_gradebook_version?version=srgb"}
 
   def basic_setup(num=1)

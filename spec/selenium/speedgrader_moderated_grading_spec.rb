@@ -3,8 +3,9 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/gradebook2_common')
 
 describe "speed grader" do
   include_context "in-process server selenium tests"
+  include Gradebook2Common
 
-  before (:once) do
+  before(:once) do
     stub_kaltura
 
     Account.default.allow_feature!(:moderated_grading)

@@ -2,8 +2,10 @@ require File.expand_path(File.dirname(__FILE__) + '/../helpers/conversations_com
 require File.expand_path(File.dirname(__FILE__) + '/../helpers/assignment_overrides')
 
 describe "conversations new" do
-  include AssignmentOverridesSeleniumHelper
   include_context "in-process server selenium tests"
+  include AssignmentOverridesSeleniumHelper
+  include ConversationsCommon
+
   let(:account) { Account.default }
   let(:account_settings_url) { "/accounts/#{account.id}/settings" }
   let(:user_notes_url) { "/courses/#{@course.id}/user_notes"}
@@ -64,7 +66,7 @@ describe "conversations new" do
     before(:each) do
       @course.account.update_attribute(:enable_user_notes, true)
       user_session(@teacher)
-      get_conversations
+      conversations
     end
 
     it "should go to the user_notes page", priority: "1", test_id: 133090 do
@@ -100,14 +102,14 @@ describe "conversations new" do
 
     it "should not be allowed if disabled", priority: "1", test_id: 207092 do
       @course.account.update_attribute(:enable_user_notes, false)
-      get_conversations
+      conversations
       compose course: @course, to: [@s1], body: 'hallo!', send: false
       expect(f(".user_note")).not_to be_displayed
     end
 
     it "should not be allowed for students", priority: "1", test_id: 138686 do
       user_session(@s1)
-      get_conversations
+      conversations
       compose course: @course, to: [@s2], body: 'hallo!', send: false
       expect(f(".user_note")).not_to be_displayed
     end
@@ -118,7 +120,7 @@ describe "conversations new" do
     end
 
     it "should send a message with faculty journal checked", priority: "1", test_id: 75433 do
-      get_conversations
+      conversations
       # First verify teacher can send a message with faculty journal entry checked to one student
       compose course: @course, to: [@s1], body: 'hallo!', send: false
       f('.user_note').click

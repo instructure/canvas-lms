@@ -4,6 +4,8 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/public_courses_conte
 
 describe "better_file_browsing" do
   include_context "in-process server selenium tests"
+  include FilesCommon
+
   context "As a teacher" do
     before(:each) do
       course_with_teacher_logged_in
@@ -14,7 +16,7 @@ describe "better_file_browsing" do
     it "should display new files UI", priority: "1", test_id: 133092 do
       wait_for_ajaximations
       expect(f('.btn-upload')).to be_displayed
-      expect(get_all_files_folders.count).to eq 1
+      expect(all_files_folders.count).to eq 1
     end
 
     context "from cog icon" do
@@ -28,7 +30,7 @@ describe "better_file_browsing" do
       end
       it "should delete file", priority: "1", test_id: 133128 do
         delete(0, :cog_icon)
-        expect(get_all_files_folders.count).to eq 0
+        expect(all_files_folders.count).to eq 0
       end
     end
 
@@ -56,7 +58,7 @@ describe "better_file_browsing" do
     context "from toolbar menu" do
       it "should delete file from toolbar", priority: "1", test_id: 133105 do
         delete(0, :toolbar_menu)
-        expect(get_all_files_folders.count).to eq 0
+        expect(all_files_folders.count).to eq 0
       end
       it "should unpublish and publish a file", priority: "1", test_id: 223503 do
         set_item_permissions(:unpublish, :toolbar_menu)
@@ -142,7 +144,7 @@ describe "better_file_browsing" do
       driver.action.send_keys(:return).perform
       # Unable to find matching line from backtrace error is encountered if refresh_page is not used
       refresh_page
-      expect(get_all_files_folders.count).to eq 2
+      expect(all_files_folders.count).to eq 2
     end
   end
 
@@ -204,7 +206,7 @@ describe "better_file_browsing" do
         driver.action.send_keys(:return).perform
         # Unable to find matching line from backtrace error is encountered if refresh_page is not used
         refresh_page
-        expect(get_all_files_folders.count).to eq 1
+        expect(all_files_folders.count).to eq 1
         move(file_name, 0, :cog_icon, destination)
         wait_for_ajaximations
         final_destination = destination.split('/').pop

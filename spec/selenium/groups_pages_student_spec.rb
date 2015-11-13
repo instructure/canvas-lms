@@ -10,6 +10,10 @@ require_relative 'helpers/course_common'
 describe "groups" do
   include_context "in-process server selenium tests"
   include AnnouncementsCommon
+  include ConferencesCommon
+  include CourseCommon
+  include DiscussionsCommon
+  include FilesCommon
 
   setup_group_page_urls
 
@@ -189,7 +193,7 @@ describe "groups" do
         get files_page
         add_folder
         delete(0, :cog_icon)
-        expect(get_all_files_folders.count).to eq 0
+        expect(all_files_folders.count).to eq 0
       end
 
       it "should allow group members to move a folder", priority: "1", test_id: 273632 do
@@ -208,10 +212,10 @@ describe "groups" do
         get files_page
         delete(0, :cog_icon)
         wait_for_ajaximations
-        expect(get_all_files_folders.count).to eq 1
+        expect(all_files_folders.count).to eq 1
         # Now try to delete the other one using toolbar menu
         delete(0, :toolbar_menu)
-        expect(get_all_files_folders.count).to eq 0
+        expect(all_files_folders.count).to eq 0
       end
 
       it "should allow group members to move a file", priority: "1", test_id: 273633 do

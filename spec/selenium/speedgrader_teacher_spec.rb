@@ -6,6 +6,7 @@ require_relative "helpers/quizzes_common"
 describe "speed grader" do
   include_context "in-process server selenium tests"
   include QuizzesCommon
+  include Gradebook2Common
 
   before(:each) do
     stub_kaltura

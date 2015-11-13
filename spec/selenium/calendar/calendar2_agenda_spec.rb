@@ -5,6 +5,7 @@ require_relative "../helpers/quizzes_common"
 describe "calendar2" do
   include_context "in-process server selenium tests"
   include QuizzesCommon
+  include Calendar2Common
 
   before(:each) do
     Account.default.tap do |a|
@@ -14,7 +15,7 @@ describe "calendar2" do
   end
 
   context "as a teacher" do
-    before (:each) do
+    before(:each) do
       course_with_teacher_logged_in
     end
 

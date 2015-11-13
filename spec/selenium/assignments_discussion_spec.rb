@@ -4,9 +4,10 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
 
 describe "discussion assignments" do
   include_context "in-process server selenium tests"
+  include DiscussionsCommon
+  include FilesCommon
 
-
-  before (:each) do
+  before(:each) do
     @domain_root_account = Account.default
     course_with_teacher_logged_in
   end

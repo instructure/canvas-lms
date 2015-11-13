@@ -3,6 +3,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../helpers/discussions_commo
 
 describe "discussion availability" do
   include_examples "in-process server selenium tests"
+  include DiscussionsCommon
 
   before :each do
     course_with_teacher_logged_in.course

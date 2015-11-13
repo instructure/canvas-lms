@@ -4,8 +4,9 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/assignment_overrides
 describe "assignment column headers" do
   include_context "in-process server selenium tests"
   include AssignmentOverridesSeleniumHelper
+  include Gradebook2Common
 
-  before (:each) do
+  before(:each) do
     gradebook_data_setup
     @assignment = @course.assignments.first
     @header_selector = %([id$="assignment_#{@assignment.id}"])

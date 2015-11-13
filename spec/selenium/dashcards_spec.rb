@@ -6,6 +6,8 @@ require_relative 'helpers/color_common'
 describe 'dashcards' do
   include_context 'in-process server selenium tests'
   include AnnouncementsCommon
+  include ColorCommon
+  include FilesCommon
 
   context 'as a student' do
 

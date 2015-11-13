@@ -3,8 +3,9 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
 require File.expand_path(File.dirname(__FILE__) + '/../helpers/assignment_overrides')
 
 describe "discussions" do
-  include AssignmentOverridesSeleniumHelper
   include_context 'in-process server selenium tests'
+  include AssignmentOverridesSeleniumHelper
+  include DiscussionsCommon
 
   before do
     @course = course_model

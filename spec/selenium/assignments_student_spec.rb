@@ -4,10 +4,11 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/google_drive_common'
 
 describe "assignments" do
   include_context "in-process server selenium tests"
+  include GoogleDriveCommon
 
   context "as a student" do
 
-    before (:each) do
+    before(:each) do
       course_with_student_logged_in
     end
 

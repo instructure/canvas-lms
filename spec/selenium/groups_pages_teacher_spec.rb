@@ -10,6 +10,10 @@ require_relative 'helpers/course_common'
 describe "groups" do
   include_context "in-process server selenium tests"
   include AnnouncementsCommon
+  include ConferencesCommon
+  include CourseCommon
+  include DiscussionsCommon
+  include FilesCommon
 
   setup_group_page_urls
 
@@ -157,7 +161,7 @@ describe "groups" do
         get files_page
         add_folder
         delete(0, :toolbar_menu)
-        expect(get_all_files_folders.count).to eq 0
+        expect(all_files_folders.count).to eq 0
       end
 
       it "should allow a teacher to delete a file", priority: "2", test_id: 304183 do
@@ -165,7 +169,7 @@ describe "groups" do
         get files_page
         delete(0, :toolbar_menu)
         wait_for_ajaximations
-        expect(get_all_files_folders.count).to eq 0
+        expect(all_files_folders.count).to eq 0
       end
 
       it "should allow teachers to move a file", priority: "2", test_id: 304185 do

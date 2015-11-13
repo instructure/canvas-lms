@@ -2,6 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../helpers/conversations_com
 
 describe "conversations new" do
   include_context "in-process server selenium tests"
+  include ConversationsCommon
 
   before do
     conversation_setup
@@ -12,7 +13,7 @@ describe "conversations new" do
   it "should have correct elements on the page when composing a new message", priority: "2", test_id: 86604 do
     # For testing media comments button, we need to stub Kaltura
     stub_kaltura
-    get_conversations
+    conversations
     f('#compose-btn').click
     wait_for_ajaximations
 
@@ -49,7 +50,7 @@ describe "conversations new" do
   end
 
   it "should not show an XSS alert when XSS script is typed into a new conversation's message subject and body", priority: "1", test_id: 201426 do
-    get_conversations
+    conversations
     script = "<IMG SRC=j&#X41vascript:alert('test2')> or <script>alert('xss');</script>"
     compose course: @course, to: [@s[0], @s[1]], subject: script, body: script
     wait_for_ajaximations
@@ -62,7 +63,7 @@ describe "conversations new" do
 
   context "conversations ui" do
     before(:each) do
-      get_conversations
+      conversations
     end
 
     it "should have a courses dropdown", priority: "1", test_id: 117960 do
@@ -137,7 +138,7 @@ describe "conversations new" do
       # before page renders
       @teacher.time_zone = 'America/Juneau'
       @teacher.save!
-      get_conversations
+      conversations
       expect(conversation_elements.size).to eq 1
       expect(f('li .author')).to include_text("#{@teacher.name}, #{@s[0].name}")
       expect(f('ul .read-state')).to be_present
@@ -154,7 +155,7 @@ describe "conversations new" do
     end
 
     it "should forward messages", priority: "1", test_id: 86608 do
-      get_conversations
+      conversations
       message_count = @convo.conversation_messages.length
       click_message(0)
 
@@ -175,7 +176,7 @@ describe "conversations new" do
     end
 
     it "should display message count", priority: "1", test_id: 138897 do
-      get_conversations
+      conversations
       expect(f('.message-count')).to include_text('1')
 
       select_view('sent')
@@ -188,7 +189,7 @@ describe "conversations new" do
     end
 
     it "should show starred messages in the starred filter", priority: "1", test_id: 138896 do
-      get_conversations
+      conversations
       unstarred_elt = conversation_elements.first
 
       hover_over_message(unstarred_elt)
@@ -200,7 +201,7 @@ describe "conversations new" do
     end
 
     it "should show a flash message when deleting a message via Trash Button", priority: "1", test_id: 201492 do
-      get_conversations
+      conversations
 
       click_message(0)
       f('#delete-btn').click
@@ -210,7 +211,7 @@ describe "conversations new" do
     end
 
     it "should show a flash message when deleting a message via cog dropdown", priority: "1", test_id: 201493 do
-      get_conversations
+      conversations
 
       click_message(0)
       # Clicks the title-level more options gear menu
@@ -221,7 +222,7 @@ describe "conversations new" do
     end
 
     it "should archive a message via the admin archive button", priority: "1", test_id: 201494 do
-      get_conversations
+      conversations
 
       click_message(0)
       click_archive_button
@@ -232,7 +233,7 @@ describe "conversations new" do
     end
 
     it "should archive a message via the cog dropdown", priority: "1", test_id: 201495 do
-      get_conversations
+      conversations
 
       click_message(0)
       # Clicks the title-level more options gear menu
@@ -248,7 +249,7 @@ describe "conversations new" do
       before do
         @participant.update_attribute(:workflow_state, 'archived')
         conversation(@teacher, @s[0], @s[1], workflow_state: 'archived')
-        get_conversations
+        conversations
         select_view('archived')
         click_message(0)
       end
@@ -295,67 +296,67 @@ describe "conversations new" do
     end
 
     it "should default to inbox view", priority: "1", test_id: 86601 do
-      get_conversations
-      selected = expect(get_bootstrap_select_value(get_view_filter)).to eq 'inbox'
+      conversations
+      expect(bootstrap_select_value(view_filter)).to eq 'inbox'
       expect(conversation_elements.size).to eq 2
     end
 
     it "should have an unread view", priority: "1", test_id: 197523 do
-      get_conversations
+      conversations
       select_view('unread')
       expect(conversation_elements.size).to eq 1
     end
 
     it "should have an starred view", priority: "1", test_id: 197524 do
-      get_conversations
+      conversations
       select_view('starred')
       expect(conversation_elements.size).to eq 2
     end
 
     it "should have an sent view", priority: "1", test_id: 197525 do
-      get_conversations
+      conversations
       select_view('sent')
       expect(conversation_elements.size).to eq 3
     end
 
     it "should have an archived view", priority: "1", test_id: 197526 do
-      get_conversations
+      conversations
       select_view('archived')
       expect(conversation_elements.size).to eq 1
     end
 
     it "should default to all courses context", priority: "1", test_id: 197527 do
-      get_conversations
-      selected = expect(get_bootstrap_select_value(get_course_filter)).to eq ''
+      conversations
+      expect(bootstrap_select_value(course_filter)).to eq ''
       expect(conversation_elements.size).to eq 2
     end
 
     it "should truncate long course names", priority: "2", test_id: 197528 do
       @course.name = "this is a very long course name that will be truncated"
       @course.save!
-      get_conversations
+      conversations
       select_course(@course.id)
-      button_text = f('.filter-option', get_course_filter).text
+      button_text = f('.filter-option', course_filter).text
       expect(button_text).not_to eq @course.name
       expect(button_text[0...5]).to eq @course.name[0...5]
       expect(button_text[-5..-1]).to eq @course.name[-5..-1]
     end
 
     it "should filter by course", priority: "1", test_id: 197529 do
-      get_conversations
+      conversations
       select_course(@course.id)
       expect(conversation_elements.size).to eq 2
     end
 
     it "should filter by course plus view", priority: "1", test_id: 197530 do
-      get_conversations
+      conversations
       select_course(@course.id)
       select_view('unread')
       expect(conversation_elements.size).to eq 1
     end
 
     it "should hide the spinner after deleting the last conversation", priority: "1", test_id: 207164 do
-      get_conversations
+      conversations
       select_view('archived')
       expect(conversation_elements.size).to eq 1
       conversation_elements[0].click
@@ -378,7 +379,7 @@ describe "conversations new" do
     end
 
     it "should star via star icon", priority: "1", test_id: 197532 do
-      get_conversations
+      conversations
       unstarred_elt = conversation_elements[1]
       # make star button visible via mouse over
       hover_over_message(unstarred_elt)
@@ -393,7 +394,7 @@ describe "conversations new" do
     end
 
     it "should unstar via star icon", priority: "1", test_id: 197533 do
-      get_conversations
+      conversations
       starred_elt = conversation_elements[0]
       star_btn = f('.star-btn', starred_elt)
       expect(star_btn).to be_present
@@ -406,7 +407,7 @@ describe "conversations new" do
     end
 
     it "should star via gear menu", priority: "1", test_id: 197534 do
-      get_conversations
+      conversations
       unstarred_elt = conversation_elements[1]
       unstarred_elt.click
       wait_for_ajaximations
@@ -417,7 +418,7 @@ describe "conversations new" do
     end
 
     it "should unstar via gear menu", priority: "1", test_id: 197535 do
-      get_conversations
+      conversations
       starred_elt = conversation_elements[0]
       starred_elt.click
       wait_for_ajaximations

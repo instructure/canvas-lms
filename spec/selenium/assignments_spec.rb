@@ -4,10 +4,10 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/public_courses_conte
 require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
 
 describe "assignments" do
+  include_context "in-process server selenium tests"
+  include FilesCommon
 
   # note: due date testing can be found in assignments_overrides_spec
-
-  include_context "in-process server selenium tests"
 
   context "as a teacher" do
 

@@ -7,6 +7,7 @@ describe 'creating a quiz' do
   include_context "in-process server selenium tests"
   include QuizzesCommon
   include AssignmentOverridesSeleniumHelper
+  include FilesCommon
 
   context 'as a teacher' do
     before(:each) do

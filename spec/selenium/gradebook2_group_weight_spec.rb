@@ -1,8 +1,10 @@
 require File.expand_path(File.dirname(__FILE__) + '/helpers/gradebook2_common')
+
 describe "group weights" do
   include_context "in-process server selenium tests"
+  include Gradebook2Common
 
-  before (:each) do
+  before(:each) do
     course_with_teacher_logged_in
     student_in_course
     @course.update_attributes(:group_weighting_scheme => 'percent')

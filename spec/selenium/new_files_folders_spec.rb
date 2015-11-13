@@ -2,7 +2,8 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
 
 describe "better_file_browsing, folders" do
-   include_context "in-process server selenium tests"
+  include_context "in-process server selenium tests"
+  include FilesCommon
 
   context "Folders" do
     before(:each) do
@@ -81,7 +82,7 @@ describe "better_file_browsing, folders" do
 
     it "should delete folder from toolbar", priority: "1", test_id: 133105 do
       delete(0, :toolbar_menu)
-      expect(get_all_files_folders.count).to eq 0
+      expect(all_files_folders.count).to eq 0
     end
 
     it "should be able to create and view a new folder with uri characters", priority: "2", test_id: 193153 do
@@ -109,14 +110,14 @@ describe "better_file_browsing, folders" do
 
      it "should create a new folder", priority: "2", test_id: 133121 do
        new_folder = create_new_folder
-       expect(get_all_files_folders.count).to eq 1
-       expect(new_folder.text).to match /New Folder/
+       expect(all_files_folders.count).to eq 1
+       expect(new_folder.text).to match(/New Folder/)
      end
 
      it "should handle duplicate folder names", priority: "1", test_id: 133130 do
        create_new_folder
        add_folder("New Folder")
-       expect(get_all_files_folders.last.text).to match /New Folder 2/
+       expect(all_files_folders.last.text).to match(/New Folder 2/)
      end
 
      it "should display folders in tree view", priority: "1", test_id: 133099 do
@@ -142,8 +143,8 @@ describe "better_file_browsing, folders" do
        1.upto(15) do |number_of_folders|
         folder_regex = number_of_folders > 1 ? Regexp.new("New Folder\\s#{number_of_folders}") : "New Folder"
         create_new_folder
-        expect(get_all_files_folders.count).to eq number_of_folders
-        expect(get_all_files_folders.last.text).to match folder_regex
+        expect(all_files_folders.count).to eq number_of_folders
+        expect(all_files_folders.last.text).to match folder_regex
        end
        get "/courses/#{@course.id}/files"
        f('ul.collectionViewItems > li > a > i.icon-mini-arrow-right').click

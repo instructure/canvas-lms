@@ -3,6 +3,8 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/public_courses_conte
 
 describe "context modules" do
   include_context "in-process server selenium tests"
+  include ContextModulesCommon
+
   context "as a teacher", priority: "1" do
     before(:each) do
       course_with_teacher_logged_in

@@ -4,6 +4,7 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/calendar2_common')
 
 describe "Notifications" do
   include_context "in-process server selenium tests"
+  include Calendar2Common
 
   context "admin" do
     before :once do
