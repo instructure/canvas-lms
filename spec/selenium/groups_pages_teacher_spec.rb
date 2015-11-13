@@ -14,6 +14,8 @@ describe "groups" do
   include CourseCommon
   include DiscussionsCommon
   include FilesCommon
+  include GroupsCommon
+  include WikiAndTinyCommon
 
   setup_group_page_urls
 

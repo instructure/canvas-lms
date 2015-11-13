@@ -8,6 +8,8 @@ describe 'assignments' do
   include_context 'in-process server selenium tests'
   include QuizzesCommon
   include FilesCommon
+  include AssignmentsCommon
+  include SubmissionsCommon
 
   before do
     course_with_teacher_logged_in

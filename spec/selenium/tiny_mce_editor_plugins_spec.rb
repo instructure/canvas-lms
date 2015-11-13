@@ -2,6 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/wiki_and_tiny_common
 
 describe "Tiny MCE editor plugins" do
   include_context "in-process server selenium tests"
+  include WikiAndTinyCommon
 
   it "should load all folders for the image plugin", priority: "1", test_id: 420486 do
     course_with_teacher_logged_in

@@ -3,11 +3,12 @@ require File.expand_path(File.dirname(__FILE__) + '/../helpers/grading_schemes_c
 
 describe "account admin grading schemes" do
   include_context "in-process server selenium tests"
+  include GradingSchemesCommon
 
   let(:account) { Account.default }
   let(:url) { "/accounts/#{Account.default.id}/grading_standards" }
 
-  before (:each) do
+  before(:each) do
     course_with_admin_logged_in
     get url
   end
@@ -31,7 +32,7 @@ describe "account admin grading schemes" do
 
     describe "grading scheme items" do
 
-      before (:each) do
+      before(:each) do
         create_simple_standard_and_edit(account, url)
       end
 
@@ -63,6 +64,7 @@ end
 
 describe "course grading schemes as account admin" do
   include_context "in-process server selenium tests"
+  include GradingSchemesCommon
 
   before(:once) do
     course_with_admin_logged_in

@@ -7,6 +7,7 @@ describe "submissions" do
   include_context "in-process server selenium tests"
   include FilesCommon
   include Gradebook2Common
+  include SubmissionsCommon
 
   context 'as a student' do
 

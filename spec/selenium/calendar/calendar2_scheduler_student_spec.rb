@@ -5,6 +5,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../helpers/scheduler_common'
 describe "scheduler" do
   include_context "in-process server selenium tests"
   include Calendar2Common
+  include SchedulerCommon
 
   context "as a student" do
 

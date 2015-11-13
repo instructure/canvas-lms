@@ -2,10 +2,11 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/wiki_and_tiny_common
 
 describe "Wiki pages and Tiny WYSIWYG editor Files" do
   include_context "in-process server selenium tests"
+  include WikiAndTinyCommon
 
   context "wiki and tiny files as a teacher" do
 
-    before (:each) do
+    before(:each) do
       course_with_teacher_logged_in
     end
 
@@ -67,7 +68,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
           expect(root_folder.attribute('aria-expanded')).to eq "false"
         end
 
-        it "goes to the next file avalible when pressing down" do 
+        it "goes to the next file avalible when pressing down" do
           root_folder = @tree1.find_elements(:css, '[role="treeitem"]').first
           @tree1.send_keys :arrow_right
           wait_for_ajaximations
@@ -77,7 +78,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
           expect(selected.attribute('id')).to eq root_folder.find_elements(:css, '[role="treeitem"]').first.attribute('id')
         end
 
-        it "goes to the prevous file avalible when pressing up" do 
+        it "goes to the prevous file avalible when pressing up" do
           root_folder = @tree1.find_elements(:css, '[role="treeitem"]').first
           @tree1.send_keys :arrow_right
           wait_for_ajaximations

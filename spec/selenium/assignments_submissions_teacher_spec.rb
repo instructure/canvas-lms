@@ -5,6 +5,7 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/submissions_common')
 describe "submissions" do
   include_context "in-process server selenium tests"
   include FilesCommon
+  include SubmissionsCommon
 
   context 'as a teacher' do
 

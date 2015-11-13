@@ -5,6 +5,7 @@ require_relative "helpers/quizzes_common"
 describe "Wiki pages and Tiny WYSIWYG editor Images" do
   include_context "in-process server selenium tests"
   include QuizzesCommon
+  include WikiAndTinyCommon
 
   context "wiki and tiny images as a teacher" do
 

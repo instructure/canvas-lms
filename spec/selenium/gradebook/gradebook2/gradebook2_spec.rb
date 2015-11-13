@@ -4,6 +4,7 @@ require_relative '../../helpers/groups_common'
 describe "gradebook2" do
   include_context "in-process server selenium tests"
   include Gradebook2Common
+  include GroupsCommon
 
   describe "multiple grading periods" do
     let!(:enable_mgp) do

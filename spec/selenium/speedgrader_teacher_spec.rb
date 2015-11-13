@@ -7,6 +7,7 @@ describe "speed grader" do
   include_context "in-process server selenium tests"
   include QuizzesCommon
   include Gradebook2Common
+  include SpeedGraderCommon
 
   before(:each) do
     stub_kaltura

@@ -4,6 +4,7 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/discussions_common')
 describe "discussion assignments" do
   include_context "in-process server selenium tests"
   include DiscussionsCommon
+  include AssignmentsCommon
 
   before :once do
     course_with_teacher(:active_all => true)

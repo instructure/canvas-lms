@@ -3,6 +3,7 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/wiki_and_tiny_common
 
 describe "Tiny MCE editor functions" do
   include_context "in-process server selenium tests"
+  include WikiAndTinyCommon
 
   context "as a teacher" do
 

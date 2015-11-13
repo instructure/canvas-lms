@@ -3,12 +3,13 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/assignments_common')
 
 describe "assignment groups" do
   include_context "in-process server selenium tests"
+  include AssignmentsCommon
 
   def get_assignment_groups
     ff('.assignment_group')
   end
 
-  before (:each) do
+  before(:each) do
     @domain_root_account = Account.default
     course_with_teacher_logged_in
     @course.require_assignment_group
@@ -231,7 +232,7 @@ describe "assignment groups" do
     a = ag.reload.assignments.last
     expect(a.name).to eq "Do this"
     expect(a.due_at).to eq time
-    expect(a.points_possible).to eq 13 
+    expect(a.points_possible).to eq 13
 
     # Checks Assignments Index page UI for correct values.
     expect(ff("#assignment_group_#{ag.id} .ig-title").last.text).to match "#{assignment_name}"

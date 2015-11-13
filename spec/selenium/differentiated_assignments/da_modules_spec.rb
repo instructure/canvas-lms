@@ -4,6 +4,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../helpers/differentiated_as
 describe "interaction with differentiated assignments/quizzes/discusssions in modules" do
   include_context "in-process server selenium tests"
   include DifferentiatedAssignments
+  include AssignmentsCommon
 
   def expect_module_to_have_items(module_item)
     expect(f("#context_module_#{module_item.id}")).to include_text(@da_assignment.title)

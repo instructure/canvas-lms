@@ -1,5 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 
+module WikiAndTinyCommon
   def clear_wiki_rce
     wiki_page_body = driver.find_element(:css, 'textarea.body')
     wiki_page_body.clear
@@ -187,3 +188,4 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
     f("[aria-label=\'#{button_aria}\'] .mce-open").click
     f("div[data-mce-color=\'#{mce_color}\']").click
   end
+end

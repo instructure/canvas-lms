@@ -3,9 +3,9 @@ require_relative "../helpers/quiz_questions_common"
 
 describe 'taking a quiz one question at a time' do
   include_context 'in-process server selenium tests'
-  include_context 'quiz question selenium tests'
+  include QuizQuestionsCommon
 
-  before(:each) do
+  before(:once) do
     create_oqaat_quiz(publish: true)
   end
 
@@ -19,7 +19,7 @@ describe 'taking a quiz one question at a time' do
 
       before(:each) do
         @quiz.update_attribute(:cant_go_back, false)
-        take_the_quiz
+        begin_quiz
       end
 
       it 'allows going back to previous questions', priority: "1", test_id: 140611 do
@@ -129,7 +129,7 @@ describe 'taking a quiz one question at a time' do
         @quiz.update_attribute(:cant_go_back, true)
         preview_the_quiz
       end
-      
+
       it 'prevents going back to previous questions', priority: "1", test_id: 209374 do
         it_should_show_cant_go_back_warning
         accept_cant_go_back_warning

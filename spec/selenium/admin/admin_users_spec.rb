@@ -1,9 +1,10 @@
 require File.expand_path(File.dirname(__FILE__) + '/../common')
-require File.expand_path(File.dirname(__FILE__) + '/../helpers/shared_user_methods')
+require File.expand_path(File.dirname(__FILE__) + '/../helpers/users_common')
 require File.expand_path(File.dirname(__FILE__) + '/../helpers/basic/users_specs')
 
 describe "admin courses tab" do
   include_context "in-process server selenium tests"
+  include UsersCommon
 
   context "add user basic" do
     describe "shared users specs" do
@@ -16,7 +17,7 @@ describe "admin courses tab" do
 
   context "add users" do
 
-    before (:each) do
+    before(:each) do
       course_with_admin_logged_in
       get "/accounts/#{Account.default.id}/users"
     end

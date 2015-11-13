@@ -5,11 +5,13 @@ require File.expand_path(File.dirname(__FILE__) + '/../helpers/outcome_common')
 
 describe "account admin outcomes" do
   include_context "in-process server selenium tests"
+  include OutcomeCommon
+
   let(:outcome_url) { "/accounts/#{Account.default.id}/outcomes" }
   let(:who_to_login) { 'admin' }
   let(:account) { Account.default }
   describe "course outcomes" do
-    before (:each) do
+    before(:each) do
       RoleOverride.create!(:context => account, :permission => 'manage_courses',
         :role => admin_role, :enabled => false) # should not manage_courses permission
       course_with_admin_logged_in

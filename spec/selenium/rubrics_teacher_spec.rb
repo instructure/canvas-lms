@@ -1,12 +1,13 @@
 require File.expand_path(File.dirname(__FILE__) + '/helpers/rubrics_common')
 
-
 describe "teacher shared rubric specs" do
   include_context "in-process server selenium tests"
+  include RubricsCommon
+
   let(:rubric_url) { "/courses/#{@course.id}/rubrics" }
   let(:who_to_login) { 'teacher' }
 
-  before (:each) do
+  before(:each) do
     resize_screen_to_normal
     course_with_teacher_logged_in
   end
@@ -39,6 +40,7 @@ end
 
 describe "course rubrics" do
   include_context "in-process server selenium tests"
+  include RubricsCommon
 
   context "as a teacher" do
 

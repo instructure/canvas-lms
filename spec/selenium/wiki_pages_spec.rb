@@ -6,6 +6,7 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
 describe "Wiki Pages" do
   include_context "in-process server selenium tests"
   include FilesCommon
+  include WikiAndTinyCommon
 
   context "Navigation" do
     before do

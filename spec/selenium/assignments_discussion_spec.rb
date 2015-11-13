@@ -6,6 +6,7 @@ describe "discussion assignments" do
   include_context "in-process server selenium tests"
   include DiscussionsCommon
   include FilesCommon
+  include AssignmentsCommon
 
   before(:each) do
     @domain_root_account = Account.default

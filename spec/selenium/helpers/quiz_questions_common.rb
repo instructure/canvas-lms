@@ -1,6 +1,6 @@
 require_relative "quizzes_common"
 
-shared_context "quiz question selenium tests" do
+module QuizQuestionsCommon
   include QuizzesCommon
 
   def create_oqaat_quiz(opts={})
@@ -36,13 +36,17 @@ shared_context "quiz question selenium tests" do
   def take_the_quiz
     get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
     fj("a:contains('Take the Quiz')").click
-    wait_for_ajaximations
+
+    # sleep because display is updated on timer, not ajax callback
+    sleep 1
   end
 
   def preview_the_quiz
     get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
     f("#preview_quiz_button").click
-    wait_for_ajaximations
+
+    # sleep because display is updated on timer, not ajax callback
+    sleep 1
   end
 
   def navigate_away_and_resume_quiz

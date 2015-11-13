@@ -23,7 +23,8 @@ module NotificationsCommon
       NotificationPolicy.create!(
         notification: n,
         communication_channel: user.communication_channel,
-        frequency: params[:frequency])
+        frequency: params[:frequency]
+      )
     end
   end
 
