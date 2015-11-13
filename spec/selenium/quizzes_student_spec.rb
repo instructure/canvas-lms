@@ -3,7 +3,7 @@ require_relative "helpers/quizzes_common"
 
 describe 'quizzes' do
   include_context "in-process server selenium tests"
-  include_context "quizzes selenium tests"
+  include QuizzesCommon
 
   def prepare_quiz
     @quiz = quiz_model({ course: @course, time_limit: 5 })

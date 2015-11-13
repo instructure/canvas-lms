@@ -3,7 +3,7 @@ require_relative "../helpers/quizzes_common"
 
 describe 'publishing a quiz' do
   include_context "in-process server selenium tests"
-  include_context "quizzes selenium tests"
+  include QuizzesCommon
 
   context 'as a teacher' do
     before(:each) do

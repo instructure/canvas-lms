@@ -7,7 +7,7 @@ require_relative "helpers/speed_grader_common"
 
 describe 'Speedgrader' do
   include_context "in-process server selenium tests"
-  include_context "quizzes selenium tests"
+  include QuizzesCommon
 
   let(:rubric_data) do
     [

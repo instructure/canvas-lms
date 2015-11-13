@@ -5,7 +5,7 @@ require_relative "helpers/files_common"
 
 describe "quizzes" do
   include_context "in-process server selenium tests"
-  include_context "quizzes selenium tests"
+  include QuizzesCommon
   include AssignmentOverridesSeleniumHelper
 
   def add_question_to_group

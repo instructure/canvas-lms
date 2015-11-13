@@ -1,7 +1,7 @@
 require_relative "quizzes_common"
 
 shared_context "quiz question selenium tests" do
-  include_context "quizzes selenium tests"
+  include QuizzesCommon
 
   def create_oqaat_quiz(opts={})
     course_with_teacher(:active_all => true)
@@ -38,7 +38,7 @@ shared_context "quiz question selenium tests" do
     fj("a:contains('Take the Quiz')").click
     wait_for_ajaximations
   end
-  
+
   def preview_the_quiz
     get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
     f("#preview_quiz_button").click
@@ -50,7 +50,7 @@ shared_context "quiz question selenium tests" do
     driver.switch_to.alert.accept
 
     wait_for_ajaximations
-    
+
     fj("a:contains('OQAAT quiz')").click
     wait_for_ajaximations
     fj("a:contains('Resume Quiz')").click
@@ -61,7 +61,7 @@ shared_context "quiz question selenium tests" do
     # defang the navigate-away-freakout-dialog
     driver.execute_script "window.onbeforeunload = function(){};"
     get course_quiz_question_path(:course_id => @course.id, :quiz_id => @quiz.id, :question_id => @quiz.quiz_questions.first.id)
-    wait_for_ajaximations    
+    wait_for_ajaximations
   end
 
   def it_should_show_cant_go_back_warning
@@ -152,7 +152,7 @@ shared_context "quiz question selenium tests" do
     expect_new_page_load {
       f("button.next-question").click
       expect(driver.switch_to.alert.text).to include "leave it blank?"
-      driver.switch_to.alert.accept      
+      driver.switch_to.alert.accept
     }
   end
 
@@ -180,7 +180,7 @@ shared_context "quiz question selenium tests" do
     it_should_have_sidebar_navigation
 
     it_should_not_show_previous_button
-    
+
     click_next_button
     it_should_be_on_second_question
 

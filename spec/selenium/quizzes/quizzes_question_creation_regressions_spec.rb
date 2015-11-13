@@ -3,9 +3,9 @@ require_relative "../helpers/quizzes_common"
 
 describe 'quizzes question creation edge cases' do
   include_context "in-process server selenium tests"
-  include_context "quizzes selenium tests"
+  include QuizzesCommon
 
-  before (:each) do
+  before(:each) do
     course_with_teacher_logged_in
     @last_quiz = start_quiz_question
   end

@@ -5,7 +5,7 @@ require_relative "../helpers/files_common"
 
 describe 'creating a quiz' do
   include_context "in-process server selenium tests"
-  include_context "quizzes selenium tests"
+  include QuizzesCommon
   include AssignmentOverridesSeleniumHelper
 
   context 'as a teacher' do

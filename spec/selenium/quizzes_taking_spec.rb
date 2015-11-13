@@ -3,7 +3,7 @@ require_relative "helpers/quizzes_common"
 
 describe "quiz taking" do
   include_context "in-process server selenium tests"
-  include_context "quizzes selenium tests"
+  include QuizzesCommon
 
   before :each do
     course_with_student_logged_in(:active_all => true)

@@ -4,7 +4,7 @@ require_relative "helpers/assignment_overrides"
 
 describe 'quizzes with draft state' do
   include_context "in-process server selenium tests"
-  include_context "quizzes selenium tests"
+  include QuizzesCommon
   include AssignmentOverridesSeleniumHelper
 
   before(:each) do

@@ -4,11 +4,11 @@ require_relative "helpers/quizzes_common"
 
 describe "Wiki pages and Tiny WYSIWYG editor Images" do
   include_context "in-process server selenium tests"
-  include_context "quizzes selenium tests"
+  include QuizzesCommon
 
   context "wiki and tiny images as a teacher" do
 
-    before (:each) do
+    before(:each) do
       course_with_teacher_logged_in
       @blank_page = @course.wiki.wiki_pages.create! :title => 'blank'
     end

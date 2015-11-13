@@ -4,7 +4,7 @@ require_relative "helpers/quizzes_common"
 
 describe "context modules" do
   include_context "in-process server selenium tests"
-  include_context "quizzes selenium tests"
+  include QuizzesCommon
 
   context "progressions", priority: "1" do
     before :each do

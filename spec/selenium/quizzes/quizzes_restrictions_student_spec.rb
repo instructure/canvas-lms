@@ -3,7 +3,7 @@ require_relative "../helpers/quizzes_common"
 
 describe 'quiz restrictions as a student' do
   include_context "in-process server selenium tests"
-  include_context "quizzes selenium tests"
+  include QuizzesCommon
 
   def begin_taking_quiz
     get "/courses/#{@course.id}/quizzes/#{@quiz.id}"

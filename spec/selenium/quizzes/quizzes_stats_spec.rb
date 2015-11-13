@@ -3,7 +3,7 @@ require_relative "../helpers/quizzes_common"
 
 describe 'quizzes stats' do
   include_context "in-process server selenium tests"
-  include_context "quizzes selenium tests"
+  include QuizzesCommon
 
   context 'as a teacher' do
 

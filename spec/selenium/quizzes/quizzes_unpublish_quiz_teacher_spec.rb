@@ -3,7 +3,7 @@ require_relative "../helpers/quizzes_common"
 
 describe 'unpublishing a quiz on the quiz show page' do
   include_context "in-process server selenium tests"
-  include_context "quizzes selenium tests"
+  include QuizzesCommon
 
   def unpublish_quiz_via_ui(opts={})
     get "/courses/#{@course.id}/quizzes/#{@quiz.id}"

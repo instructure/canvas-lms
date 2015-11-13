@@ -3,7 +3,7 @@ require_relative "helpers/quizzes_common"
 
 describe "equation editor" do
   include_context "in-process server selenium tests"
-  include_context "quizzes selenium tests"
+  include QuizzesCommon
 
   let(:equation_selector){ "div[aria-label='Insert Math Equation'] button" }
 

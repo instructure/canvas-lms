@@ -3,9 +3,9 @@ require_relative "../helpers/quizzes_common"
 
 describe 'drag and drop reordering' do
   include_context "in-process server selenium tests"
-  include_context "quizzes selenium tests"
+  include QuizzesCommon
 
-  before (:each) do
+  before(:each) do
     course_with_teacher_logged_in
     @last_quiz = start_quiz_question
     resize_screen_to_normal

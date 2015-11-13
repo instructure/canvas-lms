@@ -4,7 +4,7 @@ require_relative "../../helpers/assignment_overrides"
 
 describe 'viewing a quiz with variable due dates on the quiz show page' do
   include_context "in-process server selenium tests"
-  include_context "quizzes selenium tests"
+  include QuizzesCommon
   include AssignmentOverridesSeleniumHelper
 
   context 'as an observer linked to two students in different sections' do

@@ -6,7 +6,7 @@ require_relative "helpers/quizzes_common"
 
 describe 'assignments' do
   include_context 'in-process server selenium tests'
-  include_context "quizzes selenium tests"
+  include QuizzesCommon
 
   before do
     course_with_teacher_logged_in

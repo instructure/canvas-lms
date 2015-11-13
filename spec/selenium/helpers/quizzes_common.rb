@@ -1,5 +1,4 @@
-shared_context "quizzes selenium tests" do
-
+module QuizzesCommon
   def create_quiz_with_due_date(opts={})
     @context = opts.fetch(:course, @course)
     @quiz = quiz_model

@@ -4,7 +4,7 @@ require_relative "../helpers/assignment_overrides"
 
 describe 'Taking a quiz as a student' do
   include_context "in-process server selenium tests"
-  include_context "quizzes selenium tests"
+  include QuizzesCommon
   include AssignmentOverridesSeleniumHelper
 
   before(:each) { course_with_student_logged_in }

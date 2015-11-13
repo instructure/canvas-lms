@@ -4,7 +4,7 @@ require_relative "../helpers/testrail_report"
 
 describe 'quizzes question banks' do
   include_context "in-process server selenium tests"
-  include_context "quizzes selenium tests"
+  include QuizzesCommon
 
   context 'as a teacher' do
 
