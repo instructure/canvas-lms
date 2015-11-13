@@ -142,7 +142,7 @@ define [
         slotDuration: '00:30:00'
         scrollTime: '07:00:00'
         droppable: true
-        dropAccept: '.fc-event,.undated_event'
+        dropAccept: '.undated_event'
         events: @getEvents
         eventRender: @eventRender
         eventAfterRender: @eventAfterRender
