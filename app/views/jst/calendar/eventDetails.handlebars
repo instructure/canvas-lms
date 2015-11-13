@@ -25,7 +25,7 @@
       {{#if location_name}}
         <tr>
           <th scope="row">{{#t "location"}}Location{{/t}}</th>
-          <td>{{#link location_name}}{{/link}}</td>
+          <td>{{#bz_linkify_text location_name}}{{/bz_linkify_text}}</td>
         </tr>
       {{/if}}
       {{#if location_address}}

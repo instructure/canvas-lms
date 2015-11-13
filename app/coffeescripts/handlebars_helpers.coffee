@@ -29,7 +29,7 @@ define [
         options[key] = this[key] for key in this
       new Handlebars.SafeString htmlEscape(I18n.t(args..., options))
 
-    link : (str) ->
+    bz_linkify_text : (str) ->
       if str.match(/^http[^ ]+$/)
         thing = htmlEscape(str)
         return new Handlebars.SafeString '<a target="_BLANK" href="'+thing+'">' + thing + '</a>'
