@@ -164,7 +164,24 @@ define([
       return (
         <div className="ic-DashboardCard" ref="cardDiv">
           <div>
-            <div className="ic-DashboardCard__background" style={{backgroundColor: this.props.backgroundColor}}>
+            <div
+              className="ic-DashboardCard__background"
+              style={
+                (window.ENV.use_high_contrast ? 
+                  {borderBottomColor: this.props.backgroundColor}
+                  :
+                  {backgroundColor: this.props.backgroundColor}
+                )
+              }
+            >
+              { window.ENV.use_high_contrast ?
+                <div
+                  className="ic-DashboardCard__hicontrast-color-ribbon"
+                  style={{borderTopColor: this.props.backgroundColor}}>
+                </div> 
+                : 
+                null 
+              }
               <div className="ic-DashboardCard__header" onClick={this.headerClick}>
                 <div className="ic-DashboardCard__header_content">
                   <a className="ic-DashboardCard__link" href="#">

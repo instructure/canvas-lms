@@ -4,12 +4,20 @@
 @import "components/ic-badge";
 
 $ic-DashboardCard-border: $ic-border-light;
-$ic-DashboardCard-icon-color: $ic-icon-link-color;
 $ic-DashboardCard-font-color: $ic-color-light;
 $ic-DashboardCard-action-bgd: $ic-color-light;
-$ic-DashboardCard-action-hover-bgd: $ic-brand-primary;
-$ic-DashboardCard-action-hover-font-color: $ic-color-light;
-$ic-DashboardCard-action--active: $ic-brand-primary;
+@if $use_high_contrast { 
+  $ic-DashboardCard-icon-color: $ic-font-color-dark;
+  $ic-DashboardCard-action-hover-bgd: $ic-color-dark;
+  $ic-DashboardCard-action-hover-font-color: $ic-color-light;
+  $ic-DashboardCard-action-active-bgd: darken($ic-color-dark, 8%);
+}
+@else {
+  $ic-DashboardCard-icon-color: $ic-icon-link-color;
+  $ic-DashboardCard-action-hover-bgd: $ic-bg-light-neutral;
+  $ic-DashboardCard-action-hover-font-color: $ic-brand-primary;
+  $ic-DashboardCard-action-active-bgd: darken($ic-bg-light-neutral, 4%);
+}
 
 @mixin dashboard-badge-border($border-color) {
   box-shadow: 0 0 0 1px $border-color;
@@ -20,24 +28,47 @@ $ic-DashboardCard-action--active: $ic-brand-primary;
 
 .ic-DashboardCard {
   box-sizing: border-box;
-  border: 1px solid $ic-DashboardCard-border;
   width: 100%;
   margin-bottom: $ic-sp*2;
+  box-shadow: 0 1px 1px rgba(black, 0.05);
+  .no-touch & {
+    &:hover { box-shadow: 0 1px 12px 1px rgba(black, 0.2); }
+  }
 }
 
 .ic-DashboardCard__background {
-  position: relative; // used to keep color picker cog positioning in place
+  position: relative;
+  box-sizing: border-box;
+  @if $use_high_contrast {
+    transition: border-color 0.2s;
+    background: $ic-color-dark;
+    border-bottom-width: $ic-sp/4;
+    border-bottom-style: solid;
+  }
+  @else { transition: background-color 0.2s; }
+}
+
+@if $use_high_contrast {
+  .ic-DashboardCard__hicontrast-color-ribbon {
+    transition: border-color 0.2s;
+    width: 0; height: 0;
+    border-style: solid;
+    border-width: $ic-sp*4 $ic-sp*4 0 0;
+    border-color: transparent;
+    position: absolute;
+    top: 0; left: 0;
+  }
 }
 
 .ic-DashboardCard__header {
   cursor: pointer;
-  transition: background 0.2s;
   box-sizing: border-box;
   color: $ic-DashboardCard-font-color;
   display: flex;
   align-items: flex-end;
-  height: $ic-sp*16;
-  padding: $ic-sp;
+  height: $ic-sp*15;
+  border: 1px solid rgba(black, 0.12);
+  @include breakpoint(short) { height: $ic-sp*12; }
 }
 
 .ic-DashboardCard__header_content {
@@ -47,6 +78,7 @@ $ic-DashboardCard-action--active: $ic-brand-primary;
   padding-top: $ic-sp;
   max-height: $ic-sp*10;
   flex: 1;
+  padding: $ic-sp;
   @include breakpoint(short) { max-height: $ic-sp*9; }
 }
 
@@ -63,7 +95,6 @@ $ic-DashboardCard-action--active: $ic-brand-primary;
       outline: none;
       color: $ic-DashboardCard-font-color;
       background: rgba(black, 0.15);
-      .ic-DashboardCard__header-title { transition: text-shadow 0.2s; text-shadow: 0 0 5px #000;}
     }
   }
 }
@@ -130,31 +161,21 @@ $ic-DashboardCard-action--active: $ic-brand-primary;
   align-items: center;
   .ic-DashboardCard__action {
     transition: background 0.2s, color 0.2s;
-    background-color: $ic-color-light;;
+    background-color: $ic-color-light;
     flex: 1;
     display: block; // fix for IE10
     position: relative; // for :after alignment
     padding: $ic-sp*1.5 0;
     border-left: 1px solid $ic-DashboardCard-border;
+    border-bottom: 1px solid $ic-DashboardCard-border;
     text-align: center;
     color: $ic-DashboardCard-icon-color;
-    &:first-child {
-      border-left: none;
-    }
-    &.ic-DashboardCard__action--active::after {
-      content: "";
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: $ic-sp/4;
-      background: $ic-DashboardCard-action--active;
-    }
+    &:last-child { border-right: 1px solid $ic-DashboardCard-border; }
+
     .no-touch & {
       &:hover, &:focus {
         outline: none;
         background: $ic-DashboardCard-action-hover-bgd;
-        border-color: $ic-DashboardCard-action-hover-bgd;
         color: $ic-DashboardCard-action-hover-font-color;
         .ic-DashboardCard__action-badge {
           @include dashboard-badge-border($ic-DashboardCard-action-hover-bgd);
@@ -162,6 +183,7 @@ $ic-DashboardCard-action--active: $ic-brand-primary;
           color: $ic-DashboardCard-action-hover-bgd;
         }
       }
+      &:active { background: $ic-DashboardCard-action-active-bgd; }
     }
   }
 }
