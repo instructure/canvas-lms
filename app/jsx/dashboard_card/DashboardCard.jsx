@@ -49,6 +49,10 @@ define([
       this.setState({ nicknameInfo: this.nicknameInfo(nickname) })
     },
 
+    hasLinks: function() {
+      return this.props.links.filter(link => !link.hidden).length > 0;
+    },
+
     getInitialState: function() {
       return _.extend({ nicknameInfo: this.nicknameInfo(this.props.shortName) },
         CourseActivitySummaryStore.getStateForCourse(this.props.id))
@@ -212,7 +216,15 @@ define([
                   </span>
               </button>
             </div>
-            <div className="ic-DashboardCard__action-container">
+            <div
+              className={ 
+                (this.hasLinks() ? 
+                  "ic-DashboardCard__action-container"
+                  : 
+                  "ic-DashboardCard__action-container ic-DashboardCard__action-container--is-empty"
+                )
+              }
+            >
               { this.linksForCard() }
             </div>
           </div>

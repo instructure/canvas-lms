@@ -6,6 +6,7 @@
 $ic-DashboardCard-border: $ic-border-light;
 $ic-DashboardCard-font-color: $ic-color-light;
 $ic-DashboardCard-action-bgd: $ic-color-light;
+$ic-DashboardCard-action-height: 57px;
 @if $use_high_contrast { 
   $ic-DashboardCard-icon-color: $ic-font-color-dark;
   $ic-DashboardCard-action-hover-bgd: $ic-color-dark;
@@ -144,6 +145,7 @@ $ic-DashboardCard-action-bgd: $ic-color-light;
   position: relative;
   display: inline-block;
   width: $ic-sp*3;
+  line-height: 1;
 }
 
 .ic-DashboardCard__action-badge {
@@ -156,16 +158,26 @@ $ic-DashboardCard-action-bgd: $ic-color-light;
 }
 
 .ic-DashboardCard__action-container {
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
+  &:not(.ic-DashboardCard__action-container--is-empty) {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;  
+  }
+  &.ic-DashboardCard__action-container--is-empty {
+    background: $ic-color-light;
+    border: 1px solid $ic-border-light;
+    border-top: none;
+    box-sizing: border-box;
+    height: $ic-DashboardCard-action-height;
+  }
   .ic-DashboardCard__action {
     transition: background 0.2s, color 0.2s;
     background-color: $ic-color-light;
     flex: 1;
     display: block; // fix for IE10
     position: relative; // for :after alignment
-    padding: $ic-sp*1.5 0;
+    line-height: $ic-DashboardCard-action-height;
+    box-sizing: border-box;
     border-left: 1px solid $ic-DashboardCard-border;
     border-bottom: 1px solid $ic-DashboardCard-border;
     text-align: center;
