@@ -567,6 +567,14 @@ describe FilesController do
       expect(assigns[:attachment].display_name).to eql("bob")
     end
 
+    it "should create unpublished files if usage rights required" do
+      @course.account.allow_feature! :usage_rights_required
+      @course.enable_feature! :usage_rights_required
+      user_session(@teacher)
+      post 'create', :course_id => @course.id, :attachment => {:display_name => "wat", :uploaded_data => io}
+      expect(assigns[:attachment]).to be_locked
+    end
+
     context "sharding" do
       specs_require_sharding
 
