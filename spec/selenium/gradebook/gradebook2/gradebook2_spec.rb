@@ -971,6 +971,8 @@ describe "gradebook2" do
     it "should not be displayed if viewing outcome gradebook", priority: "1", test_id: 244959 do
       Account.default.set_feature_flag!('post_grades', 'on')
       Account.default.set_feature_flag!('outcome_gradebook', 'on')
+      @course.sis_source_id = 'xyz'
+      @course.save
 
       get "/courses/#{@course.id}/gradebook2"
 
@@ -1041,7 +1043,7 @@ describe "gradebook2" do
         expect(f('iframe.post-grades-frame')).to be_displayed
       end
 
-      it "should hide post grades lti button when section selected", priority: "1", test_id: 248027 do
+      it "should not hide post grades lti button when section selected", priority: "1", test_id: 248027 do
         create_post_grades_tool
 
         get "/courses/#{@course.id}/gradebook2"
@@ -1052,7 +1054,7 @@ describe "gradebook2" do
         wait_for_ajaximations
         fj('ul#section-to-show-menu li:nth(4)').click
         wait_for_ajaximations
-        expect(f('button.external-tools-dialog')).not_to be_displayed
+        expect(f('button.external-tools-dialog')).to be_displayed
       end
 
       it "should show as drop down menu when multiple tools are installed", priority: "1", test_id: 244920 do
@@ -1070,7 +1072,7 @@ describe "gradebook2" do
         expect(f('iframe.post-grades-frame')).to be_displayed
       end
 
-      it "should hide post grades lti dropdown when section selected", priority: "1", test_id: 248027 do
+      it "should not hide post grades lti dropdown when section selected", priority: "1", test_id: 248027 do
         (0...10).each do |i|
           create_post_grades_tool(name: "test tool #{i}")
         end
@@ -1083,7 +1085,7 @@ describe "gradebook2" do
         wait_for_ajaximations
         fj('ul#section-to-show-menu li:nth(4)').click
         wait_for_ajaximations
-        expect(f('button#post_grades')).not_to be_displayed
+        expect(f('button#post_grades')).to be_displayed
       end
 
       it "should show as drop down menu with an ellipsis when too many tools are installed", priority: "1", test_id: 244961 do

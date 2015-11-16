@@ -189,24 +189,22 @@ class GradebooksController < ApplicationController
     redirect_to action: :show
   end
 
-  def published_assignments?
-    context.assignments.published.where(post_to_sis: true).exists?
-  end
-
   def post_grades_tools
-    return [] unless published_assignments?
-    tools = []
     tool_limit = @context.feature_enabled?(:post_grades) ? MAX_POST_GRADES_TOOLS - 1 : MAX_POST_GRADES_TOOLS
-    external_tools[0...tool_limit].each do |tool|
-      tools.push(
-        data_url: tool[:placements][:post_grades][:canvas_launch_url],
-        name: tool[:name],
-        type: :lti
-      )
-    end
+    external_tools = self.external_tools.map { |tool| external_tool_detail(tool) }
+
+    tools = external_tools[0...tool_limit]
     tools.push(type: :post_grades) if @context.feature_enabled?(:post_grades)
     tools.push(type: :ellip) if external_tools.length > tool_limit
     tools
+  end
+
+  def external_tool_detail(tool)
+    {
+      data_url: tool[:placements][:post_grades][:canvas_launch_url],
+      name: tool[:name],
+      type: :lti
+    }
   end
 
   def external_tools
