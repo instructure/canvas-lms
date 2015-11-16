@@ -17,7 +17,6 @@ define([
 
     render () {
       var navClass = classnames({
-        "hidden": !this.props.store.isEnabled() || !this.props.store.hasAssignments(),
         "ui-button": this.props.renderAsButton
       });
       if(this.props.renderAsButton){

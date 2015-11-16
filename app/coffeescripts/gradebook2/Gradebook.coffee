@@ -231,7 +231,7 @@ define [
         false
 
     onShow: ->
-      $(".post-grades-placeholder").show()
+      $(".post-grades-button-placeholder").show()
       return if @startedInitializing
       @startedInitializing = true
 
@@ -1014,14 +1014,12 @@ define [
         showSections: @showSections(),
         currentSection: @sectionToShow)
       @sectionMenu.render()
-      @togglePostGrades(not @sectionToShow? or @sectionList().length is 1)
 
     updateCurrentSection: (section, author) =>
       @sectionToShow = section
       @postGradesStore.setSelectedSection @sectionToShow
       userSettings[if @sectionToShow then 'contextSet' else 'contextRemove']('grading_show_only_section', @sectionToShow)
       @buildRows() if @grid
-      @togglePostGrades(not @sectionToShow? or @sectionList().length is 1)
 
     showSections: ->
       @sections_enabled
@@ -1046,9 +1044,9 @@ define [
         course:
           id:     ENV.GRADEBOOK_OPTIONS.context_id
           sis_id: ENV.GRADEBOOK_OPTIONS.context_sis_id
+      @postGradesStore.addChangeListener(@updatePowerschoolPostGradesButton)
 
       @postGradesStore.setSelectedSection @sectionToShow
-
 
     showPostGradesButton: ->
       $placeholder = $('.post-grades-placeholder')
@@ -1061,20 +1059,9 @@ define [
         })
         React.render(app, $placeholder[0])
 
-    togglePostGrades: (visible) =>
-      # hide external tools elements
-      $('.external-tools-dialog').toggle(visible)
-      # remove menu placeholder if legacy placehoder button hidden
-      $('li.post-grades-placeholder').toggle(!$('li.post-grades-placeholder a').hasClass('hidden'))
-      # hide menu if no menu items visible
-      menuVisible = _.any(
-        _.filter(
-          $('li.external-tools-dialog, .post-grades-placeholder'),
-          (item) ->
-            return $(item).css('display') != 'none'
-        )
-      )
-      $('#post_grades').toggle(menuVisible)
+    updatePowerschoolPostGradesButton: =>
+      showButton = @postGradesStore.hasAssignments() && !!@postGradesStore.getState().selected.sis_id
+      $('.post-grades-placeholder').toggle(showButton)
 
     initHeader: =>
       @drawSectionSelectButton() if @sections_enabled
