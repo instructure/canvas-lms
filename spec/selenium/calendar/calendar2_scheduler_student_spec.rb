@@ -49,7 +49,7 @@ describe "scheduler" do
       expect(f('.event-details-content')).to include_text "my comments"
     end
 
-    it "should allow me to cancel existing reservation and sign up for the appointment group from the calendar", priority: "1", test_id: 140200 do
+    it "should allow me to cancel existing reservation and sign up for the appointment group from the calendar" do
       tomorrow = (Date.today + 1).to_s
       create_appointment_group(:max_appointments_per_participant => 1,
                                :new_appointments => [
@@ -177,8 +177,7 @@ describe "scheduler" do
         create_appointment_group(
           max_appointments_per_participant: 1,
           new_appointments: [
-            [date + ' 12:00:00', date + ' 13:00:00'],
-            [date + ' 14:00:00', date + ' 15:00:00']
+            [date + ' 12:00:00', date + ' 13:00:00']
           ]
         )
         get "/calendar2"
@@ -188,7 +187,7 @@ describe "scheduler" do
         reserve_appointment_manual(0)
       end
 
-      it "should let me do so from the month view" do
+      it "should let me do so from the month view", priority: "1", test_id: 140200 do
         load_month_view
 
         fj('.fc-event.scheduler-event').click
@@ -200,7 +199,7 @@ describe "scheduler" do
         expect(fj('.fc-event.scheduler-event')).to be_nil
       end
 
-      it "should let me do so from the week view" do
+      it "should let me do so from the week view", priority: "1", test_id: 502483 do
         load_week_view
 
         fj('.fc-event.scheduler-event').click
@@ -210,6 +209,29 @@ describe "scheduler" do
         wait_for_ajaximations
 
         expect(fj('.fc-event.scheduler-event')).to be_nil
+      end
+
+      it "should let me do so from the agenda view", priority: "1", test_id: 502484 do
+        load_agenda_view
+
+        f('.ig-row').click
+        wait_for_ajaximations
+        fj('.unreserve_event_link').click
+        fj('#delete_event_dialog~.ui-dialog-buttonpane .btn-primary').click
+
+        wait_for_ajaximations
+
+        expect(ffj('.ig-row').length).to eq 0
+      end
+
+      it "should let me do so from the from scheduler", priority: "1", test_id: 502485 do
+        fj('.fc-event.scheduler-event').click
+        fj('.unreserve_event_link').click
+        fj('#delete_event_dialog~.ui-dialog-buttonpane .btn-primary').click
+
+        wait_for_ajaximations
+
+        expect(f('.fc-event')).to include_text "Available"
       end
     end
   end
