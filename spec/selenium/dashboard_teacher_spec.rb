@@ -1,4 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
+require File.expand_path(File.dirname(__FILE__) + '/helpers/notifications_common')
+include NotificationsCommon
+
 
 describe "dashboard" do
   include_context "in-process server selenium tests"
@@ -106,6 +109,14 @@ describe "dashboard" do
 
       end
 
+    end
+
+    it "shows a stream item under the assignments in dashboard", priority: "1", test_id: 108723 do
+      NotificationsCommon.setup_notification(@teacher, name: 'Assignment Created')
+      assignment_model({:submission_types => ['online_text_entry'], :course => @course})
+      get "/"
+      find('.toggle-details').click
+      expect(element_exists(fj('.fake-link:contains("Unnamed")'))).to be true
     end
 
     context "moderation to do" do
