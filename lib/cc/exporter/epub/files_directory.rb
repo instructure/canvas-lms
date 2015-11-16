@@ -36,7 +36,7 @@ module CC::Exporter::Epub
     end
 
     def filename
-      @_filename ||= "#{SecureRandom.uuid}.zip"
+      @_filename ||= "#{Time.zone.now.strftime('%Y-%b-%d_%H-%M-%S')}.zip"
     end
 
     def zip_file

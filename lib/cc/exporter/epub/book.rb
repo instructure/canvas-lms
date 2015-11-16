@@ -54,7 +54,9 @@ module CC::Exporter::Epub
     end
 
     def filename
-      "#{pub_id}.#{title}.epub"
+      name = CanvasTextHelper.truncate_text(title, {:max_length => 200, :ellipsis => ''})
+      timestamp = Time.zone.now.strftime('%Y-%b-%d_%H-%M-%S')
+      "#{name}-#{timestamp}.epub"
     end
   end
 end
