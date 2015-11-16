@@ -383,14 +383,11 @@ END
       hidden_in_production: true,
       root_opt_in: true
     },
-    'anonymous_grading' =>
-    {
+    'anonymous_grading' => {
       display_name: -> { I18n.t('Anonymous Grading') },
       description: -> { I18n.t("Anonymous grading forces student names to be hidden in SpeedGrader™") },
       applies_to: 'Course',
-      state: 'hidden',
-      development: true,
-      root_opt_in: true,
+      state: 'allowed'
     },
     'international_sms' => {
       display_name: -> { I18n.t('International SMS') },
