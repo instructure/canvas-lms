@@ -34,6 +34,7 @@ define [
   'compiled/views/gradebook/SectionMenuView'
   'compiled/views/gradebook/GradingPeriodMenuView'
   'compiled/gradebook2/GradebookKeyboardNav'
+  'jsx/gradebook/grid/helpers/columnArranger'
   'jst/_avatar' #needed by row_student_name
   'jquery.ajaxJSON'
   'jquery.instructure_date_and_time'
@@ -52,7 +53,7 @@ define [
 ], (React, LongTextEditor, KeyboardNavDialog, keyboardNavTemplate, Slick, TotalColumnHeaderView, round, InputFilterView, I18n, GRADEBOOK_TRANSLATIONS,
   $, _, Backbone, tz, GradeCalculator, userSettings, Spinner, SubmissionDetailsDialog, AssignmentGroupWeightsDialog, GradeDisplayWarningDialog, PostGradesFrameDialog,
   SubmissionCell, GradebookHeaderMenu, numberCompare, htmlEscape, PostGradesStore, PostGradesApp, columnHeaderTemplate,
-  groupTotalCellTemplate, rowStudentNameTemplate, SectionMenuView, GradingPeriodMenuView, GradebookKeyboardNav) ->
+  groupTotalCellTemplate, rowStudentNameTemplate, SectionMenuView, GradingPeriodMenuView, GradebookKeyboardNav, ColumnArranger) ->
 
   class Gradebook
     columnWidths =
@@ -466,12 +467,9 @@ define [
       return (diffOfAssignmentGroupPosition * 1000000) + diffOfAssignmentPosition
 
     compareAssignmentDueDates: (a, b) ->
-      aDate = if a.object.due_at then (+a.object.due_at / 1000) else Number.MAX_VALUE
-      bDate = if b.object.due_at then (+b.object.due_at / 1000) else Number.MAX_VALUE
-      if aDate is bDate
-        return 0 if a.object.name is b.object.name
-        return (if a.object.name > b.object.name then 1 else -1)
-      return aDate - bDate
+      firstAssignment = a.object
+      secondAssignment = b.object
+      ColumnArranger.compareByDueDate(firstAssignment, secondAssignment)
 
     makeCompareAssignmentCustomOrderFn: (sortOrder) =>
       sortMap = {}

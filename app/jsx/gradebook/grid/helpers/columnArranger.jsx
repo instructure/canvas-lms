@@ -29,11 +29,11 @@ define([
     },
 
     getDueDateFromAssignment: function(assignment) {
-      if (assignment.due_at) return assignment.due_at;
+      if (assignment.due_at) return new Date(assignment.due_at);
       var overrides = assignment.overrides;
       if (!overrides || overrides.length > 1) return null;
       var overrideWithDueAt = _.find(overrides, override => override.due_at);
-      return overrideWithDueAt ? overrideWithDueAt.due_at : null;
+      return overrideWithDueAt ? new Date(overrideWithDueAt.due_at) : null;
     },
 
     compareByAssignmentGroup: function(a, b) {
