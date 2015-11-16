@@ -18,6 +18,7 @@ class AddContextToContentExports < ActiveRecord::Migration
           WHERE id = NEW.id
         SQL_ACTIONS
       end
+      execute("ALTER FUNCTION #{connection.quote_table_name('content_export_after_insert_row_when_context_id_is_null__tr')}() SET search_path TO #{Shard.current.name}")
 
       execute("ALTER TABLE #{ContentExport.quoted_table_name} ALTER context_type SET DEFAULT 'Course'")
     end

@@ -25,7 +25,7 @@ module Importers
         args = [quiz && quiz.id, quiz_group && quiz_group.id, hash['assessment_question_id'],
             hash.to_yaml, Time.now.utc, Time.now.utc, mig_id, position]
         query = self.item_class.send(:sanitize_sql, [<<-SQL, *args])
-          INSERT INTO quiz_questions (quiz_id, quiz_group_id, assessment_question_id, question_data, created_at, updated_at, migration_id, position)
+          INSERT INTO #{Quizzes::QuizQuestion.quoted_table_name} (quiz_id, quiz_group_id, assessment_question_id, question_data, created_at, updated_at, migration_id, position)
           VALUES (?,?,?,?,?,?,?,?)
         SQL
         qq_ids[mig_id] = self.item_class.connection.insert(query, "#{self.item_class.name} Create",

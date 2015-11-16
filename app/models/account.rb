@@ -823,9 +823,9 @@ class Account < ActiveRecord::Base
         role_scope = role_scope.where("account_id = ? OR
           account_id IN (
             WITH RECURSIVE t AS (
-              SELECT id, parent_account_id FROM accounts WHERE id = ?
+              SELECT id, parent_account_id FROM #{Account.quoted_table_name} WHERE id = ?
               UNION
-              SELECT accounts.id, accounts.parent_account_id FROM accounts INNER JOIN t ON accounts.id=t.parent_account_id
+              SELECT accounts.id, accounts.parent_account_id FROM #{Account.quoted_table_name} INNER JOIN t ON accounts.id=t.parent_account_id
             )
             SELECT id FROM t
           )", self.id, self.id)

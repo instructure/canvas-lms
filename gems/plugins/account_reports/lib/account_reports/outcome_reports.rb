@@ -79,31 +79,31 @@ module AccountReports
           lo.context_id          AS "outcome context id",
           lo.context_type        AS "outcome context type"}).
         joins(Pseudonym.send(:sanitize_sql, ["
-          INNER JOIN users u ON pseudonyms.user_id = u.id
+          INNER JOIN #{User.quoted_table_name} u ON pseudonyms.user_id = u.id
           INNER JOIN (
             SELECT user_id, course_id, course_section_id
-            FROM enrollments
+            FROM #{Enrollment.quoted_table_name}
             WHERE type = 'StudentEnrollment'
             AND root_account_id = :root_account_id
            " + (@include_deleted ? "" : "AND workflow_state = 'active'") + "
             GROUP BY user_id, course_id, course_section_id
           ) e ON pseudonyms.user_id = e.user_id
-          INNER JOIN courses c ON c.id = e.course_id
+          INNER JOIN #{Course.quoted_table_name} c ON c.id = e.course_id
             AND c.root_account_id = :root_account_id
-          INNER JOIN course_sections s ON s.id = e.course_section_id
-          INNER JOIN assignments a ON (a.context_id = c.id
+          INNER JOIN #{CourseSection.quoted_table_name} s ON s.id = e.course_section_id
+          INNER JOIN #{Assignment.quoted_table_name} a ON (a.context_id = c.id
                                        AND a.context_type = 'Course')
-          INNER JOIN content_tags ct ON (ct.content_id = a.id
+          INNER JOIN #{ContentTag.quoted_table_name} ct ON (ct.content_id = a.id
                                          AND ct.content_type = 'Assignment')
-          INNER JOIN learning_outcomes lo ON lo.id = ct.learning_outcome_id
-          INNER JOIN content_tags lol ON lol.content_id = lo.id
+          INNER JOIN #{LearningOutcome.quoted_table_name} lo ON lo.id = ct.learning_outcome_id
+          INNER JOIN #{ContentTag.quoted_table_name} lol ON lol.content_id = lo.id
             AND lol.context_id = :account_id
             AND lol.context_type = 'Account'
             AND lol.tag_type = 'learning_outcome_association'
             AND lol.workflow_state != 'deleted'
-          LEFT JOIN learning_outcome_results r ON (r.user_id=pseudonyms.user_id
+          LEFT JOIN #{LearningOutcomeResult.quoted_table_name} r ON (r.user_id=pseudonyms.user_id
                                                    AND r.content_tag_id = ct.id)
-          LEFT JOIN submissions sub ON sub.assignment_id = a.id
+          LEFT JOIN #{Submission.quoted_table_name} sub ON sub.assignment_id = a.id
             AND sub.user_id = pseudonyms.user_id", parameters])).
         where("
           ct.tag_type = 'learning_outcome'

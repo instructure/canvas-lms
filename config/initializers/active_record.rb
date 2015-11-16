@@ -708,7 +708,7 @@ ActiveRecord::Relation.class_eval do
       pluck = Array(options[:pluck])
       pluck_for_select = pluck.map do |column_name|
         if column_name.is_a?(Symbol) && column_names.include?(column_name.to_s)
-          "#{connection.quote_table_name(table_name)}.#{connection.quote_column_name(column_name)}"
+          "#{connection.quote_local_table_name(table_name)}.#{connection.quote_column_name(column_name)}"
         else
           column_name.to_s
         end
@@ -731,7 +731,7 @@ ActiveRecord::Relation.class_eval do
           begin
             old_proc = connection.raw_connection.set_notice_processor {}
             if pluck && pluck.any?{|p| p == primary_key.to_s}
-              connection.add_index table, primary_key, name: index
+              connection.execute("CREATE INDEX #{connection.quote_local_table_name(index)} ON #{connection.quote_local_table_name(table)}(#{connection.quote_column_name(primary_key)})")
               index = primary_key.to_s
             else
               pluck.unshift(index) if pluck

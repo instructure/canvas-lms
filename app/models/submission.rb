@@ -109,7 +109,7 @@ class Submission < ActiveRecord::Base
   }
 
   scope :for_course, lambda { |course|
-    where("submissions.assignment_id IN (SELECT assignments.id FROM assignments WHERE assignments.context_id = ? AND assignments.context_type = 'Course')", course)
+    where(assignment_id: course.assignments.except(:order))
   }
 
   workflow do
