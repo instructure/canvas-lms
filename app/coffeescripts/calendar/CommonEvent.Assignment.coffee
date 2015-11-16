@@ -46,7 +46,6 @@ define [
       @readableTypes[@assignmentType()]
 
     saveDates: (success, error) ->
-      @prepForSave()
       @save { 'assignment[due_at]': if @start then fcUtil.unwrap(@start).toISOString() else '' }, success, error
 
     save: (params, success, error) ->

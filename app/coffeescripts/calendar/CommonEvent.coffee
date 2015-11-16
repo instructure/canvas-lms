@@ -89,17 +89,6 @@ define [
     isPast: () ->
       @start && @start < fcUtil.now()
 
-    # note: this is a hacky solution to deal with
-    # an underlying binding issue - if possible try
-    # to figure out a better solution in future
-    # (similar hack in ShowEventDetailsDialog)
-    prepForSave: () ->
-      @_start = if @start then fcUtil.clone(@start) else null
-      @_end = if @end then fcUtil.clone(@end) else null
-
-      @_startDate = @startDate
-      @_endDate = @endDate
-
     copyDataFromObject: (data) ->
       @originalStart = fcUtil.clone(@start) if @start
       @midnightFudged = false # clear out cached value because now we have new data

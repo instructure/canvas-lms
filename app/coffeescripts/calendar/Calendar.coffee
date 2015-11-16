@@ -102,7 +102,7 @@ define [
         "CommonEvent/eventDeleted" : @eventDeleted
         "CommonEvent/eventSaving" : @eventSaving
         "CommonEvent/eventSaved" : @eventSaved
-        "CommonEvent/eventSaveError" : @eventSaveFailed
+        "CommonEvent/eventSaveFailed" : @eventSaveFailed
         "Calendar/visibleContextListChanged" : @visibleContextListChanged
         "EventDataSource/ajaxStarted" : @ajaxStarted
         "EventDataSource/ajaxEnded" : @ajaxEnded
@@ -462,7 +462,7 @@ define [
       @_eventDrop(event, 0, false, =>
         event.start = originalStart
         event.end = originalEnd
-        @calendar.fullCalendar('updateEvent', event)
+        @updateEvent(event)
       )
 
     copyYMD: (target, source) ->
@@ -493,21 +493,31 @@ define [
 
     # Subscriptions
 
+    updateEvent: (event) =>
+      # fullcalendar.js expects the argument to updateEvent to be an instance
+      # of the event that it's manipulated into having _start and _end fields.
+      # the event passed in here isn't necessarily one of those, but may be our
+      # own management of the event instead. in lieu of figuring out how to get
+      # the right copy of the event here, the one we have is good enough as
+      # long as we put the expected fields in place
+      event._start ?= fcUtil.clone(event.start)
+      event._end ?= if event.end then fcUtil.clone(event.end) else null
+      @calendar.fullCalendar('updateEvent', event)
+
     eventDeleting: (event) =>
       event.addClass 'event_pending'
-      @calendar.fullCalendar('updateEvent', event)
+      @updateEvent(event)
 
     eventDeleted: (event) =>
       @calendar.fullCalendar('removeEvents', event.id)
 
     eventSaving: (event) =>
-      event.prepForSave()
       return unless event.start # undated events can't be rendered
       event.addClass 'event_pending'
       if event.isNewEvent()
         @calendar.fullCalendar('renderEvent', event)
       else
-        @calendar.fullCalendar('updateEvent', event)
+        @updateEvent(event)
 
     eventSaved: (event) =>
       event.removeClass 'event_pending'
@@ -523,7 +533,6 @@ define [
       # but the save may be as a result of moving an event from being undated
       # to dated, and in that case we don't know whether to just update it or
       # add it. Some new state would need to be kept to track that.
-      # @calendar.fullCalendar('updateEvent', event)
       @closeEventPopups()
 
     eventSaveFailed: (event) =>
@@ -531,7 +540,7 @@ define [
       if event.isNewEvent()
         @calendar.fullCalendar('removeEvents', event.id)
       else
-        @calendar.fullCalendar('updateEvent', event)
+        @updateEvent(event)
 
     # When an assignment event is updated, update its related overrides.
     updateOverrides: (event) =>
