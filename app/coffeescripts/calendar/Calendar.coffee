@@ -323,6 +323,9 @@ define [
         revertFunc()
         return
 
+      if event.midnightFudged
+        event.start = fcUtil.clone(event.originalStart).add(minuteDelta, 'minutes')
+
       # isDueAtMidnight() will read cached midnightFudged property
       if event.eventType == "assignment" && event.isDueAtMidnight() && minuteDelta == 0
         event.start.minutes(59)

@@ -1,3 +1,4 @@
+# coding: utf-8
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 require File.expand_path(File.dirname(__FILE__) + '/../helpers/calendar2_common')
 
@@ -78,6 +79,33 @@ describe "calendar2" do
         wait_for_ajax_requests
         expect(event.reload.start_at).to eql(noon + 1.hour)
         expect(event.reload.end_at).to eql(noon + 1.hour + 5.minutes)
+      end
+
+      it "doesn't change the time when dragging an event close to midnight" do
+        # Choose a fixed date to avoid periodic end-of-week failures
+        close_to_midnight = Time.zone.parse('2015-1-1').beginning_of_day + 1.day - 20.minutes
+
+        # Create a target event because positioning on the calendar is hard
+        make_event(title: 'Event1', start: close_to_midnight + 1.day)
+
+        # The event to be dragged
+        event2 = make_event(title: 'Event2', start: close_to_midnight, end: close_to_midnight + 15.minutes)
+
+        load_week_view
+        quick_jump_to_date('Jan 1, 2015')
+        keep_trying_until { expect(ffj('.fc-event').length).to eq 2 }
+        events = ffj('.fc-event')
+
+        # Scroll the elements into view
+        events[0].location_once_scrolled_into_view
+        events[1].location_once_scrolled_into_view
+
+        # Drag object event onto target event
+        driver.action.move_to(events[0]).click_and_hold.move_to(events[1]).release.perform
+        wait_for_ajaximations
+
+        expect(event2.reload.start_at).to eql(close_to_midnight + 1.day)
+        expect(event2.end_at).to eql(close_to_midnight + 1.day + 15.minutes)
       end
 
       it "should show the right times in the tool tips for short events" do

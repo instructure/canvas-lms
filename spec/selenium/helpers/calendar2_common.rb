@@ -44,6 +44,7 @@ module Calendar2Common
     }.with_indifferent_access.merge(params)
     c = CalendarEvent.new :description => opts[:description],
                           :start_at => opts[:start],
+                          :end_at => opts[:end],
                           :title => opts[:title],
                           :location_name => opts[:location_name],
                           :location_address => opts[:location_address],
