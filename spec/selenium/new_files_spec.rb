@@ -14,9 +14,15 @@ describe "better_file_browsing" do
       get "/courses/#{@course.id}/files"
     end
     it "should display new files UI", priority: "1", test_id: 133092 do
-      wait_for_ajaximations
       expect(f('.btn-upload')).to be_displayed
       expect(all_files_folders.count).to eq 1
+    end
+    it "should load correct column values on uploaded file", priority: "1", test_id: 133129 do
+      time_current = Time.now.utc.strftime("%I:%M%p").downcase.sub!( /^0/, '')
+      expect(ff('.media-body')[0].text).to eq 'example.pdf'
+      expect(ff('.ef-date-created-col')[1].text).to eq time_current
+      expect(ff('.ef-date-modified-col')[1].text).to eq time_current
+      expect(ff('.ef-size-col')[1].text).to eq '194 KB'
     end
 
     context "from cog icon" do

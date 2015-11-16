@@ -74,6 +74,16 @@ describe "better_file_browsing" do
         expect(f('.btn-restrict')).not_to be_present
         expect(f('.btn-delete')).not_to be_present
       end
+
+      it "should see calendar icon on restricted files within a given timeframe", priority: "1", test_id: 133108 do
+        get "/courses/#{@course.id}/files"
+        set_item_permissions(:restricted_access, :available_with_timeline, :toolbar_menu)
+        student_goto_files
+        expect(f('.icon-calendar-day')).to be_displayed
+        f('.icon-calendar-day').click
+        wait_for_ajaximations
+        expect(driver.find_elements(:name, 'permissions')[0]).not_to be_present
+      end
     end
 
     context "in course with folders" do
