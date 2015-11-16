@@ -41,3 +41,8 @@ define [
     @stub(SubmissionCell.prototype, 'cellWrapper').withArgs('happy').returns('ok')
     formattedResponse = SubmissionCell.formatter(0,0,{grade: 'happy'})
     equal formattedResponse, 'ok'
+
+  test "#class.formatter adds a percent symbol for assignments with a percent grading_type", ->
+    @stub(SubmissionCell.prototype, 'cellWrapper').withArgs("73%").returns('ok')
+    formattedResponse = SubmissionCell.formatter(0, 0, { grade: 73 }, { grading_type: "percent" } )
+    equal formattedResponse, 'ok'
