@@ -2611,7 +2611,14 @@ class User < ActiveRecord::Base
 
   # mfa settings for a user are the most restrictive of any pseudonyms the user has
   # a login for
-  def mfa_settings
+  def mfa_settings(pseudonym_hint: nil)
+    # try to short-circuit site admins where it is required
+    if pseudonym_hint
+      mfa_settings = pseudonym_hint.account.mfa_settings
+      return :required if mfa_settings == :required ||
+          mfa_settings == :required_for_admins && !pseudonym_hint.account.all_account_users_for(self).empty?
+    end
+
     result = self.pseudonyms.shard(self).preload(:account).map(&:account).uniq.map do |account|
       case account.mfa_settings
         when :disabled
@@ -2619,7 +2626,10 @@ class User < ActiveRecord::Base
         when :optional
           1
         when :required_for_admins
-          if account.all_account_users_for(self).empty?
+          # if pseudonym_hint is given, and we got to here, we don't need
+          # to redo the expensive all_account_users_for check
+          if (pseudonym_hint && pseudonym_hint.account == account) ||
+              account.all_account_users_for(self).empty?
             1
           else
             # short circuit the entire method

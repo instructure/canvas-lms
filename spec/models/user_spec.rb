@@ -2221,6 +2221,15 @@ describe User do
 
       expect(user.mfa_settings).to eq :optional
     end
+
+    it "short circuits when a hint is provided" do
+      account = Account.create!(:settings => { :mfa_settings => :required_for_admins })
+      p = user.pseudonyms.create!(:account => account, :unique_id => 'user')
+      account.account_users.create!(user: user)
+
+      user.expects(:pseudonyms).never
+      expect(user.mfa_settings(pseudonym_hint: p)).to eq :required
+    end
   end
 
   context "crocodoc attributes" do
