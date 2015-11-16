@@ -177,6 +177,15 @@ describe "calendar2" do
         expect(fj(last_saturday).attribute('data-date')).to eq('2011-12-31')
       end
 
+      it "should fix up the event's date for events after 11:30pm" do
+        time = Time.zone.now.at_beginning_of_day + 23.hours + 45.minutes
+        @course.calendar_events.create! title: 'ohai', start_at: time, end_at: time + 5.minutes
+
+        load_month_view
+
+        expect(fj('.fc-event .fc-time').text).to eq('11:45p')
+      end
+
       it "should change the month" do
         get "/calendar2"
         old_header_title = header_text

@@ -53,6 +53,15 @@ describe "calendar2" do
         expect(elt.size.height).to be >= 18
       end
 
+      it "should fix up the event's data-start for events after 11:30pm" do
+        time = Time.zone.now.at_beginning_of_day + 23.hours + 45.minutes
+        @course.calendar_events.create! title: 'ohai', start_at: time, end_at: time + 5.minutes
+
+        load_week_view
+
+        expect(fj('.fc-event .fc-time').attribute('data-start')).to eq('11:45')
+      end
+
       it "should stagger pseudo-overlapping short events" do
         noon = Time.now.at_beginning_of_day + 12.hours
         first_event = @course.calendar_events.create! :title => "ohai", :start_at => noon, :end_at => noon + 5.minutes
