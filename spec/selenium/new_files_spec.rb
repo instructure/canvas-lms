@@ -18,7 +18,7 @@ describe "better_file_browsing" do
       expect(all_files_folders.count).to eq 1
     end
     it "should load correct column values on uploaded file", priority: "1", test_id: 133129 do
-      time_current = Time.now.utc.strftime("%I:%M%p").downcase.sub!( /^0/, '')
+      time_current = @course.attachments.first.updated_at.strftime("%l:%M%P").strip
       expect(ff('.media-body')[0].text).to eq 'example.pdf'
       expect(ff('.ef-date-created-col')[1].text).to eq time_current
       expect(ff('.ef-date-modified-col')[1].text).to eq time_current
