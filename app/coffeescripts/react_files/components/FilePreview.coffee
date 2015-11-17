@@ -16,7 +16,8 @@ define [
   'jsx/files/FilePreviewInfoPanel'
   '../modules/filesEnv'
   '../modules/FocusStore'
-], ($, _, React, ReactRouter, ReactModal, customPropTypes, Backbone, I18n, friendlyBytes, Folder, File, FilesystemObject, preventDefault, collectionHandler, FilePreviewInfoPanel, filesEnv, FocusStore) ->
+  'jsx/files/codeToRemoveLater'
+], ($, _, React, ReactRouter, ReactModal, customPropTypes, Backbone, I18n, friendlyBytes, Folder, File, FilesystemObject, preventDefault, collectionHandler, FilePreviewInfoPanel, filesEnv, FocusStore, codeToRemoveLater) ->
 
   FilePreview =
 
@@ -42,9 +43,11 @@ define [
 
     componentDidMount: ->
       $('.ReactModal__Overlay').on 'keydown', @handleKeyboardNavigation
+      codeToRemoveLater.hideFileTreeFromPreviewInJaws()
 
     componentWillUnmount: ->
       $('.ReactModal__Overlay').off 'keydown', @handleKeyboardNavigation
+      codeToRemoveLater.revertJawsChangesBackToNormal()
 
     componentWillReceiveProps: (newProps) ->
       if(newProps.isOpen)
