@@ -23,18 +23,18 @@ describe 'dashcards' do
       expect(f('#application.ic-app')).to be_present
       expect(f('.ic-app-header__main-navigation')).to be_present
       # verify the toggle switch is present
-      expect(f('.ic-Super-toggle__switch')).to be_present
+      expect(f('#dashboardToggleButton')).to be_present
     end
 
     it 'should toggle dashboard based on the toggle switch', priority: "1", test_id: 222507 do
       get '/'
-      expect(f('.ic-Super-toggle__switch')).to be_present
-      # toggle switch to right
-      f('.ic-Super-toggle__option--RIGHT').click
-      expect(f('#dashboard-activity').text).to include('Recent Activity')
-      # toggle switch to left
-      f('.ic-Super-toggle__option--LEFT').click
-      expect(f('.ic-DashboardCard__link')).to be_displayed
+      expect(f('#dashboardToggleButton')).to be_present
+      f('#dashboardToggleButton').click
+      if fj('#dashboardToggleButtonGridIcon').attribute(:class).include?('--active')
+        expect(f('.ic-DashboardCard__link')).to be_displayed
+      else
+        expect(f('#dashboard-activity').text).to include('Recent Activity')
+      end
     end
 
     it 'should redirect to announcements index', priority: "1", test_id: 222509 do
