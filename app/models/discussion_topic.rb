@@ -178,13 +178,20 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def update_subtopics
-    if !self.deleted? && self.has_group_category?
+    if !self.deleted? && (self.has_group_category? || !!self.group_category_id_was)
       send_later_if_production :refresh_subtopics
     end
   end
 
   def refresh_subtopics
+    if self.root_topic_id.blank?
+      # delete any lingering child topics
+      self.shard.activate do
+        DiscussionTopic.where(:root_topic_id => self).update_all(:workflow_state => "deleted")
+      end
+    end
     return if self.deleted?
+
     category = self.group_category
     return unless category && self.root_topic_id.blank?
     category.groups.active.each do |group|
