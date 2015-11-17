@@ -1409,6 +1409,37 @@ describe EnrollmentsApiController, type: :request do
       end
     end
 
+    context "a parent observer using parent app" do
+      before :once do
+        @student = user(active_all: true, active_state: 'active')
+        3.times do
+          course
+          @course.enroll_student(@student, enrollment_state: 'active')
+        end
+        @observer = user(active_all: true, active_state: 'active')
+        @observer.user_observees.create do |uo|
+          uo.user_id = @student.id
+        end
+        @user = @observer
+        @user_path = "/api/v1/users/#{@student.id}/enrollments"
+        @user_params = { :controller => "enrollments_api", :action => "index", :user_id => @student.id.to_param, :format => "json" }
+      end
+
+      it "should show all enrollments for the observee (student)" do
+        json = api_call(:get, @user_path, @user_params)
+        expect(json.length).to eql 3
+      end
+
+      it "should not authorize the parent to see other students' enrollments" do
+        @other_student = user(active_all: true, active_state: 'active')
+        @user = @observer
+        path = "/api/v1/users/#{@other_student.id}/enrollments"
+        params = { :controller => "enrollments_api", :action => "index", :user_id => @other_student.id.to_param, :format => "json" }
+        raw_api_call(:get, path, params)
+        expect(response.code).to eql '401'
+      end
+    end
+
     describe "sharding" do
       specs_require_sharding
 

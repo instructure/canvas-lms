@@ -1085,7 +1085,7 @@ class User < ActiveRecord::Base
     can :reset_mfa
 
     given { |user| user && user.user_observees.detect { |uo| uo.user == self }}
-    can :read
+    can :read and can :read_as_parent
   end
 
   def can_masquerade?(masquerader, account)
