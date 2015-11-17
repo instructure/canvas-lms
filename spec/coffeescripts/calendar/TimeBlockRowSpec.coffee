@@ -92,6 +92,10 @@ define [
     me = new TimeBlockRow(@timeBlockList)
     ok me.validate()
 
+  test 'valid if incomplete', ->
+    me = new TimeBlockRow(@timeBlockList, start: @start, end: null)
+    ok me.validate()
+
   test 'getData', ->
     me = new TimeBlockRow(@timeBlockList, {@start, @end})
     me.validate()

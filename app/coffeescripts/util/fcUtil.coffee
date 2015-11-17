@@ -8,6 +8,7 @@ define [
   # expects a date (unfudged), and returns a fullcalendar moment
   # (fudged) appropriate for passing to fullcalendar methods
   wrap = (date) ->
+    return null unless date
     $.fullCalendar.moment($.fudgeDateForProfileTimezone(date))
 
   # expects a fullcalendar moment (fudged) from a fullcalendar
