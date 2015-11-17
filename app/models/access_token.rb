@@ -97,7 +97,7 @@ class AccessToken < ActiveRecord::Base
   end
 
   def expired?
-    expires_at && expires_at < Time.now
+    developer_key.try(:auto_expire_tokens) && expires_at && expires_at < Time.zone.now
   end
 
   def token=(new_token)
@@ -113,6 +113,10 @@ class AccessToken < ActiveRecord::Base
   def generate_token(overwrite=false)
     if overwrite || !self.crypted_token
       self.token = CanvasSlug.generate(nil, TOKEN_SIZE)
+
+      if !self.expires_at_changed? && developer_key.try(:auto_expire_tokens)
+        self.expires_at = DateTime.now.utc + 1.hour
+      end
     end
   end
 
@@ -183,5 +187,7 @@ class AccessToken < ActiveRecord::Base
 
   # It's encrypted, but end users still shouldn't see this.
   # The hint is only returned in visible_token, if protected_token is false.
-  def self.serialization_excludes; [:crypted_token, :token_hint]; end
+  def self.serialization_excludes
+    [:crypted_token, :token_hint, :crypted_refresh_token]
+  end
 end

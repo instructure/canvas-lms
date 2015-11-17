@@ -181,4 +181,20 @@ describe AccessToken do
       expect(@at_without_account.authorized_for_account?(@foreign_ac)).to be true
     end
   end
+
+  describe "regenerate_access_token" do
+    before :once do
+      @at = AccessToken.create!(:user => user_model, :developer_key => DeveloperKey.default)
+      @token_string = @at.full_token
+      @refresh_token_string = @at.plaintext_refresh_token
+    end
+
+    it "should regenerate the token" do
+      DateTime.stubs(:now).returns(Time.zone.parse('2015-06-29T23:01:00+00:00'))
+
+      @at.update_attribute(:expires_at, 2.hours.ago)
+      @at.regenerate_access_token
+      expect(@at.expires_at.to_i).to be((DateTime.now.utc + 1.hour).to_i)
+    end
+  end
 end
