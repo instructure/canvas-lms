@@ -850,11 +850,17 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     fixer.run!(self)
   end
 
+  def due_at
+    return quiz.due_at if submission.blank?
+
+    quiz.overridden_for(submission.user).due_at
+  end
+
   # TODO: Extract? conceptually similar to Submission::Tardiness#late?
   def late?
     return false if finished_at.blank?
-    return false if quiz.due_at.blank?
+    return false if due_at.blank?
 
-    finished_at > quiz.due_at
+    finished_at > due_at
   end
 end
