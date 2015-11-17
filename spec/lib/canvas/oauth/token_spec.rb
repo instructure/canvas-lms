@@ -159,6 +159,12 @@ module Canvas::Oauth
       it 'does not put anything else into the json' do
         expect(json.keys.sort).to match_array(['access_token', 'refresh_token', 'user', 'expires_in'])
       end
+      it 'does not put expires_in in the json when auto_expire_tokens is false' do
+        key = token.key
+        key.auto_expire_tokens = false
+        key.save!
+        expect(json.keys.sort).to match_array(['access_token', 'refresh_token', 'user'])
+      end
 
     end
 
@@ -192,7 +198,6 @@ module Canvas::Oauth
     end
 
     context "token expiration" do
-
       it "starts expiring tokens in 1 hour" do
         DateTime.stubs(:now).returns(DateTime.parse('2016-06-29T23:01:00+00:00'))
         expect(token.access_token.expires_at.utc.iso8601).to eq('2016-06-30T00:01:00+00:00')
@@ -205,8 +210,14 @@ module Canvas::Oauth
         expect(token.access_token.expires_at).to be_nil
       end
 
-
+      it 'Tokens wont expire if the dev key has auto_expire_tokens set to false' do
+        DateTime.stubs(:now).returns(Time.zone.parse('2015-06-29T23:01:00+00:00'))
+        key = token.key
+        key.auto_expire_tokens = false
+        key.save!
+        expect(token.access_token.expires_at).to be_nil
+        expect(token.access_token.expired?).to be false
+      end
     end
-
   end
 end
