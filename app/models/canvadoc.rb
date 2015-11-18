@@ -30,6 +30,8 @@ class Canvadoc < ActiveRecord::Base
 
     url = attachment.authenticated_s3_url(:expires => 1.day)
 
+    opts.delete(:annotatable) unless Canvadocs.annotations_supported?
+
     response = Canvas.timeout_protection("canvadocs") {
       canvadocs_api.upload(url, opts)
     }
