@@ -2071,12 +2071,12 @@ describe User do
         skip "requires icu locally"
       end
       I18n.locale = :es
-      expect(User.sortable_name_order_by_clause).to match /es/
-      expect(User.sortable_name_order_by_clause).not_to match /root/
+      expect(User.sortable_name_order_by_clause).to match(/'es'/)
+      expect(User.sortable_name_order_by_clause).not_to match(/'root'/)
       # english has no specific sorting rules, so use root
       I18n.locale = :en
-      expect(User.sortable_name_order_by_clause).not_to match /es/
-      expect(User.sortable_name_order_by_clause).to match /root/
+      expect(User.sortable_name_order_by_clause).not_to match(/'es'/)
+      expect(User.sortable_name_order_by_clause).to match(/'root'/)
     end
   end
 

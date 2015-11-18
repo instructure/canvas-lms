@@ -1828,12 +1828,12 @@ class Assignment < ActiveRecord::Base
   end
 
   scope :include_submitted_count, -> { select(
-    "assignments.*, (SELECT COUNT(*) FROM submissions
+    "assignments.*, (SELECT COUNT(*) FROM #{Submission.quoted_table_name}
     WHERE assignments.id = submissions.assignment_id
     AND submissions.submission_type IS NOT NULL) AS submitted_count") }
 
   scope :include_graded_count, -> { select(
-    "assignments.*, (SELECT COUNT(*) FROM submissions
+    "assignments.*, (SELECT COUNT(*) FROM #{Submission.quoted_table_name}
     WHERE assignments.id = submissions.assignment_id
     AND submissions.grade IS NOT NULL) AS graded_count") }
 
