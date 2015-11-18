@@ -114,7 +114,6 @@ define [
         sections: sections,
         course: {name: @options.course_name},
         showSections: sections,
-        showSisSync: @options.post_grades_feature_enabled,
         currentSection: @sectionToShow)
       @sectionMenu.render()
 

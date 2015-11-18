@@ -128,9 +128,6 @@ define [
         })
         postGradesDialog.open()
 
-      if(@options.post_grades_feature_enabled)
-        ajax_calls.push($.ajaxJSON( @options.course_url, "GET", {}, @gotCourse))
-
       # getting all the enrollments for a course via the api in the polite way
       # is too slow, so we're going to cheat.
       $.when(ajax_calls...)
@@ -323,10 +320,6 @@ define [
         else
           gotAssignmentGroupsChunk(groups) for [groups, x, y] in responses
         @gotAllAssignmentGroupsPromise.resolve()
-
-
-    gotCourse: (course) =>
-      @course = course
 
     gotSections: (sections) =>
       @sections = {}
@@ -1012,17 +1005,13 @@ define [
 
     sectionList: ->
       _.map @sections, (section, id) =>
-        if(section.passback_status)
-          date = new Date(section.passback_status.sis_post_grades_status.grades_posted_at)
-        { name: section.name, id: id, passback_status: section.passback_status, date: date, checked: @sectionToShow == id }
+        { name: section.name, id: id, checked: @sectionToShow == id }
 
     drawSectionSelectButton: () ->
       @sectionMenu = new SectionMenuView(
         el: $('.section-button-placeholder'),
         sections: @sectionList(),
-        course: @course,
         showSections: @showSections(),
-        showSisSync: @options.post_grades_feature_enabled,
         currentSection: @sectionToShow)
       @sectionMenu.render()
       @togglePostGrades(not @sectionToShow? or @sectionList().length is 1)
@@ -1035,10 +1024,7 @@ define [
       @togglePostGrades(not @sectionToShow? or @sectionList().length is 1)
 
     showSections: ->
-      if @sections_enabled && @options.post_grades_feature_enabled
-        true
-      else
-        false
+      @sections_enabled
 
     gradingPeriodList: ->
       _.map @gradingPeriods, (period) =>
@@ -1091,7 +1077,7 @@ define [
       $('#post_grades').toggle(menuVisible)
 
     initHeader: =>
-      @drawSectionSelectButton() if @sections_enabled || @course
+      @drawSectionSelectButton() if @sections_enabled
       @drawGradingPeriodSelectButton() if @mgpEnabled
 
       $settingsMenu = $('#gradebook_settings').next()
