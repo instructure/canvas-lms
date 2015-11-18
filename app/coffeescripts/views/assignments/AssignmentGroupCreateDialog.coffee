@@ -22,9 +22,10 @@ define [
       @$el.html template()
       @$el.dialog(
         title: I18n.t('titles.add_assignment_group', "Add Assignment Group"),
-        width: 'auto'
+        width: 'auto',
         modal: true
       ).fixDialogButtons()
+      @$el.closest('.ui-dialog').find('.ui-dialog-titlebar-close').click =>  @cancel()
       this
 
     createAssignmentGroup: (event) =>
