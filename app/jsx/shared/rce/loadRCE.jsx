@@ -1,9 +1,9 @@
 define([
   'jquery',
   'jsx/shared/rce/editorOptions',
-  'jsx/shared/rce/rceStore'
-], function($, editorOptions, RCEStore){
-
+  'jsx/shared/rce/rceStore',
+  'jsx/shared/rce/loadEventListeners'
+], function($, editorOptions, RCEStore, loadEventListeners){
   let RCELoader = {
     cachedModule: null,
 
@@ -20,6 +20,7 @@ define([
         cb(this.cachedModule)
       } else {
         $.getScript('http://'+ host +'/get_module', (res) => {
+          loadEventListeners()
           if(!this.cachedModule){ this.setCache(RceModule) }
           cb(this.cachedModule);
         })

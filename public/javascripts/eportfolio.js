@@ -30,7 +30,7 @@ define([
   'jquery' /* $ */,
   'compiled/userSettings',
   'jsx/shared/rce/loadRCE',
-  'jsx/shared/rce/rceStore',
+  'jsx/shared/rce/callOnRCE',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.inst_tree' /* instTree */,
   'jquery.instructure_forms' /* formSubmit, getFormData, formErrors, errorBox */,
@@ -45,7 +45,7 @@ define([
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'jqueryui/progressbar' /* /\.progressbar/ */,
   'jqueryui/sortable' /* /\.sortable/ */
-], function(I18n, $, userSettings, loadRCE, RCEStore) {
+], function(I18n, $, userSettings, loadRCE, callOnRCE) {
 
   if (window.ENV.RICH_CONTENT_SERVICE_ENABLED) {
     loadRCE.preload(window.ENV.RICH_CONTENT_APP_HOST)
@@ -60,12 +60,6 @@ define([
       }
     }
   };
-
-  function callOnRCE (target, methodName) {
-    return window.ENV.RICH_CONTENT_SERVICE_ENABLED ?
-      RCEStore.callOnRCE(target, methodName) :
-      target.editorBox(methodName)
-  }
 
   function loadRCEViaService (target, defaultContent) {
     loadRCE.loadOnTarget(target, defaultContent, window.ENV.RICH_CONTENT_APP_HOST)

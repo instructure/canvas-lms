@@ -348,6 +348,7 @@ require(__dirname + "/../coffeescripts/views/SearchViewSpec.coffee")
 require(__dirname + "/../coffeescripts/views/SelectViewSpec.coffee")
 require(__dirname + "/../coffeescripts/views/SyllabusViewSpec.coffee")
 require(__dirname + "/../coffeescripts/views/tinymce/EquationEditorViewSpec.coffee")
+require(__dirname + "/../coffeescripts/views/tinymce/InsertUpdateImageViewSpec.coffee")
 require(__dirname + "/../coffeescripts/views/ToggleableSubscriptionIconViewSpec.coffee")
 require(__dirname + "/../coffeescripts/views/tours/AgendaTourSpec.coffee")
 require(__dirname + "/../coffeescripts/views/ValidatedFormViewSpec.coffee")
@@ -365,6 +366,7 @@ require(__dirname + "/../coffeescripts/widgets/DatetimeFieldSpec.coffee")
 require(__dirname + "/../coffeescripts/xhr/remoteSelectSpec.coffee")
 require(__dirname + "/../coffeescripts/jsx/shared/rce/rceStoreSpec.coffee")
 require(__dirname + "/../coffeescripts/jsx/shared/rce/loadRCESpec.coffee")
+require(__dirname + "/../coffeescripts/jsx/shared/rce/loadEventListenersSpec.coffee")
 
 
 //var testsContext = require.context(__dirname + "/../coffeescripts", true, /Spec.coffee$/);
