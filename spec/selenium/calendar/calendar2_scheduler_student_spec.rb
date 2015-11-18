@@ -49,7 +49,7 @@ describe "scheduler" do
       expect(f('.event-details-content')).to include_text "my comments"
     end
 
-    it "should allow me to cancel existing reservation and sign up for the appointment group from the calendar" do
+    it "should allow me to replace existing reservation when at limit", priority: "1", test_id: 505291 do
       tomorrow = (Date.today + 1).to_s
       create_appointment_group(:max_appointments_per_participant => 1,
                                :new_appointments => [
@@ -73,7 +73,7 @@ describe "scheduler" do
       expect(event2).to include_text "Reserved"
     end
 
-    it "should not let me book too many appointments" do
+    it "should not let me book too many appointments", priority: "1", test_id: 502964 do
       tomorrow = (Date.today + 1).to_s
       create_appointment_group(:max_appointments_per_participant => 2,
                                :new_appointments => [
@@ -224,7 +224,7 @@ describe "scheduler" do
         expect(ffj('.ig-row').length).to eq 0
       end
 
-      it "should let me do so from the from scheduler", priority: "1", test_id: 502485 do
+      it "should let me do so from the scheduler", priority: "1", test_id: 502485 do
         fj('.fc-event.scheduler-event').click
         fj('.unreserve_event_link').click
         fj('#delete_event_dialog~.ui-dialog-buttonpane .btn-primary').click
