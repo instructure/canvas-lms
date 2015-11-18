@@ -1115,7 +1115,11 @@ define([
       this.currentStudent = jsonData.studentMap[id] || _.values(jsonData.studentsWithSubmissions)[0];
       document.location.hash = "#" + encodeURIComponent(JSON.stringify({
           "student_id": this.currentStudent.id
-        }));
+      }));
+
+      // On the switch to a new student, clear the state of the last
+      // question touched on the previous student.
+      INST.lastQuestionTouched = null;
 
       if ((ENV.grading_role == 'provisional_grader' && this.currentStudent.submission_state == 'not_graded')
         || ENV.grading_role == 'moderator') {
