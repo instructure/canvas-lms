@@ -8,6 +8,7 @@ describe 'quiz restrictions as a student' do
   def begin_taking_quiz
     get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
     expect_new_page_load { f('#take_quiz_link').click }
+    sleep 1 # In this case the UI updates on a timer, not an ajax callback
   end
 
   context 'restrict access code' do
@@ -20,19 +21,18 @@ describe 'quiz restrictions as a student' do
       @quiz.save!
     end
 
-    def submit_quiz_access_code(access_code)
+    it 'should require an access code', priority: "1", test_id: 345735 do
       begin_taking_quiz
-      f('#quiz_access_code').send_keys(access_code)
-      expect_new_page_load { f('button.btn').click }
+      expect(fj("input[type=password][name= 'access_code']")).to be_present
     end
 
-    it 'should allow you to enter in a correct access token password to view the quiz', priority: "1", test_id: 345734 do
-      submit_quiz_access_code(@password)
+    it 'should allow you to enter a correct access token password to view the quiz', priority: "1", test_id: 345734 do
+      begin_quiz(@password)
       expect(f('.quiz-header')).to include_text 'Quiz Instructions'
     end
 
-    it 'should not allow you to enter in a incorrect access token password to view the quiz', priority: "1", test_id: 338079 do
-      submit_quiz_access_code('lechuck')
+    it 'should not allow you to enter an incorrect access token password to view the quiz', priority: "1", test_id: 338079 do
+      begin_quiz('lechuck')
       expect(f('#quiz_access_code').text).to eq ''
     end
   end
@@ -49,7 +49,9 @@ describe 'quiz restrictions as a student' do
 
     it 'should not be accessible from invalid ip address', priority: "1", test_id: 338081 do
       begin_taking_quiz
-      expect(f('#content')).to include_text 'This quiz is protected and is only available from certain locations'
+      expect(f('#content').text).to include_text 'This quiz is protected and is only available from certain locations.'\
+                  ' The computer you are currently using does not appear to be at a valid location for taking this quiz.'
+      expect(f('#submit_quiz_form')).to be_nil
     end
   end
 end

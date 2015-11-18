@@ -28,7 +28,7 @@ describe "quizzes section hierarchy" do
     @override.save!
   end
 
-  def take_quiz
+  def take_hierarchy_quiz
     get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
     expect_new_page_load{f('#take_quiz_link').click}
     # make sure it does not create a blank submissions
@@ -52,7 +52,7 @@ describe "quizzes section hierarchy" do
       it "should allow the student to take the quiz", priority: "1", test_id: 282619 do
         # ensure student is able to take the quiz and it does not create a blank submission
         user_session(@student)
-        take_quiz
+        take_hierarchy_quiz
       end
 
       it "should allow the teacher to preview the quiz", priority: "1", test_id: 282838 do
@@ -68,7 +68,7 @@ describe "quizzes section hierarchy" do
       @override.unlock_at = Time.zone.now.advance(days:-1)
       @override.lock_at = Time.zone.now.advance(days:4)
       user_session(@student)
-      take_quiz
+      take_hierarchy_quiz
     end
     end
 
@@ -82,19 +82,19 @@ describe "quizzes section hierarchy" do
 
       it "should still be accessible for student in the section after term end date", priority: "1", test_id: 323087 do
         user_session(@student)
-        take_quiz
+        take_hierarchy_quiz
       end
 
       it "should be accessible for teachers enrolled in section after term end date", priority: "1", test_id: 323089 do
         teacher_in_section(@new_section, user: @teacher)
-        take_quiz
+        take_hierarchy_quiz
       end
 
       it "should work with lock and unlock dates set up", priority: "1", test_id: 323090 do
         @override.unlock_at = Time.zone.now.advance(days:-1)
         @override.lock_at = Time.zone.now.advance(days:4)
         user_session(@student)
-        take_quiz
+        take_hierarchy_quiz
       end
     end
   end

@@ -22,7 +22,7 @@ describe "quiz taking" do
     expect(f('#take_quiz_link')).to be_nil
   end
 
-  it "should show a prompt wehn attempting to submit with unanswered questions", priority: "1", test_id: 140608 do
+  it "should show a prompt when attempting to submit with unanswered questions", priority: "1", test_id: 140608 do
     get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
     expect_new_page_load{f('#take_quiz_link').click}
     # answer just one question
@@ -40,50 +40,6 @@ describe "quiz taking" do
     keep_trying_until do
       expect(f('.quiz-submission .quiz_score .score_value')).to be_displayed
     end
-  end
-
-  context "quiz with access code" do
-     before :each do
-       @quiz.access_code = "12345"
-       @quiz.save!
-       get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
-       expect_new_page_load{f('#take_quiz_link').click}
-     end
-
-     it "should ask for access code for a quiz with access code restrictions", priority: "1", test_id: 345735 do
-       expect(fj("input[type=password][name= 'access_code']")).to be_present
-     end
-
-     it "should not redirect to quiz taking page with incorrect access code", priority: "1", test_id: 338079 do
-       expect(fj("input[type=password][name= 'access_code']")).to be_present
-       fj("input[type=password][name= 'access_code']").send_keys('abcde')
-       fj("button[type=submit]").click
-       wait_for_ajaximations
-       expect(fj("input[type=password][name= 'access_code']")).to be_present
-     end
-
-     it "should redirect to quiz taking page with correct access code", priority: "1", test_id: 345734 do
-       expect(fj("input[type=password][name= 'access_code']")).to be_present
-       fj("input[type=password][name= 'access_code']").send_keys('12345')
-       fj("button[type=submit]").click
-       wait_for_ajaximations
-       expect(driver.current_url).to include_text("/courses/#{@course.id}/quizzes/#{@quiz.id}/take")
-       expect(f("#content .quiz-header").text).to include('Test Quiz')
-       expect(f('#submit_quiz_form')).to be_present
-       # This is to prevent selenium from freezing when leaving the page
-       fln('Quizzes').click
-       driver.switch_to.alert.accept
-     end
-  end
-
-  it "should restrict blacklisted ip addresses", priority: "1", test_id: 338081 do
-    @quiz.ip_filter = "104.0.9.248"
-    @quiz.save!
-    get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
-    expect_new_page_load{f('#take_quiz_link').click}
-    expect(f('#content').text).to include("This quiz is protected and is only available from certain locations."\
-                " The computer you are currently using does not appear to be at a valid location for taking this quiz.")
-    expect(f('#submit_quiz_form')).to be_nil
   end
 
   it "should not restrict whitelisted ip addresses", priority: "1", test_id: 338082 do

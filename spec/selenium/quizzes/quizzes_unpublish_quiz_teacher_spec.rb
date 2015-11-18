@@ -18,7 +18,7 @@ describe 'unpublishing a quiz on the quiz show page' do
     end
 
     context 'before the ajax calls finish' do
-      it 'temporarily changes the button text to |Unpublishing...|', priority: "1", test_id: 398935 do
+      it 'temporarily changes the button text to |Unpublishing...|', priority: "1", test_id: 401339 do
         unpublish_quiz_via_ui(wait_for_ajaximations: false)
         expect(fj('.publish-text', '#quiz-publish-link').text).to include_text 'Unpublishing...'
       end
