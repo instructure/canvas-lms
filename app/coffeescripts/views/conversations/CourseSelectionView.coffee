@@ -38,9 +38,7 @@ define [
         if @options.courses.favorites.get(course.id) then return
         if course.get('access_restricted_by_date') then return
 
-        is_complete = course.get('workflow_state') == 'completed'
-        if course.get('end_at') then is_complete ||= (new Date(course.get('end_at')) < now)
-        if course.get('term') then is_complete ||= (new Date(course.get('term').end_at) < now)
+        is_complete = @is_complete(course, now)
 
         collection = if is_complete then concluded else more
         collection.push(course.toJSON())
@@ -58,6 +56,13 @@ define [
       @getAriaLabel()
       @createSearchViews()
       if !@renderValue() then @loadAll()
+
+    is_complete: (course, asOf) ->
+      is_complete = course.get('workflow_state') == 'completed'
+      if course.get('end_at') then is_complete ||= (new Date(course.get('end_at')) < asOf)
+      if course.get('term') && course.get('term').end_at
+        is_complete ||= (new Date(course.get('term').end_at) < asOf)
+      is_complete
 
     createSearchViews: ->
       searchViews = []
