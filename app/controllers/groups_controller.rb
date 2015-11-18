@@ -135,7 +135,7 @@ require 'atom'
 #
 class GroupsController < ApplicationController
   before_filter :get_context
-  before_filter :require_user, :only => %w[index]
+  before_filter :require_user, :only => %w[index accept_invitation]
 
   include Api::V1::Attachment
   include Api::V1::Group
@@ -600,7 +600,6 @@ class GroupsController < ApplicationController
   end
 
   def accept_invitation
-    require_user
     find_group
     @membership = @group.group_memberships.where(:uuid => params[:uuid]).first if @group
     @membership.accept! if @membership.try(:invited?)

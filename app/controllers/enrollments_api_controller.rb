@@ -176,6 +176,7 @@
 #
 class EnrollmentsApiController < ApplicationController
   before_filter :get_course_from_section, :require_context
+  before_filter :require_user
 
   @@errors = {
     :missing_parameters                => 'No parameters given',
@@ -291,7 +292,6 @@ class EnrollmentsApiController < ApplicationController
   # @returns Enrollment
 
   def show
-    render_unauthorized_action and return false unless @current_user
     enrollment = Enrollment.find(params[:id])
     if enrollment.user_id == @current_user.id || enrollment.root_account == @context && authorized_action(@context, @current_user, [:read_roster])
       #render enrollment object if requesting user is the current_user or user is authorized to read enrollment.
@@ -442,13 +442,7 @@ class EnrollmentsApiController < ApplicationController
       render(:json => @enrollment.errors, :status => :bad_request)
   end
 
-  def render_create_errors(errors)
-    render json: {message: errors.join(', ')}, status: 403
-  end
-
   def create_self_enrollment
-    require_user
-
     options = params[:enrollment]
     code = options[:self_enrollment_code]
     # we don't just do a straight-up comparison of the code, since
@@ -650,5 +644,9 @@ class EnrollmentsApiController < ApplicationController
     end
 
     [ clauses.join(' AND '), replacements ]
+  end
+
+  def render_create_errors(errors)
+    render json: {message: errors.join(', ')}, status: 403
   end
 end
