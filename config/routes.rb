@@ -1123,6 +1123,7 @@ CanvasRails::Application.routes.draw do
 
       get 'users/self/todo', action: :todo_items
       get 'users/self/upcoming_events', action: :upcoming_events
+      get 'users/:user_id/missing_submissions', action: :missing_submissions
 
       delete 'users/self/todo/:asset_string/:purpose', action: :ignore_item, as: 'users_todo_ignore'
       post 'accounts/:account_id/users', action: :create

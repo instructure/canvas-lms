@@ -1457,7 +1457,7 @@ class User < ActiveRecord::Base
       if opts[:contexts]
         course_ids = Array(opts[:contexts]).map(&:id) & course_ids
       end
-      opts = {limit: 15}.merge(opts.slice(:due_after, :limit))
+      opts = {limit: 15}.merge(opts.slice(:due_after, :due_before, :limit))
 
       Rails.cache.fetch([self, "assignments_needing_#{purpose}", course_ids, opts].cache_key, :expires_in => expires_in) do
         result = Shackles.activate(:slave) do
@@ -1473,17 +1473,18 @@ class User < ActiveRecord::Base
   end
 
   def assignments_needing_submitting(opts={})
-    assignments_needing('submitting', :student, 15.minutes, opts) do |assignment_scope, opts|
-      due_after = opts[:due_after] || 4.weeks.ago
+    assignments_needing('submitting', :student, 15.minutes, opts) do |assignment_scope, options|
+      due_after = options[:due_after] || 4.weeks.ago
+      due_before = options[:due_before] || 1.week.from_now
 
-      courses = Course.find(opts[:shard_course_ids])
+      courses = Course.find(options[:shard_course_ids])
       courses_with_da = courses.select{|c| c.feature_enabled?(:differentiated_assignments)}
       assignments = assignment_scope.
         filter_by_visibilities_in_given_courses(self.id, courses_with_da.map(&:id)).
         published.
-        due_between_with_overrides(due_after, 1.week.from_now).
+        due_between_with_overrides(due_after, due_before).
         expecting_submission.
-        need_submitting_info(id, opts[:limit]).
+        need_submitting_info(id, options[:limit]).
         not_locked
       select_available_assignments(assignments)
     end

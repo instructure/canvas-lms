@@ -867,6 +867,28 @@ class UsersController < ApplicationController
     end
   end
 
+  # @API List Missing Submissions
+  # returns past-due assignments for which the student does not have a submission.
+  # The user sending the request must either be an admin or a parent observer using the parent app
+  #
+  # @argument user_id
+  #   the student's ID
+  #
+  # @returns [Assignment]
+  def missing_submissions
+    user = api_find(User, params[:user_id])
+    return render_unauthorized_action unless @current_user && user.grants_right?(@current_user, :read)
+
+    assignments = []
+    Shackles.activate(:slave) do
+      preloaded_submitted_assignment_ids = user.submissions.pluck(:assignment_id)
+      assignments = user.assignments_needing_submitting due_before: Time.zone.now
+      assignments.reject {|as| preloaded_submitted_assignment_ids.include? as.id }
+    end
+
+    render json: assignments.map {|as| assignment_json(as, user, session) }
+  end
+
   def ignore_item
     unless %w[grading submitting reviewing moderation].include?(params[:purpose])
       return render(:json => { :ignored => false }, :status => 400)
