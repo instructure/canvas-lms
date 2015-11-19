@@ -16,7 +16,7 @@ define([
       return (
         <div>
           {!!avatar_image_url &&
-          <span className="ic-avatar" style={{width: 30, height: 30, margin: "-1px 10px 1px 0"}}>
+          <span className="ic-avatar" style={{width: 25, height: 25, margin: "-1px 10px 1px 0"}}>
               <img src={avatar_image_url} />
             </span>
           }

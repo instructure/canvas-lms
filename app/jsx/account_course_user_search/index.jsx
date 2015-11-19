@@ -20,7 +20,8 @@ define([
     propTypes: {
       accountId: string.isRequired,
       permissions: shape({
-        theme_editor: bool.isRequired
+        theme_editor: bool.isRequired,
+        analytics: bool.isRequired
       }).isRequired
     },
 
@@ -68,10 +69,10 @@ define([
             </div>
             <div className="col-xs-4 padding-none align-right">
               <div>
-                {/* TODO: figure out a way for plugins to inject stuff like
-                  <a href="" className="btn button-group">{I18n.t("Analytics")}</a>
-                  w/o defining them here
-                  */}
+                {
+                  permissions.analytics &&
+                  <a href={`/accounts/${accountId}/analytics`} className="btn button-group">{I18n.t("Analytics")}</a>
+                }
                 {
                   permissions.theme_editor &&
                   <a href={`/accounts/${accountId}/theme_editor`} className="btn button-group">{I18n.t("Theme Editor")}</a>

@@ -11,36 +11,39 @@ define([
     propTypes: {
       courses: arrayOf(shape(CoursesListRow.propTypes)).isRequired
     },
-
     render() {
       var { courses } = this.props;
 
       return (
-        <div className="pad-box no-sides">
-          <table className="ic-Table courses-list">
-            <thead>
-              <tr>
-                <th />
-                <th>
-                  {I18n.t("Course ID")}
-                </th>
-                <th>
-                  {I18n.t("SIS ID")}
-                </th>
-                <th>
-                  {I18n.t("Teacher")}
-                </th>
-                <th>
-                  {I18n.t("Enrollments")}
-                </th>
-                <th />
-              </tr>
-            </thead>
 
-            <tbody>
-              {courses.map((course) => <CoursesListRow key={course.id} {...course} />)}
-            </tbody>
-          </table>
+        <div className="content-box" role='grid'>
+          <div role='row' className="grid-row border border-b pad-box-mini">
+            <div className="col-md-3">
+              <div className="grid-row">
+                <div className="col-xs-2">
+                </div>
+                <div className="col-xs-10" role='columnheader'>
+                  <strong><small>{I18n.t("Course")}</small></strong>
+                </div>
+              </div>
+            </div>
+            <div role='columnheader' className="col-xs-1">
+              <strong><small>{I18n.t("SIS ID")}</small></strong>
+            </div>
+            <div role='columnheader' className="col-md-3">
+              <strong><small>{I18n.t("Teacher")}</small></strong>
+            </div>
+            <div role='columnheader' className="col-md-3">
+              <strong><small>{I18n.t("Enrollments")}</small></strong>
+            </div>
+            <div role='columnheader' className="col-md-2">
+              <span className='screenreader-only'>{I18n.t("Course option links")}</span>
+            </div>
+          </div>
+
+          <div className='courses-list' role='rowgroup'>
+            {courses.map((course) => <CoursesListRow key={course.id} {...course} />)}
+          </div>
         </div>
       );
     }
