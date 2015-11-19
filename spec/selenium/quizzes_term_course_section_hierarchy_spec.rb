@@ -96,6 +96,15 @@ describe "quizzes section hierarchy" do
         user_session(@student)
         take_hierarchy_quiz
       end
+
+      it "should not be accessible for student in the main section", priority: "1", test_id: 350077 do
+        student1 = user_with_pseudonym(username: 'student1@example.com', active_all: 1)
+        student_in_course(course: @course, user: student1)
+        user_session(student1)
+        get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
+        expect(f('#quiz_show .quiz-header .lock_explanation').text).
+            to include('This quiz is no longer available as the course has been concluded')
+      end
     end
   end
 
@@ -150,6 +159,14 @@ describe "quizzes section hierarchy" do
       end
 
       it "should still allow teachers to take the quiz", priority: "1", test_id: 323328 do
+        verify_quiz_accessible
+      end
+
+      it "should allow students in the main section to take the quiz", priority: "1", test_id: 350075 do
+        student1 = user_with_pseudonym(username: 'student1@example.com', active_all: 1)
+        enrollment = student_in_course(course: @course, user: student1)
+        enrollment.accept!
+        user_session(student1)
         verify_quiz_accessible
       end
     end
