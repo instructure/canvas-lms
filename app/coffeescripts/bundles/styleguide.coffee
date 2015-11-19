@@ -23,18 +23,24 @@ require [
 
 
     # React Modal
-    React.renderComponent(
-      ReactModalExample
-        className: 'ReactModal__Content--canvas'
-        overlayClassName: 'ReactModal__Overlay--canvas'
+    React.render(
+      React.createElement(
+        ReactModalExample, {
+          className: 'ReactModal__Content--canvas',
+          overlayClassName: 'ReactModal__Overlay--canvas'
+        }
+      )
     , document.getElementById('react-modal-example')
     );
 
-    React.renderComponent(
-      ReactModalExample
-        label: 'Trigger Confirm Dialog'
-        className: 'ReactModal__Content--canvas ReactModal__Content--mini-modal'
-        overlayClassName: 'ReactModal__Overlay--canvas'
+    React.render(
+      React.createElement(
+        ReactModalExample, {
+          label: 'Trigger Confirm Dialog',
+          className: 'ReactModal__Content--canvas ReactModal__Content--mini-modal',
+          overlayClassName: 'ReactModal__Overlay--canvas'
+        }
+      )
     , document.getElementById('react-modal-confirm-example')
     )
 
