@@ -653,7 +653,7 @@ class FilesController < ApplicationController
       redirect_to safe_domain_file_url(attachment, @safer_domain_host, params[:verifier], !inline)
     elsif Attachment.local_storage?
       @headers = false if @files_domain
-      send_file(attachment.full_filename, :type => attachment.content_type_with_encoding, :disposition => (inline ? 'inline' : 'attachment'))
+      send_file(attachment.full_filename, :type => attachment.content_type_with_encoding, :disposition => (inline ? 'inline' : 'attachment'), :filename => attachment.display_name)
     elsif redirect_to_s3
       redirect_to(inline ? attachment.inline_url : attachment.download_url)
     else
