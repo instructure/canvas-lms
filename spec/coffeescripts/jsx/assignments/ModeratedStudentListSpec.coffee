@@ -29,6 +29,25 @@ define [
   }
 
   module 'ModeratedStudentList',
+  test 'only shows the next speedgrader link when in moderation set', ->
+    newFakeStudentList = _.extend({}, fakeStudentList)
+    newFakeStudentList.students[0].in_moderation_set = true
+    studentList = TestUtils.renderIntoDocument(React.createElement(ModeratedStudentList,
+        urls: {assignment_speedgrader_url: 'blah'},
+        includeModerationSetColumns: true,
+        studentList: newFakeStudentList,
+        assignment: {published: true},
+        handleCheckbox: () => 'stub',
+        onSelectProvisionalGrade: () => 'stub'
+      )
+    )
+    moderatedColumns = TestUtils.scryRenderedDOMComponentsWithClass(studentList, 'ModeratedAssignmentList__Mark')
+    columns = TestUtils.scryRenderedDOMComponentsWithClass(studentList, 'AssignmentList__Mark')
+    equal moderatedColumns[0].getDOMNode().querySelectorAll('span')[1].textContent, '4', 'displays the grade in the first column'
+    equal moderatedColumns[1].getDOMNode().querySelectorAll('span')[1].textContent, 'SpeedGrader™', 'displays speedgrader link in the second'
+    equal columns[0].getDOMNode().querySelectorAll('span')[1].textContent, '-', 'third column is a dash'
+    React.unmountComponentAtNode(studentList.getDOMNode().parentNode)
+
   test 'show a dash in in the first column when not in the moderation set', ->
     newFakeStudentList = _.extend({}, fakeStudentList)
     studentList = TestUtils.renderIntoDocument(React.createElement(ModeratedStudentList,
@@ -41,7 +60,7 @@ define [
       )
     )
     columns = TestUtils.scryRenderedDOMComponentsWithClass(studentList, 'AssignmentList__Mark')
-    equal columns[0].getDOMNode().textContent, '-', 'shows a dash for non moderation set students'
+    equal columns[0].getDOMNode().querySelectorAll('span')[1].textContent, '-', 'shows a dash for non moderation set students'
     React.unmountComponentAtNode(studentList.getDOMNode().parentNode)
 
   test 'only shows one column when includeModerationSetHeaders is false', ->
@@ -72,8 +91,7 @@ define [
     )
 
     gradeColumns = TestUtils.scryRenderedDOMComponentsWithClass(studentList, 'AssignmentList_Grade')
-
-    equal gradeColumns[0].props.children, 4
+    equal gradeColumns[0].props.children[1].props.children, 4
     React.unmountComponentAtNode(studentList.getDOMNode().parentNode)
 
   module 'Persist provisional grades',
