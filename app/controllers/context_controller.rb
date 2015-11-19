@@ -273,7 +273,8 @@ class ContextController < ApplicationController
   def roster_user_usage
     if authorized_action(@context, @current_user, :read_reports)
       @user = @context.users.find(params[:user_id])
-      @accesses = AssetUserAccess.for_user(@user).for_context(@context).most_recent
+      contexts = [@context] + @user.group_memberships_for(@context).to_a
+      @accesses = AssetUserAccess.for_user(@user).polymorphic_where(:context => contexts).most_recent
       respond_to do |format|
         format.html do
           @accesses = @accesses.paginate(page: params[:page], per_page: 50)

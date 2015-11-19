@@ -357,6 +357,7 @@ class FilesController < ApplicationController
         :FILES_CONTEXTS => files_contexts,
         :NEW_FOLDER_TREE => @context.feature_enabled?(:use_new_tree)
       })
+      log_asset_access([ "files", @context ], "files", "other")
 
       render :text => "".html_safe, :layout => true
     end

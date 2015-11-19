@@ -142,10 +142,67 @@ class AssetUserAccess < ActiveRecord::Base
   def readable_name
     if self.asset_code && self.asset_code.match(/\:/)
       split = self.asset_code.split(/\:/)
-      if split[1] == self.context_code
-        # TODO: i18n
-        title = split[0] == "topics" ? "Discussions" : split[0].titleize
-        "#{self.context_type} #{title}"
+
+      if split[1].match(/course_\d+/)
+        case split[0]
+        when "announcements"
+          t("Course Announcements")
+        when "assignments"
+          t("Course Assignments")
+        when "calendar_feed"
+          t("Course Calendar")
+        when "collaborations"
+          t("Course Collaborations")
+        when "conferences"
+          t("Course Conferences")
+        when "files"
+          t("Course Files")
+        when "grades"
+          t("Course Grades")
+        when "home"
+          t("Course Home")
+        when "modules"
+          t("Course Modules")
+        when "outcomes"
+          t("Course Outcomes")
+        when "pages"
+          t("Course Pages")
+        when "quizzes"
+          t("Course Quizzes")
+        when "roster"
+          t("Course People")
+        when "speed_grader"
+          t("SpeedGrader")
+        when "syllabus"
+          t("Course Syllabus")
+        when "topics"
+          t("Course Discussions")
+        else
+          "Course #{split[0].titleize}"
+        end
+      elsif (match = split[1].match(/group_(\d+)/)) && (group = Group.where(:id => match[1]).first)
+        case split[0]
+        when "announcements"
+          t("%{group_name} - Group Announcements", :group_name => group.name)
+        when "calendar_feed"
+          t("%{group_name} - Group Calendar", :group_name => group.name)
+        when "collaborations"
+          t("%{group_name} - Group Collaborations", :group_name => group.name)
+        when "conferences"
+          t("%{group_name} - Group Conferences", :group_name => group.name)
+        when "files"
+          t("%{group_name} - Group Files", :group_name => group.name)
+        when "home"
+          t("%{group_name} - Group Home", :group_name => group.name)
+        when "pages"
+          t("%{group_name} - Group Pages", :group_name => group.name)
+        when "roster"
+          t("%{group_name} - Group People", :group_name => group.name)
+        when "topics"
+          t("%{group_name} - Group Discussions", :group_name => group.name)
+        else
+          "#{group.name} - Group #{split[0].titleize}"
+        end
       else
         self.display_name
       end
