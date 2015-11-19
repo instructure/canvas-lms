@@ -1,10 +1,11 @@
 define([
   'react',
+  'react-dom',
   'underscore',
   'i18n!external_tools',
   'jsx/due_dates/DueDateCalendarPicker',
   'jsx/shared/helpers/accessibleDateFormat'
-], function(React, _, I18n, DueDateCalendarPicker, accessibleDateFormat) {
+], function(React, ReactDOM, _, I18n, DueDateCalendarPicker, accessibleDateFormat) {
   const types = React.PropTypes;
 
   const buildPeriod = function(attr) {
@@ -37,7 +38,7 @@ define([
 
     componentDidMount: function() {
       this.hackTheDatepickers();
-      React.findDOMNode(this.refs.title).focus();
+      this.refs.title.focus();
     },
 
     render: function() {
@@ -155,7 +156,7 @@ define([
 
     hackTheDatepickers: function() {
       // This can be replaced when we have an extensible datepicker
-      let $form = React.findDOMNode(this);
+      let $form = ReactDOM.findDOMNode(this);
       let $appends = $form.querySelectorAll('.input-append');
       Array.prototype.forEach.call($appends, function($el) {
         $el.classList.add('ic-Input-group');

@@ -1,4 +1,4 @@
-![](https://travis-ci.org/instructure/react-tokeninput.svg?branch=master)
+![](https://travis-ci.org/instructure-react/react-tokeninput.svg?branch=master)
 
 ![](http://i.imgur.com/aboKyTx.png)
 

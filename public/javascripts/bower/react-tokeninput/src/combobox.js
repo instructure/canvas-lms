@@ -2,7 +2,7 @@ var React = require('react');
 var guid = 0;
 var k = function(){};
 var addClass = require('./add-class');
-var ComboboxOption = React.createFactory(require('./option'));
+var ComboboxOption = require('./option');
 
 var div = React.createFactory('div');
 var span = React.createFactory('span');
@@ -33,7 +33,12 @@ module.exports = React.createClass({
      * function(selectedValue){}
      * ```
     */
-    onSelect: React.PropTypes.func
+    onSelect: React.PropTypes.func,
+
+    /**
+     * Shown when the combobox is empty.
+    */
+    placeholder: React.PropTypes.string
   },
 
   getDefaultProps: function() {
@@ -67,13 +72,20 @@ module.exports = React.createClass({
   },
 
   componentWillMount: function() {
-    this.setState({menu: this.makeMenu()});
+    this.setState({menu: this.makeMenu(this.props.children)});
   },
 
   componentWillReceiveProps: function(newProps) {
     this.setState({menu: this.makeMenu(newProps.children)}, function() {
-      if(newProps.children.length && (this.isOpen || document.activeElement === this.refs.input.getDOMNode())) {
-        this.showList();
+      if(newProps.children.length && (this.isOpen || document.activeElement === this.refs.input)) {
+        if(!this.state.menu.children.length) {
+          return
+        }
+        this.setState({
+          isOpen: true
+        }, function() {
+          this.refs.list.scrollTop = 0;
+        }.bind(this))
       } else {
         this.hideList();
       }
@@ -89,31 +101,35 @@ module.exports = React.createClass({
   makeMenu: function(children) {
     var activedescendant;
     var isEmpty = true;
-    children = children || this.props.children;
 
     // Should this instead use React.addons.cloneWithProps or React.cloneElement?
-    React.Children.forEach(children, function(child, index) {
-      if (child.type !== ComboboxOption.type)
+    var _children = React.Children.map(children, function(child, index) {
+      // console.log(child.type, ComboboxOption.type)
+      if (child.type !== ComboboxOption) {
         // allow random elements to live in this list
-        return;
+        return child;
+      }
       isEmpty = false;
       // TODO: cloneWithProps and map instead of altering the children in-place
       var props = child.props;
-      if (this.state.value === props.value) {
+      var newProps = {};
+      if (this.state.value === child.props.value) {
         // need an ID for WAI-ARIA
-        props.id = props.id || 'ic-tokeninput-selected-'+(++guid);
-        props.isSelected = true
+        newProps.id = props.id || 'ic-tokeninput-selected-'+(++guid);
+        newProps.isSelected = true
         activedescendant = props.id;
       }
-      props.onBlur = this.handleOptionBlur;
-      props.onClick = this.selectOption.bind(this, child);
-      props.onFocus = this.handleOptionFocus;
-      props.onKeyDown = this.handleOptionKeyDown.bind(this, child);
-      props.onMouseEnter = this.handleOptionMouseEnter.bind(this, index);
+      newProps.onBlur = this.handleOptionBlur;
+      newProps.onClick = this.selectOption.bind(this, child);
+      newProps.onFocus = this.handleOptionFocus;
+      newProps.onKeyDown = this.handleOptionKeyDown.bind(this, child);
+      newProps.onMouseEnter = this.handleOptionMouseEnter.bind(this, index);
+
+      return React.cloneElement(child, newProps);
     }.bind(this));
 
     return {
-      children: children,
+      children: _children,
       activedescendant: activedescendant,
       isEmpty: isEmpty
     };
@@ -140,8 +156,8 @@ module.exports = React.createClass({
     }, cb);
   },
 
-  handleInputChange: function(event) {
-    var value = this.refs.input.getDOMNode().value;
+  handleInputChange: function() {
+    var value = this.refs.input.value;
     this.clearSelectedState(function() {
       this.props.onInput(value);
     }.bind(this));
@@ -215,19 +231,20 @@ module.exports = React.createClass({
   },
 
   focusInput: function() {
-    this.refs.input.getDOMNode().focus();
+    this.refs.input.focus();
   },
 
   selectInput: function() {
-    this.refs.input.getDOMNode().select();
+    this.refs.input.select();
   },
 
   inputKeydownMap: {
-    8: 'removeLastToken',
-    13: 'selectOnEnter',
-    27: 'hideOnEscape',
-    38: 'focusPrevious',
-    40: 'focusNext'
+    8: 'removeLastToken', // delete
+    13: 'selectOnEnter', // enter
+    188: 'selectOnEnter', // comma
+    27: 'hideOnEscape', // escape
+    38: 'focusPrevious', // up arrow
+    40: 'focusNext' // down arrow
   },
 
   optionKeydownMap: {
@@ -291,15 +308,15 @@ module.exports = React.createClass({
       if (options.focus !== false)
         this.selectInput();
     }.bind(this));
-    this.refs.input.getDOMNode().value = '' // added
+    this.refs.input.value = '' // added
   },
 
   selectText: function() {
-    var value = this.refs.input.getDOMNode().value;
+    var value = this.refs.input.value;
     if(!value) return;
     this.props.onSelect(value);
     this.clearSelectedState();
-    this.refs.input.getDOMNode().value = '' // added
+    this.refs.input.value = '' // added
   },
 
   focusNext: function(event) {
@@ -311,7 +328,7 @@ module.exports = React.createClass({
   },
 
   removeLastToken: function() {
-    if(this.props.onRemoveLast && !this.refs.input.getDOMNode().value) {
+    if(this.props.onRemoveLast && !this.refs.input.value) {
       this.props.onRemoveLast()
     }
     return true
@@ -364,13 +381,14 @@ module.exports = React.createClass({
 
   focusOption: function() {
     var index = this.state.focusedIndex;
-    this.refs.list.getDOMNode().childNodes[index].focus();
+    this.refs.list.childNodes[index].focus();
   },
 
   render: function() {
     var ariaLabel = this.props['aria-label'] || 'Start typing to search. ' +
       'Press the down arrow to navigate results. If you don\'t find an ' +
-      'acceptable option, you can enter an alternative.'
+      'acceptable option, you can input an alternative. Once you find or ' +
+      'input the tag you want, press Enter or Comma to add it.'
 
     return div({className: this.getClassName()},
       this.props.value,
@@ -386,6 +404,7 @@ module.exports = React.createClass({
         'aria-autocomplete': 'list',
         'aria-owns': this.state.listId,
         id: this.props.id,
+        disabled: this.props.isDisabled,
         className: 'ic-tokeninput-input',
         onFocus: this.handleInputFocus,
         onClick: this.handleInputClick,
@@ -393,6 +412,7 @@ module.exports = React.createClass({
         onBlur: this.handleInputBlur,
         onKeyDown: this.handleKeydown,
         onKeyUp: this.handleInputKeyUp,
+        placeholder: this.props.placeholder,
         role: 'combobox'
       }),
       span({

@@ -1,9 +1,10 @@
 define [
-  'react'
+  'react',
+  'react-dom',
   'jsx/assignments/ModeratedStudentList'
   'jsx/assignments/constants'
   'underscore'
-], (React, ModeratedStudentList, Constants, _) ->
+], (React, ReactDOM, ModeratedStudentList, Constants, _) ->
   TestUtils = React.addons.TestUtils
   fakeStudentList = {students:
     [
@@ -137,9 +138,10 @@ define [
       )
     )
 
-    markColumns = TestUtils.scryRenderedDOMComponentsWithClass(studentList, 'ModeratedAssignmentList__Mark')
-    equal TestUtils.scryRenderedDOMComponentsWithTag(markColumns[0], 'input').length, 0, 'does not render any radio buttons'
-    React.unmountComponentAtNode(studentList.getDOMNode().parentNode)
+    inputs = TestUtils.scryRenderedDOMComponentsWithTag(studentList, 'input')
+    radioInputs = inputs.filter((input) -> input.getDOMNode().type == 'radio')
+    equal radioInputs.length, 0, 'does not render any radio buttons'
+    React.unmountComponentAtNode(ReactDOM.findDOMNode(studentList).parentNode)
 
   test 'shows radio button if there is more than 1 provisional grade', ->
     newFakeStudentList = _.extend({}, fakeStudentList)
@@ -184,9 +186,15 @@ define [
     })
     newFakeStudentList.students[0].in_moderation_set = true
     callback = sinon.spy()
-    studentList = TestUtils.renderIntoDocument(React.createElement(ModeratedStudentList, onSelectProvisionalGrade: callback, urls: {provisional_grades_base_url: 'blah'}, includeModerationSetColumns: true, studentList: newFakeStudentList, assignment: {published: false},handleCheckbox: () => 'stub' ))
-    mark1Radio = TestUtils.scryRenderedDOMComponentsWithClass(studentList, 'ModeratedAssignmentList__Mark')
-    radio = TestUtils.scryRenderedDOMComponentsWithTag(mark1Radio[0], 'input')
-    TestUtils.Simulate.change(radio[0].getDOMNode())
+    studentList = TestUtils.renderIntoDocument(React.createElement(ModeratedStudentList, {
+      onSelectProvisionalGrade: callback,
+      urls: {provisional_grades_base_url: 'blah'},
+      includeModerationSetColumns: true,
+      studentList: newFakeStudentList,
+      assignment: {published: false},
+      handleCheckbox: () => 'stub'
+    }))
+    radio = TestUtils.scryRenderedDOMComponentsWithTag(studentList, 'input').filter((domComponent) -> domComponent.type == 'radio')
+    TestUtils.Simulate.change(radio[0])
     ok callback.called, 'called selectProvisionalGrade'
     React.unmountComponentAtNode(studentList.getDOMNode().parentNode)

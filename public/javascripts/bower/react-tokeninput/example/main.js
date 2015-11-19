@@ -1,4 +1,5 @@
 var React = require('react')
+var ReactDOM = require('react-dom')
 var TokenInput = require('../index')
 var ComboboxOption = require('../index').Option
 
@@ -9,6 +10,8 @@ var names = require('./names')
 var App = React.createClass({
   getInitialState: function() {
     return {
+      input: '',
+      loading: false,
       selected: [],
       options: names
     };
@@ -40,17 +43,33 @@ var App = React.createClass({
   },
 
   handleInput: function(userInput) {
-    // this.setState({selectedStateId: null});
-    this.filterTags(userInput);
+    this.setState({
+      input: userInput,
+      loading: true,
+      options: []
+    })
+    setTimeout(function () {
+      this.filterTags(this.state.input)
+      this.setState({
+        loading: false
+      })
+    }.bind(this), 500)
   },
 
   filterTags: function(userInput) {
     if (userInput === '')
       return this.setState({options: []});
     var filter = new RegExp('^'+userInput, 'i');
-    this.setState({options: names.filter(function(state) {
-      return filter.test(state.name) || filter.test(state.id);
-    })});
+    var filteredNames = names.filter(function(state) {
+      return filter.test(state.name); // || filter.test(state.id);
+    }).filter(function(state) {
+      return this.state.selected
+        .map(function(value) { return value.name })
+        .indexOf(state.name) === -1
+    }.bind(this))
+    this.setState({
+      options: filteredNames
+    });
   },
 
   renderComboboxOptions: function() {
@@ -65,33 +84,40 @@ var App = React.createClass({
   },
 
   render: function() {
-    var selectedFlavors = this.state.selected.map(function(tag) {
+    var selectedNames = this.state.selected.map(function(tag) {
       return <li key={tag.id}>{tag.name}</li>
     })
 
-
     var options = this.state.options.length ?
       this.renderComboboxOptions() : [];
+
+    const loadingComponent = (
+      <img src='spinner.gif' />
+    )
 
     return (
       <div>
         <h1>React TokenInput Example</h1>
 
         <TokenInput
+            isLoading={this.state.loading}
+            loadingComponent={loadingComponent}
+            menuContent={options}
             onChange={this.handleChange}
             onInput={this.handleInput}
             onSelect={this.handleSelect}
             onRemove={this.handleRemove}
             selected={this.state.selected}
-            menuContent={options} />
+            placeholder='Enter tokens here'
+          />
 
         <h2>Selected</h2>
         <ul>
-          {selectedFlavors}
+          {selectedNames}
         </ul>
       </div>
     );
   }
 })
 
-React.render(<App/>, document.getElementById('application'))
+ReactDOM.render(<App/>, document.getElementById('application'))

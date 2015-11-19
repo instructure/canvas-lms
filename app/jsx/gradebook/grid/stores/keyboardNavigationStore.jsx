@@ -33,7 +33,7 @@ define([
     },
 
     columnCount() {
-      return $('.fixedDataTableCell_columnResizerContainer').size();
+      return $('.fixedDataTableCellLayout_columnResizerContainer').size();
     },
 
     onConstructKeyboardNavManager() {

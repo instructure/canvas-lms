@@ -182,7 +182,7 @@ define([
     const shallowRenderer = React.addons.TestUtils.createRenderer()
     shallowRenderer.render(<ThemeEditorAccordion {...props} />)
     const vdom = shallowRenderer.getRenderOutput()
-    const rows = vdom.props.children[0][1]._store.props.children
+    const rows = vdom.props.children[0][1].props.children
     equal(rows[0].type, ColorRow, 'renders color row')
     equal(rows[1].type, ImageRow, 'renders image row')
   })

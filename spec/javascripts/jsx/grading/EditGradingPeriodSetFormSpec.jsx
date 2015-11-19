@@ -1,9 +1,10 @@
 define([
   'react',
+  'react-dom',
   'jquery',
   'underscore',
   'jsx/grading/EditGradingPeriodSetForm'
-], (React, $, _, GradingPeriodSetForm) => {
+], (React, ReactDOM, $, _, GradingPeriodSetForm) => {
   const wrapper = document.getElementById('fixtures');
   const Simulate = React.addons.TestUtils.Simulate;
 
@@ -23,11 +24,11 @@ define([
         onCancel: () => {}
       };
       const element = React.createElement(GradingPeriodSetForm, _.defaults(opts, defaults));
-      return React.render(element, wrapper);
+      return ReactDOM.render(element, wrapper);
     },
 
     teardown() {
-      React.unmountComponentAtNode(wrapper);
+      ReactDOM.unmountComponentAtNode(wrapper);
     }
   });
 

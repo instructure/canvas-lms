@@ -1,11 +1,12 @@
 define([
   'react',
+  'react-dom',
   'jquery',
   'axios',
   'underscore',
   'jsx/grading/AccountTabContainer',
   'jqueryui/tabs'
-], (React, $, axios, _, AccountTabContainer) => {
+], (React, ReactDOM, $, axios, _, AccountTabContainer) => {
   const wrapper = document.getElementById('fixtures');
 
   module("AccountTabContainer", {
@@ -21,7 +22,7 @@ define([
       };
 
       const element = React.createElement(AccountTabContainer, _.defaults(props, defaults));
-      return React.render(element, wrapper);
+      return ReactDOM.render(element, wrapper);
     },
     setup() {
       const response = {};
@@ -31,7 +32,7 @@ define([
     },
 
     teardown: function() {
-      React.unmountComponentAtNode(wrapper);
+      ReactDOM.unmountComponentAtNode(wrapper);
     }
   });
 

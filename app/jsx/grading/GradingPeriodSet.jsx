@@ -62,10 +62,6 @@ define([
     return !!state.editPeriod.id;
   };
 
-  const setFocus = function(ref) {
-    React.findDOMNode(ref).focus();
-  };
-
   const getShowGradingPeriodRef = function(period) {
     return "show-grading-period-" + period.id;
   };
@@ -124,10 +120,10 @@ define([
 
     componentDidUpdate(prevProps, prevState) {
       if (prevState.newPeriod.period && !this.state.newPeriod.period) {
-        setFocus(this.refs.addPeriodButton);
+        this.refs.addPeriodButton.focus();
       } else if (isEditingPeriod(prevState) && !isEditingPeriod(this.state)) {
         let period = { id: prevState.editPeriod.id };
-        setFocus(this.refs[getShowGradingPeriodRef(period)].refs.editButton);
+        this.refs[getShowGradingPeriodRef(period)].refs.editButton.focus();
       }
     },
 

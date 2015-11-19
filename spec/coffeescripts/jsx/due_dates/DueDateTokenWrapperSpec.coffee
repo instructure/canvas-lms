@@ -1,10 +1,11 @@
 define [
   'react'
+  'react-dom'
   'underscore'
   'jsx/due_dates/DueDateTokenWrapper'
   'jsx/due_dates/OverrideStudentStore'
   'helpers/fakeENV'
-], (React, _, DueDateTokenWrapper, OverrideStudentStore, fakeENV) ->
+], (React, ReactDOM, _, DueDateTokenWrapper, OverrideStudentStore, fakeENV) ->
 
   Simulate = React.addons.TestUtils.Simulate
   SimulateNative = React.addons.TestUtils.SimulateNative
@@ -13,7 +14,7 @@ define [
     setup: ->
       fakeENV.setup(context_asset_string = "course_1")
       @clock = sinon.useFakeTimers()
-      props =
+      @props =
         tokens: [
           {name: "Atilla", student_id: "3", type: "student"},
           {name: "Huns", course_section_id: "4", type: "section"},
@@ -40,13 +41,14 @@ define [
         currentlySearching: false
         rowKey: "nullnullnull"
 
-      DueDateTokenWrapperElement = React.createElement(DueDateTokenWrapper, props)
-      @DueDateTokenWrapper = React.render(DueDateTokenWrapperElement, $('<div>').appendTo('body')[0])
+      @mountPoint = $('<div>').appendTo('body')[0]
+      DueDateTokenWrapperElement = React.createElement(DueDateTokenWrapper, @props)
+      @DueDateTokenWrapper = ReactDOM.render(DueDateTokenWrapperElement, @mountPoint)
       @TokenInput = @DueDateTokenWrapper.refs.TokenInput
 
     teardown: ->
       @clock.restore()
-      React.unmountComponentAtNode(@DueDateTokenWrapper.getDOMNode().parentNode)
+      ReactDOM.unmountComponentAtNode(@mountPoint)
       fakeENV.teardown()
 
   test 'renders', ->
@@ -83,14 +85,20 @@ define [
     equal @DueDateTokenWrapper.optionsForMenu()[9].props.value, "Seneca The Elder"
 
   test 'handleTokenAdd is called when a token is added', ->
-    addProp = @stub(@DueDateTokenWrapper.props, "handleTokenAdd")
+    addProp = @stub(@props, "handleTokenAdd")
+    DueDateTokenWrapperElement = React.createElement(DueDateTokenWrapper, @props)
+    @DueDateTokenWrapper = ReactDOM.render(DueDateTokenWrapperElement, @mountPoint)
     @DueDateTokenWrapper.handleTokenAdd("sene")
     ok addProp.calledOnce
+    addProp.restore()
 
   test 'handleTokenRemove is called when a token is removed', ->
-    removeProp = @stub(@DueDateTokenWrapper.props, "handleTokenRemove")
+    removeProp = @stub(@props, "handleTokenRemove")
+    DueDateTokenWrapperElement = React.createElement(DueDateTokenWrapper, @props)
+    @DueDateTokenWrapper = ReactDOM.render(DueDateTokenWrapperElement, @mountPoint)
     @DueDateTokenWrapper.handleTokenRemove("sene")
     ok removeProp.calledOnce
+    removeProp.restore()
 
   test 'findMatchingOption can match a string with a token', ->
     foundToken = @DueDateTokenWrapper.findMatchingOption("sci")

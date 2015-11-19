@@ -1,10 +1,11 @@
 define([
   'react',
+  'react-dom',
   'jquery',
   'underscore',
   'compiled/api/gradingPeriodSetsApi',
   'jsx/grading/NewGradingPeriodSetForm'
-], (React, $, _, setsApi, NewSetForm) => {
+], (React, ReactDOM, $, _, setsApi, NewSetForm) => {
   const wrapper = document.getElementById('fixtures');
   const Simulate = React.addons.TestUtils.Simulate;
   const exampleSet = {
@@ -30,7 +31,7 @@ define([
         readOnly: false
       };
       const element = React.createElement(NewSetForm, _.defaults(props, defaultProps));
-      return React.render(element, wrapper);
+      return ReactDOM.render(element, wrapper);
     },
 
     stubCreateSuccess(){
@@ -46,7 +47,7 @@ define([
     },
 
     teardown() {
-      React.unmountComponentAtNode(wrapper);
+      ReactDOM.unmountComponentAtNode(wrapper);
     }
   });
 

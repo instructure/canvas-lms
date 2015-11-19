@@ -1,22 +1,23 @@
 define([
   'react',
+  'react-dom',
   'underscore',
   'axios',
   'jsx/grading/GradingPeriodSet',
   'compiled/api/gradingPeriodsApi'
-], (React, _, axios, GradingPeriodSet, gradingPeriodsApi) => {
+], (React, ReactDOM, _, axios, GradingPeriodSet, gradingPeriodsApi) => {
   const wrapper = document.getElementById('fixtures');
   const Simulate = React.addons.TestUtils.Simulate;
 
   const assertDisabled = function(component) {
-    let $el = React.findDOMNode(component);
+    let $el = ReactDOM.findDOMNode(component);
     ok($el, "expect element to exist");
     equal($el.getAttribute('aria-disabled'), 'true');
     ok(_.contains($el.classList, 'disabled'));
   };
 
   const assertEnabled = function(component) {
-    let $el = React.findDOMNode(component);
+    let $el = ReactDOM.findDOMNode(component);
     ok($el, "expect element to exist");
     equal($el.getAttribute('aria-disabled'), 'false');
     notOk(_.contains($el.classList, 'disabled'));
@@ -85,8 +86,10 @@ define([
   module("GradingPeriodSet", {
     renderComponent(opts = {}) {
       let attrs = _.extend({}, props, opts);
+      attrs.onDelete = this.stub();
+      attrs.onEdit = this.stub();
       const element = React.createElement(GradingPeriodSet, attrs);
-      return React.render(element, wrapper);
+      return ReactDOM.render(element, wrapper);
     },
 
     stubDeleteSuccess() {
@@ -96,7 +99,7 @@ define([
     },
 
     teardown() {
-      React.unmountComponentAtNode(wrapper);
+      ReactDOM.unmountComponentAtNode(wrapper);
     }
   });
 
@@ -143,29 +146,26 @@ define([
 
   test("calls the onEdit prop when the 'edit grading period set' button is clicked", function() {
     let set = this.renderComponent();
-    let onEdit = this.stub(set.props, "onEdit");
     Simulate.click(set.refs.editButton);
-    ok(onEdit.calledOnce);
-    equal(onEdit.args[0][0], set.props.set);
+    ok(set.props.onEdit.calledOnce);
+    equal(set.props.onEdit.args[0][0], set.props.set);
   });
 
   test("does not delete the set if the user cancels the delete confirmation", function() {
     this.stub(axios, "delete");
     this.stub(window, "confirm", () => false);
     let set = this.renderComponent();
-    let onDeleteStub = this.stub(set.props, "onDelete");
     Simulate.click(set.refs.deleteButton);
-    ok(onDeleteStub.notCalled);
+    ok(set.props.onDelete.notCalled);
   });
 
   asyncTest("deletes the set if the user confirms deletion", function() {
     let deletePromise = this.stubDeleteSuccess();
     this.stub(window, "confirm", () => true);
     let set = this.renderComponent();
-    let onDeleteStub = this.stub(set.props, "onDelete");
     Simulate.click(set.refs.deleteButton);
     deletePromise.then(function() {
-      ok(onDeleteStub.calledOnce);
+      ok(set.props.onDelete.calledOnce);
       start();
     });
   });
@@ -174,11 +174,11 @@ define([
     renderComponent(opts = {}) {
       let attrs = _.extend({}, props, opts);
       const element = React.createElement(GradingPeriodSet, attrs);
-      return React.render(element, wrapper);
+      return ReactDOM.render(element, wrapper);
     },
 
     teardown() {
-      React.unmountComponentAtNode(wrapper);
+      ReactDOM.unmountComponentAtNode(wrapper);
     }
   });
 
@@ -217,7 +217,7 @@ define([
     let set = this.renderComponent();
     Simulate.click(set.refs["show-grading-period-1"].refs.editButton);
     set.refs.editPeriodForm.props.onCancel();
-    let editButton = React.findDOMNode(set.refs["show-grading-period-1"].refs.editButton);
+    let editButton = ReactDOM.findDOMNode(set.refs["show-grading-period-1"].refs.editButton);
     equal(document.activeElement, editButton);
   });
 
@@ -244,7 +244,7 @@ define([
     renderComponent(opts = {}) {
       let attrs = _.extend({}, props, opts);
       const element = React.createElement(GradingPeriodSet, attrs);
-      let component = React.render(element, wrapper);
+      let component = ReactDOM.render(element, wrapper);
       Simulate.click(component.refs["show-grading-period-1"].refs.editButton);
       return component;
     },
@@ -254,7 +254,7 @@ define([
     },
 
     teardown() {
-      React.unmountComponentAtNode(wrapper);
+      ReactDOM.unmountComponentAtNode(wrapper);
     }
   });
 
@@ -264,7 +264,7 @@ define([
     let set = this.renderComponent();
     this.callOnSave(set);
     requestAnimationFrame(() => {
-      equal(set.refs.gradingPeriodList.props.children.length, 3);
+      equal(set.refs.gradingPeriodList.children.length, 3);
       start();
     });
   });
@@ -324,7 +324,7 @@ define([
     let set = this.renderComponent();
     this.callOnSave(set);
     requestAnimationFrame(() => {
-      equal(document.activeElement, React.findDOMNode(set.refs["show-grading-period-1"].refs.editButton));
+      equal(document.activeElement, ReactDOM.findDOMNode(set.refs["show-grading-period-1"].refs.editButton));
       start();
     });
   });
@@ -364,7 +364,7 @@ define([
 
     renderComponent() {
       const element = React.createElement(GradingPeriodSet, props);
-      let component = React.render(element, wrapper);
+      let component = ReactDOM.render(element, wrapper);
       Simulate.click(component.refs["show-grading-period-1"].refs.editButton);
       return component;
     },
@@ -374,7 +374,7 @@ define([
     },
 
     teardown() {
-      React.unmountComponentAtNode(wrapper);
+      ReactDOM.unmountComponentAtNode(wrapper);
     }
   });
 
@@ -478,11 +478,11 @@ define([
         readOnly: readOnly
       });
       const element = React.createElement(GradingPeriodSet, updatedProps);
-      return React.render(element, wrapper);
+      return ReactDOM.render(element, wrapper);
     },
 
     teardown() {
-      React.unmountComponentAtNode(wrapper);
+      ReactDOM.unmountComponentAtNode(wrapper);
     }
   });
 
@@ -527,7 +527,7 @@ define([
     let set = this.renderComponent();
     Simulate.click(set.refs.addPeriodButton);
     set.refs.newPeriodForm.props.onCancel();
-    equal(document.activeElement, React.findDOMNode(set.refs.addPeriodButton));
+    equal(document.activeElement, ReactDOM.findDOMNode(set.refs.addPeriodButton));
   });
 
   test("'onCancel' re-enables all grading period actions", function() {
@@ -543,11 +543,11 @@ define([
   module("GradingPeriodSet 'Remove Grading Period'", {
     renderComponent() {
       const element = React.createElement(GradingPeriodSet, props);
-      return React.render(element, wrapper);
+      return ReactDOM.render(element, wrapper);
     },
 
     teardown() {
-      React.unmountComponentAtNode(wrapper);
+      ReactDOM.unmountComponentAtNode(wrapper);
     }
   });
 
@@ -561,7 +561,7 @@ define([
   module("GradingPeriodSet 'New Grading Period - onSave'", {
     renderComponent(opts = {}) {
       const element = React.createElement(GradingPeriodSet, _.defaults(opts, props));
-      let component = React.render(element, wrapper);
+      let component = ReactDOM.render(element, wrapper);
       Simulate.click(component.refs.addPeriodButton);
       return component;
     },
@@ -571,7 +571,7 @@ define([
     },
 
     teardown() {
-      React.unmountComponentAtNode(wrapper);
+      ReactDOM.unmountComponentAtNode(wrapper);
     }
   });
 
@@ -659,7 +659,7 @@ define([
 
     renderComponent() {
       const element = React.createElement(GradingPeriodSet, props);
-      let component = React.render(element, wrapper);
+      let component = ReactDOM.render(element, wrapper);
       Simulate.click(component.refs.addPeriodButton);
       return component;
     },
@@ -669,7 +669,7 @@ define([
     },
 
     teardown() {
-      React.unmountComponentAtNode(wrapper);
+      ReactDOM.unmountComponentAtNode(wrapper);
     }
   });
 

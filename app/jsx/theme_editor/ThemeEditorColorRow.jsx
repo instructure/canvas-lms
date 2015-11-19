@@ -2,8 +2,9 @@ define([
   'react',
   './PropTypes',
   'i18n!theme_editor',
-  'compiled/util/rgb2hex'
-], (React, customTypes, I18n, rgb2hex) => {
+  'compiled/util/rgb2hex',
+  'classnames'
+], (React, customTypes, I18n, rgb2hex, classnames) => {
 
   return React.createClass({
 
@@ -85,8 +86,7 @@ define([
     },
 
     textColorInput(){
-      var cx = React.addons.classSet;
-      var inputClasses = cx({
+      var inputClasses = classnames({
         'Theme__editor-color-block_input-text': true,
         'Theme__editor-color-block_input': true,
         'Theme__editor-color-block_input--has-error': this.props.userInput.invalid

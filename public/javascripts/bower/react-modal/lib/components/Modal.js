@@ -1,17 +1,23 @@
 var React = require('react');
-var ExecutionEnvironment = require('react/lib/ExecutionEnvironment');
+var ReactDOM = require('react-dom');
+var ExecutionEnvironment = require('exenv');
 var ModalPortal = React.createFactory(require('./ModalPortal'));
 var ariaAppHider = require('../helpers/ariaAppHider');
 var elementClass = require('element-class');
+var renderSubtreeIntoContainer = require("react-dom").unstable_renderSubtreeIntoContainer;
+var Assign = require('lodash.assign');
 
 var SafeHTMLElement = ExecutionEnvironment.canUseDOM ? window.HTMLElement : {};
+var AppElement = ExecutionEnvironment.canUseDOM ? document.body : {appendChild: function() {}};
 
-var Modal = module.exports = React.createClass({
+var Modal = React.createClass({
 
   displayName: 'Modal',
   statics: {
-    setAppElement: ariaAppHider.setElement,
-    injectCSS : function() {
+    setAppElement: function(element) {
+        AppElement = ariaAppHider.setElement(element);
+    },
+    injectCSS: function() {
       "production" !== process.env.NODE_ENV
         && console.warn('React-Modal: injectCSS has been deprecated ' +
                         'and no longer has any effect. It will be removed in a later version');
@@ -20,21 +26,24 @@ var Modal = module.exports = React.createClass({
 
   propTypes: {
     isOpen: React.PropTypes.bool.isRequired,
-    style : React.PropTypes.shape({
+    style: React.PropTypes.shape({
       content: React.PropTypes.object,
       overlay: React.PropTypes.object
     }),
     appElement: React.PropTypes.instanceOf(SafeHTMLElement),
+    onAfterOpen: React.PropTypes.func,
     onRequestClose: React.PropTypes.func,
     closeTimeoutMS: React.PropTypes.number,
-    ariaHideApp: React.PropTypes.bool
+    ariaHideApp: React.PropTypes.bool,
+    shouldCloseOnOverlayClick: React.PropTypes.bool
   },
 
   getDefaultProps: function () {
     return {
       isOpen: false,
       ariaHideApp: true,
-      closeTimeoutMS: 0
+      closeTimeoutMS: 0,
+      shouldCloseOnOverlayClick: true
     };
   },
 
@@ -50,8 +59,9 @@ var Modal = module.exports = React.createClass({
   },
 
   componentWillUnmount: function() {
-    React.unmountComponentAtNode(this.node);
+    ReactDOM.unmountComponentAtNode(this.node);
     document.body.removeChild(this.node);
+    elementClass(document.body).remove('ReactModal__Body--open');
   },
 
   renderPortal: function(props) {
@@ -64,11 +74,8 @@ var Modal = module.exports = React.createClass({
     if (props.ariaHideApp) {
       ariaAppHider.toggle(props.isOpen, props.appElement);
     }
-    sanitizeProps(props);
-    if (this.portal)
-      this.portal.setProps(props);
-    else
-      this.portal = React.render(ModalPortal(props), this.node);
+
+    this.portal = renderSubtreeIntoContainer(this, ModalPortal(Assign({}, props, {defaultStyles: Modal.defaultStyles})), this.node);
   },
 
   render: function () {
@@ -76,6 +83,29 @@ var Modal = module.exports = React.createClass({
   }
 });
 
-function sanitizeProps(props) {
-  delete props.ref;
+Modal.defaultStyles = {
+  overlay: {
+    position        : 'fixed',
+    top             : 0,
+    left            : 0,
+    right           : 0,
+    bottom          : 0,
+    backgroundColor : 'rgba(255, 255, 255, 0.75)'
+  },
+  content: {
+    position                : 'absolute',
+    top                     : '40px',
+    left                    : '40px',
+    right                   : '40px',
+    bottom                  : '40px',
+    border                  : '1px solid #ccc',
+    background              : '#fff',
+    overflow                : 'auto',
+    WebkitOverflowScrolling : 'touch',
+    borderRadius            : '4px',
+    outline                 : 'none',
+    padding                 : '20px'
+  }
 }
+
+module.exports = Modal

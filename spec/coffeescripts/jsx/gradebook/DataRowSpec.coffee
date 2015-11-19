@@ -1,8 +1,9 @@
 define [
   'react'
+  'react-dom'
   'jquery'
   'jsx/grading/dataRow'
-], (React, $, DataRow) ->
+], (React, ReactDOM, $, DataRow) ->
 
   Simulate = React.addons.TestUtils.Simulate
   SimulateNative = React.addons.TestUtils.SimulateNative
@@ -17,10 +18,10 @@ define [
         round: (number)-> Math.round(number * 100)/100
 
       DataRowElement = React.createElement(DataRow, props)
-      @dataRow = React.render(DataRowElement, $('<table>').appendTo('#fixtures')[0])
+      @dataRow = ReactDOM.render(DataRowElement, $('<table>').appendTo('#fixtures')[0])
 
     teardown: ->
-      React.unmountComponentAtNode(@dataRow.getDOMNode().parentNode)
+      ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(@dataRow).parentNode)
       $("#fixtures").empty()
 
   test 'renders in "view" mode (as opposed to "edit" mode)', ->
@@ -40,7 +41,7 @@ define [
 
   module 'DataRow being edited',
     setup: ->
-      props =
+      @props =
         key: 0
         uniqueId: 0
         row: ['A', 92.346]
@@ -50,53 +51,70 @@ define [
         onRowNameChange: ->
         onDeleteRow: ->
 
-      DataRowElement = React.createElement(DataRow, props)
-      @dataRow = React.render(DataRowElement, $('<table>').appendTo('#fixtures')[0])
+      DataRowElement = React.createElement(DataRow, @props)
+      @dataRow = ReactDOM.render(DataRowElement, $('<table>').appendTo('#fixtures')[0])
 
     teardown: ->
-      React.unmountComponentAtNode(@dataRow.getDOMNode().parentNode)
+      ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(@dataRow).parentNode)
       $("#fixtures").empty()
 
   test 'renders in "edit" mode (as opposed to "view" mode)', ->
     ok @dataRow.refs.editContainer
 
   test 'does not accept non-numeric input', ->
-    changeMinScore = @spy(@dataRow.props, 'onRowMinScoreChange')
-    Simulate.change(@dataRow.refs.minScoreInput.getDOMNode(), {target: {value: 'A'}})
+    changeMinScore = @spy(@props, 'onRowMinScoreChange')
+    DataRowElement = React.createElement(DataRow, @props)
+    @dataRow = ReactDOM.render(DataRowElement, $('<table>').appendTo('#fixtures')[0])
+    Simulate.change(@dataRow.refs.minScoreInput, {target: {value: 'A'}})
     deepEqual @dataRow.renderMinScore(), '92.346'
-    Simulate.change(@dataRow.refs.minScoreInput.getDOMNode(), {target: {value: '*&@%!'}})
+    Simulate.change(@dataRow.refs.minScoreInput, {target: {value: '*&@%!'}})
     deepEqual @dataRow.renderMinScore(), '92.346'
-    Simulate.change(@dataRow.refs.minScoreInput.getDOMNode(), {target: {value: '3B'}})
+    Simulate.change(@dataRow.refs.minScoreInput, {target: {value: '3B'}})
     deepEqual @dataRow.renderMinScore(), '92.346'
     ok changeMinScore.notCalled
+    changeMinScore.restore()
 
   test 'does not call onRowMinScoreChange if the input is less than 0', ->
-    changeMinScore = @spy(@dataRow.props, 'onRowMinScoreChange')
-    Simulate.change(@dataRow.refs.minScoreInput.getDOMNode(), {target: {value: '-1'}})
+    changeMinScore = @spy(@props, 'onRowMinScoreChange')
+    DataRowElement = React.createElement(DataRow, @props)
+    @dataRow = ReactDOM.render(DataRowElement, $('<table>').appendTo('#fixtures')[0])
+    Simulate.change(@dataRow.refs.minScoreInput, {target: {value: '-1'}})
     ok changeMinScore.notCalled
+    changeMinScore.restore()
 
   test 'does not call onRowMinScoreChange if the input is greater than 100', ->
-    changeMinScore = @spy(@dataRow.props, 'onRowMinScoreChange')
-    Simulate.change(@dataRow.refs.minScoreInput.getDOMNode(), {target: {value: '101'}})
+    changeMinScore = @spy(@props, 'onRowMinScoreChange')
+    DataRowElement = React.createElement(DataRow, @props)
+    @dataRow = ReactDOM.render(DataRowElement, $('<table>').appendTo('#fixtures')[0])
+    Simulate.change(@dataRow.refs.minScoreInput, {target: {value: '101'}})
     ok changeMinScore.notCalled
+    changeMinScore.restore()
 
   test 'calls onRowMinScoreChange when input is a number between 0 and 100 (with or without a trailing period), or blank', ->
-    changeMinScore = @spy(@dataRow.props, 'onRowMinScoreChange')
-    Simulate.change(@dataRow.refs.minScoreInput.getDOMNode(), {target: {value: '88.'}})
-    Simulate.change(@dataRow.refs.minScoreInput.getDOMNode(), {target: {value: ''}})
-    Simulate.change(@dataRow.refs.minScoreInput.getDOMNode(), {target: {value: '100'}})
-    Simulate.change(@dataRow.refs.minScoreInput.getDOMNode(), {target: {value: '0'}})
-    Simulate.change(@dataRow.refs.minScoreInput.getDOMNode(), {target: {value: 'A'}})
-    Simulate.change(@dataRow.refs.minScoreInput.getDOMNode(), {target: {value: '%*@#($'}})
+    changeMinScore = @spy(@props, 'onRowMinScoreChange')
+    DataRowElement = React.createElement(DataRow, @props)
+    @dataRow = ReactDOM.render(DataRowElement, $('<table>').appendTo('#fixtures')[0])
+    Simulate.change(@dataRow.refs.minScoreInput, {target: {value: '88.'}})
+    Simulate.change(@dataRow.refs.minScoreInput, {target: {value: ''}})
+    Simulate.change(@dataRow.refs.minScoreInput, {target: {value: '100'}})
+    Simulate.change(@dataRow.refs.minScoreInput, {target: {value: '0'}})
+    Simulate.change(@dataRow.refs.minScoreInput, {target: {value: 'A'}})
+    Simulate.change(@dataRow.refs.minScoreInput, {target: {value: '%*@#($'}})
     deepEqual changeMinScore.callCount, 4
+    changeMinScore.restore()
 
   test 'calls onRowNameChange when input changes', ->
-    changeMinScore = @spy(@dataRow.props, 'onRowNameChange')
-    Simulate.change(@dataRow.refs.nameInput.getDOMNode(), {target: {value: 'F'}})
+    changeMinScore = @spy(@props, 'onRowNameChange')
+    DataRowElement = React.createElement(DataRow, @props)
+    @dataRow = ReactDOM.render(DataRowElement, $('<table>').appendTo('#fixtures')[0])
+    Simulate.change(@dataRow.refs.nameInput, {target: {value: 'F'}})
     ok changeMinScore.calledOnce
+    changeMinScore.restore()
 
   test 'calls onDeleteRow when the delete button is clicked', ->
-    deleteRow = @spy(@dataRow.props, 'onDeleteRow')
+    deleteRow = @spy(@props, 'onDeleteRow')
+    DataRowElement = React.createElement(DataRow, @props)
+    @dataRow = ReactDOM.render(DataRowElement, $('<table>').appendTo('#fixtures')[0])
     Simulate.click(@dataRow.refs.deleteButton.getDOMNode())
     ok deleteRow.calledOnce
 
@@ -110,10 +128,10 @@ define [
         round: (number)-> Math.round(number * 100)/100
 
       DataRowElement = React.createElement(DataRow, props)
-      @dataRow = React.render(DataRowElement, $('<table>').appendTo('#fixtures')[0])
+      @dataRow = ReactDOM.render(DataRowElement, $('<table>').appendTo('#fixtures')[0])
 
     teardown: ->
-      React.unmountComponentAtNode(@dataRow.getDOMNode().parentNode)
+      ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(@dataRow).parentNode)
       $("#fixtures").empty()
 
   test "shows the max score as the sibling's min score", ->
