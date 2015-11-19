@@ -52,7 +52,7 @@ define([
     },
     render () {
       return (
-        <div className='ModerationApp'>
+        <div className='ModerationApp' role="grid">
           <FlashMessageHolder {...this.state.flashMessage} />
           <h1 className='screenreader-only'>{I18n.t('Moderate %{assignment_name}', {assignment_name: this.state.assignment.title})}</h1>
           <Header
@@ -60,8 +60,9 @@ define([
             onReviewClick={() => this.props.store.dispatch(Actions.addStudentToModerationSet())}
             published={this.state.assignment.published}
           />
-          <div className='grid-row'>
+          <div className='grid-row' role="row">
             <div className='col-xs-12'>
+              <div className='screenreader-only'>{I18n.t('Clicking on the column headers will sort the rows by that column.')}</div>
               <ModeratedColumnHeader
                 includeModerationSetHeaders={this.isModerationSet(this.state.studentList.students)}
                 sortDirection={this.state.studentList.sort.direction}
@@ -74,7 +75,7 @@ define([
               />
             </div>
           </div>
-            <div className='grid-row'>
+            <div className='grid-row' role="row">
               <div className='col-xs-12'>
                 <ModeratedStudentList
                   includeModerationSetColumns={this.isModerationSet(this.state.studentList.students)}
