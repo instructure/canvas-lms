@@ -1391,7 +1391,10 @@ class Assignment < ActiveRecord::Base
       :include_root => false
     )
 
-    avatar_methods = (avatars && !grade_as_group?) ? [:avatar_path] : []
+    # include :provisional here someday if we need to distinguish between provisional and real comments
+    # (also in SubmissionComment#serialization_methods)
+    submission_comment_methods = []
+    submission_comment_methods << :avatar_path if avatars && !grade_as_group?
 
     res[:context][:rep_for_student] = {}
 
@@ -1416,7 +1419,7 @@ class Assignment < ActiveRecord::Base
 
     res[:context][:students] = students.map do |u|
       json = u.as_json(:include_root => false,
-                :methods => avatar_methods,
+                :methods => submission_comment_methods,
                 :only => [:name, :id])
 
       if preloaded_pg_counts
@@ -1467,7 +1470,7 @@ class Assignment < ActiveRecord::Base
       end
 
       json[:submission_comments] = (provisional_grade || sub).submission_comments.as_json(:include_root => false,
-                                                                                          :methods => avatar_methods,
+                                                                                          :methods => submission_comment_methods,
                                                                                           :only => comment_fields)
 
       json['attachments'] = sub.attachments.map{|att| att.as_json(
@@ -1532,7 +1535,7 @@ class Assignment < ActiveRecord::Base
               json[:crocodoc_urls] = sub_attachments.map { |a| pg.crocodoc_attachment_info(user, a) }
               json[:readonly] = !pg.final && (pg.scorer_id != user.id)
               json[:submission_comments] = pg.submission_comments.as_json(:include_root => false,
-                                                                          :methods => avatar_methods,
+                                                                          :methods => submission_comment_methods,
                                                                           :only => comment_fields)
             end
 

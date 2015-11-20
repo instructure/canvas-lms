@@ -59,9 +59,9 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
 
   def submission_comments
     if submission.all_submission_comments.loaded?
-      submission.all_submission_comments.select { |c| c.provisional_grade_id == id }
+      submission.all_submission_comments.select { |c| c.provisional_grade_id == id || c.provisional_grade_id.nil?}
     else
-      submission.all_submission_comments.where(provisional_grade_id: id)
+      submission.all_submission_comments.where("provisional_grade_id = ? OR provisional_grade_id IS NULL", self.id)
     end
   end
 
