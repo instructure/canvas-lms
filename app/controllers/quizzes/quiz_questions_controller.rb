@@ -444,6 +444,8 @@ class Quizzes::QuizQuestionsController < ApplicationController
         id: @quiz_submission.quiz_data.map { |question| question['id'] }
       })
 
+      reject! "Cannot view questions due to quiz settings", 401 unless @quiz_submission.results_visible_for_user?(@current_user)
+
       render_question_set(scope, @quiz_submission.quiz_data)
     end
   end
