@@ -1764,6 +1764,18 @@ CanvasRails::Application.routes.draw do
     end
   end
 
+  # this is not a "normal" api endpoint in the sense that it is not documented or
+    # generally available to hosted customers. it also does not respect the normal
+    # pagination options; however, jobs_controller already accepts `limit` and `offset`
+    # paramaters and defines a sane default limit
+    ApiRouteSet::V1.draw(self) do
+      scope(controller: :jobs) do
+        get 'jobs', action: :index
+        get 'jobs/:id', action: :show
+        post 'jobs/batch_update', action: :batch_update
+      end
+    end
+
   # this is not a "normal" api endpoint in the sense that it is not documented
   # or called directly, it's used as the redirect in the file upload process
   # for local files. it also doesn't use the normal oauth authentication
