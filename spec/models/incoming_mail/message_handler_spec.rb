@@ -212,6 +212,7 @@ describe IncomingMail::MessageHandler do
             expected_bounce_message = Message.new(message_attributes)
             Message.expects(:new).with(message_attributes).returns(expected_bounce_message)
             Rails.cache.expects(:fetch).never
+            expected_bounce_message.expects(:deliver)
 
             subject.handle(outgoing_from_address, body, html_body, incoming_message, tag)
           end
@@ -242,6 +243,7 @@ describe IncomingMail::MessageHandler do
             }
             expected_bounce_message = Message.new(message_attributes)
             Message.expects(:new).with(message_attributes).returns(expected_bounce_message)
+            expected_bounce_message.expects(:deliver)
 
             subject.handle(outgoing_from_address, body, html_body, incoming_message, tag)
           end
@@ -272,6 +274,7 @@ describe IncomingMail::MessageHandler do
             }
             expected_bounce_message = Message.new(message_attributes)
             Message.expects(:new).with(message_attributes).returns(expected_bounce_message)
+            expected_bounce_message.expects(:deliver)
 
             subject.handle(outgoing_from_address, body, html_body, incoming_message, tag)
           end

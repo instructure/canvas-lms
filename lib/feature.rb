@@ -358,6 +358,16 @@ END
           root_opt_in: true,
           beta: true
       },
+    'notification_service' =>
+    {
+      display_name: -> { I18n.t('Use remote service for notifications') },
+      description: -> { I18n.t('Allow the ability to send notifications through our a dispatch queue') },
+      applies_to: 'RootAccount',
+      state: 'hidden',
+      beta: true,
+      development: true,
+      root_opt_in: false
+    },
     'use_new_tree' =>
     {
       display_name: -> { I18n.t('Use New Folder Tree in Files')},
