@@ -881,9 +881,10 @@ define([
       });
       $moderation_tabs.each(function(index) {
         if (index == 2) index = "final"; // this will make it easier to identify the final mark
+
         $(this).find('a').click(function(e) {
-           e.preventDefault();
-           EG.showProvisionalGrade(index);
+          e.preventDefault();
+          EG.showProvisionalGrade(index);
         });
         $('<i class="icon-check selected_icon"></i>').prependTo($(this).find('.mark_title'));
         $('<button class="Button" role="button"></button>').text(I18n.t('Select')).appendTo($(this)).on('click keyclick', function(){
@@ -1279,10 +1280,16 @@ define([
       this.updateModerationTab($moderation_tab_final, this.currentStudent.submission.final_provisional_grade);
     },
     updateModerationTab: function($tab, prov_grade) {
+      var CHOSEN_GRADE_MESSAGE = I18n.t('This is the currently chosen grade for this student.');
+      var $srMessage = $('<span class="selected_sr_message screenreader-only"></span>').text(CHOSEN_GRADE_MESSAGE);
       if (prov_grade && prov_grade.selected) {
         $tab.addClass('selected');
+        // Remove an old message, should it be there
+        $tab.find('.selected_sr_message').remove();
+        $tab.find('.mark_title').prepend($srMessage);
       } else {
         $tab.removeClass('selected');
+        $tab.find('.selected_sr_message').remove();
       }
 
       if (prov_grade && prov_grade.provisional_grade_id) {
