@@ -41,22 +41,13 @@ $ic-left-side-width: $ic-sp*15;
 
   body:not(.ic-no-flex-layout) & {
     transition: all 0.1s ease-out;
-    transform: translate3d(0,0,0);
     flex: 1 0 auto;
-
-    @include breakpoint(wide) {
-      display: flex;
-      position: static;
-    }
+    display: flex;
+    margin-left: 0;
   }
 
   body.course-menu-expanded:not(.ic-no-flex-layout) & {
-    transform: translate3d($ic-left-side-width,0,0);
-
-    @include breakpoint(wide) {
-      transform: none;
-      transition: none;
-    }
+    margin-left: $ic-left-side-width;
   }
 
   // Theme Editor watermark gets attached to this element as a background image
@@ -89,9 +80,9 @@ $ic-left-side-width: $ic-sp*15;
 }
 
 .ic-app-course-menu {
-  transition: transform 0.2s ease-out, opacity 0.2s;
-  transition-delay: 0.1s;
-  transform: translate3d(0,25%,0);
+  transition: transform 1s ease-in-out;
+  transition-delay: 0.75s;
+  transform: translate3d(0,0,0);
   box-sizing: border-box;
   position: absolute;
   top: 0; right: 100%;
@@ -101,14 +92,6 @@ $ic-left-side-width: $ic-sp*15;
   body.course-menu-expanded & {
     opacity: 1;
     transform: translate3d(0,0,0);
-  }
-  @include breakpoint(wide) {
-    position: static;
-    top: auto; right: auto; width: auto;
-    flex: 0 0 $ic-left-side-width;
-    opacity: 1;
-    transition: none;
-    transform: none;
   }
   @include breakpoint(short) { padding-top: $ic-sp; }
 }
@@ -188,7 +171,6 @@ $ic-left-side-width: $ic-sp*15;
   margin-right: $ic-sp*1.5;
   padding: 0;
   width: $ic-sp*3; height: ($ic-sp*3) - ($ic-sp/2);
-  @include breakpoint(wide) { display: none; }
   @include overwrite-default-icon-size(22px);
 }
 
