@@ -55,7 +55,7 @@ class StreamItemCache < ActiveRecord::Observer
   # stream item cache keys for a context can later be invalidated.
   def self.context_stream_item_key(context_type, context_id)
     return unless context_type
-    Rails.cache.fetch(["context_stream_item_key", context_type, context_id].cache_key, :no_rails3 => true) do
+    Rails.cache.fetch(["context_stream_item_key", context_type, context_id].cache_key, :rails3 => true) do
       "#{context_type.underscore}_#{context_id}-#{Time.now.to_i}"
     end
   end
