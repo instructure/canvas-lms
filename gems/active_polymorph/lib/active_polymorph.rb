@@ -97,13 +97,13 @@ module ActiveRecord
           end
         end
 
-        unless CANVAS_RAILS3
+        if !CANVAS_RAILS3
           is_first_chain = i == 0
           klass = is_first_chain ? self.klass : reflection.klass
 
           # Exclude the scope of the association itself, because that
           # was already merged in the #scope method.
-          scope_chain[i].each do |scope_chain_item|
+          self.reflection.scope_chain[i].each do |scope_chain_item|
             item  = eval_scope(klass, scope_chain_item)
 
             if scope_chain_item == self.reflection.scope
@@ -112,6 +112,25 @@ module ActiveRecord
 
             if is_first_chain
               scope.includes! item.includes_values
+            end
+
+            scope.where_values += item.where_values
+            scope.order_values |= item.order_values
+          end
+        elsif self.reflection.respond_to?(:scope_chain)
+          # rails 3 supporting rails 4 style scope on associations
+          is_first_chain = i == 0
+          klass = is_first_chain ? self.klass : reflection.klass
+
+          self.reflection.scope_chain[i].each do |scope_chain_item|
+            item = klass.unscoped.instance_exec(&scope_chain_item)
+
+            if scope_chain_item == self.reflection.scope
+              scope = scope.merge(item.except(:where, :includes))
+            end
+
+            if is_first_chain
+              scope = scope.includes(*item.includes_values)
             end
 
             scope.where_values += item.where_values

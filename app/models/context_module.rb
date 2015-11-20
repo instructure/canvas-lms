@@ -24,7 +24,7 @@ class ContextModule < ActiveRecord::Base
   belongs_to :context, :polymorphic => true
   validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course']
   has_many :context_module_progressions, :dependent => :destroy
-  has_many :content_tags, :dependent => :destroy, :order => 'content_tags.position, content_tags.title'
+  has_many :content_tags, -> { order('content_tags.position, content_tags.title') }, dependent: :destroy
   acts_as_list scope: { context: self, workflow_state: ['active', 'unpublished'] }
 
   EXPORTABLE_ATTRIBUTES = [

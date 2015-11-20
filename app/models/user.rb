@@ -61,14 +61,14 @@ class User < ActiveRecord::Base
     Enrollment::QueryBuilder.new(state).conditions or raise "invalid enrollment conditions"
   end
 
-  has_many :communication_channels, :order => 'communication_channels.position ASC', :dependent => :destroy
+  has_many :communication_channels, -> { order('communication_channels.position ASC') }, dependent: :destroy
   has_many :notification_policies, through: :communication_channels
-  has_one :communication_channel, :conditions => ["workflow_state<>'retired'"], :order => 'position'
+  has_one :communication_channel, -> { where("workflow_state<>'retired'").order(:position) }
   has_many :notification_endpoints, :through => :access_tokens
 
   has_many :enrollments, :dependent => :destroy
 
-  has_many :not_ended_enrollments, :class_name => 'Enrollment', :conditions => "enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted')", :multishard => true
+  has_many :not_ended_enrollments, -> { where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted')") }, class_name: 'Enrollment', multishard: true
   has_many :observer_enrollments
   has_many :observee_enrollments, :foreign_key => :associated_user_id, :class_name => 'ObserverEnrollment'
   has_many :user_observers, :dependent => :delete_all
@@ -76,56 +76,56 @@ class User < ActiveRecord::Base
   has_many :user_observees, :class_name => 'UserObserver', :foreign_key => :observer_id, :dependent => :delete_all
   has_many :observed_users, :through => :user_observees, :source => :user
   has_many :all_courses, :source => :course, :through => :enrollments
-  has_many :group_memberships, preload: :group, dependent: :destroy
+  has_many :group_memberships, -> { preload(:group) }, dependent: :destroy
   has_many :groups, :through => :group_memberships
   has_many :polls, class_name: 'Polling::Poll'
 
-  has_many :current_group_memberships, eager_load: :group, class_name: 'GroupMembership', conditions: "group_memberships.workflow_state = 'accepted' AND groups.workflow_state<>'deleted'"
+  has_many :current_group_memberships, -> { eager_load(:group).where("group_memberships.workflow_state = 'accepted' AND groups.workflow_state<>'deleted'") }, class_name: 'GroupMembership'
   has_many :current_groups, :through => :current_group_memberships, :source => :group
   has_many :user_account_associations
-  has_many :associated_accounts, :source => :account, :through => :user_account_associations, :order => 'user_account_associations.depth'
-  has_many :associated_root_accounts, :source => :account, :through => :user_account_associations, :order => 'user_account_associations.depth', :conditions => 'accounts.parent_account_id IS NULL'
+  has_many :associated_accounts, -> { order("user_account_associations.depth") }, source: :account, through: :user_account_associations
+  has_many :associated_root_accounts, -> { order("user_account_associations.depth").where(accounts: { parent_account_id: nil }) }, source: :account, through: :user_account_associations
   has_many :developer_keys
-  has_many :access_tokens, preload: :developer_key
-  has_many :context_external_tools, :as => :context, :dependent => :destroy, :order => 'name'
+  has_many :access_tokens, -> { preload(:developer_key) }
+  has_many :context_external_tools, -> { order(:name) }, as: :context, dependent: :destroy
 
   has_many :student_enrollments
   has_many :ta_enrollments
-  has_many :teacher_enrollments, :class_name => 'TeacherEnrollment', :conditions => ["enrollments.type = 'TeacherEnrollment'"]
-  has_many :submissions, preload: [:assignment, :submission_comments], order: 'submissions.updated_at DESC', dependent: :destroy
-  has_many :pseudonyms, :order => 'position', :dependent => :destroy
-  has_many :active_pseudonyms, :class_name => 'Pseudonym', :conditions => ['pseudonyms.workflow_state != ?', 'deleted']
+  has_many :teacher_enrollments, -> { where(enrollments: { type: 'TeacherEnrollment' })}, class_name: 'TeacherEnrollment'
+  has_many :submissions, -> { preload(:assignment, :submission_comments).order('submissions.updated_at DESC') }, dependent: :destroy
+  has_many :pseudonyms, -> { order(:position) }, dependent: :destroy
+  has_many :active_pseudonyms, -> { where("pseudonyms.workflow_state<>'deleted'") }, class_name: 'Pseudonym'
   has_many :pseudonym_accounts, :source => :account, :through => :pseudonyms
-  has_one :pseudonym, :conditions => ['pseudonyms.workflow_state != ?', 'deleted'], :order => 'position'
+  has_one :pseudonym, -> { where("pseudonyms.workflow_state<>'deleted'").order(:position) }
   has_many :attachments, :as => 'context', :dependent => :destroy
-  has_many :active_images, as: :context, class_name: 'Attachment', conditions: ["attachments.file_state != ? AND attachments.content_type LIKE 'image%'", 'deleted'], order: 'attachments.display_name', preload: :thumbnail
-  has_many :active_assignments, :as => :context, :class_name => 'Assignment', :conditions => ['assignments.workflow_state != ?', 'deleted']
+  has_many :active_images, -> { where("attachments.file_state != ? AND attachments.content_type LIKE 'image%'", 'deleted').order('attachments.display_name').preload(:thumbnail) }, as: :context, class_name: 'Attachment'
+  has_many :active_assignments, -> { where("assignments.workflow_state<>'deleted'") }, as: :context, class_name: 'Assignment'
   has_many :all_attachments, :as => 'context', :class_name => 'Attachment'
   has_many :assignment_student_visibilities
   has_many :quiz_student_visibilities, :class_name => 'Quizzes::QuizStudentVisibility'
-  has_many :folders, :as => 'context', :order => 'folders.name'
-  has_many :active_folders, :class_name => 'Folder', :as => :context, :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
-  has_many :calendar_events, as: 'context', dependent: :destroy, preload: :parent_event
+  has_many :folders, -> { order('folders.name') }, as: 'context'
+  has_many :active_folders, -> { where("folders.workflow_state<>'deleted'").order('folders.name') }, class_name: 'Folder', as: :context
+  has_many :calendar_events, -> { preload(:parent_event) }, as: 'context', dependent: :destroy
   has_many :eportfolios, :dependent => :destroy
   has_many :quiz_submissions, :dependent => :destroy, :class_name => 'Quizzes::QuizSubmission'
-  has_many :dashboard_messages, :class_name => 'Message', :conditions => {:to => "dashboard", :workflow_state => 'dashboard'}, :order => 'created_at DESC', :dependent => :destroy
-  has_many :collaborations, :order => 'created_at DESC'
-  has_many :user_services, :order => 'created_at', :dependent => :destroy
-  has_many :rubric_associations, as: :context, preload: :rubric, order: 'rubric_associations.created_at DESC'
+  has_many :dashboard_messages, -> { where(to: "dashboard", workflow_state: 'dashboard').order('created_at DESC') }, class_name: 'Message', dependent: :destroy
+  has_many :collaborations, -> { order('created_at DESC') }
+  has_many :user_services, -> { order('created_at') }, dependent: :destroy
+  has_many :rubric_associations, -> { preload(:rubric).order('rubric_associations.created_at DESC') }, as: :context
   has_many :rubrics
   has_many :context_rubrics, :as => :context, :class_name => 'Rubric'
-  has_many :grading_standards, :conditions => ['workflow_state != ?', 'deleted']
+  has_many :grading_standards, -> { where("workflow_state<>'deleted'") }
   has_many :context_module_progressions
   has_many :assessment_question_bank_users
   has_many :assessment_question_banks, :through => :assessment_question_bank_users
   has_many :learning_outcome_results
 
-  has_many :inbox_items, :order => 'created_at DESC'
+  has_many :inbox_items, -> { order('created_at DESC') }
   has_many :submission_comment_participants
-  has_many :submission_comments, through: :submission_comment_participants, preload: { submission: [:assignment, :user] }
+  has_many :submission_comments, -> { preload(submission: [:assignment, :user]) }, through: :submission_comment_participants
   has_many :collaborators
-  has_many :collaborations, through: :collaborators, preload: [:user, :collaborators]
-  has_many :assigned_submission_assessments, class_name: 'AssessmentRequest', foreign_key: 'assessor_id', preload: [:user, submission: :assignment]
+  has_many :collaborations, -> { preload(:user, :collaborators) }, through: :collaborators
+  has_many :assigned_submission_assessments, -> { preload(:user, submission: :assignment) }, class_name: 'AssessmentRequest', foreign_key: 'assessor_id'
   has_many :assigned_assessments, :class_name => 'AssessmentRequest', :foreign_key => 'assessor_id'
   has_many :web_conference_participants
   has_many :web_conferences, :through => :web_conference_participants
@@ -136,8 +136,8 @@ class User < ActiveRecord::Base
   has_many :user_notes
   has_many :account_reports
   has_many :stream_item_instances, :dependent => :delete_all
-  has_many :all_conversations, class_name: 'ConversationParticipant', preload: :conversation
-  has_many :conversation_batches, preload: :root_conversation_message
+  has_many :all_conversations, -> { preload(:conversation) }, class_name: 'ConversationParticipant'
+  has_many :conversation_batches, -> { preload(:root_conversation_message) }
   has_many :favorites
   has_many :zip_file_imports, :as => :context
   has_many :messages

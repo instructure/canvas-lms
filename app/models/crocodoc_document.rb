@@ -23,9 +23,7 @@ class CrocodocDocument < ActiveRecord::Base
 
   belongs_to :attachment
 
-  has_and_belongs_to_many :submissions,
-    join_table: :canvadocs_submissions,
-    readonly: true
+  has_and_belongs_to_many :submissions, -> { readonly(true) }, join_table: :canvadocs_submissions
 
   MIME_TYPES = %w(
     application/pdf

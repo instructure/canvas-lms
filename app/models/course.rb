@@ -115,105 +115,105 @@ class Course < ActiveRecord::Base
   has_many :templated_courses, :class_name => 'Course', :foreign_key => 'template_course_id'
 
   has_many :course_sections
-  has_many :active_course_sections, :class_name => 'CourseSection', :conditions => {:workflow_state => 'active'}
-  has_many :enrollments, preload: :user, conditions: ['enrollments.workflow_state != ?', 'deleted'], dependent: :destroy, inverse_of: :course
+  has_many :active_course_sections, -> { where(workflow_state: 'active') }, class_name: 'CourseSection'
+  has_many :enrollments, -> { preload(:user).where("enrollments.workflow_state<>'deleted'") }, dependent: :destroy, inverse_of: :course
   has_many :all_enrollments, :class_name => 'Enrollment'
-  has_many :current_enrollments, class_name: 'Enrollment', conditions: "enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive')", preload: :user
-  has_many :all_current_enrollments, class_name: 'Enrollment', conditions: "enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted')", preload: :user
-  has_many :typical_current_enrollments, class_name: 'Enrollment', conditions: "enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive') AND enrollments.type NOT IN ('StudentViewEnrollment', 'ObserverEnrollment', 'DesignerEnrollment')", preload: :user
-  has_many :prior_enrollments, class_name: 'Enrollment', preload: [:user, :course], conditions: "enrollments.workflow_state = 'completed'"
+  has_many :current_enrollments, -> { where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive')").preload(:user) }, class_name: 'Enrollment'
+  has_many :all_current_enrollments, -> { where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted')").preload(:user) }, class_name: 'Enrollment'
+  has_many :typical_current_enrollments, -> { where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive') AND enrollments.type NOT IN ('StudentViewEnrollment', 'ObserverEnrollment', 'DesignerEnrollment')").preload(:user) }, class_name: 'Enrollment'
+  has_many :prior_enrollments, -> { preload(:user, :course).where(workflow_state: 'completed') }, class_name: 'Enrollment'
   has_many :prior_users, :through => :prior_enrollments, :source => :user
   has_many :students, :through => :student_enrollments, :source => :user
-  has_many :self_enrolled_students, :through => :student_enrollments, :source => :user, :conditions => "self_enrolled"
+  has_many :self_enrolled_students, -> { where("self_enrolled") }, through: :student_enrollments, source: :user
   has_many :all_students, :through => :all_student_enrollments, :source => :user
-  has_many :participating_students, :through => :enrollments, :source => :user, :conditions => "enrollments.type IN ('StudentEnrollment', 'StudentViewEnrollment') and enrollments.workflow_state = 'active'"
-  has_many :student_enrollments, class_name: 'Enrollment', conditions: "enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive') AND enrollments.type IN ('StudentEnrollment', 'StudentViewEnrollment')", preload: :user
-  has_many :admin_visible_student_enrollments, class_name: 'Enrollment', conditions: "enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted') AND enrollments.type IN ('StudentEnrollment', 'StudentViewEnrollment')", preload: :user
-  has_many :all_student_enrollments, class_name: 'Enrollment', conditions: "enrollments.workflow_state != 'deleted' AND enrollments.type IN ('StudentEnrollment', 'StudentViewEnrollment')", preload: :user
+  has_many :participating_students, -> { where(enrollments: { type: ['StudentEnrollment', 'StudentViewEnrollment'], workflow_state: 'active' }) }, through: :enrollments, source: :user
+  has_many :student_enrollments, -> { where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive') AND enrollments.type IN ('StudentEnrollment', 'StudentViewEnrollment')").preload(:user) }, class_name: 'Enrollment'
+  has_many :admin_visible_student_enrollments, -> { where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted') AND enrollments.type IN ('StudentEnrollment', 'StudentViewEnrollment')").preload(:user) }, class_name: 'Enrollment'
+  has_many :all_student_enrollments, -> { where("enrollments.workflow_state<>'deleted' AND enrollments.type IN ('StudentEnrollment', 'StudentViewEnrollment')").preload(:user) }, class_name: 'Enrollment'
   has_many :all_real_users, :through => :all_real_enrollments, :source => :user
-  has_many :all_real_enrollments, class_name: 'Enrollment', conditions: ["enrollments.workflow_state != 'deleted' AND enrollments.type <> 'StudentViewEnrollment'"], preload: :user
+  has_many :all_real_enrollments, -> { where("enrollments.workflow_state<>'deleted' AND enrollments.type<>'StudentViewEnrollment'").preload(:user) }, class_name: 'Enrollment'
   has_many :all_real_students, :through => :all_real_student_enrollments, :source => :user
-  has_many :all_real_student_enrollments, class_name: 'StudentEnrollment', conditions: [ "enrollments.type = 'StudentEnrollment'", "enrollments.workflow_state != ?", 'deleted'], preload: :user
+  has_many :all_real_student_enrollments, -> { where("enrollments.type = 'StudentEnrollment' AND enrollments.workflow_state <> 'deleted'").preload(:user) }, class_name: 'StudentEnrollment'
   has_many :teachers, :through => :teacher_enrollments, :source => :user
-  has_many :teacher_enrollments, class_name: 'TeacherEnrollment', conditions: ["enrollments.workflow_state != 'deleted' AND enrollments.type = 'TeacherEnrollment'"], preload: :user
+  has_many :teacher_enrollments, -> { where("enrollments.workflow_state <> 'deleted' AND enrollments.type = 'TeacherEnrollment'").preload(:user) }, class_name: 'TeacherEnrollment'
   has_many :tas, :through => :ta_enrollments, :source => :user
-  has_many :ta_enrollments, class_name: 'TaEnrollment', conditions: ['enrollments.workflow_state != ?', 'deleted'], preload: :user
+  has_many :ta_enrollments, -> { where("enrollments.workflow_state<>'deleted'").preload(:user) }, class_name: 'TaEnrollment'
   has_many :observers, :through => :observer_enrollments, :source => :user
-  has_many :participating_observers, :through => :observer_enrollments, :source => :user, :conditions => ['enrollments.workflow_state = ?', 'active']
-  has_many :observer_enrollments, class_name: 'ObserverEnrollment', conditions: ['enrollments.workflow_state != ?', 'deleted'], preload: :user
-  has_many :instructors, :through => :enrollments, :source => :user, :conditions => "enrollments.type = 'TaEnrollment' or enrollments.type = 'TeacherEnrollment'"
-  has_many :instructor_enrollments, :class_name => 'Enrollment', :conditions => "(enrollments.type = 'TaEnrollment' or enrollments.type = 'TeacherEnrollment')"
-  has_many :participating_instructors, :through => :enrollments, :source => :user, :conditions => "(enrollments.type = 'TaEnrollment' or enrollments.type = 'TeacherEnrollment') and enrollments.workflow_state = 'active'"
-  has_many :admins, :through => :enrollments, :source => :user, :conditions => "enrollments.type = 'TaEnrollment' or enrollments.type = 'TeacherEnrollment' or enrollments.type = 'DesignerEnrollment'"
-  has_many :admin_enrollments, :class_name => 'Enrollment', :conditions => "(enrollments.type = 'TaEnrollment' or enrollments.type = 'TeacherEnrollment' or enrollments.type = 'DesignerEnrollment')"
-  has_many :participating_admins, :through => :enrollments, :source => :user, :conditions => "(enrollments.type = 'TaEnrollment' or enrollments.type = 'TeacherEnrollment' or enrollments.type = 'DesignerEnrollment') and enrollments.workflow_state = 'active'"
+  has_many :participating_observers, -> { where(enrollments: { workflow_state: 'active' }) }, through: :observer_enrollments, source: :user
+  has_many :observer_enrollments, -> { where("enrollments.workflow_state<>'deleted'").preload(:user) }, class_name: 'ObserverEnrollment'
+  has_many :instructors, -> { where(enrollments: { type: ['TaEnrollment', 'TeacherEnrollment'] }) }, through: :enrollments, source: :user
+  has_many :instructor_enrollments, -> { where(type: ['TaEnrollment', 'TeacherEnrollment']) }, class_name: 'Enrollment'
+  has_many :participating_instructors, -> { where(enrollments: { type: ['TaEnrollment', 'TeacherEnrollment'], workflow_state: 'active' }) }, through: :enrollments, source: :user
+  has_many :admins, -> { where(enrollments: { type: ['TaEnrollment', 'TeacherEnrollment', 'DesignerEnrollment'] }) }, through: :enrollments, source: :user
+  has_many :admin_enrollments, -> { where(type: ['TaEnrollment', 'TeacherEnrollment', 'DesignerEnrollment']) }, class_name: 'Enrollment'
+  has_many :participating_admins, -> { where(enrollments: { type: ['TaEnrollment', 'TeacherEnrollment', 'DesignerEnrollment'], workflow_state: 'active' }) }, through: :enrollments, source: :user
   has_many :student_view_students, :through => :student_view_enrollments, :source => :user
-  has_many :student_view_enrollments, class_name: 'StudentViewEnrollment', conditions: ['enrollments.workflow_state != ?', 'deleted'], preload: :user
+  has_many :student_view_enrollments, -> { where("enrollments.workflow_state<>'deleted'").preload(:user) }, class_name: 'StudentViewEnrollment'
   has_many :participating_typical_users, :through => :typical_current_enrollments, :source => :user
-  has_many :custom_gradebook_columns, :dependent => :destroy, :order => 'custom_gradebook_columns.position, custom_gradebook_columns.title'
+  has_many :custom_gradebook_columns, -> { order('custom_gradebook_columns.position, custom_gradebook_columns.title') }, dependent: :destroy
 
   include LearningOutcomeContext
   include RubricContext
 
   has_many :course_account_associations
-  has_many :non_unique_associated_accounts, :source => :account, :through => :course_account_associations, :order => 'course_account_associations.depth'
-  has_many :users, :through => :enrollments, :source => :user, :uniq => true
-  has_many :current_users, :through => :current_enrollments, :source => :user, :uniq => true
-  has_many :all_current_users, :through => :all_current_enrollments, :source => :user, :uniq => true
-  has_many :group_categories, :as => :context, :conditions => ['deleted_at IS NULL']
+  has_many :non_unique_associated_accounts, -> { order('course_account_associations.depth') }, source: :account, through: :course_account_associations
+  has_many :users, -> { uniq }, through: :enrollments, source: :user
+  has_many :current_users, -> { uniq }, through: :current_enrollments, source: :user
+  has_many :all_current_users, -> { uniq }, through: :all_current_enrollments, source: :user
+  has_many :group_categories, -> {where(deleted_at: nil) }, as: :context
   has_many :all_group_categories, :class_name => 'GroupCategory', :as => :context
   has_many :groups, :as => :context
-  has_many :active_groups, :as => :context, :class_name => 'Group', :conditions => ['groups.workflow_state != ?', 'deleted']
-  has_many :assignment_groups, :as => :context, :dependent => :destroy, :order => 'assignment_groups.position, assignment_groups.name'
-  has_many :assignments, :as => :context, :dependent => :destroy, :order => 'assignments.created_at'
-  has_many :calendar_events, :as => :context, :conditions => ['calendar_events.workflow_state != ?', 'cancelled'], :dependent => :destroy
-  has_many :submissions, :through => :assignments, :order => 'submissions.updated_at DESC', :dependent => :destroy
+  has_many :active_groups, -> { where("groups.workflow_state<>'deleted'") }, as: :context, class_name: 'Group'
+  has_many :assignment_groups, -> { order('assignment_groups.position, assignment_groups.name') }, as: :context, dependent: :destroy
+  has_many :assignments, -> { order('assignments.created_at') }, as: :context, dependent: :destroy
+  has_many :calendar_events, -> { where("calendar_events.workflow_state<>'cancelled'") }, as: :context, dependent: :destroy
+  has_many :submissions, -> { order('submissions.updated_at DESC') }, through: :assignments, dependent: :destroy
   has_many :submission_comments, as: :context
-  has_many :discussion_topics, as: :context, conditions: ['discussion_topics.workflow_state != ?', 'deleted'], preload: :user, dependent: :destroy, order: 'discussion_topics.position DESC, discussion_topics.created_at DESC'
-  has_many :active_discussion_topics, as: :context, class_name: 'DiscussionTopic', conditions: ['discussion_topics.workflow_state != ?', 'deleted'], preload: :user
-  has_many :all_discussion_topics, as: :context, class_name: "DiscussionTopic", preload: :user, dependent: :destroy
-  has_many :discussion_entries, through: :discussion_topics, preload: [:discussion_topic, :user], dependent: :destroy
+  has_many :discussion_topics, -> { where("discussion_topics.workflow_state<>'deleted'").preload(:user).order('discussion_topics.position DESC, discussion_topics.created_at DESC') }, as: :context, dependent: :destroy
+  has_many :active_discussion_topics, -> { where("discussion_topics.workflow_state<>'deleted'").preload(:user) }, as: :context, class_name: 'DiscussionTopic'
+  has_many :all_discussion_topics, -> { preload(:user) }, as: :context, class_name: "DiscussionTopic", dependent: :destroy
+  has_many :discussion_entries, -> { preload(:discussion_topic, :user) }, through: :discussion_topics, dependent: :destroy
   has_many :announcements, :as => :context, :class_name => 'Announcement', :dependent => :destroy
-  has_many :active_announcements, :as => :context, :class_name => 'Announcement', :conditions => ['discussion_topics.workflow_state != ?', 'deleted']
+  has_many :active_announcements, -> { where("discussion_topics.workflow_state<>'deleted'") }, as: :context, class_name: 'Announcement'
   has_many :attachments, :as => :context, :dependent => :destroy, :extend => Attachment::FindInContextAssociation
-  has_many :active_images, as: :context, class_name: 'Attachment', conditions: ["attachments.file_state != ? AND attachments.content_type LIKE 'image%'", 'deleted'], order: 'attachments.display_name', preload: :thumbnail
-  has_many :active_assignments, :as => :context, :class_name => 'Assignment', :conditions => ['assignments.workflow_state != ?', 'deleted'], :order => 'assignments.title, assignments.position'
-  has_many :folders, :as => :context, :dependent => :destroy, :order => 'folders.name'
-  has_many :active_folders, :class_name => 'Folder', :as => :context, :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
+  has_many :active_images, -> { where("attachments.file_state<>? AND attachments.content_type LIKE 'image%'", 'deleted').order('attachments.display_name').preload(:thumbnail) }, as: :context, class_name: 'Attachment'
+  has_many :active_assignments, -> { where("assignments.workflow_state<>'deleted'").order('assignments.title, assignments.position') }, as: :context, class_name: 'Assignment'
+  has_many :folders, -> { order('folders.name') }, as: :context, dependent: :destroy
+  has_many :active_folders, -> { where("folders.workflow_state<>'deleted'").order('folders.name') }, class_name: 'Folder', as: :context
   has_many :messages, :as => :context, :dependent => :destroy
-  has_many :context_external_tools, :as => :context, :dependent => :destroy, :order => 'name'
+  has_many :context_external_tools, -> { order('name') }, as: :context, dependent: :destroy
   belongs_to :wiki
-  has_many :quizzes, :class_name => 'Quizzes::Quiz', :as => :context, :dependent => :destroy, :order => 'lock_at, title, id'
+  has_many :quizzes, -> { order('lock_at, title, id') }, class_name: 'Quizzes::Quiz', as: :context, dependent: :destroy
   has_many :quiz_questions, :class_name => 'Quizzes::QuizQuestion', :through => :quizzes
-  has_many :active_quizzes, class_name: 'Quizzes::Quiz', as: :context, preload: :assignment, conditions: ['quizzes.workflow_state != ?', 'deleted'], order: 'created_at'
+  has_many :active_quizzes, -> { preload(:assignment).where("quizzes.workflow_state<>'deleted'").order(:created_at) }, class_name: 'Quizzes::Quiz', as: :context
   has_many :assessment_questions, :through => :assessment_question_banks
-  has_many :assessment_question_banks, as: :context, preload: [:assessment_questions, :assessment_question_bank_users]
+  has_many :assessment_question_banks, -> { preload(:assessment_questions, :assessment_question_bank_users) }, as: :context
   def inherited_assessment_question_banks(include_self = false)
     self.account.inherited_assessment_question_banks(true, *(include_self ? [self] : []))
   end
 
   has_many :external_feeds, :as => :context, :dependent => :destroy
   belongs_to :default_grading_standard, :class_name => 'GradingStandard', :foreign_key => 'grading_standard_id'
-  has_many :grading_standards, :as => :context, :conditions => ['workflow_state != ?', 'deleted']
-  has_many :web_conferences, :as => :context, :order => 'created_at DESC', :dependent => :destroy
-  has_many :collaborations, :as => :context, :order => 'title, created_at', :dependent => :destroy
-  has_many :context_modules, :as => :context, :order => :position, :dependent => :destroy
+  has_many :grading_standards, -> { where("workflow_state<>'deleted'") }, as: :context
+  has_many :web_conferences, -> { order('created_at DESC') }, as: :context, dependent: :destroy
+  has_many :collaborations, -> { order('title, created_at') }, as: :context, dependent: :destroy
+  has_many :context_modules, -> { order(:position) }, as: :context, dependent: :destroy
   has_many :context_module_progressions, through: :context_modules
-  has_many :active_context_modules, :as => :context, :class_name => 'ContextModule', :conditions => {:workflow_state => 'active'}
-  has_many :context_module_tags, :class_name => 'ContentTag', :as => 'context', :order => :position, :conditions => ['tag_type = ?', 'context_module'], :dependent => :destroy
+  has_many :active_context_modules, -> { where(workflow_state: 'active') }, as: :context, class_name: 'ContextModule'
+  has_many :context_module_tags, -> { order(:position).where(tag_type: 'context_module') }, class_name: 'ContentTag', as: 'context', dependent: :destroy
   has_many :media_objects, :as => :context
   has_many :page_views, :as => :context
   has_many :asset_user_accesses, :as => :context
   has_many :role_overrides, :as => :context
   has_many :content_migrations, :as => :context
   has_many :content_exports, :as => :context
-  has_many :epub_exports, order: "created_at DESC"
+  has_many :epub_exports, -> { order("created_at DESC") }
   attr_accessor :latest_epub_export
   has_many :course_imports
-  has_many :alerts, as: :context, preload: :criteria
+  has_many :alerts, -> { preload(:criteria) }, as: :context
   has_many :appointment_group_contexts, :as => :context
   has_many :appointment_groups, :through => :appointment_group_contexts
-  has_many :appointment_participants, :class_name => 'CalendarEvent', :foreign_key => :effective_context_code, :primary_key => :asset_string, :conditions => "workflow_state = 'locked' AND parent_calendar_event_id IS NOT NULL"
+  has_many :appointment_participants, -> { where("workflow_state = 'locked' AND parent_calendar_event_id IS NOT NULL") }, class_name: 'CalendarEvent', foreign_key: :effective_context_code, primary_key: :asset_string
   attr_accessor :import_source
   has_many :zip_file_imports, :as => :context
   has_many :content_participation_counts, :as => :context, :dependent => :destroy

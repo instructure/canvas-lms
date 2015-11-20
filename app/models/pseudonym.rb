@@ -24,7 +24,7 @@ class Pseudonym < ActiveRecord::Base
   has_many :session_persistence_tokens
   belongs_to :account
   belongs_to :user
-  has_many :communication_channels, :order => 'position'
+  has_many :communication_channels, -> { order(:position) }
   belongs_to :communication_channel
   belongs_to :sis_communication_channel, :class_name => 'CommunicationChannel'
   belongs_to :authentication_provider, class_name: 'AccountAuthorizationConfig'

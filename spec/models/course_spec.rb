@@ -825,7 +825,7 @@ describe Course, "enroll" do
     @course.enroll_student(@user)
     scope = account.associated_courses.active.select([:id, :name]).eager_load(:teachers).joins(:teachers).where(:enrollments => { :workflow_state => 'active' })
     sql = scope.to_sql
-    expect(sql).to match(/enrollments.type = 'TeacherEnrollment'/)
+    expect(sql).to match(/"enrollments"\."type" IN \('TeacherEnrollment'\)/)
   end
 end
 

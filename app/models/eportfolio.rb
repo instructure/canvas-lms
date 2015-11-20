@@ -20,7 +20,7 @@ class Eportfolio < ActiveRecord::Base
   include Workflow
   attr_accessible :name, :public, :user
   
-  has_many :eportfolio_categories, :order => :position, :dependent => :destroy
+  has_many :eportfolio_categories, -> { order(:position) }, dependent: :destroy
   has_many :eportfolio_entries, :dependent => :destroy
   has_many :attachments, :as => :context
 

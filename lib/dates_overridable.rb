@@ -6,7 +6,7 @@ module DatesOverridable
 
   def self.included(base)
     base.has_many :assignment_overrides, :dependent => :destroy
-    base.has_many :active_assignment_overrides, :class_name => 'AssignmentOverride', :conditions => {:workflow_state => 'active'}
+    base.has_many :active_assignment_overrides, -> { where(workflow_state: 'active') }, class_name: 'AssignmentOverride'
     base.has_many :assignment_override_students, :dependent => :destroy
 
     base.validates_associated :assignment_overrides

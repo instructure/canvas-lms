@@ -1709,7 +1709,7 @@ describe Quizzes::Quiz do
         quiz.save
         expect(quiz.versions.count).to eq 2
 
-        Version.update_all("versionable_type='Quiz'","versionable_id=#{quiz.id} AND versionable_type='Quizzes::Quiz'")
+        Version.where(versionable_id: quiz, versionable_type: 'Quizzes::Quiz').update_all("versionable_type='Quiz'")
 
         expect(Quizzes::Quiz.find(quiz).versions.count).to eq 2
       end

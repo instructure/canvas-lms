@@ -42,10 +42,10 @@ class Quizzes::Quiz < ActiveRecord::Base
   attr_readonly :context_id, :context_type
   attr_accessor :notify_of_update
 
-  has_many :quiz_questions, dependent: :destroy, order: 'position', class_name: 'Quizzes::QuizQuestion', inverse_of: :quiz
+  has_many :quiz_questions, -> { order(:position) }, dependent: :destroy, class_name: 'Quizzes::QuizQuestion', inverse_of: :quiz
   has_many :quiz_submissions, :dependent => :destroy, :class_name => 'Quizzes::QuizSubmission'
-  has_many :quiz_groups, :dependent => :destroy, :order => 'position', class_name: 'Quizzes::QuizGroup'
-  has_many :quiz_statistics, :class_name => 'Quizzes::QuizStatistics', :order => 'created_at'
+  has_many :quiz_groups, -> { order(:position) }, dependent: :destroy, class_name: 'Quizzes::QuizGroup'
+  has_many :quiz_statistics, -> { order(:created_at) }, class_name: 'Quizzes::QuizStatistics'
   has_many :attachments, :as => :context, :dependent => :destroy
   has_many :quiz_regrades, class_name: 'Quizzes::QuizRegrade'
   has_many :quiz_student_visibilities
@@ -100,7 +100,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   simply_versioned
 
-  has_many :context_module_tags, :as => :content, :class_name => 'ContentTag', :conditions => "content_tags.tag_type='context_module' AND content_tags.workflow_state<>'deleted'"
+  has_many :context_module_tags, -> { where("content_tags.tag_type='context_module' AND content_tags.workflow_state<>'deleted'")}, as: :content, class_name: 'ContentTag'
 
   # This callback is listed here in order for the :link_assignment_overrides
   # method to be called after the simply_versioned callbacks. We want the

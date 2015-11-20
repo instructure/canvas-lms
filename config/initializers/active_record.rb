@@ -20,6 +20,20 @@ class ActiveRecord::Base
 
   class << self
     delegate :distinct_on, to: :scoped
+
+    if CANVAS_RAILS3
+      def has_many(name, scope = nil, options = {}, &extension)
+        ActiveRecord::Associations::Builder::HasMany.build(self, name, scope, options, &extension)
+      end
+
+      def has_one(name, scope = nil, options = {})
+        ActiveRecord::Associations::Builder::HasOne.build(self, name, scope, options)
+      end
+
+      def has_and_belongs_to_many(name, scope = nil, options = {}, &extension)
+        ActiveRecord::Associations::Builder::HasAndBelongsToMany.build(self, name, scope, options, &extension)
+      end
+    end
   end
 
   alias :clone :dup
@@ -554,7 +568,8 @@ class ActiveRecord::Base
   # the primary key from smallest to largest.
   def self.find_ids_in_ranges(options = {})
     batch_size = options[:batch_size].try(:to_i) || 1000
-    subquery_scope = self.scoped.except(:select).select("#{quoted_table_name}.#{primary_key} as id").reorder(primary_key).limit(batch_size)
+    scope = CANVAS_RAILS3 ? scoped : all
+    subquery_scope = scope.except(:select).select("#{quoted_table_name}.#{primary_key} as id").reorder(primary_key).limit(batch_size)
     ids = connection.select_rows("select min(id), max(id) from (#{subquery_scope.to_sql}) as subquery").first
     while ids.first.present?
       ids.map!(&:to_i) if columns_hash[primary_key.to_s].type == :integer
@@ -597,9 +612,257 @@ class ActiveRecord::Base
     suspend_callbacks(kind: [:validation, :save, (new_record? ? :create : :update)]) { save }
   end
 
-  if Rails.version < '4'
+  if CANVAS_RAILS3
     scope :none, -> { {:conditions => ["?", false]} }
   end
+end
+
+### Implement Rails 4 style association conditions
+### Very little meat - some copy/paste from Rails 4, a little extra work, and
+### lots of piping options through the entire associations infrastructure
+### And to add to the matters, we need to change AssociatoinScope#add_constraints -
+### which active_polymorph already does. so just go make it work there
+if CANVAS_RAILS3
+  module RelationForAssociationScope
+    def scope
+      # MEAT: do an instance_exec of the reflection's scope when creating the
+      # relation for this association
+      if reflection.scope
+        scope = klass.unscoped
+        scope = scope.extending(*Array.wrap(options[:extend]))
+
+        scope = scope.instance_exec(&reflection.scope)
+
+        scope = scope.uniq if options[:uniq]
+
+        add_constraints(scope)
+      else
+        super
+      end
+    end
+  end
+  ActiveRecord::Associations::AssociationScope.prepend(RelationForAssociationScope)
+
+  # copy/paste for rails 3, with noted exception
+  module JoinAssociationWithScope
+    def join_to(relation)
+      tables        = @tables.dup
+      foreign_table = parent_table
+      foreign_klass = parent.active_record
+
+      # The chain starts with the target table, but we want to end with it here (makes
+      # more sense in this context), so we reverse
+      chain.reverse.each_with_index do |reflection, i|
+        table = tables.shift
+
+        case reflection.source_macro
+          when :belongs_to
+            key         = reflection.association_primary_key
+            foreign_key = reflection.foreign_key
+          when :has_and_belongs_to_many
+            # Join the join table first...
+            relation.from(join(
+                              table,
+                              table[reflection.foreign_key].
+                                  eq(foreign_table[reflection.active_record_primary_key])
+                          ))
+
+            foreign_table, table = table, tables.shift
+
+            key         = reflection.association_primary_key
+            foreign_key = reflection.association_foreign_key
+          else
+            key         = reflection.foreign_key
+            foreign_key = reflection.active_record_primary_key
+        end
+
+        constraint = build_constraint(reflection, table, key, foreign_table, foreign_key)
+
+        conditions = self.conditions[i].dup
+        conditions << { reflection.type => foreign_klass.base_class.name } if reflection.type
+
+        unless conditions.empty?
+          constraint = constraint.and(sanitize(conditions, table))
+        end
+
+        # copy/paste for rails 4, to add rails 4 style scope on association
+        scope_chain_items = scope_chain[i]
+
+        if reflection.type
+          scope_chain_items += [
+              ActiveRecord::Relation.new(reflection.klass, table)
+                  .where(reflection.type => foreign_klass.base_class.name)
+          ]
+        end
+
+        scope_chain_items += [reflection.klass.send(:build_default_scope)].compact
+
+        scope_chain_items.each do |item|
+          unless item.is_a?(ActiveRecord::Relation)
+            item = ActiveRecord::Relation.new(reflection.klass, table).instance_exec(&item)
+          end
+
+          constraint = constraint.and(item.arel.constraints) unless item.arel.constraints.empty?
+        end
+
+        # back to regular rails 4
+        relation.from(join(table, constraint))
+
+        # The current table in this iteration becomes the foreign table in the next
+        foreign_table, foreign_klass = table, reflection.klass
+      end
+
+      relation
+    end
+
+    def scope_chain
+      @scope_chain ||= reflection.scope_chain.reverse
+    end
+  end
+  ActiveRecord::Associations::JoinDependency::JoinAssociation.prepend(JoinAssociationWithScope)
+
+  # lots of plumbing to pass scope through
+  module AllowScopeOnBuilder
+    module Association
+      module ClassMethods
+        def build(*args, &extension)
+          new(*args, &extension).build
+        end
+      end
+
+      def initialize(model, name, scope, options = {})
+        options = scope if scope.is_a?(Hash)
+
+        @scope = scope unless scope.is_a?(Hash)
+        super(model, name, options)
+      end
+
+      def build
+        validate_options
+        reflection = model.create_reflection(self.class.macro, name, scope, options, model)
+        define_accessors
+        reflection
+      end
+    end
+
+    module CollectionAssociation
+      def initialize(model, name, scope, options = {}, &extension)
+        options = scope if scope.is_a?(Hash)
+
+        @scope = scope unless scope.is_a?(Hash)
+
+        @model, @name, @options = model, name, options
+
+        @block_extension = extension
+      end
+    end
+  end
+  ActiveRecord::Associations::Builder::Association.prepend(AllowScopeOnBuilder::Association)
+  ActiveRecord::Associations::Builder::CollectionAssociation.singleton_class.prepend(AllowScopeOnBuilder::Association::ClassMethods)
+  ActiveRecord::Associations::Builder::Association.singleton_class.prepend(AllowScopeOnBuilder::Association::ClassMethods)
+  ActiveRecord::Associations::Builder::Association.send(:attr_reader, :scope)
+  ActiveRecord::Associations::Builder::CollectionAssociation.prepend(AllowScopeOnBuilder::CollectionAssociation)
+
+  module AllowScopeOnReflection
+    module ClassMethods
+      def create_reflection(macro, name, scope, options, active_record)
+        case macro
+          when :has_many, :belongs_to, :has_one, :has_and_belongs_to_many
+            klass = options[:through] ? ActiveRecord::Reflection::ThroughReflection : ActiveRecord::Reflection::AssociationReflection
+            reflection = klass.new(macro, name, scope, options, active_record)
+          when :composed_of
+            reflection = ActiveRecord::Reflection::AggregateReflection.new(macro, name, scope, options, active_record)
+        end
+
+        self.reflections = self.reflections.merge(name => reflection)
+        reflection
+      end
+    end
+
+    module MacroReflection
+      def scope
+        @scope
+      end
+
+      def initialize(macro, name, scope, options, active_record)
+        @scope = scope
+        super(macro, name, options, active_record)
+      end
+    end
+
+    # scope_chain on the next two modules is copy/paste from rails 4
+    module AssociationReflection
+      def initialize(macro, name, scope, options, active_record)
+        @macro         = macro
+        @name          = name
+        @options       = options
+        @active_record = active_record
+        @plural_name   = active_record.pluralize_table_names ?
+            name.to_s.pluralize : name.to_s
+        @scope = scope
+        @collection = macro.in?([:has_many, :has_and_belongs_to_many])
+      end
+
+      # An array of arrays of scopes. Each item in the outside array corresponds to a reflection
+      # in the #chain.
+      def scope_chain
+        scope ? [[scope]] : [[]]
+      end
+    end
+
+    module ThroughReflection
+      def scope_chain
+        @scope_chain ||= begin
+          scope_chain = source_reflection.scope_chain.map(&:dup)
+
+          # Add to it the scope from this reflection (if any)
+          scope_chain.first << scope if scope
+
+          through_scope_chain = through_reflection.scope_chain.map(&:dup)
+
+          if options[:source_type]
+            through_scope_chain.first <<
+                through_reflection.klass.where(foreign_type => options[:source_type])
+          end
+
+          # Recursively fill out the rest of the array from the through reflection
+          scope_chain + through_scope_chain
+        end
+      end
+    end
+  end
+  ActiveRecord::Base.singleton_class.prepend(AllowScopeOnReflection::ClassMethods)
+  ActiveRecord::Reflection::MacroReflection.prepend(AllowScopeOnReflection::MacroReflection)
+  ActiveRecord::Reflection::AssociationReflection.prepend(AllowScopeOnReflection::AssociationReflection)
+  ActiveRecord::Reflection::ThroughReflection.prepend(AllowScopeOnReflection::ThroughReflection)
+
+  # MEAT: make sure the preloader applies the scope from the association
+  module AllowScopeOnPreloader
+    def build_scope
+      scope = super
+      scope = scope.instance_exec(&reflection.scope) if reflection.scope
+      scope
+    end
+  end
+  ActiveRecord::Associations::Preloader::Association.prepend(AllowScopeOnPreloader)
+
+  # copy/paste from rails 4
+  module AssociationDumping
+    # We can't dump @reflection since it contains the scope proc
+    def marshal_dump
+      ivars = (instance_variables - [:@reflection]).map { |name| [name, instance_variable_get(name)] }
+      [@reflection.name, ivars]
+    end
+
+    def marshal_load(data)
+      reflection_name, ivars = data
+      ivars.each { |name, val| instance_variable_set(name, val) }
+      @reflection = @owner.class.reflect_on_association(reflection_name)
+    end
+  end
+  ActiveRecord::Associations::Association.include(AssociationDumping)
+else
+  ActiveRecord::Associations::Builder::Association::DEPRECATED_OPTIONS.concat([:preload, :eager_load])
 end
 
 unless defined? OpenDataExport
@@ -877,7 +1140,7 @@ ActiveRecord::Relation.class_eval do
             ORDER BY #{arel.orders.map { |x| v.send(:visit, x) }.join(', ')} LIMIT #{v.send(:visit, arel.limit)}"
         return connection.delete(sql, "#{name} Delete all")
       else
-        scope = scoped.except(:select).select("#{quoted_table_name}.#{primary_key}")
+        scope = except(:select).select("#{quoted_table_name}.#{primary_key}")
         return unscoped.where(primary_key => scope).delete_all
       end
     end

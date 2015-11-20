@@ -36,10 +36,10 @@ class Folder < ActiveRecord::Base
   belongs_to :cloned_item
   belongs_to :parent_folder, :class_name => "Folder"
   has_many :file_attachments, :class_name => "Attachment"
-  has_many :active_file_attachments, :class_name => 'Attachment', :conditions => ['attachments.file_state != ?', 'deleted']
-  has_many :visible_file_attachments, :class_name => 'Attachment', :conditions => ['attachments.file_state in (?, ?)', 'available', 'public']
+  has_many :active_file_attachments, -> { where("attachments.file_state<>'deleted'") }, class_name: 'Attachment'
+  has_many :visible_file_attachments, -> { where(file_state: ['available', 'public']) }, class_name: 'Attachment'
   has_many :sub_folders, :class_name => "Folder", :foreign_key => "parent_folder_id", :dependent => :destroy
-  has_many :active_sub_folders, :class_name => "Folder", :conditions => ['folders.workflow_state != ?', 'deleted'], :foreign_key => "parent_folder_id", :dependent => :destroy
+  has_many :active_sub_folders, -> { where("folders.workflow_state<>'deleted'") }, class_name: "Folder", foreign_key: "parent_folder_id", dependent: :destroy
 
   EXPORTABLE_ATTRIBUTES = [
     :id, :name, :full_name, :context_id, :context_type, :parent_folder_id, :workflow_state, :created_at, :updated_at, :deleted_at, :locked,

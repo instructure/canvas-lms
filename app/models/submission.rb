@@ -38,16 +38,16 @@ class Submission < ActiveRecord::Base
   belongs_to :student, :class_name => 'User', :foreign_key => :user_id
 
   belongs_to :quiz_submission, :class_name => 'Quizzes::QuizSubmission'
-  has_many :all_submission_comments, :order => 'created_at', :class_name => 'SubmissionComment', :dependent => :destroy
-  has_many :submission_comments, :order => 'created_at', :conditions => { :provisional_grade_id => nil }
-  has_many :visible_submission_comments, :class_name => 'SubmissionComment', :order => 'created_at, id', :conditions => { :provisional_grade_id => nil, :hidden => false }
-  has_many :hidden_submission_comments, :class_name => 'SubmissionComment', :order => 'created_at, id', :conditions => { :provisional_grade_id => nil, :hidden => true }
+  has_many :all_submission_comments, -> { order(:created_at) }, class_name: 'SubmissionComment', dependent: :destroy
+  has_many :submission_comments, -> { order(:created_at).where(provisional_grade_id: nil) }
+  has_many :visible_submission_comments, -> { order('created_at, id').where(provisional_grade_id: nil, hidden: false) }, class_name: 'SubmissionComment'
+  has_many :hidden_submission_comments, -> { order('created_at, id').where(provisional_grade_id: nil, hidden: true) }, class_name: 'SubmissionComment'
   has_many :assessment_requests, :as => :asset
   has_many :assigned_assessments, :class_name => 'AssessmentRequest', :as => :assessor_asset
   has_many :rubric_assessments, :as => :artifact
   has_many :attachment_associations, :as => :context
   has_many :provisional_grades, class_name: 'ModeratedGrading::ProvisionalGrade'
-  has_one :rubric_assessment, :as => :artifact, :conditions => {:assessment_type => "grading"}
+  has_one :rubric_assessment, -> { where(assessment_type: 'grading') }, as: :artifact
 
   # we no longer link submission comments and conversations, but we haven't fixed up existing
   # linked conversations so this relation might be useful
