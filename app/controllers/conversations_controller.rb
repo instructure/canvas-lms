@@ -997,25 +997,33 @@ class ConversationsController < ApplicationController
   end
 
   def normalize_recipients
-    if params[:recipients]
-      recipient_ids = params[:recipients]
-      if recipient_ids.is_a?(String)
-        params[:recipients] = recipient_ids = recipient_ids.split(/,/)
-      end
-      if params[:context_code] && params[:context_code] =~ /\A(course|group|section)/
-        @recipients = @current_user.
-                      messageable_user_calculator.
-                      messageable_users_in_context_scope(params[:context_code]).
-                      try(:where, id: MessageableUser.individual_recipients(recipient_ids)).
-                      to_a
-      else
-        @recipients = @current_user.load_messageable_users(MessageableUser.individual_recipients(recipient_ids), :conversation_id => params[:from_conversation_id])
-      end
-      MessageableUser.context_recipients(recipient_ids).map do |context|
-        @recipients.concat @current_user.messageable_users_in_context(context)
-      end
-      @recipients = @recipients.uniq(&:id)
+    return unless params[:recipients]
+    unless params[:recipients].is_a? Array
+      params[:recipients] = params[:recipients].split ","
     end
+
+    recipient_ids = MessageableUser.individual_recipients(params[:recipients])
+    contexts      = MessageableUser.context_recipients(params[:recipients])
+
+    if params[:context_code] =~ MessageableUser::Calculator::CONTEXT_RECIPIENT
+      is_admin = Context.
+        find_by_asset_string(params[:context_code]).
+        grants_right?(@current_user, :read_as_admin)
+      @recipients = @current_user.
+        messageable_user_calculator.
+        messageable_users_in_context(
+          params[:context_code],
+          admin_context: is_admin
+        ).select { |user| recipient_ids.include? user.id }
+    else
+      @recipients = @current_user.load_messageable_users(recipient_ids, conversation_id: params[:from_conversation_id])
+    end
+
+    contexts.map do |context|
+      @recipients.concat @current_user.messageable_users_in_context(context)
+    end
+
+    @recipients.uniq!(&:id)
   end
 
   def infer_tags
