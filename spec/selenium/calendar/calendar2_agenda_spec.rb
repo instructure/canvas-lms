@@ -1,10 +1,8 @@
 require_relative "../common"
 require_relative "../helpers/calendar2_common"
-require_relative "../helpers/quizzes_common"
 
 describe "calendar2" do
   include_context "in-process server selenium tests"
-  include QuizzesCommon
   include Calendar2Common
 
   before(:each) do

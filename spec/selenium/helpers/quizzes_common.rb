@@ -508,8 +508,8 @@ module QuizzesCommon
   end
 
   def quiz_create(params={})
-
-    @quiz = @course.quizzes.create
+    course = params.fetch(:course, @course)
+    @quiz = course.quizzes.create
 
     default_params = {
         quiz_name: 'bender',

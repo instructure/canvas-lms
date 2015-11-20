@@ -6,6 +6,7 @@ require_relative 'helpers/wiki_and_tiny_common'
 require_relative 'helpers/files_common'
 require_relative 'helpers/conferences_common'
 require_relative 'helpers/course_common'
+require_relative 'helpers/groups_shared_examples'
 
 describe "groups" do
   include_context "in-process server selenium tests"

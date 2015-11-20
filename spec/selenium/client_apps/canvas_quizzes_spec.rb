@@ -1,9 +1,7 @@
 require_relative "../common"
-require_relative "../helpers/quizzes_common"
 
 describe "canvas_quizzes" do
   include_context "in-process server selenium tests"
-  include QuizzesCommon
 
   USING_NEW_CLIENT_APP = File.exist?(Rails.root.join("client_apps", "canvas_quizzes"))
 

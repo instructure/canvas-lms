@@ -3,12 +3,13 @@ require_relative "../helpers/quizzes_common"
 
 describe 'publishing a quiz' do
   include_context "in-process server selenium tests"
-  include QuizzesCommon
+
+  let(:quiz_helper) { Class.new { extend QuizzesCommon } }
 
   context 'as a teacher' do
     before(:each) do
       course_with_teacher_logged_in
-      create_quiz_with_due_date
+      @quiz = quiz_helper.create_quiz_with_due_date(course: @course)
       @quiz.workflow_state = 'unavailable'
       @quiz.save!
     end
