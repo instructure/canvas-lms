@@ -1063,6 +1063,11 @@ class DiscussionTopic < ActiveRecord::Base
         return false
       end
 
+      # locked by context module
+      if self.could_be_locked && locked_by_module_item?(user, true)
+        return false
+      end
+
       # topic is not published
       if !published?
         false

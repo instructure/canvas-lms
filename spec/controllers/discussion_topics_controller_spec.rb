@@ -269,7 +269,7 @@ describe DiscussionTopicsController do
       expect(@topic.reload.read_state(@student)).to eq 'read'
     end
 
-    it "should not mark as read if locked" do
+    it "should not mark as read if not visible" do
       user_session(@student)
       course_topic(:skip_set_user => true)
       mod = @course.context_modules.create! name: 'no soup for you', unlock_at: 1.year.from_now
@@ -278,6 +278,20 @@ describe DiscussionTopicsController do
       expect(@topic.read_state(@student)).to eq 'unread'
       get 'show', :course_id => @course.id, :id => @topic.id
       expect(@topic.reload.read_state(@student)).to eq 'unread'
+    end
+
+    it "should mark as read if visible but locked" do
+      user_session(@student)
+      course_topic(:skip_set_user => true)
+      @announcement = @course.announcements.create!(
+        :title => "some announcement",
+        :message => "some message",
+        :unlock_at => 1.week.ago,
+        :lock_at => 1.day.ago
+      )
+      expect(@announcement.read_state(@student)).to eq 'unread'
+      get 'show', :course_id => @course.id, :id => @announcement.id
+      expect(@announcement.reload.read_state(@student)).to eq 'read'
     end
 
     it "should allow concluded teachers to see discussions" do
