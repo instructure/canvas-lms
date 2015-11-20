@@ -54,7 +54,7 @@
     </div>
   <% end %>
 </div></div>
-<span id="moderation_tabs" class="ui-tabs-minimal">
+<div id="moderation_tabs" class="ui-tabs-minimal">
   <ul>
     <li><a href="#dummy_container">
       <span class="mark_title"><%= t('1st Reviewer') %></span>
@@ -69,24 +69,26 @@
       <span class="mark_grade"></span>
     </a></li>
     <li id="new_mark_container">
-      <a id="new_mark_dropdown_link" href="#dummy_container" class="al-trigger" data-append-to-body="true">
-        <%= t('Add Review') %>
-        <i class="icon-mini-arrow-down"></i>
-      </a>
-      <ul id="new_mark_dropdown" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="new_mark_dropdown_link1">
-        <li role="presentation">
-          <a href="#" id="new_mark_link" tabindex="-1" role="menuitem"><%= t('Add 2nd Review') %></a>
-        </li>
-        <li role="presentation">
-          <a href="#" id="new_mark_final_link" tabindex="-1" role="menuitem"><%= t('Add Moderator Review (New)') %></a>
-        </li>
-        <li role="presentation">
-          <a href="#" id="new_mark_copy_link1" tabindex="-1" role="menuitem"><%= t('Add Moderator Review (Copy 1st)') %></a>
-        </li>
-        <li role="presentation">
-          <a href="#" id="new_mark_copy_link2" tabindex="-1" role="menuitem"><%= t('Add Moderator Review (Copy 2nd)') %></a>
-        </li>
-      </ul>
+      <div class="inline-block al-dropdown__container">
+        <a id="new_mark_dropdown_link" href="#dummy_container" class="al-trigger" data-append-to-body="true" data-popup-within="#iframe_holder">
+          <%= t('Add Review') %>
+          <i class="icon-mini-arrow-down"></i>
+        </a>
+        <ul id="new_mark_dropdown" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="new_mark_dropdown_link1">
+          <li role="presentation">
+            <a href="#" id="new_mark_link" tabindex="-1" role="menuitem"><%= t('Add 2nd Review') %></a>
+          </li>
+          <li role="presentation">
+            <a href="#" id="new_mark_final_link" tabindex="-1" role="menuitem"><%= t('Add Moderator Review (New)') %></a>
+          </li>
+          <li role="presentation">
+            <a href="#" id="new_mark_copy_link1" tabindex="-1" role="menuitem"><%= t('Add Moderator Review (Copy 1st)') %></a>
+          </li>
+          <li role="presentation">
+            <a href="#" id="new_mark_copy_link2" tabindex="-1" role="menuitem"><%= t('Add Moderator Review (Copy 2nd)') %></a>
+          </li>
+        </ul>
+      </div>
     </li>
   </ul>
   <div id="dummy_container"></div>
