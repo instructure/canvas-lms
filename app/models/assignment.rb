@@ -1053,7 +1053,9 @@ class Assignment < ActiveRecord::Base
 
   def grade_student(original_student, opts={})
     raise GradeError.new("Student is required") unless original_student
-    raise GradeError.new("Student must be enrolled in the course as a student to be graded") unless context.includes_student?(original_student)
+    unless context.includes_user?(original_student, context.admin_visible_student_enrollments) # allows inactive users to be graded
+      raise GradeError.new("Student must be enrolled in the course as a student to be graded")
+    end
     raise GradeError.new("Grader must be enrolled as a course admin") if opts[:grader] && !self.context.grants_right?(opts[:grader], :manage_grades)
 
     if opts.key? :excuse

@@ -1861,11 +1861,37 @@ describe CoursesController, type: :request do
         expect(json.map{ |s| s["name"] }).not_to include("Test Student")
       end
 
+      context "inactive enrollments" do
+        before do
+          @inactive_user = user_with_pseudonym(:name => "Inactive User")
+          student_in_course(:course => @course1, :user => @inactive_user)
+          @inactive_enroll = @inactive_user.enrollments.first
+          @inactive_enroll.inactivate
+        end
+
+        it "excludes users with inactive enrollments for students" do
+          student_in_course(:course => @course1, :active_all => true, :user => user_with_pseudonym)
+          json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
+            { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' })
+          expect(json.map{ |s| s["id"] }).not_to include(@inactive_user.id)
+        end
+
+        it "includes users with inactive enrollments for teachers" do
+          @user = @course1.teachers.first
+          json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
+            { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' }, :include => ['enrollments'])
+          expect(json.map{ |s| s["id"] }).to include(@inactive_user.id)
+          user_json = json.detect{ |s| s["id"] == @inactive_user.id}
+          expect(user_json['enrollments'].map{|e| e['id']}).to eq [@inactive_enroll.id]
+          expect(user_json['enrollments'].first['enrollment_state']).to eq 'inactive'
+        end
+      end
+
       it "includes the test student if told to do so" do
         @course1.student_view_student
         json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
-                        { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json'},
-                          :include => ['test_student'] )
+          { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json'},
+          :include => ['test_student'] )
         expect(json.map{ |s| s["name"] }).to include("Test Student")
       end
 

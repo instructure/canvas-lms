@@ -10,6 +10,7 @@ define [
   'compiled/str/underscore'
   'str/htmlEscape'
   'compiled/jquery.kylemenu'
+  'jquery.disableWhileLoading'
 ], (I18n, $, _, Backbone, template, EditSectionsView, InvitationsView, LinkToStudentsView, toUnderscore, h) ->
 
   editSectionsDialog = null
@@ -50,8 +51,13 @@ define [
       json.url = "#{ENV.COURSE_ROOT_URL}/users/#{@model.get('id')}"
       json.isObserver = @model.hasEnrollmentType('ObserverEnrollment')
       json.isPending = @model.pending(@model.currentRole)
+      json.isInactive = @model.inactive()
+      if !json.isInactive
+        json.enrollments = _.reject json.enrollments, (en) -> en.enrollment_state == 'inactive' # if not _completely_ inactive, treat the inactive enrollments as deleted
+
       json.canRemoveUsers = _.all @model.get('enrollments'), (e) -> e.can_be_removed
-      json.canEditSections = not _.isEmpty @model.sectionEditableEnrollments()
+      json.canResendInvitation = !json.isInactive
+      json.canEditSections = !json.isInactive && !(_.isEmpty(@model.sectionEditableEnrollments()))
       json.canLinkStudents = json.isObserver && !ENV.course.concluded
       json.canViewLoginIdColumn = ENV.permissions.manage_admin_users || ENV.permissions.manage_students || ENV.permissions.read_sis
       json.canViewLoginId =
@@ -69,6 +75,7 @@ define [
       if json.isObserver
         observerEnrollments = _.filter json.enrollments, (en) -> en.type == 'ObserverEnrollment'
         json.enrollments = _.reject json.enrollments, (en) -> en.type == 'ObserverEnrollment'
+
         json.sections = _.map json.enrollments, (en) -> ENV.CONTEXTS['sections'][en.course_section_id]
 
         users = {}
@@ -98,6 +105,40 @@ define [
       linkToStudentsDialog ||= new LinkToStudentsView
       linkToStudentsDialog.model = @model
       linkToStudentsDialog.render().show()
+
+    inactivateUser: ->
+      return unless confirm I18n.t('Are you sure you want to inactivate this user? They will be unable to participate in the course while inactive.')
+      deferreds = []
+      for en in @model.get('enrollments')
+        if en.enrollment_state != 'inactive'
+          url = "/api/v1/courses/#{ENV.course.id}/enrollments/#{en.id}?task=inactivate"
+          en.enrollment_state = 'inactive'
+          deferreds.push($.ajaxJSON(url, 'DELETE'))
+
+      $('.roster-tab').disableWhileLoading(
+        $.when(deferreds...)
+          .done =>
+            @render()
+            $.flashMessage I18n.t('User successfully inactivated')
+          .fail ->
+            $.flashError I18n.t("Something went wrong inactivating the user. Please try again later.")
+      )
+
+    reactivateUser: ->
+      deferreds = []
+      for en in @model.get('enrollments')
+        url = "/api/v1/courses/#{ENV.course.id}/enrollments/#{en.id}/reactivate"
+        en.enrollment_state = 'active'
+        deferreds.push($.ajaxJSON(url, 'PUT'))
+
+      $('.roster-tab').disableWhileLoading(
+        $.when(deferreds...)
+        .done =>
+          @render()
+          $.flashMessage I18n.t('User successfully re-activated')
+        .fail ->
+          $.flashError I18n.t("Something went wrong re-activating the user. Please try again later.")
+      )
 
     removeFromCourse: (e) ->
       return unless confirm I18n.t('delete_confirm', 'Are you sure you want to remove this user?')

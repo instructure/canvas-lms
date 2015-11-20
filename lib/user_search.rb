@@ -3,7 +3,7 @@ module UserSearch
   def self.for_user_in_context(search_term, context, searcher, session=nil, options = {})
     search_term = search_term.to_s
     return User.none if search_term.strip.empty?
-    base_scope = scope_for(context, searcher, options.slice(:enrollment_type, :enrollment_role, :enrollment_role_id, :exclude_groups, :enrollment_state))
+    base_scope = scope_for(context, searcher, options.slice(:enrollment_type, :enrollment_role, :enrollment_role_id, :exclude_groups, :enrollment_state, :include_inactive_enrollments))
     if search_term.to_s =~ Api::ID_REGEX
       db_id = Shard.relative_id_for(search_term, Shard.current, Shard.current)
       user = base_scope.where(id: db_id).first
@@ -48,12 +48,14 @@ module UserSearch
     enrollment_types = Array(options[:enrollment_type]) if options[:enrollment_type]
     enrollment_states = Array(options[:enrollment_state]) if options[:enrollment_state]
     include_prior_enrollments = !options[:enrollment_state].nil?
+    include_inactive_enrollments = !!options[:include_inactive_enrollments]
     exclude_groups = Array(options[:exclude_groups]) if options[:exclude_groups]
 
     users = if context.is_a?(Account)
               User.of_account(context).active
             elsif context.is_a?(Course)
-              context.users_visible_to(searcher, include_prior_enrollments, enrollment_state: enrollment_states).uniq
+              context.users_visible_to(searcher, include_prior_enrollments,
+                enrollment_state: enrollment_states, include_inactive: include_inactive_enrollments).uniq
             else
               context.users_visible_to(searcher).uniq
             end

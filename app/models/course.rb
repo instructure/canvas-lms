@@ -119,6 +119,7 @@ class Course < ActiveRecord::Base
   has_many :enrollments, preload: :user, conditions: ['enrollments.workflow_state != ?', 'deleted'], dependent: :destroy, inverse_of: :course
   has_many :all_enrollments, :class_name => 'Enrollment'
   has_many :current_enrollments, class_name: 'Enrollment', conditions: "enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive')", preload: :user
+  has_many :all_current_enrollments, class_name: 'Enrollment', conditions: "enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted')", preload: :user
   has_many :typical_current_enrollments, class_name: 'Enrollment', conditions: "enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive') AND enrollments.type NOT IN ('StudentViewEnrollment', 'ObserverEnrollment', 'DesignerEnrollment')", preload: :user
   has_many :prior_enrollments, class_name: 'Enrollment', preload: [:user, :course], conditions: "enrollments.workflow_state = 'completed'"
   has_many :prior_users, :through => :prior_enrollments, :source => :user
@@ -127,6 +128,7 @@ class Course < ActiveRecord::Base
   has_many :all_students, :through => :all_student_enrollments, :source => :user
   has_many :participating_students, :through => :enrollments, :source => :user, :conditions => "enrollments.type IN ('StudentEnrollment', 'StudentViewEnrollment') and enrollments.workflow_state = 'active'"
   has_many :student_enrollments, class_name: 'Enrollment', conditions: "enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive') AND enrollments.type IN ('StudentEnrollment', 'StudentViewEnrollment')", preload: :user
+  has_many :admin_visible_student_enrollments, class_name: 'Enrollment', conditions: "enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted') AND enrollments.type IN ('StudentEnrollment', 'StudentViewEnrollment')", preload: :user
   has_many :all_student_enrollments, class_name: 'Enrollment', conditions: "enrollments.workflow_state != 'deleted' AND enrollments.type IN ('StudentEnrollment', 'StudentViewEnrollment')", preload: :user
   has_many :all_real_users, :through => :all_real_enrollments, :source => :user
   has_many :all_real_enrollments, class_name: 'Enrollment', conditions: ["enrollments.workflow_state != 'deleted' AND enrollments.type <> 'StudentViewEnrollment'"], preload: :user
@@ -157,6 +159,7 @@ class Course < ActiveRecord::Base
   has_many :non_unique_associated_accounts, :source => :account, :through => :course_account_associations, :order => 'course_account_associations.depth'
   has_many :users, :through => :enrollments, :source => :user, :uniq => true
   has_many :current_users, :through => :current_enrollments, :source => :user, :uniq => true
+  has_many :all_current_users, :through => :all_current_enrollments, :source => :user, :uniq => true
   has_many :group_categories, :as => :context, :conditions => ['deleted_at IS NULL']
   has_many :all_group_categories, :class_name => 'GroupCategory', :as => :context
   has_many :groups, :as => :context
@@ -2082,10 +2085,19 @@ class Course < ActiveRecord::Base
 
   def users_visible_to(user, include_priors=false, opts={})
     visibilities = section_visibilities_for(user)
-    scope = include_priors ? users : current_users
+    visibility = enrollment_visibility_level_for(user, visibilities)
+
+    scope = if include_priors
+              users
+            elsif opts[:include_inactive] && [:full, :sections].include?(visibility)
+              all_current_users
+            else
+              current_users
+            end
+
     scope =  scope.where(:enrollments => {:workflow_state => opts[:enrollment_state]}) if opts[:enrollment_state]
     # See also MessageableUsers (same logic used to get users across multiple courses) (should refactor)
-    case enrollment_visibility_level_for(user, visibilities)
+    case visibility
       when :full then scope
       when :sections then scope.where(:enrollments => { :course_section_id => visibilities.map {|s| s[:course_section_id] } })
       when :restricted then scope.where(:enrollments => { :user_id => (visibilities.map { |s| s[:associated_user_id] }.compact + [user]) })

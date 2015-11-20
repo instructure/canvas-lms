@@ -468,6 +468,18 @@ class Enrollment < ActiveRecord::Base
     self.save
   end
 
+  def inactivate
+    self.workflow_state = "inactive"
+    self.user.touch
+    self.save
+  end
+
+  def reactivate
+    self.workflow_state = "active"
+    self.user.touch
+    self.save
+  end
+
   def defined_by_sis?
     !!self.sis_source_id
   end
@@ -1003,7 +1015,9 @@ class Enrollment < ActiveRecord::Base
   }
   scope :invited, -> { where(:workflow_state => 'invited') }
   scope :accepted, -> { where("enrollments.workflow_state<>'invited'") }
-  scope :active_or_pending, -> { where(:workflow_state => ['invited', 'creation_pending', 'active']) }
+  scope :active_or_pending, -> { where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive')") }
+  scope :all_active_or_pending, -> { where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted')") } # includes inactive
+
   scope :currently_online, -> { joins(:pseudonyms).where("pseudonyms.last_request_at>?", 5.minutes.ago) }
   # this returns enrollments for creation_pending users; should always be used in conjunction with the invited scope
   scope :for_email, lambda { |email|

@@ -640,6 +640,7 @@ class ApplicationController < ActionController::Base
   end
 
   def check_for_readonly_enrollment_state
+    return unless request.format.html?
     if @context_enrollment && @context_enrollment.is_a?(Enrollment) && ['invited', 'active'].include?(@context_enrollment.workflow_state) && action_name != "enrollment_invitation"
       state = @context_enrollment.state_based_on_date
       case state

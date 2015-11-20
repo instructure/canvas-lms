@@ -785,6 +785,8 @@ class CoursesController < ApplicationController
       params[:per_page] ||= params[:limit]
 
       search_params = params.slice(:search_term, :enrollment_role, :enrollment_role_id, :enrollment_type, :enrollment_state)
+      include_inactive = @context.grants_right?(@current_user, session, :read_as_admin)
+      search_params[:include_inactive_enrollments] = true if include_inactive
       search_term = search_params[:search_term].presence
 
       if search_term
@@ -817,14 +819,14 @@ class CoursesController < ApplicationController
         end
       end
       if includes.include?('enrollments')
-        enrollments_by_user = @context.enrollments.
-            active_or_pending.
-            where(user_id: users).
-            preload(:course).
-            group_by(&:user_id)
+        enrollment_scope = @context.enrollments.
+          where(user_id: users).
+          preload(:course)
+        enrollment_scope = include_inactive ? enrollment_scope.all_active_or_pending : enrollment_scope.active_or_pending
+        enrollments_by_user = enrollment_scope.group_by(&:user_id)
       end
       render :json => users.map { |u|
-        enrollments = enrollments_by_user[u.id] if includes.include?('enrollments')
+        enrollments = enrollments_by_user[u.id] || [] if includes.include?('enrollments')
         user_json(u, @current_user, session, includes, @context, enrollments)
       }
     end

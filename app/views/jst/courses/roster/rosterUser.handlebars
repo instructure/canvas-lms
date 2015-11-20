@@ -4,6 +4,7 @@
 <td>
   <a href="{{html_url}}" class="roster_user_name">{{name}}</a>
   {{#if isPending}}<span class="label label-info" title="{{#t "pending_acceptance_explanation"}}This user has not yet accepted the invitation to the course{{/t}}">{{#t "pending_acceptance_of_invitation"}}pending{{/t}}</span>{{/if}}
+  {{#if isInactive}}<span class="label" title="{{#t}}This user is currently not able to access the course{{/t}}">{{#t}}inactive{{/t}}</span>{{/if}}
 </td>
 {{#if canViewLoginIdColumn}}
 <td>
@@ -41,17 +42,24 @@
       <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
       <span class="screenreader-only">{{#t "manage_user"}}Manage {{name}}{{/t}}</span></a>
     <ul class="al-options">
-      <li><a href="#" data-event="resendInvitation"><i class="icon-email"></i> {{#t "links.resend_invitation"}}Resend Invitation{{/t}}</a></li>
-      {{#if canLinkStudents }}
-      <li><a href="#" data-event="linkToStudents"><i class="icon-link"></i> {{#t "links.link_to_students"}}Link to Students{{/t}}</a></li>
+      {{#if canResendInvitation}}
+        <li><a href="#" data-event="resendInvitation"><i class="icon-email"></i> {{#t "links.resend_invitation"}}Resend Invitation{{/t}}</a></li>
+      {{/if}}
+      {{#if canLinkStudents}}
+        <li><a href="#" data-event="linkToStudents"><i class="icon-link"></i> {{#t "links.link_to_students"}}Link to Students{{/t}}</a></li>
       {{/if}}
       {{#if canEditSections}}
-      <li><a href="#" data-event="editSections"><i class="icon-edit"></i> {{#t "links.edit_sections"}}Edit Sections{{/t}}</a></li>
+        <li><a href="#" data-event="editSections"><i class="icon-edit"></i> {{#t "links.edit_sections"}}Edit Sections{{/t}}</a></li>
       {{/if}}
-      <li><a href="{{url}}"><i class="icon-user"></i> {{#t "links.user_details"}}User Details{{/t}}</a></li>
+        <li><a href="{{url}}"><i class="icon-user"></i> {{#t "links.user_details"}}User Details{{/t}}</a></li>
       {{#if canRemoveUsers}}
-      <li class="ui-menu-item"><hr /></li>
-      <li><a href="#" data-event="removeFromCourse"><i class="icon-trash"></i> {{#t "links.remove_from_course"}}Remove From Course{{/t}}</a></li>
+        <li class="ui-menu-item"><hr /></li>
+        {{#if isInactive}}
+          <li><a href="#" data-event="reactivateUser">{{#t}}Re-activate User{{/t}}</a></li>
+        {{else}}
+          <li><a href="#" data-event="inactivateUser">{{#t}}Inactivate User{{/t}}</a></li>
+        {{/if}}
+        <li><a href="#" data-event="removeFromCourse"><i class="icon-trash"></i> {{#t "links.remove_from_course"}}Remove From Course{{/t}}</a></li>
       {{/if}}
     </ul>
   </div>
