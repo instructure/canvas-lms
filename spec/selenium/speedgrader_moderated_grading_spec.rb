@@ -147,7 +147,7 @@ describe "speed grader" do
       expect(tab).to include_text("6/8")
 
       #open dropdown, make sure that the "Create 2nd Mark" link is not shown
-      f('#moderation_tabs #new_mark_dropdown_link').click
+      f('#moderation_bar #new_mark_dropdown_link').click
       wait_for_ajaximations
       expect(f('#new_mark_link')).to_not be_displayed
 
@@ -175,7 +175,7 @@ describe "speed grader" do
       @assignment.moderated_grading_selections.create!(:student => @student)
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-      new_mark_dd = f('#moderation_tabs #new_mark_dropdown_link')
+      new_mark_dd = f('#moderation_bar #new_mark_dropdown_link')
       expect(new_mark_dd).to include_text("Add Review")
       new_mark_dd.click
       wait_for_ajaximations
@@ -226,7 +226,7 @@ describe "speed grader" do
       @assignment.moderated_grading_selections.create!(:student => @student)
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-      f('#moderation_tabs #new_mark_dropdown_link').click
+      f('#moderation_bar #new_mark_dropdown_link').click
       wait_for_ajaximations
       f('#new_mark_link').click
       wait_for_ajaximations
@@ -269,6 +269,7 @@ describe "speed grader" do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
       tabs = ff('#moderation_tabs > ul > li')
       expect(tabs[1]).to_not be_displayed # no second mark
+      expect(tabs[1]).to have_class 'ui-state-disabled'
       final_tab = tabs[2]
       expect(final_tab).to be_displayed
       expect(final_tab).to include_text("Moderator")
@@ -339,7 +340,7 @@ describe "speed grader" do
       @assignment.moderated_grading_selections.create!(:student => @student)
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-      f('#moderation_tabs #new_mark_dropdown_link').click
+      f('#moderation_bar #new_mark_dropdown_link').click
       wait_for_ajaximations
       new_mark_final = f('#new_mark_final_link')
       expect(new_mark_final).to be_displayed
@@ -370,7 +371,7 @@ describe "speed grader" do
       @assignment.moderated_grading_selections.create!(:student => @student)
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-      f('#moderation_tabs #new_mark_dropdown_link').click
+      f('#moderation_bar #new_mark_dropdown_link').click
       wait_for_ajaximations
       expect(f('#new_mark_copy_link2')).to_not be_displayed # since there is no 2nd mark to copy yet
       copy_link = f('#new_mark_copy_link1')
@@ -393,7 +394,7 @@ describe "speed grader" do
       @assignment.moderated_grading_selections.create!(:student => @student)
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-      f('#moderation_tabs #new_mark_dropdown_link').click
+      f('#moderation_bar #new_mark_dropdown_link').click
       wait_for_ajaximations
       # make a 2nd mark to copy with a rubric assessment and comments - make sure they get copied
       f('#new_mark_link').click
@@ -406,7 +407,7 @@ describe "speed grader" do
       f('#add_a_comment button[type="submit"]').click
       wait_for_ajaximations
 
-      f('#moderation_tabs #new_mark_dropdown_link').click
+      f('#moderation_bar #new_mark_dropdown_link').click
       wait_for_ajaximations
       f('#new_mark_copy_link2').click
       wait_for_ajaximations
@@ -435,7 +436,7 @@ describe "speed grader" do
       final_pg = @submission.find_or_create_provisional_grade!(scorer: other_teacher, score: 2, final: true)
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-      f('#moderation_tabs #new_mark_dropdown_link').click
+      f('#moderation_bar #new_mark_dropdown_link').click
       wait_for_ajaximations
       f('#new_mark_copy_link1').click
       driver.switch_to.alert.accept # should get a warning that it will overwrite the current final mark
@@ -603,6 +604,7 @@ describe "speed grader" do
         expect(buttons[2]).to be_displayed
         buttons[2].click
         wait_for_ajaximations
+        check_element_has_focus(tabs[2])
 
         expect(buttons[2]).to_not be_displayed
         expect(icons[0]).to_not be_displayed
@@ -630,7 +632,7 @@ describe "speed grader" do
 
       it "should be able to select a newly created provisional grade (once it's saved)" do
         get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-        f('#moderation_tabs #new_mark_dropdown_link').click
+        f('#moderation_bar #new_mark_dropdown_link').click
         wait_for_ajaximations
         f('#new_mark_link').click
         wait_for_ajaximations
@@ -661,7 +663,7 @@ describe "speed grader" do
 
         get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 
-        f('#moderation_tabs #new_mark_dropdown_link').click
+        f('#moderation_bar #new_mark_dropdown_link').click
         wait_for_ajaximations
         f('#new_mark_copy_link1').click
         wait_for_ajaximations

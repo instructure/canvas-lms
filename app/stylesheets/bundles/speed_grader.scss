@@ -157,7 +157,7 @@ $gradebook_header_height: 52px;
   right: 0;
   min-width: 960px;
   &.with_moderation_tabs {
-    top: $gradebook_header_height * 2;
+    top: $gradebook_header_height * 2 + 3;
   }
 }
 
@@ -195,16 +195,30 @@ $gradebook_header_height: 52px;
   }
 }
 
-#moderation_tabs {
+#moderation_bar {
   display: none;
   width: 100%;
   border-bottom: 1px solid $ic-border-light;
+
+  #moderation_bar_content {
+    display: flex;
+    align-items: center;
+
+    #new_mark_container {
+      padding-left: 5px;
+    }
+  }
+}
+
+#moderation_tabs {
   #dummy_container {
-    background: #f2f2f2;
+    height: 0px;
+    padding: 0px;
   }
   ul {
     background: $white;
     height: $gradebook_header_height - 1px;
+    border-bottom: none;
     li {
       height: $gradebook_header_height;
       min-width: 275px;
@@ -218,6 +232,9 @@ $gradebook_header_height: 52px;
         &.selected button, &.pending button {
           display: none;
         }
+      }
+      &.ui-state-focus .mark_title {
+        text-decoration: underline;
       }
       &.selected .selected_icon {
         display: inline-block;
