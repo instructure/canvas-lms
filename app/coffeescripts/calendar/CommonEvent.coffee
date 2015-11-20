@@ -90,7 +90,7 @@ define [
       @start && @start < fcUtil.now()
 
     copyDataFromObject: (data) ->
-      @originalStart = fcUtil.clone(@start) if @start
+      @originalStart = (fcUtil.clone(@start) if @start)
       @midnightFudged = false # clear out cached value because now we have new data
       if @isDueAtMidnight()
         @midnightFudged = true
