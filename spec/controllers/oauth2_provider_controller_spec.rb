@@ -133,7 +133,7 @@ describe Oauth2ProviderController do
       Canvas.stubs(:redis => redis)
       post :token, client_id: key.id, client_secret: key.api_key, grant_type: 'authorization_code', code: valid_code
       expect(response).to be_success
-      expect(JSON.parse(response.body).keys.sort).to match_array(['access_token',  'refresh_token', 'user'])
+      expect(JSON.parse(response.body).keys.sort).to match_array(['access_token',  'refresh_token', 'user', 'expires_in'])
     end
 
     it 'default grant_type to authorization_code if none is supplied and code is present' do
@@ -142,7 +142,7 @@ describe Oauth2ProviderController do
       post :token, :client_id => key.id, :client_secret => key.api_key, :code => valid_code
       expect(response).to be_success
       json = JSON.parse(response.body)
-      expect(json.keys.sort).to eq ['access_token', 'refresh_token', 'user']
+      expect(json.keys.sort).to match_array ['access_token', 'refresh_token', 'user', 'expires_in']
     end
 
     it 'deletes existing tokens for the same key when replace_tokens=1' do

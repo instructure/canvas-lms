@@ -38,6 +38,7 @@ define [
     @optionProperty 'course_id'
     @optionProperty 'course_home'
     @optionProperty 'course_title'
+    @optionProperty 'display_show_all_pages'
 
     initialize: ->
       @model.on 'change', => @render()
@@ -95,6 +96,7 @@ define [
       @reloadView = new WikiPageReloadView
         el: @$pageChangedAlert
         model: @model
+        interval: 150000
         reloadMessage: I18n.t 'reload_viewing_page', 'This page has changed since you started viewing it. *Reload*', wrapper: '<a class="reload" href="#">$1</a>'
       @reloadView.on 'changed', =>
         @$headerBarOuterContainer.addClass('page-changed')

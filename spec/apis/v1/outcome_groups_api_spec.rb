@@ -305,12 +305,13 @@ describe "Outcome Groups API", type: :request do
       end
 
       let(:check_outcome_link) do
-        ->(outcome_link, context, group, assessed, can_edit) do
+        ->(outcome_link, context, group, assessed, can_edit, can_unlink) do
           expect(outcome_link).to eq({
             "context_type" => context.class.to_s,
             "context_id" => context.id,
             "url" => polymorphic_path([:api_v1, context, :outcome_link], :id => group.id, :outcome_id => @outcome.id),
             "assessed" => assessed,
+            "can_unlink" => can_unlink,
             "outcome_group" => {
               "id" => group.id,
               "title" => group.title,
@@ -340,6 +341,7 @@ describe "Outcome Groups API", type: :request do
           @account,
           @group,
           false,
+          true,
           true
         )
       end
@@ -369,6 +371,7 @@ describe "Outcome Groups API", type: :request do
           json.last.tap{ |j| j.delete("outcome") },
           @account,
           @account.root_outcome_group,
+          false,
           false,
           false
         )
@@ -792,6 +795,7 @@ describe "Outcome Groups API", type: :request do
           "context_id" => @account.id,
           "url" => polymorphic_path([:api_v1, @account, :outcome_link], :id => @group.id, :outcome_id => outcome.id),
           "assessed" => false,
+          "can_unlink" => true,
           "outcome_group" => {
             "id" => @group.id,
             "title" => @group.title,
@@ -888,12 +892,13 @@ describe "Outcome Groups API", type: :request do
       end
 
       let(:check_outcome_link) do
-        ->(outcome_link, context, group, assessed) do
+        ->(outcome_link, context, group, assessed, can_unlink) do
           expect(outcome_link).to eq({
             "context_type" => context.class.to_s,
             "context_id" => context.id,
             "url" => polymorphic_path([:api_v1, context, :outcome_link], :id => group.id, :outcome_id => @outcome.id),
             "assessed" => assessed,
+            "can_unlink" => can_unlink,
             "outcome_group" => {
               "id" => group.id,
               "title" => group.title,
@@ -921,7 +926,7 @@ describe "Outcome Groups API", type: :request do
         )
 
         check_outcome.call(json.first["outcome"])
-        check_outcome_link.call(json.first.tap{|j| j.delete("outcome")}, @account, @group, false)
+        check_outcome_link.call(json.first.tap{|j| j.delete("outcome")}, @account, @group, false, true)
       end
 
       it "outcome is assessed" do
@@ -953,7 +958,35 @@ describe "Outcome Groups API", type: :request do
           json.first.tap{ |j| j.delete("outcome") },
           @course,
           @course.root_outcome_group,
-          true
+          true,
+          false
+        )
+      end
+
+      it "should return can_unlink of 'false' if it cannot unlink" do
+        create_outcome(:title => "Un outcome")
+
+        course_with_teacher(active_all: true)
+        @course.root_outcome_group.add_outcome(@outcome)
+
+        aqb = @course.assessment_question_banks.create!
+        @outcome.align(aqb, @course, :mastery_type => "none")
+
+        json = api_call(
+          :get, "/api/v1/courses/#{@course.id}/outcome_groups/#{@course.root_outcome_group.id}/outcomes",
+          :controller => 'outcome_groups_api',
+          :action => 'outcomes',
+          :course_id => @course.id.to_s,
+          :id => @course.root_outcome_group.id.to_s,
+          :format => 'json'
+        )
+
+        check_outcome_link.call(
+          json.first.tap{ |j| j.delete("outcome") },
+          @course,
+          @course.root_outcome_group,
+          false,
+          false
         )
       end
     end
@@ -1032,6 +1065,7 @@ describe "Outcome Groups API", type: :request do
           "context_id" => @account.id,
           "url" => polymorphic_path([:api_v1, @account, :outcome_link], :id => @group.id, :outcome_id => @outcome.id),
           "assessed" => false,
+          "can_unlink" => true,
           "outcome_group" => {
             "id" => @group.id,
             "title" => @group.title,

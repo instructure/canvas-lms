@@ -511,6 +511,8 @@ describe User do
       @course5.enroll_user(@user, 'TeacherEnrollment')
 
       @course6 = course(:course_name => "active but date restricted", :active_course => true)
+      @course6.restrict_student_future_view = true
+      @course6.save!
       e = @course6.enroll_user(@user, 'StudentEnrollment')
       e.accept!
       e.start_at = 1.day.from_now
@@ -523,7 +525,6 @@ describe User do
       e.start_at = 2.days.ago
       e.end_at = 1.day.ago
       e.save!
-
 
       # only four, in the right order (type, then name), and with the top type per course
       expect(@user.courses_with_primary_enrollment.map{|c| [c.id, c.primary_enrollment_type]}).to eql [
@@ -2427,6 +2428,13 @@ describe User do
         assmt.update_attribute(:grades_published_at, Time.now.utc)
         expect(@teacher.assignments_needing_moderation.length).to eq 0 # should not count anymore once grades are published
       end
+
+      it "should not give a count for non-moderators" do
+        assmt = @course2.assignments.first
+        assmt.grade_student(@studentA, :grade => "1", :grader => @teacher, :provisional => true)
+        ta = ta_in_course(:course => @course, :active_all => true).user
+        expect(ta.assignments_needing_moderation.length).to eq 0
+      end
     end
   end
 
@@ -2901,6 +2909,11 @@ describe User do
     it "includes 'teacher' if the user has a designer enrollment" do
       @enrollment = @course.enroll_user(@user, 'DesignerEnrollment', enrollment_state: 'active')
       expect(@user.roles(@account)).to eq %w[user teacher]
+    end
+
+    it "includes 'observer' if the user has an observer enrollment" do
+      @enrollment = @course.enroll_user(@user, 'ObserverEnrollment', enrollment_state: 'active')
+      expect(@user.roles(@account)).to eq %w[user observer]
     end
 
     it "includes 'admin' if the user has an admin user record" do

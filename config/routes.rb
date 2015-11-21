@@ -49,6 +49,10 @@ CanvasRails::Application.routes.draw do
   get 'mr/:id' => 'info#message_redirect', as: :message_redirect
   get 'help_links' => 'info#help_links'
 
+  # These are just debug routes, but they make working on error pages easier,
+  # and it shouldn't matter if a client stumbles across them
+  get 'test_error' => 'info#test_error'
+
   concern :question_banks do
     resources :question_banks do
       post :bookmark
@@ -618,6 +622,7 @@ CanvasRails::Application.routes.draw do
   put 'images/users/:user_id' => 'users#update_avatar_image', as: :update_avatar_image
   get 'all_menu_courses' => 'users#all_menu_courses'
   get 'grades' => 'users#grades'
+  get 'grades_for_student' => 'users#grades_for_student'
 
   get 'login' => 'login#new'
   delete 'logout' => 'login#destroy'
@@ -745,7 +750,7 @@ CanvasRails::Application.routes.draw do
   get 'dashboard-sidebar' => 'users#dashboard_sidebar', as: :dashboard_sidebar
   post 'users/toggle_recent_activity_dashboard' => 'users#toggle_recent_activity_dashboard'
   get 'styleguide' => 'info#styleguide'
-  get 'theme-preview' => 'info#theme_preview'
+  get 'accounts/:account_id/theme-preview' => 'info#theme_preview'
   get 'old_styleguide' => 'info#old_styleguide'
   root to: 'users#user_dashboard', as: 'root', via: :get
   # backwards compatibility with the old /dashboard url
@@ -1736,6 +1741,14 @@ CanvasRails::Application.routes.draw do
       post 'users/self/bookmarks', action: :create
       delete 'users/self/bookmarks/:id', action: :destroy
       put 'users/self/bookmarks/:id', action: :update
+    end
+
+    scope(controller: :course_nicknames) do
+      get 'users/self/course_nicknames', action: :index, as: :course_nicknames
+      get 'users/self/course_nicknames/:course_id', action: :show
+      put 'users/self/course_nicknames/:course_id', action: :update
+      delete 'users/self/course_nicknames/:course_id', action: :delete
+      delete 'users/self/course_nicknames', action: :clear
     end
 
     scope(controller: :errors) do

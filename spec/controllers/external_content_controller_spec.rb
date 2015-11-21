@@ -10,7 +10,7 @@ describe ExternalContentController do
 
     it "gets a context for external_tool_dialog" do
       c = course
-      get :success, service: 'external_tool_dialog', course_id:c.id
+      get :success, service: 'external_tool_dialog', course_id: c.id
       expect(assigns[:context]).to_not be_nil
     end
   end
@@ -19,7 +19,7 @@ describe ExternalContentController do
     it "js env is set correctly" do
 
       c = course
-      post(:success, service: 'external_tool_dialog', course_id:c.id, lti_message_type: 'ContentItemSelection',
+      post(:success, service: 'external_tool_dialog', course_id: c.id, lti_message_type: 'ContentItemSelection',
            lti_version: 'LTI-1p0',
            data: '',
            content_items: '{"@context":"http://purl.imsglobal.org/ctx/lti/v1/ContentItem","@graph":[{"@type":"LtiLinkItem","@id":"http://lti-tool-provider-example.dev/messages/blti","url":"http://lti-tool-provider-example.dev/messages/blti","title":"Its like sexy for your computer","text":"Arch Linux","mediaType":"application/vnd.ims.lti.v1.ltilink","windowTarget":"","placementAdvice":{"displayWidth":800,"presentationDocumentTarget":"iframe","displayHeight":600},"thumbnail":{"@id":"http://www.runeaudio.com/assets/img/banner-archlinux.png","height":128,"width":128}}]}',
@@ -47,4 +47,24 @@ describe ExternalContentController do
 
     end
   end
+
+
+  describe "#content_items_for_canvas" do
+    it 'sets default placement advice' do
+      c = course
+      post(:success, service: 'external_tool_dialog', course_id: c.id, lti_message_type: 'ContentItemSelection',
+           lti_version: 'LTI-1p0',
+           data: '',
+           content_items: '{"@context":"http://purl.imsglobal.org/ctx/lti/v1/ContentItem","@graph":[{"@type":"LtiLinkItem","@id":"http://lti-tool-provider-example.dev/messages/blti","url":"http://lti-tool-provider-example.dev/messages/blti","title":"Its like sexy for your computer","text":"Arch Linux","mediaType":"application/vnd.ims.lti.v1.ltilink","windowTarget":"","thumbnail":{"@id":"http://www.runeaudio.com/assets/img/banner-archlinux.png","height":128,"width":128}}]}',
+           lti_msg: '',
+           lti_log: '',
+           lti_errormsg: '',
+           lti_errorlog: '')
+
+      expect(controller.js_env[:retrieved_data].first.placement_advice.presentation_document_target).to eq("default")
+      expect(controller.js_env[:retrieved_data].first.placement_advice.display_height).to eq(600)
+      expect(controller.js_env[:retrieved_data].first.placement_advice.display_width).to eq(800)
+    end
+  end
+
 end

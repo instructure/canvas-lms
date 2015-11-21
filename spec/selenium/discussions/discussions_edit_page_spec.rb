@@ -102,7 +102,8 @@ describe "discussions" do
             # should correctly save changes to the assignment
             set_value f('#discussion_topic_assignment_points_possible'), '123'
           end
-          expect(Assignment.last.points_possible).to eq 123
+          assignment.reload
+          expect(assignment.points_possible).to eq 123
         end
 
         it "should warn user when leaving page unsaved", priority: "1", test_id: 270919 do

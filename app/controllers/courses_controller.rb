@@ -964,10 +964,10 @@ class CoursesController < ApplicationController
       @range_start = Date.parse("Jan 1 2000")
       @range_end = Date.tomorrow
 
-      query = "SELECT COUNT(id), SUM(size) FROM attachments WHERE context_id=%s AND context_type='Course' AND root_attachment_id IS NULL AND file_state != 'deleted'"
+      query = "SELECT COUNT(id), SUM(size) FROM #{Attachment.quoted_table_name} WHERE context_id=%s AND context_type='Course' AND root_attachment_id IS NULL AND file_state != 'deleted'"
       row = Attachment.connection.select_rows(query % [@context.id]).first
       @file_count, @files_size = [row[0].to_i, row[1].to_i]
-      query = "SELECT COUNT(id), SUM(max_size) FROM media_objects WHERE context_id=%s AND context_type='Course' AND attachment_id IS NULL AND workflow_state != 'deleted'"
+      query = "SELECT COUNT(id), SUM(max_size) FROM #{MediaObject.quoted_table_name} WHERE context_id=%s AND context_type='Course' AND attachment_id IS NULL AND workflow_state != 'deleted'"
       row = MediaObject.connection.select_rows(query % [@context.id]).first
       @media_file_count, @media_files_size = [row[0].to_i, row[1].to_i]
 
@@ -1030,28 +1030,31 @@ class CoursesController < ApplicationController
 
       @invited_count = @context.invited_count_visible_to(@current_user)
 
-      js_env(:COURSE_ID => @context.id,
-             :USERS_URL => "/api/v1/courses/#{ @context.id }/users",
-             :ALL_ROLES => @all_roles,
-             :COURSE_ROOT_URL => "/courses/#{ @context.id }",
-             :SEARCH_URL => search_recipients_url,
-             :CONTEXTS => @contexts,
-             :USER_PARAMS => {:include => ['email', 'enrollments', 'locked', 'observed_users']},
-             :PERMISSIONS => {
-               :manage_students => @context.grants_right?(@current_user, session, :manage_students),
-               :manage_admin_users => @context.grants_right?(@current_user, session, :manage_admin_users),
-               :manage_account_settings => @context.account.grants_right?(@current_user, session, :manage_account_settings),
-             })
+      @publishing_enabled = @context.allows_grade_publishing_by(@current_user) &&
+        can_do(@context, @current_user, :manage_grades)
 
       @alerts = @context.alerts
       add_crumb(t('#crumbs.settings', "Settings"), named_context_url(@context, :context_details_url))
       js_env({
-        :APP_CENTER => {
+        COURSE_ID: @context.id,
+        USERS_URL: "/api/v1/courses/#{@context.id}/users",
+        ALL_ROLES: @all_roles,
+        COURSE_ROOT_URL: "/courses/#{@context.id}",
+        SEARCH_URL: search_recipients_url,
+        CONTEXTS: @contexts,
+        USER_PARAMS: {:include => ['email', 'enrollments', 'locked', 'observed_users']},
+        PERMISSIONS: {
+          :manage_students => @context.grants_right?(@current_user, session, :manage_students),
+          :manage_admin_users => @context.grants_right?(@current_user, session, :manage_admin_users),
+          :manage_account_settings => @context.account.grants_right?(@current_user, session, :manage_account_settings),
+        },
+        APP_CENTER: {
           enabled: Canvas::Plugin.find(:app_center).enabled?
         },
         ENABLE_LTI2: @domain_root_account.feature_enabled?(:lti2_ui),
         LTI_LAUNCH_URL: course_tool_proxy_registration_path(@context),
-        CONTEXT_BASE_URL: "/courses/#{@context.id}"
+        CONTEXT_BASE_URL: "/courses/#{@context.id}",
+        PUBLISHING_ENABLED: @publishing_enabled
       })
 
       @course_settings_sub_navigation_tools = ContextExternalTool.all_tools_for(@context, :type => :course_settings_sub_navigation, :root_account => @domain_root_account, :current_user => @current_user)
@@ -1189,11 +1192,7 @@ class CoursesController < ApplicationController
       session[:accepted_enrollment_uuid] = enrollment.uuid
 
       if params[:action] != 'show'
-        if @context.restrict_enrollments_to_course_dates?
-          redirect_to courses_url
-        else
-          redirect_to course_url(@context.id)
-        end
+        redirect_to course_url(@context.id)
       else
         @context_enrollment = enrollment
         enrollment = nil
@@ -1428,10 +1427,11 @@ class CoursesController < ApplicationController
   #
   # Accepts the same include[] parameters as the list action plus:
   #
-  # @argument include[] [String, "all_courses"|"permissions"]
+  # @argument include[] [String, "all_courses"|"permissions"|"observed_users"]
   #   - "all_courses": Also search recently deleted courses.
   #   - "permissions": Include permissions the current user has
   #     for the course.
+  #   - "observed_users": include observed users in the enrollments
   #
   # @returns Course
   def show
@@ -1452,6 +1452,13 @@ class CoursesController < ApplicationController
 
       if authorized_action(@course, @current_user, :read)
         enrollments = @course.current_enrollments.where(:user_id => @current_user).to_a
+        if includes.include?("observed_users") &&
+            enrollments.any?(&:assigned_observer?)
+          observees = ObserverEnrollment.observed_students(@course,
+                                                           @current_user)
+          observees.values.each { |v| enrollments.concat(v) }
+        end
+
         includes << :hide_final_grades
         render :json => course_json(@course, @current_user, session, includes, enrollments)
       end
@@ -1491,11 +1498,13 @@ class CoursesController < ApplicationController
 
     @context_enrollment ||= @pending_enrollment
     if @context.grants_right?(@current_user, session, :read)
+      check_for_readonly_enrollment_state
+
       log_asset_access([ "home", @context ], "home", "other")
 
       check_incomplete_registration
 
-      add_crumb(@context.short_name, url_for(@context), :id => "crumb_#{@context.asset_string}")
+      add_crumb(@context.nickname_for(@current_user, :short_name), url_for(@context), :id => "crumb_#{@context.asset_string}")
       set_badge_counts_for(@context, @current_user, @current_enrollment)
 
       @course_home_view = (params[:view] == "feed" && 'feed') || @context.default_view || 'feed'

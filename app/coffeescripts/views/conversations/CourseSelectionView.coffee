@@ -36,9 +36,12 @@ define [
       now = $.fudgeDateForProfileTimezone(new Date)
       @options.courses.all.each((course) =>
         if @options.courses.favorites.get(course.id) then return
-        is_complete = course.get('workflow_state') == 'completed' ||
-          (course.get('end_at') && new Date(course.get('end_at')) < now) ||
-          (course.get('term').end_at && new Date(course.get('term').end_at) < now)
+        if course.get('access_restricted_by_date') then return
+
+        is_complete = course.get('workflow_state') == 'completed'
+        if course.get('end_at') then is_complete ||= (new Date(course.get('end_at')) < now)
+        if course.get('term') then is_complete ||= (new Date(course.get('term').end_at) < now)
+
         collection = if is_complete then concluded else more
         collection.push(course.toJSON())
       )

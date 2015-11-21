@@ -3,7 +3,7 @@ require_relative '../../../app/models/assignment/filter_with_overrides_by_due_at
 
 describe Assignment::FilterWithOverridesByDueAtForStudent do
   describe '#filter_assignments' do
-    before :all do
+    before :once do
       @course = Course.create!
       @assignment = @course.assignments.create!
       group = @course.grading_period_groups.create!
@@ -23,7 +23,7 @@ describe Assignment::FilterWithOverridesByDueAtForStudent do
     end
 
     context 'the assignment has one override and the override applies to the student' do
-      before :all do
+      before :once do
         @assignment.only_visible_to_overrides = true
         @override = @assignment.assignment_overrides.create!
         @override.assignment_override_students.create!(user: @student)
@@ -59,7 +59,7 @@ describe Assignment::FilterWithOverridesByDueAtForStudent do
       end
 
       context 'given that override does not have a due at' do
-        before :all do
+        before :once do
           @override.due_at = nil
           @override.save!
         end
@@ -87,7 +87,7 @@ describe Assignment::FilterWithOverridesByDueAtForStudent do
     end
 
     context 'the assignment has one override and the override does not apply to the student' do
-      before :all do
+      before :once do
         @assignment.assignment_overrides.create!
       end
 
@@ -270,7 +270,7 @@ describe Assignment::FilterWithOverridesByDueAtForStudent do
     end
 
     context 'the assignment has two overrides that apply to the student' do
-      before :all do
+      before :once do
         @student_override = @assignment.assignment_overrides.create!
         @student_override.assignment_override_students.create!(user: @student)
 
@@ -371,7 +371,7 @@ describe Assignment::FilterWithOverridesByDueAtForStudent do
       end
 
       context 'neither override has a due at' do
-        before :all do
+        before :once do
           @student_override.due_at = nil
           @student_override.save!
           @section_override.due_at = nil

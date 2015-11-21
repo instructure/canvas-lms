@@ -410,6 +410,7 @@ describe CoursesController do
     it "does not record recent activity for unauthorize actions" do
       user_session(@student)
       @course.workflow_state = 'available'
+      @course.restrict_student_future_view = true
       @course.save!
       @enrollment.start_at = 2.days.from_now
       @enrollment.end_at = 4.days.from_now
@@ -536,7 +537,7 @@ describe CoursesController do
       post 'enrollment_invitation', :course_id => @course.id, :accept => '1',
         :invitation => @enrollment.uuid
 
-      expect(response).to redirect_to(courses_url)
+      expect(response).to redirect_to(course_url(@course))
       @enrollment.reload
       expect(@enrollment.workflow_state).to eq('active')
       expect(@enrollment.last_activity_at).to be(nil)
@@ -573,6 +574,7 @@ describe CoursesController do
     it "should give a helpful error message for students that can't access yet" do
       user_session(@student)
       @course.workflow_state = 'claimed'
+      @course.restrict_student_future_view = true
       @course.save!
       get 'show', :id => @course.id
       assert_status(401)

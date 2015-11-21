@@ -1,4 +1,3 @@
-/** @jsx React.DOM */
 define([
   'react',
   'fixed-data-table',
@@ -6,24 +5,24 @@ define([
   'underscore',
   'bower/reflux/dist/reflux',
   'i18n!gradebook2',
-  '../wrappers/columnFactory',
-  '../wrappers/headerWrapper',
-  '../constants',
-  '../stores/assignmentGroupsStore',
-  '../actions/assignmentGroupsActions',
-  '../stores/settingsStore',
-  '../actions/settingsActions',
-  '../stores/gradebookToolbarStore',
-  '../stores/studentEnrollmentsStore',
-  '../stores/gradingPeriodsStore',
-  '../actions/studentEnrollmentsActions',
-  '../stores/submissionsStore',
-  '../actions/submissionsActions',
-  '../stores/keyboardNavigationStore',
-  '../actions/keyboardNavigationActions',
-  '../stores/tableStore',
-  '../helpers/columnArranger',
-  'vendor/spin'
+  'jsx/gradebook/grid/wrappers/columnFactory',
+  'jsx/gradebook/grid/wrappers/headerWrapper',
+  'jsx/gradebook/grid/constants',
+  'jsx/gradebook/grid/actions/assignmentGroupsActions',
+  'jsx/gradebook/grid/stores/settingsStore',
+  'jsx/gradebook/grid/actions/settingsActions',
+  'jsx/gradebook/grid/stores/gradebookToolbarStore',
+  'jsx/gradebook/grid/stores/gradingPeriodsStore',
+  'jsx/gradebook/grid/actions/studentEnrollmentsActions',
+  'jsx/gradebook/grid/actions/submissionsActions',
+  'jsx/gradebook/grid/actions/customColumnsActions',
+  'jsx/gradebook/grid/stores/keyboardNavigationStore',
+  'jsx/gradebook/grid/actions/keyboardNavigationActions',
+  'jsx/gradebook/grid/stores/tableStore',
+  'jsx/gradebook/grid/actions/sectionsActions',
+  'jsx/gradebook/grid/helpers/columnArranger',
+  'vendor/spin',
+  'jsx/gradebook/grid/helpers/submissionsHelper'
 ], function (
   React,
   FixedDataTable,
@@ -34,23 +33,22 @@ define([
   ColumnFactory,
   HeaderWrapper,
   GradebookConstants,
-  AssignmentGroupsStore,
   AssignmentGroupsActions,
   SettingsStore,
   SettingsActions,
   GradebookToolbarStore,
-  StudentEnrollmentsStore,
   GradingPeriodsStore,
   StudentEnrollmentsActions,
-  SubmissionsStore,
   SubmissionsActions,
+  CustomColumnsActions,
   KeyboardNavigationStore,
   KeyboardNavigationActions,
   TableStore,
+  SectionsActions,
   ColumnArranger,
-  Spinner
+  Spinner,
+  SubmissionsHelper
 ){
-
   var Table = FixedDataTable.Table,
       Column = FixedDataTable.Column,
       isColumnResizing = false,
@@ -67,10 +65,12 @@ define([
     componentWillMount() {
       AssignmentGroupsActions.load();
       StudentEnrollmentsActions.load()
-      .then((studentEnrollments) => {
-        var studentIds = _.pluck(studentEnrollments, 'user_id');
-        SubmissionsActions.load(studentIds);
-      });
+        .then((studentEnrollments) => {
+          var studentIds = _.pluck(studentEnrollments, 'user_id');
+          SubmissionsActions.load(studentIds);
+        });
+      SectionsActions.load();
+      CustomColumnsActions.loadTeacherNotes();
     },
 
     componentDidMount() {
@@ -152,12 +152,14 @@ define([
       var columnIdentifier = columnId || columnType,
           columnWidth = this.getColumnWidth(columnIdentifier),
           enrollments = this.state.tableData.students,
+          submissions = this.state.tableData.submissions,
           columnData = {
             columnType: columnType,
             activeCell: this.state.currentCellIndex,
             setActiveCell: KeyboardNavigationActions.setActiveCell,
             assignment: assignment,
-            enrollments: enrollments
+            enrollments: enrollments,
+            submissions: submissions
           };
 
       return (
@@ -280,7 +282,9 @@ define([
               height={this.state.settings.height}
               width={this.state.settings.width}
               headerHeight={GradebookConstants.DEFAULT_LAYOUTS.headers.height}>
+
               {this.renderAllColumns()}
+
             </Table>
           </div>
         );

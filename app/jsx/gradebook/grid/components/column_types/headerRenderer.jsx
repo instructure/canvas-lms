@@ -1,4 +1,3 @@
-/** @jsx React.DOM */
 define([
   'react',
   'underscore',
@@ -93,6 +92,7 @@ define([
       var columnType  = columnData.columnType,
           assignment  = columnData.assignment,
           enrollments = columnData.enrollments,
+          submissions = columnData.submissions,
           key, dropdownOptionsId;
       if (assignment) {
         key = 'assignment-' + assignment.id;
@@ -102,7 +102,8 @@ define([
             idToAppendTo='gradebook_grid' screenreaderText={I18n.t('Assignment Options')}
             defaultClassNames='gradebook-header-drop' options={{ noButton: true }}>
             <AssignmentHeaderDropdownOptions key={dropdownOptionsId}
-              idAttribute={dropdownOptionsId} assignment={assignment} enrollments={enrollments}/>
+              idAttribute={dropdownOptionsId} assignment={assignment}
+              enrollments={enrollments} submissions={submissions}/>
           </GradebookKyleMenu>
         );
       } else if (columnType === 'total') {

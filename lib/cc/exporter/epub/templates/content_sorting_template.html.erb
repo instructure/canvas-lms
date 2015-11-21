@@ -2,10 +2,9 @@
 <html>
 <head>
   <title><%= title %></title>
-  <!-- embedded styling will be inserted here -->
 </head>
   <body>
-    <h1 id="<%="#{title}_TOC"%>"><%="#{title} List"%></h1>
+    <h1 id="<%="#{title}_TOC"%>"><%="#{title}"%></h1>
     <ol>
     <% content.each do |item| %>
       <li><a href="#<%= "#{item[:identifier]}" %>"><%= item[:title] %></a></li>
@@ -14,6 +13,8 @@
     <div style="page-break-before:always;"></div>
     <% content.each do |item| %>
       <%=build(item)%>
+      <hr/>
+      <a href="<%= "##{reference}.xhtml" %>"><%="Back to #{title}"%></a>
       <div style="page-break-before:always;"></div>
     <% end %>
   </body>

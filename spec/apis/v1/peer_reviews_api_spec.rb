@@ -383,6 +383,7 @@ describe PeerReviewsApiController, type: :request do
 
 
       it 'should not include submission comments user information when anonymous peer reviews' do
+        @course.root_account.tap{|a| a.enable_service(:avatars)}.save!
         @assignment1.update_attribute(:anonymous_peer_reviews, true)
         @comment = @submission.add_comment(:author => @student2, :comment => "review comment")
         @user = @student1
@@ -393,6 +394,7 @@ describe PeerReviewsApiController, type: :request do
                                "id"=>@assessment_request.id,
                                "submission_comments" => [{"author_id"=>nil,
                                                           "author_name"=>"Anonymous User",
+                                                          'avatar_path' => User.default_avatar_fallback,
                                                           "comment"=>"review comment",
                                                           "created_at"=>@comment.created_at.as_json,
                                                           "id"=>@comment.id,

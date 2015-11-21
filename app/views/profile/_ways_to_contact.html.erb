@@ -49,6 +49,9 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
+  .intl_rates_may_apply {
+    font-size: 0.8em
+  }
 </style>
 <% end %>
 
@@ -209,6 +212,9 @@
         <input type="tel" name="communication_channel_sms_number" id='communication_channel_sms_number' class="user_selected sms_number" aria-describedby="communication_channel_sms_number_description" /><br/>
         <span style="font-size: 0.8em; color: #a44" id='communication_channel_sms_number_description' class="should_be_10_digits">
           <%= t('validations.should_be_10_digits', "should be 10-digit number") %>
+        </span>
+        <span class="intl_rates_may_apply">
+          <%= t('International text messaging rates may apply.') %>
         </span>
       </div>
     </div>

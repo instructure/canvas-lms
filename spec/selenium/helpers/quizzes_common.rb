@@ -1,14 +1,12 @@
 require_relative "../common"
 
-  def create_quiz_with_due_date(due_date=Time.zone.now)
-    unlock_at = Time.zone.now.advance(days:-2)
-    lock_at = Time.zone.now.advance(days:4)
-    @context = @course
+  def create_quiz_with_due_date(opts={})
+    @context = opts.fetch(:course, @course)
     @quiz = quiz_model
     @quiz.generate_quiz_data
-    @quiz.due_at = due_date
-    @quiz.lock_at = lock_at
-    @quiz.unlock_at = unlock_at
+    @quiz.due_at = opts.fetch(:due_at, default_time_for_due_date(Time.zone.now))
+    @quiz.lock_at = opts.fetch(:lock_at, default_time_for_lock_date(Time.zone.now.advance(days:4)))
+    @quiz.unlock_at = opts.fetch(:unlock_at, default_time_for_unlock_date(Time.zone.now.advance(days:-2)))
     @quiz.save!
     @quiz
   end
@@ -289,7 +287,7 @@ require_relative "../common"
     end
 
     if submit
-      expect_new_page_load { f('#submit_quiz_button').click }
+      expect_new_page_load(true) { f('#submit_quiz_button').click }
       keep_trying_until do
         expect(f('.quiz-submission .quiz_score .score_value')).to be_displayed
       end

@@ -48,15 +48,6 @@ describe 'editing a quiz' do
         delete_quiz
       end
 
-      it 'unpublishes the quiz', priority: "1", test_id: 351929 do
-        expect_new_page_load do
-          click_save_settings_button
-        end
-        f('#quiz-publish-link').click
-        wait_for_ajax_requests
-        expect(f('#quiz-publish-link .publish-text').text.strip!).to eq 'Publish'
-      end
-
       it 'saves question changes with the |Save it now| button', priority: "1", test_id: 140647 do
         course_with_student(course: @course)
 

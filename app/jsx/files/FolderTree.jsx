@@ -1,5 +1,3 @@
-/** @jsx React.DOM */
-
 define([
   'react',
   'compiled/react_files/components/FolderTree'

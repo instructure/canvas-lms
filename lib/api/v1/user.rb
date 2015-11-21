@@ -57,7 +57,7 @@ module Api::V1::User
           json[:login_id] = pseudonym.unique_id
         end
       end
-      if service_enabled?(:avatars) && includes.include?('avatar_url')
+      if user.account.service_enabled?(:avatars) && includes.include?('avatar_url')
         json[:avatar_url] = avatar_url_for_user(user, blank_fallback)
       end
       if enrollments
@@ -135,12 +135,14 @@ module Api::V1::User
       else
         polymorphic_url([parent_context, user])
       end
-    return {
+    hash = {
       id: user.id,
       display_name: user.short_name,
       avatar_image_url: avatar_url_for_user(user, blank_fallback),
       html_url: participant_url
     }
+    hash[:fake_student] = true if user.fake_student?
+    hash
   end
 
   # optimization hint, currently user only needs to pull pseudonyms from the db

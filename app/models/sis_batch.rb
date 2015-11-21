@@ -136,11 +136,18 @@ class SisBatch < ActiveRecord::Base
   end
 
   class Work < Delayed::PerformableMethod
-    def on_permanent_failure(error)
+    def on_permanent_failure(_error)
       account = args.first
       account.sis_batches.importing.each do |batch|
         batch.finish(false)
       end
+
+      job_args = {
+        singleton: "account:update_account_associations:#{Shard.birth.activate{ account.id }}",
+        priority: Delayed::LOW_PRIORITY,
+        max_attempts: 1,
+      }
+      account.send_later_enqueue_args(:update_account_associations, job_args)
     end
   end
 

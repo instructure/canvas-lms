@@ -6,7 +6,8 @@ define [
   'jst/gradebook2/section_to_show_menu'
   'compiled/jquery.kylemenu'
   'vendor/jquery.ba-tinypubsub'
-], (I18n, $, _, {View}, template) ->
+  'jsx/gradebook/grid/actions/sectionsActions'
+], (I18n, $, _, {View}, template, SectionsActions) ->
 
   class SectionMenuView extends View
 
@@ -35,6 +36,7 @@ define [
         date = new Date(options.course.passback_status.sis_post_grades_status.grades_posted_at)
         @sections[0].passback_status = options.course.passback_status
         @sections[0].date = date
+      @updateSections()
 
     render: ->
       @detachEvents()

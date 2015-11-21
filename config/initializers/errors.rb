@@ -8,6 +8,7 @@
 # disabled individually with a setting.
 #
 Rails.configuration.to_prepare do
+  ErrorReport.configure_to_ignore(["AuthenticationMethods::AccessTokenError"])
   Canvas::Errors.register!(:error_report) do |exception, data|
     setting = Setting.get("error_report_exception_handling", 'true')
     if setting == 'true'

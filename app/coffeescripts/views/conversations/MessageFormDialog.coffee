@@ -283,8 +283,7 @@ define [
           data.attachment_ids = (a.attachment.id for a in attachments)
           data
         processData: (formData) =>
-          unless formData.context_code
-            formData.context_code = @options.account_context_code
+          formData.context_code ||= @launchParams?.context || @options.account_context_code
           formData
         onSubmit: (@request, submitData) =>
           # close dialog after submitting the message

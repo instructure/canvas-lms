@@ -57,10 +57,14 @@ class GradebooksController < ApplicationController
           gp_id = @current_grading_period_id unless view_all_grading_periods?
         end
 
+        @exclude_total = exclude_total?(@context)
         Shackles.activate(:slave) do
           #run these queries on the slave database for speed
           @presenter.assignments(gp_id)
-          @presenter.groups_assignments = groups_as_assignments(@presenter.groups, :out_of_final => true, :exclude_total => @context.hide_final_grades?)
+          @presenter.groups_assignments = groups_as_assignments(
+            @presenter.groups,
+            :out_of_final => true,
+            :exclude_total => @exclude_total)
           @presenter.submissions
           @presenter.submission_counts
           @presenter.assignment_stats
@@ -78,7 +82,8 @@ class GradebooksController < ApplicationController
                group_weighting_scheme: @context.group_weighting_scheme,
                show_total_grade_as_points: @context.settings[:show_total_grade_as_points],
                grading_scheme: @context.grading_standard.try(:data) || GradingStandard.default_grading_standard,
-               grading_period: @grading_periods && @grading_periods.find {|grading_period| grading_period[:id].to_s == gp_id},
+               grading_period: @grading_periods && @grading_periods.find { |period| period[:id] == gp_id },
+               exclude_total: @exclude_total,
                student_outcome_gradebook_enabled: @context.feature_enabled?(:student_outcome_gradebook),
                student_id: @presenter.student_id
       else
@@ -206,7 +211,7 @@ class GradebooksController < ApplicationController
       case launch_definition[:definition_type]
       when 'ContextExternalTool'
         url = external_tool_url_for_lti1(launch_definition)
-      when 'MessageHandler'
+      when 'Lti::MessageHandler'
         url = external_tool_url_for_lti2(launch_definition)
       end
       launch_definition[:placements][:post_grades][:canvas_launch_url] = url
@@ -232,15 +237,17 @@ class GradebooksController < ApplicationController
   end
 
   def set_current_grading_period
-    unless @current_grading_period_id = params[:grading_period_id].presence
+    if params[:grading_period_id].present?
+      @current_grading_period_id = params[:grading_period_id].to_i
+    else
       return if view_all_grading_periods?
       current = GradingPeriod.for(@context).find(&:current?)
-      @current_grading_period_id = current ? current.id.to_s : '0'
+      @current_grading_period_id = current ? current.id : 0
     end
   end
 
   def view_all_grading_periods?
-    @current_grading_period_id == "0"
+    @current_grading_period_id == 0
   end
 
   def get_active_grading_periods
@@ -283,6 +290,7 @@ class GradebooksController < ApplicationController
       :group_weighting_scheme => @context.group_weighting_scheme,
       :grading_standard =>  @context.grading_standard_enabled? && (@context.grading_standard.try(:data) || GradingStandard.default_grading_standard),
       :course_is_concluded => @context.completed?,
+      :course_name => @context.name,
       :gradebook_is_editable => @gradebook_is_editable,
       :setting_update_url => api_v1_course_settings_url(@context),
       :show_total_grade_as_points => @context.settings[:show_total_grade_as_points],
@@ -313,7 +321,8 @@ class GradebooksController < ApplicationController
       :gradebook_column_size_settings_url => change_gradebook_column_size_course_gradebook_url,
       :gradebook_column_order_settings => @current_user.preferences[:gradebook_column_order].try(:[], @context.id),
       :gradebook_column_order_settings_url => save_gradebook_column_order_course_gradebook_url,
-      :gradebook_performance_enabled => @context.feature_enabled?(:gradebook_performance)
+      :gradebook_performance_enabled => @context.feature_enabled?(:gradebook_performance),
+      :all_grading_periods_totals => @context.feature_enabled?(:all_grading_periods_totals)
     }
   end
 
@@ -463,7 +472,12 @@ class GradebooksController < ApplicationController
                          'SpeedGrader is enabled only for published content.')
       return redirect_to polymorphic_url([@context, @assignment])
     end
-
+    if Canvadocs.enabled? &&
+       Canvadocs.annotations_supported? &&
+       @assignment.submission_types.include?('online_upload') &&
+       request.user_agent.to_s =~ /Firefox/
+        flash[:notice] = t("Warning: Crocodoc has limitations when used in Firefox. Comments will not always be saved.")
+    end
     grading_role = if moderated_grading_enabled_and_no_grades_published
       if @context.grants_right?(@current_user, :moderate_grades)
         :moderator
@@ -646,5 +660,14 @@ class GradebooksController < ApplicationController
     @context.feature_enabled?(:moderated_grading) &&
       @assignment.moderated_grading? &&
       !@assignment.grades_published?
+  end
+
+  def exclude_total?(context)
+    return true if context.hide_final_grades
+
+    all_grading_periods_selected =
+      multiple_grading_periods? && view_all_grading_periods?
+    hide_all_grading_periods_totals = !context.feature_enabled?(:all_grading_periods_totals)
+    all_grading_periods_selected && hide_all_grading_periods_totals
   end
 end

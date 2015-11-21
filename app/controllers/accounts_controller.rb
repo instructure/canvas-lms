@@ -726,7 +726,7 @@ class AccountsController < ApplicationController
 
   def avatars
     if authorized_action(@account, @current_user, :manage_admin_users)
-      @users = @account.all_users
+      @users = @account.all_users(nil)
       @avatar_counts = {
         :all => format_avatar_count(@users.with_avatar_state('any').count),
         :reported => format_avatar_count(@users.with_avatar_state('reported').count),

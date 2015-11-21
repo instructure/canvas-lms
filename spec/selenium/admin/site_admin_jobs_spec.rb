@@ -140,7 +140,7 @@ describe "site admin jobs ui" do
         end
       end
 
-      it "should check all popular tags" do
+      it "should check all popular tags", priority: "2" do
         filter_tags(FlavorTags::ALL)
         keep_trying_until do
           tags = ff("#tags-grid .slick-row .r0").map(&:text)

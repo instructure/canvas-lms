@@ -93,3 +93,8 @@ define [
     updatedDueAts = _.map @dueDates.state.rows, (row) ->
       row.dates.due_at
     ok _.all(updatedDueAts, (due_at_val) -> due_at_val == null)
+
+  test 'focuses on the new row begin added', ->
+    @spy(@dueDates, 'focusRow')
+    @dueDates.addRow()
+    equal @dueDates.focusRow.callCount, 1

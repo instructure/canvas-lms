@@ -68,11 +68,12 @@ define([
     },
 
     onUpdatedSubmissionsReceived(updatedSubs) {
-      var subIds, updatedSubsForGroup;
-
+      var updatedSubsForGroup;
       this.state.data = _.map(this.state.data, (submissionGroup) => {
-        subIds = _.pluck(submissionGroup.submissions, 'id');
-        updatedSubsForGroup = _.filter(updatedSubs, sub => _.contains(subIds, sub.id));
+        updatedSubsForGroup = _.filter(
+          updatedSubs,
+          updatedSub => updatedSub.user_id === submissionGroup.user_id
+        );
         submissionGroup.submissions = this.updateSubmissions(submissionGroup.submissions, updatedSubsForGroup);
         return submissionGroup;
       });

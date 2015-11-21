@@ -123,6 +123,14 @@ In Fedora 22 and later, docker-compose is in the repos:
 $ dnf install docker-compose
 ```
 
+###### Ubuntu and others
+
+If you have [python pip](https://en.wikipedia.org/wiki/Pip_(package_manager)) installed, you can use it to install docker-compose:
+
+```
+$ pip install docker-compose
+```
+
 ### Bootstrapping
 
 With those dependencies installed, go to your Canvas directory and run

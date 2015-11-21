@@ -65,9 +65,12 @@ define [
     initPointsCount: ->
       pts = @get 'points_possible'
       text = ''
-      if pts && pts > 0
+      if pts && pts > 0 && !@isUngradedSurvey()
         text = I18n.t('assignment_points_possible', 'pt', count: pts)
       @set 'possible_points_label', text
+
+    isUngradedSurvey: ->
+      @get('quiz_type') == "survey"
 
     initAllDates: ->
       if (allDates = @get('all_dates'))?

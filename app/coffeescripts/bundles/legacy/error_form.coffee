@@ -7,13 +7,17 @@ require [
   "compiled/jquery.rails_flash_notifications"
 ], (I18n, $, htmlEscape) ->
   $(document).ready ->
+    requiredFields = []
+    if window.ENV.current_user.display_name == undefined
+      requiredFields = ['error[email]']
     $(".submit_error_link").click (event) ->
       event.preventDefault()
       $("#submit_error_form").slideToggle ->
         $("#submit_error_form :input:visible:first").focus().select()
 
     $("#submit_error_form").formSubmit
-      formErrors: false
+      formErrors: false,
+      required: requiredFields,
       beforeSubmit: (data) ->
         $(this).loadingImage()
 

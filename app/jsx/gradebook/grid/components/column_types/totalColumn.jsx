@@ -1,4 +1,3 @@
-/** @jsx React.DOM */
 define([
   'bower/reflux/dist/reflux',
   'react',

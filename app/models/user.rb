@@ -1009,9 +1009,19 @@ class User < ActiveRecord::Base
     )
   end
 
+  def check_accounts_right?(user, sought_right)
+    # check if the user we are given is an admin in one of this user's accounts
+    user && (
+      Account.site_admin.grants_right?(user, sought_right) ||
+      self.associated_accounts.any?{|a| a.grants_right?(user, sought_right) }
+    )
+  end
+
   set_policy do
     given { |user| user == self }
-    can :read and can :read_profile and can :read_as_admin and can :manage and can :manage_content and can :manage_files and can :manage_calendar and can :send_messages and can :update_avatar and can :manage_feature_flags
+    can :read and can :read_grades and can :read_profile and can :read_as_admin and can :manage and
+      can :manage_content and can :manage_files and can :manage_calendar and can :send_messages and
+      can :update_avatar and can :manage_feature_flags
 
     given { |user| user == self && user.user_can_edit_name? }
     can :rename
@@ -1028,45 +1038,24 @@ class User < ActiveRecord::Base
     given { |user| self.check_courses_right?(user, :manage_user_notes) }
     can :create_user_notes and can :read_user_notes
 
-    given do |user|
-      user && (
-        self.associated_accounts.any?{|a| a.grants_right?(user, :manage_user_notes)}
-      )
-    end
+    given {|user| self.check_accounts_right?(user, :manage_user_notes) }
     can :create_user_notes and can :read_user_notes and can :delete_user_notes
 
-    given do |user|
-      user && (
-      Account.site_admin.grants_right?(user, :view_statistics) ||
-          self.associated_accounts.any?{|a| a.grants_right?(user, :view_statistics)  }
-      )
-    end
+    given {|user| self.check_accounts_right?(user, :view_statistics) }
     can :view_statistics
 
-    given do |user|
-      user && (
-        # or, if the user we are given is an admin in one of this user's accounts
-        Account.site_admin.grants_right?(user, :manage_students) ||
-        self.associated_accounts.any? {|a| a.grants_right?(user, :manage_students) }
-      )
-    end
-    can :manage_user_details and can :update_avatar and can :remove_avatar and can :rename and can :read_profile and can :view_statistics and can :read and can :read_reports and can :manage_feature_flags
+    given {|user| self.check_accounts_right?(user, :manage_students) }
+    can :manage_user_details and can :update_avatar and can :remove_avatar and can :rename and can :read_profile and
+      can :view_statistics and can :read and can :read_reports and can :manage_feature_flags and can :read_grades
 
-    given do |user|
-      user && (
-        Account.site_admin.grants_right?(user, :manage_user_logins) ||
-        self.associated_accounts.any?{|a| a.grants_right?(user, :manage_user_logins)  }
-      )
-    end
+    given {|user| self.check_accounts_right?(user, :manage_user_logins) }
     can :view_statistics and can :read and can :read_reports
 
+    given {|user| self.check_accounts_right?(user, :view_all_grades) }
+    can :read_grades
+
     given do |user|
-      user && (
-        # or, if the user we are given is an admin in one of this user's accounts
-        Account.site_admin.grants_right?(user, :manage_user_logins) ||
-        (self.associated_accounts.any?{|a| a.grants_right?(user, :manage_user_logins) } &&
-         self.all_accounts.select(&:root_account?).all? {|a| has_subset_of_account_permissions?(user, a) } )
-      )
+      self.check_accounts_right?(user, :manage_user_logins) && self.all_accounts.select(&:root_account?).all? {|a| has_subset_of_account_permissions?(user, a) }
     end
     can :manage_user_details and can :rename and can :read_profile
 
@@ -1096,10 +1085,12 @@ class User < ActiveRecord::Base
   def has_subset_of_account_permissions?(user, account)
     return true if user == self
     return false unless account.root_account?
-    account_users = account.all_account_users_for(self)
-    return true if account_users.empty?
-    account_users.all? do |account_user|
-      account_user.is_subset_of?(user)
+
+    Rails.cache.fetch(['has_subset_of_account_permissions', self, user, account].cache_key, :expires_in => 60.minutes) do
+      account_users = account.all_account_users_for(self)
+      account_users.all? do |account_user|
+        account_user.is_subset_of?(user)
+      end
     end
   end
 
@@ -1367,6 +1358,16 @@ class User < ActiveRecord::Base
     preferences[:custom_colors] ||= {}
   end
 
+  def course_nicknames
+    preferences[:course_nicknames] ||= {}
+  end
+
+  def course_nickname(course)
+    shard.activate do
+      course_nicknames[course.id]
+    end
+  end
+
   def watched_conversations_intro?
     preferences[:watched_conversations_intro] == true
   end
@@ -1490,8 +1491,9 @@ class User < ActiveRecord::Base
         expecting_submission.
         where(:moderated_grading => true).
         where("assignments.grades_published_at IS NULL").
-        joins(:provisional_grades).uniq.
-        need_grading_info(opts[:limit])
+        joins(:provisional_grades).uniq.preload(:context).
+        need_grading_info(opts[:limit]).
+        select{|a| a.context.grants_right?(self, :moderate_grades)}
     end
   end
 
@@ -1729,7 +1731,10 @@ class User < ActiveRecord::Base
         end
         res
       end + temporary_invitations
-      if opts[:preload_courses]
+
+      if opts[:preload_dates]
+        Canvas::Builders::EnrollmentDateBuilder.preload(enrollments)
+      elsif opts[:preload_courses]
         ActiveRecord::Associations::Preloader.new(enrollments, :course).run
       end
       enrollments
@@ -1769,7 +1774,7 @@ class User < ActiveRecord::Base
   def participating_enrollments
     @participating_enrollments ||= self.shard.activate do
       Rails.cache.fetch([self, 'participating_enrollments'].cache_key) do
-        self.cached_current_enrollments.select(&:participating?)
+        self.cached_current_enrollments(:preload_dates => true).select(&:participating?)
       end
     end
   end
@@ -1795,7 +1800,7 @@ class User < ActiveRecord::Base
             joins(self.class.send(:sanitize_sql_array, [<<-SQL, opts[:start_at], 'submitter', self.id, self.id])).
               INNER JOIN (
                 SELECT MAX(submission_comments.created_at) AS last_updated_at_from_db, submission_id
-                FROM submission_comments, submission_comment_participants
+                FROM #{SubmissionComment.quoted_table_name}, #{SubmissionCommentParticipant.quoted_table_name}
                 WHERE submission_comments.id = submission_comment_id
                   AND (submission_comments.created_at > ?)
                   AND (submission_comment_participants.participation_type = ?)
@@ -1803,7 +1808,7 @@ class User < ActiveRecord::Base
                   AND (submission_comments.author_id <> ?)
                 GROUP BY submission_id
               ) AS relevant_submission_comments ON submissions.id = submission_id
-              INNER JOIN assignments ON assignments.id = submissions.assignment_id
+              INNER JOIN #{Assignment.quoted_table_name} ON assignments.id = submissions.assignment_id
             SQL
             where(assignments: {muted: false, workflow_state: 'published'}).
             order('last_updated_at_from_db DESC').
@@ -1818,9 +1823,6 @@ class User < ActiveRecord::Base
         end
       end
     end
-  end
-
-  def uncached_submissions_for_context_codes(context_codes, opts)
   end
 
   # This is only feedback for student contexts (unless specific contexts are passed in)
@@ -1951,14 +1953,20 @@ class User < ActiveRecord::Base
       end
     end
 
-    events += select_available_assignments(
-      select_upcoming_assignments(
-        Assignment.published.
-        for_context_codes(context_codes).
-        due_between_with_overrides(now, opts[:end_at]).
-        include_submitted_count.
-        map {|a| a.overridden_for(self)},opts.merge(:time => now)).
-      first(opts[:limit]))
+    assignments = Assignment.published.
+      for_context_codes(context_codes).
+      due_between_with_overrides(now, opts[:end_at]).
+      include_submitted_count
+
+    if assignments.any?
+      if AssignmentOverrideApplicator.should_preload_override_students?(assignments, self, "upcoming_events")
+        AssignmentOverrideApplicator.preload_assignment_override_students(assignments, self)
+      end
+
+      events += select_available_assignments(
+        select_upcoming_assignments(assignments.map {|a| a.overridden_for(self)}, opts.merge(:time => now)).
+        first(opts[:limit]))
+    end
     events.sort_by{|e| [e.start_at ? 0: 1,e.start_at || 0, Canvas::ICU.collation_key(e.title)] }.uniq.first(opts[:limit])
   end
 
@@ -2051,7 +2059,7 @@ class User < ActiveRecord::Base
   def appointment_context_codes
     @appointment_context_codes ||= Rails.cache.fetch([self, 'cached_appointment_codes', ApplicationController.region ].cache_key) do
       ret = {:primary => [], :secondary => []}
-      cached_current_enrollments(preload_courses: true).each do |e|
+      cached_current_enrollments(preload_dates: true).each do |e|
         next unless e.student? && e.active?
         ret[:primary] << "course_#{e.course_id}"
         ret[:secondary] << "course_section_#{e.course_section_id}"
@@ -2064,7 +2072,7 @@ class User < ActiveRecord::Base
   def manageable_appointment_context_codes
     @manageable_appointment_context_codes ||= Rails.cache.fetch([self, 'cached_manageable_appointment_codes', ApplicationController.region ].cache_key) do
       ret = {:full => [], :limited => [], :secondary => []}
-      cached_current_enrollments(preload_courses: true).each do |e|
+      cached_current_enrollments(preload_dates: true).each do |e|
         next unless e.course.grants_right?(self, :manage_calendar)
         if e.course.visibility_limited_to_course_sections?(self)
           ret[:limited] << "course_#{e.course_id}"
@@ -2259,12 +2267,13 @@ class User < ActiveRecord::Base
   def roles(root_account)
     return @roles if @roles
     @roles = ['user']
-    valid_types = %w[StudentEnrollment StudentViewEnrollment TeacherEnrollment TaEnrollment DesignerEnrollment]
+    valid_types = %w[StudentEnrollment StudentViewEnrollment TeacherEnrollment TaEnrollment DesignerEnrollment ObserverEnrollment]
 
     # except where in order to include StudentViewEnrollment's
     enrollment_types = root_account.all_enrollments.where(type: valid_types, user_id: self, workflow_state: 'active').uniq.pluck(:type)
     @roles << 'student' unless (enrollment_types & %w[StudentEnrollment StudentViewEnrollment]).empty?
     @roles << 'teacher' unless (enrollment_types & %w[TeacherEnrollment TaEnrollment DesignerEnrollment]).empty?
+    @roles << 'observer' unless (enrollment_types & %w[ObserverEnrollment]).empty?
     @roles << 'admin' unless root_account.all_account_users_for(self).empty?
     @roles
   end
@@ -2356,7 +2365,7 @@ class User < ActiveRecord::Base
     return @menu_data if @menu_data
     coalesced_enrollments = []
 
-    cached_enrollments = self.cached_current_enrollments(:include_enrollment_uuid => enrollment_uuid, :preload_courses => true)
+    cached_enrollments = self.cached_current_enrollments(:include_enrollment_uuid => enrollment_uuid, :preload_dates => true)
     cached_enrollments.each do |e|
 
       next if e.state_based_on_date == :inactive

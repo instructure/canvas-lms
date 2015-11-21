@@ -17,6 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 
 describe AvatarHelper do
   include AvatarHelper
@@ -95,6 +96,7 @@ describe AvatarHelper do
       expect(avatar_url_for_user(@user)).to match(%r{\Ahttps?://})
       expect(avatar_url_for_user(@user, true)).to match(%r{\Ahttps?://})
 
+      @user.account.set_service_availability(:avatars, true)
       @user.avatar_image_source = 'no_pic'
       @user.save!
       # reload to clear instance vars
@@ -120,6 +122,17 @@ describe AvatarHelper do
     it "should return full URIs for groups" do
       expect(avatar_url_for_group).to match(%r{\Ahttps?://})
       expect(avatar_url_for_group(true)).to match(%r{\Ahttps?://})
+    end
+    context "from other shard" do
+      specs_require_sharding
+      it "should return full path across shards" do
+        @user.account.set_service_availability(:avatars, true)
+        @user.avatar_image_source = 'attachment'
+        @user.avatar_image_url = "/relative/canvas/path"
+        @shard2.activate do
+          expect(avatar_url_for_user(@user)).to eq "http://test.host/relative/canvas/path"
+        end
+      end
     end
   end
 end

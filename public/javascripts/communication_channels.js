@@ -66,6 +66,14 @@ $(document).ready(function() {
     // Don't show the 10-digit warning if we're not expecting a U.S. number
     $form.find(".should_be_10_digits").showIf(useEmail && sms_number && sms_number.length != 10);
 
+    // Show the "international text messaging rates may apply" warning if international SMS is enabled, the user has
+    // selected a country, and that country is not the U.S.
+    $form.find('.intl_rates_may_apply').showIf(
+      ENV.INTERNATIONAL_SMS_ENABLED &&
+      !useEmail &&
+      $form.find(".country option:selected").val() !== 'undecided'
+    );
+
     if (useEmail) {
       $form.find('.sms_email_group').show();
       var email = $form.find(".carrier").val();

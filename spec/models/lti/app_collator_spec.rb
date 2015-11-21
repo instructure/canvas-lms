@@ -62,7 +62,8 @@ module Lti
                                    description: tool_proxy.description,
                                    installed_locally: true,
                                    enabled: true,
-                                   tool_configuration: nil
+                                   tool_configuration: nil,
+                                   reregistration: false
                                  })
 
       end
@@ -83,7 +84,8 @@ module Lti
                                     description: external_tool.description,
                                     installed_locally: true,
                                     enabled: true,
-                                    tool_configuration: nil
+                                    tool_configuration: nil,
+                                    reregistration: false
                                   })
       end
 
@@ -100,6 +102,45 @@ module Lti
         tool_proxy = definitions.find { |d| d[:app_type] == 'Lti::ToolProxy' }
         expect(tool_proxy).to_not be nil
         expect(external_tool).to_not be nil
+      end
+
+      it 'has check_for_update set to false' do
+        tp = create_tool_proxy
+        tp.bindings.create(context: account)
+        new_valid_external_tool(account)
+
+        tools_collection = subject.bookmarked_collection.paginate(per_page: 100).to_a
+
+        definitions = subject.app_definitions(tools_collection)
+        expect(definitions.count).to eq 2
+        external_tool = definitions.find { |d| d[:app_type] == 'ContextExternalTool' }
+        tool_proxy = definitions.find { |d| d[:app_type] == 'Lti::ToolProxy' }
+        expect(external_tool[:reregistration]).to eq false
+        expect(tool_proxy[:reregistration]).to eq false
+      end
+
+      it 'has reregistartion set to true for tool proxies if the feature flag is enabled' do
+        account.root_account.enable_feature!(:lti2_rereg)
+        tool_proxy = create_tool_proxy
+        tool_proxy.bindings.create(context: account)
+
+        tools_collection = subject.bookmarked_collection.paginate(per_page: 100).to_a
+
+        definitions = subject.app_definitions(tools_collection)
+        expect(definitions.count).to eq 1
+        definition = definitions.first
+        expect(definition[:reregistration]).to eq true
+      end
+
+      it 'has reregistartion set to false for external_tools if the feature flag is enabled' do
+        account.root_account.enable_feature!(:lti2_rereg)
+        external_tool = new_valid_external_tool(account)
+        tools_collection = subject.bookmarked_collection.paginate(per_page: 100).to_a
+
+        definitions = subject.app_definitions(tools_collection)
+        expect(definitions.count).to eq 1
+        definition = definitions.first
+        expect(definition[:reregistration]).to eq false
       end
 
     end

@@ -212,7 +212,7 @@ module SIS
             @users_to_add_account_associations << user.id if should_add_account_associations
             @users_to_update_account_associations << user.id if should_update_account_associations
 
-            if email.present?
+            if email.present? && EmailAddressValidator.valid?(email)
               # find all CCs for this user, and active conflicting CCs for all users
               # unless we're deleting this user, then only find CCs for this user
               if status_is_active
@@ -257,19 +257,31 @@ module SIS
               pseudo.sis_communication_channel_id = pseudo.communication_channel_id = cc.id
 
               if newly_active
-                other_ccs = ccs.reject { |other_cc| other_cc.user_id == user.id || other_cc.user.nil? || other_cc.user.pseudonyms.active.count == 0 ||
-                  !other_cc.user.pseudonyms.active.where("account_id=? AND sis_user_id IS NOT NULL", @root_account).empty? }
+                user_ids = ccs.map(&:user_id)
+                pseudo_scope = Pseudonym.active.where(user_id: user_ids).group(:user_id)
+                active_pseudo_counts = pseudo_scope.count
+                sis_pseudo_counts = pseudo_scope.where('account_id = ? AND sis_user_id IS NOT NULL', @root_account).count
+
+                other_ccs = ccs.reject { |other_cc|
+                  cc_user_id = other_cc.user_id
+                  same_user = cc_user_id == user.id
+                  no_active_pseudos = active_pseudo_counts.fetch(cc_user_id, 0) == 0
+                  active_sis_pseudos = sis_pseudo_counts.fetch(cc_user_id, 0) != 0
+
+                  same_user || no_active_pseudos || active_sis_pseudos
+                }
                 unless other_ccs.empty?
                   cc.send_merge_notification!
                 end
               end
+            elsif email.present? && EmailAddressValidator.valid?(email) == false
+              @messages << "The email address associated with user '#{user_id}' is invalid (email: '#{email}')"
             end
 
             if pseudo.changed?
               pseudo.sis_batch_id = @batch.id if @batch
               if pseudo.valid?
                 pseudo.save_without_broadcasting
-                @success_count += 1
               else
                 msg = "A user did not pass validation "
                 msg += "(" + "user: #{user_id}, error: "
@@ -278,8 +290,8 @@ module SIS
               end
             elsif @batch && pseudo.sis_batch_id != @batch.id
               @pseudos_to_set_sis_batch_ids << pseudo.id
-              @success_count += 1
             end
+            @success_count += 1
 
           end
         end

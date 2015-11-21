@@ -24,7 +24,7 @@ describe "calendar2" do
 
           events = ff("#minical .event")
           expect(events.size).to eq 1
-          expect(events.first.text.strip).to eq c.start_at.day.to_s
+          expect(Time.zone.parse(events.first['data-date']).day).to eq(c.start_at.day)
         end
 
         it "should change the main calendars month on click", priority: "1", test_id: 140224 do
@@ -59,10 +59,11 @@ describe "calendar2" do
         expect(f(".event")).to be_nil
 
         #Go back a month
-        f(".fc-button-prev").click
+        f(".fc-prev-button").click
+        wait_for_ajaximations
 
         #look for the event on the mini calendar
-        expect(f(".event").text).to include("13")
+        expect(f(".event")['data-date']).to eq(date.strftime("%Y-%m-%d"))
       end
 
       describe "contexts list" do
@@ -103,15 +104,15 @@ describe "calendar2" do
           load_month_view
 
           #expect event to be on the calendar
-          expect(f('.fc-event-title').text).to include title
+          expect(f('.fc-title').text).to include title
 
           # Click the toggle button. First button should be user, second should be course
           ff(".context-list-toggle-box")[1].click
-          expect(f('.fc-event-title')).to be_nil
+          expect(f('.fc-title')).to be_nil
 
           #Turn back on the calendar and verify that your item appears
           ff(".context-list-toggle-box")[1].click
-          expect(f('.fc-event-title').text).to include title
+          expect(f('.fc-title').text).to include title
         end
       end
 

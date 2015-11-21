@@ -3,29 +3,16 @@ define [
   'react-router'
   'underscore'
   'i18n!react_files'
-  'compiled/react/shared/utils/withReactElement'
   '../modules/filesEnv'
-  'jsx/files/ColumnHeaders'
-  'jsx/files/LoadingIndicator'
-  './FolderChild'
   '../utils/getAllPages'
   '../utils/updateAPIQuerySortParams'
   'compiled/models/Folder'
-  'jsx/files/CurrentUploads'
-  'jsx/files/FilePreview'
-  'jsx/files/UploadDropZone'
   '../utils/forceScreenreaderToReparse'
-], (React, Router, _, I18n, withReactElement, filesEnv, ColumnHeadersComponent, LoadingIndicator, FolderChildComponent, getAllPages, updateAPIQuerySortParams, Folder, CurrentUploadsComponent, FilePreviewComponent, UploadDropZoneComponent, forceScreenreaderToReparse) ->
-
-  ColumnHeaders = ColumnHeadersComponent
-  FolderChild = React.createFactory FolderChildComponent
-  CurrentUploads = React.createFactory CurrentUploadsComponent
-  FilePreview = React.createFactory FilePreviewComponent
-  UploadDropZone = React.createFactory UploadDropZoneComponent
+], (React, Router, _, I18n, filesEnv, getAllPages, updateAPIQuerySortParams, Folder, forceScreenreaderToReparse) ->
 
   LEADING_SLASH_TILL_BUT_NOT_INCLUDING_NEXT_SLASH = /^\/[^\/]*/
 
-  ShowFolder = React.createClass
+  ShowFolder =
     displayName: 'ShowFolder'
 
     mixins: [Router.Navigation, Router.State]
@@ -109,58 +96,4 @@ define [
         setTimeout(=>
           @transitionTo filesEnv.baseUrl, {}, @getQuery()
         , 0)
-
-    render: withReactElement ->
-      if @state?.errorMessages
-        return div {},
-          @state.errorMessages.map (error) ->
-            div className: 'muted', error.message
-      return div({ref: 'emptyDiv'}) unless @props.currentFolder
-      div role: 'grid', style: {flex: "1 1 auto"},
-
-        div {
-          ref: 'accessibilityMessage'
-          className: 'ShowFolder__accessbilityMessage col-xs',
-          tabIndex: 0
-        },
-          I18n.t("Warning: For improved accessibility in moving files, please use the Move To Dialog option found in the menu.")
-        UploadDropZone(currentFolder: @props.currentFolder)
-        CurrentUploads({})
-        ColumnHeaders {
-          ref: 'columnHeaders'
-          to: (if @getParams().splat then 'folder' else 'rootFolder')
-          query: @getQuery()
-          params: @getParams()
-          toggleAllSelected: @props.toggleAllSelected
-          areAllItemsSelected: @props.areAllItemsSelected
-          usageRightsRequiredForContext: @props.usageRightsRequiredForContext
-          splat: @getParams().splat
-        }
-        if @props.currentFolder.isEmpty()
-          div ref: 'folderEmpty', className: 'muted', I18n.t('this_folder_is_empty', 'This folder is empty')
-        else
-          @props.currentFolder.children(@getQuery()).map (child) =>
-            FolderChild
-              key: child.cid
-              model: child
-              isSelected: child in @props.selectedItems
-              toggleSelected: @props.toggleItemSelected.bind(null, child)
-              userCanManageFilesForContext: @props.userCanManageFilesForContext
-              usageRightsRequiredForContext: @props.usageRightsRequiredForContext
-              externalToolsForContext: @props.externalToolsForContext
-              previewItem: @props.previewItem.bind(null, child)
-              dndOptions: @props.dndOptions
-              modalOptions: @props.modalOptions
-              clearSelectedItems: @props.clearSelectedItems
-
-        LoadingIndicator isLoading: @props.currentFolder.folders.fetchingNextPage || @props.currentFolder.files.fetchingNextPage
-
-        # Prepare and render the FilePreview if needed.
-        # As long as ?preview is present in the url.
-        if @getQuery().preview?
-          FilePreview
-            usageRightsRequiredForContext: @props.usageRightsRequiredForContext
-            currentFolder: @props.currentFolder
-            params: @getParams()
-            query: @getQuery()
 

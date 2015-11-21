@@ -299,6 +299,7 @@ module MigratorHelper
           assmnt[:error_message] = a[:error_message] if a[:error_message]
           if a[:assignment] && a[:assignment][:migration_id]
             assmnt[:assignment_migration_id] = a[:assignment][:migration_id]
+            ensure_topic_or_quiz_assignment(a[:assignment], quiz_migration_id: a[:migration_id])
           end
         end
       end
@@ -360,7 +361,7 @@ module MigratorHelper
       end
     end
     if @course[:assignments]
-      @overview[:assignments] = []
+      @overview[:assignments] ||= []
       @course[:assignments].each do |a|
         assign = {}
         dates << a[:due_date] if a[:due_date]
@@ -388,10 +389,8 @@ module MigratorHelper
         topic[:migration_id] = t[:migration_id]
         topic[:error_message] = t[:error_message] if t[:error_message]
         if t[:assignment] && a_mig_id = t[:assignment][:migration_id]
-          if assign = @overview[:assignments].find{|a| a[:migration_id] == a_mig_id}
-            assign[:topic_migration_id] = t[:migration_id]
-            topic[:assignment_migration_id] = a_mig_id
-          end
+          topic[:assignment_migration_id] = a_mig_id
+          ensure_topic_or_quiz_assignment(t[:assignment], topic_migration_id: t[:migration_id])
         end
       end
     end
@@ -452,6 +451,19 @@ module MigratorHelper
 #      @overview[:scrape_errors] << {:error_message=>e[:error_message], :object_type=>e[:object_type]}
 #    end
     @overview
+  end
+
+  private
+
+  def ensure_topic_or_quiz_assignment(topic_or_quiz_assignment_hash, related_object_link)
+    @overview[:assignments] ||= []
+    ah = @overview[:assignments].detect { |a| a[:migration_id] == topic_or_quiz_assignment_hash[:migration_id] }
+    unless ah
+      ah = topic_or_quiz_assignment_hash.slice(:title, :migration_id, :assignment_group_migration_id)
+      @overview[:assignments] << ah
+    end
+    ah.merge!(related_object_link)
+    ah
   end
 end
 end

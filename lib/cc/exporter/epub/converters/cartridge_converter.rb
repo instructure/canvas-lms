@@ -17,13 +17,16 @@ module CC::Exporter::Epub::Converters
       super(settings, "cc")
       @course = @course.with_indifferent_access
       @resources = {}
+      @course[:syllabus] = []
       @resource_nodes_for_flat_manifest = {}
+      @unsupported_files = []
     end
+    attr_reader :unsupported_files
 
     def convert_placeholder_paths_from_string!(html_string)
       html_node = Nokogiri::HTML::DocumentFragment.parse(html_string)
       html_node.tap do |node|
-        convert_media_paths!(node)
+        convert_media_from_node!(node)
         remove_empty_ids!(node)
       end
       html_node.to_s
@@ -36,6 +39,21 @@ module CC::Exporter::Epub::Converters
       node
     end
 
+    def update_syllabus(content)
+      return unless content[:identifier]
+      @course[:syllabus] << {
+        title: content[:title],
+        identifier: content[:identifier],
+        due_at: content[:due_at],
+        href: content[:href]
+      }
+    end
+
+    def organize_syllabus
+      due_anytime, has_due_date = @course[:syllabus].partition { |item| item[:due_at].nil? }
+      @course[:syllabus] = has_due_date.sort_by{|item| item[:due_at]} + due_anytime
+    end
+
     # exports the package into the intermediary json
     def export
       unzip_archive
@@ -45,7 +63,7 @@ module CC::Exporter::Epub::Converters
       get_all_resources(@manifest)
 
       @course[:title] = get_node_val(@manifest, "string")
-      @course[:files] = convert_files
+      @course[:files], @unsupported_files = convert_files
 
       set_progress(10)
       @course[:wikis] = convert_wikis
@@ -57,9 +75,10 @@ module CC::Exporter::Epub::Converters
       @course[:quizzes] = convert_quizzes
       set_progress(50)
       @course[:modules] = convert_modules
+      set_progress(60)
 
-      # close up shop
       save_to_file
+      organize_syllabus
       set_progress(90)
       delete_unzipped_archive
       @course

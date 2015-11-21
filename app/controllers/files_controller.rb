@@ -1109,6 +1109,7 @@ class FilesController < ApplicationController
     if folder.name == 'profile pictures'
       json[:avatar] = avatar_json(@current_user, attachment, { :type => 'attachment' })
     end
+    Api.recursively_stringify_json_ids(json)
 
     render :json => json, :as_text => true
   end

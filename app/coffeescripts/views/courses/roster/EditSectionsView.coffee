@@ -56,7 +56,7 @@ define [
       $sections = @$('#user_sections')
       for e in @model.sectionEditableEnrollments()
         if section = ENV.CONTEXTS['sections'][e.course_section_id]
-          $sections.append sectionTemplate(id: section.id, name: section.name, role: e.role)
+          $sections.append sectionTemplate(id: section.id, name: section.name, role: e.role, can_be_removed: e.can_be_removed)
 
     onNewToken: ($token) =>
       $link = $token.find('a')
@@ -86,6 +86,7 @@ define [
         if enrollment.role != enrollment.type
           data.enrollment.role = enrollment.role
         deferreds.push $.ajaxJSON url, 'POST', data, (newEnrollment) =>
+          _.extend newEnrollment, { can_be_removed: true }
           newEnrollments.push newEnrollment
 
       # delete old section enrollments

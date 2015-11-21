@@ -1,6 +1,7 @@
 define [
   'jquery'
   'underscore'
+  'compiled/util/fcUtil'
   'i18n!EditAppointmentGroupDetails'
   'str/htmlEscape'
   'compiled/calendar/TimeBlockList'
@@ -12,7 +13,7 @@ define [
   'jquery.ajaxJSON'
   'jquery.disableWhileLoading'
   'jquery.instructure_forms'
-], ($, _, I18n, htmlEscape, TimeBlockList, editAppointmentGroupTemplate, genericSelectTemplate, sectionCheckboxesTemplate, ContextSelector, preventDefault) ->
+], ($, _, fcUtil, I18n, htmlEscape, TimeBlockList, editAppointmentGroupTemplate, genericSelectTemplate, sectionCheckboxesTemplate, ContextSelector, preventDefault) ->
 
   class EditAppointmentGroupDetails
     constructor: (selector, @apptGroup, @contexts, @closeCB) ->
@@ -66,7 +67,8 @@ define [
 
       @form.find('.ag_contexts_selector').click preventDefault @toggleContextsMenu
 
-      timeBlocks = ([appt.start_at, appt.end_at, true] for appt in @apptGroup.appointments || [] )
+      # make sure this is the spot
+      timeBlocks = ([fcUtil.wrap(appt.start_at), fcUtil.wrap(appt.end_at), true] for appt in @apptGroup.appointments || [] )
       @timeBlockList = new TimeBlockList(@form.find(".time-block-list-body"), @form.find(".splitter"), timeBlocks)
 
       @form.find('[name="slot_duration"]').change (e) =>

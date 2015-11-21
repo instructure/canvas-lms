@@ -21,36 +21,48 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 describe Canvas::Security do
   describe "JWT tokens" do
     describe "encoding" do
+      after(:each) do
+        Timecop.return
+      end
+
       it "should generate a token with an expiration" do
+        Timecop.freeze(Time.utc(2013,3,13,9,12))
         expires = 1.hour.from_now
-        JWT.expects(:encode).with({ a: 1, exp: expires.to_i }, Canvas::Security.encryption_key).returns("sometoken")
         token = Canvas::Security.create_jwt({ a: 1 }, expires)
-        expect(token).to eq "sometoken"
+        expect(token).to eq "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhIjoxLCJleHAiOjEzNjMxNjk1MjB9.VwDKl46gfjFLPAIDwlkVPze1UwC6H_ApdyWYoUXFT8M"
       end
 
       it "should generate a token without expiration" do
-        JWT.expects(:encode).with({ a: 1 }, Canvas::Security.encryption_key).returns("sometoken")
         token = Canvas::Security.create_jwt({ a: 1 })
-        expect(token).to eq "sometoken"
+        expect(token).to eq "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhIjoxfQ.Pr4RQfnytL0LMwQ0pJXiKoHmEGAYw2OW3pYJTQM4d9I"
       end
 
       it "should encode with configured encryption key" do
-        JWT.expects(:encode).with({ a: 1 }, Canvas::Security.encryption_key).returns("sometoken")
+        jwt = stub
+        jwt.expects(:sign).with(Canvas::Security.encryption_key, :HS256).returns("sometoken")
+        JSON::JWT.stubs(new: jwt)
         Canvas::Security.create_jwt({ a: 1 })
       end
 
       it "should encode with the supplied key" do
-        JWT.expects(:encode).with({ a: 1 }, "mykey").returns("sometoken")
+        jwt = stub
+        jwt.expects(:sign).with("mykey", :HS256).returns("sometoken")
+        JSON::JWT.stubs(new: jwt)
         Canvas::Security.create_jwt({ a: 1 }, nil, "mykey")
       end
     end
 
     describe "decoding" do
       before do
+        Timecop.freeze(Time.utc(2013,3,13,9,12))
         @key = "mykey"
-        @token_no_expiration = JWT.encode({ a: 1 }, @key)
-        @token_expired = JWT.encode({ a: 1, 'exp' => 1.hour.ago.to_i }, @key)
-        @token_not_expired = JWT.encode({ a: 1, 'exp' => 1.hour.from_now.to_i }, @key)
+        @token_no_expiration = JSON::JWT.new({ a: 1 }).sign(@key, :HS256).to_s
+        @token_expired = JSON::JWT.new({ a: 1, 'exp' => 1.hour.ago.to_i }).sign(@key, :HS256).to_s
+        @token_not_expired = JSON::JWT.new({ a: 1, 'exp' => 1.hour.from_now.to_i }).sign(@key, :HS256).to_s
+      end
+
+      after do
+        Timecop.return
       end
 
       it "should decode token" do

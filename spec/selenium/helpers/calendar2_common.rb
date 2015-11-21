@@ -79,7 +79,7 @@ def create_graded_discussion
 end
 
 def find_middle_day
-  f('.calendar .fc-week:nth-child(1) .fc-wed')
+  fj('.calendar .fc-week:nth-child(1) .fc-wed:first')
 end
 
 def change_calendar(direction = :next)
@@ -95,7 +95,7 @@ def change_calendar(direction = :next)
                  end
 
   f('.calendar_header ' + css_selector).click
-  wait_for_ajax_requests
+  wait_for_ajaximations
 end
 
 def quick_jump_to_date(text)
@@ -111,7 +111,7 @@ def add_date(middle_number)
 end
 
 def create_assignment_event(assignment_title, should_add_date = false, publish = false)
-  middle_number = find_middle_day.find('.fc-day-number').text
+  middle_number = find_middle_day['data-date']
   find_middle_day.click
   edit_event_dialog = f('#edit_event_tabs')
   expect(edit_event_dialog).to be_displayed
@@ -123,12 +123,12 @@ def create_assignment_event(assignment_title, should_add_date = false, publish =
   add_date(middle_number) if should_add_date
   edit_assignment_form.find('#assignment_published').click if publish
   submit_form(edit_assignment_form)
-  keep_trying_until { expect(f('.fc-view-month .fc-event-title')).to include_text(assignment_title) }
+  keep_trying_until { expect(f('.fc-month-view .fc-title')).to include_text(assignment_title) }
 end
 
 # Creates event from clicking on the mini calendar
 def create_calendar_event(event_title, should_add_date = false, should_add_location = false, should_duplicate = false)
-  middle_number = find_middle_day.find('.fc-day-number').text
+  middle_number = find_middle_day['data-date']
   find_middle_day.click
   edit_event_dialog = f('#edit_event_tabs')
   expect(edit_event_dialog).to be_displayed
@@ -155,10 +155,10 @@ def create_calendar_event(event_title, should_add_date = false, should_add_locat
   keep_trying_until do
     if should_duplicate
       4.times do |i|
-        expect(ff('.fc-view-month .fc-event-title')[i]).to include_text("#{event_title} #{i + 1}")
+        expect(ff('.fc-month-view .fc-title')[i]).to include_text("#{event_title} #{i + 1}")
       end
     else
-      expect(f('.fc-view-month .fc-event-title')).to include_text(event_title)
+      expect(f('.fc-month-view .fc-title')).to include_text(event_title)
     end
   end
 end
@@ -219,7 +219,7 @@ end
 # This checks the date in the edit modal, since Week View and Month view events are placed via absolute
 # positioning and there is no other way to verify the elements are on the right date
 def assert_edit_modal_date(due_at)
-  f('.fc-event-inner').click
+  f('.fc-event').click
   wait_for_ajaximations
   expect(f('.event-details-timestring')).to include_text("#{due_at.utc.strftime('%b %-d')}")
 end
@@ -228,7 +228,7 @@ def assert_title(title,agenda_view)
   if agenda_view
     expect(f('.ig-title')).to include_text(title)
   else
-    expect(f('.fc-event-inner')).to include_text(title)
+    expect(f('.fc-title')).to include_text(title)
   end
 end
 

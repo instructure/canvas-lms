@@ -57,7 +57,8 @@ class RubricAssessmentsController < ApplicationController
       end
 
       @asset, @user = @association_object.find_asset_for_assessment(@association, @assessment ? @assessment.user_id : user_id, opts)
-      @assessment = @association.assess(:assessor => @current_user, :user => @user, :artifact => @asset, :assessment => params[:rubric_assessment])
+      @assessment = @association.assess(:assessor => @current_user, :user => @user, :artifact => @asset, :assessment => params[:rubric_assessment],
+        :graded_anonymously => value_to_boolean(params[:graded_anonymously]))
       @asset.reload
       artifact_includes =
         case @asset

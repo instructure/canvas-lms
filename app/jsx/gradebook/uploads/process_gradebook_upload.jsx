@@ -1,5 +1,3 @@
-/** @jsx React.DOM */
-
 define(['underscore', 'i18n!gradebok_upload', 'compiled/userSettings'], function(_, I18n, userSettings) {
 
   var processGradebookUpload = function(uploadedGradebook) {

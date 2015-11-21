@@ -103,6 +103,7 @@ class ExternalContentController < ApplicationController
 
   def content_items_for_canvas
     content_item_selection.map do |item|
+      item.placement_advice ||= default_placement_advice
       if item.type == IMS::LTI::Models::ContentItems::LtiLinkItem::TYPE
         url_gen_params = {url: item.url}
         url_gen_params[:display] = 'borderless' if item.placement_advice.presentation_document_target == 'iframe'
@@ -147,4 +148,13 @@ class ExternalContentController < ApplicationController
     end
     param_value
   end
+
+  def default_placement_advice
+    IMS::LTI::Models::ContentItemPlacement.new(
+        presentation_document_target: 'default',
+        display_height: 600,
+        display_width: 800
+    )
+  end
+
 end

@@ -358,7 +358,7 @@ class AppointmentGroup < ActiveRecord::Base
           group_categories = sub_contexts.find_all{|sc| sc.instance_of? GroupCategory }
           raise %Q{inconsistent appointment group: #{self.id} #{group_categories}} if group_categories.length > 1
           group_category_id = group_categories.first.id
-          user.groups.detect{ |g| g.group_category_id == group_category_id }
+          user.current_groups.detect{ |g| g.group_category_id == group_category_id }
         end
       participant if participant && eligible_participant?(participant)
     end

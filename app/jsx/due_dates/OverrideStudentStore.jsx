@@ -1,5 +1,3 @@
-/** @jsx React.DOM */
-
 define([
   'react',
   'underscore',
@@ -119,8 +117,8 @@ define([
   }
 
   OverrideStudentStore.addStudents = function(newlyFetchedStudents){
-    newStudentsHash = _.indexBy(newlyFetchedStudents, (student) => student.id)
-    newStudentState = _.extend(newStudentsHash, this.getState().students)
+    let newStudentsHash = _.indexBy(newlyFetchedStudents, (student) => student.id)
+    let newStudentState = _.extend(newStudentsHash, this.getState().students)
     this.setState({
       students: newStudentState
     })

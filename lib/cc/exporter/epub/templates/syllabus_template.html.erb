@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Syllabus</title>
+</head>
+  <body>
+    <h1>Syllabus</h1>
+    <ul>
+      <% content.each do |item| %>
+        <li>
+          <a href="<%= "#{item[:href]}" %>">
+            <%= item[:title] %>
+          </a>
+          <% if item[:due_at] %>
+            <span>: Due at <%= friendly_date(item[:due_at])%></span>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+    <div style="page-break-before:always;"></div>
+  </body>
+</html>
+

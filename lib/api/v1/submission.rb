@@ -222,6 +222,9 @@ module Api::V1::Submission
     if includes.include?('rubric_assessment')
       json['rubric_assessments'] = provisional_grade.rubric_assessments.map{|ra| ra.as_json(:methods => [:assessor_name], :include_root => false)}
     end
+    if includes.include?('crocodoc_urls')
+      json['crocodoc_urls'] = submission.versioned_attachments.map { |a| provisional_grade.crocodoc_attachment_info(current_user, a) }
+    end
     json
   end
 

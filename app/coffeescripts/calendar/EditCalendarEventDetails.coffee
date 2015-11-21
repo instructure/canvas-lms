@@ -2,6 +2,7 @@ define [
   'jquery'
   'underscore'
   'timezone'
+  'compiled/util/fcUtil'
   'compiled/calendar/commonEventFactory'
   'compiled/calendar/TimeBlockList'
   'jst/calendar/editCalendarEvent'
@@ -10,7 +11,7 @@ define [
   'jquery.instructure_forms'
   'jquery.instructure_misc_helpers'
   'vendor/date'
-], ($, _, tz, commonEventFactory, TimeBlockList, editCalendarEventTemplate, coupleTimeFields) ->
+], ($, _, tz, fcUtil, commonEventFactory, TimeBlockList, editCalendarEventTemplate, coupleTimeFields) ->
 
   class EditCalendarEventDetails
     constructor: (selector, @event, @contextChangeCB, @closeCB) ->
@@ -138,10 +139,11 @@ define [
       $end.time_field()
 
       # fill initial values of each field according to @event
-      start = $.unfudgeDateForProfileTimezone(@event.startDate())
-      end = $.unfudgeDateForProfileTimezone(@event.endDate())
+      start = fcUtil.unwrap(@event.startDate())
+      end = fcUtil.unwrap(@event.endDate())
 
       $date.data('instance').setDate(start)
+
       $start.data('instance').setTime(if @event.allDay then null else start)
       $end.data('instance').setTime(if @event.allDay then null else end)
 
@@ -176,10 +178,9 @@ define [
         newEvent.save(params)
       else
         @event.title = params['calendar_event[title]']
-        # I know this seems backward, fudging a date before saving, but the
-        # event gets all out-of-whack if it's not...
-        @event.start = $.fudgeDateForProfileTimezone(data.start_at)
-        @event.end = $.fudgeDateForProfileTimezone(data.end_at)
+        # event unfudges/unwraps values when sending to server (so wrap here)
+        @event.start = fcUtil.wrap(data.start_at)
+        @event.end = fcUtil.wrap(data.end_at)
         @event.location_name = location_name
         @event.save(params)
 

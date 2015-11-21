@@ -1527,8 +1527,9 @@ describe DiscussionTopic do
 
       @topic.reload.assignment.expects(:restore).with(:discussion_topic).once
       @topic.restore
-      expect(@topic.reload).to be_active
-      @topic.child_topics.each { |ct| expect(ct.reload).to be_active }
+      expect(@topic.reload).to be_unpublished
+      @topic.child_topics.each { |ct| expect(ct.reload).to be_unpublished }
+      expect(@topic.assignment).to be_unpublished
     end
 
     it "should restore to unpublished state if draft mode is enabled" do
@@ -1536,8 +1537,9 @@ describe DiscussionTopic do
 
       @topic.reload.assignment.expects(:restore).with(:discussion_topic).once
       @topic.restore
-      expect(@topic.reload).to be_post_delayed
-      @topic.child_topics.each { |ct| expect(ct.reload).to be_post_delayed }
+      expect(@topic.reload).to be_unpublished
+      @topic.child_topics.each { |ct| expect(ct.reload).to be_unpublished }
+      expect(@topic.assignment).to be_unpublished
     end
   end
 
@@ -1718,6 +1720,44 @@ describe DiscussionTopic do
           end
           expect(c.announcements.by_posted_at).to eq(anns)
         end
+      end
+    end
+  end
+
+  context "notifications" do
+    before :once do
+      user_with_pseudonym(:active_all => true)
+      course_with_teacher(:user => @user, :active_enrollment => true)
+      n = Notification.create!(:name => "New Discussion Topic", :category => "TestImmediately")
+      NotificationPolicy.create!(:notification => n, :communication_channel => @user.communication_channel, :frequency => "immediately")
+    end
+
+    it "should send a message for a published course" do
+      @course.offer!
+      topic = @course.discussion_topics.create!(:title => "title")
+      expect(topic.messages_sent["New Discussion Topic"].map(&:user)).to be_include(@user)
+    end
+
+    it "should not send a message for an unpublished course" do
+      topic = @course.discussion_topics.create!(:title => "title")
+      expect(topic.messages_sent["New Discussion Topic"]).to be_blank
+    end
+
+    context "group discussions" do
+      before :once do
+        group_model(:context => @course)
+        @group.add_user(@user)
+      end
+
+      it "should send a message for a group discussion in a published course" do
+        @course.offer!
+        topic = @group.discussion_topics.create!(:title => "title")
+        expect(topic.messages_sent["New Discussion Topic"].map(&:user)).to be_include(@user)
+      end
+
+      it "should not send a message for a group discussion in an unpublished course" do
+        topic = @group.discussion_topics.create!(:title => "title")
+        expect(topic.messages_sent["New Discussion Topic"]).to be_blank
       end
     end
   end

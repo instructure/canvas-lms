@@ -754,8 +754,6 @@ class ExternalToolsController < ApplicationController
   end
 
   def jwt_token
-    require 'jwt'
-
     tool = ContextExternalTool.find(params['tool_id']) if params['tool_id']
 
     if params['tool_launch_url'] && tool.nil?
@@ -769,7 +767,7 @@ class ExternalToolsController < ApplicationController
     params[:consumer_key] = tool.consumer_key
     params[:iat] = Time.zone.now.to_i
 
-    render json: {jwt_token: JWT.encode(params, tool.shared_secret)}
+    render json: {jwt_token: Canvas::Security.create_jwt(params, nil, tool.shared_secret)}
   end
 
   private

@@ -102,6 +102,7 @@ define([
                           _.find(allAssignments, assignment =>
                                  assignment.id === assignmentId));
 
+      assignments = _.reject(assignments, assignment => assignment === undefined);
       return assignments;
     }
   });

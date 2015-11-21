@@ -70,6 +70,7 @@ describe 'quizzes question creation edge cases' do
   end
 
   it 'respects character limits on short answer questions', priority: "1", test_id: 197493 do
+    skip('Fragile check for alert box on character length')
     quiz = @last_quiz
     question = fj('.question_form:visible')
     click_option('.question_form:visible .question_type', 'Fill In the Blank')

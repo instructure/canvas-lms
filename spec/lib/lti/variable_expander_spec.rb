@@ -486,6 +486,13 @@ module Lti
           expect(exp_hash[:test]).to eq 'Admin,User'
         end
 
+        it 'has substitution for $Canvas.user.globalId' do
+          user.stubs(:global_id).returns(456)
+          exp_hash = {test: '$Canvas.user.globalId'}
+          subject.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq 456
+        end
+
         it 'has substitution for $Membership.role' do
           substitution_helper.stubs(:all_roles).with('lis2').returns('Admin,User')
           Lti::SubstitutionsHelper.stubs(:new).returns(substitution_helper)

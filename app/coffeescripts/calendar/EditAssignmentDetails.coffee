@@ -1,6 +1,7 @@
 define [
   'jquery'
   'timezone'
+  'compiled/util/fcUtil'
   'compiled/calendar/commonEventFactory'
   'jst/calendar/editAssignment'
   'jst/calendar/editAssignmentOverride'
@@ -8,7 +9,7 @@ define [
   'jquery.instructure_date_and_time'
   'jquery.instructure_forms'
   'jquery.instructure_misc_helpers'
-], ($, tz, commonEventFactory, editAssignmentTemplate, editAssignmentOverrideTemplate, genericSelectOptionsTemplate) ->
+], ($, tz, fcUtil, commonEventFactory, editAssignmentTemplate, editAssignmentOverrideTemplate, genericSelectOptionsTemplate) ->
 
   class EditAssignmentDetails
     constructor: (selector, @event, @contextChangeCB, @closeCB) ->
@@ -89,7 +90,7 @@ define [
       $field = @$form.find(".datetime_field")
       $field.datetime_field()
       widget = $field.data('instance')
-      startDate = $.unfudgeDateForProfileTimezone(@event.startDate())
+      startDate = fcUtil.unwrap(@event.startDate())
       if @event.allDay
         widget.setDate(startDate)
       else if startDate

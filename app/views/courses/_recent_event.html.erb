@@ -1,3 +1,5 @@
+<li style="<%= hidden if is_hidden %>" class="event">
+
 <%
   recent_event ||= nil
   show_context ||= false
@@ -15,7 +17,7 @@
     end
   end
 
-  cache([ 'recent_event_render',
+  cache([ 'recent_event_render2',
           submission || 'no_submission',
           recent_event || 'blank_event',
           (recent_event.due_at if is_assignment),
@@ -32,7 +34,6 @@
 
 %>
 
-<li style="<%= hidden if is_hidden %>" class="event">
   <a
     data-track-category="dashboard"
     data-track-label="recent event"
@@ -73,6 +74,7 @@
       <% end %>
     </em>
   </a>
-</li>
 
 <% end %>
+
+</li>

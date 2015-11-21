@@ -1087,21 +1087,21 @@ describe Assignment do
     it "should assign multiple peer reviews" do
       @a.reload
       @submissions = []
-      users = create_users_in_course(@course, 3.times.map{ |i| {name: "user #{i}"} }, return_type: :record)
+      users = create_users_in_course(@course, 30.times.map{ |i| {name: "user #{i}"} }, return_type: :record)
       users.each do |u|
         @submissions << @a.submit_homework(u, :submission_type => "online_url", :url => "http://www.google.com")
       end
-      @a.peer_review_count = 2
+      @a.peer_review_count = 5
       res = @a.assign_peer_reviews
-      expect(res.length).to eql(@submissions.length * 2)
+      expect(res.length).to eql(@submissions.length * @a.peer_review_count)
       @submissions.each do |s|
         assets = res.select{|a| a.asset == s}
-        expect(assets.length).to be > 0 #eql(2)
+        expect(assets.length).to eql(@a.peer_review_count)
         expect(assets.map{|a| a.assessor_id}.uniq.length).to eql(assets.length)
 
         assessors = res.select{|a| a.assessor_asset == s}
-        expect(assessors.length).to eql(2)
-        expect(assessors[0].asset_id).not_to eql(assessors[1].asset_id)
+        expect(assessors.length).to eql(@a.peer_review_count)
+        expect(assessors.map(&:asset_id).uniq.length).to eq @a.peer_review_count
       end
     end
 
@@ -2432,6 +2432,17 @@ describe Assignment do
       expect(@assignment.instance_variable_get(:@ignored_files)).to eq [ignore_file]
     end
 
+    it "should ignore when assignment.id does not belog to the user" do
+      create_and_submit
+      false_attachment = @attachment
+      student_in_course(active_all: true, user_name: "other user")
+      create_and_submit
+      ignore_file = [@user.last_name_first, @user.id, false_attachment.id, @attachment.display_name].join("_")
+      @assignment.instance_variable_set :@ignored_files, []
+      expect(@assignment.send(:infer_comment_context_from_filename, ignore_file)).to be_nil
+      expect(@assignment.instance_variable_get(:@ignored_files)).to eq [ignore_file]
+    end
+
     it "should mark comments as hidden for submission zip uploads" do
       @assignment = @course.assignments.create! name: "Mute Comment Test",
                                                 submission_types: %w(online_upload)
@@ -2650,21 +2661,28 @@ describe Assignment do
       group_discussion_assignment
     end
 
-    it "should destroy the associated discussion topic" do
+    it "destroys the associated discussion topic" do
       @assignment.destroy
       expect(@topic.reload).to be_deleted
       expect(@assignment.reload).to be_deleted
     end
 
-    it "should not revive the discussion if touched after destroyed" do
+    it "does not revive the discussion if touched after destroyed" do
       @assignment.destroy
       expect(@topic.reload).to be_deleted
       @assignment.touch
       expect(@topic.reload).to be_deleted
     end
-    it 'should raise an error on validation error' do
+
+    it 'raises an error on validation error' do
       assignment = Assignment.new
       expect {assignment.destroy}.to raise_error(ActiveRecord::RecordInvalid)
+    end
+
+    it 'refreshes the course participation counts' do
+      Progress.any_instance.expects(:process_job)
+        .with(@assignment.context, :refresh_content_participation_counts)
+      @assignment.destroy
     end
   end
 
@@ -3383,18 +3401,26 @@ describe Assignment do
   end
 
   describe "#restore" do
-    it "should restore to unpublished if draft state w/ no submissions" do
+    it "restores to unpublished if draft state w/ no submissions" do
       assignment_model course: @course
       @a.destroy
       @a.restore
       expect(@a.reload).to be_unpublished
     end
 
-    it "should restore to published if draft state w/ submissions" do
+    it "restores to published if draft state w/ submissions" do
       setup_assignment_with_homework
       @assignment.destroy
       @assignment.restore
       expect(@assignment.reload).to be_published
+    end
+
+    it 'refreshes the course participation counts' do
+      assignment = assignment_model(course: @course)
+      assignment.destroy
+      Progress.any_instance.expects(:process_job)
+        .with(assignment.context, :refresh_content_participation_counts).once
+      assignment.restore
     end
   end
 
@@ -3687,6 +3713,38 @@ describe Assignment do
       a.moderated_grading = true
       a.submission_types = 'not_graded'
       expect(a).not_to be_valid
+    end
+  end
+
+  describe "context_module_tag_info" do
+    before(:once) do
+      @assignment = @course.assignments.create!(:due_at => 1.week.ago,
+                                               :points_possible => 100,
+                                               :submission_types => 'online_text_entry')
+    end
+
+    it "returns past_due if an assignment is due in the past and no submission exists" do
+      info = @assignment.context_module_tag_info(@student, @course)
+      expect(info[:past_due]).to be_truthy
+    end
+
+    it "does not return past_due for assignments that don't expect submissions" do
+      @assignment.submission_types = ''
+      @assignment.save!
+      info = @assignment.context_module_tag_info(@student, @course)
+      expect(info[:past_due]).to be_falsey
+    end
+
+    it "does not return past_due for assignments that were turned in on time" do
+      Timecop.freeze(2.weeks.ago) { @assignment.submit_homework(@student, :submission_type => 'online_text_entry', :body => 'blah') }
+      info = @assignment.context_module_tag_info(@student, @course)
+      expect(info[:past_due]).to be_falsey
+    end
+
+    it "does not return past_due for assignments that were turned in late" do
+      @assignment.submit_homework(@student, :submission_type => 'online_text_entry', :body => 'blah')
+      info = @assignment.context_module_tag_info(@student, @course)
+      expect(info[:past_due]).to be_falsey
     end
   end
 end

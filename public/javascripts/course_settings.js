@@ -400,7 +400,7 @@ define([
       event.preventDefault();
       GradePublishing.publish();
     });
-    if (typeof(sisPublishEnabled) != 'undefined' && sisPublishEnabled) {
+    if (ENV.PUBLISHING_ENABLED) {
       GradePublishing.checkup();
     }
 

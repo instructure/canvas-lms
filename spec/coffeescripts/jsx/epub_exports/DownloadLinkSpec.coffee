@@ -28,7 +28,7 @@ define [
     ok !component.showDownloadLink(), 'should be false without permissions to download'
 
     @props.course.epub_export = {
-      attachment: {
+      epub_attachment: {
         url: 'http://download.url'
       },
       permissions: {
@@ -45,7 +45,7 @@ define [
     ok _.isNull(node)
 
     @props.course.epub_export = {
-      attachment: {
+      epub_attachment: {
         url: 'http://download.url'
       },
       permissions: {
@@ -54,7 +54,8 @@ define [
     }
     component = TestUtils.renderIntoDocument(DownloadLink(@props))
     node = component.getDOMNode()
-    equal node.tagName, 'A', 'tag should be link'
-    ok node.textContent.match(I18n.t("Download")),
+    link = node.querySelectorAll('a')[0]
+    equal link.tagName, 'A', 'tag should be link'
+    ok link.textContent.match(I18n.t("Download")),
       'should show download text'
     React.unmountComponentAtNode(component.getDOMNode().parentNode)

@@ -1,5 +1,3 @@
-/** @jsx React.DOM */
-
 define(['underscore', 'Backbone'], function(_, Backbone) {
 
   class NewFilesStore {

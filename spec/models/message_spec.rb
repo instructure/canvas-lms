@@ -99,6 +99,37 @@ describe Message do
       msg = generate_message(:account_user_notification, :email, @au)
       expect(msg.html_body).to include('awesomelogo.jpg')
     end
+
+    describe "course nicknames" do
+      before(:once) do
+        course_with_student(:active_all => true, :course_name => 'badly-named-course')
+        @student.course_nicknames[@course.id] = 'student-course-nick'
+        @student.save!
+      end
+
+      def check_message(message, asset)
+        msg = generate_message(message, :email, asset, :user => @student)
+        expect(msg.html_body).not_to include 'badly-named-course'
+        expect(msg.html_body).to include 'student-course-nick'
+        expect(@course.name).to eq 'badly-named-course'
+
+        msg = generate_message(message, :email, asset, :user => @teacher)
+        expect(msg.html_body).to include 'badly-named-course'
+        expect(msg.html_body).not_to include 'student-course-nick'
+      end
+
+      it "applies nickname to asset" do
+        check_message(:grade_weight_changed, @course)
+      end
+
+      it "applies nickname to asset.course" do
+        check_message(:enrollment_registration, @student.enrollments.first)
+      end
+
+      it "applies nickname to asset.context" do
+        check_message(:assignment_changed, @course.assignments.create!)
+      end
+    end
   end
 
   context "named scopes" do
@@ -233,7 +264,7 @@ describe Message do
           path_type: 'sms',
           user: @user
         )
-        Canvas::Twilio.expects(:deliver).with('+18015550100', @message.body)
+        Canvas::Twilio.expects(:deliver).with('+18015550100', @message.body, from_recipient_country: false)
         @message.expects(:deliver_via_email).never
         @message.deliver
       end
@@ -294,6 +325,37 @@ describe Message do
         @message.deliver
         @message.reload
         expect(@message.workflow_state).to eq('cancelled')
+      end
+
+      it 'sends from recipient country when the :international_sms_from_recipient_country feature flag is enabled' do
+        @user.account.enable_feature!(:international_sms_from_recipient_country)
+        message_model(
+          dispatch_at: Time.now,
+          workflow_state: 'staged',
+          to: '+18015550100',
+          updated_at: Time.now.utc - 11.minutes,
+          path_type: 'sms',
+          user: @user
+        )
+        Canvas::Twilio.expects(:deliver).with('+18015550100', anything, from_recipient_country: true)
+        @message.deliver
+        @message.reload
+        expect(@message.workflow_state).to eq('sent')
+      end
+
+      it 'does not send from recipient country when the :international_sms_from_recipient_country feature flag is disabled' do
+        message_model(
+          dispatch_at: Time.now,
+          workflow_state: 'staged',
+          to: '+18015550100',
+          updated_at: Time.now.utc - 11.minutes,
+          path_type: 'sms',
+          user: @user
+        )
+        Canvas::Twilio.expects(:deliver).with('+18015550100', anything, from_recipient_country: false)
+        @message.deliver
+        @message.reload
+        expect(@message.workflow_state).to eq('sent')
       end
 
       it "doesn't send when the :international_sms feature flag is disabled" do

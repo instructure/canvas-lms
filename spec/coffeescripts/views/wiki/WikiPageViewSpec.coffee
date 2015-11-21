@@ -3,8 +3,15 @@ define [
   'compiled/models/WikiPage'
   'compiled/views/wiki/WikiPageView'
 ], (_, WikiPage, WikiPageView) ->
-  
+
   module 'WikiPageView'
+
+  test 'display_show_all_pages makes it through constructor', ->
+    model = new WikiPage
+    view = new WikiPageView
+      model: model
+      display_show_all_pages: true
+    equal(true, view.display_show_all_pages)
 
   test 'model.view maintained by item view', ->
     model = new WikiPage

@@ -523,8 +523,8 @@ class Course < ActiveRecord::Base
     workflow_states = (args[1].present? ? %w{'active' 'completed'} : %w{'active'}).join(', ')
     uniq.joins("INNER JOIN (
          SELECT caa.course_id, au.user_id FROM #{CourseAccountAssociation.quoted_table_name} AS caa
-         INNER JOIN accounts AS a ON a.id = caa.account_id AND a.workflow_state = 'active'
-         INNER JOIN account_users AS au ON au.account_id = a.id AND au.user_id = #{user_id.to_i}
+         INNER JOIN #{Account.quoted_table_name} AS a ON a.id = caa.account_id AND a.workflow_state = 'active'
+         INNER JOIN #{AccountUser.quoted_table_name} AS au ON au.account_id = a.id AND au.user_id = #{user_id.to_i}
        UNION SELECT courses.id AS course_id, e.user_id FROM #{Course.quoted_table_name}
          INNER JOIN #{Enrollment.quoted_table_name} AS e ON e.course_id = courses.id AND e.user_id = #{user_id.to_i}
            AND e.workflow_state IN(#{workflow_states}) AND e.type IN ('TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment')
@@ -613,7 +613,7 @@ class Course < ActiveRecord::Base
     return unless user
     RequestCache.cache('user_is_instructor', self, user) do
       Rails.cache.fetch([self, user, "course_user_is_instructor"].cache_key) do
-        user.cached_current_enrollments(preload_courses: true).any? { |e| e.course_id == self.id && e.participating_instructor? }
+        user.cached_current_enrollments(preload_dates: true).any? { |e| e.course_id == self.id && e.participating_instructor? }
       end
     end
   end
@@ -622,7 +622,7 @@ class Course < ActiveRecord::Base
     return unless user
     RequestCache.cache('user_is_student', self, user, opts) do
       Rails.cache.fetch([self, user, "course_user_is_student", opts[:include_future]].cache_key) do
-        user.cached_current_enrollments(:preload_courses => true, :include_future => opts[:include_future]).any? { |e|
+        user.cached_current_enrollments(:preload_dates => true, :include_future => opts[:include_future]).any? { |e|
           e.course_id == self.id && (opts[:include_future] ? e.student? : e.participating_student?)
         }
       end
@@ -776,22 +776,31 @@ class Course < ActiveRecord::Base
   end
 
   def update_enrolled_users
-    if self.completed?
-      Enrollment.where(:course_id => self, :workflow_state => ['active', 'invited']).update_all(:workflow_state => 'completed')
-      appointment_participants.active.current.update_all(:workflow_state => 'deleted')
-      appointment_groups.each(&:clear_cached_available_slots!)
-    elsif self.deleted?
-      Enrollment.where("course_id=? AND workflow_state<>'deleted'", self).update_all(:workflow_state => 'deleted')
-    end
+    self.shard.activate do
+      if self.workflow_state_changed?
+        if self.completed?
+          Enrollment.where(:course_id => self, :workflow_state => ['active', 'invited']).update_all(:workflow_state => 'completed')
+          appointment_participants.active.current.update_all(:workflow_state => 'deleted')
+          appointment_groups.each(&:clear_cached_available_slots!)
+        elsif self.deleted?
+          enroll_scope = Enrollment.where("course_id=? AND workflow_state<>'deleted'", self)
+          user_ids = enroll_scope.group(:user_id).pluck(:user_id).uniq
+          if user_ids.any?
+            enroll_scope.update_all(:workflow_state => 'deleted')
+            User.send_later_if_production(:update_account_associations, user_ids)
+          end
+        end
+      end
 
-    if self.root_account_id_changed?
-      CourseSection.where(:course_id => self).update_all(:root_account_id => self.root_account_id)
-      Enrollment.where(:course_id => self).update_all(:root_account_id => self.root_account_id)
-    end
+      if self.root_account_id_changed?
+        CourseSection.where(:course_id => self).update_all(:root_account_id => self.root_account_id)
+        Enrollment.where(:course_id => self).update_all(:root_account_id => self.root_account_id)
+      end
 
-    Enrollment.where(:course_id => self).update_all(:updated_at => Time.now.utc)
-    User.where("id IN (SELECT user_id FROM enrollments WHERE course_id=?)", self).
-        update_all(updated_at: Time.now.utc)
+      Enrollment.where(:course_id => self).update_all(:updated_at => Time.now.utc)
+      User.where(id: Enrollment.where(course_id: self).select(:user_id)).
+          update_all(updated_at: Time.now.utc)
+    end
   end
 
   def self_enrollment_allowed?
@@ -1084,13 +1093,13 @@ class Course < ActiveRecord::Base
     given { |user, session| session && session[:enrollment_uuid] && (hash = Enrollment.course_user_state(self, session[:enrollment_uuid]) || {}) && (hash[:enrollment_state] == "invited" || hash[:enrollment_state] == "active" && hash[:user_state].to_s == "pre_registered") && (self.available? || self.completed? || self.claimed? && hash[:is_admin]) }
     can :read and can :read_outcomes
 
-    given { |user| (self.available? || self.completed?) && user && user.cached_current_enrollments(preload_courses: true).any?{|e| e.course_id == self.id && [:active, :invited, :completed].include?(e.state_based_on_date) } }
+    given { |user| (self.available? || self.completed?) && user && user.cached_current_enrollments(preload_dates: true).any?{|e| e.course_id == self.id && [:active, :invited, :accepted, :completed].include?(e.state_based_on_date) } }
     can :read and can :read_outcomes
 
     # Active students
     given { |user|
       available?  && user &&
-        user.cached_current_enrollments(preload_courses: true).any? { |e|
+        user.cached_current_enrollments(preload_dates: true).any? { |e|
         e.course_id == id && e.participating_student?
       }
     }
@@ -2038,11 +2047,12 @@ class Course < ActiveRecord::Base
 
   # returns a scope, not an array of users/enrollments
   def students_visible_to(user, include_priors=false)
-    enrollments_visible_to(user, :include_priors => include_priors, :return_users => true)
+    scope = include_priors ? self.all_students : self.students
+    self.apply_enrollment_visibility(scope, user)
   end
 
-  def enrollments_visible_to(user, opts = {})
-    visibilities = section_visibilities_for(user)
+  def enrollments_visible_to(user, opts={})
+    # because of course it's used in a plugin
     relation = []
     relation << 'all' if opts[:include_priors]
     if opts[:type] == :all
@@ -2057,15 +2067,23 @@ class Course < ActiveRecord::Base
     end
     relation = relation.join('_')
     # our relations don't all follow the same pattern
-    relation = case relation
-                 when 'all_enrollments'; 'enrollments'
-                 when 'enrollments'; 'current_enrollments'
-                 else; relation
-               end
-    scope = self.send(relation.to_sym)
-    if opts[:section_ids]
-      scope = scope.where('enrollments.course_section_id' => opts[:section_ids].to_a)
+    unless opts[:include_deleted]
+      relation = case relation
+                   when 'all_enrollments'; 'enrollments'
+                   when 'enrollments'; 'current_enrollments'
+                   else; relation
+                 end
     end
+    self.apply_enrollment_visibility(self.send(relation.to_sym), user, opts[:section_ids])
+  end
+
+  # can apply to user scopes as well if through enrollments (e.g. students, teachers)
+  def apply_enrollment_visibility(scope, user, section_ids=nil)
+    if section_ids
+      scope = scope.where('enrollments.course_section_id' => section_ids.to_a)
+    end
+
+    visibilities = section_visibilities_for(user)
     visibility_level = enrollment_visibility_level_for(user, visibilities)
     account_admin = visibility_level == :full && visibilities.empty?
     # teachers, account admins, and student view students can see student view students
@@ -2579,7 +2597,7 @@ class Course < ActiveRecord::Base
       # we also want to bring along prior enrollments, so don't use the enrollments
       # association
       Enrollment.where(:course_id => self).update_all(:course_id => new_course, :updated_at => Time.now.utc)
-      User.where("id IN (SELECT user_id FROM enrollments WHERE course_id=?)", new_course).
+      User.where(id: new_course.all_enrollments.select(:user_id)).
           update_all(updated_at: Time.now.utc)
       self.replacement_course_id = new_course.id
       self.workflow_state = 'deleted'
@@ -2738,7 +2756,7 @@ class Course < ActiveRecord::Base
   end
 
   def re_send_invitations!(from_user)
-    self.enrollments_visible_to(from_user).invited.except(:preload).preload(user: :communication_channels).find_each do |e|
+    self.apply_enrollment_visibility(self.student_enrollments, from_user).invited.except(:preload).preload(user: :communication_channels).find_each do |e|
       e.re_send_confirmation! if e.invited?
     end
   end
@@ -2805,5 +2823,24 @@ class Course < ActiveRecord::Base
   # as a favorite.
   def favorite_for_user?(user)
     user.favorites.where(:context_type => 'Course', :context_id => self).exists?
+  end
+
+  def nickname_for(user, fallback = :name)
+    nickname = user && user.course_nickname(self)
+    nickname ||= self.send(fallback) if fallback
+    nickname
+  end
+
+  def refresh_content_participation_counts(_progress)
+    content_participation_counts.each(&:refresh_unread_count)
+  end
+
+  def name
+    return @nickname if @nickname
+    read_attribute(:name)
+  end
+
+  def apply_nickname_for!(user)
+    @nickname = nickname_for(user, nil)
   end
 end

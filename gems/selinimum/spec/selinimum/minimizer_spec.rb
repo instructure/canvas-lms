@@ -1,4 +1,4 @@
-require "spec_helper"
+require "selinimum/minimizer"
 
 describe Selinimum::Minimizer do
   describe "#filter" do
@@ -8,7 +8,7 @@ describe Selinimum::Minimizer do
       end
 
       def dependents_for(file)
-        raise Selinimum::TooManyDependenciesError, file
+        raise Selinimum::TooManyDependentsError, file
       end
     end
 

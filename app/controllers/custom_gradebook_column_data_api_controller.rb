@@ -44,9 +44,15 @@ class CustomGradebookColumnDataApiController < ApplicationController
   #
   # This does not list entries for students without associated data.
   #
+  # @argument include_hidden [Boolean]
+  #   If true, hidden columns will be included in the
+  #   result. If false or absent, only visible columns
+  #   will be returned.
+  #
   # @returns [ColumnDatum]
   def index
-    col = @context.custom_gradebook_columns.active.find(params[:id])
+    scope = value_to_boolean(params[:include_hidden]) ? :not_deleted : :active
+    col = @context.custom_gradebook_columns.send(scope).find(params[:id])
 
     if authorized_action? col, @current_user, :read
       scope = col.custom_gradebook_column_data.where(user_id: allowed_user_ids)

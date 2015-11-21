@@ -17,7 +17,6 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../file_uploads_spec_helper')
 
 describe 'Provisional Grades API', type: :request do
   describe "status" do
@@ -147,6 +146,7 @@ describe 'Provisional Grades API', type: :request do
 
       expect(json['score']).to eq 80
       expect(json['submission_comments'].first['comment']).to eq 'huttah!'
+      expect(json['crocodoc_urls']).to eq([])
     end
   end
 

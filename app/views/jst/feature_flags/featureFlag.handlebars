@@ -43,13 +43,32 @@
         {{/unless}}
       </div>
     {{else}}
-      <div class="ic-Toggle ic-Toggle--feature-settings">
-        <input id="ff_toggle_{{id}}" class="ff_toggle" type="checkbox" {{#if isOn}}checked{{/if}} {{#if disableToggle}}disabled{{/if}} data-id="{{id}}">
-        <label for="ff_toggle_{{id}}">
-          <div class="ic-Toggle__label-text"><span class="screenreader-only">{{#t}}Enable feature: {{title}}{{/t}}</span></div>
-          <div class="ic-Toggle__switch" data-checked="{{#t "on"}}On{{/t}}" data-unchecked="{{#t "off"}}Off{{/t}}" {{#if disableToggle}}disabled{{/if}}></div>
-        </label>
-      </div>
+      <!-- start super toggle -->
+      <label class="ic-Super-toggle--on-off" for="ff_toggle_{{id}}">
+        <span class="screenreader-only">
+          {{#if disableToggle}}
+            {{#if isOn}}
+              {{#t}}{{title}} is on{{/t}}
+            {{else}}
+              {{#t}}{{title}} is off{{/t}}
+            {{/if}}
+          {{else}}
+            {{#t}}Enable feature: {{title}}{{/t}}
+          {{/if}}
+        </span>
+        <input id="ff_toggle_{{id}}" class="ic-Super-toggle__input ff_toggle" type="checkbox" {{#if isOn}}checked{{/if}} {{#if disableToggle}}disabled{{/if}} data-id="{{id}}">
+        <div class="ic-Super-toggle__container" aria-hidden="true" data-checked="{{#t "on"}}On{{/t}}" data-unchecked="{{#t "off"}}Off{{/t}}">
+          <div class="ic-Super-toggle__switch">
+            <div class="ic-Super-toggle__option--LEFT">
+              <svg xmlns="http://www.w3.org/2000/svg" version="1.1" x="0" y="0" width="548.9" height="548.9" viewBox="0 0 548.9 548.9" xml:space="preserve"><polygon points="449.3 48 195.5 301.8 99.5 205.9 0 305.4 95.9 401.4 195.5 500.9 295 401.4 548.9 147.5" /></svg>
+            </div>
+            <div class="ic-Super-toggle__option--RIGHT">
+              <svg xmlns="http://www.w3.org/2000/svg" version="1.1" x="0" y="0" viewBox="0 0 28 28" xml:space="preserve"><polygon points="28 22.4 19.6 14 28 5.6 22.4 0 14 8.4 5.6 0 0 5.6 8.4 14 0 22.4 5.6 28 14 19.6 22.4 28" /></svg>
+            </div>
+          </div>
+        </div>
+      </label>
+      <!-- end super toggle -->
     {{/if}}
   </div>
 </div>

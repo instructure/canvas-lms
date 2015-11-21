@@ -1,4 +1,3 @@
-/** @jsx React.DOM */
 define([
   'underscore',
   'react',
@@ -19,6 +18,7 @@ define([
     propTypes: {
       courseId: React.PropTypes.string,
       shortName: React.PropTypes.string,
+      originalName: React.PropTypes.string,
       courseCode: React.PropTypes.string,
       assetString: React.PropTypes.string,
       term: React.PropTypes.string,
@@ -32,12 +32,26 @@ define([
       };
     },
 
+    nicknameInfo: function(nickname) {
+      return {
+        nickname: nickname,
+        originalName: this.props.originalName,
+        courseId: this.props.id,
+        onNicknameChange: this.handleNicknameChange
+      }
+    },
+
     // ===============
     //    LIFECYCLE
     // ===============
 
+    handleNicknameChange: function(nickname){
+      this.setState({ nicknameInfo: this.nicknameInfo(nickname) })
+    },
+
     getInitialState: function() {
-      return CourseActivitySummaryStore.getStateForCourse(this.props.id)
+      return _.extend({ nicknameInfo: this.nicknameInfo(this.props.shortName) },
+        CourseActivitySummaryStore.getStateForCourse(this.props.id))
     },
 
     componentDidMount: function() {
@@ -62,13 +76,18 @@ define([
     toggleEditing: function(){
       var currentState = !!this.state.editing;
 
-      if (this.isMounted()){
+      if (this.isMounted()) {
         this.setState({editing: !currentState});
       }
     },
 
+    headerClick: function(e) {
+      if (e) { e.preventDefault(); }
+      window.location = this.props.href;
+    },
+
     doneEditing: function(){
-      if(this.isMounted()){
+      if(this.isMounted()) {
         this.setState({editing: false})
       }
     },
@@ -104,16 +123,23 @@ define([
     //    RENDERING
     // ===============
 
+    colorPickerID: function(){
+      return "DashboardColorPicker-" + this.props.assetString;
+    },
+
     colorPickerIfEditing: function(){
       if (this.state.editing) {
         return (
           <DashboardColorPicker
+            elementID         = {this.colorPickerID()}
             parentNode        = {this.getDOMNode()}
             doneEditing       = {this.doneEditing}
             handleColorChange = {this.handleColorChange}
             assetString       = {this.props.assetString}
             settingsToggle    = {this.refs.settingsToggle}
-            backgroundColor   = {this.props.backgroundColor} />
+            backgroundColor   = {this.props.backgroundColor}
+            nicknameInfo      = {this.state.nicknameInfo}
+          />
         );
       }
     },
@@ -127,7 +153,8 @@ define([
               iconClass         = {link.icon}
               linkClass         = {link.css_class}
               path              = {link.path}
-              screenReaderLabel = {link.screenreader} />
+              screenReaderLabel = {link.screenreader}
+            />
           );
         }
       });
@@ -138,9 +165,13 @@ define([
         <div className="ic-DashboardCard" ref="cardDiv">
           <div>
             <div className="ic-DashboardCard__background" style={{backgroundColor: this.props.backgroundColor}}>
-              <a className="ic-DashboardCard__link" href={this.props.href}>
-                <header className="ic-DashboardCard__header">
-                  <h2 className="ic-DashboardCard__header-title">{this.props.shortName}</h2>
+              <div className="ic-DashboardCard__header" onClick={this.headerClick}>
+                <div className="ic-DashboardCard__header_content">
+                  <a className="ic-DashboardCard__link" href="#">
+                    <h2 className="ic-DashboardCard__header-title" title={this.props.originalName}>
+                      {this.state.nicknameInfo.nickname}
+                    </h2>
+                  </a>
                   <p className="ic-DashboardCard__header-subtitle">{this.props.courseCode}</p>
                   {
                     this.props.term ? (
@@ -149,16 +180,18 @@ define([
                       </p>
                     ) : null
                   }
-                </header>
-              </a>
+                </div>
+              </div>
               <button
+                aria-expanded = {this.state.editing}
+                aria-controls = {this.colorPickerID()}
                 className="Button Button--icon-action-rev ic-DashboardCard__header-button"
                 onClick={this.settingsClick}
                 ref="settingsToggle"
                 >
                   <i className="icon-settings" aria-hidden="true" />
                   <span className="screenreader-only">
-                    { I18n.t("Choose a color for %{course}", { course: this.props.shortName}) }
+                    { I18n.t("Choose a color or course nickname for %{course}", { course: this.state.nicknameInfo.nickname}) }
                   </span>
               </button>
             </div>

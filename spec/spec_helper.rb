@@ -252,12 +252,14 @@ def truncate_all_tables
   model_connections.each do |connection|
     if connection.adapter_name == "PostgreSQL"
       # use custom SQL to exclude tables from extensions
+      schema = connection.shard.name if connection.instance_variable_get(:@config)[:use_qualified_names]
       table_names = connection.query(<<-SQL, 'SCHEMA').map(&:first)
          SELECT tablename
          FROM pg_tables
-         WHERE schemaname = ANY (current_schemas(false)) AND NOT tablename IN (
-           SELECT CAST(objid::regclass AS VARCHAR) FROM pg_depend WHERE deptype='e'
-         )
+         WHERE schemaname = #{schema ? "'#{schema}'" : 'ANY (current_schemas(false))'}
+           AND NOT tablename IN (
+             SELECT CAST(objid::regclass AS VARCHAR) FROM pg_depend WHERE deptype='e'
+           )
       SQL
       table_names.delete('schema_migrations')
       connection.execute("TRUNCATE TABLE #{table_names.map { |t| connection.quote_table_name(t) }.join(',')}")

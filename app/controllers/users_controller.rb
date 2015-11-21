@@ -165,7 +165,7 @@ class UsersController < ApplicationController
   def grades
     @user = User.where(id: params[:user_id]).first if params[:user_id].present?
     @user ||= @current_user
-    if authorized_action(@user, @current_user, :read)
+    if authorized_action(@user, @current_user, :read_grades)
       crumb_url = polymorphic_url([@current_user]) if @user.grants_right?(@current_user, session, :view_statistics)
       add_crumb(@current_user.short_name, crumb_url)
       add_crumb(t('crumbs.grades', 'Grades'), grades_path)
@@ -179,8 +179,32 @@ class UsersController < ApplicationController
         return
       end
 
+      @grading_periods = collected_grading_periods_for_presenter(
+        @presenter, params[:course_id], params[:grading_period_id])
+      @grades = grades_for_presenter(@presenter, @grading_periods)
+      js_env :grades_for_student_url => grades_for_student_url
+
       ActiveRecord::Associations::Preloader.new(@observed_enrollments, :course).run
     end
+  end
+
+  def grades_for_student
+    enrollment = Enrollment.active.find(params[:enrollment_id])
+    return render_unauthorized_action unless enrollment.grants_right?(@current_user, session, :read_grades)
+
+    course = enrollment.course
+    grading_period_id = params[:grading_period_id].to_i
+    grading_period = GradingPeriod.context_find(course, grading_period_id)
+    grading_periods = {
+      course.id => {
+        :periods => [grading_period],
+        :selected_period_id => grading_period_id
+      }
+    }
+    calculator = grade_calculator([enrollment.user_id], course, grading_periods)
+    totals = calculator.compute_scores.first.first.first
+    totals[:hide_final_grades] = course.hide_final_grades?
+    render json: totals
   end
 
   def oauth
@@ -495,7 +519,7 @@ class UsersController < ApplicationController
     })
 
     @announcements = AccountNotification.for_user_and_account(@current_user, @domain_root_account)
-    @pending_invitations = @current_user.cached_current_enrollments(:include_enrollment_uuid => session[:enrollment_uuid], :preload_courses => true).select { |e| e.invited? }
+    @pending_invitations = @current_user.cached_current_enrollments(:include_enrollment_uuid => session[:enrollment_uuid], :preload_dates => true).select { |e| e.invited? }
     @stream_items = @current_user.try(:cached_recent_stream_items) || []
   end
 
@@ -1713,8 +1737,8 @@ class UsersController < ApplicationController
         enrollments = student.student_enrollments.active.preload(:course).shard(student).to_a
         enrollments.each do |enrollment|
           should_include = enrollment.course.user_has_been_instructor?(@teacher) &&
-                           enrollment.course.enrollments_visible_to(@teacher, :include_priors => true).where(id: enrollment).first &&
-                           enrollment.course.grants_right?(@current_user, :read_reports)
+                           enrollment.course.grants_right?(@current_user, :read_reports) &&
+                           enrollment.course.apply_enrollment_visibility(enrollment.course.all_student_enrollments, @teacher).where(id: enrollment).first
           if should_include
             Enrollment.recompute_final_score_if_stale(enrollment.course, student) { enrollment.reload }
             @courses[enrollment.course] = teacher_activity_report(@teacher, enrollment.course, [enrollment])
@@ -1733,7 +1757,8 @@ class UsersController < ApplicationController
           redirect_to_referrer_or_default(root_url)
         elsif authorized_action(course, @current_user, :read_reports)
           Enrollment.recompute_final_score_if_stale(course)
-          @courses[course] = teacher_activity_report(@teacher, course, course.enrollments_visible_to(@teacher, :include_priors => true))
+          enrollments = course.apply_enrollment_visibility(course.all_student_enrollments, @teacher)
+          @courses[course] = teacher_activity_report(@teacher, course, enrollments)
         end
       end
 
@@ -1892,7 +1917,79 @@ class UsersController < ApplicationController
                            [@domain_root_account.id] + @domain_root_account.trusted_account_ids)
   end
 
-  private
+  def grades_for_presenter(presenter, grading_periods)
+    grades = {
+      student_enrollments: {},
+      observed_enrollments: {}
+    }
+    grouped_observed_enrollments =
+      presenter.observed_enrollments.group_by { |enrollment| enrollment[:course_id] }
+
+    grouped_observed_enrollments.each do |course_id, enrollments|
+      user_ids = enrollments.map(&:user_id)
+      course = enrollments.first.course
+      grades[:observed_enrollments][course_id] = {}
+      calculator = grade_calculator(user_ids, course, grading_periods)
+
+      calculator.compute_scores.each_with_index.map do |score, index|
+       grade = score.first.first[:grade]
+       user_id = user_ids[index]
+       grades[:observed_enrollments][course_id][user_id] = grade
+      end
+    end
+
+    presenter.student_enrollments.each do |enrollment_course_pair|
+      course = enrollment_course_pair.first
+      enrollment = enrollment_course_pair.second
+
+      calculator = grade_calculator([enrollment.user_id],course, grading_periods)
+      grade = calculator.compute_scores.first.first.first[:grade]
+      grades[:student_enrollments][course.id] = grade
+    end
+    grades
+  end
+
+  def collected_grading_periods_for_presenter(presenter, course_id, grading_period_id)
+    observer_courses = presenter.observed_enrollments.map(&:course)
+    student_courses = presenter.student_enrollments.map(&:first)
+    teacher_courses = presenter.teacher_enrollments.map(&:course)
+    courses = observer_courses | student_courses | teacher_courses
+    grading_periods = {}
+
+    courses.each do |course|
+      next unless course.feature_enabled?(:multiple_grading_periods)
+
+      course_periods = GradingPeriod.for(course)
+      grading_period_specified = grading_period_id &&
+        course_id && course_id.to_i == course.id
+
+      selected_period_id = if grading_period_specified
+        grading_period_id.to_i
+      else
+        current_period = course_periods.find(&:current?)
+        current_period ? current_period.id : 0
+      end
+
+      grading_periods[course.id] = {
+        periods: course_periods,
+        selected_period_id: selected_period_id
+      }
+    end
+    grading_periods
+  end
+
+  def grade_calculator(user_ids, course, grading_periods)
+    if course.feature_enabled?(:multiple_grading_periods) &&
+      grading_periods[course.id][:selected_period_id] != 0
+
+      grading_period = grading_periods[course.id][:periods].find do |period|
+        period.id == grading_periods[course.id][:selected_period_id]
+      end
+      GradeCalculator.new(user_ids, course, grading_period: grading_period)
+    else
+      GradeCalculator.new(user_ids, course)
+    end
+  end
 
   def create_user
     run_login_hooks

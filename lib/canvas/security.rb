@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'jwt'
+require 'json/jwt'
 
 module Canvas::Security
   class InvalidToken < RuntimeError
@@ -41,7 +41,7 @@ module Canvas::Security
   def self.config
     @config ||= (YAML.load_file(Rails.root+"config/security.yml")[Rails.env] rescue nil)
   end
-  
+
   def self.encrypt_password(secret, key)
     require 'base64'
     c = OpenSSL::Cipher::Cipher.new('aes-256-cbc')
@@ -52,7 +52,7 @@ module Canvas::Security
     e << c.final
     [Base64.encode64(e), Base64.encode64(iv)]
   end
-  
+
   def self.decrypt_password(secret, salt, key, encryption_key = nil)
     require 'base64'
     encryption_keys = Array(encryption_key) + self.encryption_keys
@@ -73,7 +73,7 @@ module Canvas::Security
     end
     raise last_error
   end
-  
+
   def self.hmac_sha1(str, encryption_key = nil)
     OpenSSL::HMAC.hexdigest(
       OpenSSL::Digest.new('sha1'), (encryption_key || self.encryption_key), str
@@ -104,7 +104,9 @@ module Canvas::Security
     if expires
       jwt_body = jwt_body.merge({ exp: expires.to_i })
     end
-    JWT.encode(jwt_body, key || encryption_key)
+    raw_jwt = JSON::JWT.new(jwt_body)
+    return raw_jwt.to_s if key == :unsigned
+    raw_jwt.sign(key || encryption_key, :HS256).to_s
   end
 
   # Verifies and decodes a JWT token
@@ -122,11 +124,15 @@ module Canvas::Security
 
     keys.each do |key|
       begin
-        body = JWT.decode(token, key)[0]
+        body = JSON::JWT.decode(token, key)
+        if body[:exp].present?
+          if ((body[:exp].is_a?(Time) && body[:exp] <= Time.zone.now) ||
+            body[:exp] <= Time.zone.now.to_i)
+            raise Canvas::Security::TokenExpired
+          end
+        end
         return body.with_indifferent_access
-      rescue JWT::ExpiredSignature
-        raise Canvas::Security::TokenExpired
-      rescue JWT::DecodeError
+      rescue JSON::JWS::VerificationFailed
         # Keep looping, to try all the keys. If none succeed,
         # we raise below.
       end

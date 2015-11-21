@@ -10,7 +10,6 @@ module.exports = function(config) {
       'public/javascripts/vendor/require.js',
       'node_modules/karma-requirejs/lib/adapter.js',
       'spec/javascripts/support/sinon/sinon-1.7.3.js',
-      'spec/javascripts/support/sinon/sinon-patch.js',
       'spec/javascripts/support/sinon/sinon-qunit-1.0.0.js',
       {pattern: 'public/javascripts/*.js', included: false, served: true},
       {pattern: 'spec/javascripts/fixtures/*.html', included: false, served: true},

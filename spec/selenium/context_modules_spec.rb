@@ -148,6 +148,7 @@ describe "context modules" do
       expect(edit_form).to be_displayed
       f('.add_completion_criterion_link', edit_form).click
       wait_for_ajaximations
+      expect(f('#add_context_module_form .assignment_requirement_picker option[value=must_contribute]').attribute('disabled')).to be_present
       click_option('#add_context_module_form .assignment_picker', @assignment.title, :text)
       click_option('#add_context_module_form .assignment_requirement_picker', 'must_submit', :value)
 
@@ -171,7 +172,7 @@ describe "context modules" do
       expect(edit_form).to be_displayed
       f('.completion_entry .delete_criterion_link', edit_form).click
       wait_for_ajaximations
-      ff('.cancel_button.ui-button', dialog_for(edit_form)).last.click
+      ff('.cancel_button', dialog_for(edit_form)).last.click
       wait_for_ajaximations
 
       # now delete the criterion frd
@@ -456,7 +457,7 @@ describe "context modules" do
       option = first_selected_option(prereq_select)
       expect(option.text).to eq first_module_name
 
-      ff('.cancel_button.ui-button', dialog_for(add_form)).last.click
+      ff('.cancel_button', dialog_for(add_form)).last.click
       wait_for_ajaximations
       mod3.publish!
 
@@ -588,7 +589,7 @@ describe "context modules" do
 
       it "should return focus to the cog menu when closing the edit dialog for an item" do
         hover_and_click("#context_module_item_#{@tag.id} .edit_item_link")
-        keep_trying_until { ff('.cancel_button.ui-button')[2] }.click
+        keep_trying_until { ff('.cancel_button.ui-button')[1] }.click
         check_element_has_focus(fj("#context_module_item_#{@tag.id} .al-trigger"))
       end
 
@@ -1012,6 +1013,22 @@ describe "context modules" do
       expect(fln('New Assignment Title')).to be_displayed
     end
 
+    it "should add a assignment item to a module, publish new assignment refresh page and verify", priority: "2", test_id: 441358 do
+      # this test basically verifies that the published icon is accurate after a page refresh
+      add_new_module_item('#assignments_select', 'Assignment', '[ New Assignment ]', 'New Assignment 2')
+      tag = ContentTag.last
+      item = f("#context_module_item_#{tag.id}")
+      expect(f('span.publish-icon.unpublished.publish-icon-publish > i.icon-unpublish')).to be_displayed
+      # publish assignment item
+      item.find_element(:css, '.publish-icon').click
+      wait_for_ajax_requests
+      expect(tag.reload).to be_published
+      # refreshes page and checks again
+      refresh_page
+      driver.mouse.move_to f('i.icon-unpublish')
+      expect(f('span.publish-icon.published.publish-icon-published')).to be_displayed
+      expect(tag).to be_published
+    end
 
     it "should add a quiz to a module", priority: "1", test_id: 126719 do
       add_new_module_item('#quizs_select', 'Quiz', '[ New Quiz ]', 'New Quiz Title')
@@ -1021,6 +1038,17 @@ describe "context modules" do
     it "should add a content page item to a module", priority: "1", test_id: 126708 do
       add_new_module_item('#wiki_pages_select', 'Content Page', '[ New Page ]', 'New Page Title')
       verify_persistence('New Page Title')
+    end
+
+    it "should add a content page item to a module and publish new page", priority: "2", test_id: 441357 do
+      add_new_module_item('#wiki_pages_select', 'Content Page', '[ New Page ]', 'PAGE 2')
+      tag = ContentTag.last
+      item = f("#context_module_item_#{tag.id}")
+      expect(f('span.publish-icon.unpublished.publish-icon-publish > i.icon-unpublish')).to be_displayed
+      # publish new page module item
+      item.find_element(:css, '.publish-icon').click
+      wait_for_ajax_requests
+      expect(tag.reload).to be_published
     end
 
     it "should add a discussion item to a module", priority: "1", test_id: 126711 do

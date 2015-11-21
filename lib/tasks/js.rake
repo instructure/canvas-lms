@@ -293,12 +293,14 @@ namespace :js do
     end
     puts "--> Concatenated JavaScript bundles in #{optimize_time}"
 
-    puts "--> Compressing JavaScript with UglifyJS"
-    optimize_time = Benchmark.realtime do
-      output = `npm run compress 2>&1`
-      raise "Error running js:build: \n#{output}\nABORTING" if $?.exitstatus != 0
+    unless ENV["JS_BUILD_NO_UGLIFY"]
+      puts "--> Compressing JavaScript with UglifyJS"
+      optimize_time = Benchmark.realtime do
+        output = `npm run compress 2>&1`
+        raise "Error running js:build: \n#{output}\nABORTING" if $?.exitstatus != 0
+      end
+      puts "--> Compressed JavaScript in #{optimize_time}"
     end
-    puts "--> Compressed JavaScript in #{optimize_time}"
   end
 
   desc "Compile React JSX to JS"
@@ -306,10 +308,9 @@ namespace :js do
     source = Rails.root + 'app/jsx'
     dest = Rails.root + 'public/javascripts/jsx'
     if Rails.env == 'development'
-      #npm_run "jsx -x jsx --source-map-inline --harmony #{source} #{dest} 2>&1 >/dev/null"
-      msg = `node_modules/react-tools/bin/jsx -x jsx --source-map-inline --harmony #{source} #{dest} 2>&1 >/dev/null`
+      msg = `node_modules/.bin/babel #{source} --out-dir #{dest} --source-maps inline 2>&1 >/dev/null`
     else
-      msg = `node_modules/react-tools/bin/jsx -x jsx --harmony #{source} #{dest} 2>&1 >/dev/null`
+      msg = `node_modules/.bin/babel #{source} --out-dir #{dest} 2>&1 >/dev/null`
     end
 
     unless $?.success?

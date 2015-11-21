@@ -142,9 +142,14 @@ describe EpubExport do
     end
 
     it 'should create and associate an attachment' do
-      expect(epub_export.attachment).to be_nil, 'precondition'
-      expect{epub_export.convert_to_epub_without_send_later}.to change{Attachment.count}.by(1)
-      expect(epub_export.attachment).not_to be_nil
+      expect(epub_export.epub_attachment).to be_nil, 'precondition'
+      expect(epub_export.zip_attachment).to be_nil, 'precondition'
+
+      expect{epub_export.convert_to_epub_without_send_later}.to change{Attachment.count}.by(2)
+
+      epub_export.reload
+      expect(epub_export.epub_attachment).not_to be_nil
+      expect(epub_export.zip_attachment).not_to be_nil
     end
   end
 

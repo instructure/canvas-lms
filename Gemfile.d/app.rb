@@ -19,7 +19,7 @@ gem 'authlogic', '3.4.2'
 gem 'active_model-better_errors', '1.6.7', require: 'active_model/better_errors'
 gem 'dynamic_form', '1.1.4', require: false
 gem 'rails-patch-json-encode', '0.0.1'
-gem 'switchman', '1.3.4'
+gem 'switchman', '1.3.10'
 gem 'folio-pagination', '0.0.9', require: 'folio/rails'
   # for folio, see the folio README
   gem 'will_paginate', '3.0.7', require: false
@@ -34,15 +34,16 @@ gem 'bcrypt-ruby', '3.0.1'
 gem 'canvas_connect', '0.3.8'
   gem 'adobe_connect', '1.0.3', require: false
 gem 'canvas_webex', '0.15'
-gem 'canvas-jobs', '0.9.15'
+gem 'canvas-jobs', '0.10.0'
   gem 'rufus-scheduler', '3.1.2', require: false
 gem 'ffi', '1.1.5', require: false
-gem 'hairtrigger', '0.2.12'
+gem 'hairtrigger', '0.2.15'
   gem 'ruby2ruby', '2.0.8', require: false
   gem 'ruby_parser', '3.7.0', require: false
 gem 'hashery', '1.3.0', require: false
 gem 'highline', '1.6.1', require: false
 gem 'hoe', '3.8.1'
+gem 'httparty', '0.13.7'
 gem 'i18n', '0.7.0'
 gem 'i18nema', '0.0.8', platforms: [:ruby_20, :ruby_21, :ruby_22]
 gem 'i18nema19', '0.0.8', platform: :ruby_19
@@ -52,6 +53,7 @@ gem 'ims-lti', '2.0.0.beta.27'
 gem 'json', '1.8.2'
 gem 'oj', '2.5.5'
 gem 'jwt', '1.2.1', require: false
+gem 'json-jwt', '1.5.1', require: false
 gem 'twilio-ruby', '4.2.1'
 
 gem 'mail', '2.5.4', require: false

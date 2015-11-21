@@ -1,6 +1,6 @@
 @import "base/environment";
 @import "components/ic-range-input";
-
+@import "components/ProgressBar";
 
 //// Vertical content alignment on elements in Theme editor
 ///////
@@ -593,16 +593,24 @@ $te-width: 300px;
   }
 }
 
-.ReactModal__Overlay--Theme__editor_progress {
-  background-color: transparentize($ic-color-light, .2);
+.Theme-editor-progress-list-item {
+  margin: 0;
+  line-height: 1.2;
+  padding: $ic-sp 0;
+  border-top: 1px solid $ic-border-light;
+  display: flex;
+  align-items: center;
+
+  &:first-of-type { border-top: none; }
 }
 
-@import "components/ProgressBar";
-.Theme__editor_progress {
-  width: 300px;
-  text-align: center;
-  color: ensure-contrast($ic-color-dark, $ic-color-light, true);
-  .progress-bar__bar-container {
-    background-color: $ic-color-light;
-  }
+.Theme-editor-progress-list-item__title {
+  flex: 0 0 36%;
+  padding-right: $ic-sp*2;
+  font-size: $baseFontSize;
+  font-weight: 500;
+}
+
+.Theme-editor-progress-list-item__bar {
+  flex: 1;
 }

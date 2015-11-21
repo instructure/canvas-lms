@@ -212,4 +212,8 @@ module Context
   def feature_enabled?(_feature)
     false
   end
+
+  def nickname_for(_user, fallback = :name)
+    self.send fallback if fallback
+  end
 end

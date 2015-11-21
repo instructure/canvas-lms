@@ -1,5 +1,3 @@
-/** @jsx React.DOM */
-
 define([
   'i18n!new_nav',
   'react',
@@ -11,6 +9,18 @@ define([
 
     propTypes: {
       closeTray: React.PropTypes.func.isRequired
+    },
+
+    getInitialState () {
+      return {
+        logoutFormSubmitted: false
+      };
+    },
+
+    submitLogoutForm() {
+      if (!this.state.logoutFormSubmitted) {
+        this.setState({logoutFormSubmitted: true}, () => this.refs.logoutForm.getDOMNode().submit());
+      }
     },
 
     render() {
@@ -44,10 +54,10 @@ define([
                 <input name="utf8" value="✓" type="hidden"/>
                 <input name="_method" value="delete" type="hidden"/>
                 <input name="authenticity_token" value={$.cookie('_csrf_token')} type="hidden"/>
-                <a 
+                <a
                   href="/logout"
                   className="ReactTray-list-item__link"
-                  onClick={PreventDefault(() => this.refs.logoutForm.getDOMNode().submit())}>
+                  onClick={PreventDefault(this.submitLogoutForm)}>
                   <i className="icon-off"></i>
                   {I18n.t('Logout')}
                 </a>

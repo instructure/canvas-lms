@@ -74,6 +74,50 @@ describe "Migration package importers" do
       expect(File).to be_exist(File.join(mig.unzipped_file_path, 'messaging/why oh why.txt'))
       expect(File).to be_exist(File.join(mig.unzipped_file_path, 'res00175/SR_Epilogue_Frequently_Asked_Questions.html'))
     end
+
+    it "creates overview assignments for graded discussion topics and quizzes" do
+      mig = Canvas::Migration::Migrator.new({:no_archive_file => true}, "test")
+      mig.course = {
+        :assignment_groups => [{
+          :migration_id => "iee2a87de283cb9290ee8f39330e1cd13",
+          :title => "ASSIGNMENT GROUP LOL",
+        }],
+        :discussion_topics => [{
+          :title => "GRATED DISCUSSION",
+          :migration_id => "i666db8c76308d6bd5a8db8f063ec75c5",
+          :type => "topic",
+          :assignment => {
+            :title => "GRATED DISCUSSION",
+            :migration_id => "ie088c19c90e7bb4cbc1a1ad1fd5945a0",
+            :assignment_group_migration_id => "iee2a87de283cb9290ee8f39330e1cd13"
+          }
+        }],
+        :assessments => {
+          :assessments => [{
+            :title => "STUPID QUIZ",
+            :migration_id => "i6bdad32159d1447f376fed88e15b8075",
+            :assignment => {
+              :title => "STUPID QUIZ",
+              :migration_id => "iaa6f6db92ef0a3b7ee11a636858b691e",
+              :assignment_group_migration_id => "iee2a87de283cb9290ee8f39330e1cd13",
+            }
+          }]
+        }
+      }
+      overview = mig.overview
+      expect(overview[:assessments][0][:assignment_migration_id]).to eq 'iaa6f6db92ef0a3b7ee11a636858b691e'
+      expect(overview[:discussion_topics][0][:assignment_migration_id]).to eq 'ie088c19c90e7bb4cbc1a1ad1fd5945a0'
+      expect(overview[:assignment_groups]).to eq([{:migration_id => "iee2a87de283cb9290ee8f39330e1cd13",
+                                                   :title => "ASSIGNMENT GROUP LOL"}])
+      expect(overview[:assignments]).to match_array([{:title => "STUPID QUIZ",
+                                                      :migration_id => "iaa6f6db92ef0a3b7ee11a636858b691e",
+                                                      :assignment_group_migration_id => "iee2a87de283cb9290ee8f39330e1cd13",
+                                                      :quiz_migration_id => "i6bdad32159d1447f376fed88e15b8075"},
+                                                     {:title => "GRATED DISCUSSION",
+                                                      :migration_id => "ie088c19c90e7bb4cbc1a1ad1fd5945a0",
+                                                      :assignment_group_migration_id => "iee2a87de283cb9290ee8f39330e1cd13",
+                                                      :topic_migration_id => "i666db8c76308d6bd5a8db8f063ec75c5"}])
+    end
   end
 
 end
