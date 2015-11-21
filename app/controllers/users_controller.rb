@@ -1951,15 +1951,14 @@ class UsersController < ApplicationController
       presenter.observed_enrollments.group_by { |enrollment| enrollment[:course_id] }
 
     grouped_observed_enrollments.each do |course_id, enrollments|
-      user_ids = enrollments.map(&:user_id)
-      course = enrollments.first.course
       grades[:observed_enrollments][course_id] = {}
-      calculator = grade_calculator(user_ids, course, grading_periods)
 
-      calculator.compute_scores.each_with_index.map do |score, index|
-       grade = score.first.first[:grade]
-       user_id = user_ids[index]
-       grades[:observed_enrollments][course_id][user_id] = grade
+      if grading_periods[course_id].present?
+        user_ids = enrollments.map(&:user_id)
+        course = enrollments.first.course
+        grades[:observed_enrollments][course_id] = grades_from_grade_calculator(user_ids, course, grading_periods)
+      else
+        grades[:observed_enrollments][course_id] = grades_from_enrollments(enrollments)
       end
     end
 
@@ -1967,9 +1966,33 @@ class UsersController < ApplicationController
       course = enrollment_course_pair.first
       enrollment = enrollment_course_pair.second
 
-      calculator = grade_calculator([enrollment.user_id],course, grading_periods)
-      grade = calculator.compute_scores.first.first.first[:grade]
-      grades[:student_enrollments][course.id] = grade
+      if grading_periods[course.id].present?
+        computed_score = grades_from_grade_calculator([enrollment.user_id], course, grading_periods)[enrollment.user_id]
+        grades[:student_enrollments][course.id] = computed_score
+      else
+        computed_score = enrollment.computed_current_score
+        grades[:student_enrollments][course.id] = computed_score
+      end
+    end
+    grades
+  end
+
+  def grades_from_grade_calculator(user_ids, course, grading_periods)
+    calculator = grade_calculator(user_ids, course, grading_periods)
+    grades = {}
+    calculator.compute_scores.each_with_index do |score, index|
+     computed_score = score.first.first[:grade]
+     user_id = user_ids[index]
+     grades[user_id] = computed_score
+    end
+    grades
+  end
+
+  def grades_from_enrollments(enrollments)
+    grades = {}
+    enrollments.each do |enrollment|
+      computed_score = enrollment.computed_current_score
+      grades[enrollment.user_id] = computed_score
     end
     grades
   end
