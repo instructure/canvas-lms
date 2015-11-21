@@ -37,7 +37,7 @@ class AccessToken < ActiveRecord::Base
       token.send("#{token_key}=", hashed_tokens.first)
       token.save!
     end
-    token = nil unless token.try(:usable?) || token_key == :crypted_refresh_token
+    token = nil unless token.try(:usable?, token_key)
     token
   end
 
@@ -57,8 +57,23 @@ class AccessToken < ActiveRecord::Base
     Canvas::Security.encryption_keys.map { |key| Canvas::Security.hmac_sha1(token, key) }
   end
 
-  def usable?
-    user_id && !expired? && developer_key.try(:active?)
+  def usable?(token_key = :crypted_token)
+    # true if
+    # developer key is active AND
+    # there is a user id AND
+    # its not expired OR Its a refresh token
+    # since you need a refresh token to
+    # refresh expired tokens
+
+    if !developer_key_id || developer_key.try(:active?)
+      # we are a stand alone token, or a token with an active developer key
+      # make sure we
+      #   - have a user id
+      #   - its a refresh token
+      #     - If we aren't a refresh token. make sure we aren't expired
+      return true if user_id && (token_key == :crypted_refresh_token || !expired?)
+    end
+    false
   end
 
   def app_name
@@ -82,7 +97,7 @@ class AccessToken < ActiveRecord::Base
   end
 
   def expired?
-    expires_at && expires_at < Time.now
+    developer_key.try(:auto_expire_tokens) && expires_at && expires_at < Time.zone.now
   end
 
   def token=(new_token)
@@ -98,6 +113,10 @@ class AccessToken < ActiveRecord::Base
   def generate_token(overwrite=false)
     if overwrite || !self.crypted_token
       self.token = CanvasSlug.generate(nil, TOKEN_SIZE)
+
+      if !self.expires_at_changed? && developer_key.try(:auto_expire_tokens)
+        self.expires_at = DateTime.now.utc + 1.hour
+      end
     end
   end
 
@@ -132,6 +151,11 @@ class AccessToken < ActiveRecord::Base
     end
   end
 
+  def regenerate_access_token
+    generate_token(true)
+    save
+  end
+
   def visible_token
     if protected_token?
       nil
@@ -163,5 +187,7 @@ class AccessToken < ActiveRecord::Base
 
   # It's encrypted, but end users still shouldn't see this.
   # The hint is only returned in visible_token, if protected_token is false.
-  def self.serialization_excludes; [:crypted_token, :token_hint]; end
+  def self.serialization_excludes
+    [:crypted_token, :token_hint, :crypted_refresh_token]
+  end
 end

@@ -171,8 +171,8 @@ define([
           if(callback) { callback(); }
         });
       },
-      updateAssignmentData: function() {
-        $.ajaxJSON($(".assignment_info_url").attr('href'), 'GET', {}, function(data) {
+      updateAssignmentData: function(callback) {
+        return $.ajaxJSON($(".assignment_info_url").attr('href'), 'GET', {}, function(data) {
           $.each(data, function(id, info) {
             $context_module_item = $("#context_module_item_" + id);
             var data = {};
@@ -191,7 +191,9 @@ define([
             $context_module_item.fillTemplateData({data: data, htmlValues: ['points_possible_display']})
           });
           vddTooltip();
+          if (callback) { callback(); }
         }, function() {
+          if (callback) { callback(); }
         });
       },
       itemClass: function(content_tag) {
@@ -381,9 +383,9 @@ define([
           $form.find(".completion_entry .no_items_message").show();
         }
         if ($module.find(".content .context_module_item .criterion.defined").length !== 0) {
-          $(".requirement-count-radio").children().show();
+          $(".requirement-count-radio").show();
         } else {
-          $(".requirement-count-radio").children().hide();
+          $(".requirement-count-radio").hide();
         }
 
         var $requirementCount = $module.find('.pill li').data("requirement-count");
@@ -398,17 +400,20 @@ define([
         });
         $module.addClass('dont_remove');
         $form.find(".module_name").toggleClass('lonely_entry', isNew);
+
         $form.dialog({
           autoOpen: false,
           modal: true,
+          title: (isNew ? I18n.t('titles.add', "Add Module") : I18n.t('titles.edit', "Edit Module Settings")),
           width: 600,
+          height: (isNew ? 400 : 600),
           close: function() {
             modules.hideEditModule(true);
           },
           open: function(){
             $(this).find('input[type=text],textarea,select').first().focus();
           }
-        }).fixDialogButtons().dialog('option', {title: (isNew ? I18n.t('titles.add', "Add Module") : I18n.t('titles.edit', "Edit Module Settings")), width: (isNew ? 'auto' : 600)}).dialog('open'); //show();
+        }).dialog('open');
         $module.removeClass('dont_remove');
       },
       hideEditModule: function(remove) {
@@ -581,7 +586,6 @@ define([
           if (data.current_position && position && data.current_position < position) {
             $mod_item.addClass('after_current_position');
           }
-
           // set the status icon
           var $icon_container = $mod_item.find('.module-item-status-icon');
           var mod_id = $mod_item.getTemplateData({textValues: ['id']}).id;
@@ -923,9 +927,10 @@ define([
       });
       $pre.find(".option").empty().append($option);
       $option.slideDown();
+      $option.find(".id").change();
       $form.find(".completion_entry .criteria_list").append($pre).show();
       $pre.slideDown();
-      $(".requirement-count-radio").children().show();
+      $(".requirement-count-radio").show();
       $('#context_module_requirement_count_').change().focus();
     });
     $("#completion_criterion_option .id").change(function() {
@@ -973,7 +978,7 @@ define([
         $(this).remove();
         // Hides radio button and checkbox if there are no requirements
         if ($elem.html().length === 0 && $requirement.length !== 0) {
-          $(".requirement-count-radio").children().fadeOut("fast");
+          $(".requirement-count-radio").fadeOut("fast");
         }
       })
     });
@@ -1334,6 +1339,7 @@ define([
         moduleType: data.type,
         id: data.publishable_id,
         moduleItemName: data.moduleItemName,
+        moduleItemId: data.id,
         moduleId: data.context_module_id,
         courseId: data.context_id,
         published: data.published,
@@ -1697,8 +1703,10 @@ define([
       setTimeout(modules.initModuleManagement, 1000);
     }
 
-    modules.updateAssignmentData(); // need the assignment data to check past due state
-    modules.updateProgressions();
+    // need the assignment data to check past due state
+    modules.updateAssignmentData(function() {
+      modules.updateProgressions();
+    });
 
     $(".context_module").find(".expand_module_link,.collapse_module_link").bind('click keyclick', function(event, goSlow) {
       event.preventDefault();

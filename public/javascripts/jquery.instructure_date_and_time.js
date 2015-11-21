@@ -174,14 +174,10 @@ define([
       var min = $div.find(".ui-datepicker-time-minute").val() || $(this).data('time-minute');
       var ampm = $div.find(".ui-datepicker-time-ampm").val() || $(this).data('time-ampm');
       if(hr || min) {
-        // intentionally not yet localized, because it's going to go in the val
-        // of the datepicker.
+        text += " " + hr + ":" + (min || "00");
         if (tz.hasMeridian()) {
-          ampm = ampm || "pm";
-        } else {
-          ampm = parseInt(hr, 10) > 12 ? "pm" : "am";
+          text += " " + (ampm || I18n.t('#time.pm'));
         }
-        text += " " + hr + ":" + (min || "00") + " " + ampm;
       }
       picker.input.val(text).change();
     };

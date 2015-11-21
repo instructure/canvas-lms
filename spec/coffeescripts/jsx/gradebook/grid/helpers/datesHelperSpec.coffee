@@ -1,8 +1,7 @@
 define [
-  'react'
   'jsx/gradebook/grid/helpers/datesHelper'
   'underscore'
-], (React, DatesHelper, _) ->
+], (DatesHelper, _) ->
 
   defaultAssignment = ->
     {

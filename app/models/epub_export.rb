@@ -1,10 +1,21 @@
 class EpubExport < ActiveRecord::Base
+  include CC::Exporter::Epub::Exportable
   include Workflow
 
   belongs_to :content_export
   belongs_to :course
   belongs_to :user
-  has_one :attachment, as: :context, dependent: :destroy
+  with_options({
+    as: :context, class_name: 'Attachment', order: 'created_at DESC'
+  }) do |association|
+    association.has_many :attachments, dependent: :destroy
+    association.has_one :epub_attachment, conditions: {
+      content_type: 'application/epub+zip'
+    }
+    association.has_one :zip_attachment, conditions: {
+      content_type: 'application/zip'
+    }
+  end
   has_one :job_progress, as: :context, class_name: 'Progress'
   validates :course_id, :workflow_state, presence: true
 
@@ -78,7 +89,7 @@ class EpubExport < ActiveRecord::Base
 
   def mark_exported
     if content_export.failed?
-      fail
+      mark_as_failed
     else
       update_attribute(:workflow_state, 'exported')
       job_progress.update_attribute(:completion, PERCENTAGE_COMPLETE[:exported])
@@ -90,22 +101,57 @@ class EpubExport < ActiveRecord::Base
   def generate
     job_progress.update_attribute(:completion, PERCENTAGE_COMPLETE[:generating])
     update_attribute(:workflow_state, 'generating')
-    generate_epub
+    convert_to_epub
   end
   handle_asynchronously :generate, priority: Delayed::LOW_PRIORITY, max_attempts: 1
 
-  def generate_epub
-    success
-  end
-  handle_asynchronously :generate_epub, priority: Delayed::LOW_PRIORITY, max_attempts: 1
-
-  def success
+  def mark_as_generated
     job_progress.complete! if job_progress.running?
     update_attribute(:workflow_state, 'generated')
   end
 
-  def fail
+  def mark_as_failed
     job_progress.try :fail!
     update_attribute(:workflow_state, 'failed')
+  end
+
+  # Epub Exportable overrides
+  def content_cartridge
+    self.content_export.attachment
+  end
+
+  def convert_to_epub
+    begin
+      file_paths = super
+    rescue
+      mark_as_failed
+      raise e
+    end
+
+    file_paths.each do |file_path|
+      begin
+        mime_type = MIME::Types.type_for(file_path).first
+        file = Rack::Multipart::UploadedFile.new(
+          file_path,
+          mime_type.try(:content_type)
+        )
+        self.attachments.create({
+          filename: File.basename(file_path),
+          uploaded_data: file
+        })
+      rescue Errno::ENOENT => e
+        mark_as_failed
+        raise e
+      ensure
+        file.close if file
+      end
+    end
+    mark_as_generated
+    file_paths
+  end
+  handle_asynchronously :convert_to_epub, priority: Delayed::LOW_PRIORITY, max_attempts: 1
+
+  def sort_by_content_type?
+    self.course.organize_epub_by_content_type
   end
 end

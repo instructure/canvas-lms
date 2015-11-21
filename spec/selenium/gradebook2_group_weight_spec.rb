@@ -83,16 +83,15 @@ describe "group weights" do
       @course.reload
     end
 
-    it 'should display trangle warnings for assignment groups with 0 points possible', priority: "1", test_id: 164013 do
+    it 'should display triangle warnings for assignment groups with 0 points possible', priority: "1", test_id: 164013 do
       get "/courses/#{@course.id}/gradebook"
-      refresh_page
       expect(ff('.icon-warning').count).to eq(2)
     end
 
-    it 'should remove trangle warnings if group weights are turned off in gradebook', priority: "1", test_id: 305579 do
+    it 'should remove triangle warnings if group weights are turned off in gradebook', priority: "1", test_id: 305579 do
       get "/courses/#{@course.id}/gradebook"
       f('#gradebook_settings').click
-      f('#ui-id-4').click
+      f("[aria-controls='assignment_group_weights_dialog']").click
       f('#group_weighting_scheme').click
       submit_dialog('.ui-dialog-buttonset', '.ui-button')
       refresh_page

@@ -518,7 +518,12 @@ class Assignment < ActiveRecord::Base
     if self.multiple_due_dates_apply_to?(user)
       tag_info[:vdd_tooltip] = OverrideTooltipPresenter.new(self, user).as_json
     else
-      tag_info[:due_date] = self.overridden_for(user).due_at.utc.iso8601 rescue nil
+      due_date = self.overridden_for(user).due_at
+      if due_date
+        tag_info[:due_date] = due_date.utc.iso8601
+        tag_info[:past_due] = true if expects_submission? && due_date < Time.now &&
+                                      !submission_for_student(user).has_submission?
+      end
     end
     tag_info
   end
@@ -608,10 +613,18 @@ class Assignment < ActiveRecord::Base
   def destroy
     self.workflow_state = 'deleted'
     ContentTag.delete_for(self)
+    self.rubric_association.destroy if self.rubric_association
     self.save!
 
     self.discussion_topic.destroy if self.discussion_topic && !self.discussion_topic.deleted?
     self.quiz.destroy if self.quiz && !self.quiz.deleted?
+    refresh_course_content_participation_counts
+  end
+
+  def refresh_course_content_participation_counts
+    progress = self.context.progresses.build(tag: 'refresh_content_participation_counts')
+    progress.save!
+    progress.process_job(self.context, :refresh_content_participation_counts)
   end
 
   def time_zone_edited
@@ -623,6 +636,7 @@ class Assignment < ActiveRecord::Base
     self.save
     self.discussion_topic.restore(:assignment) if from != :discussion_topic && self.discussion_topic
     self.quiz.restore(:assignment) if from != :quiz && self.quiz
+    refresh_course_content_participation_counts
   end
 
   def participants_with_overridden_due_at
@@ -1380,7 +1394,7 @@ class Assignment < ActiveRecord::Base
       }
     end
 
-    enrollments = context.enrollments_visible_to(user)
+    enrollments = context.apply_enrollment_visibility(context.student_enrollments, user)
 
     is_provisional = grading_role == :provisional_grader || grading_role == :moderator
     rubric_assmnts = visible_rubric_assessments_for(user, :provisional_grader => is_provisional) || []
@@ -1434,8 +1448,6 @@ class Assignment < ActiveRecord::Base
 
     enrollment_types_by_id = enrollments.inject({}){ |h, e| h[e.user_id] ||= e.type; h }
 
-    crocodoc_user_id = is_provisional && user.crocodoc_id!
-
     res[:submissions] = submissions.map do |sub|
       json = sub.as_json(:include_root => false,
         :methods => [:submission_history, :late],
@@ -1457,6 +1469,12 @@ class Assignment < ActiveRecord::Base
 
       sub_attachments = []
 
+      crocodoc_user_ids = if is_provisional
+        [sub.user.crocodoc_id!, user.crocodoc_id!]
+      else
+        sub.crocodoc_whitelist
+      end
+
       json['submission_history'] = if json['submission_history'] && (quiz.nil? || too_many)
                                      json['submission_history'].map do |version|
                                        version.as_json(
@@ -1473,7 +1491,7 @@ class Assignment < ActiveRecord::Base
                                                :methods => [:view_inline_ping_url]
                                              ).tap { |json|
                                                json[:attachment][:canvadoc_url] = a.canvadoc_url(user)
-                                               json[:attachment][:crocodoc_url] =  a.crocodoc_url(user, [crocodoc_user_id])
+                                               json[:attachment][:crocodoc_url] =  a.crocodoc_url(user, crocodoc_user_ids)
                                                json[:attachment][:submitted_to_crocodoc] = a.crocodoc_document.present?
                                              }
                                            end
@@ -1504,13 +1522,7 @@ class Assignment < ActiveRecord::Base
                 as_json(:methods => [:assessor_name], :include_root => false)
 
               json[:selected] = !!(selection && selection.selected_provisional_grade_id == pg.id)
-
-              crocodoc_urls = []
-              sub_attachments.each do |a|
-                crocodoc_urls << {:attachment_id => a.id,
-                  :crocodoc_url => a.crocodoc_available? && a.crocodoc_url(user, [pg.scorer.crocodoc_id!]) }
-              end
-              json[:crocodoc_urls] = crocodoc_urls
+              json[:crocodoc_urls] = sub_attachments.map { |a| pg.crocodoc_attachment_info(user, a) }
               json[:readonly] = !pg.final && (pg.scorer_id != user.id)
               json[:submission_comments] = pg.submission_comments.as_json(:include_root => false,
                                                                           :methods => avatar_methods,
@@ -1728,9 +1740,9 @@ class Assignment < ActiveRecord::Base
 
     # we track existing assessment requests, and the ones we create here, so
     # that we don't have to constantly re-query the db.
-    assessment_request_counts = {}
+    assessor_id_map = {}
     submissions.each do |s|
-      assessment_request_counts[s.id] = s.assessment_requests.size
+      assessor_id_map[s.id] = s.assessment_requests.map(&:assessor_asset_id)
     end
     res = []
 
@@ -1752,8 +1764,13 @@ class Assignment < ActiveRecord::Base
         candidate_set.include?(c.id)
       }.sort_by { |c|
         [
-          # prefer those who still need more reviews done.
-          assessment_request_counts[c.id] < self.peer_review_count ? CanvasSort::First : CanvasSort::Last,
+          # prefer those who need reviews done
+          assessor_id_map[c.id].count < self.peer_review_count ? CanvasSort::First : CanvasSort::Last,
+          # then prefer those who are not reviewing this submission
+          assessor_id_map[submission.id].include?(c.id) ? CanvasSort::Last : CanvasSort::First,
+          # then prefer those who need the most reviews done (that way we don't run the risk of
+          # getting stuck with a submission needing more reviews than there are available reviewers left)
+          assessor_id_map[c.id].count,
           # then prefer those who are assigned fewer reviews at this point --
           # this helps avoid loops where everybody is reviewing those who are
           # reviewing them, leaving the final assignee out in the cold.
@@ -1773,7 +1790,7 @@ class Assignment < ActiveRecord::Base
       assessees.each do |to_assess|
         # make the assignment
         res << to_assess.assign_assessor(submission)
-        assessment_request_counts[to_assess.id] += 1
+        assessor_id_map[to_assess.id] << submission.id
       end
     end
 
@@ -1820,7 +1837,7 @@ class Assignment < ActiveRecord::Base
   scope :with_submissions, -> { preload(:submissions) }
 
   scope :with_submissions_for_user, lambda { |user|
-    eager_load(:submissions).where("submissions.user_id = ?", user.id)
+    eager_load(:submissions).where(submissions: {user_id: user})
   }
 
   scope :for_context_codes, lambda { |codes| where(:context_code => codes) }
@@ -1842,7 +1859,7 @@ class Assignment < ActiveRecord::Base
       user_ids = Array.wrap(user_ids).join(',')
       course_ids = Array.wrap(course_ids_that_have_da_enabled).join(',')
       scope = joins(sanitize_sql([<<-SQL, course_ids, user_ids]))
-        LEFT OUTER JOIN assignment_student_visibilities ON (
+        LEFT OUTER JOIN #{AssignmentStudentVisibility.quoted_table_name} ON (
          assignment_student_visibilities.assignment_id = assignments.id
          AND assignment_student_visibilities.course_id IN (%s)
          AND assignment_student_visibilities.user_id IN (%s))
@@ -1867,10 +1884,12 @@ class Assignment < ActiveRecord::Base
   # Return all assignments and their active overrides where either the
   # assignment or one of its overrides is due between start and ending.
   scope :due_between_with_overrides, lambda { |start, ending|
-    eager_load(:assignment_overrides).
-        where('assignments.due_at BETWEEN ? AND ?
-              OR assignment_overrides.due_at_overridden AND
-              assignment_overrides.due_at BETWEEN ? AND ?', start, ending, start, ending)
+    joins("LEFT OUTER JOIN #{AssignmentOverride.quoted_table_name} assignment_overrides
+          ON assignment_overrides.assignment_id = assignments.id").
+    group("assignments.id").
+    where('assignments.due_at BETWEEN ? AND ?
+          OR assignment_overrides.due_at_overridden AND
+          assignment_overrides.due_at BETWEEN ? AND ?', start, ending, start, ending)
   }
 
   scope :updated_after, lambda { |*args|
@@ -1897,7 +1916,7 @@ class Assignment < ActiveRecord::Base
   # This should only be used in the course drop down to show assignments needing a submission
   scope :need_submitting_info, lambda { |user_id, limit|
     chain = api_needed_fields.
-      where("(SELECT COUNT(id) FROM submissions
+      where("(SELECT COUNT(id) FROM #{Submission.quoted_table_name}
             WHERE assignment_id = assignments.id
             AND submission_type IS NOT NULL
             AND user_id = ?) = 0", user_id).
@@ -2024,7 +2043,9 @@ class Assignment < ActiveRecord::Base
     end
     attachment = Attachment.where(id: attachment_id).first if attachment_id
 
-    if !attachment || !submission
+    if !attachment || !submission ||
+       !attachment.grants_right?(user, :read) ||
+       !submission.attachments.where(:id => attachment_id).exists?
       @ignored_files << fullpath
       return nil
     end

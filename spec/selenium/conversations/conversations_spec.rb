@@ -60,6 +60,71 @@ describe "conversations new" do
     expect(alert_present?).to be_falsey
   end
 
+  context "conversations ui" do
+    before(:each) do
+      get_conversations
+    end
+
+    it "should have a courses dropdown", priority: "1", test_id: 117960 do
+      fj("[data-id = 'course-filter']").click
+      wait_for_ajaximations
+
+      # Verify course filter is open
+      expect(fj('.course-filter.open')).to be_truthy
+
+      # Verify course filter names
+      dropdown_array = ffj('#course-filter-bs .text')
+      expect(dropdown_array[0].text).to include_text('All Courses')
+      expect(dropdown_array[1].text).to include_text(@course.name)
+    end
+
+    it "should have a type dropdown", priority: "1", test_id: 446594 do
+      fj("[data-id = 'type-filter']").click
+      wait_for_ajaximations
+
+      # Verify type filter is open
+      expect(fj('.type-filter.open')).to be
+
+      # Verify type filter names and order
+      dropdown_array = ffj('#type-filter-bs .text')
+      expect(dropdown_array[0].text).to include_text('Inbox')
+      expect(dropdown_array[1].text).to include_text('Unread')
+      expect(dropdown_array[2].text).to include_text('Starred')
+      expect(dropdown_array[3].text).to include_text('Sent')
+      expect(dropdown_array[4].text).to include_text('Archived')
+      expect(dropdown_array[5].text).to include_text('Submission Comments')
+    end
+
+    it "should have action buttons", priority: "1", test_id: 446595 do
+      expect(fj('#conversation-actions #compose-btn')).to be
+      expect(fj('#conversation-actions #reply-btn')).to be
+      expect(fj('#conversation-actions #reply-all-btn')).to be
+      expect(fj('#conversation-actions #archive-btn')).to be
+      expect(fj('#conversation-actions #delete-btn')).to be
+      expect(fj('.inline-block')).to be
+    end
+
+    it "should have a search box with address book", priority: "1", test_id: 446596 do
+      # Click on the address book
+      fj('.recipient-finder .icon-address-book').click
+      wait_for_ajaximations
+      keep_trying_until { expect(fj('.paginatedLoadingIndicator')['style']).to include_text('none') }
+
+      # Verify the names of the course and all students and teachers appear
+      expect(fj('.ac-result-contents .context .result-name')).to include_text(@course.name)
+      users = @course.users.collect(&:name)
+      users.each do |u|
+        expect(fj(".ac-result-contents .result-name:contains('#{u}')")).to be
+      end
+    end
+
+    it "should display a no messages image", priority: "1", test_id: 456175 do
+      # Verify Text and Icon Class
+      expect(fj('.no-messages').text).to include_text('No Conversations Selected')
+      expect(fj('.no-messages .icon-email')).to be
+    end
+  end
+
   describe "message list" do
     before(:each) do
       @participant = conversation(@teacher, @s[0], @s[1], body: 'hi there', workflow_state: 'unread')

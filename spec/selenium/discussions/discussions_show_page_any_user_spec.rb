@@ -329,7 +329,7 @@ describe "discussions" do
         end
 
         it "should edit a side comment", priority: "1", test_id: 345491 do
-          edit_text = 'this has been edited '
+          edit_text = 'this has been edited'
           text = "new side comment from somebody"
           entry = topic.discussion_entries.create!(:user => somebody, :message => text, :parent_entry => entry)
           expect(topic.discussion_entries.last.message).to eq text

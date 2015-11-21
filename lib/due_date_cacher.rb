@@ -59,7 +59,7 @@ class DueDateCacher
                  end
 
     # Create submissions that do not exist yet to calculate due dates for non submitted assignments.
-    Assignment.connection.update("INSERT INTO submissions (assignment_id, user_id, workflow_state, created_at, context_code, process_attempts) #{insert_sql}")
+    Assignment.connection.update("INSERT INTO #{Submission.quoted_table_name} (assignment_id, user_id, workflow_state, created_at, context_code, process_attempts) #{insert_sql}")
   end
 
   def recompute
@@ -80,16 +80,10 @@ class DueDateCacher
             "CAST(#{Submission.sanitize(false)} AS #{cast}) AS overridden"
           ]).joins(:assignment).where(assignments: { id: @assignments }).to_sql})")
 
-          # create an ActiveRecord class around that temp table for the update_all
-          scope = Class.new(ActiveRecord::Base) do
-            self.table_name = :calculated_due_ats
-            self.primary_key = :submission_id
-          end
-
           # for each override, narrow to the affected subset of the table, and
           # apply
           overrides.each do |override|
-            override_scope(scope, override).update_all(
+            override_scope(Submission.from("calculated_due_ats"), override).update_all(
               :due_at => override.due_at,
               :overridden => true)
           end
@@ -115,7 +109,7 @@ class DueDateCacher
   end
 
   def override_scope(scope, override)
-    scope = scope.where(:assignment_id => override.assignment_id)
+    scope = scope.where(calculated_due_ats: { assignment_id: override.assignment_id })
 
     # and the override's due_at is more lenient than any existing overridden
     # due_at

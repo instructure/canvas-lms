@@ -18,16 +18,9 @@
 
 module GradebookTransformer
   private
-  def select_in_current_grading_periods(assignments, course)
-    if course.feature_enabled?(:multiple_grading_periods)
-      assignments, assignments_without_due_at = assignments.partition(&:due_at)
-      current_periods = GradingPeriod.for(course).active.current
-
-      current = assignments.select do |assignment|
-        current_periods.any? { |p| p.in_date_range? assignment.due_at }
-      end
-
-      current + assignments_without_due_at
+  def select_in_grading_period(assignments, course, grading_period)
+    if grading_period && course.feature_enabled?(:multiple_grading_periods)
+      grading_period.assignments(assignments)
     else
       assignments
     end

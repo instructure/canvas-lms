@@ -102,10 +102,14 @@ define [
       else
         'students_url'
 
-      @gotAllAssignmentGroupsPromise = $.Deferred().done => @gotAllAssignmentGroups()
-      gotAllStudents = $.Deferred().done(()=>
-        @gotAllAssignmentGroupsPromise.then(()=> @gotAllStudents())
-      )
+      gotAllStudentsPromise = $.Deferred()
+      @gotAllAssignmentGroupsPromise = $.Deferred()
+      gotAllStudentsAndAssignmentsPromise = $.Deferred()
+
+      $.when(gotAllStudentsPromise, @gotAllAssignmentGroupsPromise).then =>
+        @gotAllAssignmentGroups()
+        @gotAllStudents()
+        gotAllStudentsAndAssignmentsPromise.resolve()
 
       @assignmentGroupsParams = {exclude_descriptions: true}
       if @mgpEnabled && @gradingPeriodToShow && @gradingPeriodToShow != '0' && @gradingPeriodToShow != ''
@@ -136,12 +140,12 @@ define [
         paginationLinks = xhr.getResponseHeader('Link')
         lastLink = paginationLinks.match(/<[^>]+>; *rel="last"/)
         unless lastLink?
-          gotAllStudents.resolve()
+          gotAllStudentsPromise.resolve()
           return
         lastPage = lastLink[0].match(/page=(\d+)/)[1]
         lastPage = parseInt lastPage, 10
         if lastPage == 1
-          gotAllStudents.resolve()
+          gotAllStudentsPromise.resolve()
           return
 
         fetchEnrollments = (page) =>
@@ -152,10 +156,10 @@ define [
             @gotChunkOfStudents responses[0]
           else
             @gotChunkOfStudents(students) for [students, x, y] in responses
-          gotAllStudents.resolve()
+          gotAllStudentsPromise.resolve()
 
       gotCustomColumns = @getCustomColumns()
-      @gotAllData = $.when(gotCustomColumns, gotAllStudents, @gotAllAssignmentGroupsPromise)
+      @gotAllData = $.when(gotCustomColumns, gotAllStudentsAndAssignmentsPromise)
 
       @allSubmissionsLoaded.done =>
         for c in @customColumns
@@ -539,7 +543,7 @@ define [
 
     renderTotalHeader: () =>
       @totalHeader = new TotalColumnHeaderView
-        showingPoints: @displayPointTotals
+        showingPoints: @displayPointTotals()
         toggleShowingPoints: @togglePointsOrPercentTotals.bind(this)
         weightedGroups: @weightedGroups
         totalColumnInFront: @totalColumnInFront
@@ -829,6 +833,7 @@ define [
     # this is a workaroud to make it so only assignments are sortable but at the same time
     # so that the total and final grade columns don't dissapear after reordering columns
     fixColumnReordering: =>
+      @renderTotalHeader()
       $headers = $('#gradebook_grid .container_1').find('.slick-header-columns')
       originalItemsSelector = $headers.sortable 'option', 'items'
       onlyAssignmentColsSelector = '> *:not([id*="assignment_group"]):not([id*="total_grade"])'
@@ -1107,6 +1112,9 @@ define [
       unless (_.detect @assignments, (a) -> (''+a.submission_types) == "attendance")
         $settingsMenu.find('#show_attendance').closest('li').hide()
 
+      if @hideAggregateColumns()
+        $settingsMenu.find('#include-ungraded-list-item').hide()
+
       @$columnArrangementTogglers = $('#gradebook-toolbar [data-arrange-columns-by]').bind 'click', (event) =>
         event.preventDefault()
         newSortOrder = { sortType: $(event.currentTarget).data('arrangeColumnsBy') }
@@ -1122,7 +1130,6 @@ define [
       @userFilter = new InputFilterView el: '.gradebook_filter input'
       @userFilter.on 'input', @onUserFilterInput
 
-      @renderTotalHeader()
       @initGradebookExporter()
 
     initGradebookExporter: () =>
@@ -1143,14 +1150,19 @@ define [
 
         @pollProgressForCSVExport(loading_interval, attachment_progress)
 
-      $('.generate_new_csv').click ->
+      $('.generate_new_csv').click =>
         $('#download_csv').prop('disabled', true)
         loading_interval = self.exportingGradebookStatus()
         include_priors = $('#show_concluded_enrollments').prop('checked')
+
+        params =
+          include_priors: include_priors
+          grading_period_id: @getGradingPeriodToShow()
+
         $.ajaxJSON(
             ENV.GRADEBOOK_OPTIONS.export_gradebook_csv_url,
             'GET',
-            { "include_priors": include_priors }
+            params
         ).then((attachment_progress) ->
           self.pollProgressForCSVExport(loading_interval, attachment_progress)
         )
@@ -1366,53 +1378,55 @@ define [
               .unbind('gridready.render')
               .bind('gridready.render', => @grid.invalidate() )
         columnDef
+      if @hideAggregateColumns()
+        @aggregateColumns = []
+      else
+        @aggregateColumns = for id, group of @assignmentGroups
+          fieldName = "assignment_group_#{id}"
 
-      @aggregateColumns = for id, group of @assignmentGroups
-        fieldName = "assignment_group_#{id}"
+          aggregateWidth = testWidth(group.name, columnWidths.assignmentGroup.min, columnWidths.assignmentGroup.default_max)
+          if @gradebookColumnSizeSettings && @gradebookColumnSizeSettings[fieldName]
+            aggregateWidth = parseInt(@gradebookColumnSizeSettings[fieldName])
 
-        aggregateWidth = testWidth(group.name, columnWidths.assignmentGroup.min, columnWidths.assignmentGroup.default_max)
-        if @gradebookColumnSizeSettings && @gradebookColumnSizeSettings[fieldName]
-          aggregateWidth = parseInt(@gradebookColumnSizeSettings[fieldName])
+          {
+            id: fieldName
+            field: fieldName
+            formatter: @groupTotalFormatter
+            name: @assignmentGroupHtml(group.name, group.group_weight)
+            toolTip: group.name
+            object: group
+            minWidth: columnWidths.assignmentGroup.min,
+            maxWidth: columnWidths.assignmentGroup.max,
+            width: aggregateWidth
+            cssClass: "meta-cell assignment-group-cell",
+            sortable: true
+            type: 'assignment_group'
+          }
 
-        {
-          id: fieldName
-          field: fieldName
+        total = I18n.t "total", "Total"
+
+        totalWidth = testWidth("Total", columnWidths.total.min, columnWidths.total.max)
+        if @gradebookColumnSizeSettings && @gradebookColumnSizeSettings['total_grade']
+          totalWidth = parseInt(@gradebookColumnSizeSettings['total_grade'])
+
+        total_column =
+          id: "total_grade"
+          field: "total_grade"
           formatter: @groupTotalFormatter
-          name: @assignmentGroupHtml(group.name, group.group_weight)
-          toolTip: group.name
-          object: group
-          minWidth: columnWidths.assignmentGroup.min,
-          maxWidth: columnWidths.assignmentGroup.max,
-          width: aggregateWidth
-          cssClass: "meta-cell assignment-group-cell",
+          name: """
+            #{htmlEscape total}
+            <div id=total_column_header></div>
+          """
+          toolTip: total
+          minWidth: columnWidths.total.min
+          maxWidth: columnWidths.total.max
+          width: totalWidth
+          cssClass: if @totalColumnInFront then 'meta-cell' else 'total-cell'
           sortable: true
-          type: 'assignment_group'
-        }
+          type: 'total_grade'
 
-      total = I18n.t "total", "Total"
-
-      totalWidth = testWidth("Total", columnWidths.total.min, columnWidths.total.max)
-      if @gradebookColumnSizeSettings && @gradebookColumnSizeSettings['total_grade']
-        totalWidth = parseInt(@gradebookColumnSizeSettings['total_grade'])
-
-      total_column =
-        id: "total_grade"
-        field: "total_grade"
-        formatter: @groupTotalFormatter
-        name: """
-          #{htmlEscape total}
-          <div id=total_column_header></div>
-        """
-        toolTip: total
-        minWidth: columnWidths.total.min
-        maxWidth: columnWidths.total.max
-        width: totalWidth
-        cssClass: if @totalColumnInFront then 'meta-cell' else 'total-cell'
-        sortable: true
-        type: 'total_grade'
-
-      (if @totalColumnInFront then @parentColumns else
-        @aggregateColumns).push total_column
+        (if @totalColumnInFront then @parentColumns else
+          @aggregateColumns).push total_column
 
       $widthTester.remove()
 
@@ -1667,3 +1681,9 @@ define [
 
     isAllGradingPeriods: (currentPeriodId) ->
       currentPeriodId == "0"
+
+    hideAggregateColumns: ->
+      return false unless @mgpEnabled
+      return false if @options.all_grading_periods_totals
+      selectedPeriodId = @getGradingPeriodToShow()
+      @isAllGradingPeriods(selectedPeriodId)

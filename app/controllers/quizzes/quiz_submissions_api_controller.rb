@@ -167,7 +167,8 @@ class Quizzes::QuizSubmissionsApiController < ApplicationController
   def index
     quiz_submissions = if @context.grants_any_right?(@current_user, session, :manage_grades, :view_all_grades)
       # teachers have access to all student submissions
-      Api.paginate @quiz.quiz_submissions.where(:user_id => visible_user_ids),
+      visible_student_ids = @context.apply_enrollment_visibility(@context.student_enrollments, @current_user).pluck(:user_id)
+      Api.paginate @quiz.quiz_submissions.where(:user_id => visible_student_ids),
         self,
         api_v1_course_quiz_submissions_url(@context, @quiz)
     elsif @quiz.grants_right?(@current_user, session, :submit)
@@ -244,6 +245,10 @@ class Quizzes::QuizSubmissionsApiController < ApplicationController
   #    "quiz_submissions": [QuizSubmission]
   #  }
   def create
+    if module_locked?
+      raise RequestError.new("you are not allowed to participate in this quiz", 400)
+    end
+
     quiz_submission = if previewing?
       @service.create_preview(@quiz, session)
     else
@@ -396,13 +401,13 @@ class Quizzes::QuizSubmissionsApiController < ApplicationController
 
   private
 
-  def previewing?
-    !!params[:preview]
+  def module_locked?
+    @locked_reason = @quiz.locked_for?(@current_user, :check_policies => true, :deep_check_if_needed => true)
+    @locked_reason && !@quiz.grants_right?(@current_user, session, :update)
   end
 
-  def visible_user_ids(opts = {})
-    scope = @context.enrollments_visible_to(@current_user, opts)
-    scope.pluck(:user_id)
+  def previewing?
+    !!params[:preview]
   end
 
   def serialize_and_render(quiz_submissions)

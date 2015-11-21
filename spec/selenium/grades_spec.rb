@@ -55,7 +55,7 @@ describe "grades" do
 
     #second student submission
     @student_2_submission = @first_assignment.submit_homework(@student_2, :body => 'second student second submission')
-    @first_assignment.grade_student(@student_2, :grade => 4)
+    @first_assignment.grade_student(@student_2, :grade => 4, :graded_anonymously => true)
     @student_2_submission.score = 3
     @submission.save!
 
@@ -169,6 +169,17 @@ describe "grades" do
       assert_grade.call("96.97%")
 
       driver.execute_script '$("#grade_entry").blur()'
+    end
+
+    it "shows the assignment was not graded anonymously" do
+      get "/courses/#{@course.id}/grades"
+      expect(f("#submission_#{@first_assignment.id} .anonymous").text).to eq 'no'
+    end
+
+    it "shows the assignment was graded anonymously" do
+      user_session(@student_2)
+      get "/courses/#{@course.id}/grades"
+      expect(f("#submission_#{@first_assignment.id} .anonymous").text).to eq 'yes'
     end
 
     it "should display rubric on assignment", priority: "1", test_id: 229661 do

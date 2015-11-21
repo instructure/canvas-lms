@@ -10,8 +10,8 @@ describe ModeratedGrading::ProvisionalGrade do
   let(:assignment) { course.assignments.create! submission_types: 'online_text_entry' }
   let(:account) { a = account_model; a.allow_feature!(:moderated_grading); a}
   let(:course) { c = account.courses.create!; c.enable_feature!(:moderated_grading); c  }
-  let(:scorer) { user }
-  let(:student) { u = user(:active_user => true); course.enroll_student(u); u }
+  let(:scorer) { u = user(:active_user => true); course.enroll_teacher(u, :enrollment_state => 'active'); u }
+  let(:student) { u = user(:active_user => true); course.enroll_student(u, :enrollment_state => 'active'); u }
   let(:now) { Time.zone.now }
 
   it { is_expected.to be_valid }
@@ -223,8 +223,9 @@ describe ModeratedGrading::ProvisionalGrade do
     end
 
     def test_copy_to_final_mark
-      final_mark = ModeratedGrading::ProvisionalGrade.find(@pg.copy_to_final_mark!(@moderator))
+      final_mark = @pg.copy_to_final_mark!(@moderator)
       expect(final_mark.id).not_to eq @pg.id
+      expect(final_mark.source_provisional_grade_id).to eq @pg.id
 
       expect(final_mark.grade).to eq @pg.grade
       expect(final_mark.score).to eq @pg.score
@@ -263,6 +264,14 @@ describe ModeratedGrading::ProvisionalGrade do
 
       expect(RubricAssessment.find_by_id(fa)).to be_nil
       expect(SubmissionComment.find_by_id(fc)).to be_nil
+    end
+
+    it "generates crocodoc_attachment_info with all participants" do
+      att = stub(:id => 100, :crocodoc_available? => true)
+      crocodoc_ids = [@sub.user, @moderator, @scorer].map(&:crocodoc_id!)
+      att.expects(:crocodoc_url).with(@moderator, crocodoc_ids).returns('fake_url')
+      final_mark = @pg.copy_to_final_mark!(@moderator)
+      expect(final_mark.crocodoc_attachment_info(@moderator, att)).to eq({:attachment_id => 100, :crocodoc_url => 'fake_url'})
     end
   end
 end

@@ -24,6 +24,7 @@ class CommunicationChannel < ActiveRecord::Base
   attr_accessible :user, :path, :path_type, :build_pseudonym_on_confirm, :pseudonym
 
   serialize :last_bounce_details
+  serialize :last_transient_bounce_details
 
   belongs_to :pseudonym
   has_many :pseudonyms
@@ -441,16 +442,21 @@ class CommunicationChannel < ActiveRecord::Base
   end
   private :check_if_bouncing_changed
 
-  def self.bounce_for_path(path:, timestamp:, details:, suppression_bounce:)
+  def self.bounce_for_path(path:, timestamp:, details:, permanent_bounce:, suppression_bounce:)
     Shard.with_each_shard(CommunicationChannel.associated_shards(path)) do
       CommunicationChannel.unretired.email.by_path(path).each do |channel|
-        channel.bounce_count = channel.bounce_count + 1
+        channel.bounce_count = channel.bounce_count + 1 if permanent_bounce
+
         if suppression_bounce
           channel.last_suppression_bounce_at = timestamp
-        else
+        elsif permanent_bounce
           channel.last_bounce_at = timestamp
           channel.last_bounce_details = details
+        else
+          channel.last_transient_bounce_at = timestamp
+          channel.last_transient_bounce_details = details
         end
+
         channel.save!
       end
     end

@@ -245,7 +245,7 @@ describe UsersController do
     expect(courses.map { |c| c['label'] }).to eq %w(a B c d)
   end
 
-  context "GET 'delete'" do
+  describe "GET 'delete'" do
     it "should fail when the user doesn't exist" do
       account_admin_user
       user_session(@admin)
@@ -299,7 +299,7 @@ describe UsersController do
     end
   end
 
-  context "POST 'destroy'" do
+  describe "POST 'destroy'" do
     it "should fail when the user doesn't exist" do
       account_admin_user
       user_session(@admin)
@@ -403,7 +403,7 @@ describe UsersController do
     end
   end
 
-  context "POST 'create'" do
+  describe "POST 'create'" do
     it "should not allow creating when self_registration is disabled and you're not an admin'" do
       post 'create', :pseudonym => { :unique_id => 'jacob@instructure.com' }, :user => { :name => 'Jacob Fugal' }
       expect(response).not_to be_success
@@ -771,9 +771,282 @@ describe UsersController do
     end
   end
 
-  context "GET 'grades'" do
+  describe "GET 'grades_for_student'" do
+    let(:test_course) do
+      test_course = course(active_all: true)
+      test_course.root_account.enable_feature!(:multiple_grading_periods)
+      test_course
+    end
+    let(:student) { user(active_all: true) }
+    let!(:student_enrollment) do
+      course_with_user('StudentEnrollment', course: test_course, user: student, active_all: true)
+    end
+    let(:grading_period_group) { test_course.grading_period_groups.create! }
+    let(:grading_period) do
+      grading_period_group.grading_periods.create!(
+        title: "Some Semester",
+        start_date: 3.months.ago,
+        end_date: 2.months.from_now)
+    end
+    let!(:assignment1) do
+      assignment = assignment_model(course: test_course, due_at: Time.zone.now, points_possible: 10)
+      assignment.grade_student(student, grade: '40%')
+    end
 
-    it "should not include designers in the teacher enrollments" do
+    let!(:assignment2) do
+      assignment = assignment_model(course: test_course, due_at: 3.months.from_now, points_possible: 100)
+      assignment.grade_student(student, grade: '100%')
+    end
+
+    context "as a student" do
+      it "returns the grade and the total for the student, filtered by the grading period" do
+        user_session(student)
+        get('grades_for_student', grading_period_id: grading_period.id,
+          enrollment_id: student_enrollment.id)
+
+        expect(response).to be_ok
+        expected_response = {'grade' => 40, 'total' => 4, 'possible' => 10, 'hide_final_grades' => false}
+        expect(json_parse(response.body)).to eq expected_response
+
+        grading_period.end_date = 4.months.from_now
+        grading_period.save!
+        get('grades_for_student', grading_period_id: grading_period.id,
+          enrollment_id: student_enrollment.id)
+
+        expect(response).to be_ok
+        expected_response = {'grade' => 94.55, 'total' => 104, 'possible' => 110, 'hide_final_grades' => false}
+        expect(json_parse(response.body)).to eq expected_response
+      end
+
+      it "does not filter the grades by a grading period if " \
+      "'All Grading Periods' is selected" do
+        all_grading_periods_id = 0
+        user_session(student)
+        get('grades_for_student', grading_period_id: all_grading_periods_id,
+          enrollment_id: student_enrollment.id)
+
+        expect(response).to be_ok
+        expected_response = {'grade' => 94.55, 'total' => 104, 'possible' => 110, 'hide_final_grades' => false}
+        expect(json_parse(response.body)).to eq expected_response
+      end
+
+      it "returns unauthorized if a student is trying to get grades for " \
+      "another student (and is not observing that student)" do
+        snooping_student = user(active_all: true)
+        course_with_user('StudentEnrollment', course: test_course, user: snooping_student, active_all: true)
+        user_session(snooping_student)
+        get('grades_for_student', grading_period_id: grading_period.id,
+          enrollment_id: student_enrollment.id)
+
+        expect(response).to_not be_ok
+      end
+    end
+
+    context "as an observer" do
+      let(:observer) { user_with_pseudonym(active_all: true) }
+
+      it "returns the grade and the total for a student, filtered by grading period" do
+        student.observers << observer
+        user_session(observer)
+        get('grades_for_student', enrollment_id: student_enrollment.id,
+          grading_period_id: grading_period.id)
+
+        expect(response).to be_ok
+        expected_response = {'grade' => 40, 'total' => 4, 'possible' => 10, 'hide_final_grades' => false}
+        expect(json_parse(response.body)).to eq expected_response
+
+        grading_period.end_date = 4.months.from_now
+        grading_period.save!
+        get('grades_for_student', grading_period_id: grading_period.id,
+          enrollment_id: student_enrollment.id)
+
+        expect(response).to be_ok
+        expected_response = {'grade' => 94.55, 'total' => 104, 'possible' => 110, 'hide_final_grades' => false}
+        expect(json_parse(response.body)).to eq expected_response
+      end
+
+      it "does not filter the grades by a grading period if " \
+      "'All Grading Periods' is selected" do
+        student.observers << observer
+        all_grading_periods_id = 0
+        user_session(observer)
+        get('grades_for_student', grading_period_id: all_grading_periods_id,
+          enrollment_id: student_enrollment.id)
+
+        expect(response).to be_ok
+        expected_response = {'grade' => 94.55, 'total' => 104, 'possible' => 110, 'hide_final_grades' => false}
+        expect(json_parse(response.body)).to eq expected_response
+      end
+
+      it "returns unauthorized if the student is not an observee of the observer" do
+        user_session(observer)
+        get('grades_for_student', enrollment_id: student_enrollment.id,
+          grading_period_id: grading_period.id)
+
+        expect(response).to_not be_ok
+      end
+    end
+  end
+
+  describe "GET 'grades'" do
+    context "grading periods" do
+      let(:test_course) { course(active_all: true) }
+      let(:student1) { user(active_all: true) }
+      let(:student2) { user(active_all: true) }
+      let(:grading_period_group) { test_course.grading_period_groups.create! }
+      let!(:grading_period) do
+        grading_period_group.grading_periods.create!(
+          title: "Some Semester",
+          start_date: 3.months.ago,
+          end_date: 2.months.from_now)
+      end
+      context "as an observer" do
+        let(:observer) do
+          observer = user_with_pseudonym(active_all: true)
+          course_with_user('StudentEnrollment', course: test_course, user: student1, active_all: true)
+          course_with_user('StudentEnrollment', course: test_course, user: student2, active_all: true)
+          student1.observers << observer
+          student2.observers << observer
+          observer
+        end
+
+        context "with Multiple Grading periods disabled" do
+          it "returns grades of observees" do
+            user_session(observer)
+            get 'grades'
+
+            grades = assigns[:grades][:observed_enrollments][test_course.id]
+            expect(grades.length).to eq 2
+            expect(grades.key?(student1.id)).to eq true
+            expect(grades.key?(student2.id)).to eq true
+          end
+
+          it "returns an empty hash for grading periods" do
+            user_session(observer)
+            get 'grades'
+
+            grading_periods = assigns[:grading_periods]
+            expect(grading_periods).to be_empty
+          end
+        end
+
+        context "with Multiple Grading Periods enabled" do
+          before(:once) { course.root_account.enable_feature!(:multiple_grading_periods) }
+
+          it "returns the grading periods" do
+            user_session(observer)
+            get 'grades'
+
+            grading_periods = assigns[:grading_periods][test_course.id][:periods]
+            expect(grading_periods).to include grading_period
+          end
+
+          context "selected_period_id" do
+            it "returns the id of a current grading period, if one " \
+            "exists and no grading period parameter is passed in" do
+              user_session(observer)
+              get 'grades'
+
+              selected_period_id = assigns[:grading_periods][test_course.id][:selected_period_id]
+              expect(selected_period_id).to eq grading_period.id
+            end
+
+            it "returns 0 (signifying 'All Grading Periods') if no current " \
+            "grading period exists and no grading period parameter is passed in" do
+              grading_period.start_date = 1.month.from_now
+              grading_period.save!
+              user_session(observer)
+              get 'grades'
+
+              selected_period_id = assigns[:grading_periods][test_course.id][:selected_period_id]
+              expect(selected_period_id).to eq 0
+            end
+
+            it "returns the grading_period_id passed in, if one is provided along with a course_id" do
+              user_session(observer)
+              get 'grades', course_id: test_course.id, grading_period_id: 2939
+
+              selected_period_id = assigns[:grading_periods][test_course.id][:selected_period_id]
+              expect(selected_period_id).to eq 2939
+            end
+          end
+        end
+      end
+
+      context "as a student" do
+        let(:another_test_course) { course(active_all: true) }
+        let(:test_student) do
+          student = user(active_all: true)
+          course_with_user('StudentEnrollment', course: test_course, user: student, active_all: true)
+          course_with_user('StudentEnrollment', course: another_test_course, user: student, active_all: true)
+          student
+        end
+        context "with Multiple Grading periods disabled" do
+          it "returns grades" do
+            user_session(test_student)
+            get 'grades'
+
+            grades = assigns[:grades][:student_enrollments]
+
+            expect(grades.length).to eq 2
+            expect(grades.key?(test_course.id)).to eq true
+            expect(grades.key?(another_test_course.id)).to eq true
+          end
+
+          it "returns an empty hash for grading periods" do
+            user_session(test_student)
+            get 'grades'
+
+            grading_periods = assigns[:grading_periods]
+            expect(grading_periods).to be_empty
+          end
+        end
+
+        context "with Multiple Grading Periods enabled" do
+          before(:once) { course.root_account.enable_feature!(:multiple_grading_periods) }
+
+          it "returns the grading periods" do
+            user_session(test_student)
+            get 'grades'
+
+            grading_periods = assigns[:grading_periods][test_course.id][:periods]
+            expect(grading_periods).to include grading_period
+          end
+
+          context "selected_period_id" do
+            it "returns the id of a current grading period, if one " \
+            "exists and no grading period parameter is passed in" do
+              user_session(test_student)
+              get 'grades'
+
+              selected_period_id = assigns[:grading_periods][test_course.id][:selected_period_id]
+              expect(selected_period_id).to eq grading_period.id
+            end
+
+            it "returns 0 (signifying 'All Grading Periods') if no current " \
+            "grading period exists and no grading period parameter is passed in" do
+              grading_period.start_date = 1.month.from_now
+              grading_period.save!
+              user_session(test_student)
+              get 'grades'
+
+              selected_period_id = assigns[:grading_periods][test_course.id][:selected_period_id]
+              expect(selected_period_id).to eq 0
+            end
+
+            it "returns the grading_period_id passed in, if one is provided along with a course_id" do
+              user_session(test_student)
+              get 'grades', course_id: test_course.id, grading_period_id: 2939
+
+              selected_period_id = assigns[:grading_periods][test_course.id][:selected_period_id]
+              expect(selected_period_id).to eq 2939
+            end
+          end
+        end
+      end
+    end
+
+    it "does not include designers in the teacher enrollments" do
       # teacher needs to be in two courses to get to the point where teacher
       # enrollments are queried
       @course1 = course(:active_all => true)
@@ -795,7 +1068,7 @@ describe UsersController do
       expect(teachers).not_to be_include(@designer)
     end
 
-    it "should not redirect to an observer enrollment with no observee" do
+    it "does not redirect to an observer enrollment with no observee" do
       @course1 = course(:active_all => true)
       @course2 = course(:active_all => true)
       @user = user(:active_all => true)
@@ -807,7 +1080,7 @@ describe UsersController do
       expect(response).to redirect_to course_grades_url(@course2)
     end
 
-    it "should not include student view students in the grade average calculation" do
+    it "does not include student view students in the grade average calculation" do
       course_with_teacher_logged_in(:active_all => true)
       course_with_teacher(:active_all => true, :user => @teacher)
       @s1 = student_in_course(:active_user => true).user

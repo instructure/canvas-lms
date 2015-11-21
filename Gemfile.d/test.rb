@@ -1,6 +1,5 @@
 group :test do
   gem 'testingbot', require: false
-  gem 'testbot', github: 'smeredith0506/testbot', branch: 'master', ref: '47fbf057ab40f8a6e24b1ae780c3f1a176621892'
   gem 'simplecov', '0.9.2', require: false
     gem 'docile', '1.1.3', require: false
   gem 'simplecov-rcov', '0.2.3', require: false
@@ -39,4 +38,5 @@ group :test do
   gem 'yard', '0.8.7.6'
   gem 'yard-appendix', '>=0.1.8'
   gem 'timecop', '0.6.3'
+  gem 'jira_ref_parser', '1.0.0'
 end

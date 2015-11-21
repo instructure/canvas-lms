@@ -128,6 +128,10 @@
 #           "description": "whether this outcome has been used to assess a student in the context of this outcome link.  In other words, this will be set to true if the context is a course, and a student has been assessed with this outcome in that course.",
 #           "example": true,
 #           "type": "boolean"
+#         },
+#         "can_unlink": {
+#           "description": "whether this outcome link is manageable and is not the last link to an aligned outcome",
+#           "type": "boolean"
 #         }
 #       }
 #     }

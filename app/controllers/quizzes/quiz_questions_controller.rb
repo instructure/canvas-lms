@@ -290,7 +290,7 @@ class Quizzes::QuizQuestionsController < ApplicationController
       guard_against_big_fields do
         @question = @quiz.quiz_questions.create(:quiz_group => @group, :question_data => question_data)
         @quiz.did_edit if @quiz.created?
-        render json: question_json(@question, @current_user, session, [:assessment_question])
+        render json: question_json(@question, @current_user, session, @context, [:assessment_question, :plain_html])
       end
 
     end
@@ -370,7 +370,7 @@ class Quizzes::QuizQuestionsController < ApplicationController
         @question.question_data = question_data
         @question.save
         @quiz.did_edit if @quiz.created?
-        render json: question_json(@question, @current_user, session, [:assessment_question])
+        render json: question_json(@question, @current_user, session, @context, [:assessment_question, :plain_html])
       end
     end
   end

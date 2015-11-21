@@ -12,6 +12,8 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
     class_name: 'ModeratedGrading::Selection',
     foreign_key: :selected_provisional_grade_id
 
+  belongs_to :source_provisional_grade, :class_name => 'ModeratedGrading::ProvisionalGrade'
+
   validates :scorer, presence: true
   validates :submission, presence: true
 
@@ -84,7 +86,9 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
                                                               score: self.score,
                                                               grade: grade,
                                                               force_save: true,
-                                                              final: true)
+                                                              final: true,
+                                                              source_provisional_grade: self)
+
     final_mark.submission_comments.destroy_all
     copy_submission_comments!(final_mark)
 
@@ -93,6 +97,16 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
 
     final_mark.reload
     final_mark
+  end
+
+  def crocodoc_attachment_info(user, attachment)
+    annotators = [submission.user, scorer]
+    annotators << source_provisional_grade.scorer if source_provisional_grade
+    {
+      :attachment_id => attachment.id,
+      :crocodoc_url => attachment.crocodoc_available? &&
+                       attachment.crocodoc_url(user, annotators.map(&:crocodoc_id!))
+    }
   end
 
   private

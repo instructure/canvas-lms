@@ -82,6 +82,16 @@ describe Quizzes::QuizSubmissionHistory do
         expect(models.length).to eq 2
         expect(models.first).to be_a(Quizzes::QuizSubmission)
       end
+
+      it "should return the submission itself as the latest attempt" do
+        @submission.extra_attempts = 1
+        @submission.save! # doesn't add a new version
+
+        attempts = Quizzes::QuizSubmissionHistory.new(@submission)
+
+        models = attempts.version_models
+        expect(models.last.extra_attempts).to eq 1
+      end
     end
 
     describe "#kept" do

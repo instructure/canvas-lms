@@ -15,3 +15,12 @@ Mime::Type.register 'application/vnd.openxmlformats-officedocument.wordprocessin
 Mime::Type.register 'application/vnd.openxmlformats-officedocument.presentationml.presentation', :pptx
 Mime::Type.register 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', :xlsx
 Mime::Type.register_alias 'text/html', :fbml unless defined? Mime::FBML
+
+# Add new mime type for working with files via the mime-types gem.
+MIME::Types.add(
+  MIME::Type.new('application/epub+zip') do |mime_type|
+    mime_type.encoding = 'base64'
+    mime_type.extensions = ['epub']
+    mime_type.url = 'http://www.iana.org/assignments/media-types/application/epub+zip'
+  end
+)

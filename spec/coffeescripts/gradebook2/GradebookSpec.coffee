@@ -468,3 +468,51 @@ define [
   test 'returns true if the date is the same as the grading period end date', ->
     date = tz.parse('2015-05-01T06:00:00Z')
     ok @dateIsInGradingPeriod(@gradingPeriod, date)
+
+  module "Gradebook2#hideAggregateColumns",
+    setupThis: (options) ->
+      customOptions = options || {}
+      defaults =
+        mgpEnabled: true
+        getGradingPeriodToShow: -> '1'
+        options:
+          all_grading_periods_totals: false
+
+      _.defaults customOptions, defaults
+
+    setup: ->
+      @hideAggregateColumns = Gradebook.prototype.hideAggregateColumns
+    teardown: ->
+
+  test 'returns false if multiple grading periods is disabled', ->
+    self = @setupThis(mgpEnabled: false, isAllGradingPeriods: -> false)
+    notOk @hideAggregateColumns.call(self)
+
+  test 'returns false if multiple grading periods is disabled, even if isAllGradingPeriods is true', ->
+    self = @setupThis
+      mgpEnabled: false
+      getGradingPeriodToShow: -> '0'
+      isAllGradingPeriods: -> true
+
+    notOk @hideAggregateColumns.call(self)
+
+  test 'returns false if "All Grading Periods" is not selected', ->
+    self = @setupThis(isAllGradingPeriods: -> false)
+    notOk @hideAggregateColumns.call(self)
+
+  test 'returns true if "All Grading Periods" is selected', ->
+    self = @setupThis
+      getGradingPeriodToShow: -> '0'
+      isAllGradingPeriods: -> true
+
+    ok @hideAggregateColumns.call(self)
+
+  test 'returns false if "All Grading Periods" is selected and the feature' +
+  'flag is turned on for "Display Totals for All Grading Periods"', ->
+    self = @setupThis
+      getGradingPeriodToShow: -> '0'
+      isAllGradingPeriods: -> true
+      options:
+        all_grading_periods_totals: true
+
+    notOk @hideAggregateColumns.call(self)

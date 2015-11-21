@@ -31,9 +31,7 @@ class GradeCalculator
     @grading_period = opts[:grading_period]
 
     assignment_scope = @course.assignments.published.gradeable
-    @assignments = @grading_period ?
-                     @grading_period.assignments(assignment_scope) :
-                     assignment_scope.to_a
+    @assignments = assignment_scope.to_a
 
     @user_ids = Array(user_ids).map(&:to_i)
     @current_updates = {}
@@ -131,6 +129,11 @@ class GradeCalculator
     visible_assignments = @assignments
     if differentiated_assignments_on?
       visible_assignments = visible_assignments.select{|a| assignment_ids_visible_to_user(user_id).include?(a.id)}
+    end
+
+    if @grading_period
+      user = @course.users.find(user_id)
+      visible_assignments = @grading_period.assignments_for_student(visible_assignments, user)
     end
     assignments_by_group_id = visible_assignments.group_by(&:assignment_group_id)
     submissions_by_assignment_id = Hash[

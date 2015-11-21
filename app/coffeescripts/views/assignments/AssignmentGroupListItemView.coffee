@@ -281,7 +281,6 @@ define [
 
     showAccessibilityWarning: (ev) =>
       @$accessibilityWarning.removeClass('screenreader-only')
-      @$accessibilityWarning.focus()
 
     hideAccessibilityWarning: (ev) =>
       @$accessibilityWarning.addClass('screenreader-only')

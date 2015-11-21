@@ -26,6 +26,8 @@ class Canvadoc < ActiveRecord::Base
 
     url = attachment.authenticated_s3_url(:expires => 1.day)
 
+    opts.delete(:annotatable) unless Canvadocs.annotations_supported?
+
     response = Canvas.timeout_protection("canvadocs") {
       canvadocs_api.upload(url, opts)
     }
@@ -76,7 +78,7 @@ class Canvadoc < ActiveRecord::Base
     end
 
     # no commenting when anonymous peer reviews are enabled
-    if submissions.map(&:assignment).any? { |a| a.peer_reviews? && a.anonymouis_peer_reviews? }
+    if submissions.map(&:assignment).any? { |a| a.peer_reviews? && a.anonymous_peer_reviews? }
       opts = {}
     end
 

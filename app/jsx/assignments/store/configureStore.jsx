@@ -1,5 +1,3 @@
-/** @jsx React.DOM */
-
 define([
   'redux',
   'redux-thunk',

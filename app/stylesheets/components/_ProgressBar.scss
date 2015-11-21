@@ -1,21 +1,23 @@
 .progress-bar__bar-container {
-  height: 9px;
-  margin-bottom: 12px;
+  height: 10px;
+  margin: $ic-sp 0;
   border: solid $ic-brand-primary 1px;
   border-radius: 20px;
-  margin-top: 10px;
   overflow: hidden;
+  position: relative;
+  box-sizing: border-box;
 
   &.almost-done {
     border: solid $ic-color-success 1px;
   }
 }
 .progress-bar__bar {
-  position: relative;
+  transition: width 0.1s;
   background: $ic-brand-primary;
-  border: none;
-  height: 9px;
-
+  position: absolute;
+  top: 0; left: 0;
+  height: 100%; width: 0;
+  
   &.almost-done {
     background: $ic-color-success;
   }

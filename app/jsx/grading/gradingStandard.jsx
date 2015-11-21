@@ -1,5 +1,3 @@
-/** @jsx React.DOM */
-
 define([
   'react',
   'jsx/grading/dataRow',
@@ -158,7 +156,7 @@ function(React, DataRow, $, I18n, _) {
       if(this.props.editing){
         return (
           <div className="pull-left" tabIndex="0">
-            <input type="text" onChange={this.changeTitle} className="grading_standard_title"
+            <input type="text" onChange={this.changeTitle}
                    name="grading_standard[title]" className="scheme_name" title={I18n.t("Grading standard title")}
                    value={this.state.editingStandard.title} ref="title"/>
           </div>
@@ -312,9 +310,9 @@ function(React, DataRow, $, I18n, _) {
                   </tr>
                   <tr>
                     <th scope="col" className="insert_row_container"/>
-                    <th scope="col" className="name_header">{I18n.t("Name:")}</th>
+                    <th scope="col" className="name_header">{I18n.t("Name")}</th>
                     <th scope="col" className="range_container" colSpan="2">
-                      <div className="range_label">{I18n.t("Range:")}</div>
+                      <div className="range_label">{I18n.t("Range")}</div>
                       <div className="clear"></div>
                     </th>
                   </tr>

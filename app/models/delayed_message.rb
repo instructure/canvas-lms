@@ -18,6 +18,7 @@
 
 class DelayedMessage < ActiveRecord::Base
   include PolymorphicTypeOverride
+
   override_polymorphic_types context_type: {'QuizSubmission' => 'Quizzes::QuizSubmission'}
 
   include NotificationPreloader
@@ -125,21 +126,25 @@ class DelayedMessage < ActiveRecord::Base
     return nil unless context # the context for this message has already been deleted
     notification = BroadcastPolicy.notification_finder.by_name('Summaries')
     path = HostUrl.outgoing_email_address
-    message = to.messages.build(
-      :subject => notification.subject,
-      :to => to.path,
-      :notification_name => notification.name,
-      :notification => notification,
-      :from => path,
-      :user => user
-    )
-    message.delayed_messages = delayed_messages
-    message.context = context
-    message.asset_context = context.context(user) rescue context
-    message.root_account_id = delayed_messages.first.try(:root_account_id)
-    message.delay_for = 0
-    message.parse!
-    message.save
+    root_account_id = delayed_messages.first.try(:root_account_id)
+    locale = user.locale || (root_account_id && Account.where(id: root_account_id).first.try(:default_locale))
+    I18n.with_locale(locale) do
+      message = to.messages.build(
+        :subject => notification.subject,
+        :to => to.path,
+        :notification_name => notification.name,
+        :notification => notification,
+        :from => path,
+        :user => user
+      )
+      message.delayed_messages = delayed_messages
+      message.context = context
+      message.asset_context = context.context(user) rescue context
+      message.root_account_id = root_account_id
+      message.delay_for = 0
+      message.parse!
+      message.save
+    end
   end
 
   protected

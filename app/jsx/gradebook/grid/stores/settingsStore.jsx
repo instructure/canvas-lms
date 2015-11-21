@@ -16,11 +16,14 @@ define([
     },
 
     getInitialState() {
-      this.settings = {
-        width: this.getGradebookWidth(),
-        height: this.getGradebookHeight(),
-        columnWidths: this.columnWidths
-      };
+      if(this.settings === undefined) {
+        this.settings = {
+          width: this.getGradebookWidth(),
+          height: this.getGradebookHeight(),
+          columnWidths: this.columnWidths
+        };
+      }
+
       return this.settings;
     },
 

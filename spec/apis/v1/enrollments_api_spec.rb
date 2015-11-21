@@ -988,6 +988,25 @@ describe EnrollmentsApiController, type: :request do
         expect(json.all?{ |r| r["course_section_id"] == @section.id }).to be_truthy
       end
 
+      it "should list deleted section enrollments properly" do
+        enrollment = @student.enrollments.first
+        enrollment.course_section = @section
+        enrollment.save!
+        enrollment.destroy
+
+        @path = "/api/v1/sections/#{@section.id}/enrollments?state[]=deleted"
+        @params = { :controller => "enrollments_api", :action => "index", :section_id => @section.id.to_param, :format => "json", :state => ["deleted"] }
+        json = api_call(:get, @path, @params)
+
+        expect(json.length).to eql 1
+        expect(json.all?{ |r| r["course_section_id"] == @section.id }).to be_truthy
+
+        @path = "/api/v1/sections/#{@section.id}/enrollments"
+        @params = { :controller => "enrollments_api", :action => "index", :section_id => @section.id.to_param, :format => "json" }
+        json = api_call(:get, @path, @params)
+        expect(json.length).to eql 0
+      end
+
       describe "custom roles" do
         context "user context" do
           before :once do

@@ -75,7 +75,7 @@ module AvatarHelper
 
   def avatar_url_for_user(user, blank_fallback=false)
     default_avatar = User.avatar_fallback_url(blank_fallback ? '/images/blank.png' : User.default_avatar_fallback)
-    url = if service_enabled?(:avatars)
+    url = if user.account.service_enabled?(:avatars)
       user.avatar_url(nil, (@domain_root_account && @domain_root_account.settings[:avatars] || 'enabled'), default_avatar)
     else
       default_avatar

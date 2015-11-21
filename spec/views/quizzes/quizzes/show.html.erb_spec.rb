@@ -88,5 +88,21 @@ describe "/quizzes/quizzes/show" do
     expect(response).not_to have_tag ".unpublished_quiz_warning"
   end
 
+  it "should hide points possible for ungraded surveys" do
+    points = 5
+
+    course_with_teacher_logged_in(active_all: true)
+    @quiz = @course.quizzes.create!(quiz_type: "survey", points_possible: points)
+
+    assigns[:quiz] = @quiz
+    view_context
+    render "quizzes/quizzes/show"
+
+    doc = Nokogiri::HTML(response)
+    doc.css(".control-group .controls .value").each do |node|
+        expect(node.content).not_to include("#{points}") if node.parent.parent.content.include? "Points"
+    end
+  end
+
 end
 

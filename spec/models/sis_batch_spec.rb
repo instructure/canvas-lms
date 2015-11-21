@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011-2015 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -123,18 +123,35 @@ describe SisBatch do
     expect(job.run_at.to_i).to be <= 150.minutes.from_now.to_i
   end
 
-  it "should fail itself if the jobs dies" do
-    batch = nil
-    track_jobs do
-      batch = create_csv_data(['abc'])
-      batch.process
-      batch.update_attribute(:workflow_state, 'importing')
+  describe 'when the job dies' do
+    let!(:batch) {
+      batch = nil
+      track_jobs do
+        batch = create_csv_data(['abc'])
+        batch.process
+        batch.update_attribute(:workflow_state, 'importing')
+        batch
+      end
       batch
+    }
+
+    let!(:job) {
+      created_jobs.find { |j| j.tag == 'SisBatch.process_all_for_account' }
+    }
+
+    before do
+      expect(@account).to respond_to(:update_account_associations)
+      track_jobs { job.reschedule }
     end
 
-    job = created_jobs.find { |j| j.tag == 'SisBatch.process_all_for_account' }
-    job.reschedule
-    expect(batch.reload).to be_failed
+    it 'enqueue a job to clean up the account associations' do
+      job = created_jobs.find{ |j| j.tag == 'Account#update_account_associations' }
+      expect(job).to_not be_nil
+    end
+
+    it 'must fail itself' do
+      expect(batch.reload).to be_failed
+    end
   end
 
   describe "batch mode" do

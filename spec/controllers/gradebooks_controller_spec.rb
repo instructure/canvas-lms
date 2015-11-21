@@ -205,6 +205,25 @@ describe GradebooksController do
       expect(assignment_ids).to eq [assignment3, assignment2, assignment1].map(&:id)
     end
 
+    context "Multiple Grading Periods" do
+      before :once do
+        @course.root_account.enable_feature!(:multiple_grading_periods)
+      end
+
+      it "does not display totals if 'All Grading Periods' is selected" do
+        user_session(@student)
+        all_grading_periods_id = 0
+        get 'grade_summary', :course_id => @course.id, :id => @student.id, grading_period_id: all_grading_periods_id
+        expect(assigns[:exclude_total]).to eq true
+      end
+
+      it "displays totals if any grading period other than 'All Grading Periods' is selected" do
+        user_session(@student)
+        get 'grade_summary', :course_id => @course.id, :id => @student.id, grading_period_id: 1
+        expect(assigns[:exclude_total]).to eq false
+      end
+    end
+
     context "with assignment due date overrides" do
       before :once do
         @assignment = @course.assignments.create(:title => "Assignment 1")

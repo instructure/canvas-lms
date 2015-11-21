@@ -48,19 +48,24 @@ describe BounceNotificationProcessor do
       queue.expects(:poll).multiple_yields(*@all_bounce_messages_json.map {|m| mock_message(m)})
       bnp.stubs(:bounce_queue).returns(queue)
 
-      CommunicationChannel.expects(:bounce_for_path).with do |path:, timestamp:, details:, suppression_bounce:|
+      CommunicationChannel.expects(:bounce_for_path).with do |path:, timestamp:, details:, permanent_bounce:, suppression_bounce:|
         path == 'hard@example.edu' &&
         timestamp == '2014-08-22T12:25:46.786Z' &&
+        permanent_bounce == true &&
         suppression_bounce == false
       end.times(4)
-      CommunicationChannel.expects(:bounce_for_path).with do |path:, timestamp:, details:, suppression_bounce:|
+      CommunicationChannel.expects(:bounce_for_path).with do |path:, timestamp:, details:, permanent_bounce:, suppression_bounce:|
         path == 'suppressed@example.edu' &&
         timestamp == '2014-08-22T12:18:58.044Z' &&
+        permanent_bounce == true &&
         suppression_bounce == true
       end.times(1)
-      CommunicationChannel.expects(:bounce_for_path).with do |path:, timestamp:, details:, suppression_bounce:|
-        path == 'soft@example.edu'
-      end.times(0)
+      CommunicationChannel.expects(:bounce_for_path).with do |path:, timestamp:, details:, permanent_bounce:, suppression_bounce:|
+        path == 'soft@example.edu' &&
+        timestamp == '2014-08-22T13:24:31.000Z' &&
+        permanent_bounce == false &&
+        suppression_bounce == false
+      end.times(1)
 
       bnp.process
     end

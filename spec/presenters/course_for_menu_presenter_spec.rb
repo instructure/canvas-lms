@@ -49,6 +49,16 @@ describe CourseForMenuPresenter do
     it 'should include available_section_tabs as link element of hash' do
       expect(presenter.to_h[:links].length).to eq presenter.available_section_tabs.length
     end
+
+    it 'returns the course nickname if one is set' do
+      user = user_model
+      user.course_nicknames[course.id] = 'nickname'
+      user.save!
+      cs_presenter = CourseForMenuPresenter.new(course, nil, user)
+      h = cs_presenter.to_h
+      expect(h[:originalName]).to eq course.name
+      expect(h[:shortName]).to eq 'nickname'
+    end
   end
 
   describe '#role' do

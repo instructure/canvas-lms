@@ -130,6 +130,13 @@ describe Api::V1::Course do
       expect(json['total_students']).to eq 1
     end
 
+    it "includes the course nickname if one is set" do
+      @me.course_nicknames[@course1.id] = 'nickname'
+      json = @test_api.course_json(@course1, @me, {}, [], [])
+      expect(json['name']).to eq 'nickname'
+      expect(json['original_name']).to eq @course1.name
+    end
+
     context "total_scores" do
       before do
         @enrollment.computed_current_score = 95.0;
@@ -144,6 +151,7 @@ describe Api::V1::Course do
           "type" => "student",
           "role" => student_role.name,
           "role_id" => student_role.id,
+          "user_id" => @me.id,
           "enrollment_state" => "active",
           "computed_current_score" => 95,
           "computed_final_score" => 85,
@@ -226,6 +234,52 @@ describe CoursesController, type: :request do
   before :each do
     Course.any_instance.stubs(:start_at).returns nil
     Course.any_instance.stubs(:end_at).returns nil
+  end
+
+  describe "observer viewing a course" do
+    before :once do
+      @observer_enrollment = course_with_observer(active_all: true)
+      @observer = @user
+      @observer_course = @course
+      @observed_student = create_users(1, return_type: :record).first
+      @student_enrollment =
+        @observer_course.enroll_student(@observed_student,
+                                        :enrollment_state => 'active')
+      @assigned_observer_enrollment =
+        @observer_course.enroll_user(@observer, "ObserverEnrollment",
+                                     :associated_user_id => @observed_student.id)
+      @assigned_observer_enrollment.accept
+    end
+
+    it "should include observed users in the enrollments if requested" do
+      json = api_call_as_user(@observer, :get,
+                              "/api/v1/courses/#{@observer_course.id}?include[]=observed_users",
+                              { :controller => 'courses', :action => 'show',
+                                :id => @observer_course.to_param,
+                                :format => 'json',
+                                :include => [ "observed_users" ] })
+
+      expect(json['enrollments']).to eq [{
+         "type" => "observer",
+         "role" => @assigned_observer_enrollment.role.name,
+         "role_id" => @assigned_observer_enrollment.role.id,
+         "user_id" => @assigned_observer_enrollment.user_id,
+         "enrollment_state" => "active",
+         "associated_user_id" => @observed_student.id
+       }, {
+         "type" => "observer",
+         "role" => @observer_enrollment.role.name,
+         "role_id" => @observer_enrollment.role.id,
+         "user_id" => @observer_enrollment.user_id,
+         "enrollment_state" => "active"
+       }, {
+         "type" => "student",
+         "role" => @student_enrollment.role.name,
+         "role_id" => @student_enrollment.role.id,
+         "user_id" => @student_enrollment.user_id,
+         "enrollment_state" => "active"
+       }]
+    end
   end
 
   describe "permissions for courses" do
@@ -1281,7 +1335,7 @@ describe CoursesController, type: :request do
       json = api_call(:get, "/api/v1/courses.json?enrollment_role=SuperTeacher",
                       { :controller => 'courses', :action => 'index', :format => 'json', :enrollment_role => 'SuperTeacher' })
       expect(json.collect{ |c| c['id'].to_i }).to eq [@course3.id]
-      expect(json[0]['enrollments']).to eq [{ 'type' => 'teacher', 'role' => 'SuperTeacher', 'role_id' => @role.id, 'enrollment_state' => 'invited' }]
+      expect(json[0]['enrollments']).to eq [{ 'type' => 'teacher', 'role' => 'SuperTeacher', 'role_id' => @role.id, 'user_id' => @me.id, 'enrollment_state' => 'invited' }]
     end
   end
 
@@ -1333,7 +1387,7 @@ describe CoursesController, type: :request do
                       { :controller => 'courses', :action => 'index', :format => 'json', :enrollment_role => 'SuperTeacher' },
                       { :state => ['unpublished'] })
       expect(json.collect{ |c| c['id'].to_i }).to eq [@course3.id]
-      expect(json[0]['enrollments']).to eq [{ 'type' => 'teacher', 'role' => 'SuperTeacher', 'role_id' => @role.id, 'enrollment_state' => 'invited' }]
+      expect(json[0]['enrollments']).to eq [{ 'type' => 'teacher', 'role' => 'SuperTeacher', 'role_id' => @role.id, 'user_id' => @me.id, 'enrollment_state' => 'invited' }]
       json.collect{ |c| c['workflow_state']}.each do |s|
         expect(%w{unpublished}).to include(s)
       end
@@ -2136,7 +2190,7 @@ describe CoursesController, type: :request do
         'name' => @course1.name,
         'account_id' => @course1.account_id,
         'course_code' => @course1.course_code,
-        'enrollments' => [{'type' => 'teacher', 'role' => 'TeacherEnrollment', 'role_id' => teacher_role.id, 'enrollment_state' => 'active'}],
+        'enrollments' => [{'type' => 'teacher', 'role' => 'TeacherEnrollment', 'role_id' => teacher_role.id, 'user_id' => @me.id, 'enrollment_state' => 'active'}],
         'grading_standard_id' => nil,
         'sis_course_id' => @course1.sis_course_id,
         'integration_id' => nil,

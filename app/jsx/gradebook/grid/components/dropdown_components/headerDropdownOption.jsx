@@ -1,4 +1,3 @@
-/** @jsx React.DOM */
 define([
   'react',
   'i18n!gradebook'

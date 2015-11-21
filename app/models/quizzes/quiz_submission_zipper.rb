@@ -70,7 +70,7 @@ class Quizzes::QuizSubmissionZipper < ContentZipper
   def find_submissions
     submissions = quiz.quiz_submissions
     if zip_attachment.user && quiz.context.enrollment_visibility_level_for(zip_attachment.user) != :full
-      visible_student_ids = quiz.context.enrollments_visible_to(zip_attachment.user).pluck(:user_id)
+      visible_student_ids = quiz.context.apply_enrollment_visibility(quiz.context.student_enrollments, zip_attachment.user).pluck(:user_id)
       submissions = submissions.where(:user_id => visible_student_ids)
     end
     @submissions = submissions.map(&:latest_submitted_attempt).compact

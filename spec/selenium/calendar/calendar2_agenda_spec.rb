@@ -4,8 +4,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../helpers/quizzes_common')
 
 describe "calendar2" do
   include_context "in-process server selenium tests"
-
-  before (:each) do
+  before(:each) do
     Account.default.tap do |a|
       a.settings[:show_scheduler]   = true
       a.save!
@@ -24,14 +23,15 @@ describe "calendar2" do
         account.save!
       end
 
-      it "should create a new event" do
+      it "should create a new event via plus button", priority: "1", test_id: 250293 do
         load_agenda_view
 
+        # Clicks plus button, saves event, and verifies a row has been added
         expect(fj('.agenda-wrapper:visible')).to be_present
         f('#create_new_event_link').click
         fj('.ui-dialog:visible .btn-primary').click
         wait_for_ajaximations
-        expect(ffj('.ig-row').length).to eq 1 #expects there to be one new event on Agenda index page
+        expect(ffj('.ig-row').length).to eq 1
       end
 
       it "should display agenda events" do
@@ -73,7 +73,7 @@ describe "calendar2" do
         event = make_event(start: yesterday)
         load_agenda_view
         expect(ffj('.ig-row').length).to eq 0
-        f('.fc-button-prev').click
+        f('.fc-prev-button').click
         f('#right-side .fc-day-number').click
         wait_for_ajaximations
         keep_trying_until { expect(ffj('.ig-row').length).to eq 1 }
@@ -133,20 +133,6 @@ describe "calendar2" do
 
         load_agenda_view
         expect(f(".ig-title")).to include_text(title)
-
-        f('.ig-row').click
-        f('.event-details .delete_event_link').click
-        fj('.ui-dialog:visible .btn-primary').click
-
-        wait_for_ajaximations
-        expect(ffj('.ig-row').length).to eq 0
-      end
-
-      it "should allow deleting a graded discussion", priority: "1", test_id: 138859 do
-        create_graded_discussion
-
-        load_agenda_view
-        expect(f(".ig-title")).to include_text("Graded Discussion")
 
         f('.ig-row').click
         f('.event-details .delete_event_link').click
@@ -235,6 +221,103 @@ describe "calendar2" do
 
         load_agenda_view
         expect(f(".agenda-event")).to include_text('Test Quiz')
+      end
+
+      it "should show assignment due dates for different sections", priority: "1", test_id: 138848 do
+        assignment = @course.assignments.create!(name: 'Test Title', due_at: 1.day.from_now)
+
+        # Create Sections and Differentiated Assignment
+        s1 = @course.course_sections.create!(name: 'Section1')
+        s2 = @course.course_sections.create!(name: 'Section2')
+        s1_date = rand(2...9).day.from_now
+        s2_date = s1_date + 1.days
+        @course.enable_feature!(:differentiated_assignments)
+        @override = create_section_override_for_assignment(assignment, course_section: s1, due_at: s1_date)
+        @override = create_section_override_for_assignment(assignment, course_section: s2, due_at: s2_date)
+
+        load_agenda_view
+        keep_trying_until { expect(ffj('.ig-row').length).to eq 3 }
+
+        # Verify Titles include section name
+        agenda_array = ffj('.ig-row')
+        expect(fj('.ig-title', agenda_array[1]).text).to include_text('Section1')
+        expect(fj('.ig-title', agenda_array[2]).text).to include_text('Section2')
+
+        # Verify Dates
+        date_array = ffj('.agenda-day')
+        expect(fj('.agenda-date', date_array[1]).text).to include_text(s1_date.strftime('%a, %b %-d'))
+        expect(fj('.agenda-date', date_array[2]).text).to include_text(s2_date.strftime('%a, %b %-d'))
+      end
+
+      context "with a graded discussion created" do
+        before(:each) do
+          create_graded_discussion
+        end
+
+        it "should allow deleting a graded discussion", priority: "1", test_id: 138859 do
+          load_agenda_view
+          expect(f('.ig-title')).to include_text('Graded Discussion')
+
+          f('.ig-row').click
+          f('.event-details .delete_event_link').click
+          fj('.ui-dialog:visible .btn-primary').click
+
+          wait_for_ajaximations
+          expect(ffj('.ig-row').length).to eq 0
+        end
+
+        it "should allow editing via modal", priority: "1", test_id: 138855 do
+          test_date = 2.days.from_now
+          test_name = 'Test Title'
+          load_agenda_view
+
+          # Open Edit modal
+          f('.ig-row').click
+          wait_for_ajaximations
+          f('.event-details .edit_event_link').click
+          wait_for_ajaximations
+
+          # Edit title and date
+          replace_content(fj('.ui-dialog:visible #assignment_title'), test_name)
+          replace_content(fj('.ui-dialog:visible #assignment_due_at'), test_date.to_formatted_s(:long))
+          fj('.ui-dialog:visible .btn-primary').click
+          wait_for_ajaximations
+
+          # Verify edits
+          expect(f('.ig-title')).to include_text(test_name)
+          expect(f('.agenda-date')).to include_text(test_date.strftime('%a, %b %-d'))
+        end
+
+        it "should allow editing via More Options", priority: "1", test_id: 420724 do
+          test_date = 2.days.from_now
+          test_title = 'Test Title'
+          test_description = 'New Description'
+          load_agenda_view
+
+          # Open More Options window
+          f('.ig-row').click
+          wait_for_ajaximations
+          f('.edit_event_link').click
+          wait_for_ajaximations
+          f('.event_button').click
+          wait_for_ajaximations
+
+          # Edit title, description, and date
+          replace_content(fj('#discussion-title.input-block-level'), test_title + '1')
+          driver.execute_script "tinyMCE.activeEditor.setContent('#{test_description}')"
+          replace_content(fj('.DueDateInput'),(test_date).strftime('%b %-d, %Y at 1:59pm'))
+          fj('.form-actions.flush .btn.btn-primary').click
+          wait_for_ajaximations
+
+          # Verify edited title, description, and date
+          load_agenda_view
+          keep_trying_until { expect(ffj('.ig-row').length).to eq 1 }
+          f('.ig-row').click
+          wait_for_ajaximations
+          expect(f('.view_event_link')).to include_text(test_title)
+          expect(f('.event-detail-overflow')).to include_text(test_description)
+          expect(f('.event-details-timestring')).to include_text((test_date).strftime('%b %-d at 1:59pm'))
+        end
       end
     end
   end

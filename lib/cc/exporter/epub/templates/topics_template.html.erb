@@ -1,0 +1,16 @@
+<h2 id="<%="#{item[:identifier]}"%>"><%= item[:title] %></h2>
+<p><%= item[:description] %></p>
+<% if item[:assignment] %>
+  <p>Discussion assignment details:</p>
+  <% if item[:assignment][:due_at] %>
+    <p>Due at: <%= friendly_date(item[:assignment][:due_at]) %></p>
+  <% end %>
+  <% if item[:assignment][:unlock_at] %>
+    <p>Unlock at: <%= friendly_date(item[:assignment][:unlock_at]) %></p>
+  <% end %>
+  <% if item[:assignment][:lock_at] %>
+    <p>Lock at: <%= friendly_date(item[:assignment][:lock_at]) %></p>
+  <% end %>
+  <p>Grading Type: <%= item[:assignment][:grading_type] %></p>
+  <p>Points: <%= item[:assignment][:points_possible ]%></p>
+<% end %>

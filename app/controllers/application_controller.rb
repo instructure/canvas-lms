@@ -219,6 +219,10 @@ class ApplicationController < ActionController::Base
     @real_current_user || @current_user
   end
 
+  def not_fake_student_user
+    @current_user && @current_user.fake_student? ? logged_in_user : @current_user
+  end
+
   def rescue_action_dispatch_exception
     rescue_action_in_public(request.env['action_dispatch.exception'])
   end
@@ -260,7 +264,7 @@ class ApplicationController < ActionController::Base
   def assign_localizer
     I18n.localizer = lambda {
       infer_locale :context => @context,
-                   :user => logged_in_user,
+                   :user => not_fake_student_user,
                    :root_account => @domain_root_account,
                    :session_locale => session[:locale],
                    :accept_language => request.headers['Accept-Language']
@@ -304,7 +308,7 @@ class ApplicationController < ActionController::Base
 
   # scopes all time objects to the user's specified time zone
   def set_time_zone
-    user = logged_in_user
+    user = not_fake_student_user
     if user && !user.time_zone.blank?
       Time.zone = user.time_zone
       if Time.zone && Time.zone.name == "UTC" && user.time_zone && user.time_zone.name.match(/\s/)
@@ -508,17 +512,9 @@ class ApplicationController < ActionController::Base
         @context = api_find(Course.active, params[:course_id])
         params[:context_id] = params[:course_id]
         params[:context_type] = "Course"
-        if @context && session[:enrollment_uuid_course_id] == @context.id
-          session[:enrollment_uuid_count] ||= 0
-          if session[:enrollment_uuid_count] > 4
-            session[:enrollment_uuid_count] = 0
-            self.extend(TextHelper)
-            flash[:html_notice] = mt "#application.notices.need_to_accept_enrollment", "You'll need to [accept the enrollment invitation](%{url}) before you can fully participate in this course.", :url => course_url(@context)
-          end
-          session[:enrollment_uuid_count] += 1
-        end
         @context_enrollment = @context.enrollments.where(user_id: @current_user).sort_by{|e| [e.state_sortable, e.rank_sortable, e.id] }.first if @context && @current_user
         @context_membership = @context_enrollment
+        check_for_readonly_enrollment_state
       elsif params[:account_id] || (self.is_a?(AccountsController) && params[:account_id] = params[:id])
         @context = api_find(Account, params[:account_id])
         params[:context_id] = @context.id
@@ -566,7 +562,7 @@ class ApplicationController < ActionController::Base
 
         if @context && @context.respond_to?(:short_name)
           crumb_url = named_context_url(@context, :context_url) if @context.grants_right?(@current_user, session, :read)
-          add_crumb(@context.short_name, crumb_url)
+          add_crumb(@context.nickname_for(@current_user, :short_name), crumb_url)
         end
 
         @set_badge_counts = true
@@ -634,6 +630,25 @@ class ApplicationController < ActionController::Base
     Course.require_assignment_groups(@contexts)
     @context_enrollment = @context.membership_for_user(@current_user) if @context.respond_to?(:membership_for_user)
     @context_membership = @context_enrollment
+  end
+
+  def check_for_readonly_enrollment_state
+    if @context_enrollment && @context_enrollment.is_a?(Enrollment) && ['invited', 'active'].include?(@context_enrollment.workflow_state) && action_name != "enrollment_invitation"
+      state = @context_enrollment.state_based_on_date
+      case state
+      when :invited
+        if @context_enrollment.available_at
+          flash[:html_notice] = mt "#application.notices.need_to_accept_future_enrollment",
+            "You'll need to [accept the enrollment invitation](%{url}) before you can fully participate in this course, starting on %{date}.",
+            :url => course_url(@context),:date => datetime_string(@context_enrollment.available_at)
+        else
+          flash[:html_notice] = mt "#application.notices.need_to_accept_enrollment",
+            "You'll need to [accept the enrollment invitation](%{url}) before you can fully participate in this course.", :url => course_url(@context)
+        end
+      when :accepted
+        flash[:html_notice] = t("This course hasn’t started yet. You will not be able to participate in this course until %{date}.", :date => datetime_string(@context_enrollment.available_at))
+      end
+    end
   end
 
   def set_badge_counts_for(context, user, enrollment=nil)
@@ -1065,13 +1080,19 @@ class ApplicationController < ActionController::Base
       type = nil
       type = '404' if status == '404 Not Found'
 
+      # TODO: get rid of exceptions that implement this "skip_error_report?" thing, instead
+      # use the initializer in config/initializers/errors.rb to configure
+      # exceptions we want skipped
       unless exception.respond_to?(:skip_error_report?) && exception.skip_error_report?
         opts = {type: type}
         info = Canvas::Errors::Info.new(request, @domain_root_account, @current_user, opts)
         error_info = info.to_h
         error_info[:tags][:response_code] = response_code
         capture_outputs = Canvas::Errors.capture(exception, error_info)
-        error = ErrorReport.find(capture_outputs[:error_report])
+        error = nil
+        if capture_outputs[:error_report]
+          error = ErrorReport.find(capture_outputs[:error_report])
+        end
       end
 
       if api_request?

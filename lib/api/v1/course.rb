@@ -85,6 +85,7 @@ module Api::V1::Course
       hash['passback_status'] = post_grades_status_json(course) if includes.include?('passback_status')
       hash['is_favorite'] = course.favorite_for_user?(user) if includes.include?('favorites')
       add_helper_dependant_entries(hash, course, builder)
+      apply_nickname(hash, course, user) if user
     end
   end
 
@@ -111,6 +112,13 @@ module Api::V1::Course
     hash
   end
 
-
+  def apply_nickname(hash, course, user)
+    nickname = user.course_nickname(course)
+    if nickname
+      hash['original_name'] = hash['name']
+      hash['name'] = nickname
+    end
+    hash
+  end
 
 end

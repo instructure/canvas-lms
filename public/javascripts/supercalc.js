@@ -115,14 +115,16 @@ define([
           $entryBox.val(formula_text);
           var res = null;
           try {
-            res = "= " + calcCmd.computeValue(formula_text);
+            // precision 15 to strip floating point error
+            var precision = 15;
+            // regex strips extra 0s from toPrecision output
+            var stripZeros = function(str){return str.replace(/(?:(\.[0-9]*[^0e])|\.)0*(e.*)?$/,"$1$2")};
+
+            var val = +calcCmd.computeValue(formula_text).toPrecision(precision);
+            var rounder = Math.pow(10, parseInt(finds.round.val(), 10) || 0) || 1;
+            res = "= " + stripZeros((Math.round(val * rounder) / rounder).toPrecision(precision));
           } catch(e) {
             res = e.toString();
-          }
-          if(res && res.match(/=/)) {
-            var val = parseFloat(res.substring(res.indexOf("=") + 1), 10);
-            var rounder = Math.pow(10, parseInt(finds.round.val(), 10) || 0) || 1;
-            var res = "= " + (Math.round(val * rounder) / rounder);
           }
           this.status.attr('data-res', res);
           if(!no_dom) {

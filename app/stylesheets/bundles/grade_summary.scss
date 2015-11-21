@@ -9,7 +9,7 @@
   }
 }
 
-#grading_periods_selector {
+.grading_periods_selector {
   margin-bottom: 0px;
 }
 
@@ -121,17 +121,13 @@
   white-space: nowrap;
 }
 
-#grades_summary tr > .assignment_score:hover .grade {
-  font-weight: bold;
-}
-
 #grades_summary tr > .assignment_score .grade.changed {
   color: #800;
   font-weight: bold;
 }
 
 #grades_summary th.possible {
-  text-align: right;
+  text-align: center;
   white-space: nowrap;
 }
 
@@ -146,7 +142,19 @@
 }
 
 #grades_summary td.possible {
-  text-align: right;
+  text-align: center;
+  white-space: nowrap;
+}
+
+#grades_summary th.anonymous {
+  text-align: center;
+  white-space: nowrap;
+  padding-right: 15px;
+}
+
+#grades_summary td.anonymous {
+  text-align: center;
+  white-space: nowrap;
   padding-right: 15px;
 }
 

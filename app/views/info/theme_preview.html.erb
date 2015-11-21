@@ -34,43 +34,27 @@
           </select>
         </div>
         <div class="ic-Form-control">
-          <div class="grid-row">
-            <div class="col-xs-6">
-              <!-- start super toggle -->
-              <label class="ic-Super-toggle--on-off" for="theme-preview-input-2">
-                <div class="ic-Label"><%= t('Toggle-style checkbox') %></div>
-                <input type="checkbox" id="theme-preview-input-2" class="ic-Super-toggle__input" checked>
-                <div class="ic-Super-toggle__container" aria-hidden="true" data-checked="Yes" data-unchecked="No">
-                  <div class="ic-Super-toggle__switch">
-                    <div class="ic-Super-toggle__option--LEFT">
-                      <svg xmlns="http://www.w3.org/2000/svg" version="1.1" x="0" y="0" width="548.9" height="548.9" viewBox="0 0 548.9 548.9" xml:space="preserve"><polygon points="449.3 48 195.5 301.8 99.5 205.9 0 305.4 95.9 401.4 195.5 500.9 295 401.4 548.9 147.5 "/></svg>
-                    </div>
-                    <div class="ic-Super-toggle__option--RIGHT">
-                      <svg xmlns="http://www.w3.org/2000/svg" version="1.1" x="0" y="0" viewBox="0 0 28 28" xml:space="preserve"><polygon points="28 22.4 19.6 14 28 5.6 22.4 0 14 8.4 5.6 0 0 5.6 8.4 14 0 22.4 5.6 28 14 19.6 22.4 28 " fill="#030104"/></svg>
-                    </div>
-                  </div>
-                </div>
-              </label>
-              <!-- end super toggle -->
-            </div>
-            <div class="col-xs-6">
-              <!-- start super toggle -->
-              <label class="ic-Super-toggle--ui-switch" for="theme-preview-input-8">
-                <div class="ic-Label"><%= t('Switch-style checkbox') %></div>
-                <input type="checkbox" id="theme-preview-input-8" class="ic-Super-toggle__input">
-                <div class="ic-Super-toggle__container" aria-hidden="true" data-checked="Option A is selected" data-unchecked="Option B is selected">
-                  <div class="ic-Super-toggle__option--LEFT">
-                    <i class="icon-muted"></i>
-                  </div>
-                  <div class="ic-Super-toggle__switch"></div>
-                  <div class="ic-Super-toggle__option--RIGHT">
-                    <i class="icon-unmuted"></i>
-                  </div>
-                 </div>
-               </label>
-              <!-- end super toggle -->
-            </div>
+          <label class="ic-Label"><%= t('Progress/loading bar') %></label>
+          <div class="progress-bar__bar-container">
+            <div class="progress-bar__bar" style="width: 70%;"></div>
           </div>
+        </div>
+        <div class="ic-Form-control">
+          <!-- start super toggle -->
+          <label class="ic-Super-toggle--ui-switch" for="theme-preview-input-8">
+            <div class="ic-Label"><%= t('Switch-style checkbox') %></div>
+            <input type="checkbox" id="theme-preview-input-8" class="ic-Super-toggle__input">
+            <div class="ic-Super-toggle__container" aria-hidden="true" data-checked="Option A is selected" data-unchecked="Option B is selected">
+              <div class="ic-Super-toggle__option--LEFT">
+                <i class="icon-muted"></i>
+              </div>
+              <div class="ic-Super-toggle__switch"></div>
+              <div class="ic-Super-toggle__option--RIGHT">
+                <i class="icon-unmuted"></i>
+              </div>
+             </div>
+           </label>
+          <!-- end super toggle -->
         </div>
         <div class="ic-Checkbox-group">
           <div class="ic-Form-control ic-Form-control--checkbox">

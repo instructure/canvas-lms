@@ -133,6 +133,12 @@ module Api::V1::Outcome
         opts.slice(:outcome_style, :assessed_outcomes)
       )
 
+      unless outcome_link.deleted?
+        can_manage = outcome_link.context ? outcome_link.context.grants_right?(user, session, :manage_outcomes) :
+          Account.site_admin.grants_right?(user, session, :manage_global_outcomes)
+        hash['can_unlink'] = can_manage && outcome_link.can_destroy?
+      end
+
       if opts[:assessed_outcomes]
         hash['assessed'] = opts[:assessed_outcomes].include?(outcome_link.learning_outcome_content.id)
       else

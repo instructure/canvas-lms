@@ -32,6 +32,14 @@
   border-radius: 10px;
   cursor: default;
   position: relative;
+  &.cannot_remove, &.cannot_remove:hover {
+    background-color: $gray-light;
+    border-color: $gray-lighter;
+    div {
+      background-color: $gray-lighter;
+      color: $gray;
+    }
+  }
   &:hover {
     div {
       background-color: #bccef4;

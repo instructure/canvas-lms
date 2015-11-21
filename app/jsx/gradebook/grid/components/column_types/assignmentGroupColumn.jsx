@@ -1,4 +1,3 @@
-/** @jsx React.DOM */
 define([
   'bower/reflux/dist/reflux',
   'react',
@@ -34,7 +33,7 @@ define([
       submissions = _.flatten(_.values(submissions));
       submissions = SubmissionsStore.submissionsInCurrentPeriod(submissions);
 
-      assignmentGroupColumnId = this.props.cellData.columnId;
+      let assignmentGroupColumnId = this.props.cellData.columnId;
       assignmentGroups = this.props.rowData.assignmentGroups;
       currentAssignmentGroup = this.props.cellData.assignmentGroup;
       relevantAssignmentGroups = SubmissionsStore.assignmentGroupsForSubmissions(submissions, assignmentGroups);

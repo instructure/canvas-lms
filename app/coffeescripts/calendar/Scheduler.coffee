@@ -2,6 +2,7 @@ define [
   'jquery',
   'underscore'
   'i18n!calendar'
+  'compiled/util/fcUtil'
   'jst/calendar/appointmentGroupList'
   'jst/calendar/schedulerRightSideAdminSection'
   'compiled/calendar/EditAppointmentGroupDialog'
@@ -13,7 +14,7 @@ define [
   'jquery.instructure_misc_plugins'
   'vendor/jquery.ba-tinypubsub'
   'vendor/jquery.spin'
-], ($, _, I18n, appointmentGroupListTemplate, schedulerRightSideAdminSectionTemplate, EditAppointmentGroupDialog, MessageParticipantsDialog, deleteItemTemplate, semanticDateRange) ->
+], ($, _, I18n, fcUtil, appointmentGroupListTemplate, schedulerRightSideAdminSectionTemplate, EditAppointmentGroupDialog, MessageParticipantsDialog, deleteItemTemplate, semanticDateRange) ->
 
   class Scheduler
     constructor: (selector, @calendar) ->
@@ -187,9 +188,9 @@ define [
 
         @calendar.showSchedulerSingle();
         if @viewingGroup.start_at
-          @calendar.gotoDate($.fudgeDateForProfileTimezone(@viewingGroup.start_at))
+          @calendar.gotoDate(fcUtil.wrap(@viewingGroup.start_at))
         else
-          @calendar.gotoDate(new Date())
+          @calendar.gotoDate(fcUtil.now())
 
         @calendar.displayAppointmentEvents = @viewingGroup
         $.publish "Calendar/refetchEvents"

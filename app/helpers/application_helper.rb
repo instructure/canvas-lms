@@ -559,7 +559,7 @@ module ApplicationHelper
   def map_courses_for_menu(courses, opts={})
     mapped = courses.map do |course|
       tabs = opts[:include_section_tabs] && available_section_tabs(course)
-      presenter = CourseForMenuPresenter.new(course, tabs)
+      presenter = CourseForMenuPresenter.new(course, tabs, @current_user)
       presenter.to_h
     end
 

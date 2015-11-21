@@ -18,7 +18,7 @@ See Forms section.
 @mixin super-toggle-designer (
   $toggle-width: $ic-sp*5,
   $toggle-color-switch: $ic-color-light,
-  $toggle-background-OFF: $ic-color-dark,
+  $toggle-background-OFF: lighten($ic-color-dark, 15%),
   $toggle-background-ON: $ic-color-success,
   $toggle-color-left-unchecked: $ic-color-light,
   $toggle-color-left-checked: $ic-color-light,
@@ -26,6 +26,7 @@ See Forms section.
   $toggle-color-right-checked: $ic-color-light
   ) {
 
+  position: relative; // or the hidden checkbox input can end up in weird places
   margin-bottom: 0; // override the default margin on labels in Canvas
 
   .ic-Form-group.ic-Form-group--horizontal & {

@@ -795,7 +795,8 @@ ActiveRecord::Relation.class_eval do
           stmt = Arel::UpdateManager.new(arel.engine)
 
           stmt.set Arel.sql(@klass.send(:sanitize_sql_for_assignment, updates))
-          stmt.table(table)
+          from = CANVAS_RAILS3 ? from_value : from_value.try(:first)
+          stmt.table(from ? Arel::Nodes::SqlLiteral.new(from) : table)
           stmt.key = table[primary_key]
 
           sql = stmt.to_sql
@@ -926,7 +927,7 @@ ActiveRecord::Relation.class_eval do
   def distinct_on(*args)
     args.map! do |column_name|
       if column_name.is_a?(Symbol) && column_names.include?(column_name.to_s)
-        "#{connection.quote_table_name(table_name)}.#{connection.quote_column_name(column_name)}"
+        "#{connection.quote_local_table_name(table_name)}.#{connection.quote_column_name(column_name)}"
       else
         column_name.to_s
       end

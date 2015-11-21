@@ -85,6 +85,7 @@ end
 
 shared_examples 'user settings profile pic gravatar link' do |context|
   it 'opens the Gravatar homepage', priority: "1", test_id: pick_test_id(context, "69159", "403055", "403056") do
+    skip "depends on external service"
     enable_avatars
     get '/profile/settings'
     f('.avatar.profile_pic_link.none').click
@@ -122,7 +123,7 @@ end
 # ======================================================================================================================
 
 def enable_avatars
-  a = Account.default
+  a = Account.default.reload
   a.enable_service('avatars')
   a.settings[:enable_profiles] = true
   a.save!

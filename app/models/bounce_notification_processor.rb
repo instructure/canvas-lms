@@ -65,13 +65,12 @@ class BounceNotificationProcessor
   end
 
   def process_bounce_notification(bounce_notification)
-    return unless is_permanent_bounce?(bounce_notification)
-
     bouncy_addresses(bounce_notification).each do |address|
       CommunicationChannel.bounce_for_path(
         path: address,
         timestamp: bounce_timestamp(bounce_notification),
         details: bounce_notification,
+        permanent_bounce: is_permanent_bounce?(bounce_notification),
         suppression_bounce: is_suppression_bounce?(bounce_notification)
       )
     end

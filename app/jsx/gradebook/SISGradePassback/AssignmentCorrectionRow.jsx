@@ -1,5 +1,3 @@
-/** @jsx React.DOM */
-
 define([
   'underscore',
   'i18n!modules',
@@ -52,10 +50,6 @@ define([
         this.props.updateAssignment({please_ignore: false})
       }
 
-    },
-
-    updateAssignmentName(e) {
-      this.props.updateAssignment({name: e.target.value, please_ignore: false})
     },
 
     updateAssignmentName(e) {

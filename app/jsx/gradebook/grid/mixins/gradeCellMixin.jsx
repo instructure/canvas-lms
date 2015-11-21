@@ -1,4 +1,3 @@
-/** @jsx React.DOM */
 define([
   'underscore',
   '../actions/submissionsActions'
@@ -25,7 +24,7 @@ define([
 
     sendSubmission() {
       var submission = {
-        userId: this.props.rowData.student.id,
+        userId: this.props.rowData.student.user_id,
         assignmentId: this.props.columnData.assignment.id,
         postedGrade: this.state.gradeToPost
       };

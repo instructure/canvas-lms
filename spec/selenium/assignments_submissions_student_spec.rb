@@ -188,6 +188,18 @@ describe "submissions" do
       expect(f('.submit_assignment_link')).to be_nil
     end
 
+    it "should show not graded anonymously" do
+      @assignment.grade_student(@student, :grade => "0", graded_anonymously: false)
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+      expect(f('#sidebar_content .details')).to include_text "Graded Anonymously: no"
+    end
+
+    it "should show graded anonymously" do
+      @assignment.grade_student(@student, :grade => "0", graded_anonymously: true)
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+      expect(f('#sidebar_content .details')).to include_text "Graded Anonymously: yes"
+    end
+
     it "should not allow blank submissions for text entry", priority: "1", test_id: 237026 do
       @assignment.update_attributes(:submission_types => "online_text_entry")
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"

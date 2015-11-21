@@ -8,7 +8,10 @@ define([
     listenables: [KeyboardNavigationActions],
 
     getInitialState() {
-      this.currentCellIndex = -1;
+      if(this.currentCellIndex === undefined) {
+       this.currentCellIndex = -1;
+      }
+
       return this.currentCellIndex;
     },
 

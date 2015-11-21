@@ -445,5 +445,16 @@ describe "quizzes" do
 
       expect(f('#right-side')).to include_text('Quiz Statistics')
     end
+
+    it "should not increment badge counts when taking a quiz as a teacher" do
+      @quiz = quiz_model({ course: @course, time_limit: 5 })
+      @quiz.quiz_questions.create!(question_data: multiple_choice_question_data)
+      @quiz.generate_quiz_data
+      @quiz.save
+      @quiz
+
+      take_and_answer_quiz
+      expect(f("#section-tabs .grades .nav-badge")).to be_nil
+    end
   end
 end

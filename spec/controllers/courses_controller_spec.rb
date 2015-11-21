@@ -410,6 +410,7 @@ describe CoursesController do
     it "does not record recent activity for unauthorize actions" do
       user_session(@student)
       @course.workflow_state = 'available'
+      @course.restrict_student_future_view = true
       @course.save!
       @enrollment.start_at = 2.days.from_now
       @enrollment.end_at = 4.days.from_now
@@ -536,7 +537,7 @@ describe CoursesController do
       post 'enrollment_invitation', :course_id => @course.id, :accept => '1',
         :invitation => @enrollment.uuid
 
-      expect(response).to redirect_to(courses_url)
+      expect(response).to redirect_to(course_url(@course))
       @enrollment.reload
       expect(@enrollment.workflow_state).to eq('active')
       expect(@enrollment.last_activity_at).to be(nil)
@@ -573,6 +574,7 @@ describe CoursesController do
     it "should give a helpful error message for students that can't access yet" do
       user_session(@student)
       @course.workflow_state = 'claimed'
+      @course.restrict_student_future_view = true
       @course.save!
       get 'show', :id => @course.id
       assert_status(401)
@@ -1347,6 +1349,19 @@ describe CoursesController do
       end
     end
 
+    it "should let admins without course edit rights update only the syllabus body" do
+      role = custom_account_role('grade viewer', :account => Account.default)
+      account_admin_user_with_role_changes(:role => role, :role_changes => {:manage_content => true})
+      user_session(@user)
+
+      name = "some name"
+      body = "some body"
+      put 'update', :id => @course.id, :course => { :name => name, :syllabus_body => body }
+
+      @course.reload
+      expect(@course.name).to_not eq name
+      expect(@course.syllabus_body).to eq body
+    end
   end
 
   describe "POST 'unconclude'" do

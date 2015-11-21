@@ -2,7 +2,8 @@ define [
   'jquery'
   'i18n!calendar'
   'jst/calendar/TimeBlockRow'
-], ($, I18n, timeBlockRowTemplate) ->
+  'compiled/util/fcUtil'
+], ($, I18n, timeBlockRowTemplate, fcUtil) ->
 
   class TimeBlockRow
     constructor: (@TimeBlockList, data={}) ->
@@ -21,6 +22,9 @@ define [
       @$date.date_field().change(@validate)
       @$start_time.time_field().change(@validate)
       @$end_time.time_field().change(@validate)
+
+      if @locked
+        @$row.find('button').attr('disabled', true)
 
       @$row.find('.delete-block-link').click(@remove)
 
@@ -64,7 +68,7 @@ define [
         startValid = false
 
       # and end is in the future
-      if end and end < $.fudgeDateForProfileTimezone(new Date())
+      if end and end < fcUtil.now()
         @$end_time.errorBox(I18n.t 'ends_in_past_error', 'You cannot create an appointment slot that ends in the past')
         endValid = false
 
@@ -78,27 +82,23 @@ define [
 
     timeToDate: (date, time) ->
       return unless date and time
-      date = $.fudgeDateForProfileTimezone(date)
-      time = $.fudgeDateForProfileTimezone(time)
 
       # set all three values at once to handle potential
       # conflicts in how month rollover happens
-      time.setFullYear(
-        date.getFullYear(),
-        date.getMonth(),
-        date.getDate()
-      )
+      time.year(date.year())
+      time.month(date.month())
+      time.date(date.date())
 
       return time
 
     startAt: ->
-      date = @$date.data('unfudged-date')
-      time = @$start_time.data('unfudged-date')
+      date = fcUtil.wrap(@$date.data("unfudged-date"))
+      time = fcUtil.wrap(@$start_time.data("unfudged-date"))
       @timeToDate(date, time)
 
     endAt: ->
-      date = @$date.data('unfudged-date')
-      time = @$end_time.data('unfudged-date')
+      date = fcUtil.wrap(@$date.data("unfudged-date"))
+      time = fcUtil.wrap(@$end_time.data("unfudged-date"))
       @timeToDate(date, time)
 
     getData: ->

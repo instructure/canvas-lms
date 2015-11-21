@@ -64,7 +64,7 @@ describe CommunicationChannel do
     expect(@cc.state).to eql(:retired)
     @cc.re_activate
     expect(@cc.state).to eql(:active)
-    
+
     communication_channel_model(:path => "another_path@example.com")
     expect(@cc.state).to eql(:unconfirmed)
     @cc.retire
@@ -89,27 +89,27 @@ describe CommunicationChannel do
     communication_channel_model
     expect(@cc.confirmation_code).to eql('abc123')
   end
-  
+
   it "should be able to reset a confirmation code" do
     communication_channel_model
     old_cc = @cc.confirmation_code
     @cc.set_confirmation_code(true)
     expect(@cc.confirmation_code).not_to eql(old_cc)
   end
-  
+
   it "should use a 15-digit confirmation code for default or email path_type settings" do
     communication_channel_model
     expect(@cc.path_type).to eql('email')
     expect(@cc.confirmation_code.size).to eql(25)
   end
-  
+
   it "should use a 4-digit confirmation_code for settings other than email" do
     communication_channel_model
     @cc.path_type = 'sms'
     @cc.set_confirmation_code(true)
     expect(@cc.confirmation_code.size).to eql(4)
   end
-  
+
   it "should default the path type to email" do
     communication_channel_model
     expect(@cc.path_type).to eql('email')
@@ -134,11 +134,11 @@ describe CommunicationChannel do
     @cc.path_type = 'not valid'; @cc.save
     expect(@cc.path_type).to eql('email')
   end
-  
+
   it "should act as list" do
     expect(CommunicationChannel).to be_respond_to(:acts_as_list)
   end
-  
+
   it "should scope the list to the user" do
     @u1 = User.create!
     @u2 = User.create!
@@ -161,13 +161,13 @@ describe CommunicationChannel do
     @cc3.reload
     expect(@cc3.position).to eql(1)
   end
-  
+
   context "can_notify?" do
     it "should normally be able to be used" do
       communication_channel_model
       expect(@communication_channel).to be_can_notify
     end
-    
+
     it "should not be able to be used if it has a policy to not use it" do
       communication_channel_model
       notification_policy_model(:frequency => "never", :communication_channel => @communication_channel)
@@ -298,6 +298,7 @@ describe CommunicationChannel do
             path: path,
             timestamp: nil,
             details: nil,
+            permanent_bounce: true,
             suppression_bounce: false
           )
         end
@@ -315,36 +316,63 @@ describe CommunicationChannel do
         cc = communication_channel_model(
           path: 'foo@bar.edu',
           last_bounce_at: '2015-01-01T01:01:01.000Z',
-          last_suppression_bounce_at: '2015-03-03T03:03:03.000Z'
+          last_suppression_bounce_at: '2015-03-03T03:03:03.000Z',
+          last_transient_bounce_at: '2015-04-04T04:04:04.000Z'
         )
         CommunicationChannel.bounce_for_path(
           path: 'foo@bar.edu',
           timestamp: '2015-02-02T02:02:02.000Z',
           details: nil,
+          permanent_bounce: true,
           suppression_bounce: false
         )
 
         cc.reload
         expect(cc.last_bounce_at).to eq('2015-02-02T02:02:02.000Z')
         expect(cc.last_suppression_bounce_at).to eq('2015-03-03T03:03:03.000Z')
+        expect(cc.last_transient_bounce_at).to eq('2015-04-04T04:04:04.000Z')
+      end
+
+      it "stores the date of the last soft bounce bounce" do
+        cc = communication_channel_model(
+          path: 'foo@bar.edu',
+          last_bounce_at: '2015-01-01T01:01:01.000Z',
+          last_suppression_bounce_at: '2015-03-03T03:03:03.000Z',
+          last_transient_bounce_at: '2015-04-04T04:04:04.000Z'
+        )
+        CommunicationChannel.bounce_for_path(
+          path: 'foo@bar.edu',
+          timestamp: '2015-05-05T05:05:05.000Z',
+          details: nil,
+          permanent_bounce: false,
+          suppression_bounce: false
+        )
+
+        cc.reload
+        expect(cc.last_bounce_at).to eq('2015-01-01T01:01:01.000Z')
+        expect(cc.last_suppression_bounce_at).to eq('2015-03-03T03:03:03.000Z')
+        expect(cc.last_transient_bounce_at).to eq('2015-05-05T05:05:05.000Z')
       end
 
       it "stores the date of the last suppression bounce" do
         cc = communication_channel_model(
           path: 'foo@bar.edu',
           last_bounce_at: '2015-01-01T01:01:01.000Z',
-          last_suppression_bounce_at: '2015-03-03T03:03:03.000Z'
+          last_suppression_bounce_at: '2015-03-03T03:03:03.000Z',
+          last_transient_bounce_at: '2015-04-04T04:04:04.000Z'
         )
         CommunicationChannel.bounce_for_path(
           path: 'foo@bar.edu',
           timestamp: '2015-02-02T02:02:02.000Z',
           details: nil,
+          permanent_bounce: true,
           suppression_bounce: true
         )
 
         cc.reload
         expect(cc.last_bounce_at).to eq('2015-01-01T01:01:01.000Z')
         expect(cc.last_suppression_bounce_at).to eq('2015-02-02T02:02:02.000Z')
+        expect(cc.last_transient_bounce_at).to eq('2015-04-04T04:04:04.000Z')
       end
 
       it "stores the details of the last hard bounce" do
@@ -353,11 +381,28 @@ describe CommunicationChannel do
           path: 'foo@bar.edu',
           timestamp: nil,
           details: {'some' => 'details', 'foo' => 'bar'},
+          permanent_bounce: true,
           suppression_bounce: false
         )
 
         cc.reload
         expect(cc.last_bounce_details).to eq('some' => 'details', 'foo' => 'bar')
+        expect(cc.last_transient_bounce_details).to be_nil
+      end
+
+      it "stores the details of the last soft bounce" do
+        cc = communication_channel_model(path: 'foo@bar.edu')
+        CommunicationChannel.bounce_for_path(
+          path: 'foo@bar.edu',
+          timestamp: nil,
+          details: {'some' => 'details', 'foo' => 'bar'},
+          permanent_bounce: false,
+          suppression_bounce: false
+        )
+
+        cc.reload
+        expect(cc.last_transient_bounce_details).to eq('some' => 'details', 'foo' => 'bar')
+        expect(cc.last_bounce_details).to be_nil
       end
 
       it "does not store the details of the last suppression bounce" do
@@ -369,11 +414,13 @@ describe CommunicationChannel do
           path: 'foo@bar.edu',
           timestamp: nil,
           details: {'some' => 'details', 'foo' => 'bar'},
+          permanent_bounce: true,
           suppression_bounce: true
         )
 
         cc.reload
         expect(cc.last_bounce_details).to eq('existing' => 'details')
+        expect(cc.last_transient_bounce_details).to be_nil
       end
     end
 
@@ -431,6 +478,7 @@ describe CommunicationChannel do
               path: path,
               timestamp: nil,
               details: nil,
+              permanent_bounce: true,
               suppression_bounce: false
             )
           end

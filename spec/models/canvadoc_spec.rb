@@ -19,12 +19,17 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe 'Canvadoc' do
+
+  def stub_upload
+    Canvadocs::API.any_instance.stubs(:upload).returns "id" => 123456,
+      "status" => "pending"
+  end
+
   before do
     PluginSetting.create! :name => 'canvadocs',
                           :settings => {"api_key" => "blahblahblahblahblah",
                                         "base_url" => "http://example.com"}
-    Canvadocs::API.any_instance.stubs(:upload).returns "id" => 123456,
-      "status" => "pending"
+    stub_upload
     Canvadocs::API.any_instance.stubs(:session).returns "id" => "blah",
       "status" => "pending"
     @attachment = attachment_model(content_type: "application/pdf")
@@ -52,6 +57,11 @@ describe 'Canvadoc' do
       expect {
         @doc.upload
       }.to raise_error
+    end
+
+    it "ignores annotatable if unavailable" do
+      stub_upload.with(@doc.attachment.authenticated_s3_url, {})
+      @doc.upload annotatable: true
     end
   end
 

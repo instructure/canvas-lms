@@ -64,16 +64,5 @@
         "Signature" : "example==",
         "SigningCertURL" : "https://example.com/example.pem",
         "UnsubscribeURL" : "https://example.com/unsubscribe"
-    },
-    {
-        "Type" : "Notification",
-        "MessageId" : "example-id",
-        "TopicArn" : "example-arn",
-        "Message" : "{\"notificationType\":\"Bounce\",\"bounce\":{\"bounceSubType\":\"General\",\"bounceType\":\"Transient\",\"reportingMTA\":\"dsn; a14-1.smtp-out.amazonses.com\",\"bouncedRecipients\":[{\"emailAddress\":\"soft@example.edu\",\"status\":\"4.4.7\",\"action\":\"failed\",\"diagnosticCode\":\"smtp; 554 4.4.7 Message expired: unable to deliver in 840 minutes.<421 4.4.0 Unable to lookup DNS for ms-wasatch-edu.mail.protection.outlook.com>\"}],\"timestamp\":\"2014-08-22T12:18:58.226Z\",\"feedbackId\":\"example-id\"},\"mail\":{\"timestamp\":\"2014-08-21T20:51:56.000Z\",\"source\":\"notifications@instructure.com\",\"messageId\":\"example-id\",\"destination\":[\"soft@example.edu\"]}}",
-        "Timestamp" : "2014-08-22T12:18:58.393Z",
-        "SignatureVersion" : "1",
-        "Signature" : "example==",
-        "SigningCertURL" : "https://example.com/example.pem",
-        "UnsubscribeURL" : "https://example.com/unsubscribe"
     }
 ]

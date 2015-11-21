@@ -54,7 +54,18 @@ describe BrandConfigsController do
       user_session(admin)
 
       get 'new', {brand_config: @sub_bc, account_id: @subaccount.id}
-      vars = assigns[:js_env][:variableSchema].map{|schema| schema['variables']}.flatten
+
+      variable_schema = assigns[:js_env][:variableSchema]
+      variable_schema.each do |s|
+        expect(s['group_name']).to be_present
+      end
+
+      vars = variable_schema.map{|schema| schema['variables']}.flatten
+      vars.each do |v|
+        expect(v['human_name']).to be_present
+      end
+
+      expect(vars.detect{|v| v["variable_name"] == "ic-brand-header-image"}['helper_text']).to be_present
 
       primary = vars.detect{|v| v["variable_name"] == "ic-brand-primary"}
       expect(primary["default"]).to eq "#321"

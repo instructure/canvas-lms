@@ -73,16 +73,14 @@ class Announcement < DiscussionTopic
     dispatch :new_announcement
     to { active_participants(true) - [user] }
     whenever { |record|
-      record.context.available? and
-        !record.context.concluded? and
+      record.send_notification_for_context? and
         ((record.just_created and !(record.post_delayed? || record.unpublished?)) || record.changed_state(:active, :unpublished) || record.changed_state(:active, :post_delayed))
     }
 
     dispatch :announcement_created_by_you
     to { user }
     whenever { |record|
-      record.context.available? and
-        !record.context.concluded? and
+      record.send_notification_for_context? and
         ((record.just_created and !(record.post_delayed? || record.unpublished?)) || record.changed_state(:active, :unpublished) || record.changed_state(:active, :post_delayed))
     }
   end

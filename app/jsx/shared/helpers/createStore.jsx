@@ -1,4 +1,3 @@
-/** @jsx */
 define(['underscore', 'Backbone'], function(_, Backbone) {
 
   /**

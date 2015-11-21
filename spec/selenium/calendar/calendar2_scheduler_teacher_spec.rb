@@ -171,9 +171,10 @@ describe "scheduler" do
       create_appointment_group
       get "/calendar2"
       click_scheduler_link
+      wait_for_ajaximations
       click_appointment_link
-      click_appointment_link
-      expect(element_exists('.fc-event-bg')).to be_truthy
+      wait_for_ajaximations
+      expect(element_exists('.fc-event')).to be_truthy
     end
 
     it "should not allow limiting the max appointments per participant to less than 1", priority: "1", test_id: 140194 do

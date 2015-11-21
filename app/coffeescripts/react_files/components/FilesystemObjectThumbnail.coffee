@@ -47,6 +47,8 @@ define [
 
       @props.model?.fetch
         success: (model, response, options) =>
-          @setState(thumbnail_url: response.thumbnail_url) if response?.thumbnail_url
+          setTimeout =>
+            @setState(thumbnail_url: response.thumbnail_url) if response?.thumbnail_url
+          , 0
         error: () ->
           clearTimeout(timeout)

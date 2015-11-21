@@ -93,7 +93,7 @@ define([
       $comment_attachment_blank = $("#comment_attachment_blank").removeAttr('id').detach(),
       $comment_media_blank = $("#comment_media_blank").removeAttr('id').detach(),
       $add_a_comment = $("#add_a_comment"),
-      $add_a_comment_submit_button = $add_a_comment.find("button"),
+      $add_a_comment_submit_button = $add_a_comment.find("button:submit"),
       $add_a_comment_textarea = $add_a_comment.find("textarea"),
       $group_comment_wrapper = $("#group_comment_wrapper"),
       $comment_attachment_input_blank = $("#comment_attachment_input_blank").detach(),
@@ -274,8 +274,9 @@ define([
   }
 
   function classNameBasedOnStudent(student){
+    var raw       = submissionState(student);
     var formatted = formattedsubmissionState(student.submission_state, student.submission);
-    return {raw: student.submission_state, formatted: formatted};
+    return {raw: raw, formatted: formatted};
   }
 
   // xsslint safeString.identifier MENU_PARTS_DELIMITER
@@ -709,6 +710,7 @@ define([
           data['final'] = '1';
         }
       }
+      data['graded_anonymously'] = utils.shouldHideStudentNames();
       var url = $(".update_rubric_assessment_url").attr('href');
       var method = "POST";
       EG.toggleFullRubric();
@@ -1404,13 +1406,21 @@ define([
 
     handleSubmissionSelectionChange: function(){
       clearInterval(crocodocSessionTimer);
-      var $submission_to_view = $("#submission_to_view");
-      var submissionToViewVal = $submission_to_view.val(),
-          currentSelectedIndex = Number(submissionToViewVal) ||
-                                ( this.currentStudent &&
-                                  this.currentStudent.submission &&
-                                  this.currentStudent.submission.currentSelectedIndex )
-                                || 0,
+
+      function currentIndex (context, submissionToViewVal) {
+        if (submissionToViewVal) {
+          return Number(submissionToViewVal) - 1
+        } else if (context.currentStudent && context.currentStudent.submission &&
+                   context.currentStudent.submission.currentSelectedIndex ) {
+          return context.currentStudent.submission.currentSelectedIndex - 1
+        } else {
+          return 0
+        }
+      };
+
+      var $submission_to_view = $("#submission_to_view"),
+          submissionToViewVal = $submission_to_view.val(),
+          currentSelectedIndex = currentIndex(this, submissionToViewVal),
           isMostRecent = this.currentStudent &&
                          this.currentStudent.submission &&
                          this.currentStudent.submission.submission_history &&

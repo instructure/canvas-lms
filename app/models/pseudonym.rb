@@ -169,15 +169,15 @@ class Pseudonym < ActiveRecord::Base
     self.password_auto_generated = false
     super(new_pass)
   end
-  
+
   def communication_channel
     self.user.communication_channels.by_path(self.unique_id).first
   end
-  
+
   def confirmation_code
     (self.communication_channel || self.user.communication_channel).confirmation_code
   end
-  
+
   def infer_defaults
     self.account ||= Account.default
     if (!crypted_password || crypted_password == "") && !@require_password
@@ -185,11 +185,11 @@ class Pseudonym < ActiveRecord::Base
     end
     self.sis_user_id = nil if self.sis_user_id.blank?
   end
-  
+
   def update_passwords_on_related_pseudonyms
     return if @dont_update_passwords_on_related_pseudonyms || !self.user || self.password_auto_generated
   end
-  
+
   def login_assertions_for_user
     if !self.persistence_token || self.persistence_token == ''
       # Some pseudonyms can end up without a persistence token if they were created
@@ -197,12 +197,12 @@ class Pseudonym < ActiveRecord::Base
       self.persistence_token = CanvasSlug.generate('pseudo', 15)
       self.save
     end
-    
+
     user = self.user
     user.workflow_state = 'registered' unless user.registered?
 
     add_ldap_channel
-    
+
     # Assert a time zone for the user if none provided
     if user && !user.time_zone
       user.time_zone = self.account.default_time_zone rescue Account.default.default_time_zone
@@ -211,7 +211,7 @@ class Pseudonym < ActiveRecord::Base
     user.save if user.workflow_state_changed? || user.time_zone_changed?
     user
   end
-  
+
   def authentication_type
     :email_login
   end
@@ -239,6 +239,16 @@ class Pseudonym < ActiveRecord::Base
       unless self.unique_id.present? && self.unique_id.match(/\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i)
         self.errors.add(:unique_id, "not_email")
         return false
+      end
+    end
+    unless self.deleted?
+      self.shard.activate do
+        existing_pseudo = Pseudonym.active.by_unique_id(self.unique_id).where(:account_id => self.account_id,
+          :authentication_provider_id => self.authentication_provider_id).first
+        if existing_pseudo && existing_pseudo.id != self.id
+          self.errors.add(:unique_id, t("ID already in use for this account and authentication provider"))
+          return false
+        end
       end
     end
     true
@@ -367,14 +377,14 @@ class Pseudonym < ActiveRecord::Base
   def sms
     user.sms if user
   end
-  
+
   def sms=(s)
     return false unless user
     self.user.sms=(s)
     user.save!
     user.sms
   end
-  
+
   def managed_password?
     !!(self.sis_user_id && account && account.non_canvas_auth_configured?)
   end

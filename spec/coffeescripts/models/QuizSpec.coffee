@@ -85,6 +85,10 @@ define [
     @quiz = new Quiz(points_possible: 2)
     equal @quiz.get('possible_points_label'), "2 pts"
 
+  test "#initialize points possible to null if ungraded survey", ->
+    @quiz = new Quiz(points_possible: 5, quiz_type: "survey")
+    equal @quiz.get('possible_points_label'), ""
+
   # Publishing
 
   test '#publish saves to the server', ->

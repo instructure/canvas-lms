@@ -141,7 +141,7 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
 
 
   describe 'GET /quiz_submissions/:quiz_submission_id/questions [index]' do
-    before :all do
+    before :once do
       course_with_student(:active_all => true)
       @quiz = @course.quizzes.create!({
           title: 'test quiz',
@@ -164,9 +164,10 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
     end
 
     describe "with data" do
-      before :all do
+      before :once do
         create_question_set
       end
+
       it 'should list all items' do
         Quizzes::QuizSubmission.any_instance.stubs(:quiz_questions).returns([@qq1,@qq2])
         json = api_index

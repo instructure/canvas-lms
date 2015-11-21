@@ -41,13 +41,13 @@ describe PluginSetting do
     expect(s.valid_settings?).to be_falsey
     expect(s.settings).to eql({:bar => "qwerty", :foo_enc => "invalid", :foo_salt => "invalid", :foo => PluginSetting::DUMMY_STRING})
   end
-  
+
   it "should return default content if no setting is set" do
     settings = PluginSetting.settings_for_plugin("plugin_setting_test")
     expect(settings).not_to be_nil
     expect(settings[:bar]).to eq "asdf"
   end
-  
+
   it "should return updated content if created" do
     s = PluginSetting.new(:name => "plugin_setting_test", :settings => {:bar => "qwerty"})
     expect(s.send(:save_without_callbacks)).to be_truthy
@@ -55,14 +55,14 @@ describe PluginSetting do
     expect(settings).not_to be_nil
     expect(settings[:bar]).to eq "qwerty"
   end
-  
+
   it "should return default content if the setting is disabled" do
     s = PluginSetting.new(:name => "plugin_setting_test", :settings => {:bar => "qwerty"})
     expect(s.send(:save_without_callbacks)).to be_truthy
     settings = PluginSetting.settings_for_plugin("plugin_setting_test")
     expect(settings).not_to be_nil
     expect(settings[:bar]).to eq "qwerty"
-    
+
     s.update_attribute(:disabled, true)
     settings = PluginSetting.settings_for_plugin("plugin_setting_test")
     expect(settings).not_to be_nil

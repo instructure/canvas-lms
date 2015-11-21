@@ -26,6 +26,8 @@ class GradebookExporter
   end
 
   def to_csv
+    collection = @options[:include_priors] ? @course.all_student_enrollments : @course.student_enrollments
+    enrollments_scope = @course.apply_enrollment_visibility(collection, @user)
     student_enrollments = enrollments_for_csv(enrollments_scope, @options)
 
     student_section_names = {}
@@ -33,16 +35,24 @@ class GradebookExporter
       student_section_names[enrollment.user_id] ||= []
       student_section_names[enrollment.user_id] << (enrollment.course_section.display_name rescue nil)
     end
+
     # remove duplicate enrollments for students enrolled in multiple sections
     student_enrollments = student_enrollments.uniq(&:user_id)
 
-    calc = GradeCalculator.new(student_enrollments.map(&:user_id), @course, :ignore_muted => false)
+    # grading_period_id == 0 means no grading period selected
+    unless @options[:grading_period_id].try(:to_i) == 0
+      grading_period = GradingPeriod.context_find @course, @options[:grading_period_id]
+    end
+
+    calc = GradeCalculator.new(student_enrollments.map(&:user_id), @course,
+                               ignore_muted: false,
+                               grading_period: grading_period)
     grades = calc.compute_scores
 
     submissions = {}
     calc.submissions.each { |s| submissions[[s.user_id, s.assignment_id]] = s }
 
-    assignments = select_in_current_grading_periods calc.assignments, @course
+    assignments = select_in_grading_period calc.assignments, @course, grading_period
 
     assignments = assignments.sort_by do |a|
       [a.assignment_group_id, a.position, a.due_at || CanvasSort::Last, a.title]
@@ -51,6 +61,7 @@ class GradebookExporter
 
     read_only = I18n.t('csv.read_only_field', '(read only)')
     include_root_account = @course.root_account.trust_exists?
+    should_show_totals = show_totals?
     CSV.generate do |csv|
       # First row
       row = ["Student", "ID"]
@@ -61,16 +72,19 @@ class GradebookExporter
       row << "Section"
       row.concat assignments.map(&:title_with_id)
       include_points = !@course.apply_group_weights?
-      groups.each do |group|
-        if include_points
-          row << "#{group.name} Current Points" << "#{group.name} Final Points"
+
+      if should_show_totals
+        groups.each do |group|
+          if include_points
+            row << "#{group.name} Current Points" << "#{group.name} Final Points"
+          end
+          row << "#{group.name} Current Score" << "#{group.name} Final Score"
         end
-        row << "#{group.name} Current Score" << "#{group.name} Final Score"
-      end
-      row << "Current Points" << "Final Points" if include_points
-      row << "Current Score" << "Final Score"
-      if @course.grading_standard_enabled?
-        row << "Current Grade" << "Final Grade"
+        row << "Current Points" << "Final Points" if include_points
+        row << "Current Score" << "Final Score"
+        if @course.grading_standard_enabled?
+          row << "Current Grade" << "Final Grade"
+        end
       end
       csv << row
 
@@ -82,9 +96,13 @@ class GradebookExporter
         row = [nil, nil, nil]
         row << nil << nil if @options[:include_sis_id]
         row.concat(assignments.map { |a| 'Muted' if a.muted? })
-        row.concat([nil] * group_filler_length)
-        row << nil << nil if include_points
-        row << nil << nil
+
+        if should_show_totals
+          row.concat([nil] * group_filler_length)
+          row << nil << nil if include_points
+          row << nil << nil
+        end
+
         row << nil if @course.grading_standard_enabled?
         csv << row
       end
@@ -94,10 +112,13 @@ class GradebookExporter
       row << nil << nil if @options[:include_sis_id]
       row << nil if @options[:include_sis_id] && include_root_account
       row.concat assignments.map(&:points_possible)
-      row.concat([read_only] * group_filler_length)
-      row << read_only << read_only if include_points
-      row << read_only << read_only
-      row << read_only if @course.grading_standard_enabled?
+
+      if should_show_totals
+        row.concat([read_only] * group_filler_length)
+        row << read_only << read_only if include_points
+        row << read_only << read_only
+        row << read_only if @course.grading_standard_enabled?
+      end
       csv << row
 
       student_enrollments.each_slice(100) do |student_enrollments_batch|
@@ -139,17 +160,20 @@ class GradebookExporter
           row << student_sections
           row.concat(student_submissions)
 
-          (current_info, current_group_info),
-            (final_info, final_group_info) = grades.shift
-          groups.each do |g|
-            row << current_group_info[g.id][:score] << final_group_info[g.id][:score] if include_points
-            row << current_group_info[g.id][:grade] << final_group_info[g.id][:grade]
-          end
-          row << current_info[:total] << final_info[:total] if include_points
-          row << current_info[:grade] << final_info[:grade]
-          if @course.grading_standard_enabled?
-            row << @course.score_to_grade(current_info[:grade])
-            row << @course.score_to_grade(final_info[:grade])
+
+          if should_show_totals
+            (current_info, current_group_info),
+              (final_info, final_group_info) = grades.shift
+            groups.each do |g|
+              row << current_group_info[g.id][:score] << final_group_info[g.id][:score] if include_points
+              row << current_group_info[g.id][:grade] << final_group_info[g.id][:grade]
+            end
+            row << current_info[:total] << final_info[:total] if include_points
+            row << current_info[:grade] << final_info[:grade]
+            if @course.grading_standard_enabled?
+              row << @course.score_to_grade(current_info[:grade])
+              row << @course.score_to_grade(final_info[:grade])
+            end
           end
           csv << row
         end
@@ -170,9 +194,10 @@ class GradebookExporter
     enrollments.partition { |e| e.type != "StudentViewEnrollment" }.flatten
   end
 
-  def enrollments_scope
-    enrollment_opts = @options.slice(:include_priors)
-    @course.enrollments_visible_to(@user, enrollment_opts)
+  def show_totals?
+    return true if !@course.feature_enabled?(:multiple_grading_periods)
+    return true if @options[:grading_period_id].try(:to_i) != 0
+    @course.feature_enabled?(:all_grading_periods_totals)
   end
 
   def name_method

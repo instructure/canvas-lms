@@ -1240,6 +1240,21 @@ describe Attachment do
       quota = Attachment.get_quota(@course)
       expect(quota[:quota_used]).to eq Attachment.minimum_size_for_quota
     end
+
+    it "should not count attachments a student has used for submissions towards the quota" do
+      course_with_student(:active_all => true)
+      attachment_model(:context => @user, :uploaded_data => stub_png_data, :filename => "homework.png")
+      @attachment.update_attribute(:size, 1.megabyte)
+
+      @assignment = @course.assignments.create!
+      sub = @assignment.submit_homework(@user, attachments: [@attachment])
+
+      attachment_model(:context => @user, :uploaded_data => stub_png_data, :filename => "otherfile.png")
+      @attachment.update_attribute(:size, 1.megabyte)
+
+      quota = Attachment.get_quota(@user)
+      expect(quota[:quota_used]).to eq 1.megabyte
+    end
   end
 
   context "#open" do
@@ -1451,6 +1466,31 @@ describe Attachment do
         run_jobs
         expect(Attachment.find(@attachment).grants_right?(@student, :download)).to eq true
       end
+    end
+  end
+
+  describe 'local storage' do
+    it 'should properly sanitie a filename containing a slash' do
+      local_storage!
+      course
+      a = attachment_model(filename: 'ENGL_100_/_ENGL_200.csv')
+      expect(a.filename).to eql('ENGL_100___ENGL_200.csv')
+    end
+
+    it 'should still properly escape the same filename on s3' do
+      s3_storage!
+      course
+      a = attachment_model(filename: 'ENGL_100_/_ENGL_200.csv')
+      expect(a.filename).to eql('ENGL_100_%2F_ENGL_200.csv')
+    end
+  end
+
+  describe "preview_params" do
+    it "includes crocodoc_ids only when a whitelist is given" do
+      course :active_all => true
+      att = attachment_model
+      expect(att.send :preview_params, @teacher, 'document/msword').not_to include 'crocodoc_ids'
+      expect(att.send :preview_params, @teacher, 'document/msword', [1]).to include 'crocodoc_ids'
     end
   end
 end

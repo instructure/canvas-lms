@@ -16,8 +16,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'jwt'
-
 class OauthProxyController < ApplicationController
   skip_before_filter :require_user
   skip_before_filter :load_user
@@ -25,12 +23,12 @@ class OauthProxyController < ApplicationController
   def redirect_proxy
     reject! t("The state parameter is required") and return unless params[:state]
     begin
-      json = JWT.decode(params[:state], Canvas::Security.encryption_key).first
+      json = Canvas::Security.decode_jwt(params[:state])
       url = URI.parse(json['redirect_uri'])
       filtered_params = params.keep_if { |k, _| %w(state code).include?(k) }
       url.query = url.query.blank? ? filtered_params.to_query : "#{url.query}&#{filtered_params.to_query}"
       redirect_to url.to_s
-    rescue JWT::DecodeError
+    rescue JSON::JWT::InvalidFormat
       reject! t("Invalid state parameter") and return
     end
   end

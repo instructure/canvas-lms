@@ -1,5 +1,3 @@
-/** @jsx React.DOM */
-
 define([
   'axios',
   'jsx/shared/helpers/parseLinkHeader',

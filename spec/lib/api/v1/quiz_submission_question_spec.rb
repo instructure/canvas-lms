@@ -1,7 +1,7 @@
 require_relative '../../../spec_helper'
 
 describe Api::V1::QuizSubmissionQuestion do
-  before :all do
+  before :once do
     course_with_student(active_all: true)
     @quiz = Quizzes::Quiz.create!(title: "quiz", context: @course)
     @quiz_submission = @quiz.generate_submission(@student)

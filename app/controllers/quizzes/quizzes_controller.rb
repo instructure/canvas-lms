@@ -383,7 +383,6 @@ class Quizzes::QuizzesController < ApplicationController
 
             if params[:assignment] && Assignment.sis_grade_export_enabled?(@context)
               @quiz.assignment.post_to_sis = params[:assignment][:post_to_sis]
-              @quiz.assignment.save
             end
           end
 
@@ -403,6 +402,10 @@ class Quizzes::QuizzesController < ApplicationController
             @quiz.save!
           end
 
+          if old_assignment && @quiz.assignment.present?
+            @quiz.assignment.save
+          end
+
           batch_update_assignment_overrides(@quiz,overrides) unless overrides.nil?
 
           # quiz.rb restricts all assignment broadcasts if notify_of_update is
@@ -411,7 +414,10 @@ class Quizzes::QuizzesController < ApplicationController
             @quiz.assignment.do_notifications!(old_assignment, notify_of_update)
           end
           @quiz.reload
-          @quiz.update_quiz_submission_end_at_times if params[:quiz][:time_limit].present?
+
+          if params[:quiz][:time_limit].present?
+            @quiz.send_later_if_production_enqueue_args(:update_quiz_submission_end_at_times, { :priority => Delayed::HIGH_PRIORITY } )
+          end
 
           @quiz.publish! if params[:publish]
         end

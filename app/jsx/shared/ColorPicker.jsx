@@ -1,31 +1,28 @@
-/** @jsx React.DOM */
-
 define([
   'jquery',
   'react',
   'react-modal',
   'i18n!calendar_color_picker',
-], function($, React, ReactModal, I18n) {
+  'jsx/shared/CourseNicknameEdit'
+], function($, React, ReactModal, I18n, CourseNicknameEdit) {
 
   var PREDEFINED_COLORS = [
-    {hexcode:'#EF4437', name: I18n.t('Red')},
-    {hexcode:'#E71F63', name: I18n.t('Pink')},
-    {hexcode:'#8F3E97', name: I18n.t('Purple')},
-    {hexcode:'#65499D', name: I18n.t('Deep Purple')},
-    {hexcode:'#4554A4', name: I18n.t('Indigo')},
-    {hexcode:'#2083C5', name: I18n.t('Blue')},
-    {hexcode:'#35A4DC', name: I18n.t('Light Blue')},
-    {hexcode:'#09BCD3', name: I18n.t('Cyan')},
-    {hexcode:'#009688', name: I18n.t('Teal')},
-    {hexcode:'#43A047', name: I18n.t('Green')},
-    {hexcode:'#8BC34A', name: I18n.t('Light Green')},
-    {hexcode:'#FDC010', name: I18n.t('Yellow')},
-    {hexcode:'#F8971C', name: I18n.t('Orange')},
-    {hexcode:'#F0592B', name: I18n.t('Deep Orange')},
-    {hexcode:'#F06291', name: I18n.t('Light Pink')}
+    {hexcode: '#EF4437', name: I18n.t('Red')},
+    {hexcode: '#E71F63', name: I18n.t('Pink')},
+    {hexcode: '#8F3E97', name: I18n.t('Purple')},
+    {hexcode: '#65499D', name: I18n.t('Deep Purple')},
+    {hexcode: '#4554A4', name: I18n.t('Indigo')},
+    {hexcode: '#2083C5', name: I18n.t('Blue')},
+    {hexcode: '#35A4DC', name: I18n.t('Light Blue')},
+    {hexcode: '#09BCD3', name: I18n.t('Cyan')},
+    {hexcode: '#009688', name: I18n.t('Teal')},
+    {hexcode: '#43A047', name: I18n.t('Green')},
+    {hexcode: '#8BC34A', name: I18n.t('Light Green')},
+    {hexcode: '#FDC010', name: I18n.t('Yellow')},
+    {hexcode: '#F8971C', name: I18n.t('Orange')},
+    {hexcode: '#F0592B', name: I18n.t('Deep Orange')},
+    {hexcode: '#F06291', name: I18n.t('Light Pink')}
   ];
-
-  var SWATCHES_PER_ROW = 5;
 
   var ColorPicker = React.createClass({
 
@@ -40,10 +37,12 @@ define([
       afterUpdateColor: React.PropTypes.func,
       afterClose: React.PropTypes.func,
       assetString: React.PropTypes.string.isRequired,
+      hideOnScroll: React.PropTypes.bool,
       positions: React.PropTypes.object,
       nonModal: React.PropTypes.bool,
       hidePrompt: React.PropTypes.bool,
-      currentColor: React.PropTypes.string
+      currentColor: React.PropTypes.string,
+      nicknameInfo: React.PropTypes.object
     },
 
     // ===============
@@ -53,25 +52,35 @@ define([
     getInitialState () {
       return {
         isOpen: this.props.isOpen,
-        currentColor: this.props.currentColor
+        currentColor: this.props.currentColor,
+        saveInProgress: false
       };
     },
 
     getDefaultProps () {
       return {
-        currentColor: "#efefef"
+        currentColor: "#efefef",
+        hideOnScroll: true
       }
     },
 
     componentDidMount () {
-      if (this.refs.hexInput) {
-        this.refs.hexInput.getDOMNode().focus();
+      // focus course nickname input first if it's there, otherwise the first
+      // color swatch
+      if (this.refs.courseNicknameEdit) {
+        this.refs.courseNicknameEdit.focus();
+      } else if (this.refs.colorSwatch0) {
+        this.refs.colorSwatch0.getDOMNode().focus();
       }
-      $(window).on('scroll', this.closeModal);
+      if (this.props.hideOnScroll) {
+        $(window).on('scroll', this.closeModal);
+      }
     },
 
     componentWillUnmount () {
-      $(window).off('scroll', this.closeModal);
+      if (this.props.hideOnScroll) {
+        $(window).off('scroll', this.closeModal);
+      }
     },
 
     componentWillReceiveProps (nextProps) {
@@ -79,7 +88,7 @@ define([
         isOpen: nextProps.isOpen
       }, () => {
         if (this.state.isOpen) {
-          this.refs.hexInput.getDOMNode().focus();
+          this.refs.colorSwatch0.getDOMNode().focus();
         }
       });
     },
@@ -89,13 +98,16 @@ define([
     // ===============
 
     closeModal () {
-      this.setState({
-        isOpen: false
-      });
+      if (this.isMounted()){
+        this.setState({
+          isOpen: false
+        });
 
-      if (this.props.afterClose) {
-        this.props.afterClose()
-      };
+
+        if (this.props.afterClose) {
+          this.props.afterClose()
+        }
+      }
     },
 
     setCurrentColor (color) {
@@ -105,7 +117,7 @@ define([
     },
 
     setInputColor (event) {
-      var value = event.target.value;
+      var value = event.target.value || event.srcElement.value;
       if (value.indexOf('#') < 0) {
         value = '#' + value;
       }
@@ -113,25 +125,40 @@ define([
       this.setCurrentColor(value);
     },
 
-    setColorForCalendar (color, event) {
+    setColorForCalendar (color) {
       // Remove the hex if needed
-      var color = color.replace('#', '');
+      color = color.replace('#', '');
 
-      $.ajax({
-        url: '/api/v1/users/' + ENV.current_user_id + '/colors/' + this.props.assetString,
-        type: 'PUT',
-        data: {
-          hexcode: color
-        },
-        success: () => {
-          this.props.afterUpdateColor(color);
-        },
-        error: () => {
-          console.log('Error setting color');
-        },
-        complete: () => {
+      if (color !== this.props.currentColor.replace('#', '')) {
+        return $.ajax({
+          url: '/api/v1/users/' + window.ENV.current_user_id + '/colors/' + this.props.assetString,
+          type: 'PUT',
+          data: {
+            hexcode: color
+          },
+          success: () => {
+            this.props.afterUpdateColor(color);
+          },
+          error: () => {
+            console.log('Error setting color');
+          }
+        });
+      }
+    },
+
+    setCourseNickname() {
+      if (this.refs.courseNicknameEdit) {
+        return this.refs.courseNicknameEdit.setCourseNickname();
+      }
+    },
+
+    onApply (color, event) {
+      this.setState({ saveInProgress: true });
+      // both API calls update the same User model and thus need to be performed serially
+      $.when(this.setColorForCalendar(color)).then(() => {
+        $.when(this.setCourseNickname()).then(() => {
           this.closeModal();
-        }
+        });
       });
     },
 
@@ -155,8 +182,12 @@ define([
         };
 
         var title = color.name + ' (' + color.hexcode + ')';
+        var ref = "colorSwatch" + idx;
         return (
           <button className = "ColorPicker__ColorBlock"
+                  ref = {ref}
+                  role = "radio"
+                  aria-checked = {this.state.currentColor === color.hexcode}
                   style = {colorSwatchStyle}
                   title = {title}
                   onClick = {this.setCurrentColor.bind(null, color.hexcode)}
@@ -166,6 +197,14 @@ define([
           </button>
         );
       });
+    },
+
+    nicknameEdit () {
+      if (this.props.nicknameInfo) {
+        return (
+          <CourseNicknameEdit ref='courseNicknameEdit' nicknameInfo={this.props.nicknameInfo} />
+        );
+      }
     },
 
     prompt () {
@@ -187,16 +226,17 @@ define([
         backgroundColor: this.state.currentColor
       };
 
+      var inputId = "ColorPickerCustomInput-" + this.props.assetString;
+
       return (
         <div className="ColorPicker__Container">
           {this.prompt()}
-          <div className="ColorPicker__ColorContainer">
+          {this.nicknameEdit()}
+          <div className  = "ColorPicker__ColorContainer"
+               role       = "radiogroup"
+               aria-label = {I18n.t('Select a predefined color.')} >
             {this.renderColorRows()}
           </div>
-
-          <label className="screenreader-only" htmlFor="ColorPickerCustomInput">
-            {I18n.t('Enter a hexcode here to use a custom color.')}
-          </label>
 
           <div className="ColorPicker__CustomInputContainer ic-Input-group">
             <div className = "ic-Input-group__add-on ColorPicker__ColorPreview"
@@ -206,8 +246,12 @@ define([
                  aria-hidden = "true"
                  tabIndex = "-1" />
 
+            <label className="screenreader-only" htmlFor={inputId}>
+              {I18n.t('Enter a hexcode here to use a custom color.')}
+            </label>
+
             <input className = "ic-Input ColorPicker__CustomInput"
-                   id = "ColorPickerCustomInput"
+                   id = {inputId}
                    placeholder = {this.state.currentColor}
                    type = 'text'
                    maxLength = "7"
@@ -221,7 +265,8 @@ define([
             </button>
             <span>&nbsp;</span>
             <button className="Button Button--primary"
-              onClick = {this.setColorForCalendar.bind(null, this.state.currentColor)}>
+              onClick = {this.onApply.bind(null, this.state.currentColor)}
+              disabled = {this.state.saveInProgress}>
               {I18n.t('Apply')}
             </button>
           </div>
@@ -236,7 +281,7 @@ define([
         top: this.props.positions.top - 124
       };
 
-      return(
+      return (
         <ReactModal
           ref = 'reactModal'
           style = {styleObj}

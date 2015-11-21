@@ -10,8 +10,6 @@
   can_rename_course = can_manage_courses || (can_manage && !@context.root_account.settings[:prevent_course_renaming_by_teachers])
   has_multiple_sections = @context.course_sections.active.count > 1
 
-  publishing_enabled = @context.allows_grade_publishing_by(@current_user) && can_do(@context, @current_user, :manage_grades)
-
   can_see_users = can_do(@context, @current_user, :read_roster, :manage_students, :manage_admin_users)
 %>
 
@@ -30,7 +28,7 @@
     <% if can_do @context, @current_user, :update %>
       <li id="external_tools_tab"><a href="#tab-tools" id="tab-tools-link"><%= t('tabs.tools', %{Apps}) %></a></li>
     <% end %>
-    <% if publishing_enabled %>
+    <% if @publishing_enabled %>
       <li id="grade_publishing_tab"><a href="#tab-grade-publishing" id="tab-grade-publishing-link"><%= t('tabs.grade_publishing', %{Grade Publishing}) %></a></li>
     <% end %>
     <% if @context.root_account.settings[:enable_alerts] && can_do(@context, @current_user, :manage_interaction_alerts) %>
@@ -595,7 +593,7 @@
     </div>
   <% end %>
 
-  <% if publishing_enabled %>
+  <% if @publishing_enabled %>
     <div id="tab-grade-publishing">
       <h2><%= t('headings.grade_publishing', %{Grade Publishing}) %></h2>
       <%= form_tag context_url(@context, :context_publish_to_sis_url), { :id => "publish_to_sis_form", :style => "display: none;" } do %><% end %>
@@ -642,9 +640,6 @@
     <% end %>
   </div>
 <% end %>
-<script>
-  var sisPublishEnabled = <%= publishing_enabled %>;
-</script>
 <div id="edit_letter_grades_form" style="display: none;" data-context_code="<%= @context.asset_string %>">
   <%= render :partial => "shared/grading_standard", :object => @context.grading_standard, :locals => {:read_only => !can_manage} %>
   <a href="<%= context_url(@context, :context_grading_standards_url) %>" style="display: none;" class="create_grading_standard_url">&nbsp;</a>

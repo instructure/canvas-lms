@@ -121,4 +121,5 @@ class LearningOutcomeResult < ActiveRecord::Base
   scope :for_outcome_ids, lambda { |ids| where(:learning_outcome_id => ids) }
   scope :for_association, lambda { |association| where(:association_type => association.class.to_s, :association_id => association.id) }
   scope :for_associated_asset, lambda { |associated_asset| where(:associated_asset_type => associated_asset.class.to_s, :associated_asset_id => associated_asset.id) }
+  scope :active, lambda { where("content_tags.workflow_state <> 'deleted'").joins(:alignment) }
 end

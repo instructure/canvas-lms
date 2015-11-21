@@ -231,7 +231,11 @@ module Api::V1::Assignment
     end
 
     if submission = opts[:submission]
-      hash['submission'] = submission_json(submission,assignment,user,session)
+      if submission.is_a?(Array)
+        hash['submission'] = submission.map { |s| submission_json(s, assignment, user, session) }
+      else
+        hash['submission'] = submission_json(submission, assignment, user, session)
+      end
     end
 
     if opts[:bucket]

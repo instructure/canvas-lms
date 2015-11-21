@@ -56,8 +56,11 @@ describe Api::V1::User do
 
   context 'user_json' do
     it 'should support optionally providing the avatar if avatars are enabled' do
+      @student.account.set_service_availability(:avatars, false)
+      @student.account.save!
       expect(@test_api.user_json(@student, @admin, {}, ['avatar_url'], @course).has_key?("avatar_url")).to be_falsey
-      @test_api.services_enabled = [:avatars]
+      @student.account.set_service_availability(:avatars, true)
+      @student.account.save!
       expect(@test_api.user_json(@student, @admin, {}, [], @course).has_key?("avatar_url")).to be_falsey
       expect(@test_api.user_json(@student, @admin, {}, ['avatar_url'], @course)["avatar_url"]).to match(
         %r{^https://secure.gravatar.com/avatar/#{Digest::MD5.hexdigest(@student.email)}.*#{CGI.escape("/images/messages/avatar-50.png")}}

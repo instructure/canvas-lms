@@ -37,6 +37,9 @@ module Api::V1::SubmissionComment
     if submission_comment.grants_right?(@current_user, :read_author)
       sc_hash['author'] = user_display_json(submission_comment.author, submission_comment.context)
     else
+      if sc_hash.delete('avatar_path')
+        sc_hash['avatar_path'] = User.default_avatar_fallback
+      end
       sc_hash.merge!({
                       author: {},
                       author_id: nil,

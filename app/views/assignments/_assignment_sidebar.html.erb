@@ -1,5 +1,5 @@
 <div id="sidebar_content">
-  <% if can_do(@assignment, @current_user, :grade) %>
+  <% if @can_view_grades || @can_grade %>
     <%= render :partial => "grade_assignment" %>
   <% end %>
 

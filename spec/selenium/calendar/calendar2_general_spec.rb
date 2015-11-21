@@ -109,7 +109,7 @@ describe "calendar2" do
     it "should make an assignment undated if you delete the start date" do
       create_middle_day_assignment("undate me")
       keep_trying_until do
-        fj('.fc-event-inner').click()
+        fj('.fc-event').click()
         driver.execute_script("$('.popover-links-holder .edit_event_link').hover().click()")
         f('.ui-dialog #assignment_due_at').displayed?
       end
@@ -225,16 +225,6 @@ describe "calendar2" do
         expect(f("#context-list li[data-context=course_#{@course.id}]")).to have_class('not-checked')
         expect(f("#context-list li[data-context=user_#{@user.id}]")).to have_class('not-checked')
       end
-    end
-
-    it "tooltip is correct for creating new event", priority: "1", test_id: 138852 do
-     load_month_view
-
-      driver.mouse.move_to f("#create_new_event_link")
-      wait_for_animations
-      tooltip = fj('.ui-tooltip:visible')
-      tooltip = fj('.ui-tooltip:visible')
-      expect(tooltip).to include_text 'Create New Event'
     end
 
     it "graded discussion appears on all calendars", priority: "1", test_id: 138851 do

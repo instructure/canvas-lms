@@ -10,50 +10,34 @@ describe 'quizzes with draft state' do
     @course.update_attributes(name: 'teacher course')
     @course.save!
     @course.reload
+    create_quiz_with_due_date
   end
 
-  it 'clicking the unpublish button unpublishes a quiz', priority: "1", test_id: 210052 do
-    @context = @course
-    q = quiz_model
-    q.publish!
-
-    get "/courses/#{@course.id}/quizzes/#{q.id}"
-    expect(f('#quiz-publish-link')).to include_text('Published')
-
-    expect_new_page_load do
-      f('.quiz-publish-button').click
-      wait_for_ajaximations
-    end
-
-    # move mouse to not be hover over the button
-    driver.mouse.move_to f('#footer')
-
-    keep_trying_until do
-      expect(f('#quiz-publish-link')).not_to include_text('Published')
-      expect(f('#quiz-publish-link')).to include_text('Publish')
+  context 'when there is a single due date' do
+    it 'doesn\'t display "Multiple Dates"' do
+      get "/courses/#{@course.id}/quizzes"
+      expect(f('.ig-details .date-due')).not_to include_text 'Multiple Dates'
+      expect(f('.ig-details .date-available')).not_to include_text 'Multiple Dates'
     end
   end
 
   context 'when there are multiple due dates' do
+    before(:each) { add_due_date_override(@quiz) }
 
     it 'shows a due date summary', priority: "2", test_id: 210053 do
-      create_quiz_with_due_date
-      get "/courses/#{@course.id}/quizzes"
-      expect(f('.ig-details .date-due')).not_to include_text 'Multiple Dates'
-      expect(f('.ig-details .date-available')).not_to include_text 'Multiple Dates'
-
-      add_due_date_override(@quiz)
-
+      # verify page
       get "/courses/#{@course.id}/quizzes"
       expect(f('.ig-details .date-due')).to include_text 'Multiple Dates'
-      driver.mouse.move_to f('.ig-details .date-due a')
+      expect(f('.ig-details .date-available')).to include_text 'Multiple Dates'
+
+      # verify tooltips
+      driver.mouse.move_to f('.ig-details .date-available a')
       wait_for_ajaximations
       tooltip = fj('.ui-tooltip:visible')
       expect(tooltip).to include_text 'New Section'
       expect(tooltip).to include_text 'Everyone else'
 
-      expect(f('.ig-details .date-available')).to include_text 'Multiple Dates'
-      driver.mouse.move_to f('.ig-details .date-available a')
+      driver.mouse.move_to f('.ig-details .date-due a')
       wait_for_ajaximations
       tooltip = fj('.ui-tooltip:visible')
       expect(tooltip).to include_text 'New Section'

@@ -1,5 +1,3 @@
-/** @jsx */
-
 define([
   'react',
   'underscore',

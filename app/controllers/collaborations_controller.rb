@@ -103,13 +103,15 @@ class CollaborationsController < ApplicationController
           log_asset_access(@collaboration, "collaborations", "other", 'participate')
           redirect_to @collaboration.url
         elsif @collaboration.is_a?(GoogleDocsCollaboration)
-          redirect_to oauth_url(:service => :google_docs, :return_to => request.url)
+          redirect_to oauth_url(:service => :google_drive, :return_to => request.url)
         else
           flash[:error] = t 'errors.cannot_load_collaboration', "Cannot load collaboration"
           redirect_to named_context_url(@context, :context_collaborations_url)
         end
       rescue GoogleDocs::DriveConnectionException => drive_exception
         Canvas::Errors.capture(drive_exception)
+        flash[:error] = t 'errors.cannot_load_collaboration', "Cannot load collaboration"
+        redirect_to named_context_url(@context, :context_collaborations_url)
       end
     end
   end

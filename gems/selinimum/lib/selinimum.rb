@@ -1,8 +1,4 @@
 module Selinimum
-  class SelinimumError < StandardError; end
-  class UnknownDependenciesError < SelinimumError; end
-  class TooManyDependenciesError < SelinimumError; end
-
   def self.minimize!(spec_files, options = {})
     sha = options.delete(:sha)
     json_path = options.delete(:json_path)
@@ -31,8 +27,12 @@ module Selinimum
   def self.detectors
     [
       Selinimum::Detectors::RubyDetector.new,
-      Selinimum::Detectors::WhitelistDetector.new
-      # TODO: JSDetector et al once they work
+      Selinimum::Detectors::WhitelistDetector.new,
+      Selinimum::Detectors::JSDetector.new,
+      Selinimum::Detectors::JSXDetector.new,
+      Selinimum::Detectors::CSSDetector.new,
+      Selinimum::Detectors::CoffeeDetector.new,
+      Selinimum::Detectors::HandlebarsDetector.new
     ]
   end
 
@@ -52,6 +52,7 @@ module Selinimum
 end
 
 require_relative "selinimum/capture"
+require_relative "selinimum/errors"
 require_relative "selinimum/git"
 require_relative "selinimum/minimizer"
 require_relative "selinimum/stat_store"
