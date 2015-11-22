@@ -86,7 +86,6 @@ gem 'ruby-duration', '3.2.0', require: false
 gem 'ruby-saml-mod', '0.2.7'
 gem 'rubycas-client', '2.3.9', require: false
 gem 'rubyzip', '1.1.1', require: 'zip'
-gem 'zip-zip', '0.2' # needed until plugins use the new namespace
 gem 'safe_yaml', '0.9.7', require: false
 gem 'safe_yaml-instructure', '0.8.0', require: false
   gem 'hashie', '2.0.5', require: false
