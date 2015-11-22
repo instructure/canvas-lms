@@ -108,7 +108,7 @@ define([
         $lastSaved.text(I18n.t('saving', 'Saving...'));
         var url = $(".backup_quiz_submission_url").attr('href');
         // If called before leaving the page (ie. onbeforeunload), we can't use any async or FF will kill the PUT request.
-        data.leaving = windowUnload;
+        data.leaving = !!windowUnload && !this.oneAtATime;
         if (beforeLeave){
           $.flashMessage(I18n.t('saving', 'Saving...'));
           $.ajax({
