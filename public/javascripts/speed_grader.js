@@ -1429,14 +1429,23 @@ define([
       clearInterval(crocodocSessionTimer);
 
       function currentIndex (context, submissionToViewVal) {
+        var result;
         if (submissionToViewVal) {
-          return Number(submissionToViewVal) - 1
+          result = Number(submissionToViewVal);
         } else if (context.currentStudent && context.currentStudent.submission &&
                    context.currentStudent.submission.currentSelectedIndex ) {
-          return context.currentStudent.submission.currentSelectedIndex - 1
+          result = context.currentStudent.submission.currentSelectedIndex;
         } else {
-          return 0
+          result = 0;
         }
+
+        // For some reason, assignments and other submissions fill the
+        // select dropdown with 0 based values. Quizzes started with 1.
+        if (jsonData.context.quiz && result > 0) {
+          result = result - 1;
+        }
+
+        return result;
       };
 
       var $submission_to_view = $("#submission_to_view"),
