@@ -535,6 +535,18 @@ describe User do
       ]
     end
 
+    it "includes invitations to temporary users" do
+      user1 = user
+      user2 = user
+      c1 = course(name: 'a', active_course: true)
+      e = c1.enroll_teacher(user1)
+      user2.stubs(:temporary_invitations).returns([e])
+      c2 = course(name: 'b', active_course: true)
+      c2.enroll_user(user2)
+
+      expect(user2.courses_with_primary_enrollment.map(&:id)).to eq [c1.id, c2.id]
+    end
+
     describe 'with cross sharding' do
       specs_require_sharding
 
