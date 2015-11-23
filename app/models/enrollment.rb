@@ -837,6 +837,10 @@ class Enrollment < ActiveRecord::Base
     Enrollment.workflow_readable_type(self.workflow_state)
   end
 
+  def readable_role_name
+    self.role.built_in? ? self.readable_type : self.role.name
+  end
+
   def readable_type
     Enrollment.readable_type(self.class.to_s)
   end
