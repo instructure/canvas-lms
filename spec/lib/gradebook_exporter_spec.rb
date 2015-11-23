@@ -43,20 +43,21 @@ describe GradebookExporter do
         expect(CSV.parse(subject).count).to be 2
       end
 
-      it "is a csv with seven columns" do
-        expect(CSV.parse(subject).transpose.count).to be 7
+      it "is a csv with eight columns" do
+        expect(CSV.parse(subject).transpose.count).to be 8
       end
 
       describe "default headers order" do
-        let(:headers)   { CSV.parse(subject, headers: true).headers }
+        let(:headers) { CSV.parse(subject, headers: true).headers }
 
-        it("first column")    { expect(headers[0]).to eq "Student" }
-        it("second column")   { expect(headers[1]).to eq "ID" }
-        it("third column")    { expect(headers[2]).to eq "Section"  }
-        it("fourth column")   { expect(headers[3]).to eq "Current Points" }
-        it("fifth column")    { expect(headers[4]).to eq "Final Points" }
-        it("sixth column")    { expect(headers[5]).to eq "Current Score" }
-        it("seventh column")  { expect(headers[6]).to eq "Final Score" }
+        it("first column") { expect(headers[0]).to eq "Student" }
+        it("second column") { expect(headers[1]).to eq "ID" }
+        it("third column") { expect(headers[2]).to eq "SIS Login ID" }
+        it("fourth column") { expect(headers[3]).to eq "Section" }
+        it("fifth column") { expect(headers[4]).to eq "Current Points" }
+        it("sixth column") { expect(headers[5]).to eq "Final Points" }
+        it("seventh column") { expect(headers[6]).to eq "Current Score" }
+        it("eigth column") { expect(headers[7]).to eq "Final Score" }
       end
     end
 

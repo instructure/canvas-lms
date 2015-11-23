@@ -1010,7 +1010,7 @@ describe Course, "gradebook_to_csv" do
     a = @course.assignments.create! name: "asdf", points_possible: 10
     a.grade_student @student, excuse: true
     csv = CSV.parse(GradebookExporter.new(@course, @teacher).to_csv)
-    _name, _id, _section, score, _ = csv[-1]
+    _name, _id, _section, _sis_login_id, score, _ = csv[-1]
     expect(score).to eq "EX"
   end
 
@@ -1032,9 +1032,9 @@ describe Course, "gradebook_to_csv" do
     expect(csv).not_to be_nil
     rows = CSV.parse(csv)
     expect(rows.length).to equal(5)
-    expect(rows[2][2]).to eq "COMPSCI 123 DIS 101 and COMPSCI 123 LEC 001"
-    expect(rows[3][2]).to eq "COMPSCI 123 LEC 001"
-    expect(rows[4][2]).to eq "COMPSCI 123 DIS 101, COMPSCI 123 DIS 102, and COMPSCI 123 LEC 001"
+    expect(rows[2][3]).to eq "COMPSCI 123 DIS 101 and COMPSCI 123 LEC 001"
+    expect(rows[3][3]).to eq "COMPSCI 123 LEC 001"
+    expect(rows[4][3]).to eq "COMPSCI 123 DIS 101, COMPSCI 123 DIS 102, and COMPSCI 123 LEC 001"
   end
 
   it "should generate csv with final grade if enabled" do
@@ -1283,7 +1283,7 @@ describe Course, "gradebook_to_csv" do
     a.publish
     a.grade_student(@student, grade: "C")
     rows = CSV.parse(GradebookExporter.new(@course, @teacher).to_csv)
-    expect(rows[2][3]).to eql "C"
+    expect(rows[2][4]).to eql "C"
   end
 
   context "differentiated assignments" do
@@ -1315,14 +1315,14 @@ describe Course, "gradebook_to_csv" do
       csv = GradebookExporter.new(@course, @teacher).to_csv
       expect(csv).not_to be_nil
       rows = CSV.parse(csv)
-      expect(rows[2][3]).to eq "3"
-      expect(rows[2][4]).to eq "N/A"
+      expect(rows[2][4]).to eq "3"
+      expect(rows[2][5]).to eq "N/A"
 
-      expect(rows[3][3]).to eq "N/A"
-      expect(rows[3][4]).to eq "3"
+      expect(rows[3][4]).to eq "N/A"
+      expect(rows[3][5]).to eq "3"
 
-      expect(rows[4][3]).to eq "N/A"
       expect(rows[4][4]).to eq "N/A"
+      expect(rows[4][5]).to eq "N/A"
     end
   end
 end

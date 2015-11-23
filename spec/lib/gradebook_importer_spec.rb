@@ -218,6 +218,17 @@ describe GradebookImporter do
     expect(@gi.missing_assignments).to eq [@assignment3]
   end
 
+  it "should parse CSVs with the SIS Login ID column" do
+    course = course_model
+    user = user_model
+    progress = Progress.create!(tag: "test", context: @user)
+    importer = GradebookImporter.new(
+      course, valid_gradebook_contents_with_sis_login_id, user, progress
+    )
+
+    expect{importer.parse!}.not_to raise_error
+  end
+
   it "should not include missing assignments if no new assignments" do
     course_model
     @assignment1 = @course.assignments.create!(:name => 'Assignment 1')
@@ -578,6 +589,10 @@ end
 
 def valid_gradebook_contents
   @contents ||= File.read(File.join(File.dirname(__FILE__), %w(.. fixtures gradebooks basic_course.csv)))
+end
+
+def valid_gradebook_contents_with_sis_login_id
+  File.read(File.join(File.dirname(__FILE__), %w(.. fixtures gradebooks basic_course_with_sis_login_id.csv)))
 end
 
 def importer_with_rows(*rows)
