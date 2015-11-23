@@ -1,4 +1,5 @@
-require File.expand_path(File.dirname(__FILE__) + '/helpers/manage_groups_common')
+require_relative 'helpers/groups_common'
+require_relative 'helpers/manage_groups_common'
 require 'thread'
 
 describe "manage groups" do
