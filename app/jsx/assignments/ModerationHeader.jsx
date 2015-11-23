@@ -24,7 +24,7 @@ define([
         return (
 
           <div className="ic-notification">
-            <div className="ic-notification__icon" role="presentation">
+            <div className="ic-notification__icon" aria-hidden='true' role="presentation">
               <i className="icon-info"></i>
             </div>
             <div className="ic-notification__content">
