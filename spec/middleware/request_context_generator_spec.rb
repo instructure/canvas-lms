@@ -73,4 +73,16 @@ describe "RequestContextGenerator" do
     }).call(env)
     expect(headers['X-Session-Id']).to eq 'abc'
   end
+
+  it "should calculate the 'queued' time if header is passed" do
+    Timecop.freeze do
+      Thread.current[:context] = nil
+      env['HTTP_X_REQUEST_START'] = "t=#{1.minute.ago.to_f * 1000000}"
+      _, headers, _ = RequestContextGenerator.new(->(env) {
+        [200, {}, []]
+      }).call(env)
+      q = headers["X-Canvas-Meta"].match(/q=(\d+)/)[1].to_f
+      expect(q / 1000000).to eq 60.0
+    end
+  end
 end
