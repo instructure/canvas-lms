@@ -70,8 +70,8 @@ define [
     selectMenu.appendTo('#test_area', (e)->
       fired = true
     )
-    event = document.createEvent('Event')
-    event.initEvent("keyup", true, true)
+    event = new Event('keyup')
+    event.keyCode = 37
 
     document.getElementById('students_selectmenu').dispatchEvent(event)
     equal(fired, true)
