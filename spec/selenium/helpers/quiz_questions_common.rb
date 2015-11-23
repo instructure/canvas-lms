@@ -16,11 +16,11 @@ module QuizQuestionsCommon
       @quiz.workflow_state = "available"
       @quiz.generate_quiz_data
     end
-    @quiz.published_at = Time.now
+    @quiz.published_at = Time.zone.now
     @quiz.save!
   end
 
-  def quiz_question(name, question, id)
+  def quiz_question(name, question, _id)
     answers = [
       {:weight=>100, :answer_text=>"A", :answer_comments=>"", :id=>1490},
       {:weight=>0, :answer_text=>"B", :answer_comments=>"", :id=>1020},

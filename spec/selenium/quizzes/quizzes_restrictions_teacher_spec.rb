@@ -10,6 +10,17 @@ describe 'quiz restrictions as a teacher' do
   end
 
   context 'restrict access code' do
+    let(:access_code) { '1234' }
+    let(:quiz_with_access_code) do
+      @context = @course
+      quiz = quiz_model
+      quiz.quiz_questions.create! question_data: true_false_question_data
+      quiz.access_code = access_code
+      quiz.generate_quiz_data
+      quiz.save!
+      quiz.reload
+    end
+
     it 'should have a checkbox on the quiz creation page', priority: "1", test_id: 474273 do
       get "/courses/#{@course.id}/quizzes/new"
       expect('#enable_quiz_access_code').to be
@@ -46,13 +57,16 @@ describe 'quiz restrictions as a teacher' do
     end
 
     it 'should show the access code on the show page', priority: "1", test_id: 474277 do
-      @quiz = course_quiz
-      @quiz.access_code = 'threepwood'
-      @quiz.save!
+      @quiz = quiz_with_access_code
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
       show_page = f('#quiz_show')
       expect(show_page).to include_text('Access Code')
-      expect(show_page).to include_text('threepwood')
+      expect(show_page).to include_text(access_code)
+    end
+
+    it 'allows previewing the quiz', priority: "1", test_id: 522900 do
+      @quiz = quiz_with_access_code
+      preview_quiz
     end
   end
 

@@ -225,6 +225,16 @@ module QuizzesCommon
     Quizzes::Quiz.last
   end
 
+  def select_question_from_column_links(question_id)
+    f("#list_question_#{question_id} > a:nth-child(1)").click
+    wait_for_ajaximations
+  end
+
+  def answer_question(question_answer_id)
+    fj("input[type=radio][value=#{question_answer_id}]").click
+    wait_for_js
+  end
+
   def take_quiz
     @quiz ||= quiz_with_new_questions(!:goto_edit)
     begin_quiz
@@ -249,10 +259,7 @@ module QuizzesCommon
       @quiz.stored_questions[0][:answers][0][:id]
     end
 
-    if answer
-      fj("input[type=radio][value=#{answer}]").click
-      wait_for_js
-    end
+    answer_question(answer) if answer
 
     submit_quiz if submit
   end
@@ -277,6 +284,26 @@ module QuizzesCommon
     keep_trying_until do
       expect(f('.quiz-submission .quiz_score .score_value')).to be_truthy
     end
+  end
+
+  def preview_quiz(submit=true)
+    get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
+
+    expect_new_page_load { f('#preview_quiz_button').click }
+
+    # sleep because display is updated on timer, not ajax callback
+    sleep 1
+
+    answer =
+      if block_given?
+        yield(@quiz.stored_questions[0][:answers])
+      else
+        @quiz.stored_questions[0][:answers][0][:id]
+      end
+
+    answer_question(answer) if answer
+
+    submit_quiz if submit
   end
 
   def answer_questions_and_submit(quiz, num_questions, submit = true)
