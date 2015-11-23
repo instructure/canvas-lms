@@ -525,8 +525,10 @@ class Account < ActiveRecord::Base
   end
 
   def self.invalidate_cache(id)
+    return unless id
+    birth_id = Shard.relative_id_for(id, Shard.current, Shard.birth)
     Shard.birth.activate do
-      Rails.cache.delete(account_lookup_cache_key(id)) if id
+      Rails.cache.delete(account_lookup_cache_key(birth_id)) if birth_id
     end
   rescue
     nil

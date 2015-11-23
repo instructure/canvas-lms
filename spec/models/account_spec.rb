@@ -20,17 +20,6 @@ require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 
 describe Account do
 
-  describe ".find_cached" do
-    specs_require_sharding
-
-    it "works relative to a different shard" do
-      @shard1.activate do
-        a = Account.create!
-        expect(Account.find_cached(a.id)).to eq a
-      end
-    end
-  end
-
   it "should provide a list of courses" do
     expect{ Account.new.courses }.not_to raise_error
   end
@@ -1407,4 +1396,30 @@ describe Account do
       end
     end
   end
+
+  context "account cache" do
+    specs_require_sharding
+
+    describe ".find_cached" do
+      it "works relative to a different shard" do
+        @shard1.activate do
+          a = Account.create!
+          expect(Account.find_cached(a.id)).to eq a
+        end
+      end
+    end
+
+    describe ".invalidate_cache" do
+      it "works relative to a different shard" do
+        enable_cache do
+          @shard1.activate do
+            a = Account.create!
+            Account.find_cached(a.id) # set the cache
+            expect(Account.invalidate_cache(a.id)).to eq true
+          end
+        end
+      end
+    end
+  end
+
 end
