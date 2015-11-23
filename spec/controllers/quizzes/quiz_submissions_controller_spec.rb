@@ -40,6 +40,14 @@ describe Quizzes::QuizSubmissionsController do
       expect(response).to be_redirect
     end
 
+    it "should allow previewing a quiz with an access code" do
+      user_session(@teacher)
+      @quiz.access_code = "12345"
+      @quiz.save!
+      post 'create', :course_id => @quiz.context_id, :quiz_id => @quiz.id, :preview => 1
+      expect(response).to be_redirect
+    end
+
     it "should not break trying to sanitize parameters of an already submitted quiz" do
       user_session(@student)
       @quiz.one_question_at_a_time = true

@@ -182,7 +182,8 @@ class Quizzes::QuizSubmissionsController < ApplicationController
   protected
 
   def delete_session_access_key!
-    session[:quiz_access_code].delete(@quiz.id) if @quiz.access_code.present?
+    return unless session[:quiz_access_code] && @quiz.access_code.present?
+    session[:quiz_access_code].delete(@quiz.id)
   end
 
   def is_previewing?
