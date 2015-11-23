@@ -60,7 +60,7 @@ module Api::V1::User
           json[:login_id] = pseudonym.unique_id
         end
       end
-      if user.account.service_enabled?(:avatars) && includes.include?('avatar_url')
+      if includes.include?('avatar_url') && user.account.service_enabled?(:avatars)
         json[:avatar_url] = avatar_url_for_user(user, blank_fallback)
       end
       if enrollments
