@@ -816,7 +816,7 @@ class Submission < ActiveRecord::Base
   end
 
   def attachments
-    Attachment.where(:id => self.attachment_associations.map(&:attachment_id))
+    Attachment.where(:id => self.attachment_associations.pluck(:attachment_id))
   end
 
   def attachments=(attachments)
