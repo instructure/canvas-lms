@@ -861,6 +861,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     return false if finished_at.blank?
     return false if due_at.blank?
 
-    finished_at > due_at
+    check_time = finished_at - 60.seconds
+    check_time > due_at
   end
 end

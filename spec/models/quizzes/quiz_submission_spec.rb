@@ -1573,8 +1573,8 @@ describe Quizzes::QuizSubmission do
         expect(quiz_submission.late?).to eq false
       end
 
-      it "is not late when on turned in exactly at the due date" do
-        quiz_submission.finished_at = 3.days.ago(now)
+      it "is not late when turned in at the due date" do
+        quiz_submission.finished_at = 3.days.ago(now) + 60.seconds
         quiz_submission.save
 
         expect(quiz_submission.late?).to eq false
