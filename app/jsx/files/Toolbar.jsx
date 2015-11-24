@@ -146,8 +146,8 @@ define([
           disabled= {!this.showingButtons}
           className= 'ui-button btn-restrict'
           onClick= {this.openRestrictedDialog}
-          title= {I18n.t('Restrict Access')}
-          ariaLabel= {I18n.t('Restrict Access')}
+          title= {I18n.t('Manage Access')}
+          ariaLabel= {I18n.t('Manage Access')}
           dataTooltip= ''
         >
           <i className= 'icon-cloud-lock' />
