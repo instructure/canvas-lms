@@ -3173,7 +3173,7 @@ describe 'Submissions API', type: :request do
 
       grade_data = {
         :grade_data => {
-          @student1.id => { :posted_grade => '75%'},
+          @student1.id => { :posted_grade => '75%' },
           @student2.id => {
             :rubric_assessment => {
               :crit1 => { :points => 7 },
@@ -3260,6 +3260,44 @@ describe 'Submissions API', type: :request do
       progress = Progress.find(json["id"])
       expect(progress.failed?).to be_truthy
       expect(progress.message).to eq "Couldn't find User(s) with API ids '#{@student2.id}'"
+    end
+
+    it "should maintain grade when updating comments" do
+      @a1.grade_student(@student1, :grade => '5%')
+
+      grade_data = {
+        :grade_data => {
+          @student1.id => { :text_comment => "Awesome comment" }
+        }
+      }
+      api_call(:post,
+        "/api/v1/sections/#{@section.id}/assignments/#{@a1.id}/submissions/update_grades",
+        { :controller => 'submissions_api', :action => 'bulk_update',
+          :format => 'json', :section_id => @section.id.to_s,
+          :assignment_id => @a1.id.to_s }, grade_data)
+
+      run_jobs
+      s1 = @student1.submissions.first
+      expect(s1.grade).to eq '5%'
+    end
+
+    it "should nil grade when receiving empty posted_grade" do
+      @a1.grade_student(@student1, :grade => '5%')
+
+      grade_data = {
+        :grade_data => {
+          @student1.id => { :posted_grade => nil }
+        }
+      }
+      api_call(:post,
+        "/api/v1/sections/#{@section.id}/assignments/#{@a1.id}/submissions/update_grades",
+        { :controller => 'submissions_api', :action => 'bulk_update',
+          :format => 'json', :section_id => @section.id.to_s,
+          :assignment_id => @a1.id.to_s }, grade_data)
+
+      run_jobs
+      s1 = @student1.submissions.first
+      expect(s1.grade).to be_nil
     end
   end
 

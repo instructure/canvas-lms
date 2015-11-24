@@ -1230,6 +1230,30 @@ describe Submission do
       expect(@a2.submission_for_student(@u1).grade).to eql "10"
       expect(@a2.submission_for_student(@u2).grade).to eql "5"
     end
+
+    it "should maintain grade when only updating comments" do
+      @a1.grade_student(@u1, :grade => 3)
+      Submission.process_bulk_update(@progress, @course, nil, @teacher,
+                                     {
+                                       @a1.id => {
+                                         @u1.id => {text_comment: "comment"}
+                                       }
+                                     })
+
+      expect(@a1.submission_for_student(@u1).grade).to eql "3"
+    end
+
+    it "should nil grade when receiving empty posted_grade" do
+      @a1.grade_student(@u1, :grade => 3)
+      Submission.process_bulk_update(@progress, @course, nil, @teacher,
+                                     {
+                                       @a1.id => {
+                                         @u1.id => {posted_grade: nil}
+                                       }
+                                     })
+
+      expect(@a1.submission_for_student(@u1).grade).to be_nil
+    end
   end
 
   describe 'crocodoc_whitelist' do

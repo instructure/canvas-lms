@@ -1399,7 +1399,9 @@ class Submission < ActiveRecord::Base
         scope = scope.where(:enrollments => { :course_section_id => section })
       end
 
-      preloaded_users = scope.where(:id => user_grades.map{|id, data| id})
+      user_ids = user_grades.map { |id, data| id }
+      preloaded_users = scope.where(:id => user_ids)
+      preloaded_submissions = assignment.submissions.where(user_id: user_ids).group_by(&:user_id)
 
       Delayed::Batch.serial_batch(:priority => Delayed::LOW_PRIORITY) do
         user_grades.each do |user_id, user_data|
@@ -1411,13 +1413,16 @@ class Submission < ActiveRecord::Base
             next
           end
 
-          submissions =
-            assignment.grade_student(user, :grader => grader,
-                                     :grade => user_data[:posted_grade],
-                                     :excuse => Canvas::Plugin.value_to_boolean(user_data[:excuse]),
-                                     :skip_grade_calc => true)
-          submissions.each { |s| graded_user_ids << s.user_id }
-          submission = submissions.first
+          submission = preloaded_submissions[user_id.to_i].first if preloaded_submissions[user_id.to_i]
+          if !submission || user_data.key?(:posted_grade) || user_data.key?(:excuse)
+            submissions =
+              assignment.grade_student(user, :grader => grader,
+                                       :grade => user_data[:posted_grade],
+                                       :excuse => Canvas::Plugin.value_to_boolean(user_data[:excuse]),
+                                       :skip_grade_calc => true)
+            submissions.each { |s| graded_user_ids << s.user_id }
+            submission = submissions.first
+          end
 
           assessment = user_data[:rubric_assessment]
           if assessment.is_a?(Hash) && assignment.rubric_association
