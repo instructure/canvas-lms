@@ -277,7 +277,8 @@ class Assignment < ActiveRecord::Base
               :schedule_do_auto_peer_review_job_if_automatic_peer_review,
               :delete_empty_abandoned_children,
               :validate_assignment_overrides,
-              :update_cached_due_dates
+              :update_cached_due_dates,
+              :touch_submissions_if_muted
 
   has_a_broadcast_policy
 
@@ -515,7 +516,16 @@ class Assignment < ActiveRecord::Base
     end
     tags_to_update.each { |tag| tag.context_module_action(user, action, points) }
   end
-  
+
+  # this is necessary to generate new permissions cache keys for students
+  def touch_submissions_if_muted
+    if muted_changed?
+      connection.after_transaction_commit do
+        submissions.touch_all
+      end
+    end
+  end
+
   # call this to perform notifications on an Assignment that is not being saved
   # (useful when a batch of overrides associated with a new assignment have been saved)
   def do_notifications!(prior_version=nil, notify=false)

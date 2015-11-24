@@ -3743,6 +3743,19 @@ describe Assignment do
       expect(info[:past_due]).to be_falsey
     end
   end
+
+  describe '#touch_submissions_if_muted' do
+    before(:once) do
+      @assignment = @course.assignments.create! points_possible: 10
+      @submission = @assignment.submit_homework(@student, body: "hello")
+    end
+
+    it "touches submissions if you mute the assignment" do
+      @assignment.mute!
+      touched = @submission.reload.updated_at > @assignment.updated_at
+      expect(touched).to eq true
+    end
+  end
 end
 
 def setup_assignment_with_group
