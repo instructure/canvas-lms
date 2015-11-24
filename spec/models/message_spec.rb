@@ -76,6 +76,25 @@ describe Message do
       expect(msg.subject).to include(@assignment.title)
     end
 
+    it "should default to the account time zone if the user has no time zone" do
+      original_time_zone = Time.zone
+      Time.zone = 'UTC'
+      course_with_teacher
+      account = @course.account
+      account.default_time_zone = 'Pretoria'
+      account.save!
+      due_at = Time.zone.parse('2014-06-06 11:59:59')
+      assignment_model(course: @course, due_at: due_at)
+      msg = generate_message(:assignment_created, :email, @assignment)
+
+      presenter = Utils::DatetimeRangePresenter.new(due_at, nil, :event, ActiveSupport::TimeZone.new('Pretoria'))
+      due_at_string = presenter.as_string(shorten_midnight: false)
+
+      expect(msg.body.include?(due_at_string)).to eq true
+      expect(msg.html_body.include?(due_at_string)).to eq true
+      Time.zone = original_time_zone
+    end
+
     it "should not html escape the user_name" do
       course_with_teacher
       @teacher.name = "For some reason my parent's gave me a name with an apostrophe"

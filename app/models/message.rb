@@ -274,6 +274,11 @@ class Message < ActiveRecord::Base
     end
   end
 
+  # infer a root account time zone
+  def root_account_time_zone
+    link_root_account.time_zone if link_root_account.respond_to?(:time_zone)
+  end
+
   # Internal: Store any transmission errors in the database to help with later
   # debugging.
   #
@@ -480,7 +485,7 @@ class Message < ActiveRecord::Base
 
     # Get the users timezone but maintain the original timezone in order to set it back at the end
     original_time_zone = Time.zone.name || "UTC"
-    user_time_zone     = self.user.try(:time_zone) || original_time_zone
+    user_time_zone     = self.user.try(:time_zone) || root_account_time_zone || original_time_zone
     Time.zone          = user_time_zone
 
     # (temporarily) override course name with user's nickname for the course
