@@ -70,17 +70,11 @@ class GradebooksController < ApplicationController
           @presenter.assignment_stats
         end
 
-        display_score_to_user = ->(submission) do
-          return false if submission.assignment.quiz? && submission.pending_review?
-          submission.user_can_read_grade?(@current_user)
-        end
-
-        submissions_json = @presenter.submissions.map do |submission|
-          {
-            'assignment_id' => submission.assignment_id,
-            'score' => display_score_to_user.call(submission) ? submission.score : "ungraded assignment"
-          }
-        end
+        submissions_json = @presenter.submissions.reject { |s|
+          s.pending_review? || !s.user_can_read_grade?(@current_user)
+        }.map { |s|
+          {"assignment_id" => s.assignment_id, "score" => s.score}
+        }
 
         ags_json = light_weight_ags_json(@presenter.groups, {student: @presenter.student})
         js_env submissions: submissions_json,
@@ -101,6 +95,7 @@ class GradebooksController < ApplicationController
   def light_weight_ags_json(assignment_groups, opts={})
     assignment_groups.map do |ag|
       visible_assignments = ag.visible_assignments(opts[:student] || @current_user)
+                              .reject(&:muted?)
 
       if multiple_grading_periods? && @current_grading_period_id && !view_all_grading_periods?
         current_period = GradingPeriod.context_find(@context, @current_grading_period_id)
