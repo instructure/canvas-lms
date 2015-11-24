@@ -183,9 +183,15 @@ module WikiAndTinyCommon
     f("div[aria-label=\'#{button_aria}\'] button").click
   end
 
-  def click_tiny_dropdown(button_aria, mce_color)
-    f("[aria-label=\'#{button_aria}\'] .mce-open").send_keys(:shift) # no content but gives the italic button focus
-    f("[aria-label=\'#{button_aria}\'] .mce-open").click
+  def click_tiny_dropdown(color_or_bgcolor, mce_color)
+    ind = nil
+    if color_or_bgcolor == "color"
+      ind = 0
+    elsif color_or_bgcolor == "bgcolor"
+      ind = 1
+    end
+    ff(".mce-open")[ind].send_keys(:shift) # no content but gives the italic button focus
+    ff(".mce-open")[ind].click
     f("div[data-mce-color=\'#{mce_color}\']").click
   end
 end

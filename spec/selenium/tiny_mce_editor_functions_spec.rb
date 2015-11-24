@@ -105,7 +105,7 @@ describe "Tiny MCE editor functions" do
       p = create_wiki_page("test_page", false, "public")
       get "/courses/#{@course.id}/pages/#{p.title}/edit"
 
-      click_tiny_dropdown('Text Color, press down to select', '#800080')
+      click_tiny_dropdown('color', '#800080')
       type_in_tiny('textarea.body', "this should be typed in purple")
       f("form.edit-form button.submit").click
       wait_for_ajaximations
@@ -122,13 +122,43 @@ describe "Tiny MCE editor functions" do
       get "/courses/#{@course.id}/pages/#{p.title}/edit"
 
       select_all_wiki
-      click_tiny_dropdown('Text Color, press down to select', 'transparent')
+      click_tiny_dropdown('color', 'transparent')
       f("form.edit-form button.submit").click
       wait_for_ajaximations
 
       p.reload
       # To avoid fragility of extra formatting characters being added, I just want the first 44 characters
       expect(p.body[0..43]).to eq "<p>the purple should be changed to black</p>"
+    end
+
+    it "should change background color on wiki description", priority: "1", test_id: 298747 do
+      p = create_wiki_page("test_page", false, "public")
+      get "/courses/#{@course.id}/pages/#{p.title}/edit"
+
+      click_tiny_dropdown('bgcolor', '#33CCCC')
+      type_in_tiny('textarea.body', "the background should be turquoise")
+      f("form.edit-form button.submit").click
+      wait_for_ajaximations
+
+      p.reload
+      # To avoid fragility of extra formatting characters being added, I just want the first 91 characters
+      expect(p.body[0..90]).to eq "<p><span style=\"background-color: #33cccc;\">the background should be turquoise</span></p>"
+    end
+
+    it "should remove background color on wiki description", priority: "1", test_id: 474035 do
+      p = create_wiki_page("test_page", false, "public")
+      p.body = "<p><span style=\"background-color: #33cccc;\">the turquoise should be removed</span></p>"
+      p.save!
+      get "/courses/#{@course.id}/pages/#{p.title}/edit"
+
+      select_all_wiki
+      click_tiny_dropdown('bgcolor', 'transparent')
+      f("form.edit-form button.submit").click
+      wait_for_ajaximations
+
+      p.reload
+      # To avoid fragility of extra formatting characters being added, I just want the first 38 characters
+      expect(p.body[0..37]).to eq "<p>the turquoise should be removed</p>"
     end
   end
 end
