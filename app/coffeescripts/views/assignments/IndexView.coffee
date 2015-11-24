@@ -113,7 +113,7 @@ define [
 
     ensureContentStyle: ->
       # when loaded from homepage, need to change content style
-      if window.location.href.indexOf('assignments') == -1
+      if !@canManage() && window.location.href.indexOf('assignments') == -1
         $("#content").css("padding", "0em")
 
     filterKeyBindings: =>

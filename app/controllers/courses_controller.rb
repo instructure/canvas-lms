@@ -1583,7 +1583,8 @@ class CoursesController < ApplicationController
         @padless = true
       when 'assignments'
         add_crumb(t('#crumbs.assignments', "Assignments"))
-        set_urls_and_permissions_for_assignment_index
+        set_js_assignment_data
+        js_env(:COURSE_HOME => true)
         get_sorted_assignments
       when 'modules'
         add_crumb(t('#crumbs.modules', "Modules"))
@@ -2331,22 +2332,6 @@ class CoursesController < ApplicationController
     end
 
     changes
-  end
-
-  def set_urls_and_permissions_for_assignment_index
-    permissions = {manage: false}
-    js_env({
-      :COURSE_HOME => true,
-      :URLS => {
-        :new_assignment_url => new_polymorphic_url([@context, :assignment]),
-        :course_url => api_v1_course_url(@context),
-        :context_modules_url => api_v1_course_context_modules_path(@context),
-        :course_student_submissions_url => api_v1_course_student_submissions_url(@context)
-      },
-      :PERMISSIONS => permissions,
-      :current_user_has_been_observer_in_this_course => @context.user_has_been_observer?(@current_user),
-      :observed_student_ids => ObserverEnrollment.observed_student_ids(@context, @current_user)
-    })
   end
 
   def ping

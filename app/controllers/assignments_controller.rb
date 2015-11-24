@@ -43,29 +43,7 @@ class AssignmentsController < ApplicationController
       # It'd be nice to do this as an after_create, but it's not that simple
       # because of course import/copy.
       @context.require_assignment_group
-
-      rights = [:manage_assignments, :manage_grades, :read_grades]
-      permissions = @context.rights_status(@current_user, *rights)
-      permissions[:manage] = permissions[:manage_assignments]
-      js_env({
-        :URLS => {
-          :new_assignment_url => new_polymorphic_url([@context, :assignment]),
-          :course_url => api_v1_course_url(@context),
-          :sort_url => reorder_course_assignment_groups_url,
-          :assignment_sort_base_url => course_assignment_groups_url,
-          :context_modules_url => api_v1_course_context_modules_path(@context),
-          :course_student_submissions_url => api_v1_course_student_submissions_url(@context)
-        },
-        :PERMISSIONS => permissions,
-        :DIFFERENTIATED_ASSIGNMENTS_ENABLED => @context.feature_enabled?(:differentiated_assignments),
-        :VALID_DATE_RANGE => CourseDateRange.new(@context),
-        :assignment_menu_tools => external_tools_display_hashes(:assignment_menu),
-        :discussion_topic_menu_tools => external_tools_display_hashes(:discussion_topic_menu),
-        :quiz_menu_tools => external_tools_display_hashes(:quiz_menu),
-        :current_user_has_been_observer_in_this_course => @context.user_has_been_observer?(@current_user),
-        :observed_student_ids => ObserverEnrollment.observed_student_ids(@context, @current_user)
-      })
-
+      set_js_assignment_data # in application_controller.rb, because the assignments page can be shared with the course home
 
       respond_to do |format|
         format.html do
