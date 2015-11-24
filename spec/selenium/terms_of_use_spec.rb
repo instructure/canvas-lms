@@ -35,6 +35,26 @@ describe "terms of use test" do
     expect(f('.reaccept_terms')).not_to be_present
   end
 
+  it "should require users to check the box" do
+    account = Account.default
+    account.settings[:terms_changed_at] = Time.now.utc
+    account.save!
+    login_as
+    form = f('.reaccept_terms')
+    expect(form).to be_present
+    submit_form form
+    wait_for_ajaximations
+
+    expect(ff('.error_box').any?(&:displayed?)).to be_truthy
+    expect(account.require_acceptance_of_terms?(@user.reload)).to be_truthy
+
+    expect_new_page_load {
+      f('[name="user[terms_of_use]"]').click
+      submit_form form
+    }
+    expect(account.require_acceptance_of_terms?(@user.reload)).to be_falsey
+  end
+
   it "should prevent them from using canvas if the terms have changed", priority: "1", test_id: 268934 do
     account = Account.default
     account.settings[:terms_changed_at] = Time.now.utc
