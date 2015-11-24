@@ -423,6 +423,24 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     expect(stats[:unique_submission_count]).to eq 0
   end
 
+  it 'should not show student names for anonymous submissions' do
+    student_in_course(:active_all => true)
+    q = @course.quizzes.create!
+    q.update_attributes(:published_at => Time.zone.now, :quiz_type => 'survey', :anonymous_submissions => true)
+    q.quiz_questions.create!(:question_data => {:name => 'q1', :points_possible => 1, 'question_type' => 'multiple_choice_question', 'answers' => [{'answer_text' => '', 'answer_html' => '<em>zero</em>', 'answer_weight' => '100'}, {'answer_text' => "", 'answer_html' => "<p>one</p>", 'answer_weight' => '0'}]})
+    q.generate_quiz_data
+    q.save
+    qs = q.generate_submission(@student)
+    qs.submission_data = {
+        "question_#{q.quiz_data[0][:id]}" => "#{q.quiz_data[0][:answers][0][:id]}"
+    }
+    Quizzes::SubmissionGrader.new(qs).grade_submission
+
+    stats = q.statistics
+
+    expect(stats[:questions].first.last[:user_ids].first).to eq nil
+  end
+
   it 'should not count student view submissions' do
     @course = course(active_all: true)
     fake_student = @course.student_view_student

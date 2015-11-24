@@ -30,9 +30,9 @@ module Api::V1::Submission
     hash = submission_attempt_json(submission, assignment, current_user, session, context)
 
     if includes.include?("submission_history")
-      if submission.quiz_submission && assignment.quiz
+      if submission.quiz_submission && assignment.quiz && !assignment.quiz.anonymous_survey?
         hash['submission_history'] = submission.quiz_submission.versions.map do |ver|
-          ver.model.submission.without_versioned_attachments do
+          ver.model.submission && ver.model.submission.without_versioned_attachments do
             quiz_submission_attempt_json(ver.model, assignment, current_user, session, context)
           end
         end

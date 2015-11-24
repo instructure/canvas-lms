@@ -4,6 +4,7 @@ define(function(require) {
   var _ = require('lodash');
   var SightedUserContent = require('jsx!canvas_quizzes/components/sighted_user_content');
   var UserListDialog = require('jsx!../user_list_dialog');
+  var I18n = require('i18n!quiz_statistics');
 
   var Answers = React.createClass({
     getDefaultProps: function() {
@@ -44,6 +45,9 @@ define(function(require) {
             <UserListDialog key={answer.id+answer.poolId} answer_id={answer.id} user_names={answer.user_names} />
           </div>
         );
+      }
+      else if(answer.responses > 0){
+        return( <div>{I18n.t('%{user_count} respondents',{user_count: answer.responses})}</div>)
       }
 
     }

@@ -134,8 +134,10 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
     submissions.each do |s|
       s.submission_data.each do |a|
         q_id = a[:question_id]
-        a[:user_id] = s.user_id || s.temporary_user_code
-        a[:user_name] = s.user.name
+        unless quiz.anonymous_survey?
+          a[:user_id] = s.user_id || s.temporary_user_code
+          a[:user_name] = s.user.name
+        end
         responses_for_question[q_id] ||= []
         responses_for_question[q_id] << a
       end
@@ -152,6 +154,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
       end
       if obj[:answers] && obj[:question_type] != 'text_only_question'
         stat = stats_for_question(obj, responses_for_question[obj[:id]], legacy)
+        stat[:answers].each{|a| a.delete(:user_names)} if anonymous?
         stats[:questions] << ['question', stat]
       end
     end
