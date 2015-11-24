@@ -419,7 +419,13 @@ class OutcomeResultsController < ApplicationController
     else
       if params[:outcome_ids]
         outcome_ids = Api.value_to_array(params[:outcome_ids]).map(&:to_i).uniq
-        @outcomes = ContentTag.learning_outcome_links.active.joins(:learning_outcome_content).where(content_id: outcome_ids).map(&:learning_outcome_content)
+        # outcomes themselves are not duped when moved into a new group, so we
+        # need to instead look at the uniqueness of the associating content tag's
+        # context and outcome id in order to ensure we get the correct result
+        # from the query without rendering the reject! check moot
+        @outcomes = ContentTag.learning_outcome_links.active.joins(:learning_outcome_content)
+          .where(content_id: outcome_ids, context_type: @context.class_name, context_id: @context.id)
+          .uniq_by{|tag| [tag.context, tag.content_id]}.map(&:learning_outcome_content)
         reject! "can only include id's of outcomes in the outcome context" if @outcomes.count != outcome_ids.count
       else
         @outcome_links = []
