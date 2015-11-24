@@ -15,7 +15,8 @@ describe "conversations new" do
     conversation_setup
     @s1 = user(name: "first student")
     @s2 = user(name: "second student")
-    [@s1, @s2].each { |s| @course.enroll_student(s).update_attribute(:workflow_state, 'active') }
+    @s3 = user(name: 'third student')
+    [@s1, @s2, @s3].each { |s| @course.enroll_student(s).update_attribute(:workflow_state, 'active') }
     cat = @course.group_categories.create(:name => "the groups")
     @group = cat.groups.create(:name => "the group", :context => @course)
     @group.users = [@s1, @s2]
@@ -76,11 +77,9 @@ describe "conversations new" do
 
     it "should be allowed on new private conversations with students", priority: "1", test_id: 207094 do
       compose course: @course, to: [@s1, @s2], body: 'hallo!', send: false
-
       checkbox = f(".user_note")
       expect(checkbox).to be_displayed
       checkbox.click
-
       count1 = @s1.user_notes.count
       count2 = @s2.user_notes.count
       click_send
@@ -90,11 +89,9 @@ describe "conversations new" do
 
     it "should be allowed with student groups", priority: "1", test_id: 207093 do
       compose course: @course, to: [@group], body: 'hallo!', send: false
-
       checkbox = f(".user_note")
       expect(checkbox).to be_displayed
       checkbox.click
-
       count1 = @s1.user_notes.count
       click_send
       expect(@s1.user_notes.reload.count).to eq count1 + 1
@@ -119,6 +116,39 @@ describe "conversations new" do
       expect(f(".user_note")).not_to be_displayed
     end
 
+    it "should have the Journal entry checkbox come back unchecked", priority: "1", test_id: 523385 do
+      f('#compose-btn').click
+      expect(f('.user_note')).not_to be_displayed
+      compose course: @course, to: [@s1], body: 'Give the Turkey his day', send: false
+      expect(f('.user_note')).to be_displayed
+      add_message_recipient(@s2)
+      checkbox = f('.user_note')
+      expect(checkbox).to be_displayed
+      checkbox.click
+      expect(is_checked('.user_note')).to be_present
+      hover_and_click('.ac-token-remove-btn')
+      expect(f('.user_note')).not_to be_displayed
+      add_message_recipient(@s3)
+      expect(is_checked('.user_note')).not_to be_present
+    end
+
+    it "should have the Journal entry checkbox visible", priority: "1", test_id: 75008 do
+      f('#compose-btn').click
+      expect(f('.user_note')).not_to be_displayed
+      compose course: @course, to: [@s1], body: 'Give the Turkey his day', send: false
+      expect(f('.user_note')).to be_displayed
+      add_message_recipient(@s2)
+      expect(f('.user_note')).to be_displayed
+    end
+
+    it "should not have the Faculty Journal entry checkbox visible", priority: "1", test_id: 523384 do
+      skip('Currently broken and shelved CNVS-17248')
+      f('#compose-btn').click
+      expect(f('.user_note')).not_to be_displayed
+      compose course: @course, to: [@s1, @s2, @s3], body: 'Give the Turkey his day', send: false
+      expect(f('.user_note')).not_to be_displayed
+    end
+
     it "should send a message with faculty journal checked", priority: "1", test_id: 75433 do
       conversations
       # First verify teacher can send a message with faculty journal entry checked to one student
@@ -137,5 +167,3 @@ describe "conversations new" do
     end
   end
 end
-
-
