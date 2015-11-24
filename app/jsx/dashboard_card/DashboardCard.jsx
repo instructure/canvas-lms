@@ -98,6 +98,7 @@ define([
     doneEditing: function(){
       if(this.isMounted()) {
         this.setState({editing: false})
+        this.refs.settingsToggle.getDOMNode().focus();
       }
     },
 

@@ -44,12 +44,20 @@ define([
       }
     },
 
+    checkEsc: function(e){
+      if (e.keyCode == 27) {
+        this.props.doneEditing();
+      }
+    },
+
     setHandlers: function(){
       $(window).resize( this.props.doneEditing );
       $(document).mouseup(this.closeIfClickedOutsideOf);
+      $(document).keyup(this.checkEsc);
     },
 
     unsetHandlers: function(){
+      $(document).unbind("keyup", this.checkEsc);
       $(document).unbind("mouseup", this.closeIfClickedOutsideOf);
       $(window).unbind("resize", this.props.doneEditing);
     },

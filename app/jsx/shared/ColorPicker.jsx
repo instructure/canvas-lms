@@ -203,7 +203,7 @@ define([
     nicknameEdit () {
       if (this.props.nicknameInfo) {
         return (
-          <CourseNicknameEdit ref='courseNicknameEdit' nicknameInfo={this.props.nicknameInfo} />
+          <CourseNicknameEdit ref='courseNicknameEdit' nicknameInfo={this.props.nicknameInfo} onEnter={this.onApply.bind(null, this.state.currentColor)} />
         );
       }
     },
@@ -230,7 +230,7 @@ define([
       var inputId = "ColorPickerCustomInput-" + this.props.assetString;
 
       return (
-        <div className="ColorPicker__Container">
+        <div className="ColorPicker__Container" ref="pickerBody">
           {this.prompt()}
           {this.nicknameEdit()}
           <div className  = "ColorPicker__ColorContainer"

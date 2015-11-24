@@ -13,7 +13,8 @@ define([
     displayName: 'CourseNicknameEdit',
 
     propTypes: {
-      nicknameInfo: React.PropTypes.object.isRequired
+      nicknameInfo: React.PropTypes.object.isRequired,
+      onEnter: React.PropTypes.func
     },
 
     // ===============
@@ -29,6 +30,12 @@ define([
     // ===============
     //     ACTIONS
     // ===============
+
+    onKeyPress (event) {
+      if (this.props.onEnter && event.charCode == 13) {
+        this.props.onEnter();
+      }
+    },
 
     handleChange (event) {
       this.setState({nickname:event.target.value});
@@ -76,6 +83,7 @@ define([
                  placeholder={this.props.nicknameInfo.originalName}
                  value={this.state.nickname}
                  onChange={this.handleChange}
+                 onKeyPress={this.onKeyPress}
           />
         </div>
       );
