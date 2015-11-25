@@ -117,5 +117,36 @@ describe "announcements" do
         expect(ff('.title .count')).to eq([])
       end
     end
+
+    it "allows rating when enabled" do
+      announcement = @course.announcements.create!(title: 'stuff', message: 'things', allow_rating: true)
+      get "/courses/#{@course.id}/discussion_topics/#{announcement.id}"
+
+      f('.discussion-reply-action').click
+      wait_for_ajaximations
+      type_in_tiny('textarea', 'stuff and things')
+      submit_form('.discussion-reply-form')
+      wait_for_ajaximations
+
+      expect(f('.discussion-rate-action')).to be_displayed
+
+      f('.discussion-rate-action').click
+      wait_for_ajaximations
+
+      expect(f('.discussion-rate-action--checked')).to be_displayed
+    end
+
+    it "doesn't allow rating when not enabled" do
+      announcement = @course.announcements.create!(title: 'stuff', message: 'things', allow_rating: false)
+      get "/courses/#{@course.id}/discussion_topics/#{announcement.id}"
+
+      f('.discussion-reply-action').click
+      wait_for_ajaximations
+      type_in_tiny('textarea', 'stuff and things')
+      submit_form('.discussion-reply-form')
+      wait_for_ajaximations
+
+      expect(f('.discussion-rate-action')).to be_nil
+    end
   end
 end

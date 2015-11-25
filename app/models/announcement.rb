@@ -113,6 +113,12 @@ class Announcement < DiscussionTopic
 
     given { |user, session| self.context.grants_right?(user, session, :moderate_forum) } #admins.include?(user) }
     can :update and can :delete and can :reply and can :create and can :read and can :attach
+
+    given do |user, session|
+      self.allow_rating && (!self.only_graders_can_rate ||
+                            self.context.grants_right?(user, session, :manage_grades))
+    end
+    can :rate
   end
 
   def is_announcement; true end
