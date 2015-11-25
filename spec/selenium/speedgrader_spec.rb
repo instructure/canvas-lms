@@ -424,4 +424,46 @@ describe 'Speedgrader' do
     expect(fj('div.ui-selectmenu-menu.ui-selectmenu-open')).to include_text(@students[0].name)
     expect(fj('div.ui-selectmenu-menu.ui-selectmenu-open')).to include_text(@students[1].name)
   end
+
+  context 'submissions' do
+    # set up course and users
+    let(:test_course) { course() }
+    let(:teacher)     { user(active_all: true) }
+    let(:student)     { user(active_all: true) }
+    let!(:enroll_teacher_and_students) do
+      test_course.enroll_user(teacher, 'TeacherEnrollment', enrollment_state: 'active')
+      test_course.enroll_user(student, 'StudentEnrollment', enrollment_state: 'active')
+    end
+    # create an assignment with online_upload type submission
+    let(:assignment) { test_course.assignments.create!( title: 'Assignment A', submission_types: 'online_text_entry,online_upload') }
+    # submit to the assignment as a student twice, one with file and other with text
+    let(:file_attachment) { attachment_model(:content_type => 'application/pdf', :context => student) }
+    let(:submit_with_attachment) do
+      assignment.submit_homework(
+        student,
+        submission_type: 'online_upload',
+        attachments: [file_attachment]
+      )
+    end
+    let(:resubmit_with_text) { assignment.submit_homework(student, submission_type: 'online_text_entry', body: 'hello!') }
+    it 'should display the correct file submission in the right sidebar', priority: "1", test_id: 525188 do
+      submit_with_attachment
+      user_session(teacher)
+
+      get "/courses/#{test_course.id}/gradebook/speed_grader?assignment_id=#{assignment.id}"
+      expect(fj('#submission_files_list .submission-file .display_name')).to include_text('unknown.loser')
+    end
+
+    it 'should display submissions in order in the submission dropdown', priority: "1", test_id: 525189 do
+      Timecop.freeze(1.hour.ago) { submit_with_attachment }
+      resubmit_with_text
+      user_session(teacher)
+
+      get "/courses/#{test_course.id}/gradebook/speed_grader?assignment_id=#{assignment.id}"
+      fj('#submission_to_view').click
+      click_option('#submission_to_view', '0', :value)
+      wait_for_ajaximations
+      expect(fj('#submission_files_list .submission-file .display_name')).to include_text('unknown.loser')
+    end
+  end
 end
