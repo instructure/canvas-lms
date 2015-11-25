@@ -199,7 +199,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   end
 
   def results_visible_for_user?(user)
-    return true if user && self.quiz.grants_right?(user, :grade)
+    return true if user && self.quiz.grants_right?(user, :review_grades)
     results_visible?
   end
 

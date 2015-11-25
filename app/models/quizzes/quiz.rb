@@ -1020,7 +1020,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     can :read_statistics and can :manage and can :read and can :update and can :delete and can :create and can :submit
 
     given { |user, session| self.context.grants_right?(user, session, :manage_grades) } #admins.include? user }
-    can :read_statistics and can :read and can :submit and can :grade
+    can :read_statistics and can :read and can :submit and can :grade and can :review_grades
 
     given { |user| self.available? && self.context.try_rescue(:is_public) && !self.graded? && self.visible_to_user?(user) }
     can :submit

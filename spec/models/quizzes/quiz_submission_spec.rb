@@ -989,20 +989,19 @@ describe Quizzes::QuizSubmission do
       course_with_teacher(active_all: true)
       course_quiz(course: @course)
       student_in_course(course: @course)
+      @course.account.settings[:restrict_quiz_questions] = true
+      @course.account.save!
+      @course.enrollment_term.end_at = 1.day.ago
+      @course.enrollment_term.save!
+      @quiz_submission = Quizzes::QuizSubmission.new(:quiz => @quiz)
     end
 
     it "returns true if quiz restricts answers for concluded courses and the user is a grader" do
-      @quiz.stubs(:restrict_answers_for_concluded_course? => true)
-      qs = Quizzes::QuizSubmission.new(:quiz => @quiz)
-
-      expect(qs.results_visible_for_user?(@teacher)).to be_truthy
+      expect(@quiz_submission.results_visible_for_user?(@teacher)).to be_truthy
     end
 
     it "returns false if quiz restricts answers for concluded courses and the user is not a grader" do
-      @quiz.stubs(:restrict_answers_for_concluded_course? => true)
-      qs = Quizzes::QuizSubmission.new(:quiz => @quiz)
-
-      expect(qs.results_visible_for_user?(@student)).to be_falsey
+      expect(@quiz_submission.results_visible_for_user?(@student)).to be_falsey
     end
   end
 
