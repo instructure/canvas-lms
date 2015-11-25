@@ -102,12 +102,8 @@ describe 'taking a quiz' do
           driver.switch_to.alert.accept
         end
 
-        def skip_if_firefox
-          skip('Known issue fails in Firefox only: CNVS-24622') if driver.browser.to_s.capitalize == 'Firefox'
-        end
-
         it 'prompts for access code upon resuming the quiz', priority: "1", test_id: 421218 do
-          skip_if_firefox
+          skip_if_firefox('Known issue CNVS-24622')
           start_quiz_and_verify_reprompt_for_access_code do
             expect_new_page_load { fj('a.ig-title', '#assignment-quizzes').click }
             expect_new_page_load { fln('Resume Quiz').click }
@@ -115,7 +111,7 @@ describe 'taking a quiz' do
         end
 
         it 'prompts for an access code upon resuming the quiz via the browser back button', priority: "1", test_id: 421222 do
-          skip_if_firefox
+          skip_if_firefox('Known issue CNVS-24622')
           start_quiz_and_verify_reprompt_for_access_code do
             expect_new_page_load { driver.navigate.back }
           end

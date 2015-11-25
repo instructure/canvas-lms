@@ -1,4 +1,5 @@
 module QuizzesCommon
+
   def create_quiz_with_due_date(opts={})
     @context = opts.fetch(:course, @course)
     @quiz = quiz_model
@@ -216,9 +217,7 @@ module QuizzesCommon
 
   def start_quiz_question
     get "/courses/#{@course.id}/quizzes"
-    expect_new_page_load {
-      f('.new-quiz-link').click
-    }
+    expect_new_page_load { f('.new-quiz-link').click }
     click_questions_tab
     click_new_question_button
     wait_for_ajaximations
@@ -252,16 +251,7 @@ module QuizzesCommon
   #   answer will be chosen.
   def take_and_answer_quiz(submit=true, access_code=nil)
     begin_quiz(access_code)
-
-    answer = if block_given?
-      yield(@quiz.stored_questions[0][:answers])
-    else
-      @quiz.stored_questions[0][:answers][0][:id]
-    end
-
-    answer_question(answer) if answer
-
-    submit_quiz if submit
+    complete_and_submit_quiz(submit)
   end
 
   def begin_quiz(access_code=nil)
@@ -274,7 +264,11 @@ module QuizzesCommon
       expect_new_page_load { fj('.btn', '#main').click }
     end
 
-    # sleep because display is updated on timer, not ajax callback
+    wait_for_quiz_to_begin
+  end
+
+  # uses sleep() because the display is updated on a timer, not an ajax callback
+  def wait_for_quiz_to_begin
     sleep 1
   end
 
@@ -290,10 +284,12 @@ module QuizzesCommon
     get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
 
     expect_new_page_load { f('#preview_quiz_button').click }
+    wait_for_quiz_to_begin
 
-    # sleep because display is updated on timer, not ajax callback
-    sleep 1
+    complete_and_submit_quiz(submit)
+  end
 
+  def complete_and_submit_quiz(submit=true)
     answer =
       if block_given?
         yield(@quiz.stored_questions[0][:answers])
@@ -336,9 +332,43 @@ module QuizzesCommon
     type_in_tiny(".question_form:visible #{selector} textarea", text)
   end
 
+  def question_answers
+    ffj('.answer', '.form_answers')
+  end
+
+  def delete_possible_answer(question_answer_index)
+    question_answer = question_answers[question_answer_index]
+    hover(question_answer)
+
+    delete_question_link = fj('.delete_answer_link', question_answer)
+    hover(delete_question_link)
+    delete_question_link.click
+  end
+
+  def select_different_correct_answer(index_of_new_correct_answer)
+    new_correct_answer = fj('.select_answer_link', question_answers[index_of_new_correct_answer])
+    hover(new_correct_answer)
+    new_correct_answer.click
+    wait_for_ajaximations
+  end
+
   def hover_first_question
     question = f('.display_question')
-    driver.action.move_to(question).perform
+    hover(question)
+  end
+
+  def select_regrade_option(option_index=0)
+    visible_regrade_options[option_index].click
+  end
+
+  def visible_regrade_options
+    ffj('label.checkbox:visible', '.regrade_enabled')
+  end
+
+  # clicks |Okay, got it|
+  def close_regrade_tooltip
+    fj('.btn.usher-close').click
+    wait_for_ajaximations
   end
 
   def edit_first_question
@@ -424,9 +454,9 @@ module QuizzesCommon
       if el['class'].match(/question_holder/)
         id = el.find_element(:css, 'a')['name'].gsub(/question_/, '')
         question = {
-            :id => id.to_i,
-            :el => el,
-            :type => 'question'
+          :id => id.to_i,
+          :el => el,
+          :type => 'question'
         }
 
         if last_group_id
@@ -441,10 +471,10 @@ module QuizzesCommon
       elsif el['class'].match(/group_top/)
         last_group_id = el['id'].gsub(/group_top_/, '').to_i
         data << {
-            :id => last_group_id,
-            :questions => [],
-            :type => 'group',
-            :el => el
+          :id => last_group_id,
+          :questions => [],
+          :type => 'group',
+          :el => el
         }
 
         # group ended
@@ -534,30 +564,28 @@ module QuizzesCommon
     js_drag_and_drop source, target
   end
 
-  def quiz_create(params={})
-    course = params.fetch(:course, @course)
+  def quiz_create(opts={})
+    course = opts.fetch(:course, @course)
     @quiz = course.quizzes.create
 
-    default_params = {
-        quiz_name: 'bender',
-        question_name: 'shiny',
-    }
-    params = default_params.merge(params)
-
     answers = [
-        {weight: 100, answer_text: 'A', answer_comments: '', id: 1490},
-        {weight: 0, answer_text: 'B', answer_comments: '', id: 1020},
-        {weight: 0, answer_text: 'C', answer_comments: '', id: 7051}
+      { weight: 100, answer_text: 'A', answer_comments: '', id: 1490 },
+      { weight: 0, answer_text: 'B', answer_comments: '', id: 1020 },
+      { weight: 0, answer_text: 'C', answer_comments: '', id: 7051 }
     ]
-    data = { question_name:params[:quiz_name], points_possible: 1, question_text: params[:question_name],
-             answers: answers, question_type: 'multiple_choice_question'
+    data = {
+      question_name: 'Question 1',
+      points_possible: 1,
+      question_text: 'This is a multiple choice question',
+      answers: answers,
+      question_type: 'multiple_choice_question'
     }
 
     @quiz.quiz_questions.create!(question_data: data)
 
-    @quiz.workflow_state = "available"
+    @quiz.allowed_attempts = -1 if opts.fetch(:unlimited_attempts, false)
     @quiz.generate_quiz_data
-    @quiz.published_at = Time.now
+    @quiz.publish!
     @quiz.save!
     @quiz
   end

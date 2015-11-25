@@ -1,7 +1,11 @@
 module CustomSeleniumActions
 
   def skip_if_ie(additional_error_text)
-    skip("skipping test, fails in IE : " + additional_error_text) if driver.browser == :internet_explorer
+    skip("skipping test, fails in IE : #{additional_error_text}") if driver.browser == :internet_explorer
+  end
+
+  def skip_if_firefox(additional_error_text)
+    skip("skipping test, fails in Firefox: #{additional_error_text}") if driver.browser == :firefox
   end
 
   def find(css)
@@ -14,6 +18,10 @@ module CustomSeleniumActions
 
   def not_found(css)
     driver.not_found(css)
+  end
+
+  def find_radio_button_by_value(value, scope = nil)
+    fj("input[type=radio][value=#{value}]", scope)
   end
 
   # f means "find" this is a shortcut to finding elements
@@ -125,6 +133,10 @@ module CustomSeleniumActions
   def hover_and_click(element_jquery_finder)
     expect(fj(element_jquery_finder.to_s)).to be_present
     driver.execute_script(%{$(#{element_jquery_finder.to_s.to_json}).trigger('mouseenter').click()})
+  end
+
+  def hover(element)
+    driver.action.move_to(element).perform
   end
 
   def set_value(input, value)
