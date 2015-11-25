@@ -163,7 +163,7 @@ class GradebooksController < ApplicationController
 
   def show
     if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
-      @last_exported_gradebook_csv = @context.gradebook_csvs.where(user_id: @current_user).first
+      @last_exported_gradebook_csv = GradebookCsv.last_successful_export(course: @context, user: @current_user)
       set_current_grading_period if multiple_grading_periods?
       set_js_env
       @post_grades_tools = post_grades_tools

@@ -20,4 +20,16 @@ class GradebookCsv < ActiveRecord::Base
   belongs_to :user
   belongs_to :attachment
   belongs_to :progress
+
+  validates :progress, presence: true
+
+  def self.last_successful_export(course:, user:)
+    csv = where(course_id: course, user_id: user).first
+    return nil if csv.nil? || csv.failed?
+    csv
+  end
+
+  def failed?
+    progress.workflow_state == 'failed'
+  end
 end
