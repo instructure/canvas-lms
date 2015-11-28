@@ -60,7 +60,7 @@
 <table class="<%= 'single' if @email_channels.length <= 1 %> summary channel_list email_channels" style="width: 100%; margin-left: 0; margin-right: 0;">
   <caption><%= t('headers.email_addresses', "Email Addresses") %></caption>
   <% @email_channels.each do |c| %>
-    <tr class="channel <%= "default" if c.position && c.position <= 1 %> <%= "unconfirmed" if c.state == :unconfirmed %> pseudonym_<%= c.pseudonym &&c.pseudonym.id %>" id="channel_<%= c.id %>">
+    <tr class="channel <%= "default" if c == @default_email_channel %> <%= "unconfirmed" if c.state == :unconfirmed %> pseudonym_<%= c.pseudonym &&c.pseudonym.id %>" id="channel_<%= c.id %>">
       <td class="email_meta">
         <a href="<%= profile_url %>" class="default_link no-hover" aria-label="<%= t('titles.default_email_address_aria_label', "Default email address") %>" ><i class="icon-star standalone-icon" alt="<%= t('titles.default_email_address_alt', "Default email address") %>" title="<%= t('titles.default_email_address', "Default email address") %>"></i></a>
       </td>
@@ -138,7 +138,7 @@
             <a href="<%= registration_confirmation_url(c.confirmation_code) %>" class="confirm_channel_link no-hover"><i class="icon-check standalone-icon" title="<%= t('titles.confirm_email_address', "Confirm Email Address") %>"></i></a>
         <% end %>
         <% unless c.id == c.user.otp_communication_channel_id %>
-          <a href="<%= communication_channel_url(c.id) %>" class="delete_channel_link no-hover"><i class="icon-trash standalone-icon" style="<%= (c.first?) ? "display: none;" : "" %>" title="<%= t('titles.remove_email_address', "Remove email address") %>"></i></a>
+          <a href="<%= communication_channel_url(c.id) %>" class="delete_channel_link no-hover"><i class="icon-trash standalone-icon" title="<%= t('titles.remove_email_address', "Remove email address") %>"></i></a>
         <% end %>
         <span class="pseudonym_id" style="display: none;"><%= c.pseudonym_id %></span>
         <span class="channel_id" style="display: none;"><%= c.id %></span>
