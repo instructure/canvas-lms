@@ -3,12 +3,16 @@
 --- 
 nb: 
   1_item_scores_5512cd03: "1- Element poeng"
+  1st_reviewer_3c1d0119: "1st Anmelder"
   2_final_score_7b0fd15e: "2- Sluttresultat"
+  2nd_reviewer_94fdbcd: "2nd Anmelder"
   451_message: 
     description: "Du er ikke autorisert til å få tilgang til denne siden fordi du befinner i et land underlagt U.S. handelsrestriksjoner."
     headings: 
       page: "Ikke Autorisert"
     title: "Ikke Autorisert"
+  558x270_png_jpg_gif_c3faa839: "558x270 png, jpg, gif"
+  558x558_png_jpg_gif_1_8x_the_standard_tile_size_so_c56cc472: "558x558 png, jpg, gif (1.8x standard flisstørrelse, slik at den kan skaleres opp eller ned etter behov)"
   EditAppointmentGroupDetails: 
     affect_reservations: "Hvordan vil dette påvirke reservasjoner?"
     and_n_contexts: "og %{n} andre"
@@ -40,10 +44,12 @@ nb:
   _start_from_a_template__a03ea3b3: "-- Begynn fra en mal --"
   a_calculation_value_is_not_used_with_this_calculat_b1e854b4: "En beregnede verdien brukes ikke med denne beregningsmetoden"
   a_file_named_itemname_already_exists_in_this_folde_b0dc7185: "En fil med navnet %{itemName} finnes allerede i denne mappen."
+  a_full_size_logo_that_appears_in_the_right_sidebar_18873685: "En logo i full størrelse som vises i det høyre sidefeltet på Canvas-skrivebordet. Ideell størrelse er 360 x 140 piksler. Aksepterte format: svg, png, jpeg og gif"
   a_handy_key_value_dump_of_a_host_of_interesting_en_d0518dfe: "Et praktisk nøkkel/verdi utslipp av mye interessant miljøinfo for rapporteringsbrukeren"
   a_message_is_required_129e1814: "En melding kreves"
-  a_table_containing_the_name_of_the_grading_scheme__2c25dc3: "En tabell som inneholder navnet på gradering ordningen og ikoner for å redigere eller slette ordningen."
-  a_table_that_contains_the_grading_scheme_data_each_d461c205: "En tabell som inneholder gradering ordningen data. Hver rad inneholder et navn, en maksimal prosent, og en minimum prosent. I tillegg inneholder hver rad et ikon for å legge til en ny rad under, og et ikon for å slette gjeldende rad."
+  a_problem_occurred_adding_reviewers_57b083d9: "Det oppsto et problem å legge anmeldelser. "
+  a_table_containing_the_name_of_the_grading_scheme__2c25dc3: "En tabell som inneholder navnet på karakterskalaen og ikoner for å redigere eller slette skalaen."
+  a_table_that_contains_the_grading_scheme_data_each_d461c205: "En tabell som inneholder data om karakterene. Hver rad inneholder et navn, en maksimal prosent, og en minimum prosent. I tillegg inneholder hver rad et ikon for å legge til en ny rad under, og et ikon for å slette gjeldende rad."
   academic_benchmark: 
     api_error: "Kunne ikke oppdatere standarder for autoritet %{auth}."
     bad_ab_file: "Den tilgjengelige Academic Benchmark-filen har en feil."
@@ -61,6 +67,8 @@ nb:
         api_key: "API Nøkkel"
         api_url: "API URL"
         common_core_guid: "Felles kjerne GUID (valgfritt)"
+  accepted_formats_hex_rgba_rgb_hsl_42a37ef7: "Godkjente formater: hex, rgba, rgb, hsl"
+  accepted_formats_svg_png_jpg_gif_f793e4bc: "Godkjente formater: svg, png, jpg, gif"
   access_token_is_valid_until_d2f048cf: "Tilgangstoken er gyldig frem til"
   accordion_section_1_7888782d: "Accordion-seksjon 1"
   accordion_section_2_e1812997: "Accordion-seksjon 2"
@@ -205,6 +213,7 @@ nb:
       discovery_url_description: "Om en oppdagelse-URL er satt, vil Canvas videresende alle brukere til den URL-adressen når de trenger å bli autentisert. Siden vil trenge å hjelpe brukeren å finne ut hvor de trenger å gå for å logge inn. Om ingen oppdagelse-URL er konfigurert, vil den første konfigurasjonen bli brukt for å forsøke å autentisere brukeren."
       login_handle_name_description: "Etiketten som brukes for unike innloggingsidentifikatorer. Eksempler: Innlogging, Brukernavn, Student ID, osv."
       unknown_user_url_description: "URL-adressen å omdirigere til når en autentisert bruker ikke er funnet i Canvas."
+  account_name_13ed649: "%{account_name}"
   account_navigation_80bbefd4: Kontonavigering
   account_notification: 
     errors: 
@@ -226,7 +235,7 @@ nb:
       message: "%{type}-rapport generert med følgende innstillinger. Konto: %{account}; %{options}"
       section_text: "For klasse: %{section};"
       start_text: "Start På: %{start_at};"
-      term_text: "Begrep: %{term_name};"
+      term_text: "Semester: %{term_name};"
     grades: 
       deleted: "Inkluder slettede objekter: sant;"
       limited: "slettet objekter er begrenset av dager som er spesifisert;"
@@ -236,10 +245,10 @@ nb:
     report_header_assessment_id: "vurdering id"
     report_header_assessment_question: vurderingsspørsmål
     report_header_assessment_question_id: "id for vurderingsspørsmål"
-    report_header_assessment_title: "vurdering navn"
-    report_header_assessment_type: "vurdering type"
+    report_header_assessment_title: "navn på vurdering"
+    report_header_assessment_type: vurderingstype
     report_header_assignment_id: "oppgave id"
-    report_header_assignment_title: "oppgave navn"
+    report_header_assignment_title: oppgavenavn
     report_header_assignment_url: "oppgave url"
     report_header_associated_user_id: tilhørende_bruker_id
     report_header_attempt: forsøk
@@ -271,10 +280,11 @@ nb:
     report_header_group_id: gruppe_id
     report_header_id: id
     report_header_last_access_at: "forrige tilgang"
+    report_header_last_activity_at: "siste aktivitet på "
     report_header_last_ip: "siste ip"
     report_header_last_name: etternavn
     report_header_learning_outcome_id: "læringsmål id"
-    report_header_learning_outcome_name: "læringsmål navn"
+    report_header_learning_outcome_name: "navn på læringsmål"
     report_header_login_id: innloggings_id
     report_header_long__name: langt_navn
     report_header_long_name: "langt navn"
@@ -320,7 +330,7 @@ nb:
       enrollment_states: "Påmeldingsstatus: %{states};"
   account_settings: 
     account: Konto
-    account_name_too_long: "Kontonavn er for langt"
+    account_name_too_long: "Kontonavnet er for langt"
     confirms: 
       delete_announcement: "Er du sikker på at du vil slette denne kunngjøringen?"
       global_announcement: "Du må bekrefte den globale kunngjøringen"
@@ -487,7 +497,10 @@ nb:
         blank_placeholder: "-"
         event_type: 
           corrupted: "Detaljer Ikke Tilgjengelig"
+        no-abbreviation: "n"
+        yes-abbreviation: "y"
       grade_change_logging_results: 
+        Anonymous: "Anonym "
         Assignment: Oppgave
         Course: Kurs
         Grader: Sensor
@@ -544,8 +557,8 @@ nb:
       no_avatars_message: "Ingen profilbilder å vise"
       page_title: Profilbilder
       re_reported_link: 
-        one: "Godkjent, rapporterte %{count} på nytt"
-        other: "Godkjent, rapporterte %{count} på nytt"
+        one: "Godkjent, rapportert %{count} på nytt"
+        other: "Godkjent, rapportert %{count} på nytt"
         zero: "Godkjent, rapportert på nytt"
       reported_link: 
         one: "Rapportert %{count}"
@@ -641,7 +654,7 @@ nb:
       account_reports: 
         default: 
           description: 
-            text: "Denne rapporten viser studentenes endelige karakterer for alle studenter i et gitt semester. Den resulterende csv-filen vil ha en rad per registrering, og vil vise den nåværende og endelige karakter som vises i kursets karakterbok."
+            text: "Denne rapporten viser studentenes endelige karakterer i en gitt termin. Resultatene i csv-filen vil ha en rad per registrering, og vil vise den nåværende og endelige karakteren som viser i kursets karakterbok."
     group_type: gruppe
     include_deleted_parameter: 
       account_reports: 
@@ -653,7 +666,12 @@ nb:
       no_accounts_message: "Ingen kontoer"
       page_title: Kontoer
       title: "Kontoer jeg administrerer"
-    integer_required: "Et heltall kreves"
+    integer_required: "Et helt tall kreves"
+    last_enrollment_activity_csv_description: 
+      account_reports: 
+        default: 
+          last_enrollment_activity: 
+            text: "Denne rapporten viser den siste aktiviteten på en brukers påmeldinger. "
     last_user_access_csv_description: 
       account_reports: 
         default: 
@@ -709,8 +727,8 @@ nb:
         default: 
           public_courses: 
             text: "Denne rapporten viser alle kurs som ikke er slettet i et gitt semester som er publisert. Den resulterende CSV-filen vil ha én rad per kurs og vil vise kurs-id-en, kursets sis-id, kursets kortnavn, kursets navn og kursets start- og sluttdatoer."
-    quota_integer_required: "Et heltall kreves"
-    quota_must_be_positive: "Verdier må være positive"
+    quota_integer_required: "Et helt tall kreves"
+    quota_must_be_positive: "Verdien må være positiv"
     quota_not_updated: "Kvoten ble ikke oppdatert"
     quota_too_large: "Verdien er for høy"
     quota_updated: "Kvote oppdatert"
@@ -749,18 +767,12 @@ nb:
             field: Klasse-ID
     settings: 
       about_google_docs: |-
-          Google Docs forhåndsvisning tillater brukere å vise dokumenter fra
-          inne i Canvas, heller enn å måtte laste dem ned og
-          åpne det tilsvarende programmet (f.eks. Word eller Excel).
+          Google Docs Previews tillater brukere å vise dokumenter fra Canvas i stedet for å måtte laste dem ned og åpne det tilsvarende programmet (f.eks Word eller Excel).
           
-          Hvis Scribd har blitt aktivert på denne kontoen, vil Canvas
-          prøve å bruke den til forhåndsvisning. Hvis dokumentet
-          ikke kan forhåndsvises i Scribd, eller hvis brukeren ikke
-          har Flashplayer installert (f.eks iPad/iPhone),
-          vil Canvas velge å bruke Google Docs forhåndsvisning
-          hvis den er aktivert. Ved å bruke denne tjenesten, erkjenner
-          du at du har lest og akseptert vilkårene for
-          [Google Docs Viewer Terms of Service](%{terms_url}).
+          Google Docs Previews kan også gjengi filtyper som ikke støttes av Canvas-dokumentforhåndsvisning.
+          
+          Ved å bruke denne tjenesten erkjenner du at du har lest og akseptert
+          bruksvilkårene til [Google Docs Viewer](%{terms_url}).
       about_google_docs_tooltip: "Om Google Docs-forhåndsvisning"
       account_admins_title: Kontoadministratorer
       account_quotas: 
@@ -816,7 +828,7 @@ nb:
         report_last_run: "Siste kjøring"
         report_name: Navn
       headings: 
-        quotas: "Konto Kvoter"
+        quotas: Kontokvoter
         sections: Rapporter
         settings: Kontoinnstillinger
       help_link_available_to_all_admins: Administratorer
@@ -850,7 +862,7 @@ nb:
         equella_endpoint: Equella-sluttpunkt
         equella_teaser: Equella-kommentarer
         global_brand_includes: "Last opp globale CSS/JavaScript-includeringer i Theme Editor"
-        global_includes: "Globale CSS-/JavaScript-inkluderinger"
+        global_includes: "Global CSS/JavaScript overrides"
         global_javascript: "Global JavaScript-URL"
         global_stylesheet: "Global CSS-URL"
         help_link_available_to: "Tilgjengelig for"
@@ -863,11 +875,12 @@ nb:
         message: Beskjed
         mfa_settings: "Flerfaktors autentisering"
         name: Kontonavn
+        new_sub_account_includes: "La underkontoer bruke tema-redigering for å tilpasse deres egen merkevare"
         no_enrollments_can_create_courses: "Brukere uten kurspåmeldinger"
         open_registration: "Åpen registrering"
         outgoing_email_default_name_option_custom: "Egendefinert \"Fra\"-navn"
         outgoing_email_default_name_option_default: "Standard Canvas-innstilling"
-        prevent_course_renaming_by_teachers: "Ikke la forelesere endre navn på sine kurs"
+        prevent_course_renaming_by_teachers: "Ikke la lærere endre navn på kursene sine"
         restrict_quiz_questions: "Forhindre studentene fra å se prøvespørsmålene etter at kurset er over"
         restrict_student_future_view: "Forhindre studenter fra å se kursene før startdatoen"
         restrict_student_past_view: "Hindre studenter i å se kurs etter sluttdato"
@@ -1203,16 +1216,20 @@ nb:
   activity_13915493: Aktivitet
   activity_by_category_9c2033d1: "Aktivitet etter Kategori"
   activity_by_date_878c5b49: "Aktivitet etter Dato"
+  add_2nd_review_ea988088: "Legg til vurdering nr 2."
   add_8523c19b: "Legg til"
   add_an_identity_provider_to_this_account_c2644478: "Legg til en identitetstilbyder til denne kontoen:"
   add_app_baf540f: "Legg til app"
   add_attachment_93868828: "Legg til vedlegg"
   add_course_assignments_628ed6d0: "Legg til oppgaver for kurset"
   add_course_calendar_events_146154a5: "Legg til kalenderhendelser for kurset"
-  add_files_to_the_course_da6ffd32: "Legg filer til Kurs"
+  add_files_to_the_course_da6ffd32: "Legg filer til kurset"
   add_grading_period_6f774dc3: "Legg til vurderingsperiode"
-  add_grading_scheme_81e23c05: "Legge til gradering ordningen"
+  add_grading_scheme_81e23c05: "Legg til karakterskala"
   add_icon_567dbcaa: "legg til ikon"
+  add_moderator_review_copy_1st_a484c813: "Legg til vurdering fra moderator (1. kopi)"
+  add_moderator_review_copy_2nd_e80d458f: "Legg til vurdering fra moderator (2. kopi) "
+  add_moderator_review_new_3c183cea: "Legg til vurdering fra moderator (ny)"
   add_module_item: 
     add_assignment_to: "Legge et oppdrag til %{module}"
     add_file_to: "Legg filer til  %{module}"
@@ -1220,10 +1237,14 @@ nb:
     add_quiz_to: "Legg spørrekonkurranser til %{module}"
     add_topic_to: "Legg diskusjonsemner til %{module}"
   add_new_group_7ac49f31: "Legg til ny gruppe"
-  add_new_set_of_due_dates_e8e240f: "Legg til nytt sett av fristdatoer"
+  add_new_set_of_due_dates_e8e240f: "Legg til nytt sett av datofrister"
+  add_remove_or_rearrange_sections_for_this_portfoli_4628320a: "Legge til, fjerne eller omorganisere seksjoner for denne porteføljen"
+  add_review_2fb1590c: "Legg til en vurdering"
+  add_section_8b027a1c: "Legg til en seksjon"
   add_students_to_the_course_874be8fb: "Legg til studenter til kurset"
   add_tas_to_the_course_2aac6e02: "Legg til Læringsassistenter til kurset"
-  add_your_assignments_you_can_just_make_a_long_list_8a7862dd: "Legge til dine oppdrag. Du kan bare lage en lang liste, eller bryte dem opp i grupper - og selv spesifisere vekter for hvert oppdrag gruppe."
+  add_your_assignments_you_can_just_make_a_long_list_8a7862dd: "Legg til dine oppgaver. Du kan lage en lang liste, eller bryte dem opp i grupper - og til og med spesifisere vekting for hver oppgavegruppe."
+  add_your_zendesk_instance_s_custom_field_id_for_ea_3aeb75f4: "Legg inn Zendesk Instance sin tilpassede felt-ID for hver av følgende (felt som ikke har ID-er, vil ikke bli loggført):"
   admin_4d3ba42f: Admin
   after_date_981cd41b: "Etter %{date}"
   after_last_attempt_c9168da2: "Etter siste forsøk"
@@ -1289,6 +1310,7 @@ nb:
   all_grading_periods_77974940: "Alle vurderingsperioder"
   all_grading_periods_must_have_a_title_a1a38d87: "Alle vurderingsperioder må ha en tittel"
   all_groups_cea25817: "Alle grupper"
+  all_my_files_a0213441: "Alle mine filer"
   all_start_dates_must_be_before_the_end_date_d949eca9: "Alle startdatoer må være før sluttdatoen"
   all_students_have_taken_the_quiz_b558f8b4: "Alle studentene har tatt prøven"
   all_students_have_taken_the_survey_494f9f42: "Alle studenter har tatt undersøkelsen"
@@ -1299,9 +1321,13 @@ nb:
   allow_students_to_see_who_has_signed_up_for_time_s_497f4a46: "Tillat studenter å se hvem som har meldt seg for tidsluker"
   allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "Tillat lærere å markere karakterdata som til eksport i bulk til SIS-integrasjoner"
   allows_the_scheduling_of_recurring_calendar_events_aac71007: "Tillater planlegging av gjentagende kalenderhendelser"
+  allows_users_with_international_phone_numbers_to_r_f90f8522: "Tillater brukere med internasjonale telefonnumre å motta tekstmeldinger fra Canvas."
   always_3a59e701: Alltid
+  an_error_accurred_selecting_provisional_grades_61b36f64: "Det oppstod en feil velge foreløpige karakterer "
   an_error_occured_trying_to_generate_this_theme_ple_6ae581d: "Det oppstod en feil ved generering av denne malen, prøv igjen"
   an_error_occurred_please_post_your_reply_again_lat_b0220ac6: "*Det oppstod en feil*, vennligst publiser svaret ditt senere"
+  an_error_occurred_publishing_grades_cfdf7631: "Det oppstod en feil publisering karakterer. "
+  an_error_occurred_trying_to_apply_this_theme_pleas_253d0996: "Det oppstod en feil ved generering av denne malen, prøv igjen."
   an_error_occurred_trying_to_generate_this_theme_pl_b493e2e9: "Det oppstod en feil ved generering av denne malen, prøv igjen"
   an_error_occurred_trying_to_prepare_download_pleas_df6fa596: "Det oppstod en feil ved forbereding av nedlastingen, vennligst prøv igjen."
   an_error_occurred_when_setting_the_usage_right_for_d4ea78f5: "En feil oppstod ved innstilling av bruk rett for %{filename}"
@@ -1341,7 +1367,7 @@ nb:
     no_title: "Ingen tittel"
   announcement_ends_at_4ccc2a7e: "Kunngjøring slutter på"
   announcement_fb4cb645: Kunngjøring
-  announcement_starts_at_2e987a38: "Kunngjør begynner på"
+  announcement_starts_at_2e987a38: "Kunngjøring begynner på"
   announcements: 
     announcements_crumb: Kunngjøringer
     error_draft_state: "Dette temaet kan ikke få kladdstatus fordi det er en kunngjøring."
@@ -1379,6 +1405,7 @@ nb:
     podcast_feed_name: "%{course} Kunngjøringer som podkast-strøm"
   anonymous_e1b8ad27: Anonym
   anonymous_grading_ccb5045c: "Anonym vurdering"
+  anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: "Anonym vurdering tvinger studentnavn til å være skjult i SpeedGrader™"
   anonymous_user: "Anonym bruker"
   anonymous_user_d984b9ce: "Anonym bruker"
   another_configuration_is_currently_selected_select_95b394e: "En annen konfigurasjon er valgt. Hvis du velger denne konfigurasjonen, fjerner du den andre."
@@ -1389,6 +1416,8 @@ nb:
   api_url_3ee7cb0a: "API URL"
   app_center_will_appear_in_the_apps_tab_on_the_sett_1b9eb936: "App Senter vil vises i \"Apps\" kategorien på siden av enten et kurs eller konto innstillinger. URL som er angitt nedenfor skal peke til en gyldig App senter endepunkt (for example, %{url} -- sørg for å utelate etterfølgende skråstrek"
   app_placements_6d877225: App-plasseringer
+  appends_a_number_to_the_end_of_each_event_title_e__bca98abd: "Føyer til et tall på slutten av hver hendelsetittel (f.eks Hendelse 1 , Hendelse 2, osv.)"
+  appends_a_number_to_the_end_of_each_event_title_e__e9573bf8: "Føyer til et tall på slutten av hver hendelsetittel (f.eks. Hendelse 1, Hendelse 2, osv. )\" for=\"append_iterator"
   application: 
     errors: 
       feed_not_found: "Fant ikke strømmen."
@@ -1410,7 +1439,7 @@ nb:
       quota_exceeded_group: "Tilgjengelig lagringsplass for gruppen er overskredet "
       quota_exceeded_user: "Tilgjengelig lagringsplass for brukeren er overskredet "
       student_view_unauthorized: "Du får ikke tilgang til denne funksjonaliteten i \"Studentvisning\"."
-      submission_unauthorized: "Du får ikke tilgang til dette brevet."
+      submission_unauthorized: "Du har ikke tilgang til denne innleveringen"
       unauthorized: 
         not_started_yet: "Det kurset du forsøker å åpne har ikke startet enda. Det vil starte %{date}."
         unpublished: "Dette kurset er ikke publisert av fagansvarlig enda."
@@ -1418,6 +1447,7 @@ nb:
       first_teacher: "Dette kurset er nå ditt, og du er registrert som dets første lærer."
       first_teacher_with_email: "Dette kurset er nå ditt, og du er registrert som dets første lærer. Du vil ganske snart motta en epost for å sluttføre registreringsprosessen."
       need_to_accept_enrollment: "Du må [akseptere invitasjonen om deltagelse](%{url}) før du kan delta i dette kurset fullt ut."
+      need_to_accept_future_enrollment: "Du må [akseptere invitasjonen om deltagelse](%{url}) før du kan delta på dette kurset som begynner %{date} ."
       page_disabled: "Den siden er deaktivert"
       page_disabled_for_account: "Den siden er deaktivert for denne kontoen"
       page_disabled_for_course: "Den siden er deaktivert for dette kurset"
@@ -1432,6 +1462,7 @@ nb:
     wiki_front_page_default_content_group: "Velkommen til din nye gruppe-wiki!"
   apply_781a2546: Bruk
   apply_changes_b1dffc70: "Bruk endringer"
+  applying_new_styles_to_subaccounts_e8aeeef2: "Legg til nye stiler til underkontoer"
   appointment_group: 
     errors: 
       invalid_end_at: "Avtalens sluttidspunkt er før starttidspunktet"
@@ -1450,15 +1481,19 @@ nb:
   archive_3f794d7e: Arkiv
   archive_selected_d64506ca: "Arkiv valgt"
   are_you_sure_26795d3c: "Er du sikker?"
+  are_you_sure_you_want_to_copy_to_the_final_mark_th_28a7e7b3: "Er du sikker på at du vil kopiere til den endelige karakteren? Dette vil overskrive den eksisterende merk."
   are_you_sure_you_want_to_delete_these_count_items_148e98ba: 
     one: "Er du sikker på at du vil slette %{name}?"
     other: "Er du sikker på at du vil slette disse %{count} elementer?"
   are_you_sure_you_want_to_delete_this_announcement_293d51a8: "Er du sikker på at du vil slette denne kunngjøringen?"
-  are_you_sure_you_want_to_delete_this_grading_perio_422359cd: "Er du sikker på at du vil slette dette gradering periode?"
-  are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: "Er du sikker på at du vil slette denne karaktersettingsplanen?"
+  are_you_sure_you_want_to_delete_this_grading_perio_422359cd: "Er du sikker på at du vil slette denne vurderingsperioden?"
+  are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: "Er du sikker på at du vil slette denne karakterskalaen?"
+  are_you_sure_you_want_to_do_this_it_cannot_be_undo_3379a544: "Er du sikker på at du vil gjøre dette? Det kan ikke angres og vil overstyre eksisterende karakterer i karakterboken."
   are_you_sure_you_want_to_remove_this_grading_perio_e3251c09: "Er du sikker på at du vil fjerne denne vurderingsperioden?"
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "Er du sikker på at du vil fjerne dette verktøyet?"
   are_you_sure_you_want_to_report_this_profile_pictu_e22c2210: "Er du sikker på at du vil rapportere dette profilbildet?"
+  arrange_columns_by_assignment_group_33acdf03: "Ordne kolonner etter Innleveringsgruppe"
+  arrange_columns_by_due_date_888f2551: "Ordne kolonner av fristdato"
   as_you_type_in_this_field_the_list_of_groups_will__16688a5f: "Etter hvert som du skriver tekst i dette feltet, vil listen over grupper bli automatisk filtrert til kun å inneholde de som har et navn som passer med det du skriver inn. "
   as_you_type_in_this_field_the_list_of_results_will_c1a1a3e4: "Etter hvert som du skriver tekst i dette feltet, vil listen over resultater bli oppdatert."
   assessment_by_name_7b879a2c: "Vurdert av %{name}"
@@ -1491,6 +1526,7 @@ nb:
     labels: 
       due: "Leveres innen"
     name_is_required: "Navn kreves!"
+    name_too_long: "Navnet er for langt"
     points_possible_number: "Oppnåelige poeng må være et tall"
     select_external_tool_dialog_title: "Konfigurer eksternt verktøy"
     submission_action_take_quiz: "Ta %{title}"
@@ -1506,11 +1542,12 @@ nb:
       on_paper: "på papir"
     titles: 
       gpa_scale_explainer: "Hva er tallkaraktersetting?"
-      grading_scheme_info: "Se/rediger karaktersettingsplan"
+      grading_scheme_info: "Se/rediger karakterskala"
   assignment_976578a8: Oppgave
   assignment_comments_e43ed898: "Kommentarer til oppgaven"
   assignment_details: 
-    no_graded_submissions: "Ingen innleveringer som er karaktersatt"
+    no_graded_submissions: "Ingen innleveringer som er vurdert"
+  assignment_details_bc488179: Oppdragsdetaljer
   assignment_details_dialog: 
     average_score: "Gjennomsnittlig resultat:"
     count_of_submissions: "%{cnt} innleveringer"
@@ -1522,9 +1559,11 @@ nb:
     scores_higher_than_the_average: "Resultater som er høyere enn gjennomsnittet %{average}"
     scores_lower_than_the_average: "Resultater som er lavere enn gjennomsnittet %{average}"
     total_graded_submissions: "Antall rettede innleveringer:"
+  assignment_grades_have_already_been_published_ff2d84c6: "Oppdrags karakterer har allerede blitt publisert."
   assignment_group: 
     default_name: Oppgaver
     default_title: Oppgaver
+  assignment_group_was_saved_successfully_5caa27d3: "Vellykket lagring av arbeidsgruppe"
   assignment_group_weights_dialog: 
     buttons: 
       save: Lagre
@@ -1551,6 +1590,11 @@ nb:
     unmute_dialog: "Denne oppgaven er for tiden skjult. Det betyr at studentene ikke kan se karakter eller tilbakemelding. Vil du vise oppgaven nå?"
     unmuting_assignment: "Viser oppgaven..."
   assignment_name_b2d87383: Oppgavenavn
+  assignment_options_1e5b7074: Oppdrag-valg
+  assignment_override: 
+    student_count: 
+      one: "%{count} student"
+      other: "%{count} studenter"
   assignment_selection_6bff05c4: Oppgave-utvalg
   assignment_was_deleted_8320d26d: "Innlevering ble slettet"
   assignments: 
@@ -1622,7 +1666,7 @@ nb:
         upcoming_assignments: "Kommende oppgaver"
     available_date_description: 
       available_until: "Tilgjengelig til"
-      closed: Låst
+      closed: Lukket
       not_available_until: "Ikke tilgjengelig før"
     buttons: 
       add_group: "Legg til gruppe"
@@ -1651,7 +1695,7 @@ nb:
       external_tool_type: "Eksternt verktøy"
       more: "Flere alternativer"
       multiple_due_dates: "Flere frister"
-      not_graded_type: "Ikke karaktersatt"
+      not_graded_type: "Ikke vurdert"
       quiz_type: Prøve
       save: Lagre
       saving: Lagrer...
@@ -1678,8 +1722,8 @@ nb:
       delete: "Slett gruppe"
       deleting: Sletter…
       labels: 
-        delete_assignments_in_group: "Slett oppgavene dens"
-        move_assignments_to: "Flytt oppgavene dens til"
+        delete_assignments_in_group: "Slett disse oppgavene"
+        move_assignments_to: "Flytt disse oppgavene til"
       options: 
         select_group: "Velg en gruppe"
       tooltips: 
@@ -1704,7 +1748,7 @@ nb:
       buttons: 
         not_published: "Ikke publisert"
         published: Publisert
-      manage_assignment: "Administrere oppgave"
+      manage_assignment: "Administrer oppgave"
       page_header_title: "Ny oppgave"
       titles: 
         delete: Slett
@@ -1717,7 +1761,7 @@ nb:
       freeze_properties: "Lås oppgaveegenskaper når de blir kopiert"
       notify_content_change: "Varsle brukere om at dette innholdet er endret"
       points_possible: Poeng
-      post_to_sis: "Inkluder denne oppdrags karakterer når du legger til skolens Student Information System"
+      post_to_sis: "Inkluder denne oppgavens karakterer når du eksporterer til det skoleadministrative systemet"
       warnings: 
         assignment_is_frozen: "Noen innstillinger har blitt låst av administrator"
     errors: 
@@ -1751,7 +1795,7 @@ nb:
         reupload_submissions: "Last opp innleveringer på nytt"
       resubmission_count: 
         one: "1 Re-innlevering som ikke er rettet"
-        other: "%{count} Ikke rettede Re-innleveringer"
+        other: "%{count} Ikke rettede innleveringer som er levert på nytt"
       reupload_instructions: |-
           Hvis du har gjort endringer på studentenes innleverte filer som du har lastet ned tidligere, bare zip dem tilbake og laste opp zip med skjemaet nedenfor.
           Studentene vil se de modifiserte filene i kommentarfeltet for innlevering.
@@ -1768,7 +1812,7 @@ nb:
     grading_type_selector: 
       display_grade_as: "Vis karakteren som"
       gpa_scale_explainer: "Tallkaraktersetting er laget for institusjoner som benytter en karakterskala med tall (for eks. 0-4.0, 0-5.0 eller 0-6.0) for alle innleveringer/oppgaver. Denne karaktersettingen er tilsvarende den for bokstavkarakterer, men har noen vesentlige forskjeller:"
-      gpa_scale_input_explainer: "Poeng er inngang på 4,0 skala. For eksempel, hvis et oppdrag er ut av 100 poeng, vil innskriving 4,0 resultater i 100%, 3,0 resultater i 87%, osv."
+      gpa_scale_input_explainer: "Poengene er satt på 4.0 skalaen. For eksempel, hvis en oppgave er beregnet ut fra 100 poeng, vil 4.0 resultere i 100%, 3.0 i 87%, etc."
       gpa_scale_letters_explainer: "Bokstavkarakterer kan benyttes i tillegg til tallkarakterer."
       gpa_scale_percentage_explainer: "Du kan ikke legge inn poeng direkte, men prosenttall kan legges inn. For eksempel, hvis en oppgave totalt kan gi 50 poeng, hjelper det ikke å legge inn 40 poeng, men \"80%\" gjør susen."
       gpa_scale_recommendation: "Med unntak av de tilfeller der din institusjon benytter tallkarakterer (for eks. 0-4.0/0-5.0/0-6.0) anbefaler Canvas å vise karakterer som bokstavkarakterer."
@@ -1781,7 +1825,7 @@ nb:
         pass_fail: "Godkjent/Ikke godkjent"
         percent: Prosent
         points: Poeng
-      view_grading_scheme: "Vis Gradering ordningen"
+      view_grading_scheme: "Vis karakterskalaen"
     group_category_selector: 
       differentiated_groups_warning: "Differensierte gruppeoppgaver kan gi uventede resultater."
       grade_group_students_individually: "Tildel karakterer til hver enkelt student individuelt"
@@ -1863,7 +1907,7 @@ nb:
     non_number: "Du må bruke et tall"
     notices: 
       assignment_delete: "Denne oppgaven er slettet"
-      assignment_not_available: "Oppdraget du ba om er ikke tilgjengelig til din kurset delen."
+      assignment_not_available: "Oppgaven du ser etter er ikke tilgjengelig i dette kurset."
       created: "Oppgaven ble opprettet"
       updated: "Oppgaven ble oppdatert"
     number_of_assignments: 
@@ -1880,7 +1924,7 @@ nb:
     peer_reviews: 
       buttons: 
         add: "Legg til"
-        assign_peer_reviews: "Tildel hverandrevurderere"
+        assign_peer_reviews: "Tildel hvem som skal vurdere hverandre"
       descriptions: 
         automatically_assign_reviews: "Du kan tildele hverandrevurderinger til de brukerne som har levert inn men som ikke er tildelt vurderinger allerede ved å klikke på knappen nedenfor."
       details: "Til venstre kan du se en liste over studenter på denne oppgaven, samt hvilke innleveringer (om noen) de har blitt tildelt for \"gjennomgang\"."
@@ -1888,7 +1932,7 @@ nb:
         assign_peer_review: "Gi %{student} en annen innlevering for vurdering"
         back_to_assignment: "Tilbake til Oppgaven"
       messages: 
-        cancel_peer_review: "Kansellere denne hverandrevurderingen?"
+        cancel_peer_review: "Slette denne hverandrevurderingen?"
         no_students_found: "Ingen studenter funnet"
       none_assigned: "Ingen tildelt"
       not_yet_submitted: "foreløpig ikke levert"
@@ -1908,7 +1952,7 @@ nb:
       anonymous_peer_reviews: Anonymitet
       how_to_peer_review: "Hvordan å tildele hverandrevurderere"
       labels: 
-        anonymous_peer_reviews: "Fagfellevurderinger vises anonymt"
+        anonymous_peer_reviews: "Hverandrevurderinger vises anonymt"
         automatically_assign_peer_reviews: "Automatisk tildele hverandrevurderere"
         manually_assign_peer_reviews: "Manuelt tildele hverandrevurderere"
         require_peer_reviews: "Krev hevrandrevurderinger"
@@ -1922,8 +1966,8 @@ nb:
       redirect_message: |-
           Denne innleveringen var en url, vi tar deg til lenken nå. 
           [Klikk her for å gå til innleveringen](%{url})
-    remove_never_drop_rule: "Fjern regelen om aldri slippe"
-    remove_unsaved_never_drop_rule: "Fjern den ulagrede regelen om aldri slippe "
+    remove_never_drop_rule: "Fjern regelen om aldri å utelate"
+    remove_unsaved_never_drop_rule: "Fjern den ulagrede regelen om aldri å utelate"
     rules_text: 
       one: "1 regel"
       other: "%{count} regler"
@@ -1965,7 +2009,12 @@ nb:
       comment_signature: "%{author}, %{created_at}"
       labels: 
         grade: "Karakter: %{grade} *(%{points_possible} poeng oppnåelig)*"
+        graded_anonymously: "Karakterene satt anonymt: %{value}"
+        ? "no"
+        : nei
         none_assigned: "Ingen tildelt"
+        ? "yes"
+        : ja
       links: 
         submission: 
           details: "Detaljer om innlevering"
@@ -1987,7 +2036,7 @@ nb:
       advanced_turnitin_settings: "Avanserte Turnitin-innstillinger"
       descriptions: 
         allowed_extensions: "Skriv inn en liste over godkjente filetternavn, for eksempel: doc,xls,txt"
-      external_tool_group_warning: "Gruppeinnleveringer kan ikke bruke eksterne verktøy. Gruppeinnstillingen vil bli ukontrollert når du lagrer"
+      external_tool_group_warning: "Gruppeinnleveringer kan ikke bruke eksterne verktøy. Gruppeinnstillingen vil bli slettet når du lagrer."
       external_tool_options: "Alternativer for eksternt verktøy"
       label: 
         external_tool_new_tab: "Last inn dette verktøyet i en ny fane"
@@ -1997,7 +2046,7 @@ nb:
         allow_file_uploads: Filopplastinger
         allow_media_recordings: Medieinnspillinger
         allow_text_entry: "Innlegging av tekst"
-        allow_url: "Ingen filer"
+        allow_url: "Websidens URL"
         allowed_extensions: "Tillatte filetternavn"
         restrict_file_extensions: "Begrens filtyper for opplasting"
       online_entry_options: "Alternativer for nettbasert innlegging"
@@ -2011,7 +2060,7 @@ nb:
       additional_comments: Tileggskommentarer
       buttons: 
         record_media: "Gjør opptak/Last opp media"
-        submit_assignment: "Send inn besvarelse"
+        submit_assignment: "Lever besvarelse"
       comments_placeholder: Kommentarer...
       errors: 
         unacceptable_file_type: "Denne filtypen er ikke tillatt. Aksepterte filtyper er: %{allowed_extensions_list}"
@@ -2029,28 +2078,28 @@ nb:
       links: 
         add_another_file: "Legg til flere filer"
         authorize_google_docs: "Autoriser Google Docs-tilgang"
-        authorize_google_drive: "Autorisere Google Drive Access"
+        authorize_google_drive: "Autoriser tilgang fra Google Drive"
         find_file: "Klikk her for å finne en fil du har lastet opp tidligere"
         submit: 
           external_tool: Mer
           file_upload: Filopplasting
           google_doc: "Google Doc"
           media: Media
-          text_entry: "Innlegging av tekst"
+          text_entry: "Skriv inn tekst"
           website: Nettstedsadresse
       loading_tools: "Laster verktøy …"
       messages: 
         google_docs_auth_required: "Før du kan levere oppgaver direkte fra Google Docs må du gi Canvas tilgang til din Google Docs konto:"
         google_drives_auth_required: "Før du kan sende inn oppgaver direkte fra Google Drive må du autorisere Canvas til å få tilgang til din Google Drive konto:"
-        media_recording_ready: "Klar for innlevering! Klikk 'Lever oppgave' knappen for å avslutte."
-        media_recordings_disabled: "Medieopptak er ikke aktivisert for denne Canvasinstallasjonen, og du vil ikke kunne levere denne type oppgaver. Vennligst kontakt fagansvarlig/lærer for å endre innstillingene for denne oppgaven, eller din systemadministrator for evt. å aktivisere medieopptak."
+        media_recording_ready: "Klar for innlevering! Klikk på knappen 'Lever oppgave' for å avslutte."
+        media_recordings_disabled: "Medieopptak er ikke aktivert for denne Canvaskontoen, og du vil ikke kunne levere denne type oppgaver. Vennligst ta kontakt med fagansvarlig/lærer for å endre innstillingene for denne oppgaven, eller systemadministrator for å aktivere medieopptak."
         submitting: "Sender inn..."
         uploading: "Henter en kopi av din Google Doc for innlevering av denne oppgaven. Dette kan ta litt tid, avhengig av filstørrelsen..."
       no_files: "Ingen filer"
       no_submission: "Ingen innlevering valgt"
       submission_url: "Innlevering:"
       titles: 
-        media_recordings_disabled: "Medieopptak er ikke aktivisert for denne Canvasinstallasjonen"
+        media_recordings_disabled: "Medieopptak er ikke aktivert for denne Canvaskontoen."
       upload_or_choose_file: "Last opp en fil, eller velg en fil du har lastet opp tidligere."
     syllabus: 
       page_title: "Pensum for %{course}"
@@ -2110,10 +2159,12 @@ nb:
         settings_exclude_less_than_percent: "Mindre enn %{percentInput} av dokumentet"
     undated_assignments: "Udaterte oppgaver"
     upcoming_assignments: "Kommende oppgaver"
-  assignments_1e02582c: "Oppgaverjavascript:;"
+  assignments_1e02582c: Oppgaver
   assignments_api: 
     invalid_date_time: "Ugyldig datotid for %{attribute}"
-    invalid_submission_types: "Ugyldige Innleverings typer"
+    invalid_submission_types: "Ugyldige innleveringstyper"
+  assignments_in_this_group_have_no_points_possible__3cd35922: "Oppdrag i denne gruppen har ingen oppnåelige poeng og kan ikke inkluderes i klasse beregningen"
+  attached_files_must_be_greater_than_0_bytes_7f57bee7: "Vedlagte filer må være større enn 0 bytes"
   attachment: 
     default_filename: Fil
     errors: 
@@ -2139,11 +2190,15 @@ nb:
       mark_all_as_present: "Marker samtlige som tilstede"
     titles: 
       attendance_help: "For hjelp om oppmøte"
+  attention_aaca1f1d: "Hør etter!"
+  audio_content_is_not_supported_by_your_device_or_a_2f5037c6: "lydinnhold støttes ikke av enheten eller app"
   audio_dd489fcc: Lyd
   auth_logging: 
     corrupted: "Detaljer Ikke Tilgjengelig"
     login: "LOGG INN"
     logout: "LOGG UT"
+  authorize_e3f25bb4: Autoriser
+  available_8606e40c: Tilgjengelig
   available_after_unlock_at_b5682224: "Tilgjengelig etter %{unlock_at}"
   available_after_unlock_at_until_lock_at_499e8092: "Tilgjengelig etter %{unlock_at} inntil %{lock_at}"
   available_from_587ce92f: "Tilgjengelig fra"
@@ -2152,28 +2207,29 @@ nb:
   available_from_f84e4611: "Tilgjengelig fra"
   available_from_field_for_styleguide_7ced3861: "Tilgjengelig fra felt for styleguide"
   available_from_format_like_yyyy_mm_dd_hh_mm_8b726122: "Tilgjengelig fra - format som DD-MM-ÅÅÅÅ tt:mm"
-  available_until_date_2c0ccec3: "Tilgjengelig innen dato:"
-  available_until_date_cd125c62: "Tilgjengelig Inntil Date"
+  available_until_date_2c0ccec3: "Tilgjengelig til dato:"
+  available_until_date_cd125c62: "Tilgjengelig til dato"
   available_until_f3b9c4ed: "Tilgjengelig Frem til"
   available_until_field_for_styleguide_85d5d65a: "Tilgjengelig til felt for styleguide"
   available_until_format_like_yyyy_mm_dd_hh_mm_622378d6: "Tilgjengelig til - format som DD-MM-ÅÅÅÅ tt:mm"
   available_until_lock_at_ab022445: "Tilgjengelig til %{lock_at}"
+  availableslots_available_87b8b69d: "%{availableSlots} Tilgjengelig"
   average_49c63f9b: Gjennomsnittlig
   back_2900f52a: Tilbake
   back_to_app_center_95420d83: "Tilbake til appsenteret"
+  background_color_b92b52ac: Bakgrunnsfarge
+  background_image_1a401e1a: Bakgrunnsbilde
   base_847aca7c: Grunnlag
   bb_display: "Blackboard Learn"
   bb_file_description: "Blackboard 6/7/8/9 export .zip file"
   bb_name: Blackboard-konvertør
-  be_a_hero_and_ask_your_instructor_to_fix_this_link_4981930c: "Vær en helt og spør din instruktør for å fikse denne linken."
-  before_publishing_this_file_you_must_specify_usage_2229d20b: "Før du publiserer denne filen, må du spesifisere bruksrettigheter."
-  before_publishing_you_must_set_usage_rights_on_you_dcd7b567: "Før du publisere, må du sette bruksrettigheter på filene dine."
+  be_a_hero_and_ask_your_instructor_to_fix_this_link_4981930c: "Vær en helt og spør læreren din om å fikse denne lenken"
+  before_publishing_this_file_you_must_specify_usage_2229d20b: "Før du publiserer denne filen, må du spesifisere brukerrettigheter."
+  before_publishing_you_must_set_usage_rights_on_you_dcd7b567: "Før du publiserer, må du sette brukerrettigheter på filene dine."
   beginning_date_2d2a29ac: Startdato
-  below_this_search_field_is_a_list_of_content_type__58aaa03f: "Nedenfor dette søkefeltet er en liste over %{content_type}. Som du skriver, vil listen bli filtrert til samsvarer med søket. Samtalemeldinger vil bli filtrert av hvilken alternativ du valgte."
-  better_file_browsing_description: |-
-      Et nytt, enklere, mer brukervennlig fil surfing grensesnitt. Hvis du slår dette på ved kursnivå
-      deretter alle brukere som er i dette kurset vil se det nye grensesnittet. For å få det til å viser opp når noen
-      går til den personlige filer side for en bruker ('/files') så du må slå den på for kontoen de er medlem av.
+  below_this_search_field_is_a_list_of_content_type__58aaa03f: "Nedenfor dette søkefeltet er en liste over %{content_type}. Etter hvert som du skriver, vil listen bli filtrert i samsvar med søket. Samtalemeldinger vil bli filtrert av hvilke alternativ du valgte."
+  beta_url_3c7b88ec: "Beta URL:"
+  better_file_browsing_description: "Et nytt, enklere, mer brukervennlig grensesnitt for å finne filer. Hvis du slår dette på på kursnivå, vil alle brukerne i det kurset se det nye grensesnittet. For å vise det når noen går til sitt personlige filområde ('/files'), må du slå det på på kontoen de er medlem av."
   between_1_and_99_d421a4c0: "Mellom 1% og 99%"
   between_2_and_5_c34f5152: "Mellom 2 og 5"
   big_blue_button_conference: 
@@ -2182,6 +2238,7 @@ nb:
   blackboard: 
     no_manifest: "Denne Blackboard-zipfilen har ingen imsmanifest.xml-fil i rotmappen."
   blue_daf8fea9: Blå
+  body_shadow_d36e8c2e: Brødtekst-skygge
   bookmark_service: 
     default_title: "Ingen tittel"
   breadcrumb_1_cb3c504: "Breadcrumb 1"
@@ -2192,7 +2249,7 @@ nb:
     title: 
       permissions: "Redigere tillatelser for: %{name}"
     unpublished_title: Upublisert
-  broken_file_link_found_in_your_course_7cc24395: "Brutt fil kobling funnet i kurset"
+  broken_file_link_found_in_your_course_7cc24395: "Brutt filkobling funnet i kurset"
   bucket_name_must_be_one_of_the_following_bucket_na_81c1be40: "bøtte navn må være en av de følgende: %{bucket_names}"
   bulk_course_migration: 
     export_failed: "En feil oppsto under eksporteringen av kurset med bb_lcid %{id} fra Blackboard"
@@ -2216,7 +2273,7 @@ nb:
       migration_finished_on: "Fullført %{date}"
       migration_queueing: "De enkelte kursflyttinger settes i kø for å kjøres."
       migration_started_at: "Samlet flytting startet %{time}"
-      migration_waiting: "De fleste flyttingene venter på tur."
+      migration_waiting: "Den samlede flyttingen venter på tur."
       see_results: "Se resultater"
       show_warnings: "Vis advarsler"
       waiting_to_export: "Venter på å eksportere fra Blackboard"
@@ -2250,7 +2307,7 @@ nb:
       sis_id_description: "SIS ID på Canvas kurset det skal importere til."
       upload_migration_csv: "Last opp en flytte-CSV"
       user_name: Brukernavn
-      user_name_description: "Brukernavnet til brukeren som har lærer/designeren tilgang til kurset for raden. Dette må samsvare med en av de brukernavnet er oppført i Tavle Noterer påloggingsopplysninger ovenfor."
+      user_name_description: "Brukernavnet til brukeren som har lærer/designertilgang til kurset for raden. Dette må samsvare med en av de brukernavnene som er oppført i påloggingsopplysningene til Blackboard ovenfor."
     only_one_bulk_migration: "Bare én samlet kursflyting kan kjøres til enhver tid."
   button: 
     submit_assignment: "Lever besvarelse"
@@ -2258,7 +2315,7 @@ nb:
     add_item: "Legg til punkt"
     apply: Bruk
     authorize_google_docs: "Autoriser Google Docs-tilgang"
-    authorize_google_drive: "Autorisere Google Drive Access"
+    authorize_google_drive: "Autoriser tilgang til Google Drive"
     back_to_outcomes: "Tilbake til læringsmål"
     cancel: Avbryt
     choose_a_file: "Velg en fil "
@@ -2290,14 +2347,14 @@ nb:
     update: Oppdater
     view_account_roster: "Se kontodeltagere"
     view_course_roster: "Se kursets deltagere"
-  by_default_all_links_are_enabled_for_a_course_stud_8e617dbc: "Som standard alle koblinger er aktivert for et kurs. Studentene vil ikke se lenker til seksjoner som ikke har innhold. For eksempel, hvis du ikke har opprettet noen quizer, de vil ikke se quizer link. Du kan sortere og eksplisitt deaktivere disse linkene hvis det er områder av kurset trenger du ikke at elevene din får tilgang."
+  by_default_all_links_are_enabled_for_a_course_stud_8e617dbc: "Som standard er alle koblinger aktivert for et kurs. Studentene vil ikke se lenker til seksjoner som ikke har innhold. For eksempel, hvis du ikke har opprettet noen quizer, vil de ikke se denne i menyen. Du kan sortere og eksplisitt deaktivere disse lenkene hvis det er områder i kurset ditt du ikke ønsker at elevene har tilgang til."
   by_lti_2_registration_url_e421e523: "Av LTI 2 Registrering URL"
-  by_url_a163275e: "Etter URL"
+  by_url_a163275e: "Fra URL"
   c_2001_acme_inc_283f7f80: "(c) 2001 Acme Inc."
   c_modal_form: 
     close: lukk
   calculation_int_is_not_a_valid_value_for_this_calc_1de6e060: "'%{calculation_int}' er ikke en gyldig verdi for denne beregnings metoden. Verdien må være mellom '%{valid_calculation_ints_min}' og '%{valid_calculation_ints_max}'"
-  calculation_method_fe281f9: "Beregnings Metode"
+  calculation_method_fe281f9: Beregningsmetode
   calculation_method_must_be_one_of_the_following_ca_d8ae5dac: "beregnings_metode må være en av de følgende: %{calc_methods}"
   calculator: 
     buttons: 
@@ -2671,14 +2728,16 @@ nb:
         create_assignment: "Lag en ny oppgave"
         delete: "Slett en hendelse/oppgave"
         new: "Opprett en ny hendelse"
+  can_t_compute_score_until_an_assignment_has_points_f34dd600: "Kan ikke regne ut karakter før en innleveringen har oppnåelige poeng"
   can_t_delete_alignments_based_on_rubric_associatio_d9fd10a3: "Kan ikke slette justeringer basert på Rubrikk foreninger. For å fjerne disse assosiasjonene du trenger å fjerne rad fra eiendelens rubrikk"
   can_t_perform_diffing_against_more_than_one_file_o_44475c0d: "Kan ikke utføre diffing mot mer enn én fil av samme type"
+  can_t_unpublish_if_there_are_student_submissions_2d7cd742: "Kan ikke avpublisere om det er student innleveringer"
   cancel_caeb1e68: Avbryt
   cannot_be_nil_when_account_id_is_nil_be6d1d60: "kan ikke være null når account_id er null"
   cannot_be_nil_when_course_id_is_nil_f539388: "kan ikke være null når course_id er null"
   cannot_be_present_when_account_id_is_present_f7d9b51f: "kan ikke være til stede når account_id er til stede"
   cannot_be_present_when_course_id_is_present_785e6a59: "kan ikke være til stede når course_id er til stede"
-  cannot_delete_a_file_that_has_been_submitted_as_pa_fda24c4: "Kan ikke slette en fil som har blitt sendt som en del av en innlevering"
+  cannot_delete_a_file_that_has_been_submitted_as_pa_fda24c4: "Kan ikke slette en fil som har blitt sendt inn som en del av et oppdrag"
   canvas: 
     migration: 
       errors: 
@@ -2696,6 +2755,7 @@ nb:
         login_expiration_minimum: "Utløpstid for en sesjon må være 20 minutter eller mer"
         need_integer: "Vennligst skriv inn et heltall i spillelistens hurtigbuffer"
         stream_name_required: "Kinesis strømnavnet er påkrevd."
+  canvas_by_instructure_1490381: "Canvas av Instructure"
   canvas_cartridge_description: "Dette gjør det mulig å konvertere en Canvaseksport til et midlertidig JSON format som kan importeres"
   canvas_cartridge_display: "Canvas Common Cartridge"
   canvas_cartridge_file_description: "Canvas kurseksport pakke"
@@ -2711,6 +2771,10 @@ nb:
   canvas_will_regrade_all_your_submissions_after_you_2d68694a: "Canvas vil sette karakter på nytt i alle dine innleveringer etter at du lagrer prøven, dette kan ta noen minutter."
   careful_changes_to_group_membership_will_apply_to__19a9089c: "Forsiktig! Endringer til gruppemedlemskap blir brukt på alle grupper som allerede har innlevering-innsendinger. Det kan hende at gruppe-innlevering-innsendinger ikke blir justert på grunn av det. Vil du opprette en ny gruppe for fremtidige innleveringer?"
   cas_url_4ba2843e: CAS-URL
+  catalog_already_enabled_56478a3c: "Katalog allerede aktivert"
+  catalog_name_46d37909: Katalog-navn
+  catalog_url_a01655dd: "Katalog URL"
+  catalog_users_already_exist_2894b8c4: "Katalog-brukere eksisterer allerede"
   cc: 
     by: "CC Navngivelse BY"
     by_nc: "CC Attribution Ikke-Kommersiell"
@@ -2720,6 +2784,8 @@ nb:
     by_sa: "CC Navngivelse-Del på samme vilkår BY-SA"
     private: "Privat (Kopibeskyttet)"
     public_domain: "Åpent område"
+  cell_number_is_invalid_bd6faee0: "Celletall er ugyldig!"
+  cell_number_is_required_2edcee60: "Celletall er påkrevd"
   certificate_fingerprint_b376df90: Sertifikat-fingeravtrykk
   change_beginning_date_to_39dbd06e: "Endre startdato ti"
   change_dcaa253a: Endre
@@ -2732,7 +2798,9 @@ nb:
       update_assignment_points: "Denne oppgaven har %{assignmentPoints} oppnåelige poeng, ønsker du å endre den til å ha %{rubricPoints} oppnåelige poeng for å passe med denne vurderingen?"
     titles: 
       update_assignment_points: "Endre oppnåelige poeng for å passe med vurderingen?"
+  changes_will_still_apply_if_you_leave_this_page_935cedc6: "Endringene vil fremdeles utføres dersom du forlater denne siden."
   child_s_username_dde3aa9: "Barns brukernavn"
+  choose_a_color_or_course_nickname_for_course_2585e42c: "Velg en farge eller et kurs-kallenavn til %{course}"
   choose_a_course_home_page_8059c7b: "Velg en startside for kurset"
   choose_a_csv_file_to_upload_9644480c: "Velg en CSV-fil å laste opp:"
   choose_an_authentication_service_47dc8875: "Velg en autentiseringstjeneste"
@@ -2862,6 +2930,7 @@ nb:
   comm_messages: 
     from_beginning: begynnelsen
     to_now: nå
+  comments_e07bcbe3: Kommentarer
   common_cartridge_description: "Dette gjør det mulig å konvertere en Common Cartridge pakke til et midlertidig JSON format for import"
   common_cartridge_display: "Common Cartridge"
   common_cartridge_file_description: "Common Cartridge 1.x Pakke"
@@ -2957,7 +3026,9 @@ nb:
       description: Beskrivelse
       duration: Varighet
       duration_in_minutes: minutter
-      invite_all: "Inviter alle kursmedlemmer"
+      invite_all: 
+        course: "Inviter alle kursmedlemmer"
+        group: "Inviter alle gruppemedlemmer"
       long_running: "Ingen tidsbegrensning (for langvarige konferanser)"
       members: Medlemmer
       name: Navn
@@ -3044,6 +3115,8 @@ nb:
         all_quizzes: "Alle prøver"
       select_quizzes: "Velg prøver å eksportere"
   content_for_section_1_7ecfb319: "Innhold for Seksjon 1"
+  content_for_section_2_e7c6e2a3: "Innhold for Seksjon 2"
+  content_for_section_3_90c1d235: "Innhold for Seksjon 3"
   content_imports: 
     errors: 
       import_failed: "Det oppsto en feil i overflytting av din import. Vær snill å kontakte system administrator og oppgi den følgende kode: \"%{code}\""
@@ -3417,7 +3490,7 @@ nb:
         add_module: "Legg til modu"
       labels: 
         publish_final_grade: "Legg ut sluttkarakter for studenten når denne modulen er fullført"
-        require_sequential_progress: "Studenter må gå gjennom krav i denne modulen i en rekkefølge"
+        require_sequential_progress: "Studentene må gå gjennom kravene i kronologisk rekkefølge"
       links: 
         add_prerequisite: "Legg til forutsetning"
         add_requirement: "Legg til krav"
@@ -3567,8 +3640,8 @@ nb:
         fulfilled: "oppnådde et resultat på ikke mer enn %{score}"
         unfulfilled: "må ha et resultat på ikke mer enn %{score}"
       min_score: 
-        fulfilled: "Karakter: %{score}"
-        unfulfilled: "Karakter: %{score}"
+        fulfilled: "Fikk minst %{score}"
+        unfulfilled: "Få minst %{score}"
       modules_item_move_to: "Flytte til..."
       must_contribute: 
         fulfilled: Bidratt
@@ -3799,8 +3872,10 @@ nb:
   correct_answers_are_no_longer_available_c67dfc28: "Korrekte svar er utilgjengelige."
   correct_answers_will_be_available_from_to_5762e8c6: "Korrekte svar vil være tilgjengelige %{from}–%{to}."
   correct_answers_will_be_available_on_date_48137: "Korrekte svar blir tilgjengelige %{date}."
+  couldn_t_find_an_authority_to_update_44d9407e: "Fant ikke en autoritet å oppdatere"
   couldn_t_find_canvas_csv_import_headers_487f1b6c: "Fant ikke Canvas CSV importere overskrifter"
   couldn_t_generate_diff_message_a0528b20: "Kunne ikke generere diff: %{message}"
+  couldn_t_update_standards_for_authority_auth_81206187: "Klarte ikke å oppdatere standarder for autoriteten %{auth}"
   count_assignments_with_errors_e8f3c18c: 
     one: "1 Oppdraget med feil"
     other: "%{count} Oppdrager med feil"
@@ -3832,6 +3907,7 @@ nb:
   count_students_will_get_num_points_c970fc01: 
     one: "1 student vil få %{num} poeng"
     other: "%{count} Studentene vil få %{num} poeng"
+  country_is_required_b0afbf52: "Land er påkrevd"
   course: 
     access_denied: "Ingen tilgang"
     batch_update_message: 
@@ -4080,6 +4156,7 @@ nb:
     assignments_needing_grading: 
       headings: 
         grade: "Evaluer %{assignment}"
+        moderate: "Moderat %{assignment}"
         to_do: "Å gjøre"
       links: 
         show_more: "%{count} mer..."
@@ -4371,6 +4448,7 @@ nb:
         conclude_at: Slutter
         course_code: Kurskode
         course_description: Beskrivelse
+        course_epub_export: "ePub eksport"
         course_format: Format
         course_lock_all_announcements: "Slå av kommentarer på kunngjøringer"
         course_name: Navn
@@ -4572,6 +4650,7 @@ nb:
     unauthorized: 
       invalid_link: "Påmeldingslenka du brukte er ikke lenger gyldig. Kontakt kursets instruktør og sjekk at du er korrekt påmeldt."
   courses_43204aae: Kurs
+  create_132b3be1: Opprett
   create_item_base: 
     there_was_an_error: "Det oppstod en feil ved lagring av \"%{title}\", vennligst prøv igjen."
   create_module_item: 
@@ -4631,6 +4710,8 @@ nb:
     syllabus: Pensum
     users: Brukere
     wiki_pages: Sider
+  css_ae1d10ce: CSS
+  css_and_javascript_to_load_when_user_content_is_di_f86f73f5: "CSS og Javascript for å laste når brukeren innholdet vises på lerretet iOS eller Android native apps"
   csv: 
     alpha: Alfa
     answered: 
@@ -4688,10 +4769,13 @@ nb:
       student: 
         count: "Feil studentantall"
         ratio: "Feil studentratio"
+  current_courses_d5287d50: "Gjeldende kurs"
+  current_grading_standard_for_this_assignment_64c5375e: "Nåværende vurderingsstandard for denne oppgaven"
   current_mastery_score_score_out_of_mastery_points_fedd343f: "Nåværende Mestring Poeng: %{score} out of %{mastery_points}"
   current_provider_6c3f7f96: "Nåværende tilbyder"
   current_score_6c81792: "Gjeldende resultat"
   current_total_67bf5f72: "Nåværende Totalt:"
+  curve_grades_b7a75443: Karakterkurver
   curve_grades_dialog: 
     average_score: "Gjennomsnittlig resultat"
     buttons: 
@@ -4874,6 +4958,7 @@ nb:
       second: Sekund
       year: År
   day_s_7cc1231f: Dag(er)
+  deactivate_this_key_3e79a2b5: "Deaktiver denne nøkkelen"
   decaying_average_8bf6a0dd: "Forfalne Gjennomsnittlig"
   decrease_indent_d9cf469d: "Reduser innrykk"
   deep_orange_4c7eea99: Mørkeoransje
@@ -4882,6 +4967,7 @@ nb:
   default_grade_cannot_be_set_to_ex_723caa59: "Standard vurdering kan ikke være satt til %{ex}"
   default_question_name: Spørsmål
   default_question_text: Spørsmålstekst
+  define_text_to_go_before_and_after_the_dropdown_an_be8d16e2: "Skriv inn teksten som skal stå før og etter nedtrekksmenyen, sett sammen et knippe mulige svar."
   delay_posting_this_topic_until_aa483eec: "Avvent publisering av dette emnet til"
   delete_a6efa79d: Slette
   delete_current_module_item_21fefc54: "Slett nåværende modul/element"
@@ -5281,6 +5367,9 @@ nb:
       write_a_reply: Svar
     entry_stats: 
       show_more: "Vis mer"
+    flash: 
+      fail: "Sletting av emnet mislyktes."
+      removed: "Emnet er slettet."
     hide_due_dates: "Skjul frister"
     initial_post_required_to_subscribe: "Du må skrive et svar før du abonnerer"
     like_count: 
@@ -5329,6 +5418,8 @@ nb:
     unsubscribed: "Abonnument avsluttet"
     unsubscribed_hint: "Du abonnerer ikke på dette temaet. Klikk for å abonnere."
   display_course_catalog: "Vis søkbar liste over kurs i dette root kontoen med \"Inkluder dette kurset i den offentlige kurset indeks\" flagg aktivert."
+  display_total_grades_when_the_all_grading_periods__1d2b5cf: "Vis samtlige karakterer når \"Alle karakterperiodene\" nedtrekksmenyvalg er  valgt (Flere karakterperioder må være aktivert)."
+  display_totals_for_all_grading_periods_ad1ea050: "Vis poengsummene for \"Alle karakterperiodene\""
   distribution_of_current_grades_in_courses_across_a_e6c82f5d: |-
       Fordeling av aktuelle karakterer i kurs på tvers av alle innrullert studenter
       i avdeling kurs
@@ -5336,13 +5427,19 @@ nb:
   domain_3b54c511: Domene
   domain_is_required_1d4c8b25: "Domene er påkrevd"
   don_t_move_lti_query_params_to_post_body_21744487: "Ikke flytt LTI-søkeparametre til POST-body"
+  don_t_move_lti_query_params_to_post_body_5c80e037: "Ikke flytt LTI spørreparametere til POST-Body"
   don_t_show_again_15d8253e: "viser ikke igjen"
   done_54e3d4b6: Ferdig
   done_8af51c9b: Ferdig.
+  done_editing_9f7379d9: "Ferdig med redigering."
   down_5831a426: Ned
+  download_associated_files_f35dcb5e: "Last ned tilknyttede filer"
   download_c7ffdfb9: "Last ned"
+  download_course_content_7f66edc9: "Last ned Kursinnhold"
+  download_epub_757cf0af: "Last ned ePub"
   download_scores_generated_on_date_ff5b9cd2: "Last ned karakterer generert på %{date}"
   download_submissions_7454665f: "Last ned innleveringer"
+  downloading_course_content_allows_access_to_conten_164d9336: "Nedlasting av kursinnholdet gir tilgang til innhold mens du er frakoblet. Innhold kan omfatte filer, sider, oppgaver, diskusjonstemaer eller spørrekonkurranser. Klikk \"Generer ePub\" for hvert kurs og åpen med noen eReader programvare for å vise."
   dropdown_option_1_e6ff2fc: "Dropdown-valg 1"
   dropdown_option_2_9766a346: "Dropdown-valg 2"
   due_a73610f6: "Leveres innen"
@@ -5360,11 +5457,13 @@ nb:
   due_date_cannot_be_before_term_start_ea660b2c: "Forfallsdato kan ikke være før semesterstart"
   due_date_cannot_be_before_unlock_date_f263aab0: "Fristdato kan ikke være før låsdato"
   due_date_field_for_styleguide_a88e02d6: "Fristdato-felt for styleguide"
+  due_date_set_1c6364db: "Tidsfrist satt"
   due_dates: 
     due_at: "leveres innen: %{assignment_due_date_time}"
     multiple_due_dates: "frist: Flere frister"
     no_due_date: "leveres innen: Ingen frist"
   due_datetime_f5a81b81: "Frist: %{dateTime}"
+  due_dueat_39d7d6c2: "Frist: %{dueAt}"
   due_format_like_yyyy_mm_dd_hh_mm_ef30a9ef: "Frist - format som DD-MM-ÅÅÅÅ tt:mm"
   due_multiple_dates_cc0ee3f5: "Frist: Flere datoer"
   due_on_date_5ffb2182: Frist
@@ -5411,6 +5510,7 @@ nb:
       find_existing_rubric: "Finner eksisterende vurderingsskjemaer"
   edit_survey_b0d6890d: "Rediger undersøkelse"
   edit_toolname_app_23cfbb8: "Rediger %{toolName} App"
+  edit_your_catalog_account_cce59310: "Redigere din Catalog-konto"
   editing_permissions_for_name_3503e235: "Redigerer rettigheter for: %{name}"
   editor: 
     alt_text: "Alternativ tekst:"
@@ -5476,10 +5576,12 @@ nb:
   element_option_missing_error_an_element_to_attach__be433478: "`element` alternativ manglende feil: Et element for å feste TreeBrowserView må oppgis når du setter den gjengi muligheten til å 'true' for BBTreeBrowserView"
   email: 
     default_from_name: "Instructure Canvas"
+  email_22a7d52d: E-post
   email_address_6e0443a5: E-postadresse
   email_already_in_use_330248e: "E-post allerede i bru"
   email_e366fa29: epost
   email_is_invalid_e0d982eb: "Epost er ugyldig!"
+  email_is_required_736ac26b: "E-post er påkrevd"
   ember_modules_description: "Moduler omskrevet i Ember. Bruker den innfødte dra og slipp API for å tillate å dra fra eksterne steder."
   enable_6f5d1328: "Slå på"
   enable_feature_title_987d8e9a: "Aktiver funksjon: %{title}"
@@ -5488,6 +5590,7 @@ nb:
       Flere vurderingsperioder tillater lærere og administratorer opprette vurderingsperioder med valgte
       datoer. Innleveringer kan filtreres etter disse vurderingsperiodene i vurderingsboken.
   enable_or_condition_for_modules_a16f02d8: "Tillat \"eller\" betingelser for moduler"
+  enable_reregistration_for_lti_2_b2a10444: "Aktivere registrering for LTI 2"
   enabled_links_be110215: "Aktiverte lenker"
   end_date_e0093ed7: Sluttdato
   ending_date_e1ea13a4: Sluttdato
@@ -5528,6 +5631,11 @@ nb:
       delete_term_with_courses: "Kan ikke slette en periode med aktive kurs"
       not_unique: "SIS ID \"%{sis_source_id}\" er allerede i bruk"
   enter_a_hexcode_here_to_use_a_custom_color_51ecccce: "Oppgi en hexkode her for å bruke en tilpasset farge."
+  enter_your_question_and_multiple_answers_31370054: "Skriv inn spørsmålet ditt og flere svar."
+  enter_your_question_specifying_where_each_blank_sh_2c6e8035: "Skriv inn spørsmålet ditt, spesifisere hvor hvert tomme felt skal stå. Studentene må skrive svaret inn i hvert tomme tekstfelt."
+  enter_your_question_specifying_where_each_dropdown_b428a9ff: "Skriv inn spørsmålet ditt, spesifisere hvor nedtrekksmenyen skal plasseres. Definere deretter mulige svar for hver nedtrekksmeny."
+  enter_your_question_text_4729b886: "Skriv inn spørsmålsteksten."
+  enter_your_question_text_students_will_see_the_que_f19af9e9: "Skriv inn spørsmålsteksten din. Studentene vil se spørsmålet etterfulgt av en liten tekstboks der de skal skrive inn svaret."
   eportfolio: 
     buttons: 
       done_editing: "Ferdig med redigering"
@@ -5571,6 +5679,7 @@ nb:
     click_through: "Klikk for å vise sidens innhold"
     default_content: "Intet innhold lagt til enda"
     default_name: Sidenavn
+  eportfolio_settings_75ba1f9a: ePortfolio-innstillinger
   eportfolios: 
     _page_section: 
       section_types: 
@@ -5845,8 +5954,12 @@ nb:
   example_final_score_a92b30b9: "Eksempel sluttresultatet]]"
   example_https_example_com_config_xml_be5f36ac: "Eksempel: https://example.com/config.xml"
   example_https_lti_tool_provider_example_herokuapp__e9802142: "Eksempel: https://lti-tool-provider-example.herokuapp.com/register"
+  example_https_schoolofrock_catalog_instructure_com_b7a35ab5: "eksempel: \"https://schoolofrock.catalog.instructure.com\""
+  example_https_schoolofrock_edu_d4326f03: "eksempel: \"https://schoolofrock.edu\""
   example_item_scores_6726c689: "Eksempel element poeng"
+  example_school_of_rock_41f32c31: "eksempel: \"School of Rock\""
   exceeds_mastery_1f995dce: "Overgår Mestring"
+  excuse_this_assignment_for_the_selected_student_af04e132: "Unnskyld denne innleveringen for den valgte studenten"
   excused_5877183c: Unnskyldt!
   excused_cf8792eb: Unnskyldt
   exit_theme_editor_9ddd41bb: "Avslutt Theme Editor"
@@ -6007,10 +6120,13 @@ nb:
     user_navigation_configured: "Brukernavigering konfigurert"
     wiki_page_menu_configured: "Wiki side menyen konfigurert"
   external_url_e9b87215: "Ekstern URL"
+  failed_307449e1: Mislyktes
+  failed_to_create_webhook_b766cf5c: "Klarte ikke å opprette webhook."
   failed_to_create_zip_file_1a943d06: "Mislyktes å opprette zip-arkiv"
   failed_to_import_media_objects_4c1fcb4f: "Feil ved import av medieobjekter"
   failed_to_log_in_7ceec561: "Innlogg mislyktes"
   fair_use_bee47d77: "Virkelig Bruk"
+  favicon_6e658914: Favicon
   feature_flags: 
     feature_flag: 
       allow: Tillat
@@ -6032,12 +6148,16 @@ nb:
     differentiated_assignments: "Differensierte oppgaver"
     differentiated_assignments_account_disable_warning: "Å slå av denne funksjonen vil påvirke eksisterende kurs. For hjelp med å slå av denne funksjonen, kontakt din Canvasadmin."
     differentiated_assignments_course_disable_warning: "Deaktivering differensierte oppdrag vil gjøre alle publiserte oppdrag synlig for alle studenter."
+    differentiated_assignments_description: |-
+        Ulike oppdrag er en funksjon som gjør det mulig å velge hvilken seksjon(er) eller enkelte student(er) et oppdrag gjelder.
+        Seksjoner som ikke er tilordnet til et oppdrag, vil ikke se det i sitt kursinnhold og deres endelige karakter blir
+        beregnet uten disse poengene.
     ember_modules: "Ember Moduler"
     google_docs_domain_restriction: "Domenebegrensning for Google Docs"
     gradebook_list_students_by_sortable_name: "Karakterboken - Studenter Liste ved sorterbar navn"
     high_contrast: "Bruk stiler med høy kontrast"
     html5_first_videos: "Foretrekk HTML5 for videoavspilling"
-    k12: "K-12 spesifikk funksjoner"
+    k12: "Spesifikke K-12 funksjoner"
     learning_mastery_gradebook: "Karakterbok for mestringsbasert læring"
     lor: "LOR Ekstern verktøyene"
     multiple_grading_periods: "Flere Gradering Perioder"
@@ -6047,6 +6167,8 @@ nb:
     student_groups: "Ny side for studentgrupper"
     student_outcome_gradebook: "Karakterbok for studentens mestringsbaserte læring"
   field_name_31fff38e: Feltnavn
+  file_filename_could_not_be_included_in_the_epub_do_4bf71a87: "Fil %{filename} kunne ikke inkluderes i dette ePub-dokumentet. Vennligst se egen zip-fil for tilgang."
+  file_list_350d08df: Filliste
   file_list_updated_38e2a5ad: "Fil listen oppdatert"
   file_menu_cc0ca54: Filmeny
   file_not_found_9eec054c: "Finner ikke filen"
@@ -6130,12 +6252,15 @@ nb:
   files_c300e900: Filer
   files_uploaded_519844ed: "Opplastede Filer"
   fill_in_the_blank_read_surrounding_text_1a6c73c7: "Fyll inn den tomme boksen, les teksten rundt"
+  filled_5d8c39e: Utfylt
   filter_announcements_by_unread_495eeeb3: "filtrer annonseringer med ulest"
   filter_by_name_34cbe139: "Filtrer etter navn"
   filter_discussions_by_assignments_757924ed: "filtrer diskusjoner med oppdrager"
   filter_discussions_by_unread_6c48322: "filtrer diskusjoner med ulest"
   filter_e3398407: Filter
+  filter_replies_by_unread_342e8e90: "Filtrer svar etter ulest"
   filter_replies_by_unread_caf870ea: "filtrer svarene med ulest"
+  find_an_existing_grading_scheme_d836ea: "Finn et eksisterende vurderingsskjema"
   find_flickr_image_view: 
     find_cc_on_flickr: "Finn Creative Commons-bilder på Flickr"
     search: Søk
@@ -6157,6 +6282,7 @@ nb:
       invalid_recursion: "En mappe kan ikke være sin egen overordnete mappe"
       invalid_root_folder_name: "Root mappenavn kan ikke endres"
     folder_created: "Mappen \"%{name}\" etablert"
+  folder_browsing_tree_1f00a3ae: "Folder Browsing treet"
   folders: 
     event_updated: "Hendelsen ble oppdatert"
     file_zip_in_process: "Filzipping fremdeles underveis..."
@@ -6169,12 +6295,20 @@ nb:
   for_974cbb84: For
   for_all_devices_1f603968: "For alle enheter"
   forgot_password_url_3f9c04b: "URL for glemt passord"
+  form_background_fb654518: Skjemabakgrunn
+  form_border_f61f12dc: Skjema-marg
   from_fdd4956d: Fra
   from_from_to_to_e31f6422: "Fra %{from} til %{to}"
+  generate_epub_80e89ea4: "generere ePub"
+  generated_f26ee56b: Generert
+  generating_5b5e20f8: "generering:"
+  generating_c2aabc02: "Generering:"
+  generating_preview_45b53be0: "Genererer forhåndsvisning..."
   generating_preview_ae83830: "Laster forhåndsvisning…"
   get_the_following_from_your_salesforce_connected_a_881fc9a3: "Få følgende fra din Salesforce tilkoblede applikasjon"
   get_your_users_error_reports_posted_to_salesforce__76f57839: "Få dine brukeres feilrapporter publisert til Salesforce Service Cloud"
   get_your_users_error_reports_posted_to_salesforce_dfb1a6c2: "Få dine brukeres feilrapporter publisert til Salesforce"
+  global_branding_df1cae12: "Global markedsføring"
   global_message_icons: 
     announcement: kunngjøring
     calendar: kalender
@@ -6192,6 +6326,7 @@ nb:
       om at de trenger å oppdatere sin Google Docs integrasjon.
   google_docs_preview_9f41b23c: "Google Docs forhåndsvisning"
   google_drive_7cb003c9: "Google Drive"
+  grade_9c6f076d: Karakter
   grade_display_warning_dialog: 
     grade_display_warning: 
       checkbox: "Ikke vis for dette kurset senere."
@@ -6200,9 +6335,13 @@ nb:
   grade_export_title: Karaktereksport
   grade_summary: 
     graph_title: "Gjennomsnitt %{mean}, Høy %{high}, Lav %{low}"
+    ? "no"
+    : nei
     outcome: 
       alignment_count: "*%{count}* justeringer"
       alignment_count_summary: "*8* av *%{count}* innleveringer"
+    ? "yes"
+    : ja
   gradebook: 
     alerts: 
       no_active_students: "Beklager, det er ingen aktive studenter i kurset eller ingen du kan sette karakterer på."
@@ -6308,8 +6447,8 @@ nb:
     hide_notes: "Skjul merknadskolonne"
     hide_student_names: "Skjul studentnavn"
     invalid_assignment_groups_warning: 
-      one: "Resultatet inneholder ikke %{groups} fordi den ikke har noen oppnåelige poeng"
-      other: "Resultatet inneholder ikke %{groups} fordi de ikke har noen oppnåelige poeng"
+      one: "Vurderingen inkluderer ikke %{groups} fordi den har ingen oppnåelige poeng"
+      other: "Vurderingen inkluderer ikke %{groups} fordi de har ingen oppnåelige poeng"
     keyboard_assignment_desc: "Gå til den nåværende oppgavens detaljside"
     keyboard_close_menu: "Lukk menyen for den aktive oppgaven"
     keyboard_comment_desc: "Kommenter den aktive innleveringen"
@@ -6374,10 +6513,12 @@ nb:
     ungraded: "Ikke tatt med i sensur"
   gradebook_csvs: 
     grades_filename: Karakterer
+  gradebook_performance_764d8b3d: Vurderingsbok-ytelse
   gradebook_uploads: 
     new: 
       titles: 
         new_upload: "Last opp karakteroversikt"
+    no_file_attached: "Vi oppdaget ikke en CSV å laste opp. Vennligst velg en CSV å laste opp og sende inn på nytt."
     show: 
       assignment_answer: "Denne oppgaven er"
       assignment_example: "Prøve om egenkapitalindekser"
@@ -6391,6 +6532,7 @@ nb:
         missing_assignment: "Du lastet opp noen oppgaver som ikke har vært i karakteroversikten din før nå. Fortell oss om det er en ny oppgave, eller om det gjelder en eksisterende oppgave."
         missing_student: "Du lastet opp rader for følgende studenter, men vi kunne ikke avgjøre hvilken klasse det gjelder. Fortell oss hvem som er hvem."
         no_changes: "Ingen endringer ble oppdaget i karakteroversikten du lastet opp."
+        past_grading_periods_prevent_editing: "Følgende oppgaver kan ikke redigeres fordi de ikke er i en aktuell gradering periode:"
       ignore_assignment_option: "Bogus, ignorer den"
       ignore_student_option: "Ikke i min klasse, ignorer denne raden."
       labels: 
@@ -6453,6 +6595,7 @@ nb:
       for_course: "For kurset,"
       grading_in_progress: "Faglærer arbeider med karakterene"
       headers: 
+        anonymous: "Karakterene satt anonymt"
         details: Detaljer
         due: "Leveres innen"
         grades: "Karakterer for %{student}"
@@ -6548,6 +6691,19 @@ nb:
         other: "Filer og kommentarer opprettet for %{count} innleveringer"
     out_of_final: "%{weight} av Total"
     out_of_points_possible: "av %{points_possible}"
+    react_gradebook: 
+      accessibility_warning: "Advarsel: karakterbok Grid View er ikke tilgjengelig. Klikk her for å bruke den individuelle syn i stedet."
+      download_scores: Eksport
+      export_current_gradebook: Nåværende
+      filter_by_student: "Filtrer etter studentnavn eller sekundær ID"
+      grades: Vurderinger
+      individual_view: "Individuell visning"
+      learning_mastery: Læringsmestring
+      page_header_title: Karakterbok
+      publish_to_sis: "Publiser karakterer til SIS"
+      set_group_weights: "Still gruppevekter"
+      show_concluded_enrollments: "Vis konkluderte påmeldinger"
+      view_grading_history: "Vis vurderingshistorie"
     screenreader: 
       page_titles: "Karakteroversikt: Individuell visning"
     speed_grader: 
@@ -6724,6 +6880,7 @@ nb:
       pages: Sider
       people: Personer
   group_a8f5ed9c: Gruppe
+  group_assignments_cannot_be_enabled_for_moderated__6b2faeef: "Gruppeoppgaver kan ikke aktiveres for modererte oppdrag"
   group_categories: 
     notices: 
       create_category_success: "Kategorien ble opprettet"
@@ -6760,6 +6917,7 @@ nb:
   group_name_b69c144: Gruppenavn
   group_name_in_group_category_name_group_category_29bf3254: "%{group_name} i %{group_category_name} gruppe kategori"
   group_name_is_required_5547bc0b: "Gruppenavn kreves"
+  group_set_name_2aed2347: Gruppesettnavn
   group_settings: 
     invitation_sent: "Invitasjoner sendt"
   groups: 
@@ -7186,10 +7344,13 @@ nb:
   here_are_your_assignments_listed_by_due_date_7d8e98e6: "Her er dine Oppgaver, listet etter forfallsdato."
   here_f44564ee: her.
   here_s_a_great_chance_to_get_to_know_the_calendar__187ce49: "Her er en flott mulighet til å bli kjent med kalenderen og legge til ikke-oppgave hendelser du kanskje har til kurset. Ikke bekymre deg, vi vil hjelpe deg gjennom det."
+  hidden_14a032a7: Skjult
   hidden_available_with_a_link_65ef2bda: "Skjult, tilgjengelig med en lenke"
   hidden_available_with_a_link_click_to_modify_184990e7: "Skjult. Tilgjengelig med en link - Klikk for å modifisere"
   hidden_files_inside_will_be_available_with_links_9bdf702b: "Skjult, filer inne vil være tilgjengelig med linker."
   hide_correct_answers_at_b1a59408: "Skjul riktige svar på"
+  hide_notes_column_7749f408: "Skjule Notater Column"
+  hide_student_names_3e59e862: "Skjul Student-navn"
   high_contrast_description: |-
       Hvis du foretrekker en høyere kontrast versjon av Canvas brukergrensesnitt, aktivere den.
       Dette kan være nyttig for personer med nedsatt visjon eller problemer med å lese.
@@ -7198,6 +7359,8 @@ nb:
   highest_score_e080551e: "Høyeste Poeng"
   homework_submission_172e8354: Lekse-innlevering
   host_8be927e0: Vert
+  host_is_unreachable_or_not_pointing_to_catalog_fb3fc082: "Verten er utilgjengelig eller ikke peker til Katalog"
+  hover_over_me_496521b9: "Hold markøren over meg"
   html5_first_videos_description: |-
       Som standard vil Canvas primært forsøke Flash til å spille av videoer. Slå på dette for å sette HTML5 som primæralternativ,
       for deretter å falle tilbake til Flash.
@@ -7215,6 +7378,7 @@ nb:
     online_url_submission: "ONline URL-innlevering"
     quiz_submission: Prøveinnlevering
     text_entry_submission: "Innlevering med fritekstsvar"
+  id_already_in_use_for_this_account_and_authenticat_dc3a7d65: "ID allerede benyttet for denne kontoen og autentiseringsleverandør"
   idp_entity_id_25c51837: "IdP Entity ID"
   if_enabled_content_designers_must_provide_copyrigh_eca21f5e: "Om aktivert, må innholdsdesignere gi informasjon om opphavsrett og lisens for filer før de publiseres. Gjelder kun om Better File Browsing er aktivert."
   if_enabled_modules_will_have_the_option_to_be_mark_a4313e1: "Om aktiver, vil moduler har muligheten til å bli markert som fullført når kun ett av kravene er møtt."
@@ -7232,6 +7396,7 @@ nb:
   ignore_name_55edc6fe: "Ignorere %{name}"
   ignore_these_3940f6f5: "Ignorere disse"
   ignore_this_assignment_b7a71f80: "Ignorer denne oppgaven"
+  ignore_until_new_mark_77eb512: "Ignorer Inntil ny Merk"
   ignore_until_new_submission_87f32b4: "Ignorer fram til ny innlevering"
   image_8ad06: Bilde
   images: 
@@ -7244,6 +7409,7 @@ nb:
   immediately_c128ede6: Umiddelbart
   import_1b31507: Importer
   import_content_b2fd6620: "Importer innhold"
+  important_note_educational_institutions_have_an_ob_c9350304: "* Viktig: Utdanningsinstitusjoner har en plikt til å gjøre innholdet sitt så tilgjengelig som mulig . Instructure anbefaler minst en 3: 1 tekst-til - background-color ratio for å holde teksten lesbar. Enkelt teste dine kontrastforhold med ** WebAIM Color Contrast Checker *** ."
   importers/assignment_importer: 
     errors: 
       import: 
@@ -7276,7 +7442,10 @@ nb:
   in_progress_9d1ce8b9: Pågår
   in_progress_icon_6e69c998: Pågår-ikon
   inbox_bb245a60: Innboks
+  include_scores_when_alerting_about_grade_changes_623ec201: "Inkluder score når som varsler om karakteren endringer."
   include_this_assignment_s_grades_when_posting_to_y_6bff3323: "Inkluder denne oppdrags karakterer når du legger til skolens Student Information System"
+  include_unpublished_assignments_83ebbaec: "Inkluder Upubliserte Oppdrag"
+  include_unpublished_courses_7a0e7aab: "Inkluder Upubliserte Kurs"
   incorrect_username_and_or_password_2de73abb: "Feil brukernavn og/eller passord"
   increase_indent_6af90f7c: "Øk innryk"
   incremental_update_successfully_generated_against__db3f3f06: "Trinnvis oppdatering generert mot en forrige SIS-import."
@@ -7288,6 +7457,8 @@ nb:
     styleguide: 
       manage: Behandle
   info_8f47054a: Info
+  inner_box_background_6f9092f: "Innerste boksbakgrunn"
+  inner_box_border_d0524b03: "Innerste boksramme"
   insert_math_equation_57c6e767: "Sett Matte Likning"
   insert_row_below_25187f89: "Sett inn rad under"
   installed_7b284a91: Installert
@@ -7356,14 +7527,18 @@ nb:
     tooltips: 
       enter_search_terms: "skriv inn søkeord"
   integration_id_int_id_is_already_in_use_f30f03b5: "Integrasjon ID \"%{int_id}\" er allerede i bru"
+  international_sms_9edb9868: "internasjonal SMS"
+  international_text_messaging_rates_may_apply_d4b4a97a: "Internasjonale priser på tekstmeldinger kan påløpe."
   invalid_authenticity_token_b753558c: "Ugyldig Autentisitet Tegn"
   invalid_csv_file_grades_could_not_be_updated_6ebdeca4: "Ugyldig csv-fil, karakterer ble ikke oppdatert."
   invalid_points_possible: "Antall oppnåelige poeng for oppgaven må være større eller lik null."
+  invalid_recipient_name_56b22b86: "Ugyldig mottakernavn."
   invalid_state_parameter_7a5aa108: "Ugyldig tilstand parameter"
   invalid_url_in_xml: "Invalid url in xml. Ampersands must be escaped."
   invalid_utf_8_13c76a6: "Ugyldig UTF-8"
   invalid_xml_syntax: "ugyldig XML-syntaks"
   invite_5b1fcbcd: Inviter
+  ip_filter_is_not_valid_152a46d8: "IP-filteret er ikke gyldig."
   it_looks_like_your_content_might_not_load_you_can__dfb85860: "Det ser ut som om ditt innhold muligens ikke blir lastet inn. Du kan benytte denne knappen for å forsøke å laste det i en ny fane."
   item_complete_d334fd43: "(Item Complete)"
   item_incomplete_d6a16040: "(Item Incomplete)"
@@ -7378,6 +7553,7 @@ nb:
   items_items_selected_5b55e566: "%{items} elementer valgt"
   items_selected_have_different_usage_rights_52b325cc: "Elementer som er valgt har ulike bruksrettigheter."
   j_5226008a: j
+  javascript_24e6a9d3: JavaScript
   jobs: 
     columns: 
       attempt: forsøk
@@ -7450,6 +7626,7 @@ nb:
   kind_7f0a88c4: Type
   labels: 
     lock_module_until: "Lås inntil"
+  last_enrollment_activity_10fe15ba: "Siste Påmelding aktivitet"
   last_item_79583712: "Siste Element:"
   last_modified_by_ca4bb5e1: "Sist redigert av"
   last_user_access_title: "Forrige brukertilgang"
@@ -7583,6 +7760,7 @@ nb:
   limit_participants_to_attend_num_appointments_appo_dd3fd62f: "Begrens deltakere til å delta i %{num_appointments} møter."
   limit_search_to_activity_after_c1ac2449: "Begrens søk til aktivitet etter"
   limit_search_to_activity_before_e05aad05: "Begrens søk til aktivitet før"
+  link_7262adec: Lenke
   link_enrollment: 
     buttons: 
       link: "Lenke til Student"
@@ -7624,6 +7802,7 @@ nb:
   lock_date_cannot_be_before_due_date_ac30f54: "Låsingsdato kan ikke være før fristen"
   lock_icon_a9916601: låsiko
   locked_762f138b: Låst
+  locked_until_unlock_date_498ead5f: "låst til %{unlock_date}"
   log_in_c9e240ef: "Logg på"
   log_on_url_fc166e4c: Pålogging-URL
   log_out_379ba28a: "Logg Ut"
@@ -7678,6 +7857,7 @@ nb:
           remember_me: "Forbli innlogget"
         log_in: "Logg på"
         login_handle: "Skriv inn %{login_handle_name} og vi vil sende deg en lenke til gjenoppretting."
+        open_source_learning_management_system: "Åpen kilde LMS"
     logout_confirm: 
       cancel: Avbryt
       details: 
@@ -7717,9 +7897,17 @@ nb:
         redirect_from_idp: "Mottok LoginResponse fra IdP"
   login_6f3d6249: "Logg in"
   login_attribute_731a8181: Innloggingsattributt
+  login_button_661b410a: "Logg inn knapp"
+  login_button_text_c958250f: "Logg inn knappetekst"
+  login_footer_link_badb3898: "Logg inn bunntekst-lenke"
+  login_footer_link_hover_1b474e6c: "Logg inn bunntekst, mus-over lenke"
+  login_instructure_logo_8f2332db: "\"Instructure\" logg inn logo "
   login_is_invalid_must_be_alphanumeric_or_an_email__ae4499b3: "Innlogg er ugyldig: må være alfanumerisk eller en e-postadresse"
   login_is_too_long_25373f95: "Innlogg er for langt"
   login_label_1dea0f9d: Innloggingstekst
+  login_link_color_a887a109: "Farge logg inn lenke"
+  login_logo_5eecf564: "Logg inn logo"
+  login_screen_83518c07: "Logg inn skjermbildet"
   login_with_auth_type_a0aaa52a: "Logg inn med *%{auth_type}*"
   login_with_provider_3fd3998e: "Logg inn med %{provider}"
   logout_a9312e35: "Logg ut"
@@ -7734,6 +7922,7 @@ nb:
       new_tab_loaded: "Dette verktøyet ble suksessfullt lastet i et nytt nettleservindu. Last siden på nytt for å få tilgang til verktøyet igjen."
   lti2: 
     register_tool: "Registrere verktøy"
+  lti_2_reregistration_afabde25: "LTI 2 registrering"
   m2c_file_description: "Moodle 1.9/2.x"
   m2c_name: Moodle-importør
   main_navigation_3f080c80: Hovednavigasjon
@@ -7749,6 +7938,7 @@ nb:
       delete_avatar: "Er du sikker på at du ønsker å slette denne brukerens profilbilde?"
       lock_avatar: "Hvis du låser dette bildet, godkjenner du det og hindrer andre brukere fra å oppdatere det. Fortsett?"
   manage_group_group_name_ac8578c6: "Administrere gruppe %{group_name}"
+  manage_module_name_dfe16816: "Administrer %{module_name}"
   manage_usage_rights_c5a8c216: "Administrere bruksrettigheter"
   manual_entry_e4a4f99a: "Manuell innlegging"
   mark_as_done_6fa48d2f: "Merk som ferdig"
@@ -7758,6 +7948,8 @@ nb:
   marked_done_9fd646f: "Merket ferdig"
   mastery_score_reflects_the_highest_score_of_a_grad_fd426d1e: "Master-poengsum reflekterer den høyeste poengsummen av en vurdert innlevering eller prøve."
   mastery_score_reflects_the_most_recent_graded_assi_29fd2e00: "Mestring poengsum reflekterer den siste gradert oppgave eller quiz."
+  matching_left_side_900f860b: "Matching venstre side"
+  matching_right_side_920e71b2: "Matching høyre side"
   mathquill: 
     tabs: 
       arrows: Piler
@@ -7830,6 +8022,7 @@ nb:
     send_message: "Send beskjed"
   message_students_dialog: 
     recipients: "Mottakere:"
+  message_students_who_369b8488: "Meldings studenter som ..."
   message_this_student_6d14043d: "Send studenten en beskjed"
   messages: 
     account_suspended: 
@@ -9218,6 +9411,33 @@ nb:
           subject: "Fullfør registreringen: Canvas"
         link_message: "For å fullføre registreringsprosessen, vennligst se følgende url:"
         subject: "Fullfør registreringen: Canvas"
+      sms: 
+        body: "Du har blitt registrert for en Canvas konto på %{account}! Før du kan logge inn og begynne å bruke Canvas, må du fullføre konfigureringen."
+        link: "Klikk på følgende url for å fullføre registreringsprosessen: %{link}"
+      summary: 
+        body: "Du har blitt registrert for en Canvas konto på %{account}! Før du kan logge inn og begynne å bruke Canvas, må du fullføre konfigureringen."
+        link_message: "For å fullføre registreringsprosessen , kan du gå til følgende url:"
+        subject: "Fullfør Påmelding: Canvas"
+      twitter: 
+        body: "Canvas Alert - Du har blitt registrert for et lerret konto på %{account}!"
+    pseudonym_registration_done: 
+      email: 
+        body: "Du har blitt registrert for en Canvas konto på %{account}!"
+        html: 
+          body: "Du har blitt registrert for en Canvas konto på %{account}!"
+          link: "Klikk her for å få tilgang til kontoen din"
+          subject: "Canvas Registrering Komplett"
+        link_message: "Besøk følgende url for å få tilgang til kontoen din:"
+        subject: "Canvas Registrering Komplett"
+      sms: 
+        body: "Du har blitt registrert for en Canvas konto på %{account}!"
+        link: "Besøk følgende url for å få tilgang til kontoen din %{link}"
+      summary: 
+        body: "Du har blitt registrert for en Canvas konto på %{account}!"
+        link_message: "Besøk følgende url for å få tilgang til kontoen din :"
+        subject: "Canvas Registrering Komplett"
+      twitter: 
+        body: "Canvas varsel - Du har blitt registrert for en Canvas-konto på %{account}!"
     quiz_locked: "Denne prøven er for tiden låst."
     quiz_locked_at: "Denne prøven ble låst %{at}."
     quiz_locked_module: "Denne prøven er del av modulen *%{module}* og er ikke tilgjengelig ennå."
@@ -9542,7 +9762,22 @@ nb:
   migration_selection_5f1c5f55: Flyttevalg
   minutes_per_slot_5b7169e5: "Minutter per spor"
   missing_percent_94534638: "Mangler: %{percent}"
+  mobile_homescreen_icon_f85d6b63: "Hjemmeskjerm-ikon mobil"
   model_is_already_located_in_newgroup_e5cea361: "%{model} er allerede plassert i %{newGroup}"
+  moderate_assignment_name_cf59e0a7: "Moderér %{assignment_name}"
+  moderate_d0c85e92: Moderér
+  moderate_grades_4f43f85d: "Moderer vurderinger"
+  moderated_grading_allows_multiple_graders_to_grade_5c0d53db: "Moderert Grading gjør at flere klassinger til karakteren utvalgte oppgaver selvstendig, med en moderator som gir den endelige karakteren."
+  moderated_grading_cannot_be_enabled_for_group_assi_7e947ab7: "Moderert gradering kan ikke aktiveres for gruppeoppgaver"
+  moderated_grading_cannot_be_enabled_for_peer_revie_6b7eedc1: "Moderert gradering kan ikke aktiveres for fagfellevurderte oppdrag"
+  moderated_grading_e6127f72: "Moderert Grading"
+  moderated_grading_setting_cannot_be_changed_if_gra_ba939ce2: "Moderert gradering innstillingen kan ikke endres hvis gradert innleveringer eksisterer"
+  moderated_grading_setting_cannot_be_enabled_for_gr_d81fb43b: "Moderert vurderingsinnstilling kan ikke aktiveres for gruppeoppgaver"
+  moderated_grading_setting_cannot_be_enabled_for_pe_fc7b5b8b: "Moderert vurderingsinnstilling kan ikke aktiveres for vurderte innleveringer"
+  moderated_grading_setting_cannot_be_enabled_for_un_e40e6cd4: "Moderert vurderingsinnstilling kan ikke aktiveres for innleveringer uten karakter"
+  moderator_49b9f2e1: Moderer
+  module_completed_50c50762: "Modul fullført"
+  module_in_progress_fa600662: "Modul pågår"
   module_item_module_item_name_was_successfully_dele_8626d846: "Modulelement %{module_item_name} ble slettet."
   module_item_types: 
     assignment: Oppgave
@@ -9691,6 +9926,7 @@ nb:
     must_submit_incomplete: "må levere inn oppgaven"
     must_view_complete: "så på siden"
     must_view_incomplete: "må se på siden"
+  month_s_5c17590e: Måned(er)
   moodle_dropdown_many_warning_title: "Det er %{count} Flere spørsmål i nedtrekksmenyer i denne banken som kan ha blitt importert feil"
   moodle_dropdown_warning_title: "Flere nedtrekksspørsmål kan ha blitt importert feil"
   moodle_formula_many_warning_title: "Det er %{count} Formel-spørsmål i denne banken som må ha sine mulige svar regenerert"
@@ -9710,13 +9946,23 @@ nb:
   move_module_item_77754119: "Flytt modul/element"
   move_outcome_ce497e6c: "Flytt Utfall"
   move_outcome_group_cfa1a505: "Flytt Utfall Gruppe"
+  move_to_end_fef2fa15: "Flytt til ende"
+  move_to_front_7eae2e90: "Flytt til forsiden"
+  move_to_front_bf6f0194: "Flytt til forsiden"
   moving_a4d552df: Flytting...
   multi_factor_authentication_configured_865b1bde: "Flerfaktors autentisering konfigurert"
+  multiple_due_dates_6b0d75c6: "Flere frister"
   must_achieve_mastery_at_least_count_times_scores_a_628db168: "Må oppnå mestring minst %{count}% ganger. Resultater over mestring blir snittet for å beregne sluttkarakteren."
+  must_contribute_to_the_page_fff632c: "Må bidra til siden"
+  must_mark_as_done_91cff799: "Må markere som ferdig"
   must_mark_as_done_bf6cc563: "må merkes som ferdig"
   must_mark_assignment_as_done_e3e4af88: "Må merke innleveringen som ferdig"
+  must_score_at_least_a_score_3b4f813d: "Må få minst %{score}"
   must_submit_new_oauth2_request_e1fb00bb: "Må sende ny OAuth2-forespørsel"
+  must_submit_the_assignment_782d025: "Må levere inn oppgaven"
   must_supply_file_ids_and_or_folder_ids_parameter_9d29448c: "Må oppgi 'file_ids' and/or 'folder_ids' parameter"
+  must_view_the_page_67eec19e: "Må vise siden"
+  mute_assignment_bb505cd8: "Demp innlevering"
   mute_dialog: 
     curving_assignments: "Korrigerer oppgaver"
     grade_change_notifications: "Kunngjøring om endring i karakterer"
@@ -9741,10 +9987,23 @@ nb:
   name_is_currently_status_9065c996: "*navn* er for tiden **status**."
   name_is_required_ba379522: "Navn er påkrevd"
   name_only_5f56718e: "Kun navn"
+  nav_avatar_border_3246beb1: "Marg nav-avatar"
+  nav_background_fd299145: Nav-bakgrunn
+  nav_badge_3c67de17: Nav-skilt
+  nav_icon_active_e4825558: "Nav-ikon aktiv"
+  nav_icon_ca3fef59: "Nav ikon"
+  nav_logo_4b255c91: "Nav logo"
+  nav_logo_background_ba33fb7f: "Nav logo-bakgrunn"
+  nav_text_94206145: "Nav tekst"
+  nav_text_active_a924ae88: "Nav tekst aktiv"
   near_mastery_f25174a4: "Nær Mestring"
+  need_a_canvas_account_221d18ed: "Trenger du en Canvas-konto?"
+  new_13daf639: Ny
   new_account_role_6e5c4964: "Ny konto Rolle"
+  new_conferences_a020a8a9: "Nye konferanser"
   new_course_role_6a7bb75f: "Ny Kurset Rolle"
   new_file_135ae520: "[ Ny fil ]"
+  new_group_set_7241a581: "Nytt gruppesett"
   new_module_4e9287e4: "Ny modu"
   new_outcome_7fba8c7d: "Nytt resultat"
   new_quiz_statistics_desc: "Aktivere den nye quizstatistikkside for et kurs."
@@ -9752,12 +10011,16 @@ nb:
   next_40e12421: Neste
   next_module_item_9bb8a222: "Neste modul/element"
   next_steps_ce0f0d0c: "Neste steg"
+  nickname_7df95b09: "Kallenavn:"
   no_assignment_name_adbb215b: "Ingen Overdragelse Navn"
   no_content_has_been_added_f36bab43: "* Ingen innholdet er lagt"
+  no_date_bfeb2df7: "Ingen dato"
   no_directory_is_selected_please_select_a_directory_46ded46: "Ingen katalog er valgt, vennligst velge en katalog før du klikker \"flytte\""
+  no_due_date_1d63d13b: "Ingen forfallsdato"
   no_due_date_44271c53: "Ingen frist"
   no_due_date_6e6a23c1: "(no due date)"
   no_e16d9132: Nei
+  no_grade_3fa326c: "Ingen karakter"
   no_grading_schemes_to_display_8b0e92e7: "Ingen gradering ordninger for å vise"
   no_icon_1f6ea5f4: "ingen ikon"
   no_items_in_module_21f111a2: "Ingen elementer i modul"
@@ -9766,17 +10029,25 @@ nb:
   no_placements_enabled_f705f28: "Ingen plasseringer aktivert"
   no_results_found_58717065: "Ingen resultater funnet"
   no_score_yet_c94e919b: "Ingen poengsum ennå"
+  no_students_dd8de9f0: "Ingen studenter"
   no_students_have_taken_the_quiz_yet_e667644b: "Ingen studenter har tatt prøven"
   no_students_have_taken_the_survey_yet_d378cd35: "Ingen studenter har tatt undersøkelsen ennå"
   no_tls_618add1a: "Ingen TLS"
   no_usage_rights_object_supplied_304b8d40: "Ingen 'usage_rights' objekt som følger"
   not_a_number: "må være et positivt tall"
   not_available_until_next_submission_2175158: "Ikke tilgjengelig før neste innsending"
+  not_completed_d70acea3: "ikke fullført"
   not_installed_37a21a76: "Ikke installert"
   not_now_97efd947: "Ikke nå"
+  not_yet_completed_345a0bca: "Ennå ikke fullført"
+  note_it_may_take_up_to_a_week_for_the_beta_url_to__d695bddc: "Merk: Det kan ta opp til én uke for Beta URL til provisjon, avhengig av Beta-oppdateringssyklus."
+  note_length_cannot_exceed_maxlength_characters_82798b1: "Merk, lengden kan ikke overstige %{maxLength} tegn."
   note_some_items_fall_outside_the_start_and_or_end__feab0642: "Merk: noen elementer faller utenfor start og/eller sluttdato for kurset"
   note_students_have_submitted_work_for_these_assign_7bc34e28: "MERK: Studentene har levert arbeid for disse oppdragene som ikke er gradert. Hvis du legger inn disse karakterene nå, vil du trenger å legg inn igjen sine score etter måling deres nyeste innleveringer."
+  note_sub_account_themes_are_not_active_during_this_a5dd9da: "Merk: underkonto-temaer er ikke aktive under denne forhåndsvisningen."
   note_this_login_s_account_uses_delegated_authentic_89227914: "Merk: Denne påloggingen konto bruker delegert godkjenning, men kan falle tilbake Canvas passordautentisering. Passordfeltene i dette skjemaet oppdatere reserve Canvas passord, *ikke* den delegerte godkjenning."
+  notes_c42e0fd5: notater
+  notes_for_name_2eefac11: "Notater for %{name}"
   notification: 
     added_to_conversation_description: "Du er lagt til i en samtale"
     added_to_conversation_display: "Lagt til i samtalen"
@@ -9796,8 +10067,8 @@ nb:
         
         Endre til avtaletidspunkt
     appointment_availability_display: "Tilgjengelighet for avtaler"
-    appointment_cancelations_description: "Kansellering av avtale"
-    appointment_cancelations_display: Avtaleavbrudd
+    appointment_cancelations_description: "Oppnevning avbestilling"
+    appointment_cancelations_display: Møtekanselleringer
     appointment_signups_description: "Ny avtale på kalenderen din"
     appointment_signups_display: Avtalepåmeldinger
     calendar_description: "Nye og endrede elementer i kurskalenderen din"
@@ -9806,7 +10077,7 @@ nb:
       all_submissions: "Alle innleveringer"
       announcement: Kunngjøring
       appointment_availability: "Tilgjengelighet for avtaler"
-      appointment_cancelations: Avtalekanselleringer
+      appointment_cancelations: Møtekanselleringer
       appointment_signups: Avtalepåmeldinger
       calendar: Kalender
       course_content: Kursinnhold
@@ -9939,6 +10210,7 @@ nb:
       new_student_organized_group: "Ny studentorganisert gruppe"
       new_user: "Ny bruker"
       pseudonym_registration: Psevdonymregistrering
+      pseudonym_registration_done: "Pseudonym registrering ferdig"
       report_generated: "Rapport generert"
       report_generation_failed: "Generering av rapport mislyktes"
       rubric_assessment_invitation: "Invitasjon til vurdering av vurderingsskjema"
@@ -10010,6 +10282,7 @@ nb:
       other: Andre
       parent: Opphavs-eposter
       scheduling: Planlegger
+  notification_preferences_cf47083d: Varslingsinnstillinger
   notifications_cbfa7704: Varsler
   now_click_the_agenda_button_607fb40e: "Nå klikk på *Agenda*  knappen"
   now_that_your_course_is_set_up_and_available_you_p_c0c8635c: "Siden din kurset er satt opp og tilgjengelig, du sannsynligvis ikke vil trenge denne sjekklisten lenger. Men vi vil holde det rundt i tilfelle du innser senere du vil prøve noe nytt, eller du bare ønsker litt ekstra hjelp som du gjør endringer i kursinnhold."
@@ -10051,6 +10324,7 @@ nb:
           kb: KB
           mb: MB
           tb: TB
+  number_between_1_and_16_inclusive_31f5468d: "tall mellom 1 og 16 inkluderende"
   o_224cf405: o
   oauth2_provider: 
     auth: 
@@ -10064,12 +10338,21 @@ nb:
       labels: 
         remember_access: "Husk autoriseringen min av denne tjenesten"
       page_title: App-innlogging
+    confirm_form: 
+      cancel: Avbryt
+      details: 
+        allow_application: "%{app_name} ber om tilgang til kontoen din."
+        email: "Din e-postadresse er %{email}."
+        login_name: "Du godkjenner dette programmet som %{user_name}."
+      labels: 
+        remember_access: "Husk min autorisasjon for denne tjenesten "
     confirm_mobile: 
+      authorize: Autoriser
       cancel: Avbryt
       details: 
         allow_application: "%{app_name} spør om tilgang til kontoen din."
         email: "Din epostadresse er %{email}."
-        login_name: "Du logger inn på denne appen som %{user_name}."
+        login_name: "Du godkjenner dette programmet som %{user_name}."
       login: "Logg inn"
       page_title: App-innlogging
       remember_auth: "Husk autoriseringen min av denne tjenesten"
@@ -10080,12 +10363,21 @@ nb:
     observee_added: "Observere nå %{user}"
     observing: Observere
   observing_f3c5e759: Observerer
+  occurrence_s_c12d1aad: Forekomsten(er)
   of_students_5d1af0d2: "# Av studenter"
   ok_c47544a2: OK
   okay_got_it_d686d4e8: "Ok, fikk det"
   on_time_percent_eebffe38: "På Tid: %{percent}"
   once_you_ve_changed_an_answer_you_ll_need_to_choos_7071f728: "Når du har endret et svar må du gjøre et valg før du oppdaterer spørsmålet."
   one_per_line_format_name_value_79647700: "Én per linje. Format: navn=verdi"
+  online_submission_type_file_uploads_24910d74: "online Innlevering type - filopplasting"
+  online_submission_type_file_uploads_restrict_uploa_5ec7b263: "Online Innlevering Type - filopplasting - Begrense opp filtyper"
+  online_submission_type_media_recordings_9424bf34: "Online Innlevering Type - medie opptak"
+  online_submission_type_text_entry_ac56d100: "Online Innlevering Type - tekstinntasting"
+  online_submission_type_website_url_2c9df33d: "Online Innlevering Type - webadresse"
+  only_a_maximum_of_100_events_can_be_created_ad703982: "kun maksimalt 100 hendelser kan opprettes"
+  only_available_to_students_with_link_not_visible_i_b21ec391: "Åpent kun for studenter med lenke. Ikke synlig i studentmapper."
+  only_teachers_can_see_this_course_until_it_is_publ_6fac97a7: "Kun lærere kan se dette kurset før det er publisert"
   ontime_on_time_late_late_missing_missing_145e9e5d: "%{onTime} på tid, %{late} sent, %{missing} mangler"
   open_color_picker_f117df0a: "Åpne fargeplukker"
   open_theme_editor_2d924ebe: "Åpne Theme Editor"
@@ -10100,6 +10392,7 @@ nb:
     ? "yes"
     : Ja
   options_3ab0ea65: Valg
+  or_a01eec62: ELLER
   orange_81386a62: Oransje
   orbis_report_header_assignment_id: "oppgave id"
   orbis_report_header_assignment_title: "oppgave navn"
@@ -10112,6 +10405,7 @@ nb:
   orbis_report_header_student_name: studentnavn
   orbis_report_header_student_sis_id: "bruker sis"
   orbis_report_header_submission_score: innleveringsresultat
+  organize_epub_by_content_type_default_is_by_module_6f44ae06: "Organiser epub etter innholdstype (standard er av modul)."
   outcome_groups: 
     invalid_file: "Ugyldig resultatgruppefil"
   outcome_groups_api: 
@@ -10249,12 +10543,13 @@ nb:
         latest_score: "Siste resultat"
         outcome: Resultat
   overrides: 
-    blank_override: "Du må ha en student eller valgt en seksjon"
+    blank_override: "Du må ha en student eller seksjon valgt"
     everyone: Alle
     everyone_else: "Alle andre"
     overrides: 
       everyone: Alle
   own_copyright_cc59db55: "Egen Opphavsrett"
+  package_error: "Feil identifisere pakke Type: %{error}"
   page_comment: 
     default_user_name: Anonym
   page_comments: 
@@ -10305,6 +10600,7 @@ nb:
     view_more_link: "Vis mer"
   paginated_view: 
     loading_more_results: "Laster flere resultater"
+  parent_of_a_canvas_user_afba1624: "Forelder til et lerret bruker?"
   parent_signup_b7c6bf0a: "Påmelding for foreldre"
   parents_sign_up_here_f0aa8f4f: "Foreldre kan melde seg på her"
   participations_1823832d: Deltakelser
@@ -10316,12 +10612,15 @@ nb:
   peer_reviews_api: 
     errors: 
       delete_reminder_failed: "Sletting mislyktes"
+  peer_reviews_cannot_be_enabled_for_moderated_assig_149d33c4: "Fagfellevurderinger kan ikke aktiveres for modererte oppdrag "
   percent_complete_3a7edc20: "%{percent} fullført"
   percent_of_students_scored_score_53d2c4d5: "%{percent} av studenter scoret %{score}"
   percentused_of_bytesavailable_used_894e2327: "%{percentUsed}% av %{bytesAvailable} brukt"
+  performance_enhancements_for_the_gradebook_e6c5d5a5: "Ytelsesforbedringer for karakterbok"
   permission_not_found_620b80d1: "Tillatelse ikke funnet"
   permissions: 
     manage_webhooks: "Administrere webhooks"
+    provision_catalog: "Bestemmelsen en katalog"
   pick_a_destination_we_ll_send_you_errors_fa0cb0e0: "velg en destinasjon, vi skal sende deg feilene"
   pick_an_endpoint_we_ll_post_your_error_reports_the_71610f47: "velg et sluttpunkt, vi skal sende deg feilrapportene dit"
   pick_the_date_and_time_for_the_following_conferenc_e9f91edd: "Velg dato og tid for følgende konferansesetting:"
@@ -10380,11 +10679,15 @@ nb:
     canvadocs_settings: 
       description: "Dette programtillegget integrerer med Canvadocs (eller hvilken som helst Box View kompatibel API) for å gi HTML5 basert forhåndsvisning av dokumenter. "
       labels: 
+        annotations_supported: "merknader som støttes"
         api_key: API-nøkkel
         base_url: Grunn-URL
     canvas_webhooks: 
       description: "Webhooks programtillegg til Canvas"
       name: "Canvas Webhooks"
+    catalog_provisioner: 
+      description: "Catalog konto Provisioner for Canvas"
+      name: "Katalog Commissions"
     crocodoc: 
       description: "Aktiver Crocodoc som et alternativ for forhåndsvisning av dokumenter"
       name: Crocodoc
@@ -10679,6 +10982,24 @@ nb:
       description: "Du vil trenge en [api token from Yo](%{yo_url})."
       labels: 
         api_token: "Api pollett"
+    zendesk_settings: 
+      labels: 
+        account_domain_value: "Konto Domain Verdi"
+        account_id: "Konto ID"
+        api_url: "API URL"
+        become_user_id_uri: "Bli Bruker URL"
+        http_env: "HTTP ENV"
+        message_backtrace: sporbarhet
+        message_type: Meldingstype
+        password: Passord
+        request_context_id: "Forespørsel kontekst ID"
+        shared_secret: "Delt hemmelighet"
+        site: Side
+        url: URL
+        user_id: Bruker-ID
+        user_roles: Brukerroller
+        user_severity: "Bruker Alvorlighetsgrad"
+        username: Brukernavn
   points_bb475533: Poeng
   points_possible_must_be_0_or_more_for_selected_gra_f96a04e3: "Poeng mulig må være 0 eller mer for valgt gradering typen"
   polling: 
@@ -10696,6 +11017,7 @@ nb:
   position_f9c9b93c: Posisjon
   possible_combination_count_db651ca4: "Mulig kombinasjonstall"
   possible_score_5e0a328e: "Mulig: %{score}"
+  post_1e445890: Stolpe
   post_grades_39c52870: "Legg inn karakterer"
   post_grades_description: |-
       Innlegg Karakterer gjør at læreren kan legg inn karaktererene tilbake til aktiverte SIS systemer: Powerschool,
@@ -10704,16 +11026,24 @@ nb:
   post_grades_to_sis_97ece878: "Send karakterer til SIS"
   powerschool_a30f0bfc: PowerSchool
   practice_quiz_19a8505d: "Øv på prøve"
+  prerequisites_49659f16: "Forutsetninger:"
   prerequisites_lookup: 
     headers: 
       completion_prerequisites: Fullføringskrav
     labels: 
       requirements_must_be_completed: "Følgende krav må imøtekommes før denne siden blir låst opp"
   presentation_2d9387ca: Presentasjon
+  preview_53003fd2: Forhåndsvisning
   preview_your_changes_373557d8: "Forhåndsvis dine endringer"
   previous_module_item_2bb5e499: "Forrige modul/element"
   previous_time_cc96b361: "Forrige (%{time})"
   previous_timestamp_19343a58: "Forrige (%{timestamp})"
+  previously_unhandled_error_encountered_while_refre_ec9c2d81: "Tidligere ubehandlet feil oppstod mens forfriskende utfall"
+  primary_button_3a98f4bc: "Primær knapp"
+  primary_button_text_1f55d27b: "Primær knappetekst"
+  primary_color_630fc6f3: "Primær farge"
+  primary_color_button_b75db628: "Primær fargeknapp"
+  primary_color_button_disabled_9081ddff: "Primær fargeknapp deaktivert"
   privacy_290109ea: Personvern
   product_name: Canvas
   profile: 
@@ -10968,6 +11298,7 @@ nb:
       labels: 
         carrier: Leverandør
         cell_number: Mobilnummer
+        country: Land
         email_address: Epostadresse
         enable_login_for_email: "Jeg ønsker å logge inn i Canvas med denne epostadressen"
         sms_email: SMS-epost
@@ -11022,7 +11353,12 @@ nb:
     upload_file_view: 
       choose_a_picture: "velg et bilde"
       crop_instructions: "For å beskjære bildet, flytt det valgte området for deretter å klikke \"Lagre\" knappen nedenfor."
+  progress_for_account_name_ef203250: "fremgang for %{account_name}"
+  progress_loading_bar_a26b8861: Fremdriftsviser
   project_groups_1fa0320b: Prosjektgrupper
+  provider_icon_5064fa6e: Leverandør-ikon
+  provision_a_catalog_account_8cea67f6: "Klargjør en Catalog-konto"
+  provisioned_catalog_account_26339afd: "Klargjort Catalog-konto"
   provisioning_title: Klargjøring
   pseudonym: 
     errors: 
@@ -11070,6 +11406,8 @@ nb:
   public_course_index_59270e80: "Offentlig kursindeks"
   public_courses_title: "Offentlige kurs"
   public_domain_112ed397: "Åpent område"
+  publish_5211dca3: Publiser
+  publish_aa888e3c: "Publisere:"
   publish_btn_module: 
     buttons: 
       publish: Publiser
@@ -11095,7 +11433,11 @@ nb:
     disabled_assignment: "Kan ikke fjerne publisering om det er studentinnleveringer"
     disabled_discussion_topic: "Kan ikke fjerne publisering om det er studentinnleveringer"
     disabled_quiz: "Kan ikke fjerne publisering om det er studentinnleveringer"
+  published_4bb5209e: Publisert
+  published_c944a23d: publisert
   published_click_to_modify_233c0d4: "Publisert - Klikk for å modifisere"
+  published_click_to_unpublish_ec4495b5: "Publisert. Klikk for å avpublisere."
+  publishing_is_disabled_for_this_item_efa7803f: "Publisering er deaktivert for dette objektet"
   purchases: 
     new: 
       payment_info: Betalingsinformasjon
@@ -11106,6 +11448,7 @@ nb:
   qti_img_matching_question_distractors: "Importert matchende spørsmål inneholder bilder innenfor valg, og kan ikke rettes fordi den også inneholder distraktører"
   qti_name: QTI-konvertør
   qualified_locale: nb-NO
+  question_9121487: Spørsmål
   question_answered: Besvart
   question_bank: 
     align_outcomes: "Juster resultater"
@@ -11200,7 +11543,9 @@ nb:
       move_copy: Flytt/kopier
       select_bank: "Velg en målbank for dette spørsmålet:"
       show_details: "Vis spørsmålsdetaljer"
+  question_group_837b8014: Spørsmålsgruppe
   question_unanswered: "Ikke besvart ennå"
+  questions_a955145c: Spørsmål
   quiz: 
     regrade: 
       give_everyone_full_credit: "Gi alle full uttelling for dette spørsmålet."
@@ -11278,6 +11623,7 @@ nb:
       Aktiver sporing av hendelser for en spørrekonkurranse underkastelse, og muligheten
       for å vise en logg over disse hendelsene når en innlevering er gjort.
   quiz_lti_plugin_a189607f: "Quiz LTI plugin"
+  quiz_lti_plugin_a6256549: "Quiz LTI programtillegg"
   quiz_menu_4fcd5e61: Quiz-meny
   quiz_reports: 
     cancel_generation: Avbryt
@@ -11387,6 +11733,7 @@ nb:
       table_description: "Sammendrag statistikk for alle slått i innleveringer"
     title: Prøvestatistikk
     unknown_answer: "Noe annet"
+    user_names: brukernavn
   quizzes: 
     alerts: 
       no_valid_combinations: "Systemet kunne ikke generere noen gyldige kombinasjoner for de gitte parameterne"
@@ -11627,6 +11974,7 @@ nb:
       display_answer: 
         labels: 
           answer_with_margin: "med marginen"
+          answer_with_precision: "med presisjon"
           your_answer: "Ditt svar"
         margin_of_error: feilmargin
         plus_or_minus: +/-
@@ -11705,6 +12053,7 @@ nb:
           manage_question_banks: "Behandle spørsmålsbanker for kurs"
           more_questions: "flere spørsmål"
           select_all_banks: "Velg alle"
+          view_question_banks: "Vis kurs Spørsmål Banker"
         options: 
           new_group: "[ Ny gruppe ]"
           no_group: "[ Ingen gruppe ]"
@@ -11719,6 +12068,7 @@ nb:
         labels: 
           answer_comments: "Kommentarer om studenten velger dette svaret"
           answer_in_range: "Svar i området"
+          answer_with_precision: "Svar med presisjon"
           exact_answer: "Nøyaktig svar"
         matching_left: "Matcher venstre side"
         matching_right: "Matcher høyre side"
@@ -12409,9 +12759,13 @@ nb:
     top_level: "-- Topp nivå --"
     ? "true"
     : Sant
+  radio_button_option_1_a8ec51f9: "Radio-knapp-alternativ 1"
+  radio_button_option_2_31e50043: "Radio-knapp-alternativ 2"
+  range_56b2f310: Område
   range_8760934b: "Spekter:"
   range_name_90614433: "Spekter navn"
   re_submit_assignment_b3e2bd28: "Lever besvarelsen på nytt"
+  re_upload_submissions_125e415d: "Last opp innleveringer på nytt"
   re_upload_submissions_form: 
     buttons: 
       upload: "Last opp filer"
@@ -12486,7 +12840,14 @@ nb:
     sections_count: 
       one: "1 klasse"
       other: "%{count} seksjoner"
+  record_media_6637ff19: "rekord media"
+  record_with_microphone_only_e4ee07aa: "Spill med mikrofon bare"
+  record_with_webcam_af21e07c: "Rekord med webcam"
+  recurring_calendar_events_c940b6b8: "Gjentakende kalenderhendelser"
   red_8258edf3: Rød
+  regenerate_epub_395c8e56: "regenerere ePub"
+  region_47e29025: "Region:"
+  region_939f2a6c: Region
   registration: 
     get_started: "Kom i gang"
     incomplete_registration_warning: 
@@ -12522,20 +12883,28 @@ nb:
         name: Navn
     welcome_to_canvas: "Velkommen til Canvas!"
   registration_url_60e0eaaa: "Registrering URL"
+  regular_style_checkbox_ee3d71c1: "Vanlig-stil avkrysningsboks"
   remind_me_next_time_6402eb7d: "Minn meg neste gang"
   remove_attachment_ceae0973: "Fjern vedlegg"
+  remove_c_name_section_d8eabd3a: "Fjerne %{c.name} seksjonen"
   remove_f47dc62a: Fjern
+  remove_icon_a4646413: "Fjern ikon"
   remove_recipient_name_a6b83cef: "Fjern mottaker %{name}"
   remove_row_c198da5a: "Fjern rad"
   remove_row_f9d59cba: "Fjern Rad"
   remove_these_dates_48453a81: "Fjern disse datoene"
+  remove_this_section_9a88ca43: "Fjern denne seksjonen"
   rename_45608f54: "Døp om"
+  rename_c_name_section_e0e92c97: "Gi nytt navn til %{c.name} seksjonen"
+  rename_this_section_73065edd: "Gi nytt navn til denne seksjonen"
+  replace_e61834a7: Erstatt
   replaces_the_current_folder_tree_with_a_new_access_6f9d15c2: "Erstatter nåværende mappetreet med et nytt mappetre med flere funskjoner."
   reply_from_name: "%{name} via Canvas kunngjøringer"
   reply_to_comment_72d96728: "Svar til Kommentar"
   reply_to_main_discussion_29823888: "Reply to Main Discussion"
   require_usage_rights_for_uploaded_files_4507865b: "Krev bruksrettigheter for opplastede filer"
-  reset_95a81614: Gjenopprett
+  reserved_f247b60b: Reservert
+  reset_95a81614: Tilbakestill
   respondus_lockdown_browser_support_413352eb: "Respondus LockDown Browser support"
   respondus_soap_endpoint: 
     plugin_settings: 
@@ -12556,10 +12925,15 @@ nb:
         description: Avpubliser
     options_2: 
       description: "Planlegg student tilgjengelighet"
+  restricted_access_d3e99a39: "Begrenset tilgang"
   resume_quiz_afeceb87: "Fortsett prøve"
   resume_survey_58dce775: "Fortsett undersøkelse"
   retrieve_timeout: "could not retrieve configuration, the server response timed out"
+  retry_ebd5f8ba: "Prøv på nytt"
+  reviewer_b993ce28: Anmelder
+  reviewers_successfully_added_bd4b629a: "Anmeldere lagt"
   rich_content_editor_2708ef21: "Rikt Innhold Redigering"
+  right_sidebar_logo_5483dc0a: "Logo høyre sidestolpe"
   role: 
     duplicate_role: "En rolle med dette navnet finnes allerede"
   role_override: 
@@ -12764,6 +13138,12 @@ nb:
   sample_data_e4fd01ff: Prøve-data
   save_11a80ec3: Lagre
   saving_d55dd90e: Lagrer…
+  saving_recording_e111cb05: "Lagrer opptak ..."
+  schedule_student_availability_332154a: "Planlegg studenttilgjengelighet"
+  school_of_rock_4b7b1fd0: "School of Rock"
+  score_does_not_include_groups_becuase_they_have_no_ee031bff: 
+    one: "Vurderingen inkluderer ikke %{groups} fordi den har ingen oppnåelige poeng"
+    other: "Vurderingen inkluderer ikke %{groups} fordi de har ingen oppnåelige poeng"
   score_muted_82eef66: "Resultat: (muted)"
   score_out_of_points_possible_88f370fd: "%{score} av %{points_possible}"
   score_score_6f81e8c8: "Resultat: %{score}"
@@ -12893,6 +13273,10 @@ nb:
   search_groups_or_people_6c15d6ad: "Søk i grupper eller personer"
   search_title_body_or_author_1d26711f: "Søk tittel, innholdstekst eller forfatter"
   searching_b0207e7f: Søker
+  secondary_button_36a86f03: Sekundærknapp
+  secondary_button_text_e92b3e52: "Tekst sekundærknapp"
+  secondary_color_button_7589827d: "Sekundær fargeknapp"
+  secondary_color_button_disabled_ac2252d2: "Sekundær fargeknapp deaktivert"
   section: 
     confirms: 
       delete_enrollment: "Er du sikker på at du vil slette denne påmeldingen permanent?"
@@ -12914,6 +13298,8 @@ nb:
       confirming_course: "Bekrefter %{course_name}…"
       removing_crosslisting_of_section: "Fjerner krysslisting av klasse…"
   section_ends_at_bb9df3c0: "Økt slutter på"
+  section_filter_cde54d0a: "seksjon filter"
+  section_name_b6d82574: Seksjonsnavn
   section_starts_at_65eaed1: "Økt begynner på"
   sections: 
     section_created: "Klasse er opprettet!"
@@ -12974,7 +13360,9 @@ nb:
         current_enrollments: "Gjeldende påmeldinger"
         decrosslist_section: "Fjern denne klassen fra krysslisting"
   see_some_lti_tools_that_work_great_with_canvas_16ef75a0: "*Se noen LTI-verktøy* som fungerer bra med Canvas."
+  select_a_grading_period_5ea50f1: "Velg en karakterperiode..."
   select_a_grading_period_aab25483: "Velg en vurderingsperiode"
+  select_audio_file_7d905cce: "Velg Lydfil"
   select_content: "Velg innhold"
   select_content_checkbox: 
     select_content_error: "Du må velge relevant innhold"
@@ -12993,9 +13381,14 @@ nb:
       find_links_using_service: "Finner lenker med %{service}"
   select_course_a_selection_is_required_before_recip_f622d9df: "Velg kurs: et utvalg er påkrevd før mottakere-feltet blir tilgjengelig"
   select_course_color_cad8e62b: "Velg kursfarge"
+  select_d70f31da: Velg
+  select_for_list_of_users_who_responded_791ce930: "Velg for liste over brukere som svarte."
+  select_image_e1696a4d: "Velg bilde"
+  select_input_3dbd73c1: "Velg inngang"
   select_itemname_f70db487: "Velg %{itemName}"
   select_navigation_links_68e1e924: "Velg navigasjonslenker"
   select_the_file_you_want_to_associate_or_add_a_fil_eedd8dc4: "Velg filen du ønsker å assosiere, eller egg til flere filer ved å velge \"Ny fil\". r"
+  select_video_file_35b61d4e: "Velg videofil"
   selected_answer: "Du valgte dette svaret."
   selected_subtree_a7693937: "Valgt %{subtree}"
   self_enrollments: 
@@ -13051,6 +13444,7 @@ nb:
   service_cloud_ticketing_connector_889e1b7b: "Service Cloud Ticketing Connector"
   services_api: 
     must_be_logged_in: "Du må være logget inn for å bruke Kaltura"
+  set_default_grade_a202ebc1: "Sett standard vurdering"
   set_default_grade_dialog: 
     default_grades: "Gi alle studentene samme karakter for *%{assignment.name}* ved å skrive inn en karakterverdi nedenfor:"
     dialog_title: "Standardkarakter for %{assignment.name}"
@@ -13148,7 +13542,7 @@ nb:
         user_menu: "Bruker meny"
     canvas_footer: 
       ? "User Research"
-      : "Bruker Forskning"
+      : Brukerundersøkelse
       by_instructure: "Av Instruckture"
       open_source_learning_management_system: "Læringsplattform basert på åpen kildekode"
     components: 
@@ -13346,6 +13740,10 @@ nb:
       needs_grading_count: 
         one: "1 må rettes"
         other: "%{count} må rettes"
+    menu_enrollment: 
+      labels: 
+        enrolled_as: "innskrevet som"
+        invited_as: "invitert som"
     message_students: 
       buttons: 
         send_message: "Send melding"
@@ -13755,8 +14153,12 @@ nb:
   show_by_date_e3967761: "Vis etter dato"
   show_by_type_c5d61732: "Vis etter type"
   show_correct_answers_at_a5475aa3: "Vis riktige svar på"
+  show_current_grade_5bf4e0d9: "Vis gjeldende vurdering"
+  show_final_grade_a95e14dc: "Vis endelig karakter"
   show_lti_2_configuration_ui_94ce35a9: "Vis LTI 2 Konfigurasjon UI"
   show_me_76823679: "Vis meg"
+  show_notes_column_22d2b6c1: "Vis notater-kolonne"
+  show_student_names_dcb40934: "Vis studentnavn"
   simple_tls_45df2648: "Enkel TLS"
   sis_agent_token_authentication_2a0b29e3: "SIS Meglere Tegnet Autentiserings"
   sis_batch: 
@@ -13831,6 +14233,7 @@ nb:
     users: 
       user_search_label: Brukersøk
       users_matching_label: "Matchende brukere"
+  size_b30e1077: Størrelse
   skip_to_content_22ad1d00: "Gå til innhold"
   skipped_file_filename_due_to_error_94f0194: "Hoppet over fil %{filename} på grunn av en feil"
   skipping_unknown_file_type_cd1086ee: "Hopper over ukjent fil type"
@@ -13846,9 +14249,12 @@ nb:
     android_banner_price: GRATIS
     android_banner_title: "Canvas av Instructure"
     android_banner_view_button: SE
+  some_conferences_on_this_page_are_hidden_because_o_789684fd: "Noen konferanser på denne siden er skjult på grunn av feil ved henting sin status"
+  someone: Noen
   something_went_wrong_please_try_again_6d337b6c: "Noe gikk galt, prøv igjen"
   source_code_2395ca74: "kilde kode"
   space_ec476863: Mellomrom
+  specify_the_transparency_of_the_watermark_backgrou_f4d5cc1d: "Spesifiser vannmerkets gjennomsiktighet som bakgrunnbilde"
   speed_grader: 
     submissions_dropdown: 
       grade: "(karakter: %{grade})"
@@ -13856,6 +14262,8 @@ nb:
       see_all_quiz_attempts: "Se alle prøve-forsøk"
       submission_to_view: "Innleveringer for gjennomsyn:"
       submitted: "*Innlevert:* %{submittedAt}"
+  speedgrader_d9a6fa90: Speedgrader
+  speedgrader_tm_44688790: SpeedGrader™
   spreadsheet_6d622119: Regneark
   sr_gradebook: 
     all_grading_periods: "Alle vurderingsperioder"
@@ -13888,8 +14296,11 @@ nb:
   sso_settings_ebf98263: SSO-innstillinger
   start_date_e937be8a: Startdato
   start_date_field_for_styleguide_8a8ab1d6: "Startdato-felt for styleguide"
+  start_from_a_template_380d4e8: "Start fra en mal ..."
   start_from_a_template_theme_6c6e3dab: "Begynn fra en mal:"
+  start_from_a_theme_template_475c3d26: "Start fra en temamal"
   start_participating_f0c75256: "Begynn å delta"
+  start_tls_26e4b0dc: "Start TLS"
   statistics: 
     csv_columns: 
       attempt: forsøk
@@ -13907,6 +14318,7 @@ nb:
     exact_answer: "%{exact_value} ± %{margin}"
     inexact_answer: "%{lower_bound} til %{upper_bound}"
     no_answer: "Intet svar"
+  status_e7fdbe06: Status
   step: Trinn
   stream_items_api: 
     assessment_request_title: "Peer Gjennomgang for %{title}"
@@ -13917,9 +14329,14 @@ nb:
       Dette aktiverer den nye siden for studentgrupper i en konto. Den nye siden ble laget for å gi en mer dynamisk gruppepåmeldings-
       opplevelse.
   student_id: "Student ID"
+  student_interactions_report_7717b685: Student-dialograpport
   student_must_complete_all_of_these_requirements_656771d6: "Student må møte alle disse kravene"
-  student_must_complete_one_of_these_requirements_6046eb3a: "Student må møte minst ett av disse kravene"
+  student_must_complete_one_of_these_requirements_6046eb3a: "Studenten må fullføre ett av disse kravene"
   student_name: "Studentens Navn"
+  student_name_c45b2a7: Studentnavn
+  student_name_hidden_b894d102: "student (navn skjult)"
+  student_names_must_be_hidden_because_anonymous_gra_d2ca7255: "Studentnavn må være skjult fordi anonym sensur er nødvendig."
+  student_names_must_be_hidden_because_this_is_an_an_3c82287d: "Studentnavn må være skjult fordi dette er en anonym spørreundersøkelse."
   student_outcome_gradebook_description: |-
       Karakterbok for studentenes mestringsbaserte læring gir studentene en rask måte å se egen
       fremdrift i forhold til på kursets læringsmål. Læringsmålene presenteres i et karakterboklignende
@@ -13930,6 +14347,7 @@ nb:
     student_summary_table_descending: "Student Oppsummering Tabell sortert synkende etter %{sortText}"
   students_1b8cd07b: Studenter
   students_being_observed_4de3e520: "Studenter som blir observert"
+  students_must_complete_all_of_these_requirements_15fa97f7: "Studentene må gjennomføre alle disse kravene"
   students_who_have_taken_the_quiz_count_69dbbda0: 
     one: "Studenter som har tatt prøven (%{count})"
     other: "Studenter som har tatt prøven (%{count})"
@@ -13976,6 +14394,7 @@ nb:
     sub_accounts_count: 
       one: "1 underkonto"
       other: "%{count} underkontoer"
+  subdomain_url_1e43b6f0: "Subdomene URL"
   subject_reply_to: "Sv: %{subject}"
   submission: 
     atom_no_author: "Ingen forfatter"
@@ -14072,7 +14491,7 @@ nb:
       discussion_submission_description: "Innleveringene for denne oppgavene er poster i oppgavens diskusjon. Nedenfor er diskusjonspostene for %{user}. Du kan også *se hele diskusjonen*."
       discussion_submission_description_without_link: "Innleveringer for dette oppdraget er innlegg i oppdragets diskusjon. Nedenfor er diskusjons innlegg for %{user}."
       entry_no_image: "Husk at denne siden kan ha endret seg siden innleveringen opprinnelig skjedde."
-      entry_with_image: "Vi har inkludert et øyeblikksbilde av hva siden så ut som da den ble levert. Du kan også klikke for å se den opprinnelige innleveringen."
+      entry_with_image: "Vi har tatt et skjermbilde av hvordan siden så ut da den ble sendt."
       external_url_submission: "Denne innleveringen var en URL til en ekstern side."
       group_discussion_submission_description: "Innleveringene for denne oppgaven er poster i oppgavens diskusjon for denne gruppen. Nedenfor er diskusjonspostene for %{user}. Du kan også *se hele gruppediskusjonen*."
       group_discussion_submission_description_without_link: "Innleveringer for dette oppdraget er innlegg i oppdragets diskusjon for denne gruppen. Nedenfor er diskusjons innlegg for %{user}."
@@ -14091,6 +14510,7 @@ nb:
         external_link: "Lenker til en ekstern side."
       url_preview: URL-forhåndsvisning
       view_feedback_button: "Se tilbakemelding"
+      view_in_a_new_tab: "(Se i en ny fane)"
       view_original_submission: "Vis opprinnelig innlevering for %{user}"
       view_preview_button: Forhåndsvisning
     still_zipping: "Filzipping pågår fremdeles..."
@@ -14101,8 +14521,10 @@ nb:
   submit_a3cc6859: "Send inn"
   submit_a_feature_idea_2d4baa3d: "Send en funksjonsidé"
   submit_assignment_5799b4e3: "Lever besvarelsen"
+  submit_media_file_f334c1ba: "Send mediefil"
   submitted_datetime_fa2e9287: "Innlevert: %{dateTime}"
   success_all_users_on_this_domain_will_now_see_this_4681b85d: "Suksess! Alle brukere på dette domenet skal nå se denne merkingen."
+  success_grades_were_published_to_the_grade_book_da3b4fba: "Suksess ! Karakterer ble publisert i karakterboken."
   successfully_moved_model_to_newgroup_f7b7aa5a: "Vellykket flyttet %{model} til %{newGroup}"
   support: 
     array: 
@@ -14126,8 +14548,11 @@ nb:
       networking_academy_description: "Vis Cisco sine svar på de vanligst stilte spørsmålene."
       networking_academy_faqs: "Networking Academy FAQs"
       support_desk_livechat: "Skrivebord Støtte  Nettprat"
+  switch_style_checkbox_97a44345: "Avkrysnings Switch-måten"
   switch_to_3f310557: "Bytt til"
   switch_to_group_group_name_786b913b: "Bytt til gruppe %{group_name}"
+  switch_to_percentage_295146ac: "Bytt til Prosentvis"
+  switch_to_points_6a0a1eba: "Bytt til Points"
   syllabus: Kurspensum
   tab_1_3d6b3fb: "Fane 1"
   tab_1_content_8944c219: "Fane 1 innhold"
@@ -14170,6 +14595,7 @@ nb:
   take_the_survey_again_24ce22c2: "Ta undersøkelsen på nytt"
   teachers_52e2423f: Forelesere
   teal_f729a294: Blågrønn
+  tell_us_how_and_when_you_would_like_to_be_notified_de3ed2bc: "Fortell oss hvordan og når du ønsker å bli varslet om hendelser i Canvas."
   terms: 
     index: 
       date: 
@@ -14251,12 +14677,20 @@ nb:
       
                 Takk,
                 Canvas Support
+  the_message_titled_subject_could_not_be_delivered__f063857e: |-
+      Meldingen tittelen "%{subject}" kunne ikke leveres fordi diskusjonen emnet har blitt slettet. Hvis du prøver å kontakte noen gjennom Canvas du kan prøve å logge inn på kontoen din og sende dem en melding ved hjelp av verktøyet for innboks.
+      
+      Takk,
+      Canvas Support
   the_module_item_is_locked_27fe420b: "Modulen element er låst."
   the_most_recent_scores_for_user_current_user_name__ea82f0b6: "De nyligste poengsummene for brukeren %{current_user_name} og utfallet %{outcome_name}."
   the_profile_picture_has_been_reported_d609d6dd: "Den profilbildet har blitt rapportert"
+  the_provided_academic_benchmark_file_has_an_error_4ad2c631: "Den medfølgende Academic Benchmark fil har en feil"
   the_roles_held_by_the_reporting_user_student_teach_8fa5a269: "rollene til den rapporterende brukeren (elev, lærer, admin, osv.)"
+  the_salesforce_account_id_if_it_exists_e7949706: "Salesforce Account ID (hvis den finnes)"
   the_scheduler_tool_lets_you_set_up_time_slots_that_233345b1: "Planleggingsverktøyet lar deg sette opp tidsspor som studenter (eller studentgrupper) kan melde seg på. For å komme i gang klikk på knappen nedenfor"
   the_severity_of_the_issue_as_selected_by_the_user__88db91d9: "Problemets alvorlighetsgrad, slik som valgt i en rullegardinsliste."
+  the_shortcut_icon_for_ios_android_devices_180x180__cc17b661: "Snarvei-ikonet for iOS/Android-enheter. 180x180 png"
   the_state_parameter_is_required_ffadf213: "Staten parameteren er nødvendig"
   the_top_track_represents_days_on_which_the_student_2a347099: "Den øverste spor representerer dager hvor *student sendte meldinger* til kursinstruktører. Den nederste sporet er for **meldinger fra instruktørene** til studenter."
   the_unique_id_used_for_representing_the_specific_r_3bdf5870: "Unik ID brukt for representasjon av den spesifikke forespørsel/respons-syklusen denne feilrapporten skjedde rundt"
@@ -14271,34 +14705,47 @@ nb:
   there_was_a_problem_deleting_the_grading_scheme_2a959c40: "Det ble et problem ved å slette gradering ordningen"
   there_was_a_problem_exporting_c33dc250: "Det oppstod et problem ved eksport."
   there_was_a_problem_fetching_periods_bdc09a8f: "Det oppstod et problem ved henting av perioder"
+  there_was_a_problem_loading_the_gradebook_69b2a17: "Det var et problem ved lasting av karakterboken."
   there_was_a_problem_logging_in_at_institution_5a298155: "Det var et problem med innloggingen på %{institution}"
   there_was_a_problem_saving_the_grading_period_243bed6c: "Det oppstod et problem ved lagring av vurderingsperioden"
   there_was_a_problem_saving_the_grading_scheme_5e6076e9: "Det ble et problem ved lagring av gradering ordningen"
   there_was_an_error_in_processing_your_request_6513a49a: "En feil oppsto under behandling av forespørselen din"
+  there_was_an_error_saving_the_note_please_try_agai_f2f2cd38: "Det oppsto en feil ved lagring av notatet. Vennligst prøv igjen."
   there_was_an_error_setting_usage_rights_53739e1d: "Det oppstod en feil innstilling bruksrettigheter."
   there_were_errors_with_the_form_errors_ab5b559a: "Det var feilene med skjemaet: %{errors}"
   these_grading_periods_were_created_for_you_by_an_a_e977c2b5: "Disse vurderingsperiodene ble opprettet for deg av en administrator."
   this_assignment_has_been_excused_87f1dc13: "Denne innleveringen har blitt unnskyldt."
   this_assignment_is_dropped_and_will_not_be_conside_35c3e198: "Denne innleveringen er droppet og blir ikke tatt med i beregningen"
   this_assignment_is_excused_and_will_not_be_conside_5892de1f: "Denne innleveringen er unnskyldt og blir ikke vurdert i den totale beregningen"
+  this_assignment_is_overdue_a44bea3b: "Dette oppdraget er forsinket"
   this_conference_may_be_recorded_f76deeeb: "Denne konferansen kan bli tatt opp"
   this_course_cannot_be_added_to_the_courses_menu_at_a3fbb11e: "Dette kurset kan ikke legges til kurs menyen på dette tidspunktet."
+  this_course_hasn_t_started_yet_you_will_not_be_abl_c828c423: "Dette kurset har ikke begynt enda. Du vil ha anledning til å delta på dette kurset før %{date}."
   this_course_is_claimed_and_ready_but_you_ll_need_t_25b95a0a: "Dette kurset er hevdet og klar, men du trenger å fullføre registrerings prosessen før du kan publisere kurset. Du skal ha mottatt en epost fra Canvas med en link for å fullføre prosessen. Husk å sjekke spam boksen."
   this_course_is_visible_only_to_teachers_until_it_i_ce972f0: "Dette kurset er bare synlig for lærere før det er publisert."
   this_enables_an_updated_navigation_new_dashboard_a_8bd4cae: "Dette tillater en oppdatert navigering, nytt dashbord og et enklere og mer moderne utseende."
+  this_enables_users_to_generate_and_download_course_4c69c531: "Dette gjør det mulig å generere og laste ned kurs ePub."
   this_field_is_required_fa58c4a: "Dette feltet er påkrevd"
   this_field_name_is_required_988caebc: "Feltet \"%{name}\" er kreves."
   this_field_name_is_required_b9196401: "Feltet \"name\" kreves."
+  this_file_9443cda1: "denne filen"
   this_file_must_have_usage_rights_set_before_it_can_55aba559: "Denne filen må ha usage_rights satt før det kan publiseres."
   this_folder_is_currently_locked_and_unavailable_to_f85c451: "Denne mappen er låst og utilgjengelig for å vise."
+  this_grade_differs_from_the_student_s_view_of_the__56742bd0: "Denne karakteren er forskjellig fra studentenes syn på karakteren fordi noen oppdrag dempes"
+  this_image_appears_as_a_background_watermark_to_yo_1c6b4497: "Dette bildet vises som vannmerke i bakgrunnen på siden din. Godkjente formater: png, svg, gif, jpeg"
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "Dette er en kommaseparert liste over URL's til å stole på. Tillitsfulle noen URL's i denne listen vil hoppe over CSRF token ved pålogging til Canvas"
+  this_is_a_concluded_course_so_only_concluded_enrol_e6e3a9d9: "Dette er et avsluttet kurs , så bare konkludert påmeldingene er tilgjengelig."
   this_login_is_for_provider_6f17462: "Pålogginen er for %{provider}"
   this_most_likely_happened_because_you_imported_cou_a78ea880: "Dette skjedd sannsynlig mest fordi du importerte kursinnhold uten de tilknyttede filene."
   this_outcome_has_been_used_to_assess_a_student_and_376d5ba9: "Dette utfallet har blitt brukt til å vurdere en student og kan ikke lenger bli oppdatert"
   this_outcome_has_been_used_to_assess_a_student_and_5a925169: "Dette utfallet har blitt brukt til å analysere en student og kan ikke redigeres eller slettes"
+  this_page_cannot_be_modified_because_grades_have_a_48646991: "Denne siden kan ikke endres ettersom karakterene allerede er innsendt."
+  this_question_will_show_a_checkbox_next_to_each_an_169cd6d9: "Dette spørsmålet vil vise en avkryssingsboks ved siden av hvert svar."
   this_quiz_has_been_excused_d89d2b74: "Denne prøven har blitt unnskyldt"
   this_quiz_is_unpublished_only_teachers_can_see_the_51d281b1: "*Denne prøven er ikke publisert* Kun forelesere kan se prøven fram til den blir publisert."
+  this_sample_page_includes_common_ui_elements_in_ca_331f4ac4: "Denne prøven siden inneholder vanlige UI elementer i Canvas for å hjelpe deg å bygge din egendefinerte merkevarebygging. Når du begynner å gjøre endringer i fargeverdiene og bilder i venstre sidebar , vil du se en * forhåndsvise endringene * knapp . Klikk på den for å oppdatere denne siden og se hvordan endringene ser ut."
   this_student_wrote_f1a3f22d: "Denne student skrev:"
+  this_submission_has_already_been_graded_and_is_rea_8ec61c52: "Dette bidraget har allerede blitt gradert og er klar for moderasjon."
   this_will_allow_you_to_authenticate_canvas_for_pos_fdfca40: "Dette tillate deg til å autentisere Canvas for innlegging karakterer til SIS"
   this_will_apply_these_changes_to_your_entire_accou_22b86cde: "Disse endringer blir nå brukt på hele kontoen. Vil du fortsette?"
   ticketing_system_52205bff: Ticketingsystem
@@ -14491,6 +14938,9 @@ nb:
     edit_topic: "Rediger diskusjonstema"
     new_announcement: "Ny kunngjøring"
     new_topic: "Nytt diskusjonstema"
+  title_52b8638d: "Tittel:"
+  title_is_off_6c823e2d: "%{title} er av"
+  title_is_on_2b72a9b7: "%{title} er på"
   title_separator: ":"
   titles: 
     aligned_items: "Justerte elementer"
@@ -14517,6 +14967,7 @@ nb:
   to_minscore_43e5452e: "til %{minScore}%"
   to_view_assignments_make_sure_the_agenda_view_is_a_5695abfd: "For å vise oppgaver, sørge for at *Agenda* visningen er aktiv."
   toggle_dashcard_view_or_recent_activity_stream_1de257: "Bytt dashcard-visning og nylig aktivitetsstrøm"
+  toggle_editing_answer_text_as_html_9a93fe6: "Toggle redigering svaret tekst som HTML"
   tolerance_value_9e96573c: Toleranseverdi
   too_many_failed_login_attempts_please_try_again_la_f8e0d7c8: "For mange innloggingsforsøk. Prøv igjen senere eller kontakt systemadministratoren."
   too_many_members_b8b15069: "For mange medlemmer"
@@ -14527,6 +14978,10 @@ nb:
     incomplete: ufullstendig
     vdd: 
       more_message: "og %{count} til …"
+  top_box_background_6db383e9: "Øverste boksbakgrunn"
+  top_box_border_94cee4a7: "Øverste boksramme"
+  total_71a4807: Total
+  total_column_options_4e6a6032: "Totalt kolonnealternativer"
   tours: 
     quiz_regrade: 
       got_it: "Ok, forstått"
@@ -14549,16 +15004,19 @@ nb:
     buttons: 
       resubmit_to_turnitin: "Lever til Turnitin på nytt"
   twitter_fcef6b54: Twitter
+  uh_oh_contact_your_friendly_catalog_developer_erro_861aaf3d: "UH oh! Kontakt din vennlig Catalog Developer . Feilmelding: %{message}"
   unable_to_remove_app_4293cb53: "Kan ikke fjerne app"
   unarchive_selected_e0c4bd3d: "Dearkiver valgt"
   unauthorized: uautorisert
   unauthorized_message: "JWT-signatur ugyldig"
+  unauthorized_to_delete_this_file_a1271224: "Uautorisert slette denne filen"
   unchanged_aca18e02: "[Unchanged]"
   undo_a7be8fef: Angre
   ungraded_submissions_44efb0ec: "Usorterte innleveringer"
   ungraded_survey_ad7de790: "Ikke vurdert undersøkelse"
   unknown: Ukjent
   unknown_47a3b725: Ukjent
+  unknown_account_74d30b82: "ukjent konto"
   unknown_content_type_ae6d08e8: "Ukjent innholdstype"
   unknown_question_bank: "Ukjent spørsmålsbank"
   unknown_quiz: "Ukjent prøve"
@@ -14570,10 +15028,15 @@ nb:
   unlock_date_cannot_be_before_section_start_793ddc66: "Lås opp dato kan ikke være før seksjonsstart"
   unlock_date_cannot_be_before_term_start_d3c01813: "Lås opp dato kan ikke være før semesterstart"
   unlock_module_on_date_17144fbd: "Lås opp modul på dato"
+  unmute_assignment_29a49038: "Mikrofon Assignment"
   unprocessable_entity: "enhet kan ikke behandles"
   unprocessable_entity_message: "Signert meeting-ID ugyldig"
+  unpublish_9f2d730b: Avpubliser
+  unpublished_8b6107d6: Upublisert
   unpublished_click_to_modify_60f9051: "Upublisert - Klikk for å modifisere"
+  unpublished_click_to_publish_c073631a: "Upublisert. Klikk for å publisere."
   unpublished_courses_title: "Ikke publiserte kurs"
+  unpublished_dfd8801: upublisert
   unread_e9c1b19c: Ulest
   unstarted_932f2990: "Ikke påbegynt"
   unsupported_package: "Ustøttet innholdspakke"
@@ -14582,6 +15045,7 @@ nb:
   untitled_assignment_59354b34: "Uten tittel oppdrag"
   unused_courses_title: "Ikke benyttede kurs"
   up_c553575d: Op
+  update_4d8ee62: Oppdater
   updated_group_group_name_727b1d98: "Oppdatert Gruppe %{group_name}"
   updating_6edbab78: Oppdaterer
   upload_8b403d05: "Last opp"
@@ -14593,13 +15057,17 @@ nb:
   upload_data_dc4fa4cb: "Last opp data"
   upload_drop_zone: 
     drop_to_upload: "Slippe elementer for å laste opp"
+  upload_media_ce31135a: "Last opp Media"
   upload_successful_ca47465f: "Opplasting vellykket"
   upper_limit_of_range_c454a8f2: "Øvre grense for utvalg"
+  url_cc9398ca: "URL:"
+  url_type_3ece27d2: "URL type"
   usage_right_ff96f3e2: "Bruks Rettighet:"
   usage_rights_f0960ad6: "Bruksrettigheter:"
   usage_rights_have_been_set_d1b433c7: "Bruksrettigheter har blitt satt."
   usage_rights_will_be_set_for_all_of_the_files_cont_b192336a: "Bruksretten vil bli satt for alle filene som er inneholdt i:"
   use_default_890939b7: "Bruk standard"
+  use_new_folder_tree_in_files_bc0ea09f: "Bruk nytt folder-tre i filene"
   use_new_folder_tree_in_files_eb5a451b: "Bruk nytt mappetre i filer"
   use_the_new_quiz_lti_tool_in_place_of_regular_canv_d7cb0c7f: "Bruk det nye test-LTI-verktøyet i stedet for vanlige canvas-prøver"
   use_this_configuration_for_parent_observer_registr_e49f8f66: "Bruk denne konfigurasjonen for foreldre/observatør-påmelding"
@@ -14684,6 +15152,7 @@ nb:
       image_reported: "Dette bildet er rapportert"
   user_name_you_ll_need_to_log_in_before_you_can_vie_164c8e30: "%{user_name}, du må *logge inn* før du kan se denne siden."
   user_navigation_a097be0f: Brukernavigering
+  user_not_authorized_to_manage_sis_data_account_sis_47bd4eec: "brukeren ikke fullmakt til å forvalte SIS data - konto [ sis_account_id ]"
   user_notes: 
     confirms: 
       delete_journal_entry: "Er du sikker på at du vil slette denne protokolloppføringen?"
@@ -14904,6 +15373,7 @@ nb:
       labels: 
         default_email: Standard-epost
         display_name: "Navn som skal vises"
+        email: "standard E-post"
         full_name: "Fullt navn"
         name: "Fullt navn"
         profile_picture: Profilbilde
@@ -14999,19 +15469,24 @@ nb:
       welcome_to_happiness: "Velkommen til Canvas!"
   validate: 
     is_required: "Dette feltet er obligatorisk"
+  vanity_url_76f93382: "Vanity URL"
   video_b9f27375: Video
+  video_content_is_not_supported_by_your_device_or_a_25214f57: "Videoinnhold støttes ikke av enheten eller app."
   view_analytics_91a3b7a: "Vis Analytics"
   view_app_center_6c89a3fe: "Vis appsenteret"
   view_app_configurations_52b52441: "Vis applikasjonskonfigurasjoner"
   view_ba339f93: Se
   view_course_analytics_eefe6b2: "Vis Kurs Analytics"
+  view_file_8a1c62e5: "Vis fil"
   view_grades_8d3bae6c: "Vis karakterer"
   view_name_app_62a2ad8e: "Vis %{name} app"
+  view_question_banks_188a9e0f: "Vis Spørsmåls Banker"
   view_student_analytics_6b8ccd42: "Vis Student Analytics"
   view_toolname_placements_4a5724d1: "Vis %{toolName} plasseringer"
   viewed_6b75c21e: Sett
   visit_864b4060: Besøk
   visit_group_group_name_7a816081: "Gå til gruppe %{group_name}"
+  warning_crocodoc_has_limitations_when_used_in_fire_8ab414e6: "Advarsel: Crocodoc har begrensninger når den brukes i Firefox. Kommentarer vil ikke alltid lagres."
   warning_for_improved_accessibility_in_moving_files_71e1028b: "Advarsel: For bedre tilgjengelighet i å flytte filer, kan du bruke Flytt til Dialog alternativet finner du i menyen."
   warning_icon_f64936d7: varselsiko
   warnings: 
@@ -15021,6 +15496,9 @@ nb:
       weekly_message: 
         one: "Denne Canvas-installasjonen er kun til testing, og blir tilbakestilt hver uke."
         other: "Denne Canvas-installasjonen er kun til testing, og blir tilbakestilt hver %{count}. uke."
+  watermark_c93fae0d: Vannmerke
+  watermark_opacity_ce3d3097: "Vannmerke opasitet"
+  watermarks_other_images_e970fc6a: "Vannmerker & andre bilder"
   we_re_sorry_a_login_error_has_occurred_please_chec_6dae02e2: "Vi beklager, men det har oppstått ved feil ved innlogging. Sjekk igjen."
   we_were_unable_to_activate_the_app_578defe7: "Vi klarte ikke å aktivere app."
   we_were_unable_to_add_the_app_418877ef: "Vi klarte ikke å legge den appen."
@@ -15041,10 +15519,12 @@ nb:
   webct_display: "Blackboard Vista/CE (WebCT)"
   webct_file_description: "Blackboard Vista/CE, WebCT 6+ Course"
   webct_name: "Blackboard Vista/CE (WebCT)"
+  week_s_cb1492ee: Uke(r)
   welcome_to_the_canvas_theme_editor_73091d1: "Velkommen til Canvas Theme Editor"
   welcome_to_your_courses_to_customize_the_list_of_c_22de652e: "Velkommen til dine kurs! For å tilpasse listen over kurs klikk på \"Alle kurs\" og stjernemarker kursene å vise."
   well_below_mastery_37664bdc: "Vel Nedenfor Mestring"
   what_should_the_csv_file_look_like_985a59ac: "Hvordan bør en CSV fil se ut?"
+  when_enabled_global_javascript_and_css_files_can_b_ea21d216: "Når aktivert, kan globale JavaScript og CSS-filer lastes opp i *%{t_theme_editor}*."
   when_people_visit_the_course_this_is_the_page_they_de94acc2: "Når folk besøker kurset, er dette siden de får se. Du kan sette den til å vise en aktivitet stream, listen over kursmoduler, et pensum, eller en tilpasset side du skriver selv. Standarden er selvfølgelig aktivitetsforløp."
   where_would_you_like_to_move_title_fabd6e8f: "Hvor ønsker du å flytte %{title}?"
   widget: 
@@ -15206,11 +15686,19 @@ nb:
     external_urls: 
       archive: Arkiv
       archive_link: "Se arkiv(er)"
+  windows_tile_color_2b786bd9: "Windows flis-farge"
+  windows_tile_square_b91d2b33: "Windows-flis: firkant"
+  windows_tile_wide_4d40910: "Windows-flis: bred"
   would_you_like_to_enable_this_app_ccdf735d: "Ønsker du å aktivere denne app?"
   would_you_like_to_let_students_continue_in_the_cou_a4c36171: "Har du lyst til å la studenter fortsette i kurset eller ønsker du å låse opp igjen disse modulene til de nye kravene er fullført?"
   xml_configuration_5ea1b942: "XML Konfigurasjon"
   yellow_4cf93785: Gu
+  yes_dde87d5: Ja
   yo_e4ee15a4: Yo
+  you_are_about_to_lose_any_changes_that_you_have_no_6759802f: |-
+      Du er i ferd med å miste eventuelle endringer som du ennå ikke har søkt til din konto.
+      
+      Vil du fortsatt lyst til å fortsette?
   you_are_about_to_lose_any_unsaved_changes_would_yo_e255f393: |-
       Du er i ferd med å gå glipp av alle ulagrede endringer.
       
@@ -15220,14 +15708,19 @@ nb:
   you_are_the_group_leader_for_this_group_b8629b70: "du er gruppeleder for denne gruppen"
   you_are_trying_to_launch_insecure_content_from_wit_5c1c692b: "Du prøver å lansere usikkert innhold innenfra en sikker side (canvas). Noen nettlesere kan hindre dette innholdet i innlasting."
   you_are_unsubscribed_and_will_not_be_notified_of_n_bf4b96a2: "Du har avsluttet abonnementet og blir ikke varslet om nye kommentarer. Klikk for å abonnere"
+  you_can_also_manage_access_at_this_time_105a2530: "Du kan også administrere tilgangen på denne tiden:"
   you_can_disable_this_feature_d5e61373: "Du kan deaktivere denne funksjonen"
   you_can_hide_or_show_a_course_s_assignments_by_tog_ec8bdb8e: "Du kan skjule eller vise en kursets oppgaver ved veksling dem på eller av."
   you_can_log_in_directly_with_this_provider_by_goin_467d7f66: "Du kan logge inn direkte med denne tilbyderen ved å gå til %{url}"
   you_can_now_set_regrade_options_for_students_who_h_c1ceb1c4: "Du kan nå gjøre valg for ny vurdering av studenter som allerede har tatt prøven."
   you_can_t_delete_a_sub_account_that_has_courses_in_c4f439cf: "Du kan ikke slette en underkonto som har kurs i det"
   you_can_try_to_log_in_again_2b23ef0f: "Du kan prøve å *logge inn igjen*."
+  you_can_use_a_single_16x16_32x32_48x48_ico_file_85da88b5: "Du kan bruke en enkel 16x16, 32x32, 48x48 ico-fil."
+  you_cannot_edit_themes_on_this_subaccount_63ceaaf3: "Du kan ikke endre temaer på denne subaccount ."
+  you_cannot_remove_this_enrollment_c87be1cb: "Du  kan ikke fjerne denne kurspåmeldingen."
   you_do_not_have_access_to_the_requested_discussion_90d8ec99: "Du har ikke tilgang til den forespurte diskusjonen."
   you_do_not_have_access_to_the_requested_quiz_d3659e4b: "Du har ikke tilgang til den forespurte prøven."
+  you_do_not_have_permission_to_publish_this_course_ff361c82: "Du har ikke tillatelse til å publisere dette kurset."
   you_have_changed_the_progression_requirements_for__6772bc89: "Du har endret progresjonskrav for en aktiv kurs. Det kan være elever som allerede har kommet til denne modulen, og til andre som er avhengige av det."
   you_have_made_changes_to_the_questions_in_this_qui_1658361a: "*Du har gjort endringer på spørsmål i denne prøven.* Disse endringene vil ikke vises for studentene før du lagrer prøven."
   you_have_no_outcomes_click_here_to_create_one_ebf262a3: "Du har ingen utfall. *Klikk her* for å opprette en."
@@ -15242,8 +15735,11 @@ nb:
   you_must_select_a_course_to_copy_content_from_e7bd9e09: "Du må velge en kurs for å kopiere innhold fra"
   you_must_set_it_to_a_number_greater_than_or_equal__eb1d9275: "Du må sette den til et tall som er større enn eller lik %{min}"
   you_must_specify_a_usage_right_5eb57f87: "Du må spesifisere et bruk rett."
+  you_need_to_preview_your_changes_before_applying_t_468d56e4: "Du trenger å \" forhåndsvise endringene \" før du bruker til alle."
   you_need_to_preview_your_changes_before_applying_t_cb048bed: "du trenger å *Forhåndsvise dine endringer* før du bruker dem på alle"
+  you_re_editing_your_canvas_theme_apply_or_cancel_c_1633384e: "Du redigerer din Canvas Tema ! Påfør eller avbryte endringer fra i * Theme Editor * ."
   you_re_editing_your_canvas_theme_the_changes_have__c0ae1bd1: "Du redigerer din Canvas mal! Endringene har ikke blitt brukt ennå"
+  you_scored_a_score_a5dd5561: "Du scoret et %{score}."
   you_scored_d3e00111: "Du fikk"
   you_will_be_redirected_to_a_login_page_where_you_w_fc8df402: "Du blir omdirigert til en påloggingsside der du vil kunne logge inn med ditt barns påloggingsdetaljer."
   you_will_need_to_create_a_new_app_on_facebook_face_8fe85297: |-
@@ -15270,11 +15766,13 @@ nb:
       Du bør konfigurere %{callback_url} som Callback URL, og sette Tilgangsnivået til
       Lese, skrive og og få tilgang til direktemeldinger
       Etter at du oppretter applikasjonen, noter Consumer Key og Consumer Secret, og oppgi dem her.
+  your_answer_8dad6ea4: "Ditt svar:"
   your_assignment_list_can_now_be_found_on_the_calen_9785b5ac: "Din Oppgavelisten kan nå bli funnet på *Kalender* side."
   your_assignments_list_has_improved_3eded80e: "*Oppdrag* lista ditt har blitt forbedret"
   your_assignments_will_show_here_listed_by_due_date_18dc880f: "Dine Oppdrag vil vise her listet etter forfallsdato."
   your_browser_does_not_meet_the_minimum_requirement_2fa7c11f: "Din nettleser imøtekommer ikke minstekravene til Canvas. Vennligst besøk *Canvas Community* for en fullstendig liste over støttede nettlesere."
   your_content_has_been_exported_bbb57764: "Innholdet ditt er eksportert."
+  your_custom_theme_has_been_successfully_applied_eaa0fc82: "Din definerte temaet har blitt brukt."
   your_email_b5364bee: "Din e-post"
   your_file_is_being_uploaded_to_the_gradebook_and_y_aa5edfc6: "Filen din blir lastet opp til Gradebook, og du kan forlate denne siden når som helst. Om du har en stor CSV-fil, kan dine endringer ta et par minutter å oppdateres. For å forhindre at noendata blir overskrivet, vennligst bekreft at opplastingen har fullført og din Gradebook er riktig før du gjør ytterligere endringer."
   your_message_has_been_sent_thank_you_e0284316: "Din melding er sendt. Takk!"
@@ -15283,6 +15781,8 @@ nb:
   your_search_encountered_the_following_errors_fc3e5e7f: 
     one: "Søket ditt oppstått følgende feil:"
     other: "Søket ditt oppstått følgende feilene:"
+  your_submission_has_not_been_graded_yet_d6963e53: "Innlegget ditt har ikke vært gradert ennå"
+  yyyy_mm_dd_hh_mm_a01b6081: "ÅÅÅÅ-MM-DD tt:mm"
   zendesk: 
     engine: 
       plugin_name: Zendesk
