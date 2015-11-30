@@ -45,7 +45,8 @@ define([
         editorOptions: editorOptions.bind(null, width, textarea.id),
         defaultContent: textarea.value || defaultContent,
         textareaId: textarea.id,
-        textareaClassName: textareaClassName
+        textareaClassName: textareaClassName,
+        language: ENV.LOCALE
       }
     },
 
