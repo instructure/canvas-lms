@@ -176,5 +176,35 @@ describe "Tiny MCE editor functions" do
       # To avoid fragility of extra formatting characters being added, I just want the first 59 characters
       expect(p.body[0..58]).to eq "<p>underline and purple and turquoise should be removed</p>"
     end
+
+    it "should align text left on wiki description", priority: "1", test_id: 303702 do
+      p = create_wiki_page("test_page", false, "public")
+      get "/courses/#{@course.id}/pages/#{p.title}/edit"
+
+      click_tiny_button('Align left')
+      type_in_tiny('textarea.body', "this should be aligned left")
+      f("form.edit-form button.submit").click
+      wait_for_ajaximations
+
+      p.reload
+      # To avoid fragility of extra formatting characters being added, I just want the first 62 characters
+      expect(p.body[0..61]).to eq "<p style=\"text-align: left;\">this should be aligned left</p>"
+    end
+
+    it "should remove left alignment from text on wiki description", priority: "1", test_id: 526906 do
+      p = create_wiki_page("test_page", false, "public")
+      p.body = "<p style=\"text-align: left;\">left alignment should be removed</p>"
+      p.save!
+      get "/courses/#{@course.id}/pages/#{p.title}/edit"
+
+      select_all_wiki
+      click_tiny_button('Align left')
+      f("form.edit-form button.submit").click
+      wait_for_ajaximations
+
+      p.reload
+      # To avoid fragility of extra formatting characters being added, I just want the first 39 characters
+      expect(p.body[0..38]).to eq "<p>left alignment should be removed</p>"
+    end
   end
 end
