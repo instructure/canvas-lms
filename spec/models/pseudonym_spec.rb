@@ -671,6 +671,7 @@ describe Pseudonym do
     u.pseudonyms.create!(unique_id: 'a', account: Account.default)
     p2 = u.pseudonyms.new(unique_id: 'a', account: Account.default)
     expect(p2).to_not be_valid
+    expect(p2.errors[:unique_id].first.type).to eq :taken
     p2.authentication_provider = aac
     expect(p2).to be_valid
   end

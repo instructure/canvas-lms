@@ -246,7 +246,8 @@ class Pseudonym < ActiveRecord::Base
         existing_pseudo = Pseudonym.active.by_unique_id(self.unique_id).where(:account_id => self.account_id,
           :authentication_provider_id => self.authentication_provider_id).first
         if existing_pseudo && existing_pseudo.id != self.id
-          self.errors.add(:unique_id, t("ID already in use for this account and authentication provider"))
+          self.errors.add(:unique_id, :taken,
+            message: t("ID already in use for this account and authentication provider"))
           return false
         end
       end
