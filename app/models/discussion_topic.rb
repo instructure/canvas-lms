@@ -789,7 +789,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def restore(from=nil)
-    self.workflow_state = 'unpublished'
+    self.workflow_state = is_announcement ? 'active' : 'unpublished'
     self.save
 
     if from != :assignment && self.for_assignment? && self.root_topic_id.blank?

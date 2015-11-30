@@ -1538,9 +1538,8 @@ describe DiscussionTopic do
   end
 
   context "restore" do
-    before(:once) { group_discussion_assignment }
-
     it "should restore the assignment and associated child topics" do
+      group_discussion_assignment
       @topic.destroy
 
       @topic.reload.assignment.expects(:restore).with(:discussion_topic).once
@@ -1550,14 +1549,12 @@ describe DiscussionTopic do
       expect(@topic.assignment).to be_unpublished
     end
 
-    it "should restore to unpublished state if draft mode is enabled" do
-      @topic.destroy
+    it "should restore an announcement to active state" do
+      ann = @course.announcements.create!(:title => "something", :message => "somethingelse")
+      ann.destroy
 
-      @topic.reload.assignment.expects(:restore).with(:discussion_topic).once
-      @topic.restore
-      expect(@topic.reload).to be_unpublished
-      @topic.child_topics.each { |ct| expect(ct.reload).to be_unpublished }
-      expect(@topic.assignment).to be_unpublished
+      ann.restore
+      expect(ann.reload).to be_active
     end
   end
 
