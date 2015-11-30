@@ -266,6 +266,48 @@ describe "calendar2" do
         expect(find('.ui-datepicker-header').text).to include_text(Time.now.utc.strftime("%B"))
         expect(find('.ui-datepicker-calendar').text).to include_text("Mo")
       end
+
+      it "should have a strikethrough on past due assignemnt", priority: "1", test_id: 518370 do
+        date_due = Time.zone.now.utc - 2.days
+        @assignment = @course.assignments.create!(
+          title: 'new outdated assignemnt',
+          name: 'new outdated assignment',
+          due_at: date_due
+        )
+        get '/calendar2'
+        # go to the same month as the date_due
+        quick_jump_to_date(date_due.strftime '%Y-%m-%d')
+        # verify assignment has strikethrough
+        expect(find('.fc-title.calendar__event--completed')).to be_truthy
+      end
+    end
+  end
+
+  context "as a student" do
+    before(:each) do
+      course_with_student_logged_in
+    end
+
+    describe "main month calendar" do
+
+      it "strikes through title on for completed assignment", priority: "1", test_id: 518372 do
+        date_due = Time.zone.now.utc + 2.days
+        @assignment = @course.assignments.create!(
+          title: 'new outdated assignemnt',
+          name: 'new outdated assignment',
+          due_at: date_due,
+          submission_types: 'online_text_entry'
+        )
+        # submit assignment
+        submission = @assignment.submit_homework(@student)
+        submission.submission_type = 'online_text_entry'
+        submission.save!
+        get '/calendar2'
+        # go to the same month as the date_due
+        quick_jump_to_date(date_due.strftime '%Y-%m-%d')
+        # verify assignment has strikethrough
+        expect(find('.fc-title.calendar__event--completed')).to be_truthy
+      end
     end
   end
 end
