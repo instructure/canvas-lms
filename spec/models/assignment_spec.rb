@@ -3701,6 +3701,15 @@ describe Assignment do
       a.submission_types = 'not_graded'
       expect(a).not_to be_valid
     end
+
+    it "does not consider nil -> false to be a state change" do
+      assignment_model(course: @course)
+      @assignment.grade_student @student, score: 0
+      expect(@assignment.moderated_grading).to be_nil
+      @assignment.moderated_grading = false
+      @assignment.due_at = 1.day.from_now
+      expect(@assignment).to be_valid
+    end
   end
 
   describe "context_module_tag_info" do
