@@ -160,5 +160,21 @@ describe "Tiny MCE editor functions" do
       # To avoid fragility of extra formatting characters being added, I just want the first 38 characters
       expect(p.body[0..37]).to eq "<p>the turquoise should be removed</p>"
     end
+
+    it "should clear formatting on wiki description", priority: "1", test_id: 298748 do
+      p = create_wiki_page("test_page", false, "public")
+      p.body = "<p><span style=\"text-decoration: underline; color: #800080; background-color: #33cccc;\">underline and purple and turquoise should be removed</span></p>"
+      p.save!
+      get "/courses/#{@course.id}/pages/#{p.title}/edit"
+
+      select_all_wiki
+      click_tiny_button('Clear formatting')
+      f("form.edit-form button.submit").click
+      wait_for_ajaximations
+
+      p.reload
+      # To avoid fragility of extra formatting characters being added, I just want the first 59 characters
+      expect(p.body[0..58]).to eq "<p>underline and purple and turquoise should be removed</p>"
+    end
   end
 end
