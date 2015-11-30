@@ -9,7 +9,7 @@ define [
 
   TestUtils = React.addons.TestUtils
 
-  module 'UploadProgress',
+  module 'UsageRightsDialog',
     setup: ->
     teardown: ->
       $("#ui-datepicker-div").empty()
@@ -88,20 +88,49 @@ define [
 
   test 'render different right message', ->
     usage_rights = {
-      use_justification: 'choose'
+      use_justification: 'own_copyright'
+    }
+
+    usage_rights2 = {
+      use_justification: 'used_by_permission'
     }
 
     file = new File(thumbnail_url: 'blah', usage_rights: usage_rights)
     file.displayName = -> "cats"
 
+    file2 = new File(thumbnail_url: 'blah', usage_rights: usage_rights)
+    file.displayName = -> "cats2"
+
     props = {
       closeModal: ->
-      itemsToManage: [file, file]
+      itemsToManage: [file, file2]
     }
 
     uRD = TestUtils.renderIntoDocument(React.createElement(UsageRightsDialog, props))
 
     equal uRD.refs.differentRightsMessage.props.children[1], "Items selected have different usage rights.", "displays correct message"
+
+    React.unmountComponentAtNode(uRD.getDOMNode().parentNode)
+
+  test 'do not render different rights message when they are the same', ->
+    usage_rights = {
+      use_justification: 'own_copyright',
+      legal_copyright: ''
+    }
+
+    file = new File(thumbnail_url: 'blah', usage_rights: usage_rights)
+    file.displayName = -> "cats"
+
+    file2 = new File(thumbnail_url: 'blah', usage_rights: usage_rights)
+    file2.displayName = -> "cats"
+
+    props = {
+      closeModal: ->
+      itemsToManage: [file, file2]
+    }
+
+    uRD = TestUtils.renderIntoDocument(React.createElement(UsageRightsDialog, props))
+    ok !uRD.refs.differentRightsMessage, "does not show the message"
 
     React.unmountComponentAtNode(uRD.getDOMNode().parentNode)
 
