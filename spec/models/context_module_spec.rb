@@ -681,6 +681,11 @@ describe ContextModule do
         @assign.reload
         @assign.grade_student(@student, :grade => "5", :grader => @teacher)
         expect(@module.evaluate_for(@student)).to be_unlocked
+
+        @assign.reload
+        @assign.grade_student(@student, :grade => nil, :grader => @teacher)
+        # removing the grade manually shouldn't mark as completed either
+        expect(@module.evaluate_for(@student)).to be_unlocked
       end
 
       it "should not fulfill quiz must_submit requirement on manual grade" do
