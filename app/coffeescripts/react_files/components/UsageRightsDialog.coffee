@@ -72,7 +72,7 @@ define [
       if @props.itemsToManage.every((item) -> (item.get('usage_rights')?.legal_copyright == copyright) || (item.get('usage_rights')?.license == copyright))
         copyright
       else
-        '' # They have different copyrights
+        null
 
     defaultCCValue: ->
       if (@use_justification == 'creative_commons')
