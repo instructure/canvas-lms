@@ -137,7 +137,7 @@ END
       This enables users to generate and download course ePub.
 END
       applies_to: 'Course',
-      state: 'hidden',
+      state: 'allowed',
       root_opt_in: true,
       beta: true
     },
