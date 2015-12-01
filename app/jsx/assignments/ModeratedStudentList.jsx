@@ -33,6 +33,12 @@ define([
     },
 
     renderStudentMark (student, markIndex) {
+      // Set up previousIndex reference
+      var previousMarkIndex = 0;
+      if (markIndex > 0) {
+        previousMarkIndex = markIndex - 1;
+      }
+
       if (student.provisional_grades && student.provisional_grades[markIndex]) {
         if (this.props.includeModerationSetColumns) {
           var provisionalGradeId = student.provisional_grades[markIndex].provisional_grade_id;
@@ -60,7 +66,7 @@ define([
           );
         }
       } else {
-          if (student.in_moderation_set) {
+          if (student.in_moderation_set && (student.provisional_grades[previousMarkIndex] || markIndex == 0)) {
             return (
               <div className='col-xs-2'>
                 <div className='ModeratedAssignmentList__Mark'>

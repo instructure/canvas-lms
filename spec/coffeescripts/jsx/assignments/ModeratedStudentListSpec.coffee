@@ -29,6 +29,25 @@ define [
   }
 
   module 'ModeratedStudentList',
+  test 'only shows the next speedgrader link when in moderation set', ->
+    newFakeStudentList = _.extend({}, fakeStudentList)
+    newFakeStudentList.students[0].in_moderation_set = true
+    studentList = TestUtils.renderIntoDocument(React.createElement(ModeratedStudentList,
+        urls: {assignment_speedgrader_url: 'blah'},
+        includeModerationSetColumns: true,
+        studentList: newFakeStudentList,
+        assignment: {published: true},
+        handleCheckbox: () => 'stub',
+        onSelectProvisionalGrade: () => 'stub'
+      )
+    )
+    moderatedColumns = TestUtils.scryRenderedDOMComponentsWithClass(studentList, 'ModeratedAssignmentList__Mark')
+    columns = TestUtils.scryRenderedDOMComponentsWithClass(studentList, 'AssignmentList__Mark')
+    equal moderatedColumns[0].getDOMNode().textContent, '4', 'displays the grade in the first column'
+    equal moderatedColumns[1].getDOMNode().textContent, 'SpeedGrader™', 'displays speedgrader link in the second'
+    equal columns[0].getDOMNode().textContent, '-', 'third column is a dash'
+    React.unmountComponentAtNode(studentList.getDOMNode().parentNode)
+
   test 'show a dash in in the first column when not in the moderation set', ->
     newFakeStudentList = _.extend({}, fakeStudentList)
     studentList = TestUtils.renderIntoDocument(React.createElement(ModeratedStudentList,
@@ -55,7 +74,9 @@ define [
       )
     )
     columns = TestUtils.scryRenderedDOMComponentsWithClass(studentList, 'AssignmentList__Mark')
+    moderatedColumns = TestUtils.scryRenderedDOMComponentsWithClass(studentList, 'ModeratedAssignmentList__Mark')
     equal columns.length, 1, 'only show one column'
+    equal moderatedColumns.length, 0, 'no moderated columns shown'
     React.unmountComponentAtNode(studentList.getDOMNode().parentNode)
 
   test 'shows the grade column when there is a selected_provisional_grade_id', ->
