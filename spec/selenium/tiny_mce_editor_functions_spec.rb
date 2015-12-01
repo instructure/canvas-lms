@@ -206,5 +206,35 @@ describe "Tiny MCE editor functions" do
       # To avoid fragility of extra formatting characters being added, I just want the first 39 characters
       expect(p.body[0..38]).to eq "<p>left alignment should be removed</p>"
     end
+
+    it "should align text center on wiki description", priority: "1", test_id: 303698 do
+      p = create_wiki_page("test_page", false, "public")
+      get "/courses/#{@course.id}/pages/#{p.title}/edit"
+
+      click_tiny_button('Align center')
+      type_in_tiny('textarea.body', "this should be aligned center")
+      f("form.edit-form button.submit").click
+      wait_for_ajaximations
+
+      p.reload
+      # To avoid fragility of extra formatting characters being added, I just want the first 67 characters
+      expect(p.body[0..66]).to eq "<p style=\"text-align: center;\">this should be aligned center</p>"
+    end
+
+    it "should remove center alignment from text on wiki description", priority: "1", test_id: 529217 do
+      p = create_wiki_page("test_page", false, "public")
+      p.body = "<p style=\"text-align: center;\">center alignment should be removed</p>"
+      p.save!
+      get "/courses/#{@course.id}/pages/#{p.title}/edit"
+
+      select_all_wiki
+      click_tiny_button('Align center')
+      f("form.edit-form button.submit").click
+      wait_for_ajaximations
+
+      p.reload
+      # To avoid fragility of extra formatting characters being added, I just want the first 41 characters
+      expect(p.body[0..40]).to eq "<p>center alignment should be removed</p>"
+    end
   end
 end
