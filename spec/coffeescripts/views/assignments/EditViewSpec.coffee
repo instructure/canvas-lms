@@ -188,6 +188,22 @@ define [
     view = @editView description: "<p>&lt;E&gt;</p>"
     equal view.$description.val().match(desc), desc
 
+  test 'allows changing moderation setting if no graded submissions exist', ->
+    ENV.MODERATED_GRADING = true
+    ENV.HAS_GRADED_SUBMISSIONS = false
+    view = @editView has_submitted_submissions: true, moderated_grading: true
+    ok view.$("[type=checkbox][name=moderated_grading]").prop("checked")
+    ok !view.$("[type=checkbox][name=moderated_grading]").prop("disabled")
+    equal view.$('[type=hidden][name=moderated_grading]').attr('value'), '0'
+
+  test 'locks down moderation setting after students submit', ->
+    ENV.MODERATED_GRADING = true
+    ENV.HAS_GRADED_SUBMISSIONS = true
+    view = @editView has_submitted_submissions: true, moderated_grading: true
+    ok view.$("[type=checkbox][name=moderated_grading]").prop("checked")
+    ok view.$("[type=checkbox][name=moderated_grading]").prop("disabled")
+    equal view.$('[type=hidden][name=moderated_grading]').attr('value'), '1'
+
   module 'EditView: group category locked',
     setup: ->
       fakeENV.setup()
