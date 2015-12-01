@@ -21,8 +21,14 @@ module CC::Exporter::Epub
       return if item.try(:empty?)
       template_path = template(item) || base_template
       template = File.expand_path(template_path, __FILE__)
-      erb = ERB.new(File.read(template))
-      erb.result(binding)
+      if File.exist?(template)
+        erb = ERB.new(File.read(template))
+        erb.result(binding)
+      else
+        Rails.logger.warn(">>> Trying to use a template that doesn't exist; skipping.")
+        Rails.logger.warn(">>> item: #{item}")
+        nil
+      end
     end
 
     def parse
