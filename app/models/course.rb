@@ -239,6 +239,7 @@ class Course < ActiveRecord::Base
 
   before_save :touch_root_folder_if_necessary
   before_validation :verify_unique_ids
+  validate :validate_course_dates
   validates_presence_of :account_id, :root_account_id, :enrollment_term_id, :workflow_state
   validates_length_of :syllabus_body, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :name, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true
@@ -368,6 +369,15 @@ class Course < ActiveRecord::Base
     end
 
     is_unique
+  end
+
+  def validate_course_dates
+    if start_at.present? && conclude_at.present? && conclude_at < start_at
+      self.errors.add(:conclude_at, t("End date cannot be before start date"))
+      false
+    else
+      true
+    end
   end
 
   def public_license?

@@ -80,6 +80,7 @@ describe Api::V1::Course do
 
     it "should not show details if user is restricted from access by course dates" do
       @student = student_in_course(:course => @course2).user
+      @course2.start_at = 3.weeks.ago
       @course2.conclude_at = 2.weeks.ago
       @course2.restrict_enrollments_to_course_dates = true
       @course2.restrict_student_past_view = true
@@ -739,11 +740,11 @@ describe CoursesController, type: :request do
       end
 
       it "should not change dates that aren't given" do
-        @course.update_attribute(:conclude_at, '2012-01-01T23:59:59Z')
+        @course.update_attribute(:conclude_at, '2013-01-01T23:59:59Z')
         @new_values['course'].delete('end_at')
         api_call(:put, @path, @params, @new_values)
         @course.reload
-        expect(@course.end_at.strftime('%Y-%m-%dT%T%z')).to eq '2012-01-01T23:59:59+0000'
+        expect(@course.end_at.strftime('%Y-%m-%dT%T%z')).to eq '2013-01-01T23:59:59+0000'
       end
 
       it "should accept enrollment_term_id for updating the term" do

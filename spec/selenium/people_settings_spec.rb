@@ -114,6 +114,7 @@ describe "course people" do
     end
 
     it "should add a user to a second (active) section in a concluded course" do
+      @course.start_at = 2.days.ago
       @course.conclude_at = 1.day.ago
       @course.restrict_enrollments_to_course_dates = true
       @course.save!

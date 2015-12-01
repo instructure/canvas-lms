@@ -323,6 +323,7 @@ describe EnrollmentsApiController, type: :request do
       end
 
       it "should not allow enrollments to be added to a soft-concluded course" do
+        @course.start_at = 2.days.ago
         @course.conclude_at = 1.day.ago
         @course.restrict_enrollments_to_course_dates = true
         @course.save!
@@ -343,6 +344,7 @@ describe EnrollmentsApiController, type: :request do
         other_section = @course.course_sections.create!
         @course.enroll_user(@unenrolled_user, "StudentEnrollment", :section => other_section)
 
+        @course.start_at = 2.days.ago
         @course.conclude_at = 1.day.ago
         @course.restrict_enrollments_to_course_dates = true
         @course.save!
@@ -363,6 +365,7 @@ describe EnrollmentsApiController, type: :request do
       end
 
       it "should not allow enrollments to be added to an active section of a concluded course if the user is not already enrolled" do
+        @course.start_at = 2.days.ago
         @course.conclude_at = 1.day.ago
         @course.restrict_enrollments_to_course_dates = true
         @course.save!

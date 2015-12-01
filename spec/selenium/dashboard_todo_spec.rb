@@ -50,6 +50,7 @@ describe "dashboard" do
       assignment.save!
 
       Timecop.freeze(1.hour.ago) do
+        @course.start_at = 1.month.ago
         @course.soft_conclude!
         @course.save!
       end
