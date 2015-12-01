@@ -2,7 +2,8 @@ define [
   'jquery'
   'underscore'
   'str/htmlEscape'
-], ($, _, htmlEscape) ->
+  'i18n!user_content'
+], ($, _, htmlEscape, I18n) ->
 
   apiUserContent = {
 
@@ -57,7 +58,7 @@ define [
           $form.append($("<input type='hidden'/>").attr({name: 's', value: $this.data('uc_sig')}))
           $('body').append($form)
           setTimeout((-> $form.submit()), 0)
-          $("<iframe class='user_content_iframe' name='#{htmlEscape(uuid)}' style='width: #{htmlEscape($this.data('uc_width'))}; height: #{htmlEscape($this.data('uc_height'))};' frameborder='0' />")
+          $("<iframe class='user_content_iframe' name='#{htmlEscape(uuid)}' style='width: #{htmlEscape($this.data('uc_width'))}; height: #{htmlEscape($this.data('uc_height'))};' frameborder='0' title='#{htmlEscape(I18n.t 'User Content')}' />")
 
         $dummy.find('img.equation_image').each((index, equationImage)->
           $equationImage = $(equationImage)

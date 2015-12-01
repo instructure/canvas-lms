@@ -68,7 +68,7 @@
             <pre class="message-body"><%= message.body %></pre>
         </div>
         <div id="tabs-plain-html-<%= message.id %>">
-            <iframe class="message-html-body" src="<%= user_message_html_message_path(message.user, message) %>"></iframe>
+            <iframe class="message-html-body" src="<%= user_message_html_message_path(message.user, message) %>" title="<%= t('Message Body') %>"></iframe>
             <% if message.html_body.present? %>
               <%= link_to "Open in new window", user_message_html_message_path(message.user, message), :target => "_blank", :class => "icon-off small" %>
             <% end %>

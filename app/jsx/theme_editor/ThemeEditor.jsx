@@ -434,7 +434,7 @@ define([
                     </button>
                   </div>
                 : null }
-                <iframe id="previewIframe" ref="previewIframe" src={"/accounts/"+this.props.accountID+"/theme-preview/?editing_brand_config=1"} />
+                <iframe id="previewIframe" ref="previewIframe" src={"/accounts/"+this.props.accountID+"/theme-preview/?editing_brand_config=1"} title={I18n.t('Preview')} />
               </div>
 
             </div>
