@@ -266,5 +266,35 @@ describe "Tiny MCE editor functions" do
       # To avoid fragility of extra formatting characters being added, I just want the first 40 characters
       expect(p.body[0..39]).to eq "<p>right alignment should be removed</p>"
     end
+
+    it "should make text superscript on wiki description", priority: "1", test_id: 306263 do
+      p = create_wiki_page("test_page", false, "public")
+      get "/courses/#{@course.id}/pages/#{p.title}/edit"
+
+      click_tiny_button('Superscript')
+      type_in_tiny('textarea.body', "this should be in superscript")
+      f("form.edit-form button.submit").click
+      wait_for_ajaximations
+
+      p.reload
+      # To avoid fragility of extra formatting characters being added, I just want the first 47 characters
+      expect(p.body[0..46]).to eq "<p><sup>this should be in superscript</sup></p>"
+    end
+
+    it "should remove superscript from text on wiki description", priority: "1", test_id: 532084 do
+      p = create_wiki_page("test_page", false, "public")
+      p.body = "<p><sup>this should have superscript removed</sup></p>"
+      p.save!
+      get "/courses/#{@course.id}/pages/#{p.title}/edit"
+
+      select_all_wiki
+      click_tiny_button('Superscript')
+      f("form.edit-form button.submit").click
+      wait_for_ajaximations
+
+      p.reload
+      # To avoid fragility of extra formatting characters being added, I just want the first 43 characters
+      expect(p.body[0..42]).to eq "<p>this should have superscript removed</p>"
+    end
   end
 end
