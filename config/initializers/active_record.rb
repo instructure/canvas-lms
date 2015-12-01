@@ -724,6 +724,10 @@ if CANVAS_RAILS3
   # lots of plumbing to pass scope through
   module AllowScopeOnBuilder
     module Association
+      DEPRECATED_OPTIONS = [:readonly, :order, :limit, :group, :having,
+                            :offset, :select, :uniq, :include, :conditions,
+                            :preload, :eager_load].freeze
+
       module ClassMethods
         def build(*args, &extension)
           new(*args, &extension).build
@@ -732,6 +736,7 @@ if CANVAS_RAILS3
 
       def initialize(model, name, scope, options = {})
         options = scope if scope.is_a?(Hash)
+        check_deprecated_options(options, model, name)
 
         @scope = scope unless scope.is_a?(Hash)
         super(model, name, options)
@@ -743,11 +748,19 @@ if CANVAS_RAILS3
         define_accessors
         reflection
       end
+
+      def check_deprecated_options(options, model, name)
+        invalid_options = DEPRECATED_OPTIONS & options.keys
+        unless invalid_options.empty?
+          raise "#{invalid_options.map(&:inspect).join(', ')} in your #{model.name}.#{macro} #{name.inspect} association are invalid. Please use a lambda that returns a relation."
+        end
+      end
     end
 
     module CollectionAssociation
       def initialize(model, name, scope, options = {}, &extension)
         options = scope if scope.is_a?(Hash)
+        check_deprecated_options(options, model, name)
 
         @scope = scope unless scope.is_a?(Hash)
 
@@ -863,6 +876,17 @@ if CANVAS_RAILS3
   ActiveRecord::Associations::Association.include(AssociationDumping)
 else
   ActiveRecord::Associations::Builder::Association::DEPRECATED_OPTIONS.concat([:preload, :eager_load])
+
+  module ForceDeprecationAsError
+    def initialize(*args)
+      old_behavior = ActiveSupport::Deprecation.behavior
+      ActiveSupport::Deprecation.behavior = :raise
+      super
+    ensure
+      ActiveSupport::Deprecation.behavior = old_behavior
+    end
+  end
+  ActiveRecord::Associations::Builder::Association.prepend(ForceDeprecationAsError)
 end
 
 unless defined? OpenDataExport
