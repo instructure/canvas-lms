@@ -341,8 +341,8 @@ class DiscussionTopicsController < ApplicationController
                 :discussion_topic_menu_tools => external_tools_display_hashes(:discussion_topic_menu)
         }
         append_sis_data(hash)
+        js_env(hash)
 
-        js_env(hash.merge(POST_GRADES: Assignment.sis_grade_export_enabled?(@context)))
         if user_can_edit_course_settings?
           js_env(SETTINGS_URL: named_context_url(@context, :api_v1_context_settings_url))
         end
@@ -416,8 +416,12 @@ class DiscussionTopicsController < ApplicationController
                      map { |category| { id: category.id, name: category.name } },
                  CONTEXT_ID: @context.id,
                  CONTEXT_ACTION_SOURCE: :discussion_topic,
-                 POST_GRADES: Assignment.sis_grade_export_enabled?(@context),
                  DIFFERENTIATED_ASSIGNMENTS_ENABLED: @context.feature_enabled?(:differentiated_assignments)}
+
+      post_to_sis = Assignment.sis_grade_export_enabled?(@context)
+      js_hash[:POST_TO_SIS] = post_to_sis
+      js_hash[:POST_TO_SIS_DEFAULT] = @context.account.sis_default_grade_export[:value] if post_to_sis && @topic.new_record?
+
       if @context.is_a?(Course)
         js_hash['SECTION_LIST'] = sections.map { |section|
           {

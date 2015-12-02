@@ -337,7 +337,7 @@ TEXT
                 </div>
                 <div>
                   <%= settings.check_box :enable_profiles, :checked => @account.settings[:enable_profiles] %>
-                  <%= settings.label :enable_profiles, :en => "Enable Profiles" %> 
+                  <%= settings.label :enable_profiles, :en => "Enable Profiles" %>
                 </div>
               <% end %>
               <% if @account.canvas_authentication? %>
@@ -453,6 +453,33 @@ TEXT
                   </table>
               <% end %>
             </fieldset>
+        <% end %>
+
+        <% if !@account.site_admin? && Assignment.sis_grade_export_enabled?(@account) %>
+          <fieldset>
+            <legend><%= t("SIS Grade Export Settings") %></legend>
+            <table class="formtable">
+              <%= f.fields_for :settings do |settings| %>
+                <%= settings.fields_for :sis_default_grade_export do |r| %>
+                  <% hash = @account.sis_default_grade_export %>
+                  <% disabled = hash[:locked] && hash[:inherited] %>
+                  <tr>
+                    <td colspan="2"><%= r.check_box :value, :checked => hash[:value], :disabled => disabled %>
+                      <%= r.label :sis_default_grade_export, :en => "\"Post Grades to SIS\" checkbox is enabled by default for assignments, graded discussions, and quizzes" %>
+                    </td>
+                  </tr>
+                  <% unless disabled %>
+                    <tr>
+                      <td colspan="2" class="sub_checkbox">
+                        <%= r.check_box :locked, :checked => hash[:locked] %>
+                        <%= r.label :locked_for_sub_accounts, :en => "Lock this setting for sub-accounts" %>
+                      </td>
+                    </tr>
+                  <% end %>
+                <% end %>
+              <% end %>
+            </table>
+          </fieldset>
         <% end %>
 
         <% if @account.root_account? && !@account.site_admin? && Setting.get("show_feedback_link", "false") == "true"  %>
@@ -580,15 +607,15 @@ TEXT
                    the magic is in giving it an id of "<name_of_service>_help_dialog" and class="service_help_dialog" -->
               <div class="service_help_dialog" title="<%= t(:about_google_docs_tooltip, "About Google Docs Previews") %>" id="google_docs_previews_help_dialog">
                 <%= mt(:about_google_docs, <<-TEXT, :terms_url => "https://docs.google.com/viewer/TOS")
-Google Docs Previews allow users to view documents from 
-within Canvas, rather than having to download them and 
+Google Docs Previews allow users to view documents from
+within Canvas, rather than having to download them and
 open the corresponding program (e.g. Word or Excel).
 
 Google Docs Previews can also render file types
 not supported by the Canvas document previewer.
 
-By using this service you 
-acknowledge that you have read and agreed to the 
+By using this service you
+acknowledge that you have read and agreed to the
 [Google Docs Viewer Terms of Service](%{terms_url}).
                   TEXT
                 %>

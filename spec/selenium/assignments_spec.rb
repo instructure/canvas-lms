@@ -626,4 +626,25 @@ describe "assignments" do
       expect(f('#content h2').text).to eql "Page Not Found"
     end
   end
+
+  context "post to sis default setting" do
+    before do
+      account_model
+      @account.enable_feature!(:bulk_sis_grade_export)
+      course_with_teacher_logged_in(:active_all => true, :account => @account)
+    end
+
+    it "should default to post grades if account setting is enabled" do
+      @account.settings[:sis_default_grade_export] = {:locked => false, :value => true}
+      @account.save!
+
+      get "/courses/#{@course.id}/assignments/new"
+      expect(is_checked('#assignment_post_to_sis')).to be_truthy
+    end
+
+    it "should not default to post grades if account setting is not enabled" do
+      get "/courses/#{@course.id}/assignments/new"
+      expect(is_checked('#assignment_post_to_sis')).to be_falsey
+    end
+  end
 end

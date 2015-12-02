@@ -31,7 +31,7 @@ define [
         @set 'all_dates', new DateGroupCollection(all_dates)
       if (@postToSISEnabled())
         if !@get('id') && @get('post_to_sis') != false
-          @set 'post_to_sis', true
+          @set 'post_to_sis', !!ENV?.POST_TO_SIS_DEFAULT
 
     isQuiz: => @_hasOnlyType 'online_quiz'
     isDiscussionTopic: => @_hasOnlyType 'discussion_topic'

@@ -403,11 +403,13 @@ class AssignmentsController < ApplicationController
         assignment_group_json(group, @current_user, session, [], {stringify_json_ids: true})
       end
 
+      post_to_sis = Assignment.sis_grade_export_enabled?(@context)
+
       hash = {
         :ASSIGNMENT_GROUPS => json_for_assignment_groups,
         :GROUP_CATEGORIES => group_categories,
         :KALTURA_ENABLED => !!feature_enabled?(:kaltura),
-        :POST_TO_SIS => Assignment.sis_grade_export_enabled?(@context),
+        :POST_TO_SIS => post_to_sis,
         :MODERATED_GRADING => @context.feature_enabled?(:moderated_grading),
         :HAS_GRADED_SUBMISSIONS => @assignment.graded_submissions_exist?,
         :SECTION_LIST => (@context.course_sections.active.map { |section|
@@ -428,6 +430,7 @@ class AssignmentsController < ApplicationController
         :VALID_DATE_RANGE => CourseDateRange.new(@context)
       }
 
+      hash[:POST_TO_SIS_DEFAULT] = @context.account.sis_default_grade_export[:value] if post_to_sis && @assignment.new_record?
       hash[:ASSIGNMENT] = assignment_json(@assignment, @current_user, session, override_dates: false)
       hash[:ASSIGNMENT][:has_submitted_submissions] = @assignment.has_submitted_submissions?
       hash[:URL_ROOT] = polymorphic_url([:api_v1, @context, :assignments])
