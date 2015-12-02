@@ -80,7 +80,10 @@ class AssignmentsController < ApplicationController
       @locked = @assignment.locked_for?(@current_user, :check_policies => true, :deep_check_if_needed => true)
       @locked.delete(:lock_at) if @locked.is_a?(Hash) && @locked.has_key?(:unlock_at) # removed to allow proper translation on show page
       @unlocked = !@locked || @assignment.grants_right?(@current_user, session, :update)
-      @assignment.context_module_action(@current_user, :read) if @unlocked && !@assignment.new_record?
+
+      unless @assignment.new_record? || (@locked && !@locked[:can_view])
+        @assignment.context_module_action(@current_user, :read)
+      end
 
       if @assignment.grants_right?(@current_user, session, :read_own_submission) && @context.grants_right?(@current_user, session, :read_grades)
         @current_user_submission = @assignment.submissions.where(user_id: @current_user).first if @current_user

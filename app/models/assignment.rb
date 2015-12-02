@@ -515,7 +515,7 @@ class Assignment < ActiveRecord::Base
     end
     tags_to_update.each { |tag| tag.context_module_action(user, action, points) }
   end
-
+  
   # call this to perform notifications on an Assignment that is not being saved
   # (useful when a batch of overrides associated with a new assignment have been saved)
   def do_notifications!(prior_version=nil, notify=false)
@@ -854,7 +854,7 @@ class Assignment < ActiveRecord::Base
       if (assignment_for_user.unlock_at && assignment_for_user.unlock_at > Time.now)
         locked = {:asset_string => assignment_for_user.asset_string, :unlock_at => assignment_for_user.unlock_at}
       elsif (assignment_for_user.lock_at && assignment_for_user.lock_at < Time.now)
-        locked = {:asset_string => assignment_for_user.asset_string, :lock_at => assignment_for_user.lock_at}
+        locked = {:asset_string => assignment_for_user.asset_string, :lock_at => assignment_for_user.lock_at, :can_view => true}
       elsif self.could_be_locked && item = locked_by_module_item?(user, opts[:deep_check_if_needed])
         locked = {:asset_string => self.asset_string, :context_module => item.context_module.attributes}
       elsif self.submission_types == 'discussion_topic' && self.discussion_topic &&

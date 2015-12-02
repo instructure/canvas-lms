@@ -750,7 +750,7 @@ class Quizzes::Quiz < ActiveRecord::Base
       elsif (quiz_for_user.lock_at && quiz_for_user.lock_at <= Time.now)
         sub = user && quiz_submissions.where(user_id: user).first
         if !sub || !sub.manually_unlocked
-          locked = {:asset_string => self.asset_string, :lock_at => quiz_for_user.lock_at}
+          locked = {:asset_string => self.asset_string, :lock_at => quiz_for_user.lock_at, :can_view => true}
         end
       elsif !opts[:skip_assignment] && (self.for_assignment? && l = self.assignment.locked_for?(user, opts))
         sub = user && quiz_submissions.where(user_id: user).first

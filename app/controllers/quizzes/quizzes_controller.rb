@@ -179,7 +179,7 @@ class Quizzes::QuizzesController < ApplicationController
 
       @context_module_tag = ContextModuleItem.find_tag_with_preferred([@quiz, @quiz.assignment], params[:module_item_id])
       @sequence_asset = @context_module_tag.try(:content)
-      @quiz.context_module_action(@current_user, :read) if !@locked
+      @quiz.context_module_action(@current_user, :read) unless @locked && !@locked_reason[:can_view]
 
       @assignment = @quiz.assignment
       @assignment = @assignment.overridden_for(@current_user) if @assignment

@@ -665,8 +665,9 @@ class AssignmentsApiController < ApplicationController
       needs_grading_by_section_param = params[:needs_grading_count_by_section] || false
       needs_grading_count_by_section = value_to_boolean(needs_grading_by_section_param)
 
+      locked = @assignment.locked_for?(@current_user, :check_policies => true)
+      @assignment.context_module_action(@current_user, :read) unless locked && !locked[:can_view]
 
-      @assignment.context_module_action(@current_user, :read) unless @assignment.locked_for?(@current_user, :check_policies => true)
       render :json => assignment_json(@assignment, @current_user, session,
                   submission: submissions,
                   override_dates: override_dates,
