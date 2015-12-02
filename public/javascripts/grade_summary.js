@@ -352,15 +352,21 @@ define([
 
       if ($button.hasClass('showAll')) {
         $button.text(I18n.t('hide_all_details_button', 'Hide All Details'));
-        $("tr.rubric_assessments").show();
-        $("tr.comments").show();
+        $("tr.student_assignment.editable").each(function(assignment) {
+          var assignmentId = $(this).getTemplateValue('assignment_id');
+          var muted = $(this).data('muted');
+          if (!muted) {
+            $('#comments_thread_' + assignmentId).show();
+            $('#rubric_' + assignmentId).show();
+            $('#grade_info_' + assignmentId).show();
+          }
+        });
       } else {
         $button.text(I18n.t('show_all_details_button', 'Show All Details'));
         $("tr.rubric_assessments").hide();
         $("tr.comments").hide();
       }
     });
-
   });
 
   function updateScoreForAssignment(assignmentId, score) {
