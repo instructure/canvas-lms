@@ -215,11 +215,11 @@ module AccountReports
         joins("INNER JOIN #{LearningOutcome.quoted_table_name} ON content_tags.content_id = learning_outcomes.id
                  AND content_tags.content_type = 'LearningOutcome'
                INNER JOIN #{LearningOutcomeResult.quoted_table_name} r ON r.learning_outcome_id = learning_outcomes.id
-               FULL OUTER JOIN #{LearningOutcomeQuestionResult.quoted_table_name} qr on qr.learning_outcome_id = r.learning_outcome_id
                INNER JOIN #{ContentTag.quoted_table_name} ct ON r.content_tag_id = ct.id
                INNER JOIN #{User.quoted_table_name} u ON u.id = r.user_id
                INNER JOIN #{Pseudonym.quoted_table_name} p on p.user_id = r.user_id
                INNER JOIN #{Course.quoted_table_name} c ON r.context_id = c.id
+               LEFT OUTER JOIN #{LearningOutcomeQuestionResult.quoted_table_name} qr on qr.learning_outcome_result_id = r.id
                LEFT OUTER JOIN #{Quizzes::Quiz.quoted_table_name} q ON q.id = r.association_id
                  AND r.association_type IN ('Quiz', 'Quizzes::Quiz')
                LEFT OUTER JOIN #{Assignment.quoted_table_name} a ON a.id = ct.content_id
