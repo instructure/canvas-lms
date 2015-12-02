@@ -267,46 +267,89 @@ describe "calendar2" do
         expect(find('.ui-datepicker-calendar').text).to include_text("Mo")
       end
 
-      it "should have a strikethrough on past due assignemnt", priority: "1", test_id: 518370 do
+      it "should strikethrough past due assignment", priority: "1", test_id: 518370 do
         date_due = Time.zone.now.utc - 2.days
         @assignment = @course.assignments.create!(
-          title: 'new outdated assignemnt',
+          title: 'new outdated assignment',
           name: 'new outdated assignment',
           due_at: date_due
         )
         get '/calendar2'
+
         # go to the same month as the date_due
         quick_jump_to_date(date_due.strftime '%Y-%m-%d')
-        # verify assignment has strikethrough
-        expect(find('.fc-title.calendar__event--completed')).to be_truthy
+
+        # verify assignment has line-through
+        expect(find('.fc-title').css_value('text-decoration')).to eql('line-through')
+      end
+
+      it "should strikethrough past due graded discussion", priority: "1", test_id: 518371 do
+        date_due = Time.zone.now.utc - 2.days
+        a = @course.assignments.create!(title: 'past due assignment', due_at: date_due, points_possible: 10)
+        @pub_graded_discussion_due = @course.discussion_topics.build(assignment: a, title: 'graded discussion')
+        @pub_graded_discussion_due.save!
+        get '/calendar2'
+
+        # go to the same month as the date_due
+        quick_jump_to_date(date_due.strftime '%Y-%m-%d')
+
+        # verify discussion has line-through
+        expect(find('.fc-title').css_value('text-decoration')).to eql('line-through')
       end
     end
   end
 
   context "as a student" do
+
     before(:each) do
       course_with_student_logged_in
     end
 
     describe "main month calendar" do
 
-      it "strikes through title on for completed assignment", priority: "1", test_id: 518372 do
+      it "should strikethrough completed assignment title", priority: "1", test_id: 518372 do
         date_due = Time.zone.now.utc + 2.days
         @assignment = @course.assignments.create!(
-          title: 'new outdated assignemnt',
+          title: 'new outdated assignment',
           name: 'new outdated assignment',
           due_at: date_due,
           submission_types: 'online_text_entry'
         )
+
         # submit assignment
         submission = @assignment.submit_homework(@student)
         submission.submission_type = 'online_text_entry'
         submission.save!
         get '/calendar2'
+
         # go to the same month as the date_due
         quick_jump_to_date(date_due.strftime '%Y-%m-%d')
-        # verify assignment has strikethrough
-        expect(find('.fc-title.calendar__event--completed')).to be_truthy
+
+        # verify assignment has line-through
+        expect(find('.fc-title').css_value('text-decoration')).to eql('line-through')
+      end
+
+      it "should strikethrough completed graded discussion", priority: "1", test_id: 518373 do
+        date_due = Time.zone.now.utc + 2.days
+        reply = 'Replying to discussion'
+
+        a = @course.assignments.create!(title: 'past due assignment', due_at: date_due, points_possible: 10)
+        @pub_graded_discussion_due = @course.discussion_topics.build(assignment: a, title: 'graded discussion')
+        @pub_graded_discussion_due.save!
+
+        get "/courses/#{@course.id}/discussion_topics/#{@pub_graded_discussion_due.id}"
+        find('.discussion-reply-action').click
+        wait_for_ajaximations
+        driver.execute_script "tinyMCE.activeEditor.setContent('#{reply}')"
+        find('.btn.btn-primary').click
+        wait_for_ajaximations
+        get '/calendar2'
+
+        # go to the same month as the date_due
+        quick_jump_to_date(date_due.strftime '%Y-%m-%d')
+
+        # verify discussion has line-through
+        expect(find('.fc-title').css_value('text-decoration')).to eql('line-through')
       end
     end
   end
