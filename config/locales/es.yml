@@ -818,7 +818,7 @@ es:
       equella_settings_title: "Configuraciones de Equella"
       feature_options: "Opciones de características"
       features_title: Características
-      global_announcements_description: "Anuncios globales son una forma para que escriba un mensaje en el panel de control de todos los usuarios en su cuenta. Aparecerán en el panel de control de cada usuario por el período dado o hasta que el usuario haga click en el enlace de \"cerrar\" para ignorar la alerta. **Estos anuncios deberían usarse con poca frecuencia.**"
+      global_announcements_description: "Anuncios globales son una forma para que escriba un mensaje en el panel de control de todos los usuarios en su cuenta. Aparecerán en el panel de control de cada usuario por el período dado o hasta que el usuario haga clic en el enlace de \"cerrar\"(×) para ignorar la alerta. **Estos anuncios deberían usarse con poca frecuencia.**"
       global_announcements_title: "Anuncios Globales"
       global_js_and_css_includes_description: "Estos archivos serán incluídos en todas las cargas de la página para su cuenta"
       global_js_and_css_includes_title: "JavaScript Global y CSS incluye"
@@ -1422,9 +1422,9 @@ es:
   application: 
     errors: 
       feed_not_found: "No se pudo encontrar el canal."
-      feed_private: "El contexto correspondiente se ha hecho privado, entonces los canales públicos como este ya no estarán visibles."
+      feed_private: "El contexto correspondiente se ha hecho privado, entonces los canales públicos como éste ya no estarán visibles."
       feed_private_course: "El curso correspondiente se ha hecho privado, entonces canales públicos como éste ya no estarán visibles."
-      feed_private_group: "El grupo se ha vuelto privado, entonces los temas públicos como este ya no serán visibles."
+      feed_private_group: "El grupo se ha vuelto privado, entonces los temas públicos como éste ya no serán visibles."
       feed_unpublished_course: "Los canales para este curso no pueden ser accesados hasta que sean publicados."
       feed_unpublished_group: "Los canales para este grupo no pueden ser accesados hasta que sean publicados."
       invalid_external_tool: "No se pudieron encontrar configuraciones válidas para este enlace"
@@ -1883,7 +1883,7 @@ es:
     messages: 
       adding_group: "Añadiendo grupo..."
       agree_to_pledge: "Debe acceder al compromiso de envío antes de poder enviar esta tarea."
-      not_submitted_yet: "Aún no ha terminado de enviar su tarea. Todavía necesita hacer click en “Enviar” para completar el proceso. ¿Desea abandonar esta página de todos modos?"
+      not_submitted_yet: "Aún no ha terminado de enviar su tarea. Todavía necesita hacer clic en “Enviar” para completar el proceso. ¿Desea abandonar esta página de todos modos?"
       now_overdue: "Esta tarea está vencida. Cualquier envío nuevo sera marcado como atrasado. ¿Desea continuar?"
       overdue: "Esta tarea está atrasada. ¿Desea enviarla todavía?"
       record_before_submitting: "Grabar antes de enviar"
@@ -1929,7 +1929,7 @@ es:
         add: Agregar
         assign_peer_reviews: "Asignar Revisión por Pares"
       descriptions: 
-        automatically_assign_reviews: "Puede asignar revision por pares a aquellos usuarios que han enviado, pero que todavia no tienen revisiones asignadas, haciendo click en el boton de abajo."
+        automatically_assign_reviews: "Puede asignar revision por pares a aquellos usuarios que han enviado, pero que todavia no tienen revisiones asignadas, haciendo clic en el boton de abajo."
       details: "A la izquierda puede ver la lista de estudiantes para esta tarea, y también qué envíos (si los hay) que han sido asignados para revisar."
       links: 
         assign_peer_review: "Dar otra asignación para evaluar a %{student}"
@@ -1968,7 +1968,7 @@ es:
     redirect_page: 
       redirect_message: |-
           Este envío era un url, lo estamos llevando al url ahora.  
-          [Haga click para ir al envio](%{url})
+          [Haga clic para ir al envio](%{url})
     remove_never_drop_rule: "Eliminar regla de no abandonar"
     remove_unsaved_never_drop_rule: "Eliminar la regla de no abandonar no guardada"
     rules_text: 
@@ -2071,7 +2071,7 @@ es:
       instructions: 
         from_external_tool: "Elija una herramienta de la lista que aparece a continuación para cargar y enviar un recurso facilitado por dicha herramienta."
         google_docs: "Seleccione el archive de la lista siguiente."
-        media_recording: "Use el enlace siguiente para registrar su envio. Haga click en “Guardar” cuando haya terminado y esté listo para enviar."
+        media_recording: "Use el enlace siguiente para registrar su envio. Haga clic en “Guardar” cuando haya terminado y esté listo para enviar."
         online_text_entry: "Copie y pegue o escriba su envío aquí."
         online_url: "Copie y pegue el enlace a la página de internet que le gustaría enviar para esta tarea."
       invalid_google_docs_domain: "Dominio no válido"
@@ -2082,7 +2082,7 @@ es:
         add_another_file: "Agregue Otro Archivo"
         authorize_google_docs: "Autorize Acceso a Google Docs"
         authorize_google_drive: "Autorizar acceso a Google Drive"
-        find_file: "Haga click aqui para encontrar un archivo que ya ha cargado"
+        find_file: "Haga clic aqui para encontrar un archivo que ya ha cargado"
         submit: 
           external_tool: Más
           file_upload: "Carga de Archivo"
@@ -2096,7 +2096,7 @@ es:
             Antes de enviar tareas directamente desde Google Docs necesita
                      Autorizar Canvas para accesar su cuenta de Google Docs:
         google_drives_auth_required: "Antes de poder enviar tareas directamente desde Google Drive, debe autorizar a Canvas para acceder a su cuenta de Google Drive:"
-        media_recording_ready: "¡Listo para Enviar! Haga click en el botón “Enviar Tarea” para finalizar."
+        media_recording_ready: "¡Listo para Enviar! Haga clic en el botón “Enviar Tarea” para finalizar."
         media_recordings_disabled: "Grabaciones de media no estan disponibles para este sitio de Canvas, y no podrá enviar estos tipos de tareas. Por favor contacte a su instructor acerca de cambiar las configuraciones para esta tarea, o su administrador de sistema acerca de activar grabaciones de media."
         submitting: Enviando...
         uploading: "Recuperando una copia de su Google Doc para enviar para esta tarea. Esto puede llevar un tiempo, dependiendo en el tamaño del archivo…"
@@ -2118,7 +2118,7 @@ es:
         syllabus: |-
             El programa de estudio muestra una vista de tabla del calendario del curso, y lo básico de la calificación del curso. Puede agregar otros comentarios, notas o pensamientos que tenga acerca de la estructura del curso, pólizas del curso o cualquier otra cosa.
             
-            Para agregar algunos comentarios, haga click en el enlace de "Editar la Descripción del Programa de Estudio " en la derecha.
+            Para agregar algunos comentarios, haga clic en el enlace de "Editar la Descripción del Programa de Estudio " en la derecha.
       labels: 
         syllabus_body: "Descripción del Programa de Estudio"
       links: 
@@ -2394,7 +2394,7 @@ es:
       floor: 
         description: "Da como resultado la función piso para un valor dado"
       if: 
-        description: "Evalúa el primer argumento, de como resultado el segundo argumento si evalúa a un valor no igual a cero; en caso contrario, da como resultado el tercer valor"
+        description: "Evalúa el primer argumento, da como resultado el segundo argumento si evalúa a un valor no igual a cero; en caso contrario, da como resultado el tercer valor"
       last: 
         description: "Da como resultado el último valor de la lista"
       length: 
@@ -2706,7 +2706,7 @@ es:
       feed_dialog_title: "Canal de Calendario"
       feed_title: "Canal Atom para el Calendario del Curso"
       links: 
-        feed: "Hacer click aquí para ver el canal"
+        feed: "Hacer clic aquí para ver el canal"
       page_title_header: Calendario
       skip_to_calendar: "Avanzar al calendario"
       toggle_calendars: "Cambiar calendarios"
@@ -2714,17 +2714,17 @@ es:
       undated_items: "Elementos sin fecha"
     wizard_box: 
       descriptions: 
-        assignment: "Excelente. Ahora haga click en la etiqueta de \"Tarea\" en el diálogo para crear una tarea en vez de un evento del calendario."
-        assignment_done: "¡Hecho! ¡La tarea ha sido creada! Puede hacerle click para ver los detalles, editar y borrar el evento, o arrastre y colóquelo en un día nuevo para cambiar su fecha."
-        change_date: "Eso es fácil. Sólo arrastre el evento a una fecha nueva. O puede hacer click en “Editar” para poder ser más específico."
-        create: "Para crear un evento en el calendario, solo haga click en el día en el calendario en donde quiere el evento."
-        create_assignment: "Al igual que con el evento del calendario, haga click en la fecha donde quiere agregar la tarea. O puede crear una tarea sin una fecha límite, haciendo click en la caja de “Eventos sin Fecha” (*¿donde?*)."
-        delete: "Haga click en el evento o tarea en el calendario que quiere borrar."
-        delete2: "Ahora haga click en “Borrar” (*¿donde?*) y su evento será borrado."
+        assignment: "Excelente. Ahora haga clic en la etiqueta de \"Tarea\" en el diálogo para crear una tarea en vez de un evento del calendario."
+        assignment_done: "¡Hecho! ¡La tarea ha sido creada! Puede hacerle clic para ver los detalles, editar y borrar el evento, o arrastre y colóquelo en un día nuevo para cambiar su fecha."
+        change_date: "Eso es fácil. Sólo arrastre el evento a una fecha nueva. O puede hacer clic en “Editar” para poder ser más específico."
+        create: "Para crear un evento en el calendario, solo haga clic en el día en el calendario en donde quiere el evento."
+        create_assignment: "Al igual que con el evento del calendario, haga clic en la fecha donde quiere agregar la tarea. O puede crear una tarea sin una fecha límite, haciendo clic en la caja de “Eventos sin Fecha” (*¿donde?*)."
+        delete: "Haga clic en el evento o tarea en el calendario que quiere borrar."
+        delete2: "Ahora haga clic en “Borrar” (*¿donde?*) y su evento será borrado."
         delete_done: "Hecho y listo. Esa fue una acción de borrado extreme que hizo."
-        done: "¡Listo! ¡El evento se ha creado! Puede hacerle click para ver los detalles, editarlo y borrarlo, o arrástrelo y póngalo en un día nuevo para cambiar su fecha."
-        edit: "¡Excelente! Ahora solo agregue un nombre para el (*¿donde?*). Puede especificar un tiempo de comienzo y finalizado si quiere. O sólo un tiempo de inicio. Haga click en “Enviar” para terminar."
-        edit_assignment: "Ahora solo ingrese un nombre para la tarea (*¿donde?*) y el grupo de trabajo al que pertenece. Puede especificar una fecha límite si quiere también. Haga click en “Enviar” para finalizar."
+        done: "¡Listo! ¡El evento se ha creado! Puede hacerle clic para ver los detalles, editarlo y borrarlo, o arrástrelo y póngalo en un día nuevo para cambiar su fecha."
+        edit: "¡Excelente! Ahora solo agregue un nombre para el (*¿donde?*). Puede especificar un tiempo de comienzo y finalizado si quiere. O sólo un tiempo de inicio. Haga clic en “Enviar” para terminar."
+        edit_assignment: "Ahora solo ingrese un nombre para la tarea (*¿donde?*) y el grupo de trabajo al que pertenece. Puede especificar una fecha límite si quiere también. Haga clic en “Enviar” para finalizar."
       labels: 
         i_would_like_to: "Me gustaría"
       links: 
@@ -2906,7 +2906,7 @@ es:
         drive: 
           upgrade: 
             description: "Para acceder a esta colaboración debe autorizar a Canvas a acceder a su cuenta de Google Drive"
-      how_to_start_a_new_collaboration: "Para encontrar más acerca de un tipo particular de colaboración, haga click en \"Comenzar una Nueva Colaboración\" y luego escojer el tipo del menú desplegable."
+      how_to_start_a_new_collaboration: "Para encontrar más acerca de un tipo particular de colaboración, haga clic en \"Comenzar una Nueva Colaboración\" y luego escojer el tipo del menú desplegable."
       links: 
         delete: "Borre esta Colaboración"
         edit: "Edite esta Colaboración"
@@ -2989,8 +2989,8 @@ es:
       titles: 
         welcome_aboard: ¡Bienvenido!
     confirm_failed: 
-      details: "Parece que ya ha confirmado su inscripción. Intente *ingresar* con su correo electrónico y contraseña que registró. Si no recuerda su contraseña, haga click en el enlace \"Olvidé la Contraseña\" y debería recibir un nuevo enlace que puede usar para ingresar y reconfigurar su contraseña."
-      feedback: "Si continua teniendo problemas, haga click en la lengüeta de \"Retroalimentación\" en la parte superior derecha y déjenos saber qué sucede."
+      details: "Parece que ya ha confirmado su inscripción. Intente *ingresar* con su correo electrónico y contraseña que registró. Si no recuerda su contraseña, haga clic en el enlace \"Olvidé la Contraseña\" y debería recibir un nuevo enlace que puede usar para ingresar y reconfigurar su contraseña."
+      feedback: "Si continua teniendo problemas, haga clic en la lengüeta de \"Retroalimentación\" en la parte superior derecha y déjenos saber qué sucede."
       page_title: "Falló la Confirmación de la Inscripción"
       titles: 
         problems_with_registration: "Problemas con la Inscripción"
@@ -3098,7 +3098,7 @@ es:
         course: Curso
         quiz: Evaluación
       links: 
-        download: "Exportación del Curso desde %{date}: *Haga click aquí para descargar*"
+        download: "Exportación del Curso desde %{date}: *Haga clic aquí para descargar*"
         download_file_export: "Exportación de archivos desde %{date}: *Haga clic aquí para descargar*"
         download_qti: "Exportación QTI de %{date}: *Haga clic aquí para descargar*"
         download_user_export: "Exportación de datos de usuario desde %{date}: *Haga clic aquí para descargar*"
@@ -3109,7 +3109,7 @@ es:
     labels: 
       new_export: "Nueva exportación:"
     links: 
-      download_plain: "Haga click aquí para descargar"
+      download_plain: "Haga clic aquí para descargar"
     messages: 
       processing: Procesando
       this_may_take_a_bit: "esto puede tomar un poco de tiempo..."
@@ -5654,11 +5654,11 @@ es:
       content: "Nada se ha ingresado todavía"
       title: Bienvenido(a)
     links: 
-      manage_pages: "Haga click para editar, arrastre para reordenar"
+      manage_pages: "Haga clic para editar, arrastre para reordenar"
     titles: 
       add_submission: "Agregue la Página para el Enviado"
       download_eportfolio: "Descargar el ePortafolio"
-      section_list: "Arrastre para arreglar, haga click para editar"
+      section_list: "Arrastre para arreglar, haga clic para editar"
   eportfolio_categories: 
     default_name: "Página Nueva"
     errors: 
@@ -5672,7 +5672,7 @@ es:
       missing_page: "No se pudo encontrar esa página"
   eportfolio_entry: 
     atom_author: "Entrada en el ePortfolio"
-    click_through: "Haga click para ver el contenido de la página"
+    click_through: "Haga clic para ver el contenido de la página"
     default_content: "Aún no se ha agregado contenido"
     default_name: "Nombre de la Página"
   eportfolio_settings_75ba1f9a: "Configuraciones del ePortafolio"
@@ -5702,7 +5702,7 @@ es:
       buttons: 
         done_editing: "Edición Completada"
       default_page_name: "Nombre de la Página"
-      edit_instructions: "Haga click en cualquier página para renombrarla, o haga click y arrastrelo para reordenarlo."
+      edit_instructions: "Haga clic en cualquier página para renombrarla, o haga clic y arrastrelo para reordenarlo."
       headers: 
         page_list: "Páginas para esta sección"
       links: 
@@ -5713,7 +5713,7 @@ es:
         rename_page: "Renombrar Página"
     page_section: 
       links: 
-        download_attachment: "Haga click aquí para Descargar *%{attachment}*"
+        download_attachment: "Haga clic aquí para Descargar *%{attachment}*"
       rich_text: 
         default_content: "Nada se ha incluído aún"
       section_types: 
@@ -5728,7 +5728,7 @@ es:
       headers: 
         submission: "Evíos por Estudiantes para %{assignment}, creado %{created_date}"
       links: 
-        download_attachment: "Haga Click Aquí para Descargar *%{attachment}*"
+        download_attachment: "Haga Clic Aquí para Descargar *%{attachment}*"
         submission_url: "Ver el URL enviado para esta tarea"
       not_rendered: "Había un envío aquí, pero no pudimos encontrarlo o no soportabamos el tipo de envío para exportarlo."
       rich_text: 
@@ -5792,7 +5792,7 @@ es:
         choose_submission: "Envíos del Curso"
         delete: "Borrar este ePortafolio"
         download_eportfolio: "Descargar el contenido de este ePortafolio como un archivo comprimido"
-        download_file: "Haga click aquí para descargar %{filename}"
+        download_file: "Haga clic aquí para descargar %{filename}"
         file_uload: "Cargar Imagen/Archivo"
         html_content: "Contenido HTML/Integrado"
         portfolio: "Ir al ePortafolio Actual"
@@ -5808,12 +5808,12 @@ es:
       private_comments: " En este momento puede ver los comentarios para esta página. Puede hacer comentarios públicos si quiere al *cambiar las configuraciones para esta página*. "
       private_eportfolio: " Esto significa que la gente no puede encontrarlo o verlo sin permiso. Lo puede ver porque esta en su portafolio, pero si quiere que se público, deberá de copiarlo y compartir el siguiente enlace para que puedan tener acceso a su portafolio: "
       public_eportfolio: " Esto significa que cualquiera que conoce la dirección de su portafolio puede verlo. Puede hacer su portafolio privado *cambiando las configuraciones de su portafolio*. "
-      recent_submissions: "Haga click en cualquier envío para agregarlo en su ePortafolio."
+      recent_submissions: "Haga clic en cualquier envío para agregarlo en su ePortafolio."
       titles: 
         already_used: "Este envío ya está incluído en su portafolio"
         feed: "Canal Atom para su ePortafolio"
         view_submission: "Ver el Envío"
-      welcome: " Si esta es su primera vez visitandonos, puede que necesite la ayuda del asistente para ver como comenzar. De otra manera, puede agregar envíos recientes o simplemente accesar el portafolio. "
+      welcome: " Si esta es su primera vez visitandonos, puede que necesite la ayuda del asistente para ver cómo comenzar. De otra manera, puede agregar envíos recientes o simplemente accesar el portafolio. "
       write_only_comments: " Los comentarios para esta página son privados. Puede hacer comentarios, pero solo el dueño del portafolio podrá verlos. "
     show_me: mostrarme
     static_page: 
@@ -5841,7 +5841,7 @@ es:
         create: "Crear un ePortafolio"
       page_title: "Mis ePortafolios"
       what: 
-        details1: |
+        details1: |-
             ePortafolios son un lugar donde se pueden mostrar y discutir los envíos significantes y 
             experiencias que están sucediendo durante su proceso de aprendizaje. Puede usar un ePortafolio para:
             
@@ -5852,14 +5852,14 @@ es:
             
             ePortafolios pueden ser públicos o privados, para aquellos a los que autoriza, y puede cambiar esa configuración en cualquier momento.
             
-            ¿Listo para comenzar? Haga click en el botón.
+            ¿Listo para comenzar? Haga clic en el botón.
     wizard_box: 
       finish: 
-        body: " ¿Listo para comenzar? Siempre puede regresar a este ayudante desde cualquier página haciendo click en el enlace \"%{help_link_text}\" que verá allí. "
+        body: " ¿Listo para comenzar? Siempre puede regresar a este ayudante desde cualquier página haciendo clic en el enlace \"%{help_link_text}\" que verá allí. "
       headers: 
         finish: Hagamoslo
         getting_started: Comienzo
-        instructions: "Como Usar un ePortafolio"
+        instructions: "Cómo Usar un ePortafolio"
         introduction: Introducción
         page_content: "Contenido de la Página"
         pages: "Páginas de las Secciones"
@@ -5871,21 +5871,21 @@ es:
       links: 
         portfolio: "Ver el Portafolio"
       page_content: 
-        body1: " El contenido que puede ver en una página es el mismo contenido que cualquier visitante puede ver. Para editar este contenido, haga click en el enlace \"%{edit_link_text}\" (%{showme}) y la página cambiará al modo de edición. "
-        body2: " ¡Ahora está editando! Renombre la página o cambie las opciones de comentarios (%{showme1}) si quiere. Puede guardar, tener una vista previa o cancelar sus cambios en cualquier momento haciendo click en el botón al lado derecho (%{showme2}). "
-        body3: " El contenido está dividido en subsecciones, y cada una tiene un márgen punteado. Puede borrar o editar el contenido de una subsección haciendo click en los íconos %{edit_icon} o %{delete_icon} en la parte superior derecha de la subsección. "
-        body4: " Para agregar subsecciones nuevas, encuentre y haga click en el tipo de contenido que quiere agregar en la lista de opciones en la parte derecha de la página (%{showme}). "
+        body1: " El contenido que puede ver en una página es el mismo contenido que cualquier visitante puede ver. Para editar este contenido, haga clic en el enlace \"%{edit_link_text}\" (%{showme}) y la página cambiará al modo de edición. "
+        body2: " ¡Ahora está editando! Renombre la página o cambie las opciones de comentarios (%{showme1}) si quiere. Puede guardar, tener una vista previa o cancelar sus cambios en cualquier momento haciendo clic en el botón al lado derecho (%{showme2}). "
+        body3: " El contenido está dividido en subsecciones, y cada una tiene un márgen punteado. Puede borrar o editar el contenido de una subsección haciendo clic en los íconos %{edit_icon} o %{delete_icon} en la parte superior derecha de la subsección. "
+        body4: " Para agregar subsecciones nuevas, encuentre y haga clic en el tipo de contenido que quiere agregar en la lista de opciones en la parte derecha de la página (%{showme}). "
       pages: 
-        body1: " Secciones tienen páginas múltiples. Puede ver la lista de páginas para la sección actual en el lado derecho de la ventana (%{showme1}). Para organizar o agregar páginas, haga click en el enlace \"%{manage_pages}\" (%{showme2}). "
-        body2: " Puede renombrar cualquier página haciendo click en el ícono %{edit_icon} que aparece, borrar una página haciendo click en el ícono %{delete_icon}, o cambiar el orden de las páginas haciendo click y arrastrandolas. "
+        body1: " Secciones tienen páginas múltiples. Puede ver la lista de páginas para la sección actual en el lado derecho de la ventana (%{showme1}). Para organizar o agregar páginas, haga clic en el enlace \"%{manage_pages}\" (%{showme2}). "
+        body2: " Puede renombrar cualquier página haciendo clic en el ícono %{edit_icon} que aparece, borrar una página haciendo clic en el ícono %{delete_icon}, o cambiar el orden de las páginas haciendo clic y arrastrandolas. "
       sections: 
-        body1: " Secciones están listadas a lo largo de la izquierda de la ventana (%{showme1}). Cada sección puede tener varias páginas en ellas. Para organizar o agregar secciones, haga click en el enlace \"%{manage_sections}\" (%{showme2}). "
-        body2: " Puede renombrar cualquier sección haciendo click en el ícono %{edit_icon} que aparece, rearregle las secciones haciendo click y arrastrandolas, o borrando secciones haciendo click en el ícono %{delete_icon}. "
+        body1: " Secciones están listadas a lo largo de la izquierda de la ventana (%{showme1}). Cada sección puede tener varias páginas en ellas. Para organizar o agregar secciones, haga clic en el enlace \"%{manage_sections}\" (%{showme2}). "
+        body2: " Puede renombrar cualquier sección haciendo clic en el ícono %{edit_icon} que aparece, rearregle las secciones haciendo clic y arrastrandolas, o borrando secciones haciendo clic en el ícono %{delete_icon}. "
       settings: 
-        body: " Para cambiar las configuraciones de su ePortafolio, haga click en el enlace \"Configuraciones de ePortafolio\" (%{showme}). Puede renombrar el portafolio y también establecer su privacidad. Portafolios privados sólo son visibles a aquellos a quienes se les ha dado acceso. "
+        body: " Para cambiar las configuraciones de su ePortafolio, haga clic en el enlace \"Configuraciones de ePortafolio\" (%{showme}). Puede renombrar el portafolio y también establecer su privacidad. Portafolios privados sólo son visibles a aquellos a quienes se les ha dado acceso. "
       submissions: 
-        body1: " Puede haber notado en el fondo de esta página una lista de envíos recientes de sus clases (%{showme}). Rápidamente puede agregar envíos a páginas nuevas en su portafolio desde esta página. Sólo haga click en el envío que quiere agregar y un diálogo simple aparecerá. "
-        body2: " ¡Excelente! Ahora para terminar de agregar el envío, debe escoger qué sección quiere agregar y darle un nombre a la página. Después de hacer click en \"Agregar Página\" irá a la página nueva para poder editarla y agregarle detalles. "
+        body1: " Puede haber notado en el fondo de esta página una lista de envíos recientes de sus clases (%{showme}). Rápidamente puede agregar envíos a páginas nuevas en su portafolio desde esta página. Sólo haga clic en el envío que quiere agregar y un diálogo simple aparecerá. "
+        body2: " ¡Excelente! Ahora para terminar de agregar el envío, debe escoger qué sección quiere agregar y darle un nombre a la página. Después de hacer clic en \"Agregar Página\" irá a la página nueva para poder editarla y agregarle detalles. "
   eportfolios_f6dc4579: ePortfolios
   error_deleting_name_reason_11f9d399: "Error al eliminar %{name}: %{reason}"
   error_message_2b9d12ee: "Error: %{message}"
@@ -6205,7 +6205,7 @@ es:
   files: 
     content_folder: 
       titles: 
-        edit_and_move_instructions: "hacer click para editar, arrastre para mover a otra carpeta"
+        edit_and_move_instructions: "hacer clic para editar, arrastre para mover a otra carpeta"
     could_not_find_file: "Este archivo ha sido eliminado"
     errors: 
       empty_file: "Ese archivo está vacío. Cargue otro tipo de archivo."
@@ -6346,7 +6346,7 @@ es:
       submit_comment: "Enviar Comentario"
       submitting: Enviando...
     cancel_button: Cancelar
-    click_to_change: "Haga click para probar una calificación diferente"
+    click_to_change: "Haga clic para probar una calificación diferente"
     confirms: 
       delete_comment: "¿Seguro que quiere borrar este comentario?"
       unsaved_changes: |-
@@ -6538,17 +6538,17 @@ es:
   gradebooks: 
     attendance: 
       attendance_info: "No se han creado tareas de asistencia."
-      edit_attendance_info: "Para editar los detalles para una tarea de asistencia, haga click en el ícono de la lista desplegable justo debajo del nombre de la tarea y luego haga click en \"Editar la Tarea\"."
+      edit_attendance_info: "Para editar los detalles para una tarea de asistencia, haga clic en el ícono de la lista desplegable justo debajo del nombre de la tarea y luego haga clic en \"Editar la Tarea\"."
       headers: 
         attendance: Asistencia
         edit_attendance: "Editar los Detalles de Asistencia"
         loading_attendance: "Cargando la Tabla de Asistencia..."
         mark_attendance: "Marcar la Asistencia"
       how_do_i: "¿Cómo hago...?"
-      mark_attendance_info: " La vista de asistencia muestra una tabla con los estudiantes listados a la izquierda y las tareas listadas arriba. Para marcar un estudiante como presente o ausente, haga click en la casilla correspondiente hasta que muestre la marca correcta (%{present_icon} para presente, %{absent_icon} para ausente). Puede usar también el menú desplegable para cada tarea para marcar a todos como presentes o ausentes. "
+      mark_attendance_info: " La vista de asistencia muestra una tabla con los estudiantes listados a la izquierda y las tareas listadas arriba. Para marcar un estudiante como presente o ausente, haga clic en la casilla correspondiente hasta que muestre la marca correcta (%{present_icon} para presente, %{absent_icon} para ausente). Puede usar también el menú desplegable para cada tarea para marcar a todos como presentes o ausentes. "
       page_title: Asistencia
       titles: 
-        click_to_change: "Haga click para Cambiar"
+        click_to_change: "Haga clic para Cambiar"
     blank_submission: 
       no_submission: "Sin Envío"
     crumb: Asistencia
@@ -6564,8 +6564,8 @@ es:
       assignments: Tareas
       buttons: 
         show_what_if: "Mostrar las Calificaciones \"What-If\""
-      change_score_instructions: "Haga click en cualquier calificación e ingrese un nuevo valor para ver como el cambio afectará su total."
-      click_to_change: "Haga click para probar una calificación diferente"
+      change_score_instructions: "Haga clic en cualquier calificación e ingrese un nuevo valor para ver cómo el cambio afectará su total."
+      click_to_change: "Haga clic para probar una calificación diferente"
       close_comments: Cerrar
       close_comments_label: "Cerrar comentarios"
       close_rubric: "Cerrar rúbrica"
@@ -6603,7 +6603,7 @@ es:
         your_score: "Su Calificación"
       learning_outcomes: "Dominio de aprendizaje"
       links: 
-        click_to_view: "haga click aquí para verlo"
+        click_to_view: "haga clic aquí para verlo"
         download: "Descargar %{attachment}"
         revert_score: "Revertir a la Calificación Actual"
         show_details: "Mostrar Todos los Detalles"
@@ -6742,7 +6742,7 @@ es:
         sort_by: "Clasificar lista de estudiantes"
       late_notice: "Aviso: Este envío se hizo TARDE"
       links: 
-        click_to_view: "haga click aquí para ver"
+        click_to_view: "haga clic aquí para ver"
         course_home: "Página de Inicio del Curso"
         download_file: "Descargar el Archivo"
         gradebook: "Libro de Calificaciones"
@@ -6761,7 +6761,7 @@ es:
         status: "por estatus de envíos (necesita calificación, no enviado, etc)"
         student_name: "por nombre de estudiante (alfabéticamente)"
         submitted_at: "la fecha en la que se envío la tarea"
-      submitted_files: "Archivos Enviados: (haga click para cargar)"
+      submitted_files: "Archivos Enviados: (haga clic para cargar)"
       titles: 
         download_file: "Descargar este archivo"
         not_newest: "usar el menú para cambiar el envío que se quiere ver"
@@ -6785,9 +6785,9 @@ es:
       no_attendance_assignments: "No se han creado tareas de asistencia."
       page_title: "Asistencia para %{user}"
       titles: 
-        absent: "Marcado como Ausente, haga click para más detalles"
-        click_for_details: "Haga click para más Detalles"
-        present: "Marcado como Presente, haga click para más detalles"
+        absent: "Marcado como Ausente, haga clic para más detalles"
+        click_for_details: "Haga clic para más Detalles"
+        present: "Marcado como Presente, haga clic para más detalles"
     submissions_zip_upload: 
       comments_made: 
         one: "Se ha hecho 1 Comentario"
@@ -7005,8 +7005,8 @@ es:
       buttons: 
         add_group: "Hacer una Serie Nueva de Grupos"
       course_group_explanation: "Grupos de estudiantes son una forma útil de organizar a sus estudiantes para proyectos en grupo. Cada grupo de estudiantes tendrá su propio calendario, foro y herramientas de colaboración para que puedan organizarse y trabajar más eficientemente."
-      drag_and_drop_instructions: "Haga click y arrastre para mover al estudiante a otro grupo."
-      get_started_info: "Para comenzar, haga click en el enlace “Crear una Serie Nueva de Grupos” a su derecha."
+      drag_and_drop_instructions: "Haga clic y arrastre para mover al estudiante a otro grupo."
+      get_started_info: "Para comenzar, haga clic en el enlace “Crear una Serie Nueva de Grupos” a su derecha."
       group_assignment_instructions: "Puede asignar a sus estudiantes al azar a grupos de un tamaño específico o crearlos y organizarlos manualmente. Una vez se han completado los grupos, puede establecer tareas, que significa que cada grupo tendrán un envío para todos los usuarios de ese grupo."
       group_pages: "Páginas del Grupo"
       headings: 
@@ -7238,7 +7238,7 @@ es:
       creating_groups: "Creando la Categoría..."
       updating: Actualizando...
     student: 
-      drag_drop_instructions: "Haga click y arrastre al estudiante para moverlo a otro grupo"
+      drag_drop_instructions: "Haga clic y arrastre al estudiante para moverlo a otro grupo"
     students_who_have_not_joined_a_group: "Alumnos que no se han incorporado a ningún grupo"
     titles: 
       add_group_category: "Agregar una Serie de Grupos"
@@ -7763,8 +7763,8 @@ es:
   links: 
     dashboard: "Mi Tablero de Instrumentos"
     errors: 
-      4xx_feedback: "Haga click aquí para decirnos que es lo que buscaba."
-      feedback: "Haga click aquí para decirnos qué ocurrió"
+      4xx_feedback: "Haga clic aquí para decirnos que es lo que buscaba."
+      feedback: "Haga clic aquí para decirnos qué ocurrió"
     show_me_where: "Mostrarme Todo"
   links_14b70841: Vínculos
   loading_25990131: Cargando...
@@ -8039,7 +8039,7 @@ es:
         username_info: "Nombre de Usuario: %{username}"
     added_to_conversation: 
       email: 
-        body: "%{user_name} acaba de agregarlo a una conversación en Canvas. Para ver la conversación, haga click en el enlace a continuación:"
+        body: "%{user_name} acaba de agregarlo a una conversación en Canvas. Para ver la conversación, haga clic en el enlace a continuación:"
         html: 
           body: "%{user_name} acaba de agregarle a una conversación en Canvas."
           link_text: "Ver la conversación"
@@ -8354,10 +8354,10 @@ es:
         message: "Alerta de Canvas - Le han registrado a usted para \"%{appointment_name}\"."
     assignment_changed: 
       email: 
-        body: |
+        body: |-
             La tarea "%{title}" para %{course} ha cambiado.  
             
-            Haga click aquí para ver la tarea: %{url}
+            Haga clic aquí para ver la tarea: %{url}
         html: 
           body: "Se ha modificado la tarea \"%{title}\" para %{course}."
           link: "Haga clic aquí para ver la tarea"
@@ -8384,7 +8384,7 @@ es:
           new_assignment: "Se ha creado una tarea nueva para su curso, %{course_name}"
           no_due_date: "No hay fecha límite"
         labels: 
-          click_to_see_assignment: "Haga click aquí para ver la tarea"
+          click_to_see_assignment: "Haga clic aquí para ver la tarea"
         multiple_due_dates: "vencimiento: varias fechas"
         new_assignment: "Una tarea nueva ha sido creada para su curso, %{course_name}"
         no_due_date: "fecha límite: No hay Fecha Límite"
@@ -8414,7 +8414,7 @@ es:
           link_text: "Ver la tarea"
           no_due_date: "No hay fecha límite"
         labels: 
-          click_to_see_assignment: "Haga click aquí para ver la tarea"
+          click_to_see_assignment: "Haga clic aquí para ver la tarea"
         no_due_date: "No Hay Fecha Límite"
       sms: 
         assignment_due_date_changed: "%{assignment_name}, %{course_name}, está atrasada:"
@@ -8672,7 +8672,7 @@ es:
     conversation_message: 
       email: 
         attached_files: "Archivos Adjuntos:"
-        audio_comment: "Este mensaje incluye comentarios de media. Para reproducirlos o responder a ellos, haga click en el enlace a continuación:"
+        audio_comment: "Este mensaje incluye comentarios de media. Para reproducirlos o responder a ellos, haga clic en el enlace a continuación:"
         html: 
           attached_files: "Archivos adjuntos:"
           audio_comment: "Este mensaje contiene comentarios multimedia. Para escucharlos o responder, haga clic en el enlace que aparece a continuación:"
@@ -8760,11 +8760,11 @@ es:
           %{url}
     enrollment_accepted: 
       email: 
-        body_designer: "%{user} acaba de aceptar la invitación para participar en el curso, %{course}, como un diseñador."
-        body_observer: "%{user} acaba de aceptar la invitación para participar en el curso, %{course}, como un observador."
-        body_student: "%{user} acaba de aceptar la invitación para participar en el curso, %{course}, como un estudiante."
-        body_ta: "%{user} acaba de aceptar la invitación para participar en el curso, %{course}, como un AP."
-        body_teacher: "%{user} acaba de aceptar la invitación para participar en el curso, %{course}, como un profesor."
+        body_designer: "%{user} acaba de aceptar la invitación para participar en el curso, %{course}, como diseñador."
+        body_observer: "%{user} acaba de aceptar la invitación para participar en el curso, %{course}, como observador."
+        body_student: "%{user} acaba de aceptar la invitación para participar en el curso, %{course}, como estudiante."
+        body_ta: "%{user} acaba de aceptar la invitación para participar en el curso, %{course}, como AP."
+        body_teacher: "%{user} acaba de aceptar la invitación para participar en el curso, %{course}, como profesor."
         details: "Ver la lista de inscripciones activas aquí:"
         html: 
           body_designer: "%{user} acaba de aceptar su invitación para participar en el curso, %{course}, como diseñador."
@@ -8783,21 +8783,21 @@ es:
         body_teacher: "%{user} aceptó la invitación como profesor para el curso, %{course}"
         details: "Más información en %{url}"
       summary: 
-        body_designer: "%{user} acaba de aceptar la invitación para participar en el curso, %{course}, como un diseñador."
-        body_observer: "%{user} acaba de aceptar la invitación para participar en el curso, %{course}, como un observador."
-        body_student: "%{user} acaba de aceptar la invitación para patricipar en el curso, %{course}, como un estudiante."
-        body_ta: "%{user} acaba de aceptar la invitación para participar en el curso, %{course}, como un AP."
-        body_teacher: "%{user} acaba de aceptar la invitación para participar en el curso, %{course}, como un profesor."
+        body_designer: "%{user} acaba de aceptar la invitación para participar en el curso, %{course}, como diseñador."
+        body_observer: "%{user} acaba de aceptar la invitación para participar en el curso, %{course}, como observador."
+        body_student: "%{user} acaba de aceptar la invitación para patricipar en el curso, %{course}, como estudiante."
+        body_ta: "%{user} acaba de aceptar la invitación para participar en el curso, %{course}, como AP."
+        body_teacher: "%{user} acaba de aceptar la invitación para participar en el curso, %{course}, como profesor."
         subject: "%{user} aceptó el Invitación al Curso"
       twitter: 
         body: "Alerta de Canvas - Aceptado: %{user}, %{enrollment_type}, curso, %{course}"
     enrollment_invitation: 
       email: 
-        body_designer: "Ha sido invitado a participar en el curso, %{course}, como un diseñador."
-        body_observer: "Ha sido invitado a participar en el curso, %{course}, como un observador."
-        body_student: "Ha sido invitado a participar en el curso, %{course}, como un estudiante."
-        body_ta: "Ha sido invitado a participar en el curso, %{course}, como un AP."
-        body_teacher: "Ha sido invitado a participar en el curso, %{course}, como un profesor."
+        body_designer: "Ha sido invitado a participar en el curso, %{course}, como diseñador."
+        body_observer: "Ha sido invitado a participar en el curso, %{course}, como observador."
+        body_student: "Ha sido invitado a participar en el curso, %{course}, como estudiante."
+        body_ta: "Ha sido invitado a participar en el curso, %{course}, como AP."
+        body_teacher: "Ha sido invitado a participar en el curso, %{course}, como profesor."
         details: "Visitar la página del curso aquí:"
         html: 
           body_designer: "Ha sido invitado a participar en el curso, %{course}, como diseñador."
@@ -8818,11 +8818,11 @@ es:
         none: ninguno
         subject: "Invitación al Curso"
       sms: 
-        body_designer: "Ha sido invitado al curso como un diseñador."
-        body_observer: "Ha sido invitado al curso como un observador."
-        body_student: "Ha sido invitado al curso como un estudiante."
-        body_ta: "Ha sido invitado al curso como un AP."
-        body_teacher: "Ha sido invitado al curso como un profesor."
+        body_designer: "Ha sido invitado al curso como diseñador."
+        body_observer: "Ha sido invitado al curso como observador."
+        body_student: "Ha sido invitado al curso como estudiante."
+        body_ta: "Ha sido invitado al curso como AP."
+        body_teacher: "Ha sido invitado al curso como profesor."
         details: "Más información en %{url}"
         labels: 
           email: "Correo Electrónico"
@@ -8830,21 +8830,21 @@ es:
           username: "Nombre de Usuario"
         none: ninguno
       summary: 
-        body_designer: "Ha sido invitado a participar en el curso, %{course}, como un diseñador."
-        body_observer: "Ha sido invitado a participar en el curso, %{course}, como un observador."
-        body_student: "Ha sido invitado a participar en el curso, %{course}, como un estudiante."
-        body_ta: "Ha sido invitado a participar en el curso, %{course}, como un AP."
-        body_teacher: "Ha sido invitado a participar en el curso, %{course}, como un profesor."
+        body_designer: "Ha sido invitado a participar en el curso, %{course}, como diseñador."
+        body_observer: "Ha sido invitado a participar en el curso, %{course}, como observador."
+        body_student: "Ha sido invitado a participar en el curso, %{course}, como estudiante."
+        body_ta: "Ha sido invitado a participar en el curso, %{course}, como AP."
+        body_teacher: "Ha sido invitado a participar en el curso, %{course}, como profesor."
         subject: "Invitación al Curso"
       twitter: 
         body: "Alerta de Canvas - Invitado: al curso como %{enrollment_type}"
     enrollment_notification: 
       email: 
-        body_designer: "Ha sido inscrito en el curso, %{course}, como un diseñador."
-        body_observer: "Ha sido inscrito en el curso, %{course}, como un observador."
-        body_student: "Ha sido inscrito en el curso, %{course}, como un estudiante."
-        body_ta: "Ha sido inscrito en el curso, %{course}, como un AP."
-        body_teacher: "Ha sido inscrito en el curso, %{course}, como un profesor."
+        body_designer: "Ha sido inscrito en el curso, %{course}, como diseñador."
+        body_observer: "Ha sido inscrito en el curso, %{course}, como observador."
+        body_student: "Ha sido inscrito en el curso, %{course}, como estudiante."
+        body_ta: "Ha sido inscrito en el curso, %{course}, como AP."
+        body_teacher: "Ha sido inscrito en el curso, %{course}, como profesor."
         details: "Visite la página del curso aquí:"
         html: 
           body_designer: "Se ha inscrito en el curso, %{course}, como diseñador."
@@ -8866,11 +8866,11 @@ es:
         register: "Visite %{link} para completar la inscripción"
         subject: "Inscripciones en el Curso"
       sms: 
-        body_designer: "Ha sido inscrito en el curso como un diseñador."
-        body_observer: "Ha sido inscrito en el curso como un observador."
-        body_student: "Ha sido inscrito en el curso como un estudiante."
-        body_ta: "Ha sido inscrito en el curso como un AP."
-        body_teacher: "Ha sido inscrito en el curso como un profesor."
+        body_designer: "Ha sido inscrito en el curso como diseñador."
+        body_observer: "Ha sido inscrito en el curso como observador."
+        body_student: "Ha sido inscrito en el curso como estudiante."
+        body_ta: "Ha sido inscrito en el curso como AP."
+        body_teacher: "Ha sido inscrito en el curso como profesor."
         details: "Más información en %{url}"
         labels: 
           email: "Correo Electrónico"
@@ -8878,21 +8878,21 @@ es:
           username: "Nombre de Usuario"
         none: ninguno
       summary: 
-        body_designer: "Ha sido inscrito en el curso, %{course}, como un diseñador."
-        body_observer: "Ha sido inscrito en el curso, %{course}, como un observador."
-        body_student: "Ha sido inscrito en el curso, %{course}, como un estudiante."
-        body_ta: "Ha sido inscrito en el curso, %{course}, como un AP."
-        body_teacher: "Ha sido inscrito en el curso, %{course}, como un profesor."
+        body_designer: "Ha sido inscrito en el curso, %{course}, como diseñador."
+        body_observer: "Ha sido inscrito en el curso, %{course}, como observador."
+        body_student: "Ha sido inscrito en el curso, %{course}, como estudiante."
+        body_ta: "Ha sido inscrito en el curso, %{course}, como AP."
+        body_teacher: "Ha sido inscrito en el curso, %{course}, como profesor."
         subject: "Inscripciones en el Curso"
       twitter: 
         body: "Alerta de Canvas - Inscrito: como %{enrollment_type}"
     enrollment_registration: 
       email: 
-        body_designer: "Ha sido invitado a participar en una clase en %{website}. La clase se llama %{course}, y ha sido invitado a participar como un diseñador."
-        body_observer: "Ha sido invitado a participar en una clase en %{website}. La clase se llama %{course}, y ha sido invitado a participar como un observador."
-        body_student: "Ha sido invitado a participar en una clase en %{website}. La clase se llama %{course}, y ha sido invitado a participar como un estudiante."
-        body_ta: "Ha sido invitado a participar en una clase en %{website}. La clase se llama %{course}, y ha sido invitado a participar como un AP."
-        body_teacher: "Ha sido invitado a participar en una clase en %{website}. La clase se llama %{course}, y ha sido invitado a participar como un profesor."
+        body_designer: "Ha sido invitado a participar en una clase en %{website}. La clase se llama %{course}, y ha sido invitado a participar como diseñador."
+        body_observer: "Ha sido invitado a participar en una clase en %{website}. La clase se llama %{course}, y ha sido invitado a participar como observador."
+        body_student: "Ha sido invitado a participar en una clase en %{website}. La clase se llama %{course}, y ha sido invitado a participar como estudiante."
+        body_ta: "Ha sido invitado a participar en una clase en %{website}. La clase se llama %{course}, y ha sido invitado a participar como AP."
+        body_teacher: "Ha sido invitado a participar en una clase en %{website}. La clase se llama %{course}, y ha sido invitado a participar como profesor."
         details: "Necesitará registrarse con Canvas antes de que pueda participar en la clase. Para comenzar, visite la página del curso aquí:"
         html: 
           body_designer: "La clase se llama %{course} y usted ha sido invitado a participar como diseñador."
@@ -8915,11 +8915,11 @@ es:
         none: ninguno
         subject: "Invitación al Curso"
       sms: 
-        body_designer: "Ha sido invitado al curso como un diseñador."
-        body_observer: "Ha sido invitado al curso como un observador."
-        body_student: "Ha sido invitado al curso como un estudiante."
-        body_ta: "Ha sido invitado al curso como un AP."
-        body_teacher: "Ha sido invitado al curso como un profesor."
+        body_designer: "Ha sido invitado al curso como diseñador."
+        body_observer: "Ha sido invitado al curso como observador."
+        body_student: "Ha sido invitado al curso como estudiante."
+        body_ta: "Ha sido invitado al curso como AP."
+        body_teacher: "Ha sido invitado al curso como profesor."
         details: "Más información en %{url}"
         labels: 
           email: "Correo Electrónico"
@@ -8927,11 +8927,11 @@ es:
           username: "Nombre de Usuario"
         none: ninguno
       summary: 
-        body_designer: "Ha sido invitado a participar en una clase en %{website}. La clase se llama %{course}, y ha sido invitado a participar como un diseñador."
-        body_observer: "Ha sido invitado a participar en una clase en %{website}. La clase se llama %{course}, y ha sido invitado a participar como un observador."
-        body_student: "Ha sido invitado a participar en una clase en %{website}. La clase se llama %{course}, y ha sido invitado a participar como un estudiante."
-        body_ta: "Ha sido invitado a participar en una clase en %{website}. La clase se llama %{course}, y ha sido invitado a participar como un AP."
-        body_teacher: "Ha sido invitado a participar en una clase en %{website}. La clase se llama %{course}, y ha sido invitado a participar como un profesor."
+        body_designer: "Ha sido invitado a participar en una clase en %{website}. La clase se llama %{course}, y ha sido invitado a participar como diseñador."
+        body_observer: "Ha sido invitado a participar en una clase en %{website}. La clase se llama %{course}, y ha sido invitado a participar como observador."
+        body_student: "Ha sido invitado a participar en una clase en %{website}. La clase se llama %{course}, y ha sido invitado a participar como estudiante."
+        body_ta: "Ha sido invitado a participar en una clase en %{website}. La clase se llama %{course}, y ha sido invitado a participar como AP."
+        body_teacher: "Ha sido invitado a participar en una clase en %{website}. La clase se llama %{course}, y ha sido invitado a participar como profesor."
         subject: "Invitación al Curso"
       twitter: 
         body: "Alerta de Canvas - Invitado: curso como %{enrollment_type}"
@@ -8985,7 +8985,7 @@ es:
         labels: 
           associated_with_accounts: "Esta dirección está asociada con las siguientes cuentas"
           change_password_at: "cambiar la contraseña en"
-          click_to_reset: "Para configurar una contraseña nueva, haga click en el enlace siguiente"
+          click_to_reset: "Para configurar una contraseña nueva, haga clic en el enlace siguiente"
         login_at_account: "%{login_email} en %{account_name}"
         login_managed_by_account: "las credenciales para este inicio de sesión son administrados por %{account_name}"
         password_from_account: "La contraseña para ingresar debe haber sido provista por el administrador del sistema en %{account_name}, e Instructure no tiene acceso a su contraseña."
@@ -9047,7 +9047,7 @@ es:
           link: "Haga clic para ver el grupo"
           subject: "Suscripción al grupo aceptada: %{group_name}"
         labels: 
-          click_below: "Puede revisar el grupo haciendo click en el siguiente enlace"
+          click_below: "Puede revisar el grupo haciendo clic en el siguiente enlace"
         subject: "Membresía al Grupo Aceptada: %{group_name}"
       sms: 
         account_group: "Su solicitud para unirse al grupo %{group_name} para la cuenta %{account_name} ha sido aceptada."
@@ -9072,7 +9072,7 @@ es:
           link: "Haga clic para ver otros grupos"
           subject: "Suscripción al grupo rechazada: %{group_name}"
         labels: 
-          click_below: "Puede revisar otros grupos haciendo click en el siguiente enlace"
+          click_below: "Puede revisar otros grupos haciendo clic en el siguiente enlace"
         subject: "Membresía al Grupo Rechazada: %{group_name}"
       sms: 
         account_group: "Su solicitud para unirse al grupo %{group_name} para la cuenta %{account_name} ha sido rechazada."
@@ -9153,7 +9153,7 @@ es:
       email: 
         body_account: "Ha sido agregado a un grupo nuevo para la cuenta %{account}. El nombre del grupo es %{group_name}."
         body_course: "Ha sido agregado a un grupo nuevo para el curso %{course}. El nombre del grupo es %{group_name}."
-        details_account: "Puede ver a que grupos pertenece con esta cuenta haciendo click en el siguiente enlace:"
+        details_account: "Puede ver a que grupos pertenece con esta cuenta haciendo clic en el siguiente enlace:"
         html: 
           body_account: "Se ha añadido a un grupo nuevo para la cuenta %{account}. El nombre del grupo es %{group_name}."
           body_course: "Se ha añadido a un grupo nuevo para el curso %{course}. El nombre del grupo es %{group_name}."
@@ -9178,7 +9178,7 @@ es:
       email: 
         body_account: "Ha sido invitado a unirse al grupo %{group} para la cuenta %{account}."
         body_course: "Ha sido invitado a unirse al grupo %{group} para el curso %{course}."
-        details: "Puede revisar el grupo haciendo click en el siguiente enlace:"
+        details: "Puede revisar el grupo haciendo clic en el siguiente enlace:"
         html: 
           body_account: "Ha sido invitado a unirse al grupo %{group} para la cuenta %{account}."
           body_course: "Ha sido invitado a unirse al grupo %{group} para el curso %{course}."
@@ -9326,7 +9326,7 @@ es:
       email: 
         body_account: "Un grupo nuevo organizado por estudiantes llamado \"%{group_name}\" fue creado para la cuenta %{account}. El primer miembro es %{user}."
         body_course: "Un grupo nuevo organizado por estudiantes llamado \"%{group_name}\" fue creado para el curso %{course}. El primer miembro es %{user}."
-        details: "Puede ver los detalles para este grupo haciendo click en el siguiente enlace:"
+        details: "Puede ver los detalles para este grupo haciendo clic en el siguiente enlace:"
         html: 
           body_account: "Se ha creado un grupo nuevo organizado por alumnos llamado \"%{group_name}\" para la cuenta %{account}. El primer miembro es %{user}."
           body_course: "Se ha creado un grupo nuevo organizado por alumnos llamado \"%{group_name}\" para el curso %{course}. El primer miembro es %{user}."
@@ -9445,7 +9445,7 @@ es:
         html: 
           link_message: "Haga clic aquí para descargar el informe"
           subject: "Informe generado"
-        link_message: "Haga click aquí para descargar el reporte:"
+        link_message: "Haga clic aquí para descargar el reporte:"
         subject: "Reporte Generado"
     report_generation_failed: 
       email: 
@@ -9950,7 +9950,7 @@ es:
   mute_dialog: 
     curving_assignments: "Aplicando Curvas a tareas"
     grade_change_notifications: "Notificaciones de Cambios de Calificaciones"
-    how_to_unmute: "Una vez que ha obviado esta tarea, puede comenzar a enviar notificaciones otra vez haciendo click en el enlace \"Obviar Tarea\"."
+    how_to_unmute: "Una vez que ha obviado esta tarea, puede comenzar a enviar notificaciones otra vez haciendo clic en el enlace \"Obviar Tarea\"."
     mute_assignment: "Obviar Tarea"
     score_change_notifications: "Notificaciones de cambio en calificaciones"
     see_grade: "La calificación para su tarea"
@@ -11163,7 +11163,7 @@ es:
         name: "Nombre Completo"
         new_password: "Contraseña Nueva"
         old_password: "Contraseña Vieja"
-        other_services: "Haga click en cualquier servicio para registrarlo"
+        other_services: "Haga clic en cualquier servicio para registrarlo"
         password: Contraseña
         password_for: "Contraseña Para"
         purpose: Propósito
@@ -11215,7 +11215,7 @@ es:
         authorize_linkedin: "Autorizar LinkedIn"
         authorize_twitter: "Autorizar Twitter"
         authorize_yo: "Nombre de usuario de Yo"
-        click_to_change_profile_pic: "Haga click para cambiar su foto de perfil"
+        click_to_change_profile_pic: "Haga clic para cambiar su foto de perfil"
         delicious_login: "Inicio de Sesión de Delicious"
         diigo_login: "Inicio de sesión en Diigo"
         new_access_token: "Solicitar Código de Acceso"
@@ -11227,7 +11227,7 @@ es:
           
           También puede suscribirse para recibir notificaciones en su cuenta de Twitter. Estas notificaciones se le enviarán como mensajes directos a usted mismo y no aparecerán en la secuencia de publicaciones.
       unknown_service: Desconocido
-      web_services: "Canvas puede hacer su vida más fácil al unirse con las herramientas en línea que ya usa. Haga click en cualquiera de los servicios en \"Otros Servicios\" para ver lo que queremos decir. "
+      web_services: "Canvas puede hacer su vida más fácil al unirse con las herramientas en línea que ya usa. Haga clic en cualquiera de los servicios en \"Otros Servicios\" para ver lo que queremos decir. "
       yo_description: |-
           Yo es una herramienta de comunicación de cero caracteres y un solo punteo.
           Si posee una cuenta Yo, puede registrarla aquí. Así, si permite
@@ -11293,7 +11293,7 @@ es:
         email: "Correo Electrónico"
         resend_confirmation: "Reenviar la Confirmación"
         text_sms: "Texto (SMS)"
-      sent_confirmation_email: " Le enviamos un correo electrónico con un enlace de confirmación a %{email_address}. Haga click en el enlace en ese correo electrónico para terminar la inscripción. Asegúrese de revisar su bandeja de spam por si fue filtrado. "
+      sent_confirmation_email: " Le enviamos un correo electrónico con un enlace de confirmación a %{email_address}. Haga clic en el enlace en ese correo electrónico para terminar la inscripción. Asegúrese de revisar su bandeja de spam por si fue filtrado. "
       sent_confirmation_sms: " Enviamos una código de confirmación de cuatro caracteres a %{sms_number}. Ingrese el código abajo para activar este número de SMS. "
       titles: 
         confirm_email_address: "Confirmar el correo electrónico"
@@ -11500,7 +11500,7 @@ es:
         other: "%{count} Preguntas"
       unbookmark_bank: "No contar como favorito este Grupo de Preguntas"
     question_teaser: 
-      full_details: "Haga click para mostrar los detalles de la pregunta"
+      full_details: "Haga clic para mostrar los detalles de la pregunta"
       links: 
         delete_question: "Borrar esta Pregunta"
         edit_question: "Editar esta Pregunta"
@@ -12748,10 +12748,10 @@ es:
         time_remaining: "Tiempo Restante"
     titles: 
       add_questions_as_group: "Agregar Preguntas como un Grupo"
-      click_to_enter_comments_on_answer: "Haga click para ingresar comentarios para el estudiante si escogen esta respuesta"
-      click_to_enter_comments_on_wrong_match: "Haga click para ingresar comentarios para el estudiantes si fallan este apareo"
-      click_to_set_as_correct: "Haga click para marcar esta respuesta como la correcta"
-      click_to_unset_as_correct: "Haga click para remover esta respuesta como la correcta"
+      click_to_enter_comments_on_answer: "Haga clic para ingresar comentarios para el estudiante si escogen esta respuesta"
+      click_to_enter_comments_on_wrong_match: "Haga clic para ingresar comentarios para el estudiantes si fallan este apareo"
+      click_to_set_as_correct: "Haga clic para marcar esta respuesta como la correcta"
+      click_to_unset_as_correct: "Haga clic para remover esta respuesta como la correcta"
       find_question_bank: "Encontrar Grupo de Preguntas"
       find_quiz_question: "Encontrar Pregunta de la Evaluación"
       help_with_formulas: "Ayudar con las Formulas de las Preguntas de la Evaluación"
@@ -13019,7 +13019,7 @@ es:
       teachers: Profesores
     tooltips: 
       readonly: "no tiene permiso para cambiar esto."
-      toogle: "Haga click para cambiar este permiso de Encendido a Apagado"
+      toogle: "Haga clic para cambiar este permiso de Encendido a Apagado"
   role_overrides: 
     account_permissions: "Permisos para la cuenta"
     admin_tools_permissions: "Herramientas de administración"
@@ -13283,15 +13283,15 @@ es:
     confirms: 
       delete_enrollment: "¿Seguro que quiere borrar esta inscripción permanentemente?"
     default_course_name: "ID del Curso \"%{course_id}\""
-    enrolled_as_designer: "inscrito como un diseñador"
-    enrolled_as_limited_designer: "inscrito como un diseñador con acceso limitado por sección"
+    enrolled_as_designer: "inscrito como diseñador"
+    enrolled_as_limited_designer: "inscrito como diseñador con acceso limitado por sección"
     enrolled_as_limited_observer: "inscrito como observador con acceso restringido"
     enrolled_as_limited_student: "inscrito como alumno con acceso restringido"
-    enrolled_as_limited_ta: "inscrito como un AP con acceso limitado por sección"
-    enrolled_as_limited_teacher: "inscrito como un profesor con acceso limitado por sección"
+    enrolled_as_limited_ta: "inscrito como AP con acceso limitado por sección"
+    enrolled_as_limited_teacher: "inscrito como profesor con acceso limitado por sección"
     enrolled_as_observer: "inscrito como observador"
-    enrolled_as_student: "inscrito como un estudiante"
-    enrolled_as_ta: "inscrito como un AP"
+    enrolled_as_student: "inscrito como estudiante"
+    enrolled_as_ta: "inscrito como AP"
     enrolled_as_teacher: "inscrito como profesor"
     errors: 
       confirmation_failed: "La Confirmación Falló"
@@ -13551,11 +13551,11 @@ es:
         download_message_intro: "Se están recopilando sus envíos de alumno."
         download_submissions: "Descargar todos los envíos"
     current_enrollment: 
-      enrolled_as_designer: "Inscrito como un diseñador"
-      enrolled_as_observer: "Inscrito como un observador"
-      enrolled_as_student: "Inscrito como un estudiante"
-      enrolled_as_ta: "Inscrito como un AP"
-      enrolled_as_teacher: "Inscrito como un profesor"
+      enrolled_as_designer: "Inscrito como diseñador"
+      enrolled_as_observer: "Inscrito como observador"
+      enrolled_as_student: "Inscrito como estudiante"
+      enrolled_as_ta: "Inscrito como AP"
+      enrolled_as_teacher: "Inscrito como profesor"
       favorited_tooltip: "Haga clic para eliminar del menú de cursos."
       nonfavorited_tooltip: "Haga clic para añadir al menú de cursos."
       unpublished_course: "no publicado"
@@ -13571,16 +13571,16 @@ es:
         decline: Rechazar
       invitation_text: "Ha recibido una invitación para participar en [%{course}](%{link_to_course}) como %{enrollment_type_with_indefinite_article}"
     enrollment: 
-      enrolled_as_designer: "inscrito como un diseñador"
-      enrolled_as_limited_designer: "inscrito como un diseñador con acceso limitado por sección"
-      enrolled_as_limited_observer: "inscrito como un observador con acceso limitado por sección"
-      enrolled_as_limited_student: "inscrito como un estudiante con acceso limitado por sección"
-      enrolled_as_limited_ta: "inscrito como un AP con acceso limitado por sección"
-      enrolled_as_limited_teacher: "inscrito como un profesor con acceso limitado por sección"
-      enrolled_as_observer: "inscrito como un observador"
-      enrolled_as_student: "inscrito como un estudiante"
-      enrolled_as_ta: "inscrito como un AP"
-      enrolled_as_teacher: "inscrito como un profesor"
+      enrolled_as_designer: "inscrito como diseñador"
+      enrolled_as_limited_designer: "inscrito como diseñador con acceso limitado por sección"
+      enrolled_as_limited_observer: "inscrito como observador con acceso limitado por sección"
+      enrolled_as_limited_student: "inscrito como estudiante con acceso limitado por sección"
+      enrolled_as_limited_ta: "inscrito como AP con acceso limitado por sección"
+      enrolled_as_limited_teacher: "inscrito como profesor con acceso limitado por sección"
+      enrolled_as_observer: "inscrito como observador"
+      enrolled_as_student: "inscrito como estudiante"
+      enrolled_as_ta: "inscrito como AP"
+      enrolled_as_teacher: "inscrito como profesor"
       labels: 
         linked_to: "enlazado a"
       links: 
@@ -13707,7 +13707,7 @@ es:
         log_in: Ingresar
         logout: Salir
         settings: Configuraciones
-        sign_up_as_teacher: "Ingresar como un Profesor"
+        sign_up_as_teacher: "Ingresar como Profesor"
       masquerading: 
         as: "Como: *%{user_name}*"
     inline_preview: 
@@ -13765,7 +13765,7 @@ es:
           *  Notificaciones de cambio de calificación
           Los estudiantes podrán ver de que esta tarea está obviada.
           Una vez que ha obviado esta tarea, puede comenzar a enviar
-          notificaciones otra vez haciendo click en el enlace de "Activar la Tarea".
+          notificaciones otra vez haciendo clic en el enlace de "Activar la Tarea".
     new_course_form: 
       cancel: Cancelar
       course_cose_explanation: "Esto se mostrará en lugares con poco espacio"
@@ -13787,16 +13787,16 @@ es:
       empty_stream_message: " No tiene mensajes que mostrar aún en su stream. Una vez comience a participar en sus cursos verá este stream llenarse de mensajes de las foros, actualizaciones de calificaciones, mensajes privados entre usted y otros usuarios, etc. "
       no_recent_messages: "No hay Mensajes Recientes"
     pending_enrollment: 
-      designer: "%{course} como un diseñador."
-      designer_title: "Invitado como un diseñador, haga click para ver el Curso"
-      observer: "%{course} como un observador."
-      observer_title: "Invitado como un observador, haga click para ver el Curso"
-      student: "%{course} como un estudiante."
-      student_title: "Invitado como un estudiante, haga click para ver el Curso"
-      ta: "%{course} como un AP."
-      ta_title: "Invitado como un AP, haga click para ver el Curso"
-      teacher: "%{course} como un profesor."
-      teacher_title: "Invitado como un profesor, haga click para ver el Curso"
+      designer: "%{course} como diseñador."
+      designer_title: "Invitado como diseñador, haga clic para ver el Curso"
+      observer: "%{course} como observador."
+      observer_title: "Invitado como observador, haga clic para ver el Curso"
+      student: "%{course} como estudiante."
+      student_title: "Invitado como estudiante, haga clic para ver el Curso"
+      ta: "%{course} como AP."
+      ta_title: "Invitado como AP, haga clic para ver el Curso"
+      teacher: "%{course} como profesor."
+      teacher_title: "Invitado como profesor, haga clic para ver el Curso"
     primary_header_navigation: 
       menu: 
         calendar: Calendario
@@ -13823,7 +13823,7 @@ es:
       social_instructions: "Revise los métodos de contacto que desea que sean visibles para otros en su perfil."
       title: Título
       titles: 
-        click_to_change_profile_pic: "Haga click para cambiar su foto de perfil"
+        click_to_change_profile_pic: "Haga clic para cambiar su foto de perfil"
       user_has_no_bio: "%{user} no ha agregado una biografía"
       ways_to_contact_user: "Formas de contactar a %{name}"
     recent_activity: 
@@ -13949,7 +13949,7 @@ es:
       no_marks: "Sin Marcas"
       out_of_points: "%{points}/%{total} pts"
       titles: 
-        full_comments: "Hacer click para ver comentarios completos"
+        full_comments: "Hacer clic para ver comentarios completos"
         linked_to_learning_outcome: "Este criterio depende de un Resultado de Aprendizaje"
     select_content_dialog: 
       add_to_module: "Agregar %{item} al *módulo*"
@@ -14026,7 +14026,7 @@ es:
       unauthorized_user_is_other: "%{current_user}, no está autorizado para ver esta página. El enlace que siguió para llegar aquí fue para **%{unauthorized_user} (%{unauthorized_user_email})**. Si ese es usted, deberá salir y volver a ingresar con ese correo electrónico para poder accesar esta página."
     unauthorized_feed: 
       bad_params: "Los parámetros para el canal que quería accesar son inválidos."
-      feedback: "Si está seguro que este url debería trabajar, por favor díganos como llegar aquí haciendo click en el siguiente enlace, y lo investigaremos."
+      feedback: "Si está seguro que este url debería trabajar, por favor díganos cómo llegar aquí haciendo clic en el siguiente enlace, y lo investigaremos."
       links: 
         feedback: "Díganos qué es lo que anda buscando"
       title: "Canal Inválido"
@@ -14045,8 +14045,8 @@ es:
       user_list_explanation: "Formato de muestra: \"Alumno de ejemplo\" <student@example.com>, \"Apellido, Nombre\" <firstlast@example.com>, justAnEmailAddress@example.com"
     wiki_image: 
       titles: 
-        click_to_embed: "Haga click para incluír %{image}"
-        embed_image: "Haga click para incluír imagen"
+        click_to_embed: "Haga clic para incluír %{image}"
+        embed_image: "Haga clic para incluír imagen"
     wiki_sidebar: 
       aria: 
         file_label: "Seleccione un archivo. Límite de cargas 50"
@@ -14061,37 +14061,37 @@ es:
         insert_link: "Insertar Enlace"
         upload: Cargar
         upload_files: "Cargar Archivos a la Carpeta"
-      click_links: "Haga click en cualquier página para insertar un enlace a esa página."
+      click_links: "Haga clic en cualquier página para insertar un enlace a esa página."
       course_links: "Enlazar a otro contenido en el curso."
       drop_files: "Poner Archivos Aquí para cargarlos"
       drop_images: "Poner Imagenes Aquí para cargarlos"
       file_size_limit: "límite de %{size} por archivo"
       files_remaining: "*0* más que cargar"
-      files_tab: "Hacer click en cualquier archivo para insertar un enlace descargado para ese archivo."
+      files_tab: "Hacer clic en cualquier archivo para insertar un enlace descargado para ese archivo."
       group_links: "Enlazar a otro contenido en el grupo."
       headings: 
         insert_content: "Insertar Contenido dentro de la Página"
       images: 
         alt: 
           loading: Cargando...
-      images_tab: "Hacer click en cualquier imagen para insertar la imagen en la página."
+      images_tab: "Hacer clic en cualquier imagen para insertar la imagen en la página."
       insert: 
-        announcements: "Haga click para insertar un enlace a este anuncio"
-        announcements_page: "Haga click para insertar un enlace a la página de anuncios"
-        assignments: "Haga click para insertar un enlace a esta tarea"
-        assignments_page: "Haga click para insertar un enlace a la página de tareas"
-        collaborations_page: "Hacer click para insertar un enlace a la página de colaboraciones"
-        discussions: "Haga click para insertar un enlace a este tema"
-        discussions_page: "Haga click para insertar un enlace a la página de foros"
-        files_page: "Haga click para insertar un enlace a la página de archivos"
-        grades_page: "Haga click para insertar un enlace a la página de calificaciones"
-        modules: "Haga click para insertar un enlace a este módulo"
-        modules_page: "Haga click para insertar un enlace a la página de módulos"
-        quizzes: "Haga click para insertar un enlace a esta evaluación"
-        syllabus_page: "Haga click para insertar un enlace al programa de estudios"
-        users_page: "Haga click para insertar un enlace a la página de personas"
-        wiki_pages: "Haga click para insertar un enlace a esta página"
-        wiki_pages_index: "Haga click para insertar un enlace al wiki"
+        announcements: "Haga clic para insertar un enlace a este anuncio"
+        announcements_page: "Haga clic para insertar un enlace a la página de anuncios"
+        assignments: "Haga clic para insertar un enlace a esta tarea"
+        assignments_page: "Haga clic para insertar un enlace a la página de tareas"
+        collaborations_page: "Hacer clic para insertar un enlace a la página de colaboraciones"
+        discussions: "Haga clic para insertar un enlace a este tema"
+        discussions_page: "Haga clic para insertar un enlace a la página de foros"
+        files_page: "Haga clic para insertar un enlace a la página de archivos"
+        grades_page: "Haga clic para insertar un enlace a la página de calificaciones"
+        modules: "Haga clic para insertar un enlace a este módulo"
+        modules_page: "Haga clic para insertar un enlace a la página de módulos"
+        quizzes: "Haga clic para insertar un enlace a esta evaluación"
+        syllabus_page: "Haga clic para insertar un enlace al programa de estudios"
+        users_page: "Haga clic para insertar un enlace a la página de personas"
+        wiki_pages: "Haga clic para insertar un enlace a esta página"
+        wiki_pages_index: "Haga clic para insertar un enlace al wiki"
       labels: 
         folder: Carpeta
       links: 
@@ -14412,7 +14412,7 @@ es:
       group_comment: "Enviar un comentario al grupo entero"
     late: TARDE
     links: 
-      click_to_view: "haga click aquí para ver"
+      click_to_view: "haga clic aquí para ver"
     loading_comments: "Cargando comentarios..."
     more_details_in_the_speedgrader: "Más detalles en el Calificador Rápido"
     post_comment: "Publicar Comentario"
@@ -14423,7 +14423,7 @@ es:
   submissions: 
     assignment_submit_success: "Se envío la tarea."
     assignment_submitted: "Tarea enviada."
-    click_to_download: "Hacer click aquí para descargar %{size_of_file}"
+    click_to_download: "Hacer clic aquí para descargar %{size_of_file}"
     creating_zip: "Creando un archivo comprimido zip..."
     download_submissions: "Descargar los Envíos de Tareas"
     download_submissions_title: "Descargar los envíos de tareas"
@@ -14463,7 +14463,7 @@ es:
         resubmit: "Renviar la tarea"
         submit: "Enviar Tarea"
       media_comment: "Comentario de Media"
-      media_comment_link: "Este es un comentario de media, *hacer click aquí para ver*."
+      media_comment_link: "Este es un comentario de media, *hacer clic aquí para ver*."
       only_see_your_own_comments_muted: "Es posible que no vea todos los comentarios ahora porque la tarea está siendo calificada"
       only_see_your_own_comments_peer: "Como alumno de revisión conjunta, solo verá los comentarios escritos por usted."
       options: 
@@ -15269,11 +15269,11 @@ es:
       linked_to_user: "(Enlazado a %{user_name})"
       links: 
         teacher_activity: "Ver el Reporte de Interaccones de Estudiantes"
-      roles_designer: "Inscrito como un Diseñador."
-      roles_observer: "Inscrito como un Observador."
-      roles_student: "Inscrito como un Estudiante."
-      roles_ta: "Inscrito como un AP."
-      roles_teacher: "Inscrito como un Profesor."
+      roles_designer: "Inscrito como Diseñador."
+      roles_observer: "Inscrito como Observador."
+      roles_student: "Inscrito como Estudiante."
+      roles_ta: "Inscrito como AP."
+      roles_teacher: "Inscrito como Profesor."
       unenrollr: "Anular la inscripción"
       unpublished: "No publicado"
     errors: 
@@ -15399,7 +15399,7 @@ es:
       overview_video: "Video de resumen en Canvas"
       registration_complete: "Inscripción Completa"
       resending: Reenviando...
-      sent_email_paragraph: "Le enviamos un correo electrónico a %{email_address}. *Haga click en el enlace en el correo para completar la inscripción*. Si no lo puede ver, **haga click en reenviar el correo electrónico**, y asegurese de revisar su bandeja de spam."
+      sent_email_paragraph: "Le enviamos un correo electrónico a %{email_address}. *Haga clic en el enlace en el correo para completar la inscripción*. Si no lo puede ver, **haga clic en reenviar el correo electrónico**, y asegurese de revisar su bandeja de spam."
       while_you_wait: "Mientras está esperando..."
     scheduled_conference: 
       current_conference_text: "Ha recibido una invitación para participar en %{conference}. Comienza el %{starts_at}."
