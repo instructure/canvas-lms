@@ -20,25 +20,41 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe ObserverEnrollment do
   before do
-    course(:active_all => 1)
+    @course1 = course(:active_all => 1)
     @student = user
     @observer = user
-    @student_enrollment = @course.enroll_student(@student)
-    @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment')
+    @student_enrollment = @course1.enroll_student(@student)
+    @observer_enrollment = @course1.enroll_user(@observer, 'ObserverEnrollment')
     @observer_enrollment.update_attribute(:associated_user_id, @student.id)
+
+    @course2 = course(:active_all => 1)
+    @student_enrollment2 = @course2.enroll_student(@student)
+    @observer_enrollment2 = @course2.enroll_user(@observer, 'ObserverEnrollment')
+    @observer_enrollment2.update_attribute(:associated_user_id, @student.id)
   end
+
+  describe 'observed_enrollments_for_courses' do
+    it "retrieve observed enrollments for courses passed in" do
+      expect(ObserverEnrollment.observed_enrollments_for_courses([@course1, @course2], @observer).sort)
+        .to eq([@student_enrollment, @student_enrollment2].sort)
+    end
+  end
+
   describe 'observed_students' do
     it "should not fail if the observed has been deleted" do
-      expect(ObserverEnrollment.observed_students(@course, @observer)).to eq({ @student => [@student_enrollment]})
+      expect(ObserverEnrollment.observed_students(@course1, @observer)).to eq({ @student => [@student_enrollment]})
       @student_enrollment.destroy
-      expect(ObserverEnrollment.observed_students(@course, @observer)).to eq({})
+      expect(ObserverEnrollment.observed_students(@course1, @observer)).to eq({})
     end
   end
   describe 'observed_student_ids_by_observer_id' do
     it "should return a properly formatted hash" do
       @observer_two = user
-      @observer_enrollment_two = @course.enroll_user(@observer_two, 'ObserverEnrollment')
-      expect(ObserverEnrollment.observed_student_ids_by_observer_id(@course, [@observer.id,@observer_two.id])).to eq({@observer.id => [@student.id], @observer_two.id => []})
+      @observer_enrollment_two = @course1.enroll_user(@observer_two, 'ObserverEnrollment')
+      expect(ObserverEnrollment
+               .observed_student_ids_by_observer_id(@course1,
+                                                    [@observer.id,@observer_two.id]))
+        .to eq({@observer.id => [@student.id], @observer_two.id => []})
     end
   end
 
@@ -46,7 +62,7 @@ describe ObserverEnrollment do
     it "doesn't send enrollment notifications" do
       Notification.create!(:name => "Enrollment Notification")
       user_with_pseudonym
-      e = @course.enroll_user(@user, 'ObserverEnrollment')
+      e = @course1.enroll_user(@user, 'ObserverEnrollment')
       expect(e.messages_sent).to be_empty
     end
   end

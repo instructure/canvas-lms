@@ -318,7 +318,7 @@ class CoursesController < ApplicationController
   #   'StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'ObserverEnrollment',
   #   or 'DesignerEnrollment'.
   #
-  # @argument include[] [String, "needs_grading_count"|"syllabus_body"|"total_scores"|"term"|"course_progress"|"sections"|"storage_quota_used_mb"|"total_students"|"favorites"|"teachers"]
+  # @argument include[] [String, "needs_grading_count"|"syllabus_body"|"total_scores"|"term"|"course_progress"|"sections"|"storage_quota_used_mb"|"total_students"|"favorites"|"teachers"|"observed_users"]
   #   - "needs_grading_count": Optional information to include with each Course.
   #     When needs_grading_count is given, and the current user has grading
   #     rights, the total number of submissions needing grading for all
@@ -365,6 +365,9 @@ class CoursesController < ApplicationController
   #   - "teachers": Teacher information to include with each Course.
   #     Returns an array of hashes containing the {{api:Users:UserDisplay UserDisplay} information
   #     for each teacher in the course.
+  #   - "observed_users": Optional information to include with each Course.
+  #     Will include data for observed users if the current user has an
+  #     observer enrollment.
   #
   # @argument state[] [String, "unpublished"|"available"|"completed"|"deleted"]
   #   If set, only return courses that are in the given state(s).
@@ -1478,9 +1481,7 @@ class CoursesController < ApplicationController
         enrollments = @course.current_enrollments.where(:user_id => @current_user).to_a
         if includes.include?("observed_users") &&
             enrollments.any?(&:assigned_observer?)
-          observees = ObserverEnrollment.observed_students(@course,
-                                                           @current_user)
-          observees.values.each { |v| enrollments.concat(v) }
+          enrollments.concat(ObserverEnrollment.observed_enrollments_for_courses(@course, @current_user))
         end
 
         includes << :hide_final_grades
@@ -2372,7 +2373,14 @@ class CoursesController < ApplicationController
     # render view
   end
 
+  def retrieve_observed_enrollments(user, enrollments)
+    courses = enrollments.select(&:assigned_observer?).map(&:course).uniq
+    ObserverEnrollment.observed_enrollments_for_courses(courses, user)
+  end
+
   def courses_for_user(user)
+    include_observed = params.fetch(:include, []).include?("observed_users")
+
     if params[:state]
       states = Array(params[:state])
       states += %w(created claimed) if states.include?('unpublished')
@@ -2383,6 +2391,8 @@ class CoursesController < ApplicationController
     else
       enrollments = user.cached_current_enrollments(preload_courses: true)
     end
+
+    enrollments.concat(retrieve_observed_enrollments(user, enrollments)) if include_observed
 
     # TODO: preload roles after enrollment#role shim is taken out
     if params[:enrollment_role]

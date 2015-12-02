@@ -38,6 +38,51 @@ describe "Favorites API", type: :request do
 
       expect(@user.favorites.size).to be_zero
     end
+
+    context "observed users" do
+      before :once do
+        @observer_enrollment = course_with_observer(active_all: true)
+        @observer = @user
+        @courses << @course
+        @observer_course = @course
+        @observed_student = create_users(1, return_type: :record).first
+        @student_enrollment =
+          @observer_course.enroll_student(@observed_student,
+                                          :enrollment_state => 'active')
+        @assigned_observer_enrollment =
+          @observer_course.enroll_user(@observer, "ObserverEnrollment",
+                                       :associated_user_id => @observed_student.id)
+        @assigned_observer_enrollment.accept
+      end
+
+      it "includes observed users" do
+        json = api_call_as_user(@observer, :get,
+                                "/api/v1/users/self/favorites/courses?include[]=observed_users",
+                                :controller=>"favorites", :include => [ "observed_users" ],
+                                :action=>"list_favorite_courses", :format=>"json")
+
+        expect(json[0]['enrollments']).to eq [{
+           "type" => "observer",
+           "role" => @assigned_observer_enrollment.role.name,
+           "role_id" => @assigned_observer_enrollment.role.id,
+           "user_id" => @assigned_observer_enrollment.user_id,
+           "enrollment_state" => "active",
+           "associated_user_id" => @observed_student.id
+         }, {
+           "type" => "observer",
+           "role" => @observer_enrollment.role.name,
+           "role_id" => @observer_enrollment.role.id,
+           "user_id" => @observer_enrollment.user_id,
+           "enrollment_state" => "active"
+         }, {
+           "type" => "student",
+           "role" => @student_enrollment.role.name,
+           "role_id" => @student_enrollment.role.id,
+           "user_id" => @student_enrollment.user_id,
+           "enrollment_state" => "active"
+         }]
+      end
+    end
   end
 
   context "explicit favorites" do

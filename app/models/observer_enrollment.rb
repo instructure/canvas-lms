@@ -21,20 +21,30 @@ class ObserverEnrollment < Enrollment
     true
   end
 
+  def self.observed_enrollments_for_courses(contexts, user)
+    contexts = Array(contexts)
+    observed_students = []
+    Shard.partition_by_shard(contexts) do |sharded_contexts|
+      observer_enrollments = user.observer_enrollments.where(course_id: sharded_contexts)
+        .where('associated_user_id IS NOT NULL')
+
+      observer_enrollments.group_by(&:course_id).each do |course_id, enrollments|
+        associated_user_ids = enrollments.map(&:associated_user_id)
+        students = StudentEnrollment.active.where(user_id: associated_user_ids, course_id: course_id)
+        observed_students.concat(students)
+      end
+    end
+    observed_students
+  end
+
   # returns a hash mapping students to arrays of enrollments
   def self.observed_students(context, current_user)
     RequestCache.cache(:observed_students, context, current_user) do
       context.shard.activate do
-        observer_enrollments = context.observer_enrollments.where("user_id=? AND associated_user_id IS NOT NULL", current_user)
-        observed_students = {}
-        observer_enrollments.each do |e|
-          student_enrollment = StudentEnrollment.active.where(user_id: e.associated_user_id, course_id: e.course_id).first
-          next unless student_enrollment
-          student = student_enrollment.user
-          observed_students[student] ||= []
-          observed_students[student] << student_enrollment
-        end
-        observed_students
+        associated_user_ids = context.observer_enrollments.where(user_id: current_user)
+          .where("associated_user_id IS NOT NULL").pluck(:associated_user_id)
+        context.student_enrollments.active
+          .where(user_id: associated_user_ids).group_by(&:user)
       end
     end
   end
@@ -48,7 +58,10 @@ class ObserverEnrollment < Enrollment
 
   def self.observed_student_ids_by_observer_id(course, observers)
     # select_all allows plucking multiplecolumns without instantiating AR objects
-    obs_hash = connection.select_all( ObserverEnrollment.where(course_id: course, user_id: observers).select([:user_id, :associated_user_id])).group_by{|record| record["user_id"]}
+    obs_hash = connection.select_all(ObserverEnrollment
+                                       .where(course_id: course, user_id: observers)
+                                       .select([:user_id, :associated_user_id]))
+      .group_by{|record| record["user_id"]}
     obs_hash.keys.each{ |key|
       obs_hash[key.to_i] = obs_hash.delete(key).map{|v|
         v["associated_user_id"].try(:to_i)

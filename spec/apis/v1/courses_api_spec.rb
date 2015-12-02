@@ -252,7 +252,7 @@ describe CoursesController, type: :request do
       @assigned_observer_enrollment.accept
     end
 
-    it "should include observed users in the enrollments if requested" do
+    it "should include observed users in the enrollments in a specific course if requested" do
       json = api_call_as_user(@observer, :get,
                               "/api/v1/courses/#{@observer_course.id}?include[]=observed_users",
                               { :controller => 'courses', :action => 'show',
@@ -278,6 +278,59 @@ describe CoursesController, type: :request do
          "role" => @student_enrollment.role.name,
          "role_id" => @student_enrollment.role.id,
          "user_id" => @student_enrollment.user_id,
+         "enrollment_state" => "active"
+       }]
+    end
+
+    it "should include observed users in the enrollments if requested" do
+      json = api_call_as_user(@observer, :get,
+                              "/api/v1/courses?include[]=observed_users",
+                              { :controller => 'courses', :action => 'index',
+                                :id => @observer_course.to_param,
+                                :format => 'json',
+                                :include => [ "observed_users" ] })
+
+      expect(json[0]['enrollments']).to eq [{
+         "type" => "observer",
+         "role" => @assigned_observer_enrollment.role.name,
+         "role_id" => @assigned_observer_enrollment.role.id,
+         "user_id" => @assigned_observer_enrollment.user_id,
+         "enrollment_state" => "active",
+         "associated_user_id" => @observed_student.id
+       }, {
+         "type" => "observer",
+         "role" => @observer_enrollment.role.name,
+         "role_id" => @observer_enrollment.role.id,
+         "user_id" => @observer_enrollment.user_id,
+         "enrollment_state" => "active"
+       }, {
+         "type" => "student",
+         "role" => @student_enrollment.role.name,
+         "role_id" => @student_enrollment.role.id,
+         "user_id" => @student_enrollment.user_id,
+         "enrollment_state" => "active"
+       }]
+    end
+
+    it "should not include observed users in the enrollments if not requested" do
+      json = api_call_as_user(@observer, :get,
+                              "/api/v1/courses",
+                              { :controller => 'courses', :action => 'index',
+                                :id => @observer_course.to_param,
+                                :format => 'json' })
+
+      expect(json[0]['enrollments']).to eq [{
+         "type" => "observer",
+         "role" => @assigned_observer_enrollment.role.name,
+         "role_id" => @assigned_observer_enrollment.role.id,
+         "user_id" => @assigned_observer_enrollment.user_id,
+         "enrollment_state" => "active",
+         "associated_user_id" => @observed_student.id
+       }, {
+         "type" => "observer",
+         "role" => @observer_enrollment.role.name,
+         "role_id" => @observer_enrollment.role.id,
+         "user_id" => @observer_enrollment.user_id,
          "enrollment_state" => "active"
        }]
     end
