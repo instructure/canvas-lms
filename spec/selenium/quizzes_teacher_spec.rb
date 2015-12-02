@@ -66,6 +66,77 @@ describe "quizzes" do
       expect(group_form.find_element(:css, '.group_display.name')).to include_text('new group')
     end
 
+    it 'should display post to SIS icon on quiz page when enabled' do
+      Account.default.set_feature_flag!('post_grades', 'on')
+
+      @q1 = quiz_create
+      @q2 = quiz_create
+      @q3 = quiz_create
+
+      @q1.post_to_sis = true
+      @q2.post_to_sis = false
+      @q3.post_to_sis = true
+
+      @q1.save!
+      @q2.save!
+      @q3.save!
+
+      get "/courses/#{@course.id}/quizzes/"
+      wait_for_ajaximations
+
+      expect(find_all('.post-to-sis-status.enabled').count).to be 2
+      expect(find_all('.post-to-sis-status.disabled').count).to be 1
+
+      Account.default.set_feature_flag!('post_grades', 'off')
+
+      get "/courses/#{@course.id}/quizzes/"
+      wait_for_ajaximations
+
+      expect(find_all('.post-to-sis-status.enabled').count).to be 0
+      expect(find_all('.post-to-sis-status.disabled').count).to be 0
+    end
+
+    it 'should display post to SIS icon on quiz page when enabled' do
+      Account.default.set_feature_flag!('post_grades', 'on')
+
+      @q1 = quiz_create
+      @q2 = quiz_create
+      @q3 = quiz_create
+
+      @q1.post_to_sis = true
+      @q2.post_to_sis = false
+      @q3.post_to_sis = true
+
+      @q1.save!
+      @q2.save!
+      @q3.save!
+
+      get "/courses/#{@course.id}/quizzes/"
+      wait_for_ajaximations
+
+      enabled = find_all('.post-to-sis-status.enabled')
+      disabled = find_all('.post-to-sis-status.disabled')
+
+      expect(enabled.count).to be 2
+      expect(disabled.count).to be 1
+
+      enabled.each(&:click)
+      disabled.each(&:click)
+
+      wait_for_ajaximations
+
+      @q1.reload
+      @q2.reload
+      @q3.reload
+
+      expect(@q1.post_to_sis?).to be_falsey
+      expect(@q2.post_to_sis?).to be_truthy
+      expect(@q3.post_to_sis?).to be_falsey
+
+      expect(find_all('.post-to-sis-status.enabled').count).to be 1
+      expect(find_all('.post-to-sis-status.disabled').count).to be 2
+    end
+
     it "should update a question group", priority: "1", test_id: 210061 do
       skip('fragile')
       get "/courses/#{@course.id}/quizzes/new"

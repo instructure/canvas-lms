@@ -979,6 +979,15 @@ class Quizzes::Quiz < ActiveRecord::Base
     end
   end
 
+  def post_to_sis=(post_to_sis)
+    return unless assignment
+    assignment.post_to_sis = post_to_sis
+  end
+
+  def post_to_sis?
+    assignment && assignment.post_to_sis
+  end
+
   def unpublished_changes?
     self.last_edited_at && self.published_at && self.last_edited_at > self.published_at
   end

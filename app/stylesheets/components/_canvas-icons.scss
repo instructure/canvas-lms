@@ -305,6 +305,9 @@ Either use `<a>` with icon desired icon class added or insert `<i>` inside `<but
   <span class="span3"><i class="icon-equation"></i> icon-equation</span>
   <span class="span3"><i class="icon-commons"></i> icon-commons</span>
 </div>
+<div class="row-fluid">
+  <span class="span3"><i class="icon-post-to-sis"></i> icon-post-to-sis</span>
+</div>
 */
 
 
@@ -519,6 +522,7 @@ h1, h2, h3, h4, .h1, .h2, .h3, .h4, p {
 .icon-pin:before { content: "\f173"; }
 .icon-pinterest:before { content: "\f174"; }
 .icon-plus:before { content: "\f175"; }
+.icon-post-to-sis:before { content: "\f1b8"; }
 .icon-prerequisite:before { content: "\f176"; }
 .icon-printer:before { content: "\f177"; }
 .icon-publish:before { content: "\f178"; }
@@ -588,6 +592,3 @@ span.screen-reader-text {
   left: -9999px;
   font-size: 4px;
 }
-
-
-

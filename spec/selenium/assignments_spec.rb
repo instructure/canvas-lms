@@ -576,6 +576,61 @@ describe "assignments" do
         wait_for_ajaximations
         expect(f('#assignment_post_to_sis')).to be_nil
       end
+
+      it 'should display post to SIS icon on assignments page when enabled' do
+        Account.default.set_feature_flag!('post_grades', 'on')
+
+        @a1 = @course.assignments.create!(:name => 'assignment 1', :post_to_sis => true)
+        @a2 = @course.assignments.create!(:name => 'assignment 2', :post_to_sis => false)
+        @a3 = @course.assignments.create!(:name => 'assignment 3', :post_to_sis => true)
+
+        get "/courses/#{@course.id}/assignments/"
+        wait_for_ajaximations
+
+        expect(find_all('.post-to-sis-status.enabled').count).to be 2
+        expect(find_all('.post-to-sis-status.disabled').count).to be 1
+
+        Account.default.set_feature_flag!('post_grades', 'off')
+
+        get "/courses/#{@course.id}/assignments/"
+        wait_for_ajaximations
+
+        expect(find_all('.post-to-sis-status.enabled').count).to be 0
+        expect(find_all('.post-to-sis-status.disabled').count).to be 0
+      end
+
+      it 'should toggle the post to SIS feature when clicked' do
+        Account.default.set_feature_flag!('post_grades', 'on')
+
+        @a1 = @course.assignments.create!(:name => 'assignment 1', :post_to_sis => true)
+        @a2 = @course.assignments.create!(:name => 'assignment 2', :post_to_sis => false)
+        @a3 = @course.assignments.create!(:name => 'assignment 3', :post_to_sis => true)
+
+        get "/courses/#{@course.id}/assignments/"
+        wait_for_ajaximations
+
+        enabled = find_all('.post-to-sis-status.enabled')
+        disabled = find_all('.post-to-sis-status.disabled')
+
+        expect(enabled.count).to be 2
+        expect(disabled.count).to be 1
+
+        enabled.each(&:click)
+        disabled.each(&:click)
+
+        wait_for_ajaximations
+
+        @a1.reload
+        @a2.reload
+        @a3.reload
+
+        expect(@a1.post_to_sis).to be_falsey
+        expect(@a2.post_to_sis).to be_truthy
+        expect(@a3.post_to_sis).to be_falsey
+
+        expect(find_all('.post-to-sis-status.enabled').count).to be 1
+        expect(find_all('.post-to-sis-status.disabled').count).to be 2
+      end
     end
 
     it 'should go to the assignment index page from left nav', priority: "1", test_id: 108724 do

@@ -1989,6 +1989,7 @@ class ApplicationController < ActionController::Base
         :context_modules_url => api_v1_course_context_modules_path(@context),
         :course_student_submissions_url => api_v1_course_student_submissions_url(@context)
       },
+      :POST_TO_SIS => Assignment.sis_grade_export_enabled?(@context),
       :PERMISSIONS => permissions,
       :DIFFERENTIATED_ASSIGNMENTS_ENABLED => @context.feature_enabled?(:differentiated_assignments),
       :VALID_DATE_RANGE => CourseDateRange.new(@context),

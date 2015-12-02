@@ -41,7 +41,8 @@ class Quizzes::QuizzesController < ApplicationController
     :read_only,
     :managed_quiz_data,
     :submission_versions,
-    :submission_html
+    :submission_html,
+    :toggle_post_to_sis
   ]
   before_filter :set_download_submission_dialog_title , only: [:show,:statistics]
   after_filter :lock_results, only: [ :show, :submission_html ]
@@ -121,7 +122,8 @@ class Quizzes::QuizzesController < ApplicationController
         read_question_banks: can_manage || can_do(@context, @current_user, :read_question_banks)
       },
       :FLAGS => {
-        question_banks: feature_enabled?(:question_banks)
+        question_banks: feature_enabled?(:question_banks),
+        post_to_sis_enabled: Assignment.sis_grade_export_enabled?(@context)
       },
       :quiz_menu_tools => external_tools_display_hashes(:quiz_menu)
     })
@@ -477,6 +479,17 @@ class Quizzes::QuizzesController < ApplicationController
                            :other => "%{count} quizzes successfully unpublished!" },
                          :count => @quizzes.length)
 
+      respond_to do |format|
+        format.html { redirect_to named_context_url(@context, :context_quizzes_url) }
+        format.json { render :json => {}, :status => :ok }
+      end
+    end
+  end
+
+  def toggle_post_to_sis
+    if authorized_action(@quiz, @current_user, :update)
+      @quiz.post_to_sis = params[:post_to_sis]
+      @quiz.save!
       respond_to do |format|
         format.html { redirect_to named_context_url(@context, :context_quizzes_url) }
         format.json { render :json => {}, :status => :ok }

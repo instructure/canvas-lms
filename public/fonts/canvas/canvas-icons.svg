@@ -1,13 +1,13 @@
 <?xml version="1.0" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd" >
 <!--
-2015-9-11: Created with FontForge (http://fontforge.org)
+2015-12-9: Created with FontForge (http://fontforge.org)
 -->
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">
 <metadata>
-Created by FontForge 20150715 at Fri Sep 11 16:12:17 2015
- By Brad Horrocks
-Copyright (c) 2015, Brad Horrocks
+Created by FontForge 20150913 at Wed Dec  9 11:13:34 2015
+ By Davis McClellan
+Copyright (c) 2015, Davis McClellan
 </metadata>
 <defs>
 <font id="canvas-icons" horiz-adv-x="512" >
@@ -22,7 +22,7 @@ Copyright (c) 2015, Brad Horrocks
     bbox="-32 -64.416 513.008 449.376"
     underline-thickness="25.6"
     underline-position="-51.2"
-    unicode-range="U+0020-F1B7"
+    unicode-range="U+0020-F1B8"
   />
     <missing-glyph />
     <glyph glyph-name="space" unicode=" " horiz-adv-x="200" 
@@ -377,6 +377,8 @@ s43.3594 96.9287 96.8643 96.9287c5.90332 0 11.6631 -0.560547 17.2793 -1.56836c-0
 c21.792 27.6162 55.5195 45.3604 93.4238 45.3604c64.7041 0 117.312 -51.6797 118.928 -116.032zM255.968 32l96 96h-64v96h-64v-96h-64z" />
     <glyph glyph-name="uniF147" unicode="&#xf147;" 
 d="M512 192h-64v-256h-128v128h-128v-128h-128v256h-64l256 256z" />
+    <glyph glyph-name="uniF1B8" unicode="&#xf1b8;" 
+d="M512 448v-416h-64v-96h-448v448h96v64h416zM160 384v-288h288v288h-288zM96 32v288h-32v-320h320v32h-288zM416 288h-160v-32h128v-96h-192v32h160v32h-128v96h192v-32z" />
     <glyph glyph-name="uniF137" unicode="&#xf137;" 
 d="M0 192c0 141.385 114.615 256 256 256s256 -114.615 256 -256s-114.615 -256 -256 -256s-256 114.615 -256 256zM51.2002 192c0 -113.108 91.6914 -204.8 204.8 -204.8s204.8 91.6914 204.8 204.8s-91.6914 204.8 -204.8 204.8s-204.8 -91.6914 -204.8 -204.8z
 M196.267 277.333h114.999v-30.2383h-79.0332v-37.7988h68.4961v-27.9482h-68.4961v-67.5791h-35.9658v163.564z" />
