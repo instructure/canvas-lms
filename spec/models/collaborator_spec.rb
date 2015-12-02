@@ -28,7 +28,7 @@ describe Collaborator do
   end
 
   context 'broadcast policy' do
-    it 'should notify collaborating users' do
+    it 'should notify collaborating users', priority: "1", test_id: 193152 do
       user = user_with_pseudonym(:active_all => true)
       NotificationPolicy.create(:notification => @notification,
                                 :communication_channel => user.communication_channel,

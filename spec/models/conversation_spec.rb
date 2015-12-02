@@ -422,7 +422,7 @@ describe Conversation do
       end
     end
 
-    it "should broadcast conversation created" do
+    it "should broadcast conversation created", priority: "1", test_id: 193163 do
 
       n2 = Notification.create(:name => "Conversation Created", :category => "TestImmediately")
 
