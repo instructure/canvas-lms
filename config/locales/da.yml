@@ -47,6 +47,7 @@ da:
   a_full_size_logo_that_appears_in_the_right_sidebar_18873685: "Et fuld-størrelse logo forekommer i sidepanelet for Canvas oversigten. Ideel størrelse er 360x140 pixels. Accepterede formater: svg, png, jpeg, fig"
   a_handy_key_value_dump_of_a_host_of_interesting_en_d0518dfe: "En praktisk nøgle/værdi dump af en række interessante miljø informationer for den rapporterende bruger"
   a_message_is_required_129e1814: "En besked er nødvendig"
+  a_new_assignment_has_been_created_for_your_course__12b72639: "En ny opgave er blevet oprettet for dit kursus, %{course_name}"
   a_problem_occurred_adding_reviewers_57b083d9: "Der opstod et problem under tilføjelse af censorer."
   a_table_containing_the_name_of_the_grading_scheme__2c25dc3: "En tabel indeholdende navene på bedømmelsessystemet og ikoner for redigering eller sletning af system."
   a_table_that_contains_the_grading_scheme_data_each_d461c205: "En tabel, der indeholder bedømmelsessystem data. Hver rækker indeholder et navn, en maksimal procent og en minimum procent. Derudover indeholder hver række et ikon til at tilføje en ny række og et ikon til at slette den aktive række."
@@ -1220,13 +1221,17 @@ da:
   activity_by_date_878c5b49: "Aktivtet efter dato"
   add_2nd_review_ea988088: "Tilføj 2. gennemgang"
   add_8523c19b: Tilføj
+  add_a_new_course_4a041207: "Tilføj et nyt kursus"
+  add_a_new_user_c440d053: "Tilføj en ny bruger"
   add_an_identity_provider_to_this_account_c2644478: "Tilføj en indentitetsudbyder til denne konto:"
   add_app_baf540f: "Tilføj App"
   add_attachment_93868828: "Tilføj vedhæftet dokument"
   add_content_to_module_name_589a8d54: "Tilføj indhold til %{module_name}"
+  add_course_406cb773: "Tilføj kursus"
   add_course_assignments_628ed6d0: "Tilføj kursusopgaver"
   add_course_calendar_events_146154a5: "Tilføj kursus kalender begivenheder"
   add_files_to_the_course_da6ffd32: "Tilføj filer til kurset"
+  add_folder_ba50d107: "Tilføj mappe"
   add_grading_period_6f774dc3: "Tilføj bedømmelsesperiode"
   add_grading_scheme_81e23c05: "Tilføj bedømmelsessystem"
   add_icon_567dbcaa: "tilføj ikon"
@@ -1246,6 +1251,7 @@ da:
   add_section_8b027a1c: "Tilføj sektion"
   add_students_to_the_course_874be8fb: "Tilføj studerende til kurset"
   add_tas_to_the_course_2aac6e02: "Tilføj undervisningsassistent til kurset"
+  add_user_e73e8e50: "Tilføj bruger"
   add_your_assignments_you_can_just_make_a_long_list_8a7862dd: "Tilføj dine opgaver. Du kan blot oprette en lang liste, eller inddele dem i grupper - og endda specificerer vægtning for hver opgavegruppe."
   add_your_zendesk_instance_s_custom_field_id_for_ea_3aeb75f4: "Tilføj din Zendesk Instance kundefelt ID for hver af de følgende (felter som ikke har ID vil ikke blive logget):"
   admin_4d3ba42f: Admin
@@ -1317,6 +1323,7 @@ da:
   all_start_dates_must_be_before_the_end_date_d949eca9: "Alle startdatoer skal være før slutdatoer"
   all_students_have_taken_the_quiz_b558f8b4: "Alle studerende der har besvaret quizzen "
   all_students_have_taken_the_survey_494f9f42: "Alle studerende der har besvaret spørgeundersøgelsen"
+  all_terms_cd27b0fb: "Alle termer"
   allow_a_moderator_to_review_multiple_independent_g_752c4b90: "Tillad en moderator at evaluere flere uafhængige karakterer for valgte indsendelser"
   allow_bulk_grade_export_to_sis_e11a6e66: "Tillad samlet bedømmelseseksport til SIS"
   allow_lor_tools: "Tillad brugerne at se og bruge eksterne værtøjer til konfigurering af LOR."
@@ -1327,6 +1334,7 @@ da:
   allows_users_with_international_phone_numbers_to_r_f90f8522: "Tillad brugere med internationale telefonnumre at modtage tekstbeskeder fra Canvas."
   always_3a59e701: Altid
   an_error_accurred_selecting_provisional_grades_61b36f64: "En fejl optsod under valg af midlertidige karaktere"
+  an_error_occured_please_try_again_e59b65b: "Der opstod en fejl. Prøv venligst igen."
   an_error_occured_trying_to_generate_this_theme_ple_6ae581d: "En fejl opsted mens dette tema blev oprettet. Prøv venligst igen."
   an_error_occurred_please_post_your_reply_again_lat_b0220ac6: "*En fejl opstod*, post venligst dit svar igen senere"
   an_error_occurred_publishing_grades_cfdf7631: "En fejl opstod under offentliggørelse af karaktere."
@@ -1406,6 +1414,7 @@ da:
     podcast_feed_description_course: "Dette feed indeholder meddelelser fra kurset %{course}."
     podcast_feed_description_group: "Dette feed indeholder meddelelser fra gruppen %{group}."
     podcast_feed_name: "%{course} Meddelelser Podcast feed"
+  announcements_a4b8ed4a: Bekendtgørelser
   anonymous_e1b8ad27: Anonym
   anonymous_grading_ccb5045c: "Anonym bedømmelse"
   anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: "Anonym bedømmelse tvinger de studerendes navne til at være skjulte i SpeedGrader™"
@@ -1549,6 +1558,7 @@ da:
       grading_scheme_info: "Se/rediger bedømmelsesskema"
   assignment_976578a8: Besvarelse
   assignment_comments_e43ed898: "Besvarelse kommentare"
+  assignment_created_assignment_name_course_name_324a5639: "Opgave oprettet - %{assignment_name}, %{course_name}"
   assignment_details: 
     no_graded_submissions: "Ingen bedømte besvarelser "
   assignment_details_bc488179: Opgavedetaljer
@@ -2222,7 +2232,11 @@ da:
   availableslots_available_87b8b69d: "%{availableSlots} Tilgængelig"
   average_49c63f9b: Gennemsnit
   back_2900f52a: Tilbage
+  back_to_announcements_1036e43e: "Tilbage til bekendtgørelser"
   back_to_app_center_95420d83: "Tilbage til App center"
+  back_to_ref_title_377ea1f0: "Tilbage til %{ref_title}"
+  back_to_table_of_contents_d878b315: "Tilbage til indholdsfortegnelse"
+  back_to_title_39e7a8f4: "Tilbage til %{title}"
   background_color_b92b52ac: Baggrundsfarve
   background_image_1a401e1a: Baggrundsbillede
   base_847aca7c: Bund
@@ -2250,6 +2264,7 @@ da:
   body_shadow_d36e8c2e: Kropsskygge
   bookmark_service: 
     default_title: "Ingen Titel"
+  bounce_count_reset_c4c2218f: "Tilbagesendelsoptælling nulstillet!"
   breadcrumb_1_cb3c504: "Brødkrumme 1"
   breadcrumb_2_95ba94be: "Brødkrumme 2"
   broccoli_cloud: 
@@ -2738,6 +2753,8 @@ da:
         create_assignment: "Ændre en ny opgave"
         delete: "Slette en begvienhed/opgave"
         new: "Oprette en ny begivenhed"
+  calendars_toggle_list_visibility_488db143: "Synlighed for Kalender-skifteliste"
+  can_interact_with_users_in_their_section_only_48cb8c43: "Kan kun samarbejde med brugere i deres sektion"
   can_t_compute_score_until_an_assignment_has_points_f34dd600: "Kan ikke beregne score før en opgave har mulige points"
   can_t_delete_alignments_based_on_rubric_associatio_d9fd10a3: "Kan ikke slette en Rubric med tilknyttede vurderingskriterier. For at fjerne disse tilknytninger skal du fjerne rækken fra den aktive Rubric"
   can_t_perform_diffing_against_more_than_one_file_o_44475c0d: "Can ikke udføre forskel mod flere end en fil af samme type"
@@ -2766,12 +2783,14 @@ da:
         login_expiration_minimum: "Møde udløb skal være 20 minutter eller mere"
         need_integer: "Indtast venligst et heltal for playlist cache"
         stream_name_required: "Kinesis størm navn er nødvendig."
+  canvas_alert_change_assignment_name_course_name_2fc63d9c: "Canvas Notifikation - Ændring: %{assignment_name}, %{course_name}"
   canvas_by_instructure_1490381: "Canvas fra Instructure"
   canvas_cartridge_description: "Dette aktivere konvertering af en canvas eksport til det mellemliggende json format for import"
   canvas_cartridge_display: "Canvas fælles kasette"
   canvas_cartridge_file_description: "Canvas kursus eksportpakke"
   canvas_cartridge_name: "Canvas kassetteimporter"
   canvas_cloud_information_fdd404f2: "Canvas Cloud information"
+  canvas_dashboard_links_will_navigate_to_the_catalo_4143635e: "Canvas oversigtlinks vil navigere til Catalog oversigt"
   canvas_default_7f81a6b8: "Canvas standard"
   canvas_did_not_recognize_your_identity_provider_cb0e50fc: "Canvan kunne ikke genkende din identitetsudbyder"
   canvas_doesn_t_have_an_account_for_user_user_5bcae0dd: "Canvas har ikke en konto for bruger: %{user}"
@@ -2806,9 +2825,9 @@ da:
   change_name_to_568374c8: "Ændrer \"%{name}\" til"
   change_points_possible_to_match_rubric_dialog: 
     prompts: 
-      update_assignment_points: "Denne opgave har %{assignmentPoints} mulige points, ønsker du at ændre det til %{rubricPoints} mulige points for at matche dette vurderingskriterie?"
+      update_assignment_points: "Efterlader opgavens total points ved %{assignmentPoints} og vurderingskriteriets totale points ved %{rubricPoints} vil resultere i en maksimal mulig score på %{toPercentage_pointRatio} for studerendes indsendelser bedømt med vurderingskriteriet."
     titles: 
-      update_assignment_points: "Ændre mulige points for at matche vurderingskriterie?"
+      update_assignment_points: "Ændrer opgavepoints til at matche vurderingskriteriet?"
   changes_will_still_apply_if_you_leave_this_page_935cedc6: "Ændringer vil stadig være gældende, hvis du forlader denne side."
   child_s_username_dde3aa9: "Barns brugernavn"
   choose_a_color_or_course_nickname_for_course_2585e42c: "Vælg en farve eller kursus øgenavn for %{course}"
@@ -2822,6 +2841,7 @@ da:
   click_here_for_an_account_9536cb36: "Klik her for en konto"
   click_here_it_s_free_eeccb9cb: "Klik her, det er gratis!"
   click_here_on_the_calendar_link_c9965631: "Klik her på *Kalender* link"
+  click_here_to_see_the_file_79e2b366: "Klik her for at se filen."
   click_to_enter_comments_if_the_student_chooses_thi_507c20f6: "Klik her for at indtaste kommentarer, hvis den studerende vælger dette svar"
   click_to_modify_89fa26aa: "Klik for at ændre"
   click_to_report_profile_picture_370f9625: "Klik for at rapportere profilbillede"
@@ -3981,8 +4001,15 @@ da:
       all: Alle
       only_teachers: "Kun Undervisere"
       teachers_students: "Undervisere og studerende"
+  course_8a63b4a3: Kursus
+  course_and_user_search_ebc1ae41: "Kursus og bruger søgning"
   course_announcements_76b07340: Kursusmeddelelser
+  course_assignments_833b8cf1: Kursusopgaver
   course_atom_feed_9d95214e: "Kursus Atom feed"
+  course_calendar_7d3cba7b: Kursuskalender
+  course_collaborations_dadb327e: "Kursus samarbejder"
+  course_conferences_3d914c96: "Kursus konferencer"
+  course_content_a92eca20: "Kursus indhold"
   course_copy_argument_error: "En kursus kopi kræver et kildekursus."
   course_copy_description: "Overførsels plugin for kopiering af canvas kurser"
   course_copy_display: "Kursus kopi"
@@ -4033,7 +4060,10 @@ da:
       topic: "Ukendt emne"
       wiki_page: "Ukendt wiki side"
   course_files_62deb8f8: "Kursus filer"
+  course_grades_22adc27e: "Kursus karakterer"
+  course_home_4c4c0107: "Kursus hjem"
   course_home_sub_navigation_b1ee6b03: "Kursushjem under navigation"
+  course_id_8bd2a21c: "Kursus ID"
   course_implemented_apps_fa658f5a: "Kursusimplementerede Apps"
   course_list: 
     favorited_tooltip: "Klik for at fjerne fra kursusmenu."
@@ -4112,7 +4142,15 @@ da:
       wiki_id: "Wiki ID"
       workflow_state: "Workflow status"
   course_members_are_free_to_join_9b2603d4: "Kursusdeltagere kan tilmelde sig gratis"
+  course_modules_795cb95e: "Kursus moduler"
+  course_name_63b973d1: "Kursus navn"
+  course_name_is_required_90919349: "Kursus navn er nødvendligt"
+  course_name_successfully_added_48116a50: "%{course_name} er tilføjet successfuldt!"
   course_navigation_dd035109: Kursusnavigation
+  course_outcomes_7dc1cbc7: "Kursus indlæringsmål"
+  course_pages_449f1dd4: "Kursus sider"
+  course_people_3058c948: "Kursus personer"
+  course_quizzes_c337653c: "Kursus quizzer"
   course_restore: 
     restore_error: "Der var en fejl ved forsøg på gendannelse af kursus. Kursus blev ikke gendannet."
   course_search: 
@@ -4168,6 +4206,7 @@ da:
   course_starts_at_3a01f9da: "Kursus begynder ved"
   course_statistics: 
     unknown: ukendt
+  course_syllabus_5de1b0af: Kursuspensum
   course_users: 
     greater_than_three: "Indtast venligst et søgeord med tre eller flere karaktere"
     unknown_error: "Noget gik galt med din søgning, prøv venligst igen."
@@ -4313,6 +4352,10 @@ da:
         student: Student
       loading: "Loader studerende..."
       select_student: "Vælg Student"
+    link_validator: 
+      link_validator: "Kursuslink godkender"
+      link_validator_desc: "Kursuslink godkender søger gennem kursusinhold og returnerer enhver ugyldig eller ikke-reagerende link, som der findes. Denne process kan tage et par minutter."
+      page_title: "Kursuslink godkender"
     notices: 
       backup_restored: "Backup succesfuldt gendannet!"
       concluded: "Kursus fuldendt "
@@ -5079,6 +5122,7 @@ da:
       technology_education_director: "Teknologi undervisningsdirektør"
       united_states_and_canada: "United States og Canada"
       vp: VP
+  department_6abddd98: Afdeling
   description_436c48d7: Beskrivelse
   developer_key: 
     api_key: "Nøgle: *%{api_key}*"
@@ -5169,7 +5213,7 @@ da:
     default_discussion_title: "Ingen Titel"
     deleted_topic_notice: "Dette emne er blevet slettet"
     discussion: 
-      close_for_comments: "Lukket for kommentare"
+      close_for_comments: "Luk for kommentarer"
       delete: Slet
       due: Forfalden
       graded_discussion: "Bedømt diskussion:"
@@ -5177,7 +5221,7 @@ da:
       manage: Administrer
       move: "Flyt til..."
       no_due_date: "Ingen forfaldsdato"
-      open_for_comments: "Åben for kommentare"
+      open_for_comments: "Åbn for kommentarer"
       pin: Pin
       unpin: "Fjern pin"
       user_subscribed: "Du er tilmeldt til dette emne. Klik for at afmelde."
@@ -5339,12 +5383,12 @@ da:
       post_message: "Send besked"
     summary_view: 
       attached_file_name: "Vedhæftet: %{display_name}"
-      close_for_comments: "Lukket for kommentare"
+      close_for_comments: "Luk for kommentarer"
       delete: Slet
       drag_up_or_down_to_reorder: "Træk op eller ned for at ændre rækkefølge"
       locked: "Dette emne er lukket for kommentarer "
       manage: Administrer
-      open_to_comments: "Åben for kommentare"
+      open_to_comments: "Åben for kommentarer"
       this_topic_is_used_for_grading: "Dette emne er brugt for bedømmelse"
       topic_podcast_feed: "Emne Podcast feed"
     this_is_a_group_discussion: "Dette er en gruppediskussion"
@@ -5437,6 +5481,7 @@ da:
     unsubscribed: Aflmeld
     unsubscribed_hint: "Du er ikke tilmeldt dette emne. Klik for at tilmelde."
   display_course_catalog: "Vis en søgbar liste af kurser i denne rodkonto med \"inkluder dette kursus i offentlig kursus indeks\" flag aktiveret."
+  display_name_b80c243e: "Vis navn"
   display_total_grades_when_the_all_grading_periods__1d2b5cf: "Vis alle karakterer, når \"Alle bedømmelsesperioder\" menu muligheden er valgt (Flere bedømmelsesperioder skal være aktiveret)."
   display_totals_for_all_grading_periods_ad1ea050: "Vis totaler for \"Alle bedømmelsesperioder\""
   distribution_of_current_grades_in_courses_across_a_e6c82f5d: |-
@@ -5452,6 +5497,7 @@ da:
   done_8af51c9b: Luk
   done_editing_9f7379d9: "Færdig med redigering"
   down_5831a426: Ned
+  download_as_zip_5dae7f19: "Download som Zip"
   download_associated_files_f35dcb5e: "Download associerede filer"
   download_c7ffdfb9: Download
   download_course_content_7f66edc9: "Download kursusindhold"
@@ -5462,7 +5508,9 @@ da:
   dropdown_option_1_e6ff2fc: "Rullegardinmulighed 1"
   dropdown_option_2_9766a346: "Rullegardinmulighed 2"
   due_a73610f6: Forfalden
+  due_assignment_due_date_time_607f2e1d: "forfalden: %{assignment_due_date_time}"
   due_at_5e18eeac: "Forfalden den:"
+  due_at_time_fa41cf6c: "Forfalden kl.: %{time}"
   due_by_c263dc10: "Forfalden den:"
   due_date_5d0a953c: "Forfaldsdato:"
   due_date_6a281fe3: "Forfald: %{date}"
@@ -5483,9 +5531,13 @@ da:
     no_due_date: "forfald: Ingen forfaldsdato"
   due_datetime_f5a81b81: "Forfald: %{dateTime}"
   due_dueat_39d7d6c2: "Forfalden %{dueAt}"
+  due_dueat_ef67f6f4: "Forfladen: %{dueAt}"
   due_format_like_yyyy_mm_dd_hh_mm_ef30a9ef: "Forfald - format som YYYY-MM-DD hh:mm"
   due_multiple_dates_cc0ee3f5: "Forfald: Flere datoer"
+  due_multiple_dates_ea8a95e1: "forfalden: Flere datoer"
+  due_no_due_date_3c1d1651: "forfalden: Ingen forfaldsdato"
   due_on_date_5ffb2182: "Forfalden den"
+  due_time_9acd6b69: "Forfalden %{time}"
   e_c2991d1b: e
   e_mail_only_2cc5e513: "Kun email "
   each_bar_is_an_assignment_the_green_layer_represen_b6536ab1: "Hver bar er en opgave. Grønt lag repræsentere procent af studerende, der har indsendt deres opgave \"til tiden\". Indsendelser der er \"for sent\" er gule og \"manglende\" indsendelser er røde."
@@ -5600,7 +5652,9 @@ da:
   email_already_in_use_330248e: "E-mail benyttes allerede"
   email_e366fa29: mail
   email_is_invalid_e0d982eb: "E-mail er ugyldig!"
+  email_is_invalid_or_in_use_4c3de5b9: "E-mail er ugylding eller i brug"
   email_is_required_736ac26b: "E-mail kræves"
+  email_the_user_about_this_account_creation_e63f8759: "E-mail brugeren om denne konto oprettelse"
   ember_modules_description: "Moduler genskrivet i Ember. Bruger den medfødte træk og slip API for at tillade trækning fra eksterne placeringer."
   enable_6f5d1328: Aktiver
   enable_feature_title_987d8e9a: "Aktiver funktion: %{title}"
@@ -5649,6 +5703,7 @@ da:
       delete_default_term: "Kan ikke slette standard termin"
       delete_term_with_courses: "Can ikke slette en termin med aktive kurser"
       not_unique: "SIS ID \"%{sis_source_id}\" er allerede i brug"
+  enrollments_e250c9c3: Tilmeldelser
   enter_a_hexcode_here_to_use_a_custom_color_51ecccce: "Indtast en hexkode her for at bruge en brugetilpasset farve."
   enter_your_question_and_multiple_answers_31370054: "Indtast dit spørgsmål med flere svar."
   enter_your_question_specifying_where_each_blank_sh_2c6e8035: "Indtast dit spørgsmål, specificer hvor hvert blankt felt skal placeres. Studerende skal indtaste svar i tekstboksene ved hvert blankt felt."
@@ -5911,6 +5966,7 @@ da:
         body1: "I bunden af denne side er der en liste over nylige aktiviteter fra dine kurser (%{showme}). Fra denne side kan du tilføje aktiviteter til nye sider i din ePortfolio. Klik på den aktivitet, du ønkser at tilføje."
         body2: "Vælg den sektion, du ønsker at tilføje aktiviteten til, og giv siden en  titel. Klik på \"Tilføj side\" og du kan redigere den nye side."
   eportfolios_f6dc4579: ePortfolier
+  epub_exporting_f5592ff2: "ePub eksport"
   error_deleting_name_reason_11f9d399: "Fejl ved sletning %{name}: %{reason}"
   error_message_2b9d12ee: "Fejl: %{message}"
   error_uploading_file_e2d31b56: "Fejl under upload af fil."
@@ -6271,6 +6327,7 @@ da:
       page_title: "Fil forhåndsvisning"
   files_and_folder_contents_only_available_to_studen_944f9166: "Fil- og mappeindhold kun tilgængelig for studerende med link. Ikke synlig i studerendes filer."
   files_c300e900: Filer
+  files_toolbar_2f2f0976: "Filer værktøjslinje"
   files_uploaded_519844ed: "Uploadede filer "
   fill_in_the_blank_read_surrounding_text_1a6c73c7: "Udfyld tomme felter, læst omrkingstående tekst"
   filled_5d8c39e: Arkiveret
@@ -6303,6 +6360,7 @@ da:
       invalid_recursion: "En mappe kan ikke være forældre til dets selv"
       invalid_root_folder_name: "Rodmappenavn kan ikke ændres"
     folder_created: "Mappe \"%{name}\" oprettet"
+  folder_705fd2d7: Mappe
   folder_browsing_tree_1f00a3ae: "Mappe browsing træ"
   folders: 
     event_updated: "Begivenhed opdateret"
@@ -6320,6 +6378,8 @@ da:
   form_border_f61f12dc: "Form ramme"
   from_fdd4956d: Fra
   from_from_to_to_e31f6422: "Fra %{from} til %{to}"
+  full_name_23fdfb6d: "Fulde navn"
+  full_name_is_required_8efbdc84: "Fulde navn er nødvendig"
   generate_epub_80e89ea4: "Opret ePub"
   generated_f26ee56b: "Oprettet:"
   generating_5b5e20f8: "Opretter:"
@@ -7647,6 +7707,7 @@ da:
     lock_module_until: "Lås indtil"
   last_enrollment_activity_10fe15ba: "Sidste tilmeldingsaktivitet"
   last_item_79583712: "Sidste element:"
+  last_login_54565109: "Sidste login"
   last_modified_by_ca4bb5e1: "Sidst redigeret af"
   last_user_access_title: "Sidste bruger adgang"
   late_percent_b91d01b3: "For sent: %{percent}"
@@ -7810,6 +7871,7 @@ da:
       feedback: "Klik her for at fortælle os, hvad der skete"
     show_me_where: "Vis mig hvor"
   links_14b70841: Links
+  load_more_9ca37ccc: "Indlæs mere..."
   loading_25990131: Loading...
   loading_bde52856: Loader
   loading_more_results_def6df65: "Indlæser flere resultater..."
@@ -9947,6 +10009,7 @@ da:
       student_progress: "Fremgang for studerende"
     relock_modules: "Lås moduler igen"
     requirements_changed: "Betingelserne blev ændret"
+  modules_c4325335: Moduler
   modules_item_controller: 
     max_score_complete: "scorede ikke mere end *score*"
     max_score_incomplete: "skal ikke score mere end *score*"
@@ -10049,6 +10112,7 @@ da:
   nickname_7df95b09: "Øgenavn:"
   no_assignment_name_adbb215b: "Intet opgavenavn"
   no_content_has_been_added_f36bab43: "* Intent indhold er blevet tilføjet"
+  no_courses_found_12d68a74: "Ingen kurser fundet"
   no_date_bfeb2df7: "Ingen dato"
   no_directory_is_selected_please_select_a_directory_46ded46: "Intet bibliotek er valgt, vælg venligst et bibliotek før klikning op 'flyt'"
   no_due_date_1d63d13b: "Ingen forfaldsdato"
@@ -10069,9 +10133,11 @@ da:
   no_students_have_taken_the_survey_yet_d378cd35: "Endnu ingen studerende har taget sprøgeundersøgelsen"
   no_tls_618add1a: "Ingen TLS"
   no_usage_rights_object_supplied_304b8d40: "Ingen 'bruger_rettigheder' objekt angivet"
+  no_users_found_64a043ff: "Ingen brugere fundet"
   not_a_number: "skal være et positivt nummer"
   not_available_until_next_submission_2175158: "Ikke tilgængelig før næste indsendelse"
   not_completed_d70acea3: "Ikke fuldført"
+  not_graded_e027c866: "Ikke bedømt"
   not_installed_37a21a76: "Ikke installeret"
   not_now_97efd947: "Ikke nu"
   not_yet_completed_345a0bca: "Endnu ikke fuldført"
@@ -10400,6 +10466,7 @@ da:
   of_students_5d1af0d2: "# af studerende"
   ok_c47544a2: OK
   okay_got_it_d686d4e8: "Okay, godt"
+  on_paper_46d0ba36: "På papir"
   on_time_percent_eebffe38: "Til tid: %{percent}"
   once_you_ve_changed_an_answer_you_ll_need_to_choos_7071f728: "Når du har ændret et svar, skal du vælge en mulighed før opdatering af spørgsmål."
   one_per_line_format_name_value_79647700: "En pr. linje. Format: navn=værdi"
@@ -15721,6 +15788,7 @@ da:
       page_does_not_exist: "Siden \"%{title}\" eksisterer ikke."
     revisions: 
       page_revisions_title: "%{title} revisioner: %{context_name}"
+  wiki_pages_13eb70fb: "Wiki sider"
   wiki_pages_api: 
     cannot_delete_front_page: "Forsiden kan ikke slettes"
     cannot_have_unpublished_front_page: "Offentliggørelse af forside kan ikke fortrydes"
