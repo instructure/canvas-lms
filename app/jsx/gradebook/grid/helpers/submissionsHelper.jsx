@@ -1,13 +1,11 @@
 define([
   'underscore',
 ], function (_) {
-  var SubmissionsHelper = {
-    submissionsForAssignment: function(submissionGroups, assignmentId) {
-      var submissions = this.extractSubmissions(submissionGroups);
-      return _.filter(
-        submissions,
-        submission => submission.assignment_id.toString() === assignmentId.toString()
-      );
+  let SubmissionsHelper = {
+    submissionsForAssignment: function(submissionGroups, assignment) {
+      let submissions = this.extractSubmissions(submissionGroups);
+      let subsForAssignment = submissions[assignment.id]
+      return subsForAssignment ? _.indexBy(subsForAssignment, 'user_id') : {};
     },
 
     extractSubmissions: function(submissionGroups) {
@@ -16,6 +14,7 @@ define([
         .flatten()
         .pluck('submissions')
         .flatten()
+        .groupBy('assignment_id')
         .value();
     }
   };
