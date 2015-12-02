@@ -34,9 +34,42 @@ describe "conversations new" do
       wait_for_ajaximations
       expect(is_checked('#account_enable_user_notes')).to be_truthy
     end
+  end
+
+  context "Course with Faculty Journal enabled" do
+    before(:each) do
+      site_admin_logged_in
+      @course.account.update_attribute(:enable_user_notes, true)
+    end
+
+    it "should check the Journal messages for correct time and sender", priority: "1", test_id: 75701 do
+      user_session(@teacher)
+      conversations
+      compose course: @course, subject: 'Christmas', to: [@s1], body: 'The Fat Man cometh.', journal: true, send: true
+      time = format_time_for_view(Time.zone.now)
+      remove_user_session
+      get student_user_notes_url
+      expect(f('.subject').text).to include_text('Christmas')
+      expect(f('.user_content').text).to eq 'The Fat Man cometh.'
+      expect(f('.creator_name').text).to include_text(@teacher.name)
+      expect(f('.creator_name').text).to include_text(time)
+    end
+
+    it "should allow an admin to delete a Journal message", priority: "1", test_id: 75703 do
+      user_session(@teacher)
+      conversations
+      compose course: @course, subject: 'Christmas', to: [@s1], body: 'The Fat Man cometh.', journal: true, send: true
+      remove_user_session
+      get student_user_notes_url
+      f('.delete_link').click
+      driver.switch_to.alert.accept
+      wait_for_ajaximations
+      expect(f('.title.subject').text).to eq('')
+      get student_user_notes_url
+      expect(f('.title.subject').text).to eq('')
+    end
 
     it "should allow a new entry by an admin", priority: "1", test_id: 75702 do
-      @course.account.update_attribute(:enable_user_notes, true)
       get student_user_notes_url
       f('#new_user_note_button').click
       replace_content(f('#user_note_title'),'FJ Title 2')
@@ -50,8 +83,7 @@ describe "conversations new" do
     end
 
     it "should clear the subject and body when cancel is clicked", priority: "1", test_id: 458518 do
-      skip # This is currently broken CNVS-12522
-      @course.account.update_attribute(:enable_user_notes, true)
+      skip('Currently Broken CNVS-12522')
       get student_user_notes_url
       f('#new_user_note_button').click
       replace_content(f('#user_note_title'),'FJ Title')
@@ -77,7 +109,7 @@ describe "conversations new" do
 
     it "should be allowed on new private conversations with students", priority: "1", test_id: 207094 do
       compose course: @course, to: [@s1, @s2], body: 'hallo!', send: false
-      checkbox = f(".user_note")
+      checkbox = f('.user_note')
       expect(checkbox).to be_displayed
       checkbox.click
       count1 = @s1.user_notes.count
@@ -89,7 +121,7 @@ describe "conversations new" do
 
     it "should be allowed with student groups", priority: "1", test_id: 207093 do
       compose course: @course, to: [@group], body: 'hallo!', send: false
-      checkbox = f(".user_note")
+      checkbox = f('.user_note')
       expect(checkbox).to be_displayed
       checkbox.click
       count1 = @s1.user_notes.count
@@ -101,19 +133,19 @@ describe "conversations new" do
       @course.account.update_attribute(:enable_user_notes, false)
       conversations
       compose course: @course, to: [@s1], body: 'hallo!', send: false
-      expect(f(".user_note")).not_to be_displayed
+      expect(f('.user_note')).not_to be_displayed
     end
 
     it "should not be allowed for students", priority: "1", test_id: 138686 do
       user_session(@s1)
       conversations
       compose course: @course, to: [@s2], body: 'hallo!', send: false
-      expect(f(".user_note")).not_to be_displayed
+      expect(f('.user_note')).not_to be_displayed
     end
 
     it "should not be allowed with non-student recipient", priority: "1", test_id: 138687 do
       compose course: @course, to: [@teacher], body: 'hallo!', send: false
-      expect(f(".user_note")).not_to be_displayed
+      expect(f('.user_note')).not_to be_displayed
     end
 
     it "should have the Journal entry checkbox come back unchecked", priority: "1", test_id: 523385 do
@@ -152,14 +184,11 @@ describe "conversations new" do
     it "should send a message with faculty journal checked", priority: "1", test_id: 75433 do
       conversations
       # First verify teacher can send a message with faculty journal entry checked to one student
-      compose course: @course, to: [@s1], body: 'hallo!', send: false
-      f('.user_note').click
-      click_send
+      compose course: @course, to: [@s1], body: 'hallo!', journal: true, send: true
       expect(flash_message_present?(:success, /Message sent!/)).to be_truthy
       # Now verify adding another user while the faculty journal entry checkbox is checked doesn't uncheck it and
       #   still lets teacher know it was sent successfully.
-      compose course: @course, to: [@s1], body: 'hallo!', send: false
-      f('.user_note').click
+      compose course: @course, to: [@s1], body: 'hallo!', journal: true, send: false
       add_message_recipient(@s2)
       expect(is_checked('.user_note')).to be_truthy
       click_send
