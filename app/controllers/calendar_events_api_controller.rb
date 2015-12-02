@@ -332,9 +332,18 @@ class CalendarEventsApiController < ApplicationController
     if @type == :assignment
       events = apply_assignment_overrides(events, user)
       mark_submitted_assignments(user, events)
+      includes = Array(params[:include])
+      if includes.include?("submissions")
+        submissions = Submission.where(assignment_id: events, user_id: user)
+        subs_by_assg = submissions.group_by(&:assignment_id)
+      end
     end
     if @errors.empty?
-      render :json => events.map { |event| event_json(event, user, session, {:excludes => params[:excludes]}) }
+      json = events.map do |event|
+        subs = subs_by_assg[event.id] if subs_by_assg
+        event_json(event, user, session, {excludes: params[:excludes], submissions: subs})
+      end
+      render :json => json
     else
       render json: {errors: @errors.as_json}, status: :bad_request
     end
