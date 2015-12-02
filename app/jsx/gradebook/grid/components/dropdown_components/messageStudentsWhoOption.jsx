@@ -3,12 +3,13 @@ define([
   'underscore',
   'jsx/gradebook/grid/components/dropdown_components/headerDropdownOption',
   'jsx/gradebook/grid/helpers/submissionsHelper',
+  'jsx/gradebook/grid/helpers/enrollmentsHelper',
   'timezone',
   'jsx/gradebook/grid/helpers/messageStudentsWhoHelper',
   'message_students'
-], function (React, _, HeaderDropdownOption, SubmissionsHelper, tz, MessageStudentsWhoHelper) {
+], function (React, _, HeaderDropdownOption, SubmissionsHelper, EnrollmentsHelper, tz, MessageStudentsWhoHelper) {
 
-  var MessageStudentsWhoOption = React.createClass({
+  let MessageStudentsWhoOption = React.createClass({
     propTypes: {
       title: React.PropTypes.string.isRequired,
       assignment: React.PropTypes.object.isRequired,
@@ -17,20 +18,23 @@ define([
     },
 
     openDialog() {
-      var submissions = SubmissionsHelper.
-        submissionsForAssignment(this.props.submissions, this.props.assignment.id);
-      var students = _.map(submissions, (submission) => {
-        submission.submitted_at = tz.parse(submission.submitted_at);
-        var enrollment = _.find(
-          this.props.enrollments,
-          enrollment => enrollment.user_id === submission.user_id
-        );
-        if(enrollment) submission.name = enrollment.user.name;
-        return submission;
-      });
-
-      var settings = MessageStudentsWhoHelper.settings(this.props.assignment, students);
+      let studentsForAssignment = EnrollmentsHelper.studentsThatCanSeeAssignment(this.props.enrollments, this.props.assignment);
+      let students = this.combineStudentsWithScores(studentsForAssignment);
+      let settings = MessageStudentsWhoHelper.settings(this.props.assignment, students);
       messageStudents(settings);
+    },
+
+    combineStudentsWithScores(students) {
+      let submissions = SubmissionsHelper.submissionsForAssignment(this.props.submissions, this.props.assignment);
+      return _.map(students, function(student, studentId) {
+        let studentWithScore = _.extend({ score: null, submitted_at: null }, student);
+        let submission = submissions[studentId];
+        if (submission) {
+          studentWithScore.score = submission.score;
+          studentWithScore.submitted_at = tz.parse(submission.submitted_at);
+        }
+        return studentWithScore;
+      });
     },
 
     render() {
