@@ -4,7 +4,7 @@ Rails.application.config.to_prepare do
   module Canvas
     module Shard
       def clear_cache
-        connection.after_transaction_commit { super }
+        self.class.connection.after_transaction_commit { super }
       end
     end
   end
