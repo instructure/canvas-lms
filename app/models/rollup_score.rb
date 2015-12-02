@@ -47,8 +47,11 @@ class RollupScore
   end
 
   def n_mastery
-    n_scores = scores.sort.last(@calculation_int)
-    (n_scores.sum.to_f / n_scores.size).round(2)
+    return unless @outcome.rubric_criterion
+    cutoff_score = @outcome.rubric_criterion[:mastery_points]
+    tmp_scores = scores.compact.delete_if{|score| score < cutoff_score}
+    return nil if tmp_scores.length < @calculation_int
+    (tmp_scores.sum.to_f / tmp_scores.size).round(2)
   end
 
   def decaying_average

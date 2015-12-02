@@ -39,11 +39,27 @@ describe Outcomes::ResultAnalytics do
     end
   end
 
+  def outcome_from_score(score, args)
+    title = args[:title] || "name, o1"
+    outcome = create_outcome(args)
+    user = args[:user] || MockUser[10, 'a']
+    MockOutcomeResult[user, outcome, score, title, args[:submitted_time], args[:assessed_time]]
+  end
+
+  def create_outcome(args)
+    # score defaulting to highest is to ensure we don't alter behavior on
+    # outcomes that predate the newer calculation methods
+    id = args[:id] || 80
+    method = args[:method] || "highest"
+    criterion = args[:criterion] || {mastery_points: 3.0}
+    MockOutcome[id, method, args[:calc_int], criterion]
+  end
+
   describe '#rollup_user_results' do
     it 'returns a rollup score for each distinct outcome_id' do
       results = [
-        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[80], 2.0],
-        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[81], 3.0],
+        outcome_from_score(2.0, {}),
+        outcome_from_score(3.0, {id: 81})
       ]
       rollup = ra.rollup_user_results(results)
       expect(rollup.size).to eq 2
@@ -55,12 +71,7 @@ describe Outcomes::ResultAnalytics do
 
   describe '#mastery calculation' do
     it 'returns maximum score when no method is set' do
-      # this is to ensure we don't change behavior on outcomes that predate
-      # the calculations feature. decaying avg will be default for new outcomes
-      results = [
-        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[80], 3.0],
-        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[80], 1.0],
-      ]
+      results = [3.0, 1.0].map{|result| outcome_from_score(result, {})}
       rollup = ra.rollup_user_results(results)
       expect(rollup.size).to eq 1
       expect(rollup[0].count).to eq 2
@@ -68,98 +79,70 @@ describe Outcomes::ResultAnalytics do
     end
 
     it 'returns maximum score when highest score method is selected' do
-      results = [
-        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[80, 'highest'], 3.0],
-        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[80, 'highest'], 1.0],
-      ]
+      results = [3.0, 1.0].map{ |result| outcome_from_score(result, {method: 'highest'}) }
       rollup = ra.rollup_user_results(results)
       expect(rollup[0].score).to eq 3.0
       expect(rollup[0].outcome.calculation_method).to eq "highest"
     end
 
     it 'returns correct score when latest score method is selected' do
-      results = [
-        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[80, 'latest'], 4.0, "name, o1", nil],
-        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[80, 'latest'], 3.0, "name, o1", time],
-        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[80, 'latest'], 1.0, "name, o1", time - 1.day]
-      ]
+      submission_time = [nil, time, time-1.day]
+      results = [4.0, 3.0, 1.0].map.with_index do |result, i|
+        outcome_from_score(result, {method: 'latest', submitted_time: submission_time[i]})
+      end
       rollups = ra.rollup_user_results(results)
       expect(rollups[0].score).to eq 3.0
     end
 
     it 'properly calculates results when method is n# of scores for mastery' do
-      results = [
-        #first outcome
-        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[80, 'n_mastery', 3], 3.0],
-        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[80, 'n_mastery', 3], 1.0],
-        #second outcome
-        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[81, 'n_mastery', 5], 3.0],
-        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[81, 'n_mastery', 5], 1.0],
-        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[81, 'n_mastery', 5], 3.0],
-        #third outcome
-        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[82, 'n_mastery', 4], 4.0],
-        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[82, 'n_mastery', 4], 5.0],
-        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[82, 'n_mastery', 4], 1.0],
-        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[82, 'n_mastery', 4], 3.0],
-      ]
+      o1 = [3.0, 1.0].map{ |result| outcome_from_score(result, {method: 'n_mastery', calc_int: 3}) }
+      o2 = [3.0, 1.0, 2.0].map{ |result| outcome_from_score(result, {id: 81, method: 'n_mastery', calc_int: 3}) }
+      o3 = [4.0, 5.0, 1.0, 3.0, 2.0, 3.0].map{ |result|outcome_from_score(result, {id: 82, method: 'n_mastery', calc_int: 3}) }
+      results = [o1, o2, o3].flatten
       rollups = ra.rollup_user_results(results)
       expect(rollups.size).to eq 3
-      expect(rollups.map(&:score)).to eq [nil, nil, 3.25]
+      expect(rollups.map(&:score)).to eq [nil, nil, 3.75]
     end
 
     it 'does not error out and correctly averages when a result has a score of nil' do
-      results = [
-        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[82, 'n_mastery', 4], 4.0],
-        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[82, 'n_mastery', 4], 5.0],
-        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[82, 'n_mastery', 4], 1.0],
-        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[82, 'n_mastery', 4], 3.0],
-        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[82, 'n_mastery', 4], nil],
-      ]
+      results = [4.0, 5.0, 1.0, 3.0, nil, 3.0].map do |result|
+        outcome_from_score(result, {method: 'n_mastery', calc_int: 3})
+      end
       rollups = ra.rollup_user_results(results)
-      expect(rollups.map(&:score)).to eq [3.25]
+      expect(rollups.map(&:score)).to eq [3.75]
     end
 
     it 'properly calculates results when method is decaying average' do
-      results = [
-        #first outcome
-        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[80, 'decaying_average', 75], 3.0, "name, o1", time],
-        #second outcome
-        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[81, 'decaying_average', 75], 4.0, "name, o2", time],
-        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[81, 'decaying_average', 75], 5.0, "name, o2", time - 1.day],
-        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[81, 'decaying_average', 75], 1.0, "name, o2", time - 2.days],
-        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[81, 'decaying_average', 75], 3.0, "name, o2", time - 3.days],
-      ]
+      o1 = outcome_from_score(3.0, {method: 'decaying_average', calc_int: 75, submitted_time: time})
+      o2 = [4.0, 5.0, 1.0, 3.0].map.with_index do |result, i|
+        outcome_from_score(result, {id: 81, method: 'decaying_average', calc_int: 75, name: 'name, o2', submitted_time: time-i.days})
+      end
+      results = [o1, o2].flatten
       rollups = ra.rollup_user_results(results)
       expect(rollups.size).to eq 2
       expect(rollups.map(&:score)).to eq [nil, 3.75]
     end
 
     it 'properly sorts results when there is no submitted_at time on one or many results' do
-      results = [
-        #first outcome
-        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[80, 'decaying_average', 65], 3.0, "name, o1", nil, time],
-        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[80, 'decaying_average', 65], 2.0, "name, o1", nil, time - 1.day],
-        #second outcome
-        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[81, 'decaying_average', 75], 4.0, "name, o2", nil, time],
-        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[81, 'decaying_average', 75], 5.0, "name, o2", nil, time - 1.day],
-        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[81, 'decaying_average', 75], 1.0, "name, o2", nil, time - 2.days],
-        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[81, 'decaying_average', 75], 3.0, "name, o2", time - 3.days, nil],
-      ]
+      o1 = [3.0, 2.0].map.with_index do |result, i|
+        outcome_from_score(result, {method: 'decaying_average', calc_int: 65, assessed_time: time - i.days})
+      end
+      o2 = [4.0, 5.0, 1.0].map.with_index do |result, i|
+        outcome_from_score(result, {id: 81, method: 'decaying_average', calc_int: 75, name: "name, o2", assessed_time: time-i.days})
+      end
+      o2 << outcome_from_score(3.0, {id: 81, method: 'decaying_average', calc_int: 75, name: "name, o2", submitted_time: time-3.days})
+      results = [o1, o2].flatten
       rollups = ra.rollup_user_results(results)
       expect(rollups.size).to eq 2
       expect(rollups.map(&:score)).to eq [2.65, 3.75]
     end
 
     it 'rounds results for decaying average and n_mastery methods' do
-      results = [
-        #first outcome
-        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[80, 'decaying_average', 65], 3.0, "name, o1", nil, time],
-        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[80, 'decaying_average', 65], 2.0, "name, o1", nil, time - 1.day],
-        #second outcome
-        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[81, 'n_mastery', 3], 3.0],
-        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[81, 'n_mastery', 3], 4.0],
-        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[81, 'n_mastery', 3], 3.0],
-      ]
+      o1 = [3.0, 2.0].map.with_index do |result, i|
+        outcome_from_score(result, {method: 'decaying_average', calc_int: 65, assessed_time: time-i.days})
+      end
+      o2 = [3.0, 4.0, 3.0].map{ |result| outcome_from_score(result, {id: 81, method: 'n_mastery', calc_int: 3}) }
+      results = [o1, o2].flatten
       rollups = ra.rollup_user_results(results)
       expect(rollups.size).to eq 2
       expect(rollups.map(&:score)).to eq [2.65, 3.33]
@@ -172,9 +155,9 @@ describe Outcomes::ResultAnalytics do
     end
     it 'returns a rollup for each distinct user_id' do
       results = [
-        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[80], 4.0],
-        MockOutcomeResult[MockUser[20, 'b'], MockOutcome[80], 5.0],
-        MockOutcomeResult[MockUser[20, 'b'], MockOutcome[80], 3.0],
+        outcome_from_score(4.0,{}),
+        outcome_from_score(5.0, {user: MockUser[20, 'b']}),
+        outcome_from_score(3.0, {user: MockUser[20, 'b']})
       ]
       users = [MockUser[10, 'a'], MockUser[30, 'c']]
       rollups = ra.outcome_results_rollups(results, users)
@@ -192,14 +175,14 @@ describe Outcomes::ResultAnalytics do
     it 'returns one rollup with the rollup averages' do
       fake_context = MockUser.new(42, 'fake')
       results = [
-        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[80], 0.0],
-        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[80], 1.0],
-        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[81], 5.0],
-        MockOutcomeResult[MockUser[20, 'b'], MockOutcome[80], 2.0],
-        MockOutcomeResult[MockUser[20, 'b'], MockOutcome[81], 6.0],
-        MockOutcomeResult[MockUser[30, 'c'], MockOutcome[80], 3.0],
-        MockOutcomeResult[MockUser[40, 'd'], MockOutcome[80], 4.0],
-        MockOutcomeResult[MockUser[40, 'd'], MockOutcome[81], 7.0],
+        outcome_from_score(0.0, {}),
+        outcome_from_score(1.0, {}),
+        outcome_from_score(5.0, {id: 81}),
+        outcome_from_score(2.0, {user: MockUser[20, 'b']}),
+        outcome_from_score(6.0, {id: 81, user: MockUser[20, 'b']}),
+        outcome_from_score(3.0, {user: MockUser[30, 'c']}),
+        outcome_from_score(4.0, {user: MockUser[40, 'd']}),
+        outcome_from_score(7.0, {id: 81, user: MockUser[40, 'd']})
       ]
       aggregate_result = ra.aggregate_outcome_results_rollup(results, fake_context)
       expect(aggregate_result.size).to eq 2
@@ -211,18 +194,27 @@ describe Outcomes::ResultAnalytics do
 
   describe "handling quiz outcome results objects" do
     it "scales quiz scores to rubric score" do
+      o1 = MockOutcome[80, 'decaying_average', 65, {points_possible: 5}]
+      o2 = MockOutcome[81, 'n_mastery', 3, {:mastery_points => 3.0, points_possible: 5}]
+      o3 = MockOutcome[82, 'n_mastery', 3, {:mastery_points => 3.0, points_possible: 5}]
+      user = MockUser[10, 'a']
       results = [
         #first outcome
-        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[80, 'decaying_average', 65, {points_possible: 5}], 7.0, "name, o1", nil, time, "Quizzes::QuizSubmission", 0.4],
-        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[80, 'decaying_average', 65, {points_possible: 5}], 12.0, "name, o1", nil, time - 1.day, "Quizzes::QuizSubmission", 0.9],
+        MockOutcomeResult[user, o1, 7.0, "name, o1", nil, time, "Quizzes::QuizSubmission", 0.4],
+        MockOutcomeResult[user, o1, 12.0, "name, o1", nil, time - 1.day, "Quizzes::QuizSubmission", 0.9],
         #second outcome
-        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[81, 'n_mastery', 3, {points_possible: 5}], 30.0, "name, o2", nil, nil, "Quizzes::QuizSubmission", 0.2],
-        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[81, 'n_mastery', 3, {points_possible: 5}], 75.0, "name, o2", nil, nil, "Quizzes::QuizSubmission", 0.5],
-        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[81, 'n_mastery', 3, {points_possible: 5}], 120.0, "name, o2", nil, nil, "Quizzes::QuizSubmission", 0.8],
+        MockOutcomeResult[user, o2, 30.0, "name, o2", nil, nil, "Quizzes::QuizSubmission", 0.2],
+        MockOutcomeResult[user, o2, 75.0, "name, o2", nil, nil, "Quizzes::QuizSubmission", 0.5],
+        MockOutcomeResult[user, o2, 120.0, "name, o2", nil, nil, "Quizzes::QuizSubmission", 0.8],
+        #third outcome
+        MockOutcomeResult[user, o3, 90.0, "name, o2", nil, nil, "Quizzes::QuizSubmission", 0.2],
+        MockOutcomeResult[user, o3, 75.0, "name, o2", nil, nil, "Quizzes::QuizSubmission", 0.7],
+        MockOutcomeResult[user, o3, 120.0, "name, o2", nil, nil, "Quizzes::QuizSubmission", 0.8],
+        MockOutcomeResult[user, o3, 100.0, "name, o2", nil, nil, "Quizzes::QuizSubmission", 0.9]
       ]
       rollups = ra.rollup_user_results(results)
-      expect(rollups.size).to eq 2
-      expect(rollups.map(&:score)).to eq [2.88, 2.5]
+      expect(rollups.size).to eq 3
+      expect(rollups.map(&:score)).to eq [2.88, nil, 4.0]
     end
   end
 
