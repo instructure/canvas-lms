@@ -11,7 +11,7 @@ module CC::Exporter::Epub
     end
 
     def filter_content_to_module(module_id)
-      current_mod = cartridge_json[:modules].find{|mod| mod["migration_id"] == module_id}
+      current_mod = cartridge_json[:modules].find{|mod| mod[:identifier] == module_id}
       current_mod[:items].each do |item|
         next unless item
         merge_with_original_item_data!(item)
@@ -28,7 +28,7 @@ module CC::Exporter::Epub
 
     private
     def module_ids
-      cartridge_json[:modules].map{|mod| mod["migration_id"]}
+      cartridge_json[:modules].map{|mod| mod[:identifier]}
     end
 
     def module_item_ids
