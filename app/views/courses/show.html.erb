@@ -65,6 +65,7 @@
         <% end %>
 
         <% if @can_manage %>
+          <% set_js_course_wizard_data %>
           <% js_bundle :course_wizard %>
           <% css_bundle :course_wizard %>
           <a href="#" class="btn button-sidebar-wide wizard_popup_link  <%= 'auto_open' if @context.created? || @context.claimed? %>">
