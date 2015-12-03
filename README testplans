@@ -1,0 +1,121 @@
+Countdown Timer Test Plan
+Project Name	Countdown Timer	
+Version	1.0
+Written By	John Nguyen	
+Description	Created a countdown timer based on the assignment date and current date
+Tested By	Qui Trinh	
+Pull Request On	12/2/2015
+Tested In	Chrome, Canvas Dev		
+
+Notes: The file used in the following components column are the one used in pull requested which means that they are the files that have our code in it. The require.js contains the JavaScript function called “startTimer(date, year)” while the DateDueColumnView.handlebars contains the anchor tag where the JavaScript is called.
+The “startTimer(date, year)” function works by using the singleSectionDueDate in its datetimeFormatted to get the due date month, day, hour and minute. The year is gotten by the regular  singleSectionDueDate split by the “-”. The date components are put in the Date instance and compared with the current date to get the timer duration. The duration is used to calculate the timer length.   
+
+Test 1:
+
+Require.js
+DateDueColumnView.handlebars	
+
+1. The code are already added to the components
+2. Recompile 
+3. Restart server
+4. Create Assignments with single dates that is “past” the current date
+5. Go to Assignment Tab on left side
+6. Click on “Countdown”
+
+Expected Results:	
+A countdown timer shall be displayed below the date with day(s), hour, minute, and second base around the due date minus current date 
+
+Test 2:	
+
+Require.js
+DateDueColumnView.handlebars	
+1. Create Assignments with single dates that is “before” the current date
+4. Go to Assignment Tab on left side
+3. Click on “Countdown”
+
+Expected Results:
+A countdown timer shall be displayed below the date with day(s), hour, minute, and second which is all “zero”
+
+Test 3:
+
+Require.js
+DateDueColumnView.handlebars	
+
+1. Create Assignments with single dates that is “in the next year” 
+4. Go to Assignment Tab on left side
+3. Click on “Countdown”	
+
+Expected Results:
+A countdown timer shall be displayed below the date with day(s), hour, minute, and second based on time left to due date
+
+Test 4:
+
+Require.js
+DateDueColumnView.handlebars	
+
+1. Create Assignments with single dates that is “on” the current date
+4. Go to Assignment Tab on left side
+3. Click on “Countdown”	
+
+Expected Results:
+A countdown timer shall be displayed below the date with day(s), hour, minute, and second where day(s)  is set to “zero”
+
+
+-------------------------------------------------------------------------------------------------------------------------------
+Grade Trend Test Plan
+Project Name	Grade Trend	
+Version	1.0
+Written By	Qui Trinh	
+Description	Display a message showing the user (student) how much their grade is changing over the last two weeks compared to their overall grade.
+Tested By	John Nguyen	
+Pull Request On	12/2/2015
+Tested In	Google Chrome, Canvas Dev		
+
+Notes: The file grades_summary.js located in public/javascripts contains a function displayTrend() that uses two helper functions calculateTrend(dateGradeArr) and createDueDate(datestring) to add a dynamic message on the grades page which informs the user whether their grade is trending upwards or downwards and by how much. The functions operate by locating the grades and due dates on the page and calculates the difference between the overall grade and the grade over the last two weeks. The cutoff date for the two week interval is decided by using the last due date shown in the rows. Assignments that are not graded or do not have due dates are disregarded.
+
+Test 1:
+
+Grade_summary.js
+
+1. Replace the file grade_summary.js in public/javascripts
+2. Recompile the project
+3. Restart server the apache server
+4. Create 2 assignments with a due date that is one month ago; Create another 2 with a due date that is a week ago.
+5. Have the assignments that are due a month ago graded such that the assignments averages in a 60% grade. Grade the remaining assignments such that the 2 assignments averages in a 90% grade.
+
+Expected Results:
+A message will show above the grades table informing the user that their grade is trending upwards by 15%.
+
+Test 2:
+
+Grade_summary.js	
+1. Preconditions: code added, project recompiled, server restarted
+2. Create 2 assignments with a due date that is one month ago; Create another 2 with a due date that is a week ago.
+3. Have the assignments that are due a month ago graded such that the assignments averages in a 90% grade. Grade the remaining assignments such that the 2 assignments averages in a 60% grade.
+
+Expected Results:
+A message will show above the grades table informing the user that their grade is trending downwards by 15%.
+
+Test 3:
+
+Grade_summary.js	
+
+1. Preconditions: code added, project recompiled, server restarted
+2. Create 2 assignments with a due date that is one month ago; Create another 2 with a due date that is a week ago.
+3. Have the assignments that are due a month ago graded such that the assignments averages in a 60% grade. Grade the remaining assignments such that the 2 assignments averages in a 60% grade.
+
+Expected Results:	
+A message will show above the grades table informing the user is maintaining their grade and it has changed by 0%.
+
+Test 4:
+Grade_summary.js
+
+1. Preconditions: code added, project recompiled, server restarted
+2. Navigate to a grades page with no graded assignments
+
+Expected Results:	
+No message regarding trend will be displayed
+
+
+
+
