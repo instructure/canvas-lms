@@ -235,6 +235,14 @@ CanvasRails::Application.routes.draw do
     concerns :discussions
     resources :assignments do
       get 'moderate' => 'assignments#show_moderate'
+      get 'submissions/:id', to: 'submissions/previews#show',
+        constraints: ->(request) do
+          request.query_parameters.key?(:preview) && request.format == :html
+        end
+      get 'submissions/:id', to: 'submissions/downloads#show',
+        constraints: ->(request) do
+          request.query_parameters.key?(:download)
+        end
       resources :submissions do
         post 'turnitin/resubmit' => 'submissions#resubmit_to_turnitin', as: :resubmit_to_turnitin
         get 'turnitin/:asset_string' => 'submissions#turnitin_report', as: :turnitin_report
