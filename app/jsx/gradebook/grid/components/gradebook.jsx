@@ -216,6 +216,13 @@ define([
       }).addClass('use-css-transitions-for-show-hide').appendTo('#main');
     },
 
+    removeSpinner() {
+      if (spinner) {
+        $(spinner.el).remove();
+        spinner = null;
+      }
+    },
+
     renderNotesColumn() {
       if (!this.state.toolbarOptions.hideNotesColumn) {
         return this.renderColumn(I18n.t('Notes'), GradebookConstants.NOTES_COLUMN_ID, 'notesColumn');
@@ -261,8 +268,8 @@ define([
       if (this.hasStoreErrorOccured()) {
         $.flashError(I18n.t('There was a problem loading the gradebook.'));
       }
-      else if (this.state.tableData.rows) {
-        $(spinner.el).remove();
+      else if (!this.state.tableData.loading) {
+        this.removeSpinner();
         return (
           <div id="react-gradebook-canvas"
                onKeyDown={this.handleKeyDown}

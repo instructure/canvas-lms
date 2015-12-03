@@ -2,9 +2,8 @@ define([
   'bower/reflux/dist/reflux',
   'underscore',
   'jsx/gradebook/grid/actions/studentEnrollmentsActions',
-  'jsx/gradebook/grid/actions/sectionsActions',
   'jsx/gradebook/grid/stores/sectionsStore'
-], function (Reflux, _, StudentEnrollmentsActions, SectionsActions, SectionsStore) {
+], function (Reflux, _, StudentEnrollmentsActions, SectionsStore) {
   var StudentEnrollmentsStore = Reflux.createStore({
     listenables: [
       StudentEnrollmentsActions
