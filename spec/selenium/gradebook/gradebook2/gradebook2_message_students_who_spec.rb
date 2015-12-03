@@ -80,12 +80,12 @@ describe "gradebook2 - message students who" do
     f('[data-action="messageStudentsWho"]').click
     visible_students = ffj('.student_list li:visible')
     expect(visible_students.size).to eq 2
-    expect(visible_students[0].text.strip).to eq @student_name_1
+    expect(visible_students[0].text.strip).to include @student_name_1
     click_option('#message_assignment_recipients .message_types', "Haven't been graded")
     visible_students = ffj('.student_list li:visible')
     expect(visible_students.size).to eq 2
-    expect(visible_students[0].text.strip).to eq @student_name_2
-    expect(visible_students[1].text.strip).to eq @student_name_3
+    expect(visible_students[0].text.strip).to include @student_name_2
+    expect(visible_students[1].text.strip).to include @student_name_3
   end
 
   it "should create separate conversations" do
@@ -102,5 +102,82 @@ describe "gradebook2 - message students who" do
       wait_for_ajax_requests
       run_jobs
     }.to change(Conversation, :count).by_at_least(2)
+  end
+
+  it "allows the teacher to remove students from the message" do
+    get "/courses/#{@course.id}/gradebook2"
+
+    open_assignment_options(1)
+    f('[data-action="messageStudentsWho"]').click
+
+    message_form = f('#message_assignment_recipients')
+    click_option('#message_assignment_recipients .message_types', 'Scored more than')
+    message_form.find_element(:css, '.cutoff_score').send_keys('3')
+    wait_for_animations
+
+    remove_buttons = ff('#message_students_dialog .student_list li:not(.blank) .remove-button')
+    expect(remove_buttons.size).to eq 3
+
+    remove_buttons[0].click
+    wait_for_animations
+    check_element_has_focus(remove_buttons[1])
+
+    remove_buttons[2].click
+    wait_for_animations
+    check_element_has_focus(message_form.find_element(:css, '#subject'))
+
+    expect(message_form.find_element(:css, '.send_button')).not_to be_enabled
+    message_form.find_element(:css, '#body').send_keys('ohai student2')
+    expect(message_form.find_element(:css, '.send_button')).to be_enabled
+
+    submit_form(message_form)
+    wait_for_ajax_requests
+
+    expect(ConversationBatch.last.recipient_ids).to eq([@student_2.id])
+  end
+
+  it "disables the submit button if all students are filtered out" do
+    get "/courses/#{@course.id}/gradebook2"
+
+    open_assignment_options(1)
+    f('[data-action="messageStudentsWho"]').click
+
+    message_form = f('#message_assignment_recipients')
+    message_form.find_element(:css, '#body').send_keys('hello')
+
+    click_option('#message_assignment_recipients .message_types', 'Scored more than')
+    replace_content(message_form.find_element(:css, '.cutoff_score'), '1000')
+    wait_for_animations
+    expect(message_form.find_element(:css, '.send_button')).not_to be_enabled
+
+    replace_content(message_form.find_element(:css, '.cutoff_score'), '1')
+    wait_for_animations
+    expect(message_form.find_element(:css, '.send_button')).to be_enabled
+  end
+
+  it "disables the submit button if all students are manually removed" do
+    get "/courses/#{@course.id}/gradebook2"
+
+    open_assignment_options(1)
+    f('[data-action="messageStudentsWho"]').click
+
+    message_form = f('#message_assignment_recipients')
+    message_form.find_element(:css, '#body').send_keys('hello')
+
+    click_option('#message_assignment_recipients .message_types', 'Scored more than')
+    message_form.find_element(:css, '.cutoff_score').send_keys('3')
+    wait_for_animations
+
+    remove_buttons = ff('#message_students_dialog .student_list li:not(.blank) .remove-button')
+    expect(remove_buttons.size).to eq 3
+
+    expect(message_form.find_element(:css, '.send_button')).to be_enabled
+
+    remove_buttons.each do |button|
+      button.click
+      wait_for_animations
+    end
+
+    expect(message_form.find_element(:css, '.send_button')).not_to be_enabled
   end
 end
