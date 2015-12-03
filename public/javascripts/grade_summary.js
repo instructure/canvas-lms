@@ -36,7 +36,7 @@ define([
     var ignoreUngradedSubmissions = $("#only_consider_graded_assignments").attr('checked');
     var currentOrFinal = ignoreUngradedSubmissions ? 'current' : 'final';
     var groupWeightingScheme = ENV.group_weighting_scheme;
-    var showTotalGradeAsPoints = ENV.show_total_grade_as_points;
+    var includeTotal = !ENV.exclude_total;
 
     var calculatedGrades = GradeCalculator.calculate(
       ENV.submissions,
@@ -57,6 +57,14 @@ define([
     var droppedMessage = I18n.t('This assignment is dropped and will not be considered in the total calculation');
     $('.dropped').attr('aria-label', droppedMessage);
     $('.dropped').attr('title', droppedMessage);
+
+    if (includeTotal) {
+      calculateTotals(calculatedGrades, currentOrFinal, groupWeightingScheme);
+    }
+  }
+
+  var calculateTotals = function(calculatedGrades, currentOrFinal, groupWeightingScheme) {
+    var showTotalGradeAsPoints = ENV.show_total_grade_as_points;
 
     var calculateGrade = function(score, possible) {
       if (possible === 0 || isNaN(score)) {
@@ -103,7 +111,7 @@ define([
     }
 
     $(".revert_all_scores").showIf($("#grades_summary .revert_score_link").length > 0);
-  }
+  };
 
 
   $(document).ready(function() {
@@ -116,7 +124,6 @@ define([
       $("#.show_guess_grades.exists").show();
       updateStudentGrades();
     });
-    displayTrend();
 
     // manages toggling and screenreader focus for comments, scoring, and rubric details
     $(".toggle_comments_link, .toggle_score_details_link, .toggle_rubric_assessments_link").click(function(event) {
@@ -142,23 +149,27 @@ define([
       $(this).closest('.rubric_assessments, .comments').hide();
     });
 
-    $('.student_assignment.editable .assignment_score').click(function(event) {
-      if ($('#grades_summary.editable').length === 0 || $(this).find('#grade_entry').length > 0 || $(event.target).closest('.revert_score_link').length > 0) {
-        return;
-      }
-      // Store the original score so that we can restore it after "What-If" calculations
-      if (!$(this).find('.grade').data('originalValue')){
-        $(this).find('.grade').data('originalValue', $(this).find('.grade').html());
-      }
-      var $screenreader_link_clone = $(this).find('.screenreader-only').clone(true);
-      $(this).find('.grade').data("screenreader_link", $screenreader_link_clone);
-      $(this).find('.grade').empty().append($("#grade_entry"));
-      $(this).find('.score_value').hide();
+    var editWhatifGrade = function(event) {
+      if (event.type === "click" || event.keyCode === 13) {
+        if ($('#grades_summary.editable').length === 0 || $(this).find('#grade_entry').length > 0 || $(event.target).closest('.revert_score_link').length > 0) {
+          return;
+        }
+        // Store the original score so that we can restore it after "What-If" calculations
+        if (!$(this).find('.grade').data('originalValue')){
+          $(this).find('.grade').data('originalValue', $(this).find('.grade').html());
+        }
+        var $screenreader_link_clone = $(this).find('.screenreader-only').clone(true);
+        $(this).find('.grade').data("screenreader_link", $screenreader_link_clone);
+        $(this).find('.grade').empty().append($("#grade_entry"));
+        $(this).find('.score_value').hide();
 
-      // Get the current shown score (possibly a "What-If" score) and use it as the default value in the text entry field
-      var val = $(this).parents('.student_assignment').find('.what_if_score').text();
-      $('#grade_entry').val(parseFloat(val) || '0').show().focus().select();
-    });
+        // Get the current shown score (possibly a "What-If" score) and use it as the default value in the text entry field
+        var val = $(this).parents('.student_assignment').find('.what_if_score').text();
+        $('#grade_entry').val(parseFloat(val) || '0').show().focus().select();
+      };
+    };
+
+    $('.student_assignment.editable .assignment_score').on("click keypress", editWhatifGrade);
 
     $("#grade_entry").keydown(function(event) {
       if(event.keyCode == 13) {
@@ -363,77 +374,8 @@ define([
     }
   }
 
-  function createDueDate(dateString) {
-    months = {
-      Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5,
-      Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov:10, Dec:11
-    };
 
-    var split = dateString.split(" ");
-    var hour = parseInt(split[3].substring(0, 2));
-    if (split[4] == "PM") {
-      hour = hour + 12;
-    }
-
-    var date = new Date();
-    date.setDate(split[1]);
-    date.setMonth(months[split[0]]);
-    date.setHours(hour);
-    date.setMinutes(parseInt(split[3].substring(3, 5)));
-    return date;
-  }
-
-  function calculateTrend(dateGradeArr) {
-    var overallPoints= 0;
-    var recentPoints = 0;
-    var overallPossible = 0;
-    var recentPossible = 0;
-    var dateCutoff = new Date();
-    for (i = dateGradeArr.length - 1; i >= 0 ; i--) {
-      var split = dateGradeArr[i].split(",");
-
-      if (i == dateGradeArr.length - 1) { 
-       dateCutoff = new Date(split[0]).getTime() - (1000* 60 * 60 * 24 * 14);
-      }
-      overallPoints = overallPoints + parseFloat(split[1]);
-      overallPossible = overallPossible + parseFloat(split[2]);
-      if (new Date(split[0]).getTime() > dateCutoff) {
-        recentPoints = recentPoints + parseFloat(split[1]);
-        recentPossible = recentPossible + parseFloat(split[2]);
-      }
-    }
-    return ((parseFloat(overallPoints)/parseFloat(overallPossible) - parseFloat(recentPoints)/parseFloat(recentPossible))*100).toFixed(2);
-  }
-
-  function displayTrend() {
-    var gradesHTML = document.getElementsByClassName("student_assignment assignment_graded editable");
-    var grades = [];
-    var regexp = new RegExp(/class="due">[\s\S]*([a-zA-Z]{3} [0-9]* by [[0-9|:]*pm)[\s\S]*class="original_score">\n\s*([0-9]*)[\s\S]*class="submission_status">\n\s*([a-z]*)[\s\S]*class="possible points_possible" aria-label="">([0-9]*)/);
-
-    for (i = 0; i < gradesHTML.length; i++) {
-      var elem = gradesHTML[i];
-      var match = regexp.exec(elem.innerHTML);
-
-      if (match != null) {
-        var dueDate = createDueDate(RegExp.$1);
-        var originalScore = RegExp.$2;
-        // var status = RegExp.$3; // not needed for now
-        var pointsPossible = RegExp.$4;
-        grades[i] = dueDate + "," + originalScore + "," + pointsPossible;
-      }
-    }
-  
-    var trend = calculateTrend(grades);
-    var msg = "You've been maintaining your grade! Your total grade compared to your grade over the last two weeks (of the latest due date) has changed by " + Math.abs(trend) + "%";
-    if (trend < -5) { msg = "Your grade has been trending up! Your total total grade compared to your grade over the last two weeks (of the latest due date) went up by " + Math.abs(trend) + "%"; }
-    else if (trend > 5) { msg = "Your grade has been trending down! Your total total grade compared to your grade over the last two weeks (of the latest due date) went down by " + Math.abs(trend) + "%"; }
-    msg = '<p>' + msg + '<p>';
-    if (!isNan(trend)) {
-      $('#assignments').prepend(msg);
-    }
-  }
-
-  $(document).on('change', '#grading_periods_selector', function(e){
+  $(document).on('change', '.grading_periods_selector', function(e){
     var newGP = $(this).val();
     if (matches = location.href.match(/grading_period_id=\d*/)) {
       location.href = location.href.replace(matches[0], "grading_period_id=" + newGP);
