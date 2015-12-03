@@ -23,6 +23,7 @@ define [
   'compiled/gradebook2/AssignmentGroupWeightsDialog'
   'jsx/gradebook/grid/stores/sectionsStore'
   'jsx/gradebook/grid/actions/sectionsActions'
+  'jsx/gradebook/grid/actions/tableActions'
   'jst/_avatar' #needed by row_student_name
   'jquery.ajaxJSON'
   'jquery.instructure_date_and_time'
@@ -43,7 +44,7 @@ define [
   columnHeaderTemplate, SectionMenuView, GradingPeriodMenuView,
   GradebookConstants, GradebookToolbarActions, StudentEnrollmentsActions,
   AssignmentGroupsStore, AssignmentGroupActions, AssignmentGroupWeightsDialog,
-  SectionsStore, SectionsActions) ->
+  SectionsStore, SectionsActions, TableActions) ->
 
   class Gradebook
     constructor: (@options) ->
@@ -76,9 +77,13 @@ define [
 
 
     onSectionChange: (section) ->
+      TableActions.enterLoadingState()
       SectionsActions.selectSection(section)
       @sectionToShow = section
-      userSettings[if @sectionToShow then 'contextSet' else 'contextRemove']('grading_show_only_section', @sectionToShow)
+      if @sectionToShow
+        userSettings.contextSet('grading_show_only_section', @sectionToShow)
+      else
+        userSettings.contextRemove('grading_show_only_section', @sectionToShow)
 
     initPostGradesStore: ->
       @postGradesStore = PostGradesStore

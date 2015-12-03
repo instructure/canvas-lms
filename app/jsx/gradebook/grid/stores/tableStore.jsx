@@ -7,11 +7,12 @@ define([
   'jsx/gradebook/grid/stores/assignmentGroupsStore',
   'jsx/gradebook/grid/stores/gradingPeriodsStore',
   'jsx/gradebook/grid/stores/submissionsStore',
-  'jsx/gradebook/grid/stores/customColumnsStore'
+  'jsx/gradebook/grid/stores/customColumnsStore',
+  'jsx/gradebook/grid/actions/tableActions'
 ], function (Reflux, _, GradebookConstants, StudentEnrollmentsStore, GradebookToolbarStore,
              AssignmentGroupsStore, GradingPeriodsStore, SubmissionsStore,
-             CustomColumnsStore) {
-  var tableStore = Reflux.createStore({
+             CustomColumnsStore, TableActions) {
+  var TableStore = Reflux.createStore({
     init() {
       this.state = {
         students: null,
@@ -23,8 +24,10 @@ define([
         assignmentGroups: null,
         error: null,
         rows: null,
-        customColumns: null
+        customColumns: null,
+        loading: true
       };
+      this.listenToMany(TableActions);
       this.listenTo(GradebookToolbarStore, this.onToolbarOptionsChanged);
       this.listenTo(StudentEnrollmentsStore, this.onEnrollmentsChanged);
       this.listenTo(AssignmentGroupsStore, this.onAssignmentGroupsChanged);
@@ -34,7 +37,16 @@ define([
     },
 
     getInitialState() {
+      if (this.state === undefined) {
+        this.init();
+      }
+
       return this.state;
+    },
+
+    onEnterLoadingState() {
+      this.state.loading = true;
+      this.trigger(this.state);
     },
 
     onEnrollmentsChanged(enrollmentData) {
@@ -77,7 +89,6 @@ define([
                 GradingPeriodsStore.assignmentIsInPeriod(assignment, GradingPeriodsStore.selected()));
 
       this.state.assignments = assignments;
-      this.trigger(this.state)
     },
 
     onSubmissionsChanged(submissionsData) {
@@ -142,10 +153,11 @@ define([
 
           return rowData;
         });
+        this.state.loading = false;
       }
     }
 
   });
 
-  return tableStore;
+  return TableStore;
 });
