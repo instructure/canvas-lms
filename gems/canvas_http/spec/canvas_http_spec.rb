@@ -69,6 +69,16 @@ describe "CanvasHttp" do
       res.body.should == "Hello"
     end
 
+    it "should follow relative redirects" do
+      stub_request(:get, "http://www.example.com/a").
+        to_return(status: 301, headers: { 'Location' => '/b'})
+      stub_request(:get, "http://www.example.com/b").
+        to_return(body: "Hello", headers: { 'Content-Length' => 5 })
+      res = CanvasHttp.get("http://www.example.com/a")
+      res.should be_a Net::HTTPOK
+      res.body.should == "Hello"
+    end
+
     it "should fail on too many redirects" do
       stub_request(:get, "http://www.example.com/a").
         to_return(status: 301, headers: { 'Location' => 'http://www.example2.com/a'})
