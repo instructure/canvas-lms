@@ -326,5 +326,39 @@ describe "Tiny MCE editor functions" do
       # To avoid fragility of extra formatting characters being added, I just want the first 41 characters
       expect(p.body[0..40]).to eq "<p>this should have subscript removed</p>"
     end
+
+    it "should make an unordered list on wiki description", priority: "1", test_id: 307623 do
+      p = create_wiki_page("test_page", false, "public")
+      num_list_items = 4
+      get "/courses/#{@course.id}/pages/#{p.title}/edit"
+
+      click_tiny_button('Bullet list')
+      type_tiny_list(num_list_items)
+      f("form.edit-form button.submit").click
+      wait_for_ajaximations
+
+      p.reload
+      # To avoid fragility of extra formatting characters being added, I just want the first 63 characters
+      comparison = create_formatted_list(num_list_items, "unordered")
+      expect(p.body[0..comparison.length]).to eq comparison
+    end
+
+    it "should remove text from an unordered list on wiki description", priority: "1", test_id: 532799 do
+      p = create_wiki_page("test_page", false, "public")
+      num_list_items = 4
+      p.body = create_formatted_list(num_list_items,"unordered")
+      p.save!
+      get "/courses/#{@course.id}/pages/#{p.title}/edit"
+
+      select_all_wiki
+      click_tiny_button('Bullet list')
+      f("form.edit-form button.submit").click
+      wait_for_ajaximations
+
+      p.reload
+      # To avoid fragility of extra formatting characters being added, I just want the first 18 characters
+      comparison = create_unformatted_list(num_list_items)
+      expect(p.body[0..comparison.length]).to eq comparison
+    end
   end
 end
