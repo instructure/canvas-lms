@@ -1,6 +1,30 @@
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 
 module Calendar2Common
+  def create_course_assignment
+    Assignment.new.tap do |a|
+      a.id = 1
+      a.title = 'test assignment'
+      a.due_at = Time.now.utc.strftime("%Y-%m-%d 21:00:00")
+      a.workflow_state = 'published'
+      a.context_id = "#{@course.id}"
+      a.context_type = 'Course'
+      a.save!
+    end
+  end
+
+  def create_course_event
+    CalendarEvent.new.tap do |c|
+      c.id = 1
+      c.title = 'test event'
+      c.start_at = Time.now.utc.strftime("%Y-%m-%d 21:00:00")
+      c.workflow_state = 'active'
+      c.context_id = "#{@course.id}"
+      c.context_type = 'Course'
+      c.save!
+    end
+  end
+
   def create_appointment_group(params={})
     tomorrow = Date.today.to_s
     default_params = {
