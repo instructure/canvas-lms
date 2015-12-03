@@ -51,13 +51,11 @@ define([
     },
 
     onReplaceAssignment(updatedAssignment) {
-      var assignmentGroups = this.assignmentGroups.data,
-        assignments = _.flatten(_.pluck(assignmentGroups, 'assignments')),
+      var assignments = _.flatten(_.pluck(this.state.data, 'assignments')),
         assignment = _.find(assignments, assignment => updatedAssignment.id === assignment.id);
 
       assignment.muted = updatedAssignment.muted;
-      this.assignmentGroups.data = assignmentGroups;
-      this.trigger(this.assignmentGroups);
+      this.trigger(this.state);
     },
 
     formatAssignmentGroups(groups) {
