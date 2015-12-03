@@ -7,6 +7,11 @@ define [
   fakeEditor = undefined
   module 'loadEventListeners',
     setup: ->
+      window.INST.maxVisibleEditorButtons = 10
+      window.INST.editorButtons = [
+        { id:"__BUTTON_ID__" }
+      ]
+
       fakeEditor = {
         id: "someId",
         bookmarkMoved: false,
@@ -19,6 +24,8 @@ define [
           moveToBookmark: (prevSelect)=>
             fakeEditor.bookmarkMoved = true
         }
+        addCommand:(() => {}),
+        addButton:(() => {})
       }
 
     teardown: ->
@@ -47,4 +54,17 @@ define [
     event = document.createEvent('CustomEvent')
     eventData = {'ed': fakeEditor, 'selectNode': "<div></div>"}
     event.initCustomEvent("tinyRCE/initEquella", true, true, eventData)
+    document.dispatchEvent(event)
+
+  asyncTest 'initializes external tools plugin', ->
+    commandSpy = sinon.spy(fakeEditor, "addCommand")
+    expect(1)
+    loadEventListeners({externalToolCB:()->
+      start()
+      ok commandSpy.calledWith("instructureExternalButton__BUTTON_ID__")
+    })
+
+    event = document.createEvent('CustomEvent')
+    eventData = {'ed': fakeEditor, 'url': "someurl.com"}
+    event.initCustomEvent("tinyRCE/initExternalTools", true, true, eventData)
     document.dispatchEvent(event)

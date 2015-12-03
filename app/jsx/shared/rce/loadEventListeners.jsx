@@ -1,27 +1,36 @@
 define([
   'compiled/views/tinymce/InsertUpdateImageView',
-  'tinymce_plugins/instructure_equella/initializeEquella'
-], function(InsertUpdateImageView, initializeEquella){
+  'tinymce_plugins/instructure_equella/initializeEquella',
+  'tinymce_plugins/instructure_external_tools/initializeExternalTools',
+  'INST'
+], function(InsertUpdateImageView, initializeEquella, initializeExternalTools, INST){
 
   return function (callbacks={}) {
-    if(callbacks.imagePickerCB === undefined){
-      callbacks.imagePickerCB = function(view){ /* no-op*/ }
-    }
+    const validCallbacks = [
+      "imagePickerCB",
+      "equellaCB",
+      "externalToolCB"
+    ]
 
-    if(callbacks.equellaCB === undefined){
-      callbacks.equellaCB = function(view){ /* no-op*/ }
-    }
+    validCallbacks.forEach( (cbName) => {
+      if (callbacks[cbName] === undefined) {
+        callbacks[cbName] = function(){ /* no-op*/ }
+      }
+    })
 
     document.addEventListener('tinyRCE/initImagePicker', function(e){
       let view = new InsertUpdateImageView(e.detail.ed, e.detail.selectedNode);
-      // cb for testing
       callbacks.imagePickerCB(view)
     });
 
     document.addEventListener('tinyRCE/initEquella', function(e) {
       initializeEquella(e.detail.ed)
-      // cb for testing
       callbacks.equellaCB()
+    });
+
+    document.addEventListener('tinyRCE/initExternalTools', function(e) {
+      initializeExternalTools(e.detail.ed, e.detail.url, INST)
+      callbacks.externalToolCB()
     });
   }
 });

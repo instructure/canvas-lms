@@ -80,5 +80,4 @@ define([
     $box.dialog('close').dialog('open');
     $box.find("iframe").attr('src', full_url);
   }
-
 })
