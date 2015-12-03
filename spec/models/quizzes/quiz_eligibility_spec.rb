@@ -246,6 +246,15 @@ describe Quizzes::QuizEligibility do
       end
     end
   end
+  
+  describe "with many associated Assignment Overrides" do
+    it "allows a student to take it" do
+      sections = 4.times.map { CourseSection.new(end_at: Time.zone.now - 3.days, restrict_enrollments_to_section_dates: true) }
+      eligibility.stubs(:assignment_overrides).returns(sections)
+      eligibility.stubs(:student_sections).returns([CourseSection.new(end_at: Time.zone.now + 3.days, restrict_enrollments_to_section_dates: true)])
+      expect(eligibility.eligible?).to be_truthy
+    end
+  end
 
 
   describe "#declined_reason_renders" do
