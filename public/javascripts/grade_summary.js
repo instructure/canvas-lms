@@ -373,7 +373,76 @@ define([
       ENV.submissions.push({assignment_id: assignmentId, score: score});
     }
   }
+  
+  function createDueDate(dateString) {
+    months = {
+      Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5,
+      Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov:10, Dec:11
+    };
 
+    var split = dateString.split(" ");
+    var hour = parseInt(split[3].substring(0, 2));
+    if (split[4] == "PM") {
+      hour = hour + 12;
+    }
+
+    var date = new Date();
+    date.setDate(split[1]);
+    date.setMonth(months[split[0]]);
+    date.setHours(hour);
+    date.setMinutes(parseInt(split[3].substring(3, 5)));
+    return date;
+  }
+
+  function calculateTrend(dateGradeArr) {
+    var overallPoints= 0;
+    var recentPoints = 0;
+    var overallPossible = 0;
+    var recentPossible = 0;
+    var dateCutoff = new Date();
+    for (i = dateGradeArr.length - 1; i >= 0 ; i--) {
+      var split = dateGradeArr[i].split(",");
+
+      if (i == dateGradeArr.length - 1) { 
+       dateCutoff = new Date(split[0]).getTime() - (1000* 60 * 60 * 24 * 14);
+      }
+      overallPoints = overallPoints + parseFloat(split[1]);
+      overallPossible = overallPossible + parseFloat(split[2]);
+      if (new Date(split[0]).getTime() > dateCutoff) {
+        recentPoints = recentPoints + parseFloat(split[1]);
+        recentPossible = recentPossible + parseFloat(split[2]);
+      }
+    }
+    return ((parseFloat(overallPoints)/parseFloat(overallPossible) - parseFloat(recentPoints)/parseFloat(recentPossible))*100).toFixed(2);
+  }
+
+  function displayTrend() {
+    var gradesHTML = document.getElementsByClassName("student_assignment assignment_graded editable");
+    var grades = [];
+    var regexp = new RegExp(/class="due">[\s\S]*([a-zA-Z]{3} [0-9]* by [[0-9|:]*pm)[\s\S]*class="original_score">\n\s*([0-9]*)[\s\S]*class="submission_status">\n\s*([a-z]*)[\s\S]*class="possible points_possible" aria-label="">([0-9]*)/);
+
+    for (i = 0; i < gradesHTML.length; i++) {
+      var elem = gradesHTML[i];
+      var match = regexp.exec(elem.innerHTML);
+
+      if (match != null) {
+        var dueDate = createDueDate(RegExp.$1);
+        var originalScore = RegExp.$2;
+        // var status = RegExp.$3; // not needed for now
+        var pointsPossible = RegExp.$4;
+        grades[i] = dueDate + "," + originalScore + "," + pointsPossible;
+      }
+    }
+  
+    var trend = calculateTrend(grades);
+    var msg = "You've been maintaining your grade! Your total grade compared to your grade over the last two weeks (of the latest due date) has changed by " + Math.abs(trend) + "%";
+    if (trend < -5) { msg = "Your grade has been trending up! Your total total grade compared to your grade over the last two weeks (of the latest due date) went up by " + Math.abs(trend) + "%"; }
+    else if (trend > 5) { msg = "Your grade has been trending down! Your total total grade compared to your grade over the last two weeks (of the latest due date) went down by " + Math.abs(trend) + "%"; }
+    msg = '<p>' + msg + '<p>';
+    if (!isNan(trend)) {
+      $('#assignments').prepend(msg);
+    }
+  }
 
   $(document).on('change', '.grading_periods_selector', function(e){
     var newGP = $(this).val();
