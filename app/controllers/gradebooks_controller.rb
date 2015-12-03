@@ -534,9 +534,12 @@ class GradebooksController < ApplicationController
       end
 
       format.json do
-        render :json => @assignment.speed_grader_json(@current_user,
-                                                      avatars: service_enabled?(:avatars),
-                                                      grading_role: grading_role)
+        render json: Assignment::SpeedGrader.new(
+          @assignment,
+          @current_user,
+          avatars: service_enabled?(:avatars),
+          grading_role: grading_role
+        ).json
       end
     end
   end
