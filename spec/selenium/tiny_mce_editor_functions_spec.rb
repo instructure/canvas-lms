@@ -343,7 +343,7 @@ describe "Tiny MCE editor functions" do
       expect(p.body[0..comparison.length]).to eq comparison
     end
 
-    it "should remove text from an unordered list on wiki description", priority: "1", test_id: 532799 do
+    it "should remove text from an unordered list on wiki description", priority: "1", test_id: 535894 do
       p = create_wiki_page("test_page", false, "public")
       num_list_items = 4
       p.body = create_formatted_list(num_list_items,"unordered")
@@ -352,6 +352,40 @@ describe "Tiny MCE editor functions" do
 
       select_all_wiki
       click_tiny_button('Bullet list')
+      f("form.edit-form button.submit").click
+      wait_for_ajaximations
+
+      p.reload
+      # To avoid fragility of extra formatting characters being added, I just want the first 18 characters
+      comparison = create_unformatted_list(num_list_items)
+      expect(p.body[0..comparison.length]).to eq comparison
+    end
+
+    it "should make a numbered list on wiki description", priority: "1", test_id: 307625 do
+      p = create_wiki_page("test_page", false, "public")
+      num_list_items = 4
+      get "/courses/#{@course.id}/pages/#{p.title}/edit"
+
+      click_tiny_button('Numbered list')
+      type_tiny_list(num_list_items)
+      f("form.edit-form button.submit").click
+      wait_for_ajaximations
+
+      p.reload
+      # To avoid fragility of extra formatting characters being added, I just want the first 63 characters
+      comparison = create_formatted_list(num_list_items, "ordered")
+      expect(p.body[0..comparison.length]).to eq comparison
+    end
+
+    it "should remove text from a numbered list on wiki description", priority: "1", test_id: 537619 do
+      p = create_wiki_page("test_page", false, "public")
+      num_list_items = 4
+      p.body = create_formatted_list(num_list_items,"ordered")
+      p.save!
+      get "/courses/#{@course.id}/pages/#{p.title}/edit"
+
+      select_all_wiki
+      click_tiny_button('Numbered list')
       f("form.edit-form button.submit").click
       wait_for_ajaximations
 
