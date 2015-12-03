@@ -2254,6 +2254,7 @@ de:
   body_shadow_d36e8c2e: Textfeld-Schatten
   bookmark_service: 
     default_title: "Ohne Titel"
+  bounce_count_reset_c4c2218f: "Bounce-Zähler zurücksetzen!"
   breadcrumb_1_cb3c504: "Brotkrümel 1"
   breadcrumb_2_95ba94be: "Brotkrümel 2"
   broccoli_cloud: 
@@ -15055,6 +15056,7 @@ de:
       image_source: Bildquelle
       image_url_field_label: Bild-URL
       image_width: Bildbreite
+      quiz_warning: "Hinweis Dieses Label können Studenten sehen, die an einem Quiz teilnehmern."
       url: URL
   title: 
     edit_announcement: "Ankündigung bearbeiten"
@@ -15135,6 +15137,7 @@ de:
   unauthorized_message: "JWT-Signatur ungültig"
   unauthorized_to_delete_this_file_a1271224: "Nicht berechtigt, um diese Datei zu löschen"
   unchanged_aca18e02: "[Unverändert]"
+  undated_items_toggle_list_visibility_6219e641: "Undatierte Elemente - Sichtbarkeit der Liste ein/aus"
   undo_a7be8fef: "Rückgängig machen"
   ungraded_submissions_44efb0ec: "Nicht benotete Einsendungen"
   ungraded_survey_ad7de790: "Unbenotete Befragung"
@@ -15146,6 +15149,7 @@ de:
   unknown_quiz: "Unbekanntes Quiz"
   unknown_user_url_82196ba7: "Unbekannte Benutzer-URL"
   unlock_at_bb930b34: "Freigeben am"
+  unlock_at_time_a0bbfb9: "Entsperren um: %{time}"
   unlock_date_cannot_be_after_due_date_8829d9ca: "Das Entsperrungsdatum kann nicht nach dem Abgabetermin liegen"
   unlock_date_cannot_be_after_lock_date_591f7fda: "Das Entsperrungsdatum kann nicht nach dem Sperrdatum liegen"
   unlock_date_cannot_be_before_course_start_9c7b8524: "Das Entsperrungsdatum kann nicht vor dem Kursstart liegen"
@@ -15173,6 +15177,7 @@ de:
   up_c553575d: "Nach oben"
   update_4d8ee62: Aktualisieren
   updated_group_group_name_727b1d98: "Aktualisierte Gruppe %{group_name}"
+  updated_ui_for_searching_and_displaying_users_and__6755e08e: "Aktualisierte UI zur Suche und Anzeige von Benutzern und Kursen innerhalb eines Kontos."
   updating_6edbab78: "Wird aktualisiert"
   upload_8b403d05: Hochladen
   upload_a_css_file_ec22214b: "Eine CSS-Datei hochladen..."
@@ -15277,6 +15282,7 @@ de:
       updating_user_details: "Benutzerdaten werden aktualisiert..."
     notices: 
       image_reported: "Dieses Bild wurde gemeldet"
+  user_name_successfully_added_79af8365: "*%{user_name} erfolgreich hinzugefügt!"
   user_name_you_ll_need_to_log_in_before_you_can_vie_164c8e30: "%{user_name}, Sie müssen sich zuerst *anmelden*, bevor Sie diese Seite ansehen können."
   user_navigation_a097be0f: Benutzer-Navigation
   user_not_authorized_to_manage_sis_data_account_sis_47bd4eec: "Benutzer ist zur Verwaltung von SIS-Daten nicht berechtigt - account[sis_account_id]"
@@ -15603,6 +15609,7 @@ de:
       welcome_to_happiness: "Willkommen bei Canvas!"
   validate: 
     is_required: "Dies ist ein Pflichtfeld"
+  validate_links_in_content_b1630fba: "Links im Inhalt validieren"
   vanity_url_76f93382: "Vanity URL"
   video_b9f27375: Video
   video_content_is_not_supported_by_your_device_or_a_25214f57: "Ihr Gerät oder Ihre App unterstützt keinen Video-Inhalt."
@@ -15614,10 +15621,14 @@ de:
   view_file_8a1c62e5: "Datei ansehen"
   view_grades_8d3bae6c: "Noten anzeigen"
   view_name_app_62a2ad8e: "%{name}-App anzeigen"
+  view_next_file_a8a4a885: "Nächste Datei ansehen"
+  view_previous_file_b846db4f: "Vorige Datein ansehen"
   view_question_banks_188a9e0f: "Fragenpools ansehen"
   view_student_analytics_6b8ccd42: "Studentenanalysen anzeigen"
+  view_the_assignment_e61ca4fc: "Aufgabe ansehen"
   view_toolname_placements_4a5724d1: "%{toolName} Platzierungen ansehen"
   viewed_6b75c21e: Angezeigt
+  viewing_folders_is_not_available_798a15e1: "Ansicht von Ordnern ist nicht verfügbar"
   visit_864b4060: Besuchen
   visit_group_group_name_7a816081: "Gruppe %{group_name} besuchen"
   warning_crocodoc_has_limitations_when_used_in_fire_8ab414e6: "Achtung: Wenn in Firefox benutzt, arbeitet Crocodoc nur eingeschränkt. Kommentare werden nicht immer gespeichert."
@@ -15789,6 +15800,7 @@ de:
       page_does_not_exist: "Die Seite \"%{title}\" existiert nicht."
     revisions: 
       page_revisions_title: "Überarbeitungen für %{title}: %{context_name}"
+  wiki_pages_13eb70fb: Wiki-Seiten
   wiki_pages_api: 
     cannot_delete_front_page: "Die Startseite kann nicht gelöscht werden"
     cannot_have_unpublished_front_page: "Die Veröffentlichung der Startseite kann nicht rückgängig gemacht werden"
