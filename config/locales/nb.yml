@@ -1224,6 +1224,7 @@ nb:
   add_course_assignments_628ed6d0: "Legg til oppgaver for kurset"
   add_course_calendar_events_146154a5: "Legg til kalenderhendelser for kurset"
   add_files_to_the_course_da6ffd32: "Legg filer til kurset"
+  add_folder_ba50d107: "Legg til mappe"
   add_grading_period_6f774dc3: "Legg til vurderingsperiode"
   add_grading_scheme_81e23c05: "Legg til karakterskala"
   add_icon_567dbcaa: "legg til ikon"
@@ -5150,7 +5151,7 @@ nb:
     default_discussion_title: "Ingen tittel"
     deleted_topic_notice: "Det temaet er blitt slettet"
     discussion: 
-      close_for_comments: "Steng for kommentarer"
+      close_for_comments: "Stengt for kommentarer"
       delete: Slett
       due: "Leveres innen"
       graded_discussion: "Karaktersatt diskusjon:"
@@ -5320,7 +5321,7 @@ nb:
       post_message: "Legg til beskjed"
     summary_view: 
       attached_file_name: "Vedlagt: %{display_name}"
-      close_for_comments: "Steng for kommentarer"
+      close_for_comments: "Stengt for kommentarer"
       delete: Slette
       drag_up_or_down_to_reorder: "Dra opp eller ned for å endre rekkefølge"
       locked: "Dette temaet er stengt for kommentarer"
@@ -5433,6 +5434,7 @@ nb:
   done_8af51c9b: Ferdig.
   done_editing_9f7379d9: "Ferdig med redigering."
   down_5831a426: Ned
+  download_as_zip_5dae7f19: "Last ned som ZIP"
   download_associated_files_f35dcb5e: "Last ned tilknyttede filer"
   download_c7ffdfb9: "Last ned"
   download_course_content_7f66edc9: "Last ned Kursinnhold"
@@ -6282,6 +6284,7 @@ nb:
       invalid_recursion: "En mappe kan ikke være sin egen overordnete mappe"
       invalid_root_folder_name: "Root mappenavn kan ikke endres"
     folder_created: "Mappen \"%{name}\" etablert"
+  folder_705fd2d7: Mappe
   folder_browsing_tree_1f00a3ae: "Folder Browsing treet"
   folders: 
     event_updated: "Hendelsen ble oppdatert"
@@ -9915,6 +9918,7 @@ nb:
       student_progress: Studentfremdrift
     relock_modules: "Låse Moduler Igjen"
     requirements_changed: "Kravene Endret"
+  modules_c4325335: Moduler
   modules_item_controller: 
     max_score_complete: "scoret ikke mer enn en *poengsum*"
     max_score_incomplete: "må score ikke mer enn en *poengsum*"
@@ -10367,6 +10371,7 @@ nb:
   of_students_5d1af0d2: "# Av studenter"
   ok_c47544a2: OK
   okay_got_it_d686d4e8: "Ok, fikk det"
+  on_paper_46d0ba36: "På papir"
   on_time_percent_eebffe38: "På Tid: %{percent}"
   once_you_ve_changed_an_answer_you_ll_need_to_choos_7071f728: "Når du har endret et svar må du gjøre et valg før du oppdaterer spørsmålet."
   one_per_line_format_name_value_79647700: "Én per linje. Format: navn=verdi"
@@ -10615,6 +10620,7 @@ nb:
   peer_reviews_cannot_be_enabled_for_moderated_assig_149d33c4: "Fagfellevurderinger kan ikke aktiveres for modererte oppdrag "
   percent_complete_3a7edc20: "%{percent} fullført"
   percent_of_students_scored_score_53d2c4d5: "%{percent} av studenter scoret %{score}"
+  percentage_34ab7c2c: Prosent
   percentused_of_bytesavailable_used_894e2327: "%{percentUsed}% av %{bytesAvailable} brukt"
   performance_enhancements_for_the_gradebook_e6c5d5a5: "Ytelsesforbedringer for karakterbok"
   permission_not_found_620b80d1: "Tillatelse ikke funnet"
@@ -13268,8 +13274,10 @@ nb:
     enrollments_tas: Læringsassistenter
     enrollments_teachers: Forelesere
     student_groups: Studentgrupper
+  search_280d00bd: Søk
   search_by_user_dd3ad189: "Søk etter bruker"
   search_entries_or_author_63fb0a86: "Søk oppføringer eller forfatter"
+  search_for_files_7541fb28: "Søk etter filer"
   search_groups_or_people_6c15d6ad: "Søk i grupper eller personer"
   search_title_body_or_author_1d26711f: "Søk tittel, innholdstekst eller forfatter"
   searching_b0207e7f: Søker
@@ -14593,6 +14601,7 @@ nb:
   take_the_quiz_again_8ea51a6c: "Ta prøven på nytt"
   take_the_survey_ada59508: "Ta undersøkelsen"
   take_the_survey_again_24ce22c2: "Ta undersøkelsen på nytt"
+  teacher_5a73b637: Lærer
   teachers_52e2423f: Forelesere
   teal_f729a294: Blågrønn
   tell_us_how_and_when_you_would_like_to_be_notified_de3ed2bc: "Fortell oss hvordan og når du ønsker å bli varslet om hendelser i Canvas."
