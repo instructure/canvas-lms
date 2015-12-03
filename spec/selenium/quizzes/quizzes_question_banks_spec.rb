@@ -255,7 +255,7 @@ describe 'quizzes question banks' do
       new_name = 'I have been edited'
       new_question_text = "What is the answer to #{new_name}?"
 
-      get "/courses/#{@course.id}/quizzes/#{@q.id}/edit"
+      open_quiz_edit_form
       click_questions_tab
       hover_and_click("#question_#{@quest1.id} .edit_question_link")
       replace_content(f('.question_form [name=\'question_name\']'), new_name)
@@ -264,7 +264,7 @@ describe 'quizzes question banks' do
       click_save_settings_button
 
       # verify modifications
-      get "/courses/#{@course.id}/quizzes/#{@q.id}/edit"
+      open_quiz_edit_form
       click_questions_tab
 
       expect(f("#question_#{@quest1.id}")).to include_text new_name

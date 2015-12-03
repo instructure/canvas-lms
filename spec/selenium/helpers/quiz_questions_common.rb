@@ -13,10 +13,9 @@ module QuizQuestionsCommon
     @quiz.title = "OQAAT quiz"
     @quiz.one_question_at_a_time = true
     if opts[:publish]
-      @quiz.workflow_state = "available"
+      @quiz.publish!
       @quiz.generate_quiz_data
     end
-    @quiz.published_at = Time.zone.now
     @quiz.save!
   end
 
@@ -34,7 +33,7 @@ module QuizQuestionsCommon
   end
 
   def take_the_quiz
-    get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
+    open_quiz_show_page
     fj("a:contains('Take the Quiz')").click
 
     # sleep because display is updated on timer, not ajax callback
@@ -42,7 +41,7 @@ module QuizQuestionsCommon
   end
 
   def preview_the_quiz
-    get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
+    open_quiz_show_page
     f("#preview_quiz_button").click
 
     # sleep because display is updated on timer, not ajax callback

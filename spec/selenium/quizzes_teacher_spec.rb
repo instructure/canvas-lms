@@ -128,7 +128,7 @@ describe "quizzes" do
     end
 
     describe "insufficient count warnings" do
-      it "should show a warning for groups picking too many questions" do
+      it "should show a warning for groups picking too many questions", priority: "2", test_id: 539340 do
         get "/courses/#{@course.id}/quizzes/new"
         click_questions_tab
         f('.add_question_group_link').click
@@ -164,7 +164,7 @@ describe "quizzes" do
         expect(f(".insufficient_count_warning")).to_not be_displayed
       end
 
-      it "should show a warning for groups picking too many questions from a bank" do
+      it "should show a warning for groups picking too many questions from a bank", priority: "2", test_id: 539341 do
         bank = @course.assessment_question_banks.create!
         assessment_question_model(bank: bank)
 

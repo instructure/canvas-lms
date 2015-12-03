@@ -118,47 +118,47 @@ module QuizzesCommon
   def quiz_with_multiple_type_questions(goto_edit=true)
     @context = @course
     bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
-    @q = quiz_model
+    @quiz = quiz_model
     a = bank.assessment_questions.create!
     b = bank.assessment_questions.create!
     c = bank.assessment_questions.create!
     answers = [ {'id' => 1}, {'id' => 2}, {'id' => 3} ]
 
-    @quest1 = @q.quiz_questions.create!(question_data:
+    @quest1 = @quiz.quiz_questions.create!(question_data:
                                             {name: "first question", question_type: 'multiple_choice_question',
                                              'answers' => answers, points_possible: 1}, assessment_question: a)
-    @quest2 = @q.quiz_questions.create!(question_data:
+    @quest2 = @quiz.quiz_questions.create!(question_data:
                                             {name: "second question", question_text: 'What is 5+5?',
                                              question_type: 'numerical_question',
                                              'answers' => [], points_possible: 1}, assessment_question: b)
-    @quest3 = @q.quiz_questions.create!(question_data:
+    @quest3 = @quiz.quiz_questions.create!(question_data:
                                             {name: "third question", question_type: 'essay_question',
                                              'answers' => [], points_possible: 1}, assessment_question: c)
-    yield bank, @q if block_given?
-    @q.generate_quiz_data
-    @q.save!
-    get "/courses/#{@course.id}/quizzes/#{@q.id}/edit" if goto_edit
-    @q
+    yield bank, @quiz if block_given?
+    @quiz.generate_quiz_data
+    @quiz.save!
+    open_quiz_edit_form if goto_edit
+    @quiz
   end
 
   def quiz_with_new_questions(goto_edit=true)
     @context = @course
     bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
-    @q = quiz_model
+    @quiz = quiz_model
     a = bank.assessment_questions.create!
     b = bank.assessment_questions.create!
 
     answers = [ {'id' => 1}, {'id' => 2}, {'id' => 3} ]
 
-    @quest1 = @q.quiz_questions.create!(:question_data => {:name => "first question", 'question_type' => 'multiple_choice_question', 'answers' => answers, :points_possible => 1}, :assessment_question => a)
+    @quest1 = @quiz.quiz_questions.create!(:question_data => {:name => "first question", 'question_type' => 'multiple_choice_question', 'answers' => answers, :points_possible => 1}, :assessment_question => a)
 
-    @quest2 = @q.quiz_questions.create!(:question_data => {:name => "second question", 'question_type' => 'multiple_choice_question', 'answers' => answers, :points_possible => 1}, :assessment_question => b)
-    yield bank, @q if block_given?
+    @quest2 = @quiz.quiz_questions.create!(:question_data => {:name => "second question", 'question_type' => 'multiple_choice_question', 'answers' => answers, :points_possible => 1}, :assessment_question => b)
+    yield bank, @quiz if block_given?
 
-    @q.generate_quiz_data
-    @q.save!
-    get "/courses/#{@course.id}/quizzes/#{@q.id}/edit" if goto_edit
-    @q
+    @quiz.generate_quiz_data
+    @quiz.save!
+    open_quiz_edit_form if goto_edit
+    @quiz
   end
 
   def click_settings_tab
@@ -242,20 +242,20 @@ module QuizzesCommon
   ensure
     # This step is to prevent selenium from freezing when the dialog appears when leaving the page
     fln('Quizzes').click
-    driver.switch_to.alert.accept
+    driver.switch_to.alert.accept if alert_present?
   end
 
-  # @argument answer_chooser [#call]
-  #   You can pass a block to specify which answer to choose, the block will
-  #   receive the set of possible answers. If you don't, the first (and correct)
-  #   answer will be chosen.
-  def take_and_answer_quiz(submit=true, access_code=nil)
+  def take_and_answer_quiz(opts={})
+    @quiz = opts[:quiz] if opts.fetch(:quiz, false)
+    submit = opts.fetch(:submit, true)
+    access_code = opts.fetch(:access_code, nil)
+
     begin_quiz(access_code)
     complete_and_submit_quiz(submit)
   end
 
   def begin_quiz(access_code=nil)
-    get "/courses/#{@course.id}/quizzes/#{@quiz.id}/take?user_id=#{@user.id}"
+    get take_quiz_url
 
     if access_code.nil?
       expect_new_page_load { f('#take_quiz_link').click }
@@ -281,7 +281,7 @@ module QuizzesCommon
   end
 
   def preview_quiz(submit=true)
-    get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
+    open_quiz_show_page
 
     expect_new_page_load { f('#preview_quiz_button').click }
     wait_for_quiz_to_begin
@@ -289,6 +289,10 @@ module QuizzesCommon
     complete_and_submit_quiz(submit)
   end
 
+  # @argument answer_chooser [#call]
+  #   You can pass a block to specify which answer to choose, the block will
+  #   receive the set of possible answers. If you don't, the first (and correct)
+  #   answer will be chosen.
   def complete_and_submit_quiz(submit=true)
     answer =
       if block_given?
@@ -369,6 +373,12 @@ module QuizzesCommon
   def close_regrade_tooltip
     fj('.btn.usher-close').click
     wait_for_ajaximations
+  end
+
+  # clicks |Okay, fine|
+  def close_times_up_dialog
+    times_up_dialog = fj('div#times_up_dialog:visible')
+    fj('button.submit_quiz_button', times_up_dialog).click unless times_up_dialog.nil?
   end
 
   def edit_first_question
@@ -584,6 +594,10 @@ module QuizzesCommon
     @quiz.quiz_questions.create!(question_data: data)
 
     @quiz.allowed_attempts = -1 if opts.fetch(:unlimited_attempts, false)
+    @quiz.lock_at = opts.fetch(:lock_at, nil)
+    @quiz.due_at = opts.fetch(:due_at, nil)
+    @quiz.unlock_at = opts.fetch(:unlock_at, nil)
+
     @quiz.generate_quiz_data
     @quiz.publish!
     @quiz.save!
@@ -639,5 +653,94 @@ module QuizzesCommon
     submission.save!
 
     quiz
+  end
+
+  def verify_quiz_is_locked
+    open_quiz_show_page unless driver.current_url == quiz_show_page_url
+    expect(fj('.lock_explanation')).to include_text 'This quiz was locked'
+  end
+
+  def verify_quiz_is_submitted
+    open_quiz_show_page unless driver.current_url == quiz_show_page_url
+    expect(fj('.quiz-submission')).to include_text 'Submitted'
+  end
+
+  def verify_quiz_submission_is_late
+    verify_quiz_submission_late_status(:late)
+  end
+
+  def verify_quiz_submission_is_not_late
+    verify_quiz_submission_late_status(!:late)
+  end
+
+  def open_quiz_show_page
+    get quiz_show_page_url
+  end
+
+  def open_student_quiz_submission
+    get quiz_student_submission_url
+  end
+
+  def verify_quiz_submission_is_late_in_speedgrader
+    verify_quiz_submission_status_in_speedgrader(:late)
+  end
+
+  def verify_quiz_submission_is_not_late_in_speedgrader
+    verify_quiz_submission_status_in_speedgrader(!:late)
+  end
+
+  def open_quiz_in_speedgrader
+    user_session(@teacher)
+    get quiz_submission_speedgrader_url
+  end
+
+  def open_quiz_edit_form
+    get quiz_edit_form_url
+  end
+
+  private
+
+  def quiz_show_page_url
+    "/courses/#{@course.id}/quizzes/#{@quiz.id}"
+  end
+
+  def quiz_edit_form_url
+    "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
+  end
+
+  def quiz_student_submission_url
+    "/courses/#{@course.id}/assignments/#{@quiz.assignment_id}/submissions/#{@student.id}"
+  end
+
+  def quiz_submission_speedgrader_url
+    "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@quiz.assignment_id}"
+  end
+
+  def take_quiz_url
+    "/courses/#{@course.id}/quizzes/#{@quiz.id}/take?user_id=#{@user.id}"
+  end
+
+  def verify_quiz_submission_late_status(late)
+    open_student_quiz_submission
+    submission_page_info = fj('.submission_details', '#not_right_side')
+    late_status = '(late)'
+
+    if late
+      expect(submission_page_info).to include_text late_status
+    else
+      expect(submission_page_info).not_to include_text late_status
+    end
+  end
+
+  def verify_quiz_submission_status_in_speedgrader(late)
+    open_quiz_in_speedgrader
+    speedgrader_submission_details = fj('#submission_details', '.right_side_content')
+    late_note = 'Note: This submission was LATE'
+
+    if late
+      expect(speedgrader_submission_details).to include_text late_note
+    else
+      expect(speedgrader_submission_details).not_to include_text late_note
+    end
   end
 end

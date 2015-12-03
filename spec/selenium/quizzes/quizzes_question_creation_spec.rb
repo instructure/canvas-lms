@@ -360,14 +360,14 @@ describe 'quizzes question creation' do
   context 'when a quiz has more than 25 questions' do
 
     def quiz_questions_creation
-      @q = @course.quizzes.create!(title: 'new quiz')
+      @quiz = @course.quizzes.create!(title: 'new quiz')
       26.times do
-        @q.quiz_questions.create!(question_data: {name: 'Quiz Questions', question_type: 'essay_question', question_text: 'qq_1', answers: [], points_possible: 1})
+        @quiz.quiz_questions.create!(question_data: {name: 'Quiz Questions', question_type: 'essay_question', question_text: 'qq_1', answers: [], points_possible: 1})
       end
-      @q.generate_quiz_data
-      @q.workflow_state = 'available'
-      @q.save
-      @q.reload
+      @quiz.generate_quiz_data
+      @quiz.workflow_state = 'available'
+      @quiz.save
+      @quiz.reload
     end
 
     before(:each) do
@@ -376,7 +376,7 @@ describe 'quizzes question creation' do
     end
 
     it 'edits quiz questions', priority: "1", test_id: 140578 do
-      get "/courses/#{@course.id}/quizzes/#{@q.id}/edit"
+      open_quiz_edit_form
       click_questions_tab
       driver.execute_script("$('.display_question').first().addClass('hover').addClass('active')")
       fj('.edit_teaser_link').click

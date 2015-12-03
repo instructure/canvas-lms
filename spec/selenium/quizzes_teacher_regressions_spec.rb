@@ -26,7 +26,7 @@ describe 'quizzes regressions' do
   it 'can flag a quiz question while taking a quiz as a teacher', priority: "1", test_id: 209958 do
     quiz_with_new_questions(false)
 
-    get "/courses/#{@course.id}/quizzes/#{@q.id}"
+    open_quiz_show_page
 
     expect_new_page_load do
       f('#take_quiz_link').click
@@ -47,7 +47,7 @@ describe 'quizzes regressions' do
     expect_new_page_load {
       f('#submit_quiz_button').click
     }
-    expect(f('#quiz_title').text).to eq @q.title
+    expect(f('#quiz_title').text).to eq @quiz.title
   end
 
   it 'marks questions as answered when the window loses focus', priority: "1", test_id: 209959 do

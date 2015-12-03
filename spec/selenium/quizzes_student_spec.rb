@@ -43,52 +43,6 @@ describe 'quizzes' do
         @qsub = quiz_with_submission(false)
       end
 
-      context 'when taking a timed quiz' do
-
-        it 'warns the student before the lock date is exceeded', priority: "1", test_id: 209407 do
-          @context = @course
-          bank = @course.assessment_question_banks.create!(title: 'Test Bank')
-          q = quiz_model
-          a = bank.assessment_questions.create!
-          answers = [
-            {
-              id: 1,
-              answer_text: 'A',
-              weight: 100
-            },
-            {
-              id: 2,
-              answer_text: 'B',
-              weight: 0
-            }
-          ]
-          question = q.quiz_questions.create!(
-            question_data: {
-              name: 'first question',
-              question_type: 'multiple_choice_question',
-              answers: answers,
-              points_possible: 1
-            }, assessment_question: a
-          )
-
-          q.generate_quiz_data
-          q.lock_at = Time.now.utc + 10.seconds
-          q.save!
-
-          expect_new_page_load { get "/courses/#{@course.id}/quizzes/#{q.id}/take?user_id=#{@student.id}" }
-          expect_new_page_load { f('#take_quiz_link').click }
-          answer_one = f("#question_#{question.id}_answer_1")
-
-          # force a save to create a submission
-          answer_one.click
-
-          keep_trying_until(10) do
-            Quizzes::QuizSubmission.last
-            expect(fj('#times_up_dialog:visible')).to include_text 'Time\'s Up!'
-          end
-        end
-      end
-
       context 'when attempting to resume a quiz' do
         def update_quiz_lock(lock_at, unlock_at)
           @quiz.update_attributes(lock_at: lock_at, unlock_at: unlock_at)
@@ -215,7 +169,7 @@ describe 'quizzes' do
 
       expect(Delayed::Job.find_by_tag(job_tag)).to eq nil
 
-      take_and_answer_quiz(false)
+      take_and_answer_quiz(submit: false)
 
       driver.execute_script('window.close()')
 

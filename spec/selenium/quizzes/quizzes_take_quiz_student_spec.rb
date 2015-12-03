@@ -1,12 +1,16 @@
-require_relative "../common"
-require_relative "../helpers/quizzes_common"
+require_relative '../common'
+require_relative '../helpers/quizzes_common'
 
 describe 'taking a quiz' do
-  include_context "in-process server selenium tests"
+  include_context 'in-process server selenium tests'
   include QuizzesCommon
 
   context 'as a student' do
-    before(:once) { course_with_student(active_all: 1) }
+    before(:once) do
+      course_with_teacher(active_all: 1)
+      course_with_student(course: @course, active_all: 1)
+    end
+
     before(:each) { user_session(@student) }
 
     context 'when the quiz has an access code' do
@@ -35,8 +39,11 @@ describe 'taking a quiz' do
         end
 
         def verify_no_access_code_reprompts_during_oqaat_quiz
-          @quiz = oqaat_quiz
-          take_and_answer_quiz(false, access_code)
+          take_and_answer_quiz(
+            submit: false,
+            access_code: access_code,
+            quiz: oqaat_quiz
+          )
 
           yield if block_given?
 
@@ -81,9 +88,12 @@ describe 'taking a quiz' do
           quiz.reload
         end
 
-        def start_quiz_and_verify_reprompt_for_access_code
-          @quiz = quiz_with_unlimited_attempts
-          take_and_answer_quiz(false, access_code)
+        def start_and_exit_quiz
+          take_and_answer_quiz(
+            submit: false,
+            access_code: access_code,
+            quiz: quiz_with_unlimited_attempts
+          )
 
           # exit quiz without submitting
           expect_new_page_load do
@@ -93,27 +103,30 @@ describe 'taking a quiz' do
 
           yield if block_given?
 
-          # Canvas should prompt for access code again
-          expect(f('#quiz_access_code')).to be_truthy
-
         ensure
           # This prevents selenium from freezing when the dialog appears upon leaving the quiz
           fln('Quizzes').click
           driver.switch_to.alert.accept
         end
 
+        def verify_access_code_prompt
+          expect(f('#quiz_access_code')).to be_truthy
+        end
+
         it 'prompts for access code upon resuming the quiz', priority: "1", test_id: 421218 do
           skip_if_firefox('Known issue CNVS-24622')
-          start_quiz_and_verify_reprompt_for_access_code do
+          start_and_exit_quiz do
             expect_new_page_load { fj('a.ig-title', '#assignment-quizzes').click }
             expect_new_page_load { fln('Resume Quiz').click }
+            verify_access_code_prompt
           end
         end
 
         it 'prompts for an access code upon resuming the quiz via the browser back button', priority: "1", test_id: 421222 do
           skip_if_firefox('Known issue CNVS-24622')
-          start_quiz_and_verify_reprompt_for_access_code do
+          start_and_exit_quiz do
             expect_new_page_load { driver.navigate.back }
+            verify_access_code_prompt
           end
         end
       end
