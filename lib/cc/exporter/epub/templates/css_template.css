@@ -31,6 +31,12 @@
     max-height: 90%;
     height: auto;
   }
+  video{
+    max-width: 90%;
+    width: auto;
+    max-height: 90%;
+    height: auto;
+  }
   .item_details {
     border: 1px solid #ccc;
     background-color: #eee;
