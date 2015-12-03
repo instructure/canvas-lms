@@ -19,19 +19,33 @@ module CC::Exporter::Epub::Converters
       html_node.tap do |node|
         node.search(object_path_selector).each do |tag|
           tag['href'] = href_for_tag(tag)
+          replace_missing_content!(tag) unless tag['href'].present?
         end
       end
     end
 
     def href_for_tag(tag)
       match = tag['href'].match(/([a-z]+)\/(.+)/)
+      return nil unless match.present?
 
       if sort_by_content
-        "#{match[1]}.xhtml##{match[2]}"
+        match[1] =~ /module/ ? nil : "#{match[1]}.xhtml##{match[2]}"
       else
         item = get_item(match[1], match[2])
         item[:href]
       end
+    end
+
+    def replace_missing_content!(tag)
+      tag.replace(<<-SPAN)
+        <span>
+          #{tag.content}
+          #{I18n.t(<<-TEXT)
+            (Link has been removed because content is not present or cannot be resolved.)
+          TEXT
+          }
+        </span>
+      SPAN
     end
 
     def object_path_selector
