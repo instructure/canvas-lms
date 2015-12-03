@@ -6,7 +6,6 @@ define([
   'str/htmlEscape',
   'jquery.dropdownList',
   'jquery.instructure_misc_helpers',
-  'jquery.instructure_misc_plugins',
   'underscore'
 ], function(tinymce, I18n, $, htmlEscape) {
 

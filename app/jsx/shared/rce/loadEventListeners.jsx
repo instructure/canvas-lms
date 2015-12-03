@@ -2,14 +2,16 @@ define([
   'compiled/views/tinymce/InsertUpdateImageView',
   'tinymce_plugins/instructure_equella/initializeEquella',
   'tinymce_plugins/instructure_external_tools/initializeExternalTools',
+  'tinymce_plugins/instructure_record/mediaEditorLoader',
   'INST'
-], function(InsertUpdateImageView, initializeEquella, initializeExternalTools, INST){
+], function(InsertUpdateImageView, initializeEquella, initializeExternalTools, mediaEditorLoader, INST){
 
   return function (callbacks={}) {
     const validCallbacks = [
       "imagePickerCB",
       "equellaCB",
-      "externalToolCB"
+      "externalToolCB",
+      "recordCB"
     ]
 
     validCallbacks.forEach( (cbName) => {
@@ -31,6 +33,11 @@ define([
     document.addEventListener('tinyRCE/initExternalTools', function(e) {
       initializeExternalTools(e.detail.ed, e.detail.url, INST)
       callbacks.externalToolCB()
+    });
+
+    document.addEventListener('tinyRCE/initRecord', function(e) {
+      mediaEditorLoader.insertEditor(e.detail.ed)
+      callbacks.recordCB()
     });
   }
 });

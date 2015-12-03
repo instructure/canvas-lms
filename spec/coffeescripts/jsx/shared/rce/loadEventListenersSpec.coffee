@@ -2,9 +2,11 @@ define [
   'compiled/views/tinymce/InsertUpdateImageView',
   'jsx/shared/rce/loadEventListeners',
   'jquery',
-  'jqueryui/tabs'
+  'jqueryui/tabs',
+  'INST'
 ], (InsertUpdateImageView, loadEventListeners) ->
   fakeEditor = undefined
+
   module 'loadEventListeners',
     setup: ->
       window.INST.maxVisibleEditorButtons = 10
@@ -30,6 +32,7 @@ define [
 
     teardown: ->
       window.alert.restore && window.alert.restore()
+      console.log.restore && console.log.restore()
 
   asyncTest 'builds new image view on RCE event', ->
     expect(1)
@@ -67,4 +70,17 @@ define [
     event = document.createEvent('CustomEvent')
     eventData = {'ed': fakeEditor, 'url': "someurl.com"}
     event.initCustomEvent("tinyRCE/initExternalTools", true, true, eventData)
+    document.dispatchEvent(event)
+
+  asyncTest 'initializes recording plugin', ->
+    logSpy = sinon.spy(console, "log")
+    expect(1)
+    loadEventListeners({recordCB:()->
+      start()
+      ok logSpy.calledWith("Kaltura has not been enabled for this account")
+    })
+
+    event = document.createEvent('CustomEvent')
+    eventData = {'ed': fakeEditor}
+    event.initCustomEvent("tinyRCE/initRecord", true, true, eventData)
     document.dispatchEvent(event)

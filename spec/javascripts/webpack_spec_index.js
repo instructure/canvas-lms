@@ -369,6 +369,7 @@ require(__dirname + "/../coffeescripts/jsx/shared/rce/loadRCESpec.coffee")
 require(__dirname + "/../coffeescripts/jsx/shared/rce/loadEventListenersSpec.coffee")
 require(__dirname + "/../coffeescripts/tinymce_plugins/instructure_external_tools/ExternalToolsHelperSpec.coffee")
 require(__dirname + "/../coffeescripts/tinymce_plugins/instructure_external_tools/initializeExternalToolsSpec.coffee")
+require(__dirname + "/../coffeescripts/tinymce_plugins/instructure_record/mediaEditorLoaderSpec.coffee")
 
 
 //var testsContext = require.context(__dirname + "/../coffeescripts", true, /Spec.coffee$/);
