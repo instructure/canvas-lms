@@ -26,16 +26,21 @@ module CanvasHttp
   # header), which actually isn't even technically allowed by the HTTP spec.
   # But everybody allows and handles it.
   def self.get(url_str, other_headers = {}, redirect_limit = 3)
+    last_scheme = nil
+    last_host = nil
+
     loop do
       raise(TooManyRedirectsError) if redirect_limit <= 0
 
-      _, uri = CanvasHttp.validate_url(url_str)
+      _, uri = CanvasHttp.validate_url(url_str, last_host, last_scheme) # uses the last host and scheme for relative redirects
       http = CanvasHttp.connection_for_uri(uri)
       request = Net::HTTP::Get.new(uri.request_uri, other_headers)
       http.verify_mode = OpenSSL::SSL::VERIFY_NONE
       http.request(request) do |response|
         case response
           when Net::HTTPRedirection
+            last_host = uri.host
+            last_scheme = uri.scheme
             url_str = response['Location']
             redirect_limit -= 1
           else
@@ -51,16 +56,24 @@ module CanvasHttp
   end
 
   # returns [normalized_url_string, URI] if valid, raises otherwise
-  def self.validate_url(value)
+  def self.validate_url(value, host=nil, scheme=nil)
     value = value.strip
     raise ArgumentError if value.empty?
     uri = URI.parse(value)
+    uri.host ||= host
     unless uri.scheme
-      value = "http://#{value}"
-      uri = URI.parse(value)
+      scheme ||= "http"
+      if uri.host
+        uri.scheme = scheme
+        value = uri.to_s
+      else
+        value = "#{scheme}://#{value}"
+      end
+      uri = URI.parse(value) # it's still a URI::Generic
     end
     raise ArgumentError unless %w(http https).include?(uri.scheme.downcase)
     raise(RelativeUriError) if uri.host.nil? || uri.host.strip.empty?
+
     return value, uri
   end
 
