@@ -25,7 +25,7 @@ describe PageViewsController do
 
   # Factory-like thing for page views.
   def page_view(user, url, options={})
-    options.reverse_merge!(:request_id => rand(100000000).to_s,
+    options.reverse_merge!(:request_id => 'req' + rand(100000000).to_s,
                            :user_agent => 'Firefox/12.0')
     options.merge!(:url => url)
 
@@ -78,5 +78,17 @@ describe PageViewsController do
   context "with cassandra page views" do
     include_examples 'cassandra page views'
     include_examples "GET 'index' as csv"
+
+    context "POST 'update'" do
+      it "catches a cassandra error" do
+        PageView.stubs(:find_for_update).raises(CassandraCQL::Error::InvalidRequestException)
+        pv = page_view(@student, '/somewhere/in/app/1', :created_at => 1.day.ago)
+
+        user_session(@student)
+        expect {
+          xhr :put, 'update', id: pv.token, interaction_seconds: '5', page_view_token: pv.token
+        }.not_to change { ErrorReport.count }
+      end
+    end
   end
 end

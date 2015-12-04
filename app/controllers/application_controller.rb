@@ -1044,7 +1044,7 @@ class ApplicationController < ActionController::Base
     else
       @page_view.destroy if @page_view && !@page_view.new_record?
     end
-  rescue => e
+  rescue StandardError, CassandraCQL::Error::InvalidRequestException => e
     logger.error "Pageview error!"
     raise e if Rails.env.development?
     true
