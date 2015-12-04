@@ -386,5 +386,21 @@ describe "Tiny MCE editor functions" do
       p.reload
       expect(p.body[0..136]).to eq "<p><a id=\"\" class=\"\" title=\"\" href=\"http://www.instructure.com\" target=\"\">this text should link to instructure homepage</a></p>"
     end
+
+    it "should remove a link from text on wiki description", priority: "1", test_id: 312637 do
+      p = create_wiki_page("test_page", false, "public")
+      p.body = "<p><a id=\"\" class=\"\" title=\"\" href=\"http://www.instructure.com\" target=\"\">this text "\
+          "should no longer be linked</a></p>"
+      p.save!
+      get "/courses/#{@course.id}/pages/#{p.title}/edit"
+
+      select_all_wiki
+      click_tiny_button('Remove link')
+      f("form.edit-form button.submit").click
+      wait_for_ajaximations
+
+      p.reload
+      expect(p.body[0..42]).to eq "<p>this text should no longer be linked</p>"
+    end
   end
 end
