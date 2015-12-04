@@ -8966,7 +8966,7 @@ de:
         body_teacher: "Sie wurden als Dozent für den Kurs %{course} eingeschrieben."
         subject: Kurseinschreibung
       twitter: 
-        body: "Canvas-benachrichtigung. Eingeschrieben: Kurs als %{enrollment_type}"
+        body: "Canvas-Benachrichtigung. Eingeschrieben: Kurs als %{role_type}"
     enrollment_registration: 
       email: 
         body_designer: "Sie wurden zur Teilnahme am Unterricht auf %{website} eingeladen.  Der Unterricht hat die Bezeichnung %{course}, und Sie wurden zur Teilnahme als Designer eingeladen."
