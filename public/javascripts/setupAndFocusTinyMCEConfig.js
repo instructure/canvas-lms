@@ -1,8 +1,16 @@
 define([
   'jquery',
-  'compiled/editor/editorAccessibility'
-], function($, EditorAccessibility){
-  return function (tinymce, autoFocus, enableBookmarking) {
+  'compiled/editor/editorAccessibility',
+  'INST'
+], function($, EditorAccessibility, INST){
+  return function (tinymce, autoFocus, enableBookmarkingOverride) {
+
+    if (enableBookmarkingOverride == undefined) {
+      var enableBookmarking = !!INST.browser.ie;
+    } else {
+      var enableBookmarking = enableBookmarkingOverride;
+    }
+
     return {
       auto_focus: autoFocus,
       setup : function(ed) {

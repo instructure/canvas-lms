@@ -29,8 +29,9 @@ define([
   'i18n!eportfolio',
   'jquery' /* $ */,
   'compiled/userSettings',
-  'jsx/shared/rce/loadRCE',
+  'jsx/shared/rce/loadNewRCE',
   'jsx/shared/rce/callOnRCE',
+  'jsx/shared/rce/preloadRCE',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.inst_tree' /* instTree */,
   'jquery.instructure_forms' /* formSubmit, getFormData, formErrors, errorBox */,
@@ -45,11 +46,11 @@ define([
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'jqueryui/progressbar' /* /\.progressbar/ */,
   'jqueryui/sortable' /* /\.sortable/ */
-], function(I18n, $, userSettings, loadRCE, callOnRCE) {
+], function(I18n, $, userSettings, loadNewRCE, callOnRCE, preloadRCE) {
 
-  if (window.ENV.RICH_CONTENT_SERVICE_ENABLED) {
-    loadRCE.preload(window.ENV.RICH_CONTENT_APP_HOST)
-  }
+  // optimization so user isn't waiting on RCS to
+  // respond when they hit edit
+  preloadRCE()
 
   var ePortfolioValidations = {
     object_name: 'eportfolio',
@@ -60,22 +61,6 @@ define([
       }
     }
   };
-
-  function loadRCEViaService (target, defaultContent) {
-    loadRCE.loadOnTarget(target, defaultContent, window.ENV.RICH_CONTENT_APP_HOST)
-  }
-
-  function loadRCEViaEditorBox(target, defaultContent){
-    return defaultContent ?
-      target.editorBox().editorBox('set_code', defaultContent) :
-      target.editorBox()
-  }
-
-  function loadNewRCE (target, defaultContent) {
-    return window.ENV.RICH_CONTENT_SERVICE_ENABLED ?
-      loadRCEViaService(target, defaultContent) :
-      loadRCEViaEditorBox(target, defaultContent)
-  }
 
   function ePortfolioFormData() {
     var data = $("#edit_page_form").getFormData({
@@ -171,7 +156,7 @@ define([
           $edit.find(".edit_section").val(sectionData.section_content);
         } else if(edit_type == "edit_rich_text_content") {
           $edit.find(".edit_section").attr('id', 'edit_' + $section.attr('id'));
-          loadNewRCE($edit.find(".edit_section"), sectionData.section_content)
+          loadNewRCE($edit.find(".edit_section"), {defaultContent: sectionData.section_content})
         }
       });
       $("#edit_page_form :text:first").focus().select();
@@ -294,7 +279,7 @@ define([
         $edit.find(".edit_section").attr('id', 'edit_' + $section.attr('id'));
       } else if(edit_type == "edit_rich_text_content") {
         $edit.find(".edit_section").attr('id', 'edit_' + $section.attr('id'));
-        loadNewRCE($edit.find(".edit_section"), "")
+        loadNewRCE($edit.find(".edit_section"), {defaultContent: ""})
       }
       $section.hide().slideDown('fast', function() {
         $("html,body").scrollTo($section);

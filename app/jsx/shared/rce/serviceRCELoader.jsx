@@ -37,23 +37,23 @@ define([
       return $(textarea).parent().get(0)
     },
 
-    createRCEProps(textarea, defaultContent){
+    createRCEProps(textarea, tinyMCEInitOptions) {
       let textareaClassName = textarea.classList + " " + RCEStore.classKeyword
       let width = textarea.offsetWidth
 
       return {
-        editorOptions: editorOptions.bind(null, width, textarea.id),
-        defaultContent: textarea.value || defaultContent,
+        editorOptions: editorOptions.bind(null, width, textarea.id, tinyMCEInitOptions, null),
+        defaultContent: textarea.value || tinyMCEInitOptions.defaultContent,
         textareaId: textarea.id,
         textareaClassName: textareaClassName,
         language: ENV.LOCALE
       }
     },
 
-    loadOnTarget(target, defaultContent, host){
+    loadOnTarget(target, tinyMCEInitOptions, host) {
       const textarea = this.getTargetTextarea(target)
       const renderingTarget = this.getRenderingTarget(textarea)
-      const propsForRCE = this.createRCEProps(textarea, defaultContent)
+      const propsForRCE = this.createRCEProps(textarea, tinyMCEInitOptions)
 
       const renderCallback = function(rceInstance){
         RCEStore.addToStore(textarea.id, rceInstance)

@@ -34,7 +34,7 @@
 define([
   'i18nObj',
   'jquery',
-  'setupAndFocusTinyMCEConfig',
+  'jsx/shared/rce/editorOptions',
   'compiled/editor/editorAccessibility', /* editorAccessibility */
   'tinymce.editor_box_list',
   'tinymce.config',
@@ -49,7 +49,7 @@ define([
   'jquery.instructure_misc_plugins' /* /\.indicate/ */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'vendor/jquery.ba-tinypubsub'
-], function(I18nObj, $, setupAndFocusTinyMCEConfig,
+], function(I18nObj, $, editorOptions,
             EditorAccessibility, EditorBoxList, EditorConfig, EditorCommands,
             Utils, INST, decodeString) {
 
@@ -84,15 +84,7 @@ define([
       width = $textarea.closest(":visible").width();
     }
 
-    var editorConfig = new EditorConfig(tinymce, INST, width, id);
-    var autoFocus = options.focus ? id : null
-
-    var tinyOptions = $.extend(
-      editorConfig.defaultConfig(),
-      setupAndFocusTinyMCEConfig(tinymce, autoFocus, enableBookmarking),
-      (options.tinyOptions || {})
-    );
-
+    var tinyOptions = editorOptions(width, id, options, enableBookmarking, tinymce)
     tinyMCE.init(tinyOptions);
 
     this._textarea =  $textarea;

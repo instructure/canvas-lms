@@ -61,6 +61,8 @@ define([], function(){
       },
       language_load: false,
       relative_urls: false,
+      // we add the menubar for a11y purposes but then
+      // hide it with js for non screenreader users
       menubar: true,
       remove_script_host: true,
       resize: true,

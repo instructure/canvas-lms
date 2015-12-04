@@ -365,11 +365,12 @@ require(__dirname + "/../coffeescripts/widgets/assignmentRubricDialogSpec.coffee
 require(__dirname + "/../coffeescripts/widgets/DatetimeFieldSpec.coffee")
 require(__dirname + "/../coffeescripts/xhr/remoteSelectSpec.coffee")
 require(__dirname + "/../coffeescripts/jsx/shared/rce/rceStoreSpec.coffee")
-require(__dirname + "/../coffeescripts/jsx/shared/rce/loadRCESpec.coffee")
+require(__dirname + "/../coffeescripts/jsx/shared/rce/serviceRCELoaderSpec.coffee")
 require(__dirname + "/../coffeescripts/jsx/shared/rce/loadEventListenersSpec.coffee")
 require(__dirname + "/../coffeescripts/tinymce_plugins/instructure_external_tools/ExternalToolsHelperSpec.coffee")
 require(__dirname + "/../coffeescripts/tinymce_plugins/instructure_external_tools/initializeExternalToolsSpec.coffee")
 require(__dirname + "/../coffeescripts/tinymce_plugins/instructure_record/mediaEditorLoaderSpec.coffee")
+require(__dirname + "/../coffeescripts/jsx/shared/rce/loadNewRCESpec.coffee")
 
 
 //var testsContext = require.context(__dirname + "/../coffeescripts", true, /Spec.coffee$/);

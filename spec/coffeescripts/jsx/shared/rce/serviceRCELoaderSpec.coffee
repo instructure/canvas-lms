@@ -1,6 +1,6 @@
 define [
   'jquery'
-  'jsx/shared/rce/loadRCE'
+  'jsx/shared/rce/serviceRCELoader'
 ], ($, RCELoader) ->
   module 'loadRCE',
     setup: ->
@@ -77,11 +77,11 @@ define [
 
   test 'extracts content from the target', ->
     ta = @elementInFixtures('textarea')
-    ta.setAttribute("value", "some text here")
+    ta.value = "some text here";
     props = RCELoader.createRCEProps(ta, "default text")
     ok props.defaultContent, "some text here"
 
   test 'falls back to defaultContent if target has no content', ->
     ta = @elementInFixtures('textarea')
-    props = RCELoader.createRCEProps(ta, "default text")
+    props = RCELoader.createRCEProps(ta, {defaultContent: "default text"})
     ok props.defaultContent, "default text"

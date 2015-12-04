@@ -4,8 +4,15 @@ define([
   'setupAndFocusTinyMCEConfig',
   'INST'
 ], function(_, EditorConfig, setupAndFocusTinyMCEConfig, INST){
-  return function(width, id, tinymce){
-    var config = new EditorConfig(tinymce, INST, width, id);
-    return _.extend({}, config.defaultConfig(), setupAndFocusTinyMCEConfig(tinymce, id, !!INST.browser.ie));
+  return function(width, id, tinyMCEInitOptions, enableBookmarkingOverride, tinymce){
+    var editorConfig = new EditorConfig(tinymce, INST, width, id);
+    var autoFocus = tinyMCEInitOptions.focus ? id : null
+
+    return _.extend({},
+      editorConfig.defaultConfig(),
+      setupAndFocusTinyMCEConfig(tinymce, autoFocus, enableBookmarkingOverride),
+      (tinyMCEInitOptions.tinyOptions || {})
+    );
+
   };
 });
