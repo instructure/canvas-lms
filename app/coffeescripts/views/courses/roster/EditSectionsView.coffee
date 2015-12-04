@@ -82,7 +82,7 @@ define [
           enrollment:
             user_id: @model.get('id')
             type: enrollment.type
-            limit_privileges_to_course_section: enrollment.limit_priveleges_to_course_section
+            limit_privileges_to_course_section: enrollment.limit_privileges_to_course_section
         if enrollment.role != enrollment.type
           data.enrollment.role = enrollment.role
         deferreds.push $.ajaxJSON url, 'POST', data, (newEnrollment) =>

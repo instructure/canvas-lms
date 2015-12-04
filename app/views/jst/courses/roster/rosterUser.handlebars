@@ -51,7 +51,11 @@
       {{#if canEditSections}}
         <li><a href="#" data-event="editSections"><i class="icon-edit"></i> {{#t "links.edit_sections"}}Edit Sections{{/t}}</a></li>
       {{/if}}
-        <li><a href="{{url}}"><i class="icon-user"></i> {{#t "links.user_details"}}User Details{{/t}}</a></li>
+      {{#if canEditRoles}}
+        <li><a href="#" data-event="editRoles"><i class="icon-edit"></i> {{#t}}Edit Role{{/t}}</a></li>
+      {{/if}}
+      <li><a href="{{url}}"><i class="icon-user"></i> {{#t "links.user_details"}}User Details{{/t}}</a></li>
+
       {{#if canRemoveUsers}}
         <li class="ui-menu-item"><hr /></li>
         {{#if isInactive}}

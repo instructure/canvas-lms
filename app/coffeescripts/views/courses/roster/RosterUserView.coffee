@@ -5,15 +5,17 @@ define [
   'Backbone'
   'jst/courses/roster/rosterUser'
   'compiled/views/courses/roster/EditSectionsView'
+  'compiled/views/courses/roster/EditRolesView'
   'compiled/views/courses/roster/InvitationsView'
   'compiled/views/courses/roster/LinkToStudentsView'
   'compiled/str/underscore'
   'str/htmlEscape'
   'compiled/jquery.kylemenu'
   'jquery.disableWhileLoading'
-], (I18n, $, _, Backbone, template, EditSectionsView, InvitationsView, LinkToStudentsView, toUnderscore, h) ->
+], (I18n, $, _, Backbone, template, EditSectionsView, EditRolesView, InvitationsView, LinkToStudentsView, toUnderscore, h) ->
 
   editSectionsDialog = null
+  editRolesDialog = null
   linkToStudentsDialog = null
   invitationDialog = null
 
@@ -57,6 +59,7 @@ define [
 
       json.canRemoveUsers = _.all @model.get('enrollments'), (e) -> e.can_be_removed
       json.canResendInvitation = !json.isInactive
+      json.canEditRoles = !(_.any(@model.get('enrollments'), (e) -> e.type == 'ObserverEnrollment'))
       json.canEditSections = !json.isInactive && !(_.isEmpty(@model.sectionEditableEnrollments()))
       json.canLinkStudents = json.isObserver && !ENV.course.concluded
       json.canViewLoginIdColumn = ENV.permissions.manage_admin_users || ENV.permissions.manage_students || ENV.permissions.read_sis
@@ -100,6 +103,11 @@ define [
       editSectionsDialog ||= new EditSectionsView
       editSectionsDialog.model = @model
       editSectionsDialog.render().show()
+
+    editRoles: (e) ->
+      editRolesDialog ||= new EditRolesView
+      editRolesDialog.model = @model
+      editRolesDialog.render().show()
 
     linkToStudents: (e) ->
       linkToStudentsDialog ||= new LinkToStudentsView

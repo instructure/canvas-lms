@@ -489,4 +489,131 @@ describe "people" do
     wait_for_ajaximations
     expect(ff('tr.rosterUser').count).to eq 1
   end
+
+  context "editing role" do
+    before :once do
+      course
+      @section = @course.course_sections.create!(name: "section1")
+
+      @teacher = user_with_pseudonym(:active_all => true)
+      @enrollment = @course.enroll_teacher(@teacher)
+    end
+
+    before :each do
+      admin_logged_in
+    end
+
+    it "should not let observers have their roles changed" do
+      @course.enroll_user(@teacher, "ObserverEnrollment", :allow_multiple_enrollments => true)
+
+      get "/courses/#{@course.id}/users"
+
+      open_dropdown_menu(selector: "#user_#{@teacher.id}", option: 'editRoles', displayed: false)
+    end
+
+    def open_role_dialog(user)
+      f("#user_#{user.id} .admin-links a.al-trigger").click
+      f("#user_#{user.id} .admin-links a[data-event='editRoles']").click
+    end
+
+    it "should not let users change to an observer role" do
+      get "/courses/#{@course.id}/users"
+
+      open_role_dialog(@teacher)
+
+      expect(f("#edit_roles #role_id option[selected]")).to include_text("Teacher")
+      expect(f("#edit_roles #role_id option[value='#{student_role.id}']")).to be_present
+      expect(f("#edit_roles #role_id option[value='#{observer_role.id}']")).to be_nil
+    end
+
+    it "should not let users change to a type they don't have permission to manage" do
+      @course.root_account.role_overrides.create!(:role => admin_role, :permission => 'manage_students', :enabled => false)
+
+      get "/courses/#{@course.id}/users"
+
+      open_role_dialog(@teacher)
+      expect(f("#edit_roles #role_id option[value='#{ta_role.id}']")).to be_present
+      expect(f("#edit_roles #role_id option[value='#{student_role.id}']")).to be_nil
+    end
+
+    it "should retain the same enrollment state" do
+      role_name = 'Custom Teacher'
+      role = @course.account.roles.create(:name => role_name)
+      role.base_role_type = 'TeacherEnrollment'
+      role.save!
+      @enrollment.inactivate
+
+      get "/courses/#{@course.id}/users"
+
+      open_role_dialog(@teacher)
+      click_option("#edit_roles #role_id", role.id.to_s, :value)
+      f('.ui-dialog-buttonpane .btn-primary').click
+      wait_for_ajaximations
+      assert_flash_notice_message /Role successfully updated/
+
+      expect(f("#user_#{@teacher.id}")).to include_text(role_name)
+      @enrollment.reload
+      expect(@enrollment).to be_deleted
+
+      new_enrollment = @teacher.enrollments.not_deleted.first
+      expect(new_enrollment.role).to eq role
+      expect(new_enrollment.workflow_state).to eq "inactive"
+    end
+
+    it "should work with enrollments in different sections" do
+      enrollment2 = @course.enroll_user(@teacher, "TeacherEnrollment", :allow_multiple_enrollments => true, :section => @section)
+
+      get "/courses/#{@course.id}/users"
+
+      open_role_dialog(@teacher)
+      click_option("#edit_roles #role_id", ta_role.id.to_s, :value)
+      f('.ui-dialog-buttonpane .btn-primary').click
+      wait_for_ajaximations
+      assert_flash_notice_message /Role successfully updated/
+
+      expect(@enrollment.reload).to be_deleted
+      expect(enrollment2.reload).to be_deleted
+
+      new_enrollment1 = @teacher.enrollments.not_deleted.where(:course_section_id => @course.default_section).first
+      new_enrollment2 = @teacher.enrollments.not_deleted.where(:course_section_id => @section).first
+      expect(new_enrollment1.role).to eq ta_role
+      expect(new_enrollment2.role).to eq ta_role
+    end
+
+    it "should work with preexiting enrollments in the destination role" do
+      # should not try to overwrite this one
+      enrollment2 = @course.enroll_user(@teacher, "TaEnrollment", :allow_multiple_enrollments => true)
+
+      get "/courses/#{@course.id}/users"
+
+      open_role_dialog(@teacher)
+      click_option("#edit_roles #role_id", ta_role.id.to_s, :value)
+      f('.ui-dialog-buttonpane .btn-primary').click
+      wait_for_ajaximations
+      assert_flash_notice_message /Role successfully updated/
+
+      expect(@enrollment.reload).to be_deleted
+      expect(enrollment2.reload).to_not be_deleted
+    end
+
+    it "should work with multiple enrollments in one section" do
+      # shouldn't conflict with each other - should only add one enrollment for the new role
+      enrollment2 = @course.enroll_user(@teacher, "TaEnrollment", :allow_multiple_enrollments => true)
+
+      get "/courses/#{@course.id}/users"
+
+      open_role_dialog(@teacher)
+      expect(f("#edit_roles")).to include_text("This user has multiple roles") # warn them that both roles will be removed
+      click_option("#edit_roles #role_id", student_role.id.to_s, :value)
+      f('.ui-dialog-buttonpane .btn-primary').click
+      wait_for_ajaximations
+      assert_flash_notice_message /Role successfully updated/
+
+      expect(@enrollment.reload).to be_deleted
+      expect(enrollment2.reload).to be_deleted
+
+      new_enrollment = @teacher.enrollments.not_deleted.first
+      expect(new_enrollment.role).to eq student_role
+    end
+  end
 end

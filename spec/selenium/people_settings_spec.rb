@@ -151,8 +151,8 @@ describe "course people" do
       # open dialog
       open_kyle_menu(@student)
       # when
-      link = f("#ui-id-4")
-      expect(link).to include_text("User Details")
+      links = ff(".admin-links li a")
+      link = links.detect{|link| link.text.include?("User Details")}
       href = link['href']
       link.click
       wait_for_ajaximations
