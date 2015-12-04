@@ -21,10 +21,6 @@ require 'sanitize'
 class Quizzes::QuizSubmission < ActiveRecord::Base
   self.table_name = 'quiz_submissions'
 
-  def self.polymorphic_names
-    [self.name, "QuizSubmission"]
-  end
-
   include Workflow
 
   attr_accessible :quiz, :user, :temporary_user_code, :submission_data, :score_before_regrade, :has_seen_results

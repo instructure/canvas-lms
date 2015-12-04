@@ -1490,51 +1490,6 @@ describe Quizzes::QuizSubmission do
     end
   end
 
-  context "with versioning" do
-    before(:each) do
-      student_in_course
-      assignment_quiz([])
-      qd = multiple_choice_question_data
-      @quiz.quiz_data = [qd]
-      @quiz.points_possible = qd[:points_possible]
-      @quiz.save!
-    end
-
-    describe "#versions" do
-      it "finds the versions with both namespaced and non-namespaced quizzes" do
-        qs = @quiz.generate_submission(@student)
-        qs.submission_data = { "question_1" => "2405" }
-        Quizzes::SubmissionGrader.new(qs).grade_submission
-
-        qs = @quiz.generate_submission(@student)
-        qs.submission_data = { "question_1" => "8544" }
-        Quizzes::SubmissionGrader.new(qs).grade_submission
-
-        expect(qs.versions.count).to eq 2
-        Version.update_all("versionable_type='QuizSubmission'","versionable_id=#{qs.id} AND versionable_type='Quizzes::QuizSubmission'")
-        expect(Quizzes::QuizSubmission.find(qs).versions.count).to eq 2
-      end
-    end
-  end
-
-  context "with attachments" do
-    before(:each) do
-      course_with_student_logged_in :active_all => true
-      course_quiz !!:active
-      @qs = @quiz.generate_submission @user
-      create_attachment_for_file_upload_submission!(@qs)
-    end
-
-    describe "#attachments" do
-      it "finds the attachment with both namespaced and non-namespaced quizzes" do
-        expect(Quizzes::QuizSubmission.find(@qs).attachments.count).to eq 1
-
-        Attachment.update_all("context_type='QuizSubmission'","context_id=#{@qs.id} AND context_type='Quizzes::QuizSubmission'")
-        expect(Quizzes::QuizSubmission.find(@qs).attachments.count).to eq 1
-      end
-    end
-  end
-
   describe '#points_possible_at_submission_time' do
     it 'should work' do
       quiz_with_graded_submission([

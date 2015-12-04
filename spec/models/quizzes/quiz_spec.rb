@@ -1701,39 +1701,6 @@ describe Quizzes::Quiz do
     end
   end
 
-  context 'with versioning' do
-    let_once(:quiz) { @course.quizzes.create! title: 'Test Quiz' }
-    describe "#versions" do
-      it "finds the versions of both namespaced and non-namespaced quizzes" do
-        quiz.title = "Renamed Test Quiz"
-        quiz.save
-        expect(quiz.versions.count).to eq 2
-
-        Version.where(versionable_id: quiz, versionable_type: 'Quizzes::Quiz').update_all("versionable_type='Quiz'")
-
-        expect(Quizzes::Quiz.find(quiz).versions.count).to eq 2
-      end
-    end
-  end
-
-  describe '#context_module_tags' do
-    it "finds both namespaced and non-namespaced content tags" do
-      quiz = @course.quizzes.create! title: 'Test Quiz'
-      mod = @course.context_modules.create! name: 'Test Module'
-      tag1 = mod.add_item id: quiz.id, type: 'quiz'
-      tag2 = mod.add_item id: quiz.id, type: 'quiz'
-      tag3 = mod.add_item id: quiz.id, type: 'quiz'
-      ContentTag.where(id: tag2).update_all(content_type: 'Quiz')
-      tag3.destroy
-      expect(quiz.context_module_tags.pluck(:id).sort).to eql [tag1.id, tag2.id].sort
-    end
-
-    it "should act like an association" do
-      quiz = @course.quizzes.create! title: 'Test Quiz'
-      expect { quiz.context_module_tags.loaded? }.not_to raise_error
-    end
-  end
-
   describe 'differentiated assignments' do
     context 'visible_to_user?' do
       before :once do

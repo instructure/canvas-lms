@@ -54,10 +54,6 @@ class Quizzes::Quiz < ActiveRecord::Base
   belongs_to :assignment
   belongs_to :assignment_group
 
-  def self.polymorphic_names
-    [self.base_class.name, "Quiz"]
-  end
-
   EXPORTABLE_ATTRIBUTES = [
     :id, :title, :description, :quiz_data, :points_possible, :context_id,
     :context_type, :assignment_id, :workflow_state, :shuffle_answers,
