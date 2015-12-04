@@ -767,5 +767,10 @@ define([
     }
   });
 
+  $( document ).ready(function() {
+    $('.loaded').show();
+    $('.loading').hide();
+  });
+
   $('.essay_question .answers').before((new KeyboardShortcuts()).render().el);
 });
