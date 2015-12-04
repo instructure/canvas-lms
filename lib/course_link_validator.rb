@@ -30,10 +30,12 @@ class CourseLinkValidator
     progress.set_results({error_report_id: report_id, completed_at: Time.now.utc})
   end
 
-  attr_accessor :course, :issues, :visited_urls
+  attr_accessor :course, :domain_regex, :issues, :visited_urls
 
   def initialize(course)
     self.course = course
+    domain = course.root_account.domain
+    self.domain_regex = %r{\w+:?\/\/#{domain}\/} if domain
     self.issues = []
     self.visited_urls = {}
   end
@@ -168,17 +170,55 @@ class CourseLinkValidator
     yield links if links.any?
   end
 
+  ITEM_CLASSES = {
+    'assignments' => Assignment,
+    'announcements' => Announcement,
+    'calendar_events' => CalendarEvent,
+    'discussion_topics' => DiscussionTopic,
+    'collaborations' => Collaboration,
+    'files' => Attachment,
+    'quizzes' => Quizzes::Quiz,
+    'groups' => Group,
+    'wiki' => WikiPage,
+    'pages' => WikiPage,
+    'modules' => ContextModule,
+    'items' => ContentTag
+  }
+
   # yields a hash containing the url and an error type if the url is invalid
   def find_invalid_link(url)
     unless result = self.visited_urls[url]
       begin
-        if ImportedHtmlConverter.relative_url?(url)
-          if url =~ /\/courses\/\d+\/file_contents\/(.*)/
+        if ImportedHtmlConverter.relative_url?(url) || (self.domain_regex && url.match(self.domain_regex))
+          case url
+          when /\/courses\/\d+\/file_contents\/(.*)/
             rel_path = CGI.unescape($1)
-            unless Folder.find_attachment_in_context_with_path(self.course, rel_path)
+            unless (att = Folder.find_attachment_in_context_with_path(self.course, rel_path)) && !att.deleted?
               result = :missing_file
             end
+          when /\/courses\/\d+\/(.*)\/(\d+)/
+            obj_type =  $1
+            obj_id = $2
+
+            if obj_class = ITEM_CLASSES[obj_type]
+              if (obj = obj_class.where(:id => obj_id).first)
+                if obj.is_a?(Attachment)
+                  if obj.file_state == 'deleted'
+                    result = :missing_item
+                  elsif obj.locked?
+                    result = :unpublished_item
+                  end
+                elsif obj.workflow_state == 'deleted'
+                  result = :missing_item
+                elsif obj.workflow_state == 'unpublished'
+                  result = :unpublished_item
+                end
+              else
+                result = :missing_item
+              end
+            end
           end
+
         elsif !url.start_with?('mailto:')
           unless reachable_url?(url)
             result = :unreachable
