@@ -411,7 +411,7 @@ class ApplicationController < ActionController::Base
   # the vendor/plugins/adheres_to_policy plugin.  If authorized,
   # returns true, otherwise renders unauthorized messages and returns
   # false.  To be used as follows:
-  # if authorized_action(object, @current_user, session, :update)
+  # if authorized_action(object, @current_user, :update)
   #   render
   # end
   def authorized_action(object, actor, rights)

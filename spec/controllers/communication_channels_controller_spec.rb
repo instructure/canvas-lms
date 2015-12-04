@@ -719,26 +719,344 @@ describe CommunicationChannelsController do
   describe "POST 'reset_bounce_count'" do
     it 'should allow siteadmins to reset the bounce count' do
       u = user_with_pseudonym
-      cc = u.communication_channels.create!(:path => 'test@example.com', :path_type => 'email') { |cc| cc.workflow_state = 'active'; cc.bounce_count = 3 }
+      cc1 = u.communication_channels.create!(:path => 'test@example.com', :path_type => 'email') do |cc|
+        cc.workflow_state = 'active'
+        cc.bounce_count = 3
+      end
       account_admin_user(account: Account.site_admin)
       user_session(@user)
       session[:become_user_id] = u.id
-      post 'reset_bounce_count', :user_id => u.id, :id => cc.id
+      post 'reset_bounce_count', :user_id => u.id, :id => cc1.id
       expect(response).to be_success
-      cc.reload
-      expect(cc.bounce_count).to eq(0)
+      cc1.reload
+      expect(cc1.bounce_count).to eq(0)
     end
 
     it 'should not allow account admins to reset the bounce count' do
       u = user_with_pseudonym
-      cc = u.communication_channels.create!(:path => 'test@example.com', :path_type => 'email') { |cc| cc.workflow_state = 'active'; cc.bounce_count = 3 }
+      cc1 = u.communication_channels.create!(:path => 'test@example.com', :path_type => 'email') do |cc|
+        cc.workflow_state = 'active'
+        cc.bounce_count = 3
+      end
       account_admin_user(account: Account.default)
       user_session(@user)
       session[:become_user_id] = u.id
-      post 'reset_bounce_count', :user_id => u.id, :id => cc.id
+      post 'reset_bounce_count', :user_id => u.id, :id => cc1.id
       expect(response).to have_http_status(401)
-      cc.reload
-      expect(cc.bounce_count).to eq(3)
+      cc1.reload
+      expect(cc1.bounce_count).to eq(3)
+    end
+  end
+
+  describe "GET 'bouncing_channel_report'" do
+    def channel_csv(cc)
+      [
+        cc.user.id.try(:to_s),
+        cc.user.name,
+        cc.id.try(:to_s),
+        cc.path,
+        cc.last_bounce_at.try(:to_s),
+        cc.last_bounce_summary.try(:to_s)
+      ]
+    end
+
+    def included_channels
+      CSV.parse(response.body).drop(1).map do |row|
+        CommunicationChannel.find(row[2])
+      end
+    end
+
+    context 'as a site admin' do
+      before do
+        account_admin_user(account: Account.site_admin)
+        user_session(@user)
+      end
+
+      it 'fetches communication channels in this account and orders by date' do
+        now = Time.zone.now
+
+        u1 = user_with_pseudonym
+        u2 = user_with_pseudonym
+        c1 = u1.communication_channels.create!(path: 'one@example.com', path_type: 'email') do |cc|
+          cc.workflow_state = 'active'
+          cc.bounce_count = 1
+          cc.last_bounce_at = now
+        end
+        c2 = u1.communication_channels.create!(path: 'two@example.com', path_type: 'email') do |cc|
+          cc.workflow_state = 'active'
+          cc.bounce_count = 2
+          cc.last_bounce_at = now - 1.hour
+        end
+        c3 = u2.communication_channels.create!(path: 'three@example.com', path_type: 'email') do |cc|
+          cc.workflow_state = 'active'
+          cc.bounce_count = 3
+          cc.last_bounce_at = now + 1.hour
+          cc.last_bounce_details = {'bouncedRecipients' => [{'diagnosticCode' => 'stuff and things'}]}
+        end
+
+        get 'bouncing_channel_report', account_id: Account.default.id
+        expect(response).to have_http_status(:ok)
+
+        csv = CSV.parse(response.body)
+        expect(csv).to eq [
+          ['User ID', 'Name', 'Communication channel ID', 'Path', 'Date of most recent bounce', 'Bounce reason'],
+          channel_csv(c2),
+          channel_csv(c1),
+          channel_csv(c3)
+        ]
+      end
+
+      it 'ignores communication channels in other accounts' do
+        u1 = user_with_pseudonym
+        a = account_model
+        u2 = user_with_pseudonym(account: a)
+
+        c1 = u1.communication_channels.create!(path: 'one@example.com', path_type: 'email') do |cc|
+          cc.workflow_state = 'active'
+          cc.bounce_count = 1
+        end
+        u2.communication_channels.create!(path: 'two@example.com', path_type: 'email') do |cc|
+          cc.workflow_state = 'active'
+          cc.bounce_count = 1
+        end
+
+        get 'bouncing_channel_report', account_id: Account.default.id
+
+        expect(included_channels).to eq([c1])
+      end
+
+      it "only reports active, bouncing communication channels" do
+        user_with_pseudonym
+
+        c1 = @user.communication_channels.create!(path: 'one@example.com', path_type: 'email') do |cc|
+          cc.workflow_state = 'active'
+          cc.bounce_count = 1
+        end
+        @user.communication_channels.create!(path: 'two@example.com', path_type: 'email') do |cc|
+          cc.workflow_state = 'active'
+        end
+        @user.communication_channels.create!(path: 'three@example.com', path_type: 'email') do |cc|
+          cc.workflow_state = 'retired'
+          cc.bounce_count = 1
+        end
+
+        get 'bouncing_channel_report', account_id: Account.default.id
+
+        expect(included_channels).to eq([c1])
+      end
+
+      it 'uses the requested account' do
+        a = account_model
+        user_with_pseudonym(account: a)
+
+        c = @user.communication_channels.create!(path: 'one@example.com', path_type: 'email') do |cc|
+          cc.workflow_state = 'active'
+          cc.bounce_count = 1
+        end
+
+        get 'bouncing_channel_report', account_id: a.id
+
+        expect(included_channels).to eq([c])
+      end
+
+      it 'filters by date' do
+        user_with_pseudonym
+
+        @user.communication_channels.create!(path: 'one@example.com', path_type: 'email') do |cc|
+          cc.workflow_state = 'active'
+          cc.bounce_count = 1
+          cc.last_bounce_at = Time.zone.now - 1.day
+        end
+        c2 = @user.communication_channels.create!(path: 'two@example.com', path_type: 'email') do |cc|
+          cc.workflow_state = 'active'
+          cc.bounce_count = 1
+          cc.last_bounce_at = Time.zone.now
+        end
+        @user.communication_channels.create!(path: 'three@example.com', path_type: 'email') do |cc|
+          cc.workflow_state = 'active'
+          cc.bounce_count = 1
+          cc.last_bounce_at = Time.zone.now + 1.day
+        end
+
+        get 'bouncing_channel_report', account_id: Account.default.id,
+                                       before: Time.zone.now + 1.hour,
+                                       after: Time.zone.now - 1.hour
+
+        expect(included_channels).to eq([c2])
+      end
+
+      it 'filters by pattern, and case insensitively' do
+        user_with_pseudonym
+
+        # Uppercase "A" in the path to make sure it's matching case insensitively
+        c1 = @user.communication_channels.create!(path: 'bAr@example.com', path_type: 'email') do |cc|
+          cc.workflow_state = 'active'
+          cc.bounce_count = 1
+        end
+        @user.communication_channels.create!(path: 'foobar@example.com', path_type: 'email') do |cc|
+          cc.workflow_state = 'active'
+          cc.bounce_count = 1
+        end
+
+        get 'bouncing_channel_report', account_id: Account.default.id, pattern: 'bar*'
+
+        expect(included_channels).to eq([c1])
+      end
+
+      it 'limits to BulkBounceCountResetter.bulk_limit' do
+        BulkBounceCountResetter.stubs(:bulk_limit).returns(5)
+        now = Time.zone.now
+
+        user_with_pseudonym
+
+        ccs = (BulkBounceCountResetter.bulk_limit + 1).times.map do |n|
+          @user.communication_channels.create!(path: "c#{n}@example.com", path_type: 'email') do |cc|
+            cc.workflow_state = 'active'
+            cc.bounce_count = 1
+            cc.last_bounce_at = now + n.minutes
+          end
+        end
+
+        get 'bouncing_channel_report', account_id: Account.default.id
+
+        expect(included_channels).to eq(ccs.first(BulkBounceCountResetter.bulk_limit))
+      end
+    end
+
+    context 'as a normal user' do
+      it "doesn't work" do
+        user_with_pseudonym
+        user_session(@user)
+        get 'bouncing_channel_report', account_id: Account.default.id
+        expect(response).to have_http_status(401)
+      end
+    end
+  end
+
+  describe "POST 'bulk_reset_bounce_counts'" do
+    context 'as a site admin' do
+      before do
+        account_admin_user(account: Account.site_admin)
+        user_session(@user)
+      end
+
+      it 'resets bounce counts' do
+        u1 = user_with_pseudonym
+        u2 = user_with_pseudonym
+        c1 = u1.communication_channels.create!(path: 'one@example.com', path_type: 'email') do |cc|
+          cc.workflow_state = 'active'
+          cc.bounce_count = 1
+        end
+        c2 = u1.communication_channels.create!(path: 'two@example.com', path_type: 'email') do |cc|
+          cc.workflow_state = 'active'
+          cc.bounce_count = 2
+        end
+        c3 = u2.communication_channels.create!(path: 'three@example.com', path_type: 'email') do |cc|
+          cc.workflow_state = 'active'
+          cc.bounce_count = 3
+        end
+
+        post 'bulk_reset_bounce_counts', account_id: Account.default.id
+
+        expect(response).to have_http_status(:ok)
+        [c1, c2, c3].each_with_index do |c,i|
+          expect(c.reload.bounce_count).to eq(i+1)
+        end
+        run_jobs
+        [c1, c2, c3].each do |c|
+          expect(c.reload.bounce_count).to eq(0)
+        end
+      end
+
+      it 'filters by date' do
+        user_with_pseudonym
+
+        c1 = @user.communication_channels.create!(path: 'one@example.com', path_type: 'email') do |cc|
+          cc.workflow_state = 'active'
+          cc.bounce_count = 1
+          cc.last_bounce_at = Time.zone.now - 1.day
+        end
+        c2 = @user.communication_channels.create!(path: 'two@example.com', path_type: 'email') do |cc|
+          cc.workflow_state = 'active'
+          cc.bounce_count = 1
+          cc.last_bounce_at = Time.zone.now
+        end
+        c3 = @user.communication_channels.create!(path: 'three@example.com', path_type: 'email') do |cc|
+          cc.workflow_state = 'active'
+          cc.bounce_count = 1
+          cc.last_bounce_at = Time.zone.now + 1.day
+        end
+
+        post 'bulk_reset_bounce_counts', account_id: Account.default.id,
+                                         before: Time.zone.now + 1.hour,
+                                         after: Time.zone.now - 1.hour
+
+        run_jobs
+        expect(c1.reload.bounce_count).to eq(1)
+        expect(c2.reload.bounce_count).to eq(0)
+        expect(c3.reload.bounce_count).to eq(1)
+      end
+
+      it 'filters by pattern' do
+        user_with_pseudonym
+
+        c1 = @user.communication_channels.create!(path: 'bar@example.com', path_type: 'email') do |cc|
+          cc.workflow_state = 'active'
+          cc.bounce_count = 1
+        end
+        c2 = @user.communication_channels.create!(path: 'foobar@example.com', path_type: 'email') do |cc|
+          cc.workflow_state = 'active'
+          cc.bounce_count = 1
+        end
+
+        post 'bulk_reset_bounce_counts', account_id: Account.default.id, pattern: 'bar*'
+
+        run_jobs
+        expect(c1.reload.bounce_count).to eq(0)
+        expect(c2.reload.bounce_count).to eq(1)
+      end
+
+      it 'respects the BULK_LIMIT' do
+        BulkBounceCountResetter.stubs(:bulk_limit).returns(5)
+        now = Time.zone.now
+
+        user_with_pseudonym
+
+        ccs = (BulkBounceCountResetter.bulk_limit + 1).times.map do |n|
+          @user.communication_channels.create!(path: "c#{n}@example.com", path_type: 'email') do |cc|
+            cc.workflow_state = 'active'
+            cc.bounce_count = 1
+            cc.last_bounce_at = now + n.minutes
+          end
+        end
+
+        post 'bulk_reset_bounce_counts', account_id: Account.default.id
+
+        run_jobs
+        ccs.each(&:reload)
+        expect(ccs[-1].bounce_count).to eq(1)
+        ccs.first(BulkBounceCountResetter.bulk_limit).each do |cc|
+          expect(cc.bounce_count).to eq(0)
+        end
+      end
+    end
+
+    context 'as a normal user' do
+      it "doesn't work" do
+        user_with_pseudonym
+        c = @user.communication_channels.create!(path: 'one@example.com', path_type: 'email') do |cc|
+          cc.workflow_state = 'active'
+          cc.bounce_count = 1
+        end
+
+        user_with_pseudonym
+        user_session(@user)
+
+        post 'bulk_reset_bounce_counts', account_id: Account.default.id
+
+        expect(response).to have_http_status(401)
+        expect(c.reload.bounce_count).to eq(1)
+      end
     end
   end
 
