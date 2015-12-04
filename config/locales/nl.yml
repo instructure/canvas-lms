@@ -47,6 +47,7 @@ nl:
   a_full_size_logo_that_appears_in_the_right_sidebar_18873685: "Een compleet logo dat aan de rechter zijbalk van het Canvas dashboard verschijnt. Ideale grootte is 360 x 140 pixels. Toegelaten formaten: svg, png, jpeg, gif"
   a_handy_key_value_dump_of_a_host_of_interesting_en_d0518dfe: "Een handige sleutel/value dump van een host van interessante omgevingsinformatie voor de rapporterende gebruiker"
   a_message_is_required_129e1814: "Een bericht is vereist"
+  a_new_assignment_has_been_created_for_your_course__12b72639: "Er is een nieuwe opdracht voor je cursus gemaakt, %{course_name}"
   a_problem_occurred_adding_reviewers_57b083d9: "Er heeft zich een probleem voorgedaan bij het toevoegen van beoordelaars"
   a_table_containing_the_name_of_the_grading_scheme__2c25dc3: "Een tabel met de naam van het beoordelingsschema en pictogrammen om het schema te bewerken of te verwijderen. "
   a_table_that_contains_the_grading_scheme_data_each_d461c205: "Een tabel met de data van het beoordelingsschema . Elke rij bevat een naam, een maximum percentage, en een minimum percentage. Elke rij heeft ook een pictogram om een nieuwe rij eronder toe te voegen en een pictogram on de huidige rij te verwijderen. "
@@ -1219,13 +1220,17 @@ nl:
   activity_by_date_878c5b49: "Activititeit op datum"
   add_2nd_review_ea988088: "Voeg 2e beoordeling toe"
   add_8523c19b: Toevoegen
+  add_a_new_course_4a041207: "Een nieuwe cursus toevoegen"
+  add_a_new_user_c440d053: "Een nieuwe gebruiker toevoegen"
   add_an_identity_provider_to_this_account_c2644478: "Een identiteit van provider aan deze account toevoegen"
   add_app_baf540f: "App toevoegen "
   add_attachment_93868828: "Bijlage toevoegen"
   add_content_to_module_name_589a8d54: "Content toevoegen aan %{module_name}"
+  add_course_406cb773: "Cursus toevoegen"
   add_course_assignments_628ed6d0: "Cursusopdrachten toevoegen "
   add_course_calendar_events_146154a5: "Gebeurtenissen  aan de cursuskalender toevoegen "
   add_files_to_the_course_da6ffd32: "Bestanden aan de cursus toevoegen     "
+  add_folder_ba50d107: "Map toevoegen"
   add_grading_period_6f774dc3: "Beoordelingsperiode toevoegen"
   add_grading_scheme_81e23c05: "Beoordelingsschema toevoegen  "
   add_icon_567dbcaa: "pictogram toevoegen"
@@ -1245,6 +1250,7 @@ nl:
   add_section_8b027a1c: "Sectie toevoegen"
   add_students_to_the_course_874be8fb: "Cursisten aan de cursus toevoegen "
   add_tas_to_the_course_2aac6e02: "Onderwijsassistenten  aan de cursus toevoegen"
+  add_user_e73e8e50: "Gebruiker toevoegen"
   add_your_assignments_you_can_just_make_a_long_list_8a7862dd: "Jouw opdrachten toevoegen. Je kunt gewoon een lange lijst maken, of ze in groepen verdelen - en zelfs  waarden voor iedere groep opdrachten aangeven. "
   add_your_zendesk_instance_s_custom_field_id_for_ea_3aeb75f4: "Voeg het aangepaste veld ID van je Zendesk Exemplaar toe aan elk van het volgende (velden die geen ID hebben zullen niet gelogd worden):"
   admin_4d3ba42f: Beheer
@@ -1316,6 +1322,7 @@ nl:
   all_start_dates_must_be_before_the_end_date_d949eca9: "Alle begindata moeten voor de einddatum liggen"
   all_students_have_taken_the_quiz_b558f8b4: "Alle cursisten hebben de toets gemaakt"
   all_students_have_taken_the_survey_494f9f42: "Alle cursisten hebben de enquête ingevuld"
+  all_terms_cd27b0fb: "Alle termijnen"
   allow_a_moderator_to_review_multiple_independent_g_752c4b90: "Sta een moderator toe om verschillende onafhankelijke cijfers te beoordelen voor geslecteerde indieningen"
   allow_bulk_grade_export_to_sis_e11a6e66: "Bulk cijferexport voor SIS toestaan"
   allow_lor_tools: "Gebruikers toelaten om externe tools, die voor LOR geconfigureerd zijn, te bekijken en te gebruiken."
@@ -1326,6 +1333,7 @@ nl:
   allows_users_with_international_phone_numbers_to_r_f90f8522: "Stelt gebruikers met internationale telefoonnummers in staat tekstberichten van Canvas te ontvangen."
   always_3a59e701: Altijd
   an_error_accurred_selecting_provisional_grades_61b36f64: "Er heeft zich een fout voorgedaan bij het selecteren van voorlopige cijfers"
+  an_error_occured_please_try_again_e59b65b: "Er is een fout opgetreden. Probeer het nogmaals."
   an_error_occured_trying_to_generate_this_theme_ple_6ae581d: "Er is een fout opgetreden bij het genereren van dit thema, probeer het nogmaals."
   an_error_occurred_please_post_your_reply_again_lat_b0220ac6: "*Er is een fout opgetreden*, post je antwoord later opnieuw"
   an_error_occurred_publishing_grades_cfdf7631: "Er heeft zich een fout voorgedaan bij het publiceren van cijfers."
@@ -1548,6 +1556,7 @@ nl:
       grading_scheme_info: "Beoordelingsschema bekijken/bewerken"
   assignment_976578a8: Opdracht
   assignment_comments_e43ed898: "Commentaar op opdracht "
+  assignment_created_assignment_name_course_name_324a5639: "Opdracht gemaakt - %{assignment_name}, %{course_name}"
   assignment_details: 
     no_graded_submissions: "Geen beoordeelde inzendingen"
   assignment_details_bc488179: Opdrachtgegevens
@@ -2220,7 +2229,9 @@ nl:
   availableslots_available_87b8b69d: "%{availableSlots} Beschikbaar"
   average_49c63f9b: Gemiddeld
   back_2900f52a: Terug
+  back_to_announcements_1036e43e: "Terug naar aankondigingen"
   back_to_app_center_95420d83: "Terug naar App Center "
+  back_to_ref_title_377ea1f0: "Terug naar %{ref_title}"
   background_color_b92b52ac: Achtergrondkleur
   background_image_1a401e1a: Achtergrondafbeelding
   base_847aca7c: Basis
