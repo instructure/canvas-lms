@@ -19,6 +19,59 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe AccessToken do
+
+  context "Authenticate" do
+    shared_examples "#authenticate" do
+
+      it "new access tokens shouldnt have an expiratione" do
+        at = AccessToken.create!(:user => user_model, :developer_key => DeveloperKey.default)
+        expect(at.expires_at).to eq nil
+      end
+
+      it "should authenticate valid token" do
+        at = AccessToken.create!(:user => user_model, :developer_key => DeveloperKey.default)
+        expect(AccessToken.authenticate(at.full_token)).to eq at
+      end
+
+      it "shouldn't authenticate expired tokens" do
+        at = AccessToken.create!(
+            :user => user_model,
+            :developer_key => DeveloperKey.default,
+            :expires_at => 2.hours.ago
+        )
+        expect(AccessToken.authenticate(at.full_token)).to be nil
+      end
+    end
+
+    context "With auto expire" do
+      before :once do
+        DeveloperKey.default.auto_expire_tokens = true
+        DeveloperKey.default.save!
+      end
+
+      it "shouldn't have auto expire tokens" do
+        expect(DeveloperKey.default.auto_expire_tokens).to be true
+      end
+
+      include_examples "#authenticate"
+    end
+
+    context "Without auto expire" do
+      before :once do
+        d = DeveloperKey.default
+        d.auto_expire_tokens = false
+        d.save!
+      end
+
+      it "shouldn't have auto expire tokens" do
+
+        expect(DeveloperKey.default.auto_expire_tokens).to be false
+      end
+
+      include_examples "#authenticate"
+    end
+  end
+
   context "hashed tokens" do
     before :once do
       @at = AccessToken.create!(:user => user_model, :developer_key => DeveloperKey.default)
@@ -68,7 +121,6 @@ describe AccessToken do
       @token_string = @at.full_token
       @refresh_token_string = @at.plaintext_refresh_token
     end
-
 
     it "shouldn't be usable without proper fields" do
       token = AccessToken.new
@@ -184,7 +236,9 @@ describe AccessToken do
 
   describe "regenerate_access_token" do
     before :once do
-      @at = AccessToken.create!(:user => user_model, :developer_key => DeveloperKey.default)
+      # default developer keys no lponger regenerate expirations
+      key = DeveloperKey.create!(:redirect_uri => "http://example.com/a/b")
+      @at = AccessToken.create!(:user => user_model, :developer_key => key)
       @token_string = @at.full_token
       @refresh_token_string = @at.plaintext_refresh_token
     end
