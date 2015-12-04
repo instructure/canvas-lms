@@ -1218,9 +1218,12 @@ nb:
   activity_by_date_878c5b49: "Aktivitet etter Dato"
   add_2nd_review_ea988088: "Legg til vurdering nr 2."
   add_8523c19b: "Legg til"
+  add_a_new_course_4a041207: "Legg til et nytt kurs"
+  add_a_new_user_c440d053: "Legg til en ny bruker"
   add_an_identity_provider_to_this_account_c2644478: "Legg til en identitetstilbyder til denne kontoen:"
   add_app_baf540f: "Legg til app"
   add_attachment_93868828: "Legg til vedlegg"
+  add_course_406cb773: "Legg til kurs"
   add_course_assignments_628ed6d0: "Legg til oppgaver for kurset"
   add_course_calendar_events_146154a5: "Legg til kalenderhendelser for kurset"
   add_files_to_the_course_da6ffd32: "Legg filer til kurset"
@@ -1244,6 +1247,7 @@ nb:
   add_section_8b027a1c: "Legg til en seksjon"
   add_students_to_the_course_874be8fb: "Legg til studenter til kurset"
   add_tas_to_the_course_2aac6e02: "Legg til Læringsassistenter til kurset"
+  add_user_e73e8e50: "Legg til bruker"
   add_your_assignments_you_can_just_make_a_long_list_8a7862dd: "Legg til dine oppgaver. Du kan lage en lang liste, eller bryte dem opp i grupper - og til og med spesifisere vekting for hver oppgavegruppe."
   add_your_zendesk_instance_s_custom_field_id_for_ea_3aeb75f4: "Legg inn Zendesk Instance sin tilpassede felt-ID for hver av følgende (felt som ikke har ID-er, vil ikke bli loggført):"
   admin_4d3ba42f: Admin
@@ -1325,6 +1329,7 @@ nb:
   allows_users_with_international_phone_numbers_to_r_f90f8522: "Tillater brukere med internasjonale telefonnumre å motta tekstmeldinger fra Canvas."
   always_3a59e701: Alltid
   an_error_accurred_selecting_provisional_grades_61b36f64: "Det oppstod en feil velge foreløpige karakterer "
+  an_error_occured_please_try_again_e59b65b: "Det oppsto en feil. Vennligst prøv igjen."
   an_error_occured_trying_to_generate_this_theme_ple_6ae581d: "Det oppstod en feil ved generering av denne malen, prøv igjen"
   an_error_occurred_please_post_your_reply_again_lat_b0220ac6: "*Det oppstod en feil*, vennligst publiser svaret ditt senere"
   an_error_occurred_publishing_grades_cfdf7631: "Det oppstod en feil publisering karakterer. "
@@ -2218,6 +2223,7 @@ nb:
   average_49c63f9b: Gjennomsnittlig
   back_2900f52a: Tilbake
   back_to_app_center_95420d83: "Tilbake til appsenteret"
+  back_to_title_39e7a8f4: "Tilbake til %{title}"
   background_color_b92b52ac: Bakgrunnsfarge
   background_image_1a401e1a: Bakgrunnsbilde
   base_847aca7c: Grunnlag
@@ -2812,6 +2818,7 @@ nb:
   click_here_for_an_account_9536cb36: "Klikk her for en konto"
   click_here_it_s_free_eeccb9cb: "Klikk her, det er gratis!"
   click_here_on_the_calendar_link_c9965631: "Klikk her på *Kalender* lenken"
+  click_here_to_see_the_file_79e2b366: "Klikk her for å se filen."
   click_to_enter_comments_if_the_student_chooses_thi_507c20f6: "Klikk for å legge inn kommentarer, om eleven velger dette svaret"
   click_to_modify_89fa26aa: "Klikk for å modifisere"
   click_to_report_profile_picture_370f9625: "Klikk for å rapportere profilbilde"
@@ -3963,8 +3970,10 @@ nb:
       all: "Hvem som helst"
       only_teachers: "Kun forelesere"
       teachers_students: "Lærere og studenter"
+  course_8a63b4a3: Kurs
   course_announcements_76b07340: Kurskunngjøringer
   course_atom_feed_9d95214e: "Kurset Atom Feed"
+  course_calendar_7d3cba7b: Kurskalender
   course_copy_argument_error: "En kurskopi krever et kildekurs."
   course_copy_description: "Flytte-programtillegg for å kopiere Canvaskurs"
   course_copy_display: Kurskopi
@@ -4016,6 +4025,7 @@ nb:
       wiki_page: "Ukjent wikiside"
   course_files_62deb8f8: Kursfiler
   course_home_sub_navigation_b1ee6b03: Kursnavigering
+  course_id_8bd2a21c: "Kurs ID"
   course_implemented_apps_fa658f5a: "Kurs-implementerte applikasjoner"
   course_list: 
     favorited_tooltip: "Klikk for å fjerne fra kurs menyen."
@@ -5419,6 +5429,7 @@ nb:
     unsubscribed: "Abonnument avsluttet"
     unsubscribed_hint: "Du abonnerer ikke på dette temaet. Klikk for å abonnere."
   display_course_catalog: "Vis søkbar liste over kurs i dette root kontoen med \"Inkluder dette kurset i den offentlige kurset indeks\" flagg aktivert."
+  display_name_b80c243e: "Vis navn"
   display_total_grades_when_the_all_grading_periods__1d2b5cf: "Vis samtlige karakterer når \"Alle karakterperiodene\" nedtrekksmenyvalg er  valgt (Flere karakterperioder må være aktivert)."
   display_totals_for_all_grading_periods_ad1ea050: "Vis poengsummene for \"Alle karakterperiodene\""
   distribution_of_current_grades_in_courses_across_a_e6c82f5d: |-
@@ -7445,6 +7456,7 @@ nb:
   in_progress_9d1ce8b9: Pågår
   in_progress_icon_6e69c998: Pågår-ikon
   inbox_bb245a60: Innboks
+  include_deleted_objects_3cced3b5: "Inkluder slettede objekter:"
   include_scores_when_alerting_about_grade_changes_623ec201: "Inkluder score når som varsler om karakteren endringer."
   include_this_assignment_s_grades_when_posting_to_y_6bff3323: "Inkluder denne oppdrags karakterer når du legger til skolens Student Information System"
   include_unpublished_assignments_83ebbaec: "Inkluder Upubliserte Oppdrag"
@@ -7631,6 +7643,7 @@ nb:
     lock_module_until: "Lås inntil"
   last_enrollment_activity_10fe15ba: "Siste Påmelding aktivitet"
   last_item_79583712: "Siste Element:"
+  last_login_54565109: "Siste innlogging"
   last_modified_by_ca4bb5e1: "Sist redigert av"
   last_user_access_title: "Forrige brukertilgang"
   late_percent_b91d01b3: "Sent: %{percent}"
@@ -7794,6 +7807,7 @@ nb:
       feedback: "Klikk her for å fortelle oss hva som skjedde"
     show_me_where: "Vis meg hvor"
   links_14b70841: Lenker
+  load_more_9ca37ccc: "Last mer..."
   loading_25990131: Laster…
   loading_bde52856: Laster
   loading_more_results_def6df65: "Laster inn flere resultater…"
@@ -10018,6 +10032,7 @@ nb:
   nickname_7df95b09: "Kallenavn:"
   no_assignment_name_adbb215b: "Ingen Overdragelse Navn"
   no_content_has_been_added_f36bab43: "* Ingen innholdet er lagt"
+  no_courses_found_12d68a74: "Ingen kurs funnet"
   no_date_bfeb2df7: "Ingen dato"
   no_directory_is_selected_please_select_a_directory_46ded46: "Ingen katalog er valgt, vennligst velge en katalog før du klikker \"flytte\""
   no_due_date_1d63d13b: "Ingen forfallsdato"
@@ -10038,6 +10053,7 @@ nb:
   no_students_have_taken_the_survey_yet_d378cd35: "Ingen studenter har tatt undersøkelsen ennå"
   no_tls_618add1a: "Ingen TLS"
   no_usage_rights_object_supplied_304b8d40: "Ingen 'usage_rights' objekt som følger"
+  no_users_found_64a043ff: "Ingen brukere funnet"
   not_a_number: "må være et positivt tall"
   not_available_until_next_submission_2175158: "Ikke tilgjengelig før neste innsending"
   not_completed_d70acea3: "ikke fullført"
@@ -12851,6 +12867,7 @@ nb:
   record_with_webcam_af21e07c: "Rekord med webcam"
   recurring_calendar_events_c940b6b8: "Gjentakende kalenderhendelser"
   red_8258edf3: Rød
+  reference_code_3e8355dd: Referansekode
   regenerate_epub_395c8e56: "regenerere ePub"
   region_47e29025: "Region:"
   region_939f2a6c: Region
@@ -14178,6 +14195,7 @@ nb:
     instructure_csv: "Instructure-formatert CSV-fil eller en zipfil med CSV-filer"
     upload_filename: "sis_upload_%{id}.zip"
   sis_export_title: "SIS eksport"
+  sis_id_4495a887: "SIS ID"
   sis_import: 
     buttons: 
       process_data: "Behandler data"
@@ -15489,6 +15507,8 @@ nb:
   view_file_8a1c62e5: "Vis fil"
   view_grades_8d3bae6c: "Vis karakterer"
   view_name_app_62a2ad8e: "Vis %{name} app"
+  view_next_file_a8a4a885: "Se neste fil"
+  view_previous_file_b846db4f: "Se forrige fil"
   view_question_banks_188a9e0f: "Vis Spørsmåls Banker"
   view_student_analytics_6b8ccd42: "Vis Student Analytics"
   view_toolname_placements_4a5724d1: "Vis %{toolName} plasseringer"
