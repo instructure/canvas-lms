@@ -495,7 +495,7 @@ module Api
     html = rewriter.translate_content(html)
 
     url_helper = Html::UrlProxy.new(self, context, host, protocol)
-    account = Context.get_account(context, @domain_root_account)
+    account = Context.get_account(context) || @domain_root_account
     include_mobile = respond_to?(:mobile_device?, true) && mobile_device?
     Html::Content.rewrite_outgoing(html, account, url_helper, include_mobile: include_mobile)
   end

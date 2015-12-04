@@ -9,7 +9,7 @@
     <% if params[:editing_brand_config] %>
       <%= t("You're editing your Canvas Theme! The changes have not been applied yet.") %>
     <% else %>
-      <% current_account = ::Context.get_account(@context, @domain_root_account) %>
+      <% current_account = ::Context.get_account(@context) || @domain_root_account %>
       <%= t do %>
         You're editing your Canvas Theme! Apply or cancel changes from within the
         <%= link_to "Theme Editor", account_theme_editor_path(current_account), target: "_top" %>.

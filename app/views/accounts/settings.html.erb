@@ -312,23 +312,25 @@ TEXT
                     <%= settings.label :enable_alerts, :en => "Alerts (beta)" %>
                   </div>
                 <% end %>
-                <div>
+                <div id="global_includes_warning_message_wrapper">
                   <%= settings.check_box :global_includes, :checked => @account.settings[:global_includes] %>
-                  <%= settings.label :global_includes, :en => "Global CSS/JavaScript overrides" %>
+                  <%= settings.label :global_includes, :en => "Custom CSS/JavaScript overrides" %>
                   <% if use_new_styles? %>
-                    <div class="account_settings__help-text">
+                    <div id="global_includes_warning_message" class="account_settings__help-text">
                       <%= t do %>
-                        When enabled, global JavaScript and CSS files can be uploaded in the
-                        <%= link_to t("Theme Editor"), account_theme_editor_path(@account) %>.
+                      Before using this feature, we recommend trying the <%= link_to t("Theme Editor"), account_theme_editor_path(@account) %> to do any branding. Enabling this feature provides the ability to upload custom JavaScript and CSS files in the Theme Editor. Modifications made with this method may conflict with future changes to the Canvas DOM (eg: element class names or HTML structure) and are therefore not supported. Those using this feature should have advanced understanding of JavaScript and CSS and must maintain their own code.
+                      <div>
+                        <strong>Use at your own risk!</strong>
+                      </div>
                       <% end %>
                     </div>
-                    <div id="new_styles_sub_account_includes" style="<%= hidden unless @account.allow_global_includes? %>">
+                  </div>
+                    <div>
                       <%= settings.check_box :sub_account_includes,
                         id: :account_settings_new_sub_account_includes,
                         checked: @account.settings[:sub_account_includes]
                       %>
                       <%= settings.label :new_sub_account_includes, :en => "Let sub-accounts use the Theme Editor to customize their own branding" %>
-                    </div>
                   <% end %>
                 </div>
                 <div id="show_scheduler_checkbox">

@@ -761,7 +761,7 @@ CanvasRails::Application.routes.draw do
   get 'dashboard-sidebar' => 'users#dashboard_sidebar', as: :dashboard_sidebar
   post 'users/toggle_recent_activity_dashboard' => 'users#toggle_recent_activity_dashboard'
   get 'styleguide' => 'info#styleguide'
-  get 'accounts/:account_id/theme-preview' => 'info#theme_preview'
+  get 'accounts/:account_id/theme-preview' => 'brand_configs#show'
   get 'old_styleguide' => 'info#old_styleguide'
   root to: 'users#user_dashboard', as: 'root', via: :get
   # backwards compatibility with the old /dashboard url

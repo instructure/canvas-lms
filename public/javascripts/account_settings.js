@@ -288,7 +288,7 @@ define([
     }).trigger('change');
 
     $('#account_settings_global_includes').change(function() {
-      $('#new_styles_sub_account_includes').toggle(this.checked);
+      $('#global_includes_warning_message_wrapper').toggleClass('alert', this.checked);
     }).trigger('change');
   });
 

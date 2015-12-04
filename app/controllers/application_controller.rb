@@ -1737,34 +1737,6 @@ class ApplicationController < ActionController::Base
     super
   end
 
-  def active_brand_config(opts={})
-    return @active_brand_config if defined? @active_brand_config
-    @active_brand_config = begin
-      if !use_new_styles? || (@current_user && @current_user.prefers_high_contrast?)
-        nil
-      elsif session.key?(:brand_config_md5)
-        BrandConfig.where(md5: session[:brand_config_md5]).first
-      else
-        brand_config_for_account(opts)
-      end
-    end
-  end
-  helper_method :active_brand_config
-
-  def brand_config_for_account(opts)
-    account = @account || Context.get_account(@context, @domain_root_account)
-    if account.brand_config && account.branding_allowed?
-      account.brand_config
-    elsif !opts[:ignore_parents] && account.first_parent_brand_config
-      account.first_parent_brand_config
-    elsif k12?
-      BrandConfig.k12_config
-    end
-  end
-  private :brand_config_for_account
-
-
-
   def css_bundles
     @css_bundles ||= []
   end

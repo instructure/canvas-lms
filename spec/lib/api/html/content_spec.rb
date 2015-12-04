@@ -74,6 +74,49 @@ module Api
               "<li><img class=\"nothing_special\"></li>\n</ul></div>"
           expect(html).to eq(expected)
         end
+
+        it "inserts css/js if it is supposed to" do
+          string = "<div>stuff</div>"
+          url_helper = stub
+          html = Content.new(string).rewritten_html(url_helper)
+          expect(html).to eq("<div>stuff</div>")
+        end
+      end
+
+      describe "#add_css_and_js_overrides" do
+
+        it "does nothing if there is no brand_config" do
+          string = "<div>stuff</div>"
+          html = Content.new(string).add_css_and_js_overrides.to_s
+          expect(html).to eq("<div>stuff</div>")
+        end
+
+        it "includes brand_config css & js overrides correctly & in proper order" do
+          string = "<div>stuff</div>"
+
+          root_bc = BrandConfig.create!({
+            mobile_css_overrides: 'https://example.com/root/account.css',
+            mobile_js_overrides: 'https://example.com/root/account.js'
+          })
+
+          child_account = Account.default.sub_accounts.create!(name: 'child account')
+          child_account.root_account.enable_feature! :use_new_styles
+          child_account.root_account.settings[:sub_account_includes] = true
+
+          bc = child_account.build_brand_config({
+            mobile_css_overrides: 'https://example.com/child/account.css',
+            mobile_js_overrides: 'https://example.com/child/account.js'
+          })
+          bc.parent = root_bc
+          bc.save!
+
+          html = Content.new(string, child_account, include_mobile: true).add_css_and_js_overrides
+          expect(html.to_s).to eq '<link rel="stylesheet" href="https://example.com/root/account.css">' \
+                                  '<link rel="stylesheet" href="https://example.com/child/account.css">' \
+                                  '<div>stuff</div>' \
+                                  '<script src="https://example.com/root/account.js"></script>' \
+                                  '<script src="https://example.com/child/account.js"></script>'
+        end
       end
     end
   end

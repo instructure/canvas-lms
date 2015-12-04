@@ -89,20 +89,27 @@ module Api
           end
         end
 
-        if @include_mobile
-          if (bc = @account.brand_config) && bc.mobile_css_overrides.present?
-            css = parsed_html.document.create_element("link",
-                                                      rel: 'stylesheet',
-                                                      href: bc.mobile_css_overrides)
-            parsed_html.prepend_child(css)
+        add_css_and_js_overrides
+        parsed_html.to_s
+      end
+
+      def add_css_and_js_overrides
+        if @include_mobile && @account.root_account.feature_enabled?(:use_new_styles) && @account.effective_brand_config
+          overrides = @account.effective_brand_config.css_and_js_overrides
+          if (mobile_css_overrides = overrides[:mobile_css_overrides])
+            mobile_css_overrides.reverse_each do |url|
+              tag = parsed_html.document.create_element('link', rel: 'stylesheet', href: url)
+              parsed_html.prepend_child(tag)
+            end
           end
-          if (bc = @account.brand_config) && bc.mobile_js_overrides.present?
-            js = parsed_html.document.create_element("script",
-                                                     source: bc.mobile_js_overrides)
-            parsed_html.prepend_child(js)
+          if (mobile_js_overrides = overrides[:mobile_js_overrides])
+            mobile_js_overrides.each do |url|
+              tag = parsed_html.document.create_element('script', src: url)
+              parsed_html.add_child(tag)
+            end
           end
         end
-        parsed_html.to_s
+        parsed_html
       end
 
       private

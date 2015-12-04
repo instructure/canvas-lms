@@ -169,7 +169,7 @@ class Account < ActiveRecord::Base
   add_setting :global_includes, :root_only => true, :boolean => true, :default => false
   add_setting :global_javascript, :condition => :allow_global_includes
   add_setting :global_stylesheet, :condition => :allow_global_includes
-  add_setting :sub_account_includes, :condition => :allow_global_includes, :boolean => true, :default => false
+  add_setting :sub_account_includes, :condition => :use_new_styles_or_allow_global_includes, :boolean => true, :default => false
   add_setting :error_reporting, :hash => true, :values => [:action, :email, :url, :subject_param, :body_param], :root_only => true
   add_setting :custom_help_links, :root_only => true
   add_setting :prevent_course_renaming_by_teachers, :boolean => true, :root_only => true
@@ -221,6 +221,10 @@ class Account < ActiveRecord::Base
   add_setting :include_students_in_global_survey, boolean: true, root_only: true, default: false
   add_setting :trusted_referers, root_only: true
 
+  def use_new_styles_or_allow_global_includes?
+    feature_enabled?(:use_new_styles) || allow_global_includes?
+  end
+
   def settings=(hash)
     @invalidate_settings_cache = true
     if hash.is_a?(Hash)
@@ -262,7 +266,11 @@ class Account < ActiveRecord::Base
   end
 
   def allow_global_includes?
-    self.global_includes? || self.parent_account.try(:sub_account_includes?)
+    if root_account?
+      global_includes?
+    else
+      root_account.try(:sub_account_includes?)
+    end
   end
 
   def global_includes_hash

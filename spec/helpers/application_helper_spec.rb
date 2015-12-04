@@ -202,13 +202,13 @@ describe ApplicationHelper do
     end
   end
 
-  context "custom css/js includes" do
+  describe "custom css/js includes" do
     context "without use_new_styles" do
       before do
         helper.stubs(:use_new_styles?).returns(false)
       end
 
-      context "include_account_css" do
+      describe "include_account_css" do
 
         before :once do
           @site_admin = Account.site_admin
@@ -223,8 +223,8 @@ describe ApplicationHelper do
 
         context "with custom css" do
           it "should include account css" do
-            @domain_root_account.settings = @domain_root_account.settings.merge({ :global_includes => true })
-            @domain_root_account.settings = @domain_root_account.settings.merge({ :global_stylesheet => '/path/to/css' })
+            @domain_root_account.settings = @domain_root_account.settings.merge(global_includes: true)
+            @domain_root_account.settings = @domain_root_account.settings.merge(global_stylesheet: '/path/to/css')
             @domain_root_account.save!
 
             output = helper.include_account_css
@@ -233,8 +233,8 @@ describe ApplicationHelper do
           end
 
           it "should include site admin css" do
-            @site_admin.settings = @site_admin.settings.merge({ :global_includes => true })
-            @site_admin.settings = @site_admin.settings.merge({ :global_stylesheet => '/path/to/css' })
+            @site_admin.settings = @site_admin.settings.merge(global_includes: true)
+            @site_admin.settings = @site_admin.settings.merge(global_stylesheet: '/path/to/css')
             @site_admin.save!
 
             output = helper.include_account_css
@@ -243,8 +243,8 @@ describe ApplicationHelper do
           end
 
           it "should include site admin css once" do
-            @site_admin.settings = @site_admin.settings.merge({ :global_includes => true })
-            @site_admin.settings = @site_admin.settings.merge({ :global_stylesheet => '/path/to/css' })
+            @site_admin.settings = @site_admin.settings.merge(global_includes: true)
+            @site_admin.settings = @site_admin.settings.merge(global_stylesheet: '/path/to/css')
             @site_admin.save!
 
             output = helper.include_account_css
@@ -253,12 +253,12 @@ describe ApplicationHelper do
           end
 
           it "should include site admin css first" do
-            @site_admin.settings = @site_admin.settings.merge({ :global_includes => true })
-            @site_admin.settings = @site_admin.settings.merge({ :global_stylesheet => '/path/to/admin/css' })
+            @site_admin.settings = @site_admin.settings.merge(global_includes: true)
+            @site_admin.settings = @site_admin.settings.merge(global_stylesheet: '/path/to/admin/css')
             @site_admin.save!
 
-            @domain_root_account.settings = @domain_root_account.settings.merge({ :global_includes => true })
-            @domain_root_account.settings = @domain_root_account.settings.merge({ :global_stylesheet => '/path/to/root/css' })
+            @domain_root_account.settings = @domain_root_account.settings.merge(global_includes: true)
+            @domain_root_account.settings = @domain_root_account.settings.merge(global_stylesheet: '/path/to/root/css')
             @domain_root_account.save!
 
             output = helper.include_account_css
@@ -267,8 +267,8 @@ describe ApplicationHelper do
           end
 
           it "should not include anything if param is set to 0" do
-            @domain_root_account.settings = @domain_root_account.settings.merge({ :global_includes => true })
-            @domain_root_account.settings = @domain_root_account.settings.merge({ :global_stylesheet => '/path/to/css' })
+            @domain_root_account.settings = @domain_root_account.settings.merge(global_includes: true)
+            @domain_root_account.settings = @domain_root_account.settings.merge(global_stylesheet: '/path/to/css')
             @domain_root_account.save!
 
             params[:global_includes] = '0'
@@ -279,22 +279,22 @@ describe ApplicationHelper do
 
         context "sub-accounts" do
           before :once do
-            @site_admin.settings = @site_admin.settings.merge({ :global_includes => true })
-            @site_admin.settings = @site_admin.settings.merge({ :global_stylesheet => '/path/to/admin/css' })
+            @site_admin.settings = @site_admin.settings.merge(global_includes: true)
+            @site_admin.settings = @site_admin.settings.merge(global_stylesheet: '/path/to/admin/css')
             @site_admin.save!
 
-            @domain_root_account.settings = @domain_root_account.settings.merge({ :global_includes => true })
-            @domain_root_account.settings = @domain_root_account.settings.merge({ :sub_account_includes => true })
-            @domain_root_account.settings = @domain_root_account.settings.merge({ :global_stylesheet => '/path/to/root/css' })
+            @domain_root_account.settings = @domain_root_account.settings.merge(global_includes: true)
+            @domain_root_account.settings = @domain_root_account.settings.merge(sub_account_includes: true)
+            @domain_root_account.settings = @domain_root_account.settings.merge(global_stylesheet: '/path/to/root/css')
             @domain_root_account.save!
 
-            @sub_account1 = account_model(:root_account => @domain_root_account)
-            @sub_account1.settings = @sub_account1.settings.merge({ :global_stylesheet => '/path/to/sub1/css' })
-            @sub_account1.settings = @sub_account1.settings.merge({ :sub_account_includes => true })
+            @sub_account1 = account_model(root_account: @domain_root_account)
+            @sub_account1.settings = @sub_account1.settings.merge(global_stylesheet: '/path/to/sub1/css')
+            @sub_account1.settings = @sub_account1.settings.merge(sub_account_includes: true)
             @sub_account1.save!
 
-            @sub_account2 = account_model(:root_account => @domain_root_account)
-            @sub_account2.settings = @sub_account2.settings.merge({ :global_stylesheet => '/path/to/sub2/css' })
+            @sub_account2 = account_model(root_account: @domain_root_account)
+            @sub_account2.settings = @sub_account2.settings.merge(global_stylesheet: '/path/to/sub2/css')
             @sub_account2.save!
           end
 
@@ -330,7 +330,7 @@ describe ApplicationHelper do
           it "should use include sub-account css, if sub-account is lowest common account context" do
             @course = @sub_account1.courses.create!
             @course.offer!
-            student_in_course(:active_all => true)
+            student_in_course(active_all: true)
             @context = @user
             @current_user = @user
             output = helper.include_account_css
@@ -343,8 +343,8 @@ describe ApplicationHelper do
             @course1.offer!
             @course2 = @sub_account2.courses.create!
             @course2.offer!
-            student_in_course(:active_all => true, :course => @course1)
-            student_in_course(:active_all => true, :course => @course2, :user => @user)
+            student_in_course(active_all: true, course: @course1)
+            student_in_course(active_all: true, course: @course2, user: @user)
             @context = @user
             @current_user = @user
             output = helper.include_account_css
@@ -353,8 +353,8 @@ describe ApplicationHelper do
           end
 
           it "should include multiple levesl of sub-account css in the right order for course page" do
-            @sub_sub_account1 = account_model(:parent_account => @sub_account1, :root_account => @domain_root_account)
-            @sub_sub_account1.settings = @sub_sub_account1.settings.merge({ :global_stylesheet => '/path/to/subsub1/css' })
+            @sub_sub_account1 = account_model(parent_account: @sub_account1, root_account: @domain_root_account)
+            @sub_sub_account1.settings = @sub_sub_account1.settings.merge(global_stylesheet: '/path/to/subsub1/css')
             @sub_sub_account1.save!
 
             @context = @sub_sub_account1.courses.create!
@@ -364,13 +364,13 @@ describe ApplicationHelper do
           end
 
           it "should include multiple levesl of sub-account css in the right order" do
-            @sub_sub_account1 = account_model(:parent_account => @sub_account1, :root_account => @domain_root_account)
-            @sub_sub_account1.settings = @sub_sub_account1.settings.merge({ :global_stylesheet => '/path/to/subsub1/css' })
+            @sub_sub_account1 = account_model(parent_account: @sub_account1, root_account: @domain_root_account)
+            @sub_sub_account1.settings = @sub_sub_account1.settings.merge(global_stylesheet: '/path/to/subsub1/css')
             @sub_sub_account1.save!
 
             @course = @sub_sub_account1.courses.create!
             @course.offer!
-            student_in_course(:active_all => true)
+            student_in_course(active_all: true)
             @context = @user
             @current_user = @user
             output = helper.include_account_css
@@ -381,10 +381,6 @@ describe ApplicationHelper do
       end
 
       describe "include_account_js" do
-        before do
-          helper.stubs(:use_new_styles?).returns(false)
-        end
-
         before :once do
           @site_admin = Account.site_admin
           @domain_root_account = Account.default
@@ -398,8 +394,8 @@ describe ApplicationHelper do
 
         context "with custom js" do
           it "should include account javascript" do
-            @domain_root_account.settings = @domain_root_account.settings.merge({ :global_includes => true })
-            @domain_root_account.settings = @domain_root_account.settings.merge({ :global_javascript => '/path/to/js' })
+            @domain_root_account.settings = @domain_root_account.settings.merge(global_includes: true)
+            @domain_root_account.settings = @domain_root_account.settings.merge(global_javascript: '/path/to/js')
             @domain_root_account.save!
 
             output = helper.include_account_js
@@ -408,8 +404,8 @@ describe ApplicationHelper do
           end
 
           it "should include site admin javascript" do
-            @site_admin.settings = @site_admin.settings.merge({ :global_includes => true })
-            @site_admin.settings = @site_admin.settings.merge({ :global_javascript => '/path/to/js' })
+            @site_admin.settings = @site_admin.settings.merge(global_includes: true)
+            @site_admin.settings = @site_admin.settings.merge(global_javascript: '/path/to/js')
             @site_admin.save!
 
             output = helper.include_account_js
@@ -418,12 +414,12 @@ describe ApplicationHelper do
           end
 
           it "should include both site admin and root account javascript, site admin first" do
-            @domain_root_account.settings = @domain_root_account.settings.merge({ :global_includes => true })
-            @domain_root_account.settings = @domain_root_account.settings.merge({ :global_javascript => '/path/to/root/js' })
+            @domain_root_account.settings = @domain_root_account.settings.merge(global_includes: true)
+            @domain_root_account.settings = @domain_root_account.settings.merge(global_javascript: '/path/to/root/js')
             @domain_root_account.save!
 
-            @site_admin.settings = @site_admin.settings.merge({ :global_includes => true })
-            @site_admin.settings = @site_admin.settings.merge({ :global_javascript => '/path/to/admin/js' })
+            @site_admin.settings = @site_admin.settings.merge(global_includes: true)
+            @site_admin.settings = @site_admin.settings.merge(global_javascript: '/path/to/admin/js')
             @site_admin.save!
 
             output = helper.include_account_js
@@ -433,14 +429,10 @@ describe ApplicationHelper do
         end
       end
 
-      context "global_includes" do
-        before do
-          helper.stubs(:use_new_styles?).returns(false)
-        end
-
+      describe "global_includes" do
         it "should only compute includes once, with includes" do
           @site_admin = Account.site_admin
-          @site_admin.expects(:global_includes_hash).once.returns({:css => "/path/to/css", :js => "/path/to/js"})
+          @site_admin.expects(:global_includes_hash).once.returns({css: "/path/to/css", js: "/path/to/js"})
           expect(helper.include_account_css).to match %r{/path/to/css}
           expect(helper.include_account_js).to match %r{\\?/path\\?/to\\?/js}
         end
@@ -459,12 +451,40 @@ describe ApplicationHelper do
         helper.stubs(:use_new_styles?).returns(true)
       end
 
-      context "include_account_css" do
+      def set_up_subaccounts
+        @domain_root_account.settings[:global_includes] = true
+        @domain_root_account.settings[:sub_account_includes] = true
+        @domain_root_account.create_brand_config!({
+          css_overrides: 'https://example.com/root/account.css',
+          js_overrides: 'https://example.com/root/account.js'
+        })
+        @domain_root_account.save!
+
+        @child_account = account_model(root_account: @domain_root_account, name: 'child account')
+        bc = @child_account.build_brand_config({
+          css_overrides: 'https://example.com/child/account.css',
+          js_overrides: 'https://example.com/child/account.js'
+        })
+        bc.parent = @domain_root_account.brand_config
+        bc.save!
+        @child_account.save!
+
+        @grandchild_account = @child_account.sub_accounts.create!(name: 'grandchild account')
+        bc = @grandchild_account.build_brand_config({
+          css_overrides: 'https://example.com/grandchild/account.css',
+          js_overrides: 'https://example.com/grandchild/account.js'
+        })
+        bc.parent = @child_account.brand_config
+        bc.save!
+        @grandchild_account.save!
+      end
+
+      describe "include_account_css" do
 
         before :once do
           @site_admin = Account.site_admin
           @domain_root_account = Account.default
-          @domain_root_account.settings = @domain_root_account.settings.merge({ :global_includes => true })
+          @domain_root_account.settings = @domain_root_account.settings.merge(global_includes: true)
           @domain_root_account.save!
         end
 
@@ -501,36 +521,53 @@ describe ApplicationHelper do
         end
 
         context "sub-accounts" do
-          it "should include sub-account css" do
-            raise pending("need to make new_styles custom css/js work with subaccounts/site_admin: CNVS-23957")
+          before { set_up_subaccounts }
+
+          it "should include sub-account css when viewing the subaccount or any course or group in it" do
+            course = @grandchild_account.courses.create!
+            group = course.groups.create!
+            [@grandchild_account, course, group].each do |context|
+              @context = context
+              output = helper.include_account_css
+              expect(output).to have_tag 'link'
+              expect(output.scan(%r{https://example.com/(root|child|grandchild)?/account.css})).to eql [['root'], ['child'], ['grandchild']]
+            end
           end
 
           it "should not include sub-account css when root account is context" do
-            raise pending("need to make new_styles custom css/js work with subaccounts/site_admin: CNVS-23957")
-          end
-
-          it "should include sub-account css for course context" do
-            raise pending("need to make new_styles custom css/js work with subaccounts/site_admin: CNVS-23957")
-          end
-
-          it "should include sub-account css for group context" do
-            raise pending("need to make new_styles custom css/js work with subaccounts/site_admin: CNVS-23957")
+            @context = @domain_root_account
+            output = helper.include_account_css
+            expect(output).to have_tag 'link'
+            expect(output.scan(%r{https://example.com/(root|child|grandchild)?/account.css})).to eql [['root']]
           end
 
           it "should use include sub-account css, if sub-account is lowest common account context" do
-            raise pending("need to make new_styles custom css/js work with subaccounts/site_admin: CNVS-23957")
+            @course = @grandchild_account.courses.create!
+            @course.offer!
+            student_in_course(active_all: true)
+            @context = @user
+            @current_user = @user
+            output = helper.include_account_css
+            expect(output).to have_tag 'link'
+            expect(output.scan(%r{https://example.com/(root|child|grandchild)?/account.css})).to eql [['root'], ['child'], ['grandchild']]
           end
 
-          it "should not use include sub-account css, if sub-account is not lowest common account context" do
-            raise pending("need to make new_styles custom css/js work with subaccounts/site_admin: CNVS-23957")
+          it "should work using common_account_chain starting from lowest common account context" do
+            course1 = @child_account.courses.create!
+            course1.offer!
+            course2 = @grandchild_account.courses.create!
+            course2.offer!
+            student_in_course(active_all: true, course: course1, user: @user)
+            student_in_course(active_all: true, course: course2, user: @user)
+            @context = @user
+            @current_user = @user
+            output = helper.include_account_css
+            expect(output).to have_tag 'link'
+            expect(output.scan(%r{https://example.com/(root|child|grandchild)?/account.css})).to eql [['root'], ['child'], ['grandchild']]
           end
 
-          it "should include multiple levesl of sub-account css in the right order for course page" do
-            raise pending("need to make new_styles custom css/js work with subaccounts/site_admin: CNVS-23957")
-          end
-
-          it "should include multiple levesl of sub-account css in the right order" do
-            raise pending("need to make new_styles custom css/js work with subaccounts/site_admin: CNVS-23957")
+          it "should include site admin css/js" do
+            raise pending("need to handle site admin css/js from theme editor: CNVS-25229")
           end
         end
       end
@@ -539,7 +576,7 @@ describe ApplicationHelper do
         before :once do
           @site_admin = Account.site_admin
           @domain_root_account = Account.default
-          @domain_root_account.settings = @domain_root_account.settings.merge({ :global_includes => true })
+          @domain_root_account.settings = @domain_root_account.settings.merge(global_includes: true)
           @domain_root_account.save!
         end
 
@@ -557,12 +594,30 @@ describe ApplicationHelper do
             expect(output).to have_tag 'script', text: %r{https:\\/\\/example.com\\/path\\/to\\/overrides.js}
           end
 
-          it "should include site admin javascript" do
-            raise pending("need to make new_styles custom css/js work with subaccounts/site_admin: CNVS-23957")
-          end
+          context "sub-accounts" do
+            before { set_up_subaccounts }
 
-          it "should include both site admin and root account javascript, site admin first" do
-            raise pending("need to make new_styles custom css/js work with subaccounts/site_admin: CNVS-23957")
+            it "should include site admin javascript" do
+              raise pending("need to handle site admin css/js from theme editor: CNVS-25229")
+            end
+
+            it "should just include domain root account's when there is no context or @current_user" do
+              output = helper.include_account_js
+              expect(output).to have_tag 'script'
+              expect(output).to match(/#{Regexp.quote('["https:\/\/example.com\/root\/account.js"].forEach')}/)
+            end
+
+            it "should include granchild, child, and root when viewing the grandchild or any course or group in it" do
+              course = @grandchild_account.courses.create!
+              group = course.groups.create!
+              [@grandchild_account, course, group].each do |context|
+                @context = context
+                output = helper.include_account_js
+              expect(output).to have_tag 'script'
+              expected = '["https:\/\/example.com\/root\/account.js","https:\/\/example.com\/child\/account.js","https:\/\/example.com\/grandchild\/account.js"].forEach'
+              expect(output).to match(/#{Regexp.quote(expected)}/)
+              end
+            end
           end
         end
       end
