@@ -137,13 +137,14 @@ class ErrorReport < ActiveRecord::Base
     end
   end
 
+  PROTECTED_FIELDS = [:id, :created_at, :updated_at, :data].freeze
 
   # assigns data attributes to the column if there's a column with that name,
   # otherwise goes into the general data hash
   def assign_data(data = {})
     self.data ||= {}
     data.each do |k,v|
-      if respond_to?(:"#{k}=")
+      if respond_to?(:"#{k}=") && !ErrorReport::PROTECTED_FIELDS.include?(k.to_sym)
         self.send(:"#{k}=", v)
       else
         # dup'ing because some strings come in from Rack as frozen sometimes,

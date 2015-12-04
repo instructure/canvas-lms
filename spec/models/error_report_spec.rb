@@ -119,4 +119,10 @@ describe ErrorReport do
     expect(report.data["request_parameters"]).to eq({ "client_secret" => "[FILTERED]" }.inspect)
   end
 
+  it "should not try to assign protected fields" do
+    report = described_class.new
+    report.assign_data(id: 1)
+    expect(report.id).to be_nil
+    expect(report.data["id"]).to eq 1
+  end
 end
