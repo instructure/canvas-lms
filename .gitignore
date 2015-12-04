@@ -57,7 +57,6 @@ npm-debug.log
 /spec/javascripts/tests.js
 /tmp/
 /vendor/bundle
-/vendor/plugins/rails_upgrade
 
 # generated plugin stuff
 /app/coffeescripts/plugins/
