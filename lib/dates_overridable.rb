@@ -148,6 +148,35 @@ module DatesOverridable
     without_overrides.due_date_hash.merge(:base => true)
   end
 
+  def context_module_tag_info(user, context)
+    self.association(:context).target ||= context
+    tag_info = Rails.cache.fetch([self, user, "context_module_tag_info"].cache_key) do
+      hash = {:points_possible => self.points_possible}
+      if self.multiple_due_dates_apply_to?(user)
+        hash[:vdd_tooltip] = OverrideTooltipPresenter.new(self, user).as_json
+      else
+        if due_date = self.overridden_for(user).due_at
+          hash[:due_date] = due_date
+        end
+      end
+      hash
+    end
+
+    if tag_info[:due_date]
+      if tag_info[:due_date] < Time.now
+        if self.is_a?(Quizzes::Quiz) || (self.is_a?(Assignment) && expects_submission?)
+          has_submission = self.is_a?(Assignment) && Rails.cache.fetch([self, user, "user_has_submission"]) do
+            submission_for_student(user).has_submission?
+          end
+          tag_info[:past_due] = true unless has_submission
+        end
+      end
+
+      tag_info[:due_date] = tag_info[:due_date].utc.iso8601
+    end
+    tag_info
+  end
+
   module ClassMethods
     def due_date_compare_value(date)
       # due dates are considered equal if they're the same up to the minute

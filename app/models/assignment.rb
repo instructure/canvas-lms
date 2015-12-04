@@ -516,32 +516,6 @@ class Assignment < ActiveRecord::Base
     tags_to_update.each { |tag| tag.context_module_action(user, action, points) }
   end
 
-  def context_module_tag_info(user, context)
-    self.association(:context).target ||= context
-    tag_info = Rails.cache.fetch([self, user, "context_module_tag_info"].cache_key) do
-      hash = {:points_possible => self.points_possible}
-      if self.multiple_due_dates_apply_to?(user)
-        hash[:vdd_tooltip] = OverrideTooltipPresenter.new(self, user).as_json
-      else
-        if due_date = self.overridden_for(user).due_at
-          hash[:due_date] = due_date
-        end
-      end
-      hash
-    end
-    
-    if tag_info[:due_date]
-      if expects_submission? && tag_info[:due_date] < Time.now
-        has_submission = Rails.cache.fetch([self, user, "user_has_submission"]) do
-          submission_for_student(user).has_submission?
-        end
-        tag_info[:past_due] = true unless has_submission
-      end
-      tag_info[:due_date] = tag_info[:due_date].utc.iso8601
-    end
-    tag_info
-  end
-
   # call this to perform notifications on an Assignment that is not being saved
   # (useful when a batch of overrides associated with a new assignment have been saved)
   def do_notifications!(prior_version=nil, notify=false)
