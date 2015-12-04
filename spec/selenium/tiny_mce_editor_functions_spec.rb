@@ -21,7 +21,6 @@ describe "Tiny MCE editor functions" do
       wait_for_ajaximations
 
       p.reload
-      # To avoid fragility of extra formatting characters being added, I just want the first 55 characters
       expect(p.body[0..54]).to eq "<p><strong>this should be typed in as bold</strong></p>"
     end
 
@@ -37,7 +36,6 @@ describe "Tiny MCE editor functions" do
       wait_for_ajaximations
 
       p.reload
-      # To avoid fragility of extra formatting characters being added, I just want the first 31 characters
       expect(p.body[0..30]).to eq "<p>this should get unbolded</p>"
     end
 
@@ -51,7 +49,6 @@ describe "Tiny MCE editor functions" do
       wait_for_ajaximations
 
       p.reload
-      # To avoid fragility of extra formatting characters being added, I just want the first 50 characters
       expect(p.body[0..46]).to eq "<p><em>this should be typed in italics</em></p>"
     end
 
@@ -67,7 +64,6 @@ describe "Tiny MCE editor functions" do
       wait_for_ajaximations
 
       p.reload
-      # To avoid fragility of extra formatting characters being added, I just want the first 35 characters
       expect(p.body[0..34]).to eq "<p>this should get unitalicized</p>"
     end
 
@@ -81,7 +77,6 @@ describe "Tiny MCE editor functions" do
       wait_for_ajaximations
 
       p.reload
-      # To avoid fragility of extra formatting characters being added, I just want the first 93 characters
       expect(p.body[0..92]).to eq "<p><span style=\"text-decoration: underline;\">this should be typed with underline</span></p>"
     end
 
@@ -97,7 +92,6 @@ describe "Tiny MCE editor functions" do
       wait_for_ajaximations
 
       p.reload
-      # To avoid fragility of extra formatting characters being added, I just want the first 38 characters
       expect(p.body[0..37]).to eq "<p>the underline should be removed</p>"
     end
 
@@ -111,7 +105,6 @@ describe "Tiny MCE editor functions" do
       wait_for_ajaximations
 
       p.reload
-      # To avoid fragility of extra formatting characters being added, I just want the first 76 characters
       expect(p.body[0..75]).to eq "<p><span style=\"color: #800080;\">this should be typed in purple</span></p>"
     end
 
@@ -127,7 +120,6 @@ describe "Tiny MCE editor functions" do
       wait_for_ajaximations
 
       p.reload
-      # To avoid fragility of extra formatting characters being added, I just want the first 44 characters
       expect(p.body[0..43]).to eq "<p>the purple should be changed to black</p>"
     end
 
@@ -141,7 +133,6 @@ describe "Tiny MCE editor functions" do
       wait_for_ajaximations
 
       p.reload
-      # To avoid fragility of extra formatting characters being added, I just want the first 91 characters
       expect(p.body[0..90]).to eq "<p><span style=\"background-color: #33cccc;\">the background should be turquoise</span></p>"
     end
 
@@ -157,7 +148,6 @@ describe "Tiny MCE editor functions" do
       wait_for_ajaximations
 
       p.reload
-      # To avoid fragility of extra formatting characters being added, I just want the first 38 characters
       expect(p.body[0..37]).to eq "<p>the turquoise should be removed</p>"
     end
 
@@ -173,7 +163,6 @@ describe "Tiny MCE editor functions" do
       wait_for_ajaximations
 
       p.reload
-      # To avoid fragility of extra formatting characters being added, I just want the first 59 characters
       expect(p.body[0..58]).to eq "<p>underline and purple and turquoise should be removed</p>"
     end
 
@@ -187,7 +176,6 @@ describe "Tiny MCE editor functions" do
       wait_for_ajaximations
 
       p.reload
-      # To avoid fragility of extra formatting characters being added, I just want the first 62 characters
       expect(p.body[0..61]).to eq "<p style=\"text-align: left;\">this should be aligned left</p>"
     end
 
@@ -203,7 +191,6 @@ describe "Tiny MCE editor functions" do
       wait_for_ajaximations
 
       p.reload
-      # To avoid fragility of extra formatting characters being added, I just want the first 39 characters
       expect(p.body[0..38]).to eq "<p>left alignment should be removed</p>"
     end
 
@@ -217,7 +204,6 @@ describe "Tiny MCE editor functions" do
       wait_for_ajaximations
 
       p.reload
-      # To avoid fragility of extra formatting characters being added, I just want the first 67 characters
       expect(p.body[0..66]).to eq "<p style=\"text-align: center;\">this should be aligned center</p>"
     end
 
@@ -233,7 +219,6 @@ describe "Tiny MCE editor functions" do
       wait_for_ajaximations
 
       p.reload
-      # To avoid fragility of extra formatting characters being added, I just want the first 41 characters
       expect(p.body[0..40]).to eq "<p>center alignment should be removed</p>"
     end
 
@@ -247,7 +232,6 @@ describe "Tiny MCE editor functions" do
       wait_for_ajaximations
 
       p.reload
-      # To avoid fragility of extra formatting characters being added, I just want the first 65 characters
       expect(p.body[0..64]).to eq "<p style=\"text-align: right;\">this should be aligned right</p>"
     end
 
@@ -263,7 +247,6 @@ describe "Tiny MCE editor functions" do
       wait_for_ajaximations
 
       p.reload
-      # To avoid fragility of extra formatting characters being added, I just want the first 40 characters
       expect(p.body[0..39]).to eq "<p>right alignment should be removed</p>"
     end
 
@@ -277,7 +260,6 @@ describe "Tiny MCE editor functions" do
       wait_for_ajaximations
 
       p.reload
-      # To avoid fragility of extra formatting characters being added, I just want the first 47 characters
       expect(p.body[0..46]).to eq "<p><sup>this should be in superscript</sup></p>"
     end
 
@@ -293,7 +275,6 @@ describe "Tiny MCE editor functions" do
       wait_for_ajaximations
 
       p.reload
-      # To avoid fragility of extra formatting characters being added, I just want the first 43 characters
       expect(p.body[0..42]).to eq "<p>this should have superscript removed</p>"
     end
 
@@ -307,7 +288,6 @@ describe "Tiny MCE editor functions" do
       wait_for_ajaximations
 
       p.reload
-      # To avoid fragility of extra formatting characters being added, I just want the first 45 characters
       expect(p.body[0..44]).to eq "<p><sub>this should be in subscript</sub></p>"
     end
 
@@ -323,7 +303,6 @@ describe "Tiny MCE editor functions" do
       wait_for_ajaximations
 
       p.reload
-      # To avoid fragility of extra formatting characters being added, I just want the first 41 characters
       expect(p.body[0..40]).to eq "<p>this should have subscript removed</p>"
     end
 
@@ -338,7 +317,6 @@ describe "Tiny MCE editor functions" do
       wait_for_ajaximations
 
       p.reload
-      # To avoid fragility of extra formatting characters being added, I just want the first 63 characters
       comparison = create_formatted_list(num_list_items, "unordered")
       expect(p.body[0..comparison.length]).to eq comparison
     end
@@ -356,7 +334,6 @@ describe "Tiny MCE editor functions" do
       wait_for_ajaximations
 
       p.reload
-      # To avoid fragility of extra formatting characters being added, I just want the first 18 characters
       comparison = create_unformatted_list(num_list_items)
       expect(p.body[0..comparison.length]).to eq comparison
     end
@@ -372,7 +349,6 @@ describe "Tiny MCE editor functions" do
       wait_for_ajaximations
 
       p.reload
-      # To avoid fragility of extra formatting characters being added, I just want the first 63 characters
       comparison = create_formatted_list(num_list_items, "ordered")
       expect(p.body[0..comparison.length]).to eq comparison
     end
@@ -390,9 +366,25 @@ describe "Tiny MCE editor functions" do
       wait_for_ajaximations
 
       p.reload
-      # To avoid fragility of extra formatting characters being added, I just want the first 18 characters
       comparison = create_unformatted_list(num_list_items)
       expect(p.body[0..comparison.length]).to eq comparison
+    end
+
+    it "should add a link to text on wiki description", priority: "1", test_id: 312410 do
+      p = create_wiki_page("test_page", false, "public")
+      p.body = "<p>this text should link to instructure homepage</p>"
+      p.save!
+      get "/courses/#{@course.id}/pages/#{p.title}/edit"
+
+      select_all_wiki
+      click_tiny_button('Link to URL')
+      f("#instructure_link_prompt_form_input").send_keys("http://www.instructure.com")
+      submit_form(f("#instructure_link_prompt_form"))
+      f("form.edit-form button.submit").click
+      wait_for_ajaximations
+
+      p.reload
+      expect(p.body[0..136]).to eq "<p><a id=\"\" class=\"\" title=\"\" href=\"http://www.instructure.com\" target=\"\">this text should link to instructure homepage</a></p>"
     end
   end
 end
