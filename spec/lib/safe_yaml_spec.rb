@@ -24,9 +24,17 @@ describe "safe_yaml" do
 --- !ruby/object:ActionController::Base 
 real_format: 
 YAML
-    expect { YAML.load yaml }.to raise_error(SafeYAML::UnsafeTagError)
+    expect { YAML.load yaml }.to raise_error
     result = YAML.unsafe_load yaml
     expect(result.class).to eq ActionController::Base
+  end
+
+  it "doesn't allow deserialization of arbitrary classes" do
+    expect { YAML.load(YAML.dump(ActionController::Base)) }.to raise_error
+  end
+
+  it "allows deserialization of arbitrary classes when unsafe_loading" do
+    expect(YAML.unsafe_load(YAML.dump(ActionController::Base))).to eq ActionController::Base
   end
 
   it "should allow some whitelisted classes" do
