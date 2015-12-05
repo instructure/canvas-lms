@@ -386,7 +386,7 @@ module Api
     media_object_or_hash = OpenStruct.new(media_object_or_hash) if media_object_or_hash.is_a?(Hash)
     {
       'content-type' => "#{media_object_or_hash.media_type}/mp4",
-      'display_name' => media_object_or_hash.title,
+      'display_name' => media_object_or_hash.title.presence || media_object_or_hash.user_entered_title,
       'media_id' => media_object_or_hash.media_id,
       'media_type' => media_object_or_hash.media_type,
       'url' => user_media_download_url(:user_id => @current_user.id,

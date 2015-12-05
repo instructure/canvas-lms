@@ -1,4 +1,6 @@
 class AddAssociatedAssetToLearningOutcomeResults < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     add_column :learning_outcome_results, :associated_asset_id, :integer, :limit => 8
     add_column :learning_outcome_results, :associated_asset_type, :string

@@ -3,6 +3,8 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
 
 describe "better_file_browsing" do
   include_context "in-process server selenium tests"
+  include FilesCommon
+
   context "as a student" do
     def student_goto_files
       user_session(@student)
@@ -14,7 +16,7 @@ describe "better_file_browsing" do
       f("input[type='search']").send_keys "#{search_text}"
       driver.action.send_keys(:return).perform
       refresh_page
-      expect(get_all_files_folders.count).to eq 0
+      expect(all_files_folders.count).to eq 0
     end
 
     context "in course with files" do
@@ -32,7 +34,7 @@ describe "better_file_browsing" do
         f("input[type='search']").send_keys "b_fi"
         driver.action.send_keys(:return).perform
         refresh_page
-        expect(get_all_files_folders.count).to eq 1
+        expect(all_files_folders.count).to eq 1
       end
 
       it "should not return unpublished files in search results", priority: "1", test_id: 238870 do
@@ -72,6 +74,16 @@ describe "better_file_browsing" do
         expect(f('.btn-restrict')).not_to be_present
         expect(f('.btn-delete')).not_to be_present
       end
+
+      it "should see calendar icon on restricted files within a given timeframe", priority: "1", test_id: 133108 do
+        get "/courses/#{@course.id}/files"
+        set_item_permissions(:restricted_access, :available_with_timeline, :toolbar_menu)
+        student_goto_files
+        expect(f('.icon-calendar-day')).to be_displayed
+        f('.icon-calendar-day').click
+        wait_for_ajaximations
+        expect(driver.find_elements(:name, 'permissions')[0]).not_to be_present
+      end
     end
 
     context "in course with folders" do
@@ -95,6 +107,23 @@ describe "better_file_browsing" do
       it "should not return files from unpublished folders in search results", priority: "1", test_id: 171774 do
         set_item_permissions(:unpublish)
         verify_hidden_item_not_searchable_as_student("example")
+      end
+
+      it "should let student access files in restricted folder hidden by link", priority: "1", test_id: 134750 do
+        set_item_permissions(:restricted_access, :available_with_link)
+        f('.media-body').click
+        wait_for_ajaximations
+        f('.media-body').click
+        wait_for_ajaximations
+        file_preview_url = (driver.current_url).match(/\/files.*/)[0]
+        student_goto_files
+        expect(fln("restricted_folder")).not_to be_present
+        get "/courses/#{@course.id}/files/folder/restricted_folder"
+        expect(fln("example.pdf")).not_to be_present
+        get "/courses/#{@course.id}"+file_preview_url
+        refresh_page
+        wait_for_ajaximations
+        expect(f('.ef-file-preview-header')).to be_present
       end
     end
   end

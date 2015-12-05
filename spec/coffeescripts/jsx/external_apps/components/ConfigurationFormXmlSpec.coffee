@@ -8,7 +8,7 @@ define [
   wrapper = document.getElementById('fixtures')
 
   createElement = (data) ->
-    ConfigurationFormXml({
+    React.createElement(ConfigurationFormXml, {
       name: data.name
       consumerKey: data.consumerKey
       sharedSecret: data.sharedSecret
@@ -16,7 +16,7 @@ define [
     })
 
   renderComponent = (data) ->
-    React.renderComponent(createElement(data), wrapper)
+    React.render(createElement(data), wrapper)
 
   module 'ExternalApps.ConfigurationFormXml',
     teardown: ->

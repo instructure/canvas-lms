@@ -1,4 +1,6 @@
 class AddSamlRequestedAuthnContext < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     add_column :account_authorization_configs, :requested_authn_context, :string
 

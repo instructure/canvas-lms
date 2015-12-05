@@ -1,16 +1,23 @@
 define([
   'react',
   './ChecklistItem',
-  './ListItems'
-], function(React, ChecklistItem, ListItems) {
+  './ListItems',
+  'i18n!course_wizard'
+], function (React, ChecklistItem, ListItems, I18n) {
 
   var Checklist = React.createClass({
       displayName: 'Checklist',
 
+      propTypes: {
+        selectedItem: React.PropTypes.string.isRequired,
+        clickHandler: React.PropTypes.func.isRequired,
+        className: React.PropTypes.string.isRequired
+      },
+
       getInitialState: function () {
         return {
           selectedItem: this.props.selectedItem || ''
-        }
+        };
       },
 
       componentWillReceiveProps: function (newProps) {
@@ -38,9 +45,12 @@ define([
 
       render: function () {
         var checklist = this.renderChecklist();
-          return (
-            <div className={this.props.className}>{checklist}</div>
-          );
+        return (
+          <div className={this.props.className}>
+            <h2 className='screenreader-only'>{I18n.t('Setup Checklist')}</h2>
+            <ul className='ic-wizard-box__nav-checklist'>{checklist}</ul>
+          </div>
+        );
       }
 
   });

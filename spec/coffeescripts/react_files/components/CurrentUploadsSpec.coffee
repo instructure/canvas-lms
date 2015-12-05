@@ -10,7 +10,7 @@ define [
 
   module 'CurrentUploads',
     setup: ->
-      @uploads = React.render(CurrentUploads(), $('<div>').appendTo('#fixtures')[0])
+      @uploads = React.render(React.createElement(CurrentUploads), $('<div>').appendTo('#fixtures')[0])
 
     teardown: ->
       React.unmountComponentAtNode(@uploads.getDOMNode().parentNode)

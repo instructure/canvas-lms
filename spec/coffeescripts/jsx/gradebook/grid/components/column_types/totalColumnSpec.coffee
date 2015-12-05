@@ -36,8 +36,8 @@ define [
     renderComponent(cellData)
 
   renderComponent = (props) ->
-    componentFactory = React.createFactory(TotalColumn)
-    React.render(componentFactory(props), wrapper)
+    element = React.createElement(TotalColumn, props)
+    React.render(element, wrapper)
 
   module 'ReactGradebook.totalColumn',
     setup: ->

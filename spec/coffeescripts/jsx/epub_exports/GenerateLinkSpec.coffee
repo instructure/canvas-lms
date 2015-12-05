@@ -17,7 +17,8 @@ define [
       }
 
   test 'showGenerateLink', ->
-    component = TestUtils.renderIntoDocument(GenerateLink(@props))
+    GenerateLinkElement = React.createElement(GenerateLink, @props)
+    component = TestUtils.renderIntoDocument(GenerateLinkElement)
     ok component.showGenerateLink(), 'should be true without epub_export object'
     React.unmountComponentAtNode(component.getDOMNode().parentNode)
 
@@ -26,7 +27,8 @@ define [
         regenerate: false
       }
     }
-    component = TestUtils.renderIntoDocument(GenerateLink(@props))
+    GenerateLinkElement = React.createElement(GenerateLink, @props)
+    component = TestUtils.renderIntoDocument(GenerateLinkElement)
     ok !component.showGenerateLink(), 'should be false without permissions to rengenerate'
 
     @props.course.epub_export = {
@@ -34,14 +36,16 @@ define [
         regenerate: true
       }
     }
-    component = TestUtils.renderIntoDocument(GenerateLink(@props))
+    GenerateLinkElement = React.createElement(GenerateLink, @props)
+    component = TestUtils.renderIntoDocument(GenerateLinkElement)
     ok component.showGenerateLink(), 'should be true with permissions to rengenerate'
     React.unmountComponentAtNode(component.getDOMNode().parentNode)
 
   test 'state triggered', ->
     clock = sinon.useFakeTimers()
     sinon.stub(CourseEpubExportStore, 'create')
-    component = TestUtils.renderIntoDocument(GenerateLink(@props))
+    GenerateLinkElement = React.createElement(GenerateLink, @props)
+    component = TestUtils.renderIntoDocument(GenerateLinkElement)
     node = component.getDOMNode()
 
     TestUtils.Simulate.click(node)
@@ -58,7 +62,8 @@ define [
     clock = sinon.useFakeTimers()
     sinon.stub(CourseEpubExportStore, 'create')
 
-    component = TestUtils.renderIntoDocument(GenerateLink(@props))
+    GenerateLinkElement = React.createElement(GenerateLink, @props)
+    component = TestUtils.renderIntoDocument(GenerateLinkElement)
     node = component.getDOMNode()
     equal node.tagName, 'BUTTON', 'tag should be a button'
     ok node.querySelector('span').textContent.match(I18n.t("Generate ePub")),

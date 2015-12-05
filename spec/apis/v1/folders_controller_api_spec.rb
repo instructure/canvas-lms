@@ -341,6 +341,14 @@ describe "Folders API", type: :request do
                @folders_path_options.merge(:course_id => @course.id.to_param),
                { :name => "sub1"}, {}, :expected_status => 401)
     end
+
+    it "should error if the name is too long" do
+      api_call(:post, "/api/v1/courses/#{@course.id}/folders",
+               @folders_path_options.merge(:course_id => @course.id.to_param),
+               { :name => "X" * 256 },
+               {},
+               :expected_status => 400)
+    end
   end
 
   describe "#update" do

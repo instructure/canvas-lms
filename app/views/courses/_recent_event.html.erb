@@ -26,18 +26,19 @@
           recent_event.context.grants_right?(@current_user, :manage_grades),
           recent_event.context.grants_right?(@current_user, :participate_as_student)
         ].cache_key) do
-    icon_explanation, icon_class = icon_data(:context => @context,
-                                             :contexts => @contexts,
-                                             :current_user => @current_user,
-                                             :recent_event => recent_event,
-                                             :submission => submission)
+    icon_explanation, icon_aria_label, icon_class = icon_data(:context => @context,
+                                                              :contexts => @contexts,
+                                                              :current_user => @current_user,
+                                                              :recent_event => recent_event,
+                                                              :submission => submission,
+                                                              :show_assignment_type_icon => true)
 
 %>
 
   <a
     data-track-category="dashboard"
     data-track-label="recent event"
-    class="<%= icon_class %> tooltip" href="<%= recent_event_url(recent_event) %>"
+    class="tooltip" href="<%= recent_event_url(recent_event) %>"
   >
     <span class="tooltip_wrap">
       <span class='tooltip-carat'></span>
@@ -65,14 +66,17 @@
         <% end %>
       </span>
     </span>
-    <b><%= recent_event.title %></b>
-    <em>
-      <% if is_assignment %>
-        <%= due_at(recent_event, @current_user, 'date') %>
-      <% else %>
-        <%= datetime_string(recent_event.start_at, :short ) %>
-      <% end %>
-    </em>
+    <i class="<%= icon_class %>" aria-label="<%= icon_aria_label %>"></i>
+    <div class="event-details">
+      <b><%= recent_event.title %></b>
+      <em>
+        <% if is_assignment %>
+          <%= due_at(recent_event, @current_user, 'date') %>
+        <% else %>
+          <%= datetime_string(recent_event.start_at, :short ) %>
+        <% end %>
+      </em>
+    </div>
   </a>
 
 <% end %>

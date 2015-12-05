@@ -3,8 +3,9 @@ require 'thread'
 
 describe "manage groups students" do
   include_context "in-process server selenium tests"
+  include ManageGroupsCommon
 
-  before (:each) do
+  before(:each) do
     skip
 		#course_with_teacher_logged_in
     #Account.default.settings[:enable_manage_groups2] = false

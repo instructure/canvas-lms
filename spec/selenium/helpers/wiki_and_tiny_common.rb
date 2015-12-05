@@ -1,5 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 
+module WikiAndTinyCommon
   def clear_wiki_rce
     wiki_page_body = driver.find_element(:css, 'textarea.body')
     wiki_page_body.clear
@@ -176,3 +177,15 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
   def wiki_page_editor_id
     f('textarea.body')['id']
   end
+
+  def click_tiny_button(button_aria)
+    f("div[aria-label=\'#{button_aria}\'] button").send_keys(:shift) # no content but gives the italic button focus
+    f("div[aria-label=\'#{button_aria}\'] button").click
+  end
+
+  def click_tiny_dropdown(button_aria, mce_color)
+    f("[aria-label=\'#{button_aria}\'] .mce-open").send_keys(:shift) # no content but gives the italic button focus
+    f("[aria-label=\'#{button_aria}\'] .mce-open").click
+    f("div[data-mce-color=\'#{mce_color}\']").click
+  end
+end

@@ -1,8 +1,9 @@
-require File.expand_path(File.dirname(__FILE__) + '/../common')
-require File.expand_path(File.dirname(__FILE__) + '/../helpers/announcements_common')
+require_relative '../common'
+require_relative '../helpers/announcements_common'
 
 describe "announcements" do
   include_context "in-process server selenium tests"
+  include AnnouncementsCommon
 
   it "should validate replies are not visible until after users post", priority: "1", test_id: 150533 do
     password = 'asdfasdf'

@@ -12,6 +12,11 @@ $preview-html-background: whitesmoke;
 
 .ReactModal__Overlay.ReactModal__Overlay--ef-file-preview {
   background: rgba(black, 0.9);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
 }
 
 .ReactModal__Content.ReactModal__Content--ef-file-preview {

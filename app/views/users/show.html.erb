@@ -94,7 +94,7 @@
   </fieldset>
   </div>
 
-  <% if page_views_enabled? %>
+  <% if can_do(@user, @current_user, :view_statistics) && page_views_enabled? %>
     <h3>
       <%= t('page_views', 'Page Views') %>
     </h3>

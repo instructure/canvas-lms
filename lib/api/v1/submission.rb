@@ -30,10 +30,17 @@ module Api::V1::Submission
     hash = submission_attempt_json(submission, assignment, current_user, session, context)
 
     if includes.include?("submission_history")
-      hash['submission_history'] = []
-      submission.submission_history.each do |ver|
-        ver.without_versioned_attachments do
-          hash['submission_history'] << submission_attempt_json(ver, assignment, current_user, session, context)
+      if submission.quiz_submission && assignment.quiz
+        hash['submission_history'] = submission.quiz_submission.versions.map do |ver|
+          ver.model.submission.without_versioned_attachments do
+            quiz_submission_attempt_json(ver.model, assignment, current_user, session, context)
+          end
+        end
+      else
+        hash['submission_history'] = submission.submission_history.map do |ver|
+          ver.without_versioned_attachments do
+            submission_attempt_json(ver, assignment, current_user, session, context)
+          end
         end
       end
     end
@@ -149,6 +156,19 @@ module Api::V1::Submission
       end
       hash['discussion_entries'] = discussion_entry_api_json(entries, assignment.discussion_topic.context, user, session)
     end
+
+    hash
+  end
+
+  def quiz_submission_attempt_json(attempt, assignment, user, session, context = nil)
+    hash = submission_attempt_json(attempt.submission, assignment, user, session, context)
+    hash.each_key{|k| hash[k] = attempt[k] if attempt[k]}
+    hash[:submission_data] = attempt[:submission_data]
+    hash[:body] = nil
+
+    # since it is graded automatically the graded_at date should be the last time the
+    # quiz_submission ended
+    hash[:graded_at] = attempt[:end_at]
 
     hash
   end

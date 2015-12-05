@@ -1,12 +1,12 @@
-require File.expand_path(File.dirname(__FILE__) + '/../helpers/quizzes_common')
+require_relative "../common"
+require_relative "../helpers/quizzes_common"
 
 describe 'drag and drop reordering' do
+  include_context "in-process server selenium tests"
+  include QuizzesCommon
 
-  include_context 'in-process server selenium tests'
-
-  before (:each) do
+  before(:each) do
     course_with_teacher_logged_in
-    @last_quiz = start_quiz_question
     resize_screen_to_normal
     quiz_with_new_questions
     create_question_group
@@ -25,9 +25,11 @@ describe 'drag and drop reordering' do
 
   it 'should add questions to a group', priority: "1", test_id: 140588 do
     resize_screen_to_default
-    # drag it into the group
-    click_questions_tab
-    drag_question_into_group @quest1.id, @group.id
+    create_question_group
+    drag_question_into_group(@quest1.id, @group.id)
+    drag_question_into_group(@quest2.id, @group.id)
+    click_save_settings_button
+
     refresh_page
     group_should_contain_question(@group, @quest1)
   end
@@ -44,6 +46,7 @@ describe 'drag and drop reordering' do
 
   it 'should reorder questions within a group', priority: "1", test_id: 201952 do
     resize_screen_to_default
+    create_question_group
     drag_question_into_group @quest1.id, @group.id
     drag_question_into_group @quest2.id, @group.id
     data = get_question_data_for_group @group.id
@@ -59,7 +62,6 @@ describe 'drag and drop reordering' do
 
   it 'should reorder groups and questions', priority: "1", test_id: 206020 do
     click_questions_tab
-
     old_data = get_question_data
     drag_group_to_top @group.id
     refresh_page

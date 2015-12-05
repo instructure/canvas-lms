@@ -15,10 +15,11 @@ define [
     columnData:
       assignment:
         due_at: '2015-07-17T05:59:59Z'
+      enrollments: []
 
   renderComponent = (data) ->
-    componentFactory = React.createFactory(HeaderRenderer)
-    React.render(componentFactory(data), wrapper)
+    element = React.createElement(HeaderRenderer, data)
+    React.render(element, wrapper)
 
   buildComponent = (props) ->
     columnData = props

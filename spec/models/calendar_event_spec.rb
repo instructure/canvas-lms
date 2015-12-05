@@ -126,7 +126,7 @@ describe CalendarEvent do
 
       it "should not return data for null times" do
         calendar_event_model(:start_at => "", :end_at => "")
-        res = @event.to_ics(false)
+        res = @event.to_ics(in_own_calendar: false)
         expect(res).to be_nil
       end
 
@@ -159,7 +159,7 @@ describe CalendarEvent do
         calendar_event_model(:start_at => "Sep 3 2008 11:55am", :end_at => "Sep 3 2008 12:00pm")
         # force known value so we can check serialization
         @event.updated_at = Time.at(1220443500) # 3 Sep 2008 12:05pm (UTC)
-        res = @event.to_ics(false)
+        res = @event.to_ics(in_own_calendar: false)
         expect(res).not_to be_nil
         expect(res.start.icalendar_tzid).to eq 'UTC'
         expect(res.start.strftime('%Y-%m-%dT%H:%M:%S')).to eq Time.zone.parse("Sep 3 2008 11:55am").in_time_zone('UTC').strftime('%Y-%m-%dT%H:%M:00')
@@ -174,7 +174,7 @@ describe CalendarEvent do
         calendar_event_model(:start_at => "Sep 3 2008 11:55am", :end_at => "Sep 3 2008 12:00pm")
         # force known value so we can check serialization
         @event.updated_at = Time.at(1220472300) # 3 Sep 2008 12:05pm (AKDT)
-        res = @event.to_ics(false)
+        res = @event.to_ics(in_own_calendar: false)
         expect(res).not_to be_nil
         expect(res.start.icalendar_tzid).to eq 'UTC'
         expect(res.start.strftime('%Y-%m-%dT%H:%M:%S')).to eq Time.zone.parse("Sep 3 2008 11:55am").in_time_zone('UTC').strftime('%Y-%m-%dT%H:%M:00')
@@ -201,7 +201,7 @@ describe CalendarEvent do
         <a href="www.example.com">link!</a>
       </p>
       HTML
-        ev = @event.to_ics(false)
+        ev = @event.to_ics(in_own_calendar: false)
         expect(ev.description).to match_ignoring_whitespace("This assignment is due December 16th. Please do the reading.
 
 
@@ -213,14 +213,14 @@ describe CalendarEvent do
         attachment_model(:context => course)
         html = %{<div><a href="/courses/#{@course.id}/files/#{@attachment.id}/download?wrap=1">here</a></div>}
         calendar_event_model(:start_at => "Sep 3 2008 12:00am", :description => html)
-        ev = @event.to_ics(false)
+        ev = @event.to_ics(in_own_calendar: false)
         expect(ev.description).to_not include("verifier")
 
         @attachment.file_state = 'public'
         @attachment.save!
 
         AdheresToPolicy::Cache.clear
-        ev = @event.to_ics(false)
+        ev = @event.to_ics(in_own_calendar: false)
         expect(ev.description).to include("verifier")
 
         @attachment.file_state = 'hidden'
@@ -230,7 +230,7 @@ describe CalendarEvent do
         @course.save!
 
         AdheresToPolicy::Cache.clear
-        ev = @event.to_ics(false)
+        ev = @event.to_ics(in_own_calendar: false)
         expect(ev.description).to include("verifier")
       end
 

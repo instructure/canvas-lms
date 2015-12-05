@@ -225,22 +225,26 @@ define [
     # the stored responses so that we can respond with complete progress (from
     # the same url)
     clock.tick(1001)
-    server.responses = []
 
     ##
-    # the 100% completion response below will cascade a model.fetch request
+    # progressable mixin ensures that the progress model is now polling, respond to it with a 100% completion
+    queueResponse("GET", /progress/, progressResponse)
+    server.respond()
+
+    ##
+    # the 100% completion response will cascade a model.fetch request
     # + model.groups().fetch + model.unassignedUsers().fetch calls
     queueResponse("GET", "/api/v1/group_categories/20?includes[]=unassigned_users_count&includes[]=groups_count", _.extend({}, groupCategoryResponse, {groups_count: 1, unassigned_users_count: 0}))
+    server.respond()
+
     queueResponse("GET", "/api/v1/group_categories/20/groups?per_page=50", groupsResponse)
+    server.respond()
+
     queueResponse(
       "GET",
       "/api/v1/group_categories/20/users?per_page=50&include[]=sections&exclude[]=pseudonym&unassigned=true",
       []
     )
-
-    ##
-    # progressable mixin ensures that the progress model is now polling, respond to it with a 100% completion
-    queueResponse("GET", /progress/, progressResponse)
     server.respond()
 
     ##

@@ -256,7 +256,11 @@ module AttachmentFu # :nodoc:
       end
       # ImageScience doesn't create gif thumbnails, only pngs
       ext.sub!(/gif$/, 'png') if attachment_options[:processor] == "ImageScience"
-      "#{basename}_#{thumbnail}#{ext}"
+      name = "#{basename}_#{thumbnail}#{ext}"
+      if name.length > 255
+        name = "#{basename[0..(254 - name.length)]}_#{thumbnail}#{ext}"
+      end
+      name
     end
 
     # Creates or updates the thumbnail for the current attachment.

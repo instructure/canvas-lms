@@ -186,6 +186,20 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
         json = api_index({}, {quiz_submission_attempt: 2})
         expect(json['quiz_submission_questions'].map {|q| q['correct']}.all?).to be_truthy
       end
+
+      it "should return unauthorized when results are hidden in quiz settings" do
+        @quiz = @course.quizzes.create!({
+          title: 'test quiz',
+          hide_results: 'always'
+        })
+        @quiz_submission = @quiz.generate_submission(@student)
+        answers = create_question_set
+        @quiz.generate_quiz_data
+        @quiz.save!
+        @quiz_submission.complete!(answers)
+        api_index({}, {raw: true})
+        assert_status(401)
+      end
     end
 
     it "should deny student access when quiz is OQAAT" do

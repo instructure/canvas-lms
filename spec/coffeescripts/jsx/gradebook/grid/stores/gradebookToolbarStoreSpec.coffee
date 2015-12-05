@@ -16,7 +16,6 @@ define [
         hideStudentNames: false
         hideNotesColumn: true
         treatUngradedAsZero: false
-        showAttendanceColumns: false
         arrangeColumnsBy: 'assignment_group'
         totalColumnInFront: false
         warnedAboutTotalsDisplay: false
@@ -75,15 +74,6 @@ define [
     GradebookToolbarStore.onToggleTreatUngradedAsZero(true)
 
     deepEqual GradebookToolbarStore.toolbarOptions.treatUngradedAsZero, true
-    ok(triggerExpectation.once())
-
-  test '#onToggleShowAttendanceColumns should set toolbarOptions.showAttendanceColumns and trigger a setState', ->
-    triggerMock = @mock(GradebookToolbarStore)
-    triggerExpectation = triggerMock.expects('trigger').once()
-    GradebookToolbarStore.getInitialState()
-    GradebookToolbarStore.onToggleShowAttendanceColumns(true)
-
-    deepEqual GradebookToolbarStore.toolbarOptions.showAttendanceColumns, true
     ok(triggerExpectation.once())
 
   test '#onShowTotalGradeAsPoints should set toolbarOptions.showTotalGradeAsPoints and trigger a setState', ->

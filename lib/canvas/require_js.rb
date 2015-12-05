@@ -70,7 +70,11 @@ module Canvas
       end
 
       def map
-        @map ||= Canvas::RequireJs::ClientAppExtension.map.to_json
+        @map ||= Canvas::RequireJs::ClientAppExtension.map.merge({
+          '*' => {
+            React: "react" # for misbehaving UMD like react-tabs
+          }
+        }).to_json
       end
 
       def bundles
@@ -108,7 +112,7 @@ module Canvas
       def shims
         <<-JS.gsub(%r{\A +|^ {8}}, '')
           {
-            'bower/react-router/dist/react-router': {
+            'bower/react-router/build/umd/ReactRouter': {
               deps: ['react'],
               exports: 'ReactRouter'
             },

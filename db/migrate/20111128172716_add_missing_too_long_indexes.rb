@@ -1,4 +1,6 @@
 class AddMissingTooLongIndexes < ActiveRecord::Migration
+  tag :predeploy
+
   def self.add_index_with_check(table_name, column_name, options)
     return if index_exists?(table_name.to_s, options[:name].to_s, false)
     add_index(table_name, column_name, options)

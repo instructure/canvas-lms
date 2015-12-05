@@ -3,9 +3,11 @@ require File.expand_path(File.dirname(__FILE__) + '/../helpers/differentiated_as
 
 describe "interaction with differentiated quizzes" do
   include_context "in-process server selenium tests"
+  include DifferentiatedAssignments
+  include AssignmentsCommon
 
   context "Student" do
-    before :each do
+    before(:each) do
       course_with_student_logged_in
       da_setup
       @da_quiz = create_da_quiz
@@ -96,7 +98,7 @@ describe "interaction with differentiated quizzes" do
     end
   end
   context "Observer with student" do
-    before :each do
+    before(:each) do
       observer_setup
       da_setup
       @da_quiz = create_da_quiz

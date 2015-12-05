@@ -22,18 +22,25 @@ define(['i18n!instructure', 'timezone', 'react'], function(I18n, tz, React) {
 
     var hourInput = (
       <input id='ui-datepicker-time-hour' type='text'
-        value={data.hour} title={STRINGS.hourTitle}
+        defaultValue={data.hour} title={STRINGS.hourTitle}
         className='ui-datepicker-time-hour' style={{width: '20px'}} />
     );
 
     var minuteInput = (
       <input type='text'
-        value={data.minute} title={STRINGS.minuteTitle}
+        defaultValue={data.minute} title={STRINGS.minuteTitle}
         className='ui-datepicker-time-minute' style={{width: '20px'}} />
     );
 
     var meridianSelect = '';
     if (tz.hasMeridian()) {
+      // TODO: Change this select to work as described here:
+      // http://facebook.github.io/react/docs/forms.html#why-select-value
+      //
+      // As of React 0.13.3 this issue: https://github.com/facebook/react/issues/1398
+      // has not been fixed and released, which makes React.renderToStaticMarkup not
+      // carry things through properly. So once that is done, we can fix the warning
+      // here.
       meridianSelect = (
         <select className='ui-datepicker-time-ampm un-bootrstrapify' title={STRINGS.selectTitle}>
           <option value='' key='unset'>&nbsp;</option>

@@ -22,7 +22,7 @@ $kyle-blue: #0081e3;
       // override styles from default fullcalendar.css
       font-size: 14px;
       line-height: 35px;
-      
+
       background-color: transparent;
       margin: 0;
       //override default right side h2 styles
@@ -60,6 +60,9 @@ $kyle-blue: #0081e3;
     &.fc-last {
       border-right: 1px solid #bbbbbb;
     }
+  }
+  .fc-toolbar .fc-button .fc-icon:after {
+    margin: 0; // override -1em margin to fix Edge bug
   }
   .fc-day-number {
     float: none;

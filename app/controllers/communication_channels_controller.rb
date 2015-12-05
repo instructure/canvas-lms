@@ -89,7 +89,7 @@ class CommunicationChannelsController < ApplicationController
   # position.
   #
   # @example_request
-  #     curl https://<canvas>/api/v1/users/12345/communication_channels \ 
+  #     curl https://<canvas>/api/v1/users/12345/communication_channels \
   #          -H 'Authorization: Bearer <token>'
   #
   # @returns [CommunicationChannel]
@@ -414,6 +414,16 @@ class CommunicationChannelsController < ApplicationController
       @cc.send_confirmation!(@domain_root_account)
     end
     render :json => {:re_sent => true}
+  end
+
+  def reset_bounce_count
+    @user = api_request? ? api_find(User, params[:user_id]) : @current_user
+    @cc = @user.communication_channels.unretired.find(params[:id])
+    return render_unauthorized_action unless @cc.grants_right?(@current_user, :reset_bounce_count) || (@real_current_user && @cc.grants_right?(@real_current_user, :reset_bounce_count))
+
+    @cc.reset_bounce_count!
+
+    render json: communication_channel_json(@cc, @current_user, session)
   end
 
   def redirect_with_success_flash

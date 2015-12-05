@@ -79,13 +79,28 @@ $ic-wizard-color-dark-neutral: $ic-color-dark;
 }
 
 .ic-wizard-box__nav {
-  display: flex;
   flex: 1;
+  display: flex;
   flex-direction: column;
   @include breakpoint(mini-tablet) {
     flex: 2;
   }
   @include breakpoint(desktop) { flex: 1; }
+}
+
+.ic-wizard-box__nav-checklist {
+  list-style-type: none;
+  margin: 0; 
+  padding: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  li {
+    margin: 0;
+    line-height: 1;
+    flex: 1;
+    display: flex;
+  }
 }
 
 .ic-wizard-box__content-trigger {

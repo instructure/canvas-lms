@@ -1,9 +1,12 @@
-require File.expand_path(File.dirname(__FILE__) + '/../common')
-require File.expand_path(File.dirname(__FILE__) + '/../helpers/calendar2_common')
-require File.expand_path(File.dirname(__FILE__) + '/../helpers/quizzes_common')
+require_relative "../common"
+require_relative "../helpers/calendar2_common"
+require_relative "../helpers/quizzes_common"
 
 describe "calendar2" do
   include_context "in-process server selenium tests"
+  include QuizzesCommon
+  include Calendar2Common
+
   before(:each) do
     Account.default.tap do |a|
       a.settings[:show_scheduler]   = true
@@ -12,7 +15,7 @@ describe "calendar2" do
   end
 
   context "as a teacher" do
-    before (:each) do
+    before(:each) do
       course_with_teacher_logged_in
     end
 
@@ -289,6 +292,7 @@ describe "calendar2" do
         end
 
         it "should allow editing via More Options", priority: "1", test_id: 420724 do
+          skip('final load_agenda_view is fragile, needs analysis')
           test_date = 2.days.from_now
           test_title = 'Test Title'
           test_description = 'New Description'

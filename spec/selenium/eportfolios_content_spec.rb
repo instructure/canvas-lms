@@ -3,6 +3,7 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/eportfolios_common')
 
 describe "add content box" do
   include_context "in-process server selenium tests"
+  include EportfoliosCommon
 
   before(:each) do
     course_with_student_logged_in
@@ -31,7 +32,7 @@ describe "add content box" do
   end
 
   it "should add a user file" do
-    keep_trying_until { expect(f('.add_file_link')).to be_displayed } 
+    keep_trying_until { expect(f('.add_file_link')).to be_displayed }
     f('.add_file_link').click
     wait_for_ajaximations
     fj('.file_list:visible .sign:visible').click

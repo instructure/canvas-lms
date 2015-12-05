@@ -1,4 +1,6 @@
 class CreateFavorites < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     create_table :favorites do |t|
       t.integer :user_id, :limit => 8

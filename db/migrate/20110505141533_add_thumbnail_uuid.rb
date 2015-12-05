@@ -1,4 +1,6 @@
 class AddThumbnailUuid < ActiveRecord::Migration
+  tag :predeploy
+
   class Thumbnail < ActiveRecord::Base; end
 
   def self.up

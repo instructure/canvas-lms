@@ -76,7 +76,7 @@
       <% if crumbs.length > 1 && use_new_styles? %>
         <div class="ic-app-nav-toggle-and-crumbs">
           <% if @show_left_side %>
-            <button type="button" aria-hidden="true" id="courseMenuToggle" class="Button Button--link Button--small ic-app-course-nav-toggle" title="<%= t('Show and hide courses menu') %>"><i class="icon-hamburger"></i></button> 
+            <button type="button" aria-hidden="true" id="courseMenuToggle" class="Button Button--link Button--small ic-app-course-nav-toggle" title="<%= t('Show and hide courses menu') %>"><i class="icon-hamburger"></i></button>
             <div class="ic-app-crumbs">
           <% end %>
           <%= render_crumbs %>
@@ -170,8 +170,7 @@
         <span id="switched_role_type" class="<%= @context.asset_string %>" data-role="<%= temp_type %>"><%= Enrollment.readable_type(temp_type) %></span>
       <% end %>
       <% if @page_view %>
-        <a href="<%= page_view_path(@page_view.id || @page_view.temporary_id) %>" id="page_view_update_path">&nbsp;</a>
-        <div id="page_view_id"><%= @page_view.id || @page_view.temporary_id %></div>
+        <div id="page_view_id"><%= @page_view.id %></div>
       <% end %>
       <% if equella_enabled? %>
         <a id="equella_endpoint_url" href="<%= @equella_settings.endpoint %>">&nbsp;</a>

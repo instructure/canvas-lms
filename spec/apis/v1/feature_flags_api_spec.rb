@@ -28,7 +28,7 @@ describe "Feature Flags API", type: :request do
   before do
     Feature.stubs(:definitions).returns({
       'root_account_feature' => Feature.new(feature: 'root_account_feature', applies_to: 'RootAccount', state: 'allowed'),
-      'account_feature' => Feature.new(feature: 'account_feature', applies_to: 'Account', state: 'on', display_name: lambda { "Account Feature FRD" }, description: lambda { "FRD!!" }, beta: true),
+      'account_feature' => Feature.new(feature: 'account_feature', applies_to: 'Account', state: 'on', display_name: lambda { "Account Feature FRD" }, description: lambda { "FRD!!" }, beta: true,  autoexpand: true),
       'course_feature' => Feature.new(feature: 'course_feature', applies_to: 'Course', state: 'allowed', development: true, release_notes_url: 'http://example.com', display_name: "not localized", description: "srsly"),
       'user_feature' => Feature.new(feature: 'user_feature', applies_to: 'User', state: 'allowed'),
       'root_opt_in_feature' => Feature.new(feature: 'root_opt_in_feature', applies_to: 'Course', state: 'allowed', root_opt_in: true),
@@ -54,6 +54,7 @@ describe "Feature Flags API", type: :request do
            "description"=>"FRD!!",
            "applies_to"=>"Account",
            "beta"=>true,
+           "autoexpand"=>true,
            "feature_flag"=>
                {"feature"=>"account_feature",
                 "state"=>"on",

@@ -5,6 +5,9 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/google_drive_common'
 
 describe "collaborations" do
   include_context "in-process server selenium tests"
+  include CollaborationsCommon
+  include CollaborationsSpecsCommon
+  include GoogleDriveCommon
 
   context "a student's" do
     title = 'Google Docs'

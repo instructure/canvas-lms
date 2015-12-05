@@ -29,6 +29,13 @@ describe ContextModule do
       course_module
       expect(@module.available_for?(nil)).to eql(true)
     end
+
+    it "returns true by default when require_sequential_progress is true and there are no requirements" do
+      course_module
+      @module.require_sequential_progress = true
+      @module.save!
+      expect(@module.available_for?(nil)).to eql(true)
+    end
   end
 
   describe "prerequisites=" do

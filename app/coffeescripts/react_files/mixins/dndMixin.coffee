@@ -14,7 +14,8 @@ define [
 
     renderDragFeedback: ({pageX, pageY}) ->
       @dragHolder ||= $('<div>').appendTo(document.body)
-      React.render(DragFeedback({
+      # This should be in JSX, but /o\
+      React.render(React.createElement(DragFeedback, {
         pageX: pageX
         pageY: pageY
         itemsToDrag: @itemsToDrag()

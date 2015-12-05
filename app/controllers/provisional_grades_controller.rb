@@ -76,13 +76,14 @@ class ProvisionalGradesController < ApplicationController
 
   # @API Show provisional grade status for a student
   #
+  # Tell whether the student's submission needs one or more provisional grades.
+  #
   # @argument student_id [Integer]
   #   The id of the student to show the status for
   #
   # @example_request
   #
-  #   curl 'https://<canvas>/api/v1/courses/1/assignments/2/provisional_status?student_id=1' \
-  #        -X POST
+  #   curl 'https://<canvas>/api/v1/courses/1/assignments/2/provisional_grades/status?student_id=1'
   #
   # @example_response
   #

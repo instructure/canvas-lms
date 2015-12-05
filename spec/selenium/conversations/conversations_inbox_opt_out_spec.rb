@@ -2,6 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../helpers/conversations_com
 
 describe "conversations new" do
   include_context "in-process server selenium tests"
+  include ConversationsCommon
 
   before do
     conversation_setup

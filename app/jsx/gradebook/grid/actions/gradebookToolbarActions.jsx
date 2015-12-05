@@ -11,7 +11,6 @@ define([
     toggleStudentNames: { asyncResult: false },
     toggleNotesColumn: { asyncResult: false },
     toggleTreatUngradedAsZero: { asyncResult: false },
-    toggleShowAttendanceColumns: { asyncResult: false },
     toggleTotalColumnInFront: { asyncResult: false },
     arrangeColumnsBy: { asyncResult: false },
     showTotalGradeAsPoints: { asyncResult: false },
@@ -24,10 +23,6 @@ define([
 
   GradebookToolbarActions.toggleTreatUngradedAsZero.preEmit = (treatUngradedAsZero) => {
     userSettings.contextSet('treatUngradedAsZero', treatUngradedAsZero);
-  };
-
-  GradebookToolbarActions.toggleShowAttendanceColumns.preEmit = (showAttendanceColumns) => {
-    userSettings.contextSet('showAttendanceColumns', showAttendanceColumns);
   };
 
   GradebookToolbarActions.toggleTotalColumnInFront.preEmit = (totalColumnInFront) => {

@@ -31,7 +31,7 @@ define [
   module 'ModeratedStudentList',
   test 'show a dash in in the first column when not in the moderation set', ->
     newFakeStudentList = _.extend({}, fakeStudentList)
-    studentList = TestUtils.renderIntoDocument(ModeratedStudentList(
+    studentList = TestUtils.renderIntoDocument(React.createElement(ModeratedStudentList,
         urls: {assignment_speedgrader_url: 'blah'},
         includeModerationSetColumns: true,
         studentList: newFakeStudentList,
@@ -45,7 +45,7 @@ define [
     React.unmountComponentAtNode(studentList.getDOMNode().parentNode)
 
   test 'only shows one column when includeModerationSetHeaders is false', ->
-    studentList = TestUtils.renderIntoDocument(ModeratedStudentList(
+    studentList = TestUtils.renderIntoDocument(React.createElement(ModeratedStudentList,
         urls: {assignment_speedgrader_url: 'blah'},
         includeModerationSetColumns: false,
         studentList: fakeStudentList,
@@ -61,7 +61,7 @@ define [
   test 'shows the grade column when there is a selected_provisional_grade_id', ->
     newFakeStudentList = _.extend({}, fakeStudentList)
     newFakeStudentList.students[0].selected_provisional_grade_id = 10
-    studentList = TestUtils.renderIntoDocument(ModeratedStudentList(
+    studentList = TestUtils.renderIntoDocument(React.createElement(ModeratedStudentList,
         urls: {assignment_speedgrader_url: 'blah'},
         includeModerationSetColumns: true,
         studentList: newFakeStudentList,
@@ -81,7 +81,7 @@ define [
     newFakeStudentList = _.extend({}, fakeStudentList)
     newFakeStudentList.students[0].in_moderation_set = true
     callback = sinon.spy()
-    studentList = TestUtils.renderIntoDocument(ModeratedStudentList(onSelectProvisionalGrade: callback, urls: {provisional_grades_base_url: 'blah'}, includeModerationSetColumns: true, studentList: newFakeStudentList, assignment: {published: false},handleCheckbox: () => 'stub' ))
+    studentList = TestUtils.renderIntoDocument(React.createElement(ModeratedStudentList, onSelectProvisionalGrade: callback, urls: {provisional_grades_base_url: 'blah'}, includeModerationSetColumns: true, studentList: newFakeStudentList, assignment: {published: false},handleCheckbox: () => 'stub' ))
     mark1Radio = TestUtils.scryRenderedDOMComponentsWithClass(studentList, 'ModeratedAssignmentList__Mark')
     radio = TestUtils.scryRenderedDOMComponentsWithTag(mark1Radio[0], 'input')
     TestUtils.Simulate.change(radio[0].getDOMNode())

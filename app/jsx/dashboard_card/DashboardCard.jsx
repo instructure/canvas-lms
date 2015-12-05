@@ -49,6 +49,10 @@ define([
       this.setState({ nicknameInfo: this.nicknameInfo(nickname) })
     },
 
+    hasLinks: function() {
+      return this.props.links.filter(link => !link.hidden).length > 0;
+    },
+
     getInitialState: function() {
       return _.extend({ nicknameInfo: this.nicknameInfo(this.props.shortName) },
         CourseActivitySummaryStore.getStateForCourse(this.props.id))
@@ -56,7 +60,9 @@ define([
 
     componentDidMount: function() {
       CourseActivitySummaryStore.addChangeListener(this.handleStoreChange)
+      this.parentNode = this.getDOMNode();
     },
+
 
     // ===============
     //    ACTIONS
@@ -132,7 +138,7 @@ define([
         return (
           <DashboardColorPicker
             elementID         = {this.colorPickerID()}
-            parentNode        = {this.getDOMNode()}
+            parentNode        = {this.parentNode}
             doneEditing       = {this.doneEditing}
             handleColorChange = {this.handleColorChange}
             assetString       = {this.props.assetString}
@@ -145,7 +151,7 @@ define([
     },
 
     linksForCard: function(){
-      return this.props.links.map(link => {
+      return this.props.links.map((link) => {
         if (!link.hidden) {
           return (
             <DashboardCardAction
@@ -154,6 +160,7 @@ define([
               linkClass         = {link.css_class}
               path              = {link.path}
               screenReaderLabel = {link.screenreader}
+              key               = {link.path}
             />
           );
         }
@@ -164,7 +171,24 @@ define([
       return (
         <div className="ic-DashboardCard" ref="cardDiv">
           <div>
-            <div className="ic-DashboardCard__background" style={{backgroundColor: this.props.backgroundColor}}>
+            <div
+              className="ic-DashboardCard__background"
+              style={
+                (window.ENV.use_high_contrast ? 
+                  {borderBottomColor: this.props.backgroundColor}
+                  :
+                  {backgroundColor: this.props.backgroundColor}
+                )
+              }
+            >
+              { window.ENV.use_high_contrast ?
+                <div
+                  className="ic-DashboardCard__hicontrast-color-ribbon"
+                  style={{borderTopColor: this.props.backgroundColor}}>
+                </div> 
+                : 
+                null 
+              }
               <div className="ic-DashboardCard__header" onClick={this.headerClick}>
                 <div className="ic-DashboardCard__header_content">
                   <a className="ic-DashboardCard__link" href="#">
@@ -195,7 +219,15 @@ define([
                   </span>
               </button>
             </div>
-            <div className="ic-DashboardCard__action-container">
+            <div
+              className={ 
+                (this.hasLinks() ? 
+                  "ic-DashboardCard__action-container"
+                  : 
+                  "ic-DashboardCard__action-container ic-DashboardCard__action-container--is-empty"
+                )
+              }
+            >
               { this.linksForCard() }
             </div>
           </div>

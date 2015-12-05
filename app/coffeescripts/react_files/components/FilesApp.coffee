@@ -1,19 +1,17 @@
 define [
   'react'
   'react-router'
+  'underscore'
   'i18n!react_files'
   'compiled/str/splitAssetString'
-  './Toolbar'
+  'jsx/files/Toolbar'
   'jsx/files/Breadcrumbs'
   'jsx/files/FolderTree'
   'jsx/files/FilesUsage'
   '../mixins/MultiselectableMixin'
   '../mixins/dndMixin'
   '../modules/filesEnv'
-], (React, ReactRouter, I18n, splitAssetString, ToolbarComponent, Breadcrumbs, FolderTree, FilesUsage, MultiselectableMixin, dndMixin, filesEnv) ->
-
-  Toolbar = React.createFactory ToolbarComponent
-  RouteHandler = React.createFactory ReactRouter.RouteHandler
+], (React, ReactRouter, _, I18n, splitAssetString, Toolbar, Breadcrumbs, FolderTree, FilesUsage, MultiselectableMixin, dndMixin, filesEnv) ->
 
 
   FilesApp =
@@ -22,6 +20,15 @@ define [
     mixins: [ ReactRouter.State ]
 
     onResolvePath: ({currentFolder, rootTillCurrentFolder, showingSearchResults, searchResultCollection, pathname}) ->
+      updatedModels = @state.updatedModels
+
+      if currentFolder && !showingSearchResults
+        updatedModels.forEach (model, index, models) ->
+          if currentFolder.id.toString() isnt model.get("folder_id") and
+             removedModel = currentFolder.files.findWhere({id: model.get("id")})
+            currentFolder.files.remove removedModel
+            models.splice(index, 1)
+
       @setState
         currentFolder: currentFolder
         key: @getHandlerKey()
@@ -30,9 +37,11 @@ define [
         showingSearchResults: showingSearchResults
         selectedItems: []
         searchResultCollection: searchResultCollection
+        updatedModels: updatedModels
 
     getInitialState: ->
       {
+        updatedModels: []
         currentFolder: null
         rootTillCurrentFolder: null
         showingSearchResults: false
@@ -58,6 +67,10 @@ define [
         @state.searchResultCollection.models
       else
         @state.currentFolder.children(@getQuery())
+
+    onMove: (modelsToMove) ->
+      updatedModels = _.uniq(@state.updatedModels.concat(modelsToMove), "id")
+      @setState {updatedModels}
 
     getPreviewQuery: ->
       retObj =

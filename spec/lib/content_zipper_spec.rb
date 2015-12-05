@@ -35,9 +35,9 @@ describe ContentZipper do
       attachment.save!
       ContentZipper.process_attachment(attachment, @teacher)
       expected_file_patterns = [
-        /other-567--guy-8/,
-        /some-999----1234-guy/,
-        /-45-/,
+        /other567guy8/,
+        /some9991234guy/,
+        /45/,
       ]
 
       filename = attachment.reload.full_filename
@@ -65,7 +65,7 @@ describe ContentZipper do
       expect(attachment.workflow_state).to eq 'zipped'
       Zip::File.foreach(attachment.full_filename) do |f|
         if f.file?
-          expect(f.name).to match /some-999----1234-guy/
+          expect(f.name).to match /some9991234guy/
           expect(f.get_input_stream.read).to match(%r{This submission was a url})
           expect(f.get_input_stream.read).to be_include("http://www.instructure.com/")
         end
@@ -132,7 +132,7 @@ describe ContentZipper do
 
       ContentZipper.process_attachment(attachment, @teacher)
       sub_count = 0
-      expected_file_names = [/group-0/, /group-1/]
+      expected_file_names = [/group0/, /group1/]
       Zip::File.foreach(attachment.full_filename) do |f|
         expect {
           expected_file_names.delete_if { |expected_name| f.name =~ expected_name }

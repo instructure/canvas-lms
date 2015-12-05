@@ -164,6 +164,12 @@ describe Attachment do
       Canvadocs::API.any_instance.stubs(:upload).returns "id" => 1234
     end
 
+    it "should treat text files equally" do
+      a = attachment_model(:content_type => 'text/x-ruby-script')
+      Canvadoc.stubs(:mime_types).returns(['text/plain'])
+      expect(a.canvadocable?).to be_truthy
+    end
+
     describe "submit_to_canvadocs" do
       it "submits canvadocable documents" do
         a = canvadocable_attachment_model
@@ -486,6 +492,13 @@ describe Attachment do
       expect(a.filename.length).to eql(252)
       expect(a.unencoded_filename).to be_valid_encoding
       expect(a.unencoded_filename).to eql("\u2603" * 28)
+    end
+
+    it "should truncate thumbnail names" do
+      a = attachment_model(:filename => "#{"a" * 251}.png")
+      thumbname = a.thumbnail_name_for("thumb")
+      expect(thumbname.length).to eq 255
+      expect(thumbname).to eq "#{"a" * 245}_thumb.png"
     end
 
     it "should not double-escape a root attachment's filename" do

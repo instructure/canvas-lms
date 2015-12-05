@@ -30,6 +30,12 @@
                id="image_alt"
                aria-describedby="alt_text_description">
         <span><p class="help-block" id="alt_text_description">{{#t "alt_help_text"}}Describe the image to improve accessibility{{/t}}</p></span>
+        {{#if show_quiz_warning}}
+          <br/>
+          <span><p class="help-block">
+            {{#t "quiz_warning"}}Note: This label can be viewed by students taking the quiz.{{/t}}
+          </p></span>
+        {{/if}}
       </div>
     </div>
     <div class="control-group">

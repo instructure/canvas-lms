@@ -53,7 +53,7 @@ define([
     render() {
       return (
         <li role="presentation" className="ConfigureExternalToolButton">
-          <a href="#" tabindex="-1" ref="btnTriggerModal" role="menuitem" aria-label={I18n.t('Configure %{toolName} App', { toolName: this.props.tool.name })} className="icon-settings-2" onClick={this.openModal}>
+          <a href="#" tabIndex="-1" ref="btnTriggerModal" role="menuitem" aria-label={I18n.t('Configure %{toolName} App', { toolName: this.props.tool.name })} className="icon-settings-2" onClick={this.openModal}>
             {I18n.t('Configure')}
           </a>
           <Modal className="ReactModal__Content--canvas"

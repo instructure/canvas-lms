@@ -536,6 +536,10 @@ class Course < ActiveRecord::Base
   scope :with_enrollments, -> {
     where("EXISTS (?)", Enrollment.active.where("enrollments.course_id=courses.id"))
   }
+  scope :with_enrollment_types, -> (types) {
+    types = types.map { |type| "#{type.capitalize}Enrollment" }
+    where("EXISTS (?)", Enrollment.active.where("enrollments.course_id=courses.id").where(type: types))
+  }
   scope :without_enrollments, -> {
     where("NOT EXISTS (?)", Enrollment.active.where("enrollments.course_id=courses.id"))
   }
@@ -1589,6 +1593,7 @@ class Course < ActiveRecord::Base
 
   def enroll_user(user, type='StudentEnrollment', opts={})
     enrollment_state = opts[:enrollment_state]
+    enrollment_state ||= 'active' if type == 'ObserverEnrollment'
     section = opts[:section]
     limit_privileges_to_course_section = opts[:limit_privileges_to_course_section]
     associated_user_id = opts[:associated_user_id]
@@ -1623,9 +1628,11 @@ class Course < ActiveRecord::Base
         end
         e.attributes = {
           :course_section => section,
-          :workflow_state => e.is_a?(StudentViewEnrollment) ? 'active' : enrollment_state,
-          :limit_privileges_to_course_section => limit_privileges_to_course_section } if e.completed? || e.rejected? || e.deleted? || e.workflow_state != enrollment_state
+          :workflow_state => e.is_a?(StudentViewEnrollment) ? 'active' : enrollment_state
+        } if e.completed? || e.rejected? || e.deleted? || e.workflow_state != enrollment_state
       end
+      # if we're reusing an enrollment and +limit_privileges_to_course_section+ was supplied, apply it
+      e.limit_privileges_to_course_section = limit_privileges_to_course_section if e unless limit_privileges_to_course_section.nil?
       # if we're creating a new enrollment, we want to return it as the correct
       # subclass, but without using associations, we need to manually activate
       # sharding. We should probably find a way to go back to using the
@@ -2049,32 +2056,6 @@ class Course < ActiveRecord::Base
   def students_visible_to(user, include_priors=false)
     scope = include_priors ? self.all_students : self.students
     self.apply_enrollment_visibility(scope, user)
-  end
-
-  def enrollments_visible_to(user, opts={})
-    # because of course it's used in a plugin
-    relation = []
-    relation << 'all' if opts[:include_priors]
-    if opts[:type] == :all
-      relation << 'user' if opts[:return_users]
-    else
-      relation << (opts[:type].try(:to_s) || 'student')
-    end
-    if opts[:return_users]
-      relation.last << 's'
-    else
-      relation << 'enrollments'
-    end
-    relation = relation.join('_')
-    # our relations don't all follow the same pattern
-    unless opts[:include_deleted]
-      relation = case relation
-                   when 'all_enrollments'; 'enrollments'
-                   when 'enrollments'; 'current_enrollments'
-                   else; relation
-                 end
-    end
-    self.apply_enrollment_visibility(self.send(relation.to_sym), user, opts[:section_ids])
   end
 
   # can apply to user scopes as well if through enrollments (e.g. students, teachers)

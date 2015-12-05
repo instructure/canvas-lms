@@ -167,15 +167,13 @@ class ContextModulesController < ApplicationController
       now = Time.now.utc.iso8601
       @context.module_items_visible_to(@current_user).each do |tag|
         if tag.can_have_assignment?
-          info[tag.id] = Rails.cache.fetch([tag, @current_user, "content_tag_assignment_info3"].cache_key) do
-            if tag.assignment
-              tag.assignment.context_module_tag_info(@current_user, @context)
-            else
-              {
-                :points_possible => nil,
-                :due_date => (tag.content_type_quiz? && tag.content.due_at ? tag.content.due_at.utc.iso8601 : nil)
-              }
-            end
+          info[tag.id] = if tag.assignment
+            tag.assignment.context_module_tag_info(@current_user, @context)
+          else
+            {
+              :points_possible => nil,
+              :due_date => (tag.content_type_quiz? && tag.content.due_at ? tag.content.due_at.utc.iso8601 : nil)
+            }
           end
         else
           info[tag.id] = {:points_possible => nil, :due_date => nil}

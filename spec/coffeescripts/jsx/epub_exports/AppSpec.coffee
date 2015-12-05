@@ -24,7 +24,8 @@ define [
       CourseEpubExportStore.getAll.restore()
 
   test 'handeCourseStoreChange', ->
-    component = TestUtils.renderIntoDocument(App())
+    AppElement = React.createElement(App)
+    component = TestUtils.renderIntoDocument(AppElement)
     ok _.isEmpty(component.state), 'precondition'
 
     CourseEpubExportStore.setState(@props)

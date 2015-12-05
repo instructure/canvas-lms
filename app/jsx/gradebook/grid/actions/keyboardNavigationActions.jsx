@@ -3,11 +3,9 @@ define([
   'jquery'
 ], function (Reflux, $) {
   var KeyboardNavigationActions = Reflux.createActions([
-    'next',
-    'previous',
-    'up',
-    'down',
-    'setActiveCell'
+    'setActiveCell',
+    'constructKeyboardNavManager',
+    'handleKeyboardEvent'
   ]);
 
   return KeyboardNavigationActions;

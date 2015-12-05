@@ -116,7 +116,7 @@ define([
 
       return (
         <li role="presentation" className="EditExternalToolButton">
-          <a href="#" ref="editButton" tabindex="-1" role="menuitem" aria-label={editAriaLabel} className="icon-edit" onClick={this.openModal}>
+          <a href="#" ref="editButton" tabIndex="-1" role="menuitem" aria-label={editAriaLabel} className="icon-edit" onClick={this.openModal}>
             {I18n.t('Edit')}
           </a>
           <Modal className="ReactModal__Content--canvas"

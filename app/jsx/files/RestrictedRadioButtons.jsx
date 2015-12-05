@@ -122,9 +122,9 @@ define([
              _.contains(option.selectedOptionKey, this.state.selectedOption);
     },
     renderPermissionOptions: function () {
-      return this.permissionOptions.map((option) => {
+      return this.permissionOptions.map((option, index) => {
         return (
-          <div className='radio'>
+          <div className='radio' key={index}>
             <label>
               <input
                 ref={option.ref}
@@ -148,9 +148,9 @@ define([
       return (
         <div style={{marginLeft: '20px'}}>
           {
-            this.restrictedOptions.map((option) => {
+            this.restrictedOptions.map((option, index) => {
               return (
-                <div className='radio'>
+                <div className='radio' key={index}>
                   <label>
                     <input
                       ref={option.ref}

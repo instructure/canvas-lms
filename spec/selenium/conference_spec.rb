@@ -4,6 +4,7 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/public_courses_conte
 
 describe "web conference" do
   include_context "in-process server selenium tests"
+  include ConferencesCommon
   let(:url) { "/courses/#{@course.id}/conferences" }
 
   context "with no conferences" do

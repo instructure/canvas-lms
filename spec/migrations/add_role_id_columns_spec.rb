@@ -76,10 +76,10 @@ describe 'AddRoleIdColumns' do
 
       # make sure that the down undoes all the things
       AccountUser.reset_column_information
-      expect(AccountUser.connection.select_value("SELECT membership_type FROM account_users WHERE id=#{plain_au.id}")).to eq "AccountAdmin"
-      expect(AccountUser.connection.select_value("SELECT membership_type FROM account_users WHERE id=#{role1_au.id}")).to eq "accountrole1"
-      expect(AccountUser.connection.select_value("SELECT membership_type FROM account_users WHERE id=#{role2_au.id}")).to eq "accountrole2"
-      expect(AccountUser.connection.select_value("SELECT membership_type FROM account_users WHERE id=#{lookalike_au.id}")).to eq "accountrole2"
+      expect(AccountUser.connection.select_value("SELECT membership_type FROM #{AccountUser.quoted_table_name} WHERE id=#{plain_au.id}")).to eq "AccountAdmin"
+      expect(AccountUser.connection.select_value("SELECT membership_type FROM #{AccountUser.quoted_table_name} WHERE id=#{role1_au.id}")).to eq "accountrole1"
+      expect(AccountUser.connection.select_value("SELECT membership_type FROM #{AccountUser.quoted_table_name} WHERE id=#{role2_au.id}")).to eq "accountrole2"
+      expect(AccountUser.connection.select_value("SELECT membership_type FROM #{AccountUser.quoted_table_name} WHERE id=#{lookalike_au.id}")).to eq "accountrole2"
 
       @pre_migration.up
       AccountUser.reset_column_information
@@ -87,25 +87,25 @@ describe 'AddRoleIdColumns' do
       # make sure the triggers work while they need to
 
       # with a built-in role
-      id1 = AccountUser.connection.insert("INSERT INTO account_users(
+      id1 = AccountUser.connection.insert("INSERT INTO #{AccountUser.quoted_table_name}(
         account_id, user_id, membership_type, created_at, updated_at)
         VALUES(#{@sub_account1.id}, #{user.id}, 'AccountAdmin', '2014-07-07', '2014-07-07') RETURNING ID")
       expect(AccountUser.find(id1).role_id).to eq admin_role.id
 
       # with role 1 for @sub_account1
-      id2 = AccountUser.connection.insert("INSERT INTO account_users(
+      id2 = AccountUser.connection.insert("INSERT INTO #{AccountUser.quoted_table_name}(
         account_id, user_id, membership_type, created_at, updated_at)
         VALUES(#{@sub_account1.id}, #{user.id}, 'accountrole1', '2014-07-07', '2014-07-07') RETURNING ID")
       expect(AccountUser.find(id2).role_id).to eq @account_role1.id
 
       # with role 2 for @sub_account1
-      id3 = AccountUser.connection.insert("INSERT INTO account_users(
+      id3 = AccountUser.connection.insert("INSERT INTO #{AccountUser.quoted_table_name}(
         account_id, user_id, membership_type, created_at, updated_at)
         VALUES(#{@sub_account1.id}, #{user.id}, 'accountrole2', '2014-07-07', '2014-07-07') RETURNING ID")
       expect(AccountUser.find(id3).role_id).to eq @account_role2.id
 
       # with the role name meant for the lookalike
-      id4 = AccountUser.connection.insert("INSERT INTO account_users(
+      id4 = AccountUser.connection.insert("INSERT INTO #{AccountUser.quoted_table_name}(
         account_id, user_id, membership_type, created_at, updated_at)
         VALUES(#{@sub_account2.id}, #{user.id}, 'accountrole2', '2014-07-07', '2014-07-07') RETURNING ID")
       expect(AccountUser.find(id4).role_id).to eq account_role2_lookalike.id
@@ -136,13 +136,13 @@ describe 'AddRoleIdColumns' do
 
       # make sure that the down undoes all the things
       Enrollment.reset_column_information
-      expect(Enrollment.connection.select_value("SELECT role_name FROM enrollments WHERE id=#{plain_enrollment.id}")).to be_nil
-      expect(Enrollment.connection.select_value("SELECT role_name FROM enrollments WHERE id=#{role1_enrollment.id}")).to eq "courserole1"
-      expect(Enrollment.connection.select_value("SELECT role_name FROM enrollments WHERE id=#{role2_enrollment.id}")).to eq "courserole2"
-      expect(Enrollment.connection.select_value("SELECT role_name FROM enrollments WHERE id=#{lookalike_enrollment.id}")).to eq "courserole2"
+      expect(Enrollment.connection.select_value("SELECT role_name FROM #{Enrollment.quoted_table_name} WHERE id=#{plain_enrollment.id}")).to be_nil
+      expect(Enrollment.connection.select_value("SELECT role_name FROM #{Enrollment.quoted_table_name} WHERE id=#{role1_enrollment.id}")).to eq "courserole1"
+      expect(Enrollment.connection.select_value("SELECT role_name FROM #{Enrollment.quoted_table_name} WHERE id=#{role2_enrollment.id}")).to eq "courserole2"
+      expect(Enrollment.connection.select_value("SELECT role_name FROM #{Enrollment.quoted_table_name} WHERE id=#{lookalike_enrollment.id}")).to eq "courserole2"
 
       @user2 = user
-      null_en_id = Enrollment.connection.insert("INSERT INTO enrollments(
+      null_en_id = Enrollment.connection.insert("INSERT INTO #{Enrollment.quoted_table_name}(
         course_id, course_section_id, root_account_id, user_id, type, workflow_state, created_at, updated_at, role_name)
         VALUES(#{ssa1_course.id}, #{ssa1_course.default_section.id}, #{@root_account.id}, #{@user2.id},
           'StudentEnrollment', 'active', '2014-07-07', '2014-07-07', 'NonExistentRole') RETURNING ID")
@@ -158,21 +158,21 @@ describe 'AddRoleIdColumns' do
       # make sure the triggers work while they need to
 
       # with no role name
-      id1 = Enrollment.connection.insert("INSERT INTO enrollments(
+      id1 = Enrollment.connection.insert("INSERT INTO #{Enrollment.quoted_table_name}(
         course_id, course_section_id, root_account_id, user_id, type, workflow_state, created_at, updated_at)
         VALUES(#{ssa1_course.id}, #{ssa1_course.default_section.id}, #{@root_account.id}, #{@user2.id},
           'StudentEnrollment', 'active', '2014-07-07', '2014-07-07') RETURNING ID")
       expect(Enrollment.find(id1).role_id).to eq student_role.id
 
       # with a role name for course_role1
-      id2 = Enrollment.connection.insert("INSERT INTO enrollments(
+      id2 = Enrollment.connection.insert("INSERT INTO #{Enrollment.quoted_table_name}(
         course_id, course_section_id, root_account_id, user_id, type, role_name, workflow_state, created_at, updated_at)
         VALUES(#{ssa1_course.id}, #{ssa1_course.default_section.id}, #{@root_account.id}, #{@user2.id},
           'StudentEnrollment', 'courserole1', 'active', '2014-07-07', '2014-07-07') RETURNING ID")
       expect(Enrollment.find(id2).role_id).to eq @course_role1.id
 
       # with a role name meant for the lookalike
-      id3 = Enrollment.connection.insert("INSERT INTO enrollments(
+      id3 = Enrollment.connection.insert("INSERT INTO #{Enrollment.quoted_table_name}(
         course_id, course_section_id, root_account_id, user_id, type, role_name, workflow_state, created_at, updated_at)
         VALUES(#{sa2_course.id}, #{sa2_course.default_section.id}, #{@root_account.id}, #{@user2.id},
           'StudentEnrollment', 'courserole2', 'active', '2014-07-07', '2014-07-07') RETURNING ID")
@@ -208,10 +208,10 @@ describe 'AddRoleIdColumns' do
 
       # make sure that the down undoes all the things
       RoleOverride.reset_column_information
-      expect(RoleOverride.connection.select_value("SELECT enrollment_type FROM role_overrides WHERE id=#{plain_ro.id}")).to eq "TeacherEnrollment"
-      expect(RoleOverride.connection.select_value("SELECT enrollment_type FROM role_overrides WHERE id=#{role1_ro.id}")).to eq "accountrole1"
-      expect(RoleOverride.connection.select_value("SELECT enrollment_type FROM role_overrides WHERE id=#{role2_ro.id}")).to eq "accountrole2"
-      expect(RoleOverride.connection.select_value("SELECT enrollment_type FROM role_overrides WHERE id=#{lookalike_ro.id}")).to eq "accountrole2"
+      expect(RoleOverride.connection.select_value("SELECT enrollment_type FROM #{RoleOverride.quoted_table_name} WHERE id=#{plain_ro.id}")).to eq "TeacherEnrollment"
+      expect(RoleOverride.connection.select_value("SELECT enrollment_type FROM #{RoleOverride.quoted_table_name} WHERE id=#{role1_ro.id}")).to eq "accountrole1"
+      expect(RoleOverride.connection.select_value("SELECT enrollment_type FROM #{RoleOverride.quoted_table_name} WHERE id=#{role2_ro.id}")).to eq "accountrole2"
+      expect(RoleOverride.connection.select_value("SELECT enrollment_type FROM #{RoleOverride.quoted_table_name} WHERE id=#{lookalike_ro.id}")).to eq "accountrole2"
 
       @pre_migration.up
       RoleOverride.reset_column_information
@@ -219,25 +219,25 @@ describe 'AddRoleIdColumns' do
       # make sure the triggers work while they need to
 
       # with a built-in role
-      id1 = RoleOverride.connection.insert("INSERT INTO role_overrides(
+      id1 = RoleOverride.connection.insert("INSERT INTO #{RoleOverride.quoted_table_name}(
         context_id, context_type, enrollment_type, created_at, updated_at)
         VALUES(#{@sub_account1.id}, 'Account', 'TeacherEnrollment', '2014-07-07', '2014-07-07') RETURNING ID")
       expect(RoleOverride.find(id1).role_id).to eq teacher_role.id
 
       # with role 1 for @sub_account1
-      id2 = RoleOverride.connection.insert("INSERT INTO role_overrides(
+      id2 = RoleOverride.connection.insert("INSERT INTO #{RoleOverride.quoted_table_name}(
         context_id, context_type, enrollment_type, created_at, updated_at)
         VALUES(#{@sub_account1.id}, 'Account', 'accountrole1', '2014-07-07', '2014-07-07') RETURNING ID")
       expect(RoleOverride.find(id2).role_id).to eq @account_role1.id
 
       # with role 2 for @sub_account1
-      id3 = RoleOverride.connection.insert("INSERT INTO role_overrides(
+      id3 = RoleOverride.connection.insert("INSERT INTO #{RoleOverride.quoted_table_name}(
         context_id, context_type, enrollment_type, created_at, updated_at)
         VALUES(#{@sub_account1.id}, 'Account', 'accountrole2', '2014-07-07', '2014-07-07') RETURNING ID")
       expect(RoleOverride.find(id3).role_id).to eq @account_role2.id
 
       # with the role name meant for the lookalike
-      id4 = RoleOverride.connection.insert("INSERT INTO role_overrides(
+      id4 = RoleOverride.connection.insert("INSERT INTO #{RoleOverride.quoted_table_name}(
         context_id, context_type, enrollment_type, created_at, updated_at)
         VALUES(#{@sub_account2.id}, 'Account', 'accountrole2', '2014-07-07', '2014-07-07') RETURNING ID")
       expect(RoleOverride.find(id4).role_id).to eq account_role2_lookalike.id
@@ -263,10 +263,10 @@ describe 'AddRoleIdColumns' do
 
       # make sure that the down undoes all the things
       AccountNotificationRole.reset_column_information
-      expect(AccountNotificationRole.connection.select_values("SELECT role_type FROM account_notification_roles WHERE account_notification_id=#{an1.id}").sort).to eq ["accountrole2", "TeacherEnrollment"].sort
-      expect(AccountNotificationRole.connection.select_values("SELECT role_type FROM account_notification_roles WHERE account_notification_id=#{an2.id}").sort).to eq ["accountrole2", "NilEnrollment"].sort
+      expect(AccountNotificationRole.connection.select_values("SELECT role_type FROM #{AccountNotificationRole.quoted_table_name} WHERE account_notification_id=#{an1.id}").sort).to eq ["accountrole2", "TeacherEnrollment"].sort
+      expect(AccountNotificationRole.connection.select_values("SELECT role_type FROM #{AccountNotificationRole.quoted_table_name} WHERE account_notification_id=#{an2.id}").sort).to eq ["accountrole2", "NilEnrollment"].sort
 
-      null_anr_id = AccountNotificationRole.connection.insert("INSERT INTO account_notification_roles(
+      null_anr_id = AccountNotificationRole.connection.insert("INSERT INTO #{AccountNotificationRole.quoted_table_name}(
         account_notification_id, role_type)
         VALUES(#{an1.id}, 'NonExistentRole') RETURNING ID")
 
@@ -288,19 +288,19 @@ describe 'AddRoleIdColumns' do
       # make sure the triggers work while they need to
 
       # with a built-in role
-      id1 = AccountNotificationRole.connection.insert("INSERT INTO account_notification_roles(
+      id1 = AccountNotificationRole.connection.insert("INSERT INTO #{AccountNotificationRole.quoted_table_name}(
         account_notification_id, role_type)
         VALUES(#{an1.id}, 'AccountAdmin') RETURNING ID")
       expect(AccountNotificationRole.find(id1).role_id).to eq admin_role.id
 
       # with role 1 for @sub_account1
-      id2 = AccountNotificationRole.connection.insert("INSERT INTO account_notification_roles(
+      id2 = AccountNotificationRole.connection.insert("INSERT INTO #{AccountNotificationRole.quoted_table_name}(
         account_notification_id, role_type)
         VALUES(#{an1.id}, 'accountrole1') RETURNING ID")
       expect(AccountNotificationRole.find(id2).role_id).to eq @account_role1.id
 
       # with the role name meant for the lookalike
-      id3 = AccountNotificationRole.connection.insert("INSERT INTO account_notification_roles(
+      id3 = AccountNotificationRole.connection.insert("INSERT INTO #{AccountNotificationRole.quoted_table_name}(
         account_notification_id, role_type)
         VALUES(#{an2.id}, 'accountrole2') RETURNING ID")
       expect(AccountNotificationRole.find(id3).role_id).to eq account_role2_lookalike.id

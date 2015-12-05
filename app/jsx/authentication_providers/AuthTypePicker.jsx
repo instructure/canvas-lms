@@ -3,9 +3,9 @@ define([
   'i18n!account_authorization_configs',
   'react-select-box',
   'jquery' /* $ */
-], function(React, I18n, ReactSelectBox, $) {
+], function(React, I18n, SelectBox, $) {
 
-  var SelectBox = React.createFactory(ReactSelectBox);
+
   var AuthTypePicker = React.createClass({
 
     displayName: 'AuthTypePicker',

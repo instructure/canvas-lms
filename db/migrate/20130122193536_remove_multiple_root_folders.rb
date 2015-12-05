@@ -11,7 +11,7 @@ class RemoveMultipleRootFolders < ActiveRecord::Migration
 
   def self.down
     if connection.adapter_name =~ /\Apostgresql/i
-      execute("DROP INDEX IF EXISTS index_folders_on_context_id_and_context_type_for_root_folders")
+      remove_index :folders, name: 'index_folders_on_context_id_and_context_type_for_root_folders'
     end
   end
 end

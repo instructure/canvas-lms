@@ -11,7 +11,7 @@ define [
 
     filesUpdateTest: (props, test) ->
       @server = sinon.fakeServer.create()
-      @filesUsage = TestUtils.renderIntoDocument(FilesUsage(props))
+      @filesUsage = TestUtils.renderIntoDocument(React.createElement(FilesUsage, props))
 
       test()
 

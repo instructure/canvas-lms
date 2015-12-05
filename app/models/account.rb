@@ -55,6 +55,7 @@ class Account < ActiveRecord::Base
   has_many :all_groups, :class_name => 'Group', :foreign_key => 'root_account_id'
   has_many :all_group_memberships, source: 'group_memberships', through: :all_groups
   has_many :enrollment_terms, :foreign_key => 'root_account_id'
+  has_many :active_enrollment_terms, :class_name => 'EnrollmentTerm', :foreign_key => 'root_account_id', :conditions => ["enrollment_terms.workflow_state<>'deleted'"]
   has_many :enrollments, :foreign_key => 'root_account_id', :conditions => ["enrollments.type != 'StudentViewEnrollment'"]
   has_many :all_enrollments, :class_name => 'Enrollment', :foreign_key => 'root_account_id'
   has_many :sub_accounts, :class_name => 'Account', :foreign_key => 'parent_account_id', :conditions => ['workflow_state != ?', 'deleted']
@@ -524,8 +525,10 @@ class Account < ActiveRecord::Base
   end
 
   def self.invalidate_cache(id)
+    return unless id
+    birth_id = Shard.relative_id_for(id, Shard.current, Shard.birth)
     Shard.birth.activate do
-      Rails.cache.delete(account_lookup_cache_key(id)) if id
+      Rails.cache.delete(account_lookup_cache_key(birth_id)) if birth_id
     end
   rescue
     nil
@@ -822,9 +825,9 @@ class Account < ActiveRecord::Base
         role_scope = role_scope.where("account_id = ? OR
           account_id IN (
             WITH RECURSIVE t AS (
-              SELECT id, parent_account_id FROM accounts WHERE id = ?
+              SELECT id, parent_account_id FROM #{Account.quoted_table_name} WHERE id = ?
               UNION
-              SELECT accounts.id, accounts.parent_account_id FROM accounts INNER JOIN t ON accounts.id=t.parent_account_id
+              SELECT accounts.id, accounts.parent_account_id FROM #{Account.quoted_table_name} INNER JOIN t ON accounts.id=t.parent_account_id
             )
             SELECT id FROM t
           )", self.id, self.id)
@@ -1267,11 +1270,13 @@ class Account < ActiveRecord::Base
   TAB_SIS_IMPORT = 11
   TAB_GRADING_STANDARDS = 12
   TAB_QUESTION_BANKS = 13
+  TAB_ADMIN_TOOLS = 17
+  TAB_SEARCH = 18
+
   # site admin tabs
   TAB_PLUGINS = 14
   TAB_JOBS = 15
   TAB_DEVELOPER_KEYS = 16
-  TAB_ADMIN_TOOLS = 17
 
   def external_tool_tabs(opts)
     tools = ContextExternalTool.active.find_all_for(self, :account_navigation)
@@ -1301,8 +1306,12 @@ class Account < ActiveRecord::Base
       tabs << { :id => TAB_DEVELOPER_KEYS, :label => t("#account.tab_developer_keys", "Developer Keys"), :css_class => "developer_keys", :href => :developer_keys_path, :no_args => true } if root_account? && self.grants_right?(user, :manage_developer_keys)
     else
       tabs = []
-      tabs << { :id => TAB_COURSES, :label => t('#account.tab_courses', "Courses"), :css_class => 'courses', :href => :account_path } if user && self.grants_right?(user, :read_course_list)
-      tabs << { :id => TAB_USERS, :label => t('#account.tab_users', "Users"), :css_class => 'users', :href => :account_users_path } if user && self.grants_right?(user, :read_roster)
+      if feature_enabled?(:course_user_search)
+        tabs << { :id => TAB_SEARCH, :label => t("Search"), :css_class => 'search', :href => :account_path } if user && (grants_right?(user, :read_course_list) || grants_right?(user, :read_roster))
+      else
+        tabs << { :id => TAB_COURSES, :label => t('#account.tab_courses', "Courses"), :css_class => 'courses', :href => :account_path } if user && self.grants_right?(user, :read_course_list)
+        tabs << { :id => TAB_USERS, :label => t('#account.tab_users', "Users"), :css_class => 'users', :href => :account_users_path } if user && self.grants_right?(user, :read_roster)
+      end
       tabs << { :id => TAB_STATISTICS, :label => t('#account.tab_statistics', "Statistics"), :css_class => 'statistics', :href => :statistics_account_path } if user && self.grants_right?(user, :view_statistics)
       tabs << { :id => TAB_PERMISSIONS, :label => t('#account.tab_permissions', "Permissions"), :css_class => 'permissions', :href => :account_permissions_path } if user && self.grants_right?(user, :manage_role_overrides)
       if user && self.grants_right?(user, :manage_outcomes)

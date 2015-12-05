@@ -2,12 +2,13 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/wiki_and_tiny_common
 
 describe "Wiki pages and Tiny WYSIWYG editor features" do
   include_context "in-process server selenium tests"
+  include WikiAndTinyCommon
 
   equation_button_selector = "div[aria-label='Insert Math Equation'] button"
 
   context "WYSIWYG generic as a teacher" do
 
-    before (:each) do
+    before(:each) do
       course_with_teacher_logged_in
     end
 

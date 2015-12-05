@@ -17,6 +17,15 @@ define [
     isPercent: Ember.computed.equal('assignment.grading_type', 'percent')
     isLetterGrade: Ember.computed.equal('assignment.grading_type', 'letter_grade')
     isPassFail: Ember.computed.equal('assignment.grading_type', 'pass_fail')
+    isInPastGradingPeriodAndNotAdmin: ( ->
+      return false unless ENV.GRADEBOOK_OPTIONS.multiple_grading_periods_enabled
+      return false unless ENV.GRADEBOOK_OPTIONS.latest_end_date_of_admin_created_grading_periods_in_the_past
+      return false if ENV.current_user_roles.contains("admin")
+
+      latest_end_date = new Date(ENV.GRADEBOOK_OPTIONS.latest_end_date_of_admin_created_grading_periods_in_the_past)
+
+      @assignment.due_at <= latest_end_date
+    ).property('assignment')
     nilPointsPossible: Ember.computed.none('assignment.points_possible')
     isGpaScale: Ember.computed.equal('assignment.grading_type', 'gpa_scale')
 

@@ -21,14 +21,17 @@ cache(safe_cache_key([@current_user, contexts, 'a_need_grading']), cache_opts) d
   <h2><%= t('headings.to_do', %{To Do}) %></h2>
   <ul class="right-side-list to-do-list">
     <% needs_grading.each_with_index do |assignment, i| %>
-
+      <% icon_explanation, icon_aria_label, icon_class = icon_data(context: assignment.context,
+                                                                   current_user: @current_user,
+                                                                   recent_event: assignment)
+      %>
       <li style="<%= hidden if i >= visible_limit %>">
-      <a
-        class="item icon-grading-gray tooltip"
-        href="<%= speed_grader_course_gradebook_path( assignment.context_id, :assignment_id => assignment.id) %>"
-        data-track-category="dashboard"
-        data-track-label="todo needs grading"
-      >
+        <a
+          class="item tooltip"
+          href="<%= speed_grader_course_gradebook_path( assignment.context_id, :assignment_id => assignment.id) %>"
+          data-track-category="dashboard"
+          data-track-label="todo needs grading"
+        >
           <% if assignment.due_at || assignment.points_possible || show_context %>
             <span class="tooltip_wrap">
               <span class='tooltip-carat'></span>
@@ -43,18 +46,25 @@ cache(safe_cache_key([@current_user, contexts, 'a_need_grading']), cache_opts) d
               </span>
             </span>
           <% end %>
-          <b><%= t 'headings.grade', 'Grade %{assignment}', :assignment => assignment.title %></b>
-          <em>
-            <%= t 'need_grading_count', { one: '1 needs grading', other: '%{count} need grading' }, count: Assignments::NeedsGradingCountQuery.new(assignment, @current_user).count %>
-          </em>
+          <i class="<%= icon_class %>" aria-label="<%= icon_aria_label %>"></i>
+          <div class="todo-detail">
+            <b><%= t 'headings.grade', 'Grade %{assignment}', :assignment => assignment.title %></b>
+            <em>
+              <%= t 'need_grading_count', { one: '1 needs grading', other: '%{count} need grading' }, count: Assignments::NeedsGradingCountQuery.new(assignment, @current_user).count %>
+            </em>
+          </div>
         </a>
         <%= render :partial => 'shared/ignore_option_list', :locals => {:type => 'grading', :item => assignment } %>
       </li>
     <% end %>
     <% needs_moderation.each_with_index do |assignment, i| %>
+      <% icon_explanation, icon_aria_label, icon_class = icon_data(context: assignment.context,
+                                                                   current_user: @current_user,
+                                                                   recent_event: assignment)
+      %>
       <li style="<%= hidden if i >= visible_limit %>">
         <a
-        class="item icon-grading-gray tooltip"
+        class="item tooltip"
         href="<%= course_assignment_moderate_path(assignment.context_id, assignment) %>"
         data-track-category="dashboard"
         data-track-label="todo needs moderation"
@@ -73,15 +83,23 @@ cache(safe_cache_key([@current_user, contexts, 'a_need_grading']), cache_opts) d
               </span>
             </span>
           <% end %>
-          <b><%= t 'headings.moderate', 'Moderate %{assignment}', :assignment => assignment.title %></b>
+          <i class="<%= icon_class %>" aria-label="<%= icon_aria_label %>"></i>
+          <div class="todo-details">
+            <b><%= t 'headings.moderate', 'Moderate %{assignment}', :assignment => assignment.title %></b>
+          </div>
         </a>
         <%= render :partial => 'shared/ignore_option_list', :locals => {:type => 'moderation', :item => assignment } %>
       </li>
     <% end %>
     <% needs_submitting.each_with_index do |assignment, i| %>
-      <li style="<%= hidden if i >= visible_limit %>">
+      <% icon_explanation, icon_aria_label, icon_class = icon_data(context: assignment.context,
+                                                                   current_user: @current_user,
+                                                                   recent_event: assignment,
+                                                                   student_only: true)
+      %>
+      <li class="todo" style="<%= hidden if i >= visible_limit %>">
         <a
-          class="item icon-grading-gray tooltip todo-tooltip"
+          class="item tooltip todo-tooltip"
           href="<%= course_assignment_path( assignment.context_id, assignment.id ) %>#submit"
           data-track-category="dashboard"
           data-track-label="todo needs submitting"
@@ -99,8 +117,11 @@ cache(safe_cache_key([@current_user, contexts, 'a_need_grading']), cache_opts) d
               </span>
             </span>
           <% end %>
-          <b><%= assignment.submission_action_string %></b>
-          <em><%= translated_due_date(assignment) %></em>
+          <i class="<%= icon_class %>" aria-label="<%= icon_aria_label %>"></i>
+          <div class="todo-details">
+            <b><%= assignment.submission_action_string %></b>
+            <em><%= translated_due_date(assignment) %></em>
+          </div>
         </a>
         <%= render :partial => 'shared/ignore_option_list', :locals => {:type => 'submitting', :item => assignment } %>
       </li>
@@ -110,21 +131,24 @@ cache(safe_cache_key([@current_user, contexts, 'a_need_grading']), cache_opts) d
         <li style="<%= hidden if i >= visible_limit %>">
         <% assignment = assessment_request.asset.assignment %>
           <a
-            class="item icon-peer-review tooltip"
+            class="item tooltip"
             href="<%= course_assignment_submission_path( assignment.context_id, assignment.id, assessment_request.user_id) %>"
             data-track-category="dashboard"
             data-track-label="todo needs reviewing"
             data-tooltip
             title="<%= submission_author_name_for(assessment_request, "#{t('user')}: ") %>"
           >
-            <b>Peer Review for <%= assignment.title %></b>
-            <em>
-              <% if assignment.peer_reviews_due_at %>
-                <%= t('peer_review_due_date', 'due: %{peer_review_due_at}', {:peer_review_due_at => datetime_string(force_zone(assignment.peer_reviews_due_at))}) %>
-              <% else %>
-                <%= t('no_peer_review_due_date', 'due: No Due Date') %>
-              <% end %>
-            </em>
+            <i class="icon-peer-review" aria-label="Peer Review"></i>
+            <div class="todo-detail">
+              <b>Peer Review for <%= assignment.title %></b>
+              <em>
+                <% if assignment.peer_reviews_due_at %>
+                  <%= t('peer_review_due_date', 'due: %{peer_review_due_at}', {:peer_review_due_at => datetime_string(force_zone(assignment.peer_reviews_due_at))}) %>
+                <% else %>
+                  <%= t('no_peer_review_due_date', 'due: No Due Date') %>
+                <% end %>
+              </em>
+            </div>
           </a>
           <%= render :partial => 'shared/ignore_option_list', :locals => {:type => 'reviewing', :item => assessment_request} %>
         </li>

@@ -292,7 +292,7 @@ $cell_height: 33px;
     display: block;
   }
   &.first-row {
-    top: 30px;
+    top: 35px;
     &:after {
       border-top-color: transparent;
       border-left-color: transparent;
@@ -301,6 +301,16 @@ $cell_height: 33px;
       bottom: 30px;
     }
   }
+}
+
+.total-column-tooltip {
+  width: 250px;
+  height: 60px;
+  white-space: pre-line;
+  padding-top: 5px;
+  padding-bottom: 55px;
+  margin-top: -25px;
+  margin-bottom: -50px;
 }
 
 .slick-cell.completely-hidden {

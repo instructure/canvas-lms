@@ -30,8 +30,13 @@
               <br class="clear" />
             </div>
             <div class="assignment_details" style="display:none;">
-              <table class="table table-condensed table-bordered table-hover table-striped">
-                <thead class='toolbar'>
+              <% if use_new_styles? %>
+                <table class="ic-Table ic-Table--condensed ic-Table--hover-row ic-Table--striped">
+                  <thead>
+              <% else %>
+                <table class="table table-condensed table-bordered table-hover table-striped">
+                  <thead class="toolbar">
+              <% end %>
                   <tr>
                     <th><%= t('headers.student', "Student") %></th>
                     <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<%= t('headers.before', "Before") %>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
@@ -42,7 +47,11 @@
                 <tbody>
                   <% assignment.submissions.each_with_index do |submission, i| %>
                   <tr data-assignment-id="<%= submission.assignment_id %>" data-user-id="<%= submission.user_id %>">
-                    <th scope="row"><%= submission.student_name %></th>
+                    <% if use_new_styles? %>
+                      <th scope="row" class="ic-Table--header-row"><%= submission.student_name %></th>
+                    <% else %>
+                      <th scope="row"><%= submission.student_name %></th>
+                    <% end %>
                     <td>
                       <a href="#" class="ui-corner-all revert-grade-link" >
                         <span class="ui-icon ui-icon-arrowrefresh-1-w"></span>

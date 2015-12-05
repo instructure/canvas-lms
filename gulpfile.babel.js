@@ -28,7 +28,12 @@ const STUFF_TO_REV = [
   // Include *everything* from plugins & client_apps
   // so we don't have to worry about their internals
   'public/plugins/**/*',
-  'public/javascripts/client_apps**/*'
+  'public/javascripts/client_apps**/*',
+
+  // Include *everything* webpack builds,
+  // In order to make both javascript types available during transition
+  'public/webpack-dist/*',
+  'public/webpack-dist-optimized/*'
 ]
 
 

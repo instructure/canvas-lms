@@ -8,10 +8,7 @@ Gem::Specification.new do |spec|
   spec.version       = TurnitinApi::VERSION
   spec.authors       = ["Brad Horrocks"]
   spec.email         = ["bhorrocks@instructure.com"]
-
-  spec.summary       = %q{TODO: Write a short summary, because Rubygems requires one.}
-  spec.description   = %q{TODO: Write a longer description or delete this line.}
-  spec.homepage      = "TODO: Put your gem's website or public repo URL here."
+  spec.summary       = %q{Turnitin integration at your fingertips}
   spec.license       = "MIT"
 
   spec.files         = Dir['{lib}/**/*'] + ['LICENSE.txt', 'README.md', 'Changelog.txt']

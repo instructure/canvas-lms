@@ -46,27 +46,27 @@ class ExternalFeed < ActiveRecord::Base
     true
   end
   protected :infer_defaults
-  
+
   def display_name(short=true)
     short_url = (self.url || "").split("/")[0,3].join("/")
     res = self.title || (short ? t(:short_feed_title, "%{short_url} feed", :short_url => short_url) : self.url )
-    
+
   end
 
   def header_match=(str)
     write_attribute(:header_match, str.to_s.strip.presence)
   end
-  
+
   scope :to_be_polled, ->(start) {
     where("external_feeds.consecutive_failures<5 AND external_feeds.refresh_at<?", start).order(:refresh_at)
   }
-  
+
   def add_rss_entries(rss)
     items = rss.items.map{|item| add_entry(item, rss, :rss) }.compact
     self.context.add_aggregate_entries(items, self) if self.context && self.context.respond_to?(:add_aggregate_entries)
     items
   end
-  
+
   def add_atom_entries(atom)
     items = []
     atom.each_entry{|item| items << add_entry(item, atom, :atom) }
@@ -74,7 +74,7 @@ class ExternalFeed < ActiveRecord::Base
     self.context.add_aggregate_entries(items, self) if self.context && self.context.respond_to?(:add_aggregate_entries)
     items
   end
-  
+
   def format_description(desc)
     desc = (desc || "").to_s
     if self.verbosity == 'link_only'
@@ -86,10 +86,15 @@ class ExternalFeed < ActiveRecord::Base
       desc
     end
   end
-  
+
   def add_entry(item, feed, feed_type)
     if feed_type == :rss
-      uuid = (item.respond_to?(:guid) && item.guid && item.guid.content.to_s) || Digest::MD5.hexdigest("#{item.title}#{item.date.strftime('%Y-%m-%d')}")
+      uuid = item.respond_to?(:guid) && item.guid && item.guid.content.to_s
+      if uuid && uuid.length > 255
+        uuid = Digest::MD5.hexdigest(uuid)
+      end
+      uuid ||= Digest::MD5.hexdigest("#{item.title}#{item.date.strftime('%Y-%m-%d')}")
+
       entry = self.external_feed_entries.where(uuid: uuid).first
       entry ||= self.external_feed_entries.where(url: item.link).first
       description = entry && entry.message

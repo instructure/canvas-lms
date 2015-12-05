@@ -53,7 +53,7 @@ class GradebooksController < ApplicationController
         gp_id = nil
         if multiple_grading_periods?
           set_current_grading_period
-          @grading_periods = get_active_grading_periods
+          @grading_periods = active_grading_periods
           gp_id = @current_grading_period_id unless view_all_grading_periods?
         end
 
@@ -70,12 +70,18 @@ class GradebooksController < ApplicationController
           @presenter.assignment_stats
         end
 
-        submissions_json = @presenter.submissions.map { |s|
+        display_score_to_user = ->(submission) do
+          return false if submission.assignment.quiz? && submission.pending_review?
+          submission.user_can_read_grade?(@current_user)
+        end
+
+        submissions_json = @presenter.submissions.map do |submission|
           {
-            'assignment_id' => s.assignment_id,
-            'score' => s.user_can_read_grade?(@current_user) ? s.score  : nil
+            'assignment_id' => submission.assignment_id,
+            'score' => display_score_to_user.call(submission) ? submission.score : "ungraded assignment"
           }
-        }
+        end
+
         ags_json = light_weight_ags_json(@presenter.groups, {student: @presenter.student})
         js_env submissions: submissions_json,
                assignment_groups: ags_json,
@@ -183,24 +189,22 @@ class GradebooksController < ApplicationController
     redirect_to action: :show
   end
 
-  def published_assignments?
-    context.assignments.published.where(post_to_sis: true).exists?
-  end
-
   def post_grades_tools
-    return [] unless published_assignments?
-    tools = []
     tool_limit = @context.feature_enabled?(:post_grades) ? MAX_POST_GRADES_TOOLS - 1 : MAX_POST_GRADES_TOOLS
-    external_tools[0...tool_limit].each do |tool|
-      tools.push(
-        data_url: tool[:placements][:post_grades][:canvas_launch_url],
-        name: tool[:name],
-        type: :lti
-      )
-    end
+    external_tools = self.external_tools.map { |tool| external_tool_detail(tool) }
+
+    tools = external_tools[0...tool_limit]
     tools.push(type: :post_grades) if @context.feature_enabled?(:post_grades)
     tools.push(type: :ellip) if external_tools.length > tool_limit
     tools
+  end
+
+  def external_tool_detail(tool)
+    {
+      data_url: tool[:placements][:post_grades][:canvas_launch_url],
+      name: tool[:name],
+      type: :lti
+    }
   end
 
   def external_tools
@@ -250,13 +254,25 @@ class GradebooksController < ApplicationController
     @current_grading_period_id == 0
   end
 
-  def get_active_grading_periods
-    GradingPeriod.for(@context).map do |gp|
+  def active_grading_periods
+    @active_grading_periods ||= GradingPeriod.for(@context).map do |gp|
       json = gp.as_json(only: [:id, :title, :start_date, :end_date], permissions: {user: @current_user})
       json[:grading_period][:is_last] = gp.last?
       json[:grading_period]
     end
   end
+
+  def latest_end_date_of_admin_created_grading_periods_in_the_past
+    periods = active_grading_periods.select do |period|
+      # false if current user is an admin
+      admin_created = period["permissions"]["manage"] == false
+      in_the_past = period["end_date"] <= Time.zone.now
+
+      admin_created && in_the_past
+    end
+    periods.map { |period| period["end_date"] }.compact.sort.last
+  end
+  private :latest_end_date_of_admin_created_grading_periods_in_the_past
 
   def set_js_env
     @gradebook_is_editable = @context.grants_right?(@current_user, session, :manage_grades)
@@ -273,8 +289,8 @@ class GradebooksController < ApplicationController
     js_env  :GRADEBOOK_OPTIONS => {
       :chunk_size => chunk_size,
       :assignment_groups_url => api_v1_course_assignment_groups_url(@context, :include => ag_includes, :override_assignment_dates => "false"),
-      :sections_url => api_v1_course_sections_url(@context, :include => 'passback_status'),
-      :course_url => api_v1_course_url(@context, :include => 'passback_status'),
+      :sections_url => api_v1_course_sections_url(@context),
+      :course_url => api_v1_course_url(@context),
       :students_url => api_v1_course_enrollments_url(@context, :include => [:avatar_url], :type => ['StudentEnrollment', 'StudentViewEnrollment'], :per_page => per_page),
       :students_url_with_concluded_enrollments => api_v1_course_enrollments_url(@context, :include => [:avatar_url], :type => ['StudentEnrollment', 'StudentViewEnrollment'], :state => ['active', 'invited', 'completed'], :per_page => per_page),
       :submissions_url => api_v1_course_student_submissions_url(@context, :grouped => '1'),
@@ -299,7 +315,8 @@ class GradebooksController < ApplicationController
       :speed_grader_enabled => @context.allows_speed_grader?,
       :differentiated_assignments_enabled => @context.feature_enabled?(:differentiated_assignments),
       :multiple_grading_periods_enabled => multiple_grading_periods?,
-      :active_grading_periods => get_active_grading_periods,
+      :active_grading_periods => active_grading_periods,
+      :latest_end_date_of_admin_created_grading_periods_in_the_past => latest_end_date_of_admin_created_grading_periods_in_the_past,
       :current_grading_period_id => @current_grading_period_id,
       :outcome_gradebook_enabled => @context.feature_enabled?(:outcome_gradebook),
       :custom_columns_url => api_v1_course_custom_gradebook_columns_url(@context),
@@ -315,7 +332,6 @@ class GradebooksController < ApplicationController
       :attachment => @last_exported_gradebook_csv.try(:attachment),
       :sis_app_url => Setting.get('sis_app_url', nil),
       :sis_app_token => Setting.get('sis_app_token', nil),
-      :post_grades_feature_enabled => Assignment.sis_grade_export_enabled?(@context),
       :list_students_by_sortable_name_enabled => @context.list_students_by_sortable_name?,
       :gradebook_column_size_settings => @current_user.preferences[:gradebook_column_size],
       :gradebook_column_size_settings_url => change_gradebook_column_size_course_gradebook_url,

@@ -1,8 +1,9 @@
 define [
   'jquery'
+  'Backbone'
   'jst/ExternalTools/ExternalToolView'
   'i18n!external_tools'
-], ($, template, I18n) ->
+], ($, Backbone, template, I18n) ->
 
   class ExternalToolView extends Backbone.View
 

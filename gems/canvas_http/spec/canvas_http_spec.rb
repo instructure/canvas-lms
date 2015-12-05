@@ -50,6 +50,9 @@ describe "CanvasHttp" do
       expect(http).to receive(:use_ssl=).with(true)
       expect(http).to receive(:verify_mode=).with(OpenSSL::SSL::VERIFY_NONE)
       expect(http).to receive(:request).and_yield(double(body: 'Hello SSL'))
+      expect(http).to receive(:open_timeout=).with(5)
+      expect(http).to receive(:ssl_timeout=).with(5)
+      expect(http).to receive(:read_timeout=).with(30)
 
       CanvasHttp.get("https://www.example.com/a/b").body.should == "Hello SSL"
     end

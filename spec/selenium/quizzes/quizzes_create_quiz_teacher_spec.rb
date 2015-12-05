@@ -1,10 +1,13 @@
-require File.expand_path(File.dirname(__FILE__) + '/../helpers/quizzes_common')
-require File.expand_path(File.dirname(__FILE__) + '/../helpers/assignment_overrides')
-require File.expand_path(File.dirname(__FILE__) + '/../helpers/files_common')
+require_relative "../common"
+require_relative "../helpers/quizzes_common"
+require_relative "../helpers/assignment_overrides"
+require_relative "../helpers/files_common"
 
 describe 'creating a quiz' do
+  include_context "in-process server selenium tests"
+  include QuizzesCommon
   include AssignmentOverridesSeleniumHelper
-  include_context 'in-process server selenium tests'
+  include FilesCommon
 
   context 'as a teacher' do
     before(:each) do

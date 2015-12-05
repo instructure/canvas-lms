@@ -1,4 +1,6 @@
 class FixUngradedCounts < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     update <<-SQL
       UPDATE #{Assignment.quoted_table_name} SET needs_grading_count = COALESCE((

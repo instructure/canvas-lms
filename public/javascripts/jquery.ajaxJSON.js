@@ -43,9 +43,6 @@ define([
       submit_type = "POST";
       data.authenticity_token = authenticity_token();
     }
-    if($("#page_view_id").length > 0 && !data.page_view_id && (!options || !options.skipPageViewLog)) {
-      data.page_view_id = $("#page_view_id").text();
-    }
     var ajaxError = function(xhr, textStatus, errorThrown) {
       var data = xhr;
       if(xhr.responseText) {
@@ -70,10 +67,10 @@ define([
       type: submit_type,
       success: function(data, textStatus, xhr) {
         data = data || {};
-        var page_view_id = null;
-        if(xhr && xhr.getResponseHeader && (page_view_id = xhr.getResponseHeader("X-Canvas-Page-View-Id"))) {
+        var page_view_update_url = null;
+        if(xhr && xhr.getResponseHeader && (page_view_update_url = xhr.getResponseHeader("X-Canvas-Page-View-Update-Url"))) {
           setTimeout(function() {
-            $(document).triggerHandler('page_view_id_received', page_view_id);
+            $(document).triggerHandler('page_view_update_url_received', page_view_update_url);
           }, 50);
         }
         if(!data.length && data.errors) {

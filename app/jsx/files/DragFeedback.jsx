@@ -19,7 +19,7 @@ define([
       return (
 
         <div className='DragFeedback' style={{
-          webkitTransform: `translate3d(${this.props.pageX + 6}px, ${this.props.pageY + 6}px, 0)`,
+          WebkitTransform: `translate3d(${this.props.pageX + 6}px, ${this.props.pageY + 6}px, 0)`,
           transform: `translate3d(${this.props.pageX + 6}px, ${this.props.pageY + 6}px, 0)`
         }}>
 

@@ -1,4 +1,6 @@
 class AddOldMediaIdToMediaComments < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     add_column :media_objects, :old_media_id, :string
     add_index :media_objects, [:old_media_id]

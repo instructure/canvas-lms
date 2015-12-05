@@ -11,7 +11,7 @@ define [
     ok true, 'handleSubmit called successfully'
 
   createElement = (data) ->
-    ConfigurationForm({
+    React.createElement(ConfigurationForm,{
       configurationType: data.configurationType
       handleSubmit: data.handleSubmit
       tool: data.tool
@@ -19,7 +19,7 @@ define [
     })
 
   renderComponent = (data) ->
-    React.renderComponent(createElement(data), wrapper)
+    React.render(createElement(data), wrapper)
 
   getDOMNodes = (data) ->
     component = renderComponent(data)

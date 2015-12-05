@@ -28,7 +28,7 @@
 <div class="ig-row <%= 'with-completion-requirements' if criterion%> <%= 'ig-published' if module_item && module_item.published? %>">
   <a aria-label='<%= tag && tag.title %>' role='link' tabindex="-1" class="for-nvda"
      href="<%= context_url(@context, :context_url) %>/modules/items/<%= tag ? tag.id : "{{ id }}" %>"><%= tag && tag.title %></a>
-  <div class="ig-title module-item-title ellipsis">
+  <div style="white-space: nowrap;" class="ig-title module-item-title ellipsis">
       <% if editable || module_item.nil? %>
       <span
         class="draggable-handle move_item_link"

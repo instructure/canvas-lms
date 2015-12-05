@@ -7,6 +7,12 @@ describe "MediaConverter" do
     def initialize(course={})
       @course = course
     end
+
+    def unsupported_files
+      return [{
+        file_name: File.basename("#{CGI.escape(MediaConverterTest::WEB_CONTENT_TOKEN)}/path/to/movie.mov")
+      }]
+    end
   end
 
   describe "#convert_media_paths!" do
@@ -34,13 +40,7 @@ describe "MediaConverter" do
       HTML
     end
     subject(:test_instance) do
-      MediaConverterTest.new({
-        files: [{
-          file_name: File.basename(a_href)
-        }, {
-          file_name: File.basename(img_src)
-        }]
-      })
+      MediaConverterTest.new
     end
 
     it "should update link hrefs containing WEB_CONTENT_TOKEN" do

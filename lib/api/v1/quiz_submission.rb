@@ -49,6 +49,7 @@ module Api::V1::QuizSubmission
     time_spent
     attempts_left
     overdue_and_needs_submission
+    excused?
   ].freeze
 
   def quiz_submission_json(qs, quiz, user, session, context = nil)

@@ -2,6 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../helpers/discussions_commo
 
 describe "threaded discussions" do
   include_context "in-process server selenium tests"
+  include DiscussionsCommon
 
   before(:each) do
     @topic_title = 'threaded discussion topic'

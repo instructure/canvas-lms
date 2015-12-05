@@ -1,4 +1,6 @@
 class AddLastCourseToCourseSection < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     add_column :course_sections, :last_course_id, :integer, :limit => 8
   end

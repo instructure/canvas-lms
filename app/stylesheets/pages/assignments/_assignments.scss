@@ -111,22 +111,24 @@
     margin-bottom: 0;
   }
   .assignment_dates {
-    border-collapse: collapse;
-    width: 100%;
-    margin-bottom: 1em;
-    thead{
-      background-color: transparent;
-    }
-    tr {
-      th {
-        font-weight: bold;
-        font-size: 14px;
-        padding: 0.5em;
+    @if $use_new_styles == false {
+      border-collapse: collapse;
+      width: 100%;
+      margin-bottom: 1em;
+      thead {
+        background-color: transparent;
       }
-      td {
-        border-top: 1px solid #BBB;
-        border-bottom: 1px solid #BBB;
-        padding: 0.5em;
+      tr {
+        th {
+          font-weight: bold;
+          font-size: 14px;
+          padding: 0.5em;
+        }
+        td {
+          border-top: 1px solid #BBB;
+          border-bottom: 1px solid #BBB;
+          padding: 0.5em;
+        }
       }
     }
   }

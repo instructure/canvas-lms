@@ -35,17 +35,24 @@ module CC::Exporter::Epub::Converters
       return modules unless doc
 
       doc.css('module').each do |r_node|
+        next unless get_node_val(r_node, 'workflow_state') == 'active'
         mod = {}
-        mod[:migration_id] = r_node['identifier']
+        mod[:identifier] = r_node['identifier']
         mod[:workflow_state] = get_node_val(r_node, 'workflow_state')
         mod[:title] = get_node_val(r_node, 'title')
         mod[:position] = get_int_val(r_node, 'position')
         mod[:start_at] = get_time_val(r_node, 'start_at')
         mod[:end_at] = get_time_val(r_node, 'end_at')
-        mod[:unlock_at] = get_time_val(r_node, 'unlock_at')
         mod[:require_sequential_progress] = get_bool_val(r_node, 'require_sequential_progress')
+        mod[:locked] = get_bool_val(r_node, 'locked')
+        mod[:href] = "#{mod[:identifier]}.xhtml"
+        if get_time_val(r_node, 'unlock_at').present?
+          mod[:unlock_at] = get_time_val(r_node, 'unlock_at') / 1000
+          mod[:time_lock] = mod[:unlock_at] > Time.zone.now.to_i
+        end
 
         mod[:items] = r_node.css('item').map do |item_node|
+          next unless get_node_val(item_node, 'workflow_state') == "active"
           item = {
             item_migration_id: item_node['identifier'],
             position: get_int_val(item_node, 'position'),
@@ -61,9 +68,11 @@ module CC::Exporter::Epub::Converters
                                         get_node_val(item_node, 'identifierref')
                                       end
           item[:for_syllabus] = item.value?("Assignment") || item.value?("Quizzes::Quiz")
-          item[:href] = "#{mod[:migration_id]}.xhtml##{item[:linked_resource_id]}"
+          item[:href] = "#{mod[:identifier]}.xhtml##{item[:linked_resource_id]}"
           item
         end
+
+        mod[:items].compact!
 
         mod[:completion_requirements] = []
         r_node.css('completionRequirement').each do |cr_node|

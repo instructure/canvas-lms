@@ -1,4 +1,6 @@
 class MessageCounts < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     add_column :conversation_participants, :message_count, :int, :default => 0
     update <<-SQL

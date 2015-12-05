@@ -1,5 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 
+module ContextModulesCommon
   def io
     fixture_file_upload('scribd_docs/txt.txt', 'text/plain', true)
   end
@@ -186,3 +187,4 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
     # before it adds click handlers and drag/drop
     sleep 2
   end
+end

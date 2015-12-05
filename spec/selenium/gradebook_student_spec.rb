@@ -2,6 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/gradebook2_common')
 
 describe 'Student Gradebook' do
   include_context "in-process server selenium tests"
+  include Gradebook2Common
 
   let(:assignments) do
     assignments = []

@@ -1,4 +1,4 @@
-#
+
 # Copyright (C) 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
@@ -17,6 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 
 describe DiscussionTopicsController do
   before :once do
@@ -108,6 +109,24 @@ describe DiscussionTopicsController do
         get 'index', :group_id => @group.id
         expect(response).to be_success
         expect(assigns["topics"]).not_to include(@child_topic)
+      end
+    end
+
+    context "cross-sharding" do
+      specs_require_sharding
+
+      it 'returns the topic across shards' do
+        @topic = @course.discussion_topics.create!(title: 'student topic', message: 'Hello', user: @student)
+        user_session(@student)
+        @shard1.activate do
+          get 'index', { format: :json, course_id: @course.id }
+          expect(assigns[:topics]).to include(@topic)
+        end
+
+        @shard2.activate do
+          get 'index', { format: :json, course_id: @course.id }
+          expect(assigns[:topics]).to include(@topic)
+        end
       end
     end
 

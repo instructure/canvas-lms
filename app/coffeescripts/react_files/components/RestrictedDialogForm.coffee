@@ -1,17 +1,14 @@
 define [
   'jquery'
   'react'
-  'compiled/react/shared/utils/withReactElement'
   'i18n!restrict_student_access'
   'compiled/models/Folder'
   '../modules/customPropTypes'
   '../utils/setUsageRights'
   '../utils/updateModelsUsageRights'
-  'jsx/files/DialogPreview'
-  'jsx/files/UsageRightsSelectBox'
   'jquery.instructure_date_and_time'
   'jquery.instructure_forms'
-], ($, React, withReactElement, I18n, Folder, customPropTypes, setUsageRights, updateModelsUsageRights, DialogPreview, UsageRightsSelectBox) ->
+], ($, React, I18n, Folder, customPropTypes, setUsageRights, updateModelsUsageRights) ->
 
   RestrictedDialogForm =
 

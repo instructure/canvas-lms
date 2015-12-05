@@ -16,7 +16,8 @@ define [
         editing: false
         round: (number)-> Math.round(number * 100)/100
 
-      @dataRow = React.render(DataRow(props), $('<table>').appendTo('#fixtures')[0])
+      DataRowElement = React.createElement(DataRow, props)
+      @dataRow = React.render(DataRowElement, $('<table>').appendTo('#fixtures')[0])
 
     teardown: ->
       React.unmountComponentAtNode(@dataRow.getDOMNode().parentNode)
@@ -49,7 +50,8 @@ define [
         onRowNameChange: ->
         onDeleteRow: ->
 
-      @dataRow = React.renderComponent(DataRow(props), $('<table>').appendTo('#fixtures')[0])
+      DataRowElement = React.createElement(DataRow, props)
+      @dataRow = React.render(DataRowElement, $('<table>').appendTo('#fixtures')[0])
 
     teardown: ->
       React.unmountComponentAtNode(@dataRow.getDOMNode().parentNode)
@@ -125,7 +127,8 @@ define [
         editing: false
         round: (number)-> Math.round(number * 100)/100
 
-      @dataRow = React.renderComponent(DataRow(props), $('<table>').appendTo('#fixtures')[0])
+      DataRowElement = React.createElement(DataRow, props)
+      @dataRow = React.render(DataRowElement, $('<table>').appendTo('#fixtures')[0])
 
     teardown: ->
       React.unmountComponentAtNode(@dataRow.getDOMNode().parentNode)

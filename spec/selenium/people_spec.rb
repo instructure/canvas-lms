@@ -130,6 +130,18 @@ describe "people" do
       open_dropdown_menu(option: 'removeFromCourse', selector: '.rosterUser:nth-child(3)')
     end
 
+    it "should remove a student with/without SIS id from a course", priority: "1", test_id: 332576 do
+      enroll_student(@student_2)
+      @student = user
+      @course.enroll_student(@student).update_attribute(:sis_source_id, 'E001')
+      @course.save
+      get "/courses/#{@course.id}/users"
+      # check 1st student
+      open_dropdown_menu(option: 'removeFromCourse', selector: '.rosterUser:nth-child(2)')
+      # check 2nd student
+      open_dropdown_menu(option: 'removeFromCourse', selector: '.rosterUser:nth-child(3)')
+    end
+
     it "should display the option to remove a ta from the course" do
       open_dropdown_menu(option: 'removeFromCourse', selector: '.rosterUser:nth-child(3)')
     end

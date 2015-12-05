@@ -3,13 +3,13 @@
     <span
        class="element_toggler"
        aria-controls="{{id}}-details"
-       aria-expanded="false"
+       aria-expanded="{{#if isExpanded}}true{{else}}false{{/if}}"
        role="button"
        tabindex="0">
        <span class="screenreader-only">
          {{#t "toggle_feature_details_screenreader_info"}}Toggle feature details for {{title}} {{/t}}
        </span>
-       <i class="icon-mini-arrow-right"></i>
+       <i class="icon-mini-arrow-{{#if isExpanded}}down{{else}}right{{/if}}"></i>
     </span>
     <span class="feature-title">{{title}}</span>
 
@@ -73,7 +73,7 @@
   </div>
 </div>
 
-<div class="feature-details row-fluid" id="{{id}}-details">
+<div class="feature-details row-fluid" id="{{id}}-details" style="display: {{#if isExpanded}}block{{else}}none{{/if}}">
   <div class="span10">
     <p tabindex="0" class="feature-description">
       {{#if releaseOn}}

@@ -441,16 +441,19 @@ class UsersController < ApplicationController
 
         if api_request?
           search_term = params[:search_term].presence
-
+          page_opts = {}
           if search_term
             users = UserSearch.for_user_in_context(search_term, @context, @current_user, session)
+            page_opts[:total_entries] = nil # doesn't calculate a total count
           else
             users = UserSearch.scope_for(@context, @current_user)
           end
 
-          users = Api.paginate(users, self, api_v1_account_users_url)
-          user_json_preloads(users)
-          return render :json => users.map { |u| user_json(u, @current_user, session) }
+          includes = (params[:include] || []) & %w{avatar_url email last_login}
+          users = users.with_last_login if includes.include?('last_login')
+          users = Api.paginate(users, self, api_v1_account_users_url, page_opts)
+          user_json_preloads(users, includes.include?('email'))
+          return render :json => users.map { |u| user_json(u, @current_user, session, includes)}
         else
           @users ||= []
           @users = @users.paginate(:page => params[:page])
@@ -864,6 +867,28 @@ class UsersController < ApplicationController
     end
   end
 
+  # @API List Missing Submissions
+  # returns past-due assignments for which the student does not have a submission.
+  # The user sending the request must either be an admin or a parent observer using the parent app
+  #
+  # @argument user_id
+  #   the student's ID
+  #
+  # @returns [Assignment]
+  def missing_submissions
+    user = api_find(User, params[:user_id])
+    return render_unauthorized_action unless @current_user && user.grants_right?(@current_user, :read)
+
+    assignments = []
+    Shackles.activate(:slave) do
+      preloaded_submitted_assignment_ids = user.submissions.pluck(:assignment_id)
+      assignments = user.assignments_needing_submitting due_before: Time.zone.now
+      assignments.reject {|as| preloaded_submitted_assignment_ids.include? as.id }
+    end
+
+    render json: assignments.map {|as| assignment_json(as, user, session) }
+  end
+
   def ignore_item
     unless %w[grading submitting reviewing moderation].include?(params[:purpose])
       return render(:json => { :ignored => false }, :status => 400)
@@ -997,7 +1022,7 @@ class UsersController < ApplicationController
     get_context
     @context_account = @context.is_a?(Account) ? @context : @domain_root_account
     @user = params[:id] && params[:id] != 'self' ? User.find(params[:id]) : @current_user
-    if authorized_action(@user, @current_user, :view_statistics)
+    if authorized_action(@user, @current_user, :read_full_profile)
       add_crumb(t('crumbs.profile', "%{user}'s profile", :user => @user.short_name), @user == @current_user ? user_profile_path(@current_user) : user_path(@user) )
 
       @group_memberships = @user.current_group_memberships

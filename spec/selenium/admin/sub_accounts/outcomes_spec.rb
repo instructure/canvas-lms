@@ -3,13 +3,14 @@ require File.expand_path(File.dirname(__FILE__) + '/../../helpers/outcome_common
 
 describe "sub account outcomes" do
   include_context "in-process server selenium tests"
+  include OutcomeCommon
 
     describe "account outcome specs" do
       let(:account) { Account.create(:name => 'sub account from default account', :parent_account => Account.default) }
       let(:outcome_url) { "/accounts/#{account.id}/outcomes" }
       let(:who_to_login) { 'admin' }
 
-      before (:each) do
+      before(:each) do
         course_with_admin_logged_in
       end
 

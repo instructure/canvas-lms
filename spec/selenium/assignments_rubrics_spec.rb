@@ -3,6 +3,7 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/rubrics_common')
 
 describe "assignment rubrics" do
   include_context "in-process server selenium tests"
+  include RubricsCommon
 
   context "assignment rubrics as a teacher" do
     before(:each) do

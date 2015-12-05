@@ -10,6 +10,7 @@ define([
     POINTS_COLUMN_ID: 'points',
     GPA_SCALE_COLUMN_ID: 'gpa_scale',
     TOTAL_COLUMN_ID: 'total',
+    CUSTOM_COLUMN_ID: 'custom',
     ASSIGNMENT_GROUP_COLUMN_ID: 'assignment_group',
     MOUNT_ELEMENT: document.getElementById('gradebook-grid-wrapper'),
     DEFAULT_LAYOUTS: {
@@ -34,7 +35,6 @@ define([
       hideStudentNames: false,
       hideNotesColumn: true,
       treatUngradedAsZero: false,
-      showAttendanceColumns: false,
       totalColumnInFront: false,
       arrangeColumnsBy: 'assignment_group',
       warnedAboutTotalsDisplay: false,
@@ -44,6 +44,8 @@ define([
     OVERRIDE_DATES: ['all_day_date', 'due_at', 'lock_at', 'unlock_at'],
     PAGINATION_COUNT: 50,
     MAX_NOTE_LENGTH: 255,
+    // keyboard codes: tab, enter, left arrow, up arrow, right arrow, down arrow
+    RECOGNIZED_KEYBOARD_CODES: [9,13,37,38,39,40],
     refresh: function() {
       // For testing
       _.extend(this, ENV.GRADEBOOK_OPTIONS);

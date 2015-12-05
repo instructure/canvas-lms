@@ -52,7 +52,7 @@ define([
       gradeFormatter = new GradeFormatter(assignmentGroupScore.score, assignmentGroupScore.possible, false);
 
       return (
-        <div title={this.formatTitle(assignmentGroupScore)} ref='cell'>
+        <div className='assignment-group-grade' title={this.formatTitle(assignmentGroupScore)} ref='cell'>
           { gradeFormatter.toString() }
         </div>
       );

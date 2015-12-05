@@ -4,6 +4,7 @@ require 'nokogiri'
 
 describe "discussions" do
   include_context "in-process server selenium tests"
+  include DiscussionsCommon
 
   let(:course) { course_model.tap{|course| course.offer!} }
   let(:student) { student_in_course(course: course, name: 'student', active_all: true).user }
@@ -165,10 +166,10 @@ describe "discussions" do
         end
 
         it "should collapse and expand reply", priority: "1", test_id: 150486 do
-          f('.entry-content .entry-header').click
+          f('.entry-content .entry-header .collapse-discussion').click
           wait_for_ajaximations
           expect(fj("#entry-#{@entry1.id} .discussion-entry-reply-area .discussion-reply-action:visible")).to be_nil
-          f('.entry-content .entry-header').click
+          f('.entry-content .entry-header .collapse-discussion').click
           wait_for_ajaximations
           expect(fj("#entry-#{@entry1.id} .discussion-entry-reply-area .discussion-reply-action:visible")).to be_present
         end

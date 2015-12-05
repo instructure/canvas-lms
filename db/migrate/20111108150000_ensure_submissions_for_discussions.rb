@@ -1,4 +1,6 @@
 class EnsureSubmissionsForDiscussions < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     # entries from graded topics where the poster is enrolled as a student in
     # the topic's assignment's course and there's no current submission for the

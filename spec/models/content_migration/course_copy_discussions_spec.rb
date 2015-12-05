@@ -77,6 +77,56 @@ describe ContentMigration do
       expect(to_ann.workflow_state).to eq "post_delayed"
       expect(to_ann.delayed_post_at.to_i).to eq from_time.to_i
       expect(to_ann.lock_at.to_i).to eq until_time.to_i
+
+      Timecop.freeze(2.hours.from_now) do
+        run_jobs
+        to_ann.reload
+        expect(to_ann.workflow_state).to eq 'active'
+      end
+
+      Timecop.freeze(26.hours.from_now) do
+        run_jobs
+        to_ann.reload
+        expect(to_ann.locked).to be_truthy
+      end
+    end
+
+    it "should properly copy selected delayed announcements even if they've already posted and locked" do
+      from_ann = @copy_from.announcements.create!(:message => "goodbye", :title => "goodbye announcement", delayed_post_at: 5.days.ago, lock_at: 2.days.ago )
+      from_ann.save!
+      run_jobs
+      from_ann.reload
+
+      expect(from_ann.workflow_state).to eq "active"
+      expect(from_ann.locked).to be_truthy
+
+      @cm.copy_options = {
+        :everything => true,
+        :shift_dates => true,
+        :old_start_date => 7.days.ago.to_s,
+        :old_end_date => Time.now.to_s,
+        :new_start_date => Time.now.to_s,
+        :new_end_date => 7.days.from_now.to_s
+      }
+      @cm.save!
+
+      run_course_copy
+
+      to_ann = @copy_to.announcements.where(migration_id: mig_id(from_ann)).first
+      expect(to_ann.workflow_state).to eq "post_delayed"
+      expect(to_ann.locked).to be_falsey
+
+      Timecop.freeze(3.days.from_now) do
+        run_jobs
+        to_ann.reload
+        expect(to_ann.workflow_state).to eq 'active'
+      end
+
+      Timecop.freeze(6.days.from_now) do
+        run_jobs
+        to_ann.reload
+        expect(to_ann.locked).to be_truthy
+      end
     end
 
     it "should not copy announcements if not selected" do

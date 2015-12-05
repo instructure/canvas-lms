@@ -33,8 +33,8 @@ define ['compiled/models/progressable', 'Backbone'], (progressable, {Model}) ->
     model.progressModel.on 'complete', spy
     model.on 'progressResolved', spy
     model.set progress_url: progressUrl
-    server.respond()
-    server.respond()
+    server.respond() # respond to progress, which queues model fetch
+    server.respond() # respond to model fetch
     ok spy.calledTwice, 'complete and progressResolved handlers called'
     equal model.progressModel.get('workflow_state'), 'completed'
     equal model.get('csv'), 'one,two,three'
@@ -44,9 +44,8 @@ define ['compiled/models/progressable', 'Backbone'], (progressable, {Model}) ->
     model.progressModel.on 'complete', spy
     model.on 'progressResolved', spy
     model.progressModel.set url: progressUrl, workflow_state: 'queued'
-    server.respond()
+    server.respond() # respond to progress, which queues model fetch
+    server.respond() # respond to model fetch
     ok spy.calledTwice, 'complete and progressResolved handlers called'
-    server.respond()
-    server.respond()
     equal model.progressModel.get('workflow_state'), 'completed'
     equal model.get('csv'), 'one,two,three'

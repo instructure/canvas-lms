@@ -1,4 +1,6 @@
 class MessageMigration < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     add_index :conversation_message_participants, [:conversation_participant_id, :conversation_message_id], :name => :index_cmp_on_cpi_and_cmi
     add_index :inbox_items, [:asset_type, :asset_id]

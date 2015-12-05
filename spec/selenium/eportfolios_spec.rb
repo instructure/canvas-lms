@@ -3,8 +3,9 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/eportfolios_common')
 
 describe "eportfolios" do
   include_context "in-process server selenium tests"
+  include EportfoliosCommon
 
-  before (:each) do
+  before(:each) do
     course_with_student_logged_in
   end
 

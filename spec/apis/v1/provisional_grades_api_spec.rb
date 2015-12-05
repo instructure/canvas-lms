@@ -161,12 +161,6 @@ describe 'Provisional Grades API', type: :request do
                   :format => 'json', :course_id => @course.to_param, :assignment_id => @assignment.to_param }
     end
 
-    it "requires moderated grading" do
-      @assignment.update_attribute :moderated_grading, true
-      json = api_call_as_user(@teacher, :post, @path, @params, {}, {}, { :expected_status => 400 })
-      expect(json['message']).to eq 'Assignment does not use moderated grading'
-    end
-
     it "requires a moderated assignment" do
       @course.enable_feature! :moderated_grading
       json = api_call_as_user(@teacher, :post, @path, @params, {}, {}, { :expected_status => 400 })

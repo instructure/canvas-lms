@@ -1,4 +1,6 @@
 class RemoveExtraneousConversationTags < ActiveRecord::Migration
+  tag :postdeploy
+
   def self.up
     DataFixup::RemoveExtraneousConversationTags.send_later_if_production(:run)
 

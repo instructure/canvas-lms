@@ -248,6 +248,7 @@ class ConversationsController < ApplicationController
       hash = {
         :ATTACHMENTS_FOLDER_ID => @current_user.conversation_attachments_folder.id,
         :ACCOUNT_CONTEXT_CODE => "account_#{@domain_root_account.id}",
+        :CAN_MESSAGE_ACCOUNT_CONTEXT => valid_account_context?(@domain_root_account),
         :MAX_GROUP_CONVERSATION_SIZE => Conversation.max_group_conversation_size
       }
 
@@ -633,7 +634,7 @@ class ConversationsController < ApplicationController
   #       -X DELETE \
   #       -H 'Authorization: Bearer <token>'
   def delete_for_all
-    return unless authorized_action(Account.site_admin, @current_user, :become_user)
+    return unless authorized_action(Account.site_admin, @current_user, :manage_students)
 
     Conversation.find(params[:id]).delete_for_all
 

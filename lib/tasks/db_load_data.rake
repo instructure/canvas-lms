@@ -98,6 +98,12 @@ namespace :db do
   task :create_default_accounts => :environment do
     Account.default(true)
     Account.site_admin(true)
+
+    # This happens by default for all root accounts, but currently happens too
+    # early in the migration run (in GrandfatherDefaultAccountInvitationPreviews)
+    # to take effect.
+    Account.default.enable_canvas_authentication
+    Account.site_admin.enable_canvas_authentication
   end
 
   desc "Create an administrator user"
@@ -228,7 +234,9 @@ namespace :db do
   end # Task: load_initial_data
 
   desc "Useful initial setup task"
-  task :initial_setup => [:generate_security_key, :migrate] do
+  task :initial_setup => [:generate_security_key] do
+    Rake::Task['db:migrate:predeploy'].invoke
+    Rake::Task['db:migrate'].invoke
     load 'app/models/pseudonym.rb'
     ActiveRecord::Base.connection.schema_cache.clear!
     ActiveRecord::Base.all_models.reject{ |m| m == Shard }.each(&:reset_column_information)

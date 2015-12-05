@@ -290,4 +290,67 @@ describe "course settings" do
     end
     expect(f(".course_form button[type='submit']")).to be_nil
   end
+
+  context "link validator" do
+    it "should validate all the links" do
+      CourseLinkValidator.any_instance.stubs(:reachable_url?).returns(false).once # don't actually ping the links for the specs
+
+      course_with_teacher_logged_in
+      attachment_model
+
+      bad_url = "http://www.notarealsitebutitdoesntmattercauseimstubbingitanwyay.com"
+      bad_url2 = "/courses/#{@course.id}/file_contents/baaaad"
+      html = %{
+      <a href="#{bad_url}">Bad absolute link</a>
+      <img src="#{bad_url2}">Bad file link</a>
+      <img src="/courses/#{@course.id}/file_contents/#{CGI.escape(@attachment.full_display_path)}">Ok file link</a>
+      <a href="/courses/#{@course.id}/quizzes">Ok other link</a>
+    }
+
+      @course.syllabus_body = html
+      @course.save!
+
+      bank = @course.assessment_question_banks.create!(:title => 'bank')
+      aq = bank.assessment_questions.create!(:question_data => {'question_name' => 'test question',
+        'question_text' => html, 'answers' => [{'id' => 1}, {'id' => 2}]})
+
+      assmnt = @course.assignments.create!(:title => 'assignment', :description => html)
+      event = @course.calendar_events.create!(:title => "event", :description => html)
+      topic = @course.discussion_topics.create!(:title => "discussion title", :message => html)
+      mod = @course.context_modules.create!(:name => "some module")
+      tag = mod.add_item(:type => 'external_url', :url => bad_url, :title => 'pls view')
+      page = @course.wiki.wiki_pages.create!(:title => "wiki", :body => html)
+      quiz = @course.quizzes.create!(:title => 'quiz1', :description => html)
+
+      qq = quiz.quiz_questions.create!(:question_data => aq.question_data.merge('question_name' => 'other test question'))
+
+      get "/courses/#{@course.id}/settings"
+
+      expect_new_page_load{ f(".validator_link").click }
+
+      f('#link_validator_wrapper button').click
+      wait_for_ajaximations
+      run_jobs
+
+      keep_trying_until do
+        wait_for_ajaximations
+        expect(f("#all-results")).to be_displayed
+      end
+
+      expect(f("#all-results .alert")).to include_text("Found 17 broken links")
+
+      result_links = ff("#all-results .result a")
+      expect(result_links.map{|link| link.text.strip}).to match_array([
+        'Course Syllabus',
+        aq.question_data[:question_name],
+        qq.question_data[:question_name],
+        assmnt.title,
+        event.title,
+        topic.title,
+        tag.title,
+        quiz.title,
+        page.title
+      ])
+    end
+  end
 end

@@ -1,4 +1,6 @@
 class AddMigrationIdsForCcImporting < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     add_column :context_external_tools, :migration_id, :string
     add_column :external_feeds, :migration_id, :string

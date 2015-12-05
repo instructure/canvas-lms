@@ -24,7 +24,7 @@ define([
 
     renderViewGrade() {
       return (
-        <div ref="grade">
+        <div className="grade" ref="grade">
           {this.getDisplayGrade().replace("%", "")}
         </div>
       );

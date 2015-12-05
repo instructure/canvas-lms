@@ -62,6 +62,12 @@ See `app/jsx/examples/ReactModalExample.jsx` for complete example usage.
   background: rgba($ic-color-dark, 0.75);
   z-index: 150;
   opacity: 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
 
   &.ReactModal__Overlay--after-open {
     opacity: 1;
@@ -75,6 +81,18 @@ See `app/jsx/examples/ReactModalExample.jsx` for complete example usage.
 }
 
 .ReactModal__Content {
+
+  // Because of changes in the way react-modal works, we need to put all the
+  // default styles here.
+  position: absolute;
+  overflow: auto;
+  border-radius: 4px;
+  outline: none;
+  padding: 20px;
+  top: 40px;
+  left: 40px;
+  right: 40px;
+  bottom: 40px;
 
   // To accomodate different kinds of modals, styles for
   // the regular Canvas modal have been scoped under the

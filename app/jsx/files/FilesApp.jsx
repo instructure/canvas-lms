@@ -8,7 +8,7 @@ define([
   'jsx/files/Breadcrumbs',
   'jsx/files/FolderTree',
   'jsx/files/FilesUsage',
-  'compiled/react_files/components/Toolbar'
+  'jsx/files/Toolbar'
 ], function (React, ReactRouter, ReactModal, FilesApp, filesEnv, I18n, Breadcrumbs, FolderTree, FilesUsage, Toolbar) {
 
   var RouteHandler = ReactRouter.RouteHandler;
@@ -42,7 +42,7 @@ define([
             {I18n.t('Files')}
           </h1>
         </header>
-        {ENV.use_new_styles && contextType === 'courses' && (
+        {ENV.use_new_styles && (
           <div className='ic-app-nav-toggle-and-crumbs ic-app-nav-toggle-and-crumbs--files'>
             <button
               className='Button Button--link Button--small ic-app-course-nav-toggle'
@@ -62,7 +62,7 @@ define([
           </div>
         )}
 
-        {(!ENV.use_new_styles || contextType !== 'courses') && (
+        {(!ENV.use_new_styles) && (
           <Breadcrumbs
             rootTillCurrentFolder={this.state.rootTillCurrentFolder}
             showingSearchResults={this.state.showingSearchResults}
@@ -73,6 +73,7 @@ define([
           query={this.getQuery()}
           selectedItems={this.state.selectedItems}
           clearSelectedItems={this.clearSelectedItems}
+          onMove={this.onMove}
           contextType={contextType}
           contextId={contextId}
           userCanManageFilesForContext={userCanManageFilesForContext}
@@ -126,6 +127,7 @@ define([
               usageRightsRequiredForContext={usageRightsRequiredForContext}
               externalToolsForContext={externalToolsForContext}
               previewItem={this.previewItem}
+              onMove={this.onMove}
               modalOptions={{
                 openModal: this.openModal,
                 closeModal: this.closeModal

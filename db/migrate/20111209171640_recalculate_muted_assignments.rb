@@ -1,4 +1,6 @@
 class RecalculateMutedAssignments < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     
     course_ids = Assignment.where(:muted => true, :context_type => 'Course').select(:context_id).uniq.map(&:context_id)

@@ -88,18 +88,18 @@ define([
   };
 
   UsageRightsDialog.renderDifferentRightsMessage = function () {
-    return (
-      <span ref='differentRightsMessage' className='UsageRightsDialog__differentRightsMessage alert'>
-        <i className='icon-warning UsageRightsDialog__warning' />
-        {I18n.t('Items selected have different usage rights.')}
-      </span>
-    );
+    if ((this.copyright == null || this.use_justification === 'choose') &&
+        this.props.itemsToManage.length > 1) {
+      return (
+        <span ref='differentRightsMessage' className='UsageRightsDialog__differentRightsMessage alert'>
+          <i className='icon-warning UsageRightsDialog__warning' />
+          {I18n.t('Items selected have different usage rights.')}
+        </span>
+      );
+    }
   };
 
   UsageRightsDialog.render = function () {
-    var renderDifferentRightsMessage = ((this.copyright == '' || this.usageRight == 'choose') && this.props.itemsToManage.length > 1 && this.copyright != "undefined") ?
-                                         this.renderDifferentRightsMessage() : null;
-
     return (
       <div className='ReactModal__Layout'>
         <div className='ReactModal__Header'>
@@ -132,13 +132,13 @@ define([
                   </DialogPreview>
                 </div>
                 <div className='UsageRightsDialog__contentColumn off-xs-1 col-xs-8'>
-                  {renderDifferentRightsMessage}
+                  {this.renderDifferentRightsMessage()}
                   {this.renderFileName()}
                   {this.renderFolderMessage()}
                   <UsageRightsSelectBox
                     ref='usageSelection'
                     use_justification={this.use_justification}
-                    copyright={this.copyright}
+                    copyright={this.copyright || ''}
                     cc_value={this.cc_value}
                   >
                   </UsageRightsSelectBox>

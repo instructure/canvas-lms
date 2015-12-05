@@ -178,7 +178,7 @@ define [
       @recipientView.on('changeToken', @recipientIdsChanged)
       @recipientView.on('recipientTotalChange', @recipientTotalChanged)
 
-      unless _.include(ENV.current_user_roles, 'admin')
+      unless ENV.CONVERSATIONS.CAN_MESSAGE_ACCOUNT_CONTEXT
         @$messageCourse.attr('aria-required', true)
         @recipientView.disable(true)
 

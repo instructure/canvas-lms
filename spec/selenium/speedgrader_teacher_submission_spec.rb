@@ -2,8 +2,9 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/speed_grader_common'
 
 describe "speed grader submissions" do
   include_context "in-process server selenium tests"
+  include SpeedGraderCommon
 
-  before (:each) do
+  before(:each) do
     stub_kaltura
 
     course_with_teacher_logged_in

@@ -45,7 +45,10 @@ class InfoController < ApplicationController
 
     respond_to do |format|
       format.html { render :text => 'canvas ok' }
-      format.json { render :json => { :status => 'canvas ok', :revision => Canvas.revision } }
+      format.json { render json:
+                               { status: 'canvas ok',
+                                 revision: Canvas.revision,
+                                 installation_uuid: Canvas.installation_uuid } }
     end
   end
 

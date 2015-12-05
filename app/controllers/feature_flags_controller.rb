@@ -67,6 +67,11 @@
 #           "example": true,
 #           "type": "boolean"
 #         },
+#         "autoexpand": {
+#           "description": "Whether the details of the feature are autoexpanded on page load vs. the user clicking to expand.",
+#            "example": true,
+#            "type": "boolean"
+#          },
 #         "development": {
 #           "description": "Whether the feature is in active development. Features in this state are only visible in test and beta instances and are not yet available for production use.",
 #           "example": false,

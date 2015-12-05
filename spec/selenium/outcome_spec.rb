@@ -2,11 +2,13 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/outcome_common')
 
 describe "outcomes" do
   include_context "in-process server selenium tests"
+  include OutcomeCommon
+
   let(:who_to_login) { 'teacher' }
   let(:outcome_url) { "/courses/#{@course.id}/outcomes" }
 
   describe "course outcomes" do
-    before (:each) do
+    before(:each) do
       course_with_teacher_logged_in
     end
 

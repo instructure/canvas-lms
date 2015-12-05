@@ -1,11 +1,13 @@
-require File.expand_path(File.dirname(__FILE__) + '/helpers/quizzes_common')
-require File.expand_path(File.dirname(__FILE__) + '/helpers/assignment_overrides.rb')
-require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
+require_relative "common"
+require_relative "helpers/quizzes_common"
+require_relative "helpers/assignment_overrides"
+require_relative "helpers/files_common"
 
 describe "quizzes" do
-
+  include_context "in-process server selenium tests"
+  include QuizzesCommon
   include AssignmentOverridesSeleniumHelper
-  include_context 'in-process server selenium tests'
+  include FilesCommon
 
   def add_question_to_group
     f('.add_question_link').click
@@ -123,6 +125,83 @@ describe "quizzes" do
       pick_count.call('1000') # 1001 total, bad
       dismiss_alert
       expect(pick_count_field).to have_attribute(:value, "999")
+    end
+
+    describe "insufficient count warnings" do
+      it "should show a warning for groups picking too many questions" do
+        get "/courses/#{@course.id}/quizzes/new"
+        click_questions_tab
+        f('.add_question_group_link').click
+        submit_form('.quiz_group_form')
+        wait_for_ajaximations
+
+        expect(f(".insufficient_count_warning")).to be_displayed
+
+        add_question_to_group
+        wait_for_ajaximations
+
+        expect(f(".insufficient_count_warning")).to_not be_displayed
+
+        f('#questions .edit_group_link').click
+        replace_content(f('#questions .group_top input[name="quiz_group[pick_count]"]'), '2')
+        submit_form('.quiz_group_form')
+        wait_for_ajaximations
+        expect(f(".insufficient_count_warning")).to be_displayed
+
+        # save and reload
+        expect_new_page_load{ f('.save_quiz_button').click }
+        quiz = @course.quizzes.last
+        get "/courses/#{@course.id}/quizzes/#{quiz.id}/edit"
+
+        click_questions_tab
+        wait_for_ajaximations
+
+        expect(f(".insufficient_count_warning")).to be_displayed
+
+        add_question_to_group
+        wait_for_ajaximations
+
+        expect(f(".insufficient_count_warning")).to_not be_displayed
+      end
+
+      it "should show a warning for groups picking too many questions from a bank" do
+        bank = @course.assessment_question_banks.create!
+        assessment_question_model(bank: bank)
+
+        get "/courses/#{@course.id}/quizzes/new"
+        click_questions_tab
+        f('.add_question_group_link').click
+
+        f('.find_bank_link').click
+        keep_trying_until { fj('#find_bank_dialog .bank:visible') }.click
+        submit_dialog('#find_bank_dialog', '.submit_button')
+        submit_form('.quiz_group_form')
+        wait_for_ajaximations
+
+        expect(f(".insufficient_count_warning")).to_not be_displayed
+
+        f('#questions .edit_group_link').click
+        replace_content(f('#questions .group_top input[name="quiz_group[pick_count]"]'), '2')
+        submit_form('.quiz_group_form')
+        wait_for_ajaximations
+        expect(f(".insufficient_count_warning")).to be_displayed
+
+        # save and reload
+        expect_new_page_load{ f('.save_quiz_button').click }
+        quiz = @course.quizzes.last
+        get "/courses/#{@course.id}/quizzes/#{quiz.id}/edit"
+
+        click_questions_tab
+        wait_for_ajaximations
+
+        expect(f(".insufficient_count_warning")).to be_displayed
+
+        f('#questions .edit_group_link').click
+        replace_content(f('#questions .group_top input[name="quiz_group[pick_count]"]'), '1')
+        submit_form('.quiz_group_form')
+        wait_for_ajaximations
+        expect(f(".insufficient_count_warning")).to_not be_displayed
+      end
     end
 
     describe "moderation" do
@@ -446,7 +525,7 @@ describe "quizzes" do
       expect(f('#right-side')).to include_text('Quiz Statistics')
     end
 
-    it "should not increment badge counts when taking a quiz as a teacher" do
+    it "should not increment badge counts when taking a quiz as a teacher", priority: "2", test_id: 474290 do
       @quiz = quiz_model({ course: @course, time_limit: 5 })
       @quiz.quiz_questions.create!(question_data: multiple_choice_question_data)
       @quiz.generate_quiz_data

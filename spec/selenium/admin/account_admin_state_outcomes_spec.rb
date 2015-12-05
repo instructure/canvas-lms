@@ -5,6 +5,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../helpers/outcome_common')
 
 describe "account admin outcomes" do
   include_examples "in-process server selenium tests"
+  include OutcomeCommon
+
   let(:outcome_url) { "/accounts/#{Account.default.id}/outcomes" }
   let(:who_to_login) { 'admin' }
   let(:account) { Account.default }

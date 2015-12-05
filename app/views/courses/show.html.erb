@@ -14,7 +14,7 @@
   <div id="course_show_secondary">
     <% @can_manage = can_do(@context, @current_user, :manage) %>
     <% @can_create_announcements = @context.announcements.scoped.new.grants_right?(@current_user, session, :create) %>
-    <% if @can_manage && can_do(@context, @current_user, :change_course_state) && (@context.unpublished? || @context.unpublishable?) %>
+    <% if can_do(@context, @current_user, :change_course_state) && (@context.unpublished? || @context.unpublishable?) %>
       <div id="course_status" <% unless use_new_styles? %>class="text-center"<% end %>>
         <h3>
           <%= t('headers.course_status', %{Course Status}) %>
@@ -65,6 +65,7 @@
         <% end %>
 
         <% if @can_manage %>
+          <% set_js_course_wizard_data %>
           <% js_bundle :course_wizard %>
           <% css_bundle :course_wizard %>
           <a href="#" class="btn button-sidebar-wide wizard_popup_link  <%= 'auto_open' if @context.created? || @context.claimed? %>">

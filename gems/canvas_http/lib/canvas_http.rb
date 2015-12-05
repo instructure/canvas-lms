@@ -68,7 +68,21 @@ module CanvasHttp
   def self.connection_for_uri(uri)
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = (uri.scheme == 'https')
+    http.ssl_timeout = http.open_timeout = open_timeout
+    http.read_timeout = read_timeout
     return http
+  end
+
+  def self.open_timeout
+    @open_timeout.respond_to?(:call) ? @open_timeout.call : @open_timeout || 5
+  end
+
+  def self.read_timeout
+    @read_timeout.respond_to?(:call) ? @read_timeout.call : @read_timeout || 30
+  end
+
+  class << self
+    attr_writer :open_timeout, :read_timeout
   end
 
   # returns a tempfile with a filename based on the uri (same extension, if

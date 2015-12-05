@@ -23,7 +23,7 @@ define [
           }
         }
 
-      @moderationApp = TestUtils.renderIntoDocument(ModerationApp(store: @store))
+      @moderationApp = TestUtils.renderIntoDocument(React.createElement(ModerationApp, store: @store))
 
 
     teardown: ->

@@ -517,8 +517,10 @@ class CalendarEvent < ActiveRecord::Base
     end
   end
 
-  def to_ics(in_own_calendar=true, preloaded_attachments={})
-    return CalendarEvent::IcalEvent.new(self).to_ics(in_own_calendar, preloaded_attachments)
+  def to_ics(in_own_calendar: true, preloaded_attachments: {}, user: nil)
+    CalendarEvent::IcalEvent.new(self).to_ics(in_own_calendar:       in_own_calendar,
+                                              preloaded_attachments: preloaded_attachments,
+                                              include_description:   true)
   end
 
   def self.max_visible_calendars
@@ -568,7 +570,7 @@ class CalendarEvent < ActiveRecord::Base
     def location
     end
 
-    def to_ics(in_own_calendar, preloaded_attachments={})
+    def to_ics(in_own_calendar:, preloaded_attachments: {}, include_description: false)
       cal = Icalendar::Calendar.new
       # to appease Outlook
       cal.custom_property("METHOD","PUBLISH")
@@ -598,7 +600,7 @@ class CalendarEvent < ActiveRecord::Base
 
       event.summary = @event.title
 
-      if @event.is_a?(CalendarEvent) && @event.description
+      if @event.description && include_description
         html = api_user_content(@event.description, @event.context, nil, preloaded_attachments)
         event.description html_to_text(html)
         event.x_alt_desc(html, { 'FMTTYPE' => 'text/html' })

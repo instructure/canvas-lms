@@ -1,4 +1,6 @@
 class FixEnrollmentRootAccountId < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     case adapter_name
     when "PostgreSQL"

@@ -19,12 +19,17 @@ describe "Exportable" do
   end
 
   context "#convert_to_epub" do
+
+    before do
+      @epub_export = ExportableTest.new.convert_to_epub
+    end
+
     let(:epub_path) do
-      ExportableTest.new.convert_to_epub.first
+      @epub_export.first
     end
 
     let(:zip_path) do
-      ExportableTest.new.convert_to_epub.last
+      @epub_export.last
     end
 
     let(:epub) do

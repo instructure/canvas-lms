@@ -10,9 +10,6 @@ define([
   'compiled/jquery.rails_flash_notifications'
 ], (_ ,React, DueDateRow, DueDateAddRowButton, OverrideStudentStore, TokenActions, I18n, $) => {
 
-  var DueDateRow = React.createFactory(DueDateRow)
-  var DueDateAddRowButton = React.createFactory(DueDateAddRowButton)
-
   var DueDates = React.createClass({
 
     propTypes: {

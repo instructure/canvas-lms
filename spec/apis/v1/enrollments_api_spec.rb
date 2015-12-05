@@ -52,7 +52,7 @@ describe EnrollmentsApiController, type: :request do
           'id'                                 => new_enrollment.id,
           'user_id'                            => @unenrolled_user.id,
           'course_section_id'                  => @section.id,
-          'limit_privileges_to_course_section' => false,
+          'limit_privileges_to_course_section' => true,
           'enrollment_state'                   => 'active',
           'course_id'                          => @course.id,
           'sis_import_id'                       => nil,
@@ -83,6 +83,7 @@ describe EnrollmentsApiController, type: :request do
         expect(new_enrollment.root_account_id).to eql @course.account.id
         expect(new_enrollment.user_id).to eql @unenrolled_user.id
         expect(new_enrollment.course_section_id).to eql @section.id
+        expect(new_enrollment.limit_privileges_to_course_section).to eql true
         expect(new_enrollment.workflow_state).to eql 'active'
         expect(new_enrollment.course_id).to eql @course.id
         expect(new_enrollment.self_enrolled).to eq nil
@@ -116,7 +117,37 @@ describe EnrollmentsApiController, type: :request do
               :limit_privileges_to_course_section => true
             }
           }
-        expect(Enrollment.find(json['id'])).to be_an_instance_of TeacherEnrollment
+        enrollment = Enrollment.find(json['id'])
+        expect(enrollment).to be_an_instance_of TeacherEnrollment
+        expect(enrollment.workflow_state).to eq 'active'
+        expect(enrollment.course_section).to eq @section
+        expect(enrollment.limit_privileges_to_course_section).to eq true
+      end
+
+      it "interprets 'false' correctly" do
+        json = api_call :post, @path, @path_options,
+          {
+            :enrollment => {
+              :user_id => @unenrolled_user.id,
+              :type    => 'TeacherEnrollment',
+              :limit_privileges_to_course_section => 'false'
+            }
+          }
+        expect(Enrollment.find(json['id']).limit_privileges_to_course_section).to eq false
+      end
+
+      it "adds a section limitation after the fact" do
+        enrollment = @course.enroll_teacher @unenrolled_user
+        json = api_call :post, @path, @path_options,
+          {
+            :enrollment => {
+              :user_id => @unenrolled_user.id,
+              :type => 'TeacherEnrollment',
+              :limit_privileges_to_course_section => 'true'
+            }
+          }
+        expect(json['id']).to eq enrollment.id
+        expect(enrollment.reload.limit_privileges_to_course_section).to eq true
       end
 
       it "should create a new ta enrollment" do
@@ -139,12 +170,29 @@ describe EnrollmentsApiController, type: :request do
             :enrollment => {
               :user_id => @unenrolled_user.id,
               :type    => 'ObserverEnrollment',
-              :enrollment_state => 'active',
+              :enrollment_state => 'invited',
               :course_section_id => @section.id,
               :limit_privileges_to_course_section => true
             }
           }
-        expect(Enrollment.find(json['id'])).to be_an_instance_of ObserverEnrollment
+        enrollment = Enrollment.find(json['id'])
+        expect(enrollment).to be_an_instance_of ObserverEnrollment
+        expect(enrollment.workflow_state).to eq 'invited'
+      end
+
+      it "should default observer enrollments to 'active' state" do
+        json = api_call :post, @path, @path_options,
+          {
+            :enrollment => {
+              :user_id => @unenrolled_user.id,
+              :type    => 'ObserverEnrollment',
+              :course_section_id => @section.id,
+              :limit_privileges_to_course_section => true
+            }
+          }
+        enrollment = Enrollment.find(json['id'])
+        expect(enrollment).to be_an_instance_of ObserverEnrollment
+        expect(enrollment.workflow_state).to eq 'active'
       end
 
       it "should not create a new observer enrollment for self" do
@@ -494,7 +542,7 @@ describe EnrollmentsApiController, type: :request do
           'id'                                 => new_enrollment.id,
           'user_id'                            => @unenrolled_user.id,
           'course_section_id'                  => @section.id,
-          'limit_privileges_to_course_section' => false,
+          'limit_privileges_to_course_section' => true,
           'enrollment_state'                   => 'active',
           'course_id'                          => @course.id,
           'type'                               => 'StudentEnrollment',
@@ -524,6 +572,7 @@ describe EnrollmentsApiController, type: :request do
         expect(new_enrollment.root_account_id).to eql @course.account.id
         expect(new_enrollment.user_id).to eql @unenrolled_user.id
         expect(new_enrollment.course_section_id).to eql @section.id
+        expect(new_enrollment.limit_privileges_to_course_section).to eql true
         expect(new_enrollment.workflow_state).to eql 'active'
         expect(new_enrollment.course_id).to eql @course.id
         expect(new_enrollment).to be_an_instance_of StudentEnrollment
@@ -1356,6 +1405,37 @@ describe EnrollmentsApiController, type: :request do
 
       it "should return 401 unauthorize for a user requesting an enrollment object by id" do
         raw_api_call(:get, "#{@enroll_path}/#{@enrollment.id}", @enroll_params)
+        expect(response.code).to eql '401'
+      end
+    end
+
+    context "a parent observer using parent app" do
+      before :once do
+        @student = user(active_all: true, active_state: 'active')
+        3.times do
+          course
+          @course.enroll_student(@student, enrollment_state: 'active')
+        end
+        @observer = user(active_all: true, active_state: 'active')
+        @observer.user_observees.create do |uo|
+          uo.user_id = @student.id
+        end
+        @user = @observer
+        @user_path = "/api/v1/users/#{@student.id}/enrollments"
+        @user_params = { :controller => "enrollments_api", :action => "index", :user_id => @student.id.to_param, :format => "json" }
+      end
+
+      it "should show all enrollments for the observee (student)" do
+        json = api_call(:get, @user_path, @user_params)
+        expect(json.length).to eql 3
+      end
+
+      it "should not authorize the parent to see other students' enrollments" do
+        @other_student = user(active_all: true, active_state: 'active')
+        @user = @observer
+        path = "/api/v1/users/#{@other_student.id}/enrollments"
+        params = { :controller => "enrollments_api", :action => "index", :user_id => @other_student.id.to_param, :format => "json" }
+        raw_api_call(:get, path, params)
         expect(response.code).to eql '401'
       end
     end

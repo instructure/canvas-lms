@@ -32,6 +32,10 @@ class CustomDataController < ApplicationController
   # +/custom_data/+ defines the scope of the request, and it reflects the structure of
   # the JSON data to be stored or retrieved.
   #
+  # The value +self+ may be used for +user_id+ to store data associated with the calling user.
+  # In order to access another user's custom data, you must be an account administrator with
+  # permission to manage users.
+  #
   # A namespace parameter, +ns+, is used to prevent custom_data collisions between
   # different apps.  This parameter is required for all custom_data requests.
   #
@@ -52,7 +56,7 @@ class CustomDataController < ApplicationController
   #   }
   #
   # Subscopes (or, generated scopes) can also be specified by passing values to
-  # data[<subscope>].
+  # +data+[+subscope+].
   #
   # Example PUT specifying subscopes:
   #   curl 'https://<canvas>/api/v1/users/<user_id>/custom_data/body/measurements' \

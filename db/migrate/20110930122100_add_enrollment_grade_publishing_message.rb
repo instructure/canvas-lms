@@ -1,4 +1,6 @@
 class AddEnrollmentGradePublishingMessage < ActiveRecord::Migration
+  tag :predeploy
+
 
   def self.up
     add_column :enrollments, :grade_publishing_message, :text

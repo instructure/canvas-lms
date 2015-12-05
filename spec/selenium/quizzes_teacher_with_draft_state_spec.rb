@@ -1,9 +1,11 @@
-require File.expand_path(File.dirname(__FILE__) + '/helpers/quizzes_common')
-require File.expand_path(File.dirname(__FILE__) + '/helpers/assignment_overrides.rb')
+require_relative "common"
+require_relative "helpers/quizzes_common"
+require_relative "helpers/assignment_overrides"
 
 describe 'quizzes with draft state' do
+  include_context "in-process server selenium tests"
+  include QuizzesCommon
   include AssignmentOverridesSeleniumHelper
-  include_context 'in-process server selenium tests'
 
   before(:each) do
     course_with_teacher_logged_in
@@ -14,7 +16,7 @@ describe 'quizzes with draft state' do
   end
 
   context 'when there is a single due date' do
-    it 'doesn\'t display "Multiple Dates"' do
+    it 'doesn\'t display "Multiple Dates"', priority: "1", test_id: 474291 do
       get "/courses/#{@course.id}/quizzes"
       expect(f('.ig-details .date-due')).not_to include_text 'Multiple Dates'
       expect(f('.ig-details .date-available')).not_to include_text 'Multiple Dates'

@@ -277,7 +277,11 @@ class DiscussionTopicsController < ApplicationController
               @context.active_discussion_topics.only_discussion_topics
             end
 
-    scope = DiscussionTopic::ScopedToUser.new(@context, @current_user, scope).scope
+    # Specify the shard context, because downstream we use `union` which isn't
+    # cross-shard compatible.
+    @context.shard.activate do
+      scope = DiscussionTopic::ScopedToUser.new(@context, @current_user, scope).scope
+    end
 
     scope = if params[:order_by] == 'recent_activity'
               scope.by_last_reply_at

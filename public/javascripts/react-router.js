@@ -1,4 +1,4 @@
-define(['bower/react-router/dist/react-router'], function(ReactRouter) {
+define(['bower/react-router/build/umd/ReactRouter'], function(ReactRouter) {
   window.ReactRouter = window.ReactRouter || ReactRouter;
   return ReactRouter;
 });
