@@ -32,5 +32,8 @@
     <span {{contextSensitiveDatetimeTitle singleSectionDueDate}}>
       {{datetimeFormatted singleSectionDueDate}}
     </span>
+    <a onclick="startTimer('{{datetimeFormatted singleSectionDueDate}}', '{{singleSectionDueDate}}')">count down</a>
+    <div id="{{singleSectionDueDate}}"></div>
   {{/if}}
 {{/if}}
+

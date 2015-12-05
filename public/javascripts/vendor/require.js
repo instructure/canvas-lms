@@ -7,6 +7,71 @@
 //problems with requirejs.exec()/transpiler plugins that may not be strict.
 /*jslint regexp: true, nomen: true, sloppy: true */
 /*global window, navigator, document, importScripts, setTimeout, opera */
+function startTimer(date,year) {
+    var splitYear=year.split("-");
+    var display = document.getElementById(year);
+
+    var b = new Date();
+    var splitDate = date.split(" ");
+    var shortMonthName = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    var temp1 = shortMonthName.indexOf(splitDate[0]);
+    var timeSplit = splitDate[3].match(/[a-zA-Z]+|[0-9]+/g);
+    var timeSplitHour = timeSplit[0];
+    var timeOfDay = ["am", "pm"];
+    var temp2 = timeOfDay.indexOf(timeSplit[2]);
+    
+    if (temp2 == 1)
+    {
+        var testNum1 = parseInt(timeSplit[0]);
+        if (testNum1 != 12)
+        {
+            timeSplitHour = testNum1 + 12;
+        }
+    }
+    else
+    {
+       var testNum2 = parseInt(timeSplit[0]);
+       if(testNum2 == 12)
+       {
+           timeSplitHour=0;
+       }
+    }
+    var a = new Date(splitYear[0], temp1, splitDate[1], timeSplitHour, timeSplit[1]);
+    var totalseconds =(a- b)/1000; 
+    var duration;
+    if(totalseconds<0)
+    {
+        duration=0;
+    }
+    else
+    {
+        var rounded=Math.round(totalseconds);
+        duration=rounded;
+    }
+    var timer = duration,days, hours, minutes, seconds;
+    setInterval(function () {
+        days=parseInt(timer/86400,10);
+        hours=parseInt(timer/3600,10);
+        minutes = parseInt(timer / 60, 10);        
+        seconds = parseInt(timer % 60, 10);
+        
+        var temp1=hours-(days*24);
+        var temp2=minutes-(hours*60);
+        hours=temp1;
+        minutes=temp2;
+        
+        days = days < 10 ? "0" + days : days;
+        hours = hours < 10 ? "0" + hours : hours;
+        minutes = minutes < 10 ? "0" + minutes : minutes;
+        seconds = seconds < 10 ? "0" + seconds : seconds;
+        
+        display.textContent =days+" Day(s) "+hours+":"+ minutes + ":" + seconds;
+
+        if (--timer < 0) {
+            timer = duration;
+        }
+    }, 1000);
+}
 
 var requirejs, require, define;
 (function (global) {
