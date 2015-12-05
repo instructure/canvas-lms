@@ -1222,13 +1222,17 @@ zh:
   activity_by_date_878c5b49: 按日期划分的活动
   add_2nd_review_ea988088: 添加第2次审阅
   add_8523c19b: 添加
+  add_a_new_course_4a041207: 添加一个新课程
+  add_a_new_user_c440d053: 添加一个新用户
   add_an_identity_provider_to_this_account_c2644478: 添加一个身份提供者到此帐户：
   add_app_baf540f: 添加应用程序
   add_attachment_93868828: 添加附件
   add_content_to_module_name_589a8d54: "添加内容到%{module_name}"
+  add_course_406cb773: 添加课程
   add_course_assignments_628ed6d0: 添加课程作业
   add_course_calendar_events_146154a5: 添加课程日历事件
   add_files_to_the_course_da6ffd32: 向课程添加文件
+  add_folder_ba50d107: 添加文件夹
   add_grading_period_6f774dc3: 添加评分期
   add_grading_scheme_81e23c05: 添加评分方案
   add_icon_567dbcaa: 添加图标
@@ -1248,6 +1252,7 @@ zh:
   add_section_8b027a1c: 添加班级
   add_students_to_the_course_874be8fb: 向课程添加学生
   add_tas_to_the_course_2aac6e02: 向课程添加助教
+  add_user_e73e8e50: 添加用户
   add_your_assignments_you_can_just_make_a_long_list_8a7862dd: "添加您的作业。您可以只列一个长列表，或者将其分为几组 - 甚至可以为每个作业组指定权重。"
   add_your_zendesk_instance_s_custom_field_id_for_ea_3aeb75f4: "为下列每个(没有 ID而无法被记录的栏目)添加您的Zendesk实例的自定义字段的ID："
   admin_4d3ba42f: 管理员
@@ -1319,6 +1324,7 @@ zh:
   all_start_dates_must_be_before_the_end_date_d949eca9: 所有开始日期必须是在结束日期前
   all_students_have_taken_the_quiz_b558f8b4: 所有学生均已参加测验
   all_students_have_taken_the_survey_494f9f42: 所有学生均已参加调查
+  all_terms_cd27b0fb: 所有学期
   allow_a_moderator_to_review_multiple_independent_g_752c4b90: 允许调整人为选择的提交查阅多个独立的评分。
   allow_bulk_grade_export_to_sis_e11a6e66: 允许批量评分导出到SIS
   allow_lor_tools: "允许用户查看和使用针对 LOR 配置的外部工具。"
@@ -1329,6 +1335,7 @@ zh:
   allows_users_with_international_phone_numbers_to_r_f90f8522: "允许用户使用国际电话号码接收Canvas 的短信。"
   always_3a59e701: 始终
   an_error_accurred_selecting_provisional_grades_61b36f64: 选择临时成绩出错
+  an_error_occured_please_try_again_e59b65b: "发生错误。 请再试一次。"
   an_error_occured_trying_to_generate_this_theme_ple_6ae581d: 发生尝试生成此主题的错误，请再次尝试。
   an_error_occurred_please_post_your_reply_again_lat_b0220ac6: "*发生错误*，请稍候再次发表您的回复"
   an_error_occurred_publishing_grades_cfdf7631: 发布成绩时出错
@@ -1408,6 +1415,7 @@ zh:
     podcast_feed_description_course: "任何与课程 \"%{course}\" 中的通告链接或内嵌于其中的媒体文件都会出现在此馈送中。"
     podcast_feed_description_group: "任何与小组 \"%{group}\" 中的通告链接或内嵌于其中的媒体文件都会出现在此馈送中。"
     podcast_feed_name: "%{course} 通告播客动态消息"
+  announcements_a4b8ed4a: 通告
   anonymous_e1b8ad27: 匿名
   anonymous_grading_ccb5045c: 匿名评分
   anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: 匿名评分逼使学生的名字被隐藏在SpeedGrader™
@@ -2221,7 +2229,10 @@ zh:
   availableslots_available_87b8b69d: "%{availableSlots} 可用"
   average_49c63f9b: 平均分
   back_2900f52a: 后退
+  back_to_announcements_1036e43e: 返回通告
   back_to_app_center_95420d83: "返回 App Center"
+  back_to_table_of_contents_d878b315: 返回目录表
+  back_to_title_39e7a8f4: "回到%{title}"
   background_color_b92b52ac: 背景颜色
   background_image_1a401e1a: 背景图像
   base_847aca7c: 基础
@@ -2249,6 +2260,7 @@ zh:
   body_shadow_d36e8c2e: 形影
   bookmark_service: 
     default_title: 无标题
+  bounce_count_reset_c4c2218f: 反弹次数重置！
   breadcrumb_1_cb3c504: "面包屑 1"
   breadcrumb_2_95ba94be: "面包屑 2"
   broccoli_cloud: 
@@ -2736,6 +2748,8 @@ zh:
         create_assignment: 创建新作业
         delete: 删除事件/作业
         new: 创建新事件
+  calendars_toggle_list_visibility_488db143: 日历切换可视列表
+  can_interact_with_users_in_their_section_only_48cb8c43: 只可在他们的班级内与用户互动
   can_t_compute_score_until_an_assignment_has_points_f34dd600: 无法计算得分，直到作业有分值。
   can_t_delete_alignments_based_on_rubric_associatio_d9fd10a3: 无法基于题目关联删除对应关系。要删除这些关联，您需要从该资产的题目中删除该行
   can_t_perform_diffing_against_more_than_one_file_o_44475c0d: 无法执行版本比较中针对相同类型的多个文件
@@ -2764,12 +2778,14 @@ zh:
         login_expiration_minimum: "会话过期必须为 20 分钟或更长时间"
         need_integer: 请为播放列表缓存输入一个整数
         stream_name_required: 室壁运动流的名称是必需的。
+  canvas_alert_change_assignment_name_course_name_2fc63d9c: "Canvas 的警报 - 更改: %{assignment_name}, %{course_name}"
   canvas_by_instructure_1490381: Canvas由Instructure提供
   canvas_cartridge_description: "这可以将 canvas 导出转换为要导入的中间 json 格式"
   canvas_cartridge_display: "Canvas Common Cartridge"
   canvas_cartridge_file_description: "Canvas 课程导出包"
   canvas_cartridge_name: "Canvas Cartridge 导入器"
   canvas_cloud_information_fdd404f2: Canvas云的信息
+  canvas_dashboard_links_will_navigate_to_the_catalo_4143635e: Canvas的控制板链接将导航到目录控制板
   canvas_default_7f81a6b8: Canvas默认
   canvas_did_not_recognize_your_identity_provider_cb0e50fc: "Canvas 无法识别您的身份提供者"
   canvas_doesn_t_have_an_account_for_user_user_5bcae0dd: "以下用户没有Canvas 的帐户: %{user}"
@@ -2806,7 +2822,7 @@ zh:
     prompts: 
       update_assignment_points: "这份作业可能有 %{assignmentPoints} 分，您是否希望改变它以获得 %{rubricPoints} 分以匹配评分标准?"
     titles: 
-      update_assignment_points: 是否改变可能得分以匹配评分标准?
+      update_assignment_points: 更改作业分值以配合评分细则？
   changes_will_still_apply_if_you_leave_this_page_935cedc6: 如果您离开这个页面，更改将仍然适用。
   child_s_username_dde3aa9: 孩子的用户名
   choose_a_color_or_course_nickname_for_course_2585e42c: "为%{course}选择一种颜色或课程的绰号"
@@ -2820,6 +2836,7 @@ zh:
   click_here_for_an_account_9536cb36: 点击此处查看账户
   click_here_it_s_free_eeccb9cb: 点击这里，它是免费的！
   click_here_on_the_calendar_link_c9965631: "单击此处的 *日历* 链接"
+  click_here_to_see_the_file_79e2b366: 点击此处查看文件。
   click_to_enter_comments_if_the_student_chooses_thi_507c20f6: 如果学生选择此答案，点击此处，输入评论
   click_to_modify_89fa26aa: 点击修改
   click_to_report_profile_picture_370f9625: 点击报告资料图片
@@ -3979,8 +3996,15 @@ zh:
       all: 任何人
       only_teachers: 仅教师
       teachers_students: 教师和学生
+  course_8a63b4a3: 课程
+  course_and_user_search_ebc1ae41: 课程和用户搜索
   course_announcements_76b07340: 课程通告
+  course_assignments_833b8cf1: 课程作业
   course_atom_feed_9d95214e: "课程 Atom 馈送"
+  course_calendar_7d3cba7b: 课程日历
+  course_collaborations_dadb327e: 课程协作
+  course_conferences_3d914c96: 课程会议
+  course_content_a92eca20: 课程内容
   course_copy_argument_error: 复制课程需要源课程。
   course_copy_description: "用于复制 Canvas 课程的迁移插件"
   course_copy_display: 课程副本
@@ -4031,7 +4055,10 @@ zh:
       topic: 未知主题
       wiki_page: 未知维基页面
   course_files_62deb8f8: 课程文件
+  course_grades_22adc27e: 课程评分
+  course_home_4c4c0107: 课程主页
   course_home_sub_navigation_b1ee6b03: 课程主页的子导航
+  course_id_8bd2a21c: "课程 ID"
   course_implemented_apps_fa658f5a: 课程实施应用程序
   course_list: 
     favorited_tooltip: 单击可从课程菜单中删除。
@@ -4110,7 +4137,14 @@ zh:
       wiki_id: "Wiki ID"
       workflow_state: 工作流状态
   course_members_are_free_to_join_9b2603d4: 学员可自由加入
+  course_modules_795cb95e: 课程单元
+  course_name_63b973d1: 课程名称
+  course_name_is_required_90919349: 课程名称是必需的
   course_navigation_dd035109: 课程导航
+  course_outcomes_7dc1cbc7: 课程成果
+  course_pages_449f1dd4: 课程页面
+  course_people_3058c948: 课程人员
+  course_quizzes_c337653c: 课程测验
   course_restore: 
     restore_error: 尝试恢复课程时出现错误。课程未恢复。
   course_search: 
@@ -4166,6 +4200,7 @@ zh:
   course_starts_at_3a01f9da: 课程开始在
   course_statistics: 
     unknown: 未知
+  course_syllabus_5de1b0af: 课程教学大纲
   course_users: 
     greater_than_three: 请输入具有三个或更多字符的搜索词
     unknown_error: 搜索时出错，请重试。
@@ -4311,6 +4346,10 @@ zh:
         student: 学生
       loading: 正在加载学生...
       select_student: 选择学生
+    link_validator: 
+      link_validator: 课程链接验证
+      link_validator_desc: 课程链接验证对课程内容进行搜索，并返回它所遇到的每个无效的或无回应的链接。这个过程可能需要几分钟的时间。
+      page_title: 课程链接验证
     notices: 
       backup_restored: 备份成功恢复！
       concluded: 课程成功结束
@@ -5077,6 +5116,7 @@ zh:
       technology_education_director: 技术培训主管
       united_states_and_canada: 美国和加拿大
       vp: VP
+  department_6abddd98: 部门
   description_436c48d7: 说明
   developer_key: 
     api_key: "密钥: *%{api_key}*"
