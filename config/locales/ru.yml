@@ -51,6 +51,7 @@ ru:
   a_full_size_logo_that_appears_in_the_right_sidebar_18873685: "Полноразмерный логотип, который появляется на правой боковой панели панели инструментов Canvas . Идеально размер 360 х 140 пикселей. Допустимые форматы: svg, png, jpeg, gif"
   a_handy_key_value_dump_of_a_host_of_interesting_en_d0518dfe: "Удобный ключ/значение дампа хоста интересной информации о среде для отчитывающегося пользователя"
   a_message_is_required_129e1814: "Требуется сообщение"
+  a_new_assignment_has_been_created_for_your_course__12b72639: "Новое задание создано для вашего курса, %{course_name}"
   a_problem_occurred_adding_reviewers_57b083d9: "Возникла проблема при добавлении рецензентов."
   a_table_containing_the_name_of_the_grading_scheme__2c25dc3: "Таблица содержит название схемы оценок и значки для редактирования или удаления схемы."
   a_table_that_contains_the_grading_scheme_data_each_d461c205: "Таблица, содержащая данные схемы оценок. Каждая строка содержит имя, минимальное и максимальное процентное значение. Кроме того, каждая строка содержит значок добавления новой строки снизу и значок удаления текущей строки."
@@ -1229,13 +1230,17 @@ ru:
   activity_by_date_878c5b49: "Активность по дате"
   add_2nd_review_ea988088: "Добавить 2-й отзыв"
   add_8523c19b: Добавить
+  add_a_new_course_4a041207: "Добавить новый курс"
+  add_a_new_user_c440d053: "Добавить нового пользователя"
   add_an_identity_provider_to_this_account_c2644478: "Добавить провайдера идентификации к этой учетной записи:"
   add_app_baf540f: "Добавить приложение"
   add_attachment_93868828: "Добавить вложение"
   add_content_to_module_name_589a8d54: "Добавить контент в %{module_name}"
+  add_course_406cb773: "Добавить курс"
   add_course_assignments_628ed6d0: "Добавить задания курса"
   add_course_calendar_events_146154a5: "Добавить календарные события курса"
   add_files_to_the_course_da6ffd32: "Добавить файлы к курсу"
+  add_folder_ba50d107: "Добавить папку"
   add_grading_period_6f774dc3: "Добавить Оценочный период"
   add_grading_scheme_81e23c05: "Добавить схему оценок"
   add_icon_567dbcaa: "добавить иконку "
@@ -1255,6 +1260,7 @@ ru:
   add_section_8b027a1c: "Добавить раздел"
   add_students_to_the_course_874be8fb: "Добавить студентов к курсу"
   add_tas_to_the_course_2aac6e02: "Добавить ассистентов к курсу"
+  add_user_e73e8e50: "Добавить пользователя"
   add_your_assignments_you_can_just_make_a_long_list_8a7862dd: "Добавить задания. Вы можете просто создать длинный список либо разбить их на группы. Вы можете даже указать весовые критерии каждой группы заданий."
   add_your_zendesk_instance_s_custom_field_id_for_ea_3aeb75f4: "Добавьте ID произвольного поля в своей копии Zendesk для каждого из следующих полей (поля, которые не имеют идентификаторов, не будут введены):"
   admin_4d3ba42f: Администратор
@@ -1326,6 +1332,7 @@ ru:
   all_start_dates_must_be_before_the_end_date_d949eca9: "Все даты начала должны быть раньше даты окончания"
   all_students_have_taken_the_quiz_b558f8b4: "Все студенты взяли контрольную работу"
   all_students_have_taken_the_survey_494f9f42: "Все студенты взяли опрос"
+  all_terms_cd27b0fb: "Все условия"
   allow_a_moderator_to_review_multiple_independent_g_752c4b90: "Разрешить модератору рассмотреть несколько независимых оценок для выбранных документов"
   allow_bulk_grade_export_to_sis_e11a6e66: "Разрешить Массовый Экспорт Оценок в SIS"
   allow_lor_tools: "Разрешить пользователям просматривать и использовать внешние инструменты, сконфигурированные для LOR."
@@ -1336,6 +1343,7 @@ ru:
   allows_users_with_international_phone_numbers_to_r_f90f8522: "Позволяет пользователям с международными телефонными номерами получать текстовые сообщения от Canvas."
   always_3a59e701: Всегда
   an_error_accurred_selecting_provisional_grades_61b36f64: "Произошла ошибка при выборе предварительных оценок"
+  an_error_occured_please_try_again_e59b65b: "Произошла ошибка. Пожалуйста, попробуйте еще раз."
   an_error_occured_trying_to_generate_this_theme_ple_6ae581d: "Произошла ошибка при генерировании темы. Пожалуйста, повторите попытку."
   an_error_occurred_please_post_your_reply_again_lat_b0220ac6: "*Произошла ошибка*, пожалуйста, попробуйте опубликовать ваш ответ позже"
   an_error_occurred_publishing_grades_cfdf7631: "Произошла ошибка при публикации оценок."
@@ -1417,6 +1425,7 @@ ru:
     podcast_feed_description_course: "Все медиафайлы, связанные или встроенные в объявления в этом курсе \"%{course}\", будут отображаться в этом канале."
     podcast_feed_description_group: "Все медиафайлы, связанные или встроенные в объявления в этой группе \"%{group}\", будут отображаться в этом канале."
     podcast_feed_name: "%{course} Канал подкастов объявлений"
+  announcements_a4b8ed4a: Объявления
   anonymous_e1b8ad27: Анонимно
   anonymous_grading_ccb5045c: "Анонимное оценивание"
   anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: "Анонимное оценивание заставляет студентов быть скрытыми в SpeedGrader™"
@@ -1564,6 +1573,7 @@ ru:
       grading_scheme_info: "Просмотр/редактирование схемы оценок"
   assignment_976578a8: Задание
   assignment_comments_e43ed898: "Комментарии задания"
+  assignment_created_assignment_name_course_name_324a5639: "Задание создано - %{assignment_name}, %{course_name}"
   assignment_details: 
     no_graded_submissions: "Нет оцененных отправок"
   assignment_details_bc488179: "Сведения о задании"
@@ -2253,7 +2263,11 @@ ru:
   availableslots_available_87b8b69d: "%{availableSlots} Доступно"
   average_49c63f9b: Среднее
   back_2900f52a: Назад
+  back_to_announcements_1036e43e: "Вернуться к Объявления"
   back_to_app_center_95420d83: "Вернуться в App Center"
+  back_to_ref_title_377ea1f0: "Вернуться к %{ref_title}"
+  back_to_table_of_contents_d878b315: "Вернуться к Оглавлению"
+  back_to_title_39e7a8f4: "Вернуться к %{title}"
   background_color_b92b52ac: "Цвет фона"
   background_image_1a401e1a: "Фоновая картинка"
   base_847aca7c: Базовый
@@ -2281,6 +2295,7 @@ ru:
   body_shadow_d36e8c2e: "Тень тела"
   bookmark_service: 
     default_title: "Без названия"
+  bounce_count_reset_c4c2218f: "Сброс количества отказов!"
   breadcrumb_1_cb3c504: "Breadcrumb 1"
   breadcrumb_2_95ba94be: "Breadcrumb 2"
   broccoli_cloud: 
