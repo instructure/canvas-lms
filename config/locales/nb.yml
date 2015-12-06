@@ -47,6 +47,7 @@ nb:
   a_full_size_logo_that_appears_in_the_right_sidebar_18873685: "En logo i full størrelse som vises i det høyre sidefeltet på Canvas-skrivebordet. Ideell størrelse er 360 x 140 piksler. Aksepterte format: svg, png, jpeg og gif"
   a_handy_key_value_dump_of_a_host_of_interesting_en_d0518dfe: "Et praktisk nøkkel/verdi utslipp av mye interessant miljøinfo for rapporteringsbrukeren"
   a_message_is_required_129e1814: "En melding kreves"
+  a_new_assignment_has_been_created_for_your_course__12b72639: "Et nytt oppdrag har blitt opprettet for kurset, %{course_name}"
   a_problem_occurred_adding_reviewers_57b083d9: "Det oppsto et problem å legge anmeldelser. "
   a_table_containing_the_name_of_the_grading_scheme__2c25dc3: "En tabell som inneholder navnet på karakterskalaen og ikoner for å redigere eller slette skalaen."
   a_table_that_contains_the_grading_scheme_data_each_d461c205: "En tabell som inneholder data om karakterene. Hver rad inneholder et navn, en maksimal prosent, og en minimum prosent. I tillegg inneholder hver rad et ikon for å legge til en ny rad under, og et ikon for å slette gjeldende rad."
@@ -1319,6 +1320,7 @@ nb:
   all_start_dates_must_be_before_the_end_date_d949eca9: "Alle startdatoer må være før sluttdatoen"
   all_students_have_taken_the_quiz_b558f8b4: "Alle studentene har tatt prøven"
   all_students_have_taken_the_survey_494f9f42: "Alle studenter har tatt undersøkelsen"
+  all_terms_cd27b0fb: "alle Vilkår"
   allow_a_moderator_to_review_multiple_independent_g_752c4b90: "Tillat en moderator gjennomgå flere uavhengige vurderinger for valgte innleveringer"
   allow_bulk_grade_export_to_sis_e11a6e66: "Tillat gruppe-karaktereksport til SIS"
   allow_lor_tools: "Tillat brukere for å vise og bruke eksterne verktøy som er konfigurert for LOR."
@@ -1409,6 +1411,7 @@ nb:
     podcast_feed_description_course: "Alle mediefiler knyttet til eller innebygd i kunngjøringer i kurset \"%{course}\" vises i denne strømmen."
     podcast_feed_description_group: "Alle media filer knyttet til eller innebygd i kunngjøringer i gruppen \"%{group}\" vil være synlig i denne strømmen."
     podcast_feed_name: "%{course} Kunngjøringer som podkast-strøm"
+  announcements_a4b8ed4a: Kunngjøringer
   anonymous_e1b8ad27: Anonym
   anonymous_grading_ccb5045c: "Anonym vurdering"
   anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: "Anonym vurdering tvinger studentnavn til å være skjult i SpeedGrader™"
@@ -1551,6 +1554,7 @@ nb:
       grading_scheme_info: "Se/rediger karakterskala"
   assignment_976578a8: Oppgave
   assignment_comments_e43ed898: "Kommentarer til oppgaven"
+  assignment_created_assignment_name_course_name_324a5639: "Oppdraget Laget - %{assignment_name}, %{course_name}"
   assignment_details: 
     no_graded_submissions: "Ingen innleveringer som er vurdert"
   assignment_details_bc488179: Oppdragsdetaljer
@@ -2222,7 +2226,10 @@ nb:
   availableslots_available_87b8b69d: "%{availableSlots} Tilgjengelig"
   average_49c63f9b: Gjennomsnittlig
   back_2900f52a: Tilbake
+  back_to_announcements_1036e43e: "Tilbake til Kunngjøringer"
   back_to_app_center_95420d83: "Tilbake til appsenteret"
+  back_to_ref_title_377ea1f0: "Tilbake til %{ref_title}"
+  back_to_table_of_contents_d878b315: "Tilbake til Innhold"
   back_to_title_39e7a8f4: "Tilbake til %{title}"
   background_color_b92b52ac: Bakgrunnsfarge
   background_image_1a401e1a: Bakgrunnsbilde
@@ -2248,6 +2255,7 @@ nb:
   body_shadow_d36e8c2e: Brødtekst-skygge
   bookmark_service: 
     default_title: "Ingen tittel"
+  bounce_count_reset_c4c2218f: "sprett antallet tilbakestilt!"
   breadcrumb_1_cb3c504: "Breadcrumb 1"
   breadcrumb_2_95ba94be: "Breadcrumb 2"
   broccoli_cloud: 
@@ -2735,6 +2743,8 @@ nb:
         create_assignment: "Lag en ny oppgave"
         delete: "Slett en hendelse/oppgave"
         new: "Opprett en ny hendelse"
+  calendars_toggle_list_visibility_488db143: "Kalendere veksle liste synlighet"
+  can_interact_with_users_in_their_section_only_48cb8c43: "Kan samhandle med brukere i sine bare"
   can_t_compute_score_until_an_assignment_has_points_f34dd600: "Kan ikke regne ut karakter før en innleveringen har oppnåelige poeng"
   can_t_delete_alignments_based_on_rubric_associatio_d9fd10a3: "Kan ikke slette justeringer basert på Rubrikk foreninger. For å fjerne disse assosiasjonene du trenger å fjerne rad fra eiendelens rubrikk"
   can_t_perform_diffing_against_more_than_one_file_o_44475c0d: "Kan ikke utføre diffing mot mer enn én fil av samme type"
@@ -2762,12 +2772,14 @@ nb:
         login_expiration_minimum: "Utløpstid for en sesjon må være 20 minutter eller mer"
         need_integer: "Vennligst skriv inn et heltall i spillelistens hurtigbuffer"
         stream_name_required: "Kinesis strømnavnet er påkrevd."
+  canvas_alert_change_assignment_name_course_name_2fc63d9c: "Canvas varsling - endring: %{assignment_name}, %{course_name}"
   canvas_by_instructure_1490381: "Canvas av Instructure"
   canvas_cartridge_description: "Dette gjør det mulig å konvertere en Canvaseksport til et midlertidig JSON format som kan importeres"
   canvas_cartridge_display: "Canvas Common Cartridge"
   canvas_cartridge_file_description: "Canvas kurseksport pakke"
   canvas_cartridge_name: "Canvas pakkeimport"
   canvas_cloud_information_fdd404f2: Canvas-skyinformasjon
+  canvas_dashboard_links_will_navigate_to_the_catalo_4143635e: "Canvas dashbord linker vil navigere til Catalog dashbordet"
   canvas_default_7f81a6b8: "Canvas standard"
   canvas_did_not_recognize_your_identity_provider_cb0e50fc: "Canvas kjenner ikke igjen identitetsleverandøren din"
   canvas_doesn_t_have_an_account_for_user_user_5bcae0dd: "Canvas har ingen konto for brukeren: %{user}"
@@ -2804,7 +2816,7 @@ nb:
     prompts: 
       update_assignment_points: "Denne oppgaven har %{assignmentPoints} oppnåelige poeng, ønsker du å endre den til å ha %{rubricPoints} oppnåelige poeng for å passe med denne vurderingen?"
     titles: 
-      update_assignment_points: "Endre oppnåelige poeng for å passe med vurderingen?"
+      update_assignment_points: "Endre oppdrags poeng å matche rubrikken?"
   changes_will_still_apply_if_you_leave_this_page_935cedc6: "Endringene vil fremdeles utføres dersom du forlater denne siden."
   child_s_username_dde3aa9: "Barns brukernavn"
   choose_a_color_or_course_nickname_for_course_2585e42c: "Velg en farge eller et kurs-kallenavn til %{course}"
@@ -3971,9 +3983,14 @@ nb:
       only_teachers: "Kun forelesere"
       teachers_students: "Lærere og studenter"
   course_8a63b4a3: Kurs
+  course_and_user_search_ebc1ae41: "Kurs og bruker Søk"
   course_announcements_76b07340: Kurskunngjøringer
+  course_assignments_833b8cf1: "Kurs Oppdrag"
   course_atom_feed_9d95214e: "Kurset Atom Feed"
   course_calendar_7d3cba7b: Kurskalender
+  course_collaborations_dadb327e: "Kurs Samarbeid"
+  course_conferences_3d914c96: "Kurs Konferanser"
+  course_content_a92eca20: Kursinnhold
   course_copy_argument_error: "En kurskopi krever et kildekurs."
   course_copy_description: "Flytte-programtillegg for å kopiere Canvaskurs"
   course_copy_display: Kurskopi
@@ -4024,6 +4041,7 @@ nb:
       topic: "Ukjent tema"
       wiki_page: "Ukjent wikiside"
   course_files_62deb8f8: Kursfiler
+  course_grades_22adc27e: "Kurs klassetrinn"
   course_home_sub_navigation_b1ee6b03: Kursnavigering
   course_id_8bd2a21c: "Kurs ID"
   course_implemented_apps_fa658f5a: "Kurs-implementerte applikasjoner"
