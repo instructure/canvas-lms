@@ -24,7 +24,6 @@ describe "international sms" do
   context "international sms enabled" do
 
     before(:each) do
-      Account.default.enable_feature!(:international_sms)
       course_with_student_logged_in
     end
 
@@ -53,22 +52,6 @@ describe "international sms" do
           expect(find('.intl_rates_may_apply')).to have_attribute('style', "display: inline\;")
         end
       end
-    end
-  end
-
-  context "international sms disabled" do
-
-    before(:each) do
-      Account.default.disable_feature!(:international_sms)
-      course_with_student_logged_in
-    end
-
-    it 'does not show a disclaimer when SMS is turned off', priority: "1", test_id: 479237 do
-      get '/profile/settings'
-      make_full_screen
-      find('.add_contact_link.icon-add').click
-      wait_for_ajaximations
-      expect(find('.intl_rates_may_apply')).to have_attribute('style', "display: none\;")
     end
   end
 end
