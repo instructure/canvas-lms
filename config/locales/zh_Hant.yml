@@ -5516,6 +5516,7 @@ zh_Hant:
     multiple_due_dates: 截止日期：多個截止日期
     no_due_date: 截止日期：無截止日期
   due_datetime_f5a81b81: "到期：%{dateTime}"
+  due_dueat_39d7d6c2: "截止於 %{dueAt}"
   due_dueat_ef67f6f4: "截止於: %{dueAt}"
   due_format_like_yyyy_mm_dd_hh_mm_ef30a9ef: "截止日期-格式如年-月-日 時：分"
   due_multiple_dates_cc0ee3f5: 到期：多個日期
@@ -7467,6 +7468,7 @@ zh_Hant:
   immediately_c128ede6: 立即
   import_1b31507: 匯入
   import_content_b2fd6620: 匯入內容
+  important_note_educational_institutions_have_an_ob_c9350304: "*重要提示：教育機構根據法律要求，必須將教學内容清晰可見地展示出來。用戶手冊推薦文字和背景的色彩比至少應達到3：1方可適合讀者閲讀。您可以方便地檢查對比度，只需使用 **WebAIM Color Contrast Checker *** 。"
   importers/assignment_importer: 
     errors: 
       import: 
@@ -8944,7 +8946,7 @@ zh_Hant:
         body_teacher: "您已作為教師註冊了課程 %{course}。"
         subject: 課程註冊
       twitter: 
-        body: "Canvas 警示 – 已註冊：課程作為 %{enrollment_type}"
+        body: "Canvas 警示 – 已邀請：課程作為 %{role_type}"
     enrollment_registration: 
       email: 
         body_designer: "您已被邀請參加 %{website} 上的課程。課程名為 %{course}，您已被邀請作為設計師參加。"
@@ -10089,6 +10091,7 @@ zh_Hant:
   not_now_97efd947: 不是現在
   not_yet_completed_345a0bca: 尚未完成
   note_it_may_take_up_to_a_week_for_the_beta_url_to__d695bddc: 注意：根據測試版更新周期，測試版URL的發佈可能需要等待一週的時間。
+  note_length_cannot_exceed_maxlength_characters_82798b1: "筆記不能超過 %{maxLength} 個字元。"
   note_some_items_fall_outside_the_start_and_or_end__feab0642: 注：一些項目超出了該課程開始和/或結束日期範圍
   note_students_have_submitted_work_for_these_assign_7bc34e28: 注：學生們已經為這些尚未進行評分的任務提交了作業。如果您現在公佈這些評分，您將需要再對他們最新的提交項進行評分之後重新公佈他們的分數。
   note_sub_account_themes_are_not_active_during_this_a5dd9da: 注意：本預覽沒有激活子賬戶主題。
