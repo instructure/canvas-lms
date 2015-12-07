@@ -23,13 +23,18 @@ class PageCommentsController < ApplicationController
     if authorized_action(@page, @current_user, :comment)
       @comment = @page.page_comments.build(params[:page_comment])
       @comment.user = @current_user
+      url = if @page.slug.blank?
+              eportfolio_named_category_url(@portfolio, @page.eportfolio_category.slug)
+            else
+              eportfolio_named_category_entry_url(@portfolio, @page.eportfolio_category.slug, @page.slug)
+            end
       respond_to do |format|
         if @comment.save
-          format.html { redirect_to eportfolio_named_category_entry_url(@portfolio.id, @page.eportfolio_category.slug, @page.slug) }
+          format.html { redirect_to url }
           format.json { render :json => @comment }
         else
           flash[:error] = t('errors.create_failed', "Comment creation failed")
-          format.html { redirect_to eportfolio_named_category_entry_url(@portfolio.id, @page.eportfolio_category.slug, @page.slug) }
+          format.html { redirect_to url }
           format.json { render :json => @comment.errors, :status => :bad_request }
         end
       end
