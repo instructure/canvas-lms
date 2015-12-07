@@ -401,14 +401,14 @@ END
       display_name: -> { I18n.t('International SMS') },
       description: -> { I18n.t('Allows users with international phone numbers to receive text messages from Canvas.') },
       applies_to: 'RootAccount',
-      state: 'hidden',
+      state: 'on',
       root_opt_in: true
     },
     'international_sms_from_recipient_country' => {
       display_name: -> { I18n.t("International SMS - Send from Recipient's Country") },
       description: -> { I18n.t("Sends international text messages from a phone number in the recipient's country, if possible.") },
       applies_to: 'RootAccount',
-      state: 'hidden',
+      state: 'on',
       root_opt_in: true
     },
     'all_grading_periods_totals' =>
