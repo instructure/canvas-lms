@@ -10,6 +10,22 @@ define([
   'compiled/jquery.rails_flash_notifications'
 ], function ($, _, I18n, React, Modal, store, ConfigurationForm, Lti2Edit) {
 
+  const modalOverrides = {
+    overlay : {
+      backgroundColor: 'rgba(0,0,0,0.5)'
+    },  
+    content : {
+      position: 'static',
+      top: '0',
+      left: '0',
+      right: 'auto',
+      bottom: 'auto',
+      borderRadius: '0',
+      border: 'none',
+      padding: '0'
+    }
+  };
+
   return React.createClass({
     displayName: 'EditExternalToolButton',
 
@@ -121,6 +137,7 @@ define([
           </a>
           <Modal className="ReactModal__Content--canvas"
             overlayClassName="ReactModal__Overlay--canvas"
+            style={modalOverrides}
             isOpen={this.state.modalIsOpen}
             onRequestClose={this.closeModal}>
             <div className="ReactModal__Layout">

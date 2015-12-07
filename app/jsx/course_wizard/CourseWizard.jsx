@@ -9,6 +9,22 @@ define([
   'compiled/jquery.rails_flash_notifications'
 ], function ($, React, I18n, ReactModal, InfoFrame, Checklist, userSettings) {
 
+  const modalOverrides = {
+    overlay : {
+      backgroundColor: 'transparent'
+    },  
+    content : {
+      position: 'static',
+      top: '0',
+      left: '0',
+      right: 'auto',
+      bottom: 'auto',
+      borderRadius: '0',
+      border: 'none',
+      padding: '0'
+    }
+  };
+
   var CourseWizard = React.createClass({
       displayName: 'CourseWizard',
 
@@ -68,6 +84,7 @@ define([
           <ReactModal
             isOpen={this.state.showWizard}
             onRequestClose={this.closeModal}
+            style={modalOverrides}
             overlayClassName={this.props.overlayClassName}
           >
             <main role='main'>
