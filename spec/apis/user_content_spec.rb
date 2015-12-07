@@ -515,10 +515,10 @@ describe UserContent, type: :request do
           @html = "<img class='equation_image' alt='#{@latex}' />"
         end
 
-        it "removes the alt attribute" do
+        it "retains the alt attribute" do
           escaped = UserContent.escape(@html)
           node = Nokogiri::HTML::DocumentFragment.parse(escaped).css("img").first
-          expect(node['alt']).to be_nil
+          expect(node['alt']).to eql(@latex)
         end
 
         it "adds mathml in a span" do
