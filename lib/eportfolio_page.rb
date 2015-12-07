@@ -44,7 +44,7 @@ module EportfolioPage
       add_crumb(t('#crumbs.eportfolio_welcome', "Welcome to Your ePortfolio"))
     else
       add_crumb(@category.name, eportfolio_named_category_path(@portfolio.id, @category.slug))
-      add_crumb(@page.name, eportfolio_named_category_entry_path(@portfolio.id, @category.slug, @page.slug))
+      add_crumb(@page.name, eportfolio_named_category_entry_path(@portfolio.id, @category.slug, @page.slug)) if @page.slug.present?
     end
   end
 
