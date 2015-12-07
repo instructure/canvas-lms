@@ -348,7 +348,7 @@ class AccountsController < ApplicationController
         name = ActiveRecord::Base.wildcard('courses.name', search_term)
         code = ActiveRecord::Base.wildcard('courses.course_code', search_term)
 
-        if @account.root_account.grants_any_right?(@current_user, :read_sis, :manage_sis)
+        if @account.grants_any_right?(@current_user, :read_sis, :manage_sis)
           sis_source = ActiveRecord::Base.wildcard('courses.sis_source_id', search_term)
           @courses = @courses.where("#{name} OR #{code} OR #{sis_source}")
         else
