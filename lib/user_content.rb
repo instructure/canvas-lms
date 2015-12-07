@@ -40,9 +40,9 @@ module UserContent
       mathml = latex_to_mathml(node['alt'])
       next if mathml.blank?
 
-      # replace alt attribute with mathml
-      node.delete('alt')
-      mathml_span = Nokogiri::HTML::DocumentFragment.parse("<span class=\"hidden-readable\">#{mathml}</span>")
+      mathml_span = Nokogiri::HTML::DocumentFragment.parse(
+        "<span class=\"hidden-readable\">#{mathml}</span>"
+      )
       node.add_next_sibling(mathml_span)
     end
 
