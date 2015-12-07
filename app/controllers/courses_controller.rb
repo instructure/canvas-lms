@@ -1616,7 +1616,7 @@ class CoursesController < ApplicationController
         :add_tas => course_users_path(:course_id => @context),
         :publish_course => course_path(@context)
       },
-      :permisssions => {
+      :permissions => {
         # Sending the permissions just so maybe later we can extract this easier.
         :can_manage_content => can_do(@context, @current_user, :manage_content),
         :can_manage_students => can_do(@context, @current_user, :manage_students),
