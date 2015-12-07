@@ -76,14 +76,11 @@ class CourseNicknamesController < ApplicationController
   #   curl 'https://<canvas>/api/v1/users/self/course_nicknames/<course_id> \
   #     -H 'Authorization: Bearer <token>'
   #
-  # @returns [CourseNickname]
+  # @returns CourseNickname
   def show
     course = api_find(Course, params[:course_id])
-    if (nickname = @current_user.course_nickname(course))
-      render(:json => course_nickname_json(@current_user, course, nickname))
-    else
-      render :json => { :message => 'no nickname exists for course' } , :status => :not_found
-    end
+    return unless authorized_action(course, @current_user, :read)
+    render(:json => course_nickname_json(@current_user, course))
   end
 
   # @API Set course nickname

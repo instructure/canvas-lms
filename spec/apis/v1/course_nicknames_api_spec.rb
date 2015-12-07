@@ -54,10 +54,17 @@ describe 'Course Nicknames API', type: :request do
         expect(json).to eq({ 'course_id' => @course.id, 'name' => @course.name, 'nickname' => 'nickname' })
       end
 
-      it "404s if a nickname isn't set" do
+      it "returns a null nickname if no nickname exists" do
         json = api_call(:get, "/api/v1/users/self/course_nicknames/#{@course.id}",
-                        @params.merge(:action => 'show', :course_id => @course.to_param),
-                        {}, {}, { :expected_status => 404 })
+                        @params.merge(:action => 'show', :course_id => @course.to_param))
+        expect(json).to eq({ 'course_id' => @course.id, 'name' => @course.name, 'nickname' => nil })
+      end
+
+      it "errors if you don't have permission to view the course" do
+        other_course = Course.create!
+        api_call(:get, "/api/v1/users/self/course_nicknames/#{other_course.id}",
+                 @params.merge(:action => 'show', :course_id => other_course.to_param),
+                 {}, {}, { :expected_status => 401 })
       end
     end
 
