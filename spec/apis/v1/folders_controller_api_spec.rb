@@ -101,13 +101,26 @@ describe "Folders API", type: :request do
   end
 
   describe "#show" do
-    it "should have the file and folder counts" do
-      @root.sub_folders.create!(:name => "folder1", :context => @course)
-      @root.sub_folders.create!(:name => "folder2", :context => @course)
-      Attachment.create!(:filename => 'test.txt', :display_name => "testing.txt", :uploaded_data => StringIO.new('file'), :folder => @root, :context => @course)
-      json = api_call(:get, @folders_path + "/#{@root.id}", @folders_path_options.merge(:action => "show"), {})
-      expect(json['files_count']).to eq 1
-      expect(json['folders_count']).to eq 2
+    describe "file and folder counts" do
+      before(:once) do
+        @root.sub_folders.create!(:name => "folder1", :context => @course)
+        @root.sub_folders.create!(:name => "folder2", :context => @course, :workflow_state => 'hidden')
+        Attachment.create!(:filename => 'test1.txt', :display_name => "test1.txt", :uploaded_data => StringIO.new('file'), :folder => @root, :context => @course)
+        Attachment.create!(:filename => 'test2.txt', :display_name => "test2.txt", :uploaded_data => StringIO.new('file'), :folder => @root, :context => @course).update_attribute(:file_state, 'hidden')
+      end
+
+      it "should count hidden items for teachers" do
+        json = api_call(:get, @folders_path + "/#{@root.id}", @folders_path_options.merge(:action => "show"), {})
+        expect(json['files_count']).to eq 2
+        expect(json['folders_count']).to eq 2
+      end
+
+      it "should not count hidden items for students" do
+        student_in_course :active_all => true
+        json = api_call(:get, @folders_path + "/#{@root.id}", @folders_path_options.merge(:action => "show"), {})
+        expect(json['files_count']).to eq 1
+        expect(json['folders_count']).to eq 1
+      end
     end
 
     it "should have url to list file and folder listings" do
