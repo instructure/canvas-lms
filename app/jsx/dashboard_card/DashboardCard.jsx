@@ -173,67 +173,57 @@ define([
 
     render: function () {
       return (
-        <div className="ic-DashboardCard" ref="cardDiv">
-          <div>
+        <div
+          className="ic-DashboardCard"
+          ref="cardDiv"
+          style={{borderBottomColor: this.props.backgroundColor}}
+        >
+          
+          <div className="ic-DashboardCard__header">
             <div
-              className="ic-DashboardCard__background"
-              style={
-                (window.ENV.use_high_contrast ? 
-                  {borderBottomColor: this.props.backgroundColor}
-                  :
-                  {backgroundColor: this.props.backgroundColor}
-                )
+              className="ic-DashboardCard__header_hero"
+              style={{backgroundColor: this.props.backgroundColor}}
+              onClick={this.headerClick}>
+            </div>
+            <div
+              className="ic-DashboardCard__header_content"
+              onClick={this.headerClick}>  
+              <h2 className="ic-DashboardCard__header-title ellipsis" title={this.props.originalName}>
+                <a className="ic-DashboardCard__link" href="#">
+                  {this.state.nicknameInfo.nickname}
+                </a>
+              </h2>
+              <p className="ic-DashboardCard__header-subtitle ellipsis" title={this.props.courseCode}>{this.props.courseCode}</p>
+              {
+                this.props.term ? (
+                  <p className="ic-DashboardCard__header-term ellipsis" title={this.props.term}>
+                    {this.props.term}
+                  </p>
+                ) : null
               }
-            >
-              { window.ENV.use_high_contrast ?
-                <div
-                  className="ic-DashboardCard__hicontrast-color-ribbon"
-                  style={{borderTopColor: this.props.backgroundColor}}>
-                </div> 
+            </div>
+            <button
+              aria-expanded = {this.state.editing}
+              aria-controls = {this.colorPickerID()}
+              className="Button Button--icon-action-rev ic-DashboardCard__header-button"
+              onClick={this.settingsClick}
+              ref="settingsToggle">
+              <i className="icon-settings" aria-hidden="true" />
+                <span className="screenreader-only">
+                  { I18n.t("Choose a color or course nickname for %{course}", { course: this.state.nicknameInfo.nickname}) }
+                </span>
+            </button>
+          </div>
+          <div
+            className={ 
+              (this.hasLinks() ? 
+                "ic-DashboardCard__action-container"
                 : 
-                null 
-              }
-              <div className="ic-DashboardCard__header" onClick={this.headerClick}>
-                <div className="ic-DashboardCard__header_content">
-                  <a className="ic-DashboardCard__link" href="#">
-                    <h2 className="ic-DashboardCard__header-title" title={this.props.originalName}>
-                      {this.state.nicknameInfo.nickname}
-                    </h2>
-                  </a>
-                  <p className="ic-DashboardCard__header-subtitle">{this.props.courseCode}</p>
-                  {
-                    this.props.term ? (
-                      <p className="ic-DashboardCard__header-term">
-                        {this.props.term}
-                      </p>
-                    ) : null
-                  }
-                </div>
-              </div>
-              <button
-                aria-expanded = {this.state.editing}
-                aria-controls = {this.colorPickerID()}
-                className="Button Button--icon-action-rev ic-DashboardCard__header-button"
-                onClick={this.settingsClick}
-                ref="settingsToggle"
-                >
-                  <i className="icon-settings" aria-hidden="true" />
-                  <span className="screenreader-only">
-                    { I18n.t("Choose a color or course nickname for %{course}", { course: this.state.nicknameInfo.nickname}) }
-                  </span>
-              </button>
-            </div>
-            <div
-              className={ 
-                (this.hasLinks() ? 
-                  "ic-DashboardCard__action-container"
-                  : 
-                  "ic-DashboardCard__action-container ic-DashboardCard__action-container--is-empty"
-                )
-              }
-            >
-              { this.linksForCard() }
-            </div>
+                "ic-DashboardCard__action-container ic-DashboardCard__action-container--is-empty"
+              )
+            }
+          >
+            { this.linksForCard() }
           </div>
           { this.colorPickerIfEditing() }
         </div>
