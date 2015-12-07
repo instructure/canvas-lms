@@ -8,6 +8,22 @@ define([
   'compiled/jquery.rails_flash_notifications'
 ], function ($, _, I18n, React, ReactModal, store) {
 
+  const modalOverrides = {
+    overlay : {
+      backgroundColor: 'rgba(0,0,0,0.5)'
+    },  
+    content : {
+      position: 'static',
+      top: '0',
+      left: '0',
+      right: 'auto',
+      bottom: 'auto',
+      borderRadius: '0',
+      border: 'none',
+      padding: '0'
+    }
+  };
+
   return React.createClass({
     displayName: 'ExternalToolPlacementButton',
 
@@ -95,6 +111,7 @@ define([
           ref='reactModal'
           isOpen={this.state.modalIsOpen}
           onRequestClose={this.closeModal}
+          style={modalOverrides}
           className='ReactModal__Content--canvas ReactModal__Content--mini-modal'
           overlayClassName='ReactModal__Overlay--canvas'
           >
