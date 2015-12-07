@@ -18,7 +18,7 @@ class AccessToken < ActiveRecord::Base
   # on the scope defined in the auth process (scope has not
   # yet been implemented)
 
-  scope :active, -> { where("expires_at IS NULL OR expires_at>?", Time.zone.now) }
+  scope :active, -> { where("expires_at IS NULL OR expires_at>?", DateTime.now.utc) }
 
   TOKEN_SIZE = 64
   OAUTH2_SCOPE_NAMESPACE = '/auth/'
@@ -91,13 +91,13 @@ class AccessToken < ActiveRecord::Base
 
   def used!
     if !last_used_at || last_used_at < record_last_used_threshold.ago
-      self.last_used_at = Time.now
+      self.last_used_at = DateTime.now.utc
       self.save
     end
   end
 
   def expired?
-    developer_key.try(:auto_expire_tokens) && expires_at && expires_at < Time.zone.now
+    (developer_key == DeveloperKey.default || developer_key.try(:auto_expire_tokens)) && expires_at && expires_at < DateTime.now.utc
   end
 
   def token=(new_token)
@@ -114,7 +114,7 @@ class AccessToken < ActiveRecord::Base
     if overwrite || !self.crypted_token
       self.token = CanvasSlug.generate(nil, TOKEN_SIZE)
 
-      if !self.expires_at_changed? && developer_key.try(:auto_expire_tokens)
+      if developer_key != DeveloperKey.default && !self.expires_at_changed? && developer_key.try(:auto_expire_tokens)
         self.expires_at = DateTime.now.utc + 1.hour
       end
     end

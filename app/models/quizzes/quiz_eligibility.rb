@@ -58,7 +58,7 @@ class Quizzes::QuizEligibility
   end
 
   def course_section
-    @course_section ||= (assignment_overrides | student_sections).first || CourseSection.new
+    @course_section ||= (student_sections | assignment_overrides).first || CourseSection.new
   end
 
   private
