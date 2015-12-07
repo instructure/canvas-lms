@@ -4348,7 +4348,7 @@ zh:
       select_student: 选择学生
     link_validator: 
       link_validator: 课程链接验证
-      link_validator_desc: 课程链接验证对课程内容进行搜索，并返回它所遇到的每个无效的或无回应的链接。这个过程可能需要几分钟的时间。
+      link_validator_desc: 课程链接验证对课程内容进行搜索，并返回它所遇到的每个无效的或无回应的链接。这个过程可能需要几分钟。
       page_title: 课程链接验证
     notices: 
       backup_restored: 备份成功恢复！
@@ -6407,7 +6407,7 @@ zh:
       需要更新其 Google Docs 集成。
   google_docs_preview_9f41b23c: "Google Docs Preview"
   google_drive_7cb003c9: "Google Drive"
-  gpa_scale_a6d1cdea: 平均分衡量法
+  gpa_scale_a6d1cdea: 平均分制
   grade_9c6f076d: 评分
   grade_display_warning_dialog: 
     grade_display_warning: 
@@ -10731,7 +10731,7 @@ zh:
       delete_reminder_failed: 删除失败
   peer_reviews_cannot_be_enabled_for_moderated_assig_149d33c4: 同侪评审无法启用于缓和的作业。
   people_b4ebb13c: 人员、人们
-  people_will_see_this_name_in_discussions_messages__fca9ebb2: 人们将在讨论、留言和评论中看到这个名字。
+  people_will_see_this_name_in_discussions_messages__fca9ebb2: 人们将在讨论、留言和评论中看到这个名称。
   percent_complete_3a7edc20: "%{percent}完成"
   percent_of_students_scored_score_53d2c4d5: "%{percent} 的学生分数为 %{score}"
   percentage_34ab7c2c: 百分比、百分率
