@@ -5575,7 +5575,7 @@ sv:
       read_only_rubric: "Du kan inte redigera matrisen, det beror antingen på att du inte har behörighet eller så används den på annan plats. Om du utför ändringar kommer det resultera i en ny matris baserad på den gamla. Fortsätt?"
     titles: 
       criterion_long_description: "Kriterium lång beskrivning"
-      find_existing_rubric: "Hitta existerande matris"
+      find_existing_rubric: "Hitta befintlig matris"
   edit_survey_b0d6890d: "Redigera undersöking"
   edit_toolname_app_23cfbb8: "Redigera %{toolName} App"
   edit_your_catalog_account_cce59310: "Redigera ditt katalogkonto"
@@ -6453,7 +6453,7 @@ sv:
       aria_record: "Klicka för att spela in"
       aria_record_reset: "Klicka för att spela in"
       aria_stop: "Tryck på \"Stop\" för att avsluta inspelning."
-    edit_view_rubric: "Visa matris"
+    edit_view_rubric: "Visa bedömningsmatris"
     errors: 
       select_an_option: "Vänligen välj ett alternativ"
     graded: betygsatt
@@ -6663,7 +6663,7 @@ sv:
       click_to_change: "Kliicka för att testa en annan poäng"
       close_comments: Stäng
       close_comments_label: "Stäng kommentarer"
-      close_rubric: "Stäng matris"
+      close_rubric: "Stäng bedömningsmatris"
       close_score: Stäng
       close_score_screenreader: "Stäng poängdetaljer"
       collapse: "Minska alla inlärning mästarresultatsgrupper"
@@ -12812,7 +12812,7 @@ sv:
     rubric: 
       loading: Laddar...
       titles: 
-        details: "Detaljer om uppgiftsmatris"
+        details: "Detaljer om uppgiftens matris"
     show: 
       answers: 
         correct: Korrekt!
