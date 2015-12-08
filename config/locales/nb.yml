@@ -1224,6 +1224,7 @@ nb:
   add_an_identity_provider_to_this_account_c2644478: "Legg til en identitetstilbyder til denne kontoen:"
   add_app_baf540f: "Legg til app"
   add_attachment_93868828: "Legg til vedlegg"
+  add_content_to_module_name_589a8d54: "Legg innhold til %{module_name} "
   add_course_406cb773: "Legg til kurs"
   add_course_assignments_628ed6d0: "Legg til oppgaver for kurset"
   add_course_calendar_events_146154a5: "Legg til kalenderhendelser for kurset"
@@ -1482,6 +1483,7 @@ nb:
       invalid_course_section: "Ugyldig kursklasse"
       invalid_group_category: "Ugyldig gruppekategori"
       missing_group_category: "Gruppeavtaler må ha en gruppekategori"
+  approximate_value_with_precision_precision_6b7cc6ef: "%{approximate_value} med presisjon %{precision}"
   apps_are_an_easy_way_to_add_new_features_to_canvas_2cbc2531: "Apper er en enkel måte å legge til funksjoner i Canvas. De kan legges til individuelle kurs, eller til alle kurs i en konto. Når de er satt opp kan du lenke til dem fra kursmodulene og opprette oppgaver for vurderingsverktøy."
   appt_calendar_event_dialog: 
     invalid_participants: "Du må tillate minst en bruker å delta"
@@ -2749,6 +2751,7 @@ nb:
   can_t_delete_alignments_based_on_rubric_associatio_d9fd10a3: "Kan ikke slette justeringer basert på Rubrikk foreninger. For å fjerne disse assosiasjonene du trenger å fjerne rad fra eiendelens rubrikk"
   can_t_perform_diffing_against_more_than_one_file_o_44475c0d: "Kan ikke utføre diffing mot mer enn én fil av samme type"
   can_t_unpublish_if_there_are_student_submissions_2d7cd742: "Kan ikke avpublisere om det er student innleveringer"
+  can_t_unpublish_item_name_if_there_are_student_sub_b83c7a9f: "Kan ikke avpublisere %{item_name} hvis det er student innleveringer"
   cancel_caeb1e68: Avbryt
   cannot_be_nil_when_account_id_is_nil_be6d1d60: "kan ikke være null når account_id er null"
   cannot_be_nil_when_course_id_is_nil_f539388: "kan ikke være null når course_id er null"
@@ -6006,6 +6009,7 @@ nb:
   every_665d821e: Hver
   everyone_854554dd: Alle
   everyone_else_6c6dc7b6: "Alle andre"
+  exact_value_margin_eae7e67e: "%{exact_value} +/- %{margin}"
   example_84698b7d: Eksempel
   example_final_score_355aff0f: "Eksempel sluttresultat"
   example_final_score_a92b30b9: "Eksempel sluttresultatet]]"
@@ -7996,6 +8000,7 @@ nb:
   logout_a9312e35: "Logg ut"
   looks_great_e4d883ed: "Ser bra ut!"
   low_score_4eeb95b2: "Lav: %{score}"
+  lower_bound_to_upper_bound_48d093c2: "%{lower_bound} til %{upper_bound}"
   lower_limit_of_range_6ddd4983: "Nedre grense for utvalg"
   lti: 
     lti_message: 
@@ -8023,6 +8028,7 @@ nb:
   manage_b88f7150: Administrere
   manage_grading_schemes_in_context_name_e3678273: "Ordne karaktersystemet i %{context_name}"
   manage_group_group_name_ac8578c6: "Administrere gruppe %{group_name}"
+  manage_item_name_6118d4b0: "Administrer %{item_name}"
   manage_module_name_dfe16816: "Administrer %{module_name}"
   manage_usage_rights_c5a8c216: "Administrere bruksrettigheter"
   manual_entry_e4a4f99a: "Manuell innlegging"
@@ -11539,7 +11545,10 @@ nb:
   published_c944a23d: publisert
   published_click_to_modify_233c0d4: "Publisert - Klikk for å modifisere"
   published_click_to_unpublish_ec4495b5: "Publisert. Klikk for å avpublisere."
+  published_click_to_unpublish_item_name_aaa804b0: "Publisert. Klikk for å avpublisere %{item_name}."
+  published_click_to_unpublish_module_name_eddd07bb: "Publisert. Klikk for å avpublisere %{module_name}."
   publishing_is_disabled_for_this_item_efa7803f: "Publisering er deaktivert for dette objektet"
+  publishing_item_name_is_disabled_8207a9e7: "Publisering %{item_name} er deaktivert"
   purchases: 
     new: 
       payment_info: Betalingsinformasjon
@@ -15173,6 +15182,8 @@ nb:
   unpublished_8b6107d6: Upublisert
   unpublished_click_to_modify_60f9051: "Upublisert - Klikk for å modifisere"
   unpublished_click_to_publish_c073631a: "Upublisert. Klikk for å publisere."
+  unpublished_click_to_publish_item_name_614c4952: "Upublisert. Klikk for å publisere %{item_name}."
+  unpublished_click_to_publish_module_name_89f8601c: "Upublisert. Klikk for å publisere %{module_name}."
   unpublished_courses_title: "Ikke publiserte kurs"
   unpublished_dfd8801: upublisert
   unread_e9c1b19c: Ulest
@@ -15224,6 +15235,7 @@ nb:
       agree_to_terms_with_code_of_conduct: "Du aksepterer *bruksvilkår* og **retningslinjer for opptreden i Canvas**."
   user_696f4d6a: bruker
   user_avatars_e4fc4ed3: Brukeravatar
+  user_count_respondents_e30a8593: "%{user_count} respondentene"
   user_date_range_search: 
     cant_be_blank: "Canvas-bruker-ID kan ikke være tom"
     cant_come_before_from: "Til-datoen kan ikke være før fra-datoen"
