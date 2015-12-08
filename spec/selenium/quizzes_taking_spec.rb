@@ -52,4 +52,33 @@ describe "quiz taking" do
     expect(f("#content .quiz-header").text).to include('Test Quiz')
     expect(f('#submit_quiz_form')).to be_present
   end
+
+  it "should account for question group settings", priority: "1", test_id: 140591 do
+    quiz = quiz_model
+    bank = AssessmentQuestionBank.create!(context: @course)
+    3.times do
+      assessment_question_model(bank: bank)
+      question = bank.assessment_questions.last
+      question.question_data[:points_possible] = 1
+      question.save!
+    end
+    quiz.quiz_groups.create(pick_count: 2, question_points: 15, assessment_question_bank_id: bank.id)
+    quiz.generate_quiz_data
+    # published_at time should be greater than edited_at ime for changes to be committed
+    quiz.published_at = Time.zone.now
+    quiz.save!
+    get "/courses/#{@course.id}/quizzes"
+    expect(f('#assignment-quizzes li:nth-of-type(2)').text).to include('30 pts')
+    get "/courses/#{@course.id}/quizzes/#{quiz.id}"
+    expect_new_page_load{f('#take_quiz_link').click}
+    2.times do |o|
+      expect(fj("#question_#{quiz.quiz_questions[o].id} .question_points_holder").text).to eq('15 pts')
+      click_option("#question_#{quiz.quiz_questions[o].id} .question_input:nth-of-type(1)", 'a1')
+      click_option("#question_#{quiz.quiz_questions[o].id} .question_input:nth-of-type(2)", 'a3')
+    end
+    submit_quiz
+    keep_trying_until do
+      expect(f('.quiz-submission .quiz_score .score_value').text).to eq('30')
+    end
+  end
 end
