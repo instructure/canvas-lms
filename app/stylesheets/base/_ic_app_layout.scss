@@ -77,6 +77,10 @@ $ic-left-side-width: $ic-sp*15;
 .ic-app-main-and-right-side {
   box-sizing: border-box;
   flex: 1;
+// firefox max-width images break the parent container
+  @-moz-document url-prefix() {
+    min-width: 1px;
+  }
 }
 
 .ic-app-course-menu {
@@ -100,14 +104,24 @@ $ic-left-side-width: $ic-sp*15;
   body:not(.ic-no-flex-layout) & {
     box-sizing: border-box;
     flex: 1;
-    @include breakpoint(desktop) { display: flex; }
+// firefox max-width images break the parent container
+  @-moz-document url-prefix() {
+    min-width: 1px;
+  }
+  @include breakpoint(desktop) { display: flex; }
   }
 }
 
 .ic-app-main-content__primary {
   box-sizing: border-box;
   @include breakpoint(desktop) {
-    body:not(.ic-no-flex-layout) & { flex: 1; }
+    body:not(.ic-no-flex-layout) & {
+      flex: 1;
+    // firefox max-width images break the parent container
+      @-moz-document url-prefix() {
+        min-width: 1px;
+      }
+    }
   }
 }
 
