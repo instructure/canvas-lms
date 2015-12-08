@@ -25,8 +25,8 @@ testWebpackConfig.plugins = [
 ];
 
 testWebpackConfig.resolve.alias.qunit = "qunitjs/qunit/qunit.js";
-testWebpackConfig.resolve.modulesDirectories.push('spec/coffeescripts');
-testWebpackConfig.resolve.modulesDirectories.push('spec/javascripts/support');
+testWebpackConfig.resolve.root.push(__dirname + '/spec/coffeescripts');
+testWebpackConfig.resolve.root.push(__dirname + '/spec/javascripts/support');
 testWebpackConfig.module.loaders.push({
   test: /\/spec\/coffeescripts\//,
   loaders: ["qunitDependencyLoader"]

@@ -2,7 +2,7 @@
 #  * Make assignments (due date) events non-resizable. Having an end date on them doesn't
 #    make sense.
 
-# requires jQuery, and vendor/fullcalendar
+# requires jQuery
 
 define [
   'i18n!calendar'

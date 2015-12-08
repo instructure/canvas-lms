@@ -16,9 +16,13 @@ CompiledReferencePlugin.prototype.apply = function(compiler){
   compiler.plugin("normal-module-factory", function(nmf) {
     nmf.plugin("before-resolve", function(result, callback) {
       var requestString = result.request;
-      // this references a coffesscript file in canvas
+
       if(/^compiled\//.test(requestString)){
+        // this references a coffesscript file in canvas
         result.request = requestString.replace("compiled/", "coffeescripts/");
+      }else if(/^spec\/javascripts\/compiled/.test(requestString)){
+        // this references a coffesscript spec file in canvas
+        result.request = requestString.replace("spec/javascripts/compiled/", "");
       }
 
       // this references a coffeescript file in a canvas plugin

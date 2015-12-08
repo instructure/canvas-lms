@@ -48,7 +48,7 @@
     "testem": "~0.7.1",
     "uglify-js": "~2.4.12",
     "vinyl-fs": "0.3.7",
-    "webpack": "^1.12.2",
+    "webpack": "^1.12.9",
     "webpack-dev-server": "^1.12.0",
     "worker-loader": "^0.6.0",
     "xsslint": "0.1.2"
@@ -61,6 +61,7 @@
     "preupdate": "script/gem_npm update",
     "webpack": "webpack --progress --color --watch",
     "webpack-development": "webpack --progress --color",
+    "webpack-stats": "webpack --profile --json",
     "webpack-test": "NODE_ENV=test webpack --progress --color --config webpack.test.config.js",
     "webpack-test-watch": "NODE_ENV=test webpack --progress --color --watch --config webpack.test.config.js",
     "webpack-production": "NODE_ENV=production webpack --progress --color --config webpack.production.config.js"
