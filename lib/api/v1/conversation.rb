@@ -73,6 +73,8 @@ module Api::V1::Conversation
   end
 
   def conversation_recipients_json(recipients, current_user, session)
+    ActiveRecord::Associations::Preloader.new(recipients.select{|r| r.is_a?(MessageableUser)},
+      {:pseudonym => :account}).run # for avatar_url
     recipients.map do |recipient|
       if recipient.is_a?(MessageableUser)
         conversation_user_json(recipient, current_user, session,
@@ -90,6 +92,9 @@ module Api::V1::Conversation
       :include_participant_avatars => true,
       :include_participant_contexts => true
     }.merge(options)
+    if options[:include_participant_avatars]
+      ActiveRecord::Associations::Preloader.new(users, {:pseudonym => :account}).run # for avatar_url
+    end
     users.map { |user| conversation_user_json(user, current_user, session, options) }
   end
 
