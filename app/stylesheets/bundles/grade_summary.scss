@@ -127,7 +127,7 @@
 }
 
 #grades_summary th.possible {
-  text-align: center;
+  text-align: right;
   white-space: nowrap;
 }
 
@@ -142,19 +142,7 @@
 }
 
 #grades_summary td.possible {
-  text-align: center;
-  white-space: nowrap;
-}
-
-#grades_summary th.anonymous {
-  text-align: center;
-  white-space: nowrap;
-  padding-right: 15px;
-}
-
-#grades_summary td.anonymous {
-  text-align: center;
-  white-space: nowrap;
+  text-align: right;
   padding-right: 15px;
 }
 
