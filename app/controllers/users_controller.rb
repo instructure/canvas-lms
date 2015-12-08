@@ -1519,7 +1519,7 @@ class UsersController < ApplicationController
 
     user_params = params[:user].slice(*managed_attributes)
 
-    if user_params == params[:user]
+    if managed_attributes.any? && user_params == params[:user]
       # admins can update avatar images even if they are locked
       admin_avatar_update = user_params[:avatar_image] &&
         @user.grants_right?(@current_user, :update_avatar) &&
