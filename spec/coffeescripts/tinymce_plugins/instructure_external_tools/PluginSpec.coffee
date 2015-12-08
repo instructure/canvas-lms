@@ -35,13 +35,13 @@ define [
     calls = 0
     callback = (()-> calls = calls + 1)
     items = ExternalTools.clumpedButtonMapping(clump, callback)
-    items["<img src='some/url' data-tool-id='42'/>&nbsp;somebutton"]()
+    items["<img src='some&#x2F;url' data-tool-id='42'/>&nbsp;somebutton"]()
     equal(calls, 1)
 
   test "clumpedButtonMapping escapes extremely unlikely XSS attacks", ->
     clump = [{icon_url: 'some/url', name: "<script>alert('attacked')</script>Name", id: 42}]
     items = ExternalTools.clumpedButtonMapping(clump, (->))
-    escapedKey = "<img src='some/url' data-tool-id='42'/>&nbsp;&lt;script&gt;alert('attacked')&lt;/script&gt;Name"
+    escapedKey = "<img src='some&#x2F;url' data-tool-id='42'/>&nbsp;&lt;script&gt;alert(&#x27;attacked&#x27;)&lt;&#x2F;script&gt;Name"
     equal(Object.keys(items)[0], escapedKey)
 
   test "attachClumpedDropdown sets up dropdown closure when clicked out of", ->
