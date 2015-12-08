@@ -41,6 +41,18 @@
                 </a>
               </li>
             <% end %>
+            <% if @current_user && @current_user.all_accounts.count > 0 %>
+              <li class="menu-item ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if active_path?('/accounts') %>">
+                <a id="global_nav_accounts_link" href="/accounts" class="ic-app-header__menu-list-link">
+                  <div class="menu-item-icon-container" aria-hidden="true">
+                    <%= render(:partial => "shared/svg/svg_icon_accounts_new_styles.svg") %>
+                  </div>
+                  <div class="menu-item__text">
+                    <%= t('Admin') %>
+                  </div>
+                </a>
+              </li>
+            <% end %>
             <li class="ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if current_page?(dashboard_url) %>">
               <a id="global_nav_dashboard_link" href="<%= dashboard_url %>" class="ic-app-header__menu-list-link">
                 <div class="menu-item-icon-container" aria-hidden="true">
@@ -67,18 +79,6 @@
                   </div>
                   <div class="menu-item__text">
                     <%= t('Groups') %>
-                  </div>
-                </a>
-              </li>
-            <% end %>
-            <% if @current_user && @current_user.all_accounts.count > 0 %>
-              <li class="menu-item ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if active_path?('/accounts') %>">
-                <a id="global_nav_accounts_link" href="/accounts" class="ic-app-header__menu-list-link">
-                  <div class="menu-item-icon-container" aria-hidden="true">
-                    <%= render(:partial => "shared/svg/svg_icon_accounts_new_styles.svg") %>
-                  </div>
-                  <div class="menu-item__text">
-                    <%= t('Admin') %>
                   </div>
                 </a>
               </li>
