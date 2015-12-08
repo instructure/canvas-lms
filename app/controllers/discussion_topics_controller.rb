@@ -865,7 +865,14 @@ class DiscussionTopicsController < ApplicationController
     unless process_future_date_parameters(discussion_topic_hash)
       process_lock_parameters(discussion_topic_hash)
     end
+
     process_published_parameters(discussion_topic_hash)
+    if is_new && @topic.published? && params[:assignment]
+      @topic.unpublish
+      @topic.root_topic.try(:unpublish)
+      publish_later = true
+    end
+
     process_group_parameters(discussion_topic_hash)
     process_pin_parameters(discussion_topic_hash)
 
@@ -882,6 +889,10 @@ class DiscussionTopicsController < ApplicationController
         apply_positioning_parameters
         apply_attachment_parameters
         apply_assignment_parameters
+        if publish_later
+          @topic.publish!
+          @topic.root_topic.try(:publish!)
+        end
         render :json => discussion_topic_api_json(@topic.reload, @context, @current_user, session)
       else
         errors = @topic.errors.as_json[:errors]

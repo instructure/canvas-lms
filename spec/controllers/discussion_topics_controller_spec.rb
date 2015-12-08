@@ -555,6 +555,22 @@ describe DiscussionTopicsController do
       expect(@student.recent_stream_items.map {|item| item.data['notification_id']}).not_to include notification.id
     end
 
+    it 'does not dispatch new topic notification when hidden by selective release' do
+      notification = Notification.create(name: 'New Discussion Topic', category: 'TestImmediately')
+      @student.communication_channels.create!(path: 'student@example.com') {|cc| cc.workflow_state = 'active'}
+      @course.enable_feature!(:differentiated_assignments)
+      new_section = @course.course_sections.create!
+      obj_params = topic_params(@course, published: true).merge(assignment_params(@course, only_visible_to_overrides: true, assignment_overrides: [{course_section_id: new_section.id}]))
+      user_session(@teacher)
+      post 'create', { :format => :json }.merge(obj_params)
+      json = JSON.parse response.body
+      topic = DiscussionTopic.find(json['id'])
+      expect(topic).to be_published
+      expect(topic.assignment).to be_published
+      expect(@student.email_channel.messages).to be_empty
+      expect(@student.recent_stream_items.map {|item| item.data}).not_to include topic
+    end
+
     it 'dispatches an assignment stream item with the correct title' do
       notification = Notification.create(:name => "Assignment Created")
       obj_params = topic_params(@course).

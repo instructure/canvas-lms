@@ -706,7 +706,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   on_create_send_to_streams do
     if should_send_to_stream
-      self.active_participants
+      self.active_participants_with_visibility
     end
   end
 
@@ -714,7 +714,7 @@ class DiscussionTopic < ActiveRecord::Base
     check_state = !is_announcement ? 'unpublished' : 'post_delayed'
     became_active = workflow_state_was == check_state && workflow_state == 'active'
     if should_send_to_stream && (@content_changed || became_active)
-      self.active_participants
+      self.active_participants_with_visibility
     end
   end
 
