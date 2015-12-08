@@ -202,6 +202,7 @@ define([
             };
 
             if(item_data['item[type]'] == 'attachment') {
+              data['duplicate_handling'] = 'rename';
               $.ajaxJSONFiles(url, 'POST', data, $("#module_attachment_uploaded_data"), function(data) {
                 callback(data);
               }, function(data) {
