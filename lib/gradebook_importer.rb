@@ -100,17 +100,17 @@ class GradebookImporter
       process_submissions(row, @students.last)
     end
 
-
     @assignments_outside_current_periods = []
     if @context.feature_enabled? :multiple_grading_periods
-      memo = @assignments
-      current_grading_period = GradingPeriod.for(@context).current
+      current_period = GradingPeriod.for(@context).current.first
 
-      unless current_grading_period.empty?
-        @assignments = select_in_grading_period @assignments, @context, current_grading_period.first
+      if current_period.present?
+        with_due_at = @assignments.select(&:due_at)
+        in_current_period = select_in_grading_period(with_due_at, @context, current_period)
+
+        @assignments_outside_current_periods = with_due_at - in_current_period
+        @assignments = @assignments - @assignments_outside_current_periods
       end
-
-      @assignments_outside_current_periods = memo - @assignments
     end
 
     @missing_assignments = []
