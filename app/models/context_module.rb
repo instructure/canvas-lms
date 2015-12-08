@@ -675,7 +675,7 @@ class ContextModule < ActiveRecord::Base
 
   def completion_event_callbacks
     callbacks = []
-    if publish_final_grade?
+    if publish_final_grade? && (plugin = Canvas::Plugin.find('grade_export')) && plugin.enabled?
       callbacks << lambda { |user| context.publish_final_grades(user, user.id) }
     end
     callbacks

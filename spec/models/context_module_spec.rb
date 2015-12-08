@@ -361,6 +361,7 @@ describe ContextModule do
       @user = User.create!(:name => "some name")
       @course.enroll_student(@user)
 
+      Canvas::Plugin.find!('grade_export').stubs(:enabled?).returns(true)
       @course.expects(:publish_final_grades).with(@user, @user.id).once
 
       @module.evaluate_for(@user)
