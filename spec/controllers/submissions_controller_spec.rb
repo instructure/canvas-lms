@@ -122,6 +122,36 @@ describe SubmissionsController do
       expect(assigns[:submission].url).to eql("http://www.google.com")
     end
 
+    it "should redirect to the assignment when locked in submit-at-deadline situation" do
+      enable_cache do
+        now = Time.now.utc
+        Timecop.freeze(now) do
+          course_with_student_logged_in(:active_all => true)
+          @assignment = @course.assignments.create!(
+            :title => "some assignment",
+            :submission_types => "online_url",
+            :lock_at => now + 5.seconds
+          )
+
+          # cache permission as true (for 5 minutes)
+          expect(@assignment.grants_right?(@student, :submit)).to be_truthy
+        end
+
+        # travel past due date (which resets the Assignment#locked_for? cache)
+        Timecop.freeze(now + 10.seconds) do
+          # now it's locked, but permission is cached, locked_for? is not
+          post 'create',
+            :course_id => @course.id,
+            :assignment_id => @assignment.id,
+            :submission => {
+              :submission_type => "online_url",
+              :url => " http://www.google.com "
+            }
+          expect(response).to be_redirect
+        end
+      end
+    end
+
     describe 'when submitting a text response for the answer' do
       let(:assignment) { @course.assignments.create!(:title => "some assignment", :submission_types => "online_text_entry") }
       let(:submission_params) { {:submission_type => "online_text_entry", :body => "My Answer"} }
