@@ -44,7 +44,7 @@ describe "handlebars" do
       items: ['dont forget to stretch!!!'],
       input: '<input>',
       url: 'http://foo.bar',
-      escaped: '<b>escaped</b>',
+      escaped: '<b>escaped"`\'=&</b>',
       unescaped: '<b>unescaped</b>'
     })
 
@@ -58,9 +58,9 @@ describe "handlebars" do
       </ol>
       <p>lemme instructure you some html: if you type &lt;input&gt;, you get <input></p>
       <p>in other words you get <input> when you type &lt;input&gt;</p>
-      <p>this is &lt;b&gt;escaped&lt;/b&gt;</p>
+      <p>this is &lt;b&gt;escaped&quot;&#x60;&#x27;&#x3D;&amp;&lt;&#x2F;b&gt;</p>
       <p>this is <b>unescaped</b></p>
-      welp, see you l8r! dont forget 2 <a href="http://foo.bar">like us</a> on facebook lol
+      welp, see you l8r! dont forget 2 <a href="http:&#x2F;&#x2F;foo.bar">like us</a> on facebook lol
     RESULT
   end
 
