@@ -23,7 +23,9 @@ class PageCommentsController < ApplicationController
     if authorized_action(@page, @current_user, :comment)
       @comment = @page.page_comments.build(params[:page_comment])
       @comment.user = @current_user
-      url = if @page.slug.blank?
+      url = if @page.eportfolio_category.slug.blank?
+              eportfolio_url(@portfolio)
+            elsif @page.slug.blank?
               eportfolio_named_category_url(@portfolio, @page.eportfolio_category.slug)
             else
               eportfolio_named_category_entry_url(@portfolio, @page.eportfolio_category.slug, @page.slug)
