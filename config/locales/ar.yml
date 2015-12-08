@@ -55,7 +55,7 @@ ar:
   a_full_size_logo_that_appears_in_the_right_sidebar_18873685: "شعار بحجم كامل على الشريط الجانبي الأيمن في لوحة تحكم Canvas. الحجم المثالي 360x140 بيكسل. التنسيقات المقبولة: svg و png و jpeg و gif"
   a_handy_key_value_dump_of_a_host_of_interesting_en_d0518dfe: "قيمة/مفتاح تفريغ مفيد لخادم حول معلومات بيئة تهم المستخدم الذي يقوم بالإبلاغ"
   a_message_is_required_129e1814: "الرسالة مطلوبة"
-  a_new_assignment_has_been_created_for_your_course__12b72639: "تم إنشاء مهمة جديدة للمساق %{course_name}"
+  a_new_assignment_has_been_created_for_your_course__12b72639: "تم إنشاء مهمة جديدة لمساقك، %{course_name}"
   a_problem_occurred_adding_reviewers_57b083d9: "حدث خطأ أثناء إضافة المراجعين."
   a_table_containing_the_name_of_the_grading_scheme__2c25dc3: "جدول يحتوي على اسم نظام التقييم والرموز الخاصة بتحرير النظام وحذفه."
   a_table_that_contains_the_grading_scheme_data_each_d461c205: "جدول يحتوي على بيانات نظام التقييم. يحتوي كل صف على اسم وحدين أقصى وأدنى للنسبة المئوية. كما يحتوي كل صف على رمز لإضافة صف جديد أسفل الصف الموجود ورمز لحذف الصف الموجود."
@@ -2900,7 +2900,7 @@ ar:
   change_name_to_568374c8: "تغيير \"%{name}\" إلى"
   change_points_possible_to_match_rubric_dialog: 
     prompts: 
-      update_assignment_points: "ترك إجمالي نقاط المهمة في %{assignmentPoints} وإجمالي نقاط العنوان في %{rubricPoints} سيؤدي إلى أعلى درجة %{toPercentage_pointRatio} ممكنة بالنسبة لإرسالات الطلاب التي تم تقييم درجاتها باستخدام العنوان."
+      update_assignment_points: "سيؤدي ترك إجمالي نقاط المهمة في %{assignmentPoints} وإجمالي نقاط العنوان في %{rubricPoints} إلى أعلى درجة %{toPercentage_pointRatio} ممكنة بالنسبة لإرسالات الطلاب التي تم تقييم درجاتها باستخدام العنوان."
     titles: 
       update_assignment_points: "هل تريد تغيير نقاط المهمة لمطابقة العنوان؟"
   changes_will_still_apply_if_you_leave_this_page_935cedc6: "ستبقى التغييرات منطبقة في حال مغادرتك لهذه الصفحة."
@@ -4482,9 +4482,9 @@ ar:
       loading: "جارٍ تحميل الطلاب..."
       select_student: "تحديد طالب"
     link_validator: 
-      link_validator: "ارتباط مصادقة المساق"
-      link_validator_desc: "يبحث ارتباط مصادقة المساق بالبحث في محتويات المساق ويقوم بإرجاع كافة الارتباطات غير الصالحة أو غير المستجيبة التي يعثر عليها. قد تستغرق العملية بضع دقائق."
-      page_title: "ارتباط مصادقة المساق"
+      link_validator: "أداة المصادقة على ارتباط المساق"
+      link_validator_desc: "تبحث أداة المصادقة على ارتباط المساق في محتويات المساق وتقوم بإرجاع كافة الارتباطات غير الصالحة أو غير المستجيبة التي تعثر عليها. قد تستغرق العملية بضع دقائق."
+      page_title: "أداة المصادقة على ارتباط المساق"
     notices: 
       backup_restored: "تمت استعادة النسخ الاحتياطي بنجاح!"
       concluded: "تم الوصول إلى المساق بنجاح"
@@ -8212,7 +8212,7 @@ ar:
       feedback: "انقر هنا لإخبارنا عما حدث"
     show_me_where: "إظهاري حيث"
   links_14b70841: ارتباطات
-  load_more_9ca37ccc: "تحميل المزيد ..."
+  load_more_9ca37ccc: "تحميل المزيد..."
   loading_25990131: "جارٍ التحميل..."
   loading_bde52856: "يتم الآن التحميل..."
   loading_more_results_def6df65: "جارٍ تحميل المزيد من النتائج..."
@@ -15525,7 +15525,7 @@ ar:
   there_was_an_error_in_processing_your_request_6513a49a: "حدث خطأ أثناء معالجة طلبك"
   there_was_an_error_saving_the_note_please_try_agai_f2f2cd38: "حدث خطأ أثناء حفظ الملاحظة. يرجى المحاولة مرة أخرى."
   there_was_an_error_setting_usage_rights_53739e1d: "كان هناك خطأ في إعداد حقوق الاستخدام."
-  there_was_an_error_with_your_query_please_try_a_di_761dff12: "حدث خطأ مع طلبك، يرجى محاولة بحث آخر"
+  there_was_an_error_with_your_query_please_try_a_di_761dff12: "حدث خطأ مع طلبك، يرجى محاولة القيام ببحث آخر"
   there_were_errors_with_the_form_errors_ab5b559a: "كانت هناك أخطاء في النموذج: %{errors}"
   these_grading_periods_were_created_for_you_by_an_a_e977c2b5: "قام مسؤول بإنشاء فترات تقييم الدرجات هذه من أجلك."
   this_assignment_has_been_excused_87f1dc13: "هذه المهمة لم تعد إجبارية."
@@ -15550,7 +15550,7 @@ ar:
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "هذه قائمة تضم عناوين URL المفصولة بفاصلة للوثوق بها. تؤدي الثقة بأي عنوان URL في هذه القائمة إلى تخطي رمز CSRF المميز عند تسجيل الدخول إلى Canvas."
   this_is_a_concluded_course_so_only_concluded_enrol_e6e3a9d9: "هذا المساق منتهي، لذلك لا تتوفر سوى التسجيلات المنتهية."
   this_login_is_for_provider_6f17462: "تسجيل الدخول هذا خاص بـ %{provider}"
-  this_module_is_locked_until_completing_all_of_the__ddf06070: "هذه الوحدة مؤمنة إلى أن تستكمل جميع متطلبات الوحدات التالية: %{prerequisites}"
+  this_module_is_locked_until_completing_all_of_the__ddf06070: "هذه الوحدة مؤمنة إلى أن تُستكمل جميع متطلبات الوحدات التالية: %{prerequisites}"
   this_module_is_locked_until_datetime_b2486751: "هذه الوحدة مؤمنة إلى غاية %{datetime}"
   this_most_likely_happened_because_you_imported_cou_a78ea880: "السبب الأرجح في حدوث ذلك هو أنك قمت باستيراد محتوى المساق دون الملفات المرتبطة به."
   this_name_appears_in_sorted_lists_dccbd84b: "يظهر هذا الاسم في القوائم المفروزة."
@@ -15558,7 +15558,7 @@ ar:
   this_outcome_has_been_used_to_assess_a_student_and_376d5ba9: "تم استخدام هذه النتيجة لتقييم أحد الطلاب ولم يعد تحديثها ممكن"
   this_outcome_has_been_used_to_assess_a_student_and_5a925169: "تم استخدام هذه النتيجة لتقييم أحد الطلاب ولا يمكن تحريرها أو حذفها"
   this_page_cannot_be_modified_because_grades_have_a_48646991: "لا يمكن تعديل هذه الصفحة لأن الدرجات قد نشرت بالفعل."
-  this_question_group_is_set_to_pick_more_questions__2e3552c4: "تم تعيين مجموعة الأسئلة هذه ليكون عدد الأسئلة المختارة أكبر من عدد الأسئلة المتوفرة."
+  this_question_group_is_set_to_pick_more_questions__2e3552c4: "تم تعيين هذه المجموعة من الأسئلة ليكون عدد الأسئلة المختارة أكبر من عدد الأسئلة المتوفرة."
   this_question_will_show_a_checkbox_next_to_each_an_169cd6d9: "سيقوم هذا السؤال بعرض خانة اختيار بجوار كل إجابة."
   this_quiz_has_been_excused_d89d2b74: "هذا الامتحان لم يعد إجباري"
   this_quiz_is_unpublished_only_teachers_can_see_the_51d281b1: "*هذا الاختبار غير منشور* يمكن للمعلمين فقط مشاهدة هذا الاختبار حتى يتم نشره."
@@ -15880,6 +15880,7 @@ ar:
   up_c553575d: لأعلى
   update_4d8ee62: تحديث
   updated_group_group_name_727b1d98: "تم تحديث المجموعة %{group_name}"
+  updated_ui_for_searching_and_displaying_users_and__6755e08e: "واجهة مستخدم محدّثة للبحث عن المستخدمين والمساقات في الحساب وعرضها."
   updating_6edbab78: تحديث
   upload_8b403d05: تحميل
   upload_a_css_file_ec22214b: "تحميل ملف CSS..."
@@ -16008,6 +16009,7 @@ ar:
       updating_user_details: "جارٍ تحديث تفاصيل المستخدم..."
     notices: 
       image_reported: "لقد تم الإبلاغ عن هذه الصورة"
+  user_name_successfully_added_79af8365: "تمت إضافة %{user_name} بنجاح!"
   user_name_you_ll_need_to_log_in_before_you_can_vie_164c8e30: "%{user_name}، عليك بـ *تسجيل الدخول* قبل أن تتمكن من عرض الصفحة."
   user_navigation_a097be0f: "تصفح المستخدم"
   user_not_authorized_to_manage_sis_data_account_sis_47bd4eec: "المستخدم غير مخول لإدارة بيانات SIS - account[sis_account_id]"
@@ -16335,6 +16337,7 @@ ar:
       welcome_to_happiness: "مرحبًا بك في Canvas!"
   validate: 
     is_required: "هذا الحقل مطلوب"
+  validate_links_in_content_b1630fba: "المصادقة على الارتباطات في المحتوى"
   vanity_url_76f93382: "Vanity URL"
   video_b9f27375: فيديو
   video_content_is_not_supported_by_your_device_or_a_25214f57: "جهازك أو تطبيقك لا يدعم محتوى الفيديو."
@@ -16346,10 +16349,14 @@ ar:
   view_file_8a1c62e5: "عرض الملف"
   view_grades_8d3bae6c: "عرض الدرجات"
   view_name_app_62a2ad8e: "عرض التطبيق %{name}"
+  view_next_file_a8a4a885: "عرض الملف التالي"
+  view_previous_file_b846db4f: "عرض الملف السابق"
   view_question_banks_188a9e0f: "عرض بنوك الأسئلة"
   view_student_analytics_6b8ccd42: "عرض المعلومات التحليلية للطلاب"
+  view_the_assignment_e61ca4fc: "عرض المهمة"
   view_toolname_placements_4a5724d1: "عرض مواضع %{toolName}"
   viewed_6b75c21e: "تم العرض"
+  viewing_folders_is_not_available_798a15e1: "عرض المجلدات غير متوفر"
   visit_864b4060: زيارة
   visit_group_group_name_7a816081: "زيارة المجموعة %{group_name}"
   warning_crocodoc_has_limitations_when_used_in_fire_8ab414e6: "تحذير: لدى Crocodoc قيود أثناء استخدام Firefox. لن تحفظ التعليقات دائمًا."
@@ -16525,6 +16532,7 @@ ar:
       page_does_not_exist: "الصفحة \"%{title}\" غير موجودة."
     revisions: 
       page_revisions_title: "مراجعات %{title}: %{context_name}"
+  wiki_pages_13eb70fb: "صفحات Wiki"
   wiki_pages_api: 
     cannot_delete_front_page: "لا يمكن حذف الصفحة الأمامية"
     cannot_have_unpublished_front_page: "تعذر إلغاء نشر الصفحة الأمامية"
