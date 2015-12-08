@@ -53,7 +53,15 @@
 <% else %>
   <div id="discussion-managebar" class="toolbarView">
     <div class="headerBar">
-      <div class="row-fluid form-inline" style="overflow: visible;">
+      <div class="form-inline" style="overflow: visible;">
+        <div id="keyboard-shortcut-modal-info" tabindex="0">
+          <span aria-hidden="true" class="accessibility-warning">
+            <%= t 'Press the comma key or shift + ? to see a list of keyboard shortcuts' %>
+          </span>
+          <span class="screenreader-only">
+            <%= t 'Press the comma key or shift + question mark to see a list of keyboard shortcuts' %>
+          </span>
+        </div>
         <div class="pull-right">
           <% if !@topic.is_announcement && can_do(@context, @current_user, :moderate_forum) %>
             <button
