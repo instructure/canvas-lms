@@ -155,8 +155,11 @@ define([
               }).data('context_code', standard.context_code);
               $standard.removeClass('blank');
               for(var jdx = 0; jdx < standard.data.length; jdx++) {
-                var list = standard.data[jdx];
-                var row = {name: list[0], value: (jdx == 0 ? 100 : '< ' + standard.data[jdx - 1][1] * 100), next_value: list[1] * 100};
+                var row = {
+                  name: standard.data[jdx][0],
+                  value: jdx != 0 ? '< ' + round((standard.data[jdx - 1][1] * 100), 2) : 100,
+                  next_value: round((standard.data[jdx][1] * 100), 2)
+                };
                 var $row = $standard.find(".details_row.blank:first").clone(true);
                 $row.removeClass('blank');
                 $row.fillTemplateData({data: row});
