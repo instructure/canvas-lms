@@ -4,6 +4,7 @@
   <div class="rs-margin-lr">
     <%= form_for :user, :url => account_users_path(@account), :html => {:id => "new_user", :class => "ic-Form-control account_search_form", :method => :get} do |f| -%>
       <div class="ic-Input-group">
+        <input name="focus" type="hidden" value="user_name"/>
         <input class="ic-Input" type="text" id="user_name" name="user[name]" value="<%= @user_query %>" aria-labelledby="user_name_label" />
         <button class='Button'><%= t 'buttons.go', "Go" %></button>
       </div>
