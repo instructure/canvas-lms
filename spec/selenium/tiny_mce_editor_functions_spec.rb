@@ -416,7 +416,7 @@ describe "Tiny MCE editor functions" do
       expect(p.body[0..47]).to eq "<p dir=\"rtl\">this should run right to left</p>"
     end
 
-    it "should remove left-to-right from text on wiki description", priority: "1", test_id: 547797 do
+    it "should remove right-to-left from text on wiki description", priority: "1", test_id: 547797 do
       p = create_wiki_page("test_page", false, "public")
       p.body = "<p dir=\"rtl\">this should have right to left removed</p>"
       p.save!
@@ -428,6 +428,33 @@ describe "Tiny MCE editor functions" do
 
       p.reload
       expect(p.body[0..44]).to eq "<p>this should have right to left removed</p>"
+    end
+
+    it "should make text run left-to-right on wiki description", priority: "1", test_id: 547548 do
+      p = create_wiki_page("test_page", false, "public")
+      get "/courses/#{@course.id}/pages/#{p.title}/edit"
+
+      click_tiny_button('Left to right')
+      type_in_tiny('textarea.body', "this should run left to right")
+      f("form.edit-form button.submit").click
+      wait_for_ajaximations
+
+      p.reload
+      expect(p.body[0..47]).to eq "<p dir=\"ltr\">this should run left to right</p>"
+    end
+
+    it "should remove left-to-right from text on wiki description", priority: "1", test_id: 550312 do
+      p = create_wiki_page("test_page", false, "public")
+      p.body = "<p dir=\"ltr\">this should have left to right removed</p>"
+      p.save!
+      get "/courses/#{@course.id}/pages/#{p.title}/edit"
+
+      click_tiny_button('Left to right')
+      f("form.edit-form button.submit").click
+      wait_for_ajaximations
+
+      p.reload
+      expect(p.body[0..44]).to eq "<p>this should have left to right removed</p>"
     end
   end
 end
