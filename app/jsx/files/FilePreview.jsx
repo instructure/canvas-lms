@@ -45,7 +45,7 @@ define([
         >
           <div className='ef-file-preview-arrow-link'>
             <span className='screenreader-only'>{linkText}</span>
-            <i className={`icon-arrow-open-${direction}`} />
+            <i aria-hidden='true' className={`icon-arrow-open-${direction}`} />
           </div>
         </Link>
       </div>
