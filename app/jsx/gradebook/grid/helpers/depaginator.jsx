@@ -1,12 +1,12 @@
 define([
   'jquery',
+  'underscore',
   'jquery.ajaxJSON'
-], function($) {
-  var exists, Depaginator, depaginate;
+], function($, _) {
+  let exists, Depaginator, depaginate;
 
   depaginate = function(url, data) {
-    var deferred, depaginator;
-
+    let deferred, depaginator;
     deferred = $.Deferred();
     depaginator = new Depaginator(url, deferred, data);
     depaginator.retrieve();
@@ -34,8 +34,7 @@ define([
   };
 
   Depaginator.prototype.handleInitialRequest = function(resultData, status, xhr) {
-    var paginationLinks, lastLink;
-
+    let paginationLinks, lastLink;
     paginationLinks = xhr.getResponseHeader('Link');
     lastLink = paginationLinks.match(/<[^>]+>; *rel="last"/);
     lastLink = lastLink[0].match(/<[^>]+>;/);
@@ -49,31 +48,24 @@ define([
     }
   };
 
-  Depaginator.prototype.depaginate = function(resultData, lastLink) {
-    var lastPage, requests, allResults;
-
+  Depaginator.prototype.depaginate = function(firstPageData, lastLink) {
+    let lastPage, requests;
     lastPage = lastLink[0].match(/page=(\d+)/)[1];
     lastPage = parseInt(lastPage, 10);
-
     requests = this.getAllRequests(lastPage);
 
-    this.makeRequests(requests).then(function(responses) {
-      var results;
-
-      allResults = resultData;
-
-      for (var responseNumber = 0; responseNumber < arguments.length; responseNumber += 3) {
-        results = arguments[responseNumber];
-        allResults = allResults.concat(results);
-      }
-
-      this.deferred.resolve(allResults);
+    this.makeRequests(requests).then(function() {
+      let allOtherPagesData = _.chain(arguments)
+        .map(response => response[0])
+        .flatten()
+        .value();
+      let allData = firstPageData.concat(allOtherPagesData);
+      this.deferred.resolve(allData);
     }.bind(this));
   };
 
   Depaginator.prototype.getAllRequests = function(lastPage) {
-    var requests = [], pageNumber, request;
-
+    let requests = [], pageNumber, request;
     for (pageNumber = 2; pageNumber <= lastPage; pageNumber++) {
       request = this.fetchResources(pageNumber);
       requests.push(request);
