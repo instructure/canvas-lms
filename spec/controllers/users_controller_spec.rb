@@ -1292,6 +1292,17 @@ describe UsersController do
     end
   end
 
+  describe "PUT 'update'" do
+    it "does not leak information about arbitrary users" do
+      other_user = User.create! :name => 'secret'
+      user_with_pseudonym
+      user_session(@user)
+      put 'update', :id => other_user.id, :format => 'json'
+      expect(response.body).not_to include 'secret'
+      expect(response.status).to eq 401
+    end
+  end
+
   describe "POST 'masquerade'" do
     specs_require_sharding
 

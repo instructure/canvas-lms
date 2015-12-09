@@ -59,8 +59,11 @@ define([
                 onClick={this.props.onReviewClick}
                 disabled={this.props.published}
               >
-                <i className='icon-plus' />
-                {I18n.t(' Reviewer')}
+                <span className='screenreader-only'>{I18n.t('Add a reviewer for the selected students')}</span>
+                <span aria-hidden='true'>
+                  <i className='icon-plus' />
+                  {I18n.t(' Reviewer')}
+                </span>
               </button>
               <button
                 ref='publishBtn'

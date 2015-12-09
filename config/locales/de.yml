@@ -7881,6 +7881,7 @@ de:
   lock_date_cannot_be_before_due_date_ac30f54: "Das Sperrdatum kann nicht vor dem Abgabetermin liegen"
   lock_icon_a9916601: "Sperren Icon"
   locked_762f138b: Gesperrt
+  locked_until_unlock_date_498ead5f: "Gesperrt bis %{unlock_date}."
   log_in_c9e240ef: Anmelden
   log_on_url_fc166e4c: Anmelde-URL
   log_out_379ba28a: Abmeldung
