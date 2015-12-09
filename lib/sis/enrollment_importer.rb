@@ -43,7 +43,7 @@ module SIS
       # We batch these up at the end because we don't want to keep touching the same course over and over,
       # and to avoid hitting other callbacks for the course (especially broadcast_policy)
       i.courses_to_touch_ids.to_a.in_groups_of(1000, false) do |batch|
-        Course.where(:id => batch).update_all(:updated_at => Time.now.utc)
+        Course.where(id: batch).touch_all
       end
       i.courses_to_recache_due_dates.to_a.in_groups_of(1000, false) do |batch|
         batch.each do |course_id|
@@ -55,7 +55,7 @@ module SIS
       i.incrementally_update_account_associations
       User.update_account_associations(i.update_account_association_user_ids.to_a, :account_chain_cache => i.account_chain_cache)
       i.users_to_touch_ids.to_a.in_groups_of(1000, false) do |batch|
-        User.where(:id => batch).update_all(:updated_at => Time.now.utc)
+        User.where(id: batch).touch_all
       end
       @logger.debug("Enrollments with batch operations took #{Time.now - start} seconds")
       return i.success_count
