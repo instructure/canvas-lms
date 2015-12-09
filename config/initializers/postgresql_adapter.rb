@@ -230,14 +230,12 @@ module PostgreSQLAdapterExtensions
   def initialize_type_map(*args)
     return super if Rails.version >= '4.2'
 
-    known_type_names = OID::NAMES.keys.map { |n| "'#{n}'" }
-    sql = <<-SQL % [known_type_names.join(", "), known_type_names.join(", ")]
-    SELECT t.oid, t.typname, t.typelem, t.typdelim, t.typinput
-     FROM pg_type t
-     LEFT OUTER JOIN pg_type et ON t.typelem=et.oid
-     WHERE
-       t.typname IN (%s)
-       OR et.typname IN (%s)
+    known_type_names = OID::NAMES.keys.map { |n| "'#{n}'" } + OID::NAMES.keys.map { |n| "'_#{n}'" }
+    known_type_names.concat(%w{'name' 'oidvector' 'int2vector' 'line' 'point' 'box' 'lseg'})
+    sql = <<-SQL % [known_type_names.join(", ")]
+    SELECT oid, typname, typelem, typdelim, typinput
+     FROM pg_type
+     WHERE typname IN (%s)
     SQL
     result = execute(sql, 'SCHEMA')
     leaves, nodes = result.partition { |row| row['typelem'] == '0' }
