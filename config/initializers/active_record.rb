@@ -1294,7 +1294,10 @@ ActiveRecord::Relation.class_eval do
   end
 
   def touch_all
-    not_recently_touched.update_all(updated_at: Time.now.utc)
+    transaction do
+      ids_to_touch = not_recently_touched.lock(:no_key_update).order(:id).pluck(:id)
+      unscoped.where(id: ids_to_touch).update_all(updated_at: Time.now.utc)
+    end
   end
 
   def distinct_on(*args)
