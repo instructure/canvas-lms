@@ -64,16 +64,24 @@ describe "people" do
     enroll_student(student_4)
   end
 
-  def open_dropdown_menu(selector: nil, option: nil, displayed: true)
-    selector ||= ".rosterUser"
+  def open_dropdown_menu(selector = ".rosterUser")
     row = f(selector)
     driver.action.move_to(row).perform
     f("#{selector} .admin-links a.al-trigger").click
     expect(f("#{selector} .admin-links ul.al-options")).to be_displayed
-    if option
-      to_be_or_not_to_be = displayed ? :to : :not_to
-      expect(element_exists("#{selector} .admin-links ul.al-options li a[data-event=#{option}]")).send to_be_or_not_to_be, be_truthy
-    end
+  end
+
+  def dropdown_item_exists?(option, selector = ".rosterUser")
+    element_exists(f("#{selector} .admin-links ul.al-options li a[data-event=#{option}]"))
+  end
+
+  # Returns visibility boolean, assumes existence
+  def dropdown_item_visible?(option, selector = ".rosterUser")
+    f("#{selector} .admin-links ul.al-options li a[data-event=#{option}]").displayed?
+  end
+
+  def close_dropdown_menu
+    driver.action.send_keys(:escape).perform
   end
 
   context "people as a teacher" do
@@ -114,7 +122,8 @@ describe "people" do
     end
 
     it "should display the option to remove a student from a course if manually enrolled" do
-      open_dropdown_menu(option: 'removeFromCourse')
+      open_dropdown_menu("tr[id=user_#{@student_1.id}]")
+      expect(dropdown_item_visible?('removeFromCourse', "tr[id=user_#{@student_1.id}]")).to be true
     end
 
     it "should display the option to remove a student from a course has a SIS ID", priority: "1", test_id: 336018 do
@@ -125,25 +134,32 @@ describe "people" do
       get "/courses/#{@course.id}/users"
       wait_for_ajaximations
       # check 1st student
-      open_dropdown_menu(option: 'removeFromCourse', selector: '.rosterUser:nth-child(2)')
+      open_dropdown_menu("tr[id=user_#{@student_1.id}]")
+      expect(dropdown_item_visible?('removeFromCourse', "tr[id=user_#{@student_1.id}]")).to be true
+      close_dropdown_menu
       # check 2nd student
-      open_dropdown_menu(option: 'removeFromCourse', selector: '.rosterUser:nth-child(3)')
+      open_dropdown_menu("tr[id=user_#{@student_2.id}]")
+      expect(dropdown_item_visible?('removeFromCourse', "tr[id=user_#{@student_2.id}]")).to be true
     end
 
-    it "should remove a student with/without SIS id from a course", priority: "1", test_id: 332576 do
+    it "should display remove option for student with/without SIS id", priority: "1", test_id: 332576 do
       enroll_student(@student_2)
       @student = user
       @course.enroll_student(@student).update_attribute(:sis_source_id, 'E001')
       @course.save
       get "/courses/#{@course.id}/users"
       # check 1st student
-      open_dropdown_menu(option: 'removeFromCourse', selector: '.rosterUser:nth-child(2)')
+      open_dropdown_menu("tr[id=user_#{@student_1.id}]")
+      expect(dropdown_item_visible?('removeFromCourse', "tr[id=user_#{@student_1.id}]")).to be true
+      close_dropdown_menu
       # check 2nd student
-      open_dropdown_menu(option: 'removeFromCourse', selector: '.rosterUser:nth-child(3)')
+      open_dropdown_menu("tr[id=user_#{@student_2.id}]")
+      expect(dropdown_item_visible?('removeFromCourse', "tr[id=user_#{@student_2.id}]")).to be true
     end
 
     it "should display the option to remove a ta from the course" do
-      open_dropdown_menu(option: 'removeFromCourse', selector: '.rosterUser:nth-child(3)')
+      open_dropdown_menu("tr[id=user_#{@test_ta.id}]")
+      expect(dropdown_item_visible?('removeFromCourse', "tr[id=user_#{@test_ta.id}]")).to be true
     end
 
     it "should display activity report on clicking Student Interaction button", priority: "1", test_id: 244446 do
@@ -508,7 +524,8 @@ describe "people" do
 
       get "/courses/#{@course.id}/users"
 
-      open_dropdown_menu(selector: "#user_#{@teacher.id}", option: 'editRoles', displayed: false)
+      open_dropdown_menu("#user_#{@teacher.id}")
+      expect(dropdown_item_exists?('editRoles', "#user_#{@teacher.id}")).to be false
     end
 
     def open_role_dialog(user)
