@@ -1700,6 +1700,7 @@ describe CoursesController, type: :request do
       expect(json.sort_by{|x| x["id"]}).to eq api_json_response([first_user, new_user],
                                                             :only => USER_API_FIELDS).sort_by{|x| x["id"]}
 
+      @course2.enroll_teacher(@user).accept!
       ro.destroy
       json = api_call(:get, "/api/v1/courses/sis_course_id:TEST-SIS-ONE.2011.json",
                       { :controller => 'courses', :action => 'show', :id => 'sis_course_id:TEST-SIS-ONE.2011', :format => 'json' })
@@ -2216,6 +2217,7 @@ describe CoursesController, type: :request do
         expect(json.sort_by{|x| x["id"]}).to eq api_json_response([first_user, new_user],
                                                               :only => USER_API_FIELDS).sort_by{|x| x["id"]}
 
+        @course2.enroll_teacher(@user).accept!
         ro.destroy
         json = api_call(:get, "/api/v1/courses/sis_course_id:TEST-SIS-ONE.2011.json",
                         { :controller => 'courses', :action => 'show', :id => 'sis_course_id:TEST-SIS-ONE.2011', :format => 'json' },
