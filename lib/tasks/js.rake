@@ -70,29 +70,44 @@ namespace :js do
   desc 'test javascript specs with Karma'
   task :test, :reporter do |task, args|
     reporter = args[:reporter]
-    require 'canvas/require_js'
+    if ENV['USE_WEBPACK'].present? && ENV['USE_WEBPACK'] != 'false'
+      Rake::Task['i18n:generate_js'].invoke
+      webpack_test_dir = Rails.root + "spec/javascripts/webpack"
+      FileUtils.rm_rf(webpack_test_dir)
+      puts "--> Bundling tests for ember apps"
+      `npm run webpack-test-ember`
+      puts "--> Running tests for ember apps"
+      test_suite(reporter)
+      FileUtils.rm_rf(webpack_test_dir)
+      puts "--> Bundling tests for canvas proper"
+      `npm run webpack-test`
+      puts "--> Running tests for canvas proper"
+      test_suite(reporter)
+    else
+      require 'canvas/require_js'
 
-    # run test for each ember app individually
-    matcher = ENV['JS_SPEC_MATCHER']
+      # run test for each ember app individually
+      matcher = ENV['JS_SPEC_MATCHER']
 
-    if matcher
-      puts "--> Matcher: #{matcher}"
-    end
-
-    if !matcher || matcher.to_s =~ %r{app/coffeescripts/ember}
-      ignored_embers = ['shared','modules'] #,'quizzes','screenreader_gradebook'
-      Dir.entries('app/coffeescripts/ember').reject { |d|
-        d.match(/^\./) || ignored_embers.include?(d)
-      }.each do |ember_app|
-        puts "--> Running tests for '#{ember_app}' ember app"
-        Canvas::RequireJs.matcher = matcher_for_ember_app ember_app
-        test_suite(reporter)
+      if matcher
+        puts "--> Matcher: #{matcher}"
       end
-    end
 
-    # run test for non-ember apps
-    Canvas::RequireJs.matcher = nil
-    test_suite(reporter)
+      if !matcher || matcher.to_s =~ %r{app/coffeescripts/ember}
+        ignored_embers = ['shared','modules'] #,'quizzes','screenreader_gradebook'
+        Dir.entries('app/coffeescripts/ember').reject { |d|
+          d.match(/^\./) || ignored_embers.include?(d)
+        }.each do |ember_app|
+          puts "--> Running tests for '#{ember_app}' ember app"
+          Canvas::RequireJs.matcher = matcher_for_ember_app ember_app
+          test_suite(reporter)
+        end
+      end
+
+      # run test for non-ember apps
+      Canvas::RequireJs.matcher = nil
+      test_suite(reporter)
+    end
   end
 
   def test_suite(reporter=nil)

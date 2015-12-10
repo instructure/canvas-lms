@@ -375,10 +375,10 @@ define [
 
     notesURL: (->
       if @get('shouldCreateNotes')
-        ENV.GRADEBOOK_OPTIONS.custom_columns_url
+        window.ENV.GRADEBOOK_OPTIONS.custom_columns_url
       else
         notesID = @get('teacherNotes')?.id
-        ENV.GRADEBOOK_OPTIONS.custom_column_url.replace(/:id/, notesID)
+        window.ENV.GRADEBOOK_OPTIONS.custom_column_url.replace(/:id/, notesID)
     ).property('shouldCreateNotes', 'custom_columns.@each')
 
     notesParams: (->

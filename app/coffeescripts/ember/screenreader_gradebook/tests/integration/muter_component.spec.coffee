@@ -6,9 +6,6 @@ define [
 ], (startApp, Ember, fixtures, $) ->
 
   App = null
-
-  fixtures.create()
-
   ariaMuted = "Click to unmute."
   ariaUnmuted = "Click to mute."
   dialogTitleMuted = "Unmute Assignment"
@@ -35,6 +32,7 @@ define [
 
   module 'screenreader_gradebook assignment_muter_component: muted',
     setup: ->
+      fixtures.create()
       App = startApp()
       visit('/').then =>
         @con = App.__container__.lookup('controller:screenreader_gradebook')
@@ -73,6 +71,7 @@ define [
 
   module 'screenreader_gradebook assignment_muter_component: unmuted',
     setup: ->
+      fixtures.create()
       App = startApp()
       visit('/').then =>
         @con = App.__container__.lookup('controller:screenreader_gradebook')

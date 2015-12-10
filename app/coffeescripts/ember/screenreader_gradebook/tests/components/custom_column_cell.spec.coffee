@@ -6,12 +6,11 @@ define [
 
   {run} = Ember
 
-  fixtures.create()
-
   setType = null
 
   module 'custom_column_cell',
     setup: ->
+      fixtures.create()
       App = startApp()
       @component = App.CustomColumnCellComponent.create()
 

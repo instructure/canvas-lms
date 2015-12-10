@@ -7,9 +7,18 @@ var ShimmedAmdPlugin = require("./frontend_build/shimmedAmdPlugin");
 var baseWebpackConfig = require("./frontend_build/baseWebpackConfig");
 var testWebpackConfig = baseWebpackConfig;
 
-testWebpackConfig.entry = {
-  'WebpackedSpecs': "./spec/javascripts/webpack_spec_index.js"
+// the ember specs don't play nice with the rest,
+// so we run them in totally seperate bundles
+if(process.env.WEBPACK_TEST_BUNDLE == 'ember'){
+  testWebpackConfig.entry = {
+    'WebpackedEmberSpecs': "./spec/javascripts/webpack_ember_spec_index.js"
+  }
+}else {
+  testWebpackConfig.entry = {
+    'WebpackedSpecs': "./spec/javascripts/webpack_spec_index.js"
+  }
 }
+
 testWebpackConfig.devtool = undefined;
 testWebpackConfig.output.path = __dirname + '/spec/javascripts/webpack';
 testWebpackConfig.output.pathinfo = true;
@@ -27,10 +36,18 @@ testWebpackConfig.plugins = [
 testWebpackConfig.resolve.alias.qunit = "qunitjs/qunit/qunit.js";
 testWebpackConfig.resolve.root.push(__dirname + '/spec/coffeescripts');
 testWebpackConfig.resolve.root.push(__dirname + '/spec/javascripts/support');
+
 testWebpackConfig.module.loaders.push({
   test: /\/spec\/coffeescripts\//,
   loaders: ["qunitDependencyLoader"]
 });
+
+testWebpackConfig.module.loaders.push({
+  test: /\/ember\/.*\/tests\//,
+  loaders: ["qunitDependencyLoader"]
+});
+
+
 testWebpackConfig.module.noParse = [
   /\/sinon-1.17.2.js/
 ]

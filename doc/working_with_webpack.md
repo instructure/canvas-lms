@@ -318,6 +318,17 @@ bundle files permenant and
 committed to the git repo, and
 yank EmberBundle out entirely.
 
+[X] Extract an actual commons chunk
+
+[X]what app code changes there are, move them out into seperate
+small commits that can be tested individually
+
+[X] in a seperate commit, remove all the shared ember components that aren't
+used from "app/coffeescripts/ember/shared/components"
+
+[X] get _all_ qunit tests running in the webpack bundle (just spiked on a few)
+
+
 [ ] Migrate requires that are in views to application js (check plugins like mra)
 
 
@@ -326,16 +337,9 @@ or change how the rest of the app interacts with timezone_plugin so that we can
 return a promise, since async return is just not going to happen, and we need to have
 those promises done before using it.
 
-[ ] Extract an actual commons chunk
-
 [ ] sort out scopes for .app.app.coffeescripts.ember.shared.templates.components.ic_submission-download-dialog so that we don't need an awful exception in 18n.js
 
-[ ] get _all_ qunit tests running in the webpack bundle (just spiked on a few)
-
 [ ] sniff test files automatically rather than configuring them manually in webpack_spec_index.js
-
-[ ]what app code changes there are, move them out into seperate
-small commits that can be tested individually
 
 [ ] could get a nice performance boost out of reimplementing BrandableCSS.all_fingerprints_for(bundle)
 in node rather than shelling out to ruby for it
@@ -344,9 +348,6 @@ in node rather than shelling out to ruby for it
 
 [ ] on building for production, fails with ProximityLoader ("ERROR in 232.bundle.js from UglifyJs
 Unexpected token: operator (!) [./frontend_build/jsHandlebarsHelpers.js!./frontend_build/pluginsJstLoader.js!./frontend_build/nonAmdLoader.js!./app/coffeescripts/util/ProximityLoader.coffee:111,6]")
-
-[ ] in a seperate commit, remove all the shared ember components that aren't
-used from "app/coffeescripts/ember/shared/components"
 
 [ ] in a seperate commit extract i18nLinerHandlebars loader function and what
 it duplicates from prepare_hbs to a function both can use.
