@@ -346,12 +346,16 @@ describe "speed grader" do
     driver.switch_to.frame f('#speedgrader_iframe')
     points_input = ff('#questions .user_points input')
     driver.execute_script("$('#questions .user_points input').focus()")
+    replace_content(points_input[0], '0')
     replace_content(points_input[1], '.5')
+    replace_content(points_input[2], '0')
     f('.update_scores button[type="submit"]').click
     wait_for_ajaximations
     # Switch to the right panel
     # Verify that the grade is .5
     driver.switch_to.default_content
     expect(f('#grading-box-extended')['value']).to eq('0.5')
+    expect(f("#students_selectmenu-button")).to_not have_class("not_graded")
+    expect(f("#students_selectmenu-button")).to have_class("graded")
   end
 end
