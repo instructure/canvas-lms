@@ -5,7 +5,6 @@ ENV DEBIAN_FRONTEND noninteractive
 RUN curl -sL https://deb.nodesource.com/setup_0.12 | bash -
 RUN  apt-get update -qq \
   && apt-get install -qqy \
-       locales \
        nodejs \
        postgresql-client \
        libxmlsec1-dev \
@@ -13,11 +12,7 @@ RUN  apt-get update -qq \
   && rm -rf /var/lib/apt/lists/*
 
 # Ensure UTF-8 locale
-RUN echo en_US.UTF-8 UTF-8 >> /etc/locale.gen
-RUN locale-gen en_US.UTF-8
-ENV LANG       en_US.UTF-8
-ENV LC_ALL     en_US.UTF-8
-RUN dpkg-reconfigure locales
+ENV LANG C.UTF-8
 
 # Canvas requires bundler 1.10.6
 RUN gem uninstall bundler \
