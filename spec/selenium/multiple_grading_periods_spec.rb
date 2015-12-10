@@ -27,4 +27,19 @@ describe "interaction with multiple grading periods" do
       expect(f('.grading-period-select-button')).to include_text(current_grading_period.title)
     end
   end
+
+  context 'grading schemes' do
+    let(:account) { Account.default }
+    let(:admin) { account_admin_user(:account => account) }
+    let!(:enable_mgp_flag) { account.enable_feature!(:multiple_grading_periods) }
+
+    it 'should still be functional with mgp flag turned on and disable adding during edit mode', priority: "1", test_id: 545585 do
+      user_session(admin)
+      get "/accounts/#{account.id}/grading_standards"
+      fj('#react_grading_tabs a[href="#grading-standards-tab"]').click
+      fj('a.btn.pull-right.add_standard_link').click
+      expect(fj('input.scheme_name')).not_to be_nil
+      expect(fj('a.btn.pull-right.add_standard_link')).to have_class('disabled')
+    end
+  end
 end
