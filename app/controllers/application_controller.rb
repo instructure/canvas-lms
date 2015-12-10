@@ -1947,4 +1947,76 @@ class ApplicationController < ActionController::Base
   def teardown_live_events_context
     LiveEvents.clear_context!
   end
+
+
+  include Api::V1::ContextModule
+  def item_sequence_base(asset_type, asset_id)
+    if authorized_action(@context, @current_user, :read)
+      return render :json => { :message => 'invalid asset_type'}, :status => :bad_request unless asset_type
+      return render :json => { :message => 'missing asset_id' }, :status => :bad_request unless asset_id
+
+      # assemble a sequence of content tags in the course
+      # (break ties on module position by module id)
+      tags = @context.module_items_visible_to(@current_user).
+          select('content_tags.*, context_modules.id as module_id, context_modules.position AS module_position').
+          reject { |item| item.content_type == 'ContextModuleSubHeader' }.
+          sort_by { |item| [item.module_position.to_i, item.module_id, item.position || CanvasSort::Last] }
+
+      # find content tags to include
+      tag_indices = []
+      if asset_type == 'ContentTag'
+        tag_ix = tags.each_index.detect { |ix| tags[ix].id == asset_id.to_i }
+        tag_indices << tag_ix if tag_ix
+      else
+        # map wiki page url to id
+        if asset_type == 'WikiPage'
+          page = @context.wiki.wiki_pages.not_deleted.where(url: asset_id).first
+          asset_id = page.id if page
+        else
+          asset_id = asset_id.to_i
+        end
+
+        # find the associated assignment id, if applicable
+        if asset_type == 'Quizzes::Quiz'
+          asset = @context.quizzes.where(id: asset_id.to_i).first
+          associated_assignment_id = asset.assignment_id if asset
+        end
+
+        if asset_type == 'DiscussionTopic'
+          asset = @context.send(asset_type.tableize).where(id: asset_id.to_i).first
+          associated_assignment_id = asset.assignment_id if asset
+        end
+
+        # find up to MAX_SEQUENCES tags containing the object (or its associated assignment)
+        tags.each_index do |ix|
+          if (tags[ix].content_type == asset_type && tags[ix].content_id == asset_id) ||
+             (associated_assignment_id && tags[ix].content_type == 'Assignment' && tags[ix].content_id == associated_assignment_id)
+            tag_indices << ix
+            break if tag_indices.length == MAX_SEQUENCES
+          end
+        end
+      end
+
+      # render the result
+      module_ids = Set.new
+      result = { :items => [] }
+      tag_indices.each do |ix|
+        hash = { :current => module_item_json(tags[ix], @current_user, session), :prev => nil, :next => nil }
+        module_ids << tags[ix].context_module_id
+        if ix > 0
+          hash[:prev] = module_item_json(tags[ix - 1], @current_user, session)
+          module_ids << tags[ix - 1].context_module_id
+        end
+        if ix < tags.size - 1
+          hash[:next] = module_item_json(tags[ix + 1], @current_user, session)
+          module_ids << tags[ix + 1].context_module_id
+        end
+        result[:items] << hash
+      end
+      modules = @context.context_modules.where(id: module_ids.to_a)
+      result[:modules] = modules.map { |mod| module_json(mod, @current_user, session) }
+
+      return result
+    end
+  end
 end

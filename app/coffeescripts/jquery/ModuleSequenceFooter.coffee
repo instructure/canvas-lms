@@ -48,7 +48,9 @@ define [
       # @previous: Object
       # @next : Object
       @msfInstance = new $.fn.moduleSequenceFooter.MSFClass options
-      @msfInstance.fetch().done =>
+
+      if ENV?.ModuleSequenceFooter_data
+        @msfInstance.success(ENV?.ModuleSequenceFooter_data)
         if @msfInstance.hide
           @hide()
           return
@@ -61,8 +63,23 @@ define [
           items_current_position: @msfInstance.items_current_position
           items_count: @msfInstance.items_count
         )
-        @msfAnimation(options.animation) if options?.animation != undefined
         @show()
+      else
+        @msfInstance.fetch().done =>
+          if @msfInstance.hide
+            @hide()
+            return
+
+          @html template(
+            instanceNumber: @msfInstance.instanceNumber
+            previous: @msfInstance.previous
+            next: @msfInstance.next
+            current: @msfInstance.current
+            items_current_position: @msfInstance.items_current_position
+            items_count: @msfInstance.items_count
+          )
+          @msfAnimation(options.animation) if options?.animation != undefined
+          @show()
 
       this
 
