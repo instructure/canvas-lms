@@ -1,5 +1,5 @@
 @if $use_new_styles { $bar-height: 64px; }
-@else { 
+@else {
   $bar-height: 55px;
   $bar-background: #eff2f5;
   $button-border-line: #d4d6d9;
@@ -11,6 +11,24 @@
 
 @if $use_new_styles == false {
   .module-sequence-padding { height: $bar-height + 1; }
+}
+
+@if $use_new_styles {
+  .ModuleSequenceFooter__Container {
+    position: fixed;
+    bottom: 0;
+    z-index: 100;
+  }
+
+  .ModuleSequenceFooter__Container--bottom {
+    bottom: 42px;
+  }
+  #content {
+    &.Content--with-module-footer {
+      padding-bottom: 70px;
+    }
+  }
+
 }
 
 .module-sequence-footer {
@@ -58,7 +76,7 @@
   @else {
     background: $bar-background;
     box-shadow: inset 0px 1px 0px 0px $top-bar-shadow;
-    border-top: 1px solid $top-bar-border;  
+    border-top: 1px solid $top-bar-border;
   }
 }
 

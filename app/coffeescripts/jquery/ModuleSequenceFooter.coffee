@@ -40,6 +40,18 @@ define [
         throw 'Option must be set with assetType and assetID'
         return
 
+      setUpPositioning = () =>
+        @width($('.ic-app-main-and-right-side').width() - 50)
+        @parents().find('#content').addClass('Content--with-module-footer')
+        windowHeight = $(window).height()
+        documentHeight = $(document).height()
+        scrollTopValue = $(window).scrollTop()
+        atPageBottom = (documentHeight - windowHeight) == scrollTopValue
+        if (atPageBottom)
+          @addClass('ModuleSequenceFooter__Container--bottom')
+        else
+          @removeClass('ModuleSequenceFooter__Container--bottom')
+
       @msfAnimation = (enabled) =>
         @find('.module-sequence-padding, .module-sequence-footer').toggleClass('no-animation', !enabled)
 
@@ -60,6 +72,12 @@ define [
           new_styles: window.ENV.use_new_styles
         )
         @msfAnimation(options.animation) if options?.animation != undefined
+
+        if window.ENV.use_new_styles
+          # Make it float
+          setUpPositioning(true)
+          $(window).on('scroll', _.debounce(setUpPositioning, 5))
+          $(window).on('resize', _.debounce(setUpPositioning, 100))
         @show()
 
       this
@@ -104,7 +122,7 @@ define [
 
         params
 
-      # Retrieve data based on the url, asset_type and asset_id. @success is called after a 
+      # Retrieve data based on the url, asset_type and asset_id. @success is called after a
       # fetch is finished. This will then setup data to be used elsewhere.
       # @api public
 
@@ -115,8 +133,8 @@ define [
         else
           $.ajaxJSON @url, 'GET', {asset_type: @assetType, asset_id: @assetID, frame_external_urls: true}, @success, null, {}
 
-      # Determines if the data retrieved should be used to generate a buttom bar or hide it. We 
-      # can only have 1 item in the data set for this to work else we hide the sequence bar. 
+      # Determines if the data retrieved should be used to generate a buttom bar or hide it. We
+      # can only have 1 item in the data set for this to work else we hide the sequence bar.
       # # @api private
 
       success: (data) =>
