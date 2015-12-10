@@ -131,3 +131,10 @@ define [
     @runRouter '/courses/1/files?preview=3',  =>
       ok $('.ef-file-preview-header-download').length, 'The download button was not shown'
       ok $('.ef-file-preview-header-download').attr('href').match(@file3.get('url')), 'The download button url is incorrect'
+
+  test 'opening file preview should aria-hide the appElement div only, not the body div', ->
+    equal $(@div).attr('aria-hidden'), null, "doesn't have an aria-hidden attribute"
+    @runRouter '/courses/1/files?preview=3',  =>
+      equal $(@div).attr('aria-hidden'), 'true', "adds the aria-hidden true attribute"
+      equal $(document.body).attr('aria-hidden'), null, "body doesn't have an aria-hidden attribute"
+
