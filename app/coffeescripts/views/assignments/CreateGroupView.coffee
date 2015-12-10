@@ -144,5 +144,6 @@ define [
         @setDimensions(this.defaults.width, SHORT_HEIGHT)
 
       super
+      @$el.find("input:first").focus()
       @checkGroupWeight()
       @getNeverDrops()
