@@ -156,7 +156,6 @@ module Api::V1::Assignment
 
     if assignment.quiz
       hash['quiz_id'] = assignment.quiz.id
-      hash['hide_download_submissions_button'] = !assignment.quiz.has_file_upload_question?
       hash['anonymous_submissions'] = !!(assignment.quiz.anonymous_submissions)
     end
 
