@@ -190,35 +190,11 @@ class CourseLinkValidator
     unless result = self.visited_urls[url]
       begin
         if ImportedHtmlConverter.relative_url?(url) || (self.domain_regex && url.match(self.domain_regex))
-          case url
-          when /\/courses\/\d+\/file_contents\/(.*)/
-            rel_path = CGI.unescape($1)
-            unless (att = Folder.find_attachment_in_context_with_path(self.course, rel_path)) && !att.deleted?
-              result = :missing_file
-            end
-          when /\/courses\/\d+\/(.*)\/(\d+)/
-            obj_type =  $1
-            obj_id = $2
-
-            if obj_class = ITEM_CLASSES[obj_type]
-              if (obj = obj_class.where(:id => obj_id).first)
-                if obj.is_a?(Attachment)
-                  if obj.file_state == 'deleted'
-                    result = :missing_item
-                  elsif obj.locked?
-                    result = :unpublished_item
-                  end
-                elsif obj.workflow_state == 'deleted'
-                  result = :missing_item
-                elsif obj.workflow_state == 'unpublished'
-                  result = :unpublished_item
-                end
-              else
-                result = :missing_item
-              end
-            end
+          if url.match(/\/courses\/(\d+)/) && self.course.id.to_s != $1
+            result = :course_mismatch
+          else
+            result = check_object_status(url)
           end
-
         elsif !url.start_with?('mailto:')
           unless reachable_url?(url)
             result = :unreachable
@@ -235,6 +211,48 @@ class CourseLinkValidator
       invalid_link = {:url => url, :reason => result}
       yield invalid_link
     end
+  end
+
+  # makes sure that links to course objects exist and are in a visible state
+  def check_object_status(url)
+    result = nil
+    case url
+    when /\/courses\/\d+\/file_contents\/(.*)/
+      rel_path = CGI.unescape($1)
+      unless (att = Folder.find_attachment_in_context_with_path(self.course, rel_path)) && !att.deleted?
+        result = :missing_file
+      end
+    when /\/courses\/\d+\/(pages|wiki)\/(\w+)/
+      if obj = self.course.wiki.find_page($2)
+        if obj.workflow_state == 'unpublished'
+          result = :unpublished_item
+        end
+      else
+        result = :missing_item
+      end
+    when /\/courses\/\d+\/(.*)\/(\d+)/
+      obj_type =  $1
+      obj_id = $2
+
+      if obj_class = ITEM_CLASSES[obj_type]
+        if (obj = obj_class.where(:id => obj_id).first)
+          if obj.is_a?(Attachment)
+            if obj.file_state == 'deleted'
+              result = :missing_item
+            elsif obj.locked?
+              result = :unpublished_item
+            end
+          elsif obj.workflow_state == 'deleted'
+            result = :missing_item
+          elsif obj.workflow_state == 'unpublished'
+            result = :unpublished_item
+          end
+        else
+          result = :missing_item
+        end
+      end
+    end
+    result
   end
 
   # ping the url and make sure we get a 200

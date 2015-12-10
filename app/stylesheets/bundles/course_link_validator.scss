@@ -2,7 +2,7 @@
   margin: 20px 0;
   .alert {
     max-width: 15%;
-    margin-top: 20px
+    margin-top: 20px;
   }
 
   .result {
@@ -11,5 +11,13 @@
 
   .Button {
     width: 200px;
+  }
+
+  span.label {
+    margin-left: 8px;
+  }
+
+  .ic-Form-control {
+    margin-top: 20px;
   }
 }
