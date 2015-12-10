@@ -39,7 +39,9 @@ describe AccountAuthorizationConfig::Google do
 
   it "accepts when hosted domain isn't required" do
     ap = AccountAuthorizationConfig::Google.new
-    JWT.expects(:decode).twice.returns([{'sub' => '123'}])
+    # TODO: use JSON::JWT in AccountAuthorizationConfig::Google
+    JWT.expects(:decode).once.returns([{'sub' => '123'}])
+    JSON::JWT.expects(:decode).once.returns({'sub' => '123'})
     token = stub('token', params: {})
 
     expect(ap.unique_id(token)).to eq '123'
