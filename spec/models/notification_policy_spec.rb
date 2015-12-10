@@ -220,6 +220,16 @@ describe NotificationPolicy do
       expect(n2.frequency).to eq Notification::FREQ_IMMEDIATELY
     end
 
+    it "does not modify another user's preferences" do
+      notification_model
+      hax0r = user_with_communication_channel
+      user_with_communication_channel
+      expect {
+        NotificationPolicy.setup_for(hax0r, :channel_id => @cc.id, :frequency => Notification::FREQ_IMMEDIATELY, :category => 'test_immediately')
+      }.to raise_error(ActiveRecord::RecordNotFound)
+      expect(@user.notification_policies.any?).to eq false
+    end
+
     context "sharding" do
       specs_require_sharding
 
