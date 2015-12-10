@@ -358,7 +358,7 @@ class GroupCategory < ActiveRecord::Base
     end
 
     if !groups.empty?
-      Group.where(:id => groups.map(&:id)).update_all(:updated_at => Time.now.utc)
+      Group.where(id: groups).touch_all
       if context_type == 'Course'
         DueDateCacher.recompute_course(context_id, Assignment.where(context_type: context_type, context_id: context_id, group_category_id: self).pluck(:id))
       end

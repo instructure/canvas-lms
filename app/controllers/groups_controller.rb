@@ -534,7 +534,7 @@ class GroupsController < ApplicationController
         end
 
         if !@group.errors.any?
-          @group.users.update_all(updated_at: Time.now.utc)
+          @group.users.touch_all
           flash[:notice] = t('notices.update_success', 'Group was successfully updated.')
           format.html { redirect_to clean_return_to(params[:return_to]) || group_url(@group) }
           format.json { render :json => group_json(@group, @current_user, session, {include: ['users', 'group_category', 'permissions']}) }

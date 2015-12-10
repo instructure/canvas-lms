@@ -2797,15 +2797,14 @@ class Course < ActiveRecord::Base
 
   def touch_content_if_public_visibility_changed(changes)
     if changes[:is_public] || changes[:is_public_to_auth_users]
-      self.assignments.update_all(:updated_at => Time.now.utc)
-      self.attachments.update_all(:updated_at => Time.now.utc)
-      self.calendar_events.update_all(:updated_at => Time.now.utc)
-      self.context_modules.update_all(:updated_at => Time.now.utc)
-      self.discussion_topics.update_all(:updated_at => Time.now.utc)
-      self.quizzes.update_all(:updated_at => Time.now.utc)
-      self.quizzes.update_all(:updated_at => Time.now.utc)
+      self.assignments.touch_all
+      self.attachments.touch_all
+      self.calendar_events.touch_all
+      self.context_modules.touch_all
+      self.discussion_topics.touch_all
+      self.quizzes.touch_all
       self.wiki.touch
-      self.wiki.wiki_pages.update_all(:updated_at => Time.now.utc)
+      self.wiki.wiki_pages.touch_all
     end
   end
 

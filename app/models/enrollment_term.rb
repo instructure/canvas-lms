@@ -64,7 +64,7 @@ class EnrollmentTerm < ActiveRecord::Base
 
   def touch_all_courses
     return if new_record?
-    self.courses.update_all(:updated_at => Time.now.utc)
+    self.courses.touch_all
   end
 
   def update_courses_later

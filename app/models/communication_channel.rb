@@ -337,7 +337,7 @@ class CommunicationChannel < ActiveRecord::Base
       self.save!
       if old_user_id
         Pseudonym.where(:user_id => old_user_id, :unique_id => self.path).update_all(:user_id => user)
-        User.where(:id => [old_user_id, user]).update_all(:updated_at => Time.now.utc)
+        User.where(:id => [old_user_id, user]).touch_all
       end
     end
   end
