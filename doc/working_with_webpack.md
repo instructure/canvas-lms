@@ -350,3 +350,35 @@ used from "app/coffeescripts/ember/shared/components"
 
 [ ] in a seperate commit extract i18nLinerHandlebars loader function and what
 it duplicates from prepare_hbs to a function both can use.
+
+## After we're on webpack in production:
+
+[ ] remove all the require-js build artifacts, re-write `compile_assets` to not build the require branch (still need to generate translations)
+
+[ ] sweep for the `use_webpack` var and remove it
+
+[ ] re-work js.rake to do away with requirejs stuff
+
+[ ] un-amd all vendor dependencies that we've wrapped AMD wrappers around
+
+[ ] re-write screenreader gradebook in not-ember
+
+[ ] change all references to "compiled" to "coffeeescript" and then do away with that loader
+
+[ ] delete our custom require-js plugins
+
+[ ] migrate anything in bower to npm, dump bower
+
+[ ] find other hard-coded vendor libs that can be ported to npm
+
+[ ] rewrite qunit specs to actually have a qunit dependency and ditch that regex loader
+
+[ ] kill the auto-css-in-handlebars imports (make them explicit) and remove that loader
+
+[ ] plugins that need to be extended should have explicit extension points and let plugin register itself
+
+[ ] audit all loaders to find dumb things we had to do for require
+
+[ ] {low-priority} in chunks, take AMD requires off of our js files
+
+[ ] {low-priority} re-write tests in mocha
