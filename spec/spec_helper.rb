@@ -54,6 +54,11 @@ ENV["RAILS_ENV"] = 'test'
 require File.expand_path('../../config/environment', __FILE__) unless defined?(Rails)
 require 'rspec/rails'
 
+# ensure people aren't creating records outside the rspec lifecycle, e.g.
+# inside a describe/context block rather than a let/before/example
+require_relative 'support/blank_slate_protection'
+BlankSlateProtection.enable!
+
 Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
 
 ActionView::TestCase::TestController.view_paths = ApplicationController.view_paths
@@ -457,6 +462,10 @@ RSpec.configure do |config|
     Rails::logger.try(:info, "Running #{self.class.description} #{@method_name}")
     Attachment.domain_namespace = nil
     $spec_api_tokens = {}
+  end
+
+  config.before :suite do
+    BlankSlateProtection.disable!
   end
 
   # this runs on post-merge builds to capture dependencies of each spec;
