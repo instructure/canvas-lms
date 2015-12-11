@@ -289,8 +289,8 @@ module AuthenticationMethods
           #... so if SSO is set, we can send them there directly, instead of through
           # two other Canvas middleman pages, shaving a noticiable amount of time off
           # for the user to experience
-          params[:id] ? scope.find(params[:id]) : scope.first!
-          redirect_to delegated_auth_redirect_uri(client.add_service_to_login_url(cas_login_url))
+          client = params[:id] ? scope.find(params[:id]) : scope.first!
+          redirect_to delegated_auth_redirect_uri(client.add_service_to_login_url url_for({ controller: 'login/cas', action: :new }.merge(params.slice(:id))))
         end
       }
       format.json { render_json_unauthorized }
