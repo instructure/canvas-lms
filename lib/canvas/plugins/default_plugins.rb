@@ -1,7 +1,3 @@
-Dir.glob('lib/canvas/plugins/validators/*').each do |file|
-  require_dependency file
-end
-
 Canvas::Plugin.register('facebook', nil,
   name: 'Facebook',
   description: -> { t :description, 'Facebook Login' },
