@@ -1413,7 +1413,7 @@ define([
   function addHTMLFeedback($container, question_data, name) {
     html = question_data[name+'_html'];
     if (!html || html.length == 0) {
-      html = question_data[name];
+      html = htmlEscape(question_data[name]);
       question_data[name+'_html'] = html;
     }
     if (html && html.length > 0) {

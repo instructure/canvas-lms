@@ -41,6 +41,9 @@ class InfoController < ApplicationController
   def health_check
     # This action should perform checks on various subsystems, and raise an exception on failure.
     Account.connection.select_value("SELECT 1")
+    if Delayed::Job == Delayed::Backend::ActiveRecord::Job
+      Delayed::Job.connection.select_value("SELECT 1") unless Account.connection == Delayed::Job.connection
+    end
     Tempfile.open("heartbeat", ENV['TMPDIR'] || Dir.tmpdir) { |f| f.write("heartbeat"); f.flush }
 
     respond_to do |format|

@@ -200,9 +200,18 @@ class CourseLinkValidator
   # ping the url and make sure we get a 200
   def reachable_url?(url)
     begin
-      CanvasHttp.get(url).is_a?(Net::HTTPOK)
-    rescue CanvasHttp::Error
-      false
+      response = CanvasHttp.get(url)
+
+      case response.code
+      when /^2/ # 2xx code
+        true
+      when "401", "403", "503"
+        # we accept unauthorized and forbidden codes here because sometimes servers refuse to serve our requests
+        # and someone can link to a site that requires authentication anyway - doesn't necessarily make it invalid
+        true
+      else
+        false
+      end
     rescue
       false
     end
