@@ -219,9 +219,7 @@ class DiscussionEntriesController < ApplicationController
   #
   # Returns a boolean.
   def context_file_quota_exceeded?
-    context = named_context_url(@context, :context_discussion_topic_url,
-      @topic.id)
-    can_attach?(1.kilobyte) && quota_exceeded(context)
+    can_attach?(1.kilobyte) && quota_exceeded(@current_user, named_context_url(@context, :context_discussion_topic_url, @topic.id))
   end
 
 

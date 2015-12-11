@@ -743,7 +743,7 @@ class FilesController < ApplicationController
     if authorized_action(permission_object, @current_user, permission)
       if @context.respond_to?(:is_a_context?) && @check_quota
         get_quota
-        return if quota_exceeded(named_context_url(@context, :context_files_url))
+        return if quota_exceeded(@context, named_context_url(@context, :context_files_url))
       end
       @attachment.filename = params[:attachment][:filename]
       @attachment.file_state = 'deleted'
@@ -868,7 +868,7 @@ class FilesController < ApplicationController
     if authorized_action(@attachment, @current_user, :create)
       get_quota
       return if (params[:check_quota_after].nil? || params[:check_quota_after] == '1') &&
-                  quota_exceeded(named_context_url(@context, :context_files_url))
+                  quota_exceeded(@context, named_context_url(@context, :context_files_url))
 
       respond_to do |format|
         @attachment.folder_id ||= @folder.id

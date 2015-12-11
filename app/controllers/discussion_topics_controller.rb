@@ -1020,7 +1020,7 @@ class DiscussionTopicsController < ApplicationController
                    params[:attachment]
 
       return if attachment && attachment.size > 1.kilobytes &&
-                quota_exceeded(named_context_url(@context, :context_discussion_topics_url))
+        quota_exceeded(@context, named_context_url(@context, :context_discussion_topics_url))
 
       if (params.has_key?(:remove_attachment) || attachment) && @topic.attachment
         @topic.transaction do
