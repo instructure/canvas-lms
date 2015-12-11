@@ -5,20 +5,20 @@ development:
   bitly_access_token: 12345689assdfe
 
 test:
-  base_url: https://test.beyondz.org/
+  base_url: https://test.bebraven.org/
   change_password_path: /users/edit
   nonexistent_user_path: /users/not_on_lms
   bitly_access_token: 12345689assdfe
 
 staging:
-  base_url: https://staging.beyondz.org/
+  base_url: https://stagingjoin.bebraven.org/
   change_password_path: /users/edit
   nonexistent_user_path: /users/not_on_lms
   bitly_access_token: 12345689assdfe
 
 production:
   google_analytics_account: UA-XXXXXXXX-1
-  base_url: https://www.beyondz.org/
+  base_url: https://join.bebraven.org/
   change_password_path: /users/edit
   nonexistent_user_path: /users/not_on_lms
   bitly_access_token: 12345689assdfe
