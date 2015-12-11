@@ -23,4 +23,20 @@ class CanvasLogger < (CANVAS_RAILS3 ? ActiveSupport::BufferedLogger : ActiveSupp
     end
     super(severity, message, progname)
   end
+
+  def reopen(log_path)
+    unless File.exist?(log_path)
+      FileUtils.mkdir_p(File.dirname(log_path))
+    end
+    @log_path = log_path
+
+    if CANVAS_RAILS3
+      close
+      @log = open_logfile(log_path)
+    else
+      old_logdev = @logdev
+      @logdev = ::Logger::LogDevice.new(log_path, :shift_age => 0, :shift_size => 1048576)
+      old_logdev.close
+    end
+  end
 end

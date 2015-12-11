@@ -273,7 +273,7 @@ module SeleniumDriverSetup
       run CanvasRails::Application
     end.to_app
 
-    lambda do |env|
+    spec_safe_app = lambda do |env|
       nope = [503, {}, [""]]
       return nope unless allow_requests?
 
@@ -291,6 +291,15 @@ module SeleniumDriverSetup
         result.last.close if result.last.respond_to?(:close)
         nope
       end
+    end
+
+    lambda do |env|
+      log_request = env["REQUEST_URI"] !~ %r{/(javascripts|dist)}
+      req = "#{env['REQUEST_METHOD']} #{env['REQUEST_URI']}"
+      Rails.logger.info "STARTING REQUEST #{req}" if log_request
+      result = spec_safe_app.call(env)
+      Rails.logger.info "FINISHED REQUEST #{req}: #{result[0]}" if log_request
+      result
     end
   end
 
@@ -310,7 +319,7 @@ module SeleniumDriverSetup
     end
 
     def allow_requests?
-      @allow_requests
+      @allow_requests != false
     end
 
     def request_mutex

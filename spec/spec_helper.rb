@@ -30,8 +30,10 @@ RSpec.configure do |c|
 
   c.around(:each) do |example|
     Timeout::timeout(180) do
+      Rails.logger.info "STARTING SPEC #{example.full_description}"
       example.run
-      case example.example.exception
+      exception = example.example.exception
+      case exception
       when EOFError, Errno::ECONNREFUSED
         if $selenium_driver
           puts "SELENIUM: webdriver socket closed the connection.  Will try to re-initialize."
@@ -467,6 +469,10 @@ RSpec.configure do |config|
 
   config.before :suite do
     BlankSlateProtection.disable!
+
+    if ENV['TEST_ENV_NUMBER'].present?
+      Rails.logger.reopen("log/test#{ENV['TEST_ENV_NUMBER']}.log")
+    end
   end
 
   # this runs on post-merge builds to capture dependencies of each spec;
