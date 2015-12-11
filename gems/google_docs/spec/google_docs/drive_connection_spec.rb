@@ -26,6 +26,7 @@ describe GoogleDocs::DriveConnection do
   fake_client = Class.new do
     attr_reader :token
     attr_writer :responses
+    attr_accessor :inputs
 
     def initialize(input=nil)
       @input = input
@@ -62,7 +63,12 @@ describe GoogleDocs::DriveConnection do
       "/api_method"
     end
 
-    def execute!(*_args)
+    def list
+      "/api_method"
+    end
+
+    def execute!(*args)
+      @inputs = args
       response = @responses[@calls]
       @calls += 1
       response
@@ -162,6 +168,19 @@ describe GoogleDocs::DriveConnection do
 
     before do
       connection.send(:set_api_client, client)
+    end
+
+    describe "#list_with_extension_filter" do
+      before do
+        client.responses = [
+          stub(status: 200, data: { "items" => [] })
+        ]
+      end
+
+      it "should submit `trashed = false` parameter" do
+        connection.list_with_extension_filter('.txt')
+        expect(client.inputs.last[:parameters][:q]).to eql 'trashed=false'
+      end
     end
 
     describe "#download" do
