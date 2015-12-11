@@ -58,6 +58,103 @@ describe "calendar2" do
         create_middle_day_assignment
       end
 
+      context "drag and drop" do
+
+        let(:element_location) do
+          driver.execute_script("return $('#calendar-app .fc-content-skeleton:first')
+          .find('tbody td.fc-event-container').index()")
+        end
+
+        before(:each) do
+          @monday = 1
+          @friday = 5
+          @initial_time = Time.zone.parse('2015-1-1').beginning_of_day + 9.hours
+          @initial_time_str = @initial_time.strftime('%Y-%m-%d')
+          @one_day_later = @initial_time + 24.hours
+          @three_days_earlier = @initial_time - 72.hours
+        end
+
+        it "should drag and drop assignment forward", priority: "1", test_id: 495537 do
+          assignment1 = @course.assignments.create!(title: 'new month view assignment', due_at: @initial_time)
+          get "/calendar2"
+          quick_jump_to_date(@initial_time_str)
+
+          # Move assignment from Thursday to Friday
+          drag_and_drop_element(find('.calendar .fc-event'),
+                                find('.calendar .fc-day.fc-widget-content.fc-fri.fc-past'))
+
+          # Expect no pop up errors with drag and drop
+          expect(flash_message_present?(:error)).to be false
+
+          # Assignment should be moved to Friday
+          expect(send :element_location).to eq @friday
+
+          # Assignment time should stay at 9:00am
+          assignment1.reload
+          expect(assignment1.start_at).to eql(@one_day_later)
+        end
+
+        it "should drag and drop event forward", priority: "1", test_id: 495538 do
+          event1 = make_event(start: @initial_time, title: 'new week view event')
+          get "/calendar2"
+          quick_jump_to_date(@initial_time_str)
+
+          # Move event from Thursday to Friday
+          drag_and_drop_element(find('.calendar .fc-event'),
+                                find('.calendar .fc-day.fc-widget-content.fc-fri.fc-past'))
+
+          # Expect no pop up errors with drag and drop
+          expect(flash_message_present?(:error)).to be false
+
+          # Event should be moved to Friday
+          expect(send :element_location).to eq @friday
+
+          # Event time should stay at 9:00am
+          event1.reload
+          expect(event1.start_at).to eql(@one_day_later)
+        end
+
+        it "should drag and drop assignment back", priority: "1", test_id: 567749 do
+          assignment1 = @course.assignments.create!(title: 'new month view assignment', due_at: @initial_time)
+          get "/calendar2"
+          quick_jump_to_date(@initial_time_str)
+
+          # Move assignment from Thursday to Monday
+          drag_and_drop_element(find('.calendar .fc-event'),
+                                find('.calendar .fc-day.fc-widget-content.fc-mon.fc-past'))
+
+          # Expect no pop up errors with drag and drop
+          expect(flash_message_present?(:error)).to be false
+
+          # Assignment should be moved to Monday
+          expect(send :element_location).to eq @monday
+
+          # Assignment time should stay at 9:00am
+          assignment1.reload
+          expect(assignment1.start_at).to eql(@three_days_earlier)
+        end
+
+        it "should drag and drop event back", priority: "1", test_id: 567750 do
+          event1 = make_event(start: @initial_time, title: 'new week view event')
+          get "/calendar2"
+          quick_jump_to_date(@initial_time_str)
+
+          # Move event from Thursday to Monday
+          drag_and_drop_element(find('.calendar .fc-event'),
+                                find('.calendar .fc-day.fc-widget-content.fc-mon.fc-past'))
+
+          # Expect no pop up errors with drag and drop
+          expect(flash_message_present?(:error)).to be false
+
+          # Event should be moved to Monday
+          expect(send :element_location).to eq @monday
+
+          # Event time should stay at 9:00am
+          event1.reload
+          expect(event1.start_at).to eql(@three_days_earlier)
+        end
+      end
+
       it "more options link should go to calendar event edit page" do
         create_middle_day_event
         find('.fc-event').click
