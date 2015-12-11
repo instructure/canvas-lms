@@ -1079,6 +1079,9 @@ $wizard-highlight-color: $ic-brand-primary;
 
 #keyboard_navigation {
   display: none;
+}
+
+#keyboard_navigation, .keyboard_navigation {
   ul.navigation_list {
     padding: 0;
     margin: 0;

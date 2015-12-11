@@ -88,8 +88,7 @@ define([
                  onRequestClose={this.closeModal}
                  className={this.props.className}
                  overlayClassName={this.props.overlayClassName}
-                 appElement={this.getAppElement()}
-           >
+                 appElement={this.getAppElement()}>
             <div ref="modal" className="ReactModal__Layout">
 
               <div className="ReactModal__Header">
