@@ -9,6 +9,13 @@ describe "Wiki Pages" do
   include WikiAndTinyCommon
 
   context "Navigation" do
+    def edit_page(edit_text = nil)
+      get "/courses/#{@course.id}/pages/Page1/edit"
+      fj('a.switch_views:visible').click
+      f('textarea').send_keys(edit_text)
+      fj('button:contains("Save")').click
+    end
+
     before do
       account_model
       course_with_teacher_logged_in :account => @account
@@ -18,7 +25,7 @@ describe "Wiki Pages" do
       @course.wiki.wiki_pages.create!(title: 'Page1')
       @course.wiki.wiki_pages.create!(title: 'Page2')
       get "/courses/#{@course.id}"
-      f('.pages').click()
+      f('.pages').click
       expect(driver.current_url).to include("/courses/#{@course.id}/pages")
       expect(driver.current_url).not_to include("/courses/#{@course.id}/wiki")
       get "/courses/#{@course.id}/wiki"
@@ -31,7 +38,7 @@ describe "Wiki Pages" do
       front.set_as_front_page!
       front.save!
       get "/courses/#{@course.id}"
-      f('.pages').click()
+      f('.pages').click
       expect(driver.current_url).not_to include("/courses/#{@course.id}/pages")
       expect(driver.current_url).to include("/courses/#{@course.id}/wiki")
       expect(f('span.front-page.label')).to include_text 'Front Page'
@@ -45,19 +52,19 @@ describe "Wiki Pages" do
       front.set_as_front_page!
       front.save!
       get "/courses/#{@course.id}/wiki"
-      f('.home').click()
+      f('.home').click
       # setting front-page as home page
-      fj('.btn.button-sidebar-wide:contains("Choose Home Page")').click()
-      fj('input[type=radio][value=wiki]').click()
-      fj('button.btn.btn-primary.button_type_submit.ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-text-only').click()
-      f('.home').click()
+      fj('.btn.button-sidebar-wide:contains("Choose Home Page")').click
+      fj('input[type=radio][value=wiki]').click
+      fj('button.btn.btn-primary.button_type_submit.ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-text-only').click
+      f('.home').click
       wait_for_ajaximations
       # validations
       expect(element_exists('.al-trigger')).to be_truthy
       expect(f('.course-title')).to include_text 'Unnamed Course'
       expect(element_exists('span.front-page.label')).to be_falsey
       expect(element_exists('button.btn.btn-published')).to be_falsey
-      f('.al-trigger').click()
+      f('.al-trigger').click
       expect(element_exists('.icon-trash')).to be_falsey
       expect(element_exists('.icon-clock')).to be_truthy
     end
@@ -69,12 +76,12 @@ describe "Wiki Pages" do
       front.set_as_front_page!
       front.save!
       get "/courses/#{@course.id}/wiki"
-      f('.home').click()
+      f('.home').click
       # setting front-page as home page
-      fj('.btn.button-sidebar-wide:contains("Choose Home Page")').click()
-      fj('input[type=radio][value=wiki]').click()
-      fj('button.btn.btn-primary.button_type_submit.ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-text-only').click()
-      f('.home').click()
+      fj('.btn.button-sidebar-wide:contains("Choose Home Page")').click
+      fj('input[type=radio][value=wiki]').click
+      fj('button.btn.btn-primary.button_type_submit.ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-text-only').click
+      f('.home').click
       wait_for_ajaximations
       expect(f('.public-license-text').text).to include('This course content is offered under a')
     end
@@ -93,6 +100,18 @@ describe "Wiki Pages" do
       get "/courses/#{@course.id}/pages/fake"
       expect(flash_message_present?(:info)).to be_truthy
     end
+
+    it "should update the page with changes made in another window", priority: "1", test_id: 126833 do
+      @course.wiki.wiki_pages.create!(title: 'Page1')
+      edit_page('this is')
+      driver.execute_script("window.open()")
+      driver.switch_to.window(driver.window_handles.last)
+      edit_page('test')
+      driver.switch_to.window(driver.window_handles.first)
+      get "/courses/#{@course.id}/pages/Page1/edit"
+      fj('a.switch_views:visible').click
+      expect(f('textarea').text).to include_text('test')
+    end
   end
 
   context "Index Page as a teacher" do
@@ -104,8 +123,8 @@ describe "Wiki Pages" do
     it "should edit page title from pages index", priority: "1", test_id: 126849 do
       @course.wiki.wiki_pages.create!(title: 'B-Team')
       get "/courses/#{@course.id}/pages"
-      f('.al-trigger').click()
-      f('.edit-menu-item').click()
+      f('.al-trigger').click
+      f('.edit-menu-item').click
       expect(f('.edit-control-text').attribute(:value)).to include_text('B-Team')
       f('.edit-control-text').clear()
       f('.edit-control-text').send_keys('A-Team')
@@ -117,9 +136,9 @@ describe "Wiki Pages" do
     it "should display a warning alert when accessing a deleted page", priority: "1", test_id: 126840 do
       @course.wiki.wiki_pages.create!(title: 'deleted')
       get "/courses/#{@course.id}/pages"
-      f('.al-trigger').click()
-      f('.delete-menu-item').click()
-      fj('button:contains("Delete")').click()
+      f('.al-trigger').click
+      f('.delete-menu-item').click
+      fj('button:contains("Delete")').click
       wait_for_ajaximations
       get "/courses/#{@course.id}/pages/deleted"
       expect(flash_message_present?(:info)).to be_truthy
@@ -149,7 +168,7 @@ describe "Wiki Pages" do
   context "Accessibility" do
 
     def check_header_focus(attribute)
-      f("[data-sort-field='#{attribute}']").click()
+      f("[data-sort-field='#{attribute}']").click
       wait_for_ajaximations
       check_element_has_focus(f("[data-sort-field='#{attribute}']"))
     end
@@ -368,7 +387,6 @@ describe "Wiki Pages" do
         element.send_keys(:tab)
         check_element_has_focus(f('.restore-link'))
       end
-
     end
 
     context "Edit Page" do
@@ -379,7 +397,7 @@ describe "Wiki Pages" do
 
       it "should alert user if navigating away from page with unsaved RCE changes", priority: "1", test_id: 267612 do
         add_text_to_tiny("derp")
-        f('.home').click()
+        f('.home').click
         expect(driver.switch_to.alert.text).to be_present
         driver.switch_to.alert.accept
       end
@@ -387,7 +405,7 @@ describe "Wiki Pages" do
       it "should alert user if navigating away from page with unsaved html changes", priority: "1", test_id: 126838 do
         fj('a.switch_views:visible').click()
         f('textarea').send_keys("derp")
-        f('.home').click()
+        f('.home').click
         expect(driver.switch_to.alert.text).to be_present
         driver.switch_to.alert.accept
       end
@@ -395,7 +413,7 @@ describe "Wiki Pages" do
       it "should not save changes when navigating away and not saving", priority: "1", test_id: 267613 do
         fj('a.switch_views:visible').click()
         f('textarea').send_keys('derp')
-        f('.home').click()
+        f('.home').click
         expect(driver.switch_to.alert.text).to be_present
         driver.switch_to.alert.accept
         get "/courses/#{@course.id}/pages/bar/edit"
@@ -406,7 +424,7 @@ describe "Wiki Pages" do
         fj('a.switch_views:visible').click()
         f('.title').clear()
         f('.title').send_keys("derpy-title")
-        f('.home').click()
+        f('.home').click
         expect(driver.switch_to.alert.text).to be_present
         driver.switch_to.alert.accept
       end
@@ -537,6 +555,22 @@ describe "Wiki Pages" do
 
       get "/courses/#{public_course.id}/wiki/#{title}"
       expect(f('.user_content')).not_to be_nil
+    end
+  end
+
+  context "embed video in a Page" do
+    before :each do
+      course_with_teacher_logged_in :account => @account, :active_all => true
+      @course.wiki.wiki_pages.create!(title: 'Page1')
+    end
+
+    it "should embed vimeo video in the page", priority: "1", test_id: 126835 do
+      get "/courses/#{@course.id}/pages/Page1/edit"
+      fln("HTML Editor").click
+      f("#editor_box_unique_id_1").send_keys('<p><iframe style="width: 640px; height: 480px;" title="Instructure - About Us" src="https://player.vimeo.com/video/58752872" width="300" height="150" allowfullscreen="allowfullscreen" webkitallowfullscreen="webkitallowfullscreen" mozallowfullscreen="mozallowfullscreen"></iframe></p>')
+      f(".btn-primary").click
+      wait_for_ajaximations
+      expect(f("iframe")).to be_present
     end
   end
 end
