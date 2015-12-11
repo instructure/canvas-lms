@@ -253,9 +253,6 @@ class WikiPage < ActiveRecord::Base
     given {|user, session| self.can_read_page?(user, session)}
     can :read
 
-    given {|user| self.can_edit_page?(user)}
-    can :read
-
     given {|user| user && self.can_edit_page?(user)}
     can :update_content and can :read_revisions
 
@@ -281,6 +278,8 @@ class WikiPage < ActiveRecord::Base
   end
 
   def can_edit_page?(user, session=nil)
+    return false unless can_read_page?(user, session)
+
     # wiki managers are always allowed to edit
     return true if wiki.grants_right?(user, session, :manage)
 
