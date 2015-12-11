@@ -142,4 +142,7 @@ class PluginSetting < ActiveRecord::Base
   def self.find_by_name(name)
     where(name: name).first
   end
+
+  # stub for plugins who want to do something fancy
+  def self.current_account=(_); end
 end
