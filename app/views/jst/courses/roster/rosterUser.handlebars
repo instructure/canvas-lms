@@ -13,6 +13,13 @@
   {{/if}}
 </td>
 {{/if}}
+{{#if canViewSisIdColumn}}
+<td>
+  {{#if canViewSisId}}
+    {{sis_id}}
+  {{/if}}
+</td>
+{{/if}}
 <td>
   {{#each sections}}
   <div class="section">{{name}}</div>

@@ -10,7 +10,10 @@
         <th scope="col"><span class="screenreader-only">Profile Picture</span></th>
         <th scope="col">{{#t "name"}}Name{{/t}}</th>
         {{#if canViewLoginIdColumn}}
-        <th scope="col">{{#t "login_name_or_sis_id"}}Login / SIS ID{{/t}}</th>
+        <th scope="col">{{#t "login_name"}}Login ID{{/t}}</th>
+        {{/if}}
+        {{#if canViewSisIdColumn}}
+        <th scope="col">{{#t}}SIS ID{{/t}}</th>
         {{/if}}
         <th scope="col">{{#t "section"}}Section{{/t}}</th>
         <th scope="col">{{#t "role"}}Role{{/t}}</th>
@@ -34,7 +37,10 @@
     <ul>
       <li>{{#t "name"}}Name{{/t}}</li>
       {{#if canViewLoginIdColumn}}
-      <li>{{#t "login_name_or_sis_id"}}Login / SIS ID{{/t}}</li>
+      <li>{{#t "login_name"}}Login ID{{/t}}</li>
+      {{/if}}
+      {{#if canViewSisIdColumn}}
+          <li>{{#t}}SIS ID{{/t}}</li>
       {{/if}}
       <li>{{#t "canvas_user_id"}}Canvas User ID{{/t}}</li>
     </ul>

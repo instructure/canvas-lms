@@ -62,17 +62,21 @@ define [
       json.canEditRoles = !(_.any(@model.get('enrollments'), (e) -> e.type == 'ObserverEnrollment'))
       json.canEditSections = !json.isInactive && !(_.isEmpty(@model.sectionEditableEnrollments()))
       json.canLinkStudents = json.isObserver && !ENV.course.concluded
-      json.canViewLoginIdColumn = ENV.permissions.manage_admin_users || ENV.permissions.manage_students || ENV.permissions.read_sis
-      json.canViewLoginId =
+      json.canViewLoginIdColumn = ENV.permissions.manage_admin_users || ENV.permissions.manage_students
+      json.canViewSisIdColumn = ENV.permissions.read_sis
       json.canManage =
         if _.any(['TeacherEnrollment', 'DesignerEnrollment', 'TaEnrollment'], (et) => @model.hasEnrollmentType(et))
           ENV.permissions.manage_admin_users
         else
           ENV.permissions.manage_students
 
-      if !json.canViewLoginId && ENV.permissions.read_sis
+      if json.canViewLoginIdColumn
         json.canViewLoginId = true
-        json.login_id = json.sis_login_id
+        json.login_id = json.login_id
+
+      if json.canViewSisIdColumn
+        json.canViewSisId = true
+        json.sis_id = json.sis_user_id
 
     observerJSON: (json) ->
       if json.isObserver
