@@ -15,7 +15,11 @@
   <%# Setting the Google Analytics recognized userId above enables cross device reports, but doesn't actually expose the id itself.  
       We want to actually see the id so that we can cross reference usage patterns back to the actual person on our end (even 
       the id itself is not personably identifiable info and thus doesn't violote GA's terms of service).%>
-  ga('set', 'dimension1', '<%= @current_user.id %>');
+  <% if @current_user %>
+    ga('set', 'dimension1', '<%= @current_user.id %>');
+  <% else %>
+    ga('set', 'dimension1', '0');
+  <% end %>
   
   ga('require', 'displayfeatures');
   ga('send', 'pageview');
