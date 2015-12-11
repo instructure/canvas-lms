@@ -571,7 +571,7 @@ class Enrollment < ActiveRecord::Base
     TYPE_RANK_HASHES[order][self.class.to_s]
   end
 
-  STATE_RANK = ['active', ['invited', 'creation_pending'], 'completed', 'rejected', 'deleted']
+  STATE_RANK = ['active', ['invited', 'creation_pending'], 'inactive', 'completed', 'rejected', 'deleted']
   STATE_RANK_HASH = rank_hash(STATE_RANK)
   def self.state_rank_sql
     # don't call rank_sql during class load
@@ -580,6 +580,10 @@ class Enrollment < ActiveRecord::Base
 
   def state_sortable
     STATE_RANK_HASH[state.to_s]
+  end
+
+  def state_with_date_sortable
+    STATE_RANK_HASH[state_based_on_date.to_s]
   end
 
   def accept!

@@ -519,7 +519,11 @@ class ApplicationController < ActionController::Base
         @context = api_find(Course.active, params[:course_id])
         params[:context_id] = params[:course_id]
         params[:context_type] = "Course"
-        @context_enrollment = @context.enrollments.where(user_id: @current_user).sort_by{|e| [e.state_sortable, e.rank_sortable, e.id] }.first if @context && @current_user
+        if @context && @current_user
+          context_enrollments = @context.enrollments.where(user_id: @current_user)
+          Canvas::Builders::EnrollmentDateBuilder.preload(context_enrollments)
+          @context_enrollment = context_enrollments.sort_by{|e| [e.state_with_date_sortable, e.rank_sortable, e.id] }.first
+        end
         @context_membership = @context_enrollment
         check_for_readonly_enrollment_state
       elsif params[:account_id] || (self.is_a?(AccountsController) && params[:account_id] = params[:id])
