@@ -3465,7 +3465,7 @@ define([
           while($obj.length > 0 && !$obj.hasClass('group_bottom')) {
             $obj = $obj.next();
             if (!$obj.hasClass('ui-sortable-placeholder')) {
-              take_with.push($obj);
+              take_with.push({item: $obj, visible: $obj.is(':visible')});
               $obj.hide();
             }
           }
@@ -3513,8 +3513,10 @@ define([
           if (take_with) {
             var $obj = ui.item;
             for(var idx in take_with) {
-              var $item = take_with[idx];
-              $obj.after($item.show());
+              var data = take_with[idx];
+              var $item = data.item;
+              if (data.visible) $item.show();
+              $obj.after($item);
               $obj = $item;
             }
           }
