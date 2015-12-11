@@ -3,25 +3,18 @@ require File.expand_path(File.dirname(__FILE__) + '/../helpers/external_tools_co
 require File.expand_path(File.dirname(__FILE__) + '/../helpers/basic/settings_specs')
 
 describe "settings tabs" do
-  def format_date(day = nil)
-    day = (day.downcase).gsub(/:00/,"")
-    day = day.gsub(/, \d{4}/, " at")
-    return day
-  end
-
   def add_announcement
     f("#tab-announcements-link").click
     fj(".element_toggler:visible").click
     subject = "This is a date change"
     f("#account_notification_subject").send_keys(subject)
     f("#account_notification_icon .calendar").click
+
     ff("#add_notification_form .ui-datepicker-trigger")[0].click
     fln("1").click
-    today = f("#account_notification_start_at").attribute("value").to_s
     ff("#add_notification_form .ui-datepicker-trigger")[1].click
     fln("15").click
-    tomorrow = f("#account_notification_end_at").attribute("value").to_s
-    start_end_message = "from #{format_date(today)} to #{format_date(tomorrow)}"
+
     type_in_tiny "textarea", "this is a message"
     yield if block_given?
     submit_form("#add_notification_form")
@@ -29,11 +22,11 @@ describe "settings tabs" do
     notification = AccountNotification.first
     expect(notification.message).to include_text("this is a message")
     expect(notification.subject).to include_text(subject)
-    expect(f("#tab-announcements .notification_message").text).to eq "this is a message"
+    expect(notification.start_at.day).to eq 1
+    expect(notification.end_at.day).to eq 15
     login_text = f("#header .user_name").text
     expect(f("#tab-announcements .announcement-details").text).to include_text(login_text)
     expect(f("#tab-announcements .notification_subject").text).to eq subject
-    expect(f("#tab-announcements .announcement-details").text.downcase).to include_text(start_end_message)
     expect(f("#tab-announcements .notification_message").text).to eq "this is a message"
   end
 
