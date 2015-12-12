@@ -281,16 +281,9 @@ define [
       # an assigmentGroup's .group_weight and @options.group_weighting_scheme
       new AssignmentGroupWeightsDialog context: @options, assignmentGroups: assignmentGroups
       for group in assignmentGroups
-        # note that assignmentGroups are not yet htmlEscaped like assignments and sections
         @assignmentGroups[group.id] = group
         group.assignments = _.select group.assignments, (a) -> a.published
         for assignment in group.assignments
-          htmlUrl = assignment.html_url
-          submissionsDownloadUrl = assignment.submissions_download_url
-          htmlEscape(assignment)
-          assignment.html_url = htmlUrl
-          assignment.submissions_download_url = submissionsDownloadUrl
-
           assignment.assignment_group = group
           assignment.due_at = tz.parse(assignment.due_at)
           @assignments[assignment.id] = assignment
