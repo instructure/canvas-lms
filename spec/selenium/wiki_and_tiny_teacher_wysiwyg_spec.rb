@@ -1,4 +1,4 @@
-require File.expand_path(File.dirname(__FILE__) + '/helpers/wiki_and_tiny_common')
+require_relative 'helpers/wiki_and_tiny_common'
 
 describe "Wiki pages and Tiny WYSIWYG editor features" do
   include_context "in-process server selenium tests"
@@ -101,7 +101,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       validate_wiki_style_attrib("background-color", "rgb(255, 0, 0)", "p span")
     end
 
-    it "should change font size" do
+    it "should change font size", priority: "2", test_id: 401375 do
       wysiwyg_state_setup
 
       # I'm so, so sorry...
@@ -117,6 +117,26 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       validate_wiki_style_attrib("font-size", "36pt", "p span")
       f(".mce-i-removeformat").click
       validate_wiki_style_attrib_empty("p")
+    end
+
+    it 'should insert image using embed image widget', priority: "2", test_id: 397971 do
+      wiki_page_tools_file_tree_setup
+      fj('.mce-ico.mce-i-image').click
+      wait_for_ajaximations
+      widget = fj('.ui-dialog.ui-widget.ui-widget-content.ui-corner-all.ui-draggable.ui-dialog-buttons')
+      widget.find_element(:link_text, 'Canvas').click
+      wait_for_ajaximations
+      widget.find_element(:link_text, 'Course files').click
+      wait_for_ajaximations
+      widget.find_element(:link_text, 'email.png').click
+      fj('.btn-primary.ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-text-only').click
+      wait_for_ajaximations
+      fj('.btn.btn-primary.submit').click
+      wait_for_ajaximations
+      main = fj('#main')
+      expect(main.find_element(:tag_name, 'img')).to have_attribute('height', '16')
+      expect(main.find_element(:tag_name, 'img')).to have_attribute('width', '16')
+      expect(main.find_element(:tag_name, 'img')).to have_attribute('alt', 'email.png')
     end
 
     it "should indent and remove indentation for embedded images" do
@@ -270,7 +290,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
     expect(scroll_location).not_to be 0
   end
 
-  it "should add an equation to the rce by using the equation editor" do
+  it "should add an equation to the rce by using the equation editor", priority: "2", test_id: 397972 do
     equation_text = '\\text{yay math stuff:}\\:\\frac{d}{dx}\\sqrt{x}=\\frac{d}{dx}x^{\\frac{1}{2}}=\\frac{1}{2}x^{-\\frac{1}{2}}=\\frac{1}{2\\sqrt{x}}\\text{that. is. so. cool.}'
 
     get "/courses/#{@course.id}/pages/front-page/edit"
@@ -388,6 +408,42 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       expect(response.code).to eq "302"
       expect(response.header['location']).to include URI.encode(equation_text, Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))
     end
+  end
+
+  it 'should not throw page error with invalid LaTex on assignments', priority: "2", test_id: 237012 do
+    Assignment.new.tap do |a|
+      a.id = 1
+      a.title = 'test assignment'
+      # invalid LaTex characters in alt tag %, ^, &, _, -, ., ?
+      a.description = '<p><img class="equation_image" title="\sqrt[2]{3}%^&_-?."
+      src="/equation_images/%255Csqrt%255B2%255D%257B3%257D"
+      alt="\sqrt[2]{3}%^&_-?."/%^&_-?.></p>'
+      a.context_id = "#{@course.id}"
+      a.context_type = 'Course'
+      a.save!
+    end
+    get "/courses/#{@course.id}/assignments"
+    expect(error_displayed?).to be_falsey
+    get "/courses/#{@course.id}/assignments/1"
+    expect(error_displayed?).to be_falsey
+  end
+
+  it 'should not throw page error with invalid LaTex on discussions', priority: "2", test_id: 237013 do
+    DiscussionTopic.new.tap do |d|
+      d.id = 1
+      d.title = 'test discussion'
+      # invalid LaTex characters in alt tag %, ^, &, _, -, ., ?
+      d.message = '<p><img class="equation_image" title="\sqrt[2]{3}%^&_-?."
+      src="/equation_images/%255Csqrt%255B2%255D%257B3%257D"
+      alt="\sqrt[2]{3}%^&_-?."/%^&_-?.></p>'
+      d.context_id = "#{@course.id}"
+      d.context_type = 'Course'
+      d.save!
+    end
+    get "/courses/#{@course.id}/discussion_topics"
+    expect(error_displayed?).to be_falsey
+    get "/courses/#{@course.id}/discussion_topics/1"
+    expect(error_displayed?).to be_falsey
   end
 
   it "should display record video dialog" do
