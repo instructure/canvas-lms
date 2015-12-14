@@ -238,27 +238,6 @@ describe AcademicBenchmark::Converter do
       expect(@cm.migration_settings[:last_error]).to be_nil
       expect(@cm.workflow_state).to eq 'imported'
     end
-
-    it "should pull down the list of available authorities" do
-      @cm.migration_settings[:authorities] = nil
-      @cm.migration_settings[:refresh_all_standards] = true
-      @cm.save!
-
-      response = Object.new
-      response.stubs(:body).returns(File.read(@authority_list))
-      response.stubs(:code).returns("200")
-      AcademicBenchmark::Api.expects(:get_url).with("http://example.com/browse?api_key=oioioi&format=json&levels=2").returns(response)
-
-      ["CCC", "BBB", "AAA", "111", "222"].each do |guid|
-        response2 = Object.new
-        response2.stubs(:body).returns(File.read(@level_0_browse))
-        response2.stubs(:code).returns("200")
-        AcademicBenchmark::Api.expects(:get_url).with("http://example.com/browse?api_key=oioioi&format=json&guid=%s&levels=3" % guid).returns(response2)
-      end
-
-      run_and_check
-      verify_full_import
-    end
   end
 
   # This test came about because the titles being generated for
