@@ -389,5 +389,31 @@ describe "speed grader" do
     expect(f("#students_selectmenu-button")).to_not have_class("not_graded")
     expect(f("#students_selectmenu-button")).to have_class("graded")
   end
+
+  context 'Crocodocable Submissions' do
+    # set up course and users
+    let(:test_course) { @course }
+    let(:student)     { user(active_all: true) }
+    let!(:crocodoc_plugin) { PluginSetting.create! name: "crocodoc", settings: {api_key: "abc123"} }
+    let!(:enroll_student) do
+      test_course.enroll_user(student, 'StudentEnrollment', enrollment_state: 'active')
+    end
+    # create an assignment with online_upload type submission
+    let!(:assignment) { test_course.assignments.create!(title: 'Assignment A', submission_types: 'online_text_entry,online_upload') }
+    # submit to the assignment as a student twice, one with file and other with text
+    let!(:file_attachment) { attachment_model(:content_type => 'application/pdf', :context => student) }
+    let!(:submit_with_attachment) do
+      assignment.submit_homework(
+        student,
+        submission_type: 'online_upload',
+        attachments: [file_attachment]
+      )
+    end
+
+    it 'should display a flash warning banner when viewed in Firefox', priority: "2", test_id: 571755 do
+      get "/courses/#{test_course.id}/gradebook/speed_grader?assignment_id=#{assignment.id}"
+      expect(fj('#flash_message_holder')).to include_text('Warning: Crocodoc has limitations when used in Firefox. Comments will not always be saved.')
+    end
+  end
 end
 

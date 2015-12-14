@@ -479,10 +479,9 @@ class GradebooksController < ApplicationController
                          'SpeedGrader is enabled only for published content.')
       return redirect_to polymorphic_url([@context, @assignment])
     end
-    if Canvadocs.enabled? &&
-       Canvadocs.annotations_supported? &&
-       @assignment.submission_types.include?('online_upload') &&
-       request.user_agent.to_s =~ /Firefox/
+
+    if submisions_attachment_crocodocable_in_firefox?(@assignment.submissions) ||
+      canvadoc_annotations_enabled_in_firefox?
         flash[:notice] = t("Warning: Crocodoc has limitations when used in Firefox. Comments will not always be saved.")
     end
     grading_role = if moderated_grading_enabled_and_no_grades_published
@@ -674,5 +673,22 @@ class GradebooksController < ApplicationController
       multiple_grading_periods? && view_all_grading_periods?
     hide_all_grading_periods_totals = !context.feature_enabled?(:all_grading_periods_totals)
     all_grading_periods_selected && hide_all_grading_periods_totals
+  end
+
+  def submisions_attachment_crocodocable_in_firefox?(submissions)
+    request.user_agent.to_s =~ /Firefox/ &&
+    submissions.
+      joins("left outer join canvadocs_submissions cs on cs.submission_id = submissions.id").
+      joins("left outer join crocodoc_documents on cs.crocodoc_document_id = crocodoc_documents.id").
+      joins("left outer join canvadocs on cs.canvadoc_id = canvadocs.id").
+      where("cs.crocodoc_document_id IS NOT null or cs.canvadoc_id IS NOT null").
+      any?
+  end
+
+  def canvadoc_annotations_enabled_in_firefox?
+    request.user_agent.to_s =~ /Firefox/ &&
+    Canvadocs.enabled? &&
+    Canvadocs.annotations_supported? &&
+    @assignment.submission_types.include?('online_upload')
   end
 end
