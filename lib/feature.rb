@@ -315,14 +315,6 @@ END
       state: 'hidden',
       root_opt_in: true
     },
-    'lti2_ui' =>
-      {
-        display_name: -> { I18n.t('Show LTI 2 Configuration UI') },
-        description: -> { I18n.t('If enabled, users will be able to configure LTI 2 tools.') },
-        applies_to: 'RootAccount',
-        state: 'hidden',
-        beta: true
-      },
     'lti2_rereg' =>
     {
         display_name: -> {I18n.t('LTI 2 Reregistration')},

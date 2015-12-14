@@ -1078,7 +1078,6 @@ class CoursesController < ApplicationController
         APP_CENTER: {
           enabled: Canvas::Plugin.find(:app_center).enabled?
         },
-        ENABLE_LTI2: @domain_root_account.feature_enabled?(:lti2_ui),
         LTI_LAUNCH_URL: course_tool_proxy_registration_path(@context),
         CONTEXT_BASE_URL: "/courses/#{@context.id}",
         PUBLISHING_ENABLED: @publishing_enabled

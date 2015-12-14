@@ -163,9 +163,9 @@ module Lti
     end
 
     def build_resource_link_id(message_handler)
-      resource_link_id = "#{@context.class}_#{@context.id},MessageHandler_#{message_handler.id}"
+      resource_link_id = "#{@context.class}_#{@context.global_id},MessageHandler_#{message_handler.global_id}"
       resource_link_id += ",#{params[:resource_link_fragment]}" if params[:resource_link_fragment]
-      Base64.urlsafe_encode64("#{resource_link_id}")
+      Canvas::Security.hmac_sha1(resource_link_id)
     end
 
     def create_variable_expander(opts = {})
