@@ -795,7 +795,7 @@ class Course < ActiveRecord::Base
     self.shard.activate do
       if self.workflow_state_changed?
         if self.completed?
-          Enrollment.where(:course_id => self, :workflow_state => ['active', 'invited']).update_all(:workflow_state => 'completed')
+          Enrollment.where(:course_id => self, :workflow_state => ['active', 'invited']).update_all(:workflow_state => 'completed', :completed_at => Time.now.utc)
           appointment_participants.active.current.update_all(:workflow_state => 'deleted')
           appointment_groups.each(&:clear_cached_available_slots!)
         elsif self.deleted?
