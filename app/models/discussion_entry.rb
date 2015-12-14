@@ -370,8 +370,12 @@ class DiscussionEntry < ActiveRecord::Base
     end
   end
 
+  after_commit :subscribe_author, on: :create
+  def subscribe_author
+    discussion_topic.subscribe(user) unless discussion_topic.subscription_hold(user, nil, nil)
+  end
+
   def create_participants
-    subscription_hold = self.discussion_topic.subscription_hold(self.user, nil, nil)
     transaction do
       scope = DiscussionTopicParticipant.where(:discussion_topic_id => self.discussion_topic_id)
       scope = scope.where("user_id<>?", self.user) if self.user
@@ -388,7 +392,6 @@ class DiscussionEntry < ActiveRecord::Base
                                                                                          :workflow_state => "unread",
                                                                                          :subscribed => self.discussion_topic.subscribed?(self.user))
         end
-        self.discussion_topic.subscribe(self.user) unless subscription_hold
       end
     end
   end
