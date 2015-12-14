@@ -3229,38 +3229,6 @@ describe Course, "section_visibility" do
   end
 end
 
-describe Course, ".import_from_migration" do
-  before :once do
-    course_with_teacher
-  end
-
-  before :each do
-    attachment_model(:uploaded_data => stub_file_data('test.m4v', 'asdf', 'video/mp4'))
-  end
-
-  it "should know when it has open course imports" do
-    # no course imports
-    expect(@course).not_to have_open_course_imports
-
-    course2 = @course.account.courses.create!
-    # created course import
-    @course.course_imports.create!(source: course2, import_type: 'test')
-    expect(@course).to have_open_course_imports
-
-    # started course import
-    @course.course_imports.first.update_attribute(:workflow_state, 'started')
-    expect(@course).to have_open_course_imports
-
-    # completed course import
-    @course.course_imports.first.update_attribute(:workflow_state, 'completed')
-    expect(@course).not_to have_open_course_imports
-
-    # failed course import
-    @course.course_imports.first.update_attribute(:workflow_state, 'failed')
-    expect(@course).not_to have_open_course_imports
-  end
-end
-
 describe Course, "enrollments" do
   it "should update enrollments' root_account_id when necessary" do
     a1 = Account.create!

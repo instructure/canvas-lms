@@ -159,14 +159,6 @@
     </div>
   </div>
 <% end %>
-<% if @context.has_open_course_imports? %>
-  <div class="reminder" style="text-align: center;">
-    <h2><%= t('headings.importing', 'This course is being imported') %></h2>
-    <div class="body">
-      <p><%= t 'importing', 'Course copy/migration in progress. This means some content may be temporarily unavailable.' %></p>
-    </div>
-  </div>
-<% end %>
 <% if @pending_enrollment %>
   <%= render :partial => 'shared/dashboard_invitation', :object => @pending_enrollment %>
 <% end %>

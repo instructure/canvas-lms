@@ -209,7 +209,6 @@ class Course < ActiveRecord::Base
   has_many :content_exports, :as => :context
   has_many :epub_exports, -> { order("created_at DESC") }
   attr_accessor :latest_epub_export
-  has_many :course_imports
   has_many :alerts, -> { preload(:criteria) }, as: :context
   has_many :appointment_group_contexts, :as => :context
   has_many :appointment_groups, :through => :appointment_group_contexts
@@ -2610,10 +2609,6 @@ class Course < ActiveRecord::Base
 
       Course.find(new_course.id)
     end
-  end
-
-  def has_open_course_imports?
-    self.course_imports.where(:workflow_state => ['created', 'started']).exists?
   end
 
   def user_list_search_mode_for(user)

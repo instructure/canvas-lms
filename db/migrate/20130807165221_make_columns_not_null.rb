@@ -101,10 +101,6 @@ class MakeColumnsNotNull < ActiveRecord::Migration
     change_column_null_with_less_locking :course_account_associations, :depth
     change_column_null_with_less_locking :course_account_associations, :course_id
     change_column_null_with_less_locking :course_account_associations, :account_id
-    change_column_null_with_less_locking :course_imports, :workflow_state
-    change_fk_column_null_with_less_locking :course_imports, :course_id
-    change_column_null_with_less_locking :course_imports, :import_type
-    change_column_null_with_less_locking :course_imports, :workflow_state
     change_column_null_with_less_locking :course_sections, :course_id
     change_fk_column_null_with_less_locking :course_sections, :root_account_id, :accounts
     change_column_null_with_less_locking :course_sections, :workflow_state
@@ -331,10 +327,6 @@ class MakeColumnsNotNull < ActiveRecord::Migration
     change_column_null :course_account_associations, :depth, true
     change_column_null :course_account_associations, :course_id, true
     change_column_null :course_account_associations, :account_id, true
-    change_column_null :course_imports, :workflow_state, true
-    change_column_null :course_imports, :course_id, true
-    change_column_null :course_imports, :import_type, true
-    change_column_null :course_imports, :workflow_state, true
     change_column_null :course_sections, :course_id, true
     change_column_null :course_sections, :root_account_id, true
     change_column_null :course_sections, :workflow_state, true
