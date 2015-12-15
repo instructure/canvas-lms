@@ -59,7 +59,17 @@ class SubmissionComment < ActiveRecord::Base
 
   def delete_other_comments_in_this_group
     return if !self.group_comment_id || @skip_destroy_callbacks
-    SubmissionComment.for_assignment_id(submission.assignment_id).where(group_comment_id: self.group_comment_id).select{|c| c != self }.each do |comment|
+
+    # grab comment ids first because the objects built off
+    # readonly attributes/objects are marked as readonly and
+    # therefore cannot be destroyed
+    comment_ids = SubmissionComment
+      .for_assignment_id(submission.assignment_id)
+      .where(group_comment_id: group_comment_id)
+      .where('submission_comments.id <> ?', id)
+      .pluck(:id)
+
+    SubmissionComment.find(comment_ids).each do |comment|
       comment.skip_destroy_callbacks!
       comment.destroy
     end

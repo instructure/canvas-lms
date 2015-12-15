@@ -26,9 +26,9 @@ describe Api::Html::Content, type: :request do
         @node = Nokogiri::HTML::DocumentFragment.parse("<img alt='#{@latex}' />").children.first
       end
 
-      it "removes the alt attribute" do
+      it "retains the alt attribute" do
         Api::Html::Content.apply_mathml(@node)
-        expect(@node['alt']).to be_nil
+        expect(@node['alt']).to eql(@latex)
       end
 
       it "sets data-mathml" do
