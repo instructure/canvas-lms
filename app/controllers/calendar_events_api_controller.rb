@@ -333,15 +333,16 @@ class CalendarEventsApiController < ApplicationController
       events = apply_assignment_overrides(events, user)
       mark_submitted_assignments(user, events)
       includes = Array(params[:include])
-      if includes.include?("submissions")
+      if includes.include?("submission")
         submissions = Submission.where(assignment_id: events, user_id: user)
-        subs_by_assg = submissions.group_by(&:assignment_id)
+          .group_by(&:assignment_id)
       end
     end
     if @errors.empty?
       json = events.map do |event|
-        subs = subs_by_assg[event.id] if subs_by_assg
-        event_json(event, user, session, {excludes: params[:excludes], submissions: subs})
+        subs = submissions[event.id] if submissions
+        sub = subs.sort_by(&:submitted_at).last if subs
+        event_json(event, user, session, {excludes: params[:excludes], submission: sub})
       end
       render :json => json
     else
