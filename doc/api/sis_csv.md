@@ -128,11 +128,11 @@ this should not be set. Otherwise this is the password that will be used to
 login to Canvas along with the 'login_id' above.</p>
 <p>If the user already has a password (from a previous SIS import or
 otherwise) it will <em>not</em> be overwritten</p>
-<p>Setting the password will in most cases log the user out of Canvas. If 
-the user has managed to change their password in Canvas they will not be 
+<p>Setting the password will in most cases log the user out of Canvas. If
+the user has managed to change their password in Canvas they will not be
 affected by this.  This latter case would happen if your institution
 transitioned from using Canvas authentication to a SSO solution.
-For this reason it is important to not set this if you are using LDAP or an 
+For this reason it is important to not set this if you are using LDAP or an
 SSO protocol.</p>
 </td>
 </tr>
@@ -465,7 +465,7 @@ is specified the default section for the course will be used</td>
 <tr>
 <td>status</td>
 <td>enum</td>
-<td><b>Required field</b>. active, deleted, completed</td>
+<td><b>Required field</b>. active, deleted, completed, inactive</td>
 </tr>
 <tr>
 <td>associated_user_id</td>
@@ -480,6 +480,8 @@ Ignored for any role other than observer</td>
 When an enrollment is in a 'completed' state the student is limited to read-only access to the
 course.
 
+If in an 'inactive' state, the student will be listed in the course roster for teachers,
+but will not be able to view or participate in the course until the enrollment is activated.
 
 Sample:
 

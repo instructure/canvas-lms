@@ -315,10 +315,14 @@ class EnrollmentsApiController < ApplicationController
   # @argument enrollment[role_id] [Integer]
   #   Assigns a custom course-level role to the user.
   #
-  # @argument enrollment[enrollment_state] [String, "active"|"invited"]
+  # @argument enrollment[enrollment_state] [String, "active"|"invited"|"inactive"]
   #   If set to 'active,' student will be immediately enrolled in the course.
   #   Otherwise they will be required to accept a course invitation. Default is
-  #   'invited.'
+  #   'invited.'.
+  #
+  #   If set to 'inactive', student will be listed in the course roster for
+  #   teachers, but will not be able to participate in the course until
+  #   their enrollment is activated.
   #
   # @argument enrollment[course_section_id] [Integer]
   #   The ID of the course section to enroll the student in. If the
