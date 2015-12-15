@@ -24,7 +24,7 @@ define([
     },
 
     generateSpeedgraderUrl (baseSpeedgraderUrl, student) {
-      var encoded = window.encodeURI(`{"student_id":${student.id}}`);
+      var encoded = window.encodeURI(`{"student_id":${student.id},"add_review":true}`);
       return (`${baseSpeedgraderUrl}#${encoded}`);
     },
 

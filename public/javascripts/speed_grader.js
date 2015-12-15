@@ -1090,6 +1090,8 @@ define([
 
       if (hash.provisional_grade_id) {
         EG.selected_provisional_grade_id = hash.provisional_grade_id;
+      } else if (hash.add_review) {
+        EG.add_review = true;
       }
       EG.goToStudent(studentId);
     },
@@ -1213,6 +1215,7 @@ define([
             if (final_grade) {
               $new_mark_link_menu_item.hide();
             } else {
+              EG.can_add_review = true;
               $new_mark_link_menu_item.show();
             }
           } else {
@@ -1244,26 +1247,31 @@ define([
         $full_width_container.addClass("with_moderation_tabs");
         $moderation_bar.show();
 
-        if (this.selected_provisional_grade_id) {
-          var selected_id = this.selected_provisional_grade_id;
-          // load provisional grade id from anchor hash
-
-          if (final_grade && final_grade.provisional_grade_id == selected_id) {
-            index_to_load = 'final'; // final mark
-          } else {
-            $.each(prov_grades, function (idx, pg) {
-              if (pg.provisional_grade_id == selected_id) {
-                index_to_load = idx;
-              }
-            });
-          }
-
-          this.selected_provisional_grade_id = null; // don't load it again
-        }
-        if (index_to_load == 'final') {
-          $moderation_tab_final.find('a').click();
+        if (this.add_review && this.can_add_review) {
+          this.add_review = false;
+          this.newProvisionalGrade('new', 1);
         } else {
-          $moderation_tabs.eq(index_to_load).find('a').click(); // show a grade
+          if (this.selected_provisional_grade_id) {
+            var selected_id = this.selected_provisional_grade_id;
+            // load provisional grade id from anchor hash
+
+            if (final_grade && final_grade.provisional_grade_id == selected_id) {
+              index_to_load = 'final'; // final mark
+            } else {
+              $.each(prov_grades, function (idx, pg) {
+                if (pg.provisional_grade_id == selected_id) {
+                  index_to_load = idx;
+                }
+              });
+            }
+
+            this.selected_provisional_grade_id = null; // don't load it again
+          }
+          if (index_to_load == 'final') {
+            $moderation_tab_final.find('a').click();
+          } else {
+            $moderation_tabs.eq(index_to_load).find('a').click(); // show a grade
+          }
         }
       } else {
         $full_width_container.removeClass("with_moderation_tabs");
