@@ -14,6 +14,7 @@ require [
   'compiled/collections/EntryCollection'
   'compiled/views/DiscussionTopic/TopicView'
   'compiled/views/DiscussionTopic/EntriesView'
+  'rubricEditBinding'     # sets up event listener for 'rubricEditDataReady'
   'compiled/jquery/sticky'
   'compiled/jquery/ModuleSequenceFooter'
 ], (I18n, EntryView, DiscussionFilterState, DiscussionToolbarView, DiscussionFilterResultsView, MarkAsReadWatcher, $, _, Backbone, Entry, MaterializedDiscussionTopic, SideCommentDiscussionTopic, EntryCollection, TopicView, EntriesView) ->
