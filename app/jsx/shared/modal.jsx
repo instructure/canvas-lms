@@ -8,8 +8,6 @@ define([
   './modal-buttons',
 ], function (React, $, _, preventDefault,  ReactModal, ModalContent, ModalButtons) {
 
-  ReactModal.setAppElement(document.body)
-
   var Modal = React.createClass({
 
     getInitialState() {
@@ -32,6 +30,7 @@ define([
     closeModal() {
       this.setState({modalIsOpen: false}, function(){
         this.props.onRequestClose();
+        $(this.getAppElement()).removeAttr('aria-hidden');
       });
     },
     closeWithX() {
@@ -42,6 +41,10 @@ define([
     onSubmit(){
       var promise = this.props.onSubmit();
       $(this.refs.modal.getDOMNode()).disableWhileLoading(promise);
+    },
+    getAppElement () {
+      // Need to wait for the dom to load before we can get the default #application dom element
+      return this.props.appElement || document.getElementById('application');
     },
     processMultipleChildren(props){
       var content = null;
@@ -84,7 +87,9 @@ define([
                  isOpen={this.state.modalIsOpen}
                  onRequestClose={this.closeModal}
                  className={this.props.className}
-                 overlayClassName={this.props.overlayClassName}>
+                 overlayClassName={this.props.overlayClassName}
+                 appElement={this.getAppElement()}
+           >
             <div ref="modal" className="ReactModal__Layout">
 
               <div className="ReactModal__Header">
