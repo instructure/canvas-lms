@@ -1,6 +1,6 @@
-require_relative "common"
-require_relative "helpers/quizzes_common"
-require_relative "helpers/assignment_overrides"
+require_relative '../common'
+require_relative '../helpers/quizzes_common'
+require_relative '../helpers/assignment_overrides'
 
 describe 'quizzes regressions' do
   include_context "in-process server selenium tests"
@@ -33,20 +33,18 @@ describe 'quizzes regressions' do
       wait_for_ajaximations
     end
 
-    #flag first question
+    # flag first question
     hover_and_click("#question_#{@quest1.id} .flag_question")
 
-    #click second answer
+    # click second answer
     f("#question_#{@quest2.id} .answers .answer:first-child input").click
     f('#submit_quiz_button').click
 
-    #dismiss dialog and submit quiz
+    # dismiss dialog and submit quiz
     confirm_dialog = driver.switch_to.alert
     confirm_dialog.dismiss
     f("#question_#{@quest1.id} .answers .answer:last-child input").click
-    expect_new_page_load {
-      f('#submit_quiz_button').click
-    }
+    expect_new_page_load { f('#submit_quiz_button').click }
     expect(f('#quiz_title').text).to eq @quiz.title
   end
 
@@ -85,9 +83,7 @@ describe 'quizzes regressions' do
       end
       sleep 1
       wait_for_ajaximations
-      keep_trying_until {
-        expect(ff('#question_list .answered').size).to eq 1
-      }
+      keep_trying_until { expect(ff('#question_list .answered').size).to eq 1 }
 
       expect(input).to have_attribute(:value, '1.0000')
     end

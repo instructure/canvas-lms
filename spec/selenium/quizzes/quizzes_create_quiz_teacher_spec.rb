@@ -1,10 +1,10 @@
-require_relative "../common"
-require_relative "../helpers/quizzes_common"
-require_relative "../helpers/assignment_overrides"
-require_relative "../helpers/files_common"
+require_relative '../common'
+require_relative '../helpers/quizzes_common'
+require_relative '../helpers/assignment_overrides'
+require_relative '../helpers/files_common'
 
 describe 'creating a quiz' do
-  include_context "in-process server selenium tests"
+  include_context 'in-process server selenium tests'
   include QuizzesCommon
   include AssignmentOverridesSeleniumHelper
   include FilesCommon
@@ -19,7 +19,7 @@ describe 'creating a quiz' do
         @section_a = @course.course_sections.first
         @section_b = @course.course_sections.create!(name: 'Section B')
         course_quiz(active: true)
-        get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
+        open_quiz_edit_form
       end
 
       it 'sets availability dates and due dates for each section', priority: 1, test_id: 140670 do
@@ -73,12 +73,13 @@ describe 'creating a quiz' do
       assign_quiz_to_no_one
       save_settings
 
-      expect(ffj('div.error_text', 'div.error_box.errorBox')[1].text).to eq 'You must have a student or section selected'
+      expect(ffj('div.error_text', 'div.error_box.errorBox')[1].text).to eq 'You ' \
+        'must have a student or section selected'
     end
 
     it 'saves and publishes a new quiz', priority: "1", test_id: 193785 do
       @quiz = course_quiz
-      get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
+      open_quiz_edit_form
 
       expect(f('#quiz-draft-state')).to be_displayed
 

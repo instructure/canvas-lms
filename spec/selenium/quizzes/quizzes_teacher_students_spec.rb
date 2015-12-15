@@ -1,5 +1,5 @@
-require_relative "common"
-require_relative "helpers/quizzes_common"
+require_relative '../common'
+require_relative '../helpers/quizzes_common'
 
 describe 'quizzes students' do
   include_context "in-process server selenium tests"
@@ -10,14 +10,14 @@ describe 'quizzes students' do
       course_with_teacher_logged_in
       @quiz = @course.quizzes.create!(title: 'new quiz')
       @quiz.quiz_questions.create!(
-          question_data: {
-              name: 'test 3',
-              question_type: 'multiple_choice_question',
-              answers: {
-                  answer_0: { answer_text: '0' },
-                  answer_1: { answer_text: '1' }
-              }
+        question_data: {
+          name: 'test 3',
+          question_type: 'multiple_choice_question',
+          answers: {
+            answer_0: { answer_text: '0' },
+            answer_1: { answer_text: '1' }
           }
+        }
       )
       @quiz.generate_quiz_data
       @quiz.workflow_state = 'available'

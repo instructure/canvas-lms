@@ -1,5 +1,5 @@
-require_relative "common"
-require_relative "helpers/quizzes_common"
+require_relative '../common'
+require_relative '../helpers/quizzes_common'
 
 describe "quizzes question creation with attempts" do
   include_context "in-process server selenium tests"
@@ -14,7 +14,7 @@ describe "quizzes question creation with attempts" do
     def fill_out_attempts_and_validate(attempts, alert_text, expected_attempt_text)
       click_settings_tab
       wait_for_ajaximations
-      quiz_attempt_field = lambda {
+      quiz_attempt_field = lambda do
         set_value(f('#multiple_attempts_option'), false)
         set_value(f('#multiple_attempts_option'), true)
         set_value(f('#limit_attempts_option'), false)
@@ -22,7 +22,7 @@ describe "quizzes question creation with attempts" do
         replace_content(f('#quiz_allowed_attempts'), attempts)
         wait_for_ajaximations
         driver.execute_script(%{$('#quiz_allowed_attempts').blur();}) unless alert_present?
-      }
+      end
       keep_trying_until do
         quiz_attempt_field.call
         sleep 2
@@ -59,11 +59,11 @@ describe "quizzes question creation with attempts" do
       expect(alert_present?).to be_falsey
       expect(fj('#quiz_allowed_attempts')).to have_attribute('value', attempts) # fj to avoid selenium caching
 
-      expect_new_page_load {
+      expect_new_page_load do
         f('.save_quiz_button').click
         wait_for_ajaximations
-        keep_trying_until { expect(f('.header-bar-right')).to be_displayed }
-      }
+        keep_trying_until { expect(f('.header-bar-right')).to be_truthy }
+      end
 
       expect(Quizzes::Quiz.last.allowed_attempts).to eq attempts.to_i
     end

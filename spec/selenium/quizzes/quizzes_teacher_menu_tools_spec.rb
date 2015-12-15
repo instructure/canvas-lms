@@ -1,6 +1,6 @@
-require_relative "common"
-require_relative "helpers/quizzes_common"
-require_relative "helpers/assignment_overrides"
+require_relative '../common'
+require_relative '../helpers/quizzes_common'
+require_relative '../helpers/assignment_overrides'
 
 describe 'quizzes' do
   include_context "in-process server selenium tests"

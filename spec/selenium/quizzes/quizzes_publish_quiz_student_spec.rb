@@ -1,5 +1,5 @@
-require_relative "../common"
-require_relative "../helpers/quizzes_common"
+require_relative '../common'
+require_relative '../helpers/quizzes_common'
 
 describe 'when a quiz is published' do
   include_context "in-process server selenium tests"

@@ -1,7 +1,7 @@
-require_relative "common"
-require_relative "helpers/quizzes_common"
-require_relative "helpers/assignment_overrides"
-require_relative "helpers/files_common"
+require_relative '../common'
+require_relative '../helpers/quizzes_common'
+require_relative '../helpers/assignment_overrides'
+require_relative '../helpers/files_common'
 
 describe "quizzes" do
   include_context "in-process server selenium tests"
@@ -328,7 +328,7 @@ describe "quizzes" do
         f('.answer .question_input').click
 
         # too fast, this always fails
-        #indicator.text.should == 'Saving...'
+        # indicator.text.should == 'Saving...'
 
         wait_for_ajax_requests
         expect(indicator.text).to match(/^Quiz saved at \d+:\d+(pm|am)$/)
@@ -369,10 +369,84 @@ describe "quizzes" do
         bank.assessment_questions << aq1
         bank.assessment_questions << aq2
         q1 = quiz.quiz_questions.create!(:assessment_question => aq1)
-        q1.write_attribute :question_data, {:name => "dropdowns", :question_type => 'multiple_dropdowns_question', :answers => [{:weight => 100, :text => "orange", :blank_id => "orange", :id => 1}, {:weight => 0, :text => "rellow", :blank_id => "orange", :id => 2}, {:weight => 100, :text => "green", :blank_id => "green", :id => 3}, {:weight => 0, :text => "yellue", :blank_id => "green", :id => 4}], :question_text => "<p>multiple answers red + yellow = [orange], yellow + blue = [green]</p>", :points_possible => 1}
+        q1.write_attribute(
+          :question_data, {
+            :name => "dropdowns",
+            :question_type => 'multiple_dropdowns_question',
+            :answers => [
+              {
+                :weight => 100,
+                :text => "orange",
+                :blank_id => "orange",
+                :id => 1
+              }, {
+                :weight => 0,
+                :text => "rellow",
+                :blank_id => "orange",
+                :id => 2
+              }, {
+                :weight => 100,
+                :text => "green",
+                :blank_id => "green",
+                :id => 3
+              }, {
+                :weight => 0,
+                :text => "yellue",
+                :blank_id => "green",
+                :id => 4
+              }
+            ],
+            :question_text => "<p>multiple answers red + yellow = [orange], yellow + blue = [green]</p>",
+            :points_possible => 1
+          }
+        )
         q1.save!
         q2 = quiz.quiz_questions.create!(:assessment_question => aq2)
-        q2.write_attribute :question_data, {:name => "matching", :question_type => 'matching_question', :matches => [{:match_id => 1, :text => "north"}, {:match_id => 2, :text => "south"}, {:match_id => 3, :text => "east"}, {:match_id => 4, :text => "west"}], :answers => [{:left => "nord", :text => "nord", :right => "north", :match_id => 1}, {:left => "sud", :text => "sud", :right => "south", :match_id => 2}, {:left => "est", :text => "est", :right => "east", :match_id => 3}, {:left => "ouest", :text => "ouest", :right => "west", :match_id => 4}], :points_possible => 1}
+        q2.write_attribute(
+          :question_data, {
+            :name => "matching",
+            :question_type => 'matching_question',
+            :matches => [
+              {
+                :match_id => 1,
+                :text => "north"
+              }, {
+                :match_id => 2,
+                :text => "south"
+              }, {
+                :match_id => 3,
+                :text => "east"
+              }, {
+                :match_id => 4,
+                :text => "west"
+              }
+            ],
+            :answers => [
+              {
+                :left => "nord",
+                :text => "nord",
+                :right => "north",
+                :match_id => 1
+              }, {
+                :left => "sud",
+                :text => "sud",
+                :right => "south",
+                :match_id => 2
+              }, {
+                :left => "est",
+                :text => "est",
+                :right => "east",
+                :match_id => 3
+              }, {
+                :left => "ouest",
+                :text => "ouest",
+                :right => "west",
+                :match_id => 4
+              }
+            ],
+            :points_possible => 1
+          }
+        )
         q2.save!
       end
 
@@ -388,9 +462,7 @@ describe "quizzes" do
           wait_for_ajaximations
         end
         # not marked as answered
-        keep_trying_until {
-          expect(ff('#question_list .answered')).to be_empty
-        }
+        keep_trying_until { expect(ff('#question_list .answered')).to be_empty }
 
         # fully answer each question
         dropdowns.each do |d|
@@ -401,9 +473,7 @@ describe "quizzes" do
         end
 
         # marked as answer
-        keep_trying_until {
-          expect(ff('#question_list .answered').size).to eq 2
-        }
+        keep_trying_until { expect(ff('#question_list .answered').size).to eq 2 }
         wait_for_ajaximations
 
         fln('Quizzes').click
@@ -417,11 +487,11 @@ describe "quizzes" do
 
         # there's some initial setTimeout stuff that happens, so things won't
         # be ready right when the page loads
-        keep_trying_until {
+        keep_trying_until do
           dropdowns = ff('a.ui-selectmenu.question_input')
           expect(dropdowns.size).to eq 6
           expect(dropdowns.map(&:text)).to eq %w{orange green east east east east}
-        }
+        end
         expect(ff('#question_list .answered').size).to eq 2
       end
     end
@@ -431,7 +501,6 @@ describe "quizzes" do
       bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
       q = quiz_model
       a = bank.assessment_questions.create!
-      b = bank.assessment_questions.create!
       answers = [{id: 1, answer_text: 'A', weight: 100}, {id: 2, answer_text: 'B', weight: 0}]
       question = q.quiz_questions.create!(:question_data => {
           :name => "first question",
@@ -446,9 +515,9 @@ describe "quizzes" do
 
       get "/courses/#{@course.id}/quizzes/#{q.id}/take?user_id=#{@user.id}"
       f("#take_quiz_link").click
+      sleep 1
 
       answer_one = f("#question_#{question.id}_answer_1")
-      answer_two = f("#question_#{question.id}_answer_2")
 
       # force a save to create a submission
       answer_one.click
@@ -461,9 +530,9 @@ describe "quizzes" do
       quiz_original_end_time = Quizzes::QuizSubmission.last.end_at
       keep_trying_until do
         submission = Quizzes::QuizSubmission.last
-        submission.end_at = Time.now + 20.minutes
+        submission.end_at = Time.zone.now + 20.minutes
         submission.save!
-        quiz_original_end_time < Quizzes::QuizSubmission.last.end_at
+        expect(quiz_original_end_time).to be < Quizzes::QuizSubmission.last.end_at
         expect(f('.time_running').text).to match /19 Minutes/
       end
     end
@@ -494,7 +563,6 @@ describe "quizzes" do
       bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
       q = quiz_model
       a = bank.assessment_questions.create!
-      b = bank.assessment_questions.create!
       answers = {'answer_0' => {'id' => 1}, 'answer_1' => {'id' => 2}}
       @question = q.quiz_questions.create!(:question_data => {
           :name => "first question",
@@ -505,28 +573,25 @@ describe "quizzes" do
       }, :assessment_question => a)
       q.generate_quiz_data
       q.save!
-      filename, @fullpath, data = get_file "testfile1.txt"
+      _filename, @fullpath, _data = get_file "testfile1.txt"
       get "/courses/#{@course.id}/quizzes/#{q.id}/take?user_id=#{@user.id}"
       expect_new_page_load do
         f("#take_quiz_link").click
+        # In this case the UI updates on a timer, not an ajax callback
+        sleep 1
       end
-      wait_for_ajaximations
-      # so we can .send_keys to the input, can't if it's invisible to
-      # the browser
+
+      # so we can .send_keys to the input, can't if it's invisible to the browser
       driver.execute_script "$('.file-upload').removeClass('hidden')"
       upload_attachment_answer
       expect(file_upload_submission_data).to eq [file_upload_attachment.id.to_s]
       # delete the attachment id
       fj('.delete-attachment').click
-      keep_trying_until do
-        expect(fj('.answered')).to eq nil
-      end
+      keep_trying_until { expect(fj('.answered')).to eq nil }
 
       fj('.upload-label').click
       wait_for_ajaximations
-      keep_trying_until do
-        expect(file_upload_submission_data).to eq [""]
-      end
+      keep_trying_until { expect(file_upload_submission_data).to eq [""] }
       upload_attachment_answer
       expect_new_page_load do
         driver.get driver.current_url
@@ -537,9 +602,7 @@ describe "quizzes" do
       expect(fj('.file-upload-box').text).to include attachment.display_name
       f('#submit_quiz_button').click
       wait_for_ajaximations
-      keep_trying_until do
-        expect(fj('.selected_answer').text).to include attachment.display_name
-      end
+      keep_trying_until { expect(fj('.selected_answer').text).to include attachment.display_name }
     end
 
     it "should notify a student of extra time given by a moderator", priority: "2", test_id: 210070 do
@@ -548,7 +611,6 @@ describe "quizzes" do
       bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
       q = quiz_model
       a = bank.assessment_questions.create!
-      b = bank.assessment_questions.create!
       answers = {'answer_0' => {'id' => 1}, 'answer_1' => {'id' => 2}}
       question = q.quiz_questions.create!(:question_data => {
           :name => "first question",
@@ -562,10 +624,13 @@ describe "quizzes" do
       q.save!
 
       get "/courses/#{@course.id}/quizzes/#{q.id}/take?user_id=#{@user.id}"
-      f("#take_quiz_link").click
+      expect_new_page_load do
+        f("#take_quiz_link").click
+        # In this case the UI updates on a timer, not an ajax callback
+        sleep 1
+      end
 
       answer_one = f("#question_#{question.id}_answer_1")
-      answer_two = f("#question_#{question.id}_answer_2")
 
       # force a save to create a submission
       answer_one.click
@@ -580,9 +645,10 @@ describe "quizzes" do
 
 
       submission = Quizzes::QuizSubmission.last
-      submission.end_at = Time.now + 20.minutes
+      submission.end_at = Time.zone.now + 20.minutes
       submission.save!
-      quiz_original_end_time < Quizzes::QuizSubmission.last.end_at
+
+      expect(quiz_original_end_time).to be < Quizzes::QuizSubmission.last.end_at
       assert_flash_notice_message /You have been given extra time on this attempt/
       expect(f('.time_running').text).to match /19 Minutes/
     end
@@ -600,8 +666,7 @@ describe "quizzes" do
       @quiz = quiz_model({ course: @course, time_limit: 5 })
       @quiz.quiz_questions.create!(question_data: multiple_choice_question_data)
       @quiz.generate_quiz_data
-      @quiz.save
-      @quiz
+      @quiz.save!
 
       take_and_answer_quiz
       expect(f("#section-tabs .grades .nav-badge")).to be_nil

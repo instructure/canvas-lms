@@ -1,5 +1,5 @@
-require_relative "../common"
-require_relative "../helpers/quiz_questions_common"
+require_relative '../common'
+require_relative '../helpers/quiz_questions_common'
 
 describe 'taking a quiz one question at a time' do
   include_context 'in-process server selenium tests'

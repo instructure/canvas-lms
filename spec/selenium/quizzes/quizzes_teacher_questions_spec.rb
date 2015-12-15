@@ -1,5 +1,5 @@
-require_relative "common"
-require_relative "helpers/quizzes_common"
+require_relative '../common'
+require_relative '../helpers/quizzes_common'
 
 describe "quizzes questions" do
   include_context "in-process server selenium tests"
@@ -58,7 +58,7 @@ describe "quizzes questions" do
                     </div>
                   </div>'
 
-      quiz = start_quiz_question
+      start_quiz_question
 
       question = fj(".question_form:visible")
       click_option('.question_form:visible .question_type', 'True/False')
@@ -77,10 +77,10 @@ describe "quizzes questions" do
       expect(ff("#question_form_template option.missing_word").length).to eq 1
 
       click_questions_tab
-      keep_trying_until {
+      keep_trying_until do
         f(".add_question .add_question_link").click
         ff("#questions .question_holder").length > 0
-      }
+      end
       expect(ff("#questions .question_holder option.missing_word").length).to eq 0
     end
 
@@ -196,15 +196,13 @@ describe "quizzes questions" do
       driver.execute_script <<-JS
       $('input[type=text]').trigger('change');
       JS
-      expect_new_page_load {
-        f('#submit_quiz_button').click
-      }
+      expect_new_page_load { f('#submit_quiz_button').click }
       expect(f('.score_value').text.strip).to eq '1'
     end
   end
 
   context "select element behavior" do
-    before (:each) do
+    before(:each) do
       @context = @course
       bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
       q = quiz_model
@@ -262,7 +260,7 @@ describe "quizzes questions" do
     end
 
     after do
-      #This step is to prevent selenium from freezing when the dialog appears when leaving the page
+      # This step is to prevent selenium from freezing when the dialog appears when leaving the page
       keep_trying_until do
         f('#left-side .quizzes').click
         confirm_dialog = driver.switch_to.alert

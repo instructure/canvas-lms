@@ -1,5 +1,5 @@
-require_relative "common"
-require_relative "helpers/quizzes_common"
+require_relative '../common'
+require_relative '../helpers/quizzes_common'
 
 describe 'quizzes accessibility' do
   include_context "in-process server selenium tests"
@@ -34,9 +34,7 @@ describe 'quizzes accessibility' do
     click_questions_tab
 
     4.times do |i|
-      keep_trying_until(100) {
-        expect(f("#question_#{quiz.quiz_questions[i].id}")).to be_displayed
-      }
+      keep_trying_until(10) { expect(f("#question_#{quiz.quiz_questions[i].id}")).to be_truthy }
     end
 
     questions = ff('.display_question')
@@ -55,7 +53,7 @@ describe 'quizzes accessibility' do
     #   symbol: publish_the_quiz
     quiz.workflow_state = 'available'
     quiz.generate_quiz_data
-    quiz.published_at = Time.now
+    quiz.published_at = Time.zone.now
     quiz.save!
     # --
     # -------------------------------------------------------------------------

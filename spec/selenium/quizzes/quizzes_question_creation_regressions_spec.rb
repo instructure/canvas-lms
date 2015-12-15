@@ -1,5 +1,5 @@
-require_relative "../common"
-require_relative "../helpers/quizzes_common"
+require_relative '../common'
+require_relative '../helpers/quizzes_common'
 
 describe 'quizzes question creation edge cases' do
   include_context "in-process server selenium tests"
@@ -20,10 +20,10 @@ describe 'quizzes question creation edge cases' do
     create_fill_in_the_blank_question
 
     quiz.reload
-    refresh_page #making sure the quizzes load up from the database
+    refresh_page # make sure the quizzes load up from the database
     click_questions_tab
     3.times do |i|
-      keep_trying_until(100) {expect(f("#question_#{quiz.quiz_questions[i].id}")).to be_displayed}
+      keep_trying_until(10) {expect(f("#question_#{quiz.quiz_questions[i].id}")).to be_truthy}
     end
     questions = ff('.display_question')
     expect(questions[0]).to have_class('multiple_choice_question')
@@ -72,7 +72,6 @@ describe 'quizzes question creation edge cases' do
 
   it 'respects character limits on short answer questions', priority: "1", test_id: 197493 do
     skip('Fragile check for alert box on character length')
-    quiz = @last_quiz
     question = fj('.question_form:visible')
     click_option('.question_form:visible .question_type', 'Fill In the Blank')
 
@@ -81,27 +80,27 @@ describe 'quizzes question creation edge cases' do
     answers = question.find_elements(:css, '.form_answers > .answer')
     answer = answers[0].find_element(:css, '.short_answer input')
 
-    short_answer_field = lambda {
+    short_answer_field = lambda do
       replace_content(answer, 'a'*100)
       driver.execute_script(%{$('.short_answer input:focus').blur();}) unless alert_present?
-    }
+    end
 
     keep_trying_until do
       short_answer_field.call
       alert_present?
     end
     alert = driver.switch_to.alert
-    expect(alert.text).to match /Answers for fill in the blank questions must be under 80 characters long/
+    expect(alert.text).to eq 'Answers for fill in the blank questions must be under 80 characters long'
     alert.dismiss
   end
 
   it 'should show errors for graded quizzes but not surveys', priority: "1", test_id: 197491 do
     quiz_with_new_questions
     change_quiz_type_to 'Graded Survey'
-    expect_new_page_load {
+    expect_new_page_load do
       save_settings
       wait_for_ajax_requests
-    }
+    end
 
     edit_quiz
     click_questions_tab
@@ -114,10 +113,10 @@ describe 'quizzes question creation edge cases' do
 
     click_settings_tab
     change_quiz_type_to 'Graded Quiz'
-    expect_new_page_load {
+    expect_new_page_load do
       save_settings
       wait_for_ajax_requests
-    }
+    end
 
     edit_quiz
     click_questions_tab

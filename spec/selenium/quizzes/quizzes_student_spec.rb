@@ -1,5 +1,5 @@
-require_relative "common"
-require_relative "helpers/quizzes_common"
+require_relative '../common'
+require_relative '../helpers/quizzes_common'
 
 describe 'quizzes' do
   include_context "in-process server selenium tests"
@@ -137,7 +137,7 @@ describe 'quizzes' do
       # create new multiple fill in the blank quiz and question
       @quiz = quiz_model({ course: @course, time_limit: 5 })
 
-      question = @quiz.quiz_questions.create!(question_data: fill_in_multiple_blanks_question_data )
+      question = @quiz.quiz_questions.create!(question_data: fill_in_multiple_blanks_question_data)
       @quiz.generate_quiz_data
       @quiz.tap(&:save)
       # create and grade a submission on our mfitb quiz
