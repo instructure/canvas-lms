@@ -4045,12 +4045,12 @@ describe Course do
       @course.enroll_student(user2).accept!
 
       dm_count = DelayedMessage.count
-      expect(DelayedMessage.where(:communication_channel_id => user1.communication_channels.first).count).to eq 0
+      count1 = DelayedMessage.where(:communication_channel_id => user1.communication_channels.first).count
       Notification.create!(:name => 'Enrollment Invitation')
       @course.re_send_invitations!(@teacher)
 
       expect(DelayedMessage.count).to eq dm_count + 1
-      expect(DelayedMessage.where(:communication_channel_id => user1.communication_channels.first).count).to eq 1
+      expect(DelayedMessage.where(:communication_channel_id => user1.communication_channels.first).count).to eq count1 + 1
     end
 
     it "should respect section restrictions" do
@@ -4063,11 +4063,15 @@ describe Course do
       @course.enroll_student(user2, :section => section2)
       @course.enroll_ta(ta, :active_all => true, :section => section2, :limit_privileges_to_course_section => true)
 
-      Notification.create!(:name => 'Enrollment Invitation')
+      notification = Notification.where(:name => 'Enrollment Invitation').first_or_create!
+
+      count1 = user1.communication_channel.delayed_messages.where(notification_id: notification).count
+      count2 = user2.communication_channel.delayed_messages.where(notification_id: notification).count
+
       @course.re_send_invitations!(ta)
 
-      expect(DelayedMessage.where(:communication_channel_id => user1.communication_channel).count).to eq 0
-      expect(DelayedMessage.where(:communication_channel_id => user2.communication_channel).count).to eq 1
+      expect(user1.communication_channel.delayed_messages.where(notification_id: notification).count).to eq count1
+      expect(user2.communication_channel.delayed_messages.where(notification_id: notification).count).to eq count2 + 1
     end
   end
 
