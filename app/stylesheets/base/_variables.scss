@@ -208,9 +208,9 @@ $ic-color-icon-disabled:        darken($ic-color-neutral, 40);
 @if $use_high_contrast {
 $ic-color-icon-disabled:        darken($ic-color-neutral, 60);
 }
-$ic-dim-helper-text:            darken($ic-color-neutral, 33);
+$ic-dim-helper-text:            darken($ic-color-neutral, 45);
 @if $use_high_contrast {
-$ic-dim-helper-text:            darken($ic-color-neutral, 50);
+$ic-dim-helper-text:            darken($ic-color-neutral, 55);
 }
 
 // We don't use any of the Bootstrap glyph icons, But bootstrap's scss expects this variable to be defined.
