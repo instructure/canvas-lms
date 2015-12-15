@@ -3798,7 +3798,9 @@ def setup_assignment_with_students
 end
 
 def submit_homework(student)
-  a = Attachment.create! context: student,
+  file_context = @assignment.group_category.group_for(student) if @assignment.has_group_category?
+  file_context ||= student
+  a = Attachment.create! context: file_context,
                          filename: "homework.pdf",
                          uploaded_data: StringIO.new("blah blah blah")
   @assignment.submit_homework(student, attachments: [a],
