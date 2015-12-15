@@ -116,10 +116,7 @@ $ic-list-item-background--selected:   #d9edf9;
 // and meet our contrast needs when used with our main color variables
 
 $ic-bg-light-neutral:     lighten($ic-color-neutral, 6%);
-$ic-bg-light-primary:     lighten($ic-brand-primary, 54%);
-@if $use_high_contrast {
-  $ic-bg-light-primary:   lighten($ic-brand-primary, 64%);
-}
+$ic-bg-light-primary:     safe_background_color($ic-brand-primary);
 $ic-bg-light-success:     lighten($ic-color-success, 67%);
 $ic-bg-light-alert:       lighten($ic-color-alert, 57%);
 @if $use_high_contrast {
