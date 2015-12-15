@@ -1225,7 +1225,7 @@ class Assignment < ActiveRecord::Base
         opts[:group_comment_id] = uuid if group
         s.add_comment(opts)
         # SubmissionComment updates the submission directly in the db
-        # in an after_save, ande Rails doesn't preload the reverse association
+        # in an after_save, and Rails doesn't preload the reverse association
         # on new objects so it can't set it on this object
         s.reload
       end
