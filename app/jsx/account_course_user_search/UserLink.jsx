@@ -14,7 +14,7 @@ define([
       var { id, display_name, avatar_image_url } = this.props;
       var url = `/users/${id}`;
       return (
-        <div>
+        <div className="ellipsis">
           {!!avatar_image_url &&
           <span className="ic-avatar" style={{width: 25, height: 25, margin: "-1px 10px 1px 0"}}>
               <img src={avatar_image_url} />

@@ -4,7 +4,7 @@ define([
   "i18n!account_course_user_search",
   "underscore",
   "./UserLink",
-  "compiled/views/courses/roster/CreateUsersView"
+  "compiled/views/courses/roster/CreateUsersView",
 ], function($, React, I18n, _, UserLink, CreateUsersView) {
 
   var { number, string, func, shape, arrayOf } = React.PropTypes;
@@ -16,6 +16,20 @@ define([
       workflow_state: string.isRequired,
       total_students: number.isRequired,
       teachers: arrayOf(shape(UserLink.propTypes)).isRequired
+    },
+    getInitialState () {
+      let teachers = _.uniq(this.props.teachers, (t) => t.id);
+      return {
+        teachersToShow: _.compact([teachers[0], teachers[1]])
+      };
+    },
+    showMoreLink () {
+      if (this.props.teachers.length > 2 && this.state.teachersToShow.length === 2) {
+        return <a className="showMoreLink" href="#" onClick={this.showMoreTeachers}> {I18n.t('Show More')}</a>
+      } 
+    },
+    showMoreTeachers () {
+      this.setState({teachersToShow: _.uniq(this.props.teachers, (t) => t.id)});
     },
     addUserToCourse () {
       let createUsersBackboneView = new CreateUsersView({title: I18n.t('Add People'), height: 520});
@@ -44,7 +58,8 @@ define([
           </div>
 
           <div className="col-md-3" role='gridcell'>
-            {teachers && teachers.map((teacher) => <UserLink key={teacher.id} {...teacher} />)}
+            {this.state.teachersToShow && this.state.teachersToShow.map((teacher) => <UserLink key={teacher.id} {...teacher} />)}
+            { this.showMoreLink() }
           </div>
 
           <div className="col-md-3" role='gridcell'>
