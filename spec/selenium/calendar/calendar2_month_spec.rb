@@ -87,6 +87,31 @@ describe "calendar2" do
           @three_days_earlier = @initial_time - 72.hours
         end
 
+        it "should drag and drop assignment override forward" do
+          assignment1 = @course.assignments.create!(title: 'new month view assignment')
+          assignment1.assignment_overrides.create! do |override|
+            override.set = @course.course_sections.first
+            override.due_at = @initial_time
+            override.due_at_overridden = true
+          end
+          get "/calendar2"
+          quick_jump_to_date(@initial_time_str)
+
+          # Move assignment from Thursday to Friday
+          drag_and_drop_element(find('.calendar .fc-event'),
+                                find('.calendar .fc-day.fc-widget-content.fc-fri.fc-past'))
+
+          # Expect no pop up errors with drag and drop
+          expect(flash_message_present?(:error)).to be false
+
+          # Assignment should be moved to Friday
+          expect(element_location).to eq @friday
+
+          # Assignment time should stay at 9:00am
+          assignment1.reload
+          expect(assignment1.assignment_overrides.first.due_at).to eql(@one_day_later)
+        end
+
         it "should drag and drop assignment forward", priority: "1", test_id: 495537 do
           assignment1 = @course.assignments.create!(title: 'new month view assignment', due_at: @initial_time)
           get "/calendar2"
