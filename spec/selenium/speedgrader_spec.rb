@@ -211,7 +211,7 @@ describe 'Speedgrader' do
         f('button.save_rubric_button').click
         wait_for_ajaximations
 
-        expect(f("#student_grading_#{@assignment.id}").attribute 'value').to eq '10'
+        keep_trying_until { expect(f("#student_grading_#{@assignment.id}").attribute 'value').to eq '10' }
       end
     end
     context 'Using a rubric to grade' do
@@ -379,7 +379,7 @@ describe 'Speedgrader' do
 
     # see first student
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{assignment.id}#"
-    expect(fj('span.ui-selectmenu-item-header')).to include_text(@students[0].name)
+    keep_trying_until { expect(fj('span.ui-selectmenu-item-header')).to include_text(@students[0].name) }
     expect(f('#x_of_x_students_frd')).to include_text('Student 1 of 2')
 
     # click next to second student
@@ -399,7 +399,7 @@ describe 'Speedgrader' do
 
     # see first student
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{assignment.id}#"
-    expect(fj('span.ui-selectmenu-item-header')).to include_text(@students[0].name)
+    keep_trying_until { expect(fj('span.ui-selectmenu-item-header')).to include_text(@students[0].name) }
     expect(f('#x_of_x_students_frd')).to include_text('Student 1 of 2')
 
     # click next to second student
@@ -418,7 +418,7 @@ describe 'Speedgrader' do
     assignment = create_assignment_with_type('letter_grade')
 
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{assignment.id}#"
-    expect(fj('span.ui-selectmenu-item-header')).to include_text(@students[0].name)
+    keep_trying_until { expect(fj('span.ui-selectmenu-item-header')).to include_text(@students[0].name) }
 
     f('a.ui-selectmenu').click
     expect(fj('div.ui-selectmenu-menu.ui-selectmenu-open')).to include_text(@students[0].name)
