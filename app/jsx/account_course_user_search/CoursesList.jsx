@@ -7,12 +7,61 @@ define([
 
   var { number, string, func, shape, arrayOf } = React.PropTypes;
 
+  let defaultDirection = 'ASC';
   var CoursesList = React.createClass({
+    getInitialState () {
+      return {
+        sort: {
+          direction: defaultDirection,
+          property: 'name'
+        }
+      }
+    },
     propTypes: {
       courses: arrayOf(shape(CoursesListRow.propTypes)).isRequired
     },
+    sortArrow (column) {
+      let className = this.state.sort.direction == defaultDirection ? 'icon-mini-arrow-down' : 'icon-mini-arrow-up';
+
+      // Defaults to sort the name
+      if (column == this.state.sort.property) {
+        return <i className={className} />;
+      }
+    },
+    sortCourses ({property, direction}) {
+      let courses = _.sortBy(this.props.courses, property);
+
+      if (direction == 'DESC') {
+        courses.reverse()
+      }
+
+      return courses;
+    },
+    toggleDirection (direction) {
+      if (direction == 'DESC') {
+        return 'ASC';
+      } else {
+        return 'DESC';
+      }
+    },
+    sort (theProperty) {
+      let {property, direction} = this.state.sort;
+
+      if (theProperty == property) { // toggle the direction? Or use a new default
+        direction = this.toggleDirection(direction);
+      } else {
+        direction = defaultDirection;
+      }
+
+      this.setState({
+        sort: {
+          direction: direction,
+          property: theProperty
+        }
+      });
+    },
     render() {
-      var { courses } = this.props;
+      let courses = this.sortCourses(this.state.sort);
 
       return (
 
@@ -23,7 +72,9 @@ define([
                 <div className="col-xs-2">
                 </div>
                 <div className="col-xs-10" role='columnheader'>
-                  <strong><small>{I18n.t("Course")}</small></strong>
+                  <strong>
+                    <a href="#" className="coursesHeaderLink" onClick={this.sort.bind(this, 'name')}>{this.sortArrow('name')}<small>{I18n.t("Course")}</small></a>
+                  </strong>
                 </div>
               </div>
             </div>

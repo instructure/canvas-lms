@@ -34,7 +34,7 @@ define([
           <div className="col-md-3">
             <div role='gridcell' className="grid-row">
               <div className="col-xs-2">{isPublished && (<i className="icon-publish courses-list__published-icon" />)}</div>
-              <div className="col-xs-10"><a href={url}>{name}</a></div>
+              <div className="courseName col-xs-10"><a href={url}>{name}</a></div>
             </div>
           </div>
 

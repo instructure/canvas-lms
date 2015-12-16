@@ -106,4 +106,31 @@ describe "new account course search" do
     expect(user_link).to include_text(@user.name)
     expect(user_link['href']).to eq user_url(@user)
   end
+
+  it "should sort courses by name by defualt" do
+    2.times do |x|
+      course(:account => @account, :course_name => "course #{x + 1}")
+    end
+    get "/accounts/#{@account.id}"
+
+    first = ff('.courses-list .courseName')[0].text
+    second = ff('.courses-list .courseName')[1].text
+
+    expect(first).to eq "course 1"
+    expect(second).to eq "course 2"
+  end
+
+  it "should sort courses by name in DESC order when clicking the label" do
+    2.times do |x|
+      course(:account => @account, :course_name => "course #{x + 1}")
+    end
+    get "/accounts/#{@account.id}"
+
+    f('.coursesHeaderLink').click
+    first = ff('.courses-list .courseName')[0].text
+    second = ff('.courses-list .courseName')[1].text
+
+    expect(first).to eq "course 2"
+    expect(second).to eq "course 1"
+  end
 end
