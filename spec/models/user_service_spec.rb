@@ -140,10 +140,6 @@ describe UserService do
   end
 
   context "service type disambiguation" do
-    it "should know that google_docs means 'DocumentService" do
-      expect(UserService.service_type('google_docs')).to eql('DocumentService')
-    end
-
     it "should know that google_drive means 'DocumentService" do
       expect(UserService.service_type('google_drive')).to eql('DocumentService')
     end

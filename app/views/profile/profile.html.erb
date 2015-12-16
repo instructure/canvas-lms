@@ -229,6 +229,9 @@ TEXT
               <% if service.has_profile_link? %>
                 <a href="<%= service.service_user_link %>">
                   <%= t('links.view_your_profile', "view your profile") %>
+                  <% if service.has_readable_user_name? %>
+                      <span><%= service.service_user_name %></span>
+                  <% end %>
                 </a>
               <% elsif service.has_readable_user_name? %>
                 <span><%= service.service_user_name %></span>
@@ -252,26 +255,8 @@ TEXT
     <%= before_label(:other_services, "Click any service below to register") %>
     <% services = @user.user_services.map{|s| s.service} %>
     <ul id="unregistered_services" class="unstyled_list">
-      <li id="unregistered_service_google_docs" class="service" style="<%= hidden if !feature_and_service_enabled?(:google_docs) || services.include?("google_docs") %>">
-        <a href="#" class="btn btn-small"><%= image_tag "google_docs_icon.png" %> <%= t('links.google_docs', "Google Docs") %></a>
-        <div style="display: none; text-align: left;" class="content" title="<%= t('titles.authorize_google_docs', "Authorize Google Docs") %>" id="unregistered_service_google_docs_dialog">
-          <div>
-            <%= image_tag "google_docs.png", :style => "float: left; padding-right: 5px;" %>
-            <div style="font-size: 1.2em; font-weight: bold;"><%= t('headers.google_docs_access', "Google Docs Access") %></div>
-            <%= t(:google_docs_description, <<-TEXT)
-            Once you authorize us to see your Google Docs you'll be able to submit your assignments
-            directly from Google Docs, and create and share documents with members of your classes.
-            TEXT
-            %>
-            <div class="clear"></div>
-          </div>
-          <div style="text-align: center; margin-top: 10px;">
-            <a class="btn" href="<%= oauth_url(:service => "google_docs", :return_to => settings_profile_url) %>"><%= t('buttons.authorize_google_docs', "Authorize Google Docs Access") %></a>
-          </div>
-        </div>
-      </li>
 
-      <li id="unregistered_service_google_drive" class="service" style="<%= hidden if !feature_enabled?(:google_drive) || !feature_and_service_enabled?(:google_docs) || services.include?("google_drive") %>">
+      <li id="unregistered_service_google_drive" class="service" style="<%= hidden if !feature_and_service_enabled?(:google_drive) || services.include?("google_drive") %>">
         <a href="#" class="btn btn-small"><%= image_tag "google_drive_icon.png" %> <%= t('links.google_drive', "Google Drive") %></a>
         <div style="display: none; text-align: left;" class="content" title="<%= t('titles.authorize_google_drive', "Authorize Google Drive") %>" id="unregistered_service_google_drive_dialog">
           <div>

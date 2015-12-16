@@ -15,8 +15,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-module GoogleDocs
-  class DriveEntry
+module GoogleDrive
+  class Entry
 
     attr_reader :document_id, :folder, :entry
 
@@ -25,7 +25,7 @@ module GoogleDocs
       @document_id = @entry['id']
       @preferred_extensions = preferred_extensions
       parent = @entry['parents'].length > 0 ? @entry['parents'][0] : nil
-      @folder = (parent == nil || parent['isRoot'] ? nil : parent['id'])
+      @folder = (parent.nil? || parent['isRoot'] ? nil : parent['id'])
     end
 
     def alternate_url
@@ -37,7 +37,7 @@ module GoogleDocs
     end
 
     def extension
-      get_file_data[:ext]
+      file_data[:ext]
     end
 
     def display_name
@@ -45,7 +45,7 @@ module GoogleDocs
     end
 
     def download_url
-      get_file_data[:url]
+      file_data[:url]
     end
 
     def to_hash
@@ -58,7 +58,7 @@ module GoogleDocs
     end
 
     private
-    def get_file_data()
+    def file_data
       # First we check export links for our preferred formats
       # then we fail over to the file properties
       if @entry['exportLinks']
@@ -66,10 +66,10 @@ module GoogleDocs
       end
 
       # we'll have to find the url and extensions some other place
-      extension ||= @entry['fileExtension'] if @entry.has_key? 'fileExtension'
+      extension ||= @entry['fileExtension'] if @entry.key? 'fileExtension'
       extension ||= 'none'
 
-      url ||= @entry['downloadUrl'] if @entry.has_key? 'downloadUrl'
+      url ||= @entry['downloadUrl'] if @entry.key? 'downloadUrl'
 
       {
         url: url,
@@ -78,10 +78,29 @@ module GoogleDocs
     end
 
     def preferred_export_link(preferred_extensions=nil)
+      preferred_urls = preferred_mime_types.map do |mime_type|
+        next unless @entry['exportLinks'][mime_type]
 
+        current_url = @entry['exportLinks'][mime_type]
+        current_extension = /([a-z]+)$/.match(current_url).to_s
+        has_preferred_extension = preferred_extensions && preferred_extensions.include?(current_extension)
+
+        # our extension is in the preferred list or we have no preferences
+        [current_url, current_extension] if has_preferred_extension || !preferred_extensions
+      end
+
+      url, extension = preferred_urls.find{ |i| i}
+
+      # if we dont have any "preferred extension" just return the default.
+      # they will be filtered out by the folderize method
+      return preferred_export_link if url.nil? && preferred_extensions
+      [url, extension]
+    end
+
+    def preferred_mime_types
       # Order is important
       # we return the first matching mime type
-      preferred_mime_types = %w{
+      %w{
         application/vnd.openxmlformats-officedocument.wordprocessingml.document
         application/vnd.oasis.opendocument.text
         application/vnd.openxmlformats-officedocument.presentationml.presentation
@@ -90,22 +109,6 @@ module GoogleDocs
         application/pdf
         application/zip
       }
-
-      url, extension = preferred_mime_types.map do |mime_type|
-        next unless @entry['exportLinks'][mime_type]
-
-        current_url = @entry['exportLinks'][mime_type]
-        current_extension = /([a-z]+)$/.match(current_url).to_s
-
-        # our extension is in the preferred list or we have no preferences
-        [current_url, current_extension] if (preferred_extensions && preferred_extensions.include?(current_extension)) || !preferred_extensions
-      end.find{|i|i}
-
-      # if we dont have any "preferred extension" just return the default.
-      # they will be filtered out by the folderize method
-      return preferred_export_link if url == nil && preferred_extensions
-      [url, extension]
     end
-
   end
 end

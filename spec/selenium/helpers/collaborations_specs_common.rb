@@ -1,6 +1,12 @@
 module CollaborationsSpecsCommon
-  def new_collaborations_form(type)
+
+  def ensure_plugin(type)
+    type = 'google_drive' if type == 'google_docs'
     PluginSetting.create!(:name => type, :settings => {})
+  end
+
+  def new_collaborations_form(type)
+    ensure_plugin(type)
     validate_collaborations
   end
 
@@ -45,7 +51,7 @@ module CollaborationsSpecsCommon
   end
 
   def display_available_collaborators(type)
-    PluginSetting.create!(:name => type, :settings => {})
+    ensure_plugin(type)
 
     student_in_course(:course => @course)
     @student.update_attribute(:name, 'Don Draper')
@@ -56,7 +62,7 @@ module CollaborationsSpecsCommon
   end
 
   def select_collaborators(type)
-    PluginSetting.create!(:name => type, :settings => {})
+    ensure_plugin(type)
 
     student_in_course(:course => @course)
     @student.update_attribute(:name, 'Don Draper')
@@ -93,7 +99,7 @@ module CollaborationsSpecsCommon
   end
 
   def deselect_collaborators(type)
-    PluginSetting.create!(:name => type, :settings => {})
+    ensure_plugin(type)
 
     student_in_course(:course => @course)
     @student.update_attribute(:name, 'Don Draper')
@@ -106,7 +112,7 @@ module CollaborationsSpecsCommon
   end
 
   def select_collaborators_and_look_for_start(type)
-    PluginSetting.create!(:name => type, :settings => {})
+    ensure_plugin(type)
 
     collaboration_name = "StreetsOfRage"
     manually_create_collaboration(collaboration_name)
@@ -138,7 +144,7 @@ module CollaborationsSpecsCommon
   end
 
   def display_new_form_if_none_exist(type)
-    PluginSetting.create!(:name => type, :settings => {})
+    ensure_plugin(type)
     validate_collaborations(%W{/courses/#{@course.id}/collaborations
               /courses/#{@course.id}/collaborations#add_collaboration}, true)
   end
@@ -157,7 +163,7 @@ module CollaborationsSpecsCommon
   end
 
   def not_display_new_form_when_penultimate_collaboration_is_deleted(type, title)
-    PluginSetting.create!(:name => type, :settings => {})
+    ensure_plugin(type)
 
     @collaboration1 = Collaboration.typed_collaboration_instance(title)
     @collaboration1.context = @course

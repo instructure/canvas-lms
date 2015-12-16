@@ -27,7 +27,7 @@ describe Collaboration do
 
     it "should allow google docs collaborations" do
       expect(Collaboration.collaboration_class('GoogleDocs')).to eql(nil)
-      plugin_setting = PluginSetting.new(:name => "google_docs", :settings => {})
+      plugin_setting = PluginSetting.new(:name => "google_drive", :settings => {})
       plugin_setting.save!
       expect(Collaboration.collaboration_class('GoogleDocs')).to eql(GoogleDocsCollaboration)
       plugin_setting.disabled = true
@@ -55,10 +55,9 @@ describe Collaboration do
       google_docs_collaboration_model
     end
 
-    it "should be able to parse the data stored as an Atom entry" do
+    it "should be able to parse the data stored as JSON" do
       ae = @collaboration.parse_data
-      expect(ae).to be_is_a(Atom::Entry)
-      expect(ae.title).to eql('Biology 100 Collaboration')
+      expect(ae['title']).to eql('Biology 100 Collaboration')
     end
 
     it "should be able to get the title from the data" do

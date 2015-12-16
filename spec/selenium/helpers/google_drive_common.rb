@@ -1,23 +1,20 @@
 module GoogleDriveCommon
-  def set_up_google_docs(setupDrive = true)
+  def setup_google_drive(add_user_service=true, authorized=true)
+
+
     UserService.register(
-      :service => "google_docs",
+      :service => "google_drive",
       :token => "token",
       :secret => "secret",
       :user => @user,
-      :service_domain => "google.com",
+      :service_domain => "drive.google.com",
       :service_user_id => "service_user_id",
       :service_user_name => "service_user_name"
-    )
+    ) if add_user_service
 
-    GoogleDocs::Connection.any_instance.
-        stubs(:verify_access_token).
-        returns(true)
-
-    # GoogleDocs::Connection.any_instance.
-    #     stubs(:list).
-    #     returns(nil)
-
+    GoogleDrive::Connection.any_instance.
+      stubs(:authorized?).
+      returns(authorized)
 
     GoogleDocsCollaboration.any_instance.
         stubs(:initialize_document).
@@ -27,24 +24,5 @@ module GoogleDriveCommon
         stubs(:delete_document).
         returns(nil)
 
-    if setupDrive == true
-      set_up_drive_connection
-    end
-  end
-
-  def set_up_drive_connection
-    UserService.register(
-      :service => "google_drive",
-      :token => "token",
-      :secret => "secret",
-      :user => @user,
-      :service_domain => "drive.google.com",
-      :service_user_id => "service_user_id",
-      :service_user_name => "service_user_name"
-    )
-
-    GoogleDocs::DriveConnection.any_instance.
-        stubs(:verify_access_token).
-        returns(true)
   end
 end

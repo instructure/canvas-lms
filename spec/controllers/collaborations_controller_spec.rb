@@ -42,34 +42,22 @@ describe CollaborationsController do
 
     it "should assign variables" do
       user_session(@student)
-      controller.stubs(:google_docs_connection).returns(mock(verify_access_token:true))
+      controller.stubs(:google_drive_connection).returns(mock(authorized?:true))
 
       get 'index', :course_id => @course.id
 
       expect(response).to be_success
-      expect(assigns(:google_docs_authorized)).to eq true
+      expect(assigns(:user_has_google_drive)).to eq true
     end
 
     it "should handle users without google authorized" do
       user_session(@student)
-      controller.stubs(:google_docs_connection).returns(mock(verify_access_token:false))
+      controller.stubs(:google_drive_connection).returns(mock(authorized?:false))
 
       get 'index', :course_id => @course.id
 
       expect(response).to be_success
-      expect(assigns(:google_docs_authorized)).to eq false
-    end
-
-    it "should assign variables when verify raises" do
-      user_session(@student)
-      google_docs_connection_mock = mock()
-      google_docs_connection_mock.expects(:verify_access_token).raises("Error")
-      controller.stubs(:google_docs_connection).returns(google_docs_connection_mock)
-
-      get 'index', :course_id => @course.id
-
-      expect(response).to be_success
-      expect(assigns(:google_docs_authorized)).to eq false
+      expect(assigns(:user_has_google_drive)).to eq false
     end
 
     it 'handles users that need to upgrade to google_drive' do
@@ -81,8 +69,7 @@ describe CollaborationsController do
       get 'index', :course_id => @course.id
 
       expect(response).to be_success
-      expect(assigns(:google_docs_authorized)).to be_falsey
-      expect(assigns(:google_drive_upgrade)).to be_truthy
+      expect(assigns(:user_has_google_drive)).to be false
     end
 
     it "should not allow the student view student to access collaborations" do
@@ -101,7 +88,7 @@ describe CollaborationsController do
       group = gc.groups.create!(:context => @course)
       group.add_user(@student, 'accepted')
 
-      #controller.stubs(:google_docs_connection).returns(mock(verify_access_token:false))
+      #controller.stubs(:google_docs_connection).returns(mock(authorized?:false))
 
       get 'index', :group_id => group.id
       expect(response).to be_success

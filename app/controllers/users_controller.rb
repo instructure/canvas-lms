@@ -213,19 +213,7 @@ class UsersController < ApplicationController
       return redirect_to(user_profile_url(@current_user))
     end
     return_to_url = params[:return_to] || user_profile_url(@current_user)
-    if params[:service] == "google_docs"
-      request_token = GoogleDocs::Connection.request_token(oauth_success_url(:service => 'google_docs'))
-      OauthRequest.create(
-        :service => 'google_docs',
-        :token => request_token.token,
-        :secret => request_token.secret,
-        :user_secret => CanvasSlug.generate(nil, 16),
-        :return_url => return_to_url,
-        :user => @real_current_user || @current_user,
-        :original_host_with_port => request.host_with_port
-      )
-      redirect_to request_token.authorize_url
-    elsif params[:service] == "google_drive"
+    if params[:service] == "google_drive"
       redirect_uri = oauth_success_url(:service => 'google_drive')
       session[:oauth_gdrive_nonce] = SecureRandom.hex
       state = Canvas::Security.create_jwt(redirect_uri: redirect_uri, return_to_url: return_to_url, nonce: session[:oauth_gdrive_nonce])
@@ -273,7 +261,12 @@ class UsersController < ApplicationController
         client = google_drive_client
         client.authorization.code = params[:code]
         client.authorization.fetch_access_token!
-        drive = client.discovered_api('drive', 'v2')
+
+        # we should look into consolidating this and connection.rb
+        drive = Rails.cache.fetch(['google_drive_v2'].cache_key) do
+          client.discovered_api('drive', 'v2')
+        end
+
         result = client.execute!(:api_method => drive.about.get)
 
         if result.status == 200
@@ -318,32 +311,7 @@ class UsersController < ApplicationController
       url = url_for request.parameters.merge(:host => oauth_request.original_host_with_port, :only_path => false)
       redirect_to url
     else
-      if params[:service] == "google_docs"
-        begin
-          access_token = GoogleDocs::Connection.get_access_token(oauth_request.token, oauth_request.secret, params[:oauth_verifier])
-          google_docs = GoogleDocs::Connection.new(oauth_request.token, oauth_request.secret)
-          service_user_id, service_user_name = google_docs.get_service_user_info access_token
-          if oauth_request.user
-            UserService.register(
-              :service => "google_docs",
-              :access_token => access_token,
-              :user => oauth_request.user,
-              :service_domain => "google.com",
-              :service_user_id => service_user_id,
-              :service_user_name => service_user_name
-            )
-            oauth_request.destroy
-          else
-            session[:oauth_gdocs_access_token_token] = access_token.token
-            session[:oauth_gdocs_access_token_secret] = access_token.secret
-          end
-
-          flash[:notice] = t('google_docs_added', "Google Docs access authorized!")
-        rescue => e
-          Canvas::Errors.capture_exception(:oauth, e)
-          flash[:error] = t('google_docs_fail', "Google Docs authorization failed. Please try again")
-        end
-      elsif params[:service] == "linked_in"
+     if params[:service] == "linked_in"
         begin
           linkedin_connection = LinkedIn::Connection.new
           token = session.delete(:oauth_linked_in_request_token_token)
@@ -967,8 +935,8 @@ class UsersController < ApplicationController
 
   def delete_user_service
     deleted = @current_user.user_services.find(params[:id]).destroy
-    if deleted.service == "google_docs"
-      Rails.cache.delete(['google_docs_tokens', @current_user].cache_key)
+    if deleted.service == "google_drive"
+      Rails.cache.delete(['google_drive_tokens', @current_user].cache_key)
     end
     render :json => {:deleted => true}
   end

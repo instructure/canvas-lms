@@ -128,16 +128,8 @@ class AssignmentsController < ApplicationController
         @current_student_submissions = @assignment.submissions.where("submissions.submission_type IS NOT NULL").where(:user_id => visible_student_ids).to_a
       end
 
-      begin
-        google_docs = google_service_connection
-        @google_service = google_docs.service_type
-        @google_docs_token = google_service_connection.verify_access_token && google_docs.retrieve_access_token rescue false
-      rescue GoogleDocs::NoTokenError
-        # Just fail I guess.
-      end
-
-      @google_drive_upgrade = !!(logged_in_user && Canvas::Plugin.find(:google_drive).try(:settings) &&
-          (!logged_in_user.user_services.where(service: 'google_drive').first || !(google_docs.verify_access_token rescue false)))
+      # this will set @user_has_google_drive
+      user_has_google_drive
 
       add_crumb(@assignment.title, polymorphic_url([@context, @assignment]))
 
@@ -185,8 +177,10 @@ class AssignmentsController < ApplicationController
     if assignment.allow_google_docs_submission? && @real_current_user.blank?
       docs = {}
       begin
-        docs = google_service_connection.list_with_extension_filter(assignment.allowed_extensions)
-      rescue GoogleDocs::NoTokenError => e
+        docs = google_drive_connection.list_with_extension_filter(assignment.allowed_extensions)
+      rescue GoogleDrive::NoTokenError => e
+        Canvas::Errors.capture_exception(:oauth, e)
+      rescue Google::APIClient::AuthorizationError => e
         Canvas::Errors.capture_exception(:oauth, e)
       rescue ArgumentError => e
         Canvas::Errors.capture_exception(:oauth, e)

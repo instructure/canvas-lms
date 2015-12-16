@@ -251,9 +251,17 @@ describe Account do
     end
 
     it "should not wipe out services that are substrings of each other" do
+
+      AccountServices.register_service(
+        :google_docs_prev,
+        {
+          :name => "My google docs prev", :description => "", :expose_to_ui => :service, :default => true
+        }
+      )
+
       @a.disable_service('google_docs_previews')
-      @a.disable_service('google_docs')
-      expect(@a.allowed_services).to eq '-google_docs_previews,-google_docs'
+      @a.disable_service('google_docs_prev')
+      expect(@a.allowed_services).to eq '-google_docs_previews,-google_docs_prev'
     end
 
     describe "services_exposed_to_ui_hash" do

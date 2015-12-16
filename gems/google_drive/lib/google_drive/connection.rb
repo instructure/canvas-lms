@@ -16,13 +16,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-# See Google Docs API documentation here:
-# http://code.google.com/apis/documents/docs/2.0/developers_guide_protocol.html
-module GoogleDocs
-  class DriveConnectionException < RuntimeError
-  end
-
-  class DriveConnection
+# See Google Drive API documentation here:
+# https://developers.google.com/drive/v2/web/about-sdk
+module GoogleDrive
+  class Connection
     def initialize(refresh_token, access_token, timeout = nil)
       @refresh_token = refresh_token
       @access_token = access_token
@@ -40,7 +37,7 @@ module GoogleDocs
     def with_timeout_protection
       Timeout.timeout(@timeout || 30) { yield }
     rescue Timeout::Error
-      raise DriveConnectionException, "Google Drive connection timed out"
+      raise ConnectionException, 'Google Drive connection timed out'
     end
 
     def client_execute(options)
@@ -62,23 +59,19 @@ module GoogleDocs
       )
 
       file = response.data.to_hash
-      entry = GoogleDocs::DriveEntry.new(file, extensions)
+      entry = GoogleDrive::Entry.new(file, extensions)
       result = client_execute(:uri => entry.download_url)
       if result.status == 200
-
-        # hack to make it seem like the old object
-        result.define_singleton_method(:content_type) do
-          result.headers['Content-Type'].sub(/; charset=[^;]+/, '')
-        end
         file_name = file['title']
         name_extension = file_name[/\.([a-z]+$)/, 1]
         file_extension = name_extension || file_extension_from_header(result.headers, entry)
 
         # file_name should contain the file_extension
         file_name += ".#{file_extension}" unless name_extension
-        [result, file_name, file_extension]
+        content_type = result.headers['Content-Type'].sub(/; charset=[^;]+/, '')
+        [result, file_name, file_extension, content_type]
       else
-        raise DriveConnectionException, result.error_message
+        raise ConnectionException, result.error_message
       end
     end
 
@@ -103,7 +96,7 @@ module GoogleDocs
       if result.status == 200
         result
       else
-        raise DriveConnectionException, result.error_message
+        raise ConnectionException, result.error_message
       end
     end
 
@@ -113,21 +106,23 @@ module GoogleDocs
         :api_method => drive.files.delete,
         :parameters => { :fileId => normalize_document_id(document_id) })
       if result.error? && !result.error_message.include?('File not found')
-        raise DriveConnectionException, result.error_message
+        raise ConnectionException, result.error_message
       end
     end
 
     def acl_remove(document_id, users)
       force_token_update
       users.each do |user_id|
-        next if user_id.blank? || /@/.match(user_id) # google drive ids are numeric, google docs are emails. if it is a google doc email just skip it
+        # google drive ids are numeric, google docs are emails. if it is a google doc email just skip it
+        # this is needed for legacy purposes
+        next if user_id.blank? || /@/.match(user_id)
         result = client_execute(
           :api_method => drive.permissions.delete,
           :parameters => {
             :fileId => normalize_document_id(document_id),
             :permissionId => user_id })
         if result.error? && !result.error_message.starts_with?("Permission not found")
-          raise DriveConnectionException, result.error_message
+          raise ConnectionException, result.error_message
         end
       end
     end
@@ -155,18 +150,20 @@ module GoogleDocs
           :parameters => { :fileId => normalize_document_id(document_id) }
         )
         if result.error?
-          raise DriveConnectionException, result.error_message
+          raise ConnectionException, result.error_message
         end
       end
     end
 
-    def verify_access_token
+    def authorized?
       force_token_update
       client_execute(:api_method => drive.about.get).status == 200
+    rescue ConnectionException, NoTokenError, Google::APIClient::AuthorizationError
+      false
     end
 
     def self.config_check(_settings)
-      raise DriveConnectionException("No config check")
+      raise ConnectionException("No config check")
     end
 
     def self.config=(config)
@@ -196,20 +193,21 @@ module GoogleDocs
     end
 
     def folderize_list(documents, extensions)
-      root = GoogleDocs::DriveFolder.new('/')
+      root = GoogleDrive::Folder.new('/')
       folders = {nil => root}
 
       documents['items'].each do |doc_entry|
         next unless doc_entry['downloadUrl'] || doc_entry['exportLinks']
-        entry = GoogleDocs::DriveEntry.new(doc_entry, extensions)
-        if folders.has_key?(entry.folder)
+        entry = GoogleDrive::Entry.new(doc_entry, extensions)
+        if folders.key?(entry.folder)
           folder = folders[entry.folder]
         else
-          folder = GoogleDocs::DriveFolder.new(get_folder_name_by_id(documents['items'], entry.folder))
+          folder = GoogleDrive::Folder.new(get_folder_name_by_id(documents['items'], entry.folder))
           root.add_folder folder
           folders[entry.folder] = folder
         end
-        folder.add_file(entry) unless doc_entry['mimeType'] && doc_entry['mimeType'] == 'application/vnd.google-apps.folder'
+        is_folder = doc_entry['mimeType'] && doc_entry['mimeType'] == 'application/vnd.google-apps.folder'
+        folder.add_file(entry) unless is_folder
       end
 
       if extensions && extensions.length > 0
@@ -227,26 +225,23 @@ module GoogleDocs
     end
 
     def api_client
-      return nil if GoogleDocs::DriveConnection.config.nil?
-      @api_client ||= GoogleDrive::Client.create(GoogleDocs::DriveConnection.config, @refresh_token, @access_token)
-    end
-
-    # override for specs because GoogleDrive is in a sibling project
-    # and not an actual declared dependency of this gem.  That's
-    # probably a design mistake that should be corrected
-    def set_api_client(client)
-      @api_client = client
+      raise ConnectionException, "GoogleDrive is not configured" if GoogleDrive::Connection.config.nil?
+      raise NoTokenError unless @refresh_token && @access_token
+      @api_client ||= GoogleDrive::Client.create(GoogleDrive::Connection.config, @refresh_token, @access_token)
     end
 
     def drive
-      api_client.discovered_api('drive', 'v2')
+      @drive ||= Rails.cache.fetch('google_drive_v2') do
+        api_client.discovered_api('drive', 'v2')
+      end
     end
 
     def file_extension_from_header(headers, entry)
       file_extension = entry.extension && !entry.extension.empty? && entry.extension || 'unknown'
 
-      if headers['content-disposition'] && headers['content-disposition'].match(/filename=[\"\']?[^;\"\'\.]+\.(?<file_extension>[^;\"\']+)[\"\']?/)
-        file_extension =  Regexp.last_match[:file_extension]
+      if headers['content-disposition'] &&
+        headers['content-disposition'].match(/filename=[\"\']?[^;\"\'\.]+\.(?<file_extension>[^;\"\']+)[\"\']?/)
+        file_extension = Regexp.last_match[:file_extension]
       end
 
       file_extension

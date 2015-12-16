@@ -1352,26 +1352,6 @@ describe UsersController do
     end
   end
 
-  describe "oauth_success" do
-    it "should use the access token to get user info" do
-
-      user_with_pseudonym
-      admin = @user
-      user_session(admin)
-
-      mock_oauth_request = stub(token: 'token', secret: 'secret', original_host_with_port: 'test.host', user: @user, return_url: '/')
-      OauthRequest.expects(:where).with(token: 'token', service: 'google_docs').returns(stub(first: mock_oauth_request))
-
-      mock_access_token = stub(token: '123', secret: 'abc')
-      GoogleDocs::Connection.expects(:get_access_token).with('token', 'secret', 'oauth_verifier').returns(mock_access_token)
-      mock_google_docs = stub()
-      GoogleDocs::Connection.expects(:new).with('token', 'secret').returns(mock_google_docs)
-      mock_google_docs.expects(:get_service_user_info).with(mock_access_token)
-
-      get 'oauth_success', {oauth_token: 'token', service: 'google_docs', oauth_verifier: 'oauth_verifier'}, {host_with_port: 'test.host'}
-    end
-  end
-
   describe 'GET media_download' do
     let(:kaltura_client) do
       kaltura_client = mock('CanvasKaltura::ClientV3').responds_like_instance_of(CanvasKaltura::ClientV3)

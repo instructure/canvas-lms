@@ -2,7 +2,7 @@
     show_google_docs = @assignment.allow_google_docs_submission? &&
                        @real_current_user.blank? &&
                        @domain_root_account &&
-                       feature_and_service_enabled?(:google_docs)
+                       feature_and_service_enabled?(:google_drive)
 -%>
 <%
   js_bundle :submit_assignment
@@ -204,7 +204,7 @@
     }
     </style>
     <% if show_google_docs %>
-      <% if @google_docs_token  and not @google_drive_upgrade%>
+      <% if @user_has_google_drive %>
         <% if @domain_root_account.feature_enabled?(:google_docs_domain_restriction) &&
               @domain_root_account.settings[:google_docs_domain] &&
              !@current_user.gmail.match(%r{@#{@domain_root_account.settings[:google_docs_domain]}$}) %>
@@ -268,18 +268,11 @@
             </div>
           <% end %>
         <% end %>
-      <% elsif @google_drive_upgrade %>
+      <% else %>
         <div id="submit_google_doc_form">
           <%= t 'messages.google_drives_auth_required', "Before you can submit assignments directly from Google Drive you need to authorize Canvas to access your Google Drive account:" %>
           <div style="font-size: 1.1em; text-align: center; margin: 10px;">
             <a class="btn" href="<%= oauth_url(:service => :google_drive, :return_to => (request.url + "#submit_google_doc_form")) %>"><%= t 'links.authorize_google_drive', "Authorize Google Drive Access" %></a>
-          </div>
-        </div>
-      <% else %>
-        <div id="submit_google_doc_form">
-          <%= t 'messages.google_docs_auth_required', "Before you can submit assignments directly from Google Docs you need to authorize Canvas to access your Google Docs account:" %>
-          <div style="font-size: 1.1em; text-align: center; margin: 10px;">
-            <a class="btn" href="<%= oauth_url(:service => :google_docs, :return_to => (request.url + "#submit_google_doc_form")) %>"><%= t 'links.authorize_google_docs', "Authorize Google Docs Access" %></a>
           </div>
         </div>
       <% end %>

@@ -184,30 +184,20 @@ describe AssignmentsController do
       assert_require_login
     end
 
-    it 'should not error out when google docs is not configured' do
-      GoogleDocs::Connection.stubs(:config).returns nil
-      user_session(@student)
-      a = @course.assignments.create(:title => "some assignment")
-      get 'show', :course_id => @course.id, :id => a.id
-      GoogleDocs::Connection.unstub(:config)
-    end
-
-    it 'should force users to use google drive if available' do
+    it 'should set user_has_google_drive' do
       user_session(@student)
       a = @course.assignments.create(:title => "some assignment")
       plugin = Canvas::Plugin.find(:google_drive)
       plugin_setting = PluginSetting.find_by_name(plugin.id) || PluginSetting.new(:name => plugin.id, :settings => plugin.default_settings)
       plugin_setting.posted_settings = {}
       plugin_setting.save!
-      google_docs_mock = mock('google_docs')
-      google_docs_mock.stubs(:verify_access_token).returns(true)
-      google_docs_mock.stubs(:service_type).returns(nil)
-      google_docs_mock.stubs(:retrieve_access_token).returns(nil)
-      controller.stubs(:google_service_connection).returns(google_docs_mock)
+      google_drive_mock = mock('google_drive')
+      google_drive_mock.stubs(:authorized?).returns(true)
+      controller.stubs(:google_drive_connection).returns(google_drive_mock)
       get 'show', :course_id => @course.id, :id => a.id
 
       expect(response).to be_success
-      expect(assigns(:google_drive_upgrade)).to be_truthy
+      expect(assigns(:user_has_google_drive)).to be true
     end
 
   end
@@ -366,7 +356,7 @@ describe AssignmentsController do
       user_session(@teacher)
       connection = stub()
       connection.stubs(:list_with_extension_filter).raises(ArgumentError)
-      controller.stubs(:google_service_connection).returns(connection)
+      controller.stubs(:google_drive_connection).returns(connection)
       Assignment.any_instance.stubs(:allow_google_docs_submission?).returns(true)
       Canvas::Errors.expects(:capture_exception)
       params = {course_id: @course.id, id: @assignment.id, format: 'json' }

@@ -25,14 +25,11 @@ describe GoogleDocsCollaboration do
       google_docs_collaboration = GoogleDocsCollaboration.new
       google_docs_collaboration.title = "title"
       google_docs_collaboration.user = user
-      google_doc_connection = stub(retrieve_access_token: "asdf123")
-
-      Canvas::Plugin.stubs(:find).with(:google_drive).returns(nil)
-      GoogleDocs::Connection.expects(:new).returns(google_doc_connection)
-      file = stub(document_id: 1, entry: stub(to_xml: "<xml></xml>"), alternate_url: "http://google.com")
-      google_doc_connection.expects(:create_doc).with("title").returns(file)
+      google_drive_connection = stub(retrieve_access_token: "asdf123")
+      GoogleDrive::Connection.expects(:new).returns(google_drive_connection)
+      file = stub(data: stub(id: 1, to_json: "{id: 1}", alternateLink: "http://google.com"))
+      google_drive_connection.expects(:create_doc).with("title").returns(file)
       Rails.cache.expects(:fetch).returns(["token", "secret"])
-
       google_docs_collaboration.initialize_document
     end
   end

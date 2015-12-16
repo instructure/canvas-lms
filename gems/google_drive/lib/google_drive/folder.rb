@@ -1,5 +1,5 @@
-module GoogleDocs
-  class DriveFolder
+module GoogleDrive
+  class Folder
     attr_reader :name, :folders, :files
 
     def initialize(name, folders=[], files=[])
@@ -16,7 +16,7 @@ module GoogleDocs
     end
 
     def select(&block)
-      DriveFolder.new(@name,
+      Folder.new(@name,
                  @folders.map { |f| f.select(&block) }.select { |f| !f.files.empty? },
                  @files.select(&block))
     end
@@ -33,8 +33,8 @@ module GoogleDocs
     def to_hash
       {
         :name => @name,
-        :folders => @folders.map { |sf| sf.to_hash },
-        :files => @files.map { |f| f.to_hash }
+        :folders => @folders.map(&:to_hash),
+        :files => @files.map(&:to_hash)
       }
     end
   end

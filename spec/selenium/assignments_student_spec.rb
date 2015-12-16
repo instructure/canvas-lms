@@ -206,10 +206,9 @@ describe "assignments" do
     end
 
     context "google drive" do
-      before(:each) do
-        PluginSetting.create!(:name => 'google_docs', :settings => {})
+      before do
         PluginSetting.create!(:name => 'google_drive', :settings => {})
-        set_up_google_docs()
+        setup_google_drive()
       end
 
       it "should have a google doc tab if google docs is enabled", priority: "1", test_id: 161884 do
@@ -224,16 +223,16 @@ describe "assignments" do
       context "select file or folder" do
         before(:each) do
           # mock out function calls
-          google_service_connection = mock()
-          google_service_connection.stubs(:service_type).returns('google_drive')
-          google_service_connection.stubs(:retrieve_access_token).returns('access_token')
-          google_service_connection.stubs(:verify_access_token).returns(true)
+          google_drive_connection = mock()
+          google_drive_connection.stubs(:service_type).returns('google_drive')
+          google_drive_connection.stubs(:retrieve_access_token).returns('access_token')
+          google_drive_connection.stubs(:authorized?).returns(true)
 
           # mock files to show up from "google drive"
           file_list = create_file_list
-          google_service_connection.stubs(:list_with_extension_filter).returns(file_list)
+          google_drive_connection.stubs(:list_with_extension_filter).returns(file_list)
 
-          ApplicationController.any_instance.stubs(:google_service_connection).returns(google_service_connection)
+          ApplicationController.any_instance.stubs(:google_drive_connection).returns(google_drive_connection)
 
           # create assignment
           @assignment.update_attributes(:submission_types => 'online_upload')
@@ -261,11 +260,11 @@ describe "assignments" do
 
       it "forces users to authenticate", priority: "1", test_id: 161892 do
         # stub out google drive
-        google_service_connection = mock()
-        google_service_connection.stubs(:service_type).returns('google_drive')
-        google_service_connection.stubs(:retrieve_access_token).returns(nil)
-        google_service_connection.stubs(:verify_access_token).returns(nil)
-        ApplicationController.any_instance.stubs(:google_service_connection).returns(google_service_connection)
+        google_drive_connection = mock()
+        google_drive_connection.stubs(:service_type).returns('google_drive')
+        google_drive_connection.stubs(:retrieve_access_token).returns(nil)
+        google_drive_connection.stubs(:authorized?).returns(nil)
+        ApplicationController.any_instance.stubs(:google_drive_connection).returns(google_drive_connection)
 
         @assignment.update_attributes(:submission_types => 'online_upload')
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
