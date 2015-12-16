@@ -77,10 +77,9 @@ $ic-left-side-width: $ic-sp*15;
 .ic-app-main-and-right-side {
   box-sizing: border-box;
   flex: 1;
-// firefox max-width images break the parent container
-  @-moz-document url-prefix() {
-    min-width: 1px;
-  }
+
+  // Fix Firefox and IE Edge issues with contents breaking out of flex container
+  min-width: 1px;
 }
 
 .ic-app-course-menu {
@@ -104,11 +103,10 @@ $ic-left-side-width: $ic-sp*15;
   body:not(.ic-no-flex-layout) & {
     box-sizing: border-box;
     flex: 1;
-// firefox max-width images break the parent container
-  @-moz-document url-prefix() {
+    @include breakpoint(desktop) { display: flex; }
+    
+    // Fix Firefox and IE Edge issues with contents breaking out of flex container
     min-width: 1px;
-  }
-  @include breakpoint(desktop) { display: flex; }
   }
 }
 
@@ -117,10 +115,9 @@ $ic-left-side-width: $ic-sp*15;
   @include breakpoint(desktop) {
     body:not(.ic-no-flex-layout) & {
       flex: 1;
-    // firefox max-width images break the parent container
-      @-moz-document url-prefix() {
-        min-width: 1px;
-      }
+      
+      // Fix Firefox and IE Edge issues with contents breaking out of flex container
+      min-width: 1px;
     }
   }
 }
