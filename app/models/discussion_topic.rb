@@ -388,11 +388,16 @@ class DiscussionTopic < ActiveRecord::Base
     self.discussion_entries.active.count
   end
 
-  def unread_count(current_user = nil)
+  # Do not use the lock options unless you truly need
+  # the lock, for instance to update the count.
+  # Careless use has caused database transaction deadlocks
+  def unread_count(current_user = nil, lock: false)
     current_user ||= self.current_user
     return 0 unless current_user # default for logged out users
-    Shackles.activate(:master) do
-      topic_participant = discussion_topic_participants.lock.where(user_id: current_user).select(:unread_entry_count).first
+
+    environment = lock ? :master : :slave
+    Shackles.activate(environment) do
+      topic_participant = discussion_topic_participants.where(user_id: current_user).select(:unread_entry_count).lock(lock).first
       topic_participant.try(:unread_entry_count) || self.default_unread_count
     end
   end
@@ -479,7 +484,7 @@ class DiscussionTopic < ActiveRecord::Base
         DiscussionTopic.unique_constraint_retry do
           topic_participant = self.discussion_topic_participants.where(:user_id => current_user).lock.first
           topic_participant ||= self.discussion_topic_participants.build(:user => current_user,
-                                                                         :unread_entry_count => self.unread_count(current_user),
+                                                                         :unread_entry_count => self.unread_count(current_user, lock: true),
                                                                          :workflow_state => "unread",
                                                                          :subscribed => current_user == user && !subscription_hold(current_user, nil, nil))
           topic_participant.workflow_state = opts[:new_state] if opts[:new_state]
