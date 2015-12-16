@@ -1217,7 +1217,7 @@ class Assignment < ActiveRecord::Base
       opts[:assessment_request].complete unless opts[:assessment_request].rubric_association
     end
 
-    if (opts['comment'] && Canvas::Plugin.value_to_boolean(opts['group_comment']))
+    if (opts[:comment] && Canvas::Plugin.value_to_boolean(opts[:group_comment]))
       uuid = CanvasSlug.generate_securish_uuid
       res = find_or_create_submissions(students) do |s|
         s.group = group
@@ -1257,7 +1257,6 @@ class Assignment < ActiveRecord::Base
     group, students = group_students(original_student)
     homeworks = []
     primary_homework = nil
-    ts = Time.now.to_s
     submitted = case opts[:submission_type]
                 when "online_text_entry"
                   opts[:body].present?
@@ -1456,9 +1455,22 @@ class Assignment < ActiveRecord::Base
         json.merge! provisional_grade.grade_attributes
       end
 
-      json[:submission_comments] = (provisional_grade || sub).submission_comments.as_json(:include_root => false,
-                                                                                          :methods => submission_comment_methods,
-                                                                                          :only => comment_fields)
+      if grade_as_group?
+        group_id = (provisional_grade || sub).group_id
+        json[:submission_comments] = unique_comments(group_id).as_json(
+          :include_root => false,
+          :methods => submission_comment_methods,
+          :only => comment_fields
+        )
+      else
+        json[:submission_comments] = (provisional_grade || sub)
+          .submission_comments
+          .as_json(
+            :include_root => false,
+            :methods => submission_comment_methods,
+            :only => comment_fields
+          )
+      end
 
       json['attachments'] = sub.attachments.map{|att| att.as_json(
           :only => [:mime_class, :comment_id, :id, :submitter_id ]
@@ -2203,4 +2215,15 @@ class Assignment < ActiveRecord::Base
       context.root_account.feature_enabled?(:bulk_sis_grade_export) ||
       Lti::AppLaunchCollator.any?(context, [:post_grades])
   end
+
+  private
+
+  def unique_comments(group_id)
+    submissions.where(group_id: group_id)
+      .map(&:submission_comments)
+      .flatten
+      .uniq { |comment| [comment.author_id, comment.comment] }
+      .sort_by(&:updated_at)
+  end
+
 end
