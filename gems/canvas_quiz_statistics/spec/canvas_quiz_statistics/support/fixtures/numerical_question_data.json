@@ -46,6 +46,15 @@
       "numerical_answer_type": "exact_answer",
       "exact": 1.5,
       "margin": 1
+    },
+    {
+      "id": 9423,
+      "text": "",
+      "comments": "",
+      "weight": 100,
+      "numerical_answer_type": "precision_answer",
+      "approximate": 1.1,
+      "precision": 1
     }
   ],
   "variables": null,
