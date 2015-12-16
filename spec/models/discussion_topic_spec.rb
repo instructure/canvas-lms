@@ -1244,6 +1244,23 @@ describe DiscussionTopic do
     end
   end
 
+  describe "#unread_count" do
+    let(:topic) do
+      @course.discussion_topics.create!(:title => "title", :message => "message")
+    end
+
+    it "returns 0 for a nil user" do
+      topic.discussion_entries.create!
+      expect(topic.unread_count(nil)).to eq 0
+    end
+
+    it "returns the default_unread_count if the user has no discussion_topic_participant" do
+      topic.discussion_entries.create!
+      student_in_course
+      expect(topic.unread_count(@student)).to eq 1
+    end
+  end
+
   context "read/unread state" do
     before(:once) do
       @topic = @course.discussion_topics.create!(:title => "title", :message => "message", :user => @teacher)
