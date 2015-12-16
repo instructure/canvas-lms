@@ -86,10 +86,11 @@ module Canvas::Oauth
 
     def as_json(_options={})
       json = {
-        'access_token' => access_token.full_token,
-        'refresh_token' => access_token.plaintext_refresh_token,
-        'user' => user.as_json(:only => [:id, :name], :include_root => false)
+          'access_token' => access_token.full_token,
+          'user' => user.as_json(:only => [:id, :name], :include_root => false)
       }
+
+      json['refresh_token'] = access_token.plaintext_refresh_token if access_token.plaintext_refresh_token
 
       if access_token.expires_at && key.auto_expire_tokens
         json['expires_in'] = access_token.expires_at.utc.to_i - Time.now.utc.to_i

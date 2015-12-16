@@ -144,6 +144,19 @@ module Canvas::Oauth
         expect(json['access_token']).not_to be_empty
       end
 
+      it 'includes the refresh token' do
+        expect(json['refresh_token']).to be_a String
+        expect(json['refresh_token']).not_to be_empty
+      end
+
+      it 'ignores refresh token if its not there' do
+        # need to re-fetch the access token so refresh token wont be set
+        access_token = AccessToken.authenticate(json['access_token'])
+        # setup new token with existing access token
+        new_token = Token.new(token.key, token.code, access_token)
+        expect(new_token.as_json.keys).to_not include 'refresh_token'
+      end
+
       it 'grabs the user json as well' do
         expect(json['user']).to eq user.as_json(:only => [:id, :name], :include_root => false)
       end
