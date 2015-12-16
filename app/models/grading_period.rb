@@ -144,4 +144,12 @@ class GradingPeriod < ActiveRecord::Base
                               'Grading period end date precedes start date'))
     end
   end
+
+  def self.json_for(context, user)
+    self.for(context).sort_by(&:start_date).map do |gp|
+      json = gp.as_json(only: [:id, :title, :start_date, :end_date], permissions: {user: user})
+      json[:grading_period][:is_last] = gp.last?
+      json[:grading_period]
+    end
+  end
 end

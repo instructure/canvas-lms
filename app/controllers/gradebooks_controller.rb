@@ -250,11 +250,7 @@ class GradebooksController < ApplicationController
   end
 
   def active_grading_periods
-    @active_grading_periods ||= GradingPeriod.for(@context).map do |gp|
-      json = gp.as_json(only: [:id, :title, :start_date, :end_date], permissions: {user: @current_user})
-      json[:grading_period][:is_last] = gp.last?
-      json[:grading_period]
-    end
+    @active_grading_periods ||= GradingPeriod.json_for(@context, @current_user)
   end
 
   def latest_end_date_of_admin_created_grading_periods_in_the_past

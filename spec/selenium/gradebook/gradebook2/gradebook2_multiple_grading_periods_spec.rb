@@ -34,7 +34,7 @@ describe "gradebook2 - multiple grading periods" do
 
     let(:select_period_in_the_past) do
       f(".grading-period-select-button").click
-      f("#ui-id-4").click # The id of the Period in the Past
+      f("#ui-id-3").click # The id of the Period in the Past
     end
 
     let(:sign_in_as_a_teacher) do

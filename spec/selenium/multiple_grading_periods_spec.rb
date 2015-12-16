@@ -80,7 +80,7 @@ describe "interaction with multiple grading periods" do
     end
 
     it 'should update assignments when a different period is selected in grades page', priority: "1", test_id: 562596 do
-      fj(".grading_periods_selector option:nth-child(2)").click
+      fj(".grading_periods_selector option:nth-child(3)").click
       expect(fj("#submission_#{assignment2.id} th a")).to include_text('Assignment 2')
     end
 

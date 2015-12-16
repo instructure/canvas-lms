@@ -1992,6 +1992,7 @@ class ApplicationController < ActionController::Base
       :POST_TO_SIS => Assignment.sis_grade_export_enabled?(@context),
       :PERMISSIONS => permissions,
       :DIFFERENTIATED_ASSIGNMENTS_ENABLED => @context.feature_enabled?(:differentiated_assignments),
+      :MULTIPLE_GRADING_PERIODS_ENABLED => @context.feature_enabled?(:multiple_grading_periods),
       :VALID_DATE_RANGE => CourseDateRange.new(@context),
       :assignment_menu_tools => external_tools_display_hashes(:assignment_menu),
       :discussion_topic_menu_tools => external_tools_display_hashes(:discussion_topic_menu),
@@ -1999,6 +2000,9 @@ class ApplicationController < ActionController::Base
       :current_user_has_been_observer_in_this_course => @context.user_has_been_observer?(@current_user),
       :observed_student_ids => ObserverEnrollment.observed_student_ids(@context, @current_user)
     })
+    if @context.feature_enabled?(:multiple_grading_periods)
+      js_env(:active_grading_periods => GradingPeriod.json_for(@context, @current_user))
+    end
   end
 
   def google_docs_connection

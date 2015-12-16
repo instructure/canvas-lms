@@ -8,7 +8,9 @@ define [
   'compiled/collections/AssignmentOverrideCollection'
   'compiled/collections/DateGroupCollection'
   'i18n!assignments'
-], ($, _, {Model}, DefaultUrlMixin, TurnitinSettings, DateGroup, AssignmentOverrideCollection, DateGroupCollection, I18n) ->
+  'compiled/util/GradingPeriods'
+  'timezone'
+], ($, _, {Model}, DefaultUrlMixin, TurnitinSettings, DateGroup, AssignmentOverrideCollection, DateGroupCollection, I18n, GradingPeriods, tz) ->
 
   class Assignment extends Model
     @mixin DefaultUrlMixin
@@ -323,8 +325,18 @@ define [
       data = @_filterFrozenAttributes(data)
       if @alreadyScoped then data else { assignment: data }
 
-    search: (regex) ->
-      if @get('name').match(regex)
+    inGradingPeriod: (gradingPeriod) ->
+      dateGroups = @get("all_dates")
+      if dateGroups
+        _.any dateGroups.models, (dateGroup) =>
+          GradingPeriods.dateIsInGradingPeriod(dateGroup.dueAt(), gradingPeriod)
+      else
+        GradingPeriods.dateIsInGradingPeriod(tz.parse(@dueAt()), gradingPeriod)
+
+    search: (regex, gradingPeriod) ->
+      match = regex == "" || @get('name').match(regex)
+      match = @inGradingPeriod(gradingPeriod) if match && gradingPeriod
+      if match
         @set 'hidden', false
         return true
       else

@@ -416,3 +416,13 @@ table.full_assignment_table {
     text-align: left;
   }
 }
+
+.assignment-search {
+  margin-bottom: 0;
+  select {
+    min-width: 170px;
+  }
+  input {
+    min-width: 210px;
+  }
+}
