@@ -10,7 +10,13 @@ module CC::Exporter::Epub::Converters
       attr_reader :flv_path
 
       def convert!
-        return flv_path unless mp4_url.present?
+        begin
+          return flv_path unless mp4_url.present?
+        # Maybe a weird exception to catch, but that's what ends up being thrown
+        # if we pass a media_id that doesn't have a corresponding set of assets.
+        rescue NoMethodError => e
+          return flv_path
+        end
 
         f = File.open(mp4_path, 'wb')
         CanvasHttp.get(mp4_url) do |response|
