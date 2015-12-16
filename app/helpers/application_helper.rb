@@ -882,12 +882,12 @@ module ApplicationHelper
   end
 
   def dashboard_url(opts={})
-    return super(opts) if opts[:login_success] || opts[:become_user_id]
+    return super(opts) if opts[:login_success] || opts[:become_user_id] || @domain_root_account.nil?
     custom_dashboard_url || super(opts)
   end
 
   def dashboard_path(opts={})
-    return super(opts) if opts[:login_success] || opts[:become_user_id]
+    return super(opts) if opts[:login_success] || opts[:become_user_id] || @domain_root_account.nil?
     custom_dashboard_url || super(opts)
   end
 
