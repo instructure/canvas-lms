@@ -175,7 +175,7 @@
           <% end %>
         <% end %>
         <% if @topic.for_group_discussion? %>
-          <%= render :partial => 'group_discussion' %>
+          <%= render :partial => 'group_discussion', :locals => {show_da_note: (@topic.for_assignment? && @topic.assignment.only_visible_to_overrides)} %>
         <% end %>
         <header class="discussion-section clearfix">
           <%= avatar((@topic.user), context_code: @context.asset_string) if @topic.user %>

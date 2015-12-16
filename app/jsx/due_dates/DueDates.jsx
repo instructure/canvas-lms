@@ -4,11 +4,12 @@ define([
   'jsx/due_dates/DueDateRow',
   'jsx/due_dates/DueDateAddRowButton',
   'jsx/due_dates/OverrideStudentStore',
+  'jsx/due_dates/StudentGroupStore',
   'jsx/due_dates/TokenActions',
   'i18n!assignments',
   'jquery',
   'compiled/jquery.rails_flash_notifications'
-], (_ ,React, DueDateRow, DueDateAddRowButton, OverrideStudentStore, TokenActions, I18n, $) => {
+], (_ ,React, DueDateRow, DueDateAddRowButton, OverrideStudentStore, StudentGroupStore, TokenActions, I18n, $) => {
 
   var DueDates = React.createClass({
 
@@ -31,18 +32,25 @@ define([
         addedRowCount: 0,
         defaultSectionId: null,
         currentlySearching: false,
-        allStudentsFetched: false
+        allStudentsFetched: false,
+        selectedGroupSetId: null
       }
     },
 
     componentDidMount(){
       this.setState({
         rows: this.rowsFromOverrides(this.props.overrides),
-        sections: this.formattedSectionHash(this.props.sections)
+        sections: this.formattedSectionHash(this.props.sections),
+        groups: {},
+        selectedGroupSetId: this.props.selectedGroupSetId
       }, this.fetchAdhocStudents.bind(this))
 
       OverrideStudentStore.addChangeListener(this.handleStudentStoreChange)
       OverrideStudentStore.fetchStudentsForCourse()
+
+      StudentGroupStore.setGroupSetIfNone(this.props.selectedGroupSetId)
+      StudentGroupStore.addChangeListener(this.handleStudentGroupStoreChange)
+      StudentGroupStore.fetchGroupsForCourse()
     },
 
     fetchAdhocStudents(){
@@ -55,6 +63,15 @@ define([
           students: OverrideStudentStore.getStudents(),
           currentlySearching: OverrideStudentStore.currentlySearching(),
           allStudentsFetched: OverrideStudentStore.allStudentsFetched()
+        })
+      }
+    },
+
+    handleStudentGroupStoreChange(){
+      if( this.isMounted() ){
+        this.setState({
+          groups: this.formattedGroupHash(StudentGroupStore.getGroups()),
+          selectedGroupSetId: StudentGroupStore.getSelectedGroupSetId()
         })
       }
     },
@@ -83,14 +100,21 @@ define([
     // -------------------
 
     formattedSectionHash(unformattedSections){
-      var formattedSections = _.map(unformattedSections, (section) => {
-        return this.formatSection(section)
-      })
+      var formattedSections = _.map(unformattedSections, this.formatSection)
       return _.indexBy(formattedSections, "id")
     },
 
     formatSection(section){
       return _.extend(section.attributes, {course_section_id: section.id})
+    },
+
+    formattedGroupHash(unformattedGroups){
+      var formattedGroups = _.map(unformattedGroups, this.formatGroup)
+      return _.indexBy(formattedGroups, "id")
+    },
+
+    formatGroup(group){
+      return _.extend(group, {group_id: group.id})
     },
 
     getAllOverrides(givenRows){
@@ -124,6 +148,17 @@ define([
         lock_at: (override ? override.get("lock_at") : null),
         unlock_at: (override ? override.get("unlock_at") : null)
       }
+    },
+
+    groupsForSelectedSet(){
+      var allGroups = this.state.groups
+      var setId = this.state.selectedGroupSetId
+      return _.chain(allGroups)
+        .filter( function(value, key) {
+          return value.group_category_id === setId
+        })
+        .indexBy("id")
+        .value()
     },
 
     // -------------------
@@ -244,9 +279,13 @@ define([
 
       var onlyDefaultSectionChosen = _.isEqual(this.chosenSectionIds(), [sectionID])
       var noSectionsChosen = _.isEmpty(this.chosenSectionIds())
+
+      var noGroupsChosen = _.isEmpty(this.chosenGroupIds())
       var noStudentsChosen = _.isEmpty(this.chosenStudentIds())
 
-      if ( (onlyDefaultSectionChosen || noSectionsChosen) && noStudentsChosen) {
+      var defaultSectionOrNoSectionChosen = onlyDefaultSectionChosen || noSectionsChosen
+
+      if ( defaultSectionOrNoSectionChosen && noStudentsChosen && noGroupsChosen) {
         return I18n.t("Everyone")
       }
       return I18n.t("Everyone Else")
@@ -260,8 +299,9 @@ define([
 
     validDropdownOptions(){
       var validStudents = this.valuesWithOmission({object: this.state.students, keysToOmit: this.chosenStudentIds()})
+      var validGroups = this.valuesWithOmission({object: this.groupsForSelectedSet(), keysToOmit: this.chosenGroupIds()})
       var validSections = this.valuesWithOmission({object: this.state.sections, keysToOmit: this.chosenSectionIds()})
-      return _.union(validStudents, validSections)
+      return _.union(validStudents, validSections, validGroups)
     },
 
     chosenIds(idType){
@@ -277,6 +317,10 @@ define([
 
     chosenStudentIds(){
       return _.flatten(this.chosenIds("student_ids"))
+    },
+
+    chosenGroupIds(){
+      return this.chosenIds("group_id")
     },
 
     valuesWithOmission(args){
@@ -302,6 +346,7 @@ define([
                            dates                = {dates}
                            students             = {this.state.students}
                            sections             = {this.state.sections}
+                           groups               = {this.state.groups}
                            canDelete            = {this.canRemoveRow()}
                            validDropdownOptions = {this.validDropdownOptions()}
                            handleDelete         = {this.removeRow.bind(this, rowKey)}

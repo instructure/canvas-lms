@@ -67,6 +67,13 @@ describe Api::V1::User do
       )
     end
 
+    it 'should support optionally including group_ids' do
+      @group = @course.groups.create!(:name => "My Group")
+      @group.add_user(@student, 'accepted', true)
+      expect(@test_api.user_json(@student, @admin, {}, [], @course).has_key?("group_ids")).to be_falsey
+      expect(@test_api.user_json(@student, @admin, {}, ['group_ids'], @course)["group_ids"]).to eq([@group.id])
+    end
+
     it 'should use the correct SIS pseudonym' do
       @user = User.create!(:name => 'User')
       @account2 = Account.create!

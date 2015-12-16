@@ -136,6 +136,7 @@ define [
     generateOverrides: (dueAt) ->
       {
         studentOverrides: { '1': { '5': { student_ids: ['5'], due_at: dueAt } } }
+        groupOverrides: {},
         sectionOverrides: {}
       }
 
@@ -210,6 +211,7 @@ define [
     generateOverrides: (dueAt) ->
       {
         studentOverrides: { '1': { '5': { student_ids: ['5'], due_at: dueAt } } }
+        groupOverrides: {},
         sectionOverrides: {}
       }
 
@@ -217,6 +219,82 @@ define [
       @subOutsideOfPeriod = Gradebook.prototype.submissionOutsideOfGradingPeriod
       @submission = { assignment_id: '1' }
       @student = { id: '5', sections: ['101','102','103'] }
+      @gradingPeriods = {
+        '8': { id: '8', start_date: '2015-04-01T06:00:00Z', end_date: '2015-05-01T05:59:59Z', is_last: false }
+        '10': { id: '10', start_date: '2015-05-05T06:00:00Z', end_date: '2015-06-01T05:59:59Z', is_last: true }
+      }
+    teardown: ->
+
+  test 'returns false if the due_at on the override falls within the grading period', ->
+    overrides = @generateOverrides('2015-04-15T06:00:00Z')
+    self = @setupThis(dateIsInGradingPeriod: -> true)
+    dateIsInGradingPeriodSpy = @spy(self, 'dateIsInGradingPeriod')
+    isOutsidePeriod = @subOutsideOfPeriod.bind(self)
+    result = isOutsidePeriod(@submission, @student, @gradingPeriods, overrides)
+
+    ok dateIsInGradingPeriodSpy.called
+    ok +dateIsInGradingPeriodSpy.args[0][1] == +tz.parse('2015-04-15T06:00:00Z')
+    deepEqual result, false
+
+  test 'returns true if the due_at on the override falls outside of the grading period', ->
+    overrides = @generateOverrides('2015-06-15T06:00:00Z')
+    self = @setupThis()
+    dateIsInGradingPeriodSpy = @spy(self, 'dateIsInGradingPeriod')
+    isOutsidePeriod = @subOutsideOfPeriod.bind(self)
+    result = isOutsidePeriod(@submission, @student, @gradingPeriods, overrides)
+
+    ok dateIsInGradingPeriodSpy.called
+    ok +dateIsInGradingPeriodSpy.args[0][1] == +tz.parse('2015-06-15T06:00:00Z')
+    deepEqual result, true
+
+  test 'returns true if the due_at on the override is null and the grading period is not the last', ->
+    overrides = @generateOverrides(null)
+    self = @setupThis()
+    dateIsInGradingPeriodSpy = @spy(self, 'dateIsInGradingPeriod')
+    isOutsidePeriod = @subOutsideOfPeriod.bind(self)
+    result = isOutsidePeriod(@submission, @student, @gradingPeriods, overrides)
+
+    ok dateIsInGradingPeriodSpy.called
+    ok _.isNull(dateIsInGradingPeriodSpy.args[0][1])
+    deepEqual result, true
+
+  test 'returns false if the due_at on the override is null and the grading period is the last', ->
+    overrides = @generateOverrides(null)
+    self = @setupThis(gradingPeriodToShow: '10', lastGradingPeriodAndDueAtNull: -> true)
+    lastGradingPeriodAndDueAtNullSpy = @spy(self, 'lastGradingPeriodAndDueAtNull')
+    isOutsidePeriod = @subOutsideOfPeriod.bind(self)
+    result = isOutsidePeriod(@submission, @student, @gradingPeriods, overrides)
+
+    ok lastGradingPeriodAndDueAtNullSpy.called
+    ok _.isNull(lastGradingPeriodAndDueAtNullSpy.args[0][1])
+    deepEqual result, false
+
+
+  module "Gradebook2#submissionOutsideOfGradingPeriod - assignment with one group that applies to the student",
+    setupThis: (options) ->
+      customOptions = options || {}
+      assignments = { '1': { id: '1', has_overrides: true, due_at: tz.parse('2015-05-15T06:00:00Z') } }
+      defaults =
+        mgpEnabled: true
+        assignments: assignments
+        isAllGradingPeriods: -> false
+        gradingPeriodToShow: '8'
+        lastGradingPeriodAndDueAtNull: -> false
+        dateIsInGradingPeriod: -> false
+
+      _.defaults customOptions, defaults
+
+    generateOverrides: (dueAt) ->
+      {
+        studentOverrides: {},
+        sectionOverrides: {},
+        groupOverrides: { '1': { '202': { group_id: '202', due_at: dueAt } } }
+      }
+
+    setup: ->
+      @subOutsideOfPeriod = Gradebook.prototype.submissionOutsideOfGradingPeriod
+      @submission = { assignment_id: '1' }
+      @student = { id: '5', sections: ['101','102','103'], group_ids: ['202'] }
       @gradingPeriods = {
         '8': { id: '8', start_date: '2015-04-01T06:00:00Z', end_date: '2015-05-01T05:59:59Z', is_last: false }
         '10': { id: '10', start_date: '2015-05-05T06:00:00Z', end_date: '2015-06-01T05:59:59Z', is_last: true }
@@ -361,6 +439,7 @@ define [
     generateOverrides: (date1, date2) ->
       {
         studentOverrides: { '1': { '5': { student_ids: ['5'], due_at: date1 } } }
+        groupOverrides: {},
         sectionOverrides: { '1': { '101': { course_section_id: '101', assignment_id: '1', due_at: date2 } } }
       }
 

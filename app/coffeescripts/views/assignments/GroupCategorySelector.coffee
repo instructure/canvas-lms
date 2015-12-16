@@ -4,8 +4,9 @@ define [
   'underscore'
   'jquery'
   'jst/assignments/GroupCategorySelector'
-  'compiled/jquery/toggleAccessibly'
-], (I18n, Backbone, _, $, template, toggleAccessibly) ->
+  'compiled/jquery/toggleAccessibly',
+  'jsx/due_dates/StudentGroupStore'
+], (I18n, Backbone, _, $, template, toggleAccessibly, StudentGroupStore) ->
 
   class GroupCategorySelector extends Backbone.View
 
@@ -36,7 +37,14 @@ define [
     @optionProperty 'fieldLabel'
     @optionProperty 'lockedMessage'
 
+    render: =>
+      selectedID = @parentModel.groupCategoryId()
+      StudentGroupStore.setSelectedGroupSet(selectedID)
+      super
+
     showGroupCategoryCreateDialog: =>
+      newSelectedId = @$groupCategoryID.val()
+      StudentGroupStore.setSelectedGroupSet(newSelectedId)
       if @$groupCategoryID.val() == 'new'
         # TODO: Yikes, we need to pull the javascript out of manage_groups.js
         # and get rid of this global thing
@@ -50,9 +58,13 @@ define [
           @groupCategories.push(group)
 
     toggleGroupCategoryOptions: =>
-      @$groupCategoryOptions.toggleAccessibly @$hasGroupCategory.prop('checked')
+      isGrouped = @$hasGroupCategory.prop('checked')
+      @$groupCategoryOptions.toggleAccessibly isGrouped
 
-      if @$hasGroupCategory.prop('checked') and @groupCategories.length == 0
+      selectedGroupSetId = if isGrouped then @$groupCategoryID.val() else null
+      StudentGroupStore.setSelectedGroupSet(selectedGroupSetId)
+
+      if isGrouped and @groupCategories.length == 0
         @showGroupCategoryCreateDialog()
 
     toJSON: =>
@@ -73,7 +85,6 @@ define [
       hasGroupCategoryDisabled:  groupCategoryFrozen || groupCategoryLocked
       gradeIndividuallyDisabled: groupCategoryFrozen
       groupCategoryIdDisabled:   groupCategoryFrozen || groupCategoryLocked
-      differentiatedAssignmentsEnabled: @parentModel.differentiatedAssignmentsEnabled()
 
       sectionLabel: @sectionLabel
       fieldLabel: @fieldLabel

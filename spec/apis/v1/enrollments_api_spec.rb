@@ -685,6 +685,8 @@ describe EnrollmentsApiController, type: :request do
   describe "enrollment listing" do
     before :once do
       course_with_student(:active_all => true, :user => user_with_pseudonym)
+      @group = @course.groups.create!(:name => "My Group")
+      @group.add_user(@student, 'accepted', true)
       @teacher = User.create(:name => 'Señor Chang')
       @teacher.pseudonyms.create(:unique_id => 'chang@example.com')
       @course.enroll_teacher(@teacher)
@@ -948,6 +950,32 @@ describe EnrollmentsApiController, type: :request do
             'total_activity_time' => 0
           }
         }
+      end
+
+      context 'group_ids' do
+        it "should include a users group_ids if group_ids are in include" do
+          @path = "/api/v1/courses/#{@course.id}/enrollments"
+          @params = { :controller => "enrollments_api", :action => "index", :course_id => @course.id.to_param, :format => "json", :include => ["group_ids"] }
+          json = api_call(:get, @path, @params)
+          expect(json[0]["user"]["group_ids"]).to eq([@group.id])
+        end
+
+        it "should not include ids from different contexts" do
+          original_course = @course
+
+          course(:active_all => true, :user => @user)
+          group2 = @course.groups.create!(:name => "My Group")
+          group2.add_user(@student, 'accepted', true)
+
+          @course = original_course
+
+          @path = "/api/v1/courses/#{@course.id}/enrollments"
+          @params = { :controller => "enrollments_api", :action => "index", :course_id => @course.id.to_param, :format => "json", :include => ["group_ids"] }
+          json = api_call(:get, @path, @params)
+
+          expect(json[0]["user"]["group_ids"]).to include(@group.id)
+          expect(json[0]["user"]["group_ids"]).not_to include(group2.id)
+        end
       end
 
       it "should show last_activity_at and total_activity_time for student enrollment" do

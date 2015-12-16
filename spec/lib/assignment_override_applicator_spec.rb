@@ -33,6 +33,26 @@ describe AssignmentOverrideApplicator do
     @membership = @group.add_user(@student)
   end
 
+  def create_group_override_for_discussion
+    @category = group_category(name: "bar")
+    @group = @category.groups.create!(context: @course)
+
+    @assignment = create_assignment(:course => @course)
+    @assignment.submission_types = 'discussion_topic'
+    @assignment.saved_by = :discussion_topic
+    @discussion_topic = @course.discussion_topics.create(:message => "some message")
+    @discussion_topic.group_category_id = @category.id
+    @discussion_topic.assignment = @assignment
+    @discussion_topic.save!
+    @assignment.reload
+
+    @override = assignment_override_model(:assignment => @assignment)
+    @override.set = @group
+    @override.save!
+
+    @membership = @group.add_user(@student)
+  end
+
   def create_assignment(*args)
     # need to make sure it doesn't invalidate the cache right away
     Timecop.freeze(5.seconds.ago) do
@@ -294,6 +314,12 @@ describe AssignmentOverrideApplicator do
 
       describe 'for students' do
         it 'returns group overrides' do
+          result = AssignmentOverrideApplicator.group_override(@assignment, @student)
+          expect(result).to eq @override
+        end
+
+        it 'returns groups overrides for graded discussions' do
+          create_group_override_for_discussion
           result = AssignmentOverrideApplicator.group_override(@assignment, @student)
           expect(result).to eq @override
         end

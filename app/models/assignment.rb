@@ -271,8 +271,8 @@ class Assignment < ActiveRecord::Base
 
   after_save :remove_assignment_updated_flag # this needs to be after has_a_broadcast_policy for the message to be sent
 
-  def validate_assignment_overrides
-    if group_category_id_changed?
+  def validate_assignment_overrides(opts={})
+    if opts[:force_override_destroy] || group_category_id_changed?
       # needs to be .each(&:destroy) instead of .update_all(:workflow_state =>
       # 'deleted') so that the override gets versioned properly
       active_assignment_overrides.

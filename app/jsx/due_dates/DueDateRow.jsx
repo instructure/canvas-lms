@@ -17,6 +17,7 @@ define([
       dates: React.PropTypes.object.isRequired,
       students: React.PropTypes.object.isRequired,
       sections: React.PropTypes.object.isRequired,
+      groups: React.PropTypes.object.isRequired,
       validDropdownOptions: React.PropTypes.array.isRequired,
       handleDelete: React.PropTypes.func.isRequired,
       handleTokenAdd: React.PropTypes.func.isRequired,
@@ -33,18 +34,26 @@ define([
     // --------------------
 
     // this component takes overrides & returns a list of tokens:
-    // 1 adhoc overrides => 1 token per student
-    // 1 section overrides => 1 token for the section
+    // 1 adhoc override => 1 token per student
+    // 1 section override => 1 token for the section
+    // 1 group override => 1 token for the group
 
     tokenizedOverrides(){
-      var {sectionOverrides, adhocOverrides} = _.groupBy(this.props.overrides,
+      var {sectionOverrides, groupOverrides, adhocOverrides} = _.groupBy(this.props.overrides,
         (ov) => {
-          return !!ov.get("course_section_id") ? "sectionOverrides" : "adhocOverrides"
+          if (ov.get("course_section_id")) {
+            return "sectionOverrides"
+          } else if (ov.get("group_id")) {
+            return "groupOverrides"
+          } else {
+            return "adhocOverrides"
+          }
         }
       )
 
       return _.union(
         this.tokenizedSections(sectionOverrides),
+        this.tokenizedGroups(groupOverrides),
         this.tokenizedAdhoc(adhocOverrides)
       )
     },
@@ -56,6 +65,17 @@ define([
             type: "section",
             course_section_id: override.get("course_section_id"),
             name: this.nameForCourseSection(override.get("course_section_id"))
+          }
+      })
+    },
+
+    tokenizedGroups(groupOverrides){
+      var groupOverrides = groupOverrides || []
+      return _.map(groupOverrides, (override) => {
+        return {
+            type: "group",
+            group_id: override.get("group_id"),
+            name: this.nameForGroup(override.get("group_id"))
           }
       })
     },
@@ -80,13 +100,29 @@ define([
       var defaultName = this.props.defaultSectionNamer(sectionId)
       if(defaultName) return defaultName
 
-      var section = this.props.sections[sectionId]
-      return section ? section["name"] : I18n.t("Loading...")
+      return this.nameOrLoading(
+        this.props.sections,
+        sectionId
+      )
+    },
+
+    nameForGroup(groupId){
+      return this.nameOrLoading(
+        this.props.groups,
+        groupId
+      )
     },
 
     nameForStudentToken(studentId){
-      var student = this.props.students[studentId]
-      return student ? student["name"] : I18n.t("Loading...")
+      return this.nameOrLoading(
+        this.props.students,
+        studentId
+      )
+    },
+
+    nameOrLoading(collection, id){
+      var item = collection[id]
+      return item ? item["name"] : I18n.t("Loading...")
     },
 
     // -------------------

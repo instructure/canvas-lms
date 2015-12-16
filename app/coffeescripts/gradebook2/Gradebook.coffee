@@ -695,7 +695,11 @@ define [
 
 
     indexedOverrides: ->
-      indexed = { studentOverrides: {}, sectionOverrides: {} }
+      indexed = {
+        studentOverrides: {},
+        groupOverrides: {},
+        sectionOverrides: {}
+      }
       _.each @assignments, (assignment) ->
         if assignment.has_overrides
           _.each assignment.overrides, (override) ->
@@ -706,6 +710,9 @@ define [
             else if sectionId = override.course_section_id
               indexed.sectionOverrides[assignment.id] ?= {}
               indexed.sectionOverrides[assignment.id][sectionId] = override
+            else if groupId = override.group_id
+              indexed.groupOverrides[assignment.id] ?= {}
+              indexed.groupOverrides[assignment.id][groupId] = override
       indexed
 
     indexedGradingPeriods: ->
@@ -721,22 +728,22 @@ define [
       effectiveDueAt = assignment.due_at
 
       if assignment.has_overrides
-        # we'll eventually need to consider group overrides here
-        # (group overrides are not yet a feature but are planned)
-        sectionOverrides = []
-        sectionOverridesOnAssignment = overrides.sectionOverrides[assignment.id]
-        if sectionOverridesOnAssignment
-          _.each student.sections, (sectionId) ->
-            sectionOverride = sectionOverridesOnAssignment[sectionId]
-            sectionOverrides.push sectionOverride if sectionOverride
+        IDsByOverrideType = {
+          "sectionOverrides": student.sections
+          "groupOverrides": student.group_ids
+          "studentOverrides": [student.id]
+        }
 
-        studentOverrides = []
-        studentOverridesOnAssignment = overrides.studentOverrides[assignment.id]
-        if studentOverridesOnAssignment
-          studentOverride = studentOverridesOnAssignment[student.id]
-          studentOverrides.push studentOverride if studentOverride
+        getOverridesForType = (typeIds, overrideType) ->
+          _.map typeIds, (typeId) ->
+            overrides[overrideType]?[assignment.id]?[typeId]
 
-        allOverridesForSubmission = sectionOverrides.concat studentOverrides
+        allOverridesForSubmission = _.chain(IDsByOverrideType)
+          .map(getOverridesForType)
+          .flatten()
+          .compact()
+          .value()
+
         overrideDates = _.chain(allOverridesForSubmission)
           .pluck('due_at')
           .map((dateString) -> tz.parse(dateString))

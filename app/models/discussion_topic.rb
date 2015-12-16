@@ -227,6 +227,9 @@ class DiscussionTopic < ActiveRecord::Base
       unless is_announcement
         self.assignment.workflow_state = published? ? 'published' : 'unpublished'
       end
+      if group_category_id_changed?
+        self.assignment.validate_assignment_overrides(force_override_destroy: true)
+      end
       self.assignment.save
     end
 

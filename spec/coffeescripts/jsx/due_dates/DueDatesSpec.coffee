@@ -17,12 +17,15 @@ define [
       @override1 = new AssignmentOverride name: "Plebs", course_section_id: "1", due_at: null
       @override2 = new AssignmentOverride name: "Patricians", course_section_id: "2", due_at: "2015-04-05"
       @override3 = new AssignmentOverride name: "Students", student_ids: ["1","3"], due_at: null
+      @override4 = new AssignmentOverride name: "Reading Group One", group_id: "1", due_at: null
+      @override5 = new AssignmentOverride name: "Reading Group Two", group_id: "2", due_at: "2015-05-05"
 
       props =
-        overrides: [@override1, @override2, @override3]
+        overrides: [@override1, @override2, @override3, @override4, @override5]
         defaultSectionId: '0'
         sections: [{attributes: {id: 1, name: "Plebs"}},{attributes: {id: 2, name: "Patricians"}}]
         students: {1:{id: "1", name: "Scipio Africanus"}, 2: {id: "2", name: "Cato The Elder"}, 3:{id: 3, name: "Publius Publicoa"}}
+        groups: {1:{id: "1", name: "Reading Group One"}, 2: {id: "2", name: "Reading Group Two"}}
         overrideModel: AssignmentOverride
         syncWithBackbone: ->
 
@@ -44,7 +47,9 @@ define [
     sortedOverrides = _.map(@dueDates.state.rows, (r)-> r.overrides)
     ok _.contains(sortedOverrides[0], @override1)
     ok _.contains(sortedOverrides[0], @override3)
+    ok _.contains(sortedOverrides[0], @override4)
     ok _.contains(sortedOverrides[1], @override2)
+    ok _.contains(sortedOverrides[2], @override5)
 
   test 'syncs with backbone on update', ->
     initialCount = @syncWithBackboneStub.callCount
@@ -52,13 +57,13 @@ define [
     equal @syncWithBackboneStub.callCount, initialCount + 1
 
   test 'will add multiple rows of overrides if AddRow is called', ->
-    equal @dueDates.sortedRowKeys().length, 2
-    @dueDates.addRow()
     equal @dueDates.sortedRowKeys().length, 3
     @dueDates.addRow()
     equal @dueDates.sortedRowKeys().length, 4
+    @dueDates.addRow()
+    equal @dueDates.sortedRowKeys().length, 5
 
-  test 'will filter out picked sections and students from validDropdownOptions', ->
+  test 'will filter out picked sections from validDropdownOptions', ->
     ok !_.contains(@dueDates.validDropdownOptions().map( (opt) -> opt.name), "Patricians")
     @dueDates.setState(rows: {1: {overrides: []}})
     ok _.contains(@dueDates.validDropdownOptions().map( (opt) -> opt.name), "Patricians")
@@ -79,10 +84,10 @@ define [
     equal @dueDates.removeRow("1")
     equal @dueDates.sortedRowKeys().length, 1
 
-  test 'defaultSection namer shows Everyone if no token is selected', ->
+  test 'defaultSection namer shows Everyone Else if a section or student is selected', ->
     equal @dueDates.defaultSectionNamer('0'), "Everyone Else"
 
-  test 'defaultSection namer shows Everyone Else if a section or student is selected', ->
+  test 'defaultSection namer shows Everyone if no token is selected', ->
     @dueDates.setState(rows: {})
     equal @dueDates.defaultSectionNamer('0'), "Everyone"
 

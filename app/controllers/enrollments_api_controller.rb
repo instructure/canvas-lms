@@ -276,6 +276,10 @@ class EnrollmentsApiController < ApplicationController
   #   argument or via user enrollments endpoint), the following additional
   #   synthetic states are supported: "current_and_invited"|"current_and_future"|"current_and_concluded"
   #
+  # @argument include[] [String, "avatar_url"|"group_ids"|"locked"|"observed_users"|"can_be_removed"]
+  #   Array of additional information to include on the enrollment or user records.
+  #   "avatar_url" and "group_ids" will be returned on the user record.
+  #
   # @argument user_id [String]
   #   Filter by user_id (only valid for course or section enrollment
   #   queries). If set to the current user's id, this is a way to
@@ -331,9 +335,11 @@ class EnrollmentsApiController < ApplicationController
       self, send("api_v1_#{endpoint_scope}_enrollments_url"))
 
     ActiveRecord::Associations::Preloader.new.preload(enrollments, [:user, :course, :course_section])
-    includes = [:user] + Array(params[:include])
 
-    user_json_preloads(enrollments.map(&:user))
+    include_group_ids = Array(params[:include]).include?("group_ids")
+    includes = [:user] + Array(params[:include])
+    user_json_preloads(enrollments.map(&:user), false, {group_memberships: include_group_ids})
+
     render :json => enrollments.map { |e|
       enrollment_json(e, @current_user, session, includes,
                       grading_period: grading_period)
