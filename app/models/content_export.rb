@@ -304,6 +304,9 @@ class ContentExport < ActiveRecord::Base
     content_migration.update_conversion_progress(val) if content_migration
     self.progress = val
     ContentExport.where(:id => self).update_all(:progress=>val)
+    if EpubExport.exists?(content_export_id: self.id)
+      self.epub_export.update_progress_from_content_export!(val)
+    end
     self.job_progress.try(:update_completion!, val)
   end
 
