@@ -60,7 +60,7 @@ describe "calendar2" do
 
       context "drag and drop" do
 
-        let(:element_location) do
+        def element_location
           driver.execute_script("return $('#calendar-app .fc-content-skeleton:first')
           .find('tbody td.fc-event-container').index()")
         end
@@ -87,7 +87,7 @@ describe "calendar2" do
           expect(flash_message_present?(:error)).to be false
 
           # Assignment should be moved to Friday
-          expect(send :element_location).to eq @friday
+          expect(element_location).to eq @friday
 
           # Assignment time should stay at 9:00am
           assignment1.reload
@@ -107,7 +107,7 @@ describe "calendar2" do
           expect(flash_message_present?(:error)).to be false
 
           # Event should be moved to Friday
-          expect(send :element_location).to eq @friday
+          expect(element_location).to eq @friday
 
           # Event time should stay at 9:00am
           event1.reload
@@ -127,7 +127,7 @@ describe "calendar2" do
           expect(flash_message_present?(:error)).to be false
 
           # Assignment should be moved to Monday
-          expect(send :element_location).to eq @monday
+          expect(element_location).to eq @monday
 
           # Assignment time should stay at 9:00am
           assignment1.reload
@@ -147,7 +147,7 @@ describe "calendar2" do
           expect(flash_message_present?(:error)).to be false
 
           # Event should be moved to Monday
-          expect(send :element_location).to eq @monday
+          expect(element_location).to eq @monday
 
           # Event time should stay at 9:00am
           event1.reload
