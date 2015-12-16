@@ -1170,8 +1170,16 @@ class Quizzes::Quiz < ActiveRecord::Base
     return unless quizzes.any?
     assmnt_ids_with_subs ||= Assignment.assignment_ids_with_submissions(quizzes.map(&:assignment_id).compact)
 
-    quiz_ids_with_subs = Quizzes::QuizSubmission.where(:quiz_id => quizzes.map(&:id)).
-      not_settings_only.where("user_id IS NOT NULL").uniq.pluck(:quiz_id)
+    # yes, this is a complicated query, but it greatly improves the runtime to do it this way
+    filter = Quizzes::QuizSubmission.where("quiz_submissions.quiz_id=s.quiz_id").
+      not_settings_only.where("user_id IS NOT NULL")
+    values = quizzes.map { |q| "(#{q.id})" }.join(", ")
+    constant_table = "( VALUES #{values} ) AS s(quiz_id)"
+
+    quiz_ids_with_subs = Quizzes::QuizSubmission.
+        from(constant_table).
+        where("EXISTS (?)", filter).
+        pluck("s.quiz_id")
 
     quizzes.each do |quiz|
       quiz.can_unpublish = !(quiz_ids_with_subs.include?(quiz.id)) &&
