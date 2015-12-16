@@ -189,6 +189,18 @@ module CanvasRails
       val.constantize
     end
 
+    trusted_tags = SafeYAML::TRUSTED_TAGS.dup
+    trusted_tags << 'tag:yaml.org,2002:merge'
+    SafeYAML.send(:remove_const, :TRUSTED_TAGS)
+    SafeYAML.const_set(:TRUSTED_TAGS, trusted_tags.freeze)
+    module FixSafeYAMLNullMerge
+      def merge_into_hash(hash, array)
+        return unless array
+        super
+      end
+    end
+    SafeYAML::Resolver.prepend(FixSafeYAMLNullMerge)
+
     SafeYAML::OPTIONS.merge!(
       default_mode: :safe,
       deserialize_symbols: true,
@@ -198,7 +210,6 @@ module CanvasRails
       whitelisted_tags: %w[
         tag:ruby.yaml.org,2002:symbol
         tag:yaml.org,2002:float
-        tag:yaml.org,2002:merge
         tag:yaml.org,2002:str
         tag:yaml.org,2002:timestamp
         tag:yaml.org,2002:timestamp#iso8601
