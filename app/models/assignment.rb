@@ -1223,7 +1223,7 @@ class Assignment < ActiveRecord::Base
       opts[:assessment_request].complete unless opts[:assessment_request].rubric_association
     end
 
-    if (opts[:comment] && Canvas::Plugin.value_to_boolean(opts[:group_comment]))
+    if opts[:comment] && Canvas::Plugin.value_to_boolean(opts[:group_comment])
       uuid = CanvasSlug.generate_securish_uuid
       res = find_or_create_submissions(students) do |s|
         s.group = group
@@ -1463,14 +1463,15 @@ class Assignment < ActiveRecord::Base
 
       if grade_as_group?
         group_id = (provisional_grade || sub).group_id
-        json[:submission_comments] = unique_comments(group_id).as_json(
-          :include_root => false,
-          :methods => submission_comment_methods,
-          :only => comment_fields
-        )
+        json[:submission_comments] = unique_comments(group_id)
+          .as_json(
+            :include_root => false,
+            :methods => submission_comment_methods,
+            :only => comment_fields
+          )
       else
         json[:submission_comments] = (provisional_grade || sub)
-          .submission_comments
+          .comments_for(@current_user)
           .as_json(
             :include_root => false,
             :methods => submission_comment_methods,

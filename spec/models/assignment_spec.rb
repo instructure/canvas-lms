@@ -2750,7 +2750,12 @@ describe Assignment do
         end
 
         it "shows all comments from submitting student" do
-          assignment.submit_homework(student_one, {submission_type: 'online_text_entry', body: 'blah', comment: 'a private comment NOT a group comment'})
+          homework_params = {
+            submission_type: 'online_text_entry',
+            body: 'blah',
+            comment: 'a private comment NOT a group comment'
+          }
+          assignment.submit_homework(student_one, homework_params)
           submission = assignment.submissions.where(user_id: student_one).first
           submission.add_comment(
             author: student_one,
@@ -2763,10 +2768,20 @@ describe Assignment do
           )
 
           json = assignment.speed_grader_json(@user)
-          submission_comments = json.fetch(:submissions).first.fetch(:submission_comments).map { |comment| comment.slice(:author_id, :comment) }
-          expect(submission_comments).to include({"author_id" => student_one.id, "comment" => "a private comment NOT a group comment" })
-          expect(submission_comments).to include({"author_id" => student_one.id, "comment" => "a 2nd private comment NOT a group comment"})
-          expect(submission_comments).to include({"author_id" => student_two.id, "comment" => "a 3rd private comment NOT a group comment"})
+          submission = json.fetch(:submissions).first
+          submission_comments = submission.fetch(:submission_comments).map do |comment|
+            comment.slice(:author_id, :comment)
+          end
+          expect(submission_comments).to include({
+            "author_id" => student_one.id,
+            "comment" => "a private comment NOT a group comment"
+          }, {
+            "author_id" => student_one.id,
+            "comment" => "a 2nd private comment NOT a group comment"
+          }, {
+            "author_id" => student_two.id,
+            "comment" => "a 3rd private comment NOT a group comment"
+          })
         end
       end
     end
