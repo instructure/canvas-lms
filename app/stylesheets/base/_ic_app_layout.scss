@@ -165,7 +165,7 @@ $ic-left-side-width: $ic-sp*15;
   a {
     color: $ic-font-color--subdued;
     margin-right: $ic-sp;
-    font-size: 12px;
+    @include fontSize($ic-font-size--xsmall);
   }
   @include breakpoint(desktop) {
     justify-content: flex-end;

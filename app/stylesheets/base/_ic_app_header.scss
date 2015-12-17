@@ -194,7 +194,7 @@
     box-sizing: border-box;
     color: $ic-brand-global-nav-menu-item__text-color;
     line-height: 1.1;
-    font-size: ($baseFontSize - 2);
+    @include fontSize($ic-font-size--xsmall);
   }
 
   .menu-item__badge {
@@ -294,8 +294,7 @@
 
   .ReactTray__link-list {
     @include reset-list;
-    font-size: 14px;
-
+    @include fontSize($ic-font-size--small);
     .ReactTray-list-item {
       line-height: 1.3;
       margin-bottom: $ic-sp;
@@ -313,7 +312,7 @@
         color: $ic-dim-helper-text;
         text-transform: uppercase;
         letter-spacing: 2px;
-        font-size: $baseFontSize;
+        @include fontSize($ic-font-size);
         box-sizing: border-box;
         padding: $ic-sp*4 0;
       }
@@ -344,7 +343,7 @@
 
   .ReactTray-list-item__helper-text {
     color: $ic-hint-text;
-    font-size: $baseFontSize - 2;
+    @include fontSize(12px);
     text-transform: uppercase;
     margin-top: $ic-sp/6;
   }

@@ -12,13 +12,18 @@
 ///////==============
 /// Global Settings
 ///////==============
+html {
+  @if $use_new_styles {
+    font-size: 16px;
+  }
+}
 
 body {
   margin: 0;
-  font-family: $ic-font-family;
-  @include fontSize($ic-font-size);
-  color: $ic-color-dark;
   line-height: $ic-line-height;
+  @include fontSize($ic-font-size);
+  font-family: $ic-font-family;
+  color: $ic-color-dark;
 }
 
 p {
