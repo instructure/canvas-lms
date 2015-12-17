@@ -16,7 +16,7 @@ set :branch, 'bz-master'
 # server list. The second argument is a, or duck-types, Hash and is
 # used to set extended properties on the server.
 
-# server 'portal.beyondz.org', user: 'deploy', roles: %w{web app}, my_property: :my_value
+# server 'portal.bebraven.org', user: 'deploy', roles: %w{web app}, my_property: :my_value
 
 
 # Custom SSH Options

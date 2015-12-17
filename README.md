@@ -58,9 +58,9 @@ BZ Git branch layout
         \
      beyond-z/stable - beyondz's forked copy
           \
-       beyond-z/bz-master - the production branch hosted at https://portal.beyondz.org
+       beyond-z/bz-master - the production branch hosted at https://portal.bebraven.org
             \
-         beyond-z/bz-staging - the staging branch hosted at https://stagingportal.beyondz.org
+         beyond-z/bz-staging - the staging branch hosted at https://stagingportal.bebraven.org
      
 ## Development Process
 
@@ -88,7 +88,7 @@ BZ Git branch layout
 
 2. Open a pull request against `bz-staging`
 
-3. Have your pull request reviewed, merged, and pushed to the [staging](https://stagingportal.beyondz.org) server.
+3. Have your pull request reviewed, merged, and pushed to the [staging](https://stagingportal.bebraven.org) server.
    1. Command to deploy to staging if you have privileges
 
           `bundle exec cap staging deploy`
@@ -113,7 +113,7 @@ BZ Git branch layout
             $ bundle exec cap production deploy --trace &> prod_deploy_<insertDate>.log
 
 ## Update BZ Canvas code
-These instructions are for pulling changes from Instructure's cloud hosted version of Canvas into the Beyond Z version of Canvas hosted at (https://portal.beyondz.org)
+These instructions are for pulling changes from Instructure's cloud hosted version of Canvas into the Beyond Z version of Canvas hosted at (https://portal.bebraven.org)
 
 1. Pull changes from `instructure/stable` into `beyond-z/stable`
 
