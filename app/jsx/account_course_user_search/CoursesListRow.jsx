@@ -48,13 +48,16 @@ define([
           <div className="col-md-3">
             <div role='gridcell' className="grid-row">
               <div className="col-xs-2">{isPublished && (<i className="icon-publish courses-list__published-icon" />)}</div>
-              <div className="courseName col-xs-10"><a href={url}>{name}</a></div>
+              <div className="col-xs-10">
+                <div className="courseName">
+                  <a href={url}>{name}</a>
+                </div>
+              </div>
             </div>
           </div>
 
           <div className="col-xs-1" role='gridcell'>
-            {sis_course_id}
-            1
+            <div className="courseSIS">{sis_course_id}</div>
           </div>
 
           <div className="col-md-3" role='gridcell'>
@@ -63,7 +66,7 @@ define([
           </div>
 
           <div className="col-md-3" role='gridcell'>
-            {total_students}
+            <div className="totalStudents">{total_students}</div>
           </div>
           <div className="col-md-2" role='gridcell'>
             <div className="grid-row" style={{justifyContent: "flex-end"}}>

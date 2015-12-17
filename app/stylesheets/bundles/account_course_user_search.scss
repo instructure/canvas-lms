@@ -16,6 +16,10 @@
   padding-right: 10px;
 }
 
+[role=columnheader] a{
+  color: $ic-color-dark;
+}
+
 .padding-none {
   padding: 0;
 }

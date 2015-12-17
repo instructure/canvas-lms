@@ -29,7 +29,9 @@ define([
       }
     },
     sortCourses ({property, direction}) {
-      let courses = _.sortBy(this.props.courses, property);
+      let courses = _.sortBy(this.props.courses, (course) => {
+        return property === 'display_name' ? course.teachers.display_name : course[property];
+      });
 
       if (direction == 'DESC') {
         courses.reverse()
@@ -73,19 +75,19 @@ define([
                 </div>
                 <div className="col-xs-10" role='columnheader'>
                   <strong>
-                    <a href="#" className="coursesHeaderLink" onClick={this.sort.bind(this, 'name')}>{this.sortArrow('name')}<small>{I18n.t("Course")}</small></a>
+                    <a href="#" className="coursesHeaderLink" onClick={this.sort.bind(this, 'name')}><small>{I18n.t("Course")}</small>{this.sortArrow('name')}</a>
                   </strong>
                 </div>
               </div>
             </div>
             <div role='columnheader' className="col-xs-1">
-              <strong><small>{I18n.t("SIS ID")}</small></strong>
+              <strong><a href="#" className="courseSIS" onClick={this.sort.bind(this, 'sis_course_id')}><small>{I18n.t("SIS ID")}</small>{this.sortArrow('sis_course_id')}</a></strong>
             </div>
             <div role='columnheader' className="col-md-3">
-              <strong><small>{I18n.t("Teacher")}</small></strong>
+              <strong><a href="#" className="sortTeacherName" onClick={this.sort.bind(this, 'display_name')}><small>{I18n.t("Teacher")}</small>{this.sortArrow('display_name')}</a></strong>
             </div>
             <div role='columnheader' className="col-md-3">
-              <strong><small>{I18n.t("Enrollments")}</small></strong>
+              <strong><a href="#" className="sortEnrollments" onClick={this.sort.bind(this, 'total_students')}><small>{I18n.t("Enrollments")}</small>{this.sortArrow('total_students')}</a></strong>
             </div>
             <div role='columnheader' className="col-md-2">
               <span className='screenreader-only'>{I18n.t("Course option links")}</span>
