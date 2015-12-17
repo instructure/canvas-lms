@@ -137,7 +137,7 @@ define([
         var url = $find.find(".grading_standards_url").attr('href');
         $.ajaxJSON(url, 'GET', {}, function(data) {
           if(data.length === 0) {
-            $find.find(".loading_message").text(I18n.t('no_grading_standards', "No grading standards found"));
+            $find.find(".loading_message").text(I18n.t('no_grading_standards', "No grading schemes found"));
           } else {
             $find.find(".loading_message").remove();
             for(var idx in data) {
