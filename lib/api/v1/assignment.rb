@@ -116,8 +116,7 @@ module Api::V1::Assignment
                                              opts[:preloaded_user_content_attachments] || {})
     end
 
-    can_manage = assignment.context.grants_right?(user, :manage_assignments)
-
+    can_manage = assignment.context.grants_any_right?(user, :manage, :manage_grades, :manage_assignments)
     hash['muted'] = assignment.muted?
     hash['html_url'] = course_assignment_url(assignment.context_id, assignment)
     if can_manage
