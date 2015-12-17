@@ -8,11 +8,20 @@ RUN  apt-get update -qq \
        nodejs \
        postgresql-client \
        libxmlsec1-dev \
+       unzip \
+       fontforge \
   && npm install -g gulp \
   && rm -rf /var/lib/apt/lists/*
 
 # Ensure UTF-8 locale
 ENV LANG C.UTF-8
+
+# We will need sfnt2woff in order to build fonts
+WORKDIR /root
+RUN wget http://people.mozilla.org/~jkew/woff/woff-code-latest.zip \
+  && unzip woff-code-latest.zip \
+  && make \
+  && cp sfnt2woff /usr/local/bin
 
 # Canvas requires bundler 1.10.6
 RUN gem uninstall bundler \
