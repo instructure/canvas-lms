@@ -2158,10 +2158,9 @@ class Assignment < ActiveRecord::Base
   def self.with_student_submission_count
     joins("LEFT OUTER JOIN #{Submission.quoted_table_name} s ON
            s.assignment_id = assignments.id AND
-           s.submission_type IS NOT NULL AND
-           s.user_id IS NOT NULL")
+           s.submission_type IS NOT NULL")
     .group("assignments.id")
-    .select("assignments.*, count(s.id) AS student_submission_count")
+    .select("assignments.*, count(s.assignment_id) AS student_submission_count")
   end
 
   def can_unpublish?
