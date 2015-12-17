@@ -62,11 +62,15 @@ class Message < ActiveRecord::Base
   before_save :set_asset_context_code
 
   # Validations
-  validates_length_of :body,                :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
-  validates_length_of :transmission_errors, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
-  validates_length_of :to, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
-  validates_length_of :from, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
-  validates_length_of :url, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
+  validates :body, length: {maximum: maximum_text_length}, allow_nil: true, allow_blank: true
+  validates :html_body, length: {maximum: maximum_text_length}, allow_nil: true, allow_blank: true
+  validates :transmission_errors, length: {maximum: maximum_text_length}, allow_nil: true, allow_blank: true
+  validates :to, length: {maximum: maximum_text_length}, allow_nil: true, allow_blank: true
+  validates :from, length: {maximum: maximum_text_length}, allow_nil: true, allow_blank: true
+  validates :url, length: {maximum: maximum_text_length}, allow_nil: true, allow_blank: true
+  validates :subject, length: {maximum: maximum_string_length}, allow_nil: true, allow_blank: true
+  validates :from_name, length: {maximum: maximum_string_length}, allow_nil: true, allow_blank: true
+  validates :reply_to_name, length: {maximum: maximum_string_length}, allow_nil: true, allow_blank: true
 
   # Stream policy
   on_create_send_to_streams do
