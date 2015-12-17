@@ -6319,6 +6319,7 @@ mi:
   grade_distribution_e52c9256: "kōeke Distribution"
   grade_export_title: "kōeke Kaweake"
   grade_summary: 
+    graph_title: "Te tikanga %{mean}, Teitei %{high}, Iti %{low}"
     ? "no"
     : kahore
     outcome: 
@@ -6788,6 +6789,7 @@ mi:
       failures: "Object Hai! Ka mau Tātou i file tukuake pēhea koe, ka piri Ultimo ki te kōrero poto ki te whārangi tāpaetanga e every user mō this function. Ka Received te ākonga i te Notification i Linked ia kōrero new i."
       files_ignored: 
         one: "% {count} Kōnae Waiho"
+        other: "%{count} Kōnae Waiho"
       header: 
         ignored_files: "Waihotia te kōnae e whai ake"
       headers: 
@@ -7066,6 +7068,7 @@ mi:
       member_tooltip_show: "Rārangi Tirohia rōpū"
       no_members: "No te mau melo"
       one: "1 Rōpū"
+      other: "%{count} Rōpū"
     group_limit_number: "Me waiho rohe Rōpū he maha"
     group_name: "ingoa rōpū"
     groups_count: "Rōpū (%{count})"
@@ -7738,7 +7741,7 @@ mi:
         subject: "Karere Reply rahua: %{subject}"
     progress_runner: 
       completed_message: 
-        one: "%{count} tūemi tukatuka"
+        one: "1 tūemi tukatuka"
         other: "%{count} tūemi tukatuka"
       error_message: "%{error}: %{ids}"
     send_to_inbox: 
@@ -8070,10 +8073,16 @@ mi:
         unknown_user: "Apataki tauhou"
     alert: 
       email: 
+        body: 
+          one: "Kua tētahi mataara kua pōreareatanga mō te %{student} no te mea kua tutaki nga tikanga e whai ake nei:"
+          other: "Kua tētahi mataara kua pōreareatanga mō te %{student} no te mea kua tutaki nga tikanga e whai ake nei:"
         body_student: 
           one: "Kua tētahi mataara kua pōreareatanga hoki koutou no te mea kua tutaki nga tikanga e whai ake nei:"
           other: "Kua tētahi mataara kua pōreareatanga hoki koutou no te mea kua tutaki nga tikanga e whai ake nei:"
         html: 
+          body: 
+            one: "Kua tētahi mataara kua pōreareatanga mō te %{student} no te mea kua tutaki nga tikanga e whai ake nei:"
+            other: "Kua tētahi mataara kua pōreareatanga mō te %{student} no te mea kua tutaki nga tikanga e whai ake nei:"
           body_student: 
             one: "Kua tētahi mataara kua pōreareatanga hoki koutou no te mea kua tutaki nga tikanga e whai ake nei:"
             other: "Kua tētahi mataara kua pōreareatanga hoki koutou no te mea kua tutaki nga tikanga e whai ake nei:"
@@ -8093,18 +8102,25 @@ mi:
         body_student: "Kua tētahi mataara kua pōreareatanga hoki koutou"
         more_info: "Ētahi atu info i %{url}"
       summary: 
+        body: 
+          one: "Kua tētahi mataara kua pōreareatanga mō te %{student} no te mea kua tutaki nga tikanga e whai ake nei:"
+          other: "Kua tētahi mataara kua pōreareatanga mō te %{student} no te mea kua tutaki nga tikanga e whai ake nei:"
         body_student: 
           one: "Kua tētahi mataara kua pōreareatanga hoki koutou no te mea kua tutaki nga tikanga e whai ake nei:"
           other: "Kua tētahi mataara kua pōreareatanga hoki koutou no te mea kua tutaki nga tikanga e whai ake nei:"
         interaction_description: 
           one: "kahore taunekeneke ngā ākonga / kaiako mō te% {count} ranei nga ra ake"
+          other: "kahore taunekeneke ngā ākonga / kaiako mō te %{count} ranei nga ra ake"
         subject: "Matohi: %{user_name}"
         ungraded_count_description: 
           one: "% {count} kihai i atu ohipa māka rānei"
+          other: "%{count} kihai i atu ohipa māka rānei"
         ungraded_timespan_description: 
           one: "Tētahi, ētahi rānei tāpaetanga kua mahue Mākahia mō te% {count} ranei nga ra ake"
+          other: "Tētahi, ētahi rānei tāpaetanga kua mahue Mākahia mō te %{count} ranei nga ra ake"
         usernote_description: 
           one: "tāurunga kahore manga hautaka mō te% {count} ranei nga ra ake"
+          other: "tāurunga kahore manga hautaka mō te %{count} ranei nga ra ake"
       twitter: 
         body: "Kua tētahi mataara kua pōreareatanga mō te %{student}"
         body_student: "Kua tētahi mataara kua pōreareatanga hoki koutou"
@@ -8118,10 +8134,12 @@ mi:
           file_included: "Kei kōnae"
       sms: 
         details: "Ētahi atu info i %{url}"
+        subject: "I hanga e koe tenei pāohotia: %{title}, %{course}"
       twitter: 
         body: "Matohi Kānawehi - i hanga e koe tenei pāohotia: %{title}, %{course}."
     announcement_reply: 
       email: 
+        body: "whakairi %{user} he kōrero hou i runga i te fanongonongo: %{discussion_topic} mō te %{course}:"
         discussion_entry_reply_message: "Hono te whakahaere mā te whakamahi i te hono i raro nei, kōrero rānei i te whakautu ki tēnei karere."
         html: 
           body: "whakairi %{user} he kōrero hou i runga i te fanongonongo:%{discussion_topic} mō te %{course}:"
@@ -8209,6 +8227,7 @@ mi:
           link_text: "Tirohia te whakatūnga"
           message: "Kua whakakorea te whakatū katoa hoki %{appointment_name}."
           no_reason_given: "kahore i homai"
+          subject: "Kua whakakorea Wāhui mō %{appointment_name} (%{course})"
         labels: 
           cancel_reason: "Take mō te whakakore"
           course: Kaupapa
@@ -8216,41 +8235,75 @@ mi:
           details: "taipitopito Wāhui"
         message: "Whakatū katoa hoki \"%{appointment_name}\" Kua whakakorea."
         no_reason_given: "kahore i homai"
+        subject: "Wāhui mō \"%{appointment_name}\" kua whakakorea (%{course})"
       sms: 
         message: "\"Kua whakakorea %{appointment_name}\" whakatū katoa hoki."
+        more_info: "Ētahi atu info i %{url}"
+      twitter: 
+        message: "\"Kua whakakorea %{appointment_name}\" whakatū katoa hoki - Alert Kanaweti."
     appointment_group_published: 
       email: 
+        group_signup: "Rōpū (%{group_category})"
         html: 
           course: Kaupapa
           dates: "Rā (s)"
           details: "Taipitopito Wāhui"
+          group_signup: "Rōpū (%{group_category})"
           individual_signup: takitahi
           link_text: "Waitohu ake hoki te mokamoka wa"
+          message: "I'ai Wā mō \"%{appointment_name}\" e wātea ana mō te tohuake he inaianei."
           signup_type: "Momo tohuake"
           slots_remaining: "I'ai wā wātea"
+          subject: "Wāhui \"%{appointment_name}\" i te wātea mō te tohuake (%{course})"
         individual_signup: takitahi
+        instructions: "Waitohu ake hoki te mokamoka wa i te hono e whai ake: %{link}"
         labels: 
           course: Kaupapa
           dates: "Rā (s)"
           details: "taipitopito Wāhui"
           signup_type: "Momo tohuake"
           slots_remaining: "I'ai wā wātea"
+        message: "I'ai Wā mō \"%{appointment_name}\" e wātea ana mō te tohuake he inaianei."
+        subject: "Wāhui \"%{appointment_name}\" i te wātea mō te tohuake (%{course})"
+      sms: 
+        message: "Signups e tuwhera mō \"%{appointment_name}\"."
+        more_info: "Ētahi atu info i %{url}"
+      summary: 
+        message: "I'ai Wā mō \"%{appointment_name}\" E i teie nei e wātea ana mō te tohuake (%{dates})."
+        subject: "Wāhui \"%{appointment_name}\" i te wātea mō te tohuake (%{course})"
+      twitter: 
+        message: "Matohi Kānawehi - Signups e tuwhera mō \"%{appointment_name}\"."
     appointment_group_updated: 
       email: 
+        group_signup: "Rōpū (%{group_category})"
         html: 
           course: Kaupapa
           dates: "Rā (s)"
           details: "Taipitopito Wāhui"
+          group_signup: "Rōpū (%{group_category})"
           individual_signup: takitahi
           link_text: "Waitohu ake hoki te mokamoka wa"
+          message: "Kua Time i'ai tapiritia ki \"%{appointment_name}\" me e wātea ana mō te tohuake."
           slots_remaining: "I'ai wā wātea"
+          subject: "Wāhui \"%{appointment_name}\" Kua whakahōutia (%{course})"
         individual_signup: takitahi
+        instructions: "Waitohu ake hoki te mokamoka wa i te hono e whai ake: %{link}"
         labels: 
           course: Kaupapa
           dates: "Rā (s)"
           details: "taipitopito Wāhui"
           signup_type: "Momo tohuake"
           slots_remaining: "I'ai wā wātea"
+        message: "Kua Time i'ai tapiritia ki \"%{appointment_name}\" me e wātea ana mō te tohuake."
+        subject: "Wāhui \"%{appointment_name}\" Kua whakahōutia (%{course})"
+      sms: 
+        message: "E wātea ana hoki \"%{appointment_name}\" i'ai wā New."
+        more_info: "Ētahi atu info i %{url}"
+      summary: 
+        message: "Kua Time i'ai tapiritia ki \"%{appointment_name}\" me e wātea ana mō te tohuake (%{dates})."
+        subject: "Wāhui \"%{appointment_name}\" Kua whakahōutia (%{course})"
+      twitter: 
+        message: "Matohi Kānawehi - E wātea ana hoki \"%{appointment_name}\" i'ai wā New."
     appointment_reserved_by_user: 
       email: 
         html: 
@@ -8261,7 +8314,10 @@ mi:
           details: "Taipitopito Wāhui"
           group: rōpū
           link_text: "Tirohia te whakatūnga"
+          message: "Kua hainatia ake %{user} mō \"%{appointment_name}\"."
           slots_remaining: "I'ai wā wātea"
+          subject: "Hainatia Kaiwhakamahi ake mo \"%{appointment_name}\" (%{course})"
+        instructions: "Tirohia te whakarite i te hononga e whai ake: %{link}"
         labels: 
           attendee: Kaitāri
           attendees: Kaitāri
@@ -8270,6 +8326,13 @@ mi:
           details: "taipitopito Wāhui"
           group: rōpū
           slots_remaining: "I'ai wā wātea"
+        message: "Kua hainatia ake %{user} mō \"%{appointment_name}\"."
+        subject: "Hainatia Kaiwhakamahi ake mo \"%{appointment_name}\" (%{course})"
+      sms: 
+        message: "Kua hainatia ake %{user} mō \"%{appointment_name}\"."
+        more_info: "Ētahi atu info i %{url}"
+      twitter: 
+        message: "Kua hainatia ake %{user} mō \"%{appointment_name}\" - Matohi Kanaweti."
     appointment_reserved_for_user: 
       email: 
         html: 
@@ -8280,7 +8343,10 @@ mi:
           details: "Taipitopito Wāhui"
           group: rōpū
           link_text: "Waitohu ake hoki te mokamoka wā rerekē"
+          message: "Kua hainatia e koe %{user} ake mo \"%{appointment_name}\"."
           slots_remaining: "I'ai wā wātea"
+          subject: "Kua hainatia e koe ake mo \"%{appointment_name}\""
+        instructions: "Waitohu ake hoki te mokamoka wa rerekē i te hono e whai ake: %{link}"
         labels: 
           attendee: Kaitāri
           attendees: Kaitāri
@@ -8289,10 +8355,37 @@ mi:
           details: "taipitopito Wāhui"
           group: rōpū
           slots_remaining: "I'ai wā wātea"
+        message: "Kua hainatia e koe %{user} ake mo \"%{appointment_name}\"."
+        subject: "Kua hainatia e koe ake mo \"%{appointment_name}\""
+      sms: 
+        message: "Kua hainatia ake koe mo \"%{appointment_name}\"."
+        more_info: "Ētahi atu info i %{url}"
+      summary: 
+        message: "Kua hainatia e koe %{user} ake mo \"%{appointment_name}\" (%{date_and_time})."
+        subject: "Kua hainatia e koe ake mo \"%{appointment_name}\" (%{course})"
+      twitter: 
+        message: "Matohi Kānawehi - kua hainatia ake koe mo \"%{appointment_name}\"."
     assignment_changed: 
       email: 
+        body: |-
+            Ke te ohipa "%{title}" mō te %{course} kua.
+            
+            Pāwhiri ki konei kia te taumahi: 
+            %{url}
         html: 
+          body: "Ke te ohipa \"%{title}\" mō te %{course} kua."
           link: "Pāwhiri ki konei kia te taumahi"
+          subject: "Taumahi Kua Hurihia: %{title}, %{course}"
+        subject: "Taumahi Kua Hurihia: %{title}, %{course}"
+      sms: 
+        body: |-
+            ke %{title}, %{course} kua.
+            
+            Ētahi atu info i %{website}
+      summary: 
+        subject: "Taumahi Kua Hurihia: %{title}, %{course}"
+      twitter: 
+        assignment_change: "Matohi Kānawehi - Huria: %{assignment_name}, %{course_name}"
     assignment_created: 
       email: 
         html: 
@@ -8314,70 +8407,197 @@ mi:
         no_due_date: "e tika ana: Kāore he Rā whakaoti"
     assignment_due_date_changed: 
       email: 
+        assignment_due_date_changed: "Taumahi Nā Rā huri te: %{assignment_name}, %{course_name}"
+        assignment_due_date_changed_sentence: "Ko te rā e tika ana mo te taumahi, %{assignment_name}, mo te akoranga, %{course_name}, kua puta ke ki te:"
         html: 
+          assignment_due_date_changed: "Taumahi Nā Rā huri te: %{assignment_name}, %{course_name}"
+          assignment_due_date_changed_sentence: "Ko te rā e tika ana mo te taumahi, %{assignment_name}, mo te akoranga, %{course_name}, kua puta ke ki te:"
           link_text: "Tirohia te taumahi"
           no_due_date: "Kāore he Rā whakaoti"
         labels: 
           click_to_see_assignment: "Pāwhiri ki konei kia te taumahi"
         no_due_date: "Kāore he Rā whakaoti"
       sms: 
+        assignment_due_date_changed: "%{assignment_name}, %{course_name}, he tika inaianei:"
+        more_info_at_url: "Ētahi atu info i %{web_address}"
         no_due_date: "Kāore he Rā whakaoti"
       summary: 
+        assignment_due_date_changed: "Taumahi Nā Rā huri te: %{assignment_name}, %{course_name}"
+        due_at: "e tika ana: %{assignment_due_date_time}"
         no_due_date: "e tika ana: Kāore he Rā whakaoti"
       twitter: 
+        assignment_change: "Matohi Kānawehi - Huria te rā: %{assignment_name}, %{course_name}"
+        due_at: "e tika ana: %{assignment_due_date_time}"
         no_due_date: "e tika ana: Kāore he Rā whakaoti"
     assignment_due_date_override_changed: 
       email: 
+        assignment_due_date_changed_sentence: "Ko te rā e tika ana mo te taumahi, %{assignment_name}, mo te akoranga, %{course_name} (%{override}), kua puta ke ki te:"
         html: 
+          assignment_due_date_changed: "Taumahi Nā Rā huri te: %{assignment_name}, %{course_name} (%{override})"
+          assignment_due_date_changed_sentence: "Ko te rā e tika ana mo te taumahi, %{assignment_name}, mo te akoranga, %{course_name} (%{override}), kua puta ke ki te:"
           link: "Pāwhiri ki konei kia te taumahi"
           no_due_date: "Kāore he Rā whakaoti"
         labels: 
           click_to_see_assignment: "Pāwhiri ki konei kia te taumahi"
         no_due_date: "Kāore he Rā whakaoti"
       sms: 
+        assignment_due_date_changed: "%{assignment_name}, %{course_name} (%{override}) he tika inaianei:"
+        more_info_at_url: "Ētahi atu info i %{web_address}"
         no_due_date: "Kāore he Rā whakaoti"
       summary: 
+        assignment_due_date_changed: "Taumahi Nā Rā huri te: %{assignment_name}, %{course_name} (%{override})"
+        due_at: "e tika ana: %{assignment_due_date_time}"
         no_due_date: "e tika ana: Kāore he Rā whakaoti"
       twitter: 
+        assignment_change: "Matohi Kānawehi - Huria te rā: %{assignment_name}, %{course_name} (%{override})"
+        due_at: "e tika ana: %{assignment_due_date_time}"
         no_due_date: "e tika ana: Kāore he Rā whakaoti"
     assignment_graded: 
       email: 
+        assignment_graded: "Taumahi mākahia: %{assignment_name}, %{course_name}"
         html: 
+          assignment_graded: "Taumahi mākahia: %{assignment_name}, %{course_name}"
           link: "Pāwhiri ki konei kia te taumahi"
+          the_assignment_is_graded: "Ko te ohipa, %{assignment_name}, kua mākahia."
         labels: 
           view_here: "Ka taea e koe te tiro i te reira i konei"
+        the_assignment_is_graded: "Ko te ohipa, %{assignment_name}, kua mākahia."
+      sms: 
+        assignment_is_graded: "%{assignment_name}, %{course_name} Kua mākahia."
+        more_info_at: "Ētahi atu info i %{web_address}"
+      summary: 
+        assignment_graded: "Taumahi mākahia: %{assignment_name}, %{course_name}"
+        the_assignment_is_graded: "Ko te ohipa, %{assignment_name}, kua mākahia."
+      twitter: 
+        assignment_graded: "Matohi Kānawehi - mākahia: %{assignment_name}, %{course_name}"
     assignment_locked: "Kei te kiia wā teie faaueraa."
+    assignment_locked_at: "Kiia teie faaueraa %{at}."
+    assignment_locked_module: "Teie faaueraa Ko wahi o te kōwae *%{module}* me kua kore kua whakawātea ano."
+    assignment_locked_until: "Maukati tēnei taumahi te noa %{date}."
+    assignment_module_time_locked: "Teie faaueraa He wāhanga o te kōwae *%{module}*, kiia nei te tae noa ki %{time}."
     assignment_resubmitted: 
       email: 
         html: 
           link: "Pāwhiri ki konei kia te tāpaetanga"
+          user_resubmitted: "Tono-toai: %{user_name}, %{assignment_name}"
+          user_resubmitted_sentence: "Kua toaitia te tono a %{user_name} mō te taumahi %{assignment_name} i roto i te kaupapa %{course_name}  "
         labels: 
           view_submission: "Ka taea e koe te tiro i te tāpaetanga konei"
+        user_resubmitted: "Tono-toai: %{user_name}, %{assignment_name}"
+        user_resubmitted_sentence: "Kua toaitia te tono a %{user_name} mō te taumahi %{assignment_name} i roto i te kaupapa %{course_name}  "
+      sms: 
+        more_info_at: "Ētahi atu info i %{web_address}"
+        user_resubmitted: "Kua tonohia (anōtia) e %{user_name} tana taumahi, %{assignment_name} "
+      summary: 
+        turned_in_at: "tahuri i roto i: %{submission_date}"
+        user_resubmitted: "Tono-toai: %{user_name}, %{assignment_name}"
+      twitter: 
+        user_resubmitted: "Matohi Kānawehi - te tuku: %{user_name}, %{assignment_name}"
     assignment_submitted: 
       email: 
         html: 
           link: "Pāwhiri ki konei kia te tāpaetanga"
+          user_submitted: "Tono: %{user_name}, %{assignment_name}"
+          user_submitted_sentence: "%{user_name} kua tika tahuri i roto i te tāpaetanga mō te %{assignment_name} i roto i te akoranga %{course_name}"
         labels: 
           view_submission: "Ka taea e koe te tiro i te tāpaetanga konei"
+        user_submitted: "Tono: %{user_name}, %{assignment_name}"
+        user_submitted_sentence: "%{user_name} kua tika tahuri i roto i te tāpaetanga mō te %{assignment_name} i roto i te akoranga %{course_name}"
+      sms: 
+        more_info_at: "Ētahi atu info i %{web_address}"
+        user_submitted: "%{user_name} tika tahuri i roto i to ratou ohipa, %{assignment_name}"
+      summary: 
+        turned_in_at: "tahuri i roto i: %{submission_date}"
+        user_submitted: "Tono: %{user_name}, %{assignment_name}"
+      twitter: 
+        user_submitted: "Matohi Kānawehi - Submission: %{user_name}, %{assignment_name}"
     assignment_submitted_late: 
       email: 
         html: 
           link: "Pāwhiri ki konei kia te tāpaetanga"
+          user_resubmitted_sentence: "%{user_name} kua tika tahuri i roto i te tāpaetanga mutunga mo %{assignment_name} i roto i te akoranga %{course_name}"
+          user_submitted: "Late Taumahi: %{user_name}, %{assignment_name}"
         labels: 
           view_submission: "Ka taea e koe te tiro i te tāpaetanga konei"
+        user_resubmitted_sentence: "%{user_name} kua tika tahuri i roto i te tāpaetanga mutunga mo %{assignment_name} i roto i te akoranga %{course_name}"
+        user_submitted: "Late Taumahi: %{user_name}, %{assignment_name}"
+      sms: 
+        more_info_at: "Ētahi atu info i %{web_address}"
+        user_submitted: "%{user_name} tika tahuri i roto i to ratou ohipa (te mutunga), %{assignment_name}"
+      summary: 
+        turned_in_at: "tahuri i roto i: %{submission_date}"
+        user_submitted: "Late Taumahi: %{user_name}, %{assignment_name}"
+      twitter: 
+        user_submitted: "Matohi Kānawehi - Submission Late: %{user_name}, %{assignment_name}"
     assignment_unmuted: 
       email: 
+        body: |-
+            Kua tukua tō haapii huringa auroro me kōrero hou mō te %{title}. Ēnei whakarerekētanga e wātea inaianei.
+            
+            Ka taea e tō tiro i te reira i konei: 
+            %{url}
         html: 
+          body: "Kua tukua tō haapii huringa auroro me kōrero hou mō te %{title}. Ēnei whakarerekētanga e wātea inaianei."
           link: "Ka taea e koe te tiro i te reira i konei"
+          subject: "Taumahi Unmuted: %{title}, %{course}"
+        subject: "Taumahi Unmuted: %{title}, %{course}"
+      sms: 
+        body: |-
+            He māka tukua me ngā kōrero mō te %{title}, %{course} tou orometua haapii.
+            Ētahi atu info i %{website}
+      summary: 
+        subject: "Māka me ngā tākupu tukua hoki: %{title}, %{course}"
     assignment_unpublished_module: "Teie faaueraa He wāhanga o te kōwae kāore me he kahore e wātea ana ano."
     collaboration_invitation: 
       email: 
+        body: |-
+            Kua karangatia e koe ki te mahi i runga i te tuhinga, %{document} mō
+            %{course_or_group}. I hanga te tuhinga i roto i te %{service}
+            a i karangatia e koe te whakamahi i tō wāhitau īmēra, %{email}
+            
+            Ki te taua te te wāhitau īmēra he mo tenei momo o te mahi tahi, ka hiahia koe ki te
+            te huri i tō tautuhinga kōtaha rēhita ki %{service} ranei.
+            Ka taea e kite koe i te kōrero i konei:
+            %{link}
+        body_with_user: |-
+            Kua karangatia e koe ki te mahi i runga i te tuhinga, %{document} mō
+            %{course_or_group}. I hanga te tuhinga i te %{user}
+            i karangatia e koe i roto i te %{service} me te whakamahi i tō wāhitau īmēra, %{email}.
+            
+            Ki te taua te te wāhitau īmēra he mo tenei momo o te mahi tahi, ka hiahia koe ki te
+            te huri i tō tautuhinga kōtaha rēhita ki %{service} ranei.
+            Ka taea e kite koe i te kōrero i konei:
+            %{link}
         html: 
+          body: "Kua karangatia e koe ki te mahi i runga i te tuhinga, %{document} mō te %{course_or_group}. I hanga te tuhinga i roto i te %{service} a i karangatia e koe te whakamahi i tō wāhitau īmēra, %{email}."
+          body_with_user: "Kua karangatia e koe ki te mahi i runga i te tuhinga, %{document} mō te %{course_or_group}. I roto i te %{service} i hanga te tuhinga i te %{user} a i karangatia e koe te whakamahi i tō wāhitau īmēra, %{email}."
+          change_profile_settings: "Ki te taua te te wāhitau īmēra he mo tenei momo o te mahi tahi, ka hiahia koe ki te huri i tō tautuhinga kōtaha rēhita ki %{service} ranei."
           link: "Ka taea e kite koe i te kōrero i konei"
+          subject: "Fakaafe Tahi: %{course_or_group}"
+        subject: "Fakaafe Tahi: %{course_or_group}"
+      sms: 
+        body: |-
+            I karangatia e koe ki te mahi i runga i te tuhinga, %{document} mō te %{course_or_group}.
+            
+            Ētahi atu info i %{link}
+      summary: 
+        body: |-
+            I karangatia e koe ki te mahi i runga i te tuhinga, %{document} mō te 
+            %{course_or_group}. I hanga te tuhinga i roto i te %{service}
+            a i karangatia e koe te whakamahi i tō wāhitau īmēra, %{email}.
+        body_with_user: |-
+            Kua karangatia e koe ki te mahi i runga i te tuhinga, %{document} mō
+            %{course_or_group}. I hanga te tuhinga i te %{user}
+            i karangatia e koe i roto i te %{service} me te whakamahi i tō wāhitau īmēra, %{email}.
+        subject: "Fakaafe Tahi: %{course_or_group}"
+      twitter: 
+        body: "Matohi Kānawehi - Tahi A ani: %{document}, %{course_or_group}"
     confirm_email_communication_channel: 
       email: 
+        body: "Ko te wāhitau īmēra, kei te rehitatia %{email} i %{website} mo te kaiwhakamahi, %{user}."
         details: "Hei whakaū i tenei rēhita, haere ki te URL e whai ake:"
         html: 
+          body: "Ko te wāhitau īmēra, kei te rehitatia %{email} i %{website} mo te kaiwhakamahi, %{user}."
           details: "Pāwhiri ki konei kia whakapumautia tenei rēhita"
           subject: "Whakaū Īmēra: Kanaweti"
         subject: "Whakaū Īmēra: Kanaweti"
@@ -8388,15 +8608,39 @@ mi:
         html: 
           body: "E mihi ana mō tō rēhita ki te %{product_name}! Ko tā te karere hiko nei he whakaū i te rēhitatanga ō apataki %{user} mō tētahi pae hou i te pae ipurangi %{website}."
           link: "Pāwhiri ki konei kia whakaoti i te tukanga rēhita"
+          subject: "Whakaūngia te rēhitatanga: %{product_name}"
+        subject: "Whakaūngia te rēhitatanga: %{product_name}"
+    confirm_sms_communication_channel: 
+      sms: 
+        body: |-
+            Whakaū rēhitatanga Kānawehi w / waehere:
+            
+            %{confirmation_code}
+            
+            mo %{user} mā te haere ki %{website}.
     content_export_failed: 
       email: 
+        body: |-
+            Tera tetahi raruraru kaweake te akoranga "%{course}".
+            Tēnā whakamōhio ki tō kaiwhakahaere pūnaha, ka hoatu ki a ratou i te pūtāutu kaweake e whai ake: %{id}.
         html: 
+          body2: "Tera tetahi raruraru kaweake te akoranga *%{course}*. Tēnā whakamōhio ki tō kaiwhakahaere pūnaha, ka hoatu ki a ratou i te pūtāutu kaweake e whai ake nei:"
           link: "Pāwhiritia ki tiro tāwāhi"
+          subject: "Kaweake akoranga rahua: %{course}"
+        subject: "Kaweake akoranga rahua: %{course}"
     content_export_finished: 
       email: 
+        body: "Tou kaweake ihirangi mō \"%{course}\" oti kua."
         html: 
+          body2: "Tou kaweake akoranga mō *%{course}* kua oti."
           link: "Pāwhiritia ki tiro tāwāhi"
+          subject: "Kaweake akoranga Kua oti: %{course}"
+        subject: "Kaweake akoranga Kua oti: %{course}"
     content_locked: "Kei te kiia tēnei wā tēnei pātaitai."
+    content_locked_at: "Maukati tēnei ihirangi I %{at}."
+    content_locked_module: "He wāhanga o te kōwae *%{module}* tēnei ihirangi a kua kahore kua whakawātea ano."
+    content_locked_until: "Maukati tēnei ihirangi te noa %{date}."
+    content_module_time_locked: "He wāhanga o te kōwae *%{module}*, kiia nei te tae noa ki %{time} tēnei ihirangi."
     content_unpublished_module: "He wāhanga o te kōwae kāore tenei ihirangi, me he kahore e wātea ana ano."
     conversation_created: 
       email: 
@@ -8407,15 +8651,23 @@ mi:
           audio_comment: "Tēnei karere ngā kōrero pāpāho. Ki te whakarongo whakautu ranei, pāwhiritia te hono i raro nei:"
           download: download
           reply_to_conversation_message: "Ka taea e koe te whakautu ki tēnei karere i roto i te Kanaweti i te whakautu hāngai ki tenei īmēra."
+          subject: "%{user_name}, tonoa tika koe i te karere i roto i te Kanaweti."
           unknown_user: "Apataki tauhou"
           view_message: "Tirohia tēnei karere i roto i te kōrero"
         reply_to_conversation_message: "Ka taea e koe te whakautu ki tēnei karere i roto i te Kanaweti i te whakautu hāngai ki tenei īmēra."
+        subject: "%{user_name}, tonoa tika koe i te karere i roto i te Kanaweti."
         unknown_user: "Apataki tauhou"
         view_message: "Tirohia tēnei karere i roto i te kōrero"
       sms: 
+        body: "%{user_name}, tonoa noa koe i te karere i roto i te Kanaweti:"
+        more_info: "Ētahi atu info i %{url}"
         unknown_user: "Apataki tauhou"
       summary: 
+        body: "%{user_name}, tonoa noa koe i te karere i roto i te Kanaweti:"
+        subject: "%{user_name}, tonoa tika koe i te karere i roto i te Kanaweti."
         unknown_user: "Apataki tauhou"
+      twitter: 
+        tweet: "Matohi Kānawehi - Karere i %{user_name}."
     conversation_message: 
       email: 
         attached_files: "Ngā Kōnae i tāpirihia:"
@@ -8425,15 +8677,23 @@ mi:
           audio_comment: "Tēnei karere ngā kōrero pāpāho. Ki te whakarongo whakautu ranei, pāwhiritia te hono i raro nei:"
           download: download
           reply_to_conversation_message: "Ka taea e koe te whakautu ki tēnei karere i roto i te Kanaweti i te whakautu hāngai ki tenei īmēra."
+          subject: "%{user_name} tika tonoa koe he karere i roto i te Kanaweti."
           unknown_user: "Apataki tauhou"
           view_message: "Tirohia tēnei karere i roto i te kōrero"
         reply_to_conversation_message: "Ka taea e koe te whakautu ki tēnei karere i roto i te Kanaweti i te whakautu hāngai ki tenei īmēra."
+        subject: "%{user_name} tika tonoa koe he karere i roto i te Kanaweti."
         unknown_user: "Apataki tauhou"
         view_message: "Tirohia tēnei karere i roto i te kōrero"
       sms: 
+        body: "%{user_name} tika tonoa koe he karere i roto i te Kanaweti:"
+        more_info: "Ētahi atu info i %{url}"
         unknown_user: "Apataki tauhou"
       summary: 
+        body: "%{user_name} tika tonoa koe he karere i roto i te Kanaweti:"
+        subject: "%{user_name} tika tonoa koe he karere i roto i te Kanaweti."
         unknown_user: "Apataki tauhou"
+      twitter: 
+        tweet: "Matohi Kānawehi - Karere i %{user_name}."
     course_already_started: 
       email: 
         body: |-
@@ -8490,6 +8750,8 @@ mi:
         course_starts_next_week: "Tīmata tō akoranga wiki i muri mai"
     dialog: 
       title: "Tukua he karere whakautu"
+    email: 
+      footer: "Ua farii outou i tenei īmēra no te mea kei te whai wāhi koe i roto i te kotahi, neke atu rānei ngā karaehe te whakamahi i Kanaweti. Hei huri tahuri atu whakamōhiotanga īmēra ranei, haere ki: %{url}"
     enrollment_accepted: 
       email: 
         body_designer: "% {kaiwhakamahi} tika farii ratou fakaafe ki te whai wāhi i roto i te akoranga,% {akoranga}, ano he kaihoahoa."
@@ -8505,18 +8767,22 @@ mi:
           body_ta: "% {kaiwhakamahi} tika farii ratou fakaafe ki te whai wāhi i roto i te akoranga,% {akoranga}, ano he TA."
           body_teacher: "% {kaiwhakamahi} tika farii ratou fakaafe ki te whai wāhi i roto i te akoranga,% {akoranga}, ano he kaiako."
           details: "Tirohia te te rārangi o ngā whakaurunga o nāianei"
+          subject: "%{user} farii te Fakaafe Akoranga"
+        subject: "%{user} farii te Fakaafe Akoranga"
       sms: 
         body_designer: "% {kaiwhakamahi} farii te aniraa kaihoahoa mo te akoranga,% {akoranga}"
         body_observer: "% {kaiwhakamahi} farii te aniraa kaimātakitaki mo te akoranga,% {akoranga}"
         body_student: "% {kaiwhakamahi} farii te aniraa ākonga mo te akoranga,% {akoranga}"
         body_ta: "% {kaiwhakamahi} farii i te aniraa TA mo te akoranga,% {akoranga}"
         body_teacher: "% {kaiwhakamahi} farii te aniraa kaiako mo te akoranga,% {akoranga}"
+        details: "Ētahi atu info i %{url}"
       summary: 
         body_designer: "% {kaiwhakamahi} tika farii ratou fakaafe ki te whai wāhi i roto i te akoranga,% {akoranga}, ano he kaihoahoa."
         body_observer: "% {kaiwhakamahi} tika farii ratou fakaafe ki te whai wāhi i roto i te akoranga,% {akoranga}, hei kaimātakitaki."
         body_student: "% {kaiwhakamahi} tika farii ratou fakaafe ki te whai wāhi i roto i te akoranga,% {akoranga}, ano he ākonga."
         body_ta: "% {kaiwhakamahi} tika farii ratou fakaafe ki te whai wāhi i roto i te akoranga,% {akoranga}, ano he TA."
         body_teacher: "% {kaiwhakamahi} tika farii ratou fakaafe ki te whai wāhi i roto i te akoranga,% {akoranga}, ano he kaiako."
+        subject: "%{user} farii te Fakaafe Akoranga"
       twitter: 
         body: "Matohi Kānawehi - Whakaae:% {kaiwhakamahi}, {% enrollment_type}, akoranga,% {akoranga}"
     enrollment_invitation: 
@@ -8551,6 +8817,7 @@ mi:
         body_student: "Kua karangatia e koe ki te akoranga, ano he ākonga."
         body_ta: "Kua karangatia e koe ki te akoranga, ano he TA."
         body_teacher: "Kua karangatia e koe ki te akoranga, ano he kaiako."
+        details: "Ētahi atu info i %{url}"
         labels: 
           email: "Karere hiko"
           name: Ingoa
@@ -8590,6 +8857,7 @@ mi:
           name: Ingoa
           username: "Ingoa rēhita"
         none: kore
+        register: "Tirohia %{link} ki te whakaoti i rēhitatanga"
         subject: "akoranga whakauru"
       sms: 
         body_designer: "Kua koe kua whakauru i roto i te akoranga me te mea he kaihoahoa."
@@ -8597,6 +8865,7 @@ mi:
         body_student: "Kua koe kua whakauru i roto i te akoranga me te mea he ākonga."
         body_ta: "Kua koe kua whakauru i roto i te akoranga me te mea he TA"
         body_teacher: "Kua koe kua whakauru i roto i te akoranga me te mea he kaiako."
+        details: "Ētahi atu info i %{url}"
         labels: 
           email: "Karere hiko"
           name: Ingoa
@@ -8643,6 +8912,7 @@ mi:
         body_student: "Kua karangatia e koe ki te akoranga, ano he ākonga."
         body_ta: "Kua karangatia e koe ki te akoranga, ano he TA."
         body_teacher: "Kua karangatia e koe ki te akoranga, ano he kaiako."
+        details: "Ētahi atu info i %{url}"
         labels: 
           email: "Karere hiko"
           name: Ingoa
@@ -8659,24 +8929,42 @@ mi:
         body: "Matohi Kānawehi - I Tonoa: akoranga rite% {enrollment_type}"
     event_date_changed: 
       email: 
+        email_body: "Ko te hui, %{event_title}, mo te akoranga, %{course_name}, kua puta ke nga wa. Te reira i teie nei:"
+        from_to_time: "i %{start_date_time} ki te %{end_date_time}"
         html: 
+          email_body: "Ko te hui, %{event_title}, mo te akoranga, %{course_name}, kua puta ke nga wa. Te reira i teie nei:"
+          from_to_time: "i %{start_date_time} ki te %{end_date_time}"
           no_time_set: "Kāore he Tautuhi Wā"
           see_details: "Ka taea e kite koe i ngā kōrero i konei"
+          subject: "Takahanga Rā Kua Hurihia: %{event_title}, %{course_name}"
         labels: 
           see_details: "Ka taea e kite koe i ngā kōrero i konei"
         no_time_set: "Kāore he Tautuhi Wā"
+        subject: "Takahanga Rā Kua Hurihia: %{event_title}, %{course_name}"
       sms: 
+        from_to_time: "i %{start_date_time} ki te %{end_date_time}"
+        more_info: "Ētahi atu info i %{web_link}"
         no_time_set: "Kāore he Tautuhi Wā"
         subject: "%{event_title}, %{course_name} ke ki:"
       summary: 
+        from_to_time: "i %{start_date_time} ki te %{end_date_time}"
         no_time_set: "Kāore he Tautuhi Wā"
+        subject: "Takahanga Rā Kua Hurihia: %{event_title}, %{course_name}"
       twitter: 
+        email_body: "Ko te hui, %{event_title}, mo te akoranga, %{course_name}, kua puta ke nga wa. Te reira i teie nei: %{new_time}"
+        from_to_time: "i %{start_date_time} ki te %{end_date_time}"
         no_time_set: "Kāore he Tautuhi Wā"
     file_locked: "Kei te maukati tēnei kōnae i tēnei wā."
+    file_locked_at: "Maukatia tēnei kōnae i %{at}."
+    file_locked_module: "He wāhanga o te kōwae *%{module}* tēnei kōnae a kua kahore kua whakawātea ano."
+    file_locked_until: "Kua maukatia tēnei kōnae tae noa %{date}."
+    file_module_time_locked: "He wāhanga o te kōwae *%{module}*, kiia nei te tae noa ki %{time} tēnei kōnae."
     file_unpublished_module: "He wāhanga o te kōwae kāore tēnei kōnae, ka kore e wātea ano."
     forgot_password: 
       email: 
+        associated_login: "E hāngai ana tēnei wāhitau i te te takiuru, \"%{login_identifier}\"."
         html: 
+          associated_login: "E hāngai ana tēnei wāhitau i te te takiuru, \"%{login_identifier}\"."
           click_to_reset: "Pāwhiri ki konei kia whakaturia he kupuhipa hōu"
           labels: 
             associated_with_accounts: "Kua hono tēnei nohoanga ki ngā pae e rārangi ake nei"
@@ -8697,8 +8985,10 @@ mi:
         subject: "I wareware te kupuhipa: Kanaweti"
     grade_weight_changed: 
       email: 
+        grade_changed: "Ke te kaupapa here māka mo te akoranga, %{course_name} kua."
         grading_based_on_points: "Hāngai māka kei runga i te katoa ngā mō ngā taumahi katoa."
         html: 
+          grade_changed: "Ke te kaupapa i konei Maka mo te akoranga, %{course_name} is."
           grading_based_on_points: "Ke te kaupapa i konei Maka mo te akoranga,% {course_name} is."
           labels: 
             grades_based_on_percent: "Hāngai māka kei i runga i te katoa tautaha mō ia rōpū taumahi"
@@ -8708,47 +8998,90 @@ mi:
           grades_based_on_percent: "Hāngai māka kei i runga i te katoa tautaha mō ia rōpū taumahi"
           now_see_here: "Ka taea e kite koe i ngā kōrero i konei"
           subject: "Grade Taumaha Kua Hurihia"
+      sms: 
+        grade_changed: "Ke te kaupapa here māka mo te akoranga, %{course_name} kua."
+        more_info_at: "Ētahi atu info i %{course_url}"
       summary: 
+        grade_changed: "Ke te kaupapa i konei Maka mo te akoranga, %{course_name} is."
         grading_based_on_points: "Hāngai māka kei runga i te katoa ngā mō ngā taumahi katoa."
         labels: 
           grades_based_on_percent: "Hāngai māka kei i runga i te katoa tautaha mō ia rōpū taumahi"
           subject: "Grade Taumaha Kua Hurihia"
+      twitter: 
+        grade_changed: "Matohi Kānawehi - Kaupapahere māka huri te: %{course_name}"
     group_assignment_submitted_late: 
       email: 
+        body: "Kua tika tahuri te rōpū %{group_name} i roto i te tāpaetanga mutunga mo %{assignment_name} i roto i te akoranga %{course_name}."
         html: 
+          body: "Kua tika tahuri te rōpū %{group_name} i roto i te tāpaetanga  mutunga mo %{assignment_name} i roto i te akoranga %{course_name}."
+          subject: "te mutunga o Taumahi: %{group_name},  %{assignment_name}"
           view_submission_here: "Ka taea e koe te tiro i te tāpaetanga konei"
         labels: 
           view_submission_here: "Ka taea e koe te tiro i te tāpaetanga konei"
+        subject: "te mutunga o Taumahi: %{group_name},  %{assignment_name}"
+      sms: 
+        more_info: "Ētahi atu info i %{web_address}"
+        subject: "%{group_name} tika tahuri i roto i to ratou ohipa (te mutunga), %{assignment_name}"
+      summary: 
+        body: "Ka tahuri te rōpū %{group_name} i roto i te tāpaetanga mutunga mo %{assignment_name} i roto i te akoranga %{course_name}."
+        subject: "te mutunga o Taumahi: %{group_name}, %{assignment_name}"
+      twitter: 
+        subject: "Matohi Kānawehi - Tāpaetanga mutunga Rōpū: %{group_name}, %{assignment_name}"
     group_membership_accepted: 
       email: 
         account_group: "Kua whakaāetia tō hiahia ki te uru ki te rōpū %{group_name} i raro i te pae %{account_name}."
+        course_group: "Kua oti tō tono ki te uru atu te rōpū %{group_name} mo te akoranga %{course_name} kua manakohia."
+        group_request_accepted: "Tono Rōpū Whakaae: %{group_name}"
         html: 
           account_group: "Kua whakaāetia tō hiahia ki te uru ki te rōpū %{group_name} i raro i te pae %{account_name}."
+          course_group: "Kua oti tō tono ki te uru atu te rōpū %{group_name} mo te akoranga %{course_name} kua manakohia."
+          group_request_accepted: "Tono Rōpū Whakaae: %{group_name}"
           link: "Pāwhiritia ki tirohia i roto i te rōpū"
+          subject: "Rōpū Mema Whakaaetia te: %{group_name}"
         labels: 
           click_below: "Ka taea e te tirotiro e koe i roto i te rōpū mā te pāwhiri i te hono i raro"
+        subject: "Rōpū Member Accept te: %{group_name}"
       sms: 
         account_group: "Kua whakaāetia tō hiahia ki te uru ki te rōpū %{group_name} i raro i te pae %{account_name}."
+        course_group: "Kua oti tō tono ki te uru atu te rōpū %{group_name} mo te akoranga %{course_name} kua manakohia."
+        more_info: "Ētahi atu info i %{web_address}"
       summary: 
         account_group: "Kua whakaāetia tō hiahia ki te uru ki te rōpū %{group_name} i raro i te pae %{account_name}."
+        course_group: "Kua oti tō tono ki te uru atu te rōpū %{group_name} mo te akoranga %{course_name} kua manakohia."
+        subject: "Rōpū Mema Whakaaetia te: %{group_name}"
       twitter: 
         account_group: "Whakamataara Canvas - Kua whakaāetia te hononga ki te rōpū: %{group_name} mō te pae %{account_name}."
+        course_group: "Matohi Kānawehi - Melo Rōpū Whakaae: %{group_name} mo te akoranga %{course_name}."
     group_membership_rejected: 
       email: 
         account_group: "Kīhai i whakaāetia tō hiahia ki te uru ki te rōpū %{group_name} i raro i te pae %{account_name}."
+        course_group: "Kua oti tō tono ki te uru atu te rōpū %{group_name} mo te akoranga %{course_name} kua paopao."
+        group_request_rejected: "Tono Rōpū paopaongia: %{group_name}"
         html: 
           account_group: "Kīhai i whakaāetia tō hiahia ki te uru ki te rōpū %{group_name} i raro i te pae %{account_name}."
+          course_group: "Kua oti tō tono ki te uru atu te rōpū %{group_name} mo te akoranga %{course_name} kua paopao."
+          group_request_rejected: "Tono Rōpū paopaongia: %{group_name}"
           link: "Pāwhiritia ki tiro atu rōpū"
+          subject: "Melo Rōpū paopaongia: %{group_name}"
         labels: 
           click_below: "Ka taea e te tirotiro e koe i roto i te tahi atu rōpū mā te pāwhiri i te hono i raro"
+        subject: "Melo Rōpū paopaongia: %{group_name}"
       sms: 
         account_group: "Kīhai i whakaāetia tō hiahia ki te uru ki te rōpū %{group_name} i raro i te pae %{account_name}."
+        course_group: "Kua oti tō tono ki te uru atu te rōpū %{group_name} mo te akoranga %{course_name} kua paopao."
+        more_info: "Ētahi atu info i %{web_address}"
       summary: 
         account_group: "Kīhai i whakaāetia tō hiahia ki te uru ki te rōpū %{group_name} i raro i te pae %{account_name}."
+        course_group: "Kua oti tō tono ki te uru atu te rōpū %{group_name} mo te akoranga %{course_name} kua paopao."
+        subject: "Melo Rōpū paopaongia mō te %{group_name}"
       twitter: 
         account_group: "Whakamataara Canvas - Kīhai i whakaāetia te hononga ki te rōpū: %{group_name} mo te pae %{account_name}."
+        course_group: "Kānawehi Matohi - Mema Rōpū paopaongia: %{group_name} mo te akoranga %{course_name}."
     html_message: 
       html_not_exist: "Kihai i hanga te putanga HTML o tēnei karere e kore tonoa"
+    index: 
+      titles: 
+        messages: "Karere mō te %{name}"
     layout: 
       email: 
         html: 
@@ -8790,6 +9123,7 @@ mi:
         subject: "Apataki pae hou"
       sms: 
         body: "Kua āpitihia a %{user} hei kaiwhakahaere hou mō te pae %{account}"
+        details: "Ētahi atu info i %{website}"
       summary: 
         body: "Kua āpitihia a %{user} hei kaiwhakahaere hou mō te pae %{account}"
         subject: "Apataki pae hou"
@@ -8802,33 +9136,52 @@ mi:
           link: "Tirohia fanongonongo"
         labels: 
           file_included: "Kei kōnae"
+      sms: 
+        details: "Ētahi atu info i %{url}"
+        subject: "Fanongonongo New: %{title}, %{course}"
+      twitter: 
+        body: "Matohi Kānawehi - pāohotia: %{title}, %{course}."
     new_context_group_membership: 
       email: 
         body_account: "Kua āpitihia koe ki tetahi rōpū hou i raro i te pae %{account}. Ko %{group_name} te ingoa o te rōpū."
+        body_course: "Kua koe kua tāpirihia ki te rōpū hou mo te akoranga  %{course}. Ko te ingoa o te rōpū ko te %{group_name}."
         details_account: "Ka tāea te kite i ngā rōpū whai hononga ki a koe i raro i tēnei pae mā te tohu i te nohoanga i raro iho nei:"
         html: 
           body_account: "Kua āpitihia koe ki tetahi rōpū hou i raro i te pae %{account}. Ko %{group_name} te ingoa o te rōpū."
+          body_course: "Kua koe kua tāpirihia ki te rōpū hou mo te akoranga %{course}. Ko te ingoa o te rōpū ko te %{group_name}."
           html_details_course2: "Ka taea e kite koe i nei ngā rōpū kei a koe te wahi o te mo tenei akoranga e * pāwhiri konei *"
           subject: "He āpititanga rōpū hou mō %{course_or_account}"
+          title: "Mematanga o te Rōpū Hōu: %{group_name}"
         subject: "He āpititanga rōpū hou mō %{course_or_account}"
+        title: "Mematanga o te Rōpū Hōu: %{group_name}"
       sms: 
         body_account: "Kua āpitihia koe ki tetahi rōpū hou i raro i te pae %{account}. Ko %{group_name} te ingoa o te rōpū."
+        body_course: "Kua koe kua tāpirihia ki te rōpū hou mo te akoranga %{course}. Ko te ingoa o te rōpū ko te %{group_name}."
+        details: "Ētahi atu info i %{url}"
       summary: 
         body_account: "Kua āpitihia koe ki tetahi rōpū hou i raro i te pae %{account}. Ko %{group_name} te ingoa o te rōpū."
+        body_course: "Kua koe kua tāpirihia ki te rōpū hou mo te akoranga %{course}. Ko te ingoa o te rōpū ko te %{group_name}."
         subject: "He āpititanga rōpū hou mō %{course_or_account}"
       twitter: 
         body_account: "Whakamataara Canvas - Rōpū hou: %{group} mō te pae %{account}"
+        body_course: "Matohi Kānawehi - Rōpū New: %{group} mo te akoranga %{course}"
     new_context_group_membership_invitation: 
       email: 
         body_account: "He tono tēnei kia hono koe ki te rōpū %{group} i raro i te pae %{account}."
+        body_course: "Kua karangatia e koe ki te uru atu te rōpū %{group} mo te akoranga %{course}."
         details: "Ka taea e te tirotiro e koe i roto i te rōpū mā te pāwhiri i te hono i raro:"
         html: 
           body_account: "He tono tēnei kia hono koe ki te rōpū %{group} i raro i te pae %{account}."
+          body_course: "Kua karangatia e koe ki te uru atu te rōpū %{group} mo te akoranga %{course}."
           details: "Ka taea e te tirotiro e koe i roto i te rōpū mā te pāwhiri i konei"
           subject: "He āpititanga rōpū hou mō %{course_or_account}"
+          title: "Mematanga o te Rōpū Hōu: %{group_name}"
         subject: "He āpititanga rōpū hou mō %{course_or_account}"
+        title: "Mematanga o te Rōpū Hōu: %{group_name}"
       sms: 
         body_account: "He tono tēnei kia hono koe ki te rōpū %{group} i raro i te pae %{account}."
+        body_course: "Kua karangatia e koe ki te uru atu te rōpū %{group} mo te akoranga %{course}."
+        details: "Ētahi atu info i %{url}"
       summary: 
         body_account: "He tono tēnei kia hono koe ki te rōpū %{group} i raro i te pae %{account}."
         subject: "He āpititanga rōpū hou mō %{course_or_account}"
