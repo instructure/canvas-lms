@@ -51,7 +51,7 @@ module UserSearch
     exclude_groups = Array(options[:exclude_groups]) if options[:exclude_groups]
 
     users = if context.is_a?(Account)
-              User.of_account(context).active.select("users.id, users.name, users.short_name, users.sortable_name")
+              User.of_account(context).active
             elsif context.is_a?(Course)
               context.users_visible_to(searcher, include_prior_enrollments, enrollment_state: enrollment_states).uniq
             else

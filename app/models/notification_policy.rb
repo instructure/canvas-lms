@@ -77,13 +77,14 @@ class NotificationPolicy < ActiveRecord::Base
       # Using the category name, fetch all Notifications for the category. Will set the desired value on them.
       notifications = Notification.all_cached.select { |n| (n.category && n.category.underscore.gsub(/\s/, '_')) == params[:category] }.map(&:id)
       frequency = params[:frequency]
+      cc = user.communication_channels.find(params[:channel_id])
 
       # Find any existing NotificationPolicies for the category and the channel. If frequency is 'never', delete the
       # entry. If other than that, create or update the entry.
       NotificationPolicy.transaction do
         notifications.each do |notification_id|
           scope = user.notification_policies.
-              where(communication_channel_id: params[:channel_id], notification_id: notification_id)
+              where(communication_channel_id: cc, notification_id: notification_id)
           p = scope.first_or_initialize
           # Set the frequency and save
           p.frequency = frequency
