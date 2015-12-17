@@ -11,6 +11,22 @@ define([
   'compiled/jquery.rails_flash_notifications'
 ], function(React, _, $, I18n, Reflux, GradebookToolbarStore, CustomColumnsActions, Modal, GradebookConstants) {
 
+  const modalOverrides = {
+    overlay : {
+      backgroundColor: 'rgba(0,0,0,0.5)'
+    },  
+    content : {
+      position: 'static',
+      top: '0',
+      left: '0',
+      right: 'auto',
+      bottom: 'auto',
+      borderRadius: '0',
+      border: 'none',
+      padding: '0'
+    }
+  };
+
   var TeacherNote = React.createClass({
     propTypes: {
       note: React.PropTypes.string.isRequired,
@@ -86,6 +102,7 @@ define([
           <Modal
             className='ReactModal__Content--canvas ReactModal__Content--mini-modal'
             overlayClassName='ReactModal__Overlay--canvas'
+            style={modalOverrides}
             isOpen={this.state.showModal}
             onRequestClose={this.hideModal}>
             <div>

@@ -7,6 +7,22 @@ define([
 
   Modal.setAppElement(document.body)
 
+  const modalOverrides = {
+    overlay : {
+      backgroundColor: 'rgba(0,0,0,0.5)'
+    },  
+    content : {
+      position: 'static',
+      top: '0',
+      left: '0',
+      right: 'auto',
+      bottom: 'auto',
+      borderRadius: '0',
+      border: 'none',
+      padding: '0'
+    }
+  };
+
   return React.createClass({
     displayName: 'ThemeEditorModal',
 
@@ -102,6 +118,7 @@ define([
           className={ 
             (this.props.showProgressModal ? 'ReactModal__Content--canvas ReactModal__Content--mini-modal' : 'ReactModal__Content--canvas') 
           }
+          style={modalOverrides}
         >
           {this.modalContent()}
         </Modal>

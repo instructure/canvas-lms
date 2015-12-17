@@ -13,6 +13,22 @@ define([
 
   var RouteHandler = ReactRouter.RouteHandler;
 
+  const modalOverrides = {
+    overlay : {
+      backgroundColor: 'rgba(0,0,0,0.5)'
+    },  
+    content : {
+      position: 'static',
+      top: '0',
+      left: '0',
+      right: 'auto',
+      bottom: 'auto',
+      borderRadius: '0',
+      border: 'none',
+      padding: '0'
+    }
+  };
+
   FilesApp.render = function () {
     var contextType;
     var contextId;
@@ -167,6 +183,7 @@ define([
             closeTimeoutMS='10'
             className='ReactModal__Content--canvas'
             overlayClassName='ReactModal__Overlay--canvas'
+            style={modalOverrides}
           >
             {this.state.modalContents}
           </ReactModal>

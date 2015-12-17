@@ -15,6 +15,22 @@ define([
 
   var { arrayOf } = React.PropTypes;
 
+  const modalOverrides = {
+    overlay : {
+      backgroundColor: 'rgba(0,0,0,0.5)'
+    },  
+    content : {
+      position: 'static',
+      top: '0',
+      left: '0',
+      right: 'auto',
+      bottom: 'auto',
+      borderRadius: '0',
+      border: 'none',
+      padding: '0'
+    }
+  };
+
   var NewUserModal = React.createClass({
     getInitialState() {
       return {
@@ -96,6 +112,7 @@ define([
           className="ReactModal__Content--canvas ReactModal__Content--mini-modal"
           ref="canvasModal"
           isOpen={isOpen}
+          style={modalOverrides}
           title={I18n.t("Add a New User")}
           onRequestClose={this.closeModal}
           onSubmit={this.onSubmit}

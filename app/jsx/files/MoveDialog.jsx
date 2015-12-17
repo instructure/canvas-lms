@@ -8,6 +8,22 @@ define([
   'jsx/files/BBTreeBrowser'
 ], function (I18n, React, MoveDialog, Modal, ModalContent, ModalButtons, BBTreeBrowser) {
 
+  const modalOverrides = {
+    overlay : {
+      backgroundColor: 'rgba(0,0,0,0.5)'
+    },  
+    content : {
+      position: 'static',
+      top: '0',
+      left: '0',
+      right: 'auto',
+      bottom: 'auto',
+      borderRadius: '0',
+      border: 'none',
+      padding: '0'
+    }
+  };
+
   MoveDialog.renderMoveButton = function () {
     if (this.state.isCopyingFile) {
       return (
@@ -39,6 +55,7 @@ define([
       <Modal
         className='ReactModal__Content--canvas ReactModal__Content--mini-modal'
         overlayClassName='ReactModal__Overlay--canvas'
+        style={modalOverrides}
         ref='canvasModal'
         isOpen={this.state.isOpen}
         title={this.getTitle()}

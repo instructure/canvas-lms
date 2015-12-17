@@ -11,6 +11,22 @@ define([
   'compiled/jquery.rails_flash_notifications'
 ], function ($, I18n, React, Modal, ExternalTool, store, ConfigurationForm, Lti2Iframe, Lti2Permissions) {
 
+  const modalOverrides = {
+    overlay : {
+      backgroundColor: 'rgba(0,0,0,0.5)'
+    },  
+    content : {
+      position: 'static',
+      top: '0',
+      left: '0',
+      right: 'auto',
+      bottom: 'auto',
+      borderRadius: '0',
+      border: 'none',
+      padding: '0'
+    }
+  };
+
   return React.createClass({
     displayName: 'AddExternalToolButton',
     throttleCreation: false,
@@ -100,6 +116,7 @@ define([
           <a href="#" role="button" aria-label={I18n.t('Add App')} className="btn btn-primary add_tool_link lm" onClick={this.openModal}>{I18n.t('Add App')}</a>
           <Modal className="ReactModal__Content--canvas"
             overlayClassName="ReactModal__Overlay--canvas"
+            style={modalOverrides}
             isOpen={this.state.modalIsOpen}
             onRequestClose={this.closeModal}>
 

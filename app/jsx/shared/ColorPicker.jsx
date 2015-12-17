@@ -286,7 +286,8 @@ define([
           right: 0,
           bottom: 0,
           overflow: 'visible',
-          padding: 0
+          padding: 0,
+          borderRadius: '0'
         }
       };
 
