@@ -42,9 +42,9 @@
     <div id="undated-events"></div>
   </div>
   <div class="rs-section" id="calendar-feed">
-    <a class="dialog_opener" aria-controls="calendar_feed_box" data-dialog-opts='{"resizable":false, "width": 400}' role="button" href="<%= @feed_url%>.ics">
+    <button class="dialog_opener Button Button--link" aria-controls="calendar_feed_box" data-dialog-opts='{"resizable":false, "width": 400}'>
       <i class="icon-calendar-days"></i> <%= t :calendar_feed, "Calendar Feed" %>
-    </a>
+    </button>
   </div>
 <% end %>
 <div style="display: none" id="calendar_feed_box" title="<%= t('feed_dialog_title', 'Calendar Feed') %>">
