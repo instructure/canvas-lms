@@ -355,8 +355,12 @@ define [
           student
 
         return unless notYetLoaded.length
-        student_ids = notYetLoaded.mapBy('id')
-        fetchAllPages(ENV.GRADEBOOK_OPTIONS.submissions_url, records: @get('submissions'), data: student_ids: student_ids)
+        studentIds = notYetLoaded.mapBy('id')
+
+        while (studentIds.length)
+          chunk = studentIds.splice(0, ENV.GRADEBOOK_OPTIONS.chunk_size || 20)
+          fetchAllPages(ENV.GRADEBOOK_OPTIONS.submissions_url, records: @get('submissions'), data: student_ids: chunk)
+
     ).observes('students.@each', 'selectedGradingPeriod').on('init')
 
     showNotesColumn: (->
