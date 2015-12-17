@@ -1177,7 +1177,7 @@ class DiscussionTopic < ActiveRecord::Base
       if asset.is_a?(DiscussionTopic)
         link = "http://#{HostUrl.context_host(asset.context)}/#{asset.context_url_prefix}/discussion_topics/#{asset.id}"
       elsif asset.is_a?(DiscussionEntry)
-        link = "http://#{HostUrl.context_host(asset.context)}/#{asset.context_url_prefix}/discussion_topics/#{asset.discussion_topic_id}"
+        link = "http://#{HostUrl.context_host(asset.context)}/#{asset.context_url_prefix}/discussion_topics/#{asset.discussion_topic_id}#entry-#{asset.id}"
       end
 
       item.link = link
