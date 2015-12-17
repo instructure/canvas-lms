@@ -85,20 +85,18 @@ An error occurred in an `after(:context)` hook.
 end
 end
 
-unless CANVAS_RAILS3
-  Time.class_eval do
-    def compare_with_round(other)
-      other = Time.at(other.to_i, other.usec) if other.respond_to?(:usec)
-      Time.at(self.to_i, self.usec).compare_without_round(other)
-    end
-    alias_method :compare_without_round, :<=>
-    alias_method :<=>, :compare_with_round
+Time.class_eval do
+  def compare_with_round(other)
+    other = Time.at(other.to_i, other.usec) if other.respond_to?(:usec)
+    Time.at(self.to_i, self.usec).compare_without_round(other)
   end
-
-  # temporary patch to keep things sane
-  # TODO: actually fix the deprecation messages once we're on Rails 4 permanently and remove this
-  ActiveSupport::Deprecation.silenced = true
+  alias_method :compare_without_round, :<=>
+  alias_method :<=>, :compare_with_round
 end
+
+# temporary patch to keep things sane
+# TODO: actually fix the deprecation messages once we're on Rails 4 permanently and remove this
+ActiveSupport::Deprecation.silenced = true
 
 module RSpec::Rails
   module ViewExampleGroup
@@ -372,14 +370,6 @@ module Helpers
     m.root_account_id = opts[:account_id] || Account.default.id
     m.save!
     m
-  end
-end
-
-if CANVAS_RAILS3
-  ActionController::TestSession.class_eval do
-    def destroy
-      clear
-    end
   end
 end
 
@@ -836,7 +826,7 @@ RSpec.configure do |config|
   end
 
   def content_type_key
-    CANVAS_RAILS3 ? 'content-type' : 'Content-Type'
+    'Content-Type'
   end
 
   def force_string_encoding(str, encoding = "UTF-8")

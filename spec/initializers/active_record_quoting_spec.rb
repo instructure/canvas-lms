@@ -12,7 +12,7 @@ module ActiveRecord
           end
 
           def column(type)
-            CANVAS_RAILS3 ? PostgreSQLColumn.new(nil, 1, type) : PostgreSQLColumn.new(nil, 1, 1, type)
+            PostgreSQLColumn.new(nil, 1, 1, type)
           end
 
           describe "Infinity and NaN" do

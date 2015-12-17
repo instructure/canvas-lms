@@ -230,11 +230,7 @@ end
 namespace :db do
   desc "Shows pending db migrations."
   task :pending_migrations => :environment do
-    migrations = if CANVAS_RAILS3
-                   ActiveRecord::Migrator.migrations_paths
-                 else
-                   ActiveRecord::Migrator.migrations(ActiveRecord::Migrator.migrations_paths)
-                 end
+    migrations = ActiveRecord::Migrator.migrations(ActiveRecord::Migrator.migrations_paths)
     pending_migrations = ActiveRecord::Migrator.new(:up, migrations).pending_migrations
     pending_migrations.each do |pending_migration|
       tags = pending_migration.tags
@@ -246,11 +242,7 @@ namespace :db do
   namespace :migrate do
     desc "Run all pending predeploy migrations"
     task :predeploy => [:environment, :load_config] do
-      migrations = if CANVAS_RAILS3
-                     ActiveRecord::Migrator.migrations_paths
-                   else
-                     ActiveRecord::Migrator.migrations(ActiveRecord::Migrator.migrations_paths)
-                   end
+      migrations = ActiveRecord::Migrator.migrations(ActiveRecord::Migrator.migrations_paths)
       ActiveRecord::Migrator.new(:up, migrations).migrate(:predeploy)
     end
   end

@@ -260,7 +260,7 @@ class PageView < ActiveRecord::Base
   end
 
   class_eval <<-RUBY, __FILE__, __LINE__ + 1
-    def #{CANVAS_RAILS3 ? :create : :_create_record}(*args)
+    def _create_record(*args)
       return super unless PageView.cassandra?
       self.created_at ||= Time.zone.now
       user.shard.activate do
@@ -272,7 +272,7 @@ class PageView < ActiveRecord::Base
       end
     end
 
-    def #{CANVAS_RAILS3 ? :update : :_update_record}(*args)
+    def _update_record(*args)
       return super unless PageView.cassandra?
       user.shard.activate do
         run_callbacks(:update) do

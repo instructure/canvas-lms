@@ -69,13 +69,7 @@ module SearchHelper
 
       add_groups = lambda do |groups, group_context = nil|
         ActiveRecord::Associations::Preloader.new(groups, :group_category).run
-        preload_scope = if CANVAS_RAILS3
-          {conditions: { group_memberships: { user_id: @current_user }}}
-        else
-          # Rails 4 uses a scope, not a hash
-          GroupMembership.where(user_id: @current_user)
-        end
-        ActiveRecord::Associations::Preloader.new(groups, :group_memberships, preload_scope).run
+        ActiveRecord::Associations::Preloader.new(groups, :group_memberships, GroupMembership.where(user_id: @current_user)).run
         groups.each do |group|
           group.can_participate = true
           contexts[:groups][group.id] = {

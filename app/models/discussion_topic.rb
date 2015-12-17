@@ -661,11 +661,7 @@ class DiscussionTopic < ActiveRecord::Base
       else
         student_ids = opts[:student_ids] || self.context.all_real_student_enrollments.select(:user_id)
         if self.for_group_discussion?
-          if CANVAS_RAILS3
-            !DiscussionEntry.active.where(user_id: student_ids, discussion_topic_id: child_topics).exists?
-          else
           !DiscussionEntry.active.joins(:discussion_topic).merge(child_topics).where(user_id: student_ids).exists?
-          end
         else
           !self.discussion_entries.active.where(:user_id => student_ids).exists?
         end

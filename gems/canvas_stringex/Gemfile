@@ -7,9 +7,3 @@ gem 'simplecov-rcov', '0.2.3', :require => false
 platforms :ruby_20, :ruby_21, :ruby_22 do
   gem 'syck', '1.0.4'
 end
-
-require File.expand_path("../../../config/canvas_rails4", __FILE__)
-
-if CANVAS_RAILS3
-  gem 'rails', '~> 3.2.0'
-end

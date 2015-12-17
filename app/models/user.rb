@@ -1704,7 +1704,7 @@ class User < ActiveRecord::Base
             c = e.course
             c.primary_enrollment_type = e.type
             c.primary_enrollment_role_id = e.role_id
-            c.primary_enrollment_rank = CANVAS_RAILS3 ? e.rank_sortable.to_s : e.rank_sortable
+            c.primary_enrollment_rank = e.rank_sortable
             c.primary_enrollment_state = e.workflow_state
             c.invitation = e.uuid
             c

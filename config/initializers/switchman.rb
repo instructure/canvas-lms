@@ -44,7 +44,7 @@ Rails.application.config.to_prepare do
         return {} unless self.class.columns_hash.key?('settings')
         s = super
         unless s.is_a?(Hash) || s.nil?
-          s = CANVAS_RAILS3 ? s.unserialize : s.unserialize(s.value)
+          s = s.unserialize(s.value)
         end
         if s.nil?
           self.settings = s = {}

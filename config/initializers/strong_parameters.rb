@@ -17,12 +17,6 @@ ActionController::Base.class_eval do
   end
 end
 
-if CANVAS_RAILS3
-  module ActiveModel
-    ForbiddenAttributesError = ForbiddenAttributes
-  end
-end
-
 # completely ignore attr_accessible if it's a strong parameters
 module ForbiddenAttributesProtectionWithoutAttrAccessible
   module ClassMethods

@@ -17,11 +17,7 @@ callback_chain.insert(0, cb) if cb
 # otherwise we'll use the "remember me" cookie every request, which triggers
 # generating a new "remember me" cookie since they're one-time use.
 cb = callback_chain.delete(callback_chain.find { |cb| cb.filter == :persist_by_cookie })
-if CANVAS_RAILS3
-  callback_chain.push(cb) if cb
-else
-  callback_chain.append(cb) if cb
-end
+callback_chain.append(cb) if cb
 
 # be tolerant of using a slave
 Authlogic::Session::Callbacks.module_eval do

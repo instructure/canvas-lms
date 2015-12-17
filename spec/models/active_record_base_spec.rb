@@ -107,7 +107,6 @@ describe ActiveRecord::Base do
     end
 
     it "should multi-column pluck" do
-      skip "Rails 4 specific" if CANVAS_RAILS3
       scope = Course.where(id: [@c1, @c2])
       cs = []
       scope.find_in_batches_with_temp_table(batch_size: 1, pluck: [:id, :name]) do |batch|

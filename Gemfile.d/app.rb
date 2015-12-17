@@ -1,17 +1,21 @@
-if CANVAS_RAILS3
-  gem 'rails', '3.2.22'
-  gem 'rack', '1.4.5'
-  gem 'builder', '3.0.0'
-  gem 'routing_concerns', '0.1.0'
-  gem 'strong_parameters', '0.2.3'
-else
+if CANVAS_RAILS4_0
   gem 'rails', '4.0.13'
   gem 'rack', '1.5.4'
   gem 'builder', '3.1.4'
   gem 'protected_attributes', '1.0.8'
   gem 'rails-observers', '0.1.2'
+  gem 'tzinfo', '0.3.43'
+else
+  gem 'rails', '4.2.5'
+  gem 'rack', '1.6.4'
+  gem 'builder', '3.1.4'
+  gem 'protected_attributes', '1.0.8'
+  gem 'rails-observers', '0.1.2'
+  gem 'tzinfo', '1.2.2'
+  gem 'oj_mimic_json'
+  gem 'activesupport-json_encoder', '1.1.0'
 end
-gem 'tzinfo', '0.3.43'
+
 gem 'encrypted_cookie_store-instructure', '1.1.11', require: 'encrypted_cookie_store'
 gem 'active_model_serializers',   '0.9.0alpha1',
   github: 'rails-api/active_model_serializers', ref: '61882e1e4127facfe92e49057aec71edbe981829'
