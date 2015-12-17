@@ -664,9 +664,7 @@ class GradebooksController < ApplicationController
   private
 
   def moderated_grading_enabled_and_no_grades_published
-    @context.feature_enabled?(:moderated_grading) &&
-      @assignment.moderated_grading? &&
-      !@assignment.grades_published?
+    @assignment.moderated_grading? && !@assignment.grades_published?
   end
 
   def exclude_total?(context)

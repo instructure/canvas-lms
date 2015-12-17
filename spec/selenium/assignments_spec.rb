@@ -49,8 +49,6 @@ describe "assignments" do
       context "moderated grading assignments" do
 
         before do
-          @course.root_account.allow_feature! :moderated_grading
-          @course.enable_feature! :moderated_grading
           @assignment = @course.assignments.create({name: "Test Moderated Assignment"})
           @assignment.update_attribute(:moderated_grading, true)
           @assignment.unpublish
@@ -657,8 +655,6 @@ describe "assignments" do
       course_with_teacher_logged_in
       @course.start_at = nil
       @course.save!
-      @course.root_account.allow_feature! :moderated_grading
-      @course.enable_feature! :moderated_grading
       @assignment = @course.assignments.create({name: "Test Moderated Assignment"})
       @assignment.update_attribute(:moderated_grading, true)
       @assignment.publish

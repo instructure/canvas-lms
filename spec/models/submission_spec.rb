@@ -1269,8 +1269,6 @@ describe Submission do
 
     context "moderated" do
       before(:once) do
-        @course.root_account.allow_feature! :moderated_grading
-        @course.enable_feature! :moderated_grading
         @assignment.moderated_grading = true
         @assignment.save!
         @submission.reload

@@ -3307,8 +3307,6 @@ describe 'Submissions API', type: :request do
       ta_in_course :active_all => true
       @student1 = student_in_course(:active_all => true).user
       @student2 = student_in_course(:active_all => true).user
-      @course.root_account.allow_feature! :moderated_grading
-      @course.enable_feature! :moderated_grading
       @assignment = @course.assignments.build
       @assignment.moderated_grading = true
       @assignment.save!

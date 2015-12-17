@@ -153,7 +153,6 @@ class AssignmentsController < ApplicationController
   end
 
   def show_moderate
-    raise ActiveRecord::RecordNotFound unless @context.feature_enabled?(:moderated_grading)
     @assignment ||= @context.assignments.find(params[:assignment_id])
 
     raise ActiveRecord::RecordNotFound unless @assignment.moderated_grading? && @assignment.published?
@@ -413,7 +412,6 @@ class AssignmentsController < ApplicationController
         :GROUP_CATEGORIES => group_categories,
         :KALTURA_ENABLED => !!feature_enabled?(:kaltura),
         :POST_TO_SIS => post_to_sis,
-        :MODERATED_GRADING => @context.feature_enabled?(:moderated_grading),
         :HAS_GRADED_SUBMISSIONS => @assignment.graded_submissions_exist?,
         :SECTION_LIST => (@context.course_sections.active.map { |section|
           {

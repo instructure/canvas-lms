@@ -152,7 +152,7 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly, RCEKeyboardSho
         @checkboxAccessibleAdvisory(box).text('')
 
     handleModeratedGradingChange: =>
-      if ENV?.MODERATED_GRADING && !ENV?.HAS_GRADED_SUBMISSIONS
+      if !ENV?.HAS_GRADED_SUBMISSIONS
         if @$moderatedGradingBox.prop('checked')
           @disableCheckbox(@$peerReviewsBox, I18n.t("Peer reviews cannot be enabled for moderated assignments"))
           @disableCheckbox(@$groupCategoryBox, I18n.t("Group assignments cannot be enabled for moderated assignments"))
@@ -240,7 +240,7 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly, RCEKeyboardSho
       $ @_initializeWikiSidebar
       @addTinyMCEKeyboardShortcuts()
       @handleModeratedGradingChange()
-      if ENV?.MODERATED_GRADING && ENV?.HAS_GRADED_SUBMISSIONS
+      if ENV?.HAS_GRADED_SUBMISSIONS
         @disableCheckbox(@$moderatedGradingBox, I18n.t("Moderated grading setting cannot be changed if graded submissions exist"))
       this
 
@@ -249,7 +249,6 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly, RCEKeyboardSho
       _.extend data,
         kalturaEnabled: ENV?.KALTURA_ENABLED or false
         postToSISEnabled: ENV?.POST_TO_SIS or false
-        moderatedGradingEnabled: ENV?.MODERATED_GRADING or false
         isLargeRoster: ENV?.IS_LARGE_ROSTER or false
         submissionTypesFrozen: _.include(data.frozenAttributes, 'submission_types')
         differentiatedAssignmentsEnabled: @assignment.differentiatedAssignmentsEnabled()

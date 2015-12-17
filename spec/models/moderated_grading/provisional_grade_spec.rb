@@ -8,8 +8,8 @@ describe ModeratedGrading::ProvisionalGrade do
   end
   let(:submission) { assignment.submissions.create!(user: student) }
   let(:assignment) { course.assignments.create! submission_types: 'online_text_entry' }
-  let(:account) { a = account_model; a.allow_feature!(:moderated_grading); a}
-  let(:course) { c = account.courses.create!; c.enable_feature!(:moderated_grading); c  }
+  let(:account) { a = account_model; a}
+  let(:course) { c = account.courses.create!; c  }
   let(:scorer) { u = user(:active_user => true); course.enroll_teacher(u, :enrollment_state => 'active'); u }
   let(:student) { u = user(:active_user => true); course.enroll_student(u, :enrollment_state => 'active'); u }
   let(:now) { Time.zone.now }

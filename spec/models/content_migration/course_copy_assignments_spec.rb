@@ -141,10 +141,9 @@ describe ContentMigration do
       expect(new_assignment.group_category.name).to eq "Project Groups"
     end
 
-    it "should copy moderated_grading setting if feature enabled" do
+    it "should copy moderated_grading setting" do
       assignment_model(:course => @copy_from, :points_possible => 40,
                        :submission_types => 'file_upload', :grading_type => 'points', :moderated_grading => true)
-      @copy_to.enable_feature! :moderated_grading
       run_course_copy
       new_assignment = @copy_to.assignments.where(migration_id: mig_id(@assignment)).first
       expect(new_assignment).to be_moderated_grading

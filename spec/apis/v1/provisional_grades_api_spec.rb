@@ -24,8 +24,6 @@ describe 'Provisional Grades API', type: :request do
       course_with_teacher :active_all => true
       ta_in_course :active_all => true
       @student = student_in_course(:active_all => true).user
-      @course.root_account.allow_feature! :moderated_grading
-      @course.enable_feature! :moderated_grading
       @assignment = @course.assignments.build
       @assignment.moderated_grading = true
       @assignment.save!
@@ -62,8 +60,6 @@ describe 'Provisional Grades API', type: :request do
     before(:once) do
       course_with_student :active_all => true
       ta_in_course :active_all => true
-      @course.root_account.allow_feature! :moderated_grading
-      @course.enable_feature! :moderated_grading
       @assignment = @course.assignments.build
       @assignment.moderated_grading = true
       @assignment.save!
@@ -107,8 +103,6 @@ describe 'Provisional Grades API', type: :request do
     before(:once) do
       course_with_student :active_all => true
       ta_in_course :active_all => true
-      @course.root_account.allow_feature! :moderated_grading
-      @course.enable_feature! :moderated_grading
       @assignment = @course.assignments.create! submission_types: 'online_text_entry', moderated_grading: true
       @assignment.moderated_grading_selections.create! student: @student
       @submission = @assignment.submit_homework(@student, :submission_type => 'online_text_entry', :body => 'hallo')
@@ -154,7 +148,6 @@ describe 'Provisional Grades API', type: :request do
     before :once do
       course_with_student :active_all => true
       course_with_ta :course => @course, :active_all => true
-      @course.root_account.allow_feature! :moderated_grading
       @assignment = @course.assignments.create!
       @path = "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/provisional_grades/publish"
       @params = { :controller => 'provisional_grades', :action => 'publish',
@@ -162,14 +155,12 @@ describe 'Provisional Grades API', type: :request do
     end
 
     it "requires a moderated assignment" do
-      @course.enable_feature! :moderated_grading
       json = api_call_as_user(@teacher, :post, @path, @params, {}, {}, { :expected_status => 400 })
       expect(json['message']).to eq 'Assignment does not use moderated grading'
     end
 
     context "with moderated assignment" do
       before(:once) do
-        @course.enable_feature! :moderated_grading
         @assignment.update_attribute :moderated_grading, true
       end
 

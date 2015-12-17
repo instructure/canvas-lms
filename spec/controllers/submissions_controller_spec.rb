@@ -369,8 +369,6 @@ describe SubmissionsController do
     context "moderated grading" do
       before :once do
         course_with_student(:active_all => true)
-        @course.root_account.allow_feature!(:moderated_grading)
-        @course.enable_feature!(:moderated_grading)
         @assignment = @course.assignments.create!(:title => "some assignment",
           :submission_types => "online_url,online_upload", :moderated_grading => true)
         @submission = @assignment.submit_homework(@user)

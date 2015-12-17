@@ -91,7 +91,7 @@ class ProvisionalGradesController < ApplicationController
   #
   def status
     if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
-      unless @context.feature_enabled?(:moderated_grading) && @assignment.moderated_grading?
+      unless @assignment.moderated_grading?
         return render :json => { :message => "Assignment does not use moderated grading" }, :status => :bad_request
       end
       if @assignment.grades_published?
@@ -196,7 +196,7 @@ class ProvisionalGradesController < ApplicationController
   #
   def publish
     if authorized_action(@context, @current_user, :moderate_grades)
-      unless @context.feature_enabled?(:moderated_grading) && @assignment.moderated_grading?
+      unless @assignment.moderated_grading?
         return render :json => { :message => "Assignment does not use moderated grading" }, :status => :bad_request
       end
       if @assignment.grades_published?

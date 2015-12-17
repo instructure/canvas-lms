@@ -122,8 +122,6 @@ describe "dashboard" do
     context "moderation to do" do
       before do
         @teacher = @user
-        @course.account.allow_feature!(:moderated_grading)
-        @course.enable_feature!(:moderated_grading)
         @student = student_in_course(:course => @course, :active_all => true).user
         @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => ['online_text_entry'], :moderated_grading => true)
         @assignment.submit_homework(@student, :body => "submission")

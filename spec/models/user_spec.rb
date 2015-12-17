@@ -2428,8 +2428,6 @@ describe User do
 
     context "#assignments_needing_moderation" do
       before :once do
-        @course2.account.allow_feature!(:moderated_grading)
-        @course2.enable_feature!(:moderated_grading)
         @course2.assignments.first.update_attribute(:moderated_grading, true)
       end
 

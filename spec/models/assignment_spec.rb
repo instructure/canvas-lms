@@ -2911,7 +2911,6 @@ describe Assignment do
 
     describe "with moderated grading" do
       before(:once) do
-        Account.default.allow_feature!(:moderated_grading)
         course_with_ta :course => @course, :active_all => true
         assignment_model(:course => @course, :submission_types => 'online_text_entry')
         rubric_model
