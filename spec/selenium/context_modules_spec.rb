@@ -468,6 +468,38 @@ describe "context modules" do
       test_relock
     end
 
+    it "does not have a prerequisites section when creating the first module" do
+      get "/courses/#{@course.id}/modules"
+      wait_for_modules_ui
+
+      form = new_module_form
+      expect(f('.prerequisites_entry', form)).not_to be_displayed
+      replace_content(form.find_element(:id, 'context_module_name'), "first")
+      submit_form(form)
+
+      form = new_module_form
+      expect(f('.prerequisites_entry', form)).to be_displayed
+    end
+
+    it "does not have a prerequisites section when editing the first module" do
+      modules = create_modules(2)
+      get "/courses/#{@course.id}/modules"
+      wait_for_modules_ui
+
+      mod0 = f("#context_module_#{modules[0].id}")
+      f(".ig-header-admin .al-trigger", mod0).click
+      f('.edit_module_link', mod0).click
+      edit_form = f('#add_context_module_form')
+      expect(f('.prerequisites_entry', edit_form)).not_to be_displayed
+      submit_form(edit_form)
+
+      mod1 = f("#context_module_#{modules[1].id}")
+      f(".ig-header-admin .al-trigger", mod1).click
+      f('.edit_module_link', mod1).click
+      edit_form = f('#add_context_module_form')
+      expect(f('.prerequisites_entry', edit_form)).to be_displayed
+    end
+
     it "should save the requirement count chosen in the Edit Module form" do
       get "/courses/#{@course.id}/modules"
       add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)

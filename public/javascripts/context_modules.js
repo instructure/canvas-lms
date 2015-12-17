@@ -346,7 +346,10 @@ define([
         $form.find("#unlock_module_at").prop('checked', data.unlock_at).change()
         $form.find("#require_sequential_progress").attr('checked', data.require_sequential_progress == "true" || data.require_sequential_progress == "1");
         $form.find("#publish_final_grade").attr('checked', data.publish_final_grade == "true" || data.publish_final_grade == "1");
-        $form.find(".prerequisites_entry").showIf($("#context_modules .context_module").length > 1);
+
+        var has_predecessors = $("#context_modules .context_module").length > 1 &&
+                               $("#context_modules .context_module:first").attr("id") !== $module.attr("id")
+        $form.find(".prerequisites_entry").showIf(has_predecessors);
         var prerequisites = [];
         $module.find(".prerequisites .prerequisite_criterion").each(function() {
           prerequisites.push($(this).getTemplateData({textValues: ['id', 'name', 'type']}));
@@ -369,10 +372,9 @@ define([
             .find(".type").val(data.criterion_type || "").change().end()
             .find(".min_score").val(data.min_score || "");
         });
-        var no_prereqs = $("#context_modules .context_module").length == 1;
         var no_items = $module.find(".content .context_module_item").length === 0;
         $form.find(".prerequisites_list .criteria_list").showIf(prerequisites.length != 0).end()
-          .find(".add_prerequisite_link").showIf(!no_prereqs).end()
+          .find(".add_prerequisite_link").showIf(has_predecessors).end()
           .find(".completion_entry .criteria_list").showIf(!no_items).end()
 
           .find(".completion_entry .no_items_message").hide().end()
@@ -878,7 +880,7 @@ define([
         }
       });
       for(var idx in afters) {
-        $select.find("." + afters[idx]).attr('disabled', true);
+        $select.find("." + afters[idx]).hide();
       }
 
       $pre.find(".option").empty().append($select.show());
@@ -1300,7 +1302,7 @@ define([
         }
       });
       for(var idx in afters) {
-        $select.find(".context_module_" + afters[idx]).attr('disabled', true);
+        $select.find(".context_module_" + afters[idx]).hide();
       }
       $("#add_module_prerequisite_dialog").find(".prerequisite_module_select").empty().append($select.show());
       $("#add_module_prerequisite_dialog").dialog({
