@@ -1,8 +1,1 @@
-<?xml version="1.0" encoding="utf-8"?>
-
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="32" height="32" viewBox="0 0 32 32">
-<g>
-</g>
-	<path d="M4 6v16h6v4h-10v-20h4zM8 10v-4h16v4h-6v16h-4v-16h-6zM26 6h4v20h-4v-20z" fill="#000000"></path>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><title>LTI</title><path d="M4 6v16h6v4H0V6h4zm4 4V6h16v4h-6v16h-4V10H8zm18-4h4v20h-4V6z"/></svg>

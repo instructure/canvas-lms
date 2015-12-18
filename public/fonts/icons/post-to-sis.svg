@@ -1,5 +1,1 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="32" height="32" viewBox="0 0 32 32">
-<path fill="rgb(128, 128, 128)" d="M32 0h-26v4h-6v28h28v-6h4v-26zM10 4h18v18h-18v-18zM6 26h18v2h-20v-20h2v18zM26 10v-2h-12v6h8v2h-10v2h12v-6h-8v-2h10z"></path>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><title>Post to SIS</title><path fill="gray" d="M32 0H6v4H0v28h28v-6h4V0zM10 4h18v18H10V4zM6 26h18v2H4V8h2v18zm20-16V8H14v6h8v2H12v2h12v-6h-8v-2h10z"/></svg>
