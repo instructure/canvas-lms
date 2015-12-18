@@ -127,7 +127,7 @@ class AccountsController < ApplicationController
         else
           @accounts = []
         end
-        ActiveRecord::Associations::Preloader.new(@accounts, :root_account).run
+        ActiveRecord::Associations::Preloader.new.preload(@accounts, :root_account)
 
         # originally had 'includes' instead of 'include' like other endpoints
         includes = params[:include] || params[:includes]
@@ -154,7 +154,7 @@ class AccountsController < ApplicationController
     else
       @accounts = []
     end
-    ActiveRecord::Associations::Preloader.new(@accounts, :root_account).run
+    ActiveRecord::Associations::Preloader.new.preload(@accounts, :root_account)
     render :json => @accounts.map { |a| account_json(a, @current_user, session, params[:includes] || [], true) }
   end
 
@@ -175,7 +175,7 @@ class AccountsController < ApplicationController
         js_env(:ACCOUNT_COURSES_PATH => account_courses_path(@account, :format => :json))
         load_course_right_side
         @courses = @account.fast_all_courses(:term => @term, :limit => @maximum_courses_im_gonna_show, :hide_enrollmentless_courses => @hide_enrollmentless_courses)
-        ActiveRecord::Associations::Preloader.new(@courses, :enrollment_term).run
+        ActiveRecord::Associations::Preloader.new.preload(@courses, :enrollment_term)
         build_course_stats
       end
       format.json { render :json => account_json(@account, @current_user, session, params[:includes] || [],
@@ -238,7 +238,7 @@ class AccountsController < ApplicationController
     @accounts = Api.paginate(@accounts, self, api_v1_sub_accounts_url,
                              :total_entries => recursive ? nil : @accounts.count)
 
-    ActiveRecord::Associations::Preloader.new(@accounts, [:root_account, :parent_account]).run
+    ActiveRecord::Associations::Preloader.new.preload(@accounts, [:root_account, :parent_account])
     render :json => @accounts.map { |a| account_json(a, @current_user, session, []) }
   end
 
@@ -368,8 +368,8 @@ class AccountsController < ApplicationController
     page_opts[:total_entries] = nil if params[:search_term] # doesn't calculate a total count
     @courses = Api.paginate(@courses, self, api_v1_account_courses_url, page_opts)
 
-    ActiveRecord::Associations::Preloader.new(@courses, [:account, :root_account]).run
-    ActiveRecord::Associations::Preloader.new(@courses, [:teachers]).run if includes.include?("teachers")
+    ActiveRecord::Associations::Preloader.new.preload(@courses, [:account, :root_account])
+    ActiveRecord::Associations::Preloader.new.preload(@courses, [:teachers]) if includes.include?("teachers")
 
     if includes.include?("total_students")
       student_counts = StudentEnrollment.where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive')").
@@ -594,7 +594,7 @@ class AccountsController < ApplicationController
       end
       load_course_right_side
       @account_users = @account.account_users
-      ActiveRecord::Associations::Preloader.new(@account_users, user: :communication_channels).run
+      ActiveRecord::Associations::Preloader.new.preload(@account_users, user: :communication_channels)
       order_hash = {}
       @account.available_account_roles.each_with_index do |role, idx|
         order_hash[role.id] = idx

@@ -1496,7 +1496,7 @@ class User < ActiveRecord::Base
       as = assignment_scope.active.
         expecting_submission.
         need_grading_info
-      ActiveRecord::Associations::Preloader.new(as, :context).run
+      ActiveRecord::Associations::Preloader.new.preload(as, :context)
       as.lazy.select{|a| Assignments::NeedsGradingCountQuery.new(a, self).count != 0 }.take(opts[:limit]).to_a
     end
   end
@@ -1699,7 +1699,7 @@ class User < ActiveRecord::Base
         end
         pending_enrollments = temporary_invitations
         unless pending_enrollments.empty?
-          ActiveRecord::Associations::Preloader.new(pending_enrollments, :course).run
+          ActiveRecord::Associations::Preloader.new.preload(pending_enrollments, :course)
           res.concat(pending_enrollments.map do |e|
             c = e.course
             c.primary_enrollment_type = e.type
@@ -1751,7 +1751,7 @@ class User < ActiveRecord::Base
       if opts[:preload_dates]
         Canvas::Builders::EnrollmentDateBuilder.preload(enrollments)
       elsif opts[:preload_courses]
-        ActiveRecord::Associations::Preloader.new(enrollments, :course).run
+        ActiveRecord::Associations::Preloader.new.preload(enrollments, :course)
       end
       enrollments
     end
@@ -1834,7 +1834,7 @@ class User < ActiveRecord::Base
           submissions = submissions.uniq
           submissions.first(opts[:limit])
 
-          ActiveRecord::Associations::Preloader.new(submissions, [:assignment, :user, :submission_comments]).run
+          ActiveRecord::Associations::Preloader.new.preload(submissions, [:assignment, :user, :submission_comments])
           submissions
         end
       end
@@ -2454,7 +2454,7 @@ class User < ActiveRecord::Base
     else
       @menu_courses = self.courses_with_primary_enrollment(:current_and_invited_courses, enrollment_uuid).first(12)
     end
-    ActiveRecord::Associations::Preloader.new(@menu_courses, :enrollment_term).run
+    ActiveRecord::Associations::Preloader.new.preload(@menu_courses, :enrollment_term)
     @menu_courses
   end
 

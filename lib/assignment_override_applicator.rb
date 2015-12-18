@@ -332,11 +332,11 @@ module AssignmentOverrideApplicator
 
   def self.preload_assignment_override_students(items, user)
     return unless user
-    ActiveRecord::Associations::Preloader.new(items, :context).run
+    ActiveRecord::Associations::Preloader.new.preload(items, :context)
     # preloads the override students for a particular user for many objects at once, instead of doing separate queries for each
     quizzes, assignments = items.partition{|i| i.is_a?(Quizzes::Quiz)}
 
-    ActiveRecord::Associations::Preloader.new(assignments, [:quiz, :assignment_overrides]).run
+    ActiveRecord::Associations::Preloader.new.preload(assignments, [:quiz, :assignment_overrides])
 
     if assignments.any?
       override_students = AssignmentOverrideStudent.where(:assignment_id => assignments, :user_id => user).index_by(&:assignment_id)
@@ -349,7 +349,7 @@ module AssignmentOverrideApplicator
     end
     quizzes.uniq!
 
-    ActiveRecord::Associations::Preloader.new(quizzes, :assignment_overrides).run
+    ActiveRecord::Associations::Preloader.new.preload(quizzes, :assignment_overrides)
 
     if quizzes.any?
       override_students = AssignmentOverrideStudent.where(:quiz_id => quizzes, :user_id => user).index_by(&:quiz_id)

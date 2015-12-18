@@ -849,11 +849,11 @@ class Assignment < ActiveRecord::Base
   end
 
   def self.preload_context_module_tags(assignments)
-    ActiveRecord::Associations::Preloader.new(assignments, [
+    ActiveRecord::Associations::Preloader.new.preload(assignments, [
       :context_module_tags,
       { :discussion_topic => :context_module_tags },
       { :quiz => :context_module_tags }
-    ]).run
+    ])
   end
 
   def locked_for?(user, opts={})
@@ -1415,7 +1415,7 @@ class Assignment < ActiveRecord::Base
 
     # if we're a provisional grader, calculate whether the student needs a grade
     preloaded_pg_counts = is_provisional && self.provisional_grades.not_final.group("submissions.user_id").count
-    ActiveRecord::Associations::Preloader.new(self, :moderated_grading_selections).run if is_provisional # preload the association now
+    ActiveRecord::Associations::Preloader.new.preload(self, :moderated_grading_selections) if is_provisional # preload the association now
 
     res[:context][:students] = students.map do |u|
       json = u.as_json(:include_root => false,

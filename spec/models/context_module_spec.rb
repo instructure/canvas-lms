@@ -1132,7 +1132,7 @@ describe ContextModule do
       end
       it "should not reload the tags if already loaded" do
         ContentTag.expects(:visible_to_students_in_course_with_da).never
-        ActiveRecord::Associations::Preloader.new(@module, content_tags: :content).run
+        ActiveRecord::Associations::Preloader.new.preload(@module, content_tags: :content)
         @module.content_tags_visible_to(@student_1)
       end
       it "should filter differentiated discussions" do

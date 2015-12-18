@@ -65,7 +65,7 @@ class ContextModulesController < ApplicationController
 
       if @context.grants_right?(@current_user, session, :participate_as_student)
         return unless tab_enabled?(@context.class::TAB_MODULES)
-        ActiveRecord::Associations::Preloader.new(@modules, :content_tags).run
+        ActiveRecord::Associations::Preloader.new.preload(@modules, :content_tags)
         @modules.each{|m| m.evaluate_for(@current_user) }
         session[:module_progressions_initialized] = true
       end

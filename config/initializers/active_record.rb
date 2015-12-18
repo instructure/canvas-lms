@@ -664,7 +664,7 @@ ActiveRecord::Relation.class_eval do
         klass.unscoped do
           batch = connection.uncached { klass.find_by_sql("FETCH FORWARD #{batch_size} FROM #{cursor}") }
           while !batch.empty?
-            ActiveRecord::Associations::Preloader.new(batch, includes).run if includes
+            ActiveRecord::Associations::Preloader.new.preload(batch, includes) if includes
             yield batch
             break if batch.size < batch_size
             batch = connection.uncached { klass.find_by_sql("FETCH FORWARD #{batch_size} FROM #{cursor}") }
@@ -735,7 +735,7 @@ ActiveRecord::Relation.class_eval do
           batch = klass.find_by_sql(sql)
         end
         while !batch.empty?
-          ActiveRecord::Associations::Preloader.new(batch, includes).run if includes
+          ActiveRecord::Associations::Preloader.new.preload(batch, includes) if includes
           yield batch
           break if batch.size < batch_size
 
@@ -1363,7 +1363,6 @@ module UnscopeCallbacks
     scope.scoping { super }
   end
 end
-
 ActiveRecord::Base.send(:include, UnscopeCallbacks)
 
 ActiveRecord::DynamicMatchers::Method.class_eval do
@@ -1375,4 +1374,26 @@ ActiveRecord::DynamicMatchers::Method.class_eval do
     end
     alias_method_chain :match, :discard
   end
+end
+
+if CANVAS_RAILS4_0
+  module PreloaderShim
+    def initialize(*args)
+      super unless args.empty?
+    end
+
+    def preload(*args)
+      if args.size == 1
+        super
+      else
+        records, associations, preload_scope = args
+        @records       = Array.wrap(records).compact.uniq
+        @associations  = Array.wrap(associations)
+        @preload_scope = preload_scope || ActiveRecord::Relation.new(nil, nil)
+        run
+      end
+    end
+  end
+
+  ActiveRecord::Associations::Preloader.send(:prepend, PreloaderShim)
 end

@@ -474,7 +474,7 @@ class Conversation < ActiveRecord::Base
   end
 
   def subscribed_participants
-    ActiveRecord::Associations::Preloader.new(conversation_participants, :user).run unless ModelCache[:users]
+    ActiveRecord::Associations::Preloader.new.preload(conversation_participants, :user) unless ModelCache[:users]
     conversation_participants.select(&:subscribed?).map(&:user).compact
   end
 

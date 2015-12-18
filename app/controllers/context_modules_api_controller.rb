@@ -358,7 +358,7 @@ class ContextModulesApiController < ApplicationController
       scope = ContextModule.search_by_attribute(scope, :name, params[:search_term]) unless includes.include?('items')
       modules = Api.paginate(scope, self, route)
 
-      ActiveRecord::Associations::Preloader.new(modules, content_tags: :content) if includes.include?('items')
+      ActiveRecord::Associations::Preloader.new.preload(modules, content_tags: :content) if includes.include?('items')
 
       if @student
         modules_and_progressions = modules.map { |m| [m, m.evaluate_for(@student)] }
@@ -417,7 +417,7 @@ class ContextModulesApiController < ApplicationController
     if authorized_action(@context, @current_user, :read)
       mod = @context.modules_visible_to(@student || @current_user).find(params[:id])
       includes = Array(params[:include])
-      ActiveRecord::Associations::Preloader.new(mod, content_tags: :content).run if includes.include?('items')
+      ActiveRecord::Associations::Preloader.new.preload(mod, content_tags: :content) if includes.include?('items')
       prog = @student ? mod.evaluate_for(@student) : nil
       render :json => module_json(mod, @student || @current_user, session, prog, includes)
     end
@@ -436,12 +436,12 @@ class ContextModulesApiController < ApplicationController
   # @response_field completed A list of IDs for modules that were updated.
   #
   # @example_request
-  #     curl https://<canvas>/api/v1/courses/<course_id>/modules \  
-  #       -X PUT \ 
+  #     curl https://<canvas>/api/v1/courses/<course_id>/modules \
+  #       -X PUT \
   #       -H 'Authorization: Bearer <token>' \
   #       -d 'event=delete' \
-  #       -d 'module_ids[]=1' \ 
-  #       -d 'module_ids[]=2' 
+  #       -d 'module_ids[]=1' \
+  #       -d 'module_ids[]=2'
   #
   # @example_response
   #    {

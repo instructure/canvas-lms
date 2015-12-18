@@ -874,8 +874,8 @@ class CoursesController < ApplicationController
       if includes.include?('enrollments')
         # not_ended_enrollments for enrollment_json
         # enrollments course for has_grade_permissions?
-        ActiveRecord::Associations::Preloader.new(users, {:not_ended_enrollments => :course},
-          Enrollment.where(:course_id => @context)).run
+        ActiveRecord::Associations::Preloader.new.preload(users, {:not_ended_enrollments => :course},
+          Enrollment.where(:course_id => @context))
       end
       user = users.first or raise ActiveRecord::RecordNotFound
       enrollments = user.not_ended_enrollments if includes.include?('enrollments')
@@ -1734,7 +1734,7 @@ class CoursesController < ApplicationController
                           :search_method => @context.user_list_search_mode_for(@current_user),
                           :initial_type => params[:enrollment_type])
       if !@context.concluded? && (@enrollments = EnrollmentsFromUserList.process(list, @context, enrollment_options))
-        ActiveRecord::Associations::Preloader.new(@enrollments, [:course_section, {:user => [:communication_channel, :pseudonym]}]).run
+        ActiveRecord::Associations::Preloader.new.preload(@enrollments, [:course_section, {:user => [:communication_channel, :pseudonym]}])
         json = @enrollments.map { |e|
           { 'enrollment' =>
             { 'associated_user_id' => e.associated_user_id,
@@ -2418,7 +2418,7 @@ class CoursesController < ApplicationController
     enrollments_by_course = Api.paginate(enrollments_by_course, self, api_v1_courses_url) if api_request?
     if includes.include?("teachers")
       courses = enrollments_by_course.map(&:first).map(&:course)
-      ActiveRecord::Associations::Preloader.new(courses, :teachers).run
+      ActiveRecord::Associations::Preloader.new.preload(courses, :teachers)
     end
     enrollments_by_course.each do |course_enrollments|
       course = course_enrollments.first.course

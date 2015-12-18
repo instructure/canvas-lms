@@ -273,7 +273,7 @@ class EnrollmentsApiController < ApplicationController
       enrollments,
       self, send("api_v1_#{endpoint_scope}_enrollments_url"))
 
-    ActiveRecord::Associations::Preloader.new(enrollments, [:user, :course, :course_section]).run
+    ActiveRecord::Associations::Preloader.new.preload(enrollments, [:user, :course, :course_section])
     includes = [:user] + Array(params[:include])
 
     user_json_preloads(enrollments.map(&:user))
