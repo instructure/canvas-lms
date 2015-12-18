@@ -81,6 +81,33 @@ describe "calendar2" do
         event = @group.calendar_events.last
         expect(event.title).to eq event_name
       end
+
+      it "should create a recurring event", priority: "1", test_id: 223510 do
+        Account.default.enable_feature!(:recurring_calendar_events)
+        get '/calendar2'
+        expect(f('#context-list li:nth-of-type(1)').text).to include(@teacher.name)
+        expect(f('#context-list li:nth-of-type(2)').text).to include(@course.name)
+        fj('.calendar .fc-week .fc-today').click
+        edit_event_dialog = f('#edit_event_tabs')
+        expect(edit_event_dialog).to be_displayed
+        edit_event_form = edit_event_dialog.find('#edit_calendar_event_form')
+        title = edit_event_form.find('#calendar_event_title')
+        replace_content(title, "Test Event")
+        replace_content(fj("input[type=text][name= 'start_time']"), "6:00am")
+        replace_content(fj("input[type=text][name= 'end_time']"), "6:00pm")
+        click_option(f('.context_id'), @course.name)
+        expect_new_page_load { f('.more_options_link').click }
+        expect(f('.title').attribute('value')).to eq "Test Event"
+        expect(fj("input[type=text][name= 'start_date']").attribute('value')).
+                                                                to include(Time.zone.now.strftime('%b %d'))
+        f('#duplicate_event').click
+        replace_content(fj("input[type=number][name= 'duplicate_count']"), 2)
+        expect_new_page_load{submit_form(f('#editCalendareventFull'))}
+        expect(CalendarEvent.count).to eq(3)
+        repeat_event = CalendarEvent.where(title: "Test Event")
+        expect((repeat_event[1].start_at).to_date).to eq((Time.zone.now + 1.week).to_date)
+        expect((repeat_event[2].start_at).to_date).to eq((Time.zone.now + 2.weeks).to_date)
+      end
     end
   end
 end
