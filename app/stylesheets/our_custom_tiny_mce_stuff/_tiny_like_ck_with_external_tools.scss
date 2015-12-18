@@ -13,6 +13,13 @@ $menu-item-keyboard-shortcut-color: $ic-color-dark;
   }
 }
 
+// puts the blue glow around each little color sqare in the tinyMCE text/bg color picker
+.mce-grid td.mce-grid-cell div:focus{
+  @include tab-focus();
+  outline-offset: 0px;
+
+}
+
 .mce-menu-item {
   .mce-disabled {
     .mce-text {
