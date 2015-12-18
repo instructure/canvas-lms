@@ -680,4 +680,29 @@ class ContextExternalTool < ActiveRecord::Base
       Digest::MD5.hexdigest(tools.map(&:cache_key).join('/'))
     end
   end
+
+  def self.visible?(visibility, user, context, session = nil)
+    visibility = visibility.to_s
+    return true unless %w(public members admins).include?(visibility)
+    return true if visibility == 'public'
+    return true if visibility == 'members' &&
+        context.grants_any_right?(user, session, :participate_as_student, :read_as_admin)
+    return true if visibility == 'admins' && context.grants_right?(user, session, :read_as_admin)
+    false
+  end
+
+  def self.editor_button_json(tools, context, user, session=nil)
+    tools.select! {|tool| visible?(tool.editor_button['visibility'], user, context, session)}
+    tools.map do |tool|
+      {
+          :name => tool.label_for(:editor_button, I18n.locale),
+          :id => tool.id,
+          :url => tool.editor_button(:url),
+          :icon_url => tool.editor_button(:icon_url),
+          :canvas_icon_class => tool.editor_button(:canvas_icon_class),
+          :width => tool.editor_button(:selection_width),
+          :height => tool.editor_button(:selection_height)
+      }
+    end
+  end
 end

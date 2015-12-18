@@ -980,6 +980,67 @@ describe ContextExternalTool do
 
     end
 
+    describe ".visible?" do
+      let(:u) {user}
+      let(:admin) {account_admin_user(account:c.root_account)}
+      let(:c) {course(active_course:true)}
+      let(:student) do
+        student = factory_with_protected_attributes(User, valid_user_attributes)
+        e = c.enroll_student(student)
+        e.invite
+        e.accept
+        student
+      end
+      let(:teacher) do
+        teacher = factory_with_protected_attributes(User, valid_user_attributes)
+        e = c.enroll_teacher(teacher)
+        e.invite
+        e.accept
+        teacher
+      end
+
+      it 'returns true for public visibility' do
+        expect(described_class.visible?('public', u, c)).to be true
+      end
+
+      it 'returns false for non members if visibility is members' do
+        expect(described_class.visible?('members', u, c)).to be false
+      end
+
+      it 'returns true for members visibility if a student in the course' do
+        expect(described_class.visible?('members', student, c)).to be true
+      end
+
+      it 'returns true for members visibility if a teacher in the course' do
+        expect(described_class.visible?('members', teacher, c)).to be true
+      end
+
+      it 'returns true for admins visibility if a teacher' do
+        expect(described_class.visible?('admins', teacher, c)).to be true
+      end
+
+      it 'returns true for admins visibility if an admin' do
+        expect(described_class.visible?('admins', admin, c)).to be true
+      end
+
+      it 'returns false for admins visibility if a student' do
+        expect(described_class.visible?('admins', student, c)).to be false
+      end
+
+      it 'returns false for admins visibility if a non member user' do
+        expect(described_class.visible?('admins', u, c)).to be false
+      end
+
+      it 'returns true if visibility is invalid' do
+        expect(described_class.visible?('true', u, c)).to be true
+      end
+
+      it 'returns true if visibility is nil' do
+        expect(described_class.visible?(nil, u, c)).to be true
+      end
+
+    end
+
 
   end
 end
