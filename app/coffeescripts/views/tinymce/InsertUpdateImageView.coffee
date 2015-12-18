@@ -124,6 +124,7 @@ define [
       @setSelectedImage
         src: $a.attr('data-fullsize')
         alt: $a.attr('title')
+      @$("[name='image[alt]']").focus()
 
     onFileLinkDblclick: (event) =>
       # click event is handled on the first click
