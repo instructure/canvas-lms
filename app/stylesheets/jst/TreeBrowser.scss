@@ -1,6 +1,7 @@
 @import 'base/environment';
 
 .tree {
+  outline: none;
   font-size: 12px;
   &, ul {
     @include reset-list;
@@ -11,6 +12,9 @@
     display: flex;
     white-space: nowrap;
     &.active { background-color: $activeBG; }
+  }
+  li[aria-selected="true"] > a {
+    @include tab-focus();
   }
   .preview-thumbnail-holder {
     display: inline-block;
