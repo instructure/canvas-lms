@@ -57,19 +57,23 @@ describe "quizzes section hierarchy" do
 
       it "should allow the teacher to preview the quiz", priority: "1", test_id: 282838 do
         get "/courses/#{@course.id}/quizzes"
-        keep_trying_until { fln('Test Quiz').click }
+        keep_trying_until do
+          link = fln('Test Quiz')
+          link.click if link.present?
+          link.present?
+        end
         expect_new_page_load{f('#preview_quiz_button').click}
         keep_trying_until do
          expect(f(' .quiz-header').text).to include('This is a preview of the published version of the quiz')
         end
       end
 
-    it "should work with lock and unlock dates set up", priority: "1", test_id: 323086 do
-      @override.unlock_at = Time.zone.now.advance(days:-1)
-      @override.lock_at = Time.zone.now.advance(days:4)
-      user_session(@student)
-      take_hierarchy_quiz
-    end
+      it "should work with lock and unlock dates set up", priority: "1", test_id: 323086 do
+        @override.unlock_at = Time.zone.now.advance(days:-1)
+        @override.lock_at = Time.zone.now.advance(days:4)
+        user_session(@student)
+        take_hierarchy_quiz
+      end
     end
 
     context "term end date in past" do
