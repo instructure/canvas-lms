@@ -5,7 +5,7 @@ class ActiveRecord::Base
 
   def write_attribute(attr_name, *args)
     value = super
-    value.is_a?(ActiveRecord::AttributeMethods::Serialization::Attribute) ? value.value : value
+    (CANVAS_RAILS4_0 && value.is_a?(ActiveRecord::AttributeMethods::Serialization::Attribute)) ? value.value : value
   end
 
   class << self

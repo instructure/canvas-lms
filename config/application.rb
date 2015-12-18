@@ -192,7 +192,7 @@ module CanvasRails
 
     class ExceptionsApp
       def call(env)
-        @app_controller ||= ActionDispatch::Routing::RouteSet::Dispatcher.new.controller(:controller => 'application')
+        @app_controller ||= ActionDispatch::Routing::RouteSet::Dispatcher.new({}).controller(:controller => 'application')
         @app_controller.action('rescue_action_dispatch_exception').call(env)
       end
     end

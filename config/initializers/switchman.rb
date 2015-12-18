@@ -94,9 +94,7 @@ Rails.application.config.to_prepare do
 
     # the default shard was already loaded, but didn't deserialize it
     if default.is_a?(self) && default.instance_variable_get(:@attributes)['settings'].is_a?(String)
-      settings = ActiveRecord::AttributeMethods::Serialization::Attribute.new(serialized_attributes['settings'],
-                                                                   default.instance_variable_get(:@attributes)['settings'],
-                                                                   :serialized).unserialized_value
+      settings = serialized_attributes['settings'].load(default.read_attribute('settings'))
       default.settings = settings
     end
 

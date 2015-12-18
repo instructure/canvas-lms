@@ -12,18 +12,18 @@ else
   gem 'protected_attributes', '1.0.8'
   gem 'rails-observers', '0.1.2'
   gem 'tzinfo', '1.2.2'
-  gem 'oj_mimic_json'
+  gem 'oj_mimic_json', require: false
   gem 'activesupport-json_encoder', '1.1.0'
 end
 
-gem 'encrypted_cookie_store-instructure', '1.1.11', require: 'encrypted_cookie_store'
+gem 'encrypted_cookie_store-instructure', '1.1.12', require: 'encrypted_cookie_store'
 gem 'active_model_serializers',   '0.9.0alpha1',
   github: 'rails-api/active_model_serializers', ref: '61882e1e4127facfe92e49057aec71edbe981829'
-gem 'authlogic', '3.4.2'
+gem 'authlogic', '3.4.6'
 gem 'active_model-better_errors', '1.6.7', require: 'active_model/better_errors'
 gem 'dynamic_form', '1.1.4', require: false
 gem 'rails-patch-json-encode', '0.0.1'
-gem 'switchman', '1.3.13'
+gem 'switchman', '1.3.14'
 gem 'folio-pagination', '0.0.9', require: 'folio/rails'
   # for folio, see the folio README
   gem 'will_paginate', '3.0.7', require: false
@@ -55,7 +55,7 @@ gem 'i18nliner', '0.0.12'
 gem 'icalendar', '1.5.4', require: false
 gem 'ims-lti', '2.0.0.beta.33'
 gem 'json', '1.8.2'
-gem 'oj', '2.5.5'
+gem 'oj', '2.14.1'
 gem 'jwt', '1.2.1', require: false
 gem 'json-jwt', '1.5.1', require: false
 gem 'twilio-ruby', '4.2.1'
@@ -92,7 +92,7 @@ gem 'rubycas-client', '2.3.9', require: false
 gem 'rubyzip', '1.1.1', require: 'zip'
 gem 'safe_yaml', '1.0.4', require: false
 gem 'sanitize', '2.0.6', require: false
-gem 'shackles', '1.0.7'
+gem 'shackles', '1.0.10'
 
 gem 'useragent', '0.10.0', require: false
 
