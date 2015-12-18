@@ -1,5 +1,5 @@
-require File.expand_path(File.dirname(__FILE__) + '/common')
-require File.expand_path(File.dirname(__FILE__) + '/helpers/notifications_common')
+require_relative 'common'
+require_relative 'helpers/notifications_common'
 include NotificationsCommon
 
 
@@ -138,7 +138,7 @@ describe "dashboard" do
       expect(ff('#conversation-details tbody tr').size).to eq 1
     end
 
-    it "shows a stream item under the assignments in dashboard", priority: "1", test_id: 108725 do
+    it "shows an assignment stream item under Recent Activity in dashboard", priority: "1", test_id: 108725 do
       NotificationsCommon.setup_notification(@student, name: 'Assignment Created')
       assignment_model({:submission_types => ['online_text_entry'], :course => @course})
       get "/"
