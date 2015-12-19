@@ -1,4 +1,6 @@
 class CreateDelayedJobsTestStory < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     if Rails.env.test?
       create_table :stories do |table|

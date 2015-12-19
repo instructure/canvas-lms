@@ -24,6 +24,9 @@ define [
       width: 625
       title: I18n.t 'titles.insert_edit_image', 'Insert / Edit Image'
 
+    toJSON: () ->
+      {show_quiz_warning: ENV.SHOW_QUIZ_ALT_TEXT_WARNING}
+
     initialize: (@editor, selectedNode) ->
       @$editor = $("##{@editor.id}")
       @prevSelection = @editor.selection.getBookmark()
@@ -126,7 +129,7 @@ define [
     onFileLinkDblclick: (event) =>
       # click event is handled on the first click
       @update()
-        
+
     onImageUrlChange: (event) ->
       @flickr_link = null
       @setSelectedImage src: $(event.currentTarget).val()
@@ -136,7 +139,7 @@ define [
       if @flickr_link
         imgHtml = "<a href='#{h @flickr_link}'>#{imgHtml}</a>"
       imgHtml
-        
+
     update: =>
       @editor.selection.moveToBookmark(@prevSelection)
       @$editor.editorBox 'insert_code', @generateImageHtml()

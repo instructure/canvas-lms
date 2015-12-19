@@ -8,8 +8,8 @@ define [
   wrapper   = document.getElementById('fixtures')
 
   renderComponent = (data) ->
-    componentFactory = React.createFactory(AssignmentLetterGrade)
-    React.render(componentFactory(data), wrapper)
+    element = React.createElement(AssignmentLetterGrade, data)
+    React.render(element, wrapper)
 
   buildComponent = (props, additionalProps) ->
     cellData = props || {cellData: {id: '1'}, rowData: {enrollment: {}, submissions: []}}

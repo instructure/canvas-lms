@@ -1,4 +1,6 @@
 class StringColumnsToText < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     change_column :error_reports, :url, :text
     change_column :error_reports, :message, :text

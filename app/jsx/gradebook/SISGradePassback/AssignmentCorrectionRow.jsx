@@ -2,8 +2,9 @@ define([
   'underscore',
   'i18n!modules',
   'react',
-  'jsx/gradebook/SISGradePassback/assignmentUtils'
-], (_, I18n, React, assignmentUtils) => {
+  'jsx/gradebook/SISGradePassback/assignmentUtils',
+  'classnames'
+], (_, I18n, React, assignmentUtils, classnames) => {
 
   var AssignmentCorrectionRow = React.createClass({
     componentDidMount() {
@@ -59,7 +60,7 @@ define([
     render() {
       var assignment = this.props.assignment;
       var assignmentList = this.props.assignmentList;
-      var rowClass = React.addons.classSet({
+      var rowClass = classnames({
         "row": true,
         "correction-row": true,
         "ignore-row": assignment.please_ignore
@@ -91,7 +92,7 @@ define([
           <div className="span3 input-container">
             {anyError || assignment.please_ignore ? null : <i className="success-mark icon-check" />}
             <div
-              className={React.addons.classSet({
+              className={classnames({
                 "error-circle": nameError || nameTooLongError
               })}
             >
@@ -112,7 +113,7 @@ define([
 
           <div className="span2 date_field_container input-container assignment_correction_input">
             <div
-              className={React.addons.classSet({
+              className={classnames({
                 "error-circle": dueAtError
               })}
             >

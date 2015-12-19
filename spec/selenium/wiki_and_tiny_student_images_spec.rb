@@ -2,10 +2,11 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/wiki_and_tiny_common
 
 describe "Wiki pages and Tiny WYSIWYG editor Images" do
   include_context "in-process server selenium tests"
+  include WikiAndTinyCommon
 
   context "wiki and tiny images as a student" do
 
-    before (:each) do
+    before(:each) do
       course(:active_all => true, :name => 'wiki course')
       @student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :name => 'student@example.com', :password => 'asdfasdf')
       @teacher = user_with_pseudonym(:active_user => true, :username => 'teacher@example.com', :name => 'teacher@example.com', :password => 'asdfasdf')

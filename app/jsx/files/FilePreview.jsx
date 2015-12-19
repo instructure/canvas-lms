@@ -13,11 +13,28 @@ define([
 
   var Link = ReactRouter.Link;
 
+  const modalOverrides = {
+    overlay : {
+      backgroundColor: 'rgba(0,0,0,0.75)'
+    },  
+    content : {
+      position: 'static',
+      top: '0',
+      left: '0',
+      right: 'auto',
+      bottom: 'auto',
+      borderRadius: '0',
+      border: 'none',
+      padding: '0'
+    }
+  };
+
   FilePreview.renderArrowLink = function (direction) {
     var nextItem = (direction === 'left') ?
                    CollectionHandler.getPreviousInRelationTo(this.state.otherItems, this.state.displayedItem) :
                    CollectionHandler.getNextInRelationTo(this.state.otherItems, this.state.displayedItem);
 
+    var linkText = (direction === 'left') ? I18n.t('View previous file') : I18n.t('View next file')
     return (
       <div className='col-xs-1 ef-file-arrow_container'>
         <Link
@@ -27,6 +44,7 @@ define([
           className='ef-file-preview-container-arrow-link'
         >
           <div className='ef-file-preview-arrow-link'>
+            <span className='screenreader-only'>{linkText}</span>
             <i className={`icon-arrow-open-${direction}`} />
           </div>
         </Link>
@@ -49,13 +67,6 @@ define([
           className={iFrameClasses}
         />
       );
-    } else if (this.state.displayedItem instanceof Folder) {
-      return (
-        <div className='ef-file-not-found ef-file-preview-frame'>
-          <i className='media-object ef-not-found-icon FilesystemObjectThumbnail mimeClass-folder' />
-          {this.state.displayedItem.attributes.name}
-        </div>
-      );
     } else {
       return (
         <div className='ef-file-not-found ef-file-preview-frame'>
@@ -76,10 +87,11 @@ define([
 
     return (
       <ReactModal
-        isOpen={true}
+        isOpen={this.props.isOpen}
         onRequestClose={this.closeModal}
         className='ReactModal__Content--ef-file-preview'
         overlayClassName='ReactModal__Overlay--ef-file-preview'
+        style={modalOverrides}
         closeTimeoutMS={10}
       >
         <div className='ef-file-preview-overlay'>

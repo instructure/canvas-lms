@@ -1,4 +1,6 @@
 class DropUserCreationColumns < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     remove_index :users, 'users_sis_creation'
     remove_column :users, :creation_unique_id

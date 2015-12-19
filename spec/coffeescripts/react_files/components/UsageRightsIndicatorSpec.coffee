@@ -17,7 +17,7 @@ define [
       userCanManageFilesForContext: false
     }
 
-    uRI = TestUtils.renderIntoDocument(UsageRightsIndicator(props))
+    uRI = TestUtils.renderIntoDocument(React.createElement(UsageRightsIndicator, props))
     equal uRI.getDOMNode(), null, "returns null"
 
   test 'returns null if no usageRightsRequiredForContext and the model has no usage_rights', ->
@@ -28,7 +28,7 @@ define [
       modalOptions: {openModal: ()-> }
     }
 
-    uRI = TestUtils.renderIntoDocument(UsageRightsIndicator(props))
+    uRI = TestUtils.renderIntoDocument(React.createElement(UsageRightsIndicator, props))
     equal uRI.getDOMNode(), null, "returns null"
 
   test 'returns button if usageRightsRequiredForContext, userCanManageFilesForContext and the model has no usage_rights', ->
@@ -39,7 +39,7 @@ define [
       modalOptions: {openModal: ()-> }
     }
 
-    uRI = TestUtils.renderIntoDocument(UsageRightsIndicator(props))
+    uRI = TestUtils.renderIntoDocument(React.createElement(UsageRightsIndicator, props))
 
     equal uRI.getDOMNode().type, "submit", "submit type"
     equal uRI.getDOMNode().tagName, "BUTTON", "tag name is a button"
@@ -56,7 +56,7 @@ define [
       modalOptions: {openModal: ()-> openedModal = true}
     }
 
-    uRI = TestUtils.renderIntoDocument(UsageRightsIndicator(props))
+    uRI = TestUtils.renderIntoDocument(React.createElement(UsageRightsIndicator, props))
     TestUtils.Simulate.click(uRI.getDOMNode())
 
     ok openedModal, "tried to open the modal"
@@ -71,7 +71,7 @@ define [
       modalOptions: {openModal: ()-> }
     }
 
-    @uRI = TestUtils.renderIntoDocument(UsageRightsIndicator(props))
+    @uRI = TestUtils.renderIntoDocument(React.createElement(UsageRightsIndicator, props))
 
   module "UsageRightsIndicator: Icon Classess & Screenreader text", ->
     teardown: ->

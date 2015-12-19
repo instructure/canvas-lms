@@ -1,8 +1,9 @@
-require File.expand_path(File.dirname(__FILE__) + '/../common')
-require File.expand_path(File.dirname(__FILE__) + '/../helpers/accounts_auth_configs_common')
+require_relative '../common'
+require_relative '../helpers/accounts_auth_configs_common'
 
 describe 'account authentication' do
   include_context 'in-process server selenium tests'
+  include AccountsAuthConfigsCommon
 
   before(:each) do
     course_with_admin_logged_in

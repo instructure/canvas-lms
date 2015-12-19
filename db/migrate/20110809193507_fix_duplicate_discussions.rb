@@ -1,4 +1,6 @@
 class FixDuplicateDiscussions < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     DiscussionTopic.transaction do
       duplicate_topics = DiscussionTopic.

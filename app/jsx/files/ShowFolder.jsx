@@ -4,7 +4,7 @@ define([
   'i18n!react_files',
   'compiled/react_files/components/ShowFolder',
   'jsx/files/FilePreview',
-  'compiled/react_files/components/FolderChild',
+  'jsx/files/FolderChild',
   'jsx/files/UploadDropZone',
   'jsx/files/ColumnHeaders',
   'jsx/files/CurrentUploads',
@@ -18,6 +18,7 @@ define([
     if (this.getQuery().preview != null){
       return (
         <FilePreview
+          isOpen={true}
           usageRightsRequiredForContext={this.props.usageRightsRequiredForContext}
           currentFolder={this.props.currentFolder}
           params={this.getParams()}
@@ -51,6 +52,7 @@ define([
               dndOptions={this.props.dndOptions}
               modalOptions={this.props.modalOptions}
               clearSelectedItems={this.props.clearSelectedItems}
+              onMove={this.props.onMove}
             />
           );
         })

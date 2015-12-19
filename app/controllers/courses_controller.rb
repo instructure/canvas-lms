@@ -289,6 +289,7 @@ class CoursesController < ApplicationController
   include ContextExternalToolsHelper
 
   before_filter :require_user, :only => [:index]
+  before_filter :require_user_or_observer, :only=>[:user_index]
   before_filter :require_context, :only => [:roster, :locks, :create_file, :ping]
   skip_after_filter :update_enrollment_last_activity_at, only: [:enrollment_invitation]
 
@@ -316,6 +317,102 @@ class CoursesController < ApplicationController
   #   {api:RoleOverridesController#add_role Add Role API} or a built_in role type of
   #   'StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'ObserverEnrollment',
   #   or 'DesignerEnrollment'.
+  #
+  # @argument include[] [String, "needs_grading_count"|"syllabus_body"|"total_scores"|"term"|"course_progress"|"sections"|"storage_quota_used_mb"|"total_students"|"favorites"|"teachers"]
+  #   - "needs_grading_count": Optional information to include with each Course.
+  #     When needs_grading_count is given, and the current user has grading
+  #     rights, the total number of submissions needing grading for all
+  #     assignments is returned.
+  #   - "syllabus_body": Optional information to include with each Course.
+  #     When syllabus_body is given the user-generated html for the course
+  #     syllabus is returned.
+  #   - "total_scores": Optional information to include with each Course.
+  #     When total_scores is given, any enrollments with type 'student' will also
+  #     include the fields 'calculated_current_score', 'calculated_final_score',
+  #     'calculated_current_grade', and 'calculated_final_grade'.
+  #     calculated_current_score is the student's score in the course, ignoring
+  #     ungraded assignments. calculated_final_score is the student's score in
+  #     the course including ungraded assignments with a score of 0.
+  #     calculated_current_grade is the letter grade equivalent of
+  #     calculated_current_score (if available). calculated_final_grade is the
+  #     letter grade equivalent of calculated_final_score (if available). This
+  #     argument is ignored if the course is configured to hide final grades.
+  #   - "term": Optional information to include with each Course. When
+  #     term is given, the information for the enrollment term for each course
+  #     is returned.
+  #   - "course_progress": Optional information to include with each Course.
+  #     When course_progress is given, each course will include a
+  #     'course_progress' object with the fields: 'requirement_count', an integer
+  #     specifying the total number of requirements in the course,
+  #     'requirement_completed_count', an integer specifying the total number of
+  #     requirements in this course that have been completed, and
+  #     'next_requirement_url', a string url to the next requirement item, and
+  #     'completed_at', the date the course was completed (null if incomplete).
+  #     'next_requirement_url' will be null if all requirements have been
+  #     completed or the current module does not require sequential progress.
+  #     "course_progress" will return an error message if the course is not
+  #     module based or the user is not enrolled as a student in the course.
+  #   - "sections": Section enrollment information to include with each Course.
+  #     Returns an array of hashes containing the section ID (id), section name
+  #     (name), start and end dates (start_at, end_at), as well as the enrollment
+  #     type (enrollment_role, e.g. 'StudentEnrollment').
+  #   - "storage_quota_used_mb": The amount of storage space used by the files in this course
+  #   - "total_students": Optional information to include with each Course.
+  #     Returns an integer for the total amount of active and invited students.
+  #   - "passback_status": Include the grade passback_status
+  #   - "favorites": Optional information to include with each Course.
+  #     Indicates if the user has marked the course as a favorite course.
+  #   - "teachers": Teacher information to include with each Course.
+  #     Returns an array of hashes containing the {{api:Users:UserDisplay UserDisplay} information
+  #     for each teacher in the course.
+  #
+  # @argument state[] [String, "unpublished"|"available"|"completed"|"deleted"]
+  #   If set, only return courses that are in the given state(s).
+  #   By default, "available" is returned for students and observers, and
+  #   anything except "deleted", for all other enrollment types
+  #
+  # @returns [Course]
+  def index
+    respond_to do |format|
+      format.html {
+        all_enrollments = @current_user.enrollments.not_deleted.shard(@current_user).to_a
+        @past_enrollments = []
+        @current_enrollments = []
+        @future_enrollments  = []
+        Canvas::Builders::EnrollmentDateBuilder.preload(all_enrollments)
+        all_enrollments.group_by{|e| [e.course_id, e.type]}.values.each do |enrollments|
+          e = enrollments.first
+          if enrollments.count > 1
+            e.course_section = nil
+            e.readonly!
+          end
+
+          state = e.state_based_on_date
+          if [:completed, :rejected].include?(state)
+            @past_enrollments << e unless e.workflow_state == "invited" || e.restrict_past_view?
+          else
+            start_at, end_at = e.enrollment_dates.first
+            if start_at && start_at > Time.now.utc
+              @future_enrollments << e unless e.restrict_future_view?
+            elsif state != :inactive
+              @current_enrollments << e
+            end
+          end
+        end
+        @visible_groups = @current_user.visible_groups
+
+        @past_enrollments.sort_by!{|e| Canvas::ICU.collation_key(e.long_name)}
+        [@current_enrollments, @future_enrollments].each{|list| list.sort_by!{|e| [e.active? ? 1 : 0, Canvas::ICU.collation_key(e.long_name)] }}
+      }
+
+      format.json {
+        render json: courses_for_user(@current_user)
+      }
+    end
+  end
+
+  # @API List courses for a user
+  # Returns a list of active courses for this user. To view the course list for a user other than yourself, you must be either an observer of that user or an administrator.
   #
   # @argument include[] [String, "needs_grading_count"|"syllabus_body"|"total_scores"|"term"|"course_progress"|"sections"|"storage_quota_used_mb"|"total_students"|"favorites"]
   #   - "needs_grading_count": Optional information to include with each Course.
@@ -368,84 +465,9 @@ class CoursesController < ApplicationController
   #   anything except "deleted", for all other enrollment types
   #
   # @returns [Course]
-  def index
-    respond_to do |format|
-      format.html {
-        all_enrollments = @current_user.enrollments.not_deleted.shard(@current_user).to_a
-        @past_enrollments = []
-        @current_enrollments = []
-        @future_enrollments  = []
-        Canvas::Builders::EnrollmentDateBuilder.preload(all_enrollments)
-        all_enrollments.group_by{|e| [e.course_id, e.type]}.values.each do |enrollments|
-          e = enrollments.first
-          if enrollments.count > 1
-            e.course_section = nil
-            e.readonly!
-          end
-
-          state = e.state_based_on_date
-          if [:completed, :rejected].include?(state)
-            @past_enrollments << e unless e.workflow_state == "invited" || e.restrict_past_view?
-          else
-            start_at, end_at = e.enrollment_dates.first
-            if start_at && start_at > Time.now.utc
-              @future_enrollments << e unless e.restrict_future_view?
-            elsif state != :inactive
-              @current_enrollments << e
-            end
-          end
-        end
-        @visible_groups = @current_user.visible_groups
-
-        @past_enrollments.sort_by!{|e| Canvas::ICU.collation_key(e.long_name)}
-        [@current_enrollments, @future_enrollments].each{|list| list.sort_by!{|e| [e.active? ? 1 : 0, Canvas::ICU.collation_key(e.long_name)] }}
-      }
-
-      format.json {
-        if params[:state]
-          states = Array(params[:state])
-          states += %w(created claimed) if states.include?('unpublished')
-          conditions = states.map{ |state|
-            Enrollment::QueryBuilder.new(nil, course_workflow_state: state, enforce_course_workflow_state: true).conditions
-          }.compact.join(" OR ")
-          enrollments = @current_user.enrollments.eager_load(:course).where(conditions).shard(@current_user)
-        else
-          enrollments = @current_user.cached_current_enrollments(preload_courses: true)
-        end
-
-        # TODO: preload roles after enrollment#role shim is taken out
-        if params[:enrollment_role]
-          enrollments = enrollments.reject { |e| e.role.name != params[:enrollment_role] }
-        elsif params[:enrollment_role_id]
-          enrollments = enrollments.reject { |e| e.role.id.to_s != params[:enrollment_role_id].to_s }
-        elsif params[:enrollment_type]
-          e_type = "#{params[:enrollment_type].capitalize}Enrollment"
-          enrollments = enrollments.reject { |e| e.class.name != e_type }
-        end
-
-        if value_to_boolean(params[:current_domain_only])
-          enrollments = enrollments.select { |e| e.root_account_id == @domain_root_account.id }
-        elsif params[:root_account_id]
-          root_account = api_find_all(Account, [params[:root_account_id]]).first
-          enrollments = root_account ? enrollments.select { |e| e.root_account_id == root_account.id } : []
-        end
-
-        includes = Set.new(Array(params[:include]))
-        includes << 'access_restricted_by_date'
-        # We only want to return the permissions for single courses and not lists of courses.
-        includes.delete 'permissions'
-
-        hash = []
-
-        Canvas::Builders::EnrollmentDateBuilder.preload(enrollments)
-        enrollments_by_course = enrollments.group_by(&:course_id).values
-        enrollments_by_course = Api.paginate(enrollments_by_course, self, api_v1_courses_url) if api_request?
-        enrollments_by_course.each do |course_enrollments|
-          course = course_enrollments.first.course
-          hash << course_json(course, @current_user, session, includes, course_enrollments)
-        end
-        render :json => hash
-      }
+  def user_index
+    @user.shard.activate do
+      render json: courses_for_user(@user)
     end
   end
 
@@ -1962,10 +1984,19 @@ class CoursesController < ApplicationController
     old_settings = @course.settings
     logging_source = api_request? ? :api : :manual
 
+    params[:course] ||= {}
+    params[:course][:event] = :offer if params[:offer].present?
+
+    if params[:course][:event] && params[:course].size == 1
+      if authorized_action(@course, @current_user, :change_course_state) && process_course_event
+        render_update_success
+      end
+      return
+    end
+
     if authorized_action(@course, @current_user, [:update, :manage_content])
       return render_update_success if params[:for_reload]
 
-      params[:course] ||= {}
       unless @course.grants_right?(@current_user, :update)
         params[:course] = params[:course].slice(:syllabus_body) # let users with :manage_content only update the body
       end
@@ -2030,7 +2061,6 @@ class CoursesController < ApplicationController
       if params[:course].has_key?(:apply_assignment_group_weights)
         @course.apply_assignment_group_weights = value_to_boolean params[:course].delete(:apply_assignment_group_weights)
       end
-      params[:course][:event] = :offer if params[:offer].present?
 
       lock_announcements = params[:course].delete(:lock_all_announcements)
       unless lock_announcements.nil?
@@ -2047,19 +2077,7 @@ class CoursesController < ApplicationController
       end
 
       if params[:course][:event] && @course.grants_right?(@current_user, session, :change_course_state)
-        event = params[:course].delete(:event)
-        event = event.to_sym
-        if event == :claim && !@course.unpublishable?
-          flash[:error] = t('errors.unpublish', 'Course cannot be unpublished if student submissions exist.')
-          redirect_to(course_url(@course)) and return
-        else
-          @course.process_event(event)
-          if event == :offer
-            Auditors::Course.record_published(@course, @current_user, source: logging_source)
-          elsif event == :claim
-            Auditors::Course.record_claimed(@course, @current_user, source: logging_source)
-          end
-        end
+        return unless process_course_event
       end
 
       params[:course][:conclude_at] = params[:course].delete(:end_at) if api_request? && params[:course].has_key?(:end_at)
@@ -2082,6 +2100,24 @@ class CoursesController < ApplicationController
           format.html { render :edit }
           format.json { render :json => @course.errors, :status => :bad_request }
         end
+      end
+    end
+  end
+
+  def process_course_event
+    event = params[:course].delete(:event)
+    event = event.to_sym
+    if event == :claim && !@course.unpublishable?
+      flash[:error] = t('errors.unpublish', 'Course cannot be unpublished if student submissions exist.')
+      redirect_to(course_url(@course))
+      return false
+    else
+      @course.process_event(event)
+      logging_source = api_request? ? :api : :manual
+      if event == :offer
+        Auditors::Course.record_published(@course, @current_user, source: logging_source)
+      elsif event == :claim
+        Auditors::Course.record_claimed(@course, @current_user, source: logging_source)
       end
     end
   end
@@ -2341,5 +2377,67 @@ class CoursesController < ApplicationController
 
     CourseLinkValidator.queue_course(@context)
     render :json => {:success => true}
+  end
+
+  def link_validator
+    get_context
+    return unless authorized_action(@context, @current_user, :manage_content)
+    # render view
+  end
+
+  def courses_for_user(user)
+    if params[:state]
+      states = Array(params[:state])
+      states += %w(created claimed) if states.include?('unpublished')
+      conditions = states.map do |state|
+        Enrollment::QueryBuilder.new(nil, course_workflow_state: state, enforce_course_workflow_state: true).conditions
+      end.compact.join(" OR ")
+      enrollments = user.enrollments.eager_load(:course).where(conditions).shard(user)
+    else
+      enrollments = user.cached_current_enrollments(preload_courses: true)
+    end
+
+    # TODO: preload roles after enrollment#role shim is taken out
+    if params[:enrollment_role]
+      enrollments = enrollments.reject { |e| e.role.name != params[:enrollment_role] }
+    elsif params[:enrollment_role_id]
+      enrollments = enrollments.reject { |e| e.role.id.to_s != params[:enrollment_role_id].to_s }
+    elsif params[:enrollment_type]
+      e_type = "#{params[:enrollment_type].capitalize}Enrollment"
+      enrollments = enrollments.reject { |e| e.class.name != e_type }
+    end
+
+    if value_to_boolean(params[:current_domain_only])
+      enrollments = enrollments.select { |e| e.root_account_id == @domain_root_account.id }
+    elsif params[:root_account_id]
+      root_account = api_find_all(Account, [params[:root_account_id]]).first
+      enrollments = root_account ? enrollments.select { |e| e.root_account_id == root_account.id } : []
+    end
+
+    includes = Set.new(Array(params[:include]))
+    includes << 'access_restricted_by_date'
+    # We only want to return the permissions for single courses and not lists of courses.
+    includes.delete 'permissions'
+
+    hash = []
+
+    Canvas::Builders::EnrollmentDateBuilder.preload(enrollments)
+    enrollments_by_course = enrollments.group_by(&:course_id).values
+    enrollments_by_course = Api.paginate(enrollments_by_course, self, api_v1_courses_url) if api_request?
+    if includes.include?("teachers")
+      courses = enrollments_by_course.map(&:first).map(&:course)
+      ActiveRecord::Associations::Preloader.new(courses, :teachers).run
+    end
+    enrollments_by_course.each do |course_enrollments|
+      course = course_enrollments.first.course
+      hash << course_json(course, user, session, includes, course_enrollments)
+    end
+    hash
+  end
+
+  def require_user_or_observer
+    return render_unauthorized_action unless @current_user.present?
+    @user = params[:user_id]=="self" ? @current_user : api_find(User,params[:user_id])
+    authorized_action(@user,@current_user,:read)
   end
 end

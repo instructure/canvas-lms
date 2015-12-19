@@ -78,15 +78,19 @@ define([
       assignmentUrl = $("#assignment_url").attr('href'),
       $full_height = $(".full_height"),
       $rightside_inner = $("#rightside_inner"),
+      $moderation_bar = $("#moderation_bar"),
       $moderation_tabs_div = $("#moderation_tabs"),
       $moderation_tabs = $("#moderation_tabs > ul > li"),
       $moderation_tab_2nd = $moderation_tabs.eq(1),
       $moderation_tab_final = $moderation_tabs.eq(2),
       $new_mark_container = $("#new_mark_container"),
       $new_mark_link = $("#new_mark_link"),
+      $new_mark_link_menu_item = $new_mark_link.parent(),
       $new_mark_copy_link1 = $("#new_mark_copy_link1"),
       $new_mark_copy_link2 = $("#new_mark_copy_link2"),
+      $new_mark_copy_link2_menu_item = $new_mark_copy_link2.parent(),
       $new_mark_final_link = $("#new_mark_final_link"),
+      $new_mark_final_link_menu_item = $new_mark_final_link.parent(),
       $not_gradeable_message = $("#not_gradeable_message"),
       $comments = $("#comments"),
       $comment_blank = $("#comment_blank").removeAttr('id').detach(),
@@ -202,26 +206,43 @@ define([
     //by defaut the list is sorted alphbetically by student last name so we dont have to do any more work here,
     // if the cookie to sort it by submitted_at is set we need to sort by submitted_at.
     var hideStudentNames = utils.shouldHideStudentNames();
-    var compareBy = function(f) {
-      return function(a, b) {
-        a = f(a);
-        b = f(b);
-        if ((!a && !b) || a === b) { return 0; }
-        if (!a || a > b) { return +1; }
+    var compareStudentsBy = function(f) {
+      return function(studentA, studentB) {
+        var a = f(studentA);
+        var b = f(studentB);
+
+        if ((!a && !b) || a === b) {
+          // chrome / safari sort isn't stable, so we need to sort by name in
+          // case of tie
+          if (studentA.name > studentB.name) {
+            return -1;
+          } else if (studentB.name > studentA.name) {
+            return 1;
+          } else {
+            return 0;
+          }
+        }
+        else if (!a || a > b) { return 1; }
         else { return -1; }
       };
     };
     if(hideStudentNames) {
-      jsonData.studentsWithSubmissions.sort(compareBy(function(student) {
+      jsonData.studentsWithSubmissions.sort(compareStudentsBy(function(student) {
         return student &&
           student.submission &&
           student.submission.id;
       }));
     } else if (userSettings.get("eg_sort_by") == "submitted_at") {
-      jsonData.studentsWithSubmissions.sort(compareBy(function(student){
-        return student &&
-          student.submission &&
-          +tz.parse(student.submission.submitted_at);
+      jsonData.studentsWithSubmissions.sort(compareStudentsBy(function(student){
+        var submittedAt = student &&
+                          student.submission &&
+                          student.submission.submitted_at;
+        if (submittedAt) {
+          return +tz.parse(submittedAt);
+        } else {
+          // puts the unsubmitted assignments at the bottom
+          return Number.NaN;
+        }
       }));
     } else if (userSettings.get("eg_sort_by") == "submission_status") {
       var states = {
@@ -231,7 +252,7 @@ define([
         "graded": 4,
         "not_gradeable": 5
       };
-      jsonData.studentsWithSubmissions.sort(compareBy(function(student){
+      jsonData.studentsWithSubmissions.sort(compareStudentsBy(function(student){
         return student &&
           states[submissionState(student)];
       }));
@@ -849,21 +870,26 @@ define([
     currentStudent: null,
 
     domReady: function(){
-      $moderation_tabs_div.tabs();
+      $moderation_tabs_div.tabs({
+        activate: function(event, ui) {
+          var index = ui.newTab.data('pg-index')
+          if (index != 'final') {
+            index = parseInt(index);
+          }
+          EG.showProvisionalGrade(index);
+        }
+      });
       $moderation_tabs.each(function(index) {
         if (index == 2) index = "final"; // this will make it easier to identify the final mark
-        if (index == 3) { // don't show for the cog menu
-          $(this).find('a').off('click');
-        } else {
-          $(this).find('a').click(function(e) {
-            e.preventDefault();
-            EG.showProvisionalGrade(index);
-          });
-          $('<i class="icon-check selected_icon"></i>').prependTo($(this).find('.mark_title'));
-          $('<button class="Button"></button>').text(I18n.t('Select')).appendTo($(this)).click(function(){
-            EG.selectProvisionalGrade(index);
-          });
-        }
+
+        $(this).find('a').click(function(e) {
+          e.preventDefault();
+          EG.showProvisionalGrade(index);
+        });
+        $('<i class="icon-check selected_icon"></i>').prependTo($(this).find('.mark_title'));
+        $('<button class="Button" role="button"></button>').text(I18n.t('Select')).appendTo($(this)).on('click keyclick', function(){
+          EG.selectProvisionalGrade(index);
+        });
       });
       $new_mark_link.click(function(e){ e.preventDefault(); EG.newProvisionalGrade('new', 1)} );
       $new_mark_final_link.click(function(e){ e.preventDefault(); EG.newProvisionalGrade('new', 'final')} );
@@ -1063,6 +1089,8 @@ define([
 
       if (hash.provisional_grade_id) {
         EG.selected_provisional_grade_id = hash.provisional_grade_id;
+      } else if (hash.add_review) {
+        EG.add_review = true;
       }
       EG.goToStudent(studentId);
     },
@@ -1098,7 +1126,11 @@ define([
       this.currentStudent = jsonData.studentMap[id] || _.values(jsonData.studentsWithSubmissions)[0];
       document.location.hash = "#" + encodeURIComponent(JSON.stringify({
           "student_id": this.currentStudent.id
-        }));
+      }));
+
+      // On the switch to a new student, clear the state of the last
+      // question touched on the previous student.
+      INST.lastQuestionTouched = null;
 
       if ((ENV.grading_role == 'provisional_grader' && this.currentStudent.submission_state == 'not_graded')
         || ENV.grading_role == 'moderator') {
@@ -1168,70 +1200,81 @@ define([
 
       if (prov_grades && prov_grades.length == 1 && !final_grade && !prov_grades[0].readonly) {
         $full_width_container.removeClass("with_moderation_tabs");
-        $moderation_tabs_div.hide();
+        $moderation_bar.hide();
         EG.showProvisionalGrade(0);
       } else if (prov_grades && prov_grades.length > 0) {
         if (prov_grades.length == 1) {
-          $moderation_tab_2nd.hide(); // hide 2nd mark
+          // hide and disable second mark tab
+          $moderation_tab_2nd.hide();
+          $moderation_tabs_div.tabs('disable', 1);
 
           if (this.currentStudent.needs_provisional_grade || final_grade) {
             $new_mark_container.show();
-            $new_mark_copy_link2.hide(); // hide copy 2nd mark
+            $new_mark_copy_link2_menu_item.hide(); // hide copy 2nd mark
             if (final_grade) {
-              $new_mark_link.hide();
+              $new_mark_link_menu_item.hide();
             } else {
-              $new_mark_link.show();
+              EG.can_add_review = true;
+              $new_mark_link_menu_item.show();
             }
           } else {
             $new_mark_container.hide(); // hide new mark dropdown if not selected for moderation
           }
         } else if (prov_grades.length == 2) {
+          // enable and show second mark tab
+          $moderation_tabs_div.tabs('enable', 1);
           $moderation_tab_2nd.show();
           $new_mark_container.show();
-          $new_mark_link.hide();
+          $new_mark_link_menu_item.hide();
           if (prov_grades[1].provisional_grade_id) {
-            $new_mark_copy_link2.show(); // show copy 2nd mark
+            $new_mark_copy_link2_menu_item.show(); // show copy 2nd mark
           } else {
-            $new_mark_copy_link2.hide(); // don't show if it's a new unsaved mark
+            $new_mark_copy_link2_menu_item.hide(); // don't show if it's a new unsaved mark
           }
         }
 
         if (final_grade) {
+          $moderation_tabs_div.tabs('enable', 2);
           $moderation_tab_final.show();
-          $new_mark_final_link.hide();
+          $new_mark_final_link_menu_item.hide();
         } else {
+          $moderation_tabs_div.tabs('disable', 2);
           $moderation_tab_final.hide();
-          $new_mark_final_link.show();
+          $new_mark_final_link_menu_item.show();
         }
 
         $full_width_container.addClass("with_moderation_tabs");
-        $moderation_tabs_div.show();
+        $moderation_bar.show();
 
-        if (this.selected_provisional_grade_id) {
-          var selected_id = this.selected_provisional_grade_id;
-          // load provisional grade id from anchor hash
-
-          if (final_grade && final_grade.provisional_grade_id == selected_id) {
-            index_to_load = 'final'; // final mark
-          } else {
-            $.each(prov_grades, function (idx, pg) {
-              if (pg.provisional_grade_id == selected_id) {
-                index_to_load = idx;
-              }
-            });
-          }
-
-          this.selected_provisional_grade_id = null; // don't load it again
-        }
-
-        if (index_to_load == 'final') {
-          $moderation_tab_final.find('a').click();
+        if (this.add_review && this.can_add_review) {
+          this.add_review = false;
+          this.newProvisionalGrade('new', 1);
         } else {
-          $moderation_tabs.eq(index_to_load).find('a').click(); // show a grade
+          if (this.selected_provisional_grade_id) {
+            var selected_id = this.selected_provisional_grade_id;
+            // load provisional grade id from anchor hash
+
+            if (final_grade && final_grade.provisional_grade_id == selected_id) {
+              index_to_load = 'final'; // final mark
+            } else {
+              $.each(prov_grades, function (idx, pg) {
+                if (pg.provisional_grade_id == selected_id) {
+                  index_to_load = idx;
+                }
+              });
+            }
+
+            this.selected_provisional_grade_id = null; // don't load it again
+          }
+          if (index_to_load == 'final') {
+            $moderation_tab_final.find('a').click();
+          } else {
+            $moderation_tabs.eq(index_to_load).find('a').click(); // show a grade
+          }
         }
       } else {
         $full_width_container.removeClass("with_moderation_tabs");
-        $moderation_tabs_div.hide();
+        $moderation_bar.hide();
         this.showSubmission();
         this.setReadOnly(false);
       }
@@ -1245,10 +1288,16 @@ define([
       this.updateModerationTab($moderation_tab_final, this.currentStudent.submission.final_provisional_grade);
     },
     updateModerationTab: function($tab, prov_grade) {
+      var CHOSEN_GRADE_MESSAGE = I18n.t('This is the currently chosen grade for this student.');
+      var $srMessage = $('<span class="selected_sr_message screenreader-only"></span>').text(CHOSEN_GRADE_MESSAGE);
       if (prov_grade && prov_grade.selected) {
         $tab.addClass('selected');
+        // Remove an old message, should it be there
+        $tab.find('.selected_sr_message').remove();
+        $tab.find('.mark_title').prepend($srMessage);
       } else {
         $tab.removeClass('selected');
+        $tab.find('.selected_sr_message').remove();
       }
 
       if (prov_grade && prov_grade.provisional_grade_id) {
@@ -1317,17 +1366,20 @@ define([
               EG.current_prov_grade_index = null;
               EG.handleModerationTabs('final');
               EG.updateModerationTabs();
+              $moderation_tab_final.focus();
             })
           );
         }
       }
     },
     selectProvisionalGrade: function(index) {
-      var prov_grade;
+      var prov_grade, $tab;
       if (index == 'final') {
         prov_grade = this.currentStudent.submission.final_provisional_grade;
+        $tab = $moderation_tab_final
       } else {
         prov_grade = this.currentStudent.submission.provisional_grades[index];
+        $tab = $moderation_tabs.eq(index);
       }
       $full_width_container.disableWhileLoading(
         $.ajaxJSON($.replaceTags(ENV.provisional_select_url, {provisional_grade_id: prov_grade.provisional_grade_id}), "PUT",  {}, function(data) {
@@ -1337,6 +1389,7 @@ define([
           }
           prov_grade.selected = true;
           EG.updateModerationTabs();
+          $tab.focus();
         })
       );
     },
@@ -1912,7 +1965,7 @@ define([
             prov_grade.provisional_grade_id = submission.provisional_grade_id; // populate a new prov_grade's id
             this.updateModerationTabs();
             if (this.current_prov_grade_index == 1) {
-              $new_mark_copy_link2.show(); // show the copy link now
+              $new_mark_copy_link2_menu_item.show(); // show the copy link now
             }
           }
           prov_grade.score = submission.score;

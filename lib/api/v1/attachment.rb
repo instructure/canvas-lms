@@ -112,6 +112,9 @@ module Api::V1::Attachment
     if includes.include? 'usage_rights'
       hash['usage_rights'] = usage_rights_json(attachment.usage_rights, user)
     end
+    if includes.include? "context_asset_string"
+      hash['context_asset_string'] = attachment.context.try(:asset_string)
+    end
 
     hash
   end

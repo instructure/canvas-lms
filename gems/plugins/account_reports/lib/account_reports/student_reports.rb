@@ -177,14 +177,14 @@ module AccountReports
                   c.name AS course_name, s.id AS section_id,
                   s.sis_source_id AS section_sis_id, s.name AS section_name,
                   p.user_id, p.sis_user_id, u.sortable_name").
-          joins("INNER JOIN courses c ON c.id = enrollments.course_id
+          joins("INNER JOIN #{Course.quoted_table_name} c ON c.id = enrollments.course_id
                    AND c.workflow_state = 'available'
-                 INNER JOIN course_sections s ON s.id = enrollments.course_section_id
+                 INNER JOIN #{CourseSection.quoted_table_name} s ON s.id = enrollments.course_section_id
                    AND s.workflow_state = 'active'
-                 INNER JOIN pseudonyms p ON p.user_id = enrollments.user_id
+                 INNER JOIN #{Pseudonym.quoted_table_name} p ON p.user_id = enrollments.user_id
                    AND p.account_id = enrollments.root_account_id
                    AND p.workflow_state = 'active'
-                 INNER JOIN users u ON u.id = p.user_id").
+                 INNER JOIN #{User.quoted_table_name} u ON u.id = p.user_id").
           where("enrollments.type = 'StudentEnrollment'
                  AND enrollments.workflow_state = 'active'")
 

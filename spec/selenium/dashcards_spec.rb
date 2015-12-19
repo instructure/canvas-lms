@@ -1,11 +1,13 @@
-require File.expand_path(File.dirname(__FILE__) + '/common')
-require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
-require File.expand_path(File.dirname(__FILE__) + '/helpers/announcements_common')
-require File.expand_path(File.dirname(__FILE__) + '/helpers/color_common')
-
+require_relative 'common'
+require_relative 'helpers/files_common'
+require_relative 'helpers/announcements_common'
+require_relative 'helpers/color_common'
 
 describe 'dashcards' do
   include_context 'in-process server selenium tests'
+  include AnnouncementsCommon
+  include ColorCommon
+  include FilesCommon
 
   context 'as a student' do
 
@@ -15,7 +17,7 @@ describe 'dashcards' do
       Account.default.enable_feature! :use_new_styles
     end
 
-    it "should show the toggle button for dashcard in new UI", priority: "1", test_id: 222506 do
+    it 'should show the toggle button for dashcard in new UI', priority: "1", test_id: 222506 do
       get '/'
       # verify features of new UI
       expect(f('#application.ic-app')).to be_present
@@ -24,7 +26,7 @@ describe 'dashcards' do
       expect(f('.ic-Super-toggle__switch')).to be_present
     end
 
-    it "should toggle dashboard based on the toggle switch", priority: "1", test_id: 222507 do
+    it 'should toggle dashboard based on the toggle switch', priority: "1", test_id: 222507 do
       get '/'
       expect(f('.ic-Super-toggle__switch')).to be_present
       # toggle switch to right
@@ -332,5 +334,13 @@ describe 'dashcards' do
       # need not check for announcements, assignments and files as we have not created any
       expect(f(".ic-DashboardCard__action-container .discussions")).to be_nil
     end
+  end
+
+  def select_color_pallet_from_calendar_page
+    get '/calendar'
+    fail 'Not the right course' unless f('#context-list li:nth-of-type(2)').text.include? @course1.name
+    f('#context-list li:nth-of-type(2) .ContextList__MoreBtn').click
+    wait_for_ajaximations
+    expect(f('.ColorPicker__Container')).to be_displayed
   end
 end

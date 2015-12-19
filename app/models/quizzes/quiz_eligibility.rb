@@ -78,23 +78,9 @@ class Quizzes::QuizEligibility
   end
 
   def restricted_by_date?
-    # Term  | Restricted Course  | Section  | Section Restr? | Restricted by date?
-    # open  | open               | open     | false          | false
-    # open  | open               | open     | true           | false
-    # open  | open               | closed   | false          | false
-    # open  | open               | closed   | true           | true
-    # open  | closed             | open     | false          | true
-    # open  | closed             | open     | true           | false
-    # open  | closed             | closed   | false          | true
-    # open  | closed             | closed   | true           | true
-    # closed| open               | open     | false          | false
-    # closed| open               | open     | true           | false
-    # closed| open               | closed   | false          | false
-    # closed| open               | closed   | true           | true
-    # closed| closed             | open     | false          | true
-    # closed| closed             | open     | true           | false
-    # closed| closed             | closed   | false          | true
-    # closed| closed             | closed   | true           | true
+    # Term dates override any others unless course date restrictions or
+    # section date restrictions are selected.  Section dates override course
+    # dates if section date restrictions apply
 
     return true if restricted_section_has_ended?
     return false if section_is_ongoing? && section_restricted_by_date?
@@ -140,6 +126,7 @@ class Quizzes::QuizEligibility
   end
 
   def section_is_ongoing?
+    return true if course_section.end_at.nil?
     course_section.end_at && course_section.end_at >= Time.zone.now
   end
 

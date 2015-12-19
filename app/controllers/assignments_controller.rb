@@ -182,6 +182,8 @@ class AssignmentsController < ApplicationController
       add_crumb(t('Moderate'))
 
       js_env({
+        :ASSIGNMENT_TITLE => @assignment.title,
+        :GRADES_PUBLISHED => @assignment.grades_published?,
         :URLS => {
           :student_submissions_url => polymorphic_url([:api_v1, @context, @assignment, :submissions]) + "?include[]=user_summary&include[]=provisional_grades",
           :publish_grades_url => api_v1_publish_provisional_grades_url({course_id: @context.id, assignment_id: @assignment.id}),
@@ -190,7 +192,6 @@ class AssignmentsController < ApplicationController
           :assignment_speedgrader_url => speed_grader_course_gradebook_url({course_id: @context.id, assignment_id: @assignment.id}),
           :provisional_grades_base_url => polymorphic_url([:api_v1, @context, @assignment]) + "/provisional_grades"
         }})
-      js_env(:GRADES_PUBLISHED => @assignment.grades_published?)
 
       respond_to do |format|
         format.html { render }

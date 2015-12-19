@@ -12,7 +12,8 @@ define [
         handleClick: ->
 
       @handleClick = @stub(props, 'handleClick')
-      @DueDateRemoveRowLink = React.render(DueDateRemoveRowLink(props), $('<div>').appendTo('body')[0])
+      DueDateRemoveRowLinkElement = React.createElement(DueDateRemoveRowLink, props)
+      @DueDateRemoveRowLink = React.render(DueDateRemoveRowLinkElement, $('<div>').appendTo('body')[0])
 
     teardown: ->
       React.unmountComponentAtNode(@DueDateRemoveRowLink.getDOMNode().parentNode)

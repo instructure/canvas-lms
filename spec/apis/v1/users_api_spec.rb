@@ -1526,4 +1526,31 @@ describe "Users API", type: :request do
       end
     end
   end
+
+  describe 'missing submissions' do
+    before :once do
+      course_with_student(active_all: true)
+      @observer = user(active_all: true, active_state: 'active')
+      @observer.user_observees.create do |uo|
+        uo.user_id = @student.id
+      end
+      @user = @observer
+      2.times do
+        @course.assignments.create!(due_at: 2.days.ago, workflow_state: 'published', submission_types: "online_text_entry")
+      end
+      @path = "/api/v1/users/#{@student.id}/missing_submissions"
+      @params = {controller: "users", action: "missing_submissions", user_id: @student.id, format: "json"}
+    end
+
+    it "should return unsubmitted assignments due in the past" do
+      json = api_call(:get, @path, @params)
+      expect(json.length).to eql 2
+    end
+
+    it "should not return submitted assignments due in the past" do
+      @course.assignments.first.submit_homework @student, :submission_type => "online_text_entry"
+      json = api_call(:get, @path, @params)
+      expect(json.length).to eql 1
+    end
+  end
 end

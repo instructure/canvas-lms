@@ -591,6 +591,31 @@ describe 'Submissions API', type: :request do
     expect(response.body).to match(/Redirecting to quiz page/)
   end
 
+  it "should return a correct submission_history for quiz submissions" do
+    student1 = user(:active_all => true)
+    course_with_teacher_logged_in(:active_all => true) # need to be logged in to view the preview url below
+    @course.enroll_student(student1).accept!
+    quiz = Quizzes::Quiz.create!(:title => 'quiz1', :context => @course)
+    quiz.did_edit!
+    quiz.offer!
+    qs = quiz.generate_submission(student1)
+    qs.mark_completed
+    Quizzes::SubmissionGrader.new(qs).grade_submission
+    qs.reload
+    qs.attempt = 2
+    qs.with_versioning(true, &:save)
+
+    json = api_call(:get,
+          "/api/v1/courses/#{@course.id}/assignments/#{quiz.assignment.id}/submissions.json",
+          { :controller => 'submissions_api', :action => 'index',
+            :format => 'json', :course_id => @course.id.to_s,
+            :assignment_id => quiz.assignment.id.to_s },
+          { :include => %w(submission_history) })
+
+    expect(json.first['submission_history'].count).to eq 2
+    expect(json.first['submission_history'].first.include? "submission_data").to be_truthy
+  end
+
   it "should allow students to retrieve their own submission" do
     student1 = user(:active_all => true)
     student2 = user(:active_all => true)
@@ -1848,8 +1873,8 @@ describe 'Submissions API', type: :request do
     context "observers" do
       before :once do
         @observer = user :active_all => true
-        @course.enroll_user(@observer, 'ObserverEnrollment', :associated_user_id => @student1.id).accept!
-        @course.enroll_user(@observer, 'ObserverEnrollment', :allow_multiple_enrollments => true, :associated_user_id => @student2.id).accept!
+        @course.enroll_user(@observer, 'ObserverEnrollment', :associated_user_id => @student1.id)
+        @course.enroll_user(@observer, 'ObserverEnrollment', :allow_multiple_enrollments => true, :associated_user_id => @student2.id)
       end
 
       it "should allow an observer to view observed students' submissions" do
@@ -2955,7 +2980,7 @@ describe 'Submissions API', type: :request do
   end
 
   it "includes preview urls for attachments" do
-    Canvadocs.stubs(:enabled?).returns(true)
+    Canvadocs.stubs(:config).returns({a: 1})
 
     course_with_teacher_logged_in active_all: true
     student_in_course active_all: true
@@ -3315,6 +3340,59 @@ describe 'Submissions API', type: :request do
             "selected_provisional_grade_id"=>nil,
             "provisional_grades"=>[]}]
         )
+      end
+    end
+  end
+  describe '#index' do
+    context 'grouped_submissions' do
+      let(:test_course) { course() }
+      let(:teacher)   { user(active_all: true) }
+      let(:student1)  { user(active_all: true) }
+      let(:student2)  { user(active_all: true) }
+      let(:group) do
+        group_category = test_course.group_categories.create(name: 'Engineering')
+        test_course.groups.create(name: 'Group1', group_category: group_category)
+      end
+      let(:assignment) do
+        test_course.assignments.create!(
+          title: 'group assignment',
+          grading_type: 'points',
+          points_possible: 10,
+          submission_types: 'online_text_entry',
+          group_category: group.group_category
+        )
+      end
+
+      let!(:enroll_teacher_and_students) do
+        test_course.enroll_teacher(teacher).accept!
+        test_course.enroll_student(student1, enrollment_state: 'active')
+        test_course.enroll_student(student2, enrollment_state: 'active')
+      end
+      let!(:add_students_to_group) do
+        group.add_user(student1)
+        group.add_user(student2)
+      end
+      let!(:submit_homework) { assignment.submit_homework(student1) }
+
+      let(:path) { "/api/v1/courses/#{test_course.id}/assignments/#{assignment.id}/submissions" }
+      let(:params) do
+        {
+          controller: 'submissions_api', action: 'index',
+          format: 'json', course_id: test_course.id.to_s,
+          assignment_id: assignment.id.to_s
+        }
+      end
+
+      it 'should return two assignment and submission objects for a user group' do
+        params[:grouped] = false
+        json = api_call_as_user(teacher, :get, path, params)
+        expect(json.size).to eq 2
+      end
+
+      it 'should return a single assignment and submission object per user group' do
+        params[:grouped] = true
+        json = api_call_as_user(teacher, :get, path, params)
+        expect(json.size).to eq 1
       end
     end
   end

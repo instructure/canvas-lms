@@ -236,7 +236,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     possible = 0
     entries.each do |e|
       if e[:question_points]
-        possible += (e[:question_points].to_f * e[:actual_pick_count])
+        possible += (e[:question_points].to_f * e[:pick_count])
       else
         possible += e[:points_possible].to_f unless e[:unsupported]
       end
@@ -250,7 +250,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     cnt = 0
     entries.each do |e|
       if e[:question_points]
-        cnt += e[:actual_pick_count]
+        cnt += e[:pick_count]
       else
         cnt += 1 unless e[:unsupported]
       end
@@ -519,7 +519,7 @@ class Quizzes::Quiz < ActiveRecord::Base
         else
           data[:questions] = e.quiz_questions.active.sort_by { |q| q.position || ::CanvasSort::Last }.map(&:data)
         end
-        data[:actual_pick_count] = e.actual_pick_count
+        data[:pick_count] = e.pick_count
         res = data
       end
       res[:position] = e.position.to_i
@@ -536,7 +536,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     question_count = 0
     self.stored_questions.each do |q|
       if q[:pick_count]
-        question_count += q[:actual_pick_count] || q[:pick_count]
+        question_count += q[:pick_count]
       else
         question_count += 1 unless q[:question_type] == Quizzes::QuizQuestion::Q_TEXT_ONLY
       end
@@ -698,7 +698,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     t = Time.now
     entries.each do |e|
       if e[:question_points] #QuizGroup
-        possible += (e[:question_points].to_f * e[:actual_pick_count])
+        possible += (e[:question_points].to_f * e[:pick_count])
       else
         possible += e[:points_possible].to_f
       end

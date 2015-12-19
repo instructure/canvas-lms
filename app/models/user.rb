@@ -274,13 +274,19 @@ class User < ActiveRecord::Base
 
   scope :enrolled_in_course_between, lambda { |course_ids, start_at, end_at| joins(:enrollments).where(:enrollments => { :course_id => course_ids, :created_at => start_at..end_at }) }
 
+  scope :with_last_login, lambda {
+    select("users.*, MAX(current_login_at) as last_login").
+      joins("LEFT OUTER JOIN pseudonyms ON pseudonyms.user_id = users.id").
+      group("users.id")
+  }
+
   scope :for_course_with_last_login, lambda { |course, root_account_id, enrollment_type|
     # add a field to each user that is the aggregated max from current_login_at and last_login_at from their pseudonyms
     scope = select("users.*, MAX(current_login_at) as last_login, MAX(current_login_at) IS NULL as login_info_exists").
       # left outer join ensures we get the user even if they don't have a pseudonym
       joins(sanitize_sql([<<-SQL, root_account_id])).where(:enrollments => { :course_id => course })
-        LEFT OUTER JOIN pseudonyms ON pseudonyms.user_id = users.id AND pseudonyms.account_id = ?
-        INNER JOIN enrollments ON enrollments.user_id = users.id
+        LEFT OUTER JOIN #{Pseudonym.quoted_table_name} ON pseudonyms.user_id = users.id AND pseudonyms.account_id = ?
+        INNER JOIN #{Enrollment.quoted_table_name} ON enrollments.user_id = users.id
       SQL
     scope = scope.where("enrollments.workflow_state<>'deleted'")
     scope = scope.where(:enrollments => { :type => enrollment_type }) if enrollment_type
@@ -1011,10 +1017,13 @@ class User < ActiveRecord::Base
 
   def check_accounts_right?(user, sought_right)
     # check if the user we are given is an admin in one of this user's accounts
-    user && (
-      Account.site_admin.grants_right?(user, sought_right) ||
-      self.associated_accounts.any?{|a| a.grants_right?(user, sought_right) }
-    )
+    return false unless user
+    return true if Account.site_admin.grants_right?(user, sought_right)
+    # what shards do the seeker and target share? only check accounts on those
+    # shards, to avoid too many queries.
+    shards = self.associated_shards & user.associated_shards
+    return false if shards.empty?
+    return self.associated_accounts.shard(shards).any?{|a| a.grants_right?(user, sought_right) }
   end
 
   set_policy do
@@ -1049,7 +1058,10 @@ class User < ActiveRecord::Base
       can :view_statistics and can :read and can :read_reports and can :manage_feature_flags and can :read_grades
 
     given {|user| self.check_accounts_right?(user, :manage_user_logins) }
-    can :view_statistics and can :read and can :read_reports
+    can :read and can :read_reports
+
+    given {|user| self.check_accounts_right?(user, :read_roster) }
+    can :read_full_profile
 
     given {|user| self.check_accounts_right?(user, :view_all_grades) }
     can :read_grades
@@ -1071,6 +1083,9 @@ class User < ActiveRecord::Base
       (self != user && self.pseudonyms.shard(self).all?{ |p| p.grants_right?(user, :update) })
     end
     can :reset_mfa
+
+    given { |user| user && user.user_observees.where(user_id: self.id).exists? }
+    can :read and can :read_as_parent
   end
 
   def can_masquerade?(masquerader, account)
@@ -1442,7 +1457,7 @@ class User < ActiveRecord::Base
       if opts[:contexts]
         course_ids = Array(opts[:contexts]).map(&:id) & course_ids
       end
-      opts = {limit: 15}.merge(opts.slice(:due_after, :limit))
+      opts = {limit: 15}.merge(opts.slice(:due_after, :due_before, :limit))
 
       Rails.cache.fetch([self, "assignments_needing_#{purpose}", course_ids, opts].cache_key, :expires_in => expires_in) do
         result = Shackles.activate(:slave) do
@@ -1458,17 +1473,18 @@ class User < ActiveRecord::Base
   end
 
   def assignments_needing_submitting(opts={})
-    assignments_needing('submitting', :student, 15.minutes, opts) do |assignment_scope, opts|
-      due_after = opts[:due_after] || 4.weeks.ago
+    assignments_needing('submitting', :student, 15.minutes, opts) do |assignment_scope, options|
+      due_after = options[:due_after] || 4.weeks.ago
+      due_before = options[:due_before] || 1.week.from_now
 
-      courses = Course.find(opts[:shard_course_ids])
+      courses = Course.find(options[:shard_course_ids])
       courses_with_da = courses.select{|c| c.feature_enabled?(:differentiated_assignments)}
       assignments = assignment_scope.
         filter_by_visibilities_in_given_courses(self.id, courses_with_da.map(&:id)).
         published.
-        due_between_with_overrides(due_after, 1.week.from_now).
+        due_between_with_overrides(due_after, due_before).
         expecting_submission.
-        need_submitting_info(id, opts[:limit]).
+        need_submitting_info(id, options[:limit]).
         not_locked
       select_available_assignments(assignments)
     end
@@ -1479,9 +1495,9 @@ class User < ActiveRecord::Base
     assignments_needing('grading', :instructor, 120.minutes, opts) do |assignment_scope, opts|
       as = assignment_scope.active.
         expecting_submission.
-        need_grading_info(opts[:limit])
+        need_grading_info
       ActiveRecord::Associations::Preloader.new(as, :context).run
-      as.reject{|a| Assignments::NeedsGradingCountQuery.new(a, self).count == 0 }
+      as.lazy.select{|a| Assignments::NeedsGradingCountQuery.new(a, self).count != 0 }.take(opts[:limit]).to_a
     end
   end
 
@@ -1492,8 +1508,8 @@ class User < ActiveRecord::Base
         where(:moderated_grading => true).
         where("assignments.grades_published_at IS NULL").
         joins(:provisional_grades).uniq.preload(:context).
-        need_grading_info(opts[:limit]).
-        select{|a| a.context.grants_right?(self, :moderate_grades)}
+        need_grading_info.
+        lazy.select{|a| a.context.grants_right?(self, :moderate_grades)}.take(opts[:limit]).to_a
     end
   end
 
@@ -2602,7 +2618,14 @@ class User < ActiveRecord::Base
 
   # mfa settings for a user are the most restrictive of any pseudonyms the user has
   # a login for
-  def mfa_settings
+  def mfa_settings(pseudonym_hint: nil)
+    # try to short-circuit site admins where it is required
+    if pseudonym_hint
+      mfa_settings = pseudonym_hint.account.mfa_settings
+      return :required if mfa_settings == :required ||
+          mfa_settings == :required_for_admins && !pseudonym_hint.account.all_account_users_for(self).empty?
+    end
+
     result = self.pseudonyms.shard(self).preload(:account).map(&:account).uniq.map do |account|
       case account.mfa_settings
         when :disabled
@@ -2610,7 +2633,10 @@ class User < ActiveRecord::Base
         when :optional
           1
         when :required_for_admins
-          if account.all_account_users_for(self).empty?
+          # if pseudonym_hint is given, and we got to here, we don't need
+          # to redo the expensive all_account_users_for check
+          if (pseudonym_hint && pseudonym_hint.account == account) ||
+              account.all_account_users_for(self).empty?
             1
           else
             # short circuit the entire method

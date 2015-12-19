@@ -3,6 +3,8 @@
 # fixed, but if you ran the broken one, this will clean it up. if you ran the
 # fixed one, this migration is a no-op.
 class GroupCategoriesCleanupMigration < ActiveRecord::Migration
+  tag :predeploy
+
   def self.uncached_group_category_id_for(context, name)
     if !context.is_a?(Account) && name == "Student Groups"
       GroupCategory.student_organized_for(context).id

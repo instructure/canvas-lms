@@ -7,7 +7,7 @@ define [
 
   sections = [{id: 1, name: 'Section One', checked: true},
               {id: 2, name: 'Section Two', checked: false}]
-  course = {id: 1, name: 'Course One', checked: false, passback_status: {sis_post_grades_status: {status: 'status'}}}
+  course = {id: 1, name: 'Course One', checked: false}
   currentSection = 1
 
   module 'gradebook/SectionMenuView',
@@ -45,15 +45,9 @@ define [
 
   module 'gradebook/SectionMenuView',
     setup: ->
-      @view = new SectionMenuView(sections: sections, currentSection: currentSection, course: course, showSisSync: true)
+      @view = new SectionMenuView(sections: sections, currentSection: currentSection, course: course)
       @view.render()
       @view.$el.appendTo('#fixtures')
 
     teardown: ->
       $('#fixtures').empty()
-
-  test 'it displays sync data', ->
-    @view.$el.find('button').click()
-    html = $('.section-select-menu:visible').html()
-    ok html.match(/-- Last Sync/g), 'displays last sync'
-    ok html.match(/-- Section not synced yet/g), 'displays section not synced'

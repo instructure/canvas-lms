@@ -20,11 +20,6 @@
 # Likewise, all the methods added will be available for all controllers.
 
 class ApplicationController < ActionController::Base
-  def self.promote_view_path(path)
-    self.view_paths = self.view_paths.to_ary.reject{ |p| p.to_s == path }
-    prepend_view_path(path)
-  end
-
   attr_accessor :active_tab
   attr_reader :context
 
@@ -124,6 +119,7 @@ class ApplicationController < ActionController::Base
           open_registration: @domain_root_account.try(:open_registration?)
         }
       }
+      @js_env[:page_view_update_url] = page_view_path(@page_view.id, page_view_token: @page_view.token) if @page_view
       @js_env[:IS_LARGE_ROSTER] = true if !@js_env[:IS_LARGE_ROSTER] && @context.respond_to?(:large_roster?) && @context.large_roster?
       @js_env[:context_asset_string] = @context.try(:asset_string) if !@js_env[:context_asset_string]
       @js_env[:ping_url] = polymorphic_url([:api_v1, @context, :ping]) if @context.is_a?(Course)
@@ -244,6 +240,11 @@ class ApplicationController < ActionController::Base
       opts[-1][:only_path] = true
     end
     self.send name, *opts
+  end
+
+  def self.promote_view_path(path)
+    self.view_paths = self.view_paths.to_ary.reject{ |p| p.to_s == path }
+    prepend_view_path(path)
   end
 
   protected
@@ -420,6 +421,18 @@ class ApplicationController < ActionController::Base
   end
   alias :authorized_action? :authorized_action
 
+  def fix_ms_office_redirects
+    if ms_office?
+      # Office will follow 302's internally, until it gets to a 200. _then_ it will pop it out
+      # to a web browser - but you've lost your cookies! This breaks not only store_location,
+      # but in the case of delegated authentication where the provider does an additional
+      # redirect storing important information in session, makes it impossible to log in at all
+      render text: '', status: 200
+      return false
+    end
+    true
+  end
+
   def render_unauthorized_action
     respond_to do |format|
       @show_left_side = false
@@ -429,13 +442,7 @@ class ApplicationController < ActionController::Base
       @headers = !!@current_user if @headers != false
       @files_domain = @account_domain && @account_domain.host_type == 'files'
       format.html {
-        if ms_office?
-          # Office will follow 302's internally, until it gets to a 200. _then_ it will pop it out
-          # to a web browser - but you've lost your cookies! This breaks not only store_location,
-          # but in the case of delegated authentication where the provider does an additional
-          # redirect storing important information in session, makes it impossible to log in at all
-          return render text: '', status: 200
-        end
+        return unless fix_ms_office_redirects
         store_location
         return redirect_to login_url(params.slice(:authentication_provider)) if !@files_domain && !@current_user
 
@@ -982,10 +989,16 @@ class ApplicationController < ActionController::Base
     user = @current_user || (@accessed_asset && @accessed_asset[:user])
     if user && @log_page_views != false
       updated_fields = params.slice(:interaction_seconds)
-      if request.xhr? && params[:page_view_id] && !updated_fields.empty? && !(@page_view && @page_view.generated_by_hand)
-        @page_view = PageView.find_for_update(params[:page_view_id])
+      if request.xhr? && params[:page_view_token] && !updated_fields.empty? && !(@page_view && @page_view.generated_by_hand)
+        RequestContextGenerator.store_interaction_seconds_update(params[:page_view_token], updated_fields[:interaction_seconds])
+
+        page_view_info = PageView.decode_token(params[:page_view_token])
+        @page_view = PageView.find_for_update(page_view_info[:request_id])
         if @page_view
-          response.headers["X-Canvas-Page-View-Id"] = @page_view.id.to_s if @page_view.id
+          if @page_view.id
+            response.headers["X-Canvas-Page-View-Update-Url"] = page_view_path(
+              @page_view.id, page_view_token: @page_view.token)
+          end
           @page_view.do_update(updated_fields)
           @page_view_update = true
         end
@@ -1085,6 +1098,7 @@ class ApplicationController < ActionController::Base
       # exceptions we want skipped
       unless exception.respond_to?(:skip_error_report?) && exception.skip_error_report?
         opts = {type: type}
+        opts[:canvas_error_info] = exception.canvas_error_info if exception.respond_to?(:canvas_error_info)
         info = Canvas::Errors::Info.new(request, @domain_root_account, @current_user, opts)
         error_info = info.to_h
         error_info[:tags][:response_code] = response_code
@@ -1177,6 +1191,9 @@ class ApplicationController < ActionController::Base
       data = { errors: [{message: 'Invalid access token.'}] }
     when ActionController::ParameterMissing
       data = { errors: [{message: "#{exception.param} is missing"}] }
+    when BasicLTI::BasicOutcomes::Unauthorized,
+        BasicLTI::BasicOutcomes::InvalidRequest
+      data = { errors: [{message: exception.message}] }
     else
       if status_code.is_a?(Symbol)
         status_code_string = status_code.to_s

@@ -237,7 +237,8 @@ class ContextModule < ActiveRecord::Base
   end
 
   def available_for?(user, opts={})
-    return true if self.active? && !self.to_be_unlocked && self.prerequisites.blank? && !self.require_sequential_progress
+    return true if self.active? && !self.to_be_unlocked && self.prerequisites.blank? &&
+      (self.completion_requirements.empty? || !self.require_sequential_progress)
     if self.grants_right?(user, :read_as_admin)
       return true
     elsif !self.active?

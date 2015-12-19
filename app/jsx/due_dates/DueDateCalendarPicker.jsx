@@ -6,12 +6,11 @@ define([
   'jsx/shared/helpers/accessibleDateFormat',
   'timezone',
   'i18n!assignments',
+  'classnames',
   'jquery',
   'jquery.instructure_forms'
-], (_, React, DueDateTokenWrapper, DueDateCalendarPicker, accessibleDateFormat,
-    tz, I18n, $) => {
+], (_, React, DueDateTokenWrapper, DueDateCalendarPicker, accessibleDateFormat, tz, I18n, cx, $) => {
 
-  var cx = React.addons.classSet;
   var DueDateCalendarPicker = React.createClass({
 
     propTypes: {

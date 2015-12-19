@@ -17,7 +17,8 @@
 #
 
 class Feature
-  ATTRS = [:feature, :display_name, :description, :applies_to, :state, :root_opt_in, :enable_at, :beta, :development, :release_notes_url, :custom_transition_proc, :after_state_change_proc]
+  ATTRS = [:feature, :display_name, :description, :applies_to, :state, :root_opt_in, :enable_at, :beta, :development,
+    :release_notes_url, :custom_transition_proc, :after_state_change_proc, :autoexpand]
   attr_reader *ATTRS
 
   def initialize(opts = {})
@@ -131,12 +132,14 @@ END
     },
     'epub_export' =>
     {
-      display_name: -> { I18n.t('ePub Export') },
+      display_name: -> { I18n.t('ePub Exporting') },
       description: -> { I18n.t(<<END) },
       This enables users to generate and download course ePub.
 END
-      applies_to: 'User',
-      state: 'hidden'
+      applies_to: 'Course',
+      state: 'allowed',
+      root_opt_in: true,
+      beta: true
     },
     'html5_first_videos' =>
     {
@@ -151,14 +154,15 @@ END
     },
     'high_contrast' =>
     {
-      display_name: -> { I18n.t('features.high_contrast', 'Use High Contrast Styles') },
+      display_name: -> { I18n.t('features.high_contrast', 'High Contrast UI') },
       description: -> { I18n.t('high_contrast_description', <<-END) },
-If you would prefer a higher-contrast version of the Canvas user interface, enable this.
-This might be useful for people with impaired vision or difficulty reading.
+High Contrast enhances the color contrast of the UI (text, buttons, etc.), making those items more
+distinct and easier to identify. Note: Institution branding will be disabled.
 END
       applies_to: 'User',
       state: 'allowed',
-      beta: true
+      beta: true,
+      autoexpand: true
     },
     'outcome_gradebook' =>
     {
@@ -367,11 +371,9 @@ END
       display_name: -> { I18n.t('Moderated Grading') },
       description: -> { I18n.t('Moderated Grading allows multiple graders to grade selected assignments independently, with a moderator providing the final grade.') },
       applies_to: 'Course',
-      state: 'hidden',
-      development: true,
-      root_opt_in: true
+      state: 'on'
     },
-      'gradebook_performance' => {
+    'gradebook_performance' => {
       display_name: -> { I18n.t('Gradebook Performance') },
       description: -> { I18n.t('Performance enhancements for the Gradebook') },
       applies_to: 'Course',
@@ -379,27 +381,24 @@ END
       hidden_in_production: true,
       root_opt_in: true
     },
-    'anonymous_grading' =>
-    {
+    'anonymous_grading' => {
       display_name: -> { I18n.t('Anonymous Grading') },
       description: -> { I18n.t("Anonymous grading forces student names to be hidden in SpeedGrader™") },
       applies_to: 'Course',
-      state: 'hidden',
-      development: true,
-      root_opt_in: true,
+      state: 'allowed'
     },
     'international_sms' => {
       display_name: -> { I18n.t('International SMS') },
       description: -> { I18n.t('Allows users with international phone numbers to receive text messages from Canvas.') },
       applies_to: 'RootAccount',
-      state: 'hidden',
+      state: 'on',
       root_opt_in: true
     },
     'international_sms_from_recipient_country' => {
       display_name: -> { I18n.t("International SMS - Send from Recipient's Country") },
       description: -> { I18n.t("Sends international text messages from a phone number in the recipient's country, if possible.") },
       applies_to: 'RootAccount',
-      state: 'hidden',
+      state: 'on',
       root_opt_in: true
     },
     'all_grading_periods_totals' =>
@@ -408,6 +407,14 @@ END
       description: -> { I18n.t('Display total grades when the "All Grading Periods" dropdown option is selected (Multiple Grading Periods must be enabled).') },
       applies_to: 'Course',
       state: 'allowed',
+      root_opt_in: true
+    },
+    'course_user_search' => {
+      display_name: -> { I18n.t('Course and User Search') },
+      description: -> { I18n.t('Updated UI for searching and displaying users and courses within an account.') },
+      applies_to: 'Account',
+      state: 'hidden',
+      development: true,
       root_opt_in: true
     }
   )

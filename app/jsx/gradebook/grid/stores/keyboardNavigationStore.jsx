@@ -1,63 +1,60 @@
 define([
   'bower/reflux/dist/reflux',
+  'underscore',
   'jquery',
-  '../actions/keyboardNavigationActions',
-], function (Reflux, $, KeyboardNavigationActions) {
+  'jsx/gradebook/grid/actions/keyboardNavigationActions',
+  'jsx/gradebook/grid/helpers/keyboardNavManager'
+], function (Reflux, _, $, KeyboardNavigationActions, KeyboardNavigationManager) {
 
   var KeyboardNavigationStore = Reflux.createStore({
     listenables: [KeyboardNavigationActions],
 
+    init() {
+      this.state = {
+        currentCellIndex: -1,
+        currentColumnIndex: -1,
+        currentRowIndex: -1
+      };
+    },
+
     getInitialState() {
-      if(this.currentCellIndex === undefined) {
-       this.currentCellIndex = -1;
+      if(this.state === undefined) {
+        this.init();
       }
 
-      return this.currentCellIndex;
+      return this.state;
     },
 
-    getCellCount() {
-      return $('.gradebook-cell').size();
+    rowCount(columnCount) {
+      var cellCount;
+      if (columnCount === 0) return 0;
+      cellCount = $('.gradebook-cell').size();
+      return cellCount / columnCount;
     },
 
-    getColumnCount() {
+    columnCount() {
       return $('.fixedDataTableCell_columnResizerContainer').size();
     },
 
-    onNext() {
-      if (this.currentCellIndex + 1 < this.getCellCount()) {
-        this.currentCellIndex += 1;
-        this.trigger(this.currentCellIndex);
-      }
+    onConstructKeyboardNavManager() {
+      var columnCount = this.columnCount();
+      var rowCount = this.rowCount(columnCount);
+      var dimensions = { width: columnCount, height: rowCount };
+      this.navManager = new KeyboardNavigationManager(dimensions);
     },
 
-    onPrevious() {
-      if (this.currentCellIndex - 1 >= 0) {
-        this.currentCellIndex -= 1;
-        this.trigger(this.currentCellIndex);
-      }
-    },
-
-    onUp() {
-      var columnCount = this.getColumnCount();
-      if (this.currentCellIndex - columnCount >= 0) {
-        this.currentCellIndex -= columnCount;
-        this.trigger(this.currentCellIndex);
-      }
-    },
-
-    onDown() {
-      var columnCount = this.getColumnCount(),
-          cellCount   = this.getCellCount();
-
-      if ((this.currentCellIndex + columnCount) < cellCount) {
-        this.currentCellIndex += columnCount;
-        this.trigger(this.currentCellIndex);
-      }
+    onHandleKeyboardEvent(event) {
+      var newIndex = this.navManager.makeMove(event, this.state.currentCellIndex);
+      if (_.isNumber(newIndex)) this.onSetActiveCell(newIndex);
     },
 
     onSetActiveCell(cellIndex) {
-      this.currentCellIndex = cellIndex;
-      this.trigger(this.currentCellIndex);
+      var coords = this.navManager.indexToCoords(cellIndex);
+
+      this.state.currentCellIndex = cellIndex;
+      this.state.currentColumnIndex = coords.x;
+      this.state.currentRowIndex = coords.y;
+      this.trigger(this.state);
     }
   });
 

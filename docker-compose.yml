@@ -38,6 +38,8 @@ web:
   environment:
     RACK_ENV: development
     VIRTUAL_HOST: .canvas.docker
+    ECOSYSTEM_SECRET: 7hZoK4DZyrH+A7nxLhC=fVeRQq79oCqq]QK92M?LGPh/tKQv]Q
+    ECOSYSTEM_KEY: +h+oJTJ)(AcfUxGNUy7Pk2zRTwPaTeqA;&MQ3Gx6936VfvHumn
 
 jobs:
   build: ./docker-compose
@@ -60,3 +62,12 @@ guard:
     - ".:/app"
   environment:
     RACK_ENV: development
+
+# Uncomment this entry to run qunit tests built from webpack
+#js-tests:
+#  build: ./docker-compose/karma
+#  volumes:
+#    - ".:/app"
+#  environment:
+#    NODE_ENV: CI
+#    USE_WEBPACK: true

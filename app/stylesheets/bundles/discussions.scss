@@ -8,7 +8,7 @@ $discussion-dark-text: $ic-color-dark;
   body.with-right-side.with-left-side {
     // toolbar needs it to be this wide
     min-width: 1110px;
-  }  
+  }
 }
 
 .hidden {
@@ -42,7 +42,7 @@ $discussion-dark-text: $ic-color-dark;
   padding: 0;
 
   .entry {
-    
+
     @if $use_new_styles {
       background: $ic-color-light;
       border: 1px solid $ic-border-light;
@@ -211,7 +211,7 @@ $discussion-dark-text: $ic-color-dark;
 .discussion-assignment-section {
   .row-fluid [class*="span"] {
     min-height: 0;
-  }  
+  }
   .discussion-title {
     font-size: 14px !important;
   }
@@ -227,7 +227,7 @@ $discussion-dark-text: $ic-color-dark;
 .discussion-read-state-btn {
   position: absolute;
   top: 4px;
-  
+
   bottom: 0;
   width: 10px;
   height: 10px;
@@ -256,8 +256,8 @@ $discussion-dark-text: $ic-color-dark;
 }
 
 .discussion-reply-action, .discussion-rate-action {
-  
-  color: $ic-color-dark;     
+
+  color: $ic-color-dark;
   text-decoration: none;
 
   &:hover, &:focus {
@@ -485,7 +485,7 @@ $discussion-dark-text: $ic-color-dark;
     }
     @else {
       padding: 10px;
-      background: white;  
+      background: white;
     }
   }
 }
@@ -549,7 +549,7 @@ $discussion-dark-text: $ic-color-dark;
   border: 1px solid #d4d5d7;
   margin: 15px 0;
   @if $use_high_contrast { color: $ic-color-dark; }
-  @else {   
+  @else {
     @if $use_new_styles == false { color: #888; }
   }
   @if $use_new_styles {
@@ -608,17 +608,10 @@ $discussion-dark-text: $ic-color-dark;
   }
 }
 
-#collapse-discussion {
-  &:focus {
-    display: block;
-    content: "";
-    position: absolute;
-    top: 2px;
-    left: 50%;
-    height: 0px;
-    width: 0px;
-  }
+.collapse-discussion {
+  display: block;
 }
+
 .collapsed .collapsable:hover {
   border-color: white;
 }
@@ -660,7 +653,7 @@ $discussion-dark-text: $ic-color-dark;
   &#discussion-toolbar {
     @if $use_new_styles {
       + .discussion-entry-reply-area { margin-top: -1px; }
-    }    
+    }
   }
   .admin-links {
     text-align: left;

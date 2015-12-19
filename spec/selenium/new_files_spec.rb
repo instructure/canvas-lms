@@ -4,6 +4,8 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/public_courses_conte
 
 describe "better_file_browsing" do
   include_context "in-process server selenium tests"
+  include FilesCommon
+
   context "As a teacher" do
     before(:each) do
       course_with_teacher_logged_in
@@ -13,7 +15,14 @@ describe "better_file_browsing" do
     end
     it "should display new files UI", priority: "1", test_id: 133092 do
       expect(f('.btn-upload')).to be_displayed
-      expect(get_all_files_folders.count).to eq 1
+      expect(all_files_folders.count).to eq 1
+    end
+    it "should load correct column values on uploaded file", priority: "1", test_id: 133129 do
+      time_current = @course.attachments.first.updated_at.strftime("%l:%M%P").strip
+      expect(ff('.media-body')[0].text).to eq 'example.pdf'
+      expect(ff('.ef-date-created-col')[1].text).to eq time_current
+      expect(ff('.ef-date-modified-col')[1].text).to eq time_current
+      expect(ff('.ef-size-col')[1].text).to eq '194 KB'
     end
 
     context "from cog icon" do
@@ -27,7 +36,7 @@ describe "better_file_browsing" do
       end
       it "should delete file", priority: "1", test_id: 133128 do
         delete(0, :cog_icon)
-        expect(get_all_files_folders.count).to eq 0
+        expect(all_files_folders.count).to eq 0
       end
     end
 
@@ -55,7 +64,7 @@ describe "better_file_browsing" do
     context "from toolbar menu" do
       it "should delete file from toolbar", priority: "1", test_id: 133105 do
         delete(0, :toolbar_menu)
-        expect(get_all_files_folders.count).to eq 0
+        expect(all_files_folders.count).to eq 0
       end
       it "should unpublish and publish a file", priority: "1", test_id: 223503 do
         set_item_permissions(:unpublish, :toolbar_menu)
@@ -74,6 +83,12 @@ describe "better_file_browsing" do
         set_item_permissions(:restricted_access, :available_with_timeline, :toolbar_menu)
         expect(f('.btn-link.published-status.restricted')).to be_displayed
         expect(driver.find_element(:class => 'restricted')).to be_displayed
+      end
+
+      it "should disable the file preview button when a folder is selected" do
+        add_folder('Testing')
+        fj('.ef-item-row:contains("Testing")').click
+        expect(f('.Toolbar__ViewBtn--onlyfolders')).to be_displayed
       end
     end
 
@@ -135,7 +150,7 @@ describe "better_file_browsing" do
       driver.action.send_keys(:return).perform
       # Unable to find matching line from backtrace error is encountered if refresh_page is not used
       refresh_page
-      expect(get_all_files_folders.count).to eq 2
+      expect(all_files_folders.count).to eq 2
     end
   end
 
@@ -191,7 +206,45 @@ describe "better_file_browsing" do
       end
     end
 
+    context "Search Results" do
+      def search_and_move(file_name:  "", destination: "My Files")
+        f("input[type='search']").send_keys file_name
+        driver.action.send_keys(:return).perform
+        # Unable to find matching line from backtrace error is encountered if refresh_page is not used
+        refresh_page
+        expect(all_files_folders.count).to eq 1
+        move(file_name, 0, :cog_icon, destination)
+        wait_for_ajaximations
+        final_destination = destination.split('/').pop
+        expect(f("#flash_message_holder").text).to eq "#{file_name} moved to #{final_destination}\nClose"
+        wait_for_ajaximations
+        fj("a.treeLabel span:contains('#{final_destination}')").click
+        wait_for_ajaximations
+        expect(fln(file_name)).to be_displayed
+      end
+      before(:each) do
+        course_with_teacher_logged_in
+        user_files = ["a_file.txt", "b_file.txt"]
+        user_files.map { |text_file| add_file(fixture_file_upload("files/#{text_file}", 'text/plain'), @teacher, text_file) }
+        # Course file
+        add_file(fixture_file_upload("files/c_file.txt", 'text/plain'), @course, "c_file.txt")
+      end
 
+      it "should move a file to a destination if contexts are different" do
+        get "/courses/#{@course.id}/files"
+        folder_name = "destination_folder"
+        add_folder(folder_name)
+        get "/files"
+        search_and_move(file_name: "a_file.txt", destination: "#{@course.name}/#{folder_name}")
+      end
+
+      it "should move a file to a destination if the contexts are the same" do
+        get "/files"
+        folder_name = "destination_folder"
+        add_folder(folder_name)
+        search_and_move(file_name: "a_file.txt", destination: "My Files/#{folder_name}")
+      end
+    end
   end
 
   context "File Downloads" do

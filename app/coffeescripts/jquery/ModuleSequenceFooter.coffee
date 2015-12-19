@@ -57,6 +57,7 @@ define [
           instanceNumber: @msfInstance.instanceNumber
           previous: @msfInstance.previous
           next: @msfInstance.next
+          new_styles: window.ENV.use_new_styles
         )
         @msfAnimation(options.animation) if options?.animation != undefined
         @show()

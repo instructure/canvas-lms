@@ -1,4 +1,6 @@
 class DropTypeFromUsers < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     remove_index :users, :type
     remove_column :users, :type

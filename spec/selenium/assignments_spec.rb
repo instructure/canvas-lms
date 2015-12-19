@@ -1,13 +1,14 @@
-﻿require File.expand_path(File.dirname(__FILE__) + '/common')
+require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/assignments_common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/public_courses_context')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
 
 describe "assignments" do
+  include_context "in-process server selenium tests"
+  include FilesCommon
+  include AssignmentsCommon
 
   # note: due date testing can be found in assignments_overrides_spec
-
-  include_context "in-process server selenium tests"
 
   context "as a teacher" do
 

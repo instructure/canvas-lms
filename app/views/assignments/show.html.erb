@@ -160,7 +160,7 @@
       </fieldset>
     </form>
 
-    <table class="table assignment_dates">
+    <table class="ic-Table assignment_dates">
       <thead>
         <tr>
           <th scope="col"><%= t(:due, 'Due') %></th>
@@ -176,12 +176,14 @@
     </table>
 
     <% if can_do(@assignment, @current_user, :update) %>
-      <a
-        href="<%= context_url(@context, :context_rubrics_url) %>"
-        class="add_rubric_link btn button-sidebar-wide icon-add"
-        style="<%= hidden if @assignment.rubric_association %>"
-        role="button"
-      ><%= t 'links.add_rubric', "Add Rubric" %></a>
+      <div class="content-box">
+        <a
+          href="<%= context_url(@context, :context_rubrics_url) %>"
+          class="add_rubric_link btn button-sidebar-wide icon-add"
+          style="<%= hidden if @assignment.rubric_association %>"
+          role="button"
+        ><%= t 'links.add_rubric', "Add Rubric" %></a>
+      </div>
     <% end %>
 
     <div class="course_id" style="display: none;"><%= @context.id if @context && @context.is_a?(Course) %></div>

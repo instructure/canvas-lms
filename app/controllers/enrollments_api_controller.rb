@@ -99,7 +99,7 @@
 #             "type": "string"
 #           },
 #           "limit_privileges_to_course_section": {
-#             "description": "User can only access his or her own course section.",
+#             "description": "User can only access his or her own course section. Applies to Teacher and TA enrollments.",
 #             "example": true,
 #             "type": "boolean"
 #           },
@@ -326,8 +326,13 @@ class EnrollmentsApiController < ApplicationController
   #   ignored.
   #
   # @argument enrollment[limit_privileges_to_course_section] [Boolean]
-  #   If a teacher or TA enrollment, teacher/TA will be restricted to the
-  #   section given by course_section_id.
+  #   If set, the enrollment will only allow the user to see and interact with
+  #   users enrolled in the section given by course_section_id.
+  #   * For teachers and TAs, this includes grading privileges.
+  #   * Section-limited students will not see any users (including teachers
+  #     and TAs) not enrolled in their sections.
+  #   * Users may have other enrollments that grant privileges to
+  #     multiple sections in the same course.
   #
   # @argument enrollment[notify] [Boolean]
   #   If true, a notification will be sent to the enrolled user.
@@ -423,6 +428,9 @@ class EnrollmentsApiController < ApplicationController
         return render_create_errors([@@errors[:concluded_course]])
       end
     end
+
+    params[:enrollment][:limit_privileges_to_course_section] = value_to_boolean(params[:enrollment][:limit_privileges_to_course_section]) if params[:enrollment].has_key?(:limit_privileges_to_course_section)
+    params[:enrollment].slice!(:enrollment_state, :section, :limit_privileges_to_course_section, :associated_user_id, :role, :start_at, :end_at, :self_enrolled, :no_notify)
 
     @enrollment = @context.enroll_user(user, type, params[:enrollment].merge(:allow_multiple_enrollments => true))
     @enrollment.valid? ?
@@ -529,10 +537,11 @@ class EnrollmentsApiController < ApplicationController
         enrollments = user.enrollments.current_and_invited.where(enrollment_index_conditions)
       end
     else
+      is_approved_parent = user.grants_right?(@current_user, :read_as_parent)
       # otherwise check for read_roster rights on all of the requested
       # user's accounts
       approved_accounts = user.associated_root_accounts.inject([]) do |accounts, ra|
-        accounts << ra.id if ra.grants_right?(@current_user, session, :read_roster)
+        accounts << ra.id if is_approved_parent || ra.grants_right?(@current_user, session, :read_roster)
         accounts
       end
 

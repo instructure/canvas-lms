@@ -6,9 +6,8 @@ define [
   '../modules/BBTreeBrowserView'
   'compiled/views/RootFoldersFinder'
   '../modules/customPropTypes'
-  'compiled/react/shared/utils/withReactElement'
   'compiled/jquery.rails_flash_notifications'
-], ($, I18n, React, Router, BBTreeBrowserView, RootFoldersFinder, customPropTypes, withReactElement) ->
+], ($, I18n, React, Router, BBTreeBrowserView, RootFoldersFinder, customPropTypes) ->
 
   FolderTree =
     displayName: 'FolderTree'

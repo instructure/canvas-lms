@@ -115,13 +115,11 @@ describe GradingPeriodsController do
   end
 
   describe "PUT batch_update" do
-    let(:root_account) { Account.default }
-
     let(:first_period_params) do
       {
         title: 'First Grading Period',
-        start_date: 2.days.ago.to_s,
-        end_date: 2.days.from_now.to_s
+        start_date: 2.days.ago(now).to_s,
+        end_date: 2.days.from_now(now).to_s
       }
     end
 
@@ -131,6 +129,49 @@ describe GradingPeriodsController do
         start_date: 2.days.from_now(now).to_s,
         end_date: 4.days.from_now(now).to_s
       }
+    end
+
+    context 'given two consecutive persisted periods' do
+      before do
+        account_admin_user(account: root_account)
+        user_session(@admin)
+      end
+
+      let(:group) { root_account.grading_period_groups.create! }
+      let!(:first_persisted_period) do
+        group.grading_periods.create!(first_period_params)
+      end
+
+      let!(:second_persisted_period) do
+        group.grading_periods.create!(second_period_params)
+      end
+
+      let(:first_changed_params) do
+        first_period_params.merge(
+          id: first_persisted_period.id,
+          end_date: 3.days.from_now(now)
+        )
+      end
+
+      let(:second_changed_params) do
+        second_period_params.merge(
+          id: second_persisted_period.id,
+          start_date: 3.days.from_now(now)
+        )
+      end
+
+      it "compares the in memory periods' dates for overlapping" do
+        put :batch_update, {
+          account_id: root_account.id,
+          course_id: nil,
+          grading_periods: [
+            first_changed_params,
+            second_changed_params
+          ]
+        }
+        expect(first_persisted_period.reload.end_date).to    eq 3.days.from_now(now)
+        expect(second_persisted_period.reload.start_date).to eq 3.days.from_now(now)
+      end
     end
 
     shared_examples 'batch create and update' do
@@ -288,7 +329,7 @@ describe GradingPeriodsController do
 
         it "copies the grading period to the #{args[:context]} and creates the new period" do
           # OPTIMIZE: wrapping the `put :batch_update` in a let/let! doesn't seem to
-          # cache the action so these specs are collapse into one it block.
+          # cache the action so these specs are collapsed into one `it` block.
           # the result has been a speedup of 2x. If it's possible to cache
           # the `put :batch_update`, please split up these expectations!
           expect {

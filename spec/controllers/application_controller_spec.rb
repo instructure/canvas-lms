@@ -505,6 +505,7 @@ describe ApplicationController do
         req = mock()
         req.stubs(:url).returns('url')
         req.stubs(:headers).returns({})
+        req.stubs(:authorization).returns(nil)
         req.stubs(:request_method_symbol).returns(:get)
         req.stubs(:format).returns('format')
 

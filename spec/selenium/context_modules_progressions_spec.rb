@@ -1,8 +1,12 @@
-require File.expand_path(File.dirname(__FILE__) + '/helpers/context_modules_common')
-require File.expand_path(File.dirname(__FILE__) + '/helpers/quizzes_common')
+require_relative "common"
+require_relative "helpers/context_modules_common"
+require_relative "helpers/quizzes_common"
 
 describe "context modules" do
   include_context "in-process server selenium tests"
+  include QuizzesCommon
+  include ContextModulesCommon
+
   context "progressions", priority: "1" do
     before :each do
       course_with_teacher_logged_in

@@ -11,11 +11,28 @@ define([
   'compiled/jquery.rails_flash_notifications'
 ], function(React, _, $, I18n, Reflux, GradebookToolbarStore, CustomColumnsActions, Modal, GradebookConstants) {
 
+  const modalOverrides = {
+    overlay : {
+      backgroundColor: 'rgba(0,0,0,0.5)'
+    },  
+    content : {
+      position: 'static',
+      top: '0',
+      left: '0',
+      right: 'auto',
+      bottom: 'auto',
+      borderRadius: '0',
+      border: 'none',
+      padding: '0'
+    }
+  };
+
   var TeacherNote = React.createClass({
     propTypes: {
       note: React.PropTypes.string.isRequired,
       userId: React.PropTypes.string.isRequired,
-      studentName: React.PropTypes.string.isRequired
+      studentName: React.PropTypes.string.isRequired,
+      columnId: React.PropTypes.string.isRequired
     },
 
     mixins: [
@@ -43,7 +60,7 @@ define([
 
     updateContent(event) {
       var newContent = event.target.value,
-          maxLength  = GradebookConstants.MAX_NOTE_LENGTH;
+        maxLength  = GradebookConstants.MAX_NOTE_LENGTH;
 
       if (newContent.length <= maxLength) {
         this.setState({ content: event.target.value });
@@ -53,13 +70,12 @@ define([
     },
 
     handleSubmit() {
-      var notesColumnId = GradebookConstants.teacher_notes.id,
-          regexReplace  = notesColumnId + '/data/' + this.props.userId,
-          url           = GradebookConstants.custom_column_datum_url.replace(/:id\/data\/:user_id/, regexReplace);
+      var columnId   = this.props.columnId,
+        regexReplace = columnId + '/data/' + this.props.userId,
+        url          = GradebookConstants.custom_column_datum_url.replace(/:id\/data\/:user_id/, regexReplace);
 
       $.ajaxJSON(url, 'PUT', { 'column_data[content]': this.state.content },
         () => {
-          CustomColumnsActions.updateTeacherNote({ user_id: this.props.userId, content: this.state.content });
           this.setState({ showModal: false });
         },
         () => {
@@ -74,12 +90,19 @@ define([
     },
 
     render() {
+      var close, save, title;
+
+      close = I18n.t('Close');
+      title = I18n.t('Notes for %{name}', { name: this.nameToDisplay() });
+      save = I18n.t('Save');
+
       return (
         <div ref='noteCell' className='teacher-note' onClick={this.showModal}>
           <span>{this.state.content}</span>
           <Modal
             className='ReactModal__Content--canvas ReactModal__Content--mini-modal'
             overlayClassName='ReactModal__Overlay--canvas'
+            style={modalOverrides}
             isOpen={this.state.showModal}
             onRequestClose={this.hideModal}>
             <div>
@@ -87,7 +110,7 @@ define([
                 <div className="ReactModal__InnerSection ReactModal__Header">
                   <div className="ReactModal__Header-Title">
                     <h4 ref='studentName'>
-                      {I18n.t('Notes for %{name}', { name: this.nameToDisplay() })}
+                      {title}
                     </h4>
                   </div>
                   <div className="ReactModal__Header-Actions">
@@ -95,7 +118,7 @@ define([
                       type="button" onClick={this.hideModal}>
                       <i className="icon-x"></i>
                       <span className="screenreader-only">
-                        {I18n.t('Close')}
+                        {close}
                       </span>
                     </button>
                   </div>
@@ -115,7 +138,7 @@ define([
                     <button type="submit" className="btn btn-primary"
                       disabled={this.state.content === this.props.note}
                       onClick={this.handleSubmit}>
-                      {I18n.t('Save')}
+                      {save}
                     </button>
                   </div>
                 </div>

@@ -21,6 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../apis/api_spec_helper')
 describe EpubExportsController do
 
   before :once do
+    Account.default.enable_feature!(:epub_export)
     course_with_teacher(active_all: true)
     student_in_course(active_all: true)
   end

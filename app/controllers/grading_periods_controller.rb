@@ -174,33 +174,45 @@ class GradingPeriodsController < ApplicationController
   end
 
   def batch_update
-    grading_periods = find_or_build_period_with_params(params[:grading_periods])
-
+    periods = find_or_build_periods_with_params(params[:grading_periods])
     @context.grading_periods.transaction do
-      errors = validate_periods(grading_periods)
+      periods.each { |period| authorized_action(period, @current_user, :manage) }
+      errors = no_overlapping_for_new_periods_validation_errors(periods)
+        .concat(validation_errors(periods))
 
       if errors.present?
         render json: {errors: errors}, status: :bad_reqeust
       else
-        grading_periods.each(&:save)
-        paginated_grading_periods, meta = paginate_for(grading_periods)
-        render json: serialize_json_api(paginated_grading_periods, meta)
+        periods.each(&:save!)
+        paginated_periods, meta = paginate_for(periods)
+        render json: serialize_json_api(paginated_periods, meta)
       end
     end
   end
 
   private
 
-  def validate_periods(grading_periods)
-    grading_periods.map do |grading_period|
-      if authorized_action(grading_period, @current_user, :manage)
-        grading_period.errors if grading_period.invalid?
-      end
-    end.compact
+  # model level validations
+  def validation_errors(periods)
+    periods.select(&:invalid?).map(&:errors)
   end
 
-  def find_or_build_period_with_params(grading_periods_params)
-    grading_periods_params.map do |period_params|
+  # validate no overlapping check on newly built collection
+  def no_overlapping_for_new_periods_validation_errors(periods)
+    sorted_periods = periods.sort_by(&:start_date)
+    sorted_periods.each_cons(2) do |first_period, second_period|
+      # skip not_overlapping model validation in model level
+      first_period.skip_not_overlapping_validator
+      second_period.skip_not_overlapping_validator
+      if second_period.start_date < first_period.end_date
+        second_period.errors.add(:start_date, 'Start Date overlaps with another period')
+      end
+    end
+    sorted_periods.select { |period| period.errors.present? }.map(&:errors)
+  end
+
+  def find_or_build_periods_with_params(periods_params)
+    periods_params.map do |period_params|
       if (period = @context.grading_periods.active.where(id: period_params[:id]).first)
         period.assign_attributes(period_params.except(:id))
         period

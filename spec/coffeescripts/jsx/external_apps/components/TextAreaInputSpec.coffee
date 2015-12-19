@@ -8,7 +8,7 @@ define [
   wrapper = document.getElementById('fixtures')
 
   createElement = (data) ->
-    TextAreaInput({
+    React.createElement(TextAreaInput, {
       defaultValue: data.defaultValue
       label: data.label
       id: data.id
@@ -19,7 +19,7 @@ define [
     })
 
   renderComponent = (data) ->
-    React.renderComponent(createElement(data), wrapper)
+    React.render(createElement(data), wrapper)
 
   getDOMNodes = (data) ->
     component = renderComponent(data)

@@ -38,14 +38,6 @@ define [
 
     attach: ->
       @model.on 'change:step', @render, this
-      @model.on 'change:role_id', @maybeShowPrivileges
-
-    maybeShowPrivileges: =>
-      role = _.findWhere(@model.get('roles'), id: @model.get('role_id'))
-      if role and role.base_role_name in ['TeacherEnrollment', 'TaEnrollment']
-        @$privileges.show()
-      else
-        @$privileges.hide()
 
     changeEnrollment: (event) ->
       @model.set 'role_id', event.target.value
@@ -92,7 +84,6 @@ define [
 
     afterRender: ->
       @$('[placeholder]').placeholder()
-      @maybeShowPrivileges()
       $('#user_email_errors').focus()
       if @model.get('step') == 3
         @$('button.dialog_closer').focus()

@@ -8,7 +8,6 @@ define([
 
   ], function(React, FileRenameForm, Modal, ModalContent, ModalButtons, I18n) {
 
-
   FileRenameForm.buildContent = function () {
     var nameToUse = this.state.fileOptions.name || this.state.fileOptions.file.name;
     var buildContentToRender;
@@ -102,6 +101,21 @@ define([
           title={I18n.t('Copy')}
           onRequestClose={this.props.onClose}
           closeWithX={this.props.closeWithX}
+          style={{
+            overlay : {
+              backgroundColor: 'rgba(0,0,0,0.5)'
+            },  
+            content : {
+              position: 'static',
+              top: '0',
+              left: '0',
+              right: 'auto',
+              bottom: 'auto',
+              borderRadius: '0',
+              border: 'none',
+              padding: '0'
+            }
+          }}
         >
           <ModalContent>
             {this.buildContent()}

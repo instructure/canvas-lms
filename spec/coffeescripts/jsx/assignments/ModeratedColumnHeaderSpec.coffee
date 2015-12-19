@@ -24,7 +24,7 @@ define [
     @props.handleSortMark1 = callback
     @props.includeModerationSetHeaders = false
 
-    columnHeader = TestUtils.renderIntoDocument(ModeratedColumnHeader(@props))
+    columnHeader = TestUtils.renderIntoDocument(React.createElement(ModeratedColumnHeader, @props))
     headers = TestUtils.scryRenderedDOMComponentsWithClass(columnHeader, 'ColumnHeader__Mark')
     link = TestUtils.findRenderedDOMComponentWithTag(headers[0], 'a')
     TestUtils.Simulate.click(link.getDOMNode())
@@ -37,7 +37,7 @@ define [
     @props.markColumn = Constants.markColumnNames.MARK_TWO
     @props.handleSortMark2 = callback
 
-    columnHeader = TestUtils.renderIntoDocument(ModeratedColumnHeader(@props))
+    columnHeader = TestUtils.renderIntoDocument(React.createElement(ModeratedColumnHeader, @props))
     headers = TestUtils.scryRenderedDOMComponentsWithClass(columnHeader, 'ColumnHeader__Mark')
     link = TestUtils.findRenderedDOMComponentWithTag(headers[0], 'a')
     TestUtils.Simulate.click(link.getDOMNode())
@@ -51,19 +51,19 @@ define [
     @props.currentSortDirection = Constants.sortDirections.DESCENDING
     @props.handleSortMark3 = callback
 
-    columnHeader = TestUtils.renderIntoDocument(ModeratedColumnHeader(@props))
+    columnHeader = TestUtils.renderIntoDocument(React.createElement(ModeratedColumnHeader, @props))
     headers = TestUtils.scryRenderedDOMComponentsWithClass(columnHeader, 'ColumnHeader__Mark')
     link = TestUtils.findRenderedDOMComponentWithTag(headers[1], 'a')
     TestUtils.Simulate.click(link.getDOMNode())
     ok callback.called
     React.unmountComponentAtNode(columnHeader.getDOMNode().parentNode)
 
-  test 'calss the handleSelectAll function when the select all checkbox is checked', ->
+  test 'calls the handleSelectAll function when the select all checkbox is checked', ->
     callback = sinon.spy()
 
     @props.handleSelectAll = callback
 
-    columnHeader = TestUtils.renderIntoDocument(ModeratedColumnHeader(@props))
+    columnHeader = TestUtils.renderIntoDocument(React.createElement(ModeratedColumnHeader, @props))
     headers = TestUtils.scryRenderedDOMComponentsWithClass(columnHeader, 'ColumnHeader__Item')
     checkbox = TestUtils.findRenderedDOMComponentWithTag(headers[0], 'input')
     TestUtils.Simulate.change(checkbox.getDOMNode())
@@ -76,7 +76,7 @@ define [
     @props.sortDirection = Constants.sortDirections.DESCENDING
     @props.includeModerationSetHeaders = false
 
-    columnHeader = TestUtils.renderIntoDocument(ModeratedColumnHeader(@props))
+    columnHeader = TestUtils.renderIntoDocument(React.createElement(ModeratedColumnHeader, @props))
     headers = TestUtils.scryRenderedDOMComponentsWithClass(columnHeader, 'ColumnHeader__Mark')
     ok TestUtils. findRenderedDOMComponentWithClass(headers[0], 'icon-mini-arrow-down'), 'finds the down arrow'
     React.unmountComponentAtNode(columnHeader.getDOMNode().parentNode)
@@ -86,7 +86,7 @@ define [
     @props.sortDirection = Constants.sortDirections.ASCENDING
     @props.includeModerationSetHeaders = false
 
-    columnHeader = TestUtils.renderIntoDocument(ModeratedColumnHeader(@props))
+    columnHeader = TestUtils.renderIntoDocument(React.createElement(ModeratedColumnHeader, @props))
     headers = TestUtils.scryRenderedDOMComponentsWithClass(columnHeader, 'ColumnHeader__Mark')
     ok TestUtils. findRenderedDOMComponentWithClass(headers[0], 'icon-mini-arrow-up'), 'finds the up arrow'
     React.unmountComponentAtNode(columnHeader.getDOMNode().parentNode)
@@ -95,13 +95,13 @@ define [
     # Tests that name is shown and one grade
     @props.includeModerationSetHeaders = false
 
-    columnHeader = TestUtils.renderIntoDocument(ModeratedColumnHeader(@props))
+    columnHeader = TestUtils.renderIntoDocument(React.createElement(ModeratedColumnHeader, @props))
     headers = TestUtils.scryRenderedDOMComponentsWithClass(columnHeader, 'ColumnHeader__Item')
     equal headers.length, 2, 'only shows two header columns'
     React.unmountComponentAtNode(columnHeader.getDOMNode().parentNode)
 
   test 'only shows all columns when includeModerationSetHeaders is true', ->
-    columnHeader = TestUtils.renderIntoDocument(ModeratedColumnHeader(@props))
+    columnHeader = TestUtils.renderIntoDocument(React.createElement(ModeratedColumnHeader, @props))
     headers = TestUtils.scryRenderedDOMComponentsWithClass(columnHeader, 'ColumnHeader__Item')
     equal headers.length, 5, 'show all headers when true'
     React.unmountComponentAtNode(columnHeader.getDOMNode().parentNode)

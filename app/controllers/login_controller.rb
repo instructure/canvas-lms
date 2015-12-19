@@ -23,7 +23,8 @@ class LoginController < ApplicationController
 
   before_filter :forbid_on_files_domain, except: :clear_file_session
   before_filter :run_login_hooks, only: :new
-  before_filter :check_sa_delegated_cookie, only: [:new]
+  before_filter :check_sa_delegated_cookie, only: :new
+  before_filter :fix_ms_office_redirects, only: :new
   skip_before_filter :require_reacceptance_of_terms
 
   def new

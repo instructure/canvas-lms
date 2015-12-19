@@ -1,12 +1,7 @@
 define [
   'i18n!file_rename_form'
   'react'
-  'compiled/react/shared/utils/withReactElement'
-  'jsx/shared/modal'
-  'jsx/shared/modal-content'
-  'jsx/shared/modal-buttons'
-], (I18n, React, withReactElement, Modal, ModalContent, ModalButtons) ->
-  Modal = React.createFactory(Modal)
+], (I18n, React) ->
 
   FileRenameForm =
     displayName: 'FileRenameForm'

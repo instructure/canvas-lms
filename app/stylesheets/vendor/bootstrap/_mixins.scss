@@ -197,7 +197,7 @@
 }
 
 // Drop shadows
-@mixin box-shadow($shadow...) { 
+@mixin box-shadow($shadow...) {
   box-shadow: $shadow;
 }
 
@@ -309,10 +309,10 @@
 
 @mixin button-focus-light {
   @if $use_high_contrast { box-shadow: inset 0 0 0 2px lighten($ic-link-color, 4%); }
-  @else { box-shadow: inset 0 0 0 1px lighten($ic-link-color, 4%); } 
+  @else { box-shadow: inset 0 0 0 1px lighten($ic-link-color, 4%); }
 }
 
-@mixin button-focus-dark { 
+@mixin button-focus-dark {
   @if $use_high_contrast { box-shadow: inset 0 0 0 2px $ic-color-light; }
   @else { box-shadow: inset 0 0 0 1px $ic-color-light;  }
 }
@@ -343,16 +343,27 @@
   border: 1px solid darken($button-color, 15%);
   &:focus { color: $text-color; }
   &:hover {
-    background: darken($button-color, 5%);
-    color: $text-color;
-    
+    @if $use_high_contrast {
+      background: darken($ic-color-dark, 20%);
+      color: $ic-color-light;
+    }
+    @else  {
+      background: darken($button-color, 5%);
+      color: $text-color;
+    }
+
     // handle jquery UI ui-button conflicts
     &.ui-state-hover {
-      background: darken($button-color, 6%);
-      color: $text-color;
-      border-color: darken($button-color, 15%);
-    } 
-  
+      @if $use_high_contrast {
+        background: darken($ic-color-dark, 20%);
+        color: $ic-color-light;
+      }
+      @else {
+        background: darken($button-color, 6%);
+        color: $text-color;
+        border-color: darken($button-color, 15%);
+      }
+    }
   }
 
   @if lightness($button-color) > lightness($text-color) {
@@ -364,10 +375,10 @@
     }
     &:focus { @include button-focus-light; }
     // handle jquery UI ui-button states
-    &.ui-state-focus.ui-state-active { 
-      &:focus { @include button-focus-dark; } 
+    &.ui-state-focus.ui-state-active {
+      &:focus { @include button-focus-dark; }
     }
-    &:active { background: darken($button-color, 8%); } 
+    &:active { background: darken($button-color, 8%); }
   }
 
   @else {
@@ -377,7 +388,7 @@
       box-shadow: none;
     }
   }
-  
+
 }
 
 

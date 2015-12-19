@@ -3,8 +3,9 @@ require File.expand_path(File.dirname(__FILE__) + '/../helpers/calendar2_common'
 
 describe "calendar2" do
   include_context "in-process server selenium tests"
+  include Calendar2Common
 
-  before (:each) do
+  before(:each) do
     Account.default.tap do |a|
       a.settings[:show_scheduler]   = true
       a.save!
@@ -12,7 +13,7 @@ describe "calendar2" do
   end
 
   context "as a teacher" do
-    before (:each) do
+    before(:each) do
       course_with_teacher_logged_in
     end
 

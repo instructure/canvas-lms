@@ -154,11 +154,15 @@ class Assignment < ActiveRecord::Base
     (graded_count > 0) || provisional_grades_exist?
   end
 
+  def moderated_grading_setting_changed?
+    moderated_grading_changed? && moderated_grading.presence != moderated_grading_was.presence
+  end
+
   def moderation_setting_ok?
-    if moderated_grading_changed? && graded_submissions_exist?
+    if moderated_grading_setting_changed? && graded_submissions_exist?
       errors.add :moderated_grading, I18n.t("Moderated grading setting cannot be changed if graded submissions exist")
     end
-    if (moderated_grading_changed? || new_record?) && moderated_grading?
+    if (moderated_grading_setting_changed? || new_record?) && moderated_grading?
       if !graded?
         errors.add :moderated_grading, I18n.t("Moderated grading setting cannot be enabled for ungraded assignments")
       end
@@ -514,16 +518,26 @@ class Assignment < ActiveRecord::Base
 
   def context_module_tag_info(user, context)
     self.association(:context).target ||= context
-    tag_info = {:points_possible => self.points_possible}
-    if self.multiple_due_dates_apply_to?(user)
-      tag_info[:vdd_tooltip] = OverrideTooltipPresenter.new(self, user).as_json
-    else
-      due_date = self.overridden_for(user).due_at
-      if due_date
-        tag_info[:due_date] = due_date.utc.iso8601
-        tag_info[:past_due] = true if expects_submission? && due_date < Time.now &&
-                                      !submission_for_student(user).has_submission?
+    tag_info = Rails.cache.fetch([self, user, "context_module_tag_info"].cache_key) do
+      hash = {:points_possible => self.points_possible}
+      if self.multiple_due_dates_apply_to?(user)
+        hash[:vdd_tooltip] = OverrideTooltipPresenter.new(self, user).as_json
+      else
+        if due_date = self.overridden_for(user).due_at
+          hash[:due_date] = due_date
+        end
       end
+      hash
+    end
+    
+    if tag_info[:due_date]
+      if expects_submission? && tag_info[:due_date] < Time.now
+        has_submission = Rails.cache.fetch([self, user, "user_has_submission"]) do
+          submission_for_student(user).has_submission?
+        end
+        tag_info[:past_due] = true unless has_submission
+      end
+      tag_info[:due_date] = tag_info[:due_date].utc.iso8601
     end
     tag_info
   end
@@ -836,8 +850,14 @@ class Assignment < ActiveRecord::Base
     context_url_prefix
   end
 
-  def to_ics(in_own_calendar=true, preloaded_attachments={})
-    return CalendarEvent::IcalEvent.new(self).to_ics(in_own_calendar, preloaded_attachments)
+  def to_ics(in_own_calendar: true, preloaded_attachments: {}, user: nil)
+    CalendarEvent::IcalEvent.new(self).to_ics(in_own_calendar:       in_own_calendar,
+                                              preloaded_attachments: preloaded_attachments,
+                                              include_description:   include_description?(user))
+  end
+
+  def include_description?(user)
+    user && !self.locked_for?(user)
   end
 
   def all_day
@@ -985,6 +1005,7 @@ class Assignment < ActiveRecord::Base
       :graded_at => Time.now.utc
     }) unless submissions_to_save.empty?
 
+    Rails.logger.info "GRADES: recalculating because assignment #{global_id} had default grade set (#{options.inspect})"
     self.context.recompute_student_scores
     student_ids = context.student_ids
     send_later_if_production(:multiple_module_actions, student_ids, :scored, score)
@@ -1821,12 +1842,12 @@ class Assignment < ActiveRecord::Base
   end
 
   scope :include_submitted_count, -> { select(
-    "assignments.*, (SELECT COUNT(*) FROM submissions
+    "assignments.*, (SELECT COUNT(*) FROM #{Submission.quoted_table_name}
     WHERE assignments.id = submissions.assignment_id
     AND submissions.submission_type IS NOT NULL) AS submitted_count") }
 
   scope :include_graded_count, -> { select(
-    "assignments.*, (SELECT COUNT(*) FROM submissions
+    "assignments.*, (SELECT COUNT(*) FROM #{Submission.quoted_table_name}
     WHERE assignments.id = submissions.assignment_id
     AND submissions.grade IS NOT NULL) AS graded_count") }
 
@@ -1930,10 +1951,9 @@ class Assignment < ActiveRecord::Base
   }
 
   # This should only be used in the course drop down to show assignments not yet graded.
-  scope :need_grading_info, lambda { |limit|
+  scope :need_grading_info, lambda {
     chain = api_needed_fields.
         where("assignments.needs_grading_count>0").
-        limit(limit).
         order("assignments.due_at")
 
     chain.preload(:context)

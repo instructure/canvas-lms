@@ -1,4 +1,6 @@
 class AddCommunicationChannelsIndex < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     if connection.adapter_name == 'PostgreSQL'
       remove_index :communication_channels, [:path, :path_type]

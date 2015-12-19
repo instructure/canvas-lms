@@ -35,8 +35,8 @@ define [
     renderComponent(cellData)
 
   renderComponent = (props) ->
-    componentFactory = React.createFactory(AssignmentGroupColumn)
-    React.render(componentFactory(props), wrapper)
+    element = React.createElement(AssignmentGroupColumn, props)
+    React.render(element, wrapper)
 
   innerHTML = (component) ->
     component.refs.cell.getDOMNode().innerHTML

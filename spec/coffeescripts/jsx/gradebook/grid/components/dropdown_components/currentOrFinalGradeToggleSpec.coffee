@@ -7,8 +7,8 @@ define [
   Simulate = React.addons.TestUtils.Simulate
 
   renderComponent = () ->
-    componentFactory = React.createFactory(CurrentOrFinalGradeToggle)
-    React.render(componentFactory(), wrapper)
+    element = React.createElement(CurrentOrFinalGradeToggle)
+    React.render(element, wrapper)
 
   module 'CurrentOrFinalGradeToggle',
     setup: ->

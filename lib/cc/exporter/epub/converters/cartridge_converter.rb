@@ -12,6 +12,26 @@ module CC::Exporter::Epub::Converters
 
     MANIFEST_FILE = "imsmanifest.xml"
 
+    ALLOWED_GRADING_TYPES = {
+      "pass_fail" => I18n.t("Pass/Fail"),
+      "percent" => I18n.t("Percentage"),
+      "letter_grade" => I18n.t("Letter Grade"),
+      "gpa_scale" => I18n.t("GPA Scale"),
+      "points" => I18n.t("Points"),
+      "not_graded" => I18n.t("Not Graded")
+    }.freeze
+
+    SUBMISSION_TYPES = {
+      "online_quiz" => I18n.t("Quiz"),
+      "online_upload" => I18n.t("Online Upload"),
+      "online_text_entry" => I18n.t("Online Text Entry"),
+      "online_url" => I18n.t("Online URL"),
+      "discussion_topic" => I18n.t("Discussion Topic"),
+      "media_recording" => I18n.t("Media Recording"),
+      "on_paper" => I18n.t("On Paper"),
+      "external_tool" => I18n.t("External Tool")
+    }.freeze
+
     # settings will use these keys: :course_name, :base_download_dir
     def initialize(settings)
       super(settings, "cc")
@@ -22,22 +42,6 @@ module CC::Exporter::Epub::Converters
       @unsupported_files = []
     end
     attr_reader :unsupported_files
-
-    def convert_placeholder_paths_from_string!(html_string)
-      html_node = Nokogiri::HTML::DocumentFragment.parse(html_string)
-      html_node.tap do |node|
-        convert_media_from_node!(node)
-        remove_empty_ids!(node)
-      end
-      html_node.to_s
-    end
-
-    def remove_empty_ids!(node)
-      node.search("a[id='']").each do |tag|
-        tag.remove_attribute('id')
-      end
-      node
-    end
 
     def update_syllabus(content)
       return unless content[:identifier]
@@ -54,6 +58,11 @@ module CC::Exporter::Epub::Converters
       @course[:syllabus] = has_due_date.sort_by{|item| item[:due_at]} + due_anytime
     end
 
+    def include_item?(meta_node, workflow_state='published')
+      get_node_val(meta_node, 'workflow_state') == workflow_state &&
+      !get_bool_val(meta_node, 'module_locked')
+    end
+
     # exports the package into the intermediary json
     def export
       unzip_archive
@@ -66,11 +75,11 @@ module CC::Exporter::Epub::Converters
       @course[:files], @unsupported_files = convert_files
 
       set_progress(10)
-      @course[:wikis] = convert_wikis
+      @course[:pages] = convert_wikis
       set_progress(20)
       @course[:assignments] = convert_assignments
       set_progress(30)
-      @course[:topics] = convert_topics
+      @course[:topics], @course[:announcements] = convert_topics
       set_progress(40)
       @course[:quizzes] = convert_quizzes
       set_progress(50)

@@ -13,7 +13,7 @@ define [
         models: [new Folder(id: 999)]
         radioStateChange: sinon.stub()
 
-      @RestrictedRadioButtons = React.render(RestrictedRadioButtons(props), $('<div>').appendTo('#fixtures')[0])
+      @RestrictedRadioButtons = React.render(React.createElement(RestrictedRadioButtons, props), $('<div>').appendTo('#fixtures')[0])
 
     teardown: ->
       React.unmountComponentAtNode(@RestrictedRadioButtons.getDOMNode().parentNode)
@@ -39,7 +39,7 @@ define [
         models: [new Folder(id: 1000, hidden: false), new Folder(id: 999, hidden: true)]
         radioStateChange: sinon.stub()
 
-      @RestrictedRadioButtons = React.render(RestrictedRadioButtons(props), $('<div>').appendTo('#fixtures')[0])
+      @RestrictedRadioButtons = React.render(React.createElement(RestrictedRadioButtons, props), $('<div>').appendTo('#fixtures')[0])
 
     teardown: ->
       React.unmountComponentAtNode(@RestrictedRadioButtons.getDOMNode().parentNode)
@@ -62,7 +62,7 @@ define [
         models: [new Folder(id: 999)]
         radioStateChange: sinon.stub()
 
-      @restrictedRadioButtons = React.render(RestrictedRadioButtons(props), $('<div>').appendTo('#fixtures')[0])
+      @restrictedRadioButtons = React.render(React.createElement(RestrictedRadioButtons, props), $('<div>').appendTo('#fixtures')[0])
 
     teardown: ->
       React.unmountComponentAtNode(@restrictedRadioButtons.getDOMNode().parentNode)
@@ -126,7 +126,7 @@ define [
         models: [new Folder(id: 999, hidden: true, lock_at: undefined, unlock_at: undefined), new Folder(id: 1000, hidden: true, lock_at: undefined, unlock_at: undefined)]
         radioStateChange: sinon.stub()
 
-      @restrictedRadioButtons = React.render(RestrictedRadioButtons(props), $('<div>').appendTo('#fixtures')[0])
+      @restrictedRadioButtons = React.render(React.createElement(RestrictedRadioButtons, props), $('<div>').appendTo('#fixtures')[0])
 
     teardown: ->
       React.unmountComponentAtNode(@restrictedRadioButtons.getDOMNode().parentNode)

@@ -1,4 +1,6 @@
 class ConvertStorageQuotasToBytes < ActiveRecord::Migration
+  tag :predeploy
+
   FIELDS_TO_FIX = [
     [ User, :storage_quota ],
     [ Account, :storage_quota ],

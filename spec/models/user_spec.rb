@@ -823,9 +823,7 @@ describe User do
     end
 
     it "should not include users from other sections if visibility is limited to sections" do
-      enrollment = @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active', :limit_privileges_to_course_section => true)
-      # we currently force limit_privileges_to_course_section to be false for students; override it in the db
-      Enrollment.where(:id => enrollment).update_all(:limit_privileges_to_course_section => true)
+      @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active', :limit_privileges_to_course_section => true)
       messageable_users = search_messageable_users(@student).map(&:id)
       expect(messageable_users).to include @this_section_user.id
       expect(messageable_users).not_to include @other_section_user.id
@@ -894,9 +892,7 @@ describe User do
     end
 
     it "should respect section visibility when returning users for a specified group" do
-      enrollment = @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active', :limit_privileges_to_course_section => true)
-      # we currently force limit_privileges_to_course_section to be false for students; override it in the db
-      Enrollment.where(:id => enrollment).update_all(:limit_privileges_to_course_section => true)
+      @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active', :limit_privileges_to_course_section => true)
 
       @group.users << @other_section_user
 
@@ -2087,12 +2083,12 @@ describe User do
         skip "requires icu locally"
       end
       I18n.locale = :es
-      expect(User.sortable_name_order_by_clause).to match /es/
-      expect(User.sortable_name_order_by_clause).not_to match /root/
+      expect(User.sortable_name_order_by_clause).to match(/'es'/)
+      expect(User.sortable_name_order_by_clause).not_to match(/'root'/)
       # english has no specific sorting rules, so use root
       I18n.locale = :en
-      expect(User.sortable_name_order_by_clause).not_to match /es/
-      expect(User.sortable_name_order_by_clause).to match /root/
+      expect(User.sortable_name_order_by_clause).not_to match(/'es'/)
+      expect(User.sortable_name_order_by_clause).to match(/'root'/)
     end
   end
 
@@ -2236,6 +2232,15 @@ describe User do
       Account.default.account_users.create!(user: user)
 
       expect(user.mfa_settings).to eq :optional
+    end
+
+    it "short circuits when a hint is provided" do
+      account = Account.create!(:settings => { :mfa_settings => :required_for_admins })
+      p = user.pseudonyms.create!(:account => account, :unique_id => 'user')
+      account.account_users.create!(user: user)
+
+      user.expects(:pseudonyms).never
+      expect(user.mfa_settings(pseudonym_hint: p)).to eq :required
     end
   end
 
@@ -2708,6 +2713,25 @@ describe User do
       it "should not grant subadmins :merge on stronger admins" do
         pseudonym(alice, account: account1)
         expect(alice).not_to be_grants_right(sally, :merge)
+      end
+    end
+  end
+
+  describe "check_accounts_right?" do
+    describe "sharding" do
+      specs_require_sharding
+
+      it "should check for associated accounts on shards the user shares with the seeker" do
+        # create target user on defualt shard
+        target = user()
+        # create account on another shard
+        account = @shard1.activate{ Account.create! }
+        # associate target user with that account
+        account_admin_user(user: target, account: account, role: Role.get_built_in_role('AccountMembership'))
+        # create seeking user as admin on that account
+        seeker = account_admin_user(account: account, role: Role.get_built_in_role('AccountAdmin'))
+        # ensure seeking user gets permissions it should on target user
+        expect(target.grants_right?(seeker, :view_statistics)).to be_truthy
       end
     end
   end

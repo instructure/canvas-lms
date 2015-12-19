@@ -194,7 +194,17 @@ module AccountReports::ReportHelper
     end
   end
 
-  def report_title(account_report )
+  def include_deleted_objects
+    if @account_report.has_parameter? "include_deleted"
+      @include_deleted = value_to_boolean(@account_report.parameters["include_deleted"])
+
+      if @include_deleted
+        add_extra_text(I18n.t('Include Deleted Objects;'))
+      end
+    end
+  end
+
+  def report_title(account_report)
     AccountReports.available_reports[account_report.report_type].title
   end
 

@@ -1,4 +1,6 @@
 class CleanupQuizQuestionLinks < ActiveRecord::Migration
+  tag :postdeploy
+
   def self.up
     Quizzes::QuizQuestion.joins(:quiz).select("quiz_questions.id").where(
         "quizzes.context_type='Course' AND " \

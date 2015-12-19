@@ -1,11 +1,17 @@
-require File.expand_path(File.dirname(__FILE__) + '/helpers/gradebook2_common')
-require File.expand_path(File.dirname(__FILE__) + '/helpers/groups_common')
-require File.expand_path(File.dirname(__FILE__) + '/helpers/assignments_common')
-require File.expand_path(File.dirname(__FILE__) + '/helpers/quizzes_common')
-require File.expand_path(File.dirname(__FILE__) + '/helpers/speed_grader_common')
+require_relative "common"
+require_relative "helpers/gradebook2_common"
+require_relative "helpers/groups_common"
+require_relative "helpers/assignments_common"
+require_relative "helpers/quizzes_common"
+require_relative "helpers/speed_grader_common"
 
 describe 'Speedgrader' do
   include_context "in-process server selenium tests"
+  include QuizzesCommon
+  include Gradebook2Common
+  include GroupsCommon
+  include AssignmentsCommon
+  include SpeedGraderCommon
 
   let(:rubric_data) do
     [
@@ -110,6 +116,31 @@ describe 'Speedgrader' do
       clear_grade_and_validate
     end
 
+    context 'quizzes' do
+      before(:each) do
+        init_course_with_students
+        quiz = seed_quiz_with_submission
+
+        user_session(@teacher)
+        get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{quiz.assignment_id}"
+        driver.switch_to.frame f('#speedgrader_iframe')
+      end
+
+      it 'should display needs review alert on non-autograde questions', priority: "1", test_id: 441360 do
+        expect(ff('#update_history_form .alert')[0].text).to include_text('The following questions need review:')
+      end
+
+      it 'should only display needs review for file_upload and essay questions', priority: "2", test_id: 452539 do
+        questions_to_grade = ff('#questions_needing_review li a')
+        expect(questions_to_grade[0].text).to include_text('Question 2')
+        expect(questions_to_grade[1].text).to include_text('Question 3')
+      end
+
+      it 'should not display review warning on text only quiz questions', priority: "1", test_id: 377664 do
+        expect(ff('#update_history_form .alert')[0].text).not_to include_text('Question 4')
+      end
+    end
+
     context 'pass/fail assignment grading' do
       before :each do
         init_course_with_students 1
@@ -191,16 +222,14 @@ describe 'Speedgrader' do
         @association = @rubric.associate_with(@assignment, @course, purpose: 'grading', use_for_grading: true)
         @submission = Submission.create!(user: @student, assignment: @assignment, submission_type: "online_text_entry", has_rubric_assessment: true)
         @assessment = @association.assess(
-                                            user: @student, 
-                                            assessor: @teacher, 
-                                            artifact: @submission, 
-                                            assessment: {
-                                              assessment_type: 'grading',
-                                              criterion_crit1: {
-                                                  points: 5
-                                              }
-                                            }
-                                          )
+          user: @student,
+          assessor: @teacher,
+          artifact: @submission,
+          assessment: {
+            assessment_type: 'grading',
+            criterion_crit1: { points: 5 }
+          }
+        )
         get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}"
         f('a.assess_submission_link').click
 
@@ -261,8 +290,7 @@ describe 'Speedgrader' do
     it 'displays question navigation bar when setting is enabled', priority: "1", test_id: 164019 do
       init_course_with_students
 
-      quiz = seed_quiz_wth_submission
-
+      quiz = seed_quiz_with_submission
       user_session(@teacher)
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{quiz.assignment_id}"
 
@@ -278,13 +306,13 @@ describe 'Speedgrader' do
       expect(f('header.quiz-header').text).to include quiz.title
       expect(f('#quiz-nav-inner-wrapper')).to be_displayed
       nav = ff('.quiz-nav-li')
-      expect(nav.length).to eq 3
+      expect(nav.length).to eq 4
     end
 
     it 'scrolls nav bar and to questions', priority: "1", test_id: 164020 do
       init_course_with_students
 
-      quiz = seed_quiz_wth_submission 10
+      quiz = seed_quiz_with_submission(10)
 
       @teacher.preferences[:enable_speedgrader_grade_by_question] = true
       @teacher.save!
@@ -296,7 +324,7 @@ describe 'Speedgrader' do
       expect(f('header.quiz-header').text).to include quiz.title
 
       expect(wrapper).to be_displayed
-      expect(ff('.quiz-nav-li').length).to eq 30
+      expect(ff('.quiz-nav-li').length).to eq 40
 
       # check scrolling
       first_left = wrapper.css_value('left')
@@ -308,7 +336,7 @@ describe 'Speedgrader' do
       # check anchors
       anchors = ff('#quiz-nav-inner-wrapper li a')
 
-      [17, 5, 25].each do |index|
+      [17, 25, 33].each do |index|
         data_id = anchors[index].attribute 'data-id'
         anchors[index].click
         wait_for_animations

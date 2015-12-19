@@ -268,7 +268,7 @@ describe Enrollment do
       student.reload
       observer.reload
       expect(student.messages).to_not be_empty
-      expect(observer.messages).to_not be_empty
+      expect(observer.messages).to be_empty
     end
 
     it "should not send out invitations to an observer if the course is not published" do
@@ -1756,6 +1756,14 @@ describe Enrollment do
       expect(pe.course_section_id).to eql se.course_section_id
       expect(pe.workflow_state).to eql se.workflow_state
       expect(pe.associated_user_id).to eql se.user_id
+    end
+
+    it 'should default observer enrollments to "active" state' do
+      course(:active_all => true)
+      @course.enroll_student(@student, :enrollment_state => 'invited')
+      pe = @parent.observer_enrollments.where(course_id: @course).first
+      expect(pe).not_to be_nil
+      expect(pe.workflow_state).to eql 'active'
     end
 
     it 'should have their observer enrollments updated when an observed user\'s enrollment is updated' do

@@ -1,9 +1,15 @@
 <tr>
-  <th scope="row">
-    <strong>
+  {{#if ENV.use_new_styles}}
+    <th scope="row" class="ic-Table--header-row">
       {{ag.name}}
-    </strong>
-  </th>
+    </th>
+  {{else}}
+    <th scope="row">
+      <strong>
+        {{ag.name}}
+      </strong>
+    </th>
+  {{/if}}
 
   <td class="assignment-group-grade">
     <span class="grade">

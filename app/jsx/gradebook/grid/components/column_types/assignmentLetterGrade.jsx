@@ -34,7 +34,7 @@ define([
           </div>
         );
       } else {
-        return <div ref="grade">-</div>;
+        return <div className='grade' ref="grade">-</div>;
       }
     }
   });

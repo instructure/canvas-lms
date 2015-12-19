@@ -29,23 +29,18 @@ RSpec.configure do |c|
   c.color = true
 
   c.around(:each) do |example|
-    attempts = 0
-    begin
-      Timeout::timeout(180) {
-        example.run
-      }
-      if ENV['AUTORERUN']
-        e = @example.instance_variable_get('@exception')
-        if !e.nil? && (attempts += 1) < 2 && !example.metadata[:no_retry]
-          puts "FAILURE: #{@example.description} \n #{e}".red
-          puts "RETRYING: #{@example.description}".yellow
-          @example.instance_variable_set('@exception', nil)
-          redo
-        elsif e.nil? && attempts != 0
-          puts "SUCCESS: retry passed for \n #{@example.description}".green
+    Timeout::timeout(180) do
+      example.run
+      case example.example.exception
+      when EOFError, Errno::ECONNREFUSED
+        if $selenium_driver
+          puts "SELENIUM: webdriver socket closed the connection.  Will try to re-initialize."
+          # this will cause the selenium driver to get re-initialized if it
+          # crashes for some reason
+          $selenium_driver = nil
         end
       end
-    end until true
+    end
   end
 end
 
@@ -234,9 +229,6 @@ def truncate_table(model)
       begin
         old_proc = model.connection.raw_connection.set_notice_processor {}
         model.connection.execute("TRUNCATE TABLE #{model.connection.quote_table_name(model.table_name)} CASCADE")
-
-        # mobile verify expects specific id seq for developer key, this forces the sequence to always start at 101
-        model.connection.execute("SELECT setval('developer_keys_id_seq', 100);") if model == DeveloperKey
       ensure
         model.connection.raw_connection.set_notice_processor(&old_proc)
       end
@@ -546,6 +538,12 @@ RSpec.configure do |config|
     expect(parsed_test.scheme).to eq parsed_expected.scheme
     expect(parsed_test.host).to eq parsed_expected.host
     expect(parsed_test_query).to eq parsed_expected_query
+  end
+
+  def assert_hash_contains(test_hash, expected_hash)
+    expected_hash.each do |key, expected_value|
+      expect(test_hash[key]).to eq expected_value
+    end
   end
 
   def fixture_file_upload(path, mime_type=nil, binary=false)

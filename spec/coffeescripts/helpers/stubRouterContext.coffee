@@ -1,32 +1,29 @@
 define ['react', 'jquery'], (React, $) ->
   stubRouterContext = (Component, props, stubs) ->
+
+    RouterStub = ->
+    $.extend(RouterStub, {
+      makePath: ->
+      makeHref: ->
+      transitionTo: ->
+      replaceWith: ->
+      goBack: ->
+      getCurrentPath: ->
+      getCurrentRoutes: ->
+      getCurrentPathname: ->
+      getCurrentParams: ->
+      getCurrentQuery: ->
+      isActive: ->
+    }, stubs)
+
     React.createClass
       childContextTypes:
-        makePath: ->
-        makeHref: ->
-        transitionTo: ->
-        replaceWith: ->
-        goBack: ->
-        getCurrentPath: ->
-        getCurrentRoutes: ->
-        getCurrentPathname: ->
-        getCurrentParams: ->
-        getCurrentQuery: ->
-        isActive: ->
-      getChildContext: ->
-        $.extend {
-          makePath: ->
-          makeHref: ->
-          transitionTo: ->
-          replaceWith: ->
-          goBack: ->
-          getCurrentPath: ->
-          getCurrentRoutes: ->
-          getCurrentPathname: ->
-          getCurrentParams: ->
-          getCurrentQuery: ->
-          isActive: ->
+        router: React.PropTypes.func,
+        routeDepth: React.PropTypes.number
 
-        }, stubs
+      getChildContext: ->
+        router: RouterStub,
+        routeDepth: 0
+
       render: ->
-        Component props
+        React.createElement(Component, props)

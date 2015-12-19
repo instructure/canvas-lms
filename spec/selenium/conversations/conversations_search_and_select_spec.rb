@@ -2,6 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../helpers/conversations_com
 
 describe "conversations index page" do
   include_context "in-process server selenium tests"
+  include ConversationsCommon
 
   before do
     conversation_setup
@@ -20,7 +21,7 @@ describe "conversations index page" do
     end
 
     it "should allow finding messages by recipient", priority: "1", test_id: 197540 do
-      get_conversations
+      conversations
       name = @s2.name
       f('[role=main] header [role=search] input').send_keys(name)
       keep_trying_until { fj(".ac-result:contains('#{name}')") }.click
@@ -36,13 +37,13 @@ describe "conversations index page" do
     end
 
     it "should select multiple conversations", priority: "1", test_id: 201429 do
-      get_conversations
+      conversations
       select_conversations(2)
       expect(ff('.messages li.active').count).to eq 2
     end
 
     it "should select all conversations", priority: "1", test_id: 201462 do
-      get_conversations
+      conversations
       driver.action.key_down(modifier)
         .send_keys('a')
         .key_up(modifier)
@@ -51,7 +52,7 @@ describe "conversations index page" do
     end
 
     it "should archive multiple conversations", priority: "1", test_id: 201490 do
-      get_conversations
+      conversations
       select_conversations
       f('#archive-btn').click
       wait_for_ajaximations
@@ -61,7 +62,7 @@ describe "conversations index page" do
     end
 
     it "should delete multiple conversations", priority: "1", test_id: 201491 do
-      get_conversations
+      conversations
       select_conversations
       f('#delete-btn').click
       driver.switch_to.alert.accept
@@ -71,7 +72,7 @@ describe "conversations index page" do
 
     it "should mark multiple conversations as unread" do
       skip('breaks b/c jenkins is weird')
-      get_conversations
+      conversations
       select_conversations
       click_unread_toggle_menu_item
       keep_trying_until { expect(ffj('.read-state[aria-checked=false]').count).to eq 3 }
@@ -79,7 +80,7 @@ describe "conversations index page" do
 
     it "should mark multiple conversations as unread" do
       skip('breaks b/c jenkins is weird')
-      get_conversations
+      conversations
       select_conversations
       click_read_toggle_menu_item
       keep_trying_until { expect(ffj('.read-state[aria-checked=true]').count).to eq 3 }
@@ -87,7 +88,7 @@ describe "conversations index page" do
 
     it "should star multiple conversations" do
       skip('breaks b/c jenkins is weird')
-      get_conversations
+      conversations
       select_conversations
       click_star_toggle_menu_item
       run_progress_job

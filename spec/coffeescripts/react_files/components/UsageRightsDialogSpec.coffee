@@ -9,7 +9,7 @@ define [
 
   TestUtils = React.addons.TestUtils
 
-  module 'UploadProgress',
+  module 'UsageRightsDialog',
 
   test 'clicking cancelXButton closes modal', ->
     usage_rights = {
@@ -22,7 +22,7 @@ define [
       itemsToManage: [new File(thumbnail_url: 'blah', usage_rights: usage_rights)]
     }
 
-    uRD = TestUtils.renderIntoDocument(UsageRightsDialog(props))
+    uRD = TestUtils.renderIntoDocument(React.createElement(UsageRightsDialog, props))
     TestUtils.Simulate.click(uRD.refs.cancelXButton.getDOMNode())
 
     ok modalClosed
@@ -39,7 +39,7 @@ define [
       itemsToManage: [new File(thumbnail_url: 'blah', usage_rights: usage_rights)]
     }
 
-    uRD = TestUtils.renderIntoDocument(UsageRightsDialog(props))
+    uRD = TestUtils.renderIntoDocument(React.createElement(UsageRightsDialog, props))
     TestUtils.Simulate.click(uRD.refs.cancelButton.getDOMNode())
 
     ok modalClosed
@@ -56,7 +56,7 @@ define [
       itemsToManage: [new File(thumbnail_url: 'blah', usage_rights: usage_rights), new File(thumbnail_url: 'blah', usage_rights: usage_rights)]
     }
 
-    uRD = TestUtils.renderIntoDocument(UsageRightsDialog(props))
+    uRD = TestUtils.renderIntoDocument(React.createElement(UsageRightsDialog, props))
 
     equal uRD.refs.fileName.getDOMNode().innerHTML, "2 items selected", "has correct message"
 
@@ -75,7 +75,7 @@ define [
       itemsToManage: [file]
     }
 
-    uRD = TestUtils.renderIntoDocument(UsageRightsDialog(props))
+    uRD = TestUtils.renderIntoDocument(React.createElement(UsageRightsDialog, props))
 
     equal uRD.refs.fileName.getDOMNode().innerHTML, "cats", "has correct message"
 
@@ -83,20 +83,49 @@ define [
 
   test 'render different right message', ->
     usage_rights = {
-      use_justification: 'choose'
+      use_justification: 'own_copyright'
+    }
+
+    usage_rights2 = {
+      use_justification: 'used_by_permission'
     }
 
     file = new File(thumbnail_url: 'blah', usage_rights: usage_rights)
     file.displayName = -> "cats"
 
+    file2 = new File(thumbnail_url: 'blah', usage_rights: usage_rights)
+    file.displayName = -> "cats2"
+
     props = {
       closeModal: ->
-      itemsToManage: [file, file]
+      itemsToManage: [file, file2]
     }
 
-    uRD = TestUtils.renderIntoDocument(UsageRightsDialog(props))
+    uRD = TestUtils.renderIntoDocument(React.createElement(UsageRightsDialog, props))
 
     equal uRD.refs.differentRightsMessage.props.children[1], "Items selected have different usage rights.", "displays correct message"
+
+    React.unmountComponentAtNode(uRD.getDOMNode().parentNode)
+
+  test 'do not render different rights message when they are the same', ->
+    usage_rights = {
+      use_justification: 'own_copyright',
+      legal_copyright: ''
+    }
+
+    file = new File(thumbnail_url: 'blah', usage_rights: usage_rights)
+    file.displayName = -> "cats"
+
+    file2 = new File(thumbnail_url: 'blah', usage_rights: usage_rights)
+    file2.displayName = -> "cats"
+
+    props = {
+      closeModal: ->
+      itemsToManage: [file, file2]
+    }
+
+    uRD = TestUtils.renderIntoDocument(React.createElement(UsageRightsDialog, props))
+    ok !uRD.refs.differentRightsMessage, "does not show the message"
 
     React.unmountComponentAtNode(uRD.getDOMNode().parentNode)
 
@@ -113,7 +142,7 @@ define [
       itemsToManage: [folder]
     }
 
-    uRD = TestUtils.renderIntoDocument(UsageRightsDialog(props))
+    uRD = TestUtils.renderIntoDocument(React.createElement(UsageRightsDialog, props))
 
     equal uRD.refs.folderBulletList.props.children[0].props.children, "some folder", "shows display name"
 
@@ -132,7 +161,7 @@ define [
       itemsToManage: [folder, folder, folder, folder]
     }
 
-    uRD = TestUtils.renderIntoDocument(UsageRightsDialog(props))
+    uRD = TestUtils.renderIntoDocument(React.createElement(UsageRightsDialog, props))
 
     equal uRD.refs.folderTooltip.getDOMNode().getAttribute('data-html-tooltip-title'), "hello<br />hello", "sets title for multple folders"
     equal uRD.refs.folderTooltip.props.children[0], "and 2 more…", "sets count text"
@@ -154,7 +183,7 @@ define [
       itemsToManage: [file]
     }
 
-    uRD = TestUtils.renderIntoDocument(UsageRightsDialog(props))
+    uRD = TestUtils.renderIntoDocument(React.createElement(UsageRightsDialog, props))
 
     uRD.refs.usageSelection.getValues = -> {use_justification: "choose"}
 

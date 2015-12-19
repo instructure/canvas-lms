@@ -310,20 +310,6 @@ describe "course people" do
           add_user(user.name, "custom")
           expect(f("#user_#{user.id} .admin-links")).not_to be_nil
         end
-
-        if base_type == 'teacher' || base_type == 'ta'
-          it "should show section limited checkbox for custom #{base_type} enrollments" do
-            send "custom_#{base_type}_role", "custom"
-            select_new_role_type("custom")
-            expect(f('#limit_privileges_to_course_section')).to be_displayed
-          end
-        else
-          it "should not show section limited checkbox for custom #{base_type} enrollments" do
-            send "custom_#{base_type}_role", "custom"
-            select_new_role_type("custom")
-            expect(f('#limit_privileges_to_course_section')).not_to be_displayed
-          end
-        end
       end
     end
 

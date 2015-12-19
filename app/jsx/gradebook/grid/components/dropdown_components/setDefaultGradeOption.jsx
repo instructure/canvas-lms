@@ -30,7 +30,7 @@ define([
 
     openDialog() {
       var assignment = this.props.assignment,
-          students   = this.studentsThatCanSeeAssignment(this.students(), assignment);
+        students   = this.studentsThatCanSeeAssignment(this.students(), assignment);
       // TODO: pass in a selectedSection once the ticket for section filtering is
       // implemented
       return new SetDefaultGradeDialog({

@@ -4,6 +4,7 @@
     <%= hidden_field_tag :group_conversation, "true" %>
     <%= hidden_field_tag :bulk_message, "true" %>
     <%= hidden_field_tag :context_code, "" %>
+    <%= hidden_field_tag :mode, "async" %>
     <h2><%= t('message_students_who', 'Message students who...') %></h2>
     <div style="margin-bottom: 15px;">
       <%= t('for_title', 'for %{title}', :title => '<span class="asset_title">&nbsp;</span>'.html_safe) %>

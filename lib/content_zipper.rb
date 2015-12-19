@@ -423,7 +423,7 @@ class ContentZipper
   end
 
   def get_filename(users_name, submission)
-    filename = "#{users_name}#{submission.late? ? ' LATE' : ''}_#{submission.user_id}"
+    filename = "#{users_name}#{submission.late? ? '_LATE' : ''}_#{submission.user_id}"
     sanitize_file_name(filename)
   end
 
@@ -443,14 +443,14 @@ class ContentZipper
   end
 
   def sanitize_file_name(filename)
-    filename.gsub(/ /, "-").gsub(/[^-\w]/, "-").downcase
+    filename.gsub(/[^\w]/, '').downcase
   end
 
   def sanitize_user_name(user_name)
     # necessary because we use /_\d+_/ to infer the user/attachment
     # ids when teachers upload graded submissions
-    user_name.gsub!(/_(\d+)_/, '-\1-')
-    user_name.gsub!(/^(\d+)$/, '-\1-')
+    user_name.gsub!(/_(\d+)_/, '\1')
+    user_name.gsub!(/^(\d+)$/, '\1')
     user_name
   end
 end

@@ -1,11 +1,12 @@
-require File.expand_path(File.dirname(__FILE__) + '/../common')
-require File.expand_path(File.dirname(__FILE__) + '/../helpers/announcements_common')
+require_relative '../common'
+require_relative '../helpers/announcements_common'
 
 describe "announcements" do
   include_context "in-process server selenium tests"
+  include AnnouncementsCommon
 
   context "announcements as a teacher" do
-    before (:each) do
+    before(:each) do
       course_with_teacher_logged_in
     end
 

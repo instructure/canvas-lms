@@ -14,7 +14,7 @@ define [
           files:
             models: []
 
-      @button = React.render(UploadButton(props), $('<div>').appendTo("#fixtures")[0])
+      @button = React.render(React.createElement(UploadButton, props), $('<div>').appendTo("#fixtures")[0])
 
     teardown: ->
       React.unmountComponentAtNode(@button.getDOMNode().parentNode)

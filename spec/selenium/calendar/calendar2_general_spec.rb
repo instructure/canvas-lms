@@ -3,8 +3,9 @@ require File.expand_path(File.dirname(__FILE__) + '/../helpers/calendar2_common'
 
 describe "calendar2" do
   include_context "in-process server selenium tests"
+  include Calendar2Common
 
-  before (:each) do
+  before(:each) do
     Account.default.tap do |a|
       a.settings[:show_scheduler]   = true
       a.save!
@@ -12,7 +13,7 @@ describe "calendar2" do
   end
 
   context "as a teacher" do
-    before (:each) do
+    before(:each) do
       course_with_teacher_logged_in
     end
 
@@ -202,9 +203,9 @@ describe "calendar2" do
       current_month = Date::MONTHNAMES[current_month_num]
 
       change_calendar
-      expect(get_header_text).not_to eq current_month
+      expect(header_text).not_to eq current_month
       change_calendar(:today)
-      expect(get_header_text).to eq(current_month + ' ' + Time.now.year.to_s)
+      expect(header_text).to eq(current_month + ' ' + Time.zone.now.year.to_s)
     end
 
     it "should allow viewing an unenrolled calendar via include_contexts" do

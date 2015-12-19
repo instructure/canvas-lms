@@ -8,12 +8,12 @@ define [
   wrapper = document.getElementById('fixtures')
 
   createElement = (data) ->
-    ConfigurationFormLti2({
+    React.createElement(ConfigurationFormLti2, {
       registrationUrl: data.registrationUrl
     })
 
   renderComponent = (data) ->
-    React.renderComponent(createElement(data), wrapper)
+    React.render(createElement(data), wrapper)
 
   module 'ExternalApps.ConfigurationFormLti2',
     teardown: ->

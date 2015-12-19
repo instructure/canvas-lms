@@ -1072,7 +1072,7 @@ describe UsersController do
       @course1 = course(:active_all => true)
       @course2 = course(:active_all => true)
       @user = user(:active_all => true)
-      @course1.enroll_user(@user, 'ObserverEnrollment').accept!
+      @course1.enroll_user(@user, 'ObserverEnrollment')
       @course2.enroll_student(@user).accept!
 
       user_session(@user)

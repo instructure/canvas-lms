@@ -1,4 +1,6 @@
 class MessageAttachmentsAndMediaObjects < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     add_column :conversations, :has_attachments, :boolean
     add_column :conversations, :has_media_objects, :boolean

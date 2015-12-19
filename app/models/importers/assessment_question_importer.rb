@@ -98,7 +98,7 @@ module Importers
             assessment_question_bank_id: bank.id)
       else
         query = AssessmentQuestion.send(:sanitize_sql, [<<-SQL, hash[:question_name], hash.to_yaml, Time.now.utc, Time.now.utc, bank.id, hash[:migration_id]])
-          INSERT INTO assessment_questions (name, question_data, workflow_state, created_at, updated_at, assessment_question_bank_id, migration_id)
+          INSERT INTO #{AssessmentQuestion.quoted_table_name} (name, question_data, workflow_state, created_at, updated_at, assessment_question_bank_id, migration_id)
           VALUES (?,?,'active',?,?,?,?)
         SQL
         id = AssessmentQuestion.connection.insert(query, "#{name} Create",

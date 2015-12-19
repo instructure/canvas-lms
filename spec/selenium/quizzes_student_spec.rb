@@ -1,7 +1,9 @@
-require File.expand_path(File.dirname(__FILE__) + '/helpers/quizzes_common')
+require_relative "common"
+require_relative "helpers/quizzes_common"
 
 describe 'quizzes' do
-  include_context 'in-process server selenium tests'
+  include_context "in-process server selenium tests"
+  include QuizzesCommon
 
   def prepare_quiz
     @quiz = quiz_model({ course: @course, time_limit: 5 })
@@ -264,7 +266,7 @@ describe 'quizzes' do
       @quiz.save!
     end
 
-    it "should not show correct answers on first attempt" do
+    it "should not show correct answers on first attempt", priority: "1", test_id: 474288 do
       @student = @user
       @observer = user
       @course.enroll_user(@observer, 'ObserverEnrollment', :enrollment_state => 'active', :associated_user_id => @student.id)
@@ -309,7 +311,7 @@ describe 'quizzes' do
     end
   end
 
-  it "should show badge counts after completion" do
+  it "should show badge counts after completion", priority: "1", test_id: 474289 do
     prepare_quiz
     take_and_answer_quiz
     expect(f("#section-tabs .grades .nav-badge").text).to eq "1"

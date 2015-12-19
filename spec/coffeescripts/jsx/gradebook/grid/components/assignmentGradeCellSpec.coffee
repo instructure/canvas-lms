@@ -10,24 +10,31 @@ define [
   wrapper   = document.getElementById('fixtures')
 
   renderComponent = (props) ->
-    componentFactory = React.createFactory(AssignmentGradeCell)
-    React.render(componentFactory(props), wrapper)
+    element = React.createElement(AssignmentGradeCell, props)
+    React.render(element, wrapper)
 
   buildComponent = (props, additionalProps) ->
-    cellData = props || {columnData: {assignment: {id: '1', points_possible: 10}}, renderer: $.noop}
+    cellData = props || {columnData: {assignment: {id: '1', points_possible: 10}}, renderer: mockComponent, activeCell: false, rowData: {}}
     $.extend(cellData, additionalProps)
     renderComponent(cellData)
 
+  mockComponent = React.createClass({
+      render: () ->
+        React.createElement('div')
+  })
+
   buildComponentWithSubmission = (additionalProps, submissionType) ->
     cellData =
-      columnData: 
+      columnData:
         assignment: {id: '1', points_possible: 100}
       cellData:
         id: '1'
         submission_type: submissionType || 'discussion_topic'
         assignment_id: '1'
         workflow_state: 'submitted'
-      renderer: $.noop
+      renderer: mockComponent
+      activeCell: false
+      rowData: {}
     $.extend(cellData, additionalProps)
     buildComponent(cellData)
 
@@ -73,7 +80,7 @@ define [
     equal(getIconClassName(component), 'icon-media')
 
   test 'has "active" class when cell isActive', ->
-    component = buildComponent(undefined, {activeCell: true})
+    component = buildComponent(null, {activeCell: true})
     classList = component.refs.detailsDialog.props.className
     ok classList.indexOf('active') > -1
 
@@ -90,7 +97,7 @@ define [
             name: "Hello"
             id: "1"
 
-    component = buildComponent(undefined, props)
+    component = buildComponent(null, props)
     openDialogStub = @stub(component, 'openDialog', (->))
     detailsDialogLink = component.refs.detailsDialog
     Simulate.click(detailsDialogLink)

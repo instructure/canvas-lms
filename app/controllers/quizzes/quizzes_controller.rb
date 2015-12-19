@@ -294,6 +294,7 @@ class Quizzes::QuizzesController < ApplicationController
         :CONTEXT_ACTION_SOURCE => :quizzes,
         :REGRADE_OPTIONS => regrade_options,
         :quiz_max_combination_count => QUIZ_MAX_COMBINATION_COUNT,
+        :SHOW_QUIZ_ALT_TEXT_WARNING => true,
         :VALID_DATE_RANGE => CourseDateRange.new(@context)
       }
 

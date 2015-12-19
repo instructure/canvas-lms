@@ -357,6 +357,7 @@ class FilesController < ApplicationController
         :FILES_CONTEXTS => files_contexts,
         :NEW_FOLDER_TREE => @context.feature_enabled?(:use_new_tree)
       })
+      log_asset_access([ "files", @context ], "files", "other")
 
       render :text => "".html_safe, :layout => true
     end
@@ -873,6 +874,7 @@ class FilesController < ApplicationController
         @attachment.folder_id ||= @folder.id
         @attachment.workflow_state = nil
         @attachment.file_state = 'available'
+        @attachment.set_publish_state_for_usage_rights
         success = nil
         if params[:attachment] && params[:attachment][:source_attachment_id]
           a = Attachment.find(params[:attachment].delete(:source_attachment_id))

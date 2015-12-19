@@ -65,7 +65,8 @@ define [
       @server.respondWith "GET", ENV.GRADING_STANDARDS_URL + ".json", [200, {"Content-Type":"application/json"}, JSON.stringify @indexData]
       @server.respondWith "POST", ENV.GRADING_STANDARDS_URL, [200, {"Content-Type":"application/json"}, JSON.stringify @createdStandard]
       @server.respondWith "PUT", ENV.GRADING_STANDARDS_URL + "/1", [200, {"Content-Type":"application/json"}, JSON.stringify @updatedStandard]
-      @gradingStandardCollection = React.addons.TestUtils.renderIntoDocument(GradingStandardCollection())
+      GradingStandardCollectionElement = React.createElement(GradingStandardCollection)
+      @gradingStandardCollection = React.addons.TestUtils.renderIntoDocument(GradingStandardCollectionElement)
       @server.respond()
 
     teardown: ->

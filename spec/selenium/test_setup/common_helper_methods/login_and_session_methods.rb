@@ -99,4 +99,9 @@ module LoginAndSessionMethods
       fill_in_login_form(username, password)
     end
   end
+
+  def masquerade_as(user)
+    get "/users/#{user.id}/masquerade"
+    f('.masquerade_button').click
+  end
 end

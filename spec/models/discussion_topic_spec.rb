@@ -622,6 +622,24 @@ describe DiscussionTopic do
       expect(group.reload.discussion_topics.size).to eq 1
     end
 
+    it "should delete child topics when group category is removed" do
+      group_category = @course.group_categories.create!(:name => "category")
+      group = @course.groups.create!(:name => "group 1", :group_category => group_category)
+
+      topic = @course.discussion_topics.build(:title => "topic")
+      topic.group_category = group_category
+      topic.save!
+
+      expect(topic.reload.child_topics.active.count).to eq 1
+      expect(group.reload.discussion_topics.active.count).to eq 1
+
+      topic.group_category = nil
+      topic.save!
+
+      expect(topic.reload.child_topics.active.count).to eq 0
+      expect(group.reload.discussion_topics.active.count).to eq 0
+    end
+
     context "in a group discussion" do
       before :once do
         group_discussion_assignment

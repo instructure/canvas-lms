@@ -4,6 +4,8 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/color_common')
 
 describe 'Theme Editor' do
   include_context 'in-process server selenium tests'
+  include ColorCommon
+  include ThemeEditorCommon
 
   before(:each) do
     course_with_admin_logged_in

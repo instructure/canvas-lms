@@ -1,4 +1,6 @@
 class ChangeSisBatchIdToInteger < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     if connection.adapter_name == 'PostgreSQL'
       execute("ALTER TABLE #{AbstractCourse.quoted_table_name} ALTER sis_batch_id TYPE bigint USING CAST(sis_batch_id AS bigint)")

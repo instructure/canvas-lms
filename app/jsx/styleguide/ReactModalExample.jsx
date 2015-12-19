@@ -3,6 +3,22 @@ define([
   'react-modal'
 ], function (React, Modal) {
 
+  const modalOverrides = {
+    overlay : {
+      backgroundColor: 'rgba(0,0,0,0.5)'
+    },  
+    content : {
+      position: 'static',
+      top: '0',
+      left: '0',
+      right: 'auto',
+      bottom: 'auto',
+      borderRadius: '0',
+      border: 'none',
+      padding: '0'
+    }
+  };
+
   var ReactModalExample = React.createClass({
 
     getInitialState() {
@@ -32,7 +48,8 @@ define([
           <Modal isOpen={this.state.modalIsOpen}
                  onRequestClose={this.closeModal}
                  className={this.props.className}
-                 overlayClassName={this.props.overlayClassName}>
+                 overlayClassName={this.props.overlayClassName}
+                 style={modalOverrides}>
             <div className="ReactModal__Layout">
               <div className="ReactModal__Header">
                 <div className="ReactModal__Header-Title">

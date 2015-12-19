@@ -1,4 +1,6 @@
 class AddIndexesToPseudonyms < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     if connection.adapter_name == 'PostgreSQL'
       remove_index :pseudonyms, :unique_id

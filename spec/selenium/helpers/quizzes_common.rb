@@ -1,5 +1,4 @@
-require_relative "../common"
-
+module QuizzesCommon
   def create_quiz_with_due_date(opts={})
     @context = opts.fetch(:course, @course)
     @quiz = quiz_model
@@ -228,16 +227,11 @@ require_relative "../common"
 
   def take_quiz
     @quiz ||= quiz_with_new_questions(!:goto_edit)
-
-    get "/courses/#{@course.id}/quizzes/#{@quiz.id}/take?user_id=#{@user.id}"
-    expect_new_page_load { f("#take_quiz_link").click }
-
-    # sleep because display is updated on timer, not ajax callback
-    sleep 1
+    begin_quiz
 
     yield
   ensure
-    #This step is to prevent selenium from freezing when the dialog appears when leaving the page
+    # This step is to prevent selenium from freezing when the dialog appears when leaving the page
     fln('Quizzes').click
     driver.switch_to.alert.accept
   end
@@ -246,10 +240,8 @@ require_relative "../common"
   #   You can pass a block to specify which answer to choose, the block will
   #   receive the set of possible answers. If you don't, the first (and correct)
   #   answer will be chosen.
-  def take_and_answer_quiz(submit=true)
-    get "/courses/#{@course.id}/quizzes/#{@quiz.id}/take?user_id=#{@user.id}"
-
-    expect_new_page_load { f('#take_quiz_link').click }
+  def take_and_answer_quiz(submit=true, access_code=nil)
+    begin_quiz(access_code)
 
     answer = if block_given?
       yield(@quiz.stored_questions[0][:answers])
@@ -262,12 +254,28 @@ require_relative "../common"
       wait_for_js
     end
 
-    if submit
-      expect_new_page_load { driver.execute_script("$('#submit_quiz_form .btn-primary').click()") }
+    submit_quiz if submit
+  end
 
-      keep_trying_until do
-        expect(f('.quiz-submission .quiz_score .score_value')).to be_displayed
-      end
+  def begin_quiz(access_code=nil)
+    get "/courses/#{@course.id}/quizzes/#{@quiz.id}/take?user_id=#{@user.id}"
+
+    if access_code.nil?
+      expect_new_page_load { f('#take_quiz_link').click }
+    else
+      f('#quiz_access_code').send_keys(access_code)
+      expect_new_page_load { fj('.btn', '#main').click }
+    end
+
+    # sleep because display is updated on timer, not ajax callback
+    sleep 1
+  end
+
+  def submit_quiz
+    expect_new_page_load(true) { f('#submit_quiz_button').click }
+
+    keep_trying_until do
+      expect(f('.quiz-submission .quiz_score .score_value')).to be_truthy
     end
   end
 
@@ -286,12 +294,7 @@ require_relative "../common"
      end
     end
 
-    if submit
-      expect_new_page_load(true) { f('#submit_quiz_button').click }
-      keep_trying_until do
-        expect(f('.quiz-submission .quiz_score .score_value')).to be_displayed
-      end
-    end
+    submit_quiz if submit
   end
 
   def set_answer_comment(answer_num, text)
@@ -504,76 +507,82 @@ require_relative "../common"
     js_drag_and_drop source, target
   end
 
-def quiz_create(params={})
+  def quiz_create(params={})
 
-  @quiz = @course.quizzes.create
+    @quiz = @course.quizzes.create
 
-  default_params = {
-      quiz_name: 'bender',
-      question_name: 'shiny',
-  }
-  params = default_params.merge(params)
+    default_params = {
+        quiz_name: 'bender',
+        question_name: 'shiny',
+    }
+    params = default_params.merge(params)
 
-  answers = [
-      {weight: 100, answer_text: 'A', answer_comments: '', id: 1490},
-      {weight: 0, answer_text: 'B', answer_comments: '', id: 1020},
-      {weight: 0, answer_text: 'C', answer_comments: '', id: 7051}
-  ]
-  data = { question_name:params[:quiz_name], points_possible: 1, question_text: params[:question_name],
-           answers: answers, question_type: 'multiple_choice_question'
-  }
+    answers = [
+        {weight: 100, answer_text: 'A', answer_comments: '', id: 1490},
+        {weight: 0, answer_text: 'B', answer_comments: '', id: 1020},
+        {weight: 0, answer_text: 'C', answer_comments: '', id: 7051}
+    ]
+    data = { question_name:params[:quiz_name], points_possible: 1, question_text: params[:question_name],
+             answers: answers, question_type: 'multiple_choice_question'
+    }
 
-  @quiz.quiz_questions.create!(question_data: data)
+    @quiz.quiz_questions.create!(question_data: data)
 
-  @quiz.workflow_state = "available"
-  @quiz.generate_quiz_data
-  @quiz.published_at = Time.now
-  @quiz.save!
-  @quiz
-end
-
-def seed_quiz_wth_submission(num=1)
-  quiz_data =
-      [
-          {
-              question_name: 'Multiple Choice',
-              points_possible: 10,
-              question_text: 'Pick wisely...',
-              answers: [
-                  {weight: 100, answer_text: 'Correct', id: 1},
-                  {weight: 0, answer_text: 'Wrong', id: 2},
-                  {weight: 0, answer_text: 'Wrong', id: 3}
-              ],
-              question_type: 'multiple_choice_question'
-          },
-          {
-              question_name: 'File Upload',
-              points_possible: 5,
-              question_text: 'Upload a file',
-              question_type: 'file_upload_question'
-          },
-          {
-              question_name: 'Short Essay',
-              points_possible: 20,
-              question_text: 'Write an essay',
-              question_type: 'essay_question'
-          }
-      ]
-
-  quiz = @course.quizzes.create title: 'Quiz Me!'
-
-  num.times do
-    quiz_data.each do |question|
-      quiz.quiz_questions.create! question_data: question
-    end
+    @quiz.workflow_state = "available"
+    @quiz.generate_quiz_data
+    @quiz.published_at = Time.now
+    @quiz.save!
+    @quiz
   end
 
-  quiz.workflow_state = 'available'
-  quiz.save!
+  def seed_quiz_with_submission(num=1, opts={})
+    quiz_data =
+        [
+            {
+                question_name: 'Multiple Choice',
+                points_possible: 10,
+                question_text: 'Pick wisely...',
+                answers: [
+                    {weight: 100, answer_text: 'Correct', id: 1},
+                    {weight: 0, answer_text: 'Wrong', id: 2},
+                    {weight: 0, answer_text: 'Wrong', id: 3}
+                ],
+                question_type: 'multiple_choice_question'
+            },
+            {
+                question_name: 'File Upload',
+                points_possible: 5,
+                question_text: 'Upload a file',
+                question_type: 'file_upload_question'
+            },
+            {
+                question_name: 'Short Essay',
+                points_possible: 20,
+                question_text: 'Write an essay',
+                question_type: 'essay_question'
+            },
+            {
+                question_name: 'Text (no question)',
+                question_text: 'This is just text',
+                question_type: 'text_only_question'
+            }
+        ]
 
-  submission = quiz.generate_submission @students[0]
-  submission.workflow_state = 'complete'
-  submission.save!
+    quiz = @course.quizzes.create title: 'Quiz Me!'
 
-  quiz
+    num.times do
+      quiz_data.each do |question|
+        quiz.quiz_questions.create! question_data: question
+      end
+    end
+
+    quiz.workflow_state = 'available'
+    quiz.save!
+
+    submission = quiz.generate_submission opts[:student] || @students[0]
+    submission.workflow_state = 'complete'
+    submission.save!
+
+    quiz
+  end
 end

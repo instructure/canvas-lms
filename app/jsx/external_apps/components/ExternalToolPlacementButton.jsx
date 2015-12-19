@@ -8,6 +8,22 @@ define([
   'compiled/jquery.rails_flash_notifications'
 ], function ($, _, I18n, React, ReactModal, store) {
 
+  const modalOverrides = {
+    overlay : {
+      backgroundColor: 'rgba(0,0,0,0.5)'
+    },  
+    content : {
+      position: 'static',
+      top: '0',
+      left: '0',
+      right: 'auto',
+      bottom: 'auto',
+      borderRadius: '0',
+      border: 'none',
+      padding: '0'
+    }
+  };
+
   return React.createClass({
     displayName: 'ExternalToolPlacementButton',
 
@@ -95,6 +111,7 @@ define([
           ref='reactModal'
           isOpen={this.state.modalIsOpen}
           onRequestClose={this.closeModal}
+          style={modalOverrides}
           className='ReactModal__Content--canvas ReactModal__Content--mini-modal'
           overlayClassName='ReactModal__Overlay--canvas'
           >
@@ -103,7 +120,7 @@ define([
             >
             <div className="ReactModal__Header">
               <div className="ReactModal__Header-Title">
-                <h4 tabindex="-1">{I18n.t('App Placements')}</h4>
+                <h4 tabIndex="-1">{I18n.t('App Placements')}</h4>
               </div>
               <div className="ReactModal__Header-Actions">
                 <button  className="Button Button--icon-action" type="button"  onClick={this.closeModal} >
@@ -112,7 +129,7 @@ define([
                 </button>
               </div>
             </div>
-            <div tabindex="-1" className="ReactModal__Body" >
+            <div tabIndex="-1" className="ReactModal__Body" >
               <div id={ this.state.tool.name.replace(/\s/g,'') + 'Placements' } >
                 { this.placements() || I18n.t("No Placements Enabled")}
               </div>
@@ -139,7 +156,7 @@ define([
 
       if (this.props.type === "button") {
         return(
-          <a href="#" tabindex="-1" ref="placementButton" role="menuitem" aria-label={editAriaLabel} className="btn long" onClick={this.openModal} >
+          <a href="#" tabIndex="-1" ref="placementButton" role="menuitem" aria-label={editAriaLabel} className="btn long" onClick={this.openModal} >
             <i className="icon-info" data-tooltip="left" title={I18n.t('Tool Placements')}></i>
             { this.getModal() }
           </a>
@@ -147,7 +164,7 @@ define([
       } else {
         return(
           <li role="presentation" className="ExternalToolPlacementButton">
-            <a href="#" tabindex="-1" ref="placementButton" role="menuitem" aria-label={editAriaLabel} className="icon-info" onClick={this.openModal}>
+            <a href="#" tabIndex="-1" ref="placementButton" role="menuitem" aria-label={editAriaLabel} className="icon-info" onClick={this.openModal}>
               {I18n.t('Placements')}
             </a>
             { this.getModal() }

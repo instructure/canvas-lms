@@ -15,7 +15,8 @@ define [
       }
 
   test 'getDisplayState', ->
-    component = TestUtils.renderIntoDocument(CourseListItem(@props))
+    CourseListItemElement = React.createElement(CourseListItem, @props)
+    component = TestUtils.renderIntoDocument(CourseListItemElement)
     ok _.isNull(component.getDisplayState()),
       'display state should be null without epub_export'
     React.unmountComponentAtNode(component.getDOMNode().parentNode)
@@ -26,13 +27,15 @@ define [
         workflow_state: 'generating'
       }
     }
-    component = TestUtils.renderIntoDocument(CourseListItem(@props))
+    CourseListItemElement = React.createElement(CourseListItem, @props)
+    component = TestUtils.renderIntoDocument(CourseListItemElement)
     ok !_.isNull(component.getDisplayState()),
       'display state should not be null with epub_export'
     ok component.getDisplayState().match('Generating'), 'should include workflow_state'
     React.unmountComponentAtNode(component.getDOMNode().parentNode)
 
   test 'render', ->
-    component = TestUtils.renderIntoDocument(CourseListItem(@props))
+    CourseListItemElement = React.createElement(CourseListItem, @props)
+    component = TestUtils.renderIntoDocument(CourseListItemElement)
     ok !_.isNull(component.getDOMNode()), 'should render with course'
     React.unmountComponentAtNode(component.getDOMNode().parentNode)

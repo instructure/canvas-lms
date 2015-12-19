@@ -1,4 +1,7 @@
-define(['jquery','vendor/slickgrid/slick.core'],function(jQuery) {
+define([
+  'jquery',
+  'vendor/slickgrid/slick.core',
+  'vendor/slickgrid/lib/jquery.event.drag-2.2'],function(jQuery) {
 
 /**
  * @license
@@ -2424,18 +2427,18 @@ if (typeof Slick === "undefined") {
       scrollLeft = $viewport_1[0].scrollLeft;
       var vScrollDist = Math.abs(scrollTop - prevScrollTop);
       var hScrollDist = Math.abs(scrollLeft - prevScrollLeft);
-      
+
       if (hScrollDist) {
         prevScrollLeft = scrollLeft;
         $headerScroller_1[0].scrollLeft = scrollLeft;
         $topPanelScroller_1[0].scrollLeft = scrollLeft;
         $headerRowScroller_1[0].scrollLeft = scrollLeft;
       }
-      
+
       if (vScrollDist) {
         vScrollDir = prevScrollTop < scrollTop ? 1 : -1;
         prevScrollTop = scrollTop;
-        
+
         if (options.numberOfColumnsToFreeze > 0) {
           $viewport_0[0].scrollTop = scrollTop;
         }
@@ -2456,12 +2459,12 @@ if (typeof Slick === "undefined") {
           }
         }
       }
-      
+
       if (hScrollDist || vScrollDist) {
         if (h_render) {
           clearTimeout(h_render);
         }
-        
+
         if (Math.abs(lastRenderedScrollTop - scrollTop) > 20 ||
             Math.abs(lastRenderedScrollLeft - scrollLeft) > 20) {
           if (options.forceSyncScrolling || (
@@ -2471,7 +2474,7 @@ if (typeof Slick === "undefined") {
           } else {
             h_render = setTimeout(render, 50);
           }
-         
+
          trigger(self.onViewportChanged, {});
         }
       }
@@ -2655,7 +2658,7 @@ if (typeof Slick === "undefined") {
             cancelEditAndSetFocus();
           } else if (e.which == 34) {
             navigatePageDown();
-            handled = true;           
+            handled = true;
           } else if (e.which == 33) {
             navigatePageUp();
             handled = true;
@@ -3219,7 +3222,7 @@ if (typeof Slick === "undefined") {
         var prevActivePosX = activePosX;
         while (cell <= activePosX) {
           if (canCellBeActive(row, cell)) {
-            prevCell = cell;  
+            prevCell = cell;
           }
           cell += getColspan(row, cell);
         }

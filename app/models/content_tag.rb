@@ -274,12 +274,13 @@ class ContentTag < ActiveRecord::Base
     return unless self.asset_context_matches?
     return unless self.content && self.content.respond_to?(:publish!)
 
+    # update the asset and also update _other_ content tags that point at it
     if self.unpublished? && self.content.published? && self.content.can_unpublish?
       self.content.unpublish!
-      self.class.update_for(self.content)
+      self.class.update_for(self.content, exclude_tag: self)
     elsif self.active? && !self.content.published?
       self.content.publish!
-      self.class.update_for(self.content)
+      self.class.update_for(self.content, exclude_tag: self)
     end
   end
 
@@ -348,8 +349,11 @@ class ContentTag < ActiveRecord::Base
     self.context_module.available_for?(user, opts.merge({:tag => self}))
   end
 
-  def self.update_for(asset)
-    tags = ContentTag.where(:content_id => asset, :content_type => asset.class.to_s).not_deleted.select([:id, :tag_type, :content_type, :context_module_id]).to_a
+  def self.update_for(asset, exclude_tag: nil)
+    tags = ContentTag.where(:content_id => asset, :content_type => asset.class.to_s).not_deleted
+    tags = tags.where('content_tags.id<>?', exclude_tag.id) if exclude_tag
+    tags = tags.select([:id, :tag_type, :content_type, :context_module_id]).to_a
+    return if tags.empty?
     module_ids = tags.map(&:context_module_id).compact
 
     # update title

@@ -93,6 +93,7 @@ describe Quizzes::QuizEligibility do
       let(:concluded_section) { CourseSection.new(end_at: Time.zone.now - 3.days) }
 
       let(:restricted_active_section)    { CourseSection.new(end_at: Time.zone.now + 3.days, restrict_enrollments_to_section_dates: true) }
+      let(:restricted_section_without_end)    { CourseSection.new(end_at: nil, restrict_enrollments_to_section_dates: true) }
       let(:restricted_concluded_section) { CourseSection.new(end_at: Time.zone.now - 3.days, restrict_enrollments_to_section_dates: true) }
 
       let(:active_term)       { EnrollmentTerm.new(end_at: Time.zone.now + 3.days) }
@@ -157,6 +158,16 @@ describe Quizzes::QuizEligibility do
           expect(eligibility.eligible?).to be_truthy
           expect(eligibility.potentially_eligible?).to be_truthy
         end
+
+        it "returns true if section without end date overrides" do
+          eligibility.stubs(:term).returns(concluded_term)
+          eligibility.stubs(:course).returns(concluded_course)
+          concluded_course.stubs(:enrollment_term).returns(concluded_term)
+          eligibility.stubs(:course_section).returns(restricted_section_without_end)
+          expect(eligibility.eligible?).to be_truthy
+          expect(eligibility.potentially_eligible?).to be_truthy
+        end
+
       end
 
       context "course concluded and restricted to course dates" do

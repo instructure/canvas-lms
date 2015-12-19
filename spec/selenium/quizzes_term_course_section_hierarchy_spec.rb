@@ -1,9 +1,9 @@
-require File.expand_path(File.dirname(__FILE__) + '/helpers/quizzes_common')
-require File.expand_path(File.dirname(__FILE__) + '/helpers/assignment_overrides.rb')
+require_relative "common"
+require_relative "helpers/quizzes_common"
 
 describe "quizzes section hierarchy" do
-
-  include_examples 'in-process server selenium tests'
+  include_context "in-process server selenium tests"
+  include QuizzesCommon
 
   before :each do
     course_with_teacher_logged_in
@@ -28,7 +28,7 @@ describe "quizzes section hierarchy" do
     @override.save!
   end
 
-  def take_quiz
+  def take_hierarchy_quiz
     get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
     expect_new_page_load{f('#take_quiz_link').click}
     # make sure it does not create a blank submissions
@@ -52,7 +52,7 @@ describe "quizzes section hierarchy" do
       it "should allow the student to take the quiz", priority: "1", test_id: 282619 do
         # ensure student is able to take the quiz and it does not create a blank submission
         user_session(@student)
-        take_quiz
+        take_hierarchy_quiz
       end
 
       it "should allow the teacher to preview the quiz", priority: "1", test_id: 282838 do
@@ -68,7 +68,7 @@ describe "quizzes section hierarchy" do
       @override.unlock_at = Time.zone.now.advance(days:-1)
       @override.lock_at = Time.zone.now.advance(days:4)
       user_session(@student)
-      take_quiz
+      take_hierarchy_quiz
     end
     end
 
@@ -82,19 +82,28 @@ describe "quizzes section hierarchy" do
 
       it "should still be accessible for student in the section after term end date", priority: "1", test_id: 323087 do
         user_session(@student)
-        take_quiz
+        take_hierarchy_quiz
       end
 
       it "should be accessible for teachers enrolled in section after term end date", priority: "1", test_id: 323089 do
         teacher_in_section(@new_section, user: @teacher)
-        take_quiz
+        take_hierarchy_quiz
       end
 
       it "should work with lock and unlock dates set up", priority: "1", test_id: 323090 do
         @override.unlock_at = Time.zone.now.advance(days:-1)
         @override.lock_at = Time.zone.now.advance(days:4)
         user_session(@student)
-        take_quiz
+        take_hierarchy_quiz
+      end
+
+      it "should not be accessible for student in the main section", priority: "1", test_id: 350077 do
+        student1 = user_with_pseudonym(username: 'student1@example.com', active_all: 1)
+        student_in_course(course: @course, user: student1)
+        user_session(student1)
+        get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
+        expect(f('#quiz_show .quiz-header .lock_explanation').text).
+            to include('This quiz is no longer available as the course has been concluded')
       end
     end
   end
@@ -150,6 +159,14 @@ describe "quizzes section hierarchy" do
       end
 
       it "should still allow teachers to take the quiz", priority: "1", test_id: 323328 do
+        verify_quiz_accessible
+      end
+
+      it "should allow students in the main section to take the quiz", priority: "1", test_id: 350075 do
+        student1 = user_with_pseudonym(username: 'student1@example.com', active_all: 1)
+        enrollment = student_in_course(course: @course, user: student1)
+        enrollment.accept!
+        user_session(student1)
         verify_quiz_accessible
       end
     end

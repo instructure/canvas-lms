@@ -42,7 +42,7 @@ define([
         $dialog.dialog('close');
       };
 
-      React.renderComponent(<ManageGroupDialog userCollection={this.state.userCollection}
+      React.render(<ManageGroupDialog userCollection={this.state.userCollection}
                                                checked={_.map(group.users, (u) => u.id)}
                                                groupId={group.id}
                                                name={group.name}
@@ -71,7 +71,7 @@ define([
         $dialog.dialog('close');
       };
 
-      React.renderComponent(<NewGroupDialog userCollection={this.state.userCollection}
+      React.render(<NewGroupDialog userCollection={this.state.userCollection}
                                             createGroup={this.createGroup}
                                             closeDialog={closeDialog}
                                             loadMore={() => this._loadMore(this.state.userCollection)} />, $dialog[0])
@@ -174,7 +174,7 @@ define([
     },
 
     _filter(group) {
-      filter = this.state.filter.toLowerCase();
+      var filter = this.state.filter.toLowerCase();
       return (!filter ||
               group.name.toLowerCase().indexOf(filter) > -1 ||
               group.users.some(u => u.name.toLowerCase().indexOf(filter) > -1));

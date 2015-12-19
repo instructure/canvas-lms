@@ -1,4 +1,6 @@
 class DropEnrollmentIdFromAttachments < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     remove_index :attachments, [:enrollment_id]
     remove_column :attachments, :enrollment_id

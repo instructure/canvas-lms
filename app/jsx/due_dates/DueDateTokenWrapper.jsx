@@ -9,8 +9,8 @@ define([
   'compiled/regexp/rEscape'
 ], (_ ,React, ReactModal, OverrideStudentStore, TokenInput, I18n, $, rEscape) => {
 
-  var ComboboxOption = React.createFactory(TokenInput.Option)
-  var TokenInput = React.createFactory(TokenInput)
+  var ComboboxOption = TokenInput.Option;
+
   var DueDateWrapperConsts = {
     MINIMUM_SEARCH_LENGTH: 3,
     MAXIMUM_STUDENTS_TO_SHOW: 7,

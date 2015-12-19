@@ -170,7 +170,6 @@
     li {
       position: relative;
       a.item {
-        padding-left: 24px;
         b {
           padding-right: 20px;
         }
@@ -200,12 +199,6 @@
             color: #444;
           }
         }
-      }
-      .icon-peer-review:before {
-        position: absolute;
-        left: 0;
-        top: 14px;
-        color: #999;
       }
     }
   }

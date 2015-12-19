@@ -3,8 +3,9 @@ require File.expand_path(File.dirname(__FILE__) + '/../helpers/calendar2_common'
 
 describe "calendar2" do
   include_context "in-process server selenium tests"
+  include Calendar2Common
 
-  before (:each) do
+  before(:each) do
     Account.default.tap do |a|
       a.settings[:show_scheduler]   = true
       a.save!
@@ -12,7 +13,7 @@ describe "calendar2" do
   end
 
   context "as a teacher" do
-    before (:each) do
+    before(:each) do
       course_with_teacher_logged_in
     end
 
@@ -152,7 +153,7 @@ describe "calendar2" do
         change_calendar(:next)
 
         # Verify known dates in calendar header and grid
-        expect(get_header_text).to include_text('February 2012')
+        expect(header_text).to include_text('February 2012')
         first_wednesday = '.fc-day-number.fc-wed:first'
         expect(fj(first_wednesday).text).to eq('1')
         expect(fj(first_wednesday).attribute('data-date')).to eq('2012-02-01')
@@ -167,7 +168,7 @@ describe "calendar2" do
         change_calendar(:prev)
 
         # Verify known dates in calendar header and grid
-        expect(get_header_text).to include_text('December 2011')
+        expect(header_text).to include_text('December 2011')
         first_thursday = '.fc-day-number.fc-thu:first'
         expect(fj(first_thursday).text).to eq('1')
         expect(fj(first_thursday).attribute('data-date')).to eq('2011-12-01')
@@ -178,9 +179,9 @@ describe "calendar2" do
 
       it "should change the month" do
         get "/calendar2"
-        old_header_title = get_header_text
+        old_header_title = header_text
         change_calendar
-        new_header_title = get_header_text
+        new_header_title = header_text
         expect(old_header_title).not_to eq new_header_title
       end
 

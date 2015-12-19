@@ -1,4 +1,6 @@
 class AddSettingsToCourses < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     add_column :courses, :settings, :text
   end

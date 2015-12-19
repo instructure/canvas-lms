@@ -388,6 +388,7 @@ CanvasRails::Application.routes.draw do
     delete 'student_view' => 'courses#leave_student_view'
     delete 'test_student' => 'courses#reset_test_student'
     get 'content_migrations' => 'content_migrations#index'
+    get 'link_validator' => 'courses#link_validator', :as => :link_validator
   end
 
   get 'quiz_statistics/:quiz_statistics_id/files/:file_id/download' => 'files#show', as: :quiz_statistics_download, download: '1'
@@ -871,10 +872,11 @@ CanvasRails::Application.routes.draw do
       put  'accounts/:account_id/courses', action: :batch_update
       post 'courses/:course_id/ping', action: :ping, as: 'course_ping'
 
-      get 'courses/:course_id/link_validation', action: :link_validation
+      get 'courses/:course_id/link_validation', action: :link_validation, as: 'course_link_validation'
       post 'courses/:course_id/link_validation', action: :start_link_validation
 
       post 'courses/:course_id/reset_content', :action => :reset_content
+      get  'users/:user_id/courses', action: :user_index
     end
 
     scope(controller: :account_notifications) do
@@ -1121,6 +1123,7 @@ CanvasRails::Application.routes.draw do
 
       get 'users/self/todo', action: :todo_items
       get 'users/self/upcoming_events', action: :upcoming_events
+      get 'users/:user_id/missing_submissions', action: :missing_submissions
 
       delete 'users/self/todo/:asset_string/:purpose', action: :ignore_item, as: 'users_todo_ignore'
       post 'accounts/:account_id/users', action: :create
@@ -1260,6 +1263,7 @@ CanvasRails::Application.routes.draw do
     scope(controller: :communication_channels) do
       get 'users/:user_id/communication_channels', action: :index, as: 'communication_channels'
       post 'users/:user_id/communication_channels', action: :create
+      post 'users/:user_id/communication_channels/:id', action: :reset_bounce_count, as: 'reset_bounce_count'
       delete 'users/:user_id/communication_channels/:id', action: :destroy
       delete 'users/:user_id/communication_channels/:type/:address', action: :destroy, constraints: { address: %r{[^/?]+} }
     end
@@ -1288,6 +1292,7 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :calendar_events_api) do
       get 'calendar_events', action: :index, as: 'calendar_events'
+      get 'users/:user_id/calendar_events', action: :user_index, as: 'user_calendar_events'
       post 'calendar_events', action: :create
       get 'calendar_events/:id', action: :show, as: 'calendar_event'
       put 'calendar_events/:id', action: :update
@@ -1754,7 +1759,23 @@ CanvasRails::Application.routes.draw do
     scope(controller: :errors) do
       post "error_reports", action: :create
     end
+
+    scope(controller: :jwts) do
+      post 'jwts', action: :create
+    end
   end
+
+  # this is not a "normal" api endpoint in the sense that it is not documented or
+    # generally available to hosted customers. it also does not respect the normal
+    # pagination options; however, jobs_controller already accepts `limit` and `offset`
+    # paramaters and defines a sane default limit
+    ApiRouteSet::V1.draw(self) do
+      scope(controller: :jobs) do
+        get 'jobs', action: :index
+        get 'jobs/:id', action: :show
+        post 'jobs/batch_update', action: :batch_update
+      end
+    end
 
   # this is not a "normal" api endpoint in the sense that it is not documented
   # or called directly, it's used as the redirect in the file upload process

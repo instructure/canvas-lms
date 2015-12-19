@@ -1,10 +1,11 @@
-require File.expand_path(File.dirname(__FILE__) + '/helpers/quizzes_common')
+require_relative "common"
+require_relative "helpers/quizzes_common"
 
 describe "quizzes question creation with attempts" do
+  include_context "in-process server selenium tests"
+  include QuizzesCommon
 
-  include_context 'in-process server selenium tests'
-
-  before (:each) do
+  before(:each) do
     course_with_teacher_logged_in
     @last_quiz = start_quiz_question
   end

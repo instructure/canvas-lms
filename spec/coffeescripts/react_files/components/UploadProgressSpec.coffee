@@ -10,7 +10,7 @@ define [
   module 'UploadProgress',
     setup: ->
       @uploader = @mockUploader('filename', 35)
-      @prog = React.render(UploadProgress(uploader: @uploader), $('<div>').appendTo('#fixtures')[0])
+      @prog = React.render(React.createElement(UploadProgress, uploader: @uploader), $('<div>').appendTo('#fixtures')[0])
 
     teardown: ->
       React.unmountComponentAtNode(@prog.getDOMNode().parentNode)

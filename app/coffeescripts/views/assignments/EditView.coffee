@@ -131,12 +131,25 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly, RCEKeyboardSho
       if @assignment.hasSubmittedSubmissions()
         @$pointsChangeWarning.toggleAccessibly(@$assignmentPointsPossible.val() != "#{@assignment.pointsPossible()}")
 
+    checkboxAccessibleAdvisory: (box) ->
+      label = box.parent()
+      advisory = label.find('span.screenreader-only.accessible_label')
+      advisory = $('<span class="screenreader-only accessible_label"></span>').appendTo(label) unless advisory.length
+      advisory
+
+    setImplicitCheckboxValue: (box, value) ->
+      $("input[type='hidden'][name='#{box.attr('name')}']", box.parent()).attr('value', value)
+
     disableCheckbox: (box, message) ->
       box.prop("disabled", true).parent().attr('data-tooltip', 'top').data('tooltip', {disabled: false}).attr('title', message)
+      @setImplicitCheckboxValue(box, if box.prop('checked') then '1' else '0')
+      @checkboxAccessibleAdvisory(box).text(message)
 
     enableCheckbox: (box) ->
       if box.prop("disabled")
         box.removeProp("disabled").parent().timeoutTooltip().timeoutTooltip('disable').removeAttr('data-tooltip').removeAttr('title')
+        @setImplicitCheckboxValue(box, '0')
+        @checkboxAccessibleAdvisory(box).text('')
 
     handleModeratedGradingChange: =>
       if ENV?.MODERATED_GRADING && !ENV?.HAS_GRADED_SUBMISSIONS
@@ -228,9 +241,7 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly, RCEKeyboardSho
       @addTinyMCEKeyboardShortcuts()
       @handleModeratedGradingChange()
       if ENV?.MODERATED_GRADING && ENV?.HAS_GRADED_SUBMISSIONS
-        @$moderatedGradingBox.prop("disabled", true).
-          parent().attr('data-tooltip', 'top').
-          attr('title', I18n.t("Moderated grading setting cannot be changed if graded submissions exist"))
+        @disableCheckbox(@$moderatedGradingBox, I18n.t("Moderated grading setting cannot be changed if graded submissions exist"))
       this
 
     toJSON: =>

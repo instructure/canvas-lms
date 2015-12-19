@@ -5,6 +5,22 @@ define([
   'react-modal'
 ], function ($, I18n, React, Modal) {
 
+  const modalOverrides = {
+    overlay : {
+      backgroundColor: 'rgba(0,0,0,0.5)'
+    },  
+    content : {
+      position: 'static',
+      top: '0',
+      left: '0',
+      right: 'auto',
+      bottom: 'auto',
+      borderRadius: '0',
+      border: 'none',
+      padding: '0'
+    }
+  };
+
   return React.createClass({
     displayName: 'ConfigureExternalToolButton',
 
@@ -53,11 +69,12 @@ define([
     render() {
       return (
         <li role="presentation" className="ConfigureExternalToolButton">
-          <a href="#" tabindex="-1" ref="btnTriggerModal" role="menuitem" aria-label={I18n.t('Configure %{toolName} App', { toolName: this.props.tool.name })} className="icon-settings-2" onClick={this.openModal}>
+          <a href="#" tabIndex="-1" ref="btnTriggerModal" role="menuitem" aria-label={I18n.t('Configure %{toolName} App', { toolName: this.props.tool.name })} className="icon-settings-2" onClick={this.openModal}>
             {I18n.t('Configure')}
           </a>
           <Modal className="ReactModal__Content--canvas"
             overlayClassName="ReactModal__Overlay--canvas"
+            style={modalOverrides}
             isOpen={this.state.modalIsOpen}
             onRequestClose={this.closeModal}>
 

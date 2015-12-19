@@ -128,9 +128,6 @@ define [
         })
         postGradesDialog.open()
 
-      if(@options.post_grades_feature_enabled)
-        ajax_calls.push($.ajaxJSON( @options.course_url, "GET", {}, @gotCourse))
-
       # getting all the enrollments for a course via the api in the polite way
       # is too slow, so we're going to cheat.
       $.when(ajax_calls...)
@@ -193,7 +190,7 @@ define [
       closedAdminGradingPeriods = @getClosedAdminGradingPeriods()
 
       if closedAdminGradingPeriods.length > 0
-        assignments = @getAssignmentsInClosedGradingPeriods(closedAdminGradingPeriods)
+        assignments = @getAssignmentsInClosedGradingPeriods()
         @disabledAssignments = assignments.map (a) ->
           a.id
 
@@ -221,10 +218,8 @@ define [
       else
         ENV.GRADEBOOK_OPTIONS.current_grading_period_id
 
-    getAssignmentsInClosedGradingPeriods: (gradingPeriods) ->
-      latestEndDate = new Date(gradingPeriods[0]?.end_date)
-      for gradingPeriod in gradingPeriods
-        latestEndDate = new Date(gradingPeriod.end_date) if latestEndDate < new Date(gradingPeriod.end_date)
+    getAssignmentsInClosedGradingPeriods: () ->
+      latestEndDate = new Date(ENV.GRADEBOOK_OPTIONS.latest_end_date_of_admin_created_grading_periods_in_the_past)
       #return assignments whose end date is within the latest closed's end date
       _.select @assignments, (a) =>
         @assignmentIsDueBeforeEndDate(a, latestEndDate)
@@ -236,7 +231,7 @@ define [
         false
 
     onShow: ->
-      $(".post-grades-placeholder").show()
+      $(".post-grades-button-placeholder").show()
       return if @startedInitializing
       @startedInitializing = true
 
@@ -330,10 +325,6 @@ define [
         else
           gotAssignmentGroupsChunk(groups) for [groups, x, y] in responses
         @gotAllAssignmentGroupsPromise.resolve()
-
-
-    gotCourse: (course) =>
-      @course = course
 
     gotSections: (sections) =>
       @sections = {}
@@ -1019,33 +1010,24 @@ define [
 
     sectionList: ->
       _.map @sections, (section, id) =>
-        if(section.passback_status)
-          date = new Date(section.passback_status.sis_post_grades_status.grades_posted_at)
-        { name: section.name, id: id, passback_status: section.passback_status, date: date, checked: @sectionToShow == id }
+        { name: section.name, id: id, checked: @sectionToShow == id }
 
     drawSectionSelectButton: () ->
       @sectionMenu = new SectionMenuView(
         el: $('.section-button-placeholder'),
         sections: @sectionList(),
-        course: @course,
         showSections: @showSections(),
-        showSisSync: @options.post_grades_feature_enabled,
         currentSection: @sectionToShow)
       @sectionMenu.render()
-      @togglePostGrades(not @sectionToShow? or @sectionList().length is 1)
 
     updateCurrentSection: (section, author) =>
       @sectionToShow = section
       @postGradesStore.setSelectedSection @sectionToShow
       userSettings[if @sectionToShow then 'contextSet' else 'contextRemove']('grading_show_only_section', @sectionToShow)
       @buildRows() if @grid
-      @togglePostGrades(not @sectionToShow? or @sectionList().length is 1)
 
     showSections: ->
-      if @sections_enabled && @options.post_grades_feature_enabled
-        true
-      else
-        false
+      @sections_enabled
 
     gradingPeriodList: ->
       _.map @gradingPeriods, (period) =>
@@ -1067,37 +1049,27 @@ define [
         course:
           id:     ENV.GRADEBOOK_OPTIONS.context_id
           sis_id: ENV.GRADEBOOK_OPTIONS.context_sis_id
+      @postGradesStore.addChangeListener(@updatePowerschoolPostGradesButton)
 
       @postGradesStore.setSelectedSection @sectionToShow
-
 
     showPostGradesButton: ->
       $placeholder = $('.post-grades-placeholder')
       if $placeholder.length > 0
-        app = new PostGradesApp
+        app = React.createElement(PostGradesApp, {
           store: @postGradesStore
           renderAsButton: !$placeholder.hasClass('in-menu')
           labelText: if $placeholder.hasClass('in-menu') then I18n.t 'PowerSchool' else I18n.t 'Post Grades',
           returnFocusTo: $('#post_grades')
-        React.renderComponent(app, $placeholder[0])
+        })
+        React.render(app, $placeholder[0])
 
-    togglePostGrades: (visible) =>
-      # hide external tools elements
-      $('.external-tools-dialog').toggle(visible)
-      # remove menu placeholder if legacy placehoder button hidden
-      $('li.post-grades-placeholder').toggle(!$('li.post-grades-placeholder a').hasClass('hidden'))
-      # hide menu if no menu items visible
-      menuVisible = _.any(
-        _.filter(
-          $('li.external-tools-dialog, .post-grades-placeholder'),
-          (item) ->
-            return $(item).css('display') != 'none'
-        )
-      )
-      $('#post_grades').toggle(menuVisible)
+    updatePowerschoolPostGradesButton: =>
+      showButton = @postGradesStore.hasAssignments() && !!@postGradesStore.getState().selected.sis_id
+      $('.post-grades-placeholder').toggle(showButton)
 
     initHeader: =>
-      @drawSectionSelectButton() if @sections_enabled || @course
+      @drawSectionSelectButton() if @sections_enabled
       @drawGradingPeriodSelectButton() if @mgpEnabled
 
       $settingsMenu = $('#gradebook_settings').next()

@@ -5,8 +5,8 @@ define [
 ], (React, AssignmentPoints, $) ->
 
   renderComponent = (data) ->
-    componentFactory = React.createFactory(AssignmentPoints)
-    React.render(componentFactory(data), wrapper)
+    element = React.createElement(AssignmentPoints, data)
+    React.render(element, wrapper)
 
   buildComponent = (props, additionalProps) ->
     cellData = props || columnData: {assignment: {id: '1', points_possible: 10}}

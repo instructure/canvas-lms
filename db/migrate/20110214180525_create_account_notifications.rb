@@ -1,4 +1,6 @@
 class CreateAccountNotifications < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     create_table :account_notifications do |t|
       t.string :subject

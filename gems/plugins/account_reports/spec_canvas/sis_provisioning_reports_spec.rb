@@ -914,7 +914,9 @@ describe "Default Account Reports" do
         parameters = {}
         parameters["enrollment_term_id"] = @default_term.id
         parameters["xlist"] = true
+        parameters["include_deleted"] = false
         report = run_report("sis_export_csv", {params: parameters})
+        expect(report.parameters['extra_text']).to eq "Term: Default Term; Reports: xlist "
         parsed = parse_report(report, {header: true})
         headers = parsed.shift
         expect(headers).to eq ['xlist_course_id', 'section_id', 'status']
@@ -938,7 +940,9 @@ describe "Default Account Reports" do
         parameters = {}
         parameters["xlist"] = true
         parameters["include_deleted"] = true
-        parsed = read_report("sis_export_csv",{params: parameters, account: @sub_account})
+        report = run_report("sis_export_csv",{params: parameters, account: @sub_account})
+        expect(report.parameters['extra_text']).to eq "Term: All Terms; Include Deleted Objects; Reports: xlist "
+        parsed = parse_report(report)
         expect(parsed[0]).to eq ["SIS_COURSE_ID_1","english_section_3","deleted"]
         expect(parsed.length).to eq 1
       end

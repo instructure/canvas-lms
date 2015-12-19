@@ -25,5 +25,19 @@ describe "sections" do
       expect(ff("#current-enrollment-list .user").count).to eq 1
       expect(f("#enrollment_#{@teacher.enrollments.first.id}")).to include_text @teacher.name
     end
+
+    it "does not include X buttons for enrollments that can't be removed" do
+      course_with_teacher_logged_in(:active_all => true)
+      e1 = student_in_course(:active_all => true, :name => "Mr. Bland")
+      e2 = student_in_course(:active_all => true, :name => "Señor Havin' A Little Trouble")
+      e2.sis_source_id = '21grapes'
+      e2.save!
+
+      get "/courses/#{@course.id}/sections/#{@course.default_section.id}"
+      wait_for_ajaximations
+
+      expect(fj("#enrollment_#{e1.id} .unenroll_user_link")).not_to be_nil
+      expect(fj("#enrollment_#{e2.id} .unenroll_user_link")).to be_nil
+    end
   end
 end

@@ -2,8 +2,9 @@ require File.expand_path(File.dirname(__FILE__) + '/../helpers/discussions_commo
 require File.expand_path(File.dirname(__FILE__) + '/../helpers/assignment_overrides')
 
 describe "discussions overrides" do
-  include AssignmentOverridesSeleniumHelper
   include_context "in-process server selenium tests"
+  include AssignmentOverridesSeleniumHelper
+  include DiscussionsCommon
 
   before do
     course_with_teacher_logged_in
@@ -113,10 +114,10 @@ describe "discussions overrides" do
 
       it "should list the discussions in course and main dashboard page", priority: "2", test_id: 114322 do
         get "/courses/#{@course.id}"
-        expect(f('.events_list .event .icon-grading-gray').text).to eq("#{@discussion_topic.title}\nMultiple Due Dates")
+        expect(f('.coming_up .event a').text).to eq("#{@discussion_topic.title}\nMultiple Due Dates")
         course_with_admin_logged_in(course: @course)
         get ""
-        expect(f('.events_list .event .icon-grading-gray').text).to eq("#{@discussion_topic.title}\nMultiple Due Dates")
+        expect(f('.coming_up .event a').text).to eq("#{@discussion_topic.title}\nMultiple Due Dates")
       end
     end
   end

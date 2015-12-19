@@ -17,6 +17,7 @@ define([
     var placement = JSON.parse(element.attr('target')),
       iframe = $("<iframe/>", {
         src: element.attr('href'),
+        allowfullscreen: '',
         width: placement.displayWidth || 500,
         height: placement.displayHeight || 500
       })

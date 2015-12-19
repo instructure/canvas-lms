@@ -1,4 +1,6 @@
 class FixSpellingOfPrivilegesColumnOnEnrollments < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     add_column :enrollments, :limit_privileges_to_course_section, :boolean
   end

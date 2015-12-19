@@ -189,29 +189,7 @@ $revision-button-hover-color: $ic-brand-primary;
           padding-right: 12px;
         }
       }
-      .header-row {
-        text-transform: uppercase;
-        a.sort-field {
-          cursor: pointer;
-          user-select: none;
-          color: inherit;
-          white-space: nowrap;
-          i {
-            color: #ccc;
-          }
-        }
-        a.sort-field:hover {
-          text-decoration: none;
-          i {
-            color: #0088cc;
-          }
-        }
-        a.sort-field-active {
-          i {
-            color: black;
-          }
-        }
-      }
+
     }
     .table thead {
       background: $index-background;
@@ -322,6 +300,30 @@ $revision-button-hover-color: $ic-brand-primary;
         padding: 4px 12px;
         background: #f4f6f8;
       }
+    }
+  }
+}
+/// pulled out of the specific table class so the new UI could take advantage of the header sorting
+.header-row {
+  text-transform: uppercase;
+  a.sort-field {
+    cursor: pointer;
+    user-select: none;
+    color: inherit;
+    white-space: nowrap;
+    i {
+      color: #ccc;
+    }
+  }
+  a.sort-field:hover {
+    text-decoration: none;
+    i {
+      color: #0088cc;
+    }
+  }
+  a.sort-field-active {
+    i {
+      color: black;
     }
   }
 }

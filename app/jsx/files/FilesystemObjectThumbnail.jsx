@@ -10,7 +10,7 @@ define([
 
     if (this.state.thumbnail_url) {
       return (
-        < span
+        <span
           className={`media-object ef-thumbnail FilesystemObjectThumbnail ${additionalClassName}`}
           style = { {backgroundImage: `url('${this.state.thumbnail_url}')`} }
         ></span>
@@ -18,7 +18,7 @@ define([
     } else {
       var thumbnailClassName = (this.props.model instanceof Folder) ? 'folder' : mimeClass(this.props.model.get('content-type'));
       return (
-        < i
+        <i
           className={`media-object ef-big-icon FilesystemObjectThumbnail mimeClass-${thumbnailClassName} ${additionalClassName}`}
         ></i>
       );

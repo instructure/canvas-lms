@@ -16,6 +16,12 @@ module CC::Exporter::Epub::Converters
       convert_media_from_node!(html_node).to_s
     end
 
+    # Override on classes that include this module to return files that
+    # should not be converted to working media.
+    def unsupported_files
+      []
+    end
+
     # Find `<a>` or `<img>` tags and update the resource path attr (href or src)
     # to replace WEB_CONTENT_TOKEN with CC::Exporter::Epub::FILE_PATH.
     #
@@ -34,7 +40,7 @@ module CC::Exporter::Epub::Converters
         html_node.search(selector).each do |match|
           unescaped = CGI.unescape(match[attr]).gsub(/\?.*/, '')
 
-          if path_should_be_converted?(unescaped)
+          if should_convert_file?(unescaped)
             match[attr] = converted_media_path(unescaped)
           else
             match.replace(<<-SPAN_TAG)
@@ -50,11 +56,11 @@ module CC::Exporter::Epub::Converters
       end
     end
 
-    def path_should_be_converted?(path)
-      filename = File.basename(path).gsub(/#{File.extname(path)}/, '')
+    def should_convert_file?(unescaped)
+      filename = File.basename(unescaped).gsub(/#{File.extname(unescaped)}/, '')
 
-      @course[:files].any? do |file|
-        file[:file_name].match(filename)
+      unsupported_files.none? do |file|
+        CGI.unescape(file[:file_name]).match(filename)
       end
     end
 
@@ -91,7 +97,12 @@ module CC::Exporter::Epub::Converters
     #
     # <audio src='media/audio.mp3' controls='controls' />
     def convert_audio_tags!(html_node)
-      html_node.search('a.instructure_audio_link, a.audio_comment').each do |audio_link|
+      selector = [
+        "a.instructure_audio_link",
+        "a.audio_comment",
+        "a[href$='mp3']"
+      ].join(',')
+      html_node.search(selector).each do |audio_link|
         audio_link.replace(<<-AUDIO_TAG)
           <audio src="#{audio_link['href']}" controls="controls">
             #{I18n.t('Audio content is not supported by your device or app.')}
@@ -111,7 +122,13 @@ module CC::Exporter::Epub::Converters
     #
     # <video src='media/video.mp4' controls='controls' />
     def convert_video_tags!(html_node)
-      html_node.search('a.instructure_video_link, a.video_comment').each do |video_link|
+      selector = [
+        "a.instructure_video_link",
+        "a.video_comment",
+        "a[href$='m4v']",
+        "a[href$='mp4']"
+      ].join(',')
+      html_node.search(selector).each do |video_link|
         video_link.replace(<<-VIDEO_TAG)
           <video src="#{video_link['href']}" controls="controls">
             #{I18n.t('Video content is not supported by your device or app.')}

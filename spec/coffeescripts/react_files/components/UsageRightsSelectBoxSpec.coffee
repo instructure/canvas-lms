@@ -5,7 +5,6 @@ define [
   'jsx/files/UsageRightsSelectBox'
   ], ($, _, React, UsageRightsSelectBox ) ->
 
-    UsageRightsSelectBox = React.createFactory(UsageRightsSelectBox)
     TestUtils = React.addons.TestUtils
 
     module "UsageRightsSelectBox",
@@ -14,7 +13,7 @@ define [
         showMessage: true
       }
 
-      uRSB = TestUtils.renderIntoDocument(UsageRightsSelectBox(props))
+      uRSB = TestUtils.renderIntoDocument(React.createElement(UsageRightsSelectBox, props))
       ok uRSB.refs.showMessageAlert != undefined, "message is being shown"
       React.unmountComponentAtNode(uRSB.getDOMNode().parentNode)
 
@@ -24,7 +23,7 @@ define [
         showMessage: false
       }
 
-      uRSB = TestUtils.renderIntoDocument(UsageRightsSelectBox(props))
+      uRSB = TestUtils.renderIntoDocument(React.createElement(UsageRightsSelectBox, props))
 
       server.respond 'GET', "", [200, {
         'Content-Type': 'application/json'
@@ -41,7 +40,7 @@ define [
         copyright: copyright
       }
 
-      uRSB = TestUtils.renderIntoDocument(UsageRightsSelectBox(props))
+      uRSB = TestUtils.renderIntoDocument(React.createElement(UsageRightsSelectBox, props))
       equal uRSB.refs.copyright.getDOMNode().value, copyright
       React.unmountComponentAtNode(uRSB.getDOMNode().parentNode)
 
@@ -54,7 +53,7 @@ define [
         cc_value: cc_value
       }
 
-      uRSB = TestUtils.renderIntoDocument(UsageRightsSelectBox(props))
+      uRSB = TestUtils.renderIntoDocument(React.createElement(UsageRightsSelectBox, props))
       server.respond 'GET', "", [200, {
         'Content-Type': 'application/json'
       }, JSON.stringify([{id: 'cc_some_option', name: 'CreativeCommonsOption' }])]

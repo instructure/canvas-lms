@@ -18,23 +18,24 @@
 module CC::Importer::Canvas
   module WikiConverter
     include CC::Importer
-    
+
     def convert_wikis
       wikis = []
-      
+
       wiki_dir = File.join(@unzipped_file_path, WIKI_FOLDER)
       Dir["#{wiki_dir}/**/**"].each do |path|
+        next if File.directory?(path)
         doc = open_file(path)
         wikis << convert_wiki(doc, path)
       end
-      
+
       wikis
     end
-    
+
     def convert_wiki(doc, path)
       wiki = {}
       wiki_name = File.basename(path).sub(".html", '')
-      title, body, meta = get_html_title_and_body_and_meta_fields(doc)
+      title, body, meta = (get_html_title_and_body_and_meta_fields(doc) rescue get_html_title_and_body_and_meta_fields(open_file_xml(path)))
       wiki[:title] = title
       wiki[:migration_id] = meta['identifier']
       wiki[:editing_roles] = meta['editing_roles']
@@ -47,6 +48,6 @@ module CC::Importer::Canvas
       wiki[:url_name] = wiki_name
       wiki
     end
-    
+
   end
 end

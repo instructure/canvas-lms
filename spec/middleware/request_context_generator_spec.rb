@@ -34,12 +34,14 @@ describe "RequestContextGenerator" do
   end
 
   it "should add page view data to X-Canvas-Meta" do
-    _, headers, _ = RequestContextGenerator.new(->(env) {
+    pv = page_view_model
+    _, headers, _ = RequestContextGenerator.new(->(_env) {
       RequestContextGenerator.add_meta_header("a1", "test1")
-      RequestContextGenerator.store_page_view_meta(page_view_model)
+      RequestContextGenerator.store_page_view_meta(pv)
       [ 200, {}, [] ]
     }).call(env)
-    expect(headers['X-Canvas-Meta']).to eq "a1=test1;x=5;p=f;"
+    f = pv.created_at.try(:utc).try(:iso8601, 2)
+    expect(headers['X-Canvas-Meta']).to eq "a1=test1;x=5;p=f;f=#{f};"
   end
 
   it "should generate a request_id and store it in Thread.current" do

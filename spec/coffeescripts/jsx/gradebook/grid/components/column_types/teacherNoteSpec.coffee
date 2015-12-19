@@ -16,6 +16,7 @@ define [
       note: 'Great work!'
       userId: '1'
       studentName: 'Dora Explora'
+      columnId: '1'
 
     componentFactory = React.createFactory(TeacherNote)
     React.render(componentFactory(props), wrapper)

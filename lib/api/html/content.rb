@@ -141,8 +141,6 @@ module Api
         mathml = UserContent.latex_to_mathml(node['alt'])
         return if mathml.blank?
 
-        # replace alt attribute with mathml
-        node.delete('alt')
         node['data-mathml'] = mathml
       end
     end

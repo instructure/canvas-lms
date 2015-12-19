@@ -1,7 +1,10 @@
 require File.expand_path(File.dirname(__FILE__) + '/../helpers/assignments_common')
 require File.expand_path(File.dirname(__FILE__) + '/../helpers/differentiated_assignments')
+
 describe "interaction with differentiated assignments" do
   include_context "in-process server selenium tests"
+  include DifferentiatedAssignments
+  include AssignmentsCommon
 
   context "Student" do
     before :each do

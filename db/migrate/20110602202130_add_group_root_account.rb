@@ -1,4 +1,6 @@
 class AddGroupRootAccount < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     add_column :groups, :root_account_id, :integer, :limit => 8
 

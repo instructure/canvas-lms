@@ -2,6 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/wiki_and_tiny_common
 
 describe "Wiki pages and Tiny WYSIWYG editor" do
   include_context "in-process server selenium tests"
+  include WikiAndTinyCommon
 
   context "as a student" do
 
@@ -70,7 +71,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
 
       expect(f('a.edit-wiki')).to be_displayed
     end
-    
+
     it "should allow students to create new pages if enabled" do
       @course.default_wiki_editing_roles = "teachers,students"
       @course.save!

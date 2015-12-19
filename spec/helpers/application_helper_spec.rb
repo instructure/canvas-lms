@@ -767,4 +767,38 @@ describe ApplicationHelper do
       end
     end
   end
+
+  describe "js_base_url" do
+    it "returns an immutable string" do
+      expect(js_base_url).to be_frozen
+    end
+  end
+
+  describe "include_js_bundles" do
+    before :each do
+      helper.stubs(:js_bundles).returns([[:some_bundle], [:some_plugin_bundle, :some_plugin], [:another_bundle, nil]])
+    end
+    it "creates the correct javascript tags" do
+      base_url = helper.use_optimized_js? ? '/optimized' : '/javascripts'
+      expect(helper.include_js_bundles).to eq %{
+<script src="#{base_url}/compiled/bundles/some_bundle.js"></script>
+<script src="#{base_url}/plugins/some_plugin/compiled/bundles/some_plugin_bundle.js"></script>
+<script src="#{base_url}/compiled/bundles/another_bundle.js"></script>
+      }.strip
+    end
+
+    it "creates the correct javascript tags with webpack enabled" do
+      helper.stubs(:use_webpack?).returns(true)
+      base_url = helper.use_optimized_js? ? "/webpack-dist-optimized" : "/webpack-dist"
+      expect(helper.include_js_bundles).to eq %{
+<script src="#{base_url}/vendor.bundle.js"></script>
+<script src="#{base_url}/instructure-common.bundle.js"></script>
+<script src="#{base_url}/some_bundle.bundle.js"></script>
+<script src="#{base_url}/some_plugin-some_plugin_bundle.bundle.js"></script>
+<script src="#{base_url}/another_bundle.bundle.js"></script>
+      }.strip
+    end
+  end
+
+
 end

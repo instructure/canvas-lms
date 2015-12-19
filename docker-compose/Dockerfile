@@ -19,9 +19,9 @@ ENV LANG       en_US.UTF-8
 ENV LC_ALL     en_US.UTF-8
 RUN dpkg-reconfigure locales
 
-# Canvas requires bundler 1.7.10
+# Canvas requires bundler 1.10.6
 RUN gem uninstall bundler \
-  && gem install bundler -v 1.7.10
+  && gem install bundler -v 1.10.6
 
 RUN mkdir /app
 WORKDIR /app

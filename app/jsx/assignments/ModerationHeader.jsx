@@ -24,7 +24,7 @@ define([
         return (
 
           <div className="ic-notification">
-            <div className="ic-notification__icon" role="presentation">
+            <div className="ic-notification__icon" aria-hidden='true' role="presentation">
               <i className="icon-info"></i>
             </div>
             <div className="ic-notification__content">
@@ -48,7 +48,7 @@ define([
           <div className='ModeratedGrading__Header ic-Action-header'>
             <div className='ic-Action-header__Primary'>
               <div className='ic-Action-header__Heading ModeratedGrading__Header-Instructions'>
-                {I18n.t('Select assignments for review')}
+                {I18n.t('Select students for review')}
               </div>
             </div>
             <div className='ic-Action-header__Secondary ModeratedGrading__Header-Buttons '>
@@ -59,8 +59,11 @@ define([
                 onClick={this.props.onReviewClick}
                 disabled={this.props.published}
               >
-                <i className='icon-plus' />
-                {I18n.t(' Reviewer')}
+                <span className='screenreader-only'>{I18n.t('Add a reviewer for the selected students')}</span>
+                <span aria-hidden='true'>
+                  <i className='icon-plus' />
+                  {I18n.t(' Reviewer')}
+                </span>
               </button>
               <button
                 ref='publishBtn'

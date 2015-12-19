@@ -50,13 +50,13 @@ define([
   SubmissionsHelper
 ){
   var Table = FixedDataTable.Table,
-      Column = FixedDataTable.Column,
-      isColumnResizing = false,
-      spinner;
+    Column = FixedDataTable.Column,
+    isColumnResizing = false,
+    spinner;
 
   var Gradebook = React.createClass({
     mixins: [
-      Reflux.connect(KeyboardNavigationStore, 'currentCellIndex'),
+      Reflux.connect(KeyboardNavigationStore, 'keyboardNav'),
       Reflux.connect(SettingsStore, 'settings'),
       Reflux.connect(GradebookToolbarStore, 'toolbarOptions'),
       Reflux.connect(TableStore, 'tableData')
@@ -71,6 +71,7 @@ define([
         });
       SectionsActions.load();
       CustomColumnsActions.loadTeacherNotes();
+      CustomColumnsActions.load();
     },
 
     componentDidMount() {
@@ -80,34 +81,11 @@ define([
 
     handleKeyDown(event) {
       var reactGradebook = document.getElementById('react-gradebook-canvas');
-      var handled = true;
-
-      if (event.keyCode === 9) {
-        if (event.shiftKey) {
-          KeyboardNavigationActions.previous();
-        } else {
-          KeyboardNavigationActions.next();
-        }
-      } else if (event.keyCode === 13) {
-        if (event.shiftKey) {
-          KeyboardNavigationActions.up();
-        } else {
-          KeyboardNavigationActions.down();
-        }
-      } else if (event.keyCode === 37) {
-        KeyboardNavigationActions.previous();
-      } else if (event.keyCode === 38) {
-        KeyboardNavigationActions.up();
-      } else if (event.keyCode === 39) {
-        KeyboardNavigationActions.next();
-      } else if (event.keyCode === 40) {
-        KeyboardNavigationActions.down();
-      } else {
-        handled = false;
-      }
-
-      if (handled) {
+      var knownCodes = GradebookConstants.RECOGNIZED_KEYBOARD_CODES;
+      if (_.contains(knownCodes, event.keyCode)) {
         event.nativeEvent.preventDefault();
+        event.persist();
+        KeyboardNavigationActions.handleKeyboardEvent(event);
         $(reactGradebook).focus();
       }
     },
@@ -126,8 +104,8 @@ define([
 
     getColumnWidth(column) {
       var customWidths = this.state.settings.columnWidths,
-          defaultWidth = GradebookConstants.DEFAULT_LAYOUTS.headers.width,
-          width = (customWidths && customWidths[column]) || defaultWidth;
+        defaultWidth = GradebookConstants.DEFAULT_LAYOUTS.headers.width,
+        width = (customWidths && customWidths[column]) || defaultWidth;
 
       return parseInt(width);
     },
@@ -148,19 +126,20 @@ define([
              && this.state.toolbarOptions.totalColumnInFront;
     },
 
-    renderColumn(columnName, columnType, columnId, cellDataGetter, assignment) {
+    renderColumn(columnName, columnType, columnId, cellDataGetter, assignment, customColumnData) {
       var columnIdentifier = columnId || columnType,
-          columnWidth = this.getColumnWidth(columnIdentifier),
-          enrollments = this.state.tableData.students,
-          submissions = this.state.tableData.submissions,
-          columnData = {
-            columnType: columnType,
-            activeCell: this.state.currentCellIndex,
-            setActiveCell: KeyboardNavigationActions.setActiveCell,
-            assignment: assignment,
-            enrollments: enrollments,
-            submissions: submissions
-          };
+        columnWidth = this.getColumnWidth(columnIdentifier),
+        enrollments = this.state.tableData.students,
+        submissions = this.state.tableData.submissions,
+        columnData = {
+          columnType: columnType,
+          activeCell: this.state.keyboardNav.currentCellIndex,
+          setActiveCell: KeyboardNavigationActions.setActiveCell,
+          assignment: assignment,
+          enrollments: enrollments,
+          submissions: submissions,
+          customColumnData: customColumnData
+        };
 
       return (
         <Column
@@ -225,9 +204,7 @@ define([
     },
 
     hasStoreErrorOccured() {
-      return //this.state.assignmentGroups.error
-             this.state.tableData.error;
-             //|| this.state.submissions.error;
+      return this.state.tableData.error;
     },
 
     renderSpinner() {
@@ -239,10 +216,32 @@ define([
       }).addClass('use-css-transitions-for-show-hide').appendTo('#main');
     },
 
+    removeSpinner() {
+      if (spinner) {
+        $(spinner.el).remove();
+        spinner = null;
+      }
+    },
+
     renderNotesColumn() {
       if (!this.state.toolbarOptions.hideNotesColumn) {
-        return this.renderColumn(I18n.t('Notes'), GradebookConstants.NOTES_COLUMN_ID);
+        return this.renderColumn(I18n.t('Notes'), GradebookConstants.NOTES_COLUMN_ID, 'notesColumn');
       }
+    },
+
+    renderCustomColumns(customColumns) {
+      let customColumnData, mapFunction;
+
+      customColumnData = customColumns.customColumns.data;
+      mapFunction = function(customColumn) {
+        var columnId, columnData;
+
+        columnId = 'customColumn_' + customColumn.id;
+        columnData = this.state.tableData.customColumns.customColumns.columnData;
+        return this.renderColumn(customColumn.title, GradebookConstants.CUSTOM_COLUMN_ID, columnId, (columnId, rowData) => columnData[customColumn.id][rowData.student.user_id], null, customColumn);
+      };
+
+      return _.map(customColumnData, mapFunction.bind(this));
     },
 
     renderAllColumns() {
@@ -255,11 +254,13 @@ define([
       columns = [
         this.renderColumn(I18n.t('Student Name'), GradebookConstants.STUDENT_COLUMN_ID),
         this.renderNotesColumn(),
+        this.renderCustomColumns(this.state.tableData.customColumns),
         this.renderAssignmentColumns(_.flatten(_.values(this.state.tableData.assignments)).sort(comparator), this.state.tableData.submissions),
         this.renderAssignmentGroupColumns(this.state.tableData.assignmentGroups),
       ];
 
       (showTotalInFront) ? columns.splice(1, 0, total) : columns.push(total);
+
       return columns;
     },
 
@@ -267,8 +268,8 @@ define([
       if (this.hasStoreErrorOccured()) {
         $.flashError(I18n.t('There was a problem loading the gradebook.'));
       }
-      else if (this.state.tableData.rows) {
-        $(spinner.el).remove();
+      else if (!this.state.tableData.loading) {
+        this.removeSpinner();
         return (
           <div id="react-gradebook-canvas"
                onKeyDown={this.handleKeyDown}
@@ -276,6 +277,8 @@ define([
             <Table
               rowGetter={this.rowGetter}
               rowsCount={this.state.tableData.students.length}
+              scrollToColumn={this.state.keyboardNav.currentColumnIndex}
+              scrollToRow={this.state.keyboardNav.currentRowIndex}
               onColumnResizeEndCallback={this.handleColumnResize}
               isColumnResizing={isColumnResizing}
               rowHeight={GradebookConstants.DEFAULT_LAYOUTS.rows.height}
@@ -284,6 +287,7 @@ define([
               headerHeight={GradebookConstants.DEFAULT_LAYOUTS.headers.height}>
 
               {this.renderAllColumns()}
+              {KeyboardNavigationActions.constructKeyboardNavManager()}
 
             </Table>
           </div>

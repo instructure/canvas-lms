@@ -33,6 +33,8 @@ describe EpubExports::CourseEpubExportsPresenter do
     end
 
     it "should set latest_epub_export for course with epub_export" do
+      @course.enable_feature!(:epub_export)
+      @course_with_epub.enable_feature!(:epub_export)
       courses = presenter.courses
 
       expect(courses.find do |course|
@@ -42,6 +44,16 @@ describe EpubExports::CourseEpubExportsPresenter do
       expect(courses.find do |course|
         course.id == @course.id
       end.latest_epub_export).to be_nil
+    end
+
+    it "should only include courses that have the feature enabled" do
+
+      courses = presenter.courses
+
+      expect(courses.find do |course|
+        course.id == @course_with_epub.id
+      end).to be_nil
+
     end
   end
 end

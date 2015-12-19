@@ -811,7 +811,7 @@ describe Quizzes::Quiz do
     end
 
     it "should get the correct points possible" do
-      expect(@quiz.current_points_possible).to eq 15
+      expect(@quiz.current_points_possible).to eq 20 # actual_pick_count wasn't so actual after all
     end
 
     it "should omit top level questions when selecting from a question bank" do

@@ -24,7 +24,8 @@ define [
         onDeleteGradingStandard: ->
         onSaveGradingStandard: ->
 
-      @gradingStandard = React.render(GradingStandard(props), $('<div>').appendTo('#fixtures')[0])
+      GradingStandardElement = React.createElement(GradingStandard, props)
+      @gradingStandard = React.render(GradingStandardElement, $('<div>').appendTo('#fixtures')[0])
 
     teardown: ->
       React.unmountComponentAtNode(@gradingStandard.getDOMNode().parentNode)
@@ -85,7 +86,8 @@ define [
         onDeleteGradingStandard: ->
         onSaveGradingStandard: ->
 
-      @gradingStandard = React.renderComponent(GradingStandard(props), $('<div>').appendTo('#fixtures')[0])
+      GradingStandardElement = React.createElement(GradingStandard, props)
+      @gradingStandard = React.render(GradingStandardElement, $('<div>').appendTo('#fixtures')[0])
 
     teardown: ->
       React.unmountComponentAtNode(@gradingStandard.getDOMNode().parentNode)
@@ -113,9 +115,10 @@ define [
         round: (number)-> return Math.round(number * 100)/100
         onSetEditingStatus: ->
         onDeleteGradingStandard: ->
-        onSaveGradingStandard: ->
+        onSaveGradingStandard: sinon.spy()
 
-      @gradingStandard = React.renderComponent(GradingStandard(props), $('<div>').appendTo('#fixtures')[0])
+      GradingStandardElement = React.createElement(GradingStandard, props)
+      @gradingStandard = React.render(GradingStandardElement, $('<div>').appendTo('#fixtures')[0])
 
     teardown: ->
       React.unmountComponentAtNode(@gradingStandard.getDOMNode().parentNode)
@@ -136,9 +139,8 @@ define [
     deepEqual @gradingStandard.rowDataIsValid(), true
 
   test 'calls onSaveGradingStandard save button is clicked', ->
-    saveGradingStandard = @spy(@gradingStandard.props, 'onSaveGradingStandard')
     Simulate.click(@gradingStandard.refs.saveButton.getDOMNode())
-    ok saveGradingStandard.calledOnce
+    ok @gradingStandard.props.onSaveGradingStandard.calledOnce
 
   test 'sets the state to saving when the save button is clicked', ->
     deepEqual @gradingStandard.state.saving, false
@@ -199,7 +201,8 @@ define [
         onDeleteGradingStandard: ->
         onSaveGradingStandard: ->
 
-      @gradingStandard = React.renderComponent(GradingStandard(props), $('<div>').appendTo('#fixtures')[0])
+      GradingStandardElement = React.createElement(GradingStandard, props)
+      @gradingStandard = React.render(GradingStandardElement, $('<div>').appendTo('#fixtures')[0])
 
     teardown: ->
       React.unmountComponentAtNode(@gradingStandard.getDOMNode().parentNode)
@@ -235,7 +238,8 @@ define [
         onDeleteGradingStandard: ->
         onSaveGradingStandard: ->
 
-      @gradingStandard = React.renderComponent(GradingStandard(props), $('<div>').appendTo('#fixtures')[0])
+      GradingStandardElement = React.createElement(GradingStandard, props)
+      @gradingStandard = React.render(GradingStandardElement, $('<div>').appendTo('#fixtures')[0])
 
     teardown: ->
       React.unmountComponentAtNode(@gradingStandard.getDOMNode().parentNode)
@@ -271,7 +275,8 @@ define [
         onDeleteGradingStandard: ->
         onSaveGradingStandard: ->
 
-      @gradingStandard = React.renderComponent(GradingStandard(props), $('<div>').appendTo('#fixtures')[0])
+      GradingStandardElement = React.createElement(GradingStandard, props)
+      @gradingStandard = React.render(GradingStandardElement, $('<div>').appendTo('#fixtures')[0])
 
     teardown: ->
       React.unmountComponentAtNode(@gradingStandard.getDOMNode().parentNode)
@@ -307,7 +312,8 @@ define [
         onDeleteGradingStandard: ->
         onSaveGradingStandard: ->
 
-      @gradingStandard = React.renderComponent(GradingStandard(props), $('<div>').appendTo('#fixtures')[0])
+      GradingStandardElement = React.createElement(GradingStandard, props)
+      @gradingStandard = React.render(GradingStandardElement, $('<div>').appendTo('#fixtures')[0])
 
     teardown: ->
       React.unmountComponentAtNode(@gradingStandard.getDOMNode().parentNode)
@@ -343,7 +349,8 @@ define [
         onDeleteGradingStandard: ->
         onSaveGradingStandard: ->
 
-      @gradingStandard = React.renderComponent(GradingStandard(props), $('<div>').appendTo('#fixtures')[0])
+      GradingStandardElement = React.createElement(GradingStandard, props)
+      @gradingStandard = React.render(GradingStandardElement, $('<div>').appendTo('#fixtures')[0])
 
     teardown: ->
       React.unmountComponentAtNode(@gradingStandard.getDOMNode().parentNode)
@@ -379,7 +386,8 @@ define [
         onDeleteGradingStandard: ->
         onSaveGradingStandard: ->
 
-      @gradingStandard = React.renderComponent(GradingStandard(props), $('<div>').appendTo('#fixtures')[0])
+      GradingStandardElement = React.createElement(GradingStandard, props)
+      @gradingStandard = React.render(GradingStandardElement, $('<div>').appendTo('#fixtures')[0])
 
     teardown: ->
       React.unmountComponentAtNode(@gradingStandard.getDOMNode().parentNode)

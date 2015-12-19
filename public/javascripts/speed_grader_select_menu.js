@@ -75,7 +75,10 @@ define([
       // chosen, to work around this, we force an update on any key
       // press.
       $select_menu.bind("keyup", function(e){
-        self.jquerySelectMenu().change();
+        var code = e.keyCode || e.which;
+        if(code == 37 || code == 38 || code == 39 || code == 40) { //left, up, right, down arrow
+          self.jquerySelectMenu().change();
+        }
       });
     }
 

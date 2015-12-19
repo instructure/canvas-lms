@@ -1,5 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 
+module SchedulerCommon
   def fill_out_appointment_group_form(new_appointment_text, opts = {})
     f('.create_link').click
     edit_form = f('#edit_appointment_form')
@@ -96,4 +97,4 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
     click_al_option('.edit_link')
     wait_for_ajaximations
   end
-
+end

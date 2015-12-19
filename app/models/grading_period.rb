@@ -26,7 +26,7 @@ class GradingPeriod < ActiveRecord::Base
 
   validates :title, :start_date, :end_date, :grading_period_group_id, presence: true
   validate :start_date_is_before_end_date
-  validate :not_overlapping
+  validate :not_overlapping, unless: :skip_not_overlapping_validator?
 
   set_policy do
     given { |user| self.grading_period_group.grants_right?(user, :read) }
@@ -47,7 +47,7 @@ class GradingPeriod < ActiveRecord::Base
   # Takes a context and returns an Array (not an ActiveRecord::Relation)
   # which means this method is not .where() chainable
   def self.for(context)
-    "GradingPeriod::#{context.class}GradingPeriodFinder"
+    "#{self.name}::#{context.class}#{self.name}Finder"
       .constantize
       .new(context)
       .grading_periods
@@ -101,7 +101,16 @@ class GradingPeriod < ActiveRecord::Base
     overlaps.active.exists?
   end
 
+  def skip_not_overlapping_validator
+    @_skip_not_overlapping_validator = true
+  end
+
   private
+
+  def skip_not_overlapping_validator?
+    @_skip_not_overlapping_validator
+  end
+
   scope :overlaps, ->(from, to) do
     # sourced: http://c2.com/cgi/wiki?TestIfDateRangesOverlap
     where('((start_date < ?) and (end_date > ?))', to, from)
@@ -119,7 +128,7 @@ class GradingPeriod < ActiveRecord::Base
   end
 
   def siblings
-    grading_periods = GradingPeriod.where(
+    grading_periods = self.class.where(
       grading_period_group_id: grading_period_group_id
     )
     if new_record?

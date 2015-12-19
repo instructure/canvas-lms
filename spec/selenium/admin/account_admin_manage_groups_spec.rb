@@ -3,6 +3,7 @@ require 'thread'
 
 describe "account admin manage groups" do
   include_context "in-process server selenium tests"
+  include ManageGroupsCommon
 
   def add_account_category (account, name)
     f(".add_category_link").click
@@ -15,7 +16,7 @@ describe "account admin manage groups" do
     category
   end
 
-  before (:each) do
+  before(:each) do
     skip
 		#course_with_admin_logged_in
     #@admin_account = Account.default
@@ -45,7 +46,7 @@ describe "account admin manage groups" do
   end
 
   context "single category" do
-    before (:each) do
+    before(:each) do
       @courses_group_category = @admin_account.group_categories.create(:name => "Existing Category")
       groups_student_enrollment 1
     end

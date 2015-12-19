@@ -156,7 +156,10 @@ module ApplicationHelper
     includes = [:active_assignments, :active_discussion_topics, :active_quizzes, :active_context_modules]
     includes.each{|i| @wiki_sidebar_data[i] = @context.send(i).limit(150) if @context.respond_to?(i) }
     includes.each{|i| @wiki_sidebar_data[i] ||= [] }
-    @wiki_sidebar_data[:wiki_pages] = @context.wiki.wiki_pages.active.order(:title).limit(150) if @context.respond_to?(:wiki)
+    if @context.respond_to?(:wiki)
+      limit = Setting.get('wiki_sidebar_item_limit', 1000000).to_i
+      @wiki_sidebar_data[:wiki_pages] = @context.wiki.wiki_pages.active.order(:title).select('title, url, workflow_state').limit(limit)
+    end
     @wiki_sidebar_data[:wiki_pages] ||= []
     if can_do(@context, @current_user, :manage_files, :read_as_admin)
       @wiki_sidebar_data[:root_folders] = Folder.root_folders(@context)
@@ -229,6 +232,14 @@ module ApplicationHelper
     end
   end
 
+  def use_webpack?
+    if ENV['USE_WEBPACK'].present? && ENV['USE_WEBPACK'] != 'false'
+      !(params[:require_js])
+    else
+      params[:webpack]
+    end
+  end
+
   # Determines the location from which to load JavaScript assets
   #
   # uses optimized:
@@ -240,18 +251,26 @@ module ApplicationHelper
   #   * when ENV['USE_OPTIMIZED_JS'] is false
   #   * or when ?debug_assets=true is present in the url
   def js_base_url
-    use_optimized_js? ? '/optimized' : '/javascripts'
+    if use_webpack?
+      use_optimized_js? ? "/webpack-dist-optimized" : "/webpack-dist"
+    else
+      use_optimized_js? ? '/optimized' : '/javascripts'
+    end.freeze
   end
 
   # Returns a <script> tag for each registered js_bundle
   def include_js_bundles
-    paths = js_bundles.inject([]) do |ary, (bundle, plugin)|
-      base_url = "#{js_base_url}"
-      base_url += "/plugins/#{plugin}" if plugin
-      ary.concat(Canvas::RequireJs.extensions_for(bundle, 'plugins/')) unless use_optimized_js?
-      ary << "#{base_url}/compiled/bundles/#{bundle}.js"
+    common_bundles = []
+    common_bundles = ["#{js_base_url}/vendor.bundle.js", "#{js_base_url}/instructure-common.bundle.js"] if use_webpack?
+    paths = js_bundles.inject(common_bundles) do |ary, (bundle, plugin)|
+      if use_webpack?
+        ary << "#{js_base_url}/#{plugin ? "#{plugin}-" : ''}#{bundle}.bundle.js"
+      else
+        ary.concat(Canvas::RequireJs.extensions_for(bundle, 'plugins/')) unless use_optimized_js?
+        ary << "#{js_base_url}#{plugin ? "/plugins/#{plugin}" : ''}/compiled/bundles/#{bundle}.js"
+      end
     end
-    javascript_include_tag(*paths)
+    javascript_include_tag(*paths, type: nil)
   end
 
   def include_css_bundles

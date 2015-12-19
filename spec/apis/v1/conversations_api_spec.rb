@@ -1848,12 +1848,12 @@ describe ConversationsController, type: :request do
   end
 
   describe "delete_for_all" do
-    it "should require site_admin with become_user permissions" do
+    it "should require site_admin with manage_students permissions" do
       cp = conversation(@me, @bob, @billy, @jane, @joe, @tommy, :sender => @me)
       conv = cp.conversation
       expect(@joe.conversations.size).to eql 1
 
-      account_admin_user_with_role_changes(:account => Account.site_admin, :role_changes => { :become_user => false })
+      account_admin_user_with_role_changes(:account => Account.site_admin, :role_changes => { :manage_students => false })
       json = raw_api_call(:delete, "/api/v1/conversations/#{conv.id}/delete_for_all",
         {:controller => 'conversations', :action => 'delete_for_all', :format => 'json', :id => conv.id.to_s},
         {:domain_root_account => Account.site_admin})

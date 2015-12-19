@@ -19,6 +19,9 @@
 
 require 'atom'
 
+# Force loaded so that it will be in ActiveRecord::Base.descendants for switchman to use
+require_dependency 'assignment_student_visibility'
+
 class DiscussionTopic < ActiveRecord::Base
 
   include Workflow
@@ -64,6 +67,9 @@ class DiscussionTopic < ActiveRecord::Base
   has_many :child_topics, :class_name => 'DiscussionTopic', :foreign_key => :root_topic_id, :dependent => :destroy
   has_many :discussion_topic_participants, :dependent => :destroy
   has_many :discussion_entry_participants, :through => :discussion_entries
+
+  has_many :assignment_student_visibilities, :through => :assignment
+
   belongs_to :user
 
   EXPORTABLE_ATTRIBUTES = [
@@ -141,8 +147,15 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def set_schedule_delayed_transitions
-    @should_schedule_delayed_post = self.delayed_post_at? && self.delayed_post_at_changed?
-    @should_schedule_lock_at = self.lock_at && self.lock_at_changed?
+    if self.delayed_post_at? && self.delayed_post_at_changed?
+      @should_schedule_delayed_post = true
+      self.workflow_state = 'post_delayed' if [:migration, :after_migration].include?(self.saved_by) && self.delayed_post_at > Time.now
+    end
+    if self.lock_at && self.lock_at_changed?
+      @should_schedule_lock_at = true
+      self.locked = false if [:migration, :after_migration].include?(self.saved_by) && self.lock_at > Time.now
+    end
+
     true
   end
 
@@ -165,13 +178,20 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def update_subtopics
-    if !self.deleted? && self.has_group_category?
+    if !self.deleted? && (self.has_group_category? || !!self.group_category_id_was)
       send_later_if_production :refresh_subtopics
     end
   end
 
   def refresh_subtopics
+    if self.root_topic_id.blank?
+      # delete any lingering child topics
+      self.shard.activate do
+        DiscussionTopic.where(:root_topic_id => self).update_all(:workflow_state => "deleted")
+      end
+    end
     return if self.deleted?
+
     category = self.group_category
     return unless category && self.root_topic_id.blank?
     category.groups.active.each do |group|
@@ -501,15 +521,8 @@ class DiscussionTopic < ActiveRecord::Base
   }
 
   scope :joins_assignment_student_visibilities, lambda { |user_ids, course_ids|
-    user_ids = Array.wrap(user_ids).join(',')
-    course_ids = Array.wrap(course_ids).join(',')
-    joins(sanitize_sql([<<-SQL, user_ids, course_ids]))
-      JOIN assignment_student_visibilities
-        ON (assignment_student_visibilities.assignment_id = discussion_topics.assignment_id
-          AND assignment_student_visibilities.user_id IN (%s)
-          AND assignment_student_visibilities.course_id IN (%s)
-        )
-    SQL
+    joins(:assignment_student_visibilities)
+      .where(assignment_student_visibilities: { user_id: user_ids, course_id: course_ids })
   }
 
   alias_attribute :available_from, :delayed_post_at
@@ -806,7 +819,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   def initialize_last_reply_at
     self.posted_at ||= Time.now.utc
-    self.last_reply_at ||= Time.now.utc unless self.saved_by == :migration
+    self.last_reply_at ||= Time.now.utc unless [:migration, :after_migration].include?(self.saved_by)
   end
 
   set_policy do

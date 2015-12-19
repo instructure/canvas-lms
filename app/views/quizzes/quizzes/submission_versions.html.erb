@@ -1,10 +1,10 @@
   <div class="desc">
-    <%= t 'attempt_history', 'Attempt History' %>
+    <h3><%= t 'attempt_history', 'Attempt History' %></h3>
   </div>
-  <table class="table table-bordered" summary="<%= t('quiz_attempt_history_description', 'A table that shows your quiz attempt history. Each attempt is on the left side. The attempt, time, and score are across the top.')%>">
+  <table class="ic-Table ic-Table--condensed" summary="<%= t('quiz_attempt_history_description', 'A table that shows your quiz attempt history. Each attempt is on the left side. The attempt, time, and score are across the top.')%>">
     <thead>
       <tr>
-        <td>&nbsp;</td>
+        <th>&nbsp;</th>
         <th scope="col"><%= t 'attempt', 'Attempt' %></th>
         <th  scope="col"><%= t 'time', 'Time' %></th>
         <th scope="col"><%= t 'score', 'Score' %></th>

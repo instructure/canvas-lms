@@ -4,9 +4,12 @@ require File.expand_path(File.dirname(__FILE__) + '/../helpers/scheduler_common'
 
 describe "scheduler" do
   include_context "in-process server selenium tests"
+  include Calendar2Common
+  include SchedulerCommon
+
   context "as a teacher" do
 
-    before (:once) do
+    before(:once) do
       Account.default.tap do |a|
         a.settings[:show_scheduler]   = true
         a.settings[:agenda_view]      = true
@@ -14,7 +17,7 @@ describe "scheduler" do
       end
     end
 
-    before (:each) do
+    before(:each) do
       course_with_teacher_logged_in
       make_full_screen
     end

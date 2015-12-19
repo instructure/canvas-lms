@@ -18,10 +18,6 @@ define([
         })
       },
 
-      isEnabled () {
-        return this.getState().selected.sis_id
-      },
-
       hasAssignments () {
         var assignments = this.getAssignments()
         if (assignments != undefined && assignments.length > 0) {

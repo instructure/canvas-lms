@@ -1,4 +1,6 @@
 class AddSisBatchBatchMode < ActiveRecord::Migration
+  tag :predeploy
+
   def self.up
     add_column :sis_batches, :batch_mode, :boolean
     add_column :sis_batches, :batch_mode_term_id, :integer, :limit => 8

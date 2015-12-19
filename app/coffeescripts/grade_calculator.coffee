@@ -72,7 +72,7 @@ define [
         sub =
           total: @parse assignments[s.assignment_id].points_possible
           score: @parse s.score
-          submitted: s.score? and s.score != ''
+          submitted: s.score? and s.score != '' and s.score != 'ungraded assignment'
           submission: s
       relevantSubmissionData = if ignoreUngraded
         _(submissionData).filter (s) -> s.submitted

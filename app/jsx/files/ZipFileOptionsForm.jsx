@@ -7,11 +7,24 @@ define([
   'jsx/shared/modal-buttons'
   ], function(I18n, React, withReactElement, Modal, ModalContent, ModalButtons) {
 
-  var Modal = React.createFactory(Modal);
-
-
+  const modalOverrides = {
+    overlay : {
+      backgroundColor: 'rgba(0,0,0,0.5)'
+    },  
+    content : {
+      position: 'static',
+      top: '0',
+      left: '0',
+      right: 'auto',
+      bottom: 'auto',
+      borderRadius: '0',
+      border: 'none',
+      padding: '0'
+    }
+  };
 
   var ZipFileOptionsForm = React.createClass({
+
     displayName: 'ZipFileOptionsForm',
     propTypes: {
       onZipOptionsResolved: React.PropTypes.func.isRequired
@@ -34,9 +47,10 @@ define([
       return (
         <Modal
           className='ReactModal__Content--canvas ReactModal__Content--mini-modal'
-          isOpen={this.props.fileOptions}
+          isOpen={!!this.props.fileOptions}
           ref='canvasModal'
           title= { I18n.t('zip_options', 'Zip file options') }
+          style={modalOverrides}
           onRequestClose = {this.props.onClose}
         >
           <ModalContent>

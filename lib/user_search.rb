@@ -94,8 +94,8 @@ module UserSearch
   def self.complex_sql
     @_complex_sql ||= <<-SQL
       (EXISTS (SELECT 1 FROM #{Pseudonym.quoted_table_name}
-         WHERE #{like_condition('pseudonyms.sis_user_id')} 
-           AND pseudonyms.user_id = users.id 
+         WHERE #{like_condition('pseudonyms.sis_user_id')}
+           AND pseudonyms.user_id = users.id
            AND pseudonyms.workflow_state='active')
        OR (#{like_condition('users.name')})
        OR EXISTS (SELECT 1 FROM #{CommunicationChannel.quoted_table_name}

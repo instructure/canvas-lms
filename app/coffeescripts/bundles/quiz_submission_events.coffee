@@ -11,6 +11,3 @@ require [ 'jquery', 'canvas_quizzes/apps/events' ], ($, app) ->
 
   app.mount(document.body.querySelector('#content')).then ->
     console.log('Yeah, a canvas quiz app has been loaded!!!')
-, (error) ->
-  console.warn('App loading failed:', error, error.stack);
-

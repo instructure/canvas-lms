@@ -3,11 +3,12 @@ require File.expand_path(File.dirname(__FILE__) + '/../../helpers/grading_scheme
 
 describe "sub account grading schemes" do
   include_context "in-process server selenium tests"
+  include GradingSchemesCommon
 
   let(:account) { Account.create(:name => 'sub account from default account', :parent_account => Account.default) }
   let(:url) { "/accounts/#{account.id}/grading_standards" }
 
-  before (:each) do
+  before(:each) do
     course_with_admin_logged_in
     get url
   end
@@ -36,7 +37,7 @@ describe "sub account grading schemes" do
       end
 
       it 'should disable other grading schemes from being edited', priority: "2", test_id: 307626 do
-        2.times do 
+        2.times do
           simple_grading_standard(account)
         end
         get url
@@ -45,7 +46,7 @@ describe "sub account grading schemes" do
       end
 
       it 'should allow all available grading schemes to be edited on page load', priority: "2", test_id: 310145 do
-        2.times do 
+        2.times do
           simple_grading_standard(account)
         end
         get url

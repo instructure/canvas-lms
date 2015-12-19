@@ -3,6 +3,8 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/groups_common')
 
 describe "student groups" do
   include_context "in-process server selenium tests"
+  include GroupsCommon
+
   let(:group_name){ 'Windfury' }
   let(:group_category_name){ 'cat1' }
 

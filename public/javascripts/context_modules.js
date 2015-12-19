@@ -1397,7 +1397,8 @@ define([
           fileName: file.displayName()
         }
 
-        React.render(PublishCloud(props), $el[0]);
+        var Cloud = React.createElement(PublishCloud, props);
+        React.render(Cloud, $el[0]);
         return {model: file} // Pretending this is a backbone view
       }
 

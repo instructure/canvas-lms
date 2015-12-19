@@ -5,8 +5,8 @@ define [
   'react-router'
   'react-modal'
   '../modules/customPropTypes'
+  'Backbone'
   'i18n!file_preview'
-  'jsx/files/FriendlyDatetime'
   'compiled/util/friendlyBytes'
   'compiled/models/Folder'
   'compiled/models/File'
@@ -16,10 +16,8 @@ define [
   'jsx/files/FilePreviewInfoPanel'
   '../modules/filesEnv'
   '../modules/FocusStore'
-], ($, _, React, ReactRouter, ReactModal, customPropTypes, I18n, FriendlyDatetimeComponent, friendlyBytes, Folder, File, FilesystemObject, preventDefault, collectionHandler, FilePreviewInfoPanel, filesEnv, FocusStore) ->
-
-  FriendlyDatetime = React.createFactory FriendlyDatetimeComponent
-  Link = React.createFactory ReactRouter.Link
+  'jsx/files/codeToRemoveLater'
+], ($, _, React, ReactRouter, ReactModal, customPropTypes, Backbone, I18n, friendlyBytes, Folder, File, FilesystemObject, preventDefault, collectionHandler, FilePreviewInfoPanel, filesEnv, FocusStore, codeToRemoveLater) ->
 
   FilePreview =
 
@@ -32,24 +30,29 @@ define [
       query: React.PropTypes.object
       collection: React.PropTypes.object
       params: React.PropTypes.object
+      isOpen: React.PropTypes.bool
 
     getInitialState: ->
       showInfoPanel: false
       displayedItem: null
 
     componentWillMount: ->
-      items = @getItemsToView @props, (items) =>
-        @setState @stateProperties(items, @props)
+      if(@props.isOpen)
+        items = @getItemsToView @props, (items) =>
+          @setState @stateProperties(items, @props)
 
     componentDidMount: ->
       $('.ReactModal__Overlay').on 'keydown', @handleKeyboardNavigation
+      codeToRemoveLater.hideFileTreeFromPreviewInJaws()
 
     componentWillUnmount: ->
       $('.ReactModal__Overlay').off 'keydown', @handleKeyboardNavigation
+      codeToRemoveLater.revertJawsChangesBackToNormal()
 
     componentWillReceiveProps: (newProps) ->
-      items = @getItemsToView newProps, (items) =>
-        @setState @stateProperties(items, newProps)
+      if(newProps.isOpen)
+        items = @getItemsToView newProps, (items) =>
+          @setState @stateProperties(items, newProps)
 
     getItemsToView: (props, cb) ->
       # Sets up our collection that we will be using.
@@ -59,27 +62,21 @@ define [
                 props.collection.models
               else
                 props.currentFolder.files.models
-      folders = props.currentFolder?.folders?.models or []
 
-      items = files.concat folders
-      otherItems =  items.filter (item) ->
+      otherItems =  files.filter (file) ->
                       return true unless onlyIdsToPreview
-                      item.id in onlyIdsToPreview
+                      file.id in onlyIdsToPreview
 
       visibleFile = @getQuery().preview and _.findWhere(files, {id: @getQuery().preview})
-      visibleFolder = @getQuery().preview and _.findWhere(folders, {id: @getQuery().preview})
 
-      if !visibleFile and !visibleFolder
+      if !visibleFile
         responseDataRequested = ["enhanced_preview_url"]
         responseDataRequested.push("usage_rights") if props.usageRightsRequiredForContext
         new File({id: @getQuery().preview}, {preflightUrl: 'no/url/needed'}).fetch(data: $.param({"include": responseDataRequested})).success (file) ->
           initialItem = new FilesystemObject(file)
           cb?({initialItem, otherItems})
       else
-        if visibleFile
-          initialItem = visibleFile or (files[0] if files.length)
-        else if visibleFolder
-          initialItem = visibleFolder or (folders[0] if folder.length)
+        initialItem = visibleFile or (files[0] if files.length)
 
         cb?({initialItem, otherItems})
 
@@ -130,6 +127,13 @@ define [
       @transitionTo(@getRouteIdentifier(), @getParams(), @getNavigationParams(id: nextItem.id))
 
     closeModal: ->
+
+      # TODO Remove this jQuery line once react modal is upgraded. It should clean
+      # itself up after unmounting but it doesn't so using this quick fix for now
+      # until everything is upgraded.
+      $('#application').removeAttr('aria-hidden')
+      ############## kill me #####################
+
       @transitionTo(@getRouteIdentifier(), @getParams(), @getNavigationParams(except: 'only_preview'))
       FocusStore.setFocusToItem()
 

@@ -84,6 +84,24 @@ class PageView < ActiveRecord::Base
     end
   end
 
+  def token
+    Canvas::Security.create_jwt({
+      i: request_id,
+      u: Shard.global_id_for(user_id),
+      c: created_at.try(:utc).try(:iso8601, 2)
+    })
+  end
+
+  def self.decode_token(token)
+    data = Canvas::Security.decode_jwt(token)
+    return nil unless data
+    return {
+      request_id: data[:i],
+      user_id: data[:u],
+      created_at: data[:c]
+    }
+  end
+
   def url
     url = read_attribute(:url)
     url && LoggingFilter.filter_uri(url)
@@ -127,7 +145,15 @@ class PageView < ActiveRecord::Base
   end
 
   def self.cassandra?
-    self.page_view_method == :cassandra
+    page_view_method == :cassandra
+  end
+
+  def self.pv4?
+    page_view_method == :pv4 || Setting.get('read_from_pv4', 'false') == 'true'
+  end
+
+  def self.global_storage_namespace?
+    cassandra? || pv4?
   end
 
   EventStream = EventStream::Stream.new do
@@ -147,6 +173,12 @@ class PageView < ActiveRecord::Base
       # when writing the index
       entry_proc lambda{ |page_view| page_view.user }
       key_proc lambda{ |user| user.global_asset_string }
+    end
+
+    self.raise_on_error = Rails.env.test?
+
+    on_error do |operation, record, exception|
+      Canvas::EventStreamLogger.error('PAGEVIEW', identifier, operation, record.to_json, exception.message.to_s)
     end
   end
 
@@ -174,7 +206,8 @@ class PageView < ActiveRecord::Base
 
   def self.from_attributes(attrs, new_record=false)
     @blank_template ||= columns.inject({}) { |h,c| h[c.name] = nil; h }
-    shard = PageView.cassandra? ? Shard.birth : Shard.current
+    attrs = attrs.slice(*@blank_template.keys)
+    shard = PageView.global_storage_namespace? ? Shard.birth : Shard.current
     page_view = shard.activate do
       if new_record
         new{ |pv| pv.assign_attributes(attrs, :without_protection => true) }
@@ -253,12 +286,30 @@ class PageView < ActiveRecord::Base
   scope :for_context, proc { |ctx| where(:context_type => ctx.class.name, :context_id => ctx) }
   scope :for_users, lambda { |users| where(:user_id => users) }
 
+  def self.pv4_client
+    @pv4_client ||= begin
+      config = ConfigFile.load('pv4')
+      raise "Page Views v4 not configured!" unless config
+      Pv4Client.new(config['uri'], config['access_token'])
+    end
+  end
+
+  def self.reset_pv4_client
+    @pv4_client = nil
+  end
+
+  Canvas::Reloader.on_reload do
+    reset_pv4_client
+  end
+
   # returns a collection with very limited functionality
   # basically, it responds to #paginate and returns a
   # WillPaginate::Collection-like object
   def self.for_user(user, options={})
     user.shard.activate do
-      if PageView.cassandra?
+      if PageView.pv4?
+        pv4_client.for_user(user.global_id, **options)
+      elsif PageView.cassandra?
         PageView::EventStream.for_user(user, options)
       else
         scope = self.where(:user_id => user).order('created_at desc')

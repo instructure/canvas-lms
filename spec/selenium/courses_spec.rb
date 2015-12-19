@@ -20,7 +20,6 @@ describe "courses" do
     end
 
     context 'draft state' do
-
       before(:each) do
         course_with_teacher_logged_in
       end
@@ -87,6 +86,23 @@ describe "courses" do
         validate_action_button(:first, 'Unpublished')
       end
 
+      it "should allow publishing/unpublishing with only change_course_state permission" do
+        @course.account.role_overrides.create!(:permission => :manage_course_content, :role => teacher_role, :enabled => false)
+        @course.account.role_overrides.create!(:permission => :manage_courses, :role => teacher_role, :enabled => false)
+
+        get "/courses/#{@course.id}"
+        expect_new_page_load { ff('#course_status_actions button').first.click }
+        validate_action_button(:first, 'Unpublished')
+        expect_new_page_load { ff('#course_status_actions button').last.click }
+        validate_action_button(:last, 'Published')
+      end
+
+      it "should not allow publishing/unpublishing without change_course_state permission" do
+        @course.account.role_overrides.create!(:permission => :change_course_state, :role => teacher_role, :enabled => false)
+
+        get "/courses/#{@course.id}"
+        expect(f('#course_status_actions')).to be_nil
+      end
     end
 
     describe 'course wizard' do
