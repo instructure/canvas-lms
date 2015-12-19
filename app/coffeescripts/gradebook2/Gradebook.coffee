@@ -1272,14 +1272,21 @@ define [
       @buildRows()
 
     getVisibleGradeGridColumns: ->
-      res = [].concat @parentColumns, @customColumnDefinitions()
+      columns = []
+
       for column in @allAssignmentColumns
         if @disabledAssignments && @disabledAssignments.indexOf(column.object.id) != -1
           column.cssClass = "cannot_edit"
         submissionType = ''+ column.object.submission_types
-        res.push(column) unless submissionType is "not_graded" or
-                                submissionType is "attendance" and !@show_attendance
-      res.concat(@aggregateColumns)
+        columns.push(column) unless submissionType is "not_graded" or
+                                submissionType is "attendance" and not @show_attendance
+
+      if @gradebookColumnOrderSettings?.sortType
+        columns.sort @makeColumnSortFn(@gradebookColumnOrderSettings)
+
+      columns = columns.concat(@aggregateColumns)
+      headers = @parentColumns.concat(@customColumnDefinitions())
+      headers.concat(columns)
 
     assignmentHeaderHtml: (assignment) ->
       columnHeaderTemplate
