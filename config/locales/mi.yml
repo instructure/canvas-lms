@@ -9184,9 +9184,11 @@ mi:
         details: "Ētahi atu info i %{url}"
       summary: 
         body_account: "He tono tēnei kia hono koe ki te rōpū %{group} i raro i te pae %{account}."
+        body_course: "Kua karangatia e koe ki te uru atu te rōpū %{group} mo te akoranga %{course}."
         subject: "He āpititanga rōpū hou mō %{course_or_account}"
       twitter: 
         body_account: "Whakamataara Canvas - He Tono: %{group} mō te pae %{account}"
+        body_course: "Matohi Kānawehi - Fakaafe: %{group} mo te akoranga %{course}."
     new_course: 
       email: 
         body: "Kua āpitihia te kaupapa %{course} mō te pae %{account}"
@@ -9203,6 +9205,7 @@ mi:
         title: "He kaupapa hou mo %{account}"
       sms: 
         body: "Kua āpitihia he kaupapa hou, %{course}, mō te pae %{account}"
+        details: "Ētahi atu info i %{url}"
         labels: 
           teachers: Kaiako
       summary: 
@@ -9214,16 +9217,21 @@ mi:
         body: "Whakamataara Canvas - Kaupapa hou: %{course}, %{account}"
     new_discussion_entry: 
       email: 
+        body: "whakairi %{user} he kōrero hou i runga i te miro %{discussion_topic} mō te %{course}:"
         discussion_entry_reply_message: "Hono te whakahaere mā te whakamahi i te hono i raro nei, kōrero rānei i te whakautu ki tēnei karere."
         html: 
+          body: "whakairi %{user} he kōrero hou i runga i te miro %{discussion_topic} mō te %{course}:"
           discussion_entry_reply_message: "Hono te whakahaere mā te whakamahi i te hono i raro nei, kōrero rānei i te whakautu ki tēnei karere."
           link: "Pāwhiri ki konei kia uru atu te kōrero"
           subject: "New Comment for %{discussion_topic}: %{course}"
         subject: "New Comment for %{discussion_topic}: %{course}"
       sms: 
         body: "New Comment for %{discussion_topic}: %{course}"
+        details: "Ētahi atu info i %{url}"
       summary: 
         subject: "New Comment for %{discussion_topic}: %{course}"
+      twitter: 
+        body: "Matohi Kānawehi - Comment: %{discussion_topic}, %{course}."
     new_discussion_topic: 
       email: 
         body: "Kua tētahi matapaki hōu kua tīmata kia ngā ki a koutou:"
@@ -9233,27 +9241,53 @@ mi:
           body: "Kua tētahi matapaki hōu kua tīmata kia ngā ki a koutou:"
           download: download
           link: "Pāwhiri ki konei kia uru atu te kōrero"
+          subject: "Aparauraa New - %{discussion_topic}: %{course}"
         labels: 
           file_included: "Kei kōnae"
+        subject: "Aparauraa New - %{discussion_topic}: %{course}"
+      sms: 
+        body: "Kaupapa Hōu mō te %{course}:"
+        details: "Ētahi atu info i %{url}"
+      summary: 
+        subject: "Aparauraa New - %{discussion_topic}: %{course}"
+      twitter: 
+        subject: "Matohi Kānawehi - Kaupapa: %{discussion_topic}, %{course}"
     new_event_created: 
       email: 
+        body: "He te te kaupapa hou whakaritea mo %{course_name} e kia koe mōhio o:"
+        from_to_time: "i %{start_date_time} ki te %{end_date_time}"
         html: 
+          body: "He te te kaupapa hou whakaritea mo %{course_name} e kia koe mōhio o:"
           no_time_set: "Kāore he Tautuhi Wā"
           see_details: "Ka taea e kite koe i ngā kōrero i konei"
+          subject: "Takahanga Hōu - %{event_title}, %{course_name}"
         labels: 
           see_details: "Ka taea e kite koe i ngā kōrero i konei"
         no_time_set: "Kāore he Tautuhi Wā"
+        subject: "Takahanga Hōu - %{event_title}, %{course_name}"
       sms: 
+        from_to_time: "i %{start_date_time} ki te %{end_date_time}"
+        more_info: "Ētahi atu info i %{web_address}"
         no_time_set: "Kāore he Tautuhi Wā"
+        subject: "Hui New mō te %{course_name}:"
       summary: 
+        from_to_time: "i %{start_date_time} ki te %{end_date_time}"
         no_time_set: "Kāore he Tautuhi Wā"
+        subject: "Takahanga Hōu - %{event_title}, %{course_name}"
       twitter: 
+        from_to_time: "i %{start_date_time} ki te %{end_date_time}"
         no_time_set: "Kāore he Tautuhi Wā"
+        subject: "Matohi Kānawehi - Takahanga: %{event_title}, %{course_name}"
     new_file_added: 
       email: 
+        body: "Kua tētahi kōnae hōu kua tapiritia hoki te akoranga, %{name}:"
         html: 
+          body: "Kua tētahi kōnae hōu kua tapiritia hoki te akoranga, %{name}:"
           link: "Pāwhiritia ki tiro"
+        subject: "Kōnae New Apititia: %{title}, %{name}"
         view: "Ka taea e koe te tiro i te reira i konei"
+      sms: 
+        body: "Tapiritia kōnae New mō te %{name}:"
     new_files_added: 
       email: 
         html: 
@@ -9299,6 +9333,8 @@ mi:
       email: 
         html: 
           link_message: "Pāwhiri ki konei kia whakaoti i tō arotake"
+      summary: 
+        body: "Kua karangatia e koe ki te hoa arotake% {reviewee}. A pee i te hono i raro nei ki te arotake i ia ratou!"
     pseudonym_registration: 
       email: 
         body: "Kua rēhitatia koe mō tētahi pae Canvas i %{account}! I mua i tō takiuru hei apataki Canvas, me whakamutua e koe ngā hātepe whakariterite."
