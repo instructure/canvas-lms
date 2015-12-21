@@ -62,6 +62,7 @@ define [
           current: @msfInstance.current
           items_current_position: @msfInstance.items_current_position
           items_count: @msfInstance.items_count
+          items_percentage: @msfInstance.items_percentage
         )
         @show()
       else
@@ -77,6 +78,7 @@ define [
             current: @msfInstance.current
             items_current_position: @msfInstance.items_current_position
             items_count: @msfInstance.items_count
+            items_percentage: @msfInstance.items_percentage
           )
           @msfAnimation(options.animation) if options?.animation != undefined
           @show()
@@ -154,6 +156,7 @@ define [
         # Make progress information available
         @items_count = @modules[0].items_count
         @items_current_position = @item.current?.position
+        @items_percentage = (@items_current_position / @items_count) * 100
 
       # Each button needs to build a data that the handlebars template can use. For example, data for
       # each button could look like this:
