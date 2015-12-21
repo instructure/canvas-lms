@@ -1948,6 +1948,7 @@ class ApplicationController < ActionController::Base
     LiveEvents.clear_context!
   end
 
+  MAX_SEQUENCES = 10
 
   include Api::V1::ContextModule
   def item_sequence_base(asset_type, asset_id)
