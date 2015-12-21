@@ -128,9 +128,9 @@ $(document).ready(function() {
         // Make sure it's a valid phone number. Validate the phone number they typed instead of the address because
         // the address will already have the country code prepended, and this will result in blank phone numbers
         // valid to our fairly naive regex. (libphonenumber plz)
-        var match = data.communication_channel_sms_number.match(/^[0-9]+$/);
+        var match = address.match(/^[0-9]+$/);
         if (!match) {
-          var errorMessage = data.communication_channel_sms_number === "" ? I18n.t("Cell Number is required") : I18n.t("Cell Number is invalid!");
+          var errorMessage = address === "" ? I18n.t("Cell Number is required") : I18n.t("Cell Number is invalid!");
           $(this).formErrors({communication_channel_sms_number: errorMessage});
           return false;
         }
@@ -164,10 +164,12 @@ $(document).ready(function() {
       }
       if(!path) { return false; }
       $("#communication_channels").dialog('close');
+      $("#communication_channels").hide();
       $channel.loadingImage({image_size: 'small'});
       return $channel;
     }, success: function(channel, $channel) {
       $("#communication_channels").dialog('close');
+      $("#communication_channels").hide();
       $channel.loadingImage('remove');
 
       channel.channel_id = channel.id;
@@ -303,7 +305,8 @@ $(document).ready(function() {
       $.flashMessage( I18n.t('notices.contact_confirmed', "Contact successfully confirmed!") );
     },
     error: function(data) {
-      $(this).find(".status_message").text( I18n.t('errors.confirmation_failed', "Confirmation failed.  Please try again.") );
+      $(this).find(".status_message").css('visibility', 'hidden');
+      $.flashError( I18n.t("Confirmation failed.  Please try again.") );
     }
   });
   $(".channel_list .channel .default_link").click(function(event) {
@@ -314,8 +317,8 @@ $(document).ready(function() {
     }
     $.ajaxJSON($(this).attr('href'), 'PUT', formData, function(data) {
       var channel_id = data.user.communication_channel.id;
-      $(".channel.default").removeClass('default');
-      $(".channel#channel_" + channel_id).addClass('default');
+      $(".channel.default").removeClass('default').find('a.default_link span.screenreader-only.default_label').remove();
+      $(".channel#channel_" + channel_id).addClass('default').find('a.default_link').append( $('<span class="screenreader-only" />').text(I18n.t("This is the default email address")) );
       $(".default_email.display_data").text(data.user.pseudonym.unique_id);
     });
   });

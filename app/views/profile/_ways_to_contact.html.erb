@@ -22,6 +22,7 @@
   .channel_list .channel.default:hover .default_link {
     display: block;
     opacity: 1.0;
+    cursor: default;
   }
   .channel_list .channel.default .delete_channel_link {
     display: none;
@@ -62,7 +63,16 @@
   <% @email_channels.each do |c| %>
     <tr class="channel <%= "default" if c == @default_email_channel %> <%= "unconfirmed" if c.state == :unconfirmed %> pseudonym_<%= c.pseudonym &&c.pseudonym.id %>" id="channel_<%= c.id %>">
       <td class="email_meta">
-        <a href="<%= profile_url %>" class="default_link no-hover" aria-label="<%= t('titles.default_email_address_aria_label', "Default email address") %>" ><i class="icon-star standalone-icon" alt="<%= t('titles.default_email_address_alt', "Default email address") %>" title="<%= t('titles.default_email_address', "Default email address") %>"></i></a>
+        <a href="<%= profile_url %>" class="default_link no-hover" aria-label="<%= t("Set default email address") %>" >
+          <i class="icon-star standalone-icon" alt="<%= t('titles.default_email_address_alt', "Default email address") %>" aria-hidden="true" title="<%= t('titles.default_email_address', "Default email address") %>"></i>
+          <% if c == @default_email_channel %>
+            <span class="screenreader-only default_label"><%= t("This is the default email address") %></span>
+          <% end %>
+          <% if c.state == :unconfirmed %>
+            <span class="screenreader-only"><%= t("This email address is unconfirmed") %></span>
+            <i class="icon-warning standalone-icon" alt="" aria-hidden="true"></i>
+          <% end %>
+        </a>
       </td>
       <td>
         <a href="#" class="path email_channel" title="<%=h c.path %>"><%= c.path %></a>
@@ -251,7 +261,7 @@
 <% end %>
 </div>
 <div id="confirm_email_channel" style="display: none;" class="dialog">
-  <div style="text-align: center;"><%= t(:sent_confirmation_email, <<-TEXT, :email_address => raw('<span class="path" style="font-weight: bold;">&nbsp;</span>'))
+  <div style="text-align: center;"><%= t(<<-TEXT, :email_address => raw('<span class="path" style="font-weight: bold;">&nbsp;</span>'))
     We emailed a confirmation link to %{email_address}. Click the link in that
     email to finish registering. Make sure to check your spam box in case it
     got filtered.
@@ -265,17 +275,18 @@
     <button type="button" class="btn cancel_button"><%= t('buttons.ok_thanks', "Ok, Thanks") %></button>
   </div>
 </div>
-<%= form_tag "", {:id => "confirm_communication_channel", :style => "display: none;", :class => "dialog"} do %>
+<%= form_tag "", {:id => "confirm_communication_channel", :style => "display: none;", :class => "dialog", :role => "dialog"} do %>
   <input type="hidden" name="pseudonym_id" value=""/>
   <input type="hidden" name="channel_id" value=""/>
   <input type="hidden" name="user_id" value=""/>
-  <div id='sms_confirmation_instructions' style="text-align: center;"><%= t(:sent_confirmation_sms, <<-TEXT, :sms_number => raw('<span class="path" style="font-weight: bold;">&nbsp;</span>'))
+  <div id='sms_confirmation_instructions' style="text-align: center;"><%= t(<<-TEXT, :sms_number => raw('<span class="path" style="font-weight: bold;">&nbsp;</span>'))
     We sent a four-character confirmation code to %{sms_number}.
     Enter the code below to activate this sms number.
     TEXT
   %></div>
   <div style="text-align: center;">
-    <input type="text" style="width: 100px; font-size: 1.5em;" name="code" aria-labelledby='sms_confirmation_instructions'/><br/>
+    <label for="code" class="screenreader-only"><%= t("Confirmation code (required)") %></label>
+    <input type="text" style="width: 100px; font-size: 1.5em;" name="code" id="code" aria-describedby='sms_confirmation_instructions' required="true"/><br/>
     <span style="display: none;" class="channel_id">&nbsp;</span>
     <a href="<%= registration_confirmation_path("{{ code }}") %>" style="display: none;" class="register_channel_link">&nbsp;</a>
   </div>
