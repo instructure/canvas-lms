@@ -43,6 +43,29 @@ describe "calendar2" do
         end
       end
 
+      it 'should show manual assignment event due saturday after 6pm', priority: "1", test_id: 486894 do
+        load_week_view
+        fj('#create_new_event_link').click
+        wait_for_ajaximations
+        event_dialog = fj('#edit_event_tabs')
+        event_dialog.find('.edit_assignment_option').click
+        wait_for_ajaximations
+        event_dialog.find('#assignment_title').send_keys('saturday assignment')
+        event_dialog.find('.datetime_field').clear
+        # take next week's monday and advance to saturday from the current date
+        due_date = Time.zone.today.next_week.advance(days: 5).strftime("Sat %b %d, %Y 8:00pm")
+        event_dialog.find('.datetime_field').send_keys(due_date)
+        assignment_form = event_dialog.find('#edit_assignment_form')
+        submit_form(assignment_form)
+        wait_for_ajaximations
+        fj('.navigate_next').click unless fj('.fc-content')
+        wait_for_ajaximations
+        fj('.fc-event').click
+        wait_for_ajaximations
+        due_at = "Due: #{Time.zone.today.next_week.advance(days: 5).strftime('%b%e, %Y at 8:00pm')}"
+        expect(fj('.event-details-timestring')).to include_text(due_at)
+      end
+
       it "should show short events at full height" do
         noon = Time.now.at_beginning_of_day + 12.hours
         event = @course.calendar_events.create! :title => "ohai", :start_at => noon, :end_at => noon + 5.minutes
