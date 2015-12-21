@@ -13,7 +13,7 @@ define([
 ], function (Reflux, React, $, _, I18n, GradeCalculator, GRADEBOOK_CONSTANTS,
              GradeFormatter, GradebookToolbarStore, SubmissionsStore, currentOrFinal) {
 
-  function _generateGroupHasNoPointsWarning(groupNames) {
+  function generateGroupHasNoPointsWarning(groupNames) {
     return I18n.t({
       one: 'Score does not include %{groups} because it has no points possible',
       other: 'Score does not include %{groups} because they have no points possible'
@@ -51,7 +51,7 @@ define([
 
         if (invalidGroups.length > 0) {
           const groupNames = _.pluck(invalidGroups, 'name');
-          result = _generateGroupHasNoPointsWarning(groupNames);
+          result = generateGroupHasNoPointsWarning(groupNames);
         }
 
       } else if (this.noPointsPossible()) {
