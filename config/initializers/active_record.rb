@@ -1397,3 +1397,30 @@ if CANVAS_RAILS4_0
 
   ActiveRecord::Associations::Preloader.send(:prepend, PreloaderShim)
 end
+
+unless CANVAS_RAILS4_0
+  # see https://github.com/rails/rails/issues/18659
+  class AttributesDefiner
+    # defines attribute methods when loaded through Marshal
+    def initialize(klass)
+      @klass = klass
+    end
+
+    def marshal_dump
+      @klass
+    end
+
+    def marshal_load(klass)
+      klass.define_attribute_methods
+      @klass = klass
+    end
+  end
+
+  module DefineAttributeMethods
+    def init_internals
+      @define_attributes_helper = AttributesDefiner.new(self.class)
+      super
+    end
+  end
+  ActiveRecord::Base.include(DefineAttributeMethods)
+end
