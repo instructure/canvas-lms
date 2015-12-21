@@ -203,12 +203,29 @@ $(document).ready(function() {
     event.preventDefault();
 
   });
+
+  var manageAfterDeletingAnEmailFocus = function(currentElement) {
+    // There may be a better way to do this but I'm not aware of another way. I'm trying to
+    // find the closest prev() or next() sibling
+    var $elementToFocusOn = $(currentElement).next('.channel:not(.blank)').last();
+    if (!$elementToFocusOn.length) {
+      $elementToFocusOn = $(currentElement).prev('.channel:not(.blank)').last();
+    }
+
+    if ($elementToFocusOn.length) {
+      $elementToFocusOn.find('.email_channel').first().focus();
+    } else {
+      $(this).parents(".channel_list .email_channel").first().focus();
+    }
+  }
+
   $(".channel_list .channel .delete_channel_link").click(function(event) {
     event.preventDefault();
     $(this).parents(".channel").confirmDelete({
       url: $(this).attr('href'),
       success: function(data) {
         var $list = $(this).parents(".channel_list");
+        manageAfterDeletingAnEmailFocus(this);
         $(this).remove();
         $list.toggleClass('single', $list.find(".channel:visible").length <= 1);
       }
