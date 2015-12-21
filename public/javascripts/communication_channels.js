@@ -15,15 +15,17 @@ require([
 $(document).ready(function() {
   $("#communication_channels").tabs();
   $("#communication_channels").bind('tabsshow', function(event) {
+    var channelInputField;
     if($(this).css('display') != 'none') {
       // TODO: This is always undefined - where did this come from?
       var idx = $(this).data('selected.tabs');
       if(idx == 0) {
-        $("#register_email_address").find(":text:first").focus().select();
+        channelInputField = $("#register_email_address").find(":text:first");
       } else {
-        $("#register_sms_number").find("input[type=tel]:first").focus().select();
+        channelInputField = $("#register_sms_number").find("input[type=tel]:first");
       }
     }
+    formatTabs(channelInputField);
   });
   $(".channel_list tr").hover(function() {
     if($(this).hasClass('unconfirmed')) {
@@ -45,10 +47,7 @@ $(document).ready(function() {
       title:  I18n.t('titles.register_communication', "Register Communication") ,
       width: 600,
       resizable: false,
-      modal: true,
-      open: function() {
-        $("#communication_channels").triggerHandler('tabsshow');
-      }
+      modal: true
     });
     if($(this).hasClass('add_contact_link')) {
       $("#communication_channels").tabs('select', '#register_sms_number');
@@ -57,8 +56,9 @@ $(document).ready(function() {
       $("#communication_channels").tabs('select', '#register_email_address');
     }
   });
-  $("#register_sms_number .user_selected").bind('change blur keyup focus', function() {
-    var $form = $(this).parents("#register_sms_number");
+
+  var formatTabs = function (tabs) {
+    var $form = $(tabs).parents("#register_sms_number");
     var sms_number = $form.find(".sms_number").val().replace(/[^\d]/g, "");
 
     var useEmail = !ENV.INTERNATIONAL_SMS_ENABLED || $form.find(".country option:selected").data('useEmail');
@@ -84,6 +84,10 @@ $(document).ready(function() {
     } else {
       $form.find('.sms_email_group').hide();
     }
+  }
+
+  $("#register_sms_number .user_selected").bind('change blur keyup focus', function() {
+    formatTabs(this);
   });
 
   $("#register_sms_number,#register_email_address").formSubmit({
