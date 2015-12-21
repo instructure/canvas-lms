@@ -41,6 +41,44 @@ describe "interaction with multiple grading periods" do
       expect(fj('input.scheme_name')).not_to be_nil
       expect(fj('a.btn.pull-right.add_standard_link')).to have_class('disabled')
     end
+
+    context 'assignment index page' do
+      let(:account) { Account.default }
+      let(:test_course) { account.courses.create!(name: 'New Course', workflow_state: 'active') }
+      let(:teacher) { user(active_all: true) }
+      let!(:enroll_teacher) { test_course.enroll_user(teacher, 'TeacherEnrollment', enrollment_state: 'active') }
+      let!(:enable_mgp_flag) { account.enable_feature!(:multiple_grading_periods) }
+      let!(:enable_course_mgp_flag) { test_course.enable_feature!(:multiple_grading_periods) }
+      let!(:grading_period_group) { test_course.grading_period_groups.create! }
+      let!(:course_grading_period_current) do
+        grading_period_group.grading_periods.create!(
+          title: 'Course Grading Period 1',
+          start_date: Time.zone.now,
+          end_date: 4.weeks.from_now
+        )
+      end
+      let!(:course_grading_period_past) do
+        grading_period_group.grading_periods.create!(
+          title: 'Course Grading Period 2',
+          start_date: 4.weeks.ago,
+          end_date: 1.day.ago
+        )
+      end
+      let!(:assignment) { test_course.assignments.create!(title: 'Assignment 1', due_at: 1.day.ago, points: 10) }
+
+      it 'should list an assignment from a previous grading period', priority: "2", test_course: 381145 do
+        user_session(teacher)
+        get "/courses/#{test_course.id}/assignments"
+        expect(fj("#assignment_#{assignment.id} a.ig-title")).to include_text('Assignment 1')
+      end
+
+      it 'should list an assignment from a current grading period when due date is updated', priority: "2", test_course: 576764 do
+        assignment.update_attributes(due_at: 3.days.from_now)
+        user_session(teacher)
+        get "/courses/#{test_course.id}/assignments"
+        expect(fj("#assignment_#{assignment.id} a.ig-title")).to include_text('Assignment 1')
+      end
+    end
   end
 
   context 'student view' do
