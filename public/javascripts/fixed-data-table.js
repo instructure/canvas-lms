@@ -806,7 +806,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    var children = [];
 	    ReactChildren.forEach(props.children, function (child, index) {
-	      if (child == null) {
+	      if (child == null || !child.props) {
 	        return;
 	      }
 	      invariant(child.type.__TableColumnGroup__ || child.type.__TableColumn__, 'child type should be <FixedDataTableColumn /> or ' + '<FixedDataTableColumnGroup />');
