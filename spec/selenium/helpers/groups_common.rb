@@ -283,10 +283,12 @@ module GroupsCommon
   end
 
   def create_group_announcement_manually(title,text)
+    get announcements_page
     expect_new_page_load { f('.btn-primary').click }
     replace_content(f('input[name=title]'), title)
     type_in_tiny('textarea[name=message]', text)
     expect_new_page_load { submit_form('.form-actions') }
+    get announcements_page
   end
 
   # Checks that a group member can click a specified page entry on the index page and see its show page

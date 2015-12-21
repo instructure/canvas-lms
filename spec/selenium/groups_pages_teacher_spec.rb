@@ -43,12 +43,9 @@ describe "groups" do
       end
 
       it "should allow teachers to create an announcement", priority: "1", test_id: 287050 do
-        get announcements_page
 
         # Checks that initial user can create an announcement
         create_group_announcement_manually("Announcement by #{@teacher.name}",'sup')
-        wait_for_ajaximations
-        get announcements_page
         expect(ff('.discussion-topic').size).to eq 1
       end
 

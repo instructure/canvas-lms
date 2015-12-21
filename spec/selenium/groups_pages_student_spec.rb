@@ -44,29 +44,45 @@ describe "groups" do
       it_behaves_like 'announcements_page', 'student'
 
       it "should allow group members to delete their own announcements", priority: "1", test_id: 326521 do
-        get announcements_page
         create_group_announcement_manually("Announcement by #{@students.first.name}",'yo ho, yo ho')
-        wait_for_ajaximations
-        get announcements_page
         expect(ff('.discussion-topic').size).to eq 1
         delete_via_gear_menu
         expect(ff('.discussion-topic').size).to eq 0
       end
 
       it "should allow any group member to create an announcement", priority: "1", test_id: 273607 do
-        get announcements_page
 
         # Checks that initial user can create an announcement
         create_group_announcement_manually("Announcement by #{@user.name}",'sup')
-        wait_for_ajaximations
 
         # Log in as a new student to verify the last group was created and that they can also create a group
         user_session(@students.first)
-        get announcements_page
         expect(ff('.discussion-topic').size).to eq 1
         create_group_announcement_manually("Announcement by #{@students.first.name}",'yo')
-        get announcements_page
         expect(ff('.discussion-topic').size).to eq 2
+      end
+
+      it "should allow group members to edit their own announcements", priority: "1", test_id: 312867 do
+        create_group_announcement_manually("Announcement by #{@students.first.name}",'The Force Awakens')
+        expect(ff('.discussion-topic').size).to eq 1
+        f('.discussion-title').click
+        f('.edit-btn').click
+        expect(driver.title).to eq 'Edit Announcement'
+        type_in_tiny('textarea[name=message]','Rey is Yodas daughter ')
+        f('.btn-primary').click
+        wait_for_ajaximations
+        get announcements_page
+        expect(ff('.discussion-topic').size).to eq 1
+        expect(fj('.discussion-summary').text).to include_text('Rey is Yodas daughter ')
+      end
+
+      it "should not allow group members to edit someone else's announcement", priority: "1", test_id: 327111 do
+        create_group_announcement_manually("Announcement by #{@user.name}",'sup')
+        user_session(@students.first)
+        get announcements_page
+        expect(ff('.discussion-topic').size).to eq 1
+        f('.discussion-title').click
+        expect(f('.edit-btn')).to be_nil
       end
 
       it "should allow all group members to see announcements", priority: "1", test_id: 273613 do
