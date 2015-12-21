@@ -481,8 +481,6 @@ class ContextModuleItemsApiController < ApplicationController
     end
   end
 
-  MAX_SEQUENCES = 10
-
   # @API Get module item sequence
   #
   # Given an asset in a course, find the ModuleItem it belongs to, and also the previous and next Module Items
