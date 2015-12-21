@@ -9,7 +9,7 @@ class ActiveRecord::Base
   end
 
   class << self
-    delegate :distinct_on, to: :scoped
+    delegate :distinct_on, to: :all
   end
 
   def read_or_initialize_attribute(attr_name, default_value)
@@ -942,23 +942,11 @@ ActiveRecord::Relation.class_eval do
 end
 
 ActiveRecord::Associations::CollectionProxy.class_eval do
-  delegate :with_each_shard, :to => :scoped
-
   def respond_to?(name, include_private = false)
     return super if [:marshal_dump, :_dump, 'marshal_dump', '_dump'].include?(name)
     super ||
       (load_target && target.respond_to?(name, include_private)) ||
       proxy_association.klass.respond_to?(name, include_private)
-  end
-end
-
-ActiveRecord::Associations::CollectionAssociation.class_eval do
-  def scoped
-    scope = super
-    proxy_association = self
-    scope.extending do
-      define_method(:proxy_association) { proxy_association }
-    end
   end
 end
 

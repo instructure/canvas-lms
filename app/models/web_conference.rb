@@ -425,7 +425,7 @@ class WebConference < ActiveRecord::Base
     end
   end
 
-  scope :active, -> { scoped }
+  scope :active, -> { all }
 
   def as_json(options={})
     url = options.delete(:url)

@@ -238,9 +238,9 @@ describe NotificationPolicy do
         NotificationPolicy.delete_all
         notification_model
         @shard1.activate do
-          expect(@user.notification_policies.scoped.exists?).to be_falsey
+          expect(@user.notification_policies.scope.exists?).to be_falsey
           NotificationPolicy.setup_for(@user, channel_id: @cc.id, frequency: Notification::FREQ_IMMEDIATELY, category: 'test_immediately')
-          expect(@user.notification_policies.scoped.exists?).to be_truthy
+          expect(@user.notification_policies.scope.exists?).to be_truthy
         end
       end
     end

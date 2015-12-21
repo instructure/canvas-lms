@@ -1346,7 +1346,7 @@ describe Course, "update_account_associations" do
   it "should act like it's associated to its account and root account, even if associations are busted" do
     account1 = Account.default.sub_accounts.create!
     c = account1.courses.create!
-    c.course_account_associations.scoped.delete_all
+    c.course_account_associations.scope.delete_all
     expect(c.associated_accounts).to eq [account1, Account.default]
   end
 
@@ -3153,7 +3153,7 @@ describe Course, "section_visibility" do
 
   it "should return a scope from sections_visible_to" do
     # can't use "should respond_to", because that delegates to the instantiated Array
-    expect{ @course.sections_visible_to(@teacher).scoped }.not_to raise_exception
+    expect{ @course.sections_visible_to(@teacher).all }.not_to raise_exception
   end
 
   context "full" do
@@ -3529,7 +3529,7 @@ describe Course do
 
     it "should return a scope" do
       # can't use "should respond_to", because that delegates to the instantiated Array
-      expect{ @course.groups_visible_to(@user).scoped }.not_to raise_exception
+      expect{ @course.groups_visible_to(@user).all }.not_to raise_exception
     end
   end
 

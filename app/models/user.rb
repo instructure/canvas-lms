@@ -182,7 +182,7 @@ class User < ActiveRecord::Base
   scope :include_pseudonym, -> { preload(:pseudonym) }
   scope :restrict_to_sections, lambda { |sections|
     if sections.empty?
-      scoped
+      all
     else
       where("enrollments.limit_privileges_to_course_section IS NULL OR enrollments.limit_privileges_to_course_section<>? OR enrollments.course_section_id IN (?)", true, sections)
     end
@@ -262,7 +262,7 @@ class User < ActiveRecord::Base
   end
 
   def self.by_top_enrollment
-    scope = self.scoped
+    scope = self.all
     if scope.select_values.blank?
       scope = scope.select("users.*")
     end

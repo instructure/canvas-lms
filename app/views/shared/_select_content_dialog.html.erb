@@ -254,7 +254,7 @@
         <div style="margin-top: 5px;">
         <select class="module_item_select" aria-label="<%= t 'discussion_topic_select_label', 'Select the topic you want to associate, or add a topic by selecting "New Topic".' %>" multiple>
           <option value="new"><%= t :new_topic_option, "[ New Topic ]" %></option>
-          <% @context.discussion_topics.active.only_discussion_topics.scoped({:limit => 200}).each do |topic| %>
+          <% @context.discussion_topics.active.only_discussion_topics.limit(200).each do |topic| %>
             <option value="<%= topic.id %>"><%= topic.title %></option>
           <% end %>
         </select>

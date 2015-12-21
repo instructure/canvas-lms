@@ -251,7 +251,7 @@ class CommunicationChannel < ActiveRecord::Base
   end
 
   def send_otp!(code)
-    m = self.messages.scoped.new
+    m = self.messages.scope.new
     m.to = self.path
     m.body = t :body, "Your Canvas verification code is %{verification_code}", :verification_code => code
     Mailer.create_message(m).deliver rescue nil # omg! just ignore delivery failures
@@ -278,7 +278,7 @@ class CommunicationChannel < ActiveRecord::Base
     when Notification
       eager_load(:notification_policies).where(:notification_policies => { :notification_id => context })
     else
-      scoped
+      all
     end
   }
 

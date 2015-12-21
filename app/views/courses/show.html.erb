@@ -13,7 +13,7 @@
 <% content_for :right_side do %>
   <div id="course_show_secondary">
     <% @can_manage = can_do(@context, @current_user, :manage) %>
-    <% @can_create_announcements = @context.announcements.scoped.new.grants_right?(@current_user, session, :create) %>
+    <% @can_create_announcements = @context.announcements.scope.new.grants_right?(@current_user, session, :create) %>
     <% if can_do(@context, @current_user, :change_course_state) && (@context.unpublished? || @context.unpublishable?) %>
       <div id="course_status" <% unless use_new_styles? %>class="text-center"<% end %>>
         <h3>

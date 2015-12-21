@@ -174,7 +174,7 @@ class CalendarEvent < ActiveRecord::Base
     if args.first
       where("calendar_events.updated_at IS NULL OR calendar_events.updated_at>?", args.first)
     else
-      scoped
+      all
     end
   }
 

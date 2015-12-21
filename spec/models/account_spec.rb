@@ -932,7 +932,7 @@ describe Account do
     let(:account){ Account.default }
 
     before do
-      account.authentication_providers.scoped.delete_all
+      account.authentication_providers.scope.delete_all
       expect(account.delegated_authentication?).to eq false
     end
 
@@ -1140,7 +1140,7 @@ describe Account do
       account = Account.default.sub_accounts.create!
       c1 = account.courses.create!
       c2 = account.courses.create!
-      account.course_account_associations.scoped.delete_all
+      account.course_account_associations.scope.delete_all
       expect(account.associated_courses).to eq []
       account.update_account_associations
       account.reload

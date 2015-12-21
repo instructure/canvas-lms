@@ -337,11 +337,7 @@ class Collaboration < ActiveRecord::Base
   #
   # Returns nothing.
   def remove_groups_from_collaborators(group_ids)
-    if group_ids.empty?
-      collaborators.scoped.where("group_id IS NOT NULL").delete_all
-    else
-      collaborators.scoped.where("group_id NOT IN (?)", group_ids).delete_all
-    end
+    collaborators.where.not(group_id: group_ids.presence).delete_all
   end
   protected :remove_groups_from_collaborators
 
@@ -351,11 +347,7 @@ class Collaboration < ActiveRecord::Base
   #
   # Returns nothing.
   def remove_users_from_collaborators(users)
-    if users.empty?
-      collaborators.scoped.where("user_id IS NOT NULL").delete_all
-    else
-      collaborators.scoped.where("user_id NOT IN (?)", users).delete_all
-    end
+    collaborators.where.not(user_id: users.presence).delete_all
   end
   protected :remove_users_from_collaborators
 

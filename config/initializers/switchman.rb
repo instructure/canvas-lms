@@ -114,7 +114,7 @@ Rails.application.config.to_prepare do
     scope :in_current_region, -> do
       @current_region_scope ||=
         if !ApplicationController.region || DatabaseServer.all.all? { |db| !db.config[:region] }
-          scoped
+          all
         else
           in_region(ApplicationController.region)
         end

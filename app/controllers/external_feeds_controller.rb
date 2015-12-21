@@ -77,12 +77,12 @@ class ExternalFeedsController < ApplicationController
   # Returns the list of External Feeds this course or group.
   #
   # @example_request
-  #     curl https://<canvas>/api/v1/courses/<course_id>/external_feeds \ 
+  #     curl https://<canvas>/api/v1/courses/<course_id>/external_feeds \
   #          -H 'Authorization: Bearer <token>'
   #
   # @returns [ExternalFeed]
   def index
-    if authorized_action(@context.announcements.scoped.new, @current_user, :create)
+    if authorized_action(@context.announcements.scope.new, @current_user, :create)
       api_route = polymorphic_url([:api, :v1, @context, :external_feeds])
       @feeds = Api.paginate(@context.external_feeds.order(:id), self, api_route)
       render :json => external_feeds_api_json(@feeds, @context, @current_user, session)
@@ -103,15 +103,15 @@ class ExternalFeedsController < ApplicationController
   #   Defaults to "full"
   #
   # @example_request
-  #     curl https://<canvas>/api/v1/courses/<course_id>/external_feeds \ 
-  #         -F url='http://example.com/rss.xml' \ 
-  #         -F header_match='news flash!' \ 
-  #         -F verbosity='full' \ 
+  #     curl https://<canvas>/api/v1/courses/<course_id>/external_feeds \
+  #         -F url='http://example.com/rss.xml' \
+  #         -F header_match='news flash!' \
+  #         -F verbosity='full' \
   #         -H 'Authorization: Bearer <token>'
   #
   # @returns ExternalFeed
   def create
-    if authorized_action(@context.announcements.scoped.new, @current_user, :create)
+    if authorized_action(@context.announcements.scope.new, @current_user, :create)
       @feed = create_api_external_feed(@context, params, @current_user)
       if @feed.save
         render :json => external_feed_api_json(@feed, @context, @current_user, session)
@@ -126,12 +126,12 @@ class ExternalFeedsController < ApplicationController
   # Deletes the external feed.
   #
   # @example_request
-  #     curl -X DELETE https://<canvas>/api/v1/courses/<course_id>/external_feeds/<feed_id> \ 
+  #     curl -X DELETE https://<canvas>/api/v1/courses/<course_id>/external_feeds/<feed_id> \
   #          -H 'Authorization: Bearer <token>'
   #
   # @returns ExternalFeed
   def destroy
-    if authorized_action(@context.announcements.scoped.new, @current_user, :create)
+    if authorized_action(@context.announcements.scope.new, @current_user, :create)
       @feed = @context.external_feeds.find(params[:external_feed_id])
       if @feed.destroy
         render :json => external_feed_api_json(@feed, @context, @current_user, session)

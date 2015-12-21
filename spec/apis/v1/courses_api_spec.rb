@@ -1170,9 +1170,9 @@ describe CoursesController, type: :request do
       end
 
       it "should deal gracefully with an invalid course id" do
-        @course2.enrollments.scoped.delete_all
-        @course2.course_account_associations.scoped.delete_all
-        @course2.course_sections.scoped.delete_all
+        @course2.enrollments.scope.delete_all
+        @course2.course_account_associations.scope.delete_all
+        @course2.course_sections.scope.delete_all
         @course2.destroy!
         json = api_call(:put, @path + "?event=offer&course_ids[]=#{@course1.id}&course_ids[]=#{@course2.id}",
                         @params.merge(:event => 'offer', :course_ids => [@course1.id.to_s, @course2.id.to_s]))
@@ -1232,9 +1232,9 @@ describe CoursesController, type: :request do
       end
 
       it "should report a failure if no updates succeeded" do
-        @course2.enrollments.scoped.delete_all
-        @course2.course_account_associations.scoped.delete_all
-        @course2.course_sections.scoped.delete_all
+        @course2.enrollments.scope.delete_all
+        @course2.course_account_associations.scope.delete_all
+        @course2.course_sections.scope.delete_all
         @course2.destroy!
         json = api_call(:put, @path + "?event=offer&course_ids[]=#{@course2.id}",
                         @params.merge(:event => 'offer', :course_ids => [@course2.id.to_s]))

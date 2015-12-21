@@ -960,7 +960,7 @@ describe Assignment do
       assignment_model(course: @course)
       @assignment.context.reload
 
-      @assignment.submissions.scoped.delete_all
+      @assignment.submissions.scope.delete_all
     end
 
     def concurrent_inserts

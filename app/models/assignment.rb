@@ -1906,7 +1906,7 @@ class Assignment < ActiveRecord::Base
     if args.first
       where("assignments.updated_at IS NULL OR assignments.updated_at>?", args.first)
     else
-      scoped
+      all
     end
   }
 

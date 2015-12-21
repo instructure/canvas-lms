@@ -45,7 +45,7 @@ module ActiveRecord
             end
 
             def list_scope_base
-              self.class.base_class.scoped
+              self.class.base_class.all
             end
             RUBY
           else

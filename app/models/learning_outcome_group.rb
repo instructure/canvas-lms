@@ -48,7 +48,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
     end
     true
   end
-  
+
   workflow do
     state :active
     state :deleted
@@ -104,34 +104,34 @@ class LearningOutcomeGroup < ActiveRecord::Base
 
     orders
   end
-  
+
   def parent_ids
     [learning_outcome_group_id]
   end
-  
+
   # this finds all the ids of the ancestors avoiding relation loops
   # because of old broken behavior a group can have multiple parents, including itself
   def ancestor_ids
     if !@ancestor_ids
       @ancestor_ids = [self.id]
-      
+
       ids_to_check = parent_ids - @ancestor_ids
       until ids_to_check.empty?
         @ancestor_ids += ids_to_check
-        
+
         new_ids = []
         ids_to_check.each do |id|
           group = LearningOutcomeGroup.for_context(self.context).active.where(id: id).first
           new_ids += group.parent_ids if group
         end
-        
+
         ids_to_check = new_ids.uniq - @ancestor_ids
       end
     end
-    
+
     @ancestor_ids
   end
-  
+
   def is_ancestor?(id)
     ancestor_ids.member?(id)
   end
@@ -229,7 +229,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
       save!
     end
   end
-  
+
   scope :active, -> { where("learning_outcome_groups.workflow_state<>'deleted'") }
 
   scope :global, -> { where(:context_id => nil) }
@@ -266,7 +266,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
 
   def self.order_by_title
     scope = self
-    scope = scope.select("learning_outcome_groups.*") if !scoped.select_values.present?
+    scope = scope.select("learning_outcome_groups.*") if !all.select_values.present?
     scope.select(title_order_by_clause).order(title_order_by_clause)
   end
 end

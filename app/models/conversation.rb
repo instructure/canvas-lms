@@ -698,7 +698,7 @@ class Conversation < ActiveRecord::Base
   def delete_for_all
     stream_item.try(:destroy_stream_item_instances)
     shard.activate do
-      conversation_message_participants.scoped.delete_all
+      conversation_message_participants.scope.delete_all
     end
     conversation_participants.shard(self).delete_all
   end

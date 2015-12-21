@@ -23,7 +23,7 @@ describe TermsApiController, type: :request do
     before :once do
       @account = Account.create(name: 'new')
       account_admin_user(account: @account)
-      @account.enrollment_terms.scoped.delete_all
+      @account.enrollment_terms.scope.delete_all
       @term1 = @account.enrollment_terms.create(name: "Term 1")
       @term2 = @account.enrollment_terms.create(name: "Term 2")
     end
@@ -143,7 +143,7 @@ describe TermsController, type: :request do
   before :once do
     @account = Account.create(name: 'new')
     account_admin_user(account: @account)
-    @account.enrollment_terms.scoped.delete_all
+    @account.enrollment_terms.scope.delete_all
     @term1 = @account.enrollment_terms.create(name: "Term 1")
   end
 

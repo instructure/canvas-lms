@@ -550,7 +550,7 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   scope :having_setting, lambda { |setting| setting ? joins(:context_external_tool_placements).
-      where("context_external_tool_placements.placement_type = ?", setting) : scoped }
+      where("context_external_tool_placements.placement_type = ?", setting) : all }
 
   scope :placements, lambda { |*placements|
     if placements.present?
@@ -566,7 +566,7 @@ class ContextExternalTool < ActiveRecord::Base
             ContextExternalToolPlacement.where(placement_type: placements).
         where("context_external_tools.id = context_external_tool_placements.context_external_tool_id"))
     else
-      scoped
+      all
     end
   }
 

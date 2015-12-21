@@ -931,7 +931,7 @@ class Submission < ActiveRecord::Base
     when User
       where(:user_id => obj)
     else
-      scoped
+      all
     end
   }
 

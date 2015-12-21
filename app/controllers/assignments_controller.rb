@@ -360,7 +360,7 @@ class AssignmentsController < ApplicationController
   end
 
   def new
-    @assignment ||= @context.assignments.scoped.new
+    @assignment ||= @context.assignments.scope.new
     @assignment.workflow_state = 'unpublished'
     add_crumb t :create_new_crumb, "Create new"
 

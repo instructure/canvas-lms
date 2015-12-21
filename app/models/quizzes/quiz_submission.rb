@@ -739,7 +739,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
 
   scope :before, lambda { |date| where("quiz_submissions.created_at<?", date) }
   scope :updated_after, lambda { |date|
-    date ? where("quiz_submissions.updated_at>?", date) : scoped
+    date ? where("quiz_submissions.updated_at>?", date) : all
   }
   scope :for_user_ids, lambda { |user_ids| where(:user_id => user_ids) }
   scope :logged_out, -> { where("temporary_user_code is not null AND NOT was_preview") }

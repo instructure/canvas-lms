@@ -540,7 +540,7 @@ describe ActiveRecord::Base do
       u = User.create!
       p1 = u.pseudonyms.create!(unique_id: 'a', account: Account.default)
       p2 = u.pseudonyms.create!(unique_id: 'b', account: Account.default)
-      u.pseudonyms.scoped.reorder("unique_id DESC").limit(1).delete_all
+      u.pseudonyms.reorder("unique_id DESC").limit(1).delete_all
       p1.reload
       expect { p2.reload }.to raise_error(ActiveRecord::RecordNotFound)
     end
@@ -561,7 +561,7 @@ describe ActiveRecord::Base do
 
   describe ".polymorphic_where" do
     it "should work" do
-      relation = Assignment.scoped
+      relation = Assignment.all
       user1 = User.create!
       account1 = Account.create!
       relation.expects(:where).with("(context_id=? AND context_type=?) OR (context_id=? AND context_type=?)", user1, 'User', account1, 'Account')
@@ -569,7 +569,7 @@ describe ActiveRecord::Base do
     end
 
     it "should work with NULLs" do
-      relation = Assignment.scoped
+      relation = Assignment.all
       user1 = User.create!
       account1 = Account.create!
       relation.expects(:where).with("(context_id=? AND context_type=?) OR (context_id=? AND context_type=?) OR (context_id IS NULL AND context_type IS NULL)", user1, 'User', account1, 'Account')
@@ -622,8 +622,8 @@ describe ActiveRecord::Base do
       class MockAccount < Account
         include RSpec::Matchers
         before_save do
-          expect(Account.scoped.to_sql).not_to match /callbacks something/
-          expect(MockAccount.scoped.to_sql).not_to match /callbacks something/
+          expect(Account.all.to_sql).not_to match /callbacks something/
+          expect(MockAccount.all.to_sql).not_to match /callbacks something/
           true
         end
       end

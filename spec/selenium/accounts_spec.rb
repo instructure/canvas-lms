@@ -39,9 +39,9 @@ describe "account" do
 
     it "should be able to create a new course when no other courses exist" do
       Account.default.courses.each do |c|
-        c.course_account_associations.scoped.delete_all
-        c.enrollments.scoped.delete_all
-        c.course_sections.scoped.delete_all
+        c.course_account_associations.scope.delete_all
+        c.enrollments.scope.delete_all
+        c.course_sections.scope.delete_all
         c.destroy!
       end
 

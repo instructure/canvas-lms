@@ -268,7 +268,7 @@ class DiscussionTopicsController < ApplicationController
   #
   # @returns [DiscussionTopic]
   def index
-    return unless authorized_action(@context.discussion_topics.scoped.new, @current_user, :read)
+    return unless authorized_action(@context.discussion_topics.scope.new, @current_user, :read)
     return child_topic if is_child_topic?
 
     scope = if params[:only_announcements]
@@ -332,7 +332,7 @@ class DiscussionTopicsController < ApplicationController
                 lockedTopics: locked_topics,
                 newTopicURL: named_context_url(@context, :new_context_discussion_topic_url),
                 permissions: {
-                    create: @context.discussion_topics.scoped.new.grants_right?(@current_user, session, :create),
+                    create: @context.discussion_topics.scope.new.grants_right?(@current_user, session, :create),
                     moderate: user_can_moderate,
                     change_settings: user_can_edit_course_settings?,
                     manage_content: @context.grants_right?(@current_user, session, :manage_content),
@@ -376,7 +376,7 @@ class DiscussionTopicsController < ApplicationController
       hash =  {
         URL_ROOT: named_context_url(@context, :api_v1_context_discussion_topics_url),
         PERMISSIONS: {
-          CAN_CREATE_ASSIGNMENT: @context.respond_to?(:assignments) && @context.assignments.scoped.new.grants_right?(@current_user, session, :create),
+          CAN_CREATE_ASSIGNMENT: @context.respond_to?(:assignments) && @context.assignments.scope.new.grants_right?(@current_user, session, :create),
           CAN_ATTACH: @topic.grants_right?(@current_user, session, :attach),
           CAN_MODERATE: user_can_moderate
         }
@@ -799,7 +799,7 @@ class DiscussionTopicsController < ApplicationController
   #   (For example, "order=104,102,103".)
   #
   def reorder
-    if authorized_action(@context.discussion_topics.scoped.new, @current_user, :update)
+    if authorized_action(@context.discussion_topics.scope.new, @current_user, :update)
       order = Api.value_to_array(params[:order])
       reject! "order parameter required" unless order && order.length > 0
       topics = pinned_topics.where(id: order)
@@ -843,7 +843,7 @@ class DiscussionTopicsController < ApplicationController
   def process_discussion_topic(is_new = false)
     @errors = {}
     discussion_topic_hash = params.slice(*API_ALLOWED_TOPIC_FIELDS)
-    model_type = value_to_boolean(discussion_topic_hash.delete(:is_announcement)) && @context.announcements.scoped.new.grants_right?(@current_user, session, :create) ? :announcements : :discussion_topics
+    model_type = value_to_boolean(discussion_topic_hash.delete(:is_announcement)) && @context.announcements.scope.new.grants_right?(@current_user, session, :create) ? :announcements : :discussion_topics
     if is_new
       @topic = @context.send(model_type).build
     else
@@ -1092,7 +1092,7 @@ class DiscussionTopicsController < ApplicationController
   def handle_assignment_edit_params(hash)
     hash[:title] = params[:title] if params[:title]
     if params.slice(*[:due_at, :points_possible, :assignment_group_id]).present?
-      if hash[:assignment].nil? && @context.respond_to?(:assignments) && @context.assignments.scoped.new.grants_right?(@current_user, session, :create)
+      if hash[:assignment].nil? && @context.respond_to?(:assignments) && @context.assignments.scope.new.grants_right?(@current_user, session, :create)
         hash[:assignment] ||= {}
       end
 
