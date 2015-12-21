@@ -25,6 +25,15 @@ describe 'CleanupDuplicateExternalFeeds' do
     @migration.down
   end
 
+  around do |example|
+    begin
+      ActiveRecord::Base.in_migration = true
+      example.run
+    ensure
+      ActiveRecord::Base.in_migration = false
+    end
+  end
+
   it "should find duplicates" do
     c1 = course_model
     feeds = 3.times.map { external_feed_model({}, false) }

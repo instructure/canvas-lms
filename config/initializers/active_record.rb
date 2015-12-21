@@ -7,6 +7,8 @@ class ActiveRecord::Base
 
   class << self
     delegate :distinct_on, to: :all
+
+    attr_accessor :in_migration
   end
 
   def read_or_initialize_attribute(attr_name, default_value)
@@ -679,7 +681,30 @@ ActiveRecord::Relation.class_eval do
     end
   end
 
+  # determines if someone started a transaction in addition to the spec fixture transaction
+  # impossible to just count open transactions, cause by default it won't nest a transaction
+  # unless specifically requested
+  def in_transaction_in_test?
+    return false unless Rails.env.test?
+    transaction_method = ActiveRecord::ConnectionAdapters::DatabaseStatements.instance_method(:transaction).source_location.first
+    # don't anchor the end of the regex; test_after_commit does an alias_method_chain, thus
+    # changing the name (and source location) of this method
+    transaction_regex = /^#{Regexp.escape(transaction_method)}:\d+:in `transaction/.freeze
+    # transactions due to spec fixtures are _not_in the callstack, so we only need to find 1
+    !!caller.find { |s| s =~ transaction_regex }
+  end
+
   def find_in_batches_with_temp_table(options = {})
+    can_do_it = Rails.env.production? || ActiveRecord::Base.in_migration || in_transaction_in_test?
+    raise "find_in_batches_with_temp_table probably won't work outside a migration
+           and outside a transaction. Unfortunately, it's impossible to automatically
+           determine a better way to do it that will work correctly. You can try
+           switching to slave first (then switching to master if you modify anything
+           inside your loop), wrapping in a transaction (but be wary of locking records
+           for the duration of your query if you do any writes in your loop), or not
+           forcing find_in_batches to use a temp table (avoiding custom selects,
+           group, or order)." unless can_do_it
+
     if options[:pluck]
       pluck = Array(options[:pluck])
       pluck_for_select = pluck.map do |column_name|
@@ -1213,6 +1238,7 @@ class ActiveRecord::Migrator
       next if !migration.runnable?
 
       begin
+        old_in_migration, ActiveRecord::Base.in_migration = ActiveRecord::Base.in_migration, true
         if down? && !Rails.env.test? && !$confirmed_migrate_down
           require 'highline'
           if HighLine.new.ask("Revert migration #{migration.name} (#{migration.version}) ? [y/N/a] > ") !~ /^([ya])/i
@@ -1230,6 +1256,8 @@ class ActiveRecord::Migrator
       rescue => e
         canceled_msg = use_transaction?(migration)? "this and " : ""
         raise StandardError, "An error has occurred, #{canceled_msg}all later migrations canceled:\n\n#{e}", e.backtrace
+      ensure
+        ActiveRecord::Base.in_migration = old_in_migration
       end
     end
   end
