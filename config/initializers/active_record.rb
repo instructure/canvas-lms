@@ -986,27 +986,6 @@ unless defined? OpenDataExport
   end
 end
 
-module PreloadAndEagerLoadOnAssociation
-  def scope
-    result = super
-    result = result.preload(options[:preload]) if options[:preload]
-    result = result.eager_load(options[:eager_load]) if options[:eager_load]
-    result
-  end
-end
-
-ActiveRecord::Associations::AssociationScope.prepend(PreloadAndEagerLoadOnAssociation)
-
-ActiveRecord::Associations::Builder::Association.valid_options += [:preload, :eager_load]
-if CANVAS_RAILS3
-ActiveRecord::Associations::Builder::CollectionAssociation.valid_options += [:preload, :eager_load]
-ActiveRecord::Associations::Builder::SingularAssociation.valid_options += [:preload, :eager_load]
-ActiveRecord::Associations::Builder::BelongsTo.valid_options += [:preload, :eager_load]
-ActiveRecord::Associations::Builder::HasAndBelongsToMany.valid_options += [:preload, :eager_load]
-ActiveRecord::Associations::Builder::HasMany.valid_options += [:preload, :eager_load]
-ActiveRecord::Associations::Builder::HasOne.valid_options += [:preload, :eager_load]
-end
-
 ActiveRecord::Relation.class_eval do
   def includes(*args)
     return super if args.empty? || args == [nil]
