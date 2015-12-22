@@ -48,7 +48,9 @@ define [
       # @previous: Object
       # @next : Object
       @msfInstance = new $.fn.moduleSequenceFooter.MSFClass options
-      @msfInstance.fetch().done =>
+
+      if ENV?.ModuleSequenceFooter_data
+        @msfInstance.success(ENV?.ModuleSequenceFooter_data)
         if @msfInstance.hide
           @hide()
           return
@@ -60,9 +62,26 @@ define [
           current: @msfInstance.current
           items_current_position: @msfInstance.items_current_position
           items_count: @msfInstance.items_count
+          items_percentage: @msfInstance.items_percentage
         )
-        @msfAnimation(options.animation) if options?.animation != undefined
         @show()
+      else
+        @msfInstance.fetch().done =>
+          if @msfInstance.hide
+            @hide()
+            return
+
+          @html template(
+            instanceNumber: @msfInstance.instanceNumber
+            previous: @msfInstance.previous
+            next: @msfInstance.next
+            current: @msfInstance.current
+            items_current_position: @msfInstance.items_current_position
+            items_count: @msfInstance.items_count
+            items_percentage: @msfInstance.items_percentage
+          )
+          @msfAnimation(options.animation) if options?.animation != undefined
+          @show()
 
       this
 
@@ -137,6 +156,7 @@ define [
         # Make progress information available
         @items_count = @modules[0].items_count
         @items_current_position = @item.current?.position
+        @items_percentage = (@items_current_position / @items_count) * 100
 
       # Each button needs to build a data that the handlebars template can use. For example, data for
       # each button could look like this:

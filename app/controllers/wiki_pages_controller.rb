@@ -96,7 +96,13 @@ class WikiPagesController < ApplicationController
       add_crumb(@page.title)
       log_asset_access(@page, 'wiki', @wiki)
 
-      js_env :wiki_page_menu_tools => external_tools_display_hashes(:wiki_page_menu)
+      js_data = {}
+      js_data[:wiki_page_menu_tools] = external_tools_display_hashes(:wiki_page_menu)
+      if params[:module_item_id]
+        js_data[:ModuleSequenceFooter_data] = item_sequence_base(Api.api_type_to_canvas_name('ModuleItem'), params[:module_item_id])
+      end
+
+      js_env js_data
 
       @padless = true
     end
