@@ -1257,14 +1257,31 @@ select.ic-Input, input[type="file"].ic-Input {
   padding: 0 0 0 $ic-sp;
 }
 
-select.ic-Input {
-  // Webkit-only hack because we have removed -webkit-appearance from the
-  // selects and need to add an arrow and remove padding
-  &:not(*:root) {
-    background: url("/images/forms/ic-icon-arrow-down.svg") no-repeat calc(100% - #{$ic-sp - 4}) 50% $ic-color-light;
-    background-size: 10px 5.667px;
-  }
+
+// We removed -webkit-appearance from anything with the
+// .ic-Input class, to give us more styling control. 
+// This makes the select's caret disappear in IE Edge and Webkit.
+// So we add it back in with these hacks.
+
+@mixin add-arrow-for-webkit-and-ie-edge($bg-position-x) {
+  background-color: $ic-color-light;
+  background-image: url("/images/forms/ic-icon-arrow-down.svg");
+  background-repeat: no-repeat;
+  background-size: 10px 5.667px;
+  background-position: $bg-position-x 50%;
+  padding: 0 $ic-sp;
 }
+
+// webkit hack
+select.ic-Input:not(*:root) {
+  @include add-arrow-for-webkit-and-ie-edge( calc(100% - #{$ic-sp - 4}) );
+}
+
+// IE Edge hack (doesn't support calc here, so we need to use a percentage)
+@supports (-ms-accelerator:true) {
+  select.ic-Input { @include add-arrow-for-webkit-and-ie-edge(99%); }
+}
+
 
 .ic-Form-group {
 
