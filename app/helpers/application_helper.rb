@@ -710,8 +710,8 @@ module ApplicationHelper
       end
     end
 
-    if (bc = account.effective_brand_config)
-      bc
+    if account && (brand_config = account.effective_brand_config)
+      brand_config
     elsif k12?
       BrandConfig.k12_config
     end

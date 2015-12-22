@@ -829,6 +829,13 @@ describe ApplicationHelper do
     end
   end
 
+  describe 'brand_config_for_account' do
+    it "handles not having @domain_root_account set" do
+      helper.stubs(:k12?).returns(false)
+      expect(helper.send(:brand_config_for_account)).to be_nil
+    end
+  end
+
   describe "include_js_bundles" do
     before :each do
       helper.stubs(:js_bundles).returns([[:some_bundle], [:some_plugin_bundle, :some_plugin], [:another_bundle, nil]])
