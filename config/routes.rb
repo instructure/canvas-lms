@@ -228,6 +228,7 @@ CanvasRails::Application.routes.draw do
     get 'grades' => 'gradebooks#grade_summary', id: nil
     get 'grading_rubrics' => 'gradebooks#grading_rubrics'
     get 'grades/:id' => 'gradebooks#grade_summary', as: :student_grades
+    post 'save_assignment_order' => 'gradebooks#save_assignment_order', as: :save_assignment_order
     concerns :announcements
     get 'calendar' => 'calendars#show2', as: :old_calendar
     get :locks

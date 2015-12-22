@@ -35,7 +35,7 @@ class GradebooksController < ApplicationController
   MAX_POST_GRADES_TOOLS = 10
 
   def grade_summary
-    @presenter = GradeSummaryPresenter.new(@context, @current_user, params[:id])
+    @presenter = GradeSummaryPresenter.new(@context, @current_user, params[:id], presenter_options)
     # do this as the very first thing, if the current user is a teacher in the course and they are not trying to view another user's grades, redirect them to the gradebook
     if @presenter.user_needs_redirection?
       return redirect_to polymorphic_url([@context, 'gradebook'])
@@ -60,7 +60,7 @@ class GradebooksController < ApplicationController
         @exclude_total = exclude_total?(@context)
         Shackles.activate(:slave) do
           #run these queries on the slave database for speed
-          @presenter.assignments(gp_id)
+          @presenter.assignments(grading_period_id: gp_id)
           @presenter.groups_assignments = groups_as_assignments(
             @presenter.groups,
             :out_of_final => true,
@@ -89,6 +89,20 @@ class GradebooksController < ApplicationController
       else
         render :grade_summary_list
       end
+    end
+  end
+
+  def save_assignment_order
+    if authorized_action(@context, @current_user, :read)
+      whitelisted_orders = {
+        'due_at' => :due_at, 'title' => :title,
+        'module' => :module, 'assignment_group' => :assignment_group
+      }
+      assignment_order = whitelisted_orders.fetch(params.fetch(:assignment_order), :due_at)
+      @current_user.preferences[:course_grades_assignment_order] ||= {}
+      @current_user.preferences[:course_grades_assignment_order][@context.id] = assignment_order
+      @current_user.save!
+      redirect_to :back
     end
   end
 
@@ -690,5 +704,11 @@ class GradebooksController < ApplicationController
     Canvadocs.enabled? &&
     Canvadocs.annotations_supported? &&
     @assignment.submission_types.include?('online_upload')
+  end
+
+  def presenter_options
+    order_preferences = @current_user.preferences[:course_grades_assignment_order]
+    saved_order = order_preferences && order_preferences[@context.id]
+    saved_order ? { assignment_order: saved_order } : {}
   end
 end

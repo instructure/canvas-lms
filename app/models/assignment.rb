@@ -835,9 +835,16 @@ class Assignment < ActiveRecord::Base
     read_attribute(:all_day) || (self.new_record? && self.due_at && (self.due_at.strftime("%H:%M") == '23:59' || self.due_at.strftime("%H:%M") == '00:00'))
   end
 
-  def self.preload_context_module_tags(assignments)
+  def self.preload_context_module_tags(assignments, include_context_modules: false)
+    module_tags_include =
+      if include_context_modules
+        { context_module_tags: :context_module }
+      else
+        :context_module_tags
+      end
+
     ActiveRecord::Associations::Preloader.new.preload(assignments, [
-      :context_module_tags,
+      module_tags_include,
       { :discussion_topic => :context_module_tags },
       { :quiz => :context_module_tags }
     ])
