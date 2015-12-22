@@ -46,10 +46,6 @@ $ic-left-side-width: $ic-sp*15;
     margin-left: 0;
   }
 
-  body.course-menu-expanded:not(.ic-no-flex-layout) & {
-    margin-left: $ic-left-side-width;
-  }
-
   // Theme Editor watermark gets attached to this element as a background image
   body:not(.no-headers) & {
     z-index: 1;
@@ -62,6 +58,15 @@ $ic-left-side-width: $ic-sp*15;
       z-index: -1;
       opacity: $ic-brand-watermark-opacity;
       background: transparent $ic-brand-watermark left bottom no-repeat;
+      transition: all 0.1s ease-out;
+    }
+  }
+
+  body.course-menu-expanded:not(.ic-no-flex-layout) & {
+    margin-left: $ic-left-side-width;
+
+    &:before {
+      left: -$ic-left-side-width;
     }
   }
 
@@ -104,7 +109,7 @@ $ic-left-side-width: $ic-sp*15;
     box-sizing: border-box;
     flex: 1;
     @include breakpoint(desktop) { display: flex; }
-    
+
     // Fix Firefox and IE Edge issues with contents breaking out of flex container
     min-width: 1px;
   }
@@ -115,7 +120,7 @@ $ic-left-side-width: $ic-sp*15;
   @include breakpoint(desktop) {
     body:not(.ic-no-flex-layout) & {
       flex: 1;
-      
+
       // Fix Firefox and IE Edge issues with contents breaking out of flex container
       min-width: 1px;
     }
