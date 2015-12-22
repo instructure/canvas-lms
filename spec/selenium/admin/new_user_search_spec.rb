@@ -14,7 +14,7 @@ describe "new account user search" do
   end
 
   def get_rows
-    ff('.users-list > tbody > tr')
+    ff('.users-list div[role=row]')
   end
 
   def click_tab
@@ -89,7 +89,7 @@ describe "new account user search" do
 
   it "should search by name" do
     match_user = user_with_pseudonym(:account => @account, :name => "user with a search term")
-    not_match_user = user_with_pseudonym(:account => @account, :name => "diffrient user")
+    user_with_pseudonym(:account => @account, :name => "diffrient user")
 
     get "/accounts/#{@account.id}"
     click_tab

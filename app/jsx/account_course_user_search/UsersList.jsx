@@ -17,30 +17,25 @@ define([
       var { users } = this.props;
 
       return (
-        <div className="pad-box no-sides">
-          <table className="ic-Table users-list">
-            <thead>
-            <tr>
-              <th>
-                {I18n.t("Name")}
-              </th>
-              <th>
-                {I18n.t("Email")}
-              </th>
-              <th>
-                {I18n.t("SIS ID")}
-              </th>
-              <th>
-                {I18n.t("Last Login")}
-              </th>
-              <th />
-            </tr>
-            </thead>
+        <div className="content-box" role='grid'>
+          <div role='row' className="grid-row border border-b pad-box-mini">
+            <div role='columnheader' className="col-md-3">
+              <strong><small>{I18n.t("Name")}</small></strong>
+            </div>
+            <div role='columnheader' className="col-md-3">
+              <strong><small>{I18n.t("Email")}</small></strong>
+            </div>
+            <div role='columnheader' className="col-md-3">
+              <strong><small>{I18n.t("SIS ID")}</small></strong>
+            </div>
+            <div role='columnheader' className="col-md-3">
+              <strong><small>{I18n.t("Last Login")}</small></strong>
+            </div>
+          </div>
 
-            <tbody>
+          <div className='users-list' role='rowgroup'>
             {users.map((user) => <UsersListRow key={user.id} accountId={this.props.accountId} {...user} />)}
-            </tbody>
-          </table>
+          </div>
         </div>
       );
     }
