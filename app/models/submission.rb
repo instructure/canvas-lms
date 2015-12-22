@@ -567,11 +567,13 @@ class Submission < ActiveRecord::Base
           crocodoc_documents << a.create_crocodoc_document unless a.crocodoc_document
         end
 
-        a.send_later_enqueue_args :submit_to_canvadocs, {
-          :n_strand     => 'canvadocs',
-          :max_attempts => 1,
-          :priority => Delayed::LOW_PRIORITY
-        }, 1, wants_annotation: true
+        if a.canvadocable? || a.crocodocable?
+          a.send_later_enqueue_args :submit_to_canvadocs, {
+            :n_strand     => 'canvadocs',
+            :max_attempts => 1,
+            :priority => Delayed::LOW_PRIORITY
+          }, 1, wants_annotation: true
+        end
       end
     end
   end

@@ -1173,6 +1173,17 @@ describe Submission do
       expect(a1.crocodoc_document(true)).to eq cd
       expect(a2.crocodoc_document).to eq a2.crocodoc_document
     end
+
+    it "doesn't create jobs for non-previewable documents" do
+      job_scope = Delayed::Job.where(strand: "canvadocs")
+      orig_job_count = job_scope.count
+
+      attachment = attachment_model(context: @user)
+      s = @assignment.submit_homework(@user,
+                                      submission_type: "online_upload",
+                                      attachments: [attachment])
+      expect(job_scope.count).to eq orig_job_count
+    end
   end
 
   describe "cross-shard attachments" do
