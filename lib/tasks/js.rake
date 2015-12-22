@@ -70,7 +70,7 @@ namespace :js do
   desc 'test javascript specs with Karma'
   task :test, :reporter do |task, args|
     reporter = args[:reporter]
-    if ENV['USE_WEBPACK'].present? && ENV['USE_WEBPACK'] != 'false'
+    if ENV['USE_WEBPACK'].present? && ENV['USE_WEBPACK'] != 'false' && ENV['USE_WEBPACK'] != 'False'
       Rake::Task['i18n:generate_js'].invoke
       webpack_test_dir = Rails.root + "spec/javascripts/webpack"
       FileUtils.rm_rf(webpack_test_dir)
@@ -300,7 +300,7 @@ namespace :js do
       else
         puts "--> Building DEVELOPMENT webpack bundles"
         `npm run webpack-development`
-        if ENV['USE_OPTIMIZED_JS'] == 'true'
+        if ENV['USE_OPTIMIZED_JS'] == 'true' || ENV['USE_OPTIMIZED_JS'] == 'True'
           # if this var is set, we'll need to have optimized version of the
           # webpack bundles available too
           puts "--> Building OPTIMIZED webpack bundles"

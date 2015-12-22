@@ -70,7 +70,8 @@ describe 'Stuff related to how we load stuff from CDN and use brandable_css' do
 
       ['bundles/common', 'bundles/login'].each { |bundle| check_css(bundle) }
       ['images/favicon-yellow.ico', 'images/apple-touch-icon.png'].each { |i| check_asset('link', i) }
-      js_base_url = ENV['USE_OPTIMIZED_JS'] == 'true' ? '/optimized' : '/javascripts'
+      optimized_js_flag = ENV['USE_OPTIMIZED_JS'] == 'true' || ENV['USE_OPTIMIZED_JS'] == 'True'
+      js_base_url =  optimized_js_flag ? '/optimized' : '/javascripts'
       ['vendor/require.js', 'compiled/bundles/login.js'].each { |s| check_asset('script', "#{js_base_url}/#{s}") }
     end
 

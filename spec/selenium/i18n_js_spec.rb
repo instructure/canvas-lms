@@ -6,8 +6,12 @@ describe "i18n js" do
   before (:each) do
     course_with_teacher_logged_in
     get "/"
-    # get I18n and _ global for all the tests
-    driver.execute_script "require(['i18nObj', 'underscore'], function (I18n, _) { window.I18n = I18n; window._ = _; });"
+    if ENV['USE_WEBPACK'].present? && ENV['USE_WEBPACK'] != 'false' && ENV['USE_WEBPACK'] != 'False'
+      # I18n will already be exposed in webpack land
+    else
+      # get I18n and _ global for all the tests
+      driver.execute_script "require(['i18nObj', 'underscore'], function (I18n, _) { window.I18n = I18n; window._ = _; });"
+    end
   end
 
   context "strftime" do
@@ -28,11 +32,20 @@ describe "i18n js" do
       keep_trying_until do
         expect(driver.execute_script(<<-JS).sort).to eq I18n.available_locales.map(&:to_s).sort
         var ary = [];
-        _.each(I18n.translations, function(translations, locale) {
-          if (_.all(['date', 'time', 'number', 'datetime', 'support'], function(k) { return translations[k] })) {
-            ary.push(locale);
+        for (var locale in I18n.translations) {
+          if (I18n.translations.hasOwnProperty(locale)) {
+            var localeSet = I18n.translations[locale];
+            var hasItAll = true;
+            ['date', 'time', 'number', 'datetime', 'support'].forEach(function(key){
+              if(hasItAll){
+                hasItAll = localeSet[key] !== undefined && localeSet[key] !== null;
+              }
+            });
+            if(hasItAll){
+              ary.push(locale);
+            }
           }
-        })
+        }
         return ary;
         JS
       end
@@ -45,21 +58,14 @@ describe "i18n js" do
       skip('RAILS_LOAD_ALL_LOCALES=true') unless ENV['RAILS_LOAD_ALL_LOCALES']
       (I18n.available_locales - [:en]).each do |locale|
         exec_cs("I18n.locale = '#{locale}'")
-        expect(require_exec('i18n!conferences', "i18n.t('confirm.delete')")).to eq(
-            I18n.t('conferences.confirm.delete', :locale => locale)
-        )
+        rb_value = I18n.t('dashboard.confirm.close', locale: locale)
+        js_value = if ENV['USE_WEBPACK'].present? && ENV['USE_WEBPACK'] != 'false' && ENV['USE_WEBPACK'] != 'False'
+          driver.execute_script("return I18n.scoped('dashboard').t('confirm.close');")
+        else
+          require_exec('i18n!dashboard', "i18n.t('confirm.close')")
+        end
+        expect(js_value).to eq(rb_value)
       end
-    end
-
-    it "should not scope inferred keys" do
-      set_translations({
-        pigLatin: {
-          inferred_key_c49e3743: "Inferreday eykay",
-          test: {inferred_key_c49e3743: "Otnay isthay!"}
-        }
-      })
-      expect(require_exec('i18n!test', "I18n.locale = 'pigLatin'; i18n.t('Inferred key')"))
-        .to eq("Inferreday eykay")
     end
   end
 end

@@ -223,7 +223,7 @@ module ApplicationHelper
 
   # See `js_base_url`
   def use_optimized_js?
-    if ENV['USE_OPTIMIZED_JS'] == 'true'
+    if ENV['USE_OPTIMIZED_JS'] == 'true' || ENV['USE_OPTIMIZED_JS'] == 'True'
       # allows overriding by adding ?debug_assets=1 or ?debug_js=1 to the url
       !(params[:debug_assets] || params[:debug_js])
     else
@@ -233,7 +233,7 @@ module ApplicationHelper
   end
 
   def use_webpack?
-    if ENV['USE_WEBPACK'].present? && ENV['USE_WEBPACK'] != 'false'
+    if ENV['USE_WEBPACK'].present? && ENV['USE_WEBPACK'] != 'false' && ENV['USE_WEBPACK'] != 'False'
       !(params[:require_js])
     else
       params[:webpack]

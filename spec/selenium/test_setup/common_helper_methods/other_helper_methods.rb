@@ -49,7 +49,7 @@ module OtherHelperMethods
   #   set_translations fr: {key: "Bonjour"}
   def set_translations(translations)
     add_translations = "$.extend(true, I18n, {translations: #{translations.to_json}});"
-    if ENV['USE_OPTIMIZED_JS']
+    if ENV['USE_OPTIMIZED_JS'] == 'true' || ENV['USE_OPTIMIZED_JS'] == 'True'
       driver.execute_script <<-JS
         define('translations/test', ['i18nObj', 'jquery'], function(I18n, $) {
           #{add_translations}
