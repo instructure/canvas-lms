@@ -194,7 +194,7 @@ describe "gradebook2" do
     expect(ff(".total-cell .icon-muted")).to be_empty
   end
 
-  it "should hide and show student names" do
+  it "should hide and show student names", priority: "2", test_id: 164220 do
 
     def toggle_hiding_students
       keep_trying_until do
