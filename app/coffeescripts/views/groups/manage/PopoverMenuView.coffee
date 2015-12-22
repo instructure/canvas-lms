@@ -10,14 +10,22 @@ define [
       zIndex: 1
 
     events:
+      'mousedown': 'disableHide'
+      'mouseup': 'enableHide'
       'click': 'cancelHide'
       'focusin': 'cancelHide'
       'focusout': 'hidePopover'
       'outerclick': 'hidePopover'
       'keyup': 'checkEsc'
 
+    disableHide: ->
+      @hideDisabled = true
+
+    enableHide: ->
+      @hideDisabled = false
+
     hidePopover: ->
-      @hide() #call the hide function without any arguments.
+      @hide() unless @hideDisabled #call the hide function without any arguments.
 
     showBy: ($target, focus = false) ->
       @cancelHide()
