@@ -1079,7 +1079,7 @@ class Account < ActiveRecord::Base
     end
 
     def special_account_timed_cache
-      @special_account_timed_cache ||= TimedCache.new(-> { Setting.get('account_special_account_cache_time', 60.seconds).to_i.ago }) do
+      @special_account_timed_cache ||= TimedCache.new(-> { Setting.get('account_special_account_cache_time', 60).to_i.seconds.ago }) do
         special_accounts.clear
       end
     end

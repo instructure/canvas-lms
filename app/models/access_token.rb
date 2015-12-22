@@ -90,7 +90,7 @@ class AccessToken < ActiveRecord::Base
   end
 
   def used!
-    if !last_used_at || last_used_at < record_last_used_threshold.ago
+    if !last_used_at || last_used_at < record_last_used_threshold.seconds.ago
       self.last_used_at = DateTime.now.utc
       self.save
     end

@@ -109,7 +109,7 @@ class EventStream::Stream
   end
 
   def ttl_seconds(timestamp)
-    timestamp.to_i - time_to_live.ago.to_i
+    timestamp.to_i - time_to_live.seconds.ago.to_i
   end
 
   def fetch_cql
