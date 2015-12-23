@@ -259,29 +259,27 @@ class PageView < ActiveRecord::Base
     end
   end
 
-  class_eval <<-RUBY, __FILE__, __LINE__ + 1
-    def _create_record(*args)
-      return super unless PageView.cassandra?
-      self.created_at ||= Time.zone.now
-      user.shard.activate do
-        run_callbacks(:create) do
-          PageView::EventStream.insert(self)
-          @new_record = false
-          self.id
-        end
+  def _create_record(*args)
+    return super unless PageView.cassandra?
+    self.created_at ||= Time.zone.now
+    user.shard.activate do
+      run_callbacks(:create) do
+        PageView::EventStream.insert(self)
+        @new_record = false
+        self.id
       end
     end
+  end
 
-    def _update_record(*args)
-      return super unless PageView.cassandra?
-      user.shard.activate do
-        run_callbacks(:update) do
-          PageView::EventStream.update(self)
-          true
-        end
+  def _update_record(*args)
+    return super unless PageView.cassandra?
+    user.shard.activate do
+      run_callbacks(:update) do
+        PageView::EventStream.update(self)
+        true
       end
     end
-  RUBY
+  end
 
   scope :for_context, proc { |ctx| where(:context_type => ctx.class.name, :context_id => ctx) }
   scope :for_users, lambda { |users| where(:user_id => users) }
