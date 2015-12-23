@@ -328,6 +328,8 @@ used from "app/coffeescripts/ember/shared/components"
 
 [X] get _all_ qunit tests running in the webpack bundle (just spiked on a few)
 
+[X] on building for production, fails with ProximityLoader ("ERROR in 232.bundle.js from UglifyJs
+Unexpected token: operator (!) [./frontend_build/jsHandlebarsHelpers.js!./frontend_build/pluginsJstLoader.js!./frontend_build/nonAmdLoader.js!./app/coffeescripts/util/ProximityLoader.coffee:111,6]")
 
 [ ] Migrate requires that are in views to application js (check plugins like mra)
 
@@ -345,9 +347,6 @@ those promises done before using it.
 in node rather than shelling out to ruby for it
 
 [ ] extract duplicated loader code from i18nLinerHandlebars and emberHandlebars
-
-[ ] on building for production, fails with ProximityLoader ("ERROR in 232.bundle.js from UglifyJs
-Unexpected token: operator (!) [./frontend_build/jsHandlebarsHelpers.js!./frontend_build/pluginsJstLoader.js!./frontend_build/nonAmdLoader.js!./app/coffeescripts/util/ProximityLoader.coffee:111,6]")
 
 [ ] in a seperate commit extract i18nLinerHandlebars loader function and what
 it duplicates from prepare_hbs to a function both can use.
