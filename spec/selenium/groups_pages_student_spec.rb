@@ -171,6 +171,32 @@ describe "groups" do
         expect(ff('.discussion-title-block').size).to eq 1
         expect(f('#manage_link')).to be_nil
       end
+
+      it "should allow group members to edit their discussions", priority: "1", test_id: 312866 do
+        DiscussionTopic.create!(context: @testgroup.first,
+                                user: @user,
+                                title: 'White Snow',
+                                message: 'Where are my skis?')
+        get discussions_page
+        f('.discussion-title').click
+        f('.edit-btn').click
+        expect(driver.title).to eq 'Edit Discussion Topic'
+        type_in_tiny('textarea[name=message]','The slopes are ready,')
+        f('.btn-primary').click
+        wait_for_ajaximations
+        expect(fj('.user_content').text).to include_text('The slopes are ready,')
+      end
+
+      it "should not allow group member to edit discussions by other creators", priority: "1", test_id: 323327 do
+        DiscussionTopic.create!(context: @testgroup.first,
+                                user: @students.first,
+                                title: 'White Snow',
+                                message: 'Where are my skis?')
+        get discussions_page
+        f('.discussion-title').click
+        expect(f('.edit-btn')).to be_nil
+      end
+
     end
 
     #-------------------------------------------------------------------------------------------------------------------
