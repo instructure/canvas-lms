@@ -81,6 +81,107 @@ describe "interaction with multiple grading periods" do
     end
   end
 
+  context 'sub-accounts' do
+    # top-level account & grading periods setup
+    let(:parent_account) { Account.default }
+    let(:parent_account_admin) { account_admin_user(account: parent_account) }
+    let!(:enable_mgp_flag) { parent_account.enable_feature!(:multiple_grading_periods) }
+    let!(:grading_period_group) { parent_account.grading_period_groups.create! }
+    let!(:parent_account_grading_period) do
+      grading_period_group.grading_periods.create!(
+        title: 'Account Grading Period 1',
+        start_date: Time.zone.now,
+        end_date: 3.weeks.from_now
+      )
+    end
+    # sub-account & grading periods setup
+    let(:sub_account) { Account.create(name: 'Sub Account', parent_account: parent_account) }
+    let(:sub_account_admin) { account_admin_user(account: sub_account) }
+    let(:sub_account_grading_period_group) { sub_account.grading_period_groups.create! }
+    let(:sub_account_grading_period) do
+      sub_account_grading_period_group.grading_periods.create!(
+        title: 'Sub-Account Grading Period',
+        start_date: Time.zone.now,
+        end_date: 3.weeks.from_now
+      )
+    end
+    # sub-account course setup
+    let(:sub_account_course) do
+      sub_account.courses.create(
+        name: 'Sub-Account Course',
+        workflow_state: 'active'
+      )
+    end
+    let(:sub_account_teacher) { user(active_all: true) }
+    let(:enroll_teacher) do
+      sub_account_course.enroll_user(
+        sub_account_teacher,
+        'TeacherEnrollment',
+        enrollment_state: 'active'
+      )
+    end
+    let(:view_sub_account_grading_period) do
+      user_session(sub_account_admin)
+      get "/accounts/#{sub_account.id}/grading_standards"
+    end
+    let(:view_sub_course_grading_period) do
+      sub_account_grading_period
+      sub_account_course
+      enroll_teacher
+      user_session(sub_account_teacher)
+      get "/courses/#{sub_account_course.id}/grading_standards"
+    end
+    let(:add_new_grading_period) do
+      f('#add-period-button').click
+      replace_content(f('#period_title_new2'), 'Edited Grading Period')
+      replace_content(f('#period_start_date_new2'), 4.weeks.from_now)
+      replace_content(f('#period_end_date_new2'), 5.weeks.from_now)
+      f('button#update-button').click
+      wait_for_ajaximations
+    end
+
+    it 'displays GPs from parent account', priority: "1", test_id: 585571 do
+      view_sub_account_grading_period
+
+      id = parent_account_grading_period.id
+      expect(f("#period_title_#{id}")).to have_attribute('value', 'Account Grading Period 1')
+    end
+
+    it 'allows editing of inherited GP without messing upstream', priority: "1", test_id: 585572 do
+      view_sub_account_grading_period
+
+      id = parent_account_grading_period.id
+      replace_content(f("#period_title_#{id}"), "Edited Grading Period")
+
+      user_session(parent_account_admin)
+      get "/accounts/#{parent_account.id}/grading_standards"
+      expect(f("#period_title_#{id}")).to have_attribute('value', 'Account Grading Period 1')
+    end
+
+    it 'allows creation of a sub-account GP', priority: "1", test_id: 202324 do
+      view_sub_account_grading_period
+      add_new_grading_period
+
+      sub_id = sub_account.grading_periods[0].id
+      expect(f("#period_title_#{sub_id}")).to have_attribute('value','Edited Grading Period')
+    end
+
+    it 'displays GPs from parent account on course level', priority: "1", test_id: 202325 do
+      view_sub_course_grading_period
+
+      id = sub_account_grading_period.id
+      expect(f("#period_title_#{id}")).to have_attribute('value', 'Sub-Account Grading Period')
+    end
+
+    it 'allows creation of a GP in sub-account course', priority: "1", test_id: 587759 do
+      view_sub_course_grading_period
+      add_new_grading_period
+
+      sub_id = sub_account_course.grading_periods[0].id
+      expect(f("#period_title_#{sub_id}")).to have_attribute('value','Edited Grading Period')
+    end
+  end
+
   context 'student view' do
     let(:account) { Account.default }
     let(:test_course) { account.courses.create!(name: 'New Course', workflow_state: 'active') }
