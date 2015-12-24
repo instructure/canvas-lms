@@ -1,0 +1,886 @@
+  [
+    {
+      "data": {
+        "status": "Active",
+        "self": "http://api.academicbenchmarks.com/rest/v3/standards/CEB79A48-67AD-11DF-AB5F-995D9DFF4B22",
+        "grade": {
+          "high": "12",
+          "low": "K"
+        },
+        "document": {
+          "guid": "964E0FEE-AD71-11DE-9BF2-C9169DFF4B22",
+          "title": "Common Core State Standards"
+        },
+        "subject_doc": {
+          "guid": "CF6A375C-67AD-11DF-AB5F-995D9DFF4B22",
+          "descr": "English Language Arts/Literacy (2010)"
+        },
+        "guid": "CEB79A48-67AD-11DF-AB5F-995D9DFF4B22",
+        "course": {
+          "guid": "CF69C79A-67AD-11DF-AB5F-995D9DFF4B22",
+          "descr": "College- and Career-Readiness Anchor Standards"
+        },
+        "parent": {
+          "guid": "CEC2CF6C-67AD-11DF-AB5F-995D9DFF4B22"
+        },
+        "subject": {
+          "broad": "LANG",
+          "code": "LANG"
+        },
+        "version": "2.7.4",
+        "has_relations": {
+          "derivative": 1
+        },
+        "deepest": "N",
+        "descr": "Key Ideas and Details",
+        "level": 2,
+        "adopt_year": "2010",
+        "authority": {
+          "guid": "A83297F2-901A-11DF-A622-0C319DFF4B22",
+          "descr": "NGA Center/CCSSO",
+          "code": "CC"
+        }
+      }
+    },
+    {
+      "data": {
+        "number": "CCSS.ELA-Literacy.CCRA.R.1",
+        "status": "Active",
+        "self": "http://api.academicbenchmarks.com/rest/v3/standards/CEB87C92-67AD-11DF-AB5F-995D9DFF4B22",
+        "grade": {
+          "high": "12",
+          "low": "K"
+        },
+        "document": {
+          "guid": "964E0FEE-AD71-11DE-9BF2-C9169DFF4B22",
+          "title": "Common Core State Standards"
+        },
+        "subject_doc": {
+          "guid": "CF6A375C-67AD-11DF-AB5F-995D9DFF4B22",
+          "descr": "English Language Arts/Literacy (2010)"
+        },
+        "guid": "CEB87C92-67AD-11DF-AB5F-995D9DFF4B22",
+        "course": {
+          "guid": "CF69C79A-67AD-11DF-AB5F-995D9DFF4B22",
+          "descr": "College- and Career-Readiness Anchor Standards"
+        },
+        "parent": {
+          "guid": "CEB79A48-67AD-11DF-AB5F-995D9DFF4B22"
+        },
+        "subject": {
+          "broad": "LANG",
+          "code": "LANG"
+        },
+        "version": "2.7.4",
+        "has_relations": {
+          "derivative": 1
+        },
+        "deepest": "Y",
+        "descr": "Read closely to determine what the text says explicitly and to make logical inferences from it; cite specific textual evidence when writing or speaking to support conclusions drawn from the text.",
+        "level": 3,
+        "label": "Anchor Standard",
+        "adopt_year": "2010",
+        "authority": {
+          "guid": "A83297F2-901A-11DF-A622-0C319DFF4B22",
+          "descr": "NGA Center/CCSSO",
+          "code": "CC"
+        }
+      }
+    },
+    {
+      "data": {
+        "number": "CCSS.ELA-Literacy.CCRA.R.2",
+        "status": "Active",
+        "self": "http://api.academicbenchmarks.com/rest/v3/standards/CEB8EE66-67AD-11DF-AB5F-995D9DFF4B22",
+        "grade": {
+          "high": "12",
+          "low": "K"
+        },
+        "document": {
+          "guid": "964E0FEE-AD71-11DE-9BF2-C9169DFF4B22",
+          "title": "Common Core State Standards"
+        },
+        "subject_doc": {
+          "guid": "CF6A375C-67AD-11DF-AB5F-995D9DFF4B22",
+          "descr": "English Language Arts/Literacy (2010)"
+        },
+        "guid": "CEB8EE66-67AD-11DF-AB5F-995D9DFF4B22",
+        "course": {
+          "guid": "CF69C79A-67AD-11DF-AB5F-995D9DFF4B22",
+          "descr": "College- and Career-Readiness Anchor Standards"
+        },
+        "parent": {
+          "guid": "CEB79A48-67AD-11DF-AB5F-995D9DFF4B22"
+        },
+        "subject": {
+          "broad": "LANG",
+          "code": "LANG"
+        },
+        "version": "2.7.4",
+        "has_relations": {
+          "derivative": 1
+        },
+        "deepest": "Y",
+        "descr": "Determine central ideas or themes of a text and analyze their development; summarize the key supporting details and ideas.",
+        "level": 3,
+        "label": "Anchor Standard",
+        "adopt_year": "2010",
+        "authority": {
+          "guid": "A83297F2-901A-11DF-A622-0C319DFF4B22",
+          "descr": "NGA Center/CCSSO",
+          "code": "CC"
+        }
+      }
+    },
+    {
+      "data": {
+        "number": "CCSS.ELA-Literacy.CCRA.R.3",
+        "status": "Active",
+        "self": "http://api.academicbenchmarks.com/rest/v3/standards/CEB96684-67AD-11DF-AB5F-995D9DFF4B22",
+        "grade": {
+          "high": "12",
+          "low": "K"
+        },
+        "document": {
+          "guid": "964E0FEE-AD71-11DE-9BF2-C9169DFF4B22",
+          "title": "Common Core State Standards"
+        },
+        "subject_doc": {
+          "guid": "CF6A375C-67AD-11DF-AB5F-995D9DFF4B22",
+          "descr": "English Language Arts/Literacy (2010)"
+        },
+        "guid": "CEB96684-67AD-11DF-AB5F-995D9DFF4B22",
+        "course": {
+          "guid": "CF69C79A-67AD-11DF-AB5F-995D9DFF4B22",
+          "descr": "College- and Career-Readiness Anchor Standards"
+        },
+        "parent": {
+          "guid": "CEB79A48-67AD-11DF-AB5F-995D9DFF4B22"
+        },
+        "subject": {
+          "broad": "LANG",
+          "code": "LANG"
+        },
+        "version": "2.7.4",
+        "has_relations": {
+          "derivative": 1
+        },
+        "deepest": "Y",
+        "descr": "Analyze how and why individuals, events, and ideas develop and interact over the course of a text.",
+        "level": 3,
+        "label": "Anchor Standard",
+        "adopt_year": "2010",
+        "authority": {
+          "guid": "A83297F2-901A-11DF-A622-0C319DFF4B22",
+          "descr": "NGA Center/CCSSO",
+          "code": "CC"
+        }
+      }
+    },
+    {
+      "data": {
+        "status": "Active",
+        "self": "http://api.academicbenchmarks.com/rest/v3/standards/CEBA4798-67AD-11DF-AB5F-995D9DFF4B22",
+        "grade": {
+          "high": "12",
+          "low": "K"
+        },
+        "document": {
+          "guid": "964E0FEE-AD71-11DE-9BF2-C9169DFF4B22",
+          "title": "Common Core State Standards"
+        },
+        "subject_doc": {
+          "guid": "CF6A375C-67AD-11DF-AB5F-995D9DFF4B22",
+          "descr": "English Language Arts/Literacy (2010)"
+        },
+        "guid": "CEBA4798-67AD-11DF-AB5F-995D9DFF4B22",
+        "course": {
+          "guid": "CF69C79A-67AD-11DF-AB5F-995D9DFF4B22",
+          "descr": "College- and Career-Readiness Anchor Standards"
+        },
+        "parent": {
+          "guid": "CEC2CF6C-67AD-11DF-AB5F-995D9DFF4B22"
+        },
+        "subject": {
+          "broad": "LANG",
+          "code": "LANG"
+        },
+        "version": "2.7.4",
+        "has_relations": {
+          "derivative": 1
+        },
+        "deepest": "N",
+        "descr": "Craft and Structure",
+        "level": 2,
+        "adopt_year": "2010",
+        "authority": {
+          "guid": "A83297F2-901A-11DF-A622-0C319DFF4B22",
+          "descr": "NGA Center/CCSSO",
+          "code": "CC"
+        }
+      }
+    },
+    {
+      "data": {
+        "number": "CCSS.ELA-Literacy.CCRA.R.4",
+        "status": "Active",
+        "self": "http://api.academicbenchmarks.com/rest/v3/standards/CEBAB958-67AD-11DF-AB5F-995D9DFF4B22",
+        "grade": {
+          "high": "12",
+          "low": "K"
+        },
+        "document": {
+          "guid": "964E0FEE-AD71-11DE-9BF2-C9169DFF4B22",
+          "title": "Common Core State Standards"
+        },
+        "subject_doc": {
+          "guid": "CF6A375C-67AD-11DF-AB5F-995D9DFF4B22",
+          "descr": "English Language Arts/Literacy (2010)"
+        },
+        "guid": "CEBAB958-67AD-11DF-AB5F-995D9DFF4B22",
+        "course": {
+          "guid": "CF69C79A-67AD-11DF-AB5F-995D9DFF4B22",
+          "descr": "College- and Career-Readiness Anchor Standards"
+        },
+        "parent": {
+          "guid": "CEBA4798-67AD-11DF-AB5F-995D9DFF4B22"
+        },
+        "subject": {
+          "broad": "LANG",
+          "code": "LANG"
+        },
+        "version": "2.7.4",
+        "has_relations": {
+          "derivative": 1
+        },
+        "deepest": "Y",
+        "descr": "Interpret words and phrases as they are used in a text, including determining technical, connotative, and figurative meanings, and analyze how specific word choices shape meaning or tone.",
+        "level": 3,
+        "label": "Anchor Standard",
+        "adopt_year": "2010",
+        "authority": {
+          "guid": "A83297F2-901A-11DF-A622-0C319DFF4B22",
+          "descr": "NGA Center/CCSSO",
+          "code": "CC"
+        }
+      }
+    },
+    {
+      "data": {
+        "number": "CCSS.ELA-Literacy.CCRA.R.5",
+        "status": "Active",
+        "self": "http://api.academicbenchmarks.com/rest/v3/standards/CEBB9AA8-67AD-11DF-AB5F-995D9DFF4B22",
+        "grade": {
+          "high": "12",
+          "low": "K"
+        },
+        "document": {
+          "guid": "964E0FEE-AD71-11DE-9BF2-C9169DFF4B22",
+          "title": "Common Core State Standards"
+        },
+        "subject_doc": {
+          "guid": "CF6A375C-67AD-11DF-AB5F-995D9DFF4B22",
+          "descr": "English Language Arts/Literacy (2010)"
+        },
+        "guid": "CEBB9AA8-67AD-11DF-AB5F-995D9DFF4B22",
+        "course": {
+          "guid": "CF69C79A-67AD-11DF-AB5F-995D9DFF4B22",
+          "descr": "College- and Career-Readiness Anchor Standards"
+        },
+        "parent": {
+          "guid": "CEBA4798-67AD-11DF-AB5F-995D9DFF4B22"
+        },
+        "subject": {
+          "broad": "LANG",
+          "code": "LANG"
+        },
+        "version": "2.7.4",
+        "has_relations": {
+          "derivative": 1
+        },
+        "deepest": "Y",
+        "descr": "Analyze the structure of texts, including how specific sentences, paragraphs, and larger portions of the text (e.g., a section, chapter, scene, or stanza) relate to each other and the whole.",
+        "level": 3,
+        "label": "Anchor Standard",
+        "adopt_year": "2010",
+        "authority": {
+          "guid": "A83297F2-901A-11DF-A622-0C319DFF4B22",
+          "descr": "NGA Center/CCSSO",
+          "code": "CC"
+        }
+      }
+    },
+    {
+      "data": {
+        "number": "CCSS.ELA-Literacy.CCRA.R.6",
+        "status": "Active",
+        "self": "http://api.academicbenchmarks.com/rest/v3/standards/CEBC89F4-67AD-11DF-AB5F-995D9DFF4B22",
+        "grade": {
+          "high": "12",
+          "low": "K"
+        },
+        "document": {
+          "guid": "964E0FEE-AD71-11DE-9BF2-C9169DFF4B22",
+          "title": "Common Core State Standards"
+        },
+        "subject_doc": {
+          "guid": "CF6A375C-67AD-11DF-AB5F-995D9DFF4B22",
+          "descr": "English Language Arts/Literacy (2010)"
+        },
+        "guid": "CEBC89F4-67AD-11DF-AB5F-995D9DFF4B22",
+        "course": {
+          "guid": "CF69C79A-67AD-11DF-AB5F-995D9DFF4B22",
+          "descr": "College- and Career-Readiness Anchor Standards"
+        },
+        "parent": {
+          "guid": "CEBA4798-67AD-11DF-AB5F-995D9DFF4B22"
+        },
+        "subject": {
+          "broad": "LANG",
+          "code": "LANG"
+        },
+        "version": "2.7.4",
+        "has_relations": {
+          "derivative": 1
+        },
+        "deepest": "Y",
+        "descr": "Assess how point of view or purpose shapes the content and style of a text.",
+        "level": 3,
+        "label": "Anchor Standard",
+        "adopt_year": "2010",
+        "authority": {
+          "guid": "A83297F2-901A-11DF-A622-0C319DFF4B22",
+          "descr": "NGA Center/CCSSO",
+          "code": "CC"
+        }
+      }
+    },
+    {
+      "data": {
+        "status": "Active",
+        "self": "http://api.academicbenchmarks.com/rest/v3/standards/CEBCFB14-67AD-11DF-AB5F-995D9DFF4B22",
+        "grade": {
+          "high": "12",
+          "low": "K"
+        },
+        "document": {
+          "guid": "964E0FEE-AD71-11DE-9BF2-C9169DFF4B22",
+          "title": "Common Core State Standards"
+        },
+        "subject_doc": {
+          "guid": "CF6A375C-67AD-11DF-AB5F-995D9DFF4B22",
+          "descr": "English Language Arts/Literacy (2010)"
+        },
+        "guid": "CEBCFB14-67AD-11DF-AB5F-995D9DFF4B22",
+        "course": {
+          "guid": "CF69C79A-67AD-11DF-AB5F-995D9DFF4B22",
+          "descr": "College- and Career-Readiness Anchor Standards"
+        },
+        "parent": {
+          "guid": "CEC2CF6C-67AD-11DF-AB5F-995D9DFF4B22"
+        },
+        "subject": {
+          "broad": "LANG",
+          "code": "LANG"
+        },
+        "version": "2.7.4",
+        "has_relations": {
+          "derivative": 1
+        },
+        "deepest": "N",
+        "descr": "Integration of Knowledge and Ideas",
+        "level": 2,
+        "adopt_year": "2010",
+        "authority": {
+          "guid": "A83297F2-901A-11DF-A622-0C319DFF4B22",
+          "descr": "NGA Center/CCSSO",
+          "code": "CC"
+        }
+      }
+    },
+    {
+      "data": {
+        "number": "CCSS.ELA-Literacy.CCRA.R.7",
+        "status": "Active",
+        "self": "http://api.academicbenchmarks.com/rest/v3/standards/CEBDDCA0-67AD-11DF-AB5F-995D9DFF4B22",
+        "grade": {
+          "high": "12",
+          "low": "K"
+        },
+        "document": {
+          "guid": "964E0FEE-AD71-11DE-9BF2-C9169DFF4B22",
+          "title": "Common Core State Standards"
+        },
+        "subject_doc": {
+          "guid": "CF6A375C-67AD-11DF-AB5F-995D9DFF4B22",
+          "descr": "English Language Arts/Literacy (2010)"
+        },
+        "guid": "CEBDDCA0-67AD-11DF-AB5F-995D9DFF4B22",
+        "course": {
+          "guid": "CF69C79A-67AD-11DF-AB5F-995D9DFF4B22",
+          "descr": "College- and Career-Readiness Anchor Standards"
+        },
+        "parent": {
+          "guid": "CEBCFB14-67AD-11DF-AB5F-995D9DFF4B22"
+        },
+        "subject": {
+          "broad": "LANG",
+          "code": "LANG"
+        },
+        "version": "2.7.4",
+        "has_relations": {
+          "derivative": 1
+        },
+        "deepest": "Y",
+        "descr": "Integrate and evaluate content presented in diverse media and formats, including visually and quantitatively, as well as in words.",
+        "level": 3,
+        "label": "Anchor Standard",
+        "adopt_year": "2010",
+        "authority": {
+          "guid": "A83297F2-901A-11DF-A622-0C319DFF4B22",
+          "descr": "NGA Center/CCSSO",
+          "code": "CC"
+        }
+      }
+    },
+    {
+      "data": {
+        "number": "CCSS.ELA-Literacy.CCRA.R.8",
+        "status": "Active",
+        "self": "http://api.academicbenchmarks.com/rest/v3/standards/CEBE4D52-67AD-11DF-AB5F-995D9DFF4B22",
+        "grade": {
+          "high": "12",
+          "low": "K"
+        },
+        "document": {
+          "guid": "964E0FEE-AD71-11DE-9BF2-C9169DFF4B22",
+          "title": "Common Core State Standards"
+        },
+        "subject_doc": {
+          "guid": "CF6A375C-67AD-11DF-AB5F-995D9DFF4B22",
+          "descr": "English Language Arts/Literacy (2010)"
+        },
+        "guid": "CEBE4D52-67AD-11DF-AB5F-995D9DFF4B22",
+        "course": {
+          "guid": "CF69C79A-67AD-11DF-AB5F-995D9DFF4B22",
+          "descr": "College- and Career-Readiness Anchor Standards"
+        },
+        "parent": {
+          "guid": "CEBCFB14-67AD-11DF-AB5F-995D9DFF4B22"
+        },
+        "subject": {
+          "broad": "LANG",
+          "code": "LANG"
+        },
+        "version": "2.7.4",
+        "has_relations": {
+          "derivative": 1
+        },
+        "deepest": "Y",
+        "descr": "Delineate and evaluate the argument and specific claims in a text, including the validity of the reasoning as well as the relevance and sufficiency of the evidence.",
+        "level": 3,
+        "label": "Anchor Standard",
+        "adopt_year": "2010",
+        "authority": {
+          "guid": "A83297F2-901A-11DF-A622-0C319DFF4B22",
+          "descr": "NGA Center/CCSSO",
+          "code": "CC"
+        }
+      }
+    },
+    {
+      "data": {
+        "number": "CCSS.ELA-Literacy.CCRA.R.9",
+        "status": "Active",
+        "self": "http://api.academicbenchmarks.com/rest/v3/standards/CEBF37B2-67AD-11DF-AB5F-995D9DFF4B22",
+        "grade": {
+          "high": "12",
+          "low": "K"
+        },
+        "document": {
+          "guid": "964E0FEE-AD71-11DE-9BF2-C9169DFF4B22",
+          "title": "Common Core State Standards"
+        },
+        "subject_doc": {
+          "guid": "CF6A375C-67AD-11DF-AB5F-995D9DFF4B22",
+          "descr": "English Language Arts/Literacy (2010)"
+        },
+        "guid": "CEBF37B2-67AD-11DF-AB5F-995D9DFF4B22",
+        "course": {
+          "guid": "CF69C79A-67AD-11DF-AB5F-995D9DFF4B22",
+          "descr": "College- and Career-Readiness Anchor Standards"
+        },
+        "parent": {
+          "guid": "CEBCFB14-67AD-11DF-AB5F-995D9DFF4B22"
+        },
+        "subject": {
+          "broad": "LANG",
+          "code": "LANG"
+        },
+        "version": "2.7.4",
+        "has_relations": {
+          "derivative": 1
+        },
+        "deepest": "Y",
+        "descr": "Analyze how two or more texts address similar themes or topics in order to build knowledge or to compare the approaches the authors take.",
+        "level": 3,
+        "label": "Anchor Standard",
+        "adopt_year": "2010",
+        "authority": {
+          "guid": "A83297F2-901A-11DF-A622-0C319DFF4B22",
+          "descr": "NGA Center/CCSSO",
+          "code": "CC"
+        }
+      }
+    },
+    {
+      "data": {
+        "status": "Active",
+        "self": "http://api.academicbenchmarks.com/rest/v3/standards/CEBFA968-67AD-11DF-AB5F-995D9DFF4B22",
+        "grade": {
+          "high": "12",
+          "low": "K"
+        },
+        "document": {
+          "guid": "964E0FEE-AD71-11DE-9BF2-C9169DFF4B22",
+          "title": "Common Core State Standards"
+        },
+        "subject_doc": {
+          "guid": "CF6A375C-67AD-11DF-AB5F-995D9DFF4B22",
+          "descr": "English Language Arts/Literacy (2010)"
+        },
+        "guid": "CEBFA968-67AD-11DF-AB5F-995D9DFF4B22",
+        "course": {
+          "guid": "CF69C79A-67AD-11DF-AB5F-995D9DFF4B22",
+          "descr": "College- and Career-Readiness Anchor Standards"
+        },
+        "parent": {
+          "guid": "CEC2CF6C-67AD-11DF-AB5F-995D9DFF4B22"
+        },
+        "subject": {
+          "broad": "LANG",
+          "code": "LANG"
+        },
+        "version": "2.7.4",
+        "has_relations": {
+          "derivative": 1
+        },
+        "deepest": "N",
+        "descr": "Range of Reading and Level of Text Complexity",
+        "level": 2,
+        "adopt_year": "2010",
+        "authority": {
+          "guid": "A83297F2-901A-11DF-A622-0C319DFF4B22",
+          "descr": "NGA Center/CCSSO",
+          "code": "CC"
+        }
+      }
+    },
+    {
+      "data": {
+        "number": "CCSS.ELA-Literacy.CCRA.R.10",
+        "status": "Active",
+        "self": "http://api.academicbenchmarks.com/rest/v3/standards/CEC08B44-67AD-11DF-AB5F-995D9DFF4B22",
+        "grade": {
+          "high": "12",
+          "low": "K"
+        },
+        "document": {
+          "guid": "964E0FEE-AD71-11DE-9BF2-C9169DFF4B22",
+          "title": "Common Core State Standards"
+        },
+        "subject_doc": {
+          "guid": "CF6A375C-67AD-11DF-AB5F-995D9DFF4B22",
+          "descr": "English Language Arts/Literacy (2010)"
+        },
+        "guid": "CEC08B44-67AD-11DF-AB5F-995D9DFF4B22",
+        "course": {
+          "guid": "CF69C79A-67AD-11DF-AB5F-995D9DFF4B22",
+          "descr": "College- and Career-Readiness Anchor Standards"
+        },
+        "parent": {
+          "guid": "CEBFA968-67AD-11DF-AB5F-995D9DFF4B22"
+        },
+        "subject": {
+          "broad": "LANG",
+          "code": "LANG"
+        },
+        "version": "2.7.4",
+        "has_relations": {
+          "derivative": 1
+        },
+        "deepest": "Y",
+        "descr": "Read and comprehend complex literary and informational texts independently and proficiently.",
+        "level": 3,
+        "label": "Anchor Standard",
+        "adopt_year": "2010",
+        "authority": {
+          "guid": "A83297F2-901A-11DF-A622-0C319DFF4B22",
+          "descr": "NGA Center/CCSSO",
+          "code": "CC"
+        }
+      }
+    },
+    {
+      "data": {
+        "number": "CCSS.ELA-Literacy.CCRA.R",
+        "status": "Active",
+        "self": "http://api.academicbenchmarks.com/rest/v3/standards/CEC2CF6C-67AD-11DF-AB5F-995D9DFF4B22",
+        "grade": {
+          "high": "12",
+          "low": "K"
+        },
+        "document": {
+          "guid": "964E0FEE-AD71-11DE-9BF2-C9169DFF4B22",
+          "title": "Common Core State Standards"
+        },
+        "subject_doc": {
+          "guid": "CF6A375C-67AD-11DF-AB5F-995D9DFF4B22",
+          "descr": "English Language Arts/Literacy (2010)"
+        },
+        "guid": "CEC2CF6C-67AD-11DF-AB5F-995D9DFF4B22",
+        "course": {
+          "guid": "CF69C79A-67AD-11DF-AB5F-995D9DFF4B22",
+          "descr": "College- and Career-Readiness Anchor Standards"
+        },
+        "subject": {
+          "broad": "LANG",
+          "code": "LANG"
+        },
+        "version": "2.7.4",
+        "has_relations": {
+          "derivative": 1
+        },
+        "deepest": "N",
+        "descr": "Reading",
+        "level": 1,
+        "label": "Strand",
+        "adopt_year": "2010",
+        "authority": {
+          "guid": "A83297F2-901A-11DF-A622-0C319DFF4B22",
+          "descr": "NGA Center/CCSSO",
+          "code": "CC"
+        }
+      }
+    },
+    {
+      "data": {
+        "number": "CCSS.ELA-Literacy.CCRA.W",
+        "status": "Active",
+        "self": "http://api.academicbenchmarks.com/rest/v3/standards/CEC34096-67AD-11DF-AB5F-995D9DFF4B22",
+        "grade": {
+          "high": "12",
+          "low": "K"
+        },
+        "document": {
+          "guid": "964E0FEE-AD71-11DE-9BF2-C9169DFF4B22",
+          "title": "Common Core State Standards"
+        },
+        "subject_doc": {
+          "guid": "CF6A375C-67AD-11DF-AB5F-995D9DFF4B22",
+          "descr": "English Language Arts/Literacy (2010)"
+        },
+        "guid": "CEC34096-67AD-11DF-AB5F-995D9DFF4B22",
+        "course": {
+          "guid": "CF69C79A-67AD-11DF-AB5F-995D9DFF4B22",
+          "descr": "College- and Career-Readiness Anchor Standards"
+        },
+        "subject": {
+          "broad": "LANG",
+          "code": "LANG"
+        },
+        "version": "2.7.4",
+        "has_relations": {
+          "derivative": 1
+        },
+        "deepest": "N",
+        "descr": "Writing",
+        "level": 1,
+        "label": "Strand",
+        "adopt_year": "2010",
+        "authority": {
+          "guid": "A83297F2-901A-11DF-A622-0C319DFF4B22",
+          "descr": "NGA Center/CCSSO",
+          "code": "CC"
+        }
+      }
+    },
+    {
+      "data": {
+        "status": "Active",
+        "self": "http://api.academicbenchmarks.com/rest/v3/standards/CEC3B102-67AD-11DF-AB5F-995D9DFF4B22",
+        "grade": {
+          "high": "12",
+          "low": "K"
+        },
+        "document": {
+          "guid": "964E0FEE-AD71-11DE-9BF2-C9169DFF4B22",
+          "title": "Common Core State Standards"
+        },
+        "subject_doc": {
+          "guid": "CF6A375C-67AD-11DF-AB5F-995D9DFF4B22",
+          "descr": "English Language Arts/Literacy (2010)"
+        },
+        "guid": "CEC3B102-67AD-11DF-AB5F-995D9DFF4B22",
+        "course": {
+          "guid": "CF69C79A-67AD-11DF-AB5F-995D9DFF4B22",
+          "descr": "College- and Career-Readiness Anchor Standards"
+        },
+        "parent": {
+          "guid": "CEC34096-67AD-11DF-AB5F-995D9DFF4B22"
+        },
+        "subject": {
+          "broad": "LANG",
+          "code": "LANG"
+        },
+        "version": "2.7.4",
+        "has_relations": {
+          "derivative": 1
+        },
+        "deepest": "N",
+        "descr": "Text Types and Purposes",
+        "level": 2,
+        "adopt_year": "2010",
+        "authority": {
+          "guid": "A83297F2-901A-11DF-A622-0C319DFF4B22",
+          "descr": "NGA Center/CCSSO",
+          "code": "CC"
+        }
+      }
+    },
+    {
+      "data": {
+        "number": "CCSS.ELA-Literacy.CCRA.W.1",
+        "status": "Active",
+        "self": "http://api.academicbenchmarks.com/rest/v3/standards/CEC49A36-67AD-11DF-AB5F-995D9DFF4B22",
+        "grade": {
+          "high": "12",
+          "low": "K"
+        },
+        "document": {
+          "guid": "964E0FEE-AD71-11DE-9BF2-C9169DFF4B22",
+          "title": "Common Core State Standards"
+        },
+        "subject_doc": {
+          "guid": "CF6A375C-67AD-11DF-AB5F-995D9DFF4B22",
+          "descr": "English Language Arts/Literacy (2010)"
+        },
+        "guid": "CEC49A36-67AD-11DF-AB5F-995D9DFF4B22",
+        "course": {
+          "guid": "CF69C79A-67AD-11DF-AB5F-995D9DFF4B22",
+          "descr": "College- and Career-Readiness Anchor Standards"
+        },
+        "parent": {
+          "guid": "CEC3B102-67AD-11DF-AB5F-995D9DFF4B22"
+        },
+        "subject": {
+          "broad": "LANG",
+          "code": "LANG"
+        },
+        "version": "2.7.4",
+        "has_relations": {
+          "derivative": 1
+        },
+        "deepest": "Y",
+        "descr": "Write arguments to support claims in an analysis of substantive topics or texts, using valid reasoning and relevant and sufficient evidence.",
+        "level": 3,
+        "label": "Anchor Standard",
+        "adopt_year": "2010",
+        "authority": {
+          "guid": "A83297F2-901A-11DF-A622-0C319DFF4B22",
+          "descr": "NGA Center/CCSSO",
+          "code": "CC"
+        }
+      }
+    },
+    {
+      "data": {
+        "number": "CCSS.ELA-Literacy.CCRA.W.2",
+        "status": "Active",
+        "self": "http://api.academicbenchmarks.com/rest/v3/standards/CEC57CD0-67AD-11DF-AB5F-995D9DFF4B22",
+        "grade": {
+          "high": "12",
+          "low": "K"
+        },
+        "document": {
+          "guid": "964E0FEE-AD71-11DE-9BF2-C9169DFF4B22",
+          "title": "Common Core State Standards"
+        },
+        "subject_doc": {
+          "guid": "CF6A375C-67AD-11DF-AB5F-995D9DFF4B22",
+          "descr": "English Language Arts/Literacy (2010)"
+        },
+        "guid": "CEC57CD0-67AD-11DF-AB5F-995D9DFF4B22",
+        "course": {
+          "guid": "CF69C79A-67AD-11DF-AB5F-995D9DFF4B22",
+          "descr": "College- and Career-Readiness Anchor Standards"
+        },
+        "parent": {
+          "guid": "CEC3B102-67AD-11DF-AB5F-995D9DFF4B22"
+        },
+        "subject": {
+          "broad": "LANG",
+          "code": "LANG"
+        },
+        "version": "2.7.4",
+        "has_relations": {
+          "derivative": 1
+        },
+        "deepest": "Y",
+        "descr": "Write informative/explanatory texts to examine and convey complex ideas and information clearly and accurately through the effective selection, organization, and analysis of content.",
+        "level": 3,
+        "label": "Anchor Standard",
+        "adopt_year": "2010",
+        "authority": {
+          "guid": "A83297F2-901A-11DF-A622-0C319DFF4B22",
+          "descr": "NGA Center/CCSSO",
+          "code": "CC"
+        }
+      }
+    },
+    {
+      "data": {
+        "number": "CCSS.ELA-Literacy.CCRA.W.3",
+        "status": "Active",
+        "self": "http://api.academicbenchmarks.com/rest/v3/standards/CEC665B4-67AD-11DF-AB5F-995D9DFF4B22",
+        "grade": {
+          "high": "12",
+          "low": "K"
+        },
+        "document": {
+          "guid": "964E0FEE-AD71-11DE-9BF2-C9169DFF4B22",
+          "title": "Common Core State Standards"
+        },
+        "subject_doc": {
+          "guid": "CF6A375C-67AD-11DF-AB5F-995D9DFF4B22",
+          "descr": "English Language Arts/Literacy (2010)"
+        },
+        "guid": "CEC665B4-67AD-11DF-AB5F-995D9DFF4B22",
+        "course": {
+          "guid": "CF69C79A-67AD-11DF-AB5F-995D9DFF4B22",
+          "descr": "College- and Career-Readiness Anchor Standards"
+        },
+        "parent": {
+          "guid": "CEC3B102-67AD-11DF-AB5F-995D9DFF4B22"
+        },
+        "subject": {
+          "broad": "LANG",
+          "code": "LANG"
+        },
+        "version": "2.7.4",
+        "has_relations": {
+          "derivative": 1
+        },
+        "deepest": "Y",
+        "descr": "Write narratives to develop real or imagined experiences or events using effective technique, well-chosen details, and well-structured event sequences.",
+        "level": 3,
+        "label": "Anchor Standard",
+        "adopt_year": "2010",
+        "authority": {
+          "guid": "A83297F2-901A-11DF-A622-0C319DFF4B22",
+          "descr": "NGA Center/CCSSO",
+          "code": "CC"
+        }
+      }
+    }
+  ]

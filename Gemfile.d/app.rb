@@ -102,6 +102,7 @@ gem 'canvas_statsd', '1.0.7'
   gem 'aroi', '0.0.4', require: false
 gem 'diplomat', '1.0.0', require: false
 gem 'gepub'
+gem 'academic_benchmarks', '0.0.8', require: false
 
 gem 'activesupport-suspend_callbacks', path: 'gems/activesupport-suspend_callbacks'
 gem 'acts_as_list', path: 'gems/acts_as_list'
