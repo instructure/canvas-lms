@@ -36,12 +36,12 @@ describe "gradebook2" do
     switch_to_section(@other_section)
     expect(fj('.section-select-button:visible')).to include_text(@other_section.name)
 
-    validate_cell_text(f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2'), '1')
+    expect(f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2').text).to eq '1'
 
     # verify that it remembers the section to show across page loads
     get "/courses/#{@course.id}/gradebook2"
     expect(fj('.section-select-button:visible')).to include_text @other_section.name
-    validate_cell_text(f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2'), '1')
+    expect(f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2').text).to eq '1'
 
     # now verify that you can set it back
 
@@ -52,7 +52,7 @@ describe "gradebook2" do
     keep_trying_until { expect(fj('.section-select-button:visible')).to include_text "All Sections" }
 
     # validate all grades (i.e. submissions) were loaded
-    validate_cell_text(f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2'), '0')
-    validate_cell_text(f('#gradebook_grid .container_1 .slick-row:nth-child(2) .l2'), '1')
+    expect(f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2').text).to eq '0'
+    expect(f('#gradebook_grid .container_1 .slick-row:nth-child(2) .l2').text).to eq '1'
   end
 end

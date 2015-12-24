@@ -22,9 +22,9 @@ describe "assignment column headers" do
     meta_cells = find_slick_cells(0, f('#gradebook_grid  .container_0'))
     grade_cells = find_slick_cells(0, f('#gradebook_grid .container_1'))
     #filter validation
-    validate_cell_text(meta_cells[0], @student_name_3 + "\n" + @course.name)
-    validate_cell_text(grade_cells[0], @assignment_2_points)
-    validate_cell_text(grade_cells[4].find_element(:css, '.percentage'), @student_3_total_ignoring_ungraded)
+    expect(meta_cells[0].text).to eq @student_name_3 + "\n" + @course.name
+    expect(grade_cells[0].text).to eq @assignment_2_points
+    expect(grade_cells[4].find_element(:css, '.percentage').text).to eq @student_3_total_ignoring_ungraded
   end
 
   it "should minimize a column and remember it" do
@@ -56,9 +56,9 @@ describe "assignment column headers" do
     driver.action.drag_and_drop_by(columns[1], -300, 0).perform
 
     first_row_cells = find_slick_cells(0, f('#gradebook_grid .container_1'))
-    validate_cell_text(first_row_cells[0], @assignment_2_points)
-    validate_cell_text(first_row_cells[1], @assignment_1_points)
-    validate_cell_text(first_row_cells[2], "-")
+    expect(first_row_cells[0].text).to eq @assignment_2_points
+    expect(first_row_cells[1].text).to eq @assignment_1_points
+    expect(first_row_cells[2].text).to eq "-"
 
     # with a custom order, both sort options should be displayed
     arrange_settings = ff('input[name="arrange-columns-by"]')
@@ -77,9 +77,9 @@ describe "assignment column headers" do
     get "/courses/#{@course.id}/gradebook2"
     wait_for_ajaximations
     first_row_cells = find_slick_cells(0, f('#gradebook_grid .container_1'))
-    validate_cell_text(first_row_cells[0], '-')
-    validate_cell_text(first_row_cells[1], @assignment_2_points)
-    validate_cell_text(first_row_cells[2], @assignment_1_points)
+    expect(first_row_cells[0].text).to eq '-'
+    expect(first_row_cells[1].text).to eq @assignment_2_points
+    expect(first_row_cells[2].text).to eq @assignment_1_points
 
     # both predefined short orders should be displayed since neither one is selected.
     arrange_settings = ff('input[name="arrange-columns-by"]')
@@ -108,10 +108,10 @@ describe "assignment column headers" do
     wait_for_ajaximations
 
     first_row_cells = find_slick_cells(0, f('#gradebook_grid .container_1'))
-    validate_cell_text(first_row_cells[0], '-')
-    validate_cell_text(first_row_cells[1], @assignment_2_points)
-    validate_cell_text(first_row_cells[2], @assignment_1_points)
-    validate_cell_text(first_row_cells[3], '150')
+    expect(first_row_cells[0].text).to eq '-'
+    expect(first_row_cells[1].text).to eq @assignment_2_points
+    expect(first_row_cells[2].text).to eq @assignment_1_points
+    expect(first_row_cells[3].text).to eq '150'
   end
 
   it "should maintain order of remaining assignments if an assignment is destroyed", priority: "1", test_id: 220033 do
@@ -128,8 +128,8 @@ describe "assignment column headers" do
     wait_for_ajaximations
 
     first_row_cells = find_slick_cells(0, f('#gradebook_grid .container_1'))
-    validate_cell_text(first_row_cells[0], '-')
-    validate_cell_text(first_row_cells[1], @assignment_2_points)
+    expect(first_row_cells[0].text).to eq '-'
+    expect(first_row_cells[1].text).to eq @assignment_2_points
   end
 
   it "should validate show attendance columns option", priority: "1", test_id: 220034 do

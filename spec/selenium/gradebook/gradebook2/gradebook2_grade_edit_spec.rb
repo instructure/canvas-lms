@@ -18,7 +18,8 @@ describe "editing grades" do
       set_value(grade_box, 7)
       f("form.submission_details_grade_form button").click
       wait_for_ajax_requests
-      validate_cell_text(f('#gradebook_grid .container_1 .slick-row:nth-child(1) .slick-cell:nth-child(1)'), '7')
+      cell = f('#gradebook_grid .container_1 .slick-row:nth-child(1) .slick-cell:nth-child(1)')
+      expect(cell.text).to include '7'
       expect(final_score_for_row(0)).to eq "80%"
     end
   end
@@ -242,7 +243,7 @@ describe "editing grades" do
       set_default_grade(2, expected_grade)
       open_section_menu_and_click.call('#section-to-show-menu-0')
       expect(f(gradebook_row_1)).to be_displayed
-      validate_cell_text(f("#{gradebook_row_1} .r2"), '-')
+      expect(f("#{gradebook_row_1} .r2").text).to eq '-'
   end
 
   it "should not factor non graded assignments into group total", priority: "1", test_id: 220323 do
@@ -254,7 +255,7 @@ describe "editing grades" do
     wait_for_ajaximations
     assignment_group_cells = ff('.assignment-group-cell')
     expected_totals.zip(assignment_group_cells) do |expected, cell|
-      validate_cell_text(cell, expected)
+      expect(cell.text).to eq expected
     end
   end
 

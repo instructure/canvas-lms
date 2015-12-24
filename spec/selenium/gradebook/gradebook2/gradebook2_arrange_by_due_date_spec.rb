@@ -18,7 +18,7 @@ describe "gradebook2 - arrange by due date" do
     arrange_settings = ff('input[name="arrange-columns-by"]')
     open_gradebook_settings(arrange_settings.first.find_element(:xpath, '..'))
     first_row_cells = find_slick_cells(0, f('#gradebook_grid .container_1'))
-    validate_cell_text(first_row_cells[0], expected_text)
+    expect(first_row_cells[0].text).to eq expected_text
     open_gradebook_settings()
     expect(arrange_settings.first.find_element(:xpath, '..')).not_to be_displayed
     expect(arrange_settings.last.find_element(:xpath, '..')).to be_displayed
@@ -27,12 +27,12 @@ describe "gradebook2 - arrange by due date" do
     get "/courses/#{@course.id}/gradebook2"
     wait_for_ajaximations
     first_row_cells = find_slick_cells(0, f('#gradebook_grid .container_1'))
-    validate_cell_text(first_row_cells[0], expected_text)
+    expect(first_row_cells[0].text).to eq expected_text
 
     first_row_cells = find_slick_cells(0, f('#gradebook_grid .container_1'))
-    validate_cell_text(first_row_cells[0], expected_text)
-    validate_cell_text(first_row_cells[1], @assignment_1_points)
-    validate_cell_text(first_row_cells[2], @assignment_2_points)
+    expect(first_row_cells[0].text).to eq expected_text
+    expect(first_row_cells[1].text).to eq @assignment_1_points
+    expect(first_row_cells[2].text).to eq @assignment_2_points
 
     arrange_settings = ff('input[name="arrange-columns-by"]')
     open_gradebook_settings()

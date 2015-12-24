@@ -263,6 +263,17 @@ $cell_height: 33px;
   background-repeat: repeat;
 }
 
+@mixin first-row-tooltip() {
+  top: 35px;
+  &:after {
+    border-top-color: transparent;
+    border-left-color: transparent;
+    border-right-color: transparent;
+    border-bottom: 5px solid #444444;
+    bottom: 30px;
+  }
+}
+
 .gradebook-tooltip {
   display: none;
   background-color: #444444;
@@ -284,18 +295,17 @@ $cell_height: 33px;
     left: 15px;
     content: "";
   }
-  .slick-cell.hover &, .gradebook-cell.focus &, .slick-cell.selected & {
+  .slick-cell.hover &, .slick-cell.focus &, .slick-cell.selected &, .slick-cell.active & {
     display: block;
   }
   &.first-row {
-    top: 35px;
-    &:after {
-      border-top-color: transparent;
-      border-left-color: transparent;
-      border-right-color: transparent;
-      border-bottom: 5px solid #444444;
-      bottom: 30px;
-    }
+    @include first-row-tooltip();
+  }
+}
+
+.slick-row:first-child {
+  .gradebook-tooltip {
+    @include first-row-tooltip();
   }
 }
 

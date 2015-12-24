@@ -15,9 +15,9 @@ describe "gradebook2 - arrange by assignment group" do
 
   it "should default to arrange columns by assignment group", priority: "1", test_id: 220028 do
     first_row_cells = find_slick_cells(0, f('#gradebook_grid .container_1'))
-    validate_cell_text(first_row_cells[0], @assignment_1_points)
-    validate_cell_text(first_row_cells[1], @assignment_2_points)
-    validate_cell_text(first_row_cells[2], "-")
+    expect(first_row_cells[0].text).to eq @assignment_1_points
+    expect(first_row_cells[1].text).to eq @assignment_2_points
+    expect(first_row_cells[2].text).to eq "-"
 
     arrange_settings = ff('input[name="arrange-columns-by"]')
     open_gradebook_settings()
@@ -31,9 +31,9 @@ describe "gradebook2 - arrange by assignment group" do
     open_gradebook_settings(arrange_settings.first.find_element(:xpath, '..'))
     open_gradebook_settings(arrange_settings.last.find_element(:xpath, '..'))
     first_row_cells = find_slick_cells(0, f('#gradebook_grid .container_1'))
-    validate_cell_text(first_row_cells[0], @assignment_1_points)
-    validate_cell_text(first_row_cells[1], @assignment_2_points)
-    validate_cell_text(first_row_cells[2], "-")
+    expect(first_row_cells[0].text).to eq @assignment_1_points
+    expect(first_row_cells[1].text).to eq @assignment_2_points
+    expect(first_row_cells[2].text).to eq "-"
 
     arrange_settings = ff('input[name="arrange-columns-by"]')
     open_gradebook_settings()
@@ -45,9 +45,9 @@ describe "gradebook2 - arrange by assignment group" do
     wait_for_ajaximations
 
     first_row_cells = find_slick_cells(0, f('#gradebook_grid .container_1'))
-    validate_cell_text(first_row_cells[0], @assignment_1_points)
-    validate_cell_text(first_row_cells[1], @assignment_2_points)
-    validate_cell_text(first_row_cells[2], "-")
+    expect(first_row_cells[0].text).to eq @assignment_1_points
+    expect(first_row_cells[1].text).to eq @assignment_2_points
+    expect(first_row_cells[2].text).to eq "-"
 
     arrange_settings = ff('input[name="arrange-columns-by"]')
     open_gradebook_settings()

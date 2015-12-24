@@ -67,11 +67,6 @@ module Gradebook2Common
     wait_for_ajaximations
   end
 
-  def validate_cell_text(cell, text)
-    expect(cell.text).to eq text
-    cell.text
-  end
-
   def open_gradebook_settings(element_to_click = nil)
     keep_trying_until do
       f('#gradebook_settings').click
