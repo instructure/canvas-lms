@@ -8,10 +8,14 @@ describe "Wiki Pages" do
   include FilesCommon
   include WikiAndTinyCommon
 
+  def toggle_html_mode
+    keep_trying_until { fj('a.switch_views:visible').click }
+  end
+
   context "Navigation" do
     def edit_page(edit_text = nil)
       get "/courses/#{@course.id}/pages/Page1/edit"
-      fj('a.switch_views:visible').click
+      toggle_html_mode
       f('textarea').send_keys(edit_text)
       fj('button:contains("Save")').click
     end
@@ -109,7 +113,7 @@ describe "Wiki Pages" do
       edit_page('test')
       driver.switch_to.window(driver.window_handles.first)
       get "/courses/#{@course.id}/pages/Page1/edit"
-      fj('a.switch_views:visible').click
+      toggle_html_mode
       expect(f('textarea').text).to include_text('test')
     end
   end
@@ -423,7 +427,7 @@ describe "Wiki Pages" do
       end
 
       it "should alert user if navigating away from page with unsaved html changes", priority: "1", test_id: 126838 do
-        fj('a.switch_views:visible').click()
+        toggle_html_mode
         f('textarea').send_keys("derp")
         f('.home').click
         expect(driver.switch_to.alert.text).to be_present
@@ -431,7 +435,7 @@ describe "Wiki Pages" do
       end
 
       it "should not save changes when navigating away and not saving", priority: "1", test_id: 267613 do
-        fj('a.switch_views:visible').click()
+        toggle_html_mode
         f('textarea').send_keys('derp')
         f('.home').click
         expect(driver.switch_to.alert.text).to be_present
@@ -441,7 +445,7 @@ describe "Wiki Pages" do
       end
 
       it "should alert user if navigating away from page after title change", priority: "1", test_id: 267832 do
-        fj('a.switch_views:visible').click()
+        toggle_html_mode
         f('.title').clear()
         f('.title').send_keys("derpy-title")
         f('.home').click

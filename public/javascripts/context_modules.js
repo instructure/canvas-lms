@@ -1658,6 +1658,8 @@ define([
     // "d" deletes module or module item
     // "space" opens up Move Item or Move Module form depending on which item is focused
     $document.keycodes('e d space', function(event) {
+      if (!$currentElem) return;
+
       $elem = getClosestModuleOrItem($currentElem);
       $hasClassItemHover = $elem.hasClass('context_module_item_hover');
 
@@ -1688,6 +1690,8 @@ define([
     // "i" indents module item
     // "o" outdents module item
     $document.keycodes('i o', function(event) {
+      if (!$currentElem) return;
+
       var $currentElemID = $currentElem.attr('id');
 
       if (event.keyString == 'i') {
