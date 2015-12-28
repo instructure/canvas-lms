@@ -63,7 +63,7 @@ class AssignmentGroup < ActiveRecord::Base
 
   def update_student_grades
     if self.rules_changed? || self.group_weight_changed?
-      connection.after_transaction_commit { self.context.recompute_student_scores }
+      self.class.connection.after_transaction_commit { self.context.recompute_student_scores }
     end
   end
 

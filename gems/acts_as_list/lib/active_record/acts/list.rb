@@ -243,7 +243,7 @@ module ActiveRecord
         def update_order(ids)
           updates = []
           done_ids = Set.new
-          id_column = connection.quote_column_name(self.class.primary_key)
+          id_column = self.class.connection.quote_column_name(self.class.primary_key)
           ids.each do |id|
             id = id.to_i
             next unless id > 0

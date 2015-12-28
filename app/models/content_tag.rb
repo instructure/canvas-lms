@@ -92,7 +92,7 @@ class ContentTag < ActiveRecord::Base
   end
 
   def touch_context_module_after_transaction
-    connection.after_transaction_commit {
+    self.class.connection.after_transaction_commit {
       touch_context_module
     }
   end

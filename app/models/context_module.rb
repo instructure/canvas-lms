@@ -79,7 +79,7 @@ class ContextModule < ActiveRecord::Base
 
   def relock_progressions(relocked_modules=[])
     return if relocked_modules.include?(self)
-    connection.after_transaction_commit do
+    self.class.connection.after_transaction_commit do
       relocked_modules << self
       self.context_module_progressions.update_all(:workflow_state => "locked")
       self.invalidate_progressions
@@ -91,7 +91,7 @@ class ContextModule < ActiveRecord::Base
   end
 
   def invalidate_progressions
-    connection.after_transaction_commit do
+    self.class.connection.after_transaction_commit do
       if context_module_progressions.where(current: true).update_all(current: false) > 0
         # don't queue a job unless necessary
         send_later_if_production_enqueue_args(:evaluate_all_progressions, {:strand => "module_reeval_#{self.global_context_id}"})

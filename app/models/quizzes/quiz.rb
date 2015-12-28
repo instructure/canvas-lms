@@ -813,7 +813,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   end
 
   def check_if_submissions_need_review
-    self.connection.after_transaction_commit do
+    self.class.connection.after_transaction_commit do
       version_num = self.version_number
       submissions_to_update = []
       self.quiz_submissions.each do |sub|

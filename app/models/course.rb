@@ -886,7 +886,7 @@ class Course < ActiveRecord::Base
 
   def update_final_scores_on_weighting_scheme_change
     if @group_weighting_scheme_changed
-      connection.after_transaction_commit { self.recompute_student_scores }
+      self.class.connection.after_transaction_commit { self.recompute_student_scores }
     end
   end
 

@@ -826,7 +826,7 @@ class Account < ActiveRecord::Base
 
     self.shard.activate do
       role_scope = Role.not_deleted.where(:name => role_name)
-      if connection.adapter_name == 'PostgreSQL'
+      if self.class.connection.adapter_name == 'PostgreSQL'
         role_scope = role_scope.where("account_id = ? OR
           account_id IN (
             WITH RECURSIVE t AS (

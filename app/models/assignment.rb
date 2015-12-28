@@ -351,7 +351,7 @@ class Assignment < ActiveRecord::Base
   def update_grades_if_details_changed
     if points_possible_changed? || muted_changed? || workflow_state_changed?
       Rails.logger.info "GRADES: recalculating because assignment #{global_id} changed. (#{changes.inspect})"
-      connection.after_transaction_commit { self.context.recompute_student_scores }
+      self.class.connection.after_transaction_commit { self.context.recompute_student_scores }
     end
     true
   end
@@ -520,7 +520,7 @@ class Assignment < ActiveRecord::Base
   # this is necessary to generate new permissions cache keys for students
   def touch_submissions_if_muted
     if muted_changed?
-      connection.after_transaction_commit do
+      self.class.connection.after_transaction_commit do
         submissions.touch_all
       end
     end

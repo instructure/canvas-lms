@@ -208,7 +208,7 @@ class DiscussionEntry < ActiveRecord::Base
         dt = dt.root_topic
         break if dt.blank?
       end
-      connection.after_transaction_commit { self.discussion_topic.update_materialized_view }
+      self.class.connection.after_transaction_commit { self.discussion_topic.update_materialized_view }
     end
   end
 
