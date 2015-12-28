@@ -557,8 +557,8 @@ module AttachmentFu # :nodoc:
             callback :after_save_and_attachment_processing
           end
 
-          if connection.open_transactions == 1
-            connection.after_transaction_commit(&save_and_callbacks)
+          if self.class.connection.open_transactions == 1
+            self.class.connection.after_transaction_commit(&save_and_callbacks)
           else
             save_and_callbacks.call()
           end
@@ -583,13 +583,23 @@ module AttachmentFu # :nodoc:
           chain = ActiveSupport::Callbacks::CallbackChain.new(method, {})
 
           kind, chain_name = method.to_s.split('_', 2) # e.g. :after_save becomes 'after', 'save'
-          chain.concat(self.send("_#{chain_name}_callbacks").to_a.select{|callback| callback.kind.to_s == kind})
+          chain.append(*(self.send("_#{chain_name}_callbacks").to_a.select{|callback| callback.kind.to_s == kind}))
 
-          str = chain.compile
-          class_eval <<-RUBY_EVAL, __FILE__, __LINE__ + 1
-            def #{runner_method}() #{str} end
-            protected :#{runner_method}
-          RUBY_EVAL
+          if CANVAS_RAILS4_0
+            str = chain.compile
+            class_eval <<-RUBY_EVAL, __FILE__, __LINE__ + 1
+              def #{runner_method}()
+                #{str}
+              end
+              protected :#{runner_method}
+            RUBY_EVAL
+          else
+            class_eval <<-RUBY, __FILE__, __LINE__ + 1
+            def #{runner_method}(&block)
+              __run_callbacks__(_#{chain_name}_callbacks, &block)
+            end
+            RUBY
+          end
         end
         self.send(runner_method)
       end
