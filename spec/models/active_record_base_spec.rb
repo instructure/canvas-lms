@@ -548,6 +548,17 @@ describe ActiveRecord::Base do
       p1.reload
       expect { p2.reload }.to raise_error(ActiveRecord::RecordNotFound)
     end
+
+    it "does offset too" do
+      u = User.create!
+      p1 = u.pseudonyms.create!(unique_id: 'a', account: Account.default)
+      p2 = u.pseudonyms.create!(unique_id: 'b', account: Account.default)
+      p3 = u.pseudonyms.create!(unique_id: 'c', account: Account.default)
+      u.pseudonyms.scoped.reorder("unique_id DESC").limit(1).offset(1).delete_all
+      p1.reload
+      expect { p2.reload }.to raise_error(ActiveRecord::RecordNotFound)
+      p3.reload
+    end
   end
 
   describe "add_index" do

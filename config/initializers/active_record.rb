@@ -870,17 +870,9 @@ ActiveRecord::Relation.class_eval do
   alias_method_chain :delete_all, :joins
 
   def delete_all_with_limit(conditions = nil)
-    if limit_value
-      case connection.adapter_name
-      when 'MySQL', 'Mysql2'
-        v = arel.visitor
-        sql = "DELETE #{quoted_table_name} FROM #{quoted_table_name} #{arel.where_sql}
-            ORDER BY #{arel.orders.map { |x| v.send(:visit, x) }.join(', ')} LIMIT #{v.send(:visit, arel.limit)}"
-        return connection.delete(sql, "#{name} Delete all")
-      else
-        scope = except(:select).select("#{quoted_table_name}.#{primary_key}")
-        return unscoped.where(primary_key => scope).delete_all
-      end
+    if limit_value || offset_value
+      scope = except(:select).select("#{quoted_table_name}.#{primary_key}")
+      return unscoped.where(primary_key => scope).delete_all
     end
     delete_all_without_limit(conditions)
   end
