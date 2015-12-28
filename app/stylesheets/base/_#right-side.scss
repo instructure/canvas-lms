@@ -112,10 +112,8 @@
       display: block;
     }
     em, .more_link {
-      font: {
-        style: italic;
-        size: 10px;
-      };
+      font-style: italic;
+      @include fontSize(12px);
       line-height: 13px;
     }
     em {
