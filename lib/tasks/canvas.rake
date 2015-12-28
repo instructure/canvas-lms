@@ -253,26 +253,16 @@ namespace :db do
       raise "Run with RAILS_ENV=test" unless Rails.env.test?
       config = ActiveRecord::Base.configurations['test']
       queue = config['queue']
-      if CANVAS_RAILS3
-        drop_database(queue) if queue rescue nil
-        drop_database(config) rescue nil
-      else
-        ActiveRecord::Tasks::DatabaseTasks.drop(queue) if queue rescue nil
-        ActiveRecord::Tasks::DatabaseTasks.drop(config) rescue nil
-      end
+      ActiveRecord::Tasks::DatabaseTasks.drop(queue) if queue rescue nil
+      ActiveRecord::Tasks::DatabaseTasks.drop(config) rescue nil
       Canvas::Cassandra::DatabaseBuilder.config_names.each do |cass_config|
         db = Canvas::Cassandra::DatabaseBuilder.from_config(cass_config)
         db.tables.each do |table|
           db.execute("DROP TABLE #{table}")
         end
       end
-      if CANVAS_RAILS3
-        create_database(queue) if queue
-        create_database(config)
-      else
-        ActiveRecord::Tasks::DatabaseTasks.create(queue) if queue
-        ActiveRecord::Tasks::DatabaseTasks.create(config)
-      end
+      ActiveRecord::Tasks::DatabaseTasks.create(queue) if queue
+      ActiveRecord::Tasks::DatabaseTasks.create(config)
       ::ActiveRecord::Base.connection.schema_cache.clear!
       ::ActiveRecord::Base.descendants.each(&:reset_column_information)
       Rake::Task['db:migrate'].invoke
