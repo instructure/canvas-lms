@@ -323,13 +323,23 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       end
     end
 
-    it "should change paragraph type" do
+    it "should change paragraph type to preformatted" do
       text = "<p>This is a sample paragraph</p><p>This is a test</p><p>I E O U A</p>"
       wysiwyg_state_setup(text)
       driver.find_element(:xpath, "//button/span[text()[contains(.,'Paragraph')]]").click
       driver.find_element(:xpath, "//span[text()[contains(.,'Preformatted')]]").click
       in_frame wiki_page_body_ifr_id do
         expect(ff('#tinymce pre').length).to eq 3
+      end
+    end
+
+    it "should change paragraph type to Header 2", priority: "1", test_id: 417581 do
+      text = "<p>This is a sample paragraph</p><p>This is a test</p><p>I E O U A</p>"
+      wysiwyg_state_setup(text)
+      driver.find_element(:xpath, "//button/span[text()[contains(.,'Paragraph')]]").click
+      driver.find_element(:xpath, "//span[text()[contains(.,'Header 2')]]").click
+      in_frame wiki_page_body_ifr_id do
+        expect(ff('#tinymce h2').length).to eq 3
       end
     end
 
