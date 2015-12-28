@@ -250,6 +250,13 @@ $iconWhiteSpritePath: $iconSpritePath !default;
 //====================
 // Font Size Variables
 //====================
+$ic-font-size--xlarge:   28px;
+$ic-font-size--large:    23px;
+$ic-font-size--medium:   16px;
+$ic-font-size--small:    14px;
+$ic-font-size--xsmall:   12px;
+
+/* Legacy variables. Discontinue to use these: */
 $h1-font-size:  23px;
 $h2-font-size:  14px;
 $h3-font-size:  19px;
