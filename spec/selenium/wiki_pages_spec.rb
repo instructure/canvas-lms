@@ -387,6 +387,26 @@ describe "Wiki Pages" do
         element.send_keys(:tab)
         check_element_has_focus(f('.restore-link'))
       end
+
+      it "should validate that revision restored is displayed", priority: "1", test_id: 126832 do
+        get "/courses/#{@course.id}/pages/#{@vpage.url}"
+        f('.icon-settings').click
+        expect(f('.icon-clock')).to be_present
+        f('.view_page_history').click
+        wait_for_ajaximations
+        ff(".revision-details")[1].click
+        expect(f('.restore-link')).to be_present
+        f('.restore-link').click
+        keep_trying_until do
+          f('.close-button').click
+        end
+        wait_for_ajaximations
+        f('.icon-edit').click
+        keep_trying_until do
+          f('.btn-primary').click
+        end
+        expect(f('div.user_content.clearfix.enhanced > p').text).to include 'published by teacher'
+      end
     end
 
     context "Edit Page" do

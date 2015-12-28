@@ -44,6 +44,19 @@ describe "student groups" do
       expect(f(".icon-lock")).to be_displayed
     end
 
+    it "should restrict students from accessing groups in unpublished course", priority: "1", test_id: 246620 do
+      group_test_setup(1,1,1)
+      add_user_to_group(@students.first,@testgroup[0])
+      @course.workflow_state = 'unpublished'
+      @course.save!
+      user_session(@students.first)
+      get "/courses/#{@course.id}/groups"
+      fln("Visit").click
+      keep_trying_until do
+        expect(f("#unauthorized_message")).to be_displayed
+      end
+    end
+
     describe "new student group" do
       before(:each) do
         seed_students(5)
