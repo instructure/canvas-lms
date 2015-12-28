@@ -52,7 +52,7 @@ class WebConference < ActiveRecord::Base
 
   serialize :settings
   def settings
-    read_attribute(:settings) || write_attribute(:settings, default_settings)
+    read_or_initialize_attribute(:settings, {})
   end
 
   # whether they replace the whole hash or just update some values, make sure

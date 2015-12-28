@@ -2567,7 +2567,7 @@ class Course < ActiveRecord::Base
   end
 
   def settings_frd
-    read_attribute(:settings) || write_attribute(:settings, {})
+    read_or_initialize_attribute(:settings, {})
   end
 
   def disable_setting_defaults

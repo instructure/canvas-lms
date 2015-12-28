@@ -129,7 +129,7 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   def settings
-    read_attribute(:settings) || write_attribute(:settings, {})
+    read_or_initialize_attribute(:settings, {})
   end
 
   def label_for(key, lang=nil)

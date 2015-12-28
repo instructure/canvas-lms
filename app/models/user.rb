@@ -1366,7 +1366,7 @@ class User < ActiveRecord::Base
   end
 
   def preferences
-    read_attribute(:preferences) || write_attribute(:preferences, {})
+    read_or_initialize_attribute(:preferences, {})
   end
 
   def custom_colors

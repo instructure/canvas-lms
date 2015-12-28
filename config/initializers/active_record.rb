@@ -12,6 +12,11 @@ class ActiveRecord::Base
     delegate :distinct_on, to: :scoped
   end
 
+  def read_or_initialize_attribute(attr_name, default_value)
+    # have to read the attribute again because serialized attributes in Rails 4.2 get duped
+    read_attribute(attr_name) || (write_attribute(attr_name, default_value) && read_attribute(attr_name))
+  end
+
   alias :clone :dup
 
   def serializable_hash(options = nil)
