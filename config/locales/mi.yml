@@ -11392,12 +11392,15 @@ mi:
       show: "Whakaaturia taipitopito whakautu "
       show_all: "Whakaaturia taipitopito whakautu mō ngā pātai katoa "
     correct_answer: "whakautu tika "
+    correct_response_ratio: "%{ratio}% o koutou ākonga whakahoki tika tenei pātai. "
     discrimination_index: 
       audible_bottom_bracket: "Taiapa Raro: "
       audible_bracket_aced: "Kua whakahoki tika ākonga katoa i roto i tenei taiapa. "
       audible_bracket_failed: "Ehara i kua whakaratohia he whakautu tika he ākonga kotahi i roto i tenei taiapa. "
       audible_chart_description: "I tēnei rārangi pēhea ia taiapa o ngā ākonga i roto i te piha haapiiraa i pahono ki tenei pātai. E tito Ākonga taiapa i runga i to ratou score. Kei roto i te taiapa runga o te 27% teitei, i te taiapa waenganui ngā o te waenga 46%, me ngā te taiapa raro o te raro 27%. "
+      audible_discrimination_index: "Index Whakahāweatanga: %{number}. "
       audible_middle_bracket: "Taiapa Reanga: "
+      audible_response_ratio_distribution: "Kua whakahoki tika %{correct_ratio}% o ngā ākonga i roto i tenei taiapa. "
       audible_top_bracket: "Taiapa Top: "
       discrimination_index: "Taupū Whakahāwea "
       discrimination_index_dialog_title: "Ko te Tūtohi Whakahāwea Index "
@@ -11406,8 +11409,10 @@ mi:
     download_submissions: "Tikiake Kōnae Katoa"
     duration_in_hours: 
       one: "{count} haora% "
+    duration_in_hours_and_minutes: "%{hours} me te %{minutes} "
     duration_in_minutes: 
       one: "{count} meneti% "
+    duration_in_minutes_and_seconds: "%{minutes} me te %{seconds}"
     duration_in_seconds: 
       one: "%{count} hēkona"
       other: "%{count} hēkona"
@@ -11416,13 +11421,16 @@ mi:
     loading_questions: "Kei te utaina tatauranga Question. Tatari koa te ia."
     no_answer: "No Whakautu"
     question_breakdown: "rärangi i pātai"
+    question_header: "Pātai %{position} "
     quiz-stats-noshow-warning: "He rohe Ahakoa awesomeness. E kore e taea e hoatu e matou tatauranga mō tēnei pātaitai, engari ka taea e koe te tiki i te pūrongo."
     response_student_count: 
       one: "1 ākonga"
+      other: "%{count} ngā ākonga"
       zero: Tangata
     sad-panda-alttext: "Mea Pouri i te whenua Panda."
     speedgrader: "Tirohia i roto i te SpeedGrader"
     summary: 
+      audible_chart_description: "piro %{above_average} ākonga i runga ranei i te toharite, me te %{below_average} i raro."
       avg_time: "Wā Wawaenga"
       chart_brushing_tip: "Aki: Ka taea e te arotahi koe he tuhaa motuhake o te rā mā te hanga i te kōwhiringa mā te whakamahi i tō pehu. "
       chart_title: "Ōrau Score rā "
@@ -11432,6 +11440,14 @@ mi:
       not_available_abbrev: "N / He"
       quiz_summary: "Whakarāpopoto Quiz "
       stdev: "ine Paerewa"
+      students_who_got_a_certain_score: 
+        one: "Kua riro te hoê ākonga te kaute o te %{score}%. "
+        other: "Kua riro %{count} ngā ākonga te kaute o te %{score}%."
+        zero: "Kua riro No ākonga te kaute o te %{score}%."
+      students_who_scored_in_a_range: 
+        one: "Kua piro Kotahi ākonga i waenganui i %{start} me te %{end}%."
+        other: "Kua piro %{count} ngā ākonga i waenganui i %{start} me te %{end}%."
+        zero: "Kua piro No ākonga i waenganui i %{start} me te %{end}%."
       table_description: "Tatauranga Whakarāpopoto hoki katoa ka tahuri i roto i te tāpaetanga "
     title: "Quiz Tatauranga"
     unknown_answer: "Te tahi mea Penei "
@@ -11447,6 +11463,7 @@ mi:
       one: "%{count} pts"
       other: "%{count} pts"
     at_the_bottom: "- I te raro - "
+    before_quiz_item: "i mua i %{name}"
     buttons: 
       add_selected_questions: "Tāpiri Pātai tīpakohia "
       adding_questions: "Tāpiri Pātai ... "
@@ -11454,6 +11471,7 @@ mi:
       create_question: "Waihanga Pātai "
       creating_group: "Te hanga Rōpū ..."
       generating: "Whakanao ... "
+      generating_combinations_progress: "Te whakaputa... (%{done}/%{total})"
       save: Tiakina
       save_and_publish: "Tiaki & Whakaputa"
       saved: "Ora! "
@@ -11501,6 +11519,7 @@ mi:
     file_uploaded_or_removed: 
       quizzes: 
         file_successfully_uploaded: "Kua oti pai tukuake tō kōnae. "
+        files_removed: "Kua %{display_name} kua tangohia. "
     final_answer: "Whakautu whakamutunga "
     headers: 
       assignment_quizzes: "Taumahi Quizzes "
@@ -11553,12 +11572,14 @@ mi:
     loading_question_banks: "Uta Pātai Banks ..."
     loading_questions: "Uta Pātai ..."
     message_students: "ngā ākonga Karere"
+    message_students_for_context: "Ngā ākonga Karere mo %{context} "
     moderate: 
       buttons: 
         extend_time: "Toro Wā"
         extending_time: "Te whakawhānui Wā ... "
         save: Tiakina
         save_failed: "Whakaorangia rahua, ngana anō koa"
+        save_failed_n_updates_lost: "Tiakina ngā rahua, kihai i whakahōungia %{n} ākonga "
         saving: "Kei te tohua"
         time_extension_failed: "Toro Time rahua, ngana anō koa"
       confirms: 
@@ -11571,8 +11592,11 @@ mi:
         quiz_submission_extra_time_too_long: "Kia iti iho i te i te 10080 te wā anō."
         quiz_submission_extra_time_too_short: "Kia nui ake i te 0 te wā anō."
         server_communication_failed: "He ko te raruraru kōrero ki te tūmau. Ka ngana anō te pūnaha i roto i te rima meneti, ranei ka taea e koe tāuta anō i te whārangi "
+      extensions_for_student: "Toronga mō te %{student}"
       extensions_for_students: 
         one: "Toronga mō te% {count} ngā ākonga "
+        other: "Toronga mō te %{count} ngā ākonga  "
+      finished_in_duration: "mutu i roto i te %{duration} "
       time_up: "Up Time!"
       titles: 
         autosubmit_dialog: "Kōhure Quiz Tukunga"
@@ -11591,6 +11615,10 @@ mi:
     question_colon: "pātai:"
     question_count: 
       one: "{count} Pātai% "
+    question_limit_reached: |-
+        Kua tae koe ki te tau mōrahi o ngā pātai whakaaetia mo te pātaitai (%{count}/%{limit}).
+        
+        Ka rite ki te kimi, whakaaro horahanga i te rauemi puta noa i ngā parawhakawai maha.
     quiz: 
       current_filter: "Tātari nāianei"
       default_question_input: "[Tīpakohia]"
@@ -11600,12 +11628,16 @@ mi:
         invalid_hide_results: "E kore he tika Huna hua"
         invalid_ip_filter: "E kore he tika tātari IP"
         invalid_quiz_type: "E kore he whaimana momo Quiz"
+      question_name_counter: "Pātai %{question_number} "
       types: 
         quiz: patapatai
         survey: Survey
     quiz_attempts_length_error: "E whāiti nganatanga Quiz ki 3 ngā mati, ki te hiahia koe ki te hoatu i to outou ākonga ngana mutunga, e kore e tirohia Tukua pouaka nganatanga maha ki te maui"
     quiz_attempts_nan_error: "Ka taea anake te tohua ngā nganatanga pātaitai i roto i te tau"
     quiz_group: 
+      errors: 
+        no_bank: "Kāore i kitea te pēke pātai mō te rōpū pātaitai %{group_name}"
+        no_permissions: "Kihai Kaiwhakamahi whai whakaaetanga ki te tohutoro pēke ui pātai i roto i te rōpū quiz %{group_name}"
       question_group: "Rōpū pātai"
     quiz_item_group_view: 
       no_quizzes: "Kāore i kitea he parawhakawai"
@@ -11622,6 +11654,7 @@ mi:
         question_name: pātai
     quiz_short_answer_length_error: "Me Whakautu mo makona ana, i te mau uiraa pātea i raro i 80 pūāhua te roa"
     quiz_statistics: 
+      statistics_filename: "%{quiz_title} %{quiz_type} %{report_type} pūrongo"
       types: 
         item_analysis: "Analysis nama"
         student_analysis: "Analysis Ākonga"
@@ -11631,6 +11664,7 @@ mi:
         this_is_an_external_frame: "Ko te anga waho, kahore kuputuhi tenei, a kua puta ke i taea e mai tukuna te ākonga"
         this_is_an_image: "Ko te kore, image kuputuhi tenei, a kua puta ke i taea e mai tukuna te ākonga"
     quiz_submission_events: 
+      default_submission_crumb: "Tukunga %{id}"
       errors: 
         quiz_log_auditing_required: "Me te āhuatanga arotaupū roko pātaitai kia whakahohea mō tēnei akoranga."
       index: 
@@ -11643,6 +11677,8 @@ mi:
         invalid_submissions: "E kore e taea te manatoko tēnei tukunga pātaitai rite ki a koe,. Tēnā ngana anō."
         late_quiz: "Tuku e koe i tenei pātaitai mutunga, a koutou whakautu kore ai kua tuhia."
         protected_quiz: "Tiakina ana tēnei pātaitai, me te Kei te wātea anake i etahi wāhi. Kāore te rorohiko e whakamahi ana koe i tēnei wā puta ki te waiho i te wāhi tika mō te tango i tēnei pātaitai."
+      show: 
+        score_out_of: "Ka koe %{score} i roto i te %{points_possible}"
       still_zipping: "Kakati tonu Kōnae i roto i te tukanga ..."
     quizzes: 
       access_code: 
@@ -11661,6 +11697,7 @@ mi:
           your_answer: "tou Whakautu"
         margin_of_error: "tawhē o te hapa"
         plus_or_minus: +/-
+        range_answer: "I waenganui %{lower_bound} me te %{upper_bound}"
         you_left_this_blank: "(Waiho koe tēnei kia pātea tonu)"
       display_question: 
         default_question_answer: "[Kōwhiria]"
@@ -11676,6 +11713,7 @@ mi:
           variables: tāupe
         labels: 
           additional_comments: "tahi atu Comments"
+          for_answer_number: "Whakautu %{answer_number}"
           warning_icon: Whakatūpato
         links: 
           delete_question: "Mukua tenei Pātai"
@@ -11683,18 +11721,24 @@ mi:
           move_copy_question: "nekehanga / tārua pātai ki tētahi atu pēke"
         not_yet_graded: "E kore ano mākahia"
         original_score: "Tapeke Taketake:"
+        points_possible: "%{points_possible} pts"
         regraded_score: "Tapeke te māka anō:"
+        show_ansers_for_variable: "Whakaatu pahonoraa mō te %{variable}"
         skip_question_text: "Haere ki te ui ki kuputuhi."
         submission_was_regraded: "Kua tēnei pātai kua māka anō."
         titles: 
           question_correct_comment: "Ka kite ngā ākonga i tēnei kōrero, ki te whiwhi ratou i te pātai tika"
           question_incorrect_comment: "Ka kite ngā ākonga i tēnei kōrero, ki te whiwhi ratou i te pātai he"
           question_neutral_comment: "Ka kite ngā ākonga i tēnei kōrero kua whakahoki kotahi ratou te pātai"
+        unsupported_question_type: "I tīkina ake tēnei pātai i tētahi pūtake waho. Ko te he '%{question_type}' pātai, kāore i te tautokohia i roto i tenei taputapu pātaitai."
         you_left_this_blank: "(Waiho koe tēnei kia pātea tonu)"
       download_file_upload_submissions: 
         links: 
           download_submissions: "Tikiake Kōnae Katoa"
       equations_help: 
+        equation_functions: "I tua atu ki taurangi, i reira e ano he kohinga o ngā mahi kaiawhina taea e koe te whakamahi i ki te whakaputa uara whai hua. No te tauira: %{example} Hei kite i te exaplanation o te mahi i homai kaiawhina, tīpako i te reira i te rārangi i raro nei:"
+        equation_intro: "Hāngai ngā pātai tatauranga e runga i te huinga o tetahi atu ranei tātai computed i roto i te raupapa. Ka taea e koe te tautuhi i ngā taurangi takawaenga i roto i ēnei tātai, engari te hua tau o te tātai whakamutunga ko te mea kei te whakamahia ki te whakaputa i te whakautu tika. No te tauira: %{example} hoki tenei huinga o tātai, whakahoki te whakamutunga ko 71. Heoi, i reira he kore taurangi tautuhia kē, kia whai i te taua pātai ki te whakahoki taua ākonga katoa. A hi'oi te \"taurangi\" ripa mō ētahi atu mōhiohio i runga i taurangi."
+        equation_variables2: "Ka taea hoki te tautuhi i ngā taurangi i roto i to koutou kuputuhi pātai mā te whakamahi i taiapa (\"He aha te [he] + [b]?\"). No nga ana'iraa, ka kite koe i te \"uara Tauira\" i runga i te tautuhinga tāupe. Tenei taea ki a koe tirohia koutou pāngarau, me te kia mahi i te tātai. No te tauira, ki te ko koutou pātai \"He aha te mea [te] + 5?\" Na hiahia kia ui koe ki te tautuhi i te ao te \"te\". Ki te te uara tauira mō \"he\" 5.2 i, taea e koe te tuhituhi: %{example} Ki tenei tātai taea e koe te whakaputa i tetahi maha o ngā huinga otinga, me te uara rerekē o \"te\" i roto i ia huinga. Ai kite i tetahi ākonga te pātai, \"He aha te mea 5.2 + 5?\" a ka kite i tetahi ai \"He aha te mea 9 + 5?\"."
         links: 
           functions: Taumahi
           intro: intro
@@ -11707,12 +11751,17 @@ mi:
         page_titles: Quizzes
       find_question_from_bank: 
         already_added: "kei roto kē tēnei pātai i runga i te pātaitai"
+        bank_description: "%{bank_name}, %{n} pātai"
         buttons: 
           add_questions: "Tāpiri pātai"
           create_group: "Waihanga Rōpū"
           select_bank: "Tīpako Bank"
+        group_pick_count: "%{pick_count} pātai"
+        group_points: "%{points} ia pātai"
         headers: 
           bank_name: "ingoa Bank"
+        hints: 
+          group_pick_count: "%{pick_count} tīpakohia kia tawhiti"
         labels: 
           add_questions_to_group: "Tāpiri pātai ki te rōpū pātai"
           group_name: "ingoa rōpū"
@@ -11742,6 +11791,7 @@ mi:
         numerical_answer: "Whakautu Tau"
         possible_answer: "Whakautu pea"
       form_question: 
+        allow_tolerance: "tukua te tawhē hapa o +/- %{tolerance} "
         buttons: 
           create_update_question: "Waihanga / Whakahōu Pātai"
           generate: Hanga
@@ -11796,6 +11846,7 @@ mi:
           add_another_answer: "Tāpiri tētahi atu Whakautu "
           need_help: "Me te tauturu? "
         multi_answer_sets_example: "\"He Rōhi [color1], violets e [color2]\" i.e. "
+        offer_combinations: "Hei patunga %{how_many} ngā uara ka taea (max%{max_combinations}) "
         options: 
           only_one_correct: "Anake Kotahi Whakautu Tika "
           students_select_multiple: "Tīpakohia ngā ākonga pahonoraa Maha "
@@ -11813,6 +11864,7 @@ mi:
           short_answer: "Whakakiia I roto i te Blank "
           text_only: "Kupu (kahore pātai) "
           true_false: "True / Teka "
+        show_possible_answers: "Whakaaturia pahonoraa pea mo %{question} "
         show_possible_answers_no_question: "Whakaaturia pea pahonoraa no te "
         titles: 
           click_to_enter_correct_answer_comments: "Pāwhiritia ki te tomo kōrero mō te whakautu tika "
@@ -11823,25 +11875,36 @@ mi:
         anonymous_username: Akonga
         buttons: 
           allow_extra_attempt: "tukua tenei ākonga ha feinga anō "
+        default_quiz_name: "Pātaitai %{course_name} "
+        default_survey_name: "Rangahau %{course_name} "
         grade_by_question_warning: "Ko te auroro i te āhuatanga pātai pānga e te mau uiraa e Riwhiriwhia ngā i roto i te rōpū. "
         headers: 
           quiz_submissions: "Quiz Tukunga"
           survey_submissions: "Tukunga Survey "
+        latest_quiz_results: "Tenei te te hua pātaitai hou mō %{user}. Ka taea e koe te whakarerekē i nga ngā mo tetahi pātai me te tāpiri atu kōrero, ka pāwhiri \"Whakahōu Scores\" i te raro o te whārangi. "
+        latest_survey_results: "Tenei te te rangahau hou hua mō %{user}. Ka taea e koe te whakarerekē i nga ngā mo tetahi pātai me te tāpiri atu kōrero, ka pāwhiri \"Whakahōu Scores\" i te raro o te whārangi. "
         links: 
           back_to_quiz: "Hoki ki Quiz "
           back_to_survey: "Hoki ki Rapaau "
         logged_out_user: "Kua takiuru Out Kaiwhakamahi %{index} "
+        named_quiz_results: "%{quiz_name} Hua mō te %{user} "
         next_questions_arrow_title: "pātai Next "
+        no_more_attempts: "%{user} kahore he nganatanga i mahue"
+        page_title_quiz: "%{user}'s hītori pātaitai"
+        page_title_survey: "%{user}'s hītori rangahau"
         prev_questions_arrow_title: "pātai o mua "
         quiz_not_yet_taken: "Quiz kore kua ano i tangohia. "
         quiz_not_yet_taken_or_in_progress: "E kore kua Quiz kua riro ano ranei he wā i roto i te ahunga whakamua "
         quiz_unlimited_attempts: "He ngana mutunga tēnei pātaitai"
+        score_for_attempt: "Whakamātau %{attempt_number}: %{score}"
         survey_not_yet_taken: "Survey kore kua ano i tangohia."
         survey_not_yet_taken_or_in_progress: "E kore kua Survey kua riro ano ranei he wā i roto i te ahunga whakamua"
         survey_unlimited_attempts: "He ngana mutunga tenei rangahau"
         titles: 
           score_pending_review: "Kei te tārewa ana tēnei score arotake, a kia huri"
           submission_needs_review: "Me tēnei tukunga arotake "
+        unnamed_quiz_results: "Hua Quiz hoki %{user}"
+        unnamed_survey_results: "Survey Hua hoki %{user}"
         view_log: "Tirohia Rangitaki"
       index: 
         page_titles: Quizzes
@@ -11857,6 +11920,7 @@ mi:
           download_lockdown: "[Tikiake Respondus lockdown Pūtirotiro]"
         requires_lockdown: "Titau tēnei pātaitai Pūtirotiro Respondus lockdown. Tēnā whakarewa Pūtirotiro lockdown Respondus ki te tango i tēnei pātaitai tiro koutou hua pātaitai rānei."
       managed_quiz_data: 
+        anonymous_student: "Ākonga %{user_counter}"
         logged_out_user: "Kua takiuru Out Kaiwhakamahi %{user_counter}"
         titles: 
           submission_needs_review: "Me tēnei tukunga arotake "
@@ -11865,6 +11929,7 @@ mi:
         attempts: "nganatanga "
         autosubmit_link_description: "nganatanga "
         buttons: 
+          change_extensions_for_selected_students: "Hurihia Toronga mō te %{n} tīpakohia ngā ākonga "
           extend_time: "Toro Wā"
           save: Tiakina
         end_quiz_reference_time_current_end: "te wa o te mutunga o nāianei "
@@ -11872,6 +11937,9 @@ mi:
         end_the_quiz: "Whakamutua te pātaitai"
         extended_quiz_time_explanation: "Ka taea e hoatu e koe tenei ākonga wā anō i runga i to ratou Pātaitai nāianei. Kia pehea te nui te wa e hiahia ana koe ki te hoatu ki a ratou? "
         extra_time_on_every_attempt: "Wā anō i runga i nga ngana: "
+        finished_in: "mutu i roto i te %{duration} "
+        global_extra_attempt_time: "whiwhi kē katoa %{count} meneti"
+        global_extra_attempts: "whiwhi kē te katoa %{n}"
         headers: 
           attempt: "whakamātau "
           attempts_left: "nganatanga Mauī "
@@ -11889,10 +11957,12 @@ mi:
         maximum_of_1440_minutes: "Mōrahi o 1440 meneti (24 haora)"
         minutes: meneti
         minutes_from: "meneti i"
+        moderate_page_title: "%{title}: He āhua"
         outstanding_autosubmission_description: "He tino ēnei tāpaetanga pātaitai, pea no te mea i mahue te whārangi pātaitai he ākonga mua ki te tāpaetanga. Ki te hiahia koe ki te māka a ratou, pēhi koa 'tuku' i raro nei."
         outstanding_quiz_submissions_found: "He tāpaetanga pātaitai kōhure."
         page_title: "Quiz āhua"
         reload_student_table: "Uta anō tepu ākonga"
+        student_n: "Ākonga %{n}"
         submitting: "Te tuku ..."
         titles: 
           change_user_extensions: "Toronga Huria kaiwhakamahi"
@@ -11901,6 +11971,7 @@ mi:
           manually_unlocked: "Ā wetemaukati"
           minutes_to_add: "meneti ki te tāpiri"
           select_deselect_all: "Tīpakohia / whakawātea katoa"
+          select_user: "Tīpakohia %{user}"
       move_handle: 
         move_to: "Hūnuku ki"
         quiz_move_to_accessibility_warning: "Tenei huānga Ko te rerekē wātea atu ki te toia & maturuturu anō."
@@ -11911,6 +11982,7 @@ mi:
         question_group: "Ki te rōpū pātai:"
         save: Tiakina
         saving: "Kei te tohua"
+        where_to_move: "E rite hea koe ki te neke %{quiz_item}?"
       multi_answer: 
         choose_answer: Kōwhiri
       muted: 
@@ -11931,6 +12003,7 @@ mi:
           ip_filters: "He aha te kaitātari IP Wero Hinengaro"
         hide_correct_answers_at: "Huna pahonoraa tika i"
         hints: 
+          question_detail_disabled: "FAKATOKANGA: taipitopito Pātai kore e wātea ana, ka neke atu i te %{question_count}."
           quiz_score: "nama tonu ngā ākonga e riro ia aunoa kotahi tango ratou i te rangahau"
         ip_filters: "Ngā whiriwhiringa o Quiz IP e te ara ki te whakawhāiti i te uru ki te pātaitai, ki te rorohiko i roto i te whānuitanga IP i tohua. Ka taea e Tātari hei rārangi piko-wehea o wāhitau, he wāhitau aru e te kanohi (\"192.168.217.1\", \"192.168.217.1/24\" pe \"192.168.217.1/255.255.255.0\") ranei."
         label: 
@@ -11960,6 +12033,7 @@ mi:
         new_discussion: "Aparauraa New"
         one_question_at_a_time: "Whakaatu kotahi pātai i te wā "
         one_time_results: "Anake Kia muri ia Nganatanga "
+        points_possible: "Piro %{n} "
         post_to_sis: "Māka Post ki tātai"
         quiz_access_code: "Waehere uru hiahiatia "
         quiz_title: "Quiz Taitara"
@@ -11995,6 +12069,7 @@ mi:
         buttons: 
           update: Whakahouhia
         default_group_name: rōpū
+        edit_questions_and_points: "Tiki *%{num_questions}* pātai, #%{num_points}# ira ia pātai"
         labels: 
           group_name: "ingoa rōpū"
           number_of_questions: "Tau o Pātai"
@@ -12003,6 +12078,7 @@ mi:
         links: 
           link_to_a_question_bank: "Hono ki te Pātai Bank\n\
               \x20"
+        show_questions_and_points: "Tiki *%{num_questions}* pātai, #%{num_points}# ira ia pātai "
         titles: 
           add_question_to_group: "Tāpiri Pātai ki tenei Rōpū "
           collapse_group: "Tiango i te Rōpū"
@@ -12021,6 +12097,7 @@ mi:
           other_answers: "Ētahi atu pahonoraa "
         no_data: "No Raraunga "
         no_responses: "Kāore he whakautu tuhia hoki tenei pātai "
+        percent_of_responses: "%{percent}% o %{total} nganatanga tīpakohia tenei whakahoki"
         response_count: 
           one: "i hoatu % {count} ngā ākongatenei pātai"
       question_teaser: 
@@ -12094,11 +12171,14 @@ mi:
         until: Kia
         view_responses: "Tirohia ngā whakautu"
       quiz_submission: 
+        attempt_duration: "Ka mau tenei nganatanga %{duration}."
         buttons: 
           update_scores: "Whakahōu Tuhinga"
         labels: 
           final_score: "Score whakamutunga"
           fudge_points: "Piro fudge"
+          fudge_points_changed_points_quiz: "Mai ka mau %{user} tenei pātaitai, kua puta ke te maha o taea ngā na roto i te %{difference}. Ka taea te whakarite e koe mo tenei huringa me te tāpiri i ngā pai kino ranei, te whakamahi i tenei pouaka ā-."
+          fudge_points_changed_points_survey: "Mai ka mau %{user} tenei rangahau, kua puta ke te maha o taea ngā na roto i te %{difference}. Ka taea te whakarite e koe mo tenei huringa me te tāpiri i ngā pai kino ranei, te whakamahi i tenei pouaka ā-."
           fudge_points_generic_explanation: "Ka taea e koe te whakarite i ā-te kaute mā te tāpiri ngā pai kino ranei ki tenei pouaka."
           questions_need_review: "Me arotake i te uiraa i muri nei"
           quiz_score: "Quiz Score"
@@ -12109,6 +12189,8 @@ mi:
         links: 
           click_to_view_results: "Pāwhiri ki konei kia tiro i te hua."
         questions_not_graded: "Ētahi pātai kahore ano mākahia"
+        quiz_fudged_negative: "Kua tēnei tapeke pātaitai kua whakaritea ā-i +%{fudge} ngā."
+        quiz_fudged_positive: "Kua tēnei tapeke pātaitai kua whakaritea ā-i +%{fudge} ngā."
         quiz_not_yet_taken: "Ko te pātaitai kore kua ano i tangohia. "
         quiz_submission_needs_review: "Kua tino puta ke te pātaitai mai i hanga tēnei tukunga. Kia hiahia anō-māka tēnei tāpaetanga. "
         requires_lockdown: "Hiahiatia Pūtirotiro lockdown Respondus ki te tiro koutou hua pātaitai. "
@@ -12197,8 +12279,11 @@ mi:
       statistics: 
         class_too_large: "He nui rawa ki te whakaatu tatauranga tēnei akoranga. Taea tonu te tiki e ratou i te paetaha ringa matau."
         headers: 
+          for_question: "Hoki %{question_name}"
           quiz_statistics: "Quiz Tatauranga"
           survey_statistics: "rangahau a Tatauranga"
+          users_have_taken_this_quiz: "%{count} Kua tangohia kaiwhakamahi tenei pātaitai"
+          users_have_taken_this_survey: "%{count} Kua tangohia kaiwhakamahi tenei rangahau"
         labels: 
           average_correct: "toharite tika"
           average_incorrect: "toharite hē"
@@ -12207,6 +12292,7 @@ mi:
           low_score: "Score iti"
           mean_score: "Score toharite"
           standard_deviation: "ine Paerewa"
+          users_selected_the_answer: "Ko te kaiwhakamahi e whai ake nei i tīpakohia te whakautu, %{answer_text}"
         links: 
           count_all_attempts: "Count ** katoa nganatanga ** "
           count_only_latest_attempts: "Count anake ia Nganatanga Latest"
@@ -12214,12 +12300,14 @@ mi:
         quiz_all_version_disclaimer: "Kei te whakaatu tēnei pūrongo tatauranga pātaitai i runga i ngā nganatanga katoa mō ngā kaiwhakamahi katoa. "
         quiz_latest_version_disclaimer: "This report is showing quiz statistics based on the latest attempt for each user.\n\
             \x20"
+        student_n: "Ākonga %{student_counter} "
         survey_all_version_disclaimer: "Kei te whakaatu tēnei pūrongo tatauranga rangahau i runga i ngā nganatanga katoa mō ngā kaiwhakamahi katoa. "
         survey_latest_version_disclaimer: "Kei te whakaatu tēnei pūrongo tatauranga rangahau e hāngai ana i runga i te nganatanga hou mō ia kaiwhakamahi. "
       statistics_cqs: 
         page_title: Tatauranga
       statistics_crumb: Tatauranga
       submission_version: 
+        attempt_number: "Whakamātau %{att_no} "
         kept: "waiho e "
         latest: "Latest "
       submission_versions: 
@@ -12294,6 +12382,8 @@ mi:
       count_attempts: 
         one: "%{count} nganatanga"
         other: "%{count} nganatanga"
+      titles: 
+        submitted_users_for_quesiton: "Tāpaetia Kaiwhakamahi hoki %{user} "
       uncounted_submissions: 
         one: "{count} atu tāpaetanga% "
     take_quiz: 
@@ -12309,6 +12399,7 @@ mi:
         one: "%{count} "
         other: "%{count} "
       errors: 
+        connection_lost: "I ngaro hononga ki %{host}. Tēnā kia tūhono koe ki te Ipurangi i mua i tonu."
         only_numerical_values: "E whakaaetia anake ngā uara tau "
       hide_time_link: Huna
       hours_count: 
