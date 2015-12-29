@@ -28,7 +28,7 @@ describe "discussions" do
     user_session(@student1)
     find_vdd_time(@assignment)
     get "/courses/#{@course.id}/discussion_topics"
-    expect(f("#open-discussions .discussion-date-available").text).to include("Available until #{@lock_at_time[0, 6].strip}")
+    expect(f("#open-discussions .discussion-date-available").text).to include("Available until #{format_date_for_view(@assignment.lock_at)}")
     expect(f("#open-discussions .discussion-due-date").text).to include("Due #{@due_at_time}")
     expect_new_page_load{f('#open-discussions .discussion-title').click}
     expect(f('.discussion-reply-action')).to be_present
@@ -42,7 +42,7 @@ describe "discussions" do
     get "/courses/#{@course.id}/discussion_topics"
     keep_trying_until do
       expect(f("#open-discussions .discussion-date-available").text).
-                                                              to include("Not available until #{@unlock_at_time[0, 6].strip}")
+                                                              to include("Not available until #{format_date_for_view(@override.unlock_at)}")
       expect(f("#open-discussions .discussion-due-date").text).to include("Due #{@due_at_time}")
     end
     expect_new_page_load{f('#open-discussions .discussion-title').click}
@@ -60,7 +60,7 @@ describe "discussions" do
     # Find the due, available and lock dates of the assignment(everyone)
     find_vdd_time(@assignment)
     expect(f('.discussion-topic-due-dates')).to be_present
-    expect(f('.discussion-topic-due-dates tbody tr td:nth-of-type(1)').text).to include(@due_at_time[0, 6].strip)
+    expect(f('.discussion-topic-due-dates tbody tr td:nth-of-type(1)').text).to include(format_date_for_view(@assignment.due_at))
     expect(f('.discussion-topic-due-dates tbody tr td:nth-of-type(2)').text).to include('Everyone else')
     expect(f('.discussion-topic-due-dates tbody tr td:nth-of-type(3)').text).to include(@unlock_at_time)
     expect(f('.discussion-topic-due-dates tbody tr td:nth-of-type(4)').text).to include(@lock_at_time)
@@ -68,7 +68,7 @@ describe "discussions" do
     # Find the due, available and lock dates of the override(dates assigned to section)
     find_vdd_time(@override)
     expect(f('.discussion-topic-due-dates tbody tr:nth-of-type(2) td:nth-of-type(1)').text).
-                                                                                   to include(@due_at_time[0, 6].strip)
+                                                                                   to include(format_date_for_view(@override.due_at))
     expect(f('.discussion-topic-due-dates tbody tr:nth-of-type(2) td:nth-of-type(2)').text).to include('New Section')
     expect(f('.discussion-topic-due-dates tbody tr:nth-of-type(2) td:nth-of-type(3)').text).
                                                                                  to include(@unlock_at_time)

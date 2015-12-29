@@ -1235,7 +1235,7 @@ describe "context modules" do
       verify_persistence('Graded Published Discussion with Due Date')
       expect(f('span.publish-icon.published.publish-icon-published')).to be_displayed
       expect(f('.due_date_display').text).not_to be_blank
-      expect(f('.due_date_display').text).to eq @due_at.strftime('%b %-d')
+      expect(f('.due_date_display').text).to eq date_string(@due_at, :no_words)
       expect(f('.points_possible_display').text).to include_text "10 pts"
     end
   end

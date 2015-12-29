@@ -63,6 +63,7 @@ shared_context "in-process server selenium tests" do
   include CustomScreenActions
   include CustomValidators
   include CustomWaitMethods
+  include CustomDateHelpers
   include LoginAndSessionMethods
 
   # set up so you can use rails urls helpers in your selenium tests
