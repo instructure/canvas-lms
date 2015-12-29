@@ -76,6 +76,10 @@ class StreamItem < ActiveRecord::Base
       res.instance_variable_set(:@participants, users)
     end
 
+    unless CANVAS_RAILS4_0
+      data = res.class.attributes_builder.build_from_database(data) # @attributes is now an AttributeSet
+    end
+
     res.instance_variable_set(:@attributes, data)
     res.instance_variable_set(:@attributes_cache, {})
     res.instance_variable_set(:@new_record, false) if data['id']
