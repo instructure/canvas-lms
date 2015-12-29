@@ -60,7 +60,7 @@
   margin-bottom: $right_side_margin;
 }
 
-.right-side-list {
+#right-side .right-side-list {
   @include reset-list;
   @if $use_new_styles { margin: 0 0 $ic-sp; }
   @else { margin: 10px 0; }
@@ -78,7 +78,7 @@
         b, &.more_link {
           text-decoration: underline;
         }
-        em {
+        em, p {
           color: #666;
         }
       }
@@ -107,16 +107,18 @@
         font-size: 1em;
       }
     }
-    b, em {
+    b, em, p {
       font-weight: normal;
       display: block;
     }
-    em, .more_link {
-      font-style: italic;
+    p, .more_link {
       @include fontSize(12px);
       line-height: 13px;
     }
-    em {
+    em, .more_link {
+      font-style: italic;
+    }
+    em, p {
       @if $use_high_contrast {
         color: #555;
       }
@@ -124,6 +126,9 @@
         color: #777;
       }
       padding-bottom: 2px;
+    }
+    p {
+      margin-bottom: 0;
     }
     .more_link {
       padding-top: 6px;
@@ -139,6 +144,7 @@
   .recent_feedback_comment {
     color: $gray-light;
     border: 0;
+    font-size: 100%;
   }
   .tooltip {
     .tooltip_wrap {
@@ -162,6 +168,16 @@
       float: right;
       width: 1px;
       height: 1px;
+    }
+  }
+  &.to-do-list, &.events {
+    i {
+      width: 25px;
+    }
+    .todo-badge-wrapper {
+      display: inline-block;
+      vertical-align: top;
+      min-width: 25px;
     }
   }
   &.to-do-list {

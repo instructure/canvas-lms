@@ -39,41 +39,6 @@ describe "dashboard" do
       end
     end
 
-    it "should be able to ignore an assignment to grade permanently", priority: "1", test_id: 216398 do
-      assignment = assignment_model({:submission_types => 'online_text_entry', :course => @course})
-      student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :password => 'qwerty')
-      student2 = user_with_pseudonym(:active_user => true, :username => 'student2@example.com', :password => 'qwerty')
-      @course.enroll_user(student, "StudentEnrollment", :enrollment_state => 'active')
-      @course.enroll_user(student2, "StudentEnrollment", :enrollment_state => 'active')
-      assignment.reload
-      assignment.submit_homework(student, {:submission_type => 'online_text_entry', :body => 'ABC'})
-      assignment.reload
-      enable_cache do
-        get "/"
-
-        f('.to-do-list .disable_item_link').click
-        wait_for_ajaximations
-        f('#ignore_forever').click
-        wait_for_ajaximations
-        expect(f('.to-do-list > li')).to be_nil
-
-        get "/"
-
-        expect(f('.to-do-list')).to be_nil
-      end
-
-      assignment.reload
-      assignment.submit_homework(student2, {:submission_type => 'online_text_entry', :body => 'ABC'})
-      assignment.reload
-      enable_cache do
-        get "/"
-
-        expect(f('.to-do-list')).to be_nil
-
-      end
-
-    end
-
     it "should be able to ignore an assignment until the next submission", priority: "1", test_id: 216399 do
       assignment = assignment_model({:submission_types => 'online_text_entry', :course => @course})
       student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :password => 'qwerty')
@@ -86,10 +51,8 @@ describe "dashboard" do
       enable_cache do
         get "/"
 
-        f('.to-do-list .disable_item_link').click
-        wait_for_ajaximations
-        ignore_link = f('#ignore_until_submission')
-        expect(ignore_link).to include_text("Ignore Until New Submission")
+        ignore_link = f('.to-do-list .disable_item_link')
+        expect(ignore_link['title']).to include_text("Ignore until new submission")
         ignore_link.click
         wait_for_ajaximations
         expect(f('.to-do-list > li')).to be_nil
@@ -162,11 +125,8 @@ describe "dashboard" do
           get "/"
 
           ff('.to-do-list .disable_item_link').each do |link|
+            expect(link['title']).to include_text("Ignore until new mark")
             link.click
-            wait_for_ajaximations
-            ignore_link = f('#ignore_until_submission')
-            expect(ignore_link).to include_text("Ignore Until New Mark")
-            ignore_link.click
             wait_for_ajaximations
           end
 
@@ -203,8 +163,6 @@ describe "dashboard" do
           all_todo_links = ff('.to-do-list .disable_item_link')
           all_todo_links.last.click
           wait_for_ajaximations
-          ff('#ignore_forever').last.click
-          wait_for_ajaximations
 
           check_element_has_focus(all_todo_links.first)
         end
@@ -215,8 +173,6 @@ describe "dashboard" do
           get "/"
 
           f('.to-do-list .disable_item_link').click
-          wait_for_ajaximations
-          f('#ignore_forever').click
           wait_for_ajaximations
 
           check_element_has_focus(f('.event-list-view-calendar'))

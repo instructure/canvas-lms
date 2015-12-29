@@ -313,6 +313,11 @@
         @if $use_new_styles { color: $ic-color-success; }
         @else { color: #33802a; }
       }
+      .todo-badge {
+        @include ic-badge-maker(18px);
+        vertical-align: top;
+        margin-top: 2px;
+      }
     }
     div.event-details, div.todo-details {
       display: inline-block;

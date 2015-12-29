@@ -534,12 +534,12 @@ class UsersController < ApplicationController
   end
 
   def cached_submissions(user, upcoming_events)
-    Rails.cache.fetch(['cached_user_submissions', user].cache_key,
+    Rails.cache.fetch(['cached_user_submissions2', user].cache_key,
       :expires_in => 3.minutes) do
       assignments = upcoming_events.select{ |e| e.is_a?(Assignment) }
       Shard.partition_by_shard(assignments) do |shard_assignments|
         Submission.
-          select([:id, :assignment_id, :score, :workflow_state, :updated_at]).
+          select([:id, :assignment_id, :score, :grade, :workflow_state, :updated_at]).
           where(:assignment_id => shard_assignments, :user_id => user)
       end
     end
