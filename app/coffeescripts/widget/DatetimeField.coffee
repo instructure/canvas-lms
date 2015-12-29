@@ -189,7 +189,7 @@ define [
           'time-hour': null
           'time-minute': null
           'time-ampm': null
-      else if tz.hasMeridian()
+      else if tz.useMeridian()
         @$field.data
           'time-hour': tz.format(@datetime, "%-l")
           'time-minute': tz.format(@datetime, "%M")

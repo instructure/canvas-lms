@@ -249,6 +249,30 @@ define [
     tz.changeLocale(french, 'fr_FR')
     ok !tz.hasMeridian()
 
+  test "useMeridian() true if locale defines am/pm and uses 12-hour format", ->
+    I18nStubber.stub 'en', 'time.formats.tiny': '%l:%M%P'
+    ok tz.hasMeridian()
+    ok tz.useMeridian()
+
+  test "useMeridian() false if locale defines am/pm but uses 24-hour format", ->
+    I18nStubber.stub 'en', 'time.formats.tiny': '%k:%M'
+    ok tz.hasMeridian()
+    ok !tz.useMeridian()
+
+  test "useMeridian() false if locale doesn't define am/pm and instead uses 24-hour format", ->
+    tz.changeLocale(french, 'fr_FR')
+    I18nStubber.setLocale 'fr_FR'
+    I18nStubber.stub 'fr_FR', 'time.formats.tiny': '%-k:%M'
+    ok !tz.hasMeridian()
+    ok !tz.useMeridian()
+
+  test "useMeridian() false if locale doesn't define am/pm but still uses 12-hour format (format will be corrected)", ->
+    tz.changeLocale(french, 'fr_FR')
+    I18nStubber.setLocale 'fr_FR'
+    I18nStubber.stub 'fr_FR', 'time.formats.tiny': '%-l:%M%P'
+    ok !tz.hasMeridian()
+    ok !tz.useMeridian()
+
   test "isMidnight() is false when no argument given.", ->
     ok !tz.isMidnight()
 

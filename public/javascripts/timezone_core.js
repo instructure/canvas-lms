@@ -186,6 +186,12 @@ define([
       return _tz(new Date(), '%P') !== '';
     },
 
+    useMeridian: function() {
+      if (!this.hasMeridian()) return false;
+      var tiny = I18n.lookup('time.formats.tiny');
+      return tiny && tiny.match(/%-?l/);
+    },
+
     // apply any number of non-format directives to the value (parsing it if
     // necessary). return null for parse failure on the value or if one of the
     // directives was mistakenly a format string. returns the modified Date

@@ -175,7 +175,7 @@ define([
       var ampm = $div.find(".ui-datepicker-time-ampm").val() || $(this).data('time-ampm');
       if(hr || min) {
         text += " " + hr + ":" + (min || "00");
-        if (tz.hasMeridian()) {
+        if (tz.useMeridian()) {
           text += " " + (ampm || I18n.t('#time.pm'));
         }
       }
