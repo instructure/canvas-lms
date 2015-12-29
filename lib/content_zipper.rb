@@ -261,7 +261,9 @@ class ContentZipper
         @files_added = false if @files_added.nil?
       end
     end
-    folder.active_sub_folders.select{|f| !@check_user || f.grants_right?(@user, :read_contents)}.each do |sub_folder|
+    folder.active_sub_folders.select do |f|
+      !@check_user || f.grants_right?(@user, :read_contents_for_export)
+    end.each do |sub_folder|
       new_names = Array.new(folder_names) << sub_folder.name
       if callback
         zip_folder(sub_folder, zipfile, new_names, opts, &callback)

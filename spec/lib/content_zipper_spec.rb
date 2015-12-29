@@ -220,6 +220,24 @@ describe ContentZipper do
         names.sort
       end
 
+      context "in course with files tab hidden" do
+        before do
+          @course.tab_configuration = [{
+            id: Course::TAB_FILES,
+            hidden: true
+          }]
+          @course.save
+        end
+
+        it "should give logged in students some files" do
+          expect(zipped_files_for_user(@user)).to eq ['visible.png', 'visible/sub-vis.png'].sort
+        end
+
+        it "should give logged in teachers all files" do
+          expect(zipped_files_for_user(@teacher)).to eq ["locked/sub-locked-vis.png", "hidden/sub-hidden.png", "hidden.png", "visible.png", "visible/sub-locked.png", "visible/sub-vis.png", "locked.png"].sort
+        end
+      end
+
       context "in a private course" do
         it "should give logged in students some files" do
           expect(zipped_files_for_user(@user)).to eq ['visible.png', 'visible/sub-vis.png'].sort

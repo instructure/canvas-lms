@@ -461,10 +461,15 @@ class Folder < ActiveRecord::Base
     can :read
 
     given { |user, session| self.context.grants_right?(user, session, :read_as_admin) }
-    can :read_contents
+    can :read_contents, :read_contents_for_export
 
     given { |user, session| self.visible? && !self.locked? && self.context.grants_right?(user, session, :read) && !(self.context.is_a?(Course) && self.context.tab_hidden?(Course::TAB_FILES)) }#students.include?(user) }
-    can :read_contents
+    can :read_contents, :read_contents_for_export
+
+    given do |user, session|
+      self.visible? && !self.locked? && self.context.grants_right?(user, session, :read)
+    end
+    can :read_contents_for_export
 
     given { |user, session| self.context.grants_right?(user, session, :manage_files) }#admins.include?(user) }
     can :update and can :delete and can :create and can :read and can :read_contents
