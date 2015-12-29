@@ -55,6 +55,7 @@ ENV["RAILS_ENV"] = 'test'
 
 require File.expand_path('../../config/environment', __FILE__) unless defined?(Rails)
 require 'rspec/rails'
+require 'test/unit/assertions' unless CANVAS_RAILS4_0 # no longer automatically included in rspec-rails
 
 # ensure people aren't creating records outside the rspec lifecycle, e.g.
 # inside a describe/context block rather than a let/before/example
@@ -154,7 +155,7 @@ module RSpec::Rails
 
   module Matchers
     class HaveTag
-      include ActionDispatch::Assertions::SelectorAssertions
+      include CANVAS_RAILS4_0 ? ActionDispatch::Assertions::SelectorAssertions : Rails::Dom::Testing::Assertions::SelectorAssertions
       include Test::Unit::Assertions
 
       def initialize(expected)
