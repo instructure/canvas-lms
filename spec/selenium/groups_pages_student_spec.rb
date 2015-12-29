@@ -1,12 +1,13 @@
 require_relative 'common'
-require_relative 'helpers/groups_common'
 require_relative 'helpers/announcements_common'
-require_relative 'helpers/discussions_common'
-require_relative 'helpers/wiki_and_tiny_common'
-require_relative 'helpers/files_common'
 require_relative 'helpers/conferences_common'
 require_relative 'helpers/course_common'
+require_relative 'helpers/discussions_common'
+require_relative 'helpers/files_common'
+require_relative 'helpers/google_drive_common'
+require_relative 'helpers/groups_common'
 require_relative 'helpers/groups_shared_examples'
+require_relative 'helpers/wiki_and_tiny_common'
 
 describe "groups" do
   include_context "in-process server selenium tests"
@@ -15,6 +16,7 @@ describe "groups" do
   include CourseCommon
   include DiscussionsCommon
   include FilesCommon
+  include GoogleDriveCommon
   include GroupsCommon
   include WikiAndTinyCommon
 
@@ -299,6 +301,53 @@ describe "groups" do
         get conferences_page
         expect(f('.new-conference-btn')).to be_displayed
         verify_no_course_user_access(conferences_page)
+      end
+    end
+    #-------------------------------------------------------------------------------------------------------------------
+    describe "collaborations page" do
+      before(:each) do
+        set_up_google_docs
+        unless PluginSetting.where(name: 'google_docs').exists?
+          PluginSetting.create!(name: 'google_docs', settings: {})
+          PluginSetting.create!(name: 'google_drive', settings: {})
+        end
+      end
+
+      it 'lets student in group create a collaboration', priority: "1", test_id: 273641 do
+        get collaborations_page
+        replace_content(find('#collaboration_title'), "c1")
+        replace_content(find('#collaboration_description'), "c1 description")
+        fj('.available-users li:contains("1, Test Student") .icon-user').click
+        fj('.btn:contains("Start Collaborating")').click
+        wait_for_ajaximations
+        # Reload page and new collaboration will be displayed on main window
+        refresh_page
+        expect(element_exists(fj('.collaboration .title:contains("c1")'))).to be true
+        expect(element_exists(fj('.collaboration .description:contains("c1 description")'))).to be true
+      end
+
+      it 'can invite people within your group', priority: "1", test_id: 273642 do
+        students_in_group = @students
+        seed_students(2, 'non-group student')
+        get collaborations_page
+        students_in_group.each do |student|
+          expect(element_exists(fj(".available-users li:contains(#{student.sortable_name}) .icon-user"))).to be true
+        end
+      end
+
+      it 'cannot invite people not in your group', priority: "1", test_id: 588010 do
+        # overriding '@students' array with new students not included in the group
+        seed_students(2, 'non-group Student')
+        get collaborations_page
+        @students.each do |student|
+          expect(element_exists(fj(".available-users li:contains(#{student.sortable_name}) .icon-user"))).to be false
+        end
+      end
+
+      it "should only allow group members to access the group collaborations page", priority: "1", test_id: 319904 do
+        get collaborations_page
+        expect(find('#breadcrumbs').text).to include('Collaborations')
+        verify_no_course_user_access(collaborations_page)
       end
     end
   end

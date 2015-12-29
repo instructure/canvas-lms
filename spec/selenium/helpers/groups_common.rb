@@ -8,12 +8,13 @@ module GroupsCommon
     let(:pages_page) {url + '/pages'}
     let(:files_page) {url + '/files'}
     let(:conferences_page) {url + '/conferences'}
+    let(:collaborations_page) {url + '/collaborations'}
   end
 
-  def seed_students(count)
+  def seed_students(count, base_name = 'Test Student')
     @students = []
     count.times do |n|
-      @students << User.create!(:name => "Test Student #{n+1}")
+      @students << User.create!(:name => "#{base_name} #{n+1}")
       @course.enroll_student(@students.last).accept!
     end
   end
@@ -93,6 +94,7 @@ module GroupsCommon
         has_max_membership:false,
         member_limit: 0,
         group_category: nil,
+        add_students_to_group: false
     }
     params = default_params.merge(params)
 
@@ -113,6 +115,13 @@ module GroupsCommon
     end
 
     seed_students(params[:enroll_student_count]) if params[:enroll_student_count] > 0
+    if params[:add_students_to_group]
+      @students.each do |student|
+        add_user_to_group(student, group, false)
+      end
+    end
+
+    group
   end
 
   def create_student_group_as_a_teacher(group_name = "Windfury", enroll_student_count = 0)
