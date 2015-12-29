@@ -327,17 +327,15 @@ module AccountReports
 
         students = add_user_sub_account_scope(students)
 
-        potential_courses = Course.where(root_account_id: @domain_root_account)
+        potential_courses = Course.where(root_account_id: root_account)
         potential_courses = potential_courses.where(enrollment_term_id: term) if term
         potential_courses = potential_courses.where(id: course) if course
-        potential_courses = potential_courses.
-          joins(:course_account_associations).
-          where(course_account_associations: {account_id: account})
+        potential_courses = add_course_sub_account_scope(potential_courses)
 
         students = students.where(enrollments: {course_id: potential_courses})
 
-        students.find_in_batches do |batch|
-          batch.each do |u|
+        Shackles.activate(:slave) do
+          students.find_each do |u|
             row = []
             row << u.id
             row << u.sortable_name
