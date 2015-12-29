@@ -1858,7 +1858,8 @@ class ApplicationController < ActionController::Base
   end
 
   def ms_office?
-    request.user_agent.to_s =~ /ms-office/
+    !!(request.user_agent.to_s =~ /ms-office/) ||
+        !!(request.user_agent.to_s =~ %r{Word/\d+\.\d+})
   end
 
   def profile_data(profile, viewer, session, includes)

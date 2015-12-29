@@ -697,6 +697,13 @@ describe ApplicationController do
       ])
     end
   end
+
+  describe "#ms_office?" do
+    it "detects Word 2011 for mac" do
+      controller.request.user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X) Word/14.57.0'
+      expect(controller.send(:ms_office?)).to eq true
+    end
+  end
 end
 
 describe WikiPagesController do
