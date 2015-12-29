@@ -141,6 +141,11 @@ module ConversationsCommon
     message_body_input.send_keys(body)
   end
 
+  def click_faculty_journal # if the checkbox is not visible then end otherwise check it
+    checkbox = 'div.message-header-row:nth-child(5) > div:nth-child(2) > label:nth-child(2)'
+    f('.user_note').click if fj("#{checkbox}:visible")
+  end
+
   def click_send
     f('.compose-message-dialog .send-message').click
     wait_for_ajaximations
@@ -153,6 +158,7 @@ module ConversationsCommon
     (options[:to] || []).each {|recipient| add_message_recipient recipient}
     write_message_subject(options[:subject]) if options[:subject]
     write_message_body(options[:body]) if options[:body]
+    click_faculty_journal if options[:journal]
     click_send if options[:send].nil? || options[:send]
   end
 

@@ -1,8 +1,7 @@
 define [
-  'react'
   'jsx/gradebook/grid/stores/assignmentGroupsStore'
   'underscore'
-], (React, AssignmentGroupsStore, _) ->
+], (AssignmentGroupsStore, _) ->
 
   assignmentGroup = ->
     title: 'assignment group'

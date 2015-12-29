@@ -34,7 +34,7 @@ class MediaObject < ActiveRecord::Base
   EXPORTABLE_ASSOCIATIONS = [:user, :context, :attachment, :root_account, :media_tracks]
 
   validates_presence_of :media_id, :workflow_state
-  has_many :media_tracks, :dependent => :destroy, :order => 'locale'
+  has_many :media_tracks, -> { order(:locale) }, dependent: :destroy
   after_create :retrieve_details_later
   after_save :update_title_on_kaltura_later
   serialize :data

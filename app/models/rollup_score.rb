@@ -69,4 +69,5 @@ class RollupScore
     (latest_weighted + older_avg_weighted).round(2)
   end
 
+
 end

@@ -23,12 +23,12 @@ module Api::V1::Section
   def section_json(section, user, session, includes)
     res = section.as_json(:include_root => false,
                           :only => %w(id name course_id nonxlist_course_id start_at end_at))
-    if section.root_account.grants_any_right?(user, :read_sis, :manage_sis)
+    if section.course.grants_any_right?(user, :read_sis, :manage_sis)
       res['sis_section_id'] = section.sis_source_id
       res['sis_course_id'] = section.course.sis_source_id
       res['integration_id'] = section.integration_id
     end
-    res['sis_import_id'] = section.sis_batch_id if section.root_account.grants_right?(user, session, :manage_sis)
+    res['sis_import_id'] = section.sis_batch_id if section.course.grants_right?(user, session, :manage_sis)
     if includes.include?('students')
       proxy = section.enrollments
       if user_json_is_admin?

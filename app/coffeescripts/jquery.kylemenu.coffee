@@ -32,7 +32,7 @@ define [
                 .popup(@opts.popupOpts)
                 .addClass("ui-kyle-menu use-css-transitions-for-show-hide")
 
-      # passing an appendMenuTo option when initializing a kylemenu helps get aroud popup being hidden
+      # passing an appendMenuTo option when initializing a kylemenu helps get around popup being hidden
       # by overflow:scroll on its parents
       # but by doing so we need to make sure that click events still get propagated up in case we
       # were delegating events to a parent container

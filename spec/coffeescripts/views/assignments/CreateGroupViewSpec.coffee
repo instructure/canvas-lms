@@ -26,8 +26,11 @@ define [
     new CreateGroupView(args)
 
   module 'CreateGroupView',
-    setup: -> fakeENV.setup()
-    teardown: -> fakeENV.teardown()
+    setup: ->
+      fakeENV.setup()
+    teardown: ->
+      fakeENV.teardown()
+      $("form[id^=ui-id-]").remove()
 
   test 'hides drop options for no assignments', ->
     view = createView()

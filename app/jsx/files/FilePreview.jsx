@@ -93,6 +93,7 @@ define([
         overlayClassName='ReactModal__Overlay--ef-file-preview'
         style={modalOverrides}
         closeTimeoutMS={10}
+        appElement={document.getElementById('application')}
       >
         <div className='ef-file-preview-overlay'>
           <div className='ef-file-preview-header'>

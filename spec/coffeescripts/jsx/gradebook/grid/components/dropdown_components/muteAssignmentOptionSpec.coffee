@@ -1,8 +1,9 @@
 define [
+  'react'
   'jsx/gradebook/grid/components/dropdown_components/muteAssignmentOption',
   'compiled/gradebook2/SetDefaultGradeDialog'
   'jquery'
-], (SetDefaultGradeOption, SetDefaultGradeDialog, $) ->
+], (React, SetDefaultGradeOption, SetDefaultGradeDialog, $) ->
 
   wrapper = document.getElementById('fixtures')
 
@@ -20,6 +21,7 @@ define [
       @component = renderComponent()
     teardown: ->
       $('.ui-dialog').remove()
+      $("[id^=ui-id-]").remove()
       React.unmountComponentAtNode wrapper
 
   test 'mounts properly', ->

@@ -30,7 +30,9 @@ define [
       @clock.tick 250
       @clock.restore()
       @$holder.detach()
-      document.getElementById("fixtures").innerHTML = ""
+      $("#fixtures").empty()
+      $(".ui-tooltip").remove()
+      $(".error_box").remove()
       tz.restore(@snapshot)
 
   test "should init properly", ->

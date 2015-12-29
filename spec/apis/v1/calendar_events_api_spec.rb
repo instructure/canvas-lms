@@ -1726,20 +1726,30 @@ describe CalendarEventsApiController, type: :request do
       @observer.user_observees.create do |uo|
         uo.user_id = @student.id
       end
+      @contexts = [@course.asset_string]
+      @ctx_str = @contexts.join("&context_codes[]=")
+      @me = @observer
     end
 
     it "should return observee's calendar events" do
-      contexts = [@course.asset_string]
       3.times do |idx|
         @course.calendar_events.create(title: "event #{idx}", workflow_state: 'active')
       end
-      ctx_str = contexts.join("&context_codes[]=")
-      @me = @observer
       json = api_call(:get,
-        "/api/v1/users/#{@student.id}/calendar_events?all_events=true&context_codes[]=#{ctx_str}", {
+        "/api/v1/users/#{@student.id}/calendar_events?all_events=true&context_codes[]=#{@ctx_str}", {
         controller: 'calendar_events_api', action: 'user_index', format: 'json',
-        context_codes: contexts, all_events: true, user_id: @student.id})
-      expect(json.size).to eql 3
+        context_codes: @contexts, all_events: true, user_id: @student.id})
+      expect(json.length).to eql 3
+    end
+
+    it "should return submissions with assignments" do
+      assg = @course.assignments.create(workflow_state: 'published', due_at: 3.days.from_now, submission_types: "online_text_entry")
+      assg.submit_homework @student, submission_type: "online_text_entry"
+      json = api_call(:get,
+        "/api/v1/users/#{@student.id}/calendar_events?all_events=true&type=assignment&include[]=submissions&context_codes[]=#{@ctx_str}", {
+        controller: 'calendar_events_api', action: 'user_index', format: 'json', type: 'assignment', include: ['submissions'],
+        context_codes: @contexts, all_events: true, user_id: @student.id})
+      expect(json.first['assignment']['submission'].length).to eql 1
     end
   end
 

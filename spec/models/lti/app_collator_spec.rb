@@ -1,4 +1,3 @@
-#
 # Copyright (C) 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
@@ -21,8 +20,10 @@ require File.expand_path(File.dirname(__FILE__) + '/../../lti_spec_helper.rb')
 
 module Lti
   describe AppCollator do
-    subject { described_class.new(account) }
-    let (:account) { Account.create }
+
+    subject { described_class.new(account, mock_reregistration_url_builder)}
+    let(:account) { Account.create }
+    let(:mock_reregistration_url_builder) { -> (_c, _id) {"mock_url"} }
 
     context 'pagination' do
       it 'paginates correctly' do
@@ -47,9 +48,7 @@ module Lti
       it 'returns tool_proxy app definitions' do
         tool_proxy = create_tool_proxy
         tool_proxy.bindings.create(context: account)
-
         tools_collection = subject.bookmarked_collection.paginate(per_page: 100).to_a
-
         definitions = subject.app_definitions(tools_collection)
         expect(definitions.count).to eq 1
         definition = definitions.first
@@ -61,9 +60,10 @@ module Lti
                                    name: tool_proxy.name,
                                    description: tool_proxy.description,
                                    installed_locally: true,
+                                   has_update: nil,
                                    enabled: true,
                                    tool_configuration: nil,
-                                   reregistration: false
+                                   reregistration_url: nil
                                  })
 
       end
@@ -75,7 +75,7 @@ module Lti
         definitions = subject.app_definitions(tools_collection)
         expect(definitions.count).to eq 1
         definition = definitions.first
-        expect(definition).to eq( {
+        expect(definition).to eq({
                                     app_type: external_tool.class.name,
                                     app_id: external_tool.id,
                                     :context => external_tool.context_type,
@@ -83,9 +83,10 @@ module Lti
                                     name: external_tool.name,
                                     description: external_tool.description,
                                     installed_locally: true,
+                                    has_update: nil,
                                     enabled: true,
                                     tool_configuration: nil,
-                                    reregistration: false
+                                    reregistration_url: nil
                                   })
       end
 
@@ -115,32 +116,85 @@ module Lti
         expect(definitions.count).to eq 2
         external_tool = definitions.find { |d| d[:app_type] == 'ContextExternalTool' }
         tool_proxy = definitions.find { |d| d[:app_type] == 'Lti::ToolProxy' }
-        expect(external_tool[:reregistration]).to eq false
-        expect(tool_proxy[:reregistration]).to eq false
+        expect(external_tool[:reregistration_url]).to eq nil
+        expect(tool_proxy[:reregistration_url]).to eq nil
       end
 
       it 'has reregistartion set to true for tool proxies if the feature flag is enabled' do
         account.root_account.enable_feature!(:lti2_rereg)
         tool_proxy = create_tool_proxy
         tool_proxy.bindings.create(context: account)
+        ToolProxy.any_instance.stubs(:reregistration_message_handler).returns(true)
 
         tools_collection = subject.bookmarked_collection.paginate(per_page: 100).to_a
 
         definitions = subject.app_definitions(tools_collection)
         expect(definitions.count).to eq 1
         definition = definitions.first
-        expect(definition[:reregistration]).to eq true
+        expect(definition[:reregistration_url]).to eq 'mock_url'
+      end
+
+      it 'has_update set to false for tool proxies without an update_payload' do
+        account.root_account.enable_feature!(:lti2_rereg)
+
+        tool_proxy = create_tool_proxy
+        tool_proxy.bindings.create(context: account)
+
+        tools_collection = subject.bookmarked_collection.paginate(per_page: 100).to_a
+        definitions = subject.app_definitions(tools_collection)
+        expect(definitions.count).to eq 1
+        definition = definitions.first
+        expect(definition).to eq({
+                                     app_type: tool_proxy.class.name,
+                                     :context => tool_proxy.context_type,
+                                     :context_id => account.id,
+                                     app_id: tool_proxy.id,
+                                     name: tool_proxy.name,
+                                     description: tool_proxy.description,
+                                     installed_locally: true,
+                                     has_update: false,
+                                     enabled: true,
+                                     tool_configuration: nil,
+                                     reregistration_url: nil
+                                 })
+      end
+
+      it 'has_update set to true for tool proxies with an update_payload' do
+        account.root_account.enable_feature!(:lti2_rereg)
+
+        tool_proxy = create_tool_proxy
+        tool_proxy.bindings.create(context: account)
+        tool_proxy.update_payload = {one: 2}
+        tool_proxy.save!
+
+        tools_collection = subject.bookmarked_collection.paginate(per_page: 100).to_a
+        definitions = subject.app_definitions(tools_collection)
+        expect(definitions.count).to eq 1
+        definition = definitions.first
+        expect(definition).to eq({
+                                     app_type: tool_proxy.class.name,
+                                     :context => tool_proxy.context_type,
+                                     :context_id => account.id,
+                                     app_id: tool_proxy.id,
+                                     name: tool_proxy.name,
+                                     description: tool_proxy.description,
+                                     installed_locally: true,
+                                     has_update: true,
+                                     enabled: true,
+                                     tool_configuration: nil,
+                                     reregistration_url: nil
+                                 })
       end
 
       it 'has reregistartion set to false for external_tools if the feature flag is enabled' do
         account.root_account.enable_feature!(:lti2_rereg)
-        external_tool = new_valid_external_tool(account)
+        new_valid_external_tool(account)
         tools_collection = subject.bookmarked_collection.paginate(per_page: 100).to_a
 
         definitions = subject.app_definitions(tools_collection)
         expect(definitions.count).to eq 1
         definition = definitions.first
-        expect(definition[:reregistration]).to eq false
+        expect(definition[:reregistration_url]).to eq nil
       end
 
     end

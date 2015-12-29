@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe ContentZipper do
   describe "zip_assignment" do
-    it "sanitizes user names" do
+    it "processes user names" do
       s1, s2, s3 = n_students_in_course(3)
       s1.update_attribute :sortable_name, 'some_999_, _1234_guy'
       s2.update_attribute :sortable_name, 'other 567, guy 8'
@@ -328,7 +328,22 @@ describe ContentZipper do
   end
 
   describe "zip_eportfolio" do
-    it "should sanitize the zip file name" do
+    it "processes page entries with no content" do
+      user = User.create!
+      eportfolio = user.eportfolios.create!(name: 'an name')
+      eportfolio.ensure_defaults
+      attachment = eportfolio.attachments.build do |attachment|
+        attachment.display_name = 'an_attachment'
+        attachment.user = user
+        attachment.workflow_state = 'to_be_zipped'
+      end
+      attachment.save!
+      expect {
+        ContentZipper.zip_eportfolio(attachment, eportfolio)
+      }.to_not raise_error
+    end
+
+    it "processes the zip file name" do
       user = User.create!
       eportfolio = user.eportfolios.create!(name: '/../../etc/passwd')
 

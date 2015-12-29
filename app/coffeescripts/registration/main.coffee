@@ -3,7 +3,8 @@ define [
   'compiled/fn/preventDefault'
   'compiled/registration/signupDialog'
   'jst/registration/login'
-], ($, preventDefault, signupDialog, loginForm) ->
+  'compiled/behaviors/authenticity_token'
+], ($, preventDefault, signupDialog, loginForm, authenticity_token) ->
   $loginForm = null
 
   $('.signup_link').click preventDefault ->
@@ -22,11 +23,14 @@ define [
     unless $(e.target).closest('#registration_login, #login_form').length
       $loginForm?.hide()
 
-  $('#registration_login').on 'click focus', preventDefault ->
+  $('#registration_login').on 'click', preventDefault ->
     if $loginForm
       $loginForm.toggle()
     else
-      $loginForm = $(loginForm(login_handle_name: ENV.ACCOUNT.registration_settings.login_handle_name))
+      $loginForm = $(loginForm(
+        login_handle_name: ENV.ACCOUNT.registration_settings.login_handle_name
+        auth_token: authenticity_token()
+      ))
       $loginForm.appendTo($(this).closest('.registration-content'))
     if $loginForm.is(':visible')
       $loginForm.find('input:visible').eq(0).focus()

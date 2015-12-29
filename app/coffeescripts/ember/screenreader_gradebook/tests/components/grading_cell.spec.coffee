@@ -6,12 +6,11 @@ define [
 
   {run} = Ember
 
-  fixtures.create()
-
   setType = null
 
   module 'grading_cell',
     setup: ->
+      fixtures.create()
       App = startApp()
       @component = App.GradingCellComponent.create()
 

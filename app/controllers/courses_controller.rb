@@ -318,7 +318,7 @@ class CoursesController < ApplicationController
   #   'StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'ObserverEnrollment',
   #   or 'DesignerEnrollment'.
   #
-  # @argument include[] [String, "needs_grading_count"|"syllabus_body"|"total_scores"|"term"|"course_progress"|"sections"|"storage_quota_used_mb"|"total_students"|"favorites"|"teachers"]
+  # @argument include[] [String, "needs_grading_count"|"syllabus_body"|"total_scores"|"term"|"course_progress"|"sections"|"storage_quota_used_mb"|"total_students"|"favorites"|"teachers"|"observed_users"]
   #   - "needs_grading_count": Optional information to include with each Course.
   #     When needs_grading_count is given, and the current user has grading
   #     rights, the total number of submissions needing grading for all
@@ -365,6 +365,9 @@ class CoursesController < ApplicationController
   #   - "teachers": Teacher information to include with each Course.
   #     Returns an array of hashes containing the {{api:Users:UserDisplay UserDisplay} information
   #     for each teacher in the course.
+  #   - "observed_users": Optional information to include with each Course.
+  #     Will include data for observed users if the current user has an
+  #     observer enrollment.
   #
   # @argument state[] [String, "unpublished"|"available"|"completed"|"deleted"]
   #   If set, only return courses that are in the given state(s).
@@ -785,6 +788,8 @@ class CoursesController < ApplicationController
       params[:per_page] ||= params[:limit]
 
       search_params = params.slice(:search_term, :enrollment_role, :enrollment_role_id, :enrollment_type, :enrollment_state)
+      include_inactive = @context.grants_right?(@current_user, session, :read_as_admin)
+      search_params[:include_inactive_enrollments] = true if include_inactive
       search_term = search_params[:search_term].presence
 
       if search_term
@@ -817,14 +822,14 @@ class CoursesController < ApplicationController
         end
       end
       if includes.include?('enrollments')
-        enrollments_by_user = @context.enrollments.
-            active_or_pending.
-            where(user_id: users).
-            preload(:course).
-            group_by(&:user_id)
+        enrollment_scope = @context.enrollments.
+          where(user_id: users).
+          preload(:course)
+        enrollment_scope = include_inactive ? enrollment_scope.all_active_or_pending : enrollment_scope.active_or_pending
+        enrollments_by_user = enrollment_scope.group_by(&:user_id)
       end
       render :json => users.map { |u|
-        enrollments = enrollments_by_user[u.id] if includes.include?('enrollments')
+        enrollments = enrollments_by_user[u.id] || [] if includes.include?('enrollments')
         user_json(u, @current_user, session, includes, @context, enrollments)
       }
     end
@@ -1073,7 +1078,6 @@ class CoursesController < ApplicationController
         APP_CENTER: {
           enabled: Canvas::Plugin.find(:app_center).enabled?
         },
-        ENABLE_LTI2: @domain_root_account.feature_enabled?(:lti2_ui),
         LTI_LAUNCH_URL: course_tool_proxy_registration_path(@context),
         CONTEXT_BASE_URL: "/courses/#{@context.id}",
         PUBLISHING_ENABLED: @publishing_enabled
@@ -1476,9 +1480,7 @@ class CoursesController < ApplicationController
         enrollments = @course.current_enrollments.where(:user_id => @current_user).to_a
         if includes.include?("observed_users") &&
             enrollments.any?(&:assigned_observer?)
-          observees = ObserverEnrollment.observed_students(@course,
-                                                           @current_user)
-          observees.values.each { |v| enrollments.concat(v) }
+          enrollments.concat(ObserverEnrollment.observed_enrollments_for_courses(@course, @current_user))
         end
 
         includes << :hide_final_grades
@@ -1546,7 +1548,8 @@ class CoursesController < ApplicationController
         @padless = true
       when 'assignments'
         add_crumb(t('#crumbs.assignments', "Assignments"))
-        set_urls_and_permissions_for_assignment_index
+        set_js_assignment_data
+        js_env(:COURSE_HOME => true)
         get_sorted_assignments
       when 'modules'
         add_crumb(t('#crumbs.modules', "Modules"))
@@ -1613,7 +1616,7 @@ class CoursesController < ApplicationController
         :add_tas => course_users_path(:course_id => @context),
         :publish_course => course_path(@context)
       },
-      :permisssions => {
+      :permissions => {
         # Sending the permissions just so maybe later we can extract this easier.
         :can_manage_content => can_do(@context, @current_user, :manage_content),
         :can_manage_students => can_do(@context, @current_user, :manage_students),
@@ -2336,22 +2339,6 @@ class CoursesController < ApplicationController
     changes
   end
 
-  def set_urls_and_permissions_for_assignment_index
-    permissions = {manage: false}
-    js_env({
-      :COURSE_HOME => true,
-      :URLS => {
-        :new_assignment_url => new_polymorphic_url([@context, :assignment]),
-        :course_url => api_v1_course_url(@context),
-        :context_modules_url => api_v1_course_context_modules_path(@context),
-        :course_student_submissions_url => api_v1_course_student_submissions_url(@context)
-      },
-      :PERMISSIONS => permissions,
-      :current_user_has_been_observer_in_this_course => @context.user_has_been_observer?(@current_user),
-      :observed_student_ids => ObserverEnrollment.observed_student_ids(@context, @current_user)
-    })
-  end
-
   def ping
     render json: {success: true}
   end
@@ -2385,7 +2372,14 @@ class CoursesController < ApplicationController
     # render view
   end
 
+  def retrieve_observed_enrollments(user, enrollments)
+    courses = enrollments.select(&:assigned_observer?).map(&:course).uniq
+    ObserverEnrollment.observed_enrollments_for_courses(courses, user)
+  end
+
   def courses_for_user(user)
+    include_observed = params.fetch(:include, []).include?("observed_users")
+
     if params[:state]
       states = Array(params[:state])
       states += %w(created claimed) if states.include?('unpublished')
@@ -2396,6 +2390,8 @@ class CoursesController < ApplicationController
     else
       enrollments = user.cached_current_enrollments(preload_courses: true)
     end
+
+    enrollments.concat(retrieve_observed_enrollments(user, enrollments)) if include_observed
 
     # TODO: preload roles after enrollment#role shim is taken out
     if params[:enrollment_role]

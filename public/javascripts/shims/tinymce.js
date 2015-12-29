@@ -10,7 +10,7 @@
 // core functions into plugin code.  It's disgusting, I'm sorry, but this is how
 // we make a transition without changing app code.  This "realTinymce" thing
 // works because we define an alias in webpack.config.js
-var assign = require("lodash").assign;
+var assign = require("lodash.underscore").extend;
 var tinymceCore = require("realTinymce");
 assign(window.tinymce, tinymceCore.tinymce);
 module.exports = window.tinymce;

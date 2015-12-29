@@ -30,6 +30,7 @@ module Lti
     belongs_to :product_family, class_name: 'Lti::ProductFamily'
 
     serialize :raw_data
+    serialize :update_payload
 
     validates_presence_of :shared_secret, :guid, :product_version, :lti_version, :product_family_id, :workflow_state, :raw_data, :context
     validates_uniqueness_of :guid
@@ -53,6 +54,23 @@ module Lti
         where('(lti_tool_proxy_bindings.context_type = ? AND lti_tool_proxy_bindings.context_id = ?) OR (lti_tool_proxy_bindings.context_type = ? AND lti_tool_proxy_bindings.context_id IN (?))', context.class.name, context.id, 'Account', account_ids).
         order('lti_tool_proxies.id, x.ordering').to_sql
       ToolProxy.joins("JOIN (#{subquery}) bindings on lti_tool_proxies.id = bindings.tool_proxy_id").where('bindings.enabled = true')
+    end
+
+    def reregistration_message_handler
+      return @reregistration_message_handler if @reregistration_message_handler
+      if default_resource_handler
+        @reregistration_message_handler ||= default_resource_handler.message_handlers.
+            by_message_types(IMS::LTI::Models::Messages::ToolProxyReregistrationRequest::MESSAGE_TYPE).first
+      end
+      @reregistration_message_handler
+    end
+
+    def default_resource_handler
+      @default_resource_handler ||= resources.where(resource_type_code: 'instructure.com:default').first
+    end
+
+    def update?
+      self.update_payload.present?
     end
 
   end

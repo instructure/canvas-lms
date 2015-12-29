@@ -66,6 +66,8 @@ define [
     teardown: ->
       fakeENV.teardown()
       @server.restore()
+      $(".ui-dialog").remove()
+      $("ul[id^=ui-id-]").remove()
 
   test 'should sort assignments into groups correctly', ->
 

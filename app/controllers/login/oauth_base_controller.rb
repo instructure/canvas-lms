@@ -65,6 +65,8 @@ class Login::OauthBaseController < ApplicationController
     unique_ids.any? do |unique_id|
       pseudonym = @domain_root_account.pseudonyms.for_auth_configuration(unique_id, @aac)
     end
+    pseudonym ||= @aac.provision_user(unique_ids.first) if @aac.jit_provisioning?
+
     if pseudonym
       # Successful login and we have a user
       @domain_root_account.pseudonym_sessions.create!(pseudonym, false)

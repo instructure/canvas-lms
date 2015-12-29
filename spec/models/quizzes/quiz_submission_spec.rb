@@ -643,7 +643,7 @@ describe Quizzes::QuizSubmission do
       })
       expect(@quiz_submission.submission.workflow_state).to eql 'graded'
     end
-    
+
     it "should mark a submission complete if all essay questions have been graded, even if a text_only_question is present" do
       quiz_with_graded_submission([{:question_data => {:name => 'question 1', :points_possible => 1, 'question_type' => 'essay_question'}},
                                    {:question_data => {:name => 'question 2', :points_possible => 1, 'question_type' => 'text_only_question'}}]) do
@@ -989,20 +989,19 @@ describe Quizzes::QuizSubmission do
       course_with_teacher(active_all: true)
       course_quiz(course: @course)
       student_in_course(course: @course)
+      @course.account.settings[:restrict_quiz_questions] = true
+      @course.account.save!
+      @course.enrollment_term.end_at = 1.day.ago
+      @course.enrollment_term.save!
+      @quiz_submission = Quizzes::QuizSubmission.new(:quiz => @quiz)
     end
 
     it "returns true if quiz restricts answers for concluded courses and the user is a grader" do
-      @quiz.stubs(:restrict_answers_for_concluded_course? => true)
-      qs = Quizzes::QuizSubmission.new(:quiz => @quiz)
-
-      expect(qs.results_visible_for_user?(@teacher)).to be_truthy
+      expect(@quiz_submission.results_visible_for_user?(@teacher)).to be_truthy
     end
 
     it "returns false if quiz restricts answers for concluded courses and the user is not a grader" do
-      @quiz.stubs(:restrict_answers_for_concluded_course? => true)
-      qs = Quizzes::QuizSubmission.new(:quiz => @quiz)
-
-      expect(qs.results_visible_for_user?(@student)).to be_falsey
+      expect(@quiz_submission.results_visible_for_user?(@student)).to be_falsey
     end
   end
 
@@ -1491,51 +1490,6 @@ describe Quizzes::QuizSubmission do
     end
   end
 
-  context "with versioning" do
-    before(:each) do
-      student_in_course
-      assignment_quiz([])
-      qd = multiple_choice_question_data
-      @quiz.quiz_data = [qd]
-      @quiz.points_possible = qd[:points_possible]
-      @quiz.save!
-    end
-
-    describe "#versions" do
-      it "finds the versions with both namespaced and non-namespaced quizzes" do
-        qs = @quiz.generate_submission(@student)
-        qs.submission_data = { "question_1" => "2405" }
-        Quizzes::SubmissionGrader.new(qs).grade_submission
-
-        qs = @quiz.generate_submission(@student)
-        qs.submission_data = { "question_1" => "8544" }
-        Quizzes::SubmissionGrader.new(qs).grade_submission
-
-        expect(qs.versions.count).to eq 2
-        Version.update_all("versionable_type='QuizSubmission'","versionable_id=#{qs.id} AND versionable_type='Quizzes::QuizSubmission'")
-        expect(Quizzes::QuizSubmission.find(qs).versions.count).to eq 2
-      end
-    end
-  end
-
-  context "with attachments" do
-    before(:each) do
-      course_with_student_logged_in :active_all => true
-      course_quiz !!:active
-      @qs = @quiz.generate_submission @user
-      create_attachment_for_file_upload_submission!(@qs)
-    end
-
-    describe "#attachments" do
-      it "finds the attachment with both namespaced and non-namespaced quizzes" do
-        expect(Quizzes::QuizSubmission.find(@qs).attachments.count).to eq 1
-
-        Attachment.update_all("context_type='QuizSubmission'","context_id=#{@qs.id} AND context_type='Quizzes::QuizSubmission'")
-        expect(Quizzes::QuizSubmission.find(@qs).attachments.count).to eq 1
-      end
-    end
-  end
-
   describe '#points_possible_at_submission_time' do
     it 'should work' do
       quiz_with_graded_submission([
@@ -1559,48 +1513,87 @@ describe Quizzes::QuizSubmission do
     end
   end
 
-  describe "Tardiness" do
-    let(:course)      { Course.create! }
-    let(:now)         { Time.zone.now }
-    let(:quiz)        { course.quizzes.create! due_at: 3.days.ago(now) }
-    let(:submission)  { quiz.quiz_submissions.create! }
+  describe "#late?" do
+    let(:course)          { Course.create! }
+    let(:now)             { Time.zone.now }
+    let(:quiz)            { course.quizzes.create! due_at: 3.days.ago(now) }
 
-    describe "#late?" do
+    context "for quizzes with a due date" do
+      let(:quiz_submission) { quiz.quiz_submissions.create! }
+
       it "is not late when on turned in before the due date" do
-        submission.finished_at = 4.days.ago(now)
-        submission.save
+        quiz_submission.finished_at = 4.days.ago(now)
+        quiz_submission.save
 
-        expect(submission.late?).to eq false
+        expect(quiz_submission.late?).to eq false
       end
 
-      it "is not late when on turned in exactly at the due date" do
-        submission.finished_at = 3.days.ago(now)
-        submission.save
+      it "is not late when turned in at the due date" do
+        quiz_submission.finished_at = 3.days.ago(now) + 60.seconds
+        quiz_submission.save
 
-        expect(submission.late?).to eq false
+        expect(quiz_submission.late?).to eq false
+      end
+
+      it "is late when turned in after the due date" do
+        quiz_submission.finished_at = 2.days.ago(now)
+        quiz_submission.save
+
+        expect(quiz_submission.late?).to eq true
       end
 
       it "is not late when unfinished" do
-        expect(submission.late?).to eq false
+        expect(quiz_submission.late?).to eq false
+      end
+    end
+
+    context "for quizzes without a due date" do
+      let(:quiz) { course.quizzes.create! }
+      let(:quiz_submission) do
+        quiz.quiz_submissions.create! do |qs|
+          qs.finished_at = 3.days.ago(now)
+        end
       end
 
       it "is not late when the quiz has no due date" do
-        quiz_two                    = course.quizzes.create!
-        submission_two              = quiz_two.quiz_submissions.create!
-        submission_two.finished_at  = 3.days.ago(now)
-        submission_two.save
-        expect(submission_two.late?).to eq false
+        expect(quiz_submission.late?).to eq false
+      end
+    end
+
+    context "for quizzes with overridden due dates for some students" do
+      let(:quiz_submission) do
+        quiz.quiz_submissions.create! do |qs|
+          qs.user = student
+          qs.finished_at = 1.week.ago(now)
+        end
       end
 
-      it "is late when on turned in after the due date" do
-        submission.finished_at = 2.days.ago(now)
-        submission.save
+      let(:student) { User.create! }
 
-        expect(submission.late?).to eq true
+      let!(:enroll_student) do
+        course.enroll_user student, 'StudentEnrollment'
+      end
+
+      let!(:override_students_quiz) do
+        assignment_override = quiz.assignment_overrides.create! do |override|
+          override.due_at = 3.weeks.ago(now)
+          override.due_at_overridden = true
+        end
+
+        assignment_override.assignment_override_students.create! do |aos|
+          aos.quiz = quiz
+          aos.user = student
+        end
+      end
+
+      it "is late when it's overridden due date is before the submission" do
+        submission = stub("blank?" => false, "user" => student)
+        quiz_submission.stubs(:submission).returns(submission)
+        expect(quiz_submission.late?).to eq true
       end
     end
   end
-  
+
   describe '#excused?' do
     let(:submission) do
       s=Submission.new

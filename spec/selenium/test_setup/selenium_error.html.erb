@@ -1,0 +1,24 @@
+<body style="font-family:sans-serif;line-height:1.25;font-size:14px">
+  <h1><%= meta[:full_description] %></h1>
+
+  <code><b>bin/rspec <%= meta[:location] %></b></code>
+
+  <h2>Ruby Error</h2>
+  <pre style="overflow:auto; max-height: 300px;">
+<b><%= example.exception.class.name %> <%= example.exception.message %></b>
+<%= example.exception.backtrace.join("\n") %>
+  </pre>
+
+  <% if js_errors.present? %>
+    <h2>JS Errors</h2>
+    <ul>
+      <% js_errors.each do |error| %>
+        <li><%= error["errorMessage"] %> (<%= error["sourceName"] %>:<%= error["lineNumber"] %>)
+      <% end %>
+    </ul>
+
+  <% end %>
+
+  <h2>Screenshot</h2>
+  <img style="border:1px solid #000" src="./<%= screenshot_name %>" />
+</body>

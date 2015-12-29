@@ -9,6 +9,7 @@ define [
   module '$.fn.defaultAjaxError',
     setup: ->
       storedInstEnv = INST.environment
+      $.ajaxJSON.unhandledXHRs = []
 
     teardown: ->
       INST.environment = storedInstEnv

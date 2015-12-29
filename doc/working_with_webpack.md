@@ -318,6 +318,17 @@ bundle files permenant and
 committed to the git repo, and
 yank EmberBundle out entirely.
 
+[X] Extract an actual commons chunk
+
+[X]what app code changes there are, move them out into seperate
+small commits that can be tested individually
+
+[X] in a seperate commit, remove all the shared ember components that aren't
+used from "app/coffeescripts/ember/shared/components"
+
+[X] get _all_ qunit tests running in the webpack bundle (just spiked on a few)
+
+
 [ ] Migrate requires that are in views to application js (check plugins like mra)
 
 
@@ -326,16 +337,9 @@ or change how the rest of the app interacts with timezone_plugin so that we can
 return a promise, since async return is just not going to happen, and we need to have
 those promises done before using it.
 
-[ ] Extract an actual commons chunk
-
 [ ] sort out scopes for .app.app.coffeescripts.ember.shared.templates.components.ic_submission-download-dialog so that we don't need an awful exception in 18n.js
 
-[ ] get _all_ qunit tests running in the webpack bundle (just spiked on a few)
-
 [ ] sniff test files automatically rather than configuring them manually in webpack_spec_index.js
-
-[ ]what app code changes there are, move them out into seperate
-small commits that can be tested individually
 
 [ ] could get a nice performance boost out of reimplementing BrandableCSS.all_fingerprints_for(bundle)
 in node rather than shelling out to ruby for it
@@ -345,8 +349,37 @@ in node rather than shelling out to ruby for it
 [ ] on building for production, fails with ProximityLoader ("ERROR in 232.bundle.js from UglifyJs
 Unexpected token: operator (!) [./frontend_build/jsHandlebarsHelpers.js!./frontend_build/pluginsJstLoader.js!./frontend_build/nonAmdLoader.js!./app/coffeescripts/util/ProximityLoader.coffee:111,6]")
 
-[ ] in a seperate commit, remove all the shared ember components that aren't
-used from "app/coffeescripts/ember/shared/components"
-
 [ ] in a seperate commit extract i18nLinerHandlebars loader function and what
 it duplicates from prepare_hbs to a function both can use.
+
+## After we're on webpack in production:
+
+[ ] remove all the require-js build artifacts, re-write `compile_assets` to not build the require branch (still need to generate translations)
+
+[ ] sweep for the `use_webpack` var and remove it
+
+[ ] re-work js.rake to do away with requirejs stuff
+
+[ ] un-amd all vendor dependencies that we've wrapped AMD wrappers around
+
+[ ] re-write screenreader gradebook in not-ember
+
+[ ] change all references to "compiled" to "coffeeescript" and then do away with that loader
+
+[ ] delete our custom require-js plugins
+
+[ ] migrate anything in bower to npm, dump bower
+
+[ ] find other hard-coded vendor libs that can be ported to npm
+
+[ ] rewrite qunit specs to actually have a qunit dependency and ditch that regex loader
+
+[ ] kill the auto-css-in-handlebars imports (make them explicit) and remove that loader
+
+[ ] plugins that need to be extended should have explicit extension points and let plugin register itself
+
+[ ] audit all loaders to find dumb things we had to do for require
+
+[ ] {low-priority} in chunks, take AMD requires off of our js files
+
+[ ] {low-priority} re-write tests in mocha

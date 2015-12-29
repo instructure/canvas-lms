@@ -477,17 +477,47 @@ describe AssignmentGroupsApiController, type: :request do
       assert_status(404)
     end
 
-    it 'should include assignments' do
-      @course.assignments.create!(:title => "test", :assignment_group => @group, :points_possible => 10)
-      json = api_call(:get, "/api/v1/courses/#{@course.id}/assignment_groups/#{@group.id}?include[]=assignments",
-        :controller => 'assignment_groups_api',
-        :action => 'show',
-        :format => 'json',
-        :course_id => @course.id.to_s,
-        :assignment_group_id => @group.id.to_s,
-        :include => ['assignments'])
+    context 'with assignments' do
+      before(:once) do
+        @assignment = @course.assignments.create!({
+          title: "test",
+          assignment_group: @group,
+          points_possible: 10
+        })
+      end
 
-      expect(json['assignments']).not_to be_empty
+      it 'should include assignments' do
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/assignment_groups/#{@group.id}?include[]=assignments",
+          :controller => 'assignment_groups_api',
+          :action => 'show',
+          :format => 'json',
+          :course_id => @course.id.to_s,
+          :assignment_group_id => @group.id.to_s,
+          :include => ['assignments'])
+
+        expect(json['assignments']).not_to be_empty
+      end
+
+      it 'should include submission when flag is present' do
+        student_in_course(active_all: true)
+        @submission = bare_submission_model(@assignment, @student, {
+          score: '25',
+          grade: '25',
+          submitted_at: Time.zone.now
+        })
+
+        json = api_call_as_user(@student, :get,
+          "/api/v1/courses/#{@course.id}/assignment_groups/#{@group.id}?include[]=assignments&include[]=submission",
+          :controller => 'assignment_groups_api',
+          :action => 'show',
+          :format => 'json',
+          :course_id => @course.id.to_s,
+          :assignment_group_id => @group.id.to_s,
+          :include => ['assignments', 'submission'])
+
+        expect(json['assignments'][0]['submission']).to be_present
+        expect(json['assignments'][0]['submission']['id']).to eq @submission.id
+      end
     end
 
     it 'should only return assignments in the given grading period with MGP on' do

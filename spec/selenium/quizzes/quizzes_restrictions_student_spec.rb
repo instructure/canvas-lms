@@ -1,5 +1,5 @@
-require_relative "../common"
-require_relative "../helpers/quizzes_common"
+require_relative '../common'
+require_relative '../helpers/quizzes_common'
 
 describe 'quiz restrictions as a student' do
   include_context "in-process server selenium tests"
@@ -16,7 +16,7 @@ describe 'quiz restrictions as a student' do
       course_with_student_logged_in
       @password = 'threepwood'
       @quiz = course_quiz(true)
-      @quiz.published_at = Time.now
+      @quiz.publish!
       @quiz.access_code = @password
       @quiz.save!
     end
@@ -42,7 +42,7 @@ describe 'quiz restrictions as a student' do
       course_with_student_logged_in
       @ip = '64.233.160.0'
       @quiz = course_quiz(true)
-      @quiz.published_at = Time.now
+      @quiz.publish!
       @quiz.ip_filter = '64.233.160.0'
       @quiz.save!
     end

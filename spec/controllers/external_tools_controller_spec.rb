@@ -580,6 +580,7 @@ describe ExternalToolsController do
 
     it "should be accessible even after course is soft-concluded" do
       user_session(@student)
+      @course.start_at = 2.days.ago
       @course.conclude_at = 1.day.ago
       @course.restrict_enrollments_to_course_dates = true
       @course.save!

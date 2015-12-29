@@ -138,6 +138,36 @@ describe Login::SamlController do
     expect(session[:saml_unique_id]).to be_nil
   end
 
+  it "creates an unfound user when JIT provisioning is enabled" do
+    unique_id = 'foo@example.com'
+
+    account = account_with_saml
+    ap = account.authentication_providers.first
+    ap.update_attribute(:jit_provisioning, true)
+
+    Onelogin::Saml::Response.stubs(:new).returns(
+      stub('response',
+           is_valid?: true,
+           success_status?: true,
+           name_id: unique_id,
+           name_qualifier: nil,
+           session_index: nil,
+           process: nil,
+           issuer: "saml_entity"
+          ))
+
+    # We dont want to log them out of everything.
+    controller.expects(:logout_user_action).never
+    controller.request.env['canvas.domain_root_account'] = account
+
+    expect(account.pseudonyms.active.by_unique_id(unique_id)).to_not be_exists
+    # Default to Login url if set to nil or blank
+    post :create, :SAMLResponse => "foo"
+    expect(response).to redirect_to(dashboard_url(login_success: 1))
+    p = account.pseudonyms.active.by_unique_id(unique_id).first!
+    expect(p.authentication_provider).to eq ap
+  end
+
   context "multiple authorization configs" do
     before :once do
       @account = Account.create!

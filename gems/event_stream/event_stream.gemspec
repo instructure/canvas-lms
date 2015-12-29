@@ -22,7 +22,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'json_token'
   spec.add_dependency 'paginated_collection'
 
-  spec.add_dependency 'rails', ">= 3.2", "< 4.2"
+  spec.add_dependency 'rails', ">= 3.2", "< 4.3"
   unless CANVAS_RAILS3
     spec.add_dependency 'protected_attributes', '~>1.0'
   end

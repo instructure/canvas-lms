@@ -81,6 +81,10 @@ class SubmissionComment < ActiveRecord::Base
 
   has_a_broadcast_policy
 
+  def provisional
+    !!self.provisional_grade_id
+  end
+
   def media_comment?
     self.media_comment_id && self.media_comment_type
   end
@@ -251,7 +255,9 @@ class SubmissionComment < ActiveRecord::Base
   end
 
   def serialization_methods
-    context.root_account.service_enabled?(:avatars) ? [:avatar_path] : []
+    methods = []
+    methods << :avatar_path if context.root_account.service_enabled?(:avatars)
+    methods
   end
 
   scope :visible, -> { where(:hidden => false) }

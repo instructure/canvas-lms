@@ -619,4 +619,40 @@ describe "context modules" do
     go_to_modules
     expect(fj("#context_module_content_#{mod_lock.id} .unlock_details").text).not_to include_text 'Will unlock'
   end
+
+  it "should mark locked but visible assignments/quizzes/discussions as read" do
+    # setting lock_at in the past will cause assignments/quizzes/discussions to still be visible
+    # they just can't be submitted to anymore
+
+    course_with_student_logged_in(:active_all => true)
+    mod = @course.context_modules.create!(:name => "module")
+
+    asmt = @course.assignments.create!(:title => "assmt", :lock_at => 1.day.ago)
+    topic_asmt = @course.assignments.create!(:title => "topic assmt", :lock_at => 2.days.ago)
+
+    topic = @course.discussion_topics.create!(:title => "topic", :assignment => topic_asmt)
+    quiz = @course.quizzes.create!(:title => "quiz", :lock_at => 3.days.ago)
+    quiz.publish!
+
+
+    tag1 = mod.add_item({:id => asmt.id, :type => 'assignment'})
+    tag2 = mod.add_item({:id => topic.id, :type => 'discussion_topic'})
+    tag3 = mod.add_item({:id => quiz.id, :type => 'quiz'})
+
+    mod.completion_requirements = {tag1.id => {:type => 'must_view'}, tag2.id => {:type => 'must_view'}, tag3.id => {:type => 'must_view'}}
+    mod.save!
+
+    user_session(@student)
+
+    get "/courses/#{@course.id}/assignments/#{asmt.id}"
+    expect(f("#assignment_show")).to include_text("This assignment was locked")
+    get "/courses/#{@course.id}/discussion_topics/#{topic.id}"
+    expect(f("#discussion_topic")).to include_text("This topic was locked")
+    get "/courses/#{@course.id}/quizzes/#{quiz.id}"
+    expect(f(".lock_explanation")).to include_text("This quiz was locked")
+
+    prog = mod.evaluate_for(@student)
+    expect(prog).to be_completed
+    expect(prog.requirements_met.count).to eq 3
+  end
 end

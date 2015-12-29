@@ -98,7 +98,7 @@ module Api::V1::AssignmentOverride
         students = []
       else
         # look up the students
-        students = api_find_all(assignment.context.students_visible_to(@current_user), student_ids).uniq
+        students = api_find_all(assignment.context.students_visible_to(@current_user, true), student_ids).uniq
 
         # make sure they were all valid
         found_ids = students.map{ |s| [

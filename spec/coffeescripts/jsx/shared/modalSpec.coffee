@@ -9,8 +9,11 @@ define [
   TestUtils = React.addons.TestUtils
 
   module 'Modal',
+    setup: ->
+      $('body').append("<div id=application />")
     teardown: ->
       React.unmountComponentAtNode(@component.getDOMNode().parentNode)
+      $('#application').remove()
 
   test  'has a default class of, "ReactModal__Content--canvas"', ->
     ModalElement = React.createElement(Modal, {isOpen: true, title: "Hello"},
@@ -110,3 +113,62 @@ define [
     @component.closeModal()
     equal @component.state.modalIsOpen, false, "closes modal"
     ok calledOnRequestClose, "calls on request close"
+
+  test "doesn't default to attaching to body", ->
+    @component = TestUtils.renderIntoDocument(React.createElement(Modal,
+      isOpen: true,
+      className: 'custom_class_name'
+      title: "Hello",
+        "Inner content"
+      ))
+
+    equal $('body').attr('aria-hidden'), undefined, "doesn't attach aria-hidden to body"
+
+  test "defaults to attaching to #application", ->
+    @component = TestUtils.renderIntoDocument(React.createElement(Modal,
+      isOpen: true,
+      className: 'custom_class_name'
+      title: "Hello",
+        "Inner content"
+      ))
+
+    equal $('#application').attr('aria-hidden'), 'true', "attaches to application"
+
+  test 'removes aria-hidden from #application when closed', ->
+    @component = TestUtils.renderIntoDocument(React.createElement(Modal,
+      onRequestClose: -> console.log('closed'),
+      isOpen: true,
+      className: 'custom_class_name'
+      title: "Hello",
+        "Inner content"
+      ))
+
+    @component.closeModal()
+
+    equal $('#application').attr('aria-hidden'), undefined, "removes aria-hidden attribute"
+
+
+  test "appElement sets react modals app element", ->
+    @component = TestUtils.renderIntoDocument(React.createElement(Modal,
+      appElement: $('#fixtures')[0],
+      isOpen: true,
+      className: 'custom_class_name'
+      title: "Hello",
+        "Inner content"
+      ))
+
+    equal $('#fixtures').attr('aria-hidden'), 'true', "attaches to the specified dom element"
+
+  test "removes aria-hidden from custom setElement property when closed", ->
+    @component = TestUtils.renderIntoDocument(React.createElement(Modal,
+      onRequestClose: -> console.log('closed'),
+      appElement: $('#fixtures')[0],
+      isOpen: true,
+      className: 'custom_class_name'
+      title: "Hello",
+        "Inner content"
+      ))
+
+    @component.closeModal()
+
+    equal $('#fixtures').attr('aria-hidden'), undefined, "no aria-hidden attribute on element"

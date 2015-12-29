@@ -352,5 +352,58 @@ describe "course settings" do
         page.title
       ])
     end
+
+    it "should be able to filter links to unpublished content" do
+      course_with_teacher_logged_in
+
+      active = @course.assignments.create!(:title => "blah")
+      unpublished = @course.assignments.create!(:title => "blah")
+      unpublished.unpublish!
+      deleted = @course.assignments.create!(:title => "blah")
+      deleted.destroy
+
+      active_link = "/courses/#{@course.id}/assignments/#{active.id}"
+      unpublished_link = "/courses/#{@course.id}/assignments/#{unpublished.id}"
+      deleted_link = "/courses/#{@course.id}/assignments/#{deleted.id}"
+
+      @course.syllabus_body = %{
+        <a href='#{active_link}'>link</a>
+        <a href='#{unpublished_link}'>link</a>
+        <a href='#{deleted_link}'>link</a>
+      }
+      @course.save!
+      page = @course.wiki.wiki_pages.create!(:title => "wikiii", :body => %{<a href='#{unpublished_link}'>link</a>})
+
+      get "/courses/#{@course.id}/link_validator"
+      f('#link_validator_wrapper button').click
+      wait_for_ajaximations
+      run_jobs
+
+      keep_trying_until do
+        wait_for_ajaximations
+        expect(f("#all-results")).to be_displayed
+      end
+
+      expect(f("#all-results .alert")).to include_text("Found 3 broken links")
+      syllabus_result = ff('#all-results .result').detect{|r| r.text.include?("Course Syllabus")}
+      expect(syllabus_result).to include_text(unpublished_link)
+      expect(syllabus_result).to include_text(deleted_link)
+      page_result = ff('#all-results .result').detect{|r| r.text.include?(page.title)}
+      expect(page_result).to include_text(unpublished_link)
+
+      f('#show_unpublished').click # hide the unpublished results
+      wait_for_ajaximations
+
+      expect(f("#all-results .alert")).to include_text("Found 1 broken link")
+      expect(ff("#all-results .result a").count).to eq 1
+      result = f("#all-results .result")
+      expect(result).to include_text("Course Syllabus")
+      expect(result).to include_text(deleted_link)
+
+      f('#show_unpublished').click # show them again
+      expect(f("#all-results .alert")).to include_text("Found 3 broken links")
+      page_result = ff('#all-results .result').detect{|r| r.text.include?(page.title)}
+      expect(page_result).to include_text(unpublished_link)
+    end
   end
 end

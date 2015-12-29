@@ -7,8 +7,6 @@ define [
 
   {run} = Ember
 
-  fixtures.create()
-
   originalWeightingScheme = null
   originalGradingStandard = null
   groupScores =
@@ -22,6 +20,7 @@ define [
 
   module 'assignment_group_grades_component',
     setup: ->
+      fixtures.create()
       App = startApp()
       @component = App.AssignmentGroupGradesComponent.create()
       @component.reopen

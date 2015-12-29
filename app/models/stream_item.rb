@@ -285,12 +285,7 @@ class StreamItem < ActiveRecord::Base
             user_ids_subset, stream_item_id, greatest_existing_id).delete_all
 
       # touch all the users to invalidate the cache
-      User.transaction do
-        # lock the rows in a predefined order to prevent deadlocks
-        ids_to_touch = User.where(id: user_ids_subset).not_recently_touched.
-          lock(:no_key_update).order(:id).pluck(:id)
-        User.where(id: ids_to_touch).update_all(updated_at: Time.now.utc)
-      end
+      User.where(id: user_ids_subset).touch_all
     end
 
     return [res]
@@ -370,7 +365,7 @@ class StreamItem < ActiveRecord::Base
 
     unless user_ids.empty?
       # touch all the users to invalidate the cache
-      User.where(:id => user_ids.to_a).update_all(:updated_at => Time.now.utc)
+      User.where(:id => user_ids.to_a).touch_all
     end
 
     count

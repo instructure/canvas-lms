@@ -23,6 +23,7 @@ class EportfoliosController < ApplicationController
   include EportfolioPage
   before_filter :require_user, :only => [:index, :user_index]
   before_filter :reject_student_view_student
+  before_filter :rich_content_service_config
 
   def index
     user_index
@@ -44,7 +45,7 @@ class EportfoliosController < ApplicationController
       respond_to do |format|
         if @portfolio.save
           @portfolio.ensure_defaults
-          flash[:notice] = t('notices.created', "Porfolio successfully created")
+          flash[:notice] = t('notices.created', "ePortfolio successfully created")
           format.html { redirect_to eportfolio_url(@portfolio) }
           format.json { render :json => @portfolio.as_json(:permissions => {:user => @current_user, :session => session}) }
         else
@@ -104,7 +105,7 @@ class EportfoliosController < ApplicationController
       respond_to do |format|
         if @portfolio.update_attributes(params[:eportfolio])
           @portfolio.ensure_defaults
-          flash[:notice] = t('notices.updated', "Porfolio successfully updated")
+          flash[:notice] = t('notices.updated', "ePortfolio successfully updated")
           format.html { redirect_to eportfolio_url(@portfolio) }
           format.json { render :json => @portfolio.as_json(:permissions => {:user => @current_user, :session => session}) }
         else
@@ -120,7 +121,7 @@ class EportfoliosController < ApplicationController
     if authorized_action(@portfolio, @current_user, :delete)
       respond_to do |format|
         if @portfolio.destroy
-          flash[:notice] = t('notices.deleted', "Portfolio successfully deleted")
+          flash[:notice] = t('notices.deleted', "ePortfolio successfully deleted")
           format.html { redirect_to user_profile_url(@current_user) }
           format.json { render :json => @portfolio }
         else
@@ -209,5 +210,10 @@ class EportfoliosController < ApplicationController
     else
       authorized_action(nil, nil, :bad_permission)
     end
+  end
+
+  protected
+  def rich_content_service_config
+    js_env(Services::RichContent.env_for(@domain_root_account))
   end
 end

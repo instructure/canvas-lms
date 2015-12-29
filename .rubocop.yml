@@ -94,8 +94,6 @@ Style/AlignParameters:
   Enabled: false
 Style/Lambda:
   Enabled: false
-Style/ParallelAssignment:
-  Enabled: false
 Style/WhileUntilModifier:
   Enabled: false
 
@@ -119,6 +117,8 @@ Lint/EndAlignment:
 # Performance changes
 Performance/Detect:
   Severity: warning
+Performance/ParallelAssignment:
+  Enabled: false
 
 # these need better configuration than the default:
 Style/AndOr:

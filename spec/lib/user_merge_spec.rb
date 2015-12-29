@@ -518,7 +518,6 @@ describe UserMerge do
       qs1 = @quiz_submission
       quiz_with_graded_submission([], user: user2)
       qs2 = @quiz_submission
-      Version.where(:versionable_type => "Quizzes::QuizSubmission", :versionable_id => qs2).update_all(:versionable_type => "QuizSubmission")
 
       expect(qs1.versions).to be_present
       qs1.versions.each{ |v| expect(v.model.user_id).to eql(user2.id) }

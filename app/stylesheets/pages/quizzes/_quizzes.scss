@@ -30,7 +30,7 @@ $answersSprite: url(/images/answers_sprite.png);
 // quiz index
 li.quiz {
   cursor: pointer;
-  .ellipses, i[class^=icon-]:not(.icon-publish):not(.icon-quiz) {
+  .ellipses, i[class^=icon-]:not(.icon-publish):not(.icon-quiz):not(.icon-post-to-sis) {
     color: darken($ic-color-neutral, 40);
   }
   .ig-title {

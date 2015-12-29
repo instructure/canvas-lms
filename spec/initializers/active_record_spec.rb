@@ -189,8 +189,7 @@ module ActiveRecord
 
       context "through a relation" do
         include_examples "query creation"
-        a = Account.create!
-        let(:base) { Account.find(a.id).users }
+        let(:base) { Account.create.users }
       end
     end
   end

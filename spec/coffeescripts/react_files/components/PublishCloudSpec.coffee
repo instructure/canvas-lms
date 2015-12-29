@@ -1,9 +1,10 @@
 define [
+  '../mockFilesENV'
   'react'
   'jquery'
   'jsx/shared/PublishCloud'
   'compiled/models/FilesystemObject'
-], (React, $, PublishCloud, FilesystemObject) ->
+], (mockFilesEnv, React, $, PublishCloud, FilesystemObject) ->
 
   Simulate = React.addons.TestUtils.Simulate
 

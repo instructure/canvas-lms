@@ -1,7 +1,7 @@
 @import "base/environment";
 /* for labels */
 div.form-column-left {
-  min-width: 150px;
+  min-width: 145px;
   text-align: right;
   margin-top: 20px;
   display: inline-block;
@@ -25,6 +25,7 @@ div.form-column-left {
 /* for grouped and un-grouped form els */
 div.form-column-right, div.overrides-column-right {
   display: inline-block;
+  width: 380px;
 
   /* for groups of form els ONLY */
   .border {
@@ -75,10 +76,6 @@ div.form-column-right, div.overrides-column-right {
       padding-left: 20px;
     }
   }
-}
-
-div.form-column-right {
-  width: 380px;
 }
 
 .assignment-edit-group-alert, .assignment-edit-external-tool-alert{

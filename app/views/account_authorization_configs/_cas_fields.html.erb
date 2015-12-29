@@ -2,3 +2,4 @@
   <%= f.label :auth_base, t('CAS URL'), class: 'ic-Label' %>
   <%= f.text_field :auth_base, class: 'ic-Input' %>
 </div>
+<%= render partial: 'jit_provisioning_field', locals: { f: f, aac: aac } %>

@@ -35,3 +35,6 @@
 @import "vendor/mediaelementplayer";
 @import "base/custom_mediaelementplayer";
 
+@if $use_new_styles {
+@import "components/ic-typography";
+}

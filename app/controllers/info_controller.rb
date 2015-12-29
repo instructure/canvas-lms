@@ -61,12 +61,6 @@ class InfoController < ApplicationController
     expires_in 10.minutes, public: true
   end
 
-  def theme_preview
-    if params[:account_id]
-      @account = Account.find_cached(params[:account_id])
-    end
-  end
-
   def test_error
     render status: 404, template: "shared/errors/404_message"
   end

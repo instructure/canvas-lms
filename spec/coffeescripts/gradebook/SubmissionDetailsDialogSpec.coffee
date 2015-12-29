@@ -23,6 +23,7 @@ define [
 
     teardown: ->
       window.ENV = @previousWindowENV
+      $(".ui-dialog").remove()
       $('.submission_details_dialog').remove()
 
   test 'speed_grader_enabled sets speedgrader url', ->

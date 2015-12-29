@@ -1,10 +1,9 @@
 define [
   'jquery'
   'underscore'
-  'i18n!dicussions'
   'compiled/models/DiscussionTopic'
   'compiled/views/ToggleableSubscriptionIconView'
-], ($, _, I18n, DiscussionTopic, SubscriptionIconView) ->
+], ($, _, DiscussionTopic, SubscriptionIconView) ->
 
   module 'SubscriptionIconView',
     setup: ->

@@ -230,6 +230,56 @@ describe CommunicationChannel do
     expect(@cc.reload).to be_active
   end
 
+  describe '#last_bounce_summary' do
+    it 'gets the diagnostic code' do
+      user = User.create!
+      cc = user.communication_channels.create!(path: 'path@example.com') do |cc|
+        cc.last_bounce_details = {
+          'bouncedRecipients' => [
+            {
+              'diagnosticCode' => 'stuff and things'
+            }
+          ]
+        }
+      end
+
+      expect(cc.last_bounce_summary).to eq('stuff and things')
+    end
+
+    it "doesn't fail when there isn't a last bounce" do
+      user = User.create!
+      cc = user.communication_channels.create!(path: 'path@example.com')
+
+      expect(cc.last_bounce_details).to be_nil
+      expect(cc.last_bounce_summary).to be_nil
+    end
+  end
+
+  describe '#last_transient_bounce_summary' do
+    it 'gets the diagnostic code' do
+      user = User.create!
+      cc = user.communication_channels.create!(path: 'path@example.com') do |cc|
+        cc.last_transient_bounce_details = {
+          'bouncedRecipients' => [
+            {
+              'diagnosticCode' => 'stuff and things'
+            }
+          ]
+        }
+      end
+
+      expect(cc.last_transient_bounce_summary).to eq('stuff and things')
+    end
+
+    it "doesn't fail when there isn't a last transient bounce" do
+      user = User.create!
+      cc = user.communication_channels.create!(path: 'path@example.com')
+
+      expect(cc.last_transient_bounce_details).to be_nil
+      expect(cc.last_transient_bounce_summary).to be_nil
+    end
+  end
+
   describe "merge candidates" do
     let_once(:user1) { User.create! }
     let_once(:cc1) { user1.communication_channels.create!(:path => 'jt@instructure.com') }
@@ -293,7 +343,7 @@ describe CommunicationChannel do
         @cc1 = communication_channel_model(path: 'not_as_bouncy@example.edu')
         @cc2 = communication_channel_model(path: 'bouncy@example.edu')
 
-        %w{bouncy@example.edu Bouncy@example.edu bOuNcY@Example.edu bouncy@example.edu not_as_bouncy@example.edu bouncy@example.edu}.each do |path|
+        %w{bouncy@example.edu Bouncy@example.edu bOuNcY@Example.edu bouncy@example.edu bouncy@example.edu}.each do |path|
           CommunicationChannel.bounce_for_path(
             path: path,
             timestamp: nil,
@@ -304,7 +354,7 @@ describe CommunicationChannel do
         end
 
         @cc1.reload
-        expect(@cc1.bounce_count).to eq 1
+        expect(@cc1.bounce_count).to eq 0
         expect(@cc1.bouncing?).to be_falsey
 
         @cc2.reload
@@ -473,7 +523,7 @@ describe CommunicationChannel do
             @cc3 = communication_channel_model(path: 'BOUNCY@example.edu')
           end
 
-          %w{bouncy@example.edu Bouncy@example.edu bOuNcY@Example.edu bouncy@example.edu not_as_bouncy@example.edu bouncy@example.edu}.each do |path|
+          %w{bouncy@example.edu Bouncy@example.edu bOuNcY@Example.edu bouncy@example.edu bouncy@example.edu}.each do |path|
             CommunicationChannel.bounce_for_path(
               path: path,
               timestamp: nil,
@@ -484,7 +534,7 @@ describe CommunicationChannel do
           end
 
           @cc1.reload
-          expect(@cc1.bounce_count).to eq 1
+          expect(@cc1.bounce_count).to eq 0
           expect(@cc1.bouncing?).to be_falsey
 
           @cc2.reload

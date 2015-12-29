@@ -17,6 +17,7 @@ Rack::MiniProfiler.config.tap do |c|
   c.logger = Rails.logger
   c.skip_schema_queries =  !Rails.env.production?
   c.backtrace_includes =  [/^\/?(app|config|lib|test)/]
+  c.backtrace_remove = Rails.root.to_s + "/"
   c.authorization_mode = :whitelist
 
   if Canvas.redis_enabled?

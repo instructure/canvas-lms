@@ -256,4 +256,15 @@ describe GradingPeriod do
       expect(period.in_date_range? 15.days.from_now).to be false
     end
   end
+
+  describe ".json_for" do
+    it "returns a list sorted by date with is_last" do
+      grading_period_group.grading_periods.create! start_date: 1.week.ago, end_date: 2.weeks.from_now, title: 'C'
+      grading_period_group.grading_periods.create! start_date: 4.weeks.ago, end_date: 3.weeks.ago, title: 'A'
+      grading_period_group.grading_periods.create! start_date: 3.weeks.ago, end_date: 2.weeks.ago, title: 'B'
+      json = GradingPeriod.json_for(account, nil)
+      expect(json.map { |el| el['title'] }).to eq %w(A B C)
+      expect(json.map { |el| el['is_last'] }).to eq [false, false, true]
+    end
+  end
 end

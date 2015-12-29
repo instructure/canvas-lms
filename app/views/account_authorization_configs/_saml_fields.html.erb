@@ -30,7 +30,7 @@
                {},
                class: 'ic-Input') %>
 </div>
-<% if @account.settings[:self_registration] %>
+<% if @account.self_registration? %>
     <div id="parent_reg_selected" data-parent-reg-selected="<%= presenter.parent_reg_selected %>"></div>
     <div class="ic-Form-control">
       <%= f.label :parent_registration, "Parent Registration", class: 'ic-Label' %>
@@ -44,3 +44,4 @@
       </div>
     </div>
 <% end %>
+<%= render partial: 'jit_provisioning_field', locals: { f: f, aac: aac } %>

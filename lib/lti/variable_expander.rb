@@ -333,7 +333,7 @@ module Lti
                        -> { @tool_setting_proxy_id }
 
     register_expansion 'ToolConsumerProfile.url', [],
-                       -> { @controller.named_context_url(@tool.context, :context_tool_consumer_profile_url, "339b6700-e4cb-47c5-a54f-3ee0064921a9", include_host: true )},
+                       -> { @controller.polymorphic_url([@tool.context, :tool_consumer_profile], tool_consumer_profile_id: Lti::ToolConsumerProfileCreator::TCP_UUID)},
                        -> { @tool }
 
     register_expansion 'Canvas.file.media.id', [],

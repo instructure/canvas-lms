@@ -20,7 +20,7 @@ class EportfolioCategory < ActiveRecord::Base
   attr_accessible :name
   attr_readonly :eportfolio_id
 
-  has_many :eportfolio_entries, :order => :position, :dependent => :destroy
+  has_many :eportfolio_entries, -> { order(:position) }, dependent: :destroy
   belongs_to :eportfolio
 
   EXPORTABLE_ATTRIBUTES = [:id, :eportfolio_id, :name, :position, :slug, :created_at, :updated_at]

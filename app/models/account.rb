@@ -49,41 +49,41 @@ class Account < ActiveRecord::Base
   authenticates_many :pseudonym_sessions
   has_many :courses
   has_many :all_courses, :class_name => 'Course', :foreign_key => 'root_account_id'
-  has_many :group_categories, :as => :context, :conditions => ['deleted_at IS NULL']
+  has_many :group_categories, -> { where(deleted_at: nil) }, as: :context
   has_many :all_group_categories, :class_name => 'GroupCategory', :as => :context
   has_many :groups, :as => :context
   has_many :all_groups, :class_name => 'Group', :foreign_key => 'root_account_id'
   has_many :all_group_memberships, source: 'group_memberships', through: :all_groups
   has_many :enrollment_terms, :foreign_key => 'root_account_id'
-  has_many :active_enrollment_terms, :class_name => 'EnrollmentTerm', :foreign_key => 'root_account_id', :conditions => ["enrollment_terms.workflow_state<>'deleted'"]
-  has_many :enrollments, :foreign_key => 'root_account_id', :conditions => ["enrollments.type != 'StudentViewEnrollment'"]
+  has_many :active_enrollment_terms, -> { where("enrollment_terms.workflow_state<>'deleted'") }, class_name: 'EnrollmentTerm', foreign_key: 'root_account_id'
+  has_many :enrollments, -> { where("enrollments.type<>'StudentViewEnrollment'") }, foreign_key: 'root_account_id'
   has_many :all_enrollments, :class_name => 'Enrollment', :foreign_key => 'root_account_id'
-  has_many :sub_accounts, :class_name => 'Account', :foreign_key => 'parent_account_id', :conditions => ['workflow_state != ?', 'deleted']
-  has_many :all_accounts, :class_name => 'Account', :foreign_key => 'root_account_id', :order => 'name'
+  has_many :sub_accounts, -> { where("workflow_state<>'deleted'") }, class_name: 'Account', foreign_key: 'parent_account_id'
+  has_many :all_accounts, -> { order(:name) }, class_name: 'Account', foreign_key: 'root_account_id'
   has_many :account_users, :dependent => :destroy
   has_many :course_sections, :foreign_key => 'root_account_id'
   has_many :sis_batches
   has_many :abstract_courses, :class_name => 'AbstractCourse', :foreign_key => 'account_id'
   has_many :root_abstract_courses, :class_name => 'AbstractCourse', :foreign_key => 'root_account_id'
   has_many :users, :through => :account_users
-  has_many :pseudonyms, preload: :user
+  has_many :pseudonyms, -> { preload(:user) }
   has_many :role_overrides, :as => :context
   has_many :course_account_associations
-  has_many :child_courses, :through => :course_account_associations, :source => :course, :conditions => ['course_account_associations.depth = 0']
+  has_many :child_courses, -> { where(course_account_associations: { depth: 0 }) }, through: :course_account_associations, source: :course
   has_many :attachments, :as => :context, :dependent => :destroy
-  has_many :active_assignments, :as => :context, :class_name => 'Assignment', :conditions => ['assignments.workflow_state != ?', 'deleted']
-  has_many :folders, :as => :context, :dependent => :destroy, :order => 'folders.name'
-  has_many :active_folders, :class_name => 'Folder', :as => :context, :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
+  has_many :active_assignments, -> { where("assignments.workflow_state<>'deleted'") }, as: :context, class_name: 'Assignment'
+  has_many :folders, -> { order('folders.name') }, as: :context, dependent: :destroy
+  has_many :active_folders, -> { where("folder.workflow_state<>'deleted'").order('folders.name') }, class_name: 'Folder', as: :context
   has_many :developer_keys
   has_many :authentication_providers,
-           order: "position",
+           -> { order(:position) },
            extend: AccountAuthorizationConfig::FindWithType,
            class_name: "AccountAuthorizationConfig"
 
   has_many :account_reports
-  has_many :grading_standards, :as => :context, :conditions => ['workflow_state != ?', 'deleted']
+  has_many :grading_standards, -> { where("workflow_state<>'deleted'") }, as: :context
   has_many :assessment_questions, :through => :assessment_question_banks
-  has_many :assessment_question_banks, as: :context, preload: [:assessment_questions, :assessment_question_bank_users]
+  has_many :assessment_question_banks, -> { preload(:assessment_questions, :assessment_question_bank_users) }, as: :context
   has_many :roles
   has_many :all_roles, :class_name => 'Role', :foreign_key => 'root_account_id'
   has_many :progresses, :as => :context
@@ -107,10 +107,10 @@ class Account < ActiveRecord::Base
   include LearningOutcomeContext
   include RubricContext
 
-  has_many :context_external_tools, :as => :context, :dependent => :destroy, :order => 'name'
+  has_many :context_external_tools, -> { order(:name) }, as: :context, dependent: :destroy
   has_many :error_reports
   has_many :announcements, :class_name => 'AccountNotification'
-  has_many :alerts, as: :context, preload: :criteria
+  has_many :alerts, -> { preload(:criteria) }, as: :context
   has_many :user_account_associations
   has_many :report_snapshots
   has_many :external_integration_keys, :as => :context, :dependent => :destroy
@@ -164,10 +164,12 @@ class Account < ActiveRecord::Base
   # the account settings page
   add_setting :sis_app_token, :root_only => true
   add_setting :sis_app_url, :root_only => true
+  add_setting :sis_default_grade_export, :boolean => true, :default => false, :inheritable => true
+
   add_setting :global_includes, :root_only => true, :boolean => true, :default => false
   add_setting :global_javascript, :condition => :allow_global_includes
   add_setting :global_stylesheet, :condition => :allow_global_includes
-  add_setting :sub_account_includes, :condition => :allow_global_includes, :boolean => true, :default => false
+  add_setting :sub_account_includes, :condition => :use_new_styles_or_allow_global_includes, :boolean => true, :default => false
   add_setting :error_reporting, :hash => true, :values => [:action, :email, :url, :subject_param, :body_param], :root_only => true
   add_setting :custom_help_links, :root_only => true
   add_setting :prevent_course_renaming_by_teachers, :boolean => true, :root_only => true
@@ -209,10 +211,6 @@ class Account < ActiveRecord::Base
   # be nice to be able to see the course first if you weren't expecting the
   # invitation.
   add_setting :allow_invitation_previews, :boolean => true, :root_only => true, :default => false
-  add_setting :self_registration, :boolean => true, :root_only => true, :default => false
-  # if self_registration_type is 'observer', then only observers (i.e. parents) can self register.
-  # if self_registration_type is 'all' or nil, any user type can self register.
-  add_setting :self_registration_type, :root_only => true
   add_setting :large_course_rosters, :boolean => true, :root_only => true, :default => false
   add_setting :edit_institution_email, :boolean => true, :root_only => true, :default => true
   add_setting :js_kaltura_uploader, :boolean => true, :root_only => true, :default => false
@@ -222,6 +220,10 @@ class Account < ActiveRecord::Base
   add_setting :author_email_in_notifications, boolean: true, root_only: true, default: false
   add_setting :include_students_in_global_survey, boolean: true, root_only: true, default: false
   add_setting :trusted_referers, root_only: true
+
+  def use_new_styles_or_allow_global_includes?
+    feature_enabled?(:use_new_styles) || allow_global_includes?
+  end
 
   def settings=(hash)
     @invalidate_settings_cache = true
@@ -264,7 +266,11 @@ class Account < ActiveRecord::Base
   end
 
   def allow_global_includes?
-    self.global_includes? || self.parent_account.try(:sub_account_includes?)
+    if root_account?
+      global_includes?
+    else
+      root_account.try(:sub_account_includes?)
+    end
   end
 
   def global_includes_hash
@@ -306,22 +312,21 @@ class Account < ActiveRecord::Base
   end
 
   def self_registration?
-    !!settings[:self_registration] && canvas_authentication?
+    canvas_authentication_provider.try(:jit_provisioning?)
   end
 
   def self_registration_type
-    settings[:self_registration_type]
+    canvas_authentication_provider.try(:self_registration)
   end
 
   def self_registration_allowed_for?(type)
     return false unless self_registration?
-    return false if self_registration_type && self_registration_type != 'all' && type != self_registration_type
+    return false if self_registration_type != 'all' && type != self_registration_type
     true
   end
 
   def enable_self_registration
-    settings[:self_registration] = true
-    save!
+    canvas_authentication_provider.update_attribute(:self_registration, true)
   end
 
   def terms_required?

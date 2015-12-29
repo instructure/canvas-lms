@@ -132,6 +132,7 @@ define [
     teardown: ->
       fakeENV.teardown()
       $('#fixtures').empty()
+      $("form.dialogFormView").remove()
 
   test "initializes collection", ->
     view = createView(@model)

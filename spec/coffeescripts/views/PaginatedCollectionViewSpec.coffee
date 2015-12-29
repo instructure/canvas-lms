@@ -1,10 +1,11 @@
 define [
   'jquery'
+  'Backbone'
   'compiled/collections/PaginatedCollection'
   'compiled/views/PaginatedCollectionView'
   'helpers/getFakePage'
   'helpers/fakeENV'
-], ($, PaginatedCollection, PaginatedCollectionView, fakePage, fakeENV) ->
+], ($, Backbone, PaginatedCollection, PaginatedCollectionView, fakePage, fakeENV) ->
 
   server = null
   clock = null
@@ -154,4 +155,3 @@ define [
     # ".pagination:#{view.cid}" events are all wipe out on last fetch, so the
     # assertion at the beginning of the test in the handler shouldn't fire
     fixtures.trigger fakeEvent
-

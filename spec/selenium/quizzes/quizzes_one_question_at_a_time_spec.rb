@@ -1,5 +1,5 @@
-require_relative "../common"
-require_relative "../helpers/quiz_questions_common"
+require_relative '../common'
+require_relative '../helpers/quiz_questions_common'
 
 describe 'taking a quiz one question at a time' do
   include_context 'in-process server selenium tests'
@@ -9,7 +9,7 @@ describe 'taking a quiz one question at a time' do
     create_oqaat_quiz(publish: true)
   end
 
-  context 'with a student' do
+  context 'as a student' do
 
     before(:each) do
       user_session(@student)
@@ -101,7 +101,7 @@ describe 'taking a quiz one question at a time' do
     end
   end
 
-  context 'with a teacher' do
+  context 'as a teacher' do
 
     before(:each) do
       user_session(@teacher)

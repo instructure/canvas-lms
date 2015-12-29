@@ -42,13 +42,6 @@ define([
     });
     $(".datetime_field").datetime_field();
     $("#add_notification_form textarea").editorBox().width('100%');
-    $("#add_notification_form .datetime_field").bind('blur change', function() {
-      var date = Date.parse($(this).val());
-      if(date) {
-        date = $.datetimeString(date);
-      }
-      $(this).val(date);
-    });
     $("#add_notification_form").submit(function(event) {
       var $this = $(this);
       var $confirmation = $this.find('#confirm_global_announcement:visible:not(:checked)');
@@ -295,7 +288,7 @@ define([
     }).trigger('change');
 
     $('#account_settings_global_includes').change(function() {
-      $('#new_styles_sub_account_includes').toggle(this.checked);
+      $('#global_includes_warning_message_wrapper').toggleClass('alert', this.checked);
     }).trigger('change');
   });
 

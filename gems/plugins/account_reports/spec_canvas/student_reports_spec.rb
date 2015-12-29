@@ -468,12 +468,40 @@ describe 'Student reports' do
       expect(report.parameters["extra_text"]).to eq "Term: Fall;"
       parsed = parse_report(report, {order: 1})
       expect(parsed[0]).to eq [@user1.id.to_s, 'secondSIS', 'Clair, John St.',
-                           @last_login_time.iso8601, p1b.current_login_ip]
+                               @last_login_time.iso8601, p1b.current_login_ip]
       expect(parsed[1]).to eq [@user1.id.to_s, 'user_sis_id_01', 'Clair, John St.',
-                           @last_login_time2.iso8601, @p1.current_login_ip]
+                               @last_login_time2.iso8601, @p1.current_login_ip]
       expect(parsed[2]).to eq [@user2.id.to_s, 'user_sis_id_02', 'Bolton, Michael',
-                           @last_login_time.iso8601, @p2.current_login_ip]
+                               @last_login_time.iso8601, @p2.current_login_ip]
       expect(parsed.length).to eq 3
+    end
+
+    it 'should not include a user with a deleted enrollment' do
+      @course2.enroll_user(@user3, 'StudentEnrollment', {:enrollment_state => 'deleted'})
+      param = {}
+      param['course'] = @course2.id
+      param['include_deleted'] = false
+      parsed = read_report(@type, {params: param, order: 1})
+      expect(parsed.length).to eq 2
+      expect(parsed[0]).to eq [@user1.id.to_s, 'user_sis_id_01', 'Clair, John St.',
+                               @last_login_time2.iso8601, @p1.current_login_ip]
+      expect(parsed[1]).to eq [@user2.id.to_s, 'user_sis_id_02', 'Bolton, Michael',
+                               @last_login_time.iso8601, @p2.current_login_ip]
+    end
+
+    it 'should include a user with a deleted enrollment' do
+      @course2.enroll_user(@user3, 'StudentEnrollment', {:enrollment_state => 'deleted'})
+      param = {}
+      param['course'] = @course2.id
+      param['include_deleted'] = true
+      parsed = read_report(@type, {params: param, order: 1})
+      expect(parsed.length).to eq 3
+      expect(parsed[0]).to eq [@user1.id.to_s, 'user_sis_id_01', 'Clair, John St.',
+                               @last_login_time2.iso8601, @p1.current_login_ip]
+      expect(parsed[1]).to eq [@user2.id.to_s, 'user_sis_id_02', 'Bolton, Michael',
+                               @last_login_time.iso8601, @p2.current_login_ip]
+      expect(parsed[2]).to eq [@user3.id.to_s, 'user_sis_id_03', 'Astley, Rick',
+                               @last_login_time2.iso8601, @p3.current_login_ip]
     end
   end
 

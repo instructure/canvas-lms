@@ -1,6 +1,8 @@
 # Put this in config/application.rb
 require File.expand_path('../boot', __FILE__)
 
+require_relative '../lib/canvas_yaml'
+
 unless CANVAS_RAILS3
 
   # Yes, it doesn't seem DRY to list these both in the if and else
@@ -170,35 +172,25 @@ module CanvasRails
       end
     end
 
-    # We need to make sure that safe_yaml is loaded *after* the YAML engine
-    # is switched to Syck (which DelayedJob needs for now). Otherwise we
-    # won't have access to (safe|unsafe)_load.
-    require 'yaml'
-    if RUBY_VERSION >= '2.0.0'
-      require 'syck'
+    SafeYAML.singleton_class.send(:attr_accessor, :safe_parsing)
+    module SafeYAMLWithFlag
+      def load(*args)
+        previous, self.safe_parsing = safe_parsing, true
+        super
+      ensure
+        self.safe_parsing = previous
+      end
     end
-    YAML::ENGINE.yamler = 'syck' if defined?(YAML::ENGINE)
-    require 'safe_yaml'
-    YAML.enable_symbol_parsing!
-    # We don't need to be reminded that safe loads are being used everywhere.
-    SafeYAML::OPTIONS[:suppress_warnings] = true
+    SafeYAML.singleton_class.prepend(SafeYAMLWithFlag)
 
-    # This tag whitelist is syck specific. We'll need to tweak it when we upgrade to psych.
-    # See the tests in spec/lib/safe_yaml_spec.rb
-        YAML.whitelist.add(*%w[
-      tag:ruby.yaml.org,2002:symbol
-      tag:yaml.org,2002:timestamp
-      tag:yaml.org,2002:map:HashWithIndifferentAccess
-      tag:yaml.org,2002:map:ActiveSupport::HashWithIndifferentAccess
-      tag:ruby.yaml.org,2002:object:OpenStruct
-      tag:ruby.yaml.org,2002:object:Scribd::Document
-      tag:ruby.yaml.org,2002:object:Mime::Type
-      tag:ruby.yaml.org,2002:object:URI::HTTP
-      tag:ruby.yaml.org,2002:object:URI::HTTPS
-      tag:ruby.yaml.org,2002:object:OpenObject
-      tag:yaml.org,2002:map:WeakParameters
-    ])
-    YAML.whitelist.add('tag:ruby.yaml.org,2002:object:Class') { |classname| Canvas::Migration.valid_converter_classes.include?(classname) }
+    # safe_yaml can't whitelist specific instances of scalar values, so just override the loading
+    # here, and do a weird check
+    YAML.add_ruby_type("object:Class") do |_type, val|
+      if SafeYAML.safe_parsing && !Canvas::Migration.valid_converter_classes.include?(val)
+        raise "Cannot load class #{val} from YAML"
+      end
+      val.constantize
+    end
 
     # Extend any base classes, even gem classes
     Dir.glob("#{Rails.root}/lib/ext/**/*.rb").each { |file| require file }

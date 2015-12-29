@@ -18,6 +18,7 @@ module Lti
   class ToolProxyController < ApplicationController
     before_filter :require_context
     before_filter :require_user
+    before_filter :set_tool_proxy, only: [:destroy, :update, :accept_update, :dismiss_update]
 
     def destroy
       if authorized_action(@context, @current_user, :update)
@@ -33,14 +34,64 @@ module Lti
       end
     end
 
+
+    def accept_update
+      if authorized_action(@context, @current_user, :update)
+        success = false
+
+        if @tool_proxy.update?
+          ack_url = @tool_proxy.update_payload[:acknowledgement_url]
+          payload = @tool_proxy.update_payload[:payload]
+          tc_half_shared_secret = @tool_proxy.update_payload[:tc_half_shared_secret]
+
+          guid = @tool_proxy.guid
+          tp_service = ToolProxyService.new
+
+          ActiveRecord::Base.transaction do
+
+            tp_service.process_tool_proxy_json(payload, context, guid, @tool_proxy, tc_half_shared_secret)
+
+            ack_response = CanvasHttp.put(ack_url)
+            if ack_response.code == "200"
+              success = true
+            else
+              # something went terribly wrong
+              raise ActiveRecord::Rollback
+            end
+          end
+        end
+
+        if success
+          render json: '{"status": "Success"}'
+        else
+          render json: '{"status": "Failed"}', status: 424
+        end
+      end
+    end
+
+    def dismiss_update
+      if authorized_action(@context, @current_user, :update)
+
+        ack_url = @tool_proxy.update_payload[:acknowledgement_url]
+        @tool_proxy.update_payload = nil
+        @tool_proxy.save!
+
+        CanvasHttp.delete(ack_url)
+        render json: '{"status":"success"}'
+      end
+    end
+
     private
 
+    def set_tool_proxy
+      @tool_proxy = Lti::ToolProxy.find(params[:tool_proxy_id])
+    end
+
     def update_workflow_state(workflow_state)
-      tool_proxy = Lti::ToolProxy.find(params[:tool_proxy_id])
-      tool_proxy.update_attribute(:workflow_state, workflow_state)
+      @tool_proxy.update_attribute(:workflow_state, workflow_state)
 
       # this needs to be moved to whatever changes the workflow state to active
-      invalidate_nav_tabs_cache(tool_proxy)
+      invalidate_nav_tabs_cache(@tool_proxy)
     end
 
     def invalidate_nav_tabs_cache(tool_proxy)

@@ -8,6 +8,10 @@ define [
     TestUtils = React.addons.TestUtils
 
     module "UsageRightsSelectBox",
+      setup: ->
+      teardown: ->
+        $("div.error_box").remove()
+
     test "shows alert message if nothing is chosen and component is setup for a message", ->
       props = {
         showMessage: true

@@ -50,7 +50,7 @@ class CalendarEvent < ActiveRecord::Base
   validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'User', 'Group', 'AppointmentGroup', 'CourseSection']
   belongs_to :user
   belongs_to :parent_event, :class_name => 'CalendarEvent', :foreign_key => :parent_calendar_event_id, :inverse_of => :child_events
-  has_many :child_events, :class_name => 'CalendarEvent', :foreign_key => :parent_calendar_event_id, :conditions => "calendar_events.workflow_state <> 'deleted'", :inverse_of => :parent_event
+  has_many :child_events, -> { where("calendar_events.workflow_state <> 'deleted'") }, class_name: 'CalendarEvent', foreign_key: :parent_calendar_event_id, inverse_of: :parent_event
   validates_presence_of :context, :workflow_state
   validates_associated :context, :if => lambda { |record| record.validate_context }
   validates_length_of :description, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true

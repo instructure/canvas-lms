@@ -6,6 +6,7 @@ define({
     'id',
     'points_possible',
     'speed_grader_url',
+    'anonymous_survey',
     'quiz_submissions_zip_url',
   ],
 

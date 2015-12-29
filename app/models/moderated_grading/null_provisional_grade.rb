@@ -1,5 +1,6 @@
 class ModeratedGrading::NullProvisionalGrade
-  def initialize(scorer_id, final)
+  def initialize(submission, scorer_id, final)
+    @submission = submission
     @scorer_id = scorer_id
     @final = final
   end
@@ -17,6 +18,6 @@ class ModeratedGrading::NullProvisionalGrade
   end
 
   def submission_comments
-    SubmissionComment.none
+    @submission.submission_comments
   end
 end

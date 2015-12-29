@@ -25,9 +25,7 @@ define [
 
   test "it should inject styleSheets", 1, ->
     whnd = popup.exec()
-
-    strictEqual $(whnd.document).find("link[href]").length,
-      $(root.document).find("link[href]").length
+    strictEqual $(whnd.document).find("link[href]").length,$("link").length
 
   test "it should trigger the @open and @close events", ->
     onOpen = @spy()

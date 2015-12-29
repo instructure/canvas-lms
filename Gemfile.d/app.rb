@@ -19,7 +19,7 @@ gem 'authlogic', '3.4.2'
 gem 'active_model-better_errors', '1.6.7', require: 'active_model/better_errors'
 gem 'dynamic_form', '1.1.4', require: false
 gem 'rails-patch-json-encode', '0.0.1'
-gem 'switchman', '1.3.12'
+gem 'switchman', '1.3.13'
 gem 'folio-pagination', '0.0.9', require: 'folio/rails'
   # for folio, see the folio README
   gem 'will_paginate', '3.0.7', require: false
@@ -34,7 +34,7 @@ gem 'bcrypt-ruby', '3.0.1'
 gem 'canvas_connect', '0.3.8'
   gem 'adobe_connect', '1.0.3', require: false
 gem 'canvas_webex', '0.15'
-gem 'canvas-jobs', '0.10.0'
+gem 'canvas-jobs', '0.10.3'
   gem 'rufus-scheduler', '3.1.2', require: false
 gem 'ffi', '1.1.5', require: false
 gem 'hairtrigger', '0.2.15'
@@ -49,7 +49,7 @@ gem 'i18nema', '0.0.8', platforms: [:ruby_20, :ruby_21, :ruby_22]
 gem 'i18nema19', '0.0.8', platform: :ruby_19
 gem 'i18nliner', '0.0.12'
 gem 'icalendar', '1.5.4', require: false
-gem 'ims-lti', '2.0.0.beta.27'
+gem 'ims-lti', '2.0.0.beta.33'
 gem 'json', '1.8.2'
 gem 'oj', '2.5.5'
 gem 'jwt', '1.2.1', require: false
@@ -86,10 +86,7 @@ gem 'ruby-duration', '3.2.0', require: false
 gem 'ruby-saml-mod', '0.2.7'
 gem 'rubycas-client', '2.3.9', require: false
 gem 'rubyzip', '1.1.1', require: 'zip'
-gem 'zip-zip', '0.2' # needed until plugins use the new namespace
-gem 'safe_yaml', '0.9.7', require: false
-gem 'safe_yaml-instructure', '0.8.0', require: false
-  gem 'hashie', '2.0.5', require: false
+gem 'safe_yaml', '1.0.4', require: false
 gem 'sanitize', '2.0.6', require: false
 gem 'shackles', '1.0.7'
 
@@ -100,8 +97,8 @@ gem 'crocodoc-ruby', '0.0.1', require: false
 gem 'hey', '1.3.0', require: false
 gem 'sentry-raven', '0.13.2', require: false
 gem 'canvas_statsd', '1.0.3'
+gem 'diplomat', '0.14.0', require: false
 
-gem 'active_polymorph', path: 'gems/active_polymorph'
 gem 'activesupport-suspend_callbacks', path: 'gems/activesupport-suspend_callbacks'
 gem 'acts_as_list', path: 'gems/acts_as_list'
 gem 'adheres_to_policy', path: 'gems/adheres_to_policy'

@@ -14,11 +14,10 @@ define [
   originalWeightingScheme = null
 
   clone = (obj) ->
-    Em.copy obj, true
+    Ember.copy obj, true
 
-
-  fixtures.create()
   setup = (isDraftState=false, sortOrder='assignment_group') ->
+    fixtures.create()
     originalWeightingScheme =  window.ENV.GRADEBOOK_OPTIONS.group_weighting_scheme
     @contextGetStub = sinon.stub(userSettings, 'contextGet')
     @contextSetStub = sinon.stub(userSettings, 'contextSet')
@@ -217,7 +216,7 @@ define [
   module 'screenreader_gradebook_controller:draftState',
     setup: ->
       setup.call this, true
-      Em.run =>
+      Ember.run =>
         @srgb.get('assignment_groups').pushObject
           id: '100'
           name: 'Silent Assignments'
@@ -331,40 +330,40 @@ define [
 
   module 'screenreader_gradebook_controller: notes computed props',
     setup: ->
-      ENV.GRADEBOOK_OPTIONS.custom_column_url = '/here/is/an/:id'
-      ENV.GRADEBOOK_OPTIONS.teacher_notes = id:'42'
-      @server = sinon.fakeServer.create()
       setup.call this
+      window.ENV.GRADEBOOK_OPTIONS.custom_column_url = '/here/is/an/:id'
+      window.ENV.GRADEBOOK_OPTIONS.teacher_notes = id:'42'
+      @server = sinon.fakeServer.create()
       Ember.run =>
         #@srgb.set('custom_columns', [{teacher_notes: true, id: '42'}])
         @srgb.reopen
           updateOrCreateNotesColumn: ->
     teardown: ->
-      ENV.GRADEBOOK_OPTIONS.custom_column_url = null
-      ENV.GRADEBOOK_OPTIONS.teacher_notes = null
+      window.ENV.GRADEBOOK_OPTIONS.custom_column_url = null
+      window.ENV.GRADEBOOK_OPTIONS.teacher_notes = null
       @server.restore()
       teardown.call this
 
   test 'computes showNotesColumn correctly', ->
-    ENV.GRADEBOOK_OPTIONS.teacher_notes =
+    window.ENV.GRADEBOOK_OPTIONS.teacher_notes =
       hidden: false
     equal @srgb.get('showNotesColumn'), true
 
-    ENV.GRADEBOOK_OPTIONS.teacher_notes =
+    window.ENV.GRADEBOOK_OPTIONS.teacher_notes =
       hidden: true
     equal @srgb.get('showNotesColumn'), false
 
-    ENV.GRADEBOOK_OPTIONS.teacher_notes = null
+    window.ENV.GRADEBOOK_OPTIONS.teacher_notes = null
     equal @srgb.get('showNotesColumn'), false
 
   test 'shouldCreateNotes, no notes in ENV', ->
-    ENV.GRADEBOOK_OPTIONS.teacher_notes = null
+    window.ENV.GRADEBOOK_OPTIONS.teacher_notes = null
     Ember.run =>
       @srgb.set('showNotesColumn', true)
     equal @srgb.get('shouldCreateNotes'), true, 'true if no teacher_notes and showNotesColumns is true'
 
   test 'shouldCreateNotes, notes in ENV, hidden', ->
-    ENV.GRADEBOOK_OPTIONS.teacher_notes =
+    window.ENV.GRADEBOOK_OPTIONS.teacher_notes =
       hidden: true
     Ember.run =>
       @srgb.set('showNotesColumn', true)
@@ -372,7 +371,7 @@ define [
     equal actual, false, 'does not create if there is a teacher_notes object in the ENV'
 
   test 'shouldCreateNotes, notes in ENV, shown', ->
-    ENV.GRADEBOOK_OPTIONS.teacher_notes =
+    window.ENV.GRADEBOOK_OPTIONS.teacher_notes =
       hidden: false
     Ember.run =>
       @srgb.set('showNotesColumn', true)
@@ -417,7 +416,7 @@ define [
   module 'screenreader_gradebook_controller:invalidGroups',
     setup: ->
       setup.call this, true
-      Em.run =>
+      Ember.run =>
         @srgb.set('assignment_groups',Ember.ArrayProxy.create(content: clone fixtures.assignment_groups))
     teardown: ->
       teardown.call this
@@ -469,4 +468,3 @@ define [
       @srgb.set('selectedOutcome', outcome)
       @srgb.set('selectedStudent', student)
       equal @srgb.get('selectedOutcomeResult').mastery_points, outcome.mastery_points
-

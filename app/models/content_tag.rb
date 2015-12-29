@@ -104,10 +104,7 @@ class ContentTag < ActiveRecord::Base
     elsif ids.empty?
       # do nothing
     else
-      ContextModule.transaction do
-        ContextModule.where(id: ids).order(:id).lock.pluck(:id)
-        ContextModule.where(id: ids).update_all(updated_at: Time.now.utc)
-      end
+      ContextModule.where(id: ids).touch_all
     end
     true
   end

@@ -279,7 +279,7 @@ end
 describe ModeratedGrading::NullProvisionalGrade do
   describe 'grade_attributes' do
     it "returns the proper format" do
-      expect(ModeratedGrading::NullProvisionalGrade.new(1, false).grade_attributes).to eq({
+      expect(ModeratedGrading::NullProvisionalGrade.new(nil, 1, false).grade_attributes).to eq({
         'provisional_grade_id' => nil,
         'grade' => nil,
         'score' => nil,
@@ -289,7 +289,7 @@ describe ModeratedGrading::NullProvisionalGrade do
         'grade_matches_current_submission' => true
       })
 
-      expect(ModeratedGrading::NullProvisionalGrade.new(2, true).grade_attributes).to eq({
+      expect(ModeratedGrading::NullProvisionalGrade.new(nil, 2, true).grade_attributes).to eq({
         'provisional_grade_id' => nil,
         'grade' => nil,
         'score' => nil,
@@ -299,5 +299,12 @@ describe ModeratedGrading::NullProvisionalGrade do
         'grade_matches_current_submission' => true
       })
     end
+  end
+
+  it "should return the original submission's submission comments" do
+    sub = stub
+    comments = stub
+    sub.expects(:submission_comments).returns(comments)
+    expect(ModeratedGrading::NullProvisionalGrade.new(sub, 1, false).submission_comments).to eq(comments)
   end
 end

@@ -316,7 +316,8 @@ class ContentMigration < ActiveRecord::Base
     set_default_settings
     plugin ||= Canvas::Plugin.find(migration_type)
     if plugin
-      queue_opts = {:priority => Delayed::LOW_PRIORITY, :max_attempts => 1}
+      queue_opts = {:priority => Delayed::LOW_PRIORITY, :max_attempts => 1,
+                    :expires_at => Setting.get('content_migration_job_expiration_hours', '48').to_i.hours.from_now}
       if self.strand
         queue_opts[:strand] = self.strand
       else
@@ -327,7 +328,7 @@ class ContentMigration < ActiveRecord::Base
         # it's ready to be imported
         self.workflow_state = :importing
         self.save
-        self.send_later_enqueue_args(:import_content, queue_opts)
+        self.send_later_enqueue_args(:import_content, queue_opts.merge(:on_permanent_failure => :fail_with_error!))
       else
         # find worker and queue for conversion
         begin

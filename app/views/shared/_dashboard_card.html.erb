@@ -1,16 +1,21 @@
 <% js_bundle :dashboard_card %>
 <% css_bundle :dashboard_card %>
 
-<% js_env :DASHBOARD_COURSES => map_courses_for_menu(@current_user.menu_courses, :include_section_tabs => true) %>
+<% 
+dashboard_courses = map_courses_for_menu(@current_user.menu_courses, :include_section_tabs => true)
+js_env :DASHBOARD_COURSES => dashboard_courses %>
 
 <div id="DashboardCard_Container" style="display: <%= show_recent_activity? ? 'none' : 'block' %>">
   <div class="ic-DashboardCard_Box grid-row">
-    <% for i in 0..5 do %>
-      <div class="col-xs-6 col-lg-4 card">
-        <div class="ic-DashboardCard">
-          <%= image_tag('dashcards/dashcard_empty.svg', :alt => '') %>
+    <% for i in 0..dashboard_courses.length-1 do %>
+      <div class="col-xs-6 col-lg-4">
+        <div class="card">
+          <div class="ic-DashboardCard">
+            <%= image_tag('dashcards/dashcard_empty.svg', :alt => '') %>
+          </div>
         </div>
       </div>
     <% end %>
   </div>
+
 </div>

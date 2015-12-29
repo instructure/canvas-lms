@@ -50,10 +50,10 @@ class DiscussionTopic < ActiveRecord::Base
 
   attr_readonly :context_id, :context_type, :user_id
 
-  has_many :discussion_entries, :order => :created_at, :dependent => :destroy
-  has_many :rated_discussion_entries, :class_name => 'DiscussionEntry', :order =>
-    ['COALESCE(parent_id, 0)', 'COALESCE(rating_sum, 0) DESC', :created_at]
-  has_many :root_discussion_entries, class_name: 'DiscussionEntry', preload: :user, conditions: ['discussion_entries.parent_id IS NULL AND discussion_entries.workflow_state != ?', 'deleted']
+  has_many :discussion_entries, -> { order(:created_at) }, dependent: :destroy
+  has_many :rated_discussion_entries, -> { order(
+    ['COALESCE(parent_id, 0)', 'COALESCE(rating_sum, 0) DESC', :created_at]) }, class_name: 'DiscussionEntry'
+  has_many :root_discussion_entries, -> { preload(:user).where("discussion_entries.parent_id IS NULL AND discussion_entries.workflow_state<>'deleted'") }, class_name: 'DiscussionEntry'
   has_one :external_feed_entry, :as => :asset
   belongs_to :external_feed
   belongs_to :context, :polymorphic => true
@@ -388,11 +388,16 @@ class DiscussionTopic < ActiveRecord::Base
     self.discussion_entries.active.count
   end
 
-  def unread_count(current_user = nil)
+  # Do not use the lock options unless you truly need
+  # the lock, for instance to update the count.
+  # Careless use has caused database transaction deadlocks
+  def unread_count(current_user = nil, lock: false)
     current_user ||= self.current_user
     return 0 unless current_user # default for logged out users
-    Shackles.activate(:master) do
-      topic_participant = discussion_topic_participants.lock.where(user_id: current_user).select(:unread_entry_count).first
+
+    environment = lock ? :master : :slave
+    Shackles.activate(environment) do
+      topic_participant = discussion_topic_participants.where(user_id: current_user).select(:unread_entry_count).lock(lock).first
       topic_participant.try(:unread_entry_count) || self.default_unread_count
     end
   end
@@ -479,7 +484,7 @@ class DiscussionTopic < ActiveRecord::Base
         DiscussionTopic.unique_constraint_retry do
           topic_participant = self.discussion_topic_participants.where(:user_id => current_user).lock.first
           topic_participant ||= self.discussion_topic_participants.build(:user => current_user,
-                                                                         :unread_entry_count => self.unread_count(current_user),
+                                                                         :unread_entry_count => self.unread_count(current_user, lock: true),
                                                                          :workflow_state => "unread",
                                                                          :subscribed => current_user == user && !subscription_hold(current_user, nil, nil))
           topic_participant.workflow_state = opts[:new_state] if opts[:new_state]
@@ -656,7 +661,11 @@ class DiscussionTopic < ActiveRecord::Base
       else
         student_ids = opts[:student_ids] || self.context.all_real_student_enrollments.select(:user_id)
         if self.for_group_discussion?
-          !DiscussionEntry.active.where(user_id: student_ids, discussion_topic_id: child_topics).exists?
+          if CANVAS_RAILS3
+            !DiscussionEntry.active.where(user_id: student_ids, discussion_topic_id: child_topics).exists?
+          else
+          !DiscussionEntry.active.joins(:discussion_topic).merge(child_topics).where(user_id: student_ids).exists?
+          end
         else
           !self.discussion_entries.active.where(:user_id => student_ids).exists?
         end
@@ -706,7 +715,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   on_create_send_to_streams do
     if should_send_to_stream
-      self.active_participants
+      self.active_participants_with_visibility
     end
   end
 
@@ -714,7 +723,7 @@ class DiscussionTopic < ActiveRecord::Base
     check_state = !is_announcement ? 'unpublished' : 'post_delayed'
     became_active = workflow_state_was == check_state && workflow_state == 'active'
     if should_send_to_stream && (@content_changed || became_active)
-      self.active_participants
+      self.active_participants_with_visibility
     end
   end
 
@@ -789,7 +798,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def restore(from=nil)
-    self.workflow_state = 'unpublished'
+    self.workflow_state = is_announcement ? 'active' : 'unpublished'
     self.save
 
     if from != :assignment && self.for_assignment? && self.root_topic_id.blank?
@@ -1063,6 +1072,11 @@ class DiscussionTopic < ActiveRecord::Base
         return false
       end
 
+      # locked by context module
+      if self.could_be_locked && locked_by_module_item?(user, true)
+        return false
+      end
+
       # topic is not published
       if !published?
         false
@@ -1088,7 +1102,7 @@ class DiscussionTopic < ActiveRecord::Base
       if (self.delayed_post_at && self.delayed_post_at > Time.now)
         locked = {:asset_string => self.asset_string, :unlock_at => self.delayed_post_at}
       elsif (self.lock_at && self.lock_at < Time.now)
-        locked = {:asset_string => self.asset_string, :lock_at => self.lock_at}
+        locked = {:asset_string => self.asset_string, :lock_at => self.lock_at, :can_view => true}
       elsif !opts[:skip_assignment] && (self.assignment && l = self.assignment.locked_for?(user, opts))
         locked = l
       elsif self.could_be_locked && item = locked_by_module_item?(user, opts[:deep_check_if_needed])

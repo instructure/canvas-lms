@@ -1,9 +1,10 @@
 define [
+  '../mockFilesENV'
   'react'
   'jquery'
   'jsx/files/RestrictedDialogForm'
   'compiled/models/Folder'
-], (React, $, RestrictedDialogForm, Folder) ->
+], (mockFilesENV, React, $, RestrictedDialogForm, Folder) ->
 
   Simulate = React.addons.TestUtils.Simulate
 

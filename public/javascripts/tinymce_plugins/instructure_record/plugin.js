@@ -18,22 +18,12 @@
 
 define([
   'compiled/editor/stocktiny',
-  'jquery',
-  'str/htmlEscape',
-  'media_comments'
-], function(tinymce,$, htmlEscape) {
+  'tinymce_plugins/instructure_record/mediaEditorLoader'
+], function(tinymce, mediaEditorLoader) {
 
   tinymce.create('tinymce.plugins.InstructureRecord', {
     init : function(ed, url) {
-      ed.addCommand('instructureRecord', function() {
-        var $editor = $("#" + ed.id);
-        $.mediaComment('create', 'any', function(id, mediaType) {
-          var linkCode = "<a href='/media_objects/" + htmlEscape(id) + "' class='instructure_inline_media_comment " + htmlEscape(mediaType || "video") + "_comment' id='media_comment_" + htmlEscape(id) + "'>this is a media comment</a><br>";
-          $editor.editorBox('insert_code', linkCode);
-          ed.selection.select($(ed.getBody()).find("#media_comment_"+id+" + br")[0]);
-          ed.selection.collapse(true);
-        })
-      });
+      ed.addCommand('instructureRecord', mediaEditorLoader.insertEditor.bind(mediaEditorLoader, ed));
       ed.addButton('instructure_record', {
         title: 'Record/Upload Media',
         cmd: 'instructureRecord',

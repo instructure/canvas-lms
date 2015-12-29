@@ -23,9 +23,7 @@ class CrocodocDocument < ActiveRecord::Base
 
   belongs_to :attachment
 
-  has_and_belongs_to_many :submissions,
-    join_table: :canvadocs_submissions,
-    readonly: true
+  has_and_belongs_to_many :submissions, -> { readonly(true) }, join_table: :canvadocs_submissions
 
   MIME_TYPES = %w(
     application/pdf
@@ -98,7 +96,11 @@ class CrocodocDocument < ActiveRecord::Base
       opts[:filter] = user.crocodoc_id!
     end
 
-    submissions = self.submissions.preload(:assignment)
+    submissions = attachment.attachment_associations.
+      where(:context_type => 'Submission').
+      preload(context: [:assignment]).
+      map(&:context)
+
     if submissions.any? { |s| s.grants_right? user, :read_grade }
       opts[:filter] = 'all'
 

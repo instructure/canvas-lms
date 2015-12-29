@@ -327,46 +327,60 @@ describe CalendarEvent do
       channel.confirm
     end
 
-    it "should send notifications to participants" do
-      course_with_student(:active_all => true)
-      event1 = @course.calendar_events.build(:title => "test")
-      event1.updating_user = @teacher
-      event1.save!
-      expect(event1.messages_sent).to be_include("New Event Created")
-      users = event1.messages_sent["New Event Created"].map(&:user_id)
-      expect(users).to include(@student.id)
-      expect(users).not_to include(@teacher.id)
-      event1.messages_sent["New Event Created"].each do |message|
-        expect(message.url).to include "/courses/#{@course.id}/calendar_events/#{event1.id}"
+    context "with calendar event created" do
+      before :once do
+        course_with_student(active_all: true)
+        @event1 = @course.calendar_events.build(title: "test")
+        @event1.updating_user = @teacher
+        @event1.save!
       end
 
-      event1.update_attributes(:start_at => Time.now, :end_at => Time.now)
-      expect(event1.messages_sent).to be_include("Event Date Changed")
-      users = event1.messages_sent["Event Date Changed"].map(&:user_id)
-      expect(users).to include(@student.id)
-      expect(users).not_to include(@teacher.id)
-      event1.messages_sent["Event Date Changed"].each do |message|
-        expect(message.url).to include "/courses/#{@course.id}/calendar_events/#{event1.id}"
+      context "creation notification" do
+        before :once do
+          @users = @event1.messages_sent["New Event Created"].map(&:user_id)
+        end
+
+        it "should send to participants", priority: "1", test_id: 186751 do
+          expect(@event1.messages_sent).to be_include("New Event Created")
+          expect(@users).to include(@student.id)
+        end
+
+        it "should have correct URL" do
+          @event1.messages_sent["New Event Created"].each do |message|
+            expect(message.url).to include "/courses/#{@course.id}/calendar_events/#{@event1.id}"
+          end
+        end
+
+        it "should not send to creating teacher" do
+          expect(@users).not_to include(@teacher.id)
+        end
       end
 
-      event2 = @course.default_section.calendar_events.build(:title => "test")
-      event2.updating_user = @teacher
-      event2.save!
-      expect(event2.messages_sent).to be_include("New Event Created")
-      users = event1.messages_sent["New Event Created"].map(&:user_id)
-      expect(users).to include(@student.id)
-      expect(users).not_to include(@teacher.id)
-      event2.messages_sent["New Event Created"].each do |message|
-        expect(message.url).to include "/course_sections/#{@course.default_section.id}/calendar_events/#{event2.id}"
-      end
+      context "with event date edited" do
+        before :once do
+          @event1.update_attributes(start_at: Time.now, end_at: Time.now)
+        end
 
-      event2.update_attributes(:start_at => Time.now, :end_at => Time.now)
-      expect(event2.messages_sent).to be_include("Event Date Changed")
-      users = event1.messages_sent["Event Date Changed"].map(&:user_id)
-      expect(users).to include(@student.id)
-      expect(users).not_to include(@teacher.id)
-      event2.messages_sent["Event Date Changed"].each do |message|
-        expect(message.url).to include "/course_sections/#{@course.default_section.id}/calendar_events/#{event2.id}"
+        context "edit notification" do
+          before :once do
+            @users = @event1.messages_sent["Event Date Changed"].map(&:user_id)
+          end
+
+          it "should send to participants", priority: "1", test_id: 193162 do
+            expect(@event1.messages_sent).to be_include("Event Date Changed")
+            expect(@users).to include(@student.id)
+          end
+
+          it "should have correct url" do
+            @event1.messages_sent["Event Date Changed"].each do |message|
+              expect(message.url).to include "/courses/#{@course.id}/calendar_events/#{@event1.id}"
+            end
+          end
+
+          it "should not send to editing teacher" do
+            expect(@users).not_to include(@teacher.id)
+          end
+        end
       end
     end
 
@@ -420,7 +434,7 @@ describe CalendarEvent do
         end
       end
 
-      it "should notify all participants except the person reserving" do
+      it "should notify all participants except the person reserving", priority: "1", test_id: 193149 do
         reservation = @appointment2.reserve_for(@group, @student1)
         expect(Message.where(notification_id: BroadcastPolicy.notification_finder.by_name("Appointment Reserved For User"), user_id: [@student1, @student2]).pluck(:user_id)).to eq [@student2.id]
       end
@@ -432,28 +446,29 @@ describe CalendarEvent do
         expect(Message.where(notification_id: BroadcastPolicy.notification_finder.by_name("Appointment Deleted For User"), user_id: [@student1, @student2]).pluck(:user_id)).to eq [@student2.id]
       end
 
-      it "should notify participants if teacher deletes the appointment time slot" do
+      it "should notify participants if teacher deletes the appointment time slot", priority: "1", test_id: 193148 do
         reservation = @appointment2.reserve_for(@group, @student1)
         @appointment2.updating_user = @teacher
         @appointment2.destroy
         expect(Message.where(notification_id: BroadcastPolicy.notification_finder.by_name("Appointment Deleted For User"), user_id: [@student1, @student2]).pluck(:user_id).sort).to eq [@student1.id, @student2.id]
       end
 
-      it "should notify all participants when the the time slot is canceled" do
+      it "should notify all participants when the the time slot is canceled", priority: "1", test_id: 502005 do
         reservation = @appointment2.reserve_for(@group, @student1)
         @appointment2.updating_user = @teacher
-        @appointment2.destroy
-        expect(@appointment2.messages_sent).to be_empty
+        user_evt = CalendarEvent.where(context_type: 'Group').first
+        user_evt.updating_user = @teacher
+        user_evt.destroy
         expect(Message.where(notification_id: BroadcastPolicy.notification_finder.by_name("Appointment Deleted For User"), user_id: [@student1, @student2]).pluck(:user_id).sort).to eq [@student1.id, @student2.id]
       end
 
-      it "should notify admins when a user reserves" do
+      it "should notify admins when a user reserves", priority: "1", test_id: 193144 do
         reservation = @appointment.reserve_for(@user, @user)
         expect(reservation.messages_sent).to be_include("Appointment Reserved By User")
         expect(reservation.messages_sent["Appointment Reserved By User"].map(&:user_id).sort.uniq).to eql @course.instructors.map(&:id).sort
       end
 
-      it "should notify admins when a user cancels" do
+      it "should notify admins when a user cancels", priority: "1", test_id: 193147 do
         reservation = @appointment.reserve_for(@student1, @student1)
         reservation.updating_user = @student1
         reservation.destroy

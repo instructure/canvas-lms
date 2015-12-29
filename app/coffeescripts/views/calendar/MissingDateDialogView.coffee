@@ -72,5 +72,7 @@ define [
         @cancel(@invalidFields, @sectionNames)
 
     cancel: (e) =>
-      @$dialog.dialog('close').remove()
-      @invalidFields[0].focus()
+      if @$dialog? && @$dialog.data("dialog")
+        @$dialog.dialog('close').remove()
+      if @invalidFields[0]?
+        @invalidFields[0].focus()

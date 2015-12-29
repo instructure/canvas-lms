@@ -23,18 +23,18 @@ describe 'dashcards' do
       expect(f('#application.ic-app')).to be_present
       expect(f('.ic-app-header__main-navigation')).to be_present
       # verify the toggle switch is present
-      expect(f('.ic-Super-toggle__switch')).to be_present
+      expect(f('#dashboardToggleButton')).to be_present
     end
 
     it 'should toggle dashboard based on the toggle switch', priority: "1", test_id: 222507 do
       get '/'
-      expect(f('.ic-Super-toggle__switch')).to be_present
-      # toggle switch to right
-      f('.ic-Super-toggle__option--RIGHT').click
-      expect(f('#dashboard-activity').text).to include('Recent Activity')
-      # toggle switch to left
-      f('.ic-Super-toggle__option--LEFT').click
-      expect(f('.ic-DashboardCard__link')).to be_displayed
+      expect(f('#dashboardToggleButton')).to be_present
+      f('#dashboardToggleButton').click
+      if fj('#dashboardToggleButtonGridIcon').attribute(:class).include?('--active')
+        expect(f('.ic-DashboardCard__link')).to be_displayed
+      else
+        expect(f('#dashboard-activity').text).to include('Recent Activity')
+      end
     end
 
     it 'should redirect to announcements index', priority: "1", test_id: 222509 do
@@ -148,16 +148,6 @@ describe 'dashcards' do
         enrollment.accept!
       end
 
-      it 'should not display course code if the name is too long', priority: "1", test_id: 238191 do
-        @course1.name = 'Test Course Test Course Test Course Test Course Test Course Test Course Test Course Test' \
-                        'Course Test Course Test Course Test Course Test Course Test Course Test Course Test Course'\
-                        'Test Course Test Course Test Course Test Course Te'
-        @course1.course_code = '001'
-        @course1.save!
-        get '/'
-        expect(f('.ic-DashboardCard__header-subtitle').text).to be_blank
-      end
-
       it 'should display special characters in a course title', priority: "1", test_id: 238192 do
         @course1.name = '(/*-+_@&$#%)"Course 1"æøåñó?äçíì[{c}]<strong>stuff</strong> )'
         @course1.save!
@@ -207,9 +197,9 @@ describe 'dashcards' do
         rgb = convert_hex_to_rgb_color(new_color)
         get '/'
         keep_trying_until(5) do
-          expect(fj('.ic-DashboardCard__background').attribute(:style)).to include_text(rgb)
+          expect(fj('.ic-DashboardCard__header_hero').attribute(:style)).to include_text(rgb)
           refresh_page
-          expect(fj('.ic-DashboardCard__background').attribute(:style)).to include_text(rgb)
+          expect(fj('.ic-DashboardCard__header_hero').attribute(:style)).to include_text(rgb)
           expect(f('.ic-DashboardCard__header-title').text).to include(@course1.name)
         end
       end
@@ -223,11 +213,11 @@ describe 'dashcards' do
         wait_for_ajaximations
         get '/'
         keep_trying_until(5) do
-          if fj('.ic-DashboardCard__background').attribute(:style).include?('rgb')
+          if fj('.ic-DashboardCard__header_hero').attribute(:style).include?('rgb')
             rgb = convert_hex_to_rgb_color(hex)
-            expect(fj('.ic-DashboardCard__background').attribute(:style)).to include_text(rgb)
+            expect(fj('.ic-DashboardCard__header_hero').attribute(:style)).to include_text(rgb)
           else
-            expect(fj('.ic-DashboardCard__background').attribute(:style)).to include_text(hex)
+            expect(fj('.ic-DashboardCard__header_hero').attribute(:style)).to include_text(hex)
           end
           expect(f('.ic-DashboardCard__header-title').text).to include(@course1.name)
         end
@@ -259,9 +249,9 @@ describe 'dashcards' do
         f('.ColorPicker__Container .Button--primary').click
         rgb = convert_hex_to_rgb_color(new_color)
         keep_trying_until(5) do
-          expect(fj('.ic-DashboardCard__background').attribute(:style)).to include_text(rgb)
+          expect(fj('.ic-DashboardCard__header_hero').attribute(:style)).to include_text(rgb)
           refresh_page
-          expect(fj('.ic-DashboardCard__background').attribute(:style)).to include_text(rgb)
+          expect(fj('.ic-DashboardCard__header_hero').attribute(:style)).to include_text(rgb)
         end
       end
 
@@ -275,11 +265,11 @@ describe 'dashcards' do
         replace_content(fj("#ColorPickerCustomInput-#{@course.asset_string}"), hex)
         f('.ColorPicker__Container .Button--primary').click
         keep_trying_until(5) do
-          if fj('.ic-DashboardCard__background').attribute(:style).include?('rgb')
+          if fj('.ic-DashboardCard__header_hero').attribute(:style).include?('rgb')
             rgb = convert_hex_to_rgb_color(hex)
-            expect(fj('.ic-DashboardCard__background').attribute(:style)).to include_text(rgb)
+            expect(fj('.ic-DashboardCard__header_hero').attribute(:style)).to include_text(rgb)
           else
-            expect(fj('.ic-DashboardCard__background').attribute(:style)).to include_text(hex)
+            expect(fj('.ic-DashboardCard__header_hero').attribute(:style)).to include_text(hex)
           end
         end
       end
@@ -290,6 +280,14 @@ describe 'dashcards' do
         wait_for_ajaximations
         expect(f('.ic-DashboardCard__header-title').text).to include 'course nickname!'
         expect(@student.reload.course_nickname(@course)).to eq 'course nickname!'
+      end
+
+      it 'sets course nickname when enter is pressed' do
+        replace_content(fj('#NicknameInput'), 'course nickname too!')
+        fj('#NicknameInput').send_keys(:enter)
+        wait_for_ajaximations
+        expect(f('.ic-DashboardCard__header-title').text).to include 'course nickname too!'
+        expect(@student.reload.course_nickname(@course)).to eq 'course nickname too!'
       end
 
       it 'sets both dashcard color and course nickname at once' do

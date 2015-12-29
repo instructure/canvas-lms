@@ -38,7 +38,7 @@ class EportfolioEntry < ActiveRecord::Base
   validates_presence_of :eportfolio_category_id
   validates_length_of :name, :maximum => maximum_string_length, :allow_nil => false, :allow_blank => true
   validates_length_of :slug, :maximum => maximum_string_length, :allow_nil => false, :allow_blank => true
-  has_many :page_comments, as: :page, preload: :user, order: 'page_comments.created_at DESC'
+  has_many :page_comments, -> { preload(:user).order('page_comments.created_at DESC') }, as: :page
 
 
   serialize_utf8_safe :content

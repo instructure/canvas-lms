@@ -78,25 +78,21 @@ describe MediaObject do
   describe ".ensure_media_object" do
     it "should not create if the media object exists already" do
       MediaObject.create!(:context => user, :media_id => "test")
-      expect {
-        MediaObject.ensure_media_object("test", {})
-      }.to change { Delayed::Job.jobs_count(:future) }.by(0)
+      MediaObject.expects(:create!).never
+      MediaObject.ensure_media_object("test", {})
     end
 
     it "should not create if the media id doesn't exist in kaltura" do
       MediaObject.expects(:media_id_exists?).with("test").returns(false)
-      expect {
-        MediaObject.ensure_media_object("test", {})
-        run_jobs
-      }.to change { Delayed::Job.jobs_count(:future) }.by(0)
+      MediaObject.expects(:create!).never
+      MediaObject.ensure_media_object("test", {})
+      run_jobs
     end
 
     it "should create the media object" do
       MediaObject.expects(:media_id_exists?).with("test").returns(true)
-      expect {
-        MediaObject.ensure_media_object("test", { :context => user })
-        run_jobs
-      }.to change { Delayed::Job.jobs_count(:future) }.by(1)
+      MediaObject.ensure_media_object("test", { :context => user })
+      run_jobs
       obj = MediaObject.by_media_id("test").first
       expect(obj.context).to eq @user
     end

@@ -4,8 +4,8 @@ var usingWebpack = (process.env.USE_WEBPACK == 'True' || process.env.USE_WEBPACK
 if(usingWebpack){
   karmaFiles = [
     'spec/javascripts/support/sinon/sinon-1.17.2.js',
-    'spec/javascripts/support/sinon/sinon-qunit-1.0.0.js',
-    {pattern: 'spec/javascripts/webpack/*.bundle.test.js', included: true, served: true}
+    {pattern: 'spec/javascripts/webpack/*.bundle.test.js', included: true, served: true},
+    {pattern: 'spec/javascripts/fixtures/*', included: false, served: true}
   ];
 }else{
   karmaFiles = [

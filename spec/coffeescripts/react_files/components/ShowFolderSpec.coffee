@@ -1,11 +1,12 @@
 define [
+  '../mockFilesENV'
   'underscore'
   'react'
   'react-router'
   'jsx/files/ShowFolder'
   'compiled/models/Folder'
   'compiled/react_files/components/FolderChild'
-], (_, React, Router, ShowFolder, Folder, FolderChild) ->
+], (mockFilesENV, _, React, Router, ShowFolder, Folder, FolderChild) ->
 
   # module 'ShowFolder',
   #   setup: ->

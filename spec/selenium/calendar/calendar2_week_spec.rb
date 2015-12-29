@@ -8,7 +8,7 @@ describe "calendar2" do
 
   before(:each) do
     Account.default.tap do |a|
-      a.settings[:show_scheduler]   = true
+      a.settings[:show_scheduler] = true
       a.save!
     end
   end
@@ -51,6 +51,15 @@ describe "calendar2" do
 
         elt = fj('.fc-event:visible')
         expect(elt.size.height).to be >= 18
+      end
+
+      it "should fix up the event's data-start for events after 11:30pm" do
+        time = Time.zone.now.at_beginning_of_day + 23.hours + 45.minutes
+        @course.calendar_events.create! title: 'ohai', start_at: time, end_at: time + 5.minutes
+
+        load_week_view
+
+        expect(fj('.fc-event .fc-time').attribute('data-start')).to eq('11:45')
       end
 
       it "should stagger pseudo-overlapping short events" do
@@ -178,17 +187,17 @@ describe "calendar2" do
       make_event(:location_name => location_name, :all_day => true, :location_address => location_address)
       load_week_view
 
-      #Click calendar item to bring up event summary
+      # Click calendar item to bring up event summary
       f(".fc-event").click
 
-      #expect to find the location name and address
+      # expect to find the location name and address
       expect(f('.event-details-content').text).to include_text(location_name)
       expect(f('.event-details-content').text).to include_text(location_address)
     end
 
     it "should bring up a calendar date picker when clicking on the week range" do
       load_week_view
-      #Click on the week header
+      # Click on the week header
       f('.navigation_title').click
 
       # Expect that a the event picker is present
@@ -200,7 +209,7 @@ describe "calendar2" do
     it "should extend event time by dragging", priority: "1", test_id: 138864 do
       # Create event on current day at 9:00 AM in current time zone
       midnight = Time.zone.now.beginning_of_day
-      event1 = make_event(start: midnight + 9.hour, end_at: midnight + 10.hours)
+      event1 = make_event(start: midnight + 9.hours, end_at: midnight + 10.hours)
 
       # Create an assignment at noon to be the drag target
       #   This is a workaround because the rows do not have usable unique identifiers
@@ -234,6 +243,62 @@ describe "calendar2" do
       # Verify object event is now all-day
       expect(event2.reload.all_day).to eql(true)
       expect(event2.start_at).to eql(midnight)
+    end
+
+    context "drag and drop" do
+
+      before(:each) do
+        @saturday = 8
+        @initial_time = Time.zone.parse('2015-1-1').beginning_of_day + 9.hours
+        @initial_time_str = @initial_time.strftime('%Y-%m-%d')
+        @two_days_later = @initial_time + 48.hours
+      end
+
+      it "should drag and drop assignment", priority: "1", test_id: 557433 do
+        assignment1 = @course.assignments.create!(title: 'new week view assignment', due_at: @initial_time)
+
+        # Workaround because the rows do not have usable unique identifiers
+        @course.assignments.create!(name: 'Assignment target', due_at: @two_days_later)
+
+        load_week_view
+        quick_jump_to_date(@initial_time_str)
+
+        # Drag and drop assignment to new date
+        icon_array = ffj('.fc-view-container .icon-assignment')
+        drag_and_drop_element(icon_array[0], icon_array[1])
+        expect(flash_message_present?(:error)).to be false
+
+        # Assignment should be due on Saturday
+        expect(element_exists(fj("#calendar-app .fc-time-grid-container .fc-content-skeleton td:nth-child(#{@saturday})
+         .fc-time-grid-event:contains(#{assignment1.title})"))).to be true
+
+        # Assignment time should stay at 9:00am
+        assignment1.reload
+        expect(assignment1.start_at).to eql(@two_days_later)
+      end
+
+      it "should drag and drop event", priority: "1", test_id: 561119 do
+        event1 = make_event(start: @initial_time, title: 'new week view event')
+
+        # Workaround because the rows do not have usable unique identifiers
+        make_event(start: @two_days_later, title: 'Event Target')
+
+        load_week_view
+        quick_jump_to_date(@initial_time_str)
+
+        # Drag and drop event to new date
+        icon_array = ffj('.fc-view-container .icon-calendar-month')
+        drag_and_drop_element(icon_array[0], icon_array[1])
+        expect(flash_message_present?(:error)).to be false
+
+        # Event should be due on Saturday
+        expect(element_exists(fj("#calendar-app .fc-time-grid-container .fc-content-skeleton td:nth-child(#{@saturday})
+         .fc-time-grid-event:contains(#{event1.title})"))).to be true
+
+        # Calendar item time should stay at 9:00am
+        event1.reload
+        expect(event1.start_at).to eql(@two_days_later)
+      end
     end
   end
 end

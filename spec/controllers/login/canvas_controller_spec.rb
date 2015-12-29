@@ -142,6 +142,30 @@ describe Login::CanvasController do
       assert_status(400)
       expect(response).to render_template(:new)
     end
+
+    it "doesn't query the server at all if the enabled features don't require it, and there is no matching login" do
+      ap = Account.default.authentication_providers.create!(auth_type: 'ldap')
+      ap.any_instantiation.expects(:ldap_bind_result).never
+      post 'create', :pseudonym_session => { :unique_id => 'username', :password => 'password'}
+      assert_status(400)
+      expect(response).to render_template(:new)
+    end
+
+    it "provisions automatically when enabled" do
+      ap = Account.default.authentication_providers.create!(auth_type: 'ldap', jit_provisioning: true)
+      ap.any_instantiation.expects(:ldap_bind_result).once.
+          with('username', 'password').
+          returns([{ 'uid' => ['12345'] }])
+      unique_id = 'username'
+      expect(Account.default.pseudonyms.active.by_unique_id(unique_id)).to_not be_exists
+
+      post 'create', :pseudonym_session => { :unique_id => 'username', :password => 'password'}
+      expect(response).to be_redirect
+      expect(response).to redirect_to(dashboard_url(:login_success => 1))
+
+      p = Account.default.pseudonyms.active.by_unique_id(unique_id).first!
+      expect(p.authentication_provider).to eq ap
+    end
   end
 
   context "trusted logins" do

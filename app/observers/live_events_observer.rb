@@ -5,7 +5,9 @@ class LiveEventsObserver < ActiveRecord::Observer
           :group,
           :group_category,
           :group_membership,
-          :wiki_page
+          :wiki_page,
+          :assignment,
+          :submission
 
   def after_update(obj)
     case obj
@@ -18,6 +20,10 @@ class LiveEventsObserver < ActiveRecord::Observer
         Canvas::LiveEvents.wiki_page_updated(obj, obj.title_changed? ? obj.title_was : nil,
                                                   obj.body_changed? ? obj.body_was : nil)
       end
+    when Assignment
+      Canvas::LiveEvents.assignment_updated(obj)
+    when Submission
+      Canvas::LiveEvents.submission_updated(obj)
     end
   end
 
@@ -35,6 +41,10 @@ class LiveEventsObserver < ActiveRecord::Observer
       Canvas::LiveEvents.group_membership_created(obj)
     when WikiPage
       Canvas::LiveEvents.wiki_page_created(obj)
+    when Assignment
+      Canvas::LiveEvents.assignment_created(obj)
+    when Submission
+      Canvas::LiveEvents.submission_created(obj)
     end
   end
 

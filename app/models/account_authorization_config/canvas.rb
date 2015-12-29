@@ -24,4 +24,30 @@ class AccountAuthorizationConfig::Canvas < AccountAuthorizationConfig
   def self.singleton?
     true
   end
+
+  def self.recognized_params
+    [ :self_registration ].freeze
+  end
+
+  # Rename db field
+  def self_registration=(val)
+    case val
+    when 'none'
+      self.jit_provisioning = false
+      self.auth_filter = nil
+    when 'observer'
+      self.jit_provisioning = true
+      self.auth_filter = 'observer'
+    when 'all'
+      self.jit_provisioning = true
+      self.auth_filter = 'all'
+    else
+      self.jit_provisioning = ::Canvas::Plugin.value_to_boolean(val)
+      self.auth_filter = jit_provisioning? ? 'all' : nil
+    end
+  end
+
+  def self_registration
+    jit_provisioning? ? auth_filter : 'none'
+  end
 end

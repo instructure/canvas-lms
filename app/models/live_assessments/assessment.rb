@@ -24,7 +24,7 @@ module LiveAssessments
     has_many :submissions, class_name: 'LiveAssessments::Submission'
     has_many :results, class_name: 'LiveAssessments::Result'
 
-    has_many :learning_outcome_alignments, as: :content, class_name: 'ContentTag', conditions: ['content_tags.tag_type = ? AND content_tags.workflow_state != ?', 'learning_outcome', 'deleted'], preload: :learning_outcome
+    has_many :learning_outcome_alignments, -> { where("content_tags.tag_type='learning_outcome' AND content_tags.workflow_state<>'deleted'").preload(:learning_outcome) }, as: :content, class_name: 'ContentTag'
 
     validates_presence_of :context_id, :context_type, :key, :title
     validates_length_of :title, maximum: maximum_string_length

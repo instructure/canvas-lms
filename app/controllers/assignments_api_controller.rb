@@ -524,6 +524,7 @@
 #     }
 class AssignmentsApiController < ApplicationController
   before_filter :require_context
+  before_filter :require_user_or_observer, :only=>[:user_index]
   include Api::V1::Assignment
   include Api::V1::Submission
   include Api::V1::AssignmentOverride
@@ -545,8 +546,23 @@ class AssignmentsApiController < ApplicationController
   #   Valid buckets are "past", "overdue", "undated", "ungraded", "upcoming", and "future".
   # @returns [Assignment]
   def index
-    if authorized_action(@context, @current_user, :read)
-      scope = Assignments::ScopedToUser.new(@context, @current_user).scope.
+    error_or_array= get_assignments(@current_user)
+    render :json => error_or_array unless performed?
+  end
+
+  # @API List assignments for user
+  # Returns the list of assignments for the specified user if the current user has rights to view.
+  # See {api:AssignmentsApiController#index List assignments} for valid arguments.
+  def user_index
+    @user.shard.activate do
+      error_or_array= get_assignments(@user)
+      render :json => error_or_array unless performed?
+    end
+  end
+
+  def get_assignments(user)
+    if authorized_action(@context, user, :read)
+      scope = Assignments::ScopedToUser.new(@context, user).scope.
           eager_load(:assignment_group).
           preload(:rubric_association, :rubric).
           reorder("assignment_groups.position, assignments.position")
@@ -561,7 +577,7 @@ class AssignmentsApiController < ApplicationController
         users = current_user_and_observed(
                     include_observed: include_params.include?("observed_users"))
         submissions_for_user = scope.with_submissions_for_user(users).flat_map(&:submissions)
-        scope = SortsAssignments.bucket_filter(scope, params[:bucket], session, @current_user, @context, submissions_for_user)
+        scope = SortsAssignments.bucket_filter(scope, params[:bucket], session, user, @context, submissions_for_user)
       end
 
       assignments = Api.paginate(scope, self, api_v1_course_assignments_url(@context))
@@ -570,7 +586,7 @@ class AssignmentsApiController < ApplicationController
       submissions = submissions_hash(include_params, assignments, submissions_for_user)
 
       include_all_dates = include_params.include?('all_dates')
-      include_override_objects = include_params.include?('overrides') && @context.grants_any_right?(@current_user, :manage_assignments)
+      include_override_objects = include_params.include?('overrides') && @context.grants_any_right?(user, :manage_assignments)
 
       override_param = params[:override_assignment_dates] || true
       override_dates = value_to_boolean(override_param)
@@ -579,12 +595,12 @@ class AssignmentsApiController < ApplicationController
         assignments.select{ |a| a.assignment_overrides.size == 0 }.
           each { |a| a.has_no_overrides = true }
 
-        if AssignmentOverrideApplicator.should_preload_override_students?(assignments, @current_user, "assignments_api")
-          AssignmentOverrideApplicator.preload_assignment_override_students(assignments, @current_user)
+        if AssignmentOverrideApplicator.should_preload_override_students?(assignments, user, "assignments_api")
+          AssignmentOverrideApplicator.preload_assignment_override_students(assignments, user)
         end
       end
 
-      include_visibility = include_params.include?('assignment_visibility') && @context.grants_any_right?(@current_user, :read_as_admin, :manage_grades, :manage_assignments)
+      include_visibility = include_params.include?('assignment_visibility') && @context.grants_any_right?(user, :read_as_admin, :manage_grades, :manage_assignments)
 
       if include_visibility && da_enabled
         assignment_visibilities = AssignmentStudentVisibility.users_with_visibility_by_assignment(course_id: @context.id, assignment_id: assignments.map(&:id))
@@ -593,11 +609,11 @@ class AssignmentsApiController < ApplicationController
       needs_grading_by_section_param = params[:needs_grading_count_by_section] || false
       needs_grading_count_by_section = value_to_boolean(needs_grading_by_section_param)
 
-      if @context.grants_right?(@current_user, :manage_assignments)
+      if @context.grants_right?(user, :manage_assignments)
         Assignment.preload_can_unpublish(assignments)
       end
 
-      unless @context.grants_right?(@current_user, :read_as_admin)
+      unless @context.grants_right?(user, :read_as_admin)
         Assignment.preload_context_module_tags(assignments) # running this again is fine
       end
 
@@ -609,10 +625,10 @@ class AssignmentsApiController < ApplicationController
         visibility_array = assignment_visibilities[assignment.id] if assignment_visibilities
         submission = submissions[assignment.id]
         active_overrides = include_override_objects ? assignment.assignment_overrides.active : nil
-        needs_grading_course_proxy = @context.grants_right?(@current_user, session, :manage_grades) ?
-          Assignments::NeedsGradingCountQuery::CourseProxy.new(@context, @current_user) : nil
+        needs_grading_course_proxy = @context.grants_right?(user, session, :manage_grades) ?
+          Assignments::NeedsGradingCountQuery::CourseProxy.new(@context, user) : nil
 
-        assignment_json(assignment, @current_user, session,
+        assignment_json(assignment, user, session,
                         submission: submission, override_dates: override_dates,
                         include_visibility: include_visibility,
                         assignment_visibilities: visibility_array,
@@ -624,8 +640,7 @@ class AssignmentsApiController < ApplicationController
                         preloaded_user_content_attachments: preloaded_attachments
                         )
       end
-
-      render :json => hashes
+      hashes
     end
   end
 
@@ -665,8 +680,9 @@ class AssignmentsApiController < ApplicationController
       needs_grading_by_section_param = params[:needs_grading_count_by_section] || false
       needs_grading_count_by_section = value_to_boolean(needs_grading_by_section_param)
 
+      locked = @assignment.locked_for?(@current_user, :check_policies => true)
+      @assignment.context_module_action(@current_user, :read) unless locked && !locked[:can_view]
 
-      @assignment.context_module_action(@current_user, :read) unless @assignment.locked_for?(@current_user, :check_policies => true)
       render :json => assignment_json(@assignment, @current_user, session,
                   submission: submissions,
                   override_dates: override_dates,
@@ -985,51 +1001,15 @@ class AssignmentsApiController < ApplicationController
     end
   end
 
-  def submissions_hash(include_params, assignments, submissions_for_user=nil)
-    return {} unless include_params.include?('submission')
-    has_observed_users = include_params.include?("observed_users")
-
-    subs_list = if submissions_for_user
-      assignment_ids = assignments.map(&:id).to_set
-      submissions_for_user.select{ |s|
-        assignment_ids.include?(s.assignment_id)
-      }
-    else
-      users = current_user_and_observed(include_observed: has_observed_users)
-      @context.submissions.
-        where(:assignment_id => assignments).
-        for_user(users)
-    end
-
-    if has_observed_users
-      # assignment id -> array. even if <2 results for a given
-      # assignment, we want to consistently return an array when
-      # include[]=observed_users was supplied
-      hash = Hash.new { |h,k| h[k] = [] }
-      subs_list.each { |s| hash[s.assignment_id] << s }
-    else
-      # assignment id -> specific submission. never return an array when
-      # include[]=observed_users was _not_ supplied
-      hash = Hash[subs_list.map{|s| [s.assignment_id, s]}]
-    end
-    hash
-  end
-
   def invalid_bucket_error
     err_msg = t("bucket name must be one of the following: %{bucket_names}", bucket_names: SortsAssignments::VALID_BUCKETS.join(", "))
     @context.errors.add('bucket', err_msg, :att_name => 'bucket')
     return render :json => @context.errors, :status => :bad_request
   end
 
-  # Returns an array containing the current user.  If
-  # include_observed: true is passed also returns any observees if
-  # the current user is an observer
-  def current_user_and_observed(opts = { include_observed: false })
-    user_and_observees = Array(@current_user)
-    if opts[:include_observed] && @context_enrollment.observer?
-      user_and_observees.concat(ObserverEnrollment.observed_students(@context, @current_user).keys)
-    end
-    user_and_observees
+  def require_user_or_observer
+    return render_unauthorized_action unless @current_user.present?
+    @user = params[:user_id]=="self" ? @current_user : api_find(User, params[:user_id])
+    authorized_action(@user,@current_user, :read_as_parent)
   end
-
 end

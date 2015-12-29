@@ -26,7 +26,7 @@ class GroupCategory < ActiveRecord::Base
   has_many :groups, :dependent => :destroy
   has_many :assignments, :dependent => :nullify
   has_many :progresses, :as => 'context', :dependent => :destroy
-  has_one :current_progress, :as => 'context', :class_name => 'Progress', :conditions => "workflow_state IN ('queued','running')", :order => 'created_at'
+  has_one :current_progress, -> { where(workflow_state: ['queued', 'running']).order(:created_at) }, as: 'context', class_name: 'Progress'
 
   EXPORTABLE_ATTRIBUTES = [ :id, :context_id, :context_type, :name, :role,
     :deleted_at, :self_signup, :group_limit, :auto_leader
@@ -358,7 +358,7 @@ class GroupCategory < ActiveRecord::Base
     end
 
     if !groups.empty?
-      Group.where(:id => groups.map(&:id)).update_all(:updated_at => Time.now.utc)
+      Group.where(id: groups).touch_all
       if context_type == 'Course'
         DueDateCacher.recompute_course(context_id, Assignment.where(context_type: context_type, context_id: context_id, group_category_id: self).pluck(:id))
       end

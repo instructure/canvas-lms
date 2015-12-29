@@ -5,7 +5,8 @@ module Guard
   class JSX < Guard
 
     def initialize(watchers=[], options={})
-      super([::Guard::Watcher.new(/(app\/jsx\/.*)/)], {})
+      super([::Guard::Watcher.new(%r{app/jsx/.*}),
+             ::Guard::Watcher.new(%r{spec/javascripts/jsx/.*})], {})
     end
 
     def run_on_change(paths)
@@ -15,9 +16,10 @@ module Guard
 
     def run_all
       ::Guard::UI.info "Compiling JSX"
-      source = 'app/jsx'
-      dest = 'public/javascripts/jsx'
-      `node_modules/.bin/babel #{source} --out-dir #{dest} --source-maps inline`
+      [["app/jsx", "public/javascripts/jsx"],
+       ["spec/javascripts/jsx", "spec/javascripts/compiled"]].each { |source, dest|
+        `node_modules/.bin/babel #{source} --out-dir #{dest} --source-maps inline`
+      }
     end
 
   end

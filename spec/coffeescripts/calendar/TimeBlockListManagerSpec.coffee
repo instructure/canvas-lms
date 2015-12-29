@@ -1,5 +1,8 @@
-define ['compiled/calendar/TimeBlockListManager', 'moment'], (TimeBlockListManager, moment) ->
-  module "TimeBlockListManager"
+define ['jquery', 'compiled/calendar/TimeBlockListManager', 'moment'], ($, TimeBlockListManager, moment) ->
+  module "TimeBlockListManager",
+    setup: ->
+    teardown: ->
+      $("#ui-datepicker-div").empty()
 
   test "constructor", ->
     d1 = moment(new Date(2011, 12, 27,  9,  0))

@@ -169,6 +169,7 @@ module Lti
           tp_json['tool_profile']['resource_handler'][0]['message'][0]['enabled_capability'] = ['Canvas.placements.courseNavigation']
           tool_proxy = subject.process_tool_proxy_json(tp_json.to_json, account, tool_proxy_guid)
           rh = tool_proxy.resources.first
+          expect(rh.message_handlers.count).to eq 1
           expect(rh.message_handlers.first.placements).to only_include_placement "course_navigation"
         end
 
@@ -236,12 +237,17 @@ module Lti
         tp.enabled_capability = []
         tp.security_contract.shared_secret = nil
         tp.security_contract.tp_half_shared_secret = tp_half_secret
-        expect { subject.process_tool_proxy_json(tp.as_json, account, tool_proxy_guid) }.to raise_error(ToolProxyService::InvalidToolProxyError, 'Invalid SecurityContract')do |exception|
-          expect(JSON.parse(exception.to_json)).to eq({"invalid_security_contract"=>["shared_secret"], "error"=>"Invalid SecurityContract"})
+        expect { subject.process_tool_proxy_json(tp.as_json, account, tool_proxy_guid) }
+          .to raise_error(ToolProxyService::InvalidToolProxyError, 'Invalid SecurityContract') do |exception|
+          expect(JSON.parse(exception.to_json)).to eq({
+                                                        "invalid_security_contract" => [
+                                                          "shared_secret",
+                                                          "tp_half_shared_secret"
+                                                        ],
+                                                        "error"=>"Invalid SecurityContract"
+                                                      })
         end
       end
-
     end
-
   end
 end

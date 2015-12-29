@@ -19,16 +19,6 @@
 module Api::V1::CommunicationChannel
   include Api::V1::Json
 
-  # Internal: The attributes returned by communication_channel_json.
-  #
-  # Uses the method "path_description" instead of the field "path" because
-  # when path_type is twitter or yo, it goes and fetches tha user's account
-  # name with a fallback display value.
-  JSON_OPTS = {
-    :only => %w{ id path_type position workflow_state user_id },
-    :methods => %w{ path_description }
-  }
-
   # Public: Given a communication channel, return it in an API-friendly format.
   #
   # channel - The communication channel to turn into a hash.
@@ -43,7 +33,26 @@ module Api::V1::CommunicationChannel
   #   :user_id
   #   :workflow_state
   def communication_channel_json(channel, current_user, session)
-    api_json(channel, current_user, session, JSON_OPTS).tap do |json|
+    only = %w{ id path_type position workflow_state user_id }
+    # Uses the method "path_description" instead of the field "path" because
+    # when path_type is twitter or yo, it goes and fetches tha user's account
+    # name with a fallback display value.
+    methods = %w{ path_description }
+
+    # If the user is super special, show them this channel's bounce details
+    if channel.grants_right?(current_user, :read_bounce_details)
+      only += [
+        'last_bounce_at',
+        'last_transient_bounce_at',
+        'last_suppression_bounce_at'
+      ]
+      methods += [
+        'last_bounce_summary',
+        'last_transient_bounce_summary'
+      ]
+    end
+
+    api_json(channel, current_user, session, only: only, methods: methods).tap do |json|
       # Rename attributes for mass-consumption
       json[:address] = json.delete(:path_description)
       json[:type]    = json.delete(:path_type)

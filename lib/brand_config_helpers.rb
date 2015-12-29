@@ -1,6 +1,11 @@
 module BrandConfigHelpers
   def branding_allowed?
-    self.root_account? || self.root_account.sub_account_includes?
+    root_account? || root_account.sub_account_includes?
+  end
+
+  def effective_brand_config
+    return brand_config if root_account? || (branding_allowed? && brand_config)
+    parent_account.effective_brand_config
   end
 
   def first_parent_brand_config

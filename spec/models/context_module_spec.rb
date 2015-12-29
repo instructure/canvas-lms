@@ -361,6 +361,7 @@ describe ContextModule do
       @user = User.create!(:name => "some name")
       @course.enroll_student(@user)
 
+      Canvas::Plugin.find!('grade_export').stubs(:enabled?).returns(true)
       @course.expects(:publish_final_grades).with(@user, @user.id).once
 
       @module.evaluate_for(@user)
@@ -680,6 +681,11 @@ describe ContextModule do
 
         @assign.reload
         @assign.grade_student(@student, :grade => "5", :grader => @teacher)
+        expect(@module.evaluate_for(@student)).to be_unlocked
+
+        @assign.reload
+        @assign.grade_student(@student, :grade => nil, :grader => @teacher)
+        # removing the grade manually shouldn't mark as completed either
         expect(@module.evaluate_for(@student)).to be_unlocked
       end
 

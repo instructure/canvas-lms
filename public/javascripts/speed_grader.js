@@ -295,7 +295,7 @@ define([
   }
 
   function classNameBasedOnStudent(student){
-    var raw       = submissionState(student);
+    var raw       = student.submission_state;
     var formatted = formattedsubmissionState(student.submission_state, student.submission);
     return {raw: raw, formatted: formatted};
   }
@@ -820,6 +820,7 @@ define([
         function(data){
           if(currentStudentIDAsOfAjaxCall === EG.currentStudent.id) {
             EG.currentStudent.submission = data.submission;
+            EG.currentStudent.submission_state = submissionState(EG.currentStudent);
             EG.showGrade();
           }
       });

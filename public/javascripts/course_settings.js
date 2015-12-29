@@ -304,7 +304,6 @@ define([
       },
       error: function(data) {
         $(this).loadingImage('remove');
-        $(this).formErrors(data);
       },
       disableWhileLoading: 'spin_on_success'
     })

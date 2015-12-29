@@ -137,7 +137,7 @@ define([
         var url = $find.find(".grading_standards_url").attr('href');
         $.ajaxJSON(url, 'GET', {}, function(data) {
           if(data.length === 0) {
-            $find.find(".loading_message").text(I18n.t('no_grading_standards', "No grading standards found"));
+            $find.find(".loading_message").text(I18n.t('no_grading_standards', "No grading schemes found"));
           } else {
             $find.find(".loading_message").remove();
             for(var idx in data) {
@@ -155,8 +155,11 @@ define([
               }).data('context_code', standard.context_code);
               $standard.removeClass('blank');
               for(var jdx = 0; jdx < standard.data.length; jdx++) {
-                var list = standard.data[jdx];
-                var row = {name: list[0], value: (jdx == 0 ? 100 : '< ' + standard.data[jdx - 1][1] * 100), next_value: list[1] * 100};
+                var row = {
+                  name: standard.data[jdx][0],
+                  value: jdx != 0 ? '< ' + round((standard.data[jdx - 1][1] * 100), 2) : 100,
+                  next_value: round((standard.data[jdx][1] * 100), 2)
+                };
                 var $row = $standard.find(".details_row.blank:first").clone(true);
                 $row.removeClass('blank');
                 $row.fillTemplateData({data: row});

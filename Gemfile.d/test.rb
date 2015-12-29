@@ -31,9 +31,9 @@ group :test do
   gem 'selinimum', '0.0.1', require: false, path: 'gems/selinimum'
   gem 'test_after_commit', '0.4.0'
   gem 'test-unit', '~> 3.0', require: false, platform: :ruby_22
-  gem 'webmock', '1.16.1', require: false
-    gem 'addressable', '2.3.5', require: false
-    gem 'crack', '0.4.1', require: false
+  gem 'webmock', '1.22.3', require: false
+    gem 'addressable', '2.3.8', require: false
+    gem 'crack', '0.4.3', require: false
   gem 'yard', '0.8.7.6'
   gem 'yard-appendix', '>=0.1.8'
   gem 'timecop', '0.6.3'

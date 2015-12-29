@@ -25,8 +25,8 @@ class WebConference < ActiveRecord::Base
   validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'Group', 'Account']
   has_many :web_conference_participants
   has_many :users, :through => :web_conference_participants
-  has_many :invitees, :through => :web_conference_participants, :source => :user, :conditions => ['web_conference_participants.participation_type = ?', 'invitee']
-  has_many :attendees, :through => :web_conference_participants, :source => :user, :conditions => ['web_conference_participants.participation_type = ?', 'attendee']
+  has_many :invitees, -> { where(web_conference_participants: { participation_type: 'invitee' }) }, through: :web_conference_participants, source: :user
+  has_many :attendees, -> { where(web_conference_participants: { participation_type: 'attendee' }) }, through: :web_conference_participants, source: :user
   belongs_to :user
 
   EXPORTABLE_ATTRIBUTES = [

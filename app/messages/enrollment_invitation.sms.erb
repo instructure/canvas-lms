@@ -1,17 +1,6 @@
-<%=
-    case asset.type
-    when 'TeacherEnrollment'
-      t :body_teacher, "You've been invited to the course as a teacher."
-    when 'TaEnrollment'
-      t :body_ta, "You've been invited to the course as a TA."
-    when 'ObserverEnrollment'
-      t :body_observer, "You've been invited to the course as an observer."
-    when 'DesignerEnrollment'
-      t :body_designer, "You've been invited to the course as a designer."
-    else
-      t :body_student, "You've been invited to the course as a student."
-    end
-%>
+<%= t "You've been invited to the course, %{course}. Course role: %{role_type}",
+    :course => asset.course.name, :role_type => asset.readable_role_name %>
+
 <% email = asset.user.email; login = (asset.user.pseudonym.unique_id rescue "none") %>
 <%= before_label :name, "Name" %> <%= asset.user.name %>
 <%= before_label :email, "Email" %> <%= asset.user.email %>

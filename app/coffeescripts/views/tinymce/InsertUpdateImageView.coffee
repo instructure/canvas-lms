@@ -6,7 +6,11 @@ define [
   'compiled/fn/preventDefault'
   'compiled/views/DialogBaseView'
   'jst/tinymce/InsertUpdateImageView'
-], (I18n, $, _, h, preventDefault, DialogBaseView, template) ->
+  'jsx/shared/rce/callOnRCE'
+  'compiled/views/TreeBrowserView'
+  'compiled/views/RootFoldersFinder'
+  'compiled/views/FindFlickrImageView'
+], (I18n, $, _, h, preventDefault, DialogBaseView, template, callOnRCE, TreeBrowserView, RootFoldersFinder, FindFlickrImageView) ->
 
   class InsertUpdateImageView extends DialogBaseView
 
@@ -54,21 +58,16 @@ define [
       switch ui.panel.id
         when 'tabUploaded'
           loadTab (done) =>
-            require [
-              'compiled/views/TreeBrowserView'
-              'compiled/views/RootFoldersFinder'
-            ], (TreeBrowserView, RootFoldersFinder) =>
-              rootFoldersFinder = new RootFoldersFinder({
-                contentTypes: 'image',
-                useVerifiers: true
-              })
-              new TreeBrowserView(rootModelsFinder: rootFoldersFinder).render().$el.appendTo(ui.panel)
-              done()
+            rootFoldersFinder = new RootFoldersFinder({
+              contentTypes: 'image',
+              useVerifiers: true
+            })
+            new TreeBrowserView(rootModelsFinder: rootFoldersFinder).render().$el.appendTo(ui.panel)
+            done()
         when 'tabFlickr'
           loadTab (done) =>
-            require ['compiled/views/FindFlickrImageView'], (FindFlickrImageView) =>
-              new FindFlickrImageView().render().$el.appendTo(ui.panel)
-              done()
+            new FindFlickrImageView().render().$el.appendTo(ui.panel)
+            done()
 
     setAspectRatio: ->
       width = Number @$("[name='image[width]']").val()
@@ -142,6 +141,6 @@ define [
 
     update: =>
       @editor.selection.moveToBookmark(@prevSelection)
-      @$editor.editorBox 'insert_code', @generateImageHtml()
+      callOnRCE(@$editor, 'insert_code', @generateImageHtml())
       @editor.focus()
       @close()

@@ -93,4 +93,94 @@ describe CourseLinkValidator do
     expect(issues).to be_empty
   end
 
+  it "should check for deleted/unpublished objects" do
+    course
+    active = @course.assignments.create!(:title => "blah")
+    unpublished = @course.assignments.create!(:title => "blah")
+    unpublished.unpublish!
+    deleted = @course.assignments.create!(:title => "blah")
+    deleted.destroy
+
+    active_link = "/courses/#{@course.id}/assignments/#{active.id}"
+    unpublished_link = "/courses/#{@course.id}/assignments/#{unpublished.id}"
+    deleted_link = "/courses/#{@course.id}/assignments/#{deleted.id}"
+
+    message = %{
+      <a href='#{active_link}'>link</a>
+      <a href='#{unpublished_link}'>link</a>
+      <a href='#{deleted_link}'>link</a>
+    }
+    @course.syllabus_body = message
+    @course.save!
+
+    CourseLinkValidator.queue_course(@course)
+    run_jobs
+
+    links = CourseLinkValidator.current_progress(@course).results[:issues].first[:invalid_links].map{|l| l[:url]}
+    expect(links).to match_array [unpublished_link, deleted_link]
+  end
+
+  it "should work with absolute links to local objects" do
+    course
+    deleted = @course.assignments.create!(:title => "blah")
+    deleted.destroy
+
+    deleted_link = "http://#{HostUrl.default_host}/courses/#{@course.id}/assignments/#{deleted.id}"
+
+    message = "<a href='#{deleted_link}'>link</a>"
+    @course.syllabus_body = message
+    @course.save!
+
+    CourseLinkValidator.queue_course(@course)
+    run_jobs
+
+    links = CourseLinkValidator.current_progress(@course).results[:issues].first[:invalid_links].map{|l| l[:url]}
+    expect(links).to match_array [deleted_link]
+  end
+
+  it "should find links to other courses" do
+    other_course = course
+    course
+
+    link = "http://#{HostUrl.default_host}/courses/#{other_course.id}/assignments"
+
+    message = "<a href='#{link}'>link</a>"
+    @course.syllabus_body = message
+    @course.save!
+
+    CourseLinkValidator.queue_course(@course)
+    run_jobs
+
+    links = CourseLinkValidator.current_progress(@course).results[:issues].first[:invalid_links]
+    expect(links.count).to eq 1
+    expect(links.first[:url]).to eq link
+    expect(links.first[:reason]).to eq :course_mismatch
+  end
+
+  it "should find links to wiki pages" do
+    course
+    active = @course.wiki.wiki_pages.create!(:title => "active")
+    unpublished = @course.wiki.wiki_pages.create!(:title => "unpub")
+    unpublished.unpublish!
+    deleted = @course.wiki.wiki_pages.create!(:title => "baleeted")
+    deleted.destroy
+
+    active_link = "/courses/#{@course.id}/pages/#{active.url}"
+    unpublished_link = "/courses/#{@course.id}/pages/#{unpublished.url}"
+    deleted_link = "/courses/#{@course.id}/pages/#{deleted.url}"
+
+    message = %{
+      <a href='#{active_link}'>link</a>
+      <a href='#{unpublished_link}'>link</a>
+      <a href='#{deleted_link}'>link</a>
+    }
+    @course.syllabus_body = message
+    @course.save!
+
+    CourseLinkValidator.queue_course(@course)
+    run_jobs
+
+    links = CourseLinkValidator.current_progress(@course).results[:issues].first[:invalid_links].map{|l| l[:url]}
+    expect(links).to match_array [unpublished_link, deleted_link]
+  end
 end

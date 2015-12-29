@@ -404,7 +404,6 @@ class MessageableUser
     # NOTE: the common_courses of the returned MessageableUser objects will be
     # populated only with the course given.
     def messageable_users_in_course_scope(course_or_id, enrollment_types=nil, options={})
-      return unless course_or_id
       course = course_or_id.is_a?(Course) ? course_or_id : Course.where(id: course_or_id).first
       return unless course
 

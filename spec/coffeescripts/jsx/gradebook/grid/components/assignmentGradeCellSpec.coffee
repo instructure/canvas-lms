@@ -14,7 +14,14 @@ define [
     React.render(element, wrapper)
 
   buildComponent = (props, additionalProps) ->
-    cellData = props || {columnData: {assignment: {id: '1', points_possible: 10}}, renderer: mockComponent, activeCell: false, rowData: {}}
+    cellData = props || {
+      columnData: {
+        assignment: {id: '1', points_possible: 10}
+      },
+      renderer: mockComponent,
+      activeCell: false,
+      rowData: {}
+    }
     $.extend(cellData, additionalProps)
     renderComponent(cellData)
 

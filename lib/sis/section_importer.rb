@@ -33,7 +33,17 @@ module SIS
       importer.sections_to_update_sis_batch_ids.in_groups_of(1000, false) do |batch|
         CourseSection.where(:id => batch).update_all(:sis_batch_id => @batch)
       end if @batch
-      Enrollment.where(course_section_id: importer.deleted_section_ids.to_a).active.find_each(&:destroy)
+      # there could be a ton of deleted sections, and it would be really slow to do a normal find_each
+      # that would order by id. So do it on the slave, to force a cursor that avoids the sort so that
+      # it can run really fast
+      Shackles.activate(:slave) do
+        # ideally we change this to find_in_batches, and call (the currently non-existent) Enrollment.destroy_batch
+        Enrollment.where(course_section_id: importer.deleted_section_ids.to_a).active.find_each do |enrollment|
+          Shackles.activate(:master) do
+            enrollment.destroy
+          end
+        end
+      end
       @logger.debug("Sections took #{Time.now - start} seconds")
       return importer.success_count
     end

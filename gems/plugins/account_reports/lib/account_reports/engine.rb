@@ -46,7 +46,7 @@ module AccountReports
         'last_user_access_csv' => {
           :title => proc { I18n.t(:last_user_access_title, 'Last User Access') },
           :description_partial => true,
-          :parameters_partial => 'term_selector_parameters',
+          :parameters_partial => 'grade_export_csv_parameters',
           :parameters => {
             :enrollment_term_id => {
               :required => false,
@@ -55,6 +55,10 @@ module AccountReports
             :course_id => {
               :required => false,
               :description => 'The course to report on'
+            },
+            :include_deleted => {
+              :required => false,
+              :description => 'Include deleted objects'
             }
           }
         },

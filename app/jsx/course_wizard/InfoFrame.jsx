@@ -97,7 +97,7 @@ define([
           );
         }
         if (this.state.itemShown.key === 'publish_course') {
-          if (window.ENV.COURSE_WIZARD.permisssions.can_change_course_state) {
+          if (window.ENV.COURSE_WIZARD.permissions.can_change_course_state) {
             return (
               <form acceptCharset='UTF-8' action={window.ENV.COURSE_WIZARD.publish_course} method='post'>
                 <input name='utf8' type='hidden' value='✓' />

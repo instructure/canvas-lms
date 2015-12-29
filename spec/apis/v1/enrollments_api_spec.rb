@@ -323,6 +323,7 @@ describe EnrollmentsApiController, type: :request do
       end
 
       it "should not allow enrollments to be added to a soft-concluded course" do
+        @course.start_at = 2.days.ago
         @course.conclude_at = 1.day.ago
         @course.restrict_enrollments_to_course_dates = true
         @course.save!
@@ -343,6 +344,7 @@ describe EnrollmentsApiController, type: :request do
         other_section = @course.course_sections.create!
         @course.enroll_user(@unenrolled_user, "StudentEnrollment", :section => other_section)
 
+        @course.start_at = 2.days.ago
         @course.conclude_at = 1.day.ago
         @course.restrict_enrollments_to_course_dates = true
         @course.save!
@@ -363,6 +365,7 @@ describe EnrollmentsApiController, type: :request do
       end
 
       it "should not allow enrollments to be added to an active section of a concluded course if the user is not already enrolled" do
+        @course.start_at = 2.days.ago
         @course.conclude_at = 1.day.ago
         @course.restrict_enrollments_to_course_dates = true
         @course.save!
@@ -1539,7 +1542,31 @@ describe EnrollmentsApiController, type: :request do
       end
     end
 
-    describe "enrollment deletion and conclusion" do
+    context "inactive enrollments" do
+      before do
+        @inactive_user = user_with_pseudonym(:name => "Inactive User")
+        student_in_course(:course => @course, :user => @inactive_user)
+        @inactive_enroll = @inactive_user.enrollments.first
+        @inactive_enroll.inactivate
+      end
+
+      it "excludes users with inactive enrollments for students" do
+        student_in_course(:course => @course, :active_all => true, :user => user_with_pseudonym)
+        json = api_call(:get, @path, @params)
+        expect(json.map{ |e| e["id"] }).not_to include(@inactive_enroll.id)
+      end
+
+      it "includes users with inactive enrollments for teachers" do
+        teacher_in_course(:course => @course, :active_all => true, :user => user_with_pseudonym)
+        json = api_call(:get, @path, @params)
+        expect(json.map{ |e| e["id"] }).to include(@inactive_enroll.id)
+        enroll_json = json.detect{ |e| e["id"] == @inactive_enroll.id}
+        expect(enroll_json['user_id']).to eq @inactive_user.id
+        expect(enroll_json['enrollment_state']).to eq 'inactive'
+      end
+    end
+
+    describe "enrollment deletion, conclusion and inactivation" do
       before :once do
         course_with_student(:active_all => true, :user => user_with_pseudonym)
         @enrollment = @student.enrollments.first
@@ -1658,6 +1685,13 @@ describe EnrollmentsApiController, type: :request do
             'status'  => 'unauthorized'
           })
         end
+
+        it "should be able to inactivate an enrollment" do
+          json = api_call(:delete, "#{@path}?task=inactivate", @params.merge(:task => 'inactivate'))
+          expect(json['enrollment_state']).to eq 'inactive'
+          @enrollment.reload
+          expect(@enrollment.workflow_state).to eq 'inactive'
+        end
       end
 
       context "an unauthorized user" do
@@ -1666,9 +1700,38 @@ describe EnrollmentsApiController, type: :request do
           raw_api_call(:delete, @path, @params)
           expect(response.code).to eql '401'
 
-          raw_api_call(:delete, "#{@path}?type=delete", @params.merge(:type => 'delete'))
+          raw_api_call(:delete, "#{@path}?task=delete", @params.merge(:task => 'delete'))
+          expect(response.code).to eql '401'
+
+          raw_api_call(:delete, "#{@path}?task=inactivate", @params.merge(:task => 'inactivate'))
           expect(response.code).to eql '401'
         end
+      end
+    end
+
+    describe "enrollment reactivation" do
+      before :once do
+        course_with_student(:active_all => true, :user => user_with_pseudonym)
+        teacher_in_course(:course => @course, :user => user_with_pseudonym)
+        @enrollment = @student.enrollments.first
+        @enrollment.inactivate
+
+        @path = "/api/v1/courses/#{@course.id}/enrollments/#{@enrollment.id}/reactivate"
+        @params = { :controller => 'enrollments_api', :action => 'reactivate', :course_id => @course.id.to_param,
+          :id => @enrollment.id.to_param, :format => 'json' }
+      end
+
+      it "should require authorization" do
+        @user = @student
+        raw_api_call(:put, @path, @params)
+        expect(response.code).to eql '401'
+      end
+
+      it "should be able to reactivate an enrollment" do
+        json = api_call(:put, @path, @params)
+        expect(json['enrollment_state']).to eq 'active'
+        @enrollment.reload
+        expect(@enrollment.workflow_state).to eq 'active'
       end
     end
 

@@ -15732,6 +15732,7 @@ zh:
   welcome_to_your_courses_to_customize_the_list_of_c_22de652e: 欢迎您到课程！要自定义课程列表，点击“所有课程”的链接并标记要显示的课程。
   well_below_mastery_37664bdc: 远低于掌握
   what_should_the_csv_file_look_like_985a59ac: "CSV 文件应该是什么样子?"
+  when_enabled_global_javascript_and_css_files_can_b_ea21d216: "当启用后，全局JavaScript和CSS文件可以被上传到*％{t_theme_editor}*。"
   when_people_visit_the_course_this_is_the_page_they_de94acc2: 此页面是用户访问课程时将看到的页面。您可以将其设置为显示活动流、课程单元列表、提纲或自己编写的自定义页面。默认显示为课程活动流。
   where_would_you_like_to_move_title_fabd6e8f: "您要将 %{title} 移到何处？"
   widget: 

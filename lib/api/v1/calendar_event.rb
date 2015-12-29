@@ -19,6 +19,7 @@
 module Api::V1::CalendarEvent
   include Api::V1::Json
   include Api::V1::Assignment
+  include Api::V1::Submission
   include Api::V1::AssignmentOverride
   include Api::V1::User
   include Api::V1::Course
@@ -152,7 +153,7 @@ module Api::V1::CalendarEvent
     if excludes.include?('assignment')
       hash['html_url'] = course_assignment_url(assignment.context_id, assignment)
     else
-      hash['assignment'] = assignment_json(assignment, user, session, override_dates: false)
+      hash['assignment'] = assignment_json(assignment, user, session, override_dates: false, submission: options[:submissions])
       hash['html_url'] = hash['assignment']['html_url'] if hash['assignment'].include?('html_url')
     end
     hash['context_code'] = assignment.context_code

@@ -17,6 +17,7 @@
 #
 
 require_relative '../spec_helper'
+require File.expand_path(File.dirname(__FILE__) + '/../apis/api_spec_helper')
 
 describe AssignmentGroupsController do
   def course_group
@@ -126,6 +127,37 @@ describe AssignmentGroupsController do
           get 'index', :course_id => @course.id, :include => ['assignments', 'assignment_visibility'], :grading_period_id => '', :format => :json
           expect(response).to be_success
         end
+      end
+    end
+
+    describe 'passing include_param submission', type: :request do
+      before(:once) do
+        student_in_course(active_all: true)
+        @assignment = @course.assignments.create!(
+          title: 'assignment',
+          assignment_group: @group,
+          workflow_state: 'published',
+          submission_types: "online_url",
+          points_possible: 25
+        )
+        @submission = bare_submission_model(@assignment, @student, {
+          score: '25',
+          grade: '25',
+          submitted_at: Time.zone.now
+        })
+      end
+
+      it 'returns assignment and submission' do
+        json = api_call_as_user(@student, :get,
+          "/api/v1/courses/#{@course.id}/assignment_groups?include[]=assignments&include[]=submission", {
+          controller: 'assignment_groups',
+          action: 'index',
+          format: 'json',
+          course_id: @course.id,
+          include: ['assignments', 'submission']
+        })
+        expect(json[0]['assignments'][0]['submission']).to be_present
+        expect(json[0]['assignments'][0]['submission']['id']).to eq @submission.id
       end
     end
   end

@@ -33,8 +33,8 @@ module Api::V1::Folders
       json['locked'] = !!folder.locked
       json['folders_url'] = api_v1_list_folders_url(folder)
       json['files_url'] = api_v1_list_files_url(folder)
-      json['files_count'] = folder.attachments.active.count
-      json['folders_count'] = folder.sub_folders.active.count
+      json['files_count'] = can_view_hidden_files ? folder.attachments.not_deleted.count : folder.attachments.active.count
+      json['folders_count'] = can_view_hidden_files ? folder.sub_folders.active.count : folder.sub_folders.active.not_hidden.count
       json['hidden'] = folder.hidden?
       json['locked_for_user'] = can_view_hidden_files ? false : !!folder.currently_locked
       json['hidden_for_user'] = can_view_hidden_files ? false : !!folder.hidden?

@@ -304,11 +304,15 @@ class ContextController < ApplicationController
       end
       user_id = Shard.relative_id_for(params[:id], Shard.current, @context.shard)
       if @context.is_a?(Course)
-        @membership = @context.enrollments.where(user_id: user_id).first
-        log_asset_access(@membership, "roster", "roster")
+        scope = @context.enrollments.where(user_id: user_id)
+        scope = @context.grants_right?(@current_user, session, :read_as_admin) ? scope.active : scope.active_or_pending
+        @membership = scope.first
+
+        log_asset_access(@membership, "roster", "roster") if @membership
       elsif @context.is_a?(Group)
-        @membership = @context.group_memberships.where(user_id: user_id).first
+        @membership = @context.group_memberships.active.where(user_id: user_id).first
       end
+
       @user = @membership.user rescue nil
       if !@user
         if @context.is_a?(Course)

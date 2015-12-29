@@ -15,7 +15,7 @@
   $ic-global-nav-link-active:  darken($ic-brand-global-nav-bgd, 8%);
   $ic-masquerade-color: $ic-brand-primary;
   $ic-subnav-panel-bgd: $ic-color-light;
-  $ic-subnav-tray-bgd: darken($ic-brand-global-nav-bgd, 10%);
+  $ic-subnav-tray-bgd: black;
   $ic-logomark-url: url("/images/svg-icons/svg_canvas_logomark_only.svg");
 
   @mixin primary-nav-badge-border($border-color) { box-shadow: 0 0 0 2px $border-color; }
@@ -247,7 +247,7 @@
   }
 
   .ReactTray__Overlay {
-    background: rgba( $ic-subnav-tray-bgd, 0.8 );
+    background: rgba($ic-subnav-tray-bgd, 0.5);
     opacity: 0;
     &.ReactTray__Overlay--after-open {
       transition: opacity 0.4s;

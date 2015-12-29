@@ -1,7 +1,7 @@
+require_relative '../../spec_helper'
+
 module Api
   module V1
-
-    require File.expand_path(File.dirname(__FILE__) + '../../../../lib/api/v1/course_json')
 
     describe Api::V1::CourseJson do
       let(:includes) { [] }
@@ -180,7 +180,7 @@ module Api
       end
 
       describe '#set_sis_course_id' do
-        let(:sis_course) { stub(:root_account => stub( :grants_any_right? => @has_right ), :sis_source_id => @sis_id ) }
+        let(:sis_course) { stub(:grants_any_right? => @has_right, :sis_source_id => @sis_id ) }
         let(:hash) { Hash.new }
 
         before do

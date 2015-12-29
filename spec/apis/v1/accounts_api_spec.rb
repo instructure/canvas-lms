@@ -611,6 +611,7 @@ describe "Accounts API", type: :request do
           instance_variable_set("@#{course}".to_sym, course_model(:name => course.to_s, :account => @a1, :conclude_at => 2.days.from_now))
         end
 
+        @c2.start_at = 2.weeks.ago
         @c2.conclude_at = 1.week.ago
         @c2.save!
 

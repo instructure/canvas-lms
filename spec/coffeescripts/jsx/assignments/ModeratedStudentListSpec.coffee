@@ -74,7 +74,9 @@ define [
       )
     )
     columns = TestUtils.scryRenderedDOMComponentsWithClass(studentList, 'AssignmentList__Mark')
+    moderatedColumns = TestUtils.scryRenderedDOMComponentsWithClass(studentList, 'ModeratedAssignmentList__Mark')
     equal columns.length, 1, 'only show one column'
+    equal moderatedColumns.length, 0, 'no moderated columns shown'
     React.unmountComponentAtNode(studentList.getDOMNode().parentNode)
 
   test 'shows the grade column when there is a selected_provisional_grade_id', ->

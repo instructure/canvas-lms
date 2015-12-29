@@ -1,6 +1,6 @@
-require_relative "../common"
-require_relative "../helpers/quizzes_common"
-require_relative "../helpers/assignment_overrides"
+require_relative '../common'
+require_relative '../helpers/quizzes_common'
+require_relative '../helpers/assignment_overrides'
 
 describe 'editing a quiz' do
   include_context "in-process server selenium tests"
@@ -154,7 +154,7 @@ describe 'editing a quiz' do
       skip('This spec is frail')
       default_section = @course.course_sections.first
       other_section = @course.course_sections.create!(name: 'other section')
-      default_section_due = Time.zone.now + 1.days
+      default_section_due = Time.zone.now + 1.day
       other_section_due = Time.zone.now + 2.days
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
       wait_for_ajaximations

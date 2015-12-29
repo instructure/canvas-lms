@@ -29,6 +29,9 @@ define([
   'i18n!eportfolio',
   'jquery' /* $ */,
   'compiled/userSettings',
+  'jsx/shared/rce/loadNewRCE',
+  'jsx/shared/rce/callOnRCE',
+  'jsx/shared/rce/preloadRCE',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.inst_tree' /* instTree */,
   'jquery.instructure_forms' /* formSubmit, getFormData, formErrors, errorBox */,
@@ -43,7 +46,11 @@ define([
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'jqueryui/progressbar' /* /\.progressbar/ */,
   'jqueryui/sortable' /* /\.sortable/ */
-], function(I18n, $, userSettings) {
+], function(I18n, $, userSettings, loadNewRCE, callOnRCE, preloadRCE) {
+
+  // optimization so user isn't waiting on RCS to
+  // respond when they hit edit
+  preloadRCE()
 
   var ePortfolioValidations = {
     object_name: 'eportfolio',
@@ -68,7 +75,9 @@ define([
         var name = "section_" + idx;
         if(section_type == "rich_text") {
           data[name + '[section_type]'] = "rich_text";
-          data[name + '[content]'] = $(this).find(".edit_section").editorBox('get_code');
+          var editorContent = callOnRCE($(this).find(".edit_section"), "get_code")
+          if (editorContent){ data[name + '[content]'] = editorContent;}
+
         } else if(section_type == "html") {
           data[name + '[section_type]'] = "html";
           data[name + '[content]'] = $(this).find(".edit_section").val();
@@ -147,8 +156,7 @@ define([
           $edit.find(".edit_section").val(sectionData.section_content);
         } else if(edit_type == "edit_rich_text_content") {
           $edit.find(".edit_section").attr('id', 'edit_' + $section.attr('id'));
-          $edit.find(".edit_section").editorBox()
-            .editorBox('set_code', sectionData.section_content);
+          loadNewRCE($edit.find(".edit_section"), {defaultContent: sectionData.section_content})
         }
       });
       $("#edit_page_form :text:first").focus().select();
@@ -171,7 +179,10 @@ define([
           $preview.html($(this).find(".edit_section").val());
           $(this).find(".section_content").after($preview);
         } else if (section_type == "rich_text") {
-          $preview.html($(this).find(".edit_section").editorBox('get_code'));
+
+          var editorContent = callOnRCE($(this).find(".edit_section"), "get_code")
+          if (editorContent){ $preview.html($.raw(editorContent)) }
+
           $(this).find(".section_content").after($preview);
         }
       });
@@ -179,7 +190,9 @@ define([
       $("#edit_page_form,#page_content,#page_sidebar").removeClass('previewing');
       $("#page_content .preview_section").remove();
     }).end().find(".cancel_button").click(function() {
-      $('.edit_section').editorBox('destroy');
+
+      callOnRCE($('.edit_section'), "destroy")
+
       $("#edit_page_form,#page_content,#page_sidebar").removeClass('editing');
       $("#page_content .section.unsaved").remove();
       $(".edit_content_link_holder").show();
@@ -198,9 +211,14 @@ define([
           if(section_type == "rich_text" || section_type == "html") {
             var code = $(this).find(".edit_section").val();
             if(section_type == "rich_text") {
-              code = $(this).find(".edit_section").editorBox('get_code');
+              var editorContent = callOnRCE($(this).find(".edit_section"), "get_code")
+              if (editorContent){
+                $(this).find(".section_content").html($.raw(editorContent));
+              }
+              callOnRCE($(this).find(".edit_section"), "destroy")
+            } else {
+              $(this).find(".section_content").html($.raw(code));
             }
-            $(this).find(".section_content").html($.raw(code));
           } else if(!$(this).hasClass('read_only')) {
             $(this).remove();
           }
@@ -209,7 +227,7 @@ define([
         return data;
       },
       beforeSubmit: function(data) {
-        $('.edit_section').editorBox('destroy');
+        callOnRCE($('.edit_section'), "destroy")
         $("#edit_page_form,#page_content,#page_sidebar").removeClass('editing').removeClass('previewing');
         $("#page_content .section.unsaved,#page_content .section .form_content").remove();
         $("#edit_page_form .edit_section").each(function() {
@@ -228,7 +246,7 @@ define([
     });
     $("#edit_page_form .switch_views_link").click(function(event) {
       event.preventDefault();
-      $("#edit_page_content").editorBox('toggle');
+      callOnRCE($("#edit_page_content"), "toggle")
       //  todo: replace .andSelf with .addBack when JQuery is upgraded.
       $(this).siblings(".switch_views_link").andSelf().toggle();
     });
@@ -261,12 +279,12 @@ define([
         $edit.find(".edit_section").attr('id', 'edit_' + $section.attr('id'));
       } else if(edit_type == "edit_rich_text_content") {
         $edit.find(".edit_section").attr('id', 'edit_' + $section.attr('id'));
-        $edit.find(".edit_section").editorBox();
+        loadNewRCE($edit.find(".edit_section"), {defaultContent: ""})
       }
       $section.hide().slideDown('fast', function() {
         $("html,body").scrollTo($section);
         if(section_type == "rich_text") {
-          $edit.find(".edit_section").editorBox('focus', true);
+          callOnRCE($edit.find(".edit_section"), "focus")
         } else if(section_type == "html") {
           $edit.find(".edit_section").focus().select();
         }
@@ -289,13 +307,13 @@ define([
       start: function(event, ui) {
         var $item = $(ui.item);
         if($item.getTemplateData({textValues: ['section_type']}).section_type == 'rich_text') {
-          $item.find("textarea").editorBox('destroy');
+          callOnRCE($item.find("textarea"), "destroy")
         }
       },
       stop: function(event, ui) {
         var $item = $(ui.item);
         if($item.getTemplateData({textValues: ['section_type']}).section_type == 'rich_text') {
-          $item.find("textarea").editorBox();
+          loadNewRCE($item.find("textarea"))
         }
       }
     });

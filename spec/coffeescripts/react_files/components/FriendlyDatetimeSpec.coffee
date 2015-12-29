@@ -11,6 +11,7 @@ define [
     setup: ->
       I18nStubber.clear()
 
+
   test "parses datetime from a string", ->
     fDT = React.createFactory(FriendlyDatetime)
     rendered = TestUtils.renderIntoDocument(fDT(dateTime: '1970-01-17'))

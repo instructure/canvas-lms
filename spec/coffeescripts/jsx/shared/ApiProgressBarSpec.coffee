@@ -27,6 +27,7 @@ define [
 
     teardown: ->
       ProgressStore.get.restore()
+      ProgressStore.clearState()
       @clock.restore()
 
   test 'shouldComponentUpdate', ->

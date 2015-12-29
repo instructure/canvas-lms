@@ -70,29 +70,44 @@ namespace :js do
   desc 'test javascript specs with Karma'
   task :test, :reporter do |task, args|
     reporter = args[:reporter]
-    require 'canvas/require_js'
+    if ENV['USE_WEBPACK'].present? && ENV['USE_WEBPACK'] != 'false'
+      Rake::Task['i18n:generate_js'].invoke
+      webpack_test_dir = Rails.root + "spec/javascripts/webpack"
+      FileUtils.rm_rf(webpack_test_dir)
+      puts "--> Bundling tests for ember apps"
+      `npm run webpack-test-ember`
+      puts "--> Running tests for ember apps"
+      test_suite(reporter)
+      FileUtils.rm_rf(webpack_test_dir)
+      puts "--> Bundling tests for canvas proper"
+      `npm run webpack-test`
+      puts "--> Running tests for canvas proper"
+      test_suite(reporter)
+    else
+      require 'canvas/require_js'
 
-    # run test for each ember app individually
-    matcher = ENV['JS_SPEC_MATCHER']
+      # run test for each ember app individually
+      matcher = ENV['JS_SPEC_MATCHER']
 
-    if matcher
-      puts "--> Matcher: #{matcher}"
-    end
-
-    if !matcher || matcher.to_s =~ %r{app/coffeescripts/ember}
-      ignored_embers = ['shared','modules'] #,'quizzes','screenreader_gradebook'
-      Dir.entries('app/coffeescripts/ember').reject { |d|
-        d.match(/^\./) || ignored_embers.include?(d)
-      }.each do |ember_app|
-        puts "--> Running tests for '#{ember_app}' ember app"
-        Canvas::RequireJs.matcher = matcher_for_ember_app ember_app
-        test_suite(reporter)
+      if matcher
+        puts "--> Matcher: #{matcher}"
       end
-    end
 
-    # run test for non-ember apps
-    Canvas::RequireJs.matcher = nil
-    test_suite(reporter)
+      if !matcher || matcher.to_s =~ %r{app/coffeescripts/ember}
+        ignored_embers = ['shared','modules'] #,'quizzes','screenreader_gradebook'
+        Dir.entries('app/coffeescripts/ember').reject { |d|
+          d.match(/^\./) || ignored_embers.include?(d)
+        }.each do |ember_app|
+          puts "--> Running tests for '#{ember_app}' ember app"
+          Canvas::RequireJs.matcher = matcher_for_ember_app ember_app
+          test_suite(reporter)
+        end
+      end
+
+      # run test for non-ember apps
+      Canvas::RequireJs.matcher = nil
+      test_suite(reporter)
+    end
   end
 
   def test_suite(reporter=nil)
@@ -278,13 +293,19 @@ namespace :js do
 
   desc "build webpack js for production"
   task :webpack do
-    if ENV['USE_WEBPACK'].present? && ENV['USE_WEBPACK'] != 'false'
+    if ENV['USE_WEBPACK'].present? && ENV['USE_WEBPACK'] != 'false' && ENV['USE_WEBPACK'] != 'False'
       if ENV['RAILS_ENV'] == 'production'
         puts "--> Building PRODUCTION webpack bundles"
         `npm run webpack-production`
       else
         puts "--> Building DEVELOPMENT webpack bundles"
         `npm run webpack-development`
+        if ENV['USE_OPTIMIZED_JS'] == 'true'
+          # if this var is set, we'll need to have optimized version of the
+          # webpack bundles available too
+          puts "--> Building OPTIMIZED webpack bundles"
+          `npm run webpack-production`
+        end
       end
       raise "Error running js:webpack: \nABORTING" if $?.exitstatus != 0
     end
@@ -319,17 +340,19 @@ namespace :js do
 
   desc "Compile React JSX to JS"
   task :jsx do
-    source = Rails.root + 'app/jsx'
-    dest = Rails.root + 'public/javascripts/jsx'
-    if Rails.env == 'development'
-      msg = `node_modules/.bin/babel #{source} --out-dir #{dest} --source-maps inline 2>&1 >/dev/null`
-    else
-      msg = `node_modules/.bin/babel #{source} --out-dir #{dest} 2>&1 >/dev/null`
-    end
+    dirs = [["#{Rails.root}/app/jsx", "#{Rails.root}/public/javascripts/jsx"],
+            ["#{Rails.root}/spec/javascripts/jsx", "#{Rails.root}/spec/javascripts/compiled"]]
+    dirs.each { |source,dest|
+      if Rails.env == 'development'
+        msg = `node_modules/.bin/babel #{source} --out-dir #{dest} --source-maps inline 2>&1 >/dev/null`
+      else
+        msg = `node_modules/.bin/babel #{source} --out-dir #{dest} 2>&1 >/dev/null`
+      end
 
-    unless $?.success?
-      raise msg
-    end
+      unless $?.success?
+        raise msg
+      end
+    }
   end
 
   desc "creates ember app bundles"

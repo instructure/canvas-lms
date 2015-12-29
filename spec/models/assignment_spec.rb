@@ -2955,6 +2955,12 @@ describe Assignment do
         student_in_course(:course => @course, :user => @other_student, :active_all => true)
       end
 
+      it "should return submission comments with null provisional grade" do
+        course_with_ta :course => @course, :active_all => true
+        json = @assignment.speed_grader_json(@ta, :grading_role => :provisional_grader)
+        expect(json['submissions'][0]['submission_comments'].map { |comment| comment['comment'] }).to match_array ['real comment']
+      end
+
       describe "for provisional grader" do
         before(:once) do
           @json = @assignment.speed_grader_json(@ta, :grading_role => :provisional_grader)
@@ -2965,8 +2971,8 @@ describe Assignment do
           expect(@json['submissions'][0]['provisional_grades']).to be_nil
         end
 
-        it "should include only the grader's provisional comments" do
-          expect(@json['submissions'][0]['submission_comments'].map { |comment| comment['comment'] }).to eq ['other provisional comment']
+        it "should include only the grader's provisional comments (and the real ones)" do
+          expect(@json['submissions'][0]['submission_comments'].map { |comment| comment['comment'] }).to match_array ['other provisional comment', 'real comment']
         end
 
         it "should only include the grader's provisional rubric assessments" do
@@ -2988,7 +2994,7 @@ describe Assignment do
 
         it "should include the moderator's provisional grades and comments" do
           expect(@json['submissions'][0]['score']).to eq 2
-          expect(@json['submissions'][0]['submission_comments'].map { |comment| comment['comment'] }).to eq ['provisional comment']
+          expect(@json['submissions'][0]['submission_comments'].map { |comment| comment['comment'] }).to match_array ['provisional comment', 'real comment']
         end
 
         it "should include the moderator's provisional rubric assessments" do
@@ -3000,8 +3006,11 @@ describe Assignment do
         it "should list all provisional grades" do
           pgs = @json['submissions'][0]['provisional_grades']
           expect(pgs.size).to eq 2
-          expect(pgs.map { |pg| [pg['score'], pg['scorer_id'], pg['submission_comments'][0]['comment']] }).to eq(
-            [[2.0, @teacher.id, "provisional comment"], [3.0, @ta.id, "other provisional comment"]]
+          expect(pgs.map { |pg| [pg['score'], pg['scorer_id'], pg['submission_comments'].map{|c| c['comment']}.sort] }).to match_array(
+            [
+              [2.0, @teacher.id, ["provisional comment", "real comment"]],
+              [3.0, @ta.id, ["other provisional comment", "real comment"]]
+            ]
           )
         end
 
@@ -3734,6 +3743,19 @@ describe Assignment do
       expect(info[:past_due]).to be_falsey
     end
   end
+
+  describe '#touch_submissions_if_muted' do
+    before(:once) do
+      @assignment = @course.assignments.create! points_possible: 10
+      @submission = @assignment.submit_homework(@student, body: "hello")
+    end
+
+    it "touches submissions if you mute the assignment" do
+      @assignment.mute!
+      touched = @submission.reload.updated_at > @assignment.updated_at
+      expect(touched).to eq true
+    end
+  end
 end
 
 def setup_assignment_with_group
@@ -3776,7 +3798,9 @@ def setup_assignment_with_students
 end
 
 def submit_homework(student)
-  a = Attachment.create! context: student,
+  file_context = @assignment.group_category.group_for(student) if @assignment.has_group_category?
+  file_context ||= student
+  a = Attachment.create! context: file_context,
                          filename: "homework.pdf",
                          uploaded_data: StringIO.new("blah blah blah")
   @assignment.submit_homework(student, attachments: [a],

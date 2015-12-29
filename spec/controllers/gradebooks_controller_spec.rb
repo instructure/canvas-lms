@@ -189,7 +189,6 @@ describe GradebooksController do
       expect(assigns[:js_env][:submissions].sort_by { |s|
         s['assignment_id']
       }).to eq [
-        {'score' => "ungraded assignment", 'assignment_id' => a1.id},
         {'score' => 5, 'assignment_id' => a2.id}
       ]
     end

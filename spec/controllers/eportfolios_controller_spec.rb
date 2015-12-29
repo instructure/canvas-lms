@@ -22,29 +22,22 @@ describe EportfoliosController do
   def eportfolio_category
     @category = @portfolio.eportfolio_categories.create!(:name => "some category")
   end
-  
+
   def category_entry
     @entry = @category.eportfolio_entries.create!(:name => "some entry", :eportfolio => @portfolio)
   end
-  
+
 
   before :once do
     user(:active_all => true)
   end
-  
+
   describe "GET 'user_index'" do
     before(:once){ eportfolio }
+
     it "should require authorization" do
       get 'user_index'
       expect(response).to be_redirect
-    end
-    
-    it "should assign variables" do
-      user_session(@user)
-      get 'user_index'
-      expect(assigns[:portfolios]).not_to be_nil
-      expect(assigns[:portfolios]).not_to be_empty
-      expect(assigns[:portfolios][0]).to eql(@portfolio)
     end
 
     it "should redirect if eportfolios are disabled" do
@@ -55,14 +48,36 @@ describe EportfoliosController do
       get 'user_index'
       expect(response).to be_redirect
     end
+
+    describe "with logged in user" do
+      before{ user_session(@user) }
+
+      it "assigns variables" do
+        get 'user_index'
+        expect(assigns[:portfolios]).not_to be_nil
+        expect(assigns[:portfolios]).not_to be_empty
+        expect(assigns[:portfolios][0]).to eql(@portfolio)
+      end
+
+      it "exposes the feature state for rich content service to js_env" do
+        @user.account.root_account.enable_feature!(:rich_content_service)
+        Canvas::DynamicSettings.stubs(:find).with("rich-content-service").returns({
+          'app-host' => 'rce.docker',
+          'cdn-host' => 'rce.docker'
+        })
+        get 'user_index'
+        expect(response).to be_success
+        expect(assigns[:js_env][:RICH_CONTENT_SERVICE_ENABLED]).to be_truthy
+      end
+    end
   end
-  
+
   describe "POST 'create'" do
     it "should require authorization" do
       post 'create', :eportfolio => {:name => "some portfolio"}
       assert_unauthorized
     end
-    
+
     it "should create portfolio" do
       user_session(@user)
       post 'create', :eportfolio => {:name => "some portfolio"}
@@ -71,14 +86,14 @@ describe EportfoliosController do
       expect(assigns[:portfolio].name).to eql("some portfolio")
     end
   end
-  
+
   describe "GET 'show'" do
     before(:once){ eportfolio }
     it "should require authorization if the eportfolio is not public" do
       get 'show', :id => @portfolio.id
       assert_unauthorized
     end
-    
+
     it "should complain if eportfolios are disabled" do
       a = Account.default
       a.settings[:enable_eportfolios] = false
@@ -87,27 +102,34 @@ describe EportfoliosController do
       get 'show', :id => @portfolio.id
       assert_unauthorized
     end
-    
-    it "should show portfolio" do
-      user_session(@user)
-      get 'show', :id => @portfolio.id
-      expect(response).to be_success
-      expect(assigns[:portfolio]).not_to be_nil
-    end
 
-    it "should create a category if one doesn't exist" do
-      user_session(@user)
-      get 'show', :id => @portfolio.id
-      expect(response).to be_success
-      expect(assigns[:category]).not_to be_nil
-    end
+    describe "with authorized user" do
+      before{ user_session(@user) }
 
-    it "should create an entry in the first category if one doesn't exist" do
-      @portfolio.eportfolio_categories.create!(:name => "Home")
-      user_session(@user)
-      get 'show', :id => @portfolio.id
-      expect(response).to be_success
-      expect(assigns[:page]).not_to be_nil
+      it "should show portfolio" do
+        get 'show', :id => @portfolio.id
+        expect(response).to be_success
+        expect(assigns[:portfolio]).not_to be_nil
+      end
+
+      it "should create a category if one doesn't exist" do
+        get 'show', :id => @portfolio.id
+        expect(response).to be_success
+        expect(assigns[:category]).not_to be_nil
+      end
+
+      it "should create an entry in the first category if one doesn't exist" do
+        @portfolio.eportfolio_categories.create!(:name => "Home")
+        get 'show', :id => @portfolio.id
+        expect(response).to be_success
+        expect(assigns[:page]).not_to be_nil
+      end
+
+      it "exposes the feature state for rich content service to js_env" do
+        @user.account.root_account.disable_feature!(:rich_content_service)
+        get 'user_index'
+        expect(assigns[:js_env][:RICH_CONTENT_SERVICE_ENABLED]).to be_falsey
+      end
     end
 
     describe "assigns[:owner_url]" do
@@ -167,14 +189,14 @@ describe EportfoliosController do
       end
     end
   end
-  
+
   describe "PUT 'update'" do
     before(:once){ eportfolio }
     it "should require authorization" do
       put 'update', :id => @portfolio.id, :eportfolio => {:name => "new title"}
       assert_unauthorized
     end
-    
+
     it "should update portfolio" do
       user_session(@user)
       put 'update', :id => @portfolio.id, :eportfolio => {:name => "new title"}
@@ -183,14 +205,14 @@ describe EportfoliosController do
       expect(assigns[:portfolio].name).to eql("new title")
     end
   end
-  
+
   describe "DELETE 'destroy'" do
     before(:once){ eportfolio }
     it "should require authorization" do
       delete 'destroy', :id => @portfolio.id
       assert_unauthorized
     end
-    
+
     it "should delete portfolio" do
       user_session(@user)
       delete 'destroy', :id => @portfolio.id
@@ -202,14 +224,14 @@ describe EportfoliosController do
       expect(@user.eportfolios.active).not_to be_include(@portfolio)
     end
   end
-  
+
   describe "POST 'reorder_categories'" do
     before(:once){ eportfolio }
     it "should require authorization" do
       post 'reorder_categories', :eportfolio_id => @portfolio.id, :order => ''
       assert_unauthorized
     end
-    
+
     it "should reorder categories" do
       user_session(@user)
       c1 = eportfolio_category
@@ -228,14 +250,14 @@ describe EportfoliosController do
       expect(c3.position).to eql(2)
     end
   end
-  
+
   describe "POST 'reorder_entries'" do
     before(:once){ eportfolio }
     it "should require authorization" do
       post 'reorder_entries', :eportfolio_id => @portfolio.id, :order => '', :eportfolio_category_id => 1
       assert_unauthorized
     end
-    
+
     it "should reorder entries" do
       user_session(@user)
       eportfolio_category

@@ -7,6 +7,7 @@ define [
 
   module 'CourseEpubExportStoreSpec',
     setup: ->
+      CourseStore.clearState()
       @courses = {
         courses: [{
           name: 'Maths 101',

@@ -341,8 +341,8 @@ class DiscussionTopicsController < ApplicationController
                 :discussion_topic_menu_tools => external_tools_display_hashes(:discussion_topic_menu)
         }
         append_sis_data(hash)
+        js_env(hash)
 
-        js_env(hash.merge(POST_GRADES: Assignment.sis_grade_export_enabled?(@context)))
         if user_can_edit_course_settings?
           js_env(SETTINGS_URL: named_context_url(@context, :api_v1_context_settings_url))
         end
@@ -416,8 +416,12 @@ class DiscussionTopicsController < ApplicationController
                      map { |category| { id: category.id, name: category.name } },
                  CONTEXT_ID: @context.id,
                  CONTEXT_ACTION_SOURCE: :discussion_topic,
-                 POST_GRADES: Assignment.sis_grade_export_enabled?(@context),
                  DIFFERENTIATED_ASSIGNMENTS_ENABLED: @context.feature_enabled?(:differentiated_assignments)}
+
+      post_to_sis = Assignment.sis_grade_export_enabled?(@context)
+      js_hash[:POST_TO_SIS] = post_to_sis
+      js_hash[:POST_TO_SIS_DEFAULT] = @context.account.sis_default_grade_export[:value] if post_to_sis && @topic.new_record?
+
       if @context.is_a?(Course)
         js_hash['SECTION_LIST'] = sections.map { |section|
           {
@@ -466,7 +470,7 @@ class DiscussionTopicsController < ApplicationController
       @headers = !params[:headless]
       @locked = @topic.locked_for?(@current_user, :check_policies => true, :deep_check_if_needed => true) || @topic.locked?
       @unlock_at = @topic.available_from_for(@current_user)
-      @topic.change_read_state('read', @current_user) unless @locked
+      @topic.change_read_state('read', @current_user) if @topic.visible_for?(@current_user)
       if @topic.for_group_discussion?
         @groups = @topic.group_category.groups.active.select{ |g| g.grants_right?(@current_user, session, :post_to_forum) }.sort! {|a, b| a.id <=> b.id}
         topics = @topic.child_topics.to_a
@@ -753,7 +757,7 @@ class DiscussionTopicsController < ApplicationController
       respond_to do |format|
         format.html {
           flash[:notice] = t :topic_deleted_notice, "%{topic_title} deleted successfully", :topic_title => @topic.title
-          redirect_to named_context_url(@context, :context_discussion_topics_url)
+          redirect_to named_context_url(@context, @topic.is_announcement ? :context_announcements_url : :context_discussion_topics_url)
         }
         format.json  { render :json => @topic.as_json(:include => {:user => {:only => :name} } ), :status => :ok }
       end
@@ -861,7 +865,14 @@ class DiscussionTopicsController < ApplicationController
     unless process_future_date_parameters(discussion_topic_hash)
       process_lock_parameters(discussion_topic_hash)
     end
+
     process_published_parameters(discussion_topic_hash)
+    if is_new && @topic.published? && params[:assignment]
+      @topic.unpublish
+      @topic.root_topic.try(:unpublish)
+      publish_later = true
+    end
+
     process_group_parameters(discussion_topic_hash)
     process_pin_parameters(discussion_topic_hash)
 
@@ -878,6 +889,10 @@ class DiscussionTopicsController < ApplicationController
         apply_positioning_parameters
         apply_attachment_parameters
         apply_assignment_parameters
+        if publish_later
+          @topic.publish!
+          @topic.root_topic.try(:publish!)
+        end
         render :json => discussion_topic_api_json(@topic.reload, @context, @current_user, session)
       else
         errors = @topic.errors.as_json[:errors]

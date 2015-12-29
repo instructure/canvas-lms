@@ -567,17 +567,15 @@ describe 'Submissions API', type: :request do
   end
 
   it "should return a valid preview url for quiz submissions" do
-    student1 = user(:active_all => true)
+    @student = student1 = user(:active_all => true)
     course_with_teacher_logged_in(:active_all => true) # need to be logged in to view the preview url below
     @course.enroll_student(student1).accept!
-    quiz = Quizzes::Quiz.create!(:title => 'quiz1', :context => @course)
-    quiz.did_edit!
-    quiz.offer!
-    a1 = quiz.assignment
-    sub = a1.find_or_create_submission(student1)
-    sub.submission_type = 'online_quiz'
-    sub.workflow_state = 'submitted'
-    sub.save!
+    quiz_with_submission
+    a1 = @quiz.assignment
+    sub = @quiz.assignment.submissions.where(user_id: student1).first
+    sub.quiz_submission.with_versioning(true) do
+      sub.quiz_submission.update_attribute(:finished_at, 1.hour.ago)
+    end
 
     json = api_call(:get,
           "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions.json",
@@ -586,9 +584,11 @@ describe 'Submissions API', type: :request do
             :assignment_id => a1.id.to_s },
           { :include => %w(submission_history submission_comments rubric_assessment) })
 
-    get_via_redirect json.first['preview_url']
+    preview_url = json.first['preview_url']
+    expect(Rack::Utils.parse_query(URI(preview_url).query)['version'].to_i).to eq sub.quiz_submission_version
+    get_via_redirect preview_url
     expect(response).to be_success
-    expect(response.body).to match(/Redirecting to quiz page/)
+    expect(response.body).to match(/#{@quiz.quiz_title} Results/)
   end
 
   it "should return a correct submission_history for quiz submissions" do
@@ -3173,7 +3173,7 @@ describe 'Submissions API', type: :request do
 
       grade_data = {
         :grade_data => {
-          @student1.id => { :posted_grade => '75%'},
+          @student1.id => { :posted_grade => '75%' },
           @student2.id => {
             :rubric_assessment => {
               :crit1 => { :points => 7 },
@@ -3260,6 +3260,44 @@ describe 'Submissions API', type: :request do
       progress = Progress.find(json["id"])
       expect(progress.failed?).to be_truthy
       expect(progress.message).to eq "Couldn't find User(s) with API ids '#{@student2.id}'"
+    end
+
+    it "should maintain grade when updating comments" do
+      @a1.grade_student(@student1, :grade => '5%')
+
+      grade_data = {
+        :grade_data => {
+          @student1.id => { :text_comment => "Awesome comment" }
+        }
+      }
+      api_call(:post,
+        "/api/v1/sections/#{@section.id}/assignments/#{@a1.id}/submissions/update_grades",
+        { :controller => 'submissions_api', :action => 'bulk_update',
+          :format => 'json', :section_id => @section.id.to_s,
+          :assignment_id => @a1.id.to_s }, grade_data)
+
+      run_jobs
+      s1 = @student1.submissions.first
+      expect(s1.grade).to eq '5%'
+    end
+
+    it "should nil grade when receiving empty posted_grade" do
+      @a1.grade_student(@student1, :grade => '5%')
+
+      grade_data = {
+        :grade_data => {
+          @student1.id => { :posted_grade => nil }
+        }
+      }
+      api_call(:post,
+        "/api/v1/sections/#{@section.id}/assignments/#{@a1.id}/submissions/update_grades",
+        { :controller => 'submissions_api', :action => 'bulk_update',
+          :format => 'json', :section_id => @section.id.to_s,
+          :assignment_id => @a1.id.to_s }, grade_data)
+
+      run_jobs
+      s1 = @student1.submissions.first
+      expect(s1.grade).to be_nil
     end
   end
 

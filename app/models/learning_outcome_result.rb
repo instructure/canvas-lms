@@ -33,7 +33,7 @@ class LearningOutcomeResult < ActiveRecord::Base
   validates_inclusion_of :associated_asset_type, :allow_nil => true, :in => ['AssessmentQuestion', 'Quizzes::Quiz', 'LiveAssessments::Assessment']
   belongs_to :context, :polymorphic => true
   validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course']
-  has_many :learning_outcome_question_results
+  has_many :learning_outcome_question_results, dependent: :destroy
   simply_versioned
 
   EXPORTABLE_ATTRIBUTES = [

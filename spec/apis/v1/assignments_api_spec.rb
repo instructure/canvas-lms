@@ -18,6 +18,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../locked_spec')
+require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper')
 
 describe AssignmentsApiController, type: :request do
   include Api
@@ -699,6 +700,57 @@ describe AssignmentsApiController, type: :request do
     end
   end
 
+  describe "GET /users/:user_id/courses/:course_id/assignments (#user_index)" do
+    specs_require_sharding
+    before :once do
+      course_with_teacher(:active_all => true)
+    end
+
+    it "returns assignments for authorized observer" do
+      course_with_student_submissions(:active_all => true)
+      parent = User.create
+      parent.user_observees.create! do |uo|
+        uo.user_id = @student.id
+      end
+      parent.save!
+      json = api_get_assignments_user_index(@student, @course, parent)
+      expect(json[0]['course_id']).to eq @course.id
+    end
+
+    it "returns assignments for authorized observer" do
+      course_with_student_submissions(:active_all => true)
+      parent = nil
+      @shard2.activate do
+        parent = User.create
+        parent.user_observees.create! do |uo|
+          uo.user_id = @student.id
+        parent.save!
+        end
+      end
+      json = api_get_assignments_user_index(@student, @course, parent)
+      expect(json[0]['course_id']).to eq @course.id
+    end
+
+    it "returns unauthorized for users who cannot :read the course" do
+      # unpublished course with invited student
+      course_with_student
+      expect(@course.grants_right?(@student, :read)).to be_falsey
+      api_call(:get,
+               "/api/v1/users/#{@student.id}/courses/#{@course.id}/assignments",
+               {
+                   :controller => 'assignments_api',
+                   :action => 'user_index',
+                   :format => 'json',
+                   :course_id=> @course.id,
+                   :user_id=> @student.id.to_s
+               },
+               {},
+               {},
+               {:expected_status => 401}
+              )
+    end
+
+  end
 
   describe "POST /courses/:course_id/assignments (#create)" do
 
@@ -2643,7 +2695,19 @@ def api_get_assignments_index_from_course(course)
           })
 end
 
-def create_frozen_assignment_in_course(course)
+def api_get_assignments_user_index(user, course, api_user = @user)
+  api_call_as_user(api_user, :get,
+           "/api/v1/users/#{user.id}/courses/#{course.id}/assignments.json",
+           {
+               :controller => 'assignments_api',
+               :action => 'user_index',
+               :format => 'json',
+               :course_id => course.id.to_s,
+               :user_id => user.id.to_s
+           })
+end
+
+def create_frozen_assignment_in_course(_course)
     assignment = @course.assignments.create!({
       :title => "some assignment",
       :freeze_on_copy => true

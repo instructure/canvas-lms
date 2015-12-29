@@ -519,7 +519,11 @@ class ApplicationController < ActionController::Base
         @context = api_find(Course.active, params[:course_id])
         params[:context_id] = params[:course_id]
         params[:context_type] = "Course"
-        @context_enrollment = @context.enrollments.where(user_id: @current_user).sort_by{|e| [e.state_sortable, e.rank_sortable, e.id] }.first if @context && @current_user
+        if @context && @current_user
+          context_enrollments = @context.enrollments.where(user_id: @current_user)
+          Canvas::Builders::EnrollmentDateBuilder.preload(context_enrollments)
+          @context_enrollment = context_enrollments.sort_by{|e| [e.state_with_date_sortable, e.rank_sortable, e.id] }.first
+        end
         @context_membership = @context_enrollment
         check_for_readonly_enrollment_state
       elsif params[:account_id] || (self.is_a?(AccountsController) && params[:account_id] = params[:id])
@@ -640,6 +644,7 @@ class ApplicationController < ActionController::Base
   end
 
   def check_for_readonly_enrollment_state
+    return unless request.format.html?
     if @context_enrollment && @context_enrollment.is_a?(Enrollment) && ['invited', 'active'].include?(@context_enrollment.workflow_state) && action_name != "enrollment_invitation"
       state = @context_enrollment.state_based_on_date
       case state
@@ -1732,34 +1737,6 @@ class ApplicationController < ActionController::Base
     super
   end
 
-  def active_brand_config(opts={})
-    return @active_brand_config if defined? @active_brand_config
-    @active_brand_config = begin
-      if !use_new_styles? || (@current_user && @current_user.prefers_high_contrast?)
-        nil
-      elsif session.key?(:brand_config_md5)
-        BrandConfig.where(md5: session[:brand_config_md5]).first
-      else
-        brand_config_for_account(opts)
-      end
-    end
-  end
-  helper_method :active_brand_config
-
-  def brand_config_for_account(opts)
-    account = @account || Context.get_account(@context, @domain_root_account)
-    if account.brand_config && account.branding_allowed?
-      account.brand_config
-    elsif !opts[:ignore_parents] && account.first_parent_brand_config
-      account.first_parent_brand_config
-    elsif k12?
-      BrandConfig.k12_config
-    end
-  end
-  private :brand_config_for_account
-
-
-
   def css_bundles
     @css_bundles ||= []
   end
@@ -1969,6 +1946,35 @@ class ApplicationController < ActionController::Base
     end
 
     js_env hash
+  end
+
+  def set_js_assignment_data
+    rights = [:manage_assignments, :manage_grades, :read_grades]
+    permissions = @context.rights_status(@current_user, *rights)
+    permissions[:manage] = permissions[:manage_assignments]
+    js_env({
+      :URLS => {
+        :new_assignment_url => new_polymorphic_url([@context, :assignment]),
+        :course_url => api_v1_course_url(@context),
+        :sort_url => reorder_course_assignment_groups_url(@context),
+        :assignment_sort_base_url => course_assignment_groups_url(@context),
+        :context_modules_url => api_v1_course_context_modules_path(@context),
+        :course_student_submissions_url => api_v1_course_student_submissions_url(@context)
+      },
+      :POST_TO_SIS => Assignment.sis_grade_export_enabled?(@context),
+      :PERMISSIONS => permissions,
+      :DIFFERENTIATED_ASSIGNMENTS_ENABLED => @context.feature_enabled?(:differentiated_assignments),
+      :MULTIPLE_GRADING_PERIODS_ENABLED => @context.feature_enabled?(:multiple_grading_periods),
+      :VALID_DATE_RANGE => CourseDateRange.new(@context),
+      :assignment_menu_tools => external_tools_display_hashes(:assignment_menu),
+      :discussion_topic_menu_tools => external_tools_display_hashes(:discussion_topic_menu),
+      :quiz_menu_tools => external_tools_display_hashes(:quiz_menu),
+      :current_user_has_been_observer_in_this_course => @context.user_has_been_observer?(@current_user),
+      :observed_student_ids => ObserverEnrollment.observed_student_ids(@context, @current_user)
+    })
+    if @context.feature_enabled?(:multiple_grading_periods)
+      js_env(:active_grading_periods => GradingPeriod.json_for(@context, @current_user))
+    end
   end
 
   def google_docs_connection

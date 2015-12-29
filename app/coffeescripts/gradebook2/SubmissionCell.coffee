@@ -6,6 +6,7 @@ define [
   'compiled/gradebook2/Turnitin'
   'compiled/util/round'
   'jquery.ajaxJSON'
+  'jquery.instructure_misc_helpers' # raw
 ], (GRADEBOOK_TRANSLATIONS, htmlEscape,$, _, {extractData},round) ->
 
   class SubmissionCell
@@ -77,7 +78,11 @@ define [
         grade = if isNaN(grade)
           submission.grade
         else
-          round(grade,round.DEFAULT)
+          round(grade, round.DEFAULT)
+
+        if grade && assignment?.grading_type == "percent"
+          grade = grade.toString() + "%"
+
       this.prototype.cellWrapper(grade, {submission: submission, assignment: assignment, editable: false})
 
     cellWrapper: (innerContents, options = {}) ->
