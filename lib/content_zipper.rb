@@ -74,8 +74,14 @@ class ContentZipper
 
     filename    = assignment_zip_filename(assignment)
     user        = zip_attachment.user
-    students    = assignment.representatives(user).index_by(&:id)
-    submissions = assignment.submissions.where(:user_id => students.keys)
+    
+    if @context.completed?
+      submissions = assignment.submissions
+      students = User.where(id: submissions.pluck(:user_id)).index_by(&:id) # This neglects the complexity of group assignments
+    else
+      students    = assignment.representatives(user).index_by(&:id)
+      submissions = assignment.submissions.where(:user_id => students.keys)
+    end
 
     make_zip_tmpdir(filename) do |zip_name|
       @logger.debug("creating #{zip_name}")

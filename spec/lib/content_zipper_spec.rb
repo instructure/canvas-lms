@@ -182,6 +182,35 @@ describe ContentZipper do
     end
   end
 
+  describe "hard concluded course submissions" do
+    it "should still download the content" do
+      course_with_teacher
+      @assignment = assignment_model(course: @course)
+      submissions = 5.times.map.with_index do |i|
+        attachment = attachment_model(uploaded_data: stub_png_data("file_#{i}.png"), content_type: 'image/png')
+        submission_model(course: @course, assignment: @assignment, submission_type: 'online_upload', attachments: [attachment] )
+      end
+      @course.complete
+      @course.save!
+
+      @course.reload
+      @assignment.reload
+
+      zipper = ContentZipper.new
+      attachment = Attachment.new(display_name: 'my_download.zip')
+      attachment.user_id = @user.id
+      attachment.workflow_state = 'to_be_zipped'
+      attachment.context = @assignment
+      attachment.save!
+      zipper.process_attachment(attachment, @user)
+
+      attachment.reload
+      expect(attachment.workflow_state).to eq 'zipped'
+      f = File.new(attachment.full_filename)
+      expect(f.size).to be > 22 # the characteristic size of an empty zip file
+    end
+  end
+
   describe "zip_folder" do
     context "checking permissions" do
       before(:each) do
