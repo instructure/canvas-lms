@@ -37,6 +37,18 @@ define [
       # but by doing so we need to make sure that click events still get propagated up in case we
       # were delegating events to a parent container
       if @opts.appendMenuTo
+        # to keep tab order when appended out of place
+        @$menu.on
+          keydown: (e) =>
+            if e.keyCode is $.ui.keyCode.TAB
+              if e.shiftKey
+                tabKey = { which: $.ui.keyCode.TAB, shiftKey: true }
+              else
+                tabKey = { which: $.ui.keyCode.TAB }
+
+              pressTab = jQuery.Event('keydown', tabKey)
+              @$trigger.focus().trigger(pressTab)
+
         popupInstance = @$menu.data('popup')
         _open = popupInstance.open
         self = this
