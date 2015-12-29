@@ -1,6 +1,11 @@
 module AccountServices
+  class AllowedServicesHash < Hash
+    def _dump(*args); ''; end
+    def self._load(*args); nil; end
+  end
+
   def self.allowable_services
-    {
+    AllowedServicesHash.new.merge({
         :google_docs => {
             :name => I18n.t("Google Docs"),
             :description => "",
@@ -69,7 +74,7 @@ module AccountServices
               user && account && account.grants_right?(user, :manage_site_settings)
             end
         },
-    }.merge(@plugin_services || {}).freeze
+    }).merge(@plugin_services || {}).freeze
   end
 
   def self.register_service(service_name, info_hash)
