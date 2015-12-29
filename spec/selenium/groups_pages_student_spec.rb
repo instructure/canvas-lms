@@ -219,7 +219,7 @@ describe "groups" do
 
       it "should only allow group members to access pages", priority: "1", test_id: 315331 do
         get pages_page
-        expect(fj('.btn-primary:contains("Page")')).to be_displayed
+        expect(f('.new_page')).to be_displayed
         verify_no_course_user_access(pages_page)
       end
     end

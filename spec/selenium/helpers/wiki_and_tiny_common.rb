@@ -73,7 +73,7 @@ module WikiAndTinyCommon
   end
 
   def manually_create_wiki_page(title,body)
-    f('.btn-primary').click
+    f('.new_page').click
     wait_for_ajaximations
     replace_content(f('#title'),title)
     add_text_to_tiny(body)
