@@ -79,9 +79,15 @@ define [
     ta = @elementInFixtures('textarea')
     ta.value = "some text here";
     props = RCELoader.createRCEProps(ta, "default text")
-    ok props.defaultContent, "some text here"
+    equal props.defaultContent, "some text here"
 
   test 'falls back to defaultContent if target has no content', ->
     ta = @elementInFixtures('textarea')
     props = RCELoader.createRCEProps(ta, {defaultContent: "default text"})
-    ok props.defaultContent, "default text"
+    equal props.defaultContent, "default text"
+
+  test 'adds the elements name attribute to mirroedAttrs', ->
+    ta = @elementInFixtures('textarea')
+    ta.setAttribute("name", "elementName")
+    props = RCELoader.createRCEProps(ta, {defaultContent: "default text"})
+    equal props.mirroredAttrs.name, "elementName"
