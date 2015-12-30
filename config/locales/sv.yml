@@ -58,8 +58,8 @@ sv:
     no_api_key: "En API-nyckel krävs för att använda Academic Benchmarks"
     no_authority: "Kund inte hitta en auktoritet att uppdatera"
     no_file: "Ingen bedömningsfil eller auktoritet har uppgetts"
-    no_permissions: "Användare har inte rätt att redigera globala bedömningar"
-    no_perms: "Användaren har inte rätt att redigera globala bedömningar"
+    no_permissions: "Användare har inte rätt att redigera globala lärandemål"
+    no_perms: "Användaren har inte rätt att redigera globala lärandemål"
     plugin_settings: 
       api_url_description: "(t.ex. %{url})"
       common_core_guid: "(t.ex. %{guid})"
@@ -92,13 +92,13 @@ sv:
     tab_courses: Kurser
     tab_developer_keys: Utvecklarnycklar
     tab_faculty_journal: Fakultetsjournal
-    tab_grading_standards: Betygsättning
+    tab_grading_standards: Betygschema
     tab_jobs: Jobb
-    tab_outcomes: Bedömningar
+    tab_outcomes: Lärandemål
     tab_permissions: Behörigheter
     tab_plugins: Plugins
     tab_question_banks: Frågebanker
-    tab_rubrics: Bedömningsmatriser
+    tab_rubrics: Matriser
     tab_settings: Inställningar
     tab_sis_import: "SIS Import"
     tab_statistics: Statistik
@@ -163,7 +163,7 @@ sv:
       test_ldap_search_help_fixes_1: "Bekräfta det försedda 'filter string' (i.e. '(sAMAccountName={{login}})')."
       test_ldap_search_help_fixes_2: "Bekräfta den försedda sökbasen (t.ex. 'ou=people,dc=example,dc=com')."
       test_ldap_search_help_fixes_3: "Bekräfta att användarobjektet i LDAP har sökrättigheter för den angivna sökbasen."
-      test_ldap_search_help_header: "Canvas kan inte söka på din LDAP begäran"
+      test_ldap_search_help_header: "Canvas kan inte söka på din LDAP instans"
       test_ldap_search_label: "Testar LDAP-sökning..."
     linkedin_fields: 
       description: |-
@@ -313,7 +313,7 @@ sv:
     report_header_student_sis: "elev sis"
     report_header_student_sis_id: "elev sis id"
     report_header_submission_date: inlämningsdatum
-    report_header_submission_score: inlämningsbedömning
+    report_header_submission_score: "poäng på inlämning"
     report_header_term: termin
     report_header_term__id: termin_id
     report_header_term_id: "termin id"
@@ -609,7 +609,7 @@ sv:
     course_type: kurs
     courses: 
       courses_crumb: Kurser
-      no_results_message: "Inga bedömningar hittades"
+      no_results_message: "Inga lärandemål hittades"
       page_title: "Resultat för kurssök \"%{query}\""
       search_results_crumb: "Sökresultat för \"%{query}\""
       title: "Resultat för kurssök \"%{query}\""
@@ -655,7 +655,7 @@ sv:
       account_reports: 
         default: 
           description: 
-            text: "Den här rapporten visar slutbetyg för för alla studenter under en specifik termin. Den färdiga csv filen kommer ha en rad per anmälan, och visar det nuvarande och slutligta slutbetyget i kursens betygbok. "
+            text: "Den här rapporten visar slutbetyg för för alla studenter under en specifik termin. Den färdiga csv filen kommer ha en rad per registrering och visar det nuvarande samt slutbetyget i kursens betygbok. "
     group_type: grupp
     include_deleted_parameter: 
       account_reports: 
@@ -710,7 +710,7 @@ sv:
           order: 
             label: Order
           outcome: 
-            radio: Bedömningar
+            radio: Lärandemål
           user: 
             radio: Användare
     ph_student_grades_csv_parameters: 
@@ -768,17 +768,17 @@ sv:
             field: Sektion-ID
     settings: 
       about_google_docs: |-
-          Google Docs Previews låter användare visa document från
+          Google Docs förhandsvisning låter användare visa dokument från
           inom Canvas, istället för att behöva ladda ner dem och
           öppna respektive program (t.ex. Word eller Excel).
           
-          Google Docs Previews kan också filtyper
+          Google Docs förhandsvisning kan också återge filtyper
           som inte stödjs av Canvas dokumentvisare.
           
           Genom att använda den här tjänsten
           godkänner du att du har läst och accepterat
           [Google Docs Viewer Terms of Service](%{terms_url}).
-      about_google_docs_tooltip: "Om Google Docs Previews"
+      about_google_docs_tooltip: "Om Google Docs förhandsvisning"
       account_admins_title: Konto-administratörer
       account_quotas: 
         file_quota: Filkvot
@@ -824,7 +824,7 @@ sv:
       equella_settings_title: Equella-inställningar
       feature_options: Funktionsalternativ
       features_title: Funktioner
-      global_announcements_description: "Globala meddelanden är ett sätt för dig att snabbt kunna skicka 'sticky' meddelande till dashboard för alla användar under ditt konto. De kommer dyka upp på varje användares dashboard under den förbestämda tiden eller tills användare klickar på \"stäng\" (x) länken för att ignorera larmet. **De här meddelandena bör användas sparsamt.**"
+      global_announcements_description: "Globala meddelanden är ett sätt för dig att snabbt kunna skicka meddelanden till användare på ditt konto. Dessa dyker upp på varje användares Översikt under den förbestämda tiden eller tills användare klickar på \"stäng\" (x) länken för att ignorera larmet. **De här meddelandena bör användas sparsamt.**"
       global_announcements_title: "Globala meddelanden"
       global_js_and_css_includes_description: "De här filerna kommer inkluderas på alla sidor som laddas för ditt konto"
       global_js_and_css_includes_title: "Global JavaScript och CSS inkluderar"
@@ -880,7 +880,7 @@ sv:
         message: Meddelande
         mfa_settings: Fler-faktorsverifiering
         name: Kontonamn
-        new_sub_account_includes: "Låt underkonton använda Temaredigeraren för att göra sina egna märken."
+        new_sub_account_includes: "Låt underkonton använda Temaredigeraren för att göra sin branding"
         no_enrollments_can_create_courses: "Användare utan anmälningar"
         open_registration: "Öppen anmälan"
         outgoing_email_default_name_option_custom: "Valfritt \"Från\" namn"
@@ -986,7 +986,7 @@ sv:
       turnitin_comments_help: "de här kommentarerna kommer visas för elever när de lämnar in en Turnitin-aktiverad uppgift"
       turnitin_pledge_help: "elever måste kryssa en ruta för att bekräfta att de godkänner löftet"
       turnitin_settings_title: Turnitin-inställningar
-      update_settings_button: Uppdateringsinställningar
+      update_settings_button: "Uppdatera inställningar"
     show: 
       courses_crumb: Kurser
       no_courses_account_message: "Där finns inga kurser på det här kontot"
@@ -1013,7 +1013,7 @@ sv:
       terms_label: Terminer
       users_label: Användare
     sis_batch_messages: 
-      sis_batch_errors_title: "Fel som motverkar importeringen"
+      sis_batch_errors_title: "Fel som hindrar importeringen"
       sis_batch_warnings_title: Varningar
     sis_export_csv_description: 
       account_reports: 
@@ -1118,7 +1118,7 @@ sv:
       uploaded_data: 
         one: "%{file_size} *från en fil*"
         other: "%{file_size} *från %{count} filer*"
-      uploaded_file_storage_header: "Uppladdad filförvaring"
+      uploaded_file_storage_header: Filutrymme
     student_assessment_scores_csv_parameters: 
       account_reports: 
         orbis: 
@@ -1128,7 +1128,7 @@ sv:
       account_reports: 
         student_assignment_map: 
           description: 
-            text: "Den här rapporten visar lärandemål för alla elever. Den färdiga csv filen kommer ha en rad per användar-resultatspar och kommer visa detaljer angående resultatet, inklusive den associerade uppgiften. Rapporten visar endast resultat för uppgifter och inkluderar inte bedömningar kopplade till frågebanker."
+            text: "Den här rapporten visar lärandemål för alla elever. Den färdiga csv filen kommer ha en rad per användar-resultatspar och kommer visa detaljer angående resultatet, inklusive den associerade uppgiften. Rapporten visar endast resultat för uppgifter och inkluderar inte lärandemål kopplade till frågebanker."
     student_grades_csv_parameters: 
       account_reports: 
         auburn: 
@@ -1252,9 +1252,9 @@ sv:
   add_review_2fb1590c: "Lägg till omdöme"
   add_section_8b027a1c: "Lägg till sektion"
   add_students_to_the_course_874be8fb: "Lägg till elever till kursen"
-  add_tas_to_the_course_2aac6e02: "Lägg till TAs till kursen"
+  add_tas_to_the_course_2aac6e02: "Lägg till lärarassistenter till kursen"
   add_user_e73e8e50: "Lägg till användare"
-  add_your_assignments_you_can_just_make_a_long_list_8a7862dd: "Lägg till dina uppgifter. Du kan antingen göra en lång lista eller dela upp dem i grupper - och specifiera vikten med varje uppgiftsgrupps"
+  add_your_assignments_you_can_just_make_a_long_list_8a7862dd: "Lägg till dina uppgifter. Du kan antingen göra en lång lista eller dela upp dem i grupper - och specifiera varje uppgiftsgrupps vikt."
   add_your_zendesk_instance_s_custom_field_id_for_ea_3aeb75f4: "Lägg till ditt Zendesk custom filed ID för varje av följande (filer som inte har ID kommer inte sparas):"
   admin_4d3ba42f: Administratör
   after_date_981cd41b: "Efter %{date}"
@@ -1288,7 +1288,7 @@ sv:
       recipients: "Skicka en avisering till"
       repetition_description: "Åter-skicka larmet varje %{count} dag till det är löst"
     alerts: 
-      alerts_description_account: "Ett larm genereras för varje stundent som uppfyller kraven. De kontolleras dagligen och aviseringar kommer skuckas till eleven, läraren, och/eller konto-administratörens till trigger-problemet har lösts."
+      alerts_description_account: "Ett larm genereras för varje stundent som uppfyller kraven. De kontolleras dagligen och aviseringar går ut till eleven, läraren, och/eller konto-admin tills åtgärden är löst."
       alerts_description_course: "Ett larm genereras för varje stundent som uppfyller kraven. De kontolleras dagligen och aviseringar kommer skuckas till eleven, läraren, och/eller konto-administratörens till trigger-problemet har lösts."
       buttons: 
         add_alert: "Lägg till larm"
@@ -1303,7 +1303,7 @@ sv:
       ungraded_count_title: "Antalet inlämningar som inte har betygsatts"
       ungraded_timespan_description: "En inlämning har inte blivit betygsatt på %{count} dagar"
       ungraded_timespan_option: "Ej betygsatta inlämningar (Time)"
-      ungraded_timespan_title: "Dagar som inlämningen inte har blivit betygsatt"
+      ungraded_timespan_title: "Dagar som inlämningen inte har blivit bedömd på"
       usernote_description: "Inga fakultetsjournalsinlägg har laggts till på %{count} dagar"
       usernote_option: "Ingen inlägg i fakultetsjournal"
       usernote_title: "Dagar sedan fakultetsjournalen lades till"
@@ -1317,7 +1317,7 @@ sv:
   all_configured_apps_a14eef0a: "Alla konfigurerade appar"
   all_courses_a7dbb853: "Alla kurser"
   all_dates_fields_must_be_present_and_formatted_cor_3a0fe925: "Alla datumfält måste presenteras och formaters korrekt"
-  all_finished_time_to_publish_your_course_click_the_b6f07217: "Helt färdig? Då där det dags att publisera din kurs! Klicka på knappen nedan för att göra det officiellt! Efter publisering kommer användare kunna medverka  i kursen."
+  all_finished_time_to_publish_your_course_click_the_b6f07217: "Färdig? Då där det dags att publisera din kurs! Klicka på knappen nedan för att göra det officiellt! Efter publisering kommer användare kunna delta i kursen."
   all_grading_periods_77974940: "Alla betygsperioder"
   all_grading_periods_must_have_a_title_a1a38d87: "Alla betygsperioder måste ha en titel"
   all_groups_cea25817: "Alla grupper"
@@ -1348,26 +1348,26 @@ sv:
   an_unknown_server_error_occurred_please_try_again_f517eaf3: "Ett okänt serverfel uppstod. Vänligen försök igen."
   analytics: 
     course: 
-      analytics: Analytisk
-      page_title: "Analytisk: %{course}"
+      analytics: Analyser
+      page_title: "Analyser: %{course}"
     crumb: 
       completed: "Avklarade kurser"
       current: "Nuvarande kurser"
     department: 
-      analytics: Analytisk
+      analytics: Analyser
     filters: 
       completed: "Avklarade kurser"
       current: "Nuvarande kurser"
     page_title: 
-      completed: "Analytisk: %{account} -- Avklarade kurser "
-      current: "Analytisk: %{account} -- Nuvarande kurser"
-      term: "Analytisk: %{account} -- %{term}"
+      completed: "Analyser: %{account} -- Avklarade kurser "
+      current: "Analyser: %{account} -- Nuvarande kurser"
+      term: "Analyser: %{account} -- %{term}"
     student_in_course: 
-      analytics: Analytisk
-      page_title: "Analytisk: %{course} -- %{student}"
-  analytics_account_name_filter_name_c0fb1a7b: "Analytisk: %{account_name} -- %{filter_name}"
-  analytics_c94ba601: Analytisk
-  analytics_course_code_student_name_d63bab4c: "Analytisk: %{course_code} -- %{student_name}"
+      analytics: Analyser
+      page_title: "Analyser: %{course} -- %{student}"
+  analytics_account_name_filter_name_c0fb1a7b: "Analyser: %{account_name} -- %{filter_name}"
+  analytics_c94ba601: Analyser
+  analytics_course_code_student_name_d63bab4c: "Analyser: %{course_code} -- %{student_name}"
   and_count_more_43eae021: "och %{count} mer..."
   ange_name: Angel-konverterare
   angel: 
@@ -1419,7 +1419,7 @@ sv:
   announcements_a4b8ed4a: Meddelanden
   anonymous_e1b8ad27: Anonym
   anonymous_grading_ccb5045c: "Anonymt betyg"
-  anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: "Anonymt betyg tvingar elevnamn att dölas i SpeedGrader™"
+  anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: "Anonym bedömning döljer elevnamnet i SpeedGrader™"
   anonymous_user: "Anonym användare"
   anonymous_user_d984b9ce: "Anonym användare"
   another_configuration_is_currently_selected_select_95b394e: "En annan konfigurering har valts. Att välja den här konfigurationen kommer leda till att den andra in väljs."
@@ -1487,8 +1487,8 @@ sv:
       invalid_course_section: "Ogiltig kurssektion"
       invalid_group_category: "Ogiltig gruppkategori"
       missing_group_category: "Gruppers bokade möten måste ha en gruppkategori"
-  approximate_value_with_precision_precision_6b7cc6ef: "%{approximate_value} med precision %{precision}"
-  apps_are_an_easy_way_to_add_new_features_to_canvas_2cbc2531: "Appar erbjuder ett enkelt sätt att lägga till nya funktion i Canvas. De kan läggas till i enskilda kurser eller till alla kurser i ett konto. När de har konfigurerats kan du länka dem genom kursmoduler och skapa uppgifter för uppgiftsverktyg. "
+  approximate_value_with_precision_precision_6b7cc6ef: "%{approximate_value} med antal värdesiffror %{precision}"
+  apps_are_an_easy_way_to_add_new_features_to_canvas_2cbc2531: "Appar erbjuder ett enkelt sätt att lägga till nya funktioner i Canvas. De kan läggas till i enskilda kurser eller till alla kurser i ett konto. När de har konfigurerats kan du länka dem genom kursmoduler och skapa uppgifter för uppgiftsverktyg. "
   appt_calendar_event_dialog: 
     invalid_participants: "Du måste tillåta åtminstoden en användares deltagande"
     title: "Ändra %{name}"
@@ -1503,12 +1503,12 @@ sv:
   are_you_sure_you_want_to_delete_this_announcement_293d51a8: "Är du säker på att du vill radera det här meddelandet?"
   are_you_sure_you_want_to_delete_this_grading_perio_422359cd: "Är du säker på att du vill radera den här betygsperioden?"
   are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: "Är du säker på att du vill radera det här betygsschemat?"
-  are_you_sure_you_want_to_do_this_it_cannot_be_undo_3379a544: "Är du säker på att du vill göra det här? Det kan inte ogöras och kommer skriva över alla betygen i betygsboken."
+  are_you_sure_you_want_to_do_this_it_cannot_be_undo_3379a544: "Är du säker på att du vill göra det här? Det kan inte ångras och kommer skriva över alla betygen i betygsboken."
   are_you_sure_you_want_to_remove_this_grading_perio_e3251c09: "Är du säker på att du vill ta bort den här betygsperioden?"
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "Är du säker på att du vill ta bort det här verktyget?"
   are_you_sure_you_want_to_report_this_profile_pictu_e22c2210: "Är du säker på att du vill rapportera den här profilbilden?"
   arrange_columns_by_assignment_group_33acdf03: "Ordna kolumner efter uppgiftsgrupper"
-  arrange_columns_by_due_date_888f2551: "Ordna kolumner efter sista dag"
+  arrange_columns_by_due_date_888f2551: "Ordna kolumner efter inlämningsdag"
   as_you_type_in_this_field_the_list_of_groups_will__16688a5f: "Medans du skriver i det här filtret kommer listan av grupper automatiskt filtreras för att endast inkludera de namn som matchar vad du skriver."
   as_you_type_in_this_field_the_list_of_results_will_c1a1a3e4: "Medans du skriver i det här fältet kommer listan med resultat automatiskt uppdateras."
   assessment_by_name_7b879a2c: "Utvärdering av %{name}"
@@ -2156,7 +2156,7 @@ sv:
           labels: 
             exclude_small_matches: "Små matchningar"
       buttons: 
-        update_settings: Uppdateringsinställningar
+        update_settings: "Uppdatera inställningar"
       turnitin_settings: 
         labels: 
           compare_against: "Jämför med"
@@ -2342,7 +2342,7 @@ sv:
     apply: Tillämpa
     authorize_google_docs: "Tillåt tillgång för Google Docs"
     authorize_google_drive: "Tillåt tillgång för Google Drive"
-    back_to_outcomes: "Tillbaka till bedömningar"
+    back_to_outcomes: "Tillbaka till lärandemål"
     cancel: Avbryt
     choose_a_file: "Välj en fil"
     delete: Radera
@@ -2352,7 +2352,7 @@ sv:
     find_user: "Hitta användare"
     import: Importera
     login: "Logga in"
-    manage_rubrics: "Hantera bedömningsmatriser"
+    manage_rubrics: "Hantera Matriser"
     masquerade: "Maskera som användare"
     ok: OK
     okay: Okej
@@ -3389,7 +3389,7 @@ sv:
         user_account_details: Användarkontodetaljer
         user_grades: "Betyg för %{user}"
         user_only_view_section: "begränsa den här användaren så att den endast kan se användare samma sektion"
-        user_outcomes: "Bedömning för %{user}"
+        user_outcomes: "Lärandemål för %{user}"
         user_view_all_sections: "låt den här användare se alla kursanvändare"
       user_only_view_section: "den här användaren kan endast se deras tilldelade kurssektion(er)"
       user_view_all_sections: "den här användare kan se stundeter i alla kurssektioner"
@@ -3455,7 +3455,7 @@ sv:
         user_account_details: Användakontodetaljer
         user_grades: Betyg
         user_only_view_section: "begränsa så att den här användare endast kan se sektionsanvändare i samma sektion"
-        user_outcomes: Bedömningar
+        user_outcomes: Lärandemål
         user_view_all_sections: "låt den här användare se alla kursanvändare"
       no_messages: "Inga meddelanden"
       no_services: "%{user} har ännu inte länkat några externa tjänster till sitt konto"
@@ -4044,7 +4044,7 @@ sv:
       quiz_is_locked: "Quizen \"%{title}\" kunde inte kopieras då den är låst."
       quizzes: "Vissa quizzes kunde inte exporteras"
       resources: "Misslyckades att länka vissa resurser"
-      rubrics: "Misslyckades att exportera bedömningsmatriser"
+      rubrics: "Misslyckades att exportera Matriser"
       topic: "Diskussionsämnet \"%{title}\" kunde inte exporteras"
       topic_is_locked: "Ämnet \"%{title}\" kunde inte exporteras då det är låst"
       topics: "Misslyckades att exportera vissa ämnen"
@@ -4145,7 +4145,7 @@ sv:
   course_name_is_required_90919349: "Kursnamn krävs"
   course_name_successfully_added_48116a50: "%{course_name} har lagts till!"
   course_navigation_dd035109: Kursnavigering
-  course_outcomes_7dc1cbc7: "Kurs resultat"
+  course_outcomes_7dc1cbc7: "Kurs Lärandemål"
   course_pages_449f1dd4: Kurssidor
   course_people_3058c948: "Kurs personer"
   course_quizzes_c337653c: "Kurs quizzes"
@@ -4588,7 +4588,7 @@ sv:
       headings: 
         current_users: "Nuvarande användare"
       help: 
-        reset_course_content: "Återställning av kursinnehållet kommer leda till en permanent radering av alla associerade uppgifter, diskussioner, quizzes, moduler, bedömningsmatriser, sidor, filer, lärandemål, frågebanker, samarbeten, konferenser, och allt annat innehåll. Åtgärden kan inte ångras och datan *kan inte* återställas. Är du säker på att du vill fortsätta?"
+        reset_course_content: "Återställning av kursinnehållet kommer leda till en permanent radering av alla associerade uppgifter, diskussioner, quizzes, moduler, matriser, sidor, filer, lärandemål, frågebanker, samarbeten, konferenser, och allt annat innehåll. Åtgärden kan inte ångras och datan *kan inte* återställas. Är du säker på att du vill fortsätta?"
       links: 
         calendar: Kurskalender
         conclude: "Avsluta den här kursen"
@@ -4657,11 +4657,11 @@ sv:
       not_weighted: "Kursuppgifter vägs inte."
     statistics: 
       active_students: "Aktiva elever"
-      all_rubrics: "Alla bedömningsmatriser"
+      all_rubrics: "Alla matriser"
       any: Vemsomhels
       assignment_groups: Uppgiftsgrupper
       assignments: Uppgifter
-      course_rubrics: Kursbedömningsmatriser
+      course_rubrics: Matriser
       discussion_posts: Diskussionsinlägg
       discussion_topic: Diskussionsämne
       discussions: Diskussioner
@@ -4749,13 +4749,13 @@ sv:
     error_reports: Felrapporter
     files: Filer
     grades: Betyg
-    grading_standards: Betygsättning
+    grading_standards: Betygschema
     groups: Grupper
     jobs: Jobb
     media: Media
     messages: Meddelanden
     modules: Moduler
-    outcomes: Bedömningar
+    outcomes: Lärandemål
     people: Personer
     plugins: Plugins
     prior_users: "Tidigare användare"
@@ -4763,7 +4763,7 @@ sv:
     quizzes: Quizzes
     registered_services: "Registrerade tjänster"
     revisions: Revideringar
-    rubrics: Bedömningsmatriser
+    rubrics: Matriser
     settings: Inställningar
     site_admin: Hemside-adminstratör
     stats: Statistik
@@ -5569,7 +5569,7 @@ sv:
     leave_different: "Lämna annan"
     messages: 
       loading_rubric_groups: "Ladda matrisgrupp..."
-      loading_rubrics: "Laddar bedömningsmatriser..."
+      loading_rubrics: "Laddar matriser..."
     prompts: 
       confirm_delete: "Är du säker på att du vill radera den här matrisen?"
       read_only_rubric: "Du kan inte redigera matrisen, det beror antingen på att du inte har behörighet eller så används den på annan plats. Om du utför ändringar kommer det resultera i en ny matris baserad på den gamla. Fortsätt?"
@@ -6343,11 +6343,11 @@ sv:
     search: Sök
   find_outcome: 
     errors: 
-      outcome_retrieval_failed: "Hämtning av bedömningarna misslyckades oväntat. Vänligen försök igen."
+      outcome_retrieval_failed: "Hämtning av lärandemålen misslyckades oväntat. Vänligen försök igen."
     messages: 
-      loading_outcomes: "Laddar bedömningar..."
-      no_outcomes_found: "Inga bedömningar hittades"
-      no_rubric_outcomes_found: "In bedömningsmatris-konfigurerade bedömningar hittades"
+      loading_outcomes: "Laddar lärandemål..."
+      no_outcomes_found: "Inga lärandemål hittades"
+      no_rubric_outcomes_found: "Inga matris-konfigurerade lärandemål hittades"
     titles: 
       find_outcome: "Hitta bedömning"
   first_two_students_and_others_count_others_bb0a212a: "%{first_two_students}, och %{others_count} andra"
@@ -6805,7 +6805,7 @@ sv:
       headers: 
         anonymous_submission: "Den här elevens respons är dolt eftersom uppgiften är anonym."
         assessment: Utvärdering
-        grading: Betygsättning
+        grading: Betygschema
         no_group_submission: "Den här gruppen har ingen inlämning för uppgiften"
         no_submission: "Den här eleven har ingen inlämning för uppgiften"
         submission: "Eleven har lämnat in uppgiften"
@@ -7522,10 +7522,10 @@ sv:
     due_dates_warning: "Kunde inte justera sista dagarna."
     file_import_warning: "Filen %{file} hittades inte"
   importers/learning_outcome_group_importer: 
-    no_global_permission: "Du har inte tillåtelse att hantera globala bedömningar, kan inte lägga till \"%{title}\""
+    no_global_permission: "Du har inte tillåtelse att hantera globala lärandemål, kan inte lägga till \"%{title}\""
   importers/learning_outcome_importer: 
     no_context_found: "Det externa lärandemålet hittades inte för \"%{title}\", skapar en kopia."
-    no_global_permission: "Du har inte tillåtelse att hantera globala bedömningar, kan inte lägga till \"%{title}\""
+    no_global_permission: "Du har inte tillåtelse att hantera globala lärandemål, kan inte lägga till \"%{title}\""
   importers/rubric_importer: 
     no_context_found: "Den externa matrisen hittades inte för \"%{title}\", skapar en kopia."
   importers/wiki_page_importer: 
@@ -7819,7 +7819,7 @@ sv:
         groups: Elevgrupper
         learning_outcomes: Lärandemål
         quizzes: Quizzes
-        rubrics: Bedömningsmatriser
+        rubrics: Matriser
         syllabus_body: Kursplan
         wikis: Wikisida
     cc: 
@@ -10543,12 +10543,12 @@ sv:
   outcome_groups: 
     invalid_file: "Ogiltig bedömningsgruppfil"
   outcome_groups_api: 
-    account_group_description: "Konto nivå resultagrupp"
+    account_group_description: "Konto nivå lärandemålgrupp"
   outcome_path_mastery_points: "%{path} mästarpoäng"
   outcome_path_result: "%{path} resultat"
   outcome_results: 
-    outcomes_filename: Bedömningar
-  outcome_results_title: Bedömningar
+    outcomes_filename: Lärandemål
+  outcome_results_title: Lärandemål
   outcome_title_has_a_status_of_statustooltip_82d1e6d9: "Bedömning: %{title} har statusen %{statusTooltip}"
   outcomes: 
     account_standards: Kontostandard
@@ -10561,11 +10561,11 @@ sv:
         new_group: "Ny grupp"
         new_outcome: "Ny bedömning"
     common_core: "Common Core Standards"
-    common_core_description: "Till vänster är den bekanta bedömningsmappen för varje gruppindelning av Common Core State Standards. Det låter dig att på ett smidigt dätt inkludera Common Core Standrads när du betygsätter din kurs."
+    common_core_description: "Till vänster är den bekanta lärandemålsmappen för varje gruppindelning av Common Core State Standards. Det låter dig att på ett smidigt dätt inkludera Common Core Standrads när du betygsätter din kurs."
     confirm: 
       delete: "Är du säker på att vill radera?"
       import_group: "Importera gruppen \"%{group}\" till gruppen \"%{target}\"?"
-      import_outcome: "Importera bedömningarna \"%{outcome}\" till gruppen \"%{target}\"?"
+      import_outcome: "Importera lärandemålen \"%{outcome}\" till gruppen \"%{target}\"?"
     criteria: 
       does_not_meet_expectations: "Möter inte förväntningarna"
       exceeds_expectations: "Överträffar förväntningarna"
@@ -10586,8 +10586,8 @@ sv:
     find_instructions: 
       instructions: 
         find: 
-          description: "*Resultat som skapats av din institution eller stat kan nås här. Klicka på din kurs och använd panelen till vänster för att navigera mellan olika existerande bedömningar. När du har hittat den bedömningen eller bedömningsgruppen du vill använda, klickar du på import-knappen längst ner för att lägga till den till din kurs.*"
-          title: "Hittar bedömningar"
+          description: "*Resultat som skapats av din institution eller stat kan nås här. Klicka på din kurs och använd panelen till vänster för att navigera mellan olika existerande lärandemål. När du har hittat den bedömningen eller bedömningsgruppen du vill använda, klickar du på import-knappen längst ner för att lägga till den till din kurs.*"
+          title: "Hittar lärandemål"
     flash: 
       addSuccess: Skapades
       deleteError: "Något gick fel. Kan inte radera just nu."
@@ -10602,8 +10602,8 @@ sv:
       instructions: 
         main: 
           manage: 
-            description: "Resultat skapas här för att man ska kunna följa mastery i en kurs. För att sätta igång kan du ta en titt på menyn högst upp. Klicka på Ny-knappen för att skapa en ny bedömning, eller Ny Grupp-knappen för att skapa en ny grupp att organisera bedömningen i. Hitta-knappen låter dig använda bedömningar som har skapats av din stat eller institution. Medans du skapar och använder bedömningar kan du använda panelen till vänster för att navigera bland dina bedömningar. Du kan dra och släppa bedömningar mellan olika nivåer för att skapa en bättre struktur.* *Vad som är ännu viktigare är att Canvas låter dig lägga till bedömningar till dina betygsbedömningsmatriser så du kan räkna ut mastery medans du betygsätter uppgifter. När du är färdig med dina resultat klickar du på Hantera bedömningsmatriser för att börja använda bedömningarna när du betygsätter.*"
-            title: "Ställer in bedömningar"
+            description: "Resultat skapas här för att man ska kunna följa mastery i en kurs. För att sätta igång kan du ta en titt på menyn högst upp. Klicka på Ny-knappen för att skapa ett nytt lärandemål, eller Ny Grupp-knappen för att skapa en ny grupp att organisera lärandemålen Hitta-knappen låter dig använda lärandemål som har skapats av din stat eller institution. Medans du skapar och använder lärandemål kan du använda panelen till vänster för att navigera bland dina lärandemål. Du kan dra och släppa lärandemål mellan olika nivåer för att skapa en bättre struktur.* *Vad som är ännu viktigare är att Canvas låter dig lägga till lärandemål till dina betygsmatriser så du kan räkna ut mastery medans du betygsätter uppgifter. När du är färdig med dina resultat klickar du på Hantera matriser för att börja använda lärandemålen när du betygsätter.*"
+            title: "Ställer in lärandemål"
     mastery_error: "Måste vara högre eller samma som 0"
     missing_outcome: "Kunde inte hitta lärandemålen"
     new_outcome_group: "Ny bedömningsgrupp"
@@ -10622,7 +10622,7 @@ sv:
     outcome_form: 
       calculation_method: Räkningsmetod
       criterion: "Kriterium värdering"
-      criterion_dialog: "Lärandemål kan inkluderas i en uppgiftsbedömningsmatris för att enkelt ge tillgång till mästarbedömningen för specifika uppgifter. När du definierar ett lärandemål bör du även definiera kriterierna som ska användas när du bygger uppgiftsbedömningsmatriser. Definera så många bedömningsmatriserkolumner du behöver, och specifiera en poänggräns som kommer användas för att definiera bedömningens mastery."
+      criterion_dialog: "Lärandemål kan inkluderas i en uppgiftsmatris för att enkelt ge tillgång till mästarbedömningen för specifika uppgifter. När du definierar ett lärandemål bör du även definiera kriterierna som ska användas när du bygger uppgiftsmatriser. Definera så många bedömningsmatriserkolumner du behöver, och specifiera en poänggräns som kommer användas för att definiera bedömningens mastery."
       criterion_info_link: "Klicka här för att lära dig mer om utvärderingskriterium"
       description: "Beskriv den här bedömningen"
       display_name: "Vänlig namn (valfritt)"
@@ -10641,7 +10641,7 @@ sv:
       mastery_set_at: "Mastery satt vid"
       no_results: "(inga bedömningar)"
     outcome_result: 
-      all_outcomes: "alla bedömningar för den här eleven"
+      all_outcomes: "alla lärandemål för den här eleven"
       attempt_info: "försök #%{attempt_number}, %{attempt_date}"
       outcome_mastered: bemästrat
       scoring: "%{points} utav %{possible_points}"
@@ -10655,7 +10655,7 @@ sv:
     successful_outcome_removal: "Bedömning har tagits bort"
     successful_outcome_update: "Resutlat har uppdaterats!"
     titles: 
-      find_outcomes: "Hitta bedömningar"
+      find_outcomes: "Hitta lärandemål"
     top_level: "%{context} Högsta nivå"
     user_outcome_results: 
       artifacts: 
@@ -10669,7 +10669,7 @@ sv:
         see_results: "Se %{user_name} bedömningar för"
       mastery: "Mastery på sista försöket"
       no_mastery: "Ingen mastery på sista försöket"
-      outcomes_for: "Bedömningar för %{user_name}"
+      outcomes_for: "Lärandemål för %{user_name}"
       score_out_of_possible: "%{score}* utav %{possible}*"
       short_title: 
         attempts: Försök
@@ -11270,7 +11270,7 @@ sv:
         save_skype_name: "Spara Skypenamn"
         save_yo_name: "Spara Yo-namn"
         select_image: "Välj bild"
-        update_settings: Uppdateringsinställningar
+        update_settings: "Uppdatera inställningar"
       confirm_email_instructions: "Innan du kan redigera din profil måste du bekräfta din e-postadress (%{email}) genom att klicka på länken i e-postmeddelanet som vi skickat dig Om du inte ser den, *klicka på skicka meddelande igen* och se till att du kollar din skräppost."
       delicious_description: "Delicious är ett verktyg som låter dig förvara och dela dina bokmärken med andra. Canvas rich content editor låter dig söka efter dina Delicious taggar så att du enkelt kan länka från Canvas till andra användbara resurser. "
       diigo_description: "Diigo är ett socialt bokmärkningverktyg som designats särskilt för undersökning och utbildning. Canvas rich content editor låter dig söka efter Diigo taggar så att du enkelt kan länka från Canvas till andra användbara resurser."
@@ -11608,7 +11608,7 @@ sv:
   question_9121487: Fråga
   question_answered: Svarad
   question_bank: 
-    align_outcomes: "Tilldela bedömningar"
+    align_outcomes: "Tilldela lärandemål"
     already_bookmarked: "Redan bokmärkt"
     bookmark_failed: "Bokmärkning misslyckades"
     bookmarking: Bokmärker...
@@ -11641,8 +11641,8 @@ sv:
     remove_outcome_from_bank: "Är du säker på att du vill ta bort den här bedömningen från banken?"
     title: 
       move_copy_questions: "Flytta/kopiera frågor"
-    update_outcomes_fail: "Uppdatering av bedömning misslyckades"
-    updating_outcomes: "Uppdaterar bedömning..."
+    update_outcomes_fail: "Uppdatering av lärandemål misslyckades"
+    updating_outcomes: "Uppdaterar lärandemål..."
   question_banks: 
     bank_fail: "Frågebanken skapades inte."
     bank_success: "Frågebanken skapades!"
@@ -11686,7 +11686,7 @@ sv:
         move_questions: "Flytta flera frågor"
       edit_warning: "Kom ihåg, ändringar av frågemallar kommer inte automatiskt uppdatera quizzes som redan använder frågorna."
       headings: 
-        aligned_outcomes: "Tilldela bedömning"
+        aligned_outcomes: "Tilldela lärandemål"
       labels: 
         keep_copy: "Behåll en kopia av frågebanken"
         new_bank_name: "Nytt banknamn"
@@ -13137,7 +13137,7 @@ sv:
       manage_links: "Hantera roll och lita på -länkar"
       manage_outcomes: "Hantera lärandemål"
       manage_role_overrides: "Hantera behörigheter"
-      manage_rubrics: "Skapa och redigera utvärderings-bedömningsmatriser"
+      manage_rubrics: "Skapa och redigera utvärderingsmatriser"
       manage_sections: "Hantera (skapa / redigera / radera) kurssektioner"
       manage_sis: "Importera och hantera SIS data"
       manage_site_settings: "hantera site-wide och plugin-inställningar"
@@ -13262,25 +13262,25 @@ sv:
     no_details: "Inga detaljer"
   rubrics: 
     index: 
-      account_rubrics: Konto-bedömningsmatriser
+      account_rubrics: Konto-matriser
       are_you_sure_prompt: "Är du säker på att du vill radera den här matrisen? Kurser som är associerade med den här matrisen kommer har tillgång till den, fast inga nya kurser kommer kunna se den."
       buttons: 
         add_rubric: "Lägg till matris"
-      course_rubrics: Kurs-bedömningsmatriser
+      course_rubrics: Kurs-matriser
       delete_rubric: "Radera matris"
       edit_rubric: "Redigera matris"
-      page_title: Bedömningsmatriser
+      page_title: Matriser
       points_possible: 
         one: "%{count} möjliga poäng"
         other: "%{count} möjliga poäng"
-      user_rubrics: Användarrubiker
+      user_rubrics: Användarmatriser
     loading: Laddar...
     show: 
       buttons: 
         delete: "Radera matris"
       prompts: 
         are_you_sure_delete: "Är du säker på att du vill radera den här matrisen? Kurser som är associerade med den här matrisen kommer har tillgång till den, fast inga nya kurser kommer kunna se den."
-      rubric_can_not_modify: "Bedömningsmatriser kan inte ändras efter att de använts på mer än en plats."
+      rubric_can_not_modify: "Matriser kan inte ändras efter att de använts på mer än en plats."
       titles: 
         edit_rubric: "Redigera matris"
     titles: 
@@ -13290,8 +13290,8 @@ sv:
         add_rubric: "Lägg till matris"
       delete_rubric: "Radera matris"
       headings: 
-        user_rubrics: Användarrubiker
-      page_title: Bedömningsmatriser
+        user_rubrics: Användarmatriser
+      page_title: Matriser
       points_possible: 
         one: "möjligt poäng"
         other: "möjliga poäng"
@@ -14102,7 +14102,7 @@ sv:
         use_this_rubric: "Använd den här matrisen"
       criterion_count: "%{count} kriterier"
       links: 
-        manage_rubrics: "Hantera bedömningsmatriser"
+        manage_rubrics: "Hantera matriser"
       points_possible: "%{points} möjliga poäng"
       titles: 
         find_a_rubric: "Hitta en matris"
@@ -14358,7 +14358,7 @@ sv:
       import_failed_code: "Ett fel uppstod när din SIS data importerades. Inget importerades. Vänligen kontakta din system-administratör och ge dem följande kod: \"%{code}\""
       import_failed_messages: "Inga SIS-uppgifter importerades. Importen misslyckades med de här meddelandena:"
     headers: 
-      import_errors: "Fel som motverkar importeringen"
+      import_errors: "Fel som hindrar importeringen"
       import_warnings: Varningar
       imported_items: "Importerade föremål"
     import_counts: 
@@ -14524,7 +14524,7 @@ sv:
   student_names_must_be_hidden_because_this_is_an_an_3c82287d: "Elevnamn måste döljas efter som detta är en anonym undersökning."
   student_outcome_gradebook_description: |-
       Elev Inlärning Mastery Betygboken erbjuder ett sätt för elever att snabbt se sin utveckling
-      för kurs lärandemål. Bedömningarna presenteras i ett Betygboks-liknande
+      för kurs lärandemål. Lärandemålen presenteras i ett Betygboks-liknande
       format och utvecklingen visas i både numeriska poäng och bemästrad/nära
       mastery/stöd.
   student_summary: 
@@ -14769,7 +14769,7 @@ sv:
     logout: "Logga ut"
     modules: Moduler
     observees: Observerar
-    outcomes: Bedömningar
+    outcomes: Lärandemål
     pages: Sidor
     people: Personer
     profile: Profil
@@ -15942,8 +15942,8 @@ sv:
   you_do_not_have_permission_to_publish_this_course_ff361c82: "Du har inte tillstånd att publicera denna kursen."
   you_have_changed_the_progression_requirements_for__6772bc89: "Du har ändrat kravens utveckling för den här kursen. Det kan finnas elever som redan har använt utveckling för den här moduler och andra som förlitar sig på den."
   you_have_made_changes_to_the_questions_in_this_qui_1658361a: "*Du har gjort ändringar på frågor i den här quizen.* Dessa ändringar kommer inte synas för eleverna innan du sparat quizen."
-  you_have_no_outcomes_click_here_to_create_one_ebf262a3: "Du har inte resutlat. *Klicka här* för att skapa en."
-  you_have_no_outcomes_click_here_to_go_to_the_outco_574bd0af: "Du har inte resutlat. Klicka här för att går till resutlatssidan."
+  you_have_no_outcomes_click_here_to_create_one_ebf262a3: "Du har inga lärandemål. *Klicka här* för att skapa en."
+  you_have_no_outcomes_click_here_to_go_to_the_outco_574bd0af: "Du har inga lärandemål. Klicka här för att går till resutlatssidan."
   you_have_reached_the_maximum_webhooks_per_account__ae9a7f83: "Du har nått det högsta antalet webhooks för varje konto (%{max})"
   you_have_reached_the_maximum_webhooks_per_user_lim_2af4b256: "Du har nått det högsta antalet webhooks per användare (%{max})"
   you_have_submitted_the_assignment_7ef8a51a: "Du har lämnat in uppgiften"
