@@ -116,8 +116,6 @@ describe 'CrocodocDocument' do
     end
 
     it "returns permissions for older submission versions" do
-      pending
-
       submission2 = @assignment.submit_homework @submitter,
         submission_type: "online_upload",
         attachments: [crocodocable_attachment_model(context: @submitter)]
