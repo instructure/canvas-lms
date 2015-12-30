@@ -1215,9 +1215,10 @@ class Attachment < ActiveRecord::Base
     # ... or crocodoc (this will go away soon)
     return if Attachment.skip_3rd_party_submits?
 
-    submit_to_crocodoc_instead = opts[:wants_annotation] &&
-                                 crocodocable? &&
-                                 !Canvadocs.annotations_supported?
+    submit_to_crocodoc_instead = opts[:force_crocodoc] ||
+                                 (opts[:wants_annotation] &&
+                                  crocodocable? &&
+                                  !Canvadocs.annotations_supported?)
     if submit_to_crocodoc_instead
       # get crocodoc off the canvadocs strand
       # (maybe :wants_annotation was a dumb idea)

@@ -560,19 +560,24 @@ class Submission < ActiveRecord::Base
   def submit_attachments_to_canvadocs
     if attachment_ids_changed?
       attachments.preload(:crocodoc_document, :canvadoc).each do |a|
+        # moderated grading annotations are only supported in crocodoc right now
+        dont_submit_to_canvadocs = assignment.moderated_grading?
+
         # associate previewable-document and submission for permission checks
-        if a.canvadocable? && Canvadocs.annotations_supported?
+        if a.canvadocable? && Canvadocs.annotations_supported? && !dont_submit_to_canvadocs
+          submit_to_canvadocs = true
           canvadocs << a.create_canvadoc unless a.canvadoc
         elsif a.crocodocable?
+          submit_to_canvadocs = true
           crocodoc_documents << a.create_crocodoc_document unless a.crocodoc_document
         end
 
-        if a.canvadocable? || a.crocodocable?
+        if submit_to_canvadocs
           a.send_later_enqueue_args :submit_to_canvadocs, {
             :n_strand     => 'canvadocs',
             :max_attempts => 1,
             :priority => Delayed::LOW_PRIORITY
-          }, 1, wants_annotation: true
+          }, 1, wants_annotation: true, force_crocodoc: dont_submit_to_canvadocs
         end
       end
     end

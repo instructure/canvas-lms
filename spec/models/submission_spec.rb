@@ -1184,6 +1184,21 @@ describe Submission do
                                       attachments: [attachment])
       expect(job_scope.count).to eq orig_job_count
     end
+
+    it "doesn't use canvadocs for moderated grading assignments" do
+      @assignment.update_attribute :moderated_grading, true
+      Canvas::Crocodoc.stubs(:enabled?).returns true
+      Canvadocs.stubs(:enabled?).returns true
+      Canvadocs.stubs(:annotations_supported?).returns true
+
+      attachment = crocodocable_attachment_model(context: @user)
+      s = @assignment.submit_homework(@user,
+                                      submission_type: "online_upload",
+                                      attachments: [attachment])
+      run_jobs
+      expect(@attachment.canvadoc).to be_nil
+      expect(@attachment.crocodoc_document).not_to be_nil
+    end
   end
 
   describe "cross-shard attachments" do
