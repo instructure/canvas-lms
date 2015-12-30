@@ -49,8 +49,7 @@ gem 'highline', '1.6.1', require: false
 gem 'hoe', '3.8.1'
 gem 'httparty', '0.13.7'
 gem 'i18n', '0.7.0'
-gem 'i18nema', '0.0.8', platforms: [:ruby_20, :ruby_21, :ruby_22]
-gem 'i18nema19', '0.0.8', platform: :ruby_19
+gem 'i18nema', '0.0.8'
 gem 'i18nliner', '0.0.12'
 gem 'icalendar', '1.5.4', require: false
 gem 'ims-lti', '2.0.0.beta.33'

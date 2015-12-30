@@ -30,7 +30,7 @@ group :test do
     gem 'websocket', '1.0.7', require: false
   gem 'selinimum', '0.0.1', require: false, path: 'gems/selinimum'
   gem 'test_after_commit', '0.4.2'
-  gem 'test-unit', '~> 3.0', require: false, platform: :ruby_22
+  gem 'test-unit', '~> 3.0', require: false, platforms: [:ruby_22, :ruby_23]
   gem 'webmock', '1.22.3', require: false
     gem 'addressable', '2.3.8', require: false
     gem 'crack', '0.4.3', require: false

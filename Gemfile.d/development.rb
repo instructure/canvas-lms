@@ -18,7 +18,6 @@ group :development do
 
 
   unless ENV['DISABLE_RUBY_DEBUGGING']
-    gem 'byebug', '~> 8.2', platforms: [:ruby_20, :ruby_21, :ruby_22]
-    gem 'debugger', '1.6.6', platforms: :ruby_19
+    gem 'byebug', '~> 8.2', platform: :mri
   end
 end

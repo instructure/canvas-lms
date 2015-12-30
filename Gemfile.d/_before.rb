@@ -17,7 +17,7 @@
 #
 
 # # enforce the version of bundler itself, to avoid any surprises
-req_bundler_version_floor, req_bundler_version_ceiling = '1.7.10', '1.11.2'
+req_bundler_version_floor, req_bundler_version_ceiling = '1.11.0', '1.11.2'
 bundler_requirements = [">=#{req_bundler_version_floor}",
                         "<=#{req_bundler_version_ceiling}"]
 gem 'bundler', bundler_requirements
@@ -44,6 +44,9 @@ end
 if RUBY_VERSION >= "2.1" && RUBY_VERSION < "2.2"
   ruby RUBY_VERSION, :engine => 'ruby', :engine_version => RUBY_VERSION
 elsif RUBY_VERSION >= "2.2" && RUBY_VERSION < "2.3"
+  ruby RUBY_VERSION, :engine => 'ruby', :engine_version => RUBY_VERSION
+elsif RUBY_VERSION >= "2.3" && RUBY_VERSION < "2.4"
+  puts "Ruby 2.3 support is untested"
   ruby RUBY_VERSION, :engine => 'ruby', :engine_version => RUBY_VERSION
 else
   ruby '2.1.6', :engine => 'ruby', :engine_version => '2.1.6'
@@ -105,7 +108,5 @@ if Gem::Version.new(Bundler::VERSION) < Gem::Version.new('1.8.0')
   Bundler::Runtime.send(:include, CanvasBundlerRuntime)
 end
 
-platforms :ruby_20, :ruby_21, :ruby_22 do
-  gem 'syck', '1.0.4'
-  gem 'iconv', '1.0.4'
-end
+gem 'syck', '1.0.4'
+gem 'iconv', '1.0.4'
