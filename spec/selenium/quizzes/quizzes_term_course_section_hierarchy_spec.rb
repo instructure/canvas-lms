@@ -89,11 +89,6 @@ describe "quizzes section hierarchy" do
         take_hierarchy_quiz
       end
 
-      it "should be accessible for teachers enrolled in section after term end date", priority: "1", test_id: 323089 do
-        teacher_in_section(@new_section, user: @teacher)
-        take_hierarchy_quiz
-      end
-
       it "should work with lock and unlock dates set up", priority: "1", test_id: 323090 do
         @override.unlock_at = Time.zone.now.advance(days:-1)
         @override.lock_at = Time.zone.now.advance(days:4)
@@ -125,10 +120,6 @@ describe "quizzes section hierarchy" do
         expect(f('#quiz_show .quiz-header .lock_explanation').text).
                                         to include('This quiz is no longer available as the course has been concluded')
       end
-
-      it "should still allow teachers to take the quiz", priority: "1", test_id: 323324 do
-        verify_quiz_accessible
-      end
     end
 
     context "course ends in future" do
@@ -139,10 +130,6 @@ describe "quizzes section hierarchy" do
 
       it "should allow student in section to take quiz", priority: "1", test_id: 323321 do
         user_session(@student)
-        verify_quiz_accessible
-      end
-
-      it "should allow teachers to take the quiz", priority: "1", test_id: 323322 do
         verify_quiz_accessible
       end
     end
@@ -159,10 +146,6 @@ describe "quizzes section hierarchy" do
 
       it "should allow student to take quiz", priority: "1", test_id: 323326 do
         user_session(@student)
-        verify_quiz_accessible
-      end
-
-      it "should still allow teachers to take the quiz", priority: "1", test_id: 323328 do
         verify_quiz_accessible
       end
 

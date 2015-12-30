@@ -52,10 +52,7 @@ li.quiz {
       text-align: right;
       line-height: 36px;
     }
-    #preview_quiz_button {
-      font-weight: normal;
-      color: #333333;
-    }
+
     .unpublished_quiz_warning, .unsaved_quiz_warning {
       display: block;
     }
@@ -83,6 +80,11 @@ li.quiz {
     margin-top: 20px;
   }
   .take_quiz_button {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 1.3em;
+  }
+  .preview_quiz_button {
     text-align: center;
     margin-top: 20px;
     font-size: 1.3em;

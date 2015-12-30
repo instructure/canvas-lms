@@ -55,8 +55,8 @@ describe 'publishing a quiz' do
           expect(links_text).to include 'SpeedGrader'
         end
 
-        it 'displays the |Take the Quiz| button', priority: "1", test_id: 398939 do
-          expect(f('#take_quiz_link').text).to eq 'Take the Quiz'
+        it 'displays both |Preview| buttons', priority: "1", test_id: 398939 do
+          expect(ff('#preview_quiz_button').count).to eq 2
         end
 
         context 'when clicking the cog menu tool' do

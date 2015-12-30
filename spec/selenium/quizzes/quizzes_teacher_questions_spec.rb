@@ -7,6 +7,8 @@ describe "quizzes questions" do
 
   before(:each) do
     course_with_teacher_logged_in
+    @student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :password => 'qwerty')
+    @course.enroll_user(@student, "StudentEnrollment", :enrollment_state => 'active')
   end
 
   context "as a teacher" do
@@ -185,6 +187,10 @@ describe "quizzes questions" do
         f('.quiz-publish-button').click
         wait_for_ajaximations
       end
+
+      user_session(@student)
+      get "/courses/#{@course.id}/quizzes/#{Quizzes::Quiz.last.id}"
+
       expect_new_page_load do
         f("#take_quiz_link").click
         wait_for_ajaximations
@@ -198,6 +204,7 @@ describe "quizzes questions" do
       JS
       expect_new_page_load { f('#submit_quiz_button').click }
       expect(f('.score_value').text.strip).to eq '1'
+      user_session(@user)
     end
   end
 
