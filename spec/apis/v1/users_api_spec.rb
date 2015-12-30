@@ -999,7 +999,8 @@ describe "Users API", type: :request do
           'login_id' => 'student@example.com',
           'email' => 'student@example.com',
           'sis_login_id' => 'student@example.com',
-          'locale' => 'en'
+          'locale' => 'en',
+          'time_zone' => "Tijuana"
         })
         expect(user.birthdate.to_date).to eq birthday.to_date
         expect(user.time_zone.name).to eql 'Tijuana'

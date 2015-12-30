@@ -80,7 +80,7 @@ define([
           </ul>
           </form>
 
-          <NewUserModal ref="addUser"/>
+          <NewUserModal ref="addUser" userList={this.props.userList} handlers={this.props.handlers} />
         </div>
       );
     }

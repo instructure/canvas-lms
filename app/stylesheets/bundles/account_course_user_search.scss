@@ -7,9 +7,11 @@
   }
 }
 
-.grid-row .icon-stats {
-  margin-left: 10px;
-  margin-right: 10px;
+.grid-row {
+  .icon-stats, .icon-message{
+    margin-left: 10px;
+    margin-right: 10px;
+  }
 }
 
 .grid-row {
@@ -67,4 +69,15 @@
 
 .flex-grow-2 {
   flex-grow: 2;
+}
+
+.userUrl {
+  display: flex;
+  align-items: center;
+}
+
+.UserListRow__Avatar {
+  width: 30px;
+  height: 30px;
+  margin: -1px 10px 1px 0;
 }

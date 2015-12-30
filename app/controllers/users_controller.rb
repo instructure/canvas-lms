@@ -422,7 +422,7 @@ class UsersController < ApplicationController
             users = UserSearch.scope_for(@context, @current_user)
           end
 
-          includes = (params[:include] || []) & %w{avatar_url email last_login}
+          includes = (params[:include] || []) & %w{avatar_url email last_login time_zone}
           users = users.with_last_login if includes.include?('last_login')
           users = Api.paginate(users, self, api_v1_account_users_url, page_opts)
           user_json_preloads(users, includes.include?('email'))
@@ -1532,7 +1532,7 @@ class UsersController < ApplicationController
           end
           format.html { redirect_to user_url(@user) }
           format.json {
-            render :json => user_json(@user, @current_user, session, %w{locale avatar_url email},
+            render :json => user_json(@user, @current_user, session, %w{locale avatar_url email time_zone},
               @current_user.pseudonym.account) }
         else
           format.html { render :edit }

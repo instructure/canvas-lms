@@ -91,7 +91,12 @@ define([
           />
 
           {courses && courses.data &&
-            <CoursesList accountId={this.props.accountId} courses={courses.data} />
+            <CoursesList
+              accountId={this.props.accountId}
+              courses={courses.data}
+              roles={this.props.roles}
+              addUserUrls={this.props.addUserUrls}
+            />
           }
 
           {renderSearchMessage(courses, this.fetchMoreCourses, I18n.t("No courses found"))}
