@@ -401,16 +401,16 @@ class ActiveRecord::Base
       "((#{column} || '-00')::TIMESTAMPTZ AT TIME ZONE '#{Time.zone.tzinfo.name}')::DATE"
     end
 
-    result = count(
-      :conditions => [
+    result = where(
         "#{column} >= ? AND #{column} < ?",
         min_date,
         max_date.advance(:days => 1)
-      ],
-      :group => expression,
-      :order => expression
-    )
+      ).
+      group(expression).
+      order(expression).
+      count
     # mysql gives us date keys, sqlite/postgres don't
+
     return result if result.keys.first.is_a?(Date)
     Hash[result.map { |date, count|
       [Time.zone.parse(date).to_date, count]
@@ -733,8 +733,15 @@ ActiveRecord::Relation.class_eval do
 
       includes = includes_values + preload_values
       klass.unscoped do
+
+        quoted_plucks = pluck && pluck.map do |column_name|
+          # Rails 4.2 is going to try to quote them anyway but unfortunately not to the temp table, so just make it explicit
+          column_names.include?(column_name) ?
+            "#{connection.quote_local_table_name(table)}.#{connection.quote_column_name(column_name)}" : column_name
+        end
+
         if pluck
-          batch = klass.from(table).order(index).limit(batch_size).pluck(*pluck)
+          batch = klass.from(table).order(index).limit(batch_size).pluck(*quoted_plucks)
         else
           sql = "SELECT * FROM #{table} ORDER BY #{index} LIMIT #{batch_size}"
           batch = klass.find_by_sql(sql)
@@ -746,7 +753,7 @@ ActiveRecord::Relation.class_eval do
 
           if pluck
             last_value = pluck.length == 1 ? batch.last : batch.last[pluck.index(index)]
-            batch = klass.from(table).order(index).where("#{index} > ?", last_value).limit(batch_size).pluck(*pluck)
+            batch = klass.from(table).order(index).where("#{index} > ?", last_value).limit(batch_size).pluck(*quoted_plucks)
           else
             last_value = batch.last[index]
             sql = "SELECT *
@@ -764,46 +771,52 @@ ActiveRecord::Relation.class_eval do
     end
   end
 
-  def update_all_with_joins(updates, conditions = nil, options = {})
+  def update_all_with_joins(updates)
     if joins_values.any?
-      if conditions
-        where(conditions).update_all
-      else
-        case connection.adapter_name
-        when 'PostgreSQL'
-          stmt = Arel::UpdateManager.new(arel.engine)
+      case connection.adapter_name
+      when 'PostgreSQL'
+        stmt = Arel::UpdateManager.new(arel.engine)
 
-          stmt.set Arel.sql(@klass.send(:sanitize_sql_for_assignment, updates))
-          from = from_value.try(:first)
-          stmt.table(from ? Arel::Nodes::SqlLiteral.new(from) : table)
-          stmt.key = table[primary_key]
+        stmt.set Arel.sql(@klass.send(:sanitize_sql_for_assignment, updates))
+        from = from_value.try(:first)
+        stmt.table(from ? Arel::Nodes::SqlLiteral.new(from) : table)
+        stmt.key = table[primary_key]
 
-          sql = stmt.to_sql
+        sql = stmt.to_sql
 
-          tables, join_conditions = deconstruct_joins(arel.join_sql.to_s)
+        join_sql = CANVAS_RAILS4_0 ? arel.join_sql.to_s : arel.join_sources.map(&:to_sql).join(" ")
+        tables, join_conditions = deconstruct_joins(join_sql)
 
-          unless tables.empty?
-            sql.concat(' FROM ')
-            sql.concat(tables.join(', '))
-            sql.concat(' ')
-          end
+        unless tables.empty?
+          sql.concat(' FROM ')
+          sql.concat(tables.join(', '))
+          sql.concat(' ')
+        end
 
-          scope = self
-          join_conditions.each { |join| scope = scope.where(join) }
-          binds = scope.bind_values.dup
+        scope = self
+        join_conditions.each { |join| scope = scope.where(join) }
+        binds = scope.bind_values.dup
+        if CANVAS_RAILS4_0
           where_statements = scope.arel.constraints.map do |node|
             connection.visitor.accept(node) do
               connection.quote(*binds.shift.reverse)
             end
           end
           sql.concat('WHERE ' + where_statements.join(' AND '))
-          connection.update(sql, "#{name} Update")
         else
-          update_all_without_joins(updates, conditions, options)
+          sql_string = Arel::Collectors::Bind.new
+          scope.arel.constraints.map do |node|
+            connection.visitor.accept(node, sql_string)
+          end
+          sql.concat('WHERE ' + sql_string.compile(binds.map{|bvs| connection.quote(*bvs.reverse)}))
         end
+
+        connection.update(sql, "#{name} Update")
+      else
+        update_all_without_joins(updates)
       end
     else
-      update_all_without_joins(updates, conditions, options)
+      update_all_without_joins(updates)
     end
   end
   alias_method_chain :update_all, :joins
@@ -817,7 +830,8 @@ ActiveRecord::Relation.class_eval do
         when 'PostgreSQL'
           sql = "DELETE FROM #{quoted_table_name} "
 
-          tables, join_conditions = deconstruct_joins(arel.join_sql.to_s)
+          join_sql = CANVAS_RAILS4_0 ? arel.join_sql.to_s : arel.join_sources.map(&:to_sql).join(" ")
+          tables, join_conditions = deconstruct_joins(join_sql)
 
           sql.concat('USING ')
           sql.concat(tables.join(', '))
@@ -827,12 +841,20 @@ ActiveRecord::Relation.class_eval do
           join_conditions.each { |join| scope = scope.where(join) }
 
           binds = scope.bind_values.dup
-          where_statements = scope.arel.constraints.map do |node|
-            connection.visitor.accept(node) do
-              connection.quote(*binds.shift.reverse)
+          if CANVAS_RAILS4_0
+            where_statements = scope.arel.constraints.map do |node|
+              connection.visitor.accept(node) do
+                connection.quote(*binds.shift.reverse)
+              end
             end
+            sql.concat('WHERE ' + where_statements.join(' AND '))
+          else
+            sql_string = Arel::Collectors::Bind.new
+            scope.arel.constraints.map do |node|
+              connection.visitor.accept(node, sql_string)
+            end
+            sql.concat('WHERE ' + sql_string.compile(binds.map{|bvs| connection.quote(*bvs.reverse)}))
           end
-          sql.concat('WHERE ' + where_statements.join(' AND '))
         when 'MySQL', 'Mysql2'
           sql = "DELETE #{quoted_table_name} FROM #{quoted_table_name} #{arel.join_sql} #{arel.where_sql}"
         else
@@ -1350,10 +1372,17 @@ if Rails.version < '4'
 end
 
 module UnscopeCallbacks
-  def run_callbacks(kind)
-    scope = self.class.base_class.unscoped
-    scope.default_scoped = true
-    scope.scoping { super }
+  if CANVAS_RAILS4_0
+    def run_callbacks(kind)
+      scope = self.class.base_class.unscoped
+      scope.default_scoped = true
+      scope.scoping { super }
+    end
+  else
+    def __run_callbacks__(*args)
+      scope = self.class.base_class.unscoped
+      scope.scoping { super }
+    end
   end
 end
 ActiveRecord::Base.send(:include, UnscopeCallbacks)

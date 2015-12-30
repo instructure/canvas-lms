@@ -144,7 +144,10 @@ describe ActiveRecord::Base do
     end
 
     it "should raise an error when start is used with group" do
-      expect { Account.group(:id).find_each(start: 0) }.to raise_error(ArgumentError)
+      expect {
+        Account.group(:id).find_each(start: 0) do
+        end
+      }.to raise_error(ArgumentError)
     end
   end
 
@@ -294,12 +297,13 @@ describe ActiveRecord::Base do
       User.create
       User.cache do
         User.first
+
         User.connection.expects(:select).never
         User.first
         User.connection.unstub(:select)
 
         User.create!
-        User.connection.expects(:select).once.returns([])
+        User.connection.expects(:select).once.returns(CANVAS_RAILS4_0 ? [] : ActiveRecord::Result.new([], []))
         User.first
       end
     end
@@ -315,7 +319,7 @@ describe ActiveRecord::Base do
         u2 = User.new
         u2.id = u.id
         expect{ u2.save! }.to raise_error(ActiveRecord::RecordNotUnique)
-        User.connection.expects(:select).once.returns([])
+        User.connection.expects(:select).once.returns(CANVAS_RAILS4_0 ? [] : ActiveRecord::Result.new([], []))
         User.first
       end
     end
