@@ -189,17 +189,6 @@ class Attachment < ActiveRecord::Base
     end
   end
 
-  def before_attachment_saved
-    run_before_attachment_saved
-  end
-
-  def after_attachment_saved
-    run_after_attachment_saved
-  end
-
-  before_attachment_saved :run_before_attachment_saved
-  after_attachment_saved :run_after_attachment_saved
-
   def run_before_attachment_saved
     @after_attachment_saved_workflow_state = self.workflow_state
     self.workflow_state = 'unattached'
@@ -503,7 +492,7 @@ class Attachment < ActiveRecord::Base
       end
       save!
       # normally this would be called by attachment_fu after it had uploaded the file to S3.
-      after_attachment_saved
+      run_after_attachment_saved
     end
   end
 

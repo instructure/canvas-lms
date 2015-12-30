@@ -172,36 +172,7 @@ module AttachmentFu # :nodoc:
       base.after_save :after_process_attachment
       base.after_destroy :destroy_file
       base.after_validation :process_attachment
-      base.define_model_callbacks :resize, :attachment_saved, :save_and_attachment_processing, only: [:after]
-      base.define_model_callbacks :attachment_saved, :thumbnail_saved, only: [:before]
-    end
-
-    unless defined?(::ActiveSupport::Callbacks)
-      # Callback after an attachment has been saved either to the file system or the DB.
-      # Only called if the file has been changed, not necessarily if the record is updated.
-      #
-      #   class Foo < ActiveRecord::Base
-      #     acts_as_attachment
-      #     after_attachment_saved do |record|
-      #       ...
-      #     end
-      #   end
-      def after_attachment_saved(&block)
-        write_inheritable_array(:after_attachment_saved, [block])
-      end
-
-      # Callback before a thumbnail is saved.  Use this to pass any necessary extra attributes that may be required.
-      #
-      #   class Foo < ActiveRecord::Base
-      #     acts_as_attachment
-      #     before_thumbnail_saved do |thumbnail|
-      #       record = thumbnail.parent
-      #       ...
-      #     end
-      #   end
-      def before_thumbnail_saved(&block)
-        write_inheritable_array(:before_thumbnail_saved, [block])
-      end
+      base.define_model_callbacks :save_and_attachment_processing, only: [:after]
     end
 
     # Get the thumbnail class, which is the current attachment class by default.
@@ -523,7 +494,8 @@ module AttachmentFu # :nodoc:
       # Stub for a #process_attachment method in a processor
       def process_attachment
         @saved_attachment = save_attachment?
-        callback :before_attachment_saved if @saved_attachment
+        run_before_attachment_saved if @saved_attachment && self.respond_to?(:run_before_attachment_saved)
+        @saved_attachment
       end
 
       # Cleans up after processing.  Thumbnails are created, the attachment is stored to the backend, and the temp_paths are cleared.
@@ -553,8 +525,8 @@ module AttachmentFu # :nodoc:
             save_to_storage
             @temp_paths.clear
             @saved_attachment = nil
-            callback :after_attachment_saved
-            callback :after_save_and_attachment_processing
+            run_after_attachment_saved if self.respond_to?(:run_after_attachment_saved)
+            run_callbacks(:save_and_attachment_processing)
           end
 
           if self.class.connection.open_transactions == 1
@@ -563,7 +535,7 @@ module AttachmentFu # :nodoc:
             save_and_callbacks.call()
           end
         else
-          callback :after_save_and_attachment_processing
+          run_callbacks(:save_and_attachment_processing)
         end
       end
 
@@ -574,34 +546,6 @@ module AttachmentFu # :nodoc:
         elsif thumbnail_resize_options # thumbnail
           resize_image(img, thumbnail_resize_options)
         end
-      end
-
-      # callback is not defined in Rails 3
-      def callback(method)
-        runner_method = "_run_#{method}_callbacks"
-        unless self.respond_to?(runner_method, true)
-          chain = ActiveSupport::Callbacks::CallbackChain.new(method, {})
-
-          kind, chain_name = method.to_s.split('_', 2) # e.g. :after_save becomes 'after', 'save'
-          chain.append(*(self.send("_#{chain_name}_callbacks").to_a.select{|callback| callback.kind.to_s == kind}))
-
-          if CANVAS_RAILS4_0
-            str = chain.compile
-            class_eval <<-RUBY_EVAL, __FILE__, __LINE__ + 1
-              def #{runner_method}()
-                #{str}
-              end
-              protected :#{runner_method}
-            RUBY_EVAL
-          else
-            class_eval <<-RUBY, __FILE__, __LINE__ + 1
-            def #{runner_method}(&block)
-              __run_callbacks__(_#{chain_name}_callbacks, &block)
-            end
-            RUBY
-          end
-        end
-        self.send(runner_method)
       end
 
       # Removes the thumbnails for the attachment, if it has any
