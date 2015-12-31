@@ -37,6 +37,12 @@ end
 
 ENV["RAILS_ENV"] = 'test'
 
+if ENV['COVERAGE'] == "1"
+  puts "Code Coverage enabled"
+  require 'coverage_tool'
+  CoverageTool.start("RSpec:#{Process.pid}#{ENV['TEST_ENV_NUMBER']}")
+end
+
 require File.expand_path('../../config/environment', __FILE__) unless defined?(Rails)
 require 'rspec/rails'
 
@@ -418,6 +424,12 @@ RSpec.configure do |config|
 
     if ENV['TEST_ENV_NUMBER'].present?
       Rails.logger.reopen("log/test#{ENV['TEST_ENV_NUMBER']}.log")
+    end
+
+    if ENV['COVERAGE'] == "1"
+      # do this in a hook so that results aren't clobbered under test-queue
+      # (it forks and changes the TEST_ENV_NUMBER)
+      SimpleCov.command_name("rspec:#{Process.pid}:#{ENV['TEST_ENV_NUMBER']}")
     end
   end
 
