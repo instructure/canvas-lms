@@ -476,6 +476,7 @@ describe "context modules" do
       expect(f('.prerequisites_entry', form)).not_to be_displayed
       replace_content(form.find_element(:id, 'context_module_name'), "first")
       submit_form(form)
+      wait_for_ajaximations
 
       form = new_module_form
       expect(f('.prerequisites_entry', form)).to be_displayed
@@ -492,6 +493,7 @@ describe "context modules" do
       edit_form = f('#add_context_module_form')
       expect(f('.prerequisites_entry', edit_form)).not_to be_displayed
       submit_form(edit_form)
+      wait_for_ajaximations
 
       mod1 = f("#context_module_#{modules[1].id}")
       f(".ig-header-admin .al-trigger", mod1).click
