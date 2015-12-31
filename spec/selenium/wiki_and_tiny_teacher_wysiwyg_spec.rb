@@ -343,6 +343,19 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       end
     end
 
+    it "should create a table", priority: "1", test_id: 307627 do
+      wysiwyg_state_setup
+
+      f('.mce-i-table').click
+
+      driver.find_element(:xpath, "//span[text()[contains(.,'Insert table')]]").click
+      driver.find_element(:xpath, "//td/a[@data-mce-x='3' and @data-mce-y='3']").click
+      in_frame wiki_page_body_ifr_id do
+        expect(ff('#tinymce tr').length).to eq 4
+        expect(ff('#tinymce td').length).to eq 16
+      end
+    end
+
     it "should add bold text to the rce", priority: "1", test_id: 285128 do
       wysiwyg_state_setup
 
