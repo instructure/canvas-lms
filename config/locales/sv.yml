@@ -44,7 +44,7 @@ sv:
   _start_from_a_template__a03ea3b3: "-- Börja med en mall --"
   a_calculation_value_is_not_used_with_this_calculat_b1e854b4: "Ett uträkningsvärde används inte i den här uträkningsmetoden"
   a_file_named_itemname_already_exists_in_this_folde_b0dc7185: "En fil med namnet %{itemName} finns redan i den här mappen."
-  a_full_size_logo_that_appears_in_the_right_sidebar_18873685: "En stor logga som visas i det högra fältet på Canvas dashboard. Bra storlek är 360 x 140 pixlar. Godkända format: svg, png, jpeg, gif"
+  a_full_size_logo_that_appears_in_the_right_sidebar_18873685: "En stor logga som visas i det högra fältet pi Canvas Översikt. Bra storlek är 360 x 140 pixlar. Godkända format: svg, png, jpeg, gif"
   a_handy_key_value_dump_of_a_host_of_interesting_en_d0518dfe: "Ett smidigt nyckel/värdesutdrag med info om en värd i en intressant miljö för den rapporterande användaren"
   a_message_is_required_129e1814: "Det krävs ett meddelande"
   a_new_assignment_has_been_created_for_your_course__12b72639: "En ny uppgift har skapats för din kurs, %{course_name}"
@@ -609,7 +609,7 @@ sv:
     course_type: kurs
     courses: 
       courses_crumb: Kurser
-      no_results_message: "Inga lärandemål hittades"
+      no_results_message: "Inga resultat hittades"
       page_title: "Resultat för kurssök \"%{query}\""
       search_results_crumb: "Sökresultat för \"%{query}\""
       title: "Resultat för kurssök \"%{query}\""
@@ -787,7 +787,7 @@ sv:
         site_admin_quotas: Hemsida-administratörskvoter
         student_quota: Elevkvot
         update: Uppdatera
-      account_roles: "Kontoroller:"
+      account_roles: "Roller på kontot:"
       account_settings_title: Kontoinställningar
       add_a_custom_help_link: "Lägg till en egen hjälplänk"
       add_admin_title: "Lägg till konto-administratörer"
@@ -810,7 +810,7 @@ sv:
         modify_users: "Gå tillbaka och redigera listan med användare"
       confirm_global_announcement: "Det här meddelandet kommer visas för *alla* Canvas användare. Bekräfta att du vill skapa det."
       confirm_turnitin_settings_link: "bekräfta Turnitin-inställningar"
-      course_roles: "Kursroller:"
+      course_roles: "Roller i kurs:"
       create_courses_description: "(Konto-administratörer kan alltid skapa kurser)"
       create_courses_title: "Vem kan skapa nya kurser"
       custom_links_to_include_in_the_help_dialog_popup: "Egna länkar att inludera i hjälp pop-upsen"
@@ -1128,7 +1128,7 @@ sv:
       account_reports: 
         student_assignment_map: 
           description: 
-            text: "Den här rapporten visar lärandemål för alla elever. Den färdiga csv filen kommer ha en rad per användar-resultatspar och kommer visa detaljer angående resultatet, inklusive den associerade uppgiften. Rapporten visar endast resultat för uppgifter och inkluderar inte lärandemål kopplade till frågebanker."
+            text: "Den här rapporten visar resultat kopplade till lärandemål för alla elever. Den färdiga csv filen kommer ha en rad per användare/lärandemål/resultatm och kommer visa detaljer angående resultatet, inklusive den associerade uppgiften. Rapporten visar endast lärandemålresultat för uppgifter och inkluderar inte lärandemål kopplade till frågebanker."
     student_grades_csv_parameters: 
       account_reports: 
         auburn: 
@@ -1138,7 +1138,7 @@ sv:
       account_reports: 
         default: 
           students_with_no_submissions: 
-            text: "Det här är en rapport med alla elever anmälada till en kurs under en specifik termin som inte har lämnat in en uppgift under det givna datumintervallet. Rapporten visar en rad per elev som uppfyller kraven. Datumintervallen kan inte vara längre än två veckor."
+            text: "Det här är en rapport med alla elever anmälada till en kurs under en specifik termin som inte har lämnat in en uppgift inom det givna datumintervallet. Rapporten visar en rad per elev som uppfyller kraven. Datumintervallen kan inte vara längre än två veckor."
     students_with_no_submissions_csv_parameters: 
       account_reports: 
         default: 
@@ -1209,7 +1209,7 @@ sv:
       account_reports: 
         default: 
           zero_activity: 
-            text: "Den här rapporten visa elever som är anmälda till kurser under en specifik termin. Den färdiga csv filen kommer ha en rad per användar-anmälan som inte besökt kursen sedan startdatumet."
+            text: "Den här rapporten visa elever som är anmälda till någon kurse under en specifik termin. Den färdiga csv filen kommer ha en rad per användare/registrering som inte besökt kursen sedan startdatumet."
   achieve_mastery_count_times_8c9bbcec: "Uppnå mastery %{count} gånger"
   actions_efcde10d: Handling
   activate_this_key_6cd98f4b: "Aktivera den här nyckeln"
@@ -1298,9 +1298,9 @@ sv:
       the_student: Eleven
       the_teacher: Läraren
       title: "Dagar sedan läraren var i kontakt med eleven"
-      ungraded_count_description: "Fler än %{count} inlämningar har inte betygsatts"
+      ungraded_count_description: "Fler än %{count} inlämningar har inte bedömts"
       ungraded_count_option: "Ej betygsatta inlämningar (Count)"
-      ungraded_count_title: "Antalet inlämningar som inte har betygsatts"
+      ungraded_count_title: "Antalet inlämningar som inte har bedömts"
       ungraded_timespan_description: "En inlämning har inte blivit betygsatt på %{count} dagar"
       ungraded_timespan_option: "Ej betygsatta inlämningar (Time)"
       ungraded_timespan_title: "Dagar som inlämningen inte har blivit bedömd på"
@@ -1586,7 +1586,7 @@ sv:
     titles: 
       assignment_group_weights: "Hantera uppgiftsgruppens viktning"
       total: Total
-    weight_final: "Slutbetyg viktning baserat på grupper"
+    weight_final: "Vikting av av slutbetyg baserat på grupper"
   assignment_groups: 
     errors: 
       cannot_delete_group: "Du kan inte radera en grupp med en låst uppgift"
@@ -1661,11 +1661,11 @@ sv:
       settings: Inställningar
     assignment_list_item_score: 
       assignment_grading_type_is_not_graded: "Den här uppgiften kommer inte få ett betyg"
-      assignment_not_yet_graded_screenreader: "Uppgiften har inte betygsatts ännu. %{pointsPossible} möjliga poäng."
+      assignment_not_yet_graded_screenreader: "Uppgiften har inte bedömts ännu. %{pointsPossible} möjliga poäng."
       empty_points_possible: "-/%{pointsPossible} pts"
       no_submission: "Ingen inlämning"
       no_submission_for_assignment_screenreader: "Ingen inlämning för den här uppgiften. %{pointsPossible} möjliga poäng"
-      not_yet_graded: "*Inte betygsatt ännu*"
+      not_yet_graded: "*Inte bedömda ännu*"
       score_with_points_possible: "*%{score}*/%{pointsPossible} pts"
       score_with_points_possible_screenreader: "Poäng: %{score} utav %{pointsPossible} möjliga poäng."
     assignment_settings: 
@@ -1711,7 +1711,7 @@ sv:
       external_tool_type: "Externt verktyg"
       more: "Fler alternativ"
       multiple_due_dates: "Flera sista dagar"
-      not_graded_type: "Inte betygsatt"
+      not_graded_type: "Inte bedömd"
       quiz_type: Quiz
       save: Spara
       saving: Sparar...
@@ -1845,7 +1845,7 @@ sv:
       view_grading_scheme: "Visa betygsschema"
     group_category_selector: 
       differentiated_groups_warning: "Differentierade gruppuppgifter kan ge öväntade resultat."
-      grade_group_students_individually: "Betygsätt varje elev individuellt"
+      grade_group_students_individually: "Bedöm varje elev individuellt"
       group_assignment_header: Gruppuppgift
       group_category_locked_explanation: "Elever har redan lämnat in läxor på den här uppgiften så gruppinställningarna kan inte ändras."
       group_category_options: "Ny gruppkategori"
@@ -1973,10 +1973,10 @@ sv:
         automatically_assign_peer_reviews: "Tilldela kamratbedömning automatiskt"
         manually_assign_peer_reviews: "Tilldela kamratbedömning manuellt"
         require_peer_reviews: "Begär kamratbedömning"
-      locked_until: "Tilldela recensioner"
+      locked_until: "Tilldela bedömning"
       peer_reviews_assign_at_explanation: "Måste komma efter sista dagen. Om blank, använd sista dagen."
       peer_reviews_header: Kamratbedömningar
-      reviews_per_user: "Recensioner per användare"
+      reviews_per_user: "Bedömningar per användare"
     points_possible_number: "Möjliga poäng måste vara ett nummer"
     positive_number: "Du måste använda ett positivt nummer"
     redirect_page: 
@@ -2025,8 +2025,8 @@ sv:
     submission_sidebar: 
       comment_signature: "%{author}, %{created_at}"
       labels: 
-        grade: "Betyg: %{grade} *(%{points_possible} pts possible)*"
-        graded_anonymously: "Betygsatt anonymt: %{value}"
+        grade: "Bedöm: %{grade} *(%{points_possible} pts possible)*"
+        graded_anonymously: "Anonymt bedömda: %{value}"
         ? "no"
         : nej
         none_assigned: "Inga tilldelningar"
@@ -2054,7 +2054,7 @@ sv:
       descriptions: 
         allowed_extensions: "Uppge en lista av accepterade förlängningar, till exempel: doc,xls,txt"
       external_tool_group_warning: "Gruppuppgifter kan inte använda externa verktyg. Gruppinställningen kommer inte kontrolleras när du sparar"
-      external_tool_options: "Externa verktygsalternativ"
+      external_tool_options: "Externa alternativ"
       label: 
         external_tool_new_tab: "Öppna det här verktyget i en ny flik"
         external_tool_url: "Externt verktyg URL"
@@ -2099,7 +2099,7 @@ sv:
         find_file: "Klicka här för att hitta en fil som du redan laddat upp"
         submit: 
           external_tool: Mer
-          file_upload: "Uppladdad fil"
+          file_upload: Filuppladdning
           google_doc: "Google Doc"
           media: Media
           text_entry: Textinlägg
@@ -2171,7 +2171,7 @@ sv:
         originality_report_never: Aldrig
         originality_report_visibility: "Elever kan se den ursprungliga rapporten"
         originality_report_visible_after_due_date: "Efter sista dagen"
-        originality_report_visible_after_grading: "Efter att uppgiften har betygssatts"
+        originality_report_visible_after_grading: "Efter att uppgiften är bedömd"
         originality_report_visible_immediately: Omedelbart
         settings_exclude_fewer_than_count: "Färre än %{wordsInput} ord"
         settings_exclude_less_than_percent: "Mindre än %{percentInput}  av dokumentet"
@@ -2373,7 +2373,7 @@ sv:
     update: Uppdatera
     view_account_roster: "Visa konot-roster"
     view_course_roster: "Visa kurs-roster"
-  by_default_all_links_are_enabled_for_a_course_stud_8e617dbc: "Det är förinställt att en kurs alla länkar är aktiverade. Elev kommer inte se länksektion som saknar innehåll. Till exempel, om du inte har skapat quizzed kommerdet inte se länkar till quizzes. Du kan sortera och avaktivera enskilda länkar om det är delar av kursen som du vill vill att eleverna har tillgång till."
+  by_default_all_links_are_enabled_for_a_course_stud_8e617dbc: "Alla länkar är från start aktiverade. Elever ser inte en sektion som saknar innehåll. Till exempel, om du inte har skapat en Quiz ser inte eleverna quizmenyn. Du kan sortera och avaktivera enskilda länkar om det är delar av kursen som du vill vill att eleverna har tillgång till."
   by_lti_2_registration_url_e421e523: "Genom LTI 2 Registrerings URL"
   by_url_a163275e: "Genom URL"
   c_2001_acme_inc_283f7f80: "(c) 2001 Acme Inc."
@@ -2791,7 +2791,7 @@ sv:
   canvas_cartridge_file_description: "Canvas kursexport-paket"
   canvas_cartridge_name: "Canvas Cartridge Importerare"
   canvas_cloud_information_fdd404f2: "Canvas Cloud information"
-  canvas_dashboard_links_will_navigate_to_the_catalo_4143635e: "Canvas översiktslänkar kommer navigera till Översikt över Catalog"
+  canvas_dashboard_links_will_navigate_to_the_catalo_4143635e: "Länkar i Canvas översikt kommer navigera till Catalog översikt"
   canvas_default_7f81a6b8: "Canvas förinställt"
   canvas_did_not_recognize_your_identity_provider_cb0e50fc: "Canvas kände inte igen din identity provider"
   canvas_doesn_t_have_an_account_for_user_user_5bcae0dd: "Canvas har inget konto för användaren: %{user}"
@@ -2923,8 +2923,8 @@ sv:
       file_not_found: "Samarbetsfil kunde inte hittas"
     index: 
       description_rs: |-
-          Gratis online verktyg såsom [Google Docs](%{google_url}) är perfekta platser för elever att arbeta på grupp projekt, arbeten, dela anteckningar, osv.
-          Lärare *eller* elever kan starta gruppsamarbeten.
+          Gratis webbverktyg såsom [Google Docs](%{google_url}) är en utmärkt för elever att arbeta på grupparbeten, dela anteckningar, etc.
+          Lärare *eller* elever/studenter kan starta gruppsamarbeten.
       description_student: |-
           **Vad menar vi med samarbeten?** Vi pratar om webbaserade verktyg som
           kan användas dör att arbeta tillsammans eller dela dokument. Du kan använda resurser som
@@ -4044,7 +4044,7 @@ sv:
       quiz_is_locked: "Quizen \"%{title}\" kunde inte kopieras då den är låst."
       quizzes: "Vissa quizzes kunde inte exporteras"
       resources: "Misslyckades att länka vissa resurser"
-      rubrics: "Misslyckades att exportera Matriser"
+      rubrics: "Misslyckades med export av matriser"
       topic: "Diskussionsämnet \"%{title}\" kunde inte exporteras"
       topic_is_locked: "Ämnet \"%{title}\" kunde inte exporteras då det är låst"
       topics: "Misslyckades att exportera vissa ämnen"
@@ -4211,14 +4211,14 @@ sv:
   courses: 
     assignments_needing_grading: 
       headings: 
-        grade: "Betyg %{assignment}"
+        grade: "Bedöm %{assignment}"
         moderate: "Moderera %{assignment}"
         to_do: "Att göra"
       links: 
         show_more: "%{count} mer..."
       need_grading_count: 
-        one: "1 måste betygsättas"
-        other: "%{count} måste betygsättas"
+        one: "1 behöver bedömmas"
+        other: "%{count} behöver bedömmas"
       no_peer_review_due_date: "färdig: Ingen sista dag"
       peer_review_due_date: "färdig: %{peer_review_due_at}"
       points_possible: "utav%{points_possible}"
@@ -4567,7 +4567,7 @@ sv:
       tabs: 
         alerts: Larm
         details: Kursdetaljer
-        feature_options: "Feature alternativ"
+        feature_options: "Val av funktioner"
         grade_publishing: Betygspublicering
         navigation: Navigering
         sections: Sektioner
@@ -4633,7 +4633,7 @@ sv:
       license_notice: "Kursens innehåll erbjuds under en %{license_type} licens. Kursens innehåll kan övervägas under licensen om inget annat nämns."
       links: 
         choose_home_page: "Välj startsida"
-        course_setup: "Checklista för kursens upplägg"
+        course_setup: "Checklista för kursen"
         drop_course: "Släpp den är kursen"
         join_course: "Anslut dig till kursen"
         new_announcement: "Nytt meddelande"
@@ -4661,14 +4661,14 @@ sv:
       any: Vemsomhelst
       assignment_groups: Uppgiftsgrupper
       assignments: Uppgifter
-      course_rubrics: Matriser
+      course_rubrics: "Matriser i kursen"
       discussion_posts: Diskussionsinlägg
       discussion_topic: Diskussionsämne
       discussions: Diskussioner
       file_count: 
         one: "1 fil"
         other: "%{count} filer"
-      file_upload: "Uppladdad fil"
+      file_upload: Filuppladdning
       headings: 
         assignments: "Uppgifter användningsrapport"
         files: Filförvaring
@@ -4749,7 +4749,7 @@ sv:
     error_reports: Felrapporter
     files: Filer
     grades: Betyg
-    grading_standards: Betygschema
+    grading_standards: Betygsschema
     groups: Grupper
     jobs: Jobb
     media: Media
@@ -4831,7 +4831,7 @@ sv:
         ratio: "Fel elevratio"
   current_courses_d5287d50: "Nuvarande kurser"
   current_grading_standard_for_this_assignment_64c5375e: "Nuvarande betygsstandard för denna uppgiften"
-  current_mastery_score_score_out_of_mastery_points_fedd343f: "Nuvarande mästarpoäng: %{score} utav %{mastery_points}"
+  current_mastery_score_score_out_of_mastery_points_fedd343f: "Nuvarande måluppfyllelsepoäng: %{score} utav %{mastery_points}"
   current_provider_6c3f7f96: "Nuvarande leverantör"
   current_score_6c81792: "Nuvarande poäng"
   current_total_67bf5f72: "Nuvarande total:"
@@ -5213,7 +5213,7 @@ sv:
       close_for_comments: "Stäng för kommentarer"
       delete: Radera
       due: Färdig
-      graded_discussion: "Betygsatt diskussion:"
+      graded_discussion: "Diskussionen bedöms:"
       last_post_date: "Senaste inlägg %{display_last_reply_at}"
       manage: Hantera
       move: "Flytta till..."
@@ -5261,7 +5261,7 @@ sv:
       sort_by_likes: "Sortera efter antal \"gilla\""
       topic_title: Ämnestitel
       until: Tills
-      use_for_grading: Betygsatt
+      use_for_grading: Bedömd
       users_must_post_before_seeing_replies: "Användare måste skriva ett inlägg innan de kan se svaren"
     entry: 
       authors_name: "Författarens namn"
@@ -5704,7 +5704,7 @@ sv:
   enrollments_e250c9c3: Inskrivningar
   enter_a_hexcode_here_to_use_a_custom_color_51ecccce: "Uppge en hexkod här för att använda en färg."
   enter_your_question_and_multiple_answers_31370054: "Ange din fråga och flera svar"
-  enter_your_question_specifying_where_each_blank_sh_2c6e8035: "Ange din fråga, specifiera var varje tom del ska vara. Elever måste skriva in svaret i en ruta bredvid den tomma delen."
+  enter_your_question_specifying_where_each_blank_sh_2c6e8035: "Skriv din fråga och specifiera var varje tom ruta ska vara. Elever måste skriva in svaret i varje tom ruta."
   enter_your_question_specifying_where_each_dropdown_b428a9ff: "Ange din fråga, specifiera var varje \"dropdown\" ska vara. Definiera sedan möjliga svar för varje."
   enter_your_question_text_4729b886: "Ange din frågetext."
   enter_your_question_text_students_will_see_the_que_f19af9e9: "Ange din frågetext. Elever kommer se frågan följt av en liten textruta där de kan skriva in svaret."
@@ -5864,7 +5864,7 @@ sv:
         show_comments: "Offentliggör kommentarer"
         uploading_file: "Laddar upp"
       links: 
-        back: "Tillbaka till Översikt över Portfolio"
+        back: "Tillbaka till Översikt av Portfolio"
         choose_submission: Kursinläming
         delete: "Radera den här ePortfolion"
         download_eportfolio: "Ladda ner innehållet i den här ePortfolion som en zipfil"
@@ -5919,18 +5919,18 @@ sv:
       what: 
         details1: |-
             ePortfolios är en plats där du kan visa och disskutera viktiga
-            inlämningar och erfarenheter som hände under din inlärningsprocess.
+            arbeten och erfarenheter som hände under din inlärningsprocess.
             Du kan använda en ePortfolio till att:
             
             * Visa arbeten som du är stolt över eller om du vill att fler än instruktören ska se dem
-            * Prata om alla tankar och det arbete som du lagt ner på dina klassinlämningar
-            * Samla en översikt över din fullständiga undervisningsupplevelse
-            * Dela ditt arbete med vänner, framtida chefer, etc.
+            * Dela dina tankar och det arbete du lagt ner på dina arbeten
+            * Får en översikt över dina lärupplevelser
+            * Dela dina arbete med vänner, framtida arbetsgivar, etc.
             
-            ePortfolios kan vara offentliga för alla, eller privata för de du väljer
-            ska kunna se dem, och du kan ändra den inställningen när du vill.
+            ePortfolios kan vara offentliga för alla, eller privata så att endast
+            utvalda ska kunna se dem, och du kan ändra den inställningen när du vill.
             
-            Är du redo att sätta igång? Klicka på knappen.
+            Är du redo att komma igång? Klicka på knappen.
     wizard_box: 
       finish: 
         body: "Är du redo att sätta igån? Du kan alltid gå tillbaka till wizard från sidor genom att klicka på \"%{help_link_text}\" länken du ser här."
@@ -6178,7 +6178,7 @@ sv:
       not_installed: "Inte installerad"
       search_filter: "Filtrera efter namn"
       view_app_center: "visa app-center"
-      view_installed_tools: "Visa app-konfigurationer"
+      view_installed_tools: "Visa konfiguration av appar"
     migration_selection_configured: "Migreringssortiminet har konfigurerats"
     missing_stars: "Du måste välja en strjärnmarkering"
     module_menu_configured: "Modulenyn har konfigurerats"
@@ -6237,7 +6237,7 @@ sv:
     learning_mastery_gradebook: "Överblick för Måluppfyllelse"
     lor: "LOR externa verktyg"
     multiple_grading_periods: "Flera betygsperioder"
-    new_quiz_statistics: "Ny quizstatistik sida"
+    new_quiz_statistics: "Ny sida för Quizstatistik"
     post_grades: "Posta betyg till SIS"
     quiz_log_auditing: "Granskning av quizlogg"
     student_groups: "Ny elevgruppsida"
@@ -6416,7 +6416,7 @@ sv:
       checkbox: "Visa inte för den här kursen igen."
       warning: Varning
   grade_distribution_e52c9256: Betygsfördelning
-  grade_export_title: Betygsexport
+  grade_export_title: "Export av betyg"
   grade_summary: 
     graph_title: "Medel %{mean}, Hög %{high}, Låg %{low}"
     ? "no"
@@ -6458,7 +6458,7 @@ sv:
       select_an_option: "Vänligen välj ett alternativ"
     graded: betygsatt
     graded_by_me: "%{graded_time} av mig"
-    graded_then_resubmitted: "betygsatt och inlämnad igen (%{when})"
+    graded_then_resubmitted: "bedömd och inlämnad igen (%{when})"
     gradee_index_of_total: "%{gradee} %{x} av %{y}"
     group: Grupp
     hide_all_details_button: "Dölj alla detaljer"
@@ -6469,7 +6469,7 @@ sv:
     not_graded: "inte betygsatt"
     not_submitted: "inte inlämnad"
     nth_student: "Elev %{n}"
-    portion_graded: "%{x} / %{y} Betygsatt"
+    portion_graded: "%{x} / %{y} Betygsatta"
     recording_expired_message: "Igenkänning av tal har avlutats pga. inaktivitet. Klicka på \"Stop\" -knappen för att använda den nuvarande kommentaren eller \"Avsluta\" för att kassera."
     recording_message: "Spelar in..."
     show_all_details_button: "Visa alla detaljer"
@@ -6501,8 +6501,8 @@ sv:
       this_assignment_is_muted: "Den här uppgiften har tystats"
       zero_point_assignment: "Uppgifter i den här gruppen har inga möjliga poäng och kan inte inkluderas i betygsuträkningen."
     concluded_course_error_message: "Det här är en avslutad kurs, endast anmälningar är tillgängliga."
-    course_average: Kursgenomsnitt
-    course_median: Kursmedian
+    course_average: Genomsnitt
+    course_median: Median
     course_mode: Typvärde
     dropped_for_grading: "Sänkt för betygsändamål"
     error: 
@@ -6525,8 +6525,8 @@ sv:
       set_default_grade: "Ställ in förinställt betyg"
       speedgrader: SpeedGrader
     header_filter: 
-      course_average: Kursgenomsnitt
-      course_median: Kursmedian
+      course_average: Genomsnitt
+      course_median: Median
       course_mode: Typvärde
     hide_notes: "Dölj anteckningskolumnen"
     hide_student_names: "Dölj elevers namn"
@@ -6559,14 +6559,14 @@ sv:
       student_placeholder: Student
     secondary_id: "Sekundärt ID"
     section_to_show_menu: 
-      choose_a_section_to_show: "Visa en sektion att visa"
+      choose_a_section_to_show: "Välj en sektion att visa"
       showing_course: "Visar kurs"
       showing_sections: "Visar *%{currentSection}*"
     show_notes: "Visa anteckningskolumnen"
     show_student_names: "Visa elever namn"
     student_name: Elevnamn
     students_who: 
-      havent_been_graded: "Har inte betygsatts"
+      havent_been_graded: "Har inte bedömts"
       havent_submitted_yet: "Har inte lämnats in än"
       no_grade_for: "Inget betyg för %{assignment}"
       no_submission_for: "Ingen inlämning för %{assignment}"
@@ -8062,7 +8062,7 @@ sv:
   marked_done_8f61ebb8: "markerad som färdig"
   marked_done_9fd646f: "Markera som färdig"
   mastery_score_reflects_the_highest_score_of_a_grad_fd426d1e: "Mästarpoängen reklekterar det högsta poängen som getts för uppgiften eller quizen."
-  mastery_score_reflects_the_most_recent_graded_assi_29fd2e00: "Mästarpoängen reklekterar den senaste betygsatta uppgiften eller quizen."
+  mastery_score_reflects_the_most_recent_graded_assi_29fd2e00: "Måluppfyllelse poäng reflekterar den senaste betygsatta uppgiften eller quizen."
   matching_left_side_80_character_limit_bb12adf1: "Matchande vänster sida (högst 80 tecken)"
   matching_left_side_900f860b: "Matchar vänster sida"
   matching_right_side_80_character_limit_217edfe1: "Matchande höger sida (högst 80 tecken)"
@@ -8118,7 +8118,7 @@ sv:
   media_recording_77cddc52: Mediainspelningar
   media_recordings_749aef6d: Mediainspelningar
   median_score_4657e907: "Median: %{score}"
-  meets_mastery_754e1c06: "Möter mastery"
+  meets_mastery_754e1c06: "Möter målen"
   member_count_members_out_of_maximum_of_max_members_d3e9f575: "%{member_count} medlemmar av maximalt antal %{max_membership}"
   members_af25c21d: Medlemmar
   membership_by_invitation_only_9bc27199: "Medlemsskap genom inbjudan"
@@ -9891,7 +9891,7 @@ sv:
   moderated_grading_allows_multiple_graders_to_grade_5c0d53db: "Modererade betyg låter flera betygsättare betygsätta valda uppgifter på egen hand, med en moderator som ger slutbetyget."
   moderated_grading_cannot_be_enabled_for_group_assi_7e947ab7: "Moderering av grupper kan inte aktiveras för gruppuppgifter"
   moderated_grading_cannot_be_enabled_for_peer_revie_6b7eedc1: "Moderering av betyg kan inte aktiveras för granskade uppgifter"
-  moderated_grading_e6127f72: "Modererade betyg"
+  moderated_grading_e6127f72: "Modererade bedömning"
   moderated_grading_setting_cannot_be_changed_if_gra_ba939ce2: "Moderering av betyg kan inte ändras om en betygsatt inlämning existerar"
   moderated_grading_setting_cannot_be_enabled_for_gr_d81fb43b: "Moderering av betyg kan inte aktiveras för guppuppgifter"
   moderated_grading_setting_cannot_be_enabled_for_pe_fc7b5b8b: "Moderering av kan inte aktiveras för granskade uppgifter"
@@ -10075,7 +10075,7 @@ sv:
   moving_a4d552df: Flyttar...
   multi_factor_authentication_configured_865b1bde: "Flerstegs-bekräftelsen konfigurerad"
   multiple_due_dates_6b0d75c6: "Flera sista dagar"
-  must_achieve_mastery_at_least_count_times_scores_a_628db168: "Måste nå mästarnivå minst %{count} gånger. Poäng över mastery kommer räknas in i det uträknade slutbetyget. "
+  must_achieve_mastery_at_least_count_times_scores_a_628db168: "Måste nå måluppfyllelse minst %{count} gånger. Poäng över måluppfyllelse kommer genomsnittligen räknas till slutresltatet. "
   must_contribute_to_the_page_fff632c: "Måste bidra på sidan"
   must_mark_as_done_91cff799: "Måste markers som färdig"
   must_mark_as_done_bf6cc563: "måste markeras som färdig"
@@ -10122,7 +10122,7 @@ sv:
   nav_logo_background_ba33fb7f: "Nav logga bakgrund"
   nav_text_94206145: "Nav text"
   nav_text_active_a924ae88: "Nax text aktiv"
-  near_mastery_f25174a4: "Nära mastery"
+  near_mastery_f25174a4: "Nära målen"
   need_a_canvas_account_221d18ed: "Behöver du ett Canvas-konto?"
   new_13daf639: Ny
   new_account_role_6e5c4964: "Ny kontoroll"
@@ -10603,7 +10603,7 @@ sv:
       instructions: 
         main: 
           manage: 
-            description: "Resultat skapas här för att man ska kunna följa mastery i en kurs. För att sätta igång kan du ta en titt på menyn högst upp. Klicka på Ny-knappen för att skapa ett nytt lärandemål, eller Ny Grupp-knappen för att skapa en ny grupp att organisera lärandemålen Hitta-knappen låter dig använda lärandemål som har skapats av din stat eller institution. Medans du skapar och använder lärandemål kan du använda panelen till vänster för att navigera bland dina lärandemål. Du kan dra och släppa lärandemål mellan olika nivåer för att skapa en bättre struktur.* *Vad som är ännu viktigare är att Canvas låter dig lägga till lärandemål till dina betygsmatriser så du kan räkna ut mastery medans du betygsätter uppgifter. När du är färdig med dina resultat klickar du på Hantera matriser för att börja använda lärandemålen när du betygsätter.*"
+            description: "Här skapas lärandemålen för att följa måluppfyllelsen i kurs/ämne. För att sätta igång kan du ta en titt på menyn högst upp. Klicka på \"Ny\" för att skapa ett nytt lärandemål, eller Ny grupp-knappen för att skapa en ny grupp att organisera målen i. Hitta-knappen låter dig använda lärandemålen som skapats av din organisation. Medans du skapar och använder lärandemålen kan du använda panelen till vänster för att navigera bland dessa. Du kan dra och släppa lärandemål mellan olika nivåer för att skapa en bättre struktur.* *Vad som är ännu viktigare är att Canvas låter dig lägga till lärandemålen i dina matriser så att du kan räkna måluppfyllelse i dina uppgifter. När du är färdig med dina lärandemål trycker du på \"Hantera matriser\" för att börja använda lärandemål när du bedömmer.*"
             title: "Ställer in lärandemål"
     mastery_error: "Måste vara högre eller samma som 0"
     missing_outcome: "Kunde inte hitta lärandemålen"
@@ -10612,8 +10612,8 @@ sv:
       links: 
         delete_outcome: "Radera bedömning"
         edit_outcome: "Redigera bedömning"
-      mastery_at_label: "Ställ in mastery för samma eller högre poäng:"
-      point_mastery: "Mastery: %{mastery_points} poäng"
+      mastery_at_label: "Sätt måluppfyllelsen till poängen:"
+      point_mastery: "Måluppfyllelse: %{mastery_points} poäng"
       points: 
         rating: "%{points} Poäng"
         total: "%{points_possible} Poäng"
@@ -10623,11 +10623,11 @@ sv:
     outcome_form: 
       calculation_method: Räkningsmetod
       criterion: "Kriterium värdering"
-      criterion_dialog: "Lärandemål kan inkluderas i en uppgiftsmatris för att enkelt ge tillgång till mästarbedömningen för specifika uppgifter. När du definierar ett lärandemål bör du även definiera kriterierna som ska användas när du bygger uppgiftsmatriser. Definera så många bedömningsmatriserkolumner du behöver, och specifiera en poänggräns som kommer användas för att definiera bedömningens mastery."
+      criterion_dialog: "Lärandemål kan inkluderas i en matris för att enkelt spåra måluppfyllelsen för specifika uppgifter. När du definierar ett lärandemål bör du även definiera kriterierna som ska användas när du bygger matriser. Definera så många kolumner du behöver, och specifiera en poänggräns som kommer användas för att definiera bedömningens måluppfyllelsen."
       criterion_info_link: "Klicka här för att lära dig mer om utvärderingskriterium"
       description: "Beskriv den här bedömningen"
       display_name: "Vänlig namn (valfritt)"
-      mastery: "Mastery vid"
+      mastery: "Måluppfyllelse vid"
       points: "%{points_possible} poäng"
       title: "Namnge bedömningen"
       total_points: "Totalt antal poäng"
@@ -10639,7 +10639,7 @@ sv:
       group_description: "Beskriv gruppen"
       title: "Namnge gruppen"
     outcome_popover: 
-      mastery_set_at: "Mastery satt vid"
+      mastery_set_at: "Måluppfyllelse satt vid"
       no_results: "(inga resultat)"
     outcome_result: 
       all_outcomes: "alla resultat av lärandemål för denna elev"
@@ -10668,8 +10668,8 @@ sv:
       attempts_from_artifacts: "%{attempts} *från %{artifacts}*"
       labels: 
         see_results: "Se %{user_name}s resultat för"
-      mastery: "Mastery på sista försöket"
-      no_mastery: "Ingen mastery på sista försöket"
+      mastery: "Måluppfyllelse på sista försöket"
+      no_mastery: "Ingen måluppfyllelse på sista försöket"
       outcomes_for: "Resultat för %{user_name}"
       score_out_of_possible: "%{score}* utav %{possible}*"
       short_title: 
@@ -11697,7 +11697,7 @@ sv:
         align_outcome: "Tilldela bedömning"
         more_questions: "fler frågor"
       loading_banks: "Laddar banker..."
-      mastery_threshold: "mastery på %{threshold_percentage}"
+      mastery_threshold: "måluppfyllelse vid %{threshold_percentage}"
       move_copy: Flytta/kopiera
       select_bank: "Välj frågebank för frågan:"
       show_details: "Visa frågedetaljer"
@@ -12229,13 +12229,13 @@ sv:
         exact_answer_with_error_margin_accessible: "*exakt svar* med felmarginalen  #error margin#"
         labels: 
           answer_comments: "Kommentarer, om eleven väljer det här svaret"
-          answer_in_range: "Svar i räckvidden"
+          answer_in_range: "Svar i intervallet"
           answer_with_precision: "Svar med värdesiffror"
           exact_answer: "Exakt svar"
         matching_left: "Matchar vänstra sidan"
         matching_right: "Matchar högra sidan"
         numerical_answer: "Numeriskt svar"
-        possible_answer: "Möjligt svar"
+        possible_answer: Svarsalternativ
         titles: 
           click_to_enter_answer_comments: "Klicka för att lämna kommentarer, om eleven väljer det här svaret"
           click_to_set_as_correct: "Klicka för att ställa in det här svaret som korrekt"
@@ -12306,7 +12306,7 @@ sv:
           essay: Uppsatsfråga
           file_upload: Filuppladdningsfråga
           fill_in_multiple_blanks: "Fyll i flera tomma rutor"
-          matching: Matchar
+          matching: "Para ihop"
           missing_word: "Saknade ord"
           multiple_answers: "Flera svar"
           multiple_choice: "Flera val"
@@ -12470,7 +12470,7 @@ sv:
           hide_results_only_after_last: "Endast efter deras sista försök"
           ip_addresses: "Filtrera efter IP-adress"
           ip_filter: "Filtrera IP-adresser"
-          never_hide_results: "Låt eleverna se deras quizrespons"
+          never_hide_results: "Låt eleverna se deras respons"
           quiz_instructions: Quiz-instruktioner
           quiz_notify: "Meddela användare när den här quizen ändras"
           quiz_score: Poäng
@@ -12503,7 +12503,7 @@ sv:
         show_correct_answers_at: "Visa rätt svar kl."
         show_correct_answers_last_attempt: "Endast efter deras sista försök"
         shuffle_answers: "Blanda svaren"
-        students_cannot_view_responses_after_course_concludes: "Elever kan inte visa quizrespons efter att kursen avslutas"
+        students_cannot_view_responses_after_course_concludes: "Elever kan inte se respons efter att kursen avslutas"
         time_limit: "Hur många minuter?"
         titles: 
           click_to_select_filter: "Klicka för att välja det här filtret"
@@ -12733,7 +12733,7 @@ sv:
           related_items: "Relaterade föremål"
           unlock_for_how_long: "Hur länge vill du låsa upp quizen?"
         warnings: 
-          draft_version: "Den här är en förhandsvisning av quizens utkastsversion"
+          draft_version: "Den här är en förhandsvisning av utkastet av quizen"
       single_answer: 
         upload: "Ladda upp"
       statistics: 
@@ -13470,7 +13470,7 @@ sv:
       course_not_authorized_for_crosslist: "%{course_name} inte behörig för flytt av sektion"
     status: 
       confirming_course: "Bekräftar %{course_name}..."
-      removing_crosslisting_of_section: "De-Cross-Listing sektion..."
+      removing_crosslisting_of_section: "Ångra flytt av sektion..."
   section_ends_at_bb9df3c0: "Sektionen avslutas kl."
   section_filter_cde54d0a: Sektionsfilter
   section_name_b6d82574: Sektionsnamn
@@ -13572,7 +13572,7 @@ sv:
       already_enrolled: "Du har redan anmält dig till **%{course}**."
       buttons: 
         go_to_course: "Gå till kursen"
-        go_to_dashboard: "Gå till din översikt"
+        go_to_dashboard: "Gå till din Översikt"
     authenticate: 
       buttons: 
         enroll_in_course: "Anmäl dig till kursen"
@@ -13656,7 +13656,7 @@ sv:
         record_type: Inspelningstyp
         ret_val: "Retur URL"
   settings_5aa0fd0c: Inställningar
-  setup_checklist_eb8b00b8: "Ställ in checklista"
+  setup_checklist_eb8b00b8: "Se checklista"
   shared: 
     account_notification: 
       close: stäng
@@ -13674,7 +13674,7 @@ sv:
       percent_of_grade: "%{percent} % av betyg"
     assignment: 
       due_at: "%{date} kl. %{time}"
-      graded_count: "%{graded_count} betygsatt"
+      graded_count: "%{graded_count} betygsatta"
       links: 
         delete_assignment: Radera
         edit_assignment: Redigera
@@ -13831,13 +13831,13 @@ sv:
       buttons: 
         add_outcome: "Lägg till bedömning"
       labels: 
-        criterion_ratings: "Kriterie bedömningar"
-        master_level: "ställ in mastery för poäng på eller över"
+        criterion_ratings: Kriterie
+        master_level: "sätt måluppfyllelsen vid poäng"
         use_for_scoring: "använd det här kriteriet för poängsättning"
       points: "%{points} pts"
       points_threshold: "tröskel: %{points} pts"
       titles: 
-        mastery_level: "procent över det som sätts som mastery"
+        mastery_level: "procent över det som sätts till måluppfyllelse"
         select_and_add_criterion: "Välj och lägg till kritere"
     flash_notices: 
       close: Stäng
@@ -13917,8 +13917,8 @@ sv:
       labels: 
         due: färdig
       needs_grading_count: 
-        one: "%{count} måste betygsättas"
-        other: "%{count} måste betygsättas"
+        one: "1 behöver bedömmas"
+        other: "%{count} behöver bedömmas"
     menu_enrollment: 
       labels: 
         enrolled_as: "anmäld som"
@@ -14158,7 +14158,7 @@ sv:
         assignment_name: Uppgiftsnamn
         file: Fil
         folder: Mapp
-        header: Matris
+        header: Rubrik
         indentation: Indrag
         page_name: Sidnamn
         quiz_group: Grupp
@@ -14510,7 +14510,7 @@ sv:
     assessment_request_title: "Recension för %{title}"
   student_5da6bfd1: Elev
   student_921b864d: elev
-  student_assignment_outcome_map_title: Elevkompetens
+  student_assignment_outcome_map_title: "Elevers förmågor"
   student_groups_desc: |-
       Det här aktiverar sidor för elev-/stundentgrupper för ett konto. Den nya sidan byggdes för att erbjuda en mer dynaisk grupp-anmälnings-
       upplevelse
@@ -14521,13 +14521,12 @@ sv:
   student_name: Elevnamn
   student_name_c45b2a7: Elevnamn
   student_name_hidden_b894d102: "elev (dolt namn)"
-  student_names_must_be_hidden_because_anonymous_gra_d2ca7255: "Elevnamn måste döljas egersom anonym betygsattning krävs."
+  student_names_must_be_hidden_because_anonymous_gra_d2ca7255: "Elevnamn måste döljas eftersom anonym bedömning är aktiverad."
   student_names_must_be_hidden_because_this_is_an_an_3c82287d: "Elevnamn måste döljas efter som detta är en anonym undersökning."
   student_outcome_gradebook_description: |-
-      Elev måluppfyllelse Betygsboken erbjuder ett sätt för elever att snabbt se sin utveckling
-      för kurs lärandemål. Lärandemålen presenteras i ett Betygsboks-liknande
-      format och utvecklingen visas i både numeriska poäng och bemästrad/nära
-      mastery/stöd.
+      Elevöverblick för Måluppfyllelse ger eleven en överblick över kursutvecklingen 
+      baserat på kursens lärandemål. Resultatet presenteras i ett Betygsboks-liknande
+      format och utvecklingen visas i både siffror och definierade kategorier.
   student_summary: 
     student_summary_table_ascending: "Elevens sammanfattningstabell är sorterad i stigande ordning efter %{sortText}"
     student_summary_table_descending: "Elevens sammanfattningstabell är sorterad i sjunkande ordning efter %{sortText}"
@@ -15640,11 +15639,11 @@ sv:
       headings: 
         current_score: "Nuvarande poäng"
         final_score: Slutpoäng
-        last_interaction: "Senaste elevintegreringen"
+        last_interaction: "Senaste interaktionen"
         last_journal_entry: "Senaste fakultetsjournalsinlägget"
         student_name: Student
         teacher_activity: "Lärar-aktivitetsrapport för %{teacher}"
-        ungraded: "Ej betygsatta uppgifter"
+        ungraded: "Ej bedömda uppgifter"
       last_time: 
         one: "1 dag sen"
         other: "%{count} dagar sen"
@@ -15741,7 +15740,7 @@ sv:
   week_s_cb1492ee: Vecka(or)
   welcome_to_the_canvas_theme_editor_73091d1: "Välkommen till Canvas Theme Editor"
   welcome_to_your_courses_to_customize_the_list_of_c_22de652e: "Välkommen till dina kuser! För att ändra listan av kurser, klickar du på \"Alla kurser\" länken och stjärnmarkerar de kurser du vill visa. "
-  well_below_mastery_37664bdc: "Lång under mastery"
+  well_below_mastery_37664bdc: "Når inte målen"
   what_should_the_csv_file_look_like_985a59ac: "Hur ser CSV filen ut?"
   when_enabled_global_javascript_and_css_files_can_b_ea21d216: "När den är aktiverad kan javascript och CSS-filer laddas upp i *%{t_theme_editor}*"
   when_people_visit_the_course_this_is_the_page_they_de94acc2: "Det här är sidan man ser när man besöker din kurs. Du kan välja om den ska visa en kursström, en lista över kursmoduler, en kursplan eller en sidan som du skapat. Den är förinställd på kursström."
@@ -15845,7 +15844,7 @@ sv:
       revision_summary: "*%{updated_at}* av %{edited_by}"
       same_as_latest: "Samma som *Senaste*"
     wiki_page_revisions: 
-      revision_history: Granskningshitorik
+      revision_history: Sidhistorik
   wiki_page: 
     atom_author: Wikisida
     atom_entry_title: "Wikisida, %{course_or_group_name}: %{page_title}"
