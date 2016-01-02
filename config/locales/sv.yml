@@ -5703,7 +5703,7 @@ sv:
   enrollment_term_7bfe840: Anmälningstermin
   enrollments_e250c9c3: Inskrivningar
   enter_a_hexcode_here_to_use_a_custom_color_51ecccce: "Uppge en hexkod här för att använda en färg."
-  enter_your_question_and_multiple_answers_31370054: "Ange din fråga och flera svar"
+  enter_your_question_and_multiple_answers_31370054: "Skrivfråga fråga och flera svarsalternativ"
   enter_your_question_specifying_where_each_blank_sh_2c6e8035: "Skriv din fråga och specifiera var varje tom ruta ska vara. Elever måste skriva in svaret i varje tom ruta."
   enter_your_question_specifying_where_each_dropdown_b428a9ff: "Ange din fråga, specifiera var varje \"dropdown\" ska vara. Definiera sedan möjliga svar för varje."
   enter_your_question_text_4729b886: "Ange din frågetext."
@@ -6834,7 +6834,7 @@ sv:
         hide_names: "Dölj elevnamn in SpeedGrader"
         show_assessment_by: "Visa utvärderingar efter"
         showing: Visar
-        sort_by: "Ordna lista av elever"
+        sort_by: "Ordna elevlista"
       late_notice: "Observera: Den här inlämningen var SEN"
       links: 
         click_to_view: "klicka här för att visa"
@@ -6951,7 +6951,7 @@ sv:
     titles: 
       grading_scheme_info: "Visa/Redigera Betygsschema"
   grading_type_type_7d8b42d7: "Betygstyp: %{type}"
-  great_so_you_ve_got_a_course_now_what_well_before__38cfba67: "Perfekt, nu har du en kurs. Vad händer nu? Innan du publicerar den för världen bör du kontrollera att du har lagt ut grunderna. Gå igenom listan till vänster för att se till att din kurs är redo att användas."
+  great_so_you_ve_got_a_course_now_what_well_before__38cfba67: "Perfekt, nu har du en kurs. Vad händer nu? Innan du publicerar den för världen bör du kontrollera att du har grunden klar. Gå igenom listan till vänster för att se till att din kurs är redo att användas."
   green_15af4778: Grön
   group: 
     greater_than_1: "Måsta vara högre än 1"
@@ -7021,7 +7021,7 @@ sv:
       buttons: 
         create_category: "Skapa kategori"
       default_name_for_groups: Projektgrupper
-      group_limit_blank: "(lämnas blank för noll begränsning)"
+      group_limit_blank: "(lämnas tom om ingen begränsning finns)"
       group_structure_group_limit: "*Begränsa grupper till* %{group_limit} medlemmar"
       group_structure_self_signup: "*Skapa* %{number_of_groups} *grupper nu*"
       group_structure_standard: "*Dela in eleverna i* %{number_of_groups} *jämna grupper*"
@@ -7382,7 +7382,7 @@ sv:
     please_select_one: "Vänligen välj en..."
     report_problem: "Rapportera ett problem"
     report_problem_sub: "Om Canvas inte beter sig som det ska, berätta det för oss"
-    search_the_canvas_guides: "Sök i Canvas Guiderna"
+    search_the_canvas_guides: "Sök i Canvas Guider"
     see_if_your_issue_is_addressed_in_the_canvas_guides: "Se om ditt problem nämns i *Canvas Guiderna*."
     send_message: "Skicka meddelande"
     sending: Skickar..
@@ -7484,7 +7484,7 @@ sv:
   if_you_do_not_select_usage_rights_now_this_file_wi_40c42125: "Om du inte väljer användarättigheter nu kommer filen vara avpublicerad efter att den laddats upp."
   if_you_enable_this_feature_be_sure_that_your_sales_566967e6: "Om du aktiverar den här funktionen måste du se till att ditt salesforce konto har dessa fälten tillagda exakt med namnen från vänstra kolumnen i tabellen. "
   if_you_leave_the_zip_file_download_currently_being_c47c1dfb: "Om du lämnar kommer nedladdningen av zipfilen som just förbretts att avbrytas. "
-  if_you_ve_been_using_another_course_management_sys_67edfab1: "Om du har använt ett annat system för kurshantering kommer du förmodligen ha saker där som du vill fytta över till Canvas. Vi kan vägleda dig genom processen så att du enkelt kan migrera ditt innehåll till Canvas."
+  if_you_ve_been_using_another_course_management_sys_67edfab1: "Om ni tidigare använt en lärplattform har ni förmoldigen material fär som ni vill fytta över till Canvas. Vi kan vägleda dig genom processen så att du enkelt kan migrera ditt innehåll till Canvas."
   if_you_would_like_to_keep_your_unsubmitted_comment_b7e349ce: "Om du vill behåll ej lämnade kommentarer måste du spara dem innan du lämnar den här sidan."
   ignore_91750df8: Ignorera
   ignore_assignment_738b3c99: "Ignorera uppgift"
@@ -7522,10 +7522,10 @@ sv:
     due_dates_warning: "Kunde inte justera sista dagarna."
     file_import_warning: "Filen %{file} hittades inte"
   importers/learning_outcome_group_importer: 
-    no_global_permission: "Du har inte tillåtelse att hantera globala lärandemål, kan inte lägga till \"%{title}\""
+    no_global_permission: "Du har inte rättighet att hantera globala lärandemål, kan inte lägga till \"%{title}\""
   importers/learning_outcome_importer: 
     no_context_found: "Det externa lärandemålet hittades inte för \"%{title}\", skapar en kopia."
-    no_global_permission: "Du har inte tillåtelse att hantera globala lärandemål, kan inte lägga till \"%{title}\""
+    no_global_permission: "Du har inte rättigheter att hantera globala lärandemål, kan inte lägga till \"%{title}\""
   importers/rubric_importer: 
     no_context_found: "Den externa matrisen hittades inte för \"%{title}\", skapar en kopia."
   importers/wiki_page_importer: 
@@ -7752,7 +7752,7 @@ sv:
       student_view: 
         leave: "Lämna Stundentvy"
         reset: "Återställ elev"
-        reset_explanation: "Återställa testeleven kommer rensa elevens historik, så att du kan se kursen som en helt ny elev."
+        reset_explanation: "Genom att återställa testeleven kommer all historik att rensas, så att du kan se kursen som en helt ny elev."
         warning_title: "Du är för tillfället inloggad i Stundentvy"
     head: 
       default_page_title: "Canvas LMS"
@@ -9888,7 +9888,7 @@ sv:
   moderate_assignment_name_cf59e0a7: "Moderera: %{assignment_name}"
   moderate_d0c85e92: Moderare
   moderate_grades_4f43f85d: "Moderera betyg"
-  moderated_grading_allows_multiple_graders_to_grade_5c0d53db: "Modererade betyg låter flera betygsättare betygsätta valda uppgifter på egen hand, med en moderator som ger slutbetyget."
+  moderated_grading_allows_multiple_graders_to_grade_5c0d53db: "Modererade bedömning låter flera betygsättare bedömma valda uppgifter på egen hand, med en moderator som ger slutbetyget."
   moderated_grading_cannot_be_enabled_for_group_assi_7e947ab7: "Moderering av grupper kan inte aktiveras för gruppuppgifter"
   moderated_grading_cannot_be_enabled_for_peer_revie_6b7eedc1: "Moderering av betyg kan inte aktiveras för granskade uppgifter"
   moderated_grading_e6127f72: "Modererade bedömning"
@@ -10021,8 +10021,8 @@ sv:
         prerequisites: Förutsättningar
         published: Publicerad
     progression_module_collection: 
-      module_progress_for: "Modul-utveckling för *%{student.name}*"
-      module_progress_for_student: "Modul-utveckling för %{student.name}"
+      module_progress_for: "Framsteg i modul av *%{student.name}*"
+      module_progress_for_student: "Framsteg i modul av %{student.name}"
       no_modules_found: "Inga moduler hittades"
     progression_module_view: 
       items: "Föremål att slutföra"
@@ -10032,7 +10032,7 @@ sv:
     progressions_index: 
       back_to_modules: "Tillbaka till modulsidan"
       no_students_found: "Inga elever hittades"
-      progression_header: Modul-utveckling
+      progression_header: "Framsteg i modul"
       student_progress: Elevutveckling
     relock_modules: "Lås moduler igen"
     requirements_changed: "Kraven har ändrats"
@@ -10351,7 +10351,7 @@ sv:
       submission_comment_for_teacher: "Inlämningskommentar för lärare"
       submission_grade_changed: "Inlämningsbetyg ändrat"
       submission_graded: "Inlämning betygsatt"
-      submission_needs_grading: "Inlämningen måste betygsättas"
+      submission_needs_grading: "Inlämningen måste bedömmas"
       summaries: Sammanfattningar
       updated_wiki_page: "Uppdaterad Wikisida"
       web_conference_invitation: "Inbjudan till webb-konferens"
@@ -10930,8 +10930,8 @@ sv:
         redirect_uri: "Omdirigiera URI"
         token_uri: "Token URI"
     grade_export: 
-      description: "Betygsexportering för SIS"
-      name: Betygsexport
+      description: "Export av betyg till SIS"
+      name: "Export av betyg"
     grade_export_settings: 
       description: |-
           Den här pluginen tillåter att slutbetyg publiceras tillbaka på en elevs informationssystem (SIS). När den aktiveras kommer användaren få ett alternativ att publicera betygen när den besöker betygsboken. Detta kommer ske med en POST-begäran att specifiera publiceringens slutpunkt. Varje typ definierar sitt eget innehåll och mimtyp. Slutpunktens svar spelar ingen roll och ignoreras för tillfället.
@@ -11257,7 +11257,7 @@ sv:
     please_select_an_option: "Vänligen välj ett alternativ"
     profile: 
       access_token_description: "Tillgångstokens kan användas för att tillåta att applikationer gör API calls i ditt namn. Du kan också generera tillgångstokens och *använda Canvas Open API* för att skapa dina egna integrationer."
-      approved_integrations: "Det här är tredjehands-applikationerna som du har gett tillåtelse att använda Canvas i ditt namn:"
+      approved_integrations: "Nedan syns externa applikationer du har godkänt:"
       buttons: 
         add_picture_file: "Lägg till fil"
         authorize_google_docs: "Tillåt tillgång för Google Docs"
@@ -11395,7 +11395,7 @@ sv:
           Dessa aviseringarna kommer skickas som direkta meddelanden till dig själv\n\
           från dig själv, och kommer därför inte synas i det offentliga flödet. "
       unknown_service: Okänd
-      web_services: "Canvas kan göra ditt liv mycket enklare genom att ansluta sig till de webb-verktyg du readn använder. Klicka på tjänsterna i \"Andra tjänster\" för att se vad jag menar."
+      web_services: "Canvas kan göra ert jobb mycket enklare genom att ansluta weebbverktygen ni redan använder. Klicka på tjänsterna i \"Andra tjänster\" för att se vad vi menar."
       yo_description: |-
           Yo är ett en-klick och karaktörslöst kommunikationsverkty.
           Om du har ett Yo-konto kan d uregistrear det här. Om du sedan låter
@@ -11447,7 +11447,7 @@ sv:
       headers: 
         contact_type: Typ
         email_addresses: E-postadresser
-        other_contact: "Andra kontakter"
+        other_contact: "Andra kontaktuppgifter"
         ways_to_contact: Kontaktuppgifter
       labels: 
         carrier: Telefonföretag
@@ -12000,7 +12000,7 @@ sv:
       correct_answer: "Korrekt svar"
       message_text: Meddelandetext
       other_incorrect_matches: "Andra inkorrekta matchningsalternativ"
-      possible_answer: "Möjligt svar"
+      possible_answer: Svarsalternativ
     ldb_login_popup: 
       email: E-post
       log_in: "Logga in"
@@ -12180,7 +12180,7 @@ sv:
       equations_help: 
         equation_functions: "Utöver variabler finns där också en samling hjälpsamma funktioner som du kan använda för att genererar användbara värden. Till exempel %{example} för att se en beskrivning av en hjälpfunktion, välj från listan nedanför:"
         equation_intro: "Uträknade svar baseras på en eller fler formler som räknas ut i rätt ordning. Du kan definiera direkta varibler i de här formlerna, fast det numeriska resultatet av den sista formeln är vad som genererar rätt svar. Till exempel: %{example} för den här samlingen formler är rätt svar 71. Eftersom det inte finns några förbestämda variabler kommer alla elever ha samma fråga med samma svar. Se \"variabel\" -fliken för mer information om variabler."
-        equation_variables2: "Du kan också definera variabler i din frågetext genom att använda klasser (\"Vad är [a] + [b]?\") För varje variabel kommer du se ett \"Exempel värde\" baserat på variabelinställningarna. Det låter dig kontrollera din matte och se till att formlerna fungerar. Till exempel, om en fråga är \"Vad är [a] + 5?\" blir du frågad att definiera vad variabel \"a\" är. Om exempel värdet för \"a\" är 5.2 kan du skriva: %{example} Med den här formeln kan du generera alla nummer till alla set med lösningar, fast med ett nytt värde för \"a\" i varje set. En elev kanske ser frågan \"Vad är 5.2 + 5?\", medans en annan kanske ser \"Vad är 9 + 5?\". "
+        equation_variables2: "Du kan också definera variabler i din frågetext genom att använda klasser (\"Vad är [a] + [b]?\") För varje variabel kommer du se ett \"Exempel värde\" baserat på variabelinställningarna. Det låter dig kontrollera din matte och se till att formlerna fungerar. Till exempel, om en fråga är \"Vad är [a] + 5?\" blir du frågad att definiera vad variabel \"a\" är. Om exempel värdet för \"a\" är 5.2 kan du skriva: %{example} Med den här formeln kan du generera nummer till lösningsversionerna, fast med ett nytt värde för \"a\" i varje version. En elev kanske ser frågan \"Vad är 5.2 + 5?\", medans en annan kanske ser \"Vad är 9 + 5?\". "
         links: 
           functions: Funktioner
           intro: Intro
@@ -12228,7 +12228,7 @@ sv:
         answer_with_precision_accessible: "*exakt svar* med värdesiffror #precision#"
         exact_answer_with_error_margin_accessible: "*exakt svar* med felmarginalen  #error margin#"
         labels: 
-          answer_comments: "Kommentarer, om eleven väljer det här svaret"
+          answer_comments: "Kommentarer, om eleven väljer det här svarsalternativet"
           answer_in_range: "Svar i intervallet"
           answer_with_precision: "Svar med värdesiffror"
           exact_answer: "Exakt svar"
@@ -12253,24 +12253,26 @@ sv:
         explanation: 
           generate_possible_solutions: "Slutligen, bygg så många variabel-lösningskombinationer som du behöver för quizen."
         explanations: 
-          calculated: "Ange din fråga, bygg en formel, och generera ett set av möjliga svarskombinationer. Elever kommer se frågan med ett slumpmässigt valt set av i fyllda variabler, och de måste skriva in rätt numeriska svar."
+          calculated: "Skriv din fråga, bygg en formel och skapa sedan flera olika svarskombinationer. Den som svara kommer se frågan med slumpmässigt ifyllda variabler och måste skriva in korrekt numeriskt värde."
           equations: "Du kan definiera variabler genom att skriva in variabelnamnet inom parantes"
           essay: "Elever kommer ges ett textfält där de ska skriva in sitt svar."
           file_upload: "Elever kan ladda upp en fil som svar."
-          fill_in_multiple_blanks: "Ange din fråga, specifiera var varje tomruta ska vara. Därefter definierar du de rätta svaren för varje tomruta. Elever måste skriva in rätt svar i textrutorna för varje tomruta. "
+          fill_in_multiple_blanks: "Ange din fråga, specifiera var varje tomruta ska vara. Definiera sedan de rätta svaren för varje tomruta. Elever måste skriva in rätt svar i textrutorna för varje tomruta. "
           formula_definition: "Efter det måste du skriva formeln eller formlerna som används för att räkna ut rätt svar. Använda samma variabelnamn som nämns ovan."
-          matching: "Bygg par av matchande värden. Elever kommer se värdena till vänster och måste välja rätt matchande värde i en rullgardinsmeny till höger. Flera radera kan ha samma svar, och du kan lägga till distraktioner till höger."
+          matching: "Bygg par som ska matchas ihop. Elever kommer se värdena till vänster och måste välja rätt matchande värde i en rullgardinsmeny till höger. Flera radera kan ha samma svar, och du kan lägga till distraktioner (felaktiga svar) till höger."
           missing_word: "Definiera text som ska vara innan och efter rullgardinen. Bygg ett sätt av möjliga svar och välj ett korrekt svar."
-          multi_answer_sets: "I rutan nedanför, på varje plats du vill ha en svarsruta, skriv in ett referensord (inga mellanslag) inom parantes."
+          multi_answer_sets: |-
+              På varje plats du vill ha en svarsruta, i rutan nedanför, skriv du in ett referensord (inga mellanslag) inom alt-parantes [	] (t.ex. "Rosor	
+              är [färg1],	violer är [färg2]").
           multiple_answers: "Den här frågan kommer visa en checkruta bredvid varje svar, och eleverna måste välja ALLA svaren som du märkt som korrekta."
-          multiple_choice: "Ange din fråga och flera svar, välj sedan ett korrekt svar."
-          multiple_dropdowns: "Ange din fråga, specifiera vart varje rullgardin ska vara. Definiera sedan möjliga svar för varje rullgardin, med ett korrekt svar på rullgardin."
-          numerical: "Definiera rätt svar som vilket nummer som helst mellan två nummer, eller ett nummer plus eller minus lite felmarginal. Elever kommer ges en tom textruta där de ska skriva in sitt numeriska svar."
+          multiple_choice: "Skriv din fråga och flera möjliga svar och välj sedan korrekt svar."
+          multiple_dropdowns: "Skriv din fråga, specifiera vart varje rullgardin ska vara. Definiera sedan olika svarsalternativ för varje rullgardin, med ett korrekt svar på rullgardin."
+          numerical: "Definiera detta rätta svaret som ett nummer, mellan två nummer, eller ett nummer med plus eller minus felmarginal. Elever kommer få se frågan följd av en lite textruta där de ska ange sitt svar."
           short_answer: |-
-              Ange din svarstext, definera sedan alla korrekta svar för de tomma rutorna.
+              Ange din fråga, definera sedan alla korrekta svar för de tomma rutorna.
               Elever kommer se frågan följd av en lite textruta där de ska ange sitt svar.
           text_only: "Den här \"frågan\" kommer inte ge poäng, men kan vara användbar för att introducera flera liknande frågor."
-          true_false: "Ange din frågetext, välj sedan om Sant eller Falskt är rätt svar."
+          true_false: "Skriv din fråga och välj sedan om Sant eller Falskt är rätt svar."
           variable_definitions: "När du har angivit variablerna ovan bör du se dem listade här. Du kan specifiera ett urval av möjliga värden för varje variabel nedanför."
         general_answer_comments: "Genrella svarskommentarer"
         headers: 
@@ -12304,15 +12306,15 @@ sv:
         question_type: 
           calculated: Formelfråga
           essay: Uppsatsfråga
-          file_upload: Filuppladdningsfråga
-          fill_in_multiple_blanks: "Fyll i flera tomma rutor"
+          file_upload: Filuppladdning
+          fill_in_multiple_blanks: "Fyll i det som saknas på flera ställen"
           matching: "Para ihop"
           missing_word: "Saknade ord"
-          multiple_answers: "Flera svar"
-          multiple_choice: "Flera val"
+          multiple_answers: "Flera korrekta svar"
+          multiple_choice: "Flera svarsalternativ"
           multiple_dropdowns: "Flera rullgardiner"
           numerical: "Numeriskt svar"
-          short_answer: "Fyll i de tomma rutorna"
+          short_answer: "Fyll i det som saknas"
           text_only: "Text (ingen fråga)"
           true_false: Sant/Falskt
         show_possible_answers: "Visa möjliga svar för %{question}"
@@ -13112,10 +13114,10 @@ sv:
       app_profiling: Applikationsprofilering
       become_user: "Bli andra användare"
       change_course_state: "Ändra status på kurs"
-      comment_on_others_submissions: "Visa alla elevers inlämningar och lämna kommentarer om dem"
+      comment_on_others_submissions: "Visa alla elevers inlämningar och skriv kommentarer"
       create_accounts: "Skapa nya root-konton"
       create_collaborations: "Skapa elevsamarbeten"
-      create_conferences: "Skapa webb-konferenser"
+      create_conferences: "Skapa webbkonferenser"
       manage_account_memberships: "Lägg till/ta bort andra administratörer för kontot"
       manage_account_settings: "Hantera konto-nivåinställningar"
       manage_admin_users: "Lägg till/ta bort lärare, kursdesigners eller lärarassistenter från kursen"
@@ -13226,8 +13228,8 @@ sv:
     roles_collection_view: 
       add_role: "Lägg till roll"
     roles_override_index: 
-      account_roles: Kontoroller
-      course_roles: Kursroller
+      account_roles: "Roller på konto"
+      course_roles: "Roller i kurs"
       page_header_title: Kontotillsånd
   rootFoldersFinder: 
     course_files: Kursfiler
@@ -14853,7 +14855,7 @@ sv:
   the_app_was_deactivated_573520ab: "Appen har avaktiverats"
   the_app_was_updated_successfully_3d71cd1b: "Appen uppdaterades"
   the_error_stack_trace_if_there_is_one_b7e008a1: "Stackspåret, om det finns"
-  the_files_tab_is_the_place_to_share_lecture_slides_95a93bce: "Filfliken är där du delar kursblad, exempel dokument, studiehjälp -- allt som dina elever kommer vilja ladda ner. Ladda upp och organisera din filer är enkelt med Canvas. Vi kommer visa dig hur."
+  the_files_tab_is_the_place_to_share_lecture_slides_95a93bce: "Under meyn Filer delar du kursblad, dokument, vägledning -- allt som dina elever kommer vilja ladda ner. Ladda upp och organisera din filer är enkelt i Canvas. Vi kommer visa dig hur."
   the_following_fields_are_invalid_fields_b3565800: "Följande fält är ogiltiga: %{fields}"
   the_full_hostname_for_the_account_instance_somethi_e325da1f: "Fullständiga värdnamnet för konto-instansen (something.instructure.com, for example)"
   the_grading_period_was_deleted_7814a349: "Betygsperioden har raderats"
@@ -15642,7 +15644,7 @@ sv:
         last_interaction: "Senaste interaktionen"
         last_journal_entry: "Senaste fakultetsjournalsinlägget"
         student_name: Student
-        teacher_activity: "Lärar-aktivitetsrapport för %{teacher}"
+        teacher_activity: "Aktivitetsrapport för %{teacher}"
         ungraded: "Ej bedömda uppgifter"
       last_time: 
         one: "1 dag sen"
@@ -15657,7 +15659,7 @@ sv:
         one: "inlämnad för 1 dag sen"
         other: "inlämnad för %{count} dagar sen"
         zero: "inlämnad för mindre än 1 dag sen"
-      title: Lärar-aktivitetsrapport
+      title: "Aktivitetsrapport för"
     twitter_added: "Twitter tillgång bekräftad!"
     twitter_fail_whale: "Verifiering av Twitter misslyckades. Vänligen försök igen"
     user_dashboard: 
@@ -15688,9 +15690,9 @@ sv:
   video_content_is_not_supported_by_your_device_or_a_25214f57: "Videoinnehållet stöds inte av din enhet eller app."
   view_analytics_91a3b7a: "Visa analyser"
   view_app_center_6c89a3fe: "visa app-center"
-  view_app_configurations_52b52441: "Visa app-konfigurationer"
+  view_app_configurations_52b52441: "Visa konfiguration av appar"
   view_ba339f93: Visa
-  view_course_analytics_eefe6b2: "Visa kursanalyser"
+  view_course_analytics_eefe6b2: "Visa analys av kurs"
   view_file_8a1c62e5: "Visa fil"
   view_grades_8d3bae6c: "Visa betyg"
   view_name_app_62a2ad8e: "Visa %{name} appen"
@@ -15949,7 +15951,7 @@ sv:
   you_have_submitted_the_assignment_7ef8a51a: "Du har lämnat in uppgiften"
   you_ll_definitely_want_some_of_these_what_s_the_fu_f4f3578b: "Du vill såklart har några av dessa. Hur kul är det att undervisa i en kurs om ingen lyssnar?"
   you_ll_need_a_refresh_token_follow_the_steps_at_th_79a3984b: "Du måste uppdatera token, följ stegen i den här länken, du kan behöva hjälp från en expert"
-  you_may_want_to_assign_some_tas_to_help_you_with_t_702244aa: "Du kan anmäla några lärarassistenter att hjälpa dig med kursen. Lärarassistenter kan betygsätta elevers inlämningar, hjälpa till att styra över diskussioner och uppdatera sista dagen och uppgiftsdetaljer åt dig."
+  you_may_want_to_assign_some_tas_to_help_you_with_t_702244aa: "Du kan bjuda in kollegor som hjälper dig med kursen. De kan hjälpa dig betygsätta, kontrollera diskussioner och uppdatera kalendern och uppgifter åt dig."
   you_must_log_in_to_view_replies_9ccd4da0: "Du måste logga in för att se svar"
   you_must_select_a_course_to_copy_content_from_e7bd9e09: "Du måste välja en kurs att kopiera innehåll från"
   you_must_set_it_to_a_number_greater_than_or_equal__eb1d9275: "Du måste ställa in det som ett nummer högre eller jämnvärdigt med %{min}"
