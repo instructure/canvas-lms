@@ -209,46 +209,46 @@ describe "assignment groups" do
   it "should allow quick-adding an assignment to a group", priority: "1", test_id: 210083 do
     @course.require_assignment_group
     ag = @course.assignment_groups.first
-    time = Timecop.freeze(Time.now.year,2,7,4,15).utc
-    current_time = time.strftime('%b %-d at %-l:%M') << time.strftime('%p').downcase
-    assignment_name, assignment_points = ["Do this", "13"]
+    time = DateTime.new(Time.now.year,2,7,4,15)
+    Timecop.freeze(time) do
+      current_time = time.strftime('%b %-d at %-l:%M') << time.strftime('%p').downcase
+      assignment_name, assignment_points = ["Do this", "13"]
 
-    # Navigates to assignments index page.
-    get "/courses/#{@course.id}/assignments"
-    wait_for_ajaximations
+      # Navigates to assignments index page.
+      get "/courses/#{@course.id}/assignments"
+      wait_for_ajaximations
 
-    # Finds and clicks the Add Assignment button on an assignment group.
-    f("#assignment_group_#{ag.id} .add_assignment").click
-    wait_for_ajaximations
+      # Finds and clicks the Add Assignment button on an assignment group.
+      f("#assignment_group_#{ag.id} .add_assignment").click
+      wait_for_ajaximations
 
-    # Enters in values for Name, Due, and Points, then clicks save.
-    replace_content(f("#ag_#{ag.id}_assignment_name"), assignment_name)
-    replace_content(f("#ag_#{ag.id}_assignment_due_at"), current_time)
-    replace_content(f("#ag_#{ag.id}_assignment_points"), assignment_points)
-    fj('.create_assignment:visible').click
-    wait_for_ajaximations
+      # Enters in values for Name, Due, and Points, then clicks save.
+      replace_content(f("#ag_#{ag.id}_assignment_name"), assignment_name)
+      replace_content(f("#ag_#{ag.id}_assignment_due_at"), current_time)
+      replace_content(f("#ag_#{ag.id}_assignment_points"), assignment_points)
+      fj('.create_assignment:visible').click
+      wait_for_ajaximations
 
-    # Checks for correct values in back end.
-    a = ag.reload.assignments.last
-    expect(a.name).to eq "Do this"
-    expect(a.due_at).to eq time
-    expect(a.points_possible).to eq 13
+      # Checks for correct values in back end.
+      a = ag.reload.assignments.last
+      expect(a.name).to eq "Do this"
+      expect(a.due_at).to eq time
+      expect(a.points_possible).to eq 13
 
-    # Checks Assignments Index page UI for correct values.
-    expect(ff("#assignment_group_#{ag.id} .ig-title").last.text).to match "#{assignment_name}"
-    expect(ff("#assignment_group_#{ag.id} .assignment-date-due").last.text).to match current_time
-    expect(f("#assignment_#{a.id} .non-screenreader").text).to match "#{assignment_points} pts"
+      # Checks Assignments Index page UI for correct values.
+      expect(ff("#assignment_group_#{ag.id} .ig-title").last.text).to match "#{assignment_name}"
+      expect(ff("#assignment_group_#{ag.id} .assignment-date-due").last.text).to match current_time
+      expect(f("#assignment_#{a.id} .non-screenreader").text).to match "#{assignment_points} pts"
 
-    # Navigates to Assignment Show page.
-    get "/courses/#{@course.id}/assignments/#{a.id}"
-    wait_for_ajaximations
+      # Navigates to Assignment Show page.
+      get "/courses/#{@course.id}/assignments/#{a.id}"
+      wait_for_ajaximations
 
-    # Checks Assignment Show page for correct values.
-    expect(f(".title").text).to match "#{assignment_name}"
-    expect(f(".points_possible").text).to match "#{assignment_points}"
-    expect(f(".assignment_dates").text).to match "#{current_time}"
-    Timecop.return
-
+      # Checks Assignment Show page for correct values.
+      expect(f(".title").text).to match "#{assignment_name}"
+      expect(f(".points_possible").text).to match "#{assignment_points}"
+      expect(f(".assignment_dates").text).to match "#{current_time}"
+    end
   end
 
   it "should allow quick-adding two assignments to a group (dealing with form re-render)", priority: "2", test_id: 210084 do
