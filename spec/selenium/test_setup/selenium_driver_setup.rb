@@ -11,6 +11,9 @@ module SeleniumDriverSetup
       Selenium::WebDriver.const_get(browser.to_s.capitalize).path = path
     end
 
+    run_headless = ENV.key?("TEST_ENV_NUMBER")
+    set_up_display_buffer if run_headless
+
     driver = if browser == :firefox
                firefox_driver
              elsif browser == :chrome
@@ -19,9 +22,34 @@ module SeleniumDriverSetup
                ie_driver
              end
 
+    focus_viewport driver if run_headless
+
     driver.manage.timeouts.implicit_wait = 3
     driver.manage.timeouts.script_timeout = 60
+
     driver
+  end
+
+  def set_up_display_buffer
+    require "headless"
+
+    test_number = ENV["TEST_ENV_NUMBER"]
+    # it'll be '', '2', '3', '4'...
+    test_number = test_number.blank? ? 1 : test_number.to_i
+    # start at 21 to avoid conflicts with other test runner Xvfb stuff
+
+    display = 20 + test_number
+    Headless.new(display: display, dimensions: "2000x2000x24").start
+    puts "Setting up DISPLAY=#{ENV['DISPLAY']}"
+  end
+
+  def focus_viewport(driver)
+    # force the viewport to have focus right away; otherwise certain specs
+    # will fail unless they follow another dialog accepting/dismissing spec,
+    # since they rely on focus/blur events, which don't fire if the window
+    # doesn't have focus
+    driver.execute_script "alert('yolo')"
+    driver.switch_to.alert.accept
   end
 
   def ie_driver
@@ -151,8 +179,6 @@ module SeleniumDriverSetup
 
   def firefox_profile
     profile = Selenium::WebDriver::Firefox::Profile.new
-    profile.load_no_focus_lib=(true)
-    profile.native_events = true
     profile.add_extension Rails.root.join("spec/selenium/test_setup/JSErrorCollector.xpi")
 
     if $selenium_config[:firefox_profile].present?

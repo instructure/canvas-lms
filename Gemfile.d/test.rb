@@ -38,6 +38,7 @@ group :test do
   gem 'yard-appendix', '>=0.1.8'
   gem 'timecop', '0.6.3'
   gem 'jira_ref_parser', '1.0.0'
+  gem 'headless', '2.2.0', require: false
 
   unless CANVAS_RAILS4_0
     gem 'rails-dom-testing', '1.0.7'
