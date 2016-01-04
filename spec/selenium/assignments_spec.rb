@@ -130,7 +130,7 @@ describe "assignments" do
     it "should create an assignment using main add button", priority: "1", test_id: 132582 do
       assignment_name = 'first assignment'
       # freeze for a certain time, so we don't get unexpected ui complications
-      time = Timecop.freeze(2015,1,7,2,13)
+      time = Timecop.freeze(Time.now.year,1,7,2,13)
       due_at = time.strftime('%b %-d at %-l:%M') << time.strftime('%p').downcase
 
       get "/courses/#{@course.id}/assignments"

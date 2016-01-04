@@ -98,13 +98,12 @@ describe "calendar2" do
         click_option(f('.context_id'), @course.name)
         expect_new_page_load { f('.more_options_link').click }
         expect(f('.title').attribute('value')).to eq "Test Event"
-        expect(fj("input[type=text][name= 'start_date']").attribute('value')).
-                                                                to include(Time.zone.now.strftime('%b %d'))
         f('#duplicate_event').click
         replace_content(fj("input[type=number][name= 'duplicate_count']"), 2)
         expect_new_page_load{submit_form(f('#editCalendareventFull'))}
         expect(CalendarEvent.count).to eq(3)
         repeat_event = CalendarEvent.where(title: "Test Event")
+        expect((repeat_event[0].start_at).to_date).to eq(Time.zone.now.to_date)
         expect((repeat_event[1].start_at).to_date).to eq((Time.zone.now + 1.week).to_date)
         expect((repeat_event[2].start_at).to_date).to eq((Time.zone.now + 2.weeks).to_date)
       end

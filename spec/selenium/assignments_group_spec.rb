@@ -209,7 +209,7 @@ describe "assignment groups" do
   it "should allow quick-adding an assignment to a group", priority: "1", test_id: 210083 do
     @course.require_assignment_group
     ag = @course.assignment_groups.first
-    time = Timecop.freeze(2015,2,7,4,15).utc
+    time = Timecop.freeze(Time.now.year,2,7,4,15).utc
     current_time = time.strftime('%b %-d at %-l:%M') << time.strftime('%p').downcase
     assignment_name, assignment_points = ["Do this", "13"]
 

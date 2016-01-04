@@ -53,17 +53,16 @@ describe "calendar2" do
         event_dialog.find('#assignment_title').send_keys('saturday assignment')
         event_dialog.find('.datetime_field').clear
         # take next week's monday and advance to saturday from the current date
-        due_date = Time.zone.today.next_week.advance(days: 5).strftime("Sat %b %d, %Y 8:00pm")
+        due_date = "Dec 26, 2015 at 8:00pm"
         event_dialog.find('.datetime_field').send_keys(due_date)
         assignment_form = event_dialog.find('#edit_assignment_form')
         submit_form(assignment_form)
         wait_for_ajaximations
-        fj('.navigate_next').click unless fj('.fc-content')
-        wait_for_ajaximations
+        quick_jump_to_date("Dec 26, 2015")
         fj('.fc-event').click
         wait_for_ajaximations
-        due_at = "Due: #{Time.zone.today.next_week.advance(days: 5).strftime('%b%e, %Y at 8:00pm')}"
-        expect(fj('.event-details-timestring')).to include_text(due_at)
+
+        expect(fj('.event-details-timestring')).to include_text("Due: #{due_date}")
       end
 
       it "should show short events at full height" do
