@@ -16,11 +16,10 @@ describe "Wiki Pages" do
   end
 
   context "Navigation" do
-    def edit_page(edit_text = nil)
+    def edit_page(edit_text)
       get "/courses/#{@course.id}/pages/Page1/edit"
-      toggle_html_mode
-      f('textarea').send_keys(edit_text)
-      fj('button:contains("Save")').click
+      add_text_to_tiny(edit_text)
+      expect_new_page_load { fj('button:contains("Save")').click }
     end
 
     before do
@@ -114,6 +113,7 @@ describe "Wiki Pages" do
       driver.execute_script("window.open()")
       driver.switch_to.window(driver.window_handles.last)
       edit_page('test')
+      driver.execute_script("window.close()")
       driver.switch_to.window(driver.window_handles.first)
       get "/courses/#{@course.id}/pages/Page1/edit"
       toggle_html_mode
