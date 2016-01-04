@@ -472,63 +472,6 @@ describe Message do
     end
   end
 
-  describe '.context_type' do
-    it 'returns the correct representation of a quiz regrade run' do
-      message = message_model
-      regrade = Quizzes::QuizRegrade.create(:user_id => user_model.id, :quiz_id => quiz_model.id, :quiz_version => 1)
-      regrade_run = Quizzes::QuizRegradeRun.create(quiz_regrade_id: regrade.id)
-
-      message.context = regrade_run
-      message.save
-      expect(message.context_type).to eq "Quizzes::QuizRegradeRun"
-
-      Message.where(id: message).update_all(context_type: 'QuizRegradeRun')
-
-      expect(Message.find(message.id).context_type).to eq 'Quizzes::QuizRegradeRun'
-    end
-
-    it 'returns the correct representation of a quiz submission' do
-      message = message_model
-      submission = quiz_model.quiz_submissions.create!
-      message.context = submission
-      message.save
-      expect(message.context_type).to eq 'Quizzes::QuizSubmission'
-
-      Message.where(id: message).update_all(context_type: 'QuizSubmission')
-
-      expect(Message.find(message.id).context_type).to eq 'Quizzes::QuizSubmission'
-    end
-  end
-
-  describe '.asset_context_type' do
-    it 'returns the correct representation of a quiz regrade run' do
-      message = message_model
-      regrade = Quizzes::QuizRegrade.create(:user_id => user_model.id, :quiz_id => quiz_model.id, :quiz_version => 1)
-      regrade_run = Quizzes::QuizRegradeRun.create(quiz_regrade_id: regrade.id)
-
-      message.asset_context = regrade_run
-      message.save
-      expect(message.asset_context_type).to eq "Quizzes::QuizRegradeRun"
-
-      Message.where(id: message).update_all(asset_context_type: 'QuizRegradeRun')
-
-      expect(Message.find(message.id).asset_context_type).to eq 'Quizzes::QuizRegradeRun'
-    end
-
-    it 'returns the correct representation of a quiz submission' do
-      message = message_model
-      submission = quiz_model.quiz_submissions.create!
-      message.asset_context = submission
-      message.save
-      expect(message.asset_context_type).to eq 'Quizzes::QuizSubmission'
-
-      Message.where(id: message).update_all(asset_context_type: 'QuizSubmission')
-
-      expect(Message.find(message.id).asset_context_type).to eq 'Quizzes::QuizSubmission'
-    end
-
-  end
-
   describe "author interface" do
     let(:user) { user_model(short_name: "Jon Stewart", email: 'jon@example.com') }
     let(:authorless_message) { message_model(context: course_model(account: Account.default), context_type: 'Account', context_id: Account.default.id) }

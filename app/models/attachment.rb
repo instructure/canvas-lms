@@ -37,10 +37,6 @@ class Attachment < ActiveRecord::Base
 
   EXPORTABLE_ASSOCIATIONS = [:context, :folder, :user, :media_object, :submission].freeze
 
-  include PolymorphicTypeOverride
-  override_polymorphic_types context_type: {'QuizStatistics' => 'Quizzes::QuizStatistics',
-                                            'QuizSubmission' => 'Quizzes::QuizSubmission'}
-
   EXCLUDED_COPY_ATTRIBUTES = %w{id root_attachment_id uuid folder_id user_id
                                 filename namespace workflow_state}
 

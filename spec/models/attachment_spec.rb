@@ -1401,20 +1401,6 @@ describe Attachment do
     end
   end
 
-  describe '.context_type' do
-    it 'returns the correct representation of a quiz statistics relation' do
-      stats = Quizzes::QuizStatistics.create!(report_type: 'student_analysis')
-      attachment = attachment_obj_with_context(Account.default.default_enrollment_term)
-      attachment.context = stats
-      attachment.save
-      expect(attachment.context_type).to eq "Quizzes::QuizStatistics"
-
-      Attachment.where(id: attachment).update_all(context_type: 'QuizStatistics')
-
-      expect(Attachment.find(attachment.id).context_type).to eq 'Quizzes::QuizStatistics'
-    end
-  end
-
   describe ".clone_url_as_attachment" do
     it "should reject invalid urls" do
       expect { Attachment.clone_url_as_attachment("ftp://some/stuff") }.to raise_error(ArgumentError)

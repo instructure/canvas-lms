@@ -17,9 +17,6 @@
 #
 
 class Progress < ActiveRecord::Base
-  include PolymorphicTypeOverride
-  override_polymorphic_types context_type: {'QuizStatistics' => 'Quizzes::QuizStatistics'}
-
   validates :context_type, inclusion: {
     in: [
       'ContentMigration', 'Course', 'User', 'Quizzes::QuizStatistics', 'Account',

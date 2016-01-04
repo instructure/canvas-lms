@@ -331,18 +331,4 @@ describe DelayedMessage do
       end
     end
   end
-
-  describe '.context_type' do
-    it 'returns the correct representation of a quiz submission' do
-      message = delayed_message_model
-      submission = quiz_model.quiz_submissions.create!
-      message.context = submission
-      message.save
-      expect(message.context_type).to eq 'Quizzes::QuizSubmission'
-
-      DelayedMessage.where(id: message).update_all(context_type: 'QuizSubmission')
-
-      expect(DelayedMessage.find(message.id).context_type).to eq 'Quizzes::QuizSubmission'
-    end
-  end
 end

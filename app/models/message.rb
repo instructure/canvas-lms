@@ -22,12 +22,6 @@ class Message < ActiveRecord::Base
   # Included modules
   include Rails.application.routes.url_helpers
 
-  include PolymorphicTypeOverride
-  override_polymorphic_types context_type: {'QuizSubmission' => 'Quizzes::QuizSubmission',
-                                            'QuizRegradeRun' => 'Quizzes::QuizRegradeRun'},
-                             asset_context_type: {'QuizSubmission' => 'Quizzes::QuizSubmission',
-                                                  'QuizRegradeRun' => 'Quizzes::QuizRegradeRun'}
-
   include ERB::Util
   include SendToStream
   include TextHelper
