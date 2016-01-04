@@ -119,8 +119,8 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
   def question_data
     if data = read_attribute(:question_data)
       if data.class == Hash
-        # TODO: a reader shouldn't write ?????????????????????
-        data = write_attribute(:question_data, data.with_indifferent_access)
+        write_attribute(:question_data, data.with_indifferent_access)
+        data = read_attribute(:question_data)
       end
     end
 

@@ -3,10 +3,7 @@ require 'active_support/callbacks/suspension'
 class ActiveRecord::Base
   self.cache_timestamp_format = :usec
 
-  def write_attribute(attr_name, *args)
-    value = super
-    (CANVAS_RAILS4_0 && value.is_a?(ActiveRecord::AttributeMethods::Serialization::Attribute)) ? value.value : value
-  end
+  public :write_attribute
 
   class << self
     delegate :distinct_on, to: :all

@@ -272,7 +272,7 @@ class MediaObject < ActiveRecord::Base
   end
 
   def data
-    self.read_attribute(:data) || self.write_attribute(:data, {})
+    self.read_or_initialize_attribute(:data, {})
   end
 
   def viewed!
