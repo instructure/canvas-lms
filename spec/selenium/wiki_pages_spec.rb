@@ -9,7 +9,10 @@ describe "Wiki Pages" do
   include WikiAndTinyCommon
 
   def toggle_html_mode
-    keep_trying_until { fj('a.switch_views:visible').click }
+    keep_trying_until do
+      fj('a.switch_views:visible').present?
+    end
+    fj('a.switch_views:visible').click
   end
 
   context "Navigation" do
@@ -401,14 +404,11 @@ describe "Wiki Pages" do
         ff(".revision-details")[1].click
         expect(f('.restore-link')).to be_present
         f('.restore-link').click
-        keep_trying_until do
-          f('.close-button').click
-        end
+        f('.close-button').click
         wait_for_ajaximations
         f('.icon-edit').click
-        keep_trying_until do
-          f('.btn-primary').click
-        end
+        f('.btn-primary').click
+        wait_for_ajaximations
         expect(f('div.user_content.clearfix.enhanced > p').text).to include 'published by teacher'
       end
     end
