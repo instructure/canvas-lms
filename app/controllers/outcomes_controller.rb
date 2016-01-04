@@ -21,6 +21,7 @@ class OutcomesController < ApplicationController
   before_filter :require_context, :except => [:build_outcomes]
   add_crumb(proc { t "#crumbs.outcomes", "Outcomes" }, :except => [:destroy, :build_outcomes]) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_outcomes_path }
   before_filter { |c| c.active_tab = "outcomes" }
+  before_filter :rich_content_service_config, only: [:show, :index]
 
   def index
     return unless authorized_action(@context, @current_user, :read)
@@ -284,5 +285,10 @@ class OutcomesController < ApplicationController
       end
       format.html { redirect_to named_context_url(@context, :context_outcomes_url) }
     end
+  end
+
+  protected
+  def rich_content_service_config
+    js_env(Services::RichContent.env_for(@domain_root_account))
   end
 end

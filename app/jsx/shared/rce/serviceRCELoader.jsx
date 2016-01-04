@@ -75,7 +75,8 @@ define([
 
     loadOnTarget(target, tinyMCEInitOptions, host) {
       const textarea = this.getTargetTextarea(target)
-      const renderingTarget = this.getRenderingTarget(textarea)
+      const getTargetFn = tinyMCEInitOptions.getRenderingTarget || this.getRenderingTarget
+      const renderingTarget = getTargetFn(textarea)
       const propsForRCE = this.createRCEProps(textarea, tinyMCEInitOptions)
 
       const renderCallback = function(rceInstance){

@@ -65,13 +65,35 @@ define [
     targetTextarea = RCELoader.getTargetTextarea(d)
     equal targetTextarea.id, "theTarget"
 
-  test 'returns the textareas parent as the renderingTarget', ->
+  test 'returns the textareas parent as the renderingTarget when no custom function given', ->
     d = @elementInFixtures('div')
     ta = document.createElement('textarea')
     ta.setAttribute("id", "theTarget")
     d.appendChild(ta)
     renderingTarget = RCELoader.getRenderingTarget(ta)
     equal renderingTarget, d
+
+  test 'uses a custom get target function if given', ->
+    d = @elementInFixtures('div')
+    ta = document.createElement('textarea')
+    d.appendChild(ta)
+    customFn = ()->
+      return "someCustomTarget"
+
+    originalLoadRCE = RCELoader.loadRCE
+    RCELoader.loadRCE = sinon.spy()
+
+    renderIntoDivSpy = sinon.spy()
+    fakeRCE = { renderIntoDiv: renderIntoDivSpy}
+
+    # execute renderIntoDivSpy
+    RCELoader.loadOnTarget(ta, {getRenderingTarget: customFn}, "www.some-host.com")
+    call = RCELoader.loadRCE.getCall(0)
+    call.args[1](fakeRCE)
+
+    ok renderIntoDivSpy.calledWith("someCustomTarget")
+
+    RCELoader.loadOnTarget = originalLoadRCE
 
   # propsForRCE construction
 
