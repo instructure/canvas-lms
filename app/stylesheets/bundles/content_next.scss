@@ -216,6 +216,9 @@ input.move-module-label-spacer {
 .prereq-req-item {
   flex: 1 1 1;
   padding-right: 5px;
+  .option {
+    display: block;
+  }
 }
 
 .points_possible {
