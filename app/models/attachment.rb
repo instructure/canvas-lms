@@ -26,16 +26,6 @@ class Attachment < ActiveRecord::Base
     best_unicode_collation_key(col)
   end
   attr_accessible :context, :folder, :filename, :display_name, :user, :locked, :position, :lock_at, :unlock_at, :uploaded_data, :hidden
-  EXPORTABLE_ATTRIBUTES = [
-    :id, :context_id, :context_type, :size, :folder_id, :content_type,
-    :filename, :uuid, :display_name, :created_at, :updated_at,
-    :workflow_state, :user_id, :locked, :file_state, :deleted_at,
-    :position, :lock_at, :unlock_at, :last_lock_at, :last_unlock_at,
-    :could_be_locked, :root_attachment_id, :cloned_item_id,
-    :namespace, :media_entry_id, :encoding, :need_notify, :upload_error_message
-  ].freeze
-
-  EXPORTABLE_ASSOCIATIONS = [:context, :folder, :user, :media_object, :submission].freeze
 
   EXCLUDED_COPY_ATTRIBUTES = %w{id root_attachment_id uuid folder_id user_id
                                 filename namespace workflow_state}

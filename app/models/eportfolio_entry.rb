@@ -25,11 +25,6 @@ class EportfolioEntry < ActiveRecord::Base
   belongs_to :eportfolio, touch: true
   belongs_to :eportfolio_category
 
-  EXPORTABLE_ATTRIBUTES = [:id, :eportfolio_id, :eportfolio_category_id,
-                           :position, :name, :allow_comments, :show_comments,
-                           :slug, :url, :content, :created_at, :updated_at].freeze
-  EXPORTABLE_ASSOCIATIONS = [:eportfolio, :eportfolio_category].freeze
-
   acts_as_list :scope => :eportfolio_category
   before_save :infer_unique_slug
   before_save :infer_comment_visibility

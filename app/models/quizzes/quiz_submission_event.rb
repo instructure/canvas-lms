@@ -19,48 +19,6 @@
 class Quizzes::QuizSubmissionEvent < ActiveRecord::Base
   include CanvasPartman::Concerns::Partitioned
 
-  EXPORTABLE_ASSOCIATIONS = [ :quiz_submission ]
-  EXPORTABLE_ATTRIBUTES = [
-    :id,
-    :quiz_submission_id,
-
-    # @property [Integer] attempt
-    #
-    # The quiz submission attempt in which the event was recorded.
-    :attempt,
-
-    # @property [String] event_type
-    #
-    # The "action" this event describes. Right now the only supported event
-    # is EVT_QUESTION_ANSWERED.
-    :event_type,
-
-    # @property [Hash|String|Nil] event_data
-    #
-    # The extra serialized data for this event.
-    :event_data,
-
-    # @property [DateTime] client_timestamp
-    #
-    # The timestamp at which the event was recorded at the client.
-    :client_timestamp,
-
-    # @property [DateTime] created_at
-    #
-    # The timestamp at which the event was recorded to the database.
-    :created_at,
-
-    # @property [AnswerRecord[]]
-    # @alias event_data
-    #
-    # Set of answers to all quiz questions at the time the event was
-    # recorded. See the relevant object for what's inside the :answer
-    # field.
-    #
-    # This is present only for EVT_QUESTION_ANSWERED events.
-    :answers
-  ]
-
   # An event describing the student choosing an answer to a question.
   EVT_QUESTION_ANSWERED = "question_answered".freeze
   EVT_QUESTION_FLAGGED = "question_flagged".freeze

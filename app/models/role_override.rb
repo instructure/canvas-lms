@@ -25,9 +25,6 @@ class RoleOverride < ActiveRecord::Base
 
   attr_accessible :context, :permission, :role, :enabled, :applies_to_self, :applies_to_descendants
 
-  EXPORTABLE_ATTRIBUTES = [:id, :enrollment_type, :permission, :enabled, :locked, :context_id, :context_type, :created_at, :updated_at, :applies_to_self, :applies_to_descendants]
-  EXPORTABLE_ASSOCIATIONS = [:context]
-
   validate :must_apply_to_something
 
   def must_apply_to_something

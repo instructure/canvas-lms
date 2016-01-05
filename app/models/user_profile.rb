@@ -25,9 +25,6 @@ class UserProfile < ActiveRecord::Base
 
   has_many :links, :class_name => 'UserProfileLink', :dependent => :destroy
 
-  EXPORTABLE_ATTRIBUTES = [:id, :bio, :title, :user_id]
-  EXPORTABLE_ASSOCIATIONS = [:user, :links]
-
   validates_length_of :title, :maximum => maximum_string_length, :allow_blank => true
 
   TAB_PROFILE, TAB_COMMUNICATION_PREFERENCES, TAB_FILES, TAB_EPORTFOLIOS, TAB_LOGOUT,

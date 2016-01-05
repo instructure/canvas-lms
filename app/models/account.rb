@@ -26,20 +26,6 @@ class Account < ActiveRecord::Base
     :default_storage_quota_mb, :storage_quota, :ip_filters, :default_locale,
     :default_user_storage_quota_mb, :default_group_storage_quota_mb, :integration_id, :brand_config_md5
 
-  EXPORTABLE_ATTRIBUTES = [:id, :name, :created_at, :updated_at, :workflow_state, :deleted_at,
-    :default_time_zone, :external_status, :storage_quota,
-    :enable_user_notes, :allowed_services, :turnitin_pledge, :turnitin_comments,
-    :turnitin_account_id, :allow_sis_import, :sis_source_id, :equella_endpoint,
-    :settings, :uuid, :default_locale, :default_user_storage_quota, :turnitin_host,
-    :created_by_id, :lti_guid, :default_group_storage_quota, :lti_context_id
-  ]
-
-  EXPORTABLE_ASSOCIATIONS = [
-    :courses, :group_categories, :groups, :enrollment_terms, :enrollments, :account_users, :course_sections,
-    :pseudonyms, :attachments, :folders, :active_assignments, :grading_standards, :assessment_question_banks,
-    :roles, :announcements, :alerts, :course_account_associations, :user_account_associations
-  ]
-
   INSTANCE_GUID_SUFFIX = 'canvas-lms'
 
   include Workflow

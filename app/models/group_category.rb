@@ -28,12 +28,6 @@ class GroupCategory < ActiveRecord::Base
   has_many :progresses, :as => 'context', :dependent => :destroy
   has_one :current_progress, -> { where(workflow_state: ['queued', 'running']).order(:created_at) }, as: 'context', class_name: 'Progress'
 
-  EXPORTABLE_ATTRIBUTES = [ :id, :context_id, :context_type, :name, :role,
-    :deleted_at, :self_signup, :group_limit, :auto_leader
-  ]
-
-  EXPORTABLE_ASSOCIATIONS = [:context, :groups, :assignments]
-
   after_save :auto_create_groups
   after_update :update_groups_max_membership
 

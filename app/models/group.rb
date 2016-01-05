@@ -66,21 +66,6 @@ class Group < ActiveRecord::Base
   belongs_to :avatar_attachment, :class_name => "Attachment"
   belongs_to :leader, :class_name => "User"
 
-  EXPORTABLE_ATTRIBUTES = [
-    :id, :name, :workflow_state, :created_at, :updated_at, :context_id,
-    :context_type, :category, :max_membership, :is_public, :account_id,
-    :default_wiki_editing_roles, :wiki_id, :deleted_at, :join_level,
-    :default_view, :storage_quota, :uuid, :root_account_id, :sis_source_id,
-    :sis_batch_id, :group_category_id, :description, :avatar_attachment_id
-  ].freeze
-
-  EXPORTABLE_ASSOCIATIONS = [
-    :users, :group_memberships, :users, :context, :group_category, :account,
-    :root_account, :calendar_events, :discussion_topics, :discussion_entries,
-    :announcements, :attachments, :folders, :collaborators, :wiki,
-    :web_conferences, :collaborations, :media_objects, :avatar_attachment
-  ].freeze
-
   before_validation :ensure_defaults
   before_save :maintain_category_attribute
   before_save :update_max_membership_from_group_category

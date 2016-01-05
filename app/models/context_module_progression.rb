@@ -23,9 +23,6 @@ class ContextModuleProgression < ActiveRecord::Base
   belongs_to :user
   before_save :set_completed_at
 
-  EXPORTABLE_ATTRIBUTES = [:id, :context_module_id, :user_id, :requirements_met, :workflow_state, :created_at, :updated_at, :collapsed, :current_position, :completed_at]
-  EXPORTABLE_ASSOCIATIONS = [:context_module, :user]
-
   after_save :touch_user
 
   serialize :requirements_met, Array

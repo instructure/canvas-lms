@@ -29,14 +29,6 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
 
   GRACEFUL_FINISHED_AT_DRIFT_PERIOD = 5.minutes
 
-  EXPORTABLE_ATTRIBUTES = [
-    :id, :quiz_id, :quiz_version, :user_id, :submission_data, :submission_id, :score, :kept_score, :quiz_data, :started_at, :end_at, :finished_at, :attempt, :workflow_state,
-    :created_at, :updated_at, :fudge_points, :quiz_points_possible, :extra_attempts, :temporary_user_code, :extra_time, :manually_unlocked, :manually_scored, :score_before_regrade, :was_preview,
-    :has_seen_results
-  ]
-
-  EXPORTABLE_ASSOCIATIONS = [:quiz, :user, :submission, :attachments]
-
   validates_presence_of :quiz_id
   validates_numericality_of :extra_time, greater_than_or_equal_to: 0,
     less_than_or_equal_to: 10080, # one week

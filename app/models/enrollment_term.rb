@@ -28,12 +28,6 @@ class EnrollmentTerm < ActiveRecord::Base
   has_many :enrollments, :through => :courses
   has_many :course_sections
 
-  EXPORTABLE_ATTRIBUTES = [
-    :id, :root_account_id, :name, :term_code, :sis_source_id, :sis_batch_id, :start_at, :end_at, :accepting_enrollments, :can_manually_enroll, :created_at,
-    :updated_at, :workflow_state
-  ]
-  EXPORTABLE_ASSOCIATIONS = [:root_account, :enrollment_dates_overrides, :courses, :course_sections]
-
   validates_presence_of :root_account_id, :workflow_state
   validate :check_if_deletable
 

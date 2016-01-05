@@ -25,9 +25,6 @@ class ContentParticipation < ActiveRecord::Base
   validates_inclusion_of :content_type, :allow_nil => true, :in => ['Submission']
   belongs_to :user
 
-  EXPORTABLE_ATTRIBUTES = [:id, :content_type, :content_id, :user_id, :workflow_state]
-  EXPORTABLE_ASSOCIATIONS = [:content, :user]
-
   after_save :update_participation_count
 
   validates_presence_of :content_type, :content_id, :user_id, :workflow_state
