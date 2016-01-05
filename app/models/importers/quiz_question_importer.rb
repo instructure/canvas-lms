@@ -16,9 +16,10 @@ module Importers
       hash[:points_possible] = 0 if hash[:points_possible].to_f < 0
 
       mig_id = qq_hash['quiz_question_migration_id'] || qq_hash['migration_id']
+
       if id = qq_ids[mig_id]
         Quizzes::QuizQuestion.where(id: id).update_all(quiz_group_id: quiz_group,
-          assessment_question_id: hash['assessment_question_id'], question_data: hash.to_yaml,
+          assessment_question_id: hash['assessment_question_id'], question_data: CANVAS_RAILS4_0 ? hash.to_yaml : hash,
           created_at: Time.now.utc, updated_at: Time.now.utc, migration_id: mig_id,
           position: position)
       else
