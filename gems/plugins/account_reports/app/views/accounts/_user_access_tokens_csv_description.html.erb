@@ -1,0 +1,38 @@
+<p><%= t('account_reports.default.user_access_token.text',
+         %{This report shows users with access tokens.}) %></p>
+
+<h3><%= t('#account_reports.default.description.header', %{Example}) %></h3>
+
+<table class="report_example">
+  <thead>
+  <tr>
+    <th><%= t('#account_reports.report_header_user_id', %{user id}) %></th>
+    <th><%= t('#account_reports.report_header_user_name', %{user name}) %></th>
+    <th><%= t('#account_reports.report_header_token_hint', %{token hint}) %></th>
+    <th><%= t('#account_reports.report_header_expiration', %{expiration}) %></th>
+    <th><%= t('#account_reports.report_header_token_last_used', %{last used}) %></th>
+    <th><%= t('#account_reports.report_header_token_dev_key_id', %{dev key id}) %></th>
+    <th><%= t('#account_reports.report_header_token_dev_key_name', %{dev key name}) %></th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+    <td>u96872</td>
+    <td>smith, heather</td>
+    <td>yXj1V</td>
+    <td>2019-12-12 12:12:12</td>
+    <td>2015-12-24 04:13:12</td>
+    <td>10000000000002</td>
+    <td>User Generated</td>
+  </tr>
+  <tr>
+    <td>u48956</td>
+    <td>Montgomery, Montgomery</td>
+    <td>FeFQi</td>
+    <td>2019-12-12 12:12:12</td>
+    <td>2015-12-24 04:13:12</td>
+    <td>123</td>
+    <td>August's Tool of Unfortunate Events</td>
+  </tr>
+  </tbody>
+</table>

@@ -286,6 +286,12 @@ module AccountReports
               :description => 'The course to report on'
             }
           }
+        },
+        'user_access_tokens_csv' => {
+          :title => proc { I18n.t(:user_access_tokens_title, 'User Access Tokens') },
+          :description_partial => true,
+          :parameters => {
+          }
         }
       }
     end

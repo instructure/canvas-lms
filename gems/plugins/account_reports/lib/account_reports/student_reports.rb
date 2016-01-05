@@ -346,5 +346,60 @@ module AccountReports
       end
       send_report(file)
     end
+
+    def user_access_tokens
+      file = AccountReports.generate_file(@account_report)
+      CSV.open(file, "w") do |csv|
+
+        headers = []
+        headers << I18n.t('#account_reports.report_header_user_id', 'user id')
+        headers << I18n.t('#account_reports.report_header_user_name', 'user name')
+        headers << I18n.t('#account_reports.report_header_token_hint', 'token hint')
+        headers << I18n.t('#account_reports.report_header_expiration', 'expiration')
+        headers << I18n.t('#account_reports.report_header_token_last_used', 'last used')
+        headers << I18n.t('#account_reports.report_header_token_dev_key_id', 'dev key id')
+        headers << I18n.t('#account_reports.report_header_token_dev_key_name', 'dev key name')
+        csv << headers
+
+        columns = []
+        columns << 'access_tokens.user_id'
+        columns << 'users.sortable_name'
+        columns << 'access_tokens.token_hint'
+        columns << 'access_tokens.expires_at'
+        columns << 'access_tokens.last_used_at'
+        columns << 'access_tokens.developer_key_id'
+
+        user_tokens = AccessToken
+                        .select(columns)
+                        .joins(user: {pseudonym: :account})
+                        .where("accounts.id = ? OR accounts.root_account_id = ?", root_account, root_account)
+                        .order("users.id, sortable_name, last_used_at DESC")
+
+        user_tokens = add_user_sub_account_scope(user_tokens)
+
+
+        Shackles.activate(:slave) do
+          user_tokens.each do |token|
+            dev_key = developer_key(token[:developer_key_id])
+
+            row = []
+            row << token[:user_id]
+            row << token[:sortable_name]
+            row << token[:token_hint]
+            row << (token[:expires_at] ? default_timezone_format(token[:expires_at]) : 'never')
+            row << (token[:last_used_at] ? default_timezone_format(token[:last_used_at]) : 'never')
+            row << token[:developer_key_id]
+            row << dev_key.name
+            csv << row
+          end
+        end
+      end
+      send_report(file)
+    end
+
+    def developer_key(dev_key_id)
+      @dev_keys ||= {}
+      @dev_keys[dev_key_id] ||= DeveloperKey.find(dev_key_id)
+    end
   end
 end

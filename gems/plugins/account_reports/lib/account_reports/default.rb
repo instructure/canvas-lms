@@ -70,5 +70,9 @@ module AccountReports
     def self.last_enrollment_activity_csv(account_report)
       StudentReports.new(account_report).last_enrollment_activity
     end
+
+    def self.user_access_tokens_csv(account_report)
+      StudentReports.new(account_report).user_access_tokens
+    end
   end
 end
