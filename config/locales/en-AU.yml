@@ -590,7 +590,7 @@ en-AU:
       homepage_link: Homepage
       more_count: 
         one: "1 more"
-        other: "%{count} mores"
+        other: "%{count} more"
       none: none
       settings_link: Settings
       sis_id_label: "SIS ID"
