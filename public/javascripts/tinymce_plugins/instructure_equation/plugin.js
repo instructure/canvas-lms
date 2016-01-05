@@ -18,16 +18,15 @@
 
 define([
   'compiled/editor/stocktiny',
+  'compiled/views/tinymce/EquationEditorView',
   'i18n!editor',
   'str/htmlEscape'
-], function(tinymce, I18n, htmlEscape) {
+], function(tinymce, EquationEditorView, I18n, htmlEscape) {
 
   tinymce.create('tinymce.plugins.InstructureEquation', {
     init : function(ed, url) {
       ed.addCommand('instructureEquation', function() {
-        require(['compiled/views/tinymce/EquationEditorView'], function(EquationEditorView){
-          new EquationEditorView(ed);
-        });
+        new EquationEditorView(ed);
       });
 
       ed.addButton('instructure_equation', {
