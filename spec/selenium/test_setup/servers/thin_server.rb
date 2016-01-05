@@ -5,7 +5,7 @@ class SpecFriendlyThinServer
   def self.run(app, options = {})
     bind_address = options[:BindAddress] || IPSocket.getaddress(Socket.gethostname)
     port = options[:Port]
-    @server = Thin::Server.new(bind_address, port, app)
+    @server = Thin::Server.new(bind_address, port, app, signals: false)
     Thin::Logging.logger = Rails.logger
     Thread.new do
       Thread.current.abort_on_exception = true

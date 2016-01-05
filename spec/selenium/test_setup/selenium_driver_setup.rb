@@ -20,6 +20,7 @@ module SeleniumDriverSetup
              end
 
     driver.manage.timeouts.implicit_wait = 3
+    driver.manage.timeouts.script_timeout = 60
     driver
   end
 

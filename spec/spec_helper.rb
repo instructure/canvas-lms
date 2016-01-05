@@ -32,23 +32,8 @@ RSpec.configure do |c|
     Timeout::timeout(180) do
       Rails.logger.info "STARTING SPEC #{example.full_description}"
       example.run
-      exception = example.example.exception
-      case exception
-      when EOFError, Errno::ECONNREFUSED
-        if $selenium_driver
-          puts "SELENIUM: webdriver socket closed the connection.  Will try to re-initialize."
-          # this will cause the selenium driver to get re-initialized if it
-          # crashes for some reason
-          $selenium_driver = nil
-        end
-      end
     end
   end
-end
-
-begin
-  ; require File.expand_path(File.dirname(__FILE__) + "/../parallelized_specs/lib/parallelized_specs.rb");
-rescue LoadError;
 end
 
 ENV["RAILS_ENV"] = 'test'
