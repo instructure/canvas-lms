@@ -289,10 +289,10 @@ class ContentExport < ActiveRecord::Base
     ['created', 'exporting'].member? self.workflow_state
   end
 
-  alias_method :destroy!, :destroy
+  alias_method :destroy_permanently!, :destroy
   def destroy
     self.workflow_state = 'deleted'
-    self.attachment.destroy! if self.attachment
+    self.attachment.destroy_permanently! if self.attachment
     save!
   end
 

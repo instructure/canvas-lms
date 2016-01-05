@@ -812,7 +812,7 @@ describe ContextModule do
         @student_1 = student_in_course(course: @course, active_all: true).user
         @student_2 = student_in_course(course: @course, active_all: true).user
 
-        @student_1.enrollments.each(&:destroy!)
+        @student_1.enrollments.each(&:destroy_permanently!)
         @overriden_section = @course.course_sections.create!(name: "test section")
         student_in_section(@overriden_section, user: @student_1)
 
@@ -1090,7 +1090,7 @@ describe ContextModule do
       @student_1 = student_in_course(course: @course, active_all: true).user
       @student_2 = student_in_course(course: @course, active_all: true).user
 
-      @student_1.enrollments.each(&:destroy!)
+      @student_1.enrollments.each(&:destroy_permanently!)
       @overriden_section = @course.course_sections.create!(name: "test section")
       student_in_section(@overriden_section, user: @student_1)
 

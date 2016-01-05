@@ -257,7 +257,7 @@ class CourseSection < ActiveRecord::Base
     state :deleted
   end
 
-  alias_method :destroy!, :destroy
+  alias_method :destroy_permanently!, :destroy
   def destroy
     self.workflow_state = 'deleted'
     self.enrollments.not_fake.each(&:destroy)

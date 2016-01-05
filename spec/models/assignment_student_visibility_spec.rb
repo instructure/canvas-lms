@@ -185,21 +185,21 @@ describe "differentiated_assignments" do
           before{enroller_user_in_section(@section_foo)}
           it "should keep the assignment visible if there is a grade" do
             @assignment.grade_student(@user, {grade: 10})
-            @user.enrollments.each(&:destroy!)
+            @user.enrollments.each(&:destroy_permanently!)
             enroller_user_in_section(@section_bar, {user: @user})
             ensure_user_sees_assignment
           end
 
           it "should not keep the assignment visible if there is no grade" do
             @assignment.grade_student(@user, {grade: nil})
-            @user.enrollments.each(&:destroy!)
+            @user.enrollments.each(&:destroy_permanently!)
             enroller_user_in_section(@section_bar, {user: @user})
             ensure_user_does_not_see_assignment
           end
 
           it "should keep the assignment visible if the grade is zero" do
             @assignment.grade_student(@user, {grade: 0})
-            @user.enrollments.each(&:destroy!)
+            @user.enrollments.each(&:destroy_permanently!)
             enroller_user_in_section(@section_bar, {user: @user})
             ensure_user_sees_assignment
           end
@@ -223,12 +223,12 @@ describe "differentiated_assignments" do
           it "should update when enrollments change" do
             ensure_user_sees_assignment
             enrollments = StudentEnrollment.where(:user_id => @user.id, :course_id => @course.id, :course_section_id => @section_foo.id)
-            enrollments.each(&:destroy!)
+            enrollments.each(&:destroy_permanently!)
             ensure_user_does_not_see_assignment
           end
           it "should update when the override is deleted" do
             ensure_user_sees_assignment
-            @assignment.assignment_overrides.each(&:destroy!)
+            @assignment.assignment_overrides.each(&:destroy_permanently!)
             ensure_user_does_not_see_assignment
           end
           it "should not return duplicate visibilities with multiple visible sections" do

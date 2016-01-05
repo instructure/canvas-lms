@@ -777,7 +777,7 @@ class DiscussionTopic < ActiveRecord::Base
     end
   end
 
-  alias_method :destroy!, :destroy
+  alias_method :destroy_permanently!, :destroy
   def destroy
     ContentTag.delete_for(self)
     self.workflow_state = 'deleted'

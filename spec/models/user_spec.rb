@@ -1947,7 +1947,7 @@ describe User do
     def create_course_with_assignment_needing_submitting(opts={})
       student = opts[:student]
       course_with_student_logged_in(:active_all => true, :user => student)
-      @course.enrollments.each(&:destroy!) #student removed from default section
+      @course.enrollments.each(&:destroy_permanently!) #student removed from default section
       section = @course.course_sections.create!
       student_in_section(section, user: student)
       assignment_quiz([], :course => @course, :user => student)

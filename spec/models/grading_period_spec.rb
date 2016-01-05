@@ -67,8 +67,8 @@ describe GradingPeriod do
     end
   end
 
-  describe "#destroy!" do
-    before { subject.destroy! }
+  describe "#destroy_permanently!" do
+    before { subject.destroy_permanently! }
 
     it { is_expected.to be_destroyed }
   end

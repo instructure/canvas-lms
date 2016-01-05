@@ -13,7 +13,7 @@ class FixDuplicateCommunicationChannels < ActiveRecord::Migration
       DelayedMessage.where(communication_channel_id: all).delete_all
       # it has a dependent: :destroy, but that does them one by one, which could take forever
       NotificationPolicy.where(communication_channel_id: all).delete_all
-      all.each(&:destroy!)
+      all.each(&:destroy_permanently!)
     end
 
     if connection.adapter_name == 'PostgreSQL'

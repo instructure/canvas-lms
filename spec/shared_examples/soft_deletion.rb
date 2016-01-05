@@ -47,7 +47,7 @@ shared_examples "soft deletion" do
 
     # Use Mocha to test this.
     it "calls save"
-    it "calls save! if destroy! was called"
+    it "calls save! if destroy_permanently! was called"
 
     it "triggers destroy callbacks"
   end

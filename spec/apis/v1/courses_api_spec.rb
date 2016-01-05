@@ -1173,7 +1173,7 @@ describe CoursesController, type: :request do
         @course2.enrollments.scope.delete_all
         @course2.course_account_associations.scope.delete_all
         @course2.course_sections.scope.delete_all
-        @course2.destroy!
+        @course2.destroy_permanently!
         json = api_call(:put, @path + "?event=offer&course_ids[]=#{@course1.id}&course_ids[]=#{@course2.id}",
                         @params.merge(:event => 'offer', :course_ids => [@course1.id.to_s, @course2.id.to_s]))
         run_jobs
@@ -1235,7 +1235,7 @@ describe CoursesController, type: :request do
         @course2.enrollments.scope.delete_all
         @course2.course_account_associations.scope.delete_all
         @course2.course_sections.scope.delete_all
-        @course2.destroy!
+        @course2.destroy_permanently!
         json = api_call(:put, @path + "?event=offer&course_ids[]=#{@course2.id}",
                         @params.merge(:event => 'offer', :course_ids => [@course2.id.to_s]))
         run_jobs

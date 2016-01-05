@@ -1404,7 +1404,7 @@ describe 'Submissions API', type: :request do
         end
 
         it "should not return the submissons if the student is not in the overriden section and has a submission with no grade" do
-          @student.enrollments.each(&:destroy!)
+          @student.enrollments.each(&:destroy_permanently!)
           student_in_section(@section2, user: @student)
           @assignment.grade_student(@student, grade: nil)
 
@@ -1414,7 +1414,7 @@ describe 'Submissions API', type: :request do
         end
 
         it "should return the submissons if the student is not in the overriden section but has a graded submission" do
-          @student.enrollments.each(&:destroy!)
+          @student.enrollments.each(&:destroy_permanently!)
           student_in_section(@section2, user: @student)
           @assignment.grade_student(@student, grade: 5)
 
@@ -1428,7 +1428,7 @@ describe 'Submissions API', type: :request do
       context "differentiated_assignments off" do
         before {@course.disable_feature!(:differentiated_assignments)}
         it "should return the submission regardless of section" do
-          @student.enrollments.each(&:destroy!)
+          @student.enrollments.each(&:destroy_permanently!)
           student_in_section(@section2, user: @student)
           json = call_to_for_students(as_student: true)
 
@@ -1455,7 +1455,7 @@ describe 'Submissions API', type: :request do
         end
 
         it "should not return the submissons if the observed student is not in the overriden section and has a submission with no grade" do
-          @student.enrollments.each(&:destroy!)
+          @student.enrollments.each(&:destroy_permanently!)
           student_in_section(@section2, user: @student)
           @assignment.grade_student(@student, grade: nil)
 
@@ -1465,7 +1465,7 @@ describe 'Submissions API', type: :request do
         end
 
         it "should return the submissons if the observed student is not in the overriden section but has a graded submission" do
-          @student.enrollments.each(&:destroy!)
+          @student.enrollments.each(&:destroy_permanently!)
           student_in_section(@section2, user: @student)
           @assignment.grade_student(@student, grade: 5)
 
@@ -1479,7 +1479,7 @@ describe 'Submissions API', type: :request do
       context "differentiated_assignments off" do
         before {@course.disable_feature!(:differentiated_assignments)}
         it "should return the submission regardless of observed students section" do
-          @student.enrollments.each(&:destroy!)
+          @student.enrollments.each(&:destroy_permanently!)
           student_in_section(@section2, user: @student)
           json = call_to_for_students(as_observer: true)
 
@@ -1500,7 +1500,7 @@ describe 'Submissions API', type: :request do
         end
 
         it "should return the submissons even if the student is not in the overriden section" do
-          @student.enrollments.each(&:destroy!)
+          @student.enrollments.each(&:destroy_permanently!)
           student_in_section(@section2, user: @student)
 
           json = call_to_for_students(as_student: false)
@@ -1513,7 +1513,7 @@ describe 'Submissions API', type: :request do
       context "differentiated_assignments off" do
         before {@course.disable_feature!(:differentiated_assignments)}
         it "should return the submission regardless of section" do
-          @student.enrollments.each(&:destroy!)
+          @student.enrollments.each(&:destroy_permanently!)
           student_in_section(@section2, user: @student)
 
           json = call_to_for_students(as_student: false)
@@ -1538,7 +1538,7 @@ describe 'Submissions API', type: :request do
       @assignment = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15, :only_visible_to_overrides => true)
       create_section_override_for_assignment(@assignment, course_section: @section1)
       submit_homework(@assignment, @student)
-      @student.enrollments.each(&:destroy!)
+      @student.enrollments.each(&:destroy_permanently!)
       student_in_section(@section2, user: @student)
 
       user_session(@student)

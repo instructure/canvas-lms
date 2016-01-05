@@ -357,7 +357,7 @@ class CommunicationChannel < ActiveRecord::Base
     true
   end
 
-  alias_method :destroy!, :destroy
+  alias_method :destroy_permanently!, :destroy
   def destroy
     self.workflow_state = 'retired'
     self.save

@@ -59,7 +59,7 @@ class CustomGradebookColumn < ActiveRecord::Base
                             "active"
   end
 
-  alias_method :destroy!, :destroy
+  alias_method :destroy_permanently!, :destroy
   def destroy
     self.workflow_state = "deleted"
     save!

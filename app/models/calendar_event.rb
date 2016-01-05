@@ -309,7 +309,7 @@ class CalendarEvent < ActiveRecord::Base
     state :deleted
   end
 
-  alias_method :destroy!, :destroy
+  alias_method :destroy_permanently!, :destroy
   def destroy(update_context_or_parent=true)
     transaction do
       self.workflow_state = 'deleted'

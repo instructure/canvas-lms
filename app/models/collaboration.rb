@@ -52,7 +52,7 @@ class Collaboration < ActiveRecord::Base
 
   serialize :data
 
-  alias_method :destroy!, :destroy
+  alias_method :destroy_permanently!, :destroy
 
   workflow do
     state :active

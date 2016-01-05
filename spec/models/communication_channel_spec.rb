@@ -193,12 +193,12 @@ describe CommunicationChannel do
     @user.communication_channels.create!(:path => 'user1@example.com', :path_type => 'sms')
   end
 
-  context "destroy!" do
+  context "destroy_permanently!" do
     it "does not violate foreign key constraints" do
       communication_channel_model
       notification_policy_model(:frequency => "daily", :communication_channel => @communication_channel)
       delayed_message_model(:notification_policy_id => @notification_policy.id)
-      @communication_channel.destroy!
+      @communication_channel.destroy_permanently!
     end
   end
 

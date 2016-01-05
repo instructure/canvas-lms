@@ -109,7 +109,7 @@ class Folder < ActiveRecord::Base
     state :deleted
   end
 
-  alias_method :destroy!, :destroy
+  alias_method :destroy_permanently!, :destroy
   def destroy
     self.workflow_state = 'deleted'
     self.active_file_attachments.each{|a| a.destroy }

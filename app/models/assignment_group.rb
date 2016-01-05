@@ -84,7 +84,7 @@ class AssignmentGroup < ActiveRecord::Base
     state :deleted
   end
 
-  alias_method :destroy!, :destroy
+  alias_method :destroy_permanently!, :destroy
   def destroy
     self.workflow_state = 'deleted'
     self.assignments.active.include_quiz_and_topic.each{|a| a.destroy }

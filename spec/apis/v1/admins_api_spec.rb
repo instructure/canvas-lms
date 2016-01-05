@@ -133,7 +133,7 @@ describe "Admins API", type: :request do
       expect(response.code).to eq '404'
     end
   end
-  
+
   describe "destroy" do
     before :once do
       @account = Account.default
@@ -178,7 +178,7 @@ describe "Admins API", type: :request do
       it "should 404 if the user doesn't exist" do
         temp_user = User.create!
         bad_id = temp_user.to_param
-        temp_user.destroy!
+        temp_user.destroy_permanently!
         api_call(:delete, @base_path + bad_id, @path_opts.merge(:user_id => bad_id),
                  {}, {}, :expected_status => 404)
       end
@@ -240,7 +240,7 @@ describe "Admins API", type: :request do
       end
     end
   end
-  
+
   describe "index" do
     before :once do
       @account = Account.default

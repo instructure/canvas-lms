@@ -266,7 +266,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     self.assignment && self.assignment.muted?
   end
 
-  alias_method :destroy!, :destroy
+  alias_method :destroy_permanently!, :destroy
 
   def destroy
     self.workflow_state = 'deleted'

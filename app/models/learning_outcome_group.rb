@@ -211,7 +211,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
   end
 
   attr_accessor :skip_tag_touch
-  alias_method :destroy!, :destroy
+  alias_method :destroy_permanently!, :destroy
   def destroy
     transaction do
       # delete the children of the group, both links and subgroups, then delete

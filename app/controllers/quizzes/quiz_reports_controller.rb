@@ -213,7 +213,7 @@ class Quizzes::QuizReportsController < ApplicationController
 
       # case 1: remove a generated report:
       if statistics.csv_attachment.present?
-        statistics.csv_attachment.destroy!
+        statistics.csv_attachment.destroy_permanently!
         # progress will be present only if the CSV was generated asynchronously
         statistics.progress.destroy if statistics.progress.present?
       # case 2: abort the generation process if we can:

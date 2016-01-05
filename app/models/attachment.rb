@@ -1150,7 +1150,7 @@ class Attachment < ActiveRecord::Base
     where(condition_sql)
   }
 
-  alias_method :destroy!, :destroy
+  alias_method :destroy_permanently!, :destroy
   # file_state is like workflow_state, which was already taken
   # possible values are: available, deleted
   def destroy

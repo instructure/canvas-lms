@@ -42,7 +42,7 @@ describe "account" do
         c.course_account_associations.scope.delete_all
         c.enrollments.scope.delete_all
         c.course_sections.scope.delete_all
-        c.destroy!
+        c.destroy_permanently!
       end
 
       get "/accounts/#{Account.default.to_param}"

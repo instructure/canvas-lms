@@ -190,7 +190,7 @@ class DiscussionEntry < ActiveRecord::Base
     truncate_html(self.message, :max_length => length)
   end
 
-  alias_method :destroy!, :destroy
+  alias_method :destroy_permanently!, :destroy
   def destroy
     self.workflow_state = 'deleted'
     self.deleted_at = Time.now.utc

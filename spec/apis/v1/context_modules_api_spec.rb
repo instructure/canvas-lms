@@ -369,7 +369,7 @@ describe "Modules API", type: :request do
       it "should 404 if no modules exist with the given ids" do
         @modules_to_update.each do |m|
           m.content_tags.scope.delete_all
-          m.destroy!
+          m.destroy_permanently!
         end
         api_call(:put, @path, @path_opts, { :event => 'publish', :module_ids => @ids_to_update },
                  {}, { :expected_status => 404 })
@@ -381,7 +381,7 @@ describe "Modules API", type: :request do
       end
 
       it "should succeed if only some ids don't exist" do
-        @modules_to_update.first.destroy!
+        @modules_to_update.first.destroy_permanently!
         json = api_call(:put, @path, @path_opts, { :event => 'publish', :module_ids => @ids_to_update })
         expect(json['completed']).to eq [@modules_to_update.last.id]
         expect(@modules_to_update.last.reload).to be_active

@@ -264,7 +264,7 @@ class MediaObject < ActiveRecord::Base
     client.mediaDelete(self.media_id)
   end
 
-  alias_method :destroy!, :destroy
+  alias_method :destroy_permanently!, :destroy
   def destroy
     self.workflow_state = 'deleted'
     self.attachment.destroy if self.attachment
