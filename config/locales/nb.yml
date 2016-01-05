@@ -463,7 +463,7 @@ nb:
       course_search_form: 
         course_id: "Kurs ID"
         labels: 
-          find_deleted_course: "Søk etter en slettet kurs ved ID"
+          find_deleted_course: "Søk etter et slettet kurs ved hjelp av ID"
         select_default: "Velg et kurs"
         select_label: "Velg et kurs"
       course_search_results: 
@@ -848,7 +848,7 @@ nb:
         allow_invitation_previews: "Forhåndsvisning av invitasjon"
         allow_sending_scores_in_emails: "Studenter kan velge å motta resultater i epostvarsler"
         allow_sis_import: SIS-importer
-        author_email_in_notifications: "Vis epostadressen av senderen for brukermedvirkning Varslinger"
+        author_email_in_notifications: "Vis epostadressen til senderen ved varslinger for interaksjon mellom brukere"
         canvas_authentication: Canvas-autentisering
         default_language: "Standard språk"
         default_time_zone: "Standard tidssone"
@@ -2899,13 +2899,15 @@ nb:
             
             **Advarsel:** Sjekk [EtherPad's deletion policy](%{etherpad_deletion_policy_url}) for å sikre at arbeidet ditt ikke blir slettet.
         google_docs: |-
-            Google Docs er en godt egnet ressurs for å samarbeide på et gruppeprosjekt. Det er som Microsoft Word, men lar deg arbeide sammen med andre på den samme filen samtidig uten å måtte sende den rundt med e-post.  
+            Google Docs er en godt egnet ressurs for å samarbeide på et gruppeprosjekt. Det er som Microsoft Word, men lar deg arbeide sammen med andre på den samme filen samtidig uten
+            å måtte sende den rundt med epost.  
               
-            **Advarsel**: du (og de du samarbeider med) må ha en Google-konto for å kunne i et Google Docs samarbeid.
+            **Advarsel**. Du (og de du samarbeider med) må ha en Google-konto for å kunne delta i 
+            et Google Docs samarbeid.
       labels: 
         collaboration_type: "Samarbeid ved å bruke:"
         description: "Beskrivelse:"
-        document_name: "Dokument tittel:"
+        document_name: "Tittel på dokumentet:"
       messages: 
         delete_google_doc_as_well: "Dette Samarbeidet lagres som et Google Doc. Vil du slette det kun fra Canvas, eller vil du fjerne det fra Google Docs i tillegg?"
       titles: 
@@ -3540,9 +3542,12 @@ nb:
         course_modules: Kursmoduler
       help: 
         create: |-
-            Kursmoduler la deg organisere oppgaver, sider, filer, etc. i mindre deler eller enheter. Moduler kan være sentrert rundt et tema, med fokus på et bestemt kurs, eller bare gruppert kronologisk.
+            Kursmoduler lar deg organisere oppgaver, sider, filer, etc i mindre deler eller enheter.
+            Moduler kan være sentrert rundt et tema, med fokus på et bestemt kurs, eller bare
+            gruppert kronologisk.
             
-            Du kan også sekvensiere moduler ved å definere kriterier og forutsetninger for hver modul. Studentene vil ikke være i stand til å få tilgang til moduler før de har ferdigstilt alle forutsetninger. På den måten kan du hindre at studentene får tilgang til visse typer innhold eller filer før de har, for eksempel, fått minst 75% på en repetisjonsoppgave.
+            Du kan også sekvensiere moduler ved å definere kriterier og forutsetninger for hver modul. Studentene vil ikke være i stand til å få tilgang til moduler før de har ferdigstilt alle forutsetningene. På den måten kan du hindre at studentene får tilgang til visse typer innhold
+            eller filer før de har, for eksempel, fått minst 75% på en repetisjonsoppgave.
             
             For å begynne å organisere kurs i moduler, klikker du på "%{button}"-knappen til høyre.
         no_modules: "Ingen moduler er definert for dette kurset."
@@ -4561,7 +4566,7 @@ nb:
       titles: 
         edit_navigation: "Rediger kursnavigasjon"
       tooltips: 
-        cannot_unpublish_course: "Du kan ikke avpublisere dette kurset hvis det er gradert studentinnleveringer"
+        cannot_unpublish_course: "Du kan ikke avpublisere dette kurset hvis det er karaktersatte innleveringer fra studentene."
       transifex_message: "Hjelp til med [oversettingen av Canvas](%{transifex_url})"
       turnitin: "disse kommentarene vises til studenter når de leverer oppgaver via Turnitin-tjenesten"
       view_grading_scheme: "se karaktersettingsplan"
@@ -5017,7 +5022,7 @@ nb:
   delay_posting_this_topic_until_aa483eec: "Avvent publisering av dette emnet til"
   delete_a6efa79d: Slette
   delete_current_module_item_21fefc54: "Slett nåværende modul/element"
-  delete_grading_period_dba36e59: "Slett gradering periode"
+  delete_grading_period_dba36e59: "Slett vurderingsperioden"
   delete_grading_scheme_6b308832: "Slett karaktersettingsplan"
   delete_my_account_41060aad: "Slett kontoen min"
   delete_quiz_142b8099: "Slett prøve"
@@ -5128,7 +5133,7 @@ nb:
       saving: "Lagrer nøkkel …"
       saving_failed: "Lagring av nøkkel mislyktes"
     index: 
-      add_developer_key: "Legge til Utvikler Nøkkel"
+      add_developer_key: "Legg til utviklernøkkel"
       details: Detaljer
       developer_keys: Utviklernøkler
       key_settings: Nøkkelinnstillinger
@@ -5468,9 +5473,7 @@ nb:
   display_name_b80c243e: "Vis navn"
   display_total_grades_when_the_all_grading_periods__1d2b5cf: "Vis samtlige karakterer når \"Alle karakterperiodene\" nedtrekksmenyvalg er  valgt (Flere karakterperioder må være aktivert)."
   display_totals_for_all_grading_periods_ad1ea050: "Vis poengsummene for \"Alle karakterperiodene\""
-  distribution_of_current_grades_in_courses_across_a_e6c82f5d: |-
-      Fordeling av aktuelle karakterer i kurs på tvers av alle innrullert studenter
-      i avdeling kurs
+  distribution_of_current_grades_in_courses_across_a_e6c82f5d: "Fordeling av aktuelle karakterer i kurs på tvers av alle innrullerte studenter i organisasjonens kurs."
   divide_into_equal_slots_of_num_minutes_minutes_go_52caee81: "Del inn i like luker på %{num_minutes} minutter. *Gå*"
   domain_3b54c511: Domene
   domain_is_required_1d4c8b25: "Domene er påkrevd"
@@ -5502,7 +5505,7 @@ nb:
   due_date_cannot_be_after_course_end_fd128a14: "Forfallsdato kan ikke være etter kurs slutt"
   due_date_cannot_be_after_lock_date_675b30aa: "Fristdato kan ikke være etter låsdato"
   due_date_cannot_be_after_section_end_b0f54388: "Forfallsdato kan ikke være etter seksjon slutt"
-  due_date_cannot_be_after_term_end_5d504cb1: "Forfallsdato kan ikke være etter termin slutt"
+  due_date_cannot_be_after_term_end_5d504cb1: "Forfallsdato kan ikke være etter terminens slutt"
   due_date_cannot_be_before_course_start_ecc523ba: "Forfallsdato kan ikke være før kursstart"
   due_date_cannot_be_before_section_start_f8950484: "Forfallsdato kan ikke være før seksjonsstart"
   due_date_cannot_be_before_term_start_ea660b2c: "Forfallsdato kan ikke være før semesterstart"
@@ -5524,11 +5527,16 @@ nb:
   due_time_9acd6b69: "Tidsfrist %{time}"
   e_c2991d1b: e
   e_mail_only_2cc5e513: "Kun epost"
-  each_bar_is_an_assignment_the_green_layer_represen_b6536ab1: "Hver bar er et oppdrag. Den grønne laget representerer prosentandelen av elever som viste i sin underkastelse *på tide*. Anførsler som er **sent** er gul, og ***mangler*** innleveringer er rød."
-  each_bar_is_one_assignment_the_thin_vertical_whisk_17840129: "Hver linjen er ett oppdrag. Den *tynn vertikal værhår* utvider fra den laveste poengsummen for enhver student i kurset til den høyeste poengsummen. Den **tykkere bar** strekker seg fra den 25. persentilen til den 75., med ***median merket***."
+  each_bar_is_an_assignment_the_green_layer_represen_b6536ab1: |-
+      Hver stolpe er en oppgave. Det grønne laget representerer prosentandelen av elevene som
+      leverte inn oppgaven *i tide*. Innleveringer som er **for sein** er gule, og innleveringer som
+      ***mangler*** er røde.
+  each_bar_is_one_assignment_the_thin_vertical_whisk_17840129: |-
+      Hver stolpe er en oppgave. Den tynne vertikale linjen utvider seg fra den laveste scoren som en student har i kurset til den høyeste. Den tykke stolpen strekker seg fra den 25.
+      persentilen til den 75. med merke på medianen.
   each_bar_is_one_assignment_the_thin_whisker_extend_425bf274: "Hver linjen er ett oppdrag. Den tynne værhår strekker seg fra den laveste poengsummen for enhver student i kurset til den høyeste poengsummen. Tykkere linjen strekker seg fra den 25. persentilen til den 75., med median merket. Studentens poengsum er merket med en prikk."
   each_bar_represents_the_number_of_page_views_on_th_3f833fcd: "Hver linjen representerer antall *sidevisninger* på den dagen. En oransje søyle viser at studenten **tok noen handling** innenfor kurset på den dagen."
-  each_bar_represents_the_number_of_page_views_on_th_442f8465: "Hver linjen representerer antall *sidevisninger* på den dagen. En oransje søyle viser at noen bruker **tok en handling** innenfor et kurs på denne dagen."
+  each_bar_represents_the_number_of_page_views_on_th_442f8465: "Hver stolpe representerer antall *sidevisninger* på den dagen. En oransje stolpe viser at  noen **tok en handling** innenfor et kurs på denne dagen."
   each_bar_represents_the_number_of_page_views_on_th_66e1dcc0: "Hver linjen representerer antall *sidevisninger* på den dagen. En oransje søyle viser at noen bruker **tok en handling** innenfor kurset på den dagen."
   each_bar_represents_the_number_of_page_views_relat_29d1e341: "Hver linjen representerer antall sidevisninger relatert til den kategorien."
   each_row_is_one_assignment_the_diamond_is_the_due__2a5c7d7c: "Hver rad er en oppgave. Diamanten er forfallsdato og baren strekker seg til innleveringsdato. Grønn indikerer en *på tide innsending*, gul **sen innlevering**, og rød en ***savnet oppdrag***. Grå diamanter er oppgaver uten forfallsdatoer er lagt inn på tidspunktet for innlevering."
@@ -5684,7 +5692,7 @@ nb:
     teacher_assistant: LA
   enrollment_term: 
     errors: 
-      delete_default_term: "Kan ikke slette standardperioden"
+      delete_default_term: "Kan ikke slette standardterminen"
       delete_term_with_courses: "Kan ikke slette en periode med aktive kurs"
       not_unique: "SIS ID \"%{sis_source_id}\" er allerede i bruk"
   enrollment_term_7bfe840: Innmeldingsperiode
@@ -6221,7 +6229,7 @@ nb:
     k12: "Spesifikke K-12 funksjoner"
     learning_mastery_gradebook: "Karakterbok for mestringsbasert læring"
     lor: "LOR Ekstern verktøyene"
-    multiple_grading_periods: "Flere Gradering Perioder"
+    multiple_grading_periods: "Flere vurderingsperioder"
     new_quiz_statistics: "Ny statistikkside for prøver"
     post_grades: "Send karakterer til SIS"
     quiz_log_auditing: "Spørrekonkurranse Logg Revisjon"
@@ -6401,7 +6409,7 @@ nb:
     grade_display_warning: 
       checkbox: "Ikke vis for dette kurset senere."
       warning: Advarsel
-  grade_distribution_e52c9256: "Karakter Fordeling"
+  grade_distribution_e52c9256: Karakterfordeling
   grade_export_title: Karaktereksport
   grade_summary: 
     graph_title: "Gjennomsnitt %{mean}, Høy %{high}, Lav %{low}"
@@ -6483,7 +6491,7 @@ nb:
     assignment_muted: "Oppgaven er satt til passiv"
     column_header: 
       assignment_options: Oppgavevalg
-      points_out_of: "Utenfor %{assignment.points_possible}"
+      points_out_of: "Av %{assignment.points_possible}"
       this_assignment_is_muted: "Denne oppgaven er satt til passiv"
       zero_point_assignment: "Oppgaver i denne gruppen gir ingen poeng og kan ikke inkluderes i beregning av karakter"
     concluded_course_error_message: "Dette er et fullført kurs, så kun fullførte påmeldinger er tilgjengelig."
@@ -6602,7 +6610,7 @@ nb:
         missing_assignment: "Du lastet opp noen oppgaver som ikke har vært i karakteroversikten din før nå. Fortell oss om det er en ny oppgave, eller om det gjelder en eksisterende oppgave."
         missing_student: "Du lastet opp rader for følgende studenter, men vi kunne ikke avgjøre hvilken klasse det gjelder. Fortell oss hvem som er hvem."
         no_changes: "Ingen endringer ble oppdaget i karakteroversikten du lastet opp."
-        past_grading_periods_prevent_editing: "Følgende oppgaver kan ikke redigeres fordi de ikke er i en aktuell gradering periode:"
+        past_grading_periods_prevent_editing: "Følgende oppgaver kan ikke redigeres fordi de ikke er i en aktuell vurderingsperiode:"
       ignore_assignment_option: "Bogus, ignorer den"
       ignore_student_option: "Ikke i min klasse, ignorer denne raden."
       labels: 
@@ -6847,7 +6855,7 @@ nb:
         download_file: "Last ned denne filen"
         not_newest: "bruk nedtrekksmenyen over for å velge hvilken innlevering du skal se på"
         preview_file: "Forhåndsvis denne filen"
-        speedgrader_options: "Speedgrader Alternativer"
+        speedgrader_options: "Alternativer for SpeedGrader"
       tooltips: 
         file_attachment: "Filens vedlegg"
         media_comment: Mediekommentar
@@ -6904,17 +6912,17 @@ nb:
     out_of_with_score: "(%{score} av %{points})"
   grading_period: 
     errors: 
-      invalid_grading_period_end_date: "Gradering periodens slutt dato går forut startdato"
+      invalid_grading_period_end_date: "Vurderingsperiodens slutt er før startdato"
       overlap_message: "Vurderingsperiode kan ikke overlappe eksisterende vurderingsperioder i gruppe"
-  grading_period_name_31ceb3e3: "Gradering Periode Navn"
-  grading_periods_81941e66: "Gradering Perioder"
+  grading_period_name_31ceb3e3: "Navn på vurderingsperiode"
+  grading_periods_81941e66: Vurderingsperioder
   grading_periods_must_not_overlap_f45336fb: "Vurderingsperioder må ikke overlappe"
   grading_scheme_deleted_7ae5a072: "Vurderingsskjema slettet"
   grading_scheme_saved_85535151: "Vurderingsskjema lagret"
   grading_schemes_1c3c3252: Karaktersettingsplan
   grading_standard: 
     unknown_grading_details: "Ukjente detaljer"
-  grading_standard_title_58f540a3: "Gradering standard tittel"
+  grading_standard_title_58f540a3: "Standardtittel på vurdering"
   grading_standards: 
     buttons: 
       save: Lagre
@@ -7493,7 +7501,7 @@ nb:
     errors: 
       import: 
         external_tool_url: "URL for oppgaven som benytter eksternt verktøy \"App\" \"%{assignment_name}\" var ikke gyldig."
-        grading_standard_not_found: "Oppdraget \"%{title}\" refererte til en gradering ordning som ikke ble funnet i målet kurs konto kjeden."
+        grading_standard_not_found: "Oppgaven \"%{title}\" refererte til en vurderingsskala som ikke ble funnet i kurset det henvises  til."
     imported_assignments_group: "Importerte oppgaver"
   importers/context_external_tool_importer: 
     external_tool_attention_needed: "Sikkerhetsparameterne for det eksterne verktøyet \"%{tool_name}\" må vare i kursinnstillingene."
@@ -7791,7 +7799,7 @@ nb:
       migration: 
         announcements: Kunngjøringer
         assessment_question_banks: Spørsmålsbanker
-        assignments: "Oppgaverjavascript:;"
+        assignments: Oppgaver
         attachments: Filer
         calendar_events: Kalenderhendelse
         context_modules: Moduler
@@ -7885,7 +7893,7 @@ nb:
   lock_at_time_3c8a044e: "Lås kl.: %{time}"
   lock_date_cannot_be_after_course_end_a473158b: "Lås Datoen kan ikke være etter kurs sluttet"
   lock_date_cannot_be_after_section_end_d37da70c: "Lås Datoen kan ikke være etter seksjon slutt"
-  lock_date_cannot_be_after_term_end_cf1a188f: "Lås Datoen kan ikke være etter termin slutt"
+  lock_date_cannot_be_after_term_end_cf1a188f: "Låst dato kan ikke være etter avslutning av termin"
   lock_date_cannot_be_before_due_date_ac30f54: "Låsingsdato kan ikke være før fristen"
   lock_icon_a9916601: låsiko
   locked_762f138b: Låst
@@ -7934,7 +7942,7 @@ nb:
         register_for_canvas: "*Trenger du en Canvas-konto?* **Klikk her, det er gratis.**"
       new_login_content: 
         ? "User Research"
-        : User-research
+        : Brukerundersøkelse
         back_to_login: "Tilbake til innlogging"
         browse_courses: "Bla gjennom kurs"
         buttons: 
@@ -8038,7 +8046,7 @@ nb:
   marked_done_8f61ebb8: "merket som ferdig"
   marked_done_9fd646f: "Merket ferdig"
   mastery_score_reflects_the_highest_score_of_a_grad_fd426d1e: "Master-poengsum reflekterer den høyeste poengsummen av en vurdert innlevering eller prøve."
-  mastery_score_reflects_the_most_recent_graded_assi_29fd2e00: "Mestring poengsum reflekterer den siste gradert oppgave eller quiz."
+  mastery_score_reflects_the_most_recent_graded_assi_29fd2e00: "Poengsum for mestring reflekterer den siste vurderte oppgave eller quiz."
   matching_left_side_900f860b: "Matching venstre side"
   matching_right_side_920e71b2: "Matching høyre side"
   mathquill: 
@@ -9860,10 +9868,10 @@ nb:
   moderate_d0c85e92: Moderér
   moderate_grades_4f43f85d: "Moderer vurderinger"
   moderated_grading_allows_multiple_graders_to_grade_5c0d53db: "Moderert Grading gjør at flere klassinger til karakteren utvalgte oppgaver selvstendig, med en moderator som gir den endelige karakteren."
-  moderated_grading_cannot_be_enabled_for_group_assi_7e947ab7: "Moderert gradering kan ikke aktiveres for gruppeoppgaver"
-  moderated_grading_cannot_be_enabled_for_peer_revie_6b7eedc1: "Moderert gradering kan ikke aktiveres for fagfellevurderte oppdrag"
+  moderated_grading_cannot_be_enabled_for_group_assi_7e947ab7: "Moderert vurdering kan ikke aktiveres for gruppeoppgaver"
+  moderated_grading_cannot_be_enabled_for_peer_revie_6b7eedc1: "Moderert vurdering kan ikke aktiveres for oppgaver som krever hverandrevurderinger"
   moderated_grading_e6127f72: "Moderert Grading"
-  moderated_grading_setting_cannot_be_changed_if_gra_ba939ce2: "Moderert gradering innstillingen kan ikke endres hvis gradert innleveringer eksisterer"
+  moderated_grading_setting_cannot_be_changed_if_gra_ba939ce2: "Moderert vurderingsinnstilling kan ikke endres dersom det eksisterer vurderte innleveringer"
   moderated_grading_setting_cannot_be_enabled_for_gr_d81fb43b: "Moderert vurderingsinnstilling kan ikke aktiveres for gruppeoppgaver"
   moderated_grading_setting_cannot_be_enabled_for_pe_fc7b5b8b: "Moderert vurderingsinnstilling kan ikke aktiveres for vurderte innleveringer"
   moderated_grading_setting_cannot_be_enabled_for_un_e40e6cd4: "Moderert vurderingsinnstilling kan ikke aktiveres for innleveringer uten karakter"
@@ -9989,10 +9997,10 @@ nb:
         points_abbreviated: poeng
     module_view: 
       module: 
-        prerequisites: Forhåndskrav
+        prerequisites: Forutsetninger
         published: Publisert
     progression_module_collection: 
-      module_progress_for: "Modul Fremgang for *%{student.name}*"
+      module_progress_for: "Modulfremdrift for *%{student.name}*"
       module_progress_for_student: "Modulframdrift for %{student.name}"
       no_modules_found: "Ingen moduler funnet"
     progression_module_view: 
@@ -10006,7 +10014,7 @@ nb:
       progression_header: "Modul Progresjon"
       student_progress: Studentfremdrift
     relock_modules: "Låse Moduler Igjen"
-    requirements_changed: "Kravene Endret"
+    requirements_changed: "Kravene er endret"
   modules_c4325335: Moduler
   modules_item_controller: 
     max_score_complete: "scoret ikke mer enn en *poengsum*"
@@ -10118,7 +10126,7 @@ nb:
   no_due_date_6e6a23c1: "(no due date)"
   no_e16d9132: Nei
   no_grade_3fa326c: "Ingen karakter"
-  no_grading_schemes_to_display_8b0e92e7: "Ingen gradering ordninger for å vise"
+  no_grading_schemes_to_display_8b0e92e7: "Ingen karakterskalaer å vise"
   no_icon_1f6ea5f4: "ingen ikon"
   no_items_in_module_21f111a2: "Ingen elementer i modul"
   no_migration_file: "En fil er påkrevet for innholdsflytting."
@@ -10142,7 +10150,10 @@ nb:
   note_it_may_take_up_to_a_week_for_the_beta_url_to__d695bddc: "Merk: Det kan ta opp til én uke for Beta URL til provisjon, avhengig av Beta-oppdateringssyklus."
   note_length_cannot_exceed_maxlength_characters_82798b1: "Merk, lengden kan ikke overstige %{maxLength} tegn."
   note_some_items_fall_outside_the_start_and_or_end__feab0642: "Merk: noen elementer faller utenfor start og/eller sluttdato for kurset"
-  note_students_have_submitted_work_for_these_assign_7bc34e28: "MERK: Studentene har levert arbeid for disse oppdragene som ikke er gradert. Hvis du legger inn disse karakterene nå, vil du trenger å legg inn igjen sine score etter måling deres nyeste innleveringer."
+  note_students_have_submitted_work_for_these_assign_7bc34e28: |-
+      MERK: Studentene har levert inn arbeid for disse oppgavene som enda ikke har blitt 
+      karaktersatt. Dersom du publiserer disse karakterene nå, må du re-publisere karakterene 
+      etter at de har levert.
   note_sub_account_themes_are_not_active_during_this_a5dd9da: "Merk: underkonto-temaer er ikke aktive under denne forhåndsvisningen."
   note_this_login_s_account_uses_delegated_authentic_89227914: "Merk: Denne påloggingen konto bruker delegert godkjenning, men kan falle tilbake Canvas passordautentisering. Passordfeltene i dette skjemaet oppdatere reserve Canvas passord, *ikke* den delegerte godkjenning."
   notes_c42e0fd5: notater
@@ -10198,7 +10209,7 @@ nb:
       student_appointment_signups: "Påmeldinger til studentavtaler"
       submission_comment: Innleveringskommentar
     conversation_created_description: "Du opprettet en samtale"
-    conversation_created_display: "Samtaler Opprettet Av Meg"
+    conversation_created_display: "Samtaler opprettet av meg"
     conversation_message_description: "Nye innboksbeskjeder"
     conversation_message_display: Samtalebeskjed
     course_content_description: |-
@@ -10923,8 +10934,8 @@ nb:
         section_end_days_adjustment: "Klasseslutt dager justering"
         section_name_selection: "Valg av klassenavn"
         section_start_days_adjustment: "Klassestart dager justering"
-        term_end_days_adjustment: "Semesterslutt dager justering"
-        term_start_days_adjustment: "Semesterstart dager justering"
+        term_end_days_adjustment: "Justering av semesterets avslutningsdager"
+        term_start_days_adjustment: "Justering av semesterets oppstartsdager"
     index: 
       author: Forfatter
       description: Beskrivelse
@@ -11109,7 +11120,7 @@ nb:
         username: Brukernavn
   points_bb475533: Poeng
   points_points_b6b422e2: "Poeng: %{points}"
-  points_possible_must_be_0_or_more_for_selected_gra_f96a04e3: "Poeng mulig må være 0 eller mer for valgt gradering typen"
+  points_possible_must_be_0_or_more_for_selected_gra_f96a04e3: "Antall mulige poeng må være 0 eller mer for valgt vurderingstype"
   polling: 
     poll_sessions: 
       errors: 
@@ -11821,7 +11832,7 @@ nb:
       other: "%{count} studenter"
       zero: "ingen som"
     sad-panda-alttext: "Triste tingene i panda land."
-    speedgrader: "Vis i Hurtighet grader"
+    speedgrader: "Vis i SpeedGrader"
     summary: 
       audible_chart_description: "%{above_average} studenter scoret over eller på gjennomsnittet, og %{below_average} nedenfor."
       avg_time: "Gjennomsnittlig tid"
@@ -13268,22 +13279,22 @@ nb:
   screenreader_gradebook: 
     assignment_information: 
       actions: 
-        assignment_is_muted: Dempet?
+        assignment_is_muted: "Steng oppgaven?"
         curve_grades: "Korriger karakterer"
         message_students: "Send beskjed til studenter som…"
         set_default_grade: "Sett standard klasse"
       details: 
         avg_score: "Gjennomsnittlig resultat"
-        graded_sub_count: "Gradert innleveringer:"
+        graded_sub_count: "Vurderte innleveringer:"
         high_score: "Høyeste resultat"
         low_score: "Laveste resultat"
         no_points: "Ingen oppnåelige poeng"
         points_possible: "Poeng mulig"
-        submission_types: "Innlevering typer:"
+        submission_types: Innleveringstyper
       index: 
-        assignment_in_speedgrader: "Se dette oppdraget i hastighet grader"
-        assignment_info: "Oppdrag Informasjon"
-        empty_assignment_selection: "Velg et oppdrag for å vise mer informasjon her."
+        assignment_in_speedgrader: "Åpne denne oppgaven i SpeedGrader"
+        assignment_info: "Informasjon om oppgaven"
+        empty_assignment_selection: "Velg en oppgave for å vise mer informasjon her."
         no_points_possible_warning: "Oppdrag i denne gruppen har ingen poeng mulig og kan ikke inkluderes i klasse grade beregning."
         warning: Advarsel
     components: 
@@ -13293,7 +13304,7 @@ nb:
       assignment: 
         select_assignment: "Velg et oppdrag"
       header: 
-        content_selection: "Innhold Utvalg"
+        content_selection: "Utvalg av innhold"
       outcome: 
         select_outcome: "Velg et utfall"
       student: 
@@ -13306,11 +13317,11 @@ nb:
       is_late: "Dette innlevering var sent."
       submission_details: "Detaljer om innlevering"
       submission_hidden: "Dette oppdraget er ikke tilgjengelig for denne eleven, og vil ikke bli inkludert i sin karakter."
-      was_resubmitted: "Dette oppdraget har blitt sendt inn på nytt siden den ble gradert sist."
+      was_resubmitted: "Denne oppgaven har blitt sendt inn på nytt siden den ble vurdert sist."
     header: 
       gradebook_individual_view: "Karakteroversikt: Individuell visning"
       save_instructions: "Merk: Karakterer og notater vil bli lagret automatisk når du har flyttet ut av feltet."
-      switch_to_gradebook2: "Skifte til Standard karakterboken"
+      switch_to_gradebook2: "Skift til standardvisning for karakterbok."
     learning_mastery: 
       download_results: "Last ned resultater (.csv)"
       empty_student_selection: "Velg en student for å se mer informasjon her."
@@ -13321,7 +13332,7 @@ nb:
       results_loading: "Resultater for denne studenten fortsatt laster ..."
       select_a_section: "Velg en seksjon"
       select_student: "Velg en student"
-      student_info: "Student Informasjon"
+      student_info: "Informasjon om studenten"
     outcome_information: 
       avg_score: "Gjennomsnittlig resultat"
       empty_outcome_selection: "Velg et utfall for å se mer informasjon her."
@@ -13330,7 +13341,7 @@ nb:
       outcome_info: "Utfallet Informasjon"
       result_sub_count: "Totalt resultater:"
     screenreader_gradebook: 
-      assignments: "Oppgaverjavascript:;"
+      assignments: Oppgaver
       learning_mastery: "Mestringsbasert læring"
     settings: 
       assignment_toggles_and_actions: 
@@ -13340,8 +13351,8 @@ nb:
         include_ungraded_assignments: "Behandle ikke karaktersatt som 0"
         set_group_weights: "Sett vekting for grupper"
         show_concluded_enrollments_label: "Vis fullførte påmeldinger"
-        show_notes: "Vis merknader i Student Info"
-        show_total_as_points: "Vis Totalt som punkter på Student Grade Side"
+        show_notes: "Vis notater i studentinformasjonen"
+        show_total_as_points: "Vis totalsum som poeng på studentens karakterside."
         sis_export: "Overfør karakterer til SIS"
         upload_scores: "Last opp Scores (.csv)"
       header: 
@@ -13366,7 +13377,7 @@ nb:
       index: 
         empty_student_selection: "Velg en student for å se mer informasjon her."
         grades: Karakterer
-        student_info: "Student Informasjon"
+        student_info: "Informasjon om studenten"
         submissions_loading: "Innleveringer for denne studenten er fortsatt lasting..."
   search: 
     all_courses: 
@@ -13392,7 +13403,7 @@ nb:
   search_entries_or_author_63fb0a86: "Søk oppføringer eller forfatter"
   search_for_files_7541fb28: "Søk etter filer"
   search_groups_or_people_6c15d6ad: "Søk i grupper eller personer"
-  search_term_must_be_at_least_num_characters_669098ed: "Søkestrengen må være på minst %{num} tegn"
+  search_term_must_be_at_least_num_characters_669098ed: "Søkeordet må være på minst %{num} tegn"
   search_title_body_or_author_1d26711f: "Søk tittel, innholdstekst eller forfatter"
   search_users_48b1789e: "Søk brukere..."
   searching_b0207e7f: Søker
@@ -14839,14 +14850,14 @@ nb:
     one: "Det er en resultat i listen"
     other: "Det er %{count} resultater i listen"
   there_are_no_announcements_for_this_course_5ee649c3: "Det er ingen kunngjøringer for dette kurset."
-  there_was_a_problem_deleting_the_grading_period_50ce07c5: "Det ble et problem ved sletting av gradering periode"
-  there_was_a_problem_deleting_the_grading_scheme_2a959c40: "Det ble et problem ved å slette gradering ordningen"
+  there_was_a_problem_deleting_the_grading_period_50ce07c5: "Det oppstod et problem ved sletting av vurderingsperioden"
+  there_was_a_problem_deleting_the_grading_scheme_2a959c40: "Det oppstod et problem ved sletting av karakterskalaen"
   there_was_a_problem_exporting_c33dc250: "Det oppstod et problem ved eksport."
   there_was_a_problem_fetching_periods_bdc09a8f: "Det oppstod et problem ved henting av perioder"
   there_was_a_problem_loading_the_gradebook_69b2a17: "Det var et problem ved lasting av karakterboken."
   there_was_a_problem_logging_in_at_institution_5a298155: "Det var et problem med innloggingen på %{institution}"
   there_was_a_problem_saving_the_grading_period_243bed6c: "Det oppstod et problem ved lagring av vurderingsperioden"
-  there_was_a_problem_saving_the_grading_scheme_5e6076e9: "Det ble et problem ved lagring av gradering ordningen"
+  there_was_a_problem_saving_the_grading_scheme_5e6076e9: "Det oppstod et problem ved lagring av karakterskalaen"
   there_was_an_error_in_processing_your_request_6513a49a: "En feil oppsto under behandling av forespørselen din"
   there_was_an_error_saving_the_note_please_try_agai_f2f2cd38: "Det oppsto en feil ved lagring av notatet. Vennligst prøv igjen."
   there_was_an_error_setting_usage_rights_53739e1d: "Det oppstod en feil innstilling bruksrettigheter."
@@ -14889,7 +14900,7 @@ nb:
   this_quiz_is_unpublished_only_teachers_can_see_the_51d281b1: "*Denne prøven er ikke publisert* Kun forelesere kan se prøven fram til den blir publisert."
   this_sample_page_includes_common_ui_elements_in_ca_331f4ac4: "Denne prøven siden inneholder vanlige UI elementer i Canvas for å hjelpe deg å bygge din egendefinerte merkevarebygging. Når du begynner å gjøre endringer i fargeverdiene og bilder i venstre sidebar , vil du se en * forhåndsvise endringene * knapp . Klikk på den for å oppdatere denne siden og se hvordan endringene ser ut."
   this_student_wrote_f1a3f22d: "Denne student skrev:"
-  this_submission_has_already_been_graded_and_is_rea_8ec61c52: "Dette bidraget har allerede blitt gradert og er klar for moderasjon."
+  this_submission_has_already_been_graded_and_is_rea_8ec61c52: "Denne innleveringen har allerede blitt vurdert og er klar for moderering."
   this_will_allow_you_to_authenticate_canvas_for_pos_fdfca40: "Dette tillate deg til å autentisere Canvas for innlegging karakterer til SIS"
   this_will_apply_these_changes_to_your_entire_accou_22b86cde: "Disse endringer blir nå brukt på hele kontoen. Vil du fortsette?"
   ticketing_system_52205bff: Ticketingsystem
@@ -15632,6 +15643,7 @@ nb:
   view_course_analytics_eefe6b2: "Vis Kurs Analytics"
   view_file_8a1c62e5: "Vis fil"
   view_grades_8d3bae6c: "Vis karakterer"
+  view_in_speedgrader_773b9d81: "Vis i SpeedGrader"
   view_name_app_62a2ad8e: "Vis %{name} app"
   view_next_file_a8a4a885: "Se neste fil"
   view_previous_file_b846db4f: "Se forrige fil"
@@ -15879,7 +15891,7 @@ nb:
   you_do_not_have_access_to_the_requested_discussion_90d8ec99: "Du har ikke tilgang til den forespurte diskusjonen."
   you_do_not_have_access_to_the_requested_quiz_d3659e4b: "Du har ikke tilgang til den forespurte prøven."
   you_do_not_have_permission_to_publish_this_course_ff361c82: "Du har ikke tillatelse til å publisere dette kurset."
-  you_have_changed_the_progression_requirements_for__6772bc89: "Du har endret progresjonskrav for en aktiv kurs. Det kan være elever som allerede har kommet til denne modulen, og til andre som er avhengige av det."
+  you_have_changed_the_progression_requirements_for__6772bc89: "Du har endret progresjonskrav for et aktivt kurs. Det kan være elever som allerede har kommet til denne modulen, og til andre som er avhengige av det."
   you_have_made_changes_to_the_questions_in_this_qui_1658361a: "*Du har gjort endringer på spørsmål i denne prøven.* Disse endringene vil ikke vises for studentene før du lagrer prøven."
   you_have_no_outcomes_click_here_to_create_one_ebf262a3: "Du har ingen utfall. *Klikk her* for å opprette en."
   you_have_no_outcomes_click_here_to_go_to_the_outco_574bd0af: "Du har ingen utfall. Klikk her for å gå til utfall siden."
@@ -15939,7 +15951,7 @@ nb:
   your_search_encountered_the_following_errors_fc3e5e7f: 
     one: "Søket ditt oppstått følgende feil:"
     other: "Søket ditt oppstått følgende feilene:"
-  your_submission_has_not_been_graded_yet_d6963e53: "Innlegget ditt har ikke vært gradert ennå"
+  your_submission_has_not_been_graded_yet_d6963e53: "Innleveringen din har ikke blitt vurdert enda"
   yyyy_mm_dd_hh_mm_a01b6081: "ÅÅÅÅ-MM-DD tt:mm"
   zendesk: 
     engine: 
