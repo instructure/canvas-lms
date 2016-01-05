@@ -497,7 +497,9 @@ describe SIS::CSV::EnrollmentImporter do
 
     @observer.reload
     expect(@observer.enrollments.count).to eq 1
-    expect(@observer.enrollments.first.workflow_state).to eq 'completed'
+    e = @observer.enrollments.first
+    expect(e.workflow_state).to eq 'completed'
+    expect(e.completed_at).to be_present
   end
 
   it "should only queue up one DueDateCacher job per course" do
