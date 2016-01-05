@@ -14141,7 +14141,7 @@ sv:
       add_to_module: "Lägg till %{item} till *modul*"
       assignment_item: Uppgift
       assignment_item_select_label: "Välj den uppgiften du vill associera eller lägg till en uppgift genom att välja \"Ny uppgift\"."
-      assignment_notice: "Välj den uppgiften du vil associera med den här *modulen* eller lägg till en uppgift genom att välja \"Lägg till uppgift\"."
+      assignment_notice: "Välj den uppgift du vil associera med den här *modulen* eller lägg till en uppgift genom att välja \"Ny uppgift\"."
       content_page_item: Innehållssida
       discussion_item: Diskussion
       discussion_topic_select_label: "Välj ämnet du vill associera eller lägg till ett ämmen genom att välja \"Nytt ämne\"."
