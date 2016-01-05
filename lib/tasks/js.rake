@@ -1,5 +1,6 @@
 require 'timeout'
 require 'json'
+require_relative "../../config/initializers/webpack"
 
 namespace :js do
 
@@ -70,7 +71,7 @@ namespace :js do
   desc 'test javascript specs with Karma'
   task :test, :reporter do |task, args|
     reporter = args[:reporter]
-    if ENV['USE_WEBPACK'].present? && ENV['USE_WEBPACK'] != 'false' && ENV['USE_WEBPACK'] != 'False'
+    if CANVAS_WEBPACK
       Rake::Task['i18n:generate_js'].invoke
       webpack_test_dir = Rails.root + "spec/javascripts/webpack"
       FileUtils.rm_rf(webpack_test_dir)
@@ -293,7 +294,7 @@ namespace :js do
 
   desc "build webpack js for production"
   task :webpack do
-    if ENV['USE_WEBPACK'].present? && ENV['USE_WEBPACK'] != 'false' && ENV['USE_WEBPACK'] != 'False'
+    if CANVAS_WEBPACK
       if ENV['RAILS_ENV'] == 'production'
         puts "--> Building PRODUCTION webpack bundles"
         `npm run webpack-production`

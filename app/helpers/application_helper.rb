@@ -233,7 +233,7 @@ module ApplicationHelper
   end
 
   def use_webpack?
-    if ENV['USE_WEBPACK'].present? && ENV['USE_WEBPACK'] != 'false' && ENV['USE_WEBPACK'] != 'False'
+    if CANVAS_WEBPACK
       !(params[:require_js])
     else
       params[:webpack]

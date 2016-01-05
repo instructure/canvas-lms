@@ -6,7 +6,7 @@ describe "i18n js" do
   before (:each) do
     course_with_teacher_logged_in
     get "/"
-    if ENV['USE_WEBPACK'].present? && ENV['USE_WEBPACK'] != 'false' && ENV['USE_WEBPACK'] != 'False'
+    if CANVAS_WEBPACK
       # I18n will already be exposed in webpack land
     else
       # get I18n and _ global for all the tests
@@ -59,7 +59,7 @@ describe "i18n js" do
       (I18n.available_locales - [:en]).each do |locale|
         exec_cs("I18n.locale = '#{locale}'")
         rb_value = I18n.t('dashboard.confirm.close', locale: locale)
-        js_value = if ENV['USE_WEBPACK'].present? && ENV['USE_WEBPACK'] != 'false' && ENV['USE_WEBPACK'] != 'False'
+        js_value = if CANVAS_WEBPACK
           driver.execute_script("return I18n.scoped('dashboard').t('confirm.close');")
         else
           require_exec('i18n!dashboard', "i18n.t('confirm.close')")

@@ -55,7 +55,9 @@ Webpack's output goes to "public/webpack-dist" for development js and
 
 The environment variable USE_WEBPACK is useful for trying out the assets
 that webpack builds locally.  If set to 'true', when you start your server
-you'll load JS from your webpack-dist directory rather than public/js.
+you'll load JS from your webpack-dist directory rather than public/js.  You
+can do the same thing by touching the file "config/WEBPACK" (if present, it's
+like having the USE_WEBPACK env var set).
 
 At any time you can use the url parameter "require_js=1" to get the requirejs
 version of the js instead so you can compare them side by side.
