@@ -90,7 +90,7 @@ describe "eportfolios" do
 
     it "should validate time stamp on ePortfolio", priority: "2" do
       # Freezes time to 2 days from today.
-      old_time = 2.days.from_now.utc
+      old_time = 2.days.from_now.utc.beginning_of_hour
       Timecop.freeze(old_time) do
         current_time = old_time.strftime('%b %-d at %-l') << old_time.strftime('%p').downcase
         # Saves an entry to initiate an update.
