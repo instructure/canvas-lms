@@ -1368,7 +1368,7 @@ class Assignment < ActiveRecord::Base
 
     attachment_fields = [:id, :comment_id, :content_type, :context_id, :context_type,
                          :display_name, :filename, :mime_class,
-                         :size, :submitter_id, :workflow_state].freeze
+                         :size, :submitter_id, :workflow_state, :viewed_at].freeze
 
     res = as_json(
       :include => {
