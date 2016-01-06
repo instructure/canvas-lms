@@ -1060,9 +1060,17 @@ class User < ActiveRecord::Base
       # a user can reset their own MFA, but only if the setting isn't required
       (self == user && self.mfa_settings != :required) ||
 
+      # a site_admin with permission to reset_any_mfa
+      (Account.site_admin.grants_right?(user, :reset_any_mfa)) ||
       # an admin can reset another user's MFA only if they can manage *all*
       # of the user's pseudonyms
-      (self != user && self.pseudonyms.shard(self).all?{ |p| p.grants_right?(user, :update) })
+      self != user && self.pseudonyms.shard(self).all? do |p|
+        p.grants_right?(user, :update) ||
+        # the account does not have mfa enabled
+        p.account.mfa_settings == :disabled ||
+        # they are an admin user and have reset MFA permission
+        p.account.grants_right?(user, :reset_any_mfa)
+      end
     end
     can :reset_mfa
 

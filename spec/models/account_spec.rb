@@ -401,12 +401,15 @@ describe Account do
       next unless v[:if]
       Account.any_instance.stubs(v[:if]).returns(true)
     end
+    site_admin = Account.site_admin
 
     # Set up a hierarchy of 4 accounts - a root account, a sub account,
     # a sub sub account, and SiteAdmin account.  Create a 'Restricted Admin'
     # role available for each one, and create an admin user and a user in that restricted role
-    @sa_role = custom_account_role('Restricted SA Admin', :account => Account.site_admin)
+    @sa_role = custom_account_role('Restricted SA Admin', account: site_admin)
 
+    site_admin.settings[:mfa_settings] = 'required'
+    site_admin.save!
     root_account = Account.create
     @root_role = custom_account_role('Restricted Root Admin', :account => root_account)
 
@@ -469,6 +472,7 @@ describe Account do
     hash.each do |k, v|
       account = v[:account]
       account.role_overrides.create!(:permission => 'read_reports', :role => (k == :site_admin ? @sa_role : @root_role), :enabled => true)
+      account.role_overrides.create!(:permission => 'reset_any_mfa', :role => @sa_role, :enabled => true)
       # clear caches
       v[:account] = Account.find(account)
     end
@@ -476,8 +480,11 @@ describe Account do
     AdheresToPolicy::Cache.clear
     hash.each do |k, v|
       account = v[:account]
-      expect(account.check_policy(hash[:site_admin][:admin]) - conditional_access).to match_array full_access + (k == :site_admin ? [:read_global_outcomes] : [])
-      expect(account.check_policy(hash[:site_admin][:user])).to match_array siteadmin_access + some_access + (k == :site_admin ? [:read_global_outcomes] : [])
+      admin_array = full_access + (k == :site_admin ? [:read_global_outcomes] : [])
+      user_array = siteadmin_access + some_access + [:reset_any_mfa] +
+        (k == :site_admin ? [:read_global_outcomes] : [])
+      expect(account.check_policy(hash[:site_admin][:admin]) - conditional_access).to match_array admin_array
+      expect(account.check_policy(hash[:site_admin][:user])).to match_array user_array
     end
 
     account = hash[:site_admin][:account]

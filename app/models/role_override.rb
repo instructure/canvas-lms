@@ -739,6 +739,13 @@ class RoleOverride < ActiveRecord::Base
         :label => -> { t('Moderate Grades') },
         :true_for => %w(AccountAdmin TeacherEnrollment),
         :available_to => %w(AccountAdmin AccountMembership TeacherEnrollment TaEnrollment)
+      },
+      :reset_any_mfa => {
+        :label => -> { t('Reset Multi-Factor Authentication') },
+        :account_only => :root,
+        :true_for => %w(AccountAdmin),
+        :available_to => %w(AccountAdmin AccountMembership),
+        :account_allows => lambda {|a| a.mfa_settings != :disabled}
       }
     })
 
