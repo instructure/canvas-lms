@@ -52,10 +52,10 @@ define(function(require) {
       });
 
       testRects([
-        { i: 15, x: 136, y: 92, h: 92 },
-        { i: 25, x: 226, y: 92, h: 92 },
-        { i: 44, x: 397, y: 92, h: 92 },
-        { i: 59, x: 532, y: 2,  h: 182 },
+        { i: 15, x: 136, y: 88, h: 92 },
+        { i: 25, x: 226, y: 88, h: 92 },
+        { i: 44, x: 397, y: 88, h: 92 },
+        { i: 59, x: 532, y: -2,  h: 182 },
       ], done);
     });
 
@@ -69,8 +69,8 @@ define(function(require) {
       });
 
       testRects([
-        { i: 15, x: 136, y: 2, h: 182 },
-        { i: 25, x: 226, y: 182, h: 2 },
+        { i: 15, x: 136, y: -2, h: 182 },
+        { i: 25, x: 226, y: 178, h: 2 },
       ], function updatePropsAnotherTime() {
         setProps({
           scores: {
@@ -80,8 +80,8 @@ define(function(require) {
         });
 
         testRects([
-          { i: 15, x: 136, y: 2, h: 182 },
-          { i: 25, x: 226, y: 2, h: 182 },
+          { i: 15, x: 136, y: -2, h: 182 },
+          { i: 25, x: 226, y: -2, h: 182 },
         ], done);
       });
     });
@@ -95,8 +95,8 @@ define(function(require) {
       });
 
       testRects([
-        { i: 0,   x: 1,  y: 146, h: 38  },
-        { i: 100, x: 901, y: 2,  h: 182 },
+        { i: 0,   x: 1,  y: 142, h: 38  },
+        { i: 100, x: 901, y: -2,  h: 182 },
       ], done);
     });
 
