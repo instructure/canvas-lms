@@ -50,7 +50,8 @@ class Assignment::FilterWithOverridesByDueAtForStudent
 
   def most_lenient_due_at(assignment)
     date_to_use = assignment.due_at if assigned_to_everyone_else?(assignment)
-    if assignment.has_active_overrides?
+
+    if any_active_overrides?(assignment)
       override_dates = override_dates_for_student(assignment)
       return nil if override_dates.any?(&:nil?)
 

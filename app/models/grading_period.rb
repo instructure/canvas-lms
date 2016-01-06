@@ -53,6 +53,10 @@ class GradingPeriod < ActiveRecord::Base
       .grading_periods
   end
 
+  def self.current_period_for(context)
+    self.for(context).find(&:current?)
+  end
+
   # Takes a context and a grading_period_id and returns a grading period
   # if it is in the for collection. Uses Enumberable#find to query
   # collection.

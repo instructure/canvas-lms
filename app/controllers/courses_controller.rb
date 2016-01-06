@@ -318,7 +318,7 @@ class CoursesController < ApplicationController
   #   'StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'ObserverEnrollment',
   #   or 'DesignerEnrollment'.
   #
-  # @argument include[] [String, "needs_grading_count"|"syllabus_body"|"total_scores"|"term"|"course_progress"|"sections"|"storage_quota_used_mb"|"total_students"|"favorites"|"teachers"|"observed_users"]
+  # @argument include[] [String, "needs_grading_count"|"syllabus_body"|"total_scores"|"term"|"course_progress"|"sections"|"storage_quota_used_mb"|"total_students"|"favorites"|"teachers"|"observed_users"|"current_grading_period_scores"]
   #   - "needs_grading_count": Optional information to include with each Course.
   #     When needs_grading_count is given, and the current user has grading
   #     rights, the total number of submissions needing grading for all
@@ -327,16 +327,23 @@ class CoursesController < ApplicationController
   #     When syllabus_body is given the user-generated html for the course
   #     syllabus is returned.
   #   - "total_scores": Optional information to include with each Course.
-  #     When total_scores is given, any enrollments with type 'student' will also
-  #     include the fields 'calculated_current_score', 'calculated_final_score',
-  #     'calculated_current_grade', and 'calculated_final_grade'.
-  #     calculated_current_score is the student's score in the course, ignoring
-  #     ungraded assignments. calculated_final_score is the student's score in
-  #     the course including ungraded assignments with a score of 0.
-  #     calculated_current_grade is the letter grade equivalent of
-  #     calculated_current_score (if available). calculated_final_grade is the
-  #     letter grade equivalent of calculated_final_score (if available). This
-  #     argument is ignored if the course is configured to hide final grades.
+  #     When total_scores is given, any student enrollments will also
+  #     include the fields 'computed_current_score', 'computed_final_score',
+  #     'computed_current_grade', and 'computed_final_grade' (see Enrollment
+  #     documentation for more information on these fields). This argument
+  #     is ignored if the course is configured to hide final grades.
+  #   - "current_grading_period_scores": Optional information to include with
+  #     each Course. When current_grading_period_scores is given and total_scores
+  #     is given, any student enrollments will also include the fields
+  #     'multiple_grading_periods_enabled',
+  #     'totals_for_all_grading_periods_option', 'current_grading_period_title',
+  #     'current_period_computed_current_score',
+  #     'current_period_computed_final_score',
+  #     'current_period_computed_current_grade', and
+  #     'current_period_computed_final_grade' (see Enrollment documentation for
+  #     more information on these fields). This argument is ignored if the course
+  #     is configured to hide final grades or if the total_scores argument is not
+  #     included.
   #   - "term": Optional information to include with each Course. When
   #     term is given, the information for the enrollment term for each course
   #     is returned.
@@ -417,7 +424,7 @@ class CoursesController < ApplicationController
   # @API List courses for a user
   # Returns a list of active courses for this user. To view the course list for a user other than yourself, you must be either an observer of that user or an administrator.
   #
-  # @argument include[] [String, "needs_grading_count"|"syllabus_body"|"total_scores"|"term"|"course_progress"|"sections"|"storage_quota_used_mb"|"total_students"|"favorites"]
+  # @argument include[] [String, "needs_grading_count"|"syllabus_body"|"total_scores"|"term"|"course_progress"|"sections"|"storage_quota_used_mb"|"total_students"|"favorites"|"current_grading_period_scores"]
   #   - "needs_grading_count": Optional information to include with each Course.
   #     When needs_grading_count is given, and the current user has grading
   #     rights, the total number of submissions needing grading for all
@@ -426,16 +433,23 @@ class CoursesController < ApplicationController
   #     When syllabus_body is given the user-generated html for the course
   #     syllabus is returned.
   #   - "total_scores": Optional information to include with each Course.
-  #     When total_scores is given, any enrollments with type 'student' will also
-  #     include the fields 'calculated_current_score', 'calculated_final_score',
-  #     'calculated_current_grade', and 'calculated_final_grade'.
-  #     calculated_current_score is the student's score in the course, ignoring
-  #     ungraded assignments. calculated_final_score is the student's score in
-  #     the course including ungraded assignments with a score of 0.
-  #     calculated_current_grade is the letter grade equivalent of
-  #     calculated_current_score (if available). calculated_final_grade is the
-  #     letter grade equivalent of calculated_final_score (if available). This
-  #     argument is ignored if the course is configured to hide final grades.
+  #     When total_scores is given, any student enrollments will also
+  #     include the fields 'computed_current_score', 'computed_final_score',
+  #     'computed_current_grade', and 'computed_final_grade' (see Enrollment
+  #     documentation for more information on these fields). This argument
+  #     is ignored if the course is configured to hide final grades.
+  #   - "current_grading_period_scores": Optional information to include with
+  #     each Course. When current_grading_period_scores is given and total_scores
+  #     is given, any student enrollments will also include the fields
+  #     'multiple_grading_periods_enabled',
+  #     'totals_for_all_grading_periods_option', 'current_grading_period_title',
+  #     'current_period_computed_current_score',
+  #     'current_period_computed_final_score',
+  #     'current_period_computed_current_grade', and
+  #     'current_period_computed_final_grade' (see Enrollment documentation for
+  #     more information on these fields). This argument is ignored if the course
+  #     is configured to hide final grades or if the total_scores argument is not
+  #     included.
   #   - "term": Optional information to include with each Course. When
   #     term is given, the information for the enrollment term for each course
   #     is returned.
@@ -2418,10 +2432,12 @@ class CoursesController < ApplicationController
     Canvas::Builders::EnrollmentDateBuilder.preload(enrollments)
     enrollments_by_course = enrollments.group_by(&:course_id).values
     enrollments_by_course = Api.paginate(enrollments_by_course, self, api_v1_courses_url) if api_request?
-    if includes.include?("teachers")
-      courses = enrollments_by_course.map(&:first).map(&:course)
-      ActiveRecord::Associations::Preloader.new.preload(courses, :teachers)
-    end
+    courses = enrollments_by_course.map(&:first).map(&:course)
+    preloads = [:account]
+    preloads << :teachers if includes.include?('teachers')
+    preloads << :grading_standard if includes.include?('total_scores')
+    ActiveRecord::Associations::Preloader.new.preload(courses, preloads)
+
     enrollments_by_course.each do |course_enrollments|
       course = course_enrollments.first.course
       hash << course_json(course, user, session, includes, course_enrollments)

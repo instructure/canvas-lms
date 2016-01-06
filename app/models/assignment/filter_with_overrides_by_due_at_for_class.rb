@@ -34,7 +34,7 @@ class Assignment::FilterWithOverridesByDueAtForClass
   end
 
   def find_due_at(assignment)
-    due_at = no_active_overrides?(assignment) ? assignment.due_at : filter_date_from_overrides(assignment)
+    due_at = any_active_overrides?(assignment) ? filter_date_from_overrides(assignment) : assignment.due_at
     milliseconds_to_zero(due_at)
   end
 
