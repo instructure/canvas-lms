@@ -129,13 +129,15 @@ define(function(require) {
             </ScreenReaderContent>
 
             <Dialog
-              tagName="i"
+              tagName="button"
               title={I18n.t('discrimination_index_dialog_title', 'The Discrimination Index Chart')}
               content={Help}
               width={550}
-              className="chart-help-trigger icon-question"
+              className="Button Button--icon-action chart-help-trigger"
               aria-label={I18n.t('discrimination_index_dialog_trigger', 'Learn more about the Discrimination Index.')}
-              tabIndex="0" />
+              tabIndex="0">
+                <i className="icon-question"></i>
+              </Dialog>
           </p>
 
           {Chart(chartData)}
