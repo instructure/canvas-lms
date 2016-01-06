@@ -570,6 +570,38 @@ describe "Common Cartridge exporting" do
         check_resource_node(@published, CC::CCHelper::LOR)
         check_resource_node(@unpublished, CC::CCHelper::LOR, false)
       end
+
+      it "should always use relevant migration ids in anchor tags when exporting for ePub" do
+        cm1 = @course.context_modules.create!(name: "unlocked module")
+        cm1.publish
+        cm2 = @course.context_modules.create!({
+          name: "locked module",
+          prerequisites: [{:id=>cm1.id, :type=>"context_module", :name=>cm1.name}]
+        })
+        cm2.publish
+        cm1link = %{<a href="/courses/#{@course.id}/modules/#{cm1.id}">Mod 1</a>}
+        cm2link = %{<a href="/courses/#{@course.id}/modules/#{cm2.id}">Mod 2</a>}
+        assignment = @course.assignments.create!({
+          title: 'Assignment 1',
+          description: "go to module 1 at #{cm1link} and module 2 at #{cm2link}"
+        })
+        cm1.completion_requirements = [{:id=>assignment.id, :type=>"must_mark_done"}]
+        cm1.save!
+
+        student_in_course(active_all: true, user_name: "a student")
+        @ce.epub_export = EpubExport.create!({course: @course})
+        @ce.user = @student
+        @ce.save!
+
+        run_export
+
+        assignment_html = @manifest_doc.at_css("file[href$='#{mig_id(assignment)}/assignment-1.html']")
+        html_content = @zip_file.read(assignment_html["href"])
+
+        expect(html_content.match(/\$CANVAS_OBJECT_REFERENCE\$\/modules\/#{mig_id(cm1)}/)).not_to be_nil
+        expect(html_content.match(/\$CANVAS_OBJECT_REFERENCE\$\/modules\/#{mig_id(cm2)}/)).not_to be_nil
+
+      end
     end
 
     context 'attachment permissions' do

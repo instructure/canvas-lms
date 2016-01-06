@@ -15,13 +15,13 @@ describe "Exporter" do
 
     @attachment = Attachment.create({
       context: course,
-      filename: 'exortable-test-file',
+      filename: 'exportable-test-file',
       uploaded_data: File.open(cartridge_path)
     })
 
     @attachment_without_modules = Attachment.create({
       context: course,
-      filename: 'exortable-test-file',
+      filename: 'exportable-test-file',
       uploaded_data: File.open(cartridge_without_modules_path)
     })
 
