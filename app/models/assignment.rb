@@ -253,7 +253,8 @@ class Assignment < ActiveRecord::Base
               :process_if_quiz,
               :default_values,
               :update_submissions_if_details_changed,
-              :maintain_group_category_attribute
+              :maintain_group_category_attribute,
+              :validate_assignment_overrides
 
   after_save  :update_grades_if_details_changed,
               :touch_assignment_group,
@@ -263,7 +264,6 @@ class Assignment < ActiveRecord::Base
               :update_submissions_later,
               :schedule_do_auto_peer_review_job_if_automatic_peer_review,
               :delete_empty_abandoned_children,
-              :validate_assignment_overrides,
               :update_cached_due_dates,
               :touch_submissions_if_muted
 

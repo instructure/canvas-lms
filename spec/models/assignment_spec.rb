@@ -935,13 +935,14 @@ describe Assignment do
     @assignment.save!
 
     overrides = 5.times.map do
-      override = @assignment.assignment_overrides.build
+      override = @assignment.assignment_overrides.scope.new
       override.set = @assignment.group_category.groups.create!(context: @assignment.context)
       override.save!
 
       expect(override.workflow_state).to eq 'active'
       override
     end
+    old_version_number = @assignment.version_number
 
     @assignment.group_category = group_category(context: @assignment.context, name: "bar")
     @assignment.save!
@@ -951,7 +952,7 @@ describe Assignment do
 
       expect(override.workflow_state).to eq 'deleted'
       expect(override.versions.size).to eq 2
-      expect(override.assignment_version).to eq @assignment.version_number
+      expect(override.assignment_version).to eq old_version_number
     end
   end
 

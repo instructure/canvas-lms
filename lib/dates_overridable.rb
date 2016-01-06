@@ -9,7 +9,7 @@ module DatesOverridable
     base.has_many :active_assignment_overrides, -> { where(workflow_state: 'active') }, class_name: 'AssignmentOverride'
     base.has_many :assignment_override_students, :dependent => :destroy
 
-    base.validates_associated :assignment_overrides
+    base.validates_associated :active_assignment_overrides
 
     base.extend(ClassMethods)
   end
