@@ -387,7 +387,7 @@ END
       display_name: -> { I18n.t('International SMS') },
       description: -> { I18n.t('Allows users with international phone numbers to receive text messages from Canvas.') },
       applies_to: 'RootAccount',
-      state: 'on',
+      state: 'hidden',
       root_opt_in: true
     },
     'international_sms_from_recipient_country' => {
