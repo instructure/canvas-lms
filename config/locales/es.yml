@@ -2,12 +2,12 @@
 # Do not edit it by hand, your changes will be overwritten.
 --- 
 es: 
-  1_item_scores_5512cd03: "2- Puntuaciones de los elementos"
+  1_item_scores_5512cd03: "1- Puntuaciones de los elementos"
   1st_reviewer_3c1d0119: "1er evaluador"
-  2_final_score_7b0fd15e: "2. Puntuación final"
+  2_final_score_7b0fd15e: "2- Puntuación final"
   2nd_reviewer_94fdbcd: "2do evaluador"
   451_message: 
-    description: "No tiene autorización para acceder a este sitio porque reside en un país tema a restricciones de comercio con los EE. UU."
+    description: "No tiene autorización para acceder a este sitio porque reside en un país sujeto a restricciones de comercio con los EE. UU."
     headings: 
       page: "No autorizado"
     title: "No autorizado"
