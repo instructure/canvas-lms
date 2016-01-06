@@ -65,18 +65,26 @@ shared_context "in-process server selenium tests" do
   # set up so you can use rails urls helpers in your selenium tests
   include Rails.application.routes.url_helpers
 
-  around do |example|
-    example.run
-    exception = example.example.exception
+  def check_exception(exception)
     case exception
-    when EOFError, Errno::ECONNREFUSED
-      if $selenium_driver && !RSpec.wants_to_quit
-        puts "SELENIUM: webdriver socket closed the connection.  Will try to re-initialize."
+    when EOFError, Errno::ECONNREFUSED, Net::ReadTimeout
+      if $selenium_driver && !RSpec.world.wants_to_quit && exception.backtrace.grep(/selenium-webdriver/).present?
+        puts "SELENIUM: webdriver is misbehaving.  Will try to re-initialize."
         # this will cause the selenium driver to get re-initialized if it
         # crashes for some reason
         $selenium_driver = nil
       end
     end
+  end
+
+  around do |example|
+    begin
+      example.run
+    rescue # before/after/around ... always re-raise so the example fails
+      check_exception $ERROR_INFO
+      raise
+    end
+    check_exception example.example.exception
   end
 
   prepend_before :all do
