@@ -13,7 +13,7 @@ define(function(require) {
   var Help = require('jsx!./discrimination_index/help');
   var Chart = require('jsx!./discrimination_index/chart');
   var Table = require('jsx!./discrimination_index/table');
-  var formatNumber = require('canvas_quizzes/util/format_number');
+  var formatNumber = require('../../util/format_number');
 
   var divide = function(x, y) {
     return (parseFloat(x) / y) || 0;

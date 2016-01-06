@@ -1,5 +1,6 @@
 define(function(require) {
   var Store = require('canvas_quizzes/core/store');
+  var Dispatcher = require('../core/dispatcher');
   var config = require('../config');
   var QuizStats = require('../collections/quiz_statistics');
   var populateCollection = require('./common/populate_collection');
@@ -165,7 +166,7 @@ define(function(require) {
       expanded = [];
       return Store.prototype.__reset__.call(this);
     }
-  });
+  }, Dispatcher);
 
   return store;
 });

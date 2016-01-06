@@ -1,10 +1,11 @@
 define(function(require) {
   var RSVP = require('rsvp');
   var $ = require('canvas_packages/jquery');
-  var Adapter = require('../core/adapter');
+  var CoreAdapter = require('canvas_quizzes/core/adapter');
   var K = require('../constants');
   var config = require('../config');
-  var pickAndNormalize = require('../models/common/pick_and_normalize');
+  var Adapter = new CoreAdapter(config);
+  var pickAndNormalize = require('canvas_quizzes/models/common/pick_and_normalize');;
 
   var fetchProgress = function(url) {
     return Adapter.request({

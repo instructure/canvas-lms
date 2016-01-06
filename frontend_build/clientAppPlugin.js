@@ -10,17 +10,21 @@ clientAppPlugin.prototype.apply = function(compiler){
 
   compiler.plugin("normal-module-factory", function(nmf) {
 
-    // the client apps have common js files that depend upon config files.
-    // the config files are named the same per app, and the common files "require"
-    // a non-existant path that maps to one of the mini app config files.  this
-    // context tracks which app we're compiling right now so we can rewrite config
-    // requests to the correct app.  Probably the best long term approach is
-    // to have the apps themselves pass in their config objects to the constructors
-    // of the common code rather than doing these kind of opaque path rewrites
-    var appContext = "";
-
     nmf.plugin("before-resolve", function(result, callback) {
       request = result.request;
+
+      // the client apps use an old version of react and used requirejs aliases
+      // to keep it seperate from the react version the rest of canvas uses.
+      //  This should shim that difference into the webpack build.
+      if(/client_apps\/canvas_quizzes/.test(result.context)){
+        if(request == "react"){
+          request = "old_unsupported_dont_use_react"
+        }
+
+        if(request == "react-router"){
+          request = "old_unsupported_dont_use_react-router"
+        }
+      }
 
       // client apps are using a jsx plugin for require js; we have a JSX
       // loader for webpack so we can just ditch the loader prefix
@@ -35,22 +39,16 @@ clientAppPlugin.prototype.apply = function(compiler){
         request = request.replace(/jquery\/instructure_date_and_time/, "jquery.instructure_date_and_time");
       }
 
+
       var newRequest = request;
 
-      if(/^canvas_quizzes\/apps/.test(request)){
+      if(/^canvas_quizzes\/apps\/[^/]+$/.test(request)){
         // when a core app js file loads a client app (canvas_quizzes/app/statistics), rather than
         // requiring the pre-built file (client_apps/dist/canvas_quizzes/apps/statistics.js)
         // this reaches into it's respective
         // "main" file for the app (client_apps/canvas_quizzes/apps/statistics/js/main)
-        // to compile from source (canvas).  It also sets
-        // the app context so subsequent requires get the right config files.
-        //  (see appContext above for more on that)
-        appContext = request + "/js/";
+        // to compile from source (canvas).
         newRequest = request + "/js/main";
-      } else if(/^app\/config\/environments/.test(request)){
-        // rewrite abstract config file requires (like app/config/environments/production)
-        // to the right app context for the current require tree (like canvas_quizzes/apps/statistics/js/config/environments/production)
-        newRequest = appContext + request.replace("app/", "");
       } else if(/^canvas\/vendor\//.test(request)){
         // client apps would prefix canvas vendor files with "canvas" and map them across.
         // webpack knows where to look for vendor files, so we can ditch the prefix
@@ -67,6 +65,21 @@ clientAppPlugin.prototype.apply = function(compiler){
         // and let it resolve normally.
         newRequest = request.replace("canvas_packages/", "");
       }
+
+      // each client app requests the common client app config, but it's
+      // not very webpack-friendly.  This replaces those requests with webpack
+      // specific shims that do the same work without sharing a config file that
+      // has to know how to dynamically require similarly named files from different
+      // apps based on context.
+      if(/^canvas_quizzes\/config$/.test(result.request)){
+
+        if(/apps\/statistics\/js/.test(result.context)){
+          newRequest = "canvas_quizzes/apps/statistics/js/webpack_config";
+        }else if(/apps\/events\/js/.test(result.context)){
+          newRequest = "canvas_quizzes/apps/events/js/webpack_config";
+        }
+      }
+
       result.request = newRequest;
       return callback(null, result);
     });

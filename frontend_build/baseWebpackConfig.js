@@ -62,15 +62,18 @@ module.exports = {
       },
       {
         test: /\.jsx$/,
-        include: [
-          path.resolve(__dirname, "../app/jsx"),
-          /client_apps\/canvas_quizzes\/apps\//
-        ],
-        exclude: [/(node_modules|bower)/, /public\/javascripts\/vendor/, /public\/javascripts\/translations/],
+        include: [path.resolve(__dirname, "../app/jsx")],
+        exclude: [/(node_modules|bower)/, /public\/javascripts\/vendor/, /public\/javascripts\/translations/, /app\/client_apps\/canvas_quizzes\/apps\//],
         loaders: [
           'babel?cacheDirectory=tmp',
           'jsxYankPragma'
         ]
+      },
+      {
+        test: /\.jsx$/,
+        include: [/app\/client_apps\/canvas_quizzes\/apps\//],
+        exclude: [/(node_modules|bower)/, /public\/javascripts\/vendor/, /public\/javascripts\/translations/, path.resolve(__dirname, "../app/jsx")],
+        loaders: ["jsx"]
       },
       {
         test: /\.coffee$/,

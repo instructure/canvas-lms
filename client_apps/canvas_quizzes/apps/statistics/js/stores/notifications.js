@@ -1,7 +1,9 @@
 define(function(require) {
-  var Store = require('../core/store');
+  var Store = require('canvas_quizzes/core/store');
+  var Dispatcher = require('../core/dispatcher');
   var _ = require('lodash');
   var throttle = _.throttle;
+
 
   /**
    * @class Stores.Notifications
@@ -78,7 +80,7 @@ define(function(require) {
         }
       }
     }
-  });
+  }, Dispatcher);
 
   return store;
 });

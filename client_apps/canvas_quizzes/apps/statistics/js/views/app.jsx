@@ -3,7 +3,7 @@ define(function(require) {
   var React = require('react');
   var _ = require('lodash');
   var I18n = require('i18n!quiz_statistics');
-  var Notifications = require('jsx!canvas_quizzes/views/notifications');
+  var Notifications = require('jsx!./notifications');
   var ScreenReaderContent = require('jsx!canvas_quizzes/components/screen_reader_content');
   var SightedUserContent = require('jsx!canvas_quizzes/components/sighted_user_content');
   var Summary = require('jsx!./summary');
