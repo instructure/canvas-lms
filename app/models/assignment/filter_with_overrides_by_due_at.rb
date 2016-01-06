@@ -18,6 +18,7 @@
 module Assignment::FilterWithOverridesByDueAt
 
   def filter_assignments
+    ActiveRecord::Associations::Preloader.new.preload(assignments, :assignment_overrides)
     assignments.select { |assignment| in_grading_period?(assignment) }
   end
 
@@ -51,7 +52,11 @@ module Assignment::FilterWithOverridesByDueAt
       end
   end
 
+  def any_active_overrides?(assignment)
+    active_overrides(assignment).any?
+  end
+
   def no_active_overrides?(assignment)
-    active_overrides(assignment).none?
+    !any_active_overrides?(assignment)
   end
 end

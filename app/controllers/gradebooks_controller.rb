@@ -240,7 +240,7 @@ class GradebooksController < ApplicationController
       @current_grading_period_id = params[:grading_period_id].to_i
     else
       return if view_all_grading_periods?
-      current = GradingPeriod.for(@context).find(&:current?)
+      current = GradingPeriod.current_period_for(@context)
       @current_grading_period_id = current ? current.id : 0
     end
   end

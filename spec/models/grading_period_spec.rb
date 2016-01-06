@@ -74,7 +74,6 @@ describe GradingPeriod do
   end
 
   describe ".for" do
-
     context "when context is an account" do
       let(:account) { Account.new }
       let(:finder) { mock }
@@ -95,6 +94,30 @@ describe GradingPeriod do
         finder.expects(:grading_periods).once
         GradingPeriod.for(course)
       end
+    end
+  end
+
+  describe ".current_period_for" do
+    let(:account) { Account.new }
+    let(:not_current_grading_period) { mock }
+    let(:current_grading_period) { mock }
+
+    it "returns the current grading period given a context" do
+      GradingPeriod.expects(:for).with(account).returns([not_current_grading_period, current_grading_period])
+      not_current_grading_period.expects(:current?).returns(false)
+      current_grading_period.expects(:current?).returns(true)
+      expect(GradingPeriod.current_period_for(account)).to eq(current_grading_period)
+    end
+
+    it "returns nil if grading periods exist for the given context, but none are current" do
+      GradingPeriod.expects(:for).with(account).returns([not_current_grading_period])
+      not_current_grading_period.expects(:current?).returns(false)
+      expect(GradingPeriod.current_period_for(account)).to be_nil
+    end
+
+    it "returns nil if no grading periods exist for the given context" do
+      GradingPeriod.expects(:for).with(account).returns([])
+      expect(GradingPeriod.current_period_for(account)).to be_nil
     end
   end
 
