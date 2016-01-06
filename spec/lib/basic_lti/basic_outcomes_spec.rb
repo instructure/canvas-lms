@@ -47,12 +47,14 @@ describe BasicLTI::BasicOutcomes do
     )
   end
 
-  let(:source_id) {
+  let(:source_id) {gen_source_id}
+
+  def gen_source_id(t: tool, c: @course, a: assignment, u: @user)
     tool.shard.activate do
-      payload = [tool.id, @course.id, assignment.id, @user.id].join('-')
+      payload = [t.id, c.id, a.id, u.id].join('-')
       "#{payload}-#{Canvas::Security.hmac_sha1(payload, tool.shard.settings[:encryption_key])}"
     end
-  }
+  end
 
   let(:xml) do
     Nokogiri::XML.parse %Q{
@@ -106,6 +108,71 @@ describe BasicLTI::BasicOutcomes do
     end
   end
 
+  describe ".decode_source_id" do
+
+    it 'successfully decodes a source_id' do
+      expect(described_class.decode_source_id(tool, source_id)).to eq [@course, assignment, @user]
+    end
+
+    it 'throws Invalid sourcedid if no signature' do
+      missing_signature = source_id.split('-')[0..3].join('-')
+      expect{described_class.decode_source_id(tool, missing_signature)}.
+          to raise_error(BasicLTI::BasicOutcomes::InvalidSourceId, 'Invalid sourcedid')
+    end
+
+    it 'throws Invalid signature if the signature is invalid' do
+      bad_signature = source_id.split('-')[0..3].join('-') + '-asb9dksld9k3'
+      expect{described_class.decode_source_id(tool, bad_signature)}.
+          to raise_error(BasicLTI::BasicOutcomes::InvalidSourceId, 'Invalid signature')
+    end
+
+    it "throws Tool is invalid if the tool doesn't match" do
+      t = @course.context_external_tools.
+          create(:name => "b", :url => "http://google.com", :consumer_key => '12345', :shared_secret => 'secret')
+      expect{described_class.decode_source_id(tool, gen_source_id(t: t))}.
+          to raise_error(BasicLTI::BasicOutcomes::InvalidSourceId, 'Tool is invalid')
+    end
+
+    it "throws Course is invalid if the course doesn't match" do
+      @course.workflow_state = 'deleted'
+      @course.save!
+      expect{described_class.decode_source_id(tool, source_id)}.
+          to raise_error(BasicLTI::BasicOutcomes::InvalidSourceId, 'Course is invalid')
+    end
+
+    it "throws User is no longer in course isuser enrollment is missing" do
+      @user.enrollments.destroy_all
+      expect{described_class.decode_source_id(tool, source_id)}.
+          to raise_error(BasicLTI::BasicOutcomes::InvalidSourceId, 'User is no longer in course')
+    end
+
+    it "throws Assignment is invalid if the Addignment doesn't match" do
+      assignment.destroy
+      expect{described_class.decode_source_id(tool, source_id)}.
+          to raise_error(BasicLTI::BasicOutcomes::InvalidSourceId, 'Assignment is invalid')
+    end
+
+    it "throws Assignment is no longer associated with this tool if tool is deleted" do
+      tool.destroy
+      expect{described_class.decode_source_id(tool, source_id)}.
+          to raise_error(BasicLTI::BasicOutcomes::InvalidSourceId, 'Assignment is no longer associated with this tool')
+    end
+
+    it "throws Assignment is no longer associated with this tool if tool doesn't match the url" do
+      tag = assignment.external_tool_tag
+      tag.url = 'example.com'
+      tag.save!
+      expect{described_class.decode_source_id(tool, source_id)}.
+          to raise_error(BasicLTI::BasicOutcomes::InvalidSourceId, 'Assignment is no longer associated with this tool')
+    end
+
+    it "throws Assignment is no longer associated with this tool if tag is missing" do
+      assignment.external_tool_tag.delete
+      expect{described_class.decode_source_id(tool, source_id)}.
+          to raise_error(BasicLTI::BasicOutcomes::InvalidSourceId, 'Assignment is no longer associated with this tool')
+    end
+
+  end
 
   describe "#handle_replaceResult" do
     it "accepts a grade" do
