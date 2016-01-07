@@ -278,12 +278,9 @@
     text-decoration: none;
   }
 
-  .ellipses { 
+  .ellipses {
     @include item-group-ellipses;
   }
-
-  // Handle Firefox white space bug that affects .ellipses class
-  @include firefox-white-space-bug-fix($ic-color-light, $ic-list-item-background--hover);
 
   &:hover {
     background-color: $ic-list-item-background--hover;
@@ -334,6 +331,9 @@
   flex: 1;
   box-sizing: border-box;
   padding-right: $ic-sp;
+  // firefox flex breaks the parent container
+  min-width: 1px;
+
   @include breakpoint(desktop) { flex: 0 0 34%; }
   @include breakpoint(wide) { flex: 0 0 40%; }
   @if $use_new_styles { font-weight: 500; }
@@ -345,6 +345,9 @@
   flex: 0.66;
   line-height: 1.5;
   box-sizing: border-box;
+  // firefox flex breaks the parent container
+  min-width: 1px;
+
   @include breakpoint(desktop) {
     flex: 1;
     display: flex;

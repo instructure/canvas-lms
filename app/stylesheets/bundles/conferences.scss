@@ -55,11 +55,7 @@ header:not(.ic-app-header) {
 }
 
 .ig-list .ig-row  {
-  
-  // Conferences has no background color highlight on hover,
-  // so need to overwrite .ig-row default for Firefox
-  @include firefox-white-space-bug-fix($ic-color-light, $ic-color-light);
-  
+
   .ellipses { color: $ic-font-color--subdued; }
 }
 
