@@ -48,6 +48,9 @@ define [
 
     template: template
 
+    # all instances share same element
+    el: $(document.createElement('div')).appendTo('body')[0]
+
     els:
       '#mathquill-view': '$mathquillView'
       '#mathquill-container': '$mathquillContainer'
