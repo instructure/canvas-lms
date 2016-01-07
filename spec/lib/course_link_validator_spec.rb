@@ -159,7 +159,7 @@ describe CourseLinkValidator do
 
   it "should find links to wiki pages" do
     course
-    active = @course.wiki.wiki_pages.create!(:title => "active")
+    active = @course.wiki.wiki_pages.create!(:title => "active and stuff")
     unpublished = @course.wiki.wiki_pages.create!(:title => "unpub")
     unpublished.unpublish!
     deleted = @course.wiki.wiki_pages.create!(:title => "baleeted")
@@ -171,6 +171,8 @@ describe CourseLinkValidator do
 
     message = %{
       <a href='#{active_link}'>link</a>
+      <a href='#{active_link}#achor'>link</a>
+      <a href='#{active_link}?query_param'>link</a>
       <a href='#{unpublished_link}'>link</a>
       <a href='#{deleted_link}'>link</a>
     }
@@ -182,5 +184,58 @@ describe CourseLinkValidator do
 
     links = CourseLinkValidator.current_progress(@course).results[:issues].first[:invalid_links].map{|l| l[:url]}
     expect(links).to match_array [unpublished_link, deleted_link]
+  end
+
+  it "should identify typo'd canvas links" do
+    course
+    invalid_link1 = "/cupbopourses"
+    invalid_link2 = "http://#{HostUrl.default_host}/courses/#{@course.id}/pon3s"
+
+    message = %{
+      <a href='/courses'>link</a>
+      <a href='/courses/#{@course.id}/assignments/'>link</a>
+      <a href='#{invalid_link1}'>link</a>
+      <a href='#{invalid_link2}'>link</a>
+    }
+    @course.syllabus_body = message
+    @course.save!
+
+    CourseLinkValidator.queue_course(@course)
+    run_jobs
+
+    links = CourseLinkValidator.current_progress(@course).results[:issues].first[:invalid_links].map{|l| l[:url]}
+    expect(links).to match_array [invalid_link1, invalid_link2]
+  end
+
+  it "should not flag valid replaced attachments" do
+    course
+    att1 = attachment_with_context(@course, :display_name => "name")
+    att2 = attachment_with_context(@course)
+
+    att2.display_name = "name"
+    att2.handle_duplicates(:overwrite)
+    att1.reload
+    expect(att1.replacement_attachment).to eq att2
+
+    link = "/courses/#{@course.id}/files/#{att1.id}/download" # should still work because it uses att2 as a fallback
+    message = %{
+      <a href='#{link}'>link</a>
+    }
+    @course.syllabus_body = message
+    @course.save!
+
+    CourseLinkValidator.queue_course(@course)
+    run_jobs
+
+    issues = CourseLinkValidator.current_progress(@course).results[:issues]
+    expect(issues).to be_empty
+
+    att2.destroy # shouldn't work anymore
+
+    CourseLinkValidator.queue_course(@course)
+    run_jobs
+
+    links = CourseLinkValidator.current_progress(@course).results[:issues].first[:invalid_links].map{|l| l[:url]}
+    expect(links).to match_array [link]
   end
 end
