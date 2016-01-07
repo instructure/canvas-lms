@@ -179,6 +179,12 @@ $ docker-compose run --rm web bundle exec rake canvas:compile_assets
 Changes you're making are not showing up? See the Caveats section below.
 Ctrl-C your `docker-compose up` window and restart.
 
+## Cassandra
+
+If you're using the analytics package, you'll also need Cassandra. The
+Cassandra configuration is commented out in the docker-compose file; uncomment
+it and also uncomment the Cassandra configuration in cassandra.yml. Also follow
+the directions in cassandra.yml.example.
 
 ## Running tests
 
