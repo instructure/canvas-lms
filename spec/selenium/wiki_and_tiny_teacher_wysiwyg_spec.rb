@@ -345,15 +345,36 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
 
     it "should create a table", priority: "1", test_id: 307627 do
       wysiwyg_state_setup
-
       f('.mce-i-table').click
-
       driver.find_element(:xpath, "//span[text()[contains(.,'Insert table')]]").click
       driver.find_element(:xpath, "//td/a[@data-mce-x='3' and @data-mce-y='3']").click
       in_frame wiki_page_body_ifr_id do
         expect(ff('#tinymce tr').length).to eq 4
         expect(ff('#tinymce td').length).to eq 16
       end
+    end
+
+    it "should edit a table", priority: "1", test_id: 588944 do
+      wysiwyg_state_setup
+      f('.mce-i-table').click
+      driver.find_element(:xpath, "//span[text()[contains(.,'Insert table')]]").click
+      driver.find_element(:xpath, "//td/a[@data-mce-x='3' and @data-mce-y='3']").click
+
+      f('.mce-i-table').click
+      driver.find_element(:xpath, "//span[text()[contains(.,'Row')]]").click
+      driver.find_element(:xpath, "//span[text()[contains(.,'Insert row after')]]").click
+
+      f('.mce-i-table').click
+      driver.find_element(:xpath, "//span[text()[contains(.,'Table properties')]]").click
+      driver.find_element(:xpath, "//div[text()[contains(.,'Advanced')]]").click
+      ff('.mce-placeholder')[1].send_keys("green")
+      f('.mce-primary').click
+
+      in_frame wiki_page_body_ifr_id do
+        expect(ff('#tinymce tr').length).to eq 5
+        expect(ff('#tinymce td').length).to eq 20
+      end
+      validate_wiki_style_attrib("background-color", "green", "table")
     end
 
     it "should add bold text to the rce", priority: "1", test_id: 285128 do
