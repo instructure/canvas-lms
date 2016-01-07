@@ -661,36 +661,47 @@ class Account < ActiveRecord::Base
   end
 
   def self.account_chain(starting_account_id)
-    return [] unless starting_account_id
+    chain = []
 
-    if ActiveRecord::Base.configurations[Rails.env]['adapter'] == 'postgresql'
-      chain = Shard.shard_for(starting_account_id).activate do
-        Account.find_by_sql(<<-SQL)
-              WITH RECURSIVE t AS (
-                SELECT * FROM #{Account.quoted_table_name} WHERE id=#{Shard.local_id_for(starting_account_id).first}
-                UNION
-                SELECT accounts.* FROM #{Account.quoted_table_name} INNER JOIN t ON accounts.id=t.parent_account_id
-              )
-              SELECT * FROM t
-        SQL
-      end
-    else
-      account = Account.find(starting_account_id)
-      chain = [account]
-      while account.parent_account
-        account = account.parent_account
+    if (starting_account_id.is_a?(Account))
+      chain << starting_account_id
+      starting_account_id = starting_account_id.parent_account_id
+    end
+
+    if starting_account_id
+      if ActiveRecord::Base.configurations[Rails.env]['adapter'] == 'postgresql'
+        chain.concat(Shard.shard_for(starting_account_id).activate do
+          Account.find_by_sql(<<-SQL)
+                WITH RECURSIVE t AS (
+                  SELECT * FROM #{Account.quoted_table_name} WHERE id=#{Shard.local_id_for(starting_account_id).first}
+                  UNION
+                  SELECT accounts.* FROM #{Account.quoted_table_name} INNER JOIN t ON accounts.id=t.parent_account_id
+                )
+                SELECT * FROM t
+          SQL
+        end)
+      else
+        account = Account.find(starting_account_id)
         chain << account
+        while account.parent_account
+          account = account.parent_account
+          chain << account
+        end
       end
     end
     chain
   end
 
-  def account_chain(opts = {})
-    @account_chain ||= [self] + Account.account_chain(self.parent_account_id)
-    results = @account_chain.dup
-    results << self.root_account if !results.map(&:id).include?(self.root_account_id) && !root_account?
-    results << Account.site_admin if opts[:include_site_admin] && !self.site_admin?
-    results
+  def self.add_site_admin_to_chain!(chain)
+    chain << Account.site_admin unless chain.last.site_admin?
+    chain
+  end
+
+  def account_chain(include_site_admin: false)
+    @account_chain ||= Account.account_chain(self)
+    result = @account_chain.dup
+    Account.add_site_admin_to_chain!(result) if include_site_admin
+    result
   end
 
   def account_chain_loop
@@ -900,7 +911,7 @@ class Account < ActiveRecord::Base
   # returns all account users for this entire account tree
   def all_account_users_for(user)
     raise "must be a root account" unless self.root_account?
-    Shard.partition_by_shard([self, Account.site_admin].uniq) do |accounts|
+    Shard.partition_by_shard(account_chain(include_site_admin: true).uniq) do |accounts|
       next unless user.associated_shards.include?(Shard.current)
       AccountUser.eager_load(:account).where("user_id=? AND (root_account_id IN (?) OR account_id IN (?))", user, accounts, accounts)
     end

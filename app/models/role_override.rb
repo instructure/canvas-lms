@@ -858,12 +858,11 @@ class RoleOverride < ActiveRecord::Base
     @@role_override_chain ||= {}
     overrides = @@role_override_chain[permissionless_key] ||= begin
       context.shard.activate do
-        accounts = context.account_chain
-        overrides = RoleOverride.where(:context_id => accounts, :context_type => 'Account', :role_id => role)
-
-        if role_context == Account.site_admin && !accounts.include?(Account.site_admin)
-          accounts << Account.site_admin
-          overrides += Account.site_admin.role_overrides.where(:role_id => role)
+        accounts = context.account_chain(include_site_admin: true)
+        overrides = Shard.partition_by_shard(accounts) do |shard_accounts|
+          # skip loading from site admin if the role is not from site admin
+          next if shard_accounts == [Account.site_admin] && role_context != Account.site_admin
+          RoleOverride.where(:context_id => accounts, :context_type => 'Account', :role_id => role)
         end
 
         accounts.reverse!

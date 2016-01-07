@@ -701,9 +701,11 @@ class Group < ActiveRecord::Base
     self.content_exports.where(user_id: user)
   end
 
-  def account_chain
+  def account_chain(include_site_admin: false)
     @account_chain ||= Account.account_chain(account_id)
-    @account_chain.dup
+    result = @account_chain.dup
+    Account.add_site_admin_to_chain!(result) if include_site_admin
+    result
   end
 
   def sortable_name

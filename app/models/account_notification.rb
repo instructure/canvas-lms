@@ -97,7 +97,7 @@ class AccountNotification < ActiveRecord::Base
       # this allows us to make a global announcement that is filtered to only accounts with this flag
       enabled_flags = ACCOUNT_SERVICE_NOTIFICATION_FLAGS & account.allowed_services_hash.keys.map(&:to_s)
 
-      Shard.partition_by_shard([Account.site_admin, account]) do |accounts|
+      Shard.partition_by_shard(account.account_chain(include_site_admin: true).reverse) do |accounts|
         AccountNotification.where("account_id IN (?) AND start_at <? AND end_at>?", accounts, now, now).
           where("required_account_service IS NULL OR required_account_service IN (?)", enabled_flags).
           order('start_at DESC').

@@ -1275,9 +1275,11 @@ class Course < ActiveRecord::Base
     end
   end
 
-  def account_chain
+  def account_chain(include_site_admin: false)
     @account_chain ||= Account.account_chain(account_id)
-    @account_chain.dup
+    result = @account_chain.dup
+    Account.add_site_admin_to_chain!(result) if include_site_admin
+    result
   end
 
   def institution_name
@@ -1287,7 +1289,8 @@ class Course < ActiveRecord::Base
 
   def account_users_for(user)
     return [] unless user
-    @associated_account_ids ||= (self.associated_accounts + [Account.site_admin]).map { |a| a.active? ? a.id : nil }.compact
+    @associated_account_ids ||= (self.associated_accounts + root_account.account_chain(include_site_admin: true)).
+        uniq.map { |a| a.active? ? a.id : nil }.compact
     @account_users ||= {}
     @account_users[user.global_id] ||= Shard.partition_by_shard(@associated_account_ids) do |account_chain_ids|
       if account_chain_ids == [Account.site_admin.id]

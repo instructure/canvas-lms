@@ -711,8 +711,8 @@ module ApplicationHelper
 
   def get_global_includes
     return @global_includes if defined?(@global_includes)
-    @global_includes = [Account.site_admin.global_includes_hash]
-    @global_includes << @domain_root_account.global_includes_hash if @domain_root_account.present?
+    chain = (@domain_root_account || Account.site_admin).account_chain(include_site_admin: true).reverse
+    @global_includes = chain.map(&:global_includes_hash)
     if @domain_root_account.try(:sub_account_includes?)
       # get the deepest account to start looking for branding
       if (acct = Context.get_account(@context))
