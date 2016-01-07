@@ -105,3 +105,8 @@ sv:
   locales:
     sv: Svenska
   qualified_locale: sv-SE
+he:
+  locales:
+    he: עברית (crowd-sourced)
+  crowdsourced: true
+  qualified_locale: he-IL
