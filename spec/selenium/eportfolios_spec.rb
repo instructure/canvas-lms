@@ -50,6 +50,7 @@ describe "eportfolios" do
 
       get "/eportfolios/#{@eportfolio.id}"
       f('.manage_pages_link').click
+      wait_for_animations
       f('.add_page_link').click
       wait_for_ajaximations
       replace_content(f('#page_name'), page_title)
