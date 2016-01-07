@@ -925,9 +925,9 @@ class AccountsController < ApplicationController
     end
   end
 
-  def process_external_integration_keys
+  def process_external_integration_keys(account = @account)
     if params_keys = params[:account][:external_integration_keys]
-      ExternalIntegrationKey.indexed_keys_for(@account).each do |key_type, key|
+      ExternalIntegrationKey.indexed_keys_for(account).each do |key_type, key|
         next unless params_keys.key?(key_type)
         next unless key.grants_right?(@current_user, :write)
         unless params_keys[key_type].blank?
