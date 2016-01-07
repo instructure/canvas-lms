@@ -117,24 +117,46 @@ module QuizzesCommon
 
   def quiz_with_multiple_type_questions(goto_edit=true)
     @context = @course
-    bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
+    bank = @context.assessment_question_banks.create!(:title => 'Test Bank')
     @quiz = quiz_model
     a = bank.assessment_questions.create!
     b = bank.assessment_questions.create!
     c = bank.assessment_questions.create!
     answers = [ {'id' => 1}, {'id' => 2}, {'id' => 3} ]
 
-    @quest1 = @quiz.quiz_questions.create!(question_data:
-                                            {name: "first question", question_type: 'multiple_choice_question',
-                                             'answers' => answers, points_possible: 1}, assessment_question: a)
-    @quest2 = @quiz.quiz_questions.create!(question_data:
-                                            {name: "second question", question_text: 'What is 5+5?',
-                                             question_type: 'numerical_question',
-                                             'answers' => [], points_possible: 1}, assessment_question: b)
-    @quest3 = @quiz.quiz_questions.create!(question_data:
-                                            {name: "third question", question_type: 'essay_question',
-                                             'answers' => [], points_possible: 1}, assessment_question: c)
+    @quest1 = @quiz.quiz_questions.create!(
+      question_data: {
+        name: 'first question',
+        question_type: 'multiple_choice_question',
+        answers: answers,
+        points_possible: 1
+      },
+      assessment_question: a
+    )
+
+    @quest2 = @quiz.quiz_questions.create!(
+      question_data: {
+        name: 'second question',
+        question_text: 'What is 5+5?',
+        question_type: 'numerical_question',
+        answers: [],
+        points_possible: 1
+      },
+      assessment_question: b
+    )
+
+    @quest3 = @quiz.quiz_questions.create!(
+      question_data: {
+        name: 'third question',
+        question_type: 'essay_question',
+        answers: [],
+        points_possible: 1
+      },
+      assessment_question: c
+    )
+
     yield bank, @quiz if block_given?
+
     @quiz.generate_quiz_data
     @quiz.save!
     open_quiz_edit_form if goto_edit
@@ -143,16 +165,33 @@ module QuizzesCommon
 
   def quiz_with_new_questions(goto_edit=true)
     @context = @course
-    bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
+    bank = @context.assessment_question_banks.create!(title: 'Test Bank')
     @quiz = quiz_model
     a = bank.assessment_questions.create!
     b = bank.assessment_questions.create!
 
-    answers = [ {'id' => 1}, {'id' => 2}, {'id' => 3} ]
+    answers = [ {id: 1}, {id: 2}, {id: 3} ]
 
-    @quest1 = @quiz.quiz_questions.create!(:question_data => {:name => "first question", 'question_type' => 'multiple_choice_question', 'answers' => answers, :points_possible => 1}, :assessment_question => a)
+    @quest1 = @quiz.quiz_questions.create!(
+      question_data: {
+        name: 'first question',
+        question_type: 'multiple_choice_question',
+        answers: answers,
+        points_possible: 1
+      },
+      assessment_question: a
+    )
 
-    @quest2 = @quiz.quiz_questions.create!(:question_data => {:name => "second question", 'question_type' => 'multiple_choice_question', 'answers' => answers, :points_possible => 1}, :assessment_question => b)
+    @quest2 = @quiz.quiz_questions.create!(
+      question_data: {
+        name: 'second question',
+        question_type: 'multiple_choice_question',
+        answers: answers,
+        points_possible: 1
+      },
+      assessment_question: b
+    )
+
     yield bank, @quiz if block_given?
 
     @quiz.generate_quiz_data
@@ -404,10 +443,10 @@ module QuizzesCommon
   end
 
   def edit_quiz
-    expect_new_page_load {
+    expect_new_page_load do
       wait_for_ajaximations
       f('.quiz-edit-button').click
-    }
+    end
   end
 
   def cancel_quiz_edit
@@ -607,37 +646,36 @@ module QuizzesCommon
   end
 
   def seed_quiz_with_submission(num=1, opts={})
-    quiz_data =
-        [
-            {
-                question_name: 'Multiple Choice',
-                points_possible: 10,
-                question_text: 'Pick wisely...',
-                answers: [
-                    {weight: 100, answer_text: 'Correct', id: 1},
-                    {weight: 0, answer_text: 'Wrong', id: 2},
-                    {weight: 0, answer_text: 'Wrong', id: 3}
-                ],
-                question_type: 'multiple_choice_question'
-            },
-            {
-                question_name: 'File Upload',
-                points_possible: 5,
-                question_text: 'Upload a file',
-                question_type: 'file_upload_question'
-            },
-            {
-                question_name: 'Short Essay',
-                points_possible: 20,
-                question_text: 'Write an essay',
-                question_type: 'essay_question'
-            },
-            {
-                question_name: 'Text (no question)',
-                question_text: 'This is just text',
-                question_type: 'text_only_question'
-            }
-        ]
+    quiz_data = [
+      {
+        question_name: 'Multiple Choice',
+        points_possible: 10,
+        question_text: 'Pick wisely...',
+        answers: [
+          { weight: 100, answer_text: 'Correct', id: 1 },
+          { weight: 0, answer_text: 'Wrong', id: 2 },
+          { weight: 0, answer_text: 'Wrong', id: 3 }
+        ],
+        question_type: 'multiple_choice_question'
+      },
+      {
+        question_name: 'File Upload',
+        points_possible: 5,
+        question_text: 'Upload a file',
+        question_type: 'file_upload_question'
+      },
+      {
+        question_name: 'Short Essay',
+        points_possible: 20,
+        question_text: 'Write an essay',
+        question_type: 'essay_question'
+      },
+      {
+        question_name: 'Text (no question)',
+        question_text: 'This is just text',
+        question_type: 'text_only_question'
+      }
+    ]
 
     quiz = @course.quizzes.create title: 'Quiz Me!'
 
@@ -655,6 +693,11 @@ module QuizzesCommon
     submission.save!
 
     quiz
+  end
+
+  def verify_quiz_show_page_due_date(due_date)
+    open_quiz_show_page unless driver.current_url == quiz_show_page_url
+    expect(f('#quiz_show')).to include_text due_date
   end
 
   def verify_quiz_is_locked
