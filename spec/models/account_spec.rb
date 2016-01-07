@@ -427,16 +427,16 @@ describe Account do
     end
 
     limited_access = [ :read, :manage, :update, :delete, :read_outcomes ]
-    account_enabled_access = [ :view_notifications, :manage_catalog ]
-    full_access = RoleOverride.permissions.keys + limited_access - account_enabled_access + [:create_courses]
+    conditional_access = RoleOverride.permissions.select { |_, v| v[:account_allows] }.map(&:first)
+    full_access = RoleOverride.permissions.keys + limited_access - conditional_access + [:create_courses]
     siteadmin_access = [:app_profiling]
     full_root_access = full_access - RoleOverride.permissions.select { |k, v| v[:account_only] == :site_admin }.map(&:first)
     full_sub_access = full_root_access - RoleOverride.permissions.select { |k, v| v[:account_only] == :root }.map(&:first)
     # site admin has access to everything everywhere
     hash.each do |k, v|
       account = v[:account]
-      expect(account.check_policy(hash[:site_admin][:admin])).to match_array full_access + (k == :site_admin ? [:read_global_outcomes] : [])
-      expect(account.check_policy(hash[:site_admin][:user])).to match_array siteadmin_access + limited_access + (k == :site_admin ? [:read_global_outcomes] : [])
+      expect(account.check_policy(hash[:site_admin][:admin]) - conditional_access).to match_array full_access + (k == :site_admin ? [:read_global_outcomes] : [])
+      expect(account.check_policy(hash[:site_admin][:user]) - conditional_access).to match_array siteadmin_access + limited_access + (k == :site_admin ? [:read_global_outcomes] : [])
     end
 
     # root admin has access to everything except site admin
@@ -446,7 +446,7 @@ describe Account do
     hash.each do |k, v|
       next if k == :site_admin
       account = v[:account]
-      expect(account.check_policy(hash[:root][:admin])).to match_array full_root_access
+      expect(account.check_policy(hash[:root][:admin]) - conditional_access).to match_array full_root_access
       expect(account.check_policy(hash[:root][:user])).to match_array limited_access
     end
 
@@ -460,7 +460,7 @@ describe Account do
     hash.each do |k, v|
       next if k == :site_admin || k == :root
       account = v[:account]
-      expect(account.check_policy(hash[:sub][:admin])).to match_array full_sub_access
+      expect(account.check_policy(hash[:sub][:admin]) - conditional_access).to match_array full_sub_access
       expect(account.check_policy(hash[:sub][:user])).to match_array limited_access
     end
 
@@ -476,7 +476,7 @@ describe Account do
     AdheresToPolicy::Cache.clear
     hash.each do |k, v|
       account = v[:account]
-      expect(account.check_policy(hash[:site_admin][:admin])).to match_array full_access + (k == :site_admin ? [:read_global_outcomes] : [])
+      expect(account.check_policy(hash[:site_admin][:admin]) - conditional_access).to match_array full_access + (k == :site_admin ? [:read_global_outcomes] : [])
       expect(account.check_policy(hash[:site_admin][:user])).to match_array siteadmin_access + some_access + (k == :site_admin ? [:read_global_outcomes] : [])
     end
 
@@ -486,7 +486,7 @@ describe Account do
     hash.each do |k, v|
       next if k == :site_admin
       account = v[:account]
-      expect(account.check_policy(hash[:root][:admin])).to match_array full_root_access
+      expect(account.check_policy(hash[:root][:admin]) - conditional_access).to match_array full_root_access
       expect(account.check_policy(hash[:root][:user])).to match_array some_access
     end
 
@@ -500,7 +500,7 @@ describe Account do
     hash.each do |k, v|
       next if k == :site_admin || k == :root
       account = v[:account]
-      expect(account.check_policy(hash[:sub][:admin])).to match_array full_sub_access
+      expect(account.check_policy(hash[:sub][:admin]) - conditional_access).to match_array full_sub_access
       expect(account.check_policy(hash[:sub][:user])).to match_array some_access
     end
   end
