@@ -1,5 +1,6 @@
 require 'i18n_tasks'
 require 'i18n_extraction'
+require 'shellwords'
 
 namespace :i18n do
   desc "Verifies all translation calls"
@@ -411,7 +412,7 @@ HEADER
 
     transifex_url = "http://www.transifex.com/api/2/project/canvas-lms/"
     translation_url = transifex_url + "resource/canvas-lms/translation"
-    userpass = "#{user}:#{password}"
+    userpass = "#{user}:#{Shellwords.escape(password)}"
     languages.each do |lang|
       if lang.is_a?(Array)
         lang, transifex_lang = *lang
