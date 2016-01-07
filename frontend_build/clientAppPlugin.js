@@ -21,8 +21,8 @@ clientAppPlugin.prototype.apply = function(compiler){
           request = "old_unsupported_dont_use_react"
         }
 
-        if(request == "react-router"){
-          request = "old_unsupported_dont_use_react-router"
+        if(request == "react-router" || request == "canvas_packages/react-router"){
+          request = "old_unsupported_dont_use_react-router-webpack"
         }
       }
 

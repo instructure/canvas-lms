@@ -41,6 +41,7 @@
     "karma-requirejs": "^0.2.2",
     "karma-webpack": "^1.7.0",
     "lodash": "^3.10.1",
+    "on-build-webpack": "^0.1.0",
     "qunitjs": "^1.14.0",
     "requirejs": "~2.1.10",
     "rsvp": "^3.1.0",

@@ -1,4 +1,6 @@
-!function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define(['old_unsupported_dont_use_react'],e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.ReactRouter=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
+define(['old_unsupported_dont_use_react'], function (React){
+
+!function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define([],e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.ReactRouter=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 /**
  * Actions that modify the URL.
  */
@@ -68,7 +70,7 @@ var ScrollToTopBehavior = {
 module.exports = ScrollToTopBehavior;
 
 },{}],4:[function(_dereq_,module,exports){
-var merge = _dereq_('old_unsupported_dont_use_react/lib/merge');
+var merge = React.__internals.merge;
 var Route = _dereq_('./Route');
 
 /**
@@ -89,9 +91,11 @@ function DefaultRoute(props) {
 module.exports = DefaultRoute;
 
 },{"./Route":8,"old_unsupported_dont_use_react/lib/merge":71}],5:[function(_dereq_,module,exports){
-var React = _dereq_('old_unsupported_dont_use_react');
-var classSet = _dereq_('old_unsupported_dont_use_react/lib/cx');
-var merge = _dereq_('old_unsupported_dont_use_react/lib/merge');
+//var React = _dereq_('old_unsupported_dont_use_react');
+//var classSet = _dereq_('old_unsupported_dont_use_react/lib/cx');
+var classSet = React.__internals.cx;
+//var merge = _dereq_('old_unsupported_dont_use_react/lib/merge');
+var merge = React.__internals.merge;
 var ActiveState = _dereq_('../mixins/ActiveState');
 var Navigation = _dereq_('../mixins/Navigation');
 
@@ -198,7 +202,8 @@ var Link = React.createClass({
 module.exports = Link;
 
 },{"../mixins/ActiveState":15,"../mixins/Navigation":18,"old_unsupported_dont_use_react/lib/cx":61,"old_unsupported_dont_use_react/lib/merge":71}],6:[function(_dereq_,module,exports){
-var merge = _dereq_('old_unsupported_dont_use_react/lib/merge');
+//var merge = _dereq_('old_unsupported_dont_use_react/lib/merge');
+var merge = React.__internals.merge;
 var Route = _dereq_('./Route');
 
 /**
@@ -220,7 +225,7 @@ function NotFoundRoute(props) {
 module.exports = NotFoundRoute;
 
 },{"./Route":8,"old_unsupported_dont_use_react/lib/merge":71}],7:[function(_dereq_,module,exports){
-var React = _dereq_('old_unsupported_dont_use_react');
+//var React = _dereq_('old_unsupported_dont_use_react');
 var Route = _dereq_('./Route');
 
 function createRedirectHandler(to, _params, _query) {
@@ -252,7 +257,7 @@ function Redirect(props) {
 module.exports = Redirect;
 
 },{"./Route":8}],8:[function(_dereq_,module,exports){
-var React = _dereq_('old_unsupported_dont_use_react');
+//var React = _dereq_('old_unsupported_dont_use_react');
 var withoutProperties = _dereq_('../utils/withoutProperties');
 
 /**
@@ -345,10 +350,13 @@ var Route = React.createClass({
 module.exports = Route;
 
 },{"../utils/withoutProperties":30}],9:[function(_dereq_,module,exports){
-var React = _dereq_('old_unsupported_dont_use_react');
-var warning = _dereq_('old_unsupported_dont_use_react/lib/warning');
-var invariant = _dereq_('old_unsupported_dont_use_react/lib/invariant');
-var copyProperties = _dereq_('old_unsupported_dont_use_react/lib/copyProperties');
+//var React = _dereq_('old_unsupported_dont_use_react');
+//var warning = _dereq_('old_unsupported_dont_use_react/lib/warning');
+var warning = React.__internals.warning;
+//var invariant = _dereq_('old_unsupported_dont_use_react/lib/invariant');
+var invariant = React.__internals.invariant;
+//var copyProperties = _dereq_('old_unsupported_dont_use_react/lib/copyProperties');
+var copyProperties = React.__internals.copyProperties;
 var HashLocation = _dereq_('../locations/HashLocation');
 var ActiveContext = _dereq_('../mixins/ActiveContext');
 var LocationContext = _dereq_('../mixins/LocationContext');
@@ -1122,8 +1130,9 @@ var RefreshLocation = {
 module.exports = RefreshLocation;
 
 },{"../utils/getWindowPath":27}],14:[function(_dereq_,module,exports){
-var React = _dereq_('old_unsupported_dont_use_react');
-var copyProperties = _dereq_('old_unsupported_dont_use_react/lib/copyProperties');
+//var React = _dereq_('old_unsupported_dont_use_react');
+//var copyProperties = _dereq_('old_unsupported_dont_use_react/lib/copyProperties');
+var copyProperties = React.__internals.copyProperties;
 
 /**
  * A mixin for components that store the active state of routes,
@@ -1193,7 +1202,7 @@ var ActiveContext = {
 module.exports = ActiveContext;
 
 },{"old_unsupported_dont_use_react/lib/copyProperties":60}],15:[function(_dereq_,module,exports){
-var React = _dereq_('old_unsupported_dont_use_react');
+//var React = _dereq_('old_unsupported_dont_use_react');
 
 /**
  * A mixin for components that need to know the routes, URL
@@ -1256,7 +1265,7 @@ var ActiveState = {
 module.exports = ActiveState;
 
 },{}],16:[function(_dereq_,module,exports){
-var React = _dereq_('old_unsupported_dont_use_react');
+//var React = _dereq_('old_unsupported_dont_use_react');
 
 /**
  * A mixin for components that need to know the current URL path.
@@ -1290,9 +1299,11 @@ var CurrentPath = {
 module.exports = CurrentPath;
 
 },{}],17:[function(_dereq_,module,exports){
-var React = _dereq_('old_unsupported_dont_use_react');
-var invariant = _dereq_('old_unsupported_dont_use_react/lib/invariant');
-var canUseDOM = _dereq_('old_unsupported_dont_use_react/lib/ExecutionEnvironment').canUseDOM;
+//var React = _dereq_('old_unsupported_dont_use_react');
+//var invariant = _dereq_('old_unsupported_dont_use_react/lib/invariant');
+var invariant = React.__internals.invariant;
+//var canUseDOM = _dereq_('old_unsupported_dont_use_react/lib/ExecutionEnvironment').canUseDOM;
+var canUseDOM = React.__internals.ExecutionEnvironment.canUseDOM;
 var HashLocation = _dereq_('../locations/HashLocation');
 var HistoryLocation = _dereq_('../locations/HistoryLocation');
 var RefreshLocation = _dereq_('../locations/RefreshLocation');
@@ -1392,7 +1403,7 @@ var LocationContext = {
 module.exports = LocationContext;
 
 },{"../locations/HashLocation":11,"../locations/HistoryLocation":12,"../locations/RefreshLocation":13,"../stores/PathStore":21,"../utils/supportsHistory":29,"old_unsupported_dont_use_react/lib/ExecutionEnvironment":42,"old_unsupported_dont_use_react/lib/invariant":66}],18:[function(_dereq_,module,exports){
-var React = _dereq_('old_unsupported_dont_use_react');
+//var React = _dereq_('old_unsupported_dont_use_react');
 
 /**
  * A mixin for components that modify the URL.
@@ -1451,8 +1462,9 @@ var Navigation = {
 module.exports = Navigation;
 
 },{}],19:[function(_dereq_,module,exports){
-var React = _dereq_('old_unsupported_dont_use_react');
-var invariant = _dereq_('old_unsupported_dont_use_react/lib/invariant');
+//var React = _dereq_('old_unsupported_dont_use_react');
+//var invariant = _dereq_('old_unsupported_dont_use_react/lib/invariant');
+var invariant = React.__internals.invariant;
 var Path = _dereq_('../utils/Path');
 
 /**
@@ -1622,9 +1634,11 @@ var RouteContext = {
 module.exports = RouteContext;
 
 },{"../utils/Path":22,"old_unsupported_dont_use_react/lib/invariant":66}],20:[function(_dereq_,module,exports){
-var React = _dereq_('old_unsupported_dont_use_react');
-var invariant = _dereq_('old_unsupported_dont_use_react/lib/invariant');
-var canUseDOM = _dereq_('old_unsupported_dont_use_react/lib/ExecutionEnvironment').canUseDOM;
+//var React = _dereq_('old_unsupported_dont_use_react');
+//var invariant = _dereq_('old_unsupported_dont_use_react/lib/invariant');
+var invariant = React.__internals.invariant;
+//var canUseDOM = _dereq_('old_unsupported_dont_use_react/lib/ExecutionEnvironment').canUseDOM;
+var canUseDOM = React.__internals.ExecutionEnvironment.canUseDOM;
 var ImitateBrowserBehavior = _dereq_('../behaviors/ImitateBrowserBehavior');
 var ScrollToTopBehavior = _dereq_('../behaviors/ScrollToTopBehavior');
 
@@ -1739,7 +1753,8 @@ var ScrollContext = {
 module.exports = ScrollContext;
 
 },{"../behaviors/ImitateBrowserBehavior":2,"../behaviors/ScrollToTopBehavior":3,"old_unsupported_dont_use_react/lib/ExecutionEnvironment":42,"old_unsupported_dont_use_react/lib/invariant":66}],21:[function(_dereq_,module,exports){
-var invariant = _dereq_('old_unsupported_dont_use_react/lib/invariant');
+//var invariant = _dereq_('old_unsupported_dont_use_react/lib/invariant');
+var invariant = React.__internals.invariant;
 var EventEmitter = _dereq_('events').EventEmitter;
 var LocationActions = _dereq_('../actions/LocationActions');
 
@@ -1830,7 +1845,8 @@ var PathStore = {
 module.exports = PathStore;
 
 },{"../actions/LocationActions":1,"events":31,"old_unsupported_dont_use_react/lib/invariant":66}],22:[function(_dereq_,module,exports){
-var invariant = _dereq_('old_unsupported_dont_use_react/lib/invariant');
+//var invariant = _dereq_('old_unsupported_dont_use_react/lib/invariant');
+var invariant = React.__internals.invariant;
 var merge = _dereq_('qs/lib/utils').merge;
 var qs = _dereq_('qs');
 
@@ -2028,15 +2044,23 @@ function Redirect(to, params, query) {
 module.exports = Redirect;
 
 },{}],25:[function(_dereq_,module,exports){
-var ReactDescriptor = _dereq_('old_unsupported_dont_use_react/lib/ReactDescriptor');
-var ReactInstanceHandles = _dereq_('old_unsupported_dont_use_react/lib/ReactInstanceHandles');
-var ReactMarkupChecksum = _dereq_('old_unsupported_dont_use_react/lib/ReactMarkupChecksum');
-var ReactServerRenderingTransaction = _dereq_('old_unsupported_dont_use_react/lib/ReactServerRenderingTransaction');
+//var ReactDescriptor = _dereq_('old_unsupported_dont_use_react/lib/ReactDescriptor');
+var ReactDescriptor = React.__internals.ReactDescriptor;
+//var ReactInstanceHandles = _dereq_('old_unsupported_dont_use_react/lib/ReactInstanceHandles');
+var ReactInstanceHandles = React.__internals.InstanceHandles;
+//var ReactMarkupChecksum = _dereq_('old_unsupported_dont_use_react/lib/ReactMarkupChecksum');
+var ReactMarkupChecksum = React.__internals.ReactMarkupChecksum;
+//var ReactServerRenderingTransaction = _dereq_('old_unsupported_dont_use_react/lib/ReactServerRenderingTransaction');
+var ReactServerRenderingTransaction = React.__internals.ReactServerRenderingTransaction;
 
-var cloneWithProps = _dereq_('old_unsupported_dont_use_react/lib/cloneWithProps');
-var copyProperties = _dereq_('old_unsupported_dont_use_react/lib/copyProperties');
-var instantiateReactComponent = _dereq_('old_unsupported_dont_use_react/lib/instantiateReactComponent');
-var invariant = _dereq_('old_unsupported_dont_use_react/lib/invariant');
+//var cloneWithProps = _dereq_('old_unsupported_dont_use_react/lib/cloneWithProps');
+var cloneWithProps = React.__internals.cloneWithProps;
+//var copyProperties = _dereq_('old_unsupported_dont_use_react/lib/copyProperties');
+var copyProperties = React.__internals.copyProperties;
+//var instantiateReactComponent = _dereq_('old_unsupported_dont_use_react/lib/instantiateReactComponent');
+var instantiateReactComponent = React.__internals.instantiateReactComponent;
+//var invariant = _dereq_('old_unsupported_dont_use_react/lib/invariant');
+var invariant = React.__internals.invariant;
 
 function cloneRoutesForServerRendering(routes) {
   return cloneWithProps(routes, {
@@ -2138,7 +2162,8 @@ module.exports = {
 };
 
 },{"old_unsupported_dont_use_react/lib/ReactDescriptor":47,"old_unsupported_dont_use_react/lib/ReactInstanceHandles":49,"old_unsupported_dont_use_react/lib/ReactMarkupChecksum":50,"old_unsupported_dont_use_react/lib/ReactServerRenderingTransaction":54,"old_unsupported_dont_use_react/lib/cloneWithProps":59,"old_unsupported_dont_use_react/lib/copyProperties":60,"old_unsupported_dont_use_react/lib/instantiateReactComponent":65,"old_unsupported_dont_use_react/lib/invariant":66}],26:[function(_dereq_,module,exports){
-var mixInto = _dereq_('old_unsupported_dont_use_react/lib/mixInto');
+//var mixInto = _dereq_('old_unsupported_dont_use_react/lib/mixInto');
+var mixInto = React.__internals.mixInto;
 var Promise = _dereq_('./Promise');
 var Redirect = _dereq_('./Redirect');
 
@@ -8061,4 +8086,5 @@ define(function() {
 
 },{}]},{},[10])
 (10)
+});
 });

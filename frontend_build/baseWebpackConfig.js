@@ -1,10 +1,12 @@
 var webpack = require("webpack");
+var child_process = require('child_process');
 var I18nPlugin = require("./i18nPlugin");
 var ClientAppsPlugin = require("./clientAppPlugin");
 var CompiledReferencePlugin = require("./CompiledReferencePlugin");
 var bundleEntries = require("./bundles");
 var ShimmedAmdPlugin = require("./shimmedAmdPlugin");
 var BundleExtensionsPlugin = require("./BundleExtensionsPlugin");
+var WebpackOnBuildPlugin = require('on-build-webpack');
 var path = require('path');
 
 module.exports = {
@@ -146,6 +148,9 @@ module.exports = {
     new webpack.IgnorePlugin(/\.md$/),
     new webpack.IgnorePlugin(/(CHANGELOG|LICENSE|README)$/),
     new webpack.IgnorePlugin(/package.json/),
+    new WebpackOnBuildPlugin(function(stats){
+      child_process.spawnSync("gulp", ["rev"]);
+    }),
     new webpack.PrefetchPlugin("./app/coffeescripts/calendar/ContextSelector.coffee"),
     new webpack.PrefetchPlugin("./app/coffeescripts/calendar/TimeBlockRow.coffee"),
     new webpack.PrefetchPlugin("./app/coffeescripts/react_files/components/FolderTree.coffee"),
