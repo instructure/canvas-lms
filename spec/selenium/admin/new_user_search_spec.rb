@@ -102,4 +102,30 @@ describe "new account user search" do
     expect(rows.count).to eq 1
     expect(rows.first).to include_text(match_user.name)
   end
+
+  it "should link to the user avatar page" do
+    match_user = user_with_pseudonym(:account => @account, :name => "user with a search term")
+    user_with_pseudonym(:account => @account, :name => "diffrient user")
+
+    get "/accounts/#{@account.id}"
+    click_tab
+
+    f('#peopleOptionsBtn').click
+    f('#manageStudentsLink').click
+
+    expect(driver.current_url).to include_text("/accounts/#{@account.id}/avatars")
+  end
+
+  it "should link to the user group page" do
+    match_user = user_with_pseudonym(:account => @account, :name => "user with a search term")
+    user_with_pseudonym(:account => @account, :name => "diffrient user")
+
+    get "/accounts/#{@account.id}"
+    click_tab
+
+    f('#peopleOptionsBtn').click
+    f('#viewUserGroupLink').click
+
+    expect(driver.current_url).to include_text("/accounts/#{@account.id}/groups")
+  end
 end
