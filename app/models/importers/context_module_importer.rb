@@ -147,7 +147,7 @@ module Importers
           }, existing_item, :wiki_page => wiki, :position => context_module.migration_position)
         end
       elsif resource_class == Attachment
-        file = context_module.context.attachments.active.where(migration_id: hash[:linked_resource_id]).first if hash[:linked_resource_id]
+        file = context_module.context.attachments.not_deleted.where(migration_id: hash[:linked_resource_id]).first if hash[:linked_resource_id]
         if file
           title = hash[:title] || hash[:linked_resource_title]
           item = context_module.add_item({
