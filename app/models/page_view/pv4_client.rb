@@ -50,7 +50,7 @@ class PageView
         pv['account_id'] = pv.delete('root_account_id')
         pv['remote_ip'] = pv.delete('client_ip')
         pv['render_time'] = pv.delete('microseconds').to_f / 1_000_000
-        pv['http_method'].downcase!
+        pv['http_method'].try(:downcase!)
 
         PageView.from_attributes(pv)
       end
