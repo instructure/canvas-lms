@@ -227,7 +227,7 @@ TEXT
           </table>
         </fieldset>
 
-        <%= render :partial => 'additional_settings' %>
+        <%= render partial: 'additional_settings', locals: { f: f } %>
 
         <% if !@account.site_admin? &&
                @account.root_account? &&
