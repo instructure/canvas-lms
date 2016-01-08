@@ -27,6 +27,11 @@ define([
     init: function(){
       $('.assignment_header').click(function(event) {
         event.preventDefault();
+
+        var toggleLink = $(this).find('.assignment-header');
+        var currentState = toggleLink.attr('aria-expanded');
+
+        toggleLink.attr('aria-expanded', currentState == 'false' ? 'true' : 'false');
         $(this).find('.ui-icon').toggleClass('ui-icon-circle-arrow-n').end()
           .next('.assignment_details').slideToggle('fast');
       });

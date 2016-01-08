@@ -29,5 +29,35 @@ describe "gradebook2 - Grading History" do
       changed_values = ff('.assignment_details td').map(& :text)
       expect(changed_values).to eq ['EX', '10', '10']
     end
+
+    context 'Individual Assignments' do
+      let(:test_course) { course() }
+      let(:teacher) { user(active_all: true) }
+      let(:student) { user(active_all: true) }
+      let!(:enroll_teacher) { test_course.enroll_user(teacher, 'TeacherEnrollment', enrollment_state: 'active') }
+      let!(:enroll_student) { test_course.enroll_user(student, 'StudentEnrollment', enrollment_state: 'active') }
+      let!(:assignment) do
+        test_course.assignments.create!(
+          title: 'Assignment Yeah',
+          points_possible: 10,
+          submission_types: 'online_text_entry'
+        )
+      end
+      let!(:submit_assignment) { assignment.submit_homework(student, submission_types: 'online_text_entry', body: 'blah')}
+      let!(:grade_homework) { assignment.grade_student(student, grade: 8) }
+      let!(:grade_homework) { assignment.grade_student(student, grade: 10) }
+
+      it 'toggles and displays grading history', priority: "2", test_id: 602872 do
+        user_session(teacher)
+        get "/courses/#{test_course.id}/gradebook/history"
+
+        # expand grade history toggle
+        fj('.assignment_header a').click
+        wait_for_animations
+
+        current_grade_column = fj(".current_grade.assignment_#{assignment.id}_user_#{student.id}_current_grade")
+        expect(current_grade_column).to include_text('10')
+      end
+    end
   end
 end
