@@ -389,7 +389,7 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   def self.standardize_url(url)
-    return "" if url.empty?
+    return "" if url.blank?
     url = "http://" + url unless url.match(/:\/\//)
     res = URI.parse(url).normalize
     res.query = res.query.split(/&/).sort.join('&') if !res.query.blank?
