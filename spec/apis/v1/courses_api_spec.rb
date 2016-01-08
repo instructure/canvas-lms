@@ -920,6 +920,33 @@ describe CoursesController, type: :request do
       end
     end
 
+    context "a designer" do
+      before(:once) do
+        course_with_designer(:course => @course, :active_all => true)
+        @standard = @course.account.grading_standards.create!(:title => "account standard", :standard_data => {:a => {:name => 'A', :value => '95'}, :b => {:name => 'B', :value => '80'}, :f => {:name => 'F', :value => ''}})
+      end
+
+      it "should require :manage_grades rights if the grading standard is changing" do
+        json = api_call_as_user(@designer, :put, @path, @params, { :course => { :grading_standard_id => @standard.id, :apply_assignment_group_weights => true } }, {}, { :expected_status => 401 })
+      end
+
+      it "should not require :manage_grades rights if the grading standard is not changing" do
+        @course.grading_standard = @standard
+        @course.save!
+        json = api_call_as_user(@designer, :put, @path, @params, :course => { :grading_standard_id => @standard.id, :apply_assignment_group_weights => true })
+        @course.reload
+        expect(@course.apply_group_weights?).to eq true
+        expect(@course.grading_standard).to eq @standard
+      end
+
+      it "should not require :manage_grades rights if the grading standard isn't changing (null)" do
+        json = api_call_as_user(@designer, :put, @path, @params, :course => { :grading_standard_id => nil, :apply_assignment_group_weights => true })
+        @course.reload
+        expect(@course.apply_group_weights?).to eq true
+        expect(@course.grading_standard).to be_nil
+      end
+    end
+
     context "a teacher" do
       before :once do
         user

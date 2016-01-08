@@ -2026,15 +2026,17 @@ class CoursesController < ApplicationController
 
       if params[:course].has_key? :grading_standard_id
         standard_id = params[:course].delete :grading_standard_id
-        if authorized_action?(@course, @current_user, :manage_grades)
-          if standard_id.present?
-            grading_standard = GradingStandard.for(@course).where(id: standard_id).first
-            @course.grading_standard = grading_standard if grading_standard
+        grading_standard = GradingStandard.for(@course).where(id: standard_id).first if standard_id.present?
+        if grading_standard != @course.grading_standard
+          if authorized_action?(@course, @current_user, :manage_grades)
+            if standard_id.present?
+              @course.grading_standard = grading_standard if grading_standard
+            else
+              @course.grading_standard = nil
+            end
           else
-            @course.grading_standard = nil
+            return
           end
-        else
-          return
         end
       end
       unless @course.account.grants_right? @current_user, session, :manage_storage_quotas
