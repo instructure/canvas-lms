@@ -305,7 +305,10 @@ module SeleniumDriverSetup
       return nope unless allow_requests?
 
       # wrap request in a mutex so we can ensure it doesn't span spec
-      # boundaries (see clear_requests!)
+      # boundaries (see clear_requests!). we also use this mutex to
+      # synchronize db access (so both threads see stuff in the overall
+      # spec transaction, while ensuring savepoints in one don't mess
+      # up the other)
       result = request_mutex.synchronize { app.call(env) }
 
       # check if the spec just finished while we ran, and if so prevent
@@ -350,7 +353,7 @@ module SeleniumDriverSetup
     end
 
     def request_mutex
-      @request_mutex ||= Mutex.new
+      @request_mutex ||= Monitor.new
     end
   end
 

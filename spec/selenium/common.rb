@@ -125,14 +125,15 @@ shared_context "in-process server selenium tests" do
       @dj_connection = Delayed::Backend::ActiveRecord::Job.connection
 
       # synchronize db connection methods for a modicum of thread safety
-      methods_to_sync = %w{execute exec_cache exec_no_cache query}
+      methods_to_sync = %w{execute exec_cache exec_no_cache query transaction}
       [@db_connection, @dj_connection].each do |conn|
         methods_to_sync.each do |method_name|
           if conn.respond_to?(method_name, true) && !conn.respond_to?("#{method_name}_with_synchronization", true)
+            arg_list = "*args"
+            arg_list << ", &Proc.new" if method_name == "transaction"
             conn.class.class_eval <<-RUBY
               def #{method_name}_with_synchronization(*args)
-                @mutex ||= Mutex.new
-                @mutex.synchronize { #{method_name}_without_synchronization(*args) }
+                SeleniumDriverSetup.request_mutex.synchronize { #{method_name}_without_synchronization(#{arg_list}) }
               end
               alias_method_chain :#{method_name}, :synchronization
             RUBY
