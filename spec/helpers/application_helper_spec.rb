@@ -573,6 +573,15 @@ describe ApplicationHelper do
             expect(output.scan(%r{https://example.com/(root|child|grandchild)?/account.css})).to eql [['root']]
           end
 
+          it "should load custom css even for high contrast users" do
+            @current_user = user
+            user.enable_feature!(:high_contrast)
+            @context = @grandchild_account
+            output = helper.include_account_css
+            expect(output).to have_tag 'link'
+            expect(output.scan(%r{https://example.com/(root|child|grandchild)?/account.css})).to eql [["root"], ["child"], ["grandchild"]]
+          end
+
           it "should include site admin css/js" do
             raise pending("need to handle site admin css/js from theme editor: CNVS-25229")
           end
@@ -609,6 +618,14 @@ describe ApplicationHelper do
             end
 
             it "should just include domain root account's when there is no context or @current_user" do
+              output = helper.include_account_js
+              expect(output).to have_tag 'script'
+              expect(output).to match(/#{Regexp.quote('["https:\/\/example.com\/root\/account.js"].forEach')}/)
+            end
+
+            it "should load custom js even for high contrast users" do
+              @current_user = user
+              user.enable_feature!(:high_contrast)
               output = helper.include_account_js
               expect(output).to have_tag 'script'
               expect(output).to match(/#{Regexp.quote('["https:\/\/example.com\/root\/account.js"].forEach')}/)

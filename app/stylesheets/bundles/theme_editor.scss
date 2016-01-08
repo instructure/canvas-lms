@@ -188,7 +188,7 @@ $te-width: 300px;
   }
 
   #te-upload:checked ~ .Theme__editor-tab-label-layout #te-upload-tab:before {
-    border-bottom-color: $te-bgd;
+    border-bottom-color: $te-content-bgd;
   }
 
   #te-editor:checked ~ #te-upload-panel,
@@ -211,24 +211,33 @@ $te-width: 300px;
 ///////
 
 .Theme__editor-upload-overrides {
-  background-color: $te-bgd;
+  background-color: $te-content-bgd;
   color: $ic-color-dark;
 
   .Theme__editor-upload-overrides_header {
     font-weight: 300;
     padding: 10px;
-  }
-
-  .Theme__editor-upload-overrides_form {
-    background: $te-content-bgd;
+    border-top: 1px solid $ic-border-light;
   }
 }
-
+.Theme__editor-upload-warning {
+  padding: $ic-sp;
+  @include fontSize(14px);
+  background: $te-content-bgd;
+  display: flex;
+  align-items: flex-start;
+  .Theme__editor-upload-warning_icon {
+    width: 60px;
+    text-align: center;
+    i {color: $ic-color-alert;}
+  } // added so icon div gets a width
+  p {margin: 0;} // override canvas global margins on p tags
+  .Theme__editor-upload-warning_text-emphasis {padding-bottom: $ic-sp;}
+}
 .ThemeEditorFileUpload {
   padding: $ic-sp;
   width: 100%;
 }
-
 .ThemeEditorFileUpload__file-chooser {
   display: flex;
   flex: 1;
