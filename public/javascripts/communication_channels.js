@@ -130,9 +130,10 @@ $(document).ready(function() {
         }
       } else {
         // Make sure it's a valid phone number. Validate the phone number they typed instead of the address because
-        // the address will already have the country code prepended, and this will result in blank phone numbers
-        // valid to our fairly naive regex. (libphonenumber plz)
-        var match = address.match(/^[0-9]+$/);
+        // the address will already have the country code prepended, and this will result in our regex failing always
+        // because it's not expecting the leading plus sign (and it can't just be added to the regex because then
+        // we can't detect when they entered a blank phone number). libphonenumber plz
+        var match = data.communication_channel_sms_number.match(/^[0-9]+$/);
         if (!match) {
           var errorMessage = address === "" ? I18n.t("Cell Number is required") : I18n.t("Cell Number is invalid!");
           $(this).formErrors({communication_channel_sms_number: errorMessage});
