@@ -1090,8 +1090,8 @@ define [
       @drawSectionSelectButton() if @sections_enabled
       @drawGradingPeriodSelectButton() if @mgpEnabled
 
-      $settingsMenu = $('#gradebook_settings').next()
-      $.each ['show_attendance', 'include_ungraded_assignments', 'show_concluded_enrollments'], (i, setting) =>
+      $settingsMenu = $('.gradebook_dropdown')
+      $.each ['show_attendance', 'include_ungraded_assignments', 'show_concluded_enrollments'], (_i, setting) =>
         $settingsMenu.find("##{setting}").prop('checked', !!@[setting]).change (event) =>
           if setting is 'show_concluded_enrollments' and @options.course_is_concluded and @show_concluded_enrollments
             $("##{setting}").prop('checked', true)
@@ -1117,7 +1117,7 @@ define [
       @arrangeColumnsBy(@getStoredSortOrder(), true)
 
       $('#gradebook_settings').kyleMenu()
-      $('#download_csv').kyleMenu()
+      $('#download_csv').kyleMenu(returnFocusTo: $('#download_csv'))
       $('#post_grades').kyleMenu()
 
       $settingsMenu.find('.student_names_toggle').click(@studentNamesToggle)
@@ -1150,6 +1150,7 @@ define [
 
       $('.generate_new_csv').click =>
         $('#download_csv').prop('disabled', true)
+        $('.icon-import').parent().focus()
         loading_interval = self.exportingGradebookStatus()
         include_priors = $('#show_concluded_enrollments').prop('checked')
 
