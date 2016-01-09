@@ -48,7 +48,8 @@ module CC::Exporter::Epub::Converters
       assignment
     end
 
-    def submission_types(types="")
+    def submission_types(types)
+      return [] unless types.present?
       types.split(",").map{|sub_type| CartridgeConverter::SUBMISSION_TYPES[sub_type]}
     end
   end

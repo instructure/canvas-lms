@@ -23,12 +23,14 @@ define [
   'jquery'
   'jquery.instructure_misc_helpers'
 ], (_, $) ->
-  userSettings = {}
+  userSettings = {
+    globalEnv: window.ENV
+  }
 
   addTokens = (method, tokens...) ->
     (key, value) ->
       stringifiedValue = JSON.stringify(value)
-      joinedTokens = _(tokens).map((token) -> ENV[token]).join('_')
+      joinedTokens = _(tokens).map((token) -> userSettings.globalEnv[token]).join('_')
       res = localStorage["#{method}Item"]("_#{joinedTokens}_#{key}", stringifiedValue)
       return undefined if res == "undefined"
       JSON.parse(res) if res

@@ -19,6 +19,7 @@ class BrandConfig < ActiveRecord::Base
           'save a new one and it will generate the new md5 for you'
   end
 
+  belongs_to :parent, class_name: 'BrandConfig', foreign_key: 'parent_md5'
   has_many :accounts, foreign_key: 'brand_config_md5'
 
   scope :without_k12, lambda { where("md5 != ?", BrandConfig.k12_config) }
@@ -73,32 +74,7 @@ class BrandConfig < ActiveRecord::Base
   end
 
   def chain_of_ancestor_configs
-    @chain_of_ancestor_configs ||= begin
-      if ActiveRecord::Base.configurations[Rails.env]['adapter'] == 'postgresql'
-        sql_ancestor_config_chain
-      else
-        manual_ancestor_config_chain
-      end
-    end
-  end
-
-  def sql_ancestor_config_chain
-    ancestors = BrandConfig.find_by_sql(ActiveRecord::Base.send(:sanitize_sql_array, [<<-SQL, parent_md5]))
-      WITH RECURSIVE t AS (
-        SELECT * FROM #{BrandConfig.quoted_table_name} WHERE parent_md5=?
-        UNION
-        SELECT brand_configs.* FROM #{BrandConfig.quoted_table_name} INNER JOIN t ON brand_configs.md5=t.parent_md5
-      )
-      SELECT * FROM t
-    SQL
-    ([self] + ancestors).uniq
-  end
-
-  def manual_ancestor_config_chain
-    return [self] unless parent_md5
-    parent = BrandConfig.where(md5: parent_md5).first
-    return [self] unless parent
-    ([self] + parent.chain_of_ancestor_configs).flatten
+    @ancestor_configs ||= [self] + (parent && parent.chain_of_ancestor_configs).to_a
   end
 
   def save_unless_dup!
@@ -142,6 +118,18 @@ class BrandConfig < ActiveRecord::Base
 
   def compile_css!(opts=nil)
     BrandableCSS.compile_brand!(md5, opts)
+  end
+
+  def css_and_js_overrides
+    Rails.cache.fetch([self, 'css_and_js_overrides']) do
+      chain_of_ancestor_configs.each_with_object({}) do |brand_config, includes|
+        BrandConfig::OVERRIDE_TYPES.each do |override_type|
+          if brand_config[override_type].present?
+            (includes[override_type] ||= []).unshift(brand_config[override_type])
+          end
+        end
+      end
+    end
   end
 
   def sync_to_s3_and_save_to_account!(progress, account_id)

@@ -204,7 +204,7 @@ describe "screenreader gradebook" do
     expect(f('#message_students_dialog')).to be_displayed
 
     f('#body').send_keys 'Hello!'
-    fj('.ui-dialog:visible button.button_type_submit').click
+    fj('.ui-dialog:visible button.send_button').click
     wait_for_ajaximations
     expect(f('#message_students_dialog')).to_not be_displayed
   end

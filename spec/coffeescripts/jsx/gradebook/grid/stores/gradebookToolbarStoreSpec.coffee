@@ -1,10 +1,9 @@
 define [
-  'react'
   'jsx/gradebook/grid/stores/gradebookToolbarStore'
   'underscore'
   'helpers/fakeENV'
   'compiled/userSettings'
-], (React, GradebookToolbarStore, _, fakeENV, userSettings) ->
+], (GradebookToolbarStore, _, fakeENV, userSettings) ->
 
   module 'ReactGradebook.gradebookToolbarStore',
     setup: ->

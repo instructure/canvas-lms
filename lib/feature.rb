@@ -315,14 +315,6 @@ END
       state: 'hidden',
       root_opt_in: true
     },
-    'lti2_ui' =>
-      {
-        display_name: -> { I18n.t('Show LTI 2 Configuration UI') },
-        description: -> { I18n.t('If enabled, users will be able to configure LTI 2 tools.') },
-        applies_to: 'RootAccount',
-        state: 'hidden',
-        beta: true
-      },
     'lti2_rereg' =>
     {
         display_name: -> {I18n.t('LTI 2 Reregistration')},
@@ -358,6 +350,16 @@ END
           root_opt_in: true,
           beta: true
       },
+    'notification_service' =>
+    {
+      display_name: -> { I18n.t('Use remote service for notifications') },
+      description: -> { I18n.t('Allow the ability to send notifications through our a dispatch queue') },
+      applies_to: 'RootAccount',
+      state: 'hidden',
+      beta: true,
+      development: true,
+      root_opt_in: false
+    },
     'use_new_tree' =>
     {
       display_name: -> { I18n.t('Use New Folder Tree in Files')},
@@ -378,7 +380,7 @@ END
       description: -> { I18n.t('Performance enhancements for the Gradebook') },
       applies_to: 'Course',
       state: 'hidden',
-      hidden_in_production: true,
+      development: true,
       root_opt_in: true
     },
     'anonymous_grading' => {
@@ -391,7 +393,7 @@ END
       display_name: -> { I18n.t('International SMS') },
       description: -> { I18n.t('Allows users with international phone numbers to receive text messages from Canvas.') },
       applies_to: 'RootAccount',
-      state: 'on',
+      state: 'hidden',
       root_opt_in: true
     },
     'international_sms_from_recipient_country' => {
@@ -416,6 +418,16 @@ END
       state: 'hidden',
       development: true,
       root_opt_in: true
+    },
+    'rich_content_service' =>
+    {
+      display_name: -> { I18n.t('Use remote version of Rich Content Editor') },
+      description: -> { I18n.t('In cases where it is available, load the RCE from a canvas rich content service') },
+      applies_to: 'RootAccount',
+      state: 'hidden',
+      beta: true,
+      development: true,
+      root_opt_in: false
     }
   )
 
@@ -488,4 +500,3 @@ end
 
 # load feature definitions
 Dir.glob("#{Rails.root}/lib/features/*.rb").each { |file| require_dependency file }
-

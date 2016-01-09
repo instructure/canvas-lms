@@ -64,7 +64,7 @@ class Attachment < ActiveRecord::Base
   belongs_to :root_attachment, :class_name => 'Attachment'
   belongs_to :replacement_attachment, :class_name => 'Attachment'
   has_one :sis_batch
-  has_one :thumbnail, :foreign_key => "parent_id", :conditions => {:thumbnail => "thumb"}
+  has_one :thumbnail, -> { where(thumbnail: 'thumb') }, foreign_key: "parent_id"
   has_many :thumbnails, :foreign_key => "parent_id"
   has_many :children, foreign_key: :root_attachment_id, class_name: 'Attachment'
   has_one :crocodoc_document
@@ -703,8 +703,8 @@ class Attachment < ActiveRecord::Base
   end
 
   def content_type_with_text_match
-    # treats all text/X files as text/plain
-    content_type.to_s.match(/^text\/.*/) ? "text/plain" : content_type
+    # treats all text/X files as text/plain (except text/html)
+    (content_type.to_s.match(/^text\/.*/) && content_type.to_s != "text/html") ? "text/plain" : content_type
   end
 
   # Returns an IO-like object containing the contents of the attachment file.

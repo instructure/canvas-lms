@@ -25,7 +25,7 @@ define [
     options = options || {}
     _.defaults(options, { name: 'assignment', due_at: new Date('Mon May 11 2015') })
 
-  defaultOverrides = ->
+  generateOverrides = ->
     [
       { title: 'section 1', due_at: new Date('Mon May 11 2015') },
       { title: 'section 2', due_at: new Date('Tue May 12 2015') }
@@ -69,7 +69,7 @@ define [
 
   test 'compares by due date overrides if dates are both null', ->
     assignment1 = generateAssignment({ due_at: null, has_overrides: true })
-    assignment1.overrides = defaultOverrides()
+    assignment1.overrides = generateOverrides()
     assignment2 = generateAssignment({ due_at: null, has_overrides: false })
     comparisonVal = ColumnArranger.compareByDueDate(assignment1, assignment2)
     ok comparisonVal < 0
@@ -90,9 +90,9 @@ define [
 
   test 'compares by name if dates are both null and both have multiple overrides', ->
     assignment1 = { name: 'Banana', due_at: null, has_overrides: true }
-    assignment1.overrides = defaultOverrides()
+    assignment1.overrides = generateOverrides()
     assignment2 = { name: 'Apple', due_at: null, has_overrides: true }
-    assignment2.overrides = defaultOverrides()
+    assignment2.overrides = generateOverrides()
     comparisonVal = ColumnArranger.compareByDueDate(assignment1, assignment2)
     ok comparisonVal > 0
 
@@ -115,6 +115,49 @@ define [
     assignment2 = generateAssignment()
     comparisonVal = ColumnArranger.compareByDueDate(assignment1, assignment2)
     ok comparisonVal == 0
+
+  test 'handles one due_at passed in as string and another passed in as date', ->
+    assignment1 = generateAssignment()
+    assignment2 = generateAssignment({ due_at: '2015-05-20T06:59:00Z' })
+    comparisonVal = ColumnArranger.compareByDueDate(assignment1, assignment2)
+    ok comparisonVal < 0
+
+    assignment2.due_at = '2015-05-05T06:59:00Z'
+    comparisonVal = ColumnArranger.compareByDueDate(assignment1, assignment2)
+    ok comparisonVal > 0
+
+  test 'handles both due_ats passed in as strings', ->
+    assignment1 = generateAssignment({ due_at: '2015-05-11T06:59:00Z' })
+    assignment2 = generateAssignment({ due_at: '2015-05-20T06:59:00Z' })
+    comparisonVal = ColumnArranger.compareByDueDate(assignment1, assignment2)
+    ok comparisonVal < 0
+
+    assignment2.due_at = '2015-05-05T06:59:00Z'
+    comparisonVal = ColumnArranger.compareByDueDate(assignment1, assignment2)
+    ok comparisonVal > 0
+
+  test 'handles an override and an assignment due_ats passed in as strings', ->
+    assignment1 = generateAssignment({ due_at: null, has_overrides: true })
+    assignment1.overrides = [{ title: 'section 1', due_at: '2015-05-05T06:59:00Z' }]
+    assignment2 = generateAssignment({ due_at: '2015-05-11T06:59:00Z' })
+    comparisonVal = ColumnArranger.compareByDueDate(assignment1, assignment2)
+    ok comparisonVal < 0
+
+    assignment2.due_at = '2015-04-05T06:59:00Z'
+    comparisonVal = ColumnArranger.compareByDueDate(assignment1, assignment2)
+    ok comparisonVal > 0
+
+  test 'handles two assignments each with only a single override, and override due_ats passed in as strings', ->
+    assignment1 = generateAssignment({ due_at: null, has_overrides: true })
+    assignment1.overrides = [{ title: 'section 1', due_at: '2015-05-05T06:59:00Z' }]
+    assignment2 = generateAssignment({ due_at: null, has_overrides: true })
+    assignment2.overrides = [{ title: 'section 2', due_at: '2015-05-10T06:59:00Z' }]
+    comparisonVal = ColumnArranger.compareByDueDate(assignment1, assignment2)
+    ok comparisonVal < 0
+
+    assignment2.overrides[0].due_at = '2015-04-05T06:59:00Z'
+    comparisonVal = ColumnArranger.compareByDueDate(assignment1, assignment2)
+    ok comparisonVal > 0
 
   module 'columnArranger#compareByAssignmentGroup',
     setup: ->

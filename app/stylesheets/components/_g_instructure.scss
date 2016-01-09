@@ -140,6 +140,11 @@
 .user_content, .mceContentBody {
   position: relative;
   min-height: 5px;
+// firefox max-width images break the parent container
+  @-moz-document url-prefix() {
+    overflow-x: hidden;
+  }
+
   h3, .h3 {
     margin-top: 1em;
     margin-bottom: 1em;

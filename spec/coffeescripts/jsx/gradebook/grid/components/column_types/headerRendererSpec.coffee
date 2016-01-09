@@ -1,9 +1,10 @@
 define [
+  'react'
   'jsx/gradebook/grid/components/column_types/headerRenderer'
   'jquery'
   'jquery.instructure_date_and_time'
   'translations/_core_en'
-], (HeaderRenderer, $) ->
+], (React, HeaderRenderer, $) ->
 
   wrapper = document.getElementById('fixtures')
 

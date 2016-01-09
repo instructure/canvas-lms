@@ -30,9 +30,9 @@ module Api::V1::Submission
     hash = submission_attempt_json(submission, assignment, current_user, session, context)
 
     if includes.include?("submission_history")
-      if submission.quiz_submission && assignment.quiz
+      if submission.quiz_submission && assignment.quiz && !assignment.quiz.anonymous_survey?
         hash['submission_history'] = submission.quiz_submission.versions.map do |ver|
-          ver.model.submission.without_versioned_attachments do
+          ver.model.submission && ver.model.submission.without_versioned_attachments do
             quiz_submission_attempt_json(ver.model, assignment, current_user, session, context)
           end
         end
@@ -114,7 +114,7 @@ module Api::V1::Submission
 
     unless params[:exclude_response_fields] && params[:exclude_response_fields].include?('preview_url')
       preview_args = { 'preview' => '1' }
-      preview_args['version'] = attempt.version_number
+      preview_args['version'] = attempt.quiz_submission_version || attempt.version_number
       hash['preview_url'] = course_assignment_submission_url(
         context, assignment, attempt[:user_id], preview_args)
     end

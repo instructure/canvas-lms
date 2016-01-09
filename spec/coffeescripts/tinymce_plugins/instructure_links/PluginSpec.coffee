@@ -12,6 +12,7 @@ define [
         getContent: (()-> return "Selection Content" )
       }
     teardown: ->
+      $(".ui-dialog").remove()
 
   test "buttonToImg builds an img tag", ->
     target =

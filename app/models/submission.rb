@@ -38,16 +38,16 @@ class Submission < ActiveRecord::Base
   belongs_to :student, :class_name => 'User', :foreign_key => :user_id
 
   belongs_to :quiz_submission, :class_name => 'Quizzes::QuizSubmission'
-  has_many :all_submission_comments, :order => 'created_at', :class_name => 'SubmissionComment', :dependent => :destroy
-  has_many :submission_comments, :order => 'created_at', :conditions => { :provisional_grade_id => nil }
-  has_many :visible_submission_comments, :class_name => 'SubmissionComment', :order => 'created_at, id', :conditions => { :provisional_grade_id => nil, :hidden => false }
-  has_many :hidden_submission_comments, :class_name => 'SubmissionComment', :order => 'created_at, id', :conditions => { :provisional_grade_id => nil, :hidden => true }
+  has_many :all_submission_comments, -> { order(:created_at) }, class_name: 'SubmissionComment', dependent: :destroy
+  has_many :submission_comments, -> { order(:created_at).where(provisional_grade_id: nil) }
+  has_many :visible_submission_comments, -> { order('created_at, id').where(provisional_grade_id: nil, hidden: false) }, class_name: 'SubmissionComment'
+  has_many :hidden_submission_comments, -> { order('created_at, id').where(provisional_grade_id: nil, hidden: true) }, class_name: 'SubmissionComment'
   has_many :assessment_requests, :as => :asset
   has_many :assigned_assessments, :class_name => 'AssessmentRequest', :as => :assessor_asset
   has_many :rubric_assessments, :as => :artifact
   has_many :attachment_associations, :as => :context
   has_many :provisional_grades, class_name: 'ModeratedGrading::ProvisionalGrade'
-  has_one :rubric_assessment, :as => :artifact, :conditions => {:assessment_type => "grading"}
+  has_one :rubric_assessment, -> { where(assessment_type: 'grading') }, as: :artifact
 
   # we no longer link submission comments and conversations, but we haven't fixed up existing
   # linked conversations so this relation might be useful
@@ -957,7 +957,7 @@ class Submission < ActiveRecord::Base
         self.provisional_grades.not_final.where(scorer_id: scorer).first
       end
     end
-    pg ||= ModeratedGrading::NullProvisionalGrade.new(scorer.id, final)
+    pg ||= ModeratedGrading::NullProvisionalGrade.new(self, scorer.id, final)
   end
 
   def find_or_create_provisional_grade!(scorer:, score: nil, grade: nil, force_save: false, final: false, source_provisional_grade: nil)
@@ -1399,7 +1399,9 @@ class Submission < ActiveRecord::Base
         scope = scope.where(:enrollments => { :course_section_id => section })
       end
 
-      preloaded_users = scope.where(:id => user_grades.map{|id, data| id})
+      user_ids = user_grades.map { |id, data| id }
+      preloaded_users = scope.where(:id => user_ids)
+      preloaded_submissions = assignment.submissions.where(user_id: user_ids).group_by(&:user_id)
 
       Delayed::Batch.serial_batch(:priority => Delayed::LOW_PRIORITY) do
         user_grades.each do |user_id, user_data|
@@ -1411,13 +1413,16 @@ class Submission < ActiveRecord::Base
             next
           end
 
-          submissions =
-            assignment.grade_student(user, :grader => grader,
-                                     :grade => user_data[:posted_grade],
-                                     :excuse => Canvas::Plugin.value_to_boolean(user_data[:excuse]),
-                                     :skip_grade_calc => true)
-          submissions.each { |s| graded_user_ids << s.user_id }
-          submission = submissions.first
+          submission = preloaded_submissions[user_id.to_i].first if preloaded_submissions[user_id.to_i]
+          if !submission || user_data.key?(:posted_grade) || user_data.key?(:excuse)
+            submissions =
+              assignment.grade_student(user, :grader => grader,
+                                       :grade => user_data[:posted_grade],
+                                       :excuse => Canvas::Plugin.value_to_boolean(user_data[:excuse]),
+                                       :skip_grade_calc => true)
+            submissions.each { |s| graded_user_ids << s.user_id }
+            submission = submissions.first
+          end
 
           assessment = user_data[:rubric_assessment]
           if assessment.is_a?(Hash) && assignment.rubric_association

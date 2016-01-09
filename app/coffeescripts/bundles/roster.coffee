@@ -53,6 +53,7 @@ require [
     itemViewOptions:
       course: ENV.course
     canViewLoginIdColumn: ENV.permissions.manage_admin_users or ENV.permissions.manage_students
+    canViewSisIdColumn: ENV.permissions.read_sis
     buffer: 1000
     template: rosterUsersTemplate
   roleSelectView = new RoleSelectView

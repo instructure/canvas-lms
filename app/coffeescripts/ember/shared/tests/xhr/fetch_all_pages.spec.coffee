@@ -4,7 +4,9 @@ define [
   '../shared_ajax_fixtures'
 ], ({ArrayProxy}, fetchAllPages, fixtures) ->
 
-  fixtures.create()
+  module 'Fetch all pages component',
+    setup: ->
+      fixtures.create()
 
   asyncTest 'passes records through by default', ->
     fetchAllPages(ENV.numbers_url).promise.then (records) ->

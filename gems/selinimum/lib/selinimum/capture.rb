@@ -69,6 +69,7 @@ module Selinimum
       end
 
       def log_render(controller)
+        return unless current_example
         classes = controller.ancestors - controller.included_modules
         classes = classes.take_while { |klass| klass < ApplicationController }
         classes.each do |klass|
@@ -77,12 +78,14 @@ module Selinimum
       end
 
       def log_template_render(file)
+        return unless current_example
         unless file =~ Selinimum::Detectors::RubyDetector::GLOBAL_FILES
           dependencies[current_file] << "file:#{file}"
         end
       end
 
       def log_bundle(type, *args)
+        return unless current_example
         args.each do |bundle|
           dependencies[current_file] << "#{type}:#{bundle}"
         end

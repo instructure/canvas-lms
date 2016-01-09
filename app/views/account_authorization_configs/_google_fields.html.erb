@@ -7,4 +7,13 @@ TEXT
       %></p>
   <%= render partial: 'oauth2_fields', locals: { f: f } %>
 <% end %>
+<p><%= t(<<-TEXT)
+To restrict to users from specific Google Apps domain, enter the domain here.
+TEXT
+%></p>
+<div class="ic-Form-control">
+  <%= f.label :hosted_domain, t('Google Apps Domain'), class: 'ic-Label' %>
+  <%= f.text_field :hosted_domain, placeholder: 'school.edu', class: 'ic-Input' %>
+</div>
 <%= render partial: 'login_attribute_dropdown', locals: { f: f, aac: aac } %>
+<%= render partial: 'jit_provisioning_field', locals: { f: f, aac: aac } %>

@@ -411,16 +411,12 @@ describe UsersController do
 
     context 'self registration' do
       before :each do
-        a = Account.default
-        a.settings = { :self_registration => true }
-        a.save!
+        Account.default.canvas_authentication_provider.update_attribute(:self_registration, true)
       end
 
       context 'self registration for observers only' do
         before :each do
-          a = Account.default
-          a.settings[:self_registration_type] = 'observer'
-          a.save!
+          Account.default.canvas_authentication_provider.update_attribute(:self_registration, 'observer')
         end
 
         it "should not allow teachers to self register" do
@@ -1440,9 +1436,7 @@ describe UsersController do
 
   describe "login hooks" do
     before :each do
-      a = Account.default
-      a.settings = { :self_registration => true }
-      a.save!
+      Account.default.canvas_authentication_provider.update_attribute(:self_registration, true)
     end
 
     it "should hook on new" do

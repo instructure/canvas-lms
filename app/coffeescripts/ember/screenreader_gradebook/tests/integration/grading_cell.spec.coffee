@@ -6,10 +6,9 @@ define [
 
   App = null
 
-  fixtures.create()
-
   module 'grading_cell_component integration test for isPoints',
     setup: ->
+      fixtures.create()
       App = startApp()
       visit('/').then =>
         @controller = App.__container__.lookup('controller:screenreader_gradebook')
@@ -27,5 +26,3 @@ define [
   test 'fast-select instance is used for grade input', ->
     ok find('#student_and_assignment_grade').is('select')
     equal find('#student_and_assignment_grade').val(), 'incomplete'
-
-

@@ -71,11 +71,11 @@ class Assignment < ActiveRecord::Base
   has_many :assignment_student_visibilities
   has_one :quiz, class_name: 'Quizzes::Quiz'
   belongs_to :assignment_group
-  has_one :discussion_topic, :conditions => ['discussion_topics.root_topic_id IS NULL'], :order => 'created_at'
-  has_many :learning_outcome_alignments, as: :content, class_name: 'ContentTag', conditions: ['content_tags.tag_type = ? AND content_tags.workflow_state != ?', 'learning_outcome', 'deleted'], preload: :learning_outcome
-  has_one :rubric_association, as: :association, conditions: ['rubric_associations.purpose = ?', "grading"], order: :created_at, preload: :rubric
+  has_one :discussion_topic, -> { where(root_topic_id: nil).order(:created_at) }
+  has_many :learning_outcome_alignments, -> { where("content_tags.tag_type='learning_outcome' AND content_tags.workflow_state<>'deleted'").preload(:learning_outcome) }, as: :content, class_name: 'ContentTag'
+  has_one :rubric_association, -> { where(purpose: 'grading').order(:created_at).preload(:rubric) }, as: :association
   has_one :rubric, :through => :rubric_association
-  has_one :teacher_enrollment, class_name: 'TeacherEnrollment', foreign_key: 'course_id', primary_key: 'context_id', preload: :user, conditions: ["enrollments.workflow_state = 'active' AND enrollments.type = 'TeacherEnrollment'"]
+  has_one :teacher_enrollment, -> { preload(:user).where(enrollments: { workflow_state: 'active', type: 'TeacherEnrollment' }) }, class_name: 'TeacherEnrollment', foreign_key: 'course_id', primary_key: 'context_id'
   has_many :ignores, :as => :asset
   has_many :moderated_grading_selections, class_name: 'ModeratedGrading::Selection'
   belongs_to :context, :polymorphic => true
@@ -277,7 +277,8 @@ class Assignment < ActiveRecord::Base
               :schedule_do_auto_peer_review_job_if_automatic_peer_review,
               :delete_empty_abandoned_children,
               :validate_assignment_overrides,
-              :update_cached_due_dates
+              :update_cached_due_dates,
+              :touch_submissions_if_muted
 
   has_a_broadcast_policy
 
@@ -516,30 +517,13 @@ class Assignment < ActiveRecord::Base
     tags_to_update.each { |tag| tag.context_module_action(user, action, points) }
   end
 
-  def context_module_tag_info(user, context)
-    self.association(:context).target ||= context
-    tag_info = Rails.cache.fetch([self, user, "context_module_tag_info"].cache_key) do
-      hash = {:points_possible => self.points_possible}
-      if self.multiple_due_dates_apply_to?(user)
-        hash[:vdd_tooltip] = OverrideTooltipPresenter.new(self, user).as_json
-      else
-        if due_date = self.overridden_for(user).due_at
-          hash[:due_date] = due_date
-        end
+  # this is necessary to generate new permissions cache keys for students
+  def touch_submissions_if_muted
+    if muted_changed?
+      connection.after_transaction_commit do
+        submissions.touch_all
       end
-      hash
     end
-    
-    if tag_info[:due_date]
-      if expects_submission? && tag_info[:due_date] < Time.now
-        has_submission = Rails.cache.fetch([self, user, "user_has_submission"]) do
-          submission_for_student(user).has_submission?
-        end
-        tag_info[:past_due] = true unless has_submission
-      end
-      tag_info[:due_date] = tag_info[:due_date].utc.iso8601
-    end
-    tag_info
   end
 
   # call this to perform notifications on an Assignment that is not being saved
@@ -880,7 +864,7 @@ class Assignment < ActiveRecord::Base
       if (assignment_for_user.unlock_at && assignment_for_user.unlock_at > Time.now)
         locked = {:asset_string => assignment_for_user.asset_string, :unlock_at => assignment_for_user.unlock_at}
       elsif (assignment_for_user.lock_at && assignment_for_user.lock_at < Time.now)
-        locked = {:asset_string => assignment_for_user.asset_string, :lock_at => assignment_for_user.lock_at}
+        locked = {:asset_string => assignment_for_user.asset_string, :lock_at => assignment_for_user.lock_at, :can_view => true}
       elsif self.could_be_locked && item = locked_by_module_item?(user, opts[:deep_check_if_needed])
         locked = {:asset_string => self.asset_string, :context_module => item.context_module.attributes}
       elsif self.submission_types == 'discussion_topic' && self.discussion_topic &&
@@ -1067,7 +1051,9 @@ class Assignment < ActiveRecord::Base
 
   def grade_student(original_student, opts={})
     raise GradeError.new("Student is required") unless original_student
-    raise GradeError.new("Student must be enrolled in the course as a student to be graded") unless context.includes_student?(original_student)
+    unless context.includes_user?(original_student, context.admin_visible_student_enrollments) # allows inactive users to be graded
+      raise GradeError.new("Student must be enrolled in the course as a student to be graded")
+    end
     raise GradeError.new("Grader must be enrolled as a course admin") if opts[:grader] && !self.context.grants_right?(opts[:grader], :manage_grades)
 
     if opts.key? :excuse
@@ -1405,7 +1391,10 @@ class Assignment < ActiveRecord::Base
       :include_root => false
     )
 
-    avatar_methods = (avatars && !grade_as_group?) ? [:avatar_path] : []
+    # include :provisional here someday if we need to distinguish between provisional and real comments
+    # (also in SubmissionComment#serialization_methods)
+    submission_comment_methods = []
+    submission_comment_methods << :avatar_path if avatars && !grade_as_group?
 
     res[:context][:rep_for_student] = {}
 
@@ -1430,7 +1419,7 @@ class Assignment < ActiveRecord::Base
 
     res[:context][:students] = students.map do |u|
       json = u.as_json(:include_root => false,
-                :methods => avatar_methods,
+                :methods => submission_comment_methods,
                 :only => [:name, :id])
 
       if preloaded_pg_counts
@@ -1481,7 +1470,7 @@ class Assignment < ActiveRecord::Base
       end
 
       json[:submission_comments] = (provisional_grade || sub).submission_comments.as_json(:include_root => false,
-                                                                                          :methods => avatar_methods,
+                                                                                          :methods => submission_comment_methods,
                                                                                           :only => comment_fields)
 
       json['attachments'] = sub.attachments.map{|att| att.as_json(
@@ -1546,7 +1535,7 @@ class Assignment < ActiveRecord::Base
               json[:crocodoc_urls] = sub_attachments.map { |a| pg.crocodoc_attachment_info(user, a) }
               json[:readonly] = !pg.final && (pg.scorer_id != user.id)
               json[:submission_comments] = pg.submission_comments.as_json(:include_root => false,
-                                                                          :methods => avatar_methods,
+                                                                          :methods => submission_comment_methods,
                                                                           :only => comment_fields)
             end
 
@@ -2169,10 +2158,9 @@ class Assignment < ActiveRecord::Base
   def self.with_student_submission_count
     joins("LEFT OUTER JOIN #{Submission.quoted_table_name} s ON
            s.assignment_id = assignments.id AND
-           s.submission_type IS NOT NULL AND
-           s.user_id IS NOT NULL")
+           s.submission_type IS NOT NULL")
     .group("assignments.id")
-    .select("assignments.*, count(s.id) AS student_submission_count")
+    .select("assignments.*, count(s.assignment_id) AS student_submission_count")
   end
 
   def can_unpublish?

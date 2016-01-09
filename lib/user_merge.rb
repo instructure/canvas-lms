@@ -158,7 +158,7 @@ class UserMerge
       # flagged as updated so the materialized views update
       begin
         entries = DiscussionEntry.where(user_id: from_user)
-        DiscussionTopic.where(id: entries.select(['discussion_topic_id'])).update_all(updated_at: Time.now.utc)
+        DiscussionTopic.where(id: entries.select(['discussion_topic_id'])).touch_all
         entries.update_all(user_id: target_user.id)
         DiscussionTopic.where(user_id: from_user).update_all(user_id: target_user.id, updated_at: Time.now.utc)
       rescue => e

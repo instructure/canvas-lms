@@ -1,8 +1,9 @@
 define [
+  'react'
   'jsx/gradebook/grid/components/dropdown_components/totalHeaderDropdownOptions'
   'helpers/fakeENV'
   'jsx/gradebook/grid/constants'
-], (DropdownOptions, fakeENV, GradebookConstants) ->
+], (React, DropdownOptions, fakeENV, GradebookConstants) ->
 
   wrapper = document.getElementById('fixtures')
 

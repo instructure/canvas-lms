@@ -73,7 +73,7 @@ define([
           );
         }
       } else {
-          if (student.in_moderation_set) {
+          if (student.in_moderation_set && (student.provisional_grades[previousMarkIndex] || markIndex == 0)) {
             return (
               <div className='col-xs-2' role="gridcell">
                 <div className='ModeratedAssignmentList__Mark'>

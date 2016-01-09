@@ -1,21 +1,34 @@
 require 'thin'
-require 'socket'
+require 'httparty'
 
 class SpecFriendlyThinServer
   def self.run(app, options = {})
     bind_address = options[:BindAddress] || IPSocket.getaddress(Socket.gethostname)
     port = options[:Port]
     @server = Thin::Server.new(bind_address, port, app)
-    Thread.new {@server.start}
-    for i in 0..MAX_SERVER_START_TIME
+    Thin::Logging.logger = Rails.logger
+    Thread.new do
+      Thread.current.abort_on_exception = true
+      @server.start
+    end
+    max_time = Time.now + MAX_SERVER_START_TIME
+    print "Starting thin server..."
+    while Time.now < max_time
       begin
-        s = TCPSocket.open(bind_address, port)
-      rescue StandardError
+        response = HTTParty.get("http://#{bind_address}:#{port}/health_check")
+        if response.success?
+          puts " Done!"
+          return
+        end
+      rescue
         nil
       end
-      break if s
+      print "."
       sleep 1
     end
+    puts "Failed!"
+    $stderr.puts "unable to start thin server within #{MAX_SERVER_START_TIME} seconds!"
+    exit! 1
   end
 
   def self.shutdown

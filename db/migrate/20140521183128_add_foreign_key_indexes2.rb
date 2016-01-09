@@ -14,8 +14,6 @@ class AddForeignKeyIndexes2 < ActiveRecord::Migration
     add_index :pseudonyms, :sis_batch_id, where: "sis_batch_id IS NOT NULL", algorithm: :concurrently
     add_index :course_account_associations, :course_section_id, algorithm: :concurrently
     add_index :content_migrations, :source_course_id, where: "source_course_id IS NOT NULL", algorithm: :concurrently
-    add_index :course_imports, :course_id, algorithm: :concurrently
-    add_index :course_imports, :source_id, algorithm: :concurrently
     add_index :custom_gradebook_columns, :course_id, algorithm: :concurrently
     add_index :courses, :abstract_course_id, where: "abstract_course_id IS NOT NULL", algorithm: :concurrently
     add_index :abstract_courses, :enrollment_term_id, algorithm: :concurrently
@@ -37,8 +35,6 @@ class AddForeignKeyIndexes2 < ActiveRecord::Migration
     remove_index :pseudonyms, :sis_batch_id
     remove_index :course_account_associations, :course_section_id
     remove_index :content_migrations, :source_course_id
-    remove_index :course_imports, :course_id
-    remove_index :course_imports, :source_id
     remove_index :custom_gradebook_columns, :course_id
     remove_index :courses, :abstract_course_id
     remove_index :abstract_courses, :enrollment_term_id

@@ -2,7 +2,7 @@
 #  * Make assignments (due date) events non-resizable. Having an end date on them doesn't
 #    make sense.
 
-# requires jQuery, and vendor/fullcalendar
+# requires jQuery
 
 define [
   'i18n!calendar'
@@ -290,8 +290,9 @@ define [
         time = element.find('.fc-time')
         html = time.html()
         # the time element also contains the title for calendar events
-        html = html?.replace(/^\d+:\d+\w?/, event.startDate().format("h:mm:ss"))
+        html = html?.replace(/^\d+:\d+\w?/, event.startDate().format('h:mmt'))
         time.html(html)
+        time.attr('data-start', event.startDate().format('h:mm'))
       if event.eventType.match(/assignment/) && view.name == "agendaWeek"
         element.height('') # this fixes it so it can wrap and not be forced onto 1 line
           .find('.ui-resizable-handle').remove()

@@ -94,6 +94,18 @@ $borderRadius:              4px;
 $contentBoxPadding:         8px;
 
 //============================
+// Typography Variables
+//============================
+
+// Placeholder for old bootstrap variable; deprecated, but still in use some places
+// Once all of those have been adjusted to use the new variable we can get rid of this
+$ic-line-height: 1.5;
+@if not $use_new_styles {$ic-line-height: 20px;}
+$ic-font-size: 13px;
+$ic-font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+$ic-font-weight: 500; // instead of "bold"
+
+//============================
 // Layout Functional Variables
 //============================
 $ic-body-background-color:      lighten($ic-color-neutral, 4);
@@ -116,10 +128,7 @@ $ic-list-item-background--selected:   #d9edf9;
 // and meet our contrast needs when used with our main color variables
 
 $ic-bg-light-neutral:     lighten($ic-color-neutral, 6%);
-$ic-bg-light-primary:     lighten($ic-brand-primary, 54%);
-@if $use_high_contrast {
-  $ic-bg-light-primary:   lighten($ic-brand-primary, 64%);
-}
+$ic-bg-light-primary:     safe_background_color($ic-brand-primary);
 $ic-bg-light-success:     lighten($ic-color-success, 67%);
 $ic-bg-light-alert:       lighten($ic-color-alert, 57%);
 @if $use_high_contrast {

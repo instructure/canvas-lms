@@ -26,6 +26,7 @@ define [
       @$holder.detach()
       @$splitter.detach()
       $("#fixtures").empty()
+      $(".ui-tooltip").remove()
 
   test "should init properly", ->
     equal @me.rows.length, 3+1, 'three rows + 1 blank'

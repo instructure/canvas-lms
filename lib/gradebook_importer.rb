@@ -70,7 +70,6 @@ class GradebookImporter
   end
 
   def parse!
-    @student_columns = 3 # name, user id, section
     # preload a ton of data that presumably we'll be querying
     @all_assignments = @context.assignments
       .published
@@ -232,13 +231,17 @@ class GradebookImporter
   def update_column_count(row)
     # A side effect that's necessary to finish validation, but needs to come
     # after the row.length check above.
-    if row[2] =~ /SIS\s+User\s+ID/ && row[3] =~ /SIS\s+Login\s+ID/
+    @student_columns = 3 # name, user id, section
+    if row[2] =~ /SIS\s+Login\s+ID/
+      @sis_login_id_column = 2
+      @student_columns += 1
+    elsif row[2] =~ /SIS\s+User\s+ID/ && row[3] =~ /SIS\s+Login\s+ID/
       @sis_user_id_column = 2
       @sis_login_id_column = 3
       @student_columns += 2
       if row[4] =~ /Root\s+Account/
+        @student_columns +=1
         @root_account_column = 4
-        @student_columns += 1
       end
     end
   end

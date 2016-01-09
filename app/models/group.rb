@@ -30,9 +30,9 @@ class Group < ActiveRecord::Base
   # use to skip queries in can_participate?, called by policy block
   attr_accessor :can_participate
 
-  has_many :group_memberships, :dependent => :destroy, :conditions => ['group_memberships.workflow_state != ?', 'deleted']
-  has_many :users, :through => :group_memberships, :conditions => ['users.workflow_state != ?', 'deleted']
-  has_many :participating_group_memberships, :class_name => "GroupMembership", :conditions => ['group_memberships.workflow_state = ?', 'accepted']
+  has_many :group_memberships, -> { where("group_memberships.workflow_state<>'deleted'") }, dependent: :destroy
+  has_many :users, -> { where("users.workflow_state<>'deleted'") }, through: :group_memberships
+  has_many :participating_group_memberships, -> { where(workflow_state: 'accepted') }, class_name: "GroupMembership"
   has_many :participating_users, :source => :user, :through => :participating_group_memberships
   belongs_to :context, :polymorphic => true
   validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'Account']
@@ -40,24 +40,24 @@ class Group < ActiveRecord::Base
   belongs_to :account
   belongs_to :root_account, :class_name => "Account"
   has_many :calendar_events, :as => :context, :dependent => :destroy
-  has_many :discussion_topics, as: :context, conditions: ['discussion_topics.workflow_state != ?', 'deleted'], preload: :user, dependent: :destroy, order: 'discussion_topics.position DESC, discussion_topics.created_at DESC'
-  has_many :active_discussion_topics, as: :context, class_name: 'DiscussionTopic', conditions: ['discussion_topics.workflow_state != ?', 'deleted'], preload: :user
-  has_many :all_discussion_topics, as: :context, class_name: "DiscussionTopic", preload: :user, dependent: :destroy
-  has_many :discussion_entries, through: :discussion_topics, preload: [:discussion_topic, :user], dependent: :destroy
+  has_many :discussion_topics, -> { where("discussion_topics.workflow_state<>'deleted'").preload(:user).order('discussion_topics.position DESC, discussion_topics.created_at DESC') }, dependent: :destroy, as: :context
+  has_many :active_discussion_topics, -> { where("discussion_topics.workflow_state<>'deleted'").preload(:user) }, as: :context, class_name: 'DiscussionTopic'
+  has_many :all_discussion_topics, -> { preload(:user) }, as: :context, class_name: "DiscussionTopic", dependent: :destroy
+  has_many :discussion_entries, -> { preload(:discussion_topic, :user) }, through: :discussion_topics, dependent: :destroy
   has_many :announcements, :as => :context, :class_name => 'Announcement', :dependent => :destroy
-  has_many :active_announcements, :as => :context, :class_name => 'Announcement', :conditions => ['discussion_topics.workflow_state != ?', 'deleted']
+  has_many :active_announcements, -> { where("discussion_topics.workflow_state<>'deleted'") }, as: :context, class_name: 'Announcement'
   has_many :attachments, :as => :context, :dependent => :destroy, :extend => Attachment::FindInContextAssociation
-  has_many :active_images, as: :context, class_name: 'Attachment', conditions: ["attachments.file_state != ? AND attachments.content_type LIKE 'image%'", 'deleted'], order: 'attachments.display_name', preload: :thumbnail
-  has_many :active_assignments, :as => :context, :class_name => 'Assignment', :conditions => ['assignments.workflow_state != ?', 'deleted']
+  has_many :active_images, -> { where("attachments.file_state<>'deleted' AND attachments.content_type LIKE 'image%'").order('attachments.display_name').preload(:thumbnail) }, as: :context, class_name: 'Attachment'
+  has_many :active_assignments, -> { where("assignments.workflow_state<>'deleted'") }, as: :context, class_name: 'Assignment'
   has_many :all_attachments, :as => 'context', :class_name => 'Attachment'
-  has_many :folders, :as => :context, :dependent => :destroy, :order => 'folders.name'
-  has_many :active_folders, :class_name => 'Folder', :as => :context, :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
+  has_many :folders, -> { order('folders.name') }, as: :context, dependent: :destroy
+  has_many :active_folders, -> { where("folders.workflow_state<>'deleted'").order('folders.name') }, class_name: 'Folder', as: :context
   has_many :collaborators
   has_many :external_feeds, :as => :context, :dependent => :destroy
   has_many :messages, :as => :context, :dependent => :destroy
   belongs_to :wiki
   has_many :web_conferences, :as => :context, :dependent => :destroy
-  has_many :collaborations, :as => :context, :order => 'title, created_at', :dependent => :destroy
+  has_many :collaborations, -> { order('title, created_at') }, as: :context, dependent: :destroy
   has_many :media_objects, :as => :context
   has_many :zip_file_imports, :as => :context
   has_many :content_migrations, :as => :context

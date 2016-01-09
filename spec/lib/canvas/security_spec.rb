@@ -21,19 +21,17 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 describe Canvas::Security do
   describe "JWT tokens" do
     describe "encoding" do
-      after(:each) do
-        Timecop.return
-      end
-
       describe ".create_jwt" do
         it "should generate a token with an expiration" do
-          Timecop.freeze(Time.utc(2013,3,13,9,12))
-          expires = 1.hour.from_now
-          token = Canvas::Security.create_jwt({ a: 1 }, expires)
-          expected_token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9."\
-                           "eyJhIjoxLCJleHAiOjEzNjMxNjk1MjB9."\
-                           "VwDKl46gfjFLPAIDwlkVPze1UwC6H_ApdyWYoUXFT8M"
-          expect(token).to eq(expected_token)
+          Timecop.freeze(Time.utc(2013,3,13,9,12)) do
+            expires = 1.hour.from_now
+            token = Canvas::Security.create_jwt({ a: 1 }, expires)
+
+            expected_token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9."\
+                             "eyJhIjoxLCJleHAiOjEzNjMxNjk1MjB9."\
+                             "VwDKl46gfjFLPAIDwlkVPze1UwC6H_ApdyWYoUXFT8M"
+            expect(token).to eq(expected_token)
+          end
         end
 
         it "should generate a token without expiration" do
@@ -83,16 +81,14 @@ describe Canvas::Security do
     end
 
     describe "decoding" do
-      before do
-        Timecop.freeze(Time.utc(2013,3,13,9,12))
-        @key = "mykey"
-        @token_no_expiration = JSON::JWT.new({ a: 1 }).sign(@key, :HS256).to_s
-        @token_expired = JSON::JWT.new({ a: 1, 'exp' => 1.hour.ago.to_i }).sign(@key, :HS256).to_s
-        @token_not_expired = JSON::JWT.new({ a: 1, 'exp' => 1.hour.from_now.to_i }).sign(@key, :HS256).to_s
-      end
-
-      after do
-        Timecop.return
+      around(:example) do |example|
+        Timecop.freeze(Time.utc(2013,3,13,9,12)) do
+          @key = "mykey"
+          @token_no_expiration = JSON::JWT.new({ a: 1 }).sign(@key, :HS256).to_s
+          @token_expired = JSON::JWT.new({ a: 1, 'exp' => 1.hour.ago.to_i }).sign(@key, :HS256).to_s
+          @token_not_expired = JSON::JWT.new({ a: 1, 'exp' => 1.hour.from_now.to_i }).sign(@key, :HS256).to_s
+          example.run
+        end
       end
 
       it "should decode token" do

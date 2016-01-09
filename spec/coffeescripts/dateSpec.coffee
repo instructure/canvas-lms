@@ -1,4 +1,4 @@
-define [ 'vendor/date' ], ->
+define [ 'vendor/date' ], () ->
 
   module 'Date'
 

@@ -23,7 +23,9 @@ module Lti
     describe ToolProxyController, type: :request do
 
       let(:account) { Account.new }
-      let (:product_family) { ProductFamily.create(vendor_code: '123', product_code: 'abc', vendor_name: 'acme', root_account: account) }
+      let(:product_family) do
+        ProductFamily.create(vendor_code: '123', product_code: 'abc', vendor_name: 'acme', root_account: account)
+      end
       let(:tool_proxy) do
         ToolProxy.create!(
           context: account,
@@ -38,12 +40,13 @@ module Lti
         )
       end
 
-      before(:each) do
-        OAuth::Signature.stubs(:build).returns(mock(verify: true))
-        OAuth::Helper.stubs(:parse_header).returns({'oauth_consumer_key' => 'key'})
-      end
-
       describe "Get #show" do
+
+        before(:each) do
+          OAuth::Signature.stubs(:build).returns(mock(verify: true))
+          OAuth::Helper.stubs(:parse_header).returns({'oauth_consumer_key' => 'key'})
+        end
+
         it 'the tool proxy raw data' do
           get "api/lti/tool_proxy/#{tool_proxy.guid}", tool_proxy_guid: tool_proxy.guid
           expect(JSON.parse(body)).to eq tool_proxy.raw_data
@@ -57,6 +60,12 @@ module Lti
       end
 
       describe "POST #create" do
+
+        before(:each) do
+          OAuth::Signature.stubs(:build).returns(mock(verify: true))
+          OAuth::Helper.stubs(:parse_header).returns({'oauth_consumer_key' => 'key'})
+        end
+
         it 'returns a tool_proxy id object' do
           course_with_teacher_logged_in(:active_all => true)
           tool_proxy_fixture = File.read(File.join(Rails.root, 'spec', 'fixtures', 'lti', 'tool_proxy.json'))
@@ -103,6 +112,81 @@ module Lti
 
       end
 
+      describe "POST #reregistration" do
+
+        before(:each) do
+          mock_siq = mock('signature')
+          mock_siq.stubs(:verify).returns(true)
+          OAuth::Signature.stubs(:build).returns(mock_siq)
+        end
+
+        let(:auth_header) do
+          {
+              'HTTP_AUTHORIZATION' => "OAuth
+                oauth_consumer_key=\"#{tool_proxy.guid}\",
+                oauth_signature_method=\"HMAC-SHA1\",
+                oauth_signature=\"not_a_sig\",
+                oauth_timestamp=\"137131200\",
+                oauth_nonce=\"4572616e48616d6d65724c61686176\",
+                oauth_version=\"1.0\" ".gsub(/\s+/, ' ')
+          }
+        end
+
+        it "routes to the reregistration action based on header" do
+          course_with_teacher_logged_in(:active_all => true)
+          headers = {'VND-IMS-CONFIRM-URL' => 'Routing based on arbitrary headers, Barf!'}.merge(auth_header)
+          post "/api/lti/accounts/#{@course.account.id}/tool_proxy.json", 'sad times', headers
+          expect(controller.params[:action]).to eq 're_reg'
+        end
+
+        it 'checks for valid oauth signatures' do
+          mock_siq = mock('signature')
+          mock_siq.stubs(:verify).returns(false)
+          OAuth::Signature.stubs(:build).returns(mock_siq)
+          course_with_teacher_logged_in(:active_all => true)
+          headers = {'VND-IMS-CONFIRM-URL' => 'Routing based on arbitrary headers, Barf!'}.merge(auth_header)
+          response = post "/api/lti/accounts/#{@course.account.id}/tool_proxy.json", 'sad times', headers
+          expect(response).to eq 401
+        end
+
+        it 'updates the tool proxy update payload' do
+          mock_siq = mock('signature')
+          mock_siq.stubs(:verify).returns(true)
+          OAuth::Signature.stubs(:build).returns(mock_siq)
+          course_with_teacher_logged_in(:active_all => true)
+
+          fixture_file = File.join(Rails.root, 'spec', 'fixtures', 'lti', 'tool_proxy.json')
+          tool_proxy_fixture = JSON.parse(File.read(fixture_file))
+
+          tcp_url = polymorphic_url([@course.account, :tool_consumer_profile],
+                                    tool_consumer_profile_id: Lti::ToolConsumerProfileCreator::TCP_UUID)
+          tool_proxy_fixture["tool_consumer_profile"] = tcp_url
+
+          headers = {'VND-IMS-CONFIRM-URL' => 'Routing based on arbitrary headers, Barf!'}.merge(auth_header)
+          response = post "/api/lti/accounts/#{@course.account.id}/tool_proxy.json", tool_proxy_fixture.to_json, headers
+
+          expect(response).to eq 200
+
+          tool_proxy.reload
+          expect(tool_proxy.update_payload).to eq({
+              :acknowledgement_url => "Routing based on arbitrary headers, Barf!",
+              :payload => tool_proxy_fixture
+          })
+        end
+
+        it 'Errors on invalid payload' do
+          mock_siq = mock('signature')
+          mock_siq.stubs(:verify).returns(true)
+          OAuth::Signature.stubs(:build).returns(mock_siq)
+          course_with_teacher_logged_in(:active_all => true)
+          headers = {'VND-IMS-CONFIRM-URL' => 'Routing based on arbitrary headers, Barf!'}.merge(auth_header)
+          response = post "/api/lti/accounts/#{@course.account.id}/tool_proxy.json", 'sad times', headers
+          expect(response).to eq 400
+
+          tool_proxy.reload
+          expect(tool_proxy.update_payload).to be_nil
+        end
+      end
     end
   end
 end

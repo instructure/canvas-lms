@@ -67,6 +67,11 @@ class FavoritesController < ApplicationController
     includes = Set.new(Array(params[:include]))
     render :json => @current_user.menu_courses.map { |course|
       enrollments = course.current_enrollments.where(:user_id => @current_user).to_a
+      if includes.include?('observed_users') &&
+          enrollments.any?(&:assigned_observer?)
+        enrollments.concat(ObserverEnrollment.observed_enrollments_for_courses(course, @current_user))
+      end
+
       course_json(course, @current_user, session, includes, enrollments)
     }
   end

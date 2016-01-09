@@ -160,8 +160,8 @@ $ docker-compose run --rm web bundle exec rake canvas:compile_assets
 $ docker-compose up
 ```
 
-Now you can open Canvas at http://canvas.docker/
-
+If on OS X and using dinghy, you can now open Canvas at http://canvas.docker/.
+If on Linux, canvas is listening and available on localhost port 3000 (http://localhost:3000)
 
 ## Normal Usage
 

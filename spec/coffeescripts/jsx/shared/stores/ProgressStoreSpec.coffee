@@ -7,7 +7,7 @@ define [
 
   module 'ProgressStoreSpec',
     setup: ->
-      @progress_id = 1
+      @progress_id = 2
       @progress = {
         id: @progress_id,
         context_id: 1,
@@ -21,6 +21,7 @@ define [
       @server = sinon.fakeServer.create()
 
     teardown: ->
+      ProgressStore.clearState()
       @server.restore()
 
   test 'get', ->

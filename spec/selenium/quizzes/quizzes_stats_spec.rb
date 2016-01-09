@@ -1,5 +1,5 @@
-require_relative "../common"
-require_relative "../helpers/quizzes_common"
+require_relative '../common'
+require_relative '../helpers/quizzes_common'
 
 describe 'quizzes stats' do
   include_context "in-process server selenium tests"
@@ -31,7 +31,7 @@ describe 'quizzes stats' do
 
     context 'teacher preview' do
       it 'should not show a quiz stats button if there was a teacher preview', priority: "2", test_id: 140645 do
-        quiz_create
+        quiz_with_new_questions(!:goto_edit)
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
 
         # take the quiz

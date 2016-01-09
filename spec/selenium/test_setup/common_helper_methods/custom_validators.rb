@@ -84,7 +84,7 @@ module CustomValidators
     keep_trying_until do
       begin
         driver.execute_script("return INST.still_on_old_page;") == nil
-      rescue Selenium::WebDriver::Error::UnhandledAlertError
+      rescue Selenium::WebDriver::Error::UnhandledAlertError, Selenium::WebDriver::Error::UnknownError
         raise unless accept_alert
         driver.switch_to.alert.accept
       end

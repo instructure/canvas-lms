@@ -178,7 +178,7 @@ describe WebConference do
       student_in_course(user: @student, active_all: true)
     end
 
-    it "should send invitation notifications" do
+    it "should send invitation notifications", priority: "1", test_id: 193154 do
       conference = WimbaConference.create!(
         :title => "my conference",
         :user => @teacher,

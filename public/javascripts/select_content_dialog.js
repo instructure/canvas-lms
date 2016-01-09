@@ -101,12 +101,14 @@ define([
     });
     $("#select_context_content_dialog .add_item_button").click(function() {
       var submit = function(item_data) {
-        $dialog.dialog('close');
-        $dialog.find('.alert').remove();
         var submitted = $dialog.data('submitted_function');
         if(submitted && $.isFunction(submitted)) {
           submitted(item_data);
         }
+        setTimeout(function() {
+          $dialog.dialog('close');
+          $dialog.find('.alert').remove();
+        }, 0);
       };
 
       var item_type = $("#add_module_item_select").val();
@@ -202,6 +204,7 @@ define([
             };
 
             if(item_data['item[type]'] == 'attachment') {
+              data['duplicate_handling'] = 'rename';
               $.ajaxJSONFiles(url, 'POST', data, $("#module_attachment_uploaded_data"), function(data) {
                 callback(data);
               }, function(data) {

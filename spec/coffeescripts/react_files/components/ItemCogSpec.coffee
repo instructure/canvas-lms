@@ -1,9 +1,10 @@
 define [
+  '../mockFilesENV'
   'react'
   'jquery'
   'jsx/files/ItemCog'
   'compiled/models/Folder'
-], (React, $, ItemCog, Folder) ->
+], (mockFilesENV, React, $, ItemCog, Folder) ->
 
   Simulate = React.addons.TestUtils.Simulate
 

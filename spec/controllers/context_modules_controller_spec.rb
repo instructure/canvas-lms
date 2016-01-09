@@ -629,6 +629,24 @@ describe ContextModulesController do
         end
       end
     end
+
+    it "should return multiple due date info for survey quizzes" do
+      course_with_teacher_logged_in(:active_all => true)
+      @mod = @course.context_modules.create!
+      @quiz = @course.quizzes.create!(:title => "sad", :due_at => 1.week.from_now, :quiz_type => "survey")
+      @tag = @mod.add_item(type: 'quiz', id: @quiz.id)
+
+      new_section = @course.course_sections.create!(:name => 'New Section')
+      override = @quiz.assignment_overrides.build
+      override.set = new_section
+      override.due_at = 1.day.from_now
+      override.due_at_overridden = true
+      override.save!
+
+      get 'content_tag_assignment_data', course_id: @course.id, format: 'json' # precache
+      json = JSON.parse response.body.gsub("while(1);",'')
+      expect(json[@tag.id.to_s]["vdd_tooltip"]["due_dates"].count).to eq 2
+    end
   end
 
   describe "GET 'show'" do

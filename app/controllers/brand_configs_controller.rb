@@ -23,6 +23,10 @@ class BrandConfigsController < ApplicationController
     render text: '', layout: 'layouts/bare'
   end
 
+  def show
+    # this is the controller action for the preview in the theme editor
+  end
+
   def default_schema
     parent_config = @account.first_parent_brand_config || BrandConfig.new
     variables = parent_config.effective_variables

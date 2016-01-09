@@ -6,8 +6,11 @@ $assign-border-color: #ccc;
 // Overrides for New Assign section
 // Note: a lot of these are overrides due to
 // legacy code.
-.overrides-column-right.overrideFormFlex {
-  width: 500px; // only needed for legacy layout support
+#edit_assignment_wrapper .overrides-column-right.overrideFormFlex {
+  @if $use_new_styles == false {
+    width: 500px; // only needed for legacy layout support
+  }
+
   select, .subtitle {
     margin-left: 0;
   }
@@ -37,7 +40,10 @@ $assign-border-color: #ccc;
   font-weight: 500;
 }
 .ContainerDueDate {
-  width: 500px;
+  @if $use_new_styles == false {
+    width: 500px;
+  }
+
   margin: 20px 0; // matches legacy margins
 }
 
@@ -66,11 +72,11 @@ $assign-border-color: #ccc;
 
 .UnlockLockInput {
   display: inline;
-  width: 150px;
+  width: 90px;
 }
 
 .DueDateInput {
-  width: 407px;
+  width: 285px;
   display: inline;
 }
 
@@ -82,7 +88,6 @@ $assign-border-color: #ccc;
 .Available-from-to {
   display: flex;
   .Available-from-to__prompt {
-    flex: 1;
     text-align: center;
     line-height: 38px;
     padding: 0 $ic-sp/2;

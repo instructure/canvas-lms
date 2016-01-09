@@ -21,10 +21,6 @@ require 'sanitize'
 class Quizzes::QuizSubmission < ActiveRecord::Base
   self.table_name = 'quiz_submissions'
 
-  def self.polymorphic_names
-    [self.name, "QuizSubmission"]
-  end
-
   include Workflow
 
   attr_accessible :quiz, :user, :temporary_user_code, :submission_data, :score_before_regrade, :has_seen_results
@@ -199,7 +195,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   end
 
   def results_visible_for_user?(user)
-    return true if user && self.quiz.grants_right?(user, :grade)
+    return true if user && self.quiz.grants_right?(user, :review_grades)
     results_visible?
   end
 
@@ -850,11 +846,18 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     fixer.run!(self)
   end
 
+  def due_at
+    return quiz.due_at if submission.blank?
+
+    quiz.overridden_for(submission.user).due_at
+  end
+
   # TODO: Extract? conceptually similar to Submission::Tardiness#late?
   def late?
     return false if finished_at.blank?
-    return false if quiz.due_at.blank?
+    return false if due_at.blank?
 
-    finished_at > quiz.due_at
+    check_time = finished_at - 60.seconds
+    check_time > due_at
   end
 end

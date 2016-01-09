@@ -17,7 +17,8 @@ describe "self enrollment" do
 
   shared_examples_for "open registration" do
     before do
-      Account.default.update_attribute(:settings, :self_enrollment => 'any', :open_registration => true, :self_registration => true)
+      Account.default.update_attribute(:settings, :self_enrollment => 'any', :open_registration => true)
+      Account.default.canvas_authentication_provider.update_attribute(:self_registration, true)
       course(:active_all => active_course)
       set_up_course
       @course.update_attribute(:self_enrollment, true)

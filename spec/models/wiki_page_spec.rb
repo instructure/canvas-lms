@@ -214,8 +214,17 @@ describe WikiPage do
       expect(page.can_edit_page?(student)).to be_truthy
     end
 
-    it 'is true for users who are not in the course' do
+    it 'is not true for users who are not in the course (if it is not public)' do
       course(:active_all => true)
+      page = @course.wiki.wiki_pages.create(:title => "some page", :editing_roles => 'public')
+      user(:active_all => true)
+      expect(page.can_edit_page?(@user)).to be_falsey
+    end
+
+    it 'is true for users who are not in the course (if it is public)' do
+      course(:active_all => true)
+      @course.is_public = true
+      @course.save!
       page = @course.wiki.wiki_pages.create(:title => "some page", :editing_roles => 'public')
       user(:active_all => true)
       expect(page.can_edit_page?(@user)).to be_truthy

@@ -21,7 +21,9 @@ module AccountAuthorizationConfig::PluginSettings
     def singleton?
       true
     end
+  end
 
+  module PrependedClassMethods
     def globally_configured?
       ::Canvas::Plugin.find(plugin).enabled?
     end
@@ -63,7 +65,8 @@ module AccountAuthorizationConfig::PluginSettings
 
   def self.included(klass)
     klass.instance_variable_set(:@recognized_params, klass.recognized_params)
-    klass.singleton_class.prepend(ClassMethods)
+    klass.singleton_class.prepend(PrependedClassMethods)
+    klass.singleton_class.include(ClassMethods)
     klass.cattr_accessor(:plugin)
   end
 

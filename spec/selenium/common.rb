@@ -144,7 +144,7 @@ shared_context "in-process server selenium tests" do
     end
   end
 
-  after(:each) do
+  after(:each) do |example|
     clear_timers!
     # while disallow_requests! would generally get these, there's a small window
     # between the ajax request starting up and the middleware actually processing it
@@ -154,6 +154,7 @@ shared_context "in-process server selenium tests" do
       # we want to ignore selenium errors when attempting to wait here
       nil
     end
+    record_errors(example)
     SeleniumDriverSetup.disallow_requests!
     truncate_all_tables unless self.use_transactional_fixtures
   end

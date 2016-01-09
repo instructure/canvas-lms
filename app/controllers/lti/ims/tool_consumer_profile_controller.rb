@@ -24,24 +24,12 @@ module Lti
       skip_before_filter :load_user
 
       def show
-        uuid = "339b6700-e4cb-47c5-a54f-3ee0064921a9" #Hard coded until we start persisting the tcp
-        profile = Lti::ToolConsumerProfileCreator.new(@context, tool_consumer_profile_url(uuid)).create
+        tcp_url = polymorphic_url([@context, :tool_consumer_profile],
+                                  tool_consumer_profile_id: Lti::ToolConsumerProfileCreator::TCP_UUID)
+        profile = Lti::ToolConsumerProfileCreator.new(@context, tcp_url).create
+
         render json: profile.to_json, :content_type => 'application/vnd.ims.lti.v2.toolconsumerprofile+json'
       end
-
-      private
-
-      def tool_consumer_profile_url(uuid)
-        case context
-          when Course
-            course_tool_consumer_profile_url(context, uuid)
-          when Account
-            account_tool_consumer_profile_url(context, uuid)
-          else
-            raise "Unsupported context"
-        end
-      end
-
     end
   end
 end

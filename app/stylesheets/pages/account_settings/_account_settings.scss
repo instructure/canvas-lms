@@ -123,6 +123,13 @@
     font-size: 15px;
     font-weight: bold;
   }
+  .alert {
+    padding-top: 0;
+    margin-left: -5px;
+  }
+}
+#global_includes_warning_message_wrapper:not(.alert) #global_includes_warning_message {
+  display: none;
 }
 
 #survey_announcement_field {

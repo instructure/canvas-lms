@@ -27,7 +27,7 @@ class DiscussionEntry < ActiveRecord::Base
 
   attr_accessible :plaintext_message, :message, :discussion_topic, :user, :parent, :attachment, :parent_entry
   attr_readonly :discussion_topic_id, :user_id, :parent_id
-  has_many :discussion_subentries, :class_name => 'DiscussionEntry', :foreign_key => "parent_id", :order => :created_at
+  has_many :discussion_subentries, -> { order(:created_at) }, class_name: 'DiscussionEntry', foreign_key: "parent_id"
   has_many :unordered_discussion_subentries, :class_name => 'DiscussionEntry', :foreign_key => "parent_id"
   has_many :flattened_discussion_subentries, :class_name => 'DiscussionEntry', :foreign_key => "root_entry_id"
   has_many :discussion_entry_participants
@@ -370,8 +370,12 @@ class DiscussionEntry < ActiveRecord::Base
     end
   end
 
+  after_commit :subscribe_author, on: :create
+  def subscribe_author
+    discussion_topic.subscribe(user) unless discussion_topic.subscription_hold(user, nil, nil)
+  end
+
   def create_participants
-    subscription_hold = self.discussion_topic.subscription_hold(self.user, nil, nil)
     transaction do
       scope = DiscussionTopicParticipant.where(:discussion_topic_id => self.discussion_topic_id)
       scope = scope.where("user_id<>?", self.user) if self.user
@@ -388,7 +392,6 @@ class DiscussionEntry < ActiveRecord::Base
                                                                                          :workflow_state => "unread",
                                                                                          :subscribed => self.discussion_topic.subscribed?(self.user))
         end
-        self.discussion_topic.subscribe(self.user) unless subscription_hold
       end
     end
   end

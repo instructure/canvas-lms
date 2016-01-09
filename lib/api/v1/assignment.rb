@@ -156,7 +156,6 @@ module Api::V1::Assignment
 
     if assignment.quiz
       hash['quiz_id'] = assignment.quiz.id
-      hash['hide_download_submissions_button'] = !assignment.quiz.has_file_upload_question?
       hash['anonymous_submissions'] = !!(assignment.quiz.anonymous_submissions)
     end
 
@@ -491,6 +490,47 @@ module Api::V1::Assignment
     assignment.infer_times
 
     assignment
+  end
+
+  def submissions_hash(include_params, assignments, submissions_for_user=nil)
+    return {} unless include_params.include?('submission')
+    has_observed_users = include_params.include?("observed_users")
+
+    subs_list = if submissions_for_user
+      assignment_ids = assignments.map(&:id).to_set
+      submissions_for_user.select{ |s|
+        assignment_ids.include?(s.assignment_id)
+      }
+    else
+      users = current_user_and_observed(include_observed: has_observed_users)
+      @context.submissions.
+        where(:assignment_id => assignments).
+        for_user(users)
+    end
+
+    if has_observed_users
+      # assignment id -> array. even if <2 results for a given
+      # assignment, we want to consistently return an array when
+      # include[]=observed_users was supplied
+      hash = Hash.new { |h,k| h[k] = [] }
+      subs_list.each { |s| hash[s.assignment_id] << s }
+    else
+      # assignment id -> specific submission. never return an array when
+      # include[]=observed_users was _not_ supplied
+      hash = Hash[subs_list.map{|s| [s.assignment_id, s]}]
+    end
+    hash
+  end
+
+  # Returns an array containing the current user.  If
+  # include_observed: true is passed also returns any observees if
+  # the current user is an observer
+  def current_user_and_observed(opts = { include_observed: false })
+    user_and_observees = Array(@current_user)
+    if opts[:include_observed] && @context_enrollment.observer?
+      user_and_observees.concat(ObserverEnrollment.observed_students(@context, @current_user).keys)
+    end
+    user_and_observees
   end
 
   private

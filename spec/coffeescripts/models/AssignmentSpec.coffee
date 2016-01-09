@@ -19,6 +19,7 @@ define [
     setup: ->
       fakeENV.setup
         POST_TO_SIS: true
+        POST_TO_SIS_DEFAULT: true
     teardown: -> fakeENV.teardown()
 
   test "must default post_to_sis to true for a new assignment", ->

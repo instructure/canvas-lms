@@ -6,4 +6,9 @@
   <%= t('#messages.peer_review_invitation.email.subject', "Assigned peer review for %{reviewee}", :reviewee => reviewee_name(asset, user))%>
 <% end %>
 
-<%= t('#messages.peer_review_invitation.email.body', "You've been invited to peer review %{reviewee}. Follow the link below to review them!", :reviewee => reviewee_name(asset, user))%>
+<%=
+  t("You've been invited to peer review %{reviewee}. Follow this link to review them: %{link}.", {
+    reviewee: reviewee_name(asset, user),
+    link: content(:link)
+  })
+%>

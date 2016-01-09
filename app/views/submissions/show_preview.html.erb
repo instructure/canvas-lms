@@ -115,7 +115,7 @@
           </div>
 
           <div class="col-xs-5 align-right">
-            <% if attachment.crocodoc_available? %>
+            <% if attachment.crocodoc_available? || attachment.canvadoc.try(:has_annotations?) %>
               <% preview_document = t('preview_crocodoc_document', 'Preview your submission and view teacher feedback, if available')
                  button_text = t('view_feedback_button', 'View Feedback')
               %>

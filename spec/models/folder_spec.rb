@@ -52,6 +52,16 @@ describe Folder do
     expect(great_grandchild.full_name).to eql("course files/grandchild/great_grandchild")
   end
 
+  it "should trim trailing whitespaces from folder names" do
+    f = Folder.root_folders(@course).first
+    expect(f.full_name).to eql("course files")
+    child = f.active_sub_folders.build(:name => "space cadet            ")
+    child.context = @course
+    child.save!
+    expect(child.parent_folder).to eql(f)
+    expect(child.full_name).to eql("course files/space cadet")
+  end
+
   it "should add an iterator to duplicate folder names" do
     f = Folder.root_folders(@course).first
     expect(f.full_name).to eql("course files")

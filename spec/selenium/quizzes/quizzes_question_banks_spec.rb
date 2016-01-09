@@ -1,6 +1,6 @@
-require_relative "../common"
-require_relative "../helpers/quizzes_common"
-require_relative "../helpers/testrail_report"
+require_relative '../common'
+require_relative '../helpers/quizzes_common'
+require_relative '../helpers/testrail_report'
 
 describe 'quizzes question banks' do
   include_context "in-process server selenium tests"
@@ -50,11 +50,11 @@ describe 'quizzes question banks' do
       get "/courses/#{@course.id}/quizzes/#{quiz.id}/edit"
       find_questions_link = f('.find_question_link')
       click_questions_tab
-      keep_trying_until {
+      keep_trying_until do
         find_questions_link.click
         wait_for_ajaximations
         f('.select_all_link')
-      }.click
+      end.click
       submit_dialog('#find_question_dialog', '.submit_button')
       wait_for_ajaximations
       click_settings_tab
@@ -255,7 +255,7 @@ describe 'quizzes question banks' do
       new_name = 'I have been edited'
       new_question_text = "What is the answer to #{new_name}?"
 
-      get "/courses/#{@course.id}/quizzes/#{@q.id}/edit"
+      open_quiz_edit_form
       click_questions_tab
       hover_and_click("#question_#{@quest1.id} .edit_question_link")
       replace_content(f('.question_form [name=\'question_name\']'), new_name)
@@ -264,7 +264,7 @@ describe 'quizzes question banks' do
       click_save_settings_button
 
       # verify modifications
-      get "/courses/#{@course.id}/quizzes/#{@q.id}/edit"
+      open_quiz_edit_form
       click_questions_tab
 
       expect(f("#question_#{@quest1.id}")).to include_text new_name

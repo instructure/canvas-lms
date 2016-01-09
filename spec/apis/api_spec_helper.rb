@@ -117,7 +117,7 @@ def raw_api_call(method, path, params, body_params = {}, headers = {}, opts = {}
   path = path.sub(%r{\Ahttps?://[^/]+}, '') # remove protocol+host
   enable_forgery_protection do
     params_from_with_nesting(method, path).each do |key, value|
-      expect(params[key].to_s).to eq value.to_s
+      expect(params[key].to_s).to eq(value.to_s), lambda{ "Expected value of params[\'#{key}\'] to equal #{value}, actual: #{params[key]}"}
     end
     if @use_basic_auth
       user_session(@user)

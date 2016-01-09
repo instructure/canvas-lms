@@ -58,6 +58,8 @@ class Login::CasController < ApplicationController
 
     if st.is_valid?
       pseudonym = @domain_root_account.pseudonyms.for_auth_configuration(st.user, aac)
+      pseudonym ||= aac.provision_user(st.user) if aac.jit_provisioning?
+
       if pseudonym
         # Successful login and we have a user
         @domain_root_account.pseudonym_sessions.create!(pseudonym, false)

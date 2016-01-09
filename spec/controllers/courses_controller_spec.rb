@@ -173,6 +173,7 @@ describe CoursesController do
         teacher_enrollment = course_with_teacher course: course1, :user => teacher
         teacher_enrollment.accept!
 
+        course1.start_at = 2.months.ago
         course1.conclude_at = 1.month.ago
         course1.save!
 
@@ -650,6 +651,7 @@ describe CoursesController do
     it "should show unauthorized/authorized to a student for a past course depending on restrict_student_past_view setting" do
       course_with_student_logged_in(:active_course => 1)
 
+      @course.start_at = 3.weeks.ago
       @course.conclude_at = 2.weeks.ago
       @course.restrict_enrollments_to_course_dates = true
       @course.restrict_student_past_view = true
@@ -1073,6 +1075,7 @@ describe CoursesController do
 
     it "should not enroll people in soft-concluded courses" do
       user_session(@teacher)
+      @course.start_at = 2.days.ago
       @course.conclude_at = 1.day.ago
       @course.restrict_enrollments_to_course_dates = true
       @course.save!

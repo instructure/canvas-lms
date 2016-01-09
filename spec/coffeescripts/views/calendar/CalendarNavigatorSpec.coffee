@@ -10,6 +10,10 @@ define [
 
     teardown: ->
       @navigator.$el.remove()
+      $("#fixtures").empty()
+      $("#ui-datepicker-div").empty()
+      $(".ui-dialog").remove()
+      $("ul[id^=ui-id-]").remove()
 
   test 'clicking a day in picker navigates to that date', ->
     # instrument the callback

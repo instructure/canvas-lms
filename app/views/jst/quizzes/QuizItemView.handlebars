@@ -23,6 +23,20 @@
 
     {{#if can_update}}
     <div class="ig-admin">
+
+      {{#if post_to_sis_enabled}}
+        {{#if post_to_sis}}
+        <span class="post-to-sis-status enabled">
+          <i class="icon-post-to-sis" title='{{#t}}Post grade to SIS enabled. Click to toggle.{{/t}}' data-tooltip></i>
+          <span class="screenreader-only">{{#t}}The grade for this assignment will sync to the student information system. Click here to toggle this setting.{{/t}}</span>
+        </span>
+        {{else}}
+        <span class="post-to-sis-status disabled">
+          <i class="icon-post-to-sis" title='{{#t}}Post grade to SIS disabled. Click to toggle.{{/t}}' data-tooltip></i>
+          <span class="screenreader-only">{{#t}}The grade for this assignment will not sync to the student information system. Click here to toggle this setting.{{/t}}</span>
+        </span>
+        {{/if}}
+      {{/if}}
       <span data-view="publish-icon" class="publish-icon"></span>
 
       <div class="inline-block">

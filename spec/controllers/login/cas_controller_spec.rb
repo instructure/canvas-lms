@@ -163,6 +163,19 @@ describe Login::CasController do
       expect(response).to redirect_to(unknown_user_url)
       expect(session[:cas_session]).to be_nil
     end
+
+    it "provisions automatically when enabled" do
+      ap = account.authentication_providers.first
+      ap.update_attribute(:jit_provisioning, true)
+      unique_id = 'foo@example.com'
+
+      expect(account.pseudonyms.active.by_unique_id(unique_id)).to_not be_exists
+      get 'new', :ticket => 'ST-abcd'
+      expect(response).to redirect_to(dashboard_url(:login_success => 1))
+      expect(session[:cas_session]).to eq 'ST-abcd'
+      p = account.pseudonyms.active.by_unique_id(unique_id).first!
+      expect(p.authentication_provider).to eq ap
+    end
   end
 
   it "should time out correctly" do

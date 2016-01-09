@@ -3,7 +3,7 @@
 <% grading_standard_list ||= false %>
 <% read_only ||= false %>
 <% data = grading_standard.data rescue GradingStandard.default_grading_standard %>
-<div class="grading_standard" id="grading_standard_<%= grading_standard ? grading_standard.id : 'blank' %>">
+<div class="grading_standard" id="grading_standard_<%= grading_standard && grading_standard.id ? grading_standard.id : 'blank' %>">
   <div class="display_grading_standard">
     <div class="standard_title text-center">
       <% if !read_only %>

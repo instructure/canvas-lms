@@ -20,7 +20,8 @@ require 'securerandom'
 
 class EportfolioCategoriesController < ApplicationController
   include EportfolioPage
-  
+  before_filter :rich_content_service_config
+
   def index
     @portfolio = Eportfolio.find(params[:eportfolio_id])
     redirect_to eportfolio_url(@portfolio)
@@ -42,7 +43,7 @@ class EportfolioCategoriesController < ApplicationController
       end
     end
   end
-  
+
   def update
     @portfolio = Eportfolio.find(params[:eportfolio_id])
     if authorized_action(@portfolio, @current_user, :update)
@@ -96,5 +97,10 @@ class EportfolioCategoriesController < ApplicationController
         end
       end
     end
+  end
+
+  protected
+  def rich_content_service_config
+    js_env(Services::RichContent.env_for(@domain_root_account))
   end
 end

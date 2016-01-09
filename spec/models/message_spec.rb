@@ -267,6 +267,7 @@ describe Message do
     context 'SMS' do
       before :once do
         user_model
+        @user.account.enable_feature!(:international_sms)
       end
 
       before do
@@ -451,6 +452,22 @@ describe Message do
           expect(message.from_name).to eq "OutgoingName"
         end
 
+      end
+    end
+
+    describe "#translate" do
+      it "should work with an explicit key" do
+        message = message_model
+        message.get_template("new_discussion_entry.email.erb") # populate @i18n_scope
+        message = message.translate(:key, "value %{link}", link: 'hi')
+        expect(message).to eq "value hi"
+      end
+
+      it "should work with an implicit key" do
+        message = message_model
+        message.get_template("new_discussion_entry.email.erb") # populate @i18n_scope
+        message = message.translate("value %{link}", link: 'hi')
+        expect(message).to eq "value hi"
       end
     end
   end

@@ -157,14 +157,12 @@ define [
 
     showDownloadSubmissionsButton: (->
       hasSubmittedSubmissions     = @get('selectedAssignment.has_submitted_submissions')
-      whitelist                   = ['online_upload','online_text_entry',
-                                      'online_url', 'online_quiz']
+      whitelist                   = ['online_upload','online_text_entry', 'online_url']
       submissionTypes             = @get('selectedAssignment.submission_types')
       submissionTypesOnWhitelist  = _.intersection(submissionTypes, whitelist)
       hasWhitelistedSubmissions   = submissionTypesOnWhitelist.length == submissionTypes.length
-      showButton                  = !@get('selectedAssignment.hide_download_submissions_button')
 
-      hasSubmittedSubmissions and hasWhitelistedSubmissions and showButton
+      hasSubmittedSubmissions and hasWhitelistedSubmissions
     ).property('selectedAssignment')
 
     hideStudentNames: false
@@ -375,10 +373,10 @@ define [
 
     notesURL: (->
       if @get('shouldCreateNotes')
-        ENV.GRADEBOOK_OPTIONS.custom_columns_url
+        window.ENV.GRADEBOOK_OPTIONS.custom_columns_url
       else
         notesID = @get('teacherNotes')?.id
-        ENV.GRADEBOOK_OPTIONS.custom_column_url.replace(/:id/, notesID)
+        window.ENV.GRADEBOOK_OPTIONS.custom_column_url.replace(/:id/, notesID)
     ).property('shouldCreateNotes', 'custom_columns.@each')
 
     notesParams: (->

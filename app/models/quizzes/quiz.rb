@@ -42,10 +42,10 @@ class Quizzes::Quiz < ActiveRecord::Base
   attr_readonly :context_id, :context_type
   attr_accessor :notify_of_update
 
-  has_many :quiz_questions, dependent: :destroy, order: 'position', class_name: 'Quizzes::QuizQuestion', inverse_of: :quiz
+  has_many :quiz_questions, -> { order(:position) }, dependent: :destroy, class_name: 'Quizzes::QuizQuestion', inverse_of: :quiz
   has_many :quiz_submissions, :dependent => :destroy, :class_name => 'Quizzes::QuizSubmission'
-  has_many :quiz_groups, :dependent => :destroy, :order => 'position', class_name: 'Quizzes::QuizGroup'
-  has_many :quiz_statistics, :class_name => 'Quizzes::QuizStatistics', :order => 'created_at'
+  has_many :quiz_groups, -> { order(:position) }, dependent: :destroy, class_name: 'Quizzes::QuizGroup'
+  has_many :quiz_statistics, -> { order(:created_at) }, class_name: 'Quizzes::QuizStatistics'
   has_many :attachments, :as => :context, :dependent => :destroy
   has_many :quiz_regrades, class_name: 'Quizzes::QuizRegrade'
   has_many :quiz_student_visibilities
@@ -53,10 +53,6 @@ class Quizzes::Quiz < ActiveRecord::Base
   validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course']
   belongs_to :assignment
   belongs_to :assignment_group
-
-  def self.polymorphic_names
-    [self.base_class.name, "Quiz"]
-  end
 
   EXPORTABLE_ATTRIBUTES = [
     :id, :title, :description, :quiz_data, :points_possible, :context_id,
@@ -100,7 +96,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   simply_versioned
 
-  has_many :context_module_tags, :as => :content, :class_name => 'ContentTag', :conditions => "content_tags.tag_type='context_module' AND content_tags.workflow_state<>'deleted'"
+  has_many :context_module_tags, -> { where("content_tags.tag_type='context_module' AND content_tags.workflow_state<>'deleted'")}, as: :content, class_name: 'ContentTag'
 
   # This callback is listed here in order for the :link_assignment_overrides
   # method to be called after the simply_versioned callbacks. We want the
@@ -754,7 +750,7 @@ class Quizzes::Quiz < ActiveRecord::Base
       elsif (quiz_for_user.lock_at && quiz_for_user.lock_at <= Time.now)
         sub = user && quiz_submissions.where(user_id: user).first
         if !sub || !sub.manually_unlocked
-          locked = {:asset_string => self.asset_string, :lock_at => quiz_for_user.lock_at}
+          locked = {:asset_string => self.asset_string, :lock_at => quiz_for_user.lock_at, :can_view => true}
         end
       elsif !opts[:skip_assignment] && (self.for_assignment? && l = self.assignment.locked_for?(user, opts))
         sub = user && quiz_submissions.where(user_id: user).first
@@ -983,6 +979,15 @@ class Quizzes::Quiz < ActiveRecord::Base
     end
   end
 
+  def post_to_sis=(post_to_sis)
+    return unless assignment
+    assignment.post_to_sis = post_to_sis
+  end
+
+  def post_to_sis?
+    assignment && assignment.post_to_sis
+  end
+
   def unpublished_changes?
     self.last_edited_at && self.published_at && self.last_edited_at > self.published_at
   end
@@ -1020,7 +1025,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     can :read_statistics and can :manage and can :read and can :update and can :delete and can :create and can :submit
 
     given { |user, session| self.context.grants_right?(user, session, :manage_grades) } #admins.include? user }
-    can :read_statistics and can :read and can :submit and can :grade
+    can :read_statistics and can :read and can :submit and can :grade and can :review_grades
 
     given { |user| self.available? && self.context.try_rescue(:is_public) && !self.graded? && self.visible_to_user?(user) }
     can :submit
@@ -1165,8 +1170,16 @@ class Quizzes::Quiz < ActiveRecord::Base
     return unless quizzes.any?
     assmnt_ids_with_subs ||= Assignment.assignment_ids_with_submissions(quizzes.map(&:assignment_id).compact)
 
-    quiz_ids_with_subs = Quizzes::QuizSubmission.where(:quiz_id => quizzes.map(&:id)).
-      not_settings_only.where("user_id IS NOT NULL").uniq.pluck(:quiz_id)
+    # yes, this is a complicated query, but it greatly improves the runtime to do it this way
+    filter = Quizzes::QuizSubmission.where("quiz_submissions.quiz_id=s.quiz_id").
+      not_settings_only.where("user_id IS NOT NULL")
+    values = quizzes.map { |q| "(#{q.id})" }.join(", ")
+    constant_table = "( VALUES #{values} ) AS s(quiz_id)"
+
+    quiz_ids_with_subs = Quizzes::QuizSubmission.
+        from(constant_table).
+        where("EXISTS (?)", filter).
+        pluck("s.quiz_id")
 
     quizzes.each do |quiz|
       quiz.can_unpublish = !(quiz_ids_with_subs.include?(quiz.id)) &&

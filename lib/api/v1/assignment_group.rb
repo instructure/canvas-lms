@@ -19,13 +19,14 @@
 module Api::V1::AssignmentGroup
   include Api::V1::Json
   include Api::V1::Assignment
+  include Api::V1::Submission
 
   API_ALLOWED_ASSIGNMENT_GROUP_INPUT_FIELDS = %w(
     name
     position
     group_weight
     rules
-  )
+  ).freeze
 
   def assignment_group_json(group, user, session, includes = [], opts = {})
     includes ||= []
@@ -64,7 +65,8 @@ module Api::V1::AssignmentGroup
           exclude_description: opts[:exclude_descriptions],
           exclude_rubric: opts[:exclude_rubrics],
           overrides: overrides,
-          needs_grading_course_proxy: needs_grading_course_proxy
+          needs_grading_course_proxy: needs_grading_course_proxy,
+          submission: includes.include?('submission') ? opts[:submissions][a.id] : nil
         )
       }
     end

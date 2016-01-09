@@ -8,7 +8,9 @@ define [
   'compiled/collections/AssignmentOverrideCollection'
   'compiled/collections/DateGroupCollection'
   'i18n!assignments'
-], ($, _, {Model}, DefaultUrlMixin, TurnitinSettings, DateGroup, AssignmentOverrideCollection, DateGroupCollection, I18n) ->
+  'compiled/util/GradingPeriods'
+  'timezone'
+], ($, _, {Model}, DefaultUrlMixin, TurnitinSettings, DateGroup, AssignmentOverrideCollection, DateGroupCollection, I18n, GradingPeriods, tz) ->
 
   class Assignment extends Model
     @mixin DefaultUrlMixin
@@ -31,7 +33,7 @@ define [
         @set 'all_dates', new DateGroupCollection(all_dates)
       if (@postToSISEnabled())
         if !@get('id') && @get('post_to_sis') != false
-          @set 'post_to_sis', true
+          @set 'post_to_sis', !!ENV?.POST_TO_SIS_DEFAULT
 
     isQuiz: => @_hasOnlyType 'online_quiz'
     isDiscussionTopic: => @_hasOnlyType 'discussion_topic'
@@ -308,7 +310,7 @@ define [
         'gradingStandardId', 'isLetterGraded', 'isGpaScaled', 'assignmentGroupId', 'iconType',
         'published', 'htmlUrl', 'htmlEditUrl', 'labelId', 'position', 'postToSIS',
         'multipleDueDates', 'nonBaseDates', 'allDates', 'isQuiz', 'singleSectionDueDate',
-        'moderatedGrading'
+        'moderatedGrading', 'postToSISEnabled'
       ]
       if ENV.DIFFERENTIATED_ASSIGNMENTS_ENABLED
         fields.push 'isOnlyVisibleToOverrides'
@@ -323,8 +325,18 @@ define [
       data = @_filterFrozenAttributes(data)
       if @alreadyScoped then data else { assignment: data }
 
-    search: (regex) ->
-      if @get('name').match(regex)
+    inGradingPeriod: (gradingPeriod) ->
+      dateGroups = @get("all_dates")
+      if dateGroups
+        _.any dateGroups.models, (dateGroup) =>
+          GradingPeriods.dateIsInGradingPeriod(dateGroup.dueAt(), gradingPeriod)
+      else
+        GradingPeriods.dateIsInGradingPeriod(tz.parse(@dueAt()), gradingPeriod)
+
+    search: (regex, gradingPeriod) ->
+      match = regex == "" || @get('name').match(regex)
+      match = @inGradingPeriod(gradingPeriod) if match && gradingPeriod
+      if match
         @set 'hidden', false
         return true
       else

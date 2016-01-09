@@ -6,7 +6,8 @@
   <%= t :subject, "Canvas Account Admin Invitation" %>
 <% end %>
 
-<%= t(:added_message, "You've been added as an %{role_type} to the account %{account} at %{website}.", :role_type => asset.readable_type, :account => asset.account.name, :website => HostUrl.context_host(asset.account)) %>
+<%= t("You've been given an account role for the %{account} account at %{website}. Role type: %{role_type}.",
+    :role_type => asset.readable_type, :account => asset.account.name, :website => HostUrl.context_host(asset.account)) %>
 
 <% email = asset.user.email; login = (asset.user.pseudonym.unique_id rescue "none") %>
 <%= t(:name_info, "Name: %{name}", :name => asset.user.name) %>

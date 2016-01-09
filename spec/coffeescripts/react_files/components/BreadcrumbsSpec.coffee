@@ -41,6 +41,7 @@ define [
       React.render React.createElement(Handler, sampleProps), @div, ->
         start()
         $breadcrumbs = $('#breadcrumbs')
+        ok($breadcrumbs.length > 0)
         equal $breadcrumbs.find('.home a')?.attr('href'), '/', 'correct home url'
         equal $breadcrumbs.find('li:nth-child(3) a')?.attr('href'), '/courses/1/files/', 'rootFolder link has correct url'
         equal $breadcrumbs.find('li:nth-child(4) a')?.attr('href'), '/courses/1/files/folder/test_folder_name', 'correct url for child'

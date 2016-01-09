@@ -1244,6 +1244,23 @@ describe DiscussionTopic do
     end
   end
 
+  describe "#unread_count" do
+    let(:topic) do
+      @course.discussion_topics.create!(:title => "title", :message => "message")
+    end
+
+    it "returns 0 for a nil user" do
+      topic.discussion_entries.create!
+      expect(topic.unread_count(nil)).to eq 0
+    end
+
+    it "returns the default_unread_count if the user has no discussion_topic_participant" do
+      topic.discussion_entries.create!
+      student_in_course
+      expect(topic.unread_count(@student)).to eq 1
+    end
+  end
+
   context "read/unread state" do
     before(:once) do
       @topic = @course.discussion_topics.create!(:title => "title", :message => "message", :user => @teacher)
@@ -1538,9 +1555,8 @@ describe DiscussionTopic do
   end
 
   context "restore" do
-    before(:once) { group_discussion_assignment }
-
     it "should restore the assignment and associated child topics" do
+      group_discussion_assignment
       @topic.destroy
 
       @topic.reload.assignment.expects(:restore).with(:discussion_topic).once
@@ -1550,14 +1566,12 @@ describe DiscussionTopic do
       expect(@topic.assignment).to be_unpublished
     end
 
-    it "should restore to unpublished state if draft mode is enabled" do
-      @topic.destroy
+    it "should restore an announcement to active state" do
+      ann = @course.announcements.create!(:title => "something", :message => "somethingelse")
+      ann.destroy
 
-      @topic.reload.assignment.expects(:restore).with(:discussion_topic).once
-      @topic.restore
-      expect(@topic.reload).to be_unpublished
-      @topic.child_topics.each { |ct| expect(ct.reload).to be_unpublished }
-      expect(@topic.assignment).to be_unpublished
+      ann.restore
+      expect(ann.reload).to be_active
     end
   end
 

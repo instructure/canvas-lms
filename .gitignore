@@ -11,6 +11,7 @@
 # That's what .git/info/exclude and core.excludesfile are for :)
 
 .bundle/
+.byebug_history
 /.yardoc/
 /app/coffeescripts/ember/*/main.coffee
 /app/coffeescripts/ember/screenreader_gradebook/templates/**/*.js
@@ -32,7 +33,9 @@ Gemfile.lock2
 Gemfile.lock3
 Gemfile.lock4
 /log/
+mkmf.log
 /node_modules
+npm-debug.log
 /public/assets/
 /public/dist/
 /public/webpack-dist/
@@ -53,9 +56,6 @@ Gemfile.lock4
 /spec/javascripts/runner.html
 /spec/javascripts/tests.js
 /tmp/
-/vendor/plugins/rails_upgrade
-npm-debug.log
-mkmf.log
 /vendor/bundle
 
 # generated plugin stuff

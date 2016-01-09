@@ -1,4 +1,4 @@
-require File.expand_path(File.dirname(__FILE__) + '/helpers/wiki_and_tiny_common')
+require_relative 'helpers/wiki_and_tiny_common'
 
 describe "Wiki pages and Tiny WYSIWYG editor features" do
   include_context "in-process server selenium tests"
@@ -25,14 +25,15 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       end
     end
 
-    it "should type a web address link, save it, and validate auto link plugin worked correctly" do
+    it "should type a web address link, save it, "\
+    "and validate auto link plugin worked correctly", priority: "1", test_id: 312410 do
       text = "http://www.google.com/"
       wysiwyg_state_setup(text, val = true)
       save_wiki
       validate_link(text)
     end
 
-    it "should remove web address link previously embedded, save it and persist" do
+    it "should remove web address link previously embedded, save it and persist", priority: "1", test_id: 312637 do
       text = "http://www.google.com/"
       wysiwyg_state_setup(text, val = true)
 
@@ -53,37 +54,45 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       end
     end
 
-    it "should add and remove bullet lists" do
+    it "should add bullet lists", priority: "1", test_id: 307623 do
       wysiwyg_state_setup
-      bullist_selector = ".mce-i-bullist"
 
-      f(bullist_selector).click
+      f(".mce-i-bullist").click
       in_frame wiki_page_body_ifr_id do
         ff('#tinymce li').length == 3
       end
+    end
 
-      f(bullist_selector).click
+    it "should remove bullet lists", priority: "1", test_id: 535894 do
+      text = "<ul><li>1</li><li>2</li><li>3</li></ul>"
+      wysiwyg_state_setup(text)
+
+      f(".mce-i-bullist").click
       in_frame wiki_page_body_ifr_id do
         expect(f('#tinymce li')).to be_nil
       end
     end
 
-    it "should add and remove numbered lists" do
+    it "should add numbered lists", priority: "1", test_id: 307625 do
       wysiwyg_state_setup
-      numlist_selector = '.mce-i-numlist'
 
-      f(numlist_selector).click
+      f('.mce-i-numlist').click
       in_frame wiki_page_body_ifr_id do
         ff('#tinymce li').length == 3
       end
+    end
 
-      f(numlist_selector).click
+    it "should remove numbered lists", priority: "1", test_id: 537619 do
+      text = "<ol><li>1</li><li>2</li><li>3</li></ol>"
+      wysiwyg_state_setup(text)
+
+      f('.mce-i-numlist').click
       in_frame wiki_page_body_ifr_id do
         expect(f('#tinymce li')).to be_nil
       end
     end
 
-    it "should change font color for all selected text" do
+    it "should change font color for all selected text", priority: "1", test_id: 285357 do
       wysiwyg_state_setup
 
       # order-dependent ID of the forecolor button
@@ -92,7 +101,19 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       validate_wiki_style_attrib("color", "rgb(255, 0, 0)", "p span")
     end
 
-    it "should change background font color" do
+    it "should remove font color for all selected text", priority: "1", test_id: 469876 do
+      text = "<p><span style=\"color: rgb(255, 0, 0);\">1</span></p>"
+      wysiwyg_state_setup(text)
+
+      # order-dependent ID of the forecolor button
+      f("#mceu_3 .mce-caret").click
+      f(".mce-colorbutton-grid div[title='No color']").click
+      in_frame wiki_page_body_ifr_id do
+        expect(f('#tinymce span')).to be_nil
+      end
+    end
+
+    it "should change background font color", priority: "1", test_id: 298747 do
       wysiwyg_state_setup
 
       # order-dependent ID of the backcolor button
@@ -101,7 +122,19 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       validate_wiki_style_attrib("background-color", "rgb(255, 0, 0)", "p span")
     end
 
-    it "should change font size" do
+    it "should remove background font color", priority: "1", test_id: 474035 do
+      text = "<p><span style=\"background-color: rgb(255, 0, 0);\">1</span></p>"
+      wysiwyg_state_setup(text)
+
+      # order-dependent ID of the backcolor button
+      f("#mceu_4 .mce-caret").click
+      f(".mce-colorbutton-grid div[title='No color']").click
+      in_frame wiki_page_body_ifr_id do
+        expect(f('#tinymce span')).to be_nil
+      end
+    end
+
+    it "should change font size", priority: "1", test_id: 401375 do
       wysiwyg_state_setup
 
       # I'm so, so sorry...
@@ -110,13 +143,33 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       validate_wiki_style_attrib("font-size", "36pt", "p span")
     end
 
-    it "should change and remove all custom formatting on selected text" do
+    it "should change and remove all custom formatting on selected text", priority: "1", test_id: 298748 do
       wysiwyg_state_setup
       driver.find_element(:xpath, "//button/span[text()[contains(.,'Font Sizes')]]").click
       driver.find_element(:xpath, "//span[text()[contains(.,'36pt')]]").click
       validate_wiki_style_attrib("font-size", "36pt", "p span")
       f(".mce-i-removeformat").click
       validate_wiki_style_attrib_empty("p")
+    end
+
+    it 'should insert image using embed image widget', priority: "2", test_id: 397971 do
+      wiki_page_tools_file_tree_setup
+      fj('.mce-ico.mce-i-image').click
+      wait_for_ajaximations
+      widget = fj('.ui-dialog.ui-widget.ui-widget-content.ui-corner-all.ui-draggable.ui-dialog-buttons')
+      widget.find_element(:link_text, 'Canvas').click
+      wait_for_ajaximations
+      widget.find_element(:link_text, 'Course files').click
+      wait_for_ajaximations
+      widget.find_element(:link_text, 'email.png').click
+      fj('.btn-primary.ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-text-only').click
+      wait_for_ajaximations
+      fj('.btn.btn-primary.submit').click
+      wait_for_ajaximations
+      main = fj('#main')
+      expect(main.find_element(:tag_name, 'img')).to have_attribute('height', '16')
+      expect(main.find_element(:tag_name, 'img')).to have_attribute('width', '16')
+      expect(main.find_element(:tag_name, 'img')).to have_attribute('alt', 'email.png')
     end
 
     it "should indent and remove indentation for embedded images" do
@@ -144,12 +197,46 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       validate_wiki_style_attrib_empty("p")
     end
 
-    ["right", "center", "left"].each do |setting|
-      it "should align text to the #{setting}" do
-        wysiwyg_state_setup(text = "test")
-        f(".mce-i-align#{setting}").click
-        validate_wiki_style_attrib("text-align", setting, "p")
-      end
+    it "should align text to the left", priority: "1", test_id: 303702 do
+      wysiwyg_state_setup(text = "left")
+      f(".mce-i-align#{text}").click
+      validate_wiki_style_attrib("text-align", text, "p")
+    end
+
+    it "should remove left align from text", priority: "1", test_id: 526906 do
+      text = "<p style=\"text-align: left;\">1</p>"
+      wysiwyg_state_setup(text)
+
+      f(".mce-i-alignleft").click
+      validate_wiki_style_attrib_empty("p")
+    end
+
+    it "should align text to the center", priority: "1", test_id: 303698 do
+      wysiwyg_state_setup(text = "center")
+      f(".mce-i-align#{text}").click
+      validate_wiki_style_attrib("text-align", text, "p")
+    end
+
+    it "should remove center align from text", priority: "1", test_id: 529217 do
+      text = "<p style=\"text-align: center;\">1</p>"
+      wysiwyg_state_setup(text)
+
+      f(".mce-i-aligncenter").click
+      validate_wiki_style_attrib_empty("p")
+    end
+
+    it "should align text to the right", priority: "1", test_id: 303704 do
+      wysiwyg_state_setup(text = "right")
+      f(".mce-i-align#{text}").click
+      validate_wiki_style_attrib("text-align", text, "p")
+    end
+
+    it "should remove right align from text", priority: "1", test_id: 530886 do
+      text = "<p style=\"text-align: right;\">1</p>"
+      wysiwyg_state_setup(text)
+
+      f(".mce-i-alignright").click
+      validate_wiki_style_attrib_empty("p")
     end
 
     ["right", "center", "left"].each do |setting|
@@ -165,6 +252,48 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
         f(".mce-i-align#{setting}").click
 
         validate_wiki_style_attrib("text-align", setting, "p")
+      end
+    end
+
+    it "should make text superscript in rce", priority: "1", test_id: 306263 do
+      wysiwyg_state_setup
+
+      f('.mce-i-superscript').click
+
+      in_frame wiki_page_body_ifr_id do
+        expect(f('#tinymce sup')).to be_displayed
+      end
+    end
+
+    it "should remove superscript from text in rce", priority: "1", test_id: 532084 do
+      text = "<p><sup>This is my text</sup></p>"
+      wysiwyg_state_setup(text)
+
+      f('.mce-i-superscript').send_keys(:shift)
+      f('.mce-i-superscript').click
+      in_frame wiki_page_body_ifr_id do
+        expect(f('#tinymce sup')).to be_nil
+      end
+    end
+
+    it "should make text subscript in rce", priority: "1", test_id: 306264 do
+      wysiwyg_state_setup
+
+      f('.mce-i-subscript').click
+
+      in_frame wiki_page_body_ifr_id do
+        expect(f('#tinymce sub')).to be_displayed
+      end
+    end
+
+    it "should remove subscript from text in rce", priority: "1", test_id: 532799 do
+      text = "<p><sub>This is my text</sub></p>"
+      wysiwyg_state_setup(text)
+
+      f('.mce-i-subscript').send_keys(:shift)
+      f('.mce-i-subscript').click
+      in_frame wiki_page_body_ifr_id do
+        expect(f('#tinymce sub')).to be_nil
       end
     end
 
@@ -204,205 +333,313 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       end
     end
 
-  it "should add bold and italic text to the rce" do
-    get "/courses/#{@course.id}/pages/front-page/edit"
+    it "should add bold text to the rce", priority: "1", test_id: 285128 do
+      wysiwyg_state_setup
 
-    wait_for_tiny(keep_trying_until { f("form.edit-form .edit-content") })
-    f('.mce-i-bold').click
-    f('.mce-i-italic').click
-    first_text = 'This is my text.'
+      f('.mce-i-bold').click
 
-    type_in_tiny("##{wiki_page_editor_id}", first_text)
-    in_frame wiki_page_body_ifr_id do
-      expect(f('#tinymce')).to include_text(first_text)
-    end
-    #make sure each view uses the proper format
-    fj('a.switch_views:visible').click
-    expect(driver.execute_script("return $('##{wiki_page_editor_id}').val()")).to include '<em><strong>'
-    fj('a.switch_views:visible').click
-    in_frame wiki_page_body_ifr_id do
-      expect(f('#tinymce')).not_to include_text('<p>')
-    end
-
-    f('form.edit-form button.submit').click
-    wait_for_ajax_requests
-
-    expect(driver.page_source).to match(/<em><strong>This is my text\./)
-  end
-
-  it "should add an equation to the rce by using equation buttons" do
-    skip "check_image broken"
-    get "/courses/#{@course.id}/pages/front-page/edit"
-
-    f("##{wiki_page_editor_id}_instructure_equation").click
-    wait_for_ajaximations
-    expect(f('.mathquill-editor')).to be_displayed
-    misc_tab = f('.mathquill-tab-bar > li:last-child a')
-    misc_tab.click
-    f('#Misc_tab li:nth-child(35) a').click
-    basic_tab = f('.mathquill-tab-bar > li:first-child a')
-    basic_tab.click
-    f('#Basic_tab li:nth-child(27) a').click
-    f('.ui-dialog-buttonset .btn-primary').click
-    keep_trying_until do
       in_frame wiki_page_body_ifr_id do
-        expect(f('#tinymce img.equation_image')).to be_displayed
+        expect(f('#tinymce strong')).to be_displayed
       end
     end
 
-    f('form.edit-form button.submit').click
-    wait_for_ajax_requests
+    it "should remove bold from text in rce", priority: "1", test_id: 417603 do
+      text = "<p><strong>This is my text</strong></p>"
+      wysiwyg_state_setup(text)
 
-    check_image(f('#wiki_page_show img'))
-  end
-
-  it "should not scroll to the top of the page after using an equation button" do
-    get "/courses/#{@course.id}/pages/front-page/edit"
-    scroll_page_to_bottom
-
-    f(equation_button_selector).click
-    wait_for_ajaximations
-
-    misc_tab = f('.mathquill-tab-bar > li:last-child a')
-    misc_tab.click
-    f('#Misc_tab li:nth-child(35) a').click
-    scroll_location = driver.execute_script("return window.scrollY")
-    expect(scroll_location).not_to be 0
-  end
-
-  it "should add an equation to the rce by using the equation editor" do
-    equation_text = '\\text{yay math stuff:}\\:\\frac{d}{dx}\\sqrt{x}=\\frac{d}{dx}x^{\\frac{1}{2}}=\\frac{1}{2}x^{-\\frac{1}{2}}=\\frac{1}{2\\sqrt{x}}\\text{that. is. so. cool.}'
-
-    get "/courses/#{@course.id}/pages/front-page/edit"
-    f(equation_button_selector).click
-    wait_for_ajaximations
-    expect(f('.mathquill-editor')).to be_displayed
-    textarea = f('.mathquill-editor .textarea textarea')
-    3.times do
-      textarea.send_keys(:backspace)
-    end
-
-    # "paste" some text
-    driver.execute_script "$('.mathquill-editor .textarea textarea').val('\\\\text{yay math stuff:}\\\\:\\\\frac{d}{dx}\\\\sqrt{x}=').trigger('paste')"
-    # make sure it renders correctly (inclding the medium space)
-    expect(f('.mathquill-editor').text).to include "yay math stuff: \nd\n\dx\n"
-
-    # type and click a bit
-    textarea.send_keys "d/dx"
-    textarea.send_keys :arrow_right
-    textarea.send_keys "x^1/2"
-    textarea.send_keys :arrow_right
-    textarea.send_keys :arrow_right
-    textarea.send_keys "="
-    textarea.send_keys "1/2"
-    textarea.send_keys :arrow_right
-    textarea.send_keys "x^-1/2"
-    textarea.send_keys :arrow_right
-    textarea.send_keys :arrow_right
-    textarea.send_keys "=1/2"
-    textarea.send_keys "\\sqrt"
-    textarea.send_keys :space
-    textarea.send_keys "x"
-    textarea.send_keys :arrow_right
-    textarea.send_keys :arrow_right
-    textarea.send_keys "\\text that. is. so. cool."
-    f('.ui-dialog-buttonset .btn-primary').click
-    wait_for_ajax_requests
-    in_frame wiki_page_body_ifr_id do
-      keep_trying_until { expect(f('.equation_image').attribute('title')).to eq equation_text }
-
-      # currently there's an issue where the equation is double-escaped in the
-      # src, though it's correct after the redirect to codecogs. here we just
-      # want to confirm we redirect correctly. so when that bug is fixed, this
-      # spec should still pass.
-      src = f('.equation_image').attribute('src')
-      response = Net::HTTP.get_response(URI.parse(src))
-      expect(response.code).to eq "302"
-      expect(response.header['location']).to include URI.encode(equation_text, Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))
-    end
-  end
-
-  it "should add an equation to the rce by using equation buttons in advanced view" do
-    skip('broken')
-    get "/courses/#{@course.id}/pages/front-page/edit"
-
-    f("##{wiki_page_editor_id}_instructure_equation").click
-    wait_for_ajaximations
-    expect(f('.mathquill-editor')).to be_displayed
-    f('a.math-toggle-link').click
-    wait_for_ajaximations
-    expect(f('#mathjax-editor')).to be_displayed
-    misc_tab = f('#mathjax-view .mathquill-tab-bar > li:last-child a')
-    misc_tab.click
-    f('#misc_tab li:nth-child(35) a').click
-    basic_tab = f('#mathjax-view .mathquill-tab-bar > li:first-child a')
-    basic_tab.click
-    f('#basic_tab li:nth-child(27) a').click
-    f('.ui-dialog-buttonset .btn-primary').click
-    keep_trying_until do
+      f('.mce-i-bold').send_keys(:shift)
+      f('.mce-i-bold').click
       in_frame wiki_page_body_ifr_id do
-        expect(f('#tinymce img.equation_image')).to be_displayed
+        expect(f('#tinymce strong')).to be_nil
       end
     end
 
-    f('form.edit-form button.submit').click
-    wait_for_ajax_requests
+    it "should add italic text to the rce", priority: "1", test_id: 285129 do
+      wysiwyg_state_setup
 
-    check_image(f('#wiki_page_show img'))
-  end
+      f('.mce-i-italic').click
 
-  it "should add an equation to the rce by using the equation editor in advanced view" do
-    equation_text = '\\text{yay math stuff:}\\:\\frac{d}{dx}\\sqrt{x}=\\frac{d}{dx}x^{\\frac{1}{2}}= \\frac{1}{2}x^{-\\frac{1}{2}}=\\frac{1}{2\\sqrt{x}}\\text{that. is. so. cool.}'
-
-    get "/courses/#{@course.id}/pages/front-page/edit"
-    f(equation_button_selector).click
-    wait_for_ajaximations
-    expect(f('.mathquill-editor')).to be_displayed
-    f('a.math-toggle-link').click
-    wait_for_ajaximations
-    expect(f('#mathjax-editor')).to be_displayed
-    textarea = f('#mathjax-editor')
-    3.times do
-      textarea.send_keys(:backspace)
+      in_frame wiki_page_body_ifr_id do
+        expect(f('#tinymce em')).to be_displayed
+      end
     end
 
-    # "paste" some latex
-    driver.execute_script "$('#mathjax-editor').val('\\\\text{yay math stuff:}\\\\:\\\\frac{d}{dx}\\\\sqrt{x}=').trigger('paste')"
+    it "should remove italic from text in rce", priority: "1", test_id: 417607 do
+      text = "<p><em>This is my text</em></p>"
+      wysiwyg_state_setup(text)
+
+      f('.mce-i-italic').send_keys(:shift)
+      f('.mce-i-italic').click
+      in_frame wiki_page_body_ifr_id do
+        expect(f('#tinymce em')).to be_nil
+      end
+    end
+
+    it "should underline text in the rce", priority: "1", test_id: 285356 do
+      wysiwyg_state_setup
+
+      f('.mce-i-underline').click
+
+      validate_wiki_style_attrib("text-decoration", "underline", "p span")
+    end
+
+    it "should remove underline from text in the rce", priority: "1", test_id: 460408 do
+      text = "<p><em>This is my text</em></p>"
+      wysiwyg_state_setup(text)
+
+      f('.mce-i-italic').send_keys(:shift)
+      f('.mce-i-italic').click
+      in_frame wiki_page_body_ifr_id do
+        expect(f('#tinymce em')).to be_nil
+      end
+    end
+
+    it "should change text to right-to-left in the rce", priority: "1", test_id: 401335 do
+      wysiwyg_state_setup(text = "rtl")
+
+      f(".mce-i-#{text}").click
+
+      in_frame wiki_page_body_ifr_id do
+        expect(f('#tinymce p').attribute('dir')).to eq text
+      end
+    end
+
+    it "should remove right-to-left from text in the rce", priority: "1", test_id: 547797 do
+      text = "<p dir=\"rtl\">This is my text</p>"
+      wysiwyg_state_setup(text)
+
+      f('.mce-i-rtl').send_keys(:shift)
+      f('.mce-i-rtl').click
+      validate_wiki_style_attrib_empty("p")
+    end
+
+    it "should change text to left-to-right in the rce", priority: "1", test_id: 547548 do
+      wysiwyg_state_setup(text = "ltr")
+
+      f(".mce-i-#{text}").click
+
+      in_frame wiki_page_body_ifr_id do
+        expect(f('#tinymce p').attribute('dir')).to eq text
+      end
+    end
+
+    it "should remove left-to-right from text in the rce", priority: "1", test_id: 550312 do
+      text = "<p dir=\"ltr\">This is my text</p>"
+      wysiwyg_state_setup(text)
+
+      f('.mce-i-ltr').send_keys(:shift)
+      f('.mce-i-ltr').click
+      validate_wiki_style_attrib_empty("p")
+    end
+
+    it "should add an equation to the rce by using equation buttons" do
+      skip "check_image broken"
+      get "/courses/#{@course.id}/pages/front-page/edit"
+
+      f("##{wiki_page_editor_id}_instructure_equation").click
+      wait_for_ajaximations
+      expect(f('.mathquill-editor')).to be_displayed
+      misc_tab = f('.mathquill-tab-bar > li:last-child a')
+      misc_tab.click
+      f('#Misc_tab li:nth-child(35) a').click
+      basic_tab = f('.mathquill-tab-bar > li:first-child a')
+      basic_tab.click
+      f('#Basic_tab li:nth-child(27) a').click
+      f('.ui-dialog-buttonset .btn-primary').click
+      keep_trying_until do
+        in_frame wiki_page_body_ifr_id do
+          expect(f('#tinymce img.equation_image')).to be_displayed
+        end
+      end
+
+      f('form.edit-form button.submit').click
+      wait_for_ajax_requests
+
+      check_image(f('#wiki_page_show img'))
+    end
+
+    it "should not scroll to the top of the page after using an equation button" do
+      get "/courses/#{@course.id}/pages/front-page/edit"
+      scroll_page_to_bottom
+
+      f(equation_button_selector).click
+      wait_for_ajaximations
+
+      misc_tab = f('.mathquill-tab-bar > li:last-child a')
+      misc_tab.click
+      f('#Misc_tab li:nth-child(35) a').click
+      scroll_location = driver.execute_script("return window.scrollY")
+      expect(scroll_location).not_to be 0
+    end
+
+    it "should add an equation to the rce by using the equation editor", priority: "2", test_id: 397972 do
+      equation_text = '\\text{yay math stuff:}\\:\\frac{d}{dx}\\sqrt{x}=\\frac{d}{dx}x^{\\frac{1}{2}}=\\frac{1}{2}x^{-\\frac{1}{2}}=\\frac{1}{2\\sqrt{x}}\\text{that. is. so. cool.}'
+
+      get "/courses/#{@course.id}/pages/front-page/edit"
+      f(equation_button_selector).click
+      wait_for_ajaximations
+      expect(f('.mathquill-editor')).to be_displayed
+      textarea = f('.mathquill-editor .textarea textarea')
+      3.times do
+        textarea.send_keys(:backspace)
+      end
+
+      # "paste" some text
+      driver.execute_script "$('.mathquill-editor .textarea textarea').val('\\\\text{yay math stuff:}\\\\:\\\\frac{d}{dx}\\\\sqrt{x}=').trigger('paste')"
+      # make sure it renders correctly (inclding the medium space)
+      expect(f('.mathquill-editor').text).to include "yay math stuff: \nd\n\dx\n"
+
+      # type and click a bit
+      textarea.send_keys "d/dx"
+      textarea.send_keys :arrow_right
+      textarea.send_keys "x^1/2"
+      textarea.send_keys :arrow_right
+      textarea.send_keys :arrow_right
+      textarea.send_keys "="
+      textarea.send_keys "1/2"
+      textarea.send_keys :arrow_right
+      textarea.send_keys "x^-1/2"
+      textarea.send_keys :arrow_right
+      textarea.send_keys :arrow_right
+      textarea.send_keys "=1/2"
+      textarea.send_keys "\\sqrt"
+      textarea.send_keys :space
+      textarea.send_keys "x"
+      textarea.send_keys :arrow_right
+      textarea.send_keys :arrow_right
+      textarea.send_keys "\\text that. is. so. cool."
+      f('.ui-dialog-buttonset .btn-primary').click
+      wait_for_ajax_requests
+      in_frame wiki_page_body_ifr_id do
+        keep_trying_until { expect(f('.equation_image').attribute('title')).to eq equation_text }
+
+        # currently there's an issue where the equation is double-escaped in the
+        # src, though it's correct after the redirect to codecogs. here we just
+        # want to confirm we redirect correctly. so when that bug is fixed, this
+        # spec should still pass.
+        src = f('.equation_image').attribute('src')
+        response = Net::HTTP.get_response(URI.parse(src))
+        expect(response.code).to eq "302"
+        expect(response.header['location']).to include URI.encode(equation_text, Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))
+      end
+    end
+
+    it "should add an equation to the rce by using equation buttons in advanced view" do
+      skip('broken')
+      get "/courses/#{@course.id}/pages/front-page/edit"
+
+      f("##{wiki_page_editor_id}_instructure_equation").click
+      wait_for_ajaximations
+      expect(f('.mathquill-editor')).to be_displayed
+      f('a.math-toggle-link').click
+      wait_for_ajaximations
+      expect(f('#mathjax-editor')).to be_displayed
+      misc_tab = f('#mathjax-view .mathquill-tab-bar > li:last-child a')
+      misc_tab.click
+      f('#misc_tab li:nth-child(35) a').click
+      basic_tab = f('#mathjax-view .mathquill-tab-bar > li:first-child a')
+      basic_tab.click
+      f('#basic_tab li:nth-child(27) a').click
+      f('.ui-dialog-buttonset .btn-primary').click
+      keep_trying_until do
+        in_frame wiki_page_body_ifr_id do
+          expect(f('#tinymce img.equation_image')).to be_displayed
+        end
+      end
+
+      f('form.edit-form button.submit').click
+      wait_for_ajax_requests
+
+      check_image(f('#wiki_page_show img'))
+    end
+
+    it "should add an equation to the rce by using the equation editor in advanced view" do
+      equation_text = '\\text{yay math stuff:}\\:\\frac{d}{dx}\\sqrt{x}=\\frac{d}{dx}x^{\\frac{1}{2}}= \\frac{1}{2}x^{-\\frac{1}{2}}=\\frac{1}{2\\sqrt{x}}\\text{that. is. so. cool.}'
+
+      get "/courses/#{@course.id}/pages/front-page/edit"
+      f(equation_button_selector).click
+      wait_for_ajaximations
+      expect(f('.mathquill-editor')).to be_displayed
+      f('a.math-toggle-link').click
+      wait_for_ajaximations
+      expect(f('#mathjax-editor')).to be_displayed
+      textarea = f('#mathjax-editor')
+      3.times do
+        textarea.send_keys(:backspace)
+      end
+
+      # "paste" some latex
+      driver.execute_script "$('#mathjax-editor').val('\\\\text{yay math stuff:}\\\\:\\\\frac{d}{dx}\\\\sqrt{x}=').trigger('paste')"
 
 
-    textarea.send_keys "\\frac{d}{dx}x^{\\frac{1}{2}}"
-    f('#mathjax-view .mathquill-toolbar a[title="="]').click
-    textarea.send_keys "\\frac{1}{2}x^{-\\frac{1}{2}}=\\frac{1}{2\\sqrt{x}}\\text{that. is. so. cool.}"
+      textarea.send_keys "\\frac{d}{dx}x^{\\frac{1}{2}}"
+      f('#mathjax-view .mathquill-toolbar a[title="="]').click
+      textarea.send_keys "\\frac{1}{2}x^{-\\frac{1}{2}}=\\frac{1}{2\\sqrt{x}}\\text{that. is. so. cool.}"
 
-    f('.ui-dialog-buttonset .btn-primary').click
-    wait_for_ajax_requests
-    in_frame wiki_page_body_ifr_id do
-      keep_trying_until { expect(f('.equation_image').attribute('title')).to eq equation_text }
+      f('.ui-dialog-buttonset .btn-primary').click
+      wait_for_ajax_requests
+      in_frame wiki_page_body_ifr_id do
+        keep_trying_until { expect(f('.equation_image').attribute('title')).to eq equation_text }
 
-      # currently there's an issue where the equation is double-escaped in the
-      # src, though it's correct after the redirect to codecogs. here we just
-      # want to confirm we redirect correctly. so when that bug is fixed, this
-      # spec should still pass.
-      src = f('.equation_image').attribute('src')
-      response = Net::HTTP.get_response(URI.parse(src))
-      expect(response.code).to eq "302"
-      expect(response.header['location']).to include URI.encode(equation_text, Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))
+        # currently there's an issue where the equation is double-escaped in the
+        # src, though it's correct after the redirect to codecogs. here we just
+        # want to confirm we redirect correctly. so when that bug is fixed, this
+        # spec should still pass.
+        src = f('.equation_image').attribute('src')
+        response = Net::HTTP.get_response(URI.parse(src))
+        expect(response.code).to eq "302"
+        expect(response.header['location']).to include URI.encode(equation_text, Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))
+      end
+    end
+
+    it 'should not throw page error with invalid LaTex on assignments', priority: "2", test_id: 237012 do
+      Assignment.new.tap do |a|
+        a.id = 1
+        a.title = 'test assignment'
+        # invalid LaTex characters in alt tag %, ^, &, _, -, ., ?
+        a.description = '<p><img class="equation_image" title="\sqrt[2]{3}%^&_-?."
+      src="/equation_images/%255Csqrt%255B2%255D%257B3%257D"
+      alt="\sqrt[2]{3}%^&_-?."/%^&_-?.></p>'
+        a.context_id = "#{@course.id}"
+        a.context_type = 'Course'
+        a.save!
+      end
+      get "/courses/#{@course.id}/assignments"
+      expect(error_displayed?).to be_falsey
+      get "/courses/#{@course.id}/assignments/1"
+      expect(error_displayed?).to be_falsey
+    end
+
+    it 'should not throw page error with invalid LaTex on discussions', priority: "2", test_id: 237013 do
+      DiscussionTopic.new.tap do |d|
+        d.id = 1
+        d.title = 'test discussion'
+        # invalid LaTex characters in alt tag %, ^, &, _, -, ., ?
+        d.message = '<p><img class="equation_image" title="\sqrt[2]{3}%^&_-?."
+      src="/equation_images/%255Csqrt%255B2%255D%257B3%257D"
+      alt="\sqrt[2]{3}%^&_-?."/%^&_-?.></p>'
+        d.context_id = "#{@course.id}"
+        d.context_type = 'Course'
+        d.save!
+      end
+      get "/courses/#{@course.id}/discussion_topics"
+      expect(error_displayed?).to be_falsey
+      get "/courses/#{@course.id}/discussion_topics/1"
+      expect(error_displayed?).to be_falsey
+    end
+
+    it "should display record video dialog" do
+      stub_kaltura
+      #pending("failing because it is dependant on an external kaltura system")
+
+      get "/courses/#{@course.id}/pages/front-page/edit"
+
+      f("div[aria-label='Record/Upload Media'] button").click
+      keep_trying_until { expect(f('#record_media_tab')).to be_displayed }
+      f('#media_comment_dialog a[href="#upload_media_tab"]').click
+      expect(f('#media_comment_dialog #audio_upload')).to be_displayed
+      close_visible_dialog
+      expect(f('#media_comment_dialog')).not_to be_displayed
     end
   end
-
-  it "should display record video dialog" do
-    stub_kaltura
-    #pending("failing because it is dependant on an external kaltura system")
-
-    get "/courses/#{@course.id}/pages/front-page/edit"
-
-    f("div[aria-label='Record/Upload Media'] button").click
-    keep_trying_until { expect(f('#record_media_tab')).to be_displayed }
-    f('#media_comment_dialog a[href="#upload_media_tab"]').click
-    expect(f('#media_comment_dialog #audio_upload')).to be_displayed
-    close_visible_dialog
-    expect(f('#media_comment_dialog')).not_to be_displayed
-  end
-
-end
 end

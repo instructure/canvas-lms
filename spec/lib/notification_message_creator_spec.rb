@@ -300,12 +300,12 @@ describe NotificationMessageCreator do
 
     it "should not send to bouncing channels" do
       notification_set
-      @communication_channel.bounce_count = 1
+      @communication_channel.bounce_count = CommunicationChannel::RETIRE_THRESHOLD - 1
       @communication_channel.save!
       messages = NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message
       expect(messages.select{|m| m.to == 'value for path'}.size).to eq 1
 
-      @communication_channel.bounce_count = 100
+      @communication_channel.bounce_count = CommunicationChannel::RETIRE_THRESHOLD
       @communication_channel.save!
       messages = NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message
       expect(messages.select{|m| m.to == 'value for path'}.size).to eq 0

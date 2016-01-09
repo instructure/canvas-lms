@@ -1,10 +1,10 @@
-require_relative "../common"
-require_relative "../helpers/quizzes_common"
-require_relative "../helpers/assignment_overrides"
-require_relative "../helpers/files_common"
+require_relative '../common'
+require_relative '../helpers/quizzes_common'
+require_relative '../helpers/assignment_overrides'
+require_relative '../helpers/files_common'
 
 describe 'creating a quiz' do
-  include_context "in-process server selenium tests"
+  include_context 'in-process server selenium tests'
   include QuizzesCommon
   include AssignmentOverridesSeleniumHelper
   include FilesCommon
@@ -19,7 +19,7 @@ describe 'creating a quiz' do
         @section_a = @course.course_sections.first
         @section_b = @course.course_sections.create!(name: 'Section B')
         course_quiz(active: true)
-        get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
+        open_quiz_edit_form
       end
 
       it 'sets availability dates and due dates for each section', priority: 1, test_id: 140670 do
@@ -73,12 +73,13 @@ describe 'creating a quiz' do
       assign_quiz_to_no_one
       save_settings
 
-      expect(ffj('div.error_text', 'div.error_box.errorBox')[1].text).to eq 'You must have a student or section selected'
+      expect(ffj('div.error_text', 'div.error_box.errorBox')[1].text).to eq 'You ' \
+        'must have a student or section selected'
     end
 
     it 'saves and publishes a new quiz', priority: "1", test_id: 193785 do
       @quiz = course_quiz
-      get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
+      open_quiz_edit_form
 
       expect(f('#quiz-draft-state')).to be_displayed
 
@@ -159,6 +160,35 @@ describe 'creating a quiz' do
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
       insert_file_from_rce(:quiz)
       expect(fln('b_file.txt')).to be_displayed
+    end
+  end
+
+  context "post to sis default setting" do
+    before do
+      account_model
+      @account.enable_feature!(:bulk_sis_grade_export)
+      course_with_teacher_logged_in(:active_all => true, :account => @account)
+    end
+
+    it "should default to post grades if account setting is enabled" do
+      @account.settings[:sis_default_grade_export] = {:locked => false, :value => true}
+      @account.save!
+
+      get "/courses/#{@course.id}/quizzes"
+      expect_new_page_load do
+        f('.new-quiz-link').click
+        wait_for_ajaximations
+      end
+      expect(is_checked('#assignment_post_to_sis')).to be_truthy
+    end
+
+    it "should not default to post grades if account setting is not enabled" do
+      get "/courses/#{@course.id}/quizzes"
+      expect_new_page_load do
+        f('.new-quiz-link').click
+        wait_for_ajaximations
+      end
+      expect(is_checked('#assignment_post_to_sis')).to be_falsey
     end
   end
 end

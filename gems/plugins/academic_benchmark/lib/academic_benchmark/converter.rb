@@ -22,14 +22,10 @@ module AcademicBenchmark
 
       if @archive_file
         convert_file
-      elsif @settings[:authorities] || @settings[:guids] || @settings[:refresh_all_standards]
+      elsif @settings[:authorities] || @settings[:guids]
         if @api_key && !@api_key.empty?
-          if @settings[:refresh_all_standards]
-            refresh_all_outcomes
-          else
-            convert_authorities(@settings[:authorities]) if @settings[:authorities]
-            convert_guids(@settings[:guids]) if @settings[:guids]
-          end
+          convert_authorities(@settings[:authorities]) if @settings[:authorities]
+          convert_guids(@settings[:guids]) if @settings[:guids]
         else
           raise Canvas::Migration::Error.new(I18n.t('academic_benchmark.no_api_key', "An API key is required to use Academic Benchmarks"))
         end
@@ -126,29 +122,6 @@ module AcademicBenchmark
       end
 
       data
-    end
-
-    # Get list of all authorities available for this api key and refresh them
-    def refresh_all_outcomes
-      auths = @api.list_available_authorities
-      auth_count = auths.length
-      set_progress(2)
-      auths.each_with_index do |auth, i|
-        next unless auth["type"] == "authority"
-
-        refresh_outcomes(:guid => auth["guid"])
-        set_progress((i/auth_count.to_f) * 90)
-      end
-
-      set_progress(95)
-    rescue APIError => e
-      add_error(
-        I18n.t("Previously unhandled error encountered while refreshing outcomes"),
-        {
-          exception: e,
-          error_message: e.message
-        }
-      )
     end
 
     def process_json_data(data)

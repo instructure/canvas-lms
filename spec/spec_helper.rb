@@ -30,8 +30,10 @@ RSpec.configure do |c|
 
   c.around(:each) do |example|
     Timeout::timeout(180) do
+      Rails.logger.info "STARTING SPEC #{example.full_description}"
       example.run
-      case example.example.exception
+      exception = example.example.exception
+      case exception
       when EOFError, Errno::ECONNREFUSED
         if $selenium_driver
           puts "SELENIUM: webdriver socket closed the connection.  Will try to re-initialize."
@@ -54,9 +56,34 @@ ENV["RAILS_ENV"] = 'test'
 require File.expand_path('../../config/environment', __FILE__) unless defined?(Rails)
 require 'rspec/rails'
 
+# ensure people aren't creating records outside the rspec lifecycle, e.g.
+# inside a describe/context block rather than a let/before/example
+require_relative 'support/blank_slate_protection'
+BlankSlateProtection.enable!
+
 Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
 
 ActionView::TestCase::TestController.view_paths = ApplicationController.view_paths
+
+module RSpec::Core::Hooks
+class AfterContextHook < Hook
+  def run(example)
+    exception_class = if defined?(RSpec::Support::AllExceptionsExceptOnesWeMustNotRescue)
+                        RSpec::Support::AllExceptionsExceptOnesWeMustNotRescue
+                      else
+                        Exception
+                      end
+    example.instance_exec(example, &block)
+  rescue exception_class => e
+    # TODO: Come up with a better solution for this.
+    RSpec.configuration.reporter.message <<-EOS
+An error occurred in an `after(:context)` hook.
+  #{e.class}: #{e.message}
+  occurred at #{e.backtrace.join("\n")}
+    EOS
+  end
+end
+end
 
 unless CANVAS_RAILS3
   Time.class_eval do
@@ -423,6 +450,7 @@ RSpec.configure do |config|
     Time.zone = 'UTC'
     LoadAccount.force_special_account_reload = true
     Account.clear_special_account_cache!(true)
+    PluginSetting.current_account = nil
     AdheresToPolicy::Cache.clear
     Setting.reset_cache!
     ConfigFile.unstub
@@ -437,6 +465,14 @@ RSpec.configure do |config|
     Rails::logger.try(:info, "Running #{self.class.description} #{@method_name}")
     Attachment.domain_namespace = nil
     $spec_api_tokens = {}
+  end
+
+  config.before :suite do
+    BlankSlateProtection.disable!
+
+    if ENV['TEST_ENV_NUMBER'].present?
+      Rails.logger.reopen("log/test#{ENV['TEST_ENV_NUMBER']}.log")
+    end
   end
 
   # this runs on post-merge builds to capture dependencies of each spec;

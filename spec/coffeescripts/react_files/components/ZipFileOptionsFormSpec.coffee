@@ -7,7 +7,8 @@ define [
 
     TestUtils = React.addons.TestUtils
 
-    module "ZipFileOptionsForm",
+    module "ZipFileOptionsForm"
+
     test "creates a display message based on fileOptions ", ->
       props = {
         fileOptions: {file: {name: 'neat_file'}}
@@ -38,7 +39,9 @@ define [
 
       props = {
         fileOptions: {file: 'the_file_obj' }
-        onZipOptionsResolved: zipOptionsResolvedStub
+        onZipOptionsResolved: (options)->
+          console.log("Called With ", options)
+          zipOptionsResolvedStub(options)
       }
 
       zFOF = TestUtils.renderIntoDocument(React.createElement(ZipFileOptionsForm, props))

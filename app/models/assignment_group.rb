@@ -34,9 +34,9 @@ class AssignmentGroup < ActiveRecord::Base
   acts_as_list scope: { context: self, workflow_state: 'available' }
   has_a_broadcast_policy
 
-  has_many :assignments, :order => 'position, due_at, title', :dependent => :destroy
-  has_many :active_assignments, :class_name => 'Assignment', :conditions => ['assignments.workflow_state != ?', 'deleted'], :order => 'assignments.position, assignments.due_at, assignments.title'
-  has_many :published_assignments, :class_name => 'Assignment', :conditions => "assignments.workflow_state = 'published'", :order => 'assignments.position, assignments.due_at, assignments.title'
+  has_many :assignments, -> { order('position, due_at, title') }, dependent: :destroy
+  has_many :active_assignments, -> { where("assignments.workflow_state<>'deleted'").order('assignments.position, assignments.due_at, assignments.title') }, class_name: 'Assignment'
+  has_many :published_assignments,  -> { where(workflow_state: 'published').order('assignments.position, assignments.due_at, assignments.title') }, class_name: 'Assignment'
 
   validates_presence_of :context_id, :context_type, :workflow_state
   validates_length_of :rules, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true

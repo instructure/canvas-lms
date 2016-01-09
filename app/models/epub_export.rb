@@ -5,17 +5,9 @@ class EpubExport < ActiveRecord::Base
   belongs_to :content_export
   belongs_to :course
   belongs_to :user
-  with_options({
-    as: :context, class_name: 'Attachment', order: 'created_at DESC'
-  }) do |association|
-    association.has_many :attachments, dependent: :destroy
-    association.has_one :epub_attachment, conditions: {
-      content_type: 'application/epub+zip'
-    }
-    association.has_one :zip_attachment, conditions: {
-      content_type: 'application/zip'
-    }
-  end
+  has_many :attachments, -> { order('created_at DESC') }, dependent: :destroy, as: :context, class_name: 'Attachment'
+  has_one :epub_attachment, -> { where(content_type: 'application/epub+zip').order('created_at DESC') }, as: :context, class_name: 'Attachment'
+  has_one :zip_attachment, -> { where(content_type: 'application/zip').order('created_at DESC') }, as: :context, class_name: 'Attachment'
   has_one :job_progress, as: :context, class_name: 'Progress'
   validates :course_id, :workflow_state, presence: true
 

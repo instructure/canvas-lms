@@ -18,6 +18,7 @@
 require 'nokogiri'
 require 'cgi'
 require 'iconv'
+require 'active_support'
 require 'active_support/core_ext'
 require 'sanitize'
 require 'canvas_text_helper'

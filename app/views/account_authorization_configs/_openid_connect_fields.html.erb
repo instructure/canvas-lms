@@ -22,3 +22,4 @@ If the provider can configure valid callback or redirect URIs, use %{callback_ur
   <%= f.label :login_attribute, 'Login Attribute', class: 'ic-Label' %>
   <%= f.text_field :login_attribute, placeholder: 'sub', class: 'ic-Input' %>
 </div>
+<%= render partial: 'jit_provisioning_field', locals: { f: f, aac: aac } %>

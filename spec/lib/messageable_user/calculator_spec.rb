@@ -180,12 +180,14 @@ describe "MessageableUser::Calculator" do
           end
 
           it "should include the group if the course was recently concluded" do
+            @course.start_at = 2.days.ago
             @course.conclude_at = 1.day.ago
             @course.save!
             expect(@calculator.uncached_fully_visible_group_ids).to include(@group.id)
           end
 
           it "should not include the group if the course concluding was not recent" do
+            @course.start_at = 46.days.ago
             @course.conclude_at = 45.days.ago
             @course.save!
             expect(@calculator.uncached_fully_visible_group_ids).not_to include(@group.id)

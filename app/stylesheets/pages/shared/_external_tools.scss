@@ -78,6 +78,10 @@ $app_height: 143px;
       overflow: hidden;
       text-overflow: ellipsis;
     }
+    .tool-update-badge {
+      margin: 0 15px;
+      color: $ic-brand-primary;
+    }
   }
   .app-full-view {
     td {

@@ -15,6 +15,7 @@ define [
         success: @spy()
 
     teardown: ->
+      @dialog.cancel({})
       $('input[name=date]').remove()
       $('label[for=date]').remove()
       $('.ui-dialog').remove()

@@ -26,6 +26,7 @@ module AccountReports
     def initialize(account_report)
       @account_report = account_report
       @account_report.parameters ||= {}
+      include_deleted_objects
     end
 
     def start_and_end_times
@@ -247,7 +248,7 @@ module AccountReports
       file = AccountReports.generate_file(@account_report)
       CSV.open(file, "w") do |csv|
 
-        students = root_account.pseudonyms.active.
+        students = root_account.pseudonyms.
           select('pseudonyms.last_request_at, pseudonyms.user_id,
                   pseudonyms.sis_user_id, users.sortable_name,
                   pseudonyms.current_login_ip').
@@ -268,6 +269,12 @@ module AccountReports
                    INNER JOIN #{Course.quoted_table_name} c on c.id = e.course_id").
             where('c.id = ?', course)
         end
+
+        if course || term
+          students = students.where('e.workflow_state <> ?', "deleted") unless @include_deleted
+        end
+
+        students = students.active unless @include_deleted
 
         headers = []
         headers << I18n.t('#account_reports.report_header_user_id', 'user id')

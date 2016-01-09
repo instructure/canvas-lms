@@ -121,7 +121,7 @@ htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, Missin
       _.defer(@renderGradingTypeOptions)
       _.defer(@renderGroupCategoryOptions)
       _.defer(@renderPeerReviewOptions)
-      _.defer(@renderPostToSisOptions) if ENV.POST_GRADES
+      _.defer(@renderPostToSisOptions) if ENV.POST_TO_SIS
       _.defer(@watchUnload)
       _.defer(@attachKeyboardShortcuts)
 

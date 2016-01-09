@@ -17,6 +17,7 @@ define ['collaborations'], (collaborations) ->
       $("#fixtures").append(dom)
 
     teardown: ->
+      $("#delete_collaboration_dialog").remove()
       $("#fixtures").empty()
       $.ajaxJSON = oldAjaxJSON
 

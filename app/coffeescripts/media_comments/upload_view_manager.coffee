@@ -31,7 +31,7 @@ define [
       @uploader.removeEventListener 'K5.progress', @updateProgBar
 
     onFileTypeError: (error) =>
-      if (error.maxFileSize > error.file.size)
+      if (error.file.size > error.maxFileSize)
         message = I18n.t('file_size_error', 'Size of %{file} is greater than the maximum %{max} allowed file size.',{file: error.file.name, max: error.maxFileSize})
       else
         message = I18n.t('file_type_error', '%{file} is not an acceptable %{type} file.', {file: error.file.name, type: error.allowedMediaTypes[0]})

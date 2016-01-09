@@ -466,7 +466,7 @@ module Api
                 end
       end
 
-      unless obj && ((is_public && !obj.locked_for?(user)) || user_can_download_attachment?(obj, context, user))
+      unless obj && !obj.deleted? && ((is_public && !obj.locked_for?(user)) || user_can_download_attachment?(obj, context, user))
         if obj && obj.previewable_media? && (uri = URI.parse(match.url) rescue nil)
           uri.query = (uri.query.to_s.split("&") + ["no_preview=1"]).join("&")
           next uri.to_s
@@ -495,7 +495,7 @@ module Api
     html = rewriter.translate_content(html)
 
     url_helper = Html::UrlProxy.new(self, context, host, protocol)
-    account = Context.get_account(context, @domain_root_account)
+    account = Context.get_account(context) || @domain_root_account
     include_mobile = respond_to?(:mobile_device?, true) && mobile_device?
     Html::Content.rewrite_outgoing(html, account, url_helper, include_mobile: include_mobile)
   end

@@ -7,17 +7,18 @@ define [
   'jst/courses/autocomplete_item'
   'jquery.ajaxJSON'
   'jquery.disableWhileLoading'
+  'jqueryui/autocomplete'
 ], ($, Backbone, _, I18n, template, autocompleteItemTemplate) ->
   class CourseFindSelectView extends Backbone.View
     @optionProperty 'current_user_id', 'show_select'
     template: template
 
-    els: 
+    els:
       '#courseSearchField'   : '$courseSearchField'
       '#courseSelect'        : '$courseSelect'
       '#courseSelectWarning' : '$selectWarning'
 
-    events: 
+    events:
       'change #courseSelect' : 'updateSearch'
       'change #include_completed_courses' : 'toggleConcludedCourses'
 
@@ -31,7 +32,7 @@ define [
         super
 
     afterRender: ->
-      @$courseSearchField.autocomplete 
+      @$courseSearchField.autocomplete
         source: @manageableCourseUrl()
         select: @updateSelect
       @$courseSearchField.data('ui-autocomplete')._renderItem = (ul, item) ->
@@ -46,7 +47,7 @@ define [
       @$courseSelect.on 'blur', -> $converterDiv.attr('aria-atomic', true)
       ## hack finished ##
 
-    toJSON: -> 
+    toJSON: ->
       json = super
       json.terms = @coursesByTerms
       json.include_concluded = @includeConcludedCourses
@@ -63,7 +64,7 @@ define [
       dfd
 
     # Turn on a param that lets this view know to filter terms with concluded
-    # courses. Also, automatically update the dropdown menu with items 
+    # courses. Also, automatically update the dropdown menu with items
     # that include concluded courses.
 
     toggleConcludedCourses: ->
@@ -89,16 +90,16 @@ define [
     # @api private
 
     autocompleteCourses: ->
-      _.map @courses, (course) -> 
+      _.map @courses, (course) ->
         {label: course.label, id: course.id, value: course.label}
 
-    # After finding a course by searching via autocomplete, update the 
-    # select menu to keep both input fields in sync. Also sets the 
+    # After finding a course by searching via autocomplete, update the
+    # select menu to keep both input fields in sync. Also sets the
     # source course id
     # @input (jqueryEvent, uiObj)
     # @api private
 
-    updateSelect: (event, ui) => 
+    updateSelect: (event, ui) =>
       @setSourceCourseId ui.item.id
       @$courseSelect.val ui.item.id if @$courseSelect.length
 
@@ -107,7 +108,7 @@ define [
     # @input jqueryEvent
     # @api private
 
-    updateSearch: (event) => 
+    updateSearch: (event) =>
       value = event.target.value && String(event.target.value)
       @setSourceCourseId value
 
@@ -129,7 +130,7 @@ define [
       if course = _.find(@courses, (c) -> c.id == id)
         @trigger 'course_changed', course
 
-    # Validates this form element. This validates method is a convention used 
+    # Validates this form element. This validates method is a convention used
     # for all sub views.
     # ie:
     #   error_object = {fieldName:[{type:'required', message: 'This is wrong'}]}
@@ -138,7 +139,7 @@ define [
     # @returns void | object (error)
     # @api private
 
-    validations: -> 
+    validations: ->
       errors = {}
       settings = @model.get('settings')
 

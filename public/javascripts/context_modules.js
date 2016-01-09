@@ -1230,7 +1230,9 @@ define([
               $module.find(".context_module_items.ui-sortable").sortable('enable').sortable('refresh');
               initNewItemPublishButton($item, data.content_tag);
               modules.updateAssignmentData();
-            })
+            }), { onComplete: function() {
+              $module.find('.add_module_item_link').focus();
+            }}
           );
         };
         INST.selectContentDialog(options);

@@ -89,53 +89,59 @@ describe GroupMembership do
     end
   end
 
-  it "should dispatch a 'new_student_organized_group' message if the first membership in a student organized group" do
-    course_with_teacher
-    student = user_model
-    @course.enroll_student(student)
-    group = @course.groups.create(:group_category => GroupCategory.student_organized_for(@course))
+  context "Notifications" do
+    context "in published course" do
+      before :each do
+        course_with_teacher(active_all: true)
+        @student1 = student_in_course(active_all: true).user
+        @group1 = @course.groups.create(group_category: GroupCategory.student_organized_for(@course))
+      end
 
-    Notification.create(:name => "New Student Organized Group", :category => "TestImmediately")
-    @teacher.communication_channels.create(:path => "test_channel_email_#{@teacher.id}", :path_type => "email").confirm
+      it "should send message if the first membership in a student organized group", priority: "1", test_id: 193157 do
+        Notification.create(name: 'New Student Organized Group', category: 'TestImmediately')
+        @teacher.communication_channels.create(path: "test_channel_email_#{@teacher.id}", path_type: 'email').confirm
 
-    group_membership = group.group_memberships.create(:user => student)
-    expect(group_membership.messages_sent).to be_include("New Student Organized Group")
-  end
+        group_membership = @group1.group_memberships.create(user: @student1)
+        expect(group_membership.messages_sent['New Student Organized Group']).not_to be_empty
+      end
 
-  it "should not dispatch a message if the membership has been created with SIS" do
-    course_with_teacher(active_all: true)
-    student    = user_model
-    group      = @course.groups.create(group_category: GroupCategory.student_organized_for(@course))
-    membership = group.group_memberships.build(user: student)
-    @course.enroll_student(student).accept!
-    Notification.create!(name: 'New Context Group Membership', category: 'TestImmediately')
-    Notification.create!(name: 'New Context Group Membership Invitation', category: 'TestImmediately')
-    batch = @course.root_account.sis_batches.create!
-    membership.sis_batch_id = batch.id
-    membership.save!
-    expect(membership.messages_sent).to be_empty
-  end
+      it "should send message when a new student is invited to group and auto-joins", priority: "1", test_id: 193155 do
+        Notification.create!(name: 'New Context Group Membership', category: 'TestImmediately')
+        student2 = student_in_course(active_all: true).user
+        student2.communication_channels.create(path: "test_channel_email_#{student2.id}", path_type: 'email').confirm
+        group_membership = @group1.group_memberships.create(user: @student1)
+        @group1.add_user(student2)
+        expect(group_membership.messages_sent['New Context Group Membership']).not_to be_empty
+      end
 
-  it "should dispatch a message if the course is available" do
-    course_with_teacher(active_all: true)
-    student    = user_model
-    group      = @course.groups.create(group_category: GroupCategory.student_organized_for(@course))
-    membership = group.group_memberships.build(user: student)
-    @course.enroll_student(student).accept!
-    Notification.create!(name: 'New Context Group Membership', category: 'TestImmediately')
-    membership.save!
-    expect(membership.messages_sent).to_not be_empty
-  end
+      it "should not dispatch a message if the membership has been created with SIS" do
+        membership = @group1.group_memberships.build(user: @student1)
+        Notification.create!(name: 'New Context Group Membership', category: 'TestImmediately')
+        Notification.create!(name: 'New Context Group Membership Invitation', category: 'TestImmediately')
+        batch = @course.root_account.sis_batches.create!
+        membership.sis_batch_id = batch.id
+        membership.save!
+        expect(membership.messages_sent).to be_empty
+      end
 
-  it "should not dispatch a message if the course is unpublished" do
-    course_with_teacher
-    student    = user_model
-    group      = @course.groups.create(group_category: GroupCategory.student_organized_for(@course))
-    membership = group.group_memberships.build(user: student)
-    @course.enroll_student(student)
-    Notification.create!(name: 'New Context Group Membership', category: 'TestImmediately')
-    membership.save!
-    expect(membership.messages_sent).to be_empty
+      it "should dispatch a message if the course is available" do
+        membership = @group1.group_memberships.build(user: @student1)
+        Notification.create!(name: 'New Context Group Membership', category: 'TestImmediately')
+        membership.save!
+        expect(membership.messages_sent['New Context Group Membership']).not_to be_empty
+      end
+    end
+
+    it "should not dispatch a message if the course is unpublished" do
+      course_with_teacher
+      student = user_model
+      group = @course.groups.create(group_category: GroupCategory.student_organized_for(@course))
+      membership = group.group_memberships.build(user: student)
+      @course.enroll_student(student)
+      Notification.create!(name: 'New Context Group Membership', category: 'TestImmediately')
+      membership.save!
+      expect(membership.messages_sent).to be_empty
+    end
   end
 
   it "should be invalid if group wants a common section, but doesn't have one with the user" do

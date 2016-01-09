@@ -315,10 +315,14 @@ class EnrollmentsApiController < ApplicationController
   # @argument enrollment[role_id] [Integer]
   #   Assigns a custom course-level role to the user.
   #
-  # @argument enrollment[enrollment_state] [String, "active"|"invited"]
+  # @argument enrollment[enrollment_state] [String, "active"|"invited"|"inactive"]
   #   If set to 'active,' student will be immediately enrolled in the course.
   #   Otherwise they will be required to accept a course invitation. Default is
-  #   'invited.'
+  #   'invited.'.
+  #
+  #   If set to 'inactive', student will be listed in the course roster for
+  #   teachers, but will not be able to participate in the course until
+  #   their enrollment is activated.
   #
   # @argument enrollment[course_section_id] [Integer]
   #   The ID of the course section to enroll the student in. If the
@@ -469,11 +473,12 @@ class EnrollmentsApiController < ApplicationController
     end
   end
 
-  # @API Conclude an enrollment
-  # Delete or conclude an enrollment.
+  # @API Conclude or inactivate an enrollment
+  # Delete, conclude or inactivate an enrollment.
   #
-  # @argument task [String, "conclude"|"delete"]
+  # @argument task [String, "conclude"|"delete"|"inactivate"]
   #   The action to take on the enrollment.
+  #   When inactive, a user will still appear in the course roster to admins, but be unable to participate.
   #
   # @example_request
   #   curl https://<canvas>/api/v1/courses/:course_id/enrollments/:enrollment_id \
@@ -483,14 +488,48 @@ class EnrollmentsApiController < ApplicationController
   # @returns Enrollment
   def destroy
     @enrollment = @context.enrollments.find(params[:id])
-    task = %w{conclude delete}.include?(params[:task]) ? params[:task] : 'conclude'
+    task = %w{conclude delete inactivate}.include?(params[:task]) ? params[:task] : 'conclude'
 
-    unless @enrollment.send("can_be_#{task}d_by", @current_user, @context, session)
+    permission = case task
+                 when 'conclude'
+                   :can_be_concluded_by
+                 when 'delete', 'inactivate'
+                   :can_be_deleted_by
+                 end
+
+    unless @enrollment.send(permission, @current_user, @context, session)
       return render_unauthorized_action
     end
 
     task = 'destroy' if task == 'delete'
     if @enrollment.send(task)
+      render :json => enrollment_json(@enrollment, @current_user, session)
+    else
+      render :json => @enrollment.errors, :status => :bad_request
+    end
+  end
+
+  # @API Re-activate an enrollment
+  # Activates an inactive enrollment
+  #
+  # @example_request
+  #   curl https://<canvas>/api/v1/courses/:course_id/enrollments/:enrollment_id/reactivate \
+  #     -X PUT
+  #
+  # @returns Enrollment
+  def reactivate
+    @enrollment = @context.enrollments.find(params[:id])
+
+    unless @enrollment.send(:can_be_deleted_by, @current_user, @context, session)
+      return render_unauthorized_action
+    end
+
+
+    unless @enrollment.workflow_state == 'inactive'
+      return render(:json => {:error => "enrollment not inactive"}, :status => :bad_request)
+    end
+
+    if @enrollment.reactivate
       render :json => enrollment_json(@enrollment, @current_user, session)
     else
       render :json => @enrollment.errors, :status => :bad_request
@@ -512,8 +551,10 @@ class EnrollmentsApiController < ApplicationController
 
     if authorized_action(@context, @current_user, [:read_roster, :view_all_grades, :manage_grades])
       scope = @context.apply_enrollment_visibility(@context.all_enrollments, @current_user).where(enrollment_index_conditions)
+
       unless params[:state].present?
-        scope = scope.active_or_pending
+        include_inactive = @context.grants_right?(@current_user, session, :read_as_admin)
+        scope = include_inactive ? scope.all_active_or_pending : scope.active_or_pending
       end
       scope
     else

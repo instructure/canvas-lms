@@ -428,4 +428,43 @@ describe ContentMigration do
     expect(qq.question_data.to_yaml).to include("/media_objects/m-5U5Jww6HL7zG35CgyaYGyA5bhzsremxY")
 
   end
+
+  it "expires migration jobs after 48 hours" do
+    course_with_teacher
+    cm = ContentMigration.new(:context => @course, :user => @teacher)
+    cm.migration_type = 'common_cartridge_importer'
+    cm.workflow_state = 'created'
+    cm.save!
+    cm.queue_migration
+
+    Canvas::Migration::Worker::CCWorker.any_instance.expects(:perform).never
+    Timecop.travel(50.hours.from_now) do
+      run_jobs
+    end
+
+    cm.reload
+    expect(cm).to be_failed
+    expect(cm.migration_issues).not_to be_empty
+    expect(cm.migration_issues.last.error_report.message).to include 'job expired'
+  end
+
+  it "expires import jobs after 48 hours" do
+    course_with_teacher
+    cm = ContentMigration.new(:context => @course, :user => @teacher)
+    cm.migration_type = 'common_cartridge_importer'
+    cm.workflow_state = 'exported'
+    cm.save!
+    Canvas::Migration::Worker::CCWorker.expects(:new).never
+    cm.queue_migration
+
+    ContentMigration.any_instance.expects(:import_content).never
+    Timecop.travel(50.hours.from_now) do
+      run_jobs
+    end
+
+    cm.reload
+    expect(cm).to be_failed
+    expect(cm.migration_issues).not_to be_empty
+    expect(cm.migration_issues.last.error_report.message).to include 'job expired'
+  end
 end

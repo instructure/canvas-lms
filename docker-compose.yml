@@ -4,6 +4,9 @@ postgres:
 redis:
   image: redis:2.6
 
+consul:
+  build: ./docker-compose/consul
+
 # Uncomment the below lines to run selenium tests locally. Don't forget the
 # line in the `web` section below too.
 #
@@ -31,6 +34,7 @@ web:
   volumes:
     - ".:/app"
   links:
+    - consul
     - postgres
     - redis
 #    - selenium
@@ -40,6 +44,8 @@ web:
     VIRTUAL_HOST: .canvas.docker
     ECOSYSTEM_SECRET: 7hZoK4DZyrH+A7nxLhC=fVeRQq79oCqq]QK92M?LGPh/tKQv]Q
     ECOSYSTEM_KEY: +h+oJTJ)(AcfUxGNUy7Pk2zRTwPaTeqA;&MQ3Gx6936VfvHumn
+    # uncomment if primarily using webpack in development
+    # USE_WEBPACK: true
 
 jobs:
   build: ./docker-compose
@@ -64,7 +70,7 @@ guard:
     RACK_ENV: development
 
 # Uncomment this entry to run qunit tests built from webpack
-#js-tests:
+# js-tests:
 #  build: ./docker-compose/karma
 #  volumes:
 #    - ".:/app"

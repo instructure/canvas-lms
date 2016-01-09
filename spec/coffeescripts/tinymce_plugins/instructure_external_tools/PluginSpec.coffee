@@ -6,6 +6,7 @@ define [
   module "ExternalTools Plugin",
     setup: ->
     teardown: ->
+      $(".ui-dialog").remove()
 
   test "buttonConfig populates a config hash with button properties", ->
     button = {

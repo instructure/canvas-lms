@@ -33,6 +33,7 @@ module Quizzes
       :includes_all_versions,
 
       :points_possible,
+      :anonymous_survey,
 
       :speed_grader_url,
       :quiz_submissions_zip_url,
@@ -127,6 +128,10 @@ module Quizzes
 
     def points_possible
       quiz.points_possible
+    end
+
+    def anonymous_survey
+      quiz.anonymous_survey?
     end
 
     def speed_grader_url

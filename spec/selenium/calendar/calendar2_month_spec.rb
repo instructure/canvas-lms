@@ -58,6 +58,103 @@ describe "calendar2" do
         create_middle_day_assignment
       end
 
+      context "drag and drop" do
+
+        def element_location
+          driver.execute_script("return $('#calendar-app .fc-content-skeleton:first')
+          .find('tbody td.fc-event-container').index()")
+        end
+
+        before(:each) do
+          @monday = 1
+          @friday = 5
+          @initial_time = Time.zone.parse('2015-1-1').beginning_of_day + 9.hours
+          @initial_time_str = @initial_time.strftime('%Y-%m-%d')
+          @one_day_later = @initial_time + 24.hours
+          @three_days_earlier = @initial_time - 72.hours
+        end
+
+        it "should drag and drop assignment forward", priority: "1", test_id: 495537 do
+          assignment1 = @course.assignments.create!(title: 'new month view assignment', due_at: @initial_time)
+          get "/calendar2"
+          quick_jump_to_date(@initial_time_str)
+
+          # Move assignment from Thursday to Friday
+          drag_and_drop_element(find('.calendar .fc-event'),
+                                find('.calendar .fc-day.fc-widget-content.fc-fri.fc-past'))
+
+          # Expect no pop up errors with drag and drop
+          expect(flash_message_present?(:error)).to be false
+
+          # Assignment should be moved to Friday
+          expect(element_location).to eq @friday
+
+          # Assignment time should stay at 9:00am
+          assignment1.reload
+          expect(assignment1.start_at).to eql(@one_day_later)
+        end
+
+        it "should drag and drop event forward", priority: "1", test_id: 495538 do
+          event1 = make_event(start: @initial_time, title: 'new week view event')
+          get "/calendar2"
+          quick_jump_to_date(@initial_time_str)
+
+          # Move event from Thursday to Friday
+          drag_and_drop_element(find('.calendar .fc-event'),
+                                find('.calendar .fc-day.fc-widget-content.fc-fri.fc-past'))
+
+          # Expect no pop up errors with drag and drop
+          expect(flash_message_present?(:error)).to be false
+
+          # Event should be moved to Friday
+          expect(element_location).to eq @friday
+
+          # Event time should stay at 9:00am
+          event1.reload
+          expect(event1.start_at).to eql(@one_day_later)
+        end
+
+        it "should drag and drop assignment back", priority: "1", test_id: 567749 do
+          assignment1 = @course.assignments.create!(title: 'new month view assignment', due_at: @initial_time)
+          get "/calendar2"
+          quick_jump_to_date(@initial_time_str)
+
+          # Move assignment from Thursday to Monday
+          drag_and_drop_element(find('.calendar .fc-event'),
+                                find('.calendar .fc-day.fc-widget-content.fc-mon.fc-past'))
+
+          # Expect no pop up errors with drag and drop
+          expect(flash_message_present?(:error)).to be false
+
+          # Assignment should be moved to Monday
+          expect(element_location).to eq @monday
+
+          # Assignment time should stay at 9:00am
+          assignment1.reload
+          expect(assignment1.start_at).to eql(@three_days_earlier)
+        end
+
+        it "should drag and drop event back", priority: "1", test_id: 567750 do
+          event1 = make_event(start: @initial_time, title: 'new week view event')
+          get "/calendar2"
+          quick_jump_to_date(@initial_time_str)
+
+          # Move event from Thursday to Monday
+          drag_and_drop_element(find('.calendar .fc-event'),
+                                find('.calendar .fc-day.fc-widget-content.fc-mon.fc-past'))
+
+          # Expect no pop up errors with drag and drop
+          expect(flash_message_present?(:error)).to be false
+
+          # Event should be moved to Monday
+          expect(element_location).to eq @monday
+
+          # Event time should stay at 9:00am
+          event1.reload
+          expect(event1.start_at).to eql(@three_days_earlier)
+        end
+      end
+
       it "more options link should go to calendar event edit page" do
         create_middle_day_event
         find('.fc-event').click
@@ -177,6 +274,15 @@ describe "calendar2" do
         expect(fj(last_saturday).attribute('data-date')).to eq('2011-12-31')
       end
 
+      it "should fix up the event's date for events after 11:30pm" do
+        time = Time.zone.now.at_beginning_of_day + 23.hours + 45.minutes
+        @course.calendar_events.create! title: 'ohai', start_at: time, end_at: time + 5.minutes
+
+        load_month_view
+
+        expect(fj('.fc-event .fc-time').text).to eq('11:45p')
+      end
+
       it "should change the month" do
         get "/calendar2"
         old_header_title = header_text
@@ -265,6 +371,91 @@ describe "calendar2" do
         # Check various elements to verify that the calendar looks good
         expect(find('.ui-datepicker-header').text).to include_text(Time.now.utc.strftime("%B"))
         expect(find('.ui-datepicker-calendar').text).to include_text("Mo")
+      end
+
+      it "should strikethrough past due assignment", priority: "1", test_id: 518370 do
+        date_due = Time.zone.now.utc - 2.days
+        @assignment = @course.assignments.create!(
+          title: 'new outdated assignment',
+          name: 'new outdated assignment',
+          due_at: date_due
+        )
+        get '/calendar2'
+
+        # go to the same month as the date_due
+        quick_jump_to_date(date_due.strftime '%Y-%m-%d')
+
+        # verify assignment has line-through
+        expect(find('.fc-title').css_value('text-decoration')).to eql('line-through')
+      end
+
+      it "should strikethrough past due graded discussion", priority: "1", test_id: 518371 do
+        date_due = Time.zone.now.utc - 2.days
+        a = @course.assignments.create!(title: 'past due assignment', due_at: date_due, points_possible: 10)
+        @pub_graded_discussion_due = @course.discussion_topics.build(assignment: a, title: 'graded discussion')
+        @pub_graded_discussion_due.save!
+        get '/calendar2'
+
+        # go to the same month as the date_due
+        quick_jump_to_date(date_due.strftime '%Y-%m-%d')
+
+        # verify discussion has line-through
+        expect(find('.fc-title').css_value('text-decoration')).to eql('line-through')
+      end
+    end
+  end
+
+  context "as a student" do
+
+    before(:each) do
+      course_with_student_logged_in
+    end
+
+    describe "main month calendar" do
+
+      it "should strikethrough completed assignment title", priority: "1", test_id: 518372 do
+        date_due = Time.zone.now.utc + 2.days
+        @assignment = @course.assignments.create!(
+          title: 'new outdated assignment',
+          name: 'new outdated assignment',
+          due_at: date_due,
+          submission_types: 'online_text_entry'
+        )
+
+        # submit assignment
+        submission = @assignment.submit_homework(@student)
+        submission.submission_type = 'online_text_entry'
+        submission.save!
+        get '/calendar2'
+
+        # go to the same month as the date_due
+        quick_jump_to_date(date_due.strftime '%Y-%m-%d')
+
+        # verify assignment has line-through
+        expect(find('.fc-title').css_value('text-decoration')).to eql('line-through')
+      end
+
+      it "should strikethrough completed graded discussion", priority: "1", test_id: 518373 do
+        date_due = Time.zone.now.utc + 2.days
+        reply = 'Replying to discussion'
+
+        a = @course.assignments.create!(title: 'past due assignment', due_at: date_due, points_possible: 10)
+        @pub_graded_discussion_due = @course.discussion_topics.build(assignment: a, title: 'graded discussion')
+        @pub_graded_discussion_due.save!
+
+        get "/courses/#{@course.id}/discussion_topics/#{@pub_graded_discussion_due.id}"
+        find('.discussion-reply-action').click
+        wait_for_ajaximations
+        driver.execute_script "tinyMCE.activeEditor.setContent('#{reply}')"
+        find('.btn.btn-primary').click
+        wait_for_ajaximations
+        get '/calendar2'
+
+        # go to the same month as the date_due
+        quick_jump_to_date(date_due.strftime '%Y-%m-%d')
+
+        # verify discussion has line-through
+        expect(find('.fc-title').css_value('text-decoration')).to eql('line-through')
       end
     end
   end

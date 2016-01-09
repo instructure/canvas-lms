@@ -275,6 +275,7 @@ describe Quizzes::QuizzesController do
     end
 
     it 'logs a single asset access entry with an action level of "view"' do
+      Thread.current[:context] = {request_id: "middleware doesn't run in controller specs so let's make one up"}
       Setting.set('enable_page_views', 'db')
 
       user_session(@teacher)
@@ -284,6 +285,7 @@ describe Quizzes::QuizzesController do
       expect(assigns[:accessed_asset]).not_to be_nil
       expect(assigns[:accessed_asset][:level]).to eq 'view'
       expect(assigns[:access].view_score).to eq 1
+      Thread.current[:context] = nil
     end
 
     it "locks results if there is a submission and one_time_results is on" do

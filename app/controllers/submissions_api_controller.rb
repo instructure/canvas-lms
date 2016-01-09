@@ -830,7 +830,7 @@ class SubmissionsApiController < ApplicationController
   end
 
   def get_user_considering_section(user_id)
-    students = @context.students_visible_to(@current_user)
+    students = @context.students_visible_to(@current_user, true)
     if @section
       students = students.where(:enrollments => { :course_section_id => @section })
     end

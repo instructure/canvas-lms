@@ -24,8 +24,8 @@ class ClonedItem < ActiveRecord::Base
   validates_inclusion_of :original_item_type, :allow_nil => true, :in => ['Attachment', 'ContentTag', 'Folder',
     'Assignment', 'WikiPage', 'Quizzes::Quiz', 'DiscussionTopic', 'ContextModule', 'CalendarEvent',
     'AssignmentGroup', 'ContextExternalTool']
-  has_many :attachments, :order => 'id asc'
-  has_many :discussion_topics, :order => 'id asc'
-  has_many :wiki_pages, :order => 'id asc'
+  has_many :attachments, -> { order(:id) }
+  has_many :discussion_topics, -> { order(:id) }
+  has_many :wiki_pages, -> { order(:id) }
   attr_accessible :original_item
 end

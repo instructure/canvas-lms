@@ -21,6 +21,7 @@ define [
       lock_at: null
       unpublishable: true
       points_possible: null
+      post_to_sis: false
 
     initialize: (attributes, options = {}) ->
       super
@@ -33,10 +34,12 @@ define [
       @initPointsCount()
       @initAllDates()
 
+
     # initialize attributes
     initAssignment: ->
       if @attributes.assignment
         @set 'assignment', new Assignment(@attributes.assignment)
+      @set 'post_to_sis_enabled', @postToSISEnabled()
 
     initAssignmentOverrides: ->
       if @attributes.assignment_overrides
@@ -51,6 +54,7 @@ define [
         @set 'edit_url',      "#{@get 'base_url'}/#{@get 'id'}/edit"
         @set 'publish_url',   "#{@get 'base_url'}/publish"
         @set 'unpublish_url', "#{@get 'base_url'}/unpublish"
+        @set 'toggle_post_to_sis_url', "#{@get 'base_url'}/#{@get 'id'}/toggle_post_to_sis"
 
     initTitleLabel: ->
       @set 'title_label', @get('title') or @get('readable_type')
@@ -106,6 +110,9 @@ define [
     htmlUrl: =>
       @get 'url'
 
+    togglePostToSISUrl: =>
+      @get 'toggle_post_to_sis_url'
+
     defaultDates: =>
       group = new DateGroup
         due_at:    @get("due_at")
@@ -136,6 +143,10 @@ define [
       return @get('only_visible_to_overrides') || false unless arguments.length > 0
       @set('only_visible_to_overrides', overrideFlag)
 
+    postToSIS: (postToSisBoolean) =>
+      return @get 'post_to_sis' unless arguments.length > 0
+      @set 'post_to_sis', postToSisBoolean
+
     toView: =>
       fields = [
         'htmlUrl', 'multipleDueDates', 'nonBaseDates', 'allDates', 'dueAt', 'lockAt', 'unlockAt', 'singleSectionDueDate'
@@ -144,3 +155,6 @@ define [
       for field in fields
         hash[field] = @[field]()
       hash
+
+    postToSISEnabled: =>
+      return ENV.FLAGS && ENV.FLAGS.post_to_sis_enabled

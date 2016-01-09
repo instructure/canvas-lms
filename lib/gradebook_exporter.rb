@@ -62,13 +62,13 @@ class GradebookExporter
     read_only = I18n.t('csv.read_only_field', '(read only)')
     include_root_account = @course.root_account.trust_exists?
     should_show_totals = show_totals?
+    include_sis_id = @options[:include_sis_id]
     CSV.generate do |csv|
       # First row
       row = ["Student", "ID"]
-      if @options[:include_sis_id]
-        row << "SIS User ID" << "SIS Login ID"
-        row << "Root Account" if include_root_account
-      end
+      row << "SIS User ID" if include_sis_id
+      row << "SIS Login ID"
+      row << "Root Account" if include_sis_id && include_root_account
       row << "Section"
       row.concat assignments.map(&:title_with_id)
       include_points = !@course.apply_group_weights?
@@ -93,8 +93,8 @@ class GradebookExporter
       # Possible muted row
       if assignments.any?(&:muted)
         # This is is not translated since we look for this exact string when we upload to gradebook.
-        row = [nil, nil, nil]
-        row << nil << nil if @options[:include_sis_id]
+        row = [nil, nil, nil, nil]
+        row << nil if include_sis_id
         row.concat(assignments.map { |a| 'Muted' if a.muted? })
 
         if should_show_totals
@@ -108,9 +108,11 @@ class GradebookExporter
       end
 
       # Second Row
-      row = ["    Points Possible", nil, nil]
-      row << nil << nil if @options[:include_sis_id]
-      row << nil if @options[:include_sis_id] && include_root_account
+      row = ["    Points Possible", nil, nil, nil]
+      if include_sis_id
+        row << nil
+        row << nil if include_root_account
+      end
       row.concat assignments.map(&:points_possible)
 
       if should_show_totals
@@ -149,14 +151,11 @@ class GradebookExporter
             end
           end
           row = [student.send(name_method), student.id]
-          if @options[:include_sis_id]
-            pseudonym = SisPseudonym.for(student, @course, include_root_account)
-            row << pseudonym.try(:sis_user_id)
-            pseudonym ||= student.find_pseudonym_for_account(@course.root_account, include_root_account)
-            row << pseudonym.try(:unique_id)
-            row << (pseudonym && HostUrl.context_host(pseudonym.account)) if include_root_account
-          end
-
+          pseudonym = SisPseudonym.for(student, @course, include_root_account)
+          row << pseudonym.try(:sis_user_id) if include_sis_id
+          pseudonym ||= student.find_pseudonym_for_account(@course.root_account, include_root_account)
+          row << pseudonym.try(:unique_id)
+          row << (pseudonym && HostUrl.context_host(pseudonym.account)) if include_sis_id && include_root_account
           row << student_sections
           row.concat(student_submissions)
 
@@ -187,8 +186,7 @@ class GradebookExporter
     # course_section: used for display_name in csv output
     # user > pseudonyms: used for sis_user_id/unique_id if options[:include_sis_id]
     # user > pseudonyms > account: used in find_pseudonym_for_account > works_for_account
-    includes = :course_section
-    includes = {:user => {:pseudonyms => :account}, :course_section => []} if options[:include_sis_id]
+    includes = {:user => {:pseudonyms => :account}, :course_section => []}
 
     enrollments = scope.preload(includes).eager_load(:user).order_by_sortable_name.to_a
     enrollments.partition { |e| e.type != "StudentViewEnrollment" }.flatten

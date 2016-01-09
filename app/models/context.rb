@@ -188,12 +188,14 @@ module Context
     nil
   end
 
-  def self.get_account(context, fallback)
-    return fallback unless context
-    case context.class_name
-    when "Account" then context
-    when "Course", "Group" then Account.find_cached(context.account_id)
-    end || fallback
+  def self.get_account(context)
+    if context.is_a?(Account)
+      context
+    elsif context.is_a?(Course) || context.is_a?(CourseSection)
+      get_account(context.account)
+    elsif context.is_a?(Group)
+      get_account(context.context)
+    end
   end
 
   def is_a_context?

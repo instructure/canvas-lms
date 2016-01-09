@@ -18,7 +18,11 @@
       </span>
     </div>
     <ul class="student_list">
-      <li class="student blank" style="display: none;"><span class="name">&nbsp;</span><span class="score">&nbsp;</span></li>
+      <li class="student blank" style="display: none;">
+        <span class="name">&nbsp;</span>
+        <span class="score">&nbsp;</span>
+        <button class="remove-button Button Button--icon-action"><i class="icon-x"></i></button>
+      </li>
     </ul>
     <div class="clear"></div>
     <table class="formtable" style="width: 100%;">
@@ -36,8 +40,8 @@
       </tr>
     </table>
     <div class="button-container">
-      <button class="btn dialog_closer"><%= t('#buttons.cancel', "Cancel") %></button>
-      <button type="submit" class="btn btn-primary send_button"><%= t('buttons.send_message', 'Send Message') %></button>
+      <button class="Button cancel_button"><%= t('#buttons.cancel', "Cancel") %></button>
+      <button type="submit" class="Button Button--primary send_button"><%= t('buttons.send_message', 'Send Message') %></button>
     </div>
   <% end %>
 </div>

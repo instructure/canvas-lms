@@ -8,8 +8,22 @@ define([
       var rows = [];
 
       invalid_links.forEach((link) => {
+        var label, label_elem;
+        if (link.reason == 'unpublished_item') {
+          label = I18n.t("unpublished");
+        } else if (link.reason == 'missing_item') {
+          label = I18n.t("deleted");
+        } else if (link.reason == 'course_mismatch') {
+          label = I18n.t("different course");
+        }
+
+        if (label) {
+          label_elem = <span className="label">{label}</span>;
+        }
+
         rows.push(<li key={link.url + invalid_links.indexOf(link)}>
           {link.url}
+          {!!label_elem && label_elem}
         </li>);
       });
 

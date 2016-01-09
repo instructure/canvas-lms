@@ -26,7 +26,7 @@ class AccountAuthorizationConfig::LinkedIn < AccountAuthorizationConfig::Oauth2
   end
 
   def self.recognized_params
-    [ :login_attribute ].freeze
+    [ :login_attribute, :jit_provisioning ].freeze
   end
 
   def self.login_attributes

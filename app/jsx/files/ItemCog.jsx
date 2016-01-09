@@ -44,14 +44,14 @@ define([
         externalToolMenuItems = this.props.externalToolsForContext.map((tool) => {
           if (this.props.model.externalToolEnabled(tool)) {
             return (
-              <li key={tool.title}>
-                <a href={`${tool.base_url}&files[]=${this.props.model.id}`}>
+              <li key={tool.title} role='presentation'>
+                <a href={`${tool.base_url}&files[]=${this.props.model.id}`} role='menuitem' tabindex='-1'>
                   {tool.title}
                 </a>
               </li>
             );
           } else {
-            return (<li key={tool.title}><a href='#' className='disabled'>{tool.title}</a></li>);
+            return (<li key={tool.title} role='presentation'><a href='#' className='disabled' role='menuitem' tabindex='-1' aria-disabled='true'>{tool.title}</a></li>);
           }
         });
       } else {
@@ -82,43 +82,43 @@ define([
 
       // Download Link
       if (this.props.model instanceof Folder) {
-        menuItems.push(<li key='folderDownload'><a href='#' onClick={wrap(downloadStuffAsAZip)} ref='download'>{I18n.t('Download')}</a></li>);
+        menuItems.push(<li key='folderDownload' role='presentation'><a href='#' onClick={wrap(downloadStuffAsAZip)} ref='download' role='menuitem' tabindex='-1'>{I18n.t('Download')}</a></li>);
       } else {
-        menuItems.push(<li key='download'><a href={this.props.model.get('url')} ref='download'>{I18n.t('Download')}</a></li>);
+        menuItems.push(<li key='download' role='presentation'><a href={this.props.model.get('url')} ref='download' role='menuitem' tabindex='-1'>{I18n.t('Download')}</a></li>);
       }
 
       if (this.props.userCanManageFilesForContext) {
         // Rename Link
-        menuItems.push(<li key='rename'><a href='#' onClick={preventDefault(this.props.startEditingName)} ref='editName'>{I18n.t('Rename')}</a></li>);
+        menuItems.push(<li key='rename' role='presentation'><a href='#' onClick={preventDefault(this.props.startEditingName)} ref='editName' role='menuitem' tabindex='-1'>{I18n.t('Rename')}</a></li>);
         // Move Link
-        menuItems.push(<li key='move'><a href='#' onClick={wrap(openMoveDialog, {clearSelectedItems: this.props.clearSelectedItems, onMove: this.props.onMove})} ref='move'>{I18n.t('Move')}</a></li>);
+        menuItems.push(<li key='move' role='presentation'><a href='#' onClick={wrap(openMoveDialog, {clearSelectedItems: this.props.clearSelectedItems, onMove: this.props.onMove})} ref='move' role='menuitem' tabindex='-1'>{I18n.t('Move')}</a></li>);
 
         if (this.props.usageRightsRequiredForContext) {
           // Manage Usage Rights Link
-          menuItems.push(<li key='manageUsageRights' className='ItemCog__OpenUsageRights'><a href='#' onClick={preventDefault(this.openUsageRightsDialog)} ref='usageRights'>{I18n.t('Manage Usage Rights')}</a></li>);
+          menuItems.push(<li key='manageUsageRights' className='ItemCog__OpenUsageRights' role='presentation'><a href='#' onClick={preventDefault(this.openUsageRightsDialog)} ref='usageRights' role='menuitem' tabindex='-1'>{I18n.t('Manage Usage Rights')}</a></li>);
         }
 
         // Delete Link
-        menuItems.push(<li key='delete'><a href='#' onClick={wrap(deleteStuff)} ref='deleteLink'>{I18n.t('Delete')}</a></li>);
+        menuItems.push(<li key='delete' role='presentation'><a href='#' onClick={wrap(deleteStuff)} ref='deleteLink' role='menuitem' tabindex='-1'>{I18n.t('Delete')}</a></li>);
       }
 
       return (
-        <span style={{minWidth: '45px'}}>
+        <div class='al-dropdown__container' style={{minWidth: '45px', display: 'inline-block'}}>
           <button
             type='button'
             ref='settingsCogBtn'
             className='al-trigger al-trigger-gray btn btn-link'
             aria-label={I18n.t('Actions')}
-            data-popup-within='#wrapper'
+            data-popup-within='#application'
             data-append-to-body={true}
           >
             <i className='icon-settings' />
             <i className='icon-mini-arrow-down' />
           </button>
-          <ul className='al-options'>
+          <ul className='al-options' role='menu' aria-hidden='true' aria-expanded='false' tabindex='0'>
             {menuItems.concat(externalToolMenuItems)}
           </ul>
-        </span>
+        </div>
       );
     }
 

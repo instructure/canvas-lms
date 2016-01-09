@@ -114,6 +114,7 @@ describe "course people" do
     end
 
     it "should add a user to a second (active) section in a concluded course" do
+      @course.start_at = 2.days.ago
       @course.conclude_at = 1.day.ago
       @course.restrict_enrollments_to_course_dates = true
       @course.save!
@@ -150,13 +151,40 @@ describe "course people" do
       # open dialog
       open_kyle_menu(@student)
       # when
-      link = f("#ui-id-4")
+      links = ff(".admin-links li a")
+      link = links.detect{|link| link.text.include?("User Details")}
       href = link['href']
       link.click
       wait_for_ajaximations
       wait_for_ajax_requests
       # expect
       expect(driver.current_url).to include(href)
+    end
+
+    it "should be able to inactivate and reactivate users" do
+      username = "user@example.com"
+      student_in_course(:name => username, :active_all => true)
+
+      go_to_people_page
+      cog = open_kyle_menu(@student)
+      link = f('a[data-event="inactivateUser"]', cog)
+      expect(link).to include_text("Inactivate User")
+      link.click
+      driver.switch_to.alert.accept
+      wait_for_ajaximations
+
+      expect(f("#user_#{@student.id} span.label")).to include_text("inactive")
+      @enrollment.reload
+      expect(@enrollment.workflow_state).to eq 'inactive'
+
+      cog = open_kyle_menu(@student)
+      link = f('a[data-event="reactivateUser"]', cog)
+      expect(link).to include_text("Re-activate User")
+      link.click
+      wait_for_ajaximations
+      expect(f("#user_#{@student.id} span.label")).to be_nil
+      @enrollment.reload
+      expect(@enrollment.workflow_state).to eq 'active'
     end
 
     def use_link_dialog(observer, role = nil)

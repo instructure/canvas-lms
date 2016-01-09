@@ -163,27 +163,30 @@ class Enrollment < ActiveRecord::Base
     p.dispatch :enrollment_invitation
     p.to { self.user }
     p.whenever { |record|
-      !record.self_enrolled and
-      record.course and
-      record.user.registered? and
+      !record.self_enrolled &&
+      record.course &&
+      record.user.registered? &&
+      !record.observer? &&
       ((record.just_created && record.invited?) || record.changed_state(:invited) || @re_send_confirmation)
     }
 
     p.dispatch :enrollment_registration
     p.to { self.user.communication_channel }
     p.whenever { |record|
-      !record.self_enrolled and
-      record.course and
-      !record.user.registered? and
+      !record.self_enrolled &&
+      record.course &&
+      !record.user.registered? &&
+      !record.observer? &&
       ((record.just_created && record.invited?) || record.changed_state(:invited) || @re_send_confirmation)
     }
 
     p.dispatch :enrollment_notification
     p.to { self.user }
     p.whenever { |record|
-      !record.self_enrolled and
+      !record.self_enrolled &&
       record.course &&
       !record.course.created? &&
+      !record.observer? &&
       record.just_created && record.active?
     }
 
@@ -191,6 +194,7 @@ class Enrollment < ActiveRecord::Base
     p.to {self.course.admins - [self.user] }
     p.whenever { |record|
       record.course &&
+      !record.observer? &&
       !record.just_created && (record.changed_state(:active, :invited) || record.changed_state(:active, :creation_pending))
     }
   end
@@ -464,6 +468,18 @@ class Enrollment < ActiveRecord::Base
     self.save
   end
 
+  def inactivate
+    self.workflow_state = "inactive"
+    self.user.touch
+    self.save
+  end
+
+  def reactivate
+    self.workflow_state = "active"
+    self.user.touch
+    self.save
+  end
+
   def defined_by_sis?
     !!self.sis_source_id
   end
@@ -555,7 +571,7 @@ class Enrollment < ActiveRecord::Base
     TYPE_RANK_HASHES[order][self.class.to_s]
   end
 
-  STATE_RANK = ['active', ['invited', 'creation_pending'], 'completed', 'rejected', 'deleted']
+  STATE_RANK = ['active', ['invited', 'creation_pending'], 'inactive', 'completed', 'rejected', 'deleted']
   STATE_RANK_HASH = rank_hash(STATE_RANK)
   def self.state_rank_sql
     # don't call rank_sql during class load
@@ -564,6 +580,10 @@ class Enrollment < ActiveRecord::Base
 
   def state_sortable
     STATE_RANK_HASH[state.to_s]
+  end
+
+  def state_with_date_sortable
+    STATE_RANK_HASH[state_based_on_date.to_s]
   end
 
   def accept!
@@ -837,6 +857,10 @@ class Enrollment < ActiveRecord::Base
     Enrollment.workflow_readable_type(self.workflow_state)
   end
 
+  def readable_role_name
+    self.role.built_in? ? self.readable_type : self.role.name
+  end
+
   def readable_type
     Enrollment.readable_type(self.class.to_s)
   end
@@ -995,7 +1019,9 @@ class Enrollment < ActiveRecord::Base
   }
   scope :invited, -> { where(:workflow_state => 'invited') }
   scope :accepted, -> { where("enrollments.workflow_state<>'invited'") }
-  scope :active_or_pending, -> { where(:workflow_state => ['invited', 'creation_pending', 'active']) }
+  scope :active_or_pending, -> { where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive')") }
+  scope :all_active_or_pending, -> { where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted')") } # includes inactive
+
   scope :currently_online, -> { joins(:pseudonyms).where("pseudonyms.last_request_at>?", 5.minutes.ago) }
   # this returns enrollments for creation_pending users; should always be used in conjunction with the invited scope
   scope :for_email, lambda { |email|

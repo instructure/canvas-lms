@@ -19,9 +19,8 @@
 <%=
     case asset.group.context_type
     when 'Account'
-      t :details_account, "You can see which groups you're a part of for this account by clicking the link below:"
+      t("You can see which groups you're a part of for this account by clicking this link: %{link}.", link: content(:link))
     else
-      t :details_account, "You can see which groups you're a part of for this account by clicking the link below:"
+      t("You can see which groups you're a part of for this course by clicking this link: %{link}.", link: content(:link))
     end
 %>
-<%= content :link %>
