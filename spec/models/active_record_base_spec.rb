@@ -652,4 +652,12 @@ describe ActiveRecord::Base do
       MockAccount.where(name: 'callbacks something').create!
     end
   end
+
+  describe "not_recently_touched" do
+    it "should work with joins" do
+      Setting.set('touch_personal_space', '1')
+      group_model
+      expect(@group.users.not_recently_touched.to_a).to be_empty
+    end
+  end
 end

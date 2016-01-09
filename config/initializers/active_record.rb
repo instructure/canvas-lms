@@ -905,7 +905,7 @@ ActiveRecord::Relation.class_eval do
       personal_space -= 1
       # truncate to seconds
       bound = Time.at(Time.now.to_i - personal_space).utc
-      scope = scope.where("updated_at<?", bound)
+      scope = scope.where("#{connection.quote_local_table_name(table_name)}.updated_at<?", bound)
     end
     scope
   end
