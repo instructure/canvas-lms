@@ -159,9 +159,13 @@ define [
 
     viewCalendarLinkClick: (jsEvent) =>
       jsEvent.preventDefault()
+      if not @viewingGroup
+        $.screenReaderFlashMessageExclusive(I18n.t('Scheduler shown'))
       @viewCalendarForElement $(jsEvent.target)
 
     showEventLinkClick: (jsEvent) =>
+      if not @viewingGroup
+        $.screenReaderFlashMessageExclusive(I18n.t('Scheduler shown'))
       jsEvent.preventDefault()
       group = @viewCalendarForElement $(jsEvent.target)
 
