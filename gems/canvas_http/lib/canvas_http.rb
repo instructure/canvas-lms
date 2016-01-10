@@ -12,16 +12,16 @@ module CanvasHttp
   end
   class RelativeUriError < ArgumentError; end
 
-  def self.put(*args)
-    CanvasHttp.request(Net::HTTP::Put, *args)
+  def self.put(*args, &block)
+    CanvasHttp.request(Net::HTTP::Put, *args, &block)
   end
 
-  def self.delete(*args)
-    CanvasHttp.request(Net::HTTP::Delete, *args)
+  def self.delete(*args, &block)
+    CanvasHttp.request(Net::HTTP::Delete, *args, &block)
   end
 
-  def self.get(*args)
-    CanvasHttp.request(Net::HTTP::Get, *args)
+  def self.get(*args, &block)
+    CanvasHttp.request(Net::HTTP::Get, *args, &block)
   end
 
   # Use this helper method to do HTTP GET requests. It knows how to handle
