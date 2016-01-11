@@ -1,7 +1,7 @@
 /// This is the beginning of fixing typography usage in Canvas. We originally were pulling in a bunch of
 /// bootstrap styles, of which, we'd like to phase out in multiple iterations.
 /// Below is the combination of overwrites and bootstrap styles that were originally in Canvas.
-/// As we sift through fixing things to the way we need them, this fille should get smaller and smaller. :)
+/// As we sift through fixing things to the way we need them, this file should get smaller and smaller. :)
 
 /// Repeat - this is a work in progress, iterative approach to handing typography in Canvas.
 /// There's a lot here we don't want, and a lot more we need to re-work, but not all in one go.
@@ -94,7 +94,6 @@ h1 small { font-size: $ic-font-size * 1.75; } // ~24px
 h2 small { font-size: $ic-font-size * 1.25; } // ~18px
 h3 small { font-size: $ic-font-size; }
 h4 small { font-size: $ic-font-size; }
-
 
 // now tweak them all a bit to be less shouty
 

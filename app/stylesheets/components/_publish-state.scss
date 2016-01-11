@@ -51,7 +51,7 @@ The publish button has two states on click (publish and published) and a hover s
     line-height: 17px;
   }
   i:before {
-    font-size: 18px;
+    @include fontSize(18px);
   }
 }
 .btn-publish {

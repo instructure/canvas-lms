@@ -35,15 +35,14 @@ You can easily create notification badges in two ways:
   $text-color: $ic-color-light,
   $font-size: 11px) {
 
+  @include fontSize($font-size);
   min-width: $circle-size;
   line-height: $circle-size;
   border-radius: $circle-size/2;
   background: $background-color;
   color: $text-color;
-  
   display: inline-block;
   vertical-align: middle;
-  font-size: $font-size;
   text-align: center;
   box-sizing: border-box;
   padding: 0 6px;

@@ -10,7 +10,6 @@
   $range-input-value-bg-color: $ic-color-dark;
   $range-input-value-text-color: $ic-color-light;
   $range-input-label-color: $ic-color-dark;
-  $range-input-label-font-size: $h2-font-size;
 
   @mixin range-input-handle-selector() {
     &::-webkit-slider-thumb {
@@ -116,7 +115,6 @@
     margin: 0 0 $ic-sp/2;
     display: block;
     line-height: 1.3;
-    font-size: $range-input-label-font-size;
     color: $range-input-label-color;
   }
 
@@ -138,7 +136,7 @@
     position: relative;
     width: 70px;
     color: $range-input-value-text-color;
-    font-size: 16px;
+    @include fontSize($ic-font-size--medium);
     line-height: 20px;
     text-align: center;
     border-radius: 3px;

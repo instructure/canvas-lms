@@ -76,12 +76,12 @@
     h3 {
       margin: 0 7px 0 5px;
       font-weight: bold;
-      font-size: 14px;
+      @include fontSize($ic-font-size--small);
       float: left;
       line-height: 18px;
       order: 2;
       small {
-        font-size: 12px;
+        @include fontSize($ic-font-size--xsmall);
       }
       a {
         color: #555;

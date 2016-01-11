@@ -13,7 +13,7 @@
 .ColorPicker__Title {
   margin: 0 0 $ic-sp; padding: 0;
   line-height: 1.1;
-  font-size: $baseFontSize;
+  @include fontSize($ic-font-size--small);
   font-weight: 500;
 }
 

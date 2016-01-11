@@ -198,13 +198,13 @@
   }
   .Reminder__course-setup-subttitle {
     float: right;
-    font-size: 11px;
+    @include fontSize(11px);
     text-transform: capitalize;
   }
   .Reminder__course-setup-body {
     text-align: center;
     p {
-      font-size: 15px;
+      @include fontSize(15px);
       margin-bottom: 0;
       padding-bottom: 0;
     }
@@ -324,10 +324,10 @@
     @else { margin-bottom: 20px; }
     .event-list-view-calendar {
       float: right;
-      font-size: 10px;
+      @include fontSize(10px);
       font-weight: normal;
       &[class*=icon-]:before, &[class^=icon-]:before {
-        font-size: 16px;
+        @include fontSize($ic-font-size--medium);
         vertical-align: middle;
       }
     }
@@ -769,7 +769,7 @@ $wizard-highlight-color: $ic-brand-primary;
         }
         a[class*=icon-], a[class^=icon-] {
           &:before {
-            font-size: 16px;
+            @include fontSize($ic-font-size--medium);
             line-height: 16px;
             vertical-align: text-top;
             color: #555;
@@ -918,7 +918,7 @@ $wizard-highlight-color: $ic-brand-primary;
           border-radius: 0;
           font-weight: normal;
           @include breakpoint(desktop) {
-            font-size: 15px;
+            @include fontSize(15px);
           }
 
           &.selected {
@@ -1022,7 +1022,7 @@ $wizard-highlight-color: $ic-brand-primary;
         p {
           line-height: 1.5;
           @include breakpoint(desktop) {
-            font-size: 15px;
+            @include fontSize(15px);
           }
 
           &:last-of-type {
@@ -1707,7 +1707,7 @@ html > body .new_activity_message form textarea {
       background: #FFF;
       margin: 0 8px 8px 0;
       padding: 4px;
-      font-size: 11px;
+      @include fontSize(11px);
       min-height: 21px;
       box-shadow: inset 33px 0 0 #F7F7F7, inset 34px 0 0 #CCC;
       div {
@@ -2036,7 +2036,7 @@ form.user_content_post_form {
     border-color: #165A92;
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
   }
-  font-size: 12px;
+  @include fontSize($ic-font-size--xsmall);
   font-family: GillSans, Calibri, Trebuchet, sans-serif;
   border: 1px solid #1e7eca;
   color: white !important;
@@ -2107,7 +2107,7 @@ form.user_content_post_form {
   border-radius: 30px;
   background-color: $ic-brand-primary;
   padding: 0 8px;
-  font-size: 9px;
+  @include fontSize(9px);
   color: #fff;
   float: right;
 }

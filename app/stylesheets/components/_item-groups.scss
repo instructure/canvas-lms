@@ -193,7 +193,7 @@
 
 .ig-header .name {
   color: #3d454c;
-  font-size: 15px;
+  @include fontSize(15px);
   text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.5);
   font-weight: bold;
 }
@@ -216,7 +216,7 @@
 
   .ig-header-title {
     text-decoration: none;
-    font-size: 15px;
+    @include fontSize(15px);
     font-weight: bold;
     line-height: 20px;
     margin: auto;
@@ -341,7 +341,7 @@
 }
 
 .ig-details {
-  font-size: 11px;
+  @include fontSize(11px);
   flex: 0.66;
   line-height: 1.5;
   box-sizing: border-box;
@@ -369,7 +369,7 @@
     margin-right: $ic-sp/2;
     @include breakpoint(desktop) { margin-right: $ic-sp; }
     i[class*=icon-]:before,
-    i[class^=icon-]:before { font-size: 18px; }
+    i[class^=icon-]:before { @include fontSize(18px); }
   }
 }
 
@@ -396,5 +396,5 @@
 
 .ig-text {
   color: #3d454c;
-  font-size: 15px;
+  @include fontSize(15px);
 }

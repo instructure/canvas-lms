@@ -31,7 +31,7 @@ The Icon-Text Combo is a tiny component for when you want to use an icon with a 
     width: auto; height: auto; line-height: 1;
     &:before {
       top: auto;
-      font-size: 18px;
+      @include fontSize(18px);
     }
   }
 

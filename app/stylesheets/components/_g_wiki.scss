@@ -251,7 +251,7 @@ $revision-button-hover-color: $ic-brand-primary;
         }
       }
       td {
-        font-size: 11px;
+        @include fontSize(11px);
         color: $subdued-text-color;
         border-top: $pages-inner-border;
         @if $use_new_styles {
@@ -259,7 +259,7 @@ $revision-button-hover-color: $ic-brand-primary;
           line-height: 1.5;
         }
         .wiki-page-link {
-          font-size: 13px;
+          @include fontSize(13px);
           color: $darkened-text-color;
           @if $use_new_styles { font-weight: 500; }
           @else { font-weight: bold; }
@@ -491,11 +491,11 @@ $revision-button-hover-color: $ic-brand-primary;
       @if $use_new_styles {
         font-weight: 500;
         margin-bottom: $ic-sp;
-        font-size: 14px;
+        @include fontSize($ic-font-size--small);
       }
       @else {
         text-transform: uppercase;
-        font-size: 14px;
+        @include fontSize($ic-font-size--small);
         font-weight: bold;
         line-height: 40px;
         padding: 4px 11px;
@@ -559,7 +559,7 @@ $revision-button-hover-color: $ic-brand-primary;
     }
     .revision-content {
       padding: 7px 8px;
-      @if $use_new_styles { font-size: 12px; }
+      @if $use_new_styles { @include fontSize($ic-font-size--xsmall); }
       @else { margin-left: 1px; }
 
       .revision-details {
@@ -612,7 +612,7 @@ $revision-button-hover-color: $ic-brand-primary;
         font-weight: 500;
       }
       @else {
-        font-size: 12px;
+        @include fontSize($ic-font-size--xsmall);
         font-weight: bold;
         padding: 10px 10px;
         color: $revision-button-color;

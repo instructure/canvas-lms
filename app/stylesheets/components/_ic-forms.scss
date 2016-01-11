@@ -1388,7 +1388,7 @@ select.ic-Input:not(*:root) {
   display: flex;
   align-items: center;
   padding: ($ic-sp - 4) ($ic-sp - 4) ($ic-sp - 4) 0;
-  font-size: $baseFontSize - 2;
+  @include fontSize($ic-font-size--xsmall);
   line-height: 1.2;
   color: $ic-color-light;
   box-shadow: 0 2px 2px rgba(black, 0.2);
@@ -1501,7 +1501,7 @@ form.ic-Form-group { margin: 0; }
   display: block;
   line-height: $ic-label-line-height;
   font-weight: 500;
-  font-size: $baseFontSize;
+  @include fontSize($ic-font-size--small);
 }
 
 .ic-Form-actions {
