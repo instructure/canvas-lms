@@ -271,7 +271,10 @@ module SeleniumDriverSetup
     s.close() if s
   end
 
+  class ServerStartupError < RuntimeError; end
+
   def self.start_webserver(webserver)
+    attempts ||= 0
     setup_host_and_port
     case webserver
     when 'thin'
@@ -282,6 +285,11 @@ module SeleniumDriverSetup
       puts "no web server specified, defaulting to WEBrick"
       self.start_in_process_webrick_server
     end
+  rescue ServerStartupError
+    attempts += 1
+    retry if attempts <= 3
+    $stderr.puts "unable to start server, giving up :'("
+    exit! 1
   end
 
   def self.shutdown_webserver(server)

@@ -33,7 +33,7 @@ SERVER_IP = $selenium_config[:server_ip] || UDPSocket.open { |s| s.connect('8.8.
 BIND_ADDRESS = $selenium_config[:bind_address] || '0.0.0.0'
 SECONDS_UNTIL_COUNTDOWN = 5
 SECONDS_UNTIL_GIVING_UP = 20
-MAX_SERVER_START_TIME = 60
+MAX_SERVER_START_TIME = 15
 
 #NEED BETTER variable handling
 THIS_ENV = ENV['TEST_ENV_NUMBER'].present? ? ENV['TEST_ENV_NUMBER'].to_i : 1

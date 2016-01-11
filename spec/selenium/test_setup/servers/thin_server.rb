@@ -5,30 +5,46 @@ class SpecFriendlyThinServer
   def self.run(app, options = {})
     bind_address = options[:BindAddress] || IPSocket.getaddress(Socket.gethostname)
     port = options[:Port]
+    start_server(app, bind_address, port)
+    wait_for_server(bind_address, port)
+  end
+
+  def self.start_server(app, bind_address, port)
     @server = Thin::Server.new(bind_address, port, app, signals: false)
     Thin::Logging.logger = Rails.logger
     Thread.new do
       Thread.current.abort_on_exception = true
-      @server.start
-    end
-    max_time = Time.now + MAX_SERVER_START_TIME
-    print "Starting thin server..."
-    while Time.now < max_time
+
+      max_attempts = 2
+      retry_count = 0
+
       begin
-        response = HTTParty.get("http://#{bind_address}:#{port}/health_check")
-        if response.success?
-          puts " Done!"
-          return
-        end
+        @server.start
       rescue
-        nil
+        raise unless $ERROR_INFO.message =~ /no acceptor/ && retry_count <= max_attempts
+        puts "Got `#{$ERROR_INFO.message}`, retrying"
+        sleep 1
+        retry_count += 1
+        retry
+      end
+    end
+  end
+
+  def self.wait_for_server(bind_address, port)
+    print "Starting thin server..."
+    max_time = Time.now + MAX_SERVER_START_TIME
+    while Time.now < max_time
+      response = HTTParty.get("http://#{bind_address}:#{port}/health_check") rescue nil
+      if response && response.success?
+        puts " Done!"
+        return
       end
       print "."
       sleep 1
     end
     puts "Failed!"
     $stderr.puts "unable to start thin server within #{MAX_SERVER_START_TIME} seconds!"
-    exit! 1
+    raise SeleniumDriverSetup::ServerStartupError
   end
 
   def self.shutdown
