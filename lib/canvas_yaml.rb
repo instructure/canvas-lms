@@ -49,6 +49,7 @@ SafeYAML::OPTIONS.merge!(
     whitelisted_tags: %w[
         tag:ruby.yaml.org,2002:symbol
         tag:yaml.org,2002:float
+        tag:yaml.org,2002:float#exp
         tag:yaml.org,2002:str
         tag:yaml.org,2002:timestamp
         tag:yaml.org,2002:timestamp#iso8601
