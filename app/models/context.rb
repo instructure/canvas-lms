@@ -189,11 +189,14 @@ module Context
   end
 
   def self.get_account(context)
-    if context.is_a?(Account)
+    case context
+    when Account
       context
-    elsif context.is_a?(Course) || context.is_a?(CourseSection)
+    when Course
       get_account(context.account)
-    elsif context.is_a?(Group)
+    when CourseSection
+      get_account(context.course)
+    when Group
       get_account(context.context)
     end
   end
