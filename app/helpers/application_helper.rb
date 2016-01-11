@@ -694,11 +694,11 @@ module ApplicationHelper
         # if I'm at saltlakeschooldistrict.instructure.com, but I'm only enrolled in classes at
         # Highland High, show Highland's branding even on the dashboard.
         account = @current_user.common_account_chain(@domain_root_account).last
-      else
-        # If we're not logged in, and we're on the dashboard at
-        # saltlakeschooldistrict.instructure.com, just show it's branding
-        account = @domain_root_account
       end
+      # If we're not logged in, or we have no enrollments anywhere in domain_root_account,
+      # and we're on the dashboard at eg: saltlakeschooldistrict.instructure.com, just
+      # show its branding
+      account ||= @domain_root_account
     end
 
     if account && (brand_config = account.effective_brand_config)
