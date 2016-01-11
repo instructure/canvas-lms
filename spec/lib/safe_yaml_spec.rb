@@ -45,6 +45,7 @@ hwia: !map:HashWithIndifferentAccess
   b: 2
 float: !float
   5.1
+float_with_exp: -1.7763568394002505e-15
 os: !ruby/object:OpenStruct
   modifiable: true
   table: 
@@ -104,6 +105,9 @@ YAML
 
     float = verify(result, 'float', Float)
     expect(float).to eq 5.1
+
+    float_with_exp = verify(result, 'float_with_exp', Float)
+    expect(float_with_exp).to eq(-1.7763568394002505e-15)
 
     os = verify(result, 'os', OpenStruct)
     expect(os.a).to eq 1
