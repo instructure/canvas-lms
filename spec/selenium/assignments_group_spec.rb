@@ -341,4 +341,18 @@ describe "assignment groups" do
     end
   end
 
+  it "Should be able to delete assignments when deleting assignment Groups", priority: "2", test_id: 56007 do
+    group0 = @course.assignment_groups.create!(name: "Guybrush Group")
+    assignment = @course.assignments.create!(title: "Fine Leather Jacket", assignment_group: group0,)
+    get "/courses/#{@course.id}/assignments"
+    expect(f('#ag-list')).to include_text(assignment.name)
+
+    f("#ag_#{group0.id}_manage_link").click
+
+    f("#assignment_group_#{group0.id} .delete_group").click
+    wait_for_ajaximations
+    fj('.delete_group:visible').click
+    wait_for_ajaximations
+    expect(f('#ag-list')).not_to include_text(assignment.name)
+  end
 end

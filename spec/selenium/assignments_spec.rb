@@ -697,4 +697,37 @@ describe "assignments" do
       expect(is_checked('#assignment_post_to_sis')).to be_falsey
     end
   end
+
+  context 'adding new assignment groups from assignment creation page' do
+    before do
+      course_with_teacher_logged_in
+      @new_group = 'fine_leather_jacket'
+      get "/courses/#{@course.id}/assignments/new"
+      click_option('#assignment_group_id', '[ New Group ]')
+
+      # type something in here so you can check to make sure it was not added
+      fj('div.controls > input:visible').send_keys(@new_group)
+    end
+
+    it "should add a new assignment group", priority: "1", test_id:525190 do
+      fj('.button_type_submit:visible').click
+      wait_for_ajaximations
+
+      expect(f('#assignment_group_id')).to include_text(@new_group)
+    end
+
+    it "should cancel adding new assignment group via the cancel button", priority: "2", test_id: 602873 do
+      fj('.cancel-button:visible').click
+      wait_for_ajaximations
+
+      expect(f('#assignment_group_id')).not_to include_text(@new_group)
+    end
+
+    it "should cancel adding new assignment group via the x button", priority: "2", test_id: 602874 do
+      fj('.ui-icon-closethick:visible').click
+      wait_for_ajaximations
+
+      expect(f('#assignment_group_id')).not_to include_text(@new_group)
+    end
+  end
 end
