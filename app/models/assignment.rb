@@ -1581,10 +1581,9 @@ class Assignment < ActiveRecord::Base
     submissions_with_qs = student_submissions.select do |sub|
       quiz && sub.quiz_submission && !too_many_qs_versions
     end
-    qs_versions = Version.where(
-      "versionable_type IN ('QuizSubmission', 'Quizzes::QuizSubmission') AND versionable_id IN (?)",
-      submissions_with_qs.map {|submission| submission.quiz_submission.id }
-    ).order("number")
+    qs_versions = Version.where(versionable_type: 'Quizzes::QuizSubmission',
+                                versionable_id: submissions_with_qs.map(&:quiz_submission)).
+                          order(:number)
 
     qs_versions.each_with_object({}) do |version, hash|
       hash[version.versionable_id] ||= []
