@@ -77,7 +77,7 @@
         <% if @quiz_presenter.previous_question_viewable? %>
           <% previous_question_button_title = t('buttons.previous', "Previous") %>
           <button type="submit" class="btn submit_button btn-secondary previous-question" data-action="<%= @quiz_presenter.previous_question_form_action(session, @current_user) %>" disabled>
-            <i class="icon-mini-arrow-left"><span class="screenreader-only"><%= previous_question_button_title %></span></i>
+            <i class="icon-mini-arrow-left"></i>
             <%= previous_question_button_title %>
           </button>
         <% end %>
@@ -88,7 +88,7 @@
 
           <button type="submit" class="btn submit_button btn-secondary next-question" data-action="<%= @quiz_presenter.next_question_form_action(session, @current_user) %>" disabled>
             <%= next_question_button_title %>
-            <i class="icon-mini-arrow-right"><span class="screenreader-only"><%= next_question_button_title %></span></i>
+            <i class="icon-mini-arrow-right"></i>
           </button>
         <% end %>
       <% end %>
