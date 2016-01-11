@@ -97,6 +97,8 @@ module CanvasRails
                             #{Rails.root}/app/serializers
                             #{Rails.root}/app/presenters)
 
+    config.autoload_once_paths << Rails.root.join("app/middleware")
+
     # prevent directory->module inference in these directories from wreaking
     # havoc on the app (e.g. stylesheets/base -> ::Base)
     config.eager_load_paths -= %W(#{Rails.root}/app/coffeescripts
