@@ -138,39 +138,9 @@ module RSpec::Rails
     end
   end
 
-  module Matchers
-    class HaveTag
-      include CANVAS_RAILS4_0 ? ActionDispatch::Assertions::SelectorAssertions : Rails::Dom::Testing::Assertions::SelectorAssertions
-      include Test::Unit::Assertions
-
-      def initialize(expected)
-        @expected = expected
-      end
-
-      def matches?(html, &block)
-        @selected = [HTML::Document.new(html).root]
-        assert_select(*@expected, &block)
-        return !@failed
-      end
-
-      def assert(val, msg=nil)
-        unless !!val
-          @msg = msg
-          @failed = true
-        end
-      end
-
-      def failure_message
-        @msg
-      end
-
-      def failure_message_when_negated
-        @msg
-      end
-    end
-
-    def have_tag(*args)
-      HaveTag.new(args)
+  RSpec::Matchers.define :have_tag do |expected|
+    match do |actual|
+      !!Nokogiri::HTML(actual).at_css(expected)
     end
   end
 end
