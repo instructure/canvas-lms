@@ -64,7 +64,7 @@ module.exports = {
         test: /\.jsx$/,
         include: [
           path.resolve(__dirname, "../app/jsx"),
-          /app\/client_apps\/canvas_quizzes\/apps\//
+          /client_apps\/canvas_quizzes\/apps\//
         ],
         exclude: [/(node_modules|bower)/, /public\/javascripts\/vendor/, /public\/javascripts\/translations/],
         loaders: [
