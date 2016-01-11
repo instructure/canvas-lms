@@ -384,6 +384,28 @@ describe "dashboard" do
       expect(fj("#past_enrollments_table a[href='/courses/#{@course.id}']")).to include_text(c1.name)
     end
 
+    it "should show future courses (even if restricted) to students on courses page" do
+      term = EnrollmentTerm.new(:name => "Super Term", :start_at => 1.week.from_now, :end_at => 1.month.from_now)
+      term.root_account_id = @course.root_account_id
+      term.save!
+      course_with_student_logged_in(:active_all => true)
+      c1 = @course
+      c1.name = 'a future course'
+      c1.update_attributes!(:enrollment_term => term)
+
+      course_with_student(:active_course => true, :user => @student)
+      c2 = @course
+      c2.name = "a restricted future course"
+      c2.restrict_student_future_view = true
+      c2.update_attributes!(:enrollment_term => term)
+
+      get "/courses"
+      expect(fj("#future_enrollments_table a[href='/courses/#{c1.id}']")).to include_text(c1.name)
+
+      expect(fj("#future_enrollments_table a[href='/courses/#{c2.id}']")).to be_nil # should not have a link
+      expect(f("#future_enrollments_table")).to include_text(c2.name) # but should still show restricted future enrollment
+    end
+
     it "should display assignment to grade in to do list for a teacher", priority: "1", test_id: 216376 do
       assignment = assignment_model({:submission_types => 'online_text_entry', :course => @course})
       student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :password => 'qwerty')
