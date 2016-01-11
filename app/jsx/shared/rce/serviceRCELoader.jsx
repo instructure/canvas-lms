@@ -54,6 +54,14 @@ define([
     createRCEProps(textarea, tinyMCEInitOptions) {
       let textareaClassName = textarea.classList + " " + RCEStore.classKeyword
       let width = textarea.offsetWidth
+      let height = textarea.offsetHeight
+
+      if (height){
+        tinyMCEInitOptions.tinyOptions = _.extend({},
+          {height: height},
+          (tinyMCEInitOptions.tinyOptions || {})
+        )
+      }
 
       return {
         editorOptions: editorOptions.bind(null, width, textarea.id, tinyMCEInitOptions, null),

@@ -78,8 +78,18 @@ define [
   test 'extracts content from the target', ->
     ta = @elementInFixtures('textarea')
     ta.value = "some text here";
-    props = RCELoader.createRCEProps(ta, "default text")
+    props = RCELoader.createRCEProps(ta, {defaultContent: "default text"})
     equal props.defaultContent, "some text here"
+
+  test 'passes the textarea height into tinyOptions', ->
+    taHeight = "123"
+    ta = {
+      offsetHeight: taHeight
+    }
+
+    opts = {defaultContent: "default text"}
+    props = RCELoader.createRCEProps(ta, opts)
+    equal opts.tinyOptions.height, taHeight
 
   test 'falls back to defaultContent if target has no content', ->
     ta = @elementInFixtures('textarea')
