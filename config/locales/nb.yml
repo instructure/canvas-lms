@@ -2817,7 +2817,7 @@ nb:
   change_name_to_568374c8: "Endre \"%{name}\" til"
   change_points_possible_to_match_rubric_dialog: 
     prompts: 
-      update_assignment_points: "Denne oppgaven har %{assignmentPoints} oppnåelige poeng, ønsker du å endre den til å ha %{rubricPoints} oppnåelige poeng for å passe med denne vurderingen?"
+      update_assignment_points: "Gir oppgavens totale poengsum til %{assignmentPoints} og rubrikken samlede poeng på %{rubricPoints} vil resultere i en størst mulig poengsum på %{toPercentage_pointRatio} for studentinnleveringer karaktersatt med rubrikken."
     titles: 
       update_assignment_points: "Endre oppgavepoeng for å matche rubrikken?"
   changes_will_still_apply_if_you_leave_this_page_935cedc6: "Endringene vil fremdeles utføres dersom du forlater denne siden."
@@ -10001,7 +10001,7 @@ nb:
         published: Publisert
     progression_module_collection: 
       module_progress_for: "Modulfremdrift for *%{student.name}*"
-      module_progress_for_student: "Modulframdrift for %{student.name}"
+      module_progress_for_student: "Modulfremdrift for %{student.name}"
       no_modules_found: "Ingen moduler funnet"
     progression_module_view: 
       items: "Elementer å fullføre"
@@ -12186,6 +12186,7 @@ nb:
         answer_in_range_accessible: "mellom *range start* og #range end#"
         answer_text: Svartekst
         answer_weight: "Svarets vekt"
+        answer_with_precision_accessible: "*eksakte svaret* med presisjon #presisjon#"
         exact_answer_with_error_margin_accessible: "*eksakt svar* med feilmargin #feilmargin#"
         labels: 
           answer_comments: "Kommentarer om studenten velger dette svaret"
