@@ -2,7 +2,7 @@
 
 .tree {
   outline: none;
-  font-size: 12px;
+  @include fontSize(12px);
   &, ul {
     @include reset-list;
   }
@@ -27,7 +27,7 @@
     }
   }
   .icon-folder:before {
-    font-size: 11px;
+    @include fontSize(11px);
   }
 
   i[class*=icon-], i[class^=icon-] { color: $ic-font-color-dark }

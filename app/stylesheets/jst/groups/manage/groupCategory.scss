@@ -8,7 +8,7 @@
   width: 1px;
   height: 1px;
   overflow: hidden;
-  font-size: 12px;
+  @include fontSize(12px);
   &:focus{
     left: 0;
     top: 36px;
