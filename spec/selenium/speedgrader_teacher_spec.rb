@@ -2,12 +2,14 @@ require_relative "common"
 require_relative "helpers/speed_grader_common"
 require_relative "helpers/gradebook2_common"
 require_relative "helpers/quizzes_common"
+require_relative "helpers/groups_common"
 
 describe "speed grader" do
   include_context "in-process server selenium tests"
   include QuizzesCommon
   include Gradebook2Common
   include SpeedGraderCommon
+  include GroupsCommon
 
   before(:each) do
     stub_kaltura
@@ -297,6 +299,35 @@ describe "speed grader" do
     keep_trying_until { expect(f('#combo_box_container .ui-selectmenu .ui-selectmenu-item-header').text).to eq "student@example.com" }
   end
 
+  context "student dropdown" do
+    before(:each) do
+      @section0 = @course.course_sections.create!(name: "Section0")
+      @section1 = @course.course_sections.create!(name: "Section1")
+
+      @student0 = User.create!(name: "Test Student 0")
+      @student1 = User.create!(name: "Test Student 1")
+      @course.enroll_student(@student0, section: @section0)
+      @course.enroll_student(@student1, section: @section1)
+
+      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+    end
+
+    it "show all sections menu item is present", priority: "2", test_id: "164207" do
+      f("#students_selectmenu-button").click
+      hover(f("#section-menu-link"))
+      wait_for_ajaximations
+      expect(f("#section-menu .ui-menu")).to include_text("Show all sections")
+    end
+
+    it "should list all course sections", priority: "2", test_id: "588914" do
+      f("#students_selectmenu-button").click
+      hover(f("#section-menu-link"))
+      wait_for_ajaximations
+      expect(f("#section-menu .ui-menu")).to include_text(@section0.name)
+      expect(f("#section-menu .ui-menu")).to include_text(@section1.name)
+    end
+  end
+
   it "includes the student view student for grading", priority: "1", test_id: 283990 do
     @course.student_view_student
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
@@ -359,3 +390,4 @@ describe "speed grader" do
     expect(f("#students_selectmenu-button")).to have_class("graded")
   end
 end
+
