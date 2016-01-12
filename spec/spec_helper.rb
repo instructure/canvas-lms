@@ -17,12 +17,11 @@
 #
 
 begin
-  require RUBY_VERSION >= '2.0.0' ? 'byebug' : 'debugger'
+  require 'byebug'
 rescue LoadError
 end
 
 require 'securerandom'
-require 'test/unit' if RUBY_VERSION >= '2.2.0'
 
 RSpec.configure do |c|
   c.raise_errors_for_deprecations!
@@ -40,7 +39,6 @@ ENV["RAILS_ENV"] = 'test'
 
 require File.expand_path('../../config/environment', __FILE__) unless defined?(Rails)
 require 'rspec/rails'
-require 'test/unit/assertions' unless CANVAS_RAILS4_0 # no longer automatically included in rspec-rails
 
 # ensure people aren't creating records outside the rspec lifecycle, e.g.
 # inside a describe/context block rather than a let/before/example
