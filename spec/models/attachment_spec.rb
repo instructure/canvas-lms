@@ -1109,9 +1109,7 @@ describe Attachment do
       attachment_model(:uploaded_data => stub_file_data('file.txt', nil, 'text/html'), :content_type => 'text/html')
       expect(@attachment.need_notify).to be_truthy
 
-      new_time = Time.now + 10.minutes
-      Time.stubs(:now).returns(new_time)
-      Attachment.do_notifications
+      Timecop.freeze(10.minutes.from_now) { Attachment.do_notifications }
 
       @attachment.reload
       expect(@attachment.need_notify).not_to be_truthy
@@ -1124,9 +1122,7 @@ describe Attachment do
       att3 = attachment_model(:uploaded_data => stub_file_data('file3.txt', nil, 'text/html'), :content_type => 'text/html')
       [att1, att2, att3].each {|att| expect(att.need_notify).to be_truthy}
 
-      new_time = Time.now + 10.minutes
-      Time.stubs(:now).returns(new_time)
-      Attachment.do_notifications
+      Timecop.freeze(10.minutes.from_now) { Attachment.do_notifications }
 
       [att1, att2, att3].each {|att| expect(att.reload.need_notify).not_to be_truthy}
       expect(Message.where(user_id: @student, notification_name: 'New Files Added').first).not_to be_nil
@@ -1144,15 +1140,11 @@ describe Attachment do
       att3 = attachment_model(:uploaded_data => stub_file_data('file3.txt', nil, 'text/html'), :content_type => 'text/html')
       [att1, att2, att3].each {|att| expect(att.need_notify).to be_truthy}
 
-      new_time = Time.now + 2.minutes
-      Time.stubs(:now).returns(new_time)
-      Attachment.do_notifications
+      Timecop.freeze(2.minutes.from_now) { Attachment.do_notifications }
       [att1, att2, att3].each {|att| expect(att.reload.need_notify).to be_truthy}
       expect(Message.where(user_id: @student, notification_name: 'New File Added').first).to be_nil
 
-      new_time = Time.now + 4.minutes
-      Time.stubs(:now).returns(new_time)
-      Attachment.do_notifications
+      Timecop.freeze(6.minutes.from_now) { Attachment.do_notifications }
       [att1, att2, att3].each {|att| expect(att.reload.need_notify).not_to be_truthy}
       expect(Message.where(user_id: @student, notification_name: 'New Files Added').first).not_to be_nil
     end
@@ -1161,9 +1153,7 @@ describe Attachment do
       attachment_model(:uploaded_data => stub_file_data('file.txt', nil, 'text/html'), :content_type => 'text/html')
       expect(@attachment.need_notify).to be_truthy
 
-      new_time = Time.now + 1.week
-      Time.stubs(:now).returns(new_time)
-      Attachment.do_notifications
+      Timecop.freeze(1.week.from_now) { Attachment.do_notifications }
 
       @attachment.reload
       expect(@attachment.need_notify).to be_falsey
@@ -1203,9 +1193,7 @@ describe Attachment do
       @attachment.folder.locked = true
       @attachment.folder.save!
 
-      new_time = Time.now + 10.minutes
-      Time.stubs(:now).returns(new_time)
-      Attachment.do_notifications
+      Timecop.freeze(10.minutes.from_now) { Attachment.do_notifications }
 
       @attachment.reload
       expect(@attachment.need_notify).not_to be_truthy
@@ -1224,9 +1212,7 @@ describe Attachment do
       @course.tab_configuration = [{:id => Course::TAB_FILES, :hidden => true}]
       @course.save!
 
-      new_time = Time.now + 10.minutes
-      Time.stubs(:now).returns(new_time)
-      Attachment.do_notifications
+      Timecop.freeze(10.minutes.from_now) { Attachment.do_notifications }
 
       @attachment.reload
       expect(@attachment.need_notify).not_to be_truthy
@@ -1240,9 +1226,15 @@ describe Attachment do
 
       Attachment.where(:id => @attachment).update_all(:need_notify => true)
 
-      new_time = Time.now + 10.minutes
-      Time.stubs(:now).returns(new_time)
-      Attachment.do_notifications
+      Timecop.freeze(10.minutes.from_now) { Attachment.do_notifications }
+    end
+
+    it "doesn't send notifications for a concluded course" do
+      attachment_model(:uploaded_data => stub_file_data('file.txt', nil, 'text/html'), :content_type => 'text/html')
+      @course.soft_conclude!
+      @course.save!
+      Timecop.freeze(10.minutes.from_now) { Attachment.do_notifications }
+      expect(Message.where(user_id: @student, notification_name: 'New File Added').first).to be_nil
     end
   end
 

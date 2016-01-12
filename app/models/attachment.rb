@@ -802,8 +802,7 @@ class Attachment < ActiveRecord::Base
 
         # now generate the notification
         record = Attachment.find(attachment_id)
-        notification = BroadcastPolicy.notification_finder.by_name(count.to_i > 1 ? 'New Files Added' : 'New File Added')
-
+        next if record.context.is_a?(Course) && (!record.context.available? || record.context.concluded?)
         if record.context.is_a?(Course) && (record.folder.locked? || record.context.tab_hidden?(Course::TAB_FILES))
           # only notify course students if they are able to access it
           to_list = record.context.participating_admins - [record.user]
@@ -813,6 +812,7 @@ class Attachment < ActiveRecord::Base
         recipient_keys = (to_list || []).compact.map(&:asset_string)
         next if recipient_keys.empty?
 
+        notification = BroadcastPolicy.notification_finder.by_name(count.to_i > 1 ? 'New Files Added' : 'New File Added')
         asset_context = record.context
         data = { :count => count }
         DelayedNotification.send_later_if_production_enqueue_args(
