@@ -80,7 +80,7 @@ input + .hint-text {
 
 .post-summary h1 {
     color: #aaaaaa;
-    font-size: 28px
+    @include fontSize(28px);
 }
 
 .assignments-to-post-count {

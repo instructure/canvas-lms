@@ -62,7 +62,7 @@
       list-style-type: none;
       min-width: 105px;
       text-align: center;
-      font-size: 14px;
+      @include fontSize($ic-font-size--small);
 
       a {
         font-weight: bold;
@@ -150,7 +150,7 @@
   .quiz-overview {
     .quiz-description {
       font-weight: 300;
-      font-size: 14px;
+      @include fontSize($ic-font-size--small);
       margin-bottom: 1.5em;
     }
 

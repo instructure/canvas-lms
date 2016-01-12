@@ -4,7 +4,7 @@ $kyle-blue: #0081e3;
 
 .accessibility-warning {
   @include accessibility-prompt;
-  font-size: 14px;
+  @include fontSize($ic-font-size--small);
 }
 
 #minical {
@@ -20,7 +20,7 @@ $kyle-blue: #0081e3;
     @include user-select(none);
     h2, .h2 {
       // override styles from default fullcalendar.css
-      font-size: 14px;
+      @include fontSize($ic-font-size--small);
       line-height: 35px;
 
       background-color: transparent;
@@ -35,7 +35,7 @@ $kyle-blue: #0081e3;
     }
     .fc-button {
       padding: 0px 10px;
-      font-size: 13px;
+      @include fontSize(13px);
       line-height: 35px;
       background: none;
       border: none;
@@ -52,7 +52,7 @@ $kyle-blue: #0081e3;
   .fc-widget-header {
     border: none;
     border-bottom: 1px solid #bbbbbb;
-    font-size: 10px;
+    @include fontSize(10px);
     line-height: 20px;
     &.fc-first {
       border-left: 1px solid #bbbbbb;

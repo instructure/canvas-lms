@@ -46,5 +46,5 @@ $usage-rights-alert-text: $ic-color-light;
 }
 
 .manage-access {
-  font-size: 14px;
+  @include fontSize($ic-font-size--small);
 }

@@ -52,7 +52,7 @@ $muteTextColor: ensure-contrast(#757575, #ffffff);
       font-weight: bold;
       margin-bottom: 0;
       line-height: 22px;
-      font-size: 14.5px;
+      @include fontSize($ic-font-size--small);
     }
   }
 }
@@ -193,7 +193,7 @@ $muteTextColor: ensure-contrast(#757575, #ffffff);
     position: relative;
 
     .index {
-      font-size: 24px;
+      @include fontSize(24px);
       font-weight: bold;
       font-style: normal;
 

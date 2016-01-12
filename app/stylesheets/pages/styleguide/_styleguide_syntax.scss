@@ -6,7 +6,7 @@
 ////
 .Sg-Main code, .Sg-Main pre {
   font-family: $sg-codefont;
-  font-size: 14px;
+  @include fontSize($ic-font-size--small);
   border: 1px solid $sg-example-border;
   padding: 2px 5px;
   border-radius: 2px;
@@ -39,7 +39,7 @@
     padding: 5px 8px;
     display: inline-block;
     font-family: $sg-font;
-    font-size: 12px;
+    @include fontSize($ic-font-size--xsmall);
   }  
 }
 .Sg-Main .codeBlock,
@@ -48,7 +48,7 @@
   margin: 0 0 20px 0;
   background: $sg-example-main-color;
   color: $sg-example-tag-color;
-  font-size: 15px;
+  @include fontSize(15px);
   line-height: 1.6em;
   overflow-x: auto;  
   position: relative;
@@ -65,7 +65,7 @@
     padding: 5px 8px;
     display: inline-block;
     font-family: $sg-font;
-    font-size: 12px;
+    @include fontSize($ic-font-size--xsmall);
   }  
   &.jsExample:after {
     content: 'JS';
@@ -83,7 +83,7 @@
     margin: 0px;
     padding: 0px;
     padding-left: 15px;
-    font-size: 14px;
+    @include fontSize($ic-font-size--small);
     position: relative;
     line-height: 1.6em;
     color: $sg-example-string-color;

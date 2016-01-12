@@ -30,7 +30,7 @@
     }
   }
   .links {
-    font-size: 11px;
+    @include fontSize(11px);
   }
   .unread-count {
     display: block;
@@ -73,7 +73,7 @@
   }
   .toggle-details {
     text-transform: uppercase;
-    @if $use_new_styles { font-size: 11px; }
+    @if $use_new_styles { @include fontSize(11px); }
     @else { font-size: 0.75em; }
   }
   &:hover {
@@ -133,7 +133,7 @@ $ignore-col-width: 50px;
     }
   }
   .date {
-    font-size: 11px;
+    @include fontSize(11px);
     width: 100px;
     white-space: nowrap;
     text-align: center;
@@ -166,7 +166,7 @@ $ignore-col-width: 50px;
   }
   @if $use_new_styles {
     font-weight: 500;
-    font-size: 12px;
+    @include fontSize($ic-font-size--xsmall);
   }
 }
 

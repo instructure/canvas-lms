@@ -1,5 +1,6 @@
 @import "sass-functions/_ensure-contrast.scss";
 @import "base/variables";
+@import "base/mixins/typography";
 @import "vendor/bootstrap/variables";
 @import "vendor/bootstrap/mixins";
 @import "vendor/bootstrap/grid";
@@ -28,7 +29,7 @@ div.checkbox {
 // bootstrap table overrides for pretty formatting
 table.table {
   border: 1px solid darken($grayLighter, 10%);
-  font-size: 12px;
+  @include fontSize($ic-font-size--xsmall);
 
   th, td {
     padding: 12px;

@@ -39,7 +39,7 @@
   }
   .undated_event_title {
     color: rgba(0, 0, 0, 0.75);
-    font-size: 11px;
+    @include fontSize(11px);
   }
 }
 

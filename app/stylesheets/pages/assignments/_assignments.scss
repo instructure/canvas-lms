@@ -121,7 +121,7 @@
       tr {
         th {
           font-weight: bold;
-          font-size: 14px;
+          @include fontSize($ic-font-size--small);
           padding: 0.5em;
         }
         td {
@@ -180,7 +180,7 @@
     .content {
       padding-left: 5px;
       h4 {
-        font-size: 11px;
+        @include fontSize(11px);
         font-weight: bold;
         margin-bottom: 0;
       }
@@ -195,7 +195,7 @@
         margin: 5px 10px 0 10px;
       }
       .comments {
-        font-size: 11px;
+        @include fontSize(11px);
         max-height: 300px;
         overflow: auto;
         .comment {
