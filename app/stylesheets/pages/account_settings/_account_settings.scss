@@ -69,13 +69,33 @@
   }
 }
 
-.announcements_list {
-  .alert {
-    color: #666;
+.announcement-details-post-info {
+  display: flex;
+}
+
+.announcement-details-post-info__datetime {
+  flex: 1;
+  box-sizing: border-box;
+  padding-right: $ic-sp;
+  font-weight: 500;
+}
+
+.announcement-details-roles {
+  margin-top: $ic-sp;
+}
+
+.announcements_list_item {
+  background: $ic-bg-light-neutral;
+  margin-bottom: $ic-sp*2;
+  padding: $ic-sp;
+  @include breakpoint(wide) { padding: $ic-sp*2; }
+
+  .edit_notification_form {
+    margin-top: $ic-sp*2;
+    padding-top: $ic-sp*2;
+    border-top: 1px solid $ic-border-light;
   }
-  .announcement-details {
-    margin-top: 10px;
-  }
+
 }
 
 #self_registration_type_radios {
@@ -144,4 +164,8 @@
 .account_settings td.sub_checkbox {
   padding-left: 20px;
   padding-top: 0px;
+}
+
+.hidden_form {
+  display: none;
 }

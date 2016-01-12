@@ -337,3 +337,9 @@ $ic-notification-border-thickness: 2px;
     margin-left: $ic-sp*4;
   }
 }
+
+.ic-notification__admin-actions {
+  float: right;
+  margin-left: $ic-sp;
+  margin-bottom: $ic-sp/2;
+}

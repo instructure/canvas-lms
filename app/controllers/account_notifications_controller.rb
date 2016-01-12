@@ -170,14 +170,89 @@ class AccountNotificationsController < ApplicationController
         if api_request?
           format.json { render :json => account_notification_json(@notification, @current_user, session) }
         else
-          flash[:notice] = t(:announcement_created_notice, "Announcement successfully created")
+          flash[:notice] = t("Announcement successfully created")
           format.html { redirect_to account_settings_path(@account, :anchor => 'tab-announcements') }
           format.json { render :json => @notification }
         end
       else
-        flash[:error] = t(:announcement_creation_failed_notice, "Announcement creation failed")
+        flash[:error] = t("Announcement creation failed")
         format.html { redirect_to account_settings_path(@account, :anchor => 'tab-announcements') } unless api_request?
         format.json { render :json => @notification.errors, :status => :bad_request }
+      end
+    end
+  end
+
+  # @API Update a global notification
+  #
+  # Update global notification for an account.
+  #
+  # @argument account_notification[subject] [String]
+  #  The subject of the notification.
+  #
+  # @argument account_notification[message] [String]
+  #  The message body of the notification.
+  #
+  # @argument account_notification[start_at] [DateTime]
+  #   The start date and time of the notification in ISO8601 format.
+  #   e.g. 2014-01-01T01:00Z
+  #
+  # @argument account_notification[end_at] [DateTime]
+  #   The end date and time of the notification in ISO8601 format.
+  #   e.g. 2014-01-01T01:00Z
+  #
+  # @argument account_notification[icon] ["warning"|"information"|"question"|"error"|"calendar"]
+  #   The icon to display with the notification.
+  #
+  # @argument account_notification_roles[] [String]
+  #   The role(s) to send global notification to.  Note:  ommitting this field will send to everyone
+  #   Example:
+  #     account_notification_roles: ["StudentEnrollment", "TeacherEnrollment"]
+  #
+  # @example_request
+  #   curl -X PUT -H 'Authorization: Bearer <token>' \
+  #   https://<canvas>/api/v1/accounts/2/account_notifications/1 \
+  #   -d 'account_notification[subject]=New notification' \
+  #   -d 'account_notification[start_at]=2014-01-01T00:00:00Z' \
+  #   -d 'account_notification[end_at]=2014-02-01T00:00:00Z' \
+  #   -d 'account_notification[message]=This is a global notification'
+  #
+  # @example_response
+  #   {
+  #     "subject": "New notification",
+  #     "start_at": "2014-01-01T00:00:00Z",
+  #     "end_at": "2014-02-01T00:00:00Z",
+  #     "message": "This is a global notification"
+  #   }
+
+  def update
+    account_notification = @account.announcements.find(params[:id])
+    if account_notification
+      account_notification.attributes = params[:account_notification]
+
+      existing_roles = account_notification.account_notification_roles.map(&:role)
+      requested_roles = roles_to_add(params[:account_notification_roles])
+      new_roles = requested_roles - existing_roles
+      remove_roles = existing_roles - requested_roles
+      remove_roles_ids = remove_roles.map {|r| r.try(:id)}
+      account_notification.account_notification_roles.create!(new_roles.map{|r| {role: r}})
+      account_notification.account_notification_roles.where(role_id: remove_roles_ids).destroy_all if remove_roles.any?
+      updated = account_notification.save
+      respond_to do |format|
+        if updated
+          flash[:notice] = t("Announcement successfully updated")
+          format.json { render :json => account_notification_json(account_notification, @current_user, session) }
+          format.html { redirect_to account_settings_path(@account, :anchor => 'tab-announcements') }
+        else
+          flash[:error] = t("Announcement update failed")
+          format.html { redirect_to account_settings_path(@account, :anchor => 'tab-announcements') }
+          format.json { render :json => account_notification.errors, :status => :bad_request }
+        end
+      end
+    else
+      respond_to do |format|
+        flash[:error] = t("Announcement not found")
+        format.html { redirect_to account_settings_path(@account, :anchor => 'tab-announcements') }
+        format.json { render :json => {:message => "announcement not found"} }
       end
     end
   end
@@ -201,6 +276,21 @@ class AccountNotificationsController < ApplicationController
       return false
     end
     return false unless authorized_action(@account, @current_user, :manage_alerts)
+  end
+
+  def roles_to_add(role_params)
+    roles = []
+    return roles unless role_params
+    role_params.each do |role_param|
+      if role_param.nil? || role_param.to_s == "NilEnrollment"
+        roles << nil
+      else
+        role = @account.get_role_by_id(role_param)
+        role ||= @account.get_role_by_name(role_param)
+        roles << role if role
+      end
+    end
+    roles.uniq
   end
 
 end

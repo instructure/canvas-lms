@@ -549,7 +549,7 @@ CanvasRails::Application.routes.draw do
 
     # create/delete are handled by specific routes just above
     resources :users, only: [:index, :new, :edit, :show, :update]
-    resources :account_notifications, only: [:create, :destroy]
+    resources :account_notifications, only: [:create, :update, :destroy]
     concerns :announcements
     resources :assignments
     resources :submissions
@@ -893,6 +893,7 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :account_notifications) do
       post 'accounts/:account_id/account_notifications', action: :create, as: 'account_notification'
+      put 'accounts/:account_id/account_notifications/:id', action: :update, as: 'account_notification_update'
       get 'accounts/:account_id/users/:user_id/account_notifications', action: :user_index, as: 'user_account_notifications'
       delete 'accounts/:account_id/users/:user_id/account_notifications/:id', action: :user_close_notification, as: 'user_account_notification'
     end

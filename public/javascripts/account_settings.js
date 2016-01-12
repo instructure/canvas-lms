@@ -3,6 +3,7 @@ define([
   'jquery', // $
   'jsx/shared/rce/loadNewRCE',
   'jsx/shared/rce/preloadRCE',
+  'tinymce.config',
   'jquery.ajaxJSON', // ajaxJSON
   'jquery.instructure_date_and_time', // date_field, time_field, datetime_field, /\$\.datetime/
   'jquery.instructure_forms', // formSubmit, getFormData, validateForm
@@ -15,11 +16,27 @@ define([
   'vendor/date', // Date.parse
   'vendor/jquery.scrollTo', // /\.scrollTo/
   'jqueryui/tabs' // /\.tabs/
-], function(I18n, $, loadNewRCE, preloadRCE) {
+], function(I18n, $, loadNewRCE, preloadRCE, EditorConfig) {
 
   // optimization so user isn't waiting on RCS to
   // respond when they hit announcements
   preloadRCE()
+
+  EditorConfig.prototype.balanceButtonsOverride = function(instructure_buttons) {
+    var instBtnGroup = "table,instructure_links,unlink" + instructure_buttons;
+    var top_row_buttons = "";
+    var bottom_row_buttons = "";
+
+    top_row_buttons = this.formatBtnGroup + "," + this.positionBtnGroup;
+    bottom_row_buttons = instBtnGroup + "," + this.fontBtnGroup;
+
+    return [top_row_buttons, bottom_row_buttons];
+  };
+
+  EditorConfig.prototype.toolbar = function() {
+    var instructure_buttons = this.buildInstructureButtons();
+    return this.balanceButtonsOverride(instructure_buttons);
+  }
 
   $(document).ready(function() {
     checkFutureListingSetting = function() {
@@ -68,10 +85,35 @@ define([
     });
     $(".datetime_field").datetime_field();
 
-    $("#add_notification_form textarea").width('100%');
-    loadNewRCE($("#add_notification_form textarea"))
+    $(".add_notification_toggle_focus").click(function() {
+      var aria_expanded = $('add_notification_form').attr('aria-expanded') === "true";
+      if(!aria_expanded) {
+        setTimeout(function() {$('#account_notification_subject').focus()}, 100);
+      }
+    });
 
-    $("#add_notification_form").submit(function(event) {
+    $(".edit_notification_toggle_focus").click(function() {
+      var id = $(this).attr('data-edit-toggle-id');
+      var form_id = '#edit_notification_form_' + id;
+      var aria_expanded = $(form_id).attr('aria-expanded') === "true";
+      if(!aria_expanded) {
+        setTimeout(function() {$('#account_notification_subject_' + id).focus()}, 100);
+      }
+    });
+
+    $(".add_notification_cancel_focus").click(function() {
+      $("#add_announcement_button").focus();
+    });
+
+    $(".edit_cancel_focus").click(function() {
+      var id = $(this).attr('data-cancel-focus-id');
+      $("#notification_edit_" + id).focus();
+    });
+
+    $("#add_notification_form textarea").width('100%');
+    loadNewRCE($("textarea.edit_notification_form, #add_notification_form textarea"));
+
+    $("#add_notification_form, .edit_notification_form").submit(function(event) {
       var $this = $(this);
       var $confirmation = $this.find('#confirm_global_announcement:visible:not(:checked)');
       if ($confirmation.length > 0) {
@@ -84,7 +126,7 @@ define([
         date_fields: ['start_at', 'end_at'],
         numbers: []
       };
-      if ($('#account_notification_months_in_display_cycle').length > 0) {
+      if ($this[0].id == 'add_notification_form' && $('#account_notification_months_in_display_cycle').length > 0) {
         validations.numbers.push('months_in_display_cycle');
       }
       var result = $this.validateForm(validations);
