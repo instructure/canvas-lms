@@ -39,7 +39,7 @@ class LearningOutcome < ActiveRecord::Base
   }.freeze
   VALID_CALCULATION_INTS = {
     "decaying_average" => (1..99),
-    "n_mastery" => (2..5),
+    "n_mastery" => (1..5),
     "highest" => [].freeze,
     "latest" => [].freeze,
   }.freeze

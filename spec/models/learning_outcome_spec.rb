@@ -455,28 +455,34 @@ describe LearningOutcome do
       expect(@outcome.calculation_method).to eq('latest')
     end
 
-    context "should not let you set calculation_int to nil for certain calculation methods" do
+    context "should not let you set calculation_int to invalid values for certain calculation methods" do
       calc_method = [
         'decaying_average',
         'n_mastery'
       ]
+      invalid_values = {
+        decaying_average: [0, 100, 1000, nil],
+        n_mastery: [0, 10, nil]
+      }.with_indifferent_access
 
       calc_method.each do |method|
-        it "should not let you set calculation_int to nil if calculation_method is #{method}" do
-          @outcome.calculation_method = method
-          @outcome.calculation_int = 4
-          @outcome.save!
-          expect(@outcome.calculation_method).to eq(method)
-          expect(@outcome.calculation_int).to eq(4)
-          expect(@outcome).to have(:no).errors
-          @outcome.calculation_int = nil
-          @outcome.save
-          expect(@outcome).to have(1).error_on(:calculation_int)
-          expect(@outcome).to have(1).errors
-          expect(outcome_errors(:calculation_int).first).to include("is not a valid value for this calculation method")
-          @outcome.reload
-          expect(@outcome.calculation_method).to eq(method)
-          expect(@outcome.calculation_int).to eq(4)
+        invalid_values[method].each do |invalid_value|
+          it "should not let you set calculation_int to #{invalid_value} if calculation_method is #{method}" do
+            @outcome.calculation_method = method
+            @outcome.calculation_int = 4
+            @outcome.save!
+            expect(@outcome.calculation_method).to eq(method)
+            expect(@outcome.calculation_int).to eq(4)
+            expect(@outcome).to have(:no).errors
+            @outcome.calculation_int = invalid_value
+            @outcome.save
+            expect(@outcome).to have(1).error_on(:calculation_int)
+            expect(@outcome).to have(1).errors
+            expect(outcome_errors(:calculation_int).first).to include("is not a valid value for this calculation method")
+            @outcome.reload
+            expect(@outcome.calculation_method).to eq(method)
+            expect(@outcome.calculation_int).to eq(4)
+          end
         end
       end
     end

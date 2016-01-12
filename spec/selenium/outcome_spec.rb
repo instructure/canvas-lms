@@ -66,8 +66,8 @@ describe "outcomes" do
           expect(f('#calculation_int')).to have_value('65')
           expect(f('#calculation_int_example')).to include_text("Most recent result counts as 65%"\
                                                               " of mastery weight, average of all other results count"\
-                                                              " as 35% of weight. There must be at least 2 results"\
-                                                              " before a score is returned.")
+                                                              " as 35% of weight. If there is only one result, the single score"\
+                                                              " will be returned.")
         end
 
         it "should validate decaying average_above_range", priority: "2", test_id: 261708 do

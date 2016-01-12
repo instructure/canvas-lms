@@ -67,6 +67,18 @@ describe Outcomes::ResultAnalytics do
         expect(ru.outcome_results.first).to eq results[i]
       end
     end
+
+    it 'does not return rollup scores when all results are nil' do
+      o = (1..3).map do |i|
+        outcome_from_score(nil, { method: 'decaying_average', calc_int: 75, submitted_time: time - i.days})
+        outcome_from_score(nil, { id: 81, method: 'n_mastery', calc_int: 3, submitted_time: time- i.days})
+        outcome_from_score(nil, { id: 82, method: 'latest', calc_int: 3, submitted_time: time- i.days})
+        outcome_from_score(nil, { id: 83, method: 'highest', calc_int: 3, submitted_time: time- i.days})
+      end
+      results = o.flatten
+      rollups = ra.rollup_user_results(results)
+      expect(rollups.size).to eq 0
+    end
   end
 
   describe '#mastery calculation' do
@@ -97,11 +109,15 @@ describe Outcomes::ResultAnalytics do
     it 'properly calculates results when method is n# of scores for mastery' do
       o1 = [3.0, 1.0].map{ |result| outcome_from_score(result, {method: 'n_mastery', calc_int: 3}) }
       o2 = [3.0, 1.0, 2.0].map{ |result| outcome_from_score(result, {id: 81, method: 'n_mastery', calc_int: 3}) }
-      o3 = [4.0, 5.0, 1.0, 3.0, 2.0, 3.0].map{ |result|outcome_from_score(result, {id: 82, method: 'n_mastery', calc_int: 3}) }
-      results = [o1, o2, o3].flatten
+      o3 = [4.0, 5.0, 1.0, 3.0, 2.0, 3.0].map{ |result| outcome_from_score(result, {id: 82, method: 'n_mastery', calc_int: 3}) }
+      o4 = [1.0, 2.0].map{ |result| outcome_from_score(result, {id: 83, method: 'n_mastery', calc_int: 1}) }
+      o5 = [1.0, 2.0, 3.0].map{ |result| outcome_from_score(result, {id: 84, method: 'n_mastery', calc_int: 1}) }
+      o6 = [1.0, 2.0, 3.0, 4.0].map{ |result| outcome_from_score(result, {id: 85, method: 'n_mastery', calc_int: 1}) }
+
+      results = [o1, o2, o3, o4, o5, o6].flatten
       rollups = ra.rollup_user_results(results)
-      expect(rollups.size).to eq 3
-      expect(rollups.map(&:score)).to eq [nil, nil, 3.75]
+      expect(rollups.size).to eq 6
+      expect(rollups.map(&:score)).to eq [nil, nil, 3.75, nil, 3.0, 3.5]
     end
 
     it 'does not error out and correctly averages when a result has a score of nil' do
@@ -120,7 +136,7 @@ describe Outcomes::ResultAnalytics do
       results = [o1, o2].flatten
       rollups = ra.rollup_user_results(results)
       expect(rollups.size).to eq 2
-      expect(rollups.map(&:score)).to eq [nil, 3.75]
+      expect(rollups.map(&:score)).to eq [3.0, 3.75]
     end
 
     it 'properly sorts results when there is no submitted_at time on one or many results' do
@@ -141,11 +157,12 @@ describe Outcomes::ResultAnalytics do
       o1 = [3.0, 2.0].map.with_index do |result, i|
         outcome_from_score(result, {method: 'decaying_average', calc_int: 65, assessed_time: time-i.days})
       end
-      o2 = [3.0, 4.0, 3.0].map{ |result| outcome_from_score(result, {id: 81, method: 'n_mastery', calc_int: 3}) }
-      results = [o1, o2].flatten
+      o2 = outcome_from_score(2.123, {id: 81, method: 'decaying_average', calc_int: 65})
+      o3 = [3.0, 4.0, 3.0].map{ |result| outcome_from_score(result, {id: 82, method: 'n_mastery', calc_int: 3}) }
+      results = [o1, o2, o3].flatten
       rollups = ra.rollup_user_results(results)
-      expect(rollups.size).to eq 2
-      expect(rollups.map(&:score)).to eq [2.65, 3.33]
+      expect(rollups.size).to eq 3
+      expect(rollups.map(&:score)).to eq [2.65, 2.12, 3.33]
     end
   end
 
