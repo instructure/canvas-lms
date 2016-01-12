@@ -340,12 +340,12 @@ sv:
     custom_text_blank: "[Custom Text]"
     links: 
       turnitin: 
-        confirm_settings: "bekräfta Turnitin-inställningar"
+        confirm_settings: "bekräfta inställningar för Turnitin"
     notices: 
       turnitin: 
-        checking_settings: "kontrollerar Turnitin-inställningar..."
+        checking_settings: "kontrollerar inställningar för Turnitin..."
         invalid_settings: "ogilitig Turnitin-inställning, vänligen kontrollera ditt konto id och den hemligheten som delats från Turnitin"
-        setings_confirmed: "Turnitin-inställningarna har bekräftats!"
+        setings_confirmed: "Inställningar för Turnitin har bekräftats!"
     titles: 
       configure_report: Konfigureringsrapport
       open_registration_delegated_warning_dialog: "En extern Identity Provider är aktiverad"
@@ -809,7 +809,7 @@ sv:
         continue: Fortsätt...
         modify_users: "Gå tillbaka och redigera listan med användare"
       confirm_global_announcement: "Det här meddelandet kommer visas för *alla* Canvas användare. Bekräfta att du vill skapa det."
-      confirm_turnitin_settings_link: "bekräfta Turnitin-inställningar"
+      confirm_turnitin_settings_link: "bekräfta inställningar för Turnitin"
       course_roles: "Roller i kurs:"
       create_courses_description: "(Konto-administratörer kan alltid skapa kurser)"
       create_courses_title: "Vem kan skapa nya kurser"
@@ -985,7 +985,7 @@ sv:
       transifex_message: "Anslut dig till [Canvas Translation Community](%{transifex_url})"
       turnitin_comments_help: "de här kommentarerna kommer visas för elever när de lämnar in en Turnitin-aktiverad uppgift"
       turnitin_pledge_help: "elever måste kryssa en ruta för att bekräfta att de godkänner löftet"
-      turnitin_settings_title: Turnitin-inställningar
+      turnitin_settings_title: "Inställningar för Turnitin"
       update_settings_button: "Uppdatera inställningar"
     show: 
       courses_crumb: Kurser
@@ -2050,7 +2050,7 @@ sv:
         submission_not_turned_in: "Inte inlämnad!"
         submission_turned_in: Inlämnad!
     submission_types_form: 
-      advanced_turnitin_settings: "Avancerade Turnitin-inställningar"
+      advanced_turnitin_settings: "Avancerade inställningar för Turnitin"
       descriptions: 
         allowed_extensions: "Uppge en lista av accepterade förlängningar, till exempel: doc,xls,txt"
       external_tool_group_warning: "Gruppuppgifter kan inte använda externa verktyg. Gruppinställningen kommer inte kontrolleras när du sparar"
