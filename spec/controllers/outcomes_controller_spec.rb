@@ -45,7 +45,7 @@ describe OutcomesController do
       get 'index', :course_id => @course.id
       assert_unauthorized
     end
-    
+
     it "should redirect 'disabled', if disabled by the teacher" do
       user_session(@student)
       @course.update_attribute(:tab_configuration, [{'id'=>15,'hidden'=>true}])
@@ -53,13 +53,13 @@ describe OutcomesController do
       expect(response).to be_redirect
       expect(flash[:notice]).to match(/That page has been disabled/)
     end
-    
+
     it "should assign variables" do
       user_session(@student)
       get 'index', :course_id => @course.id
       expect(response).to be_success
     end
-    
+
     it "should work in accounts" do
       user_session(@admin)
       account_outcome
@@ -81,31 +81,30 @@ describe OutcomesController do
       get 'show', :course_id => @course.id, :id => @outcome.id
       assert_unauthorized
     end
-    
+
     it "should not allow students to view outcomes" do
       user_session(@student)
       course_outcome
       get 'show', :course_id => @course.id, :id => @outcome.id
       assert_unauthorized
     end
-    
+
     it "should assign variables" do
       user_session(@teacher)
       course_outcome
       get 'show', :course_id => @course.id, :id => @outcome.id
       expect(response).to be_success
     end
-    
+
     it "should work in accounts" do
       user_session(@admin)
       account_outcome
       get 'show', :account_id => @account.id, :id => @outcome.id
       expect(response).to be_success
     end
-    
+
     it "should include tags from courses when viewed in the account" do
       account_outcome
-      @outcome
 
       quiz = @course.quizzes.create!
       alignment = @outcome.align(quiz, @course)
@@ -133,14 +132,14 @@ describe OutcomesController do
       get 'details', :course_id => @course.id, :outcome_id => @outcome.id
       assert_unauthorized
     end
-    
+
     it "should assign variables" do
       user_session(@student)
       course_outcome
       get 'details', :course_id => @course.id, :outcome_id => @outcome.id
       expect(response).to be_success
     end
-    
+
     it "should work in accounts" do
       user_session(@admin)
       account_outcome
@@ -294,6 +293,45 @@ describe OutcomesController do
       delete 'destroy', :course_id => @course.id, :id => @outcome.id
       @outcome.reload
       expect(@outcome).to be_deleted
+    end
+  end
+
+  describe "GET 'outcome_result" do
+    before :each do
+      course_outcome
+    end
+
+    context "with a quiz result" do
+      before :each do
+        assessment_question_bank_with_questions
+        @outcome.align(@bank, @bank.context, :mastery_score => 0.7)
+
+        @quiz = @course.quizzes.create!(:title => "a quiz")
+        @quiz.add_assessment_questions [ @q1, @q2 ]
+
+        @submission = @quiz.generate_submission @student
+        @submission.quiz_data = @quiz.generate_quiz_data
+        @submission.mark_completed
+        Quizzes::SubmissionGrader.new(@submission).grade_submission
+      end
+
+      it "should require teacher authorization" do
+        user_session(@student)
+        get 'outcome_result',
+          :course_id => @course.id,
+          :outcome_id => @outcome.id,
+          :id => @outcome.learning_outcome_results.last
+        assert_unauthorized
+      end
+
+      it "should redirect to show quiz when result is a quiz" do
+        user_session(@teacher)
+        get 'outcome_result',
+          :course_id => @course.id,
+          :outcome_id => @outcome.id,
+          :id => @outcome.learning_outcome_results.last
+        expect(response).to redirect_to(/#{Regexp.quote(course_quiz_history_url(quiz_id: @submission.quiz_id))}/)
+      end
     end
   end
 end

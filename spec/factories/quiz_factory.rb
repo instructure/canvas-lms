@@ -40,9 +40,9 @@ def quiz_with_submission(complete_quiz = true)
   @course.enroll_student(@student).accept
   @quiz = @course.quizzes.create
   @quiz.workflow_state = "available"
-  @quiz.quiz_data = test_data
+  @quiz.quiz_questions.create!({ question_data: test_data.first })
   @quiz.save!
-  @quiz
+
   @qsub = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(@student)
   @qsub.quiz_data = test_data
   @qsub.submission_data = complete_quiz ? [{:points=>0, :text=>"7051", :question_id=>128, :correct=>false, :answer_id=>7051}] : test_data.first
