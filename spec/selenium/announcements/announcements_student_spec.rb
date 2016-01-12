@@ -118,7 +118,7 @@ describe "announcements" do
       end
     end
 
-    it "allows rating when enabled" do
+    it "allows rating when enabled", priority: "1", test_id: 603587 do
       announcement = @course.announcements.create!(title: 'stuff', message: 'things', allow_rating: true)
       get "/courses/#{@course.id}/discussion_topics/#{announcement.id}"
 
@@ -136,7 +136,7 @@ describe "announcements" do
       expect(f('.discussion-rate-action--checked')).to be_displayed
     end
 
-    it "doesn't allow rating when not enabled" do
+    it "doesn't allow rating when not enabled", priority: "1", test_id: 603588 do
       announcement = @course.announcements.create!(title: 'stuff', message: 'things', allow_rating: false)
       get "/courses/#{@course.id}/discussion_topics/#{announcement.id}"
 
