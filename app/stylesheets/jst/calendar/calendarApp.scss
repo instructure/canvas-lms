@@ -14,7 +14,7 @@
     background-color: white;
   }
   .fc-month-view .fc-widget-header {
-    font-size: 14px;
+    @include fontSize(14px);
     background-color: #f6f7f9;
     line-height: 35px;
     color: $ic-font-color--subdued;
