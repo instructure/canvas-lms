@@ -153,7 +153,9 @@
                variables.each {|var| answer_list << hash_get(user_answer, "answer_id_for_#{var}") }
              end
           %>
-          <%= multiple_dropdowns_question :question => question, :answers => @stored_params, :answer_list => answer_list %>
+          <%= multiple_dropdowns_question({
+            :question => question, :answers => @stored_params, :answer_list => answer_list, :editable => assessing
+          }) %>
         <% else %>
           <%= user_content(hash_get(question, :question_text)) %>
         <% end %>

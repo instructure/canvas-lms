@@ -253,17 +253,41 @@ describe QuizzesHelper do
     end
 
     it "should select the user's answer" do
-      html = multiple_dropdowns_question(question: { question_text: 'some <select class="question_input" name="question_4"><option value="val">val</option></select>'},
-                                         answer_list: ['val'])
+      html = multiple_dropdowns_question({
+        question: {
+          question_text: 'some <select class="question_input" name="question_4"><option value="val">val</option></select>'
+        },
+        answer_list: ['val'],
+        editable: true
+      })
       expect(html).to eq 'some <select class="question_input" name="question_4"><option value="val" selected>val</option></select>'
       expect(html).to be_html_safe
     end
 
     it "should not blow up if the user's answer isn't there" do
-      html = multiple_dropdowns_question(question: { question_text: 'some <select class="question_input" name="question_4"><option value="other_val">val</option></select>'},
-                                         answer_list: ['val'])
+      html = multiple_dropdowns_question({
+        question: {
+          question_text: 'some <select class="question_input" name="question_4"><option value="other_val">val</option></select>'
+        },
+        answer_list: ['val'],
+        editable: true
+      })
       expect(html).to eq 'some <select class="question_input" name="question_4"><option value="other_val">val</option></select>'
       expect(html).to be_html_safe
+    end
+
+    it "should disable select boxes that are not editable" do
+      html_string = multiple_dropdowns_question({
+        question: {
+          question_text: 'some <select class="question_input" name="question_4"><option value="val">val</option></select>'
+        },
+        answer_list: ['val'],
+        editable: false
+      })
+      html = Nokogiri::HTML.fragment(html_string)
+      span_html = html.css('span').first
+      expect(span_html).not_to be_nil
+      expect(html_string).to be_html_safe
     end
   end
 
