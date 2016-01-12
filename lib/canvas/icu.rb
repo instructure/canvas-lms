@@ -19,15 +19,15 @@ module Canvas::ICU
 
   begin
     Bundler.require 'icu'
-    if !ICU::Lib.respond_to?(:ucol_getRules)
-      require 'ffi'
-      suffix = ICU::Lib.figure_suffix(ICU::Lib.version.to_s)
+    require 'ffi'
 
-      ICU::Lib.attach_function(:ucol_getRules, "ucol_getRules#{suffix}", [:pointer, :pointer], :pointer)
-      ICU::Lib.attach_function(:ucol_getSortKey, "ucol_getSortKey#{suffix}", [:pointer, :pointer, :int, :pointer, :int], :int)
-      ICU::Lib.attach_function(:ucol_getAttribute, "ucol_getAttribute#{suffix}", [:pointer, :int, :pointer], :int)
-      ICU::Lib.attach_function(:ucol_setAttribute, "ucol_setAttribute#{suffix}", [:pointer, :int, :int, :pointer], :void)
+    suffix = ICU::Lib.figure_suffix(ICU::Lib.version.to_s)
+    ICU::Lib.attach_function(:ucol_getRules, "ucol_getRules#{suffix}", [:pointer, :pointer], :pointer) if !ICU::Lib.respond_to?(:ucol_getRules)
+    ICU::Lib.attach_function(:ucol_getSortKey, "ucol_getSortKey#{suffix}", [:pointer, :pointer, :int, :pointer, :int], :int) if !ICU::Lib.respond_to?(:ucol_getSortKey)
+    ICU::Lib.attach_function(:ucol_getAttribute, "ucol_getAttribute#{suffix}", [:pointer, :int, :pointer], :int) if !ICU::Lib.respond_to?(:ucol_getAttribute)
+    ICU::Lib.attach_function(:ucol_setAttribute, "ucol_setAttribute#{suffix}", [:pointer, :int, :int, :pointer], :void) if !ICU::Lib.respond_to?(:ucol_setAttribute)
 
+    if !ICU::Collation::Collator.new(I18n.locale.to_s).respond_to?(:normalization_mode)
       ICU::Collation::Collator.class_eval do
         def rules
           @rules ||= begin
