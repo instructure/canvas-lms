@@ -548,6 +548,22 @@ describe "API Authentication", type: :request do
       expect(response.body).to match(/Invalid access token/)
     end
 
+    it "falls through to checking access token for non-JWT but JWT-like strings" do
+      get "/api/v1/courses", nil, {
+        'HTTP_AUTHORIZATION' => "Bearer 1050~LvwezC5Dd3ZK9CR1lusJTRv24dN0263txia3KF3mU6pDjOv5PaoX8Jv4ikdcvoiy"
+      }
+      # this error message proves that it ended up throwing an AccessTokenError
+      # rather than dying mid-jwt-parse. That can only happen if
+      #  1) the JWT is good, but no user/pseudony associated with it
+      #  2) load_pseudonym_from_access_token parsed it and decided nobody
+      #      was associated with it.
+      #  Therefore, this is valid proof that we're hitting the access_token loader
+      #   because the token provided above is _not_ a valid JWT
+
+      assert_status(401)
+      expect(response.body).to match(/Invalid access token/)
+    end
+
   end
 
   describe "access token" do

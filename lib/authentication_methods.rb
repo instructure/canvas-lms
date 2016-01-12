@@ -76,7 +76,7 @@ module AuthenticationMethods
         raise AccessTokenError
       end
       @authenticated_with_jwt = true
-    rescue JSON::JWT::InvalidFormat, Canvas::Security::TokenExpired
+    rescue JSON::JWT::InvalidFormat, Canvas::Security::TokenExpired, Canvas::Security::InvalidToken
       # could still be a regular access token
       return
     end
