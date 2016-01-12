@@ -115,6 +115,12 @@ describe Canvas::Security do
         body = Canvas::Security.decode_jwt(@token_not_expired, [ @key ])
         expect(body[:a]).to eq(1)
       end
+
+      it "produces an InvalidToken error if string isn't a jwt (even if it looks like one)" do
+        # this is an example token which base64_decodes to a thing that looks like a jwt because of the periods
+        not_a_jwt = Canvas::Security.base64_decode("1050~LvwezC5Dd3ZK9CR1lusJTRv24dN0263txia3KF3mU6pDjOv5PaoX8Jv4ikdcvoiy")
+        expect { Canvas::Security.decode_jwt(not_a_jwt, [ @key ]) }.to raise_error(Canvas::Security::InvalidToken)
+      end
     end
   end
 
