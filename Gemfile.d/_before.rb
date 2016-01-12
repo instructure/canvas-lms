@@ -17,7 +17,7 @@
 #
 
 # # enforce the version of bundler itself, to avoid any surprises
-req_bundler_version_floor, req_bundler_version_ceiling = '1.7.10', '1.11.2'
+req_bundler_version_floor, req_bundler_version_ceiling = '1.8.0', '1.11.2'
 bundler_requirements = [">=#{req_bundler_version_floor}",
                         "<=#{req_bundler_version_ceiling}"]
 gem 'bundler', bundler_requirements
@@ -77,39 +77,6 @@ end
 git_source(:github) do |repo_name|
   repo_name = "#{repo_name}/#{repo_name}" unless repo_name.include?("/")
   "https://github.com/#{repo_name}.git"
-end
-
-if Gem::Version.new(Bundler::VERSION) < Gem::Version.new('1.8.0')
-  module CanvasBundlerRuntime
-    def self.included(klass)
-      klass.send(:remove_method, :cache)
-    end
-
-    def cache(custom_path = nil)
-      cache_path = cache_path(custom_path)
-      FileUtils.mkdir_p(cache_path) unless File.exist?(cache_path)
-
-      all_platforms = true # Bundler.config[:all_platforms]
-      Bundler.ui.info "Updating files in vendor/cache"
-      specs = if all_platforms
-                @definition.resolve.map(&:__materialize__)
-              else
-                self.specs
-              end
-      specs.each do |spec|
-        spec.source.send(:fetch_gem, spec) if all_platforms && spec.source.respond_to?(:fetch_gem, true)
-        spec.source.cache(spec, custom_path) if spec.source.respond_to?(:cache)
-      end
-
-      Dir[cache_path.join("*/.git")].each do |git_dir|
-        FileUtils.rm_rf(git_dir)
-        FileUtils.touch(File.expand_path("../.bundlecache", git_dir))
-      end
-
-      prune_cache(custom_path) unless Bundler.settings[:no_prune]
-    end
-  end
-  Bundler::Runtime.send(:include, CanvasBundlerRuntime)
 end
 
 gem 'syck', '1.0.4'
