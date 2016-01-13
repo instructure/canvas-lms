@@ -181,6 +181,7 @@ describe "new groups" do
       fln("Set as Leader").click
       f(".group-user-actions[data-user-id=\"#{@students[0].id}\"]").click
       f(".ui-menu-item .edit-group-assignment").click
+      wait_for_ajaximations
       f(".single-select option").click
       f(".set-group").click
       wait_for_ajaximations
