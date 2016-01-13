@@ -12,7 +12,6 @@ module Selinimum
         return true if file =~ %r{\Agems/selinimum/}
         return true if file == "spec/spec.opts"
         return true if file == "public/javascripts/translations/_core_en.js"
-        return true if file == "Gemfile.d/test.rb" # TODO: this is :totes: temporary, just until https://gerrit.instructure.com/#/c/58088/ lands and we can remove testbot from canvas-lms proper
         false
       end
     end
