@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
+require 'dynamic_form'
 
 class UserNotesController < ApplicationController
   def index
@@ -29,7 +30,7 @@ class UserNotesController < ApplicationController
       end
     end
   end
-  
+
    def user_notes
     get_context
     return render_unauthorized_action unless @context.root_account.enable_user_notes
@@ -68,7 +69,7 @@ class UserNotesController < ApplicationController
     params[:user_note][:note] = format_message(params[:user_note][:note]).first if params[:user_note][:note]
     @user_note = UserNote.new(params[:user_note])
     @user_note.creator = @current_user
-    
+
     if authorized_action(@user_note.user, @current_user, :create_user_notes)
       respond_to do |format|
         if @user_note.save
@@ -93,7 +94,7 @@ class UserNotesController < ApplicationController
       respond_to do |format|
         format.html { redirect_to user_user_notes_path }
         format.json { render :json => @user_note.as_json(:methods=>[:creator_name]), :status => :ok }
-      end 
+      end
     end
   end
 end
