@@ -405,7 +405,7 @@ define [
     unpublish: -> @save("published", false)
 
     disabledMessage: ->
-      I18n.t('cant_unpublish_when_students_submit', "Can't unpublish if there are student submissions")
+      I18n.t("Can't unpublish %{name} if there are student submissions", name: @get('name'))
 
     isOnlyVisibleToOverrides: (override_flag) ->
       return @get('only_visible_to_overrides') || false unless arguments.length > 0
