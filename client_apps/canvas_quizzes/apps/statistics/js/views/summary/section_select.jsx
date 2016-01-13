@@ -54,7 +54,7 @@ define(function(require) {
              <i className="icon-mini-arrow-down" aria-hidden="true"></i>
              <span className="screenreader-only">{I18n.t('Section Filter')}</span>
            </a>
-           <ul id="toolbar-1" className="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="toolbar-2">
+           <ul id="toolbar-1" className="al-options" role="menu" tabIndex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="toolbar-2">
             <SectionLink key={'all'} sectionId={'all'} name={'All Sections'} />
               {sectionNodes}
            </ul>

@@ -8,7 +8,6 @@ define(function(require) {
   var SightedUserContent = require('jsx!canvas_quizzes/components/sighted_user_content');
   var Summary = require('jsx!./summary');
   var Report = require('jsx!./summary/report');
-  var ToggleDetailsButton = require('jsx!./questions/toggle_details_button');
   var QuestionRenderer = require('jsx!./question');
   var MultipleChoiceRenderer = require('jsx!./questions/multiple_choice');
   var ShortAnswerRenderer = require('jsx!./questions/short_answer');
@@ -47,7 +46,6 @@ define(function(require) {
     },
 
     render: function() {
-      var props = this.props;
       var quizStatistics = this.props.quizStatistics;
       var submissionStatistics = quizStatistics.submissionStatistics;
       if (!this.props.canBeLoaded) {
@@ -94,16 +92,6 @@ define(function(require) {
                 <h2 className="section-title inline">
                   {I18n.t('question_breakdown', 'Question Breakdown')}
                 </h2>
-
-                <aside className="all-question-controls pull-right">
-                  <SightedUserContent tagName="div">
-                    <ToggleDetailsButton
-                      onClick={this.toggleAllDetails}
-                      expanded={quizStatistics.expandingAll}
-                      disabled={this.props.isLoadingStatistics}
-                      controlsAll />
-                  </SightedUserContent>
-                </aside>
               </header>
 
               {this.renderQuestions()}
@@ -159,35 +147,11 @@ define(function(require) {
       var questionProps = extend({}, question, {
         key: 'question-' + question.id,
         participantCount: question.participantCount,
-        expanded: stats.expanded.indexOf(question.id) > -1,
         speedGraderUrl: stats.speedGraderUrl,
         quizSubmissionsZipUrl: stats.quizSubmissionsZipUrl,
-        onToggleDetails: this.toggleDetails.bind(null, question.id)
       });
 
       return renderer(questionProps);
-    },
-
-    toggleDetails: function(questionId, e) {
-      e.preventDefault();
-
-      if (this.props.quizStatistics.expanded.indexOf(questionId) !== -1) {
-        this.sendAction('statistics:collapseQuestion', questionId);
-      }
-      else {
-        this.sendAction('statistics:expandQuestion', questionId);
-      }
-    },
-
-    toggleAllDetails: function(e) {
-      e.preventDefault();
-
-      if (this.props.quizStatistics.expandingAll) {
-        this.sendAction('statistics:collapseAll');
-      }
-      else {
-        this.sendAction('statistics:expandAll');
-      }
     }
   });
 

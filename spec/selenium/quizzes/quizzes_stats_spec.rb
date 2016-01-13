@@ -103,48 +103,6 @@ describe 'quizzes stats' do
           expect(ffj('.quiz-report-status')[1]).to include_text('Report is being generated')
         end
       end
-
-      context 'question breakdown toggle' do
-        it 'should expand an area for all question breakdowns', priority: "1", test_id: 140640 do
-          expect(ffj('ol.sighted-user-content.answer-drilldown.detail-section').size).to eq 0
-
-          fj('div.sighted-user-content > button.btn').click
-          expect(ffj('ol.sighted-user-content.answer-drilldown.detail-section').size).to eq 1
-        end
-
-        it 'should expand an area for each question breakdown', priority: "1", test_id: 140641 do
-          expect(ffj('ol.sighted-user-content.answer-drilldown.detail-section').size).to eq 0
-
-          fj('span.sighted-user-content > button.btn').click
-          expect(ffj('ol.sighted-user-content.answer-drilldown.detail-section').size).to eq 1
-        end
-
-        it 'should have individual and all work togehter', priority: "1", test_id: 140642 do
-          expect(ffj('ol.sighted-user-content.answer-drilldown.detail-section').size).to eq 0
-
-          # click to expand all
-          fj('span.sighted-user-content > button.btn').click
-          expect(ffj('ol.sighted-user-content.answer-drilldown.detail-section').size).to eq 1
-
-          # close a single question
-          fj('span.sighted-user-content > button.btn').click
-          expect(ffj('ol.sighted-user-content.answer-drilldown.detail-section').size).to eq 0
-
-          # click to expand all
-          fj('span.sighted-user-content > button.btn').click
-          expect(ffj('ol.sighted-user-content.answer-drilldown.detail-section').size).to eq 1
-
-          # click to close all
-          fj('span.sighted-user-content > button.btn').click
-          expect(ffj('ol.sighted-user-content.answer-drilldown.detail-section').size).to eq 0
-        end
-
-        it 'should have a discrimination index pop up', priority: "2", test_id: 140643 do
-          f('span.sighted-user-content > button.btn').click
-          f('.chart-help-trigger .icon-question').click
-          expect(ff('span.ui-dialog-title').any? {|dialog| dialog.text == 'The Discrimination Index Chart'})
-        end
-      end
     end
   end
 end
