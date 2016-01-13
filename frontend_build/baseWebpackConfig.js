@@ -24,6 +24,8 @@ module.exports = {
   resolve: {
     alias: {
       qtip: "jquery.qtip",
+      'backbone': 'Backbone',
+      'React': 'react',
       realTinymce: "bower/tinymce/tinymce",
       'ic-ajax': "bower/ic-ajax/dist/amd/main",
       'ic-tabs': "bower/ic-tabs/dist/amd/main",
