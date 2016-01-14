@@ -73,7 +73,7 @@ class ContextModule < ActiveRecord::Base
     return if relocked_modules.include?(self)
     self.class.connection.after_transaction_commit do
       relocked_modules << self
-      self.context_module_progressions.update_all(:workflow_state => "locked")
+      self.context_module_progressions.update_all("workflow_state = 'locked', lock_version = lock_version + 1")
       self.invalidate_progressions
 
       self.context.context_modules.each do |mod|
