@@ -21,11 +21,6 @@ describe "brandableCss JS integration specs" do
     expect(data[:combinedChecksum]).to match(/\A[a-f0-9]{10}\z/), '10 chars of an MD5'
     url = "#{Canvas::Cdn.config.host || app_host}/dist/brandable_css/no_variables/#{css_bundle}-#{data[:combinedChecksum]}.css"
     expect(fj("head link[rel='stylesheet'][data-loaded-by-brandableCss][href*='#{css_bundle}']")['href']).to eq(url)
-
-    driver.execute_script("window.ENV.ASSET_HOST = '#{EXAMPLE_CDN_HOST}'")
-    require_exec('compiled/util/brandableCss', "brandableCss.loadStylesheet('jst/some/css/bundle', {combinedChecksum: 'abcde12345'})")
-    url = "#{EXAMPLE_CDN_HOST}/dist/brandable_css/legacy_normal_contrast/jst/some/css/bundle-abcde12345.css"
-    expect(fj("head link[rel='stylesheet'][data-loaded-by-brandableCss][href*='jst/some/css/bundle']")['href']).to eq(url)
   end
 
   it "loads css from handlebars with variables correctly" do
