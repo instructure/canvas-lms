@@ -236,7 +236,7 @@ require(__dirname + "/../coffeescripts/react_files/modules/FileOptionsCollection
 require(__dirname + "/../coffeescripts/react_files/modules/FileUploaderSpec.coffee")
 require(__dirname + "/../coffeescripts/react_files/modules/UploadQueueSpec.coffee")
 require(__dirname + "/../coffeescripts/ReferenceSpec.coffee")
-require(__dirname + "/../coffeescripts/SpeedGraderSelectMenuSpec.coffee")
+require(__dirname + "/../coffeescripts/speed_grader/SpeedGraderSelectMenuSpec.coffee")
 require(__dirname + "/../coffeescripts/str/apiUserContentSpec.coffee")
 require(__dirname + "/../coffeescripts/str/TextHelperSpec.coffee")
 require(__dirname + "/../coffeescripts/timezoneSpec.coffee")
