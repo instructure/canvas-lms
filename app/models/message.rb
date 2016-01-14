@@ -549,12 +549,27 @@ class Message < ActiveRecord::Base
     end
 
     if user.account.feature_enabled?(:notification_service) && path_type != "yo"
-      message_body = path_type == "email" ? Mailer.create_message(self).to_s : body
-      NotificationService.process(message_body, path_type, to, remote_configuration)
-      complete_dispatch
-      return
+      enqueue_to_sqs
+    else
+      send(delivery_method)
     end
-    send(delivery_method)
+  end
+
+  def enqueue_to_sqs
+    message_body = path_type == "email" ? Mailer.create_message(self).to_s : body
+    NotificationService.process(message_body, path_type, to, remote_configuration)
+    complete_dispatch
+  rescue AWS::SQS::Errors::ServiceError => e
+    Canvas::Errors.capture(
+      e,
+      message: 'Message delivery failed',
+      to: to,
+      object: inspect.to_s
+    )
+    error_string = "Exception: #{e.class}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
+    self.transmission_errors = error_string
+    self.errored_dispatch
+    raise
   end
 
   class RemoteConfigurationError < StandardError; end

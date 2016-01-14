@@ -27,33 +27,43 @@ describe NotificationService do
       @message.user.account.root_account.enable_feature!(:notification_service)
       @message.save!
   end
+  before(:each) do
+    @queue = stub('notification queue')
+    NotificationService.stubs(:notification_queue).returns(@queue)
+  end
 
   describe "notification Service" do
     it "processes email message type" do
-      NotificationService.expects(:process).once
+      @queue.expects(:send_message).once
       @message.path_type = "email"
       expect{@message.deliver}.not_to raise_error
     end
     it "processes twitter message type" do
-      NotificationService.expects(:process).once
+      @queue.expects(:send_message).once
       @message.path_type = "twitter"
       expect{@message.deliver}.not_to raise_error
     end
     it "processes twilio message type" do
-      NotificationService.expects(:process).once
+      @queue.expects(:send_message).once
       @message.path_type = "sms"
       expect{@message.deliver}.not_to raise_error
     end
     it "processes sms message type" do
-      NotificationService.expects(:process).once
+      @queue.expects(:send_message).once
       @message.path_type = "sms"
       @message.to = "+18015550100"
       expect{@message.deliver}.not_to raise_error
     end
     it "processes push notification message type" do
-      NotificationService.expects(:process).once
+      @queue.expects(:send_message).once
       @message.path_type = "push"
       expect{@message.deliver}.not_to raise_error
+    end
+    it "throws error if cannot connect to queue" do
+      @queue.stubs(:send_message).raises(AWS::SQS::Errors::ServiceError)
+      expect{@message.deliver}.to raise_error(AWS::SQS::Errors::ServiceError)
+      expect(@message.transmission_errors).to include("AWS::SQS::Errors::ServiceError")
+      expect(@message.workflow_state).to eql("staged")
     end
   end
 end
