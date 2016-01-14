@@ -251,6 +251,8 @@ pre.code {
   padding: 15px;
   border: 1px solid black;
   overflow: scroll;
+  background-color: #2A404D;
+  color: #fff;
 }
 
 div.syntaxhighlighter {

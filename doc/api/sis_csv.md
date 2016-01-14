@@ -198,8 +198,7 @@ student to be able to log in but just not participate, leave the student
 
 Sample:
 
-<pre>
-user_id,login_id,authentication_provider_id,password,first_name,last_name,short_name,email,status
+<pre>user_id,login_id,authentication_provider_id,password,first_name,last_name,short_name,email,status
 01103,bsmith01,,,Bob,Smith,Bobby Smith,bob.smith@myschool.edu,active
 13834,jdoe03,google,,John,Doe,,john.doe@myschool.edu,active
 13aa3,psue01,7,,Peggy,Sue,,peggy.sue@myschool.edu,active
@@ -244,8 +243,7 @@ references it.
 
 Sample:
 
-<pre>
-account_id,parent_account_id,name,status
+<pre>account_id,parent_account_id,name,status
 A001,,Humanities,active
 A002,A001,English,active
 A003,A001,Spanish,active
@@ -291,8 +289,7 @@ interface, this is called the SIS ID.</td>
 
 Sample:
 
-<pre>
-term_id,name,status,start_date,end_date
+<pre>term_id,name,status,start_date,end_date
 T001,Winter2011,active,,
 T002,Spring2011,active,2013-1-03 00:00:00,2013-05-03 00:00:00-06:00
 T003,Fall2011,active,,
@@ -359,8 +356,7 @@ override the term end date.</p>
 
 Sample:
 
-<pre>
-course_id,short_name,long_name,account_id,term_id,status
+<pre>course_id,short_name,long_name,account_id,term_id,status
 E411208,ENG115,English 115: Intro to English,A002,,active
 R001104,BIO300,"Biology 300: Rocking it, Bio Style",A004,Fall2011,active
 A110035,ART105,"Art 105: ""Art as a Medium""",A001,,active
@@ -414,8 +410,7 @@ set, it will override the course and term end dates.</p>
 
 Sample:
 
-<pre>
-section_id,course_id,name,status,start_date,end_date
+<pre>section_id,course_id,name,status,start_date,end_date
 S001,E411208,Section 1,active,,
 S002,E411208,Section 2,active,,
 S003,R001104,Section 1,active,,
@@ -485,8 +480,7 @@ but will not be able to view or participate in the course until the enrollment i
 
 Sample:
 
-<pre>
-course_id,user_id,role,section_id,status
+<pre>course_id,user_id,role,section_id,status
 E411208,01103,student,1B,active
 E411208,13834,student,2A,active
 E411208,13aa3,teacher,2A,active
@@ -527,8 +521,7 @@ the root account.</td>
 
 Sample:
 
-<pre>
-group_id,account_id,name,status
+<pre>group_id,account_id,name,status
 G411208,A001,Group1,available
 G411208,,Group2,available
 G411208,,Group3,deleted
@@ -562,8 +555,7 @@ groups_membership.csv
 
 Sample:
 
-<pre>
-group_id,user_id,status
+<pre>group_id,user_id,status
 G411208,U001,accepted
 G411208,U002,accepted
 G411208,U003,deleted
@@ -605,8 +597,7 @@ provide more information about the cross-listed course, please do so in courses.
 
 Sample:
 
-<pre>
-xlist_course_id,section_id,status
+<pre>xlist_course_id,section_id,status
 E411208,1B,active
 E411208,2A,active
 E411208,2A,active

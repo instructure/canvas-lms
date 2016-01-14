@@ -25,11 +25,15 @@ POST and PUT requests may also optionally be sent in <a href="http://www.json.or
 
 As an example, this HTML form request:
 
-    name=test+name&file_ids[]=1&file_ids[]=2&sub[name]=foo&sub[message]=bar
+```bash
+name=test+name&file_ids[]=1&file_ids[]=2&sub[name]=foo&sub[message]=bar
+```
 
 would translate into this JSON request:
 
-    { "name": "test name", "file_ids": [1,2], "sub": { "name": "foo", "message": "bar" } }
+```json
+{ "name": "test name", "file_ids": [1,2], "sub": { "name": "foo", "message": "bar" } }
+```
 
 With either encoding, all timestamps are sent and returned in ISO 8601 format (UTC time zone):
 
@@ -44,11 +48,15 @@ query string or POST parameters is also supported.
 
 OAuth2 Token sent in header:
 
-    curl -H "Authorization: Bearer <ACCESS-TOKEN>" https://canvas.instructure.com/api/v1/courses
+```bash
+curl -H "Authorization: Bearer <ACCESS-TOKEN>" "https://canvas.instructure.com/api/v1/courses"
+```
 
 OAuth2 Token sent in query string:
 
-    curl https://canvas.instructure.com/api/v1/courses?access_token=<ACCESS-TOKEN>
+```bash
+curl "https://canvas.instructure.com/api/v1/courses?access_token=<ACCESS-TOKEN>"
+```
 
 Read more about <a href="oauth.html">OAuth2 and how to get access tokens.</a>
 
@@ -73,5 +81,6 @@ itself. You can generate this documentation yourself if you've set up a
 local Canvas environment following the instructions on <a href="https://www.github.com/instructure/canvas-lms/wiki">Github</a>,
 run the following command from your Canvas directory:
 
-    bundle exec rake doc:api
-
+```bash
+bundle exec rake doc:api
+```

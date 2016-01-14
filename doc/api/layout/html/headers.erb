@@ -2,8 +2,16 @@
 <meta charset="UTF-8">
 <title><%= options[:page_title] %></title>
 <link rel="stylesheet" href="<%= url_for("css/common.css") %>" type="text/css" media="screen" charset="utf-8" />
-<link href="<%= url_for("css/shThemeDefault.css") %>" rel="stylesheet" type="text/css" />
-<script src="<%= url_for("js/shCore.js") %>" type="text/javascript"></script>
+<link href="<%= url_for("css/prettify.css") %>" rel="stylesheet" type="text/css" media="screen" />
 <script src="<%= url_for("js/jquery.min.js") %>" type="text/javascript"></script>
-<script src="<%= url_for("js/shAutoloader.js") %>" type="text/javascript"></script>
-<script src="<%= url_for("js/shBrushJScript.js") %>" type="text/javascript"></script>
+<script src="<%= url_for("js/prettify.js") %>" type="text/javascript"></script>
+<script type="text/javascript">
+$(function() {
+  // set up pretty-printing in static docs generated from .md files
+  $('pre.code.bash').addClass('prettyprint language-bash');
+  $('pre.code.html').addClass('prettyprint language-html');
+  $('pre.code.xml').addClass('prettyprint language-xml');
+  $('pre.code.json').addClass('prettyprint language-json');
+  prettyPrint();
+});
+</script>
