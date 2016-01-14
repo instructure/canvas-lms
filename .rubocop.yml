@@ -68,7 +68,7 @@ Style/IndentHash:
   Enabled: false
 Style/DoubleNegation:
   Enabled: false
-Style/TrailingComma:
+Style/TrailingCommaInLiteral:
   Enabled: false
 Style/MethodCallParentheses:
   Enabled: false
