@@ -1,4 +1,5 @@
 require File.expand_path(File.dirname(__FILE__) + '/helpers/gradebook2_common')
+require File.expand_path(File.dirname(__FILE__) + '/gradebook_student_common')
 
 describe 'Student Gradebook' do
   include_context "in-process server selenium tests"
@@ -201,6 +202,69 @@ describe 'Student Gradebook' do
 
       get "/courses/#{published_course.id}/assignments/#{assignment.id}"
       expect(fj('.comments.module p')).to include_text('You may not see all comments right now because the assignment is currently being graded.')
+    end
+  end
+
+  describe "Arrange By dropdown" do
+    before :all do
+      course_with_student(name: "Student", active_all: true)
+
+      # create multiple assignments in different modules and assignment groups
+      group0 = @course.assignment_groups.create!(name: "Physics Group")
+      group1 = @course.assignment_groups.create!(name: "Chem Group")
+
+      @assignment0 = @course.assignments.create!(
+        name: "Physics Alpha Assign",
+        due_at: Time.now.utc + 3.days,
+        assignment_group: group0,
+      )
+
+      @quiz = @course.quizzes.create!(
+        title: "Chem Alpha Quiz",
+        due_at: Time.now.utc + 5.days,
+        assignment_group_id: group1.id
+      )
+      @quiz.publish!
+
+      assignment = @course.assignments.create!(
+        due_at: Time.now.utc + 5.days,
+        assignment_group: group0
+      )
+
+      @discussion = @course.discussion_topics.create!(
+        assignment: assignment,
+        title: "Physics Beta Discussion"
+      )
+
+      @assignment1 = @course.assignments.create!(
+        name: "Chem Beta Assign",
+        due_at: Time.now.utc + 6.days,
+        assignment_group: group1
+      )
+
+      module0 = ContextModule.create!(name: "Beta Mod", context: @course)
+      module1 = ContextModule.create!(name: "Alpha Mod", context: @course)
+
+      module0.content_tags.create!(context: @course, content: @quiz, tag_type: 'context_module')
+      module0.content_tags.create!(context: @course, content: @assignment0, tag_type: 'context_module')
+      module1.content_tags.create!(context: @course, content: @assignment1, tag_type: 'context_module')
+      module1.content_tags.create!(context: @course, content: @discussion, tag_type: 'context_module')
+    end
+
+    context "as a student" do
+      it_behaves_like 'Arrange By dropdown', 'student'
+    end
+
+    context "as a teacher" do
+      it_behaves_like 'Arrange By dropdown', 'teacher'
+    end
+
+    context "as an admin" do
+      it_behaves_like 'Arrange By dropdown', 'admin'
+    end
+
+    context "as a ta" do
+      it_behaves_like 'Arrange By dropdown', 'ta'
     end
   end
 end
