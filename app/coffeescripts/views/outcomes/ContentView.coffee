@@ -139,9 +139,8 @@ define [
 
     renderNoOutcomeWarning: =>
       @$el?.empty()
-      contextPath = htmlEscape(@_contextPath())
       noOutcomesLinkLabel = I18n.t("You have no outcomes. Click here to go to the outcomes page.")
-      @$el?.append($.raw(noOutcomesWarning(addOutcomesUrl: "/#{contextPath}/outcomes", noOutcomesLinkLabel: noOutcomesLinkLabel)))
+      @$el?.append($.raw(noOutcomesWarning(addOutcomesUrl: "/#{@_contextPath()}/outcomes", noOutcomesLinkLabel: noOutcomesLinkLabel)))
 
     clearNoOutcomeWarning: =>
       @$el?.empty()
