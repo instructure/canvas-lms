@@ -34,7 +34,7 @@ hy:
       one: "% {count}  օգտագործողներ"
   GroupUserCollection: 
     flash: 
-      userAlreadyInGroup: "ՆԱԽԱԶԳՈՒՇԱՑՈՒՄ. %{user} արդեն %{group} անդամ է"
+      userAlreadyInGroup: "ՆԱԽԱԶԳՈՒՇԱՑՈՒՄ. %{user} արդեն %{group}ի անդամ է"
   LongTextEditor: 
     cancel: "Չեղյալ համարել"
     save: Պահպանել
@@ -54,8 +54,8 @@ hy:
     no_api_key: "Ակադեմիական ստանդարտների օգտագործման համար պահանջվում է API բանալին:"
     no_authority: "Հնարավոր չէր գտնել թարմացման լիազորությունները: "
     no_file: "Տրված չէ վերջնական արդյունքների ֆայլը կամ լիազորությունները"
-    no_permissions: "Օգտագործողին չի թույլատրվում խմբագրել ընդհանուր արդյունքները"
-    no_perms: "Օգտագործողին չի թույլատրվում խմբագրել ընդհանուր արդյունքները"
+    no_permissions: "Օգտատիրոջը չի թույլատրվում խմբագրել ընդհանուր արդյունքները"
+    no_perms: "Օգտատիրոջը չի թույլատրվում խմբագրել ընդհանուր արդյունքները"
     plugin_settings: 
       api_url_description: "(օր.՝ %{url})"
       description: "Դուք պետք է մուտք գործեք  [Academic Benchmark](%{url}) հաշիվը"
@@ -94,14 +94,14 @@ hy:
     tab_outcomes: Արդյունքներ
     tab_permissions: Թույլտվություններ
     tab_plugins: "Միացվող մոդուլներ"
-    tab_question_banks: "Հարցերի \"բանկեր\""
+    tab_question_banks: "Հարցերի շտեմարաններ"
     tab_rubrics: Բաժիններ
     tab_settings: Կարգաբերումներ
     tab_sis_import: "SIS ներմուծում"
     tab_statistics: Վիճակագրություն
     tab_sub_accounts: Ենթահաշիվներ
     tab_terms: Ժամանակահատված
-    tab_users: Օգտագործողներ
+    tab_users: Օգտատերեր
     turnitin_pledge: "Այս ուղարկվող հանձնարարությունը իմ սեփական աշխատանքն է "
   account_97b34646: Հաշիվ
   account_authorization_config: 
@@ -128,21 +128,21 @@ hy:
       no_auth_type_description: "Այս հաշիվը ներկայումս ինտեգրված չէ նույնականացման պրովայդերի հետ"
       page_title: "Իսկության հաստատման կարգաբերումներ"
       profile_page_link_example: "Օրինակ՝ Ձեր պրոֆիլի էջ [%{friendlyname}](%{url})"
-      settings_description: "Օգտագործողի իսկությունը նույնականացման արտաքին պրովայդերի (IdP) միջոցով հաստատելու համար օգտագործողը պետք է ունենա հաշվի հետ կապված մուտքի նույնականացուցիչ, որը համապատասխանում է  IdP-ի կողմից վերադարձված եզակի նույնականացուցչին: Օգտագործողի կողմից մուտքի ընթացիկ լոգինը տես օգտագործողի պրոֆիլի էջի  \"Լոգին-տեղեկություններ\" բաժնում: (Կարելի է գտնել, փնտրելով \"Օգտագործողներ\" ներդիրում): "
+      settings_description: "Օգտատիրոջ ինքնությունը նույնականացման արտաքին պրովայդերի (IdP) միջոցով հաստատելու համար օգտատերը պետք է ունենա հաշվի հետ կապված մուտքի նույնականացուցիչ, որը համապատասխանում է  IdP-ի կողմից վերադարձված եզակի նույնականացուցչին: Օգտատիրոջ կողմից մուտքի ընթացիկ լոգինը տես օգտագործողի պրոֆիլի էջի  \"Լոգին-տեղեկություններ\" բաժնում: (Կարելի է գտնել, փնտրելով \"Օգտատերեր\" ներդիրում): "
       settings_title: "Իսկության հաստատման կարգաբերումներ"
       test_ldap_link: "Փորձել  LDAP  իսկության ստուգումը"
     ldap_fields: 
-      auth_filter_description: "Օգտագործեք *%{placeholder}* որպես օգտագործողի կողմից նշված նրա անվան լրացման դաշտ: Օրինակ՝  *(sAMAccountName=%{placeholder})*"
-      identifer_format_description: "LDAP ատրիբուտն օգտագործվում է Canvas համակարգ մուտք փնտրելու համար: Թողեք դատարկ, որպեսզի օգտագործեք օգտագործողի կողմից տրամադրված օգտագործողի անունը: "
+      auth_filter_description: "Օգտագործեք *%{placeholder}* որպես օգտատիրոջ կողմից նշված նրա անվան լրացման դաշտ: Օրինակ՝  *(sAMAccountName=%{placeholder})*"
+      identifer_format_description: "LDAP ատրիբուտն օգտագործվում է Canvas համակարգ մուտք փնտրելու համար: Թողեք դատարկ, որպեսզի օգտագործեք օգտատիրոջ կողմից տրամադրված օգտատիրոջ անունը: "
       ldap_timeout_failure_help2: "Եթե Canvas չափազանց շատ անգամ ընդհատում է կապը LDAP սերվերի հետ, այն %{time} ժամանակով  կարգելափակի այդ LDAP սերվերի միջոցով համակարգ մուտք գործելու փորձերը: Ձեր LDAP սերվերը վերջին անգամ ընդհատել է կապը  %{timestamp}:"
     ldap_settings_test: 
       labels: 
         pass: Գաղտնաբառ
-        user: "Օգտագործողի անուն"
+        user: "Օգտատիրոջ անուն"
       ldap_test_login_button: "Համակարգ մուտքի ստուգում"
       test_ldap_bind_help_body: "LDAP սերվերը մերժել է կապվելու փորձը: Պետք է դիտարկել հետևայլը."
       test_ldap_bind_help_fixes_1: "Ստուգել ֆիլտրի տրված պարամետրերը (օր.՝ '(sAMAccountName={{login}})')."
-      test_ldap_bind_help_fixes_2: "Արդյո՞ք օգտագործողի անվան համար պահանջվում է լրացուցիչ տեղեկատվություն (օր.՝ 'cn=Canvas,ou=people,dc=example,dc=com'):"
+      test_ldap_bind_help_fixes_2: "Արդյո՞ք օգտատիրոջ անվան համար պահանջվում է լրացուցիչ տեղեկատվություն (օր.՝ 'cn=Canvas,ou=people,dc=example,dc=com'):"
       test_ldap_bind_help_header: "Canvas-ը չի կարող կապվել (մուտք գործել) LDAP սերվերի հետ"
       test_ldap_bind_label: "LDAP կապի ստուգում..."
       test_ldap_connection_help_body: "Միացումը մերժվել է կամ ժամանակը սպառվել է: Պետք է դիտարկել հետևյալը."
@@ -153,9 +153,9 @@ hy:
       test_ldap_connection_label: "Միացման ստուգում..."
       test_ldap_dialog_close: Փակել
       test_ldap_dialog_page_title: "Ստուգվում է LDAP-ի կոնֆիգուրացիան"
-      test_ldap_login_form_header: "Համակարգ մուտքի փորձակման համար տվեք LDAP օգտագործողի ընդունելի անուն/գաղտնաբառ"
+      test_ldap_login_form_header: "Համակարգ մուտքի փորձակման համար տրամադրեք LDAP օգտատիրոջ ընդունելի անուն/գաղտնաբառ"
       test_ldap_login_help_header: "LDAP սերվերը մերժել է ձեր իրավասությունները"
-      test_ldap_login_label: "Համակարգ օգտագործողի մուտքի փորձարկում"
+      test_ldap_login_label: "Համակարգ օգտատիրոջ մուտքի փորձարկում"
       test_ldap_search_help_body: "Որոնումները կամ ձախողվեցին կամ չտվեցին ոչ մի արդյունք: Դիտարկման համար պետք է՝"
       test_ldap_search_help_fixes_1: "Ստուգել ֆիլտրի տրված պարամետրերը (օր.՝ '(sAMAccountName={{login}})')."
       test_ldap_search_help_fixes_2: "Ստուգել տրված որոնումների բազան (օր.՝'ou=people,dc=example,dc=com'): "
@@ -193,9 +193,9 @@ hy:
         idp_response_xml_decrypted: "IdP մուտքի պատասխանը ապակոդավորված է"
         idp_response_xml_encrypted: "IdP մուտքի պատասխանը կոդավորված է"
         is_valid_login_response: "Canvas-ը կարծում է, որ պատասխանը ընդունելի է"
-        logged_in_user_id: "Մուտք օգտագործողի նույնականացուցիչ "
+        logged_in_user_id: "Օգտատիրոջ՝ մուտք գործելու նույնականացուցիչ "
         login_response_validation_error: "Իսկության հաստատման սխալ"
-        login_to_canvas_success: "Օգտագործողը հաջողությամբ մուտք է գործել Canvas"
+        login_to_canvas_success: "Օգտատերը հաջողությամբ մուտք է գործել Canvas"
         logout_request_id: "Ելքի համար պահանջվում է օգտագործողի նույնականացուցիչը"
         logout_to_idp_url: "Ելքի պահանջի կոդավորված URL"
         logout_to_idp_xml: "IdP-ին ուղարկված ելքի պահանջ XML"
@@ -207,9 +207,9 @@ hy:
       logout_response_from_idp: "Ելքի պատասխանը IdP-ից"
     sso_settings_form: 
       change_password_url_help: "Թողեք դատարկ՝ Canvas-ի ըստ լռության ընդունված գործողությունների համար"
-      discovery_url_description: "Եթե սահմանված է discovery URL-հասցեն, Canvas բոլոր օգտագործողներին կուղարկի URL այդ հասցեով, երբ նրանք կարիք ունենան իսկության ստուգման: Այդ էջը կօգնի օգտագործողներին հասկանալ, ուր պետք է նրանք գնան համակարգ մուտք գործելու համար: Եթե ոչ մի discovery URL կարգաբերված չէ, առաջին կոնֆիգուրացիան պետք է օգտագործվի փորձելու համար ստուգել օգտագործողի իսկությունը: "
-      login_handle_name_description: "Տարբերանիշն օգտագործվում է մուտքի յուրօրինակ նույնականացուցիչների համար: Օրինակ՝ Մուտք, Օգտագործողի անուն, Ունկնդրի նույնականացուցիչ և այլն"
-      unknown_user_url_description: "Url-հասցե վերահասցեագրելու համար, երբ իսկությունը հաստատված օգտագործողը չի գտնվել canvas-ում:"
+      discovery_url_description: "Եթե սահմանված է discovery URL-հասցեն, Canvas համակարգը բոլոր օգտատերերին կուղարկի URL այդ հասցեով, երբ նրանք կարիք ունենան իսկության ստուգման: Այդ էջը կօգնի օգտատերերին հասկանալ, ուր պետք է նրանք գնան համակարգ մուտք գործելու համար: Եթե ոչ մի discovery URL կարգաբերված չէ, առաջին կոնֆիգուրացիան պետք է օգտագործվի փորձելու համար ստուգել օգտատիրոջ իսկությունը: "
+      login_handle_name_description: "Տարբերանիշն օգտագործվում է մուտքի յուրօրինակ նույնականացուցիչների համար: Օրինակ՝ Մուտք, Օգտատիրոջ անուն, Ունկնդրի նույնականացուցիչ և այլն"
+      unknown_user_url_description: "Url-հասցե վերահասցեագրելու համար, երբ իսկությունը հաստատված օգտատերը չի գտնվել canvas համակարգում:"
   account_name_13ed649: "%{account_name}"
   account_name_analytics_62bf60ae: "%{account.name} Վերլուծություններ"
   account_navigation_80bbefd4: "Հաշվի նավարկում"
@@ -258,7 +258,7 @@ hy:
     report_header_canvas_parent_id: canvas_parent_id
     report_header_canvas_section_id: canvas_section_id
     report_header_canvas_term_id: canvas_term_id
-    report_header_canvas_user_id: canvas_user_id
+    report_header_canvas_user_id: "canvas համակարգի_օգտատիրոջ_նույնականացուցիչ"
     report_header_canvas_xlist_course_id: canvas_xlist_course_id
     report_header_course: Դասընթաց
     report_header_course__id: "դասընթացի նույնականացուցիչ"
@@ -317,11 +317,11 @@ hy:
     report_header_term_id: "սեմեստրի նույնականացուցիչ"
     report_header_term_sis: "սեմեստրի sis"
     report_header_token_last_used: "Օգտագործվել է վերջին անգամ"
-    report_header_user__id: user_id
-    report_header_user_id: "օգտագործողի նույնականացուցիչ"
-    report_header_user_name: "օգտագործողի անուն"
+    report_header_user__id: օգտատիրոջ_նույնականացուցիչ
+    report_header_user_id: "օգտատիրոջ նույնականացուցիչ"
+    report_header_user_name: "օգտատիրոջ անուն"
     report_header_user_short_name: short_name
-    report_header_user_sis_id: "sis օգտագործողի նույնականացուցիչ"
+    report_header_user_sis_id: "sis օգտատիրոջ նույնականացուցիչ"
     report_header_xlist_course_id: xlist_course_id
     sis_exporter: 
       reports: "Հաշվետվություններ %{files}"
@@ -349,7 +349,7 @@ hy:
       configure_report: "Կարգաբերել հաշվետվությունը"
       open_registration_delegated_warning_dialog: "Արտաքին նույնականացման պրովայդերը միացվել է"
       what_are_quiz_ip_filters: "Ի՞նչ է թեստի IP ֆիլտրը:"
-    user: Օգտագործող
+    user: Օգտատեր
   account_surveys_b0039876: "Հաշիվների հետազոտություններ"
   account_user: 
     types: 
@@ -365,8 +365,8 @@ hy:
     add_course_or_user: 
       add_course_button: "Ավելացնել դասընթաց"
       add_course_link: "Ավելացնել նոր դասընթաց"
-      add_user_button: "Ավելացնել օգտագործողի"
-      add_user_link: "Ավելացնել նոր օգտագործողի"
+      add_user_button: "Ավելացնել օգտատեր"
+      add_user_link: "Ավելացնել նոր օգտատեր"
       display_name_help: "Մարդիկ կտեսնեն այս անունը քննարկումներում, հաղորդագրություններում և մեկնաբանություններում:"
       full_name_description: "Այս անունը դասավանդողներն օգտագործելու են գնահատականներ նշանակելիս:"
       labels: 
@@ -376,16 +376,16 @@ hy:
         full_name: "Ամբողջ Անունը"
         name: "Դասընթացի անվանումը"
         path: Էլ.փոստ
-        send_confirmation: "Էլ.փոստի միջոցով օգտագործողին տեղեկացրեք այս հաշվի ստեղծման մասին:"
+        send_confirmation: "Էլ.փոստի միջոցով օգտատիրոջը տեղեկացնել այս հաշվի ստեղծման մասին:"
         short_name: "Ցույց տալ անունը"
         sis_user_id: "Համակարգի ID"
         sortable_name: "Սորտավորվող անուն"
       sortable_name_help: "Այս անունը հայտնվում է սորտավորված ցուցակում"
       unique_id_label_1: "%{label}:"
-    add_user_button: "Ավելացնել օգտագործողի"
-    add_user_dialog_title: "Ավելացնել նոր օգտագործողի"
+    add_user_button: "Ավելացնել օգտատեր"
+    add_user_dialog_title: "Ավելացնել նոր օգտատեր"
     adding_course_message: "Նոր դասընթացի ներառում․․․"
-    adding_user_message: "Նոր օգտագործողի ներառում..."
+    adding_user_message: "Նոր օգտատիրոջ ընդգրկում..."
     additional_settings: 
       account_status: "Հաշվի գրառման կարգավիճակ"
       add_new_domain: "Նոր դոմենի ավելացում"
@@ -409,7 +409,7 @@ hy:
       admin_tools_cumb: "Ադմինիստրատորի գործիքներ"
       admin_tools_title: "Ադմինիստրատորի գործիքները"
       auth_logging_content_pane: 
-        auth_logging: "Օգտագործողի մուտքերի/ելքերի ակտիվությունը"
+        auth_logging: "Օգտատիրոջ մուտքերի/ելքերի ակտիվությունը"
       auth_logging_search_results: 
         activity: Ակտիվություն
         date: Ամսաթիվ
@@ -422,7 +422,7 @@ hy:
         sent_at: Ուղարկել
         to: Ում
       comm_messages_content_pane: 
-        search_info2: "Canvas-ի օգտագործողին ուղարկված բոլոր ծանուցումները դիտելու համար ընտրեք օգտագործողին և որոնման ամսաթվերի տիրույթը  "
+        search_info2: "Canvas համակարգի օգտատիրոջն ուղարկված բոլոր ծանուցումները դիտելու համար ընտրեք օգտատիրոջը և որոնման ամսաթվերի տիրույթը  "
         view_notifications: "Դիտել ծանուցումները"
       comm_messages_search_overview: 
         messages_viewed: "Ծանուցումն ուղարկվել է *%{user}*  *%{start_date}*-ից մինչև *%{end_date}*."
@@ -447,7 +447,7 @@ hy:
         reset_from_label: "Սկզբնական Վիճակին Բերել Սկսած"
         reset_to_label: "Սկզբնական Վիճակին Բերել Դեպի"
         time: Ժամը
-        user: Օգտագործող
+        user: Օգտատեր
       course_logging_item: 
         blank_placeholder: "-"
         view_event_details: "Դիտել մանրամասները"
@@ -458,7 +458,7 @@ hy:
         event_type: Տեսակ
         no_item_found: "Ոչինչ չի գտնվել"
         time: Ժամը
-        user: Օգտագործող
+        user: Օգտատեր
       course_search_form: 
         course_id: "Դասընթացի նույնականացուցիչ"
         labels: 
@@ -519,7 +519,7 @@ hy:
       page_title: "Ադմինիստրատորի գործիքները %{account} համար"
       user_date_range_search_form: 
         find: Գտնել
-        generate_activity_userid: "Օգտագործողի նույնականացուցիչ՝ *%{user_id}*"
+        generate_activity_userid: "Օգտատիրոջ նույնականացուցիչ՝ *%{user_id}*"
         generate_activity_username: "*%{user}* համար ստեղծել ակտիվություն"
         message_date_from: "սկսված ամսաթից"
         message_date_to: "մինչև ամսաթիվը"
@@ -579,13 +579,13 @@ hy:
           filter_online: 
             check_box: "Միայն առցանց դասերի համար"
     confirm_delete_user: 
-      confirm_delete: "Դուք համոզվա՞ծ եք, որ ցանկանում եք հեռացել տվյալ օգտագործողին հաշվից %{account}: Օգտագործողի տվյալները (այդ թվում՝ գնահատականները) կջնջվեն բոլոր դասընթացներից և խմբերից: Դա հնարավոր չէ վերականգնել:"
+      confirm_delete: "Դուք իսկապե՞ս ցանկանում եք հեռացնել տվյալ օգտատիրոջը հաշվից %{account}: Օգտատիրոջ տվյալները (այդ թվում՝ գնահատականները) կջնջվեն բոլոր դասընթացներից և խմբերից: Դա հնարավոր չէ վերականգնել:"
       delete_button: "Ջնջել %{user}"
       page_title: "Հաստատեք ջնջելու գործողությունը"
     course: 
       course_unpublished_title: "Այս դասընթացը դեռևս հրապարակված չէ"
       course_unpublished_tooltip: "Հրապարակված չէ"
-      homepage_link: "Տնային էջ"
+      homepage_link: "Հիմնական էջ"
       more_count: 
         one: "1-ով ավելի"
         other: "%{count} ավելի"
@@ -670,12 +670,12 @@ hy:
       account_reports: 
         default: 
           last_enrollment_activity: 
-            text: "Այս հաշվետվության մեջ ցույց է տրվում վերջին ակտիվությունը օգտագործողների գրանցումներում։"
+            text: "Այս հաշվետվությունը ցույց է տալիս օգտատերերի գրանցումների վերջին ակտիվությունը։"
     last_user_access_csv_description: 
       account_reports: 
         default: 
           last_user_access: 
-            text: "Այս հաշվետվության մեջ ցույց է տրվում ակտիվ օգտագործողների կողմից վերջին մուտքը համակարգ"
+            text: "Այս հաշվետվությունը ցույց է տալիս ակտիվ օգտատերերի կողմից վերջին մուտքը համակարգ"
     learning_outcome_assignment_type_csv_parameters: 
       account_reports: 
         samuel_merrit_university: 
@@ -693,13 +693,13 @@ hy:
           sections: 
             check_box: "Բաժինների CSV ֆայլ"
           users: 
-            check_box: "Oգտագործողների CSV ֆայլ"
-    no_user_message: "Այդ նույնականացուցչով օգտագործող չի գտնվել"
+            check_box: "Oգտատերերի CSV ֆայլ"
+    no_user_message: "Այդ նույնականացուցչով օգտատեր չի գտնվել"
     outcome_results_csv_description: 
       account_reports: 
         outcomes: 
           description: 
-            text: "Այս հաշվետվության մեջ ցույց են տրվում բոլոր ունկնդիրների վերջնական գնահատականները: Վերջնական CSV ֆայլում մեկ տող է հատկացվում մեկ օգտագործողի վերջնական գնահատականի համար, դրանում ցույց են տրվում արդյունքների մանրամասները, այդ թվում՝ համապատասխան հանձնարարությունները:  "
+            text: "Այս հաշվետվությունը ցույց է տալիս բոլոր ունկնդիրների վերջնական գնահատականները: Վերջնական CSV ֆայլում մեկ տող է հատկացվում մեկ օգտատիրոջ վերջնական գնահատականի համար, որը ցույց է տալիս արդյունքների մանրամասները, այդ թվում՝ համապատասխան հանձնարարությունները:  "
     outcome_results_csv_parameters: 
       account_reports: 
         outcomes: 
@@ -790,19 +790,19 @@ hy:
       alert_timespan: "%{start_at}-ից մինչև %{end_at}"
       alerts_title: Զգուշացումներ
       announcement_blank_to_all: "(Եթե ոչ մեկը ընտրված չէ, ուղարկել յուրաքանչյուրին)"
-      announcement_sent_to_roles: "Ուղարկել միայն հետևյալ տեսակի օգտագործողներին՝"
-      announcement_sent_to_subset: "Ամեն ամիս ուղարկված է 1/%{denominator} օգտագործողների "
+      announcement_sent_to_roles: "Ուղարկել միայն հետևյալ տեսակի օգտատերերին՝"
+      announcement_sent_to_subset: "Յուրաքանչյուր ամիս ուղարկված է 1/%{denominator} օգտատիրոջ"
       buttons: 
-        add_users: "Ok,  ավելացնել այդ օգտագործողներին"
+        add_users: "Ok,  ավելացնել այդ օգտատերերին"
         continue: Շարունակել...
-        modify_users: "Վերադառնալ և խմբագրել օգտագործողների ցուցակը"
-      confirm_global_announcement: "Այս հայտարարությունը ցույց է տրվելու Canvas-ի *բոլոր* օգտագործողներին: Հաստատեք, որ իսկապես ցանկանում եք ստեղծել այն:"
+        modify_users: "Վերադառնալ և խմբագրել օգտատերերի ցուցակը"
+      confirm_global_announcement: "Այս հայտարարությունը տեսանելի է լինելու Canvas-ի *բոլոր* օգտատերերին: Հաստատեք, որ իսկապես ցանկանում եք ստեղծել այն:"
       confirm_turnitin_settings_link: "հաստատել Turnitin կարգաբերումները"
       course_roles: "Դասընթացի դերը՝"
       create_courses_description: "(Հաշվի գրառման ադմինիստրատորները միշտ կարող են ստեղծել դասընթացներ)"
       create_courses_title: "Ով կարող է ստեղծել նոր դասընթացներ"
       custom_links_to_include_in_the_help_dialog_popup: "Կարգաբերել հղումները, որպեսզի դրանք ներառվեն օգնության դիալոգների պատուհանում"
-      default_language_description: "Սա կփոխի բրաուզերի/OS բոլոր լեզվական կարգաբերումները: Նախապատվելի լեզուները կարելի է սահմանել դասընթացի/օգտագործողի մակարդակներում:   "
+      default_language_description: "Սա կփոխի բրաուզերի/OS բոլոր լեզվական կարգաբերումները: Նախընտրելի լեզուները կարելի է նախանշել դասընթացի/օգտատիրոջ մակարդակներում:   "
       delete: Ջնջել
       delete_announcement_tooltip: "Ջնջել այս հայտարարությունը"
       email_notification_from_description: "Այս կարգաբերումները թույլ են տալիս ադմինիստրատորին այս հաշվին Canvas-ից ուղարկված բոլոր ծանուցումներում \"ումից\" տեքստը բրենդավորել կամ պիտակավորել "
@@ -827,10 +827,10 @@ hy:
       help_link_available_to_all_admins: Ադմինիստրատորներ
       help_link_available_to_all_students: Ունկնդիրներ
       help_link_available_to_all_teachers: Դասավանդողներ
-      help_link_available_to_all_users: Օգտագործողներ
+      help_link_available_to_all_users: Օգտատերեր
       if_you_would_like_to_link_to_your_own_campus_support_website_in_the_help_dialog_you_can_do_that_here: "Եթե դուք ցանկանում եք օգնության դիալոգի հղումով միանալ ձեր ուսանողական տարածքի օգնության կայքին, ապա դա կարող եք անել այստեղ:"
-      interpolate_account_domain: "Մուտքագրեք \"{{ACCOUNT_DOMAIN}}\" օգտագործողի հաշվի՝ հասանելիության առավելագույն իրավունքներով դոմենի փոխարինման համար"
-      interpolate_user_id: "Մուտքագրեք \"{{CANVAS_USER_ID}}\" փոխարինելու համար օգտագործողի եզակի Canvas նույնականացուցչին"
+      interpolate_account_domain: "Մուտքագրեք \"{{ACCOUNT_DOMAIN}}\" օգտատիրոջ հաշիվը՝ հասանելիության առավելագույն իրավունքներով դոմենի փոխարինման համար"
+      interpolate_user_id: "Մուտքագրեք \"{{CANVAS_USER_ID}}\" փոխարինելու համար օգտատիրոջ եզակի Canvas նույնականացուցչին"
       ip_filter_filter_label: Ֆիլտր
       ip_filter_name_label: Անուն
       labels: 
@@ -840,12 +840,12 @@ hy:
         allow_invitation_previews: "Հրավերների նախնական դիտում"
         allow_sending_scores_in_emails: "Ունկնդիրները կարող են ընտրել ծանուցումները էլ.փոստով ստանալու տարբերակը"
         allow_sis_import: "SIS ներմուծում"
-        author_email_in_notifications: "Ցույց տալ ուղարկողի էլ.փոստի հասցեն օգտագործողների փոխգործողությունների մասին ծանուցումների ուղարկման համար "
+        author_email_in_notifications: "Ցույց տալ ուղարկողի էլ.փոստի հասցեն օգտատերերի փոխգործողությունների մասին ծանուցումների ուղարկման համար "
         canvas_authentication: "Canvas-ի իսկության հաստատում"
         default_language: "Լռությամբ ընդունված լեզուն "
         default_time_zone: "Լռությամբ ընդունված ժամային գոտին"
         domain: Դոմեն
-        edit_institution_email: "Օգտագործողները կարող են ջնջել հաստատությունների կողմից իրենց տրված էլ.փոստի հասցեները"
+        edit_institution_email: "Օգտատերերը կարող են ջնջել հաստատության կողմից իրենց տրված էլ.փոստի հասցեները"
         enable_alerts: "Ծանուցումներ (beta)"
         enable_eportfolios: "Էլ. պորտֆոլիոներ"
         enable_profiles: "Միացնել պրոֆիլները"
@@ -869,7 +869,7 @@ hy:
         mfa_settings: "Իսկության բազմաֆակտորային ստուգում"
         name: "Հաշվի անունը"
         new_sub_account_includes: "Թույլատրել ենթահաշիվների օգտագործումը Թեմայի խմբագրին հարմարեցնել իր սեփական բրենդինգին"
-        no_enrollments_can_create_courses: "Օգտագործողներ առանց գրանցման "
+        no_enrollments_can_create_courses: "Օգտատերեր առանց գրանցման "
         open_registration: "Բացել գրանցումը"
         outgoing_email_default_name_option_custom: "\"Ումից\" օգտագործողի անուն"
         outgoing_email_default_name_option_default: "Canvas-ի լռությամբ ընդունած կարգավորումները "
@@ -898,12 +898,12 @@ hy:
         turnitin_host: "Turnitin-ի հանգույց"
         turnitin_pledge: "Turnitin -ի երաշխավորություն"
         turnitin_shared_secret: "Turnitin-ի ընդհանուր գաղտնի բանալի"
-        users_can_edit_name: "Օգտագործողները կարող են խմբագրել իրենց անունները"
+        users_can_edit_name: "Օգտատերերը կարող են խմբագրել իրենց անունները"
       links: 
         add_admins: "Ավելացնել հաշիվների ադմինիստրատորներին"
         configure_report: Կարգաբերել...
         run_report: "Պատրաստել հաշվետվություն"
-      login_handle_name_placeholder: "օրինակ՝ մուտքային անուն, օգտագործողի անուն կամ ունկնդրի նույնականացուցիչ"
+      login_handle_name_placeholder: "օրինակ՝ մուտք գործելու անուն, օգտատիրոջ անուն կամ ունկնդրի նույնականացուցիչ"
       manual_quotas: 
         find_button: Գտնել
         manual_quotas_title: "Ձեռքով սահմանվող քվոտաներ"
@@ -914,7 +914,7 @@ hy:
         select_type_label: "Գտնել դասընթացը կամ խումբը"
         update_button: "Թարմացնել քվոտան"
       never_allow_self_enrollment_option: Երբեք
-      no_enrollment_roles: "Չգրանցված օգատագործողներ"
+      no_enrollment_roles: "Չգրանցված օգտատերեր"
       no_language_preference: "Սահմանված չէ (լռությամբ ընդունված է՝ %{language})"
       notifications: 
         custom_name_description: "Ընտրության դեպքում այն կփոխարինի Canvas-ի ծանուցումներում ուղարկված բոլոր մյուս բրենդինգները"
@@ -929,7 +929,7 @@ hy:
         from: Ումից
         sample_subject: "Գնահատականը փոխվել է, դիտել հարցումը, թեստը"
         subject: Առարկա
-      open_registration_delegated_warning_message: "Արտաքին նույնականացման պրովայդերը միացված է և բաց գրանցման միջոցով ստեղծված օգտագործողները կարող է հնարավորություն չունենան համակարգ մուտք գործել, բացառությամբ այն դեպքերի, երբ արտաքին նույնականացման պրովայդերի մուտքային անվան ձևը հղում ունենա դեպի  %{url}:"
+      open_registration_delegated_warning_message: "Արտաքին նույնականացման պրովայդերը միացված է, և բաց գրանցման միջոցով գրանցված օգտատերերը չեն կարող մուտք գործելհամակարգ, բացառությամբ այն դեպքերի, երբ արտաքին նույնականացման պրովայդերի մուտքային անվան ձևը հղում ունենա դեպի  %{url}:"
       open_registration_delegated_warning_tooltip: "Արտաքին նույնականացման պրովայդերը միացված է"
       open_report_description: "Բացել հաշվետվության նկարագրությունը"
       page_header_title: "Հաշիվների կարգաբերումներ"
@@ -945,7 +945,7 @@ hy:
         default_account_quota_title: "Հաշվի՝ լռությամբ ընդունված քվոտաներ"
         default_course_storage_quota: "Դասընթացի քվոտա"
         default_group_storage_quota: "Խմբի քվոտա"
-        default_user_storage_quota: "Օգտագործողի քվոտա"
+        default_user_storage_quota: "Օգտատիրոջ քվոտա"
         megabytes: մեգաբայթեր
         megabytes_tooltip: մեգաբայթեր
         update_button: Թարմացնել
@@ -960,7 +960,7 @@ hy:
       self_enroll_for_any_courses_option: "Բոլոր դասընթացների համար"
       self_enroll_for_manually_created_courses_option: "Ձեռքով ստեղծված դասընթացների համար"
       settings_crumb: Կարգաբերումներ
-      survey_announcement: "Սա հարցման անցկացման հայտարարություն է: Այն ուղարկվելու է ամեն ամիս 1/%{denominator} օգտագործողներին, ում հաշիվները ակտիվ են:  "
+      survey_announcement: "Սա հարցում անցկացնելու վերաբերյալ հայտարարություն է: Այն ուղարկվելու է յուրաքանչյուր ամիս 1/%{denominator} օգտատերերին, ում հաշիվները ակտիվ են:  "
       tab_admins: Ադմինիստրատորներ
       tab_alerts: Զգուշացումներ
       tab_announcements: Հայտարարություններ
@@ -998,7 +998,7 @@ hy:
       imported_items_title: "Ներմուծված տարրեր"
       sections_label: Բաժիններ
       terms_label: Ժամանակահատված
-      users_label: Օգտագործողներ
+      users_label: Օգտատերեր
     sis_batch_messages: 
       sis_batch_errors_title: "Սխալներ, որոնք խոչընդոտում են ներմուծմանը"
       sis_batch_warnings_title: Նախազգուշացումներ
@@ -1006,7 +1006,7 @@ hy:
       account_reports: 
         sis_export: 
           description: 
-            text: "SIS արտահանման հաշվետվություն. այս հաշվետվությունը արտահանում է Օգտագործողների, Հաշիվների, Սեմեստրների, Բաժինների, Գրանցումների, Խմբերի, Խմբերի Անդամակցության և Խաչաձև ցուցակների համար բոլոր անհրաժեշտ ֆայլերը համապատասխան կատեգորիաներում SIS ներմուծման նպատակով:  "
+            text: "SIS արտահանման հաշվետվություն. այս հաշվետվությունը արտահանում է Օգտատերերի, Հաշիվների, Սեմեստրների, Բաժինների, Գրանցումների, Խմբերի, Խմբերի Անդամակցության և Խաչաձև ցուցակների համար բոլոր անհրաժեշտ ֆայլերը համապատասխան կատեգորիաներում SIS ներմուծման նպատակով:  "
     sis_export_csv_parameters: 
       account_reports: 
         default: 
@@ -1026,7 +1026,7 @@ hy:
           terms: 
             check_box: "Սեմեստրի CSV ֆայլ"
           users: 
-            check_box: "Oգտագործողների CSV ֆայլ"
+            check_box: "Oգտատերերի CSV ֆայլ"
           xlist: 
             check_box: "Խաչաձև ցուցակի CSV ֆայլ"
         sis_default: 
@@ -1080,7 +1080,7 @@ hy:
         students: Ունկնդիրներ
         teachers: Դասավանդողներ
         uploaded_storage: "Ներբեռնված է"
-        users: Օգտագործողներ
+        users: Օգտատերեր
       last_logged_in_at: "Վերջին անգամ մուտքը համակարգ %{at}"
       loading_error: Սխալ
       loading_text: "բեռնվում է..."
@@ -1094,7 +1094,7 @@ hy:
       page_title: "Վիճակագրություն %{account} համար"
       recently_created_courses_title: "Վերջերս ստեղծված դասընթացներ"
       recently_ended_courses_title: "Վերջերս ավարտված դասընթացներ"
-      recently_logged_in_users_title: "Վերջերս համակարգ մուտք գործած օգտագործողներ"
+      recently_logged_in_users_title: "Վերջերս համակարգ մուտք գործած օգտատերեր"
       recently_started_courses_title: "Վերջերս մեկնարկած դասընթացներ"
       started_at: "սկսվել է %{at}"
       title_data_point_over_time: "%{data_point} ժամանակի ընթացքում"
@@ -1111,7 +1111,7 @@ hy:
       account_reports: 
         student_assignment_map: 
           description: 
-            text: "Այս հաշվետվությունը ցույց է տալիս բոլոր ունկնդիրների  գնահատականների վերջնական արդյունքները: Վերջնական CSV ֆայլում մեկ տող հատկացված է օգտագործող-արդյունք զույգին և ցույց է տալիս հանձնարարությունների վերջնական արդյունքները և չի ներառում հարցերի \"բանկի\" հետ կապված արդյունքները:"
+            text: "Այս հաշվետվությունը ցույց է տալիս բոլոր ունկնդիրների  գնահատականների վերջնական արդյունքները: Վերջնական CSV ֆայլում մեկ տող հատկացված է օգտատեր-արդյունք զույգին, ցույց է տալիս հանձնարարությունների վերջնական արդյունքները և չի ներառում հարցերի \"շտեմարանի\" հետ կապված արդյունքները:"
     student_grades_csv_parameters: 
       account_reports: 
         auburn: 
@@ -1178,10 +1178,10 @@ hy:
       account_reports: 
         default: 
           user_access_token: 
-            text: "Այս հաշվետվությունը ցույց է տալիս այն ունկնդիրներին, ովքեր ունեն հասանելի թոքեններ:"
-    user_add_failed_message: "Չհաջողվեց ավելացնել օգտագործողին, փորձեք նորից"
+            text: "Այս հաշվետվությունը ցույց է տալիս այն օգտատերերին, ովքեր ունեն հասանելի թոքեններ:"
+    user_add_failed_message: "Չհաջողվեց ավելացնել օգտատիրոջը, փորձեք կրկին"
     user_added_message: "*%{user}* հաջողությամբ ավելացվել է"
-    user_added_message_sent_message: "*%{user}* հաջողությամբ ավելացվել է: Շուտով էլ.հաղորդագրություն կստանա որպես հաստատում: "
+    user_added_message_sent_message: "*%{user}* հաջողությամբ ավելացվել է: Այդ փաստը կհաստատվի  էլ. փոստի միջոցով հաղորդագրություն ստանալու միջոցով: "
     user_inactivity_csv_parameters: 
       account_reports: 
         webster: 
@@ -1196,7 +1196,7 @@ hy:
       account_reports: 
         default: 
           zero_activity: 
-            text: "Այս հաշվետվությունը ներկայացնում է այն բոլոր ունկնդիրներին, որոնք գրանցվել են տվյալ սեմեստրոմ անցկացվող ցանկացած դասընթացներում: Վերջնական csv ֆայլում մեկ տող հատկացված է գրանցված այն ունկնդիրներին, ովքեր տվյալ ամսաթվից հետո չեն հաճախել դասընթացին:"
+            text: "Այս հաշվետվությունը ներկայացնում է այն բոլոր ունկնդիրներին, ովքեր գրանցվել են տվյալ սեմեստրում անցկացվող որեւէ դասընթացում: Վերջնական csv ֆայլում մեկ տող հատկացված է գրանցված այն ունկնդիրներին, ովքեր տվյալ ամսաթվից հետո չեն հաճախել դասընթացին:"
   achieve_mastery_count_times_8c9bbcec: "Յուրացումը հաջողվել է %{count} անգամ"
   actions_efcde10d: Գործողություններ
   activate_this_key_6cd98f4b: "Ակտիվացնել այս բանալին"
@@ -1236,7 +1236,7 @@ hy:
   add_remove_or_rearrange_sections_for_this_portfoli_4628320a: "Ավելացնել, ջնջել կամ վերադասավորել այս պորտֆոլիայի բաժինները"
   add_review_2fb1590c: "Ավելացնել կարծիք"
   add_section_8b027a1c: "Ավելացնել բաժին"
-  add_students_to_the_course_874be8fb: "Դասընթացում ավելացնել ունկնդիրների"
+  add_students_to_the_course_874be8fb: "Դասընթացում ավելացնել ունկնդիրներ"
   add_tas_to_the_course_2aac6e02: "Դասընթացին ավելացնել ասիստենտների"
   add_user_e73e8e50: "Ավելացնել օգտատեր"
   add_your_assignments_you_can_just_make_a_long_list_8a7862dd: "Ավելացնել Ձեր հանձնարարությունները: Դուք կարող եք պարզապես ստեղծել երկար ցանկ կամ էլ բաժանել դրանք խմբերի, դուք կարող եք նույնիսկ հանձնարարությունների յուրաքանչյուր խմբի համար նշել տեսակարար կշիռը:"
@@ -1302,7 +1302,7 @@ hy:
   all_configured_apps_a14eef0a: "Բոլոր կարգաբերված հավելվածները"
   all_courses_a7dbb853: "Բոլոր դասընթացներ"
   all_dates_fields_must_be_present_and_formatted_cor_3a0fe925: "Ամսաթվերի բոլոր դաշտերը պետք է առկա լինեն և ճիշտ ձևով ֆորմատավորված"
-  all_finished_time_to_publish_your_course_click_the_b6f07217: "Բոլորը ավարտե՞լ եք: Ժամանակն է հրապարակել ձեր հաշվետվությունը: Սեղմեք ներքևի կոճակը այն պաշտոնական դարձնելու համար: Հրապարակումը թույլ կտա օգտագործողներին սկսել մասնակցել դասընթացին:"
+  all_finished_time_to_publish_your_course_click_the_b6f07217: "Եթե բոլորը աշխատանքներն ավարտել եք, ապա կարող եք հրապարակել ձեր դասընթացը: Սեղմեք ներքևի կոճակը այն հրապարակելու համար: Հրապարակումը թույլ կտա օգտատերերին սկսել մասնակցությունը դասընթացին:"
   all_grading_periods_77974940: "Գնահատման բոլոր ժամանակահատվածները"
   all_grading_periods_must_have_a_title_a1a38d87: "Բոլոր գնահատման ժամանակահատվածները պետք է անվանում ունենան"
   all_groups_cea25817: "Բոլոր խմբեր"
@@ -1312,8 +1312,8 @@ hy:
   all_students_have_taken_the_survey_494f9f42: "Բոլոր ունկնդիրները սկսել են հարցումը"
   allow_a_moderator_to_review_multiple_independent_g_752c4b90: "Թույլ տալ մոդերատորին տեսնել նշված աշխատանքների տարբեր անկախ գնահատականներ"
   allow_bulk_grade_export_to_sis_e11a6e66: "Թույլ տալ Bulk Grade արտահանում դեպի SIS"
-  allow_lor_tools: "Թույլ տալ բոլոր օգտագործողներին դիտելու և օգտագործելու արտաքին գործիքները, որոնք LOR-ի համար կոնֆիգուրացիայի են ենթարկվել: "
-  allow_opt_out_of_inbox: "Թույլ տալ օգտագործողներին հրաժարվել խոսակցական մուտքային հաղորդագրություների արկղից: Սրա արդյունքում բոլոր խոսակցական հաղորդագրությունները և ծանուցումները կուղարկվեն որպես ASAP ծանուցումներ օգտագործողի էլեկտրոնային հիմնական հասցեին, ստացվող հաղորդագրությունների արկղում կանհետանա \"չկարդացված հաղորդագրություններ\" նշանը և ծանուցման նախապատվությունները:"
+  allow_lor_tools: "Թույլ տալ բոլոր օգտատերին դիտելու և օգտագործելու արտաքին գործիքները, որոնք LOR-ի համար կոնֆիգուրացիայի են ենթարկվել: "
+  allow_opt_out_of_inbox: "Թույլ տալ օգտատերին հրաժարվել խոսակցական մուտքային հաղորդագրությունների արկղից: Սրա արդյունքում բոլոր խոսակցական հաղորդագրությունները և ծանուցումներն անհապաղ կուղարկվեն օգտագործողի էլեկտրոնային փոստի հիմնական հասցեին, ստացվող հաղորդագրությունների արկղում կանհետանա \"չընթերցված հաղորդագրություններ\" նշանը և ծանուցման նախապատվությունները:"
   allow_students_to_see_who_has_signed_up_for_time_s_497f4a46: "Թույլ տալ ունկնդիրներին տեսնել, թե ով է գրանցվել ժամանակային միջակայքերում:"
   allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "Թույլ տալ դասավանդողներին նշել այն գնահատականները, որոնք պետք է խմբով արտահանվեն դեպի SIS:"
   allows_users_with_international_phone_numbers_to_r_f90f8522: "Թույլ տալ օգտատերերին ստանալ Canvas համակարգից հաղորդագրություններ արտասահմանյան հեռախոսահամարին "
@@ -1400,9 +1400,9 @@ hy:
   announcements_a4b8ed4a: Հայտարարություններ
   anonymous_e1b8ad27: Անանուն
   anonymous_grading_ccb5045c: "Անանուն գնահատում"
-  anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: "Անանուն գնահատումը անտեսանելի է դարձնում ունկնդիրների անունները \"SpeedGrader\"-ում"
-  anonymous_user: "Անանուն Օգտագործող"
-  anonymous_user_d984b9ce: "Անանուն օգտագործող"
+  anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: "Անանուն գնահատումը անտեսանելի է դարձնում ունկնդիրների անունները «SpeedGrader»-ում"
+  anonymous_user: "Անանուն օգտատեր"
+  anonymous_user_d984b9ce: "Անանուն օգտատեր"
   another_configuration_is_currently_selected_select_95b394e: "Մեկ այլ կոնֆիգուրացիա է ներկայումս ընտրվում: Այս կոնֆիգուրացիայի ընտրությամբ կհանվի մյուսի ընտրությունը: "
   answer_text_80_character_limit_2fce1113: "Պատասխանի տեքստ (80 գրանշանից վոչ ավել)"
   answer_text_909894d6: "Պատասխանի տեքստ"
@@ -1426,13 +1426,13 @@ hy:
       invalid_feed_parameters: "RSS հոսքի պարամետրերը անընդունելի են:"
       invalid_tag_type: "Այս պիտակի համար տարրի տեսակը չի ճանաչվել:"
       invalid_verification_code: "Հաստատման սխալ կոդ"
-      mismatched_verification_code: "Հաստատման կոդը չի համապատասխանում գրանցված օգտագործողներից որևէ մեկին:"
+      mismatched_verification_code: "Հաստատման կոդը չի համապատասխանում գրանցված օգտատերերից որևէ մեկին:"
       permission_denied: "Դուք չունեք այս էջը մտնելու թույլտվություն:"
       quota_exceeded: "Պահոցի քվոտան գերազանցվել է:"
       quota_exceeded_account: "Հաշվի պահոցի քվոտան գերազանցվել է:"
       quota_exceeded_course: "Դասընթացի պահոցի քվոտան գերազանցվել է:"
       quota_exceeded_group: "Խմբի պահոցի քվոտան գերազանցվել է:"
-      quota_exceeded_user: "Օգտագործողի պահոցի քվոտան գերազանցվել է:"
+      quota_exceeded_user: "Օգտատիրոջ պահոցի քվոտան գերազանցվել է:"
       student_view_unauthorized: "Որպես ունկնդիր դուք չեք կարող ստանալ այդ ֆունկցիայից օգտվելու հնարավորություն:"
       submission_unauthorized: "Դուք չեք կարող օգտվել տվյալների այդ փոխանցումից: "
       unauthorized: 
@@ -1467,7 +1467,7 @@ hy:
       missing_group_category: "Խմբային հանդիպումները պետք է ունենան խմբի կատեգորիա:"
   apps_are_an_easy_way_to_add_new_features_to_canvas_2cbc2531: "Հավելվածները պարզ միջոց են նոր ֆունկցիաներ ավելացնելու Canvas-ին: Դրանք կարող են ավելացվել առանձին դասընթացներին կամ հաշվի բոլոր դասընթացներին: Կարգաբերումից հետո դուք կարող եք կապվել դրանց դասընթացի մոդուլների միջոցով և ստեղծել հանձնարարություններ գիտելիքների գնահատման գործիքների համար:"
   appt_calendar_event_dialog: 
-    invalid_participants: "Դուք պետք է առնվազն մեկ օգտագործողի թույլ տաք մասնակցելու:"
+    invalid_participants: "Դուք պետք է թույլատրեք առնվազն մեկ օգտատիրոջ մասնակցությունը:"
     title: "Խմբագրել %{name}"
     update: Թարմացնել
   archive_3f794d7e: Արխիվ
@@ -1479,6 +1479,7 @@ hy:
   are_you_sure_you_want_to_delete_this_announcement_293d51a8: "Համոզվա՞ծ եք, որ ցանկանում եք ջնջել այս հայտարարությունը:"
   are_you_sure_you_want_to_delete_this_grading_perio_422359cd: "Համոզվա՞ծ եք, որ ցանկանում եք ջնջել գնահատման այս ժամանակահատվածը:"
   are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: "Համոզվա՞ծ եք, որ ցանկանում եք ջնջել գնահատման այս սխեման:"
+  are_you_sure_you_want_to_inactivate_this_user_they_ec265d25: "Դուք իսկապե՞ս ցանականում եք ապաակտիվացնել այս օգտատիրոջը: Ապաակտիվացման դեպքում նա չի կարող մասնակցել դասընթացին:"
   are_you_sure_you_want_to_remove_this_grading_perio_e3251c09: "Համոզվա՞ծ եք, որ ցանկանում եք ջնջել գնահատման այս ժամանակահատվածը:"
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "Համոզվա՞ծ եք, որ ցանկանում եք ջնջել այս գործիքը:"
   are_you_sure_you_want_to_report_this_profile_pictu_e22c2210: "Համոզվա՞ծ եք, որ ցանկանում եք հայտնել պրոֆիլի այս նկարի  մասին:"
@@ -1746,7 +1747,7 @@ hy:
         save_and_publish: "Պահպանել և հրապարակել"
       description: Նկարագրություն
       freeze_properties: "Արգելափակել հանձնարարության հատկանիշերը պատճենման ժամանակ"
-      notify_content_change: "Ծանուցել օգտագործողներին այն մասին, որ այս բովանդակությունը փոխվել է"
+      notify_content_change: "Ծանուցել օգտատերերին բովանդակության փոփոխության մասին"
       points_possible: Միավորներ
       post_to_sis: "Ներառել այս հանձնարարության համար գնահատականները ձեր դպրոցի Ուսանողական տեղեկությունների համակարգում տեղադրելիս:"
       warnings: 
@@ -1754,7 +1755,7 @@ hy:
     errors: 
       add_group_failed: "Խմբի ավելացումը չի հաջողվել"
       delete_reminder_failed: "Ջնջելը չի հաջողվել"
-      google_docs_masquerade_rejected: "Հնարավոր չէ միանալ Google Docs-ին այլ օգտագործողի անվան տակ:"
+      google_docs_masquerade_rejected: "Հնարավոր չէ միանալ Google Docs-ին այլ օգտատիրոջ անվան տակ:"
       reminder_failed: "Հիշեցումը չի հաջողվել"
     everyone_else: "Մնացած յուրաքանչյուրը"
     external_content_homework_file_submission_view: 
@@ -1784,7 +1785,7 @@ hy:
         other: "%{count} չգնահատված կրկնակի ուղարկված աշխատանքներ"
       reupload_instructions: "Եթե դուք փոփոխություններ եք կատարել ձեր կողմից նախքան այդ ներբեռնված ուսանողների ֆայլերում, պարզապես արխիվացրեք դրանք և ներբեռնեք zip ֆայլը, օգտագործելով  ստորև ձևը: Ուսանողները կտեսնեն ձևափոխված ֆայլերը ուղարկման համար իրենց մեկնաբանություններում:\n\
           *Համոզվեք, որ ֆայլերի անունները չեն փոխվել, որպեսզի դրանք հնարավոր լինի ճանաչել:* "
-      speed_grader: SpeedGrader™
+      speed_grader: «SpeedGrader™»
       titles: 
         related_items: "Կապված տարրեր"
     grade_gpa_scale_screenreader: "Գնահատական՝  %{grade}"
@@ -1898,15 +1899,15 @@ hy:
     past_assignments: "Նախկին հանձնարարություններ"
     peer_review_assignment: 
       titles: 
-        remind_reviewer: "Հիշեցնել %{user} օգտագործողին  գիտելիքների գնահատման մասին"
-        remind_reviewier_with_last_notification: "Հիշեցնել %{user} օգտագործողին  գիտելիքների գնահատման մասին, վերջին ծանուցումը %{at}"
-        user_default: Օգտագործող
+        remind_reviewer: "Հիշեցնել %{user} օգտատիրոջը գիտելիքների գնահատման մասին"
+        remind_reviewier_with_last_notification: "Հիշեցնել %{user} օգտատիրոջը գիտելիքների գնահատման մասին, վերջին ծանուցումը %{at}"
+        user_default: Օգտատեր
     peer_reviews: 
       buttons: 
         add: Ավելացնել
         assign_peer_reviews: "Նշանակել դասընկերների հետ հանձնարարությունների ուսումնասիրումներ"
       descriptions: 
-        automatically_assign_reviews: "Սեղմելով ներքևի կոճակը, դուք կարող եք նշանակել դասընկերների կողմից այն օգտագործողների հանձնարարությունների ուսումնասիրումը, ովքեր արդեն ուղարկել են, սակայն դեռևս  նրանց հանձնարարության ստուգումը նշանակված չէ:"
+        automatically_assign_reviews: "Սեղմելով ներքևի կոճակը, դուք կարող եք հանձնարարել օգտատերերի կողմից միմյանց հանձնարարությունների վերաբերյալ կարծիքների ներկայացում:"
       details: "Ձախ մասում դուք կարող եք տեսնել այս հանձնարարության համար ունկնդիրների ցուցակը և որ ունկնդիրների ուղարկած աշխատանքները (եթե առկա են) նրանք պետք է ուսումնասիրեն: "
       links: 
         assign_peer_review: "Տալ %{student} մեկ այլ հանձնարարություն գնահատելու համար"
@@ -1921,7 +1922,7 @@ hy:
       overview: "Դասընկերների կողմից աշխատանքների ուսումնասիրումները կհամարվեն ավարտված, երբ ունկնդիրները գոնե մեկ մեկնաբանություն գրեն այդ էջում:  "
       overview_with_rubric: "Ունկնդիրների ուսումնասիրումները կհամարվեն ավարտված, երբ ունկնդիրները գոնե մեկ մեկնաբանություն գրեն այդ էջում և լրացնեն հանձնարարության համար բաժնի ձևը:  "
       page_title: "Դասընկերների կողմից աշխատանքների ուսումնասիրում"
-      reviews_per_user: "Մեկ օգտագործողի գծով %{count} ուսումնասիրություններ"
+      reviews_per_user: "Յուրաքանչյուր օգտատիրոջ հետ կապված %{count} կարծիքներ"
       submitted: "ուղարկված է"
       title: "Դասընկերների կողմից %{assignment} ուսումնասիրություն"
       titles: 
@@ -1939,7 +1940,7 @@ hy:
       locked_until: "Նշանակել ուսումնասիրություններ"
       peer_reviews_assign_at_explanation: "Պետք է լինի կատարման ամսաթվից հետո: Եթե դատարկ է, ապա օգտագործեք կատարման ամսաթիվը:"
       peer_reviews_header: "Ուսումնասիրում դասընկերների կողմից"
-      reviews_per_user: "Ուսումնասիրություններ ամեն օգտագործողի գծով "
+      reviews_per_user: "Յուրաքանչյուր օգտատիրոջ հետ կապված կարծիքներ "
     points_possible_number: "Հնարավոր միավորները պետք է թիվ լինեն:"
     positive_number: "Պետք է օգտագործել դրական թիվ"
     redirect_page: 
@@ -2044,7 +2045,7 @@ hy:
       comments_placeholder: Մեկնաբանություններ...
       errors: 
         unacceptable_file_type: "Ֆայլի այս տեսակը չի թույլատրվում: Ընդունելի ֆայլերի տեսակներն են՝ %{allowed_extensions_list}"
-      gmail_restriction_description: "Ձեր հաշիվը սահմանափակել է Google Docs ուղարկումները դեպի Google հաշիվներ %{domain}-ում: Այս հանձնարարությունը Google Docs-ով ուղարկելու համար դուք պետք է օգտագործողի կարգաբերումների ձեր էջում կրկին անգամ կարգաբերեք Google Docs-ի հետ ինտեգրումը:"
+      gmail_restriction_description: "Ձեր հաշիվը սահմանափակել է Google Docs ուղարկումները դեպի Google հաշիվներ %{domain}-ում: Այս հանձնարարությունը Google Docs-ով ուղարկելու համար դուք պետք է օգտատիրոջ կարգաբերումների ձեր էջում կրկին անգամ կարգաբերեք Google Docs-ի հետ ինտեգրումը:"
       instructions: 
         from_external_tool: "Բեռնման համար ընտրեք ստորև բերված ցուցակից մի գործիք և ուղարկեք այդ գործիքով տրամադրված ռեսուրսին: "
         google_docs: "Ստորև տրված ցուցակից ընտրեք ֆայլը:"
@@ -2211,9 +2212,9 @@ hy:
   beginning_date_2d2a29ac: "Մեկնարկի ամսաթիվ"
   below_this_search_field_is_a_list_of_content_type__58aaa03f: "Որոնման այս դաշտի ներքևում գտնվում է %{content_type} ցուցակը: Տպելիս ցուցակը կզտվի, համապատասխանեցվելով ձեր հարցմանը: Խոսակցության հաղորդակցությունները կզտվեն ձեր կողմից ընտրված չափանիշների հիման վրա:"
   better_file_browsing_description: |-
-      Ֆայլերի որոնման ավելի նոր, պարզ, օգտագործողների համար ավելի հարմար  ինտերֆեյս: Եթե դուք սա միացնեք դասընթացի մակարդակում, 
-      տվյալ դասընթացի բոլոր օգտագործողները կտեսնեն նոր ինտերֆեյսը: Որպեսզի այն երևա, երբ որևէ մեկը
-      տեղափոխվում է օգտագործողի անձնական ֆայլերի ('/files') էջ, դուք պետք է միացնեք այդ օպցիան այն հաշվի համար, որին նրանք անդամ են:
+      Ֆայլերի որոնման ավելի նոր, պարզ, օգտատերերի համար ավելի հարմար  ինտերֆեյս: Եթե դուք սա միացնեք դասընթացի մակարդակում, 
+      տվյալ դասընթացի բոլոր օգտատերերը կտեսնեն նոր ինտերֆեյսը: Որպեսզի այն երևա, երբ որևէ մեկը
+      տեղափոխվում է օգտատիրոջ անձնական ֆայլերի ('/files') էջ, դուք պետք է միացնեք այդ օպցիան այն հաշվի համար, որին նրանք անդամ են:
   between_1_and_99_d421a4c0: "1%-ից  99%-ի սահմաններում"
   between_2_and_5_c34f5152: "2-ց մինչև 5-ի սահմաններում"
   big_blue_button_conference: 
@@ -2237,12 +2238,12 @@ hy:
   bulk_course_migration: 
     export_failed: "Սխալ է տեղի ունեցել Blackborad-ից դասընթացը bb_lcid%{id} հետ արտահանելիս "
     export_failed_no_id: "Սխալ է տեղի ունեցել դասընթացը ներմուծելիս"
-    export_failed_not_found: "Blackboard-ում հնարավոր չէ գտնել bb_lcid%{id}-ով դասընթացը %{user_name} օգտագործողի անվամբ"
+    export_failed_not_found: "Գրատախտակում հնարավոր չէ գտնել bb_lcid%{id}-ով դասընթացը %{user_name} օգտատիրոջ անվամբ"
     export_failed_with_id: "Սխալ է տեղի ունեցել դասընթացը bb_lcid%{id}-ի հետ Canvas ներմուծելիս"
     no_course_found: "Ոչ մի դասընթաց չի գտնվել %{id}-ի %{id_type}-ով "
     no_course_id_given: "Ոչ մի Canvas-ի դասընթաց չի հայտնաբերվել bb_lcid%{id} համար"
-    no_credentials_found: "Տվյալ օգտագործողի անվան %{user_name} համար ոչ մի հաշվի գրառում չի գտնվել"
-    no_credentials_given: "Դասընթացի  %{course_identifier}  համար ոչ մի օգտագործողի անուն չի տրվել "
+    no_credentials_found: "Տվյալ օգտատիրոջ անվամբ %{user_name} համար ոչ մի հաշվի գրառում չի գտնվել"
+    no_credentials_given: "  %{course_identifier} դասընթացի համար ոչ մի օգտատիրոջ անուն չի տրվել "
     no_lcid_found: "Տողի համար չի նշվել bb_lcid"
     queue_error: "Սխալ է տեղի ունեցել տեղափոխումների հերթագրման ժամանակ"
   bulk_course_migrations: 
@@ -2270,7 +2271,7 @@ hy:
       column_name: "Սյունակի անունը"
       course_id_description: "Canvas-ի դասընթացի նույնականացուցիչ, ուր պետք է կատարվի ներմուծումը"
       credential_description: "Այս գործիքը կօգնի ձեզ միաժամանակ Blackboard Vista/CE համակարգից տեղափոխել մի քանի դասընթացներ:  Ձեր դասընթացները տեղափոխելու համար ավելացրեք ձեր Blackboard համակարգի նույնականացման տվյալները, հետո տրված CSV շաբլոնին ավելացրեք Canvas-ի դասընթացի նույնականացուցիչները:"
-      csv_description: "Կարելի է ավելացնել այլ սյունակներ, սակայն դրանք կանտեսվեն: Ստորև տրվում է 3 դասընթացի համար պարզ CSV ֆայլի օրինակ \"greg\"  անվամբ օգտագործողի համար:"
+      csv_description: "Կարելի է ավելացնել այլ սյունակներ, սակայն դրանք կանտեսվեն: Ստորև տրվում է 3 դասընթացի համար պարզ CSV ֆայլի օրինակ \"greg\"  անվամբ օգտատիրոջ համար:"
       csv_template: "CSV շաբլոն"
       current_migration_batch: "Ներկայումս տեղափոխվող փաթեթ"
       description: Նկարագրություն
@@ -2280,7 +2281,7 @@ hy:
         only_use_one: "Օգտագործեք միայն այս երկու սյունակներից մեկը"
         password: Գաղտնաբառ
         school: Դպրոց
-        user_name: "Օգտագործողի անուն"
+        user_name: "Օգտատիրոջ անուն"
       lcid_description: "Blackboard համակարգում դասընթացի lcid"
       login_credentials: "Blackboard համակարգ մուտք գործելու նույնականացման տվյալներ"
       page_title: "Դասընթացների զանգվածային տեղափոխություն"
@@ -2289,8 +2290,8 @@ hy:
       school_not_supported: "Խնդրում ենք օգտվել Instructure-ի հետ ձեր ադմինիստրատորի կապից ձեր դպրոցի համար օժանդակություն ստանալու նպատակով: "
       sis_id_description: "Ներմուծման համար Canvas -ի դասընթացի SIS նույնականացուցիչ"
       upload_migration_csv: "Տեղափոխությունների համար CSV ներբեռնում"
-      user_name: "Օգտագործողի անուն"
-      user_name_description: "Օգտագործողին առնչվող օգտագործողի անուն, որը կարող է դասընթաց մուտք գործել որպես  դասավանդող/դիզայներ: Սա պետք է համընկնի Blackboard  համակարգ մուտք գործելու համար վերը նշված օգտագործողների անուններից մեկին:  "
+      user_name: "Օգտատիրոջ անուն"
+      user_name_description: "Օգտատիրոջ տրամադրած օգտատիրոջ անուն, որը կարող է դասընթաց մուտք գործել որպես  դասավանդող/դիզայներ: Սա պետք է համընկնի Blackboard  համակարգ մուտք գործելու համար վերը նշված օգտատերերի անուններից մեկին:  "
     only_one_bulk_migration: "Դասընթացի միայն մեկ զանգվածային տեղեփոխություն կարող է կատարվել ժամանակի որոշակի պահին:"
   button: 
     submit_assignment: "Ներկայացնել հանձնարարությունը"
@@ -2306,11 +2307,11 @@ hy:
     delete_file: "Ջնջել %{name} ֆայլը "
     done: "Պատրաստ է"
     filter: Ֆիլտր
-    find_user: "Գտնել օգտագործողին"
+    find_user: "Գտնել օգտատիրոջը"
     import: Ներմուծել
     login: "Մուտք համակարգ"
     manage_rubrics: "Կառավարել բաժինները"
-    masquerade: "Կեղծ ներկայանալ որպես օգտագործող"
+    masquerade: "Ներկայանալ որպես կեղծ օգտատեր"
     ok: Ok
     okay: Okay
     publish: Հրապարակել
@@ -2502,7 +2503,7 @@ hy:
     edit_appt_calendar_event: 
       description: Նկարագրություն
       slot_limit: "Սահմանափակել այս միջակայքը __ով"
-      users: օգտագործողներ
+      users: օգտատերեր
     edit_assignment: 
       calendar: Օրացույց
       due: Մինչև
@@ -2575,15 +2576,15 @@ hy:
     loading_undated_events: "Չթվագրված միջոցառումների բեռնում"
     message_participants: 
       all_groups: "Բոլոր խմբերը"
-      all_users: "Բոլոր օգտագործողները"
+      all_users: "Բոլոր օգտատերերը"
       message_groups: "Հաղորդագրություն ուղարկել խմբերին"
       message_label: Հաղորդագրություն
       message_students: "Հաղորդագրություն ուղարկել ունկնդիրներին"
       registered_groups: "Արդեն իսկ գրանցված խմբեր"
-      registered_users: "Արդեն իսկ գրանցված օգտագործողներ"
+      registered_users: "Արդեն իսկ գրանցված օգտատերեր"
       send_message_to: "Ուղարկել հաղորդագրություն...-ին"
       unregistered_groups: "Դեռևս չգրանցված խմբեր"
-      unregistered_users: "Դեռևս չգրանցված օգտագործողներ"
+      unregistered_users: "Դեռևս չգրանցված օգտատերեր"
     messages_sent: "Հաղորդագրությունները ուղարկվել են"
     missing_due_date_dialog: 
       buttons: 
@@ -2596,7 +2597,7 @@ hy:
         notAllSectionsAssigned: "Այս տարրը կնշանակվի ոչ բոլոր բաժինների համար "
     no_dates_error: "Դուք պետք է նշել առնվազն մեկ ամսաթիվ և ժամ"
     no_groups: "Խմբեր չեն գտնվել"
-    no_users: "Օգտագործողներ չեն գտնվել"
+    no_users: "Օգտատերեր չեն գտնվել"
     ok: Ok
     open_appointment_on_this_day: "Նշված օրվա համար բաց մնացած հանդիպում կա "
     prompts: 
@@ -2664,7 +2665,7 @@ hy:
     ics_description: "%{context_name} -ի համար օրացուցային միջոցառումներ"
     ics_description_course: "%{course_name} դասընթացի համար օրացուցային միջոցառումներ "
     ics_description_group: "%{group_name} խմբի համար օրացուցային միջոցառումներ"
-    ics_description_user: "%{user_name} օգտագործողի համար օրացուցային միջոցառումներ"
+    ics_description_user: "%{user_name} օգտատիրոջ համար օրացուցային միջոցառումներ"
     ics_title: "%{course_or_group_name} օրացույց (Canvas)"
     invalid_date_or_time: "%{attr}-ի համար սխալ ամսաթիվ կամ սխալ ժամ "
   calendars: 
@@ -2703,6 +2704,7 @@ hy:
         create_assignment: "Ստեղծել նոր հանձնարարություն"
         delete: "Ջնջել միջոցառումը/հանձնարարությունը"
         new: "Ստեղծել նոր միջոցառում"
+  can_interact_with_users_in_their_section_only_48cb8c43: "Հնարավոր չէ ամագործակցել օգտատերերի հետ միայն իրենց բաժնում"
   can_t_delete_alignments_based_on_rubric_associatio_d9fd10a3: "Հնարավոր չէ ջնջել բաժինների հետ կապված համապատասխանությունները: Այդ կապերը հանելու համար դուք պետք է ակտիվների բաժնից տողը հանեք:"
   can_t_perform_diffing_against_more_than_one_file_o_44475c0d: "Հնարավոր չէ կատարել տարբերությունների սահմանում նույն տեսակի մի քանի ֆայլի համար:"
   can_t_unpublish_if_there_are_student_submissions_2d7cd742: "Հնարավոր չէ չեղարկել հրապարակումը, եթե առկա են ունկնդիրների ներկայացրած աշխատանքները:"
@@ -2736,7 +2738,7 @@ hy:
   canvas_cloud_information_fdd404f2: "Canvas Cloud տեղեկություններ"
   canvas_default_7f81a6b8: "Canvas-ի ըստ լռության ընդունված կարգավորումներ"
   canvas_did_not_recognize_your_identity_provider_cb0e50fc: "Canvas չի ճանաչում ձեր նույնականացուցչի պրովայդերին"
-  canvas_doesn_t_have_an_account_for_user_user_5bcae0dd: "Canvas չունի %{user} օգտագործողի համար հաշիվ"
+  canvas_doesn_t_have_an_account_for_user_user_5bcae0dd: "Canvas համակարգը չունի %{user} օգտատիրոջ համար հաշիվ"
   canvas_error_report_ff678539: "Canvas սխալի մասին հաշվետվություն"
   canvas_revision_unknown: "Անհայտ է"
   canvas_ticketing_email_connector_27e253ae: "Canvas ձևերը գեներացնող էլ.փոստի կոնեկտոր "
@@ -2744,6 +2746,7 @@ hy:
   canvas_will_regrade_all_your_submissions_after_you_2d68694a: "Canvas վերստին կգնահատի բոլոր ձեր ուղարկածները այն բանից հետո, երբ  կպահպանեք թեստը: Դա կտևի մի քանի րոպե:"
   careful_changes_to_group_membership_will_apply_to__19a9089c: "Ուշադրությո՛ւն։ Խմբի անդամակցության փոփոխությունները կկիրառվեն այն խմբերի վրա, որոնք արդեն ներկայացրել են իրենց հանձնարարությունները։ Արդյունքում խմբերի ներկայացրած հանձնարարությունները կարող են չհամընկնել։ Ուզո՞ւմ եք ստեղծել նոր խումբ ապագա հանձնարարությունների համար։"
   cas_url_4ba2843e: "CAS URL"
+  catalog_users_already_exist_2894b8c4: "Օգտատերերի կատալոգն արդեն գոյություն ունի"
   cc: 
     by: "CC-ին պատկանելություն "
     by_nc: "CC-ին պատկանելություն, ոչ կոմերցիոն"
@@ -2766,8 +2769,8 @@ hy:
     titles: 
       update_assignment_points: "Փոխե՞լ հնարավոր միավորները բաժնի վերնագրին համապատասխանելու համար:"
   changes_will_still_apply_if_you_leave_this_page_935cedc6: "Փոփոխությունները կշարունակեն գործել, եթե դուք դուրս գաք այս էջից:"
-  child_s_username_dde3aa9: "Երեխա օգտագործողի անունը"
-  choose_a_course_home_page_8059c7b: "Ընտրել դասընթացի տնային էջը"
+  child_s_username_dde3aa9: "Երեխա օգտատիրոջ անունը"
+  choose_a_course_home_page_8059c7b: "Ընտրել դասընթացի հիմնական էջը"
   choose_a_csv_file_to_upload_9644480c: "Ընտրել CSV ֆայլը բեռնման համար"
   choose_an_authentication_service_47dc8875: "Ընտրել իսկության ստուգման ծառայությունը"
   choose_usage_rights_33683854: "Ընտրել օգտագործման իրավունքները..."
@@ -2783,7 +2786,7 @@ hy:
   click_to_test_dropdown_b950974d: "Սեղմեք ցուցակը ստուգելու համար"
   clicking_on_the_column_headers_will_sort_the_rows__3a6e9573: "Սյունակների վերնագրերի վրա սեղմելիս տողերը կտեսակավորվեն այդ սյունակի մեջ "
   clone_group_set_c2a40e15: "Կլոնավորել խմբերի շարքը"
-  close_and_return_to_canvas_80544344: "Փակել և վերադառնալ Canvas "
+  close_and_return_to_canvas_80544344: "Փակել և վերադառնալ Canvas համակարգ"
   close_d634289d: Փակել
   collaboration: 
     default_title: "Առանց անվանման համատեղ աշխատանք"
@@ -2802,14 +2805,14 @@ hy:
     collaborator_picker: 
       labels: 
         available_groups: "Առկա խմբերը"
-        available_users: "Առկա օգտագործողները"
+        available_users: "Հասանելի օգտատերեր"
         collaborate_with: "Համատեղ աշխատանք"
         collaboration_members: "Համատեղ աշխատանքի անդամներ"
         groups: Խմբեր
         loading: "Բեռնում է"
         people: Մարդիկ
         remove_all: "Հեռացնել բոլորը"
-      member_instructions: "Սեղմեք ձախակողմյան սյունակում օգտագործողին կամ խմբին  համագործակցող մասնակիցներին ավելացնելու համար"
+      member_instructions: "Սեղմեք ձախակողմյան սյունակում օգտատիրոջ կամ խմբի վրա  համագործակցող մասնակիցներին ավելացնելու համար"
     edit: 
       buttons: 
         cancel: "Չեղյալ համարել"
@@ -2919,7 +2922,7 @@ hy:
         : Այո
       details: 
         account_exists: |-
-            %{email}-ի հետ կապված արդեն իսկ գոյություն ունի օգտագործողի հաշիվ: 
+            %{email}-ի հետ կապված արդեն իսկ գոյություն ունի օգտատիրոջ հաշիվ: 
             
             **Դուք ե՞ք %{name}**
         account_needed: "Ձեզ հրավիրել են մասնակցելու **%{course}**: Այս հրավերը ընդունելու համար դուք պետք է ունենաք Canvas հաշիվ: Սեղմեք ստորև հղումը Canvas-ի հաշիվ ստեղծելու համար: "
@@ -3091,7 +3094,7 @@ hy:
       import_complete: "Ներմուծումն ավարտված է: Վերադարձ դեպի դասընթացի էջ..."
       importing_button: "Ներմուծվում է... սա կարող է որոշ ժամանակ պահանջել"
     titles: 
-      home_page: "Տնային էջ"
+      home_page: "Հիմնական էջ"
   content_locks: 
     buttons: 
       ok_thanks: "Ok, շնորհակալություն"
@@ -3242,13 +3245,13 @@ hy:
         assessment_help_title_icon: "Հանձնարարության վերագրանցման համար օգնության նշան"
         overwrite_assessment_content: "Վերագրանցել գիտելիքների գնահատման բովանդակությունը համապատասխան նույնականացուցիչներով"
       question_bank: 
-        aria_new_label: "Ստեղծել հարցերի նոր բանկ"
-        create_new_question: "--Ստեղծել հարցերի նոր բանկ --"
-        default_question_bank_label: "Հարցերի բանկ ըստ լռության ընդունված"
-        question_bank_placeholder: "\"Հարցերի բանկի անվանումը\""
-        question_bank_placeholder_aria: "\"Մուտքագրել հարցերի նոր բանկի անվանումը\""
-        question_bank_title: "Հարցերի նոր բանկի անվանումը"
-        select_question_bank: "Ընտրել հարցերի բանկը"
+        aria_new_label: "Ստեղծել հարցերի նոր շտեմարան"
+        create_new_question: "--Ստեղծել հարցերի նոր շտեմարան --"
+        default_question_bank_label: "Լռելյայն ընդունված հարցերի շտեմարան"
+        question_bank_placeholder: "\"Հարցերի շտեմարանի անվանումը\""
+        question_bank_placeholder_aria: "\"Մուտքագրել հարցերի նոր շտեմարանի անվանումը\""
+        question_bank_title: "Հարցերի նոր շտեմարանի անվանումը"
+        select_question_bank: "Ընտրել հարցերի շտեմարանը"
       select_content_checkbox: 
         select_all_content: "Ողջ բովանդակությունը"
         select_specific_content: "Ընտրել որոշակի բովանդակություն"
@@ -3628,7 +3631,7 @@ hy:
   context_nav_link_8d15d95: "Կոնտեքստային հղում"
   context_nav_link_active_78adb0fa: "Ակտիվ կոնտեքստային հղում"
   continue_ac067716: Շարունակել
-  continue_typing_to_find_additional_sections_or_stu_49786085: "Շարունակել մուտքագրել լրացուցիչ բաժիններ կամ ունկնդիրներ գտնելու համար"
+  continue_typing_to_find_additional_sections_or_stu_49786085: "Շարունակել մուտքագրել` լրացուցիչ բաժիններ կամ ունկնդիրներ գտնելու համար"
   conversation_dialog: 
     errors: 
       field_is_required: "Անհրաժեշտ է լրացնել այս դաշտը"
@@ -3930,7 +3933,7 @@ hy:
       media_files_too_large: "Մուլտիմեդիա ֆայլերը չեն արտահանվել, քանի որ ֆայլերը ընդհանուր չափը չափազանց մեծ էր: "
       module_meta: "Չհաջողվեց արտահանել մոդուլի մետա տվյալները"
       organization: "Չհաջողվեց գեներացնել կազմակերչական կառուցվածքը"
-      question_bank: "Չհաջողվեց արտահանել \"%{title}\" հարցերի բանկը"
+      question_bank: "Չհաջողվեց արտահանել \"%{title}\" հարցերի շտեմարանը"
       quiz: "Չհաջողվեց արտահանել \"%{title}\" թեստը"
       quiz_is_locked: "\"%{title}\" թեստը հնարավոր չէ պատճենել, քանի որ այն արգելափակված է:"
       quizzes: "Չհաջողվեց արտահանել որոշ թեստեր"
@@ -3951,7 +3954,7 @@ hy:
   course_files_62deb8f8: "Դասընթացի ֆայլեր"
   course_grades_22adc27e: "Դասընթացի գնահատականներ"
   course_home_4c4c0107: "Դասընթացի սկիզբ"
-  course_home_sub_navigation_b1ee6b03: "Դասընթացի տնային էջի սուբնավարկման ֆունկցիա"
+  course_home_sub_navigation_b1ee6b03: "Դասընթացի հիմնական էջի ենթանավարկման ֆունկցիա"
   course_implemented_apps_fa658f5a: "Դասընթացի իրականացված հավելվածները"
   course_list: 
     favorited_tooltip: "Սեղմեք դասընթացների մենյուից հանելու համար"
@@ -4034,7 +4037,7 @@ hy:
   course_name_63b973d1: "Դասընթացի անվանում"
   course_name_is_required_90919349: "Դասընթացի անվանումը պարտադիր է "
   course_name_successfully_added_48116a50: "%{course_name} դասընթացը հաջողությամբ ավելացվել է:"
-  course_navigation_dd035109: "Դասընթացում նավարկություն"
+  course_navigation_dd035109: "Նավարկում դասընթացում"
   course_outcomes_7dc1cbc7: "Դասընթացի արդյունքներ"
   course_pages_449f1dd4: "Դասընթացի էջեր"
   course_people_3058c948: "Դասընթացի մարդիկ"
@@ -4359,7 +4362,7 @@ hy:
       course_settings_title: "Դասընթացի կարգաբերումներ"
       deatils: 
         move_course: "Այս դասընթացի համար ընտրել նոր՝ հասանելիության առավելագույն իրավունքներով հաշիվ: Դասընթացը տեղափոխելուց հետո կպահանջվի նաև նշել դասընթացի նոր բաժինը: "
-      drag_details: "Էջերի մեծ մասի անջատման պատճառող այդ էջերը այցելած ունկնդիրներին կուղարկեն դասընթացի տնային էջ: "
+      drag_details: "Էջերի մեծ մասի անջատման պատճառող այդ էջերը այցելած ունկնդիրներին կուղարկեն դասընթացի հիմնական էջ: "
       drag_to_hide: "Քաշեք տարրերը այստեղ՝ ունկնդիրներից դրանք թաքցնելու համար: "
       enrollment_count: 
         one: "1 օգտագործող"
@@ -4371,14 +4374,14 @@ hy:
         navigation: "Դասընթացում նավարկում"
         sections: "Դասընթացի բաժիններ"
       help: 
-        edit_navigation: "Տարրերը քաշեք և բաց թողեք, որպեսզի դասընթացի նավարկության արդյունքում վերադասավորեք դրանք: "
+        edit_navigation: "Տարրերը քաշեք և բաց թողեք, որպեսզի դասընթացի նավարկման արդյունքում վերադասավորեք դրանք: "
       images: 
         alt: 
           delete: Ջնջել
           edit: Խմբագրել
       keycode_descriptions: 
-        next_navigation_link: "Ընտրել հաջորդ նավարկության հղումը"
-        previous_navigation_link: "Ընտրել նախորդ նավարկության հղումը"
+        next_navigation_link: "Ընտրել հաջորդ նավարկման հղումը"
+        previous_navigation_link: "Ընտրել նախորդ նավարկման հղումը"
         toggle_navigation_dragging: "Ընտրեք հղումը, որպեսզի սկսեք տեղափոխումը կամ բաց թողեք արդեն ընտրված հղումը  "
       keycodes: 
         next_navigation_link: Վերև
@@ -4410,7 +4413,7 @@ hy:
         is_public_to_auth_users: "Այս դասընթացը տեսանելի դարձնել հաստատված օգտագործողների համար"
         language: Լեզուն
         license: Արտոնագիր
-        open_enrollment: "Դասընթացի տնային էջին ավելացնել \"Միանալ այս դասընթացին\" հղումը"
+        open_enrollment: "Դասընթացի հիմնական էջին ավելացնել \"Միանալ այս դասընթացին\" հղումը"
         public_syllabus: "Այս դասընթացի ուսումնական ծրագիրը հանրությանը տեսանելի դարձնել "
         restrict_enrollments_to_course_dates: "Օգտագործողները կարող են մասնակցել դասընթացին միայն այս ամսաթվերի միջև ընկած ժամանակահատվածում"
         restrict_student_future_view: "Նախքան մեկնարկման ամսաթիվը սահմանափակել ունկնդիրների կողմից դասընթացի դիտումը"
@@ -4447,7 +4450,7 @@ hy:
       set_grading_scheme: "սահմանել գնահատման սխեման"
       sis_source_id: "Համակարգի ID"
       tab_cant_disable: "Այս էջը հնարավոր չէ անջատել, այլ միայն թաքցնել"
-      tab_disabled: "Էջն անջատված է, անցնել դասընթացի տնային էջին"
+      tab_disabled: "Էջն անջատված է, անցնել դասընթացի հիմնական էջին"
       tab_hidden_if_disabled: "Էջն անջատված է, չի երևա նավարկման ժամանակ"
       tabs: 
         alerts: Զգուշացումներ
@@ -4495,9 +4498,9 @@ hy:
           cancel: "Չեղյալ համարել"
           update_layout: Պահպանել
         headings: 
-          set_layout: "Սահմանել տնային էջի կառուցվածքը"
+          set_layout: "Սահմանել հիմնական էջի կառուցվածքը"
         labels: 
-          select_content: "Ընտրեք, ինչ կցանկանայիք ցուցադրել տնային էջում:"
+          select_content: "Ընտրեք, ինչ կցանկանայիք ցուցադրել հիմնական էջում:"
         options: 
           assignments: "Հանձնարարությունների ցուցակ"
           course_activity_stream: "Դասընթացի գործողությունների հեռարձակում"
@@ -4509,15 +4512,15 @@ hy:
       headers: 
         course_status: "Դասընթացի կարգավիճակ"
       headings: 
-        choose_home_page_title: "Ընտրել Տնային էջը"
+        choose_home_page_title: "Ընտրել հիմնական էջ"
         confirm_unenroll: "Հաստատել գրանցման չեղյալացումը"
         importing: "Այս դասընթացը ներմուծվում է"
         unpublished: "Այս դասընթացը չի հրապարակվել"
       importing: "Դասընթացի պատճենումը/տեղափոխումը ընթացքի մեջ է: Սա նշանակում է, որ բովանդակության որոշ մասը կարող է ժամանակավորապես հասանելի չլինել: "
       license_notice: "Այս դասընթացի բովանդակությունն առաջարկվել է համաձայն %{license_type} լիցենզիայի: Այս դասընթացի բովանդակությունը տրամադրվում է այդ լիցենզիայով, եթե այլ բան չի նշված:"
       links: 
-        choose_home_page: "Ընտրել Տնային էջը"
-        course_setup: "Դասընթացի կարգաբերման ստուգիչ հարցեր"
+        choose_home_page: "Ընտրել հիմնական էջ"
+        course_setup: "Դասընթացի տեղադրման ստուգիչ հարցեր"
         drop_course: "Բաց թողնել այս դասընթացը"
         join_course: "Միանալ այս դասընթացին"
         new_announcement: "Նոր հայտարարություն"
@@ -4644,7 +4647,7 @@ hy:
     people: Մարդիկ
     plugins: "Միացվող մոդուլներ"
     prior_users: "Նախորդ օգտագործողներ"
-    question_banks: "Հարցերի բանկեր"
+    question_banks: "Հարցերի շտեմարաններ"
     quizzes: Թեստեր
     registered_services: "Գրանցված ծառայություններ"
     revisions: Վերանայումներ
@@ -5247,7 +5250,7 @@ hy:
       reply_to_topic: "Պատասխանել թեմային"
       retrieved_from_feed: "Ստացվել է %{feed}-ից"
       show_rubric: "Ցույց տալ բաժինը"
-      speed_grader: SpeedGrader™
+      speed_grader: «SpeedGrader™»
       topic: Թեմա
       topic_podcast_feed_link: "Թեմայի podcast կանալ"
       topic_subscribe: Բաժանորդագրվել
@@ -5964,7 +5967,7 @@ hy:
       delete: Ջնջել
     cannot_locate_launch_request: "Հնարավոր չէ որոշել մեկնարկի հարցման տեղը, խնդրում ենք փորձել կրկին:"
     consumer_key: "Օգտագործողի բանալի"
-    course_home_sub_navigation_configured: "Դասընթացի տնային էջի լրացուցիչ նավարկումը կարգաբերված է"
+    course_home_sub_navigation_configured: "Դասընթացի հիմնական էջի լրացուցիչ նավարկումը կարգաբերված է"
     course_navigation_configured: "Դասընթացի նավարկումը կարգաբերված է "
     course_settings_sub_navigation_configured: "Դասընթացի կարգաբերումների լրացուցիչ նավարկումը կարգաբերված է"
     delete: Ջնջել
@@ -6011,7 +6014,7 @@ hy:
         url: "URL հասցե"
         vendor_help_link: "Օգնությանը դիմելու հղում"
       resource_selection_configured: "Ռեսուրսների ընտրությունը կարգաբերված է"
-      user_navigation_configured: "Օգտագործողի նավարկումը կարգաբերված է"
+      user_navigation_configured: "Օգտատիրոջ նավարկումը կարգաբերված է"
     external_tool_view: 
       delete_tool: "Ջնջել գործիքը"
       edit_tool: "Խմբագրել գործիքը"
@@ -6048,7 +6051,7 @@ hy:
     saving: "Պահպանվում է..."
     shared_secret: "Ընդհանուր գաղտնի բանալի"
     submit: Ուղարկել
-    user_navigation_configured: "Օգտագործողի նավարկումը կարգաբերված է"
+    user_navigation_configured: "Օգտատիրոջ նավարկումը կարգաբերված է"
     wiki_page_menu_configured: "Wiki էջի մենյուն կարգաբերված է"
   external_url_e9b87215: "Արտաքին url"
   failed_to_create_zip_file_1a943d06: "Չհաջողվեց ստեղծել zip ֆայլ"
@@ -6264,8 +6267,8 @@ hy:
   gradebook: 
     alerts: 
       no_active_students: "Ներեցեք, դասընթացում ակտիվ ունկնդիրներ չկան կամ նրանցից ոչ մեկը ձեր կողմից ենթակա չէ գնահատման:"
-      no_students_in_groups_back: "Ներեցեք, այս հանձնարարության ուղարկումները հնարավոր չէ  գնահատել Speedgrader-ում, քանի որ չկան նշանակված օգտագործողներ: Խնդրում ենք այս խմբում նշանակել օգտագործողների և փորձել նորից: Սեղմեք 'OK' վերադառնալու համար: "
-      no_students_in_groups_close: "Ներեցեք, այս հանձնարարության ուղարկումները հնարավոր չէ  գնահատել Speedgrader-ում, քանի որ չկան նշանակված օգտագործողներ: Խնդրում ենք այս խմբում նշանակել օգտագործողների և փորձել նորից: Սեղմեք 'OK' պատուհանը փակելու համար:"
+      no_students_in_groups_back: "Ներեցեք, այս հանձնարարության շրջանակներում ուղարկված աշխատանքները հնարավոր չէ  գնահատել «Speedgrader»-ի միջոցով, քանի որ չկան ընդգրկված օգտատերեր: Խնդրում ենք այս խմբում ընդգրկել օգտատերեր և կրկին փորձել : Սեղմեք «OK» վերադառնալու համար: "
+      no_students_in_groups_close: "Ներեցեք, այս հանձնարարության շրջանակներում ուղարկված աշխատանքները հնարավոր չէ  գնահատել «Speedgrader»-ի միջոցով, քանի որ չկան ընդգրկված օգտատերեր: Խնդրում ենք այս խմբում ընդգրկել օգտատերեր և կրկին փորձել : Սեղմեք «OK» պատուհանը փակելու համար: "
       no_students_in_section: "Հնարավոր չէ այդ բաժնում ունկնդիրներ գտնել, վերադառնալ բոլոր բաժինների դիտմանը:"
     allow_message: "Սեղմեք \"Թույլատրել\" կոճակը ձայնագրումը սկսելու համար:"
     begin_record_prompt: "Սեղմեք \"Ձայնագրել\" կոճակը սկսելու համար:"
@@ -6358,7 +6361,7 @@ hy:
       message_students_who: "Հաղորդագրություններ ուղարկել ունկնդիրներին, ովքեր..."
       re_upload_submissions: "Կրկին ներբեռնել ուղարկվածները"
       set_default_grade: "Սահմանել լռությամբ ընդունվաղ գնահատականը"
-      speedgrader: SpeedGrader
+      speedgrader: «SpeedGrader»
     header_filter: 
       course_average: "Դասընթացի միջին գնահատական "
       course_median: "Դասընթացի մեդիան"
@@ -6659,7 +6662,7 @@ hy:
         average: Միջին
         grade_by_question_beta: "Գնահատական ըստ հարցերի (բետա-տարբերակ)"
         group_comment: "Մեկնաբանություն ուղարկել ամբողջ խմբին:"
-        hide_names: "Speedgrader-ում թաքցնել ունկնդիրների անունները"
+        hide_names: "«Speedgrader»-ում թաքցնել ունկնդիրների անունները"
         show_assessment_by: "Ցույց տալ գնահատականները ըստ"
         showing: Ցուցադրում
         sort_by: "Սորտավորել ունկնդիրների ցուցակը"
@@ -6678,8 +6681,8 @@ hy:
       loading: "բեռնվում է..."
       no_annotation: "Այս փաստաթղթի համար անոտացիաները հասանելի չեն:"
       not_newest_notice: "Նշում. սա ամենավերջին ուղարկված աշխատանքը չէ "
-      page_header_title: SpeedGrader
-      page_title: "%{assignment_name}, SpeedGrader, %{course_name}"
+      page_header_title: «SpeedGrader»
+      page_title: "%{assignment_name}, «SpeedGrader», %{course_name}"
       sort_by: 
         status: "ըստ ուղարկման կարգավիճակի (անհրաժեշտ է գնահատական, ուղարկված չէ և այլն)"
         student_name: "ըստ ունկնդիրների անունների (այբբենական կարգով)"
@@ -6689,13 +6692,13 @@ hy:
         download_file: "Ներբեռնել այս ֆայլը"
         not_newest: "օգտագործեք վերևի բացվող ցուցակը ուղարկված աշխատանքը ընտրելու համար  "
         preview_file: "Այս ֆայլի նախնական դիտում"
-        speedgrader_options: "SpeedGrader պարամետրեր"
+        speedgrader_options: "«SpeedGrader»-ի պարամետրեր"
       tooltips: 
         file_attachment: "Ֆայլային հավելված"
         media_comment: "Մուլտիմեդիա մեկնաբանություն"
         speech_recognition: "Խոսքի ճանաչում"
-    speed_grader_disabled: "Այս դասընթացի համար SpeedGrader անջատված է"
-    speedgrader_enabled_only_for_published_content: "SpeedGrader միացված է միայն հրապարակված բովանդակության համար:"
+    speed_grader_disabled: "Այս դասընթացի համար «SpeedGrader»-ն անջատված է"
+    speedgrader_enabled_only_for_published_content: "«SpeedGrader»-ը միացված է միայն հրապարակված բովանդակության համար:"
     student_attendance: 
       headers: 
         assignment: Հանձնարարություն
@@ -6927,7 +6930,7 @@ hy:
     context_manage_groups: 
       account_group_explanation: "Միևնույն հաշիվն ունեցող ունկնդիրների խմբերը գերազանց միջոց են խմբավորելու ունկնդիրներին՝ առանց կապված լինելու որոշակի դասընթացի: Ունկնդիրների ամեն խումբ ստանում է իր սեփական օրացույցը, քննարկման տախտակը և համատեղ աշխատելու գործիքներ, այնպես որ նրանք կարող են կազմակերպվել ինքնուրույն և ավելի արդյունավետ աշխատել միմյանց հետ:  "
       actions: 
-        add_students: "Դասընթացում ավելացնել ունկնդիրների"
+        add_students: "Դասընթացում ավելացնել ունկնդիրներ"
       buttons: 
         add_group: "Ստեղծել խմբերի նոր շարքեր"
       course_group_explanation: "Ունկնդիրների խմբերը օգտակար միջոց են կազմակերպելու ունկնդիրներին խմբային նախագծերի կամ փաստաթղթերի վրա աշխատելու համար: Ունկնդիրների ամեն խումբ ստանում է իր սեփական օրացույցը, քննարկման տախտակը և համատեղ աշխատելու գործիքներ, այնպես որ նրանք կարող են կազմակերպվել ինքնուրույն և ավելի արդյունավետ աշխատել միմյանց հետ:  "
@@ -7089,7 +7092,7 @@ hy:
         group_leader: "Խմբի առաջնորդ"
         group_settings: Կարգաբերումներ
         show_group_details: "Ցույց տալ  %{name} խմբի մանրամասները"
-        visit_group_homepage: "Այցելել խմբի տնային էջը"
+        visit_group_homepage: "Այցելել խմբի հիմնական էջը"
       group_edit: 
         cancel: "Չեղյալ համարել"
         group_join_level: "Միանում է"
@@ -7416,11 +7419,11 @@ hy:
       posting_message: "Հաղորդագրությունը տեղադրվում է..."
       searching: "Որոնումը ընթացքում է..."
     switched_roles_message: 
-      designer: "Դուք այս դասընթացի համար ժամանակավորապես միացրել եք դերերը և այժմ դիտում եք դասընթացը որպես դիզայներ: Դասընթացի տնային էջից դուք կարող եք վերականգնել ձեր դերը և թույլտվությունները: "
-      observer: "Դուք այս դասընթացի համար ժամանակավորապես միացրել եք դերերը և այժմ դիտում եք դասընթացը որպես դիտորդ: Դասընթացի տնային էջից դուք կարող եք վերականգնել ձեր դերը և թույլտվությունները:"
-      student: "Դուք այս դասընթացի համար ժամանակավորապես միացրել եք դերերը և այժմ դիտում եք դասընթացը որպես ունկնդիր: Դասընթացի տնային էջից դուք կարող եք վերականգնել ձեր դերը և թույլտվությունները:"
-      ta: "Դուք այս դասընթացի համար ժամանակավորապես միացրել եք դերերը և այժմ դիտում եք դասընթացը որպես ասիստենտ: Դասընթացի տնային էջից դուք կարող եք վերականգնել ձեր դերը և թույլտվությունները:"
-      teacher: "Դուք այս դասընթացի համար ժամանակավորապես միացրել եք դերերը և այժմ դիտում եք դասընթացը որպես դասավանդող: Դասընթացի տնային էջից դուք կարող եք վերականգնել ձեր դերը և թույլտվությունները:"
+      designer: "Դուք այս դասընթացի համար ժամանակավորապես միացրել եք դերերը և այժմ դիտում եք դասընթացը որպես դիզայներ: Դասընթացի հիմնական էջից դուք կարող եք վերականգնել ձեր դերը և թույլտվությունները: "
+      observer: "Դուք այս դասընթացի համար ժամանակավորապես միացրել եք դերերը և այժմ դիտում եք դասընթացը որպես դիտորդ: Դասընթացի հիմնական էջից դուք կարող եք վերականգնել ձեր դերը և թույլտվությունները:"
+      student: "Դուք այս դասընթացի համար ժամանակավորապես միացրել եք դերերը և այժմ դիտում եք դասընթացը որպես ունկնդիր: Դասընթացի հիմնական էջից դուք կարող եք վերականգնել ձեր դերը և թույլտվությունները:"
+      ta: "Դուք այս դասընթացի համար ժամանակավորապես միացրել եք դերերը և այժմ դիտում եք դասընթացը որպես ասիստենտ: Դասընթացի հիմնական էջից դուք կարող եք վերականգնել ձեր դերը և թույլտվությունները:"
+      teacher: "Դուք այս դասընթացի համար ժամանակավորապես միացրել եք դերերը և այժմ դիտում եք դասընթացը որպես դասավանդող: Դասընթացի հիմնական էջից դուք կարող եք վերականգնել ձեր դերը և թույլտվությունները:"
     titles: 
       bookmark_search: "Էջանշանի որոնում՝ %{service_name}"
       cant_create_recordings: "Հնարավոր չէ՞ ստեղծել գրառումներ"
@@ -7605,7 +7608,7 @@ hy:
     canvas: 
       migration: 
         announcements: Հայտարարություններ
-        assessment_question_banks: "Հարցերի բանկեր"
+        assessment_question_banks: "Հարցերի շտեմարաններ"
         assignments: Հանձնարարություններ
         attachments: Ֆայլեր
         calendar_events: "Օրացուցային միջոցառումներ"
@@ -9742,9 +9745,9 @@ hy:
     must_view_complete: "դիտել է էջը"
     must_view_incomplete: "պետք է դիտի էջը"
   month_s_5c17590e: Ամիս(ներ)
-  moodle_dropdown_many_warning_title: "Այս բանկում %{count} բացվող ցուցակների մի քանի հարցեր  ներմուծվել են սխալ ձևով"
+  moodle_dropdown_many_warning_title: "Այս շտեմարանում %{count} բացվող ցուցակների մի քանի հարցեր  ներմուծվել են սխալ ձևով"
   moodle_dropdown_warning_title: "Բացվող ցուցակների մի քանի հարցեր  կարող են սխալ ձևով ներմուծված լինել"
-  moodle_formula_many_warning_title: "Այս բանկում %{count} բանաձևերով հարցեր կան, որոնց հնարավոր պատասխանները պետք է նորից ստեղծվեն "
+  moodle_formula_many_warning_title: "Այս շտեմարանում %{count} բանաձևերով հարցեր կան, որոնց հնարավոր պատասխանները անհրաժեշտ է կրկին մուտքագրել "
   moodle_formula_warning_title: "Բանաձևով հարցերի հնարավոր պատասխանները պետք է նորից ստեղծվեն "
   more_courses_5ebbe998: "Այլ դասընթացներ "
   more_information_3dfb76b5: "Ավելի շատ տեղեկություն"
@@ -9811,7 +9814,7 @@ hy:
   new_ui_487a624e: "Նոր UI"
   next_40e12421: Հաջորդը
   next_module_item_9bb8a222: "Հաջորդ Մոդուլ/Տարր"
-  next_steps_ce0f0d0c: "Հաջորդ քայլերը"
+  next_steps_ce0f0d0c: "Հերթական քայլերը"
   no_assignment_name_adbb215b: "Հանձնարարության անվանում չկա"
   no_content_has_been_added_f36bab43: "* Բովանդակություն չի ավելացվել"
   no_courses_found_12d68a74: "Որեւէ դասընթաց չի գտնվել"
@@ -10730,6 +10733,7 @@ hy:
         password: Գաղտնաբառ
         site: Կայք
         user_roles: "Օգտատերերի դերեր"
+        username: "Օգտատիրոջ անուն"
   points_bb475533: Միավորներ
   points_possible_must_be_0_or_more_for_selected_gra_f96a04e3: "Գնահատման այս ընտրված տեսակի համար հնարավոր միավորները պետք է լինեն 0-ից ոչ պակաս"
   polling: 
@@ -11196,51 +11200,51 @@ hy:
       submit_retry_copying: "Հարցի պատճենումը չհաջողվեց, փորձեք կրկին..."
       submit_retry_moving: "Հարցի տեղափոխումը չհաջողվեց, փորձեք կրկին..."
     default_name: "Անուն չկա"
-    delete_are_you_sure: "Դուք իսկապե՞ս ցանկանում եք ջնջել հարցերի այս բանկը:"
-    error_loading_banks: "Բանկերի բեռնման սխալ"
+    delete_are_you_sure: "Դուք իսկապե՞ս ցանկանում եք ջնջել հարցերի այս շտեմարանը:"
+    error_loading_banks: "Շտեմարանների բեռնման ընթացքում տեղի է ունեցել սխալ"
     links: 
       more_questions: "այլ հարցեր"
     load_questions: "Հարցերի բեռնում..."
-    loading_banks: "Բանկերի բեռնում..."
+    loading_banks: "Շտեմարանների բեռնում..."
     loading_more_fail: "այլ հարցերի բեռնումը չհաջողվեց, փորձեք կրկին"
     move_questions: "Տեղափոխել հարցերը"
     multiple_questions: "Մի քանի հարց"
-    question_bank: "Հարցերի բանկ"
-    remove_outcome_from_bank: "Դուք իսկապե՞ս ցանկանում եք բանկից հանել այս արդյունքը:"
+    question_bank: "Հարցերի շտեմարան"
+    remove_outcome_from_bank: "Դուք իսկապե՞ս ցանկանում եք շտեմարանից ջնջել այս արդյունքը:"
     title: 
       move_copy_questions: "Տեղափոխել/պատճենել հարցերը"
     update_outcomes_fail: "Արդյունքների թարմացումը չհաջողվեց"
     updating_outcomes: "Արդյունքների թարմացում..."
   question_banks: 
-    bank_fail: "Հարցերի բանկը չհաջողվեց ստեղծել:"
-    bank_success: "Հարցերի բանկը հաջողությամբ ստեղծվել է:"
-    delete_question_bank_prompt: "Դուք իսկապե՞ս ցանկանում եք ջնջել հարցերի այս բանկը:"
+    bank_fail: "Հարցերի շտեմարանը չհաջողվեց ստեղծել:"
+    bank_success: "Հարցերի շտեմարանը հաջողությամբ ստեղծվել է:"
+    delete_question_bank_prompt: "Դուք իսկապե՞ս ցանկանում եք ջնջել հարցերի այս շտեմարանը:"
     index: 
-      account_question_banks: "Հաշվի հարցերի բանկ "
-      add_bank: "Ավելացնել հարցերի բանկը"
-      course_question_banks: "Դասընթացի հարցերի բանկեր"
+      account_question_banks: "Հաշվի հարցերի շտեմարան"
+      add_bank: "Ավելացնել հարցերի շտեմարանը"
+      course_question_banks: "Դասընթացի հարցերի շտեմարաններ"
       labels: 
-        title: "Բանկի անվանում"
-      page_title: "Հարցերի բանկեր"
-      see_bookmarked_banks: "Տես էջանշված իմ բանկերը"
-      user_question_banks: "Օգտագործողի հարցերի բանկեր"
+        title: "Շտեմարանի անվանում"
+      page_title: "Հարցերի շտեմարաններ"
+      see_bookmarked_banks: "Տես իմ կողմից նշված շտեմարանները"
+      user_question_banks: "Օգտատիրոջ հարցերի շտեմարաններ"
     question_bank: 
-      bookmark_bank: "Էջանշել հարցերի այս բանկը"
-      delete_bank: "Ջնջել հարցերի այս բանկը"
-      edit_bank: "Խմբագրել հարցերի այս բանկը"
+      bookmark_bank: "Նշել հարցերի այս շտեմարանը"
+      delete_bank: "Ջնջել հարցերի այս շտեմարանը"
+      edit_bank: "Խմբագրել հարցերի այս շտեմարանը"
       last_updated: "Վերջին անգամ թարմացվել է *%{datetime}*"
       no_name: "Անուն չկա"
-      no_questions: "Հարց չկա"
+      no_questions: "Հարցեր չկան"
       question_count: 
         one: "1 հարց"
         other: "%{count} հարց"
-      unbookmark_bank: "Հարցերի այս բանկից հանել էջանշանը"
+      unbookmark_bank: "Հարցերի այս շտեմարանից ջնջել նշումը"
     question_teaser: 
       full_details: "Սեղմեք հարցերի ամբողջական տեղեկությունները ցույց տալու համար"
       links: 
         delete_question: "Ջնջել այս հարցը"
         edit_question: "Խմբագրել այս հարցը"
-      move_bank: "հարցը տեղաշարժել/պատճենել մեկ այլ բանկում"
+      move_bank: "հարցը տեղափոխել/պատճենել մեկ այլ շտեմարան"
     show: 
       button: 
         cancel: "Չեղյալ համարել"
@@ -11248,25 +11252,25 @@ hy:
       buttons: 
         add_a_question: "Ավելացնել հարց"
         already_bookmarked: "Արդեն էջանշվել է"
-        bookmark: "Էջանշել այս բանկը"
-        delete: "Ջնջել բանկը"
-        edit: "Խմբագրել բանկի մասին տեղեկությունները"
+        bookmark: "Նշել այս շտեմարանը"
+        delete: "Ջնջել շտեմարանը"
+        edit: "Խմբագրել շտեմարանի մասին տեղեկությունները"
         move_questions: "Տեղափոխել մի քանի հարց"
       edit_warning: "Հիշեք, որ հարցերի շաբլոնների փոփոխությունները ավտոմատ կերպով չեն հանգեցնում այն թեստերի թարմացմանը, որտեղ արդեն օգտագործվում են այդ հարցերը:"
       headings: 
         aligned_outcomes: "Համապատասխանեցված արդյունքներ"
       labels: 
-        keep_copy: "Մեկ օրինակ էլ պահել հարցերի այս բանկում"
-        new_bank_name: "Նոր բանկի անվանում"
-        new_question_bank: "Հարցերի նոր բանկ"
-        title: "Բանկի անվանում"
+        keep_copy: "Մեկ օրինակ պահել հարցերի այս շտեմարանում եւս"
+        new_bank_name: "Նոր շտեմարանի անվանում"
+        new_question_bank: "Հարցերի նոր շտեմարան"
+        title: "Շտեմարանի անվանում"
       links: 
         align_outcome: "Արդյունքը համապատասխանեցնել"
         more_questions: "այլ հարցեր"
-      loading_banks: "Բանկերի բեռնում..."
+      loading_banks: "Շտեմարանների բեռնում..."
       mastery_threshold: "յուրացված է %{threshold_percentage}"
       move_copy: Տեղափոխել/պատճենել
-      select_bank: "Այս հարցի համար ընտրել համապատասխան հարցերի բանկը՝"
+      select_bank: "Այս հարցի համար ընտրել համապատասխան հարցերի շտեմարանը՝"
       show_details: "Ցույց տալ հարցերի մանրամասները"
   question_group_837b8014: "Հարցերի խումբ"
   question_unanswered: "Դեռևս պատասխան չի տրվել"
@@ -11431,7 +11435,7 @@ hy:
       other: "%{count} ունկնդիրներ"
       zero: "Ոչ ոք"
     sad-panda-alttext: "Տխուր լուրեր պանդաների երկրից:"
-    speedgrader: "Դիտել SpeedGrader-ում"
+    speedgrader: "Դիտել «SpeedGrader»-ում"
     summary: 
       audible_chart_description: "%{above_average} ունկնդիրներ ստացել են միջին և միջինից բարձր  գնահատական, իսկ %{below_average} ունկնդիրներ՝ միջինից ցածր:"
       avg_time: "Միջին տևողություն"
@@ -11504,7 +11508,7 @@ hy:
       creating_group_failed: "Խումբը ստեղծել չհաջողվեց, փորձեք կրկին"
       field_is_required: "Անհրաժեշտ է լրացնել այս դաշտը"
       invalid_show_correct_answers_range: "Թաքցնելու ամսաթիվը չի կարող լինել նախքան ցույց տալու ամսաթիվը: "
-      loading_banks_failed: "Հարցերի բանկերը չհաջողվեց բեռնել, փորձեք կրկին:"
+      loading_banks_failed: "Հարցերի շտեմարանները չհաջողվեց բեռնել, փորձեք կրկին:"
       loading_more_questions_failed: "լրացուցիչ հարցերի բեռնումը չհաջողվեց"
       loading_question_failed: "Հարցի բեռնումը չհաջողվեց..."
       loading_questions_failed: "Հարցերը չհաջողվեց բեռնել, փորձեք կրկին"
@@ -11541,7 +11545,7 @@ hy:
     index_view: 
       add_quiz: Թեստ
       links: 
-        manage_question_banks: "Կառավարել հարցերի բանկերը"
+        manage_question_banks: "Կառավարել հարցերի շտեմարանները"
         publish_multiple_quizzes: "Հրապարակել մի քանի թեստ"
         settings: Կարգաբերումներ
       quizzes_title: Թեստեր
@@ -11572,7 +11576,7 @@ hy:
         log_in: "Մուտք Գործեք Համակարգ"
     loading_more_questions: "լրացուցիչ հարցերի բեռնում..."
     loading_question: "Հարցի Բեռնում..."
-    loading_question_banks: "Հարցերի Բանկերի Բեռնում..."
+    loading_question_banks: "Հարցերի շտեմարանների բեռնում..."
     loading_questions: "Հարցերի Բեռնում..."
     message_students: "Հաղորդագրություն ուղարկել ունկնդիրներին"
     message_students_for_context: "Հաղորդագրություն ուղարկել ունկնդիրներին  %{context} մասին"
@@ -11638,8 +11642,8 @@ hy:
     quiz_attempts_nan_error: "Թեստի կատարման փորձերը կարող են միայն նշվել թվերով "
     quiz_group: 
       errors: 
-        no_bank: "Հնարավոր չէ գտնել թեստի %{group_name} խմբի հարցերի բանկը "
-        no_permissions: "Օգտագործողը թույլտվություն չուներ դիմելու թեստերի %{group_name} խմբի հարցերի բանկին"
+        no_bank: "Հնարավոր չէ գտնել թեստի %{group_name} խմբի հարցերի շտեմարանը "
+        no_permissions: "Օգտագործողը թույլտվություն չուներ դիմելու թեստերի %{group_name} խմբի հարցերի շտեմարանին"
       question_group: "Հարցերի Խումբ "
     quiz_item_group_view: 
       no_quizzes: "Թեստեր չեն գտնվել"
@@ -11719,7 +11723,7 @@ hy:
         links: 
           delete_question: "Ջնջել այս հարցը"
           edit_question: "Խմբագրել այս հարցը"
-          move_copy_question: "հարցը տեղաշարժել/պատճենել մեկ այլ բանկում"
+          move_copy_question: "հարցը տեղափոխելլ/պատճենել մեկ այլ շտեմարան"
         not_yet_graded: "Դեռևս գնահատված չէ"
         original_score: "Սկզբնական գնահատականը՝"
         points_possible: "%{points_possible} միավոր"
@@ -11756,11 +11760,11 @@ hy:
         buttons: 
           add_questions: "Ավելացնել հարցեր"
           create_group: "Ստեղծել խումբ"
-          select_bank: "Ընտրել Բանկը"
+          select_bank: "Ընտրել շտեմարանը"
         group_pick_count: "%{pick_count} հարցեր"
         group_points: "%{points}  մեկ հարցի համար"
         headers: 
-          bank_name: "Բանկի անվանում"
+          bank_name: "Շտեմարանի անվանում"
         hints: 
           group_pick_count: "Առայժմ ընտրվել է %{pick_count}"
         labels: 
@@ -11777,7 +11781,7 @@ hy:
         options: 
           new_group: "[Նոր Խումբ]"
           no_group: "[Խումբ Չկա]"
-        select_a_question_bank: "Ներքևի ցուցակից ընտրել հարցերի բանկ՝ որպես հարցերի խումբ այս թեստի հետ այն կապակցելու համար: "
+        select_a_question_bank: "Ներկայացված ցուցակից ընտրել հարցերի շտեմարան՝ որպես հարցերի խումբ այս թեստի հետ այն կապակցելու համար: "
         titles: 
           add_new_question_group: "Ավելացնել Նոր հարցերի խումբ"
       form_answer: 
@@ -12057,7 +12061,7 @@ hy:
           delete: Ջնջել
           find_ip_address_filter: "IP-հասցեների ֆիլտրի որոնում "
         warnings: 
-          has_student_submissions: "Ունկնդիրները արդեն կատարել են կամ սկսել են կատարել այս թեստը, ուստի զգույշ եղեք այն խմբագրելիս: Եթե էականորեն փոխեք թեստի որևէ հարց, հնարավոր է, որ ցանկանաք կրկին գնահատել այն ունկնդիրներին, ովքեր արդեն կատարել են թեստի հին տարբերակը:"
+          has_student_submissions: "Ունկնդիրներն արդեն կատարել են կամ սկսել են կատարել այս թեսթը, ուստի զգույշ եղեք այն խմբագրելիս: Եթե էականորեն փոխեք թեսթի որևէ հարց, հնարավոր է, որ ցանկանաք կրկին գնահատել այն ունկնդիրներին, ովքեր արդեն կատարել են թեսթի հին տարբերակը:"
       notices: 
         cant_view_submission_while_muted: "Դուք չեք կարող դիտել թեստի պատմությունը, քանի դեռ թեստի ձայնն անջատված է: "
         has_submissions_already: "Հիշեք, որ որոշ ունկնդիրներ արդեն կատարել կամ սկսել են կատարել այս թեստը։"
@@ -12075,14 +12079,14 @@ hy:
         buttons: 
           update: Թարմացնել
         default_group_name: Խումբ
-        edit_questions_and_points: "Ընտրել *%{num_questions}* հարց, #%{num_points}# միավոր ամեն հարցի համար"
+        edit_questions_and_points: "Ընտրել *%{num_questions}* հարցերը, #%{num_points}# միավոր յուրանքաչյուր հարցի համար"
         labels: 
           group_name: "Խմբի անունը"
           number_of_questions: "Հարցերի քանակը"
           points_per_question: "Միավորներ ամեն հարցի համար"
-          question_bank: "Հարցերը կհանվեն բանկից"
+          question_bank: "Հարցերը կհանվեն շտեմարանից"
         links: 
-          link_to_a_question_bank: "Հղում կատարել հարցերի բանկին"
+          link_to_a_question_bank: "Հղում հարցերի շտեմարանին"
         show_questions_and_points: "Ընտրել *%{num_questions}* հարց, #%{num_points}# միավոր ամեն հարցի համար"
         titles: 
           add_question_to_group: "Հարց ավելացնել այս խմբին "
@@ -12459,7 +12463,7 @@ hy:
       click_to_enter_comments_on_wrong_match: "Սեղմեք ունկնդրի համար մուտքագրելու մեկնաբանություններ, եթե տարբերակը բաց է թողնված"
       click_to_set_as_correct: "Սեղմեք այս պատասխանը որպես ճիշտ սահմանելու համար"
       click_to_unset_as_correct: "Սեղմեք, որպեսզի հրաժարվեք այս պատասխանը ճիշտ համարելուց: "
-      find_question_bank: "Հարցերի բանկի որոնում"
+      find_question_bank: "Հարցերի շտեմարանի որոնում"
       find_quiz_question: "Թեստի հարցի որոնում "
       help_with_formulas: "Օգնություն թեստի հարցերի բանաձևերի գծով"
       ip_address_filtering: "IP-հասցեների զտում"
@@ -12673,7 +12677,7 @@ hy:
       manage_sis: "Ներմուծել և կառավարել SIS տվյալները"
       manage_site_settings: "Կառավարել կայքի և միացվող մոդուլների կարգաբերումները"
       manage_storage_quotas: "Կառավարել պահոցի քվոտաները"
-      manage_students: "Դասընթացին ավելացնել/հանել ունկնդիրներ"
+      manage_students: "Դասընթացին ավելացնել/ջնջել ունկնդիրներ"
       manage_user_logins: "Ձևափոխել օգտագործողների մուտքի տվյալները "
       manage_user_notes: "Կառավարել դասավանդողների մատյանի գրառումները"
       manage_user_observers: "Կառավարել դիտորդներով օգտագործողների համար"
@@ -12685,7 +12689,7 @@ hy:
       read_course_list: "Դիտել դասընթացների ցանկը"
       read_forum: "Դիտել քննարկումները"
       read_messages: "Դիտել օգտագործողներին ուղարկված ծանուցումները"
-      read_question_banks: "Դիտել և կապվել հարցերի բանկերի հետ"
+      read_question_banks: "Դիտել հարցերի շտեմարանները եւ կապել դրանց հետ "
       read_reports: "Դիտել դասընթացի վերաբերյալ օգտագործման հաշվետվությունները"
       read_roster: "Տեսնել օգտագործողների ցուցակը"
       send_messages: "Հաղորդագրություններ ուղարկել անհատական դասընթացի անդամներին"
@@ -12838,6 +12842,7 @@ hy:
   save_11a80ec3: Պահպանել
   saving_d55dd90e: "Պահպանվում է..."
   score_muted_82eef66: "Գնահատական՝ (անջատված է)"
+  score_of_score_view_in_speedgrader_a7c1c954: "%{score} միավոր: Դիտել «SpeedGrader»-ում"
   score_out_of_points_possible_88f370fd: "%{points_possible} -ից  %{score} "
   score_score_6f81e8c8: "Գնահատական՝ %{score}"
   screenreader_gradebook: 
@@ -12856,7 +12861,7 @@ hy:
         points_possible: "Հնարավոր միավորներ"
         submission_types: "Ուղարկման տեսակներ՝"
       index: 
-        assignment_in_speedgrader: "Տես այս հանձնարարությունը speedgrader-ում"
+        assignment_in_speedgrader: "Տես այս հանձնարարությունը «speedgrader»-ում"
         assignment_info: "Հանձնարարության մասին տեղեկություններ"
         empty_assignment_selection: "Ընտրել հանձնարարությունը լրացուցիչ տեղեկություններն այստեղ դիտելու համար"
         no_points_possible_warning: "Այս խմբի հանձնարարությունները չունեն հնարավոր միավորներ և չեն կարող ներառվել գնահատականի հաշվարկում:"
@@ -13080,7 +13085,7 @@ hy:
   select_image_e1696a4d: "Ընտրել պատկերը"
   select_input_3dbd73c1: "Ընտրել մուտք"
   select_itemname_f70db487: "Ընտրել %{itemName}"
-  select_navigation_links_68e1e924: "Ընտրել նավիգացիաի հղումները"
+  select_navigation_links_68e1e924: "Ընտրել նավարկման հղումները"
   select_the_file_you_want_to_associate_or_add_a_fil_eedd8dc4: "Ընտրել այն ֆայլը, որը ցանկանում եք կապակցել կամ ավելացնել ֆայլը, ընտրելով \"Նոր ֆայլը\":"
   select_video_file_35b61d4e: "Ընտրել վիդեո ֆայլ"
   selected_answer: "Դուք ընտրել եք այս պատասխանը:"
@@ -13486,7 +13491,7 @@ hy:
         calendar: Օրացույց
         grades: Գնահատականներ
       navigation: 
-        main: "Հիմնական նավիգացիա"
+        main: "Հիմնական նավարկում"
     profile: 
       add_link_field: "Ավելացնել մեկ այլ հղում"
       bio: Կենսագրություն
@@ -14101,12 +14106,12 @@ hy:
     links: 
       click_to_view: "սեղմեք այստեղ դիտելու համար"
     loading_comments: "Մեկնաբանությունների բեռնում..."
-    more_details_in_the_speedgrader: "Լրացուցիչ տեղեկությունները տես SpeedGrader-ում"
+    more_details_in_the_speedgrader: "Մանրամասն տեղեկատվությունը տես «SpeedGrader»-ում"
     post_comment: "Տեղադրել մեկնաբանություն"
     submitted: "Ուղարկված է՝"
     this_was_submitted_multiple_times_choose_a_submission_to_view: "Ուղարկվել է մի քանի անգամ, նշել, թե որը պետք է նայել՝"
     update_grade: "Թարմացնել գնահատականը"
-    view_rubric_assessment_in_the_speedgrader: "Դիտել բաժնի գնահատումը SpeedGrader-ում"
+    view_rubric_assessment_in_the_speedgrader: "Դիտել բաժնի գնահատումը «SpeedGrader»-ում"
   submissions: 
     assignment_submit_success: "Հանձնարարությունը հաջողությամբ ուղարկված է:"
     assignment_submitted: "Հանձնարարությունն ուղարկված է:"
@@ -14162,7 +14167,7 @@ hy:
       peer_review_steps_complete: "Դուք ավարտել եք կոլեգաների կողմից ուսումնասիրման  համար պահանջվող քայլերը:"
       sent_to_whole_group: "Մեկնաբանություն ուղարկել ամբողջ խմբին:"
       show_rubric: "Ցույց տալ բաժինը"
-      speedgrader: SpeedGrader™
+      speedgrader: «SpeedGrader™»
       student_mute_notification: "Գնահատականները անհասանելի են, քանի որ դասավանդողը դեռ չի ավարտել գնահատումը:"
       submission_details: "Ուղարկման մանրամասներ"
       submitted_at: "ուղարկվել է  %{submit_date}"
@@ -14414,6 +14419,7 @@ hy:
   this_name_will_be_used_by_teachers_for_grading_9b6aa8a0: "Այս անունը դասավանդողներն օգտագործելու են գնահատականներ նշանակելիս:"
   this_outcome_has_been_used_to_assess_a_student_and_376d5ba9: "Այս արդյունքը օգտագործվել է գնահատելու ունկնդրին և այլևս չի կարող թարմացվել"
   this_outcome_has_been_used_to_assess_a_student_and_5a925169: "Այս արդյունքը օգտագործվել է ունկնդրին գնահատելու համար և չի կարող խմբագրվել կամ ջնջվել"
+  this_question_group_is_set_to_pick_more_questions__2e3552c4: "Այս հարցերի խմբում ընդգրկված հարցերի քնակաը գերազանցում է հասանելի հարցերի քանակը:"
   this_quiz_has_been_excused_d89d2b74: "Այս թեստը ներվել է:"
   this_quiz_is_unpublished_only_teachers_can_see_the_51d281b1: "*Այս թեստը հրապարակված չէ:* Մինչև դրա հրապարակումը միայն դասավանդողները կարող են այն տեսնել: "
   this_student_s_responses_are_hidden_because_this_a_252e8335: "Ունկնդրի պատասխանները թաքցված են, քանի որ այս հանձնարարությունն անանուն է: "
@@ -14686,7 +14692,7 @@ hy:
   unknown_47a3b725: "Անհայտ է"
   unknown_account_74d30b82: "Անհայտ հաշիվ"
   unknown_content_type_ae6d08e8: "Անհայտ բովանդակության  տեսակ"
-  unknown_question_bank: "Անհայտ հարցերի բանկ "
+  unknown_question_bank: "Անհայտ հարցերի շտեմարան"
   unknown_quiz: "Անհայտ թեստ"
   unknown_user_url_82196ba7: "Անհայտ օգտագործողի URL-հասցե"
   unlock_at_bb930b34: Արգելազերծել
@@ -14762,7 +14768,7 @@ hy:
     adding_users: "Օգտագործողներ են ավելացվում..."
     buttons: 
       continue: Շարունակել...
-    cant_unenroll: "Այս օգտագործողը ավտոմատ կերպով գրանցվել է կամպուսի գրանցման համակարգի միջոցով, այնպես որ նրան հնարավոր չէ ձեռքով հանել: Որևէ հարցի դեպքում խնդրում ենք դիմել ձեր համակարգի ադմինիստրատորին:"
+    cant_unenroll: "Այս օգտատերը ավտոմատ կերպով գրանցվել է կամպուսի գրանցման համակարգի միջոցով, այնպես որ նրան հնարավոր չէ ձեռքով հանել: Հարցերի դեպքում խնդրում ենք դիմել Ձեր համակարգի ադմինիստրատորին:"
     delete_confirm: "Դուք իսկապե՞ս ցանկանում եք հեռացնել այս օգտագործողին:"
     duplicate_users: 
       one: "1 նույնական օգտագործող է գտնվել, նույնական օգտագործողները հանվել են:"
@@ -14817,7 +14823,7 @@ hy:
     notices: 
       image_reported: "Այս պատկերի մասին զեկուցվել է"
   user_name_you_ll_need_to_log_in_before_you_can_vie_164c8e30: "%{user_name}, դուք պետք է *մուտք գործեք համակարգ*, նախքան դուք կարողանաք դիտել այս էջը:  "
-  user_navigation_a097be0f: "Օգտագործողի նավարկում"
+  user_navigation_a097be0f: "Օգտատիրոջ նավարկում"
   user_notes: 
     confirms: 
       delete_journal_entry: "Դուք իսկապե՞ս ցանկանում եք ջնջել մատյանի այս գրառումը:"
@@ -15150,7 +15156,7 @@ hy:
   view_course_analytics_eefe6b2: "Դիտել դասընթացի վերլուծությունը"
   view_file_8a1c62e5: "Դիտել ֆայլը"
   view_grades_8d3bae6c: "Դիտել Գնահատականները"
-  view_in_speedgrader_773b9d81: "Դիտել  SpeedGrader-ում"
+  view_in_speedgrader_773b9d81: "Դիտել  «SpeedGrader»-ում"
   view_name_app_62a2ad8e: "Դիտել %{name} հավելվածը"
   view_next_file_a8a4a885: "Դիտել հաջորդ ֆայլը"
   view_previous_file_b846db4f: "Դիտել նախորդ ֆայլը"
@@ -15383,7 +15389,7 @@ hy:
   you_do_not_have_access_to_the_requested_discussion_90d8ec99: "Դուք չեք կարող մուտք գործել պահանջվող քննարկման էջ: "
   you_do_not_have_access_to_the_requested_quiz_d3659e4b: "Դուք չեք կարող մուտք գործել պահանջվող թեստի էջ: "
   you_have_changed_the_progression_requirements_for__6772bc89: "Դուք փոխել եք ակտիվ դասընթացում առաջ ընթանալու պահանջները: Կարող են լինել ունկնդիրներ, ովքեր արդեն անցել են այս մոդուլին և այլ մոդուլներին, որ կախված են դրանից:"
-  you_have_made_changes_to_the_questions_in_this_qui_1658361a: "*Դուք փոփոխություններ եք մտցրել այս թեստի հարցերում:* Այդ փոփոխությունները չեն երևա ունկնդիրների համար, քանի դեռ դուք չեն պահպանել թեստը:"
+  you_have_made_changes_to_the_questions_in_this_qui_1658361a: "*Դուք փոփոխություններ եք կատարել այս թեստի հարցերում:* Այդ փոփոխությունները չեն երևա ունկնդիրների համար, քանի դեռ դուք չեն պահպանել թեստը:"
   you_have_no_outcomes_click_here_to_create_one_ebf262a3: "Դուք արդյունքներ չունեք: *Սեղմեք այստեղ* արդյունք ստեղծելու համար:"
   you_have_no_outcomes_click_here_to_go_to_the_outco_574bd0af: "Դուք արդյունքներ չունեք: Սեղմեք այստեղ  արդյունքների էջին անցնելու համար:"
   you_have_reached_the_maximum_webhooks_per_account__ae9a7f83: "Դուք հասել եք մեկ հաշվի (%{max}) սահմանաչափի համար սահմանված առավելագույն թվով webhooks"
