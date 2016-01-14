@@ -252,13 +252,13 @@ class ApplicationController < ActionController::Base
 
   protected
 
-  # we track the cost of each request in Canvas::RequestThrottle in order
+  # we track the cost of each request in RequestThrottle in order
   # to rate limit clients that are abusing the API.  Some actions consume
   # time or resources that are not well represented by simple time/cpu
   # benchmarks, so you can use this method to increase the perceived cost
   # of a request by an arbitrary amount.  For an anchor, rate limiting
   # kicks in when a user has exceeded 600 arbitrary units of cost (it's
-  # a leaky bucket, go see Canvas::RequestThrottle), so using an 'amount'
+  # a leaky bucket, go see RequestThrottle), so using an 'amount'
   # param of 600, for example, would max out the bucket immediately
   def increment_request_cost(amount)
     current_cost = request.env['extra-request-cost'] || 0

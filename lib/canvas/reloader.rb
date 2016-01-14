@@ -20,7 +20,7 @@
 module Canvas::Reloader
   def self.reload!
     Setting.reset_cache!
-    Canvas::RequestThrottle.reload!
+    RequestThrottle.reload!
     to_reload.each(&:call)
   end
 

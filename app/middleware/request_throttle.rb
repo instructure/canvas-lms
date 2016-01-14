@@ -16,7 +16,6 @@
 #
 require 'set'
 
-module Canvas
 class RequestThrottle
   # this @@last_sample data isn't thread-safe, and if canvas ever becomes
   # multi-threaded, we'll have to just get rid of it since we can't measure
@@ -288,5 +287,4 @@ class RequestThrottle
       self.last_touched = last_touched.to_f
     end
   end
-end
 end

@@ -4,7 +4,7 @@ local current_time = tonumber(ARGV[2])
 local outflow = tonumber(ARGV[3])
 local maximum = tonumber(ARGV[4])
 
--- Our modified leaky bucket algorithm is explained in lib/canvas/request_throttle.rb
+-- Our modified leaky bucket algorithm is explained in app/middleware/request_throttle.rb
 local leak = function(count, last_touched, current_time, outflow)
   if count > 0 then
     local timespan = current_time - last_touched
