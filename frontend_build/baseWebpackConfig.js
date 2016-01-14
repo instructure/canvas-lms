@@ -67,7 +67,7 @@ module.exports = {
       {
         test: /\.jsx$/,
         include: [path.resolve(__dirname, "../app/jsx")],
-        exclude: [/(node_modules|bower)/, /public\/javascripts\/vendor/, /public\/javascripts\/translations/, /app\/client_apps\/canvas_quizzes\/apps\//],
+        exclude: [/(node_modules|bower)/, /public\/javascripts\/vendor/, /public\/javascripts\/translations/, /client_apps\/canvas_quizzes\/apps\//],
         loaders: [
           'babel?cacheDirectory=tmp',
           'jsxYankPragma'
@@ -75,7 +75,7 @@ module.exports = {
       },
       {
         test: /\.jsx$/,
-        include: [/app\/client_apps\/canvas_quizzes\/apps\//],
+        include: [/client_apps\/canvas_quizzes\/apps\//],
         exclude: [/(node_modules|bower)/, /public\/javascripts\/vendor/, /public\/javascripts\/translations/, path.resolve(__dirname, "../app/jsx")],
         loaders: ["jsx"]
       },
@@ -151,7 +151,7 @@ module.exports = {
     new webpack.IgnorePlugin(/(CHANGELOG|LICENSE|README)$/),
     new webpack.IgnorePlugin(/package.json/),
     new WebpackOnBuildPlugin(function(stats){
-      child_process.spawnSync("gulp", ["rev"]);
+      child_process.spawn("gulp", ["rev"]);
     }),
     new webpack.PrefetchPlugin("./app/coffeescripts/calendar/ContextSelector.coffee"),
     new webpack.PrefetchPlugin("./app/coffeescripts/calendar/TimeBlockRow.coffee"),
