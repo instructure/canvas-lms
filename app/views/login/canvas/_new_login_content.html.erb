@@ -71,7 +71,7 @@
             </p>
             <div class="ic-Form-control ic-Form-control--login">
               <label for="pseudonym_session_unique_id_forgot" class="ic-Label">
-                <%= t("Email") %>
+                <%= login_handle_name %>
               </label>
               <input aria-describedby="forgot_password_instructions" class="ic-Input email_address text" type="text" name="pseudonym_session[unique_id_forgot]" value="<%= @unauthorized_user.email rescue '' %>" id="pseudonym_session_unique_id_forgot" />
 
