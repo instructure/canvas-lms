@@ -1,3 +1,5 @@
+require 'parser/current'
+
 module RuboCop
   module Cop
     module Migration
