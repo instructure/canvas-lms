@@ -92,11 +92,13 @@ module QuizQuestionsCommon
   end
 
   def it_should_be_on_question(which_question)
-    body = f('body')
-    expect(body).to include_text which_question
-    questions = ['first question', 'second question', 'third question'] - [which_question]
-    questions.each do |question|
-      expect(body).not_to include_text question
+    keep_trying_until(3) do
+      body = f('body')
+      expect(body).to include_text which_question
+      questions = ['first question', 'second question', 'third question'] - [which_question]
+      questions.each do |question|
+        expect(body).not_to include_text question
+      end
     end
   end
 
