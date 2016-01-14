@@ -176,9 +176,8 @@ class PageView < ActiveRecord::Base
     end
   end
 
-  def self.find(ids, options={})
+  def self.find(ids)
     return super unless PageView.cassandra?
-    raise(NotImplementedError, "options not implemented: #{options.inspect}") if options.present?
 
     case ids
     when Array

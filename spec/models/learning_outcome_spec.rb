@@ -445,6 +445,7 @@ describe LearningOutcome do
       @outcome.save!
       expect(@outcome.calculation_method).to eq('latest')
       expect(@outcome).to have(:no).errors
+      @outcome.reload
       @outcome.calculation_method = nil
       @outcome.save
       expect(@outcome).to have(1).error_on(:calculation_method)
@@ -758,7 +759,6 @@ describe LearningOutcome do
         @outcome.calculation_method = nil
         @outcome.save
         expect(@outcome).to have(1).error
-        expect(@outcome).to have(1).error_on(:calculation_method)
         expect(outcome_errors(:calculation_method).first).to include("calculation_method must be one of")
         @outcome.reload
         expect(@outcome.calculation_method).not_to be_nil

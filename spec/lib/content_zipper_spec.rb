@@ -432,7 +432,7 @@ describe ContentZipper do
       attachment = Attachment.new display_name: "donuts.jpg"
       attachment.expects(:save!).once
       ContentZipper.new.update_progress(attachment,5,10)
-      expect(attachment.file_state).to eq 60 # accounts for zero-indexed arrays
+      expect(attachment.file_state.to_s).to eq '60' # accounts for zero-indexed arrays
     end
   end
 

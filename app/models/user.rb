@@ -1978,7 +1978,7 @@ class User < ActiveRecord::Base
 
   def select_available_assignments(assignments)
     return [] if assignments.empty?
-    enrollments = self.enrollments.where(:course_id => assignments.select{|a| a.context_type == "Course"}.map(&:context_id))
+    enrollments = self.enrollments.where(:course_id => assignments.select{|a| a.context_type == "Course"}.map(&:context_id)).to_a
     Canvas::Builders::EnrollmentDateBuilder.preload(enrollments)
     enrollments.select!{|e| e.participating?}
     assignments.select{|a| a.context_type != "Course" || enrollments.any?{|e| e.course_id == a.context_id}}

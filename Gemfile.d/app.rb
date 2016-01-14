@@ -9,7 +9,7 @@ else
   gem 'rails', '4.2.5'
   gem 'rack', '1.6.4'
   gem 'builder', '3.1.4'
-  gem 'protected_attributes', '1.0.8'
+  gem 'protected_attributes', '1.1.3'
   gem 'rails-observers', '0.1.2'
   gem 'tzinfo', '1.2.2'
   gem 'oj_mimic_json', require: false

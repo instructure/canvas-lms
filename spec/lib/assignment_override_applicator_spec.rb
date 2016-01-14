@@ -750,7 +750,9 @@ describe AssignmentOverrideApplicator do
       enable_cache do
         overrides1 = AssignmentOverrideApplicator.collapsed_overrides(@assignment, [@override])
         Rails.cache.expects(:write_entry).never
-        overrides2 = AssignmentOverrideApplicator.collapsed_overrides(@assignment, [@override])
+        Timecop.freeze(5.seconds.from_now) do
+          overrides2 = AssignmentOverrideApplicator.collapsed_overrides(@assignment, [@override])
+        end
       end
     end
 

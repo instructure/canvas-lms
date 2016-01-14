@@ -90,6 +90,10 @@ module CanvasRails
 
     config.active_record.whitelist_attributes = false
 
+    unless CANVAS_RAILS4_0
+      config.active_record.raise_in_transactional_callbacks = true # may as well opt into the new behavior
+    end
+
     config.autoload_paths += %W(#{Rails.root}/app/middleware
                             #{Rails.root}/app/observers
                             #{Rails.root}/app/presenters

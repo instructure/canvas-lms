@@ -108,13 +108,13 @@ class ContextExternalTool < ActiveRecord::Base
 
   def sync_placements!(placements)
     old_placements = self.context_external_tool_placements.pluck(:placement_type)
-    (placements - old_placements).each do |new_placement|
-      self.context_external_tool_placements.new(:placement_type => new_placement)
-    end
     placements_to_delete = EXTENSION_TYPES.map(&:to_s) - placements
     if placements_to_delete.any?
       self.context_external_tool_placements.where(placement_type: placements_to_delete).delete_all if self.persisted?
-      self.context_external_tool_placements.delete_if{|p| placements_to_delete.include?(p.placement_type)}
+      self.context_external_tool_placements.reload if self.context_external_tool_placements.loaded?
+    end
+    (placements - old_placements).each do |new_placement|
+      self.context_external_tool_placements.new(:placement_type => new_placement)
     end
   end
   private :sync_placements!
@@ -664,7 +664,7 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   def self.global_navigation_tools(root_account, visibility)
-    tools = root_account.context_external_tools.active.having_setting(:global_navigation)
+    tools = root_account.context_external_tools.active.having_setting(:global_navigation).to_a
     if visibility == 'members'
       # reject the admin only tools
       tools.reject!{|tool| tool.global_navigation[:visibility] == 'admins'}

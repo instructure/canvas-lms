@@ -242,8 +242,11 @@ class ConversationMessage < ActiveRecord::Base
   def generate_user_note!
     return if skip_broadcasts
     return unless @generate_user_note
-    recipients.each do |recipient|
-      next unless recipient.grants_right?(author, :create_user_notes) && recipient.associated_accounts.any?{|a| a.enable_user_notes }
+    valid_recipients = recipients.select{|recipient| recipient.grants_right?(author, :create_user_notes) && recipient.associated_accounts.any?{|a| a.enable_user_notes }}
+    return unless valid_recipients.any?
+
+    valid_recipients = User.where(:id => valid_recipients) unless CANVAS_RAILS4_0 # need to reload to get all the attributes needed for User#save
+    valid_recipients.each do |recipient|
       title = if conversation.subject
         t(:subject_specified, "Private message: %{subject}", subject: conversation.subject)
       else

@@ -999,7 +999,7 @@ class DiscussionTopic < ActiveRecord::Base
     legacy_sub_ids &= poster_ids
     sub_ids += legacy_sub_ids
 
-    subscribed_users = participating_users(sub_ids)
+    subscribed_users = participating_users(sub_ids).to_a
 
     if course.feature_enabled?(:differentiated_assignments) && self.for_assignment?
       students_with_visibility = AssignmentStudentVisibility.where(course_id: course.id, assignment_id: assignment_id).pluck(:user_id)

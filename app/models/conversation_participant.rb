@@ -398,7 +398,7 @@ class ConversationParticipant < ActiveRecord::Base
     # if starred were an actual boolean column, this is the method that would
     # be used to convert strings to appropriate boolean values (e.g. 'true' =>
     # true and 'false' => false)
-    val = ActiveRecord::ConnectionAdapters::Column.value_to_boolean(val)
+    val = Canvas::Plugin.value_to_boolean(val)
     write_attribute(:label, val ? 'starred' : nil)
   end
 

@@ -210,7 +210,8 @@ class GroupCategory < ActiveRecord::Base
       complete_progress
       return []
     end
-
+    members = members.to_a
+    groups = groups.to_a
     ##
     # new memberships to be returned
     new_memberships = []
@@ -348,7 +349,10 @@ class GroupCategory < ActiveRecord::Base
     end
 
     if self.auto_leader
-      groups.each{|group| GroupLeadership.new(group).auto_assign!(auto_leader) }
+      groups.each do |group|
+        group.users.reload
+        GroupLeadership.new(group).auto_assign!(auto_leader)
+      end
     end
 
     if !groups.empty?

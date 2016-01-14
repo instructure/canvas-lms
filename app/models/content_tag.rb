@@ -137,6 +137,8 @@ class ContentTag < ActiveRecord::Base
     end
     content_ids.each do |type, ids|
       klass = type.constantize
+      next unless klass < ActiveRecord::Base
+      next if klass.respond_to?(:tableless?) && klass.tableless?
       if klass.new.respond_to?(:could_be_locked=)
         klass.where(:id => ids).update_all(:could_be_locked => true)
       end

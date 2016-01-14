@@ -67,7 +67,7 @@ module Canvas::Plugins::TicketingSystem
     end
 
     def user_severity
-      self.data.is_a?(Hash) ? self.data['user_perceived_severity'] : ''
+      (self.data.is_a?(Hash) && self.data['user_perceived_severity']) || ''
     end
 
     def user_roles

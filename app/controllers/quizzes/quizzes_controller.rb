@@ -20,7 +20,7 @@ class Quizzes::QuizzesController < ApplicationController
   include Api::V1::Quiz
   include Api::V1::AssignmentOverride
   include KalturaHelper
-  include Filters::Quizzes
+  include ::Filters::Quizzes
 
   # If Quiz#one_time_results is on, this flag must be set whenever we've
   # rendered the submission results to the student so that the results can be
