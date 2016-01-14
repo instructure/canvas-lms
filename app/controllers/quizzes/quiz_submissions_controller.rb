@@ -21,7 +21,7 @@ class Quizzes::QuizSubmissionsController < ApplicationController
   include Filters::Quizzes
   include Filters::QuizSubmissions
 
-  protect_from_forgery :except => [:create, :backup, :record_answer]
+  protect_from_forgery :except => [:create, :backup, :record_answer], with: :exception
   before_filter :require_context
   before_filter :require_quiz, :only => [ :index, :create, :extensions, :show, :update, :log ]
   before_filter :require_quiz_submission, :only => [ :show, :log ]

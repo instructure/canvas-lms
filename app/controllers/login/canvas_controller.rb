@@ -23,7 +23,7 @@ class Login::CanvasController < ApplicationController
   before_filter :run_login_hooks, only: [:new, :create]
   before_filter :fix_ms_office_redirects, only: :new
 
-  protect_from_forgery except: :create
+  protect_from_forgery except: :create, with: :exception
 
   def new
     @pseudonym_session = PseudonymSession.new

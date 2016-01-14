@@ -22,7 +22,7 @@ class ContextController < ApplicationController
   before_filter :require_context, :except => [:inbox, :create_media_object, :kaltura_notifications, :media_object_redirect, :media_object_inline, :media_object_thumbnail, :object_snippet]
   before_filter :require_user, :only => [:inbox, :report_avatar_image]
   before_filter :reject_student_view_student, :only => [:inbox]
-  protect_from_forgery :except => [:kaltura_notifications, :object_snippet]
+  protect_from_forgery :except => [:kaltura_notifications, :object_snippet], with: :exception
 
   def create_media_object
     @context = Context.find_by_asset_string(params[:context_code])

@@ -78,7 +78,7 @@ describe "login logout test" do
     expect(f('#login_form')).to be_displayed
   end
 
-  it "should fail on an invalid authenticity token", priority: "2" do
+  it "should fail on an invalid authenticity token", priority: "1" do
     user_with_pseudonym({:active_user => true})
     destroy_session(true)
     driver.navigate.to(app_host + '/login')

@@ -19,7 +19,7 @@
 class Login::SamlController < ApplicationController
   include Login::Shared
 
-  protect_from_forgery except: [:create, :destroy]
+  protect_from_forgery except: [:create, :destroy], with: :exception
 
   before_filter :forbid_on_files_domain
   before_filter :run_login_hooks, :check_sa_delegated_cookie, only: [:new, :create]

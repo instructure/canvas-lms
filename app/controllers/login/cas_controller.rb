@@ -21,7 +21,7 @@ require 'casclient'
 class Login::CasController < ApplicationController
   include Login::Shared
 
-  protect_from_forgery except: :destroy
+  protect_from_forgery except: :destroy, with: :exception
 
   before_filter :forbid_on_files_domain
   before_filter :run_login_hooks, :check_sa_delegated_cookie, :fix_ms_office_redirects, only: :new
