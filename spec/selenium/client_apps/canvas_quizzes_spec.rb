@@ -29,28 +29,11 @@ describe "canvas_quizzes" do
   describe 'events app' do
     it 'should mount' do
       Account.default.enable_feature!(:quiz_log_auditing)
-
       sub = @quiz.quiz_submissions.first
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions/#{sub.id}/log"
-
-      status = driver.execute_script <<-JS
-        var mountStatus = document.body.appendChild(document.createElement('div'));
-
-        require([ 'jquery', 'canvas_quizzes/apps/events' ], function($, app) {
-          if (app.isMounted()) {
-            $(mountStatus).text('success');
-          } else {
-            $(mountStatus).text('error');
-          }
-        });
-
-        return mountStatus;
-      JS
-
       wait = Selenium::WebDriver::Wait.new(timeout: 5)
-      wait.until { status.text.present? } # require call is async
-
-      expect(status.text).to match('success')
+      wait.until { f("#ic-EventStream").present? }
+      expect(f("#ic-EventStream")).to include_text('Action Log')
     end
   end
 
