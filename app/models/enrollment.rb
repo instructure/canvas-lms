@@ -667,7 +667,7 @@ class Enrollment < ActiveRecord::Base
       self.restrict_past_view? ? :inactive : :completed
     elsif self.fake_student? # Allow student view students to use the course before the term starts
       state
-    elsif !self.restrict_future_view?
+    elsif view_restrictable? && !self.restrict_future_view?
       self.available_at = global_start_at
       if state == :active
         # an accepted enrollment state means they still can't participate yet,
