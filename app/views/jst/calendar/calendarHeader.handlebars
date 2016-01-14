@@ -14,20 +14,20 @@
             data-tooltip>
         <span class="screenreader-only">{{#t "loading"}}Loading{{/t}}</span>
       </span>
-      <span class="calendar_view_buttons btn-group" role="radiogroup">
-        <button type="button" id="week" class="btn calendar-button" role="radio" aria-checked="false">
+      <span class="calendar_view_buttons btn-group" role="tablist">
+        <button type="button" id="week" class="btn calendar-button" role="tab" aria-selected="false" aria-controls="calendar-app" tabindex="-1">
           {{#t "links.calendar_week"}}Week{{/t}}
           <span class="screenreader-only accessibility-warning">{{#t "links.accessibility_warning"}}Warning: For improved accessibility of calendar events, please use the agenda view.{{/t}}</span>
         </button>
-        <button type="button" id="month" class="btn calendar-button" role="radio" aria-checked="false">
+        <button type="button" id="month" class="btn calendar-button" role="tab" aria-selected="false" aria-controls="calendar-app" tabindex="-1">
           {{#t "links.calendar_month"}}Month{{/t}}
           <span class="screenreader-only accessibility-warning">{{#t "links.accessibility_warning"}}Warning: For improved accessibility of calendar events, please use the agenda view.{{/t}}</span>
         </button>
-        <button type="button" id="agenda" class="btn" role="radio" aria-checked="false">
+        <button type="button" id="agenda" class="btn" role="tab" aria-selected="false" aria-controls="calendar-app" tabindex="-1">
           {{#t "links.calendar_agenda"}}Agenda{{/t}}
         </button>
         {{#if showScheduler}}
-          <button type="button" id="scheduler" class="btn" role="radio" aria-checked="false">
+          <button type="button" id="scheduler" class="btn" role="tab" aria-selected="false" aria-controls="calendar-app" tabindex="-1">
             {{#t "links.calendar_scheduler"}}Scheduler{{/t}}
           </button>
         {{/if}}
