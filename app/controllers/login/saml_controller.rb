@@ -242,36 +242,37 @@ class Login::SamlController < ApplicationController
     else
       increment_saml_stat("logout_request_received")
       saml_request = Onelogin::Saml::LogoutRequest.parse(params[:SAMLRequest])
-      if (aac = @domain_root_account.authentication_providers.active.where(idp_entity_id: saml_request.issuer).first)
-        settings = aac.saml_settings(request.host_with_port)
-        saml_request.process(settings)
+      aac = @domain_root_account.authentication_providers.active.where(idp_entity_id: saml_request.issuer).first
+      return render status: :bad_request, text: "Could not find SAML Entity" unless aac
 
-        if aac.debugging? && aac.debug_get(:logged_in_user_id) == @current_user.id
-          aac.debug_set(:idp_logout_request_encoded, params[:SAMLRequest])
-          aac.debug_set(:idp_logout_request_xml_encrypted, saml_request.request_xml)
-          aac.debug_set(:idp_logout_request_name_id, saml_request.name_id)
-          aac.debug_set(:idp_logout_request_session_index, saml_request.session_index)
-          aac.debug_set(:idp_logout_request_destination, saml_request.destination)
-          aac.debug_set(:debugging, t('debug.logout_request_redirect_from_idp', "Received LogoutRequest from IdP"))
-        end
+      settings = aac.saml_settings(request.host_with_port)
+      saml_request.process(settings)
 
-        settings.relay_state = params[:RelayState]
-        saml_response = Onelogin::Saml::LogoutResponse.generate(saml_request.id, settings)
-
-        # Seperate the debugging out because we want it to log the request even if the response dies.
-        if aac.debugging? && aac.debug_get(:logged_in_user_id) == @current_user.id
-          aac.debug_set(:idp_logout_request_encoded, saml_response.base64_assertion)
-          aac.debug_set(:idp_logout_response_xml_encrypted, saml_response.xml)
-          aac.debug_set(:idp_logout_response_status_code, saml_response.status_code)
-          aac.debug_set(:idp_logout_response_status_message, saml_response.status_message)
-          aac.debug_set(:idp_logout_response_destination, saml_response.destination)
-          aac.debug_set(:idp_logout_response_in_response_to, saml_response.in_response_to)
-          aac.debug_set(:debugging, t('debug.logout_response_redirect_to_idp', "Sending LogoutResponse to IdP"))
-        end
-
-        logout_current_user
-        redirect_to(saml_response.forward_url)
+      if aac.debugging? && aac.debug_get(:logged_in_user_id) == @current_user.id
+        aac.debug_set(:idp_logout_request_encoded, params[:SAMLRequest])
+        aac.debug_set(:idp_logout_request_xml_encrypted, saml_request.request_xml)
+        aac.debug_set(:idp_logout_request_name_id, saml_request.name_id)
+        aac.debug_set(:idp_logout_request_session_index, saml_request.session_index)
+        aac.debug_set(:idp_logout_request_destination, saml_request.destination)
+        aac.debug_set(:debugging, t('debug.logout_request_redirect_from_idp', "Received LogoutRequest from IdP"))
       end
+
+      settings.relay_state = params[:RelayState]
+      saml_response = Onelogin::Saml::LogoutResponse.generate(saml_request.id, settings)
+
+      # Seperate the debugging out because we want it to log the request even if the response dies.
+      if aac.debugging? && aac.debug_get(:logged_in_user_id) == @current_user.id
+        aac.debug_set(:idp_logout_request_encoded, saml_response.base64_assertion)
+        aac.debug_set(:idp_logout_response_xml_encrypted, saml_response.xml)
+        aac.debug_set(:idp_logout_response_status_code, saml_response.status_code)
+        aac.debug_set(:idp_logout_response_status_message, saml_response.status_message)
+        aac.debug_set(:idp_logout_response_destination, saml_response.destination)
+        aac.debug_set(:idp_logout_response_in_response_to, saml_response.in_response_to)
+        aac.debug_set(:debugging, t('debug.logout_response_redirect_to_idp', "Sending LogoutResponse to IdP"))
+      end
+
+      logout_current_user
+      redirect_to(saml_response.forward_url)
     end
   end
 
