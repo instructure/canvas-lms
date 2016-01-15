@@ -38,6 +38,11 @@ describe 'Speedgrader' do
     ]
   end
 
+  def let_speedgrader_load
+    wait = Selenium::WebDriver::Wait.new(timeout: 5)
+    wait.until { f("#grading-box-extended").attribute('value') != "" }
+  end
+
   context 'grading' do
     it 'complete/incomplete', priority: "1", test_id: 164014 do
       init_course_with_students 2
@@ -50,6 +55,7 @@ describe 'Speedgrader' do
       @assignment.grade_student @students[1], {grade: 'incomplete'}
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#"
+      let_speedgrader_load
       expect(f('#grading-box-extended').attribute 'value').to eq 'complete'
       f('a.next').click
       expect(f('#grading-box-extended').attribute 'value').to eq 'incomplete'
@@ -63,6 +69,7 @@ describe 'Speedgrader' do
       @assignment.grade_student @students[1], {grade: 'C'}
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#"
+      let_speedgrader_load
       expect(f('#grading-box-extended').attribute 'value').to eq 'A'
       f('a.next').click
       expect(f('#grading-box-extended').attribute 'value').to eq 'C'
@@ -78,6 +85,7 @@ describe 'Speedgrader' do
       @assignment.grade_student @students[1], {grade: 10}
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#"
+      let_speedgrader_load
       expect(f('#grading-box-extended').attribute 'value').to eq '75'
       f('a.next').click
       expect(f('#grading-box-extended').attribute 'value').to eq '50'
@@ -93,7 +101,7 @@ describe 'Speedgrader' do
       @assignment.grade_student @students[1], {grade: 10}
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#"
-      sleep 5
+      let_speedgrader_load
       expect(f('#grading-box-extended').attribute 'value').to eq '15'
       f('a.next').click
       expect(f('#grading-box-extended').attribute 'value').to eq '10'
@@ -109,6 +117,7 @@ describe 'Speedgrader' do
       @assignment.grade_student @students[1], {grade: 'D'}
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#"
+      let_speedgrader_load
       expect(f('#grading-box-extended').attribute 'value').to eq 'A'
       f('a.next').click
       expect(f('#grading-box-extended').attribute 'value').to eq 'D'
@@ -150,6 +159,7 @@ describe 'Speedgrader' do
 
       it 'should allow pass grade on assignments worth 0 points', priority: "1", test_id: 400127 do
         get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#"
+        let_speedgrader_load
         expect(f('#grading-box-extended')['value']).to eq('complete')
         expect(fj('#grade_container label').text()).to include_text('(0 / 0)')
       end
@@ -157,6 +167,7 @@ describe 'Speedgrader' do
       it 'should display pass/fail correctly when total points possible is changed', priority: "1", test_id: 419289 do
         @assignment.update_attributes(points_possible: 1)
         get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#"
+        let_speedgrader_load
         expect(f('#grading-box-extended')['value']).to eq('complete')
         expect(fj('#grade_container label').text()).to include_text('(1 / 1)')
       end
