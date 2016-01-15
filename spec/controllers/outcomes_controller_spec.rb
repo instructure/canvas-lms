@@ -147,6 +147,22 @@ describe OutcomesController do
     end
   end
 
+  describe "GET 'user_outcome_results'" do
+    it "should require authorization" do
+      account_outcome
+      get 'user_outcome_results', :account_id => @account.id, :user_id => @student.id
+      assert_unauthorized
+    end
+
+    it "should return outcomes for the given user" do
+      account_outcome
+      user_session(@admin)
+      get 'user_outcome_results', :account_id => @account.id, :user_id => @student.id
+      expect(response).to be_success
+      expect(response).to render_template('user_outcome_results')
+    end
+  end
+
   describe "GET 'list'" do
     it "should list account outcomes for an account context" do
       account_outcome
