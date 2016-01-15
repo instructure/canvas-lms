@@ -87,10 +87,6 @@ shared_context "in-process server selenium tests" do
     check_exception example.example.exception
   end
 
-  prepend_before :all do
-    SeleniumDriverSetup.allow_requests!
-  end
-
   prepend_before :each do
     SeleniumDriverSetup.allow_requests!
   end

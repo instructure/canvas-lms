@@ -36,6 +36,7 @@ class SpecFriendlyThinServer
     while Time.now < max_time
       response = HTTParty.get("http://#{bind_address}:#{port}/health_check") rescue nil
       if response && response.success?
+        SeleniumDriverSetup.disallow_requests!
         puts " Done!"
         return
       end
