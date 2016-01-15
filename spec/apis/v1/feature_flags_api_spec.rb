@@ -45,7 +45,7 @@ describe "Feature Flags API", type: :request do
     end
 
     it "should return the correct format" do
-      t_root_account.feature_flags.create! feature: 'course_feature', state: 'on', locking_account: t_site_admin
+      t_root_account.feature_flags.create! feature: 'course_feature', state: 'on'
       json = api_call_as_user(t_root_admin, :get, "/api/v1/accounts/#{t_root_account.id}/features",
          { controller: 'feature_flags', action: 'index', format: 'json', account_id: t_root_account.to_param })
       expect(json.sort_by { |f| f['feature'] }).to eql(
@@ -69,10 +69,10 @@ describe "Feature Flags API", type: :request do
            "feature_flag"=>
                {"context_id"=>t_root_account.id,
                 "context_type"=>"Account",
-                "locking_account_id"=>t_site_admin.id,
+                "locking_account_id"=>nil,
                 "feature"=>"course_feature",
                 "state"=>"on",
-                "locked"=>true,
+                "locked"=>false,
                 "transitions"=>{"allowed"=>{"locked"=>false}, "off"=>{"locked"=>false}}}},
           {"feature"=>"root_account_feature",
            "applies_to"=>"RootAccount",
@@ -311,56 +311,6 @@ describe "Feature Flags API", type: :request do
       end
     end
 
-    describe "locking_account_id" do
-      it "should require admin rights in the locking account to lock a flag" do
-        api_call_as_user(t_teacher, :put, "/api/v1/courses/#{t_course.id}/features/flags/course_feature?state=on&locking_account_id=#{t_root_account.id}",
-                 { controller: 'feature_flags', action: 'update', format: 'json', course_id: t_course.to_param, feature: 'course_feature',
-                   state: 'on', locking_account_id: t_root_account.to_param },
-                 {}, {}, { expected_status: 403 })
-
-        api_call_as_user(t_root_admin, :put, "/api/v1/courses/#{t_course.id}/features/flags/course_feature?state=on&locking_account_id=#{t_root_account.id}",
-                 { controller: 'feature_flags', action: 'update', format: 'json', course_id: t_course.to_param, feature: 'course_feature',
-                   state: 'on', locking_account_id: t_root_account.to_param })
-        expect(t_course.feature_flags.where(feature: 'course_feature').first.locking_account).to eql t_root_account
-      end
-
-      it "should require admin rights in the locking account to modify a locked flag" do
-        t_course.feature_flags.create! feature: 'course_feature', state: 'on', locking_account: t_root_account
-        api_call_as_user(t_teacher, :put, "/api/v1/courses/#{t_course.id}/features/flags/course_feature?state=off",
-                 { controller: 'feature_flags', action: 'update', format: 'json', course_id: t_course.to_param, feature: 'course_feature',
-                   state: 'off' }, {}, {}, { expected_status: 403 })
-
-        api_call_as_user(t_root_admin, :put, "/api/v1/courses/#{t_course.id}/features/flags/course_feature?state=off",
-                 { controller: 'feature_flags', action: 'update', format: 'json', course_id: t_course.to_param, feature: 'course_feature',
-                   state: 'off' })
-        expect(t_course.feature_flags.where(feature: 'course_feature').first).not_to be_enabled
-      end
-
-      it "should fail if the locking account isn't in the chain" do
-        other_account = account_model
-        user = account_admin_user user: t_teacher, account: other_account
-        json = api_call_as_user(user, :put, "/api/v1/courses/#{t_course.id}/features/flags/course_feature?state=on&locking_account_id=#{other_account.id}",
-                 { controller: 'feature_flags', action: 'update', format: 'json', course_id: t_course.to_param, feature: 'course_feature',
-                   state: 'on', locking_account_id: other_account.to_param }, {}, {}, { expected_status: 400 })
-      end
-
-      it "should accept a SIS ID for the locking account" do
-        t_sub_account.update_attribute(:sis_source_id, 'rainbow_sparkle')
-        json = api_call_as_user(t_root_admin, :put, "/api/v1/courses/#{t_course.id}/features/flags/course_feature?state=on&locking_account_id=sis_account_id:rainbow_sparkle",
-                        { controller: 'feature_flags', action: 'update', format: 'json', course_id: t_course.to_param, feature: 'course_feature',
-                          state: 'on', locking_account_id: 'sis_account_id:rainbow_sparkle' }, {}, {}, { domain_root_account: t_root_account })
-        expect(t_course.feature_flags.where(feature: 'course_feature').first.locking_account).to eql t_sub_account
-      end
-
-      it "should clear the locking account" do
-        t_course.feature_flags.create! feature: 'course_feature', state: 'on', locking_account: t_root_account
-        api_call_as_user(t_root_admin, :put, "/api/v1/courses/#{t_course.id}/features/flags/course_feature?locking_account_id=",
-                 { controller: 'feature_flags', action: 'update', format: 'json', course_id: t_course.to_param, feature: 'course_feature',
-                   locking_account_id: '' })
-        expect(t_course.feature_flags.where(feature: 'course_feature').first.locking_account).to be_nil
-      end
-    end
-
     describe "hidden" do
       it "should create a site admin feature flag" do
         api_call_as_user(site_admin_user, :put, "/api/v1/accounts/#{t_site_admin.id}/features/flags/hidden_feature",
@@ -462,18 +412,6 @@ describe "Feature Flags API", type: :request do
       api_call_as_user(t_root_admin, :delete, "/api/v1/accounts/#{t_sub_account.id}/features/flags/course_feature",
                { controller: 'feature_flags', action: 'delete', format: 'json', account_id: t_sub_account.to_param, feature: 'course_feature' },
                {}, {}, { expected_status: 404 })
-    end
-
-    it "should not delete a feature flag locked by a higher account" do
-      t_teacher.feature_flags.create! feature: 'user_feature', state: 'on'
-      api_call_as_user(t_teacher, :delete, "/api/v1/users/#{t_teacher.id}/features/flags/user_feature",
-               { controller: 'feature_flags', action: 'delete', format: 'json', user_id: t_teacher.to_param, feature: 'user_feature' })
-      expect(t_teacher.feature_flags.where(feature: 'course_feature')).to be_empty
-
-      t_teacher.feature_flags.create! feature: 'user_feature', state: 'on', locking_account: t_site_admin
-      api_call_as_user(t_teacher, :delete, "/api/v1/users/#{t_teacher.id}/features/flags/user_feature",
-               { controller: 'feature_flags', action: 'delete', format: 'json', user_id: t_teacher.to_param, feature: 'user_feature' },
-               {}, {}, { expected_status: 403 })
     end
   end
 

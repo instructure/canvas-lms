@@ -41,7 +41,7 @@ class Feature
     true
   end
 
-  def locked?(query_context, current_user = nil)
+  def locked?(query_context)
     query_context.blank? || !allowed? && !hidden?
   end
 
