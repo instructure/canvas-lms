@@ -27,6 +27,7 @@ describe 'quizzes question banks' do
       expect(question_bank).to be_present
       expect(question_bank.workflow_state).to eq 'active'
       expect(f('#question_bank_adding .title')).to(include_text('goober'))
+      expect(driver.switch_to.active_element).to eq(f('#question_bank_adding .title'))
       expect(question_bank.bookmarked_for?(User.last)).to be_truthy
       question_bank
     end
