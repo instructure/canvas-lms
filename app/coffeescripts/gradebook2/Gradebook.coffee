@@ -1121,6 +1121,9 @@ define [
       $('#post_grades').kyleMenu()
 
       $settingsMenu.find('.student_names_toggle').click(@studentNamesToggle)
+      $('#keyboard-shortcuts').click ->
+        questionMarkKeyDown = $.Event('keydown', keyCode: 191)
+        $(document).trigger(questionMarkKeyDown)
 
       @userFilter = new InputFilterView el: '.gradebook_filter input'
       @userFilter.on 'input', @onUserFilterInput
