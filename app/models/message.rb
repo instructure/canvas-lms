@@ -566,10 +566,14 @@ class Message < ActiveRecord::Base
     end
   end
 
+  # Public: Enqueues a message to the notification_service's sqs queue
+  #
+  # Returns nothing
   def enqueue_to_sqs
-    message_body = path_type == "email" ? Mailer.create_message(self).to_s : body
-    NotificationService.process(global_id, message_body, path_type, to, remote_configuration)
-    complete_dispatch
+    notification_targets.each do |target|
+      NotificationService.process(global_id, notification_message, path_type, target, remote_configuration)
+      complete_dispatch
+    end
   rescue AWS::SQS::Errors::ServiceError => e
     Canvas::Errors.capture(
       e,
@@ -599,6 +603,31 @@ class Message < ActiveRecord::Base
       return if to =~ /^\+[0-9]+$/ ? "Twilio.com" : "email.amazonaws.com"
     else
       raise RemoteConfigurationError, "No matching path types for notification service"
+    end
+  end
+
+  # Public: Determines the message body for a notification endpoint
+  #
+  # Returns target notification message body
+  def notification_message
+    case path_type
+    when "email"
+      Mailer.create_message(self).to_s
+    when "push"
+      sns_json
+    else
+      body
+    end
+  end
+
+  # Public: Returns all notification_service targets to send to
+  #
+  # Returns the targets in which to send the notification to
+  def notification_targets
+    if path_type == "push"
+      self.user.notification_endpoints.map(&:arn)
+    else
+      [to]
     end
   end
 

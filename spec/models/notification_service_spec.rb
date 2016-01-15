@@ -21,11 +21,14 @@ require File.expand_path(File.dirname(__FILE__) + '/../messages/messages_helper'
 
 describe NotificationService do
   before(:once) do
-      @au = AccountUser.create(:account => account_model)
-      @au.account.root_account.enable_feature!(:notification_service)
-      @message = generate_message(:account_user_notification, :email, @au)
+      user_model
+      @au = tie_user_to_account(@user, account: account_model)
+      @account.root_account.enable_feature!(:notification_service)
+      @message = generate_message(:account_user_notification, :email, @au, user: @user)
       @message.user.account.root_account.enable_feature!(:notification_service)
       @message.save!
+      @message.to = "testing123"
+      @at = AccessToken.create!(:user => @user, :developer_key => DeveloperKey.default)
   end
   before(:each) do
     @queue = stub('notification queue')
@@ -56,7 +59,12 @@ describe NotificationService do
     end
     it "processes push notification message type" do
       @queue.expects(:send_message).once
+      sns_client = mock()
+      sns_client.stubs(:create_platform_endpoint).returns(endpoint_arn: 'arn')
+      NotificationEndpoint.any_instance.stubs(:sns_client).returns(sns_client)
+      @at.notification_endpoints.create!(token: 'token')
       @message.path_type = "push"
+      @message.deliver
       expect{@message.deliver}.not_to raise_error
     end
     it "throws error if cannot connect to queue" do
