@@ -1414,6 +1414,11 @@ describe Account do
           expect(Account.find_cached(a.id)).to eq a
         end
       end
+
+      it "errors if infrastructure fails and we can't see the account" do
+        nonsense_id = 987654321
+        expect{ Account.find_cached(nonsense_id) }.to raise_error(ActiveRecord::RecordNotFound)
+      end
     end
 
     describe ".invalidate_cache" do

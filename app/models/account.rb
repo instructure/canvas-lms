@@ -1094,8 +1094,8 @@ class Account < ActiveRecord::Base
     birth_id = Shard.relative_id_for(id, Shard.current, Shard.birth)
     Shard.birth.activate do
       Rails.cache.fetch(account_lookup_cache_key(birth_id)) do
-        account = Account.where(id: birth_id).first
-        account.precache if account
+        account = Account.find(birth_id)
+        account.precache
         account
       end
     end
@@ -1106,7 +1106,11 @@ class Account < ActiveRecord::Base
       account = special_accounts[special_account_type]
       unless account
         special_account_id = special_account_ids[special_account_type] ||= Setting.get("#{special_account_type}_account_id", nil)
-        account = special_accounts[special_account_type] = Account.find_cached(special_account_id) if special_account_id
+        begin
+          account = special_accounts[special_account_type] = Account.find_cached(special_account_id) if special_account_id
+        rescue ActiveRecord::RecordNotFound
+          raise unless Rails.env.test?
+        end
       end
       # another process (i.e. selenium spec) may have changed the setting
       unless account
@@ -1117,7 +1121,6 @@ class Account < ActiveRecord::Base
         end
       end
       if !account && default_account_name && ((!special_account_id && !Rails.env.production?) || force_create)
-        # TODO i18n
         t '#account.default_site_administrator_account_name', 'Site Admin'
         t '#account.default_account_name', 'Default Account'
         account = special_accounts[special_account_type] = Account.new(:name => default_account_name)
