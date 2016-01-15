@@ -342,6 +342,14 @@ describe "screenreader gradebook" do
         @first_assignment.save
       end
 
+      let!(:change_third_assignment_to_include_media_and_have_submission) do
+        @third_assignment.submission_types = "online_text_entry,media_recording"
+        @third_assignment.save
+
+        submission = @third_assignment.submit_homework(@student_1, body: "Can you click?")
+        submission.save!
+      end
+
       let!(:get_screenreader_gradebook) do
         get srgb
       end
@@ -358,6 +366,12 @@ describe "screenreader gradebook" do
         click_option '#assignment_select', @assignment.name
 
         expect(f("#submissions_download_button")).to_not be_present
+      end
+
+      it "is displayed for assignments which allow both online and non-online submittion" do
+        click_option '#assignment_select', 'assignment three'
+
+        expect(f("#submissions_download_button")).to be_present
       end
     end
   end

@@ -51,6 +51,33 @@ describe ContentZipper do
       expect(expected_file_patterns).to be_empty
     end
 
+    it "should ignore undownloadable submissions" do
+      course_with_student(active_all: true)
+      @user.update_attributes!(sortable_name: 'some_999_, _1234_guy')
+      assignment_model(course: @course)
+      @assignment.submission_types="online_text_entry,media_recording"
+      @assignment.save
+      my_media_object = media_object(context: @course, user: @user)
+      submission = @assignment.submit_homework(@user, {
+                                                 submission_type: "media_recording",
+                                                 media_comment_id: my_media_object.media_id,
+                                                 media_comment_type: my_media_object.media_type
+                                               })
+      submission.save
+
+      attachment = Attachment.new(display_name: 'my_download.zip')
+      attachment.user = @teacher
+      attachment.workflow_state = 'to_be_zipped'
+      attachment.context = @assignment
+      attachment.save!
+      ContentZipper.process_attachment(attachment, @teacher)
+      attachment.reload
+
+      zip_file = Zip::File.open(attachment.full_filename)
+      expect(zip_file.entries).to be_empty
+      zip_file.close
+    end
+
     it "should zip up online_url submissions" do
       course_with_student(active_all: true)
       @user.update_attributes!(sortable_name: 'some_999_, _1234_guy')

@@ -74,13 +74,20 @@ class ContentZipper
 
     filename    = assignment_zip_filename(assignment)
     user        = zip_attachment.user
-    
+
+    # It is possible to get this far if an assignment allows the
+    # downloadable submissions below as well as those that can't be
+    # downloaded. In that case, only retrieve the ones that can be
+    # downloaded.
+    downloadable_submissions = ["online_upload", "online_url", "online_text_entry"]
     if @context.completed?
-      submissions = assignment.submissions
-      students = User.where(id: submissions.pluck(:user_id)).index_by(&:id) # This neglects the complexity of group assignments
+      submissions = assignment.submissions.where(submission_type: downloadable_submissions)
+      # This neglects the complexity of group assignments
+      students = User.where(id: submissions.pluck(:user_id)).index_by(&:id)
     else
       students    = assignment.representatives(user).index_by(&:id)
-      submissions = assignment.submissions.where(:user_id => students.keys)
+      submissions = assignment.submissions.where(user_id: students.keys,
+                                                 submission_type: downloadable_submissions)
     end
 
     make_zip_tmpdir(filename) do |zip_name|
