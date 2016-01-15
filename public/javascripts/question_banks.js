@@ -53,6 +53,7 @@ $(document).ready(function() {
     var $bank = $link.parents(".question_bank");
     $.ajaxJSON($(this).attr('href'), 'POST', {}, function(data) {
       $bank.find(".bookmark_bank_link").toggle();
+      $bank.find(".bookmark_bank_link:visible:first").focus();
     });
   });
   $(".question_bank .edit_bank_link").click(function(event) {
