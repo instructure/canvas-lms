@@ -96,6 +96,8 @@ Style/Lambda:
   Enabled: false
 Style/WhileUntilModifier:
   Enabled: false
+Style/ParallelAssignment:
+  Enabled: false
 
 # Rails style changes
 Rails/TimeZone:
@@ -117,8 +119,6 @@ Lint/EndAlignment:
 # Performance changes
 Performance/Detect:
   Severity: warning
-Performance/ParallelAssignment:
-  Enabled: false
 
 # these need better configuration than the default:
 Style/AndOr:
