@@ -1081,17 +1081,26 @@ class Account < ActiveRecord::Base
       end
     end
 
+    def special_account_list
+      @special_account_list ||= []
+    end
+
     def clear_special_account_cache!(force = false)
       special_account_timed_cache.clear(force)
     end
 
     def define_special_account(key, name = nil)
       name ||= key.to_s.titleize
+      self.special_account_list << key
       instance_eval <<-RUBY
         def self.#{key}(force_create = false)
           get_special_account(:#{key}, #{name.inspect}, force_create)
         end
       RUBY
+    end
+
+    def all_special_accounts
+      special_account_list.map { |key| send(key) }
     end
   end
   define_special_account(:default, 'Default Account')
