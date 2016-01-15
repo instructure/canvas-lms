@@ -140,10 +140,8 @@ describe 'quizzes stats' do
         end
 
         it 'should have a discrimination index pop up', priority: "2", test_id: 140643 do
-          fj('span.sighted-user-content > button.btn').click
-          wait_for_ajaximations
-          fj('i.chart-help-trigger.icon-question').click
-          wait_for_ajaximations
+          f('span.sighted-user-content > button.btn').click
+          f('.chart-help-trigger .icon-question').click
           expect(ff('span.ui-dialog-title').any? {|dialog| dialog.text == 'The Discrimination Index Chart'})
         end
       end
