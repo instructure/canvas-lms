@@ -1005,7 +1005,7 @@ class Assignment < ActiveRecord::Base
       students = group.users
         .joins(:enrollments)
         .where(:enrollments => { :course_id => self.context})
-        .where(Course.reflections[:student_enrollments].options[:conditions])
+        .merge(Course.instance_exec(&Course.reflections[CANVAS_RAILS4_0 ? :student_enrollments : 'student_enrollments'].scope).only(:where))
         .order("users.id") # this helps with preventing deadlock with other things that touch lots of users
         .uniq
         .to_a

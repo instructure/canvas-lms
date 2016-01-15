@@ -2159,7 +2159,7 @@ class User < ActiveRecord::Base
 
       group_rows = pluck_global_id_rows(
           GroupMembership.joins(:group).
-              where(User.reflections[:current_group_memberships].options[:conditions]).
+              merge(User.instance_exec(&User.reflections[CANVAS_RAILS4_0 ? :current_group_memberships : 'current_group_memberships'].scope).only(:where)).
               where(user_id: users).
               select([:user_id, :group_id]).
               uniq)
