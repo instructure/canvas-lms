@@ -102,6 +102,11 @@ class WikiPagesController < ApplicationController
         js_data[:ModuleSequenceFooter_data] = item_sequence_base(Api.api_type_to_canvas_name('ModuleItem'), params[:module_item_id])
       end
 
+      context_module = @context.context_modules.first
+      if context_module
+        js_data[:module_listing_data] = context_module.content_tags_visible_to(@current_user)
+      end
+
       js_env js_data
 
       @padless = true

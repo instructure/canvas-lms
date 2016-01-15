@@ -2,4 +2,57 @@
   content_for :page_title, join_title(@page.title.to_s, @context.name)
   js_bundle :wiki_page_show
 %>
+
+<script>
+	// THIS SHOULD ACTUALLY BE IN OUR BZ_CUSTOM.JS!!!
+	function bzAutoTOC() {
+		var toc = document.getElementById("bz-auto-toc");
+		if(toc == null) return;
+
+		var data = ENV["module_listing_data"];
+		if(data == null) return;
+
+		var mid = location.search;
+		if(mid && mid.length) {
+			mid = mid.substring(1);
+			var parts = mid.split("&");
+			for(var i = 0; i < parts.length; i++) {
+				var idx = parts[i].indexOf("=");
+				if(idx == -1)
+					idx = parts[i].length;
+				var name = parts[i].substring(0, idx);
+				if(name == "module_item_id") {
+					mid = parts[i].substring(idx + 1)|0;
+					break;
+				}
+			}
+		}
+
+
+		toc.innerHTML = "";
+
+		var ol = document.createElement("ol");
+
+		for(var i = 0; i < data.length; i++) {
+			var item = data[i].content_tag;
+
+			if(item.indent > 0)
+				continue;
+
+			var li = document.createElement("li");
+
+			if(mid == item.id)
+				li.className = "bz-toc-current";
+
+			var a = document.createElement("a");
+			a.textContent = item.title;
+			a.href = item.url ? item.url : ("/courses/" + item.context_id + "/items/" + item.id);
+			li.appendChild(a);
+			ol.appendChild(li);
+		}
+
+		toc.appendChild(ol);
+	}
+</script>
+
 <div id="wiki_page_show"></div>
