@@ -77,7 +77,7 @@ def render_properties(json)
   if properties = properties_of_model(json)
     "{\n" + indent(
     properties.map do |name, prop|
-      "\n" + render_comment(prop['description']) +
+      render_comment(prop['description']) +
       %{"#{name}": } + render_value(prop['example'], prop['type'])
     end.join(",\n")) +
     "\n}"
