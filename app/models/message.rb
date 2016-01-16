@@ -84,12 +84,14 @@ class Message < ActiveRecord::Base
           MessageDispatcher.dispatch(self)
         end
       end
+      event :set_transmission_error, :transitions_to => :transmission_error
       event :cancel, :transitions_to => :cancelled
       event :close, :transitions_to => :closed # needed for dashboard messages
     end
 
     state :staged do
       event :dispatch, :transitions_to => :sending
+      event :set_transmission_error, :transitions_to => :transmission_error
       event :cancel, :transitions_to => :cancelled
       event :close, :transitions_to => :closed # needed for dashboard messages
     end
@@ -98,6 +100,7 @@ class Message < ActiveRecord::Base
       event :complete_dispatch, :transitions_to => :sent do
         self.sent_at ||= Time.now
       end
+      event :set_transmission_error, :transitions_to => :transmission_error
       event :cancel, :transitions_to => :cancelled
       event :close, :transitions_to => :closed
       event :errored_dispatch, :transitions_to => :staged do
@@ -107,6 +110,7 @@ class Message < ActiveRecord::Base
     end
 
     state :sent do
+      event :set_transmission_error, :transitions_to => :transmission_error
       event :close, :transitions_to => :closed
       event :bounce, :transitions_to => :bounced do
         # Permenant reminder that this bounced.
@@ -122,12 +126,19 @@ class Message < ActiveRecord::Base
     end
 
     state :dashboard do
+      event :set_transmission_error, :transitions_to => :transmission_error
       event :close, :transitions_to => :closed
       event :cancel, :transitions_to => :closed
     end
+
     state :cancelled
 
+    state :transmission_error do
+      event :close, :transitions_to => :closed
+    end
+
     state :closed do
+      event :set_transmission_error, :transitions_to => :transmission_error
       event :send_message, :transitions_to => :closed do
         self.sent_at ||= Time.now
       end
@@ -557,7 +568,7 @@ class Message < ActiveRecord::Base
 
   def enqueue_to_sqs
     message_body = path_type == "email" ? Mailer.create_message(self).to_s : body
-    NotificationService.process(message_body, path_type, to, remote_configuration)
+    NotificationService.process(global_id, message_body, path_type, to, remote_configuration)
     complete_dispatch
   rescue AWS::SQS::Errors::ServiceError => e
     Canvas::Errors.capture(

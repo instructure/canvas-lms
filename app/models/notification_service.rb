@@ -20,8 +20,9 @@ require 'aws-sdk'
 
 class NotificationService
 
-  def self.process(body, type, to, remote)
+  def self.process(global_id, body, type, to, remote)
     self.notification_queue.send_message({
+      'global_id' => global_id,
       'type' => type,
       'delivery' => { 'remote' => remote },
       'message' => body,
