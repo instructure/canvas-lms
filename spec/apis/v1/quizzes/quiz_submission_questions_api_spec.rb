@@ -202,6 +202,18 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
       end
     end
 
+    it "should be authorized when results are hidden in quiz settings and isn't complete" do
+      @quiz = @course.quizzes.create!({
+        title: 'test quiz',
+        hide_results: 'always'
+      })
+      @quiz_submission = @quiz.generate_submission(@student)
+
+      # Check if it still accepts a non-completed submission
+      api_index({}, {raw: true})
+      assert_status(200)
+    end
+
     it "should deny student access when quiz is OQAAT" do
       @quiz = @course.quizzes.create!({
         title: "oqaat quiz",
