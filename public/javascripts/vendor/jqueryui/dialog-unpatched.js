@@ -345,7 +345,19 @@ $.widget("ui.dialog", {
 				if ( index == -1 ) {return;}
 				var targetIndex = index + (event.shiftKey ? -1 : 1);
 				targetIndex = (targetIndex + tabbables.length) % tabbables.length;
-				tabbables.eq(targetIndex).focus();
+				var target = tabbables.eq(targetIndex)
+				target.focus();
+
+				// when switching to a target for which the browser would select the
+				// full contents on default tab behavior, we still want to do the same.
+				var fullSelectTypes = [
+				  'input[type="text"]', 'input[type="password"]', 'input[type="number"]',
+				  'input[type="datetime"]', 'input[type="email"]',
+				  'input[type="search"]', 'input[type="tel"]', 'input[type="url"]'
+				];
+				if (target.is(fullSelectTypes.join(',')))
+				  target[0].select();
+
 				return false;
 			}});
 		}
