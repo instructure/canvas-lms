@@ -1463,3 +1463,39 @@ unless CANVAS_RAILS4_0
   end
   ActiveRecord::Base.include(DefineAttributeMethods)
 end
+
+module SkipTouchCallbacks
+  module Base
+    def skip_touch_callbacks(name)
+      if CANVAS_RAILS4_0
+        self.suspend_callbacks("(belongs_to_touch_after_save_or_destroy_for_#{name})") do
+          yield
+        end
+      else
+        @skip_touch_callbacks ||= Set.new
+        if @skip_touch_callbacks.include?(name)
+          yield
+        else
+          @skip_touch_callbacks << name
+          yield
+          @skip_touch_callbacks.delete(name)
+        end
+      end
+    end
+
+    def touch_callbacks_skipped?(name)
+      (@skip_touch_callbacks && @skip_touch_callbacks.include?(name)) ||
+        (self.superclass < ActiveRecord::Base && self.superclass.touch_callbacks_skipped?(name))
+    end
+  end
+
+  module BelongsTo
+    def touch_record(o, foreign_key, name, *args)
+      return if o.class.touch_callbacks_skipped?(name)
+      super
+    end
+  end
+end
+
+ActiveRecord::Base.singleton_class.include(SkipTouchCallbacks::Base)
+ActiveRecord::Associations::Builder::BelongsTo.singleton_class.prepend(SkipTouchCallbacks::BelongsTo) unless CANVAS_RAILS4_0

@@ -24,14 +24,15 @@ module SIS
     def process(messages, updates_every)
       start = Time.now
       i = Work.new(@batch, @root_account, @logger, updates_every, messages)
-      # the suspend callbacks is weird with string and symbol because of rails
-      # see pp Enrollment.first._save_callbacks.map(&:filter);''
-      Enrollment.suspend_callbacks("(belongs_to_touch_after_save_or_destroy_for_course)", :update_cached_due_dates) do
-        User.skip_updating_account_associations do
-          Enrollment.process_as_sis(@sis_options) do
-            yield i
-            while i.any_left_to_process?
-              i.process_batch
+
+      Enrollment.skip_touch_callbacks(:course) do
+        Enrollment.suspend_callbacks(:update_cached_due_dates) do
+          User.skip_updating_account_associations do
+            Enrollment.process_as_sis(@sis_options) do
+              yield i
+              while i.any_left_to_process?
+                i.process_batch
+              end
             end
           end
         end
