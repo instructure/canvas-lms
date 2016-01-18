@@ -360,7 +360,7 @@ class ContentZipper
     #
     # All other attachments toss on the static attachment pile for
     # later processing.
-    if entry.content.present?
+    if entry.content.is_a?(Array) && entry.content.present?
       entry.content.select { |c| c[:section_type] == "rich_text" }.each do |rt|
         rt[:content].gsub!(StaticAttachment::FILES_REGEX) do |match|
           att = Attachment.find_by_id(Regexp.last_match(:obj_id))
