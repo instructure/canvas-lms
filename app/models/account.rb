@@ -1101,11 +1101,17 @@ class Account < ActiveRecord::Base
   def precache
   end
 
+  class ::Canvas::AccountCacheError < StandardError; end
+
   def self.find_cached(id)
     birth_id = Shard.relative_id_for(id, Shard.current, Shard.birth)
     Shard.birth.activate do
       Rails.cache.fetch(account_lookup_cache_key(birth_id)) do
-        account = Account.find(birth_id)
+        begin
+          account = Account.find(birth_id)
+        rescue ActiveRecord::RecordNotFound => e
+          raise ::Canvas::AccountCacheError, e.message
+        end
         account.precache
         account
       end
@@ -1119,7 +1125,7 @@ class Account < ActiveRecord::Base
         special_account_id = special_account_ids[special_account_type] ||= Setting.get("#{special_account_type}_account_id", nil)
         begin
           account = special_accounts[special_account_type] = Account.find_cached(special_account_id) if special_account_id
-        rescue ActiveRecord::RecordNotFound
+        rescue ::Canvas::AccountCacheError
           raise unless Rails.env.test?
         end
       end
