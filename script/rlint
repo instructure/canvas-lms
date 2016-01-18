@@ -35,6 +35,10 @@ if ENV['GERRIT_PATCHSET_REVISION']
   plugin = ENV['GERRIT_PROJECT']
   plugin = nil if plugin == 'canvas-lms'
   git_dir = "gems/plugins/#{plugin}/" if plugin
+  if git_dir && !Dir.exist?(git_dir)
+    puts "No plugin #{plugin} found"
+    exit 0
+  end
 
   file_sieve = RuboCop::Canvas::FileSieve.new(git_dir: git_dir)
   results_json = get_offenses_json(file_sieve, env_sha)
