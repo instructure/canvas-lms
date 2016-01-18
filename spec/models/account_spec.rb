@@ -1401,6 +1401,8 @@ describe Account do
     specs_require_sharding
 
     describe ".find_cached" do
+      let(:nonsense_id){ 987654321 }
+
       it "works relative to a different shard" do
         @shard1.activate do
           a = Account.create!
@@ -1409,8 +1411,15 @@ describe Account do
       end
 
       it "errors if infrastructure fails and we can't see the account" do
-        nonsense_id = 987654321
-        expect{ Account.find_cached(nonsense_id) }.to raise_error(ActiveRecord::RecordNotFound)
+        expect{ Account.find_cached(nonsense_id) }.to raise_error(::Canvas::AccountCacheError)
+      end
+
+      it "includes the account id in the error message" do
+        begin
+          Account.find_cached(nonsense_id)
+        rescue ::Canvas::AccountCacheError => e
+          expect(e.message).to eq("Couldn't find Account with id=#{nonsense_id}")
+        end
       end
     end
 
