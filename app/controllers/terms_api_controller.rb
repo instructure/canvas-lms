@@ -70,7 +70,7 @@ class TermsApiController < ApplicationController
   #
   # Return all of the terms in the account.
   #
-  # @argument workflow_state[] [String, 'active'| 'deleted'| 'all']
+  # @argument workflow_state[] [String, "active"|"deleted"|"all"]
   #   If set, only returns terms that are in the given state.
   #   Defaults to 'active'.
   #

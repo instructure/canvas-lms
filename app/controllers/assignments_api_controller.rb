@@ -540,9 +540,8 @@ class AssignmentsApiController < ApplicationController
   #   Apply assignment overrides for each assignment, defaults to true.
   # @argument needs_grading_count_by_section [Boolean]
   #   Split up "needs_grading_count" by sections into the "needs_grading_count_by_section" key, defaults to false
-  # @argument bucket [String]
+  # @argument bucket [String, "past"|"overdue"|"undated"|"ungraded"|"upcoming"|"future"]
   #   If included, only return certain assignments depending on due date and submission status.
-  #   Valid buckets are "past", "overdue", "undated", "ungraded", "upcoming", and "future".
   # @returns [Assignment]
   def index
     error_or_array= get_assignments(@current_user)
@@ -786,15 +785,15 @@ class AssignmentsApiController < ApplicationController
   #  The strategy used for grading the assignment.
   #  The assignment is ungraded if this field is omitted.
   #
-  # @argument assignment[due_at] [Timestamp]
+  # @argument assignment[due_at] [DateTime]
   #   The day/time the assignment is due.
   #   Accepts times in ISO 8601 format, e.g. 2014-10-21T18:48:00Z.
   #
-  # @argument assignment[lock_at] [Timestamp]
+  # @argument assignment[lock_at] [DateTime]
   #   The day/time the assignment is locked after.
   #   Accepts times in ISO 8601 format, e.g. 2014-10-21T18:48:00Z.
   #
-  # @argument assignment[unlock_at] [Timestamp]
+  # @argument assignment[unlock_at] [DateTime]
   #   The day/time the assignment is unlocked.
   #   Accepts times in ISO 8601 format, e.g. 2014-10-21T18:48:00Z.
   #
@@ -930,15 +929,15 @@ class AssignmentsApiController < ApplicationController
   #  The strategy used for grading the assignment.
   #  The assignment is ungraded if this field is omitted.
   #
-  # @argument assignment[due_at] [Timestamp]
+  # @argument assignment[due_at] [DateTime]
   #   The day/time the assignment is due.
   #   Accepts times in ISO 8601 format, e.g. 2014-10-21T18:48:00Z.
   #
-  # @argument assignment[lock_at] [Timestamp]
+  # @argument assignment[lock_at] [DateTime]
   #   The day/time the assignment is locked after.
   #   Accepts times in ISO 8601 format, e.g. 2014-10-21T18:48:00Z.
   #
-  # @argument assignment[unlock_at] [Timestamp]
+  # @argument assignment[unlock_at] [DateTime]
   #   The day/time the assignment is unlocked.
   #   Accepts times in ISO 8601 format, e.g. 2014-10-21T18:48:00Z.
   #

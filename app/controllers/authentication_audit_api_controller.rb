@@ -78,7 +78,7 @@ class AuthenticationAuditApiController < AuditorApiController
   # @argument start_time [DateTime]
   #   The beginning of the time range from which you want events.
   #
-  # @argument end_time [Datetime]
+  # @argument end_time [DateTime]
   #   The end of the time range from which you want events.
   #
   def for_login
@@ -95,10 +95,10 @@ class AuthenticationAuditApiController < AuditorApiController
   #
   # List authentication events for a given account.
   #
-  # @argument start_time [Datetime]
+  # @argument start_time [DateTime]
   #   The beginning of the time range from which you want events.
   #
-  # @argument end_time [Datetime]
+  # @argument end_time [DateTime]
   #   The end of the time range from which you want events.
   #
   def for_account
@@ -115,10 +115,10 @@ class AuthenticationAuditApiController < AuditorApiController
   #
   # List authentication events for a given user.
   #
-  # @argument start_time [Datetime]
+  # @argument start_time [DateTime]
   #   The beginning of the time range from which you want events.
   #
-  # @argument end_time [Datetime]
+  # @argument end_time [DateTime]
   #   The end of the time range from which you want events.
   #
   def for_user

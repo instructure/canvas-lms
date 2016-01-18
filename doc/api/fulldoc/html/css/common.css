@@ -1,3 +1,7 @@
+p {
+  line-height: 1.5;
+}
+
 .label {
   display: inline-block;
   padding: 1px 4px;
@@ -80,7 +84,7 @@ body {
 }
 #content {
   margin: 10px 20px 0 220px;
-  max-width: 800px;
+  max-width: 1280px;
 }
 
 #header {
@@ -254,6 +258,9 @@ pre.code {
   background-color: #2A404D;
   color: #fff;
 }
+pre.code code {
+  overflow: scroll;
+}
 
 div.syntaxhighlighter {
   padding: 15px;
@@ -293,4 +300,36 @@ div.warning-message {
   box-shadow: 0 1px 1px rgba(0,0,0,0.25);
   border-bottom-color: rgba(0,0,0,0.5);
   border-radius: 3px;
+}
+
+code.enum {
+  color: #d14;
+  padding: 0 4px;
+  margin-bottom: 2px;
+  background-color: #f7f7f9;
+  border: 1px solid #e1e1e8;
+}
+
+table.request-params {
+  table-layout: fixed;
+  width: 100%;
+}
+table.request-params, table.request-params th, table.request-params td {
+  border: 0;
+  text-align: left;
+}
+table.request-params td {
+  border-bottom: 1px solid #ccc;
+  vertical-align: text-top;
+}
+.param-name {
+  width: 20em;
+}
+.param-req {
+  width: 5em;
+}
+.param-type {
+  width: 10em;
+}
+.param-desc {
 }
