@@ -1,20 +1,19 @@
 #!/usr/bin/env ruby
 $:.push File.expand_path("../../gems/rubocop-canvas/lib", __FILE__)
 
-def git_diff(env_sha)
-  sha = env_sha
-  if sha.nil?
-    return `git diff` if RuboCop::Canvas::GitProxy.dirty?
-    sha = RuboCop::Canvas::GitProxy.head_sha
+def git_diff(git, sha)
+  unless sha
+    return git.diff if git.dirty?
+    sha = git.head_sha
   end
-  `git show #{sha}`
+  git.show(sha)
 end
 
-def get_offenses_json(cli, env_sha)
-  ruby_files = RuboCop::Canvas::FileSieve.new.files(env_sha)
+def get_offenses_json(file_sieve, env_sha)
+  ruby_files = file_sieve.files(env_sha)
   return {} unless ruby_files.size > 0
   json = `rubocop #{ruby_files.join(' ')} --format json`
-  results_json = JSON.parse(json)
+  JSON.parse(json)
 end
 
 def pretty_comment(comment)
@@ -26,26 +25,38 @@ def pretty_comment(comment)
 end
 
 require 'rubocop_canvas'
+require 'optparse'
 
 cli = RuboCop::CLI.new
-if ENV['GERRIT_REFSPEC']
-  if ENV['GERRIT_PROJECT'] == 'canvas-lms' # only really want this on canvas atm
-    require 'rubocop_canvas/helpers/comments'
-    require 'shellwords'
-    rev = ENV['GERRIT_REFSPEC']
-    env_sha = `git fetch origin #{rev} && git rev-parse FETCH_HEAD`
-    results_json = get_offenses_json(cli, env_sha)
-    unless results_json.empty?
-      diff = git_diff(env_sha)
-      comments = RuboCop::Canvas::Comments.build(diff, results_json)
-      `gergich comment #{Shellwords.escape(comments.to_json)}`
-    end
+if ENV['GERRIT_PATCHSET_REVISION']
+  require 'rubocop_canvas/helpers/comments'
+  require 'shellwords'
+  env_sha = ENV['GERRIT_PATCHSET_REVISION']
+  plugin = ENV['GERRIT_PROJECT']
+  plugin = nil if plugin == 'canvas-lms'
+  git_dir = "gems/plugins/#{plugin}/" if plugin
+
+  file_sieve = RuboCop::Canvas::FileSieve.new(git_dir: git_dir)
+  results_json = get_offenses_json(file_sieve, env_sha)
+  unless results_json.empty?
+    diff = git_diff(file_sieve.git, env_sha)
+    comments = RuboCop::Canvas::Comments.build(diff, results_json, git_dir: git_dir)
+    `gergich comment #{Shellwords.escape(comments.to_json)}`
   end
 else
-  heavy_mode = ARGV.include?("--heavy")
-  boyscout_mode = ARGV.include?("--boy-scout")
+  heavy_mode = false
+  boyscout_mode = false
+  plugin = nil
+  OptionParser.new do |opts|
+    opts.on("--heavy") { heavy_mode = true }
+    opts.on("--boy-scout") { boyscout_mode = true }
+    opts.on("--plugin PLUGIN") { |v| plugin = v }
+  end.parse!
+  git_dir = "gems/plugins/#{plugin}/" if plugin
+
   env_sha = ENV['SHA']
-  ruby_files = RuboCop::Canvas::FileSieve.new.files(env_sha)
+  file_sieve = RuboCop::Canvas::FileSieve.new(git_dir: git_dir)
+  ruby_files = file_sieve.files(env_sha)
   if ruby_files.size > 0
     if heavy_mode
       args = ruby_files
@@ -59,8 +70,11 @@ else
       output_filename = ".rubocop-output.json"
       cli.run(ruby_files + ["--format", "json", "--out", output_filename])
       results_json = JSON.parse(File.read(output_filename))
-      diff = git_diff(env_sha)
-      comments = RuboCop::Canvas::Comments.build(diff, results_json, boyscout_mode)
+      diff = git_diff(file_sieve.git, env_sha)
+      comments = RuboCop::Canvas::Comments.build(diff,
+                                                 results_json,
+                                                 git_dir: git_dir,
+                                                 boyscout_mode: boyscout_mode)
       comments.each{ |comment| pretty_comment(comment) }
       File.delete(output_filename)
     end

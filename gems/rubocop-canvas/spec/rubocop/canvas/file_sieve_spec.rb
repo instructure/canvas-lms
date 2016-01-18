@@ -20,7 +20,7 @@ module RuboCop::Canvas
             }
           end
           let(:git){ double('git', changes: git_output, dirty?: true) }
-          let(:sieve){ described_class.new(git) }
+          let(:sieve){ described_class.new(git: git) }
 
           it "excludes non ruby files" do
             git_output << "\n   modified:   README.md"
@@ -40,7 +40,7 @@ module RuboCop::Canvas
 
         it "gets file list from the head SHA if git is clean" do
           git = double('git', diff_files: git_output, dirty?: false, head_sha: '123')
-          sieve = described_class.new(git)
+          sieve = described_class.new(git: git)
           expect(sieve.files).to eq(file_list)
         end
       end
@@ -48,7 +48,7 @@ module RuboCop::Canvas
       it "gets file list from git diff of an explicit sha" do
         git = double('git')
         allow(git).to receive(:diff_files).with('MYSHA').and_return(git_output)
-        sieve = described_class.new(git)
+        sieve = described_class.new(git: git)
         expect(sieve.files('MYSHA')).to eq(file_list)
       end
 
