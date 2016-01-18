@@ -53,7 +53,7 @@ describe 'lti report' do
   end
 
   it 'should run on a root account' do
-    parsed = read_report(@type, {order: 1})
+    parsed = read_report(@type, {order: [0, 1]})
     expect(parsed.length).to eq 2
     expect(parsed[0]).to eq([
       @t1.context_type,
@@ -70,7 +70,7 @@ describe 'lti report' do
   end
 
   it 'should run on a sub account' do
-    parsed = read_report(@type, {account: @sub_account})
+    parsed = read_report(@type, {order: [0, 1], account: @sub_account})
     expect(parsed.length).to eq 2
     expect(parsed[1]).to eq([
       @t2.context_type,
