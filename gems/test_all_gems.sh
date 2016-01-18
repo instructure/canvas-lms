@@ -3,6 +3,7 @@ result=0
 
 for test_script in $(find . -name test.sh); do
   pushd `dirname $test_script` > /dev/null
+  echo "################ $(basename `dirname $test_script`) ################"
   ./test.sh
   let gem_result=$?
   let result=result+gem_result
