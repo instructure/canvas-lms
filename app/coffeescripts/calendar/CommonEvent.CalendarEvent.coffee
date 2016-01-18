@@ -14,6 +14,7 @@ define [
     constructor: (data, contextInfo, actualContextInfo) ->
       super data, contextInfo, actualContextInfo
       @eventType = 'calendar_event'
+      @appointmentGroupEventStatus = @calculateAppointmentGroupEventStatus()
       @deleteConfirmation = deleteConfirmation
       @deleteURL = contextInfo.calendar_event_url
 
@@ -84,3 +85,15 @@ define [
         method = 'PUT'
         url = @calendarEvent.url
       [ method, url ]
+
+    calculateAppointmentGroupEventStatus: ->
+      status = I18n.t 'Available'
+
+      if @calendarEvent.available_slots > 0
+        status = I18n.t('%{availableSlots} Available', {availableSlots: @calendarEvent.available_slots})
+      if @calendarEvent.available_slots == 0
+        status = I18n.t('Filled')
+      if @calendarEvent.reserved == true
+        status = I18n.t('Reserved')
+
+      status

@@ -132,7 +132,7 @@ describe "scheduler" do
       get "/calendar2"
       click_scheduler_link
       click_appointment_link
-      fj('.fc-event:visible').click
+      fj('.agenda-event .ig-row').click
       wait_for_ajaximations
       driver.execute_script("$('.event-details .delete_event_link').trigger('click')")
       wait_for_ajaximations

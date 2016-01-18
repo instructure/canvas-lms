@@ -4,13 +4,14 @@ define [
   'moment'
   'timezone_core'
   'compiled/util/fcUtil'
+  'compiled/calendar/CalendarEventFilter'
   'underscore'
   'Backbone'
   'compiled/collections/CalendarEventCollection'
   'compiled/calendar/ShowEventDetailsDialog'
   'jst/calendar/agendaView'
   'vendor/jquery.ba-tinypubsub'
-], (I18n, $, moment, tz, fcUtil, _, Backbone, CalendarEventCollection, ShowEventDetailsDialog, template) ->
+], (I18n, $, moment, tz, fcUtil, calendarEventFilter, _, Backbone, CalendarEventCollection, ShowEventDetailsDialog, template) ->
 
   class AgendaView extends Backbone.View
 
@@ -38,11 +39,15 @@ define [
     constructor: ->
       super
       @dataSource = @options.dataSource
+      @viewingGroup = null
 
       $.subscribe
         "CommonEvent/eventDeleted" : @refetch
         "CommonEvent/eventSaved" : @refetch
         "CalendarHeader/createNewEvent" : @handleNewEvent
+
+    hide: ->
+      @$el.removeClass('active')
 
     fetch: (contexts, start) ->
       @$el.empty()
@@ -70,7 +75,7 @@ define [
 
     appendEvents: (events) =>
       @nextPageDate = events.nextPageDate
-      @collection.push.apply(@collection, events)
+      @collection.push.apply(@collection, calendarEventFilter(@viewingGroup, events))
       @collection = _.sortBy(@collection, 'originalStart')
       @render()
 
@@ -194,6 +199,7 @@ define [
       days: _.map(boxedEvents, @eventBoxToHash)
       meta:
         hasMore: !!@nextPageDate
+        displayAppointmentEvents: @viewingGroup
 
     # Public: Creates the json for the template.
     #

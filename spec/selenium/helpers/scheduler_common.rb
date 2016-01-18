@@ -66,7 +66,7 @@ module SchedulerCommon
 
   def click_appointment_link
     f('.view_calendar_link').click
-    expect(f('.scheduler-mode')).to be_displayed
+    expect(f('.agenda-wrapper.active')).to be_displayed
     wait_for_ajaximations
   end
 
@@ -95,6 +95,13 @@ module SchedulerCommon
   def open_edit_dialog
     driver.action.move_to(f('.appointment-group-item')).perform
     click_al_option('.edit_link')
+    wait_for_ajaximations
+  end
+
+  def open_edit_appointment_group_event_dialog
+    f('.agenda-event .ig-row').click
+    keep_trying_until { expect(f('.edit_event_link')).to be_displayed }
+    driver.execute_script("$('.edit_event_link').trigger('click')")
     wait_for_ajaximations
   end
 end
