@@ -198,8 +198,8 @@ require 'securerandom'
 #         },
 #         "permissions": {
 #           "description": "optional: the permissions the user has for the course. returned only for a single course and include[]=permissions",
-#           "example": "{\"create_discussion_topic\"=>true,\"create_announcement\"=>true}",
-#           "type": "map",
+#           "example": {"create_discussion_topic": true, "create_announcement": true},
+#           "type": "object",
 #           "key": { "type": "string" },
 #           "value": { "type": "boolean" }
 #         },
@@ -225,7 +225,7 @@ require 'securerandom'
 #         },
 #         "storage_quota_used_mb": {
 #           "example": 5,
-#           "type": "float"
+#           "type": "number"
 #         },
 #         "hide_final_grades": {
 #           "example": false,

@@ -103,7 +103,7 @@
 #         },
 #         "links": {
 #           "description": "Jsonapi.org links",
-#           "example": "{\"course\"=>\"12345\", \"user\"=>\"12345\", \"page_view\"=>\"e2b76430-27a5-0131-3ca1-48e0eb13f29b\"}",
+#           "example": {"course": "12345", "user": "12345", "page_view": "e2b76430-27a5-0131-3ca1-48e0eb13f29b"},
 #           "$ref": "CourseEventLink"
 #         }
 #       }
@@ -115,22 +115,22 @@
 #       "description": "The created event data object returns all the fields that were set in the format of the following example.  If a field does not exist it was not set. The value of each field changed is in the format of [:old_value, :new_value].  The created event type also includes a created_source field to specify what triggered the creation of the course.",
 #       "properties": {
 #         "name": {
-#           "example": "[nil, \"Course 1\"]",
+#           "example": [null, "Course 1"],
 #           "type": "array",
 #           "items": { "type": "string" }
 #         },
 #         "start_at": {
-#           "example": "[nil, \"2012-01-19T15:00:00-06:00\"]",
+#           "example": [null, "2012-01-19T15:00:00-06:00"],
 #           "type": "array",
 #           "items": { "type": "datetime" }
 #         },
 #         "conclude_at": {
-#           "example": "[nil, \"2012-01-19T15:00:00-08:00\"]",
+#           "example": [null, "2012-01-19T15:00:00-08:00"],
 #           "type": "array",
 #           "items": { "type": "datetime" }
 #         },
 #         "is_public": {
-#           "example": "[nil, false]",
+#           "example": [null, false],
 #           "type": "array",
 #           "items": { "type": "boolean" }
 #         },
@@ -144,22 +144,22 @@
 #       "description": "The updated event data object returns all the fields that have changed in the format of the following example.  If a field does not exist it was not changed.  The value is an array that contains the before and after values for the change as in [:old_value, :new_value].",
 #       "properties": {
 #         "name": {
-#           "example": "[\"Course 1\", \"Course 2\"]",
+#           "example": ["Course 1", "Course 2"],
 #           "type": "array",
 #           "items": { "type": "string" }
 #         },
 #         "start_at": {
-#           "example": "[\"2012-01-19T15:00:00-06:00\", \"2012-07-19T15:00:00-06:00\"]",
+#           "example": ["2012-01-19T15:00:00-06:00", "2012-07-19T15:00:00-06:00"],
 #           "type": "array",
 #           "items": { "type": "datetime" }
 #         },
 #         "conclude_at": {
-#           "example": "[\"2012-01-19T15:00:00-08:00\", \"2012-07-19T15:00:00-08:00\"]",
+#           "example": ["2012-01-19T15:00:00-08:00", "2012-07-19T15:00:00-08:00"],
 #           "type": "array",
 #           "items": { "type": "datetime" }
 #         },
 #         "is_public": {
-#           "example": "[true, false]",
+#           "example": [true, false],
 #           "type": "array",
 #           "items": { "type": "boolean" }
 #         }

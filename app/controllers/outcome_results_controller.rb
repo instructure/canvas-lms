@@ -42,7 +42,8 @@
 #           "type": "datetime"
 #         },
 #         "links": {
-#           "example": "{\"user\"=>\"3\", \"learning_outcome\"=>\"97\", \"alignment\"=>\"53\"}",
+#           "example": {"user": "3", "learning_outcome": "97", "alignment": "53"},
+#           "type": "object",
 #           "description": "Unique identifiers of objects associated with this result"
 #         }
 #       }
@@ -77,7 +78,7 @@
 #           "description": "The number of alignment scores included in this rollup."
 #         },
 #         "links": {
-#           "example": "{\"outcome\"=>\"42\"}",
+#           "example": {"outcome": "42"},
 #           "$ref": "OutcomeRollupScoreLinks"
 #         }
 #       }
@@ -121,7 +122,7 @@
 #           "type": "string"
 #         },
 #         "links": {
-#           "example": "{\"course\"=>42, \"user\"=>42, \"section\"=>57}",
+#           "example": {"course": 42, "user": 42, "section": 57},
 #           "$ref": "OutcomeRollupLinks"
 #         }
 #       }

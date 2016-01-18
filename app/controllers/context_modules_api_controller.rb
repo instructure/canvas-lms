@@ -271,7 +271,7 @@
 #         },
 #         "prerequisite_module_ids": {
 #           "description": "IDs of Modules that must be completed before this one is unlocked",
-#           "example": "\[121, 122\]",
+#           "example": [121, 122],
 #           "type": "array",
 #           "items": {"type": "integer"}
 #         },
@@ -287,7 +287,6 @@
 #         },
 #         "items": {
 #           "description": "The contents of this module, as an array of Module Items. (Present only if requested via include[]=items AND the module is not deemed too large by Canvas.)",
-#           "example": "\[\]",
 #           "type": "array",
 #           "items": { "$ref": "ModuleItem" }
 #         },

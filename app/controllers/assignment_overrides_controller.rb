@@ -36,7 +36,7 @@
 #         },
 #         "student_ids": {
 #           "description": "the IDs of the override's target students (present if the override targets an ad-hoc set of students)",
-#           "example": "[1, 2, 3]",
+#           "example": [1, 2, 3],
 #           "type": "array",
 #           "items": {"type": "integer"}
 #         },

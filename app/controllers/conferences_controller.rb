@@ -95,7 +95,7 @@
 #         },
 #         "users": {
 #           "description": "Array of user ids that are participants in the conference",
-#           "example": "[1, 7, 8, 9, 10]",
+#           "example": [1, 7, 8, 9, 10],
 #           "type": "array",
 #           "items": { "type": "integer"}
 #         },
@@ -111,10 +111,8 @@
 #         },
 #         "user_settings": {
 #           "description": "A collection of settings specific to the conference type",
-#           "example": "{}",
-#           "type": "map",
-#           "key": { "type": "string" },
-#           "value": { "type": "string" }
+#           "example": {"record": true},
+#           "type": "object"
 #         },
 #         "recordings": {
 #           "description": "A List of recordings for the conference",

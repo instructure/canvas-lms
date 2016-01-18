@@ -114,7 +114,7 @@
 #         },
 #         "required_settings": {
 #           "description": "A list of fields this system requires",
-#           "example": "\[\]",
+#           "example": ["source_course_id"],
 #           "type": "array",
 #           "items": {"type": "string"}
 #         }

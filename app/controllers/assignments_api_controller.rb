@@ -303,7 +303,7 @@
 #         },
 #         "allowed_extensions": {
 #           "description": "Allowed file extensions, which take effect if submission_types includes 'online_upload'.",
-#           "example": "[\"docx\", \"ppt\"]",
+#           "example": ["docx", "ppt"],
 #           "type": "array",
 #           "items": {"type": "string"}
 #         },
@@ -395,7 +395,7 @@
 #         },
 #         "submission_types": {
 #           "description": "the types of submissions allowed for this assignment list containing one or more of the following: 'discussion_topic', 'online_quiz', 'on_paper', 'none', 'external_tool', 'online_text_entry', 'online_url', 'online_upload' 'media_recording'",
-#           "example": "[\"online_text_entry\"]",
+#           "example": ["online_text_entry"],
 #           "type": "array",
 #           "items": {"type": "string"},
 #           "allowableValues": {
@@ -485,13 +485,12 @@
 #         },
 #         "frozen_attributes": {
 #           "description": "(Optional) Array of frozen attributes for the assignment. Only account administrators currently have permission to change an attribute in this list. Will be empty if no attributes are frozen for this assignment. Possible frozen attributes are: title, description, lock_at, points_possible, grading_type, submission_types, assignment_group_id, allowed_extensions, group_category_id, notify_of_update, peer_reviews NOTE: This field will only be present if the AssignmentFreezer plugin is available for your account.",
-#           "example": "[\"title\"]",
+#           "example": ["title"],
 #           "type": "array",
 #           "items": {"type": "string"}
 #         },
 #         "submission": {
 #           "description": "(Optional) If 'submission' is included in the 'include' parameter, includes a Submission object that represents the current user's (user who is requesting information from the api) current submission for the assignment. See the Submissions API for an example response. If the user does not have a submission, this key will be absent.",
-#           "example": "{}",
 #           "$ref": "Submission"
 #         },
 #         "use_rubric_for_grading": {
@@ -511,7 +510,7 @@
 #         },
 #         "assignment_visibility": {
 #           "description": "(Optional) If 'assignment_visibility' is included in the 'include' parameter, includes an array of student IDs who can see this assignment.",
-#           "example": "[137,381,572]",
+#           "example": [137,381,572],
 #           "type": "array",
 #           "items": {"type": "integer"}
 #         },

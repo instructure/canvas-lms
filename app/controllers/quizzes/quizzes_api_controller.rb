@@ -227,7 +227,8 @@
 #         "question_types": {
 #           "description": "List of question types in the quiz",
 #           "example": ["mutliple_choice", "essay"],
-#           "type": "array"
+#           "type": "array",
+#           "items": {"type": "string"}
 #         }
 #       }
 #     }

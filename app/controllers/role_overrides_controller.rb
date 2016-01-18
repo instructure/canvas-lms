@@ -54,7 +54,7 @@
 #
 # @model Role
 #     {
-#       "id": 1,
+#       "id": "Role",
 #       "description": "",
 #       "properties": {
 #         "label": {
@@ -74,7 +74,8 @@
 #         },
 #         "account": {
 #           "description": "JSON representation of the account the role is in.",
-#           "example": "{\"id\"=>1019, \"name\"=>\"CGNU\", \"parent_account_id\"=>73, \"root_account_id\"=>1, \"sis_account_id\"=>\"cgnu\"}",
+#           "example": {"id": 1019, "name": "CGNU", "parent_account_id": 73, "root_account_id": 1, "sis_account_id": "cgnu"},
+#           "type": "object",
 #           "$ref": "Account"
 #         },
 #         "workflow_state": {
@@ -84,8 +85,8 @@
 #         },
 #         "permissions": {
 #           "description": "A dictionary of permissions keyed by name (see permissions input parameter in the 'Create a role' API).",
-#           "example": "{\"read_course_content\"=>{\"enabled\"=>true, \"locked\"=>false, \"readonly\"=>false, \"explicit\"=>true, \"prior_default\"=>false}, \"read_course_list\"=>{\"enabled\"=>true, \"locked\"=>true, \"readonly\"=>true, \"explicit\"=>false}, \"read_question_banks\"=>{\"enabled\"=>false, \"locked\"=>true, \"readonly\"=>false, \"explicit\"=>true, \"prior_default\"=>false}, \"read_reports\"=>{\"enabled\"=>true, \"locked\"=>false, \"readonly\"=>false, \"explicit\"=>false}}",
-#           "type": "map",
+#           "example": {"read_course_content": {"enabled": true, "locked": false, "readonly": false, "explicit": true, "prior_default": false}, "read_course_list": {"enabled": true, "locked": true, "readonly": true, "explicit": false}, "read_question_banks": {"enabled": false, "locked": true, "readonly": false, "explicit": true, "prior_default": false}, "read_reports": {"enabled": true, "locked": false, "readonly": false, "explicit": false}},
+#           "type": "object",
 #           "key": { "type": "string" },
 #           "value": { "$ref": "RolePermissions" }
 #         }

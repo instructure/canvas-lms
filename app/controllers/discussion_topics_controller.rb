@@ -177,7 +177,7 @@ require 'atom'
 #         },
 #         "topic_children": {
 #           "description": "An array of topic_ids for the group discussions the user is a part of.",
-#           "example": "[5, 7, 10]",
+#           "example": [5, 7, 10],
 #           "type": "array",
 #           "items": { "type": "integer"}
 #         },
@@ -212,8 +212,8 @@ require 'atom'
 #         },
 #         "permissions": {
 #           "description": "The current user's permissions on this topic.",
-#           "example": "{\"attach\"=>true}",
-#           "type": "map",
+#           "example": {"attach": true},
+#           "type": "object",
 #           "key": { "type": "string" },
 #           "value": { "type": "boolean" }
 #         },

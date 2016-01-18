@@ -42,7 +42,7 @@ module LiveAssessments
   #           "description": "When this result was recorded"
   #         },
   #         "links": {
-  #           "type": "ResultLinks",
+  #           "$ref": "ResultLinks",
   #           "example": {"user": "42", "assessor": "23", "assessment": "5"},
   #           "description": "Unique identifiers of objects associated with this result"
   #         }

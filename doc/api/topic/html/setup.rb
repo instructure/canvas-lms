@@ -66,10 +66,26 @@ def render_comment(string, wrap = 75)
   end
 end
 
-def render_value(value, type = 'string')
-  case type
-  when 'integer', 'number' then value.to_s
-  else %{"#{value}"}
+def render_value(prop)
+  value = prop['example']
+
+  return "null" if value.nil?
+
+  if prop['$ref']
+    # we don't fully support $refs yet in these generated docs, but some of our
+    # docs include an example sub-object so let's at least render that
+    return JSON.generate(value)
+  end
+
+  case prop['type']
+  when 'array'
+    "[#{value.map { |v| render_value(prop['items'].merge('example' => v)) }.join(', ')}]"
+  when 'object'
+    JSON.generate(value)
+  when 'integer', 'number', 'boolean' then value.to_s
+  when 'string', 'datetime' then %{"#{value}"}
+  else
+    raise ArgumentError, %{invalid or missing "type" in API property: #{prop.inspect}}
   end
 end
 
@@ -78,8 +94,11 @@ def render_properties(json)
     "{\n" + indent(
     properties.map do |name, prop|
       render_comment(prop['description']) +
-      %{"#{name}": } + render_value(prop['example'], prop['type'])
+      %{"#{name}": } + render_value(prop)
     end.join(",\n")) +
     "\n}"
   end
+rescue
+  puts "error rendering properties for model:\n#{json}"
+  raise
 end

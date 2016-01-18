@@ -37,7 +37,7 @@
 #         },
 #         "never_drop": {
 #           "description": "Assignment IDs that should never be dropped.",
-#           "example": "[33, 17, 24]",
+#           "example": [33, 17, 24],
 #           "type": "array",
 #           "items": {"type": "integer"}
 #         }
@@ -70,7 +70,7 @@
 #         },
 #         "assignments": {
 #           "description": "the assignments in this Assignment Group (see the Assignment API for a detailed list of fields)",
-#           "example": "[]",
+#           "example": [],
 #           "type": "array",
 #           "items": {"type": "integer"}
 #         },
