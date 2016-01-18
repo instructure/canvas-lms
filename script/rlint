@@ -44,7 +44,9 @@ if ENV['GERRIT_PATCHSET_REVISION']
   results_json = get_offenses_json(file_sieve, env_sha)
   unless results_json.empty?
     diff = git_diff(file_sieve.git, env_sha)
-    comments = RuboCop::Canvas::Comments.build(diff, results_json, git_dir: git_dir)
+    comments = RuboCop::Canvas::Comments.build(diff, results_json,
+                                               git_dir: git_dir,
+                                               include_git_dir_in_output: false)
     `gergich comment #{Shellwords.escape(comments.to_json)}`
   end
 else
