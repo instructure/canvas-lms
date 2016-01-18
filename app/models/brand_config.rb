@@ -21,14 +21,8 @@ class BrandConfig < ActiveRecord::Base
 
   belongs_to :parent, class_name: 'BrandConfig', foreign_key: 'parent_md5'
   has_many :accounts, foreign_key: 'brand_config_md5'
+  has_many :shared_brand_configs, foreign_key: 'brand_config_md5'
 
-  scope :without_k12, lambda { where("md5 != ?", BrandConfig.k12_config) }
-
-  scope :shared, -> (account = nil) {
-    shared_scope = where(share: true)
-    shared_scope = shared_scope.without_k12 unless account && account.feature_enabled?(:k12)
-    shared_scope
-  }
 
   def self.for(attrs)
     attrs = attrs.with_indifferent_access.slice(*ATTRS_TO_INCLUDE_IN_MD5)
@@ -44,8 +38,9 @@ class BrandConfig < ActiveRecord::Base
     new
   end
 
+  MD5_OF_K12_CONFIG = 'a1f113321fa024e7a14cb0948597a2a4'
   def self.k12_config
-    BrandConfig.where(name: 'K12 Theme', share: true).first
+    find(MD5_OF_K12_CONFIG)
   end
 
   def default?
@@ -197,7 +192,7 @@ class BrandConfig < ActiveRecord::Base
     unused_brand_config = BrandConfig.
       where(md5: md5).
       where("NOT EXISTS (?)", Account.where("brand_config_md5=brand_configs.md5")).
-      where("NOT share").
+      where("NOT EXISTS (?)", SharedBrandConfig.where("brand_config_md5=brand_configs.md5")).
       first
     if unused_brand_config
       unused_brand_config.destroy
@@ -208,7 +203,7 @@ class BrandConfig < ActiveRecord::Base
   def self.clean_unused_from_db!
     BrandConfig.
       where("NOT EXISTS (?)", Account.where("brand_config_md5=brand_configs.md5")).
-      where('NOT share').
+      where("NOT EXISTS (?)", SharedBrandConfig.where("brand_config_md5=brand_configs.md5")).
       # When someone is actively working in the theme editor, it just saves one
       # in their session, so only delete stuff that is more than a week old,
       # to not clear out a theme someone was working on.

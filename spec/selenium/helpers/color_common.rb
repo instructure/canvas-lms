@@ -12,7 +12,7 @@ module ColorCommon
         rgb_array = hex.scan(/../).map {|color| color.to_i(16)}
         color_string = "(#{rgb_array[0]}, #{rgb_array[1]}, #{rgb_array[2]})"
 
-        expect(color_box_array[index].attribute(:style)).to include_text(color_string)
+        expect(color_box_array[index].attribute(:style)).to include(color_string)
       end
     end
   end

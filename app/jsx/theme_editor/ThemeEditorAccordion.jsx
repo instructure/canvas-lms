@@ -39,6 +39,7 @@ define([
 
     renderRow(varDef) {
       var props = {
+        key: varDef.variable_name,
         currentValue: this.props.brandConfigVariables[varDef.variable_name],
         userInput: this.props.changedValues[varDef.variable_name],
         onChange: this.props.changeSomething.bind(null, varDef.variable_name),
@@ -46,28 +47,26 @@ define([
         varDef: varDef
       };
 
-      if (varDef.type === 'color') {
-        return (
-          <ThemeEditorColorRow {...props} />
-        );
-      } else if (varDef.type === 'image') {
-        return (
-          <ThemeEditorImageRow {...props} />
-        );
-      } else if (varDef.type === 'percentage') {
-        var defaultValue = props.currentValue || props.placeholder;
-        return (
-            <RangeInput labelText={varDef.human_name}
-                        min={0}
-                        max={1}
-                        step={0.1}
-                        defaultValue={defaultValue ? parseFloat(defaultValue) : 0.5}
-                        name={'brand_config[variables][' + varDef.variable_name + ']'}
-                        onChange={value => props.onChange(value)}
-                        formatValue={value => I18n.toPercentage(value * 100, {precision: 0})} />
-        );
-      } else {
-        return null;
+      switch (varDef.type) {
+        case 'color':
+          return <ThemeEditorColorRow {...props} />
+        case 'image':
+          return <ThemeEditorImageRow {...props} />
+        case 'percentage':
+          const defaultValue = props.currentValue || props.placeholder;
+          return <RangeInput
+            key={varDef.variable_name}
+            labelText={varDef.human_name}
+            min={0}
+            max={1}
+            step={0.1}
+            defaultValue={defaultValue ? parseFloat(defaultValue) : 0.5}
+            name={'brand_config[variables][' + varDef.variable_name + ']'}
+            onChange={value => props.onChange(value)}
+            formatValue={value => I18n.toPercentage(value * 100, {precision: 0})}
+          />
+        default:
+          return null
       }
     },
 

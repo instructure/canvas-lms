@@ -1,0 +1,37 @@
+@import "base/environment";
+@import "components/ic-theme-card";
+
+.ic-ThemeCard-container {
+  + .ic-ThemeCard-container { margin-bottom: $ic-sp*3; }
+}
+
+.ic-ThemeCard-container__Main {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+}
+
+.ic-ThemeCard-container__Heading {
+  @include fontSize(14px);
+  position: relative;
+  line-height: 1;
+  text-align: center;
+  color: $ic-font-color--subdued;
+  margin: 0 0 $ic-sp*2;
+  &:before {
+    content: "";
+    position: absolute;
+    top: 50%; left: 0;
+    height: 1px; width: 100%;
+    background: $ic-border-light;
+  }
+}
+
+.ic-ThemeCard-container__Heading-text {
+  display: inline-block;
+  background: $ic-color-light;
+  position: relative;
+  z-index: 1;
+  padding-left: $ic-sp;
+  padding-right: $ic-sp;
+}

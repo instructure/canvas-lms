@@ -72,10 +72,6 @@ define([
                 permissions.analytics &&
                 <a href={`/accounts/${accountId}/analytics`} className="Button">{I18n.t("Analytics")}</a>
               }
-              {
-                permissions.theme_editor &&
-                <a href={`/accounts/${accountId}/theme_editor`} className="Button">{I18n.t("Theme Editor")}</a>
-              }
             </div>
           </div>
 

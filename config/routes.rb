@@ -529,6 +529,7 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :brand_configs) do
       get 'theme_editor', action: :new, as: :theme_editor
+      get 'brand_configs', action: :index
       post 'brand_configs', action: :create
       delete 'brand_configs', action: :destroy
       post 'brand_configs/save_to_account', action: :save_to_account
@@ -1795,6 +1796,12 @@ CanvasRails::Application.routes.draw do
       put 'users/self/course_nicknames/:course_id', action: :update
       delete 'users/self/course_nicknames/:course_id', action: :delete
       delete 'users/self/course_nicknames', action: :clear
+    end
+
+    scope(controller: :shared_brand_configs) do
+      post 'accounts/:account_id/shared_brand_configs', action: :create
+      put 'accounts/:account_id/shared_brand_configs/:id', action: :update
+      delete 'shared_brand_configs/:id', action: :destroy
     end
 
     scope(controller: :errors) do
