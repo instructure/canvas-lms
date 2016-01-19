@@ -99,7 +99,7 @@
   font-family: $monoFontFamily;
 }
 @mixin font-shorthand($size: $baseFontSize, $weight: normal, $lineHeight: $baseLineHeight) {
-  font-size: $size;
+  @include fontSize($size);
   font-weight: $weight;
   line-height: $lineHeight;
 }

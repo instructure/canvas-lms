@@ -9,7 +9,7 @@
 body {
   margin: 0;
   font-family: $baseFontFamily;
-  font-size: $baseFontSize;
+  @include fontSize($baseFontSize);
   line-height: $baseLineHeight;
   color: $ic-font-color-dark;
   background-color: $bodyBackground;
