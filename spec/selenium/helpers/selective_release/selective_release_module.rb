@@ -10,10 +10,10 @@ module SelectiveRelease
 
     def initialize
       @the_course = create_course
-      SelectiveRelease::Sections.initialize(self.the_course)
-      SelectiveRelease::Users.initialize(self.the_course)
-      SelectiveRelease::Homework.initialize(self.the_course)
-      SelectiveRelease::CourseModules.initialize(self.the_course)
+      SelectiveRelease::Sections.initialize
+      SelectiveRelease::Users.initialize
+      SelectiveRelease::Homework.initialize
+      SelectiveRelease::CourseModules.initialize
     end
 
     private

@@ -4,13 +4,12 @@ module SelectiveRelease
   module Homework
     module Assignments
       class << self
-        attr_reader :course, :assignment_for_everyone, :assignment_for_section_a,
+        attr_reader :assignment_for_everyone, :assignment_for_section_a,
           :assignment_for_section_b, :assignment_for_sections_a_and_b,
           :assignment_for_section_c, :assignment_for_first_student,
           :assignment_for_second_and_third_students
 
-        def initialize(course)
-          @course                                   = course
+        def initialize
           @assignment_for_everyone                  = create_assignment_for(HomeworkAssignee::EVERYONE)
           @assignment_for_section_a                 = create_assignment_for(HomeworkAssignee::Section::SECTION_A)
           @assignment_for_section_b                 = create_assignment_for(HomeworkAssignee::Section::SECTION_B)
@@ -37,7 +36,7 @@ module SelectiveRelease
         private
 
           def create_assignment_for(assignee)
-            SelectiveRelease::Assignment.new(self.course, assignee)
+            SelectiveRelease::Assignment.new(assignee)
           end
 
           def assign_assignment_overrides

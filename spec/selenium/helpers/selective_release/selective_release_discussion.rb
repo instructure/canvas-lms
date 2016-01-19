@@ -5,9 +5,9 @@ module SelectiveRelease
   class Discussion < SpecComponents::Discussion
     include SelectiveReleaseWrappable
 
-    def initialize(course, assignees)
+    def initialize(assignees)
       initialize_assignees(assignees)
-      super(course, "Discussion for #{self.assignees_list}")
+      super(course: SelectiveRelease.the_course, title: "Discussion for #{self.assignees_list}")
     end
   end
 end

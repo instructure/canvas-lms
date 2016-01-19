@@ -3,11 +3,10 @@ require_relative 'selective_release_homework_assignee_module'
 module SelectiveRelease
   module Users
     class << self
-      attr_reader :course, :first_student, :second_student, :third_student, :fourth_student, :teacher,
+      attr_reader :first_student, :second_student, :third_student, :fourth_student, :teacher,
         :ta, :first_observer, :third_observer, :student_group_x, :student_group_y, :student_group_z
 
-      def initialize(course)
-        @course          = course
+      def initialize
         @first_student   = create_user('Student1')
         @second_student  = create_user('Student2')
         @third_student   = create_user('Student3')
@@ -64,7 +63,7 @@ module SelectiveRelease
         end
 
         def create_student_group(group_name)
-          self.course.groups.create!(name: group_name)
+          SelectiveRelease.the_course.groups.create!(name: group_name)
         end
 
         def enroll_users
@@ -75,11 +74,11 @@ module SelectiveRelease
         end
 
         def enroll_teacher
-          self.course.enroll_teacher(teacher).accept!
+          SelectiveRelease.the_course.enroll_teacher(teacher).accept!
         end
 
         def enroll_ta
-          self.course.enroll_ta(ta).accept!
+          SelectiveRelease.the_course.enroll_ta(ta).accept!
         end
 
         def enroll_students
@@ -90,26 +89,26 @@ module SelectiveRelease
         end
 
         def enroll_first_student
-          student = first_student
+          student = self.first_student
           enroll_student_in_section_a(student)
           add_user_to_group(group: self.student_group_x, user: student, is_leader: true)
         end
 
         def enroll_second_student
-          student = second_student
+          student = self.second_student
           enroll_student_in_section_b(student)
           add_user_to_group(group: self.student_group_x, user: student)
         end
 
         def enroll_third_student
-          student = third_student
+          student = self.third_student
           enroll_student_in_section_a(student)
           enroll_student_in_section_b(student)
           add_user_to_group(group: self.student_group_y, user: student, is_leader: true)
         end
 
         def enroll_fourth_student
-          student = fourth_student
+          student = self.fourth_student
           enroll_student_in_section_c(student)
           add_user_to_group(group: self.student_group_y, user: student)
         end
@@ -127,7 +126,11 @@ module SelectiveRelease
         end
 
         def enroll_student_in_section(student, section)
-          self.course.self_enroll_student(student, section: section)
+          SelectiveRelease.the_course.self_enroll_student(
+            student,
+            section: section,
+            allow_multiple_enrollments: true
+          )
         end
 
         def add_user_to_group(opts)
@@ -144,15 +147,15 @@ module SelectiveRelease
         end
 
         def enroll_first_observer
-          enroll_observer(first_observer, first_student)
+          enroll_observer(self.first_observer, self.first_student)
         end
 
         def enroll_third_observer
-          enroll_observer(third_observer, third_student)
+          enroll_observer(self.third_observer, self.third_student)
         end
 
         def enroll_observer(an_observer, student_to_observe)
-          self.course.enroll_user(
+          SelectiveRelease.the_course.enroll_user(
             an_observer,
             'ObserverEnrollment',
             enrollment_state: 'active',

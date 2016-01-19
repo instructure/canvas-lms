@@ -6,10 +6,10 @@ module SelectiveRelease
   module Homework
     class << self
 
-      def initialize(course)
-        SelectiveRelease::Homework::Assignments.initialize(course)
-        SelectiveRelease::Homework::Discussions.initialize(course)
-        SelectiveRelease::Homework::Quizzes.initialize(course)
+      def initialize
+        SelectiveRelease::Homework::Assignments.initialize
+        SelectiveRelease::Homework::Discussions.initialize
+        SelectiveRelease::Homework::Quizzes.initialize
       end
     end
   end

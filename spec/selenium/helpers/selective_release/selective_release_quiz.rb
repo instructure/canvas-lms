@@ -5,9 +5,9 @@ module SelectiveRelease
   class Quiz < SpecComponents::Quiz
     include SelectiveReleaseWrappable
 
-    def initialize(course, assignees)
+    def initialize(assignees)
       initialize_assignees(assignees)
-      super(course, "Quiz for #{self.assignees_list}")
+      super(course: SelectiveRelease.the_course, title: "Quiz for #{self.assignees_list}")
     end
   end
 end

@@ -4,12 +4,11 @@ module SelectiveRelease
   module Homework
     module Discussions
       class << self
-        attr_reader :course, :discussion_for_everyone, :discussion_for_section_a, :discussion_for_section_b,
+        attr_reader :discussion_for_everyone, :discussion_for_section_a, :discussion_for_section_b,
           :discussion_for_sections_a_and_b, :discussion_for_section_c, :discussion_for_first_student,
           :discussion_for_second_and_third_students
 
-        def initialize(course)
-          @course                                   = course
+        def initialize
           @discussion_for_everyone                  = create_discussion_for(HomeworkAssignee::EVERYONE)
           @discussion_for_section_a                 = create_discussion_for(HomeworkAssignee::Section::SECTION_A)
           @discussion_for_section_b                 = create_discussion_for(HomeworkAssignee::Section::SECTION_B)
@@ -36,7 +35,7 @@ module SelectiveRelease
         private
 
           def create_discussion_for(assignee)
-            SelectiveRelease::Discussion.new(self.course, assignee)
+            SelectiveRelease::Discussion.new(assignee)
           end
 
           def assign_discussion_overrides
