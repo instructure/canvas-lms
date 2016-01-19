@@ -91,10 +91,15 @@ module LoginAndSessionMethods
 
   def login_as(username = "nobody@example.com", password = "asdfasdf", expect_success = true)
     destroy_session(true)
-    driver.navigate.to(app_host + '/login')
+    get "/login"
     if expect_success
       expect_new_page_load { fill_in_login_form(username, password) }
-      expect(f('#identity .logout')).to be_present
+      unless f('#identity .logout').present?
+        # perform one retry with a refresh'd page in case of a session/auth-token problem
+        refresh_page
+        expect_new_page_load { fill_in_login_form(username, password) }
+        expect(f('#identity .logout')).to be_present
+      end
     else
       fill_in_login_form(username, password)
     end

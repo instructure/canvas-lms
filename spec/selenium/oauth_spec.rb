@@ -15,7 +15,7 @@ describe "oauth2 flow" do
       before do
         course_with_student_logged_in(:active_all => true)
       end
-  
+
       it "should show the confirmation dialog without requiring login" do
         get "/login/oauth2/auth?response_type=code&client_id=#{@client_id}&redirect_uri=urn:ietf:wg:oauth:2.0:oob"
         expect(f('#modal-box').text).to match(%r{Specs is requesting access to your account})
@@ -24,28 +24,38 @@ describe "oauth2 flow" do
         code = driver.current_url.match(%r{code=([^\?&]+)})[1]
         expect(code).to be_present
       end
-      
+
     end
-  
+
     describe "a non-logged-in user" do
       before do
         course_with_student(:active_all => true, :user => user_with_pseudonym)
       end
-  
-      it "should show the confirmation dialog after logging in" do
-        get "/login/oauth2/auth?response_type=code&client_id=#{@client_id}&redirect_uri=urn:ietf:wg:oauth:2.0:oob"
+
+      def oauth_login_fill_out_form
         expect(driver.current_url).to match(%r{/login/canvas$})
         user_element = f('#pseudonym_session_unique_id')
         user_element.send_keys("nobody@example.com")
         password_element = f('#pseudonym_session_password')
         password_element.send_keys("asdfasdf")
         password_element.submit
+      end
+
+      it "should show the confirmation dialog after logging in" do
+        destroy_session(true)
+        get "/login/oauth2/auth?response_type=code&client_id=#{@client_id}&redirect_uri=urn:ietf:wg:oauth:2.0:oob"
+        oauth_login_fill_out_form
+        unless f('#modal-box').text =~ %r{Specs is requesting access to your account}
+          #retry once with refreshed page in case of bad session/auth token
+          refresh_page
+          oauth_login_fill_out_form
+        end
         expect(f('#modal-box').text).to match(%r{Specs is requesting access to your account})
         expect_new_page_load { f('#modal-box .btn-primary').click() }
         expect(driver.current_url).to match(%r{/login/oauth2/auth\?})
         code = driver.current_url.match(%r{code=([^\?&]+)})[1]
         expect(code).to be_present
-      end    
+      end
     end
   end
 
@@ -64,7 +74,7 @@ describe "oauth2 flow" do
       expect(f('#modal-box').text).to match(%r{Specs is requesting access to your account})
       expect(f('.icon_url')).to be_nil
     end
-    
+
     it "should show the developer keys icon if icon_url is set" do
       @key.icon_url = "/images/delete.png"
       @key.save!
@@ -85,4 +95,3 @@ describe "oauth2 flow" do
     end
   end
 end
-
