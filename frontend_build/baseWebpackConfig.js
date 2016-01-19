@@ -29,7 +29,8 @@ module.exports = {
       realTinymce: "bower/tinymce/tinymce",
       'ic-ajax': "bower/ic-ajax/dist/amd/main",
       'ic-tabs': "bower/ic-tabs/dist/amd/main",
-      'bower/axios/dist/axios': 'bower/axios/dist/axios.amd'
+      'bower/axios/dist/axios': 'bower/axios/dist/axios.amd',
+      'timezone': 'timezone_webpack_shim'
     },
     root: [
       __dirname + "/../public/javascripts",
