@@ -2176,11 +2176,13 @@ class UsersController < ApplicationController
 
     @pseudonym.account = @context
     @pseudonym.workflow_state = 'active'
-    @cc =
+    if cc_addr.present?
+      @cc =
         @user.communication_channels.where(:path_type => cc_type).by_path(cc_addr).first ||
             @user.communication_channels.build(:path_type => cc_type, :path => cc_addr)
-    @cc.user = @user
-    @cc.workflow_state = skip_confirmation ? 'active' : 'unconfirmed' unless @cc.workflow_state == 'confirmed'
+      @cc.user = @user
+      @cc.workflow_state = skip_confirmation ? 'active' : 'unconfirmed' unless @cc.workflow_state == 'confirmed'
+    end
 
     if @user.valid? && @pseudonym.valid? && @invalid_observee_creds.nil?
       # saving the user takes care of the @pseudonym and @cc, so we can't call
@@ -2202,7 +2204,7 @@ class UsersController < ApplicationController
         registration_params = params.fetch(:user, {}).merge(remote_ip: request.remote_ip, cookies: cookies)
         @user.new_registration(registration_params)
       end
-      message_sent = notify_policy.dispatch!(@user, @pseudonym, @cc)
+      message_sent = notify_policy.dispatch!(@user, @pseudonym, @cc) if @cc
 
       data = { :user => @user, :pseudonym => @pseudonym, :channel => @cc, :message_sent => message_sent, :course => @user.self_enrollment_course }
       if api_request?
