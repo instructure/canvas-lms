@@ -655,6 +655,7 @@ describe Quizzes::Quiz do
       before(:each) do
         # when course.end_at or term.end_at doesn't exist
         @deadline = 3.days.from_now
+        @start_at = 3.days.ago
         @course.restrict_enrollments_to_course_dates = true
         @course.conclude_at = 2.days.from_now
         @course.save!
@@ -662,7 +663,7 @@ describe Quizzes::Quiz do
         @course.enrollment_term.save!
 
         # Create a special time extension section
-        section = @course.course_sections.create!(restrict_enrollments_to_section_dates: true, end_at: @deadline)
+        section = @course.course_sections.create!(restrict_enrollments_to_section_dates: true, end_at: @deadline, start_at: @start_at)
 
         # Create user and enroll them in our section
         @user = User.create!(:name => "Fred Colon")

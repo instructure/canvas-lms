@@ -598,7 +598,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     can_take = Quizzes::QuizEligibility.new(course: self.context, quiz: self, user: submission.user)
 
     fallback_end_at = if can_take.section_dates_currently_apply?
-      can_take.course_section.end_at
+      can_take.active_sections_max_end_at
     elsif course.restrict_enrollments_to_course_dates
       course.end_at || course.enrollment_term.end_at
     else

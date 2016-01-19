@@ -54,16 +54,35 @@ class Quizzes::QuizEligibility
   end
 
   def section_dates_currently_apply?
-    section_restricted_by_date? && section_is_ongoing?
+    active_sections = student_sections.select{|s| restricted?(s) && active?(s)}
+    @active_sections_max_end_at = active_sections.map(&:end_at).compact.max if active_sections.present?
+    active_sections.present?
   end
 
-  def course_section
-    @course_section ||= (student_sections | assignment_overrides).first || CourseSection.new
+  def active_sections_max_end_at
+    section_dates_currently_apply? if @active_sections_max_end_at.nil?
+    @active_sections_max_end_at
   end
 
   private
 
   attr_reader :course, :quiz, :user, :session, :remote_ip
+
+  def active?(section)
+    now = Time.zone.now
+    (section.start_at.nil? || section.start_at <= now) && (section.end_at.nil? || section.end_at >= now)
+  end
+
+  def restricted?(section)
+    #  Restrictions aren't applicable if date boundries are not set
+    return false unless section.start_at && section.end_at
+    case section
+    when Course
+      !!section.restrict_enrollments_to_course_dates
+    when CourseSection
+      !!section.restrict_enrollments_to_section_dates
+    end
+  end
 
   def course_restrictions_apply?
     locked? || restricted_by_date?
@@ -78,18 +97,37 @@ class Quizzes::QuizEligibility
   end
 
   def restricted_by_date?
+    # First check if any of the assignment overides are active
+    assignment_override_sections.each{|ao| return false if active?(ao)}
+
     # Term dates override any others unless course date restrictions or
     # section date restrictions are selected.  Section dates override course
     # dates if section date restrictions apply
 
-    return true if restricted_section_has_ended?
-    return false if section_is_ongoing? && section_restricted_by_date?
+    any_section_restriction = false
 
-    return true if restricted_course_has_ended?
-    if term_has_ended? && !course_restricted_by_date?
-      return true
+    term_active = active?(term)
+
+    course_restricted = restricted?(course)
+    course_active = active?(course)
+
+    student_sections.each do |section|
+      section_restricted = restricted?(section)
+      section_active = active?(section)
+
+      any_section_restriction = true if section_restricted
+
+      # if there is a section restriction and the user is in an active section
+      return false if section_restricted && section_active
     end
-    false
+
+    # If there aren't any section restrictions and the course is restricted
+    return false if !term_active && course_restricted && course_active && !any_section_restriction
+
+    # fall back to the term if there aren't any other restrictions
+    return false if term_active && !course_restricted && !any_section_restriction
+
+    true
   end
 
   def store_session_access_code(access_code)
@@ -115,39 +153,8 @@ class Quizzes::QuizEligibility
     false
   end
 
-  def assignment_overrides
-    AssignmentOverride.where(quiz_id: quiz.id, set_type: CourseSection).map(&:set)
-  end
-
-  def restricted_section_has_ended?
-    return false unless course_section.present?
-    return false unless section_restricted_by_date?
-    course_section.end_at && course_section.end_at < Time.zone.now
-  end
-
-  def section_is_ongoing?
-    return true if course_section.end_at.nil?
-    course_section.end_at && course_section.end_at >= Time.zone.now
-  end
-
-  def section_restricted_by_date?
-    course_section.restrict_enrollments_to_section_dates
-  end
-
-  def course_has_ended?
-    course.end_at && course.end_at <= Time.zone.now
-  end
-
-  def course_restricted_by_date?
-    course && course.restrict_enrollments_to_course_dates
-  end
-
-  def restricted_course_has_ended?
-    if course.restrict_enrollments_to_course_dates
-      course.end_at ? course_has_ended? : term_has_ended?
-    else
-      false
-    end
+  def assignment_override_sections
+    AssignmentOverride.where(quiz_id: quiz.id, set_type: CourseSection).map(&:set) & student_sections
   end
 
   def inactive_non_admin?
@@ -164,15 +171,11 @@ class Quizzes::QuizEligibility
   end
 
   def student_sections
-    !user.new_record? && user.sections_for_course(course) || []
+    @student_sections ||= !user.new_record? && user.sections_for_course(course) || []
   end
 
   def term
     @term ||= course.enrollment_term || EnrollmentTerm.new
-  end
-
-  def term_has_ended?
-    term.end_at && term.end_at <= Time.zone.now
   end
 
   def user_cannot_not_read_as_admin?

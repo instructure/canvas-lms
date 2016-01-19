@@ -82,28 +82,43 @@ describe Quizzes::QuizEligibility do
 
     describe "date-based overrides" do
 
-      let(:active_course)     { Course.new(conclude_at: Time.zone.now + 3.days) }
-      let(:concluded_course)  { Course.new(conclude_at: Time.zone.now - 3.days) }
+      def create_enrollment_term(start_at, end_at)
+        EnrollmentTerm.new(start_at: start_at, end_at: end_at)
+      end
 
-      let(:restricted_active_course)    { Course.new(conclude_at: Time.zone.now + 3.days, restrict_enrollments_to_course_dates: true)}
-      let(:restricted_concluded_course) { Course.new(conclude_at: Time.zone.now - 3.days, restrict_enrollments_to_course_dates: true)}
-      let(:restricted_nodate_course) { Course.new(restrict_enrollments_to_course_dates: true)}
+      def create_course(start_at, end_at, restricted=nil)
+        Course.new(start_at:start_at, conclude_at:end_at, restrict_enrollments_to_course_dates:restricted)
+      end
 
-      let(:active_section)    { CourseSection.new(end_at: Time.zone.now + 3.days) }
-      let(:concluded_section) { CourseSection.new(end_at: Time.zone.now - 3.days) }
+      def create_course_section(start_at, end_at, restricted=nil)
+        CourseSection.new(start_at:start_at, end_at:end_at, restrict_enrollments_to_section_dates:restricted)
+      end
 
-      let(:restricted_active_section)    { CourseSection.new(end_at: Time.zone.now + 3.days, restrict_enrollments_to_section_dates: true) }
-      let(:restricted_section_without_end)    { CourseSection.new(end_at: nil, restrict_enrollments_to_section_dates: true) }
-      let(:restricted_concluded_section) { CourseSection.new(end_at: Time.zone.now - 3.days, restrict_enrollments_to_section_dates: true) }
+      let(:active_course)     { create_course(Time.zone.now - 3.days, Time.zone.now + 3.days) }
+      let(:concluded_course)  { create_course(Time.zone.now - 6.days, Time.zone.now - 3.days) }
 
-      let(:active_term)       { EnrollmentTerm.new(end_at: Time.zone.now + 3.days) }
-      let(:concluded_term)    { EnrollmentTerm.new(end_at: Time.zone.now - 3.days) }
+      let(:restricted_active_course)    { create_course(Time.zone.now - 3.days, Time.zone.now + 3.days, true)}
+      let(:restricted_concluded_course) { create_course(Time.zone.now - 6.days, Time.zone.now - 3.days, true)}
+      let(:restricted_unstarted_course) { create_course(Time.zone.now + 3.days, Time.zone.now + 6.days, true)}
+      let(:restricted_nodate_course)    { create_course(nil, nil, true)}
+
+      let(:active_section)    { create_course_section(Time.zone.now - 3.days, Time.zone.now + 3.days)}
+      let(:concluded_section) { create_course_section(Time.zone.now - 6.days, Time.zone.now - 3.days)}
+      let(:unstarted_section) { create_course_section(Time.zone.now + 3.days, Time.zone.now + 6.days)}
+
+      let(:restricted_active_section)       { create_course_section(Time.zone.now - 3.days, Time.zone.now + 3.days, true) }
+      let(:restricted_section_without_end)  { create_course_section(Time.zone.now - 3.days, nil, true) }
+      let(:restricted_concluded_section)    { create_course_section(Time.zone.now - 6.days, Time.zone.now - 3.days, true) }
+      let(:restricted_unstarted_section)    { create_course_section(Time.zone.now + 3.days, Time.zone.now + 6.days, true)}
+
+      let(:active_term)       { create_enrollment_term(Time.zone.now - 3.days, Time.zone.now + 3.days) }
+      let(:concluded_term)    { create_enrollment_term(Time.zone.now - 6.days, Time.zone.now - 3.days) }
 
       context "term concluded" do
         it "returns false if no overrides" do
           eligibility.stubs(:term).returns(concluded_term)
           eligibility.stubs(:course).returns(concluded_course)
-          eligibility.stubs(:course_section).returns(concluded_section)
+          eligibility.stubs(:student_sections).returns([concluded_section])
           expect(eligibility.eligible?).to be_falsey
           expect(eligibility.potentially_eligible?).to be_falsey
         end
@@ -111,7 +126,7 @@ describe Quizzes::QuizEligibility do
         it "returns false if restricted course doesn't have an end_at" do
           eligibility.stubs(:term).returns(concluded_term)
           eligibility.stubs(:course).returns(restricted_nodate_course)
-          eligibility.stubs(:course_section).returns(concluded_section)
+          eligibility.stubs(:student_sections).returns([concluded_section])
           expect(eligibility.eligible?).to be_falsey
           expect(eligibility.potentially_eligible?).to be_falsey
         end
@@ -119,8 +134,8 @@ describe Quizzes::QuizEligibility do
         it "returns false if active course because term > course" do
           eligibility.stubs(:term).returns(concluded_term)
           eligibility.stubs(:course).returns(active_course)
-          restricted_active_course.stubs(:enrollment_term).returns(concluded_term)
-          eligibility.stubs(:course_section).returns(concluded_section)
+          active_course.stubs(:enrollment_term).returns(concluded_term)
+          eligibility.stubs(:student_sections).returns([concluded_section])
           expect(eligibility.eligible?).to be_falsey
           expect(eligibility.potentially_eligible?).to be_falsey
         end
@@ -129,7 +144,7 @@ describe Quizzes::QuizEligibility do
           eligibility.stubs(:term).returns(concluded_term)
           eligibility.stubs(:course).returns(restricted_active_course)
           restricted_active_course.stubs(:enrollment_term).returns(concluded_term)
-          eligibility.stubs(:course_section).returns(concluded_section)
+          eligibility.stubs(:student_sections).returns([concluded_section])
           expect(eligibility.eligible?).to be_truthy
           expect(eligibility.potentially_eligible?).to be_truthy
         end
@@ -137,7 +152,7 @@ describe Quizzes::QuizEligibility do
         it "returns false and ignores section" do
           eligibility.stubs(:term).returns(concluded_term)
           eligibility.stubs(:course).returns(concluded_course)
-          eligibility.stubs(:course_section).returns(active_section)
+          eligibility.stubs(:student_sections).returns([active_section])
           expect(eligibility.eligible?).to be_falsey
           expect(eligibility.potentially_eligible?).to be_falsey
         end
@@ -145,7 +160,7 @@ describe Quizzes::QuizEligibility do
         it "returns false and ignores section" do
           eligibility.stubs(:term).returns(concluded_term)
           eligibility.stubs(:course).returns(concluded_course)
-          eligibility.stubs(:course_section).returns(active_section)
+          eligibility.stubs(:student_sections).returns([active_section])
           expect(eligibility.eligible?).to be_falsey
           expect(eligibility.potentially_eligible?).to be_falsey
         end
@@ -154,18 +169,18 @@ describe Quizzes::QuizEligibility do
           eligibility.stubs(:term).returns(concluded_term)
           eligibility.stubs(:course).returns(concluded_course)
           concluded_course.stubs(:enrollment_term).returns(concluded_term)
-          eligibility.stubs(:course_section).returns(restricted_active_section)
+          eligibility.stubs(:student_sections).returns([restricted_active_section])
           expect(eligibility.eligible?).to be_truthy
           expect(eligibility.potentially_eligible?).to be_truthy
         end
 
-        it "returns true if section without end date overrides" do
+        it "returns false if section without end is part of concluded course" do
           eligibility.stubs(:term).returns(concluded_term)
           eligibility.stubs(:course).returns(concluded_course)
           concluded_course.stubs(:enrollment_term).returns(concluded_term)
-          eligibility.stubs(:course_section).returns(restricted_section_without_end)
-          expect(eligibility.eligible?).to be_truthy
-          expect(eligibility.potentially_eligible?).to be_truthy
+          eligibility.stubs(:student_sections).returns([restricted_section_without_end])
+          expect(eligibility.eligible?).to be_falsey
+          expect(eligibility.potentially_eligible?).to be_falsey
         end
 
       end
@@ -175,7 +190,7 @@ describe Quizzes::QuizEligibility do
           eligibility.stubs(:term).returns(active_term)
           eligibility.stubs(:course).returns(restricted_concluded_course)
           restricted_concluded_course.stubs(:enrollment_term).returns(active_term)
-          eligibility.stubs(:course_section).returns(active_section)
+          eligibility.stubs(:student_sections).returns([active_section])
           expect(eligibility.eligible?).to be_falsey
           expect(eligibility.potentially_eligible?).to be_falsey
         end
@@ -183,7 +198,7 @@ describe Quizzes::QuizEligibility do
         it "returns true if active section overrides" do
           eligibility.stubs(:term).returns(concluded_term)
           eligibility.stubs(:course).returns(restricted_concluded_course)
-          eligibility.stubs(:course_section).returns(restricted_active_section)
+          eligibility.stubs(:student_sections).returns([restricted_active_section])
           expect(eligibility.eligible?).to be_truthy
           expect(eligibility.potentially_eligible?).to be_truthy
         end
@@ -193,7 +208,7 @@ describe Quizzes::QuizEligibility do
         it "returns true if no overrides because term > course" do
           eligibility.stubs(:term).returns(active_term)
           eligibility.stubs(:course).returns(concluded_course)
-          eligibility.stubs(:course_section).returns(concluded_section)
+          eligibility.stubs(:student_sections).returns([concluded_section])
           expect(eligibility.eligible?).to be_truthy
           expect(eligibility.potentially_eligible?).to be_truthy
         end
@@ -201,11 +216,11 @@ describe Quizzes::QuizEligibility do
         it "returns false if term is closed with no respect for section" do
           eligibility.stubs(:term).returns(concluded_term)
           eligibility.stubs(:course).returns(concluded_course)
-          eligibility.stubs(:course_section).returns(active_section)
+          eligibility.stubs(:student_sections).returns([active_section])
           expect(eligibility.eligible?).to be_falsey
           expect(eligibility.potentially_eligible?).to be_falsey
 
-          eligibility.stubs(:course_section).returns(concluded_section)
+          eligibility.stubs(:student_sections).returns([concluded_section])
           expect(eligibility.eligible?).to be_falsey
           expect(eligibility.potentially_eligible?).to be_falsey
         end
@@ -213,7 +228,7 @@ describe Quizzes::QuizEligibility do
         it "returns true if active section overrides" do
           eligibility.stubs(:term).returns(concluded_term)
           eligibility.stubs(:course).returns(concluded_course)
-          eligibility.stubs(:course_section).returns(restricted_active_section)
+          eligibility.stubs(:student_sections).returns([restricted_active_section])
           expect(eligibility.eligible?).to be_truthy
           expect(eligibility.potentially_eligible?).to be_truthy
         end
@@ -223,7 +238,7 @@ describe Quizzes::QuizEligibility do
         it "returns true with no overrides" do
           eligibility.stubs(:term).returns(active_term)
           eligibility.stubs(:course).returns(active_course)
-          eligibility.stubs(:course_section).returns(concluded_section)
+          eligibility.stubs(:student_sections).returns([concluded_section])
           expect(eligibility.eligible?).to be_truthy
           expect(eligibility.potentially_eligible?).to be_truthy
         end
@@ -231,7 +246,7 @@ describe Quizzes::QuizEligibility do
         it "returns false if section overrides" do
           eligibility.stubs(:term).returns(active_term)
           eligibility.stubs(:course).returns(active_course)
-          eligibility.stubs(:course_section).returns(restricted_concluded_section)
+          eligibility.stubs(:student_sections).returns([restricted_concluded_section])
           expect(eligibility.eligible?).to be_falsey
           expect(eligibility.potentially_eligible?).to be_falsey
         end
@@ -240,22 +255,100 @@ describe Quizzes::QuizEligibility do
       it "returns false if section overrides and course overrides" do
         eligibility.stubs(:term).returns(active_term)
         eligibility.stubs(:course).returns(restricted_active_course)
-        eligibility.stubs(:course_section).returns(restricted_concluded_section)
+        eligibility.stubs(:student_sections).returns([restricted_concluded_section])
         expect(eligibility.eligible?).to be_falsey
         expect(eligibility.potentially_eligible?).to be_falsey
       end
-    end
-  end
-  
-  describe "with many associated Assignment Overrides" do
-    it "allows a student to take it" do
-      sections = 4.times.map { CourseSection.new(end_at: Time.zone.now - 3.days, restrict_enrollments_to_section_dates: true) }
-      eligibility.stubs(:assignment_overrides).returns(sections)
-      eligibility.stubs(:student_sections).returns([CourseSection.new(end_at: Time.zone.now + 3.days, restrict_enrollments_to_section_dates: true)])
-      expect(eligibility.eligible?).to be_truthy
-    end
-  end
 
+      it "returns false if unstarted section overides" do
+        eligibility.stubs(:term).returns(concluded_term)
+        eligibility.stubs(:course).returns(concluded_course)
+        eligibility.stubs(:student_sections).returns([restricted_unstarted_section])
+        expect(eligibility.eligible?).to be_falsey
+        expect(eligibility.potentially_eligible?).to be_falsey
+      end
+
+      it "returns false if unstarted course overrides" do
+        eligibility.stubs(:term).returns(concluded_term)
+        eligibility.stubs(:course).returns(restricted_unstarted_course)
+        eligibility.stubs(:student_sections).returns([active_section])
+        expect(eligibility.eligible?).to be_falsey
+        expect(eligibility.potentially_eligible?).to be_falsey
+      end
+
+      describe "with many section enrollments" do
+        it "returns true with one restricted active section" do
+          student_sections = [restricted_active_section, restricted_concluded_section, restricted_unstarted_section, restricted_section_without_end]
+          eligibility.stubs(:student_sections).returns(student_sections)
+          expect(eligibility.eligible?).to be_truthy
+          expect(eligibility.potentially_eligible?).to be_truthy
+        end
+
+        it "returns false without a restricted active section" do
+          student_sections = [restricted_unstarted_section, active_section, restricted_concluded_section, restricted_section_without_end]
+          eligibility.stubs(:student_sections).returns(student_sections)
+          expect(eligibility.eligible?).to be_falsey
+          expect(eligibility.potentially_eligible?).to be_falsey
+        end
+
+        it "returns true without a restricted active section at the front of the list" do
+          student_sections = [restricted_active_section, restricted_concluded_section, restricted_unstarted_section, restricted_section_without_end]
+          eligibility.stubs(:student_sections).returns(student_sections)
+          expect(eligibility.eligible?).to be_truthy
+          expect(eligibility.potentially_eligible?).to be_truthy
+        end
+
+      end
+
+      describe "with associated Assignment Overrides" do
+        let(:active_assignment_override)    { create_course_section(Time.zone.now - 3.days, Time.zone.now + 3.days, true) }
+        let(:concluded_assignment_override) { create_course_section(Time.zone.now - 6.days, Time.zone.now - 3.days, true) }
+        let(:unstarted_assignment_override) { create_course_section(Time.zone.now + 3.days, Time.zone.now + 6.days, true) }
+
+        it "returns true if there is an active override" do
+          assignment_overrides = [active_assignment_override, concluded_assignment_override, unstarted_assignment_override]
+          eligibility.stubs(:assignment_override_sections).returns(assignment_overrides)
+          eligibility.stubs(:student_sections).returns([])
+          expect(eligibility.eligible?).to be_truthy
+        end
+
+        it "returns false if there is no active override" do
+          assignment_overrides = [concluded_assignment_override, unstarted_assignment_override]
+          eligibility.stubs(:assignment_override_sections).returns(assignment_overrides)
+          eligibility.stubs(:term).returns(concluded_term)
+          eligibility.stubs(:course).returns(restricted_concluded_course)
+          eligibility.stubs(:student_sections).returns([restricted_concluded_section])
+          expect(eligibility.eligible?).to be_falsey
+        end
+
+        it "returns true if all other sections (i.e. term, course, section) are concluded and one override is active" do
+          assignment_overrides = [active_assignment_override, concluded_assignment_override, unstarted_assignment_override]
+          eligibility.stubs(:assignment_override_sections).returns(assignment_overrides)
+          eligibility.stubs(:term).returns(concluded_term)
+          eligibility.stubs(:course).returns(restricted_concluded_course)
+          eligibility.stubs(:student_sections).returns([restricted_concluded_section])
+          expect(eligibility.eligible?).to be_truthy
+        end
+
+        it "returns true if course section is active and no override is active" do
+          assignment_overrides = [concluded_assignment_override, unstarted_assignment_override]
+          eligibility.stubs(:assignment_override_sections).returns(assignment_overrides)
+          eligibility.stubs(:student_sections).returns([restricted_active_section])
+          expect(eligibility.eligible?).to be_truthy
+        end
+
+      end
+
+      it "returns true if there are no student sections and course overrides" do
+        eligibility.stubs(:term).returns(concluded_term)
+        eligibility.stubs(:course).returns(restricted_active_course)
+        eligibility.stubs(:student_sections).returns([])
+        expect(eligibility.eligible?).to be_truthy
+        expect(eligibility.potentially_eligible?).to be_truthy
+      end
+
+    end
+  end
 
   describe "#declined_reason_renders" do
 
