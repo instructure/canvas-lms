@@ -72,7 +72,7 @@ module LiveAssessments
   #       }
   #     }
   class ResultsController < ApplicationController
-    include Filters::LiveAssessments
+    include ::Filters::LiveAssessments
 
     before_filter :require_user
     before_filter :require_context

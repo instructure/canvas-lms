@@ -96,7 +96,7 @@
 #     }
 #
 class Quizzes::QuizReportsController < ApplicationController
-  include Filters::Quizzes
+  include ::Filters::Quizzes
 
   before_filter :require_context, :require_quiz
 

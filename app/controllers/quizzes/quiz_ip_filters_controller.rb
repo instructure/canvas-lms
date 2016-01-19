@@ -46,7 +46,7 @@
 #
 class Quizzes::QuizIpFiltersController < ApplicationController
   include Api::V1::QuizIpFilter
-  include Filters::Quizzes
+  include ::Filters::Quizzes
 
   before_filter :require_user, :require_context, :require_quiz
 

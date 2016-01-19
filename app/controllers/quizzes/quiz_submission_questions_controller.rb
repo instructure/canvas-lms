@@ -50,7 +50,7 @@
 #
 class Quizzes::QuizSubmissionQuestionsController < ApplicationController
   include Api::V1::QuizSubmissionQuestion
-  include Filters::QuizSubmissions
+  include ::Filters::QuizSubmissions
 
   before_filter :require_user, :require_quiz_submission, :export_scopes
   before_filter :require_question, only: [ :show, :flag, :unflag ]

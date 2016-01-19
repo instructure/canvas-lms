@@ -277,7 +277,7 @@
 #
 class Quizzes::QuizzesApiController < ApplicationController
   include Api::V1::Quiz
-  include Filters::Quizzes
+  include ::Filters::Quizzes
 
   before_filter :require_context
   before_filter :require_quiz, :only => [:show, :update, :destroy, :reorder, :validate_access_code]

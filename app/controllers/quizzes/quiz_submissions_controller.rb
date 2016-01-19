@@ -18,8 +18,8 @@
 
 class Quizzes::QuizSubmissionsController < ApplicationController
   include Api::V1::QuizSubmission
-  include Filters::Quizzes
-  include Filters::QuizSubmissions
+  include ::Filters::Quizzes
+  include ::Filters::QuizSubmissions
 
   protect_from_forgery :except => [:create, :backup, :record_answer], with: :exception
   before_filter :require_context

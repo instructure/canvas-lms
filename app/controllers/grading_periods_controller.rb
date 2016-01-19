@@ -55,7 +55,7 @@
 #    }
 #
 class GradingPeriodsController < ApplicationController
-  include Filters::GradingPeriods
+  include ::Filters::GradingPeriods
 
   before_filter :require_user
   before_filter :get_context

@@ -184,8 +184,8 @@
 #
 class Quizzes::QuizQuestionsController < ApplicationController
   include Api::V1::QuizQuestion
-  include Filters::Quizzes
-  include Filters::QuizSubmissions
+  include ::Filters::Quizzes
+  include ::Filters::QuizSubmissions
 
   before_filter :require_context, :require_quiz
   before_filter :require_question, :only => [:show]

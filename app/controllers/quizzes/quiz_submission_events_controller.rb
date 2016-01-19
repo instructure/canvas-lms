@@ -17,8 +17,8 @@
 #
 
 class Quizzes::QuizSubmissionEventsController < ApplicationController
-  include Filters::Quizzes
-  include Filters::QuizSubmissions
+  include ::Filters::Quizzes
+  include ::Filters::QuizSubmissions
 
   before_filter :require_user, :require_context
   before_filter :require_quiz, :only => [ :index ]
