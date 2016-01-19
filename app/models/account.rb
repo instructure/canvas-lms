@@ -1092,7 +1092,7 @@ class Account < ActiveRecord::Base
     def define_special_account(key, name = nil)
       name ||= key.to_s.titleize
       self.special_account_list << key
-      instance_eval <<-RUBY
+      instance_eval <<-RUBY, __FILE__, __LINE__ + 1
         def self.#{key}(force_create = false)
           get_special_account(:#{key}, #{name.inspect}, force_create)
         end
