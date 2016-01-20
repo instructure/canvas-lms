@@ -1,6 +1,3 @@
 @import "base/environment";
 
-.ui-widget {
-  font-size: $baseFontSize;
-}
-
+.ui-widget { @include fontSize($baseFontSize); }
