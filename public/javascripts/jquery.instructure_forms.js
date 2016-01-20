@@ -1025,7 +1025,14 @@ define([
       }).fadeIn('fast');
 
       var cleanup = function() {
+        var $screenReaderErrors = $("#flash_screenreader_holder").find("span");
+        var srError = _.find($screenReaderErrors, function(node){
+          return $(node).text() == $box.text();
+        });
         $box.remove();
+        if(srError){
+          $(srError).remove();
+        };
         $obj.removeData('associated_error_box');
         $obj.removeData('associated_error_object');
       };
@@ -1094,6 +1101,7 @@ define([
   $.fn.hideErrors = function(options) {
     if(this.length) {
       var $oldBox = this.data('associated_error_box');
+      var $screenReaderErrors = $("#flash_screenreader_holder").find("span");
       if($oldBox) {
         $oldBox.remove();
         this.data('associated_error_box', null);
@@ -1104,6 +1112,12 @@ define([
         if($oldBox) {
           $oldBox.remove();
           $obj.data('associated_error_box', null);
+          srError = _.find($screenReaderErrors, function(node){
+            return $(node).text() == $oldBox.text();
+          });
+          if(srError){
+            $(srError).remove();
+          };
         }
       });
     }

@@ -30,15 +30,22 @@ define [
     if content.hasOwnProperty('html') then content.html else htmlEscape(content)
 
   screenReaderFlashBox = (type, content) ->
-    $screenreader_node = $("""
-      <span>#{escapeContent(content)}</span>
-    """)
+    # nothing to do here if $screenreader_holder is not yet defined
+    if $screenreader_holder.length > 0
+      existing_nodes = $screenreader_holder.find('span')
+      if existing_nodes.length > 0 && content.string
+        message_text = content.string
+        matching_node = _.find existing_nodes, (node) ->
+                          $(node).text() == message_text
+        if matching_node
+          # need to remove and re-add error for accessibility, and to ensure
+          # duplicate errors/messages do not pile up
+          $(matching_node).remove()
 
+    $screenreader_node = $("""
+        <span>#{escapeContent(content)}</span>
+      """)
     $screenreader_node.appendTo($screenreader_holder)
-    # we're hiding these instead of removing them, since calling .remove() on a
-    # DOM node contained in an 'assertive' live region causes another alert that
-    # interrupts whatever alert message(s) are in progress
-    window.setTimeout((-> $screenreader_node.attr('aria-hidden', 'true')), 1000)
 
   flashBox = (type, content, timeout, cssOptions = {}) ->
     $node = $("""
