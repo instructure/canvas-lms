@@ -152,6 +152,11 @@ define [
       @$el.disableWhileLoading disablingDfd
       disablingDfd
 
+    makeFocusable: =>
+      return if @$el.find('[tabindex=0]').length > 0
+      if (@views().length > 0)
+        @views()[0].makeFocusable()
+
     focusFirstOutcome: =>
       $li = @$el.find('[tabindex=0]')
       if $li.length > 0

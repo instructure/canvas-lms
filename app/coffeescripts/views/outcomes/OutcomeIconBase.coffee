@@ -172,12 +172,19 @@ define [
       $target.parents('.wrapper:first').find('[tabindex=0]').attr('tabindex', -1)
       $target.attr('tabindex', 0)
 
+    # Internal: Makes an element focusable
+    #
+    # Returns jQuery element
+    makeFocusable: ->
+      @$el.parent().find('[tabindex=0]').attr('tabindex', -1)
+      @$el.attr('tabindex', 0)
+
     # Internal: Add selected class to <li />.
     #
     # Returns jQuery element.
-    select: ->
-      @$el.parent().find('[tabindex=0]').attr('tabindex', -1)
-      @$el.addClass('selected').attr('tabindex', 0)
+    select: =>
+      @makeFocusable()
+      @$el.addClass('selected')
 
     # Internal: Remove selected class to <li />.
     #
