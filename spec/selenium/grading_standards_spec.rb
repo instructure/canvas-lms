@@ -140,11 +140,11 @@ describe "grading standards" do
       @standard = simple_grading_standard(Account.default)
       get("/accounts/#{Account.default.id}/grading_standards")
       std = keep_trying_until { f("#grading_standard_#{@standard.id}") }
-      std.find_element(:css, ".edit_grading_standard_link").click
+      std.find_element(:css, ".edit_grading_standard_button").click
       std.find_element(:css, "button.save_button").click
       wait_for_ajax_requests
       std = keep_trying_until { f("#grading_standard_#{@standard.id}") }
-      std.find_element(:css, ".edit_grading_standard_link").click
+      std.find_element(:css, ".edit_grading_standard_button").click
       std.find_element(:css, "button.save_button")
       wait_for_ajax_requests
       expect(@standard.reload.data.length).to eq 3

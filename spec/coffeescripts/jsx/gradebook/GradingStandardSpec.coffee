@@ -42,20 +42,20 @@ define [
   test 'renders the correct id name', ->
     deepEqual @gradingStandard.renderIdNames(), "grading_standard_1"
 
-  test 'renders the edit link', ->
-    ok @gradingStandard.refs.editLink
+  test 'renders the edit button', ->
+    ok @gradingStandard.refs.editButton
 
-  test 'calls onSetEditingStatus when edit link is clicked', ->
+  test 'calls onSetEditingStatus when edit button is clicked', ->
     setEditingStatus = @spy(@gradingStandard.props, 'onSetEditingStatus')
-    Simulate.click(@gradingStandard.refs.editLink.getDOMNode())
+    Simulate.click(@gradingStandard.refs.editButton.getDOMNode())
     ok setEditingStatus.calledOnce
 
-  test 'renders the delete link', ->
-    ok @gradingStandard.refs.deleteLink
+  test 'renders the delete button', ->
+    ok @gradingStandard.refs.deleteButton
 
-  test 'calls onDeleteGradingStandard when delete link is clicked', ->
+  test 'calls onDeleteGradingStandard when delete button is clicked', ->
     deleteGradingStandard = @spy(@gradingStandard.props, 'onDeleteGradingStandard')
-    Simulate.click(@gradingStandard.refs.deleteLink.getDOMNode())
+    Simulate.click(@gradingStandard.refs.deleteButton.getDOMNode())
     ok deleteGradingStandard.calledOnce
 
   test 'does not show a message about not being able to manage', ->
@@ -96,8 +96,8 @@ define [
   test 'displays a cannot manage message', ->
     ok @gradingStandard.refs.cannotManageMessage
 
-  test 'disables edit and delete links', ->
-    ok @gradingStandard.refs.disabledLinks
+  test 'disables edit and delete buttons', ->
+    ok @gradingStandard.refs.disabledButtons
 
   module "GradingStandard being edited",
     setup: ->
@@ -123,11 +123,11 @@ define [
     teardown: ->
       React.unmountComponentAtNode(@gradingStandard.getDOMNode().parentNode)
 
-  test 'does not render the edit link', ->
-    deepEqual @gradingStandard.refs.editLink, undefined
+  test 'does not render the edit button', ->
+    deepEqual @gradingStandard.refs.editButton, undefined
 
-  test 'does not render the delete link', ->
-    deepEqual @gradingStandard.refs.deleteLink, undefined
+  test 'does not render the delete button', ->
+    deepEqual @gradingStandard.refs.deleteButton, undefined
 
   test 'renders the save button', ->
     ok @gradingStandard.refs.saveButton

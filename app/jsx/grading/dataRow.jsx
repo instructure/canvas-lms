@@ -7,10 +7,7 @@ function(React, I18n) {
   var DataRow = React.createClass({
 
     getInitialState: function() {
-      return {
-        showInsertRowLink: false,
-        showBottomBorder: false
-      };
+      return { showBottomBorder: false };
     },
 
     getRowData: function(){
@@ -20,10 +17,7 @@ function(React, I18n) {
     },
 
     componentWillReceiveProps: function(nextProps) {
-      this.setState({
-        showInsertRowLink: false,
-        showBottomBorder: false
-      });
+      this.setState({ showBottomBorder: false });
     },
 
     triggerRowNameChange: function(event){
@@ -42,32 +36,20 @@ function(React, I18n) {
       return this.props.onDeleteRow(this.props.uniqueId);
     },
 
-    showInsertRowLink: function(){
-      this.setState({showInsertRowLink: true});
-    },
-
-    hideInsertRowLink: function(){
-      this.setState({showInsertRowLink: false});
-    },
-
     triggerInsertRow: function(event){
       event.preventDefault();
       return this.props.onInsertRow(this.props.uniqueId);
     },
 
-    renderInsertRowLink: function(){
-      if(this.state.showInsertRowLink){
-        return (
-          <a href="#" ref="insertRowLink" className="insert_grading_standard_link"
-             onMouseEnter={this.showBottomBorder} onFocus={this.showBottomBorder}
-             onBlur={this.hideBottomBorder} onMouseLeave={this.hideBottomBorder}
-             onClick={this.triggerInsertRow}>
-            <i className="icon-add standalone-icon">
-              <span className="screenreader-only">{I18n.t("Insert row below")}</span>
-            </i>
-          </a>);
-      }
-      return null;
+    renderInsertRowButton: function(){
+      return (
+        <button className="Button Button--icon-action insert_row_button"
+                onMouseEnter={this.showBottomBorder} onFocus={this.showBottomBorder}
+                onBlur={this.hideBottomBorder} onMouseLeave={this.hideBottomBorder}
+                onClick={this.triggerInsertRow} type="button">
+          <span className="screenreader-only">{I18n.t("Insert row below")}</span>
+          <i className="icon-add"/>
+        </button>);
     },
 
     showBottomBorder: function(){
@@ -89,15 +71,14 @@ function(React, I18n) {
       return score;
     },
 
-    renderDeleteLink: function(){
+    renderDeleteRowButton: function(){
       if(this.props.onlyDataRowRemaining) return null;
       return(
-        <a href="#" ref="deleteLink" onClick={this.triggerDeleteRow}
-           className="delete_row_link no-hover" title={I18n.t('Remove row')}>
-          <i className="icon-end standalone-icon">
-            <span className="screenreader-only">{I18n.t("Remove Row")}</span>
-          </i>
-        </a>
+        <button ref="deleteButton" className="Button Button--icon-action delete_row_button"
+                onClick={this.triggerDeleteRow} type="button">
+          <span className="screenreader-only">{I18n.t("Remove row")}</span>
+          <i className="icon-end"/>
+        </button>
       );
     },
 
@@ -134,11 +115,9 @@ function(React, I18n) {
         <tr className={this.state.showBottomBorder ?
                        "grading_standard_row react_grading_standard_row border_below" :
                        "grading_standard_row react_grading_standard_row"}
-            ref="editContainer"
-            onMouseEnter={this.showInsertRowLink} onMouseLeave={this.hideInsertRowLink}
-            onFocus={this.showInsertRowLink}>
-          <td className="insert_row_icon_container" tabIndex="0">
-            {this.renderInsertRowLink()}
+            ref="editContainer">
+          <td className="insert_row_icon_container">
+            {this.renderInsertRowButton()}
           </td>
           <td className="row_name_container">
             <div>
@@ -166,7 +145,7 @@ function(React, I18n) {
             </div>
           </td>
           <td className="row_cell last_row_cell">
-            {this.renderDeleteLink()}
+            {this.renderDeleteRowButton()}
           </td>
         </tr>
       );

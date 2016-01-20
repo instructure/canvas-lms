@@ -17,8 +17,8 @@ module GradingSchemesCommon
 
   def should_add_a_grading_scheme(options = {name: "new grading standard"})
     new_standard_name = options[:name]
-    f('.add_standard_link').click
-    expect(f('.add_standard_link')).to have_class('disabled')
+    f('.add_standard_button').click
+    expect(f('.add_standard_button')).to have_class('disabled')
     replace_content(f('.scheme_name'), new_standard_name)
     f('.save_button').click
     wait_for_ajax_requests
@@ -32,7 +32,7 @@ module GradingSchemesCommon
     simple_grading_standard(context)
     grading_standard = GradingStandard.last
     get url
-    f('.edit_grading_standard_link').click
+    f('.edit_grading_standard_button').click
     replace_content(f('.scheme_name'), edit_name)
     save_and_reload_changes(grading_standard)
     expect(grading_standard.title).to eq edit_name
@@ -42,7 +42,7 @@ module GradingSchemesCommon
   def should_delete_a_grading_scheme(context, url)
     simple_grading_standard(context)
     get url
-    f('.delete_grading_standard_link').click
+    f('.delete_grading_standard_button').click
     driver.switch_to.alert.accept
     wait_for_ajaximations
     expect(GradingStandard.last.workflow_state).to eq 'deleted'
@@ -52,14 +52,14 @@ module GradingSchemesCommon
     simple_grading_standard(context)
     @grading_standard = GradingStandard.last
     get url
-    f('.edit_grading_standard_link').click
+    f('.edit_grading_standard_button').click
   end
 
   def should_add_a_grading_scheme_item
     data_count = @grading_standard.data.count
     grading_standard_row = f('.grading_standard_row')
     driver.action.move_to(grading_standard_row).perform
-    f('.insert_grading_standard_link').click
+    f('.insert_row_button').click
     replace_content(ff('.standard_name')[1], 'Z')
     replace_content(ff('.standard_value')[1], '88')
     save_and_reload_changes(@grading_standard)
@@ -89,7 +89,7 @@ module GradingSchemesCommon
 
   def should_delete_a_grading_scheme_item
     data_count = @grading_standard.data.count
-    grading_standard_rows[0].find_element(:css, '.delete_row_link').click
+    grading_standard_rows[0].find_element(:css, '.delete_row_button').click
     wait_for_ajaximations
     save_and_reload_changes(@grading_standard)
     expect(@grading_standard.data.count).to eq data_count - 1
@@ -107,6 +107,6 @@ module GradingSchemesCommon
 
     expect(f(".grading_standards_tab")).to be_displayed
     f(".grading_standards_tab").click
-    expect(f(".add_standard_link")).to be_displayed
+    expect(f(".add_standard_button")).to be_displayed
   end
 end

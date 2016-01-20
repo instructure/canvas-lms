@@ -37,9 +37,9 @@ describe "interaction with multiple grading periods" do
       user_session(admin)
       get "/accounts/#{account.id}/grading_standards"
       fj('#react_grading_tabs a[href="#grading-standards-tab"]').click
-      fj('a.btn.pull-right.add_standard_link').click
+      fj('button.add_standard_button').click
       expect(fj('input.scheme_name')).not_to be_nil
-      expect(fj('a.btn.pull-right.add_standard_link')).to have_class('disabled')
+      expect(fj('button.add_standard_button')).to have_class('disabled')
     end
 
     context 'assignment index page' do
