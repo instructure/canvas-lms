@@ -61,7 +61,7 @@ describe 'login' do
       get login_url
       redirect_until(cas_redirect_url)
 
-      get 'login/cas', ticket: 'ST-abcd'
+      get '/login/cas', ticket: 'ST-abcd'
       expect(response).to redirect_to(dashboard_url(:login_success => 1))
       expect(session[:cas_session]).to eq 'ST-abcd'
 
@@ -76,7 +76,7 @@ describe 'login' do
       get login_url
       redirect_until(cas_redirect_url)
 
-      get 'login/cas', ticket: 'ST-abcd'
+      get '/login/cas', ticket: 'ST-abcd'
       expect(response).to redirect_to(login_url)
       expect(flash[:delegated_message]).to match(/There was a problem logging in/)
     end
@@ -90,7 +90,7 @@ describe 'login' do
       get login_url
       redirect_until(cas_redirect_url)
 
-      get 'login/cas', ticket: 'ST-abcd'
+      get '/login/cas', ticket: 'ST-abcd'
       expect(response).to redirect_to(login_url)
       expect(flash[:delegated_message]).to match(/There was a problem logging in/)
     end
@@ -101,7 +101,7 @@ describe 'login' do
       get login_url
       redirect_until(cas_redirect_url)
 
-      get 'login/cas', ticket: 'ST-abcd'
+      get '/login/cas', ticket: 'ST-abcd'
       expect(response).to redirect_to(login_url)
       get login_url
       expect(flash[:delegated_message]).to match(/Canvas doesn't have an account for user/)
@@ -117,7 +117,7 @@ describe 'login' do
       get login_url
       redirect_until(cas_redirect_url)
 
-      get 'login/cas', ticket: 'ST-abcd'
+      get '/login/cas', ticket: 'ST-abcd'
       expect(response).to redirect_to(redirect_url)
     end
 
@@ -129,7 +129,7 @@ describe 'login' do
       get login_url
       redirect_until(cas_redirect_url)
 
-      get 'login/cas', ticket: 'ST-abcd'
+      get '/login/cas', ticket: 'ST-abcd'
       expect(response).to redirect_to(dashboard_url(:login_success => 1))
       expect(session[:cas_session]).to eq 'ST-abcd'
     end
@@ -144,7 +144,7 @@ describe 'login' do
       get login_url
       redirect_until(cas_redirect_url)
 
-      get 'login/cas', ticket: 'ST-abcd'
+      get '/login/cas', ticket: 'ST-abcd'
       expect(response).to redirect_to(dashboard_url(:login_success => 1))
       expect(session[:cas_session]).to eq cas_ticket
 
@@ -166,7 +166,7 @@ describe 'login' do
         get login_url
         redirect_until(cas_redirect_url)
 
-        get 'login/cas', ticket: 'ST-abcd'
+        get '/login/cas', ticket: 'ST-abcd'
         expect(response).to redirect_to(dashboard_url(:login_success => 1))
         expect(session[:cas_session]).to eq 'ST-abcd'
         expect(Canvas.redis.get("cas_session:ST-abcd")).to eq @pseudonym.global_id.to_s
@@ -193,7 +193,7 @@ describe 'login' do
         get login_url
         redirect_until(cas_redirect_url)
 
-        get 'login/cas', ticket: 'ST-abcd'
+        get '/login/cas', ticket: 'ST-abcd'
         expect(response).to redirect_to(dashboard_url(:login_success => 1))
         expect(session[:cas_session]).to eq 'ST-abcd'
         expect(Canvas.redis.get("cas_session:ST-abcd")).to eq @pseudonym.global_id.to_s

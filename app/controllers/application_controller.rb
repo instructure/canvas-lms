@@ -711,7 +711,7 @@ class ApplicationController < ActionController::Base
       end
 
       @groups = @context.assignment_groups.active
-      @assignments = AssignmentGroup.visible_assignments(@current_user, @context, @groups)
+      @assignments = AssignmentGroup.visible_assignments(@current_user, @context, @groups).to_a
     else
       assignments_and_groups = Shard.partition_by_shard(@courses) do |courses|
         [[Assignment.published.for_course(courses).all,

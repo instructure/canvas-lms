@@ -773,7 +773,7 @@ class Account < ActiveRecord::Base
   end
 
   def available_custom_account_roles(include_inactive=false)
-    available_custom_roles(include_inactive).for_accounts
+    available_custom_roles(include_inactive).for_accounts.to_a
   end
 
   def available_account_roles(include_inactive=false, user = nil)
@@ -786,7 +786,7 @@ class Account < ActiveRecord::Base
   end
 
   def available_custom_course_roles(include_inactive=false)
-    available_custom_roles(include_inactive).for_courses
+    available_custom_roles(include_inactive).for_courses.to_a
   end
 
   def available_course_roles(include_inactive=false)

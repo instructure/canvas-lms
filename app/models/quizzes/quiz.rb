@@ -768,7 +768,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   # virtual attribute
   def locked=(new_val)
-    new_val = ::ActiveRecord::ConnectionAdapters::Column.value_to_boolean(new_val)
+    new_val = Canvas::Plugin.value_to_boolean(new_val)
     if new_val
       #lock the quiz either until unlock_at, or indefinitely if unlock_at.nil?
       self.lock_at = Time.now

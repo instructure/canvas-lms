@@ -33,7 +33,7 @@ describe "/quizzes/quizzes/show" do
     quiz = @course.quizzes.create
     quiz.workflow_state = "available"
     quiz.save!
-    quiz.assignment = @course.assignments.create(:title => quiz.title, :due_at => quiz.due_at, :submission_types => 'online_quiz')
+    quiz.reload
     quiz.assignment.mute!
     quiz.assignment.grade_student(@student, :grade => 5)
     submission = quiz.quiz_submissions.create

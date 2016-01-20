@@ -337,8 +337,8 @@ class CommunicationChannelsController < ApplicationController
         # User chose to continue with this cc/pseudonym/user combination on confirmation page
         if @pseudonym && params[:register]
           @user.require_acceptance_of_terms = require_terms?
-          @user.attributes = params[:user]
-          @pseudonym.attributes = params[:pseudonym]
+          @user.attributes = params[:user] if params[:user]
+          @pseudonym.attributes = params[:pseudonym] if params[:pseudonym]
           @pseudonym.communication_channel = cc
 
           # ensure the password gets validated, but don't require confirmation

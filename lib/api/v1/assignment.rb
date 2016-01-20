@@ -503,7 +503,7 @@ module Api::V1::Assignment
     else
       users = current_user_and_observed(include_observed: has_observed_users)
       @context.submissions.
-        where(:assignment_id => assignments).
+        where(:assignment_id => assignments.map(&:id)).
         for_user(users)
     end
 

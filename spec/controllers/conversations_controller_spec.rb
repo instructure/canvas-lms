@@ -289,10 +289,10 @@ describe ConversationsController do
     context "group conversations" do
       before :once do
         @old_count = Conversation.count
-  
+
         @new_user1 = User.create
         @course.enroll_student(@new_user1).accept!
-  
+
         @new_user2 = User.create
         @course.enroll_student(@new_user2).accept!
 
@@ -307,7 +307,7 @@ describe ConversationsController do
         it "should create a conversation shared by all recipients if group_conversation=#{truish.inspect}" do
           post 'create', :recipients => [@new_user1.id.to_s, @new_user2.id.to_s], :body => "yo", :group_conversation => truish
           expect(response).to be_success
-    
+
           expect(Conversation.count).to eql(@old_count + 1)
         end
       end
@@ -316,7 +316,7 @@ describe ConversationsController do
         it "should create one conversation per recipient if group_conversation=#{falsish.inspect}" do
           post 'create', :recipients => [@new_user1.id.to_s, @new_user2.id.to_s], :body => "yo", :group_conversation => falsish
           expect(response).to be_success
-    
+
           expect(Conversation.count).to eql(@old_count + 2)
         end
       end
@@ -476,9 +476,9 @@ describe ConversationsController do
 
       post 'add_message', :conversation_id => @conversation.conversation_id, :body => "hello world"
       expect(response).to be_success
-      expect(@conversation.reload.messages.count).to eq 1
+      expect(@conversation.reload.messages.count(:all)).to eq 1
       run_jobs
-      expect(@conversation.reload.messages.count).to eq 2
+      expect(@conversation.reload.messages.count(:all)).to eq 2
       expect(@conversation.reload.last_message_at).to eql expected_lma
     end
 
