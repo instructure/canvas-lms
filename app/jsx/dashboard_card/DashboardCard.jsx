@@ -138,20 +138,19 @@ define([
     },
 
     colorPickerIfEditing: function(){
-      if (this.state.editing) {
-        return (
-          <DashboardColorPicker
-            elementID         = {this.colorPickerID()}
-            parentNode        = {this.parentNode}
-            doneEditing       = {this.doneEditing}
-            handleColorChange = {this.handleColorChange}
-            assetString       = {this.props.assetString}
-            settingsToggle    = {this.refs.settingsToggle}
-            backgroundColor   = {this.props.backgroundColor}
-            nicknameInfo      = {this.state.nicknameInfo}
-          />
-        );
-      }
+      return (
+        <DashboardColorPicker
+          isOpen            = {this.state.editing}
+          elementID         = {this.colorPickerID()}
+          parentNode        = {this.parentNode}
+          doneEditing       = {this.doneEditing}
+          handleColorChange = {this.handleColorChange}
+          assetString       = {this.props.assetString}
+          settingsToggle    = {this.refs.settingsToggle}
+          backgroundColor   = {this.props.backgroundColor}
+          nicknameInfo      = {this.state.nicknameInfo}
+        />
+      );
     },
 
     linksForCard: function(){
@@ -178,7 +177,7 @@ define([
           ref="cardDiv"
           style={{borderBottomColor: this.props.backgroundColor}}
         >
-          
+
           <div className="ic-DashboardCard__header">
             <div
               className="ic-DashboardCard__header_hero"
@@ -187,7 +186,7 @@ define([
             </div>
             <div
               className="ic-DashboardCard__header_content"
-              onClick={this.headerClick}>  
+              onClick={this.headerClick}>
               <h2 className="ic-DashboardCard__header-title ellipsis" title={this.props.originalName}>
                 <a className="ic-DashboardCard__link" href="#">
                   {this.state.nicknameInfo.nickname}
@@ -215,10 +214,10 @@ define([
             </button>
           </div>
           <div
-            className={ 
-              (this.hasLinks() ? 
+            className={
+              (this.hasLinks() ?
                 "ic-DashboardCard__action-container"
-                : 
+                :
                 "ic-DashboardCard__action-container ic-DashboardCard__action-container--is-empty"
               )
             }

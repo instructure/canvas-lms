@@ -49,7 +49,8 @@ testWebpackConfig.module.loaders.push({
 
 
 testWebpackConfig.module.noParse = [
-  /\/sinon-1.17.2.js/
+  /\/sinon-1.17.2.js/,
+  /\/axe.js/
 ]
 
 module.exports = testWebpackConfig;
