@@ -16,7 +16,6 @@ class AddRoleIdColumns < ActiveRecord::Migration
 
     # populate built-in roles
     change_column_null :roles, :account_id, true
-    remove_index :roles, :name => 'index_roles_unique_account_name'
 
     Role.ensure_built_in_roles!
 
@@ -245,8 +244,6 @@ class AddRoleIdColumns < ActiveRecord::Migration
     remove_column :role_overrides, :role_id
 
     Role.where(:workflow_state => "built_in").delete_all
-
-    add_index :roles, [:account_id, :name], :unique => true, :name => "index_roles_unique_account_name"
 
     change_column_null :roles, :account_id, false
     change_column :account_users, :membership_type, :string, :default => "AccountAdmin"

@@ -1274,7 +1274,7 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
       if index_name.length > index_name_length
         raise(ArgumentError, "Index name '#{index_name}' on table '#{table_name}' is too long; the limit is #{index_name_length} characters.")
       end
-      if index_exists?(table_name, index_name, false)
+      if index_exists?(table_name, column_names, :name => index_name)
         raise(ArgumentError, "Index name '#{index_name}' on table '#{table_name}' already exists.")
       end
     end
@@ -1285,11 +1285,12 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
   # in anticipation of having to re-run migrations due to integrity violations or
   # killing stuff that is holding locks too long
   def add_foreign_key_if_not_exists(from_table, to_table, options = {})
-    column  = options[:column] || "#{to_table.to_s.singularize}_id"
+    options[:column] ||= "#{to_table.to_s.singularize}_id"
+    column = options[:column]
     case self.adapter_name
     when 'SQLite'; return
     when 'PostgreSQL'
-      foreign_key_name = foreign_key_name(from_table, column, options)
+      foreign_key_name = CANVAS_RAILS4_0 ? foreign_key_name(from_table, column, options) : foreign_key_name(from_table, options)
       query = supports_delayed_constraint_validation? ? 'convalidated' : 'conname'
       schema = @config[:use_qualified_names] ? quote(shard.name) : 'current_schema()'
       value = select_value("SELECT #{query} FROM pg_constraint INNER JOIN pg_namespace ON pg_namespace.oid=connamespace WHERE conname='#{foreign_key_name}' AND nspname=#{schema}")
@@ -1320,28 +1321,6 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
     execute("SELECT COUNT(*) FROM #{quote_table_name(table)} WHERE #{column} IS NULL") if open_transactions == 0
     change_column_null table, column, false
   end
-
-  def index_exists_with_options?(table_name, column_name, options = {})
-    if options.is_a?(Hash)
-      index_exists_without_options?(table_name, column_name, options)
-    else
-      # in ActiveRecord 2.3, the second argument is index_name
-      name = column_name.to_s
-      index_exists_without_options?(table_name, nil, {:name => name})
-    end
-  end
-  alias_method_chain :index_exists?, :options
-
-  # in ActiveRecord 3.2, it will raise an ArgumentError if the index doesn't exist
-  def remove_index(table_name, options)
-    name = index_name(table_name, options)
-    unless index_exists?(table_name, nil, {:name => name})
-      @logger.warn("Index name '#{name}' on table '#{table_name}' does not exist. Skipping.")
-      return
-    end
-    remove_index!(table_name, name)
-  end
-
 end
 
 ActiveRecord::Associations::CollectionAssociation.class_eval do

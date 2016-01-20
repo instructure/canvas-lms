@@ -5,6 +5,7 @@ if CANVAS_RAILS4_0
   gem 'protected_attributes', '1.0.8'
   gem 'rails-observers', '0.1.2'
   gem 'tzinfo', '0.3.43'
+  gem 'foreigner', '0.9.2'
 else
   gem 'rails', '4.2.5'
   gem 'rack', '1.6.4'
@@ -95,7 +96,6 @@ gem 'shackles', '1.0.10'
 
 gem 'useragent', '0.10.0', require: false
 
-gem 'foreigner', '0.9.2'
 gem 'crocodoc-ruby', '0.0.1', require: false
 gem 'hey', '1.3.0', require: false
 gem 'sentry-raven', '0.13.2', require: false

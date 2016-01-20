@@ -2,7 +2,7 @@ class AddMissingTooLongIndexes < ActiveRecord::Migration
   tag :predeploy
 
   def self.add_index_with_check(table_name, column_name, options)
-    return if index_exists?(table_name.to_s, options[:name].to_s, false)
+    return if index_exists?(table_name.to_s, column_name, :name => options[:name].to_s)
     add_index(table_name, column_name, options)
   end
 
@@ -22,15 +22,6 @@ class AddMissingTooLongIndexes < ActiveRecord::Migration
     add_index_with_check :context_external_tools, [:context_id, :context_type, :has_account_navigation], :name => "external_tools_account_navigation"
     add_index_with_check :context_external_tools, [:context_id, :context_type, :has_resource_selection], :name => "external_tools_resource_selection"
     add_index_with_check :context_external_tools, [:context_id, :context_type, :has_editor_button], :name => "external_tools_editor_button"
-
-    # these indexes should've been dropped, but may have failed to create
-    # anyway because of the above name length issue
-    if index_exists?("stream_item_instances", "index_stream_item_instances_on_user_id_and_id_and_stream_item_id", false)
-      remove_index "stream_item_instances", :name => "index_stream_item_instances_on_user_id_and_id_and_stream_item_id"
-    end
-    if index_exists?("stream_item_instances", "index_stream_item_instances_with_context_code", false)
-      remove_index "stream_item_instances", :name => "index_stream_item_instances_with_context_code"
-    end
   end
 
   def self.down

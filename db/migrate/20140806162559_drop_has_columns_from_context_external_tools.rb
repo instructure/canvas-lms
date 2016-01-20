@@ -20,7 +20,9 @@ class DropHasColumnsFromContextExternalTools < ActiveRecord::Migration
 
     EXTENSION_TYPES.each do |type|
       next if type == :homework_submission # note, there is no index for homework_submission
-      remove_index :context_external_tools, :"external_tools_#{type}"
+      if index_exists?(:context_external_tools, :"external_tools_#{type}")
+        remove_index :context_external_tools, :"external_tools_#{type}"
+      end
     end
   end
 

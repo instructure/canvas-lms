@@ -10,8 +10,6 @@ class MakeSisIdsUnique < ActiveRecord::Migration
     add_index :enrollment_terms, [:sis_source_id, :root_account_id], where: "sis_source_id IS NOT NULL", unique: true, algorithm: :concurrently
     add_index :enrollment_terms, :root_account_id, algorithm: :concurrently
     if connection.adapter_name == 'PostgreSQL'
-      concurrently = " CONCURRENTLY" if connection.open_transactions == 0
-      execute "CREATE UNIQUE INDEX#{concurrently} index_pseudonyms_on_unique_id_and_account_id ON #{Pseudonym.quoted_table_name} (LOWER(unique_id), account_id) WHERE workflow_state='active'"
       remove_index :pseudonyms, :unique_id
     end
     add_index :pseudonyms, [:sis_user_id, :account_id], where: "sis_user_id IS NOT NULL", unique: true, algorithm: :concurrently
