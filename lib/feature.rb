@@ -127,8 +127,7 @@ This enables an updated navigation, new dashboard and a simpler, more modern loo
 END
       applies_to: 'RootAccount',
       state: 'allowed',
-      root_opt_in: true,
-      beta: true
+      root_opt_in: true
     },
     'epub_export' =>
     {
