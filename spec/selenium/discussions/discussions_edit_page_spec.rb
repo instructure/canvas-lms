@@ -39,7 +39,8 @@ describe "discussions" do
           assign_group_2 = course.assignment_groups.create!(:name => "Group 2")
 
           get url
-
+          wait = Selenium::WebDriver::Wait.new(timeout: 5)
+          wait.until { f("#assignment_group_id").present? }
           click_option("#assignment_group_id", assign_group_2.name)
 
           expect_new_page_load { f('.form-actions button[type=submit]').click }
@@ -48,7 +49,8 @@ describe "discussions" do
 
         it "should allow editing the grading type", priority: "1", test_id: 270914 do
           get url
-
+          wait = Selenium::WebDriver::Wait.new(timeout: 5)
+          wait.until { f("#assignment_grading_type").present? }
           click_option("#assignment_grading_type", "Letter Grade")
 
           expect_new_page_load { f('.form-actions button[type=submit]').click }
