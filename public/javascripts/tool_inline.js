@@ -174,6 +174,10 @@ window.addEventListener('message', function(e) {
       case 'lti.removeUnloadMessage':
         removeUnloadMessage();
         break;
+
+      case 'lti.screenReaderAlert':
+        $.screenReaderFlashMessageExclusive(message.body)
+        break;
     }
   } catch(err) {
     (console.error || console.log)('invalid message received from ', e.origin);
