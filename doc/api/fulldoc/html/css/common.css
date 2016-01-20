@@ -62,7 +62,6 @@ a:visited {
   color: #5090f0;
 }
 
-
 a:hover {
   color: #2f6fdf;
 }
@@ -70,7 +69,6 @@ a:hover {
 a:active {
   color: #2060d0;
 }
-
 
 body {
   margin:0; padding:0;
@@ -80,7 +78,7 @@ body {
 #sidebar {
   float: left;
   width: 180px;
-  border-bottom: 1px solid #D0D0D0;
+
 }
 #content {
   margin: 10px 20px 0 220px;
@@ -88,9 +86,8 @@ body {
 }
 
 #header {
-  background-color: #6A7177;
+  background-color: #2A404D;
   padding: 4px 0;
-  border-bottom: 1px #aaa solid;
 }
 #header a, #alert-header a {
   text-decoration: none;
@@ -99,23 +96,21 @@ body {
 
 #header h1, #alert-header h1 {
   font-size: 16px;
-  text-align: center;
+  padding: 10px 10px;
   font-weight: normal;
 }
 
 h1 {
-  font-size: 1.6em;
+  font-size: 2em;
   padding: 4px 0 0;
 }
 #content h1 {
-  padding: 0.6em 1em;
-  background-color: #555;
-  border: 1px solid #d8d8e5;
-  border-radius: 5px;
-  color: #eee;
+  padding: 1em 0 0.5em 0;
+  border-bottom: 1px solid #333;
+  color: #333;
+  font-weight: 300;
 }
 h2 {
-  border-bottom: 1px #aaa solid;
   padding: 0 0 3px;
   font-size: 1.4em;
   margin-top: 30px;
@@ -132,25 +127,21 @@ h3.beta {
   background-color: #F2F5F7;
 }
 #sidebar nav > a, #sidebar h2 {
-  display:block;
-  border: none;
-  border-top: 1px solid #D0D0D0;
+  display: block;
   font-size: 1.1em;
-  border-right: 1px solid #D0D0D0;
 }
+
 #sidebar h2 {
-  padding:10px 26px 10px 10px;
-  font-family: Skolar, Georgia, Cambria, 'Times New Roman', Times, serif;
-  font-size: 20px;
-  font-weight: normal;
-  margin: 0;
-}
-#sidebar h2.first {
-  border-top:none;
+  padding: 14px 10px 14px 6px;
+  font-size: 14px;
+  font-weight: 500;
+  border-left: 3px solid #0073ac;
+
+  margin:  0;
 }
 #sidebar nav > a {
-  padding:8px 26px;
-  color: #4B7092;
+  padding:8px 10px;
+  color: #333;
   text-decoration: none;
 }
 #sidebar nav > a:hover, #sidebar nav > a:focus {
@@ -159,25 +150,17 @@ h3.beta {
 }
 #sidebar nav > a.current {
   background-color: white;
-  border-right: none;
-  padding:12px 26px;
 }
-
-.method_details_list h2 {
-}
-
-.syntaxhighlighter .line code { white-space: nowrap; }
-.syntaxhighlighter { overflow: auto; }
 
 .method_details h3.endpoint {
-  font-size: 14px;
   font-weight: normal;
+  font-size: 14px;
   font-family: Monaco, Consolas, Courier, monospace;
   padding: 6px 10px;
   margin-top: 18px;
-  background: #e5e8ff;
-  border: 1px solid #d8d8e5;
-  border-radius: 3px;
+  color: #333;
+  background: #eee;
+  border-left: 3px solid #0073ac;
 }
 
 h2 .defined-in {
@@ -187,16 +170,15 @@ h2 .defined-in {
   opacity:0.7;
 }
 
-.method_details h4 {
-}
-
 table {
   border: 1px solid gray;
   border-collapse: collapse;
 }
 
 table th {
-  background-color: #DDD;
+  background-color: #0073ac;
+  color: #fff;
+  font-weight: 300;
 }
 
 table th, table td {
@@ -205,37 +187,38 @@ table th, table td {
 }
 
 table.sis_csv {
-	border: 2px solid gray;
-	border-collapse: collapse;
+  border: 2px solid gray;
+  border-collapse: collapse;
 }
 table.sis_csv th, table.sis_csv td {
-    padding: 4px;
-    border: 1px inset gray;
-    border-spacing: 1px;
+  padding: 4px;
+  border: 1px inset gray;
+  border-spacing: 1px;
 }
 table.sis_csv th {
-    background-color: #DDD;
+  color: #333;
+  background-color: #DDD;
 }
 
 table.tool {
-	border: 1px solid gray;
-	border-collapse: collapse;
-	width: 75%;
+  border: 1px solid gray;
+  border-collapse: collapse;
+  width: 75%;
 }
 table.tool th, table.tool td {
-    padding: 2px 4px;
-    border: 1px inset gray;
-    border-spacing: 1px;
+  padding: 2px 4px;
+  border: 1px inset gray;
+  border-spacing: 1px;
 }
 table.tool th {
-    background-color: #DDD;
+  background-color: #DDD;
 }
 table.tool tr td:first-child {
-    font-weight: bold;
-    width: 20%;
+  font-weight: bold;
+  width: 20%;
 }
 table.tool tr td:last-child {
-    width: 20%;
+  width: 20%;
 }
 
 /* Footer */
@@ -262,23 +245,26 @@ pre.code code {
   overflow: scroll;
 }
 
-div.syntaxhighlighter {
-  padding: 15px;
-  border: 1px solid black;
-}
-
 table#quicklinks {
   width: 100%;
 }
 table#quicklinks tr {
-  border: 1px solid black;
+  border: 1px solid #ccc;
+}
+table#quicklinks td {
+  line-height: 1.5;
+  padding-left: 12px;
 }
 table#quicklinks td a {
-  padding: 6px;
+  padding: 6px 12px 6px 0;
+  color: #0073ac;
+  text-decoration: none;
+
 }
+table#quicklinks td a:hover {text-decoration: underline;}
 table#quicklinks th {
-  font-weight: bold;
   padding: 12px;
+  text-align: left;
 }
 
 h2.api_method_name a {
@@ -303,13 +289,24 @@ div.warning-message {
 }
 
 code.enum {
-  color: #d14;
+  color: white;
+  font-weight: 500;
   padding: 0 4px;
-  margin-bottom: 2px;
-  background-color: #f7f7f9;
-  border: 1px solid #e1e1e8;
+  background-color: #2A404D;
+  border: 1px solid #2A404D;
+  border-radius: 3px;
 }
-
+.param-values .allowed {
+  display: block;
+  font-weight: 500;
+  margin-bottom:13px;
+}
+.param-values {
+  background: #efefef;
+  border-radius: 3px;
+  padding: 12px;
+  font-size: 1.1em;
+}
 table.request-params {
   table-layout: fixed;
   width: 100%;
@@ -321,7 +318,17 @@ table.request-params, table.request-params th, table.request-params td {
 table.request-params td {
   border-bottom: 1px solid #ccc;
   vertical-align: text-top;
+  font-family: Monaco;
+  font-size: 12px;
 }
+table.request-params td.param-desc {
+  font-family: "Helvetica Neue", Helvetica;
+}
+table.request-params td.param-desc ul {
+  padding: 0;
+  list-style-position: inside;
+}
+
 .param-name {
   width: 20em;
 }

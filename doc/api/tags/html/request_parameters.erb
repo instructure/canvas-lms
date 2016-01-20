@@ -18,11 +18,11 @@
         <% end %>
       </td>
       <td><%= h param.swagger_type %></td>
-      <td>
+      <td class="param-desc">
         <%= htmlify param.desc %>
         <% if param.enums.present? %>
-        <p>
-          Allowed values: <%= param.enums.map { |v| "<code class=enum>#{v}</code>" }.join(", ") %>
+        <p class="param-values">
+          <span class="allowed">Allowed values:</span> <%= param.enums.map { |v| "<code class=enum>#{v}</code>" }.join(", ") %>
         </p>
         <% end %>
       </td>
