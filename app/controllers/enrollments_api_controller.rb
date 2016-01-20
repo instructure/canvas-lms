@@ -170,12 +170,12 @@
 #           "computed_current_score": {
 #             "description": "optional: The student's score in the course, ignoring ungraded assignments. (applies only to student enrollments, and only available in course endpoints)",
 #             "example": 90.25,
-#             "type": "float"
+#             "type": "number"
 #           },
 #           "computed_final_score": {
 #             "description": "optional: The student's score in the course including ungraded assignments with a score of 0. (applies only to student enrollments, and only available in course endpoints)",
 #             "example": 80.67,
-#             "type": "float"
+#             "type": "number"
 #           },
 #           "computed_current_grade": {
 #             "description": "optional: The letter grade equivalent of computed_current_score, if available. (applies only to student enrollments, and only available in course endpoints)",
@@ -205,12 +205,12 @@
 #           "current_period_computed_current_score": {
 #             "description": "optional: The student's score in the course for the current grading period, ignoring ungraded assignments. If the course the enrollment belongs to does not have Multiple Grading Periods enabled, or if no currently active grading period exists, the value will be null. (applies only to student enrollments, and only available in course endpoints)",
 #             "example": 95.80,
-#             "type": "float"
+#             "type": "number"
 #           },
 #           "current_period_computed_final_score": {
 #             "description": "optional: The student's score in the course for the current grading period, including ungraded assignments with a score of 0. If the course the enrollment belongs to does not have Multiple Grading Periods enabled, or if no currently active grading period exists, the value will be null. (applies only to student enrollments, and only available in course endpoints)",
 #             "example": 85.25,
-#             "type": "float"
+#             "type": "number"
 #           },
 #           "current_period_computed_current_grade": {
 #             "description": "optional: The letter grade equivalent of current_period_computed_current_score, if available. If the course the enrollment belongs to does not have Multiple Grading Periods enabled, or if no currently active grading period exists, the value will be null. (applies only to student enrollments, and only available in course endpoints)",
