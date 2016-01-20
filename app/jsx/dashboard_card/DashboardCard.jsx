@@ -188,7 +188,7 @@ define([
               className="ic-DashboardCard__header_content"
               onClick={this.headerClick}>
               <h2 className="ic-DashboardCard__header-title ellipsis" title={this.props.originalName}>
-                <a className="ic-DashboardCard__link" href="#">
+                <a className="ic-DashboardCard__link" href={this.props.href}>
                   {this.state.nicknameInfo.nickname}
                 </a>
               </h2>
