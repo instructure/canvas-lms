@@ -50,8 +50,8 @@ describe "Roles API", type: :request do
       json
     end
 
-    describe "add_role" do 
-      it "includes base_role_type_label" do 
+    describe "add_role" do
+      it "includes base_role_type_label" do
         json = api_call_with_settings(:base_role_type => "StudentEnrollment")
         expect(json).to include("base_role_type_label" => "Student")
       end
@@ -319,6 +319,72 @@ describe "Roles API", type: :request do
       expect(override.locked).to be_truthy
     end
 
+    it "should set applies to self and applies to descendents" do
+      json = api_call_with_settings(enabled: '1', explicit: '1', applies_to_descendants: '0')
+      override = @account.role_overrides.where(permission: @permission, role_id: @role.id).first
+      expect(override).to_not be_nil
+      expect(json['permissions'][@permission]['applies_to_self']).to eq true
+      expect(json['permissions'][@permission]['applies_to_descendants']).to eq false
+      expect(override.applies_to_self).to eq true
+      expect(override.applies_to_descendants).to eq false
+    end
+
+    it "should set applies to self and applies to descendents" do
+      json = api_call_with_settings(enabled: '1', explicit: '1', applies_to_self: '0')
+      override = @account.role_overrides.where(permission: @permission, role_id: @role.id).first
+      expect(override).to_not be_nil
+      expect(json['permissions'][@permission]['applies_to_self']).to eq false
+      expect(json['permissions'][@permission]['applies_to_descendants']).to eq true
+      expect(override.applies_to_self).to eq false
+      expect(override.applies_to_descendants).to eq true
+    end
+
+    it "should set applies to self and applies to descendents" do
+      options = {controller: 'role_overrides', action: 'add_role', format: 'json', account_id: @account.id.to_s}
+      settings = {locked: '1', applies_to_descendants: '0', applies_to_self: '0'}
+      parameters = {role: @role_name, permissions: {@permission => settings}}
+
+      response = raw_api_call(:post, "/api/v1/accounts/#{@account.id}/roles", options, parameters)
+      expect(response).to eq 400
+    end
+
+    it "should cascade applies to descendents" do
+      sub = @account.sub_accounts.create!
+      json = api_call_with_settings(enabled: '1', explicit: '1', applies_to_descendants: '1', applies_to_self: '0')
+      override = @account.role_overrides.where(permission: @permission, role_id: @role.id).first
+      expect(override).to_not be_nil
+      expect(json['permissions'][@permission]['applies_to_self']).to eq false
+      expect(json['permissions'][@permission]['applies_to_descendants']).to eq true
+      expect(override.applies_to_self).to eq false
+      expect(override.applies_to_descendants).to eq true
+
+      json = api_call(:get, "/api/v1/accounts/#{sub.id}/roles",
+                      { controller: 'role_overrides', action: 'api_index',
+                        format: 'json', account_id: sub.id.to_s,
+                        show_inherited: '1'})
+      perm = json.find { |role| role['role'] == @role.name }['permissions'][@permission]
+      expect(perm['applies_to_self']).to eq true
+      expect(perm['applies_to_descendants']).to eq true
+    end
+
+    it "should not cascade if applies to descendents is false" do
+      sub = @account.sub_accounts.create!
+      json = api_call_with_settings(enabled: '1', explicit: '1', applies_to_descendants: '0', applies_to_self: '1')
+      override = @account.role_overrides.where(permission: @permission, role_id: @role.id).first
+      expect(override).to_not be_nil
+      expect(json['permissions'][@permission]['applies_to_self']).to eq true
+      expect(json['permissions'][@permission]['applies_to_descendants']).to eq false
+      expect(override.applies_to_self).to eq true
+      expect(override.applies_to_descendants).to eq false
+
+      json = api_call(:get, "/api/v1/accounts/#{sub.id}/roles",
+                      { controller: 'role_overrides', action: 'api_index',
+                        format: 'json', account_id: sub.id.to_s,
+                        show_inherited: '1'})
+      perm = json.find { |role| role['role'] == @role.name }['permissions'][@permission]
+      expect(perm['enabled']).to eq false
+    end
+
     it "should only set the parts that are specified" do
       api_call_with_settings(:explicit => '1', :enabled => '0')
       override = @account.role_overrides.where(:permission => @permission, :role_id => @role.id).first
@@ -415,6 +481,8 @@ describe "Roles API", type: :request do
           "explicit" => true,
           "readonly" => false,
           "enabled" => true,
+          "applies_to_descendants" => true,
+          "applies_to_self" => true,
           "locked" => false,
           "prior_default" => false
         })
@@ -463,6 +531,8 @@ describe "Roles API", type: :request do
           'explicit' => false,
           'enabled'  => true,
           'readonly' => true,
+          'applies_to_descendants' => true,
+          'applies_to_self' => true,
           'locked'   => true })
       end
 

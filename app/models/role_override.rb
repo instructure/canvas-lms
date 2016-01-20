@@ -902,7 +902,15 @@ class RoleOverride < ActiveRecord::Base
       # keep track of the value for the parent
       generated_permission[:prior_default] = generated_permission[:enabled]
 
-      unless override.new_record?
+      if override.new_record?
+        if last_override
+          if generated_permission[:enabled] == [:descendants]
+            generated_permission[:enabled] = [:self, :descendants]
+          elsif generated_permission[:enabled] == [:self]
+            generated_permission[:enabled] = nil
+          end
+        end
+      else
         generated_permission[:explicit] = true if last_override
         if hit_role_context
           generated_permission[:enabled] ||= override.enabled? ? override.applies_to : nil
@@ -957,6 +965,10 @@ class RoleOverride < ActiveRecord::Base
           :role => role)
         role_override.enabled = settings[:override] unless settings[:override].nil?
         role_override.locked = settings[:locked] unless settings[:locked].nil?
+        role_override.applies_to_self = settings[:applies_to_self] unless settings[:applies_to_self].nil?
+        unless settings[:applies_to_descendants].nil?
+          role_override.applies_to_descendants = settings[:applies_to_descendants]
+        end
         role_override.save!
       elsif role_override
         role_override.destroy
