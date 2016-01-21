@@ -53,12 +53,12 @@
             <%= render :partial => "assignments/group_submission_reminder" if @assignment.has_group_category? %>
         </td>
       </tr><tr>
-        <td><%= blabel :attachment, :uploaded_data, :en => "File" %></td>
+        <td><%= blabel :attachment, :uploaded_data, :en => "File", id: 'attachmentLabel' %></td>
         <td>
           <a href="#" class="add add_another_file_link"> <%= t 'links.add_another_file', "Add Another File" %> </a>
           <div id="submission_attachment_blank" class="submission_attachment" style="display: none;">
-            <input type="file" name="attachments[-1][uploaded_data]" class="input-file"/>
-            <a href="#" class="remove_attachment_link no-hover" style="display: none;"><%= image_tag "delete_circle.png" %></a>
+            <input aria-labelledby="attachmentLabel" type="file" name="attachments[-1][uploaded_data]" class="input-file"/>
+            <a href="#" class="remove_attachment_link no-hover" style="display: none;"><%= image_tag "delete_circle.png", alt: t('remove empty attachment') %></a>
             <% if @assignment.allowed_extensions.present? -%>
               <div class='bad_ext_msg error_message' style="display: none">
                 <%= t 'errors.unacceptable_file_type', "This file type is not allowed. Accepted file types are: %{allowed_extensions_list}", :allowed_extensions_list => @assignment.allowed_extensions.to_sentence %>

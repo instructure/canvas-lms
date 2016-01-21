@@ -349,7 +349,16 @@ define([
       // disable the submit button if any extensions are bad
       $('#submit_online_upload_form button[type=submit]').attr('disabled', !!$(".bad_ext_msg:visible").length);
     }
+    function updateRemoveLinkAltText(fileInput) {
+      var altText = I18n.t("remove empty attachment");
+      if(fileInput.val()){
+        var filename = fileInput.val().replace(/^.*?([^\\\/]*)$/, '$1');
+        altText = I18n.t("remove %{filename}", {filename: filename})
+      }
+      fileInput.parent().find('img').attr("alt", altText)
+    }
     $(".submission_attachment input[type=file]").live('change', function() {
+      updateRemoveLinkAltText($(this));
       if (ENV.SUBMIT_ASSIGNMENT.ALLOWED_EXTENSIONS.length < 1 || $(this).val() == "")
         return;
 
