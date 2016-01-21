@@ -168,14 +168,14 @@ describe "dashboard" do
         end
       end
 
-      it "should focus on the 'View Calendar' link if there are no other todo items", priority: "1", test_id: 216401 do
+      it "should focus on the 'To Do' header if there are no other todo items", priority: "1", test_id: 216401 do
         enable_cache do
           get "/"
 
           f('.to-do-list .disable_item_link').click
           wait_for_ajaximations
 
-          check_element_has_focus(f('.event-list-view-calendar'))
+          check_element_has_focus(f('.todo-list-header'))
         end
       end
     end

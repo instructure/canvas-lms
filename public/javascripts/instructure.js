@@ -854,7 +854,7 @@ define([
       var $item = $(this).parents("li, div.topic_message").last();
       var $prevItem = $(this).closest('.to-do-list > li').prev()
       var toFocus = ($prevItem.find('.disable-todo-item-link').length && $prevItem.find('.disable-todo-item-link')) ||
-                    $('.event-list-view-calendar')
+                    $('.todo-list-header')
       var url = $(this).data('api-href');
       var flashMessage = $(this).data('flash-message');
       function remove(delete_url) {
