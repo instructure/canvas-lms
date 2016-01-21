@@ -35,6 +35,11 @@ set :deploy_to, '/var/canvas'
 # Default value for :log_level is :debug
 # set :log_level, :debug
 
+# Turn this on to see why SSH connections are failing:
+#set :ssh_options, {
+#   verbose: :debug
+#}
+
 # Default value for :pty is false
 # set :pty, true
 
