@@ -620,7 +620,9 @@ describe ApplicationHelper do
             it "should just include domain root account's when there is no context or @current_user" do
               output = helper.include_account_js
               expect(output).to have_tag 'script'
-              expect(output).to match(/#{Regexp.quote('["https:\/\/example.com\/root\/account.js"].forEach')}/)
+              expected = '["https://example.com/root/account.js"].forEach'
+              expected.gsub!("/", "\\/") if CANVAS_RAILS4_0
+              expect(output).to match(/#{Regexp.quote(expected)}/)
             end
 
             it "should load custom js even for high contrast users" do
@@ -628,7 +630,9 @@ describe ApplicationHelper do
               user.enable_feature!(:high_contrast)
               output = helper.include_account_js
               expect(output).to have_tag 'script'
-              expect(output).to match(/#{Regexp.quote('["https:\/\/example.com\/root\/account.js"].forEach')}/)
+              expected = '["https://example.com/root/account.js"].forEach'
+              expected.gsub!("/", "\\/") if CANVAS_RAILS4_0
+              expect(output).to match(/#{Regexp.quote(expected)}/)
             end
 
             it "should include granchild, child, and root when viewing the grandchild or any course or group in it" do
@@ -638,7 +642,8 @@ describe ApplicationHelper do
                 @context = context
                 output = helper.include_account_js
               expect(output).to have_tag 'script'
-              expected = '["https:\/\/example.com\/root\/account.js","https:\/\/example.com\/child\/account.js","https:\/\/example.com\/grandchild\/account.js"].forEach'
+              expected = '["https://example.com/root/account.js","https://example.com/child/account.js","https://example.com/grandchild/account.js"].forEach'
+              expected.gsub!("/", "\\/") if CANVAS_RAILS4_0
               expect(output).to match(/#{Regexp.quote(expected)}/)
               end
             end
