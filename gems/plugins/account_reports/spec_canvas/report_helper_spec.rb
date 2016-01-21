@@ -105,7 +105,7 @@ describe "report helper" do
 
         report.stubs(:course).returns(@course3)
         courses = report.add_course_scope(courses)
-        expect(courses.count).to eq(1)
+        expect(courses.count(:all)).to eq(1)
       end
 
       it 'should not add course scope if course is not set' do
@@ -113,7 +113,7 @@ describe "report helper" do
 
         report.stubs(:course).returns(nil)
         courses = report.add_course_scope(courses)
-        expect(courses.count).to eq(3)
+        expect(courses.count(:all)).to eq(3)
       end
 
     end
@@ -124,7 +124,7 @@ describe "report helper" do
 
         report.stubs(:term).returns(@enrollment_term)
         courses = report.add_term_scope(courses)
-        expect(courses.count).to eq(2)
+        expect(courses.count(:all)).to eq(2)
       end
 
       it 'should not add term scope if term is not set' do
@@ -132,7 +132,7 @@ describe "report helper" do
 
         report.stubs(:term).returns(nil)
         courses = report.add_term_scope(courses)
-        expect(courses.count).to eq(3)
+        expect(courses.count(:all)).to eq(3)
       end
 
     end

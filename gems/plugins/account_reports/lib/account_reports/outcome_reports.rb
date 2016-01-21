@@ -147,7 +147,7 @@ module AccountReports
       CSV.open(filename, "w") do |csv|
         csv << t_headers
         Shackles.activate(:slave) do
-          @total = students.count
+          @total = students.count(:all)
           i = 0
           students.find_each do |row|
             row = row.attributes.dup
@@ -272,7 +272,7 @@ module AccountReports
       CSV.open(filename, "w") do |csv|
         csv << t_headers
         Shackles.activate(:slave) do
-          @total = students.count
+          @total = students.count(:all)
           i = 0
           students.find_each do |row|
             row = row.attributes.dup
