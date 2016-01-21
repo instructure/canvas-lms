@@ -417,7 +417,7 @@ describe ActiveRecord::Base do
     end
   end
 
-  context "distinct" do
+  context "distinct_values" do
     before :once do
       User.create()
       User.create()
@@ -427,11 +427,11 @@ describe ActiveRecord::Base do
     end
 
     it "should return distinct values" do
-      expect(User.distinct(:locale)).to eql ["en", "es"]
+      expect(User.distinct_values(:locale)).to eql ["en", "es"]
     end
 
     it "should return distinct values with nil" do
-      expect(User.distinct(:locale, :include_nil => true)).to eql [nil, "en", "es"]
+      expect(User.distinct_values(:locale, include_nil: true)).to eql [nil, "en", "es"]
     end
   end
 

@@ -429,13 +429,12 @@ class ActiveRecord::Base
     }
   end
 
-  def self.distinct(column, options={})
+  def self.distinct_values(column, include_nil: false)
     column = column.to_s
-    options = {:include_nil => false}.merge(options)
 
     result = if ActiveRecord::Base.configurations[Rails.env]['adapter'] == 'postgresql'
       sql = ''
-      sql << "SELECT NULL AS #{column} WHERE EXISTS (SELECT * FROM #{quoted_table_name} WHERE #{column} IS NULL) UNION ALL (" if options[:include_nil]
+      sql << "SELECT NULL AS #{column} WHERE EXISTS (SELECT * FROM #{quoted_table_name} WHERE #{column} IS NULL) UNION ALL (" if include_nil
       sql << <<-SQL
         WITH RECURSIVE t AS (
           SELECT MIN(#{column}) AS #{column} FROM #{quoted_table_name}
@@ -446,10 +445,10 @@ class ActiveRecord::Base
         )
         SELECT #{column} FROM t WHERE #{column} IS NOT NULL
       SQL
-      sql << ")" if options[:include_nil]
+      sql << ")" if include_nil
       find_by_sql(sql)
     else
-      conditions = "#{column} IS NOT NULL" unless options[:include_nil]
+      conditions = "#{column} IS NOT NULL" unless include_nil
       find(:all, :select => "DISTINCT #{column}", :conditions => conditions, :order => column)
     end
     result.map(&column.to_sym)
