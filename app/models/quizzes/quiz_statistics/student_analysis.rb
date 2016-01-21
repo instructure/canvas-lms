@@ -154,7 +154,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
       end
       if obj[:answers] && obj[:question_type] != 'text_only_question'
         stat = stats_for_question(obj, responses_for_question[obj[:id]], legacy)
-        stat[:answers].each{|a| a.delete(:user_names)} if anonymous?
+        stat[:answers].each{|a| a.delete(:user_names)} if stat[:answers] && anonymous?
         stats[:questions] << ['question', stat]
       end
     end

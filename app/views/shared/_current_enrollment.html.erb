@@ -2,7 +2,7 @@
 <% unless dashboard %>
   <tr class="course-list-table-row">
 <% end %>
-<% if current_enrollment.workflow_state == "invited" %>
+<% if current_enrollment.workflow_state == "invited" && !current_enrollment.inactive? %>
   <div class="<%= dashboard ? 'communication_message dashboard_notification alert alert-info' : 'reminder' %>">
     <h2><a href="<%= course_path(current_enrollment.course_id, :invitation => current_enrollment.uuid) %>"><%= current_enrollment.long_name %></a></h2>
     <div class="body">

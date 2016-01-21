@@ -2,6 +2,13 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe 'Canvas::Twilio' do
+  def make_phone_number_stub(number, country_code)
+    phone_number_stub = stub("Canvas::TWilio.lookups_client.phone_numbers.get(#{number})")
+    phone_number_stub.stubs(:country_code).returns(country_code)
+    phone_number_stub.stubs(:try).raises(Exception, "Rails 4 #try breaks Twilio lazy load logic. Don't use it.")
+    phone_number_stub
+  end
+
   def stub_twilio(available_phone_numbers, phone_number_countries = {})
     phone_number_objects = available_phone_numbers.map do |number|
       stub("Canvas::Twilio.client.incoming_phone_numbers.list/#{number}",
@@ -14,16 +21,12 @@ describe 'Canvas::Twilio' do
     lookup_stub = stub('Canvas::Twilio.lookups_client.phone_numbers')
     # Expectations are matched last to first, so add our catch-all expectation before the number specific ones
     lookup_stub.stubs(:get).with(anything).returns(
-      stub("Canvas::Twilio.lookups_client.phone_numbers.get(anything)",
-        country_code: Canvas::Twilio::DEFAULT_COUNTRY
-      )
+      make_phone_number_stub('anything', Canvas::Twilio::DEFAULT_COUNTRY)
     )
     # Now add one expectation for each number+country mapping
     phone_number_countries.each do |number, country_code|
       lookup_stub.stubs(:get).with(number).returns(
-        stub("Canvas::Twilio.lookups_client.phone_numbers.get(#{number.inspect})",
-          country_code: country_code
-        )
+        make_phone_number_stub(number.inspect, country_code)
       )
     end
 

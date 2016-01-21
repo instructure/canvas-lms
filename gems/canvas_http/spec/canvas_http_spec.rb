@@ -86,6 +86,18 @@ describe "CanvasHttp" do
         to_return(status: 301, headers: { 'Location' => 'http://www.example3.com/a'})
       expect { CanvasHttp.get("http://www.example.com/a", {}, 2) }.to raise_error(CanvasHttp::TooManyRedirectsError)
     end
+
+    it "should yield requests to blocks" do
+      res = nil
+      stub_request(:get, "http://www.example.com/a/b").
+        to_return(body: "Hello", headers: { 'Content-Length' => 5 })
+      CanvasHttp.get("http://www.example.com/a/b") do |yielded_res|
+        res = yielded_res
+      end
+      res.should be_a Net::HTTPOK
+      res.body.should == "Hello"
+    end
+
   end
 
   describe ".tempfile_for_url" do
