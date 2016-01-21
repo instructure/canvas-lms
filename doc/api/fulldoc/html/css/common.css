@@ -124,7 +124,7 @@ h3.beta {
 }
 
 #sidebar {
-  background-color: #F2F5F7;
+  background-color: #efefef;
 }
 #sidebar nav > a, #sidebar h2 {
   display: block;
@@ -237,12 +237,12 @@ table.tool tr td:last-child {
 pre.code {
   padding: 15px;
   border: 1px solid black;
-  overflow: scroll;
+  overflow: auto;
   background-color: #2A404D;
   color: #fff;
 }
 pre.code code {
-  overflow: scroll;
+  overflow: auto;
 }
 
 table#quicklinks {
