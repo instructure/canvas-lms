@@ -2989,7 +2989,7 @@ hy:
     profile: 
       notices: 
         contact_registered: "Կոնտակտի եղանակը գրանցված է: "
-  complete_all_items_e1779257: "Ավարտիր Բոլոր Առարկաները"
+  complete_all_items_e1779257: "Ավարտել բոլոր տարրերի կատարումը"
   complete_icon_7455be93: "Ավարտել պատկերը"
   complete_one_item_90e5fb03: "Ավարտիր Մեկ Առարկա"
   completed_19711ce7: "Ավարտված է"
@@ -3271,7 +3271,7 @@ hy:
         upload_to: "Ներբեռնել դեպի"
       overwrite_assessment_content: 
         assessment_help_label: "Հանձնարարության վերագրանցման համար օգնության նշան"
-        assessment_help_text: "Որոշ համակարգեր յուրաքանչյուր նոր արտահանման համար օգտագործում են իրենց նույն ID: Արդյունքում եթե արտահանում եք երկու առանձին հարցերի բանկ, դրանք կունենան նույն ID-ն: Գնահատման տվյալները կորցնելուց խուսափելու համար այդ օբյեկտները տարբեր են համարվում, չնայած նույն ID-ին: Այս օպցիայի ընտրությունը անջատում է  անվտանգության ֆունկցիան և թույլ է տալիս, որ առկա տվյալների վրա վերագրանցվեն գնահատման տվյալները՝ նույն ID-ով: "
+        assessment_help_text: "Որոշ համակարգեր յուրաքանչյուր նոր արտահանման համար օգտագործում են իրենց նույն մեւտքանունը: Արդյունքում երկու առանձին հարցերի շտեմարանների արտահանման դեպքում դրանք կունենան նույն մուտքանունը: Գնահատման տվյալների կորուստը կանխելու համար այդ օբյեկտները տարբերակվում են, թեեւ ունեն նույն մուտքանունը: Այս օպցիայի ընտրությունը անջատում է  անվտանգության ֆունկցիան և թույլ է տալիս, որ առկա տվյալները փոխարինվեն նույն մուտքանունը ունեցող գնահատման տվյալներով: "
         assessment_help_title: "\"Հանձնարարության վերագրանցման համար օգնություն\""
         assessment_help_title_icon: "Հանձնարարության վերագրանցման համար օգնության նշան"
         overwrite_assessment_content: "Վերագրանցել գիտելիքների գնահատման բովանդակությունը համապատասխան նույնականացուցիչներով"
@@ -3478,8 +3478,8 @@ hy:
   context_modules: 
     add_context_module_form: 
       button: 
-        delete_label: "Ջնջել նախնական պայմանները"
-        delete_title: "Ջնջել նախնական պայմանները"
+        delete_label: "Ջնջել նախապայմանները"
+        delete_title: "Ջնջել նախապայմանները"
       buttons: 
         add_module: "Ավելացնել Միավոր"
       labels: 
@@ -3644,7 +3644,7 @@ hy:
     points_possible_short: "%{points} միավորներ"
     prerequisites_message: 
       labels: 
-        prerequisites: Նախադրյալներ
+        prerequisites: Նախապայմաններ
     progressions: 
       titles: 
         student_progress: "Ունկնդրի առաջադիմություն"
@@ -8833,7 +8833,7 @@ hy:
         body_teacher: "Դուք ներգրավված եք %{course} դասընթացում որպես դասավանդող:"
         subject: "Դասընթացում գրանցում"
       twitter: 
-        body: "Canvas ծանուցում. գրանցվել է դասընթացում որպես  %{enrollment_type}"
+        body: "Canvas  նախազգուշացում - գրանցված դասընթացում որպես %{role_type}"
     enrollment_registration: 
       email: 
         body_designer: "Դուք հրավիրված եք մասնակցելու %{website}-ի պարապմունքին, որը կոչվում է %{course} և դուք հրավիրված եք մասնակցելու որպես դիզայներ:"
@@ -9347,8 +9347,12 @@ hy:
         html: 
           link: "Սեղմեք այստեղ ձեր հաշվին անցնելու համար"
           subject: "Canvas համակարգում գրանցումն ավարտված է "
+        link_message: "Այցելեք այս url-ը Ձեր հաշիվ մուտք գործելու համար."
         subject: "Canvas համակարգում գրանցումն ավարտված է "
+      sms: 
+        link: "Այցելեք այս url-ը Ձեր հաշիվ մուտք գործելու համար. %{link} "
       summary: 
+        link_message: "Այցելեք այս url-ը Ձեր հաշիվ մուտք գործելու համար."
         subject: "Canvas համակարգում գրանցումն ավարտված է "
     quiz_locked: "Այս թեստը ներկայումս արգելափակված է:"
     quiz_locked_at: "Այս թեստը արգելափակված է %{at}:"
@@ -9681,6 +9685,7 @@ hy:
   moderated_grading_setting_cannot_be_enabled_for_gr_d81fb43b: "Խմբային հանձնարարությունների համար մոդերացված գնահատումը չի կարող կարգաբերվել"
   moderated_grading_setting_cannot_be_enabled_for_pe_fc7b5b8b: "Ունկնդիրների կողմից միմյանց աշխատանքների վերաբերյալ ներկայացված կարծիքների համար մոդերացված գնահատումը չի կարող կարգաբերվել:"
   moderated_grading_setting_cannot_be_enabled_for_un_e40e6cd4: "Չգնահատվող հանձնարարությունների համար մոդերացվող գնահատումը չի կարող կարգաբերվել"
+  moderator_49b9f2e1: Մոդերատոր
   module_completed_50c50762: "Մոդուլն ավարտված է"
   module_in_progress_fa600662: "Մոդուլի աշխատանքը կատարվում է"
   module_item_module_item_name_was_successfully_dele_8626d846: "%{module_item_name} մոդուլի տարրը հաջողությամբ ջնջվել է:"
@@ -9838,6 +9843,7 @@ hy:
   moodle_formula_many_warning_title: "Այս շտեմարանում %{count} բանաձևերով հարցեր կան, որոնց հնարավոր պատասխանները անհրաժեշտ է կրկին մուտքագրել "
   moodle_formula_warning_title: "Բանաձևով հարցերի հնարավոր պատասխանները պետք է նորից ստեղծվեն "
   more_courses_5ebbe998: "Այլ դասընթացներ "
+  more_info_at_course_name_56dc8c10: "Տեղափոխել տեղեկատվությունը %{course_name} դասընթաց"
   more_information_3dfb76b5: "Ավելի շատ տեղեկություն"
   most_recent_result_counts_as_calculation_int_of_ma_13628bf0: "Ամենավերջին գնահատականը հաշվարկվում է որպես յուրացման կշռի %{calculation_int}% o մնացած այլ գնահատականների միջինը՝ որպես  կշռի %{remainder}% o  Այնտեղ պետք է լինի առնվազն 2 արդյունքները նախքան գնահատական վերադարձվում."
   most_recent_score_13a87e8c: "Ամենավերջին գնահատականը"
@@ -9852,11 +9858,17 @@ hy:
   move_module_item_77754119: "Տեղափոխել Մոդուլ/Տարր"
   move_outcome_ce497e6c: "Տեղափոխել արդյունքը"
   move_outcome_group_cfa1a505: "Տեղափոխել արդյունքների խումբը"
+  move_to_end_fef2fa15: "Տեղափոխել վերջ"
+  move_to_front_7eae2e90: "Տեղափոխել սկիզբ"
+  move_to_front_bf6f0194: "Տեղափոխել սկիզբ"
   moving_a4d552df: "Տեղափոխում է..."
   multi_factor_authentication_configured_865b1bde: "Բազմագործոնային իսկության ստուգումը կարգաբերված է"
+  multiple_due_dates_6b0d75c6: "Կատարման մի քանի վերջնաժամկետ"
   must_achieve_mastery_at_least_count_times_scores_a_628db168: "Պետք է անցողիկ միավորներ ապահովի առնվազն %{count} անգամ: Անցողիկից ավելի բարձր միավորները միջինացվելու են վերջնական միավորները հաշվարկելու համար:"
+  must_mark_as_done_91cff799: "Անհրաժեշտ է նշել որպես կատարված"
   must_mark_as_done_bf6cc563: "պետք է նշվի որպես կատարված"
   must_mark_assignment_as_done_e3e4af88: "Պետք է նշվի հանձնարարությունը որպես կատարված"
+  must_score_at_least_a_score_3b4f813d: "Անհրաժեշտ է գնահատել առնվազն %{score} միավոր"
   must_score_at_least_points_points_16a7548e: "Արդյունքը պետք է լինի առնվազն %{score} միավոր"
   must_submit_assignment_ae38221c: "Պետք է հանձնել հանձնարարությունը"
   must_submit_new_oauth2_request_e1fb00bb: "Պետք է ներկայացնել OAuth2  նոր հարցում"
@@ -9915,6 +9927,7 @@ hy:
   no_e16d9132: Ոչ
   no_final_grade_selected_3595c9c: "Վերջնական գնահատական ընտրված չէ"
   no_grade_3fa326c: "Գնահատական չկա"
+  no_grade_assigned_90e531f5: "Նշանակված գնահատակններ չկան:"
   no_grading_schemes_to_display_8b0e92e7: "Ցուցադրման համար բացակայում են գնահատման սխեմաները"
   no_icon_1f6ea5f4: "պատկեր չկա"
   no_items_in_module_21f111a2: "Ոչ արարկա չկա  մոդուլում"
@@ -9937,6 +9950,7 @@ hy:
   not_installed_37a21a76: "Տեղադրված չէ"
   not_now_97efd947: "Ոչ հիմա"
   not_yet_completed_345a0bca: "Դեռեւս ավարտված չէ"
+  note_length_cannot_exceed_maxlength_characters_82798b1: "Նշումը չի կարող գերազանցել %{maxLength} նիշը"
   note_some_items_fall_outside_the_start_and_or_end__feab0642: "Ծանուցում. որոշ տարրեր դասընթացի սկզբի և/կամ ավարտի ամսաթվերից դուրս են:"
   note_students_have_submitted_work_for_these_assign_7bc34e28: "ԾԱՆՈԹՈՒԹՅՈՒՆ. Ունկնդիրներն այս հանձնարարությունների հետ կապված ուղարկել են աշխատանքներ, որոնք չեն գնահատվել: Եթե այժմ տեղադրեք գնահատականները, դուք պետք է վերատեղադրեք նրանց գնահատականները նրանց ուղարկած վերջին աշխատանքները գնահատելուց հետո:  "
   note_sub_account_themes_are_not_active_during_this_a5dd9da: "Ծանոթություն. Ենթահաշվային թեմաները ակտիվ չեն այս կարծիքը ներկայացնելիս"
@@ -10136,6 +10150,7 @@ hy:
       other: Այլ
       parent: "Ծնողների էլեկտրոնային փոստ"
       scheduling: Պլանավորում
+  notification_preferences_cf47083d: "Ծանուցման նախընտրելի տարբերակներ"
   notifications_cbfa7704: Ծանուցումներ
   now_click_the_agenda_button_607fb40e: "Այժմ սեղմեք *Օրակարգ* կոճակը"
   now_that_your_course_is_set_up_and_available_you_p_c0c8635c: "Այժմ, երբ ձեր դասընթացը կարգաբերված և հասանելի է, ձեզ հավանաբար այլևս պետք չեն այս ստուգիչ հարցերը: Բայց մենք դրանք կպահենք այն դեպքերի համար, երբ դուք հետագայում ինչ-որ նոր բան կցանկանաք կամ ձեզ լրացուցիչ օգնություն պետք լինի ձեր դասընթացի բովանդակությունը փոխելիս:   "
@@ -10180,6 +10195,7 @@ hy:
     percentage: 
       format: 
         format: "%n%"
+  number_between_1_and_16_inclusive_31f5468d: "1-ից 16-ը ներառյալ"
   o_224cf405: o
   oauth2_provider: 
     auth: 
@@ -10196,7 +10212,10 @@ hy:
     confirm_form: 
       cancel: "Չեղյալ համարել"
       details: 
+        allow_application: "%{app_name}-ը պահանջում է Ձեր հաշվի հասանելիություն:"
         email: "Ձեր էլեկտրոնային փոստի հասցեն է՝ %{email}:"
+      labels: 
+        remember_access: "Հիշել իմ թույլտվությունը որպես ծառայություն"
     confirm_mobile: 
       authorize: Թույլատրել
       cancel: "Չեղյալ համարել"
@@ -10213,16 +10232,22 @@ hy:
     new_observee_username: "Օգտագործողի անուն"
     observee_added: "Այժմ դիտարկվում է %{user}:"
     observing: Դիտարկում
+  observer_accounts_only_30c70a70: "Միայն դիտորդների հաշիվները"
   observing_f3c5e759: "Ուսումնասիրում "
   of_students_5d1af0d2: "# ունկնդիրներ"
   ok_c47544a2: Ok
   okay_got_it_d686d4e8: "OK, եղավ"
+  on_paper_46d0ba36: "Թղթային տարբերակով"
   on_time_percent_eebffe38: "Ժամանակին՝ %{percent}"
   once_you_ve_changed_an_answer_you_ll_need_to_choos_7071f728: "Պատասխանը փոխելուց հետո դուք պետք է ընտրեք տարբերակ՝ նախքան հարցը թարմացնելը:"
   one_per_line_format_name_value_79647700: "Մեկ տողին՝ մեկը: Ֆորմատ՝ անուն=մեծություն"
   online_submission_type_file_uploads_24910d74: "Առցանց ներկայացնելու ձեւը՝ ֆայլերի բեռնում"
   online_submission_type_file_uploads_restrict_uploa_5ec7b263: "Առցանց ներկայացնելու ձեւը՝ ֆայլերի բեռնում - սահմանափակել բեռնվող ֆայլերի տեսակները"
+  online_submission_type_text_entry_ac56d100: "Ուղարկման առցանց տարբերակ - տեքստի մուտքագրում"
+  online_submission_type_website_url_2c9df33d: "Ուղարկման առցանց տարբերակ- կայքի URL"
+  online_text_entry_1d893ce: "Առցանց տեքստի մուտքագրում"
   online_upload_59969592: "Առցանց բեռնում"
+  online_url_37830a72: "Առցանց URL"
   only_a_maximum_of_100_events_can_be_created_ad703982: "Կարող է ստեղծվել առավելագույնը 100 միջոցառում "
   only_teachers_can_see_this_course_until_it_is_publ_6fac97a7: "Միայն դասավանդողները կարող են տեսնել այս դասընթացը, մինչև որ այն հրապարակվի"
   ontime_on_time_late_late_missing_missing_145e9e5d: "%{onTime} ժամանակին, %{late} ուշացումով, %{missing} բացակա"
@@ -10477,6 +10502,7 @@ hy:
   please_enter_your_label_name_7745272d: "Մուտքագրեք ձեր  %{label_name}՝"
   please_enter_your_label_name_and_password_5c56be80: "Մուտքագրեք ձեր  %{label_name} և գաղտնաբառը՝"
   please_let_them_know_which_page_you_were_viewing_a_6039f59a: "Տեղեկացրեք նրանց, որ էջն եք դիտում և որ հղումով անցաք այդտեղ:"
+  please_let_them_know_which_page_you_were_viewing_a_c9816406: "Թույլ տվեք նրանց տեսնել Ձեր կողմից տվյալ պահին դիտվող էջը եւ ձեր սեղմած հղումը"
   please_wait_e6355980: "Խնդրում ենք սպասել..."
   plugins: 
     academic_benchmark_importer: 
@@ -10755,6 +10781,8 @@ hy:
     pandapub: 
       description: "Հրապարակման/բաժանորդագրման ծառայություն"
       name: PandaPub
+    pv4: 
+      description: "Էջի դիտումների քանակը՝ 4"
     qti_converter_settings: 
       labels: 
         enabled: "Միացվել է"
@@ -10822,12 +10850,18 @@ hy:
         api_token: "Api թոքեն"
     zendesk_settings: 
       labels: 
+        account_id: "Հաշվի մուտքանուն"
+        api_url: "API URL"
+        http_env: "HTTP ENV"
         message_type: "Հաղորդագրության տեսակ"
         password: Գաղտնաբառ
         site: Կայք
+        url: URL
+        user_id: "Օգտատիրոջ մուտքանուն"
         user_roles: "Օգտատերերի դերեր"
         username: "Օգտատիրոջ անուն"
   points_bb475533: Միավորներ
+  points_points_b6b422e2: "Միավոր.  %{points}"
   points_possible_must_be_0_or_more_for_selected_gra_f96a04e3: "Գնահատման այս ընտրված տեսակի համար հնարավոր միավորները պետք է լինեն 0-ից ոչ պակաս"
   polling: 
     poll_sessions: 
@@ -12038,7 +12072,7 @@ hy:
         end_the_quiz: "Ավարտել թեստը"
         extended_quiz_time_explanation: "Դուք կարող եք այս ունկնդրին լրացուցիչ ժամանակ տալ ընթացիկ թեստի կատարման փորձի համար: Որքա՞ն ժամանակ կցանկանայիք նրանց տրամադրել:"
         extra_time_on_every_attempt: "Լրացուցիչ ժամանակ ամեն փորձի համար՝"
-        finished_in: "ավարտվել է %{duration}"
+        finished_in: "ավարտվել է %{duration} ընթացքում"
         global_extra_attempt_time: "յուրաքանչյուրը արդեն ստացել է %{count} րոպե"
         global_extra_attempts: "յուրաքանչյուրը արդեն ստանում է %{n} "
         headers: 
@@ -12090,7 +12124,7 @@ hy:
       multi_answer: 
         choose_answer: Ընտրել
       muted: 
-        muted_quiz_description: "Ձեր թեստի գնահատականը անհասանելի է, քանի որ ձեր դասավանդողը դեռ չի ավարտել գնահատումը: Թեստի գնահատումից հետո ձեր գնահատականը կհայտնվի այս էջում:"
+        muted_quiz_description: "Ձեր թեստի գնահատականը անհասանելի է, քանի որ Ձեր դասավանդողը դեռ չի ավարտել գնահատումը: Թեստի գնահատումից հետո Ձեր գնահատականը կհայտնվի այս էջում:"
         muted_quiz_header: "Ձեր թեստի ձայնը անջատված է "
       new: 
         allowed_attempts: "Թույլատրված փորձերի թիվը"
@@ -12648,6 +12682,9 @@ hy:
       other: "%{count} բաժին"
   record_with_microphone_only_e4ee07aa: "Ձայնագրել միայն միկրոֆոնի միջոցով"
   red_8258edf3: Կարմիր
+  reference_code_3e8355dd: "Հղման կոդ"
+  reference_code_is_required_c32c757f: "Պահանջվում է հղման կոդ"
+  regenerate_epub_395c8e56: "Կրկին գեներացնել ePub-ը"
   region_47e29025: Տարածաշրջան.
   region_939f2a6c: Տարածաշրջան
   registration: 
@@ -12695,17 +12732,20 @@ hy:
   remove_recipient_name_a6b83cef: "Հեռացնել  %{name} ստացողին "
   remove_row_c198da5a: "Հանել տողը"
   remove_row_f9d59cba: "Հանել Տողը"
+  remove_student_from_recipients_4b206e35: "Ջնջել %{student} -ին ստացողների ցանկից"
   remove_these_dates_48453a81: "Հեռացնել այս ամսաթվերը"
   remove_this_section_9a88ca43: "Ջնջել այս բաժինը"
   rename_45608f54: Վերանվանել
   rename_c_name_section_e0e92c97: "Վերանվանել %{c.name} բաժինը"
   rename_this_section_73065edd: "Վերանվանել այս բաժինը"
+  replace_e61834a7: Փոխարինել
   replaces_the_current_folder_tree_with_a_new_access_6f9d15c2: "Ընթացիկ թղթապանակի ծառը փոխարինում է հասանելի և ավելի շատ հնարավորություններով նոր թղթապանակի ծառով:  "
   reply_from_name: "%{name} Canvas ծանուցումների միջոցով "
   reply_to_comment_72d96728: "Պատասխանել մեկնաբանության մեջ"
   reply_to_main_discussion_29823888: "Պատասխանել հիմնական քննարկմանը"
   require_usage_rights_for_uploaded_files_4507865b: "Բեռնված ֆայլերի համար անհրաժեշտ է նշել օգտագործման իրավունքները"
   reregister_9ab95a57: "Կրկին գրանցել"
+  reregister_toolname_3dde0bfc: "Վերագրանցել %{toolName}"
   respondus_lockdown_browser_support_413352eb: "Respondus LockDow բրաուզերի աջակցությունը"
   respondus_soap_endpoint: 
     plugin_settings: 
@@ -12834,6 +12874,7 @@ hy:
       saved: "Փոփոխությունները հաջողությամբ պահպանվել են:"
     site_admin_permissions: "Կայքի ադմինիստրատորի թույլտվություններ"
     update_failed_notice: "Դերի ստեղծումը չհաջողվեց"
+  role_successfully_updated_4317e6a4: "Դերը հաջողությամբ թարմացվել է"
   roles: 
     based_on_type: "Հիմնված է %{base_type} վրա"
     edit_role: 
@@ -12939,6 +12980,8 @@ hy:
   sample_data_e4fd01ff: "Ընտրանքային տվյալներ"
   save_11a80ec3: Պահպանել
   saving_d55dd90e: "Պահպանվում է..."
+  saving_recording_e111cb05: "Ձայնագրառումը պահպանվում է..."
+  schedule_student_availability_332154a: "Սահմանել ունկնդիրների հասանելիության ժամանակացույց"
   score_muted_82eef66: "Գնահատական՝ (անջատված է)"
   score_of_score_view_in_speedgrader_a7c1c954: "%{score} միավոր: Դիտել «Արագ գնահատման համակարգ»-ում"
   score_out_of_points_possible_88f370fd: "%{points_possible} -ից  %{score} "
@@ -13098,6 +13141,7 @@ hy:
       confirming_course: "%{course_name} հաստատում... "
       removing_crosslisting_of_section: "Չեղարկել համատեղ ցուցակների բաժինը... "
   section_ends_at_bb9df3c0: "Բաժինն ավարտվում է "
+  section_filter_cde54d0a: "Բաժնի ֆիլտր"
   section_name_b6d82574: "Բաժնի անվանում"
   section_starts_at_65eaed1: "Բաժինը սկսվում է "
   sections: 
@@ -13159,7 +13203,9 @@ hy:
         current_enrollments: "Ընթացիկ գրանցումներ"
         decrosslist_section: "Այս բաժինը հանել խաչաձև ցուցակից"
   see_some_lti_tools_that_work_great_with_canvas_16ef75a0: "*Որոշ LTI գործիքներ* որոօնք գերազանց են աշխատում Canvas -ի հետ:"
+  select_a_grading_period_5ea50f1: "Ընտրել գնահատման ժամանակահատված..."
   select_a_grading_period_aab25483: "Ընտրել գնահատման ժամանակահատվածը"
+  select_a_predefined_color_c77ab2f5: "Ընտրել նախընտրած գույնը:"
   select_all_students_7c2c34b3: "Ընտրել բոլոր ունկնդիրներին"
   select_audio_file_7d905cce: "Ընտրել աուդիո ֆայլ"
   select_content: "Ընտրել բովանդակությունը"
@@ -13181,6 +13227,7 @@ hy:
   select_course_a_selection_is_required_before_recip_f622d9df: "Ընտրել դասընթացը. ընտրությունը անհրաժեշտ է կատարել նախքան ստացողների դաշտը հասանելի կդառնա "
   select_course_color_cad8e62b: "Ընտրել դասընթացի գույնը"
   select_d70f31da: Ընտրել
+  select_for_list_of_users_who_responded_791ce930: "Ընտրել պատասխան ուղարկած օգտատերերի ցանկը:"
   select_image_e1696a4d: "Ընտրել պատկերը"
   select_input_3dbd73c1: "Ընտրել մուտք"
   select_itemname_f70db487: "Ընտրել %{itemName}"
@@ -13231,6 +13278,7 @@ hy:
         go_to_course: "Անցնել դասընթացին"
         go_to_dashboard: "Անցնել տեղեկատվական վահանակին"
       not_available_yet: "Մենք ձեզ էլեկտրոնային հաղորդագրություն կուղարկենք դասընթացն սկսվելուց քիչ առաջ:"
+  self_registration_156392d6: Ինքնագրանցում
   send_custom_fields_uncheck_unless_using_canvas_zen_67e83666: "Ուղարկել Օգտագործողի դաշտերը  (հանել դրոշակը, եթե չեք օգտագործում  Canvas zendesk)"
   send_e3bd0ed0: Ուղարկել
   sequence_footer: 
@@ -13944,6 +13992,7 @@ hy:
   show_me_76823679: "Ցույց տալ"
   show_more_af9cbc16: "Ցույց տալ ավելին"
   show_notes_column_22d2b6c1: "Ցույց տալ նշումների համար նախատեսված սյունակը"
+  show_recent_activity_stream_2be4abc1: "Ցույց տալ վերջին գործողությունների պատկերը"
   show_student_names_dcb40934: "Ցույց տալ ունկնդիրների անունները"
   simple_tls_45df2648: "Պարզ  TLS"
   sis_agent_token_authentication_2a0b29e3: "SIS գործակալի թոքենի վավերացում"
@@ -13956,6 +14005,8 @@ hy:
     instructure_csv: "Ֆորմատավորված Instructure CSV կամ CSV ֆայլերի արխիվ"
     upload_filename: "sis_upload_%{id}.zip"
   sis_export_title: "SIS արտահանում"
+  sis_grade_export_settings_45a9f709: "SIS գնահատականների արտահանման կարգաբերումներ"
+  sis_id_4495a887: "SIS մուտքանուն"
   sis_import: 
     buttons: 
       process_data: "Մշակել տվյալները"
@@ -14036,6 +14087,7 @@ hy:
     android_banner_title: "Canvas  Instructure-ով"
     android_banner_view_button: ԴԻՏԵԼ
   some_conferences_on_this_page_are_hidden_because_o_789684fd: "Այս էջում որոշ կոնֆերանսներ անտեսանելի են, քանի որ դրանց կարգավիճակը վերականգնվում է տեղի ունեցած սխալների պատճառով:"
+  someone: "որեւէ մեկը"
   something_went_wrong_inactivating_the_user_please__ea7d0001: "Օգտատիրոջ կարգավիճակի ապաակտիվացման ժամանակ սխալ է տեղի ունեցել: Ավելի ուշ կրկին փորձեք:"
   something_went_wrong_re_activating_the_user_please_82c3e7a: "Օգտատիրոջ կարգավիճակի  կրկին ակտիվացման ժամանակ սխալ է տեղի ունեցել: Ավելի ուշ կրկին փորձեք:"
   something_went_wrong_updating_the_user_s_role_plea_5de95400: "Օգտատիրոջ դերի թարմացման ժամանակ սխալ է տեղի ունեցել: Ավելի ուշ կրկին փորձեք:"
@@ -14212,6 +14264,7 @@ hy:
     this_was_submitted_multiple_times_choose_a_submission_to_view: "Ուղարկվել է մի քանի անգամ, նշել, թե որը պետք է նայել՝"
     update_grade: "Թարմացնել գնահատականը"
     view_rubric_assessment_in_the_speedgrader: "Դիտել բաժնի գնահատումը «Արագ գնահատման համակարգ»-ում"
+  submission_in_another_grading_period_e754b329: "Աշխատանքի ուղարկում գնահատման այլ ժամանակահատվածի համար"
   submissions: 
     assignment_submit_success: "Հանձնարարությունը հաջողությամբ ուղարկված է:"
     assignment_submitted: "Հանձնարարությունն ուղարկված է:"
@@ -14296,6 +14349,7 @@ hy:
         external_link: "Արտաքին կայքին հղումներ"
       url_preview: "URL-հասցեի նախնական դիտում "
       view_feedback_button: "Դիտել կարծիքները"
+      view_in_a_new_tab: "(Դիտել նոր պատուհանում)"
       view_original_submission: "Դիտել %{user} -ի կողմից սկզբնապես ուղարկված աշխատանքը"
       view_preview_button: "Նախնական դիտում "
     still_zipping: "Ֆայլի արխիվացումը ընթացքի մեջ է..."
@@ -14306,7 +14360,9 @@ hy:
   submit_a3cc6859: Ուղարկել
   submit_a_feature_idea_2d4baa3d: "Ուղարկել ֆուկցիաներին առնչվող առաջարկություններ"
   submit_assignment_5799b4e3: "Ուղարկել հանձնարարությունը"
+  submit_media_file_f334c1ba: "Ուղարկել մեդի ֆայլ"
   submitted_datetime_fa2e9287: "Ուղարկված է՝ %{dateTime}"
+  submitting_types_7c5a7096: "Ուղարկվում է. %{types}"
   success_all_users_on_this_domain_will_now_see_this_4681b85d: "Հաջողություն՝ Բոլոր օգտագործողները այս դոմեյնի այժմ կտեսնեն այս բրենդինգը:"
   success_grades_were_published_to_the_grade_book_da3b4fba: "Գնահատականները հաջողությամբ հրապարկվել են գնահատականների մատյանում"
   successfully_moved_model_to_newgroup_f7b7aa5a: "%{model}-ը հաջողությամբ տեղափոխվել է %{newGroup}"
@@ -14336,6 +14392,8 @@ hy:
   switch_style_checkbox_97a44345: "Փոխանջատման-ոճի կոճակ"
   switch_to_3f310557: "Անցնել "
   switch_to_group_group_name_786b913b: "Անցնել %{group_name}-ին"
+  switch_to_percentage_295146ac: "Փոխակերպել տոկոսների"
+  switch_to_points_6a0a1eba: "Փոխակերպել միավորների"
   syllabus: "Դասընթացի ուսումնական ծրագիրը"
   syllabus_f191f65b: "Դասընթացի ծրագիր"
   tab_1_3d6b3fb: "Ներդիր 1"
@@ -14382,6 +14440,7 @@ hy:
   teacher_5a73b637: Դասավանդող
   teachers_52e2423f: Դասավանդողներ
   teal_f729a294: Փիրուզագույն
+  tell_us_how_and_when_you_would_like_to_be_notified_de3ed2bc: "Canvas համակարգի ո՞ր միջոցառումների մասին եւ ի՞նչ եղանակով եք ցանկանում ստանալ ծանուցում"
   terms: 
     index: 
       date: 
@@ -14472,6 +14531,7 @@ hy:
   the_module_item_is_locked_27fe420b: "Մոդուլի տարրը արգելափակված է:"
   the_most_recent_scores_for_user_current_user_name__ea82f0b6: " %{current_user_name} օգտագործողի ամենավերջին միավորները և %{outcome_name} արդյունքները:"
   the_profile_picture_has_been_reported_d609d6dd: "Բողոք է ուղարկվել պրոֆիլի պատկերի համար "
+  the_provided_academic_benchmark_file_has_an_error_4ad2c631: "Տրամադրված Ակադեմիական չափանիշների ֆայլում առկա է սխալ"
   the_roles_held_by_the_reporting_user_student_teach_8fa5a269: "հաշվետու օգտագործողի (ունկնդրի, դասավանդողի, ադմինիստրատորի և այլնի) կողմից կատարվող դերերը"
   the_scheduler_tool_lets_you_set_up_time_slots_that_233345b1: "Պլանավորող գործիքը թույլ է տալիս սահմանել ժամանակային այն միջակայքը, որը նախընտրում են ունկնդիրները (կամ ունկնդիրների խմբերը): Սկսելու համար սեղմեք ներքևի կոճակը: "
   the_severity_of_the_issue_as_selected_by_the_user__88db91d9: "Հարցի լրջությունը բացվող մենյուից ընտրվում է օգտագործողի կողմից: "
