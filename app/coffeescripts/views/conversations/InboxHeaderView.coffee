@@ -98,6 +98,7 @@ define [
 
     onStarToggle: (e) ->
       e.preventDefault()
+      @$adminBtn.focus()
       @trigger('star-toggle')
 
     onSubmissionReply: (e) -> @trigger('submission-reply')
