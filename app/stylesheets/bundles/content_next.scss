@@ -1,3 +1,5 @@
+@import "base/_environment.scss";
+
 .context_module .items {
   min-height: 10px; /* sortable on empty */
 }
@@ -42,7 +44,7 @@
 
 .unlock_at_text {
   font-weight: normal;
-  font-size: 12px;
+  @include fontSize(12px);
 }
 
 .add_module_item_link {
@@ -79,7 +81,7 @@
 
       display: flex;
       align-items: center;
-      font-size: 12px;
+      @include fontSize(12px);
       margin: 0;
     }
   }
@@ -182,7 +184,7 @@
 .context_module_item .item_name .title {
   padding: 0;
   color: inherit;
-  font-size: 13px;
+  @include fontSize(13px);
 }
 
 .context_module_placeholder {

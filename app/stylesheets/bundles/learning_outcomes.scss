@@ -42,7 +42,7 @@
     padding: 0;
     overflow: hidden;
     background-color: white;
-    @if $use_new_styles { 
+    @if $use_new_styles {
       border: 1px solid $ic-border-light;
       border-top: none;
     }
@@ -293,7 +293,7 @@ table.criterion .insert {
 }
 
 .outcomes-points-label {
-  font-size: 11px;
+  @include fontSize(11px);
 }
 
 .outcomes-edit-row {

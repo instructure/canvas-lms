@@ -2,14 +2,14 @@
 
 #import_subset_options {
   margin: 10px 20px;
-  font-size: 9px;
+  @include fontSize(9px);
 }
 #file_upload {
   #export_file_input {
     display: block;
   }
   span.zip_error {
-    font-size: 12px;
+    @include fontSize(12px);
     padding: 4px 6px;
   }
 }

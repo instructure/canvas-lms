@@ -26,7 +26,7 @@ $gradebook_header_height: 52px;
 
 #speed_grader_loading {
   padding: 5px;
-  font-size: 24px;
+  @include fontSize(24px);
 }
 
 #gradebook_header {
@@ -40,7 +40,7 @@ $gradebook_header_height: 52px;
     background-color: #4b5662;
   }
   padding: 12px 25px 12px 12px;
-  font-size: 11px;
+  @include fontSize(11px);
   text-align: center;
   color: $ic-color-light;
   line-height: 15px;
@@ -320,7 +320,7 @@ $gradebook_header_height: 52px;
   right: 0;
   background-color: #f2f2f2;
   color: #444;
-  font-size: 12px;
+  @include fontSize(12px);
   .bold {
     font-weight: bold;
   }
@@ -338,7 +338,7 @@ $gradebook_header_height: 52px;
   }
   div.comment {
     padding: 8px;
-    font-size: 12px;
+    @include fontSize(12px);
     border-top: 1px dashed $ic-border-light;
     background: $ic-color-light;
     &:first-of-type {
@@ -471,7 +471,7 @@ $gradebook_header_height: 52px;
   }
   #teachers_and_submitter_will_be_notified {
     color: #888;
-    font-size: 10px;
+    @include fontSize(10px);
   }
   label {
     font-weight: bold;
@@ -524,7 +524,7 @@ $gradebook_header_height: 52px;
       width: 85%;
       // this is a hack  because windows based browsers do not allow me to set the width of a file input.
       // so I just have to make it smaller font so that it fits.
-      font-size: 8.5px;
+      @include fontSize(8.5px);
     }
     a {
       display: block;
@@ -534,7 +534,7 @@ $gradebook_header_height: 52px;
   textarea {
     border-radius: $baseBorderRadius;
     max-height: 200px;
-    font-size: 13px;
+    @include fontSize(13px);
   }
 }
 
@@ -555,7 +555,7 @@ body .ui-selectmenu-dropdown {
     text-decoration: none !important;
   }
   .ui-selectmenu-status {
-    font-size: 14px;
+    @include fontSize(14px);
     padding: 0 20px 0;
     padding: 0 0 0 20px;
     margin: 0 20px 0 0;
@@ -598,7 +598,7 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
     .ui-selectmenu-item-footer {
       margin: 1px 0 1px;
       margin-top: -1px;
-      font-size: 10px;
+      @include fontSize(10px);
       line-height: 1em;
       opacity: 0;
     }
@@ -673,7 +673,7 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
 #submission_details {
   border-bottom: 1px solid $ic-border-light;
   a {
-    font-size: 12px;
+    @include fontSize(12px);
   }
   .on_time {
     color: #004B00;
@@ -715,12 +715,12 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
         right: 20px;
       }
       .turnitin_similarity_score {
-        font-size: 9px;
+        @include fontSize(9px);
         &.submission_error, &.submission_pending {
           padding: 1px;
         }
         &:hover {
-          font-size: 9px;
+          @include fontSize(9px);
         }
       }
       .submission-file-download {

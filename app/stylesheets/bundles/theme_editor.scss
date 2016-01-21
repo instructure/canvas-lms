@@ -109,7 +109,7 @@ $te-width: 300px;
   .Theme__editor-header_title-text {
     color: $ic-color-light;
     line-height: normal;
-    font-size: 16px;
+    @include fontSize(16px);
     font-weight: 300;
     margin: 0 0 0 $ic-sp;
     flex: 1;
@@ -150,7 +150,7 @@ $te-width: 300px;
   .Theme__editor-tabs_item {
     color: $te-tab-text-color;
     padding: $ic-sp;
-    font-size: 14px;
+    @include fontSize(14px);
     margin: 0;
     cursor: pointer;
     font-weight: normal;
@@ -326,7 +326,7 @@ $te-width: 300px;
         transition: padding 0.2s;
         padding: $ic-sp/2 0;
         font-weight: 500;
-        font-size: 14px;
+        @include fontSize(14px);
         &:hover {
           color: $ic-color-light;
         }
@@ -508,7 +508,7 @@ $te-width: 300px;
     color: $ic-color-dark;
     font-style: italic;
     display: block;
-    font-size: 12px;
+    @include fontSize(12px);
     font-weight: normal;
     padding-top: $ic-sp/2;
   }
