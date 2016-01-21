@@ -983,6 +983,11 @@ ActiveRecord::Associations::CollectionProxy.class_eval do
       (load_target && target.respond_to?(name, include_private)) ||
       proxy_association.klass.respond_to?(name, include_private)
   end
+
+  def temp_record(*args)
+    # creates a record with attributes like a child record but is not added to the collection for autosaving
+    klass.unscoped.merge(scope).new(*args)
+  end
 end
 
 ActiveRecord::ConnectionAdapters::AbstractAdapter.class_eval do

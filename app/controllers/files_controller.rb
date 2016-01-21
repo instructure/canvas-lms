@@ -119,7 +119,7 @@ class FilesController < ApplicationController
 
   def quota
     get_quota
-    if authorized_action(@context.attachments.scope.new, @current_user, :create)
+    if authorized_action(@context.attachments.temp_record, @current_user, :create)
       h = ActionView::Base.new
       h.extend ActionView::Helpers::NumberHelper
       result = {
@@ -305,7 +305,7 @@ class FilesController < ApplicationController
   end
 
   def images
-    if authorized_action(@context.attachments.scope.new, @current_user, :read)
+    if authorized_action(@context.attachments.temp_record, @current_user, :read)
       if Folder.root_folders(@context).first.grants_right?(@current_user, session, :read_contents)
         if @context.grants_right?(@current_user, session, :manage_files)
           @images = @context.active_images.paginate :page => params[:page]
@@ -721,7 +721,7 @@ class FilesController < ApplicationController
       @context = @group || @current_user
       @check_quota = false
     elsif @context && intent == 'attach_discussion_file'
-      permission_object = @context.discussion_topics.scope.new
+      permission_object = @context.discussion_topics.temp_record
       permission = :attach
     elsif @context && intent == 'message'
       permission_object = @context

@@ -214,7 +214,7 @@ class ConferencesController < ApplicationController
   end
 
   def create
-    if authorized_action(@context.web_conferences.scope.new, @current_user, :create)
+    if authorized_action(@context.web_conferences.temp_record, @current_user, :create)
       params[:web_conference].try(:delete, :long_running)
       @conference = @context.web_conferences.build(params[:web_conference])
       @conference.settings[:default_return_url] = named_context_url(@context, :context_url, :include_host => true)

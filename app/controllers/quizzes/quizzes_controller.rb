@@ -117,7 +117,7 @@ class Quizzes::QuizzesController < ApplicationController
         assignment_overrides: api_v1_course_quiz_assignment_overrides_url(@context)
       },
       :PERMISSIONS => {
-        create: can_do(@context.quizzes.scope.new, @current_user, :create),
+        create: can_do(@context.quizzes.temp_record, @current_user, :create),
         manage: can_manage,
         read_question_banks: can_manage || can_do(@context, @current_user, :read_question_banks)
       },
@@ -240,7 +240,7 @@ class Quizzes::QuizzesController < ApplicationController
   end
 
   def new
-    if authorized_action(@context.quizzes.scope.new, @current_user, :create)
+    if authorized_action(@context.quizzes.temp_record, @current_user, :create)
       @assignment = nil
       @assignment = @context.assignments.active.find(params[:assignment_id]) if params[:assignment_id]
       @quiz = @context.quizzes.build
@@ -307,7 +307,7 @@ class Quizzes::QuizzesController < ApplicationController
   end
 
   def create
-    if authorized_action(@context.quizzes.scope.new, @current_user, :create)
+    if authorized_action(@context.quizzes.temp_record, @current_user, :create)
       params[:quiz][:title] = nil if params[:quiz][:title] == "undefined"
       params[:quiz][:title] ||= t(:default_title, "New Quiz")
       params[:quiz].delete(:points_possible) unless params[:quiz][:quiz_type] == 'graded_survey'

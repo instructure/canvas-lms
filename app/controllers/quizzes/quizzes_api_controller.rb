@@ -457,7 +457,7 @@ class Quizzes::QuizzesApiController < ApplicationController
   #
   # @returns Quiz
   def create
-    if authorized_action(@context.quizzes.scope.new, @current_user, :create)
+    if authorized_action(@context.quizzes.temp_record, @current_user, :create)
       @quiz = @context.quizzes.build
       update_api_quiz(@quiz, params)
       unless @quiz.new_record?

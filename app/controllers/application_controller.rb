@@ -701,7 +701,7 @@ class ApplicationController < ActionController::Base
     if @just_viewing_one_course
 
       # fake assignment used for checking if the @current_user can read unpublished assignments
-      fake = @context.assignments.scope.new
+      fake = @context.assignments.temp_record
       fake.workflow_state = 'unpublished'
 
       assignment_scope = :active_assignments
