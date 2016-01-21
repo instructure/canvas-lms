@@ -266,7 +266,6 @@ module ApplicationHelper
       if use_webpack?
         ary << "#{js_base_url}/#{plugin ? "#{plugin}-" : ''}#{bundle}.bundle.js"
       else
-        ary.concat(Canvas::RequireJs.extensions_for(bundle, 'plugins/')) unless use_optimized_js?
         ary << "#{js_base_url}#{plugin ? "/plugins/#{plugin}" : ''}/compiled/bundles/#{bundle}.js"
       end
     end
