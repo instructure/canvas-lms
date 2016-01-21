@@ -40,9 +40,8 @@ define [
       'focus':   'onFocus'
 
     keyCodes:
-      13: 'Enter'
-      27: 'Escape'
-      32: 'Space'
+      13: 'Action'
+      32: 'Action'
       37: 'LeftArrow'
       38: 'UpArrow'
       39: 'RightArrow'
@@ -111,58 +110,8 @@ define [
     # Internal: Trigger a select when enter key is pressed.
     #
     # Returns nothing.
-    onEnterKey: (e, $target) ->
+    onActionKey: (e, $target) ->
       if $target.hasClass('outcome-group') then @onRightArrowKey(e, $target) else @triggerSelect()
-
-    # Internal: Store a group or outcome in another group.
-    #
-    # Returns nothing.
-    onDrop: (dragObject, $destination) ->
-      # TODO: reduce duplication b/w this and OutcomesDirectoryView.initDroppable
-      $target         = dragObject.$li
-      model           = dragObject.model
-      destinationView = $destination.data('view')
-      originalView    = dragObject.parent
-      if destinationView?
-        model.collection.remove(model)
-        if $target.hasClass('outcome-link') then destinationView.outcomes.add(model) else destinationView.groups.add(model)
-        model.trigger 'select'
-        dfd = destinationView.moveModelHere(model)
-      else
-        destinationView = originalView
-      return unless dfd
-      dfd.done ->
-        $('.wrapper [data-id=' + $target.data('id') + ']').attr('tabindex', 0).attr('aria-grabbed', false).focus()
-        $destination.parents('.wrapper:first').data('drag', null)
-
-    # Internal: Start drag or initiate drop.
-    #
-    # Returns nothing.
-    onSpaceKey: (e, $target) ->
-      $sidebar = $target.parents('.wrapper:first')
-      if dragObject = $sidebar.data('drag')
-        # drop
-        $target.after(dragObject.$li)
-        @onDrop(dragObject, $target.parent())
-      else
-        # drag
-        $target.attr('aria-grabbed', true)
-        dragObject =
-          $li: $target,
-          model: $target.data('view').model
-          parent: $target.parent().data('view')
-        $sidebar.data('drag', dragObject)
-        $target.blur()
-        $target.focus()
-
-    # Internal: Cancel a drag and drop action.
-    #
-    # Returns nothing.
-    onEscapeKey: (e, $target) ->
-      $sidebar = $target.parents('.wrapper:first')
-      return unless dataObject = $sidebar.data('drag')
-      dataObject.$li.data('parent', null).attr('aria-grabbed', false)
-      $sidebar.data('drag', null);
 
     # Internal: Update tabindex on $el and its siblings.
     #
