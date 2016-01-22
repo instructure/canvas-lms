@@ -68,9 +68,12 @@ en-GB:
         api_key: "API key"
         api_url: "API URL"
         common_core_guid: "Common Core GUID (optional)"
+  accept_2fdd362e: Accept
   accepted_formats_hex_rgba_rgb_hsl_42a37ef7: "accepted formats: hex, rgba, rgb, hsl"
   accepted_formats_svg_png_jpg_gif_f793e4bc: "Accepted formats: svg, png, jpg, gif"
+  accepted_user_role_type_course_course_2ce91589: "Accepted: %{user}, %{role_type}, course, %{course}"
   access_token_is_valid_until_d2f048cf: "Access token is valid until"
+  access_tokens_can_be_used_to_allow_other_applicati_16c4a3ab: "Access tokens can be used to allow other applications to make API calls on your behalf. You can also generate access tokens and *use the Canvas Open API* to come up with your own integrations."
   accordion_section_1_7888782d: "Accordion Section 1"
   accordion_section_2_e1812997: "Accordion Section 2"
   accordion_section_3_96861901: "Accordion Section 3"
@@ -217,6 +220,7 @@ en-GB:
       login_handle_name_description: "The label used for unique log-in identifiers. Examples: Login, Username, Student ID, etc."
       unknown_user_url_description: "The URL to redirect to when an authenticated user is not found in Canvas."
   account_name_13ed649: "%{account_name}"
+  account_name_analytics_62bf60ae: "%{account.name} Analytics"
   account_navigation_80bbefd4: "Account Navigation"
   account_notification: 
     errors: 
@@ -277,6 +281,7 @@ en-GB:
     report_header_end__date: end_date
     report_header_end_date: "end date"
     report_header_enrollment_state: "enrolment state"
+    report_header_expiration: expiration
     report_header_final_score: "final score"
     report_header_first_name: first_name
     report_header_full_name: full_name
@@ -320,6 +325,10 @@ en-GB:
     report_header_term__id: term_id
     report_header_term_id: "term id"
     report_header_term_sis: "term sis"
+    report_header_token_dev_key_id: "dev key id"
+    report_header_token_dev_key_name: "dev key name"
+    report_header_token_hint: "token hint"
+    report_header_token_last_used: "last used"
     report_header_user__id: user_id
     report_header_user_id: "user id"
     report_header_user_name: "user name"
@@ -770,15 +779,15 @@ en-GB:
             field: "Section ID"
     settings: 
       about_google_docs: |-
-          Google Docs Previews allow users to view documents from 
-          within Canvas rather than having to download them and 
+          Google Docs Previews allow users to view documents from
+          within Canvas rather than having to download them and
           open the corresponding programme (e.g. Word or Excel).
           
           Google Docs Previews can also render file types
           not supported by the Canvas document previewer.
           
-          By using this service you 
-          acknowledge that you have read and agreed to the 
+          By using this service you
+          acknowledge that you have read and agreed to the
           [Google Docs Viewer Terms of Service](%{terms_url}).
       about_google_docs_tooltip: "About Google Docs previews"
       account_admins_title: "Account admins"
@@ -869,7 +878,7 @@ en-GB:
         equella_endpoint: "Equella endpoint"
         equella_teaser: "Equella comments"
         global_brand_includes: "Upload global CSS/JavaScript includes in Theme Editor"
-        global_includes: "Global CSS/JavaScript overrides"
+        global_includes: "Custom CSS/JavaScript overrides"
         global_javascript: "Global JavaScript URL"
         global_stylesheet: "Global CSS URL"
         help_link_available_to: "Available to"
@@ -878,6 +887,7 @@ en-GB:
         help_link_url: URL
         include_students_in_global_survey: "Include students in global surveys"
         locked: "Lock this setting for sub-accounts and courses"
+        locked_for_sub_accounts: "Lock this setting for sub-accounts"
         login_handle_name: "Login Label"
         message: Message
         mfa_settings: "Multi-factor authentication"
@@ -899,6 +909,7 @@ en-GB:
         show_scheduler: "Enable scheduler"
         sis_app_token: "SIS Agent Token"
         sis_app_url: "SIS App URL"
+        sis_default_grade_export: "'Post Grades to SIS' checkbox is enabled by default for assignments, marekd discussions and quizzes"
         sis_source_id: "SIS ID"
         start_at: Starts
         students_can_create_courses: Students
@@ -1193,6 +1204,11 @@ en-GB:
       students: "Student Enrolments"
       ta: "Ta Enrolments"
       teachers: "Teacher Enrolments"
+    user_access_tokens_csv_description: 
+      account_reports: 
+        default: 
+          user_access_token: 
+            text: "This report shows users with access tokens."
     user_add_failed_message: "Adding user failed, please try again"
     user_added_message: "*%{user}* successfully added!"
     user_added_message_sent_message: "*%{user}* successfully added! They should receive an email confirmation shortly."
@@ -1219,6 +1235,9 @@ en-GB:
     errors: 
       messages: 
         record_invalid: "Validation failed: %{errors}"
+        restrict_dependent_destroy: 
+          many: "Cannot delete record because dependent %{record} exist"
+          one: "Cannot delete record because a dependent %{record} exists"
         taken: "has already been taken"
   activity_13915493: Activity
   activity_by_category_9c2033d1: "Activity by Category"
@@ -1227,6 +1246,7 @@ en-GB:
   add_8523c19b: Add
   add_a_new_course_4a041207: "Add a new course"
   add_a_new_user_c440d053: "Add a new user"
+  add_a_reviewer_for_the_selected_students_1c7b5d6f: "Add a reviewer for the selected students"
   add_an_identity_provider_to_this_account_c2644478: "Add an identity provider to this account:"
   add_app_baf540f: "Add App"
   add_attachment_93868828: "Add attachment"
@@ -1250,6 +1270,7 @@ en-GB:
     add_topic_to: "Add discussion topics to %{module}"
   add_new_group_7ac49f31: "Add new group"
   add_new_set_of_due_dates_e8e240f: "Add new set of due dates"
+  add_people_7ee4b2ec: "Add People"
   add_remove_or_rearrange_sections_for_this_portfoli_4628320a: "Add, remove or rearrange sections for this portfolio"
   add_review_2fb1590c: "Add review"
   add_section_8b027a1c: "Add section"
@@ -1314,6 +1335,7 @@ en-GB:
       recipients_required: "At least one recipient is required"
       threshold_should_be_numeric: "This should be a positive number"
   all_4321c3a1: All
+  all_account_types_e83c1516: "All Account Types"
   all_accounts_3bafc860: "All Accounts"
   all_changes_were_saved_f6f3ddcc: "All changes were saved"
   all_configured_apps_a14eef0a: "All configured apps"
@@ -1333,6 +1355,7 @@ en-GB:
   allow_lor_tools: "Allow users to view and use external tools configured for LOR."
   allow_opt_out_of_inbox: "Allow users to opt out of the Conversation's Inbox. This will cause all conversation messages and notifications to be sent as ASAP notifications to the user's primary email, hide the Conversation's Inbox unread messages badge on the Inbox, and hide the Conversation's notification preferences."
   allow_students_to_see_who_has_signed_up_for_time_s_497f4a46: "Allow students to see who has signed up for time slots."
+  allow_the_ability_to_send_notifications_through_ou_fdaace5a: "Allow the ability to send notifications through our dispatch queue"
   allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "Allows teachers to mark grade data to be exported in bulk to SIS integrations."
   allows_the_scheduling_of_recurring_calendar_events_aac71007: "Allows the scheduling of recurring calendar events"
   allows_users_with_international_phone_numbers_to_r_f90f8522: "Allows users with international phone numbers to receive text messages from Canvas."
@@ -1348,6 +1371,7 @@ en-GB:
   an_error_occurred_when_setting_the_usage_right_for_d4ea78f5: "An error occurred when setting the usage right for %{filename}"
   an_item_named_name_already_exists_in_this_location_147b7312: "An item named \"%{name}\" already exists in this location. Do you wish to replace the existing file?"
   an_unknown_server_error_occurred_please_try_again_f517eaf3: "An unknown server error occurred.  Please try again."
+  an_update_is_available_for_toolname_bba3fa2: "An update is available for %{toolName}"
   analytics: 
     course: 
       analytics: Analytics
@@ -1432,6 +1456,7 @@ en-GB:
   api_url_3ee7cb0a: "API URL"
   app_center_will_appear_in_the_apps_tab_on_the_sett_1b9eb936: "App Centre will appear in the \"Apps\" tab on the settings page of either a course or account. The URL provided below should point to a valid App Centre endpoint (for example, %{url} - be sure to omit the trailing slash"
   app_placements_6d877225: "App placements"
+  app_reregistration_87cc8817: "App Re-registration"
   appends_a_number_to_the_end_of_each_event_title_e__bca98abd: "Appends a number to the end of each event title (e.g. Event 1, Event 2, etc.)"
   appends_a_number_to_the_end_of_each_event_title_e__e9573bf8: "Appends a number to the end of each event title (e.g. Event 1, Event 2, etc.)\" for=\"append_iterator"
   application: 
@@ -1506,6 +1531,7 @@ en-GB:
   are_you_sure_you_want_to_delete_this_grading_perio_422359cd: "Are you sure you want to delete this grading period?"
   are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: "Are you sure you want to delete this grading scheme?"
   are_you_sure_you_want_to_do_this_it_cannot_be_undo_3379a544: "Are you sure you want to do this? It cannot be undone and will override existing marks in the gradebook."
+  are_you_sure_you_want_to_inactivate_this_user_they_ec265d25: "Are you sure you want to inactivate this user? They will be unable to participate in the course while inactive."
   are_you_sure_you_want_to_remove_this_grading_perio_e3251c09: "Are you certain you want to remove this marking period?"
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "Are you sure you want to remove this tool?"
   are_you_sure_you_want_to_report_this_profile_pictu_e22c2210: "Are you certain you want to report this profile picture?"
@@ -2785,6 +2811,8 @@ en-GB:
         need_integer: "Please enter an integer for the play list cache"
         stream_name_required: "Kinesis stream name is required."
   canvas_alert_change_assignment_name_course_name_2fc63d9c: "Canvas Alert  – Change: %{assignment_name}, %{course_name}"
+  canvas_alert_invited_course_as_role_type_9ed79ce3: "Canvas Alert - Invited: %{course} as %{role_type}"
+  canvas_alert_invited_course_as_role_type_ea825937: "Canvas Alert - Invited: course as %{role_type}"
   canvas_by_instructure_1490381: "Canvas by Instructure"
   canvas_cartridge_description: "This enables converting a canvas export to the intermediary json format to be imported"
   canvas_cartridge_display: "Canvas Common Cartridge"
@@ -2796,6 +2824,7 @@ en-GB:
   canvas_did_not_recognize_your_identity_provider_cb0e50fc: "Canvas did not recognise your identity provider"
   canvas_doesn_t_have_an_account_for_user_user_5bcae0dd: "Canvas does not have an account for user: %{user}"
   canvas_error_report_ff678539: "Canvas Error Report"
+  canvas_introduction_video_2d81f3ad: "Canvas Introduction Video"
   canvas_revision_unknown: Unknown
   canvas_ticketing_email_connector_27e253ae: "Canvas Ticketing Email Connector"
   canvas_ticketing_web_post_connector_11158897: "Canvas Ticketing Web Post Connector"
@@ -2830,6 +2859,7 @@ en-GB:
     titles: 
       update_assignment_points: "Change assignment points to match rubric?"
   changes_will_still_apply_if_you_leave_this_page_935cedc6: "Changes will still apply if you leave this page."
+  chat_2153c6b7: Chat
   child_s_username_dde3aa9: "Child's Username"
   choose_a_color_or_course_nickname_for_course_2585e42c: "Choose a colour or course nickname for %{course}"
   choose_a_course_home_page_8059c7b: "Choose a course home page"
@@ -2848,6 +2878,7 @@ en-GB:
   click_to_report_profile_picture_370f9625: "Click to report profile picture"
   click_to_set_this_answer_as_correct_1326e3fd: "Click to set this answer as correct"
   click_to_test_dropdown_b950974d: "Click to test dropdown"
+  clicking_on_the_column_headers_will_sort_the_rows__3a6e9573: "Clicking on the column headers will sort rows by that column."
   clone_group_set_c2a40e15: "Clone group set"
   close_and_return_to_canvas_80544344: "Close and return to Canvas"
   close_d634289d: Close
@@ -2970,6 +3001,7 @@ en-GB:
   comm_messages: 
     from_beginning: "the beginning"
     to_now: now
+  comment_by_replying_to_this_message_or_join_the_co_26d42fde: "Comment by replying to this message or join the conversation using this link: %{link}."
   comments_e07bcbe3: Comments
   common_cartridge_description: "This enables converting a Common Cartridge packages in the intermediary json format to be imported"
   common_cartridge_display: "Common Cartridge"
@@ -3112,11 +3144,14 @@ en-GB:
   configuration_type_25a084a4: "Configuration Type"
   configure_ecb97e30: Configure
   configure_toolname_app_651371be: "Configure %{toolName} App"
+  confirm_contact_method_29d6fe4b: "Confirm contact method"
   confirm_dialog: 
     cancel: Cancel
     submit: Submit
   confirm_dialog_component: 
     ok: Ok
+  confirmation_code_required_22984955: "Confirmation code (required)"
+  confirmation_failed_please_try_again_ae566d37: "Confirmation failed. Please try again."
   consumer_key_57d9fcf1: "Consumer key"
   consumer_key_6f94ba11: "Consumer key"
   content_exports: 
@@ -4008,6 +4043,7 @@ en-GB:
   course_assignments_833b8cf1: "Course assignments"
   course_atom_feed_9d95214e: "Course Atom Feed"
   course_calendar_7d3cba7b: "Course calendar"
+  course_catalog_4cc7c8ce: "Course Catalogue"
   course_collaborations_dadb327e: "Course collaborations"
   course_conferences_3d914c96: "Course conferences"
   course_content_a92eca20: "Course content"
@@ -4148,6 +4184,7 @@ en-GB:
   course_name_is_required_90919349: "Course name is required"
   course_name_successfully_added_48116a50: "%{course_name} successfully added!"
   course_navigation_dd035109: "Course navigation"
+  course_option_links_a79d263d: "Course option links"
   course_outcomes_7dc1cbc7: "Course outcomes"
   course_pages_449f1dd4: "Course pages"
   course_people_3058c948: "Course people"
@@ -4449,6 +4486,7 @@ en-GB:
       roster_users: 
         canvas_user_id: "Canvas user ID"
         last_activity: "Last Activity"
+        login_name: "Login ID"
         login_name_or_sis_id: "Login / SIS ID"
         name: Name
         no_people_found: "No people found"
@@ -4714,6 +4752,7 @@ en-GB:
       invalid_link: "The enrolment link you used appears to no longer be valid.  Please contact the course instructor and make sure you're still correctly enrolled."
   courses_43204aae: Courses
   create_132b3be1: Create
+  create_assignment_68532ceb: "Create Assignment"
   create_item_base: 
     there_was_an_error: "There was an error saving \"%{title}\", please try again."
   create_module_item: 
@@ -5038,11 +5077,13 @@ en-GB:
   delete_grading_scheme_6b308832: "Delete grading scheme"
   delete_my_account_41060aad: "Delete My Account"
   delete_quiz_142b8099: "Delete quiz"
+  delete_requirement_bce2d943: "Delete requirement"
   delete_selected_a023ccf8: "Delete Selected"
   delete_survey_56fddbbd: "Delete survey"
   delete_this_answer_f1802eaa: "Delete this answer"
   delete_tool_app_9c9f6d35: "Delete %{tool} App?"
   delete_toolname_app_85f9d4ee: "Delete %{toolName} App"
+  deleted_ce03674d: deleted
   deleting_6421031e: deleting...
   delicious_7f9ac66f: Delicious
   demo_sites_require_recaptcha_settings_to_be_config_8bf9c7e3: "Demo sites require Recaptcha settings to be configured. Please see your site admin for this instance of Canvas."
@@ -5162,6 +5203,7 @@ en-GB:
     cancel: Cancel
     save_settings: "Save settings"
     saving: Saving...
+  different_course_b875770e: "different course"
   differentiated_assignments_description: |-
       Differentiated Assignments is a feature that enables choosing to which section(s) or individual student(s) an assignment applies.
       Students who are not given an assignment will not see this feature in their course content, and their final mark will be
@@ -15906,6 +15948,7 @@ en-GB:
   windows_tile_color_2b786bd9: "Windows tile colour"
   windows_tile_square_b91d2b33: "Windows tile: square"
   windows_tile_wide_4d40910: "Windows tile: wide"
+  would_you_like_to_accept_or_dismiss_this_update_9009d696: "Would you like to accept or dismiss this update?"
   would_you_like_to_enable_this_app_ccdf735d: "Would you like to enable this app?"
   would_you_like_to_let_students_continue_in_the_cou_a4c36171: "Would you like to let students continue in the course or do you want to re-lock these modules until the new requirements are completed?"
   xml_configuration_5ea1b942: "XML Configuration"
@@ -15926,10 +15969,18 @@ en-GB:
   you_are_trying_to_launch_insecure_content_from_wit_5c1c692b: "You are trying to launch insecure content from within a secure site (canvas). Some web browsers may prevent this content from loading."
   you_are_unsubscribed_and_will_not_be_notified_of_n_bf4b96a2: "You are unsubscribed and will not be notified of new comments. Click to subscribe"
   you_can_also_manage_access_at_this_time_105a2530: "You can also manage access at this time:"
+  you_can_check_out_other_groups_by_clicking_this_li_1c09e4fb: "You can check out other groups by clicking this link: %{link}"
+  you_can_check_out_the_group_by_clicking_this_link__10fb5deb: "You can check out the group by clicking this link: %{link}."
   you_can_disable_this_feature_d5e61373: "You can disable this feature"
   you_can_hide_or_show_a_course_s_assignments_by_tog_ec8bdb8e: "You can hide or show a course’s assignments by toggling them on or off."
   you_can_log_in_directly_with_this_provider_by_goin_467d7f66: "You can log in directly with this provider by going to %{url}"
   you_can_now_set_regrade_options_for_students_who_h_c1ceb1c4: "You can now set regrade options for students who have already taken the quiz."
+  you_can_reply_to_this_comment_by_responding_to_thi_3d130e8c: "You can reply to this comment by responding to this message or review the submission details using this link: %{link}."
+  you_can_reply_to_this_message_in_canvas_by_replyin_fa33638d: "You can reply to this message in Canvas by replying directly to this email or by clicking this link: %{link}."
+  you_can_review_the_submission_details_by_clicking__9abc5515: "You can review the submission details by clicking this link: %{link}."
+  you_can_see_details_for_this_group_by_clicking_thi_acaf07e5: "You can see details for this group by clicking this link: %{link}."
+  you_can_see_which_groups_you_re_a_part_of_for_this_6efda22c: "You can see which groups you are part of for this account by clicking this link: %{link}."
+  you_can_see_which_groups_you_re_a_part_of_for_this_827a3706: "You can see which groups you are part of for this course by clicking this link: %{link}."
   you_can_t_delete_a_sub_account_that_has_courses_in_c4f439cf: "You cannot delete a sub-account that has courses in it."
   you_can_try_to_log_in_again_2b23ef0f: "You may try to *log in again*."
   you_can_use_a_single_16x16_32x32_48x48_ico_file_85da88b5: "You can use a single 16x16, 32x32, 48x48 ico file."
@@ -15947,7 +15998,9 @@ en-GB:
   you_have_submitted_the_assignment_7ef8a51a: "You have submitted the assignment"
   you_ll_definitely_want_some_of_these_what_s_the_fu_f4f3578b: "You'll definitely want some of these.  What's the fun of teaching a course if nobody's even listening?"
   you_ll_need_a_refresh_token_follow_the_steps_at_th_79a3984b: "You will need a refresh token; follow the steps at this link; you might want a technical expert to help"
+  you_may_not_see_all_comments_right_now_because_the_96cf2051: "You might not see all comments right now because the assignment is currently being marked."
   you_may_want_to_assign_some_tas_to_help_you_with_t_702244aa: "You may want to assign some TAs to help you with the course.  TAs can grade student submissions, help moderate the discussions and even update due dates and assignment details for you."
+  you_must_agree_to_the_terms_99723f97: "You must agree to the terms."
   you_must_log_in_to_view_replies_9ccd4da0: "You must log in to view replies"
   you_must_select_a_course_to_copy_content_from_e7bd9e09: "You must select a course to copy content from"
   you_must_set_it_to_a_number_greater_than_or_equal__eb1d9275: "You must set it to a number greater than or equal to %{min}"
@@ -15958,6 +16011,14 @@ en-GB:
   you_re_editing_your_canvas_theme_the_changes_have__c0ae1bd1: "You are editing your Canvas theme. Your changes have not yet been applied."
   you_scored_a_score_a5dd5561: "You scored a %{score}."
   you_scored_d3e00111: "You scored"
+  you_ve_been_enrolled_in_the_course_course_course_r_2b2f00f9: "You have been enrolled in the course, %{course}. Course role: %{role_type}"
+  you_ve_been_given_an_account_role_for_the_account__18e0ef38: "You have been given an account role for the %{account} account at %{website}. Role type: %{role_type}."
+  you_ve_been_invited_to_course_course_role_role_typ_b8ab8f22: "You have been invited to %{course}. Course role: %{role_type}"
+  you_ve_been_invited_to_participate_in_a_class_at_w_b87cd481: "You have been invited to participate in a class at %{website}. The class is called %{course}. Course role: %{role_type}"
+  you_ve_been_invited_to_participate_in_the_course_c_a8d1f6a8: "You have been invited to participate in the course, %{course}. Course role: %{role_type}"
+  you_ve_been_invited_to_peer_review_reviewee_82580fb: "You have been invited to peer review %{reviewee}."
+  you_ve_been_invited_to_peer_review_reviewee_follow_2e71fce2: "You have been invited to peer review %{reviewee}. Follow this link to review them: %{link}."
+  you_ve_been_invited_to_the_course_course_course_ro_a74d748b: "You have been invited to the course, %{course}. Course role: %{role_type}"
   you_will_be_redirected_to_a_login_page_where_you_w_fc8df402: "You will be redirected to a Log-in page where you must log in with your child's credentials."
   you_will_need_to_create_a_new_app_on_facebook_face_8fe85297: |-
       You will need to create a [new app on Facebook](%{facebook_url}), and enable Client OAuth Login
