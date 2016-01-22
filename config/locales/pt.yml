@@ -13407,6 +13407,9 @@ pt:
   saving_recording_e111cb05: "Guardando Gravações..."
   schedule_student_availability_332154a: "Agendar disponibilidade de alunos"
   school_of_rock_4b7b1fd0: "School of Rock"
+  score_does_not_include_groups_because_they_have_no_80d12f42: 
+    one: "A pontuação não inclui %{groups} porque não têm pontos possíveis"
+    other: "A pontuação não inclui %{groups} porque não têm pontos possíveis"
   score_does_not_include_groups_becuase_they_have_no_ee031bff: 
     one: "A pontuação não inclui %{groups} porque não têm pontos possíveis"
     other: "A pontuação não inclui %{groups} porque não têm pontos possíveis"
@@ -15361,6 +15364,7 @@ pt:
   unlock_date_cannot_be_before_term_start_d3c01813: "A data de desbloqueio não pode ser anterior ao início do período"
   unlock_module_on_date_17144fbd: "Desbloquear módulo na data"
   unmute_assignment_29a49038: "Dessilenciar tarefa"
+  unnamed_account_id_e688ad87: "Conta sem nome (%{id})"
   unprocessable_entity: "entidade sem processamento"
   unprocessable_entity_message: "ID assinada para a reunião inválida"
   unpublish_9f2d730b: "Anular publicação"
@@ -15380,6 +15384,7 @@ pt:
   unused_courses_title: "Disciplinas não utilizadas"
   up_c553575d: "Para cima"
   update_4d8ee62: Atualizar
+  update_tool_7d48ef2a: "Atualizar %{tool}"
   updated_group_group_name_727b1d98: "Atualizou o grupo %{group_name}"
   updated_ui_for_searching_and_displaying_users_and__6755e08e: "UI atualizado para pesquisar e apresentar utilizadores e disciplinas dentro de uma conta."
   updating_6edbab78: Atualizando
@@ -15404,6 +15409,8 @@ pt:
   use_default_890939b7: "Utilizar predefinição"
   use_new_folder_tree_in_files_bc0ea09f: "Utilizar Nova Árvore de Pastas no Ficheiro"
   use_new_folder_tree_in_files_eb5a451b: "Utilizar novo esquema de pasta nos Ficheiros"
+  use_remote_service_for_notifications_9fe667c6: "Utilize o serviço remoto para notificações"
+  use_remote_version_of_rich_content_editor_52f7fc4b: "Utilize a versão remota do Editor de Conteúdo Complexo"
   use_the_new_quiz_lti_tool_in_place_of_regular_canv_d7cb0c7f: "Utilizar a nova ferramenta de teste LTI em substituição dos testes canvas frequentes"
   use_this_configuration_for_parent_observer_registr_e49f8f66: "Utilizar esta configuração para registo de pais/observadores"
   used_by_permission_314a78dd: "Utilizado com permissão"
@@ -15419,12 +15426,18 @@ pt:
     registration: 
       agree_to_terms_with_code_of_conduct: "Aceita os *termos de uso* e o **código de conduta**."
   user_696f4d6a: utilizador
+  user_accepted_their_invitation_for_the_course_cour_5eaa1357: "%{user} aceitou o seu convite para a disciplina, %{course}. Função na disciplina: %{role_type}"
+  user_access_tokens_title: "Token de Acesso do utilizador"
   user_avatars_e4fc4ed3: "Avatars do utilizador"
+  user_content_aaf0fb5a: "Conteúdo do Utilizador"
   user_count_respondents_e30a8593: "%{user_count} respostas"
   user_date_range_search: 
     cant_be_blank: "O ID de utilizador Canvas não pode ficar em branco"
     cant_come_before_from: "'Até à data' não pode ser anterior a 'Da data'"
     results_found: "%{length} resultados encontrados"
+  user_id_or_sis_id_sis_id_should_be_prepended_with__980ff02b: "ID do utilizador ou  ID SIS (a ID SIS ID deve ser identificada com sis_user_id:)"
+  user_id_user_id_69a9e865: "ID do utilizador: %{user_id}"
+  user_just_accepted_their_invitation_to_participate_7a4b2ce4: "%{user} acabou de aceitar seu convite para participar na disciplina, %{course}. Função na disciplina: %{role_type}"
   user_lists: 
     add_n_users: 
       one: "Parece estar tudo bem, adicionar este utilizador"
