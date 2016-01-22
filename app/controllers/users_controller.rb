@@ -98,6 +98,11 @@ require 'atom'
 #           "description": "DEPRECATED: The SIS login ID associated with the user. Please use the sis_user_id or login_id. This field will be removed in a future version of the API.",
 #           "type": "string"
 #         },
+#         "integration_id": {
+#           "description": "The integration_id associated with the user.  This field is only included if the user came from a SIS import and has permissions to view SIS information.",
+#           "example": "ABC59802",
+#           "type": "string"
+#         },
 #         "login_id": {
 #           "description": "The unique login id for the user.  This is what the user uses to log in to Canvas.",
 #           "example": "sheldon@caltech.example.com",
@@ -1149,6 +1154,11 @@ class UsersController < ApplicationController
   #   SIS ID for the user's account. To set this parameter, the caller must be
   #   able to manage SIS permissions.
   #
+  # @argument pseudonym[integration_id] [String]
+  #   Integration ID for the login. To set this parameter, the caller must be able to
+  #   manage SIS permissions. The Integration ID is a secondary
+  #   identifier useful for more complex SIS integrations.
+  #
   # @argument pseudonym[send_confirmation] [Boolean]
   #   Send user notification of account creation if true.
   #   Automatically set to true during self-registration.
@@ -2012,10 +2022,12 @@ class UsersController < ApplicationController
     # Look for an incomplete registration with this pseudonym
 
     sis_user_id = nil
+    integration_id = nil
     params[:pseudonym] ||= {}
 
     if @context.grants_right?(@current_user, session, :manage_sis)
       sis_user_id = params[:pseudonym].delete(:sis_user_id)
+      integration_id = params[:pseudonym].delete(:integration_id)
     end
 
     @pseudonym = nil
@@ -2141,6 +2153,7 @@ class UsersController < ApplicationController
     end
     @pseudonym.attributes = params[:pseudonym]
     @pseudonym.sis_user_id = sis_user_id
+    @pseudonym.integration_id = integration_id
 
     @pseudonym.account = @context
     @pseudonym.workflow_state = 'active'

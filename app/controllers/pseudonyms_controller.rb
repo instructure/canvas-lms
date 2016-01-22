@@ -180,6 +180,11 @@ class PseudonymsController < ApplicationController
   #   SIS ID for the login. To set this parameter, the caller must be able to
   #   manage SIS permissions on the account.
   #
+  # @argument login[integration_id] [String]
+  #   Integration ID for the login. To set this parameter, the caller must be able to
+  #   manage SIS permissions on the account. The Integration ID is a secondary
+  #   identifier useful for more complex SIS integrations.
+  #
   # @argument login[authentication_provider_id] [String]
   #   The authentication provider this login is associated with. Logins
   #   associated with a specific provider can only be used with that provider.
@@ -262,6 +267,12 @@ class PseudonymsController < ApplicationController
   # @argument login[sis_user_id] [String]
   #   SIS ID for the login. To set this parameter, the caller must be able to
   #   manage SIS permissions on the account.
+  #
+  # @argument login[integration_id] [String]
+  #   Integration ID for the login. To set this parameter, the caller must be able to
+  #   manage SIS permissions on the account. The Integration ID is a secondary
+  #   identifier useful for more complex SIS integrations.
+
   def update
     if api_request?
       @pseudonym          = Pseudonym.active.find(params[:id])
@@ -344,7 +355,7 @@ class PseudonymsController < ApplicationController
 
   def update_pseudonym_from_params
     # you have to at least attempt something recognized...
-    if params[:pseudonym].slice(:unique_id, :password, :sis_user_id, :authentication_provider).blank?
+    if params[:pseudonym].slice(:unique_id, :password, :sis_user_id, :authentication_provider, :integration_id).blank?
       render json: nil, status: :bad_request
       return false
     end
@@ -365,6 +376,11 @@ class PseudonymsController < ApplicationController
     has_right_if_requests_change(:sis_user_id, :manage_sis) do
       # convert "" -> nil for sis_user_id
       @pseudonym.sis_user_id = params[:pseudonym][:sis_user_id].presence
+    end or return false
+
+    has_right_if_requests_change(:integration_id, :manage_sis) do
+      # convert "" -> nil for integration_id
+      @pseudonym.integration_id = params[:pseudonym][:integration_id].presence
     end or return false
 
     # give a 400 instead of a 401 if it doesn't make sense to change the password

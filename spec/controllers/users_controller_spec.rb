@@ -673,12 +673,13 @@ describe UsersController do
         end
 
         it "should create users with non-email pseudonyms" do
-          post 'create', format: 'json', account_id: account.id, pseudonym: { unique_id: 'jacob', sis_user_id: 'testsisid', path: '' }, user: { name: 'Jacob Fugal' }
+          post 'create', format: 'json', account_id: account.id, pseudonym: { unique_id: 'jacob', sis_user_id: 'testsisid', integration_id: 'abc', path: '' }, user: { name: 'Jacob Fugal' }
           expect(response).to be_success
           p = Pseudonym.where(unique_id: 'jacob').first
           expect(p.account_id).to eq account.id
           expect(p).to be_active
           expect(p.sis_user_id).to eq 'testsisid'
+          expect(p.integration_id).to eq 'abc'
           expect(p.user).to be_pre_registered
         end
 
