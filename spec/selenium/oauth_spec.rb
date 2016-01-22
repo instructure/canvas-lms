@@ -42,14 +42,8 @@ describe "oauth2 flow" do
       end
 
       it "should show the confirmation dialog after logging in" do
-        destroy_session(true)
         get "/login/oauth2/auth?response_type=code&client_id=#{@client_id}&redirect_uri=urn:ietf:wg:oauth:2.0:oob"
         oauth_login_fill_out_form
-        unless f('#modal-box').text =~ %r{Specs is requesting access to your account}
-          #retry once with refreshed page in case of bad session/auth token
-          refresh_page
-          oauth_login_fill_out_form
-        end
         expect(f('#modal-box').text).to match(%r{Specs is requesting access to your account})
         expect_new_page_load { f('#modal-box .btn-primary').click() }
         expect(driver.current_url).to match(%r{/login/oauth2/auth\?})

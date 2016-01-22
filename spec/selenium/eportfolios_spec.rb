@@ -182,7 +182,7 @@ describe "eportfolios" do
     end
 
     it "should be viewable with a shared link" do
-      destroy_session false
+      destroy_session
       get "/eportfolios/#{@eportfolio.id}?verifier=#{@eportfolio.uuid}"
       expect(f('#content h2').text).to eq "page"
     end

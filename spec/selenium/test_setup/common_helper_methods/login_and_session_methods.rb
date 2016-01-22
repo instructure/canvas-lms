@@ -1,36 +1,15 @@
 module LoginAndSessionMethods
-  alias_method :login, :login_as
-
-  def create_session(pseudonym, real_login = false)
-    if real_login
-      login_as(pseudonym.unique_id, pseudonym.password)
-    else
-      PseudonymSession.any_instance.stubs(:session_credentials).returns([])
-      PseudonymSession.any_instance.stubs(:record).returns { pseudonym.reload }
-      # PseudonymSession.stubs(:find).returns(@pseudonym_session)
-    end
+  def create_session(pseudonym)
+    PseudonymSession.any_instance.stubs(:record).returns { pseudonym.reload }
   end
 
-  def destroy_session(real_login)
-    if real_login
-      logout_link = f('#identity .logout a')
-      if logout_link
-        if logout_link.displayed?
-          expect_new_page_load(:accept_alert) { logout_link.click() }
-        else
-          get '/'
-          destroy_session(true)
-        end
-      end
-    else
-      PseudonymSession.any_instance.unstub :session_credentials
-      PseudonymSession.any_instance.unstub :record
-    end
+  def destroy_session
+    PseudonymSession.any_instance.unstub :record
   end
 
   def user_logged_in(opts={})
     user_with_pseudonym({:active_user => true}.merge(opts))
-    create_session(@pseudonym, opts[:real_login] || $in_proc_webserver_shutdown.nil?)
+    create_session(@pseudonym)
   end
 
   def course_with_teacher_logged_in(opts={})
@@ -89,20 +68,16 @@ module LoginAndSessionMethods
     password_element.submit
   end
 
-  def login_as(username = "nobody@example.com", password = "asdfasdf", expect_success = true)
-    destroy_session(true)
-    get "/login"
-    if expect_success
-      expect_new_page_load { fill_in_login_form(username, password) }
-      unless f('#identity .logout').present?
-        # perform one retry with a refresh'd page in case of a session/auth-token problem
-        refresh_page
-        expect_new_page_load { fill_in_login_form(username, password) }
-        expect(f('#identity .logout')).to be_present
-      end
-    else
-      fill_in_login_form(username, password)
+  # don't use this unless you are actually testing the login/logout
+  # process; instead prefer create_session or the various *_logged_in
+  # methods above
+  def login_as(username = "nobody@example.com", password = "asdfasdf")
+    if Onceler.open_transactions > 0
+      raise "don't use real logins with once-ler, since a session cookie could be valid across specs if the pseudonym is shared"
     end
+    get "/login"
+    expect_new_page_load { fill_in_login_form(username, password) }
+    expect(f('#identity .logout')).to be_present
   end
 
   def masquerade_as(user)

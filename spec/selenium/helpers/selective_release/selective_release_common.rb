@@ -7,10 +7,6 @@ shared_context 'selective release' do
 
   before(:once) { SelectiveRelease.initialize }
 
-  def login_as(user)
-    user_session(user)
-  end
-
   def go_to(url)
     get url
   end

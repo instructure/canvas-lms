@@ -9,15 +9,6 @@ describe "login logout test" do
     expect(driver.execute_script("return $('#flash_screenreader_holder').text()")).to eq message_text
   end
 
-  def verify_logout
-    expected_url = app_host + "/login/canvas"
-    user_with_pseudonym({:active_user => true})
-    login_as
-    expect_new_page_load { f('.logout a').click }
-    expect(driver.current_url).to eq expected_url
-    expected_url
-  end
-
   def go_to_forgot_password
     get "/"
     f('#login_forgot_password').click
@@ -34,30 +25,34 @@ describe "login logout test" do
   end
 
   it "should show error message if wrong credentials are used", priority: "2" do
-    login_as("fake@user.com", "fakepass", false)
+    get "/login"
+    fill_in_login_form("fake@user.com", "fakepass")
     assert_flash_error_message /Incorrect username/
   end
 
   it "should show invalid password message if password is nil", priority: "2" do
     expected_error = "Invalid password"
-    login_as("fake@user.com", nil, false)
+    get "/login"
+    fill_in_login_form("fake@user.com", nil)
     should_show_message(expected_error, @login_error_box_css)
   end
 
   it "should show invalid login message if username is nil", priority: "2" do
     expected_error = "Invalid login"
-    login_as(nil, "123", false)
+    get "/login"
+    fill_in_login_form(nil, "123")
     should_show_message(expected_error, @login_error_box_css)
   end
 
   it "should should invalid login message if both username and password are nil", priority: "2" do
     expected_error = "Invalid login"
-    login_as(nil, nil, false)
+    get "/login"
+    fill_in_login_form(nil, nil)
     should_show_message(expected_error, @login_error_box_css)
   end
 
   it "should prompt must be logged in message when accessing permission based pages while not logged in", priority: "2" do
-    expected_url = verify_logout
+    expected_url = app_host + "/login/canvas"
     get "/grades"
     assert_flash_warning_message /You must be logged in to access this page/
     expect(driver.current_url).to eq expected_url
@@ -81,8 +76,7 @@ describe "login logout test" do
   it "should fail on an invalid authenticity token", priority: "1" do
     begin
       user_with_pseudonym({:active_user => true})
-      destroy_session(true)
-      driver.navigate.to(app_host + '/login')
+      get "/login"
       driver.execute_script "$.cookie('_csrf_token', '42')"
       fill_in_login_form("nobody@example.com", 'asdfasdf')
       assert_flash_error_message /Invalid Authenticity Token/
@@ -94,8 +88,7 @@ describe "login logout test" do
   it "should login when a trusted referer exists", priority: "2" do
     Account.any_instance.stubs(:trusted_referer?).returns(true)
     user_with_pseudonym(active_user: true)
-    destroy_session(true)
-    driver.navigate.to(app_host + '/login')
+    get "/login"
     driver.execute_script "$.cookie('_csrf_token', '', { expires: -1 })"
     driver.execute_script "$('[name=authenticity_token]').remove()"
     fill_in_login_form("nobody@example.com", 'asdfasdf')
