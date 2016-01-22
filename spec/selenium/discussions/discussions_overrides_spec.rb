@@ -117,7 +117,7 @@ describe "discussions overrides" do
         expect(f('.coming_up .event a').text).to eq("#{@discussion_topic.title}\nMultiple Due Dates")
         course_with_admin_logged_in(course: @course)
         get ""
-        expect(f('.coming_up .event a').text).to eq("#{@discussion_topic.title}\nMultiple Due Dates")
+        expect(f('.coming_up .event a').text).to eq("#{@discussion_topic.title}\n#{course.name}\nMultiple Due Dates")
       end
     end
   end
