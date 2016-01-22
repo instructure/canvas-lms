@@ -23,7 +23,7 @@ ul.instTree {
     &.separator {
       min-height: 2px;
       line-height: 2px;
-      font-size: 2px;
+      @include fontSize(12px);
     }
     &.node {
       background-image: url("/images/mimeClassIcons/folder.svg");
