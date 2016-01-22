@@ -24,5 +24,10 @@ describe Canvas::Plugin do
       expect(Canvas::Plugin.value_to_boolean('0')).to eq false
       expect(Canvas::Plugin.value_to_boolean('1')).to eq true
     end
+
+    it "accepts t/f" do
+      expect(Canvas::Plugin.value_to_boolean('f')).to eq false
+      expect(Canvas::Plugin.value_to_boolean('t')).to eq true
+    end
   end
 end

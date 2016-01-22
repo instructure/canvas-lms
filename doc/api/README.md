@@ -17,6 +17,8 @@ All API responses are in <a href="http://www.json.org/">JSON format</a>.
 
 All integer ids in Canvas are 64 bit integers.
 
+All boolean parameters can be passed as true/false, t/f, yes/no, y/n, on/off, or 1/0. When using JSON format, a literal true/false is preferred, rather than as a string.
+
 For POST and PUT requests, parameters are sent using standard
 <a href="http://www.w3.org/TR/html4/interact/forms.html#h-17.13.4">HTML form
 encoding</a> (the application/x-www-form-urlencoded content type).
@@ -26,13 +28,13 @@ POST and PUT requests may also optionally be sent in <a href="http://www.json.or
 As an example, this HTML form request:
 
 ```bash
-name=test+name&file_ids[]=1&file_ids[]=2&sub[name]=foo&sub[message]=bar
+name=test+name&file_ids[]=1&file_ids[]=2&sub[name]=foo&sub[message]=bar&flag=y
 ```
 
 would translate into this JSON request:
 
 ```json
-{ "name": "test name", "file_ids": [1,2], "sub": { "name": "foo", "message": "bar" } }
+{ "name": "test name", "file_ids": [1,2], "sub": { "name": "foo", "message": "bar" }, "flag": true }
 ```
 
 With either encoding, all timestamps are sent and returned in ISO 8601 format (UTC time zone):
