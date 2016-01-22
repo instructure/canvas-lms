@@ -587,10 +587,3 @@ h1, h2, h3, h4, .h1, .h2, .h3, .h4, p {
 .icon-x:before { content: "\f1b1"; }
 .icon-zipped:before { content: "\f1b2"; }
 
-// deprecated in favor of .screenreader-only, which is meant to be usable anywhere
-span.screen-reader-text {
-  position: absolute;
-  top: -9999px;
-  left: -9999px;
-  font-size: 4px;
-}

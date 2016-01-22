@@ -402,10 +402,3 @@ h1, h2, h3, h4, .h1, .h2, .h3, .h4, p {
 
 <%= glyphs %>
 
-// deprecated in favor of .screenreader-only, which is meant to be usable anywhere
-span.screen-reader-text {
-  position: absolute;
-  top: -9999px;
-  left: -9999px;
-  font-size: 4px;
-}
