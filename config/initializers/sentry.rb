@@ -13,6 +13,7 @@ if settings.present?
     config.silence_ready = true
     config.dsn = settings[:dsn]
     config.tags = settings.fetch(:tags, {}).merge('canvas_revision' => Canvas.revision)
+    config.release = Canvas.revision
     config.sanitize_fields += Rails.application.config.filter_parameters.map(&:to_s)
     config.sanitize_credit_cards = false
     config.excluded_exceptions += %w{
