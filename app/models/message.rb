@@ -31,6 +31,8 @@ class Message < ActiveRecord::Base
 
   extend TextHelper
 
+  MAX_TWITTER_MESSAGE_LENGTH = 140
+
 
   # Associations
   belongs_to :asset_context, :polymorphic => true
@@ -615,6 +617,11 @@ class Message < ActiveRecord::Base
       Mailer.create_message(self).to_s
     when "push"
       sns_json
+    when "twitter"
+      url = self.main_link || self.url
+      message_length = MAX_TWITTER_MESSAGE_LENGTH - url.length - 1
+      truncated_body = HtmlTextHelper.strip_and_truncate(body, max_length: message_length)
+      "#{truncated_body} #{url}"
     else
       body
     end
@@ -624,8 +631,16 @@ class Message < ActiveRecord::Base
   #
   # Returns the targets in which to send the notification to
   def notification_targets
-    if path_type == "push"
+    case path_type
+    when "push"
       self.user.notification_endpoints.map(&:arn)
+    when "twitter"
+      twitter_service = user.user_services.where(service: 'twitter').first
+      [
+        "access_token"=> twitter_service.token,
+        "access_token_secret"=> twitter_service.secret,
+        "user_id"=> twitter_service.service_user_id
+      ]
     else
       [to]
     end

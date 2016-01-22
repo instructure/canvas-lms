@@ -42,6 +42,7 @@ describe NotificationService do
       expect{@message.deliver}.not_to raise_error
     end
     it "processes twitter message type" do
+      @user.user_services.create!(service: 'twitter', service_user_name: 'user', service_user_id: 'user', visible: true)
       @queue.expects(:send_message).once
       @message.path_type = "twitter"
       expect{@message.deliver}.not_to raise_error
