@@ -453,14 +453,21 @@ TEXT
                   <% hash = @account.sis_default_grade_export %>
                   <% disabled = hash[:locked] && hash[:inherited] %>
                   <tr>
-                    <td colspan="2"><%= r.check_box :value, :checked => hash[:value], :disabled => disabled %>
-                      <%= r.label :sis_default_grade_export, :en => "\"Post Grades to SIS\" checkbox is enabled by default for assignments, graded discussions, and quizzes" %>
-                    </td>
+                    <td colspan="2">
+                      <div class="ic-Checkbox-group">
+                        <div class="ic-Form-control ic-Form-control--checkbox">
+                          <%= r.check_box :value, :checked => hash[:value], :disabled => disabled %>
+                          <label class="ic-Label" for="account_settings_sis_default_grade_export_value" />
+                          <%= t("\"Post Grades to SIS\" checkbox is enabled by default for assignments, graded discussions, and quizzes") %>
+                        </label>
+                      </div>
+                    </div>
+                  </td>
                   </tr>
                   <% unless disabled %>
                     <tr>
                       <td colspan="2" class="sub_checkbox">
-                        <%= r.check_box :locked, :checked => hash[:locked] %>
+                        <%= r.check_box :locked, :checked => hash[:locked], :id => "account_settings_sis_default_grade_export_locked_for_sub_accounts" %>
                         <%= r.label :locked_for_sub_accounts, :en => "Lock this setting for sub-accounts" %>
                       </td>
                     </tr>
