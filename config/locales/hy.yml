@@ -68,9 +68,9 @@ hy:
   accepted_formats_svg_png_jpg_gif_f793e4bc: "Ընդունելի ձեւաչափեր․ svg, png, jpg, gif"
   accepted_user_role_type_course_course_2ce91589: "Ընդունված. %{user}, %{role_type}, դասընթաց, %{course}"
   access_token_is_valid_until_d2f048cf: "Մուտքի token-ը ուժի մեջ է մինչև"
-  accordion_section_1_7888782d: "Accordion Բաժին 1"
-  accordion_section_2_e1812997: "Accordion Բաժին 2"
-  accordion_section_3_96861901: "Accordion Բաժին 3"
+  accordion_section_1_7888782d: "Accordion բաժին 1"
+  accordion_section_2_e1812997: "Accordion բաժին 2"
+  accordion_section_3_96861901: "Accordion բաժին 3"
   account: 
     ask_canvas_network: "Հարցնել Canvas-ի ցանցի օգտատերերին "
     default_account_name: "Հաշվի՝ լռելյայն ընդունված անվանումը "
@@ -82,8 +82,8 @@ hy:
     feedback_coach_sub: "Օգնություն ստանալ Canvas-ի փորձագետից "
     feedback_feature_request_sub: "Ունե՞ք գաղափարներ Canvas համակարգը կատարելագործելու համար"
     manually_created_courses: "Մեխանիկական եղանակով ստեղծված դասընթացներ"
-    root_account_cant_have_sis_id: "Հասանելիության առավելագույն իրավունքներով հաշիվների վրա հնարավոր չէ տեղադրել SIS նույնականացուցիչներ"
-    sis_id_in_use: "SIS նույնականացուցիչը %{sis_id} արդեն իսկ գործածվում է"
+    root_account_cant_have_sis_id: "Հասանելիության առավելագույն իրավունքներով հաշիվների վրա հնարավոր չէ տեղադրել SIS  ID-ներ"
+    sis_id_in_use: "%{sis_id} SIS ID-ն արդեն իսկ գործածվում է"
     tab_admin_tools: "Ադմինիստրատորի գործիքները"
     tab_authentication: "Իսկության հաստատում"
     tab_courses: Դասընթացներ
@@ -95,7 +95,7 @@ hy:
     tab_permissions: Թույլտվություններ
     tab_plugins: "Միացվող մոդուլներ"
     tab_question_banks: "Հարցերի շտեմարաններ"
-    tab_rubrics: Բաժիններ
+    tab_rubrics: Ռուբրիկներ
     tab_settings: Կարգաբերումներ
     tab_sis_import: "SIS ներմուծում"
     tab_statistics: Վիճակագրություն
@@ -265,7 +265,7 @@ hy:
     report_header_course_id: "դասընթացի նույնականացուցիչ"
     report_header_course_name: "դասընթացի անվանում"
     report_header_course_sis: "դասընթացի SIS"
-    report_header_course_sis_id: "դասընթացի SIS նույնականացուցիչ"
+    report_header_course_sis_id: "դասընթացի sis id"
     report_header_created_at: "Ստեղծվել է"
     report_header_current_score: "Ընթացիկ գնահատականը"
     report_header_email: Էլ.փոստ
@@ -298,10 +298,10 @@ hy:
     report_header_section_id: "բաժնի նույնականացուցիչ"
     report_header_section_name: "բաժնի անվանում"
     report_header_section_sis: "բաժնի sis"
-    report_header_section_sis_id: "sis բաժնի նույնականացուցիչ"
+    report_header_section_sis_id: "sis բաժնի id"
     report_header_short__name: short_name
     report_header_short_name: "կարճ անուն"
-    report_header_sis_id: "sis նույնականացուցիչ"
+    report_header_sis_id: "sis id"
     report_header_sortable_name: sortable_name
     report_header_start__date: start_date
     report_header_start_date: "սկզբի ամսաթիվ"
@@ -309,19 +309,19 @@ hy:
     report_header_student_id: "ունկնդրի նույնականացուցիչ"
     report_header_student_name: "ունկնդրի անուն"
     report_header_student_sis: "ունկնդրի sis"
-    report_header_student_sis_id: "ունկնդրի sis նույնականացուցիչ"
+    report_header_student_sis_id: "ունկնդրի sis  id"
     report_header_submission_date: "ներկայացման ամսաթիվ"
     report_header_submission_score: "ներկայացման գնահատական"
     report_header_term: սեմեստր
     report_header_term__id: term_id
     report_header_term_id: "սեմեստրի նույնականացուցիչ"
-    report_header_term_sis: "սեմեստրի sis"
+    report_header_term_sis: "ժամանակահատվածի sis"
     report_header_token_last_used: "Օգտագործվել է վերջին անգամ"
     report_header_user__id: օգտատիրոջ_նույնականացուցիչ
     report_header_user_id: "օգտատիրոջ նույնականացուցիչ"
     report_header_user_name: "օգտատիրոջ անուն"
     report_header_user_short_name: short_name
-    report_header_user_sis_id: "sis օգտատիրոջ նույնականացուցիչ"
+    report_header_user_sis_id: "օգտատիրոջ sis id"
     report_header_xlist_course_id: xlist_course_id
     sis_exporter: 
       reports: "Հաշվետվություններ %{files}"
@@ -378,7 +378,7 @@ hy:
         path: Էլ.փոստ
         send_confirmation: "Էլ.փոստի միջոցով օգտատիրոջը տեղեկացնել այս հաշվի ստեղծման մասին:"
         short_name: "Ցույց տալ անունը"
-        sis_user_id: "Համակարգի ID"
+        sis_user_id: "SIS ID"
         sortable_name: "Սորտավորվող անուն"
       sortable_name_help: "Այս անունն օգտագործվելու է տեսակավորված ցանկերում"
       unique_id_label_1: "%{label}:"
@@ -591,7 +591,7 @@ hy:
         other: "%{count} ավելի"
       none: Չկա
       settings_link: Կարգաբերումներ
-      sis_id_label: "Համակարգի ID"
+      sis_id_label: "SIS ID"
       statistics_link: Վիճակագրություն
       student_count: 
         one: "1 ուսանող"
@@ -681,7 +681,7 @@ hy:
         samuel_merrit_university: 
           course: 
             sis: 
-              text: "Համակարգի դասընթացի ID"
+              text: "Դասընթացի SIS ID"
             text: "Դասընթացի նույնականացուցիչ"
           parameters: 
             note1: "Դասընթացի նույնականացուցչի դաշտը  կարելի է դատարկ թողնել սեմեստրում բոլոր դասընթացների հաշվետվությունը կազմելու նպատակով: "
@@ -725,7 +725,7 @@ hy:
       account_reports: 
         default: 
           public_courses: 
-            text: "Այս հաշվետվության մեջ ցույց են տրվում բոլոր հասանելի դասընթացները, որոնք տվյալ սեմեստրում չեն հանվել: Վերջնական csv ֆայլում մեկ տող է հատկացվում մի դասընթացին և ցույց է տրվում դասընթացի նույնականացուցիչը, sis դասընթացի նույնականացուցիչը, դասընթացի կարճ անվանումը, դասընթացի անվանումը, դասընթացը սկսելու և ավարտելու ամսաթվերը: "
+            text: "Այս հաշվետվության մեջ ցույց են տրվում բոլոր հասանելի դասընթացները, որոնք տվյալ սեմեստրում չեն հանվել: Վերջնական csv ֆայլում մեկ տող է հատկացվում մի դասընթացին և ցույց է տրվում դասընթացի id-ն, դասընթացի sis id-ն, դասընթացի կարճ անվանումը, դասընթացի անվանումը, դասընթացը սկսելու և ավարտելու ամսաթվերը: "
     quota_integer_required: "Պահանջվում է մուտքագրել ամբողջ թիվ"
     quota_must_be_positive: "Պետք է դրական մեծություն լինի"
     quota_not_updated: "Քվոտան չի թարմացվել"
@@ -842,7 +842,7 @@ hy:
         admins_can_view_notifications: "Ադմինիստրատորները կարող են դիտել ծանուցումները"
         allow_invitation_previews: "Հրավերների նախնական դիտում"
         allow_sending_scores_in_emails: "Ունկնդիրները կարող են ընտրել ծանուցումները էլ.փոստով ստանալու տարբերակը"
-        allow_sis_import: "SIS ներմուծում"
+        allow_sis_import: "SIS ներմուծումներ"
         author_email_in_notifications: "Ցույց տալ ուղարկողի էլ.փոստի հասցեն օգտատերերի փոխգործողությունների մասին ծանուցումների ուղարկման համար "
         canvas_authentication: "Canvas-ի իսկության հաստատում"
         default_language: "Լռությամբ ընդունված լեզուն "
@@ -888,9 +888,9 @@ hy:
         self_registration_type_observer: "Միայն դիտորդի հաշիվները"
         show_scheduler: "Միացնել \"Պլանավորիչը\""
         sis_app_token: "SIS գործակալի token"
-        sis_app_url: "SIS հավելված URL"
+        sis_app_url: "SIS App URL"
         sis_default_grade_export: "\"Տեղադրել գնահատականները SIS համակարգում\" սյունակը լռելյայն միացված չէ հանձնարարությունների, գնահատվող քննարկումների եւ թեստերի համար"
-        sis_source_id: "Համակարգի ID"
+        sis_source_id: "SIS ID"
         start_at: Սկիզբ
         students_can_create_courses: Ունկնդիրներ
         sub_account_includes: "Թույլ տվեք ենթահաշիվներին որոշել լրացուցիչ միացումները"
@@ -1029,14 +1029,14 @@ hy:
           sections: 
             check_box: "Բաժինների CSV ֆայլ"
           terms: 
-            check_box: "Սեմեստրի CSV ֆայլ"
+            check_box: "Ժամանակահատվածի CSV ֆայլ"
           users: 
             check_box: "Oգտատերերի CSV ֆայլ"
           xlist: 
             check_box: "Խաչաձև ցուցակի CSV ֆայլ"
         sis_default: 
           parameters: 
-            note: "*Սեմեստրի կարգաբերումը միայն ազդում է Դասընթացների, Բաժինների, Գրանցումների և Խաչաձև ցուցակի CSV ֆայլերի վրա:"
+            note: "*Ժամանակահտվածի կարգաբերումը միայն ազդում է Դասընթացների, Բաժինների, Գրանցումների և Խաչաձև ցուցակի CSV ֆայլերի վրա:"
     sis_import: 
       add_sis_stickiness_instructions: "Այս օպցիան ընտրելով SIS ներմուծման միջոցով կատարված փոփոխությունները կմշակվեն որպես UI փոփոխություններ, կանխելով այն, որ հետագա SIS չկրկնօրինակող ներմուծումները փոխեն այստեղ փոփոխված դաշտերը: "
       add_sis_stickiness_label: "Մշակվում են  որպես UI փոփոխություններ "
@@ -1054,7 +1054,7 @@ hy:
       imported_with_messages_message: "SIS տվյալները ներմուծվել են, սակայն հետևյալ հաղորդագրություններով՝"
       last_batch_title: "Վերջին փաթեթ"
       override_sis_stickiness_instructions: |-
-          Ըստ լռության ընդունված, UI փոփոխությունները առավելություն ունեն SIS ներմուծման փոփոխությունների համեմատ; մի քանի դաշտերում SIS ներմուծումը չի փոխում տվյալ դաշտի տվյալները, եթե ադմինիստրատորը փոխել է դաշտը UI միջոցով: Եթե դուք ընտրում եք այս տարբերակը, SIS ներմուծումը կվերասահմանի Ui փոփոխությունները:
+          Ըստ լռության ընդունված, UI փոփոխությունները առավելություն ունեն SIS ներմուծման փոփոխությունների համեմատ; մի քանի դաշտերում SIS ներմուծումը չի փոխում տվյալ դաշտի տվյալները, եթե ադմինիստրատորը փոխել է դաշտը UI միջոցով: Եթե դուք ընտրում եք այս տարբերակը, SIS ներմուծումը կվերասահմանի UI փոփոխությունները:
           Մանրամասների համար տես փաստաթղթերը:
       override_sis_stickiness_label: "Վերասահմանել UI փոփոխությունները"
       page_title: "SIS ներմուծում"
@@ -1073,7 +1073,7 @@ hy:
       concluded_at: "Ավարտված է %{at}"
       created_at: "Ստեղծված է %{at}"
       created_at_by: "ստեղծված է %{at}by [%{teacher}](%{url})"
-      download_csv_link: "Ներբեռնել CSV"
+      download_csv_link: "Ներբեռնել CSV ֆայլ"
       file_storage_header: "Ֆայլի պահպանում"
       general_numbers_title: "Ընդհանուր թվեր"
       heading_date: Ամսաթիվ
@@ -1160,7 +1160,7 @@ hy:
       account_reports: 
         default: 
           unpublishd_courses: 
-            text: "Այս հաշվետվությունը ցույց է տալիս տրված սեմեստրում այն բոլոր դասընթացները, որոնք չեն հրապարակվել: Վերջնական CSV ֆայլում մեկ տող հատկացված է մեկ դասընթացին և ցույց է տալիս տվյալ դասընթացի նույնականացուցիչը, դասընթացի SIS նույնականացուցիչը, դասընթացի կարճ անվանումը, դասընթացի անվանումը, սկսելու և ավարտելու ամսաթվերը:"
+            text: "Այս հաշվետվությունը ցույց է տալիս տրված սեմեստրում այն բոլոր դասընթացները, որոնք չեն հրապարակվել: Վերջնական csv ֆայլում մեկ տող հատկացված է մեկ դասընթացին և ցույց է տալիս տվյալ դասընթացի id-ն, դասընթացի sis id-ն, դասընթացի կարճ անվանումը, դասընթացի անվանումը, սկսելու և ավարտելու ամսաթվերը:"
     unrecognized_time_zone: "'%{timezone}'-ը ընդունելի ժամային գոտի չէ:"
     unused_courses_csv_description: 
       account_reports: 
@@ -1193,7 +1193,7 @@ hy:
           login: 
             day_drop: "Ամենից քիչ այցելված դասընթացի տարրերը:"
     users_list: 
-      login_name_or_sis_id: "Մուտքային անուն/ SIS ID"
+      login_name_or_sis_id: "Մուտքի / SIS ID"
       name: Անուն
       no_people_found: "Ոչ մի օգտագործող չի գտնվել"
       you_can_search_by: "Դուք կարող եք փնտրել՝"
@@ -1321,7 +1321,7 @@ hy:
   all_students_have_taken_the_survey_494f9f42: "Բոլոր ունկնդիրները սկսել են հարցումը"
   all_terms_cd27b0fb: "Բոլոր ժամանակահատվածները"
   allow_a_moderator_to_review_multiple_independent_g_752c4b90: "Թույլ տալ մոդերատորին տեսնել նշված աշխատանքների տարբեր անկախ գնահատականներ"
-  allow_bulk_grade_export_to_sis_e11a6e66: "Թույլ տալ Bulk Grade արտահանում դեպի SIS"
+  allow_bulk_grade_export_to_sis_e11a6e66: "Թույլ տալ գնահատականների մեծությունների արտահանում դեպի SIS"
   allow_lor_tools: "Թույլ տալ բոլոր օգտատերին դիտելու և օգտագործելու արտաքին գործիքները, որոնք LOR-ի համար կոնֆիգուրացիայի են ենթարկվել: "
   allow_opt_out_of_inbox: "Թույլ տալ օգտատերին հրաժարվել խոսակցական մուտքային հաղորդագրությունների արկղից: Սրա արդյունքում բոլոր խոսակցական հաղորդագրությունները և ծանուցումներն անհապաղ կուղարկվեն օգտագործողի էլեկտրոնային փոստի հիմնական հասցեին, ստացվող հաղորդագրությունների արկղում կանհետանա \"չընթերցված հաղորդագրություններ\" նշանը և ծանուցման նախապատվությունները:"
   allow_students_to_see_who_has_signed_up_for_time_s_497f4a46: "Թույլ տալ ունկնդիրներին տեսնել, թե ով է գրանցվել ժամանակային միջակայքերում:"
@@ -1941,7 +1941,7 @@ hy:
       options: 
         select_student: "[Ընտրել ունկնդրին]"
       overview: "Ունկնդիրների կողմից միմյանց աշխատանքների վերաբերյալ կարծիքների ներկայացումը համարվում է կատարված, եթե ունկնդիրները յուրաքանչյուր էջի վերաբերյալ կատարել են առնվազն մեկ մեկնաբանություն:  "
-      overview_with_rubric: "Ունկնդիրների կողմից միմյանց աշխատանքների վերաբերյալ կարծիքների ներկայացումը համարվում է կատարված, եթե ունկնդիրները յուրաքանչյուր էջի վերաբերյալ կատարել են առնվազն մեկ մեկնաբանություն և լրացրել են հանձնարարության համար նախատեսված սյունակը:  "
+      overview_with_rubric: "Ունկնդիրների կողմից միմյանց աշխատանքների վերաբերյալ կարծիքների ներկայացումը համարվում է կատարված, եթե ունկնդիրները յուրաքանչյուր էջի վերաբերյալ կատարել են առնվազն մեկ մեկնաբանություն և լրացրել են հանձնարարության համար նախատեսված ռուբրիկը:  "
       page_title: "Ունկնդիրների կողմից միմյանց աշխատանքների վերաբերյալ ներկայացված կարծիքներ"
       reviews_per_user: "Յուրաքանչյուր օգտատիրոջ հետ կապված %{count} կարծիքներ"
       submitted: "ուղարկված է"
@@ -1984,8 +1984,8 @@ hy:
       due_at: Մինչև
       for: համար
       links: 
-        add_rubric: "Ավելացնել վերնագիր"
-        assign_rubric: "Նշանակել բաժին"
+        add_rubric: "Ավելացնել ռուբրիկ"
+        assign_rubric: "Նշանակել ռուբրիկ"
         edit: Խմբագրել
       manage: Կառավարել
       messages: 
@@ -2024,7 +2024,7 @@ hy:
           view_original_page: "Դիտել սկզբնական էջը"
           view_quiz: "Դիտել ուղարկված թեստը"
           view_survey: "Դիտել ուղարկված հարցումը"
-        view_rubric_evaluation: "Դիտել բաժնի գնահատումը"
+        view_rubric_evaluation: "Դիտել ռուբրիկի գնահատումը"
       messages: 
         no_comments: "Մեկնաբանություններ չկան"
         submission_late_timestamp: "%{submitted_at} (ուշացված)"
@@ -2292,9 +2292,9 @@ hy:
         migrate_courses: "Տեղափոխել դասընթացները"
       column_name: "Սյունակի անունը"
       course_id_description: "Canvas-ի դասընթացի նույնականացուցիչ, ուր պետք է կատարվի ներմուծումը"
-      credential_description: "Այս գործիքը կօգնի ձեզ միաժամանակ Blackboard Vista/CE համակարգից տեղափոխել մի քանի դասընթացներ:  Ձեր դասընթացները տեղափոխելու համար ավելացրեք ձեր Blackboard համակարգի նույնականացման տվյալները, հետո տրված CSV շաբլոնին ավելացրեք Canvas-ի դասընթացի նույնականացուցիչները:"
+      credential_description: "Այս գործիքը կօգնի ձեզ միաժամանակ Blackboard Vista/CE համակարգից տեղափոխել մի քանի դասընթացներ:  Ձեր դասընթացները տեղափոխելու համար ավելացրեք ձեր Blackboard համակարգի նույնականացման տվյալները, հետո տրված CSV ձևին ավելացրեք Canvas-ի դասընթացի նույնականացուցիչները:"
       csv_description: "Կարելի է ավելացնել այլ սյունակներ, սակայն դրանք կանտեսվեն: Ստորև տրվում է 3 դասընթացի համար պարզ CSV ֆայլի օրինակ \"greg\"  անվամբ օգտատիրոջ համար:"
-      csv_template: "CSV շաբլոն"
+      csv_template: "CSV ձև"
       current_migration_batch: "Ներկայումս տեղափոխվող փաթեթ"
       description: Նկարագրություն
       errors: 
@@ -2310,8 +2310,8 @@ hy:
       previous_migration_batches: "Նախորդ տեղափոխությունների փաթեթներ"
       school: Դպրոց
       school_not_supported: "Խնդրում ենք օգտվել Instructure-ի հետ ձեր ադմինիստրատորի կապից ձեր դպրոցի համար օժանդակություն ստանալու նպատակով: "
-      sis_id_description: "Ներմուծման համար Canvas -ի դասընթացի SIS նույնականացուցիչ"
-      upload_migration_csv: "Տեղափոխությունների համար CSV ներբեռնում"
+      sis_id_description: "Ներմուծման համար Canvas -ի դասընթացի SIS ID "
+      upload_migration_csv: "Ներբեռնել տեղափոխությունների  CSV ֆայլ"
       user_name: "Օգտատիրոջ անուն"
       user_name_description: "Օգտատիրոջ տրամադրած օգտատիրոջ անուն, որը կարող է դասընթաց մուտք գործել որպես  դասավանդող/դիզայներ: Սա պետք է համընկնի Blackboard  համակարգ մուտք գործելու համար վերը նշված օգտատերերի անուններից մեկին:  "
     only_one_bulk_migration: "Դասընթացի միայն մեկ զանգվածային տեղեփոխություն կարող է կատարվել ժամանակի որոշակի պահին:"
@@ -2332,7 +2332,7 @@ hy:
     find_user: "Գտնել օգտատիրոջը"
     import: Ներմուծել
     login: "Մուտք համակարգ"
-    manage_rubrics: "Կառավարել բաժինները"
+    manage_rubrics: "Կառավարել ռուբրիկները"
     masquerade: "Ներկայանալ որպես կեղծ օգտատեր"
     ok: Ok
     okay: Okay
@@ -2730,7 +2730,7 @@ hy:
         new: "Ստեղծել նոր միջոցառում"
   can_interact_with_users_in_their_section_only_48cb8c43: "Հնարավոր չէ ամագործակցել օգտատերերի հետ միայն իրենց բաժնում"
   can_t_compute_score_until_an_assignment_has_points_f34dd600: "Անհնար է հաշվել գնահատականը, եթե դեռեւս առկա են չկատարված գնահատվող հանձնարարություններ"
-  can_t_delete_alignments_based_on_rubric_associatio_d9fd10a3: "Հնարավոր չէ ջնջել բաժինների հետ կապված համապատասխանությունները: Այդ կապերը հանելու համար դուք պետք է ակտիվների բաժնից տողը հանեք:"
+  can_t_delete_alignments_based_on_rubric_associatio_d9fd10a3: "Հնարավոր չէ ջնջել ռուբրիկների հետ կապված համապատասխանությունները: Այդ կապերը հանելու համար դուք պետք է ակտիվների բաժնից տողը հանեք:"
   can_t_perform_diffing_against_more_than_one_file_o_44475c0d: "Հնարավոր չէ կատարել տարբերությունների սահմանում նույն տեսակի մի քանի ֆայլի համար:"
   can_t_unpublish_if_there_are_student_submissions_2d7cd742: "Հնարավոր չէ չեղարկել հրապարակումը, եթե առկա են ունկնդիրների ներկայացրած աշխատանքները:"
   can_t_unpublish_item_name_if_there_are_student_sub_b83c7a9f: "Հնարավոր չէ չեղարկել %{item_name} հրապարակումը, եթե առկա են ունկնդիրների ներկայացրած աշխատանքները"
@@ -2756,7 +2756,7 @@ hy:
         invalid_url: "Սխալ URL"
         login_expiration_minimum: "Սեսիայի տևողությունը պետք է լինի առնվազն 20 րոպե"
         need_integer: "Վերարտադրելու ցանկի քեշի համար մուտքագրեք ամբողջ թիվ "
-        stream_name_required: "Պահանջվում է նշել ակտիվության հոսքի անվանումը"
+        stream_name_required: "Պահանջվում է նշել kinesis հոսքի անվանումը"
   canvas_alert_change_assignment_name_course_name_2fc63d9c: "Canvas համակարգի նախազգուշացում - Փոփոխություն: %{assignment_name}, %{course_name}"
   canvas_alert_invited_course_as_role_type_9ed79ce3: "Canvas համակարգի նախազգուշացում - Հրավիրված եք %{course} դասընթացին որպես %{role_type}"
   canvas_alert_invited_course_as_role_type_ea825937: "Canvas համակարգի նախազգուշացում - Հրավիրված եք դասընթացին որպես %{role_type}"
@@ -2798,8 +2798,10 @@ hy:
   change_name_c8cce76c: "Փոխել անունը"
   change_name_to_568374c8: " \"%{name}\" փոխել -ով"
   change_points_possible_to_match_rubric_dialog: 
+    prompts: 
+      update_assignment_points: "Հանձնարարության %{assignmentPoints} ընդհանուր գնահատականի և ռուբրիկի %{rubricPoints}  ընդհանուր գնահատականի սահմանման դեպքում ռուբրիկի շրջանակներում ունկնդրի կողմից ուղարկված աշխատանքի առավելագույն գնահատականը կարող է կազմել %{toPercentage_pointRatio}:   "
     titles: 
-      update_assignment_points: "Փոխե՞լ հնարավոր միավորները բաժնի վերնագրին համապատասխանելու համար:"
+      update_assignment_points: "Փոխե՞լ հանձնարարության կետերը ըստ ռուբրիկների:"
   changes_will_still_apply_if_you_leave_this_page_935cedc6: "Փոփոխությունները կշարունակեն գործել, եթե դուք դուրս գաք այս էջից:"
   child_s_username_dde3aa9: "Երեխա օգտատիրոջ անունը"
   choose_a_course_home_page_8059c7b: "Ընտրել դասընթացի հիմնական էջը"
@@ -3897,7 +3899,7 @@ hy:
     default_name: "Իմ դասընթացը"
     default_short_name: "Դասընթաց -101"
     errors: 
-      sis_in_use: "%{sis_id}  SIS նույնականացուցիչը արդեն իսկ գործածվում է"
+      sis_in_use: "%{sis_id}  SIS ID-ն արդեն իսկ գործածվում է"
     file_copy_error: "Հնարավոր չէ պատճենել \"%{name}\" ֆայլը"
     grade_export_types: 
       instructure_csv: "Ֆորմատի ենթարկված Instructure CSV"
@@ -3970,7 +3972,7 @@ hy:
       quiz_is_locked: "\"%{title}\" թեստը հնարավոր չէ պատճենել, քանի որ այն արգելափակված է:"
       quizzes: "Չհաջողվեց արտահանել որոշ թեստեր"
       resources: "Չհաջողվեց կապակցել որոշ ռեսուրսներ"
-      rubrics: "Չհաջողվեց արտահանել բաժիններ"
+      rubrics: "Չհաջողվեց արտահանել ռուբրիկները"
       topic: "Չհաջողվեց արտահանել \"%{title}\" քննարկման թեման"
       topic_is_locked: "\"%{title}\" քննարկման թեման հնարավոր չէ արտահանել, քանի որ այն արգելափակված է"
       topics: "Չհաջողվեց արտահանել որոշ թեմաներ"
@@ -4052,8 +4054,8 @@ hy:
       self_enrollment_limit: "Ինքնագրանցման սահմանաչափ"
       show_all_discussion_entries: "Ցույց տալ քննարկման բոլոր գրառումները"
       show_public_context_messages: "Ցույց տալ հանրությանը հասանելի հաղորդագրության բովանդակությունը"
-      sis_batch_id: "SIS փաթեթի նույնականացուցիչ"
-      sis_source_id: "SIS աղբյուրի նույնականացուցիչ"
+      sis_batch_id: "SIS փաթեթի Id"
+      sis_source_id: "SIS աղբյուրի Id"
       start_at: Սկսել
       storage_quota: "Պահոցի քվոտան"
       syllabus_body: syllabus_body
@@ -4079,7 +4081,7 @@ hy:
   course_search: 
     cant_be_blank: "Չի կարող դատարկ լինել"
   course_section: 
-    sis_id_taken: "SIS նույնականացուցիչը %{sis_id} արդեն իսկ գործածվում է"
+    sis_id_taken: " %{sis_id} SIS ID-ն արդեն իսկ գործածվում է"
   course_section_7a988066: "Դասընթացի բաժին"
   course_settings: 
     buttons: 
@@ -4116,7 +4118,7 @@ hy:
       publishing: "SIS-ում հրապարակվում են գնահատականները..."
       re_send_all: "Կրկին ուղարկել բոլոր չընդունված հրավերները"
       re_sending_invitation: "Հրավերները կրկին ուղարկում են..."
-      republish: "SIS-ում գնահատականների կրկնակի հրապարակում"
+      republish: "Կրկին հրապարակել գնահատականները SIS-ում "
     re_send_invitation: "Հրավերները կրկին ուղարկել"
     remove_user_from_course_section: "Հանել օգտագործողին %{course_section}-ից"
     titles: 
@@ -4454,7 +4456,7 @@ hy:
         restrict_student_past_view: "Ավարտման ամսաթվից հետո սահմանափակել ունկնդիրների կողմից դասընթացի դիտումը"
         root_account: "Հասանելիության առավելագույն իրավունքներով հաշիվ"
         root_account_id: "Հասանելիության առավելագույն իրավունքներով հաշիվ"
-        sis_source_id: "Համակարգի ID"
+        sis_source_id: "SIS ID"
         start_at: Սկիզբը
         storage_quota: "Ֆայլի պահպանում"
         time_zone: "Ժամային գոտի"
@@ -4478,11 +4480,11 @@ hy:
       no_language_preference: "Չի սահմանված (կարգաբերվում է օգտագործողի կողմից, լռությամբ ընդունվող՝ %{language})"
       none: "Ոչինչ չկա"
       page_title: "Դասընթացի մասին տեղեկություններ"
-      section_sis_id: "SIS նույնականացուցիչ՝ %{section_sis}"
+      section_sis_id: "SIS ID՝ %{section_sis}"
       self_enrollment: "Թույլ տվեք ունկնդիրներին ինքնուրույն գրանցվել, տրամադրելով նրանց գաղտնի URL-հասցեն  կամ կոդը:"
       self_enrollment_without_code: "Թույլ տվեք ունկնդիրներին ինքնուրույն գրանցվել, տրամադրելով նրանց գաղտնի URL-հասցեն:"
       set_grading_scheme: "սահմանել գնահատման սխեման"
-      sis_source_id: "Համակարգի ID"
+      sis_source_id: "SIS ID"
       tab_cant_disable: "Այս էջը հնարավոր չէ անջատել, այլ միայն թաքցնել"
       tab_disabled: "Էջն անջատված է, անցնել դասընթացի հիմնական էջին"
       tab_hidden_if_disabled: "Էջն անջատված է, չի երևա նավարկման ժամանակ"
@@ -4509,7 +4511,7 @@ hy:
       headings: 
         current_users: "Ընթացիկ օգտագործողներ"
       help: 
-        reset_course_content: "Դասընթացի բովանդակության կրկին տեղադրումը վերջնակապես կջնջի դրա հետ կապված բոլոր կոնֆերանսները, հանձնարարությունները, քննարկումները, թեստերը, մոդուլները, թեմաները, էջերը, ֆայլերը, ուսուցման արդյունքները, հարցերի շտեմարանները, համատեղ աշխատանքները կամ ցանկացած այլ բովանդակություն: Այս գործողությունը անառնալի է և տվյալները *հնարավոր չէ* վերականգնել: Դուք իսկապե՞ս ցանկանում եք շարունակել:"
+        reset_course_content: "Դասընթացի բովանդակության կրկին տեղադրումը վերջնակապես կջնջի դրա հետ կապված բոլոր կոնֆերանսները, հանձնարարությունները, քննարկումները, թեստերը, մոդուլները, ռուբրիկները, էջերը, ֆայլերը, ուսուցման արդյունքները, հարցերի շտեմարանները, համատեղ աշխատանքները կամ ցանկացած այլ բովանդակություն: Այս գործողությունը անառնալի է և տվյալները *հնարավոր չէ* վերականգնել: Դուք իսկապե՞ս ցանկանում եք շարունակել:"
       links: 
         calendar: "Դասընթացի օրացույց"
         conclude: "Ավարտել այս դասընթացը"
@@ -4577,11 +4579,11 @@ hy:
       not_weighted: "Դասընթացի հանձնարարությունների տեսակարար կշիռները սահմանված չեն:"
     statistics: 
       active_students: "Ակտիվ ունկնդիրներ"
-      all_rubrics: "Բոլոր բաժինները"
+      all_rubrics: "Բոլոր ռուբրիկները"
       any: Ցանկացած
       assignment_groups: "Հանձնարարությունների խմբեր"
       assignments: Հանձնարարություններ
-      course_rubrics: "Դասընթացի բաժիններ"
+      course_rubrics: "Դասընթացի ռուբրիկներ"
       discussion_posts: "Քննարկման վերաբերյալ գրառումներ"
       discussion_topic: "Քննարման թեմա"
       discussions: Քննարկումներ
@@ -4685,7 +4687,7 @@ hy:
     quizzes: Թեստեր
     registered_services: "Գրանցված ծառայություններ"
     revisions: Վերանայումներ
-    rubrics: Բաժիններ
+    rubrics: Ռուբրիկներ
     settings: Կարգաբերումներ
     site_admin: "Կայքի ադմինիստրատոր"
     stats: Վիճակագրություն
@@ -4982,7 +4984,7 @@ hy:
       africa: Աֆրիկա
       agree_to_terms: "Ես համաձայն եմ *օգտագործման պայմաններին* և ընդունում եմ **գաղտնիության քաղաքականությունը**:"
       asia_and_middle_east: "Ասիա և Մերձավոր Արևելք"
-      assistant_superintendent: "Ղեկավարի ասիստենտ"
+      assistant_superintendent: "Կառավարիչի օգնական"
       australia_new_zealand_and_oceania: "Ավստրալիա, Նոր Զելանդիա և Օկեանիա"
       begin_trial: "Գործարկել փորձնական տարբերակը"
       bus_finance_purchasing_director: "Բիզնես/Ֆինանսական/Գնումների տնօրեն"
@@ -5254,7 +5256,7 @@ hy:
       other: "%{count} պատասխաններ"
       zero: "Պատասխաններ չկան:"
     show: 
-      add_rubric: "Ավելացնել բաժին"
+      add_rubric: "Ավելացնել ռուբրիկ"
       announcement_closed: "Այս հայտարարությունը փակ է մեկնաբանությունների համար"
       announcement_locked: "Այս հայտարարության բովանդակությունը տեսանելի չի լինելու օգտագործողների համար մինչև %{date} "
       announcement_locked_until: "Այս հայտարարությունը արգելափակված է մինչև %{time}"
@@ -5285,7 +5287,7 @@ hy:
       reply_to_message: "Պատասխանել ներկայիս հաղորդագրությանը"
       reply_to_topic: "Պատասխանել թեմային"
       retrieved_from_feed: "Ստացվել է %{feed}-ից"
-      show_rubric: "Ցույց տալ բաժինը"
+      show_rubric: "Ցույց տալ ռուբրիկը"
       speed_grader: "«Արագ գնահատման համակարգ™»"
       topic: Թեմա
       topic_podcast_feed_link: "Թեմայի podcast կանալ"
@@ -5420,7 +5422,7 @@ hy:
   download_epub_757cf0af: "Ներբեռնել ePub"
   download_scores_generated_on_date_ff5b9cd2: "Ներբեռնել այն գնահատականները, որոնք գեներացվել են  %{date}-ին"
   download_submissions_7454665f: "Ներբեռնել ուղարկված փաստաթղթերը"
-  downloading_course_content_allows_access_to_conten_164d9336: "Դասընթացի բովանդակության ներբեռնումը հասանելի է դարձնում դասընթացի բովանդակությունը առանց համացանցում գտնվելու: Բովանդակությունը կարող է ներառել ֆայլեր, էջեր, հանձնարարություններ, քննարկման թեմաներ կամ թեստեր: Սեղմեք \"գեներացնել ePub-ը\" յուրաքանչյուր դասընթացի համար եւ դրանք դիտելու համար բացել ցանկացած eReader ծրագրով:"
+  downloading_course_content_allows_access_to_conten_164d9336: "Դասընթացի բովանդակության ներբեռնումը հասանելի է դարձնում դասընթացի բովանդակությունը առանց համացանցում գտնվելու: Բովանդակությունը կարող է ներառել ֆայլեր, էջեր, հանձնարարություններ, քննարկման թեմաներ կամ թեստեր: Սեղմեք \"գեներացնել ePub-ը\" յուրաքանչյուր դասընթացի համար եւ դրանք դիտելու համար բացել ցանկացած Էլեկտրոնային ընթերցման ծրագրով:"
   dropdown_option_1_e6ff2fc: "Ընկնող տարբերակ 1"
   dropdown_option_2_9766a346: "Ընկնող տարբերակ 2"
   due_a73610f6: Մինչև
@@ -5479,24 +5481,24 @@ hy:
   edit_role_1e96ad20: "Խմբագրել դերը"
   edit_rubric: 
     buttons: 
-      create_rubric: "Ստեղծել բաժին"
-      update_rubric: "Թարմացնել բաժինը"
+      create_rubric: "Ստեղծել ռուբրիկ"
+      update_rubric: "Թարմացնել ռուբրիկը"
     change: Փոխել
     discussion_points_possible: 
       one: "%{count} հնարավոր միավոր"
       other: "%{count} հնարավոր միավորներ"
     errors: 
-      load_rubrics_failed: "Բաժինների բեռնումը չհաջողվեց, խնդրում ենք փորձել ավելի ուշ"
+      load_rubrics_failed: "Ռուբրիկների բեռնումը չհաջողվեց, խնդրում ենք փորձել ավելի ուշ"
     leave_different: "Թողնել իրարից տարբեր"
     messages: 
-      loading_rubric_groups: "Բեռնում է բաժինների խմբերը..."
-      loading_rubrics: "Բեռնում է բաժինները..."
+      loading_rubric_groups: "Բեռնում է ռուբրիկների խմբերը..."
+      loading_rubrics: "Բեռնում է ռուբրիկները..."
     prompts: 
-      confirm_delete: "Դուք իսկապե՞ս ցանկանում եք ջնջել այս բաժինը"
-      read_only_rubric: "Դուք չեք կարող խմբագրել այս բաժինը, որովհետև  թույլտվություն չունեք, կամ էլ սա օգտագործվում է մեկից ավելի տեղերում: Ձեր կատարած ցանկացած փոփոխության արդյունքում կունենաք հնի վրա հիմնված նոր բաժին: Ցանկանո՞ւմ եք շարունակել: "
+      confirm_delete: "Դուք իսկապե՞ս ցանկանում եք ջնջել այս ռուբրիկը"
+      read_only_rubric: "Դուք չեք կարող խմբագրել այս ռուբրիկը, որովհետև  թույլտվություն չունեք, կամ այն օգտագործվում է մեկից ավելի տեղերում: Ձեր կատարած ցանկացած փոփոխություն կհանգեցնի հին ռուբրիկի վրա հիմնված նոր ռուբրիկի: Ցանկանո՞ւմ եք շարունակել: "
     titles: 
       criterion_long_description: "Չափանիշի երկար նկարագրություն"
-      find_existing_rubric: "Գտնել գոյություն ունեցող բաժինը"
+      find_existing_rubric: "Գտնել գոյություն ունեցող ռուբրիկը"
   edit_survey_b0d6890d: "Խմբագրել հարցումը"
   edit_toolname_app_23cfbb8: "Խմբագրել %{toolName}  հավելվածը"
   edit_your_catalog_account_cce59310: "Խմբագրեք Ձեր կատալոգային հաշիվը"
@@ -5532,7 +5534,7 @@ hy:
     no_name_error: "Նշել անունը"
     save_failed: "Պահպանման սխալ, խնդրում ենք փորձել ավելի ուշ"
     saving: "Պահպանվում է..."
-    screen_reader_tip: "Էկրանից կարդալու ծրագրի օգտագործողնե՛ր, այս խմբագիրն օգտագործելու ամենամատչելի ուղին ընդլայնված տեսքի անցնելն է, իսկ հետո կարելի է անմիջապես ներդնել LaTeX կամ օգտագործել գործիքների տողը ձեզ դրանում օգնելու համար: Ընդլայնված տեսքին անցնելու հղումը այս երկխոսության վերջում է՝ խմբագրման դաշտից անմիջապես առաջ: "
+    screen_reader_tip: "Էկրանից կարդալու ծրագրի օգտագործողնե՛ր, այս խմբագրիչն օգտագործելու ամենամատչելի ուղին ընդլայնված դիտմանն անցնելն է, իսկ հետո կարելի է անմիջապես մուտքագրել LaTeX կամ օգտագործել գործիքների տողը Ձեզ դրանում աջակցելու համար: Ընդլայնված դիտմանն անցնելու հղումը այս երկխոսության վերջում է՝ խմբագրման դաշտից անմիջապես առաջ: "
     search_flickr: "Որոնումներ flickr creative commons-ում"
     switch_editor_html: "HTML խմբագիր"
     switch_editor_rich_text: "Ֆորմատավորված տեքստի խմբագիր"
@@ -5554,7 +5556,7 @@ hy:
     accessibles: 
       background_color: "Ֆոնի գույն, ընտրելու համար սեղմեք ներքև"
       forecolor: "Տեքստի գույն, ընտրելու համար սեղմեք ներքև"
-      record: "Այս ֆունկցիան հասանելի չէ էկրանից կարդացողների համար"
+      record: "Այս ֆունկցիան հասանելի չէ էկրանից ընթերցողների համար"
     titles: 
       font_size: "Տառերի չափ, ընտրելու համար սեղմեք ներքև"
       formatting: "Ֆորմատավորում, ընտրելու համար սեղմեք ներքև"
@@ -5619,7 +5621,7 @@ hy:
     errors: 
       delete_default_term: "Հնարավոր չէ ջնջել լռությամբ ընդունվող սեմեստրը"
       delete_term_with_courses: "Հնարավոր չէ ջնջել ակտիվ դասընթացներ ունեցող սեմեստրը"
-      not_unique: "\"%{sis_source_id}\" SIS նույնականացուցիչը արդեն գործածվում է"
+      not_unique: "\"%{sis_source_id}\" SIS ID-ն արդեն գործածվում է"
   enrollment_term_7bfe840: "Գրանցման պայմաններ"
   enrollments_e250c9c3: Գրանցումներ
   enter_a_hexcode_here_to_use_a_custom_color_51ecccce: "Մուտքագրել hexcode լրացուցիչ գույն օգտագործելու համար"
@@ -5880,7 +5882,7 @@ hy:
   error_deleting_name_reason_11f9d399: "%{name} ջնջման սխալ՝ %{reason}"
   error_message_2b9d12ee: "Սխալ՝ %{message}"
   error_uploading_file_e2d31b56: "Ֆայլը բեռնելու սխալ"
-  error_while_importing_csv_please_contact_support_e_57e6b3b: "CSV ներմուծման սխալ: Խնդրում ենք դիմել օգնության ծառայությանը: (Սխալի մասին զեկուցում %{number}):"
+  error_while_importing_csv_please_contact_support_e_57e6b3b: "CSV ֆայլի ներմուծման սխալ: Խնդրում ենք դիմել օժանդակության ծառայությանը: (Սխալի մասին զեկուցում %{number}):"
   errors: 
     bad_navigation_config: "Դասընթացի տաբուլյացիայի կարգաբերման սխալ"
     blank: "Պահանջվում է"
@@ -5924,7 +5926,7 @@ hy:
       error_reported: "Շնորհալակություն օգնության համար: Մենք անմիջապես կանցնենք աշխատանքի:"
     registration_incomplete: "Դուք պետք է հաստատեք ձեր էլեկտրոնային փոստի հասցեն, նախքան այս էջը դիտելը:"
     required: "Պահանջվում է"
-    sis_id_in_use: "SIS նույնականացուցիչը %{sis_id} արդեն իսկ գործածվում է"
+    sis_id_in_use: " %{sis_id} SIS ID-ն արդեն իսկ գործածվում է"
     unsaved_changes: "Դուք չպահպանված փոփոխություններ եք արել:"
   event_date_c9459fe3: "Միջոցառման ամսաթիվ"
   event_date_f05219e7: "Միջոցառման ամսաթիվ՝"
@@ -6127,7 +6129,7 @@ hy:
     better_file_browsing: "ֆայլերի բարելավված դիտում"
     differentiated_assignments: "Տարբերակված հանձնարարություններ"
     differentiated_assignments_account_disable_warning: |-
-        Այս ֆունկցիայի անջատումը կազդի գոյություն ունեցող դասընթացների վրա: Այս ֆունկիան անջատելու համար 
+        Այս ֆունկցիայի անջատումը կազդի գոյություն ունեցող դասընթացների վրա: Այս ֆունկցիան անջատելու համար 
         դիմեք ձեր Canvas Success Manager-ին:
     differentiated_assignments_course_disable_warning: "Տարբերակված հանձնարարությունների անջատումը բոլոր հրապարակված հանձնարարությունները տեսանելի կդարձնի բոլոր ունկնդիրների համար:"
     differentiated_assignments_description: "Տարբերակված հանձնարարությունները հնարավորություն են տալիս ընտրել այն բաժինը(ները) կամ ունկնդրին(ունկնդիրներին), որոնց նկատմամբ կիրառելի է տվյալ հանձնարարությունը: Չընտրված բաժիններում հանձնարարությունը տեսանելի չի լինելու դասընթացի բովանդակության մեջ, եւ ունկնդիրների վերջնական գնահատականը հաշվարկվելու է առանց այդ հանձնարարության միավորների:"
@@ -6251,7 +6253,7 @@ hy:
     messages: 
       loading_outcomes: "Արդյունքների բեռնում..."
       no_outcomes_found: "Արդյունքներ չեն գտնվել"
-      no_rubric_outcomes_found: "Բաժինների կարգաբերմամբ արդյունքներ չեն գտնվել"
+      no_rubric_outcomes_found: "Ռուբրիկների կարգաբերմամբ արդյունքներ չեն գտնվել"
     titles: 
       find_outcome: "Արդյունքների որոնում"
   first_reviewer_9ea05caa: "Առաջին կարծիք ներկայացնող"
@@ -6349,7 +6351,7 @@ hy:
       aria_record: "Սեղմեք գրանցելու համար"
       aria_record_reset: "Սեղմեք գրանցելու համար"
       aria_stop: "Սեղմեք \"Դադարեցնել\" կոճակը գրանցումն ավարտելու համար:"
-    edit_view_rubric: "Դիտել բաժինը"
+    edit_view_rubric: "Դիտել ռուբրիկը"
     errors: 
       select_an_option: "Ընտրել պարամետրերը"
     graded: "գնահատված է"
@@ -6498,7 +6500,7 @@ hy:
     new: 
       titles: 
         new_upload: "Բեռնել գնահատականների մատյանը"
-    no_file_attached: "Մենք չենք հայտնաբերել CSV բեռնելու համար։ Խնդրում ենք ըմտրել CSV բեռնելու համար և ուղարկեք նորից։"
+    no_file_attached: "Մենք չենք հայտնաբերել CSV ֆայլեր բեռնելու համար։ Խնդրում ենք ընտրել CSV ֆայլ բեռնելու համար և ուղարկել նորից։"
     show: 
       assignment_answer: "Այս հանձնարարությունը"
       assignment_example: "Թեստ հավասար ցուցանիշներով"
@@ -6559,7 +6561,7 @@ hy:
       click_to_change: "Սեղմեք մեկ այլ գնահատական ստուգելու համար"
       close_comments: Փակել
       close_comments_label: "Փակել մեկնաբանությունները"
-      close_rubric: "Փակել բաժինը"
+      close_rubric: "Փակել ռուբրիկը"
       close_score: Փակել
       close_score_screenreader: "Փակել գնահատականների մանրամասները"
       collapse: "Սեղմել ուսուցման արդյունքների բոլոր խմբերը:"
@@ -6602,8 +6604,8 @@ hy:
       page_title: "%{student} գնահատականները"
       print_grades: "Տպել գնահատականները"
       score_details: "Գնահատականների մանրամասներ"
-      see_rubric_results: "Տես բաժինների արդյունքները"
-      see_rubric_results_screenreader: "Տես խորագրերի արդյունքները"
+      see_rubric_results: "Տեսնել ռուբրիկի արդյունքները"
+      see_rubric_results_screenreader: "Տեսնել ռուբրիկի արդյունքները"
       see_scoring_details: "Տես գնահատականների մանրամասները"
       see_scoring_details_screenreader: "Տես գնահատականների մանրամասները"
       see_turnitin_results: "Տես Turnitin արդյունքները"
@@ -6614,7 +6616,7 @@ hy:
         enter_score: "Մուտքագրեք գնահատականը թեստի համար"
         revert_score: "Անցնել սկզբնական գնահատականին"
         turnitin_score: "Turnitin նմանության գնահատական՝ լրացուցիչ տեղեկություններ"
-        view_rubric_evaluation: "Դիտել բաժնի գնահատումը"
+        view_rubric_evaluation: "Դիտել ռուբրիկի գնահատումը"
         view_scoring_details: "Դիտել գնահատականների մանրամասները"
       total: Ընդամենը
     gradebook2: 
@@ -6713,7 +6715,7 @@ hy:
         leave_comment: "Թողնել մեկնաբանություն"
         next_student: "Հաջորդ ունկնդիրը"
         previous_student: "Նախորդ ունկնդիրը"
-        use_rubric: "Օգտագործել բաժնի անվանում"
+        use_rubric: "Օգտագործել ռուբրիկը"
       keycodes: 
         change_grade: g
         leave_comment: c
@@ -7140,7 +7142,7 @@ hy:
         self_organized_warning: "Այս խմբերն ինքնակազմակերպված են ունկնդիրների կողմից: Ի տարբերություն այլ խմբերի, ունկնդիրները կարող են միաժամանակ լինել մի քանի նման խմբերում, ուստի այս խմբերը հնարավոր չէ օգտագործել հանձնարարությունների գնահատման ամար: "
         self_signup_blurb: "Այս խմբերում ինքնագրանցումը միացված է:"
         settings: Կարգաբերումներ
-        uncategorized_groups: "Այս խմբերը կապված չեն խմբերի որևէ որոշակի շարքի հետ: Քանի որ դրանք ներմուծվել են SIS միջոցով, դրանք կարելի է միայն թարմացնել կամ ջնջել SIS-ի միջոցով: "
+        uncategorized_groups: "Այս խմբերը կապված չեն խմբերի որևէ որոշակի շարքի հետ: Քանի որ դրանք ներմուծվել են SIS-ի միջոցով, դրանք կարելի է թարմացնել կամ ջնջել միայն SIS-ի միջոցով: "
       group_category_edit: 
         allow_self_signup: "Թույլատրել ինքնագրանցում"
         cancel: "Չեղյալ համարել"
@@ -7406,7 +7408,7 @@ hy:
     no_context_found: " \"%{title}\" համար հնարավոր չէ գտնել   ուսուցման  արտաքին արդյունքները, պատճենի ստեղծում: "
     no_global_permission: "Դուք չեք կարող կառավարել ընդհանուր արդյունքները, հնարավոր չէ ավելացնել  \"%{title}\":"
   importers/rubric_importer: 
-    no_context_found: "\"%{title}\" համար հնարավոր չէ գտնել   արտաքին բաժինը, պատճենի ստեղծում: "
+    no_context_found: "\"%{title}\" համար հնարավոր չէ գտնել արտաքին ռուբրիկը, պատճենի ստեղծում: "
   importers/wiki_page_importer: 
     title_for_topics_category: "%{category} թեմաներ"
     warnings: 
@@ -7508,7 +7510,7 @@ hy:
   international_sms_send_from_recipient_s_country_43881ea4: "Միջազգային հաղորդագրություն - ուղարկել ստացողի երկրից"
   international_text_messaging_rates_may_apply_d4b4a97a: "Միջազգային հաղորդագրության սակագները կարող են կիրառելի լինել:"
   invalid_authenticity_token_b753558c: "Իսկության ստուգման սխալ token"
-  invalid_csv_file_grades_could_not_be_updated_6ebdeca4: "csv ֆայլի սխալ ֆորմատ, գնահատականները հնարավոր չէ թարմացնել:"
+  invalid_csv_file_grades_could_not_be_updated_6ebdeca4: "csv սխալ ֆայլ, գնահատականները հնարավոր չէ թարմացնել:"
   invalid_points_possible: "Այս հանձնարարության համար հնարավոր միավորների մեծությունը պետք է  զրո կամ ավելի մեծ լինի:"
   invalid_recipient_name_56b22b86: "Ստացողի անունը սխալ է"
   invalid_state_parameter_7a5aa108: "Վիճակի սխալ պարամետր"
@@ -7691,7 +7693,7 @@ hy:
         groups: "Ունկնդիրների խմբեր"
         learning_outcomes: "Ուսուցման արդյունքներ"
         quizzes: Թեստեր
-        rubrics: Բաժիններ
+        rubrics: Ռուբրիկներ
         syllabus_body: "Ուսումնական ծրագիր"
         wikis: "Wiki էջեր"
     cc: 
@@ -7892,7 +7894,7 @@ hy:
   main_navigation_3f080c80: "Հիմնական նավարկում"
   make_sure_you_choose_the_most_appropiate_option_as_93079937: "Համոզվեք, որ ընտրել եք ամենահարմար տարբերակը, քանի որ դա ԿԱՐՈՂ Է ազդել ունկնդիրների գնահատականների վրա:"
   make_this_course_publicly_visible_student_data_wil_3954d6c8: "Դարձրեք այս դասընթացը հանրության համար տեսանելի (ունկնդիրների տվյալները կմնան գաղտնի):"
-  malformed_csv_aaa4b7f2: "Սխալ ձևավորված CSV"
+  malformed_csv_aaa4b7f2: "Սխալ ձևավորված CSV ֆայլ"
   manage_avatars: 
     errors: 
       update_failed: "Թարմացնել չհաջողվեց, փորձեք կրկին"
@@ -9406,21 +9408,21 @@ hy:
         subject: "Հաշվետվության ստեղծումը չհաջողվեց"
     rubric_assessment_submission_reminder: 
       email: 
-        body: "Ձեզ հիշեցրել են գնահատել %{rubric}, %{context}՝"
+        body: "Դուք ստացել եք հիշեցում %{rubric}, %{context} գնահատման վերաբերյալ."
         html: 
-          body: "Ձեզ հիշեցրել են գնահատել %{rubric}, %{context}՝"
+          body: "Դուք ստացել եք հիշեցում %{rubric}, %{context} գնահատման վերաբերյալ."
           link_message: "Սեղմեք այստեղ՝ գիտելիքների գնահատումը դիտելու և  ձեր գրառումը մուտքագրելու համար"
           subject: "Գնահատման մասին հիշեցում՝ %{rubric}, %{context}"
         link_message: "Դուք կարող եք ստուգել գիտելիքների գնահատումը և մուտքագրել ձեր գրառումը"
         subject: "Գնահատման մասին հիշեցում՝ %{rubric}, %{context}"
       sms: 
-        body: "Ձեզ հիշեցրել են գնահատելու %{rubric}, %{context}:"
+        body: "Դուք ստացել եք հիշեցում %{rubric}, %{context} գնահատման վերաբերյալ."
         more_info: "Լրացուցիչ տեղեկությունները հասանելի են %{url}-ում"
       summary: 
-        body: "Ձեզ հիշեցրել են գնահատել %{rubric}, %{context}՝"
+        body: "Դուք ստացել եք հիշեցում %{rubric}, %{context} գնահատման վերաբերյալ"
         subject: "Գնահատման մասին հիշեցում՝ %{rubric}, %{context}"
       twitter: 
-        tweet: "Canvas ծանուցում. գնահատել %{rubric}, %{context}"
+        tweet: "Canvas ծանուցում. %{rubric}, %{context} գնահատման մասին հիշեցում"
     rubric_association_created: 
       email: 
         body: "Գիտելիքների նոր ստուգում է ստեղծվել %{context}-ի համար`"
@@ -9680,7 +9682,7 @@ hy:
     module_type: Մոդուլ
     quiz_question_type: "Թեստի հարց"
     quiz_type: Թեստ
-    rubric_type: Բաժին
+    rubric_type: Ռուբրիկ
     webct: 
       course_not_found: "Blackboard դասընթացը չի գտնվել:"
     wiki_page_type: "Վիկի էջ"
@@ -10106,9 +10108,9 @@ hy:
       pseudonym_registration: "Կեղծանվան գրանցում "
       report_generated: "Հաշվետվությունը ստեղծված է"
       report_generation_failed: "Հաշվետվության ստեղծումը չհաջողվեց"
-      rubric_assessment_invitation: "Բաժնի գնահատման հրավեր"
-      rubric_assessment_submission_reminder: "Բաժնի գնահատականի ուղարկման մասին հիշեցում "
-      rubric_association_created: "Բաժնի կապը ստեղծվել է"
+      rubric_assessment_invitation: "Ռուբրիկի գնահատման հրավեր"
+      rubric_assessment_submission_reminder: "Ռուբրիկի գնահատումն ուղարկելու մասին հիշեցում "
+      rubric_association_created: "Ռուբրիկի կապը ստեղծվել է"
       submission_comment: "Ուղարկված աշխատանքների մեկնաբանություն"
       submission_comment_for_teacher: "Ուղարկված աշխատանքների մեկնաբանություն դասախոսի համար"
       submission_grade_changed: "Ուղարկվածի գնահատականը փոխվել է"
@@ -10287,12 +10289,12 @@ hy:
   orbis_report_header_assignment_title: "հանձնարարության անվանում"
   orbis_report_header_canvas_course_id: "դասընթացի նույնականացուցիչ"
   orbis_report_header_course_name: "դասընթացի անվանում"
-  orbis_report_header_course_sis_id: "դասընթացի SIS նույնականացուցիչ"
+  orbis_report_header_course_sis_id: "դասընթացի sis id"
   orbis_report_header_date_submitted: "ուղարկման ամսաթիվը"
   orbis_report_header_points_possible: "հնարավոր միավորներ"
   orbis_report_header_student_canvas_id: "canvas օգտագործողի նույնականացուցիչ"
   orbis_report_header_student_name: "ունկնդրի անուն"
-  orbis_report_header_student_sis_id: "օգտագործողի sis"
+  orbis_report_header_student_sis_id: "օգտատիրոջ sis"
   orbis_report_header_submission_score: "ուղարկված աշխատանքի գնահատական"
   organize_epub_by_content_type_default_is_by_module_6f44ae06: "Կազմակերպել epub ըստ բովանդակության տեսակի (լռելյայն ընդունված է ըստ մոդուլների)"
   outcome_groups: 
@@ -10357,7 +10359,7 @@ hy:
       instructions: 
         main: 
           manage: 
-            description: "*Արդյունքները ստեղծվել են դասընթացի յուրացման ընթացքին հետևելու նպատակով: Սկսելու համար ծանոթացեք էջի վերևի մասում գտնվող մենյուին: Սեղմեք \"Նոր\" կոճակը նոր արդյունք ստեղծելու համար կամ էլ՝ \"Նոր խումբ\" կոճակը նոր խումբ ստեղծելու համար, որտեղ կարող եք կդասավորել Ձեր արդյունքները: \"Գտնել\" կոճակը թույլ կտա Ձեզ օգտագործել Ձեր կազմակերպության կողմից ստեղծված արդյունքները: Արդյունքներ ստեղծելիս և օգտագործելիս, Դուք կարող եք ձախ կողմում գտնվող վահանակի միջոցով կառավարել Ձեր արդյունքները: Դուք կարող եք քաշել և տեղադրել արդյունքները տարբեր մակարդակներում որոշակի կառուցվածք ստեղծելու համար:* *Ավելին, Canvas համակարգը Ձեզ հնարավորություն է տալիս Ձեր գնահատման բաժնին արդյունքներ  ավելացնել այնպես, որ դուք կարողանաք գնահատել յուրացումը հանձնարարության կատարումը գնահատելիս: Արդյունքները զետեղելուց հետո, սեղմեք \"Կառավարել բաժինները\" կոճակը, որպեսզի սկսեք օգտագործել արդյունքները գնահատման նպատակով:*"
+            description: "*Արդյունքները ստեղծվել են դասընթացի յուրացման ընթացքին հետևելու նպատակով: Սկսելու համար ծանոթացեք էջի վերևի մասում գտնվող մենյուին: Սեղմեք \"Նոր\" կոճակը նոր արդյունք ստեղծելու համար կամ էլ՝ \"Նոր խումբ\" կոճակը նոր խումբ ստեղծելու համար, որտեղ կարող եք կդասավորել Ձեր արդյունքները: \"Գտնել\" կոճակը թույլ կտա Ձեզ օգտագործել Ձեր կազմակերպության կողմից ստեղծված արդյունքները: Արդյունքներ ստեղծելիս և օգտագործելիս, Դուք կարող եք ձախ կողմում գտնվող վահանակի միջոցով կառավարել Ձեր արդյունքները: Դուք կարող եք քաշել և տեղադրել արդյունքները տարբեր մակարդակներում որոշակի կառուցվածք ստեղծելու համար:* *Ավելին, Canvas համակարգը Ձեզ հնարավորություն է տալիս Ձեր գնահատման ռուբրիկին արդյունքներ  ավելացնել այնպես, որ դուք կարողանաք գնահատել յուրացումը հանձնարարության կատարումը գնահատելիս: Արդյունքները զետեղելուց հետո, սեղմեք \"Կառավարել բաժինները\" կոճակը, որպեսզի սկսեք օգտագործել արդյունքները գնահատման նպատակով:*"
             title: "Գնահատականների տեղադրում"
     mastery_error: "Պետք է 0-ին հավասար կամ մեծ լինի"
     missing_outcome: "Հնարավոր չէ գտնել ուսուցման արդյունքը"
@@ -10377,7 +10379,7 @@ hy:
     outcome_form: 
       calculation_method: "Հաշվարկման մեթոդ"
       criterion: "Չափանիշի գնահատականներ"
-      criterion_dialog: "Ուսուցման արդյունքները կարող են ներառվել հանձնարարությունների բաժիններում՝ որպես որոշակի հանձնարարությունների հետ կապված գիտելիքների յուրացման արդյունքների յուրացման դյուրին միջոց: Ուսուցման արդյունքները որոշելիս դուք պետք է նաև սահմանեք այն չափանիշը, որով կարելի է կառուցել հանձնարարությունների խորագրերը: Որոշեք անհրաժեշտ սյունակների թիվը և սահմանեք այն շեմային միավորները, որոնք օգտագործվելու են  այս արդյունքների անցողիկը որոշելու համար: "
+      criterion_dialog: "Ուսուցման արդյունքները կարող են ներառվել հանձնարարությունների ռուբրիկներում՝ որպես որոշակի հանձնարարությունների հետ կապված գիտելիքների յուրացման արդյունքների յուրացման դյուրին միջոց: Ուսուցման արդյունքները որոշելիս դուք պետք է նաև սահմանեք այն չափանիշը, որով կարելի է կառուցել հանձնարարությունների խորագրերը: Որոշեք ռուբրիկի սյունակների անհրաժեշտ թիվը և սահմանեք այն շեմային միավորները, որոնք օգտագործվելու են  այս արդյունքների անցողիկը որոշելու համար: "
       criterion_info_link: "Սեղմեք չափանիշի գնահատականի մասին տեղեկանալու համար "
       description: "Նկարագրել այս արդյունքը"
       display_name: "Ընկերական անուն (ոչ պարտադիր)"
@@ -10676,13 +10678,13 @@ hy:
         redirect_uri: "Վերահասցեագրման URI հասցե"
         token_uri: "Token-ի URI "
     grade_export: 
-      description: "Գնահատականի արտահանում SIS համար"
+      description: "Գնահատականի արտահանում SIS-ի համար"
       name: "Գնահատականների արտահանում"
     grade_export_settings: 
       description: "Այս միացվող մոդուլը թույլ է տալիս վերջնական գնահատականները կրկին հրապարակել ունկնդիրների տեղեկատվական համակարգում (SIS): Միացնելուց հետո օգտագործողի գնահատականների մատյանում կհայտնվի հրապարակել գնահատականները օպցիան: Դրանք կհրապարակվեն POST հարցման միջոցով, նշված հրապարակման վերջնական կետում: Յուրաքանչյուր տեսակ որոշում է իր սեփական ֆորմատը և mime տեսակը: Վերջնական կետից ստացված պատասխանը կարևոր չէ և այդ պահին անտեսվում է: \n\n\
           Օրինակ, Instructure-ի կողմից ֆորմատավորված CSV ֆայլը կուղարկի POST եղանակով mime տեսակի 'text/csv' csv ֆայլը նշված վերջնական կետին, որում կներառվեն հետևյալ սյունակները.\n\n\
           \"publisher_id\", \"publisher_sis_id\", \"course_id\", \"course_sis_id\", \"section_id\", \"section_sis_id\", \"student_id\", \"student_sis_id\", \"enrollment_id\", \"enrollment_status\", \"score\", \"grade\"\n\n\
-          (Նշում.  \"գնահատական\" սյունակը վերադարձվում է միայն այն դեպքում, երբ դասընթացում սահմանված է գնահատման\\ չափանիշ):\n\n\
+          (Նշում.  \"գնահատական\" սյունակը վերադարձվում է միայն այն դեպքում, երբ դասընթացում սահմանված է գնահատման չափանիշ):\n\n\
           Հրապարակվող դասընթացի յուրաքանչյուր ունկնդրի համար 1 կամ ավելի տողեր են լինելու հրապարակվող csv-ֆայլում: Մասնավորապես, 1 տող է լինելու յուրաքանչյուր օգտատիրոջ անվան համար, եթե այդ անունը գրացված է դասընթացի հասանելիությունների առավելագույն իրավունքներով հաշվում:  Մեծամասամբ, յուրաքանչյուր ունկնդրի համար նախատեսված է 1 տող, սակայն եթե ունկնդիրը մի քանի մուտքանուն ունի, դրանցից յուրաքանչյուրի համար պետք է նախատեսվի առանձին տեղ: "
       labels: 
         format_type: "Ելքի ֆորմատի տեսակ"
@@ -10741,7 +10743,7 @@ hy:
         resource_domain: "Տեղադրված հաշիվների համար օգտագործել \"cdn.kaltura.com\""
         rtmp_domain: "Տեղադրված հաշիվների համար օգտագործել \"www.kaltura.com\""
       kaltura_path_example: օրինակ՝
-      kaltura_sis_explanation: "Ստուգվելուց հետո օգտագործողի և դասընթացի SIS տվյալները  կտրամադրվեն Kaltura-ին:"
+      kaltura_sis_explanation: "Ստուգվելուց հետո օգտատիրոջ և դասընթացի SIS տվյալները  կտրամադրվեն Kaltura-ին:"
       labels: 
         cache_play_list_seconds: "Վայրկյաններ, որոնք անհրաժեշտ են եղել վերարտադրման ցուցակը URL-հասցեի քեշին ավելացնելու համար"
         do_analytics: "Ուղարկել միջոցառումների վերլուծությունը"
@@ -10777,7 +10779,7 @@ hy:
         aws_endpoint: "AWS (url) վերջնական կետ"
         aws_region: "AWS տարածք"
         aws_secret_access_key: "AWS մուտքի գաղտնի բանալի "
-        kinesis_stream_name: "Ակտիվության հոսքի անվանում"
+        kinesis_stream_name: "Kinesis հոսքի անվանում"
     lockdown_browser: 
       labels: 
         download_url: "LockDown բրաուզերի բեռնման URL"
@@ -10897,12 +10899,14 @@ hy:
   possible_combination_count_db651ca4: "Հնարավոր կոմբինացիաների թիվը"
   possible_score_5e0a328e: "Հնարավոր %{score}"
   post_1e445890: Գրառում
+  post_grade_to_sis_disabled_click_to_toggle_6ee5ff3: "Գնահատականների տեղադրումը SIS-ում: Սեղմեք փոխակերպման համար:"
+  post_grade_to_sis_enabled_click_to_toggle_82da8ce8: "Գնահատականների տեղադրումը SIS-ում: Սեղմեք փոխակերպման համար:"
   post_grades_39c52870: "Տեղադրել գնահատականները"
   post_grades_description: |-
-      Post Grades-ը թույլ է տալիս դասավանդողներին գնահատականների տվյալները կրկին տեղադրել ակտիվացված  SIS համակարգերում՝ Powerschool,
-      Aspire (SIS2000), JMC և որևէայլ SIF-ով ակտիվացված SIS-ում, որը համատեղելի է GradingCategory  SIF տարրերի,
-      GradingAssignment, 
-      GradingAssignmentScore հետ:
+      Գնահատականների տեղադրման գործիքը թույլ է տալիս դասավանդողներին գնահատականների տվյալները կրկին տեղադրել ակտիվացված SIS համակարգերում՝ Powerschool,
+      Aspire (SIS2000), JMC և որևէ այլ SIF-ով ակտիվացված SIS-ում, որը համատեղելի է GradingCategory  SIF տարրերի,
+      GradingAssignment-ի, 
+      GradingAssignmentScore-ի հետ:
   post_grades_to_sis_97ece878: "Գնահատականները տեղադրել SIS-ում"
   powerschool_a30f0bfc: PowerSchool
   practice_quiz_19a8505d: "Գործնական թեստ"
@@ -11505,8 +11509,8 @@ hy:
     download_item_analysis: "Բեռնել տարրի վերլուծության մասին հաշվետվությունը: "
     download_student_analysis: "Բեռնել ունկնդրի վերլուծության մասին հաշվետվությունը: "
     generatable: "Հաշվետվությունը երբեք չի ստեղծվել:"
-    generate_item_analysis_report: "Ստեղծել տարրի վերլուծության մասին հաշվետվություն:"
-    generate_student_analysis_report: "Ստեղծել ունկնդրի վերլուծության մասին հաշվետվություն:"
+    generate_item_analysis_report: "Գեներացնել տարրի վերլուծության մասին հաշվետվություն:"
+    generate_student_analysis_report: "Գեներացնել ունկնդրի վերլուծության մասին հաշվետվություն:"
     generated_at: "Ստեղծվել է՝  %{date}"
     generating: "Հաշվետվությունը ստեղծվում է..."
     generation_almost_done: "Համարյա պատրաստ է:"
@@ -12184,7 +12188,7 @@ hy:
           find_questions: "Գտնել հարցերը"
           new_question: "Նոր հարց"
           new_question_group: "Նոր հարցերի խումբ"
-          show_assignment_rubric: "Ցույց տալ բաժինը"
+          show_assignment_rubric: "Ցույց տալ ռուբրիկը"
         manage: Կառավարել
         minutes: Րոպե
         new_assignment: "Նոր հանձնարարություն"
@@ -12415,7 +12419,7 @@ hy:
           preview: "Նախնական դիտում "
           quiz_statistics: "Ստուգողական աշխատանքի վիճակագրություն"
           see_full_quiz: "Տեսնել ամբողջ թեստը"
-          show_assignment_rubric: "Ցույց տալ բաժինը"
+          show_assignment_rubric: "Ցույց տալ ռուբրիկը"
           show_student_quiz_results: "Ցույց տալ ունկնդրի թեստի արդյունքները"
           show_student_survey_results: "Ցույց տալ ունկնդրի հարցման արդյունքները"
           survey_statistics: "Հարցման վիճակագրությունը"
@@ -12514,7 +12518,7 @@ hy:
     rubric: 
       loading: "Բեռնում է..."
       titles: 
-        details: "Հանձնարարության խորագրի մանրամասներ"
+        details: "Հանձնարարության ռուբրիկի մանրամասներ"
     show: 
       answers: 
         correct: "Ճիշտ է:"
@@ -12830,7 +12834,7 @@ hy:
       manage_links: "Կառավարել դերերը և վստահելի հղումները"
       manage_outcomes: "Կառավարել ուսուցման արդյունքները"
       manage_role_overrides: "Կառավարել թույլտվությունները"
-      manage_rubrics: "Ստեղծել և խմբագրել գնահատման խորագրերը"
+      manage_rubrics: "Ստեղծել և խմբագրել գնահատման ռուբրիկները"
       manage_sections: "Կառավարել (ավելացնել/խմբագրել/ջնջել) դասընթացի բաժինները"
       manage_sis: "Ներմուծել և կառավարել SIS տվյալները"
       manage_site_settings: "Կառավարել կայքի և միացվող մոդուլների կարգաբերումները"
@@ -12942,7 +12946,7 @@ hy:
     unknown_error: "Ձեր որոնումների ժամանակ ինչ-որ բան սխալ է գնացել, փորձեք նորից:"
     updating: Թարմացում...
   rubric: 
-    context_name_rubric: "%{course_name} խորագիր"
+    context_name_rubric: "%{course_name} ռուբրիկ"
     no_description: "Նկարագրություն չկա"
     unknown_details: "Անհայտ տվյալներ"
   rubric_assessment: 
@@ -12956,43 +12960,43 @@ hy:
     no_details: "Մանրամասներ չկան"
   rubrics: 
     index: 
-      account_rubrics: "Հաշվի խորագրերը"
-      are_you_sure_prompt: "Դուք իսկապե՞ս ցանկանում եք ջնջել այս բաժինը: Այս բաժնի հետ ներկայումս կապված ցանկացած դասընթաց պահպանում է այն մուտք գործելու հնարավորությունը, սակայն ոչ մի նոր դասընթաց չի կարողանա այն օգտագործել:  "
+      account_rubrics: "Հաշվի ռուբրիկները"
+      are_you_sure_prompt: "Դուք իսկապե՞ս ցանկանում եք ջնջել այս ռուբրիկը: Այս ռուբրիկի հետ ներկայումս կապված ցանկացած դասընթաց պահպանում է այն մուտք գործելու հնարավորությունը, սակայն ոչ մի նոր դասընթաց չի կարողանա այն օգտագործել:  "
       buttons: 
-        add_rubric: "Ավելացնել բաժին"
-      course_rubrics: "Դասընթացի թեմաներ"
-      delete_rubric: "Ջնջել խորագիրը"
-      edit_rubric: "Խմբագրել խորագիրը"
-      page_title: Բաժիններ
+        add_rubric: "Ավելացնել ռուբրիկ"
+      course_rubrics: "Դասընթացի ռուբրիկներ"
+      delete_rubric: "Ջնջել ռուբրիկը"
+      edit_rubric: "Խմբագրել ռուբրիկը"
+      page_title: Ռուբրիկներ
       points_possible: 
         one: "%{count} հնարավոր միավորներ"
         other: "%{count} հնարավոր միավորներ"
-      user_rubrics: "Օգտագործողի խորագիրը"
+      user_rubrics: "Օգտագործողի ռուբրիկը"
     loading: "Բեռնում է..."
     show: 
       buttons: 
-        delete: "Ջնջել խորագիրը"
+        delete: "Ջնջել ռուբրիկը"
       prompts: 
-        are_you_sure_delete: "Դուք իսկապե՞ս ցանկանում եք ջնջել այս բաժինը: Այս բաժնի հետ ներկայումս կապված ցանկացած դասընթաց պահպանում է այն մուտք գործելու հնարավորությունը, սակայն ոչ մի նոր դասընթաց չի կարողանա այն օգտագործել:  "
-      rubric_can_not_modify: "Բաժինները հնարավոր չէ ձևափոխել այն բանից հետո, երբ դրանք օգտագործվել են մեկից ավելի տեղերում:"
+        are_you_sure_delete: "Դուք իսկապե՞ս ցանկանում եք ջնջել այս ռուբրիկը: Այս ռուբրիկի հետ ներկայումս կապված ցանկացած դասընթաց պահպանում է այն մուտք գործելու հնարավորությունը, սակայն ոչ մի նոր դասընթաց չի կարողանա այն օգտագործել:  "
+      rubric_can_not_modify: "Ռուբրիկները հնարավոր չէ ձևափոխել այն բանից հետո, երբ դրանք օգտագործվել են մեկից ավելի տեղերում:"
       titles: 
-        edit_rubric: "Խմբագրել խորագիրը"
+        edit_rubric: "Խմբագրել ռուբրիկը"
     titles: 
-      assignment_rubric_details: "Հանձնարարության խորագրի մանրամասներ"
+      assignment_rubric_details: "Հանձնարարության ռուբրիկի մանրամասներ"
     user_index: 
       buttons: 
-        add_rubric: "Ավելացնել բաժին"
-      delete_rubric: "Ջնջել խորագիրը"
+        add_rubric: "Ավելացնել ռուբրիկ"
+      delete_rubric: "Ջնջել ռուբրիկը"
       headings: 
-        user_rubrics: "Օգտագործողի խորագրեր"
-      page_title: Բաժիններ
+        user_rubrics: "Օգտատիրոջ ռուբրիկներ"
+      page_title: Ռուբրիկներ
       points_possible: 
         one: "հնարավոր միավոր"
         other: "հնարավոր միավորներ"
       prompts: 
-        are_you_sure_delete: "Դուք իսկապե՞ս ցանկանում եք ջնջել այս բաժինը: Այս բաժնի հետ ներկայումս կապված ցանկացած դասընթաց պահպանում է այն մուտք գործելու հնարավորությունը, սակայն ոչ մի նոր դասընթաց չի կարողանա այն օգտագործել:  "
-        are_you_sure_remove: "Դուք իսկապե՞ս ցանկանում եք հանել այս բաժինը ձեր ցուցակից:"
-      remove_rubric: "Հեռացնել այս խորագիրը իմ ցուցակից"
+        are_you_sure_delete: "Դուք իսկապե՞ս ցանկանում եք ջնջել այս ռուբրիկը: Այս ռուբրիկի հետ ներկայումս կապված ցանկացած դասընթաց պահպանում է այն մուտք գործելու հնարավորությունը, սակայն ոչ մի նոր դասընթաց չի կարողանա այն օգտագործել:  "
+        are_you_sure_remove: "Դուք իսկապե՞ս ցանկանում եք հանել այս ռուբրիկը ձեր ցուցակից:"
+      remove_rubric: "Հեռացնել այս ռուբրիկը իմ ցուցակից"
   salesforce_account_id_eb5c78ad: "Salesforce հաշվի նույնականացուցիչը"
   salesforce_has_a_different_login_host_for_sanbox_a_2d878ae9: "Salesforce-ը թեստային միջավայրի հաշիվների համար մուտքի այլ հանգույց ունի, որը տարբերվում է աշխատանքային հաշիվներից, ուստի եթե դուք օգտագործում եք Salesforce-ի թեստային հաշիվը և դրոշակով չեք նշում այդ դաշտը, ապա իսկության ստուգում հնարավոր չի լինի կատարել (և դա աշխատում է նաև հակառակ դեպքում, երբ ունեք աշխատանքային հաշիվ և ՆՇՈՒՄ եք դրոշակով այս դաշտը, ապա իսկության ստուգում չի կատարվի): "
   salesforce_ticketing_webtocase_connector_80f75716: "Վեբ-տարրին հետևելու Salesforce  կոնեկտոր "
@@ -13124,7 +13128,7 @@ hy:
     course_sections: "Դասընթացի բաժիններ"
     enrollments_observers: Դիտորդներ
     enrollments_students: Ունկնդիրներ
-    enrollments_tas: "Դասավանդող ասիստենտներ"
+    enrollments_tas: "Դասավանդողների օգնականներ"
     enrollments_teachers: Դասավանդողներ
     student_groups: "Ունկնդիրների խմբեր"
   search_280d00bd: Որոնել
@@ -13200,11 +13204,11 @@ hy:
         labels: 
           account: "Հաշվի գրառում"
           selected_course: "Ընտրված դասընթաց"
-          sis_id: "Համակարգի ID"
+          sis_id: "SIS ID"
         name: "Բաժնի անվանում"
         search_for_course: "Դասընթացի որոնում"
-        sis_id: "Համակարգի ID"
-        sis_source_id: "Համակարգի ID"
+        sis_id: "SIS ID"
+        sis_source_id: "SIS ID"
         start_at: Սկիզբ
       override_settings: "Սա կրկին կսահմանի սեմեստրների կամ դասընթացի ամսաթվերի կարգաբերումները:"
       pending_enrollment: 
@@ -13366,7 +13370,7 @@ hy:
         delete_assignment: Ջնջել
         edit_assignment: Խմբագրել
         submission_comments: "Turnitin-ի ներկայացմանը մեկնաբանություններ"
-        view_rubric_evaluation: "Դիտել բաժնի գնահատումը"
+        view_rubric_evaluation: "Դիտել ռուբրիկի գնահատումը"
       points_out_of: "%{points} %{possible}-ից"
       student_mute_notification: "Դասավանդողը դեռ չի ավարտել գնահատումը "
       submitted_and_graded_count: "%{submitted_count} ուղարկված է, %{graded_count} գնահատված "
@@ -13393,8 +13397,8 @@ hy:
         percent_of_final_grade: "Վերջնական գնահատականի տոկոսը"
     assignment_rubric_dialog: 
       links: 
-        add_rubric: "Ավելացնել բաժին"
-        assign_rubric: "Նշանակել բաժին"
+        add_rubric: "Ավելացնել ռուբրիկ"
+        assign_rubric: "Նշանակել ռուբրիկ"
     available_dates: 
       headers: 
         available: "Հասանելի է"
@@ -13703,38 +13707,38 @@ hy:
       sidebar_content: "Կողային վահանակի բովանդակությունը"
     rubric: 
       buttons: 
-        create: "Ստեղծել բաժին"
+        create: "Ստեղծել ռուբրիկ"
       defaults: 
-        rubric_title: "Որոշակի բաժին"
+        rubric_title: "Որոշակի ռուբրիկ"
       headers: 
         criteria: Չափանիշեր
         points: Միավորներ
         ratings: Վարկանիշեր
       labels: 
         custom_rating: "Ունկնդիրներին գնահատելիս ես ազատ ձևաչափով մեկնաբանություններ եմ գրելու:"
-        grading_rubric: "Օգտագործել այս բաժինը հանձնարարությունը գնահատելու համար"
+        grading_rubric: "Օգտագործել այս ռուբրիկը հանձնարարությունը գնահատելու համար"
         total_points: "Ընդհանուր միավորներ"
         totallying_rubric: "Անտեսանելի դարձնել ընդհանուր միավորները ստուգման արդյունքների համար"
       links: 
         add_criterion: " Ավելացնել չափանիշ"
-        delete: "Ջնջել բաժինը"
-        edit: "Խմբագրել բաժինը"
-        find_a_rubric: "Գտնել բաժինը"
-        find_another_rubric: "Գտնել մեկ այլ խորագիր"
+        delete: "Ջնջել ռուբրիկը"
+        edit: "Խմբագրել ռուբրիկը"
+        find_a_rubric: "Գտնել ռուբրիկը"
+        find_another_rubric: "Գտնել մեկ այլ ռուբրիկ"
         find_outcome: "Արդյունքների որոնում"
-        find_rubric: "Գտնել խորագիր"
+        find_rubric: "Գտնել ռուբրիկը"
       messages: 
-        locked: "Հնարավոր չէ փոխել բաժինը, քանի որ դուք սկսել եք այն օգտագործել:"
+        locked: "Հնարավոր չէ փոխել ռուբրիկը, քանի որ դուք սկսել եք այն օգտագործել:"
         rubric_in_use: 
           one: "Հիշեք, որ 1 ուսանող արդեն գնահատվել է այս խորագրի միջոցով: Խորագրի փոփոխությունը կազդի նրա գնահատականների վրա:"
-          other: "Հիշեք, որ %{count} ունկնդիր արդեն գնահատվել են այս բաժնի խորագրի միջոցով: Խորագրի փոփոխությունը կազդի նրանց գնահատականների վրա:"
-        rubric_in_use2: "Դուք արդեն գնահատել եք ունկնդիրներին այս խորագրի միջոցով: Ցանկացած էական փոփոխություն կարող է ազդել գնահատման արդյունքների վրա:"
+          other: "Հիշեք, որ %{count} ունկնդիր արդեն գնահատվել է այս ռուբրիկի միջոցով: Ռուբրիկի փոփոխությունը կազդի նրանց գնահատականների վրա:"
+        rubric_in_use2: "Դուք արդեն գնահատել եք ունկնդիրներին այս ռուբրիկի միջոցով: Ցանկացած էական փոփոխություն կարող է ազդել գնահատման արդյունքների վրա:"
       out_of: "%{points} * %{total}*-ից"
-      rubric: Բաժին
+      rubric: Ռուբրիկ
       rubric_title: Վերնագիր
       title: Վերնագիր
       titles: 
-        find_existing_rubric: "Գտնել գոյություն ունեցող բաժինը"
+        find_existing_rubric: "Գտնել գոյություն ունեցող ռուբրիկը"
     rubric_criterion: 
       defaults: 
         description: "Չափանիշի նկարագրությունը"
@@ -13773,13 +13777,13 @@ hy:
         long_description: "Երկար նկարագրություն"
     rubric_dialog: 
       buttons: 
-        use_this_rubric: "Օգտագործել այս բաժինը"
+        use_this_rubric: "Օգտագործել այս ռուբրիկը"
       criterion_count: "%{count} չափանիշ"
       links: 
-        manage_rubrics: "Կառավարել վերնագրերը"
+        manage_rubrics: "Կառավարել ռուբրիկները"
       points_possible: "%{points} հնարավոր միավոր"
       titles: 
-        find_a_rubric: "Գտնել բաժինը"
+        find_a_rubric: "Գտնել ռուբրիկը"
     rubric_forms: 
       criteria_description_label: "Չափանիշի նկարագրությունը"
       points: "%{points} pts"
@@ -13794,7 +13798,7 @@ hy:
       labels: 
         total_points: "Ընդհանուր միավորների քանակը"
       points_out_of: "*%{points}* **%{total}**-ից"
-      rubric: Բաժին
+      rubric: Ռուբրիկ
     rubric_summary_criterion: 
       defaults: 
         description: "Չափանիշի նկարագրությունը"
@@ -14026,12 +14030,12 @@ hy:
     upload_filename: "sis_upload_%{id}.zip"
   sis_export_title: "SIS արտահանում"
   sis_grade_export_settings_45a9f709: "SIS գնահատականների արտահանման կարգաբերումներ"
-  sis_id_4495a887: "SIS մուտքանուն"
+  sis_id_4495a887: "SIS ID"
   sis_import: 
     buttons: 
       process_data: "Մշակել տվյալները"
     errors: 
-      import_failed_code: "Ձեր SIS տվյալները ներմուծելիս սխալ է տեղի ունեցել: Գրառումները չեն ներմուծվել: Խնդրում ենք հայտնել ձեր համակարգի ադմինիստրատորին այդ մասին և տվեք հետևյալ կոդը՝\"%{code}\""
+      import_failed_code: "Ձեր SIS տվյալները ներմուծելիս սխալ է տեղի ունեցել: Գրառումները չեն ներմուծվել: Խնդրում ենք հայտնել ձեր համակարգի ադմինիստրատորին այդ մասին և տալ հետևյալ կոդը՝\"%{code}\""
       import_failed_messages: "SIS գրանցումները չեն ներմուծվել: Ներմուծման սխալ հետևյալ հաղորդագրությամբ."
     headers: 
       import_errors: "Սխալներ, որոնք խոչընդոտում են ներմուծմանը"
@@ -14283,7 +14287,7 @@ hy:
     submitted: "Ուղարկված է՝"
     this_was_submitted_multiple_times_choose_a_submission_to_view: "Ուղարկվել է մի քանի անգամ, նշել, թե որը պետք է նայել՝"
     update_grade: "Թարմացնել գնահատականը"
-    view_rubric_assessment_in_the_speedgrader: "Դիտել բաժնի գնահատումը «Արագ գնահատման համակարգ»-ում"
+    view_rubric_assessment_in_the_speedgrader: "Դիտել ռուբրիկի գնահատումը «Արագ գնահատման համակարգ»-ում"
   submission_in_another_grading_period_e754b329: "Աշխատանքի ուղարկում գնահատման այլ ժամանակահատվածի համար"
   submissions: 
     assignment_submit_success: "Հանձնարարությունը հաջողությամբ ուղարկված է:"
@@ -14318,7 +14322,7 @@ hy:
         save_comment: "Պահպանել մեկնաբանությունը"
       crumbs: 
         assignments: Հանձնարարություններ
-      hide_rubric_button: "Թաքցնել բաժնի անվանումը"
+      hide_rubric_button: "Թաքցնել ռուբրիկը"
       labels: 
         add_a_comment: "Ավելացնել մեկնաբանություն"
         grade: Գնահատականներ
@@ -14336,10 +14340,10 @@ hy:
       out_of_points: "%{points_possible}-ից "
       peer_review: "Ունկնդիրների կողմից միմյանց աշխատանքների վերաբերյալ ներկայացված կարծիք"
       peer_review_not_done: "**Ունկնդիրների կողմից միմյանց աշխատանքների վերաբերյալ կարծիքների ներկայացումը դեռ չի ավարտվել:** Դուք պետք է կատարեք առնվազն մեկ մեկնաբանություն, որպեսզի այն համարվի կատարված: "
-      peer_review_not_done_rubric: "**Ունկնդիրների կողմից միմյանց աշխատանքների վերաբերյալ կարծիքների ներկայացումը դեռ չի ավարտվել:** Դուք պետք է կատարեք առնվազն մեկ մեկնաբանություն և լրացնեք աջ կողմում գտնվող սյունակը, որպեսզի այն համարվի կատարված: "
+      peer_review_not_done_rubric: "**Ունկնդիրների կողմից միմյանց աշխատանքների վերաբերյալ կարծիքների ներկայացումը դեռ չի ավարտվել:** Դուք պետք է կատարեք առնվազն մեկ մեկնաբանություն և լրացնեք աջ կողմում գտնվող ռուբրիկը, որպեսզի այն համարվի կատարված: "
       peer_review_steps_complete: "Դուք ամբողջությամբ կատարել եք ունկնդիրների կողմից միմյանց աշխատանքների վերաբերյալ կարծիքների ներկայացման համար պահանջվող քայլերը:"
       sent_to_whole_group: "Մեկնաբանություն ուղարկել ամբողջ խմբին:"
-      show_rubric: "Ցույց տալ բաժինը"
+      show_rubric: "Ցույց տալ ռուբրիկը"
       speedgrader: "«Արագ գնահատման համակարգ™»"
       student_mute_notification: "Գնահատականները անհասանելի են, քանի որ դասավանդողը դեռ չի ավարտել գնահատումը:"
       submission_details: "Ուղարկման մանրամասներ"
@@ -14398,14 +14402,14 @@ hy:
     help_menu: 
       cisco_netacad_facebook: "Օժանդակող օգտագործողների համայնք"
       cisco_netacad_facebook_description: "Խնդրում ենք այցելել Facebook ցանցային ակադեմիայի մեր էջը օժանդակող ծառայությանը կամ Ձեր դասավանդողին դիմելու համար:"
-      community_support_description: "Փոխգործակցել և օժանդակություն ստանալ ձեր դասընկերներից:"
+      community_support_description: "Փոխգործակցել և օժանդակություն ստանալ ձեր աշխատանքի մասին կարծիք ներկայացնողներից:"
       community_support_forums: "Օժանդակող օգտագործողների համայնք ֆորումներ"
       contact_support: "Դիմել սպասարկող ծառայությանը"
-      contact_support_sub_text: "Շտապ հարցերի դեպքում ստանալ անհապաղ օգնություն"
+      contact_support_sub_text: "Շտապ հարցերի դեպքում ստանալ անհապաղ օժանդակություն"
       curriculum_assessment_errata: "Ուսումնական պլանում/գնահատման մեջ վրիպակներ"
       curriculum_assessment_errata_description: "Դիտել արդեն իսկ զեկուցված գնահատման և ուսումնական պլանի վրիպակները: Որոնել \"վրիպակները\": "
       global_support_desk: "Գլոբալ օժանդակության ծառայություն"
-      global_support_desk_description: "Օժանդակման ծառայության մեր աշխատակիցները  ապահովում են ձեր առաջին գծի օժանդակությունը և կարող են միացնել ձեզ մեր Գլոբալ օժանդակության ծառայության հետ այն հարցերի առնչությամբ, որոնք լրացուցիչ աջակցության կարիք ունեն:  "
+      global_support_desk_description: "Օժանդակման ծառայության մեր աշխատակիցները  ապահովում են Ձեր առաջնային օժանդակությունը և կարող են միացնել Ձեզ մեր Գլոբալ օժանդակության ծառայության հետ այն հարցերի առնչությամբ, որոնք լրացուցիչ աջակցության կարիք ունեն:  "
       networking_academy_description: "Դիտել Cisco պատասխանները ամենից հաճախ տրվող հարցերին: "
       networking_academy_faqs: "Ցանցային ակադեմիայի հաճախակի տրվող հարցեր"
       support_desk_livechat: "Տեխնիկական օժանդակության ծառայության հետ առցանց երկխոսություն"
@@ -14489,12 +14493,12 @@ hy:
         other: "%{count} դասընթաց"
       labels: 
         designers_can_access_from: "**Դիզայներները** կարող են մուտք գործել սկսած"
-        sis_id: "Համակարգի ID"
+        sis_id: "SIS ID"
         students_can_access_from: "**Ունկնդիրները** կարող են մուտք գործել սկսած"
         tas_can_access_from: "**Ասիստենտները** կարող են մուտք գործել սկսած"
         teachers_can_access_from: "**Դասավանդողները** կարող են մուտք գործել սկսած"
       name: "Սեմեստրի անվանում՝"
-      sis_source_id: "Համակարգի ID․"
+      sis_source_id: "SIS ID․"
       term_runs_from: "**Սեմեստրը սկսվում է ** սկսած"
       titles: 
         term_ends: "Սեմեստրը ավարտվում է "
@@ -14960,6 +14964,7 @@ hy:
     cant_be_blank: "Canvas օգտագործողի նույնականացուցիչը չի կարող դատակ լինել"
     cant_come_before_from: "'Կատարման ամսաթիվը' չի կարող 'Մեկնարկման ամսաթվից' շուտ լինել"
     results_found: "%{length} արդյունքներ են գտնվել"
+  user_id_or_sis_id_sis_id_should_be_prepended_with__980ff02b: "Օգտատիրոջ ID կամ SIS ID (SIS ID-ն պետք է սկսվի sis_user_id-ի հետ:)"
   user_id_user_id_69a9e865: "Օգտատիրոջ մուտքանուն. %{user_id}"
   user_just_accepted_their_invitation_to_participate_7a4b2ce4: "%{user}-ը այս պահին ընդունել է %{course} դասընթացին որպես %{role_type} մասնակցելու Ձեր հրավերը"
   user_lists: 
@@ -15027,7 +15032,7 @@ hy:
   user_name_successfully_added_79af8365: "%{user_name} օգտատերը հաջողությամբ ավելացվել է"
   user_name_you_ll_need_to_log_in_before_you_can_vie_164c8e30: "%{user_name}, դուք պետք է *մուտք գործեք համակարգ*, նախքան դուք կարողանաք դիտել այս էջը:  "
   user_navigation_a097be0f: "Օգտատիրոջ նավարկում"
-  user_not_authorized_to_manage_sis_data_account_sis_47bd4eec: "Օգտատերը չունի [sis_account_id] հաշվի SIS տվյալների կառավարման թույլտվություն"
+  user_not_authorized_to_manage_sis_data_account_sis_47bd4eec: "օգտատերը չունի [sis_account_id] հաշվի SIS տվյալների կառավարման թույլտվություն"
   user_notes: 
     confirms: 
       delete_journal_entry: "Դուք իսկապե՞ս ցանկանում եք ջնջել մատյանի այս գրառումը:"
@@ -15217,8 +15222,8 @@ hy:
         last_login: "Վերջին մուտքանունը"
         last_request: "Վերջին հարցումը"
         password: Գաղտնաբառ
-        sis_id: "Համակարգի ID"
-        sis_user_id: "Համակարգի ID"
+        sis_id: "SIS ID"
+        sis_user_id: "SIS ID"
         unique_id: "Մուտք համակարգ"
       more: "ավելի շատ..."
       never: երբեք
