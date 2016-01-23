@@ -15499,6 +15499,7 @@ pt:
       updating_user_details: "A atualizar detalhes do utilizador..."
     notices: 
       image_reported: "Esta imagem foi reportada"
+  user_name_just_added_you_to_a_conversation_in_canv_7b278b51: "%{user_name} acabou de adicioná-lo a uma conversa no Canvas. Para exibir a conversa, clique no link abaixo: %{link}."
   user_name_successfully_added_79af8365: "%{user_name} adicionado com sucesso!"
   user_name_you_ll_need_to_log_in_before_you_can_vie_164c8e30: "%{user_name}, vai precisar de *registar* antes que possa ver esta página."
   user_navigation_a097be0f: "Navegação de Utilizador"
@@ -15553,6 +15554,7 @@ pt:
       notifications: Notificações
       profile: Perfil
       settings: Configurações
+  user_s_settings_d65644b4: "Definições de %{user}"
   user_selected_answer: Selecionou
   user_selected_wrong: "A resposta correta foi %{correct_answer_text}."
   user_service: 
@@ -15565,6 +15567,9 @@ pt:
       skype: "Skype é uma ferramenta gratuita para chamadas de voz e vídeo."
       twitter: "Twitter é um ótimo recurso para comunicação fora da sala de aula."
       yo: "Yo é uma ferramenta de comunicação de zero caracteres e um só toque."
+  user_settings_785eed40: "Configurações do usuário"
+  user_successfully_inactivated_aee66efd: "O utilizador foi inativado com sucesso."
+  user_successfully_re_activated_b897e35b: "O utilizador foi reativado"
   username_47bb5bbe: "Nome de utilizador"
   username_could_not_be_found_6c3e8383: "O nome de utilizador não pode ser encontrado"
   users: 
@@ -15827,6 +15832,7 @@ pt:
   vanity_url_76f93382: "URL Simples"
   video_b9f27375: Vídeo
   video_content_is_not_supported_by_your_device_or_a_25214f57: "Não é suportado conteúdo vídeo pelo seu dispositivo ou app."
+  video_player_b371005: "Reprodutor de vídeo"
   view_analytics_91a3b7a: "Ver estatísticas"
   view_app_center_6c89a3fe: "Ver Centro de Aplicações"
   view_app_configurations_52b52441: "Ver configurações de aplicação"
@@ -15834,6 +15840,7 @@ pt:
   view_course_analytics_eefe6b2: "Ver estatísticas da disciplina"
   view_file_8a1c62e5: "Ver ficheiro"
   view_grades_8d3bae6c: "Ver Notas"
+  view_in_speedgrader_773b9d81: "Ver no SpeedGrader"
   view_name_app_62a2ad8e: "Ver aplicação %{name}"
   view_next_file_a8a4a885: "Ver o próximo ficheiro"
   view_previous_file_b846db4f: "Exibir ficheiros anteriores"
@@ -15841,6 +15848,7 @@ pt:
   view_student_analytics_6b8ccd42: "Ver estatísticas de aluno"
   view_the_assignment_e61ca4fc: "Ver tarefa"
   view_toolname_placements_4a5724d1: "Ver %{toolName} Colocações"
+  view_user_groups_d2bfa855: "Ver grupos de utilizadores"
   viewed_6b75c21e: Exibida
   viewing_folders_is_not_available_798a15e1: "Ver as pastas não disponíveis"
   visit_864b4060: Visitar
@@ -15858,7 +15866,9 @@ pt:
   watermark_c93fae0d: "Marca de água"
   watermark_opacity_ce3d3097: "Opacidade da Marca de Água"
   watermarks_other_images_e970fc6a: "Marca de Água & outras Imagens"
+  we_emailed_a_confirmation_link_to_email_address_cl_e5f1d2ae: "Nós enviamos um link de confirmação para %{email_address}. Clique no link neste email para concluir o registro. Verifique sua caixa de spam, caso ele tenha sido filtrado."
   we_re_sorry_a_login_error_has_occurred_please_chec_6dae02e2: "Pedimos desculpa, ocorreu um erro de registo, por favor verifique as credenciais do seu filho e tente novamente."
+  we_sent_a_four_character_confirmation_code_to_sms__a1123db0: "Nós enviamos um código de confirmação de quatro caracteres para %{sms_number}. Insira o código abaixo para ativar este número de sms."
   we_were_unable_to_activate_the_app_578defe7: "Não foi possível ativar a aplicação."
   we_were_unable_to_add_the_app_418877ef: "Não foi possível adicionar a aplicação."
   we_were_unable_to_deactivate_the_app_5e2632f3: "Não foi possível desativar a aplicação."
@@ -16049,6 +16059,7 @@ pt:
   windows_tile_color_2b786bd9: "Cor de mosaico do Windows"
   windows_tile_square_b91d2b33: "Mosaico do Windows: Quadrado"
   windows_tile_wide_4d40910: "Mosaico do Windows: Largura"
+  would_you_like_to_accept_or_dismiss_this_update_9009d696: "Gostaria de aceitar ou rejeitar esta atualização?"
   would_you_like_to_enable_this_app_ccdf735d: "Pretende ativar esta aplicação?"
   would_you_like_to_let_students_continue_in_the_cou_a4c36171: "Pretende deixar que os alunos continuem na disciplina ou deseja voltar a bloquear estes módulos até os novos requisitos serem concluídos?"
   xml_configuration_5ea1b942: "Configuração XML"
@@ -16069,10 +16080,18 @@ pt:
   you_are_trying_to_launch_insecure_content_from_wit_5c1c692b: "Está a tentar enviar conteúdo inseguro a partir de um site seguro (canvas). Alguns navegadores podem evitar o carregamento deste conteúdo."
   you_are_unsubscribed_and_will_not_be_notified_of_n_bf4b96a2: "Cancelou a subscrição e não será notificado de novos comentários. Clique para subscrever"
   you_can_also_manage_access_at_this_time_105a2530: "Também pode gerir acesso nesta altura:"
+  you_can_check_out_other_groups_by_clicking_this_li_1c09e4fb: "Pode verificar outros grupos clicando nesta ligação: %{link}"
+  you_can_check_out_the_group_by_clicking_this_link__10fb5deb: "Pode verificar outros grupos clicando nesta ligação: %{link}"
   you_can_disable_this_feature_d5e61373: "Pode cancelar esta caraterística"
   you_can_hide_or_show_a_course_s_assignments_by_tog_ec8bdb8e: "Pode ocultar ou mostrar as tarefas de uma disciplina ativando-as ou desativando-as."
   you_can_log_in_directly_with_this_provider_by_goin_467d7f66: "Pode registar-se diretamente com este fornecedor utilizando o %{url}"
   you_can_now_set_regrade_options_for_students_who_h_c1ceb1c4: "Pode agora definir opções de reavaliação para alunos que já fizeram o teste."
+  you_can_reply_to_this_comment_by_responding_to_thi_3d130e8c: "Pode responder a este comentário respondendo a esta mensagem, ou rever os detalhes de entrega utilizando esta ligação: %{link}."
+  you_can_reply_to_this_message_in_canvas_by_replyin_fa33638d: "Pode responder a esta mensagem  no Canvas respondendo diretamente a este email, ou clicando nesta ligação: %{link}"
+  you_can_review_the_submission_details_by_clicking__9abc5515: "Pode rever os detalhes do envio clicando na ligação: %{link}."
+  you_can_see_details_for_this_group_by_clicking_thi_acaf07e5: "Pode ver os detalhes para este grupo clicando nesta ligação: %{link}."
+  you_can_see_which_groups_you_re_a_part_of_for_this_6efda22c: "Pode ver a que grupos pertence nesta conta clicando nesta ligação: %{link}."
+  you_can_see_which_groups_you_re_a_part_of_for_this_827a3706: "Pode ver a que grupos pertence nesta conta clicando nesta ligação: %{link}."
   you_can_t_delete_a_sub_account_that_has_courses_in_c4f439cf: "Não é possível excluir uma subconta que contenha cursos"
   you_can_try_to_log_in_again_2b23ef0f: "Pode tentar *registar novamente*"
   you_can_use_a_single_16x16_32x32_48x48_ico_file_85da88b5: "Pode utilizar um um único ficheiro ico 16x16, 32x32, 48x48."
@@ -16090,7 +16109,9 @@ pt:
   you_have_submitted_the_assignment_7ef8a51a: "Enviou a tarefa"
   you_ll_definitely_want_some_of_these_what_s_the_fu_f4f3578b: "De certeza que vai querer alguns destes. Qual é a piada de ensinar uma disciplina se ninguém estiver a ouvir?"
   you_ll_need_a_refresh_token_follow_the_steps_at_th_79a3984b: "Vai precisar de um token atualizado, siga os passos nesta ligação, pode precisar de um especialista técnico para ajudar"
+  you_may_not_see_all_comments_right_now_because_the_96cf2051: "Pode não conseguir ver todos os comentários neste momento porque a tarefa está atualmente a ser avaliada."
   you_may_want_to_assign_some_tas_to_help_you_with_t_702244aa: "Poderá ser útil nomear alguns assistentes para o ajudarem na disciplina. Os assistentes podem avaliar envios dos alunos, ajudar a moderar as discussões e até atualizar datas de entrega e detalhes de envios por si."
+  you_must_agree_to_the_terms_99723f97: "Tem de concordar com os termos de utilização"
   you_must_log_in_to_view_replies_9ccd4da0: "Tem de aceder para ver as respostas"
   you_must_select_a_course_to_copy_content_from_e7bd9e09: "Tem de selecionar uma disciplina da qual pretende copiar conteúdo"
   you_must_set_it_to_a_number_greater_than_or_equal__eb1d9275: "É necessário definir um número igual ou superior a %{min}"
@@ -16101,6 +16122,14 @@ pt:
   you_re_editing_your_canvas_theme_the_changes_have__c0ae1bd1: "Esta a editar o seu Tema Canvas! As alterações ainda não foram aplicadas."
   you_scored_a_score_a5dd5561: "pontuou %{score}"
   you_scored_d3e00111: "A sua pontuação"
+  you_ve_been_enrolled_in_the_course_course_course_r_2b2f00f9: "Foi inscrito na disciplina, %{course}. Função na disciplina: %{role_type}"
+  you_ve_been_given_an_account_role_for_the_account__18e0ef38: "Foi-lhe atribuida uma função na conta para %{account} conta em %{website}. Tipo de função: %{role_type}."
+  you_ve_been_invited_to_course_course_role_role_typ_b8ab8f22: "Foi convidado para %{course}. Função na disciplina: %{role_type}"
+  you_ve_been_invited_to_participate_in_a_class_at_w_b87cd481: "Foi convidado para participar numa disciplina em %{website}. A disicplina tem o nome %{course}. Função na disciplina: %{role_type}"
+  you_ve_been_invited_to_participate_in_the_course_c_a8d1f6a8: "Foi convidado para participar na disciplina, %{course}. Função na disciplina: %{role_type}"
+  you_ve_been_invited_to_peer_review_reviewee_82580fb: "Foi convidado para revisor %{reviewee}."
+  you_ve_been_invited_to_peer_review_reviewee_follow_2e71fce2: "Foi convidado para ser revisor %{reviewee}. Siga esta ligação para revê-los: %{link}."
+  you_ve_been_invited_to_the_course_course_course_ro_a74d748b: "Foi convidado para a disciplina, %{course}. Função na disciplina: %{role_type}"
   you_will_be_redirected_to_a_login_page_where_you_w_fc8df402: "Vai ser redireccionado para uma página de entrada onde precisa de registar-se com as credenciais do seu filho."
   you_will_need_to_create_a_new_app_on_facebook_face_8fe85297: |-
       Vai precisar de criar uma [nova aplicação no Facebook](%{facebook_url}), e permitir o Registo Cliente OAuth
