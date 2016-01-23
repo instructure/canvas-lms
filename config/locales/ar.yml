@@ -76,9 +76,12 @@ ar:
         api_key: "مفتاح واجهة API"
         api_url: "عنوان Url لواجهة Api"
         common_core_guid: "المعرف الأساسي المشترك GUID (اختياري)"
+  accept_2fdd362e: قبول
   accepted_formats_hex_rgba_rgb_hsl_42a37ef7: "التنسيقات المقبولة: hex و rgba و rgb و hsl"
   accepted_formats_svg_png_jpg_gif_f793e4bc: "التنسيقات المقبولة: svg و png و jpeg و gif"
+  accepted_user_role_type_course_course_2ce91589: "مقبول: %{user}، %{role_type}، مساق، %{course}"
   access_token_is_valid_until_d2f048cf: "رمز الوصول المميز صالح لغاية"
+  access_tokens_can_be_used_to_allow_other_applicati_16c4a3ab: "يمكن استخدام رموز الوصول للسماح للتطبيقات الأخرى بإجراء مكالمات API نيابة عنك. ويمكنك كذلك إنشاء رموز الوصول و*استخدام API المفتوحة لـ Canvas* لمسايرة عمليات التكامل الخاصة بك."
   accordion_section_1_7888782d: "القسم 1 من الأكورديون"
   accordion_section_2_e1812997: "القسم 2 من الأكورديون"
   accordion_section_3_96861901: "القسم 3 من الأكورديون"
@@ -223,6 +226,7 @@ ar:
       login_handle_name_description: "التسمية المستخدمة لمعرّفات تسجيل الدخول الفريدة. أمثلة: تسجيل الدخول، اسم المستخدم، معرف الطالب، إلخ"
       unknown_user_url_description: "عنوان URL مخصص لإعادة التوجيه في حالة عدم العثور على مستخدم مصدق في Canvas."
   account_name_13ed649: "%{account_name}"
+  account_name_analytics_62bf60ae: "المعلومات التحليلية لـ %{account.name}"
   account_navigation_80bbefd4: "التنقل عبر الحساب"
   account_notification: 
     errors: 
@@ -283,6 +287,7 @@ ar:
     report_header_end__date: end_date
     report_header_end_date: "تاريخ الانتهاء"
     report_header_enrollment_state: "حالة التسجيل"
+    report_header_expiration: "انتهاء الصلاحية"
     report_header_final_score: "الدرجة النهائية"
     report_header_first_name: first_name
     report_header_full_name: full_name
@@ -326,6 +331,10 @@ ar:
     report_header_term__id: term_id
     report_header_term_id: "معرف الفصل الدراسي"
     report_header_term_sis: "sis للفصل الدراسي"
+    report_header_token_dev_key_id: "معرف مفتاح المطور"
+    report_header_token_dev_key_name: "اسم مفتاح المطور"
+    report_header_token_hint: "تلميح الرمز"
+    report_header_token_last_used: "آخر استخدام"
     report_header_user__id: user_id
     report_header_user_id: "معرف المستخدم"
     report_header_user_name: "اسم المستخدم"
@@ -785,14 +794,12 @@ ar:
     settings: 
       about_google_docs: |-
           تتيح معاينات Google Docs للمستخدمين عرض المستندات
-          من داخل Canvas دون الحاجة إلى تنزيلها وفتح
-          البرنامج الذي يناسبها (مثل Word أو Excel).
-          
-          وبإمكان معاينات Google Docs عرض ملفات
+          من داخل Canvas دون الحاجة إلى تنزيلها و
+          فتح البرنامج المناسب (مثل Word أو Excel).
+          كما أن معاينات Google Docs قادرة على عرض أنواع ملفات
           لا يدعمها عارض مستندات Canvas.
-          
-          باستخدام هذه الخدمة فإنك
-          تقر بأنك قرأت [شروط استخدام Google Docs Viewer](%{terms_url}) وتوافق عليها.
+          باستخدام هذه الخدمة فإنك تقر بأنك قرأت
+          [شروط استخدام Google Docs Viewer](%{terms_url}) وتوافق عليها.
       about_google_docs_tooltip: "نبذة حول معاينات Google Docs"
       account_admins_title: "مسؤولو الحساب"
       account_quotas: 
@@ -882,7 +889,7 @@ ar:
         equella_endpoint: "نقطة نهاية Equella"
         equella_teaser: "تعليقات Equella"
         global_brand_includes: "تحميل تضمينات CSS/JavaScript العامة في محرر النسق"
-        global_includes: "استبدالات CSS/JavaScript الشاملة"
+        global_includes: "تجاوزات CSS/JavaScript المخصصة"
         global_javascript: "عنوان URL العمومي لـ JavaScript"
         global_stylesheet: "عنوان URL العمومي لـ CSS"
         help_link_available_to: "متاح لـ"
@@ -891,6 +898,7 @@ ar:
         help_link_url: URL
         include_students_in_global_survey: "إدراج الطلاب في الاستطلاعات العامة"
         locked: "تأمين هذا الإعداد للحسابات الفرعية والدورات"
+        locked_for_sub_accounts: "تأمين هذا الإعداد للحسابات الفرعية"
         login_handle_name: "تسمية تسجيل الدخول"
         message: الرسالة
         mfa_settings: "مصادقة متعددة العوامل"
@@ -912,6 +920,7 @@ ar:
         show_scheduler: "تمكين المجدول"
         sis_app_token: "رمز وكيل SIS المميز"
         sis_app_url: "عنوان URL لتطبيق SIS"
+        sis_default_grade_export: "بشكل افتراضي، لم يتم وضع العلامة على خانة الاختيار \"نشر الدرجات في SIS\" بالنسبة للمهام والمناقشات التي تم تقييمها والاختبارات."
         sis_source_id: "معرّف SIS"
         start_at: يبدأ
         students_can_create_courses: الطلاب
@@ -1218,6 +1227,11 @@ ar:
       students: "تسجيلات الطلاب"
       ta: "تسجيلات Ta"
       teachers: "تسجيلات المعلمين"
+    user_access_tokens_csv_description: 
+      account_reports: 
+        default: 
+          user_access_token: 
+            text: "يعرض هذا التقرير الطلاب الذين لديهم رموز وصول."
     user_add_failed_message: "فشل إضافة مستخدم، الرجاء المحاولة مرة أخرى"
     user_added_message: "تمت إضافة *%{user}* بنجاح!"
     user_added_message_sent_message: "تمت إضافة *%{user}* بنجاح! يجب أن يتلقوا بريدًا إلكترونيًا للتأكيد بعد قليل."
