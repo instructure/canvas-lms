@@ -31,17 +31,7 @@ define(function(require) {
                 aria-hidden
                 dangerouslySetInnerHTML={{ __html: this.props.questionText }} />
             </div>
-            <div className="col-sm-4 question-top-right">
-              <DiscriminationIndex
-                discriminationIndex={this.props.discriminationIndex}
-                topStudentCount={this.props.topStudentCount}
-                middleStudentCount={this.props.middleStudentCount}
-                bottomStudentCount={this.props.bottomStudentCount}
-                correctTopStudentCount={this.props.correctTopStudentCount}
-                correctMiddleStudentCount={this.props.correctMiddleStudentCount}
-                correctBottomStudentCount={this.props.correctBottomStudentCount}
-              />
-            </div>
+            <div className="col-sm-4 question-top-right"></div>
           </div>
           <div className="grid-row">
             <div className="col-sm-8 question-bottom-left">
