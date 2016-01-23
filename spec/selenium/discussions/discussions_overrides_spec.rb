@@ -112,9 +112,12 @@ describe "discussions overrides" do
         expect(f('.detail_list tbody tr td .special_date_title').text).to include(@new_section.name)
       end
 
-      it "should list the discussions in course and main dashboard page", priority: "2", test_id: 114322 do
+      it "should list the discussions in course dashboard page", priority: "2", test_id: 114322 do
         get "/courses/#{@course.id}"
         expect(f('.coming_up .event a').text).to eq("#{@discussion_topic.title}\nMultiple Due Dates")
+      end
+
+      it "should list the discussions in main dashboard page", priority: "2", test_id: 632022 do
         course_with_admin_logged_in(course: @course)
         get ""
         expect(f('.coming_up .event a').text).to eq("#{@discussion_topic.title}\n#{course.name}\nMultiple Due Dates")
