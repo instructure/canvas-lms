@@ -13371,6 +13371,9 @@ nb:
   saving_recording_e111cb05: "Lagrer opptak ..."
   schedule_student_availability_332154a: "Planlegg studenttilgjengelighet"
   school_of_rock_4b7b1fd0: "School of Rock"
+  score_does_not_include_groups_because_they_have_no_80d12f42: 
+    one: "Resultatet inkluderer ikke %{groups} fordi de ikke hadde noen oppnåelige poeng"
+    other: "Resultatet inkluderer ikke %{groups} fordi de ikke hadde noen oppnåelige poeng"
   score_does_not_include_groups_becuase_they_have_no_ee031bff: 
     one: "Vurderingen inkluderer ikke %{groups} fordi den har ingen oppnåelige poeng"
     other: "Vurderingen inkluderer ikke %{groups} fordi de har ingen oppnåelige poeng"
