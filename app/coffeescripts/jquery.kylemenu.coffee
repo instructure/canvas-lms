@@ -78,7 +78,6 @@ define [
       @$menu.addClass 'ui-state-open'
       @$notifyParent.addClass('menu_active') if @opts.notifyMenuActiveOnParent
 
-
     open: ->
       @$menu.popup 'open'
 

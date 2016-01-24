@@ -15,11 +15,12 @@ describe "gradebook2 - arrange by due date" do
 
   it "should validate arrange columns by due date option", priority: "1", test_id: 220027 do
     expected_text = "-"
+    f('#gradebook_settings').click
     arrange_settings = ff('input[name="arrange-columns-by"]')
-    open_gradebook_settings(arrange_settings.first.find_element(:xpath, '..'))
+    arrange_settings.first.find_element(:xpath, '..').click
     first_row_cells = find_slick_cells(0, f('#gradebook_grid .container_1'))
     expect(first_row_cells[0].text).to eq expected_text
-    open_gradebook_settings()
+    f('#gradebook_settings').click
     expect(arrange_settings.first.find_element(:xpath, '..')).not_to be_displayed
     expect(arrange_settings.last.find_element(:xpath, '..')).to be_displayed
 
@@ -34,8 +35,8 @@ describe "gradebook2 - arrange by due date" do
     expect(first_row_cells[1].text).to eq @assignment_1_points
     expect(first_row_cells[2].text).to eq @assignment_2_points
 
+    f('#gradebook_settings').click
     arrange_settings = ff('input[name="arrange-columns-by"]')
-    open_gradebook_settings()
     expect(arrange_settings.first.find_element(:xpath, '..')).not_to be_displayed
     expect(arrange_settings.last.find_element(:xpath, '..')).to be_displayed
   end
@@ -49,13 +50,13 @@ describe "gradebook2 - arrange by due date" do
     assignment2.update_attribute(:due_at, 3.days.from_now)
     create_assignment_override(assignment2, @section_a, 2)
 
-    fj('#gradebook_settings').click
-    fj("a[data-arrange-columns-by='due_date']").click
+    f('#gradebook_settings').click
+    f("a[data-arrange-columns-by='due_date']").click
     # since due date changes in assignments don't reflect in column sorting without a refresh
     get "/courses/#{@course.id}/gradebook2"
-    expect(fj('#gradebook_grid .container_1 .slick-header-sortable:nth-child(1)')).to include_text(assignment3.title)
-    expect(fj('#gradebook_grid .container_1 .slick-header-sortable:nth-child(2)')).to include_text(assignment2.title)
-    expect(fj('#gradebook_grid .container_1 .slick-header-sortable:nth-child(3)')).to include_text(@assignment.title)
+    expect(f('#gradebook_grid .container_1 .slick-header-sortable:nth-child(1)')).to include_text(assignment3.title)
+    expect(f('#gradebook_grid .container_1 .slick-header-sortable:nth-child(2)')).to include_text(assignment2.title)
+    expect(f('#gradebook_grid .container_1 .slick-header-sortable:nth-child(3)')).to include_text(@assignment.title)
   end
 
   it "should arrange columns by due date when multiple due dates are present", priority: "2", test_id: 378823 do
@@ -70,9 +71,9 @@ describe "gradebook2 - arrange by due date" do
     create_assignment_override(@assignment, @section_a, 5)
     create_assignment_override(assignment3, @section_b, 4)
 
-    fj('#gradebook_settings').click
-    fj("a[data-arrange-columns-by='due_date']").click
-    expect(fj('#gradebook_grid .container_1 .slick-header-sortable:nth-child(1)')).to include_text(assignment3.title)
-    expect(fj('#gradebook_grid .container_1 .slick-header-sortable:nth-child(2)')).to include_text(@assignment.title)
+    f('#gradebook_settings').click
+    f("a[data-arrange-columns-by='due_date']").click
+    expect(f('#gradebook_grid .container_1 .slick-header-sortable:nth-child(1)')).to include_text(assignment3.title)
+    expect(f('#gradebook_grid .container_1 .slick-header-sortable:nth-child(2)')).to include_text(@assignment.title)
   end
 end

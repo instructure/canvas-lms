@@ -67,16 +67,6 @@ module Gradebook2Common
     wait_for_ajaximations
   end
 
-  def open_gradebook_settings(element_to_click = nil)
-    keep_trying_until do
-      f('#gradebook_settings').click
-      expect(ff('#gradebook-toolbar ul.ui-kyle-menu').last).to be_displayed
-      true
-    end
-    yield(f('#gradebook_settings')) if block_given?
-    element_to_click.click unless element_to_click.nil?
-  end
-
   def open_comment_dialog(x=0, y=0)
     # move_to occasionally breaks in the hudson build
     cell = driver.execute_script "return $('#gradebook_grid .container_1 .slick-row:nth-child(#{y+1}) .slick-cell:nth-child(#{x+1})').addClass('hover')[0]"
@@ -280,7 +270,6 @@ module Gradebook2Common
 
   def set_group_weight(assignment_group, weight_number)
     f('#gradebook_settings').click
-    wait_for_ajaximations
     f('[aria-controls="assignment_group_weights_dialog"]').click
 
     dialog = f('#assignment_group_weights_dialog')

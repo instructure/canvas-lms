@@ -61,8 +61,8 @@ describe "assignment column headers" do
     expect(first_row_cells[2].text).to eq "-"
 
     # with a custom order, both sort options should be displayed
+    f('#gradebook_settings').click
     arrange_settings = ff('input[name="arrange-columns-by"]')
-    open_gradebook_settings()
     expect(arrange_settings.first.find_element(:xpath, '..')).to be_displayed
     expect(arrange_settings.last.find_element(:xpath, '..')).to be_displayed
   end
@@ -82,8 +82,8 @@ describe "assignment column headers" do
     expect(first_row_cells[2].text).to eq @assignment_1_points
 
     # both predefined short orders should be displayed since neither one is selected.
+    f('#gradebook_settings').click
     arrange_settings = ff('input[name="arrange-columns-by"]')
-    open_gradebook_settings()
     expect(arrange_settings.first.find_element(:xpath, '..')).to be_displayed
     expect(arrange_settings.last.find_element(:xpath, '..')).to be_displayed
   end
@@ -133,11 +133,12 @@ describe "assignment column headers" do
   end
 
   it "should validate show attendance columns option", priority: "1", test_id: 220034 do
-    attendance_setting = f('#show_attendance').find_element(:xpath, '..')
-    open_gradebook_settings(attendance_setting)
+    f('#gradebook_settings').click
+    f('#show_attendance').find_element(:xpath, '..').click
     headers = ff('.slick-header')
     expect(headers[1]).to include_text(@attendance_assignment.title)
-    open_gradebook_settings(attendance_setting)
+    f('#gradebook_settings').click
+    f('#show_attendance').find_element(:xpath, '..').click
   end
 
   it "should show letter grade in total column", priority: "1", test_id: 220035 do

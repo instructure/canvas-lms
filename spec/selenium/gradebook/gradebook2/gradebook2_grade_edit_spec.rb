@@ -51,7 +51,9 @@ describe "editing grades" do
     expect(final_score_for_row(1)).to eq @student_2_total_ignoring_ungraded
 
     # set the "treat ungraded as 0's" option in the header
-    open_gradebook_settings(f('label[for="include_ungraded_assignments"]'))
+
+    f('#gradebook_settings').click
+    f('label[for="include_ungraded_assignments"]').click
 
     # now make sure that the grades show as if those ungraded assignments had a '0'
     expect(is_checked('#include_ungraded_assignments')).to be_truthy
@@ -68,7 +70,8 @@ describe "editing grades" do
     # NOTE: gradebook1 does not handle 'remembering' the `include_ungraded_assignments` setting
 
     # check that reverting back to unchecking 'include_ungraded_assignments' also reverts grades
-    open_gradebook_settings(f('label[for="include_ungraded_assignments"]'))
+    f('#gradebook_settings').click
+    f('label[for="include_ungraded_assignments"]').click
     expect(is_checked('#include_ungraded_assignments')).to be_falsey
     expect(final_score_for_row(0)).to eq @student_1_total_ignoring_ungraded
     expect(final_score_for_row(1)).to eq @student_2_total_ignoring_ungraded

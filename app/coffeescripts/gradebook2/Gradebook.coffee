@@ -1116,7 +1116,7 @@ define [
         @arrangeColumnsBy(newSortOrder, false)
       @arrangeColumnsBy(@getStoredSortOrder(), true)
 
-      $('#gradebook_settings').kyleMenu()
+      $('#gradebook_settings').kyleMenu(returnFocusTo: $('#gradebook_settings'))
       $('#download_csv').kyleMenu(returnFocusTo: $('#download_csv'))
       $('#post_grades').kyleMenu()
 
