@@ -1266,6 +1266,7 @@ ar:
   add_8523c19b: إضافة
   add_a_new_course_4a041207: "إضافة مساق جديد"
   add_a_new_user_c440d053: "إضافة مستخدم جديد"
+  add_a_reviewer_for_the_selected_students_1c7b5d6f: "إضافة مراجع للطلاب المحددين"
   add_an_identity_provider_to_this_account_c2644478: "إضافة موفر الهوية لهذا الحساب:"
   add_app_baf540f: "إضافة تطبيق"
   add_attachment_93868828: "إضافة مرفق"
@@ -1289,6 +1290,7 @@ ar:
     add_topic_to: "إضافة موضوعات المناقشة إلى %{module}"
   add_new_group_7ac49f31: "إضافة مجموعة جديدة"
   add_new_set_of_due_dates_e8e240f: "إضافة مجموعة جديدة من تواريخ الاستحقاق"
+  add_people_7ee4b2ec: "إضافة أشخاص"
   add_remove_or_rearrange_sections_for_this_portfoli_4628320a: "إضافة الأقسام الخاصة بهذه المحفظة أو إزالتها أو إعادة ترتيبها"
   add_review_2fb1590c: "إضافة مراجعة"
   add_section_8b027a1c: "إضافة قسم"
@@ -1353,6 +1355,7 @@ ar:
       recipients_required: "مطلوب مستلم واحد على الأقل"
       threshold_should_be_numeric: "من المفترض أن يكون رقمًا إيجابيًا"
   all_4321c3a1: الكل
+  all_account_types_e83c1516: "جميع أنواع الحسابات"
   all_accounts_3bafc860: "جميع الحسابات"
   all_changes_were_saved_f6f3ddcc: "تم حفظ جميع التغييرات"
   all_configured_apps_a14eef0a: "جميع التطبيقات المكوّنة"
@@ -1387,6 +1390,7 @@ ar:
   an_error_occurred_when_setting_the_usage_right_for_d4ea78f5: "حدث خطأ أثناء إعداد حق الاستخدام الخاص بـ %{filename}"
   an_item_named_name_already_exists_in_this_location_147b7312: "يوجد عنصر يسمى \"%{name}\" بالفعل في هذا الموقع. هل تريد استبدال الملف الموجود؟"
   an_unknown_server_error_occurred_please_try_again_f517eaf3: "حدث خطأ غير معروف في الخادم. الرجاء إعادة المحاولة."
+  an_update_is_available_for_toolname_bba3fa2: "هناك تحديث متوفر لـ %{toolName}"
   analytics: 
     course: 
       analytics: "المعلومات التحليلية"
@@ -1475,6 +1479,7 @@ ar:
   api_url_3ee7cb0a: "URL واجهة برمجة التطبيقات"
   app_center_will_appear_in_the_apps_tab_on_the_sett_1b9eb936: "يظهر مركز التطبيقات في علامة التبويب \"التطبيقات\" في صفحة إعدادات المساق أو صفحة إعدادات الحساب. من المفترض أن يشير عنوان URL الموجود أدناه إلى نقطة نهاية صالحة لمركز التطبيقات (على سبيل المثال، %{url} -- تأكد من حذف الشرطة المائلة اللاحقة"
   app_placements_6d877225: "مواضع التطبيق"
+  app_reregistration_87cc8817: "إعادة التسجيل في التطبيق"
   appends_a_number_to_the_end_of_each_event_title_e__bca98abd: "إضافة رقم إلى نهاية عنوان كل حدث (عل ىسبيل المثال، Event 1 ،Event 2، إلخ)"
   appends_a_number_to_the_end_of_each_event_title_e__e9573bf8: "إضافة رقم إلى نهاية عنوان كل حدث (عل ىسبيل المثال، Event 1 ،Event 2، إلخ)\" for=\"append_iterator"
   application: 
@@ -2884,6 +2889,7 @@ ar:
   canvas_did_not_recognize_your_identity_provider_cb0e50fc: "لم يتعرف Canvas على موفر الهوية"
   canvas_doesn_t_have_an_account_for_user_user_5bcae0dd: "لا يحتوي Canvas على حساب للمستخدم: %{user}"
   canvas_error_report_ff678539: "تقرير خطأ Canvas"
+  canvas_introduction_video_2d81f3ad: "فيديو مقدمة Canvas"
   canvas_revision_unknown: "غير معروف"
   canvas_ticketing_email_connector_27e253ae: "رابط تذاكر البريد الإلكتروني لـ Canvas"
   canvas_ticketing_web_post_connector_11158897: "رابط تذاكر منشورات Canvas"
