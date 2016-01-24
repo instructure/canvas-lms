@@ -72,9 +72,11 @@ ru:
         api_key: "Ключ API"
         api_url: "Url-адрес Api"
         common_core_guid: "Общий ключевой GUID (необязательно)"
+  accept_2fdd362e: Принять
   accepted_formats_hex_rgba_rgb_hsl_42a37ef7: "допустимые форматы: hex, rgba, rgb, hsl"
   accepted_formats_svg_png_jpg_gif_f793e4bc: "Допустимые форматы: svg, png, jpg, gif"
   access_token_is_valid_until_d2f048cf: "Токен доступа действителен до"
+  access_tokens_can_be_used_to_allow_other_applicati_16c4a3ab: "Маркеры доступа могут использоваться для разрешения другим приложениям выполнять вызовы API от вашего имени. Также можно создать маркеры доступа и *использовать Canvas Open API* для работы с собственными интеграциями."
   accordion_section_1_7888782d: "Accordion Раздел 1"
   accordion_section_2_e1812997: "Accordion Раздел 2"
   accordion_section_3_96861901: "Accordion Раздел 3"
@@ -322,6 +324,7 @@ ru:
     report_header_term__id: term_id
     report_header_term_id: "идентификатор семестра"
     report_header_term_sis: "sis семестра"
+    report_header_token_last_used: "последний раз использовался"
     report_header_user__id: user_id
     report_header_user_id: "идентификатор пользователя"
     report_header_user_name: "имя пользователя"
