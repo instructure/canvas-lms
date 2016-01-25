@@ -402,6 +402,7 @@ module OutcomeCommon
 
     driver.execute_script("$('.submit_button').click()") unless f('.submit_button').nil?
     refresh_page
+    wait_for_ajaximations
 
     # select group
     fj('.outcome-level:eq(0) .outcome-group').click
