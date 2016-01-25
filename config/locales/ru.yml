@@ -75,6 +75,7 @@ ru:
   accept_2fdd362e: Принять
   accepted_formats_hex_rgba_rgb_hsl_42a37ef7: "допустимые форматы: hex, rgba, rgb, hsl"
   accepted_formats_svg_png_jpg_gif_f793e4bc: "Допустимые форматы: svg, png, jpg, gif"
+  accepted_user_role_type_course_course_2ce91589: "Принято: %{user}, %{role_type}, курс, %{course}"
   access_token_is_valid_until_d2f048cf: "Токен доступа действителен до"
   access_tokens_can_be_used_to_allow_other_applicati_16c4a3ab: "Маркеры доступа могут использоваться для разрешения другим приложениям выполнять вызовы API от вашего имени. Также можно создать маркеры доступа и *использовать Canvas Open API* для работы с собственными интеграциями."
   accordion_section_1_7888782d: "Accordion Раздел 1"
@@ -221,6 +222,7 @@ ru:
       login_handle_name_description: "Метка используется для уникальных идентификаторов входа. Примеры: Вход, имя пользователя, идентификатор учащегося и т.д."
       unknown_user_url_description: "Url-адрес для переадресации, если аутентифицированный пользователь не найден в системе Canvas."
   account_name_13ed649: "%{account_name}"
+  account_name_analytics_62bf60ae: "%{account.name} Аналитика"
   account_navigation_80bbefd4: "Навигация по аккаунту"
   account_notification: 
     errors: 
@@ -281,6 +283,7 @@ ru:
     report_header_end__date: end_date
     report_header_end_date: "дата окончания"
     report_header_enrollment_state: "состояние регистрации"
+    report_header_expiration: "истечение срока"
     report_header_final_score: "итоговая оценка"
     report_header_first_name: first_name
     report_header_full_name: full_name
@@ -324,6 +327,9 @@ ru:
     report_header_term__id: term_id
     report_header_term_id: "идентификатор семестра"
     report_header_term_sis: "sis семестра"
+    report_header_token_dev_key_id: "id ключа разработчика"
+    report_header_token_dev_key_name: "имя ключа разработчика"
+    report_header_token_hint: "подсказка токена"
     report_header_token_last_used: "последний раз использовался"
     report_header_user__id: user_id
     report_header_user_id: "идентификатор пользователя"
@@ -779,9 +785,16 @@ ru:
             field: "Идентификатор раздела"
     settings: 
       about_google_docs: |-
-          Функция предварительного просмотра документов Google Docs позволяет пользователям просматривать документы внутри Canvas, вместо того, чтобы скачивать их и открывать соответствующие программы (например, Word или Excel).
+          Google Docs Previews позволяют пользователям просматривать документы из
+          Canvas, вместо того, чтобы загрузить их и
+          открыть соответствующую программу (например, Word или Excel).
           
-          Если для данной учетной записи был подключен Scribd, Canvas попытается использовать его для предварительного просмотра. Если для документа предварительный просмотр в Scribd невозможен, или если у пользователя не установлен проигрыватель Flash player (например, у владельцев iPad/iPhone), Canvas вернется к использованию функции предварительного просмотра Google Docs, если эта функция включена. Используя данную службу, вы подтверждаете, что прочли и согласились с [Условиями обслуживания средства просмотра Google Docs](%{terms_url}).
+          Google Docs Previews также можете показывать типы файлов,
+          не поддерживаемые программой предварительного просмотра документов Canvas.
+          
+          Если вы используете эту услугу, Вы
+          подтверждаете, что вы прочитали и согласились с
+          [Условиями предоставления услугGoogle Docs Viewer](%{terms_url}).
       about_google_docs_tooltip: "О Google Docs Previews"
       account_admins_title: "Администраторы учетных записей"
       account_quotas: 
@@ -871,7 +884,7 @@ ru:
         equella_endpoint: "Конечная точка Equella"
         equella_teaser: "Комментарии Equella"
         global_brand_includes: "Загрузить глобальные включения CSS/JavaScript в Редактор Тем"
-        global_includes: "Глобальные коррекции CSS/JavaScript"
+        global_includes: "Пользовательские отмены CSS/JavaScript"
         global_javascript: "UR-адрес глобального JavaScript"
         global_stylesheet: "URL-адрес глобального CSS"
         help_link_available_to: "Доступно для"
