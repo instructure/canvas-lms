@@ -1170,41 +1170,20 @@ class ActiveRecord::MigrationProxy
   end
 end
 
+module MigratorCache
+  def migrations(paths)
+    @@migrations_hash ||= {}
+    @@migrations_hash[paths] ||= super
+  end
+
+  def migrations_paths
+    @@migrations_paths ||= [File.join(Rails.root, "db/migrate")]
+  end
+end
+ActiveRecord::Migrator.singleton_class.prepend(MigratorCache)
+
 class ActiveRecord::Migrator
   cattr_accessor :migrated_versions
-
-  def self.migrations_paths
-    @@migration_paths ||= []
-  end
-
-  def migrations
-    @@migrations ||= begin
-      @migrations_path ||= File.join(Rails.root, 'db/migrate')
-      files = ([@migrations_path].compact + self.class.migrations_paths).uniq.
-        map { |p| Dir["#{p}/[0-9]*_*.rb"] }.flatten
-
-      migrations = files.inject([]) do |klasses, file|
-        version, name, scope = file.scan(/([0-9]+)_([_a-z0-9]*)\.?([_a-z0-9]*)?\.rb\z/).first
-
-        raise ActiveRecord::IllegalMigrationNameError.new(file) unless version
-        version = version.to_i
-
-        if klasses.detect { |m| m.version == version }
-          raise ActiveRecord::DuplicateMigrationVersionError.new(version)
-        end
-
-        if klasses.detect { |m| m.name == name.camelize }
-          raise ActiveRecord::DuplicateMigrationNameError.new(name.camelize)
-        end
-
-        klasses << ActiveRecord::MigrationProxy.new(name.camelize, version, file, scope)
-        klasses
-      end
-
-      migrations = migrations.sort_by(&:version)
-      down? ? migrations.reverse : migrations
-    end
-  end
 
   def pending_migrations_with_runnable
     pending_migrations_without_runnable.reject { |m| !m.runnable? }
