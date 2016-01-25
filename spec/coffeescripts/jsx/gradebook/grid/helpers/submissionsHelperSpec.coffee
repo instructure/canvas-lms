@@ -23,7 +23,7 @@ define [
         }]
     }
 
-  module 'SubmissionsHelper#extractSubmissions',
+  module 'SubmissionsHelper#extractSubmissions'
 
   test 'returns an object with a key for each assignment', ->
     submissionGroups = defaultSubmissionGroups()
@@ -39,7 +39,7 @@ define [
     propEqual _.pluck(submissions[7], 'id'), [19, 24]
 
 
-  module 'SubmissionsHelper#submissionsForAssignment',
+  module 'SubmissionsHelper#submissionsForAssignment'
 
   test 'returns all submissions for an assignment indexed by user id, if any exist', ->
     submissionGroups = defaultSubmissionGroups()

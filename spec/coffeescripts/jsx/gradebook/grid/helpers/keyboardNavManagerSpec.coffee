@@ -2,7 +2,7 @@ define [
   'jsx/gradebook/grid/helpers/keyboardNavManager'
 
 ], (KeyboardNavManager) ->
-  module 'KeyboardNavManager#new',
+  module 'KeyboardNavManager#new'
 
   test 'returns an object with the appropriate boundaries', ->
     nav = new KeyboardNavManager({ width: 5, height: 8 })

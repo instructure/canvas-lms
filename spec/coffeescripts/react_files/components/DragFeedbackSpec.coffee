@@ -6,7 +6,7 @@ define [
 ], ($, React, File, DragFeedback) ->
   TestUtils = React.addons.TestUtils
 
-  module 'DragFeedback',
+  module 'DragFeedback'
 
   test 'DF: shows a badge with number of items being dragged', ->
     file = new File(id: 1, name: 'Test File', thumbnail_url: 'blah')

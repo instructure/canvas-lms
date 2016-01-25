@@ -69,7 +69,7 @@ define [
       }
     ]
 
-  module 'AssignmentGroupsStore#formatAssignment',
+  module 'AssignmentGroupsStore#formatAssignment'
 
   test 'parses created_at, updated_at, due_at, lock_at, and unlock_at (if exist and non null)', ->
     assignment = assignmentWithoutOverrides()

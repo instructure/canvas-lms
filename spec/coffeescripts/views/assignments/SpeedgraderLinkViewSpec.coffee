@@ -5,7 +5,6 @@ define [
 ], (SpeedgraderLinkView, Assignment, $) ->
 
   module "SpeedgraderLinkView",
-
     setup: ->
       @model = new Assignment published: false
       $('#fixtures').html """
@@ -21,11 +20,9 @@ define [
       $('#fixtures').empty()
 
   test "#toggleSpeedgraderLink toggles visibility of speedgrader link on change", ->
-
     @model.set 'published', true
 
     ok ! @view.$el.hasClass 'hidden'
 
     @model.set 'published', false
     ok @view.$el.hasClass 'hidden'
-

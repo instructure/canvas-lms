@@ -1,4 +1,3 @@
-
 define [
   'compiled/userSettings'
 ], (userSettings)->
@@ -6,7 +5,6 @@ define [
   globalObj = this
 
   module 'UserSettings',
-
     setup: ->
       @_ENV = globalObj.ENV
       globalObj.ENV =

@@ -6,7 +6,8 @@ define [
 
   TestUtils = React.addons.TestUtils
 
-  module 'ModalButtons',
+  module 'ModalButtons'
+
   test "applies className", ->
     ModalButtonsElement = React.createElement(ModalButtons, className: "cat", footerClassName: "dog")
     component = TestUtils.renderIntoDocument(ModalButtonsElement)

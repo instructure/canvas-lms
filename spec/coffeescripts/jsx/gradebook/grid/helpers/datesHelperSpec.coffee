@@ -11,7 +11,7 @@ define [
       updated_at: "2015-07-07T18:35:22Z"
     }
 
-  module 'DatesHelper#parseDates',
+  module 'DatesHelper#parseDates'
 
   test 'returns a new object with specified dates parsed', ->
     assignment = defaultAssignment()

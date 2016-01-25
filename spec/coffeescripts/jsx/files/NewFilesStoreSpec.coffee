@@ -1,6 +1,6 @@
 define ['jsx/files/NewFilesStore'], (NewFilesStore) ->
 
-  module 'NewFilesStore',
+  module 'NewFilesStore'
 
   test 'constructor', ->
     store = new NewFilesStore()

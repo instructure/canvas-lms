@@ -21,7 +21,6 @@ define [
   """)
 
   module 'autocomplete',
-
     teardown: ->
       $el.remove()
       $('#fixtures').empty()

@@ -6,7 +6,8 @@ define [
 
   TestUtils = React.addons.TestUtils
 
-  module 'LoadingIndicator',
+  module 'LoadingIndicator'
+
   test 'display none if no props supplied', ->
     loadingIndicator = React.createFactory(LoadingIndicator)
     rendered = TestUtils.renderIntoDocument(loadingIndicator())

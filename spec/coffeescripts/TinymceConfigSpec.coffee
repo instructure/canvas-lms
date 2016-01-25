@@ -15,7 +15,6 @@ define [
   toolbar3 = "ltr,rtl,fontsizeselect,formatselect"
 
   module "EditorConfig",
-
     setup: ->
       INST = {}
       INST.editorButtons = []

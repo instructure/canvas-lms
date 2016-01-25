@@ -67,6 +67,7 @@ define [
     equal helpers.toPrecision(3.6666666, 2), '3.7'
 
   module 'truncate'
+
   test 'default truncates 30 characters', ->
     text = "asdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdf"
     truncText = helpers.truncate text
@@ -133,8 +134,6 @@ define [
     timeTag = helpers.friendlyDatetime('1970-01-01 00:00:00Z', hash: {pubDate: false, contextSensitive: true}).string
     equal timeTag, "<time data-tooltip data-html-tooltip-title='Dec 31, 1969 at 7:00pm' datetime='1970-01-01T00:00:00.000Z' undefined>Dec 31, 1969</time>"
 
-
-
   module 'contextSensitiveDatetimeTitle',
     setup: ->
       @snapshot = tz.snapshot()
@@ -181,8 +180,6 @@ define [
     titleText = helpers.contextSensitiveDatetimeTitle('1970-01-01 00:00:00Z', hash: {justText: undefined})
     equal titleText, "data-tooltip data-html-tooltip-title=\"Dec 31, 1969 at 7:00pm\""
 
-
-
   module 'datetimeFormatted',
     setup: -> @snapshot = tz.snapshot()
     teardown: -> tz.restore(@snapshot)
@@ -192,57 +189,58 @@ define [
     equal helpers.datetimeFormatted('1970-01-01 00:00:00'),
       "Jan 1, 1970 at 12:00am"
 
-  module 'ifSettingIs',
+  module 'ifSettingIs'
 
-    test 'it runs primary case if setting matches', ->
-      ENV.SETTINGS = {key: 'value'}
-      semaphore = false
-      funcs = {
-        fn: (()-> semaphore = true ),
-        inverse: (()-> throw new Error("Dont call this!"))
-      }
-      helpers.ifSettingIs('key', 'value', funcs)
-      equal semaphore, true
+  test 'it runs primary case if setting matches', ->
+    ENV.SETTINGS = {key: 'value'}
+    semaphore = false
+    funcs = {
+      fn: (()-> semaphore = true ),
+      inverse: (()-> throw new Error("Dont call this!"))
+    }
+    helpers.ifSettingIs('key', 'value', funcs)
+    equal semaphore, true
 
-    test 'it runs inverse case if setting does not match', ->
-      ENV.SETTINGS = {key: 'NOTvalue'}
-      semaphore = false
-      funcs = {
-        inverse: (()-> semaphore = true ),
-        fn: (()-> throw new Error("Dont call this!"))
-      }
-      helpers.ifSettingIs('key', 'value', funcs)
-      equal semaphore, true
+  test 'it runs inverse case if setting does not match', ->
+    ENV.SETTINGS = {key: 'NOTvalue'}
+    semaphore = false
+    funcs = {
+      inverse: (()-> semaphore = true ),
+      fn: (()-> throw new Error("Dont call this!"))
+    }
+    helpers.ifSettingIs('key', 'value', funcs)
+    equal semaphore, true
 
-    test 'it runs inverse case if setting does not exist', ->
-      ENV.SETTINGS = {}
-      semaphore = false
-      funcs = {
-        inverse: (()-> semaphore = true ),
-        fn: (()-> throw new Error("Dont call this!"))
-      }
-      helpers.ifSettingIs('key', 'value', funcs)
-      equal semaphore, true
+  test 'it runs inverse case if setting does not exist', ->
+    ENV.SETTINGS = {}
+    semaphore = false
+    funcs = {
+      inverse: (()-> semaphore = true ),
+      fn: (()-> throw new Error("Dont call this!"))
+    }
+    helpers.ifSettingIs('key', 'value', funcs)
+    equal semaphore, true
 
-   module 'accessible date pickers',
-     test 'it provides a format', ->
-       equal(typeof(helpers.accessibleDateFormat()), "string")
+   module 'accessible date pickers'
 
-     test 'it can shorten the format for dateonly purposes',->
-       shortForm = helpers.accessibleDateFormat('date')
-       equal(shortForm.indexOf("hh:mm"), -1)
-       ok(shortForm.indexOf("YYYY") > -1)
+   test 'it provides a format', ->
+     equal(typeof(helpers.accessibleDateFormat()), "string")
 
-     test 'it can shorten the format for time-only purposes',->
-       shortForm = helpers.accessibleDateFormat('time')
-       ok(shortForm.indexOf("hh:mm") > -1)
-       equal(shortForm.indexOf("YYYY"), -1)
+   test 'it can shorten the format for dateonly purposes',->
+     shortForm = helpers.accessibleDateFormat('date')
+     equal(shortForm.indexOf("hh:mm"), -1)
+     ok(shortForm.indexOf("YYYY") > -1)
 
-     test 'it provides a common format prompt wrapped around the format', ->
-       formatPrompt = helpers.datepickerScreenreaderPrompt()
-       ok(formatPrompt.indexOf(helpers.accessibleDateFormat()) > -1)
+   test 'it can shorten the format for time-only purposes',->
+     shortForm = helpers.accessibleDateFormat('time')
+     ok(shortForm.indexOf("hh:mm") > -1)
+     equal(shortForm.indexOf("YYYY"), -1)
 
-     test 'it passes format info through to date format', ->
-       shortFormatPrompt = helpers.datepickerScreenreaderPrompt('date')
-       equal(shortFormatPrompt.indexOf(helpers.accessibleDateFormat()), -1)
-       ok(shortFormatPrompt.indexOf(helpers.accessibleDateFormat('date')) > -1)
+   test 'it provides a common format prompt wrapped around the format', ->
+     formatPrompt = helpers.datepickerScreenreaderPrompt()
+     ok(formatPrompt.indexOf(helpers.accessibleDateFormat()) > -1)
+
+   test 'it passes format info through to date format', ->
+     shortFormatPrompt = helpers.datepickerScreenreaderPrompt('date')
+     equal(shortFormatPrompt.indexOf(helpers.accessibleDateFormat()), -1)
+     ok(shortFormatPrompt.indexOf(helpers.accessibleDateFormat('date')) > -1)
