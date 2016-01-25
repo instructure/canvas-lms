@@ -102,6 +102,9 @@ class WikiPagesController < ApplicationController
         js_data[:ModuleSequenceFooter_data] = item_sequence_base(Api.api_type_to_canvas_name('ModuleItem'), params[:module_item_id])
       end
 
+      # This next bit is to set the module listing into the javascript
+      # data so we can use it to build tables of contents without needing
+      # additional ajax queries to get the available modules
       context_module = @context.context_modules.first
       if context_module
         js_data[:module_listing_data] = context_module.content_tags_visible_to(@current_user)
