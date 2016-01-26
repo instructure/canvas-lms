@@ -6386,6 +6386,7 @@ pt-BR:
       page_title: "Visualização do arquivo"
   files_and_folder_contents_only_available_to_studen_944f9166: "Arquivos e conteúdo da pasta disponíveis somente aos alunos com link. Não visível nos arquivos do aluno."
   files_c300e900: Arquivos
+  files_quota_percentused_of_bytesavailable_used_d208857a: "Cota de Arquivos: %{percentUsed}% de %{bytesAvailable} usado"
   files_toolbar_2f2f0976: "Barra de Ferramentas de Arquivos"
   files_uploaded_519844ed: "Arquivos enviados"
   fill_in_the_blank_read_surrounding_text_1a6c73c7: "Preencha a lacuna, leia o texto ao redor"
@@ -13187,6 +13188,7 @@ pt-BR:
   reply_to_main_discussion_29823888: "Responder discussão principal"
   require_usage_rights_for_uploaded_files_4507865b: "Requer direitos de uso para arquivos enviados por upload"
   reregister_9ab95a57: "Matricular novamente"
+  reregister_toolname_3dde0bfc: "Matricular %{toolName}"
   reserved_f247b60b: Reservado
   reset_95a81614: Redefinir
   reset_this_contact_method_s_bounce_count_3845ecf4: "Redefinir a contagem de bounce deste método de contato"
@@ -13735,7 +13737,7 @@ pt-BR:
         go_to_course: "Ir para o curso"
         go_to_dashboard: "Ir para seu painel"
       not_available_yet: "Enviaremos a você um e-mail um pouco antes do curso começar."
-  self_registration_156392d6: Autorregistração
+  self_registration_156392d6: "Auto Matriculação"
   send_custom_fields_uncheck_unless_using_canvas_zen_67e83666: "Enviar Campos Personalizados (desmarcar a menos que esteja utilizando o Canvas Zendesk)"
   send_e3bd0ed0: Enviar
   sends_international_text_messages_from_a_phone_num_10afbad6: "Envia mensagens de texto internacionais de um número de telefone no país do destinatário, se possivel."
