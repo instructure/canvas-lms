@@ -68,8 +68,10 @@ nl:
         api_key: API-sleutel
         api_url: Api-URL
         common_core_guid: "Common Core GUID (optioneel)"
+  accept_2fdd362e: Accepteren
   accepted_formats_hex_rgba_rgb_hsl_42a37ef7: "geaccepteerde formaten: hex, rgba, rgb, hsi"
   accepted_formats_svg_png_jpg_gif_f793e4bc: "Geaccepteerde formaten: svg, png, jpg, gif"
+  accepted_user_role_type_course_course_2ce91589: "Geaccepteerd:  %{user}, %{role_type}, cursus, %{course}"
   access_token_is_valid_until_d2f048cf: "Toegangstoken is geldig tot"
   accordion_section_1_7888782d: "Accordion Sectie 1"
   accordion_section_2_e1812997: "Accordion Sectie 2"
