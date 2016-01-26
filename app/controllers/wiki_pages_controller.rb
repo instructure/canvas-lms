@@ -105,9 +105,25 @@ class WikiPagesController < ApplicationController
       # This next bit is to set the module listing into the javascript
       # data so we can use it to build tables of contents without needing
       # additional ajax queries to get the available modules
-      context_module = @context.context_modules.first
-      if context_module
-        js_data[:module_listing_data] = context_module.content_tags_visible_to(@current_user)
+      if params[:module_item_id]
+        done = false # Ruby doesn't have `break outer_loop;` so i'll use a flag
+        # Gotta loop through them all and find the module that we are actually
+        # currently in, so the javascript will have the right context for its
+        # corresponding search
+        @context.context_modules.each do |context_module|
+          possible_items = context_module.content_tags_visible_to(@current_user)
+          possible_items.each do |item|
+            # if the searched module includes the current item, it is usable to us!
+            # now, the script will use this data to generate a table of contents of
+            # the surrounding items.
+            if item.id.to_i == params[:module_item_id].to_i
+              js_data[:module_listing_data] = possible_items
+              done = true
+              break
+            end
+          end
+          break if done
+        end
       end
 
       js_env js_data
