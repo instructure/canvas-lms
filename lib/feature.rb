@@ -352,7 +352,7 @@ END
     'notification_service' =>
     {
       display_name: -> { I18n.t('Use remote service for notifications') },
-      description: -> { I18n.t('Allow the ability to send notifications through our a dispatch queue') },
+      description: -> { I18n.t('Allow the ability to send notifications through our dispatch queue') },
       applies_to: 'RootAccount',
       state: 'hidden',
       beta: true,
