@@ -554,7 +554,7 @@ class Message < ActiveRecord::Base
       return nil
     end
 
-    if user.account.feature_enabled?(:notification_service) && path_type != "yo"
+    if user && user.account.feature_enabled?(:notification_service) && path_type != "yo"
       message_body = path_type == "email" ? Mailer.create_message(self).to_s : body
       NotificationService.process(message_body, path_type, to, remote_configuration)
       complete_dispatch
