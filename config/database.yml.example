@@ -21,11 +21,3 @@ production:
   username: canvas
   password: your_password
   timeout: 5000
-  queue:
-    adapter: postgresql
-    encoding: utf8
-    database: canvas_queue_production
-    host: localhost
-    username: canvas
-    password: your_password
-    timeout: 5000
