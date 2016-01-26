@@ -168,6 +168,12 @@ class AccountAuthorizationConfig < ActiveRecord::Base
     end
   end
 
+  protected
+
+  def statsd_prefix
+    "auth.account_#{Shard.global_id_for(account_id)}.config_#{self.global_id}"
+  end
+
   private
 
   def soft_delete_pseudonyms
