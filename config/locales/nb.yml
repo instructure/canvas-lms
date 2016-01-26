@@ -6378,7 +6378,7 @@ nb:
       page_title: "Forhåndsvis fil"
   files_and_folder_contents_only_available_to_studen_944f9166: "Filer og mappeinnhold kun tilgjengelig for studenter med lenke. Ikke synlig i elevmapper."
   files_c300e900: Filer
-  files_quota_percentused_of_bytesavailable_used_d208857a: "Filkvote: %{percentUsed}% of %{bytesAvailable} brukt"
+  files_quota_percentused_of_bytesavailable_used_d208857a: "Filkvote: %{percentUsed}% av %{bytesAvailable} brukt"
   files_toolbar_2f2f0976: "Filer verktøylinje"
   files_uploaded_519844ed: "Opplastede Filer"
   fill_in_the_blank_read_surrounding_text_1a6c73c7: "Fyll inn den tomme boksen, les teksten rundt"
