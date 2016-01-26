@@ -238,6 +238,20 @@ describe Message do
       expect(@message.deliver).to eq false
     end
 
+    it "completes delivery without a user" do
+      message = message_model({
+        dispatch_at: Time.now,
+        to: 'somebody',
+        updated_at: Time.now.utc - 11.minutes,
+        user: nil,
+        path_type: 'email'
+      })
+      message.workflow_state = "staged"
+      Mailer.stubs(create_message: stub(deliver: "Response!"))
+      expect(message.workflow_state).to eq("staged")
+      expect{ message.deliver }.not_to raise_error
+    end
+
     context 'push' do
       before :once do
         user_model
