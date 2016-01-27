@@ -33,6 +33,10 @@
   #content {
     &.Content--with-module-footer {
       padding-bottom: 70px;
+
+      .tool_content_wrapper {
+        padding-bottom: 70px;
+      }
     }
   }
 
