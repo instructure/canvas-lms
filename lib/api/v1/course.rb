@@ -88,6 +88,9 @@ module Api::V1::Course
       hash['teachers'] = course.teachers.map { |teacher| user_display_json(teacher) } if includes.include?('teachers')
       add_helper_dependant_entries(hash, course, builder)
       apply_nickname(hash, course, user) if user
+
+      # return hash from the block for additional processing in Api::V1::CourseJson
+      hash
     end
   end
 
