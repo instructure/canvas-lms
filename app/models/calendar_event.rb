@@ -59,7 +59,12 @@ class CalendarEvent < ActiveRecord::Base
   after_save :touch_context
   after_save :replace_child_events
   after_save :sync_parent_event
+  after_save :sync_google_calendar
   after_update :sync_child_events
+
+  def sync_google_calendar
+    return if !google_event_id || google_event_id.empty?
+  end
 
   # when creating/updating a calendar_event, you can give it a list of child
   # events. these will update/replace any existing child events. the format is:
