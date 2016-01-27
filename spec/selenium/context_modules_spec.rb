@@ -48,6 +48,19 @@ describe "context modules" do
       expect(f('.context_module .content')).not_to be_displayed
     end
 
+    it "should create a new module using enter key", priority: "2", test_id: 126705 do
+      get "/courses/#{@course.id}/modules"
+      add_form = new_module_form
+      replace_content(add_form.find_element(:id, 'context_module_name'), "module 1")
+      3.times do
+        driver.action.send_keys(:tab).perform
+        wait_for_ajaximations
+      end
+      driver.action.send_keys(:return).perform
+      wait_for_ajaximations
+      expect(f('.name')).to be_present
+    end
+
     it "should rearrange child objects in same module", priority: "1", test_id: 126733  do
       modules = create_modules(1, true)
       #attach 1 assignment to module 1 and 2 assignments to module 2 and add completion reqs
