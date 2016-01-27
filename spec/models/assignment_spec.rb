@@ -1819,7 +1819,7 @@ describe Assignment do
         assignment_model(course: @course)
       end
 
-      it "should create a message when an assigment changes after it's been published" do
+      it "should create a message when an assignment changes after it's been published" do
         @a.created_at = Time.parse("Jan 2 2000")
         @a.description = "something different"
         @a.notify_of_update = true
@@ -1827,7 +1827,7 @@ describe Assignment do
         expect(@a.messages_sent).to be_include('Assignment Changed')
       end
 
-      it "should NOT create a message when an assigment changes SHORTLY AFTER it's been created" do
+      it "should NOT create a message when an assignment changes SHORTLY AFTER it's been created" do
         @a.description = "something different"
         @a.save
         expect(@a.messages_sent).not_to be_include('Assignment Changed')
@@ -1847,7 +1847,7 @@ describe Assignment do
         Notification.create(:name => 'Assignment Created')
       end
 
-      it "should create a message when an assigment is added to a course in process" do
+      it "should create a message when an assignment is added to a course in process" do
         assignment_model(:course => @course)
         expect(@a.messages_sent).to be_include('Assignment Created')
       end
@@ -1865,7 +1865,7 @@ describe Assignment do
         Notification.create(:name => 'Assignment Unmuted')
       end
 
-      it "should create a message when an assigment is unmuted" do
+      it "should create a message when an assignment is unmuted" do
         assignment_model(:course => @course)
         @assignment.broadcast_unmute_event
         expect(@assignment.messages_sent).to be_include('Assignment Unmuted')

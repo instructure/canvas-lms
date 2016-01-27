@@ -108,7 +108,7 @@ class Assignment < ActiveRecord::Base
       :points_possible,
       I18n.t(
         "invalid_points_possible",
-        "The value of possible points for this assigment must be zero or greater."
+        "The value of possible points for this assignment must be zero or greater."
       )
     )
   end

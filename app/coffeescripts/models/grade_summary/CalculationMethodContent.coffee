@@ -94,7 +94,7 @@ define [
       latest:
         method: I18n.t("Latest Score")
         friendlyCalculationMethod: I18n.t("Most Recent Score")
-        exampleText: I18n.t("Mastery score reflects the most recent graded assigment or quiz."),
+        exampleText: I18n.t("Mastery score reflects the most recent graded assignment or quiz."),
         exampleScores: @exampleScoreIntegers()[..3].join(', '),
         exampleResult: _.last(@exampleScoreIntegers()[..3])
       highest:
