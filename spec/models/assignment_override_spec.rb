@@ -632,6 +632,35 @@ describe AssignmentOverride do
     end
   end
 
+  describe "destroy_if_empty_set" do
+    before do
+      @override = assignment_override_model
+    end
+
+    it "does nothing if it is not ADHOC" do
+      @override.stubs(:set_type).returns "NOT_ADHOC"
+      @override.expects(:destroy).never
+
+      @override.destroy_if_empty_set
+    end
+
+    it "does nothing if the set is not empty" do
+      @override.stubs(:set_type).returns "ADHOC"
+      @override.stubs(:set).returns [1,2,3]
+      @override.expects(:destroy).never
+
+      @override.destroy_if_empty_set
+    end
+
+    it "destroys itself if the set is empty" do
+      @override.stubs(:set_type).returns 'ADHOC'
+      @override.stubs(:set).returns []
+      @override.expects(:destroy).once
+
+      @override.destroy_if_empty_set
+    end
+  end
+
   describe "applies_to_students" do
     before do
       student_in_course

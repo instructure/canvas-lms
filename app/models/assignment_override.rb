@@ -242,7 +242,6 @@ class AssignmentOverride < ActiveRecord::Base
   end
 
   def set_title_if_needed
-
     if set_type != 'ADHOC' && set
       self.title = set.name
     elsif set_type == 'ADHOC' && set.any?
@@ -261,6 +260,11 @@ class AssignmentOverride < ActiveRecord::Base
       },
       count: students.count
      )
+  end
+
+  def destroy_if_empty_set
+    return unless set_type == 'ADHOC'
+    self.destroy if set.empty?
   end
 
   has_a_broadcast_policy

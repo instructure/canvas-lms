@@ -282,6 +282,8 @@ class Assignment < ActiveRecord::Base
           o.destroy
         }
     end
+
+    AssignmentOverrideStudent.clean_up_for_assignment(self)
   end
 
   def schedule_do_auto_peer_review_job_if_automatic_peer_review

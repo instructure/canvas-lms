@@ -1607,6 +1607,27 @@ describe Enrollment do
       @enrollment.destroy
       expect(grading_period_grade.workflow_state).to eq('deleted')
     end
+
+    it "should remove assingment overrides if they are only linked to this enrollment" do
+      course_with_student
+      assignment = assignment_model(:course => @course)
+      ao = AssignmentOverride.new()
+      ao.assignment = assignment
+      ao.title = "ADHOC OVERRIDE"
+      ao.workflow_state = "active"
+      ao.set_type = "ADHOC"
+      ao.save!
+      assignment.reload
+      override_student = ao.assignment_override_students.build
+      override_student.user = @user
+      override_student.save!
+
+      expect(ao.workflow_state).to eq("active")
+      @user.enrollments.destroy_all
+
+      ao.reload
+      expect(ao.workflow_state).to eq("deleted")
+    end
   end
 
   describe "effective_start_at" do
