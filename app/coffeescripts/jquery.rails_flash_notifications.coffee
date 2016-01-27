@@ -91,9 +91,11 @@ define [
   # updating it with new content.  Makes it so the SR only reads this one
   # message.
   $.screenReaderFlashMessageExclusive = (content) ->
-    $screenreader_holder.html("""
-      <span>#{escapeContent(content)}</span>
-    """)
+    # nothing to do here if $screenreader_holder is not yet defined
+    if $screenreader_holder.length > 0
+      $screenreader_holder.html("""
+        <span>#{escapeContent(content)}</span>
+      """)
 
   $.initFlashContainer = ->
     initFlashContainer()
