@@ -36,5 +36,11 @@ describe ConsulInitializer do
       message = "INITIALIZATION: can't reach consul, attempts to load DynamicSettings will fail"
       expect(logger.messages).to include(message)
     end
+
+    it "logs nothing if there's no config file" do
+      logger = FakeLogger.new
+      ConsulInitializer.configure_with(nil, logger)
+      expect(logger.messages).to eq([])
+    end
   end
 end

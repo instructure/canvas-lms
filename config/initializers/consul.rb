@@ -4,16 +4,11 @@ module ConsulInitializer
       begin
         Canvas::DynamicSettings.config = settings_hash
       rescue Faraday::ConnectionFailed
-        logger.warn(initialization_failed_message("can't reach consul"))
+        logger.warn("INITIALIZATION: can't reach consul, attempts to load DynamicSettings will fail")
       end
-    else
-      logger.warn(initialization_failed_message("No consul configuration"))
     end
   end
 
-  def self.initialization_failed_message(reason)
-    "INITIALIZATION: #{reason}, attempts to load DynamicSettings will fail"
-  end
 end
 
 Rails.configuration.to_prepare do
