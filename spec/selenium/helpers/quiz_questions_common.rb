@@ -34,7 +34,7 @@ module QuizQuestionsCommon
 
   def take_the_quiz
     open_quiz_show_page
-    fj("a:contains('Take the Quiz')").click
+    click_quiz_link("Take the Quiz")
 
     # sleep because display is updated on timer, not ajax callback
     sleep 1
@@ -48,15 +48,22 @@ module QuizQuestionsCommon
     sleep 1
   end
 
+  def click_quiz_link(title)
+    selector = "a:contains('#{title}')"
+    wait = Selenium::WebDriver::Wait.new(timeout: 5)
+    wait.until { !fj(selector).nil? }
+    fj(selector).click
+  end
+
   def navigate_away_and_resume_quiz
-    fj("a:contains('Quizzes')").click
+    click_quiz_link("Quizzes")
     driver.switch_to.alert.accept
 
     wait_for_ajaximations
 
-    fj("a:contains('OQAAT quiz')").click
+    click_quiz_link("OQAAT quiz")
     wait_for_ajaximations
-    fj("a:contains('Resume Quiz')").click
+    click_quiz_link("Resume Quiz")
     wait_for_ajaximations
   end
 
