@@ -2,9 +2,10 @@ define [
   'react'
   'underscore'
   'jsx/due_dates/DueDates'
+  'jsx/due_dates/OverrideStudentStore'
   'compiled/models/AssignmentOverride',
   'helpers/fakeENV'
-], (React, _, DueDates, AssignmentOverride, fakeENV) ->
+], (React, _, DueDates, OverrideStudentStore, AssignmentOverride, fakeENV) ->
 
   Simulate = React.addons.TestUtils.Simulate
   SimulateNative = React.addons.TestUtils.SimulateNative
@@ -99,3 +100,43 @@ define [
     @spy(@dueDates, 'focusRow')
     @dueDates.addRow()
     equal @dueDates.focusRow.callCount, 1
+
+  module 'DueDates render callbacks',
+    setup: ->
+      fakeENV.setup()
+      ENV.context_asset_string = "course_1"
+      @override = new AssignmentOverride name: "Students", student_ids: ["1", "3"], due_at: null
+
+      @dueDates
+
+      @props =
+        overrides: [@override]
+        defaultSectionId: '0'
+        sections: []
+        students: {"1":{id: "1", name: "Scipio Africanus"}, "3":{id: 3, name: "Publius Publicoa"}}
+        overrideModel: AssignmentOverride
+        syncWithBackbone: ->
+
+    teardown: ->
+      fakeENV.teardown()
+
+  test 'fetchAdhocStudents does not fire until state is set', ->
+    getInitialStateStub = @stub(DueDates.prototype, "getInitialState")
+    fetchAdhocStudentsStub = @stub(OverrideStudentStore, "fetchStudentsByID")
+
+    DueDatesElement = React.createElement(DueDates, @props)
+
+    # provide an initial state that should not get pssed into the
+    # fetchStudentsByID call
+    getInitialStateStub.returns(
+      rows: [{1: {overrides: {student_ids: ["18", "22"]}}}]
+      students: {}
+    )
+
+    # render with the props (which should provide info for fetchStudentsByID call)
+    @dueDates = React.render(DueDatesElement, $('<div>').appendTo('body')[0])
+
+    ok !fetchAdhocStudentsStub.calledWith(["18", "22"])
+    ok fetchAdhocStudentsStub.calledWith(["1","3"])
+
+    React.unmountComponentAtNode(@dueDates.getDOMNode().parentNode)

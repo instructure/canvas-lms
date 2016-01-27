@@ -39,11 +39,14 @@ define([
       this.setState({
         rows: this.rowsFromOverrides(this.props.overrides),
         sections: this.formattedSectionHash(this.props.sections)
-      })
+      }, this.fetchAdhocStudents.bind(this))
 
       OverrideStudentStore.addChangeListener(this.handleStudentStoreChange)
-      OverrideStudentStore.fetchStudentsByID(this.adhocOverrideStudentIDs())
       OverrideStudentStore.fetchStudentsForCourse()
+    },
+
+    fetchAdhocStudents(){
+      OverrideStudentStore.fetchStudentsByID(this.adhocOverrideStudentIDs())
     },
 
     handleStudentStoreChange(){
