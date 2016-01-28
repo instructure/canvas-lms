@@ -23,6 +23,7 @@ define [
       @$iframe = @$el.find(".mce-edit-area iframe")
 
     _addLabels: ->
+      @$el.attr("aria-label", I18n.t('Rich Content Editor'))
       @$el.find("div[aria-label='Font Sizes']").attr('aria-label', I18n.t('titles.font_size',"Font Size, press down to select"))
       @$el.find("div.mce-listbox.mce-last:not([aria-label])").attr('aria-label', I18n.t('titles.formatting',"Formatting, press down to select"))
       @$el.find("div[aria-label='Text color']").attr('aria-label', I18n.t('accessibles.forecolor',"Text Color, press down to select"))

@@ -55,3 +55,7 @@ define [
 
     tinymce.activeEditor.fire("keydown", event)
     equal($menu.is(":visible"), true)
+
+  test "accessiblize() gives an aria-label to the role=application div", ->
+    acc.accessiblize()
+    ok $(acc.$el).attr('aria-label'), "aria-label has a value"
