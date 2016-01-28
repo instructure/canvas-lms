@@ -148,6 +148,27 @@ class RoleOverride < ActiveRecord::Base
           'AccountAdmin'
         ]
       },
+      :read_announcements => {
+        :label => lambda { t('View announcements') },
+        :available_to => [
+          'StudentEnrollment',
+          'TaEnrollment',
+          'DesignerEnrollment',
+          'TeacherEnrollment',
+          'TeacherlessStudentEnrollment',
+          'ObserverEnrollment',
+          'AccountAdmin',
+          'AccountMembership'
+        ],
+        :true_for => [
+          'StudentEnrollment',
+          'TaEnrollment',
+          'DesignerEnrollment',
+          'ObserverEnrollment',
+          'TeacherEnrollment',
+          'AccountAdmin'
+        ]
+      },
       :send_messages => {
         :label => lambda { t('permissions.send_messages', "Send messages to individual course members") },
         :available_to => [
