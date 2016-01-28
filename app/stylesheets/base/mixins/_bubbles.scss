@@ -52,11 +52,10 @@
 }
 
 @mixin count-bubble {
-  border-radius: 30px;
+  border-radius: 50%;
   background-color: $ic-brand-primary;
-  padding: 0 8px;
-  font-size: 9px;
+  @include fontSize(12px);
   color: #fff;
   background-color: $ic-brand-primary;
-  padding: 1px 6px;
+  padding: 0.063em 0.438em;
 }
