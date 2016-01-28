@@ -56,12 +56,6 @@ describe "discussions" do
       end
 
       describe "subscription icon" do
-        def wait_for_subscription_icon_to_load(expected_class)
-          wait = Selenium::WebDriver::Wait.new(timeout: 5)
-          wait.until do
-            f(".subscription-toggler").attribute("class").include?(expected_class)
-          end
-        end
 
         it "should allow subscribing to a topic", priority: "1", test_id: 270931 do
           topic.unsubscribe(somebody)
