@@ -54,8 +54,8 @@ $ic-color-success:                  #008a14; // green
 
 $ic-color-neutral:                  hsl(0,0,90%);
 
-$ic-color-action:                   #ba3fa5; // magenta
-@if $use_high_contrast { $ic-color-action: #a23891; }
+$ic-color-action:                   #ee0097; // magenta
+@if $use_high_contrast { $ic-color-action: #d00084; }
 
 $ic-color-danger:                   #ad393a; // red
 @if $use_high_contrast { $ic-color-danger: #a03536; }

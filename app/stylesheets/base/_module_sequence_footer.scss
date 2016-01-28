@@ -28,15 +28,22 @@
     .ModuleSequenceFooter__Container--bottom {
       bottom: 102px;
     }
+
+    &.is-masquerading-or-student-view {
+      .ModuleSequenceFooter__Container--bottom { bottom: 105px; }
+    }
   }
 
   #content {
     &.Content--with-module-footer {
       padding-bottom: 70px;
+      .tool_content_wrapper { padding-bottom: 70px; }
+    }
+  }
 
-      .tool_content_wrapper {
-        padding-bottom: 70px;
-      }
+  body.is-masquerading-or-student-view {
+    .ModuleSequenceFooter__Container {
+      bottom: 38px;
     }
   }
 

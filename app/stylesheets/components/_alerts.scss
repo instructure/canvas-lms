@@ -171,58 +171,69 @@ a.Button--flash {
   }
 }
 
-.ic-fixed-bottom-alert {
-  background: $ic-color-light;
-  border-top: 1px solid $ic-border-light;
-  box-shadow: 0 -1px 2px rgba(black, 0.1);
+// .ic-alert-masquerade-student-view is used when a user is
+// masquerading or using student view. In the new UI, it gives 
+// Canvas the appearance of being inside a 3px frame.
+.ic-alert-masquerade-student-view {
   padding: $ic-sp/2 $ic-sp;
   box-sizing: border-box;
   display: flex;
   align-items: center;
   @if $use_new_styles {
-    @include breakpoint(desktop) {
-      width: $ic-sp*23;
-      padding: $ic-sp*0.75;
-      align-items: flex-start;
-      border: 1px solid $ic-border-light;
-      border-radius: $baseBorderRadius;
-      box-shadow: 0 0 8px rgba(black, 0.1);
-      position: absolute;
-      right: $ic-sp; bottom: $ic-sp;
-      display: block;
+    background: $ic-color-action;
+    color: $ic-color-light;
+    // This adds a fixed top border for the fixed bottom alert,
+    // so the top border doesn't disappear on scroll
+    &:after {
+      content: "";
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 3px;
+      background: $ic-color-action;
     }
   }
+  @else {
+    border-top: 1px solid $ic-border-light;
+    background: $ic-color-light;
+    box-shadow: 0 -1px 2px rgba(black, 0.1);
+  }
+
   .avatar {
     width: $ic-sp*3; height: $ic-sp*3;
   }
 }
 
-.ic-fixed-bottom-module {
+// When the fixed bottom alert is showing, add a
+// left and right border, making Canvas appear as if
+// it is inside a frame.
+@if $use_new_styles {
+  body.is-masquerading-or-student-view {
+    border-right: 3px solid $ic-color-action;
+    .ic-app-header { border-left: 3px solid $ic-color-action; }
+  }
+}
+
+.ic-alert-masquerade-student-view-module {
   flex: 1;
   padding: 0 $ic-sp/2;
   &:first-of-type { padding-left: 0; }
   &:last-of-type {
     padding-right: 0;
-    &.ic-fixed-bottom-module--buttons {
+    &.ic-alert-masquerade-student-view-module--buttons {
       text-align: right;
     }
   }
-  &.ic-fixed-bottom-module--header {
+  &.ic-alert-masquerade-student-view-module--header {
     font-weight: 500;
   }
-  &.ic-fixed-bottom-module--description {
+  &.ic-alert-masquerade-student-view-module--description {
     font-style: italic;
     @include fontSize($ic-font-size--xsmall);
     line-height: 1.3;
   }
-  @if $use_new_styles {
-    @include breakpoint(desktop) {
-      padding-left: 0; padding-right: 0;
-      margin-bottom: $ic-sp/2;
-      &:last-of-type { margin-bottom: 0; }
-    }
-  }
 }
+
 
 $ic-notification-icon-size: 22px;
 $ic-notification-border-thickness: 2px;

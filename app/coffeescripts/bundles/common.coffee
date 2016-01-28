@@ -97,7 +97,6 @@ require [
     , 50)
     )
 
-
   ##
   # Backbone routes
   $('body').on 'click', '[data-pushstate]', (event) ->

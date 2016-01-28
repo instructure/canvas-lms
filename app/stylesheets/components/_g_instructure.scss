@@ -2072,7 +2072,7 @@ form.user_content_post_form {
   bottom: 0;
   // The styles below are no longer needed for the masquerading or student view;
   // however, we need to keep them for other fixed warnings
-  >*:not(.ic-fixed-bottom-alert) {
+  >*:not(.ic-alert-masquerade-student-view) {
     i {
       vertical-align: middle;
       margin-right: 10px;
