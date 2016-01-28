@@ -161,7 +161,9 @@ module SIS
             end
 
             unless pseudo
-              @messages << "User #{user_id} didn't exist for user enrollment"
+              err = "User not found for enrollment "
+              err << "(User ID: #{user_id}, Course ID: #{course_id}, Section ID: #{section_id})"
+              @messages << err
               next
             end
 
