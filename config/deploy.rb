@@ -35,6 +35,11 @@ set :deploy_to, '/var/canvas'
 # Default value for :log_level is :debug
 # set :log_level, :debug
 
+# Turn this on to see why SSH connections are failing:
+#set :ssh_options, {
+#   verbose: :debug
+#}
+
 # Default value for :pty is false
 # set :pty, true
 
@@ -57,7 +62,7 @@ set :linked_dirs, %w{log tmp/pids public/system}
 set :keep_releases, 2
 
 # set the locations that we will look for changed assets to determine whether to precompile
-set :assets_dependencies, %w(app/stylesheets app/coffeescripts public/javascripts public/stylesheets spec/javascripts spec/coffeescripts Gemfile.lock config/routes.rb)
+set :assets_dependencies, %w(app/stylesheets app/coffeescripts public/javascripts public/stylesheets app/views/jst spec/javascripts spec/coffeescripts Gemfile.lock config/routes.rb)
 #
 # Capistrano runs as the deploy user, but Canvas is setup to be owned by another user.
 # Rollbacks and cleanups of more than :keep_releases fail with permissions errors. 

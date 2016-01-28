@@ -95,10 +95,10 @@ class CalendarEvent < ActiveRecord::Base
     @child_event_data.each do |data|
       if event = current_events.delete(data[:context_code]) and event = event[0]
         event.updating_user = @updating_user
-        event.update_attributes(:start_at => data[:start_at], :end_at => data[:end_at])
+        event.update_attributes(:start_at => data[:start_at], :end_at => data[:end_at], :location_name => data[:location_name])
       else
         context = @child_event_contexts[data[:context_code]][0]
-        event = child_events.build(:start_at => data[:start_at], :end_at => data[:end_at])
+        event = child_events.build(:start_at => data[:start_at], :end_at => data[:end_at], :location_name => data[:location_name])
         event.updating_user = @updating_user
         event.context = context
         event.skip_sync_parent_event = true
@@ -265,10 +265,10 @@ class CalendarEvent < ActiveRecord::Base
   CASCADED_ATTRIBUTES = [
     :title,
     :description,
-    :location_name,
     :location_address
   ]
   LOCKED_ATTRIBUTES = CASCADED_ATTRIBUTES + [
+    :location_name,
     :start_at,
     :end_at
   ]
