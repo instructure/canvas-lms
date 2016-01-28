@@ -59,7 +59,13 @@ module CC::Importer::Standard
           end
         else
           if !item_node['identifierref']
-            add_children(item_node, mod, indent + 1)
+            if item_node['identifier']
+              sub_mod = {:items => [], :migration_id => item_node['identifier'], :type => 'submodule'}
+              add_children(item_node, sub_mod, indent)
+              mod[:items] << sub_mod
+            else
+              add_children(item_node, mod, indent + 1)
+            end
           elsif item = process_item(item_node, indent)
             mod[:items] << item
           end
@@ -126,7 +132,7 @@ module CC::Importer::Standard
           item[:workflow_state] = 'unpublished'
         end
       end
-      
+
       item
     end
 

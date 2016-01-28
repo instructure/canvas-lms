@@ -25,11 +25,11 @@ module MigratorHelper
   ERROR_FILENAME = "errors.json"
   OVERVIEW_JSON = "overview.json"
   ALL_FILES_ZIP = "all_files.zip"
-  
+
   COURSE_NO_COPY_ATTS = [:name, :course_code, :start_at, :conclude_at, :grading_standard_id, :tab_configuration, :syllabus_body, :storage_quota]
-  
+
   QUIZ_FILE_DIRECTORY = "Quiz Files"
-  
+
   attr_reader :overview
 
   def self.get_utc_time_from_timestamp(timestamp)
@@ -66,7 +66,7 @@ module MigratorHelper
 
     error
   end
-  
+
   def unique_quiz_dir
     if content_migration
       if a = content_migration.attachment
@@ -79,11 +79,11 @@ module MigratorHelper
     end
     "#{QUIZ_FILE_DIRECTORY}/#{key}"
   end
-  
+
   def content_migration
     @settings[:content_migration]
   end
-  
+
   def add_warning(user_message, exception_or_info='')
     if content_migration.respond_to?(:add_warning)
       content_migration.add_warning(user_message, exception_or_info)
@@ -95,11 +95,11 @@ module MigratorHelper
       content_migration.update_conversion_progress(progress)
     end
   end
-  
+
   def logger
     Rails.logger
   end
-  
+
   def find_export_dir
     if @settings[:content_migration_id] && @settings[:user_id]
       slug = "cm_#{@settings[:content_migration_id]}_user_id_#{@settings[:user_id]}_#{@settings[:migration_type]}"
@@ -351,13 +351,7 @@ module MigratorHelper
     if @course[:modules]
       @overview[:modules] = []
       @course[:modules].each do |m|
-        mod = {}
-        @overview[:modules] << mod
-        mod[:title] = m[:title]
-        mod[:order] = m[:order]
-        mod[:migration_id] = m[:migration_id]
-        mod[:description] = m[:description]
-        mod[:error_message] = m[:error_message] if m[:error_message]
+        @overview[:modules] << module_overview_hash(m)
       end
     end
     if @course[:assignments]
@@ -454,6 +448,23 @@ module MigratorHelper
   end
 
   private
+
+  def module_overview_hash(m)
+    mod = {}
+    mod[:title] = m[:title]
+    mod[:order] = m[:order]
+    mod[:migration_id] = m[:migration_id]
+    mod[:description] = m[:description]
+    mod[:error_message] = m[:error_message] if m[:error_message]
+
+    sub_mods, items = m[:items].partition{|mi| mi[:type] == "submodule"}
+    mod[:item_count] = items.count
+    if sub_mods.any?
+      mod[:submodules] = sub_mods.map{|sub| module_overview_hash(sub)}
+      mod[:item_count] += mod[:submodules].sum{|sub| sub[:item_count]}
+    end
+    mod
+  end
 
   def ensure_topic_or_quiz_assignment(topic_or_quiz_assignment_hash, related_object_link)
     @overview[:assignments] ||= []
