@@ -62,10 +62,10 @@ class Canvadoc < ActiveRecord::Base
     opts = {
       annotation_context: "default",
       permissions: "readwrite",
-      user_id: user.global_id,
+      user_id: user.global_id.to_s,
       user_name: user.short_name.gsub(",", ""),
       user_role: "",
-      user_filter: user.global_id,
+      user_filter: user.global_id.to_s,
     }
 
     submissions = self.submissions.preload(:assignment)
