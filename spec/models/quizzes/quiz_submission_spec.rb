@@ -601,6 +601,15 @@ describe Quizzes::QuizSubmission do
         expect(@quiz_submission.submission).to be_pending_review
         expect(@quiz.assignment.reload.needs_grading_count).to eq 1
       end
+
+      it "redisplays hidden todo items on new submissions" do
+        student_in_course
+        @user.ignore_item!(@quiz.assignment, :grading)
+        qs = @quiz.generate_submission(@student)
+        qs.submission_data = { "question_1" => "essay answer" }
+        Quizzes::SubmissionGrader.new(qs).grade_submission
+        expect(@quiz.assignment.reload.ignores.count).to eq 0
+      end
     end
 
     describe "with multiple essay questions" do
