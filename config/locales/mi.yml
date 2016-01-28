@@ -1948,7 +1948,7 @@ mi:
       created: "I momoho te hanga Taumahi."
       updated: "I momoho te whakahōu Taumahi."
     number_of_assignments: 
-      one: "{count} ohipa%"
+      one: "1 ohipa"
       other: "%{count} ohipa"
     other_assignments: "Ētahi atu Taumahi"
     overdue_assignments: "Taumahi tōmuri"
@@ -2006,7 +2006,7 @@ mi:
     remove_never_drop_rule: "Tangohia e kore maturuturu tikanga"
     remove_unsaved_never_drop_rule: "Tangohia tiakina kore maturuturu tikanga"
     rules_text: 
-      one: "{count} Ture%"
+      one: "1 Ture"
       other: "%{count} Ture"
     select_assignment: "[Tīpako Taumahi]"
     show: 
@@ -9910,7 +9910,8 @@ mi:
       cancel: Whakakore
       creating: "Te hanga ..."
     assignments_to_grade: 
-      one: "% {count} ohipa i tāpaetanga Mākahia"
+      one: "1 ohipa i tāpaetanga Mākahia"
+      other: "%{count} ohipa i tāpaetanga Mākahia"
     assignments_to_post: 
       one: "He rite ki te tuku %{count} ohipa koe."
       other: "He rite ki te tuku %{count} ohipa koe."
@@ -11627,7 +11628,8 @@ mi:
       no_name: "No ingoa"
       no_questions: "Kāore he pātai"
       question_count: 
-        one: "{count} Pātai% "
+        one: "1 Pātai"
+        other: "%{count} Pātai "
       unbookmark_bank: "Unbookmark tenei Pātai Bank"
     question_teaser: 
       full_details: "Pāwhiritia ki te whakaatu taipitopito pātai tonu"
@@ -11806,10 +11808,12 @@ mi:
     discrimination_index_help: "* Tēnei ngahuru whakarato te mehua o te pai te uiraa kotahi e taea te korero i te rerekētanga (ranei tātari) i waenganui i ngā ākonga e mahi pai i runga i te whakamātautau me te hunga e kore e mahi nei i. * ** Tuwhaina e te reira i ngā ākonga ki ngā rōpū e toru e hāngai ana i runga i to ratou score i runga i te katoa o te pātaitai, me te whakaatu te hunga rōpū i nei ka whakahoki te pātai tika. ** *** **** Ētahi atu mōhiohio e wātea ana i konei. **** ***"
     download_submissions: "Tikiake Kōnae Katoa"
     duration_in_hours: 
-      one: "{count} haora% "
+      one: "1 haora"
+      other: "%{count} haora"
     duration_in_hours_and_minutes: "%{hours} me te %{minutes} "
     duration_in_minutes: 
-      one: "{count} meneti% "
+      one: "1 meneti "
+      other: "%{count} meneti"
     duration_in_minutes_and_seconds: "%{minutes} me te %{seconds}"
     duration_in_seconds: 
       one: "%{count} hēkona"
@@ -11854,7 +11858,8 @@ mi:
     alerts: 
       no_valid_combinations: "Kihai i taea e te pūnaha whakaputa i tetahi ngā tika mō te tawhā homai "
       only_n_valid_combinations: 
-        one: "Ko te pūnaha i taea e anake whakaputa% {count} ngā tika mō te tawhā homai "
+        one: "Ko te pūnaha i taea e anake whakaputa 1 ngā tika mō te tawhā homai "
+        other: "Ko te pūnaha i taea e anake whakaputa %{count} ngā tika mō te tawhā homai "
     answer_comments: "whakautu ki ngā kōrero "
     answer_text: "kuputuhi Whakautu "
     assignment_points_possible: 
@@ -12012,7 +12017,8 @@ mi:
       positive_points: "Me e kore nui ranei"
     question_colon: "pātai:"
     question_count: 
-      one: "{count} Pātai% "
+      one: "1 Pātai"
+      other: "%{count} Pātai"
     question_limit_reached: |-
         Kua tae koe ki te tau mōrahi o ngā pātai whakaaetia mo te pātaitai (%{count}/%{limit}).
         
@@ -12360,6 +12366,9 @@ mi:
         outstanding_quiz_submissions_found: "He tāpaetanga pātaitai kōhure."
         page_title: "Quiz āhua"
         reload_student_table: "Uta anō tepu ākonga"
+        student_gets_extra_time: 
+          one: "*%{student_name} * ** whiwhi 1 anō meneti i runga i ia nganatanga **"
+          other: "*%{student_name} * ** whiwhi %{count} anō meneti i runga i ia nganatanga **"
         student_n: "Ākonga %{n}"
         submitting: "Te tuku ..."
         titles: 
@@ -12459,9 +12468,11 @@ mi:
         no_submission_for_user: "Kahore he tukunga e wātea ana mō taua kaiwhakamahi"
         quiz_updated: "Momoho te whakahōu Quiz"
         quizzes_published: 
-          one: "% {count} Quizzes pai te whakaputaina!"
+          one: "1 Quizzes pai te whakaputaina!"
+          other: "%{count} Quizzes pai te whakaputaina!"
         quizzes_unpublished: 
-          one: "% {count} Quizzes pai te haapararehia! "
+          one: "1 Quizzes pai te haapararehia! "
+          other: "%{count} Quizzes pai te haapararehia!"
         submission_doesnt_count: "Tēnei pātaitai e tatau e kore a muri ake ki tou kōeke."
       question_group: 
         buttons: 
@@ -12497,7 +12508,8 @@ mi:
         no_responses: "Kāore he whakautu tuhia hoki tenei pātai "
         percent_of_responses: "%{percent}% o %{total} nganatanga tīpakohia tenei whakahoki"
         response_count: 
-          one: "i hoatu % {count} ngā ākongatenei pātai"
+          one: "i hoatu 1 ngā ākongatenei pātai"
+          other: "i hoatu  %{count} ngā ākongatenei pātai"
       question_teaser: 
         titles: 
           click_to_show_details: "Pāwhiritia ki te whakaatu taipitopito pātai tonu"
@@ -12661,7 +12673,8 @@ mi:
         manage: Whakahaere
         only_registered_users: "Rēhita anake, kaiwhakamahi whakauru taea te tango i ngā pātaitai Whakatau "
         quiz_regraded_your_score_affected: 
-          one: "Kua tēnei pātaitai i te māka anō; tou tapeke hou whakaata % {count} pātaii pāngia. "
+          one: "Kua tēnei pātaitai i te māka anō; tou tapeke hou whakaata 1 pātaii pāngia. "
+          other: "Kua tēnei pātaitai i te māka anō; tou tapeke hou whakaata %{count} pātaii pāngia. "
         quiz_regraded_your_score_not_affected: "Kua tēnei pātaitai i te māka anō; e kore tou tapeke i pāngia."
         speed_grader: "SpeedGrader ™"
         students_submitted_so_far: 
@@ -12768,7 +12781,8 @@ mi:
       confirms: 
         delete_quiz: "E tino hiahia ana koe ki te muku i tēnei pātaitai? "
         delete_quiz_submissions_warning: 
-          one: "Kua tangohia kē% {count} ngā ākonga i tēnei pātaitai: Whakatūpato. Ki te muku koe i te reira, ka mukua i tetahi tāpaetanga oti a heoi ano puta i roto i te pukamāka. "
+          one: "Kua tangohia kē 1 ngā ākonga i tēnei pātaitai: Whakatūpato. Ki te muku koe i te reira, ka mukua i tetahi tāpaetanga oti a heoi ano puta i roto i te pukamāka. "
+          other: "Kua tangohia kē %{count} ngā ākonga i tēnei pātaitai: Whakatūpato. Ki te muku koe i te reira, ka mukua i tetahi tāpaetanga oti a heoi ano puta i roto i te pukamāka. "
       links: 
         hide_student_quiz_results: "Huna Ākonga Quiz Hua "
         hide_student_survey_results: "Huna Survey Ākonga Hua "
@@ -12783,16 +12797,19 @@ mi:
       titles: 
         submitted_users_for_quesiton: "Tāpaetia Kaiwhakamahi hoki %{user} "
       uncounted_submissions: 
-        one: "{count} atu tāpaetanga% "
+        one: "1 atu tāpaetanga"
+        other: "%{count} atu tāpaetanga"
     take_quiz: 
       confirms: 
         cant_go_back_blank: "E kore e taea te hoki koe mai ki tenei pātai kotahi patua koutou i muri. E tino hiahia ana koe ki te waiho kia pātea? "
         navigate_away: "Kei koe e pā ana ki ki te whakatere atu i tēnei whārangi. Haere tonu? "
         unanswered_questions: 
-          one: "E koe% {count} pātai tēwhakautua (kite i te paetaha tika mō ngā taipitopito). Tuku tonu? "
+          one: "E koe 1 pātai tēwhakautua (kite i te paetaha tika mō ngā taipitopito). Tuku tonu? "
+          other: "E koe %{count} pātai tēwhakautua (kite i te paetaha tika mō ngā taipitopito). Tuku tonu? "
         unfinished_quiz: "Kei koe e pā ana ki ki te waiho i te pātaitai oti. Haere tonu? "
         unseen_questions: 
-          one: "He {count} pātai% kihai i ano koutou i kite tonu e Tuku tonu?"
+          one: "He 1 pātai kihai i ano koutou i kite tonu e Tuku tonu?"
+          other: "He %{count} pātai kihai i ano koutou i kite tonu e. Tuku tonu?"
       days_count: 
         one: "%{count} "
         other: "%{count} "
@@ -12896,6 +12913,9 @@ mi:
     folder_name: "ingoa kōpaki "
     modified_by: "Kua whakarerekēhia e "
     move: Nuku
+    move_success: 
+      one: "%{item} ngā tūemi neke ki %{destinationFolder} "
+      other: "%{count} ngā tūemi neke ki %{destinationFolder} "
     name: Ingoa
     progress_message: "Teuteu download: %{percent}% complete"
     restrict_access: "Whakawhāitihia Access "
@@ -12919,12 +12939,15 @@ mi:
     context_search_placeholder: "E tomo te ingoa, te akoranga, rōpū rānei"
     context_search_title: "Ingoa, te akoranga, rōpū rānei "
     groups_count: 
-      one: "{count} ngā rōpū% "
+      one: "1 ngā rōpū"
+      other: "%{count} ngā rōpū"
     no_results: "Kāore he hua i kitea"
     people_count: 
-      one: "{count} iwi% "
+      one: "1 iwi"
+      other: "%{count} iwi"
     sections_count: 
-      one: "{count} ngā wāhanga% "
+      one: "1 ngā wāhanga"
+      other: "%{count} ngā wāhanga"
   record_media_6637ff19: "record pāpāho"
   record_with_microphone_only_e4ee07aa: "Record ki Hopureo anake"
   record_with_webcam_af21e07c: "Record ki webcam"
@@ -13200,7 +13223,8 @@ mi:
       edit_rubric: "Whakatika Rubric"
       page_title: "Ngā tohutohu"
       points_possible: 
-        one: "taea% {count} tohu "
+        one: "taea 1 tohu "
+        other: "taea %{count} tohu "
       user_rubrics: "Rubrics kaiwhakamahi"
     loading: "Loading ..."
     show: 
@@ -13419,7 +13443,8 @@ mi:
     show: 
       access_limit: "Ka taea e anake ngā kaiwhakamahi te whai wāhi i roto i te akoranga i waenganui i enei rā "
       active_enrollment: 
-        one: "% {count} whakaurunga Hohe "
+        one: "1 whakaurunga Hohe "
+        other: "%{count} whakaurunga Hohe "
       buttons: 
         back_to_course: "Hoki ki ngā tautuhinga akoranga "
         cancel: Whakakore
@@ -13431,7 +13456,8 @@ mi:
         uncrosslist_section: "De-Cross-Rārangi tenei Wāhanga "
         update_section: "Whakahōu Wāhanga "
       completed_enrollment: 
-        one: "{count} whakaurunga oti% "
+        one: "1 whakaurunga oti"
+        other: "%{count} whakaurunga oti"
       crosslist_description: "Cross-rārangi taea ki a koe te hanga i tētahi wāhanga i roto i te kotahi pūkete a ka neke te reira ki te akoranga i runga i te pūkete rerekē. Ki-rārangi ripeka tenei akoranga, e hiahia ana ka koe ki te kitea i te akoranga e hiahia ana koe ki te neke i te reira ki, rānei te whakamahi i te kimihanga i tomo ID te akoranga o te ranei. "
       decrosslist_description: "Tenei ka neke hoki te wāhanga ki tona akoranga taketake, **%{course_name} **. "
       decrosslist_long_description: "E kore ano e kia kitea kōeke katoa mō ngā ākonga i roto i tēnei akoranga. Ka taea e koe te tiki i te kōeke i muri mai i te ripeka anō--whakarārangi i te akoranga, engari i roto i te wā toharite e haere mai i te kōeke mō enei ākonga i te akoranga taketake. "
@@ -13449,7 +13475,8 @@ mi:
         start_at: Tīmata
       override_settings: "Ka takahi i tenei tetahi tautuhinga rā wā akoranga ranei. "
       pending_enrollment: 
-        one: "% {count} Tārewa ana ngā whakaurunga "
+        one: "1 Tārewa ana ngā whakaurunga "
+        other: "%{count} Tārewa ana ngā whakaurunga "
       prompts: 
         are_you_sure_decrosslist: "E tino hiahia ana koe ki te de--rārangi ripeka tēnei wāhanga? "
       run_dates: "Rere mai i %{start_date} ki te %{end_date} "
@@ -13849,7 +13876,8 @@ mi:
       labels: 
         due: "e tika ana"
       needs_grading_count: 
-        one: "% {count} Me māka  "
+        one: "1 Me māka  "
+        other: "%{count} Me māka "
     menu_enrollment: 
       labels: 
         enrolled_as: "whakaurua ki "
@@ -13948,7 +13976,8 @@ mi:
       recent_activity_in_course: "Mahi Tata i roto i te %{course_or_group} "
       unread_column: "kia pānuitia"
       unread_count_badge: 
-        one: "{count} * tūemi% pānuihia *  "
+        one: "1 * tūemi pānuihia *  "
+        other: "%{count} * tūemi pānuihia * "
     recent_activity_item: 
       close: tata
       unread: "kia pānuitia"
@@ -14769,7 +14798,8 @@ mi:
         term_starts_tas: "Hoki Tas tīmata te wā "
         term_starts_teachers: "No te kaiako tīmata te wā "
       user_count: 
-        one: "{count} Kaiwhakamahi% "
+        one: "1 Kaiwhakamahi"
+        other: "%{count} Kaiwhakamahi"
     timespan: 
       date: 
         term_end: "mutunga wā "
@@ -14826,7 +14856,8 @@ mi:
   theme_editor_b7b00f6b: "Kaiwhakatika Kaupapa"
   theme_editor_changes_have_been_cancelled_2af5cc5f: "Kua whakakorea ngā huringa ētita Kaupapa kua."
   there_are_count_results_in_the_list_e74f6e36: 
-    one: "He hua% {count} i roto i te rārangi "
+    one: "He hua 1 i roto i te rārangi "
+    other: "He hua %{count} i roto i te rārangi "
   there_are_no_announcements_for_this_course_5ee649c3: "Karekau he fanongonongó mō tēnei akoranga."
   there_was_a_problem_deleting_the_grading_period_50ce07c5: "Tera tetahi raruraru te muku i te wā māka"
   there_was_a_problem_deleting_the_grading_scheme_2a959c40: "Tera tetahi raruraru te muku i te kaupapa māka"
@@ -14893,9 +14924,11 @@ mi:
   time: 
     am: ahau
     count_hours_ago: 
-      one: "{count} haora% i mua "
+      one: "1 haora i mua "
+      other: "%{count} haora i mua "
     count_minutes_ago: 
-      one: "{count} meneti% i mua "
+      one: "1 meneti i mua "
+      other: "%{count} meneti i mua "
     due_date: "%{date} i te %{time}"
     event: "%{date} i %{time} "
     formats: 
@@ -15253,14 +15286,16 @@ mi:
   user_just_accepted_their_invitation_to_participate_7a4b2ce4: "%{user} tika farii ratou fakaafe ki te whai wāhi i roto i te akoranga, %{course}. Tūnga Akoranga: %{role_type}"
   user_lists: 
     add_n_users: 
-      one: "OK Titiro pai, Tāpiri enei {count} Kaiwhakamahi% "
+      one: "OK Titiro pai, Tāpiri enei 1 Kaiwhakamahi"
+      other: "OK Titiro pai, Tāpiri enei %{count} Kaiwhakamahi"
     adding_users: "Tāpiri Kaiwhakamahi ... "
     buttons: 
       continue: "Haere tonu..."
     cant_unenroll: "I whakaurua tenei kaiwhakamahi aunoa whakamahi i te pūnaha whakauru wānanga, kia kore e taea te tangohia ā-ratou. Whakapā atu koa ki tō kaiwhakahaere pūnaha, ki te whai koe i ngā pātai. "
     delete_confirm: "E tino hiahia ana koe ki te tango i tēnei kaiwhakamahi? "
     duplicate_users: 
-      one: "% {count} kitea kaiwhakamahi tāruarua, kua tārua kua tangohia. "
+      one: "1 kitea kaiwhakamahi tāruarua, kua tārua kua tangohia. "
+      other: "%{count} kitea kaiwhakamahi tāruarua, kua tārua kua tangohia. "
     invalid_users_notice: "He kia etahi i muhu, a kia hiahia ana koe ki te haere hoki, me te whakatika i tetahi hapa."
     just_now: "tika Na"
     messages: 
