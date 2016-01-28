@@ -64,6 +64,13 @@ class ContextExternalTool < ActiveRecord::Base
     RUBY
   end
 
+  def self.tool_for_assignment(assignment)
+    tag = assignment.external_tool_tag
+    return unless tag
+    launch_url = assignment.external_tool_tag.url
+    self.find_external_tool(launch_url, assignment.context)
+  end
+
   def extension_setting(type, property = nil)
     type = type.to_sym
     return settings[type] unless property && settings[type]

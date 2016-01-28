@@ -986,6 +986,32 @@ describe ContextExternalTool do
 
     end
 
+    describe ".find_tool_for_assignment" do
+
+      let(:tool) do
+        @course.context_external_tools.create(
+            name: "a",
+            consumer_key: '12345',
+            shared_secret: 'secret',
+            url: 'http://example.com/launch'
+        )
+      end
+
+      it 'finds the tool from an assignment' do
+        a = @course.assignments.create!(title: "test",
+                                        submission_types: 'external_tool',
+                                        external_tool_tag_attributes: {url: tool.url})
+        expect(described_class.tool_for_assignment(a)).to eq tool
+      end
+
+      it 'returns nil if there is no content tag' do
+        a = @course.assignments.create!(title: "test",
+                                        submission_types: 'external_tool')
+        expect(described_class.tool_for_assignment(a)).to be_nil
+      end
+
+    end
+
     describe ".visible?" do
       let(:u) {user}
       let(:admin) {account_admin_user(account:c.root_account)}

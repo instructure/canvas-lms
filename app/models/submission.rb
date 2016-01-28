@@ -462,12 +462,24 @@ class Submission < ActiveRecord::Base
     self.save
 
     @submit_to_turnitin = true
-    submit_to_turnitin_later
+    turnitinable_by_lti? ? retrieve_lti_tii_score : submit_to_turnitin_later
+  end
+
+  def retrieve_lti_tii_score
+    if (tool = ContextExternalTool.tool_for_assignment(self.assignment))
+      turnitin_data.select {|_,v| v.key?(:outcome_response) }.each do |k, v|
+        Turnitin::OutcomeResponseProcessor.new(tool, self.assignment, self.user, v[:outcome_response].as_json).resubmit(self, k)
+      end
+    end
   end
 
   def turnitinable?
     %w(online_upload online_text_entry).include?(submission_type) &&
       assignment.turnitin_enabled?
+  end
+
+  def turnitinable_by_lti?
+    turnitin_data.select{|_, v| v.is_a?(Hash) && v.key?(:outcome_response)}.any?
   end
 
   def touch_graders
