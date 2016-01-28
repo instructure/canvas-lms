@@ -294,7 +294,7 @@ class AccountsController < ApplicationController
   #
   # @returns [Course]
   def courses_api
-    return unless authorized_action(@account, @current_user, :read)
+    return unless authorized_action(@account, @current_user, :read_course_list)
 
     params[:state] ||= %w{created claimed available completed}
     params[:state] = %w{created claimed available completed deleted} if Array(params[:state]).include?('all')

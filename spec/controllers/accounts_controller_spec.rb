@@ -600,6 +600,17 @@ describe AccountsController do
       @c2 = course(account: @account, name: "bar")
     end
 
+    it "should not allow get a list of courses with no permissions" do
+      role = custom_account_role 'non_course_reader', account: @account
+      u = User.create(name: 'billy bob')
+      user_session(u)
+      @account.role_overrides.create! permission: 'read_course_list',
+                                      enabled: false, role: role
+      @account.account_users.create!(user: u, role: role)
+      get 'courses_api', account_id: @account.id
+      assert_unauthorized
+    end
+
     it "should get a list of courses" do
       admin_logged_in(@account)
       get 'courses_api', :account_id => @account.id
