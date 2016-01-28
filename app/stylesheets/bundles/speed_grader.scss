@@ -715,12 +715,12 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
         right: 20px;
       }
       .turnitin_similarity_score {
-        @include fontSize(9px);
+        @include fontSize(12px);
         &.submission_error, &.submission_pending {
           padding: 1px;
         }
         &:hover {
-          @include fontSize(9px);
+          @include fontSize(12px);
         }
       }
       .submission-file-download {
