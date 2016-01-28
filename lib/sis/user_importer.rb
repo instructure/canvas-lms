@@ -205,7 +205,13 @@ module SIS
                 end
               end
             rescue => e
-              @messages << "Failed saving user. Internal error: #{e}"
+              user_message = generate_readable_error_message(
+                message: e.message,
+                user_id: user_id,
+                login_id: login_id
+              )
+              developer_message = "Internal error: #{e.inspect}"
+              @messages << "#{user_message} (#{developer_message})"
               next
             end
 
@@ -295,6 +301,21 @@ module SIS
 
           end
         end
+      end
+
+      private
+
+      ERRORS_TO_REASONS = {
+        'unique_id is invalid' => "Invalid login_id: '%{login_id}'",
+      }.freeze
+      DEFAULT_REASON = 'Unknown reason: %{message}'.freeze
+
+      def generate_readable_error_message(options)
+        response = ERRORS_TO_REASONS.fetch(options[:message]) { DEFAULT_REASON }
+        reason = format(response, options)
+        result = "Could not save the user with user_id: '#{options[:user_id]}'."
+        result << " #{reason}"
+        result
       end
     end
   end
