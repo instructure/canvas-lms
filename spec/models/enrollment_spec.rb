@@ -1889,4 +1889,60 @@ describe Enrollment do
       @enrollment.save
     end
   end
+
+  describe "#student_with_conditions?" do
+    it "returns false if the enrollment is neither a student enrollment nor a fake student enrollment" do
+      @enrollment.stubs(:student?).returns(false)
+      @enrollment.stubs(:fake_student?).returns(false)
+      expect(@enrollment.student_with_conditions?(include_future: true, include_fake_student: true)).to eq(false)
+    end
+
+    context "the enrollment is a student enrollment" do
+      before(:each) do
+        @enrollment.stubs(:student?).returns(true)
+        @enrollment.stubs(:fake_student?).returns(false)
+      end
+
+      it "returns true if include_future is true" do
+        expect(@enrollment.student_with_conditions?(include_future: true, include_fake_student: false)).to eq(true)
+      end
+
+      it "returns true if include_future is false and the enrollment is active" do
+        @enrollment.stubs(:participating?).returns(true)
+        expect(@enrollment.student_with_conditions?(include_future: false, include_fake_student: false)).to eq(true)
+      end
+
+      it "returns false if include_future is false and the enrollment is inactive" do
+        @enrollment.stubs(:participating?).returns(false)
+        expect(@enrollment.student_with_conditions?(include_future: false, include_fake_student: false)).to eq(false)
+      end
+    end
+
+    context "the enrollment is a fake student enrollment" do
+      before(:each) do
+        @enrollment.stubs(:student?).returns(false)
+        @enrollment.stubs(:fake_student?).returns(true)
+      end
+
+      it "returns false if include_fake_student is false" do
+        expect(@enrollment.student_with_conditions?(include_future: true, include_fake_student: false)).to eq(false)
+      end
+
+      context "include_fake_student is passed in as true" do
+        it "returns true if include_future is true" do
+          expect(@enrollment.student_with_conditions?(include_future: true, include_fake_student: true)).to eq(true)
+        end
+
+        it "returns true if include_future is false and the enrollment is active" do
+          @enrollment.stubs(:participating?).returns(true)
+          expect(@enrollment.student_with_conditions?(include_future: false, include_fake_student: true)).to eq(true)
+        end
+
+        it "returns false if include_future is false and the enrollment is inactive" do
+          @enrollment.stubs(:participating?).returns(false)
+          expect(@enrollment.student_with_conditions?(include_future: false, include_fake_student: true)).to eq(false)
+        end
+      end
+    end
+  end
 end
