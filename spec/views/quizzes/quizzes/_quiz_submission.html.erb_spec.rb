@@ -58,4 +58,25 @@ describe "/quizzes/quizzes/_quiz_submission" do
       expect(response).not_to be_nil
     end
   end
+
+  context 'as a teacher' do
+    it "should render Respondus lockdown submission for soft concluded course" do
+      course_with_student
+      course_with_teacher
+      view_context
+
+      Quizzes::Quiz.stubs(:lockdown_browser_plugin_enabled?).returns(true)
+      quiz = @course.quizzes.create!
+      quiz.require_lockdown_browser = true
+      quiz.require_lockdown_browser_for_results = true
+      quiz.save!
+      @course.soft_conclude!
+
+      assigns[:quiz] = quiz
+      assigns[:submission] = assigns[:quiz].generate_submission(@student)
+      Quizzes::SubmissionGrader.new(assigns[:submission]).grade_submission
+      render :partial => "quizzes/quizzes/quiz_submission"
+      expect(response).not_to be_nil
+    end
+  end
 end

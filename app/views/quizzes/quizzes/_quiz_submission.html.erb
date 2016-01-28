@@ -102,7 +102,7 @@
 <div class="quiz_duration" style="<%= hidden if @quiz.ungraded? %>">
   <%= t(:attempt_duration, "This attempt took %{duration}.", :duration => duration_in_minutes(@submission.duration)) %>
 </div>
-<% if @quiz.require_lockdown_browser && @quiz.require_lockdown_browser_for_results && !@lockdown_browser_authorized_to_view && !can_do(@quiz, @current_user, :grade) %>
+<% if @quiz.require_lockdown_browser && @quiz.require_lockdown_browser_for_results && !@lockdown_browser_authorized_to_view && !can_do(@quiz, @current_user, :review_grades) %>
 <p>
   <br /><br />
   <%= t(:requires_lockdown, "Respondus LockDown Browser is required to view your quiz results.") %>
