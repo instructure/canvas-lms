@@ -337,7 +337,7 @@ class CoursesController < ApplicationController
   #     is given, any student enrollments will also include the fields
   #     'multiple_grading_periods_enabled',
   #     'totals_for_all_grading_periods_option', 'current_grading_period_title',
-  #     'current_period_computed_current_score',
+  #     'current_grading_period_id', current_period_computed_current_score',
   #     'current_period_computed_final_score',
   #     'current_period_computed_current_grade', and
   #     'current_period_computed_final_grade' (see Enrollment documentation for
@@ -443,7 +443,7 @@ class CoursesController < ApplicationController
   #     is given, any student enrollments will also include the fields
   #     'multiple_grading_periods_enabled',
   #     'totals_for_all_grading_periods_option', 'current_grading_period_title',
-  #     'current_period_computed_current_score',
+  #     'current_grading_period_id', current_period_computed_current_score',
   #     'current_period_computed_final_score',
   #     'current_period_computed_current_grade', and
   #     'current_period_computed_final_grade' (see Enrollment documentation for

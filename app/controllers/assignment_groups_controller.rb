@@ -101,7 +101,14 @@ class AssignmentGroupsController < ApplicationController
   #
   # @argument grading_period_id [Integer]
   #   The id of the grading period in which assignment groups are being requested
-  #   (Requires the Multiple Grading Periods account feature turned on)
+  #   (Requires the Multiple Grading Periods feature turned on.)
+  #
+  # @argument scope_assignments_to_student [Boolean]
+  #   If true, all assignments returned will apply to the current user in the
+  #   specified grading period. If assignments apply to other students in the
+  #   specified grading period, but not the current user, they will not be
+  #   returned. (Requires the grading_period_id argument and the Multiple Grading
+  #   Periods feature turned on. In addition, the current user must be a student.)
   #
   # @returns [AssignmentGroup]
   def index
@@ -336,12 +343,7 @@ class AssignmentGroupsController < ApplicationController
     ).with_student_submission_count.all
 
     if params[:grading_period_id].present? && multiple_grading_periods?
-      grading_period = GradingPeriod.context_find(
-        context,
-        params.fetch(:grading_period_id)
-      )
-
-      assignments = grading_period.assignments(assignments) if grading_period
+      assignments = filter_assignments_by_grading_period(assignments, context)
     end
 
     # because of a bug with including content_tags, we are preloading
@@ -362,5 +364,17 @@ class AssignmentGroupsController < ApplicationController
     end
 
     assignments
+  end
+
+  def filter_assignments_by_grading_period(assignments, course)
+    grading_period = GradingPeriod.context_find(course, params.fetch(:grading_period_id))
+    return assignments unless grading_period
+
+    if params[:scope_assignments_to_student] &&
+      course.user_is_student?(@current_user, include_future: true, include_fake_student: true)
+      grading_period.assignments_for_student(assignments, @current_user)
+    else
+      grading_period.assignments(assignments)
+    end
   end
 end

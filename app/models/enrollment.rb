@@ -940,6 +940,15 @@ class Enrollment < ActiveRecord::Base
     false
   end
 
+  def student_with_conditions?(include_future:, include_fake_student:)
+    return false unless student? || fake_student?
+    if include_fake_student
+      include_future || participating?
+    else
+      include_future ? student? : participating_student?
+    end
+  end
+
   def observer?
     false
   end

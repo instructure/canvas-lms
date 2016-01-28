@@ -156,7 +156,8 @@ module Api::V1
         scores[enrollment.id] = current_period_scores[index].merge({
           multiple_grading_periods_enabled: true,
           totals_for_all_grading_periods_option: totals_for_all_grading_periods_option,
-          current_grading_period_title: current_period.title
+          current_grading_period_title: current_period.title,
+          current_grading_period_id: current_period.id
         })
       end
       scores
@@ -170,6 +171,7 @@ module Api::V1
           multiple_grading_periods_enabled: mgp_enabled,
           totals_for_all_grading_periods_option: totals_for_all_grading_periods_option,
           current_grading_period_title: nil,
+          current_grading_period_id: nil,
           current_period_computed_current_score: nil,
           current_period_computed_final_score: nil,
           current_period_computed_current_grade: nil,

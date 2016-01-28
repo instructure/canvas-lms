@@ -622,9 +622,15 @@ class Course < ActiveRecord::Base
     return unless user
     RequestCache.cache('user_is_student', self, user, opts) do
       Rails.cache.fetch([self, user, "course_user_is_student", opts[:include_future]].cache_key) do
-        user.cached_current_enrollments(:preload_dates => true, :include_future => opts[:include_future]).any? { |e|
-          e.course_id == self.id && (opts[:include_future] ? e.student? : e.participating_student?)
-        }
+        current_enrollments = user.cached_current_enrollments(
+          preload_dates: true, include_future: opts[:include_future])
+        current_enrollments.any? do |enrollment|
+          enrollment.course_id == self.id &&
+            enrollment.student_with_conditions?(
+              include_future: opts[:include_future],
+              include_fake_student: opts[:include_fake_student]
+            )
+        end
       end
     end
   end

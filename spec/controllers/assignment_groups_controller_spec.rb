@@ -26,14 +26,24 @@ describe AssignmentGroupsController do
 
   describe 'GET index' do
     describe 'filtering by grading period and overrides' do
-      let!(:assignment) { course.assignments.create!(due_at: Date.new(2015, 1, 15)) }
-      let!(:assignment_with_override) { course.assignments.create!(due_at: Date.new(2015, 1, 15)) }
+      let!(:assignment) { course.assignments.create!(name: "Assignment without overrides", due_at: Date.new(2015, 1, 15)) }
+      let!(:assignment_with_override) do
+        course.assignments.create!(name: "Assignment with override", due_at: Date.new(2015, 1, 15))
+      end
       let!(:feb_override) do
         # mass assignment is disabled for AssigmentOverride
-        assignment_with_override.assignment_overrides.new.tap do |override|
-          override.title =  'feb override'
+        student_override = assignment_with_override.assignment_overrides.new.tap do |override|
+          override.title = 'feb override'
           override.due_at = Time.zone.local(2015, 2, 15)
-        end.save!
+        end
+        student_override.save!
+        student_override.assignment_override_students.create!(user: student)
+      end
+
+      let(:student) do
+        dora = User.create!(name: "Dora")
+        course_with_student(course: course, user: dora, active_enrollment: true)
+        dora
       end
 
       let(:jan_grading_period) do
@@ -53,38 +63,79 @@ describe AssignmentGroupsController do
       end
 
       let(:grading_period_group) { course.grading_period_groups.create! }
-      let(:course) { Course.create! }
+      let(:course) do
+        course = sub_account.courses.create!
+        course.offer!
+        course
+      end
       let(:root_account) { Account.default }
       let(:sub_account) { root_account.sub_accounts.create! }
 
       context 'given a root account with a grading period and a sub account with a grading period' do
-        before do
+        before(:once) do
           root_account.allow_feature!(:multiple_grading_periods)
           root_account.enable_feature!(:multiple_grading_periods)
           root_account.enable_feature!(:differentiated_assignments)
-
           account_admin_user(account: root_account)
-          user_session(@admin)
         end
 
-        it 'when there is an assignment with overrides, filter grading periods by overrides due_at' do
-          get :index,
-           course_id: course.id,
-           include: ['assignments', 'assignment_visibility', 'overrides'],
-           override_assignment_dates: false,
-           exclude_descriptions: true,
-           grading_period_id: feb_grading_period.id,
-           format: :json
+        let(:index_params) do
+          { course_id: course.id, exclude_descriptions: true, format: :json,
+            include: ['assignments', 'assignment_visibility', 'overrides'] }
+        end
 
-          json = JSON.parse(response.body[9..-1])
-          assignments_ids = json.first['assignments'].map{|a| a['id']}
+        let(:assignments_ids) do
+          json_response = json_parse(response.body)
+          json_response.first['assignments'].map { |assignment| assignment['id'] }
+        end
+
+        it 'when there is an assignment with overrides, filter grading periods by the override\'s due_at' do
+          user_session(@admin)
+          get :index, index_params.merge(grading_period_id: feb_grading_period.id)
           expect(assignments_ids).to include assignment_with_override.id
           expect(assignments_ids).to_not include assignment.id
+        end
+
+        it 'it should include an assignment if any of its overrides fall within the given grading period' do
+          user_session(student)
+          get :index, index_params.merge(grading_period_id: jan_grading_period.id)
+          expect(assignments_ids).to include assignment_with_override.id
+          expect(assignments_ids).to include assignment.id
+        end
+
+        it 'if scope_assignments_to_student is passed in and the requesting user ' \
+        'is a student, it should only include an assignment if its effective due ' \
+        'date for the requesting user falls within the given grading period' do
+          user_session(student)
+          get :index, index_params.merge(grading_period_id: jan_grading_period.id, scope_assignments_to_student: true)
+          expect(assignments_ids).to_not include assignment_with_override.id
+          expect(assignments_ids).to include assignment.id
+        end
+
+        it 'if scope_assignments_to_student is passed in and the requesting user ' \
+        'is a fake student, it should only include an assignment if its effective due ' \
+        'date for the requesting user falls within the given grading period' do
+          fake_student = course.student_view_student
+          override = assignment_with_override.assignment_overrides.first
+          override.assignment_override_students.create!(user: fake_student)
+          user_session(fake_student)
+          get :index, index_params.merge(grading_period_id: jan_grading_period.id, scope_assignments_to_student: true)
+          expect(assignments_ids).to_not include assignment_with_override.id
+          expect(assignments_ids).to include assignment.id
+        end
+
+        it 'if scope_assignments_to_student is passed in and the requesting user ' \
+        'is not a student or fake student, it should behave as though ' \
+        'scope_assignments_to_student was not passed in' do
+          user_session(@admin)
+          get :index, index_params.merge(grading_period_id: jan_grading_period.id, scope_assignments_to_student: true)
+          expect(assignments_ids).to include assignment_with_override.id
+          expect(assignments_ids).to include assignment.id
         end
       end
     end
 
-    context 'given a course with teach and a student in course' do
+    context 'given a course with a teacher and a student' do
       before :once do
         course_with_teacher(active_all: true)
         student_in_course(active_all: true)
@@ -120,10 +171,10 @@ describe AssignmentGroupsController do
       context 'multiple grading periods feature enabled' do
         before do
           @course.root_account.enable_feature!(:multiple_grading_periods)
-          user_session(@teacher)
         end
 
         it 'does not throw an error when grading_period_id is passed in as empty string' do
+          user_session(@teacher)
           get 'index', :course_id => @course.id, :include => ['assignments', 'assignment_visibility'], :grading_period_id => '', :format => :json
           expect(response).to be_success
         end
