@@ -73,7 +73,7 @@ describe 'editing a quiz' do
         # verify the alert disappears after clicking the button
         save_it_now_button.click
         wait_for_ajaximations
-        expect(alert_box).not_to be_displayed
+        expect(fj('.unpublished_warning', '.alert')).not_to be_displayed
 
         # verify the student sees the changes
         @user = @student
