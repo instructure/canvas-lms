@@ -21,7 +21,7 @@ module Canvas::ICU
     Bundler.require 'icu'
     if !ICU::Lib.respond_to?(:ucol_getRules)
       require 'ffi'
-      suffix = ICU::Lib.figure_suffix(ICU::Lib.version.to_s)
+      suffix = ICU::Lib.figure_suffix(ICU::Lib.load_icu)
 
       ICU::Lib.attach_function(:ucol_getRules, "ucol_getRules#{suffix}", [:pointer, :pointer], :pointer)
       ICU::Lib.attach_function(:ucol_getSortKey, "ucol_getSortKey#{suffix}", [:pointer, :pointer, :int, :pointer, :int], :int)
