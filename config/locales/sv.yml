@@ -3,9 +3,9 @@
 --- 
 sv: 
   1_item_scores_5512cd03: "1- Artikelresultat"
-  1st_reviewer_3c1d0119: "1:a granskare"
+  1st_reviewer_3c1d0119: "1:a bedömmare"
   2_final_score_7b0fd15e: "2- Slutresultat"
-  2nd_reviewer_94fdbcd: "2: granskare"
+  2nd_reviewer_94fdbcd: "2: bedömmare"
   451_message: 
     description: "Du har inte behörighet att besöka den här hemsidan då du befinner dig i ett land som är föremål för handelsrestriktioner med USA."
     headings: 
@@ -48,7 +48,7 @@ sv:
   a_handy_key_value_dump_of_a_host_of_interesting_en_d0518dfe: "Ett smidigt nyckel/värdesutdrag med info om en värd i en intressant miljö för den rapporterande användaren"
   a_message_is_required_129e1814: "Det krävs ett meddelande"
   a_new_assignment_has_been_created_for_your_course__12b72639: "En ny uppgift har skapats för din kurs, %{course_name}"
-  a_problem_occurred_adding_reviewers_57b083d9: "Ett problem uppstod när granskare lades till."
+  a_problem_occurred_adding_reviewers_57b083d9: "Ett problem uppstod när bedömmare lades till."
   a_table_containing_the_name_of_the_grading_scheme__2c25dc3: "En tabell med namn på betygsystemet och ikoner för redigering eller radering av systemet."
   a_table_that_contains_the_grading_scheme_data_each_d461c205: "En tabell som innehåller data för betygssystemet. Varje rad innehåller ett namn, ett max. procent, ett min. procent. Varje rad innehåller också en ikon för att lägga till en ny rad under och en ikon för att radera nuvarande rad. "
   academic_benchmark: 
@@ -916,7 +916,7 @@ sv:
         trusted_referers: "Förtrodda HTTP referenser"
         turnitin: Tunitin
         turnitin_account_id: "Turnitin Konto-ID"
-        turnitin_comments: Inlämningskommentarer
+        turnitin_comments: "Kommentar på inlämning"
         turnitin_host: "Turnitin Värd"
         turnitin_pledge: "Turnitin Pledge"
         turnitin_shared_secret: "Delad Turnitin hemlighet"
@@ -1243,7 +1243,7 @@ sv:
   add_8523c19b: "Lägg till"
   add_a_new_course_4a041207: "Lägg till en ny kurs"
   add_a_new_user_c440d053: "Lägg till en ny användare"
-  add_a_reviewer_for_the_selected_students_1c7b5d6f: "Lägg till granskare för valda elever"
+  add_a_reviewer_for_the_selected_students_1c7b5d6f: "Lägg till bedömmare för valda elever"
   add_an_identity_provider_to_this_account_c2644478: "Lägg till en identity provider till det här kontot:"
   add_app_baf540f: "Lägg till App"
   add_attachment_93868828: Bifoga
@@ -1344,7 +1344,7 @@ sv:
   all_groups_cea25817: "Alla grupper"
   all_my_files_a0213441: "Alla mina filer"
   all_start_dates_must_be_before_the_end_date_d949eca9: "Alla startdatum måste vara före slutdatum"
-  all_students_have_taken_the_quiz_b558f8b4: "Alla eleverna har tagit quizen"
+  all_students_have_taken_the_quiz_b558f8b4: "Alla eleverna har gjort detta quiz"
   all_students_have_taken_the_survey_494f9f42: "Alla stundenterna har gjort undersökningen"
   all_terms_cd27b0fb: "Alla terminer"
   allow_a_moderator_to_review_multiple_independent_g_752c4b90: "TIllåter att moderatorn ser över flera olika oberonder betyg väljs för inlämning"
@@ -1746,7 +1746,7 @@ sv:
       drop_lowest: "Lägsta poäng:"
       example_group_name: "t.ex., Uppsatsgrupp 1"
       group_name: "Gruppnamn:"
-      never_drop: "Tappa aldrig:"
+      never_drop: "Justera aldrig:"
       percent_of_total: "% av totala betyget"
       save: Spara
       saving: Sparar...
@@ -2008,8 +2008,8 @@ sv:
       redirect_message: |-
           Den här inlämingen var en url, vi tar dig till url länken.
           [Klicka här för att gå till inlämningen](%{url})
-    remove_never_drop_rule: "Ta bort aldig-sänk-regeln"
-    remove_unsaved_never_drop_rule: "Ta bort osparade aldrig-sänk-regler"
+    remove_never_drop_rule: "Ta bort \"justera aldrig\" -regeln"
+    remove_unsaved_never_drop_rule: "Ta bort osparad \"justera aldrig\" -regel"
     rules_text: 
       one: "1 Regel"
       other: "%{count} regler"
@@ -2829,7 +2829,7 @@ sv:
   canvas_revision_unknown: Okänd
   canvas_ticketing_email_connector_27e253ae: "Canvas Ticketing Email Connector"
   canvas_ticketing_web_post_connector_11158897: "Canvas Ticketing Web Post Connector"
-  canvas_will_regrade_all_your_submissions_after_you_2d68694a: "Canvas omklassa alla svar efter att du har sparat quizen, den kan ta ett par minuter."
+  canvas_will_regrade_all_your_submissions_after_you_2d68694a: "Canvas omklassa alla svar efter att du har detta Quiz, det kan ta ett par minuter."
   careful_changes_to_group_membership_will_apply_to__19a9089c: "Försiktigt! Ändringar till gruppers medlemskap kommer tillämpas på grupper som redan har uppgiftsinlämningar. Det är inte säkert att Grupp uppgiftsinämningar behålls som ett resultat. VIll du skapa en ny grupp för framtida uppgifter? "
   cas_url_4ba2843e: "CAS URL"
   catalog_already_enabled_56478a3c: "Catalogen är redan aktiverad"
@@ -3225,10 +3225,10 @@ sv:
       page_locked_module: "Den här sidan är en del av modulen *%{module}* och har ännu inte låsts upp."
       page_locked_no_reason: "Den här sidan är låst. Ingen annan anledning har uppgetts. "
       page_locked_until: "Den här sidan är låst tills %{date}."
-      quiz_locked_at: "Den här quizen låstes %{at}."
-      quiz_locked_module: "Den här quizen är en del av modulen *%{module}* och har ännu inte låsts upp."
-      quiz_locked_no_reason: "Den här quizen är låst. Ingen annan anledning har uppgetts."
-      quiz_locked_until: "Den här quizen är låst tills %{date}."
+      quiz_locked_at: "Detta Quiz låstes %{at}."
+      quiz_locked_module: "Detta Quiz är en del av modulen *%{module}* och har ännu inte låsts upp."
+      quiz_locked_no_reason: "Detta Quiz är låst. Ingen annan anledning har uppgetts."
+      quiz_locked_until: "Detta Quiz är låst tills %{date}."
       topic_locked_at: "Det här ämnet låstes %{at}."
       topic_locked_module: "Det här ämnet är en del av modulen *%{module}* och har ännu inte låsts upp."
       topic_locked_no_reason: "Det här ämnet är låst. Ingen annan anledning har uppgetts,"
@@ -3850,7 +3850,7 @@ sv:
       sent: Skickat
       settings: Inställningar
       starred: Stjärnmärkt
-      submission_comments: Inlämningskommentarer
+      submission_comments: "Kommentar på inlämning"
       titles: 
         conversations: Konversationer
       unread: Oläst
@@ -3988,7 +3988,7 @@ sv:
       other: "%{count} kurser bearbetade"
     course_format: 
       not_set: "Inte inställd"
-      on_campus: På-campus
+      on_campus: "\"På skola\""
       online: Online
     course_not_found: "Kursen hittades inte"
     csv: 
@@ -4077,8 +4077,8 @@ sv:
       module_meta: "Misslyckades att exportera modul meta data"
       organization: "Misslyckades att generera organisationsstruktur"
       question_bank: "Frågebanken \"%{title}\" kunde inte exporteras"
-      quiz: "Quizen \"%{title}\" kunde inte exporteras"
-      quiz_is_locked: "Quizen \"%{title}\" kunde inte kopieras då den är låst."
+      quiz: "Detta Quiz \"%{title}\" kunde inte exporteras"
+      quiz_is_locked: "Detta Quiz \"%{title}\" kunde inte kopieras då den är låst."
       quizzes: "Vissa quizzes kunde inte exporteras"
       resources: "Misslyckades att länka vissa resurser"
       rubrics: "Misslyckades med export av matriser"
@@ -4673,7 +4673,7 @@ sv:
       links: 
         choose_home_page: "Välj startsida"
         course_setup: "Checklista för kursen"
-        drop_course: "Släpp den är kursen"
+        drop_course: "Hoppa av kursen"
         join_course: "Anslut dig till kursen"
         new_announcement: "Nytt meddelande"
         view_course_stream: "Visa kursström"
@@ -4682,7 +4682,7 @@ sv:
       send_failed: "Begäran misslyckades. Försök igen."
       teachers_only: "Enbart lärare kan se kursen innan den har *publicerats*"
       titles: 
-        drop_course: "Släpp kursen"
+        drop_course: "Hoppa av kursen"
         recent_feedback: "Senaste feedback"
     sidebar_weighting: 
       default_name: Grupp
@@ -4859,7 +4859,7 @@ sv:
     sis_login_id: "SIS Inloggnings-ID"
     sis_user_id: "SIS användar-ID"
     standard: 
-      deviation: "Normal avikelse"
+      deviation: Standardavikelse
     student: Elev
     top: 
       student: 
@@ -5270,7 +5270,7 @@ sv:
     discussion_feed_title: "%{title} Diskussionsflöde"
     discussion_list: 
       no_pinned_discussions: "Du har förtillfället inga pinnade diskussioner"
-      pinned_instructions: "För att nåla fast en diskussion högst upp på sidan, drar du hit diskussionen eller så väljer du Nåla i diskussionsinställningsmenyn."
+      pinned_instructions: "För att nåla fast en diskussion högst upp på sidan, drar du hit diskussionen eller så väljer du Nåla i inställningar för diskussioner."
       there_are_no_discussions_show: "Det finns inga diskussioner att visa i den här sektionen."
     discussions_settings_view: 
       allow_student_discussion_editing: "Redigera eller radera sina egna inlägg"
@@ -6407,7 +6407,7 @@ sv:
       no_rubric_outcomes_found: "Inga matris-konfigurerade lärandemål hittades"
     titles: 
       find_outcome: "Hitta bedömning"
-  first_reviewer_9ea05caa: "Första granskaren"
+  first_reviewer_9ea05caa: "Första bedömmareen"
   first_two_students_and_others_count_others_bb0a212a: "%{first_two_students}, och %{others_count} andra"
   flash_6afbf65a: Flash
   folder: 
@@ -6642,7 +6642,7 @@ sv:
       discussion: Diskussionsinlämning
       media: Media-kommentarsinlämning
       media_recording: Media-inspelningsinlämning
-      quiz_review: "Den här quizen behöver recenceras"
+      quiz_review: "Detta Quiz behöver bedömmas"
       text: "Text inläggsinlämning"
       upload: "Fil uppladdningsinlämning"
       url: URL-inlämning
@@ -6814,7 +6814,7 @@ sv:
         current: Nuvarande
         student: Student
       page_title: Betygsbokshistoria
-      regraded: Omgradera
+      regraded: Ombedömd
       revert: "Återgå till det här betyget"
       submission_count: 
         one: "1 ändring"
@@ -7539,7 +7539,7 @@ sv:
   if_enabled_modules_will_have_the_option_to_be_mark_a4313e1: "Om aktiverad kommer moduler ha alternativet att bli markerade som färdig även om bara ett krav har uppnåtts."
   if_enabled_query_parameters_will_not_be_copied_to__4c6ed625: "Om aktiverad kommer frågeparametrarna inte att koperias från POST body under en LTI start."
   if_enabled_users_will_be_able_to_configure_lti_2_t_6293eebd: "Om aktiverat kommer användare kunna konfigurerar LTI 2 verktyg."
-  if_you_change_an_assignment_s_points_possible_you__25a0edad: "Om du ändra en uppgifts möjliga poäng måste du omgradera uppgiften."
+  if_you_change_an_assignment_s_points_possible_you__25a0edad: "Om du ändra en uppgifts möjliga poäng måste du ombedömma uppgiften."
   if_you_configure_settings_that_cause_you_to_not_be_13d4cbbf: "Om du konfigurerar inställningar som gör så att du inte kan logga in kan du nå den vanliga Canvas-inloggningen från %{url}"
   if_you_do_not_select_usage_rights_now_this_file_wi_40c42125: "Om du inte väljer användarättigheter nu kommer filen vara avpublicerad efter att den laddats upp."
   if_you_enable_this_feature_be_sure_that_your_sales_566967e6: "Om du aktiverar den här funktionen måste du se till att ditt salesforce konto har dessa fälten tillagda exakt med namnen från vänstra kolumnen i tabellen. "
@@ -7953,7 +7953,7 @@ sv:
   link_url_cf96376: "Länk Url"
   linked_assignment_message: "länkad till uppgiften '%{title}'"
   linked_discussion_topic_message: "länkad med diskussionsämnet '%{title}'"
-  linked_quiz_message: "länkad med Quizen '%{title}'"
+  linked_quiz_message: "länkad med Quiz '%{title}'"
   linkedin_5726caca: LinkedIn
   links: 
     dashboard: "Min Dashboard"
@@ -8030,7 +8030,7 @@ sv:
           remember_me: "Fortsätt vara inloggad"
         log_in: "Logga in"
         login_handle: "Ange ditt %{login_handle_name} så skickar vi en länk du kan ändra lösenordet med."
-        open_source_learning_management_system: "Öppenkäll LMS"
+        open_source_learning_management_system: "Open Source LMS"
     logout_confirm: 
       cancel: Avbryt
       details: 
@@ -8132,8 +8132,8 @@ sv:
   mark_done_9d81bcd9: "Markera som färdig "
   marked_done_8f61ebb8: "markerad som färdig"
   marked_done_9fd646f: "Markera som färdig"
-  mastery_score_reflects_the_highest_score_of_a_grad_fd426d1e: "Mästarpoängen reklekterar det högsta poängen som getts för uppgiften eller quizen."
-  mastery_score_reflects_the_most_recent_graded_assi_29fd2e00: "Måluppfyllelse poäng reflekterar den senaste betygsatta uppgiften eller quizen."
+  mastery_score_reflects_the_highest_score_of_a_grad_fd426d1e: "Mästarpoängen reklekterar det högsta poängen som getts för uppgiften eller Quiz."
+  mastery_score_reflects_the_most_recent_graded_assi_29fd2e00: "Poängen för måluppfyllelse reflekterar den senaste betygsatta uppgift eller quiz."
   matching_left_side_80_character_limit_bb12adf1: "Matchande vänster sida (högst 80 tecken)"
   matching_left_side_900f860b: "Matchar vänster sida"
   matching_right_side_80_character_limit_217edfe1: "Matchande höger sida (högst 80 tecken)"
@@ -8849,7 +8849,7 @@ sv:
           link: "Klicka för att visa exporteringar"
           subject: "Exportering av kurs avslutades: %{course}"
         subject: "Exportering av kurs avslutades: %{course}"
-    content_locked: "Den här quizen är för nuvarande låst."
+    content_locked: "Detta Quiz är för nuvarande låst."
     content_locked_at: "Det här innehållet låstes kl. %{at}."
     content_locked_module: "Det här innehållet är en del av modulen *%{module}* och har ännu inte låsts upp."
     content_locked_until: "Det här innehållet är låst tills %{date}."
@@ -8955,15 +8955,15 @@ sv:
         body: |-
             %{user},
             
-            Det är nästan dags! %{course}, en kurs du anmält dig för på Canvas Network, börjar nästa vecka. Vi vet hur uppjagad du måste vara, det är vi också.
+            Det är snart dags! %{course}, en kurs du anmält dig för på Canvas Network, börjar nästa vecka. Vi vet hur uppjagad du måste vara, det är vi också.
             
             Vad kan du göra för att förbereda dig?
             
-            Om du inte redan har skapat din Canvas Network profil, kan du logga in och göra det på Canvas.net. Din profil kommer hjälpa andra i samma kurs att veta vem du är. Du kan också ställa in dina aviseringsinställningar.
+            Om du inte redan har skapat din Canvas Network profil, kan du logga in och göra det på Canvas.net. Din profil kommer hjälpa dina kurskopmisar att veta vem du är. Du kan också ställa in dina aviseringar.
             
-            Slutligen kan du även gå över det nödvängida materialet och instruktioner för kursen här:%{url}
+            Slutligen kan du titta på kursmaterialet och instruktioner för kursen här:%{url}
             
-            Forsätt utbilda dig,
+            Keep learning,
             
             Canvas Network
         course_starts_next_week: "Din kurs börjar nästa vecka"
@@ -9309,7 +9309,7 @@ sv:
     layout: 
       email: 
         html: 
-          click_to_preferences: "Uppdatera dina aviseringsinställningar"
+          click_to_preferences: "Uppdatera inställningar för aviseringar"
     merge_email_communication_channel: 
       email: 
         body: "Ett konto har skapats för dig på %{host}, men du har redan ett Canvaskonto. Om du vill sammanfoga dem kan du besöka följande url:"
@@ -9633,29 +9633,29 @@ sv:
         subject: "Canvasrgistreringen är färdig"
       twitter: 
         body: "Canvaslarm - Du har registrerats för ett Canvas-konto på %{account}!"
-    quiz_locked: "Den här quizen är för nuvarande låst."
-    quiz_locked_at: "Den här quizen låstes %{at}."
-    quiz_locked_module: "Den här quizen är en del av modulen *%{module}* och har ännu inte låsts upp."
-    quiz_locked_until: "Den här quizen är låst tills %{date}."
-    quiz_module_time_locked: "Den här quizen är en del av modulen *%{module}*, som är låste tills %{time}."
+    quiz_locked: "Detta Quiz är för nuvarande låst."
+    quiz_locked_at: "Detta Quiz låstes %{at}."
+    quiz_locked_module: "Detta Quiz är en del av modulen *%{module}* och har ännu inte låsts upp."
+    quiz_locked_until: "Detta Quiz är låst tills %{date}."
+    quiz_module_time_locked: "Detta Quiz är en del av modulen *%{module}*, som är låste tills %{time}."
     quiz_regrade_finished: 
       email: 
-        body: "En omgraderar är färdig för quizen %{quiz}"
+        body: "En ombedömning är färdig för Quiz %{quiz}"
         html: 
           body: "A regrade has finished for the quiz %{quiz}"
-          link_message: "Du kan se quizen här:"
+          link_message: "Du kan se Quiz här:"
           subject: "Quiz omgradering färdig: %{quiz}, %{context}"
-        link_message: "Du kan se quizen här:"
+        link_message: "Du kan se Quiz här:"
         subject: "Quiz omgradering färdig: %{quiz}, %{context}"
       sms: 
         body_sms: "Quiz omgradering färdig för %{title} i %{context}."
         more_info: "Mer information på %{url}"
       summary: 
         body: "En omgradering är färdig för din quiz %{title}."
-        subject: "Quiz omgraderad: %{quiz}, %{context}"
+        subject: "Quiz ombedömd: %{quiz}, %{context}"
       twitter: 
-        body: "Canvaslarm - Quiz omgraderad: %{quiz}"
-    quiz_unpublished_module: "Den här quizen är en del av en avpublicerad modul och är därför inte tillgänglig än."
+        body: "Canvaslarm - Quiz ombedömd: %{quiz}"
+    quiz_unpublished_module: "Detta Quiz är en del av en avpublicerad modul och är därför inte tillgänglig än."
     report_generated: 
       email: 
         html: 
@@ -9758,14 +9758,14 @@ sv:
           link_message: "Du kan se över uppgiften här"
           no_date_set: "Inget datum inställt"
           not_applicable: N/A
-          regraded_date: "omgraderad: %{date}"
+          regraded_date: "ombedömd: %{date}"
           score: "poäng: %{score} utav %{total}"
           score_pending: "poängen väntar på att läraren ser över dem"
           subject: "Betyget ändrat: %{assignment}, %{context}"
         link_message: "Du kan se över uppgiften här:"
         no_date_set: "Inget datum inställt"
         not_applicable: N/A
-        regraded_date: "omgraderad: %{date}"
+        regraded_date: "ombedömd: %{date}"
         score: "poäng: %{score} utav %{total}"
         score_pending: "poängen väntar på att läraren ser över dem"
         subject: "Betyg ändrat: %{assignment}, %{context}"
@@ -9774,13 +9774,13 @@ sv:
         more_info: "Mer information på %{url}"
         no_date_set: "Inget datum inställt"
         not_applicable: N/A
-        regraded_date: "omgraderad: %{date}"
+        regraded_date: "ombedömd: %{date}"
         score: "poäng: %{score} utav %{total}"
         score_pending: "poängen väntar på att läraren ser över dem"
       summary: 
         no_date_set: "Inget datum inställt"
         not_applicable: N/A
-        regraded_date: "omgraderad: %{date}"
+        regraded_date: "ombedömd: %{date}"
         score: "poäng: %{score} utav %{total}"
         score_pending: "poängen väntar på att läraren ser över dem"
         subject: "Betyg ändrades: %{title}, %{context}"
@@ -9834,21 +9834,21 @@ sv:
         tweet: "Canvaslarm - Betygsatt: %{assignment}, %{context}"
     submission_needs_grading: 
       email: 
-        body: "%{user_name} är färdig med quizen %{quiz_title}, och den kräver manuell betygsättning."
+        body: "%{user_name} är färdig med detta Quiz %{quiz_title}, och den kräver manuell betygsättning."
         html: 
-          body: "%{user_name} är färdig med quizen %{quiz_title}, och den kräver manuell betygsättning."
+          body: "%{user_name} är färdig med detta Quiz %{quiz_title}, och den kräver manuell betygsättning."
           link_message: "Du kan se över inlämningen här"
           subject: "Quien inlämnad: %{quiz}, %{context}"
           submitted_date: "inlämnad: %{date}"
         link_message: "Du kan se över inlämningen här:"
-        subject: "Quizen inlämnad: %{quiz}, %{context}"
+        subject: "Quiz inlämnad: %{quiz}, %{context}"
         submitted_date: "inlämnad: %{date}"
       sms: 
         body_sms: "Ditt betyg för %{title}, %{context} ändrades nyss."
         more_info: "Mer information på %{url}"
         no_date_set: "Inget datum inställt"
         not_applicable: N/A
-        regraded_date: "omgraderad: %{date}"
+        regraded_date: "ombedömd: %{date}"
         score: "poäng: %{score} utav %{total}"
         score_pending: "poängen väntar på att läraren ser över dem"
       summary: 
@@ -10171,7 +10171,7 @@ sv:
     score_change_notifications: "Aviseringar om poängändringar"
     see_grade: "Deras betyg för uppgiften"
     students_will_see: "Elever kommer också kunna se att uppgiften är tystad."
-    submission_comments: Inlämningskommentarer
+    submission_comments: "Kommentar på inlämning"
     sure_you_want_to_mute: "Är du säker på att du vill tysta den här uppgiften? När uppgiften är tystad kommer elever inte längre ta emot aviseringar om eller kunna se:"
   muted_283cfa0f: (tystad)
   my_dashboard_b724020: "Min översikt"
@@ -10235,7 +10235,7 @@ sv:
   no_results_found_58717065: "Inga resultat hittades"
   no_score_yet_c94e919b: "Inga poäng än"
   no_students_dd8de9f0: "Inga elever"
-  no_students_have_taken_the_quiz_yet_e667644b: "Inga elever har tagit quizen än"
+  no_students_have_taken_the_quiz_yet_e667644b: "Inga elever har gjort denna Quiz"
   no_students_have_taken_the_survey_yet_d378cd35: "Inga elever har gjort undersökningen än"
   no_tls_618add1a: "Ingen TLS"
   no_usage_rights_object_supplied_304b8d40: "Inga 'användar_rättigheter' -objekt har uppgetts"
@@ -10490,7 +10490,7 @@ sv:
       other: Andra
       parent: "Förälder e-post"
       scheduling: Schemaläggning
-  notification_preferences_cf47083d: Aviseringsinställningar
+  notification_preferences_cf47083d: "Inställningar för aviseringar"
   notifications_cbfa7704: Aviseringar
   now_click_the_agenda_button_607fb40e: "Klicka nu på *Agenda* -knappen"
   now_that_your_course_is_set_up_and_available_you_p_c0c8635c: "Nu när din kurs är färdig och tillgänglig, behöver du nog inte den här checklistan längre. Fast vi kommer behålla den om du skulle inse att du vill testa något nytt eller om du behöver tips när du ändrar kursens innehåll."
@@ -11798,9 +11798,9 @@ sv:
       give_everyone_full_credit: "Ge alla fullt beröm för denna frågan"
       no_scores_reduced: "Ge poäng till både fixad och före detta rätt svar (*inga poäng kommer minskas*)"
       regrade_disabled: "Omgradering av den här frågan är inte tillåtet eftersom svaret togs bort eller frågetypen ändrades efter att eleven slutfört inlämningen."
-      regrade_options: "Välj ett ograderingsalternativ för elever som redan har tagit quizzen. Canvas kommer omgradera alla dina inlämningar efter att du spara quizzen (elevpoäng KAN komma att påverkas)."
+      regrade_options: "Välj ett ograderingsalternativ för elever som redan har tagit quizzen. Canvas kommer ombedömm alla dina inlämningar efter att du spara quizzen (elevpoäng KAN komma att påverkas)."
       some_scores_reduced: "Gen endast poäng för rätt svar (*vissa elevers poäng kan sänkas*)"
-      update_question_without_regrading: "Uppdatera fråga utan att omgradera"
+      update_question_without_regrading: "Uppdatera fråga utan att ombedömma"
   quiz_e0dcce8f: Quiz
   quiz_log_auditing: 
     buttons: 
@@ -11885,18 +11885,18 @@ sv:
     generation_complete: "Rapport har genereras."
     generation_halfway: "Mindre än hälften kvar."
     generation_started: "Rapport genereras."
-    item_analysis: Föremålsanalys
+    item_analysis: "Analys av föremål"
     non_generatable_report_notice: "Rapport kan inte genereras för undersökningsquizzes."
     quiz_report_generator: 
       download_report_name: "Ladda ner %{report_name}"
       generate_report_name: "Generera %{report_name}"
       generated_at_date_time: "Genererat %{dateAndTime}"
       generating_report_name: "Genererar %{report_name}..."
-      item_analysis_not_available: "Föremålsanalys är inte tillgänglig för undersökningar"
-    student_analysis: Eleveanalys
-  quiz_results_are_protected_for_this_quiz_and_are_n_1ea03502: "Quizresultat är skyddade för den här quizen och därför inte synliga för elever."
-  quiz_results_are_protected_for_this_quiz_and_are_n_c85bd56e: "Quizresultat är skyddade för den här quizen och därför inte synliga för eleverna innan de har lämnat in sitt sista försök."
-  quiz_results_are_protected_for_this_quiz_and_can_b_fc4fc208: "Quizresultat är skyddade för den här quizen och kan visas en gång direkt efter inlämning."
+      item_analysis_not_available: "Analys av föremål är inte tillgänglig för undersökningar"
+    student_analysis: "Analys av elev"
+  quiz_results_are_protected_for_this_quiz_and_are_n_1ea03502: "Resultatet för detta quiz är låst och därför inte synliga för elever."
+  quiz_results_are_protected_for_this_quiz_and_are_n_c85bd56e: "Resultatet för detta Quiz är låsta och därför inte synliga för eleverna innan de har gjort sitt sista försök."
+  quiz_results_are_protected_for_this_quiz_and_can_b_fc4fc208: "Resultatet för detta quiz är låst och kan granskas en gång direkt efter inlämning."
   quiz_statistics: 
     answer_bars_chart: 
       audible_answer_position: "Svar %{position}:"
@@ -11917,7 +11917,7 @@ sv:
       show_all: "Visa svarsdetaljer för alla frågorna"
     attempts: "Försök: %{count} utav %{total}"
     correct_answer: "Korrekt svar"
-    correct_essay_student_ratio: "%{ratio}% av dina elever har fått fullt beröm för den här frågan."
+    correct_essay_student_ratio: "%{ratio}% av dina elever har fick full pott på denna här frågan."
     correct_multiple_response_ratio: "%{ratio}% av dina elever har svarat korrekt."
     correct_response_ratio: "%{ratio}% av dina elever gav rätt svar på frågan."
     discrimination_index: 
@@ -11932,7 +11932,7 @@ sv:
       discrimination_index: Diskriminationsindex
       discrimination_index_dialog_title: "Karta över diskriminationsindexen"
       discrimination_index_dialog_trigger: "Lär dig mer om diskriminationsidexen."
-    discrimination_index_help: "* Denna statisktik erbjuder en mätning av hur väl en enda fråga kan skilja (eller diskriminera) mellan elever som gör bra ifrån sig på ett prov och de som inte gör bra ifrån sig. * **Det delar in eleverna i tre grupper baserade på deras poäng från quizen och visar grupperna efter vem som gett korrekt svar på frågorna. ** *** ****Mer information finns tillgänglig här.**** ***"
+    discrimination_index_help: "* Denna statisktik erbjuder en mätning av hur väl en enda fråga kan skilja (eller diskriminera) mellan elever som gör bra ifrån sig på ett prov och de som inte gör bra ifrån sig. * **Det delar in eleverna i tre grupper baserade på deras poäng från Quiz och visar grupperna efter vem som gett korrekt svar på frågorna. ** *** ****Mer information finns tillgänglig här.**** ***"
     download_submissions: "Ladda ner alla filer"
     duration_in_hours: 
       one: "1 timme"
@@ -11951,7 +11951,7 @@ sv:
     no_answer: "Inget svar"
     question_breakdown: "Uppdelning av fråga"
     question_header: "Fråga %{position}"
-    quiz-stats-noshow-warning: "Även förträffligheten har sina gränser. Vi kan inte framställa statistik för den här quizen, men du kan ladda ner rapporten."
+    quiz-stats-noshow-warning: "Även förträffligheten har sina gränser. Vi kan inte visa statisti för detta Quiz, men du kan ladda ner rapporten."
     response_student_count: 
       one: "1 elev"
       other: "%{count} elever"
@@ -11968,7 +11968,7 @@ sv:
       mean: "Genomsnittlig poäng"
       not_available_abbrev: N/A
       quiz_summary: Quizsammanfattning
-      stdev: "Normal avikelse"
+      stdev: Standardavikelse
       students_who_got_a_certain_score: 
         one: "En elev fick en poäng av %{score}% poäng."
         other: "%{count} elever fick %{score}% poäng."
@@ -12011,10 +12011,10 @@ sv:
     cant_unpublish_when_students_submit: "Kan inte avpublicera om där finns elevinlämningar"
     choose_option: "[ Välj ]"
     confirms: 
-      delete_answer: "Är du säker? Radera svar från frågor med inlämningar avaktiverar möjligheten att omgradera frågan."
+      delete_answer: "Är du säker? Radera svar från frågor med inlämningar avaktiverar möjligheten att ombedömma frågan."
       delete_question: "Är du säker på att du vill radera den här fråga?"
-      delete_quiz: "Är du säker på att du vill radera den här quizen?"
-      scrap_and_restart: "Skrota den här quizen och börja om från början?"
+      delete_quiz: "Är du säker på att du vill radera detta Quiz?"
+      scrap_and_restart: "Kasta detta Quiz ocn och börja om från början?"
     default_answer_comments: "Respons om eleven väljer det här svaret"
     default_answer_comments_on_match: "Respons om eleven matchar det här svaret"
     default_comments_on_wrong_match: "Respons om användaren missar den här matchen"
@@ -12059,7 +12059,7 @@ sv:
       buttons: 
         publishing_quizzes: "Publicerar quizzes..."
       confirms: 
-        delete_quiz: "Är du säker på att du vill radera den här quizen?"
+        delete_quiz: "Är du säker på att du vill radera detta Quiz?"
       default_title: "Ej namngiven quiz"
       flash: 
         fail: "Radering av quiz misslyckades"
@@ -12187,7 +12187,7 @@ sv:
     quiz_statistics: 
       statistics_filename: "%{quiz_title} %{quiz_type} %{report_type} rapport"
       types: 
-        item_analysis: Föremålsanalys
+        item_analysis: "Analys av föremål"
         student_analysis: Eleveanalys
     quiz_submission: 
       titles: 
@@ -12206,8 +12206,8 @@ sv:
     quiz_submissions: 
       errors: 
         invalid_submissions: "Vi kunde inte bekräfta att den här quizinlämningen tillhör dig. Vänligen försök igen."
-        late_quiz: "Du lämnade in quizen sen, och det är inte säkert att dina svar sparades."
-        protected_quiz: "Den här quizen är skyddad och enbart tillgänglig från utvalda platser. Datorn du använder för att ta quizen är inte placerad i en utav de utvalda platserna."
+        late_quiz: "Du lämnade in detta Quiz sent och det är inte säkert att dina svar sparades."
+        protected_quiz: "Detta Quiz är låst och enbart tillgänglig från utvalda platser. Datorn du använder för att svar på Quiz är inte placerad i en utav de utvalda platserna."
       show: 
         score_out_of: "Du fick %{score} utav %{points_possible}"
       still_zipping: "Fil-zipping pågår..."
@@ -12217,7 +12217,7 @@ sv:
           submit: "Lämna in"
         labels: 
           access_code: Tillgångskod
-        quiz_restricted: "Den här quizzen har begränsats med en tillgångskod. Du måste be din lärare eller poctor att fylla i eller ge dig tillgångskoden så att du kan ta quizen."
+        quiz_restricted: "Detta Quiz har begränsats med en tillgångskod. Du måste be din lärare eller poctor att fylla i eller ge dig tillgångskoden så att du kan svara på Quiz."
         survey_restricted: "Den här undersökningen har begränsats med en tillgångskod. Du måste be din lärare eller poctor att fylla i eller ge dig tillgångskoden så att du kan ta undersökningen."
       default_history_crumb: Historia
       default_title: "Ny quiz"
@@ -12253,10 +12253,10 @@ sv:
         not_yet_graded: "Inte betygsatt än"
         original_score: "Ursprunglig poäng:"
         points_possible: "%{points_possible} pts"
-        regraded_score: "Omgraderad poäng:"
+        regraded_score: "Ombedömd poäng:"
         show_ansers_for_variable: "Visa svar för %{variable}"
         skip_question_text: "Hoppa över till svarstext."
-        submission_was_regraded: "Den fråga har omgraderats."
+        submission_was_regraded: "Den fråga har ombedömts."
         titles: 
           question_correct_comment: "Elever kommer se den här kommentarer om de svarar rätt på frågan"
           question_incorrect_comment: "Eleve kommer se den här kommentaren om de svarar fel på frågan"
@@ -12276,12 +12276,12 @@ sv:
           variables: Variabler
       errors: 
         no_more_attempts: "Du har inga quizförsök kvar"
-        quiz_deleted: "Den quizen har raderats"
-        quiz_update_failed: "Quizen lyckades inte uppdateras"
+        quiz_deleted: "Quiz har raderats"
+        quiz_update_failed: "Quiz lyckades inte uppdateras"
       fabulous_quizzes: 
         page_titles: Quizzes
       find_question_from_bank: 
-        already_added: "den här frågan finns redan i quizen"
+        already_added: "den här frågan finns redan i Quiz"
         bank_description: "%{bank_name}, %{n} frågor"
         buttons: 
           add_questions: "Lägg till frågor"
@@ -12307,7 +12307,7 @@ sv:
         options: 
           new_group: "[ Ny grupp ]"
           no_group: "[ Ingen grupp ]"
-        select_a_question_bank: "Välj en frågebank från listan nedanför för att länka den till den här quizen som en frågegrupp."
+        select_a_question_bank: "Välj en frågebank från listan nedanför för att länka den till detta Quiz som en frågegrupp."
         titles: 
           add_new_question_group: "Lägg till ny frågegrupp"
       form_answer: 
@@ -12340,7 +12340,7 @@ sv:
         distractor_instructions: "skriv in varje distraktion på sin egen linje"
         equation_example: "t.ex. \"Vad är 5 plus [x]?\""
         explanation: 
-          generate_possible_solutions: "Slutligen, bygg så många variabel-lösningskombinationer som du behöver för quizen."
+          generate_possible_solutions: "Slutligen, bygg så många variabel-lösningskombinationer som du behöver för detta Quiz."
         explanations: 
           calculated: "Skriv din fråga, bygg en formel och skapa sedan flera olika svarskombinationer. Den som svara kommer se frågan med slumpmässigt ifyllda variabler och måste skriva in korrekt numeriskt värde."
           equations: "Du kan definiera variabler genom att skriva in variabelnamnet inom parantes"
@@ -12438,9 +12438,9 @@ sv:
         page_title_quiz: "%{user}s quizhistorik"
         page_title_survey: "%{user}s undersökningshistorik"
         prev_questions_arrow_title: "Föregående frågor"
-        quiz_not_yet_taken: "Quizen har inte tagits än."
-        quiz_not_yet_taken_or_in_progress: "Quizen har inte tagits än eller så pågår det"
-        quiz_unlimited_attempts: "Den här quizen har obegränsat med försök"
+        quiz_not_yet_taken: "Quiz har inte tagits än."
+        quiz_not_yet_taken_or_in_progress: "Quiz har inte tagits än eller så pågår det"
+        quiz_unlimited_attempts: "Detta Quiz har obegränsat med försök"
         score_for_attempt: "Försök %{attempt_number}: %{score}"
         survey_not_yet_taken: "Undersökningen har inte tagits än."
         survey_not_yet_taken_or_in_progress: "Undersökningen har inte tagits än eller så pågår den"
@@ -12454,7 +12454,7 @@ sv:
       index: 
         page_titles: Quizzes
       invalid_ip: 
-        quiz_protected: "Den här quizen är skyddad och enbart tillgänglig från utvalda platser. Datorn du använder för att ta quizen är inte placerad i en utav de utvalda platserna."
+        quiz_protected: "Detta Quiz är låst och enbart tillgänglig från utvalda platser. Datorn du använder för att svara på detta Quiz är inte placerad i en utav de utvalda platserna."
         survey_protected: "Den här undersökningen är skyddad och enbart tillgänglig från utvalda platser. Datorn du använder för att ta undersökningen är inte placerad i en utav de utvalda platserna."
       lockdown_browser_required: 
         headers: 
@@ -12463,7 +12463,7 @@ sv:
           download_lockdown: "Om du inte redan har installerat webbläsaren, kan du ladda ner den härifrån"
         links: 
           download_lockdown: "[Ladda ner Respondus LockDown Browser]"
-        requires_lockdown: "Den här quizen kräver Respondus LockDown Browser. Vänligen starta Respondus LockDown Browser för att ta quizen eller se dina resultat."
+        requires_lockdown: "Detta Quiz kräver Respondus LockDown Browser. Vänligen starta Respondus LockDown Browser för att svara på detta Quiz eller se dina resultat."
       managed_quiz_data: 
         anonymous_student: "Elev %{user_counter}"
         logged_out_user: "Logga ut användaren %{user_counter}"
@@ -12479,7 +12479,7 @@ sv:
           save: Spara
         end_quiz_reference_time_current_end: "den nuvarande sluttiden"
         end_quiz_reference_time_now: nu
-        end_the_quiz: "Avsluta quizen"
+        end_the_quiz: "Avsluta Quiz"
         extended_quiz_time_explanation: "Du kan ge eleven extra tid för deras nuvarande quizförsök. Hur mycket tid vill du ge dem?"
         extra_time_on_every_attempt: "Extra tid på varje försök:"
         finished_in: "färdig på %{duration}"
@@ -12496,7 +12496,7 @@ sv:
         labels: 
           ending: Avslutas
           extra_attempts: "Extra försök"
-          manually_unlock: "Lås quizen manuellt för nästa försök"
+          manually_unlock: "Lås Quiz manuellt för nästa försök"
           reset_has_seen_results: "Låt eleven se resultat en gång till"
           started: Startad
         maximum_of_1440_minutes: "Max 1440 minuter (24 timmar)"
@@ -12534,7 +12534,7 @@ sv:
       multi_answer: 
         choose_answer: Välj
       muted: 
-        muted_quiz_description: "Din quizpoäng är inte tillgänglig eftersom instruktören inte är färdig med betygsättningen. När sin instruktör är färdig med betygsättningen av quizen kommer din poäng bli tillgänglig på den här sidan."
+        muted_quiz_description: "Poäng för detta Quiz är inte tillgänglig eftersom instruktören inte är färdig med betygsättningen. När sin instruktör är färdig med betygsättningen av detta Quiz kommer din poäng bli tillgänglig på den här sidan."
         muted_quiz_header: "Din quiz har tystats."
       new: 
         allowed_attempts: "Antal tillåtna försök"
@@ -12563,7 +12563,7 @@ sv:
           ip_filter: "Filtrera IP-adresser"
           never_hide_results: "Låt eleverna se deras respons"
           quiz_instructions: Quiz-instruktioner
-          quiz_notify: "Meddela användare när den här quizen ändras"
+          quiz_notify: "Meddela användare när detta Quiz ändras"
           quiz_score: Poäng
           require_access_code: "Kräv en tillgångskod"
           restrict_quiz: Quizbegränsningar
@@ -12601,20 +12601,20 @@ sv:
           delete: Radera
           find_ip_address_filter: "Hitta ett IP-adressfilter"
         warnings: 
-          has_student_submissions: "Elever har redan tagit eller påbörjat den här quizen, så akta dig när du redigerar den. Om du ändrar en quizfråga anmärkningsvärt, bör du överväga att omgradera elever som tog quizens gamla version."
+          has_student_submissions: "Elever har redan tagit eller påbörjat detta Quiz, så akta dig när du redigerar den. Om du ändrar en quizfråga anmärkningsvärt, bör du överväga att ombedömma elever som tog den gamla versionen av Quiz."
       notices: 
-        cant_view_submission_while_muted: "Du kan inte visa quihistoriken medans quizen är tystad."
-        has_submissions_already: "Kom ihåg att vissa elever redan har tagit eller påbörjat den här quizen."
-        less_than_allotted_time: "Du påbörjade den här quizen nära den sista dagen, därför kommer du inte ha samma mängd tid att genomföra den."
+        cant_view_submission_while_muted: "Du kan inte visa quizhistoriken medans Quiz är tystad."
+        has_submissions_already: "Kom ihåg att vissa elever redan har tagit eller påbörjat detta Quiz."
+        less_than_allotted_time: "Du påbörjade detta Quiz nära den sista dagen, därför kommer du inte ha samma mängd tid att genomföra den."
         no_submission_for_user: "Det finns inga inlämningar tillgängliga för den användaren"
-        quiz_updated: "Quizen har uppdaterats"
+        quiz_updated: "Quiz har uppdaterats"
         quizzes_published: 
           one: "1 quiz har publicerats!"
           other: "%{count} quizzes har publicerats!"
         quizzes_unpublished: 
           one: "1 quiz har opublicerats!"
           other: "%{count} quizzes har avpublicerats!"
-        submission_doesnt_count: "Den här quizen kommer inte längre räknas in i ditt betyg."
+        submission_doesnt_count: "Detta Quiz kommer inte längre räknas in i ditt betyg."
       question_group: 
         buttons: 
           update: Uppdatera
@@ -12684,7 +12684,7 @@ sv:
           submission_details: Inlämningsdetaljer
           time: Tid
         links: 
-          preview_quiz_again: "Förhandsvisa quizen igen"
+          preview_quiz_again: "Förhandsvisa Quiz igen"
           preview_survey_again: "Förhandsvisa undersökningen igen"
         no_more_attempts: "Inga fler försök tillgängliga"
         questions_not_graded: "Vissa frågor har inte betygsatts än"
@@ -12726,13 +12726,13 @@ sv:
         labels: 
           final_score: Slutpoäng
           fudge_points: "Slarva ihop poäng"
-          fudge_points_changed_points_quiz: "Sen %{user} tog den här quizen har antalet möjlig poäng ändrats med %{difference}. Du kan justera den här ändringen och manuellt lägga till positiva eller negativa poäng med den här boxen."
+          fudge_points_changed_points_quiz: "Sen %{user} tog detta Quiz har antalet möjliga poäng ändrats med %{difference}. Du kan justera den här ändringen och manuellt lägga till positiva eller negativa poäng med den här boxen."
           fudge_points_changed_points_survey: "Sen %{user} tog den här undersökningen har antalet möjlig poäng ändrats med %{difference}. Du kan justera den här ändringen och manuellt lägga till positiva eller negativa poäng med den här boxen."
           fudge_points_generic_explanation: "Du kan justera poängen manuellt genom att lägga till positiva eller negativa poäng i den här boxen."
           questions_need_review: "Den följande frågan måste ses över"
           quiz_score: Quizpoäng
           score_for_attempt: "Poäng för det här försöket"
-          score_for_quiz: "Poäng för den här quizen"
+          score_for_quiz: "Poäng för detta Quiz"
           score_for_survey: "Poäng för den här undersökningen"
           survey_score: Undersökningspoäng
         links: 
@@ -12740,8 +12740,8 @@ sv:
         questions_not_graded: "Vissa frågor har inte betygsatts än"
         quiz_fudged_negative: "Den här quizpoängen har manuellt justerats med %{fudge} poäng."
         quiz_fudged_positive: "Den här quizpoängen har manuellt justerats med +%{fudge} poäng."
-        quiz_not_yet_taken: "Den här quizen har inte tagits än."
-        quiz_submission_needs_review: "Den här quizen har ändrats anmärkningsvärt sedan inlämningen gjordes. Inlämning kan behöva omgraderas."
+        quiz_not_yet_taken: "Detta Quiz har inte tagits än."
+        quiz_submission_needs_review: "Detta Quiz har ändrats anmärkningsvärt sedan inlämningen gjordes. Inlämning kan behöva ombedömmas."
         requires_lockdown: "Respondus LockDown Browser krävs för att visa dina quizresultat."
         submitted_at: "Inlämnad %{when}"
         survey_fudged_negative: "Den här undersökningspoängen har manuellt justerats med %{fudge} poäng."
@@ -12786,25 +12786,25 @@ sv:
           loading_in_lockdown: "Laddar quiz i Respondus LockDown Browser"
       show: 
         buttons: 
-          lock_quiz: "Lås den här quizen nu"
+          lock_quiz: "Lås detta Quiz nu"
           lock_survey: "Lås den här undersökningen nu"
-          unlock_quiz: "Låt elever ta quizen nu"
+          unlock_quiz: "Låt elever ta Quiz nu"
           unlock_survey: "Låt elever ta undersökningen nu"
-        course_concluded_notice: "Den här quizen är inte längre tillgänglig eftersom kursen har avslutats."
+        course_concluded_notice: "Detta Quiz är inte längre tillgänglig eftersom kursen har avslutats."
         labels: 
           available_until: Tills
           no_time_limit: "Ingen tidsgräns"
           warning_icon: Varning
         links: 
           edit: Redigera
-          keep_editing_this_quiz: "Fortsätt redigera den här quizen"
+          keep_editing_this_quiz: "Fortsätt redigera detta Quiz"
           keep_editing_this_survey: "Fortsätt redigera den här undersökningen"
           message_students_who: "Meddela elever som..."
-          moderate_this_quiz: "Dämpa den här quizen"
+          moderate_this_quiz: "Dämpa detta Quiz"
           moderate_this_survey: "Dämpa den här undersökningen"
           preview: Förhandsvisa
           quiz_statistics: Quizstatistik
-          see_full_quiz: "Se hela quizen"
+          see_full_quiz: "Se hela Quiz"
           show_assignment_rubric: "Visa matris"
           show_student_quiz_results: "Visa elevs quizresultat"
           show_student_survey_results: "Visa elevs undersökningsresultat"
@@ -12812,9 +12812,9 @@ sv:
         manage: Hantera
         only_registered_users: "Endast registrerad, anmälda användare kan ta betygsatta quizzes."
         quiz_regraded_your_score_affected: 
-          one: "Den här quizen har omgraderats; din poäng påverkades."
-          other: "Den här quizen har omgraderats; din nya poäng innehåller %{count} påverkade frågor."
-        quiz_regraded_your_score_not_affected: "Den här quizen omgraderades; din poäng påverkades inte."
+          one: "Detta Quiz har ombedömts; din poäng påverkades."
+          other: "Detta Quiz har ombedömts; din nya poäng innehåller %{count} påverkade frågor."
+        quiz_regraded_your_score_not_affected: "Detta Quiz ombedömdes; din poäng påverkades inte."
         speed_grader: SpeedGrader™
         students_submitted_so_far: 
           one: "1 elev har lämnat in än så länge"
@@ -12822,9 +12822,9 @@ sv:
         titles: 
           delete: Radera
           related_items: "Relaterade föremål"
-          unlock_for_how_long: "Hur länge vill du låsa upp quizen?"
+          unlock_for_how_long: "Hur länge vill du låsa upp detta Quiz?"
         warnings: 
-          draft_version: "Den här är en förhandsvisning av utkastet av quizen"
+          draft_version: "Den här är en förhandsvisning av utkastet av detta Quiz"
       single_answer: 
         upload: "Ladda upp"
       statistics: 
@@ -12833,7 +12833,7 @@ sv:
           for_question: "För %{question_name}"
           quiz_statistics: Quizstatistik
           survey_statistics: Undersökningstatistik
-          users_have_taken_this_quiz: "%{count} användare har tagit den här quizen"
+          users_have_taken_this_quiz: "%{count} användare har tagit detta Quiz"
           users_have_taken_this_survey: "%{count}  har tagit de här undersökningen"
         labels: 
           average_correct: "Genomsnittligt korrekt"
@@ -12842,7 +12842,7 @@ sv:
           high_score: "Högst poäng"
           low_score: "Lägst poäng"
           mean_score: "Låg poäng"
-          standard_deviation: "Normal avikelse"
+          standard_deviation: Standardavikelse
           users_selected_the_answer: "Följande användare har valt svaret, %{answer_text}"
         links: 
           count_all_attempts: "Räkna **Alla** försök"
@@ -12865,7 +12865,7 @@ sv:
         attempt_history: Försökshistorik
         questions_not_graded: "Vissa frågor har inte betygsatts än"
         quiz_attempt_history_description: "En tabell som visa din quizförsökshistorik. Varje försök är till vänster. Försöker, tiden och poängen ses högst upp."
-        regraded: Omgradera
+        regraded: Ombedöm
         score: Poäng
         time: Tid
       take_quiz: 
@@ -12876,8 +12876,8 @@ sv:
           previous: Föregående
           submit_quiz: "Lämna in quiz"
         headers: 
-          draft_preview: "Den här är en förhandsvisning av quizens utkastsversion"
-          published_preview: "Det här är en förhandsvisning av quizens publicerade version"
+          draft_preview: "Den här är en förhandsvisning detta Quiz utkastsversion"
+          published_preview: "Det här är en förhandsvisning av Quiz publicerade version"
         labels: 
           started: Startad
           times_up: "Tiden är slut! Lämnar in resultat om"
@@ -12898,7 +12898,7 @@ sv:
           time_running: "Tiden går"
         links: 
           hide_time_running: Dölj
-          keep_editing_quiz: "Forsätt redigera den här quizen"
+          keep_editing_quiz: "Forsätt redigera detta Quiz"
           keep_editing_survey: "Fortsätt redigera den här undersökningen"
     retrieving_filters: "Hämtar filter..."
     rubric: 
@@ -12918,17 +12918,17 @@ sv:
         already_published: Publicerad!
         publishing: Publicera...
       confirms: 
-        delete_quiz: "Är du säker på att du vill radera den här quizen?"
+        delete_quiz: "Är du säker på att du vill radera detta Quiz?"
         delete_quiz_submissions_warning: 
-          one: "Varning: 1 elev har redan tagit quizen. Om du raderar den kommer även färdiga inlämningar raderas och inte längre synas i betygsboken."
-          other: "Varning: %{count} har redan tagit den här quizen. Om du raderar den kommer även färdig inlämningar att raderas och inte längre synas i betygsboken."
+          one: "Varning: 1 elev har redan tagit detta Quiz. Om du raderar den kommer även färdiga inlämningar raderas och inte längre synas i betygsboken."
+          other: "Varning: %{count} har redan tagit detta Quiz. Om du raderar den kommer även färdig inlämningar att raderas och inte längre synas i betygsboken."
       links: 
         hide_student_quiz_results: "Dölj elevs quizresultat"
         hide_student_survey_results: "Dölj elevs undersökningsresultat"
         show_student_quiz_results: "Visa elevs quizresultat"
         show_student_survey_results: "Visa elevs undersökningsresultat"
-      students_who_have_not_taken_the_quiz: "Elever som INTE har tagit quizen"
-      students_who_have_taken_the_quiz: "Elever som har tagit quizen"
+      students_who_have_not_taken_the_quiz: "Elever som INTE har tagit Quiz"
+      students_who_have_taken_the_quiz: "Elever som har tagit Quiz"
     statistics: 
       count_attempts: 
         one: "1 försök"
@@ -12970,14 +12970,14 @@ sv:
         one: "1 månad"
         other: "%{count} månader"
       notices: 
-        due_date_five_minutes_left: "Fem minuter kvar innan quizen markeras som försenad"
-        due_date_one_minute_left: "En minut kvar innan quizen markeras som försenad"
-        due_date_thirty_minutes_left: "Trettio minuter kvar innan quizen markeras som försenad"
+        due_date_five_minutes_left: "Fem minuter kvar innan Quiz markeras som försenad"
+        due_date_one_minute_left: "En minut kvar innan Quiz markeras som försenad"
+        due_date_thirty_minutes_left: "Trettio minuter kvar innan Quiz markeras som försenad"
         extra_time: "Du har fått extra tid för det här försöket"
-        less_time: "Din tid för quizen har minskats."
-        submission_five_minutes_left: "Den här quizen kommer lämnas in om fem minuter"
-        submission_one_minute_left: "Den här quizen kommer lämnas in om en minut"
-        submission_thirty_minutes_left: "Den här quizen kommer lämnas in om trettio minuter"
+        less_time: "Din tid för Quiz har minskats."
+        submission_five_minutes_left: "Detta Quiz kommer lämnas in om fem minuter"
+        submission_one_minute_left: "Detta Quiz kommer lämnas in om en minut"
+        submission_thirty_minutes_left: "Detta Quiz kommer lämnas in om trettio minuter"
       question_answered: Svarad
       question_unanswered: "Har inte svara än"
       saved_at: "Quiz sparad kl. %{t}"
@@ -13195,7 +13195,7 @@ sv:
   resume_survey_58dce775: "Fortsätt undersökning"
   retrieve_timeout: "kunde inte hämta konfiguration, serverns responstid tog slut"
   retry_ebd5f8ba: "Försök igen"
-  reviewer_b993ce28: Granskare
+  reviewer_b993ce28: Bedömmare
   reviewers_successfully_added_bd4b629a: "Granskare har lagts til"
   rich_content_editor_2708ef21: "Rich Content Editor"
   right_sidebar_logo_5483dc0a: "Logga högra sidan"
@@ -13549,7 +13549,7 @@ sv:
   search_title_body_or_author_1d26711f: "Söker efter titel, body, eller författare"
   search_users_48b1789e: "Sök efter användare..."
   searching_b0207e7f: Söker
-  second_reviewer_90046c68: "Andra granskaren"
+  second_reviewer_90046c68: "Andra bedömmaren"
   secondary_button_36a86f03: "Andra knappen"
   secondary_button_text_e92b3e52: "Andra knappen text"
   secondary_color_button_7589827d: "Sekundär färgknapp"
@@ -13575,7 +13575,7 @@ sv:
       confirming_course: "Bekräftar %{course_name}..."
       removing_crosslisting_of_section: "Ångra flytt av sektion..."
   section_ends_at_bb9df3c0: "Sektionen avslutas kl."
-  section_filter_cde54d0a: Sektionsfilter
+  section_filter_cde54d0a: Sektion
   section_name_b6d82574: Sektionsnamn
   section_starts_at_65eaed1: "Sektionen börjar kl."
   sections: 
@@ -14282,8 +14282,8 @@ sv:
       options: 
         assignments: Uppgifter
       quiz_item: Quiz
-      quiz_notice: "Välj den quizen du vill associera till den här *modulen* eller lägg till en ny genom att välja \"Ny quiz\"."
-      quiz_select_label: "Välj den quizen du vill associera eller lägg till en ny genom att välja \"Ny quiz\"."
+      quiz_notice: "Välj det Quiz du vill associera till den här *modulen* eller lägg till en ny genom att välja \"Ny quiz\"."
+      quiz_select_label: "Välj Quiz du vill associera eller lägg till en ny genom att välja \"Ny quiz\"."
       select_item_type_label: "Välj den sortens innehåll du vill lägga till."
       sub_header_notice: "Skirv texten du vill lägga till som *modul* -undermatris"
       text_header_item: Textrubrik
@@ -14377,7 +14377,7 @@ sv:
         grades_page: "Klicka för att lägga till en länk på betygssidan"
         modules: "Klicka för att lägga till en länk till den här modulen"
         modules_page: "Klicka för att lägga till en länk på modulssidan"
-        quizzes: "Klicka för att lägga till en länk till den här quizen"
+        quizzes: "Klicka för att lägga till en länk till detta Quiz"
         syllabus_page: "Klicka för att lägga till en länk till kursplanen"
         users_page: "Klicka för att lägga till en länk på personsidan"
         wiki_pages: "Klicka för att lägga till en länk på den här sidan"
@@ -14650,17 +14650,17 @@ sv:
   students_being_observed_4de3e520: "Elever blir observerade"
   students_must_complete_all_of_these_requirements_15fa97f7: "Elever måste slutföra alla dessa kraven"
   students_who_have_taken_the_quiz_count_69dbbda0: 
-    one: "Elever som tagit quizen (%{count})"
-    other: "Elever som har tagit quizen (%{count})"
-    zero: "Elever som har tagit quizen"
+    one: "Elever som tagit Quiz (%{count})"
+    other: "Elever som har tagit Quiz (%{count})"
+    zero: "Elever som har tagit Quiz"
   students_who_have_taken_the_survey_count_ef9e6492: 
     one: "Elever som gjort undersökningen (%{count})"
     other: "Elever som gjort undersökningen (%{count})"
     zero: "Elever som gjort undersöknigen"
   students_who_haven_t_taken_the_quiz_count_9966e994: 
-    one: "Elever som inte ha tagit quizen (%{count})"
-    other: "Elever som inte har tagit quizen (%{count})"
-    zero: "Elever som inte har tagit quizen"
+    one: "Elever som inte ha tagit Quiz (%{count})"
+    other: "Elever som inte har tagit Quiz (%{count})"
+    zero: "Elever som inte har tagit Quiz"
   students_who_haven_t_taken_the_survey_count_c03f4d80: 
     one: "Elever som inte har gjort undersöknigen (%{count})"
     other: "Elever som inte har gjort undersöknigen (%{count})"
@@ -14897,8 +14897,8 @@ sv:
     syllabus: Kursplan
     tab_location_error: "Flikens placering är ogiltig"
     tab_unmanagable_error: "%{css_class} kan inte hanteras"
-  take_the_quiz_87214d7e: "Ta quizen"
-  take_the_quiz_again_8ea51a6c: "Ta quizen igen"
+  take_the_quiz_87214d7e: "Ta Quiz"
+  take_the_quiz_again_8ea51a6c: "Ta Quiz igen"
   take_the_survey_ada59508: "Gör undersökningen"
   take_the_survey_again_24ce22c2: "Gör undersökningen igen"
   teacher_5a73b637: Lärare
@@ -15064,8 +15064,8 @@ sv:
   this_page_cannot_be_modified_because_grades_have_a_48646991: "Denna sidan kan inte ändras efter som betygen redan har satts."
   this_question_group_is_set_to_pick_more_questions__2e3552c4: "Denna frågegruppen ska välja fler frågor än de som finns tillgängliga."
   this_question_will_show_a_checkbox_next_to_each_an_169cd6d9: "Frågan kommer visa en checkruta bredvid svaret."
-  this_quiz_has_been_excused_d89d2b74: "Quizen har utförts."
-  this_quiz_is_unpublished_only_teachers_can_see_the_51d281b1: "*Den här quizen är avpublicerad* endast lärar kan se quizen tills den är publicerad."
+  this_quiz_has_been_excused_d89d2b74: "Quiz har slutförts."
+  this_quiz_is_unpublished_only_teachers_can_see_the_51d281b1: "*Detta Quiz är avpublicerad* endast lärare kan se detta Quiz tills den är publicerad."
   this_sample_page_includes_common_ui_elements_in_ca_331f4ac4: "Denna sample-sidan inkluderar vanliga UI element i Canvas för att hjlpa dig bygga ditt eget märke. När du börjar ändra färgvärden och bilder i den vänstra menyn, kommer du se en *Förhandsvisa Dina Ändringar* -knapp. Klicka på den för att uppdatera sidan och se hur dina ändringar ser ut."
   this_student_s_responses_are_hidden_because_this_a_252e8335: "Elevens respons är dold efter som uppgiften är anonym."
   this_student_wrote_f1a3f22d: "Eleven skrev:"
@@ -15258,7 +15258,7 @@ sv:
       image_source: Bildekälla
       image_url_field_label: "Bild URL"
       image_width: Bildbredd
-      quiz_warning: "Obeservera: Detta kan visasa av elever som tar quizen."
+      quiz_warning: "Obeservera: Detta kan visasa av elever som tar Quiz."
       url: URL
   title: 
     edit_announcement: "Redigera meddelande"
@@ -16088,7 +16088,7 @@ sv:
   you_can_disable_this_feature_d5e61373: "Du har avaktiverat den funktionen"
   you_can_hide_or_show_a_course_s_assignments_by_tog_ec8bdb8e: "Du kan dölja eller visa en kurs upggifter genom att starta och stänga av dem."
   you_can_log_in_directly_with_this_provider_by_goin_467d7f66: "Du kan logga in direkt med den här leverantören genom att gå till %{url}"
-  you_can_now_set_regrade_options_for_students_who_h_c1ceb1c4: "Du kan du ställa in omgraderingsalternativ för elever som redan tagit quizen."
+  you_can_now_set_regrade_options_for_students_who_h_c1ceb1c4: "Du kan du ställa in omgraderingsalternativ för elever som redan tagit Quiz."
   you_can_reply_to_this_comment_by_responding_to_thi_3d130e8c: "Du kan svara på denna kommentaren genom att svara på detta meddelandet, eller granska inlämningsdetaljerna via denna länken: %{link}."
   you_can_reply_to_this_message_in_canvas_by_replyin_fa33638d: "Du kan svara på detta meddelandet i Canvas genom att svar direkt på detta e-postmeddelandet, eller genom att klicka på denna länken: %{link}"
   you_can_review_the_submission_details_by_clicking__9abc5515: "Du kan granska inlämningsdetaljerna genom att klicka på denna länken: %{link}"
@@ -16101,10 +16101,10 @@ sv:
   you_cannot_edit_themes_on_this_subaccount_63ceaaf3: "Du kan inte redigar teman i detta underkontot."
   you_cannot_remove_this_enrollment_c87be1cb: "Du kan inte ta bort den här anmälan."
   you_do_not_have_access_to_the_requested_discussion_90d8ec99: "Du har inte tillgång till den begärda disukssionen."
-  you_do_not_have_access_to_the_requested_quiz_d3659e4b: "Du har inte tillgång till den begärda quizen."
+  you_do_not_have_access_to_the_requested_quiz_d3659e4b: "Du har inte tillgång till den begärda Quiz."
   you_do_not_have_permission_to_publish_this_course_ff361c82: "Du har inte tillstånd att publicera denna kursen."
   you_have_changed_the_progression_requirements_for__6772bc89: "Du har ändrat kravens utveckling för den här kursen. Det kan finnas elever som redan har använt utveckling för den här moduler och andra som förlitar sig på den."
-  you_have_made_changes_to_the_questions_in_this_qui_1658361a: "*Du har gjort ändringar på frågor i den här quizen.* Dessa ändringar kommer inte synas för eleverna innan du sparat quizen."
+  you_have_made_changes_to_the_questions_in_this_qui_1658361a: "*Du har gjort ändringar på frågor i detta Quiz.* Dessa ändringar kommer inte synas för eleverna innan du sparat detta Quiz."
   you_have_no_outcomes_click_here_to_create_one_ebf262a3: "Du har inga lärandemål. *Klicka här* för att skapa en."
   you_have_no_outcomes_click_here_to_go_to_the_outco_574bd0af: "Du har inga lärandemål. Klicka här för att går till resutlatssidan."
   you_have_reached_the_maximum_webhooks_per_account__ae9a7f83: "Du har nått det högsta antalet webhooks för varje konto (%{max})"
