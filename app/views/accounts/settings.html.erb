@@ -335,12 +335,14 @@ TEXT
                   <%= settings.label :global_includes, :en => "Custom CSS/JavaScript overrides" %>
                   <% if use_new_styles? %>
                     <div id="global_includes_warning_message" class="account_settings__help-text">
-                      <%= t do %>
-                      Before using this feature, we recommend trying the <%= link_to t("Theme Editor"), account_theme_editor_path(@account) %> to do any branding. Enabling this feature provides the ability to upload custom JavaScript and CSS files in the Theme Editor. Modifications made with this method may conflict with future changes to the Canvas DOM (eg: element class names or HTML structure) and are therefore not supported. Also, you need to make sure that whatever modifications you make are accessible to all, including, for example, those using <a href="http://webaim.org/techniques/screenreader/">screen readers</a> and <a href="http://www.w3.org/TR/WCAG20/#visual-audio-contrast-contrast">those</a> <a href="http://webaim.org/blog/wcag-2-0-and-link-colors/">relying</a> on the <a href="https://community.canvaslms.com/search.jspa?q=high+contrast&type=document">high contrast feature</a>. Instructure disclaims any liability for any changes you make. It is your responsibility to ensure they meet <a href="http://webaim.org/resources/evalquickref/">any</a> <a href="http://www.access-board.gov/guidelines-and-standards/communications-and-it/about-the-section-508-standards/section-508-standards#subpart_b">compliance</a> <a href="http://www.w3.org/TR/WCAG20/">standards</a> that may be required in your jurisdiction. Those using this feature should have advanced understanding of JavaScript and CSS and must maintain their own code.
-                      <div>
-                        <strong>Use at your own risk!</strong>
-                      </div>
-                      <% end %>
+                      <p>
+                        <%= t ("Custom CSS and Javascript may cause accessibility issues or conflicts with future Canvas updates!")%>
+                      </p>
+                      <p>
+                        <%= t do %>
+                        Before implementing custom CSS or Javascript, please refer to <a href="https://community.canvaslms.com/docs/DOC-3010" target="_blank"> our documentation</a>.
+                        <% end %>
+                      </p>
                     </div>
                   </div>
                     <div>
