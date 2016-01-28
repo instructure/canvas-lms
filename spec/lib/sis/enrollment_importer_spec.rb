@@ -2,21 +2,35 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 module SIS
   describe EnrollmentImporter do
+    let(:user_id) { "5235536377654" }
+    let(:course_id) { "82433211" }
+    let(:section_id) { "299981672" }
 
-    it 'does not break postgres if I give it integers' do
-      messages = []
-      EnrollmentImporter.new(Account.default, {}).process(messages, 2) do |importer|
-        enrollment = SIS::Models::Enrollment.new()
-        enrollment.course_id = 1
-        enrollment.section_id = 2
-        enrollment.user_id = 3
-        enrollment.role = 'student'
-        enrollment.status = 'active'
-        enrollment.start_date = Time.zone.today
-        enrollment.end_date = Time.zone.today
-        importer.add_enrollment(enrollment)
+    let(:enrollment) do
+      SIS::Models::Enrollment.new(
+        course_id: course_id,
+        section_id: section_id,
+        user_id: user_id,
+        role: 'student',
+        status: 'active',
+        start_date: Time.zone.today,
+        end_date: Time.zone.today
+      )
+    end
+
+    context 'gives a meaningful error message when a user does not exist for an enrollment' do
+      let(:messages) { [] }
+
+      before do
+        EnrollmentImporter.new(Account.default, {}).process(messages, 2) do |importer|
+          importer.add_enrollment(enrollment)
+        end
       end
-      expect(messages).not_to be_empty
+
+      it { expect(messages.first).to include("User not found for enrollment") }
+      it { expect(messages.first).to include("User ID: #{user_id}") }
+      it { expect(messages.first).to include("Course ID: #{course_id}") }
+      it { expect(messages.first).to include("Section ID: #{section_id}") }
     end
 
     context 'with a valid user ID but invalid course and section IDs' do
