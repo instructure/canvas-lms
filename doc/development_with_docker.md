@@ -18,8 +18,11 @@ pretty close, about 90% of VMWare fusion in basic testing)
 
 ##### Dinghy
 
+You'll want to walk through https://github.com/codekitchen/dinghy#install, but
+when you run create, you may want to increase the system resources you give the
+VM, like so:
+
 ```
-$ brew install https://github.com/codekitchen/dinghy/raw/latest/dinghy.rb
 $ dinghy create --memory=4096 --cpus=4 --provider=vmware_fusion
 ```
 
