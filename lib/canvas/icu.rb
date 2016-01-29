@@ -19,24 +19,13 @@ module Canvas::ICU
 
   begin
     Bundler.require 'icu'
-    if !ICU::Lib.respond_to?(:ucol_getRules)
-      require 'ffi'
-      suffix = ICU::Lib.figure_suffix(ICU::Lib.load_icu)
+    require 'ffi'
+    suffix = ICU::Lib.figure_suffix(ICU::Lib.load_icu)
 
-      ICU::Lib.attach_function(:ucol_getRules, "ucol_getRules#{suffix}", [:pointer, :pointer], :pointer)
+    unless ICU::Lib.respond_to?(:ucol_getSortKey)
       ICU::Lib.attach_function(:ucol_getSortKey, "ucol_getSortKey#{suffix}", [:pointer, :pointer, :int, :pointer, :int], :int)
-      ICU::Lib.attach_function(:ucol_getAttribute, "ucol_getAttribute#{suffix}", [:pointer, :int, :pointer], :int)
-      ICU::Lib.attach_function(:ucol_setAttribute, "ucol_setAttribute#{suffix}", [:pointer, :int, :int, :pointer], :void)
 
       ICU::Collation::Collator.class_eval do
-        def rules
-          @rules ||= begin
-            length = FFI::MemoryPointer.new(:int)
-            ptr = ICU::Lib.ucol_getRules(@c, length)
-            ptr.read_array_of_uint16(length.read_int).pack("U*")
-          end
-        end
-
         def collation_key(string)
           ptr = ICU::UCharPointer.from_string(string)
           size = ICU::Lib.ucol_getSortKey(@c, ptr, string.jlength, nil, 0)
@@ -44,7 +33,15 @@ module Canvas::ICU
           ICU::Lib.ucol_getSortKey(@c, ptr, string.jlength, buffer, size)
           buffer.read_bytes(size - 1)
         end
+      end
+    end
 
+
+    unless ICU::Lib.respond_to?(:ucol_getAttribute)
+      ICU::Lib.attach_function(:ucol_getAttribute, "ucol_getAttribute#{suffix}", [:pointer, :int, :pointer], :int)
+      ICU::Lib.attach_function(:ucol_setAttribute, "ucol_setAttribute#{suffix}", [:pointer, :int, :int, :pointer], :void)
+
+      ICU::Collation::Collator.class_eval do
         def [](attribute)
           ATTRIBUTE_VALUES_INVERSE[ICU::Lib.check_error do |error|
             ICU::Lib.ucol_getAttribute(@c, ATTRIBUTES[attribute], error)
