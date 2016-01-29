@@ -97,7 +97,7 @@ class AssessmentQuestion < ActiveRecord::Base
         file = Folder.find_attachment_in_context_with_path(assessment_question_bank.context, path)
       end
       begin
-        new_file = file.clone_for(self)
+        new_file = file.try(:clone_for, self)
       rescue => e
         new_file = nil
         er_id = Canvas::Errors.capture_exception(:file_clone_during_translate_links, e)[:error_report]
