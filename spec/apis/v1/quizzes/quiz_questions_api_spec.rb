@@ -45,7 +45,7 @@ describe Quizzes::QuizQuestionsController, type: :request do
         (1..3).map do |n|
           @quiz.quiz_questions.create!(:question_data => {
             :question_name => "Question #{n}",
-            "answers" => [{"id" => 1, "text" => "foo foo"}, {"id" => 2}]
+            "answers" => [{"id" => 1, "html" => "foo foo"}, {"id" => 2}]
           })
         end
 
