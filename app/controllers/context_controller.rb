@@ -349,10 +349,12 @@ class ContextController < ApplicationController
     end
   end
 
+  ITEM_TYPES = [:all_discussion_topics, :assignments, :assignment_groups, :enrollments,
+                :rubrics, :collaborations, :quizzes, :context_modules].freeze
   def undelete_index
     if authorized_action(@context, @current_user, :manage_content)
-      @item_types = [:all_discussion_topics, :assignments, :assignment_groups, :enrollments,
-                     :rubrics, :collaborations, :quizzes, :context_modules].map {|assoc| @context.send(assoc) if @context.respond_to?(assoc)}.compact
+      @item_types = ITEM_TYPES.select { |type| @context.reflections.key?(type) }.
+          map { |type| @context.association(type).reader }
 
       @item_types << @context.wiki.wiki_pages if @context.respond_to? :wiki
       @deleted_items = []
@@ -372,7 +374,9 @@ class ContextController < ApplicationController
       scope = @context
       scope = @context.wiki if type == 'wiki_page'
       type = 'all_discussion_topic' if type == 'discussion_topic'
-      @item = scope.send(type.pluralize).find(id)
+      type = type.pluralize.to_sym
+      raise "invalid type" unless ITEM_TYPES.include?(type) && scope.reflections.key?(type)
+      @item = scope.association(type).reader.find(id)
       @item.restore
       render :json => @item
     end

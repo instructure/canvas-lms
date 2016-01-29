@@ -194,4 +194,13 @@ describe ContextController do
       expect(assigns[:prior_users].size).to eql 20
     end
   end
+
+  describe "POST 'undelete_item'" do
+    it 'does not allow dangerous sends' do
+      user_session(@teacher)
+      @course.any_instantiation.expects(:teacher_names).never
+      post :undelete_item, course_id: @course.id, asset_string: 'teacher_name_1'
+      expect(response.status).to eq 500
+    end
+  end
 end
