@@ -50,7 +50,6 @@ describe 'Models' do
     ignore_classes << CustomField if Object.const_defined?('CustomField')
     ignore_classes << CustomFieldValue if Object.const_defined?('CustomFieldValue')
     ignore_classes << RemoveQuizDataIds::QuizQuestion if Object.const_defined?('RemoveQuizDataIds::QuizQuestion')
-    ignore_classes << Woozel if Object.const_defined?('Woozel')
     ActiveRecord::Base.all_models.each do |subclass|
       next unless subclass.name # unnamed class, probably from specs
       expect(subclass).to protect_attributes unless ignore_classes.include?(subclass)
