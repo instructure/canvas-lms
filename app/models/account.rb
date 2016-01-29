@@ -165,6 +165,7 @@ class Account < ActiveRecord::Base
   add_setting :fft_registration_url, root_only: true
 
   add_setting :restrict_student_future_view, :boolean => true, :default => false, :inheritable => true
+  add_setting :restrict_student_future_listing, :boolean => true, :default => false, :inheritable => true
   add_setting :restrict_student_past_view, :boolean => true, :default => false, :inheritable => true
 
   add_setting :teachers_can_create_courses, :boolean => true, :root_only => true, :default => false

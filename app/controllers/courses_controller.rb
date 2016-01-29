@@ -403,7 +403,7 @@ class CoursesController < ApplicationController
           else
             start_at, end_at = e.enrollment_dates.first
             if start_at && start_at > Time.now.utc
-              @future_enrollments << e
+              @future_enrollments << e unless e.restrict_future_listing?
             elsif state != :inactive
               @current_enrollments << e
             end
