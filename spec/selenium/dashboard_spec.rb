@@ -384,26 +384,43 @@ describe "dashboard" do
       expect(fj("#past_enrollments_table a[href='/courses/#{@course.id}']")).to include_text(c1.name)
     end
 
-    it "should show future courses (even if restricted) to students on courses page" do
-      term = EnrollmentTerm.new(:name => "Super Term", :start_at => 1.week.from_now, :end_at => 1.month.from_now)
-      term.root_account_id = @course.root_account_id
-      term.save!
-      course_with_student_logged_in(:active_all => true)
-      c1 = @course
-      c1.name = 'a future course'
-      c1.update_attributes!(:enrollment_term => term)
+    context "restricted future courses" do
+      before :once do
+        term = EnrollmentTerm.new(:name => "Super Term", :start_at => 1.week.from_now, :end_at => 1.month.from_now)
+        term.root_account_id = Account.default.id
+        term.save!
+        course_with_student(:active_all => true)
+        @c1 = @course
+        @c1.name = 'a future course'
+        @c1.update_attributes!(:enrollment_term => term)
 
-      course_with_student(:active_course => true, :user => @student)
-      c2 = @course
-      c2.name = "a restricted future course"
-      c2.restrict_student_future_view = true
-      c2.update_attributes!(:enrollment_term => term)
+        course_with_student(:active_course => true, :user => @student)
+        @c2 = @course
+        @c2.name = "a restricted future course"
+        @c2.restrict_student_future_view = true
+        @c2.update_attributes!(:enrollment_term => term)
+      end
 
-      get "/courses"
-      expect(fj("#future_enrollments_table a[href='/courses/#{c1.id}']")).to include_text(c1.name)
+      before do
+        user_session(@student)
+      end
 
-      expect(fj("#future_enrollments_table a[href='/courses/#{c2.id}']")).to be_nil # should not have a link
-      expect(f("#future_enrollments_table")).to include_text(c2.name) # but should still show restricted future enrollment
+      it "should show future courses (even if restricted) to students on courses page" do
+        get "/courses"
+        expect(fj("#future_enrollments_table a[href='/courses/#{@c1.id}']")).to include_text(@c1.name)
+
+        expect(fj("#future_enrollments_table a[href='/courses/#{@c2.id}']")).to be_nil # should not have a link
+        expect(f("#future_enrollments_table")).to include_text(@c2.name) # but should still show restricted future enrollment
+      end
+
+      it "should not show restricted future courses to students on courses page if configured on account" do
+        a = @c2.account
+        a.settings[:restrict_student_future_listing] = {:value => true}
+        a.save!
+        get "/courses"
+        expect(fj("#future_enrollments_table a[href='/courses/#{@c1.id}']")).to include_text(@c1.name)
+        expect(f("#future_enrollments_table")).to_not include_text(@c2.name) # shouldn't be included at all
+      end
     end
 
     it "should display assignment to grade in to do list for a teacher", priority: "1", test_id: 216376 do

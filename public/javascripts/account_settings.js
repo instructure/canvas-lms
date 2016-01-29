@@ -22,6 +22,17 @@ define([
   preloadRCE()
 
   $(document).ready(function() {
+    checkFutureListingSetting = function() {
+
+      if ($('#account_settings_restrict_student_future_view_value').is(':checked')) {
+        $('.future_listing').show();
+      } else {
+        $('.future_listing').hide();
+      }
+    };
+    checkFutureListingSetting();
+    $('#account_settings_restrict_student_future_view_value').change(checkFutureListingSetting);
+
     $("#account_settings").submit(function() {
       var $this = $(this);
       $(".ip_filter .value").each(function() {
