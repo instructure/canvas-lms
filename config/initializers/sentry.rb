@@ -10,6 +10,7 @@ settings = ConfigFile.load("raven")
 if settings.present?
   require "raven/base"
   Raven.configure do |config|
+    config.logger = Rails.logger
     config.silence_ready = true
     config.dsn = settings[:dsn]
     config.tags = settings.fetch(:tags, {}).merge('canvas_revision' => Canvas.revision)
@@ -28,5 +29,4 @@ if settings.present?
       SentryProxy.capture(exception, data) if setting == 'true'
     end
   end
-
 end
