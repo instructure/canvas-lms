@@ -131,6 +131,24 @@ describe ContentMigration do
       expect(copy.lock_at.to_i).to eq att.lock_at.to_i
     end
 
+    it "should preserve module items for hidden files on course copy" do
+      att = Attachment.create!(:filename => '1.txt', :uploaded_data => StringIO.new('1'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
+      att.hidden = true
+      att.save!
+
+      mod = @copy_from.context_modules.create!(:name => "some module")
+      tag = mod.add_item({:id => att.id, :type => 'attachment'})
+
+      run_course_copy
+
+      copy_att = @copy_to.attachments.where(migration_id: mig_id(att)).first
+      expect(copy_att.hidden).to be_truthy
+
+      copy_mod = @copy_to.context_modules.where(:migration_id => mig_id(mod)).first
+      copy_tag = copy_mod.content_tags.first
+      expect(copy_tag.content).to eq copy_att
+    end
+
     it "should preserve usage rights on export/import" do
       att1 = Attachment.create!(:filename => '1.txt', :uploaded_data => StringIO.new('1'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
       att2 = Attachment.create!(:filename => '2.txt', :uploaded_data => StringIO.new('2'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)

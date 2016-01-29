@@ -200,7 +200,7 @@ class Submission < ActiveRecord::Base
   after_create :update_needs_grading_count, if: :needs_grading?
   after_update :update_needs_grading_count, if: :needs_grading_changed?
   def update_needs_grading_count
-    connection.after_transaction_commit do
+    self.class.connection.after_transaction_commit do
       adjust_needs_grading_count(needs_grading? ? :increment : :decrement)
     end
   end
@@ -293,7 +293,7 @@ class Submission < ActiveRecord::Base
         Rails.logger.info "GRADES: NOT recomputing scores for submission #{global_id} because skip_grade_calc was set"
       else
         Rails.logger.info "GRADES: submission #{global_id} score changed. recomputing grade for course #{context.global_id} user #{user_id}."
-        connection.after_transaction_commit do
+        self.class.connection.after_transaction_commit do
           Enrollment.send_later_if_production_enqueue_args(:recompute_final_score, { run_at: 3.seconds.from_now }, self.user_id, self.context.id)
         end
       end
@@ -491,7 +491,7 @@ class Submission < ActiveRecord::Base
 
   def touch_graders
     if self.assignment && self.user && self.assignment.context.is_a?(Course)
-      connection.after_transaction_commit do
+      self.class.connection.after_transaction_commit do
         self.assignment.context.touch_admins_later
       end
     end
@@ -560,18 +560,25 @@ class Submission < ActiveRecord::Base
   def submit_attachments_to_canvadocs
     if attachment_ids_changed?
       attachments.preload(:crocodoc_document, :canvadoc).each do |a|
+        # moderated grading annotations are only supported in crocodoc right now
+        dont_submit_to_canvadocs = assignment.moderated_grading?
+
         # associate previewable-document and submission for permission checks
-        if a.canvadocable? && Canvadocs.annotations_supported?
+        if a.canvadocable? && Canvadocs.annotations_supported? && !dont_submit_to_canvadocs
+          submit_to_canvadocs = true
           canvadocs << a.create_canvadoc unless a.canvadoc
         elsif a.crocodocable?
+          submit_to_canvadocs = true
           crocodoc_documents << a.create_crocodoc_document unless a.crocodoc_document
         end
 
-        a.send_later_enqueue_args :submit_to_canvadocs, {
-          :n_strand     => 'canvadocs',
-          :max_attempts => 1,
-          :priority => Delayed::LOW_PRIORITY
-        }, 1, wants_annotation: true
+        if submit_to_canvadocs
+          a.send_later_enqueue_args :submit_to_canvadocs, {
+            :n_strand     => 'canvadocs',
+            :max_attempts => 1,
+            :priority => Delayed::LOW_PRIORITY
+          }, 1, wants_annotation: true, force_crocodoc: dont_submit_to_canvadocs
+        end
       end
     end
   end
@@ -848,7 +855,7 @@ class Submission < ActiveRecord::Base
 
   def grade_change_audit
     return true unless self.grade_changed?
-    connection.after_transaction_commit { Auditors::GradeChange.record(self) }
+    self.class.connection.after_transaction_commit { Auditors::GradeChange.record(self) }
   end
 
   scope :with_assignment, -> { joins(:assignment).where("assignments.workflow_state <> 'deleted'")}
@@ -931,7 +938,7 @@ class Submission < ActiveRecord::Base
     when User
       where(:user_id => obj)
     else
-      scoped
+      all
     end
   }
 

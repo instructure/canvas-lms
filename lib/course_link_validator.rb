@@ -190,10 +190,15 @@ class CourseLinkValidator
     unless result = self.visited_urls[url]
       begin
         if ImportedHtmlConverter.relative_url?(url) || (self.domain_regex && url.match(self.domain_regex))
-          if url.match(/\/courses\/(\d+)/) && self.course.id.to_s != $1
-            result = :course_mismatch
+
+          if valid_route?(url)
+            if url.match(/\/courses\/(\d+)/) && self.course.id.to_s != $1
+              result = :course_mismatch
+            else
+              result = check_object_status(url)
+            end
           else
-            result = check_object_status(url)
+            result = :unreachable
           end
         elsif !url.start_with?('mailto:')
           unless reachable_url?(url)
@@ -213,6 +218,15 @@ class CourseLinkValidator
     end
   end
 
+  # checks against the Rails routes to see if the url matches anything
+  def valid_route?(url)
+    path = URI.parse(url).path
+    path = path.chomp("/")
+
+    @route_set ||= ::Rails.application.routes.set.routes.select{|r| r.verb === "GET"}
+    @route_set.any?{|r| r.path.match(path)}
+  end
+
   # makes sure that links to course objects exist and are in a visible state
   def check_object_status(url)
     result = nil
@@ -222,7 +236,7 @@ class CourseLinkValidator
       unless (att = Folder.find_attachment_in_context_with_path(self.course, rel_path)) && !att.deleted?
         result = :missing_file
       end
-    when /\/courses\/\d+\/(pages|wiki)\/(\w+)/
+    when /\/courses\/\d+\/(pages|wiki)\/([^\s"<'\?\/#]*)/
       if obj = self.course.wiki.find_page($2)
         if obj.workflow_state == 'unpublished'
           result = :unpublished_item
@@ -235,14 +249,14 @@ class CourseLinkValidator
       obj_id = $2
 
       if obj_class = ITEM_CLASSES[obj_type]
-        if (obj = obj_class.where(:id => obj_id).first)
-          if obj.is_a?(Attachment)
-            if obj.file_state == 'deleted'
-              result = :missing_item
-            elsif obj.locked?
-              result = :unpublished_item
-            end
-          elsif obj.workflow_state == 'deleted'
+        if (obj_class == Attachment) && (obj = self.course.attachments.find_by_id(obj_id)) # attachments.find_by_id uses the replacement hackery
+          if obj.file_state == 'deleted'
+            result = :missing_item
+          elsif obj.locked?
+            result = :unpublished_item
+          end
+        elsif (obj = obj_class.where(:id => obj_id).first)
+          if obj.workflow_state == 'deleted'
             result = :missing_item
           elsif obj.workflow_state == 'unpublished'
             result = :unpublished_item

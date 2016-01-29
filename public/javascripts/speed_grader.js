@@ -29,6 +29,7 @@ define([
   'str/htmlEscape',
   'rubric_assessment',
   'speed_grader_select_menu',
+  'speed_grader_helpers',
   'jst/_turnitinInfo',
   'jst/_turnitinScore',
   'jqueryui/draggable' /* /\.draggable/ */,
@@ -51,7 +52,7 @@ define([
   'vendor/jquery.spin' /* /\.spin/ */,
   'vendor/spin' /* new Spinner */,
   'vendor/ui.selectmenu' /* /\.selectmenu/ */
-], function(submissionsDropdownTemplate, speechRecognitionTemplate, round, _, INST, I18n, $, tz, userSettings, htmlEscape, rubricAssessment, SpeedgraderSelectMenu, turnitinInfoTemplate, turnitinScoreTemplate) {
+], function(submissionsDropdownTemplate, speechRecognitionTemplate, round, _, INST, I18n, $, tz, userSettings, htmlEscape, rubricAssessment, SpeedgraderSelectMenu, SpeedgraderHelpers, turnitinInfoTemplate, turnitinScoreTemplate) {
 
   // fire off the request to get the jsonData
   window.jsonData = {};
@@ -980,7 +981,10 @@ define([
       $window.bind('hashchange', EG.handleFragmentChange);
       $('#eg_sort_by').val(userSettings.get('eg_sort_by'));
       $('#submit_same_score').click(function(e) {
-        EG.handleGradeSubmit();
+        // By passing true as the second argument, we're telling
+        // handleGradeSubmit to use the existing previous submission score
+        // for the current grade.
+        EG.handleGradeSubmit(e, true);
         e.preventDefault();
       });
 
@@ -1978,7 +1982,11 @@ define([
 
       return student;
     },
-    handleGradeSubmit: function(){
+    // If the second argument is passed as true, the grade used will
+    // be the existing score from the previous submission.  This
+    // should only be called from the anonymous function attached so
+    // #submit_same_score.
+    handleGradeSubmit: function(e, use_existing_score){
       var url    = $(".update_submission_grade_url").attr('href'),
           method = $(".update_submission_grade_url").attr('title'),
           formData = {
@@ -1986,7 +1994,10 @@ define([
             'submission[user_id]':       EG.currentStudent.id,
             'submission[graded_anonymously]': utils.shouldHideStudentNames()
           };
-      var grade = $grade.val();
+
+      var grade = SpeedgraderHelpers.determineGradeToSubmit(use_existing_score,
+                                                            EG.currentStudent, $grade);
+
       if (grade.toUpperCase() === "EX") {
         formData["submission[excuse]"] = true;
       } else {

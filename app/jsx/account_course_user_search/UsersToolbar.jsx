@@ -16,6 +16,7 @@ define([
 
       search_term: string,
       errors: object,
+      accountId: string
     },
 
     applyFilters(e) {
@@ -64,6 +65,19 @@ define([
             </div>
 
             {addUserButton}
+
+          <a id="peopleOptionsBtn" className="al-trigger btn" role="button" href="#" style={{"margin-left": "10px", "padding-left": "12px", "padding-right": "12px"}}>
+            <i className="icon-more"></i>
+            <span className="screenreader-only">{I18n.t('People Options')}</span>
+          </a>
+          <ul className="al-options" role="menu" aria-hidden="true">
+            <li>
+              <a href={`/accounts/${this.props.accountId}/avatars`} className="icon-student-view" id="manageStudentsLink" role="menuitem">{I18n.t('Manage profile pictures')}</a>
+            </li>
+            <li>
+              <a href={`/accounts/${this.props.accountId}/groups`} className="icon-group" id="viewUserGroupLink" role="menuitem">{I18n.t('View user groups')}</a>
+            </li>
+          </ul>
           </form>
 
           <NewUserModal ref="addUser"/>

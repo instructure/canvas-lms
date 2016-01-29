@@ -13,10 +13,10 @@ module Canvas::SoftDeletable
 
     scope :active, -> { where workflow_state: "active" }
 
-    # save the previous definition of `destroy` and alias it to `destroy!`
-    # Note: `destroy!` now does NOT throw errors while the newly defined
+    # save the previous definition of `destroy` and alias it to `destroy_permanently!`
+    # Note: `destroy_permanently!` now does NOT throw errors while the newly defined
     # `destroy` DOES throw errors due to `save!`
-    alias_method :destroy!, :destroy
+    alias_method :destroy_permanently!, :destroy
     def destroy
       self.workflow_state = 'deleted'
       save!

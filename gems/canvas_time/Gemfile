@@ -2,9 +2,3 @@ source 'https://rubygems.org'
 
 # Specify your gem's dependencies in canvas_time.gemspec
 gemspec
-
-require File.expand_path("../../../config/canvas_rails4", __FILE__)
-
-if CANVAS_RAILS3
-  gem 'activesupport', '3.2.21', github: 'rails/rails', branch: '3-2-stable', ref: 'b344986bc3d94ca7821fc5e0eef1874882ac6cbb'
-end

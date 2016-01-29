@@ -1,3 +1,4 @@
+@import "base/environment";
 @import "components/ui.selectmenu";
 
 $border: #C1C7CF;
@@ -592,6 +593,11 @@ $discussion-dark-text: $ic-color-dark;
   }
 }
 
+.accessibility-warning {
+  @include accessibility-prompt;
+  font-size: 14px;
+}
+
 .collapsable:hover, .collapsable:focus {
   cursor: pointer;
   &:before {
@@ -623,6 +629,23 @@ $discussion-dark-text: $ic-color-dark;
 
 .bootstrap-form {
   margin: 0;
+}
+
+#discussion-managebar {
+  div.form-inline {
+    display: flex;
+    align-items: center;
+    flex-flow: row wrap;
+    justify-content: space-between;
+  }
+
+  #keyboard-shortcut-modal-info {
+    padding: 4px 0px 3px 0px;
+
+    .accessibility-warning {
+      display: none;
+    }
+  }
 }
 
 .headerBar {

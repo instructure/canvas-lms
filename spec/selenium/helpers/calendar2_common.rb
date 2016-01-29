@@ -7,7 +7,7 @@ module Calendar2Common
       a.title = 'test assignment'
       a.due_at = Time.now.utc.strftime("%Y-%m-%d 21:00:00")
       a.workflow_state = 'published'
-      a.context_id = "#{@course.id}"
+      a.context_id = @course.id
       a.context_type = 'Course'
       a.save!
     end
@@ -19,7 +19,7 @@ module Calendar2Common
       c.title = 'test event'
       c.start_at = Time.now.utc.strftime("%Y-%m-%d 21:00:00")
       c.workflow_state = 'active'
-      c.context_id = "#{@course.id}"
+      c.context_id = @course.id
       c.context_type = 'Course'
       c.save!
     end

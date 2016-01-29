@@ -8,12 +8,18 @@ describe "Wiki Pages" do
   include FilesCommon
   include WikiAndTinyCommon
 
+  def toggle_html_mode
+    keep_trying_until do
+      fj('a.switch_views:visible').present?
+    end
+    fj('a.switch_views:visible').click
+  end
+
   context "Navigation" do
-    def edit_page(edit_text = nil)
+    def edit_page(edit_text)
       get "/courses/#{@course.id}/pages/Page1/edit"
-      fj('a.switch_views:visible').click
-      f('textarea').send_keys(edit_text)
-      fj('button:contains("Save")').click
+      add_text_to_tiny(edit_text)
+      expect_new_page_load { fj('button:contains("Save")').click }
     end
 
     before do
@@ -107,9 +113,10 @@ describe "Wiki Pages" do
       driver.execute_script("window.open()")
       driver.switch_to.window(driver.window_handles.last)
       edit_page('test')
+      driver.execute_script("window.close()")
       driver.switch_to.window(driver.window_handles.first)
       get "/courses/#{@course.id}/pages/Page1/edit"
-      fj('a.switch_views:visible').click
+      toggle_html_mode
       expect(f('textarea').text).to include_text('test')
     end
   end
@@ -387,6 +394,23 @@ describe "Wiki Pages" do
         element.send_keys(:tab)
         check_element_has_focus(f('.restore-link'))
       end
+
+      it "should validate that revision restored is displayed", priority: "1", test_id: 126832 do
+        get "/courses/#{@course.id}/pages/#{@vpage.url}"
+        f('.icon-settings').click
+        expect(f('.icon-clock')).to be_present
+        f('.view_page_history').click
+        wait_for_ajaximations
+        ff(".revision-details")[1].click
+        expect(f('.restore-link')).to be_present
+        f('.restore-link').click
+        f('.close-button').click
+        wait_for_ajaximations
+        f('.icon-edit').click
+        f('.btn-primary').click
+        wait_for_ajaximations
+        expect(f('div.user_content.clearfix.enhanced > p').text).to include 'published by teacher'
+      end
     end
 
     context "Edit Page" do
@@ -403,7 +427,7 @@ describe "Wiki Pages" do
       end
 
       it "should alert user if navigating away from page with unsaved html changes", priority: "1", test_id: 126838 do
-        fj('a.switch_views:visible').click()
+        toggle_html_mode
         f('textarea').send_keys("derp")
         f('.home').click
         expect(driver.switch_to.alert.text).to be_present
@@ -411,7 +435,7 @@ describe "Wiki Pages" do
       end
 
       it "should not save changes when navigating away and not saving", priority: "1", test_id: 267613 do
-        fj('a.switch_views:visible').click()
+        toggle_html_mode
         f('textarea').send_keys('derp')
         f('.home').click
         expect(driver.switch_to.alert.text).to be_present
@@ -421,7 +445,7 @@ describe "Wiki Pages" do
       end
 
       it "should alert user if navigating away from page after title change", priority: "1", test_id: 267832 do
-        fj('a.switch_views:visible').click()
+        toggle_html_mode
         f('.title').clear()
         f('.title').send_keys("derpy-title")
         f('.home').click

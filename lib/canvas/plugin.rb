@@ -135,16 +135,16 @@ module Canvas
     # add any errors that it would like.
     def validate_settings(plugin_setting, settings)
       if validator
-        validator_module = Canvas::Plugins::Validators.const_defined?(validator) && Canvas::Plugins::Validators.const_get(validator)
-        if validator_module && validator_module.respond_to?(:validate)
-          res = validator_module.validate(settings, plugin_setting)
-          if res.is_a?(Hash)
-            plugin_setting.settings = (plugin_setting.settings || self.default_settings || {}).with_indifferent_access.merge(res || {})
-          else
-            false
-          end
-        else
+        begin
+          validator_module = Canvas::Plugins::Validators.const_get(validator)
+        rescue NameError
           plugin_setting.errors.add(:base, "provided validator #{validator} failed to load")
+          return false
+        end
+        res = validator_module.validate(settings, plugin_setting)
+        if res.is_a?(Hash)
+          plugin_setting.settings = (plugin_setting.settings || self.default_settings || {}).with_indifferent_access.merge(res || {})
+        else
           false
         end
       else

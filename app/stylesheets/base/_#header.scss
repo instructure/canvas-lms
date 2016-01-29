@@ -88,7 +88,7 @@ $masquerade-link-color: $ic-color-alert;
 
 
   float: right;
-  font-size: 12px;
+  @include fontSize($ic-font-size--xsmall);
   margin-right: $right_side_margin;
   // make room for the drop shadow
   margin-bottom: 4px;
@@ -178,7 +178,7 @@ $masquerade-link-color: $ic-color-alert;
       padding: 6px 17px 5px;
       height: 29px;
       color: #fff;
-      font-size: 15px;
+      @include fontSize(15px);
     }
   }
   .menu-item-no-drop, .menu-item-title {
@@ -204,7 +204,7 @@ $masquerade-link-color: $ic-color-alert;
   }
 
   .menu-item-drop {
-    font-size: 13px;
+    @include fontSize(13px);
     // hide off screen, dont do display:none, so screenreaders can see it
     overflow: hidden;
     position: absolute;
@@ -216,7 +216,7 @@ $masquerade-link-color: $ic-color-alert;
     z-index: 99;
     .menu-item-view-all {
       border-bottom: none;
-      font-size: 12px;
+      @include fontSize($ic-font-size--xsmall);
       text-align: right;
       white-space: nowrap;
       &:hover {
@@ -268,7 +268,7 @@ $masquerade-link-color: $ic-color-alert;
         @if $use_high_contrast {
           color: $course-dropdown-text-color;
         }
-        font-size: 12px;
+        @include fontSize($ic-font-size--xsmall);
       }
       .menu-item-drop-float-right {
         float: right;
@@ -288,11 +288,11 @@ $masquerade-link-color: $ic-color-alert;
       .secondary-right {
         float: right;
         white-space: nowrap;
-        font-size: 11px;
+        @include fontSize(11px);
       }
       .name {
         display: block;
-        font-size: 14px;
+        @include fontSize($ic-font-size--small);
       }
     }
   }
@@ -370,7 +370,7 @@ $masquerade-link-color: $ic-color-alert;
     }
   }
   .customListOpen {
-    font-size: 11px;
+    @include fontSize(11px);
     color: $ic-link-color;
   }
 }

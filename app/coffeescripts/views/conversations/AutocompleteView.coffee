@@ -389,7 +389,7 @@ define [
       @resultView.$('.collectionViewItems').empty()
       @resultView.render()
       $el = @$resultList.find('li:first').addClass('selected')
-      @selectedModel = @_getModel($el.data('id'))
+      @selectedModel = @_getModel($el.attr('data-id'))
       @$input.attr('aria-activedescendant', $el.attr('id'))
 
     # Internal: Fetch and display autocomplete results from the server.
@@ -526,7 +526,7 @@ define [
       return unless e.button == 0
       e.preventDefault() && e.stopPropagation()
       $target = $(e.currentTarget)
-      @selectedModel = @resultCollection.get($target.data('id'))
+      @selectedModel = @resultCollection.get($target.attr('data-id'))
       @_activateSelected(e.metaKey or e.ctrlKey)
 
     # Internal: Clear the current token.

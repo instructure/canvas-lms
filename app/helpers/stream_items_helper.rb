@@ -61,7 +61,6 @@ module StreamItemsHelper
       end
 
       if ["DiscussionTopic","Announcement"].include? category
-        item.data.reload
         next if item.data.try(:visible_for?, user) == false
       end
 
@@ -87,11 +86,11 @@ module StreamItemsHelper
   def extract_path(category, item)
     case category
     when "Announcement", "DiscussionTopic"
-      polymorphic_path([item.context_type.underscore, category.underscore], "#{item.context_type.underscore}_id" => Shard.short_id_for(item.context_id), :id => Shard.short_id_for(item.asset_id))
+      polymorphic_path([item.context_type.underscore, category.underscore], :"#{item.context_type.underscore}_id" => Shard.short_id_for(item.context_id), :id => Shard.short_id_for(item.asset_id))
     when "Conversation"
       conversation_path(Shard.short_id_for(item.asset_id))
     when "Assignment"
-      polymorphic_path([item.context_type.underscore, category.underscore], "#{item.context_type.underscore}_id" => Shard.short_id_for(item.context_id), :id => Shard.short_id_for(item.data.asset_context_id))
+      polymorphic_path([item.context_type.underscore, category.underscore], :"#{item.context_type.underscore}_id" => Shard.short_id_for(item.context_id), :id => Shard.short_id_for(item.data.asset_context_id))
     when "AssessmentRequest"
       submission = item.data.assessor_asset
       course_assignment_submission_path(item.context_id, submission.assignment_id, Shard.short_id_for(item.data.user_id))
@@ -108,7 +107,7 @@ module StreamItemsHelper
       context.type = item.context_type
       context.id = item.context_id
       context.name = asset.context_short_name
-      context.linked_to = polymorphic_path([context.type.underscore, category.underscore.pluralize], "#{context.type.underscore}_id" => Shard.short_id_for(context.id))
+      context.linked_to = polymorphic_path([context.type.underscore, category.underscore.pluralize], :"#{context.type.underscore}_id" => Shard.short_id_for(context.id))
     when "Conversation"
       context.type = "User"
       last_author = item.participant.last_message.author

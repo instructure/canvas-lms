@@ -27,10 +27,10 @@ describe "site-wide" do
     consider_all_requests_local(true)
   end
 
-  let(:x_frame_options) { CANVAS_RAILS3 ? 'x-frame-options' : 'X-Frame-Options' }
-  let(:x_canvas_meta) { CANVAS_RAILS3 ? 'x-canvas-meta' : 'X-Canvas-Meta' }
-  let(:x_canvas_user_id) { CANVAS_RAILS3 ? 'x-canvas-user-id' : 'X-Canvas-User-Id' }
-  let(:x_canvas_real_user_id) { CANVAS_RAILS3 ? 'x-canvas-real-user-id' : 'X-Canvas-Real-User-Id' }
+  let(:x_frame_options) { 'X-Frame-Options' }
+  let(:x_canvas_meta) { 'X-Canvas-Meta' }
+  let(:x_canvas_user_id) { 'X-Canvas-User-Id' }
+  let(:x_canvas_real_user_id) { 'X-Canvas-Real-User-Id' }
 
   it "should render 404 when user isn't logged in" do
     Setting.set 'show_feedback_link', 'true'
@@ -40,7 +40,7 @@ describe "site-wide" do
 
   it "should set the x-ua-compatible http header" do
     get "/login"
-    key = CANVAS_RAILS3 ? 'x-ua-compatible' : 'X-UA-Compatible'
+    key = 'X-UA-Compatible'
     expect(response[key]).to eq "IE=Edge,chrome=1"
   end
 

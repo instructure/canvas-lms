@@ -1,9 +1,9 @@
 #right-side-wrapper {
   display: none;
-  position: relative;  
+  position: relative;
   @if $use_new_styles == false {
     width: 0;
-    right: 0;  
+    right: 0;
   }
 }
 
@@ -23,7 +23,7 @@
     margin: 17px 0 20px;
   }
   h2, .h2 {
-    font-size: 14px;
+    @include fontSize($ic-font-size--small);
     overflow: hidden;
     line-height: 1.2em;
     @if $use_new_styles {
@@ -36,8 +36,8 @@
       color: $gray;
       font-weight: bold;
       border-bottom: solid 1px #bbb;
-      margin: $right_side_margin 0; 
-      padding-bottom: 6px; 
+      margin: $right_side_margin 0;
+      padding-bottom: 6px;
     }
   }
 }
@@ -66,7 +66,7 @@
   @else { margin: 10px 0; }
   li {
     a {
-      font-size: 12px;
+      @include fontSize($ic-font-size--xsmall);
       padding-top: 4px;
       padding-bottom: 4px;
       display: block;
@@ -99,12 +99,12 @@
       display: block;
       @if $use_new_styles {
         font-style: italic;
-        font-size: 13px;
+        @include fontSize(13px);
       }
       @else {
         padding: 3px 0 0px 31px;
         color: #666;
-        font-size: 1em;  
+        font-size: 1em;
       }
     }
     b, em {
@@ -208,7 +208,7 @@
 // NOTE: they used to get applied to body but were moved to #right side to not force a repaint
 // of the entire page and be less jumpy going in and out display modes.
 .with-scrolling-right-side {
-  
+
   @if $use_new_styles {
     #right-side {
       @include breakpoint(desktop) {

@@ -15,15 +15,17 @@ require([
 $(document).ready(function() {
   $("#communication_channels").tabs();
   $("#communication_channels").bind('tabsshow', function(event) {
+    var channelInputField;
     if($(this).css('display') != 'none') {
       // TODO: This is always undefined - where did this come from?
       var idx = $(this).data('selected.tabs');
       if(idx == 0) {
-        $("#register_email_address").find(":text:first").focus().select();
+        channelInputField = $("#register_email_address").find(":text:first");
       } else {
-        $("#register_sms_number").find("input[type=tel]:first").focus().select();
+        channelInputField = $("#register_sms_number").find("input[type=tel]:first");
       }
     }
+    formatTabs(channelInputField);
   });
   $(".channel_list tr").hover(function() {
     if($(this).hasClass('unconfirmed')) {
@@ -45,10 +47,7 @@ $(document).ready(function() {
       title:  I18n.t('titles.register_communication', "Register Communication") ,
       width: 600,
       resizable: false,
-      modal: true,
-      open: function() {
-        $("#communication_channels").triggerHandler('tabsshow');
-      }
+      modal: true
     });
     if($(this).hasClass('add_contact_link')) {
       $("#communication_channels").tabs('select', '#register_sms_number');
@@ -57,8 +56,9 @@ $(document).ready(function() {
       $("#communication_channels").tabs('select', '#register_email_address');
     }
   });
-  $("#register_sms_number .user_selected").bind('change blur keyup focus', function() {
-    var $form = $(this).parents("#register_sms_number");
+
+  var formatTabs = function (tabs) {
+    var $form = $(tabs).parents("#register_sms_number");
     var sms_number = $form.find(".sms_number").val().replace(/[^\d]/g, "");
 
     var useEmail = !ENV.INTERNATIONAL_SMS_ENABLED || $form.find(".country option:selected").data('useEmail');
@@ -84,6 +84,10 @@ $(document).ready(function() {
     } else {
       $form.find('.sms_email_group').hide();
     }
+  }
+
+  $("#register_sms_number .user_selected").bind('change blur keyup focus', function() {
+    formatTabs(this);
   });
 
   $("#register_sms_number,#register_email_address").formSubmit({
@@ -126,11 +130,12 @@ $(document).ready(function() {
         }
       } else {
         // Make sure it's a valid phone number. Validate the phone number they typed instead of the address because
-        // the address will already have the country code prepended, and this will result in blank phone numbers
-        // valid to our fairly naive regex. (libphonenumber plz)
+        // the address will already have the country code prepended, and this will result in our regex failing always
+        // because it's not expecting the leading plus sign (and it can't just be added to the regex because then
+        // we can't detect when they entered a blank phone number). libphonenumber plz
         var match = data.communication_channel_sms_number.match(/^[0-9]+$/);
         if (!match) {
-          var errorMessage = data.communication_channel_sms_number === "" ? I18n.t("Cell Number is required") : I18n.t("Cell Number is invalid!");
+          var errorMessage = address === "" ? I18n.t("Cell Number is required") : I18n.t("Cell Number is invalid!");
           $(this).formErrors({communication_channel_sms_number: errorMessage});
           return false;
         }
@@ -164,10 +169,12 @@ $(document).ready(function() {
       }
       if(!path) { return false; }
       $("#communication_channels").dialog('close');
+      $("#communication_channels").hide();
       $channel.loadingImage({image_size: 'small'});
       return $channel;
     }, success: function(channel, $channel) {
       $("#communication_channels").dialog('close');
+      $("#communication_channels").hide();
       $channel.loadingImage('remove');
 
       channel.channel_id = channel.id;
@@ -203,12 +210,29 @@ $(document).ready(function() {
     event.preventDefault();
 
   });
+
+  var manageAfterDeletingAnEmailFocus = function(currentElement) {
+    // There may be a better way to do this but I'm not aware of another way. I'm trying to
+    // find the closest prev() or next() sibling
+    var $elementToFocusOn = $(currentElement).next('.channel:not(.blank)').last();
+    if (!$elementToFocusOn.length) {
+      $elementToFocusOn = $(currentElement).prev('.channel:not(.blank)').last();
+    }
+
+    if ($elementToFocusOn.length) {
+      $elementToFocusOn.find('.email_channel').first().focus();
+    } else {
+      $(this).parents(".channel_list .email_channel").first().focus();
+    }
+  }
+
   $(".channel_list .channel .delete_channel_link").click(function(event) {
     event.preventDefault();
     $(this).parents(".channel").confirmDelete({
       url: $(this).attr('href'),
       success: function(data) {
         var $list = $(this).parents(".channel_list");
+        manageAfterDeletingAnEmailFocus(this);
         $(this).remove();
         $list.toggleClass('single', $list.find(".channel:visible").length <= 1);
       }
@@ -286,7 +310,8 @@ $(document).ready(function() {
       $.flashMessage( I18n.t('notices.contact_confirmed', "Contact successfully confirmed!") );
     },
     error: function(data) {
-      $(this).find(".status_message").text( I18n.t('errors.confirmation_failed', "Confirmation failed.  Please try again.") );
+      $(this).find(".status_message").css('visibility', 'hidden');
+      $.flashError( I18n.t("Confirmation failed.  Please try again.") );
     }
   });
   $(".channel_list .channel .default_link").click(function(event) {
@@ -297,8 +322,8 @@ $(document).ready(function() {
     }
     $.ajaxJSON($(this).attr('href'), 'PUT', formData, function(data) {
       var channel_id = data.user.communication_channel.id;
-      $(".channel.default").removeClass('default');
-      $(".channel#channel_" + channel_id).addClass('default');
+      $(".channel.default").removeClass('default').find('a.default_link span.screenreader-only.default_label').remove();
+      $(".channel#channel_" + channel_id).addClass('default').find('a.default_link').append( $('<span class="screenreader-only" />').text(I18n.t("This is the default email address")) );
       $(".default_email.display_data").text(data.user.pseudonym.unique_id);
     });
   });

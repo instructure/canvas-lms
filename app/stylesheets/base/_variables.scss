@@ -101,9 +101,21 @@ $contentBoxPadding:         8px;
 // Once all of those have been adjusted to use the new variable we can get rid of this
 $ic-line-height: 1.5;
 @if not $use_new_styles {$ic-line-height: 20px;}
-$ic-font-size: 13px;
 $ic-font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 $ic-font-weight: 500; // instead of "bold"
+
+$ic-font-size: 14px;
+
+$ic-font-size--xlarge:   28px;
+$ic-font-size--large:    23px;
+$ic-font-size--medium:   16px;
+$ic-font-size--small:    14px;
+$ic-font-size--xsmall:   12px;
+
+/* Legacy variables. Discontinue to use these: */
+$h1-font-size:  23px;
+$h2-font-size:  14px;
+$h3-font-size:  19px;
 
 //============================
 // Layout Functional Variables
@@ -208,9 +220,9 @@ $ic-color-icon-disabled:        darken($ic-color-neutral, 40);
 @if $use_high_contrast {
 $ic-color-icon-disabled:        darken($ic-color-neutral, 60);
 }
-$ic-dim-helper-text:            darken($ic-color-neutral, 33);
+$ic-dim-helper-text:            darken($ic-color-neutral, 45);
 @if $use_high_contrast {
-$ic-dim-helper-text:            darken($ic-color-neutral, 50);
+$ic-dim-helper-text:            darken($ic-color-neutral, 55);
 }
 
 // We don't use any of the Bootstrap glyph icons, But bootstrap's scss expects this variable to be defined.
@@ -246,13 +258,6 @@ $iconWhiteSpritePath: $iconSpritePath !default;
   $borderColor:                   #a8adb3;
   $activeBG:                      #d6ecfc;
 }
-
-//====================
-// Font Size Variables
-//====================
-$h1-font-size:  23px;
-$h2-font-size:  14px;
-$h3-font-size:  19px;
 
 //=====================
 // Transition Variables

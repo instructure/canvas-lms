@@ -4,36 +4,57 @@ describe "gradebook2 - permissions" do
   include_context "in-process server selenium tests"
   include Gradebook2Common
 
-  let(:course) { Course.create! }
+  context "as an admin" do
 
-  it "should display for users with only :view_all_grades permissions" do
-    user_logged_in
+    let(:course) { Course.create! }
 
-    role = custom_account_role('CustomAdmin', :account => Account.default)
-    RoleOverride.create!(:role => role,
-                         :permission => 'view_all_grades',
-                         :context => Account.default,
-                         :enabled => true)
-    AccountUser.create!(:user => @user,
-                        :account => Account.default,
-                        :role => role)
+    it "should display for users with only :view_all_grades permissions" do
+      user_logged_in
 
-    get "/courses/#{course.id}/gradebook2"
-    expect(flash_message_present?(:error)).to be_falsey
+      role = custom_account_role('CustomAdmin', :account => Account.default)
+      RoleOverride.create!(:role => role,
+                           :permission => 'view_all_grades',
+                           :context => Account.default,
+                           :enabled => true)
+      AccountUser.create!(:user => @user,
+                          :account => Account.default,
+                          :role => role)
+
+      get "/courses/#{course.id}/gradebook2"
+      expect(flash_message_present?(:error)).to be_falsey
+    end
+
+    it "should display for users with only :manage_grades permissions" do
+      user_logged_in
+      role = custom_account_role('CustomAdmin', :account => Account.default)
+      RoleOverride.create!(:role => role,
+                           :permission => 'manage_grades',
+                           :context => Account.default,
+                           :enabled => true)
+      AccountUser.create!(:user => @user,
+                          :account => Account.default,
+                          :role => role)
+
+      get "/courses/#{course.id}/gradebook2"
+      expect(flash_message_present?(:error)).to be_falsey
+    end
   end
 
-  it "should display for users with only :manage_grades permissions" do
-    user_logged_in
-    role = custom_account_role('CustomAdmin', :account => Account.default)
-    RoleOverride.create!(:role => role,
-                         :permission => 'manage_grades',
-                         :context => Account.default,
-                         :enabled => true)
-    AccountUser.create!(:user => @user,
-                        :account => Account.default,
-                        :role => role)
+  context "as a ta" do
 
-    get "/courses/#{course.id}/gradebook2"
-    expect(flash_message_present?(:error)).to be_falsey
+    def disable_view_all_grades
+      RoleOverride.create!(:role => ta_role,
+                            :permission => 'view_all_grades',
+                            :context => Account.default,
+                            :enabled => false)
+    end
+
+    it "should not show gradebook after course conclude if view_all_grades disabled", priority: "1", test_id: 417601 do
+      disable_view_all_grades
+      concluded_course = course_with_ta_logged_in
+      concluded_course.conclude
+      get "/courses/#{@course.id}/gradebook"
+      expect(f('#unauthorized_message')).to be_displayed
+    end
   end
 end

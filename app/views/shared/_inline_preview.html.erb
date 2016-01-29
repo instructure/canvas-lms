@@ -139,10 +139,10 @@
     
     <td id="content_holder">
       <% if @attachment %>
-        <iframe name="content_preview" frameborder="0" id="content_preview" src="<%= context_url(@context, :context_file_url, @attachment.id) %>/<%= @attachment.full_path %>">
+        <iframe name="content_preview" frameborder="0" id="content_preview" src="<%= context_url(@context, :context_file_url, @attachment.id) %>/<%= @attachment.full_path %>" title="<%= t('Preview') %>">
         </iframe>
       <% elsif @tag %>
-        <iframe name="content_preview" frameborder="0" id="content_preview" src="<%= @tag.url %>">
+        <iframe name="content_preview" frameborder="0" id="content_preview" src="<%= @tag.url %>" title="<%= t('Preview') %>">
         </iframe>
       <% end %>
     </td>

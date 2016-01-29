@@ -1,4 +1,4 @@
 <% context ||= @context; asset ||= nil %>
 <% if context && context.is_a?(Course) && asset && @headers != false %>
-  <div id="sequence_footer" data-course-id="<%= context.id %>" data-asset-id="<%= asset.id %>" data-asset-type="<%= Api::API_DATA_TYPE[asset.class.to_s] || asset.class.to_s %>"></div>
+  <div id="sequence_footer" class="ModuleSequenceFooter__Container" data-course-id="<%= context.id %>" data-asset-id="<%= asset.id %>" data-asset-type="<%= Api::API_DATA_TYPE[asset.class.to_s] || asset.class.to_s %>"></div>
 <% end %>

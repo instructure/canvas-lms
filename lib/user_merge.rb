@@ -51,7 +51,7 @@ class UserMerge
       elsif source_cc.active?
         # active, unconfirmed*
         # active, retired
-        target_cc.destroy!
+        target_cc.destroy_permanently!
         if from_user.shard != target_user.shard
           User.clone_communication_channel(source_cc, target_user, max_position)
         end
@@ -61,7 +61,7 @@ class UserMerge
         to_retire = source_cc
       elsif source_cc.unconfirmed?
         # unconfirmed, retired
-        target_cc.destroy!
+        target_cc.destroy_permanently!
         if from_user.shard != target_user.shard
           User.clone_communication_channel(source_cc, target_user, max_position)
         end

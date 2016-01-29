@@ -83,7 +83,7 @@ describe Pseudonym do
 
     expect(pseudonym.root_account_id).to eq 1
   end
-  
+
   it "should find the correct pseudonym for logins" do
     user = User.create!
     p1 = Pseudonym.create!(:unique_id => 'Cody@instructure.com', :user => user)
@@ -99,7 +99,7 @@ describe Pseudonym do
     pseudonym_model
     expect(@pseudonym.user).to eql(@user)
   end
-  
+
   it "should order by position" do
     user_model
     p1 = pseudonym_model(:user_id => @user.id)
@@ -109,19 +109,19 @@ describe Pseudonym do
     p3.move_to_top
     expect(Pseudonym.all.sort.map(&:id)).to eql([p3.id, p2.id, p1.id])
   end
-  
+
   it "should update user account associations on CRUD" do
     account_model
     user_model
     account1 = account_model
     account2 = account_model
     expect(@user.user_account_associations.length).to eql(0)
-    
+
     pseudonym_model(:user => @user, :account => account1)
     @user.reload
     expect(@user.user_account_associations.length).to eql(1)
     expect(@user.user_account_associations.first.account).to eql(account1)
-    
+
     account2 = account_model
     @pseudonym.account = account2
     @pseudonym.save
@@ -209,7 +209,7 @@ describe Pseudonym do
       user_model
       pseudonym_model
     end
-    
+
     it "should offer login as the unique id" do
       expect(@pseudonym.login).to eql(@pseudonym.unique_id)
     end
@@ -292,7 +292,7 @@ describe Pseudonym do
       user_with_pseudonym(:password => 'qwerty')
       expect(@pseudonym.valid_arbitrary_credentials?('qwerty')).to be_truthy
 
-      Account.default.authentication_providers.scoped.delete_all
+      Account.default.authentication_providers.scope.delete_all
       Account.default.authentication_providers.create!(:auth_type => 'ldap')
       @pseudonym.reload
 
@@ -539,7 +539,7 @@ describe Pseudonym do
 
         context "without canvas authentication enabled on the account" do
           before do
-            account1.authentication_providers.scoped.delete_all
+            account1.authentication_providers.scope.delete_all
           end
 
           it "should no longer grant admins :change_password for others on the account" do

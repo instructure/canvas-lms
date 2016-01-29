@@ -34,7 +34,7 @@ describe "discussion availability" do
                                                           message: 'assignment topic message',
                                                           assignment: assignment)
     unlock_at_time = @discussion_topic1.delayed_post_at.strftime('%b %-d')
-    due_at_time = assignment.due_at.strftime('%b %-d at %-l:%M')
+    due_at_time = format_time_for_view(assignment.due_at)
     get "/courses/#{@course.id}/discussion_topics"
     expect(f(" .collectionViewItems .discussion[data-id = '#{@discussion_topic1.id}'] .discussion-date-available")).
                                                                 to include_text("Not available until #{unlock_at_time}")

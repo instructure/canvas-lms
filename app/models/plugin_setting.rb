@@ -126,7 +126,7 @@ class PluginSetting < ActiveRecord::Base
   end
 
   def clear_cache
-    connection.after_transaction_commit do
+    self.class.connection.after_transaction_commit do
       MultiCache.delete(PluginSetting.settings_cache_key(self.name))
     end
   end

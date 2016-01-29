@@ -40,7 +40,7 @@ module BroadcastPolicy
       notification = BroadcastPolicy.notification_finder.by_name(self.dispatch)
       return if notification.nil?
 
-      record.connection.after_transaction_commit do
+      record.class.connection.after_transaction_commit do
         to_list = record.instance_eval(&self.to)
         to_list = Array(to_list).flatten
         next if to_list.empty?
@@ -60,5 +60,5 @@ module BroadcastPolicy
     end
 
   end
-  
+
 end

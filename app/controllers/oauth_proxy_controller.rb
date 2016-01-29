@@ -28,7 +28,7 @@ class OauthProxyController < ApplicationController
       filtered_params = params.keep_if { |k, _| %w(state code).include?(k) }
       url.query = url.query.blank? ? filtered_params.to_query : "#{url.query}&#{filtered_params.to_query}"
       redirect_to url.to_s
-    rescue JSON::JWT::InvalidFormat
+    rescue JSON::JWT::InvalidFormat, Canvas::Security::InvalidToken
       reject! t("Invalid state parameter") and return
     end
   end

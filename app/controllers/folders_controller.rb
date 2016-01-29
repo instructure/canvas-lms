@@ -286,10 +286,10 @@ class FoldersController < ApplicationController
           where("file_state<>'deleted'").
           order(:created_at).to_a
       @attachment = @attachments.pop
-      @attachments.each{|a| a.destroy! }
+      @attachments.each{|a| a.destroy_permanently! }
       last_date = (@folder.active_file_attachments.map(&:updated_at) + @folder.active_sub_folders.by_position.map(&:updated_at)).compact.max
       if @attachment && last_date && @attachment.created_at < last_date
-        @attachment.destroy!
+        @attachment.destroy_permanently!
         @attachment = nil
       end
 

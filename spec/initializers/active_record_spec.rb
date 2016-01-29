@@ -68,7 +68,7 @@ module ActiveRecord
         it "should not use a temp table for a plain query" do
           User.create!
           User.find_in_batches do |batch|
-            expect { User.connection.select_value("SELECT COUNT(*) FROM users_find_in_batches_temp_table_#{User.scoped.to_sql.hash.abs.to_s(36)}") }.to raise_error
+            expect { User.connection.select_value("SELECT COUNT(*) FROM users_find_in_batches_temp_table_#{User.all.to_sql.hash.abs.to_s(36)}") }.to raise_error
           end
         end
 

@@ -223,7 +223,7 @@ module ApplicationHelper
 
   # See `js_base_url`
   def use_optimized_js?
-    if ENV['USE_OPTIMIZED_JS'] == 'true'
+    if ENV['USE_OPTIMIZED_JS'] == 'true' || ENV['USE_OPTIMIZED_JS'] == 'True'
       # allows overriding by adding ?debug_assets=1 or ?debug_js=1 to the url
       !(params[:debug_assets] || params[:debug_js])
     else
@@ -233,7 +233,7 @@ module ApplicationHelper
   end
 
   def use_webpack?
-    if ENV['USE_WEBPACK'].present? && ENV['USE_WEBPACK'] != 'false'
+    if CANVAS_WEBPACK
       !(params[:require_js])
     else
       params[:webpack]
@@ -469,21 +469,12 @@ module ApplicationHelper
   def editor_buttons
     contexts = ContextExternalTool.contexts_to_search(@context)
     return [] if contexts.empty?
-    Rails.cache.fetch((['editor_buttons_for'] + contexts.uniq).cache_key) do
+    cached_tools = Rails.cache.fetch((['editor_buttons_for'] + contexts.uniq).cache_key) do
       tools = ContextExternalTool.shard(@context.shard).active.
           having_setting('editor_button').polymorphic_where(context: contexts)
-      tools.sort_by(&:id).map do |tool|
-        {
-          :name => tool.label_for(:editor_button, I18n.locale),
-          :id => tool.id,
-          :url => tool.editor_button(:url),
-          :icon_url => tool.editor_button(:icon_url),
-          :canvas_icon_class => tool.editor_button(:canvas_icon_class),
-          :width => tool.editor_button(:selection_width),
-          :height => tool.editor_button(:selection_height)
-        }
-      end
+      tools.sort_by(&:id)
     end
+    ContextExternalTool.shard(@context.shard).editor_button_json(cached_tools, @context, @current_user, session)
   end
 
   def nbsp
@@ -703,11 +694,11 @@ module ApplicationHelper
         # if I'm at saltlakeschooldistrict.instructure.com, but I'm only enrolled in classes at
         # Highland High, show Highland's branding even on the dashboard.
         account = @current_user.common_account_chain(@domain_root_account).last
-      else
-        # If we're not logged in, and we're on the dashboard at
-        # saltlakeschooldistrict.instructure.com, just show it's branding
-        account = @domain_root_account
       end
+      # If we're not logged in, or we have no enrollments anywhere in domain_root_account,
+      # and we're on the dashboard at eg: saltlakeschooldistrict.instructure.com, just
+      # show its branding
+      account ||= @domain_root_account
     end
 
     if account && (brand_config = account.effective_brand_config)

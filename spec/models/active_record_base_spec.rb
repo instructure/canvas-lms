@@ -107,7 +107,6 @@ describe ActiveRecord::Base do
     end
 
     it "should multi-column pluck" do
-      skip "Rails 4 specific" if CANVAS_RAILS3
       scope = Course.where(id: [@c1, @c2])
       cs = []
       scope.find_in_batches_with_temp_table(batch_size: 1, pluck: [:id, :name]) do |batch|
@@ -145,7 +144,10 @@ describe ActiveRecord::Base do
     end
 
     it "should raise an error when start is used with group" do
-      expect { Account.group(:id).find_each(start: 0) }.to raise_error(ArgumentError)
+      expect {
+        Account.group(:id).find_each(start: 0) do
+        end
+      }.to raise_error(ArgumentError)
     end
   end
 
@@ -295,12 +297,13 @@ describe ActiveRecord::Base do
       User.create
       User.cache do
         User.first
+
         User.connection.expects(:select).never
         User.first
         User.connection.unstub(:select)
 
         User.create!
-        User.connection.expects(:select).once.returns([])
+        User.connection.expects(:select).once.returns(CANVAS_RAILS4_0 ? [] : ActiveRecord::Result.new([], []))
         User.first
       end
     end
@@ -316,7 +319,7 @@ describe ActiveRecord::Base do
         u2 = User.new
         u2.id = u.id
         expect{ u2.save! }.to raise_error(ActiveRecord::RecordNotUnique)
-        User.connection.expects(:select).once.returns([])
+        User.connection.expects(:select).once.returns(CANVAS_RAILS4_0 ? [] : ActiveRecord::Result.new([], []))
         User.first
       end
     end
@@ -541,9 +544,20 @@ describe ActiveRecord::Base do
       u = User.create!
       p1 = u.pseudonyms.create!(unique_id: 'a', account: Account.default)
       p2 = u.pseudonyms.create!(unique_id: 'b', account: Account.default)
-      u.pseudonyms.scoped.reorder("unique_id DESC").limit(1).delete_all
+      u.pseudonyms.reorder("unique_id DESC").limit(1).delete_all
       p1.reload
       expect { p2.reload }.to raise_error(ActiveRecord::RecordNotFound)
+    end
+
+    it "does offset too" do
+      u = User.create!
+      p1 = u.pseudonyms.create!(unique_id: 'a', account: Account.default)
+      p2 = u.pseudonyms.create!(unique_id: 'b', account: Account.default)
+      p3 = u.pseudonyms.create!(unique_id: 'c', account: Account.default)
+      u.pseudonyms.scoped.reorder("unique_id DESC").limit(1).offset(1).delete_all
+      p1.reload
+      expect { p2.reload }.to raise_error(ActiveRecord::RecordNotFound)
+      p3.reload
     end
   end
 
@@ -562,7 +576,7 @@ describe ActiveRecord::Base do
 
   describe ".polymorphic_where" do
     it "should work" do
-      relation = Assignment.scoped
+      relation = Assignment.all
       user1 = User.create!
       account1 = Account.create!
       relation.expects(:where).with("(context_id=? AND context_type=?) OR (context_id=? AND context_type=?)", user1, 'User', account1, 'Account')
@@ -570,7 +584,7 @@ describe ActiveRecord::Base do
     end
 
     it "should work with NULLs" do
-      relation = Assignment.scoped
+      relation = Assignment.all
       user1 = User.create!
       account1 = Account.create!
       relation.expects(:where).with("(context_id=? AND context_type=?) OR (context_id=? AND context_type=?) OR (context_id IS NULL AND context_type IS NULL)", user1, 'User', account1, 'Account')
@@ -623,8 +637,8 @@ describe ActiveRecord::Base do
       class MockAccount < Account
         include RSpec::Matchers
         before_save do
-          expect(Account.scoped.to_sql).not_to match /callbacks something/
-          expect(MockAccount.scoped.to_sql).not_to match /callbacks something/
+          expect(Account.all.to_sql).not_to match /callbacks something/
+          expect(MockAccount.all.to_sql).not_to match /callbacks something/
           true
         end
       end
@@ -636,6 +650,14 @@ describe ActiveRecord::Base do
 
     it "should use default scope" do
       MockAccount.where(name: 'callbacks something').create!
+    end
+  end
+
+  describe "not_recently_touched" do
+    it "should work with joins" do
+      Setting.set('touch_personal_space', '1')
+      group_model
+      expect(@group.users.not_recently_touched.to_a).to be_empty
     end
   end
 end

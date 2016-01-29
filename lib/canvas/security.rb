@@ -147,6 +147,10 @@ module Canvas::Security
       rescue JSON::JWS::VerificationFailed
         # Keep looping, to try all the keys. If none succeed,
         # we raise below.
+      rescue Canvas::Security::TokenExpired => expired_exception
+        raise expired_exception
+      rescue => e
+        raise Canvas::Security::InvalidToken, e
       end
     end
 

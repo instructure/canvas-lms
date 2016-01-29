@@ -44,7 +44,7 @@ Rails.application.config.to_prepare do
         return {} unless self.class.columns_hash.key?('settings')
         s = super
         unless s.is_a?(Hash) || s.nil?
-          s = CANVAS_RAILS3 ? s.unserialize : s.unserialize(s.value)
+          s = s.unserialize(s.value)
         end
         if s.nil?
           self.settings = s = {}
@@ -94,9 +94,7 @@ Rails.application.config.to_prepare do
 
     # the default shard was already loaded, but didn't deserialize it
     if default.is_a?(self) && default.instance_variable_get(:@attributes)['settings'].is_a?(String)
-      settings = ActiveRecord::AttributeMethods::Serialization::Attribute.new(serialized_attributes['settings'],
-                                                                   default.instance_variable_get(:@attributes)['settings'],
-                                                                   :serialized).unserialized_value
+      settings = serialized_attributes['settings'].load(default.read_attribute('settings'))
       default.settings = settings
     end
 
@@ -116,7 +114,7 @@ Rails.application.config.to_prepare do
     scope :in_current_region, -> do
       @current_region_scope ||=
         if !ApplicationController.region || DatabaseServer.all.all? { |db| !db.config[:region] }
-          scoped
+          all
         else
           in_region(ApplicationController.region)
         end

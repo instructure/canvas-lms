@@ -52,8 +52,8 @@ class AccountNotification < ActiveRecord::Base
         end
 
         # preload role objects for those enrollments and account users
-        ActiveRecord::Associations::Preloader.new(enrollments, [:role]).run
-        ActiveRecord::Associations::Preloader.new(account_users, [:role]).run
+        ActiveRecord::Associations::Preloader.new.preload(enrollments, [:role])
+        ActiveRecord::Associations::Preloader.new.preload(account_users, [:role])
 
         # map to role ids. user role.id instead of role_id to trigger Role#id
         # magic for built in roles. announcements intended for users not

@@ -92,7 +92,7 @@ class ContentTag < ActiveRecord::Base
   end
 
   def touch_context_module_after_transaction
-    connection.after_transaction_commit {
+    self.class.connection.after_transaction_commit {
       touch_context_module
     }
   end
@@ -315,7 +315,7 @@ class ContentTag < ActiveRecord::Base
     true
   end
 
-  alias_method :destroy!, :destroy
+  alias_method :destroy_permanently!, :destroy
   def destroy
     unless can_destroy?
       raise LastLinkToOutcomeNotDestroyed.new('Link is the last link to an aligned outcome. Remove the alignment and then try again')

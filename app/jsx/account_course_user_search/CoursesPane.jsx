@@ -91,7 +91,7 @@ define([
           />
 
           {courses && courses.data &&
-            <CoursesList courses={courses.data} />
+            <CoursesList accountId={this.props.accountId} courses={courses.data} />
           }
 
           {renderSearchMessage(courses, this.fetchMoreCourses, I18n.t("No courses found"))}

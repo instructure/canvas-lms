@@ -307,20 +307,41 @@ describe "submissions" do
       expect(tooltip_text_elements[1].text).to eq 'submitted'
     end
 
+    context 'with Canvadocs enabled' do
+      before(:once) do
+        PluginSetting.create! name: 'canvadocs',
+                              settings: {"api_key" => "blahblahblahblahblah",
+                                            "base_url" => "http://example.com",
+                                            "disabled" => false}
+      end
+
+      it "should show preview link after submitting a canvadocable file type", priority: "1", test_id: 587302 do
+        @assignment.submission_types = 'online_upload'
+        @assignment.save!
+
+        # Add a fake pdf, which is a canvadocable file type
+        file_attachment = attachment_model(content_type: 'application/pdf', context: @student)
+        @assignment.submit_homework(@student, submission_type: 'online_upload', attachments: [file_attachment])
+
+        # Open assignment
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+
+        # Enter Submission Details page
+        fj(".forward:contains('Submission Details')").click
+        wait_for_ajaximations
+
+        # Expect preview link to exist
+        driver.switch_to.frame(f('#preview_frame'))
+        expect(f('.modal_preview_link')).to be
+      end
+    end
+
     describe 'uploaded files for submission' do
       include_context "in-process server selenium tests"
 
       def fixture_file_path(file)
         path = ActionController::TestCase.respond_to?(:fixture_path) ? ActionController::TestCase.send(:fixture_path) : nil
         return "#{path}#{file}"
-      end
-
-      def add_file(fixture, context, name)
-        context.attachments.create! do |attachment|
-          attachment.uploaded_data = fixture
-          attachment.filename = name
-          attachment.folder = Folder.root_folders(context).first
-        end
       end
 
       def make_folder_actions_visible

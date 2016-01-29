@@ -75,6 +75,8 @@ describe "discussions" do
           topic.save!
 
           get url
+
+          wait_for_ajaximations
           expect(f('.topic-unsubscribe-button')).not_to be_displayed
           expect(f('.topic-subscribe-button')).not_to be_displayed
 

@@ -23,11 +23,10 @@ define [
       if @component
         React.unmountComponentAtNode(@component.getDOMNode().parentNode)
 
-  test 'should render div.card per provided courseCard', ->
+  test 'should render div.ic-DashboardCard per provided courseCard', ->
     CardBox = React.createElement(DashboardCardBox, {
       courseCards: @courseCards
     })
     @component = TestUtils.renderIntoDocument(CardBox)
     $html = $(@component.getDOMNode())
-    ok $html.attr('class').match(/Box/)
-    equal $html.children('div.card').length, @courseCards.length
+    equal $html.children('div.ic-DashboardCard').length, @courseCards.length

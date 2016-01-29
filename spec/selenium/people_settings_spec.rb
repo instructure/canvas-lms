@@ -3,6 +3,12 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 describe "course people" do
   include_context "in-process server selenium tests"
 
+  before(:all) do
+    # in the people table, the kyle menu can be off the screen
+    # and uninteractable if the window is too small
+    driver.manage.window.maximize
+  end
+
   before (:each) do
     course_with_teacher_logged_in :limit_privileges_to_course_section => false
     @account = @course.account # for custom roles

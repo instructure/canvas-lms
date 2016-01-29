@@ -79,6 +79,25 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     expect(stats[:submission_scores]).to eq({ 50 => 1, 57 => 1, 67 => 1 })
   end
 
+  it 'should create quiz statistics with essay questions and anonymous submissions' do
+    @user1 = User.create! :name => "some_user 1"
+    student_in_course :course => @course, :user => @user1
+    quiz = @course.quizzes.create!
+    quiz.update_attributes(:published_at => Time.zone.now, :quiz_type => 'survey', :anonymous_submissions => true)
+    quiz.quiz_questions.create!(question_data: essay_question_data)
+    quiz.generate_quiz_data
+    quiz.save
+    qs = quiz.generate_submission(@user1)
+    qs.submission_data = { "question_#{quiz.quiz_data[0][:id]}" => "Essay response user 1" }
+    qs.workflow_state = 'complete'
+    qs.save
+    expect do
+      quiz.quiz_statistics.build(:report_type => 'student_analysis',
+                                 :includes_all_versions => true,
+                                 :anonymous => true).report.generate(false)
+    end.to_not raise_error
+  end
+
   context "csv" do
 
     def temporary_user_code
@@ -264,7 +283,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
       account2 = Account.create!
       HostUrl.stubs(:context_host).returns('school')
       HostUrl.expects(:context_host).with(account2).returns('school1')
-      @student.pseudonyms.scoped.delete_all
+      @student.pseudonyms.scope.delete_all
       account2.pseudonyms.create!(user: @student, unique_id: 'user') { |p| p.sis_user_id = 'sisid' }
       @quiz.context.root_account.any_instantiation.stubs(:trust_exists?).returns(true)
       @quiz.context.root_account.any_instantiation.stubs(:trusted_account_ids).returns([account2.id])

@@ -41,7 +41,7 @@ describe "interaction with differentiated discussions" do
       it "should redirect back to discussion index from inaccessible discussions" do
         create_section_override_for_assignment(@da_discussion.assignment) #on default section
         @da_discussion.reply_from(:user => @user, :text => 'hello')
-        @da_discussion.assignment.assignment_overrides.each(&:destroy!)
+        @da_discussion.assignment.assignment_overrides.each(&:destroy_permanently!)
         create_section_override_for_assignment(@da_discussion.assignment, course_section: @section1)
         get "/courses/#{@course.id}/discussion_topics/#{@da_discussion.id}"
         keep_trying_until { expect(f("#flash_message_holder")).to include_text("You do not have access to the requested discussion.") }
@@ -113,7 +113,7 @@ describe "interaction with differentiated discussions" do
       it "should redirect back to discussion index from inaccessible discussions" do
         create_section_override_for_assignment(@da_discussion.assignment) #on default section
         @da_discussion.reply_from(:user => @user, :text => 'hello')
-        @da_discussion.assignment.assignment_overrides.each(&:destroy!)
+        @da_discussion.assignment.assignment_overrides.each(&:destroy_permanently!)
         create_section_override_for_assignment(@da_discussion.assignment, course_section: @section1)
         get "/courses/#{@course.id}/discussion_topics/#{@da_discussion.id}"
         keep_trying_until { expect(f("#flash_message_holder")).to include_text("You do not have access to the requested discussion.") }

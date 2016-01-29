@@ -433,7 +433,7 @@ class OutcomeResultsController < ApplicationController
           @outcome_links += ContentTag.learning_outcome_links.active.where(associated_asset_id: outcome_group_ids_slice)
         end
         @outcome_links.each_slice(100) do |outcome_links_slice|
-          ActiveRecord::Associations::Preloader.new(outcome_links_slice, :learning_outcome_content).run
+          ActiveRecord::Associations::Preloader.new.preload(outcome_links_slice, :learning_outcome_content)
         end
         @outcomes = @outcome_links.map(&:learning_outcome_content)
       end

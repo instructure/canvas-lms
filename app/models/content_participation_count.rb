@@ -105,7 +105,7 @@ class ContentParticipationCount < ActiveRecord::Base
   end
 
   def unread_count(refresh = true)
-    refresh_unread_count if refresh && !frozen? && ttl.present? && self.updated_at.utc < ttl.ago.utc
+    refresh_unread_count if refresh && !frozen? && ttl.present? && self.updated_at.utc < ttl.seconds.ago.utc
     read_attribute(:unread_count)
   end
 

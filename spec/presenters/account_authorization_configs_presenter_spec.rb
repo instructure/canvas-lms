@@ -223,7 +223,7 @@ describe AccountAuthorizationConfigsPresenter do
       config = AccountAuthorizationConfig::SAML.new
       config2 = AccountAuthorizationConfig::SAML.new
       pre_configs = [stub, config, stub, config2]
-      pre_configs.stubs(:scoped).returns(AccountAuthorizationConfig)
+      pre_configs.stubs(:all).returns(AccountAuthorizationConfig)
       account = stubbed_account(pre_configs)
       configs = described_class.new(account).saml_configs
       expect(configs[0]).to eq(config)
@@ -238,7 +238,7 @@ describe AccountAuthorizationConfigsPresenter do
     let(:account){ stubbed_account(configs) }
 
     before do
-      configs.stubs(:scoped).returns(AccountAuthorizationConfig)
+      configs.stubs(:all).returns(AccountAuthorizationConfig)
     end
 
     it "generates a list from the saml config size" do

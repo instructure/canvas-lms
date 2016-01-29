@@ -40,7 +40,11 @@ define [
 
     ok component.shouldComponentUpdate({}, {
       workflow_state: 'running'
-    }), 'should update when state changes'
+    }), 'should update when workflow_state changes'
+
+    ok component.shouldComponentUpdate({}, {
+      completion: 10
+    }), 'should update when completion level changes'
 
     component.setProps(progress_id: @progress_id)
     component.setState(workflow_state: 'running')
@@ -48,6 +52,7 @@ define [
     ok !component.shouldComponentUpdate({
       progress_id: @progress_id
     }, {
+      completion: component.state.completion,
       workflow_state: component.state.workflow_state
     }), 'should not update if state & props are the same'
 

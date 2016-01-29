@@ -28,14 +28,14 @@ module Api::V1::User
 
   def user_json_preloads(users, preload_email=false)
     # for User#account
-    ActiveRecord::Associations::Preloader.new(users, :pseudonym => :account).run
+    ActiveRecord::Associations::Preloader.new.preload(users, :pseudonym => :account)
 
     # pseudonyms for User#sis_pseudoym_for and User#find_pseudonym_for_account
     # pseudonyms account for Pseudonym#works_for_account?
-    ActiveRecord::Associations::Preloader.new(users, pseudonyms: :account).run if user_json_is_admin?
+    ActiveRecord::Associations::Preloader.new.preload(users, pseudonyms: :account) if user_json_is_admin?
     if preload_email && (no_email_users = users.reject(&:email_cached?)).present?
       # communication_channels for User#email if it is not cached
-      ActiveRecord::Associations::Preloader.new(no_email_users, :communication_channels).run
+      ActiveRecord::Associations::Preloader.new.preload(no_email_users, :communication_channels)
     end
   end
 
@@ -109,7 +109,7 @@ module Api::V1::User
   def users_json(users, current_user, session, includes = [], context = @context, enrollments = nil, excludes = [])
 
     if includes.include?('sections')
-      ActiveRecord::Associations::Preloader.new(users, enrollments: :course_section).run
+      ActiveRecord::Associations::Preloader.new.preload(users, enrollments: :course_section)
     end
 
     users.map{ |user| user_json(user, current_user, session, includes, context, enrollments, excludes) }

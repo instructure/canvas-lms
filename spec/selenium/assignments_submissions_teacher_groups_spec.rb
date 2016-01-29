@@ -14,11 +14,13 @@ describe 'submissions' do
     it 'Should be able to create group assignments in a new assignment', priority: "1", test_id: 56751 do
       group_test_setup(3,3,1)
       create_assignment_with_group_category
-      f('button[type="submit"]').click
-      wait_for_ajaximations
+      expect_new_page_load do
+        f('button[type="submit"]').click
+      end
 
-      f('.edit_assignment_link').click
-      wait_for_ajaximations
+      expect_new_page_load do
+        f('.edit_assignment_link').click
+      end
 
       expect(is_checked('input[type=checkbox][name=has_group_category]')).to be_truthy
       expect(fj('#assignment_group_category_id:visible')).to include_text(@group_category[0].name)
@@ -29,20 +31,20 @@ describe 'submissions' do
                                                 points_possible: 50, submission_types: 'online_text_entry')
       group_test_setup(3,3,1)
 
-      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-      f('.icon-edit').click
-      wait_for_ajaximations
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
 
       f('#has_group_category').click
       f('#assignment_group_category_id').click
       f('#assignment_group_category_id').send_keys :arrow_up
       f('#assignment_group_category_id').send_keys :return
 
-      f('button[type="submit"]').click
-      wait_for_ajaximations
+      expect_new_page_load do
+        f('button[type="submit"]').click
+      end
 
-      f('.edit_assignment_link').click
-      wait_for_ajaximations
+      expect_new_page_load do
+        f('.edit_assignment_link').click
+      end
 
       expect(is_checked('input[type=checkbox][name=has_group_category]')).to be_truthy
       expect(fj('#assignment_group_category_id:visible')).to include_text(@group_category[0].name)
@@ -50,7 +52,6 @@ describe 'submissions' do
 
     it 'Should be able to create a new student group category from the assignment edit page', priority: "1", test_id: 56752 do
       create_assignment_with_group_category
-      wait_for_ajaximations
 
       f('input[name="category[split_groups]"]').click
       f('button[type="submit"]').click

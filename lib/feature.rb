@@ -369,12 +369,6 @@ END
       development: true,
       root_opt_in: true
     },
-    'moderated_grading' => {
-      display_name: -> { I18n.t('Moderated Grading') },
-      description: -> { I18n.t('Moderated Grading allows multiple graders to grade selected assignments independently, with a moderator providing the final grade.') },
-      applies_to: 'Course',
-      state: 'on'
-    },
     'gradebook_performance' => {
       display_name: -> { I18n.t('Gradebook Performance') },
       description: -> { I18n.t('Performance enhancements for the Gradebook') },
@@ -393,7 +387,7 @@ END
       display_name: -> { I18n.t('International SMS') },
       description: -> { I18n.t('Allows users with international phone numbers to receive text messages from Canvas.') },
       applies_to: 'RootAccount',
-      state: 'on',
+      state: 'hidden',
       root_opt_in: true
     },
     'international_sms_from_recipient_country' => {

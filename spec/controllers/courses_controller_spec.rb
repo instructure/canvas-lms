@@ -320,7 +320,7 @@ describe CoursesController do
         expect(assigns[:future_enrollments].map(&:course_id)).to eq [course1.id]
       end
 
-      it "should be empty if the caller is a student or observer and the root account restricts students viewing courses before the start date" do
+      it "should not be empty if the caller is a student or observer and the root account restricts students viewing courses before the start date" do
         course1 = Account.default.courses.create! start_at: 1.month.from_now, restrict_enrollments_to_course_dates: true
         course1.offer!
         enrollment1 = course_with_student course: course1
@@ -333,7 +333,7 @@ describe CoursesController do
         expect(response).to be_success
         expect(assigns[:past_enrollments]).to be_empty
         expect(assigns[:current_enrollments]).to be_empty
-        expect(assigns[:future_enrollments]).to be_empty
+        expect(assigns[:future_enrollments]).to eq [enrollment1]
 
         observer = user_with_pseudonym(active_all: true)
         o = @student.user_observers.build; o.observer = observer; o.save!
@@ -342,7 +342,7 @@ describe CoursesController do
         expect(response).to be_success
         expect(assigns[:past_enrollments]).to be_empty
         expect(assigns[:current_enrollments]).to be_empty
-        expect(assigns[:future_enrollments]).to be_empty
+        expect(assigns[:future_enrollments]).to eq [observer.enrollments.first]
 
         teacher = user_with_pseudonym(:active_all => true)
         teacher_enrollment = course_with_teacher course: course1, :user => teacher

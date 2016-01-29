@@ -261,7 +261,7 @@ class LearningOutcome < ActiveRecord::Base
     self.data[:rubric_criterion] = criterion
   end
 
-  alias_method :destroy!, :destroy
+  alias_method :destroy_permanently!, :destroy
   def destroy
     # delete any remaining links to the outcome. in case of UI, this was
     # triggered by ContentTag#destroy and the checks have already run, we don't

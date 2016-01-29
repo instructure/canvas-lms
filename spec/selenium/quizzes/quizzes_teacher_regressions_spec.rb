@@ -7,12 +7,7 @@ describe 'quizzes regressions' do
   include QuizzesCommon
   include AssignmentOverridesSeleniumHelper
 
-  before(:each) do
-    course_with_teacher_logged_in
-    @course.update_attributes(name: 'teacher course')
-    @course.save!
-    @course.reload
-  end
+  before(:each) { course_with_teacher_logged_in(course_name: 'teacher course') }
 
   it 'calendar pops up on top of #main', priority: "1", test_id: 209957 do
     get "/courses/#{@course.id}/quizzes/new"
@@ -89,19 +84,10 @@ describe 'quizzes regressions' do
     end
   end
 
-  it 'creates assignment with default due date', priority: "1", test_id: 209960 do
-    skip('daylight savings time fix')
-    get "/courses/#{@course.id}/quizzes/new"
-    wait_for_ajaximations
-    fill_assignment_overrides
-    replace_content(f('#quiz_title'), 'VDD Quiz')
-
-    expect_new_page_load do
-      click_save_settings_button
-      wait_for_ajax_requests
-    end
-
-    compare_assignment_times(Quizzes::Quiz.where(title: 'VDD Quiz').first)
+  it 'quiz show page displays the quiz due date', priority: "1", test_id: 209960 do
+    due_date = Time.zone.now + 4.days
+    create_quiz_with_due_date(due_at: due_date)
+    verify_quiz_show_page_due_date(format_date_for_view(due_date))
   end
 
   it 'doesn\'t show \'use for grading\' as an option in rubrics', priority: "2", test_id: 209962 do

@@ -393,7 +393,7 @@ describe EventStream::Index do
           # force Time.now and scrollback_limit into one bucket, but oldest in
           # an earlier bucket
           @index.scrollback_limit 1.minute
-          scrollback_limit = @index.scrollback_limit.ago
+          scrollback_limit = @index.scrollback_limit.seconds.ago
           @index.bucket_size scrollback_limit.to_i - 1
           bucket = @index.bucket_for_time(scrollback_limit)
 

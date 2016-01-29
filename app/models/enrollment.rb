@@ -75,7 +75,7 @@ class Enrollment < ActiveRecord::Base
   after_save :touch_graders_if_needed
   after_save :reset_notifications_cache
 
-  attr_accessor :already_enrolled, :available_at
+  attr_accessor :already_enrolled, :available_at, :soft_completed_at
   attr_accessible :user, :course, :workflow_state, :course_section, :limit_privileges_to_course_section, :already_enrolled, :start_at, :end_at
 
   scope :current, -> { joins(:course).where(QueryBuilder.new(:active).conditions).readonly(false) }
@@ -671,6 +671,7 @@ class Enrollment < ActiveRecord::Base
     # Not strictly within any range
     return state unless global_start_at = ranges.map(&:compact).map(&:min).compact.min
     if global_start_at < now
+      self.soft_completed_at = ranges.map(&:last).compact.min
       self.restrict_past_view? ? :inactive : :completed
     elsif self.fake_student? # Allow student view students to use the course before the term starts
       state
@@ -721,23 +722,19 @@ class Enrollment < ActiveRecord::Base
   end
 
   def completed?
-    state_based_on_date == :completed
+    s = self.state_based_on_date
+    (s == :completed) || (s == :inactive && !!completed_at)
   end
 
   def explicitly_completed?
     state == :completed
   end
 
-  def soft_completed_at
-    enrollment_dates.map(&:last).compact.min
-  end
-  protected :soft_completed_at
-
   def completed_at
-    read_attribute(:completed_at) || (completed? ? soft_completed_at : nil)
+    self.read_attribute(:completed_at) || (self.state_based_on_date && self.soft_completed_at) # soft_completed_at is loaded through state_based_on_date
   end
 
-  alias_method :destroy!, :destroy
+  alias_method :destroy_permanently!, :destroy
   def destroy
     self.workflow_state = 'deleted'
     result = self.save
@@ -751,6 +748,7 @@ class Enrollment < ActiveRecord::Base
 
   def restore
     self.workflow_state = 'active'
+    self.completed_at = nil
     self.save
   end
 
@@ -1058,7 +1056,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   def self.top_enrollment_by(key, rank_order = :default)
-    raise "top_enrollment_by_user must be scoped" unless scoped.where_values.present?
+    raise "top_enrollment_by_user must be scoped" unless all.where_values.present?
     key = key.to_s
     order("#{key}, #{type_rank_sql(rank_order)}").distinct_on(key)
   end
@@ -1157,7 +1155,7 @@ class Enrollment < ActiveRecord::Base
 
   def touch_graders_if_needed
     if !active_student? && active_student?(:was) && self.course.submissions.where(:user_id => self.user_id).exists?
-      connection.after_transaction_commit do
+      self.class.connection.after_transaction_commit do
         User.where(id: self.course.admins).touch_all
       end
     end

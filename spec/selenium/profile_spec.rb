@@ -14,7 +14,7 @@ describe "profile" do
   def add_skype_service
     f('#unregistered_service_skype > a').click
     skype_dialog = f('#unregistered_service_skype_dialog')
-    skype_dialog.find_element(:id, 'user_service_user_name').send_keys("jakesorce")
+    skype_dialog.find_element(:id, 'skype_user_service_user_name').send_keys("jakesorce")
     submit_dialog(skype_dialog, '.btn')
     wait_for_ajaximations
     expect(f('#registered_services')).to include_text("Skype")
@@ -80,6 +80,7 @@ describe "profile" do
     end
 
     it "should add a new email address on profile settings page" do
+      @user.account.enable_feature!(:international_sms)
       notification_model(:category => 'Grading')
       notification_policy_model(:notification_id => @notification.id)
 
@@ -161,6 +162,7 @@ describe "profile" do
     end
 
     it "should add another contact method - sms" do
+      @user.account.enable_feature!(:international_sms)
       test_cell_number = '8017121011'
       get "/profile/settings"
       f('.add_contact_link').click

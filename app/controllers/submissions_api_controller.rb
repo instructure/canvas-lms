@@ -844,8 +844,8 @@ class SubmissionsApiController < ApplicationController
   def bulk_load_attachments_and_previews(submissions)
     Submission.bulk_load_versioned_attachments(submissions)
     attachments = submissions.flat_map &:versioned_attachments
-    ActiveRecord::Associations::Preloader.new(attachments,
-      [:canvadoc, :crocodoc_document]).run
+    ActiveRecord::Associations::Preloader.new.preload(attachments,
+      [:canvadoc, :crocodoc_document])
   end
 
   def bulk_process_submissions_for_visibility(submissions_scope, includes)

@@ -29,11 +29,13 @@ module Canvas
             account_id: @account.try(:global_id),
             type: @type,
           },
+          user: {
+            id: @user.try(:global_id),
+          },
           extra: {
             request_context_id: @rci,
             request_method: @req.request_method_symbol,
             format: @req.format,
-            user_id: @user.try(:global_id),
           }.merge(self.class.useful_http_env_stuff_from_request(@req))
                    .merge(self.class.useful_http_headers(@req))
                    .merge(@canvas_error_info)

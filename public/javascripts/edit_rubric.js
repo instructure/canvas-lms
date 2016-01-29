@@ -1009,4 +1009,3 @@ define([
 
   return rubricEditing;
 });
-

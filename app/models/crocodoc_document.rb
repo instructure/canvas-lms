@@ -96,11 +96,7 @@ class CrocodocDocument < ActiveRecord::Base
       opts[:filter] = user.crocodoc_id!
     end
 
-    submissions = attachment.attachment_associations.
-      where(:context_type => 'Submission').
-      preload(context: [:assignment]).
-      map(&:context)
-
+    submissions = self.submissions.preload(:assignment)
     if submissions.any? { |s| s.grants_right? user, :read_grade }
       opts[:filter] = 'all'
 

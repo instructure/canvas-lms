@@ -22,8 +22,6 @@ require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 describe 'Moderated Grades API', type: :request do
   before :once do
     course_with_teacher_logged_in active_all: true
-    @course.root_account.allow_feature! :moderated_grading
-    @course.enable_feature! :moderated_grading
     @assignment = @course.assignments.create! name: "asdf"
     @assignment.update_attribute :moderated_grading, true
     @student1, @student2 = n_students_in_course(2)

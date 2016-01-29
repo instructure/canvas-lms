@@ -127,7 +127,7 @@ class AccountAuthorizationConfig < ActiveRecord::Base
     enable_canvas_authentication
     send_later_if_production(:soft_delete_pseudonyms)
   end
-  alias_method :destroy!, :destroy
+  alias_method :destroy_permanently!, :destroy
 
   def auth_password=(password)
     return if password.blank?

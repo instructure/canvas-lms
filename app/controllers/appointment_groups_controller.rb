@@ -257,7 +257,7 @@ class AppointmentGroupsController < ApplicationController
       api_v1_appointment_groups_url(:scope => params[:scope])
     )
     if params[:include]
-      ActiveRecord::Associations::Preloader.new(groups,
+      ActiveRecord::Associations::Preloader.new.preload(groups,
                             [{:appointments =>
                                [:parent_event,
                                 {:context =>
@@ -270,9 +270,9 @@ class AppointmentGroupsController < ApplicationController
                                      [:parent_event,
                                       :context]}]}]},
                              {:appointment_group_contexts => :context},
-                             :appointment_group_sub_contexts]).run
+                             :appointment_group_sub_contexts])
     end
-    render :json => groups.map{ |group| appointment_group_json(group, @current_user, session, :include => params[:include]) } 
+    render :json => groups.map{ |group| appointment_group_json(group, @current_user, session, :include => params[:include]) }
   end
 
   # @API Create an appointment group
@@ -333,17 +333,17 @@ class AppointmentGroupsController < ApplicationController
   # @example_request
   #
   #   curl 'https://<canvas>/api/v1/appointment_groups.json' \
-  #        -X POST \ 
-  #        -F 'appointment_group[context_codes][]=course_123' \ 
-  #        -F 'appointment_group[sub_context_codes][]=course_section_234' \ 
-  #        -F 'appointment_group[title]=Final Presentation' \ 
+  #        -X POST \
+  #        -F 'appointment_group[context_codes][]=course_123' \
+  #        -F 'appointment_group[sub_context_codes][]=course_section_234' \
+  #        -F 'appointment_group[title]=Final Presentation' \
   #        -F 'appointment_group[participants_per_appointment]=1' \
   #        -F 'appointment_group[min_appointments_per_participant]=1' \
   #        -F 'appointment_group[max_appointments_per_participant]=1' \
-  #        -F 'appointment_group[new_appointments][0][]=2012-07-19T21:00:00Z' \ 
-  #        -F 'appointment_group[new_appointments][0][]=2012-07-19T22:00:00Z' \ 
-  #        -F 'appointment_group[new_appointments][1][]=2012-07-19T22:00:00Z' \ 
-  #        -F 'appointment_group[new_appointments][1][]=2012-07-19T23:00:00Z' \ 
+  #        -F 'appointment_group[new_appointments][0][]=2012-07-19T21:00:00Z' \
+  #        -F 'appointment_group[new_appointments][0][]=2012-07-19T22:00:00Z' \
+  #        -F 'appointment_group[new_appointments][1][]=2012-07-19T22:00:00Z' \
+  #        -F 'appointment_group[new_appointments][1][]=2012-07-19T23:00:00Z' \
   #        -H "Authorization: Bearer <token>"
   def create
     contexts = get_contexts
@@ -441,7 +441,7 @@ class AppointmentGroupsController < ApplicationController
   # @example_request
   #
   #   curl 'https://<canvas>/api/v1/appointment_groups/543.json' \
-  #        -X PUT \ 
+  #        -X PUT \
   #        -F 'appointment_group[publish]=1' \
   #        -H "Authorization: Bearer <token>"
   def update
@@ -460,7 +460,7 @@ class AppointmentGroupsController < ApplicationController
 
   # @API Delete an appointment group
   #
-  # Delete an appointment group (and associated time slots and reservations) 
+  # Delete an appointment group (and associated time slots and reservations)
   # and return the deleted group
   #
   # @argument cancel_reason [String]
@@ -469,8 +469,8 @@ class AppointmentGroupsController < ApplicationController
   # @example_request
   #
   #   curl 'https://<canvas>/api/v1/appointment_groups/543.json' \
-  #        -X DELETE \ 
-  #        -F 'cancel_reason=El Tigre Chino got fired' \ 
+  #        -X DELETE \
+  #        -F 'cancel_reason=El Tigre Chino got fired' \
   #        -H "Authorization: Bearer <token>"
   def destroy
     if authorized_action(@group, @current_user, :delete)

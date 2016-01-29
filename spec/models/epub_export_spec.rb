@@ -47,11 +47,6 @@ describe EpubExport do
         expect(epub_export.workflow_state).to eq 'exporting'
       end
 
-      it "should set job_progress completion to 25%" do
-        epub_export.export_without_send_later
-        expect(epub_export.job_progress.completion).to eq 25.0
-      end
-
       it "should start job_progress" do
         epub_export.export_without_send_later
         expect(epub_export.job_progress.reload.running?).to be_truthy
@@ -83,8 +78,8 @@ describe EpubExport do
         expect(epub_export.workflow_state).to eq 'exported'
       end
 
-      it "should set job_progress completion to 50" do
-        expect(epub_export.job_progress.completion).to eq 50.0
+      it "should update job_progress completion" do
+        expect(epub_export.job_progress.completion).to eq EpubExport::PERCENTAGE_COMPLETE[:exported]
       end
     end
 
@@ -106,9 +101,9 @@ describe EpubExport do
       end
     end
 
-    it "should set job_progress completion to 75" do
+    it "should update job_progress completion" do
       epub_export.generate_without_send_later
-      expect(epub_export.job_progress.completion).to eq 75.0
+      expect(epub_export.job_progress.completion).to eq EpubExport::PERCENTAGE_COMPLETE[:generating]
     end
 
     it "should set state to generating" do

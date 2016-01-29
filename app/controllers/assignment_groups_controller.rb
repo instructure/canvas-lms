@@ -105,7 +105,7 @@ class AssignmentGroupsController < ApplicationController
   #
   # @returns [AssignmentGroup]
   def index
-    if authorized_action(@context.assignment_groups.scoped.new, @current_user, :read)
+    if authorized_action(@context.assignment_groups.scope.new, @current_user, :read)
       groups = Api.paginate(@context.assignment_groups.active, self, api_v1_course_assignment_groups_url(@context))
 
       assignments = if include_params.include?('assignments')
@@ -127,7 +127,7 @@ class AssignmentGroupsController < ApplicationController
   end
 
   def reorder
-    if authorized_action(@context.assignment_groups.scoped.new, @current_user, :update)
+    if authorized_action(@context.assignment_groups.scope.new, @current_user, :update)
       order = params[:order].split(',')
       @context.assignment_groups.first.update_order(order)
       new_order = @context.assignment_groups.pluck(:id)
@@ -171,7 +171,7 @@ class AssignmentGroupsController < ApplicationController
   end
 
   def create
-    @assignment_group = @context.assignment_groups.scoped.new(params[:assignment_group])
+    @assignment_group = @context.assignment_groups.scope.new(params[:assignment_group])
     if authorized_action(@assignment_group, @current_user, :create)
       respond_to do |format|
         if @assignment_group.save

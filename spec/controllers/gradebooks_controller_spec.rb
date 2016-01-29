@@ -487,8 +487,6 @@ describe GradebooksController do
 
     context "moderated grading" do
       before :once do
-        @course.root_account.allow_feature!(:moderated_grading)
-        @course.enable_feature!(:moderated_grading)
         @assignment = @course.assignments.create!(:title => "some assignment", :moderated_grading => true)
         @student = @course.enroll_student(User.create!(:name => "some user"), :enrollment_state => :active).user
       end

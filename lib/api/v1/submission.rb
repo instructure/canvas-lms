@@ -196,7 +196,7 @@ module Api::V1::Submission
     }).order(:created_at).to_a
 
     attachment = attachments.pop
-    attachments.each { |a| a.destroy! }
+    attachments.each { |a| a.destroy_permanently! }
 
     # Remove the earlier attachment and re-create it if it's "stale"
     if attachment
@@ -204,7 +204,7 @@ module Api::V1::Submission
       updated_at ||= assignment.submissions.map { |s| s.submitted_at }.compact.max
 
       if created_at < 1.hour.ago || (updated_at && created_at < updated_at)
-        attachment.destroy!
+        attachment.destroy_permanently!
         attachment = nil
       end
     end

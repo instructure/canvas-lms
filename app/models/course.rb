@@ -418,7 +418,7 @@ class Course < ActiveRecord::Base
 
       if courses_or_course_ids.first.is_a? Course
         courses = courses_or_course_ids
-        ActiveRecord::Associations::Preloader.new(courses, :course_sections => :nonxlist_course).run
+        ActiveRecord::Associations::Preloader.new.preload(courses, :course_sections => :nonxlist_course)
         course_ids = courses.map(&:id)
       else
         course_ids = courses_or_course_ids
@@ -522,7 +522,7 @@ class Course < ActiveRecord::Base
   scope :recently_started, -> { where(:start_at => 1.month.ago..Time.zone.now).order("start_at DESC").limit(10) }
   scope :recently_ended, -> { where(:conclude_at => 1.month.ago..Time.zone.now).order("start_at DESC").limit(10) }
   scope :recently_created, -> { where("created_at>?", 1.month.ago).order("created_at DESC").limit(50).preload(:teachers) }
-  scope :for_term, lambda {|term| term ? where(:enrollment_term_id => term) : scoped }
+  scope :for_term, lambda {|term| term ? where(:enrollment_term_id => term) : all }
   scope :active_first, -> { order("CASE WHEN courses.workflow_state='available' THEN 0 ELSE 1 END, #{best_unicode_collation_key('name')}") }
   scope :name_like, lambda {|name| where(coalesced_wildcard('courses.name', 'courses.sis_source_id', 'courses.course_code', name)) }
   scope :needs_account, lambda { |account, limit| where(:account_id => nil, :root_account_id => account).limit(limit) }
@@ -795,7 +795,7 @@ class Course < ActiveRecord::Base
     self.shard.activate do
       if self.workflow_state_changed?
         if self.completed?
-          Enrollment.where(:course_id => self, :workflow_state => ['active', 'invited']).update_all(:workflow_state => 'completed')
+          Enrollment.where(:course_id => self, :workflow_state => ['active', 'invited']).update_all(:workflow_state => 'completed', :completed_at => Time.now.utc)
           appointment_participants.active.current.update_all(:workflow_state => 'deleted')
           appointment_groups.each(&:clear_cached_available_slots!)
         elsif self.deleted?
@@ -886,7 +886,7 @@ class Course < ActiveRecord::Base
 
   def update_final_scores_on_weighting_scheme_change
     if @group_weighting_scheme_changed
-      connection.after_transaction_commit { self.recompute_student_scores }
+      self.class.connection.after_transaction_commit { self.recompute_student_scores }
     end
   end
 
@@ -986,7 +986,7 @@ class Course < ActiveRecord::Base
     workflow_state
   end
 
-  alias_method :destroy!, :destroy
+  alias_method :destroy_permanently!, :destroy
   def destroy
     self.workflow_state = 'deleted'
     save!
@@ -2422,7 +2422,7 @@ class Course < ActiveRecord::Base
             tabs.delete_if {|t| [TAB_PEOPLE, TAB_OUTCOMES].include?(t[:id]) }
           end
 
-          unless discussion_topics.scoped.new.grants_right?(user, :read)
+          unless discussion_topics.scope.new.grants_right?(user, :read)
             tabs.delete_if { |t| t[:id] == TAB_ANNOUNCEMENTS }
           end
 
@@ -2567,7 +2567,7 @@ class Course < ActiveRecord::Base
   end
 
   def settings_frd
-    read_attribute(:settings) || write_attribute(:settings, {})
+    read_or_initialize_attribute(:settings, {})
   end
 
   def disable_setting_defaults

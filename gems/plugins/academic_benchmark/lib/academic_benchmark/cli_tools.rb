@@ -108,9 +108,9 @@ class CliTools
       item.child_outcome_groups.each do |child|
         delete_with_children(child)
       end
-      item.destroy!
+      item.destroy_permanently!
     else
-      item.destroy!
+      item.destroy_permanently!
     end
   end
 

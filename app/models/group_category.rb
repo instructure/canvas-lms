@@ -81,7 +81,7 @@ class GroupCategory < ActiveRecord::Base
   end
 
   Bookmarker = BookmarkedCollection::SimpleBookmarker.new(GroupCategory, :name, :id)
-  
+
   scope :by_name, -> { order(Bookmarker.order_by) }
   scope :active, -> { where(:deleted_at => nil) }
   scope :other_than, lambda { |cat| where("group_categories.id<>?", cat.id || 0) }
@@ -200,7 +200,7 @@ class GroupCategory < ActiveRecord::Base
     groups.active.where("EXISTS (?)", GroupMembership.active.where("group_id=groups.id").where(user_id: user)).any?
   end
 
-  alias_method :destroy!, :destroy
+  alias_method :destroy_permanently!, :destroy
   def destroy
     # TODO: this is kinda redundant with the :dependent => :destroy on the
     # groups association, but that doesn't get called since we override

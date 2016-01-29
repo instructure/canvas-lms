@@ -25,6 +25,7 @@ describe "international sms" do
 
     before(:each) do
       course_with_student_logged_in
+      @user.account.enable_feature!(:international_sms)
     end
 
     it 'shows a disclaimer for international numbers', priority: "1", test_id: 443930 do
@@ -52,6 +53,20 @@ describe "international sms" do
           expect(find('.intl_rates_may_apply')).to have_attribute('style', "display: inline\;")
         end
       end
+    end
+
+    it 'allows a phone number to be entered' do
+      get '/profile/settings'
+      make_full_screen
+      find('.add_contact_link.icon-add').click
+      wait_for_ajaximations
+
+      set_value fj(".user_selected.country"), '54'
+      set_value fj('#communication_channel_sms_number'), '12345'
+      fj('#register_sms_number button[type="submit"]').click
+      wait_for_ajaximations
+
+      expect(fj('#sms_confirmation_instructions')).to be_displayed
     end
   end
 end

@@ -2,7 +2,7 @@
 
 /* make subtitle text bigger when it's in fullscreen */
 .mejs-container-fullscreen .mejs-captions-layer {
-  font-size: 28px;
+  @include fontSize($ic-font-size--xlarge);
 }
 
 /* wider and more opaque source chooser */
@@ -30,7 +30,7 @@ div.mejs-speed-button {
 .mejs-controls .mejs-button.mejs-speed-button button {
   background: transparent;
   width: 36px;
-  font-size: 11px;
+  @include fontSize(11px);
   line-height: normal;
   color: #ffffff;
 }
@@ -90,7 +90,7 @@ div.mejs-speed-button {
   padding: 4px 0 0 0;
   line-height: 15px;
   font-family: helvetica, arial;
-  font-size: 11.5px;
+  @include fontSize(11.5px);
   color: white;
   margin-left: 5px;
   cursor: pointer;

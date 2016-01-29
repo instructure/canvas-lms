@@ -566,6 +566,13 @@ describe ApplicationHelper do
             expect(output.scan(%r{https://example.com/(root|child|grandchild)?/account.css})).to eql [['root'], ['child'], ['grandchild']]
           end
 
+          it "should fall-back to @domain_root_account's branding if I'm logged in but not enrolled in anything" do
+            @current_user = user
+            output = helper.include_account_css
+            expect(output).to have_tag 'link'
+            expect(output.scan(%r{https://example.com/(root|child|grandchild)?/account.css})).to eql [['root']]
+          end
+
           it "should include site admin css/js" do
             raise pending("need to handle site admin css/js from theme editor: CNVS-25229")
           end

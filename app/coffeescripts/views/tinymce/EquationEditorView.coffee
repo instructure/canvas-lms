@@ -16,7 +16,7 @@ define [
     ##
     # class method
     #
-    # like $.text() / Sizzle.getText(elems), except it also gets alt 
+    # like $.text() / Sizzle.getText(elems), except it also gets alt
     #   attributes from images
     #
     # @param {jquery object} elems The collection of elements (or the
@@ -49,7 +49,7 @@ define [
     template: template
 
     # all instances share same element
-    el: $(document.createElement('span')).appendTo('body')[0]
+    el: $(document.createElement('div')).appendTo('body')[0]
 
     els:
       '#mathquill-view': '$mathquillView'

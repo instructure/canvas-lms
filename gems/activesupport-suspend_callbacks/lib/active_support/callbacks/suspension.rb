@@ -132,7 +132,7 @@ module ActiveSupport::Callbacks
             end
           end
         end
-      else
+      elsif ActiveSupport::VERSION::STRING < '4.2'
         # [ActiveSupport 4.1]
         def run_callbacks(kind, &block)
           cbs = send("_#{kind}_callbacks").dup
@@ -141,6 +141,22 @@ module ActiveSupport::Callbacks
           filtered = cbs.dup
           filtered.clear
           cbs.each{ |cb| filtered.insert(-1, cb) unless suspended_callback?(cb.filter, kind, cb.kind) }
+
+          if filtered.empty?
+            yield if block_given?
+          else
+            runner = filtered.compile
+            e = Filters::Environment.new(self, false, nil, block)
+            runner.call(e).value
+          end
+        end
+      else
+        # [ActiveSupport 4.2]
+        def __run_callbacks__(cbs, &block)
+          # emulate cbs.delete_if{ ... } since CallbackChain doesn't proxy it
+          filtered = cbs.dup
+          filtered.clear
+          cbs.each{ |cb| filtered.insert(-1, cb) unless suspended_callback?(cb.filter, cbs.name, cb.kind) }
 
           if filtered.empty?
             yield if block_given?

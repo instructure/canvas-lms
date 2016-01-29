@@ -583,4 +583,63 @@ describe 'Student reports' do
       expect(parsed.length).to eq 3
     end
   end
+
+  describe 'user access token report' do
+    before(:each) do
+      @type = 'user_access_tokens_csv'
+      @at1 = AccessToken.create!(
+        :user => @user1,
+        :developer_key => DeveloperKey.default,
+        :expires_at => 2.hours.ago
+      )
+
+      @at2 = AccessToken.create!(
+        :user => @user2,
+        :developer_key => DeveloperKey.default,
+        :expires_at => 2.hours.from_now
+      )
+
+      @at2.update_attribute(:last_used_at, 2.hours.ago)
+
+      @at3 = AccessToken.create!(
+        :user => @user3,
+        :developer_key => DeveloperKey.default,
+        :expires_at => nil
+      )
+    end
+
+    it 'should run the user access tokens report' do
+      parsed = read_report(@type, {order: 1})
+      expect(parsed.length).to eq 3
+      expect(parsed[0]).to eq([
+        @user3.id.to_s,
+        "Astley, Rick",
+        @at3.token_hint.gsub(/.+~/, ''),
+        'never',
+        'never',
+        DeveloperKey.default.id.to_s,
+        "User-Generated"
+      ])
+
+      expect(parsed[1]).to eq([
+        @user2.id.to_s,
+        "Bolton, Michael",
+        @at2.token_hint.gsub(/.+~/, ''),
+        @at2.expires_at.iso8601,
+        @at2.last_used_at.iso8601,
+        DeveloperKey.default.id.to_s,
+        "User-Generated"
+      ])
+
+      expect(parsed[2]).to eq([
+        @user1.id.to_s,
+        "Clair, John St.",
+        @at1.token_hint.gsub(/.+~/, ''),
+        @at1.expires_at.iso8601,
+        'never',
+        DeveloperKey.default.id.to_s,
+        "User-Generated"
+      ])
+    end
+  end
 end

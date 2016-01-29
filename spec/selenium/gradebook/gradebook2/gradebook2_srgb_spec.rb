@@ -233,6 +233,56 @@ describe "screenreader gradebook" do
     expect(ff('#assignment_information table td').map(&:text)).to eq ['20', '10', '15', '5']
   end
 
+  context 'Group Weights' do
+    let(:test_course) { course() }
+    let(:teacher)     { user(active_all: true) }
+    let(:student)     { user(active_all: true) }
+    let!(:enroll_teacher_and_students) do
+      test_course.enroll_user(teacher, 'TeacherEnrollment', enrollment_state: 'active')
+      test_course.enroll_user(student, 'StudentEnrollment', enrollment_state: 'active')
+    end
+    let!(:assignment_group_1) { test_course.assignment_groups.create! name: 'Group 1' }
+    let!(:assignment_group_2) { test_course.assignment_groups.create! name: 'Group 2' }
+    let!(:assignment_1) do
+      test_course.assignments.create!(
+        title: 'Test 1',
+        points_possible: 20,
+        assignment_group: assignment_group_1
+      )
+    end
+    let!(:assignment_2) do
+      test_course.assignments.create!(
+        title: 'Test 2',
+        points_possible: 20,
+        assignment_group: assignment_group_2
+      )
+    end
+
+    before(:each) do
+      user_session(teacher)
+      get "/courses/#{test_course.id}/gradebook/change_gradebook_version?version=srgb"
+    end
+
+    it 'should display the group weighting dialog with group weights disabled', priority: "1", test_id: 163995 do
+      f('#ag_weights').click
+      expect(fj("#assignment_group_weights_dialog table[style='opacity: 0.5;']")).to be_truthy
+    end
+
+    it 'should correctly sync group weight settings between srgb and gb2', priority: "1", test_id: 588913 do
+      # turn on group weights in srgb
+      f('#ag_weights').click
+      f('#group_weighting_scheme').click
+      f('button .ui-button-text').click
+
+      # go back to gb2 to verify settings stuck
+      get "/courses/#{test_course.id}/gradebook/change_gradebook_version?version=2"
+      fj('#gradebook_settings').click
+      fj('.gradebook_dropdown .ui-menu-item:nth-child(3) a').click
+
+      expect(fj("#assignment_group_weights_dialog table[style='opacity: 1;']")).to be_truthy
+    end
+  end
+
   context "as a teacher" do
     before(:each) do
       gradebook_data_setup

@@ -87,27 +87,31 @@
     <% end %>
 
     <div class="comments module">
-      <h4><%= t 'titles.comments', "Comments:" %> </h4>
+      <% if @assignment.muted? %>
+        <p><%= t 'You may not see all comments right now because the assignment is currently being graded.' %></p>
+      <% else %>
+        <h4><%= t 'titles.comments', "Comments:" %> </h4>
 
-      <% visible_comments = @current_user_submission.visible_submission_comments -%>
-      <%= t('messages.no_comments', "No Comments") if visible_comments.empty? %>
-      <% visible_comments.each do |comment| %>
-        <div id="comment-<%= comment.id %>" class="comment">
-          <%= comment.comment %>
-          <div class="comment_attachments">
-            <% comment.attachments.each do |attachment| %>
-              <div class="comment_attachment">
-                <a href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, @current_user_submission.user_id, :comment_id => comment.id, :download => attachment.id) %>" class="comment_attachment_link <%= attachment.mime_class %>"><%= attachment.display_name %></a>
-              </div>
-            <% end %>
+        <% visible_comments = @current_user_submission.visible_submission_comments -%>
+        <%= t('messages.no_comments', "No Comments") if visible_comments.empty? %>
+        <% visible_comments.each do |comment| %>
+          <div id="comment-<%= comment.id %>" class="comment">
+            <%= comment.comment %>
+            <div class="comment_attachments">
+              <% comment.attachments.each do |attachment| %>
+                <div class="comment_attachment">
+                  <a href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, @current_user_submission.user_id, :comment_id => comment.id, :download => attachment.id) %>" class="comment_attachment_link <%= attachment.mime_class %>"><%= attachment.display_name %></a>
+                </div>
+              <% end %>
+            </div>
+            <div class="signature" style="font-size: 0.8em; text-align: right; color: #888;">
+              <%= t :comment_signature, "%{author}, %{created_at}", {
+                :author => comment_author_name_for(comment),
+                :created_at => datetime_string(comment.created_at)
+              } %>
+            </div>
           </div>
-          <div class="signature" style="font-size: 0.8em; text-align: right; color: #888;">
-            <%= t :comment_signature, "%{author}, %{created_at}", {
-              :author => comment_author_name_for(comment),
-              :created_at => datetime_string(comment.created_at)
-            } %>
-          </div>
-        </div>
+        <% end %>
       <% end %>
     </div>
   </div>

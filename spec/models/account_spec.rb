@@ -427,16 +427,16 @@ describe Account do
     end
 
     limited_access = [ :read, :manage, :update, :delete, :read_outcomes ]
-    account_enabled_access = [ :view_notifications, :manage_catalog ]
-    full_access = RoleOverride.permissions.keys + limited_access - account_enabled_access + [:create_courses]
+    conditional_access = RoleOverride.permissions.select { |_, v| v[:account_allows] }.map(&:first)
+    full_access = RoleOverride.permissions.keys + limited_access - conditional_access + [:create_courses]
     siteadmin_access = [:app_profiling]
     full_root_access = full_access - RoleOverride.permissions.select { |k, v| v[:account_only] == :site_admin }.map(&:first)
     full_sub_access = full_root_access - RoleOverride.permissions.select { |k, v| v[:account_only] == :root }.map(&:first)
     # site admin has access to everything everywhere
     hash.each do |k, v|
       account = v[:account]
-      expect(account.check_policy(hash[:site_admin][:admin])).to match_array full_access + (k == :site_admin ? [:read_global_outcomes] : [])
-      expect(account.check_policy(hash[:site_admin][:user])).to match_array siteadmin_access + limited_access + (k == :site_admin ? [:read_global_outcomes] : [])
+      expect(account.check_policy(hash[:site_admin][:admin]) - conditional_access).to match_array full_access + (k == :site_admin ? [:read_global_outcomes] : [])
+      expect(account.check_policy(hash[:site_admin][:user]) - conditional_access).to match_array siteadmin_access + limited_access + (k == :site_admin ? [:read_global_outcomes] : [])
     end
 
     # root admin has access to everything except site admin
@@ -446,7 +446,7 @@ describe Account do
     hash.each do |k, v|
       next if k == :site_admin
       account = v[:account]
-      expect(account.check_policy(hash[:root][:admin])).to match_array full_root_access
+      expect(account.check_policy(hash[:root][:admin]) - conditional_access).to match_array full_root_access
       expect(account.check_policy(hash[:root][:user])).to match_array limited_access
     end
 
@@ -460,7 +460,7 @@ describe Account do
     hash.each do |k, v|
       next if k == :site_admin || k == :root
       account = v[:account]
-      expect(account.check_policy(hash[:sub][:admin])).to match_array full_sub_access
+      expect(account.check_policy(hash[:sub][:admin]) - conditional_access).to match_array full_sub_access
       expect(account.check_policy(hash[:sub][:user])).to match_array limited_access
     end
 
@@ -476,7 +476,7 @@ describe Account do
     AdheresToPolicy::Cache.clear
     hash.each do |k, v|
       account = v[:account]
-      expect(account.check_policy(hash[:site_admin][:admin])).to match_array full_access + (k == :site_admin ? [:read_global_outcomes] : [])
+      expect(account.check_policy(hash[:site_admin][:admin]) - conditional_access).to match_array full_access + (k == :site_admin ? [:read_global_outcomes] : [])
       expect(account.check_policy(hash[:site_admin][:user])).to match_array siteadmin_access + some_access + (k == :site_admin ? [:read_global_outcomes] : [])
     end
 
@@ -486,7 +486,7 @@ describe Account do
     hash.each do |k, v|
       next if k == :site_admin
       account = v[:account]
-      expect(account.check_policy(hash[:root][:admin])).to match_array full_root_access
+      expect(account.check_policy(hash[:root][:admin]) - conditional_access).to match_array full_root_access
       expect(account.check_policy(hash[:root][:user])).to match_array some_access
     end
 
@@ -500,7 +500,7 @@ describe Account do
     hash.each do |k, v|
       next if k == :site_admin || k == :root
       account = v[:account]
-      expect(account.check_policy(hash[:sub][:admin])).to match_array full_sub_access
+      expect(account.check_policy(hash[:sub][:admin]) - conditional_access).to match_array full_sub_access
       expect(account.check_policy(hash[:sub][:user])).to match_array some_access
     end
   end
@@ -932,7 +932,7 @@ describe Account do
     let(:account){ Account.default }
 
     before do
-      account.authentication_providers.scoped.delete_all
+      account.authentication_providers.scope.delete_all
       expect(account.delegated_authentication?).to eq false
     end
 
@@ -1140,7 +1140,7 @@ describe Account do
       account = Account.default.sub_accounts.create!
       c1 = account.courses.create!
       c2 = account.courses.create!
-      account.course_account_associations.scoped.delete_all
+      account.course_account_associations.scope.delete_all
       expect(account.associated_courses).to eq []
       account.update_account_associations
       account.reload
@@ -1401,10 +1401,24 @@ describe Account do
     specs_require_sharding
 
     describe ".find_cached" do
+      let(:nonsense_id){ 987654321 }
+
       it "works relative to a different shard" do
         @shard1.activate do
           a = Account.create!
           expect(Account.find_cached(a.id)).to eq a
+        end
+      end
+
+      it "errors if infrastructure fails and we can't see the account" do
+        expect{ Account.find_cached(nonsense_id) }.to raise_error(::Canvas::AccountCacheError)
+      end
+
+      it "includes the account id in the error message" do
+        begin
+          Account.find_cached(nonsense_id)
+        rescue ::Canvas::AccountCacheError => e
+          expect(e.message).to eq("Couldn't find Account with id=#{nonsense_id}")
         end
       end
     end

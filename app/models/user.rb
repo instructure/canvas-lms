@@ -182,7 +182,7 @@ class User < ActiveRecord::Base
   scope :include_pseudonym, -> { preload(:pseudonym) }
   scope :restrict_to_sections, lambda { |sections|
     if sections.empty?
-      scoped
+      all
     else
       where("enrollments.limit_privileges_to_course_section IS NULL OR enrollments.limit_privileges_to_course_section<>? OR enrollments.course_section_id IN (?)", true, sections)
     end
@@ -262,7 +262,7 @@ class User < ActiveRecord::Base
   end
 
   def self.by_top_enrollment
-    scope = self.scoped
+    scope = self.all
     if scope.select_values.blank?
       scope = scope.select("users.*")
     end
@@ -879,7 +879,7 @@ class User < ActiveRecord::Base
     deleted?
   end
 
-  alias_method :destroy!, :destroy
+  alias_method :destroy_permanently!, :destroy
   def destroy
     self.remove_from_root_account(:all)
     self.workflow_state = 'deleted'
@@ -1366,7 +1366,7 @@ class User < ActiveRecord::Base
   end
 
   def preferences
-    read_attribute(:preferences) || write_attribute(:preferences, {})
+    read_or_initialize_attribute(:preferences, {})
   end
 
   def custom_colors
@@ -1496,7 +1496,7 @@ class User < ActiveRecord::Base
       as = assignment_scope.active.
         expecting_submission.
         need_grading_info
-      ActiveRecord::Associations::Preloader.new(as, :context).run
+      ActiveRecord::Associations::Preloader.new.preload(as, :context)
       as.lazy.select{|a| Assignments::NeedsGradingCountQuery.new(a, self).count != 0 }.take(opts[:limit]).to_a
     end
   end
@@ -1699,12 +1699,12 @@ class User < ActiveRecord::Base
         end
         pending_enrollments = temporary_invitations
         unless pending_enrollments.empty?
-          ActiveRecord::Associations::Preloader.new(pending_enrollments, :course).run
+          ActiveRecord::Associations::Preloader.new.preload(pending_enrollments, :course)
           res.concat(pending_enrollments.map do |e|
             c = e.course
             c.primary_enrollment_type = e.type
             c.primary_enrollment_role_id = e.role_id
-            c.primary_enrollment_rank = CANVAS_RAILS3 ? e.rank_sortable.to_s : e.rank_sortable
+            c.primary_enrollment_rank = e.rank_sortable
             c.primary_enrollment_state = e.workflow_state
             c.invitation = e.uuid
             c
@@ -1751,7 +1751,7 @@ class User < ActiveRecord::Base
       if opts[:preload_dates]
         Canvas::Builders::EnrollmentDateBuilder.preload(enrollments)
       elsif opts[:preload_courses]
-        ActiveRecord::Associations::Preloader.new(enrollments, :course).run
+        ActiveRecord::Associations::Preloader.new.preload(enrollments, :course)
       end
       enrollments
     end
@@ -1834,7 +1834,7 @@ class User < ActiveRecord::Base
           submissions = submissions.uniq
           submissions.first(opts[:limit])
 
-          ActiveRecord::Associations::Preloader.new(submissions, [:assignment, :user, :submission_comments]).run
+          ActiveRecord::Associations::Preloader.new.preload(submissions, [:assignment, :user, :submission_comments])
           submissions
         end
       end
@@ -2454,7 +2454,7 @@ class User < ActiveRecord::Base
     else
       @menu_courses = self.courses_with_primary_enrollment(:current_and_invited_courses, enrollment_uuid).first(12)
     end
-    ActiveRecord::Associations::Preloader.new(@menu_courses, :enrollment_term).run
+    ActiveRecord::Associations::Preloader.new.preload(@menu_courses, :enrollment_term)
     @menu_courses
   end
 

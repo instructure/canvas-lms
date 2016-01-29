@@ -30,7 +30,7 @@
 <script>
   window.ENV = window.ENV || {};
   window.ENV.ROOT_OUTCOME_GROUP = <%= raw @root_outcome_group %>;
-  require(['compiled/bundles/edit_rubric'])
+  var event = document.createEvent('Event');
+  event.initEvent('rubricEditDataReady', true, true);
+  document.dispatchEvent(event)
 </script>
-
-

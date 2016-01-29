@@ -20,24 +20,24 @@ require 'nokogiri'
 
 module CC
 module CCHelper
-  
+
   CANVAS_NAMESPACE = 'http://canvas.instructure.com/xsd/cccv1p0'
   XSD_URI = 'http://canvas.instructure.com/xsd/cccv1p0.xsd'
-  
+
   # IMS formats/types
   IMS_DATE = "%Y-%m-%d"
   IMS_DATETIME = "%Y-%m-%dT%H:%M:%S"
   CC_EXTENSION = 'imscc'
   QTI_EXTENSION = ".xml.qti"
   CANVAS_PLATFORM = 'canvas.instructure.com'
-  
+
   # Common Cartridge 1.0
   # associatedcontent/imscc_xmlv1p0/learning-application-resource
   # imsdt_xmlv1p0
   # imswl_xmlv1p0
   # imsqti_xmlv1p2/imscc_xmlv1p0/assessment
   # imsqti_xmlv1p2/imscc_xmlv1p0/question-bank
-  
+
   # Common Cartridge 1.1 (What Canvas exports)
   ASSESSMENT_TYPE = 'imsqti_xmlv1p2/imscc_xmlv1p1/assessment'
   QUESTION_BANK = 'imsqti_xmlv1p2/imscc_xmlv1p1/question-bank'
@@ -47,7 +47,7 @@ module CCHelper
   WEBCONTENT = "webcontent"
   BASIC_LTI = 'imsbasiclti_xmlv1p0'
   BLTI_NAMESPACE = "http://www.imsglobal.org/xsd/imsbasiclti_v1p0"
-  
+
   # Common Cartridge 1.2
   # associatedcontent/imscc_xmlv1p2/learning-application-resource
   # imsdt_xmlv1p2
@@ -63,7 +63,7 @@ module CCHelper
 
   # QTI-only export
   QTI_ASSESSMENT_TYPE = 'imsqti_xmlv1p2'
-  
+
   # substitution tokens
   OBJECT_TOKEN = "$CANVAS_OBJECT_REFERENCE$"
   COURSE_TOKEN = "$CANVAS_COURSE_REFERENCE$"
@@ -98,15 +98,15 @@ module CCHelper
   def create_key(object, prepend="")
     CCHelper.create_key(object, prepend)
   end
-  
+
   def ims_date(date=nil)
     CCHelper.ims_date(date)
   end
-  
+
   def ims_datetime(date=nil)
     CCHelper.ims_datetime(date)
   end
-  
+
   def self.create_key(object, prepend="")
     if object.is_a? ActiveRecord::Base
       key = object.asset_string
@@ -115,17 +115,17 @@ module CCHelper
     end
     "i" + Digest::MD5.hexdigest(prepend + key)
   end
-  
+
   def self.ims_date(date=nil)
     date ||= Time.now
     date.respond_to?(:utc) ? date.utc.strftime(IMS_DATE) : date.strftime(IMS_DATE)
   end
-  
+
   def self.ims_datetime(date=nil)
     date ||= Time.now
     date.respond_to?(:utc) ? date.utc.strftime(IMS_DATETIME) : date.strftime(IMS_DATETIME)
   end
-  
+
   def get_html_title_and_body_and_id(doc)
     id = get_node_val(doc, 'html head meta[name=identifier] @content')
     get_html_title_and_body(doc) << id
@@ -140,7 +140,7 @@ module CCHelper
     end
     get_html_title_and_body(doc) << meta_fields
   end
-  
+
   def get_html_title_and_body(doc)
     title = get_node_val(doc, 'html head title')
     body = doc.at_css('html body').to_s.gsub(%r{</?body>}, '').strip
@@ -161,6 +161,7 @@ module CCHelper
       @user = user
       @track_referenced_files = opts[:track_referenced_files]
       @for_course_copy = opts[:for_course_copy]
+      @for_epub_export = opts[:for_epub_export]
       @referenced_files = {}
 
       @rewriter.set_handler('file_contents') do |match|
@@ -220,7 +221,7 @@ module CCHelper
         new_url = match.url
         if match.obj_id && match.obj_class
           obj = match.obj_class.where(id: match.obj_id).first
-          if obj && @rewriter.user_can_view_content?(obj)
+          if obj && (@rewriter.user_can_view_content?(obj) || @for_epub_export)
             # for all other types,
             # create a migration id for the object, and use that as the new link
             migration_id = CCHelper.create_key(obj)

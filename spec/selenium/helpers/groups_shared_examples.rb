@@ -211,7 +211,7 @@ shared_examples 'conferences_page' do |context|
   it "should allow group users to create a conference", priority: pick_priority(context,"1","2"),test_id: pick_test_id(context, 307624, 308534) do
     title = 'test conference'
     get conferences_page
-    create_conference(title)
+    create_conference(title: title)
     expect(f('#new-conference-list .ig-title').text).to include(title)
   end
 
@@ -219,7 +219,6 @@ shared_examples 'conferences_page' do |context|
     WimbaConference.create!(title: "new conference", user: @user, context: @testgroup.first)
     get conferences_page
 
-    click_gear_menu(0)
     delete_conference
     expect(f('#new-conference-list')).to include_text('There are no new conferences')
   end
@@ -228,7 +227,7 @@ shared_examples 'conferences_page' do |context|
     cc = WimbaConference.create!(title: "cncluded conference", user: @user, context: @testgroup.first)
     conclude_conference(cc)
     get conferences_page
-    click_gear_menu(0)
+
     delete_conference
     expect(f('#concluded-conference-list')).to include_text('There are no concluded conferences')
   end

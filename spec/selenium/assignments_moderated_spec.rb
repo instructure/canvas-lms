@@ -4,9 +4,7 @@ describe "moderated grading assignments" do
   include_context "in-process server selenium tests"
 
   before do
-    Account.default.allow_feature!(:moderated_grading)
     @course = course_model
-    @course.enable_feature! :moderated_grading
     @course.offer!
     @assignment = @course.assignments.create!(submission_types: 'online_text_entry', title: 'Test Assignment')
     @assignment.update_attribute :moderated_grading, true

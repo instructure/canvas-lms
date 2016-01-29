@@ -1,5 +1,6 @@
 require 'timeout'
 require 'json'
+require_relative "../../config/initializers/webpack"
 
 namespace :js do
 
@@ -70,7 +71,7 @@ namespace :js do
   desc 'test javascript specs with Karma'
   task :test, :reporter do |task, args|
     reporter = args[:reporter]
-    if ENV['USE_WEBPACK'].present? && ENV['USE_WEBPACK'] != 'false'
+    if CANVAS_WEBPACK
       Rake::Task['i18n:generate_js'].invoke
       webpack_test_dir = Rails.root + "spec/javascripts/webpack"
       FileUtils.rm_rf(webpack_test_dir)
@@ -293,14 +294,14 @@ namespace :js do
 
   desc "build webpack js for production"
   task :webpack do
-    if ENV['USE_WEBPACK'].present? && ENV['USE_WEBPACK'] != 'false' && ENV['USE_WEBPACK'] != 'False'
+    if CANVAS_WEBPACK
       if ENV['RAILS_ENV'] == 'production'
         puts "--> Building PRODUCTION webpack bundles"
         `npm run webpack-production`
       else
         puts "--> Building DEVELOPMENT webpack bundles"
         `npm run webpack-development`
-        if ENV['USE_OPTIMIZED_JS'] == 'true'
+        if ENV['USE_OPTIMIZED_JS'] == 'true' || ENV['USE_OPTIMIZED_JS'] == 'True'
           # if this var is set, we'll need to have optimized version of the
           # webpack bundles available too
           puts "--> Building OPTIMIZED webpack bundles"

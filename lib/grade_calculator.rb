@@ -89,7 +89,8 @@ class GradeCalculator
     raise "Can't save scores when ignore_muted is false" unless @ignore_muted
 
     Course.where(:id => @course).update_all(:updated_at => Time.now.utc)
-    query = "updated_at=#{Enrollment.sanitize(Time.now.utc)}"
+    time = Enrollment.sanitize(Time.now.utc)
+    query = "updated_at=#{time}, graded_at=#{time}"
     query += ", computed_current_score=CASE user_id #{@current_updates.map { |user_id, grade| "WHEN #{user_id} THEN #{grade || "NULL"}"}.
       join(" ")} ELSE computed_current_score END"
     query += ", computed_final_score=CASE user_id #{@final_updates.map { |user_id, grade| "WHEN #{user_id} THEN #{grade || "NULL"}"}.

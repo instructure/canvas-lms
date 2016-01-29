@@ -1,25 +1,29 @@
-if CANVAS_RAILS3
-  gem 'rails', '3.2.22'
-  gem 'rack', '1.4.5'
-  gem 'builder', '3.0.0'
-  gem 'routing_concerns', '0.1.0'
-  gem 'strong_parameters', '0.2.3'
-else
+if CANVAS_RAILS4_0
   gem 'rails', '4.0.13'
   gem 'rack', '1.5.4'
   gem 'builder', '3.1.4'
   gem 'protected_attributes', '1.0.8'
   gem 'rails-observers', '0.1.2'
+  gem 'tzinfo', '0.3.43'
+else
+  gem 'rails', '4.2.5'
+  gem 'rack', '1.6.4'
+  gem 'builder', '3.1.4'
+  gem 'protected_attributes', '1.0.8'
+  gem 'rails-observers', '0.1.2'
+  gem 'tzinfo', '1.2.2'
+  gem 'oj_mimic_json', require: false
+  gem 'activesupport-json_encoder', '1.1.0'
 end
-gem 'tzinfo', '0.3.43'
-gem 'encrypted_cookie_store-instructure', '1.1.11', require: 'encrypted_cookie_store'
+
+gem 'encrypted_cookie_store-instructure', '1.1.12', require: 'encrypted_cookie_store'
 gem 'active_model_serializers',   '0.9.0alpha1',
   github: 'rails-api/active_model_serializers', ref: '61882e1e4127facfe92e49057aec71edbe981829'
-gem 'authlogic', '3.4.2'
+gem 'authlogic', '3.4.6'
 gem 'active_model-better_errors', '1.6.7', require: 'active_model/better_errors'
 gem 'dynamic_form', '1.1.4', require: false
 gem 'rails-patch-json-encode', '0.0.1'
-gem 'switchman', '1.3.13'
+gem 'switchman', '1.3.14-1'
 gem 'folio-pagination', '0.0.9', require: 'folio/rails'
   # for folio, see the folio README
   gem 'will_paginate', '3.0.7', require: false
@@ -31,9 +35,9 @@ gem 'barby', '0.5.0', require: false
   gem 'rqrcode', '0.4.2', require: false
   gem 'chunky_png', '1.3.0', require: false
 gem 'bcrypt-ruby', '3.0.1'
-gem 'canvas_connect', '0.3.8'
+gem 'canvas_connect', '0.3.10'
   gem 'adobe_connect', '1.0.3', require: false
-gem 'canvas_webex', '0.15'
+gem 'canvas_webex', '0.17'
 gem 'canvas-jobs', '0.10.3'
   gem 'rufus-scheduler', '3.1.2', require: false
 gem 'ffi', '1.1.5', require: false
@@ -45,13 +49,12 @@ gem 'highline', '1.6.1', require: false
 gem 'hoe', '3.8.1'
 gem 'httparty', '0.13.7'
 gem 'i18n', '0.7.0'
-gem 'i18nema', '0.0.8', platforms: [:ruby_20, :ruby_21, :ruby_22]
-gem 'i18nema19', '0.0.8', platform: :ruby_19
+gem 'i18nema', '0.0.8'
 gem 'i18nliner', '0.0.12'
 gem 'icalendar', '1.5.4', require: false
 gem 'ims-lti', '2.0.0.beta.33'
 gem 'json', '1.8.2'
-gem 'oj', '2.5.5'
+gem 'oj', '2.14.1'
 gem 'jwt', '1.2.1', require: false
 gem 'json-jwt', '1.5.1', require: false
 gem 'twilio-ruby', '4.2.1'
@@ -88,14 +91,14 @@ gem 'rubycas-client', '2.3.9', require: false
 gem 'rubyzip', '1.1.1', require: 'zip'
 gem 'safe_yaml', '1.0.4', require: false
 gem 'sanitize', '2.0.6', require: false
-gem 'shackles', '1.0.7'
+gem 'shackles', '1.0.10'
 
 gem 'useragent', '0.10.0', require: false
 
 gem 'foreigner', '0.9.2'
 gem 'crocodoc-ruby', '0.0.1', require: false
 gem 'hey', '1.3.0', require: false
-gem 'sentry-raven', '0.13.2', require: false
+gem 'sentry-raven', '0.15.3', require: false
 gem 'canvas_statsd', '1.0.3'
 gem 'diplomat', '0.14.0', require: false
 

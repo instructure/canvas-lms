@@ -41,7 +41,7 @@ class NotificationPolicy < ActiveRecord::Base
     when Notification
       where(:notification_id => context)
     else
-      scoped
+      all
     end
   }
 

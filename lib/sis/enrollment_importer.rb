@@ -274,6 +274,7 @@ module SIS
               enrollment.workflow_state = 'deleted'
             elsif status =~ /\Acompleted/i
               enrollment.workflow_state = 'completed'
+              enrollment.completed_at ||= Time.now
             elsif status =~ /\Ainactive/i
               enrollment.workflow_state = 'inactive'
             end

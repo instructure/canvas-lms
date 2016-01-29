@@ -51,7 +51,7 @@ class UserNote < ActiveRecord::Base
     can :read
   end
 
-  alias_method :destroy!, :destroy
+  alias_method :destroy_permanently!, :destroy
   def destroy
     self.workflow_state = 'deleted'
     self.deleted_at = Time.now.utc

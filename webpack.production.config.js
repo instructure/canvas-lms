@@ -8,8 +8,13 @@ if(process.env.NODE_ENV == 'production'){
   var fs   = require('fs');
   try {
     var doc = yaml.safeLoad(fs.readFileSync(__dirname + '/config/canvas_cdn.yml', 'utf8'));
-    publicPath = doc.production.host + "/dist" + publicPath;
-    console.log(publicPath);
+    var cdnHost = doc.production.host
+    if(cdnHost !== undefined && cdnHost !== null){
+      publicPath = cdnHost + "/dist" + publicPath;
+      console.log(publicPath);
+    }else{
+      console.log("NO CDN HOST, USING LOCAL ASSETS");
+    }
   } catch (e) {
     console.log("NO CDN FILE, USING LOCAL ASSETS");
   }

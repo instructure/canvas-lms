@@ -119,7 +119,7 @@ class CourseSection < ActiveRecord::Base
 
     given { |user, session|
       user &&
-      self.course.sections_visible_to(user).scoped.where(:id => self).exists? &&
+      self.course.sections_visible_to(user).where(:id => self).exists? &&
       self.course.grants_right?(user, session, :read_roster)
     }
     can :read
@@ -257,7 +257,7 @@ class CourseSection < ActiveRecord::Base
     state :deleted
   end
 
-  alias_method :destroy!, :destroy
+  alias_method :destroy_permanently!, :destroy
   def destroy
     self.workflow_state = 'deleted'
     self.enrollments.not_fake.each(&:destroy)

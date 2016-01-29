@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2016 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -17,12 +17,11 @@
 #
 
 begin
-  require RUBY_VERSION >= '2.0.0' ? 'byebug' : 'debugger'
+  require 'byebug'
 rescue LoadError
 end
 
 require 'securerandom'
-require 'test/unit' if RUBY_VERSION >= '2.2.0'
 
 RSpec.configure do |c|
   c.raise_errors_for_deprecations!
@@ -32,23 +31,8 @@ RSpec.configure do |c|
     Timeout::timeout(180) do
       Rails.logger.info "STARTING SPEC #{example.full_description}"
       example.run
-      exception = example.example.exception
-      case exception
-      when EOFError, Errno::ECONNREFUSED
-        if $selenium_driver
-          puts "SELENIUM: webdriver socket closed the connection.  Will try to re-initialize."
-          # this will cause the selenium driver to get re-initialized if it
-          # crashes for some reason
-          $selenium_driver = nil
-        end
-      end
     end
   end
-end
-
-begin
-  ; require File.expand_path(File.dirname(__FILE__) + "/../parallelized_specs/lib/parallelized_specs.rb");
-rescue LoadError;
 end
 
 ENV["RAILS_ENV"] = 'test'
@@ -85,20 +69,18 @@ An error occurred in an `after(:context)` hook.
 end
 end
 
-unless CANVAS_RAILS3
-  Time.class_eval do
-    def compare_with_round(other)
-      other = Time.at(other.to_i, other.usec) if other.respond_to?(:usec)
-      Time.at(self.to_i, self.usec).compare_without_round(other)
-    end
-    alias_method :compare_without_round, :<=>
-    alias_method :<=>, :compare_with_round
+Time.class_eval do
+  def compare_with_round(other)
+    other = Time.at(other.to_i, other.usec) if other.respond_to?(:usec)
+    Time.at(self.to_i, self.usec).compare_without_round(other)
   end
-
-  # temporary patch to keep things sane
-  # TODO: actually fix the deprecation messages once we're on Rails 4 permanently and remove this
-  ActiveSupport::Deprecation.silenced = true
+  alias_method :compare_without_round, :<=>
+  alias_method :<=>, :compare_with_round
 end
+
+# temporary patch to keep things sane
+# TODO: actually fix the deprecation messages once we're on Rails 4 permanently and remove this
+ActiveSupport::Deprecation.silenced = true
 
 module RSpec::Rails
   module ViewExampleGroup
@@ -154,39 +136,9 @@ module RSpec::Rails
     end
   end
 
-  module Matchers
-    class HaveTag
-      include ActionDispatch::Assertions::SelectorAssertions
-      include Test::Unit::Assertions
-
-      def initialize(expected)
-        @expected = expected
-      end
-
-      def matches?(html, &block)
-        @selected = [HTML::Document.new(html).root]
-        assert_select(*@expected, &block)
-        return !@failed
-      end
-
-      def assert(val, msg=nil)
-        unless !!val
-          @msg = msg
-          @failed = true
-        end
-      end
-
-      def failure_message
-        @msg
-      end
-
-      def failure_message_when_negated
-        @msg
-      end
-    end
-
-    def have_tag(*args)
-      HaveTag.new(args)
+  RSpec::Matchers.define :have_tag do |expected|
+    match do |actual|
+      !!Nokogiri::HTML(actual).at_css(expected)
     end
   end
 end
@@ -372,14 +324,6 @@ module Helpers
     m.root_account_id = opts[:account_id] || Account.default.id
     m.save!
     m
-  end
-end
-
-if CANVAS_RAILS3
-  ActionController::TestSession.class_eval do
-    def destroy
-      clear
-    end
   end
 end
 
@@ -836,7 +780,7 @@ RSpec.configure do |config|
   end
 
   def content_type_key
-    CANVAS_RAILS3 ? 'content-type' : 'Content-Type'
+    'Content-Type'
   end
 
   def force_string_encoding(str, encoding = "UTF-8")

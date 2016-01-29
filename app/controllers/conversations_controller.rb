@@ -530,7 +530,7 @@ class ConversationsController < ApplicationController
     messages = nil
     Shackles.activate(:slave) do
       messages = @conversation.messages
-      ActiveRecord::Associations::Preloader.new(messages, :asset).run
+      ActiveRecord::Associations::Preloader.new.preload(messages, :asset)
     end
 
     render :json => conversation_json(@conversation,

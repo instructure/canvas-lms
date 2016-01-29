@@ -14,7 +14,7 @@ describe "new account user search" do
   end
 
   def get_rows
-    ff('.users-list > tbody > tr')
+    ff('.users-list div[role=row]')
   end
 
   def click_tab
@@ -89,7 +89,7 @@ describe "new account user search" do
 
   it "should search by name" do
     match_user = user_with_pseudonym(:account => @account, :name => "user with a search term")
-    not_match_user = user_with_pseudonym(:account => @account, :name => "diffrient user")
+    user_with_pseudonym(:account => @account, :name => "diffrient user")
 
     get "/accounts/#{@account.id}"
     click_tab
@@ -101,5 +101,31 @@ describe "new account user search" do
     rows = get_rows
     expect(rows.count).to eq 1
     expect(rows.first).to include_text(match_user.name)
+  end
+
+  it "should link to the user avatar page" do
+    match_user = user_with_pseudonym(:account => @account, :name => "user with a search term")
+    user_with_pseudonym(:account => @account, :name => "diffrient user")
+
+    get "/accounts/#{@account.id}"
+    click_tab
+
+    f('#peopleOptionsBtn').click
+    f('#manageStudentsLink').click
+
+    expect(driver.current_url).to include_text("/accounts/#{@account.id}/avatars")
+  end
+
+  it "should link to the user group page" do
+    match_user = user_with_pseudonym(:account => @account, :name => "user with a search term")
+    user_with_pseudonym(:account => @account, :name => "diffrient user")
+
+    get "/accounts/#{@account.id}"
+    click_tab
+
+    f('#peopleOptionsBtn').click
+    f('#viewUserGroupLink').click
+
+    expect(driver.current_url).to include_text("/accounts/#{@account.id}/groups")
   end
 end

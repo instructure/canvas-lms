@@ -293,27 +293,3 @@ module PostgreSQLAdapterExtensions
 end
 
 ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.prepend(PostgreSQLAdapterExtensions)
-
-if CANVAS_RAILS3
-  module PostgreSQLAdapterFloatFixes
-    # Handle quoting properly for Infinity and NaN. This fix exists in Rails 4.0
-    # and can be safely removed once we upgrade.
-    #
-    # This patch is covered by tests in spec/initializers/active_record_quoting_spec.rb
-    def quote(value, column = nil) #:nodoc:
-      if value.kind_of?(Float)
-        if value.infinite? && column && column.type == :datetime
-          "'#{value.to_s.downcase}'"
-        elsif value.infinite? || value.nan?
-          "'#{value}'"
-        else
-          super
-        end
-      else
-        super
-      end
-    end
-  end
-
-  ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.prepend(PostgreSQLAdapterFloatFixes)
-end

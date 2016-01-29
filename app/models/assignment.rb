@@ -351,7 +351,7 @@ class Assignment < ActiveRecord::Base
   def update_grades_if_details_changed
     if points_possible_changed? || muted_changed? || workflow_state_changed?
       Rails.logger.info "GRADES: recalculating because assignment #{global_id} changed. (#{changes.inspect})"
-      connection.after_transaction_commit { self.context.recompute_student_scores }
+      self.class.connection.after_transaction_commit { self.context.recompute_student_scores }
     end
     true
   end
@@ -520,7 +520,7 @@ class Assignment < ActiveRecord::Base
   # this is necessary to generate new permissions cache keys for students
   def touch_submissions_if_muted
     if muted_changed?
-      connection.after_transaction_commit do
+      self.class.connection.after_transaction_commit do
         submissions.touch_all
       end
     end
@@ -607,7 +607,7 @@ class Assignment < ActiveRecord::Base
     state :deleted
   end
 
-  alias_method :destroy!, :destroy
+  alias_method :destroy_permanently!, :destroy
   def destroy
     self.workflow_state = 'deleted'
     ContentTag.delete_for(self)
@@ -849,11 +849,11 @@ class Assignment < ActiveRecord::Base
   end
 
   def self.preload_context_module_tags(assignments)
-    ActiveRecord::Associations::Preloader.new(assignments, [
+    ActiveRecord::Associations::Preloader.new.preload(assignments, [
       :context_module_tags,
       { :discussion_topic => :context_module_tags },
       { :quiz => :context_module_tags }
-    ]).run
+    ])
   end
 
   def locked_for?(user, opts={})
@@ -1415,7 +1415,7 @@ class Assignment < ActiveRecord::Base
 
     # if we're a provisional grader, calculate whether the student needs a grade
     preloaded_pg_counts = is_provisional && self.provisional_grades.not_final.group("submissions.user_id").count
-    ActiveRecord::Associations::Preloader.new(self, :moderated_grading_selections).run if is_provisional # preload the association now
+    ActiveRecord::Associations::Preloader.new.preload(self, :moderated_grading_selections) if is_provisional # preload the association now
 
     res[:context][:students] = students.map do |u|
       json = u.as_json(:include_root => false,
@@ -1906,7 +1906,7 @@ class Assignment < ActiveRecord::Base
     if args.first
       where("assignments.updated_at IS NULL OR assignments.updated_at>?", args.first)
     else
-      scoped
+      all
     end
   }
 

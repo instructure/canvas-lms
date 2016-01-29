@@ -29,15 +29,15 @@ describe ScopeFilter do
 
     describe '#concat_scope' do
       it 'should set @relation as value returned from provided block' do
-        scope_filter.send(:concat_scope) { Course.scoped }
-        expect(scope_filter.instance_variable_get("@relation")).to eq(Course.scoped)
+        scope_filter.send(:concat_scope) { Course.all }
+        expect(scope_filter.instance_variable_get("@relation")).to eq(Course.all)
       end
 
       it 'should maintain @relation when block returns a falsey value' do
-        scope_filter.send(:concat_scope) { Course.scoped }
-        expect(scope_filter.instance_variable_get("@relation")).to eq(Course.scoped), 'precondition'
+        scope_filter.send(:concat_scope) { Course.all }
+        expect(scope_filter.instance_variable_get("@relation")).to eq(Course.all), 'precondition'
         scope_filter.send(:concat_scope) { nil }
-        expect(scope_filter.instance_variable_get("@relation")).to eq(Course.scoped)
+        expect(scope_filter.instance_variable_get("@relation")).to eq(Course.all)
       end
     end
   end

@@ -2350,7 +2350,7 @@ describe DiscussionTopicsController, type: :request do
   it "returns due dates as they apply to the user" do
     course_with_student(:active_all => true)
     @user = @student
-    @student.enrollments.map(&:destroy!)
+    @student.enrollments.map(&:destroy_permanently!)
     @section = @course.course_sections.create! :name => "afternoon delight"
     @course.enroll_user(@student,'StudentEnrollment',
                         :section => @section,

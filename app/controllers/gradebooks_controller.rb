@@ -240,7 +240,7 @@ class GradebooksController < ApplicationController
       @current_grading_period_id = params[:grading_period_id].to_i
     else
       return if view_all_grading_periods?
-      current = GradingPeriod.for(@context).find(&:current?)
+      current = GradingPeriod.current_period_for(@context)
       @current_grading_period_id = current ? current.id : 0
     end
   end
@@ -664,9 +664,7 @@ class GradebooksController < ApplicationController
   private
 
   def moderated_grading_enabled_and_no_grades_published
-    @context.feature_enabled?(:moderated_grading) &&
-      @assignment.moderated_grading? &&
-      !@assignment.grades_published?
+    @assignment.moderated_grading? && !@assignment.grades_published?
   end
 
   def exclude_total?(context)

@@ -86,7 +86,7 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def migration_settings
-    read_attribute(:migration_settings) || write_attribute(:migration_settings,{}.with_indifferent_access)
+    read_or_initialize_attribute(:migration_settings, {}.with_indifferent_access)
   end
 
   def update_migration_settings(new_settings)
