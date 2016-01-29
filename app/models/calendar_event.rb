@@ -92,6 +92,12 @@ class CalendarEvent < ActiveRecord::Base
       end
     end
 
+    if context_type == 'Course'
+      Course.find(context_id).students.all.each do |user|
+        event['attendees'] << { email: user.email }
+      end
+    end
+
     # note: we can set event.reminder_overrides[].minutes to change the time, but I'm leaving default for now
 
   #reminders: {
@@ -104,7 +110,8 @@ class CalendarEvent < ActiveRecord::Base
 
 
     params = {
-      :calendarId => 'primary'
+      :calendarId => 'primary',
+      :sendNotifications => true
     }
 
     if google_calendar_id
