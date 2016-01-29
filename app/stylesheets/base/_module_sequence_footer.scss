@@ -23,13 +23,6 @@
   .ModuleSequenceFooter__Container--bottom {
     bottom: 42px;
   }
-
-  body.with-fixed-bottom {
-    .ModuleSequenceFooter__Container--bottom {
-      bottom: 102px;
-    }
-  }
-
   #content {
     &.Content--with-module-footer {
       padding-bottom: 70px;
