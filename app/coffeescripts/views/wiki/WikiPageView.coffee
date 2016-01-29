@@ -70,10 +70,7 @@ define [
 
       # attach/re-attach the sequence footer (if this is a course, but not the home page)
       unless @$sequenceFooter || @course_home || !@course_id
-        if (ENV.use_new_styles)
-          @$sequenceFooter ||= $('<div class="ModuleSequenceFooter__Container"></div>').hide()
-        else
-          @$sequenceFooter ||= $('<div></div>').hide()
+        @$sequenceFooter ||= $('<div class="ModuleSequenceFooter__Container"></div>').hide()
         @$sequenceFooter.moduleSequenceFooter(
           courseID: @course_id
           assetType: 'Page'
@@ -82,10 +79,7 @@ define [
         )
       else
         @$sequenceFooter?.msfAnimation(false)
-      if (ENV.use_new_styles)
-        @$sequenceFooter.appendTo($('.ic-app-main-and-right-side')) if @$sequenceFooter
-      else
-        @$sequenceFooter.appendTo(@$el) if @$sequenceFooter
+      @$sequenceFooter.appendTo($('.ic-app-main-and-right-side')) if @$sequenceFooter
 
     navigateToLinkAnchor: ->
       anchor_name = window.location.hash.replace(/^#/, "")
