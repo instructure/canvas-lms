@@ -14,7 +14,7 @@ describe "new account course search" do
   end
 
   def get_rows
-    ff('.courses-list > tbody > tr')
+    ff('.courses-list [role=row]')
   end
 
   it "should not show the courses tab without permission" do

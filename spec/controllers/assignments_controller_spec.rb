@@ -77,7 +77,6 @@ describe AssignmentsController do
   describe "GET 'show_moderate'" do
 
     it "should set the js_env for URLS" do
-      @course.account.enable_feature!(:moderated_grading)
       user_session(@teacher)
       assignment = @course.assignments.create(:title => "some assignment")
       assignment.workflow_state = 'published'
@@ -90,7 +89,6 @@ describe AssignmentsController do
     end
 
     it "should set the js_env for ASSIGNMENT_TITLE" do
-      @course.account.enable_feature!(:moderated_grading)
       user_session(@teacher)
       assignment = @course.assignments.create(:title => "some assignment")
       assignment.workflow_state = 'published'

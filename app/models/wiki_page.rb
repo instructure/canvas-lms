@@ -112,7 +112,7 @@ class WikiPage < ActiveRecord::Base
         return unless send(scope)
         base_scope = base_scope.send(scope)
       else
-        conditions.first << " and #{connection.quote_column_name(scope)} = ?"
+        conditions.first << " and #{self.class.connection.quote_column_name(scope)} = ?"
         conditions << send(scope)
       end
     end

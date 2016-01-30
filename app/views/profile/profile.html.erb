@@ -1,5 +1,5 @@
 <% content_for :page_title do %>
-  <%= join_title t(:page_title, "User Settings"), @user.name %>
+  <%= join_title t("User Settings"), @user.name %>
 <% end %>
 
 <% content_for :right_side do %>
@@ -40,7 +40,7 @@
 <% if service_enabled?(:avatars) %>
   <%= avatar(@user, url: '#', edit: true, class: "profile_pic_link #{@user.avatar_state}", title: t('titles.click_to_change_profile_pic', "Click to change profile pic")) %>
 <% end %>
-<h1 style="padding-top: 0.3em;"><%= t('headers.users_profile', "%{user}'s Settings", :user => @user.short_name) %></h1>
+<h1 style="padding-top: 0.3em;"><%= t("%{user}'s Settings", :user => @user.short_name) %></h1>
 <div class="clear"></div>
 <%= form_for @user, :url => profile_path, :html => {:id => "update_profile_form", :style => "margin-bottom: 20px;", :class => 'form-inline'} do |f| %>
 <table class="profile_table">
@@ -49,23 +49,23 @@
     <td><%= f.blabel :name, :en => "Full Name" %></td>
     <td><span <% unless editable_name %>id="name"<% end %>
               class="full_name <%= editable_name ? 'display_data' : 'edit_or_show_data' %>"><%=h @user.name %></span>
-      <%= f.text_field :name, :class => "edit_data", :maxlength => 255, :size => 30 if editable_name %>
-      <span class="edit_or_show_data data_description"><br/><%= t('hints.name', "This name will be used for grading.") %></span>
+      <%= f.text_field :name, :class => "edit_data", :maxlength => 255, :size => 30, "aria-describedby" => "#hints_name" if editable_name %>
+      <span id="hints_name" class="edit_or_show_data data_description"><br/><%= t('hints.name', "This name will be used for grading.") %></span>
   </tr>
   <tr>
     <td><%= f.blabel :short_name, :en => "Display Name" %></td>
     <td><span <% unless editable_name %>id="short_name"<% end %>
               class="short_name <%= editable_name ? 'display_data' : 'edit_or_show_data' %>"><%=h @user.short_name %></span>
-      <%= f.text_field :short_name, :class => "edit_data", :maxlength => 255, :size => 30 if editable_name %>
-      <span class="edit_or_show_data data_description"><br/><%= t('hints.short_name', "People will see this name in discussions, messages and comments.") %></span>
+      <%= f.text_field :short_name, :class => "edit_data", :maxlength => 255, :size => 30, "aria-describedby" => "#hints_short_name" if editable_name %>
+      <span id="hints_short_name" class="edit_or_show_data data_description"><br/><%= t('hints.short_name', "People will see this name in discussions, messages and comments.") %></span>
     </td>
   </tr>
   <tr>
     <td><%= f.blabel :sortable_name, :en => "Sortable Name" %></td>
     <td><span <% unless editable_name %>id="sortable_name"<% end %>
               class="sortable_name <%= editable_name ? 'display_data' : 'edit_or_show_data' %>"><%=h @user.sortable_name %></span>
-      <%= f.text_field :sortable_name, :class => "edit_data", :maxlength => 255, :size => 30  if editable_name %>
-      <span class="edit_or_show_data data_description"><br/><%= t('hints.sortable_name', "This name appears in sorted lists.") %></span>
+      <%= f.text_field :sortable_name, :class => "edit_data", :maxlength => 255, :size => 30, "aria-describedby" => "#hints_sortable_name" if editable_name %>
+      <span id="hints_sortable_name" class="edit_or_show_data data_description"><br/><%= t('hints.sortable_name', "This name appears in sorted lists.") %></span>
     </td>
   </tr>
   <% active_email_channels = @email_channels.select { |cc| cc.active? } %>
@@ -86,11 +86,11 @@
   <tr>
     <td><%= f.blabel :locale, :en => "Language" %></td>
     <td>
-      <% no_language = t(:no_language_preference, "System Default (%{language})", :language => available_locales[infer_locale(:root_account => @domain_root_account, :accept_language => request.headers['Accept-Language'])]) %>
+      <% no_language = t("System Default (%{language})", :language => available_locales[infer_locale(:root_account => @domain_root_account, :accept_language => request.headers['Accept-Language'])]) %>
       <span class="locale display_data"><%= @user.locale ? available_locales[@user.locale] : no_language %></span>
-      <span class="edit_data"><%= f.select :locale, [[no_language, nil]] + available_locales.invert.sort, {:selected => @user.locale}, {:class => 'locale'} %>
+      <span class="edit_data"><%= f.select :locale, [[no_language, nil]] + available_locales.invert.sort, {:selected => @user.locale}, {:class => 'locale', "aria-describedby" => "#hints_language"} %>
       <%= render :partial => 'shared/locale_warning' %>
-      <span style="font-size: 0.8em; color: #888;"><br/><%= t('hints.language', "This will override any browser or account settings.") %></span>
+      <span id="hints_language" style="font-size: 0.8em; color: #888;"><br/><%= t('hints.language', "This will override any browser or account settings.") %></span>
       </span>
     </td>
   </tr>
@@ -306,7 +306,7 @@ TEXT
             <div class="clear"></div>
           </div>
           <div style="text-align: center; font-size: 1.2em; margin-top: 10px;">
-            <%= form_for :user_service, :url => profile_create_user_service_url, :html => {:class => "create_user_service_form"} do |f| %>
+            <%= form_for :user_service, :url => profile_create_user_service_url, :html => {:class => "create_user_service_form"}, :namespace => "skype" do |f| %>
             <%= f.hidden_field :service, :value => "skype" %>
             <table class="formtable">
               <tr>
@@ -386,7 +386,7 @@ TEXT
             <div class="clear"></div>
           </div>
           <div style="text-align: center; font-size: 1.2em; margin-top: 10px;">
-            <%= form_for :user_service, :url => profile_create_user_service_url, :html => {:class => "create_user_service_form"} do |f| %>
+            <%= form_for :user_service, :url => profile_create_user_service_url, :html => {:class => "create_user_service_form"}, :namespace => "yo" do |f| %>
             <%= f.hidden_field :service, :value => "yo" %>
             <table class="formtable">
               <tr>
@@ -417,7 +417,7 @@ TEXT
             <div class="clear"></div>
           </div>
           <div style="font-size: 1.0em; margin-top: 10px;">
-            <%= form_for :user_service, :url => profile_create_user_service_url, :html => {:class => "create_user_service_form"} do |f| %>
+            <%= form_for :user_service, :url => profile_create_user_service_url, :html => {:class => "create_user_service_form"}, :namespace => "delicious" do |f| %>
             <%= f.hidden_field :service, :value => "delicious" %>
             <table class="formtable">
               <tr>
@@ -452,7 +452,7 @@ TEXT
             <div class="clear"></div>
           </div>
           <div style="font-size: 1.0em; margin-top: 10px;">
-            <%= form_for :user_service, :url => profile_create_user_service_url, :html => {:class => "create_user_service_form"} do |f| %>
+            <%= form_for :user_service, :url => profile_create_user_service_url, :html => {:class => "create_user_service_form"}, :namespace => "diigo" do |f| %>
             <%= f.hidden_field :service, :value => "diigo" %>
             <table class="formtable">
               <tr>
@@ -514,7 +514,7 @@ TEXT
     </div>
   <% end %>
   <div id="token_details_dialog" style="display: none;" title="<%= t('titles.access_token_details', "Access Token Details") %>">
-    <p><%= t(:access_token_description, <<-TEXT, :wrapper => '<a href="https://canvas.instructure.com/doc/api/index.html" target="_blank" class="external">\1</a>')
+    <p><%= t(<<-TEXT, :wrapper => '<a href="https://canvas.instructure.com/doc/api/index.html" target="_blank" class="external">\1</a>')
       Access tokens can be used to allow other applications to make API calls
       on your behalf.  You can also generate access tokens and *use the Canvas
       Open API* to come up with your own integrations.
@@ -638,7 +638,7 @@ TEXT
 </div>
 <% else %>
   <p class="alert alert-info">
-    <%= t "confirm_email_instructions", <<-TEXT, :email => @current_user.email, :wrapper => {'*' => '<a href="' + re_send_confirmation_path(@current_user, @current_user.communication_channel) + '" class="re_send_confirmation_link">\1</a>'}
+    <%= t <<-TEXT, :email => @current_user.email, :wrapper => {'*' => '<a href="' + re_send_confirmation_path(@current_user, @current_user.communication_channel) + '" class="re_send_confirmation_link">\1</a>'}
       Before you can edit your profile, you need to verify your email address (%{email}) by clicking the link in the email we sent you.
       If you don't see it, *click to re-send the email*, and make sure to check your spam box.
     TEXT

@@ -254,7 +254,7 @@ module SIS
       def update_progress?
         @last_progress_update ||= Time.now
         update_interval = Setting.get('sis_batch_progress_interval', 2.seconds).to_i
-        @last_progress_update < update_interval.ago
+        @last_progress_update < update_interval.seconds.ago
       end
 
       def run_single_importer(importer, csv)

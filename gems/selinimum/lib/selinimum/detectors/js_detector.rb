@@ -12,7 +12,7 @@ module Selinimum
         mod = module_from(file)
         bundles = find_js_bundles(mod)
         raise UnknownDependentsError, file if bundles.empty?
-        raise TooManyDependentsError, file if bundles.include?("js:common")
+        raise TooManyDependentsError, file if bundles.include?("js:common") || bundles.include?("js:compiled/tinymce")
         bundles
       end
 
@@ -22,7 +22,7 @@ module Selinimum
 
       def find_js_bundles(mod)
         (graph[mod + ".js"] || []).map do |bundle|
-          bundle.sub(%r{\Acompiled/bundles/(.*)\.js\z}, "js:\\1")
+          bundle.sub(%r{\A(compiled/bundles/)?(.*)\.js\z}, "js:\\2")
         end
       end
 

@@ -37,7 +37,7 @@ module ShardedBookmarkedCollection
     # not the result of association.with_each_shard because we don't want it to
     # flatten our list of pairs
     collections = []
-    association = association.scoped
+    association = association.scope unless association.is_a?(ActiveRecord::Relation)
     if association.is_a?(ActiveRecord::Relation) && association.shard_category != :explicit &&
         owner = (association.respond_to?(:proxy_association) && association.proxy_association.try(:owner))
       association = association.shard(owner)

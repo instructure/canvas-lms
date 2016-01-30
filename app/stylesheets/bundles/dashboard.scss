@@ -1,10 +1,6 @@
 @import "pages/dashboard/dashboard_activity";
 
 @if $use_new_styles {
-  .ic-Dashboard-container {
-    max-width: 1052px;
-    margin: 0 auto;
-  }
   .ic-Dashboard-content--align-right {
     align-items: flex-end;
   }

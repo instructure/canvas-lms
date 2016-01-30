@@ -626,8 +626,8 @@ body .disabled_link {
 
 .datetime_suggest {
   font-size: 0.8em;
-  color: #888;
   padding-left: 10px;
+  color: $ic-dim-helper-text;
 }
 
 #submission_preview {

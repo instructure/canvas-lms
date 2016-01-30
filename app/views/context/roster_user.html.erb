@@ -107,12 +107,14 @@
             </td>
             <% if enrollment.admin? ? (can_manage_admins && enrollment.user_id != @current_user.id) : can_manage_students %>
               <td style="vertical-align: top; padding: 5px; font-size: 0.8em;">
-                <div class="conclude_enrollment_link_holder" style="margin-bottom: 5px; <%= hidden if enrollment.completed? %>">
-                  <a class="conclude_enrollment_link" href="<%= context_url(@context, :controller => :courses, :action => :conclude_user, :id => enrollment.id) %>"><%= t('links.conclude_enrollment', %{Conclude this Enrollment}) %></a>
-                </div>
-                <div class="unconclude_enrollment_link_holder" style="margin-bottom: 5px; <%= hidden unless enrollment.explicitly_completed? %>">
-                  <a class="unconclude_enrollment_link" href="<%= context_url(@context, :controller => :courses, :action => :unconclude_user, :id => enrollment.id) %>"><%= t('links.restore_enrollment', %{Restore this Enrollment}) %></a>
-                </div>
+                <% unless @context.completed? %>
+                  <div class="conclude_enrollment_link_holder" style="margin-bottom: 5px; <%= hidden if enrollment.completed? %>">
+                    <a class="conclude_enrollment_link" href="<%= context_url(@context, :controller => :courses, :action => :conclude_user, :id => enrollment.id) %>"><%= t('links.conclude_enrollment', %{Conclude this Enrollment}) %></a>
+                  </div>
+                  <div class="unconclude_enrollment_link_holder" style="margin-bottom: 5px; <%= hidden unless enrollment.explicitly_completed? %>">
+                    <a class="unconclude_enrollment_link" href="<%= context_url(@context, :controller => :courses, :action => :unconclude_user, :id => enrollment.id) %>"><%= t('links.restore_enrollment', %{Restore this Enrollment}) %></a>
+                  </div>
+                <% end %>
                 <% if can_do(@context, @current_user, :manage_admin_users) && enrollment.is_a?(ObserverEnrollment) %>
                   <div class="link_enrollment_link_holder" style="margin-bottom: 5px;">
                     <a class="link_enrollment_link" href="#" data-id="<%= enrollment.id %>" data-associated-id="<%= enrollment.associated_user_id %>"><%= t('links.link_enrollment', %{Link this Enrollment}) %></a>

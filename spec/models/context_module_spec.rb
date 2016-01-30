@@ -812,7 +812,7 @@ describe ContextModule do
         @student_1 = student_in_course(course: @course, active_all: true).user
         @student_2 = student_in_course(course: @course, active_all: true).user
 
-        @student_1.enrollments.each(&:destroy!)
+        @student_1.enrollments.each(&:destroy_permanently!)
         @overriden_section = @course.course_sections.create!(name: "test section")
         student_in_section(@overriden_section, user: @student_1)
 
@@ -1090,7 +1090,7 @@ describe ContextModule do
       @student_1 = student_in_course(course: @course, active_all: true).user
       @student_2 = student_in_course(course: @course, active_all: true).user
 
-      @student_1.enrollments.each(&:destroy!)
+      @student_1.enrollments.each(&:destroy_permanently!)
       @overriden_section = @course.course_sections.create!(name: "test section")
       student_in_section(@overriden_section, user: @student_1)
 
@@ -1132,7 +1132,7 @@ describe ContextModule do
       end
       it "should not reload the tags if already loaded" do
         ContentTag.expects(:visible_to_students_in_course_with_da).never
-        ActiveRecord::Associations::Preloader.new(@module, content_tags: :content).run
+        ActiveRecord::Associations::Preloader.new.preload(@module, content_tags: :content)
         @module.content_tags_visible_to(@student_1)
       end
       it "should filter differentiated discussions" do

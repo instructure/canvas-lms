@@ -32,7 +32,7 @@ describe PolymorphicTypeOverride do
       expect(fizz_buzz.content_type).to eq 'Quizzes::Quiz'
       expect(fizz_buzz.context_type).to eq 'Quizzes::Quiz'
 
-      ContentTag.update_all("content_type='OldClassInDatabase', context_type='AnotherOldClassInDatabase'", "id=#{fizz_buzz.id}")
+      ContentTag.where(:id => fizz_buzz.id).update_all(:content_type => 'OldClassInDatabase', :context_type => 'AnotherOldClassInDatabase')
 
       updated_fizz_buzz = ContentTag.find(fizz_buzz.id)
 
@@ -52,7 +52,7 @@ describe PolymorphicTypeOverride do
       fizz_buzz = ContentTag.create! content: quiz_model, context: course_model
       expect(fizz_buzz.content_type).to eq 'Quizzes::Quiz'
 
-      ContentTag.update_all("content_type='OldClassInDatabase'", "id=#{fizz_buzz.id}")
+      ContentTag.where(:id => fizz_buzz.id).update_all(:content_type => 'OldClassInDatabase')
 
       updated_fizz_buzz = ContentTag.find(fizz_buzz.id)
       expect(updated_fizz_buzz.content_type).to eq 'Quizzes::Quiz'

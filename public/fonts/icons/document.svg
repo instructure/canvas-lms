@@ -1,8 +1,1 @@
-<?xml version="1.0" encoding="utf-8"?>
-
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="32" height="32" viewBox="0 0 32 32">
-<g>
-</g>
-	<path d="M22 2h-14c-1.104 0-2 0.896-2 2v26c0 1.104 0.896 2 2 2h18c1.104 0 2-0.896 2-2v-22l-6-6zM26 29c0 0.947-1 1-1 1h-16c0 0-1-0.053-1-1v-24c0 0 0.096-1 1-1h11v4c0 2.094 2 2 2 2h4v19zM10 15.469h14v-1h-14v1zM10 19.469h14v-1h-14v1zM10 23.469h14v-1h-14v1zM18 10.469h-8v1h8v-1zM10 27.469h14v-1h-14v1z" fill="#000000"></path>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><title>Document</title><path d="M22 2H8a2 2 0 0 0-2 2v26a2 2 0 0 0 2 2h18a2 2 0 0 0 2-2V8l-6-6zm4 27c0 .947-1 1-1 1H9s-1-.053-1-1V5s.096-1 1-1h11v4c0 2.094 2 2 2 2h4v19zM10 15.47h14v-1H10v1zm0 4h14v-1H10v1zm0 4h14v-1H10v1zm8-13h-8v1h8v-1zm-8 17h14v-1H10v1z"/></svg>

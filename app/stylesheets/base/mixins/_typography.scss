@@ -14,15 +14,8 @@
 
 // Mixin that will include the fall back px declaration as well as the calculated rem value.
 @mixin fontSize($size) {
-  @if $use_new_styles {
-    font-size: $size;
-    font-size: calculateRem($size);
-  }
-  @else {
-    font-family: $baseFontFamily;
-    font-size: $baseFontSize;
-    color: $textColor;
-  }
+  font-size: $size;
+  font-size: calculateRem($size);
 }
 
 

@@ -68,7 +68,7 @@
           <% elsif @post_grades_tools.count == 1 %>
             <% case @post_grades_tools[0][:type] %>
             <% when :lti %>
-            <button class="external-tools-dialog ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" data-url="<%= @post_grades_tools[0][:data_url]%>"><%= @post_grades_tools[0][:name]%></button>
+            <button class="external-tools-dialog ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" data-url="<%= @post_grades_tools[0][:data_url]%>"><%= @post_grades_tools[0][:name]%></button>
             <% when :post_grades %>
             <span class="post-grades-placeholder"></span>
             <% end %>

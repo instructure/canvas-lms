@@ -142,7 +142,7 @@ describe "MessageableUser::Calculator" do
         # contrived, but have read_roster permission, but no association
         account = Account.create!
         account_admin_user(:user => @viewing_user, :account => account)
-        @viewing_user.user_account_associations.scoped.delete_all
+        @viewing_user.user_account_associations.scope.delete_all
         expect(@calculator.uncached_visible_account_ids).not_to include(account.id)
       end
 

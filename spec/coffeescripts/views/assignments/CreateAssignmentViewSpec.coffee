@@ -30,10 +30,10 @@ define [
 
   buildAssignment1 = ->
     date1 =
-      "due_at": new Date("August 28, 2013").toISOString()
+      "due_at": new Date("2103-08-28T00:00:00").toISOString()
       "title":"Summer Session"
     date2 =
-      "due_at": new Date("August 28, 2013").toISOString()
+      "due_at": new Date("2103-08-28T00:00:00").toISOString()
       "title":"Winter Session"
 
     buildAssignment(

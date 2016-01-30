@@ -938,7 +938,7 @@ describe Quizzes::Quiz do
     end
 
     it 'is false if there are no submissions' do
-      @quiz.quiz_submissions.scoped.delete_all
+      @quiz.quiz_submissions.scope.delete_all
       expect(@quiz.has_student_submissions?).to be_falsey
     end
 

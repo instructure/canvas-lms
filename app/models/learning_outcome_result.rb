@@ -102,7 +102,7 @@ class LearningOutcomeResult < ActiveRecord::Base
 
   scope :for_context_codes, lambda { |codes|
     if codes == 'all'
-      scoped
+      all
     else
       where(:context_code => codes)
     end

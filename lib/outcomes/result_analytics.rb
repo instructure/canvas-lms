@@ -62,7 +62,7 @@ module Outcomes
     #
     # Returns an Array of Rollup objects.
     def outcome_results_rollups(results, users=[])
-      ActiveRecord::Associations::Preloader.new(results, :learning_outcome).run
+      ActiveRecord::Associations::Preloader.new.preload(results, :learning_outcome)
       rollups = results.chunk(&:user_id).map do |_, user_results|
         Rollup.new(user_results.first.user, rollup_user_results(user_results))
       end

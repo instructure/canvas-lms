@@ -13,18 +13,23 @@ class EpubExport < ActiveRecord::Base
 
   PERCENTAGE_COMPLETE = {
     created: 0,
-    exporting: 25,
-    exported: 50,
-    generating: 75,
+    exported: 80,
+    generating: 90,
     generated: 100
   }.freeze
 
-  workflow do         # percentage completion
-    state :created    # 0%
-    state :exporting  # 25%
-    state :exported   # 50%
-    state :generating # 75%
-    state :generated  # 100%
+  def update_progress_from_content_export!(val)
+    multiplier = PERCENTAGE_COMPLETE[:exported].to_f / 100
+    n = val * multiplier
+    self.job_progress.update_completion!(n.to_i)
+  end
+
+  workflow do
+    state :created
+    state :exporting
+    state :exported
+    state :generating
+    state :generated
     state :failed
     state :deleted
   end
@@ -71,7 +76,6 @@ class EpubExport < ActiveRecord::Base
       progress: 0,
       context: course
     })
-    job_progress.completion = PERCENTAGE_COMPLETE[:exporting]
     job_progress.start
     update_attribute(:workflow_state, 'exporting')
     content_export.export

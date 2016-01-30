@@ -184,7 +184,7 @@ class UsersController < ApplicationController
       @grades = grades_for_presenter(@presenter, @grading_periods)
       js_env :grades_for_student_url => grades_for_student_url
 
-      ActiveRecord::Associations::Preloader.new(@observed_enrollments, :course).run
+      ActiveRecord::Associations::Preloader.new.preload(@observed_enrollments, :course)
     end
   end
 

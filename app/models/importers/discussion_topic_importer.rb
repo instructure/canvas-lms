@@ -65,9 +65,9 @@ module Importers
       topic = DiscussionTopic.where(context_type: context.class.to_s, context_id: context.id).
         where(['id = ? OR (migration_id IS NOT NULL AND migration_id = ?)', options[:id], options[:migration_id]]).first
       topic ||= if options[:type] =~ /announcement/i
-                  context.announcements.scoped.new
+                  context.announcements.scope.new
                 else
-                  context.discussion_topics.scoped.new
+                  context.discussion_topics.scope.new
                 end
       topic.saved_by = :migration
       topic

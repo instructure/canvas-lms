@@ -1,8 +1,1 @@
-<?xml version="1.0" encoding="utf-8"?>
-
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="32" height="32" viewBox="0 0 32 32">
-<g>
-</g>
-	<path d="M4 2h24c2.161 0 4 1.841 4 4v16c0 2.159-1.839 4-4 4h-14l-8 6v-6h-2c-2.161 0-4-1.841-4-4v-16c0-2.159 1.839-4 4-4z" fill="#000000"></path>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><title>Discussion</title><path d="M4 2h24c2.16 0 4 1.84 4 4v16c0 2.16-1.84 4-4 4H14l-8 6v-6H4c-2.16 0-4-1.84-4-4V6c0-2.16 1.84-4 4-4z"/></svg>

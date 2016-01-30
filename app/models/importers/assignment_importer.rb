@@ -167,14 +167,9 @@ module Importers
       [:turnitin_enabled, :peer_reviews,
        :automatic_peer_reviews, :anonymous_peer_reviews,
        :grade_group_students_individually, :allowed_extensions,
-       :position, :peer_review_count, :muted
+       :position, :peer_review_count, :muted, :moderated_grading
       ].each do |prop|
         item.send("#{prop}=", hash[prop]) unless hash[prop].nil?
-      end
-
-      # ^ merge into prop list above once this feature flag is retired
-      if hash[:moderated_grading] && context.feature_enabled?(:moderated_grading)
-        item.moderated_grading = true
       end
 
       migration.add_imported_item(item)

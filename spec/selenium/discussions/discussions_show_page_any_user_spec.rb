@@ -284,6 +284,7 @@ describe "discussions" do
         end
         topic.create_materialized_view
         get url
+        wait_for_ajaximations
         expect(ffj('.comment_attachments').count).to eq 10
         fj('.showMore').click
         wait_for_ajaximations

@@ -114,7 +114,7 @@ class EventStream::Index
 
     # where to stop ("oldest" if given, defaulting to scrollback_limit, but
     # can't go past scrollback_limit)
-    scrollback_limit = self.scrollback_limit.ago
+    scrollback_limit = self.scrollback_limit.seconds.ago
     oldest = options[:oldest] || scrollback_limit
     oldest = scrollback_limit if oldest < scrollback_limit
     oldest_bucket = bucket_for_time(oldest)

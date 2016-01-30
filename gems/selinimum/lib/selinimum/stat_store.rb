@@ -2,6 +2,7 @@ require "json"
 require "aws-sdk"
 require "fileutils"
 require "tmpdir"
+require 'yaml'
 
 module Selinimum
   module StatStore

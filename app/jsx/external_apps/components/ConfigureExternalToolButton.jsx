@@ -54,7 +54,7 @@ define([
 
     renderIframe() {
       if (this.state.modalIsOpen) {
-        return <iframe src={this.getLaunchUrl()} style={{
+        return <iframe src={this.getLaunchUrl()} title={I18n.t('Tool Configuration')} style={{
           width: '100%',
           padding: 0,
           margin: 0,

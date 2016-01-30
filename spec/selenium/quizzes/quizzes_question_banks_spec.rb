@@ -163,16 +163,33 @@ describe 'quizzes question banks' do
     end
 
     it 'should create a question group from a question bank', priority: "1", test_id: 319907 do
+      bank = AssessmentQuestionBank.create!(context: @course)
+      3.times { assessment_question_model(bank: bank) }
+
       get "/courses/#{@course.id}/quizzes/new"
       click_questions_tab
 
       f('.add_question_group_link').click
       wait_for_ajaximations
       group_form = f('#group_top_new .quiz_group_form')
-      group_form.find_element(:name, 'quiz_group[name]').send_keys('new group')
-      replace_content(group_form.find_element(:name, 'quiz_group[question_points]'), '2')
+
+      # give the question group a title
+      question_group_title = 'New Question Group'
+      group_form.find_element(:name, 'quiz_group[name]').send_keys(question_group_title)
+
+      fln('Link to a Question Bank').click
+      wait_for_ajaximations
+
+      # select a question bank
+      hover_and_click('li.bank:nth-child(2)')
+      fj('div.button-container:nth-child(2) > button:nth-child(1)').click
+
+      message = "Questions will be pulled from the bank: #{bank.title}"
+      expect(fj('.assessment_question_bank')).to include_text message
       submit_form(group_form)
-      expect(f('#questions .group_top .group_display.name')).to include_text('new group')
+
+      expect(f('#questions .group_top .group_display.name')).to include_text question_group_title
+      expect(fj('.assessment_question_bank')).to include_text message
     end
 
     it 'creates a question group from a question bank from within the Find Quiz Question modal', priority: "1", test_id: 140590 do

@@ -56,7 +56,7 @@ describe "assignments" do
 
       get "/courses/#{@course.id}/assignments/#{assignment.id}"
       details = f(".details")
-      expect(details).to include_text('comment before muting')
+      expect(details).not_to include_text('comment before muting')
       expect(details).not_to include_text('comment after muting')
     end
 

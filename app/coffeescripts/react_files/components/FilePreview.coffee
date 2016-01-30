@@ -17,6 +17,7 @@ define [
   '../modules/filesEnv'
   '../modules/FocusStore'
   'jsx/files/codeToRemoveLater'
+  'compiled/jquery.rails_flash_notifications'
 ], ($, _, React, ReactRouter, ReactModal, customPropTypes, Backbone, I18n, friendlyBytes, Folder, File, FilesystemObject, preventDefault, collectionHandler, FilePreviewInfoPanel, filesEnv, FocusStore, codeToRemoveLater) ->
 
   FilePreview =
@@ -141,4 +142,8 @@ define [
       newState = {}
       newState[key] = !@state[key]
       return =>
-        @setState newState
+        @setState newState, ->
+          if (key == 'showInfoPanel' && @state.showInfoPanel)
+            $.screenReaderFlashMessage(I18n.t('Info panel displayed'))
+          else
+            $.screenReaderFlashMessage(I18n.t('Info panel hidden'))

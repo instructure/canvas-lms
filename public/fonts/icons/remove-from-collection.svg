@@ -1,8 +1,1 @@
-<?xml version="1.0" encoding="utf-8"?>
-
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="32" height="32" viewBox="0 0 32 32">
-<g>
-</g>
-	<path d="M31.75 11.105v9.831l-6 9.831v-15.729l4.976-2.787h-5.899l1.966-2h4.957v0.855zM11.25 12.284l-6.085 3.966h18.584v15.5h-23.5v-16.712l6.226-2.787h4.774v0.034zM11.064 23.75h3.933c0.967 0 1.966-0.925 1.966-2 0-1.136-0.998-2-1.966-2h-3.932c-0.967 0-2.027 0.927-1.966 2 0.061 1.075 0.875 2 1.966 2zM6.292 10.291h6v4h6v-4h6l-9-10z" fill="#000000"></path>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><title>Remove from Collection</title><path d="M31.75 11.105v9.83l-6 9.832v-15.73l4.976-2.786h-5.9l1.967-2h4.957v.856zm-20.5 1.18L5.165 16.25H23.75v15.5H.25V15.038l6.225-2.787h4.774v.035zm-.186 11.465h3.933c.967 0 1.966-.925 1.966-2 0-1.136-.998-2-1.966-2h-3.932c-.967 0-2.027.927-1.966 2 .06 1.075.874 2 1.965 2zM6.292 10.29h6v4h6v-4h6l-9-10z"/></svg>

@@ -2,7 +2,7 @@
 @import "base/environment";
 
 body {
-  font-size: 13px;
+  @include fontSize(13px);
 }
 
 //*********** BEGIN HEADER OVERRIDES **************
@@ -229,7 +229,7 @@ Here's an accessible way to do it for popovers without a header.
 
 .ui-widget.ui-tooltip.popover {
   padding: 1px;
-  font-size: 14px;
+  @include fontSize($ic-font-size--small);
   max-width: 236px;
   width: 236px;
   color: $gray;

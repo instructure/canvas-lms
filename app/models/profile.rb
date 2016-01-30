@@ -36,7 +36,7 @@ class Profile < ActiveRecord::Base
   end
 
   def data
-    read_attribute(:data) || write_attribute(:data, {})
+    read_or_initialize_attribute(:data, {})
   end
 
   def data_before_type_cast # for validations and such

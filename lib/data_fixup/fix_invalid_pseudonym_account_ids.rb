@@ -22,7 +22,7 @@ module DataFixup::FixInvalidPseudonymAccountIds
 
   def self.destroy_pseudonym(p)
     p.session_persistence_tokens.scoped.delete_all
-    p.destroy!
+    p.destroy_permanently!
   end
 
 end

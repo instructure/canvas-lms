@@ -16,19 +16,17 @@ I18n.enforce_available_locales = true
 
 I18nliner.infer_interpolation_values = false
 
-unless CANVAS_RAILS3
-  module I18nliner
-    module RehashArrays
-      def infer_pluralization_hash(default, *args)
-        if default.is_a?(Array) && default.all?{|a| a.is_a?(Array) && a.size == 2 && a.first.is_a?(Symbol)}
-          # this was a pluralization hash but rails 4 made it an array in the view helpers
-          return Hash[default]
-        end
-        super
+module I18nliner
+  module RehashArrays
+    def infer_pluralization_hash(default, *args)
+      if default.is_a?(Array) && default.all?{|a| a.is_a?(Array) && a.size == 2 && a.first.is_a?(Symbol)}
+        # this was a pluralization hash but rails 4 made it an array in the view helpers
+        return Hash[default]
       end
+      super
     end
-    CallHelpers.extend(RehashArrays)
   end
+  CallHelpers.extend(RehashArrays)
 end
 
 if ENV['LOLCALIZE']
@@ -81,9 +79,6 @@ ActionView::Helpers::FormHelper.module_eval do
   alias_method_chain :label, :symbol_translation
 end
 
-if CANVAS_RAILS3
-  ActionView::Helpers::InstanceTag.send(:include, I18nUtilities)
-end
 ActionView::Helpers::FormTagHelper.send(:include, I18nUtilities)
 ActionView::Helpers::FormTagHelper.class_eval do
   def label_tag_with_symbol_translation(method, text = nil, options = {})

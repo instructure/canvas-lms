@@ -9,9 +9,7 @@ describe "speed grader" do
   before(:once) do
     stub_kaltura
 
-    Account.default.allow_feature!(:moderated_grading)
     course(:active_all => true)
-    @course.enable_feature!(:moderated_grading)
     outcome_with_rubric
     @assignment = @course.assignments.new(:name => 'assignment with rubric', :points_possible => 10)
     @assignment.moderated_grading = true

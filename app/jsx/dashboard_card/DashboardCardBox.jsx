@@ -48,25 +48,23 @@ define([
     render: function () {
       var cards = this.props.courseCards.map((card) => {
         return (
-          <div className="col-xs-6 col-lg-4 card" key={card.id}>
-            <div>{/* Div here protects card container from grid cell's display: flex */}
-              <DashboardCard shortName={card.shortName}
-                originalName={card.originalName}
-                courseCode={card.courseCode}
-                id={card.id}
-                href={card.href}
-                links={card.links}
-                term={card.term}
-                assetString={card.assetString}
-                backgroundColor={this.colorForCard(card.assetString)}
-                handleColorChange={this.handleColorChange.bind(this, card.assetString)}
-              />
-            </div>
-          </div>
+          <DashboardCard 
+            key={card.id}
+            shortName={card.shortName}
+            originalName={card.originalName}
+            courseCode={card.courseCode}
+            id={card.id}
+            href={card.href}
+            links={card.links}
+            term={card.term}
+            assetString={card.assetString}
+            backgroundColor={this.colorForCard(card.assetString)}
+            handleColorChange={this.handleColorChange.bind(this, card.assetString)}
+          />
         );
       });
       return (
-        <div className="ic-DashboardCard_Box grid-row">
+        <div className="ic-DashboardCard__box">
           {cards}
         </div>
       );

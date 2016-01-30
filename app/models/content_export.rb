@@ -289,21 +289,24 @@ class ContentExport < ActiveRecord::Base
     ['created', 'exporting'].member? self.workflow_state
   end
 
-  alias_method :destroy!, :destroy
+  alias_method :destroy_permanently!, :destroy
   def destroy
     self.workflow_state = 'deleted'
-    self.attachment.destroy! if self.attachment
+    self.attachment.destroy_permanently! if self.attachment
     save!
   end
 
   def settings
-    read_attribute(:settings) || write_attribute(:settings,{}.with_indifferent_access)
+    read_or_initialize_attribute(:settings, {}.with_indifferent_access)
   end
 
   def fast_update_progress(val)
     content_migration.update_conversion_progress(val) if content_migration
     self.progress = val
     ContentExport.where(:id => self).update_all(:progress=>val)
+    if EpubExport.exists?(content_export_id: self.id)
+      self.epub_export.update_progress_from_content_export!(val)
+    end
     self.job_progress.try(:update_completion!, val)
   end
 

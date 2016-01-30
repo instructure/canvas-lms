@@ -1,5 +1,20 @@
+var fs = require("fs");
 var karmaFiles = [];
-var usingWebpack = (process.env.USE_WEBPACK == 'True' || process.env.USE_WEBPACK == 'true');
+
+var webpackFileExists = false;
+var webpackFilePath = __dirname + "/config/WEBPACK";
+try {
+  fs.statSync(webpackFilePath);
+  webpackFileExists = true;
+}
+catch (e) {
+  console.log("no webpack file....")
+}
+
+var usingWebpack = (process.env.USE_WEBPACK == 'True' ||
+                    process.env.USE_WEBPACK == 'true' ||
+                    webpackFileExists);
+
 // If we're using webpack, we don't want to load all the requirejs stuff;
 if(usingWebpack){
   karmaFiles = [

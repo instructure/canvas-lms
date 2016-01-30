@@ -185,7 +185,7 @@ module GoogleDocs
     def list(extensions)
       client_params = {
         api_method: drive.files.list,
-        parameters: { maxResults: 0 }
+        parameters: { maxResults: 0, q: 'trashed=false' }
       }
       list_data = client_execute!(client_params).data.to_hash
       folderize_list(list_data, extensions)
@@ -216,7 +216,7 @@ module GoogleDocs
         root = root.select { |e| extensions.include?(e.extension) }
       end
 
-      root.select { |e| !e.in_trash? }
+      root
     end
 
     def get_folder_name_by_id(entries, folder_id)

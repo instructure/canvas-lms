@@ -6,14 +6,21 @@ dashboard_courses = map_courses_for_menu(@current_user.menu_courses, :include_se
 js_env :DASHBOARD_COURSES => dashboard_courses %>
 
 <div id="DashboardCard_Container" style="display: <%= show_recent_activity? ? 'none' : 'block' %>">
-  <div class="ic-DashboardCard_Box grid-row">
+  <div class="ic-DashboardCard__box">
     <% for i in 0..dashboard_courses.length-1 do %>
-      <div class="col-xs-6 col-lg-4">
-        <div class="card">
-          <div class="ic-DashboardCard">
-            <%= image_tag('dashcards/dashcard_empty.svg', :alt => '') %>
-          </div>
-        </div>
+      <div class="ic-DashboardCard">
+        <svg xmlns="http://www.w3.org/2000/svg" class="ic-DashboardCard__placeholder-svg" version="1.1" x="0" y="0" viewBox="-1087 618 260 254" xml:space="preserve">
+          <title>Empty Card</title>
+          <g class="ic-DashboardCard__placeholder-animates">
+            <path d="M-1087 618h260v126h-260V618z"/>
+            <rect x="-1062" y="759.5" class="st0" width="184" height="16"/>
+            <rect x="-1062" y="785.5" class="st0" width="106" height="9"/>
+            <circle cx="-1054" cy="842.5" r="8"/>
+            <circle cx="-989" cy="842.5" r="8"/>
+            <circle cx="-924" cy="842.5" r="8"/>
+            <circle cx="-859" cy="842.5" r="8"/>
+          </g>
+        </svg>
       </div>
     <% end %>
   </div>

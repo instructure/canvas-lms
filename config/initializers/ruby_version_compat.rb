@@ -68,56 +68,17 @@ class ActionController::Base
   before_filter :force_utf8_params
 end
 
-if CANVAS_RAILS3
-  module HandleInvalidUtf8
-    # this is basically all potentially affected AR serialized columns that
-    # existed in the DB before Canvas was Ruby 1.9 only. We've verified that
-    # none of these columns should legitimately contain binary data, only text.
-    SERIALIZED_COLUMNS_WITH_POTENTIALLY_INVALID_UTF8 = {
-      'AssessmentQuestion'                => %w[question_data],
-      'ContextExternalTool'               => %w[settings],
-      'EportfolioEntry'                   => %w[content],
-      'ErrorReport'                       => %w[http_env data],
-      'LearningOutcome'                   => %w[data],
-      'Profile'                           => %w[data],
-      'Quizzes::Quiz'                     => %w[quiz_data],
-      'Quizzes::QuizQuestion'             => %w[question_data],
-      'Quizzes::QuizSubmission'           => %w[quiz_data submission_data],
-      'Quizzes::QuizSubmissionSnapshot'   => %w[data],
-      'Rubric'                            => %w[data],
-      'RubricAssessment'                  => %w[data],
-      'SisBatch'                          => %w[processing_errors processing_warnings],
-      'StreamItem'                        => %w[data]
-    }
-
-    def attribute_cast_code(attr_name)
-      if SERIALIZED_COLUMNS_WITH_POTENTIALLY_INVALID_UTF8[self.name].try(:include?, attr_name.to_s)
-        "Utf8Cleaner.recursively_strip_invalid_utf8!(#{super}, true)"
-      else
-        super
-      end
+module ActiveRecord::Coders
+  class Utf8SafeYAMLColumn < YAMLColumn
+    def load(*args)
+      Utf8Cleaner.recursively_strip_invalid_utf8!(super, true)
     end
   end
+end
 
-  class ActiveRecord::Base
-    extend HandleInvalidUtf8
-    def self.serialize_utf8_safe(*args)
-      serialize(*args)
-    end
-  end
-else
-  module ActiveRecord::Coders
-    class Utf8SafeYAMLColumn < YAMLColumn
-      def load(*args)
-        Utf8Cleaner.recursively_strip_invalid_utf8!(super, true)
-      end
-    end
-  end
-
-  class ActiveRecord::Base
-    def self.serialize_utf8_safe(attr_name, class_name = Object)
-      serialize(attr_name, ::ActiveRecord::Coders::Utf8SafeYAMLColumn.new(class_name))
-    end
+class ActiveRecord::Base
+  def self.serialize_utf8_safe(attr_name, class_name = Object)
+    serialize(attr_name, ::ActiveRecord::Coders::Utf8SafeYAMLColumn.new(class_name))
   end
 end
 

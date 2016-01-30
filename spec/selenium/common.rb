@@ -43,13 +43,9 @@ $server_port = nil
 $app_host_and_port = nil
 
 at_exit do
-  [1, 2, 3].each do
-    begin
-      $selenium_driver.try(:quit)
-      break
-    rescue Timeout::Error => te
-      puts "rescued timeout error from selenium_driver quit : #{te}"
-    end
+  begin
+    $selenium_driver.try(:quit)
+  rescue Errno::ECONNREFUSED
   end
 end
 
@@ -63,10 +59,33 @@ shared_context "in-process server selenium tests" do
   include CustomScreenActions
   include CustomValidators
   include CustomWaitMethods
+  include CustomDateHelpers
   include LoginAndSessionMethods
 
   # set up so you can use rails urls helpers in your selenium tests
   include Rails.application.routes.url_helpers
+
+  def check_exception(exception)
+    case exception
+    when EOFError, Errno::ECONNREFUSED, Net::ReadTimeout
+      if $selenium_driver && !RSpec.world.wants_to_quit && exception.backtrace.grep(/selenium-webdriver/).present?
+        puts "SELENIUM: webdriver is misbehaving.  Will try to re-initialize."
+        # this will cause the selenium driver to get re-initialized if it
+        # crashes for some reason
+        $selenium_driver = nil
+      end
+    end
+  end
+
+  around do |example|
+    begin
+      example.run
+    rescue # before/after/around ... always re-raise so the example fails
+      check_exception $ERROR_INFO
+      raise
+    end
+    check_exception example.example.exception
+  end
 
   prepend_before :all do
     SeleniumDriverSetup.allow_requests!
@@ -88,25 +107,8 @@ shared_context "in-process server selenium tests" do
   end
 
   append_before :each do
-    #the driver sometimes gets in a hung state and this if almost always the first line of code to catch it
-    begin
-      tries ||= 3
-      driver.manage.timeouts.implicit_wait = 3
-      driver.manage.timeouts.script_timeout = 60
-      EncryptedCookieStore.test_secret = SecureRandom.hex(64)
-      enable_forgery_protection
-    rescue
-      if ENV['PARALLEL_EXECS'] != nil
-        #cleans up and provisions a new driver
-        puts "ERROR: thread: #{THIS_ENV} selenium server hung, attempting to recover the node"
-        $selenium_driver = nil
-        $selenium_driver ||= setup_selenium
-        default_url_options[:host] = $app_host_and_port
-        retry unless (tries -= 1).zero?
-      else
-        raise # preserve original error
-      end
-    end
+    EncryptedCookieStore.test_secret = SecureRandom.hex(64)
+    enable_forgery_protection
   end
 
   before do

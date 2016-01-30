@@ -80,6 +80,7 @@ define([
             isLoading={isLoading}
             {...draftFilters}
             errors={errors}
+            accountId={this.props.accountId}
           />
 
           {users && users.data &&
@@ -94,4 +95,3 @@ define([
 
   return UsersPane;
 });
-

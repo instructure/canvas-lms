@@ -412,7 +412,7 @@ describe Attachment do
       a.destroy
       expect(a).not_to be_frozen
       expect(a).to be_deleted
-      a.destroy!
+      a.destroy_permanently!
       expect(a).to be_frozen
     end
 
@@ -447,13 +447,13 @@ describe Attachment do
     end
   end
 
-  context "destroy!" do
+  context "destroy_permanently!" do
     it "should not delete the s3 object, even here" do
       s3_storage!
       a = attachment_model
       s3object = a.s3object
       s3object.expects(:delete).never
-      a.destroy!
+      a.destroy_permanently!
     end
   end
 

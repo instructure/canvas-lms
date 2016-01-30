@@ -53,9 +53,7 @@ environment_configuration(defined?(config) && config) do |config|
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
 
-  unless CANVAS_RAILS3
-    config.eager_load = true
-  end
+  config.eager_load = true
 
   # eval <env>-local.rb if it exists
   Dir[File.dirname(__FILE__) + "/" + File.basename(__FILE__, ".rb") + "-*.rb"].each { |localfile| eval(File.new(localfile).read, nil, localfile, 1) }

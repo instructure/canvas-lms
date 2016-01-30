@@ -135,5 +135,73 @@ describe 'Student Gradebook' do
     f('#only_consider_graded_assignments').click
     expect(f('.final_grade .grade').text).to eq '66.67%'
   end
+
+  context 'Comments' do
+    # create a course, publish and enroll teacher and student
+    let(:test_course) { course() }
+    let(:teacher) { user(active_all: true) }
+    let(:student) { user(active_all: true) }
+    let!(:published_course) do
+      test_course.workflow_state = 'available'
+      test_course.save!
+      test_course
+    end
+    let!(:enroll_teacher_and_students) do
+      published_course.enroll_teacher(teacher).accept!
+      published_course.enroll_student(student, enrollment_state: 'active')
+    end
+    # create an assignment and submit as a student
+    let(:assignment) do
+      published_course.assignments.create!(
+        title: 'Assignment Yay',
+        grading_type: 'points',
+        points_possible: 10,
+        submission_types: 'online_upload'
+      )
+    end
+    let(:file_attachment) { attachment_model(:content_type => 'application/pdf', :context => student) }
+    let!(:student_submission) do
+      assignment.submit_homework(
+        student,
+        submission_type: 'online_upload',
+        attachments: [file_attachment]
+      )
+    end
+    # leave a comment as a teacher
+    let!(:teacher_comment) { student_submission.submission_comments.create!(comment: 'good job')}
+
+    it 'should display comments from a teacher on student grades page', priority: "1", test_id: 537621 do
+      user_session(student)
+
+      get "/courses/#{published_course.id}/grades"
+      fj('.toggle_comments_link .icon-discussion:first').click
+      expect(fj('.score_details_table span:first')).to include_text('good job')
+    end
+
+    it 'should not display comments from a teacher on student grades page if assignment is muted', priority: "1", test_id: 537620 do
+      assignment.muted = true
+      assignment.save!
+      user_session(student)
+
+      get "/courses/#{published_course.id}/grades"
+      expect(fj('.score_details_table span:first')).not_to include_text('good job')
+    end
+
+    it 'should display comments from a teacher on assignment show page if assignment is muted', priority: "1", test_id: 537868 do
+      user_session(student)
+
+      get "/courses/#{published_course.id}/assignments/#{assignment.id}"
+      expect(fj('.comments.module .comment:first')).to include_text('good job')
+    end
+
+    it 'should not display comments from a teacher on assignment show page if assignment is muted', priority: "1", test_id: 537867 do
+      assignment.muted = true
+      assignment.save!
+      user_session(student)
+
+      get "/courses/#{published_course.id}/assignments/#{assignment.id}"
+      expect(fj('.comments.module p')).to include_text('You may not see all comments right now because the assignment is currently being graded.')
+    end
+  end
 end
 

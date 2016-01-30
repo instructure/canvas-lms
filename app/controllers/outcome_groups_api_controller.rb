@@ -341,7 +341,7 @@ class OutcomeGroupsApiController < ApplicationController
     end
 
     # preload the links' outcomes' contexts.
-    ActiveRecord::Associations::Preloader.new(@links, :learning_outcome_content => :context).run
+    ActiveRecord::Associations::Preloader.new.preload(@links, :learning_outcome_content => :context)
 
     # render to json and serve
     render :json => outcome_links_json(@links, @current_user, session)

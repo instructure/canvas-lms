@@ -23,9 +23,9 @@ RUN wget http://people.mozilla.org/~jkew/woff/woff-code-latest.zip \
   && make \
   && cp sfnt2woff /usr/local/bin
 
-# Canvas requires bundler 1.10.6
+# Canvas requires bundler 1.11.2
 RUN gem uninstall bundler \
-  && gem install bundler -v 1.10.6
+  && gem install bundler -v 1.11.2
 
 RUN mkdir /app
 WORKDIR /app

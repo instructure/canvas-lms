@@ -18,7 +18,6 @@
 #
 
 require 'iconv'
-require 'yaml'
 
 module Utf8Cleaner
   # This doesn't make any attempt to convert other encodings to utf-8, it just

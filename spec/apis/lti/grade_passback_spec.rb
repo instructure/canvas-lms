@@ -567,7 +567,7 @@ to because the assignment has no points possible.
 
   it "should reject if the assignment doesn't use this tool" do
     tool = @course.context_external_tools.create!(:shared_secret => 'test_secret_2', :consumer_key => 'test_key_2', :name => 'new tool', :domain => 'example.net')
-    @assignment.external_tool_tag.destroy!
+    @assignment.external_tool_tag.destroy_permanently!
     @assignment.external_tool_tag = nil
     tag = @assignment.build_external_tool_tag(:url => "http://example.net/one")
     tag.content_type = 'ContextExternalTool'
@@ -578,7 +578,7 @@ to because the assignment has no points possible.
 
   it "should be unsupported if the assignment switched to a new tool with the same shared secret" do
     tool = @course.context_external_tools.create!(:shared_secret => 'test_secret', :consumer_key => 'test_key', :name => 'new tool', :domain => 'example.net')
-    @assignment.external_tool_tag.destroy!
+    @assignment.external_tool_tag.destroy_permanently!
     @assignment.external_tool_tag = nil
     tag = @assignment.build_external_tool_tag(:url => "http://example.net/one")
     tag.content_type = 'ContextExternalTool'
@@ -589,7 +589,7 @@ to because the assignment has no points possible.
 
   it "should reject if the assignment is no longer a tool assignment" do
     @assignment.update_attributes(:submission_types => 'online_upload')
-    @assignment.reload.external_tool_tag.destroy!
+    @assignment.reload.external_tool_tag.destroy_permanently!
     make_call('body' => replace_result(score: '0.5'))
     check_failure('failure', 'Assignment is no longer associated with this tool')
   end
@@ -779,7 +779,7 @@ to because the assignment has no points possible.
 
     it "should reject if the assignment doesn't use this tool" do
       tool = @course.context_external_tools.create!(:shared_secret => 'test_secret_2', :consumer_key => 'test_key_2', :name => 'new tool', :domain => 'example.net')
-      @assignment.external_tool_tag.destroy!
+      @assignment.external_tool_tag.destroy_permanently!
       @assignment.external_tool_tag = nil
       tag = @assignment.build_external_tool_tag(:url => "http://example.net/one")
       tag.content_type = 'ContextExternalTool'
@@ -790,7 +790,7 @@ to because the assignment has no points possible.
 
     it "should be unsupported if the assignment switched to a new tool with the same shared secret" do
       tool = @course.context_external_tools.create!(:shared_secret => 'test_secret', :consumer_key => 'test_key', :name => 'new tool', :domain => 'example.net')
-      @assignment.external_tool_tag.destroy!
+      @assignment.external_tool_tag.destroy_permanently!
       @assignment.external_tool_tag = nil
       tag = @assignment.build_external_tool_tag(:url => "http://example.net/one")
       tag.content_type = 'ContextExternalTool'
@@ -801,7 +801,7 @@ to because the assignment has no points possible.
 
     it "should reject if the assignment is no longer a tool assignment" do
       @assignment.update_attributes(:submission_types => 'online_upload')
-      @assignment.reload.external_tool_tag.destroy!
+      @assignment.reload.external_tool_tag.destroy_permanently!
       make_call('body' => update_result('0.5'))
       check_failure
     end

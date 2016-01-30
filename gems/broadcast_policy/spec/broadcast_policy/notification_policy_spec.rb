@@ -18,7 +18,7 @@ describe BroadcastPolicy::NotificationPolicy do
   end
 
   it "should call the notifier" do
-    record = double('test record', skip_broadcasts: false, connection: test_connection_class.new)
+    record = double('test record', skip_broadcasts: false, class: double(connection: test_connection_class.new))
     subject.broadcast(record)
     expect(BroadcastPolicy.notifier.messages.count).to eq(1)
   end
@@ -37,23 +37,23 @@ describe BroadcastPolicy::NotificationPolicy do
   end
 
   it "should not send if there is not a recipient list" do
-    record = double('test object', skip_broadcasts: false, connection: test_connection_class.new)
+    record = double('test object', skip_broadcasts: false, class: double(connection: test_connection_class.new))
     subject.to = ->(_) { nil }
     subject.broadcast(record)
     expect(BroadcastPolicy.notifier.messages).to be_empty
   end
 
   it "should send even if there isn't a context" do
-    record = double('test object', skip_broadcasts: false, connection: test_connection_class.new)
+    record = double('test object', skip_broadcasts: false, class: double(connection: test_connection_class.new))
     subject.context = ->(_) { nil }
     subject.broadcast(record)
     expect(BroadcastPolicy.notifier.messages).to_not be_empty
   end
 
   it "should send even if there isn't data" do
-    record = double('test object', skip_broadcasts: false, connection: test_connection_class.new)
+    record = double('test object', skip_broadcasts: false, class: double(connection: test_connection_class.new))
     subject.data = ->(_) { nil }
     subject.broadcast(record)
     expect(BroadcastPolicy.notifier.messages).to_not be_empty
   end
-end 
+end

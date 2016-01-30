@@ -36,8 +36,8 @@ describe "discussions overrides" do
       @assignment.due_at = default_due_at
       add_user_specific_due_date_override(@assignment, due_at: override_due_at, section: @new_section)
       @discussion_topic.save!
-      @default_due_at_time = default_due_at.strftime('%b %-d at %-l:%M') << default_due_at.strftime('%p').downcase
-      @override_due_at_time = override_due_at.strftime('%b %-d at %-l:%M') << override_due_at.strftime('%p').downcase
+      @default_due_at_time = format_time_for_view(default_due_at)
+      @override_due_at_time = format_time_for_view(override_due_at)
       get "/courses/#{@course.id}/discussion_topics/#{@discussion_topic.id}"
     end
 

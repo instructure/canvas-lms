@@ -28,8 +28,8 @@ module Api
       end
 
 
-      describe '#include_total_scores' do
-        let(:predicate) { course_json.include_total_scores }
+      describe '#include_total_scores?' do
+        let(:predicate) { course_json.include_total_scores? }
         let(:course_settings) { Hash.new }
         let(:course) { stub( course_settings ) }
 

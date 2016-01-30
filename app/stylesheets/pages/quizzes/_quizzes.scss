@@ -2074,9 +2074,8 @@ ul#quiz_versions {
 }
 
 .regrade-options {
-  margin-top: 12px;
   color: #333;
-  padding: 2px 10px 13px 10px;
+  padding: 2px 10px;
   h3 {
     margin: 0;
     text-transform: uppercase;
@@ -2088,16 +2087,15 @@ ul#quiz_versions {
     }
   }
   .checkbox {
-    padding-left: 12px;
     input {
       height: 16px;
       margin: 0 9px 0 0;
     }
   }
-}
-
-.regrade-options label {
-  display: block;
+  label {
+    display: block;
+    padding-left: 0px;
+  }
 }
 
 .user-regrade-points {

@@ -42,6 +42,10 @@ class RequestContextGenerator
       meta_headers: meta_headers,
     }
 
+    # logged here to get as close to the beginning of the request being
+    # processed as possible
+    RequestContextGenerator.store_request_queue_time(env['HTTP_X_REQUEST_START'])
+
     status, headers, body = @app.call(env)
 
     # The session id may have been reset in the request, in which case
@@ -69,6 +73,16 @@ class RequestContextGenerator
     data = PageView.decode_token(token)
     if data
       self.add_meta_header("r", "#{data[:request_id]}|#{data[:created_at]}|#{interaction_seconds}")
+    end
+  end
+
+  def self.store_request_queue_time(header_val)
+    if header_val
+      match = header_val.match(/t=(?<req_start>\d+)/)
+      return unless match
+
+      delta = (Time.now.utc.to_f * 1000000).to_i - match['req_start'].to_i
+      RequestContextGenerator.add_meta_header("q", delta)
     end
   end
 

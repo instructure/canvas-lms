@@ -1,8 +1,1 @@
-<?xml version="1.0" encoding="utf-8"?>
-
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="32" height="32" viewBox="0 0 32 32">
-<g>
-</g>
-	<path d="M25.973-0.053h-20c-4 0-6.027 2.005-6.027 6.005v14c0 4 2.027 6 5.973 6v6l8.053-5.978h12c4 0 5.973-2.022 5.973-6.022l0-14c0-4-1.973-6.005-5.973-6.005zM23.947 12.352c-3.307 0-9.522 6.422-11.237 9.6-2.432-3.033-4.741-4.078-6.743-4.801l3.378-6 3.363 4.801c0 0 4.518-9.6 11.238-12l-0 8.4z" fill="#000000"></path>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><title>Discussion Check</title><path d="M14 0H2C.9 0 0 .9 0 2v9c0 1.1.9 2 2 2h2v3l3.6-3H14c1.1 0 2-.9 2-2V2c0-1.1-.9-2-2-2zm-.4 4l-7 7.1c-.1.1-.2.1-.3.1-.1 0-.2 0-.3-.1L2.1 7.4c-.1-.1-.1-.4 0-.5l1.4-1.4c.2-.2.4-.2.6 0l2.2 2.1 5.4-5.4c.1-.2.3-.2.5-.1l1.4 1.4c.2.1.2.4 0 .5z"/></svg>

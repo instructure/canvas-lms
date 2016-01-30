@@ -95,7 +95,7 @@ describe "calendar2" do
         it "should validate calendar feed display" do
           get "/calendar2"
 
-          f('#calendar-feed a').click
+          f('#calendar-feed button').click
           expect(f('#calendar_feed_box')).to be_displayed
         end
 

@@ -224,9 +224,9 @@ class SubmissionComment < ActiveRecord::Base
   end
 
   def self.preload_attachments(comments)
-    ActiveRecord::Associations::Preloader.new(comments, [:submission]).run
+    ActiveRecord::Associations::Preloader.new.preload(comments, [:submission])
     submissions = comments.map(&:submission).uniq
-    ActiveRecord::Associations::Preloader.new(submissions, :assignment => :attachments).run
+    ActiveRecord::Associations::Preloader.new.preload(submissions, :assignment => :attachments)
   end
 
   def update_submission

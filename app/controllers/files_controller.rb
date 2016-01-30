@@ -119,7 +119,7 @@ class FilesController < ApplicationController
 
   def quota
     get_quota
-    if authorized_action(@context.attachments.scoped.new, @current_user, :create)
+    if authorized_action(@context.attachments.scope.new, @current_user, :create)
       h = ActionView::Base.new
       h.extend ActionView::Helpers::NumberHelper
       result = {
@@ -305,7 +305,7 @@ class FilesController < ApplicationController
   end
 
   def images
-    if authorized_action(@context.attachments.scoped.new, @current_user, :read)
+    if authorized_action(@context.attachments.scope.new, @current_user, :read)
       if Folder.root_folders(@context).first.grants_right?(@current_user, session, :read_contents)
         if @context.grants_right?(@current_user, session, :manage_files)
           @images = @context.active_images.paginate :page => params[:page]
@@ -721,7 +721,7 @@ class FilesController < ApplicationController
       @context = @group || @current_user
       @check_quota = false
     elsif @context && intent == 'attach_discussion_file'
-      permission_object = @context.discussion_topics.scoped.new
+      permission_object = @context.discussion_topics.scope.new
       permission = :attach
     elsif @context && intent == 'message'
       permission_object = @context
@@ -743,7 +743,7 @@ class FilesController < ApplicationController
     if authorized_action(permission_object, @current_user, permission)
       if @context.respond_to?(:is_a_context?) && @check_quota
         get_quota
-        return if quota_exceeded(named_context_url(@context, :context_files_url))
+        return if quota_exceeded(@context, named_context_url(@context, :context_files_url))
       end
       @attachment.filename = params[:attachment][:filename]
       @attachment.file_state = 'deleted'
@@ -868,7 +868,7 @@ class FilesController < ApplicationController
     if authorized_action(@attachment, @current_user, :create)
       get_quota
       return if (params[:check_quota_after].nil? || params[:check_quota_after] == '1') &&
-                  quota_exceeded(named_context_url(@context, :context_files_url))
+                  quota_exceeded(@context, named_context_url(@context, :context_files_url))
 
       respond_to do |format|
         @attachment.folder_id ||= @folder.id

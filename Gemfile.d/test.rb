@@ -29,8 +29,7 @@ group :test do
     gem 'childprocess', '0.5.0', require: false
     gem 'websocket', '1.0.7', require: false
   gem 'selinimum', '0.0.1', require: false, path: 'gems/selinimum'
-  gem 'test_after_commit', '0.4.0'
-  gem 'test-unit', '~> 3.0', require: false, platform: :ruby_22
+  gem 'test_after_commit', '0.4.2'
   gem 'webmock', '1.22.3', require: false
     gem 'addressable', '2.3.8', require: false
     gem 'crack', '0.4.3', require: false
@@ -38,4 +37,9 @@ group :test do
   gem 'yard-appendix', '>=0.1.8'
   gem 'timecop', '0.6.3'
   gem 'jira_ref_parser', '1.0.0'
+  gem 'headless', '2.2.0', require: false
+
+  unless CANVAS_RAILS4_0
+    gem 'rails-dom-testing', '1.0.7'
+  end
 end

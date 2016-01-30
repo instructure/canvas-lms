@@ -481,7 +481,7 @@ module Api::V1::Assignment
       assignment.post_to_sis = post_to_sis
     end
 
-    if assignment.context.feature_enabled?(:moderated_grading) && assignment_params.key?('moderated_grading')
+    if assignment_params.key?('moderated_grading')
       assignment.moderated_grading = value_to_boolean(assignment_params['moderated_grading'])
     end
 

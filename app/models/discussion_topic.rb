@@ -661,11 +661,7 @@ class DiscussionTopic < ActiveRecord::Base
       else
         student_ids = opts[:student_ids] || self.context.all_real_student_enrollments.select(:user_id)
         if self.for_group_discussion?
-          if CANVAS_RAILS3
-            !DiscussionEntry.active.where(user_id: student_ids, discussion_topic_id: child_topics).exists?
-          else
           !DiscussionEntry.active.joins(:discussion_topic).merge(child_topics).where(user_id: student_ids).exists?
-          end
         else
           !self.discussion_entries.active.where(:user_id => student_ids).exists?
         end
@@ -781,7 +777,7 @@ class DiscussionTopic < ActiveRecord::Base
     end
   end
 
-  alias_method :destroy!, :destroy
+  alias_method :destroy_permanently!, :destroy
   def destroy
     ContentTag.delete_for(self)
     self.workflow_state = 'deleted'
@@ -1181,7 +1177,7 @@ class DiscussionTopic < ActiveRecord::Base
       if asset.is_a?(DiscussionTopic)
         link = "http://#{HostUrl.context_host(asset.context)}/#{asset.context_url_prefix}/discussion_topics/#{asset.id}"
       elsif asset.is_a?(DiscussionEntry)
-        link = "http://#{HostUrl.context_host(asset.context)}/#{asset.context_url_prefix}/discussion_topics/#{asset.discussion_topic_id}"
+        link = "http://#{HostUrl.context_host(asset.context)}/#{asset.context_url_prefix}/discussion_topics/#{asset.discussion_topic_id}#entry-#{asset.id}"
       end
 
       item.link = link

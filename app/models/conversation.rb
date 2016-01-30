@@ -163,7 +163,7 @@ class Conversation < ActiveRecord::Base
         unless options[:no_messages]
           # give them all messages
           # NOTE: individual messages in group conversations don't have tags
-          connection.execute(sanitize_sql([<<-SQL, self.id, current_user.id, user_ids]))
+          self.class.connection.execute(sanitize_sql([<<-SQL, self.id, current_user.id, user_ids]))
             INSERT INTO #{ConversationMessageParticipant.quoted_table_name}(conversation_message_id, conversation_participant_id, user_id, workflow_state)
             SELECT conversation_messages.id, conversation_participants.id, conversation_participants.user_id, 'active'
             FROM #{ConversationMessage.quoted_table_name}, #{ConversationParticipant.quoted_table_name}, #{ConversationMessageParticipant.quoted_table_name}
@@ -474,7 +474,7 @@ class Conversation < ActiveRecord::Base
   end
 
   def subscribed_participants
-    ActiveRecord::Associations::Preloader.new(conversation_participants, :user).run unless ModelCache[:users]
+    ActiveRecord::Associations::Preloader.new.preload(conversation_participants, :user) unless ModelCache[:users]
     conversation_participants.select(&:subscribed?).map(&:user).compact
   end
 
@@ -698,7 +698,7 @@ class Conversation < ActiveRecord::Base
   def delete_for_all
     stream_item.try(:destroy_stream_item_instances)
     shard.activate do
-      conversation_message_participants.scoped.delete_all
+      conversation_message_participants.scope.delete_all
     end
     conversation_participants.shard(self).delete_all
   end

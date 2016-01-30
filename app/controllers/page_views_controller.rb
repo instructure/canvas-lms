@@ -203,9 +203,13 @@ class PageViewsController < ApplicationController
           user: @user.name.to_s.gsub(/ /, '_')) + '.csv', disposition: 'attachment'
         }
 
-        header = Array(page_views.first.export_columns.to_csv)
-        rows   = Array(page_views.map { |view| view.to_row.to_csv })
-        csv    = (header + rows).join
+        if page_views.any?
+          header = Array(page_views.first.export_columns.to_csv)
+          rows   = Array(page_views.map { |view| view.to_row.to_csv })
+          csv    = (header + rows).join
+        else
+          csv    = ""
+        end
 
         send_data(csv, options)
       end

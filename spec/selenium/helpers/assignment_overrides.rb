@@ -1,5 +1,4 @@
 module AssignmentOverridesSeleniumHelper
-
   def visit_new_assignment_page
     get "/courses/#{@course.id}/assignments/new"
   end
@@ -112,12 +111,9 @@ module AssignmentOverridesSeleniumHelper
   end
 
   def find_vdd_time(override_context)
-    @due_at_time = override_context.due_at.strftime('%b %-d at %-l:%M') <<
-                                                               override_context.lock_at.strftime('%p').downcase
-    @lock_at_time = override_context.lock_at.strftime('%b %-d at %-l:%M') <<
-                                                               override_context.lock_at.strftime('%p').downcase
-    @unlock_at_time = override_context.unlock_at.strftime('%b %-d at %-l:%M') <<
-                                                               override_context.unlock_at.strftime('%p').downcase
+    @due_at_time = format_time_for_view(override_context.due_at)
+    @lock_at_time = format_time_for_view(override_context.lock_at)
+    @unlock_at_time = format_time_for_view(override_context.unlock_at)
   end
 
   def add_due_date_override(assignment, due_at = Time.zone.now.advance(days:1))
@@ -271,24 +267,6 @@ module AssignmentOverridesSeleniumHelper
       unlock_at: @unlock_at_b,
       lock_at: @lock_at_b
     )
-  end
-
-  # Formatted output: Mmm d, e.g. 'Jan 1'
-  def format_date_for_view(date)
-    date.strftime('%b %-d')
-  end
-
-  # Formatted output: Mmm d at h:mm, e.g. 'Jan 1 at 1:01pm'
-  # Note: Removes on-the-hour minutes, e.g. '5:00pm' becomes '5pm'
-  def format_time_for_view(time)
-    formatter = '%b %-d at %-l'
-    formatted_time = time.strftime(formatter)
-
-    on_the_hour = true if time.strftime(':%M') == ':00'
-    formatted_time << time.strftime(':%M') unless on_the_hour
-
-    # append 'am' or 'pm'
-    formatted_time << time.strftime('%p').downcase
   end
 
   def obtain_due_date(section)

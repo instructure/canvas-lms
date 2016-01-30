@@ -19,10 +19,7 @@
 
 require "spec_helper"
 
-if RUBY_VERSION >= '2.0.0'
-  require 'syck'
-end
-YAML::ENGINE.yamler = 'syck' if defined?(YAML::ENGINE)
+require 'syck'
 
 describe Utf8Cleaner do
   it "should strip out invalid utf-8" do

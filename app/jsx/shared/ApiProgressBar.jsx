@@ -47,6 +47,7 @@ define([
 
     shouldComponentUpdate (nextProps, nextState) {
       return this.state.workflow_state != nextState.workflow_state ||
+        this.state.completion != nextState.completion ||
         this.props.progress_id != nextProps.progress_id;
     },
     componentDidUpdate () {

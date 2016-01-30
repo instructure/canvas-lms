@@ -52,7 +52,7 @@ class Quizzes::QuizSubmission::QuestionReferenceDataFixer
 
     modified = false
 
-    connection = quiz_submission.connection
+    connection = quiz_submission.class.connection
     connection.transaction do
       Quizzes::QuizQuestion.transaction(requires_new: true) do
         if relink_or_create_questions(quiz_submission)

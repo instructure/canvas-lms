@@ -17,6 +17,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'nokogiri'
   spec.add_dependency 'sanitize', '~> 2.0.3'
   spec.add_dependency 'canvas_text_helper'
+  spec.add_dependency 'iconv', '~> 1.0'
 
   spec.add_dependency 'activesupport', ">= 3.2", "< 4.3"
 

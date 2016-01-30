@@ -24,6 +24,9 @@ describe BounceNotificationProcessor do
     @all_bounce_messages_json = JSON.parse(bounce_queue_log)
     @soft_bounce_messages_json = @all_bounce_messages_json.select {|m| m['Message'].include?('Transient')}
     @hard_bounce_messages_json = @all_bounce_messages_json.select {|m| m['Message'].include?('Permanent')}
+    @bounce_count = @all_bounce_messages_json.count do |notification|
+      JSON.parse(notification['Message'])['notificationType'] == 'Bounce'
+    end
   end
 
   def mock_message(json)
@@ -38,7 +41,7 @@ describe BounceNotificationProcessor do
       queue = mock
       queue.expects(:poll).multiple_yields(*@all_bounce_messages_json.map {|m| mock_message(m)})
       bnp.stubs(:bounce_queue).returns(queue)
-      bnp.expects(:process_bounce_notification).times(@all_bounce_messages_json.size)
+      bnp.expects(:process_bounce_notification).times(@bounce_count)
       bnp.process
     end
 
@@ -59,13 +62,28 @@ describe BounceNotificationProcessor do
         timestamp == '2014-08-22T12:18:58.044Z' &&
         permanent_bounce == true &&
         suppression_bounce == true
-      end.times(1)
+      end.times(3)
       CommunicationChannel.expects(:bounce_for_path).with do |path:, timestamp:, details:, permanent_bounce:, suppression_bounce:|
         path == 'soft@example.edu' &&
         timestamp == '2014-08-22T13:24:31.000Z' &&
         permanent_bounce == false &&
         suppression_bounce == false
       end.times(1)
+
+      bnp.process
+    end
+
+    it 'pings statsd' do
+      bnp = BounceNotificationProcessor.new(access_key: 'key', secret_access_key: 'secret')
+      queue = mock
+      queue.expects(:poll).multiple_yields(*@all_bounce_messages_json.map {|m| mock_message(m)})
+      bnp.stubs(:bounce_queue).returns(queue)
+      CommunicationChannel.stubs(:bounce_for_path)
+
+      CanvasStatsd::Statsd.expects(:increment).with('bounce_notification_processor.processed.transient').once
+      CanvasStatsd::Statsd.expects(:increment).with('bounce_notification_processor.processed.no_bounce').twice
+      CanvasStatsd::Statsd.expects(:increment).with('bounce_notification_processor.processed.suppression').times(3)
+      CanvasStatsd::Statsd.expects(:increment).with('bounce_notification_processor.processed.permanent').times(4)
 
       bnp.process
     end

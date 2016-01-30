@@ -43,8 +43,9 @@ describe 'quizzes students' do
       expect(f('#take_quiz_link')).to be_nil
     end
 
-    context 'when masquerading as a student' do
+    context 'when using the course student view' do
       it 'can take a quiz', priority: "1", test_id: 210050 do
+        # Note: this is different from masquerading!
         @fake_student = @course.student_view_student
         enter_student_view
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}"

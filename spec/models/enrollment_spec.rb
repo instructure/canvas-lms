@@ -37,15 +37,15 @@ describe Enrollment do
     expect(@enrollment.state).to eql(:active)
     @enrollment.reject
     expect(@enrollment.state).to eql(:rejected)
-    @enrollment.destroy!
+    @enrollment.destroy_permanently!
     enrollment_model
     @enrollment.complete
     expect(@enrollment.state).to eql(:completed)
-    @enrollment.destroy!
+    @enrollment.destroy_permanently!
     enrollment_model
     @enrollment.reject
     expect(@enrollment.state).to eql(:rejected)
-    @enrollment.destroy!
+    @enrollment.destroy_permanently!
     enrollment_model
     @enrollment.accept
     expect(@enrollment.state).to eql(:active)
@@ -54,7 +54,7 @@ describe Enrollment do
   it "should be pending if it is invited or creation_pending" do
     enrollment_model(:workflow_state => 'invited')
     expect(@enrollment).to be_pending
-    @enrollment.destroy!
+    @enrollment.destroy_permanently!
 
     enrollment_model(:workflow_state => 'creation_pending')
     expect(@enrollment).to be_pending

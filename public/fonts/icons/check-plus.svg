@@ -1,8 +1,1 @@
-<?xml version="1.0" encoding="utf-8"?>
-
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="32" height="32" viewBox="0 0 32 32">
-<g>
-</g>
-	<path d="M7.167 12.467l5.3 7.067c0 0 7.107-14.133 17.667-17.667 0 3.188 0 7.087 0 12.367-5.333 0-14.972 9.456-17.667 14.133-3.818-4.465-7.456-6.004-10.6-7.067l5.3-8.833zM30.133 23.093h-3.52v-3.627h-3.52v3.627h-3.627v3.52h3.627v3.52h3.52v-3.52h3.52v-3.52z" fill="#000000"></path>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512"><title>Check Plus</title><path d="M244.7 387.1h-30v-106H322V173.8h111v33.9l74.9-80.7c5.7-6.2 5.5-17.4-1-24l-63-64c-6.7-5.7-17.4-5.6-23 2l-235 251-97-97c-6.4-5.9-17.1-5.7-24 1l-61 66c-5.7 6.4-5.5 17.5 1 24l170 170c4.6 4 10.3 5.6 15 5 5-.5 9.4-2.3 13-6l63.2-67.9h-21.4z"/><path d="M508 357.1H404.7v103.3h-46V357.1H255.4v-46h103.3V207.8h46v103.3H508v46z"/></svg>

@@ -100,8 +100,8 @@ describe AccountAuthorizationConfig do
       expect(aac.workflow_state).to eq('deleted')
     end
 
-    it "is aliased with #destroy!" do
-      aac.destroy!
+    it "is aliased with #destroy_permanently!" do
+      aac.destroy_permanently!
       found = AccountAuthorizationConfig.find(aac.id)
       expect(found).to_not be_nil
     end

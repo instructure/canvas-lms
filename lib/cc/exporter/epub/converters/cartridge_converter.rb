@@ -66,7 +66,6 @@ module CC::Exporter::Epub::Converters
     # exports the package into the intermediary json
     def export
       unzip_archive
-      set_progress(5)
 
       @manifest = open_file(File.join(@unzipped_file_path, MANIFEST_FILE))
       get_all_resources(@manifest)
@@ -74,21 +73,14 @@ module CC::Exporter::Epub::Converters
       @course[:title] = get_node_val(@manifest, "string")
       @course[:files], @unsupported_files = convert_files
 
-      set_progress(10)
       @course[:pages] = convert_wikis
-      set_progress(20)
       @course[:assignments] = convert_assignments
-      set_progress(30)
       @course[:topics], @course[:announcements] = convert_topics
-      set_progress(40)
       @course[:quizzes] = convert_quizzes
-      set_progress(50)
       @course[:modules] = convert_modules
-      set_progress(60)
 
       save_to_file
       organize_syllabus
-      set_progress(90)
       delete_unzipped_archive
       @course
     end

@@ -19,31 +19,35 @@ define([
     },
 
     render() {
-      var { accountId, id, name, sis_user_id, email, avatar_url, last_login } = this.props;
-      var url = `/accounts/${accountId}/users/${id}`;
+      let { accountId, id, name, sis_user_id, email, avatar_url, last_login } = this.props;
+      let url = `/accounts/${accountId}/users/${id}`;
 
       return (
-        <tr>
-          <td>
-            {!!avatar_url &&
-              <span className="ic-avatar" style={{width: 30, height: 30, margin: "-1px 10px 1px 0"}}>
-                <img src={avatar_url} />
-              </span>
-            }
-            <a href={url} className="user_link">{name}</a>
-          </td>
-          <td>
+        <div role='row' className="grid-row pad-box-mini border border-b">
+          <div className="col-md-3" role="gridcell">
+            <span className="userAvatar">
+              {!!avatar_url &&
+                <span className="ic-avatar" style={{width: 30, height: 30, margin: "-1px 10px 1px 0"}}>
+                  <img src={avatar_url} />
+                </span>
+              }
+            </span>
+            <span className="userUrl">
+              <a href={url}>{name}</a>
+            </span>
+          </div>
+          <div className="col-md-3" role='gridcell'>
             {email}
-          </td>
-          <td>
+          </div>
+
+          <div className="col-md-3" role='gridcell'>
             {sis_user_id}
-          </td>
-          <td>
+          </div>
+
+          <div className="col-md-3" role='gridcell'>
             {$.datetimeString(last_login)}
-          </td>
-          <td>
-          </td>
-        </tr>
+          </div>
+        </div>
       );
     }
   });

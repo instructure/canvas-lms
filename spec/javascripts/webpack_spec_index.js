@@ -200,6 +200,7 @@ require(__dirname + "/../coffeescripts/object/unflattenSpec.coffee")
 require(__dirname + "/../coffeescripts/objectCollectionSpec.coffee")
 require(__dirname + "/../coffeescripts/paginatedListSpec.coffee")
 require(__dirname + "/../coffeescripts/QuizFormulaSolutionSpec.coffee")
+require(__dirname + "/../coffeescripts/QuizRubricSpec.coffee")
 require(__dirname + "/../coffeescripts/quizzes/QuizOverrideLoaderSpec.coffee")
 require(__dirname + "/../coffeescripts/react_files/components/BreadcrumbCollapsedContainerSpec.coffee")
 require(__dirname + "/../coffeescripts/react_files/components/BreadcrumbsSpec.coffee")
@@ -248,6 +249,7 @@ require(__dirname + "/../coffeescripts/TinymceEditorBoxListSpec.coffee")
 require(__dirname + "/../coffeescripts/TinymceEditorboxUtilsSpec.coffee")
 require(__dirname + "/../coffeescripts/userNamePartsSpec.coffee")
 require(__dirname + "/../coffeescripts/userSettingsSpec.coffee")
+require(__dirname + "/../coffeescripts/util/AvatarWidgetSpec.coffee")
 require(__dirname + "/../coffeescripts/util/BackoffPollerSpec.coffee")
 require(__dirname + "/../coffeescripts/util/brandableCssSpec.coffee")
 require(__dirname + "/../coffeescripts/util/ConverterViewControlSpec.coffee")
@@ -371,7 +373,3 @@ require(__dirname + "/../coffeescripts/tinymce_plugins/instructure_external_tool
 require(__dirname + "/../coffeescripts/tinymce_plugins/instructure_external_tools/initializeExternalToolsSpec.coffee")
 require(__dirname + "/../coffeescripts/tinymce_plugins/instructure_record/mediaEditorLoaderSpec.coffee")
 require(__dirname + "/../coffeescripts/jsx/shared/rce/loadNewRCESpec.coffee")
-
-
-//var testsContext = require.context(__dirname + "/../coffeescripts", true, /Spec.coffee$/);
-//testsContext.keys().forEach(testsContext);

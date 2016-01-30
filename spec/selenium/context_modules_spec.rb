@@ -468,6 +468,40 @@ describe "context modules" do
       test_relock
     end
 
+    it "does not have a prerequisites section when creating the first module" do
+      get "/courses/#{@course.id}/modules"
+      wait_for_modules_ui
+
+      form = new_module_form
+      expect(f('.prerequisites_entry', form)).not_to be_displayed
+      replace_content(form.find_element(:id, 'context_module_name'), "first")
+      submit_form(form)
+      wait_for_ajaximations
+
+      form = new_module_form
+      expect(f('.prerequisites_entry', form)).to be_displayed
+    end
+
+    it "does not have a prerequisites section when editing the first module" do
+      modules = create_modules(2)
+      get "/courses/#{@course.id}/modules"
+      wait_for_modules_ui
+
+      mod0 = f("#context_module_#{modules[0].id}")
+      f(".ig-header-admin .al-trigger", mod0).click
+      f('.edit_module_link', mod0).click
+      edit_form = f('#add_context_module_form')
+      expect(f('.prerequisites_entry', edit_form)).not_to be_displayed
+      submit_form(edit_form)
+      wait_for_ajaximations
+
+      mod1 = f("#context_module_#{modules[1].id}")
+      f(".ig-header-admin .al-trigger", mod1).click
+      f('.edit_module_link', mod1).click
+      edit_form = f('#add_context_module_form')
+      expect(f('.prerequisites_entry', edit_form)).to be_displayed
+    end
+
     it "should save the requirement count chosen in the Edit Module form" do
       get "/courses/#{@course.id}/modules"
       add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
@@ -1203,7 +1237,7 @@ describe "context modules" do
       verify_persistence('Graded Published Discussion with Due Date')
       expect(f('span.publish-icon.published.publish-icon-published')).to be_displayed
       expect(f('.due_date_display').text).not_to be_blank
-      expect(f('.due_date_display').text).to eq @due_at.strftime('%b %-d')
+      expect(f('.due_date_display').text).to eq date_string(@due_at, :no_words)
       expect(f('.points_possible_display').text).to include_text "10 pts"
     end
   end

@@ -17,7 +17,7 @@ define [
       @deleteUrl          = contextInfo.assignment_url
       @addClass 'assignment_override'
 
-    copyDataFromObject: (data) =>
+    copyDataFromObject: (data) ->
       if data.assignment?
         @copyDataFromAssignment(data.assignment)
         @copyDataFromOverride(data.assignment_override)
@@ -62,7 +62,7 @@ define [
       titleContext = @title.match(/\(.+\)$/)[0]
       @title = "#{title} #{titleContext}"
 
-    saveDates: (success, error) =>
+    saveDates: (success, error) ->
       @save { 'assignment_override[due_at]': if @start then fcUtil.unwrap(@start).toISOString() else ''}, success, error
 
     methodAndURLForSave: () ->

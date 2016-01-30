@@ -826,7 +826,7 @@ class Account < ActiveRecord::Base
 
     self.shard.activate do
       role_scope = Role.not_deleted.where(:name => role_name)
-      if connection.adapter_name == 'PostgreSQL'
+      if self.class.connection.adapter_name == 'PostgreSQL'
         role_scope = role_scope.where("account_id = ? OR
           account_id IN (
             WITH RECURSIVE t AS (
@@ -971,7 +971,7 @@ class Account < ActiveRecord::Base
     can :read
   end
 
-  alias_method :destroy!, :destroy
+  alias_method :destroy_permanently!, :destroy
   def destroy
     self.workflow_state = 'deleted'
     self.deleted_at = Time.now.utc
@@ -1079,7 +1079,7 @@ class Account < ActiveRecord::Base
     end
 
     def special_account_timed_cache
-      @special_account_timed_cache ||= TimedCache.new(-> { Setting.get('account_special_account_cache_time', 60.seconds).to_i.ago }) do
+      @special_account_timed_cache ||= TimedCache.new(-> { Setting.get('account_special_account_cache_time', 60).to_i.seconds.ago }) do
         special_accounts.clear
       end
     end
