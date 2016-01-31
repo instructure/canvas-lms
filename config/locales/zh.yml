@@ -418,7 +418,7 @@ zh:
       admin_tools_cumb: 管理工具
       admin_tools_title: 管理工具
       auth_logging_content_pane: 
-        auth_logging: 用户登录/登出活动
+        auth_logging: 用户登录/退出活动
       auth_logging_search_results: 
         activity: 活动
         date: 日期
@@ -520,7 +520,7 @@ zh:
         no_item_found: 找不到项目
         time: 时间
       logging_content_pane: 
-        authentication: 登录/登出活动
+        authentication: 登录/退出活动
         course: 课程活动
         grade_change: 评分更改活动
         select_default: 选择日志类型
@@ -2235,7 +2235,7 @@ zh:
   auth_logging: 
     corrupted: 详细信息不可用
     login: 登录
-    logout: 登出
+    logout: 退出
   authorize_e3f25bb4: 授权
   available_8606e40c: 可提供、可用
   available_after_unlock_at_b5682224: "%{unlock_at} 之后可供使用"
@@ -7967,9 +7967,9 @@ zh:
   locked_until_unlock_date_498ead5f: "锁定状态直到 %{unlock_date} "
   log_in_c9e240ef: 登录
   log_on_url_fc166e4c: 登录到URL
-  log_out_379ba28a: 注销
+  log_out_379ba28a: 退出
   log_out_url_2605c2c1: 退出URL
-  logged_out_user: "注销的用户 %{user_counter}"
+  logged_out_user: "退出的用户 %{user_counter}"
   login: 
     canvas: 
       forgot_password_link: 
@@ -12426,7 +12426,7 @@ zh:
         links: 
           back_to_quiz: 返回测验
           back_to_survey: 返回调查
-        logged_out_user: "注销的用户 %{index}"
+        logged_out_user: "退出的用户 %{index}"
         named_quiz_results: "%{user} 的 %{quiz_name} 结果"
         next_questions_arrow_title: 下面的问题
         no_more_attempts: "%{user} 没有剩余尝试次数"
@@ -12461,7 +12461,7 @@ zh:
         requires_lockdown: "此测验需要 Respondus LockDown Browser。请启动 Respondus LockDown Browser 以进行此测验或查看您的测验结果。"
       managed_quiz_data: 
         anonymous_student: "学生 %{user_counter}"
-        logged_out_user: "注销的用户 %{user_counter}"
+        logged_out_user: "退出的用户 %{user_counter}"
         titles: 
           submission_needs_review: 此提交文件需要审阅
       moderate: 
@@ -12876,7 +12876,7 @@ zh:
         labels: 
           started: 已开始
           times_up: 时间到！提交结果
-        logged_out_of_canvas: "*您已注销 Canvas。*若要继续，请登录"
+        logged_out_of_canvas: "*您已退出 Canvas。*若要继续，请登录"
         login_required: 需要登录
         not_saved: 未保存
         quiz_instructions: 测验说明
@@ -13983,7 +13983,7 @@ zh:
       links: 
         inbox: 收件箱
         log_in: 登录
-        logout: 登出
+        logout: 退出
         settings: 设置
         sign_up_as_teacher: 作为教师注册
       masquerading: 
@@ -14305,7 +14305,7 @@ zh:
         unauthorized_action: 未授权
       unauthorized_1: 您似乎没有访问此页面的权限。请确保您已获得查看此内容的授权。
       unauthorized_2: 如果您认为自己应该能够查看此页面，请使用"帮助"链接通知支持团队该问题。
-      unauthorized_user_is_other: "%{current_user}，您没有获得查看此页面的授权。您跟随到达此处的链接适用于 **%{unauthorized_user} (%{unauthorized_user_email})**。如果是您本人，您可能想要注销并再次使用该电子邮件地址登录以获取此页面的访问权限。"
+      unauthorized_user_is_other: "%{current_user}，您没有获得查看此页面的授权。您跟随到达此处的链接适用于 **%{unauthorized_user} (%{unauthorized_user_email})**。如果是您本人，您可能要退出并再次使用该电子邮件地址登录以获取此页面的访问权限。"
     unauthorized_feed: 
       bad_params: 您尝试访问的源的参数无效。
       feedback: "如果您非常确定此 url 应该有效，请通过单击下面的链接告诉我们您是如何到达此处，我们将调查此情况。"
@@ -14503,7 +14503,7 @@ zh:
     institution_suspended: 
       body: "您学校的 Canvas 帐户已暂时挂起。请联系您的 Canvas 管理员。"
       links: 
-        logout: 登出
+        logout: 退出
         stop_masquerading: "[停止仿冒]"
       page_title: 机构已挂起
     links: 
@@ -14880,7 +14880,7 @@ zh:
     files: 文件
     grades: 评分
     home: 主页
-    logout: 登出
+    logout: 退出
     modules: 单元
     observees: 正在观察
     outcomes: 成果
