@@ -6379,6 +6379,7 @@ pt:
       page_title: "Visualização do arquivo"
   files_and_folder_contents_only_available_to_studen_944f9166: "Conteúdos de ficheiros e pastas apenas disponíveis para os alunos com ligação. Não são visíveis nos ficheiros dos alunos."
   files_c300e900: Arquivos
+  files_quota_percentused_of_bytesavailable_used_d208857a: "Cota de Ficheiros: %{percentUsed}% de %{bytesAvailable} utilizado"
   files_toolbar_2f2f0976: "Barra de ferramentas de ficheiros"
   files_uploaded_519844ed: "Ficheiros carregados"
   fill_in_the_blank_read_surrounding_text_1a6c73c7: "Preencher o espaço em branco, ler o texto à volta"
