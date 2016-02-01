@@ -3,13 +3,12 @@ require_relative '../helpers/quizzes_common'
 
 describe 'publishing a quiz' do
   include_context "in-process server selenium tests"
-
-  let(:quiz_helper) { Class.new { extend QuizzesCommon } }
+  include QuizzesCommon
 
   context 'as a teacher' do
     before(:each) do
       course_with_teacher_logged_in
-      @quiz = quiz_helper.create_quiz_with_due_date(course: @course)
+      @quiz = create_quiz_with_due_date(course: @course)
       @quiz.workflow_state = 'unavailable'
       @quiz.save!
     end
@@ -29,12 +28,7 @@ describe 'publishing a quiz' do
       context 'after the ajax calls finish' do
         before(:each) do
           wait_for_ajaximations
-          wait = Selenium::WebDriver::Wait.new(timeout: 5)
-          wait.until do
-            f('#quiz-publish-link').present? &&
-            f('#quiz-publish-link').text.present? &&
-            f('#quiz-publish-link').text.strip!.split("\n") != []
-          end
+          wait_for_quiz_publish_button_to_populate
         end
 
         it 'changes the button\'s text to \'Published\'', priority: "1", test_id: 140649 do

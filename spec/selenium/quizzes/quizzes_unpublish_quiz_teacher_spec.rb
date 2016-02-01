@@ -9,6 +9,7 @@ describe 'unpublishing a quiz on the quiz show page' do
     get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
     f('#quiz-publish-link').click
     wait_for_ajaximations if opts.fetch(:wait_for_ajaximations, true)
+    wait_for_quiz_publish_button_to_populate
   end
 
   context 'as a teacher' do
