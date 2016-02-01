@@ -7269,6 +7269,7 @@ mi:
         save: Tiakina
         saving: "Kei te tohua"
       group_user: 
+        assign_user_to_group: "Vahe %{name} ki te rōpū"
         edit_group_membership: "Mema %{name}'s Whakatika%"
         group_leader: "Leader rōpū"
         move: "Hūnuku ki"
@@ -10237,6 +10238,11 @@ mi:
         
         Tukunga taumahi Late
     late_grading_display: "māka Late"
+    membership_update_description: |-
+        *Whakahaere anake: tārewa whakauru whakahohe*
+        
+        * Whakaurunga Rōpū
+        * Whakaaetia / paopao
     membership_update_display: "Whakahōu Mema"
     missing_description_description: "Hoki %{category} whakamōhiotanga"
     missing_display_display: "Hoki %{category} whakamōhiotanga"
@@ -14014,6 +14020,7 @@ mi:
         rubric_in_use: 
           one: "Kia mahara ki e kua oti aromatawaihia {count} ngā ākonga% te whakamahi i tēnei rubric. Huri ka pā te reira rātou aromātai. "
         rubric_in_use2: "Kua oti kē tērā te koe ākonga ki tenei rubric. Tetahi tino huringa taea e pā ratou hua aromatawai. "
+      out_of: "%{points} *i roto i te %{total}* "
       rubric: rubric
       rubric_title: taitara
       title: "taitara:"
