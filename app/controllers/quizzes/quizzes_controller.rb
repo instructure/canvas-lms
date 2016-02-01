@@ -328,10 +328,6 @@ class Quizzes::QuizzesController < ApplicationController
         params[:quiz][:assignment_id] = nil unless @assignment
         params[:quiz][:title] = @assignment.title if @assignment
       end
-      if params[:assignment].present? && Assignment.sis_grade_export_enabled?(@context) && @quiz.assignment
-        @quiz.assignment.post_to_sis = params[:assignment][:post_to_sis]
-        @quiz.assignment.save
-      end
       @quiz = @context.quizzes.build
       @quiz.content_being_saved_by(@current_user)
       @quiz.infer_times
@@ -340,6 +336,13 @@ class Quizzes::QuizzesController < ApplicationController
       @quiz.transaction do
         @quiz.update_attributes!(params[:quiz])
         batch_update_assignment_overrides(@quiz,overrides) unless overrides.nil?
+      end
+      if Assignment.sis_grade_export_enabled?(@context) && @quiz.assignment
+        post_to_sis = nil
+        post_to_sis = params[:assignment][:post_to_sis] if params[:assignment].present?
+        post_to_sis = @context.account.sis_default_grade_export[:value] if post_to_sis.nil?
+        @quiz.assignment.post_to_sis = post_to_sis
+        @quiz.assignment.save
       end
       @quiz.did_edit if @quiz.created?
       @quiz.reload

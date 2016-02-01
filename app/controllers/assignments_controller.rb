@@ -330,9 +330,13 @@ class AssignmentsController < ApplicationController
   end
 
   def create
+    if params[:assignment] && params[:assignment][:post_to_sis].nil?
+      params[:assignment][:post_to_sis] = @context.account.sis_default_grade_export[:value]
+    end
     params[:assignment][:time_zone_edited] = Time.zone.name if params[:assignment]
     group = get_assignment_group(params[:assignment])
     @assignment ||= @context.assignments.build(params[:assignment])
+
     @assignment.workflow_state ||= "unpublished"
     @assignment.updating_user = @current_user
     @assignment.content_being_saved_by(@current_user)
