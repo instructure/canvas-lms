@@ -268,7 +268,12 @@ class DiscussionTopicsController < ApplicationController
   #
   # @returns [DiscussionTopic]
   def index
-    return unless authorized_action(@context.discussion_topics.temp_record, @current_user, :read)
+    if params[:only_announcements]
+      return unless authorized_action(@context.announcements.temp_record, @current_user, :read)
+    else
+      return unless authorized_action(@context.discussion_topics.temp_record, @current_user, :read)
+    end
+
     return child_topic if is_child_topic?
 
     scope = if params[:only_announcements]

@@ -78,6 +78,20 @@ describe Announcement do
       group_with_user(:active_user => 1)
       expect(Announcement.context_allows_user_to_create?(@group, @user, {})).to be_truthy
     end
+
+    it 'allows announcements to be viewed without :read_forum' do
+      course_with_student(active_all: true)
+      @course.account.role_overrides.create!(permission: 'read_forum', role: student_role, enabled: false)
+      a = @course.announcements.create!(valid_announcement_attributes)
+      expect(a.grants_right?(@user, :read)).to be(true)
+    end
+
+    it 'does not allow announcements to be viewed without :read_announcements' do
+      course_with_student(active_all: true)
+      @course.account.role_overrides.create!(permission: 'read_announcements', role: student_role, enabled: false)
+      a = @course.announcements.create!(valid_announcement_attributes)
+      expect(a.grants_right?(@user, :read)).to be(false)
+    end
   end
 
   context "broadcast policy" do

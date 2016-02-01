@@ -1149,7 +1149,7 @@ class Course < ActiveRecord::Base
          end
         )
     end
-    can [:read, :read_as_admin, :read_roster, :read_prior_roster, :read_forum, :use_student_view, :read_outcomes, :view_unpublished_items]
+    can [:read, :read_as_admin, :read_roster, :read_prior_roster, :use_student_view, :read_outcomes, :view_unpublished_items]
 
     # overrideable permissions for concluded users
     RoleOverride.concluded_permission_types.each do |permission|
@@ -2396,7 +2396,7 @@ class Course < ActiveRecord::Base
             tabs.delete_if {|t| [TAB_PEOPLE, TAB_OUTCOMES].include?(t[:id]) }
           end
 
-          unless discussion_topics.temp_record.grants_right?(user, :read)
+          unless announcements.temp_record.grants_right?(user, :read)
             tabs.delete_if { |t| t[:id] == TAB_ANNOUNCEMENTS }
           end
 

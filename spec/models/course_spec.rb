@@ -3578,7 +3578,7 @@ describe Course do
 
       it 'can be read by a prior user' do
         user.student_enrollments.create!(:workflow_state => 'completed', :course => @course)
-        expect(@course.check_policy(user).sort).to eq [:read, :read_forum, :read_grades, :read_outcomes]
+        expect(@course.check_policy(user).sort).to eq [:read, :read_announcements, :read_forum, :read_grades, :read_outcomes]
       end
 
       it 'can have its forum read by an observer' do

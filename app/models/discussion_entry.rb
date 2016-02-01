@@ -285,7 +285,10 @@ class DiscussionEntry < ActiveRecord::Base
     given { |user| self.user && self.user == user && self.discussion_topic.available_for?(user) && context.user_can_manage_own_discussion_posts?(user) }
     can :update and can :delete
 
-    given { |user, session| self.context.grants_right?(user, session, :read_forum) && self.discussion_topic.visible_for?(user) }
+    given { |user, session| self.discussion_topic.is_announcement && self.context.grants_right?(user, session, :read_announcements) && self.discussion_topic.visible_for?(user) }
+    can :read
+
+    given { |user, session| !self.discussion_topic.is_announcement && self.context.grants_right?(user, session, :read_forum) && self.discussion_topic.visible_for?(user) }
     can :read
 
     given { |user, session| self.context.grants_right?(user, session, :post_to_forum) && !self.discussion_topic.locked_for?(user) && self.discussion_topic.visible_for?(user) }
