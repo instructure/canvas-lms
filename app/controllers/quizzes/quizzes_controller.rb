@@ -279,7 +279,7 @@ class Quizzes::QuizzesController < ApplicationController
 
       hash = {
         :ASSIGNMENT_ID => @assignment.present? ? @assignment.id : nil,
-        :ASSIGNMENT_OVERRIDES => assignment_overrides_json(@quiz.overrides_for(@current_user)),
+        :ASSIGNMENT_OVERRIDES => assignment_overrides_json(@quiz.overrides_for(@current_user, ensure_set_not_empty: true)),
         :DIFFERENTIATED_ASSIGNMENTS_ENABLED => @context.feature_enabled?(:differentiated_assignments),
         :QUIZ => quiz_json(@quiz, @context, @current_user, session),
         :SECTION_LIST => sections.map { |section|

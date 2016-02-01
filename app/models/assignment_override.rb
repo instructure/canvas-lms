@@ -69,6 +69,12 @@ class AssignmentOverride < ActiveRecord::Base
   after_save :update_cached_due_dates
   after_save :touch_assignment, :if => :assignment
 
+  def set_not_empty?
+    overridable = assignment? ? assignment : quiz
+    ['CourseSection', 'Group'].include?(self.set_type) ||
+    set.any? && overridable.context.current_enrollments.where(user_id: set).exists?
+  end
+
   def update_cached_due_dates
     return unless assignment?
     if due_at_overridden_changed? ||

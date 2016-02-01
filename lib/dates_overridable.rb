@@ -27,8 +27,13 @@ module DatesOverridable
   end
 
   # All overrides, not just dates
-  def overrides_for(user)
-    AssignmentOverrideApplicator.overrides_for_assignment_and_user(self, user)
+  def overrides_for(user, opts={})
+    overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(self, user)
+    if opts[:ensure_set_not_empty] 
+      overrides.select(&:set_not_empty?) 
+    else
+      overrides
+    end
   end
 
   def overridden_for?(user)

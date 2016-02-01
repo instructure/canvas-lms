@@ -402,7 +402,7 @@ class DiscussionTopicsController < ApplicationController
       if @topic.assignment.present?
         hash[:ATTRIBUTES][:assignment][:assignment_overrides] =
           (assignment_overrides_json(
-            @topic.assignment.overrides_for(@current_user)
+            @topic.assignment.overrides_for(@current_user, ensure_set_not_empty: true)
             ))
         hash[:ATTRIBUTES][:assignment][:has_student_submissions] = @topic.assignment.has_student_submissions?
       end
