@@ -21,8 +21,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 describe "safe_yaml" do
   it "should be used by default" do
     yaml = <<-YAML
---- !ruby/object:ActionController::Base 
-real_format: 
+--- !ruby/object:ActionController::Base
+real_format:
 YAML
     expect { YAML.load yaml }.to raise_error
     result = YAML.unsafe_load yaml
@@ -46,45 +46,46 @@ hwia: !map:HashWithIndifferentAccess
 float: !float
   5.1
 float_with_exp: -1.7763568394002505e-15
+float_inf: .inf
 os: !ruby/object:OpenStruct
   modifiable: true
-  table: 
+  table:
     :a: 1
     :b: 2
     :sub: !ruby/object:OpenStruct
       modifiable: true
-      table: 
+      table:
         :c: 3
 str: !str
   hai
 mime: !ruby/object:Mime::Type
   string: png
-  symbol: 
+  symbol:
   synonyms: []
-http: !ruby/object:URI::HTTP 
-  fragment: 
+http: !ruby/object:URI::HTTP
+  fragment:
   host: example.com
-  opaque: 
-  parser: 
-  password: 
+  opaque:
+  parser:
+  password:
   path: /
   port: 80
-  query: 
-  registry: 
+  query:
+  registry:
   scheme: http
-  user: 
-https: !ruby/object:URI::HTTPS 
-  fragment: 
+  user:
+https: !ruby/object:URI::HTTPS
+  fragment:
   host: example.com
-  opaque: 
-  parser: 
-  password: 
+  opaque:
+  parser:
+  password:
   path: /
   port: 443
-  query: 
-  registry: 
+  query:
+  registry:
   scheme: https
-  user: 
+  user:
 ab: !ruby/object:Class AcademicBenchmark::Converter
 qt: !ruby/object:Class Qti::Converter
 verbose_symbol: !ruby/symbol blah
@@ -108,6 +109,9 @@ YAML
 
     float_with_exp = verify(result, 'float_with_exp', Float)
     expect(float_with_exp).to eq(-1.7763568394002505e-15)
+
+    float_inf = verify(result, 'float_inf', Float)
+    expect(float_inf).to eq(Float::INFINITY)
 
     os = verify(result, 'os', OpenStruct)
     expect(os.a).to eq 1
