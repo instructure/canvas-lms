@@ -27,6 +27,7 @@ define [
       'click .scheduler_done_button': '_triggerDone'
       'click #create_new_event_link': '_triggerCreateNewEvent'
       'click #refresh_calendar_link': '_triggerRefreshCalendar'
+      'keydown .calendar_view_buttons': '_handleKeyDownEvent'
 
     initialize: ->
       super
@@ -49,12 +50,27 @@ define [
 
     toggleView: (e) ->
       e.preventDefault()
-      $target = $(this)
-      $target.attr('aria-checked', true)
+      $target = $(e.currentTarget)
+      $target.attr('aria-selected', true)
              .addClass('active')
+             .attr('tabindex', 0)
       $target.siblings()
-             .attr('aria-checked', false)
+             .attr('aria-selected', false)
              .removeClass('active')
+             .attr('tabindex', -1)
+
+    moveToCalendarViewButton: (direction) ->
+      buttons = @$calendarViewButtons.children('button')
+      active = @$calendarViewButtons.find('.active')
+      activeIndex = buttons.index(active)
+      lastIndex = buttons.length - 1
+
+      if direction == 'prev'
+        activeIndex = (activeIndex + lastIndex) % buttons.length
+      else if direction == 'next'
+        activeIndex = (activeIndex + 1) % buttons.length
+
+      buttons.eq(activeIndex).focus().click()
 
     showNavigator: ->
       @$navigator.show()
@@ -124,3 +140,12 @@ define [
     _triggerRefreshCalendar: (event) ->
       event.preventDefault()
       @trigger('refreshCalendar')
+
+    _handleKeyDownEvent: (event) ->
+      switch event.which
+        when 37, 38 # left, up
+          event.preventDefault()
+          @moveToCalendarViewButton('prev')
+        when 39, 40 # right, down
+          event.preventDefault()
+          @moveToCalendarViewButton('next')

@@ -113,7 +113,7 @@ describe "Conferences API", type: :request do
     let(:course_id) { conference.context.id }
 
     let(:path) do
-      "api/v1/courses/#{course_id}/conferences/#{conference.id}/recording_ready"
+      "/api/v1/courses/#{course_id}/conferences/#{conference.id}/recording_ready"
     end
 
     let(:params) do

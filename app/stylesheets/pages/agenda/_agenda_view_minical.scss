@@ -75,21 +75,33 @@ $mini-cal-highlight-border: #fa0;
   }
 
   .fc-bg .fc-state-highlight {
-    background: $ic-bg-light-alert;
+    background: $ic-color-dark;
   }
 
   .fc-content-skeleton .fc-state-highlight {
+    color: $ic-color-light;
     @if $use_new_styles { font-weight: 500; }
     @else { font-weight: bold; }
   }
 
-  .fc-basic-view td.fc-day-number { padding: 5px 0 0; }
+  .fc-basic-view td.fc-day-number {
+    @if $use_new_styles { padding: 3px 2px 2px 0; }
+    @else { padding: 4px 1px 4px 0px; }
+  }
 
   .event {
-    @if $use_new_styles {
-      background-color: $ic-bg-light-neutral;
+    position: relative;
+
+    &::after {
+      position: absolute;
+      top: 1px;
+      left: 1px;
+      height: 1.2em;
+      right: 1px;
+      border: 1px solid $ic-color-dark;
+      content: " ";
     }
-    @else { background-color: #e4e8ed; }
+
     .fc-day-content { display: none; }
   }
 }

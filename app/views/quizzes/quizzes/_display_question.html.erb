@@ -39,7 +39,7 @@
       </a>
     <% end %>
     <div class="header" <%= hidden(true) if (assessing || assessment_results) && question_type && question_type.entry_type == "none" %>>
-      <span class="name question_name" tabindex="0" role="heading" aria-level="2"><%= hash_get(question, :question_name) %></span>
+      <span class="name question_name" role="heading" aria-level="2"><%= hash_get(question, :question_name) %></span>
       <span class="question_points_holder" style="<%= hidden if question_type && question_type.entry_type == "none" %>">
       <% if user_answer %>
         <div class="user_points" <%= hidden(true) if (assessing || assessment_results) && question_type && question_type.entry_type == "none" %>>
@@ -77,9 +77,6 @@
         <%= t(:points_possible, "%{points_possible} pts", :points_possible => raw("<span class=\"points question_points\">#{hash_get(question, :points_possible, "0")}</span>")) %>
       <% end %>
     </span>
-      <% unless question && hash_get(question, :question_type) != "missing_word_question" && hash_get(question, :question_text) && hash_get(question, :question_text).length < 255 %>
-        <a class='ui-helper-hidden-accessible' href="#question_<%= hash_get(question, :id, "new") %>_question_text"><%= t(:skip_question_text, "Skip to question text.") %></a>
-      <% end %>
     </div>
     <div class="links" style="<%= hidden if user_answer || assessing %>">
       <% edit_question_title = t('links.edit_question', 'Edit this Question') %>
@@ -104,7 +101,7 @@
         <textarea style="display: none;" name="text_after_answers" class="textarea_text_after_answers"><%= h(hash_get(question, :text_after_answers)) %></textarea>
         <textarea style="display: none;" name="question_text" class="textarea_question_text"><%= h(hash_get(question, :question_text)) %></textarea>
       </div>
-      <div tabindex=0 id="question_<%= hash_get(question, :id, "new") %>_question_text" class="question_text user_content">
+      <div id="question_<%= hash_get(question, :id, "new") %>_question_text" class="question_text user_content">
         <% if user_answer && user_answer[:regrade_option] %>
           <p class="ui-widget">
             <div class="ui-state-warning ui-corner-all pad-box-micro text-center">
@@ -156,7 +153,9 @@
                variables.each {|var| answer_list << hash_get(user_answer, "answer_id_for_#{var}") }
              end
           %>
-          <%= multiple_dropdowns_question :question => question, :answers => @stored_params, :answer_list => answer_list %>
+          <%= multiple_dropdowns_question({
+            :question => question, :answers => @stored_params, :answer_list => answer_list, :editable => assessing
+          }) %>
         <% else %>
           <%= user_content(hash_get(question, :question_text)) %>
         <% end %>

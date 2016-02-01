@@ -219,7 +219,9 @@ recommended.
 
 OAuth2 Token sent in header:
 
-    curl -H "Authorization: Bearer <ACCESS-TOKEN>" https://canvas.instructure.com/api/v1/courses
+```bash
+curl -H "Authorization: Bearer <ACCESS-TOKEN>" "https://canvas.instructure.com/api/v1/courses"
+```
 
 Sending the access token in the query string or POST
 parameters is also supported, but discouraged as it increases the
@@ -227,7 +229,9 @@ chances of the token being logged or leaked in transit.
 
 OAuth2 Token sent in query string:
 
-    curl https://canvas.instructure.com/api/v1/courses?access_token=<ACCESS-TOKEN>
+```bash
+curl "https://canvas.instructure.com/api/v1/courses?access_token=<ACCESS-TOKEN>"
+```
 
 <a name="using-refresh-tokens"></a>
 ## [Using a Refresh Token to get a new Access Token](#using-refresh-tokens)

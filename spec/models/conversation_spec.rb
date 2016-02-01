@@ -657,7 +657,7 @@ describe Conversation do
 
         cp2.remove_messages(:all)
         expect(cp2.tags).to eql []
-        
+
         # no change here
         expect(cp1.reload.tags).to eql [@course.asset_string]
         expect(conversation.reload.tags).to eql [@course.asset_string]
@@ -838,7 +838,7 @@ describe Conversation do
 
       it "should ignore conversation_participants without a user" do
         broken_one = @u3.conversations.first
-        ConversationParticipant.where(id: broken_one).update_all(user_id: -1)
+        ConversationParticipant.where(id: broken_one).update_all(user_id: 0)
 
         @conversation.migrate_context_tags!
 

@@ -11,7 +11,7 @@
       white-space: nowrap;
       @if $use_new_styles {
         vertical-align: top;
-        font-size: 18px;
+        @include fontSize(18px);
         // temporary solution for new styles before crumbs are re-done:
         // we do not want to see the home link
         &:first-of-type { display: none; }
@@ -50,6 +50,7 @@
             @extend i[class*=icon-]:before;
             @extend .icon-arrow-open-right:before;
             font-size: 10px !important;
+            font-size: 0.65rem !important;
             color: hsl(0,0,61%);
             padding: 0 5px;
           }
@@ -63,7 +64,7 @@
   }
 
   .icon-home:before {
-    font-size: 10px;
+    @include fontSize(10px);
     color: $ic-font-color--subdued;
   }
 }

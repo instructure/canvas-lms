@@ -1205,10 +1205,10 @@ var React = _dereq_('old_unsupported_dont_use_react');
  *     mixins: [ Router.ActiveState ],
  *     render: function () {
  *       var className = this.props.className;
- *   
+ *
  *       if (this.isActive('about'))
  *         className += ' is-active';
- *   
+ *
  *       return React.DOM.a({ className: className }, this.props.children);
  *     }
  *   });

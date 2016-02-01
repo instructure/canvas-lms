@@ -46,7 +46,7 @@ body.modal {
       float: right;
       padding: 10px 36px;
       margin: 2px 7px 0 0;
-      font-size: 15px;
+      @include fontSize(15px);
     }
     .button_box {
       text-align: right;
@@ -112,7 +112,7 @@ body.modal {
       input.text {
         background: url(/images/login-input-bg.png) no-repeat;
         border: 0 none;
-        font-size: 13px;
+        @include fontSize(13px);
         padding: 19px 9px 18px 22px;
         width: 204px;
         color: #303030;

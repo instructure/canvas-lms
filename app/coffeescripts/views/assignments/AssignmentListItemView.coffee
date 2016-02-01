@@ -69,7 +69,11 @@ define [
       @moveAssignmentView = false
 
       if @canManage()
-        @publishIconView    = new PublishIconView(model: @model)
+        @publishIconView    = new PublishIconView({
+          model: @model,
+          publishText: I18n.t("Unpublished. Click to publish %{name}", name: @model.get('name')),
+          unpublishText: I18n.t("Published. Click to unpublish %{name}", name: @model.get('name'))
+        })
         @editAssignmentView = new CreateAssignmentView(model: @model)
         @moveAssignmentView = new MoveDialogView
           model: @model

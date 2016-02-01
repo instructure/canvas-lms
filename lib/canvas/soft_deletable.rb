@@ -21,6 +21,7 @@ module Canvas::SoftDeletable
       self.workflow_state = 'deleted'
       save!
       run_callbacks :destroy
+      true
     end
   end
 end

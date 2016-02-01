@@ -674,6 +674,41 @@ describe ApplicationController do
       end
     end
   end
+
+  describe 'verify_authenticity_token' do
+    before :each do
+      # default setup is a protected non-GET non-API session-authenticated request with bogus tokens
+      cookies = ActionDispatch::Cookies::CookieJar.new(nil)
+      controller.allow_forgery_protection = true
+      controller.request.stubs(:cookie_jar).returns(cookies)
+      controller.request.stubs(:get?).returns(false)
+      controller.request.stubs(:head?).returns(false)
+      controller.request.stubs(:path).returns('/non-api/endpoint')
+      controller.instance_variable_set(:@pseudonym_session, "session-authenticated")
+      controller.params[controller.request_forgery_protection_token] = "bogus"
+      controller.request.headers['X-CSRF-Token'] = "bogus"
+    end
+
+    it "should raise InvalidAuthenticityToken with invalid tokens" do
+      expect{ controller.send(:verify_authenticity_token) }.to raise_exception(ActionController::InvalidAuthenticityToken)
+    end
+
+    it "should not raise with valid token" do
+      controller.request.headers['X-CSRF-Token'] = controller.form_authenticity_token
+      expect{ controller.send(:verify_authenticity_token) }.not_to raise_exception
+    end
+
+    it "should still raise on session-authenticated api request with invalid tokens" do
+      controller.request.stubs(:path).returns('/api/endpoint')
+      expect{ controller.send(:verify_authenticity_token) }.to raise_exception(ActionController::InvalidAuthenticityToken)
+    end
+
+    it "should not raise on token-authenticated api request despite invalid tokens" do
+      controller.request.stubs(:path).returns('/api/endpoint')
+      controller.instance_variable_set(:@pseudonym_session, nil)
+      expect{ controller.send(:verify_authenticity_token) }.not_to raise_exception
+    end
+  end
 end
 
 describe ApplicationController do

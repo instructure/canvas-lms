@@ -7,7 +7,8 @@
   grade = nil
   score = nil
 
-  cache(['recent_feedback_render2', recent_feedback || 'blank_feedback', Time.zone.utc_offset].cache_key) do
+  # current user needs to be in the cache key to bust the cache when they change course nicknames
+  cache(['recent_feedback_render3', @current_user, recent_feedback || 'blank_feedback', Time.zone.utc_offset].cache_key) do
     context = recent_feedback.context
     assignment = recent_feedback.assignment
     url = context_url(context, :context_assignment_submission_url, :assignment_id => recent_feedback.assignment_id, :id=>@current_user.id)
@@ -25,42 +26,8 @@
   <a
     data-track-category="dashboard"
     data-track-label="recent feedback"
-    class="recent_feedback_icon tooltip" href="<%= url %>"
+    class="recent_feedback_icon" href="<%= url %>"
   >
-    <span class="tooltip_wrap">
-      <span class='tooltip-carat'></span>
-      <span class="tooltip_text">
-        <% if recent_feedback.workflow_state != 'unsubmitted' %>
-          <span style="display: block;"><%= before_label(icon_explanation.try(:capitalize)) %>
-            <% if recent_feedback.workflow_state == 'graded' %>
-              <span style="font-size: 0.8em;"><%= datetime_string(recent_feedback.graded_at) %></span>
-            <% else %>
-              <span style="font-size: 0.8em;"><%= datetime_string(recent_feedback.submitted_at) %></span>
-            <% end %>
-          </span>
-          <% unless recent_feedback.workflow_state == 'graded' %>
-            <span style="display: block; font-style: italic;"><%= t('not_graded', %{not graded}) %></span>
-          <% end %>
-        <% else %>
-          <span style="display: block; font-style: italic;"><%= icon_explanation.try(:capitalize) %></span>
-          <span style="display: block; font-size: 0.8em;"><%= translated_due_date(assignment) %></span>
-        <% end %>
-        <% if assignment.points_possible %>
-          <span style="display: block;">
-            <% if grade %>
-              <%= t 'submission_points.with_score', %{Score: %{score} *out of %{points_possible}*}, :score => render_score(score), :points_possible => assignment.points_possible,
-                :wrapper => '<span style="font-size: 0.8em;">\1</span>' %>
-            <% else %>
-              <span style="font-size: 0.8em;"><%= t 'submission_points.without_score', "out of %{points_possible}", :points_possible => assignment.points_possible %></span>
-            <% end %>
-          </span>
-        <% end %>
-        <span style="display: block;"><%= t 'comments', "Comments: %{count}", :count => recent_feedback.submission_comments.length %></span>
-        <% if show_context %>
-          <span style="display: block; font-size: 0.8em;"><%= context.short_name %></span>
-        <% end %>
-      </span>
-    </span>
     <i class="<%= icon_class %>"></i>
     <div class="event-details">
       <% if comment && comment.media_comment? %>
@@ -68,18 +35,14 @@
         <img src="<%= kaltura_thumbnail_url %>" style="float: right; padding-left: 3px;" alt=""/>
       <% end %>
       <b class="recent_feedback_title"><%= recent_feedback.assignment.title %></b>
-      <% if comment_text or grade %>
-        <em class="recent_feedback_comment">
-          <% if grade %>
-            <strong><%= grade %></strong>
-            <%= " - " if comment_text && (!comment || !comment.media_comment?) %>
-          <% end %>
-          <% if comment_text %>
-            <span class="<%= 'hidden-readable' if comment && comment.media_comment? %>">
-            &ldquo;<%= comment_text %>&rdquo;
-            </span>
-          <% end %>
-        </em>
+      <% if show_context %>
+        <p><%= context.nickname_for(@current_user) %></p>
+      <% end %>
+      <% if grade %>
+        <p><strong><%= grade %></strong></p>
+      <% end %>
+      <% if comment_text %>
+        <p>"<%= comment_text %>"</p>
       <% end %>
     </div>
     <div class="clear"></div>

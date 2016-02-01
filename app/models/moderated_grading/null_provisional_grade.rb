@@ -20,4 +20,8 @@ class ModeratedGrading::NullProvisionalGrade
   def submission_comments
     @submission.submission_comments
   end
+
+  def comments_for(_)
+    submission_comments
+  end
 end

@@ -2,7 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
 
 shared_context "public course as a logged out user" do
   def ensure_logged_out
-    destroy_session(true)
+    destroy_session
   end
 
   def validate_selector_displayed(selector)

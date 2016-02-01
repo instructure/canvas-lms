@@ -37,8 +37,10 @@ module PostgreSQLAdapterExtensions
     options.delete(:delay_validation) unless supports_delayed_constraint_validation?
     # pointless if we're in a transaction
     options.delete(:delay_validation) if open_transactions > 0
-    column  = options[:column] || "#{to_table.to_s.singularize}_id"
-    foreign_key_name = foreign_key_name(from_table, column, options)
+    options[:column] ||= "#{to_table.to_s.singularize}_id"
+    column = options[:column]
+
+    foreign_key_name = CANVAS_RAILS4_0 ? foreign_key_name(from_table, column, options) : foreign_key_name(from_table, options)
 
     if options[:delay_validation]
       options[:options] = 'NOT VALID'
@@ -88,7 +90,8 @@ module PostgreSQLAdapterExtensions
       raise warning unless Rails.env.production?
       return
     end
-    if index_exists?(table_name, index_name, false)
+
+    if index_exists?(table_name, column_names, :name => index_name)
       @logger.warn("Index name '#{index_name}' on table '#{table_name}' already exists. Skipping.")
       return
     end

@@ -10,7 +10,6 @@ define [
   activeEditorNodes = null
 
   module "EditorAccessibility",
-
     setup: ->
       textarea = $("<textarea id='42' data-rich_text='true'></textarea>")
       fixtures.append(textarea)

@@ -42,28 +42,31 @@ Arguments:
 
 Example Request:
 
-    curl 'https://<canvas>/api/v1/users/self/files' \
-         -F 'name=profile_pic.jpg' \
-         -F 'size=302185' \
-         -F 'content_type=image/jpeg' \
-         -F 'parent_folder_path=my_files/section1' \
-         -H "Authorization: Bearer <token>"
+```bash
+curl 'https://<canvas>/api/v1/users/self/files' \
+     -F 'name=profile_pic.jpg' \
+     -F 'size=302185' \
+     -F 'content_type=image/jpeg' \
+     -F 'parent_folder_path=my_files/section1' \
+     -H "Authorization: Bearer <token>"
+```
 
 Example Response:
 
-    !!!javascript
-    {
-      "upload_url": "https://some-bucket.s3.amazonaws.com/",
-      "upload_params": {
-        "key": "/users/1234/files/profile_pic.jpg",
-        "acl": "private",
-        "Filename": "profile_pic.jpg",
-        "AWSAccessKeyId": "some_id",
-        "Policy": "some_opaque_string",
-        "Signature": "another_opaque_string",
-        "Content-Type": "image/jpeg"
-      }
-    }
+```json
+{
+  "upload_url": "https://some-bucket.s3.amazonaws.com/",
+  "upload_params": {
+    "key": "/users/1234/files/profile_pic.jpg",
+    "acl": "private",
+    "Filename": "profile_pic.jpg",
+    "AWSAccessKeyId": "some_id",
+    "Policy": "some_opaque_string",
+    "Signature": "another_opaque_string",
+    "Content-Type": "image/jpeg"
+  }
+}
+```
 
 At this point, the file object has been created in Canvas in a "pending"
 state, with no content. It will not appear in any listings in the UI until
@@ -91,16 +94,18 @@ last parameter following all the others.
 
 Example Request:
 
-    curl '<upload_url>' \ 
-         -F 'key=/users/1234/files/profile_pic.jpg' \ 
-         -F 'acl=private' \ 
-         -F 'Filename=profile_pic.jpg' \ 
-         -F 'AWSAccessKeyId=some_id' \ 
-         -F 'Policy=some_opaque_string' \ 
-         -F 'Signature=another_opaque_string' \ 
-         -F 'Content-Type=image/jpeg' \ 
-         -F '<any other fields returned in upload_params>' \
-         -F 'file=@my_local_file.jpg'
+```bash
+curl '<upload_url>' \
+     -F 'key=/users/1234/files/profile_pic.jpg' \
+     -F 'acl=private' \
+     -F 'Filename=profile_pic.jpg' \
+     -F 'AWSAccessKeyId=some_id' \
+     -F 'Policy=some_opaque_string' \
+     -F 'Signature=another_opaque_string' \
+     -F 'Content-Type=image/jpeg' \
+     -F '<any other fields returned in upload_params>' \
+     -F 'file=@my_local_file.jpg'
+```
 
 The access token is not sent with this request.
 
@@ -130,20 +135,23 @@ authentication.
 
 Example Request:
 
-    curl -X POST '<Location>' \
-         -H 'Content-Length: 0' \
-         -H "Authorization: Bearer <token>"
+```bash
+curl -X POST '<Location>' \
+     -H 'Content-Length: 0' \
+     -H "Authorization: Bearer <token>"
+```
 
 Example Response:
 
-    !!!javascript
-    {
-      'id': 1234,
-      'url': '...url to download the file...',
-      'content-type': 'image/jpeg',
-      'display_name': 'profile_pic.jpg',
-      'size': 302185
-    }
+```json
+{
+  "id": 1234,
+  "url": "...url to download the file...",
+  "content-type": "image/jpeg",
+  "display_name": "profile_pic.jpg",
+  "size": 302185
+}
+```
 
 <h2 class='api_method_name' name='method.file_uploads.url' data-subtopic="Uploading Files">
 <a name="method.file_uploads.url" href="#method.file_uploads.url">Uploading via URL</a>
@@ -167,22 +175,25 @@ with the addition of one new parameter:
 
 Example Request:
 
-    curl 'https://<canvas>/api/v1/users/self/files' \
-         -F 'url=http://example.com/my_pic.jpg' \
-         -F 'name=profile_pic.jpg' \
-         -F 'size=302185' \
-         -F 'content_type=image/jpeg' \
-         -F 'parent_folder_path=my_files/section1' \
-         -H "Authorization: Bearer <token>"
+```bash
+curl 'https://<canvas>/api/v1/users/self/files' \
+     -F 'url=http://example.com/my_pic.jpg' \
+     -F 'name=profile_pic.jpg' \
+     -F 'size=302185' \
+     -F 'content_type=image/jpeg' \
+     -F 'parent_folder_path=my_files/section1' \
+     -H "Authorization: Bearer <token>"
+```
 
 Example Response:
 
-    !!!javascript
-    {
-      'id': 1234,
-      'upload_status': 'pending',
-      'status_url' '...url to check status...'
-    }
+```json
+{
+  "id": 1234,
+  "upload_status": "pending",
+  "status_url": "...url to check status..."
+}
+```
 
 Canvas will return a status_url parameter, which is a Canvas
 API endpoint that the application can periodically poll to check on the
@@ -196,35 +207,40 @@ the status_url.
 
 Example Request:
 
-    curl 'https://<canvas>/api/v1/files/1234/5678/status' \
-         -H "Authorization: Bearer <token>"
+```bash
+curl 'https://<canvas>/api/v1/files/1234/5678/status' \
+     -H "Authorization: Bearer <token>"
+```
 
 When still pending:
 
-    !!!javascript
-    {
-      'upload_status': 'pending'
-    }
+```json
+{
+  "upload_status": "pending"
+}
+```
 
 When complete:
 
-    !!!javascript
-    {
-      'upload_status': 'ready',
-      // This is the normal attachment JSON response object
-      'attachment': {
-        'id': 1234,
-        'url': '...url to download the file...',
-        'content-type': 'image/jpeg',
-        'display_name': 'profile_pic.jpg',
-        'size': 302185
-      }
-    }
+```json
+{
+  "upload_status": "ready",
+  // This is the normal attachment JSON response object
+  "attachment": {
+    "id": 1234,
+    "url": "...url to download the file...",
+    "content-type": "image/jpeg",
+    "display_name": "profile_pic.jpg",
+    "size": 302185
+  }
+}
+```
 
 On error:
 
-    !!!javascript
-    {
-      'upload_status': 'errored',
-      'message': 'Invalid response code, expected 200 got 404'
-    }
+```json
+{
+  "upload_status": "errored",
+  "message": "Invalid response code, expected 200 got 404"
+}
+```

@@ -92,7 +92,7 @@
 #       }
 #     }
 class Quizzes::QuizAssignmentOverridesController < ApplicationController
-  include Filters::Quizzes
+  include ::Filters::Quizzes
 
   before_filter :require_course, only: [ :index ]
   skip_around_filter :set_locale, only: [ :index ]

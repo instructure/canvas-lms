@@ -98,7 +98,7 @@ $assign-border-color: #ccc;
   z-index: 9999;
   text-align: center;
   color:#e9e9e9;
-  font-size: 10px;
+  @include fontSize(10px);
   background: url("/images/load.gif") no-repeat 50% 80%;
   background-size: 16px;
   margin-bottom: -3px;

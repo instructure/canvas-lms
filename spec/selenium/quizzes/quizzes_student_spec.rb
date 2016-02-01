@@ -106,7 +106,7 @@ describe 'quizzes' do
           wait_for_ajaximations
           expect(f('#last_saved_indicator').text).to match(/^Quiz saved at \d+:\d+(pm|am)$/)
           # now kill our session (like logging out)
-          destroy_session(false)
+          destroy_session
 
           index = 1
           keep_trying_until do
@@ -122,7 +122,7 @@ describe 'quizzes' do
           expect_new_page_load { submit_dialog('#deauthorized_dialog') }
 
           # log back in
-          expect_new_page_load { fill_in_login_form(@pseudonym.unique_id, @pseudonym.password) }
+          login_as(@pseudonym.unique_id, @pseudonym.password)
 
           # we should be back at the quiz show page
           expect(fln('Resume Quiz')).to be_present

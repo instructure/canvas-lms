@@ -1406,9 +1406,23 @@ describe EnrollmentsApiController, type: :request do
         expect(response.code).to eql "401"
       end
 
-      it "should return 401 unauthorize for a user requesting an enrollment object by id" do
+      it "should return 401 unauthorized for a user requesting an enrollment object by id" do
         raw_api_call(:get, "#{@enroll_path}/#{@enrollment.id}", @enroll_params)
         expect(response.code).to eql '401'
+      end
+
+      it "should return 404 for a user querying from the wrong account" do
+        sub = @enrollment.root_account.sub_accounts.create!(name: "sub")
+        bad_path ="/api/v1/accounts/#{sub.id}/enrollments/#{@enrollment.id}"
+        enroll_params = {
+          :controller => "enrollments_api",
+          :action => "show",
+          :account_id => sub.id,
+          :id => @enrollment.id,
+          :format => "json"
+        }
+        raw_api_call(:get, bad_path, enroll_params)
+        expect(response.code).to eql '404'
       end
     end
 

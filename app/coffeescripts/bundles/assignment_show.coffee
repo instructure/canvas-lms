@@ -12,8 +12,9 @@ require [
 ], (INST, I18n, $, Assignment, PublishButtonView, SpeedgraderLinkView, vddTooltip, MarkAsDone) ->
 
   $ ->
-    $('#mark-as-done-checkbox').click ->
+    $('#content').on('click', '#mark-as-done-checkbox', ->
       MarkAsDone.toggle(this)
+    )
 
   $ ->
     $el = $('#assignment_publish_button')

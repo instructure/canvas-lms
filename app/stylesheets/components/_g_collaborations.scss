@@ -179,7 +179,7 @@ $highlight-blue: #00b5fe;
     border: 2px dashed #999;
     border-radius: 10px;
     color: #777;
-    font-size: 16px;
+    @include fontSize($ic-font-size--medium);
     margin: 36px 8px 8px 8px;
     padding: 4px;
     text-align: center;

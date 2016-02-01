@@ -82,15 +82,21 @@ describe ActiveRecord::Base do
       @e6 = @c2.enroll_student(u3, :enrollment_state => 'active')
     end
 
+    it "should raise an error when not in a transaction" do
+      expect { User.find_in_batches_with_temp_table }.to raise_error
+    end
+
     it "should find all enrollments from course join in batches" do
       e = Course.active.where(id: [@c1, @c2]).select("enrollments.id AS e_id").
                         joins(:enrollments).order("e_id asc")
       batch_size = 2
       es = []
-      e.find_in_batches_with_temp_table(:batch_size => batch_size) do |batch|
-        expect(batch.size).to eq batch_size
-        batch.each do |r|
-          es << r["e_id"].to_i
+      Course.transaction do
+        e.find_in_batches_with_temp_table(:batch_size => batch_size) do |batch|
+          expect(batch.size).to eq batch_size
+          batch.each do |r|
+            es << r["e_id"].to_i
+          end
         end
       end
       expect(es.length).to eq 6
@@ -100,8 +106,10 @@ describe ActiveRecord::Base do
     it "should pluck" do
       scope = Course.where(id: [@c1, @c2])
       cs = []
-      scope.find_in_batches_with_temp_table(batch_size: 1, pluck: :id) do |batch|
-        cs.concat(batch)
+      Course.transaction do
+        scope.find_in_batches_with_temp_table(batch_size: 1, pluck: :id) do |batch|
+          cs.concat(batch)
+        end
       end
       expect(cs.sort).to eq [@c1.id, @c2.id].sort
     end
@@ -109,8 +117,10 @@ describe ActiveRecord::Base do
     it "should multi-column pluck" do
       scope = Course.where(id: [@c1, @c2])
       cs = []
-      scope.find_in_batches_with_temp_table(batch_size: 1, pluck: [:id, :name]) do |batch|
-        cs.concat(batch)
+      Course.transaction do
+        scope.find_in_batches_with_temp_table(batch_size: 1, pluck: [:id, :name]) do |batch|
+          cs.concat(batch)
+        end
       end
       expect(cs.sort).to eq [[@c1.id, @c1.name], [@c2.id, @c2.name]].sort
     end
@@ -118,8 +128,10 @@ describe ActiveRecord::Base do
     it "should pluck with join" do
       scope = Enrollment.joins(:course).where(courses: { id: [@c1, @c2] })
       es = []
-      scope.find_in_batches_with_temp_table(batch_size: 2, pluck: :id) do |batch|
-        es.concat(batch)
+      Course.transaction do
+        scope.find_in_batches_with_temp_table(batch_size: 2, pluck: :id) do |batch|
+          es.concat(batch)
+        end
       end
       expect(es.sort).to eq [@e1.id, @e2.id, @e3.id, @e4.id, @e5.id, @e6.id].sort
     end
@@ -405,7 +417,7 @@ describe ActiveRecord::Base do
     end
   end
 
-  context "distinct" do
+  context "distinct_values" do
     before :once do
       User.create()
       User.create()
@@ -415,11 +427,11 @@ describe ActiveRecord::Base do
     end
 
     it "should return distinct values" do
-      expect(User.distinct(:locale)).to eql ["en", "es"]
+      expect(User.distinct_values(:locale)).to eql ["en", "es"]
     end
 
     it "should return distinct values with nil" do
-      expect(User.distinct(:locale, :include_nil => true)).to eql [nil, "en", "es"]
+      expect(User.distinct_values(:locale, include_nil: true)).to eql [nil, "en", "es"]
     end
   end
 
@@ -554,7 +566,7 @@ describe ActiveRecord::Base do
       p1 = u.pseudonyms.create!(unique_id: 'a', account: Account.default)
       p2 = u.pseudonyms.create!(unique_id: 'b', account: Account.default)
       p3 = u.pseudonyms.create!(unique_id: 'c', account: Account.default)
-      u.pseudonyms.scoped.reorder("unique_id DESC").limit(1).offset(1).delete_all
+      u.pseudonyms.reorder("unique_id DESC").limit(1).offset(1).delete_all
       p1.reload
       expect { p2.reload }.to raise_error(ActiveRecord::RecordNotFound)
       p3.reload

@@ -11,7 +11,7 @@ p {
 }
 .lead {
   margin-bottom: $baseLineHeight;
-  font-size: $baseFontSize * 1.5;;
+  @include fontSize($baseFontSize * 1.5);
   font-weight: 200;
   line-height: $baseLineHeight * 1.5;
 }
@@ -19,8 +19,6 @@ p {
 
 // Emphasis & misc
 // -------------------------
-
-
 
 small {
   font-size: 85%; // Ex: 14px base font * 85% = about 12px
@@ -74,17 +72,17 @@ h1,
 h2,
 h3 { line-height: $baseLineHeight * 2; }
 
-h1 { font-size: $baseFontSize * 2.75; } // ~38px
-h2 { font-size: $baseFontSize * 2.25; } // ~32px
-h3 { font-size: $baseFontSize * 1.75; } // ~24px
-h4 { font-size: $baseFontSize * 1.25; } // ~18px
-h5 { font-size: $baseFontSize; }
-h6 { font-size: $baseFontSize * 0.85; } // ~12px
+h1 { @include fontSize($baseFontSize * 2.75); } // ~38px
+h2 { @include fontSize($baseFontSize * 2.25); } // ~32px
+h3 { @include fontSize($baseFontSize * 1.75); } // ~24px
+h4 { @include fontSize($baseFontSize * 1.25); } // ~18px
+h5 { @include fontSize($baseFontSize); }
+h6 { @include fontSize($baseFontSize * 0.85); } // ~12px
 
-h1 small { font-size: $baseFontSize * 1.75; } // ~24px
-h2 small { font-size: $baseFontSize * 1.25; } // ~18px
-h3 small { font-size: $baseFontSize; }
-h4 small { font-size: $baseFontSize; }
+h1 small { @include fontSize($baseFontSize * 1.75); } // ~24px
+h2 small { @include fontSize($baseFontSize * 1.25); } // ~18px
+h3 small { @include fontSize($baseFontSize); }
+h4 small { @include fontSize($baseFontSize); }
 
 
 // Page header

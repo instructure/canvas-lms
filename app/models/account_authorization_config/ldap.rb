@@ -178,15 +178,22 @@ class AccountAuthorizationConfig::LDAP < AccountAuthorizationConfig
     default_timeout = Setting.get('ldap_timelimit', 5.seconds.to_s).to_f
 
     timeout_options = { raise_on_timeout: true, fallback_timeout_length: default_timeout }
-    ::Canvas.timeout_protection("ldap:#{self.global_id}", timeout_options) do
+    result = ::Canvas.timeout_protection("ldap:#{self.global_id}", timeout_options) do
       ldap = self.ldap_connection
       filter = self.ldap_filter(unique_id)
       ldap.bind_as(base: ldap.base, filter: filter, password: password_plaintext)
     end
+
+    CanvasStatsd::Statsd.increment("#{statsd_prefix}.ldap_#{result ? 'success' : 'failure'}")
+
+    result
   rescue => e
     ::Canvas::Errors.capture(e, type: :ldap, account: self.account)
     if e.is_a?(Timeout::Error)
+      CanvasStatsd::Statsd.increment("#{statsd_prefix}.ldap_timeout")
       self.update_attribute(:last_timeout_failure, Time.zone.now)
+    else
+      CanvasStatsd::Statsd.increment("#{statsd_prefix}.ldap_error")
     end
     return nil
   end

@@ -55,7 +55,7 @@ describe "international sms" do
       end
     end
 
-    it 'allows a phone number to be entered' do
+    it 'allows a phone number to be entered', priority: "1", test_id: 602158 do
       get '/profile/settings'
       make_full_screen
       find('.add_contact_link.icon-add').click

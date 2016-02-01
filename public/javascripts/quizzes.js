@@ -3062,11 +3062,14 @@ define([
         var $question = $("#question_template").clone().removeAttr('id');
         var question = question_data;
         var questionData = $.extend({}, question, question.question_data);
+        var $questionHeader = $question.find(".display_question .question_name")
         $teaser.after($question);
         $teaser.remove();
         $question.show();
         $question.find(".question_points").text(questionData.points_possible);
         quiz.updateDisplayQuestion($question.find(".display_question"), questionData, true);
+        $questionHeader.attr('tabindex', '0');
+        $questionHeader.focus();
         if ($teaser.hasClass('to_edit')) {
           // we need to explicity set our quiz variables in the dom
           // or this appears to be adding a new question instead of editing

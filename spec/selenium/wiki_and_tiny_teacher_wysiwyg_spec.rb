@@ -377,6 +377,17 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       validate_wiki_style_attrib("background-color", "green", "table")
     end
 
+    it "should delete a table", priority: "1", test_id: 588945 do
+      table = "<table><tbody><tr><td></td><td></td></tr><tr><td></td><td></td></tr></tbody></table>"
+      wysiwyg_state_setup(table)
+      f('.mce-i-table').click
+      driver.find_element(:xpath, "//span[text()[contains(.,'Delete table')]]").click
+
+      in_frame wiki_page_body_ifr_id do
+        expect(f('#tinymce table')).to be_nil
+      end
+    end
+
     it "should add bold text to the rce", priority: "1", test_id: 285128 do
       wysiwyg_state_setup
 

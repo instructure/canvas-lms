@@ -46,7 +46,7 @@ module Api::V1::Conversation
     unless interleave_submissions
       result['message_count'] = result[:submissions] ?
         result['message_count'] - result[:submissions].size :
-        conversation.messages.human.where(:asset_id => nil).count
+        conversation.messages.human.where(:asset_id => nil).count(:all)
     end
     result[:audience] = audience.map(&:id)
     result[:audience].map!(&:to_s) if stringify_json_ids?

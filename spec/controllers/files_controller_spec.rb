@@ -921,7 +921,7 @@ describe FilesController do
     end
 
     it "should reject an expired policy" do
-      params = @attachment.ajax_upload_params(@teacher.pseudonym, "", "", :expiration => -60)
+      params = @attachment.ajax_upload_params(@teacher.pseudonym, "", "", :expiration => -60.seconds)
       post "api_create", params[:upload_params].merge({ :file => @content })
       assert_status(400)
     end

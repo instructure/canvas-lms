@@ -35,6 +35,11 @@ class CrocodocSessionsController < ApplicationController
       url = crocodoc.session_url(:user => @current_user,
                                  :annotations => annotations,
                                  :crocodoc_ids => blob["crocodoc_ids"])
+
+      # For the purposes of reporting student viewership, we only
+      # care if the original attachment owner is looking
+      attachment.touch(:viewed_at) if attachment.context == @current_user
+
       redirect_to url
     else
       render :text => "Not found", :status => :not_found

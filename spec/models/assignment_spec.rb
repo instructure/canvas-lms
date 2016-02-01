@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 describe Assignment do
   before :once do
     course_with_teacher(active_all: true)
-    student_in_course(active_all: true, user_name: "some user")
+    student_in_course(active_all: true, user_name: 'a student')
   end
 
   it "should create a new instance given valid attributes" do
@@ -2665,6 +2665,54 @@ describe Assignment do
   end
 
   describe "speed_grader_json" do
+    context "create and publish a course with 2 students " do
+      let(:student_one) do
+        course_with_student(course: @course, user_name: "student one")
+        @user
+      end
+      let(:student_two) do
+        course_with_student(course: @course, user_name: "student two")
+        @user
+      end
+
+      context "add students to the group" do
+        let(:category) { @course.group_categories.create! name: "Assignment Groups" }
+        let(:assignment) do
+          @course.assignments.create!(
+            group_category_id: category.id,
+            grade_group_students_individually: false,
+            submission_types: %w(text_entry)
+          )
+        end
+
+        before do
+          group = category.groups.create!(name: 'a group', context: @course)
+          group.add_user(student_one)
+          group.add_user(student_two)
+        end
+
+        it "shows all comments from submitting student" do
+          assignment.submit_homework(student_one, {submission_type: 'online_text_entry', body: 'blah', comment: 'a private comment NOT a group comment'})
+          submission = assignment.submissions.where(user_id: student_one).first
+          submission.add_comment(
+            author: student_one,
+            comment: 'a 2nd private comment NOT a group comment'
+          )
+          submission = assignment.submissions.where(user_id: student_one).first
+          submission.add_comment(
+            author: student_two,
+            comment: 'a 3rd private comment NOT a group comment'
+          )
+
+          json = assignment.speed_grader_json(@user)
+          submission_comments = json.fetch(:submissions).first.fetch(:submission_comments).map { |comment| comment.slice(:author_id, :comment) }
+          expect(submission_comments).to include({"author_id" => student_one.id, "comment" => "a private comment NOT a group comment" })
+          expect(submission_comments).to include({"author_id" => student_one.id, "comment" => "a 2nd private comment NOT a group comment"})
+          expect(submission_comments).to include({"author_id" => student_two.id, "comment" => "a 3rd private comment NOT a group comment"})
+        end
+      end
+    end
+
     it "should include comments' created_at" do
       setup_assignment_with_homework
       @submission = @assignment.submissions.first
@@ -3482,27 +3530,31 @@ describe Assignment do
     context "when the student is in a group" do
       let!(:create_a_group_with_a_submitted_assignment) {
         setup_assignment_with_group
-        @assignment.submit_homework(@u1,
-                                    submission_type: "online_text_entry",
-                                    body: "Some text for you")
+        @assignment.submit_homework(
+          @u1,
+          submission_type: "online_text_entry",
+          body: "Some text for you"
+        )
       }
 
       context "when a comment is submitted" do
         let(:update_assignment_with_comment) {
-          @assignment.update_submission @u2,
-                                        "comment" => "WAT?",
-                                        "group_comment" => true,
-                                        user_id: @course.teachers.first.id
+          @assignment.update_submission(
+            @u2,
+            comment:  "WAT?",
+            group_comment: true,
+            user_id: @course.teachers.first.id
+          )
         }
 
         it "returns an Array" do
-          expect(update_assignment_with_comment.class).to eq Array
+          expect(update_assignment_with_comment).to be_an_instance_of Array
         end
 
         it "creates a comment for each student in the group" do
           expect {
             update_assignment_with_comment
-          }.to change{SubmissionComment.count}.by(@u1.groups.first.users.count)
+          }.to change{ SubmissionComment.count }.by(@u1.groups.first.users.count)
         end
 
         it "creates comments with the same group_comment_id" do

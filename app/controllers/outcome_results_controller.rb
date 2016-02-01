@@ -42,7 +42,8 @@
 #           "type": "datetime"
 #         },
 #         "links": {
-#           "example": "{\"user\"=>\"3\", \"learning_outcome\"=>\"97\", \"alignment\"=>\"53\"}",
+#           "example": {"user": "3", "learning_outcome": "97", "alignment": "53"},
+#           "type": "object",
 #           "description": "Unique identifiers of objects associated with this result"
 #         }
 #       }
@@ -77,7 +78,7 @@
 #           "description": "The number of alignment scores included in this rollup."
 #         },
 #         "links": {
-#           "example": "{\"outcome\"=>\"42\"}",
+#           "example": {"outcome": "42"},
 #           "$ref": "OutcomeRollupScoreLinks"
 #         }
 #       }
@@ -121,7 +122,7 @@
 #           "type": "string"
 #         },
 #         "links": {
-#           "example": "{\"course\"=>42, \"user\"=>42, \"section\"=>57}",
+#           "example": {"course": 42, "user": 42, "section": 57},
 #           "$ref": "OutcomeRollupLinks"
 #         }
 #       }
@@ -425,7 +426,7 @@ class OutcomeResultsController < ApplicationController
         # from the query without rendering the reject! check moot
         @outcomes = ContentTag.learning_outcome_links.active.joins(:learning_outcome_content)
           .where(content_id: outcome_ids, context_type: @context.class_name, context_id: @context.id)
-          .uniq_by{|tag| [tag.context, tag.content_id]}.map(&:learning_outcome_content)
+          .to_a.uniq{|tag| [tag.context, tag.content_id]}.map(&:learning_outcome_content)
         reject! "can only include id's of outcomes in the outcome context" if @outcomes.count != outcome_ids.count
       else
         @outcome_links = []
@@ -458,14 +459,14 @@ class OutcomeResultsController < ApplicationController
     reject! "cannot specify both user_ids and section_id" if params[:user_ids] && params[:section_id]
     if params[:user_ids]
       user_ids = Api.value_to_array(params[:user_ids]).uniq
-      @users = api_find_all(users_for_outcome_context, user_ids).uniq
+      @users = api_find_all(users_for_outcome_context, user_ids).uniq.to_a
       reject!( "can only include id's of users in the outcome context") if @users.count != user_ids.count
     elsif params[:section_id]
       @section = @context.course_sections.where(id: params[:section_id].to_i).first
       reject! "invalid section id" unless @section
       @users = @section.students
     end
-    @users ||= users_for_outcome_context
+    @users ||= users_for_outcome_context.to_a
     @users.sort! {|a,b| a.id <=> b.id}
   end
 

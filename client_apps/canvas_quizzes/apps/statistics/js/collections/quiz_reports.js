@@ -3,7 +3,8 @@ define(function(require) {
   var QuizReport = require('../models/quiz_report');
   var fromJSONAPI = require('canvas_quizzes/models/common/from_jsonapi');
   var config = require('../config');
-  var Adapter = require('canvas_quizzes/core/adapter');
+  var CoreAdapter = require('canvas_quizzes/core/adapter');
+  var Adapter = new CoreAdapter(config);
   var SORT_ORDER = [
     'student_analysis',
     'item_analysis'

@@ -58,6 +58,7 @@ npm-debug.log
 /spec/javascripts/tests.js
 /tmp/
 /vendor/bundle
+docker-compose.override.yml
 
 # generated plugin stuff
 /app/coffeescripts/plugins/

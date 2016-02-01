@@ -337,8 +337,8 @@ class CommunicationChannelsController < ApplicationController
         # User chose to continue with this cc/pseudonym/user combination on confirmation page
         if @pseudonym && params[:register]
           @user.require_acceptance_of_terms = require_terms?
-          @user.attributes = params[:user]
-          @pseudonym.attributes = params[:pseudonym]
+          @user.attributes = params[:user] if params[:user]
+          @pseudonym.attributes = params[:pseudonym] if params[:pseudonym]
           @pseudonym.communication_channel = cc
 
           # ensure the password gets validated, but don't require confirmation
@@ -471,7 +471,28 @@ class CommunicationChannelsController < ApplicationController
     end
   end
 
+  def bouncing_channel_report
+    if authorized_action(Account.site_admin, @current_user, :read_messages)
+      res = BulkBounceCountResetter.new(bouncing_channel_args).bouncing_channel_report
+      send_data(res, type: 'text/csv')
+    end
+  end
+
+  def bulk_reset_bounce_counts
+    if authorized_action(Account.site_admin, @current_user, :read_messages)
+      resetter = BulkBounceCountResetter.new(bouncing_channel_args)
+      resetter.send_later(:bulk_reset_bounce_counts)
+      render json: {scheduled_reset_approximate_count: resetter.count}
+    end
+  end
+
   protected
+  def bouncing_channel_args
+    account = params[:account_id] == 'self' ? @domain_root_account : Account.find(params[:account_id])
+    args = params.slice(:after, :before, :pattern).symbolize_keys
+    args.merge!({account: account})
+  end
+
   def has_api_permissions?
     @user == @current_user ||
       @user.grants_right?(@current_user, session, :manage_user_details)

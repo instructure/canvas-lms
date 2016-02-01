@@ -1,30 +1,12 @@
+<%# presenter is a ToDoListPresenter::AssignmentPresenter or a ToDoListPresenter::AssessmentRequestPresenter %>
 <div class="IgnoreButton al-dropbown__container">
-  <a class="<%= todo_link_classes(type) %>"
-     aria-haspopup="true"
-     title="<%= t('Ignore this assignment') %>"
+  <a class="disable_item_link disable-todo-item-link"
+     title="<%= presenter.ignore_title %>"
      href="#"
-     data-api-href="<%= todo_ignore_api_url(type, item) %>"
-     data-popup-within="body"
+     data-api-href="<%= presenter.ignore_url %>"
+     data-flash-message="<%= presenter.ignore_flash_message %>"
   >
     <i class="icon-x"></i>
     <span class="screenreader-only"><%= t('Ignore') %></span>
   </a>
-
-  <% if todo_ignore_dropdown_type?(type) %>
-  <% title = case type.to_sym
-      when :grading
-        t('Ignore Until New Submission')
-      when :moderation
-        t('Ignore Until New Mark')
-      end %>
-
-  <ul id="ignore_dropdown" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="ignore_dropdown">
-    <li role="presentation">
-      <a href="#" id="ignore_forever" class="icon-trash disable-todo-item-link" tabindex="-1" role="menuitem" data-api-href="<%= todo_ignore_api_url(type, item, true) %>" title="<%= t('Ignore') %>"><%= t('Ignore') %></a>
-    </li>
-    <li role="presentation">
-      <a href="#" id="ignore_until_submission" class="icon-star disable-todo-item-link" tabindex="-1" role="menuitem" data-api-href="<%= todo_ignore_api_url(type, item) %>" title="<%= title %>"><%= title %></a>
-    </li>
-  </ul>
-  <% end %>
 </div>

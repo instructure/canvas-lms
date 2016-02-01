@@ -27,7 +27,7 @@ describe "varied due dates" do
 
   def assert_coming_up_due_date(response, expected)
     doc = Nokogiri::HTML(response.body)
-    expect(doc.at_css("#right-side .coming_up .event a .tooltip_text").text).to include(
+    expect(doc.at_css("#right-side .coming_up .event a .event-details").text).to include(
       expected.is_a?(String) ? expected : datetime_string(expected)
     )
   end
@@ -41,7 +41,7 @@ describe "varied due dates" do
 
   def assert_recent_feedback_due_date(response, expected)
     doc = Nokogiri::HTML(response.body)
-    expect(doc.at_css("#right-side .recent_feedback .event a .tooltip_text").text).to include(
+    expect(doc.at_css("#right-side .recent_feedback .event a .event-details").text).to include(
       expected.is_a?(String) ? expected : datetime_string(expected)
     )
   end
@@ -151,13 +151,6 @@ describe "varied due dates" do
           get '/dashboard-sidebar'
           assert_coming_up_due_date wrap_partial(response), @course_due_date
         end
-
-        it "shows the course due date in 'recent feedback'" do
-          create_recent_feedback @student1
-          login_as(@student1.pseudonym.login, 'asdfasdf')
-          get '/dashboard-sidebar'
-          assert_recent_feedback_due_date wrap_partial(response), @course_due_date
-        end
       end
 
       context "in the overridden section" do
@@ -172,13 +165,6 @@ describe "varied due dates" do
           login_as(@student2.pseudonym.login, 'asdfasdf')
           get '/dashboard-sidebar'
           assert_coming_up_due_date wrap_partial(response), @section_due_date
-        end
-
-        it "shows the section due date in 'recent feedback'" do
-          create_recent_feedback @student2
-          login_as(@student2.pseudonym.login, 'asdfasdf')
-          get '/dashboard-sidebar'
-          assert_recent_feedback_due_date wrap_partial(response), @section_due_date
         end
       end
     end

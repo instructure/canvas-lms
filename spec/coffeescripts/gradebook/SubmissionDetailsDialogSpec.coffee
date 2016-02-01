@@ -49,7 +49,6 @@ define [
     ok dialog.dialog.find('.submission-details').text().match('LATE')
 
   module '_submission_detail',
-
     setup: ->
       defaults =
         current_user_roles: [ "teacher" ]
@@ -82,7 +81,6 @@ define [
     equal dialog.dialog.find('.submisison-attachment').length, 3
 
   module '_grading_box',
-
     setup: ->
       defaults =
         current_user_roles: [ "teacher" ]

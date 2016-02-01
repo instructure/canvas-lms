@@ -5,11 +5,11 @@ module CustomPageLoaders
     link = polymorphic_path(link) if link.is_a? Array
 
     # If the new link is identical to the old link except for the hash, we don't
-    # want to actually expect a new page load.
-    current_uri = driver.execute_script("return window.location")
+    # want to actually expect a new page load, cuz it won't happen.
+    current_uri = URI.parse(driver.execute_script("return window.location.toString()"))
     new_uri = URI.parse(link)
 
-    if current_uri['pathname'] == new_uri.path && (current_uri['query'] || '') == (new_uri.query || '')
+    if current_uri.path == new_uri.path && (current_uri.query || '') == (new_uri.query || '') && (new_uri.fragment || current_uri.fragment)
       driver.get(app_host + link)
       close_modal_if_present
       wait_for_ajaximations

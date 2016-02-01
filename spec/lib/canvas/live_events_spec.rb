@@ -89,14 +89,14 @@ describe Canvas::LiveEvents do
 
       LiveEvents.expects(:post_event).with('grade_change', {
         submission_id: submission.global_id,
-        grade: 10,
+        grade: '10',
         old_grade: 0,
         grader_id: @teacher.global_id,
         student_id: @student.global_id
       })
 
       submission.grader = @teacher
-      submission.grade = 10
+      submission.grade = '10'
       Canvas::LiveEvents.grade_changed(submission, 0)
     end
   end

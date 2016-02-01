@@ -6,7 +6,6 @@ define [
 ], ($, Assignment, SetDefaultGradeDialog) ->
 
   module 'SetDefaultGradeDialog',
-
     setup: ->
       @assignment = new Assignment(id: 1, points_possible: 10)
 

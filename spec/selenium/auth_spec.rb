@@ -5,7 +5,7 @@ describe "auth" do
 
   describe "logout" do
     it "should present confirmation on GET /logout" do
-      user_logged_in(real_login: true)
+      user_logged_in
       get "/logout"
 
       expect_new_page_load { f('#modal-box form input[type=submit]').submit() }

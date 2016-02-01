@@ -341,8 +341,18 @@ namespace :js do
 
   desc "Compile React JSX to JS"
   task :jsx do
+    # Get the canvas-lms jsx and specs to compile
     dirs = [["#{Rails.root}/app/jsx", "#{Rails.root}/public/javascripts/jsx"],
             ["#{Rails.root}/spec/javascripts/jsx", "#{Rails.root}/spec/javascripts/compiled"]]
+    # Get files that need compilation in plugins
+    plugin_jsx_dirs = Dir.glob("#{Rails.root}/gems/plugins/**/jsx")
+    plugin_jsx_dirs.each do |directory|
+      plugin_name = directory.match(/gems\/plugins\/([^\/]+)\//)[1]
+      destination = "#{Rails.root}/public/javascripts/plugins/#{plugin_name}/compiled/jsx"
+      FileUtils.mkdir_p(destination)
+      dirs << [directory, destination]
+    end
+
     dirs.each { |source,dest|
       if Rails.env == 'development'
         msg = `node_modules/.bin/babel #{source} --out-dir #{dest} --source-maps inline 2>&1 >/dev/null`

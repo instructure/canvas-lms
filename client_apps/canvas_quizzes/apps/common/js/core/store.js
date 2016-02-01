@@ -1,9 +1,8 @@
 define(function(require) {
   var _ = require('lodash');
-  var Dispatcher = require('./dispatcher');
   var extend = _.extend;
 
-  var Store = function(key, proto) {
+  var Store = function(key, proto, Dispatcher) {
     var emitChange = this.emitChange.bind(this);
 
     extend(this, proto || {});

@@ -200,6 +200,8 @@ describe NotificationMessageCreator do
       notification_set # we get one channel here
       communication_channel_model(:path => 'this one gets a delayed policy').confirm! # this gives us a total of two channels
       NotificationPolicy.delete_all
+
+      @notification = @notification.dup
       @notification.category = 'Discussion' # default frequency of 'Never'
       expect { NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message }.to change(DelayedMessage, :count).by 0
       @notification.category = 'DiscussionEntry' # default frequency of 'Daily'

@@ -3,7 +3,8 @@ define [
   "jsx/assignments/actions/ModerationActions",
 ], (whenJS, ModerationActions) ->
 
-  module "ModerationActions - Action Creators",
+  module "ModerationActions - Action Creators"
+
   test 'creates the SORT_MARK1_COLUMN action', ->
     action = ModerationActions.sortMark1Column()
     expected =
@@ -131,7 +132,6 @@ define [
 
 
   module "ModerationActions#apiGetStudents",
-
     setup: ->
       @client = {
         get: ->

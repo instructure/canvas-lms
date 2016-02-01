@@ -5,11 +5,12 @@ if CANVAS_RAILS4_0
   gem 'protected_attributes', '1.0.8'
   gem 'rails-observers', '0.1.2'
   gem 'tzinfo', '0.3.43'
+  gem 'foreigner', '0.9.2'
 else
-  gem 'rails', '4.2.5'
+  gem 'rails', '4.2.5.1'
   gem 'rack', '1.6.4'
   gem 'builder', '3.1.4'
-  gem 'protected_attributes', '1.0.8'
+  gem 'protected_attributes', '1.1.3'
   gem 'rails-observers', '0.1.2'
   gem 'tzinfo', '1.2.2'
   gem 'oj_mimic_json', require: false
@@ -23,8 +24,8 @@ gem 'authlogic', '3.4.6'
 gem 'active_model-better_errors', '1.6.7', require: 'active_model/better_errors'
 gem 'dynamic_form', '1.1.4', require: false
 gem 'rails-patch-json-encode', '0.0.1'
-gem 'switchman', '1.3.14-1'
-gem 'folio-pagination', '0.0.9', require: 'folio/rails'
+gem 'switchman', '1.3.18'
+gem 'folio-pagination', '0.0.11', require: 'folio/rails'
   # for folio, see the folio README
   gem 'will_paginate', '3.0.7', require: false
 
@@ -38,7 +39,7 @@ gem 'bcrypt-ruby', '3.0.1'
 gem 'canvas_connect', '0.3.10'
   gem 'adobe_connect', '1.0.3', require: false
 gem 'canvas_webex', '0.17'
-gem 'canvas-jobs', '0.10.3'
+gem 'canvas-jobs', '0.10.4'
   gem 'rufus-scheduler', '3.1.2', require: false
 gem 'ffi', '1.1.5', require: false
 gem 'hairtrigger', '0.2.15'
@@ -77,7 +78,7 @@ gem 'parallel', '1.4.1', require: false
 gem 'rack-mini-profiler', '0.9.2', require: false
 gem 'flamegraph', '0.1.0', require: false
   gem 'stackprof', '0.2.7', require: false
-gem 'rake', '10.4.2'
+gem 'rake', '10.5.0'
 gem 'rdoc', '3.12'
 gem 'ratom-nokogiri', '0.10.4', require: false
 gem 'rdiscount', '1.6.8', require: false
@@ -95,7 +96,6 @@ gem 'shackles', '1.0.10'
 
 gem 'useragent', '0.10.0', require: false
 
-gem 'foreigner', '0.9.2'
 gem 'crocodoc-ruby', '0.0.1', require: false
 gem 'hey', '1.3.0', require: false
 gem 'sentry-raven', '0.15.3', require: false

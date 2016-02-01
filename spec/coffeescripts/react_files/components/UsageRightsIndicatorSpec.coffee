@@ -8,7 +8,8 @@ define [
 
   TestUtils = React.addons.TestUtils
 
-  module 'UsageRightsIndicator',
+  module 'UsageRightsIndicator'
+
   test 'returns null for folders', ->
     props = {
       model: new Folder(id: 3)
@@ -63,19 +64,20 @@ define [
 
     React.unmountComponentAtNode(uRI.getDOMNode().parentNode)
 
-  renderIndicator = (usage_rights) ->
-    props = {
-      model: new File(id: 4, usage_rights: usage_rights)
-      usageRightsRequiredForContext: false
-      userCanManageFilesForContext: true
-      modalOptions: {openModal: ()-> }
-    }
 
-    @uRI = TestUtils.renderIntoDocument(React.createElement(UsageRightsIndicator, props))
-
-  module "UsageRightsIndicator: Icon Classess & Screenreader text", ->
+  module "UsageRightsIndicator: Icon Classess & Screenreader text",
     teardown: ->
       React.unmountComponentAtNode(@uRI.getDOMNode().parentNode)
+
+    renderIndicator: (usage_rights) ->
+      props = {
+        model: new File(id: 4, usage_rights: usage_rights)
+        usageRightsRequiredForContext: false
+        userCanManageFilesForContext: true
+        modalOptions: {openModal: ()-> }
+      }
+
+      @uRI = TestUtils.renderIntoDocument(React.createElement(UsageRightsIndicator, props))
 
   test "own_copyright class and screenreader text", ->
     usage_rights = {
@@ -83,7 +85,7 @@ define [
       license_name: "best license ever"
     }
 
-    uRI = renderIndicator(usage_rights)
+    uRI = @renderIndicator(usage_rights)
 
     equal uRI.refs.icon.getDOMNode().className, "icon-files-copyright", "has correct class"
     equal uRI.refs.screenreaderText.getDOMNode().innerHTML, "Own Copyright", "has correct screenreader text"
@@ -94,7 +96,7 @@ define [
       license_name: "best license ever"
     }
 
-    uRI = renderIndicator(usage_rights)
+    uRI = @renderIndicator(usage_rights)
 
     equal uRI.refs.icon.getDOMNode().className, "icon-files-public-domain", "has correct class"
     equal uRI.refs.screenreaderText.getDOMNode().innerHTML, "Public Domain", "has correct screenreader text"
@@ -105,7 +107,7 @@ define [
       license_name: "best license ever"
     }
 
-    uRI = renderIndicator(usage_rights)
+    uRI = @renderIndicator(usage_rights)
 
     equal uRI.refs.icon.getDOMNode().className, "icon-files-obtained-permission", "has correct class"
     equal uRI.refs.screenreaderText.getDOMNode().innerHTML, "Used by Permission", "has correct screenreader text"
@@ -116,7 +118,7 @@ define [
       license_name: "best license ever"
     }
 
-    uRI = renderIndicator(usage_rights)
+    uRI = @renderIndicator(usage_rights)
 
     equal uRI.refs.icon.getDOMNode().className, "icon-files-fair-use", "has correct class"
     equal uRI.refs.screenreaderText.getDOMNode().innerHTML, "Fair Use", "has correct screenreader text"
@@ -127,7 +129,7 @@ define [
       license_name: "best license ever"
     }
 
-    uRI = renderIndicator(usage_rights)
+    uRI = @renderIndicator(usage_rights)
 
     equal uRI.refs.icon.getDOMNode().className, "icon-files-creative-commons", "has correct class"
     equal uRI.refs.screenreaderText.getDOMNode().innerHTML, "Creative Commons", "has correct screenreader text"

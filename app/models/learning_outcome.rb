@@ -26,8 +26,6 @@ class LearningOutcome < ActiveRecord::Base
   has_many :learning_outcome_results
   has_many :alignments, -> { where("content_tags.tag_type='learning_outcome' AND content_tags.workflow_state<>'deleted'") }, class_name: 'ContentTag'
 
-  EXPORTABLE_ATTRIBUTES = [:id, :context_id, :context_type, :short_description, :context_code, :description, :data, :workflow_state, :created_at, :updated_at, :vendor_guid, :low_grade, :high_grade]
-  EXPORTABLE_ASSOCIATIONS = [:context, :learning_outcome_results, :alignments]
   serialize_utf8_safe :data
 
   before_validation :infer_default_calculation_method, :adjust_calculation_int
@@ -41,7 +39,7 @@ class LearningOutcome < ActiveRecord::Base
   }.freeze
   VALID_CALCULATION_INTS = {
     "decaying_average" => (1..99),
-    "n_mastery" => (2..5),
+    "n_mastery" => (1..5),
     "highest" => [].freeze,
     "latest" => [].freeze,
   }.freeze

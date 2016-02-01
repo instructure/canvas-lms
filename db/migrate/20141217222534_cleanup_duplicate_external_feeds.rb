@@ -26,6 +26,7 @@ class CleanupDuplicateExternalFeeds < ActiveRecord::Migration
   end
 
   def down
-    remove_index :external_feeds, name: 'index_external_feeds_uniquely'
+    remove_index :external_feeds, name: 'index_external_feeds_uniquely_1'
+    remove_index :external_feeds, name: 'index_external_feeds_uniquely_2'
   end
 end

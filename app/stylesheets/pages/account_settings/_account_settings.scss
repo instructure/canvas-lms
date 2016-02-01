@@ -120,7 +120,7 @@
 
 #account_settings_tabs {
   legend {
-    font-size: 15px;
+    @include fontSize(15px);
     font-weight: bold;
   }
   .alert {

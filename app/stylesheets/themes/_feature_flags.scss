@@ -46,7 +46,7 @@ $left-offset:  16px;
 }
 
 .feature-flag-group-title {
-  font-size: 16px;
+  @include fontSize(16px);
   font-weight: bold;
   line-height: 24px;
   padding-left: $left-offset;
@@ -58,7 +58,7 @@ $left-offset:  16px;
 }
 
 .feature-release, .feature-release-notes-link {
-  font-size: 12px;
+  @include fontSize(12px);
 }
 
 .feature-release-date {
@@ -67,7 +67,7 @@ $left-offset:  16px;
 
 .feature-details {
   display: none;
-  font-size: 12px;
+  @include fontSize(12px);
   line-height: 20px;
   margin-top: 16px;
   position: relative;
@@ -110,7 +110,7 @@ $switch-text: rgba($ic-color-light, 0.6);
     border-width: 3px;
     margin: 0;
     text-transform: uppercase;
-    font-size: 12px;
+    @include fontSize(12px);
     border-radius: 20px;
     height: 15px;
     line-height: 15px;

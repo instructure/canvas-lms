@@ -15,7 +15,7 @@ $answersSprite: url(/images/answers_sprite.png);
 
 .accessibility-warning {
   @include accessibility-prompt;
-  font-size: 12px;
+  @include fontSize($ic-font-size--xsmall);
   position: absolute;
   left: 0px;
   top: -16px;
@@ -128,7 +128,7 @@ li.quiz {
       tr {
         th {
           font-weight: bold;
-          font-size: 14px;
+          @include fontSize($ic-font-size--small);
           padding: 0.5em;
         }
         td {
@@ -456,7 +456,7 @@ li.quiz {
       font-weight: bold;
       padding-right: 20px;
       line-height: 20px;
-      font-size: 14px;
+      @include fontSize($ic-font-size--small);
       display: inline;
     }
     .group_display.hidden {
@@ -1356,7 +1356,7 @@ ul#quiz_versions {
         color: #999;
       }
       .option-caption {
-        font-size: 15px;
+        @include fontSize(15px);
         font-weight: bold;
         line-height: 1.4em;
         &:not(:first-of-type) {
@@ -1667,7 +1667,7 @@ ul#quiz_versions {
   background-image: $answersSprite;
   background-repeat: repeat-x;
   display: inline-block;
-  font-size: 12px;
+  @include fontSize($ic-font-size--xsmall);
   font-weight: bold;
   line-height: 27px;
   min-width: 96px;
@@ -1741,7 +1741,7 @@ ul#quiz_versions {
   filter: none;
   border-radius: 5px;
   box-shadow: 0 1px 2px rgba(#000, 0.2);
-  font-size: 14px;
+  @include fontSize($ic-font-size--small);
   min-width: 100px;
   padding: 14px;
   position: relative;
@@ -1837,7 +1837,7 @@ ul#quiz_versions {
   }
   .header {
     .question_points_holder {
-      font-size: 12px;
+      @include fontSize($ic-font-size--xsmall);
       margin: 0;
     }
     .question_input {
@@ -1848,7 +1848,7 @@ ul#quiz_versions {
   .short_answer_question {
     .answers {
       .question_input {
-        font-size: 13px;
+        @include fontSize(13px);
         width: 125px;
       }
     }
@@ -1856,7 +1856,7 @@ ul#quiz_versions {
 }
 
 .summary .footnote {
-  font-size: 12px;
+  @include fontSize($ic-font-size--xsmall);
   text-align: right;
 }
 
@@ -2199,7 +2199,7 @@ ul#quiz_versions {
     background-clip: padding-box;
     width: 40%;
     max-width: 45%;
-    font-size: 13px;
+    @include fontSize(13px);
     color: #303030;
     // margin: 0 6px 6px 0
     outline: none;
@@ -2216,7 +2216,7 @@ ul#quiz_versions {
       right: 0;
       top: 0;
       padding: 10px 36px;
-      font-size: 15px;
+      @include fontSize(15px);
     }
   }
   span.field + span.field {

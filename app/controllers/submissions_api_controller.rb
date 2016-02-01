@@ -79,7 +79,7 @@
 #         "score": {
 #           "description": "The raw score",
 #           "example": 13.5,
-#           "type": "float"
+#           "type": "number"
 #         },
 #         "submission_comments": {
 #           "description": "Associated comments for a submission (optional)",

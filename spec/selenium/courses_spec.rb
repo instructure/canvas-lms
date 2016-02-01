@@ -317,7 +317,7 @@ describe "courses" do
       course2 = course_with_teacher(:user => teacher, :active_all => 1, :course_name => 'course2').course
       student_in_course(:user => student, :active_all => 1)
 
-      create_session(student.pseudonyms.first, false)
+      create_session(student.pseudonyms.first)
 
       get "/courses/#{course1.id}/grades/#{student.id}"
 

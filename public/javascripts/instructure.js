@@ -853,14 +853,18 @@ define([
       event.preventDefault();
       var $item = $(this).parents("li, div.topic_message").last();
       var $prevItem = $(this).closest('.to-do-list > li').prev()
-      var toFocus = ($prevItem.find('.al-trigger').length && $prevItem.find('.al-trigger')) ||
+      var toFocus = ($prevItem.find('.disable-todo-item-link').length && $prevItem.find('.disable-todo-item-link')) ||
                     $('.event-list-view-calendar')
       var url = $(this).data('api-href');
+      var flashMessage = $(this).data('flash-message');
       function remove(delete_url) {
         $item.confirmDelete({
           url: delete_url,
           noMessage: true,
           success: function() {
+            if (flashMessage) {
+              $.flashMessage(flashMessage);
+            }
             $(this).slideUp(function() {
               $(this).remove();
               toFocus.focus();

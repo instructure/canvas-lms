@@ -33,7 +33,7 @@ SERVER_IP = $selenium_config[:server_ip] || UDPSocket.open { |s| s.connect('8.8.
 BIND_ADDRESS = $selenium_config[:bind_address] || '0.0.0.0'
 SECONDS_UNTIL_COUNTDOWN = 5
 SECONDS_UNTIL_GIVING_UP = 20
-MAX_SERVER_START_TIME = 60
+MAX_SERVER_START_TIME = 15
 
 #NEED BETTER variable handling
 THIS_ENV = ENV['TEST_ENV_NUMBER'].present? ? ENV['TEST_ENV_NUMBER'].to_i : 1
@@ -87,10 +87,6 @@ shared_context "in-process server selenium tests" do
     check_exception example.example.exception
   end
 
-  prepend_before :all do
-    SeleniumDriverSetup.allow_requests!
-  end
-
   prepend_before :each do
     SeleniumDriverSetup.allow_requests!
   end
@@ -125,14 +121,15 @@ shared_context "in-process server selenium tests" do
       @dj_connection = Delayed::Backend::ActiveRecord::Job.connection
 
       # synchronize db connection methods for a modicum of thread safety
-      methods_to_sync = %w{execute exec_cache exec_no_cache query}
+      methods_to_sync = %w{execute exec_cache exec_no_cache query transaction}
       [@db_connection, @dj_connection].each do |conn|
         methods_to_sync.each do |method_name|
           if conn.respond_to?(method_name, true) && !conn.respond_to?("#{method_name}_with_synchronization", true)
+            arg_list = "*args"
+            arg_list << ", &Proc.new" if method_name == "transaction"
             conn.class.class_eval <<-RUBY
               def #{method_name}_with_synchronization(*args)
-                @mutex ||= Mutex.new
-                @mutex.synchronize { #{method_name}_without_synchronization(*args) }
+                SeleniumDriverSetup.request_mutex.synchronize { #{method_name}_without_synchronization(#{arg_list}) }
               end
               alias_method_chain :#{method_name}, :synchronization
             RUBY

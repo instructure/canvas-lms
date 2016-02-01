@@ -26,18 +26,16 @@ module SIS
         @e = @c.enroll_user(u)
         @time = @c.updated_at
       end
-
-      # this is the new way that the callback is being suspended
-      Enrollment.suspend_callbacks("(belongs_to_touch_after_save_or_destroy_for_course)") do
+      
+      Enrollment.skip_touch_callbacks(:course) do
+        @e.updated_at = 2.seconds.from_now
         @e.save!
       end
       @c.reload
       expect(@c.updated_at).to eq @time
 
-      # this is the old way that the callback was being suspended
-      Enrollment.suspend_callbacks(:belongs_to_touch_after_save_or_destroy_for_course) do
-        @e.save!
-      end
+      @e.updated_at = 5.seconds.from_now
+      @e.save!
       @c.reload
       expect(@c.updated_at).not_to eq @time
     end

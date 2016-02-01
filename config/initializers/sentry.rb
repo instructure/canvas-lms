@@ -10,13 +10,17 @@ settings = ConfigFile.load("raven")
 if settings.present?
   require "raven/base"
   Raven.configure do |config|
+    config.logger = Rails.logger
     config.silence_ready = true
     config.dsn = settings[:dsn]
     config.tags = settings.fetch(:tags, {}).merge('canvas_revision' => Canvas.revision)
     config.release = Canvas.revision
     config.sanitize_fields += Rails.application.config.filter_parameters.map(&:to_s)
     config.sanitize_credit_cards = false
-    config.excluded_exceptions += %w{AuthenticationMethods::AccessTokenError}
+    config.excluded_exceptions += %w{
+      AuthenticationMethods::AccessTokenError
+      ActionController::InvalidAuthenticityToken
+    }
   end
 
   Rails.configuration.to_prepare do
@@ -25,5 +29,4 @@ if settings.present?
       SentryProxy.capture(exception, data) if setting == 'true'
     end
   end
-
 end

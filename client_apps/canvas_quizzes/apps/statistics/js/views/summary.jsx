@@ -4,7 +4,7 @@ define(function(require) {
   var I18n = require('i18n!quiz_statistics.summary');
   var secondsToTime = require('canvas_quizzes/util/seconds_to_time');
   var round = require('canvas_quizzes/util/round');
-  var formatNumber = require('canvas_quizzes/util/format_number');
+  var formatNumber = require('../util/format_number');
   var ScorePercentileChart = require('jsx!./summary/score_percentile_chart');
   var Report = require('jsx!./summary/report');
   var SightedUserContent = require('jsx!canvas_quizzes/components/sighted_user_content');

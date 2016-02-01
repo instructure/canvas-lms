@@ -8,6 +8,5 @@ class FixAttachmentSortingIndexes < ActiveRecord::Migration
       add_index :attachments, [:folder_id, :file_state, :position], :algorithm => :concurrently
       remove_index :attachments, name: 'index_attachments_on_folder_id_and_file_state_and_position2'
     end
-    remove_index :attachments, :folder_id
   end
 end

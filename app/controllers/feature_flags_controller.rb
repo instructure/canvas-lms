@@ -54,7 +54,7 @@
 #         },
 #         "feature_flag": {
 #           "description": "The FeatureFlag that applies to the caller",
-#           "example": "\{\"feature\"=>\"fancy_wickets\", \"state\"=>\"allowed\", \"locking_account_id\"=>nil\}",
+#           "example": {"feature": "fancy_wickets", "state": "allowed", "locking_account_id": null},
 #           "$ref": "FeatureFlag"
 #         },
 #         "root_opt_in": {

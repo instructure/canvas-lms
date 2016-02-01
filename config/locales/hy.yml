@@ -1703,7 +1703,7 @@ hy:
       external_tool_type: "Արտաքին գործիք"
       more: "Լրացուցիչ օպցիաներ"
       multiple_due_dates: "Կատարման մի քանի ամսաթվեր"
-      not_graded_type: "Գնահատված չէ"
+      not_graded_type: Չգնահատվող
       quiz_type: Թեստ
       save: Պահպանել
       saving: "Պահպանվում է..."
@@ -1825,7 +1825,7 @@ hy:
       grading_type_options: 
         gpa_scale: "GPA գնահատման համակարգ"
         letter_grade: "Տառերով գնահատում"
-        not_graded: "Գնահատված չէ"
+        not_graded: Չգնահատվող
         pass_fail: "Ավարտված է /Ավարտված չէ "
         percent: Տոկոսներ
         points: Միավորներ
@@ -5139,7 +5139,7 @@ hy:
       close_for_comments: "Փակ է մեկնաբանությունների համար"
       delete: Ջնջել
       due: Մինչև
-      graded_discussion: "Գնահատված քննարկում՝"
+      graded_discussion: "Գնահատվող քննարկում՝"
       last_post_date: "Վերջին գրառումը՝ %{display_last_reply_at}"
       manage: Կառավարել
       move: "Տեղափոխել դեպի..."
@@ -5187,7 +5187,7 @@ hy:
       sort_by_likes: "Տեսակավորել ըստ հավանումների"
       topic_title: "Թեմայի վերնագիր"
       until: Մինչև
-      use_for_grading: "Գնահատվել է"
+      use_for_grading: Գնահատվող
       users_must_post_before_seeing_replies: "Օգտատերերի մասնակցությունը պարտադիր է պատասխանները տեսնելու համար"
     entry: 
       authors_name: "Հեղինակի անուն"
@@ -6358,7 +6358,7 @@ hy:
     edit_view_rubric: "Դիտել ռուբրիկը"
     errors: 
       select_an_option: "Ընտրել պարամետրերը"
-    graded: "գնահատված է"
+    graded: գնահատվող
     graded_by_me: "%{graded_time} իմ կողմից"
     graded_then_resubmitted: "գնահատված, հետո կրկին ուղարկված է (%{when})"
     gradee_index_of_total: "%{y}-ի %{gradee} %{x}  "
@@ -6805,14 +6805,14 @@ hy:
     titles: 
       total: Ընդամենը
   graded_quiz_7fabdf1f: "Գնահատվող թեստ"
-  graded_survey_c0f0c395: "Գնահատված հարցում"
+  graded_survey_c0f0c395: "Գնահատվող հարցում"
   grades_a61eba0a: Գնահատականներ
   grading_box: 
     out_of_points_possible: "%{assignment.points_possible} հնարավոր միավորներից"
   grading_cell: 
     grade_complete: Ավարտել
     grade_incomplete: "Ավարտված չէ"
-    grade_ungraded: "Առանց գնահատման"
+    grade_ungraded: Չգնահատվող
     out_of: "(%{points} միավորներից)"
     out_of_nil: "Չկան հնարավոր միավորներ"
     out_of_with_score: "(%{points}միավորից %{score})"
@@ -14269,7 +14269,7 @@ hy:
     attached_files_comment: "Տես կցված ֆայլերը:"
     media_comment: "Սա մուլտիմեդիա մեկնաբանություն է:"
     state: 
-      graded: "գնահատված է"
+      graded: գնահատվող
       submitted: "ուղարկված է"
       unsubmitted: "ուղարկված չէ"
   submission_comment: 
@@ -14625,6 +14625,7 @@ hy:
   this_quiz_is_unpublished_only_teachers_can_see_the_51d281b1: "*Այս թեստը հրապարակված չէ:* Մինչև դրա հրապարակումը միայն դասավանդողները կարող են այն տեսնել: "
   this_student_s_responses_are_hidden_because_this_a_252e8335: "Ունկնդրի պատասխանները թաքցված են, քանի որ այս հանձնարարությունն անանուն է: "
   this_student_wrote_f1a3f22d: "Այս ունկնդիրը գրել է՝"
+  this_submission_has_already_been_graded_and_is_rea_8ec61c52: "Այս աշխատանքն արդեն գնահատված է եւ պատրաստ է մոդերացման:"
   this_user_is_currently_not_able_to_access_the_cour_39cabed1: "Այս օգտատերն այս պահին չի կարող տեսնել դասընթացը"
   this_will_allow_you_to_authenticate_canvas_for_pos_fdfca40: "Սա ձեզ թույլ կտա մտնել Canvas՝ SIS-ում գնահատականները տեղադրելու համար"
   this_will_apply_these_changes_to_your_entire_accou_22b86cde: "Այս փոփոխությունները կտարածվեն, ձեր ամբողջ հաշվին: Ցանկանում եք շարունակել՞"

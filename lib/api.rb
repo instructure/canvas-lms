@@ -430,8 +430,9 @@ module Api
 
   def resolve_placeholders(content)
     host, protocol = get_host_and_protocol_from_request
-    # content is a json-encoded string; slashes are escaped
-    content.gsub("#{PLACEHOLDER_PROTOCOL}:\\/\\/#{PLACEHOLDER_HOST}", "#{protocol}:\\/\\/#{host}")
+    # content is a json-encoded string; slashes are escaped (at least in Rails 4.0)
+    content.gsub("#{PLACEHOLDER_PROTOCOL}:\\/\\/#{PLACEHOLDER_HOST}", "#{protocol}:\\/\\/#{host}").
+            gsub("#{PLACEHOLDER_PROTOCOL}://#{PLACEHOLDER_HOST}", "#{protocol}://#{host}")
   end
 
   def user_can_download_attachment?(attachment, context, user)

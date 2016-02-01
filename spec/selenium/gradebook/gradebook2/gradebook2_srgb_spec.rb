@@ -342,6 +342,14 @@ describe "screenreader gradebook" do
         @first_assignment.save
       end
 
+      let!(:change_third_assignment_to_include_media_and_have_submission) do
+        @third_assignment.submission_types = "online_text_entry,media_recording"
+        @third_assignment.save
+
+        submission = @third_assignment.submit_homework(@student_1, body: "Can you click?")
+        submission.save!
+      end
+
       let!(:get_screenreader_gradebook) do
         get srgb
       end
@@ -359,6 +367,46 @@ describe "screenreader gradebook" do
 
         expect(f("#submissions_download_button")).to_not be_present
       end
+
+      it "is displayed for assignments which allow both online and non-online submittion" do
+        click_option '#assignment_select', 'assignment three'
+
+        expect(f("#submissions_download_button")).to be_present
+      end
+    end
+  end
+
+  context 'warning messages for group weights with no points' do
+    before(:each) do
+      init_course_with_students 1
+      group0 = @course.assignment_groups.create!(name: "Guybrush Group")
+      @course.assignment_groups.create!(name: "Threepwood Group")
+      @assignment = @course.assignments.create!(title: "Fine Leather Jacket", assignment_group: group0)
+
+      get srgb
+
+      # turn on group weights
+      f('#ag_weights').click
+      wait_for_ajaximations
+      f('#group_weighting_scheme').click
+      f('.ui-button-text').click
+      wait_for_ajaximations
+    end
+
+    it "should have a no point possible warning when a student is selected", priority: "2", test_id: 164226 do
+      # select from dropdown
+      click_option('#student_select', @students[0].name)
+
+      expect(f('span.text-error > i.icon-warning')).to be_displayed
+      expect(f('#student_information > div.row')).to include_text('Score does not include assignments from the group')
+    end
+
+    it "should have a no point possible warning when an assignment is selected", priority: "2", test_id: 602625 do
+      # select from dropdown
+      click_option('#assignment_select', @assignment.name)
+
+      expect(f('a > i.icon-warning')).to be_displayed
+      expect(f('#assignment_information > div.row')).to include_text('Assignments in this group have no points')
     end
   end
 end

@@ -72,9 +72,11 @@ describe "quiz taking" do
     get "/courses/#{@course.id}/quizzes/#{quiz.id}"
     expect_new_page_load{f('#take_quiz_link').click}
     2.times do |o|
-      expect(fj("#question_#{quiz.quiz_questions[o].id} .question_points_holder").text).to eq('15 pts')
-      click_option("#question_#{quiz.quiz_questions[o].id} .question_input:nth-of-type(1)", 'a1')
-      click_option("#question_#{quiz.quiz_questions[o].id} .question_input:nth-of-type(2)", 'a3')
+      keep_trying_until(3) do
+        expect(fj("#question_#{quiz.quiz_questions[o].id} .question_points_holder").text).to eq('15 pts')
+        click_option("#question_#{quiz.quiz_questions[o].id} .question_input:nth-of-type(1)", 'a1')
+        click_option("#question_#{quiz.quiz_questions[o].id} .question_input:nth-of-type(2)", 'a3')
+      end
     end
     submit_quiz
     keep_trying_until do

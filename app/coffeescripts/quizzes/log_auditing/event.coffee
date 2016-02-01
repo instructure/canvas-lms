@@ -8,7 +8,7 @@ define (require) ->
     # @internal Create an Event from the JSON version stored in localStorage.
     @fromJSON: (descriptor) ->
       event = new QuizEvent(descriptor.event_type, descriptor.event_data)
-      event.recordedAt = new Date(descriptor.created_at)
+      event.recordedAt = new Date(descriptor.client_timestamp)
       event
 
     constructor: (type, data) ->

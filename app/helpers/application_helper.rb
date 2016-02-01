@@ -266,7 +266,6 @@ module ApplicationHelper
       if use_webpack?
         ary << "#{js_base_url}/#{plugin ? "#{plugin}-" : ''}#{bundle}.bundle.js"
       else
-        ary.concat(Canvas::RequireJs.extensions_for(bundle, 'plugins/')) unless use_optimized_js?
         ary << "#{js_base_url}#{plugin ? "/plugins/#{plugin}" : ''}/compiled/bundles/#{bundle}.js"
       end
     end
@@ -668,7 +667,7 @@ module ApplicationHelper
     @active_brand_config_cache ||= {}
     return @active_brand_config_cache[opts] if @active_brand_config_cache.key?(opts)
     @active_brand_config_cache[opts] = begin
-      if !use_new_styles? || (@current_user && @current_user.prefers_high_contrast?)
+      if !use_new_styles? || (!opts[:ignore_high_contrast_preference] && @current_user && @current_user.prefers_high_contrast?)
         nil
       elsif session.key?(:brand_config_md5)
         BrandConfig.where(md5: session[:brand_config_md5]).first
@@ -711,8 +710,8 @@ module ApplicationHelper
 
   def get_global_includes
     return @global_includes if defined?(@global_includes)
-    @global_includes = [Account.site_admin.global_includes_hash]
-    @global_includes << @domain_root_account.global_includes_hash if @domain_root_account.present?
+    chain = (@domain_root_account || Account.site_admin).account_chain(include_site_admin: true).reverse
+    @global_includes = chain.map(&:global_includes_hash)
     if @domain_root_account.try(:sub_account_includes?)
       # get the deepest account to start looking for branding
       if (acct = Context.get_account(@context))
@@ -737,8 +736,8 @@ module ApplicationHelper
   def include_account_js(options = {})
     return if params[:global_includes] == '0'
     includes = if use_new_styles?
-      if @domain_root_account.allow_global_includes? && active_brand_config
-        active_brand_config.css_and_js_overrides[:js_overrides]
+      if @domain_root_account.allow_global_includes? && (abc = active_brand_config(ignore_high_contrast_preference: true))
+        abc.css_and_js_overrides[:js_overrides]
       end
     else
       get_global_includes.each_with_object([]) do |global_include, memo|
@@ -778,8 +777,8 @@ module ApplicationHelper
     return if disable_account_css?
 
     includes = if use_new_styles?
-      if @domain_root_account.allow_global_includes? && active_brand_config
-        active_brand_config.css_and_js_overrides[:css_overrides]
+      if @domain_root_account.allow_global_includes? && (abc = active_brand_config(ignore_high_contrast_preference: true))
+        abc.css_and_js_overrides[:css_overrides]
       end
     else
       get_global_includes.each_with_object([]) do |global_include, css_includes|

@@ -110,6 +110,7 @@ describe Quizzes::QuizSubmission do
 
   it "should copy the quiz's points_possible whenever it's saved" do
     Quizzes::Quiz.where(:id => @quiz).update_all(:points_possible => 1.1)
+    @quiz.reload
     q = @quiz.quiz_submissions.create!
     expect(q.reload.quiz_points_possible).to eql 1.1
 
@@ -1033,15 +1034,16 @@ describe Quizzes::QuizSubmission do
 
     context "when loading UTF-8 data" do
       it "should strip bad chars" do
-        vs = submission.versions
+        version = submission.versions.last
 
         # inject bad byte into yaml
-        submission.submission_data = ["bad\x81byte"]
-        submission.update_submission_version(vs.last, [:submission_data])
+        submission.submission_data = ["placeholder"]
+        submission.update_submission_version(version, [:submission_data])
+        version.yaml = version.yaml.sub("placeholder", "bad\x81byte")
 
         # reload yaml by setting a different column
         submission.score = 20
-        submission.update_submission_version(vs.last, [:score])
+        submission.update_submission_version(version, [:score])
 
         expect(submission.versions.map{ |s| s.model.submission_data }).to eq [nil, ["badbyte"]]
       end

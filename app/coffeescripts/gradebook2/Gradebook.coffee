@@ -281,16 +281,9 @@ define [
       # an assigmentGroup's .group_weight and @options.group_weighting_scheme
       new AssignmentGroupWeightsDialog context: @options, assignmentGroups: assignmentGroups
       for group in assignmentGroups
-        # note that assignmentGroups are not yet htmlEscaped like assignments and sections
         @assignmentGroups[group.id] = group
         group.assignments = _.select group.assignments, (a) -> a.published
         for assignment in group.assignments
-          htmlUrl = assignment.html_url
-          submissionsDownloadUrl = assignment.submissions_download_url
-          htmlEscape(assignment)
-          assignment.html_url = htmlUrl
-          assignment.submissions_download_url = submissionsDownloadUrl
-
           assignment.assignment_group = group
           assignment.due_at = tz.parse(assignment.due_at)
           @assignments[assignment.id] = assignment
@@ -1121,6 +1114,9 @@ define [
       $('#post_grades').kyleMenu()
 
       $settingsMenu.find('.student_names_toggle').click(@studentNamesToggle)
+      $('#keyboard-shortcuts').click ->
+        questionMarkKeyDown = $.Event('keydown', keyCode: 191)
+        $(document).trigger(questionMarkKeyDown)
 
       @userFilter = new InputFilterView el: '.gradebook_filter input'
       @userFilter.on 'input', @onUserFilterInput
@@ -1244,24 +1240,24 @@ define [
       else
         @options.show_total_grade_as_points
 
-    switch_total_display: =>
+    switchTotalDisplay: =>
       @options.show_total_grade_as_points = not @options.show_total_grade_as_points
       $.ajaxJSON @options.setting_update_url, "PUT", show_total_grade_as_points: @displayPointTotals()
       @grid.invalidate()
-      @totalHeader.render()
+      @totalHeader.switchTotalDisplay(@options.show_total_grade_as_points)
 
-    switch_total_display_and_mark_user_as_warned: =>
+    switchTotalDisplayAndMarkUserAsWarned: =>
       userSettings.contextSet('warned_about_totals_display', true)
-      @switch_total_display()
+      @switchTotalDisplay()
 
     togglePointsOrPercentTotals: =>
       if userSettings.contextGet('warned_about_totals_display')
-        @switch_total_display()
+        @switchTotalDisplay()
       else
         dialog_options =
           showing_points: @options.show_total_grade_as_points
-          unchecked_save: @switch_total_display
-          checked_save: @switch_total_display_and_mark_user_as_warned
+          unchecked_save: @switchTotalDisplay
+          checked_save: @switchTotalDisplayAndMarkUserAsWarned
         new GradeDisplayWarningDialog(dialog_options)
 
     onUserFilterInput: (term) =>
@@ -1269,14 +1265,21 @@ define [
       @buildRows()
 
     getVisibleGradeGridColumns: ->
-      res = [].concat @parentColumns, @customColumnDefinitions()
+      columns = []
+
       for column in @allAssignmentColumns
         if @disabledAssignments && @disabledAssignments.indexOf(column.object.id) != -1
           column.cssClass = "cannot_edit"
         submissionType = ''+ column.object.submission_types
-        res.push(column) unless submissionType is "not_graded" or
-                                submissionType is "attendance" and !@show_attendance
-      res.concat(@aggregateColumns)
+        columns.push(column) unless submissionType is "not_graded" or
+                                submissionType is "attendance" and not @show_attendance
+
+      if @gradebookColumnOrderSettings?.sortType
+        columns.sort @makeColumnSortFn(@gradebookColumnOrderSettings)
+
+      columns = columns.concat(@aggregateColumns)
+      headers = @parentColumns.concat(@customColumnDefinitions())
+      headers.concat(columns)
 
     assignmentHeaderHtml: (assignment) ->
       columnHeaderTemplate

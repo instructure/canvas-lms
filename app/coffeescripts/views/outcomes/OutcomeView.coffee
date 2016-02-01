@@ -61,7 +61,10 @@ define [
     # overriding superclass
     getFormData: ->
       data = super()
-      delete data.calculation_int if data.calculation_method in ['highest', 'latest']
+      if data.calculation_method in ['highest', 'latest']
+        delete data.calculation_int
+      else
+        data.calculation_int = Number(data.calculation_int)
       data
 
     editRating: (e) =>

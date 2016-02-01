@@ -49,7 +49,7 @@
 #         },
 #         "attachment": {
 #           "description": "attachment api object for the export package (not present until the export completes)",
-#           "example": "{\"url\"=>\"https://example.com/api/v1/attachments/789?download_frd=1&verifier=bG9sY2F0cyEh\"}",
+#           "example": {"url": "https://example.com/api/v1/attachments/789?download_frd=1&verifier=bG9sY2F0cyEh"},
 #           "$ref": "File"
 #         },
 #         "progress_url": {

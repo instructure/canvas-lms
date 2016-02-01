@@ -208,6 +208,16 @@ describe "Outcomes Import API", type: :request do
         end
       end
 
+      it "accepts case-insensitive GUIDs" do
+        %w[
+          9426DCAE-734C-40D5-ABF6-FB748CD8BE65
+          9426dcae-734c-40d5-abf6-fb748cd8be65
+          9426DCAE-734C-40d5-abf6-fb748cd8be65
+        ].each do |guid|
+          expect(create_json(guid: guid)).not_to have_key("error")
+        end
+      end
+
       include_examples "academic benchmark config" do
         let(:request_type) { "create" }
       end

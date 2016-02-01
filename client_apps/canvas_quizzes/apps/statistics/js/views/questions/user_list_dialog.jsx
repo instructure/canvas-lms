@@ -13,18 +13,15 @@ define(function(require) {
     },
 
     render: function() {
-      var cssStlye = {
-        height: 500,
-        overflow: scroll
-      };
-
       return(
         <div>
-          <Dialog style={{height: 300, overflow: scroll}}
+          <Dialog
             title={I18n.t('user_names', 'User Names')}
-            content={this.userList} answer_id={this.props.answer_id}
-            user_names={this.props.user_names}>
-            <a>{I18n.t('%{user_count} respondents',{user_count: this.props.user_names.length})}</a>
+            content={this.userList}
+            width={500}
+            tagName="a"
+          >
+            {I18n.t('%{user_count} respondents',{user_count: this.props.user_names.length})}
           </Dialog>
         </div>);
     },
@@ -34,9 +31,9 @@ define(function(require) {
         <div key={'answer-users-'+this.props.answer_id}>
           <ul className='answer-response-list'>
             {this.props.user_names.map(function(user_name, i) {
-                return(<li key={i}>{user_name}</li>);
-              })
-            }
+              return(<li key={i}>{user_name}</li>);
+            })
+          }
           </ul>
         </div>);
     }

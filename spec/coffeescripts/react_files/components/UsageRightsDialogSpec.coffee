@@ -173,7 +173,7 @@ define [
 
     React.unmountComponentAtNode(uRD.getDOMNode().parentNode)
 
-  module 'UploadProgress: Submitting',
+  module 'UploadProgress: Submitting'
 
   test 'validate they selected usage right', ->
     usage_rights = {

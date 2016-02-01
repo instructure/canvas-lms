@@ -411,7 +411,7 @@ describe ConversationParticipant do
       c2.add_message("hola")
 
       c.reload
-      ConversationParticipant.send :with_scope, :find => {:conditions => ["user_id = ?", @user1.id]} do
+      ConversationParticipant.where(:user_id => @user1.id).scoping do
         c.move_to_user @user2
       end
 

@@ -17,7 +17,7 @@ body.modal {
 }
 @media (max-width: 767px) {
   body {
-    font-size: 16px;
+    @include fontSize($ic-font-size--medium);
     line-height: 1.6;
   }
   body,
@@ -63,7 +63,7 @@ body.modal {
     input[type="search"],
     select {
       height: 32px;
-      font-size: 16px;
+      @include fontSize($ic-font-size--medium);
       width: 95%;
     }
     .bootstrap-form {

@@ -15,7 +15,6 @@ define [
       @_cacheElements()
       @_addTitles()
       @_addLabels()
-      @_disableNonScreenreaderButtons()
       @_accessiblizeMenubar()
       @_removeStatusbarFromTabindex()
 
@@ -28,19 +27,6 @@ define [
       @$el.find("div.mce-listbox.mce-last:not([aria-label])").attr('aria-label', I18n.t('titles.formatting',"Formatting, press down to select"))
       @$el.find("div[aria-label='Text color']").attr('aria-label', I18n.t('accessibles.forecolor',"Text Color, press down to select"))
       @$el.find("div[aria-label='Background color'").attr('aria-label', I18n.t('accessibles.background_color',"Background Color, press down to select"))
-
-    ##
-    # the "record" feature (letting you record yourself over webcam)
-    # just isn't very screenreader friendly,
-    # this method just makes sure the screenreader knows this feature
-    # is in accessible with appropriate labeling
-    _disableNonScreenreaderButtons: ->
-      recordButton = @$el.find("div[aria-label='Record/Upload Media']")
-      recordButton.attr('aria-disabled', 'true')
-      recordButton.removeAttr('role')
-      screenreaderDisabledText = I18n.t('accessibles.record', 'This feature is inaccessible for screen readers.')
-      recordButton.find("i.mce-ico").attr("alt", screenreaderDisabledText)
-      recordButton.find("i.mce-ico").attr("title", screenreaderDisabledText)
 
     _addTitles: ->
       @$iframe.attr 'title', I18n.t('titles.rte_help', 'Rich Text Area. Press ALT+F8 for help')

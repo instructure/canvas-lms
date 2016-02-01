@@ -126,7 +126,12 @@ module CustomSeleniumActions
   end
 
   def type_in_tiny(tiny_controlling_element, text)
-    scr = "$(#{tiny_controlling_element.to_s.to_json}).editorBox('execute', 'mceInsertContent', false, #{text.to_s.to_json})"
+    selector = tiny_controlling_element.to_s.to_json
+    wait = Selenium::WebDriver::Wait.new(timeout: 5)
+    wait.until do
+      driver.execute_script("return $(#{selector}).editorBox('exists?');")
+    end
+    scr = "$(#{selector}).editorBox('execute', 'mceInsertContent', false, #{text.to_s.to_json})"
     driver.execute_script(scr)
   end
 

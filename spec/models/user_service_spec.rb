@@ -68,7 +68,7 @@ describe UserService do
       )
       expect(@registration.token).to eql('some token')
       expect(@registration.secret).to eql('some secret')
-      expect(@registration.service_user_id).to eql(@user.id)
+      expect(@registration.service_user_id.to_i).to eql(@user.id)
       expect(@registration.service_user_name).to eql(@user.name)
       expect(@registration.service_user_url).to eql('some url')
       expect(@registration.decrypted_password).to eql('password')
@@ -121,7 +121,7 @@ describe UserService do
 
         expect(@registration.token).to eql('some token')
         expect(@registration.secret).to eql('some secret')
-        expect(@registration.service_user_id).to eql(user.id)
+        expect(@registration.service_user_id.to_i).to eql(user.id)
         expect(@registration.service_user_name).to eql(user.name)
         expect(@registration.service_user_url).to eql('some url')
         expect(@registration.decrypted_password).to eql('password')

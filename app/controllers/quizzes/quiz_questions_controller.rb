@@ -152,7 +152,7 @@
 #       "approximate": {
 #         "description": "Used in numerical questions of type 'precision_answer'.  The value the answer should equal.",
 #         "example": 1.2346e+9,
-#         "type": "float",
+#         "type": "number",
 #         "format": "float64"
 #       },
 #       "precision": {
@@ -184,8 +184,8 @@
 #
 class Quizzes::QuizQuestionsController < ApplicationController
   include Api::V1::QuizQuestion
-  include Filters::Quizzes
-  include Filters::QuizSubmissions
+  include ::Filters::Quizzes
+  include ::Filters::QuizSubmissions
 
   before_filter :require_context, :require_quiz
   before_filter :require_question, :only => [:show]

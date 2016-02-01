@@ -153,9 +153,12 @@ describe GradeSummaryPresenter do
   end
 
   describe '#submissions' do
-    it "doesn't return submissions for deleted assignments" do
+    before(:once) do
       teacher_in_course
       student_in_course
+    end
+
+    it "doesn't return submissions for deleted assignments" do
       a1, a2 = 2.times.map {
         @course.assignments.create! points_possible: 10
       }
@@ -169,8 +172,6 @@ describe GradeSummaryPresenter do
     end
 
     it "doesn't error on submissions for assignments not in the pre-loaded assignment list" do
-      teacher_in_course
-      student_in_course
       assign = @course.assignments.create! points_possible: 10
       assign.grade_student @student, grade: 10
       assign.update_attribute(:submission_types, "not_graded")
@@ -181,15 +182,177 @@ describe GradeSummaryPresenter do
   end
 
   describe '#assignments' do
-    it "filters unpublished assignments" do
+    before(:once) do
       teacher_in_course
       student_in_course
-      published_assignment = @course.assignments.create!
-      unpublished_assign = @course.assignments.create!
-      unpublished_assign.update_attribute(:workflow_state, "unpublished")
+    end
+
+    let!(:published_assignment) { @course.assignments.create! }
+
+    it "filters unpublished assignments" do
+      unpublished_assignment = @course.assignments.create!
+      unpublished_assignment.update_attribute(:workflow_state, "unpublished")
 
       p = GradeSummaryPresenter.new(@course, @teacher, @student.id)
       expect(p.assignments).to eq [published_assignment]
+    end
+  end
+
+  describe '#sort_options' do
+    before(:once) do
+      teacher_in_course
+      student_in_course
+    end
+
+    let(:presenter) { GradeSummaryPresenter.new(@course, @teacher, @student.id) }
+    let(:assignment_group_option) { ["Assignment Group", "assignment_group"] }
+    let(:module_option) { ["Module", "module"] }
+
+    it "returns the default sort options" do
+      default_options = [["Due Date", "due_at"], ["Title", "title"]]
+      expect(presenter.sort_options).to include(*default_options)
+    end
+
+    it "does not return 'Assignment Group' as an option if the course has no assignments" do
+      expect(presenter.sort_options).to_not include assignment_group_option
+    end
+
+    it "does not return 'Assignment Group' as an option if all of the " \
+    "assignments belong to the same assignment group" do
+      @course.assignments.create!(title: "Math Assignment")
+      @course.assignments.create!(title: "Science Assignment")
+      expect(presenter.sort_options).to_not include assignment_group_option
+    end
+
+    it "returns 'Assignment Group' as an option if there are " \
+    "assignments that belong to different assignment groups" do
+      @course.assignments.create!(title: "Math Assignment")
+      science_group = @course.assignment_groups.create!(title: "Science Assignments")
+      @course.assignments.create!(title: "Science Assignment", assignment_group: science_group)
+      expect(presenter.sort_options).to include assignment_group_option
+    end
+
+    it "does not return 'Module' as an option if the course does not have any modules" do
+      expect(presenter.sort_options).to_not include module_option
+    end
+
+    it "returns 'Module' as an option if the course has any modules" do
+      @course.context_modules.create!(name: "I <3 Modules")
+      expect(presenter.sort_options).to include module_option
+    end
+  end
+
+  describe '#sorted_assignments' do
+    before(:once) do
+      teacher_in_course
+      student_in_course
+    end
+
+    let!(:assignment1) { @course.assignments.create!(title: 'Apple', due_at: 2.days.ago, position: 1) }
+    let!(:assignment2) { @course.assignments.create!(title: 'Banana', due_at: 2.days.from_now, position: 2) }
+    let!(:assignment3) { @course.assignments.create!(title: 'Carrot', due_at: 5.days.ago, position: 3) }
+    let(:ordered_assignment_ids) { presenter.assignments.map(&:id) }
+
+    it "assignment order defaults to due_at" do
+      presenter = GradeSummaryPresenter.new(@course, @teacher, @student.id)
+      expect(presenter.assignment_order).to eq(:due_at)
+    end
+
+    context "assignment order: due_at" do
+      let(:presenter) { GradeSummaryPresenter.new(@course, @teacher, @student.id, assignment_order: :due_at) }
+
+      it "sorts by due_at" do
+        expected_id_order = [assignment3.id, assignment1.id, assignment2.id]
+        expect(ordered_assignment_ids).to eq(expected_id_order)
+      end
+
+      it "sorts assignments without due_ats after assignments with due_ats" do
+        assignment1.due_at = nil
+        assignment1.save!
+        expected_id_order = [assignment3.id, assignment2.id, assignment1.id]
+        expect(ordered_assignment_ids).to eq(expected_id_order)
+      end
+
+      it "sorts by assignment title if due_ats are equal" do
+        assignment1.due_at = assignment3.due_at
+        assignment1.save!
+        expected_id_order = [assignment1.id, assignment3.id, assignment2.id]
+        expect(ordered_assignment_ids).to eq(expected_id_order)
+      end
+
+      it "ignores case when comparing assignment titles" do
+        assignment1.due_at = assignment3.due_at
+        assignment1.title = 'apple'
+        assignment1.save!
+        expected_id_order = [assignment1.id, assignment3.id, assignment2.id]
+        expect(ordered_assignment_ids).to eq(expected_id_order)
+      end
+    end
+
+    context "assignment order: title" do
+      let(:presenter) { GradeSummaryPresenter.new(@course, @teacher, @student.id, assignment_order: :title) }
+
+      it "sorts by title" do
+        expected_id_order = [assignment1.id, assignment2.id, assignment3.id]
+        expect(ordered_assignment_ids).to eq(expected_id_order)
+      end
+
+      it "ignores case when sorting by title" do
+        assignment1.title = 'apple'
+        assignment1.save!
+        expected_id_order = [assignment1.id, assignment2.id, assignment3.id]
+        expect(ordered_assignment_ids).to eq(expected_id_order)
+      end
+    end
+
+    context "assignment order: module" do
+      let(:presenter) { GradeSummaryPresenter.new(@course, @teacher, @student.id, assignment_order: :module) }
+      let!(:first_context_module) { @course.context_modules.create! }
+      let!(:second_context_module) { @course.context_modules.create! }
+      let!(:assignment1_tag) do
+        a1_tag = assignment1.context_module_tags.new(context: @course, position: 1, tag_type: 'context_module')
+        a1_tag.context_module = second_context_module
+        a1_tag.save!
+      end
+
+      let!(:assignment2_tag) do
+        a2_tag = assignment2.context_module_tags.new(context: @course, position: 3, tag_type: 'context_module')
+        a2_tag.context_module = first_context_module
+        a2_tag.save!
+      end
+
+      let!(:assignment3_tag) do
+        a3_tag = assignment3.context_module_tags.new(context: @course, position: 2, tag_type: 'context_module')
+        a3_tag.context_module = first_context_module
+        a3_tag.save!
+      end
+
+      it "sorts by module position, then context module tag position" do
+        expected_id_order = [assignment3.id, assignment2.id, assignment1.id]
+        expect(ordered_assignment_ids).to eq(expected_id_order)
+      end
+
+      it "sorts by module position, then context module tag position, " \
+      "with those not belonging to a module sorted last" do
+        assignment3.context_module_tags.first.destroy!
+        expected_id_order = [assignment2.id, assignment1.id, assignment3.id]
+        expect(ordered_assignment_ids).to eq(expected_id_order)
+      end
+    end
+
+    context "assignment order: assignment_group" do
+      let(:presenter) do
+        GradeSummaryPresenter.new(@course, @teacher, @student.id, assignment_order: :assignment_group)
+      end
+
+      it "sorts by assignment group position then assignment position" do
+        new_assignment_group = @course.assignment_groups.create!(position: 2)
+        assignment4 = @course.assignments.create!(
+          assignment_group: new_assignment_group, title: "Dog", position: 1
+        )
+        expected_id_order = [assignment1.id, assignment2.id, assignment3.id, assignment4.id]
+        expect(ordered_assignment_ids).to eq(expected_id_order)
+      end
     end
   end
 end

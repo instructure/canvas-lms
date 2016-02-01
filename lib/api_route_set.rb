@@ -110,7 +110,7 @@ class ApiRouteSet
     opts[:constraints] ||= {}
     opts[:constraints][:format] = 'json' if opts[:constraints].is_a? Hash
     opts[:format] = 'json'
-    mapper.send(method, "#{prefix}/#{path}(.json)", opts)
+    mapper.send(method, "#{prefix}/#{path}", opts)
   end
 
   class V1 < ::ApiRouteSet

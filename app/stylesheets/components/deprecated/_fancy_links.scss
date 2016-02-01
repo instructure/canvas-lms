@@ -278,7 +278,7 @@ a.admin {
 @mixin attachment_link {
   background-repeat: no-repeat;
   background-position: left center;
-  font-size: 10px;
+  @include fontSize(10px);
   padding: 1px 0 2px 20px;
 }
 

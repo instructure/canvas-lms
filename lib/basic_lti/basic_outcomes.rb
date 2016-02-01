@@ -43,8 +43,10 @@ module BasicLTI
         md = sourceid.match(SOURCE_ID_REGEX)
         raise InvalidSourceId, 'Invalid sourcedid' unless md
         new_encoding = [md[1], md[2], md[3], md[4]].join('-')
-        return false unless Canvas::Security.verify_hmac_sha1(md[5], new_encoding, key: tool.shard.settings[:encryption_key])
-        return false unless tool.id == md[1].to_i
+        raise InvalidSourceId, 'Invalid signature' unless Canvas::Security.
+            verify_hmac_sha1(md[5], new_encoding, key: tool.shard.settings[:encryption_key])
+        
+        raise InvalidSourceId, 'Tool is invalid' unless tool.id == md[1].to_i
         course = Course.active.where(id: md[2]).first
         raise InvalidSourceId, 'Course is invalid' unless course
 
@@ -55,7 +57,8 @@ module BasicLTI
         raise InvalidSourceId, 'Assignment is invalid' unless assignment
 
         tag = assignment.external_tool_tag if assignment
-        raise InvalidSourceId, 'Assignment is no longer associated with this tool' unless tag and tool.matches_url?(tag.url, false) and tool.workflow_state != 'deleted'
+        raise InvalidSourceId, 'Assignment is no longer associated with this tool' unless tag and tool.
+            matches_url?(tag.url, false) and tool.workflow_state != 'deleted'
 
         return course, assignment, user
       end

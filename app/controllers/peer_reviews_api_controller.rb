@@ -107,6 +107,9 @@ class PeerReviewsApiController < ApplicationController
   #
   # @returns PeerReview
   def create
+    if @reviewer == @student
+      return render :json => {:errors => {:base => t("Create failed")}}, :status => :bad_request
+    end
     if authorized_action(@assignment, @current_user, :grade)
       assessment_request = @assignment.assign_peer_review(@reviewer, @student)
       includes = Set.new(Array(params[:include]))

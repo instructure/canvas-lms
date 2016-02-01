@@ -77,7 +77,7 @@ describe 'ruby_version_compat' do
       }.force_encoding('binary').strip
       # now actually insert it into an AR column
       aq = assessment_question_model(bank: AssessmentQuestionBank.create!(context: Course.create!))
-      AssessmentQuestion.where(:id => aq).update_all(:question_data => yaml_blob)
+      ActiveRecord::Base.connection.execute("UPDATE #{AssessmentQuestion.quoted_table_name} SET question_data = '#{yaml_blob}' WHERE id = #{aq.id}")
       text = aq.reload.question_data['answers'][0]['valid_ascii']
       expect(text).to eq "text"
       expect(text.encoding).to eq Encoding::UTF_8

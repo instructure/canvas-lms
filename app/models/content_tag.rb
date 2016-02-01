@@ -39,12 +39,6 @@ class ContentTag < ActiveRecord::Base
   belongs_to :learning_outcome_content, :class_name => 'LearningOutcome', :foreign_key => :content_id
   has_many :learning_outcome_results
 
-  EXPORTABLE_ATTRIBUTES = [
-    :id, :content_id, :content_type, :context_id, :context_type, :title, :tag, :url, :created_at, :updated_at, :comments, :tag_type, :context_module_id, :position,
-    :indent, :learning_outcome_id, :context_code, :mastery_score, :rubric_association_id, :workflow_state, :cloned_item_id, :associated_asset_id, :associated_asset_type, :new_tab
-  ]
-
-  EXPORTABLE_ASSOCIATIONS = [:content, :context, :associated_asset, :context_module, :learning_outcome, :learning_outcome_results, :learning_outcome_content]
   # This allows bypassing loading context for validation if we have
   # context_id and context_type set, but still allows validating when
   # context is not yet saved.
@@ -57,9 +51,6 @@ class ContentTag < ActiveRecord::Base
   after_save :touch_context_if_learning_outcome
   include CustomValidations
   validates_as_url :url
-
-  include PolymorphicTypeOverride
-  override_polymorphic_types content_type: {'Quiz' => 'Quizzes::Quiz'}
 
   acts_as_list :scope => :context_module
 
@@ -146,6 +137,8 @@ class ContentTag < ActiveRecord::Base
     end
     content_ids.each do |type, ids|
       klass = type.constantize
+      next unless klass < ActiveRecord::Base
+      next if klass.respond_to?(:tableless?) && klass.tableless?
       if klass.new.respond_to?(:could_be_locked=)
         klass.where(:id => ids).update_all(:could_be_locked => true)
       end

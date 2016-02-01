@@ -65,7 +65,7 @@ define [
     targetTextarea = RCELoader.getTargetTextarea(d)
     equal targetTextarea.id, "theTarget"
 
-  test 'returns the textareas parent as the renderingTarget', ->
+  test 'returns the textareas parent as the renderingTarget when no custom function given', ->
     d = @elementInFixtures('div')
     ta = document.createElement('textarea')
     ta.setAttribute("id", "theTarget")
@@ -73,15 +73,53 @@ define [
     renderingTarget = RCELoader.getRenderingTarget(ta)
     equal renderingTarget, d
 
+  test 'uses a custom get target function if given', ->
+    d = @elementInFixtures('div')
+    ta = document.createElement('textarea')
+    d.appendChild(ta)
+    customFn = ()->
+      return "someCustomTarget"
+
+    originalLoadRCE = RCELoader.loadRCE
+    RCELoader.loadRCE = sinon.spy()
+
+    renderIntoDivSpy = sinon.spy()
+    fakeRCE = { renderIntoDiv: renderIntoDivSpy}
+
+    # execute renderIntoDivSpy
+    RCELoader.loadOnTarget(ta, {getRenderingTarget: customFn}, "www.some-host.com")
+    call = RCELoader.loadRCE.getCall(0)
+    call.args[1](fakeRCE)
+
+    ok renderIntoDivSpy.calledWith("someCustomTarget")
+
+    RCELoader.loadOnTarget = originalLoadRCE
+
   # propsForRCE construction
 
   test 'extracts content from the target', ->
     ta = @elementInFixtures('textarea')
     ta.value = "some text here";
-    props = RCELoader.createRCEProps(ta, "default text")
-    ok props.defaultContent, "some text here"
+    props = RCELoader.createRCEProps(ta, {defaultContent: "default text"})
+    equal props.defaultContent, "some text here"
+
+  test 'passes the textarea height into tinyOptions', ->
+    taHeight = "123"
+    ta = {
+      offsetHeight: taHeight
+    }
+
+    opts = {defaultContent: "default text"}
+    props = RCELoader.createRCEProps(ta, opts)
+    equal opts.tinyOptions.height, taHeight
 
   test 'falls back to defaultContent if target has no content', ->
     ta = @elementInFixtures('textarea')
     props = RCELoader.createRCEProps(ta, {defaultContent: "default text"})
-    ok props.defaultContent, "default text"
+    equal props.defaultContent, "default text"
+
+  test 'adds the elements name attribute to mirroedAttrs', ->
+    ta = @elementInFixtures('textarea')
+    ta.setAttribute("name", "elementName")
+    props = RCELoader.createRCEProps(ta, {defaultContent: "default text"})
+    equal props.mirroredAttrs.name, "elementName"

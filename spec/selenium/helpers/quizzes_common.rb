@@ -788,4 +788,10 @@ module QuizzesCommon
       expect(speedgrader_submission_details).not_to include_text late_note
     end
   end
+
+  def generate_and_save_submission(quiz, student)
+    submission = quiz.generate_submission student
+    submission.workflow_state = 'complete'
+    submission.save!
+  end
 end

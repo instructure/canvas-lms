@@ -67,7 +67,7 @@
 </div>
 
 <h2>
-<% ot('headers.grades', "Grades For %{student}", :student => capture { %>
+<% ot('headers.grades', "Grades for %{student}", :student => capture { %>
  <% unless @presenter.multiple_observed_students?  %>
    <%= @presenter.student_name %>
  <% else %>
@@ -81,25 +81,33 @@
 <% }) %>
 </h2>
 
-<% if @presenter.has_courses_with_grades? %>
-  <div id="course-selector-dropdown" style="margin-left: 10px;" class="course_selector">
-  <%= t(:for_course, "For the course,") %>
-  <select id="course_url">
-    <% @presenter.selectable_courses.each do |course| %>
-      <%
-         url = if course.grants_any_right?(@current_user, :manage_grades, :view_all_grades)
-           context_url(course, :context_student_grades_url, @presenter.student_id)
-         else
-           context_url(course, :context_grades_url)
-         end
-      %>
-      <option value="<%= url %>" <%= 'selected' if course == @context %>><%= course.nickname_for(@current_user) %></option>
+<div class="dropdowns">
+  <% if @presenter.has_courses_with_grades? %>
+    <div id="course-selector-dropdown" style="margin-left: 10px; float: left;" class="course_selector">
+    <label for="course_url"><%= t(:for_course, "For the course") %></label>
+    <select id="course_url">
+      <% @presenter.selectable_courses.each do |course| %>
+        <%
+           url = if course.grants_any_right?(@current_user, :manage_grades, :view_all_grades)
+             context_url(course, :context_student_grades_url, @presenter.student_id)
+           else
+             context_url(course, :context_grades_url)
+           end
+        %>
+        <option value="<%= url %>" <%= 'selected' if course == @context %>><%= course.nickname_for(@current_user) %></option>
+      <% end %>
+    </select>
+    </div>
+    <% js_bundle 'legacy/gradebooks_grade_summary' %>
+  <% end %>
+
+  <div class="assignment_order" style=<%= @presenter.has_courses_with_grades? ? "margin-right:10px;float:right;" : "margin-left:10px;float:left;" %>>
+    <%= form_tag context_url(@context, :context_save_assignment_order_url), style: 'margin-bottom: 0;' do %>
+      <label for="assignment_order"><%= t("Arrange by") %></label>
+      <%= select_tag "assignment_order", options_for_select(@presenter.sort_options, selected: @presenter.assignment_order) %>
     <% end %>
-  </select>
   </div>
-  <% js_bundle 'legacy/gradebooks_grade_summary' %>
-<% end %>
-</h2>
+</div>
 
 <% if @context.feature_enabled?(:student_outcome_gradebook) %>
   <ul id="navpills">

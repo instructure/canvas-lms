@@ -54,22 +54,6 @@ class Quizzes::Quiz < ActiveRecord::Base
   belongs_to :assignment
   belongs_to :assignment_group
 
-  EXPORTABLE_ATTRIBUTES = [
-    :id, :title, :description, :quiz_data, :points_possible, :context_id,
-    :context_type, :assignment_id, :workflow_state, :shuffle_answers,
-    :show_correct_answers, :time_limit, :allowed_attempts, :scoring_policy,
-    :quiz_type, :created_at, :updated_at, :lock_at, :unlock_at, :deleted_at,
-    :could_be_locked, :cloned_item_id, :unpublished_question_count, :due_at,
-    :question_count, :last_assignment_id, :published_at, :last_edited_at,
-    :anonymous_submissions, :assignment_group_id, :hide_results, :ip_filter,
-    :require_lockdown_browser, :require_lockdown_browser_for_results,
-    :one_question_at_a_time, :cant_go_back, :show_correct_answers_at,
-    :hide_correct_answers_at, :require_lockdown_browser_monitor,
-    :lockdown_browser_monitor_data, :only_visible_to_overrides
-  ]
-
-  EXPORTABLE_ASSOCIATIONS = [:quiz_questions, :quiz_submissions, :quiz_groups, :quiz_statistics, :attachments, :quiz_regrades, :context, :assignment, :assignment_group]
-
   validates_length_of :description, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true
   validates_presence_of :context_id
@@ -402,6 +386,7 @@ class Quizzes::Quiz < ActiveRecord::Base
         Quizzes::Quiz.where("assignment_id=? AND id<>?", self.assignment_id, self).update_all(:workflow_state => 'deleted', :assignment_id => nil, :updated_at => Time.now.utc) if self.assignment_id
         self.assignment = @assignment_to_set if @assignment_to_set && !self.assignment
         a = self.assignment
+        a.quiz.clear_changes_information if a.quiz && !CANVAS_RAILS4_0 # AR#changes persist in after_saves now - needed to prevent an autosave loop
         a.points_possible = self.points_possible
         a.description = self.description
         a.title = self.title
@@ -783,7 +768,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   # virtual attribute
   def locked=(new_val)
-    new_val = ::ActiveRecord::ConnectionAdapters::Column.value_to_boolean(new_val)
+    new_val = Canvas::Plugin.value_to_boolean(new_val)
     if new_val
       #lock the quiz either until unlock_at, or indefinitely if unlock_at.nil?
       self.lock_at = Time.now

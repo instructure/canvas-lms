@@ -547,7 +547,6 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
         question_data: true_false_question_data
       })
 
-      @quiz.quiz_data = [ @qq1.question_data, @qq2.question_data ]
       @quiz.generate_quiz_data
 
       enroll_student_and_submit({

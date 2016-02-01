@@ -272,7 +272,7 @@ class CourseLinkValidator
   # ping the url and make sure we get a 200
   def reachable_url?(url)
     begin
-      response = CanvasHttp.get(url)
+      response = CanvasHttp.get(url, {}, 9)
 
       case response.code
       when /^2/ # 2xx code

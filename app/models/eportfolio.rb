@@ -24,9 +24,6 @@ class Eportfolio < ActiveRecord::Base
   has_many :eportfolio_entries, :dependent => :destroy
   has_many :attachments, :as => :context
 
-  EXPORTABLE_ATTRIBUTES = [:id, :user_id, :name, :public, :context_id, :context_type, :created_at, :updated_at, :uuid, :workflow_state, :deleted_at]
-  EXPORTABLE_ASSOCIATIONS = [:eportfolio_categories, :eportfolio_entries, :attachments]
-
   belongs_to :user
   validates_presence_of :user_id
   validates_length_of :name, :maximum => maximum_string_length, :allow_blank => true
@@ -37,6 +34,7 @@ class Eportfolio < ActiveRecord::Base
   end
 
   alias_method :destroy_permanently!, :destroy
+
   def destroy
     self.workflow_state = 'deleted'
     self.deleted_at = Time.now.utc
@@ -58,10 +56,10 @@ class Eportfolio < ActiveRecord::Base
     given {|user| self.user == user && user.eportfolios_enabled? }
     can :read and can :manage and can :update and can :delete
 
-    given {|user| self.public }
+    given {|_| self.public }
     can :read
 
-    given {|user, session| session && session[:eportfolio_ids] && session[:eportfolio_ids].include?(self.id) }
+    given {|_, session| session && session[:eportfolio_ids] && session[:eportfolio_ids].include?(self.id) }
     can :read
   end
 

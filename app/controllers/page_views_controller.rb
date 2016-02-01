@@ -64,7 +64,7 @@
 #         "interaction_seconds": {
 #           "description": "An approximation of how long the user spent on the page, in seconds",
 #           "example": "7.21",
-#           "type": "float"
+#           "type": "number"
 #         },
 #         "created_at": {
 #           "description": "When the request was made",
@@ -80,7 +80,7 @@
 #         "render_time": {
 #           "description": "How long the response took to render, in seconds",
 #           "example": "0.369",
-#           "type": "float"
+#           "type": "number"
 #         },
 #         "user_agent": {
 #           "description": "The user-agent of the browser or program that made the request",
@@ -104,8 +104,8 @@
 #         },
 #         "links": {
 #           "description": "The page view links to define the relationships",
-#           "type": "PageViewLinks",
-#           "example": "{}"
+#           "$ref": "PageViewLinks",
+#           "example": {"user": 1234, "account": 1234}
 #         }
 #       }
 #     }

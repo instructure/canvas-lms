@@ -193,15 +193,94 @@ describe GradebooksController do
       ]
     end
 
-    it "sorts assignments by due date (null last), then title" do
-      user_session(@teacher)
-      assignment1 = @course.assignments.create(:title => "Assignment 1")
-      assignment2 = @course.assignments.create(:title => "Assignment 2", :due_at => 3.days.from_now)
-      assignment3 = @course.assignments.create(:title => "Assignment 3", :due_at => 2.days.from_now)
+    context "assignment sorting" do
+      let!(:teacher_session) { user_session(@teacher) }
+      let!(:assignment1) { @course.assignments.create(title: "Banana", position: 2) }
+      let!(:assignment2) { @course.assignments.create(title: "Apple", due_at: 3.days.from_now, position: 3) }
+      let!(:assignment3) do
+        assignment_group = @course.assignment_groups.create!(position: 2)
+        @course.assignments.create!(
+          assignment_group: assignment_group, title: "Carrot", due_at: 2.days.from_now, position: 1
+        )
+      end
+      let(:assignment_ids) { assigns[:presenter].assignments.select{ |a| a.class == Assignment }.map(&:id) }
 
-      get 'grade_summary', :course_id => @course.id, :id => @student.id
-      assignment_ids = assigns[:presenter].assignments.select{|a| a.class == Assignment}.map(&:id)
-      expect(assignment_ids).to eq [assignment3, assignment2, assignment1].map(&:id)
+      it "sorts assignments by due date (null last), then title if there is no saved order preference" do
+        get 'grade_summary', course_id: @course.id, id: @student.id
+        expect(assignment_ids).to eq [assignment3, assignment2, assignment1].map(&:id)
+      end
+
+      it "sort order of 'due_at' sorts by due date (null last), then title" do
+        @teacher.preferences[:course_grades_assignment_order] = { @course.id => :due_at }
+        @teacher.save!
+        get 'grade_summary', course_id: @course.id, id: @student.id
+        expect(assignment_ids).to eq [assignment3, assignment2, assignment1].map(&:id)
+      end
+
+      context "sort by: title" do
+        let!(:teacher_setup) do
+          @teacher.preferences[:course_grades_assignment_order] = { @course.id => :title }
+          @teacher.save!
+        end
+
+        it "sorts assignments by title" do
+          get 'grade_summary', course_id: @course.id, id: @student.id
+          expect(assignment_ids).to eq [assignment2, assignment1, assignment3].map(&:id)
+        end
+
+        it "ingores case" do
+          assignment1.title = 'banana'
+          assignment1.save!
+          get 'grade_summary', course_id: @course.id, id: @student.id
+          expect(assignment_ids).to eq [assignment2, assignment1, assignment3].map(&:id)
+        end
+      end
+
+      it "sort order of 'assignment_group' sorts by assignment group position, then assignment position" do
+        @teacher.preferences[:course_grades_assignment_order] = { @course.id => :assignment_group }
+        @teacher.save!
+        get 'grade_summary', course_id: @course.id, id: @student.id
+        expect(assignment_ids).to eq [assignment1, assignment2, assignment3].map(&:id)
+      end
+
+      context "sort by: module" do
+        let!(:first_context_module) { @course.context_modules.create! }
+        let!(:second_context_module) { @course.context_modules.create! }
+        let!(:assignment1_tag) do
+          a1_tag = assignment1.context_module_tags.new(context: @course, position: 1, tag_type: 'context_module')
+          a1_tag.context_module = second_context_module
+          a1_tag.save!
+        end
+
+        let!(:assignment2_tag) do
+          a2_tag = assignment2.context_module_tags.new(context: @course, position: 3, tag_type: 'context_module')
+          a2_tag.context_module = first_context_module
+          a2_tag.save!
+        end
+
+        let!(:assignment3_tag) do
+          a3_tag = assignment3.context_module_tags.new(context: @course, position: 2, tag_type: 'context_module')
+          a3_tag.context_module = first_context_module
+          a3_tag.save!
+        end
+
+        let!(:teacher_setup) do
+          @teacher.preferences[:course_grades_assignment_order] = { @course.id => :module }
+          @teacher.save!
+        end
+
+        it "sorts by module position, then context module tag position" do
+          get 'grade_summary', course_id: @course.id, id: @student.id
+          expect(assignment_ids).to eq [assignment3, assignment2, assignment1].map(&:id)
+        end
+
+        it "sorts by module position, then context module tag position, " \
+        "with those not belonging to a module sorted last" do
+          assignment3.context_module_tags.first.destroy!
+          get 'grade_summary', course_id: @course.id, id: @student.id
+          expect(assignment_ids).to eq [assignment2, assignment1, assignment3].map(&:id)
+        end
+      end
     end
 
     context "Multiple Grading Periods" do
@@ -640,6 +719,15 @@ describe GradebooksController do
       post 'speed_grader_settings', course_id: @course.id,
         enable_speedgrader_grade_by_question: "0"
       expect(@teacher.reload.preferences[:enable_speedgrader_grade_by_question]).not_to be_truthy
+    end
+  end
+
+  describe "POST 'save_assignment_order'" do
+    it "saves the sort order in the user's preferences" do
+      user_session(@teacher)
+      post 'save_assignment_order', course_id: @course.id, assignment_order: 'due_at'
+      saved_order = @teacher.preferences[:course_grades_assignment_order][@course.id]
+      expect(saved_order).to eq(:due_at)
     end
   end
 

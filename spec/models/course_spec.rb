@@ -548,7 +548,7 @@ describe Course do
 
       @new_course = @course.reset_content
 
-      expect(@new_course.profile.data).to eq data
+      expect(@new_course.profile.data[:something]).to eq data[:something]
       expect(@new_course.profile.description).to eq description
     end
 

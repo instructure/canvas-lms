@@ -1,4 +1,3 @@
-
 define [
   'react'
   'jquery'
@@ -8,7 +7,6 @@ define [
   Simulate = TestUtils.Simulate
 
   module 'FilesUsage#update',
-
     filesUpdateTest: (props, test) ->
       @server = sinon.fakeServer.create()
       @filesUsage = TestUtils.renderIntoDocument(React.createElement(FilesUsage, props))

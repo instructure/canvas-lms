@@ -38,12 +38,6 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
   belongs_to :assessment_question
   belongs_to :quiz_group, class_name: 'Quizzes::QuizGroup'
 
-  EXPORTABLE_ATTRIBUTES = [
-    :id, :quiz_id, :quiz_group_id, :assessment_question_id, :question_data, :assessment_question_version,
-    :position, :created_at, :updated_at, :workflow_state
-  ].freeze
-  EXPORTABLE_ASSOCIATIONS = [:quiz, :assessment_question, :quiz_group].freeze
-
   Q_TEXT_ONLY = 'text_only_question'
   Q_FILL_IN_MULTIPLE_BLANKS = 'fill_in_multiple_blanks_question'
   Q_MULTIPLE_DROPDOWNS = 'multiple_dropdowns_question'

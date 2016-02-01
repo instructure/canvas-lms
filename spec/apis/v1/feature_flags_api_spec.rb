@@ -470,7 +470,7 @@ describe "Feature Flags API", type: :request do
                { controller: 'feature_flags', action: 'delete', format: 'json', user_id: t_teacher.to_param, feature: 'user_feature' })
       expect(t_teacher.feature_flags.where(feature: 'course_feature')).to be_empty
 
-      t_teacher.feature_flags.create! feature: 'user_feature', state: 'on', locking_account: t_root_account
+      t_teacher.feature_flags.create! feature: 'user_feature', state: 'on', locking_account: t_site_admin
       api_call_as_user(t_teacher, :delete, "/api/v1/users/#{t_teacher.id}/features/flags/user_feature",
                { controller: 'feature_flags', action: 'delete', format: 'json', user_id: t_teacher.to_param, feature: 'user_feature' },
                {}, {}, { expected_status: 403 })

@@ -68,6 +68,13 @@ describe TermsApiController, type: :request do
         expect(names).to include(@term2.name)
       end
 
+      it "should not blow up for invalid state parameters" do
+        json = get_terms(workflow_state: {all: nil})
+        names = json.map { |t| t['name'] }
+        expect(names).to include(@term1.name)
+        expect(names).not_to include(@term2.name)
+      end
+
       it "should list all terms, active and deleted, with state=[all]" do
         json = get_terms(workflow_state: ['all'])
         names = json.map{ |t| t['name'] }

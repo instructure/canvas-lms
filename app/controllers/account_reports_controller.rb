@@ -46,6 +46,7 @@
 #         },
 #         "parameters": {
 #           "description": "The report parameters",
+#           "example": {"course_id": 2, "start_at": "2012-07-13T10:55:20-06:00", "end_at": "2012-07-13T10:55:20-06:00"},
 #           "$ref": "ReportParameters"
 #         },
 #         "progress": {
@@ -141,10 +142,11 @@
 #           "example": false,
 #           "type": "boolean"
 #         },
-#         "enrollment_state[]": {
+#         "enrollment_state": {
 #           "description": "Include enrollment state. Defaults to 'all' Options: ['active'| 'invited'| 'creation_pending'| 'deleted'| 'rejected'| 'completed'| 'inactive'| 'all']",
-#           "example": "['all']",
-#           "type": "string"
+#           "example": ["all"],
+#           "type": "array",
+#           "items": {"type": "string"}
 #         },
 #         "start_at": {
 #           "description": "The beginning date for submissions. Max time range is 2 weeks.",

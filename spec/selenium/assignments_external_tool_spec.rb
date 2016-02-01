@@ -37,7 +37,7 @@ describe "external tool assignments" do
 
     f('#assignment_name').send_keys('test1')
     click_option('#assignment_submission_type', 'External Tool')
-    f('#assignment_external_tool_tag_attributes_url').click
+    f('#assignment_external_tool_tag_attributes_url_find').click
     keep_trying_until do
       fj('#context_external_tools_select td .tools .tool:first-child:visible').click
       wait_for_ajaximations
@@ -70,7 +70,7 @@ describe "external tool assignments" do
     get "/courses/#{@course.id}/assignments/#{a.id}/edit"
     # don't display dialog on page load, since url isn't blank
     expect(f('#context_external_tools_select')).not_to be_displayed
-    f('#assignment_external_tool_tag_attributes_url').click
+    f('#assignment_external_tool_tag_attributes_url_find').click
     ff('#context_external_tools_select td .tools .tool')[0].click
     expect(f('#context_external_tools_select input#external_tool_create_url')).to have_attribute('value', @t1.url)
     fj('.add_item_button.ui-button').click

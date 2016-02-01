@@ -23,9 +23,6 @@ class ContentParticipationCount < ActiveRecord::Base
   validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course']
   belongs_to :user
 
-  EXPORTABLE_ATTRIBUTES = [:id, :content_type, :context_type, :context_id, :user_id, :unread_count, :created_at, :updated_at]
-  EXPORTABLE_ASSOCATIONS = [:context, :user]
-
   def self.create_or_update(opts={})
     opts = opts.with_indifferent_access
     context = opts.delete(:context)

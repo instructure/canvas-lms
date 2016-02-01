@@ -2625,14 +2625,22 @@ describe User do
       end
 
       it "should not grant admins :reset_mfa on partially admined users" do
+        account1.settings[:mfa_settings] = :required
+        account1.save!
+        account2.settings[:mfa_settings] = :required
+        account2.save!
         pseudonym(bob, account: account1)
         pseudonym(bob, account: account2)
         expect(bob).not_to be_grants_right(sally, :reset_mfa)
       end
 
       it "should not grant subadmins :reset_mfa on stronger admins" do
+        account1.settings[:mfa_settings] = :required
+        account1.save!
+        sub = Account.create(root_account_id: account1)
+        AccountUser.create(account: sub, user: bob)
         pseudonym(alice, account: account1)
-        expect(alice).not_to be_grants_right(sally, :reset_mfa)
+        expect(alice).not_to be_grants_right(bob, :reset_mfa)
       end
 
       context "MFA is required on the account" do

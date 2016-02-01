@@ -85,7 +85,7 @@
 }
 
 .ag-x-of-x-signed-up {
-  font-size: 11px;
+  @include fontSize(11px);
 }
 
 .time-block-list-body-wrapper {

@@ -99,6 +99,7 @@ class AccountsController < ApplicationController
   before_filter :require_user, :only => [:index]
   before_filter :reject_student_view_student
   before_filter :get_context
+  before_filter :rich_content_service_config, only: [:settings]
 
   include Api::V1::Account
 
@@ -945,4 +946,8 @@ class AccountsController < ApplicationController
   end
   private :format_avatar_count
 
+  protected
+  def rich_content_service_config
+    js_env(Services::RichContent.env_for(@domain_root_account))
+  end
 end

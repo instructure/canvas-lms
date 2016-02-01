@@ -145,18 +145,20 @@
 #         },
 #         "processing_warnings": {
 #           "description": "Only imports that are complete will get this data. An array of CSV_file/warning_message pairs.",
-#           "example": "[['students.csv','user John Doe has already claimed john_doe's requested login information, skipping'], ...]",
+#           "example": [["students.csv","user John Doe has already claimed john_doe's requested login information, skipping"]],
 #           "type": "array",
 #           "items": {
-#             "type": "string"
+#             "type": "array",
+#             "items": {"type": "string"}
 #           }
 #         },
 #         "processing_errors": {
 #           "description": "An array of CSV_file/error_message pairs.",
-#           "example": "[['students.csv','Error while importing CSV. Please contact support.'], ...]",
+#           "example": [["students.csv","Error while importing CSV. Please contact support."]],
 #           "type": "array",
 #           "items": {
-#             "type": "string"
+#             "type": "array",
+#             "items": {"type": "string"}
 #           }
 #         },
 #         "batch_mode": {

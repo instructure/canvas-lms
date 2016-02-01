@@ -94,6 +94,15 @@ describe "course settings" do
 
       code = @course.reload.self_enrollment_code
       expect(code).not_to be_nil
+      # this element _can_ still be on the page if the post hasn't finished yet,
+      # so make sure it's been populated before continuing
+      wait = Selenium::WebDriver::Wait.new(timeout: 5)
+      wait.until do
+        el = f('.self_enrollment_message')
+        el.present? &&
+        el.text != nil &&
+        el.text != ""
+      end
       message = f('.self_enrollment_message')
       expect(message.text).to include(code)
       expect(message.text).not_to include('self_enrollment_code')

@@ -1488,13 +1488,8 @@ describe Quizzes::QuizzesController do
       end
 
       it "renders access_code template" do
-        # render returns a RunTimeError when the private method is called without
-        # the context of a controller action. When this method is extracted the
-        # contract will need to change to return a value to the controller letting
-        # it know which template to render.
-        expect {
-          subject.send(:can_take_quiz?)
-        }.to raise_error RuntimeError # triggered by render access_code
+        subject.expects(:render).with(:access_code)
+        subject.send(:can_take_quiz?)
       end
 
       it "returns false" do
@@ -1512,9 +1507,8 @@ describe Quizzes::QuizzesController do
       end
 
       it "renders invalid_ip" do
-        expect {
-          subject.send(:can_take_quiz?)
-        }.to raise_error RuntimeError # triggered by render invalid_ip
+        subject.expects(:render).with(:invalid_ip)
+        subject.send(:can_take_quiz?)
       end
 
       it "returns false" do

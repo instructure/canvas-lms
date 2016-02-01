@@ -198,8 +198,8 @@ require 'securerandom'
 #         },
 #         "permissions": {
 #           "description": "optional: the permissions the user has for the course. returned only for a single course and include[]=permissions",
-#           "example": "{\"create_discussion_topic\"=>true,\"create_announcement\"=>true}",
-#           "type": "map",
+#           "example": {"create_discussion_topic": true, "create_announcement": true},
+#           "type": "object",
 #           "key": { "type": "string" },
 #           "value": { "type": "boolean" }
 #         },
@@ -225,7 +225,7 @@ require 'securerandom'
 #         },
 #         "storage_quota_used_mb": {
 #           "example": 5,
-#           "type": "float"
+#           "type": "number"
 #         },
 #         "hide_final_grades": {
 #           "example": false,
@@ -817,7 +817,7 @@ class CoursesController < ApplicationController
       user_id = params[:user_id]
       if user_id.present? && user = users.where(:users => { :id => user_id }).first
         position_scope = users.where("#{User.sortable_name_order_by_clause}<=#{User.best_unicode_collation_key('?')}", user.sortable_name)
-        position = position_scope.count(:select => "users.id", :distinct => true)
+        position = position_scope.uniq.count(:all)
         per_page = Api.per_page_for(self)
         params[:page] = (position.to_f / per_page.to_f).ceil
       end
@@ -2040,15 +2040,17 @@ class CoursesController < ApplicationController
 
       if params[:course].has_key? :grading_standard_id
         standard_id = params[:course].delete :grading_standard_id
-        if authorized_action?(@course, @current_user, :manage_grades)
-          if standard_id.present?
-            grading_standard = GradingStandard.for(@course).where(id: standard_id).first
-            @course.grading_standard = grading_standard if grading_standard
+        grading_standard = GradingStandard.for(@course).where(id: standard_id).first if standard_id.present?
+        if grading_standard != @course.grading_standard
+          if authorized_action?(@course, @current_user, :manage_grades)
+            if standard_id.present?
+              @course.grading_standard = grading_standard if grading_standard
+            else
+              @course.grading_standard = nil
+            end
           else
-            @course.grading_standard = nil
+            return
           end
-        else
-          return
         end
       end
       unless @course.account.grants_right? @current_user, session, :manage_storage_quotas

@@ -6,8 +6,8 @@ describe "context modules" do
   include ContextModulesCommon
 
   context "as a teacher", priority: "1" do
-    before(:each) do
-      course_with_teacher_logged_in
+    before(:once) do
+      course(:active_course => true)
       # have to add quiz and assignment to be able to add them to a new module
       @quiz = @course.assignments.create!(:title => 'quiz assignment', :submission_types => 'online_quiz')
       @assignment = @course.assignments.create!(:title => 'assignment 1', :submission_types => 'online_text_entry')
@@ -21,6 +21,10 @@ describe "context modules" do
       @ag2 = @course.assignment_groups.create!(:name => "Assignment Group 2")
 
       @course.reload
+    end
+
+    before(:each) do
+      course_with_teacher_logged_in(:course => @course, :active_enrollment => true)
     end
 
     def module_with_two_items
@@ -42,6 +46,19 @@ describe "context modules" do
       module_with_two_items
       wait_for_ajaximations
       expect(f('.context_module .content')).not_to be_displayed
+    end
+
+    it "should create a new module using enter key", priority: "2", test_id: 126705 do
+      get "/courses/#{@course.id}/modules"
+      add_form = new_module_form
+      replace_content(add_form.find_element(:id, 'context_module_name'), "module 1")
+      3.times do
+        driver.action.send_keys(:tab).perform
+        wait_for_ajaximations
+      end
+      driver.action.send_keys(:return).perform
+      wait_for_ajaximations
+      expect(f('.name')).to be_present
     end
 
     it "should rearrange child objects in same module", priority: "1", test_id: 126733  do
@@ -500,6 +517,25 @@ describe "context modules" do
       f('.edit_module_link', mod1).click
       edit_form = f('#add_context_module_form')
       expect(f('.prerequisites_entry', edit_form)).to be_displayed
+    end
+
+    it "retains focus when deleting prerequisites" do
+      modules = create_modules(2)
+      get "/courses/#{@course.id}/modules"
+      wait_for_modules_ui
+      mod1 = f("#context_module_#{modules[1].id}")
+      f(".ig-header-admin .al-trigger", mod1).click
+      f('.edit_module_link', mod1).click; wait_for_ajaximations
+      add_button = f(".add_prerequisite_link")
+      2.times { add_button.click; wait_for_animations }
+      links = ff(".prerequisites_list .criteria_list .delete_criterion_link")
+      expect(links.size).to eq 2
+      links[1].click
+      wait_for_animations
+      check_element_has_focus(links[0])
+      links[0].click
+      wait_for_animations
+      check_element_has_focus(add_button)
     end
 
     it "should save the requirement count chosen in the Edit Module form" do
@@ -967,10 +1003,14 @@ describe "context modules" do
   end
 
   context "as a teacher", priority: "1" do
-    before(:each) do
-      course_with_teacher_logged_in
+    before(:once) do
+      course(:active_course => true)
       @course.default_view = 'modules'
       @course.save!
+    end
+
+    before(:each) do
+      course_with_teacher_logged_in(:course => @course, :active_enrollment => true)
       get "/courses/#{@course.id}"
     end
 
@@ -1026,6 +1066,7 @@ describe "context modules" do
       submit_form(edit_form)
       expect(edit_form).not_to be_displayed
       wait_for_ajaximations
+      check_element_has_focus(f('.ig-header-admin .al-trigger'))
       expect(f('.context_module > .header')).to include_text(edit_text)
     end
 
@@ -1038,6 +1079,7 @@ describe "context modules" do
       expect(driver.switch_to.alert).not_to be_nil
       driver.switch_to.alert.accept
       wait_for_ajaximations
+      check_element_has_focus(f(".add_module_link"))
       refresh_page
       expect(f('#no_context_modules_message')).to be_displayed
       wait_for_ajaximations
@@ -1126,10 +1168,14 @@ describe "context modules" do
   end
 
   context 'adds existing items to modules' do
-    before do
-      course_with_teacher_logged_in
+    before(:once) do
+      course(:active_course => true)
       @course.context_modules.create! name: 'Module 1'
       @mod = @course.context_modules.first
+    end
+
+    before(:each) do
+      course_with_teacher_logged_in(:course => @course, :active_enrollment => true)
     end
 
      it 'should add an unpublished page to a module', priority: "1", test_id: 126709 do
@@ -1244,13 +1290,17 @@ describe "context modules" do
   describe "files" do
     FILE_NAME = 'some test file'
 
-    before(:each) do
-      course_with_teacher_logged_in
+    before(:once) do
+      course(:active_course => true)
       Account.default.enable_feature!(:usage_rights_required)
       #adding file to course
       @file = @course.attachments.create!(:display_name => FILE_NAME, :uploaded_data => default_uploaded_data)
       @file.context = @course
       @file.save!
+    end
+
+    before(:each) do
+      course_with_teacher_logged_in(:course => @course, :active_enrollment => true)
     end
 
     it "should add a file item to a module", priority: "1", test_id: 126728 do
@@ -1289,12 +1339,15 @@ describe "context modules" do
   end
 
   context "logged out", priority: "2" do
-    before(:each) do
+    before(:once) do
       @course = course(:active_all => true)
       course_module
       @course.is_public = true
       @course.save!
       @course.reload
+    end
+
+    before(:each) do
       remove_user_session
     end
 

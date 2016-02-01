@@ -85,8 +85,10 @@ class PluginSetting < ActiveRecord::Base
           value = settings.delete(key)
           settings.delete("#{key}_dec".to_sym)
           if value == DUMMY_STRING  # no change, use what was there previously
-            settings["#{key}_enc".to_sym] = settings_was["#{key}_enc".to_sym]
-            settings["#{key}_salt".to_sym] = settings_was["#{key}_salt".to_sym]
+            unless settings_was.nil? # we wont have setting_was if we are a new plugin
+              settings["#{key}_enc".to_sym] = settings_was["#{key}_enc".to_sym]
+              settings["#{key}_salt".to_sym] = settings_was["#{key}_salt".to_sym]
+            end
           else
             settings["#{key}_enc".to_sym], settings["#{key}_salt".to_sym] = self.class.encrypt(value)
           end

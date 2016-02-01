@@ -308,7 +308,7 @@ module OutcomeCommon
   def should_validate_n_mastery_below_range
     get outcome_url
     f('.add_outcome_link').click
-    below_range = 1
+    below_range = 0
     replace_content(f('.outcomes-content input[name=title]'), 'n Number of Times')
     click_option('#calculation_method', "n Number of Times")
     # enter invalid number below range
@@ -402,6 +402,7 @@ module OutcomeCommon
 
     driver.execute_script("$('.submit_button').click()") unless f('.submit_button').nil?
     refresh_page
+    wait_for_ajaximations
 
     # select group
     fj('.outcome-level:eq(0) .outcome-group').click

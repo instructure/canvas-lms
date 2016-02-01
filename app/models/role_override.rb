@@ -25,9 +25,6 @@ class RoleOverride < ActiveRecord::Base
 
   attr_accessible :context, :permission, :role, :enabled, :applies_to_self, :applies_to_descendants
 
-  EXPORTABLE_ATTRIBUTES = [:id, :enrollment_type, :permission, :enabled, :locked, :context_id, :context_type, :created_at, :updated_at, :applies_to_self, :applies_to_descendants]
-  EXPORTABLE_ASSOCIATIONS = [:context]
-
   validate :must_apply_to_something
 
   def must_apply_to_something
@@ -742,6 +739,13 @@ class RoleOverride < ActiveRecord::Base
         :label => -> { t('Moderate Grades') },
         :true_for => %w(AccountAdmin TeacherEnrollment),
         :available_to => %w(AccountAdmin AccountMembership TeacherEnrollment TaEnrollment)
+      },
+      :reset_any_mfa => {
+        :label => -> { t('Reset Multi-Factor Authentication') },
+        :account_only => :root,
+        :true_for => %w(AccountAdmin),
+        :available_to => %w(AccountAdmin AccountMembership),
+        :account_allows => lambda {|a| a.mfa_settings != :disabled}
       }
     })
 
@@ -854,12 +858,11 @@ class RoleOverride < ActiveRecord::Base
     @@role_override_chain ||= {}
     overrides = @@role_override_chain[permissionless_key] ||= begin
       context.shard.activate do
-        accounts = context.account_chain
-        overrides = RoleOverride.where(:context_id => accounts, :context_type => 'Account', :role_id => role)
-
-        if role_context == Account.site_admin && !accounts.include?(Account.site_admin)
-          accounts << Account.site_admin
-          overrides += Account.site_admin.role_overrides.where(:role_id => role)
+        accounts = context.account_chain(include_site_admin: true)
+        overrides = Shard.partition_by_shard(accounts) do |shard_accounts|
+          # skip loading from site admin if the role is not from site admin
+          next if shard_accounts == [Account.site_admin] && role_context != Account.site_admin
+          RoleOverride.where(:context_id => accounts, :context_type => 'Account', :role_id => role)
         end
 
         accounts.reverse!

@@ -16,7 +16,7 @@
   padding: 10px 0;
   margin: 0;
   line-height: normal;
-  font-size: 11px;
+  @include fontSize(11px);
   color: darken($ic-color-neutral, 10);
   display: flex;
   align-items: center;

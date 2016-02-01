@@ -28,7 +28,8 @@ define [
     ]
   }
 
-  module 'ModeratedStudentList',
+  module 'ModeratedStudentList'
+
   test 'only shows the next speedgrader link when in moderation set', ->
     newFakeStudentList = _.extend({}, fakeStudentList)
     newFakeStudentList.students[0].in_moderation_set = true
@@ -96,7 +97,8 @@ define [
     equal gradeColumns[0].props.children[1].props.children, 4
     React.unmountComponentAtNode(studentList.getDOMNode().parentNode)
 
-  module 'Persist provisional grades',
+  module 'Persist provisional grades'
+
   test 'selecting provisional grade triggers handleSelectProvisionalGrade handler', ->
     newFakeStudentList = _.extend({}, fakeStudentList)
     newFakeStudentList.students[0].in_moderation_set = true

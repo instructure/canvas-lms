@@ -21,22 +21,13 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 describe AssessmentQuestionBank do
   before :once do
     course
+    assessment_question_bank_model
     @bank = @course.assessment_question_banks.create!(:title=>'Test Bank')
   end
 
   describe "#select_for_submission" do
     before :once do
-      # create a bunch of questions to make it more likely that they'll shuffle randomly
-      @q1  = @bank.assessment_questions.create!(:question_data => {'name' => 'test question 1',  'answers' => [{'id' => 1}, {'id' => 2}]})
-      @q2  = @bank.assessment_questions.create!(:question_data => {'name' => 'test question 2',  'answers' => [{'id' => 3}, {'id' => 4}]})
-      @q3  = @bank.assessment_questions.create!(:question_data => {'name' => 'test question 3',  'answers' => [{'id' => 3}, {'id' => 4}]})
-      @q4  = @bank.assessment_questions.create!(:question_data => {'name' => 'test question 4',  'answers' => [{'id' => 3}, {'id' => 4}]})
-      @q5  = @bank.assessment_questions.create!(:question_data => {'name' => 'test question 5',  'answers' => [{'id' => 3}, {'id' => 4}]})
-      @q6  = @bank.assessment_questions.create!(:question_data => {'name' => 'test question 6',  'answers' => [{'id' => 3}, {'id' => 4}]})
-      @q7  = @bank.assessment_questions.create!(:question_data => {'name' => 'test question 7',  'answers' => [{'id' => 3}, {'id' => 4}]})
-      @q8  = @bank.assessment_questions.create!(:question_data => {'name' => 'test question 8',  'answers' => [{'id' => 3}, {'id' => 4}]})
-      @q9  = @bank.assessment_questions.create!(:question_data => {'name' => 'test question 9',  'answers' => [{'id' => 3}, {'id' => 4}]})
-      @q10 = @bank.assessment_questions.create!(:question_data => {'name' => 'test question 10', 'answers' => [{'id' => 3}, {'id' => 4}]})
+      assessment_question_bank_with_questions
       @quiz = @course.quizzes.create!(:title => "some quiz")
       @group = @quiz.quiz_groups.create!(:name => "question group", :pick_count => 3, :question_points => 5.0)
       @group.assessment_question_bank = @bank

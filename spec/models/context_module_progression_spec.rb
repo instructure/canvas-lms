@@ -163,14 +163,14 @@ describe ContextModuleProgression do
   context "optimistic locking" do
     def stale_progression
       progression = @user.context_module_progressions.create!(context_module: @module)
-      ContextModuleProgression.find(progression.id).save!
+      ContextModuleProgression.find(progression.id).update_attribute(:updated_at, 10.seconds.ago)
       progression
     end
 
     it "raises a stale object error during save" do
       progression = stale_progression
-      expect { progression.save }.to raise_error(ActiveRecord::StaleObjectError)
-      expect { progression.reload.save }.to_not raise_error
+      expect { progression.update_attribute(:updated_at, 10.seconds.from_now) }.to raise_error(ActiveRecord::StaleObjectError)
+      expect { progression.reload.update_attribute(:updated_at, 10.seconds.from_now) }.to_not raise_error
     end
 
     it 'raises a stale object error during evaluate' do

@@ -37,7 +37,7 @@ class ExternalFeedAggregator
         feeds.each do |feed|
           Shackles.activate(:master) do
             if !feed.context || feed.context.root_account.deleted?
-              feed.update_attribute(:refresh_at, success_wait_seconds.from_now)
+              feed.update_attribute(:refresh_at, success_wait_seconds.seconds.from_now)
               next
             end
 
@@ -88,7 +88,7 @@ class ExternalFeedAggregator
         success = parse_entries(feed, response.body)
         @logger.info(success ? 'successful response' : '200 with no data returned')
         feed.consecutive_failures = 0 if success
-        feed.update_attribute(:refresh_at, success_wait_seconds.from_now)
+        feed.update_attribute(:refresh_at, success_wait_seconds.seconds.from_now)
       else
         @logger.info("request failed #{response.class}")
         handle_failure(feed)
@@ -102,7 +102,7 @@ class ExternalFeedAggregator
   def handle_failure(feed)
     feed.increment(:failures)
     feed.increment(:consecutive_failures)
-    feed.update_attribute(:refresh_at, failure_wait_seconds.from_now)
+    feed.update_attribute(:refresh_at, failure_wait_seconds.seconds.from_now)
   end
 
   def success_wait_seconds

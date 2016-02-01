@@ -436,6 +436,13 @@ describe GradebookImporter do
       group.grading_periods.create current_period_params
     end
 
+    let(:future_period) do
+      future_period_params = { title: "Course Period 3: future period",
+                                start_date: 1.month.from_now,
+                                end_date: 2.months.from_now }
+      group.grading_periods.create future_period_params
+    end
+
     let(:account)   { Account.default }
     let(:course)    { Course.create account: account }
     let(:student)   { User.create }
@@ -462,8 +469,8 @@ CSV
           course.root_account.enable_feature! :multiple_grading_periods
         end
 
-        describe "when all assignments have current due_ats" do
-          it "empty when assignments are in a current grading period" do
+        describe "empty assignments_outside_current_periods" do
+          it "when assignments are in a current grading period" do
             assignment_hashes = [ { name:            'Assignment 1',
                                     points_possible: 10,
                                     due_at:          Time.zone.now } ]
@@ -471,9 +478,17 @@ CSV
             expect(json[:assignments_outside_current_periods]).to be_empty
           end
 
-          it "empty when all assignments have no due_ats" do
+          it "when all assignments have no due_ats" do
             assignment_hashes = [ { points_possible: 10,
                                     name:            'Assignment 2' } ]
+            json = importer_json.call(assignment_hashes)
+            expect(json[:assignments_outside_current_periods]).to be_empty
+          end
+
+          it "when assignment due_ats are nil and there is a future period" do
+            future_period
+            assignment_hashes = [ { points_possible: 10,
+                                    name:            'Assignment 2.five' } ]
             json = importer_json.call(assignment_hashes)
             expect(json[:assignments_outside_current_periods]).to be_empty
           end

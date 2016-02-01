@@ -57,7 +57,7 @@
   height: 100%;
   color: $white;
   float: left;
-  font-size: 12px;
+  @include fontSize(12px);
   text-align: center;
   text-shadow: 0 -1px 0 rgba(0,0,0,.25);
   @include gradient-vertical(#149bdf, #0480be);
