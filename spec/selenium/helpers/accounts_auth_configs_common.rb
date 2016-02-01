@@ -113,7 +113,7 @@ module AccountsAuthConfigsCommon
     set_value(f("#authentication_provider_authorize_url"), 'http://authorize.url.dev')
     set_value(f("#authentication_provider_token_url"), 'http://token.url.dev')
     set_value(f("#authentication_provider_scope"), 'scope')
-    openid_connect_form.find_element(:id, 'authentication_provider_login_attribute').send_keys('sub')
+    replace_content(openid_connect_form.find_element(:id, 'authentication_provider_login_attribute'), 'sub')
     submit_form(openid_connect_form)
   end
 

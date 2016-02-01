@@ -888,8 +888,8 @@ class CoursesController < ApplicationController
       if includes.include?('enrollments')
         # not_ended_enrollments for enrollment_json
         # enrollments course for has_grade_permissions?
-        ActiveRecord::Associations::Preloader.new.preload(users, {:not_ended_enrollments => :course},
-          Enrollment.where(:course_id => @context))
+        ActiveRecord::Associations::Preloader.new.preload(users, :not_ended_enrollments, Enrollment.where(:course_id => @context))
+        ActiveRecord::Associations::Preloader.new.preload(users, {:not_ended_enrollments => :course})
       end
       user = users.first or raise ActiveRecord::RecordNotFound
       enrollments = user.not_ended_enrollments if includes.include?('enrollments')

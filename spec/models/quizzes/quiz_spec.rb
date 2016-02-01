@@ -1009,7 +1009,7 @@ describe Quizzes::Quiz do
         quiz.save!
         override.reload
         override_student.reload
-        quiz.assignment.reload
+        quiz.reload
       end
 
       context "override" do

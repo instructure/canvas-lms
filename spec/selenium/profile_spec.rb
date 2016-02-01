@@ -123,7 +123,7 @@ describe "profile" do
       new_user_name = 'new user name'
       get "/profile/settings"
       edit_form = click_edit
-      edit_form.find_element(:id, 'user_name').send_keys(new_user_name)
+      replace_content(edit_form.find_element(:id, 'user_name'), new_user_name)
       submit_form(edit_form)
       wait_for_ajaximations
       keep_trying_until { expect(f('.full_name').text).to eq new_user_name }
@@ -133,7 +133,7 @@ describe "profile" do
       new_display_name = 'test name'
       get "/profile/settings"
       edit_form = click_edit
-      edit_form.find_element(:id, 'user_short_name').send_keys(new_display_name)
+      replace_content(edit_form.find_element(:id, 'user_short_name'), new_display_name)
       submit_form(edit_form)
       wait_for_ajaximations
       refresh_page

@@ -1425,7 +1425,7 @@ describe Account do
         begin
           Account.find_cached(nonsense_id)
         rescue ::Canvas::AccountCacheError => e
-          expect(e.message).to eq("Couldn't find Account with id=#{nonsense_id}")
+          expect(e.message).to eq(CANVAS_RAILS4_0 ? "Couldn't find Account with id=#{nonsense_id}" : "Couldn't find Account with 'id'=#{nonsense_id}")
         end
       end
     end

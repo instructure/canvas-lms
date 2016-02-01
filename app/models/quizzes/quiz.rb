@@ -89,7 +89,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   # method would fire first, meaning that the overrides would reflect the
   # last version of the assignment, because the next callback would be a
   # simply_versioned callback updating the version.
-  after_save :link_assignment_overrides, :if => :assignment_id_changed?
+  after_save :link_assignment_overrides, :if => :new_assignment_id?
 
   # override has_one relationship provided by simply_versioned
   def current_version_unidirectional
