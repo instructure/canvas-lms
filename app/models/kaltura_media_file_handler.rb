@@ -32,8 +32,9 @@ class KalturaMediaFileHandler
                   :partner_data  => build_partner_data(attachment)
                }
     end
-    res = client.bulkUploadAdd(files)
+    return nil if files.empty?
 
+    res = client.bulkUploadAdd(files)
     handle_bulk_upload_response(res, client, wait_for_completion, attachments, root_account_id)
   end
 
