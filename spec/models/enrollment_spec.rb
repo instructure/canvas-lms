@@ -1986,4 +1986,20 @@ describe Enrollment do
       end
     end
   end
+
+  describe ".not_yet_started" do
+    before :once do
+      course_with_student(active_all: true)
+    end
+
+    it 'includes users for whom the enrollment has not yet started' do
+      Enrollment.any_instance.stubs(:effective_start_at).returns(1.month.from_now)
+      expect(Enrollment.not_yet_started(@course)).to include(@enrollment)
+    end
+
+    it 'excludes users for whom the enrollment has started' do
+      @enrollment.stubs(:effective_start_at).returns(1.month.ago)
+      expect(Enrollment.not_yet_started(@course)).not_to include(@enrollment)
+    end
+  end
 end

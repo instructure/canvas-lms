@@ -532,11 +532,11 @@ class Assignment < ActiveRecord::Base
 
   set_broadcast_policy do |p|
     p.dispatch :assignment_due_date_changed
-    p.to {
+    p.to { |assignment|
       # everyone who is _not_ covered by an assignment override affecting due_at
       # (the AssignmentOverride records will take care of notifying those users)
       excluded_ids = participants_with_overridden_due_at.map(&:id).to_set
-      participants(include_observers: true, excluded_user_ids: excluded_ids)
+      BroadcastPolicies::AssignmentParticipants.new(assignment, excluded_ids).to
     }
     p.whenever { |assignment|
       BroadcastPolicies::AssignmentPolicy.new(assignment).
@@ -544,14 +544,18 @@ class Assignment < ActiveRecord::Base
     }
 
     p.dispatch :assignment_changed
-    p.to { participants(include_observers: true) }
+    p.to { |assignment|
+      BroadcastPolicies::AssignmentParticipants.new(assignment).to
+    }
     p.whenever { |assignment|
       BroadcastPolicies::AssignmentPolicy.new(assignment).
         should_dispatch_assignment_changed?
     }
 
     p.dispatch :assignment_created
-    p.to { participants(include_observers: true) }
+    p.to { |assignment|
+      BroadcastPolicies::AssignmentParticipants.new(assignment).to
+    }
     p.whenever { |assignment|
       BroadcastPolicies::AssignmentPolicy.new(assignment).
         should_dispatch_assignment_created?
@@ -561,12 +565,13 @@ class Assignment < ActiveRecord::Base
     }
 
     p.dispatch :assignment_unmuted
-    p.to { participants(include_observers: true) }
+    p.to { |assignment|
+      BroadcastPolicies::AssignmentParticipants.new(assignment).to
+    }
     p.whenever { |assignment|
       BroadcastPolicies::AssignmentPolicy.new(assignment).
         should_dispatch_assignment_unmuted?
     }
-
   end
 
   def notify_of_update=(val)
