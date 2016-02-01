@@ -2976,12 +2976,12 @@ define([
         // questionData.assessment_question_id might be null now because
         // question.question_data.assessment_quesiton_id might be null but
         // question.assessment_question_id is the right value. because $.extend
-        // overwrites all kes that exist even if they have null values.  this
+        // overwrites all keys that exist even if they have null values.  this
         // is hacky, the better thing to do is just get the right thing back
         // from the server.  it matters because the form when you click "find
         // questions" uses it to see if the question already exists in this
-        // quiz.
-        questionData.assessment_question_id = questionData.assessment_question_id || question.assessment_question_id || question.id;
+        // quiz, and is vital to properly move/copy it to another question bank
+        questionData.assessment_question_id = questionData.assessment_question_id || question.assessment_question_id || question.id || questionData.id;
         quiz.updateDisplayQuestion($displayQuestion, questionData, true);
         // Trigger a custom 'saved' event for catching and responding to change
         // after save process completed. Used in quizzes_bundle.coffee
