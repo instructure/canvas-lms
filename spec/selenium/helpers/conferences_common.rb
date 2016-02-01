@@ -5,32 +5,32 @@ module ConferencesCommon
   end
 
   def new_conference_button
-    fj('.new-conference-btn')
+    f('.new-conference-btn')
   end
 
-  def start_conference_buttons
-    ffj('.start-button', new_conference_list)
+  def start_conference_button
+    f('.start-button', new_conference_list)
   end
 
-  def end_conference_buttons
-    ffj('.close_conference_link', new_conference_list)
+  def end_conference_button
+    f('.close_conference_link', new_conference_list)
   end
 
   def start_first_conference_in_list
-    expect_new_page_load { start_conference_buttons[0].click }
+    expect_new_page_load { start_conference_button.click }
   end
 
   def end_first_conference_in_list
-    end_conference_buttons[0].click
+    end_conference_button.click
     close_modal_if_present
   end
 
   def new_conference_list
-    fj('#new-conference-list')
+    f('#new-conference-list')
   end
 
   def concluded_conference_list
-    fj('#concluded-conference-list')
+    f('#concluded-conference-list')
   end
 
   def verify_conference_list_includes(conference_title)
@@ -124,7 +124,7 @@ module ConferencesCommon
   end
 
   def possible_conference_attendees
-    ffj('input[type=checkbox]', '#members_list')
+    ff('input[type=checkbox]', f('#members_list'))
   end
 
   def conclude_conference(conf)
