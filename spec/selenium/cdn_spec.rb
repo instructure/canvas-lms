@@ -6,12 +6,14 @@
 # of the browser specs, after it has compiled assets.
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/common')
 
 RE_SHORT_MD5 = /\A[a-f0-9]{10}\z/ # 10 chars of an MD5
 
 EXAMPLE_CDN_HOST = 'https://somecdn.example.com'
 
 describe 'Stuff related to how we load stuff from CDN and use brandable_css' do
+  include_context "in-process server selenium tests"
 
   describe BrandableCSS do
 
@@ -44,52 +46,39 @@ describe 'Stuff related to how we load stuff from CDN and use brandable_css' do
     end
   end
 
+  def assert_tag(tag, attribute, value)
+    selector = "#{tag}[#{attribute}='#{value}']"
+    expect(f(selector)).to be_present
+  end
 
   def check_css(bundle_name)
     fingerprint = BrandableCSS.cache_for(bundle_name, 'legacy_normal_contrast')[:combinedChecksum]
     expect(fingerprint).to match(RE_SHORT_MD5)
-    assert_tag(tag: 'link', attributes: {
-      rel: 'stylesheet',
-      href: "#{EXAMPLE_CDN_HOST}/dist/brandable_css/legacy_normal_contrast/#{bundle_name}-#{fingerprint}.css"
-    })
+    url = "#{EXAMPLE_CDN_HOST}/dist/brandable_css/legacy_normal_contrast/#{bundle_name}-#{fingerprint}.css"
+    assert_tag('link', 'href', url)
   end
 
   def check_asset(tag, asset_path)
     revved_path = Canvas::Cdn::RevManifest.url_for(asset_path)
     expect(revved_path).to be_present
-    attributes = {}
-    attributes[(tag == 'link') ? :href : :src] = "#{EXAMPLE_CDN_HOST}#{revved_path}"
-    assert_tag(tag: tag, attributes: attributes)
+    attribute = (tag == 'link') ? 'href' : 'src'
+    url = "#{EXAMPLE_CDN_HOST}#{revved_path}"
+    assert_tag(tag, attribute, url)
   end
 
-  describe 'urls for script tag and stylesheets on actual pages', :type => :request do
+  it 'has the right urls for script tag and stylesheets on the login page' do
+    Canvas::Cdn.config.expects(:host).at_least_once.returns(EXAMPLE_CDN_HOST)
+    get '/login/canvas'
 
-    it 'has the right stuff on the login page' do
-      Canvas::Cdn.config.expects(:host).at_least_once.returns(EXAMPLE_CDN_HOST)
-      get '/login/canvas'
-
-      ['bundles/common', 'bundles/login'].each { |bundle| check_css(bundle) }
-      ['images/favicon-yellow.ico', 'images/apple-touch-icon.png'].each { |i| check_asset('link', i) }
-      optimized_js_flag = ENV['USE_OPTIMIZED_JS'] == 'true' || ENV['USE_OPTIMIZED_JS'] == 'True'
-      js_base_url =  optimized_js_flag ? '/optimized' : '/javascripts'
-      expected_js_bundles = ['vendor/require.js', 'compiled/bundles/login.js']
-      if CANVAS_WEBPACK
-        js_base_url =  optimized_js_flag ? '/webpack-dist-optimized' : '/webpack-dist'
-        expected_js_bundles = ['vendor.bundle.js', 'instructure-common.bundle.js', 'login.bundle.js']
-      end
-      expected_js_bundles.each { |s| check_asset('script', "#{js_base_url}/#{s}") }
+    ['bundles/common', 'bundles/login'].each { |bundle| check_css(bundle) }
+    ['images/favicon-yellow.ico', 'images/apple-touch-icon.png'].each { |i| check_asset('link', i) }
+    optimized_js_flag = ENV['USE_OPTIMIZED_JS'] == 'true' || ENV['USE_OPTIMIZED_JS'] == 'True'
+    js_base_url =  optimized_js_flag ? '/optimized' : '/javascripts'
+    expected_js_bundles = ['vendor/require.js', 'compiled/bundles/login.js']
+    if CANVAS_WEBPACK
+      js_base_url =  optimized_js_flag ? '/webpack-dist-optimized' : '/webpack-dist'
+      expected_js_bundles = ['vendor.bundle.js', 'instructure-common.bundle.js', 'login.bundle.js']
     end
-
-    it "loads custom js 'raw' on mobile login screen" do
-      js_url = 'https://example.com/path/to/some/file.js'
-      Account.default.settings[:global_includes] = true
-      Account.default.settings[:global_javascript] = js_url
-      Account.default.save!
-
-      get '/login/canvas', {}, { 'HTTP_USER_AGENT' => 'iphone' }
-      # match /optimized/vendor/jquery-1.7.2.js?1440111591 or /optimized/vendor/jquery-1.7.2.js
-      assert_tag(tag: 'script', attributes: { src: /^\/optimized\/vendor\/jquery-1.7.2.js(\?\d+)*$/})
-      assert_tag(tag: 'script', attributes: { src: js_url})
-    end
+    expected_js_bundles.each { |s| check_asset('script', "#{js_base_url}/#{s}") }
   end
 end
