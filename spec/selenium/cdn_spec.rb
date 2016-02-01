@@ -72,7 +72,12 @@ describe 'Stuff related to how we load stuff from CDN and use brandable_css' do
       ['images/favicon-yellow.ico', 'images/apple-touch-icon.png'].each { |i| check_asset('link', i) }
       optimized_js_flag = ENV['USE_OPTIMIZED_JS'] == 'true' || ENV['USE_OPTIMIZED_JS'] == 'True'
       js_base_url =  optimized_js_flag ? '/optimized' : '/javascripts'
-      ['vendor/require.js', 'compiled/bundles/login.js'].each { |s| check_asset('script', "#{js_base_url}/#{s}") }
+      expected_js_bundles = ['vendor/require.js', 'compiled/bundles/login.js']
+      if CANVAS_WEBPACK
+        js_base_url =  optimized_js_flag ? '/webpack-dist-optimized' : '/webpack-dist'
+        expected_js_bundles = ['vendor.bundle.js', 'instructure-common.bundle.js', 'login.bundle.js']
+      end
+      expected_js_bundles.each { |s| check_asset('script', "#{js_base_url}/#{s}") }
     end
 
     it "loads custom js 'raw' on mobile login screen" do
