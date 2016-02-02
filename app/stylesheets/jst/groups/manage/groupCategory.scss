@@ -97,11 +97,8 @@ a.group-heading:hover {
     background-color: $droppableBackground;
   }
 
-  input[type=text] {
-    box-sizing: border-box;
-    height: $baseLineHeight + 8; // adjust default for box-sizing
-    width: 100%;
-    margin: 8px 0;
+  input.filterable-unassigned-users {
+    margin-bottom: $ic-sp/2;
   }
 
   .no-results {
