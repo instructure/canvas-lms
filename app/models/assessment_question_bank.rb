@@ -124,10 +124,13 @@ class AssessmentQuestionBank < ActiveRecord::Base
   def select_for_submission(quiz_id, count, exclude_ids=[], exclude_qq_ids=[])
     ids = self.assessment_questions.active.pluck(:id)
     ids = (ids - exclude_ids).shuffle[0...count]
-    questions = ids.empty? ? [] : AssessmentQuestion.where(id: ids).shuffle
-    questions.map do |aq|
+    questions = ids.empty? ? [] : AssessmentQuestion.where(id: ids).order(:id)
+    quiz_questions = questions.map do |aq|
       aq.find_or_create_quiz_question(quiz_id, exclude_qq_ids)
     end
+    # it's important that this shuffle come after the db updates, otherwise
+    # this can cause deadlocks when run in a transaction
+    quiz_questions.shuffle
   end
 
   alias_method :destroy_permanently!, :destroy
