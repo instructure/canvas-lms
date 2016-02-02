@@ -221,8 +221,10 @@ li.quiz {
 }
 
 #submit_quiz_form {
-  .question_holder {
-    overflow: hidden;
+  @if not $use_new_styles {
+    .question_holder {
+      overflow: hidden;
+    }
   }
   .button-container .btn, #submit_quiz_button {
     min-width: 120px;
@@ -576,7 +578,9 @@ li.quiz {
   background-color: #fff;
   position: relative;
   min-height: 50px;
-  min-width: 515px;
+  @if not $use_new_styles {
+    min-width: 515px;
+  }
   margin: 0.7em auto 30px auto;
   _height: 10px;
   &.modified_but_not_saved {
