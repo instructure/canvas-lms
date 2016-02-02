@@ -175,8 +175,10 @@ module SIS
 
             @course ||= @root_account.all_courses.where(sis_source_id: course_id).first unless course_id.blank?
             @section ||= @root_account.course_sections.where(sis_source_id: section_id).first unless section_id.blank?
-            unless (@course || @section)
-              @messages << "Neither course #{course_id} nor section #{section_id} existed for user enrollment"
+            if @course.nil? && @section.nil?
+              message = "Neither course nor section existed for user enrollment "
+              message << "(Course ID: #{course_id}, Section ID: #{section_id}, User ID: #{user_id})"
+              @messages << message
               next
             end
 
