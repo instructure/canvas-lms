@@ -33,6 +33,16 @@ class FixMoreDeprecatedPolymorphicNames < ActiveRecord::Migration
       }
     }
 
+    LearningOutcomeResult.where(association_type: 'Quiz').
+        where("EXISTS (SELECT 1 FROM #{LearningOutcomeResult.quoted_table_name} lor2 WHERE
+                       lor2.association_type='Quizzes::Quiz' AND
+                       learning_outcome_results.user_id=lor2.user_id AND
+                       learning_outcome_results.content_tag_id=lor2.content_tag_id AND
+                       learning_outcome_results.association_id=lor2.association_id AND
+                       learning_outcome_results.associated_asset_id=lor2.associated_asset_id AND
+                       learning_outcome_results.associated_asset_type=lor2.associated_asset_type)").
+        delete_all
+
     tables.each do |(table, columns)|
       klass = table.to_s.classify.constantize
       klass.find_ids_in_ranges(batch_size: 10000) do |min_id, max_id|
