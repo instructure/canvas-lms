@@ -975,7 +975,7 @@ class Attachment < ActiveRecord::Base
     can :delete
 
     given { |user, session| self.context.grants_right?(user, session, :manage_files) } #admins.include? user }
-    can :read and can :update and can :create and can :download
+    can :read and can :update and can :create and can :download and can :read_as_admin
 
     given { self.public? }
     can :read and can :download
@@ -983,9 +983,11 @@ class Attachment < ActiveRecord::Base
     given { |user, session| self.context.grants_right?(user, session, :read) } #students.include? user }
     can :read
 
+    given { |user, session| self.context.grants_right?(user, session, :read_as_admin) }
+    can :read_as_admin
+
     given { |user, session|
-      self.context.grants_right?(user, session, :read) &&
-      (self.context.grants_right?(user, session, :read_as_admin) || !self.locked_for?(user))
+      self.context.grants_right?(user, session, :read) && !self.locked_for?(user, :check_policies => true)
     }
     can :download
 
@@ -1006,7 +1008,7 @@ class Attachment < ActiveRecord::Base
         (u = User.where(id: session['file_access_user_id']).first) &&
         (self.context.grants_right?(u, session, :read) ||
           (self.context.respond_to?(:is_public_to_auth_users?) && self.context.is_public_to_auth_users?)) &&
-        (self.context.grants_right?(u, session, :manage_files) || !self.locked_for?(u)) &&
+        !self.locked_for?(u, :check_policies => true) &&
         session['file_access_expiration'] && session['file_access_expiration'].to_i > Time.now.to_i
     }
     can :download
@@ -1030,7 +1032,7 @@ class Attachment < ActiveRecord::Base
 
   def locked_for?(user, opts={})
     return false if @skip_submission_attachment_lock_checks
-    return false if opts[:check_policies] && self.grants_right?(user, :update)
+    return false if opts[:check_policies] && self.grants_right?(user, :read_as_admin)
     return {:asset_string => self.asset_string, :manually_locked => true} if self.locked || Folder.is_locked?(self.folder_id)
     Rails.cache.fetch(locked_cache_key(user), :expires_in => 1.minute) do
       locked = false

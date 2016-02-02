@@ -1460,6 +1460,19 @@ describe Attachment do
     end
   end
 
+  it "should not be locked_for soft-concluded admin users" do
+    term = Account.default.enrollment_terms.create!
+    term.set_overrides(Account.default, 'TeacherEnrollment' => {:end_at => 3.days.ago})
+    course_with_teacher(:active_all => true)
+    @course.enrollment_term = term
+    @course.save!
+
+    attachment_model uploaded_data: default_uploaded_data
+    @attachment.update_attribute(:locked, true)
+    @attachment.reload
+    expect(@attachment.locked_for?(@teacher, :check_policies => true)).to be_falsey
+  end
+
   describe 'local storage' do
     it 'should properly sanitie a filename containing a slash' do
       local_storage!
