@@ -22,6 +22,8 @@ define [
 
     showEmail: -> not ENV.current_user_id
 
+    animateDuration: 100
+
     initDialog: ->
       @$dialog = $('<div style="padding:0; overflow: visible;" />').dialog
         resizable: false
@@ -67,6 +69,7 @@ define [
 
     switchTo: (panelId) ->
       toggleablePanels = "#teacher_feedback, #create_ticket"
+      homePanel = "#help-dialog-options"
       @$dialog.find(toggleablePanels).hide()
       newPanel = @$dialog.find(panelId)
       newHeight = newPanel.show().outerHeight()
@@ -78,9 +81,13 @@ define [
           #reposition vertically to reflect current height
           @initDialog() unless @dialogInited and @$dialog?.hasClass("ui-dialog-content")
           @$dialog?.dialog('option', 'position', 'center')
-        duration: 100
+        duration: @animateDuration
         complete: ->
-          newPanel.find(':input').not(':disabled').first().focus()
+          toFocus = newPanel.find(':input').not(':disabled')
+          if toFocus.length is 0
+            toFocus = newPanel.find(':focusable')
+          toFocus.first().focus()
+          $(homePanel).hide() unless panelId is homePanel
       })
 
       if newTitle = @$dialog.find("a[href='#{panelId}'] .text").text()
