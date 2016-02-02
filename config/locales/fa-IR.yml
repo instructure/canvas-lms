@@ -2,6 +2,10 @@
 # Do not edit it by hand, your changes will be overwritten.
 --- 
 fa-IR: 
+  451_message: 
+    headings: 
+      page: "مجاز نیست"
+    title: "مجاز نیست"
   EditAppointmentGroupDetails: 
     affect_reservations: "چگونه روی رزروها اثر خواهد گذاشت؟"
     and_n_contexts: "و %{n} دیگر"
@@ -29,6 +33,7 @@ fa-IR:
   LongTextEditor: 
     cancel: لغو
     save: "ذخیره سازی"
+  a_message_is_required_129e1814: "یک پیام لازم است"
   a_table_containing_the_name_of_the_grading_scheme__2c25dc3: "یک جدول که حاوی نام طرح نمره گذاری و نمادهای ویرایش و حذف طرح است."
   a_table_that_contains_the_grading_scheme_data_each_d461c205: "یک جدول که حاوی داده های طرح نمره گذاری است. هر ردیف دارای یک نام، یک درصد حداکثر و یک درصد حداقل است. افزون بر این، هر ردیف دارای یک نماد برای افزودن یک ردیف جدید در قسمت پایین و یک نماد برای حذف ردیف فعلی است."
   academic_benchmark: 
@@ -48,6 +53,7 @@ fa-IR:
         api_key: "کلید API"
         api_url: "نشانی اینترنتی Api"
         common_core_guid: "هسته مشترک GUID (اختیاری)"
+  accept_2fdd362e: قبول
   account: 
     ask_canvas_network: "پرسیدن از انجمن شبکه کانواس"
     default_account_name: "حساب پیش‌فرض"
@@ -80,6 +86,7 @@ fa-IR:
     tab_terms: "نیمسال ها"
     tab_users: کاربران
     turnitin_pledge: "این تکلیف ارسالی نتیجه کار اصیل و شخصی من است"
+  account_97b34646: حساب
   account_authorization_config: 
     default_delegated_login_handle_name: ورود
     default_login_handle_name: "پست الکترونیکی"
@@ -99,6 +106,7 @@ fa-IR:
     account_required: "باید با LDAP اعتبارسنجی شود"
     index: 
       delete_auth_confirmation: "آیا مطمئنید؟ ممکن است در صورت حذف، کاربران نتوانند وارد شوند"
+      delete_auth_link: "حذف همه اعتبارسنجی‌ها"
       ip_address_list_description: "اگر از یک سرویس اعتبارسنجی استفاده می‌کنید که نیازمند اتصال مستقیم سرورهای کانواس به سرورهای شماست، مانند LDAP، باید مطمئن شوید که سرورهای شما می‌توانند مستقیما از این نشانی های آی‌پی ارتباط قبول کنند:"
       no_auth_type_description: "این حساب در حال حاضر با ارائه دهنده هویت یکپارچه نمی شود."
       page_title: "تنظیمات اعتبارسنجی"
@@ -234,6 +242,7 @@ fa-IR:
     report_header_end__date: تاریخ_پایان
     report_header_end_date: "تاریخ پایان"
     report_header_enrollment_state: "وضعیت ثبت نام"
+    report_header_expiration: انقضا
     report_header_final_score: "نمره نهایی"
     report_header_first_name: نام_کوچک
     report_header_group_id: شناسه_گروه
@@ -452,6 +461,7 @@ fa-IR:
         event_type: 
           corrupted: "اطلاعات بیشتر موجود نیست"
       grade_change_logging_results: 
+        Anonymous: ناشناس
         Assignment: تکلیف
         Course: درس
         Grader: "نمره گذار"
@@ -1167,6 +1177,7 @@ fa-IR:
   add_students_to_the_course_874be8fb: "افزودن دانشجویان به درس"
   add_tas_to_the_course_2aac6e02: "افزودن دستیارهای آموزشی به درس"
   add_your_assignments_you_can_just_make_a_long_list_8a7862dd: "تکلیف های خود را بیفزایید. می توانید یک فهرست طولانی ایجاد کنید، یا آنها را به گروه هایی تقسیم کنید و حتی برای هر گروه تکلیف، وزن تعیین کنید."
+  admin_4d3ba42f: مدیر
   after_date_981cd41b: "بعد از %{date} "
   after_last_attempt_c9168da2: "بعد از آخرین تلاش"
   ajax_errors: 
@@ -1222,7 +1233,13 @@ fa-IR:
       recipients_required: "حداقل یک گیرنده لازم است"
       threshold_should_be_numeric: "باید یک عدد مثبت باشد"
   all_4321c3a1: همه
+  all_account_types_e83c1516: "همه انواع حساب"
+  all_accounts_3bafc860: "همه حساب‌ها"
+  all_changes_were_saved_f6f3ddcc: "همه تغییرات ذخیره شد"
+  all_courses_a7dbb853: "همه درس‌ها"
   all_finished_time_to_publish_your_course_click_the_b6f07217: "همه کارها انجام شده؟ زمان انتشار درس است! برای رسمی کردن آن، روی دکمه زیر کلیک کنید! انتشار به کاربران امکان می دهد در درس شرکت کنند."
+  all_groups_cea25817: "همه گروه‌ها"
+  all_my_files_a0213441: "همه فایل‌های من"
   all_students_have_taken_the_quiz_b558f8b4: "همه دانشجویان آزمون داده اند"
   all_students_have_taken_the_survey_494f9f42: "همه دانشجویان نظرسنجی را انجام داده اند"
   allow_lor_tools: "به کاربران اجازه داده شود ابزارهای بیرونی پیکربندی شده برای LOR را مشاهده و از آنها استفاده نمایند."
@@ -1296,9 +1313,16 @@ fa-IR:
     podcast_feed_description_course: "هر گونه فایل رسانه ای که از اطلاعیه های موجود در درس \"%{course}\" پیوند داده شده یا در آن درج شده است، در این خوراک خبری ظاهر خواهد شد."
     podcast_feed_description_group: "هر گونه فایل رسانه ای که از اطلاعیه های موجود در گروه \"%{group}\" پیوند داده شده یا در آن درج شده است، در این خوراک خبری ظاهر خواهد شد."
     podcast_feed_name: "خوراک خبری پادکست اطلاعیه های \"%{course}\""
+  announcements_a4b8ed4a: اطلاعیه‌ها
   anonymous_e1b8ad27: ناشناس
+  anonymous_grading_ccb5045c: "نمره‌دهی ناشناس"
+  anonymous_user: "کاربر ناشناس"
+  anonymous_user_d984b9ce: "کاربر ناشناس"
+  answer_text_909894d6: "متن پاسخ"
+  answer_weight_43420dc5: "وزن پاسخ"
   answers_will_be_shown_after_your_last_attempt_d9db6b1d: "پاسخ ها بعد از آخرین تلاش شما نمایش داده خواهد شد"
   app_center_will_appear_in_the_apps_tab_on_the_sett_1b9eb936: "مرکز برنامه در زبانه \"برنامه ها\" در صفحه تنظیمات یک درس یا حساب ظاهر خواهد شد. نشانی اینترنتی ارائه شده در قسمت زیر باید به یک نقطه نهایی معتبر مرکز برنامه اشاره داشته باشد (برای مثال، %{url} -- حتما اسلش انتهایی را حتما حذف کنید"
+  app_reregistration_87cc8817: "ثتب‌نام اپ"
   application: 
     errors: 
       feed_not_found: "خوراک خبری یافت نشد."
@@ -1357,6 +1381,8 @@ fa-IR:
     title: "ویرایش %{name}"
     update: "بهنگام سازی"
   archive_3f794d7e: بایگانی
+  archive_selected_d64506ca: "بایگانی انتخاب شده"
+  are_you_sure_26795d3c: "مطمئن هستید؟"
   are_you_sure_you_want_to_delete_these_count_items_148e98ba: 
     one: "مطمئنید که می خواهید این %{count} مورد حذف شود؟"
     other: "مطمئنید که می خواهید این %{count} مورد حذف شود؟"
@@ -1364,12 +1390,15 @@ fa-IR:
   are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: "مطمئنید که می خواهید این طرح نمره گذاری حذف شود؟"
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "مطمئنید که می خواهید این ابزار حذف شود؟"
   as_you_type_in_this_field_the_list_of_groups_will__16688a5f: "وقتی در این جای خالی تایپ می کنید، فهرست گروه ها به طور خودکار فقط برای شامل سازی افرادی که نام آنها با ورودی شما مطابقت دارند، فیلتر خواهد شد."
+  assessment_by_name_7b879a2c: "ارزیابی بر اساس %{name}"
   assessment_question: 
     default_question_name: پرسش
   assessment_question_bank: 
     default_imported_title: "پرسش های وارد شده"
     default_title: "نام موجود نیست - %{course}"
     default_unfiled_title: "پرسش های بایگانی نشده"
+  assign_eedf72bb: اختصاص
+  assign_to_c46e21: "اختصاص به"
   assignment: 
     assignment_group_must_have_group: "لطفا یک گروه تکلیف برای این تکلیف انتخاب کنید"
     at_least_one_file_type: "لطفا حداقل یک نوع مجاز فایل را تعیین کنید"
@@ -1390,6 +1419,7 @@ fa-IR:
     labels: 
       due: مهلت
     name_is_required: "نام لازم است!"
+    name_too_long: "نام طولانی است"
     points_possible_number: "امتیازهای ممکن باید یک عدد باشد"
     select_external_tool_dialog_title: "پیکربندی ابزار بیرونی"
     submission_action_take_quiz: "دادن آزمون %{title}"
@@ -1410,6 +1440,7 @@ fa-IR:
   assignment_comments_e43ed898: "نظرهای مربوط به تکلیف"
   assignment_details: 
     no_graded_submissions: "هیچ مورد ارسالی نمره گذاری شده موجود نیست"
+  assignment_details_bc488179: "جزئیات تکلیف"
   assignment_details_dialog: 
     average_score: "میانگین نمره:"
     count_of_submissions: "%{cnt} مورد ارسالی"
@@ -1441,6 +1472,7 @@ fa-IR:
   assignment_groups_api: 
     errors: 
       frozen_assignments_error: "نمی توانید یک گروه با یک تکلیف قفل شده را حذف کنید."
+  assignment_menu_91fe3716: "منوی تکلیف"
   assignment_muter: 
     mute_assignment: "غیر فعال کردن تکلیف"
     muting_assignment: "در حال غیر فعال کردن تکلیف..."
@@ -1449,6 +1481,8 @@ fa-IR:
     unmute_dialog: "این تکلیف در حال حاضر غیر فعال شده است. بدین معنا که دانشجویان نمی توانند نمره ها و بازخورد خود را ببینند. آیا مایلید الان فعال شود؟"
     unmuting_assignment: "در حال فعال کردن تکلیف..."
   assignment_name_b2d87383: "نام تکلیف"
+  assignment_options_1e5b7074: "گزینه های تکلیف"
+  assignment_was_deleted_8320d26d: "تکلیف حذف شد"
   assignments: 
     assignment_count: 
       one: "%{count} تکلیف"
@@ -1799,6 +1833,7 @@ fa-IR:
         remind: "یادآوری به %{assessor} درباره ارزیابی، آخرین اطلاع در %{time}"
         reminder: "یادآوری به %{assessor} درباره ارزیابی، آخرین اطلاع در %{time}"
     peer_reviews_selector: 
+      anonymous_peer_reviews: ناشناسی
       how_to_peer_review: "شیوه تخصیص بازبینی های گروهی"
       labels: 
         automatically_assign_peer_reviews: "تخصیص بازبینی های گروهی به طور خودکار"
@@ -1857,7 +1892,11 @@ fa-IR:
       comment_signature: "%{author}، %{created_at}"
       labels: 
         grade: "نمره: %{grade} *(%{points_possible} امتیاز ممکن)*"
+        ? "no"
+        : نه
         none_assigned: "هیچ موردی تخصیص داده نشده است"
+        ? "yes"
+        : بله
       links: 
         submission: 
           details: "اطلاعات ارسال"
@@ -2031,23 +2070,36 @@ fa-IR:
       mark_all_as_present: "علامت گذاری همه به عنوان حاضر"
     titles: 
       attendance_help: "راهنمای حضور"
+  attention_aaca1f1d: توجه!
   audio_dd489fcc: صدا
   auth_logging: 
     corrupted: "اطلاعات بیشتر موجود نیست"
     login: ورود
     logout: خروج
+  authorize_e3f25bb4: اجازه
+  available_8606e40c: "در دسترس"
   available_after_unlock_at_b5682224: "بعد از %{unlock_at} در دسترس است"
   available_after_unlock_at_until_lock_at_499e8092: "بعد از %{unlock_at} تا %{lock_at} در دسترس است"
   available_from_587ce92f: "قابل دسترسی از طریق"
+  available_from_date_43b5e11d: "در دسترس از تاریخ"
+  available_from_date_afc594fa: "در دسترس از تاریخ:"
   available_from_f84e4611: "قابل دسترسی از"
+  available_until_date_2c0ccec3: "قابل دسترسی تا تاریخ:"
+  available_until_date_cd125c62: "قابل دسترسی تا تاریخ"
   available_until_f3b9c4ed: "قابل دسترسی تا"
   available_until_lock_at_ab022445: "تا %{lock_at} قابل دسترسی است"
+  average_49c63f9b: میانگین
+  back_2900f52a: بازگشت
+  back_to_announcements_1036e43e: "بازگشت به اطلاعیه‌ها"
   back_to_app_center_95420d83: "بازگشت به مرکز برنامه"
+  base_847aca7c: مبنا
   bb_display: "یادگیری Blackboard"
   bb_file_description: "فایل .zip صدور 6/7/8/9 Blackboard"
   bb_name: "مبدل Blackboard"
   be_a_hero_and_ask_your_instructor_to_fix_this_link_4981930c: "یک قهرمان باش و از استاد خود درخواست کن که این پیوند را اصلاح کند."
   before_publishing_this_file_you_must_specify_usage_2229d20b: "قبل از انتشار این فایل، باید حقوق استفاده را تعیین کنید."
+  beginning_date_2d2a29ac: "تاریخ شروع"
+  beta_url_3c7b88ec: "نشانی نسخه آزمایشی:"
   better_file_browsing_description: |-
       یک واسط ساده تر و کاربرپسندتر برای مرور فایل ها. اگر آن را در سطح درس
       فعال کنید،
@@ -2055,10 +2107,13 @@ fa-IR:
       که شخصی
       به صفحه فایل های شخصی یک کاربر می رود ('/files')، باید آن را برای حسابی که
       عضوی از آن هستید، فعال کنید.
+  between_1_and_99_d421a4c0: "بین یک و ۹۹ درصد"
+  between_2_and_5_c34f5152: "بین ۲ تا ۵"
   big_blue_button_conference: 
     recording_setting: "در حال ضبط"
   blackboard: 
     no_manifest: "این Blackboard .zip هیچ فایل imsmanifest.xml در دایرکتوری ریشه ندارد."
+  blue_daf8fea9: آبی
   bookmark_service: 
     default_title: "عنوان موجود نیست"
   broccoli_cloud: 
@@ -2359,6 +2414,7 @@ fa-IR:
       buttons: 
         create: "ایجاد رویداد"
         update: "بهنگام سازی رویداد"
+      count: "تعداد:"
       date: تاریخ
       delete: حذف
       different_date_for_each_section: "استفاده از تاریخ های متفاوت برای هر بخش"
@@ -2369,6 +2425,7 @@ fa-IR:
       location_address: "نشانی:"
       location_name: "مکان:"
       new_calendar_event_header: "رویداد جدید تقویم"
+      repeat: تکرار
       start_time: "زمان شروع"
     edit_event: 
       tabs: 
@@ -2441,6 +2498,7 @@ fa-IR:
       would_you_like_to_cancel_that_and_sign_up_for_this: "مایلید که آن را لغو کنید و برای این یکی ثبت نام کنید؟"
       you_are_already_signed_up_for: "شما قبلا ثبت نام کرده اید برای:"
     save: "ذخیره سازی"
+    save_and_publish: "ذخیره سازی و انتشار"
     save_changes: "ذخیره سازی تغییرات"
     scheduler_right_side_admin_section: 
       create_a_new_set_of_appointments: "ایجاد یک گروه قرار ملاقات"
@@ -2459,6 +2517,7 @@ fa-IR:
       loading_undated_events: "درحال بارگذاری موردهای بدون تاریخ..."
       no_undated_events: "موردهای بدون تاریخ موجود نیست."
       show_undated_events: "نمایش موردهای بدون تاریخ"
+  calendar_d14cfc8f: تقویم
   calendar_event: 
     errors: 
       duplicate_child_event_contexts: "دو نسخه ای کردن زمینه رویدادهای مشتق شده"
@@ -2563,14 +2622,17 @@ fa-IR:
     by_sa: "ارجاع کریتیو کامنز، اشتراک سازی یکسان"
     private: "خصوصی (دارای حق تکثیر)"
     public_domain: "دامنه عمومی"
+  change_dcaa253a: تغییر
   change_points_possible_to_match_rubric_dialog: 
     prompts: 
       update_assignment_points: "این تکلیف دارای  %{assignmentPoints} امتیاز ممکن است، آیا می خواهید آن را تغییر دهید تا %{rubricPoints} امتیاز ممکن برای مطابقت با این دستورالعمل ارزیابی را داشته باشد؟"
     titles: 
       update_assignment_points: "امتیازهای ممکن برای مطابقت با دستورالعمل ارزیابی تغییر داده شوند؟"
+  chat_2153c6b7: چت
   choose_a_course_home_page_8059c7b: "انتخاب صفحه خانگی یک درس"
   choose_a_csv_file_to_upload_9644480c: "انتخاب یک فایل CSV برای بارگذاری:"
   choose_usage_rights_33683854: "انتخاب حقوق استفاده..."
+  clear_2084585f: "پاک کردن"
   close_and_return_to_canvas_80544344: "بستن و بازگشتن به کانواس"
   close_d634289d: بستن
   collaboration: 
@@ -2651,10 +2713,12 @@ fa-IR:
         current: "همکاری های فعلی"
     titles: 
       delete: "همکاری حذف شود؟"
+  collapsed_510aa02a: "جمع شده"
   coming_up_4348b0bd: "در حال نمایش"
   comm_messages: 
     from_beginning: آغاز
     to_now: اکنون
+  comments_e07bcbe3: نظرها
   common_cartridge_description: "امکان تبدیل بسته های متداول کارتریج به قالب واسط  json را برای وارد شدن فراهم می کند"
   common_cartridge_display: "کارتریج رایج"
   common_cartridge_file_description: "بسته متداول 1.x کارتریج"
@@ -2721,6 +2785,7 @@ fa-IR:
     profile: 
       notices: 
         contact_registered: "شیوه تماس ثبت شد!"
+  completed_19711ce7: "کامل شد"
   conferences: 
     concluded_conference: 
       delete: حذف
@@ -2752,6 +2817,7 @@ fa-IR:
     inactive_error: "این کنفرانس درحال حاضر فعال نیست"
     index: 
       concluded_conferences: "کنفرانس های خاتمه یافته"
+      conference: کنفرانس
       conference_header: "همایش ها"
       new_conference: "کنفرانس جدید"
       new_conferences: "کنفرانس های جدید"
@@ -2782,6 +2848,7 @@ fa-IR:
     type_disabled_error: "این نوع کنفرانس دیگر برای این تارنمای کانواس فعال نیست"
   config_url_e96ceaf3: "نشانی اینترنتی پیکربندی"
   configuration_type_25a084a4: "نوع پیکربندی"
+  configure_ecb97e30: پیکربندی
   confirm_dialog: 
     cancel: لغو
     submit: ارسال
@@ -3182,6 +3249,14 @@ fa-IR:
     invalid_position: "موقعیت معتبر نیست"
     invalid_requirement_type: "نوع الزام تکمیل معتبر نیست"
   context_modules: 
+    add_context_module_form: 
+      buttons: 
+        add_module: "افزودن ماژول"
+      links: 
+        add_prerequisite: "افزودن پیش نیاز"
+        add_requirement: "افزودن الزام"
+      module_name: "نام ماژول"
+      must_complete_prerequisites: "باید تکمیل شود"
     buttons: 
       add: "افزودن ماژول"
       add_item: "افزودن مورد"
@@ -3327,10 +3402,10 @@ fa-IR:
       modules_item_move_to: "انتقال به..."
       must_contribute: 
         fulfilled: "در محتوای صفحه مشارکت شد"
-        unfulfilled: "باید در محتوای صفحه مشارکت شود"
+        unfulfilled: مشارکت
       must_submit: 
-        fulfilled: "تکلیف ارسال شد"
-        unfulfilled: "تکلیف باید ارسال شود"
+        fulfilled: "ارسال شد"
+        unfulfilled: ارسال
       must_view: 
         fulfilled: "این صفحه مشاهده شد"
         unfulfilled: "این صفحه باید مشاهده شود"
@@ -3347,6 +3422,9 @@ fa-IR:
       quizzes: "آزمون ها"
       wiki_pages: "صفحه های ویکی"
     points_possible_short: "%{points} امتیاز"
+    prerequisites_message: 
+      labels: 
+        prerequisites: "پیش نیازها"
     progressions: 
       titles: 
         student_progress: "پیشرفت دانشجو"
@@ -3538,6 +3616,9 @@ fa-IR:
     unarchive: "لغو بایگانی"
     unstar: "برداشتن ستاره"
     unstar_conversation: "برداشتن ستاره گفتگو"
+  copy_9748f9f: "کپی کردن"
+  copy_to_folder_32ecc3c3: "کپی به پوشه"
+  copying_628a9607: "در حال کپی کردن.."
   copyright_holder_66ee111: "دارنده حق نشر:"
   correct_answer: "جواب درست بود."
   correct_answers_are_available_until_date_df01cc5f: "پاسخ های درست تا %{date} در دسترس هستند."
@@ -3620,7 +3701,14 @@ fa-IR:
       all: همه
       only_teachers: "فقط اساتید"
       teachers_students: "استاد و دانشجویان"
+  course_8a63b4a3: درس
+  course_and_user_search_ebc1ae41: "جست‌وجوی درس و کاربر"
   course_atom_feed_9d95214e: "تک خوراک خبری درس"
+  course_calendar_7d3cba7b: "تقویم درس"
+  course_catalog_4cc7c8ce: "کاتالوگ درس"
+  course_collaborations_dadb327e: "همکاری‌های درس"
+  course_conferences_3d914c96: "کنفرانس‌های درس"
+  course_content_a92eca20: "محتوای درس"
   course_copy_argument_error: "نسخه کپی درس نیازمند یک درس منبع است."
   course_copy_description: "افزونه انتقال برای کپی کردن دوره های کانواس"
   course_copy_display: "نسخه کپی درس"
@@ -3628,6 +3716,8 @@ fa-IR:
   course_copy_name: "کپی کردن درس کانواس"
   course_copy_no_course_error: "درس منبع یافت نشد."
   course_copy_not_allowed_error: "مجاز به کپی کردن درس منبع نیستید."
+  course_discussions_38c0b74f: "بحث‌های درس"
+  course_ends_at_e8b166df: "پایان درس در"
   course_exports: 
     errors: 
       assignment: "صدور تکلیف \"%{title}\" انجام نشد"
@@ -3668,6 +3758,9 @@ fa-IR:
       file: "فایل ناشناس"
       topic: "موضوع ناشناس"
       wiki_page: "صفحه ویکی ناشناس"
+  course_files_62deb8f8: "فایل های درس"
+  course_grades_22adc27e: "نمره های درس"
+  course_home_4c4c0107: "صفحه اصلی درس"
   course_list: 
     favorited_tooltip: "برای حذف از منوی درس ها، کلیک کنید."
     nonfavorited_tooltip: "برای افزودن به منوی درس ها، کلیک کنید."
@@ -3745,7 +3838,13 @@ fa-IR:
       wiki_id: "شناسه ویکی"
       workflow_state: "وضعیت گردش کار"
   course_members_are_free_to_join_9b2603d4: "پیوستن اعضای درس آزاد است"
+  course_modules_795cb95e: "ماژول‌های درس"
+  course_name_63b973d1: "نام درس"
+  course_name_is_required_90919349: "نام درس لازم است"
   course_navigation_dd035109: "پیمایش درس"
+  course_pages_449f1dd4: "صفحه‌های درس"
+  course_people_3058c948: "افراد درس"
+  course_quizzes_c337653c: "آزمون‌های درس"
   course_restore: 
     restore_error: "در هنگام تلاش برای بازیابی درس، خطایی رخ داد. درس بازیابی نشد.."
   course_search: 
@@ -3980,6 +4079,7 @@ fa-IR:
         email: "پست الکترونیکی"
         email_field_label: "نشانی های پست الکترونیکی کاربرانی که باید اضافه شوند به نحوی که با ویرگول از هم جدا شده باشند وارد کنید"
         email_field_place_holder: "«دانشجوی نمونه» <student@example.com>، «نام خانوادگی، نام» <firstlast@example.com>، justAnEmailAddress@example.com"
+        email_or_login: ایمیل/ورود
         example_formats: "مثال ها: user@example.com، «نام نام خانوادگی» <user@example.com>، «نام خانوادگی، نام» <user@example.com>"
         form_instructions: "فهرستی از نشانی های پست الکترونیکی را در قسمت زیر تایپ کنید یا بچسبانید:"
         go_back: "شروع دوباره"
@@ -4506,6 +4606,9 @@ fa-IR:
       - نوامبر
       - دسامبر
   date_error_7b38f8ff: "خطای تاریخ"
+  datepicker: 
+    nextText: بعدی
+    prevText: قبلی
   dates: 
     no_date: "تاریخ موجود نیست"
   datetime: 
@@ -4551,6 +4654,7 @@ fa-IR:
       month: ماه
       second: ثانیه
       year: سال
+  day_s_7cc1231f: روز(ها)
   default_conference_title: "کنفرانس %{course_name} "
   default_question_name: پرسش
   default_question_text: "متن پرسش"
@@ -4971,6 +5075,11 @@ fa-IR:
     unsubscribed_hint: "شما در این موضوع مشترک نیستید. برای اشتراک، کلیک کنید."
   display_course_catalog: "فهرست قابل جستجوی درس های موجود در این حساب ریشه را در حالی که پرچم «شامل سازی این درس در فهرست عمومی درس» فعال شده است»، نمایش دهید."
   domain_3b54c511: دامنه
+  done_54e3d4b6: "انجام شد"
+  done_8af51c9b: "انجام شد"
+  done_editing_9f7379d9: "ویرایش انجام شد"
+  down_5831a426: پایین
+  download_c7ffdfb9: بارگیری
   download_submissions_7454665f: "بارگیری موردهای ارسالی"
   due_a73610f6: مهلت
   due_date_6a281fe3: "مهلت: %{date}"
@@ -5074,6 +5183,9 @@ fa-IR:
   either_the_url_or_domain_should_be_set_c29cf8c1: "نشانی اینترنتی یا دامنه باید تعیین شود."
   email: 
     default_from_name: "نرم افزار کانواس شرکت Instructure"
+  email_22a7d52d: "پست الکترونیکی"
+  email_address_6e0443a5: "نشانی پست الکترونیکی"
+  email_already_in_use_330248e: "ایمیل قبلا استفاده شده است"
   email_e366fa29: "پست الکترونیکی"
   email_is_invalid_e0d982eb: "پست اکترونیکی معتبر نیست!"
   ember_modules_description: "ماژول هایی که در Ember بازنویسی شده اند. از API کشیدن و رها کردن اصلی برای فراهم کردن امکان کشیدن از محل های بیرونی استفاده می کند."
@@ -5366,6 +5478,7 @@ fa-IR:
       submissions: 
         body1: "ممکن است در قسمت پایین این صفحه، متوجه فهرستی از موردهای ارسالی جدید از کلاس های خود شده باشید (%{showme}). می توانید از این صفحه، موردهای ارسالی را به سرعت به صفحه های جدید موجود در مجموعه اسناد خود بیفزایید. فقط کافیست روی مورد ارسالی که می خواهید افزوده شود کلیک کنید تا یک کادر گفتگوی ساده ظاهر شود."
         body2: "عالیست! اکنون برای پایان دادن به افزودن مورد ارسالی، باید بخشی را که می خواهید به آن بیفزایید را انتخاب کنید و یک نام برای صفحه برگزینید. بعد از اینکه روی «افزودن صفحه» کلیک کردید، به صفحه جدید منتقل می شوید تا بتوانید در صورت تمایل ان را به طور دقیق تر ویرایش کنید."
+  error_98e81528: خطا
   error_deleting_name_reason_11f9d399: "خطا در حذف %{name}: %{reason}"
   error_message_2b9d12ee: "خطا: %{message}"
   error_uploading_file_e2d31b56: "خطا در بارگذاری فایل."
@@ -7070,6 +7183,16 @@ fa-IR:
   logged_out_user: "کاربر خارج شده %{user_counter}"
   login: 
     canvas: 
+      forgot_password_link: 
+        dont_know_password: "رمز عبور را فراموش کردید؟"
+      legacy_login_content: 
+        back_to_login: "بازگشت به صفحه ورود"
+        buttons: 
+          request_password: "درخواست رمز عبور"
+        labels: 
+          password: "رمز عبور"
+          remember_me: "مرا به یاد داشته باش"
+        log_in: ورود
       mobile_login: 
         back_to_login: "بازگشت به صفحه ورود"
         buttons: 
@@ -7093,6 +7216,14 @@ fa-IR:
         login_handle: "%{login_handle_name} خود را وارد کنید تا برای شما پیوندی را ارسال کنیم که رمز عبور خود را تغییر دهید."
         page_title: "ورود به کانواس"
         register_for_canvas: "*به حساب کانواس نیاز دارید؟* **اینجا کلیک کنید, رایگان است!**"
+      new_login_content: 
+        back_to_login: "بازگشت به صفحه ورود"
+        buttons: 
+          request_password: "درخواست رمز عبور"
+        labels: 
+          password: "رمز عبور"
+          remember_me: "مرا به یاد داشته باش"
+        log_in: ورود
     logout_confirm: 
       cancel: لغو
       details: 
@@ -7139,6 +7270,7 @@ fa-IR:
         logout_response_redirect_from_idp: "پاسخ به خروج را از IdP دریافت کرد"
         logout_response_redirect_to_idp: "ارسال درخواست خروج به IdP"
         redirect_from_idp: "پاسخ به ورود را از IdP دریافت کرد"
+  login_screen_83518c07: "برچسب ورود"
   low_score_4eeb95b2: "پایین: %{score}"
   lower_limit_of_range_6ddd4983: "حد پایین تر محدوده"
   lti: 
@@ -9405,6 +9537,7 @@ fa-IR:
         remember_access: "مجوز من برای این سرویس به خاطر سپرده شود"
       page_title: "ورود به برنامه"
     confirm_mobile: 
+      authorize: اجازه
       cancel: لغو
       details: 
         allow_application: "%{app_name} درخواست دسترسی به حساب شما را دارد."
@@ -9929,6 +10062,9 @@ fa-IR:
       description: "به یک [نشانه برنامه از Yo](%{yo_url}) نیاز خواهید داشت."
       labels: 
         api_token: "نشانه Api"
+    zendesk_settings: 
+      labels: 
+        password: "رمز عبور"
   points_bb475533: امتیازها
   points_possible_must_be_0_or_more_for_selected_gra_f96a04e3: "امتیازهای ممکن باید برای نوع نمره گذاری انتخابی 0 یا بیشتر باشد"
   polling: 
@@ -13168,6 +13304,7 @@ fa-IR:
     resubmitted_to_turnitin: "با موفقیت به turnitin ارسال شد."
     see_attached_files: "مشاهده فایل های پیوست شده"
     show: 
+      anonymous_user: "کاربر ناشناس"
       attach_file: "پیوست کردن فایل"
       buttons: 
         save: "ذخیره سازی"
