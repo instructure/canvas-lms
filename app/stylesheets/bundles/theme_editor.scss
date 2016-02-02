@@ -514,20 +514,23 @@ $te-width: 300px;
   }
   .Theme__editor_preview-img-container {
     padding: $ic-sp;
-    width: 100%;
-    height: $ic-sp*10;
     border: 1px solid rgba($ic-color-neutral, 0.2);
     background: $ic-color-neutral;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     .Theme__editor_preview-img {
+      box-sizing: border-box;
       text-align: center;
       overflow: hidden;
-      height: $ic-sp*8;
-      width: 100%;
+      height: 75px; width: 75px;
       display: flex;
       align-items: center;
       justify-content: center;
       img {
         max-height: 100%;
+
       }
     }
     &.Theme__editor_preview-img-container--ic-brand-header-image {
@@ -605,4 +608,14 @@ $te-width: 300px;
 
 .Theme-editor-progress-list-item__bar {
   flex: 1;
+}
+
+// ***HACK*** to make IE10 and 11 properly scale SVGs inside Theme Editor sidebar
+// (Also affects other image types because our user-uploaded image URLs do
+// not have filetype suffixes. This should be ok, though, because most
+// institutions' images should be at least 75px wide.)
+@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+  .Theme__editor-upload .Theme__editor_preview-img-container .Theme__editor_preview-img img {
+    min-width: 75px;
+  }
 }
