@@ -33,4 +33,25 @@ describe "root account basic settings" do
     get account_settings_url
     expect(fj('[name="default_user_storage_quota_mb"]')).to have_value(user_quota.to_s) # fj to avoid selenium caching
   end
+
+  it "should be able to remove account quiz ip filters" do
+    account.ip_filters = {"name" => "192.168.217.1/24"}
+    account.save!
+
+    course_with_admin_logged_in
+    get account_settings_url
+
+    expect_new_page_load { submit_form("#account_settings") }
+
+    account.reload
+    expect(account.settings[:ip_filters]).to be_present # should not have cleared them if we didn't do anything
+
+    filter = ff('.ip_filter').detect{|fil| fil.displayed?}
+    filter.find_element(:css, '.delete_filter_link').click
+
+    expect_new_page_load { submit_form("#account_settings") }
+
+    account.reload
+    expect(account.settings[:ip_filters]).to be_blank
+  end
 end
