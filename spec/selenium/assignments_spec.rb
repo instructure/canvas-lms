@@ -54,14 +54,14 @@ describe "assignments" do
           @assignment.unpublish
         end
 
-        it "should show the moderate button when the assignment is published" do
+        it "should show the moderate button when the assignment is published", priority: "1", test_id: 609412 do
           get "/courses/#{@course.id}/assignments/#{@assignment.id}"
           f('#assignment_publish_button').click()
           wait_for_ajaximations
           expect(f('#moderated_grading_button')).to be_displayed
         end
 
-        it "should remove the moderate button when the assignment is unpublished" do
+        it "should remove the moderate button when the assignment is unpublished", priority: "1", test_id: 609413 do
           @assignment.publish
           get "/courses/#{@course.id}/assignments/#{@assignment.id}"
           f('#assignment_publish_button').click()
@@ -158,7 +158,7 @@ describe "assignments" do
     end
 
     it "only allows an assignment editor to edit points and title if assignment " +
-           "if assignment has multiple due dates" do
+           "if assignment has multiple due dates", priority: "2", test_id: 622376 do
       middle_number = '15'
       expected_date = (Time.now - 1.month).strftime("%b #{middle_number}")
       @assignment = @course.assignments.create!(
@@ -189,7 +189,7 @@ describe "assignments" do
       expect(@assignment.due_at.strftime('%b %d')).to eq expected_date
     end
 
-    it "should create an assignment with more options" do
+    it "should create an assignment with more options", priority: "2", test_id: 622614 do
       enable_cache do
         expected_text = "Assignment 1"
         # freeze time to avoid ui complications
@@ -223,7 +223,7 @@ describe "assignments" do
       end
     end
 
-    it "should keep erased field on more options click" do
+    it "should keep erased field on more options click", priority: "2", test_id: 622615 do
       enable_cache do
         middle_number = '15'
         expected_date = (Time.now - 1.month).strftime("%b #{middle_number}")
@@ -257,7 +257,7 @@ describe "assignments" do
       end
     end
 
-    it "should verify that self sign-up link works in more options" do
+    it "should verify that self sign-up link works in more options", priority: "2", test_id: 622853 do
       get "/courses/#{@course.id}/assignments"
       manually_create_assignment
       f('#has_group_category').click
@@ -268,7 +268,7 @@ describe "assignments" do
       expect(f('#self_signup_help_dialog')).to be_displayed
     end
 
-    it "should validate that a group category is selected" do
+    it "should validate that a group category is selected", priority: "1", test_id: 626905 do
       assignment_name = 'first test assignment'
       @assignment = @course.assignments.create({
         :name => assignment_name,
@@ -286,7 +286,7 @@ describe "assignments" do
       expect(visBoxes.first.text).to eq "Please select a group set for this assignment"
     end
 
-    it "shows assignment details, un-editable, for concluded teachers" do
+    it "shows assignment details, un-editable, for concluded teachers", priority: "2", test_id: 626906 do
       @teacher.enrollments.first.conclude
       @assignment = @course.assignments.create({
         :name => "assignment after concluded",
@@ -313,14 +313,14 @@ describe "assignments" do
         submission.save!
       end
 
-      it "should not allow group set to be changed if there are submissions" do
+      it "should not allow group set to be changed if there are submissions", priority: "1", test_id: 626907 do
         get "/courses/#{@course.id}/assignments/#{@assignment1.id}/edit"
         wait_for_ajaximations
         expect(f("#assignment_group_category_id").attribute('disabled')).to be_present
       end
 
       it "should still show deleted group set only on an attached assignment with " +
-        "submissions" do
+        "submissions", priority: "2", test_id: 627149 do
         @assignment1.group_category.destroy
         @assignment2.group_category.destroy
 
@@ -341,7 +341,7 @@ describe "assignments" do
         expect(f("#assignment_group_category_id").attribute('disabled')).to be_present
       end
 
-      it "should revert to [ New Group Category ] if original group is deleted with no submissions" do
+      it "should revert to [ New Group Category ] if original group is deleted with no submissions", priority: "2", test_id: 627150 do
         @assignment2.group_category.destroy
         get "/courses/#{@course.id}/assignments/#{@assignment2.id}/edit"
         wait_for_ajaximations
@@ -357,21 +357,21 @@ describe "assignments" do
         @frozen_assign = frozen_assignment(default_group)
       end
 
-      it "should not allow assignment group to be deleted by teacher if assignments are frozen" do
+      it "should not allow assignment group to be deleted by teacher if assignments are frozen", priority: "2", test_id: 649308 do
         get "/courses/#{@course.id}/assignments"
         fj("#ag_#{@frozen_assign.assignment_group_id}_manage_link").click
         wait_for_ajaximations
         expect(element_exists("div#assignment_group_#{@frozen_assign.assignment_group_id} a.delete_group")).to be_falsey
       end
 
-      it "should not allow deleting a frozen assignment from index page" do
+      it "should not allow deleting a frozen assignment from index page", priority:"2", test_id: 649309 do
         get "/courses/#{@course.id}/assignments"
         fj("div#assignment_#{@frozen_assign.id} a.al-trigger").click
         wait_for_ajaximations
         expect(element_exists("div#assignment_#{@frozen_assign.id} a.delete_assignment:visible")).to be_falsey
       end
 
-      it "should allow editing the due date even if completely frozen" do
+      it "should allow editing the due date even if completely frozen", priority: "2", test_id: 649310 do
         old_due_at = @frozen_assign.due_at
         run_assignment_edit(@frozen_assign) do
           replace_content(fj(".datePickerDateField[data-date-type='due_at']"), 'Sep 20, 2012')
@@ -385,7 +385,7 @@ describe "assignments" do
 
     # This should be part of a spec that follows a critical path through
     #  the draft state index page, but does not need to be a lone wolf
-    it "should delete assignments" do
+    it "should delete assignments", priority: "1", test_id: 647609 do
       ag = @course.assignment_groups.first
       as = @course.assignments.create({:assignment_group => ag})
 
@@ -404,7 +404,7 @@ describe "assignments" do
       expect(as.workflow_state).to eq 'deleted'
     end
 
-    it "should reorder assignments with drag and drop" do
+    it "should reorder assignments with drag and drop", priority: "2", test_id: 647848 do
       ag = @course.assignment_groups.first
       as = []
       4.times do |i|
@@ -432,7 +432,7 @@ describe "assignments" do
         @module.add_item :type => 'assignment', :id => @a3.id
       end
 
-      it "should show the new modules sequence footer" do
+      it "should show the new modules sequence footer", priority: "2", test_id: 649311 do
         get "/courses/#{@course.id}/assignments/#{@a2.id}"
         wait_for_ajaximations
         expect(f("#sequence_footer .module-sequence-footer")).to be_present
@@ -446,7 +446,7 @@ describe "assignments" do
         @assignment.unpublish
       end
 
-      it "should allow publishing from the index page", priority: "2" do
+      it "should allow publishing from the index page", priority: "2", test_id: 647849 do
         get "/courses/#{@course.id}/assignments"
         wait_for_ajaximations
         f("#assignment_#{@assignment.id} .publish-icon").click
@@ -455,7 +455,7 @@ describe "assignments" do
         keep_trying_until { expect(f("#assignment_#{@assignment.id} .publish-icon").attribute('aria-label')).to include_text("Published") }
       end
 
-      it "shows submission scores for students on index page" do
+      it "shows submission scores for students on index page", priority: "2", test_id: 647850 do
         @assignment.update_attributes(points_possible: 15)
         @assignment.publish
         course_with_student_logged_in(active_all: true, course: @course)
@@ -466,7 +466,7 @@ describe "assignments" do
             text).to match "14/15 pts"
       end
 
-      it "should allow publishing from the show page" do
+      it "should allow publishing from the show page", priority: "1", test_id: 647851 do
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
         wait_for_ajaximations
 
@@ -486,7 +486,7 @@ describe "assignments" do
         expect(speedgrader_hidden?).to eq false
       end
 
-      it "should show publishing status on the edit page" do
+      it "should show publishing status on the edit page", priority: "2", test_id: 647852 do
         get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
         wait_for_ajaximations
 
@@ -503,7 +503,7 @@ describe "assignments" do
           }
         end
 
-        it "should not overwrite overrides if published twice from the index page" do
+        it "should not overwrite overrides if published twice from the index page", priority: "2", test_id: 649312 do
           get "/courses/#{@course.id}/assignments"
 
           f("#assignment_#{@assignment.id} .publish-icon").click
@@ -524,7 +524,7 @@ describe "assignments" do
           expect(@assignment.reload.active_assignment_overrides.count).to eq 1
         end
 
-        it "should not overwrite overrides if published twice from the show page" do
+        it "should not overwrite overrides if published twice from the show page", priority: "2", test_id: 649313 do
           get "/courses/#{@course.id}/assignments/#{@assignment.id}"
           wait_for_ajaximations
 
@@ -574,7 +574,7 @@ describe "assignments" do
         expect(f('#assignment_post_to_sis')).to be_nil
       end
 
-      it 'should display post to SIS icon on assignments page when enabled' do
+      it 'should display post to SIS icon on assignments page when enabled', priority: "2", test_id: 649314 do
         Account.default.set_feature_flag!('post_grades', 'on')
 
         @a1 = @course.assignments.create!(:name => 'assignment 1', :post_to_sis => true)
@@ -596,7 +596,7 @@ describe "assignments" do
         expect(find_all('.post-to-sis-status.disabled').count).to be 0
       end
 
-      it 'should toggle the post to SIS feature when clicked' do
+      it 'should toggle the post to SIS feature when clicked', priority: "2", test_id: 649315 do
         Account.default.set_feature_flag!('post_grades', 'on')
 
         @a1 = @course.assignments.create!(:name => 'assignment 1', :post_to_sis => true)
@@ -659,18 +659,18 @@ describe "assignments" do
       @assignment.publish
     end
 
-    it "should show the moderated grading page for moderated grading assignments" do
+    it "should show the moderated grading page for moderated grading assignments", priority: "1", test_id: 609651 do
       get "/courses/#{@course.id}/assignments/#{@assignment.id}/moderate"
       expect(f('#assignment_moderation')).to be_displayed
     end
 
-    it "should deny access for a regular student to the moderation page" do
+    it "should deny access for a regular student to the moderation page", priority: "1", test_id: 609652 do
       course_with_student_logged_in({course: @course})
       get "/courses/#{@course.id}/assignments/#{@assignment.id}/moderate"
       expect(f('#unauthorized_message')).to be_displayed
     end
 
-    it "should not show the moderation page if it is not a moderated assignment " do
+    it "should not show the moderation page if it is not a moderated assignment ", priority: "2", test_id: 609653 do
       @assignment.update_attribute(:moderated_grading, false)
       get "/courses/#{@course.id}/assignments/#{@assignment.id}/moderate"
       expect(f('#content h2').text).to eql "Page Not Found"
@@ -684,7 +684,7 @@ describe "assignments" do
       course_with_teacher_logged_in(:active_all => true, :account => @account)
     end
 
-    it "should default to post grades if account setting is enabled" do
+    it "should default to post grades if account setting is enabled", priority: "2", test_id: 498879 do
       @account.settings[:sis_default_grade_export] = {:locked => false, :value => true}
       @account.save!
 
@@ -692,7 +692,7 @@ describe "assignments" do
       expect(is_checked('#assignment_post_to_sis')).to be_truthy
     end
 
-    it "should not default to post grades if account setting is not enabled" do
+    it "should not default to post grades if account setting is not enabled", priority: "2", test_id: 498874 do
       get "/courses/#{@course.id}/assignments/new"
       expect(is_checked('#assignment_post_to_sis')).to be_falsey
     end
