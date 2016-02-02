@@ -77,25 +77,89 @@ module DatesOverridable
     dates
   end
 
-  def all_dates_visible_to(user)
-    if user.nil?
-      all_due_dates
-    elsif ObserverEnrollment.observed_students(context, user).any?
-      observed_student_due_dates(user)
-    elsif context.user_has_been_student?(user) || context.user_has_been_admin?(user) || context.user_has_been_observer?(user)
-      overrides = overrides_for(user)
-      overrides = overrides.map(&:as_hash)
-      unless differentiated_assignments_applies?
-        overrides << base_due_date_hash if overrides.empty? || context.user_has_been_admin?(user)
+  # returns a hash of observer, student, or admin to course ids.
+  # the observer bucket is additionally a hash with the values being a set
+  # of the users they observer (possibly including nil, for unassociated observers)
+  # note that #include?(course_id) will work equivalently on a Hash (of observers)
+  # or an array (of admins or students)
+  def self.precache_enrollments_for_multiple_assignments(assignments, user)
+    courses_user_has_been_enrolled_in = { observer: {}, student: [], admin: []}
+    current_shard = Shard.current
+    Shard.partition_by_shard(assignments) do |shard_assignments|
+      Enrollment.where(course_id: shard_assignments.map(&:context), user_id: user).
+          active.
+          uniq.
+          # duplicate the subquery logic of ObserverEnrollment.observed_users, where it verifies the observee exists
+          where("associated_user_id IS NULL OR EXISTS (
+            SELECT 1 FROM #{Enrollment.quoted_table_name} e2
+            WHERE e2.type IN ('StudentEnrollment', 'StudentViewEnrollment')
+             AND e2.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive')
+             AND e2.user_id=enrollments.associated_user_id
+             AND e2.course_id=enrollments.course_id)").
+          pluck(:course_id, :type, :associated_user_id).each do |(course_id, type, associated_user_id)|
+        relative_course_id = Shard.relative_id_for(course_id, Shard.current, current_shard)
+        bucket = case type
+                 when 'ObserverEnrollment' then :observer
+                 when 'StudentEnrollment', 'StudentViewEnrollment' then :student
+                 # when 'TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment' then :admin
+                 else; :admin
+                 end
+        if bucket == :observer
+          observees = (courses_user_has_been_enrolled_in[bucket][relative_course_id] ||= Set.new)
+          observees << Shard.relative_id_for(associated_user_id, Shard.current, current_shard)
+        else
+          courses_user_has_been_enrolled_in[bucket] << relative_course_id
+        end
       end
-      overrides
-    elsif context.user_has_no_enrollments?(user)
-      all_due_dates
     end
+    courses_user_has_been_enrolled_in
   end
 
-  def observed_student_due_dates(user)
-    dates = ObserverEnrollment.observed_students(context, user).map do |student, enrollments|
+  def all_dates_visible_to(user, courses_user_has_been_enrolled_in: nil)
+    return all_due_dates if user.nil?
+
+    if courses_user_has_been_enrolled_in
+      if courses_user_has_been_enrolled_in[:observer][context_id].try(:any?)
+        observed_student_due_dates(user, courses_user_has_been_enrolled_in[:observer][context_id].to_a)
+      elsif courses_user_has_been_enrolled_in[:student].include?(context_id) ||
+              courses_user_has_been_enrolled_in[:admin].include?(context_id) ||
+              courses_user_has_been_enrolled_in[:observer].include?(context_id)
+        overrides = overrides_for(user)
+        overrides = overrides.map(&:as_hash)
+        if !differentiated_assignments_applies? &&
+            (overrides.empty? || courses_user_has_been_enrolled_in[:admin].include?(context_id))
+          overrides << base_due_date_hash
+        end
+        overrides
+      else
+        all_due_dates
+      end
+    else
+      if ObserverEnrollment.observed_students(context, user).any?
+        observed_student_due_dates(user)
+      elsif context.user_has_been_student?(user) ||
+          context.user_has_been_admin?(user) ||
+          context.user_has_been_observer?(user)
+        overrides = overrides_for(user)
+        overrides = overrides.map(&:as_hash)
+        if !differentiated_assignments_applies? && (overrides.empty? || context.user_has_been_admin?(user))
+          overrides << base_due_date_hash
+        end
+        overrides
+      else
+        all_due_dates
+      end
+    end
+
+  end
+
+  def observed_student_due_dates(user, observed_student_ids = nil)
+    observed_students = if observed_student_ids
+      User.find(observed_student_ids)
+                        else
+      ObserverEnrollment.observed_students(context, user).keys
+                        end
+    dates = observed_students.map do |student|
       self.all_dates_visible_to(student)
     end
     dates.flatten.uniq

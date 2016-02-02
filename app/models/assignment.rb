@@ -896,8 +896,10 @@ class Assignment < ActiveRecord::Base
   end
 
   def has_submitted_submissions?
+    return @has_submitted_submissions unless @has_submitted_submissions.nil?
     submitted_count > 0
   end
+  attr_writer :has_submitted_submissions
 
   def submitted_count
     return read_attribute(:submitted_count).to_i if read_attribute(:submitted_count)
@@ -2149,12 +2151,15 @@ class Assignment < ActiveRecord::Base
   end
 
   def has_student_submissions?
-    if attribute_present? :student_submission_count
+    if !@has_student_submissions.nil?
+      @has_student_submissions
+    elsif attribute_present? :student_submission_count
       student_submission_count.to_i > 0
     else
       submissions.having_submission.where("user_id IS NOT NULL").exists?
     end
   end
+  attr_writer :has_student_submissions
 
   def group_category_deleted_with_submissions?
     self.group_category.try(:deleted_at?) && self.has_student_submissions?

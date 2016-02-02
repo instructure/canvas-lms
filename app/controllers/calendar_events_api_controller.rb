@@ -337,7 +337,28 @@ class CalendarEventsApiController < ApplicationController
         submissions = Submission.where(assignment_id: events, user_id: user)
           .group_by(&:assignment_id)
       end
+      # preload data used by assignment_json
+      ActiveRecord::Associations::Preloader.new.preload(events, :discussion_topic)
+      Shard.partition_by_shard(events) do |shard_events|
+        having_submission = Submission.having_submission.
+            where(assignment_id: shard_events).
+            uniq.
+            pluck(:assignment_id).to_set
+        shard_events.each do |event|
+          event.has_submitted_submissions = having_submission.include?(event.id)
+        end
+
+        having_student_submission = Submission.having_submission.
+            where(assignment_id: shard_events).
+            where.not(user_id: nil).
+            uniq.
+            pluck(:assignment_id).to_set
+        shard_events.each do |event|
+          event.has_student_submissions = having_student_submission.include?(event.id)
+        end
+      end
     end
+
     if @errors.empty?
       json = events.map do |event|
         subs = submissions[event.id] if submissions
@@ -885,14 +906,16 @@ class CalendarEventsApiController < ApplicationController
       Assignment.preload_context_module_tags(student_events) if student_events.any?
     end
 
+    courses_user_has_been_enrolled_in = DatesOverridable.precache_enrollments_for_multiple_assignments(events, user)
     events = events.inject([]) do |assignments, assignment|
 
-      if assignment.context.user_has_been_student?(user)
+      if courses_user_has_been_enrolled_in[:student].include?(assignment.context_id)
         assignment = assignment.overridden_for(user)
         assignment.infer_all_day
         assignments << assignment
       else
-        dates_list = assignment.all_dates_visible_to(user)
+        dates_list = assignment.all_dates_visible_to(user,
+          courses_user_has_been_enrolled_in: courses_user_has_been_enrolled_in)
 
         if dates_list.empty?
           assignments << assignment
@@ -907,7 +930,8 @@ class CalendarEventsApiController < ApplicationController
         if original_dates.present?
           section_override_count = dates_list.count{|d| d[:set_type] == 'CourseSection'}
           all_sections_overridden = section_override_count > 0 && section_override_count == assignment.context.active_section_count
-          if (assignment.context.user_has_been_observer?(user) && assignments.empty?) || !all_sections_overridden
+          if !all_sections_overridden ||
+              (assignments.empty? && courses_user_has_been_enrolled_in[:observer].include?(assignment.context_id))
             assignments << assignment
           end
         end

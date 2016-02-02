@@ -612,10 +612,18 @@ class ApplicationController < ActionController::Base
         # parameter, but still scoped by user so we know they have rights to
         # view them.
         course_ids = only_contexts.select { |c| c.first == "Course" }.map(&:last)
-        enrollment_scope = enrollment_scope.where(:course_id => course_ids)
+        if course_ids.empty?
+          enrollment_scope = enrollment_scope.none
+        else
+          enrollment_scope = enrollment_scope.where(:course_id => course_ids)
+        end
         if group_scope
           group_ids = only_contexts.select { |c| c.first == "Group" }.map(&:last)
-          group_scope = group_scope.where(:id => group_ids)
+          if group_ids.empty?
+            group_scope = group_scope.none
+          else
+            group_scope = group_scope.where(:id => group_ids)
+          end
         end
       end
       courses = enrollment_scope.select { |e| e.state_based_on_date == :active }.map(&:course).uniq

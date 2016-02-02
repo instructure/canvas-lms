@@ -602,6 +602,31 @@ describe ApplicationController do
       expect(controller.send(:ms_office?)).to eq true
     end
   end
+
+  describe "#get_all_pertinent_contexts" do
+    it "doesn't touch the database if there are no valid courses" do
+      user
+      controller.instance_variable_set(:@context, @user)
+
+      course_scope = stub('current_enrollments')
+      course_scope.stubs(:current).returns(course_scope)
+      course_scope.stubs(:shard).returns(course_scope)
+      course_scope.stubs(:preload).returns(course_scope)
+      course_scope.expects(:none).returns(Enrollment.none)
+      @user.stubs(:enrollments).returns(course_scope)
+      controller.send(:get_all_pertinent_contexts, only_contexts: 'Group_1')
+    end
+
+    it "doesn't touch the database if there are no valid groups" do
+      user
+      controller.instance_variable_set(:@context, @user)
+
+      group_scope = stub('current_groups')
+      group_scope.expects(:none).returns(Group.none)
+      @user.stubs(:current_groups).returns(group_scope)
+      controller.send(:get_all_pertinent_contexts, include_groups: true, only_contexts: 'Course_1')
+    end
+  end
 end
 
 describe WikiPagesController do
