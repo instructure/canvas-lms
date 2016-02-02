@@ -54,7 +54,7 @@
     float: left;
     height: 610px;
     width: 201px;
-    background-color: $lightBackground;
+    background-color: $ic-color-light;
     overflow-x: auto;
     overflow-y: hidden;
     padding-bottom: 15px;
@@ -72,7 +72,7 @@
     position: relative;
     border: none;
     border-radius: 0px 0px 5px 0px;
-    background-color: #fbfbfb;
+    background-color: $ic-color-light;
     .learning_outcome {
       label.span3 {
         margin-left: 0px;
@@ -129,15 +129,12 @@ ul.outcome-level {
   li {
     padding: 0;
     margin: 0;
-    background-color: $lightBackground;
     overflow: hidden;
     list-style: none;
     width: 200px;
     &:hover, &:focus {
-      outline: none;
-      a {
-        background: white;
-      }
+      background-color: $ic-bg-light-primary;
+
       i[class*=icon-] {
         background-image: url(/images/blue/canvas-icons-16x16-blue.png);
       }
@@ -146,23 +143,40 @@ ul.outcome-level {
       text-decoration: none;
       display: block;
       white-space: nowrap;
-      &:hover { background: white; }
+
       @if $use_new_styles {
         padding: $ic-sp/2 $ic-sp;
         color: $ic-font-color--subdued;
-        span { vertical-align: middle; }
+        span {
+          vertical-align: middle;
+          &:hover {
+            text-decoration: underline;
+          }
+        }
       }
       @else {
         padding: 4px 12px;
         color: #555555;
-        i[class*=icon-]:before, i[class^=icon-]:before { vertical-align: baseline; }
+        i[class*=icon-]:before, i[class^=icon-]:before {vertical-align: baseline;}
       }
     }
     &.selected {
       a {
         background-color: $ic-bg-light-primary;
+        color: $ic-color-dark;
+        position: relative;
+        &::before {
+          // adds blue border
+          content: '';
+          position: absolute;
+          left: 0;
+          top:0;
+          width: 4px;
+          height: 100%;
+          background: $ic-brand-primary;
+        }
         &:hover {
-          background-color: $activeBG;
+          background-color: $ic-bg-light-primary;
         }
       }
       &.droppable {
@@ -174,7 +188,7 @@ ul.outcome-level {
     }
     &.droppable {
       a {
-        background-color: $activeBG;
+        background-color: $ic-bg-light-primary;
       }
     }
     a.loading-more {
