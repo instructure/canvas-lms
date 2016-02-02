@@ -65,6 +65,8 @@ define([
         "correction-row": true,
         "ignore-row": assignment.please_ignore
       })
+
+      var nameEmptyError = assignmentUtils.nameEmpty(assignment) && !assignment.please_ignore
       var nameTooLongError = assignmentUtils.nameTooLong(assignment) && !assignment.please_ignore
       var nameError = assignmentUtils.notUniqueName(assignmentList, assignment) && !assignment.please_ignore
       var dueAtError = !assignment.due_at && !assignment.please_ignore
@@ -86,14 +88,15 @@ define([
         default_value = $.datetimeString(assignment.due_at, {format: 'medium'})
         place_holder = assignment.due_at ? null : I18n.t("No Due Date")
       }
-      var anyError = nameError || dueAtError || nameTooLongError
+      var anyError = nameError || dueAtError || nameTooLongError || nameEmptyError
+
       return (
         <div className={rowClass}>
           <div className="span3 input-container">
             {anyError || assignment.please_ignore ? null : <i className="success-mark icon-check" />}
             <div
               className={classnames({
-                "error-circle": nameError || nameTooLongError
+                "error-circle": nameError || nameTooLongError || nameEmptyError
               })}
             >
               <label className="screenreader-only">{I18n.t("Name Error")}</label>
@@ -109,6 +112,7 @@ define([
             />
             {nameError ? <div className="hint-text">The assignment name must be unique</div> : ""}
             {nameTooLongError ? <div className="hint-text">The name must be under 30 characters</div> : ""}
+            {nameEmptyError ? <div className="hint-text">The name must not be empty</div> : ""}
           </div>
 
           <div className="span2 date_field_container input-container assignment_correction_input">
