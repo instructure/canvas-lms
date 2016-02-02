@@ -233,5 +233,13 @@ describe AssessmentQuestion do
       expect(qq.assessment_question_version).to_not eql(qq2.assessment_question_version)
       expect(qq2.assessment_question_version).to eql(assessment_question.version_number)
     end
+
+    it "grabs the first match by ID order" do
+      # consistent ordering is good for preventing deadlocks
+      questions = []
+      3.times { questions << assessment_question.create_quiz_question(quiz.id) }
+      smallest_id_question = questions.sort_by(&:id).first
+      expect(assessment_question.find_or_create_quiz_question(quiz.id).id).to eq(smallest_id_question.id)
+    end
   end
 end

@@ -225,7 +225,7 @@ class AssessmentQuestion < ActiveRecord::Base
   end
 
   def find_or_create_quiz_question(quiz_id, exclude_ids=[])
-    query = quiz_questions.where(quiz_id: quiz_id)
+    query = quiz_questions.where(quiz_id: quiz_id).order(:id)
     query = query.where('id NOT IN (?)', exclude_ids) if exclude_ids.present?
 
     if qq = query.first

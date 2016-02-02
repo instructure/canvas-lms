@@ -34,6 +34,10 @@ describe AssessmentQuestionBank do
       @group.save
     end
 
+    after(:each) do
+      Timecop.return
+    end
+
     it "should return the desired count of questions" do
       expect(@bank.select_for_submission(@quiz.id, 0).length).to eq 0
       expect(@bank.select_for_submission(@quiz.id, 2).length).to eq 2
@@ -63,6 +67,23 @@ describe AssessmentQuestionBank do
 
       # it's possible but unlikely that shuffled version is same as original
       expect(is_shuffled1 || is_shuffled2).to be_truthy
+    end
+
+    it "shuffles _after_ iteration has happened" do
+      class FakeAq
+        attr_reader :called_at
+        def find_or_create_quiz_question(_quiz_id, _exclude_qq_ids)
+          @called_at = Time.zone.now
+          Timecop.travel(Time.zone.now + 2.seconds)
+          self
+        end
+      end
+      aqs = [FakeAq.new, FakeAq.new, FakeAq.new]
+      ordered_aqs = stub(order: aqs, pluck: [1,2,3], shuffle: aqs.shuffle)
+      AssessmentQuestion.stubs(:where).returns(ordered_aqs)
+      @bank.select_for_submission(@quiz.id, 3)
+      expect(aqs[0].called_at < aqs[1].called_at).to be_truthy
+      expect(aqs[1].called_at < aqs[2].called_at).to be_truthy
     end
   end
 
