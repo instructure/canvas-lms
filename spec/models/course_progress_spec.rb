@@ -209,7 +209,7 @@ describe CourseProgress do
         pend_with_bullet
 
         @shard1.activate { @shard_user = User.create!(name: 'outofshard') }
-        @course.enroll_student(@shard_user)
+        @course.enroll_student(@shard_user).accept!
 
         submit_homework(@assignment, @shard_user)
         submit_homework(@assignment2, @shard_user)

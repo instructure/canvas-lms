@@ -520,7 +520,7 @@ class ContextModule < ActiveRecord::Base
 
   def update_for(user, action, tag, points=nil)
     retry_count = 0
-    return nil unless self.context.users.include?(user)
+    return nil unless self.context.grants_right?(user, :participate_as_student)
     return nil unless progression = self.evaluate_for(user)
     return nil if progression.locked?
 

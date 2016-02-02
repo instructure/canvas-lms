@@ -258,7 +258,7 @@ describe ContextModule do
       course_module
       @user = User.create!(:name => "some name")
       @assignment = @course.assignments.create!(:title => "some assignment")
-      @course.enroll_student(@user)
+      @course.enroll_student(@user).accept!
       @tag = @module.add_item(:id => @assignment.id, :type => 'assignment')
       @module.completion_requirements = {@tag.id => {:type => 'must_view'}}
 
@@ -321,7 +321,7 @@ describe ContextModule do
     it "should create a completed progression for no prerequisites and no requirements" do
       course_module
       @user = User.create!(:name => "some name")
-      @course.enroll_student(@user)
+      @course.enroll_student(@user).accept!
 
       @progression = @module.evaluate_for(@user)
       expect(@progression).to be_completed
@@ -343,7 +343,7 @@ describe ContextModule do
       @module.save!
 
       @user = User.create!(:name => "some name")
-      @course.enroll_student(@user)
+      @course.enroll_student(@user).accept!
 
       @progression = @module.evaluate_for(@user)
       expect(@progression).to be_unlocked
@@ -359,7 +359,7 @@ describe ContextModule do
       @module.completion_events = [:publish_final_grade]
       @module.context = @course
       @user = User.create!(:name => "some name")
-      @course.enroll_student(@user)
+      @course.enroll_student(@user).accept!
 
       Canvas::Plugin.find!('grade_export').stubs(:enabled?).returns(true)
       @course.expects(:publish_final_grades).with(@user, @user.id).once
@@ -373,7 +373,7 @@ describe ContextModule do
       @assignment = @course.assignments.create!(:title => "some assignment")
       @tag = @module.add_item(:id => @assignment.id, :type => 'assignment')
       expect(@tag).not_to be_nil
-      @course.enroll_student(@user)
+      @course.enroll_student(@user).accept!
       @module.completion_requirements = {@tag.id => {:type => 'must_view'}}
 
       @progression = @module.evaluate_for(@user)
@@ -388,7 +388,7 @@ describe ContextModule do
       @module.save!
 
       @user = User.create!(:name => "some name")
-      @course.enroll_student(@user)
+      @course.enroll_student(@user).accept!
       @module2 = @course.context_modules.create!(:name => "another module")
       @module2.prerequisites = "module_#{@module.id}"
 
@@ -408,7 +408,7 @@ describe ContextModule do
       @module.completion_requirements = {@tag.id => {:type => 'must_view'}}
       @module.workflow_state = 'unpublished'
       @user = User.create!(:name => "some name")
-      @course.enroll_student(@user)
+      @course.enroll_student(@user).accept!
 
       @module2 = @course.context_modules.create!(:name => "another module")
       @module2.publish
@@ -427,7 +427,7 @@ describe ContextModule do
       it "should be locked if all tags are locked" do
         course_module
         @user = User.create!(:name => "some name")
-        @course.enroll_student(@user)
+        @course.enroll_student(@user).accept!
         @a1 = @course.assignments.create!(:title => "some assignment")
         @tag1 = @module.add_item({:id => @a1.id, :type => 'assignment'})
         @module.require_sequential_progress = true
@@ -456,7 +456,7 @@ describe ContextModule do
       @module.completion_requirements = {@tag.id => {:type => 'must_view'}}
       @module.save!
       @user = User.create!(:name => "some name")
-      @course.enroll_student(@user)
+      @course.enroll_student(@user).accept!
 
       @module2 = @course.context_modules.create!(:name => "another module")
       @module2.prerequisites = "module_#{@module.id}"
@@ -485,7 +485,7 @@ describe ContextModule do
       @module.completion_requirements = {@tag.id => {:type => 'must_view'}}
       @module.save!
       @student = User.create!(:name => "some name")
-      @course.enroll_student(@student)
+      @course.enroll_student(@student).accept!
 
       @module2 = @course.context_modules.create!(:name => "another module")
       @module2.prerequisites = "module_#{@module.id}"
@@ -509,7 +509,7 @@ describe ContextModule do
     it "should create an unlocked progression if there are prerequisites that are met" do
       course_module
       @user = User.create!(:name => "some name")
-      @course.enroll_student(@user)
+      @course.enroll_student(@user).accept!
       @assignment = @course.assignments.create!(:title => "some assignment")
       @module2 = @course.context_modules.create!(:name => "another module")
       @tag = @module2.add_item(:id => @assignment.id, :type => 'assignment')
@@ -527,7 +527,7 @@ describe ContextModule do
     it "should create a completed progression if there are prerequisites and requirements met" do
       course_module
       @user = User.create!(:name => "some name")
-      @course.enroll_student(@user)
+      @course.enroll_student(@user).accept!
       @assignment = @course.assignments.create!(:title => "some assignment")
       @module2 = @course.context_modules.create!(:name => "another module")
       @tag = @module2.add_item(:id => @assignment.id, :type => 'assignment')
@@ -552,7 +552,7 @@ describe ContextModule do
       @teacher = User.create!(:name => "some teacher")
       @course.enroll_teacher(@teacher)
       @user = User.create!(:name => "some name")
-      @course.enroll_student(@user)
+      @course.enroll_student(@user).accept!
 
       expect(@module.evaluate_for(@user)).to be_unlocked
       expect(@assignment.locked_for?(@user)).to eql(false)
@@ -588,7 +588,7 @@ describe ContextModule do
       @teacher = User.create!(:name => "some teacher")
       @course.enroll_teacher(@teacher)
       @user = User.create!(:name => "some name")
-      @course.enroll_student(@user)
+      @course.enroll_student(@user).accept!
 
       expect(@module.evaluate_for(@user)).to be_unlocked
       expect(@assignment.locked_for?(@user)).to eql(false)
@@ -866,7 +866,7 @@ describe ContextModule do
       @teacher = User.create!(:name => "some teacher")
       @course.enroll_teacher(@teacher)
       @user = User.create!(:name => "some name")
-      @course.enroll_student(@user)
+      @course.enroll_student(@user).accept!
 
       @progression = @module.evaluate_for(@user)
       expect(@progression).to be_unlocked
@@ -946,7 +946,7 @@ describe ContextModule do
       @teacher = User.create!(:name => "some teacher")
       @course.enroll_teacher(@teacher)
       @user = User.create!(:name => "some name")
-      @course.enroll_student(@user)
+      @course.enroll_student(@user).accept!
 
       @quiz.assignment.grade_student(@user, :grade => 100)
 
@@ -971,7 +971,7 @@ describe ContextModule do
       @teacher = User.create!(:name => "some teacher")
       @course.enroll_teacher(@teacher)
       @user = User.create!(:name => "some name")
-      @course.enroll_student(@user)
+      @course.enroll_student(@user).accept!
 
       @progression = @module.evaluate_for(@user)
       expect(@progression).to be_unlocked

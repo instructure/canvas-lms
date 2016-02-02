@@ -24,7 +24,7 @@ describe ContextModuleProgression do
     @module = @course.context_modules.create!(:name => "some module")
 
     @user = User.create!(:name => "some name")
-    @course.enroll_student(@user)
+    @course.enroll_student(@user).accept!
   end
 
   def setup_modules
