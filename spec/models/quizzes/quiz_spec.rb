@@ -94,6 +94,56 @@ describe Quizzes::Quiz do
     end
   end
 
+  describe "#update_assignment" do
+    def create_quiz_with_submission(opts)
+      @quiz = @course.quizzes.create!(opts)
+      @quiz.generate_submission(User.create!)
+    end
+
+    it "updates the assignment with new quiz values" do
+      create_quiz_with_submission(quiz_type: 'assignment')
+      @quiz.description = 'new description'
+      @quiz.title = 'new title'
+
+      @quiz.save! # should trigger update_assignment
+      @quiz.reload
+
+      a = @quiz.assignment
+      expect(a.description).to eq('new description')
+      expect(a.title).to eq('new title')
+    end
+
+    it "triggers submission updates when quiz_type changes" do
+      create_quiz_with_submission(quiz_type: 'graded_survey')
+      @quiz.expects(:destroy_related_submissions).never
+      @quiz.quiz_type = 'assignment'
+
+      @quiz.save! # should trigger update_assignment
+      @quiz.reload
+
+      # Submissions should only be destroyed for non-graded quizzes:
+      expect(@quiz.quiz_submissions.count).to eq(1)
+      expect(@quiz.quiz_submissions.first.submission).not_to be_nil
+      expect(@quiz.assignment).not_to be_nil
+      expect(Submission.count).to eq(1)
+    end
+
+    context "with change to non-graded" do
+      it "deletes related graded submissions" do
+        create_quiz_with_submission(quiz_type: 'assignment')
+        @quiz.quiz_type = 'practice_quiz'
+
+        @quiz.save! # should trigger update_assignment
+        @quiz.reload
+
+        expect(@quiz.quiz_submissions.count).to eq(1)
+        expect(@quiz.quiz_submissions.first.submission).to be_nil
+        expect(@quiz.assignment).to be_nil
+        expect(Submission.count).to eq(0)
+      end
+    end
+  end
+
   it_should_behave_like 'Canvas::DraftStateValidations'
 
   it "should infer the times if none given" do
@@ -518,7 +568,6 @@ describe Quizzes::Quiz do
   describe "#generate_submission" do
     it "should generate a valid submission for a given user" do
       u = User.create!(:name => "some user")
-      q = @course.quizzes.create!(:title => "some quiz")
       q = @course.quizzes.create!(:title => "new quiz")
       g = q.quiz_groups.create!(:name => "group 1", :pick_count => 1, :question_points => 2)
       q.quiz_questions.create!(:question_data => { :name => "test 1", }, :quiz_group => g)
@@ -542,7 +591,6 @@ describe Quizzes::Quiz do
       expect(s.quiz_version).to eql(q.version_number)
       expect(s.finished_at).to be_nil
       expect(s.submission_data).to eql({})
-
     end
 
     it "sets end_at to lock_at when end_at is nil or after lock_at" do

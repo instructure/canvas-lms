@@ -359,6 +359,15 @@ class Quizzes::Quiz < ActiveRecord::Base
     self.quiz_submissions.each { |s| s.save! }
   end
 
+  def destroy_related_submissions
+    self.quiz_submissions.each do |qs|
+      submission = qs.submission
+      qs.submission = nil
+      qs.save! if qs.changed?
+      submission.try(:destroy)
+    end
+  end
+
   attr_accessor :saved_by
 
   def update_assignment
@@ -367,21 +376,18 @@ class Quizzes::Quiz < ActiveRecord::Base
       self.context_module_tags.preload(:context_module => :content_tags).each { |tag| tag.confirm_valid_module_requirements }
     end
     if !self.graded? && (@old_assignment_id || self.last_assignment_id)
-      ::Assignment.where(:id => [@old_assignment_id, self.last_assignment_id].compact, :submission_types => 'online_quiz').update_all(:workflow_state => 'deleted', :updated_at => Time.now.utc)
-      self.quiz_submissions.each do |qs|
-        submission = qs.submission
-        qs.submission = nil
-        qs.save! if qs.changed?
-        submission.try(:destroy)
-      end
+      ::Assignment.where(
+        id: [@old_assignment_id, self.last_assignment_id].compact,
+        submission_types: 'online_quiz'
+      ).update_all(:workflow_state => 'deleted', :updated_at => Time.now.utc)
+      send_later_if_production_enqueue_args(:destroy_related_submissions, priority: Delayed::HIGH_PRIORITY)
       ::ContentTag.delete_for(::Assignment.find(@old_assignment_id)) if @old_assignment_id
       ::ContentTag.delete_for(::Assignment.find(self.last_assignment_id)) if self.last_assignment_id
     end
 
     send_later_if_production(:update_existing_submissions) if @update_existing_submissions
     if (self.assignment || @assignment_to_set) && (@assignment_id_set || self.for_assignment?) && @saved_by != :assignment
-      if !self.graded? && @old_assignment_id
-      else
+      unless !self.graded? && @old_assignment_id
         Quizzes::Quiz.where("assignment_id=? AND id<>?", self.assignment_id, self).update_all(:workflow_state => 'deleted', :assignment_id => nil, :updated_at => Time.now.utc) if self.assignment_id
         self.assignment = @assignment_to_set if @assignment_to_set && !self.assignment
         a = self.assignment
