@@ -308,7 +308,8 @@
         <td class="form-label"><label for="course_course_format"><%= before_label('course_format', %{Format}) %></label></td>
         <% format_options = [[t('#course.course_format.not_set', 'Not Set'), ''],
           [t('#course.course_format.on_campus', "On-Campus"), "on_campus"],
-          [t('#course.course_format.online', "Online"), "online"]] %>
+          [t('#course.course_format.online', "Online"), "online"],
+          [t('#course.course_format.blended', "Blended"), "blended"]] %>
         <td>
           <% if can_manage %>
             <%= f.select :course_format, format_options %>

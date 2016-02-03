@@ -751,7 +751,9 @@ class Course < ActiveRecord::Base
     self.enrollment_term = nil if self.enrollment_term.try(:root_account_id) != self.root_account_id
     self.enrollment_term ||= self.root_account.default_enrollment_term
     self.allow_student_wiki_edits = (self.default_wiki_editing_roles || "").split(',').include?('students')
-    self.course_format = nil if self.course_format && !['on_campus', 'online'].include?(self.course_format)
+    if self.course_format && !['on_campus', 'online', 'blended'].include?(self.course_format)
+      self.course_format = nil
+    end
     true
   end
 

@@ -580,7 +580,7 @@ class CoursesController < ApplicationController
   #   The grading standard id to set for the course.  If no value is provided for this argument the current grading_standard will be un-set from this course.
   #
   # @argument course[course_format] [String]
-  #   Optional. Specifies the format of the course. (Should be either 'on_campus' or 'online')
+  #   Optional. Specifies the format of the course. (Should be 'on_campus', 'online', or 'blended')
   #
   # @argument enable_sis_reactivation [Boolean]
   #   When true, will first try to re-activate a deleted course with matching sis_course_id if possible.
