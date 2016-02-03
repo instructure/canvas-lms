@@ -6379,6 +6379,7 @@ fr:
       page_title: "Aperçu de fichier"
   files_and_folder_contents_only_available_to_studen_944f9166: "Fichiers et contenu des dossiers disponibles uniquement via un lien pour les étudiants. Pas visibles dans les fichiers des étudiants."
   files_c300e900: Fichiers
+  files_quota_percentused_of_bytesavailable_used_d208857a: "Quotas de fichiers : %{percentUsed}% de %{bytesAvailable} utilisés"
   files_toolbar_2f2f0976: "Barre d’outils des fichiers"
   files_uploaded_519844ed: "Fichiers transmis"
   fill_in_the_blank_read_surrounding_text_1a6c73c7: "Remplissez les espaces vides en vous aidant du texte autour"
