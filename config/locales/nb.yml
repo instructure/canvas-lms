@@ -2864,7 +2864,7 @@ nb:
   choose_usage_rights_33683854: "Velg bruksrettigheter..."
   chosencolor_is_not_a_valid_color_5d542cc: "'%{chosenColor}' er ikke en gyldig farge."
   clear_2084585f: Tøm
-  click_for_more_details_on_this_outcome_8c018d2f: "klikk for flere opplysninger om dette utfallet"
+  click_for_more_details_on_this_outcome_8c018d2f: "klikk for flere opplysninger om dette læringsmålet"
   click_here_for_an_account_9536cb36: "Klikk her for en konto"
   click_here_it_s_free_eeccb9cb: "Klikk her, det er gratis!"
   click_here_on_the_calendar_link_c9965631: "Klikk her på *Kalender* lenken"
@@ -4178,7 +4178,7 @@ nb:
   course_name_successfully_added_48116a50: "%{course_name} vellykket lagt til!"
   course_navigation_dd035109: Kursnavigering
   course_option_links_a79d263d: "Lenker for kursvalg"
-  course_outcomes_7dc1cbc7: "Utfall av kurset"
+  course_outcomes_7dc1cbc7: "Læringsmål i kurset"
   course_pages_449f1dd4: Kurssider
   course_people_3058c948: "Personer på kurset"
   course_quizzes_c337653c: Kurs-quiz
@@ -6085,7 +6085,7 @@ nb:
   excused_5877183c: Unnskyldt!
   excused_cf8792eb: Unnskyldt
   exit_theme_editor_9ddd41bb: "Avslutt Theme Editor"
-  expand_collapse_title_outcome_group_239f0a9d: "utvide/kollaps %{title} Utfallet Gruppe"
+  expand_collapse_title_outcome_group_239f0a9d: "utvide/kollapse %{title} gruppen av læringsmål"
   expand_list_of_group_members_for_groupname_9ce9d2f7: "Utvide listen over gruppemedlemmer for %{groupName}"
   expand_or_collapse_calendars_9854b0d0: "Utvides eller skjul Kalendere"
   expand_or_collapse_undated_items_b901de09: "Utvide eller skjule Udaterte elementer"
@@ -6720,7 +6720,7 @@ nb:
       close_rubric: "Lukk vurderingsveiledning"
       close_score: Lukk
       close_score_screenreader: "Lukk resultatdetaljer"
-      collapse: "Kollapse alle lærings mestring utfalls grupper."
+      collapse: "Kollapse alle grupper tilknyttet mestringsbasert læring."
       collapse_title: Skjul
       comment_count: 
         one: "1 kommentar"
@@ -6728,7 +6728,7 @@ nb:
       comment_count_screenreader: "Les kommentarer"
       comments: Kommentarer
       disabled_for_student_view: "Resultater fra Teststudenten er ikke inkludert i karakterstatistikken."
-      expand: "Utvid alle lærings mestring utfalls grupper."
+      expand: "Utvid alle grupper tilknyttet mestringsbasert læring."
       expand_title: Utvid
       for_course: "For kurset,"
       grading_in_progress: "Faglærer arbeider med karakterene"
@@ -10127,8 +10127,8 @@ nb:
   move_dialog_select: 
     move_to_end: "-- På bunnen --"
   move_module_item_77754119: "Flytt modul/element"
-  move_outcome_ce497e6c: "Flytt Utfall"
-  move_outcome_group_cfa1a505: "Flytt Utfall Gruppe"
+  move_outcome_ce497e6c: "Flytt læringsmål"
+  move_outcome_group_cfa1a505: "Flytt gruppen av læringsmål"
   move_to_end_fef2fa15: "Flytt til ende"
   move_to_front_7eae2e90: "Flytt til forsiden"
   move_to_front_bf6f0194: "Flytt til forsiden"
@@ -10617,7 +10617,7 @@ nb:
   outcome_results: 
     outcomes_filename: Læringsmål
   outcome_results_title: "Resultater fra læringsmål"
-  outcome_title_has_a_status_of_statustooltip_82d1e6d9: "Utfall: %{title} har status av %{statusTooltip}"
+  outcome_title_has_a_status_of_statustooltip_82d1e6d9: "Læringsmål: %{title} har status som %{statusTooltip}"
   outcomes: 
     account_standards: Kontostandarder
     account_standards_description: "Til venstre kan du se standardene institusjonen din har laget for bruk i kursene dine."
@@ -11671,7 +11671,7 @@ nb:
   question_9121487: Spørsmål
   question_answered: Besvart
   question_bank: 
-    align_outcomes: "Juster resultater"
+    align_outcomes: "Juster læringsmål"
     already_bookmarked: "Allerede bokmerket"
     bookmark_failed: "Bokmerking mislyktes"
     bookmarking: "Bokmerker …"
@@ -11701,11 +11701,13 @@ nb:
     move_questions: "Flytt spørsmål"
     multiple_questions: "Flere spørsmål"
     question_bank: Spørsmålsbank
-    remove_outcome_from_bank: "Er du sikker på at du vil fjerne dette resultatet fra banken?"
+    remove_outcome_from_bank: |-
+        Er du sikker på at du vil fjerne dette læringsmålet fra
+        banken?
     title: 
       move_copy_questions: "Flytt/kopier spørsmål"
-    update_outcomes_fail: "Oppdatering av resultater mislyktes"
-    updating_outcomes: "Oppdaterer resultater …"
+    update_outcomes_fail: "Oppdatering av læringsmål mislyktes"
+    updating_outcomes: "Oppdaterer læringsmål …"
   question_banks: 
     bank_fail: "Oppretting av spørsmålsbank mislyktes."
     bank_success: "Spørsmålsbanken ble opprettet."
@@ -11749,14 +11751,14 @@ nb:
         move_questions: "Flytt flere spørsmål"
       edit_warning: "Husk at endringer i spørsmålsmaler ikke vil oppdatere prøver som allerede bruker de spørsmålene."
       headings: 
-        aligned_outcomes: "Justerte resultat"
+        aligned_outcomes: "Innrettede læringsmål"
       labels: 
         keep_copy: "Behold en kopi i denne spørsmålsbanken også"
         new_bank_name: "Nytt banknavn"
         new_question_bank: "Ny spørsmålsbank"
         title: Banknavn
       links: 
-        align_outcome: "Juster resultat"
+        align_outcome: "Innrett læringsmålet"
         more_questions: "flere spørsmål"
       loading_banks: "Laster banker …"
       mastery_threshold: "mestring på %{threshold_percentage}"
@@ -12698,7 +12700,7 @@ nb:
           fudge_points_changed_points_survey: "Siden %{user} tok denne undersøkelsen har antall oppnåelige poeng blitt endret med %{difference}. Du kan tilpasse denne endringen og manuelt legge til positive eller negative poeng med denne boksen."
           fudge_points_generic_explanation: "Du kan manuelt justere resultatet ved å legge til positive eller negative poeng i denne boksen."
           questions_need_review: "Følgende spørsmål trenger en gjennomgang"
-          quiz_score: Prøve-resultat
+          quiz_score: Prøveresultat
           score_for_attempt: "Resultat for dette forsøket"
           score_for_quiz: "Resultat for denne prøven"
           score_for_survey: "Resultat for denne undersøkelsen"
@@ -13416,7 +13418,7 @@ nb:
       header: 
         content_selection: "Utvalg av innhold"
       outcome: 
-        select_outcome: "Velg et utfall"
+        select_outcome: "Velg et læringsmål"
       student: 
         select_student: "Velg en student"
     grading: 
@@ -13445,10 +13447,10 @@ nb:
       student_info: "Informasjon om studenten"
     outcome_information: 
       avg_score: "Gjennomsnittlig resultat"
-      empty_outcome_selection: "Velg et utfall for å se mer informasjon her."
+      empty_outcome_selection: "Velg et læringsmål for å se mer informasjon her."
       high_score: "Høyeste resultat"
       low_score: "Laveste resultat"
-      outcome_info: "Utfallet Informasjon"
+      outcome_info: "Informasjon om læringsmålet"
       result_sub_count: "Totalt resultater:"
     screenreader_gradebook: 
       assignments: Oppgaver
@@ -13903,7 +13905,7 @@ nb:
         events: Hendelser
     find_outcome: 
       buttons: 
-        add_outcome: "Legg til resultat"
+        add_outcome: "Legg til læringsmål"
       labels: 
         criterion_ratings: Kriterievurderinger
         master_level: "sett mestring for et resultat på eller over"
@@ -14548,7 +14550,7 @@ nb:
     media_recordin: Medieinnspilling
     next_object: "Neste %{type}"
     no_assignment: "Ingen oppgave valgt"
-    no_outcome: "Ingen resultat valgt"
+    no_outcome: "Ingen læringsmål valgt"
     no_student: "Ingen student valgt"
     none: Ingen
     notes: Merknader
@@ -14961,7 +14963,9 @@ nb:
       Takk,
       Canvas Support
   the_module_item_is_locked_27fe420b: "Modulen element er låst."
-  the_most_recent_scores_for_user_current_user_name__ea82f0b6: "De nyligste poengsummene for brukeren %{current_user_name} og utfallet %{outcome_name}."
+  the_most_recent_scores_for_user_current_user_name__ea82f0b6: |-
+      De nyligste poengsummene for brukeren
+      %{current_user_name} og læringsmålet %{outcome_name}.
   the_profile_picture_has_been_reported_d609d6dd: "Den profilbildet har blitt rapportert"
   the_provided_academic_benchmark_file_has_an_error_4ad2c631: "Den medfølgende Academic Benchmark fil har en feil"
   the_roles_held_by_the_reporting_user_student_teach_8fa5a269: "rollene til den rapporterende brukeren (elev, lærer, admin, osv.)"
@@ -15025,8 +15029,8 @@ nb:
   this_most_likely_happened_because_you_imported_cou_a78ea880: "Dette skjedd sannsynlig mest fordi du importerte kursinnhold uten de tilknyttede filene."
   this_name_appears_in_sorted_lists_dccbd84b: "Dette navnet vises i sorterte lister."
   this_name_will_be_used_by_teachers_for_grading_9b6aa8a0: "Dette navnet vil bli brukt av lærere ved karaktersetting"
-  this_outcome_has_been_used_to_assess_a_student_and_376d5ba9: "Dette utfallet har blitt brukt til å vurdere en student og kan ikke lenger bli oppdatert"
-  this_outcome_has_been_used_to_assess_a_student_and_5a925169: "Dette utfallet har blitt brukt til å analysere en student og kan ikke redigeres eller slettes"
+  this_outcome_has_been_used_to_assess_a_student_and_376d5ba9: "Dette læringsmålet har blitt brukt til å vurdere en student og kan ikke lenger bli oppdatert"
+  this_outcome_has_been_used_to_assess_a_student_and_5a925169: "Dette læringsmålet har blitt brukt til å vurdere en student og kan ikke redigeres eller slettes"
   this_page_cannot_be_modified_because_grades_have_a_48646991: "Denne siden kan ikke endres ettersom karakterene allerede er innsendt."
   this_question_group_is_set_to_pick_more_questions__2e3552c4: "Denne spørsmålsgruppen er satt for å plukke flere spørsmål enn det som er tilgjengelig."
   this_question_will_show_a_checkbox_next_to_each_an_169cd6d9: "Dette spørsmålet vil vise en avkryssingsboks ved siden av hvert svar."
@@ -15742,7 +15746,7 @@ nb:
       none_yet: "Ingen ennå."
       page_header_title: Brukerprofil
       page_views: Sidevisninger
-      see_outcomes: "Se resultater for %{user}"
+      see_outcomes: "Se resultater på læringsmål for %{user}"
     teacher_activity: 
       crumbs: 
         interaction_report: "Student dialograpport"
@@ -16005,11 +16009,11 @@ nb:
       single_page: 
         one: "Viser 1 %{model}"
         other: "Viser alle %{count} %{model}"
-        zero: "Ingen %{model} fant"
+        zero: "Fant ingen %{model}"
       single_page_html: 
         one: "Viser <b>1</b> %{model}"
         other: "Viser <b>all&nbsp;%{count}</b> %{model}"
-        zero: "Ingen %{model} fant"
+        zero: "Fant ingen %{model}"
     page_gap: "&hellip;"
     previous_label: "8592; Forrige"
   will_unlock_unlock_date_1024c38d: "Vil låse opp %{unlock_date}"
@@ -16063,8 +16067,10 @@ nb:
   you_do_not_have_permission_to_publish_this_course_ff361c82: "Du har ikke tillatelse til å publisere dette kurset."
   you_have_changed_the_progression_requirements_for__6772bc89: "Du har endret progresjonskrav for et aktivt kurs. Det kan være elever som allerede har kommet til denne modulen, og til andre som er avhengige av det."
   you_have_made_changes_to_the_questions_in_this_qui_1658361a: "*Du har gjort endringer på spørsmål i denne prøven.* Disse endringene vil ikke vises for studentene før du lagrer prøven."
-  you_have_no_outcomes_click_here_to_create_one_ebf262a3: "Du har ingen utfall. *Klikk her* for å opprette en."
-  you_have_no_outcomes_click_here_to_go_to_the_outco_574bd0af: "Du har ingen utfall. Klikk her for å gå til utfall siden."
+  you_have_no_outcomes_click_here_to_create_one_ebf262a3: "Du har ingen læringsmål. *Klikk her* for å opprette et."
+  you_have_no_outcomes_click_here_to_go_to_the_outco_574bd0af: |-
+      Du har ingen læringsmål. Klikk her for å gå til siden for
+      læringsmål.
   you_have_reached_the_maximum_webhooks_per_account__ae9a7f83: "Du har nådd maksimalt webhooks per konto grense (%{max})"
   you_have_reached_the_maximum_webhooks_per_user_lim_2af4b256: "Du har nådd maksimalt webhooks per bruker Grense (%{max})"
   you_have_submitted_the_assignment_7ef8a51a: "Du har levert inn en oppgave"
