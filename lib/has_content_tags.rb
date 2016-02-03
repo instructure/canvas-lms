@@ -44,7 +44,12 @@ module HasContentTags
   end
 
   def locked_cache_key(user)
-    ['_locked_for2', self, user].cache_key
+    keys = ['_locked_for2', self, user]
+    unlocked_at = self.respond_to?(:unlock_at) ? self.unlock_at : nil
+    locked_at = self.respond_to?(:lock_at) ? self.lock_at : nil
+    keys << (unlocked_at ? unlocked_at > Time.zone.now : false)
+    keys << (locked_at ? locked_at < Time.zone.now : false)
+    keys.cache_key
   end
 
   def clear_locked_cache(user)
