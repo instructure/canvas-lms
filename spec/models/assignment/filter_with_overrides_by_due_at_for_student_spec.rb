@@ -29,11 +29,6 @@ describe Assignment::FilterWithOverridesByDueAtForStudent do
         @override.assignment_override_students.create!(user: @student)
       end
 
-      after :all do
-        @assignment.only_visible_to_overrides = false
-        @assignment.assignment_overrides.destroy_all
-      end
-
       context 'given that override has a due at' do
         it 'selects the assignment if the override due_at falls within the grading period' do
           @override.due_at = 2.days.from_now
@@ -89,12 +84,6 @@ describe Assignment::FilterWithOverridesByDueAtForStudent do
     context 'the assignment has one override and the override does not apply to the student' do
       before :once do
         @assignment.assignment_overrides.create!
-      end
-
-      after :all do
-        @assignment.assignment_overrides.destroy_all
-        @assignment.due_at = nil
-        @assignment.only_visible_to_overrides = false
       end
 
       context 'the assignment has a due at' do
@@ -212,10 +201,6 @@ describe Assignment::FilterWithOverridesByDueAtForStudent do
     end
 
     context 'the assignment does not have any overrides' do
-      after :all do
-        @assignment.due_at = nil
-      end
-
       context 'the assignment has a due at' do
         it 'selects the assignment if its due at falls within the grading period' do
           @assignment.due_at = 2.days.from_now
@@ -277,10 +262,6 @@ describe Assignment::FilterWithOverridesByDueAtForStudent do
         @section_override = @assignment.assignment_overrides.new
         @section_override.set = @section
         @section_override.save!
-      end
-
-      after :all do
-        @assignment.assignment_overrides.destroy_all
       end
 
       context 'both overrides have a due at' do

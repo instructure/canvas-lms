@@ -24,7 +24,7 @@ describe I18nTimeZone do
     it "should provide an array of i18n tz instances" do
       tzs = I18nTimeZone.all
       expect(tzs.first.class).to eq I18nTimeZone
-      expect(tzs.count).to eq ActiveSupport::TimeZone::MAPPING.count
+      expect(tzs.count).to eq ActiveSupport::TimeZone.all.count
     end
   end
 
