@@ -608,7 +608,7 @@ class User < ActiveRecord::Base
     @visible_groups ||= begin
       enrollments = self.cached_current_enrollments(preload_courses: true)
       visible_groups = self.current_groups.select do |group|
-        group.context_type != 'Course' || enrollments.any? { |en| en.course == group.context && (en.admin? || en.course.available?)}
+        group.context_type != 'Course' || enrollments.any? { |en| en.course == group.context && !en.inactive? && (en.admin? || en.course.available?)}
       end
     end
   end
