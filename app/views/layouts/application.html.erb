@@ -76,7 +76,7 @@
     <div id="wrapper" <% if use_new_styles? %>class="ic-app-main-layout-vertical"<% end %>>
       <% #Start new styles div %>
       <% if crumbs.length > 1 && use_new_styles? %>
-        <div class="ic-app-nav-toggle-and-crumbs">
+        <div class="ic-app-nav-toggle-and-crumbs no-print">
           <% if @show_left_side %>
             <button type="button" aria-hidden="true" id="courseMenuToggle" class="Button Button--link Button--small ic-app-course-nav-toggle" title="<%= t('Show and hide courses menu') %>"><i class="icon-hamburger"></i></button>
             <div class="ic-app-crumbs">

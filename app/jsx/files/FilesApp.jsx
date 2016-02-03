@@ -59,7 +59,7 @@ define([
           </h1>
         </header>
         {ENV.use_new_styles && (
-          <div className='ic-app-nav-toggle-and-crumbs ic-app-nav-toggle-and-crumbs--files'>
+          <div className='ic-app-nav-toggle-and-crumbs ic-app-nav-toggle-and-crumbs--files no-print'>
             <button
               className='Button Button--link Button--small ic-app-course-nav-toggle'
               type='button'
