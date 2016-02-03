@@ -24,7 +24,7 @@ define([
     },
 
     nameTooLong (a) {
-      if (a.name.length > 30){
+      if (_.unescape(a.name).length > 30){
         return true
       }
       else{

@@ -107,7 +107,7 @@ define([
               aria-label={I18n.t("Assignment Name")}
               className="input-mlarge assignment-name"
               placeholder={assignment.name ? null : I18n.t("No Assignment Name")}
-              defaultValue={assignment.name}
+              defaultValue={_.unescape(assignment.name)}
               onChange={this.updateAssignmentName}
             />
             {nameError ? <div className="hint-text">The assignment name must be unique</div> : ""}
