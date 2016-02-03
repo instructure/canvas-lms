@@ -80,14 +80,13 @@ class Course < ActiveRecord::Base
                   :organize_epub_by_content_type
 
   time_zone_attribute :time_zone
-  def time_zone_with_root_account
+  def time_zone
     if read_attribute(:time_zone)
-      time_zone_without_root_account
+      super
     else
       root_account.default_time_zone
     end
   end
-  alias_method_chain :time_zone, :root_account
 
   serialize :tab_configuration
   serialize :settings, Hash

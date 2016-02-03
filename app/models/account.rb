@@ -116,14 +116,13 @@ class Account < ActiveRecord::Base
   include TimeZoneHelper
 
   time_zone_attribute :default_time_zone, default: "America/Denver"
-  def default_time_zone_with_root_account
+  def default_time_zone
     if read_attribute(:default_time_zone) || root_account?
-      default_time_zone_without_root_account
+      super
     else
       root_account.default_time_zone
     end
   end
-  alias_method_chain :default_time_zone, :root_account
   alias_method :time_zone, :default_time_zone
 
   validates_locale :default_locale, :allow_nil => true
