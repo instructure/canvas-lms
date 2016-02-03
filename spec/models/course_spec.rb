@@ -3178,6 +3178,22 @@ describe Course, "section_visibility" do
       expect(@course.sections_visible_to(@student1)).to eq [@course.default_section]
     end
 
+    it "should ignore concluded secitions if option is given" do
+      @student1 = student_in_section(@other_section, {:active_all => true})
+      @student1.enrollments.each(&:conclude)
+
+      all_sections = @course.course_sections
+      expect(@course.sections_visible_to(@student1, all_sections, excluded_workflows: ['deleted', 'completed'])).to be_empty
+    end
+
+    it "should include concluded secitions if no options" do
+      @student1 = student_in_section(@other_section, {:active_all => true})
+      @student1.enrollments.each(&:conclude)
+
+      all_sections = @course.course_sections
+      expect(@course.sections_visible_to(@student1, all_sections)).to eq [@other_section]
+    end
+
     it "should return users from all sections" do
       expect(@course.users_visible_to(@teacher).sort_by(&:id)).to eql [@teacher, @ta, @student1, @student2, @observer]
       expect(@course.users_visible_to(@ta).sort_by(&:id)).to      eql [@teacher, @ta, @student1, @observer]

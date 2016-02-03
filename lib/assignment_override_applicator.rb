@@ -163,8 +163,16 @@ module AssignmentOverrideApplicator
   def self.section_overrides(assignment_or_quiz, user)
     context = assignment_or_quiz.context
     section_ids = RequestCache.cache(:visible_section_ids, context, user) do
-      context.sections_visible_to(user).map(&:id) +
-      context.section_visibilities_for(user).select { |v|
+      context.sections_visible_to(
+        user,
+        context.active_course_sections,
+        excluded_workflows: ['deleted', 'completed']
+      ).map(&:id) +
+
+      context.section_visibilities_for(
+        user,
+        excluded_workflows: ['deleted', 'completed']
+      ).select { |v|
         ['StudentEnrollment', 'ObserverEnrollment', 'StudentViewEnrollment'].include? v[:type]
       }.map { |v| v[:course_section_id] }.uniq
     end
