@@ -504,7 +504,7 @@ fa-IR:
           reports: 
             check_box: "گزارش ها"
           tests: 
-            check_box: "آزمون ها"
+            check_box: آزمون‌ها
     avatars: 
       all_link: 
         one: "همه %{count}"
@@ -713,7 +713,7 @@ fa-IR:
           reports: 
             check_box: "گزارش ها"
           tests: 
-            check_box: "آزمون ها"
+            check_box: آزمون‌ها
     scantron_quiz_csv_parameters: 
       account_reports: 
         edison: 
@@ -1242,6 +1242,7 @@ fa-IR:
   all_my_files_a0213441: "همه فایل‌های من"
   all_students_have_taken_the_quiz_b558f8b4: "همه دانشجویان آزمون داده اند"
   all_students_have_taken_the_survey_494f9f42: "همه دانشجویان نظرسنجی را انجام داده اند"
+  all_terms_cd27b0fb: "همه نیمسال‌ها"
   allow_lor_tools: "به کاربران اجازه داده شود ابزارهای بیرونی پیکربندی شده برای LOR را مشاهده و از آنها استفاده نمایند."
   allow_opt_out_of_inbox: "به کاربران اجازه داده شود از صندوق ورودی گفتگو انتخاب کنند. این امر همه اطلاعیه ها و پیام های گفتگو را به عنوان اطلاعیه های فوری به پست الکترونیکی اولیه کاربر ارسال خواهد کرد، نشانه پیام های خوانده نشده صندوق ورودی گفتگو در صندوق ورودی را مخفی خواهد کرد و تنظیمات دلخواه اطلاعیه گفتگو را مخفی خواهد کرد."
   always_3a59e701: همیشه
@@ -3419,7 +3420,7 @@ fa-IR:
       external_tools: "ابزارهای بیرونی"
       external_urls: "نشانی های اینترنتی بیرونی"
       files: "فایل ها"
-      quizzes: "آزمون ها"
+      quizzes: آزمون‌ها
       wiki_pages: "صفحه های ویکی"
     points_possible_short: "%{points} امتیاز"
     prerequisites_message: 
@@ -4437,7 +4438,7 @@ fa-IR:
     plugins: "افزونه ها"
     prior_users: "کاربران قبلی"
     question_banks: "مخزن های پرسش"
-    quizzes: "آزمون ها"
+    quizzes: آزمون‌ها
     registered_services: "سرویس های ثبت شده"
     revisions: "تجدید نظرها"
     rubrics: "دستورالعمل های ارزیابی"
@@ -4853,6 +4854,7 @@ fa-IR:
       new_quiz: "آزمون جدید"
     edit_crumb: ویرایش
     edit_view: 
+      allow_liking: "اجازه لایک زدن"
       allow_threaded_replies: "اجازه دادن به پاسخ های نخ کشی شده"
       attachment: پیوست
       available_from: "قابل دسترسی از طریق"
@@ -5532,6 +5534,8 @@ fa-IR:
   example_https_example_com_config_xml_be5f36ac: "مثال: https://example.com/config.xml"
   expand_or_collapse_calendars_9854b0d0: "باز کردن یا جمع کردن تقویم ها"
   expand_or_collapse_undated_items_b901de09: "باز کردن یا جمع کردن موردهای بهنگام سازی شده"
+  export_de71cd8e: صدور
+  exporting_b1eab154: "در حال صدور"
   external_apps_f5490181: "برنامه های بیرونی"
   external_content: 
     cancel: 
@@ -6147,6 +6151,7 @@ fa-IR:
       accessibility_warning: "هشدار: نمای شبکه ای دفتر نمره قابل دسترسی نیست. در عوض، برای استفاده از نمای منفرد، اینجا کلیک کنید."
       arrange_columns_by_due_date: "مرتب کردن ستون ها بر اساس تاریخ مهلت"
       arrange_columns_by_group: "مرتب کردن ستون ها بر اساس گروه تکلیف"
+      download_scores: دریافت
       export_current_gradebook: فعلی
       filter_by_student: "فیلتر کردن بر اساس نام یا شناسه ثانویه دانشجو"
       grades: "نمره ها"
@@ -6195,6 +6200,8 @@ fa-IR:
         other: "فایل ها و نظرهای ایجاد شده برای %{count} مورد ارسالی"
     out_of_final: "%{weight} از نمره نهایی"
     out_of_points_possible: "از %{points_possible}"
+    react_gradebook: 
+      download_scores: دریافت
     screenreader: 
       page_titles: "دفتر نمره: نمای منفرد"
     speed_grader: 
@@ -7109,7 +7116,7 @@ fa-IR:
         external_tools: "ابزارهای بیرونی"
         groups: "گروه های دانشجویی"
         learning_outcomes: "نتایج یادگیری"
-        quizzes: "آزمون ها"
+        quizzes: آزمون‌ها
         rubrics: "دستورالعمل های ارزیابی"
         syllabus_body: "متن سرفصل"
         wikis: "صفحه های ویکی"
@@ -7270,6 +7277,7 @@ fa-IR:
         logout_response_redirect_from_idp: "پاسخ به خروج را از IdP دریافت کرد"
         logout_response_redirect_to_idp: "ارسال درخواست خروج به IdP"
         redirect_from_idp: "پاسخ به ورود را از IdP دریافت کرد"
+  login_6f3d6249: ورود
   login_screen_83518c07: "برچسب ورود"
   low_score_4eeb95b2: "پایین: %{score}"
   lower_limit_of_range_6ddd4983: "حد پایین تر محدوده"
@@ -10897,7 +10905,7 @@ fa-IR:
     no_filters_found: "فیلتر یافت نشد"
     no_quizzes_view: 
       headers: 
-        course_quizzes: "آزمون های درس"
+        course_quizzes: "آزمو‌ن‌های درس"
       no_quizzes: "هیچ آزمونی در دسترس نیست"
     notices: 
       message_sent: "پیام ارسال شد!"
@@ -11758,6 +11766,7 @@ fa-IR:
     top_level: "-- رده بالا --"
     ? "true"
     : درست
+  quizzes_7e598f57: آزمون‌ها
   range_8760934b: "محدوده:"
   range_name_90614433: "نام محدوده"
   re_upload_submissions_form: 
@@ -11915,7 +11924,7 @@ fa-IR:
       manage_account_settings: "مدیریت تنظیمات در سطح حساب"
       manage_admin_users: "افزودن/حذف دیگر اساتید، طراح های درس یا دستیارهای آموزشی درس"
       manage_announcements: "مدیریت اطلاعیه های سراسری"
-      manage_assignments: "مدیریت (افزودن / ویرایش / حذف) تکلیف ها و آزمون ها"
+      manage_assignments: "مدیریت (افزودن / ویرایش / حذف) تکلیف‌ها و آزمون‌ها"
       manage_calendar: "افزودن، ویرایش و حذف رویدادها در تقویم درس"
       manage_canvasnet_courses: "مدیریت درس های شبکه کانواس"
       manage_content: "مدیریت کل محتوای دیگر درس"
@@ -12650,6 +12659,9 @@ fa-IR:
       needs_grading_count: 
         one: "%{count} تکلیف نیاز به نمره گذاری دارد"
         other: "%{count} تکلیف نیاز به نمره گذاری دارد"
+    menu_enrollment: 
+      labels: 
+        enrolled_as: "ثبت نام شده به عنوان"
     message_students: 
       buttons: 
         send_message: "ارسال پیام"
@@ -13023,7 +13035,7 @@ fa-IR:
         nav: 
           course: "پیمایش درس"
           group: "پیمایش گروه"
-        quizzes: "آزمون ها"
+        quizzes: آزمون‌ها
         wiki_pages: "صفحه های ویکی"
       messages: 
         loading: "درحال بارگذاری..."
@@ -13412,7 +13424,7 @@ fa-IR:
     pages: "صفحه ها"
     people: افراد
     profile: "رخ نما"
-    quizzes: "آزمون ها"
+    quizzes: آزمون‌ها
     settings: تنظیمات
     syllabus: سرفصل
     tab_location_error: "مکان این زبانه معتبر نیست"
