@@ -118,12 +118,12 @@ define [
       linkToStudentsDialog.model = @model
       linkToStudentsDialog.render().show()
 
-    inactivateUser: ->
-      return unless confirm I18n.t('Are you sure you want to inactivate this user? They will be unable to participate in the course while inactive.')
+    deactivateUser: ->
+      return unless confirm I18n.t('Are you sure you want to deactivate this user? They will be unable to participate in the course while inactive.')
       deferreds = []
       for en in @model.get('enrollments')
         if en.enrollment_state != 'inactive'
-          url = "/api/v1/courses/#{ENV.course.id}/enrollments/#{en.id}?task=inactivate"
+          url = "/api/v1/courses/#{ENV.course.id}/enrollments/#{en.id}?task=deactivate"
           en.enrollment_state = 'inactive'
           deferreds.push($.ajaxJSON(url, 'DELETE'))
 
@@ -131,9 +131,9 @@ define [
         $.when(deferreds...)
           .done =>
             @render()
-            $.flashMessage I18n.t('User successfully inactivated')
+            $.flashMessage I18n.t('User successfully deactivated')
           .fail ->
-            $.flashError I18n.t("Something went wrong inactivating the user. Please try again later.")
+            $.flashError I18n.t("Something went wrong while deactivating the user. Please try again later.")
       )
 
     reactivateUser: ->

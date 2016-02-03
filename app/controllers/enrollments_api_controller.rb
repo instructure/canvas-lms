@@ -528,12 +528,13 @@ class EnrollmentsApiController < ApplicationController
     end
   end
 
-  # @API Conclude or inactivate an enrollment
-  # Delete, conclude or inactivate an enrollment.
+  # @API Conclude or deactivate an enrollment
+  # Delete, conclude or deactivate an enrollment.
   #
-  # @argument task [String, "conclude"|"delete"|"inactivate"]
+  # @argument task [String, "conclude"|"delete"|"inactivate"|"deactivate"]
   #   The action to take on the enrollment.
   #   When inactive, a user will still appear in the course roster to admins, but be unable to participate.
+  #   ("inactivate" and "deactivate" are equivalent tasks)
   #
   # @example_request
   #   curl https://<canvas>/api/v1/courses/:course_id/enrollments/:enrollment_id \
@@ -543,21 +544,33 @@ class EnrollmentsApiController < ApplicationController
   # @returns Enrollment
   def destroy
     @enrollment = @context.enrollments.find(params[:id])
-    task = %w{conclude delete inactivate}.include?(params[:task]) ? params[:task] : 'conclude'
+    permission =
+      case params[:task]
+      when 'conclude'
+        :can_be_concluded_by
+      when 'delete', 'deactivate', 'inactivate'
+        :can_be_deleted_by
+      else
+        :can_be_concluded_by
+      end
 
-    permission = case task
-                 when 'conclude'
-                   :can_be_concluded_by
-                 when 'delete', 'inactivate'
-                   :can_be_deleted_by
-                 end
+    action =
+      case params[:task]
+      when 'conclude'
+        :conclude
+      when 'delete'
+        :destroy
+      when 'deactivate', 'inactivate'
+        :deactivate
+      else
+        :conclude
+      end
 
     unless @enrollment.send(permission, @current_user, @context, session)
       return render_unauthorized_action
     end
 
-    task = 'destroy' if task == 'delete'
-    if @enrollment.send(task)
+    if @enrollment.send(action)
       render :json => enrollment_json(@enrollment, @current_user, session)
     else
       render :json => @enrollment.errors, :status => :bad_request

@@ -167,14 +167,14 @@ describe "course people" do
       expect(driver.current_url).to include(href)
     end
 
-    it "should be able to inactivate and reactivate users" do
+    it "should be able to deactivate and reactivate users" do
       username = "user@example.com"
       student_in_course(:name => username, :active_all => true)
 
       go_to_people_page
       cog = open_kyle_menu(@student)
-      link = f('a[data-event="inactivateUser"]', cog)
-      expect(link).to include_text("Inactivate User")
+      link = f('a[data-event="deactivateUser"]', cog)
+      expect(link).to include_text("Deactivate User")
       link.click
       driver.switch_to.alert.accept
       wait_for_ajaximations

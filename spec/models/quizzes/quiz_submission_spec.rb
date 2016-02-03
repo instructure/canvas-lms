@@ -1421,12 +1421,12 @@ describe Quizzes::QuizSubmission do
       end
 
       it "does not include inactive enrollments" do
-        @active_enrollment.inactivate
+        @active_enrollment.deactivate
         expect(@quiz_submission.teachers).to_not include @active_teacher
       end
 
-      it "includes teachers that were inactivated and then later reactivated" do
-        @active_enrollment.inactivate
+      it "includes teachers that were deactivated and then later reactivated" do
+        @active_enrollment.deactivate
         @active_enrollment.reactivate
         expect(@quiz_submission.teachers).to include @active_teacher
       end

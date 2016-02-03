@@ -462,7 +462,7 @@ class Enrollment < ActiveRecord::Base
     self.save
   end
 
-  def inactivate
+  def deactivate
     self.workflow_state = "inactive"
     self.user.touch
     self.save

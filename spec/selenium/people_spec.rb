@@ -569,7 +569,7 @@ describe "people" do
       role = @course.account.roles.create(:name => role_name)
       role.base_role_type = 'TeacherEnrollment'
       role.save!
-      @enrollment.inactivate
+      @enrollment.deactivate
 
       get "/courses/#{@course.id}/users"
 

@@ -1259,27 +1259,6 @@ class Course < ActiveRecord::Base
     completed? || soft_concluded?
   end
 
-  def state_sortable
-    case state
-    when :invited
-      1
-    when :creation_pending
-      1
-    when :active
-      0
-    when :deleted
-      5
-    when :course_inactivated
-      3
-    when :rejected
-      4
-    when :completed
-      2
-    else
-      6
-    end
-  end
-
   def account_chain(include_site_admin: false)
     @account_chain ||= Account.account_chain(account_id)
     result = @account_chain.dup

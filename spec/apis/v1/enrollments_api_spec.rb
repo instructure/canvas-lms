@@ -1589,7 +1589,7 @@ describe EnrollmentsApiController, type: :request do
         @inactive_user = user_with_pseudonym(:name => "Inactive User")
         student_in_course(:course => @course, :user => @inactive_user)
         @inactive_enroll = @inactive_user.enrollments.first
-        @inactive_enroll.inactivate
+        @inactive_enroll.deactivate
       end
 
       it "excludes users with inactive enrollments for students" do
@@ -1728,8 +1728,15 @@ describe EnrollmentsApiController, type: :request do
           })
         end
 
-        it "should be able to inactivate an enrollment" do
+        it "should be able to deactivate an enrollment using the 'inactivate' task" do
           json = api_call(:delete, "#{@path}?task=inactivate", @params.merge(:task => 'inactivate'))
+          expect(json['enrollment_state']).to eq 'inactive'
+          @enrollment.reload
+          expect(@enrollment.workflow_state).to eq 'inactive'
+        end
+
+        it "should be able to deactivate an enrollment using the 'deactivate' task" do
+          json = api_call(:delete, "#{@path}?task=deactivate", @params.merge(:task => 'deactivate'))
           expect(json['enrollment_state']).to eq 'inactive'
           @enrollment.reload
           expect(@enrollment.workflow_state).to eq 'inactive'
@@ -1747,6 +1754,9 @@ describe EnrollmentsApiController, type: :request do
 
           raw_api_call(:delete, "#{@path}?task=inactivate", @params.merge(:task => 'inactivate'))
           expect(response.code).to eql '401'
+
+          raw_api_call(:delete, "#{@path}?task=deactivate", @params.merge(:task => 'deactivate'))
+          expect(response.code).to eql '401'
         end
       end
     end
@@ -1756,7 +1766,7 @@ describe EnrollmentsApiController, type: :request do
         course_with_student(:active_all => true, :user => user_with_pseudonym)
         teacher_in_course(:course => @course, :user => user_with_pseudonym)
         @enrollment = @student.enrollments.first
-        @enrollment.inactivate
+        @enrollment.deactivate
 
         @path = "/api/v1/courses/#{@course.id}/enrollments/#{@enrollment.id}/reactivate"
         @params = { :controller => 'enrollments_api', :action => 'reactivate', :course_id => @course.id.to_param,
