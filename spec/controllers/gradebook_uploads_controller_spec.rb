@@ -32,17 +32,21 @@ describe GradebookUploadsController do
     @course.reload
   end
 
-  def generate_file(include_sis_id)
+  def generate_file(include_sis_id=false)
     file = Tempfile.new("csv.csv")
     file.puts(GradebookExporter.new(@course, @teacher, :include_sis_id => include_sis_id).to_csv)
     file.close
     file
   end
 
+  def upload_gradebook_import(course, file)
+    data = Rack::Test::UploadedFile.new(file.path, 'text/csv', true)
+    post 'create', course_id: course.id, gradebook_upload: {uploaded_data: data}
+  end
+
   def check_create_response(include_sis_id=false)
     file = generate_file(include_sis_id)
-    data = Rack::Test::UploadedFile.new(file.path, 'text/csv', true)
-    post 'create', :course_id => @course.id, :gradebook_upload => {:uploaded_data => data}
+    upload_gradebook_import(@course, file)
     expect(response).to be_success
   end
 
@@ -77,23 +81,34 @@ describe GradebookUploadsController do
       assert_unauthorized
     end
 
-    it "should accept a valid csv upload" do
-      user_session(@teacher)
-      check_create_response
-    end
+    context "with authorized teacher" do
+      before(:each) { user_session(@teacher) }
 
-    it "should accept a valid csv upload with a final grade column" do
-      user_session(@teacher)
-      @course.grading_standard_id = 0
-      @course.save!
-      check_create_response
-    end
+      it "should accept a valid csv upload" do
+        check_create_response
+      end
 
-    it "should accept a valid csv upload with sis id columns" do
-      user_session(@teacher)
-      @course.grading_standard_id = 0
-      @course.save!
-      check_create_response(true)
+      it "puts the uploaded data into a durable attachment so it's recoverable" do
+        gradebook_import_file = generate_file
+        upload_gradebook_import(@course, gradebook_import_file)
+        attachment = Attachment.last
+        expect(gradebook_import_file.path).to include(attachment.filename)
+      end
+
+      context "and final grade column" do
+        before(:each) do
+          @course.grading_standard_id = 0
+          @course.save!
+        end
+
+        it "should accept a valid csv upload with a final grade column" do
+          check_create_response
+        end
+
+        it "should accept a valid csv upload with sis id columns" do
+          check_create_response(true)
+        end
+      end
     end
   end
 

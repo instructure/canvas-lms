@@ -22,12 +22,15 @@ class GradebookUpload < ActiveRecord::Base
   belongs_to :course
   belongs_to :user
   belongs_to :progress
+  has_many :attachments, as: :context, dependent: :destroy
 
   serialize :gradebook, JSON
 
-  def self.queue_from(course, user, params)
-    progress = Progress.create!(:context => course, :tag => "gradebook_upload", user: user)
-    progress.process_job(GradebookImporter, :create_from, {}, course, user, params)
+  def self.queue_from(course, user, attachment_data)
+    progress = Progress.create!(context: course, tag: "gradebook_upload", user: user)
+    gradebook_upload = GradebookUpload.create!(course: course, user: user, progress: progress)
+    gradebook_upload_attachment = gradebook_upload.attachments.create!(attachment_data)
+    progress.process_job(GradebookImporter, :create_from, {}, gradebook_upload, user, gradebook_upload_attachment)
     progress
   end
 

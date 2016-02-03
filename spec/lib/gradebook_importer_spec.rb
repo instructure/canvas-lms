@@ -21,34 +21,35 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 require 'csv'
 
 describe GradebookImporter do
+  let(:gradebook_user){ user_model }
+
   context "construction" do
+    let!(:gradebook_course){ course_model }
+
     it "should require a context, usually a course" do
-      course = course_model
       user = user_model
       progress = Progress.create!(tag: "test", context: @user)
 
       expect{GradebookImporter.new(1)}.to raise_error(ArgumentError, "Must provide a valid context for this gradebook.")
-      expect{GradebookImporter.new(course, valid_gradebook_contents, user, progress)}.not_to raise_error
+      expect{GradebookImporter.new(gradebook_course, valid_gradebook_contents, user, progress)}.not_to raise_error
     end
 
     it "should store the context and make it available" do
-      course_model
       new_gradebook_importer
       expect(@gi.context).to be_is_a(Course)
     end
 
     it "should require the contents of an upload" do
-      expect{GradebookImporter.new(course_model)}.to raise_error(ArgumentError, "Must provide CSV contents.")
+      expect{ GradebookImporter.new(gradebook_course) }.
+        to raise_error(ArgumentError, "Must provide CSV contents or attachment.")
     end
 
     it "should store the contents and make them available" do
-      course_model
       new_gradebook_importer
       expect(@gi.contents).not_to be_nil
     end
 
     it "should handle points possible being sorted in weird places" do
-      course_model
       importer_with_rows(
         'Student,ID,Section,Assignment 1,Final Score',
         '"Blend, Bill",6,My Course,-,',
@@ -60,7 +61,6 @@ describe GradebookImporter do
     end
 
     it "should handle muted line and being sorted in weird places" do
-      course_model
       importer_with_rows(
           'Student,ID,Section,Assignment 1,Final Score',
           '"Blend, Bill",6,My Course,-,',
@@ -73,9 +73,46 @@ describe GradebookImporter do
     end
 
     it "creates a GradebookUpload" do
-      course_model
       new_gradebook_importer
       expect(GradebookUpload.where(course_id: @course, user_id: @user)).not_to be_empty
+    end
+
+    context "when attachment and gradebook_upload is provided" do
+
+      let(:attachment) do
+        a = attachment_model
+        file = Tempfile.new("gradebook.csv")
+        file.puts("'Student,ID,Section,Assignment 1,Final Score'\n")
+        file.puts("\"Blend, Bill\",6,My Course,-,\n")
+        file.close
+        a.stubs(:open).returns(file)
+        return a
+      end
+
+      let(:progress){ Progress.create!(tag: "test", context: gradebook_user) }
+
+      let(:upload) do
+        GradebookUpload.create!(course: gradebook_course, user: gradebook_user, progress: progress)
+      end
+
+      let(:importer) { new_gradebook_importer(attachment, upload, gradebook_user, progress) }
+
+      it "hangs onto the provided model for streaming" do
+        expect(importer.attachment).to eq(attachment)
+      end
+
+      it "nils out contents when using an attachment (saves on memory to not parse all at once)" do
+        expect(importer.contents).to be_nil
+      end
+
+      it "keeps the provided upload rather than creating a new one" do
+        expect(importer.upload).to eq(upload)
+      end
+
+      it "sets the uploads course as the importer context" do
+        expect(importer.context).to eq(gradebook_course)
+      end
+
     end
   end
 
@@ -593,11 +630,11 @@ CSV
   end
 end
 
-def new_gradebook_importer(contents = valid_gradebook_contents)
-  @user = user_model
-  @progress = Progress.create!(tag: "test", context: @user)
+def new_gradebook_importer(contents = valid_gradebook_contents, context = @course, user = gradebook_user, progress = nil)
+  @user = user
+  @progress = progress || Progress.create!(tag: "test", context: @user)
 
-  @gi = GradebookImporter.new(@course, contents, @user, @progress)
+  @gi = GradebookImporter.new(context, contents, @user, @progress)
   @gi.parse!
   @gi
 end
@@ -611,5 +648,12 @@ def valid_gradebook_contents_with_sis_login_id
 end
 
 def importer_with_rows(*rows)
-  new_gradebook_importer(rows.join("\n"))
+  a = attachment_model
+  file = Tempfile.new("gradebook_import.csv")
+  rows.each do |row|
+    file.puts(row)
+  end
+  file.close
+  a.stubs(:open).returns(file)
+  new_gradebook_importer(a)
 end

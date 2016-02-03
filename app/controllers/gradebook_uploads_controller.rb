@@ -55,8 +55,7 @@ class GradebookUploadsController < ApplicationController
   def create
     if authorized_action(@context, @current_user, :manage_grades)
       if params[:gradebook_upload]
-        attachment = params[:gradebook_upload][:uploaded_data]
-        @progress = GradebookUpload.queue_from(@context, @current_user, attachment.read)
+        @progress = GradebookUpload.queue_from(@context, @current_user, gradebook_upload_params)
         js_env gradebook_env(@progress)
         render :show
       else
@@ -94,5 +93,9 @@ class GradebookUploadsController < ApplicationController
       course_id: @context,
       user_id: @current_user
     ).first
+  end
+
+  def gradebook_upload_params
+    strong_params.require(:gradebook_upload).permit(:uploaded_data)
   end
 end
