@@ -1,5 +1,6 @@
 # This class both creates the slickgrid instance, and acts as the data source for that instance.
 define [
+  'jsx/gradebook2/CheatDepaginator'
   'react'
   'slickgrid.long_text_editor'
   'compiled/views/KeyboardNavDialog'
@@ -50,7 +51,7 @@ define [
   'jqueryui/sortable'
   'compiled/jquery.kylemenu'
   'compiled/jquery/fixDialogButtons'
-], (React, LongTextEditor, KeyboardNavDialog, keyboardNavTemplate, Slick, TotalColumnHeaderView, round, InputFilterView, I18n, GRADEBOOK_TRANSLATIONS,
+], (cheaterDepaginate, React, LongTextEditor, KeyboardNavDialog, keyboardNavTemplate, Slick, TotalColumnHeaderView, round, InputFilterView, I18n, GRADEBOOK_TRANSLATIONS,
   $, _, Backbone, tz, GradeCalculator, userSettings, Spinner, SubmissionDetailsDialog, AssignmentGroupWeightsDialog, GradeDisplayWarningDialog, PostGradesFrameDialog,
   SubmissionCell, GradebookHeaderMenu, numberCompare, htmlEscape, PostGradesStore, PostGradesApp, columnHeaderTemplate,
   groupTotalCellTemplate, rowStudentNameTemplate, SectionMenuView, GradingPeriodMenuView, GradebookKeyboardNav, ColumnArranger) ->
@@ -103,24 +104,13 @@ define [
       else
         'students_url'
 
-      gotAllStudentsPromise = $.Deferred()
-      @gotAllAssignmentGroupsPromise = $.Deferred()
-      gotAllStudentsAndAssignmentsPromise = $.Deferred()
 
-      $.when(gotAllStudentsPromise, @gotAllAssignmentGroupsPromise).then =>
-        @gotAllAssignmentGroups()
-        @gotAllStudents()
-        gotAllStudentsAndAssignmentsPromise.resolve()
 
       @assignmentGroupsParams = { exclude_response_fields: @fieldsToExcludeFromAssignments }
       if @mgpEnabled && @gradingPeriodToShow && @gradingPeriodToShow != '0' && @gradingPeriodToShow != ''
         $.extend(@assignmentGroupsParams, {grading_period_id: @gradingPeriodToShow})
 
-      ajax_calls = [
-        $.ajaxJSON(@options[enrollmentsUrl], "GET")
-      , $.ajaxJSON(@options.assignment_groups_url, "GET", @assignmentGroupsParams, @gotAssignmentGroups)
-      , $.ajaxJSON( @options.sections_url, "GET", {}, @gotSections)
-      ]
+      @gotSectionsPromise = $.ajaxJSON( @options.sections_url, "GET", {}, @gotSections)
 
       $('li.external-tools-dialog > a[data-url], button.external-tools-dialog').on 'click keyclick', (event) ->
         postGradesDialog = new PostGradesFrameDialog({
@@ -129,35 +119,18 @@ define [
         })
         postGradesDialog.open()
 
-      # getting all the enrollments for a course via the api in the polite way
-      # is too slow, so we're going to cheat.
-      $.when(ajax_calls...)
-      .then ([students, status, xhr]) =>
-        @gotChunkOfStudents students
+      @gotAllAssignmentGroupsPromise = cheaterDepaginate(@options.assignment_groups_url, @assignmentGroupParams, @gotAssignmentGroups)
+      @gotAllAssignmentGroupsPromise.then @gotAllAssignmentGroups
 
-        paginationLinks = xhr.getResponseHeader('Link')
-        lastLink = paginationLinks.match(/<[^>]+>; *rel="last"/)
-        unless lastLink?
-          gotAllStudentsPromise.resolve()
-          return
-        lastPage = lastLink[0].match(/page=(\d+)/)[1]
-        lastPage = parseInt lastPage, 10
-        if lastPage == 1
-          gotAllStudentsPromise.resolve()
-          return
-
-        fetchEnrollments = (page) =>
-          $.ajaxJSON @options[enrollmentsUrl], "GET", {page}
-        dfds = (fetchEnrollments(page) for page in [2..lastPage])
-        $.when(dfds...).then (responses...) =>
-          if dfds.length == 1
-            @gotChunkOfStudents responses[0]
-          else
-            @gotChunkOfStudents(students) for [students, x, y] in responses
-          gotAllStudentsPromise.resolve()
+      @gotAllStudentsPromise = cheaterDepaginate(@options[enrollmentsUrl], {}, @gotChunkOfStudents)
+      @gotAllStudentsPromise.then @gotAllStudents
+      $.when(@gotAllStudentsPromise, @gotAllAssignmentGroupsPromise).then @makeDummySubmissions
 
       gotCustomColumns = @getCustomColumns()
-      @gotAllData = $.when(gotCustomColumns, gotAllStudentsAndAssignmentsPromise)
+      @gotAllData = $.when(gotCustomColumns,
+                           @gotSectionsPromise,
+                           @gotAllStudentsPromise,
+                           @gotAllAssignmentGroupsPromise)
 
       @allSubmissionsLoaded.done =>
         for c in @customColumns
@@ -273,7 +246,7 @@ define [
       @initHeader()
 
     gotAllAssignmentGroups: () =>
-      assignmentGroups = @allAssignmentGroups;
+      assignmentGroups = @allAssignmentGroups
       @assignmentGroups = {}
       @assignments      = {}
 
@@ -290,36 +263,10 @@ define [
       @postGradesStore.setGradeBookAssignments @assignments
 
 
-    gotAssignmentGroups: (assignmentGroups, xhr) =>
-      @allAssignmentGroups = [];
-
-      gotAssignmentGroupsChunk = (groups) =>
-        for group in groups
-          @allAssignmentGroups.push(group)
-
-      gotAssignmentGroupsChunk(assignmentGroups)
-
-
-      paginationLinks = xhr.getResponseHeader('Link')
-      lastLink = paginationLinks.match(/<[^>]+>; *rel="last"/)
-      unless lastLink?
-        @gotAllAssignmentGroupsPromise.resolve()
-        return
-      lastPage = lastLink[0].match(/page=(\d+)/)[1]
-      lastPage = parseInt lastPage, 10
-      if lastPage == 1
-        @gotAllAssignmentGroupsPromise.resolve()
-        return
-      agParams = @assignmentGroupsParams
-      fetchAssignmentGroupsChunk = (page) =>
-        $.ajaxJSON @options.assignment_groups_url, "GET", $.extend(agParams, {page})
-      dfds = (fetchAssignmentGroupsChunk(page) for page in [2..lastPage])
-      $.when(dfds...).then (responses...) =>
-        if dfds.length == 1
-          gotAssignmentGroupsChunk(responses[0])
-        else
-          gotAssignmentGroupsChunk(groups) for [groups, x, y] in responses
-        @gotAllAssignmentGroupsPromise.resolve()
+    gotAssignmentGroups: (assignmentGroupsChunk) =>
+      @allAssignmentGroups ||= []
+      for ag in assignmentGroupsChunk
+        @allAssignmentGroups.push ag
 
     gotSections: (sections) =>
       @sections = {}
@@ -349,11 +296,8 @@ define [
         student.sections ||= []
         student.sections.push(studentEnrollment.course_section_id)
 
-    gotAllStudents: ->
+    gotAllStudents: =>
       @withAllStudents (students) =>
-        if @mgpEnabled
-          gradingPeriods = @indexedGradingPeriods()
-          overrides = @indexedOverrides()
         #empty the array so this is idempotent, you can end up with too many rows
         @rows.length = 0
         for student_id, student of students
@@ -372,15 +316,23 @@ define [
             sectionNames: sectionNames
             alreadyEscaped: true
 
-          # fill in dummy submissions, so there's something there even if the
-          # student didn't submit anything for that assignment
-          for assignment_id, assignment of @assignments
-            student["assignment_#{assignment_id}"] ?= { assignment_id: assignment_id, user_id: student_id }
-            submission = student["assignment_#{assignment_id}"]
+          @rows.push(student)
+
+    # fill in dummy submissions, so there's something there even if the
+    # student didn't submit anything for that assignment
+    makeDummySubmissions: =>
+      if @mgpEnabled
+        gradingPeriods = @indexedGradingPeriods()
+        overrides = @indexedOverrides()
+
+      @withAllStudents (students) =>
+        for studentId, student of students
+          for assignmentId, assignment of @assignments
+            student["assignment_#{assignmentId}"] ?= { assignment_id: assignmentId, user_id: studentId }
+            submission = student["assignment_#{assignmentId}"]
             if @submissionOutsideOfGradingPeriod(submission, student, gradingPeriods, overrides)
               submission.hidden = true
               submission.outsideOfGradingPeriod = true
-          @rows.push(student)
 
     defaultSortType: 'assignment_group'
 
