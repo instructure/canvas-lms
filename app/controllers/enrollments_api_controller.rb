@@ -202,6 +202,11 @@
 #             "example": "Fall Grading Period",
 #             "type": "string"
 #           },
+#           "current_grading_period_id": {
+#             "description": "optional: The id of the currently active grading period, if one exists. If the course the enrollment belongs to does not have Multiple Grading Periods enabled, or if no currently active grading period exists, the value will be null. (applies only to student enrollments, and only available in course endpoints)",
+#             "example": 5,
+#             "type": "integer"
+#           },
 #           "current_period_computed_current_score": {
 #             "description": "optional: The student's score in the course for the current grading period, ignoring ungraded assignments. If the course the enrollment belongs to does not have Multiple Grading Periods enabled, or if no currently active grading period exists, the value will be null. (applies only to student enrollments, and only available in course endpoints)",
 #             "example": 95.80,

@@ -256,25 +256,47 @@ describe AssignmentGroupsController, type: :request do
   context "multiple grading periods" do
     before :once do
       setup_multiple_grading_periods
-
-      @api_settings = { :controller => 'assignment_groups',
-                        :action => 'index',
-                        :format => 'json',
-                        :course_id => @course.id.to_s,
-                        :grading_period_id => @gp_future.id.to_s,
-                        :include => ['assignments'] }
-      @api_path = "/api/v1/courses/#{@course.id}/assignment_groups?include[]=assignments&grading_period_id=#{@gp_future.id}"
     end
 
-    it "should only return assignments within the grading period" do
-      json = api_call(:get, @api_path, @api_settings)
-      expect(json[1]['assignments'].length).to eq 1
+    describe "#index" do
+      let(:api_path) { "api/v1/courses/#{@course.id}/assignment_groups" }
+      let(:api_settings) do
+        {
+          controller: 'assignment_groups', action: 'index', format: 'json',
+          course_id: @course.id.to_s, grading_period_id: @gp_future.id.to_s,
+          include: ['assignments']
+        }
+      end
+
+      it "should only return assignments within the grading period" do
+        json = api_call(:get, api_path, api_settings)
+        expect(json[1]['assignments'].length).to eq 1
+      end
+
+      it "should not return assignments outside the grading period" do
+        json = api_call(:get, api_path, api_settings)
+        expect(json[0]['assignments'].length).to eq 0
+      end
     end
 
-    it "should not return assignments outside the grading period" do
-      json = api_call(:get, @api_path, @api_settings)
-      expect(json[0]['assignments'].length).to eq 0
+    describe "#show" do
+      it "should only return assignments and submissions within the grading period" do
+        student = User.create!
+        @course.enroll_student(student)
+        api_path = "api/v1/courses/#{@course.id}/assignment_groups/#{@group1.id}"
+        api_settings = {
+          controller: 'assignment_groups_api', action: 'show', format: 'json',
+          course_id: @course.id, grading_period_id: @gp_future.id,
+          assignment_group_id: @group1.id, include: ['assignments', 'submission']
+        }
+        @group1_assignment_future.grade_student(student, grade: 10)
+        @group1_assignment_today.grade_student(student, grade: 8)
+        json = api_call_as_user(student, :get, api_path, api_settings)
+        expect(json["assignments"].length).to eq(1)
+        expect(json["assignments"].first["submission"]).to be_present
+      end
     end
+
   end
 
   it "should include module_ids when requested" do

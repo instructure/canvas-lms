@@ -697,6 +697,10 @@ class Enrollment < ActiveRecord::Base
     end
   end
 
+  def restrict_future_listing?
+    self.restrict_future_view? && self.course.account.restrict_student_future_listing[:value]
+  end
+
   def active?
     state_based_on_date == :active
   end
@@ -934,6 +938,15 @@ class Enrollment < ActiveRecord::Base
 
   def fake_student?
     false
+  end
+
+  def student_with_conditions?(include_future:, include_fake_student:)
+    return false unless student? || fake_student?
+    if include_fake_student
+      include_future || participating?
+    else
+      include_future ? student? : participating_student?
+    end
   end
 
   def observer?

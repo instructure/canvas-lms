@@ -97,7 +97,7 @@ class AssessmentQuestion < ActiveRecord::Base
         file = Folder.find_attachment_in_context_with_path(assessment_question_bank.context, path)
       end
       begin
-        new_file = file.clone_for(self)
+        new_file = file.try(:clone_for, self)
       rescue => e
         new_file = nil
         er_id = Canvas::Errors.capture_exception(:file_clone_during_translate_links, e)[:error_report]
@@ -225,7 +225,7 @@ class AssessmentQuestion < ActiveRecord::Base
   end
 
   def find_or_create_quiz_question(quiz_id, exclude_ids=[])
-    query = quiz_questions.where(quiz_id: quiz_id)
+    query = quiz_questions.where(quiz_id: quiz_id).order(:id)
     query = query.where('id NOT IN (?)', exclude_ids) if exclude_ids.present?
 
     if qq = query.first

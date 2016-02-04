@@ -5195,7 +5195,7 @@ mi:
       one: "Kei te tino hiahia koe ki te muku i enei 1 faaararaa? "
       other: "Kei te tino hiahia koe ki te muku i enei %{count} faaararaa?"
     confirm_delete_discussion_topic: 
-      one: "Kei te tino hiahia koe ki te muku i enei %{count} ngā kaupapa kōrero?"
+      one: "Kei te tino hiahia koe ki te muku i enei ngā kaupapa kōrero? "
       other: "Kei te tino hiahia koe ki te muku i enei %{count} ngā kaupapa kōrero?"
     create_new_crumb: "Waihanga hōu"
     default_discussion_title: "kahore taitara"
@@ -6873,7 +6873,7 @@ mi:
       done: "Mea ai! Ka mau tatou i te kōnae tukuake koe, ka piri ratou ki te kōrero poto ki te whārangi tāpaetanga o ia kaiwhakamahi mō tēnei taumahi. Ka whiwhi te ākonga i te whakamōhiotanga i honoa he kōrero hōu i."
       failures: "Object Hai! Ka mau Tātou i file tukuake pēhea koe, ka piri Ultimo ki te kōrero poto ki te whārangi tāpaetanga e every user mō this function. Ka Received te ākonga i te Notification i Linked ia kōrero new i."
       files_ignored: 
-        one: "% {count} Kōnae Waiho"
+        one: "1 Kōnae Waiho"
         other: "%{count} Kōnae Waiho"
       header: 
         ignored_files: "Waihotia te kōnae e whai ake"
@@ -8216,17 +8216,17 @@ mi:
           one: "Kua tētahi mataara kua pōreareatanga hoki koutou no te mea kua tutaki nga tikanga e whai ake nei:"
           other: "Kua tētahi mataara kua pōreareatanga hoki koutou no te mea kua tutaki nga tikanga e whai ake nei:"
         interaction_description: 
-          one: "kahore taunekeneke ngā ākonga / kaiako mō te% {count} ranei nga ra ake"
+          one: "kahore taunekeneke ngā ākonga / kaiako mō te 1 ranei nga ra ake"
           other: "kahore taunekeneke ngā ākonga / kaiako mō te %{count} ranei nga ra ake"
         subject: "Matohi: %{user_name}"
         ungraded_count_description: 
-          one: "% {count} kihai i atu ohipa māka rānei"
+          one: "1 kihai i atu ohipa māka rānei"
           other: "%{count} kihai i atu ohipa māka rānei"
         ungraded_timespan_description: 
-          one: "Tētahi, ētahi rānei tāpaetanga kua mahue Mākahia mō te% {count} ranei nga ra ake"
+          one: "Tētahi, ētahi rānei tāpaetanga kua mahue Mākahia mō te 1 ranei nga ra ake"
           other: "Tētahi, ētahi rānei tāpaetanga kua mahue Mākahia mō te %{count} ranei nga ra ake"
         usernote_description: 
-          one: "tāurunga kahore manga hautaka mō te% {count} ranei nga ra ake"
+          one: "tāurunga kahore manga hautaka mō te 1 ranei nga ra ake"
           other: "tāurunga kahore manga hautaka mō te %{count} ranei nga ra ake"
       twitter: 
         body: "Kua tētahi mataara kua pōreareatanga mō te %{student}"
@@ -8538,6 +8538,7 @@ mi:
         no_due_date: "e tika ana: Kāore he Rā whakaoti"
     assignment_due_date_override_changed: 
       email: 
+        assignment_due_date_changed: "Taumahi Nā Rā huri te: %{assignment_name}, %{course_name} (%{override})"
         assignment_due_date_changed_sentence: "Ko te rā e tika ana mo te taumahi, %{assignment_name}, mo te akoranga, %{course_name} (%{override}), kua puta ke ki te:"
         html: 
           assignment_due_date_changed: "Taumahi Nā Rā huri te: %{assignment_name}, %{course_name} (%{override})"
@@ -10623,10 +10624,10 @@ mi:
     top_level: "%{context} Top Taumata"
     user_outcome_results: 
       artifacts: 
-        one: "%{count} tao'ao"
+        one: "1 tao'ao"
         other: "%{count} tao'ao"
       attempts: 
-        one: "%{count} nganatanga"
+        one: "1 nganatanga"
         other: "%{count} nganatanga"
       attempts_from_artifacts: "%{attempts} *i %{artifacts}*"
       labels: 
@@ -11722,6 +11723,7 @@ mi:
     question_header: "Pātai #%{position} "
     question_response_count: 
       one: "Kotahi tenei pātai i whakahoki. "
+      other: "%{count} wa tenei pātai i whakahoki."
       zero: "E kore tenei pātai i whakahoki. "
     question_type: "%{type} "
     session_table_headers: 
@@ -11822,7 +11824,7 @@ mi:
       other: "%{count} meneti"
     duration_in_minutes_and_seconds: "%{minutes} me te %{seconds}"
     duration_in_seconds: 
-      one: "%{count} hēkona"
+      one: "1 hēkona"
       other: "%{count} hēkona"
     empty_question_breakdown: "Karekau he tatauranga pātai e wātea ana. "
     essay_score: "Score: %{score}"
@@ -11869,7 +11871,7 @@ mi:
     answer_comments: "whakautu ki ngā kōrero "
     answer_text: "kuputuhi Whakautu "
     assignment_points_possible: 
-      one: "%{count} pts"
+      one: "1 pts"
       other: "%{count} pts"
     at_the_bottom: "- I te raro - "
     before_quiz_item: "i mua i %{name}"
@@ -12003,7 +12005,7 @@ mi:
         server_communication_failed: "He ko te raruraru kōrero ki te tūmau. Ka ngana anō te pūnaha i roto i te rima meneti, ranei ka taea e koe tāuta anō i te whārangi "
       extensions_for_student: "Toronga mō te %{student}"
       extensions_for_students: 
-        one: "Toronga mō te% {count} ngā ākonga "
+        one: "Toronga mō te 1 ngā ākonga "
         other: "Toronga mō te %{count} ngā ākonga  "
       finished_in_duration: "mutu i roto i te %{duration} "
       time_up: "Up Time!"
@@ -12285,6 +12287,9 @@ mi:
         anonymous_username: Akonga
         buttons: 
           allow_extra_attempt: "tukua tenei ākonga ha feinga anō "
+        count_attempts_left: 
+          one: "He %{user} ngā nganatanga mahue"
+          other: "He %{user} ngā nganatanga %{count} mahue "
         default_quiz_name: "Pātaitai %{course_name} "
         default_survey_name: "Rangahau %{course_name} "
         grade_by_question_warning: "Ko te auroro i te āhuatanga pātai pānga e te mau uiraa e Riwhiriwhia ngā i roto i te rōpū. "
@@ -12505,7 +12510,7 @@ mi:
           questions: "pātai "
       question_statistic: 
         attempts: 
-          one: "%{count} nganatanga"
+          one: "1 nganatanga"
           other: "%{count} nganatanga"
         empty_response: "Urupare Putua "
         labels: 
@@ -12533,15 +12538,15 @@ mi:
         none: tetahi
         requires_lockdown: "E hiahiatia ana Pūtirotiro Respondus lockdown"
         time_limit: 
-          one: "%{count} meneti"
+          one: "1 meneti"
           other: "%{count} meneti"
         unlimited: mutunga
       quiz_right_side: 
         attempts_left: 
-          one: "%{count} nganatanga e wātea ana atu"
+          one: "1 nganatanga e wātea ana atu"
           other: "%{count} nganatanga e wātea ana atu"
         attempts_so_far: 
-          one: "%{count} Nganatanga kia tawhiti"
+          one: "1 Nganatanga kia tawhiti"
           other: "%{count} Nganatanga kia tawhiti"
         labels: 
           current_score: "Score nāianei"
@@ -12582,7 +12587,7 @@ mi:
         show_correct_answers: "Whakaaturia whakautu tika "
         shuffle_answers: "Riwhi pahonoraa "
         time_limit: 
-          one: "%{count} meneti"
+          one: "1 meneti"
           other: "%{count} meneti"
         until: Kia
         view_responses: "Tirohia ngā whakautu"
@@ -12616,7 +12621,7 @@ mi:
         survey_not_yet_taken: "Ko te rangahau e kore kua ano i tangohia. "
       quiz_summary: 
         assignment_points_possible: 
-          one: "%{count} pts"
+          one: "1 pts"
           other: "%{count} pts"
         labels: 
           allowed_attempts: "nganatanga e whakaaetia ana "
@@ -12630,12 +12635,12 @@ mi:
         no_details: "Kāore he Ngā Taipitopito "
         points_possible: "%{points_possible} tohu taea"
         question_count: 
-          one: "%{count} pātai "
+          one: "1 pātai "
           other: "%{count} pātai "
         quiz_multiple_due_dates: "Rā Maha"
         quiz_no_points: "Kāore he Piro"
         quiz_points_possible: 
-          one: "%{count} Piro"
+          one: "1 Piro"
           other: "%{count} Piro"
         student_mute_notification: "Kei te mahi Instructor i runga i ngā auroro"
         unlimited_attempts: "nganatanga mutunga"
@@ -12684,7 +12689,8 @@ mi:
         quiz_regraded_your_score_not_affected: "Kua tēnei pātaitai i te māka anō; e kore tou tapeke i pāngia."
         speed_grader: "SpeedGrader ™"
         students_submitted_so_far: 
-          one: "% tuku ngā ākonga {count} kia tae noa"
+          one: "tuku ngā 1 ākonga kia tae noa"
+          other: "tuku ngā ākonga %{count} kia tae noa"
         titles: 
           delete: Mukua
           related_items: "Tūemi e pā ana"
@@ -12798,7 +12804,7 @@ mi:
       students_who_have_taken_the_quiz: "Ngā ākonga nei i tango i te pātaitai "
     statistics: 
       count_attempts: 
-        one: "%{count} nganatanga"
+        one: "1 nganatanga"
         other: "%{count} nganatanga"
       titles: 
         submitted_users_for_quesiton: "Tāpaetia Kaiwhakamahi hoki %{user} "
@@ -12817,24 +12823,24 @@ mi:
           one: "He 1 pātai kihai i ano koutou i kite tonu e Tuku tonu?"
           other: "He %{count} pātai kihai i ano koutou i kite tonu e. Tuku tonu?"
       days_count: 
-        one: "%{count} "
-        other: "%{count} "
+        one: "1 Ra"
+        other: "%{count} Ra"
       errors: 
         connection_lost: "I ngaro hononga ki %{host}. Tēnā kia tūhono koe ki te Ipurangi i mua i tonu."
         only_numerical_values: "E whakaaetia anake ngā uara tau "
       hide_time_link: Huna
       hours_count: 
-        one: "%{count} Hours"
+        one: "1 Hours"
         other: "%{count} Hours"
       labels: 
         time_elapsed: "Wā Kua Pau"
       login_failed: "I hapa te takiurutanga."
       login_successful: "I whakaāetia te takiurutanga."
       minutes_count: 
-        one: "%{count} meneti"
+        one: "1 meneti"
         other: "%{count} meneti"
       months_count: 
-        one: "%{count} marama"
+        one: "1 marama"
         other: "%{count} marama"
       notices: 
         due_date_five_minutes_left: "E rima meneti e toe ana i mua i Quiz E Kia tohua Late "
@@ -12851,14 +12857,14 @@ mi:
       saving: "Kei te tohua"
       saving_not_needed: "No raraunga hou ki te whakaora. Takina Last i %{t}"
       seconds_count: 
-        one: "%{count} hēkona"
+        one: "1 hēkona"
         other: "%{count} hēkona"
       show_time_link: Whakaatuhia
       titles: 
         come_back_later: "Tohua e koe tenei pātai ki hoki mai ki muri "
         times_up: "ake wa o! "
       years_count: 
-        one: "%{count} tau"
+        one: "1 tau"
         other: "%{count} tau"
     timing: 
       labels: 
@@ -12898,6 +12904,9 @@ mi:
     add_folder: "Tāpiri Kōpaki"
     all_my_files: "Kōnae toku Katoa"
     cancel: Whakakore
+    confirm_delete_with_contents: 
+      one: "Kei te tino hiahia koe ki te muku i enei %{name} ngā tūemi me nga mea katoa i roto ia ratou? "
+      other: "Kei te tino hiahia koe ki te muku i enei %{count} ngā tūemi me nga mea katoa i roto ia ratou?  "
     created_at: "rā i waihangatia"
     created_at_short: "I waihangatia"
     delete: Mukua
@@ -12919,6 +12928,9 @@ mi:
     folder_name: "ingoa kōpaki "
     modified_by: "Kua whakarerekēhia e "
     move: Nuku
+    move_question: 
+      one: "E rite hea koe ki te neke i enei %{item} ngā tūemi? "
+      other: "E rite hea koe ki te neke i enei %{count} ngā tūemi?  "
     move_success: 
       one: "%{item} ngā tūemi neke ki %{destinationFolder} "
       other: "%{count} ngā tūemi neke ki %{destinationFolder} "
@@ -14018,7 +14030,8 @@ mi:
       messages: 
         locked: "Kāore e taea te huri i te rubric kua tīmata i mua ia koutou te whakamahi i te reira. "
         rubric_in_use: 
-          one: "Kia mahara ki e kua oti aromatawaihia {count} ngā ākonga% te whakamahi i tēnei rubric. Huri ka pā te reira rātou aromātai. "
+          one: "Kia mahara ki e kua oti aromatawaihia 1 ngā ākonga% te whakamahi i tēnei rubric. Huri ka pā te reira rātou aromātai. "
+          other: "Kia mahara ki e kua oti aromatawaihia %{count} ngā ākonga te whakamahi i tēnei rubric. Huri ka pā te reira rātou aromātai. "
         rubric_in_use2: "Kua oti kē tērā te koe ākonga ki tenei rubric. Tetahi tino huringa taea e pā ratou hua aromatawai. "
       out_of: "%{points} *i roto i te %{total}* "
       rubric: rubric
@@ -14434,6 +14447,9 @@ mi:
     discussion_topic: "kaupapa Aparauraa "
     external_tool: "taputapu waho "
     final_point_ratio: "%{pointRatio} ngā"
+    invalid_group_warning: 
+      one: "mōhio: e kore e score ngā ohipa i te rōpū %{list_of_group_names} no te mea kua ratou taea kahore ngā."
+      other: "mōhio: e kore e score ngā ohipa i te rōpū %{list_of_group_names} no te mea kua ratou taea kahore ngā."
     media_recordin: "tuhi pāpāho "
     next_object: "Tō muri mai %{type}"
     no_assignment: "No Taumahi tīpakohia "
@@ -14526,7 +14542,7 @@ mi:
     confirms: 
       delete_subaccount: "E tino hiahia ana koe ki te muku i tēnei hapū-pūkete? "
     courses_count: 
-      one: "%{count} Kōhi"
+      one: "1 Kōhi"
       other: "%{count} Kōhi"
     index: 
       page_header_title: "pūkete iti "
@@ -14534,10 +14550,10 @@ mi:
         sub_accounts: Pae-Hauraro
     sub_accounts: 
       account_courses: 
-        one: "%{count} Kōhi"
+        one: "1 Kōhi"
         other: "%{count} Kōhi"
       account_sub_accounts: 
-        one: "%{count} iti-Pūkete"
+        one: "1 iti-Pūkete"
         other: "%{count} iti-Pūkete"
       add_sub_accounts: "Tāpiri Sub-Pūkete "
       can_not_delete: "E kore e taea e koe te muku i te  pūkete-iti e he akoranga i roto i te reira "
@@ -14546,7 +14562,7 @@ mi:
       hide_sub_accounts: "Huna iti-pūkete "
       show_sub_accounts: "Whakaaturia iti-pūkete "
     sub_accounts_count: 
-      one: "%{count} iti-Pūkete"
+      one: "1 iti-Pūkete"
       other: "%{count} iti-Pūkete"
   subdomain_url_1e43b6f0: "subdomain URL "
   subject_reply_to: "Re: %{subject}"
@@ -14781,7 +14797,7 @@ mi:
         add: "Tāpiri Term "
         update: "Whakahōu wā"
       course_count: 
-        one: "%{count} Kōhi"
+        one: "1 Kōhi"
         other: "%{count} Kōhi"
       labels: 
         designers_can_access_from: "** Kaihoahoa ** kēne uru i "
@@ -15310,17 +15326,17 @@ mi:
     titles: 
       existing_user: "kaiwhakamahi tīariari"
     user_parsing_errors: 
-      one: "Na, i reira %{count} hapa pāhi e rārangi o ngā kaiwhakamahi."
+      one: "Na, i reira 1 hapa pāhi e rārangi o ngā kaiwhakamahi."
       other: "Na, i reira %{count} hapa pāhi e rārangi o ngā kaiwhakamahi."
     users_added: 
-      one: "%{count} kaiwhakamahi tāpiri"
+      one: "1 kaiwhakamahi tāpiri"
       other: "%{count} kaiwhakamahi tāpiri"
     users_adding_failed: "I rahua te whakauru kaiwhakamahi"
     users_existed: 
-      one: "(vai kē %{count} ngā kaiwhakamahi)"
+      one: "(vai kē 1 ngā kaiwhakamahi)"
       other: "(vai kē %{count} ngā kaiwhakamahi)"
     users_to_add: 
-      one: "Ki te haere tonu koe rite ko, ka tapiritia %{count} ngā kaiwhakamahi."
+      one: "Ki te haere tonu koe rite ko, ka tapiritia 1 ngā kaiwhakamahi."
       other: "Ki te haere tonu koe rite ko, ka tapiritia %{count} ngā kaiwhakamahi."
   user_logins: 
     buttons: 
@@ -15461,7 +15477,7 @@ mi:
     current_conference: 
       current_conference_text: "Kua karangatia ki te uru atu koe **[%{conference}](%{link_to_conference})**. Tīmata te reira i %{started_at} me he %{participant_count}."
       participant_count: 
-        one: "%{count} ngā kaiuru"
+        one: "1 ngā kaiuru"
         other: "%{count} ngā kaiuru"
     dashboard_sidebar: 
       coming_up: "haere mai Up"
@@ -15494,7 +15510,7 @@ mi:
     google_drive_added: "Google Drive pūkete pai te tāpiri!"
     grades: 
       average_grades: 
-        one: "toharite mō %{count} ngā ākonga"
+        one: "toharite mō 1 ngā ākonga"
         other: "toharite mō %{count} ngā ākonga"
       course: Kaupapa
       current_teacher_courses: "Au e Faiako ahau Kōhi"

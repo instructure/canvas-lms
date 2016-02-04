@@ -187,12 +187,12 @@ TEXT
             <% end %>
             <% unless @account.site_admin? %>
               <%= f.fields_for :settings do |settings| %>
-                <%= settings.fields_for :restrict_student_past_view do |r| %>
-                  <% hash = @account.restrict_student_past_view %>
+                <%= settings.fields_for :restrict_student_future_view do |r| %>
+                  <% hash = @account.restrict_student_future_view %>
                   <% disabled = hash[:locked] && hash[:inherited] %>
                   <tr>
                     <td colspan="2"><%= r.check_box :value, :checked => hash[:value], :disabled => disabled %>
-                      <%= r.label :restrict_student_past_view, :en => "Restrict students from viewing courses after end date" %>
+                      <%= r.label :restrict_student_future_view, :en => "Restrict students from accessing courses before start date" %>
                     </td>
                   </tr>
                   <% unless disabled %>
@@ -205,12 +205,30 @@ TEXT
                   <% end %>
                 <% end %>
 
-                <%= settings.fields_for :restrict_student_future_view do |r| %>
-                  <% hash = @account.restrict_student_future_view %>
+                <%= settings.fields_for :restrict_student_future_listing do |r| %>
+                  <% hash = @account.restrict_student_future_listing %>
+                  <% disabled = hash[:locked] && hash[:inherited] %>
+                  <tr class="future_listing">
+                    <td colspan="2"><%= r.check_box :value, :checked => hash[:value], :disabled => disabled %>
+                      <%= r.label :restrict_student_future_listing, :en => "Restrict students from viewing future courses in enrollments list" %>
+                    </td>
+                  </tr>
+                  <% unless disabled %>
+                    <tr class="future_listing">
+                      <td colspan="2" class="sub_checkbox">
+                        <%= r.check_box :locked, :checked => hash[:locked] %>
+                        <%= r.label :locked, t("Lock this setting for sub-accounts") %>
+                      </td>
+                    </tr>
+                  <% end %>
+                <% end %>
+
+                <%= settings.fields_for :restrict_student_past_view do |r| %>
+                  <% hash = @account.restrict_student_past_view %>
                   <% disabled = hash[:locked] && hash[:inherited] %>
                   <tr>
                     <td colspan="2"><%= r.check_box :value, :checked => hash[:value], :disabled => disabled %>
-                      <%= r.label :restrict_student_future_view, :en => "Restrict students from viewing courses before start date" %>
+                      <%= r.label :restrict_student_past_view, :en => "Restrict students from accessing courses after end date" %>
                     </td>
                   </tr>
                   <% unless disabled %>

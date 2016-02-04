@@ -1443,7 +1443,8 @@ describe CoursesController, type: :request do
           'current_period_computed_final_score',
           'current_period_computed_current_grade',
           'current_period_computed_final_grade',
-          'current_grading_period_title' ]
+          'current_grading_period_title',
+          'current_grading_period_id' ]
       end
 
       before(:once) do
@@ -1456,7 +1457,7 @@ describe CoursesController, type: :request do
       "and 'current_grading_period_scores' are requested" do
         json_response = courses_api_index_call(includes: ['total_scores', 'current_grading_period_scores'])
         enrollment_json = enrollment(json_response)
-        expect(enrollment_json).to include *grading_period_keys
+        expect(enrollment_json).to include(*grading_period_keys)
         current_grading_period_title = 'Course Period 2: current period'
         expect(enrollment_json['current_grading_period_title']).to eq(current_grading_period_title)
       end
@@ -1465,7 +1466,7 @@ describe CoursesController, type: :request do
       "not requested, even if 'current_grading_period_scores' are requested" do
         json_response = courses_api_index_call(includes: ['current_grading_period_scores'])
         enrollment_json = enrollment(json_response)
-        expect(enrollment_json).to_not include *grading_period_keys
+        expect(enrollment_json).to_not include(*grading_period_keys)
       end
 
       it "does not include current grading period scores if final grades are hidden, " \
@@ -1474,7 +1475,7 @@ describe CoursesController, type: :request do
         @course2.save
         json_response = courses_api_index_call(includes: ['total_scores', 'current_grading_period_scores'])
         enrollment_json = enrollment(json_response)
-        expect(enrollment_json).to_not include *grading_period_keys
+        expect(enrollment_json).to_not include(*grading_period_keys)
       end
 
       it "returns true for 'multiple_grading_periods_enabled' if the course has Multiple Grading Periods enabled" do
