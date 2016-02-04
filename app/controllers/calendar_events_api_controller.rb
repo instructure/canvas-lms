@@ -310,6 +310,8 @@ class CalendarEventsApiController < ApplicationController
     events = apply_assignment_overrides(events) if @type == :assignment
     mark_submitted_assignments(@current_user, events) if @type == :assignment
 
+    events = filter_other_sections_from_events(events)
+
     if @errors.empty?
       render :json => events.map { |event| event_json(event, @current_user, session) }
     else
@@ -601,6 +603,32 @@ class CalendarEventsApiController < ApplicationController
   end
 
   protected
+
+  def filter_other_sections_from_events(events)
+    return events if events.nil? || events.empty?
+
+    # No need to filter anyone other than TAs because Canvas
+    # already does a good job with all those users
+    return events if !@current_user
+
+    user_section_ids = []
+    @current_user.ta_enrollments.each do |e|
+      user_section_ids << e.course_section_id
+    end
+
+    # Also relying on Canvas' built-in filtering in the event
+    # of no TA (coach) enrollments found because we want to use
+    # other rolls for other purposes like general administration
+    return events if user_section_ids.empty?
+
+    filtered_events = []
+    events.each do |event|
+      unless event.context_type == 'CourseSection' && !user_section_ids.include?(event.context_id)
+        filtered_events << event
+      end
+    end
+    filtered_events
+  end
 
   def get_calendar_context
     @context = Context.find_by_asset_string(params[:calendar_event].delete(:context_code)) if params[:calendar_event] && params[:calendar_event][:context_code]
