@@ -42,7 +42,7 @@ cite {
   font-style: normal;
 }
 .lead {
-  margin-bottom: $ic-line-height;
+  margin-bottom: $ic-sp;
   @include fontSize($ic-font-size);
   font-weight: 200;
   line-height: $ic-line-height * 1.5;
@@ -68,7 +68,7 @@ a.text-success:hover { color: darken($ic-color-success, 10%); }
 ///////==============
 
 h1, h2, h3, h4, h5, h6 {
-  margin: ($ic-line-height / 2) 0;
+  margin: $ic-sp/2 0;
   font-family: $ic-font-family;
   font-weight: $ic-font-weight;
   line-height: $ic-line-height;
@@ -112,7 +112,7 @@ h3, .h3 {
 }
 
 .page-header {
-  padding-bottom: ($ic-line-height / 2) - 1;
+  padding-bottom: ($ic-sp / 2);
   margin: 20px 0 30px;
   border-bottom: 1px solid $ic-border-color;
 }
