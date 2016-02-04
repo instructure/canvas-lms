@@ -468,6 +468,12 @@ describe CalendarEvent do
         expect(reservation.messages_sent["Appointment Reserved By User"].map(&:user_id).sort.uniq).to eql @course.instructors.map(&:id).sort
       end
 
+      it "should notify admins when a user reserves a group appointment" do
+        reservation = @appointment2.reserve_for(@group, @student1)
+        expect(reservation.messages_sent).to be_include("Appointment Reserved By User")
+        expect(reservation.messages_sent["Appointment Reserved By User"].map(&:user_id).sort.uniq).to eql @course.instructors.map(&:id).sort
+      end
+
       it "should notify admins when a user cancels", priority: "1", test_id: 193147 do
         reservation = @appointment.reserve_for(@student1, @student1)
         reservation.updating_user = @student1
