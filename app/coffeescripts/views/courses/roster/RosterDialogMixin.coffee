@@ -11,7 +11,7 @@ define [
 
     updateEnrollments: (addEnrollments, removeEnrollments) ->
       enrollments = @model.get 'enrollments'
-      enrollments.push(en) for en in addEnrollments
+      enrollments = enrollments.concat(addEnrollments)
       removeIds = _.pluck removeEnrollments, 'id'
       enrollments = _.reject enrollments, (en) -> _.include removeIds, en.id
       sectionIds = _.pluck enrollments, 'course_section_id'

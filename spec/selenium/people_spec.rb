@@ -519,8 +519,19 @@ describe "people" do
       admin_logged_in
     end
 
-    it "should not let observers have their roles changed" do
+    it "should let observers have their roles changed if they don't have associated users" do
       @course.enroll_user(@teacher, "ObserverEnrollment", :allow_multiple_enrollments => true)
+
+      get "/courses/#{@course.id}/users"
+
+      open_dropdown_menu("#user_#{@teacher.id}")
+      expect(dropdown_item_exists?('editRoles', "#user_#{@teacher.id}")).to be true
+    end
+
+    it "should not let observers with associated users have their roles changed" do
+      student = user
+      @course.enroll_student(student)
+      @course.enroll_user(@teacher, "ObserverEnrollment", :allow_multiple_enrollments => true, :associated_user_id => student.id)
 
       get "/courses/#{@course.id}/users"
 
@@ -533,14 +544,14 @@ describe "people" do
       f("#user_#{user.id} .admin-links a[data-event='editRoles']").click
     end
 
-    it "should not let users change to an observer role" do
+    it "should let users change to an observer role" do
       get "/courses/#{@course.id}/users"
 
       open_role_dialog(@teacher)
 
       expect(f("#edit_roles #role_id option[selected]")).to include_text("Teacher")
       expect(f("#edit_roles #role_id option[value='#{student_role.id}']")).to be_present
-      expect(f("#edit_roles #role_id option[value='#{observer_role.id}']")).to be_nil
+      expect(f("#edit_roles #role_id option[value='#{observer_role.id}']")).to be_present
     end
 
     it "should not let users change to a type they don't have permission to manage" do
