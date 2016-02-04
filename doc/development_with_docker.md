@@ -208,7 +208,7 @@ $ open vnc://secret:secret@selenium.docker/
 
 ## Troubleshooting
 
-If you are having trouble running the `web` or `kinesis` containers, make sure that permissions on the directory are permissive.  You can try the owner change (less disruptive):
+If you are having trouble running the `web` container, make sure that permissions on the directory are permissive.  You can try the owner change (less disruptive):
 
 ```
 chown -R 1000:1000 canvas-lms

@@ -29,12 +29,7 @@ consul:
 #    - "5900:5900"
 
 kinesis:
-  build: ./docker-compose/kinesalite
-  command: "--path /var/lib/kinesalite"
-  volumes:
-    - "./tmp/cache:/var/lib/kinesalite"
-  ports:
-    - "4567:4567"
+  image: instructure/kinesalite
   environment:
     VIRTUAL_HOST: kinesis.docker
     VIRTUAL_PORT: 4567
