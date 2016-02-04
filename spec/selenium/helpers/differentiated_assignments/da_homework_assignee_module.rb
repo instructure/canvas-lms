@@ -1,4 +1,4 @@
-module SelectiveRelease
+module DifferentiatedAssignments
   module HomeworkAssignee
 
     module Group

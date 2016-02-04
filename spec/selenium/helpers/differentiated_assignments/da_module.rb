@@ -1,19 +1,19 @@
-require_relative 'selective_release_sections_module'
-require_relative 'selective_release_users_module'
-require_relative 'selective_release_homework_module'
-require_relative 'selective_release_course_modules_module'
+require_relative 'da_sections_module'
+require_relative 'da_users_module'
+require_relative 'da_homework_module'
+require_relative 'da_course_modules_module'
 
-# Selective Release is AKA Differentiated Assignments
-module SelectiveRelease
+# Differentiated Assignments is AKA Selective Release
+module DifferentiatedAssignments
   class << self
     attr_reader :the_course
 
     def initialize
       @the_course = create_course
-      SelectiveRelease::Sections.initialize
-      SelectiveRelease::Users.initialize
-      SelectiveRelease::Homework.initialize
-      SelectiveRelease::CourseModules.initialize
+      DifferentiatedAssignments::Sections.initialize
+      DifferentiatedAssignments::Users.initialize
+      DifferentiatedAssignments::Homework.initialize
+      DifferentiatedAssignments::CourseModules.initialize
     end
 
     private
@@ -32,7 +32,7 @@ module SelectiveRelease
     class << self
 
       def course_home_page
-        "/courses/#{SelectiveRelease.the_course.id}"
+        "/courses/#{DifferentiatedAssignments.the_course.id}"
       end
 
       def quiz_show_page(quiz)

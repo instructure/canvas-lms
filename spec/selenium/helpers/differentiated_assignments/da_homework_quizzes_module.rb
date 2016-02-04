@@ -1,6 +1,6 @@
-require_relative 'selective_release_quiz'
+require_relative 'da_quiz'
 
-module SelectiveRelease
+module DifferentiatedAssignments
   module Homework
     module Quizzes
       class << self
@@ -34,7 +34,7 @@ module SelectiveRelease
         private
 
           def create_quiz_for(assignee)
-            SelectiveRelease::Quiz.new(assignee)
+            DifferentiatedAssignments::Quiz.new(assignee)
           end
 
           def assign_quiz_overrides
@@ -42,14 +42,15 @@ module SelectiveRelease
           end
 
           def submit_quizzes
-            self.quiz_for_everyone.submit_as(SelectiveRelease::Users.first_student)
-            self.quiz_for_section_a.submit_as(SelectiveRelease::Users.first_student)
-            self.quiz_for_section_b.submit_as(SelectiveRelease::Users.second_student)
-            self.quiz_for_section_c.submit_as(SelectiveRelease::Users.fourth_student)
-            self.quiz_for_sections_a_and_b.submit_as(SelectiveRelease::Users.third_student)
-            self.quiz_for_first_student.submit_as(SelectiveRelease::Users.first_student)
-            self.quiz_for_second_and_third_students.submit_as(SelectiveRelease::Users.second_student)
-            self.quiz_for_second_and_third_students.submit_as(SelectiveRelease::Users.third_student)
+            users = DifferentiatedAssignments::Users
+            self.quiz_for_everyone.submit_as(users.first_student)
+            self.quiz_for_section_a.submit_as(users.first_student)
+            self.quiz_for_section_b.submit_as(users.second_student)
+            self.quiz_for_section_c.submit_as(users.fourth_student)
+            self.quiz_for_sections_a_and_b.submit_as(users.third_student)
+            self.quiz_for_first_student.submit_as(users.first_student)
+            self.quiz_for_second_and_third_students.submit_as(users.second_student)
+            self.quiz_for_second_and_third_students.submit_as(users.third_student)
           end
       end
     end

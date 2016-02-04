@@ -1,7 +1,7 @@
-require_relative '../../helpers/selective_release/selective_release_common'
+require_relative '../../helpers/differentiated_assignments/da_common'
 
-describe 'Viewing selective release assignments' do
-  include_context 'selective release'
+describe 'Viewing differentiated assignments' do
+  include_context 'differentiated assignments'
 
   context 'as the first student' do
     before(:each) { login_as(users.first_student) }

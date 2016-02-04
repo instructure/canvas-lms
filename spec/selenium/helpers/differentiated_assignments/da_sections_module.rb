@@ -1,4 +1,4 @@
-module SelectiveRelease
+module DifferentiatedAssignments
   module Sections
     class << self
       attr_reader :section_a, :section_b, :section_c
@@ -12,7 +12,7 @@ module SelectiveRelease
       private
 
         def create_section(section_name)
-          SelectiveRelease.the_course.course_sections.create!(name: section_name)
+          DifferentiatedAssignments.the_course.course_sections.create!(name: section_name)
         end
     end
   end

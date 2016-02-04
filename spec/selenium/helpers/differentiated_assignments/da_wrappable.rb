@@ -1,7 +1,7 @@
-require_relative 'selective_release_homework_assignee_module'
+require_relative 'da_homework_assignee_module'
 
-module SelectiveRelease
-  module SelectiveReleaseWrappable
+module DifferentiatedAssignments
+  module DifferentiatedAssignmentsWrappable
     include HomeworkAssignee
 
     attr_reader :assignees
@@ -42,11 +42,11 @@ module SelectiveRelease
       end
 
       def validate_assignees
-        (SelectiveRelease::HomeworkAssignee::ASSIGNEES & self.assignees).empty?
+        (DifferentiatedAssignments::HomeworkAssignee::ASSIGNEES & self.assignees).empty?
       end
 
       def assign_to(assignee)
-        users = SelectiveRelease::Users
+        users = DifferentiatedAssignments::Users
         super(user: users.student(assignee)) if HomeworkAssignee::Student::ALL.include? assignee
         super(section: users.section(assignee)) if HomeworkAssignee::Section::ALL.include? assignee
         super(group: users.group(assignee)) if HomeworkAssignee::Group::ALL.include? assignee

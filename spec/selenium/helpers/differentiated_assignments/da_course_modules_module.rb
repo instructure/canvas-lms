@@ -1,6 +1,6 @@
 require_relative '../spec_components/spec_components_course_module'
 
-module SelectiveRelease
+module DifferentiatedAssignments
   module CourseModules
     class << self
       attr_reader :first_module, :second_module, :third_module, :fourth_module
@@ -16,21 +16,21 @@ module SelectiveRelease
       private
 
         def create_course_module(module_name)
-          SpecComponents::CourseModule.new(SelectiveRelease.the_course, module_name)
+          SpecComponents::CourseModule.new(DifferentiatedAssignments.the_course, module_name)
         end
 
         def add_assignments_to_modules
-          assignments = SelectiveRelease::Homework::Assignments
+          assignments = DifferentiatedAssignments::Homework::Assignments
           self.first_module.add_assignment(assignments.assignment_for_section_a)
           self.first_module.add_assignment(assignments.assignment_for_section_b)
           self.first_module.add_assignment(assignments.assignment_for_first_student)
 
-          quizzes = SelectiveRelease::Homework::Quizzes
+          quizzes = DifferentiatedAssignments::Homework::Quizzes
           self.second_module.add_quiz(quizzes.quiz_for_section_a)
           self.second_module.add_quiz(quizzes.quiz_for_section_b)
           self.second_module.add_quiz(quizzes.quiz_for_second_and_third_students)
 
-          discussions = SelectiveRelease::Homework::Discussions
+          discussions = DifferentiatedAssignments::Homework::Discussions
           self.third_module.add_discussion(discussions.discussion_for_section_a)
           self.third_module.add_discussion(discussions.discussion_for_section_b)
           self.third_module.add_discussion(discussions.discussion_for_first_student)

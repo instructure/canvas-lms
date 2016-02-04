@@ -1,6 +1,6 @@
-require_relative 'selective_release_assignment'
+require_relative 'da_assignment'
 
-module SelectiveRelease
+module DifferentiatedAssignments
   module Homework
     module Assignments
       class << self
@@ -36,7 +36,7 @@ module SelectiveRelease
         private
 
           def create_assignment_for(assignee)
-            SelectiveRelease::Assignment.new(assignee)
+            DifferentiatedAssignments::Assignment.new(assignee)
           end
 
           def assign_assignment_overrides
@@ -44,14 +44,15 @@ module SelectiveRelease
           end
 
           def submit_assignments
-            self.assignment_for_everyone.submit_as(SelectiveRelease::Users.first_student)
-            self.assignment_for_section_a.submit_as(SelectiveRelease::Users.first_student)
-            self.assignment_for_section_b.submit_as(SelectiveRelease::Users.second_student)
-            self.assignment_for_sections_a_and_b.submit_as(SelectiveRelease::Users.third_student)
-            self.assignment_for_section_c.submit_as(SelectiveRelease::Users.fourth_student)
-            self.assignment_for_first_student.submit_as(SelectiveRelease::Users.first_student)
-            self.assignment_for_second_and_third_students.submit_as(SelectiveRelease::Users.second_student)
-            self.assignment_for_second_and_third_students.submit_as(SelectiveRelease::Users.third_student)
+            users = DifferentiatedAssignments::Users
+            self.assignment_for_everyone.submit_as(users.first_student)
+            self.assignment_for_section_a.submit_as(users.first_student)
+            self.assignment_for_section_b.submit_as(users.second_student)
+            self.assignment_for_sections_a_and_b.submit_as(users.third_student)
+            self.assignment_for_section_c.submit_as(users.fourth_student)
+            self.assignment_for_first_student.submit_as(users.first_student)
+            self.assignment_for_second_and_third_students.submit_as(users.second_student)
+            self.assignment_for_second_and_third_students.submit_as(users.third_student)
           end
       end
     end

@@ -1,6 +1,6 @@
-require_relative 'selective_release_homework_assignee_module'
+require_relative 'da_homework_assignee_module'
 
-module SelectiveRelease
+module DifferentiatedAssignments
   module Users
     class << self
       attr_reader :first_student, :second_student, :third_student, :fourth_student, :teacher,
@@ -24,35 +24,35 @@ module SelectiveRelease
       def student(homework_assignee)
         case homework_assignee
         when HomeworkAssignee::Student::FIRST_STUDENT
-          SelectiveRelease::Users.first_student
+          DifferentiatedAssignments::Users.first_student
         when HomeworkAssignee::Student::SECOND_STUDENT
-          SelectiveRelease::Users.second_student
+          DifferentiatedAssignments::Users.second_student
         when HomeworkAssignee::Student::THIRD_STUDENT
-          SelectiveRelease::Users.third_student
+          DifferentiatedAssignments::Users.third_student
         when HomeworkAssignee::Student::FOURTH_STUDENT
-          SelectiveRelease::Users.fourth_student
+          DifferentiatedAssignments::Users.fourth_student
         end
       end
 
       def section(homework_assignee)
         case homework_assignee
         when HomeworkAssignee::Section::SECTION_A
-          SelectiveRelease::Sections.section_a
+          DifferentiatedAssignments::Sections.section_a
         when HomeworkAssignee::Section::SECTION_B
-          SelectiveRelease::Sections.section_b
+          DifferentiatedAssignments::Sections.section_b
         when HomeworkAssignee::Section::SECTION_C
-          SelectiveRelease::Sections.section_c
+          DifferentiatedAssignments::Sections.section_c
         end
       end
 
       def group(homework_assignee)
         case homework_assignee
         when HomeworkAssignee::Group::GROUP_X
-          SelectiveRelease::Users.student_group_x
+          DifferentiatedAssignments::Users.student_group_x
         when HomeworkAssignee::Group::GROUP_Y
-          SelectiveRelease::Users.student_group_y
+          DifferentiatedAssignments::Users.student_group_y
         when HomeworkAssignee::Group::GROUP_Z
-          SelectiveRelease::Users.student_group_z
+          DifferentiatedAssignments::Users.student_group_z
         end
       end
 
@@ -63,7 +63,7 @@ module SelectiveRelease
         end
 
         def create_student_group(group_name)
-          SelectiveRelease.the_course.groups.create!(name: group_name)
+          DifferentiatedAssignments.the_course.groups.create!(name: group_name)
         end
 
         def enroll_users
@@ -74,11 +74,11 @@ module SelectiveRelease
         end
 
         def enroll_teacher
-          SelectiveRelease.the_course.enroll_teacher(teacher).accept!
+          DifferentiatedAssignments.the_course.enroll_teacher(teacher).accept!
         end
 
         def enroll_ta
-          SelectiveRelease.the_course.enroll_ta(ta).accept!
+          DifferentiatedAssignments.the_course.enroll_ta(ta).accept!
         end
 
         def enroll_students
@@ -114,19 +114,19 @@ module SelectiveRelease
         end
 
         def enroll_student_in_section_a(student)
-          enroll_student_in_section(student, SelectiveRelease::Sections.section_a)
+          enroll_student_in_section(student, DifferentiatedAssignments::Sections.section_a)
         end
 
         def enroll_student_in_section_b(student)
-          enroll_student_in_section(student, SelectiveRelease::Sections.section_b)
+          enroll_student_in_section(student, DifferentiatedAssignments::Sections.section_b)
         end
 
         def enroll_student_in_section_c(student)
-          enroll_student_in_section(student, SelectiveRelease::Sections.section_c)
+          enroll_student_in_section(student, DifferentiatedAssignments::Sections.section_c)
         end
 
         def enroll_student_in_section(student, section)
-          SelectiveRelease.the_course.self_enroll_student(
+          DifferentiatedAssignments.the_course.self_enroll_student(
             student,
             section: section,
             allow_multiple_enrollments: true
@@ -155,7 +155,7 @@ module SelectiveRelease
         end
 
         def enroll_observer(an_observer, student_to_observe)
-          SelectiveRelease.the_course.enroll_user(
+          DifferentiatedAssignments.the_course.enroll_user(
             an_observer,
             'ObserverEnrollment',
             enrollment_state: 'active',
