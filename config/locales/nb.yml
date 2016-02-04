@@ -73,6 +73,7 @@ nb:
   accepted_formats_svg_png_jpg_gif_f793e4bc: "Godkjente formater: svg, png, jpg, gif"
   accepted_user_role_type_course_course_2ce91589: "Godtatt: %{user}, %{role_type}, kurs, %{course}"
   access_token_is_valid_until_d2f048cf: "Tilgangstoken er gyldig frem til"
+  access_tokens_can_be_used_to_allow_other_applicati_16c4a3ab: "Tilgangsnøkler kan brukes for å tillate andre applikasjoner til å gjøre API-oppkall på dine vegne. Du kan også generere tilgangsnøkler og bruke *Canvas Open API* for å finne på dine egne integrasjoner."
   accordion_section_1_7888782d: "Accordion-seksjon 1"
   accordion_section_2_e1812997: "Accordion-seksjon 2"
   accordion_section_3_96861901: "Accordion-seksjon 3"
@@ -1838,10 +1839,11 @@ nb:
         one: "1 Re-innlevering som ikke er rettet"
         other: "%{count} Ikke rettede innleveringer som er levert på nytt"
       reupload_instructions: |-
-          Hvis du har gjort endringer på studentenes innleverte filer som du har lastet ned tidligere, bare zip dem tilbake og laste opp zip med skjemaet nedenfor.
-          Studentene vil se de modifiserte filene i kommentarfeltet for innlevering.
+          Hvis du har gjort endringer til innleveringene du lastet ned
+          tidligere, zip filene sammen igjen og last opp zip-filen sammen med skjema nedenfor.
+          Studentene vil se de modifiserte filene i kommentarene til innleveringen.
           
-          *Pass på at du ikke endrer navnene på innleverte filer slik at vi kan gjenkjenne dem.*
+          *Vær sikker på at du ikke endrer navnene på innleveringene så vi kan kjenne de igjen.*
       speed_grader: SpeedGrader™
       titles: 
         related_items: "Relaterte elementer"
