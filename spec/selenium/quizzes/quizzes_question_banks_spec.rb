@@ -359,5 +359,35 @@ describe 'quizzes question banks' do
       get "/courses/#{@course.id}/question_banks/#{@bank.id}"
       expect(f('#unauthorized_message')).to be_displayed
     end
+
+    it "should move paginated questions in a question bank from one bank to another", priority: "2", test_id: 312864 do
+      @context = @course
+      source_bank = @course.assessment_question_banks.create!(title: 'Source Bank')
+      target_bank = @course.assessment_question_banks.create!(title: 'Target Bank')
+      @q = quiz_model
+      assessment_question = []
+      @quiz_question = []
+      answers = [ {'id' => 1}, {'id' => 2}, {'id' => 3} ]
+      51.times do |o|
+        assessment_question[o] = source_bank.assessment_questions.create!
+        @quiz_question.push(@q.quiz_questions.create!(question_data:
+                                                   {name: "question #{o}", question_type: 'multiple_choice_question',
+                                                   'answers' => answers, points_possible: 1},
+                                                      assessment_question: assessment_question[o]))
+
+      end
+      get "/courses/#{@course.id}/question_banks/#{source_bank.id}"
+      f('.more_questions_link').click
+      wait_for_ajaximations
+      f("#question_teaser_#{assessment_question[50].id} .move_question_link").click
+      f("#question_bank_#{target_bank.id}").click
+      f('input[type=checkbox][name=copy]').click
+      submit_dialog('#move_question_dialog', '.submit_button')
+      wait_for_ajaximations
+      refresh_page
+      expect(f('.more_questions_link')).not_to be_present
+      expect(source_bank.assessment_question_count).to eq(50)
+      expect(target_bank.assessment_question_count).to eq(1)
+    end
   end
 end

@@ -297,6 +297,19 @@ describe 'quizzes question creation' do
       expect(f("#question_#{quiz.quiz_questions[0].id}")).to be_displayed
     end
 
+    it "should change example value on clicking the 'recompute' button when creating formula questions", priority: "2", test_id: 324919 do
+      start_quiz_question
+      click_option('.question_form:visible .question_type', 'Formula Question')
+      wait_for_ajaximations
+      type_in_tiny '.question:visible textarea.question_content', '5 + [x] = 10'
+      wait_for_ajaximations
+      replace_content(f('input[type =text][name =min]'), '4')
+      replace_content(f('input[type =text][name =max]'), '8')
+      previous_example_value = f('.value').text
+      f('.recompute_variables').click
+      expect(previous_example_value).not_to eq(f('.value').text)
+    end
+
     # Essay Question
     it 'creates a basic essay question', priority: "1", test_id: 201946 do
       quiz = @last_quiz
@@ -354,6 +367,19 @@ describe 'quizzes question creation' do
       wait_for_ajaximations
       expect(question).to be_displayed
       assert_error_box(".question_form:visible input[name='question_points']")
+    end
+
+    it "should show an error when the quiz question exceeds character limit", priority: "2", test_id: 140672 do
+      start_quiz_question
+      chars = [*('a'..'z')]
+      value = (0..16385).map{chars.sample}.join
+      type_in_tiny '.question:visible textarea.question_content', value
+      wait_for_ajaximations
+      f('.submit_button').click
+      wait_for_ajaximations
+      error_boxes = driver.execute_script("return $('.errorBox').filter('[id!=error_box_template]').toArray();")
+      visboxes, _hidboxes = error_boxes.partition { |eb| eb.displayed? }
+      expect(visboxes.first.text).to eq "question text is too long, max length is 16384 characters"
     end
   end
 
