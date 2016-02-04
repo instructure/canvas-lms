@@ -2,7 +2,6 @@
 // you should put it in its own css file named after
 // the React Component you're using it in.
 
-
 $ef-thumbnail-size: 36px;
 
 
@@ -105,18 +104,18 @@ body.files {
 
     .tree {
       margin: 10px;
-
+      @include fontSize($ic-font-size);
       li {
         a {
-        display: flex;
-
-        i {
-          flex: 0 0 auto;
-        }
-
-        span {
-          flex: 1 1 auto;
-        }
+          display: flex;
+          align-items: center; // so icons et all, align vertically
+          padding: 2px;
+          i {
+            flex: 0 0 auto;
+          }
+          span {
+            flex: 1 1 auto;
+          }
         }
       }
     }
@@ -187,7 +186,6 @@ body.files {
   padding: 5px;
   user-select: none; /* so that we can shift-click to select */
   margin-bottom: 1px;
-  border-radius: 3px;
   line-height: $ef-thumbnail-size;
   box-sizing: border-box;
   @if $use_high_contrast { border: 1px solid transparent; }
@@ -201,8 +199,18 @@ body.files {
     @else { background-color: $ic-bg-light-primary; }
   }
   &.ef-item-selected {
-    @if $use_high_contrast { border-color: $ic-brand-primary; }
-    @else { background-color: darken($ic-bg-light-primary, 4%); }
+    background-color: $ic-bg-light-primary;
+    position: relative;
+    &::before {
+      // adds blue border
+      content: '';
+      position: absolute;
+      left: 0;
+      top:0;
+      width: 4px;
+      height: 100%;
+      background: $ic-brand-primary;
+    }
   }
 
   .al-trigger { opacity: 0 }
@@ -224,7 +232,7 @@ body.files {
 
 .ef-big-icon {
   width: $ef-thumbnail-size !important;
-  color: $ic-font-color-dark;
+  color: $ic-color-dark;
   &:before {
     font-size: $ef-thumbnail-size - 7px !important;
   }
