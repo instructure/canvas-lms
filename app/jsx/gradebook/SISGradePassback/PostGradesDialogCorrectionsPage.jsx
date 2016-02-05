@@ -21,7 +21,7 @@ define([
 
     ignoreErrors () {
       var assignments = assignmentUtils.withErrors(this.props.store.getAssignments())
-      _.each(assignments, (a) => this.props.store.updateAssignment(a.id, {please_ignore: true}) )
+      _.each(assignments, (a) => this.props.store.updateAssignment(a.id, {please_ignore: true}) )  
     },
 
     ignoreErrorsThenProceed () {
@@ -30,12 +30,38 @@ define([
       this.props.advanceToSummaryPage()
     },
 
+    invalidAssignmentsForCorrection(assignments){
+      var original_error_assignments = assignmentUtils.withOriginalErrors(assignments, this.props.store)
+      var invalid_assignments = []
+      _.each(assignments, (a) => {
+        if(original_error_assignments.length > 0 && this.props.store.validCheck(a)){ return }
+        else if(original_error_assignments.length == 0 && this.props.store.validCheck(a)){ return }
+        else{ invalid_assignments.push(a) }
+      });
+      return invalid_assignments
+    },
+
     render () {
       var assignments = _.filter(this.props.store.getAssignments(), (a) => {
-        return a.overrides == undefined || (a.overrideForThisSection != undefined)
+        return a.overrides == undefined || (a.overrideForThisSection != undefined) || a.selectedSectionForEveryone != undefined || (a.selectedSectionForEveryone == undefined && a.currentlySelected.type == 'course')
       });
       var errorCount = Object.keys(assignmentUtils.withErrors(assignments)).length;
       var store = this.props.store;
+      var correctionRow = this.invalidAssignmentsForCorrection(assignments)
+      var originalErrorAssignments = assignmentUtils.withOriginalErrors(assignments, this.props.store)
+
+      var assignmentRow;
+      if(originalErrorAssignments.length != 0){
+        assignmentRow = originalErrorAssignments
+      }else if(correctionRow.length != 0){
+        assignmentRow = correctionRow
+      }else if(errorCount == 0 && correctionRow.length == 0 && originalErrorAssignments.length == 0){
+        assignmentRow = []
+      }
+      else{
+        assignmentRow = []
+      }
+
       return (
         <div id="assignment-errors">
           <form className="form-horizontal form-dialog form-inline">
@@ -54,7 +80,7 @@ define([
                 <h5 className="muted span2" aria-hidden="true">{I18n.t("Due Date")}</h5>
               </div>
 
-              {assignmentUtils.withOriginalErrors(assignments, this.props.store).map((a) => {
+              {assignmentRow.map((a) => {
                 return (
                   <AssignmentCorrectionRow
                     assignment={ a }
