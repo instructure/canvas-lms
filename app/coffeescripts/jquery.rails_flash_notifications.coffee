@@ -46,6 +46,10 @@ define [
         <span>#{escapeContent(content)}</span>
       """)
     $screenreader_node.appendTo($screenreader_holder)
+    # we're hiding these instead of removing them, since calling .remove() on a
+    # DOM node contained in an 'assertive' live region causes another alert that
+    # interrupts whatever alert message(s) are in progress in NVDA
+    window.setTimeout((-> $screenreader_node.attr('aria-hidden', true)), 1000)
 
   flashBox = (type, content, timeout, cssOptions = {}) ->
     $node = $("""
