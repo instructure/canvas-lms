@@ -69,11 +69,11 @@ module Canvas
       end
 
       def self.encryption_secret
-        ENV['ECOSYSTEM_KEY']
+        Canvas::DynamicSettings.find("canvas")["encryption-secret"]
       end
 
       def self.signing_secret
-        ENV['ECOSYSTEM_SECRET']
+        Canvas::DynamicSettings.find("canvas")["signing-secret"]
       end
     end
   end

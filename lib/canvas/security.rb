@@ -158,8 +158,8 @@ module Canvas::Security
   end
 
   def self.decrypt_services_jwt(token, signing_secret=nil, encryption_secret=nil)
-    signing_secret ||= ENV['ECOSYSTEM_SECRET']
-    encryption_secret ||= ENV['ECOSYSTEM_KEY']
+    signing_secret ||= Canvas::DynamicSettings.find("canvas")["signing-secret"]
+    encryption_secret ||= Canvas::DynamicSettings.find("canvas")["encryption-secret"]
     begin
       signed_coded_jwt = JSON::JWT.decode(token, encryption_secret)
       raw_jwt = JSON::JWT.decode(signed_coded_jwt.plain_text, signing_secret)

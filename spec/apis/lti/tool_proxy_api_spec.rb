@@ -22,6 +22,7 @@ require 'webmock'
 
 module Lti
   describe ToolProxyController, type: :request do
+    before(:all){ WebMock.allow_net_connect! }
     let(:account) { Account.create }
 
     describe "#destroy" do

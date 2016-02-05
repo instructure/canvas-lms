@@ -1,8 +1,11 @@
 require File.expand_path(File.dirname(__FILE__) + '/cc_spec_helper')
 
 require 'nokogiri'
+require 'webmock'
 
 describe "Common Cartridge exporting" do
+  before(:all){ WebMock.allow_net_connect! }
+
   it "should collect errors and finish running" do
     course = course_model
     user = user_model
@@ -24,6 +27,7 @@ describe "Common Cartridge exporting" do
   end
 
   context "creating .zip exports" do
+    include WebMock::API
 
     before do
       course_with_teacher

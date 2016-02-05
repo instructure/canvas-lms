@@ -517,7 +517,7 @@ describe "API Authentication", type: :request do
         iss: "some other service",
         user_token: services_jwt
       }
-      wrapped_jwt = Canvas::Security.create_jwt(payload, nil, signing_secret)
+      wrapped_jwt = Canvas::Security.create_jwt(payload, nil, fake_signing_secret)
       Canvas::Security.base64_encode(wrapped_jwt)
     end
 

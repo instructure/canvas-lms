@@ -10,9 +10,14 @@ module Canvas::Security
         iss: "some other service",
         user_token: crypted_token
       }
-      wrapper_token = Canvas::Security.create_jwt(payload, nil, signing_secret)
+      wrapper_token = Canvas::Security.create_jwt(payload, nil, fake_signing_secret)
       # because it will come over base64 encoded from any other service
       Canvas::Security.base64_encode(wrapper_token)
+    end
+
+    it "has secrets accessors" do
+      expect(ServicesJwt.encryption_secret).to eq(fake_encryption_secret)
+      expect(ServicesJwt.signing_secret).to eq(fake_signing_secret)
     end
 
     describe "#initialize" do

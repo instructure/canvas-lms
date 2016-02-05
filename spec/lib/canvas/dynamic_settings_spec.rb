@@ -8,7 +8,12 @@ module Canvas
     end
 
     after do
-      DynamicSettings.config = @cached_config
+      Diplomat::Kv.unstub(:put)
+      begin
+        DynamicSettings.config = @cached_config
+      rescue Faraday::ConnectionFailed
+        # don't fail the test if there is no consul running
+      end
     end
 
     describe ".config=" do
@@ -52,7 +57,7 @@ module Canvas
 
     describe ".find" do
       # we don't need to interact with a real consul for unit tests
-      before { Diplomat::Kv.stubs(:put) } 
+      before { Diplomat::Kv.stubs(:put) }
 
       it "explodes when trying to access it without a config file" do
         DynamicSettings.config = nil
