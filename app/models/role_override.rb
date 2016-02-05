@@ -105,7 +105,8 @@ class RoleOverride < ActiveRecord::Base
           'ObserverEnrollment',
           'TeacherEnrollment',
           'AccountAdmin'
-        ]
+        ],
+        :applies_to_concluded => true
       },
       :post_to_forum => {
         :label => lambda { t('permissions.post_to_forum', "Post to discussions") },
@@ -277,7 +278,8 @@ class RoleOverride < ActiveRecord::Base
           'TaEnrollment',
           'TeacherEnrollment',
           'AccountAdmin'
-        ]
+        ],
+        :applies_to_concluded => true
       },
       :manage_grades => {
         :label => lambda { t('permissions.manage_grades', "Edit grades") },
@@ -511,7 +513,8 @@ class RoleOverride < ActiveRecord::Base
           'DesignerEnrollment',
           'TeacherEnrollment',
           'AccountAdmin'
-        ]
+        ],
+        :applies_to_concluded => true
       },
       :manage_calendar => {
         :label => lambda { t('permissions.manage_calendar', "Add, edit and delete events on the course calendar") },
@@ -753,6 +756,11 @@ class RoleOverride < ActiveRecord::Base
 
   def self.permissions
     Permissions.retrieve
+  end
+
+  # permissions that apply to concluded courses/enrollments
+  def self.concluded_permission_types
+    self.permissions.select{|k, p| p[:applies_to_concluded]}.keys
   end
 
   def self.manageable_permissions(context, base_role_type=nil)

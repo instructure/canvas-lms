@@ -1149,13 +1149,13 @@ class Course < ActiveRecord::Base
     end
     can [:read, :read_as_admin, :read_roster, :read_prior_roster, :read_forum, :use_student_view, :read_outcomes, :view_unpublished_items]
 
-    # overrideable permissions for concluded admins
-    [:read_question_banks, :view_all_grades].each do |permission|
+    # overrideable permissions for concluded users
+    RoleOverride.concluded_permission_types.each do |permission|
       given do |user|
         !self.deleted? && user &&
-          (prior_enrollments.for_user(user).any?{|e| e.admin? && e.has_permission_to?(permission)} ||
+          (prior_enrollments.for_user(user).any?{|e| !e.inactive? && e.has_permission_to?(permission)} ||
             user.cached_not_ended_enrollments.any? do |e|
-              e.course_id == self.id && e.admin? && e.completed? && e.has_permission_to?(permission)
+              e.course_id == self.id && e.completed? && e.has_permission_to?(permission)
             end
           )
       end
@@ -1182,7 +1182,7 @@ class Course < ActiveRecord::Base
          end
         )
     end
-    can :read, :read_grades, :read_forum, :read_outcomes
+    can :read, :read_grades, :read_outcomes
 
     # Admin
     given { |user| self.account_membership_allows(user) }

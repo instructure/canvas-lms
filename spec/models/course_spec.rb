@@ -430,6 +430,14 @@ describe Course do
         expect(c.grants_right?(@student, :read_forum)).to be_truthy
       end
 
+      it "should not grant read_forum to date-completed student if disabled by role override" do
+        c.root_account.role_overrides.create!(:role => student_role, :permission => :read_forum, :enabled => false)
+        c.offer!
+        make_date_completed
+        expect(c.prior_enrollments).to eq []
+        expect(c.grants_right?(@student, :read_forum)).to be_falsey
+      end
+
       it "should not grant read to completed students of an unpublished course" do
         expect(c).to be_created
         @enrollment.update_attribute(:workflow_state, 'completed')
