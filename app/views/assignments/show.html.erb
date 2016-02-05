@@ -96,7 +96,7 @@
         <span class='value'><%= @assignment.points_possible || t(:no_points, 'None') %></span>
       </li>
       <% if @assignment.expects_submission? || @assignment.expects_external_submission? %>
-        <% turnitin_text = @assignment.turnitin_enabled? ? ' ' + t(:turnitin_enabled_short, '(Turnitin enabled)') : '' %>
+        <% turnitin_text = turnitin_active? ? ' ' + t(:turnitin_enabled_short, '(Turnitin enabled)') : '' %>
         <li>
           <span class='title'><%= t :submitting, 'Submitting' %></span>
           <span class='value'><%= @assignment.readable_submission_types + turnitin_text %></span>
@@ -149,7 +149,7 @@
             </div>
           </div>
         <% end -%>
-        <% if @assignment.turnitin_enabled %>
+        <% if turnitin_active? %>
           <div class="control-group">
             <div class="control-label"><%= t :turnitin, 'Turnitin' %></div>
             <div class="controls">

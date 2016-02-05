@@ -75,4 +75,9 @@ module AssignmentsHelper
       @user.try_rescue(:short_name)
     end
   end
+
+  def turnitin_active?
+    @assignment.turnitin_enabled? && @context.turnitin_enabled? &&
+    !@assignment.submission_types.include?("none")
+  end
 end
