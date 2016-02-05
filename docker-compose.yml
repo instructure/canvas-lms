@@ -16,7 +16,7 @@ redis:
 
 consul:
   image: gliderlabs/consul-server:0.5
-  command: -node canvas-consul
+  command: -node canvas-consul -bootstrap
   environment:
     GOMAXPROCS: "2"
 
