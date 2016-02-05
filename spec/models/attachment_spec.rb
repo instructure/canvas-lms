@@ -1251,6 +1251,9 @@ describe Attachment do
       attachment_model(:context => @user, :uploaded_data => stub_png_data, :filename => "homework.png")
       @attachment.update_attribute(:size, 1.megabyte)
 
+      quota = Attachment.get_quota(@user)
+      expect(quota[:quota_used]).to eq 1.megabyte
+
       @assignment = @course.assignments.create!
       sub = @assignment.submit_homework(@user, attachments: [@attachment])
 
