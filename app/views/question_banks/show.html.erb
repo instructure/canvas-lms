@@ -12,9 +12,9 @@
       <a href="<%= context_url(@context, :context_question_bank_url, @bank.id) %>" class="btn button-sidebar-wide delete_bank_link"><i class="icon-end"></i> <%= t 'buttons.delete', "Delete Bank" %></a>
     <% end %>
     <% if @bank && !@bank.bookmarked_for?(@current_user) %>
-      <a href="<%= context_url(@context, :context_question_bank_bookmark_url, @bank ? @bank.id : "{{ id }}") %>" class="btn button-sidebar-wide bookmark_bank_link"><%= image_tag "bookmark_gray.png" %> <span class="message"><%= t 'buttons.bookmark', "Bookmark this Bank" %></span></a>
+      <a href="<%= context_url(@context, :context_question_bank_bookmark_url, @bank ? @bank.id : "{{ id }}") %>" class="btn button-sidebar-wide bookmark_bank_link"><%= image_tag("bookmark_gray.png", alt: "") %> <span class="message"><%= t 'buttons.bookmark', "Bookmark this Bank" %></span></a>
     <% else %>
-      <button class="btn button-sidebar-wide disabled" disabled="true"><%= image_tag "bookmark.png" %> <%= t 'buttons.already_bookmarked', "Already Bookmarked" %></button>
+      <button class="btn button-sidebar-wide disabled" disabled="true"><%= image_tag("bookmark.png", alt: "") %> <%= t 'buttons.already_bookmarked', "Already Bookmarked" %></button>
     <% end %>
   </div>
   <h2 id="aligned_outcomes"><%= t 'headings.aligned_outcomes', "Aligned Outcomes" %></h2>

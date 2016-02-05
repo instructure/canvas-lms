@@ -10,7 +10,7 @@
     <div class="links">
       <a href="#" class="edit_teaser_link no-hover" title="<%= t('titles.edit_this_question', "Edit this Question") %>"><%= image_tag "edit.png" %></a>
       <a href="#" class="delete_question_link no-hover" title="<%= t('titles.delete_this_question', "Delete this Question") %>"><%= image_tag "delete.png" %></a>
-      <a href="<%= context_url(@context, :context_quiz_quiz_question_url, @quiz.id, question_teaser ? question_teaser[:id] : "{{ id }}") %>" class="update_question_url">&nbsp;</a>
+      <a href="<%= context_url(@context, :context_quiz_quiz_question_url, @quiz.id, question_teaser ? question_teaser[:id] : "{{ id }}") %>" class="update_question_url" tabindex="-1" aria-hidden="true">&nbsp;</a>
     </div>
     <div class="text">
       <div class="teaser question_text user_content">
