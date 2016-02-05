@@ -10,6 +10,21 @@
 // a compile step ahead of time.
 
 var CompiledReferencePlugin = function(){};
+var pluginTranspiledRegexp = /^([^/]+)\/compiled\//;
+
+var rewritePluginPath = function(requestString){
+  var pluginName = pluginTranspiledRegexp.exec(requestString)[1];
+  var jsxRegexp = /compiled\/jsx/;
+  var relativePath = requestString.replace(pluginName + "/compiled/", "");
+  if(jsxRegexp.test(requestString)){
+    // this references a JSX file which already has "jsx" in it's file path
+    return pluginName + "/app/" + relativePath;
+  }else{
+    // this references a coffeescript file which needs "coffeescripts" to
+    // replace the "compiled" part of the path
+    return pluginName + "/app/coffeescripts/" + relativePath;
+  }
+};
 
 CompiledReferencePlugin.prototype.apply = function(compiler){
 
@@ -25,13 +40,10 @@ CompiledReferencePlugin.prototype.apply = function(compiler){
         result.request = requestString.replace("spec/javascripts/compiled/", "");
       }
 
-      // this references a coffeescript file in a canvas plugin
-      var pluginCoffeeRegexp = /^([^/]+)\/compiled\//;
-      if(pluginCoffeeRegexp.test(requestString)){
-        var pluginName = pluginCoffeeRegexp.exec(requestString)[1];
-        var relativePath = requestString.replace(pluginName + "/compiled/", "");
-        var fullRequire = pluginName + "/app/coffeescripts/" + relativePath;
-        result.request = fullRequire;
+      // this references a file in a canvas plugin
+      var pluginTranspiledRegexp = /^([^/]+)\/compiled\//;
+      if(pluginTranspiledRegexp.test(requestString)){
+        result.request = rewritePluginPath(requestString);
       }
       return callback(null, result);
     });
