@@ -4,6 +4,7 @@
 pt-BR: 
   1_item_scores_5512cd03: "1- Pontuações do item"
   1st_reviewer_3c1d0119: "1o Avaliador"
+  25th_75th_percentile_aa4c11f2: "Percentis 25-75 "
   2_final_score_7b0fd15e: "2- Pontuação final"
   2nd_reviewer_94fdbcd: "2o Avaliador"
   451_message: 
@@ -50,6 +51,7 @@ pt-BR:
   a_new_assignment_has_been_created_for_your_course__12b72639: "Uma nova tarefa foi criada para o seu curso, %{course_name}"
   a_problem_occurred_adding_reviewers_57b083d9: "Ocorreu um erro ao adicionar avaliadores."
   a_table_containing_the_name_of_the_grading_scheme__2c25dc3: "Uma tabela contendo o nome do esquema de avaliação e ícones para editar ou excluir o esquema."
+  a_table_of_answers_and_brief_statistics_regarding__f516e98f: "Uma tabela de respostas e breves estatísticas sobre opções de respostas do estudante."
   a_table_that_contains_the_grading_scheme_data_each_d461c205: "Uma tabela que contém dados do esquema de avaliação. Cada linha contém um nome, uma porcentagem máxima e uma porcentagem mínima. Além disso, cada linha contém um ícone para adicionar uma nova linha abaixo e um ícone para excluir a linha atual."
   academic_benchmark: 
     api_error: "Não foi possível atualizar os padrões para a autoridade %{auth}."
@@ -101,6 +103,7 @@ pt-BR:
     tab_permissions: Permissões
     tab_plugins: Plugins
     tab_question_banks: "Bancos de perguntas"
+    tab_root_accounts: "Contas Raiz"
     tab_rubrics: Protocolos
     tab_settings: Configurações
     tab_sis_import: "Importação do SIS"
@@ -217,6 +220,7 @@ pt-BR:
       discovery_url_description: "Se uma URL de descoberta está definido, o Canvas irá encaminhar todos os usuários para aquela URL quando eles precisarem ser autenticados. Essa página será necessário, então, para ajudar o usuário a descobrir para onde eles precisam ir para fazer login. Se nenhuma URL de descoberta está configurada, a primeira configuração será usada para tentar autenticar o usuário."
       login_handle_name_description: "O rótulo usado para identificadores exclusivos de login. Exemplos: Login, nome de usuário, ID do aluno, etc."
       unknown_user_url_description: "A url para qual redireciona quando um usuário autenticado não é encontrado em Canvas."
+  account_domain_78f43049: "Domínio da Conta"
   account_name_13ed649: "%{account_name}"
   account_name_analytics_62bf60ae: "%{account.name} Analítica"
   account_navigation_80bbefd4: "Navegação da conta"
@@ -399,6 +403,12 @@ pt-BR:
     additional_settings: 
       account_status: "Status da conta"
       add_new_domain: "Adicionar um novo domínio"
+      labels: 
+        consortium_autocreate_reverse_trust: "Automaticamente faz com que a conta mãe confie em contas raiz (o contrário sempre é verdade)"
+        consortium_autocreate_web_of_trust: "Automaticamente criar uma teia de confiança quando criando novas contas"
+        consortium_can_create_own_accounts: "Administradores de consórcio podem criar contas raiz"
+        consortium_parent_account: "Conta mãe de consórcio"
+        shard_per_account: "Criar novo estilhaço por toda nova conta raiz"
       license: Licença
       license_type: "Tipo de licença"
       new_account_domain_title: "Novo domínio de conta"
@@ -696,6 +706,11 @@ pt-BR:
             text: "ID do curso"
           parameters: 
             note1: "O ID de curso pode ser deixado em branco para executar o relatório para todos os cursos no período."
+    lti_report_csv_description: 
+      account_reports: 
+        default: 
+          lti_reports: 
+            text: "Este relatório fornece uma exportação de dados que mostra informações de uso de LTI (Interoperabilidade de Ferramentas de Aprendizado)"
     mississippi_sis_csv_parameters: 
       account_reports: 
         default: 
@@ -1226,7 +1241,9 @@ pt-BR:
         default: 
           zero_activity: 
             text: "Este relatório mostra todos os estudantes inscritos em qualquer curso em um dado período. O arquivo CSV resultante terá uma linha por inscrição de usuário que não visitou o curso desde a data."
-  achieve_mastery_count_times_8c9bbcec: "Alcançar domínio %{count} vezes"
+  achieve_mastery_count_times_8c9bbcec: 
+    one: "Alcançar domínio uma vez"
+    other: "Alcançar domínio %{count} vezes"
   actions_efcde10d: Ações
   activate_this_key_6cd98f4b: "Ativar esta chave"
   activerecord: 
@@ -1353,6 +1370,7 @@ pt-BR:
   allow_lor_tools: "Permitir que usuários visualizem e usem as ferramentas externas para LOR."
   allow_opt_out_of_inbox: "Permitir que usuários optem fora da caixa de entrada Conversa. Isso fará com que todas as mensagens de conversas e notificações sejam enviadas como notificações ASAP para o email principal do usuário, ocultem os emblemas de mensagens não lidas da caixa de entrada de Conversas na Caixa de entrada e ocultem as preferências de notificação da Conversa."
   allow_students_to_see_who_has_signed_up_for_time_s_497f4a46: "Permite que alunos vejam quem já se inscreveu para intervalos de tempo."
+  allow_the_ability_to_send_notifications_through_ou_13cc8537: "Permitir a capacidade de enviar notificações pela nossa fila de despacho"
   allow_the_ability_to_send_notifications_through_ou_fdaace5a: "Permitir a capacidade de enviar notificações pela nossa fila de despacho"
   allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "Permite que professores marquem dados de notas para serem exportados à granel para integrações do Sistema de Informações do Aluno."
   allows_the_scheduling_of_recurring_calendar_events_aac71007: "Permite a programação de eventos recorrentes do calendário"
@@ -1447,6 +1465,7 @@ pt-BR:
   anonymous_user: "Usuário anônimo"
   anonymous_user_d984b9ce: "Usuário Anônimo"
   another_configuration_is_currently_selected_select_95b394e: "Outra configuração está selecionada no momento. A seleção desta configuração irá desmarcar a outra."
+  answer_distribution_2a956e3f: "Distribuição de respostas"
   answer_text_80_character_limit_2fce1113: "Texto de Resposta (limite de 80 caráteres)"
   answer_text_909894d6: "Texto de Resposta"
   answer_weight_43420dc5: "Peso da Resposta"
@@ -1533,6 +1552,7 @@ pt-BR:
   are_you_sure_you_want_to_remove_this_grading_perio_e3251c09: "Tem certeza de que deseja remover este período de classificação?"
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "Tem certeza de que deseja remover esta ferramenta?"
   are_you_sure_you_want_to_report_this_profile_pictu_e22c2210: "Tem certeza de que quer denunciar esta foto de perfil?"
+  arrange_by_34a545de: "Ordenar por"
   arrange_columns_by_assignment_group_33acdf03: "Organizar Colunas por Grupo de Tarefa"
   arrange_columns_by_due_date_888f2551: "Organizar Colunas por Data de Entrega"
   as_you_type_in_this_field_the_list_of_groups_will__16688a5f: "Conforme você digitou nesse campo, a lista de grupos que serão automaticamente filtrados para apenas incluir àqueles cujos nomes correspondem a sua entrada."
@@ -1673,9 +1693,9 @@ pt-BR:
       one: "1 grupo"
       other: "%{count} grupos"
     assignment_list_item: 
-      assignment_delete: "Excluir tarefa"
-      assignment_edit: "Editar tarefa"
-      assignment_move: "Mover tarefa"
+      assignment_delete: "Excluir Tarefa %{name}"
+      assignment_edit: "Editar Tareefa %{name}"
+      assignment_move: "Mover Tarefa %{name}"
       delete: Excluir
       edit: Editar
       module: Módulo
@@ -2208,6 +2228,9 @@ pt-BR:
     invalid_date_time: "Datetime inválido para %{attribute}"
     invalid_submission_types: "Tipos de envio inválido"
   assignments_in_this_group_have_no_points_possible__3cd35922: "As tarefas neste grupo não têm pontos possíveis e não podem ser incluídas no cálculo de notas"
+  associated_account_course_id_d87a01c5: "ID de Conta/Curso Associado"
+  associated_account_name_91854e37: "Nome da Conta Associada"
+  associated_course_name_9b5b1945: "Nome do Curso Associado"
   attached_files_must_be_greater_than_0_bytes_7f57bee7: "Arquivos anexados devem ser maiores que 0 bytes"
   attachment: 
     default_filename: Arquivo
@@ -2275,6 +2298,7 @@ pt-BR:
   before_publishing_this_file_you_must_specify_usage_2229d20b: "Antes de publicar este arquivo, você deve especificar os direitos de uso."
   before_publishing_you_must_set_usage_rights_on_you_dcd7b567: "Antes de publicar, você deve especificar os direitos de uso em seus arquivos."
   before_using_this_feature_we_recommend_trying_the__1dea6042: "Antes de usar este recurso, recomendamos tentar o **%{t_theme_editor}** para fazer qualquer branding. Ao ativar este recurso providencia a capacidade de fazer upload de arquivos de JavaScript e CSS no Editor de Temas. Modificações feitos com este método podem entrar em conflito com alterações futuras para o DOM do Canvas (por exemplo: nomes de classes de elemento ou estrutura de HTML) e assim não são suportados. Os que usarem este recurso devem ter uma compreensão avançada de JavaScript e CSS e devem manter o seu próprio código. *Use por sua conta e risco!*"
+  before_using_this_feature_we_recommend_trying_the__7e6f194e: "Antes de usar este recurso, recomendamos provar o *********%{t_theme_editor}*********  para fazer qualquer branding. A ativação deste recurso fornece a capacidade de fazer upload de arquivos personalizados de JavaScript e CSS no Editor de Temas. Modificações feitas com este método podem entrar em conflito com as futuras alterações ao DOM de Canvas (por exemplo: nomes de classes de elemento ou estrutura HTML) e são, portanto, não suportados. Além disso, você precisa ter certeza de que quaisquer modificações que você faça  são acessíveis a todos, incluindo, por exemplo, aqueles que utilizam *leitores de tela* e **aqueles** ***confiando*** no  ****recurso de alta contraste****. Instructure exime de qualquer responsabilidade por quaisquer alterações que você fizer. É de sua responsabilidade para garantir que atendam *****quaisquer***** ******normas****** de *******conformidade******* que podem ser exigido em sua jurisdição. Aqueles que utilizam este recurso devem ter conhecimento avançado de JavaScript e CSS e devem manter o seu próprio código.********Use por sua conta e risco!********"
   before_you_can_edit_your_profile_you_need_to_verif_4fd9143e: "Antes poder editar o seu perfil, você precisa verificar o seu endereço de e-mail (%{email}) clicando no link no e-mail que te enviamos. Caso não o ver, *clique para re-enviar o e-mail*, e não esquece de verificar a caixa de spam."
   beginning_date_2d2a29ac: "Data de início"
   below_this_search_field_is_a_list_of_content_type__58aaa03f: "Abaixo desse campo de pesquisa está uma lista de %{content_type}. Conforme você digita, a lista será filtrada para corresponder à sua consulta. Mensagens de conversa serão filtradas em qualquer opção que você selecionar."
@@ -2283,6 +2307,7 @@ pt-BR:
       Uma nova interface de navegação mais amigável ao usuário e simplificada. Se você ativá-la no nível de curso,
       todos os usuários nesse curso verão a nova interface. Para fazer com que ela seja exibida quando alguém
       acessa a página de arquivos pessoais para um usuário ('/files'), é necessário ativá-la para a conta da qual ele é membro.
+  between_1_and_5_f2a74bcf: "Entre 1 e 5"
   between_1_and_99_d421a4c0: "Entre 1% e 99%"
   between_2_and_5_c34f5152: "Entre 2 e 5"
   big_blue_button_conference: 
@@ -2295,6 +2320,7 @@ pt-BR:
   bookmark_service: 
     default_title: "Sem título"
   bounce_count_reset_c4c2218f: "Redefinir contagem de bounces!"
+  bounce_reason_689ed4c6: "Motivo por bounce"
   breadcrumb_1_cb3c504: "Breadcrumb 1"
   breadcrumb_2_95ba94be: "Breadcrumb 2"
   broccoli_cloud: 
@@ -2363,6 +2389,16 @@ pt-BR:
       user_name: "Nome do Usuário"
       user_name_description: "O nome de usuário do usuário  que tem acesso de professor/designer ao curso para a linha. Ele deve ser igual a um dos nomes de usuário listados nas credenciais de login do quadro negro acima."
     only_one_bulk_migration: "Somente uma migração de curso em lote pode ser executada por vez"
+  bulk_migration: 
+    buttons: 
+      migrate_courses: "Migrar Cursos"
+    confirm: 
+      cancel_migration: "Tem certez de que deseja cancelar esta migração? Todos os cursos já em andamento concluirão."
+      delete_credential: "Tem certeza de que deseja remover estes credenciais?"
+    errors: 
+      upload_failed: "Falha no upload, por favor tente novamente"
+    messages: 
+      uploading_button: "Fazendo upload de Arquivo CSV..."
   button: 
     submit_assignment: "Enviar tarefa"
   buttons: 
@@ -2789,6 +2825,7 @@ pt-BR:
   can_t_perform_diffing_against_more_than_one_file_o_44475c0d: "Não é possível executar diff contra mais de um arquivo do mesmo tipo"
   can_t_unpublish_if_there_are_student_submissions_2d7cd742: "Não é possível cancelar a publicação se há submissões de estudantes"
   can_t_unpublish_item_name_if_there_are_student_sub_b83c7a9f: "Não é possível cancelar a publicação de %{item_name} se há submissões de estudantes"
+  can_t_unpublish_name_if_there_are_student_submissi_8ab8086c: "Não é possível remover a publicação de %{name} se houver submissões dos alunos"
   cancel_caeb1e68: Cancelar
   cannot_be_nil_when_account_id_is_nil_be6d1d60: "não pode ser nulo quando  número_de_identificação_da_conta é nulo"
   cannot_be_nil_when_course_id_is_nil_f539388: "não pode ser nulo quando número_de_identificação_do_curso é nulo"
@@ -3014,6 +3051,7 @@ pt-BR:
     body: "Seu código de verificação Canvas é  %{verification_code}"
     default_twitter_handle: "Nome do usuário (handle) do Twitter"
     default_yo_name: "Seu nome"
+  communication_channel_id_197ef6f9: "ID do canal de comunicação"
   communication_channels: 
     confirm: 
       buttons: 
@@ -3143,6 +3181,7 @@ pt-BR:
     type_disabled_error: "Este tipo de conferência não está mais ativada para este site do Canvas"
   config_url_e96ceaf3: "URL de configuração"
   configurate_tool_app_5a721f2c: "Configurar aplicativo %{tool}?"
+  configuration_location_ee0f6592: "Local de Configuração"
   configuration_type_25a084a4: "Tipo de configuração"
   configure_ecb97e30: Configurar
   configure_toolname_app_651371be: "Configurar aplicativo %{toolName}"
@@ -3978,12 +4017,18 @@ pt-BR:
   count_participations_ac8f82b7: 
     one: "1 participação"
     other: "%{count} participações"
+  count_points_4735a2e8: 
+    one: "1 ponto"
+    other: "%{count} pontos"
   count_students_30e46120: 
     one: "1 alunos"
     other: "%{count} alunos"
   count_students_will_get_num_points_c970fc01: 
     one: "1 aluno receberá %{num} pontos"
     other: "%{count} alunos receberão %{num} pontos"
+  count_submissions_need_grading_d34bae25: 
+    one: "1 trabalho submetido precisa de avaliação"
+    other: "%{count} trabalhos submitidos precisam de avaliação"
   country_is_required_b0afbf52: "O País é necessário"
   course: 
     access_denied: "Acesso foi negado"
@@ -13356,6 +13401,7 @@ pt-BR:
     course_files: "Arquivos do curso"
     group_files: "Arquivos de grupo"
     my_files: "Meus arquivos"
+  root_accounts_cc035dcf: "Contas Raiz"
   roster: 
     delete_confirm: "Tem certeza que deseja remover este usuário?"
     error_sending_invitations: "Erro ao enviar convite. Tente novamente."
