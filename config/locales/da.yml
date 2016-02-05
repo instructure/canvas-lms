@@ -4,6 +4,7 @@
 da: 
   1_item_scores_5512cd03: "1 - Element score"
   1st_reviewer_3c1d0119: "1. evaluering"
+  25th_75th_percentile_aa4c11f2: "25ende-75ende kvartil"
   2_final_score_7b0fd15e: "2 - Endelig score"
   2nd_reviewer_94fdbcd: "2. evaluering"
   451_message: 
@@ -50,6 +51,7 @@ da:
   a_new_assignment_has_been_created_for_your_course__12b72639: "En ny opgave er blevet oprettet for dit kursus, %{course_name}"
   a_problem_occurred_adding_reviewers_57b083d9: "Der opstod et problem under tilføjelse af censorer."
   a_table_containing_the_name_of_the_grading_scheme__2c25dc3: "En tabel indeholdende navene på bedømmelsessystemet og ikoner for redigering eller sletning af system."
+  a_table_of_answers_and_brief_statistics_regarding__f516e98f: "En tabel over svar og korte statistikker for studerendes svarvalg."
   a_table_that_contains_the_grading_scheme_data_each_d461c205: "En tabel, der indeholder bedømmelsessystem data. Hver rækker indeholder et navn, en maksimal procent og en minimum procent. Derudover indeholder hver række et ikon til at tilføje en ny række og et ikon til at slette den aktive række."
   academic_benchmark: 
     api_error: "Kunne ikke opdatere standarder for autorisering %{auth}."
@@ -101,6 +103,7 @@ da:
     tab_permissions: Tilladelser
     tab_plugins: Plugins
     tab_question_banks: Spørgsmålssamling
+    tab_root_accounts: Rodkonti
     tab_rubrics: Rubrics
     tab_settings: Indstillinger
     tab_sis_import: "SIS Import"
@@ -217,6 +220,7 @@ da:
       discovery_url_description: "Hvis et opdagelses URL er sat, vil Canvas videresende alle brugere til det URL, når de behøver at blive bekræftet. Den side vil hjælpe brugeren til det korrekte login. Hvis der ikke er konfigureret et opdagelses URL, vil den første konfiguration blive brugt som forsøg til at bekræfte brugeren."
       login_handle_name_description: "Etikette benyttet for unik login identificering. For eksempel: Login, Brugernavn, Studie ID, etc."
       unknown_user_url_description: "URL for omdirigering når en autoriceret bruger ikke er fundet i Canvas."
+  account_domain_78f43049: Kontodomæne
   account_name_13ed649: "%{account_name}"
   account_name_analytics_62bf60ae: "%{account.name} Analyser"
   account_navigation_80bbefd4: Kontonavigation
@@ -399,6 +403,12 @@ da:
     additional_settings: 
       account_status: "Konto status"
       add_new_domain: "Tilføj nyt domæne"
+      labels: 
+        consortium_autocreate_reverse_trust: "Tillad automatisk forældre konto at have tillid til nye rodkonti (det omvendte er altid sandt)"
+        consortium_autocreate_web_of_trust: "Opret automatisk et net af tillid, når der oprettes nye konti"
+        consortium_can_create_own_accounts: "Konsortium admins kan oprette rodkonti"
+        consortium_parent_account: "Konsortium forældrekonto"
+        shard_per_account: "Opret et nyt stykke for hver ny rodkonto"
       license: Licens
       license_type: "Licens type"
       new_account_domain_title: "Nyt kontodomæne"
@@ -696,6 +706,11 @@ da:
             text: "Kursus ID"
           parameters: 
             note1: "Kursus ID kan udelades ved rapportering for alle kurser i terminen."
+    lti_report_csv_description: 
+      account_reports: 
+        default: 
+          lti_reports: 
+            text: "Denne rapport give en eksport af data, der viser LTI (Learning Tool Interoperability) forbrugsinformation."
     mississippi_sis_csv_parameters: 
       account_reports: 
         default: 
@@ -1223,7 +1238,9 @@ da:
         default: 
           zero_activity: 
             text: "Denne rapport viser alle de studerende tilmeldt til ethvert kursus i en given termin. Resulterende cvs fil vil have en række pr. brugertilmelding, der ikke har besøgt kurset siden datoen."
-  achieve_mastery_count_times_8c9bbcec: "Opnå beherskelse %{count} gange"
+  achieve_mastery_count_times_8c9bbcec: 
+    one: "Opnå beherskelse en gang"
+    other: "Opnå beherskelse %{count} gange"
   actions_efcde10d: Handlinger
   activate_this_key_6cd98f4b: "Aktiver denne nøgle"
   activerecord: 
@@ -1350,6 +1367,7 @@ da:
   allow_lor_tools: "Tillad brugerne at se og bruge eksterne værtøjer til konfigurering af LOR."
   allow_opt_out_of_inbox: "Tillad brugere at fravælge samtaleindbakken. Dette vil bevirke at alle samtalesbeskeder og notifikationer sendes som ASAP notifikation til brugerens primære email, skjule samtalesindbakkens ulæste besked mærke på indbakkken og skjule samtalesnotifikation indstillinger."
   allow_students_to_see_who_has_signed_up_for_time_s_497f4a46: "Tillad studerende at se hvem, der har meldt sig til tidsplaceringer."
+  allow_the_ability_to_send_notifications_through_ou_13cc8537: "Tillad muligheden for at sende bekendtgørelser gennem vores forsendelseskø"
   allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "Tillader underviserne at vælge karakterdata for samlet eksport til SIS integrationer."
   allows_the_scheduling_of_recurring_calendar_events_aac71007: "Tillad planlægning af gentagne kalender begivenheder"
   allows_users_with_international_phone_numbers_to_r_f90f8522: "Tillad brugere med internationale telefonnumre at modtage tekstbeskeder fra Canvas."
@@ -1443,6 +1461,7 @@ da:
   anonymous_user: "Anonym bruger"
   anonymous_user_d984b9ce: "Anonym bruger"
   another_configuration_is_currently_selected_select_95b394e: "En anden konfiguration er for øjeblikket valgt. Valg af denne konfiguration vil tilsidesætte den anden."
+  answer_distribution_2a956e3f: Svardistribution
   answer_text_80_character_limit_2fce1113: "Svartekst (80 karaktergrænse)"
   answer_text_909894d6: "Svar tekst"
   answer_weight_43420dc5: "Svar vægtning"
@@ -1529,6 +1548,7 @@ da:
   are_you_sure_you_want_to_remove_this_grading_perio_e3251c09: "Er du sikker på, at du ønsker at fjerne denne bedømmelsesperiode?"
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "Er du sikker på, at du ønsker at fjerne dette værktøj?"
   are_you_sure_you_want_to_report_this_profile_pictu_e22c2210: "Er du sikker på, at du ønsker at rapportere dette profilbillede?"
+  arrange_by_34a545de: "Sorter efter"
   arrange_columns_by_assignment_group_33acdf03: "Opstil kolonner efter Opgavegruppe"
   arrange_columns_by_due_date_888f2551: "Opstil kolonner efter forfaldsdato"
   as_you_type_in_this_field_the_list_of_groups_will__16688a5f: "Mens du indtaster i dette felt, vil listen af grupper automatisk blive filtreret til kun at inkludere dem, hvis navn matcher dit indput."
@@ -1669,9 +1689,9 @@ da:
       one: "%{count} grupper"
       other: "%{count} grupper"
     assignment_list_item: 
-      assignment_delete: "Slet opgave"
-      assignment_edit: "Rediger opgave"
-      assignment_move: "Flyt opgave"
+      assignment_delete: "Slet opgave %{name}"
+      assignment_edit: "Rediger opgave %{name}"
+      assignment_move: "Flyt opgave %{name}"
       delete: Slet
       edit: Rediger
       module: Modul
@@ -2204,6 +2224,8 @@ da:
     invalid_date_time: "Ugyldig datotid for %{attribute}"
     invalid_submission_types: "Ugyldig indsendelsestyper"
   assignments_in_this_group_have_no_points_possible__3cd35922: "Opgaver i denne grupper har ingen mulige points og kan ikke inkluderes i karakterberegningen"
+  associated_account_course_id_d87a01c5: "Associerede konto/kursus ID"
+  associated_account_name_91854e37: "Associeret kontonavn"
   attached_files_must_be_greater_than_0_bytes_7f57bee7: "Vedhæftede filer skal være mere end 0 bytes"
   attachment: 
     default_filename: Fil
@@ -2278,6 +2300,7 @@ da:
       En ny, simplere, mere bruervenlig fil browsing interface. Du kan aktivere det på kursusniveau,
       så alle brugere i det kusus kan se det nye interface. For at få det til at vise sig, når nogle
       går til den personlige fil side for en bruger  ('/filer') skal du aktivere det for den konto, de er medlem af.
+  between_1_and_5_f2a74bcf: "Mellem 1 og 5"
   between_1_and_99_d421a4c0: "Mellem 1% og 99%"
   between_2_and_5_c34f5152: "Mellem 2 og 5"
   big_blue_button_conference: 
@@ -2290,6 +2313,7 @@ da:
   bookmark_service: 
     default_title: "Ingen Titel"
   bounce_count_reset_c4c2218f: "Tilbagesendelsoptælling nulstillet!"
+  bounce_reason_689ed4c6: "Årsag for tilbagesendelse"
   breadcrumb_1_cb3c504: "Brødkrumme 1"
   breadcrumb_2_95ba94be: "Brødkrumme 2"
   broccoli_cloud: 
@@ -2358,6 +2382,9 @@ da:
       user_name: Brugernavn
       user_name_description: "Brugernavn med underviser/designer med adgang til kurserne. Det skal matche et af brugernavnene listet på Blackboard login legitimationsbeskrivelserne ovenfor."
     only_one_bulk_migration: "Kun én samlet kursusoverførsel kan udføres ad gangen."
+  bulk_migration: 
+    buttons: 
+      migrate_courses: "Flyt kurser"
   button: 
     submit_assignment: "Indsend opgave"
   buttons: 
@@ -13327,6 +13354,7 @@ da:
     course_files: Kursusfiler
     group_files: Gruppefiler
     my_files: "Mine filer"
+  root_accounts_cc035dcf: Rodkonti
   roster: 
     delete_confirm: "Er du sikker på, at du ønsker at fjerne denne bruger?"
     error_sending_invitations: "Fejl under forsendelse af invitation. Prøve venligst igen."
