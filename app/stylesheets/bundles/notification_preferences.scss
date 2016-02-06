@@ -86,10 +86,23 @@ thead th {
 
 .notification-prefs-table {
   .ui-button {
-    padding: 1px;
+    margin-left: 0;
+    margin-right: 0;
+    padding: 2px;
+    border-radius: 3px;
+    border: none;
+    background-image: none;
+    background: initial;
+  }
+  .ui-button.ui-state-hover {
+    background: $ic-bg-light-neutral;
   }
   .ui-buttonset {
+    margin-left: 0;
     margin-right: 0;
+  }
+  .ui-state-active, .ui-state-active.ui-state-hover {
+    background: $ic-brand-primary;
   }
   .grouping > td:first-child {
     min-width: 205px;
@@ -128,26 +141,9 @@ thead th {
     min-width: 110px;
     padding: 4px;
     vertical-align: middle;
-    // By default, hide buttons and show selection text
-    .event-option-selection {
-      display: block;
-    }
-    .event-option-buttons {
-      float: left;
-    }
     .comm-event-option-contents {
       position: relative;
       min-height: 22px;
-      .event-option-selection {
-        padding-top: 2px;
-        margin-left: 10px;
-        a {
-          &:hover, &:focus, &:active {
-            text-decoration: none;
-          }
-          color: $gray;
-        }
-      }
       select {
         opacity: 0;
         outline: 0;
@@ -162,24 +158,6 @@ thead th {
     label {
       display: block;
       @include fontSize(13px);
-    }
-  }
-  .no-touch & {
-    td.comm-event-option[data-selection='never'] .event-option-selection a.change-selection {
-      opacity: 0;
-      &:hover, &:focus {
-        opacity: 0.35;
-      }
-    }
-  }
-  .touch & {
-    td.comm-event-option .event-option-selection a.change-selection {
-      span.drop-arrow {
-        float: right;
-      }
-    }
-    td.comm-event-option[data-selection='never'] .event-option-selection a.change-selection span {
-      opacity: 0.35;
     }
   }
 }

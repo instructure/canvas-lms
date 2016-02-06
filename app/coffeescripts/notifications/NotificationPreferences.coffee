@@ -59,29 +59,6 @@ define [
       @$notificationSaveStatus = $('#notifications_save_status')
       @initGrid()
 
-    # Display the frequency selection buttons. Optionally set the focus to the control if desired.
-    cellButtonsShow: ($cell, setFocus=true) ->
-      $cell.addClass('show-buttons')
-      $selection = $cell.find('.event-option-selection')
-      $buttons   = $cell.find('.event-option-buttons')
-      #
-      $selection.hide()
-      $buttons.removeClass('screenreader-only')
-      if setFocus
-        $radio = $cell.find('.frequency:checked')
-        $labelToFocus = $cell.find("label[for=#{$radio.attr('id')}]")
-        $labelToFocus.focus() if $labelToFocus
-
-    # Hide the frequency selection buttons. Optionally set the focus to the selected status link if desired.
-    cellButtonsHide: ($cell, setFocus=true) =>
-      $cell.removeClass('show-buttons')
-      $selection = $cell.find('.event-option-selection')
-      $buttons   = $cell.find('.event-option-buttons')
-      #
-      $buttons.addClass('screenreader-only')
-      $selection.show()
-      $selection.find('a:first').focus() if setFocus
-
     # Build the option cell HTML as an array for all channels and for the given category
     buildPolicyCellsHtml: (category) =>
       fragments = for c in @channels
@@ -91,13 +68,6 @@ define [
         frequency = policy['frequency'] if policy
         @policyCellHtml(category, c, frequency)
       fragments.join ''
-
-    hideButtonsExceptCell: ($notCell) =>
-      # Hide any and all option buttons. May remain from another selection that wasn't changed.
-      for cellElem in $("#notification-preferences td.comm-event-option.show-buttons")
-        $cell = $(cellElem)
-        if $cell != $notCell
-          @cellButtonsHide($cell, false) if $cell.find(':focus').length == 0
 
     communicationEventGroups: =>
       # Want return structure to be like this...
@@ -150,7 +120,6 @@ define [
     # Build the HTML notifications table.
     buildTable: =>
       $('#notification-preferences').append(notificationPreferencesTemplate(
-        touch: INST.browser.touch,
         channels: @channels,
         eventGroups: @communicationEventGroups()
         ))
@@ -183,7 +152,6 @@ define [
       cellButtonData = if channel.type == 'push' then @limitedButtonData else @buttonData
 
       policyCellTemplate
-        touch:      INST.browser.touch
         category:   category.category
         channelId:  channel.id
         selected:   selected
@@ -191,12 +159,8 @@ define [
 
     # Record and display the value for the cell.
     saveNewCellValue: ($cell, value) =>
-      # Find the button data for display and showing selection.
-      btnData = @findButtonDataForCode(value)
       # Setup display
       $cell.attr('data-selection', value)
-      $cell.find('a.change-selection i').attr('class', btnData['icon'])
-      $cell.find('a.change-selection span.img-text').text(btnData['text'])
       # Get category and channel values
       category = $cell.attr('data-category')
       channelId = $cell.attr('data-channelId')
@@ -213,41 +177,13 @@ define [
     setupEventBindings: =>
 
       $notificationPrefs = $('#notification-preferences')
+      $notificationPrefs.find('.event-option-selection').buttonset()
 
-      # Setup the buttons as a buttonset
-      $notificationPrefs.find('.event-option-buttons').buttonset()
-
-      unless INST.browser.touch
-        # Catch mouse over and auto-toggle for faster interactions.
-        $notificationPrefs.find('.notification-prefs-table').on
-          mouseenter: (e) =>
-            @cellButtonsShow($(e.currentTarget), false)
-          mouseleave: (e) =>
-            @cellButtonsHide($(e.currentTarget), false)
-          , '.comm-event-option'
-
-        # Setup current selection click event to display selection changing buttons
-        $notificationPrefs.find('.notification-prefs-table a.change-selection').on 'click', (e) =>
-          # Hide any/all other showing buttons
-          e.preventDefault()
-          cell = $(e.currentTarget).closest('td')
-          @hideButtonsExceptCell(cell)
-          @cellButtonsShow(cell, true)
-
-      # When selection button is clicked, the hidden radio button is changed. React to that change. Hide the control and focus the selection
       $notificationPrefs.find('.frequency').on 'change', (e) =>
-        radio = $(e.currentTarget)
-        cell = radio.closest('td')
+        freq = $(e.currentTarget)
+        cell = freq.closest('td')
         # Record the selected value in data attribute and update image class to reflect new state
-        val = radio.attr('data-value')
-        @saveNewCellValue(cell, val)
-
-      # When selection option is changed. (Used for mobile users)
-      $notificationPrefs.find('.mobile-select').on 'change', (e) =>
-        select = $(e.currentTarget)
-        cell = $(e.currentTarget).closest('td')
-        # Record the selected value in data attribute and update image class to reflect new state
-        val = select.find('option:selected').val()
+        val = freq.attr('data-value')
         @saveNewCellValue(cell, val)
 
       # Catch the change for a user preference and record it at the server.
