@@ -9915,7 +9915,7 @@ mi:
       one: "1 ohipa i tāpaetanga Mākahia"
       other: "%{count} ohipa i tāpaetanga Mākahia"
     assignments_to_post: 
-      one: "He rite ki te tuku %{count} ohipa koe."
+      one: "He rite ki te tuku 1 ohipa koe."
       other: "He rite ki te tuku %{count} ohipa koe."
     continue: Tonu
     create: 
