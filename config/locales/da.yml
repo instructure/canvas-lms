@@ -12835,8 +12835,8 @@ da:
         manage: Administrer
         only_registered_users: "Kun registrerede, tilmeldte brugere kan tage bedømte quizzer"
         quiz_regraded_your_score_affected: 
-          one: "Denne quiz er blevet bedømt igen"
-          other: "Denne quiz er blevet bedømt igen; din nye score reflektere %{count} spørgsmål, der var påvirket."
+          one: "Denne quiz er blevet bedømt igen; din score blev påvirket."
+          other: "Denne quiz er blevet bedømt igen; din nye score afspejler %{count} spørgsmål, der blev ramt."
         quiz_regraded_your_score_not_affected: "Denne quiz er blevet bedømt igen"
         speed_grader: SpeedGrader™
         students_submitted_so_far: 
@@ -14352,7 +14352,7 @@ da:
       labels: 
         alert: Alarm
         notice: Bemærk
-      no_valid_users: "*Beklager*, det ser ud til at der var en gyldig e-mailadrese eller login ID indtastet, gå venligst tilbage og prøv igen."
+      no_valid_users: "*Ingen* gyldig e-mailadresse eller ID indtastet. Gå tilbage og prøv igen."
       titles: 
         new_user: "Ny bruger"
       user_list_explanation: "Prøvformat: \"Eksempel Student\" <student@example.com>, \"Efternavn, Fornavn\" <firstlast@example.com>, justAnEmailAddress@example.com"
