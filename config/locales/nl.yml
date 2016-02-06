@@ -2293,6 +2293,7 @@ nl:
   before_publishing_this_file_you_must_specify_usage_2229d20b: "Je moet de gebruiksrechten bepalen voordat dit bestand gepubliceerd kan worden. "
   before_publishing_you_must_set_usage_rights_on_you_dcd7b567: "Alvorens te publiceren, moet je gebruiksrechten op je bestanden instellen."
   before_using_this_feature_we_recommend_trying_the__1dea6042: "Voordat je deze functie gebruikt, raden wij aan de**%{t_theme_editor}** te proberen om eventuele branding uit te voeren. Door deze functie in te schakelen ontstaat de mogelijkheid om aangepaste JavaScript en CSS-bestanden te uploaden in de Thema-editor. Wijzigingen die met deze methode gemaakt zijn, kunnen strijdig kunnen zijn met toekomstige wijzigingen van de Canvas DOM (bv: element klasnamen of HTML-structuur) en worden daarom niet ondersteund. Degenen die gebruik maken van deze functie moeten een geavanceerd begrip van JavaScript en CSS hebben en  hun eigen code handhaven. *Gebruik op eigen risico! *"
+  before_using_this_feature_we_recommend_trying_the__7e6f194e: "Alvorens deze functie te gebruiken raden we aan de *********%{t_theme_editor}********* te gebruiken om eventuele branding uit te voeren. Het inschakelen van deze functie biedt de mogelijkheid om aangepaste JavaScript en CSS-bestanden te uploaden in de Theme Editor. Aanpassingen die met deze methode gedaan zijn kunnen strijdig zijn met toekomstige wijzigingen van de Canvas DOM (bv: element klasnamen of HTML-structuur) en worden daarom niet ondersteund. Ook moet je ervoor zorgen dat alle wijzigingen die je maakt voor iedereen toegankelijk zijn, bijvoorbeeld wijzigingen die *screen readers*  gebruiken en **die wijzigingen** ***vertrouwen*** op de ****hoge contrast functie****. Instructure aanvaardt geen enkele aansprakelijkheid voor eventuele wijzigingen die je aanbrengt. Het is je eigen verantwoordelijkheid om ervoor te zorgen dat deze voldoen aan *****elke***** ******nalevings- ****** *******normen******* die in je rechtsgebied vereist zijn. Diegenen die gebruik maken van deze functie dienen een gevorderd begrip van JavaScript en CSS te hebben en moeten hun eigen code te behouden. ********Gebruik op eigen risico!********"
   before_you_can_edit_your_profile_you_need_to_verif_4fd9143e: "Voordat je je profiel kunt bewerken, moet je je e-mailadres (%{email}) verifiëren door op de koppeling te klikken in de e-mail die we je gestuurd hebben. *Hier klikken om de e-mail opnieuw te versturen* als je de mail niet ziet, en bekijk je spamfolder."
   beginning_date_2d2a29ac: Begindatum
   below_this_search_field_is_a_list_of_content_type__58aaa03f: "Onder dit zoekveld is een lijst van %{content_type}. Terwijl je typt, wordt de lijst gefilterd om bij je vraag te passen. Conversatieberichten worden gefilterd door de optie die je kiest."
@@ -4941,7 +4942,7 @@ nl:
     out_of_points_possible: "vanuit %{assignment.points_possible}"
     this_is_permanent: "Gewijzigde cijferverdeling kan niet ongedaan gemaakt worden. De cijfers van vóór de cijferverdeling zijn nog wel beschikbaar, maar de gewijzigde verdeling kan niet teruggedraaid worden."
   custom_fields_fc3e55af: "Aangepaste velden "
-  cutoff_score_74254c89: afsluitscore
+  cutoff_score_74254c89: afsluit-score
   cyan_c1d5f68a: Cyaan
   d2l_display: Desire2Learn
   d2l_file_description: "D2L-exportindeling (.zip)"
@@ -7072,6 +7073,7 @@ nl:
       saving: "Bezig met opslaan..."
     titles: 
       grading_scheme_info: "Beoordelingsschema bekijken/bewerken"
+  grading_type_type_7d8b42d7: "Beoordelingtype: %{type}"
   graphs_89fcfeb: Grafieken
   great_so_you_ve_got_a_course_now_what_well_before__38cfba67: "Fantastisch, nu heb je een cursus. Nu wat? Voordat je deze voor iedereen publiceert wil je deze misschien controleren en ervoor zorgen dat je de basiswerkingen hebt opgemaakt. Neem de lijst links door om ervoor te zorgen dat jouw cursus klaar is voor gebruik. "
   green_15af4778: Groen
@@ -7849,7 +7851,7 @@ nl:
       enkele stijlwijzigingen in, maar meer specifieke aanpassingen voor het basis onderwijs, het lager en hoger middelbaar onderwijs kunnen in de toekomst toegevoegd worden.
   k_2521301c: k
   keyboard_nav_dialog: 
-    esc_key_notification: "Druk op de escape-toets voor gebruik van de sneltoetsen van het toetsenbord bij het navigeren van het cijferlijst raster."
+    esc_key_notification: "Druk op de escape-toets voor gebruik van de sneltoetsen bij het navigeren van het cijferlijst raster."
   keyboard_shortcuts_ed1844bd: Sneltoetsen
   kind_7f0a88c4: Soort
   labels: 
@@ -8030,6 +8032,7 @@ nl:
   loading_more_results_def6df65: "Bezig met het laden van meer resultaten..."
   locales: 
     nl: Nederlands
+  lock_at_time_3c8a044e: "Sluiten om: %{time} "
   lock_date_cannot_be_after_course_end_a473158b: "Vergrendeldatum kan niet na afloop van cursus plaatsvinden "
   lock_date_cannot_be_after_section_end_d37da70c: "Datumvergrendeling kan niet na afloop van gedeelte plaatsvinden "
   lock_date_cannot_be_after_term_end_cf1a188f: "Datumvergrendeling kan niet na afloop van termijn plaatsvinden "
@@ -10907,7 +10910,7 @@ nl:
   people_options_cfb419a6: "Mensen opties"
   people_will_see_this_name_in_discussions_messages__fca9ebb2: "Deze naam is te zien in discussies, berichten en opmerkingen."
   percent_complete_3a7edc20: "%{percent} voltooid"
-  percent_of_respondents_selecting_this_answer_4c2ce4ee: "Percentage van respondents die dit antwoord heeft geslecteerd"
+  percent_of_respondents_selecting_this_answer_4c2ce4ee: "Percentage van respondents dat dit antwoord heeft geselecteerd"
   percent_of_students_scored_score_53d2c4d5: "%{percent} van cursisten hebben %{score} gehaald "
   percentage_34ab7c2c: Percentage
   percentused_of_bytesavailable_used_894e2327: "%{percentUsed}% van %{bytesAvailable} gebruikt "
@@ -15139,7 +15142,7 @@ nl:
   this_question_will_show_a_checkbox_next_to_each_an_169cd6d9: "Deze vraag zal een aankruisvakje naast elk antwoord tonen."
   this_quiz_has_been_excused_d89d2b74: "Deze toets is geëxcuseerd"
   this_quiz_is_unpublished_only_teachers_can_see_the_51d281b1: "*Deze toets is niet gepubliceerd* Alleen docenten kunnen de toets zien totdat deze gepubliceerd wordt."
-  this_recorder_uses_flash_as_a_result_you_may_find__427d2ddb: "Deze recorder gebruikt Flash. Als resultaat is het mogelijk makkelijker om een opname te maken op je lokale machine en vervolgens de media uploader tab gebruiken om het te uploaden."
+  this_recorder_uses_flash_as_a_result_you_may_find__427d2ddb: "Deze recorder gebruikt Flash. Als gevolg daarvan is het mogelijk makkelijker om een opname te maken op je lokale machine en vervolgens de media uploader tab te gebruiken om het te uploaden."
   this_sample_page_includes_common_ui_elements_in_ca_331f4ac4: "Deze voorbeeldpagina bevat gemeenschappelijke UI-elementen in Canvas om je te helpen je aangepaste huisstijl op te bouwen. Zodra je begint met het aanbrengen van wijzigingen aan de kleurwaarden en beelden in de zijbalk links, zie je een knop *Bekijk je wijzigingen*.  knop. Klik erop om deze pagina te vernieuwen en te zien hoe je wijzigingen eruit zien."
   this_student_s_responses_are_hidden_because_this_a_252e8335: "De antwoorden van deze cursist zijn verborgen omdat de opdracht anoniem is. "
   this_student_wrote_f1a3f22d: "Deze cursist schreef: "
@@ -15904,7 +15907,7 @@ nl:
       no_courses_message: "Je hebt nog geen cursus, dus op deze pagina is nog weinig opvallend te vinden. Als je cursussen hebt gemaakt of als je je voor cursussen hebt aangemeld , zul je hier gesprekken gaan zien van al jouw cursussen."
       unpublished_courses_message: "Je bent ingeschreven in een of meerdere cursussen die nog niet van start zijn gegaan. Eens deze cursussen beschikbaar zijn kun je hier en boven in de navigatie informatie zien. Ondertussen kun je je ook aanmelden voor meer cursussen of jouw profiel instellen."
       welcome_to_happiness: "Welkom bij Canvas!"
-  users_of_screen_readers_may_need_to_turn_off_the_v_98811cd: "Gebruikers van schermlezers kan de virtuele cursor uitschakelen om deze sneltoetsen te gebruiken"
+  users_of_screen_readers_may_need_to_turn_off_the_v_98811cd: "Gebruikers van schermlezers moeten mogelijk de virtuele cursor uitschakelen om deze sneltoetsen te gebruiken"
   validate: 
     is_required: "Dit veld is verplicht"
   validate_links_in_content_b1630fba: "Koppelingen in content valideren"
