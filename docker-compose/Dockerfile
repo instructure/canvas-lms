@@ -24,7 +24,7 @@ RUN wget http://people.mozilla.org/~jkew/woff/woff-code-latest.zip \
   && cp sfnt2woff /usr/local/bin
 
 # Canvas requires bundler 1.11.2
-RUN gem uninstall bundler \
+RUN gem uninstall -i /usr/local/lib/ruby/gems/2.1.0 bundler \
   && gem install bundler -v 1.11.2
 
 RUN mkdir /app
@@ -35,8 +35,7 @@ RUN mkdir /home/docker \
  && chown -R docker:docker /home/docker /usr/local/bundle
 
 ENV PATH /usr/local/bundle/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+ENV BUNDLE_PATH /app/vendor/bundle/docker/"$RUBY_VERSION"
 USER docker
 
-RUN bundle config path /app/vendor/bundle/docker/$(ruby -e 'print RUBY_VERSION')/
-RUN bundle config bin /usr/local/bundle/bin
 ENV RAILS_ENV development
