@@ -5,7 +5,7 @@ module Canvas::Security
     include_context "JWT setup"
 
     def build_wrapped_token(user_id)
-      crypted_token = ServicesJwt.generate(user_id, false)
+      crypted_token = ServicesJwt.generate({ sub: user_id }, false)
       payload = {
         iss: "some other service",
         user_token: crypted_token
@@ -36,7 +36,7 @@ module Canvas::Security
       end
 
       it "is an empty hash if an unwrapped token" do
-        original_token = ServicesJwt.generate(user_id)
+        original_token = ServicesJwt.generate(sub: user_id)
         jwt = ServicesJwt.new(original_token, false)
         expect(jwt.wrapper_token).to eq({})
       end
@@ -52,23 +52,9 @@ module Canvas::Security
       end
     end
 
-    describe ".generate" do
+    describe "initialization" do
       after{ Timecop.return }
-
-      let(:base64_regex) do
-        %r{^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{4}|[A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)$}
-      end
-
-      let(:jwt_string){ ServicesJwt.generate(1) }
-
-      it "builds an encoded token out" do
-        expect(jwt_string).to match(base64_regex)
-      end
-
-      it "can return just the encrypted token without base64 encoding" do
-        jwt = ServicesJwt.generate(1, false)
-        expect(jwt).to_not match(base64_regex)
-      end
+      let(:jwt_string){ ServicesJwt.generate(sub: 1) }
 
       it "uses SecureRandom for generating the JWT" do
         SecureRandom.stubs(uuid: "some-secure-random-string")
@@ -82,6 +68,36 @@ module Canvas::Security
         expect(jwt.expires_at).to eq(1363169520)
       end
 
+      describe "via .generate" do
+
+        let(:base64_regex) do
+          %r{^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{4}|[A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)$}
+        end
+
+        let(:jwt_string){ ServicesJwt.generate(sub: 1) }
+
+        it "builds an encoded token out" do
+          expect(jwt_string).to match(base64_regex)
+        end
+
+        it "can return just the encrypted token without base64 encoding" do
+          jwt = ServicesJwt.generate({ sub: 1 }, false)
+          expect(jwt).to_not match(base64_regex)
+        end
+
+        it "allows the introduction of arbitrary data" do
+          jwt = ServicesJwt.generate(sub: 2, foo: "bar")
+          decoded_crypted_token = Canvas::Security.base64_decode(jwt)
+          decrypted_token_body = Canvas::Security.decrypt_services_jwt(decoded_crypted_token)
+          expect(decrypted_token_body[:foo]).to eq("bar")
+        end
+
+        it "errors if you try to pass data without a sub entry" do
+          expect{ ServicesJwt.generate(foo: "bar", bang: "baz") }.
+            to raise_error(ArgumentError)
+        end
+
+      end
     end
   end
 end
