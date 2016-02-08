@@ -88,6 +88,8 @@ jQuery(function($){
 
       var expand_link = $("#account_" + account.id + " .expand_sub_accounts_link");
       expand_link.attr({'data-link': $.replaceTags(expand_link.attr('data-link'), 'id', account.id)});
+
+      $("#account_" + account.id + " > .header .name").focus();
     }
   });
   
@@ -104,8 +106,12 @@ jQuery(function($){
         url: $(this).parents(".header").find("form").attr('action'),
         message: I18n.t('confirms.delete_subaccount', "Are you sure you want to delete this sub-account?"),
         success: function() {
+          var $list_entry = $(this).closest(".sub_account");
+          var $prev_entry = $list_entry.prev();
+          var $focusTo = $prev_entry.length ? $("> .account > .header .name", $prev_entry) : $("> .header .name", $list_entry.closest(".account"))
           $(this).slideUp(function() {
             $(this).remove();
+            $focusTo.focus();
           });
         },
         error: function(data, request, status, error) {
@@ -122,7 +128,7 @@ jQuery(function($){
   $(".collapse_sub_accounts_link").click(function() {
     var $header = $(this).parents(".header:first");
     $header.closest(".account").children("ul").slideUp();
-    $header.find(".expand_sub_accounts_link").show();
+    $header.find(".expand_sub_accounts_link").show().focus();
     $header.find(".collapse_sub_accounts_link, .add_sub_account_link").hide();
     return false;
   });
@@ -133,6 +139,7 @@ jQuery(function($){
       $header.parent(".account").children("ul").slideDown();
       $header.find(".expand_sub_accounts_link").hide();
       $header.find(".collapse_sub_accounts_link, .add_sub_account_link").show();
+      $header.find(".collapse_sub_accounts_link").focus();
     } else {
       $header.loadingImage({image_size: 'small'});
       $.ajaxJSON($(this).data('link'), 'GET', {}, function(data) {
@@ -177,6 +184,7 @@ jQuery(function($){
             );
         }
         $header.parent(".account").children("ul").slideDown();
+        $header.find(".collapse_sub_accounts_link").focus();
       }, function(data) {
       });
     }
