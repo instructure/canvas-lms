@@ -531,6 +531,7 @@ class Submission < ActiveRecord::Base
   end
 
   def attachment_fake_belongs_to_group(attachment)
+    return false if submission_type == 'discussion_topic'
     return false unless attachment.context_type == "User" &&
       assignment.has_group_category?
     gc = assignment.group_category
@@ -539,7 +540,7 @@ class Submission < ActiveRecord::Base
   private :attachment_fake_belongs_to_group
 
   def submit_attachments_to_canvadocs
-    if attachment_ids_changed?
+    if attachment_ids_changed? && submission_type != 'discussion_topic'
       attachments.preload(:crocodoc_document, :canvadoc).each do |a|
         # moderated grading annotations are only supported in crocodoc right now
         dont_submit_to_canvadocs = assignment.moderated_grading?
