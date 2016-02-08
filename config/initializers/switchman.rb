@@ -1,4 +1,4 @@
-Rails.application.config.to_prepare do
+Rails.application.config.after_initialize do
   Switchman.cache = -> { MultiCache.cache }
 
   module Canvas
