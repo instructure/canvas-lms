@@ -158,7 +158,6 @@ module CustomSeleniumActions
       else
         replace_content(input, value)
     end
-    driver.execute_script(input['onchange']) if input['onchange']
   end
 
   def click_option(select_css, option_text, select_by = :text)
@@ -191,9 +190,11 @@ module CustomSeleniumActions
     fj("#ui-datepicker-div a:contains(#{day_text})").click
   end
 
-  def replace_content(el, value)
-    el.clear
-    el.send_keys(value)
+  MODIFIER_KEY = RUBY_PLATFORM =~ /darwin/ ? :command : :control
+  def replace_content(el, value, options = {})
+    keys = [MODIFIER_KEY, "a"], :backspace, value
+    keys << :tab if options[:tab_out]
+    el.send_keys *keys
   end
 
   # can pass in either an element or a forms css

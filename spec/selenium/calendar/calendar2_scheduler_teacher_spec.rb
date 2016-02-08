@@ -188,7 +188,9 @@ describe "scheduler" do
       # invalid max_appointments
       max_appointments_input = f('[name="max_appointments_per_participant"]')
       replace_content(max_appointments_input, '0')
-      expect(get_value('[name="max_appointments_per_participant"]').to_i).to be > 0
+
+      f('.ui-dialog-buttonset .btn-primary').click
+      assert_error_box('[name="max_appointments_per_participant"]')
     end
 
     it "should show appointment notes",:priority => "1", test_id: 140195 do
