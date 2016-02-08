@@ -1242,6 +1242,22 @@ describe DiscussionTopic do
       @topic.ensure_submission(@student)
       expect(@submission.reload.workflow_state).to eq 'graded'
     end
+
+    it "should associate attachments with graded discussion submissions" do
+      @assignment = assignment_model(:course => @course)
+      @topic.assignment = @assignment
+      @topic.save!
+      @topic.reload
+
+      attachment_model(:context => @user, :uploaded_data => stub_png_data, :filename => "homework.png")
+      entry = @topic.reply_from(:user => @student, :text => "entry")
+      entry.attachment = @attachment
+      entry.save!
+
+      @topic.ensure_submission(@student)
+      sub = @assignment.submissions.where(:user_id => @student).first
+      expect(sub.attachments.to_a).to eq [@attachment]
+    end
   end
 
   describe "#unread_count" do
