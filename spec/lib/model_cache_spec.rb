@@ -23,7 +23,7 @@ describe ModelCache do
     class TestModelCacheUser < ActiveRecord::Base
       self.table_name = :users # reuse exiting tables so AR doesn't asplode
 
-      attr_protected
+      strong_params
     end
 
     class TestModelCachePseudonym < ActiveRecord::Base
@@ -34,6 +34,8 @@ describe ModelCache do
       cacheable_method :test_model_cache_user, :key_method => :user_id
 
       belongs_to :test_model_cache_user_copy, :class_name => 'TestModelCacheUser', :foreign_key => :user_id
+
+      strong_params
     end
   end
 
@@ -46,6 +48,8 @@ describe ModelCache do
   after(:all) do
     ModelCache.keys.delete('TestModelCacheUser')
     ModelCache.keys.delete('TestModelCachePseudonym')
+    ActiveSupport::DescendantsTracker.class_variable_get(:@@direct_descendants)[ActiveRecord::Base].delete(TestModelCacheUser)
+    ActiveSupport::DescendantsTracker.class_variable_get(:@@direct_descendants)[ActiveRecord::Base].delete(TestModelCachePseudonym)
     Object.send(:remove_const, :TestModelCacheUser)
     Object.send(:remove_const, :TestModelCachePseudonym)
   end
