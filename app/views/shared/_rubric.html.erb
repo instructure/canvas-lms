@@ -4,7 +4,7 @@
    for_context ||= false
    context = @context
    context = context.context if context.is_a?(Group)
-   show_grading = !@assignment || @assignment.submission_types != 'online_quiz' 
+   show_grading = !@assignment || @assignment.submission_types != 'online_quiz'
    rubric_association = assessment.rubric_association if assessment
 %>
 <% cache(['rubric_render3',

@@ -135,7 +135,14 @@
         <% end %>
       </select>
     </div>
-    <%= render :partial => "shared/rubric", :object => @assignment.try_rescue(:rubric_association).try_rescue(:rubric), :locals => {:assessing => @submission.user != @current_user } if @assignment.try_rescue(:rubric_association).try_rescue(:rubric) %>
+    <% if @assignment.rubric.present? %>
+      <%= render({
+        partial: 'shared/rubric',
+        object: @assignment.rubric,
+        locals: {
+          assessing: @submission.grants_right?(@current_user, :grade) || currently_peer_reviewing
+        }}) %>
+    <% end -%>
     <%= render :partial => "shared/rubric_criterion_dialog" %>
     <div class="button-container">
       <% if @assignment.rubric_association && can_do(@assignment.rubric_association, @current_user, :assess) %>
