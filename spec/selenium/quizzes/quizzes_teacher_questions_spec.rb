@@ -23,6 +23,7 @@ describe "quizzes questions" do
       wait_for_ajax_requests
 
       click_questions_tab
+      wait_for_ajaximations
       hover_and_click(".edit_question_link")
       wait_for_ajaximations
       question = fj(".question_form:visible")
