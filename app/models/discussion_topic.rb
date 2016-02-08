@@ -928,8 +928,15 @@ class DiscussionTopic < ActiveRecord::Base
 
   def ensure_submission(user)
     submission = Submission.where(assignment_id: self.assignment_id, user_id: user).first
-    return if submission && submission.submission_type == 'discussion_topic' && submission.workflow_state != 'unsubmitted'
-    self.assignment.submit_homework(user, :submission_type => 'discussion_topic')
+    unless submission && submission.submission_type == 'discussion_topic' && submission.workflow_state != 'unsubmitted'
+      submission = self.assignment.submit_homework(user, :submission_type => 'discussion_topic')
+    end
+    topic = self.root_topic? ? self.child_topic_for(user) : self
+    attachment_ids = topic.discussion_entries.where(:user_id => user).where.not(:attachment_id => nil).pluck(:attachment_id)
+    if attachment_ids.any?
+      submission.attachment_ids = attachment_ids.sort.map(&:to_s).join(",")
+      submission.save! if submission.changed?
+    end
   end
 
   def send_notification_for_context?
