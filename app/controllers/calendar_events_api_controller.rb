@@ -623,8 +623,27 @@ class CalendarEventsApiController < ApplicationController
 
     filtered_events = []
     events.each do |event|
-      unless event.context_type == 'CourseSection' && !user_section_ids.include?(event.context_id)
-        filtered_events << event
+      if event.assignment_overrides
+        # assignments are a completely different kind of object... we need to make sure it filters
+        # the overrides intelligently
+        if event.assignment_overrides.empty?
+          filtered_events << event
+        else
+          filtered_overrides = []
+          event.assignment_overrides.each do |o|
+            if user_section_ids.include?(o.set_id)
+              filtered_overrides << o
+            end
+          end
+          if filtered_overrides.length
+            event.assignment_overrides = filtered_overrides
+            filtered_events << event
+          end
+        end
+      else
+        unless event.context_type == 'CourseSection' && !user_section_ids.include?(event.context_id)
+          filtered_events << event
+        end
       end
     end
     filtered_events
