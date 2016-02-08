@@ -1,7 +1,7 @@
 {
   "checksum": {
-    "previous": "8641c1ae6ade1c1888a6b5a7dd678e3e298610b7fea294edf717c8d1907ff500",
-    "current": "8641c1ae6ade1c1888a6b5a7dd678e3e298610b7fea294edf717c8d1907ff500"
+    "previous": "7cce59b4ad868e5482f0e727ad9ee095c5c4d5898601ce890d194f0e092cc9f1",
+    "current": "7cce59b4ad868e5482f0e727ad9ee095c5c4d5898601ce890d194f0e092cc9f1"
   },
   "fonts": [
     "public/fonts/canvas/canvas-icons.ttf",
@@ -633,6 +633,10 @@
     "syllabus": {
       "codepoint": 61844,
       "source": "public/fonts/icons/syllabus.svg"
+    },
+    "table": {
+      "codepoint": 61882,
+      "source": "public/fonts/icons/table.svg"
     },
     "tag": {
       "codepoint": 61845,

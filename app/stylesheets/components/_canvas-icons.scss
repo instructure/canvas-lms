@@ -308,6 +308,7 @@ Either use `<a>` with icon desired icon class added or insert `<i>` inside `<but
 <div class="row-fluid">
   <span class="span3"><i class="icon-post-to-sis"></i> icon-post-to-sis</span>
   <span class="span3"><i class="icon-masquerade"></i> icon-masquerade</span>
+  <span class="span3"><i class="icon-table"></i> icon-table</span>
 </div>
 */
 
@@ -556,6 +557,7 @@ h1, h2, h3, h4, .h1, .h2, .h3, .h4, p {
 .icon-stats:before { content: "\f192"; }
 .icon-student-view:before { content: "\f193"; }
 .icon-syllabus:before { content: "\f194"; }
+.icon-table:before { content: "\f1ba"; }
 .icon-tag:before { content: "\f195"; }
 .icon-target:before { content: "\f196"; }
 .icon-text:before { content: "\f197"; }
