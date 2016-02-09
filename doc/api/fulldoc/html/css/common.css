@@ -238,8 +238,7 @@ pre.code {
   padding: 15px;
   border: 1px solid black;
   overflow: auto;
-  background-color: #2A404D;
-  color: #fff;
+  background-color: white;
 }
 pre.code code {
   overflow: auto;
