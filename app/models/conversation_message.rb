@@ -33,8 +33,7 @@ class ConversationMessage < ActiveRecord::Base
   has_many :attachment_associations, :as => :context
   # we used to attach submission comments to conversations via this asset
   # TODO: remove this column when we're sure we don't want this relation anymore
-  belongs_to :asset, :polymorphic => true, :types => :submission
-  validates_inclusion_of :asset_type, :allow_nil => true, :in => ['Submission']
+  belongs_to :asset, polymorphic: [:submission]
   delegate :participants, :to => :conversation
   delegate :subscribed_participants, :to => :conversation
   attr_accessible

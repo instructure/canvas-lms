@@ -337,70 +337,6 @@ describe ActiveRecord::Base do
     end
   end
 
-  context "add_polymorphs" do
-    class OtherPolymorphyThing; end
-    before :all do
-      # it already has :submission
-      ConversationMessage.add_polymorph_methods :asset, [:other_polymorphy_thing]
-    end
-
-    before :once do
-      @conversation = Conversation.create
-      @user = user_model
-      @assignment = assignment_model
-    end
-
-    context "getter" do
-      it "should return the polymorph" do
-        sub = @user.submissions.create!(:assignment => @assignment)
-        m = @conversation.conversation_messages.build
-        m.asset = sub
-
-        expect(m.submission).to be_an_instance_of(Submission)
-      end
-
-      it "should not return the polymorph if the type is wrong" do
-        m = @conversation.conversation_messages.build
-        m.asset = @user.submissions.create!(:assignment => @assignment)
-
-        expect(m.other_polymorphy_thing).to be_nil
-      end
-    end
-
-    context "setter" do
-      it "should set the underlying association" do
-        m = @conversation.conversation_messages.build
-        s = @user.submissions.create!(:assignment => @assignment)
-        m.submission = s
-
-        expect(m.asset_type).to eql 'Submission'
-        expect(m.asset_id).to eql s.id
-        expect(m.asset).to eql s
-        expect(m.submission).to eql s
-
-        m.submission = nil
-
-        expect(m.asset_type).to be_nil
-        expect(m.asset_id).to be_nil
-        expect(m.asset).to be_nil
-        expect(m.submission).to be_nil
-      end
-
-      it "should not change the underlying association if it's another object and we're setting nil" do
-        m = @conversation.conversation_messages.build
-        s =  @user.submissions.create!(:assignment => @assignment)
-        m.submission = s
-        m.other_polymorphy_thing = nil
-
-        expect(m.asset_type).to eql 'Submission'
-        expect(m.asset_id).to eql s.id
-        expect(m.asset).to eql s
-        expect(m.submission).to eql s
-        expect(m.other_polymorphy_thing).to be_nil
-      end
-    end
-  end
-
   context "bulk_insert" do
     it "should work" do
       User.bulk_insert [
@@ -670,6 +606,59 @@ describe ActiveRecord::Base do
       Setting.set('touch_personal_space', '1')
       group_model
       expect(@group.users.not_recently_touched.to_a).to be_empty
+    end
+  end
+
+  context "polymorphic associations" do
+    it "allows joins to specific classes" do
+      # no error
+      sql = StreamItem.joins(:discussion_topic).to_sql
+      # and the sql
+      expect(sql).to include('asset_type')
+      expect(sql).to include('DiscussionTopic')
+    end
+
+    it "validates the type field" do
+      si = StreamItem.new
+      si.asset_type = 'Submission'
+      si.data = {}
+      expect(si.valid?).to eq true
+
+      si.context_type = 'User'
+      expect(si.valid?).to eq false
+    end
+
+    it "doesn't allow mismatched assignment" do
+      si = StreamItem.new
+      expect { si.discussion_topic = Course.new }.to raise_error(ActiveRecord::AssociationTypeMismatch)
+      expect { si.asset = Course.new }.to raise_error(ActiveRecord::AssociationTypeMismatch)
+      si.asset = DiscussionTopic.new
+      si.asset = nil
+    end
+
+    it "has the same backing store for both generic and specific accessors" do
+      si = StreamItem.new
+      dt = DiscussionTopic.new
+      si.discussion_topic = dt
+      expect(si.asset_type).to eq 'DiscussionTopic'
+      expect(si.asset_id).to eq dt.id
+      expect(si.asset.object_id).to eq si.discussion_topic.object_id
+    end
+
+    it "returns nil for the specific type if it's not that type" do
+      si = StreamItem.new
+      si.discussion_topic = DiscussionTopic.new
+      expect(si.conversation).to eq nil
+    end
+
+    it "doesn't ignores specific type if we're setting nil" do
+      si = StreamItem.new
+      dt = DiscussionTopic.new
+      si.discussion_topic = dt
+      si.conversation = nil
+      expect(si.asset).to eq dt
+      si.discussion_topic = nil
+      expect(si.asset).to eq nil
     end
   end
 end

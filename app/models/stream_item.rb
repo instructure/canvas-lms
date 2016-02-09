@@ -24,13 +24,10 @@ class StreamItem < ActiveRecord::Base
 
   has_many :stream_item_instances
   has_many :users, :through => :stream_item_instances
-  belongs_to :context, :polymorphic => true
-  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'Account', 'Group', 'AssignmentOverride', 'Assignment']
-  belongs_to :asset, :polymorphic => true, :types => [
+  belongs_to :context, polymorphic: [:course, :account, :group, :assignment_override, :assignment]
+  belongs_to :asset, polymorphic: [
       :collaboration, :conversation, :discussion_entry,
       :discussion_topic, :message, :submission, :web_conference, :assessment_request]
-  validates_inclusion_of :asset_type, :allow_nil => true, :in => ['Collaboration', 'Conversation', 'DiscussionEntry',
-      'DiscussionTopic', 'Message', 'Submission', 'WebConference', 'AssessmentRequest']
   validates_presence_of :asset_type, :data
 
   attr_accessible :context, :asset

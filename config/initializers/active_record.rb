@@ -469,39 +469,61 @@ class ActiveRecord::Base
   end
 
   # set up class-specific getters/setters for a polymorphic association, e.g.
-  #   belongs_to :context, :polymorphic => true, :types => [:course, :account]
-  def self.belongs_to(name, options={})
-    if types = options.delete(:types)
-      add_polymorph_methods(name, Array(types))
+  #   belongs_to :context, polymorphic: [:course, :account]
+  def self.belongs_to(name, scope = nil, options={})
+    options = scope if scope.is_a?(Hash)
+
+    if options[:polymorphic].is_a?(Array)
+      add_polymorph_methods(name, options[:polymorphic])
     end
     super
   end
 
   def self.add_polymorph_methods(generic, specifics)
+    unless @polymorph_module
+      @polymorph_module = Module.new
+      include(@polymorph_module)
+    end
+
+    specific_classes = specifics.map(&:to_s).map(&:classify).sort
+    validates "#{generic}_type", inclusion: { in: specific_classes }, allow_nil: true
+
+    @polymorph_module.class_eval <<-RUBY, __FILE__, __LINE__ + 1
+      def #{generic}=(record)
+        if record && [#{specific_classes.join(', ')}].none? { |klass| record.is_a?(klass) }
+          message = "one of #{specific_classes.join(', ')} expected, got \#{record.class}"
+          raise ActiveRecord::AssociationTypeMismatch, message
+        end
+        super
+      end
+    RUBY
+
     specifics.each do |specific|
-      next if method_defined?(specific.to_sym)
       class_name = specific.to_s.classify
+
+      # ensure we capture this class's table name
+      table_name = self.table_name
+      belongs_to specific, -> { where(table_name => { "#{generic}_type" => class_name }) }, foreign_key: "#{generic}_id"
+
       correct_type = "#{generic}_type && self.class.send(:compute_type, #{generic}_type) <= #{class_name}"
 
-      class_eval <<-CODE
+      @polymorph_module.class_eval <<-RUBY, __FILE__, __LINE__ + 1
       def #{specific}
         #{generic} if #{correct_type}
       end
 
-      def #{specific}=(val)
-        if val.nil?
-          # we don't want to unset it if it's currently some other type, i.e.
-          # foo.bar = Bar.new
-          # foo.baz = nil
-          # foo.bar.should_not be_nil
-          self.#{generic} = nil if #{correct_type}
-        elsif val.is_a?(#{class_name})
-          self.#{generic} = val
-        else
-          raise ArgumentError, "argument is not a #{class_name}"
-        end
+      def #{specific}=(record)
+        # we don't want to unset it if it's currently some other type, i.e.
+        # foo.bar = Bar.new
+        # foo.baz = nil
+        # foo.bar.should_not be_nil
+        return if record.nil? && !(#{correct_type})
+        association(:#{specific}).send(:raise_on_type_mismatch!, record) if record
+
+        self.#{generic} = record
       end
-      CODE
+
+      RUBY
     end
   end
 
