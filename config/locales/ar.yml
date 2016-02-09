@@ -412,8 +412,10 @@ ar:
       account_status: "حالة الحساب"
       add_new_domain: "إضافة مجال جديد"
       labels: 
-        consortium_autocreate_reverse_trust: "وثوق الحساب الأصلي بالحسابات الجذرية الجديدة تلقلئيًا (العكس صحيح دائمًا)"
+        consortium_autocreate_reverse_trust: "وثوق الحساب الأصلي بالحسابات الجذرية الجديدة تلقائيًا (العكس صحيح دائمًا)"
         consortium_autocreate_web_of_trust: "إنشاء صفحة ويب الثقة تلقائيًا أثناء إنشاء حسابات جديدة."
+        consortium_can_create_own_accounts: "لا يستطيع مسؤولي المجمعات إنشاء حاسبات جذرية"
+        consortium_parent_account: "الحساب الأصلي للمجمع"
         shard_per_account: "إنشاء جزء جديد لكل حساب جديد"
       license: الترخيص
       license_type: "نوع الترخيص"
@@ -4942,6 +4944,8 @@ ar:
     to_do_list: 
       headings: 
         to_do: "يجب القيام بها"
+      links: 
+        show_more: "%{count} آخر/أخرى..."
     unauthorized: 
       invalid_link: "يبدو أن ارتباط التسجيل الذي تستخدمه لم يعد صالحًا.  الرجاء الاتصال بمعلم المساق والتأكد أنك ما زلت مسجلاً بشكل صحيح."
   courses_43204aae: المساقات
@@ -16060,7 +16064,7 @@ ar:
   tool_created_at_82c0daba: "تم إنشاء الأداة في"
   tool_name_7d58a6e4: "اسم الأداة"
   tool_placements_3f996c24: "مواضع الأداة"
-  tool_privacy_level_9d392813: "مستوى الخصوصية الأداة"
+  tool_privacy_level_9d392813: "مستوى خصوصية الأداة"
   tool_type_afa58fcb: "نوع الأداة"
   tooltips: 
     finished: "تم الانتهاء"
