@@ -1463,18 +1463,13 @@ class Account < ActiveRecord::Base
 
   def self.serialization_excludes; [:uuid]; end
 
-  # This could be much faster if we implement a SQL tree for the account tree
-  # structure.
   def find_child(child_id)
-    child_id = child_id.to_i
-    child_ids = self.class.connection.select_values("SELECT id FROM accounts WHERE parent_account_id = #{self.id}").map(&:to_i)
-    until child_ids.empty?
-      if child_ids.include?(child_id)
-        return self.class.find(child_id)
-      end
-      child_ids = self.class.connection.select_values("SELECT id FROM accounts WHERE parent_account_id IN (#{child_ids.join(",")})").map(&:to_i)
-    end
-    return false
+    return all_accounts.find(child_id) if root_account?
+
+    child = Account.find(child_id)
+    raise ActiveRecord::RecordNotFound unless child.account_chain.include?(self)
+
+    child
   end
 
   def manually_created_courses_account

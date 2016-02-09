@@ -981,6 +981,27 @@ describe Account do
     end
   end
 
+  describe '#find_child' do
+    it 'works for root accounts' do
+      sub = Account.default.sub_accounts.create!
+      expect(Account.default.find_child(sub.id)).to eq sub
+    end
+
+    it 'works for children accounts' do
+      sub = Account.default.sub_accounts.create!
+      sub_sub = sub.sub_accounts.create!
+      sub_sub_sub = sub_sub.sub_accounts.create!
+      expect(sub.find_child(sub_sub_sub.id)).to eq sub_sub_sub
+    end
+
+    it 'raises for out-of-tree accounts' do
+      sub = Account.default.sub_accounts.create!
+      sub_sub = sub.sub_accounts.create!
+      sibling = sub.sub_accounts.create!
+      expect { sub_sub.find_child(sibling.id) }.to raise_error(ActiveRecord::RecordNotFound)
+    end
+  end
+
   context "manually created courses account" do
     it "should still work with existing manually created courses accounts" do
       acct = Account.default

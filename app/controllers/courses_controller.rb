@@ -596,7 +596,7 @@ class CoursesController < ApplicationController
       end
 
       if (sub_account_id = params[:course].delete(:account_id)) && sub_account_id.to_i != @account.id
-        @sub_account = @account.find_child(sub_account_id) || raise(ActiveRecord::RecordNotFound)
+        @sub_account = @account.find_child(sub_account_id)
       end
 
       term_id = params[:course].delete(:term_id).presence || params[:course].delete(:enrollment_term_id).presence
