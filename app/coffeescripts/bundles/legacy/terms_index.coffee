@@ -15,8 +15,13 @@ require [
       $(this).parents(".term").find(".date_field").not(".already_has_date_field").addClass("already_has_date_field").date_field()
 
     $(".term .cancel_button").click ->
-      $(this).parents(".term").removeClass "editing_term"
-      $(this).parents(".term").remove()  if $(this).parents(".term").attr("id") is "term_new"
+      $term = $(this).closest(".term")
+      $term.removeClass "editing_term"
+      if $term.attr("id") is "term_new"
+        $term.remove()
+        $(".add_term_link").focus()
+      else
+        $(".edit_term_link", $term).focus()
 
     $(".cant_delete_term_link").click (event) ->
       event.preventDefault()
@@ -24,13 +29,18 @@ require [
 
     $(".delete_term_link").click (event) ->
       event.preventDefault()
-      url = $(this).parents(".term").find(".enrollment_term_form").attr("action")
-      $(this).parents(".term").confirmDelete
+      $term = $(this).closest(".term")
+      $focusTerm = $term.prev()
+      $focusTerm = $term.next() unless $focusTerm.length
+      $toFocus = if $focusTerm.length then $(".delete_term_link,.cant_delete_term_link", $focusTerm) else $(".add_term_link")
+      url = $term.find(".enrollment_term_form").attr("action")
+      $term.confirmDelete
         url: url
         message: I18n.t("prompts.delete", "Are you sure you want to delete this term?")
         success: ->
           $(this).fadeOut ->
             $(this).remove()
+            $toFocus.focus()
 
     $(".enrollment_term_form").formSubmit
       processData: (data) ->
@@ -64,11 +74,13 @@ require [
           object_name: "enrollment_term"
 
         $tr.removeClass "editing_term"
+        $(".edit_term_link", $tr).focus()
 
       error: (data) ->
         $(this).find("button").attr "disabled", false
         $(this).formErrors data
         $(this).find(".submit_button").text I18n.t("errors.submit", "Error Submitting")
+        $(".edit_term_link", $(this).closest("term")).focus()
 
     $(".add_term_link").click (event) ->
       event.preventDefault()
