@@ -787,10 +787,12 @@ class Attachment < ActiveRecord::Base
     discard_older_than = Setting.get("attachment_notify_discard_older_than_hours", "120").to_i.hours.ago
 
     while true
-      file_batches = Attachment.connection.select_rows(sanitize_sql([<<-SQL, quiet_period]))
-        SELECT COUNT(attachments.id), MIN(attachments.id), MAX(updated_at), context_id, context_type
-        FROM attachments WHERE need_notify GROUP BY context_id, context_type HAVING MAX(updated_at) < ? LIMIT 500
-      SQL
+      file_batches = Attachment.
+          where("need_notify").
+          group(:context_id, :context_type).
+          having("MAX(updated_at)<?", quiet_period).
+          limit(500).
+          pluck("COUNT(attachments.id), MIN(attachments.id), MAX(updated_at), context_id, context_type")
       break if file_batches.empty?
       file_batches.each do |count, attachment_id, last_updated_at, context_id, context_type|
         # clear the need_notify flag for this batch
