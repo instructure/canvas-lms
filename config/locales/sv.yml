@@ -907,6 +907,7 @@ sv:
         show_scheduler: "Akriver schemaläggare"
         sis_app_token: "SIS Agent Token"
         sis_app_url: "SIS App URL"
+        sis_default_grade_export: "*Publicera betyg till SIS* checkrutan är aktiverad för uppgifter, betygsdiskussioner och quizzes"
         sis_source_id: "SIS ID"
         start_at: Börjar
         students_can_create_courses: Elever

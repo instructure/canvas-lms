@@ -58,8 +58,8 @@ nb:
     no_api_key: "En API-nøkkel kreves for å bruke Academic Benchmarks"
     no_authority: "Kunne ikke finne en autoritet å oppdatere"
     no_file: "Ingen resultatfil eller autoritet gitt"
-    no_permissions: "Brukeren har ikke lov til å redigere globale resultater"
-    no_perms: "Brukeren har ikke lov til å redigere globale resultater"
+    no_permissions: "Brukeren har ikke lov til å redigere globale læringsmål"
+    no_perms: "Brukeren har ikke lov til å redigere globale læringsmål"
     plugin_settings: 
       api_url_description: "(f.eks. %{url})"
       common_core_guid: "(f.eks. %{guid})"
@@ -718,7 +718,7 @@ nb:
           order: 
             label: Rekkefølge
           outcome: 
-            radio: Resultat
+            radio: Læringsmål
           user: 
             radio: Brukere
     ph_student_grades_csv_parameters: 
@@ -5576,10 +5576,7 @@ nb:
   due_time_9acd6b69: "Tidsfrist %{time}"
   e_c2991d1b: e
   e_mail_only_2cc5e513: "Kun epost"
-  each_bar_is_an_assignment_the_green_layer_represen_b6536ab1: |-
-      Hver stolpe er en oppgave. Det grønne laget representerer prosentandelen av elevene som
-      leverte inn oppgaven *i tide*. Innleveringer som er **for sein** er gule, og innleveringer som
-      ***mangler*** er røde.
+  each_bar_is_an_assignment_the_green_layer_represen_b6536ab1: "Hver stolpe er en oppgave. Det grønne laget representerer prosentandelen av elevene som leverte inn oppgaven *i tide*. Innleveringer som er **for sein** er gule, og innleveringer som ***mangler*** er røde."
   each_bar_is_one_assignment_the_thin_vertical_whisk_17840129: |-
       Hver stolpe er en oppgave. Den tynne vertikale linjen utvider seg fra den laveste scoren som en student har i kurset til den høyeste. Den tykke stolpen strekker seg fra den 25.
       persentilen til den 75. med merke på medianen.
@@ -7578,10 +7575,14 @@ nb:
     due_dates_warning: "Kunne ikke justere fristene."
     file_import_warning: "Fil %{file} ble ikke funnet"
   importers/learning_outcome_group_importer: 
-    no_global_permission: "Du har ikke tillatelse til å behandle globale resultater, kan ikke legge til \"%{title}\""
+    no_global_permission: |-
+        Du har ikke tillatelse til å behandle globale læringsmål, kan
+        ikke legge til "%{title}"
   importers/learning_outcome_importer: 
     no_context_found: "Finner ikke det eksterne læringsmålet for \"%{title}\", lager en kopi."
-    no_global_permission: "Du har ikke tillatelse til å behandle globale resultater, kan ikke legge til \"%{title}\""
+    no_global_permission: |-
+        Du har ikke tillatelse til å behandle globale læringsmål, kan
+        ikke legge til "%{title}"
   importers/rubric_importer: 
     no_context_found: "Finner ikke den eksterne vurderingsveiledningen for \"%{title}\". Oppretter en kopi."
   importers/wiki_page_importer: 
@@ -7864,7 +7865,9 @@ nb:
       no_points_comment: "Et ekstern verktøy prøvde å sette karakteren på denne oppgaven til %{grade}, men var ikke i stand til det fordi oppgaven ikke har noen oppnåelige poeng."
       no_points_possible: "Oppgaven har ingen oppnåelige poeng."
       no_score: "Resultat er ikke gitt"
-      no_submission_created: "Denne resultatforespørselen mislyktes i å etablere en ny lekseinnlevering."
+      no_submission_created: |-
+          Denne forespørselen på læringsmål mislyktes i å etablere
+          en ny lekseinnlevering.
     canvas: 
       migration: 
         announcements: Kunngjøringer
@@ -10186,7 +10189,7 @@ nb:
   new_file_135ae520: "[ Ny fil ]"
   new_group_set_7241a581: "Nytt gruppesett"
   new_module_4e9287e4: "Ny modu"
-  new_outcome_7fba8c7d: "Nytt resultat"
+  new_outcome_7fba8c7d: "Nytt læringsmål"
   new_quiz_statistics_desc: "Aktivere den nye quizstatistikkside for et kurs."
   new_ui_487a624e: "Ny UI"
   next_40e12421: Neste
@@ -10606,14 +10609,14 @@ nb:
   orbis_report_header_submission_score: innleveringsresultat
   organize_epub_by_content_type_default_is_by_module_6f44ae06: "Organiser epub etter innholdstype (standard er av modul)."
   outcome_groups: 
-    invalid_file: "Ugyldig resultatgruppefil"
+    invalid_file: "Ugyldig fil for gruppen av læringsmål"
   outcome_groups_api: 
-    account_group_description: "Resultatgruppe på kontonivå"
+    account_group_description: "Gruppe av læringsmål på kontonivå"
   outcome_path_mastery_points: "%{path} mestringspoeng"
   outcome_path_result: "%{path} resultat"
   outcome_results: 
-    outcomes_filename: Resultat
-  outcome_results_title: Resultater
+    outcomes_filename: Læringsmål
+  outcome_results_title: "Resultater fra læringsmål"
   outcome_title_has_a_status_of_statustooltip_82d1e6d9: "Utfall: %{title} har status av %{statusTooltip}"
   outcomes: 
     account_standards: Kontostandarder
@@ -10624,13 +10627,15 @@ nb:
         back: Tilbake
         find: Finn
         new_group: "Ny gruppe"
-        new_outcome: "Nytt resultat"
+        new_outcome: "Nytt læringsmål"
     common_core: "Felles kjernestandarder"
     common_core_description: "Til venstre er den velkjente mappestrukturen for læringsmål i henhold til gruppering av de overordnete felles kjernestandardene. Dette gjør at du enkelt kan benytte hvilken som helst av de felles kjernestandardene innenfor ditt kurs."
     confirm: 
       delete: "Er du sikker på at du ønsker å slette den?"
       import_group: "Importer gruppen \"%{group}\" til gruppen \"%{target}\"?"
-      import_outcome: "Importer resultatet \"%{outcome}\" til gruppen \"%{target}\"?"
+      import_outcome: |-
+          Importer læringsmålet "%{outcome}" til gruppen
+          "%{target}"?
     criteria: 
       does_not_meet_expectations: "Innfrir ikke forventningene"
       exceeds_expectations: "Overgår forventningene"
@@ -10646,13 +10651,13 @@ nb:
       pts: poeng
       rating_description: "Beskrivelse av kriterievurdering"
     dont_import: "Denne gruppen kan ikke importeres."
-    failed_outcome_creation: "Oppretting av resultat mislyktes"
-    failed_outcome_update: "Oppdatering av resultat mislyktes"
+    failed_outcome_creation: "Oppretting av læringsmål mislyktes"
+    failed_outcome_update: "Oppdatering av læringsmål mislyktes"
     find_instructions: 
       instructions: 
         find: 
           description: "*Læringsmål som er etablert av institusjonen eller på nasjonalt nivå er tilgjengelig her. Som i kurset forøvrig, vil kontrollpanelet til venstre gi deg muligheten til å navigere mellom eksisterende mål. Når du har funnet det målet elelr målgruppen du ønsker å benytte, klikk på importer-knappen nedenfor for å legge det til i kurset ditt.*"
-          title: "Finner resultater"
+          title: "Finner læringsmål"
     flash: 
       addSuccess: "Oppretting lyktes"
       deleteError: "Noe gikk galt. Kan ikke slette for øyeblikket."
@@ -10668,14 +10673,14 @@ nb:
         main: 
           manage: 
             description: "*Læringsmål er opprettet her for å spore mestring i et kurs. For å komme i gang, se menylinjen øverst. Klikk på knappen Ny for å opprette et nytt læringsmål, eller Ny gruppe for å opprette en ny gruppe for å organisere dine læringsmål i. Finn-knappen vil tillate deg å bruke mål som er opprettet av departementet, fylket eller din institusjon. Ettersom du oppretter og bruker læringsmål vil du være i stand til å bruke panelet til venstre for å navigere gjennom dine læringsmål. Du kan dra og slippe mål mellom de ulike nivåer for å skape struktur.* *Enda viktigere, Canvas lar deg legge resultatene til vurderingskriteriene slik at du kan vurdere mestring etterhvert som du retter oppgaver. Når du har satt opp læringsmål, klikk Behandle kriterier for å begynne å bruke dine mål for karaktersetting.*"
-            title: "Setter opp resultater"
+            title: "Setter opp læringsmål"
     mastery_error: "Må være større eller lik 0"
     missing_outcome: "Kunne ikke finne læringsmålet"
-    new_outcome_group: "Ny resultatgruppe"
+    new_outcome_group: "Ny gruppe for læringsmål"
     outcome: 
       links: 
-        delete_outcome: "Slett resultat"
-        edit_outcome: "Rediger resultat"
+        delete_outcome: "Slett læringsmål"
+        edit_outcome: "Rediger læringsmål"
       mastery_at_label: "Sett mestring for resultat på eller over:"
       point_mastery: "Mestring: %{mastery_points} Poeng"
       points: 
@@ -10689,16 +10694,16 @@ nb:
       criterion: Kriterievurderinger
       criterion_dialog: "Læringsmål kan inkluderes i oppgavekriteriene som en enkel måte å vurdere mestring av det enkelte mål justert ift konkrete oppgaver. Når du definerer et læringsutbytte, bør du også definere et kriterium som kan brukes når du etablerer vurderingskriteriene. Definer så mange kolonner som du trenger for kriteriene, og angi en terskel som skal brukes til å definere mestring av dette utbyttet."
       criterion_info_link: "Klikk for å lære om kriterievurderinger"
-      description: "Beskriv dette resultatet"
+      description: "Beskriv dette læringsmålet"
       display_name: "Kallenavn (valgfritt)"
       mastery: "Mestring ved "
       points: "%{points_possible} points"
-      title: "Gi navn til dette resultatet"
+      title: "Gi navn til dette læringsmålet"
       total_points: "Totalt antall poeng"
     outcome_group: 
       links: 
-        delete_outcome_group: "Slett resultatgruppe"
-        edit_outcome_group: "Rediger resultatgruppe"
+        delete_outcome_group: "Slett gruppen av læringsmål"
+        edit_outcome_group: "Rediger gruppen av læringsmål"
     outcome_group_form: 
       group_description: "Beskriv denne gruppen"
       title: "Navngi gruppen"
@@ -10706,7 +10711,7 @@ nb:
       mastery_set_at: "Mestring satt ved"
       no_results: "(ingen resultater)"
     outcome_result: 
-      all_outcomes: "alle resultater for denne studenten"
+      all_outcomes: "alle resultater på læringsmål for denne studenten"
       attempt_info: "forsøk nr. %{attempt_number}, %{attempt_date}"
       outcome_mastered: mestret
       scoring: "%{points} av %{possible_points}"
@@ -10715,12 +10720,12 @@ nb:
       no_artifacts: "Ingen artefakter"
     state_standards: "Nasjonale standarder"
     state_standards_description: "Til venstre ser du en mappe for hver stat med deres respektive oppdaterte standarder. Dette gir deg muligheten til smertefritt å inkludere de respektive standardene for karaktersetting i ditt kurs."
-    successful_outcome_creation: "Resultat opprettet."
-    successful_outcome_delete: "Resultat slettet"
-    successful_outcome_removal: "Resultat fjernet"
-    successful_outcome_update: "Resultat oppdatert."
+    successful_outcome_creation: "Læringsmål opprettet."
+    successful_outcome_delete: "Læringsmål slettet"
+    successful_outcome_removal: "Læringsmål fjernet"
+    successful_outcome_update: "Læringsmålet ble oppdatert."
     titles: 
-      find_outcomes: "Finn resultater"
+      find_outcomes: "Finn læringsmål"
     top_level: "%{context} toppnivå"
     user_outcome_results: 
       artifacts: 
@@ -10734,13 +10739,13 @@ nb:
         see_results: "Se %{user_name}s resultater i "
       mastery: "Mestring i siste forsøk"
       no_mastery: "Ingen mestring i siste forsøk"
-      outcomes_for: "Resultater for %{user_name}"
+      outcomes_for: "Læringsmål for %{user_name}"
       score_out_of_possible: "%{score}* av %{possible}*"
       short_title: 
         attempts: Forsøk
         average_percent: "Snitt i prosent"
         latest_score: "Siste resultat"
-        outcome: Resultat
+        outcome: Læringsmål
   overrides: 
     blank_override: "Du må ha en student eller seksjon valgt"
     everyone: Alle
