@@ -48,8 +48,8 @@ cite {
   line-height: $ic-line-height * 1.5;
 }
 .muted {
-  @if $use_high_contrast { color: darken($ic-color-neutral, 20%); }
-  @else { color: $ic-color-neutral; }
+  @if $use_high_contrast { color: darken($ic-hint-text, 20%); }
+  @else { color: $ic-hint-text; }
 }
 .text-warning { color: $ic-color-alert; }
 a.text-warning:hover { color: darken($ic-color-alert, 10%); }

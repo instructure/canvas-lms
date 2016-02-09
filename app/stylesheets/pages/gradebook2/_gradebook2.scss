@@ -691,6 +691,10 @@ $gradebook_checkbox_width: 16px;
   padding-left: 8px;
   line-height: 19px;
   color: $gradebook_letter-grade-font;
+  .muted & {
+    @if $use_high_contrast { color: darken($ic-hint-text, 20%); }
+    @else { color: $ic-hint-text; }
+  }
 }
 
 .final-warning {
