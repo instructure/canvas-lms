@@ -50,12 +50,3 @@
     }
   }
 }
-
-@mixin count-bubble {
-  border-radius: 50%;
-  background-color: $ic-brand-primary;
-  @include fontSize(12px);
-  color: #fff;
-  background-color: $ic-brand-primary;
-  padding: 0.063em 0.438em;
-}

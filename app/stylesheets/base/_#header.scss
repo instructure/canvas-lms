@@ -142,7 +142,7 @@ $masquerade-link-color: $ic-color-alert;
       }
     }
     .unread-messages-count {
-      @include count-bubble;
+      @include ic-badge-maker;
     }
   }
   #identity-help-container a {
