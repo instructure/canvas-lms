@@ -349,11 +349,16 @@ class ContextController < ApplicationController
     end
   end
 
-  ITEM_TYPES = [:all_discussion_topics, :assignments, :assignment_groups, :enrollments,
-                :rubrics, :collaborations, :quizzes, :context_modules].freeze
+  WORKFLOW_TYPES = [
+    :all_discussion_topics, :assignments, :assignment_groups,
+    :enrollments, :rubrics, :collaborations, :quizzes, :context_modules
+  ].freeze
+  ITEM_TYPES = WORKFLOW_TYPES + [
+    :wiki_pages, :attachments
+  ].freeze
   def undelete_index
     if authorized_action(@context, @current_user, :manage_content)
-      @item_types = ITEM_TYPES.select { |type| @context.reflections.key?(type) }.
+      @item_types = WORKFLOW_TYPES.select { |type| @context.reflections.key?(type) }.
           map { |type| @context.association(type).reader }
 
       @item_types << @context.wiki.wiki_pages if @context.respond_to? :wiki
