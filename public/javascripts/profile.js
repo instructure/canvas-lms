@@ -195,7 +195,13 @@ define([
   });
   $(".delete_key_link").click(function(event) {
     event.preventDefault();
-    $(this).closest(".access_token").confirmDelete({
+    var $key_row = $(this).closest(".access_token");
+    var $focus_row = $key_row.prevAll(":not(.blank)").first();
+    if ($focus_row.length == 0) {
+      $focus_row = $key_row.nextAll(":not(.blank)").first();
+    }
+    var $to_focus = $focus_row.length > 0 ? $(".delete_key_link", $focus_row) : $(".add_access_token_link");
+    $key_row.confirmDelete({
       url: $(this).attr('rel'),
       message: I18n.t('confirms.delete_access_key', "Are you sure you want to delete this access key?"),
       success: function() {
@@ -203,6 +209,7 @@ define([
         if(!$(".access_token:visible").length) {
           $("#no_approved_integrations,#access_tokens_holder").toggle();
         }
+        $to_focus.focus();
       }
     });
   });
@@ -283,6 +290,7 @@ define([
       $dialog.find(".loading_message,.error_loading_message").hide().end()
         .find(".results").show().end()
         .find(".full_token_warning").showIf(token.visible_token.length > 10);
+      $dialog.find(".regenerate_token").focus();
     }
     var token = $token.data('token');
     if(token) {

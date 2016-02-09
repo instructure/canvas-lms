@@ -239,6 +239,18 @@ describe "profile" do
       driver.switch_to.alert.accept
       wait_for_ajaximations
       expect(f('#access_tokens')).not_to be_displayed
+      check_element_has_focus f(".add_access_token_link")
+    end
+
+    it "should set focus to the previous access token when deleting and multiple exist" do
+      @token1 = @user.access_tokens.create! purpose: 'token_one'
+      @token2 = @user.access_tokens.create! purpose: 'token_two'
+      get "/profile/settings"
+      fj(".delete_key_link[rel$=#{@token2.id}]").click
+      expect(driver.switch_to.alert).not_to be_nil
+      driver.switch_to.alert.accept
+      wait_for_ajaximations
+      check_element_has_focus fj(".delete_key_link[rel$=#{@token1.id}]")
     end
   end
 
