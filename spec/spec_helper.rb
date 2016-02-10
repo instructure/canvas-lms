@@ -537,10 +537,6 @@ RSpec.configure do |config|
     fixture_file_upload('scribd_docs/doc.doc', 'application/msword', true)
   end
 
-  def valid_gradebook_csv_content
-    File.read(File.expand_path(File.join(File.dirname(__FILE__), %w(fixtures default_gradebook.csv))))
-  end
-
   def factory_with_protected_attributes(ar_klass, attrs, do_save = true)
     obj = ar_klass.respond_to?(:new) ? ar_klass.new : ar_klass.build
     attrs.each { |k, v| obj.send("#{k}=", attrs[k]) }
