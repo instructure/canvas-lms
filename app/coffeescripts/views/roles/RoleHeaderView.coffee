@@ -45,7 +45,7 @@ define [
     # @api backbone override
     toJSON: ->
       json = super
-      if @model.editable()
+      if @model.editable() && @model.get('account').id == "#{ENV.CURRENT_ACCOUNT.account.id}"
         json['editable'] = true
         if @base_role_types.length > 1
           base_type = @model.get("base_role_type")
