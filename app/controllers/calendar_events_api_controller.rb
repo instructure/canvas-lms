@@ -604,51 +604,6 @@ class CalendarEventsApiController < ApplicationController
 
   protected
 
-  def filter_other_sections_from_events(events)
-    return events if events.nil? || events.empty?
-
-    # No need to filter anyone other than TAs because Canvas
-    # already does a good job with all those users
-    return events if !@current_user
-
-    user_section_ids = []
-    @current_user.ta_enrollments.each do |e|
-      user_section_ids << e.course_section_id
-    end
-
-    # Also relying on Canvas' built-in filtering in the event
-    # of no TA (coach) enrollments found because we want to use
-    # other rolls for other purposes like general administration
-    return events if user_section_ids.empty?
-
-    filtered_events = []
-    events.each do |event|
-      if event.assignment_overrides
-        # assignments are a completely different kind of object... we need to make sure it filters
-        # the overrides intelligently
-        if event.assignment_overrides.empty?
-          filtered_events << event
-        else
-          filtered_overrides = []
-          event.assignment_overrides.each do |o|
-            if user_section_ids.include?(o.set_id)
-              filtered_overrides << o
-            end
-          end
-          if filtered_overrides.length
-            event.assignment_overrides = filtered_overrides
-            filtered_events << event
-          end
-        end
-      else
-        unless event.context_type == 'CourseSection' && !user_section_ids.include?(event.context_id)
-          filtered_events << event
-        end
-      end
-    end
-    filtered_events
-  end
-
   def get_calendar_context
     @context = Context.find_by_asset_string(params[:calendar_event].delete(:context_code)) if params[:calendar_event] && params[:calendar_event][:context_code]
     raise ActiveRecord::RecordNotFound unless @context
