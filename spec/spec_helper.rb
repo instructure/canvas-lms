@@ -219,11 +219,12 @@ def truncate_all_tables
       # use custom SQL to exclude tables from extensions
       schema = connection.shard.name if connection.instance_variable_get(:@config)[:use_qualified_names]
       table_names = connection.query(<<-SQL, 'SCHEMA').map(&:first)
-         SELECT tablename
-         FROM pg_tables
-         WHERE schemaname = #{schema ? "'#{schema}'" : 'ANY (current_schemas(false))'}
-           AND NOT tablename IN (
-             SELECT CAST(objid::regclass AS VARCHAR) FROM pg_depend WHERE deptype='e'
+         SELECT relname
+         FROM pg_class INNER JOIN pg_namespace ON relnamespace=pg_namespace.oid
+         WHERE nspname = #{schema ? "'#{schema}'" : 'ANY (current_schemas(false))'}
+           AND relkind='r'
+           AND NOT EXISTS (
+             SELECT 1 FROM pg_depend WHERE deptype='e' AND objid=pg_class.oid
            )
       SQL
       table_names.delete('schema_migrations')
