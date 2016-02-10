@@ -375,6 +375,8 @@ class RoleOverridesController < ApplicationController
       elsif @role.built_in?
         return render :json => {:message => t('cannot_remove_built_in_role', "Cannot remove a built-in role")}, :status => :bad_request
       end
+      raise ActiveRecord::RecordNotFound unless @role.account == @context
+
       @role.deactivate!
       respond_to do |format|
         format.html { redirect_to named_context_url(@context, :context_permissions_url, :account_roles => params[:account_roles]) }
