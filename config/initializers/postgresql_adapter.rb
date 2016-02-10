@@ -230,6 +230,26 @@ module PostgreSQLAdapterExtensions
     execute("ALTER FUNCTION #{quote_table_name(function)}#{args} SET search_path TO #{search_path}")
   end
 
+  # temporarily adds schema to the search_path (i.e. so you can use an extension that won't work
+  # using qualified names)
+  def add_schema_to_search_path(schema)
+    if schema_search_path.split(',').include?(schema)
+      yield
+    else
+      old_search_path = schema_search_path
+      transaction(requires_new: true) do
+        begin
+          self.schema_search_path += ",#{schema}"
+          yield
+        ensure
+          # the transaction rolling back or committing will revert the search path change;
+          # we don't need to do another query to set it
+          @schema_search_path = old_search_path
+        end
+      end
+    end
+  end
+
   private
 
   OID = ActiveRecord::ConnectionAdapters::PostgreSQLAdapter::OID if Rails.version >= '4'
