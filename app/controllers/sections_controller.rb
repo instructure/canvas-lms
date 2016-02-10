@@ -108,9 +108,9 @@ class SectionsController < ApplicationController
       end
 
       includes = Array(params[:include])
-      result = @context.active_course_sections.map { |section| section_json(section, @current_user, session, includes) }
 
-      render :json => result
+      render :json => sections_json(@context.active_course_sections,
+                                    @current_user, session, includes)
     end
   end
 

@@ -17,8 +17,8 @@ define([
       GradebookConstants.course_is_concluded;
 
     studentsUrl = showConcludedEnrollments ?
-      GradebookConstants.students_url_with_concluded_enrollments :
-      GradebookConstants.students_url;
+      GradebookConstants.enrollments_url_with_concluded_enrollments :
+      GradebookConstants.enrollments_url;
 
     depaginate(studentsUrl)
       .then(self.completed)

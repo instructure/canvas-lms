@@ -38,6 +38,10 @@ define [
     , 'assignment1') < 0
     , "other fields are sorted by score"
 
+  gradebookStubs = ->
+    indexedOverrides: Gradebook.prototype.indexedOverrides
+    indexedGradingPeriods: _.indexBy(@gradingPeriods, 'id')
+
   module "Gradebook2#submissionOutsideOfGradingPeriod - assignment with no overrides",
     setupThis: (options) ->
       customOptions = options || {}
@@ -48,7 +52,7 @@ define [
         lastGradingPeriodAndDueAtNull: -> false
         dateIsInGradingPeriod: -> false
 
-      _.defaults customOptions, defaults
+      _.defaults customOptions, defaults, gradebookStubs()
 
     setup: ->
       @subOutsideOfPeriod = Gradebook.prototype.submissionOutsideOfGradingPeriod
@@ -131,14 +135,12 @@ define [
         lastGradingPeriodAndDueAtNull: -> false
         dateIsInGradingPeriod: -> false
 
-      _.defaults customOptions, defaults
+      _.defaults customOptions, defaults, gradebookStubs()
 
     generateOverrides: (dueAt) ->
-      {
-        studentOverrides: { '1': { '5': { student_ids: ['5'], due_at: dueAt } } }
-        groupOverrides: {},
-        sectionOverrides: {}
-      }
+      [
+        { student_ids: ['5'], due_at: dueAt }
+      ]
 
     setup: ->
       @subOutsideOfPeriod = Gradebook.prototype.submissionOutsideOfGradingPeriod
@@ -155,7 +157,7 @@ define [
     self = @setupThis({ dateIsInGradingPeriod: -> true }, overrides)
     dateIsInGradingPeriodSpy = @spy(self, 'dateIsInGradingPeriod')
     isOutsidePeriod = @subOutsideOfPeriod.bind(self)
-    result = isOutsidePeriod(@submission, @student, @gradingPeriods, overrides)
+    result = isOutsidePeriod(@submission, @student)
 
     ok dateIsInGradingPeriodSpy.called
     ok +dateIsInGradingPeriodSpy.args[0][1] == +tz.parse('2015-04-15T06:00:00Z')
@@ -206,14 +208,12 @@ define [
         lastGradingPeriodAndDueAtNull: -> false
         dateIsInGradingPeriod: -> false
 
-      _.defaults customOptions, defaults
+      _.defaults customOptions, defaults, gradebookStubs()
 
     generateOverrides: (dueAt) ->
-      {
-        studentOverrides: { '1': { '5': { student_ids: ['5'], due_at: dueAt } } }
-        groupOverrides: {},
-        sectionOverrides: {}
-      }
+      [
+        { student_ids: ['5'], due_at: dueAt }
+      ]
 
     setup: ->
       @subOutsideOfPeriod = Gradebook.prototype.submissionOutsideOfGradingPeriod
@@ -230,7 +230,7 @@ define [
     self = @setupThis({ dateIsInGradingPeriod: -> true }, overrides)
     dateIsInGradingPeriodSpy = @spy(self, 'dateIsInGradingPeriod')
     isOutsidePeriod = @subOutsideOfPeriod.bind(self)
-    result = isOutsidePeriod(@submission, @student, @gradingPeriods, overrides)
+    result = isOutsidePeriod(@submission, @student)
 
     ok dateIsInGradingPeriodSpy.called
     ok +dateIsInGradingPeriodSpy.args[0][1] == +tz.parse('2015-04-15T06:00:00Z')
@@ -282,14 +282,12 @@ define [
         lastGradingPeriodAndDueAtNull: -> false
         dateIsInGradingPeriod: -> false
 
-      _.defaults customOptions, defaults
+      _.defaults customOptions, defaults, gradebookStubs()
 
     generateOverrides: (dueAt) ->
-      {
-        studentOverrides: {},
-        sectionOverrides: {},
-        groupOverrides: { '1': { '202': { group_id: '202', due_at: dueAt } } }
-      }
+      [
+        { group_id: '202', due_at: dueAt }
+      ]
 
     setup: ->
       @subOutsideOfPeriod = Gradebook.prototype.submissionOutsideOfGradingPeriod
@@ -355,7 +353,7 @@ define [
         lastGradingPeriodAndDueAtNull: -> false
         dateIsInGradingPeriod: -> false
 
-      _.defaults customOptions, defaults
+      _.defaults customOptions, defaults, gradebookStubs()
 
     setup: ->
       @subOutsideOfPeriod = Gradebook.prototype.submissionOutsideOfGradingPeriod
@@ -434,14 +432,13 @@ define [
         lastGradingPeriodAndDueAtNull: -> false
         dateIsInGradingPeriod: -> false
 
-      _.defaults customOptions, defaults
+      _.defaults customOptions, defaults, gradebookStubs()
 
     generateOverrides: (date1, date2) ->
-      {
-        studentOverrides: { '1': { '5': { student_ids: ['5'], due_at: date1 } } }
-        groupOverrides: {},
-        sectionOverrides: { '1': { '101': { course_section_id: '101', assignment_id: '1', due_at: date2 } } }
-      }
+      [
+        { student_ids: ['5'], due_at: date1 }
+        { course_section_id: '101', assignment_id: '1', due_at: date2 }
+      ]
 
     setup: ->
       @subOutsideOfPeriod = Gradebook.prototype.submissionOutsideOfGradingPeriod
@@ -557,7 +554,7 @@ define [
         options:
           all_grading_periods_totals: false
 
-      _.defaults customOptions, defaults
+      _.defaults customOptions, defaults, gradebookStubs()
 
     setup: ->
       @hideAggregateColumns = Gradebook.prototype.hideAggregateColumns
@@ -640,7 +637,7 @@ define [
       @excludedFields = Gradebook.prototype.fieldsToExcludeFromAssignments
 
   test "includes 'description' in the response", ->
-    ok _.contains(@excludedFields(), 'description')
+    ok _.contains(@excludedFields, 'description')
 
   test "includes 'needs_grading_count' in the response", ->
-    ok _.contains(@excludedFields(), 'needs_grading_count')
+    ok _.contains(@excludedFields, 'needs_grading_count')

@@ -23,6 +23,7 @@ class GradebooksController < ApplicationController
   include Api::V1::AssignmentGroup
   include Api::V1::Submission
   include Api::V1::CustomGradebookColumn
+  include Api::V1::Section
 
   before_filter :require_context
   before_filter :require_user, only: %w(speed_grader speed_grader_settings)
@@ -292,8 +293,10 @@ class GradebooksController < ApplicationController
       :assignment_groups_url => api_v1_course_assignment_groups_url(@context, :include => ag_includes, :override_assignment_dates => "false"),
       :sections_url => api_v1_course_sections_url(@context),
       :course_url => api_v1_course_url(@context),
-      :students_url => api_v1_course_enrollments_url(@context, :include => [:avatar_url, :group_ids], :type => ['StudentEnrollment', 'StudentViewEnrollment'], :per_page => per_page),
-      :students_url_with_concluded_enrollments => api_v1_course_enrollments_url(@context, :include => [:avatar_url, :group_ids], :type => ['StudentEnrollment', 'StudentViewEnrollment'], :state => ['active', 'invited', 'completed'], :per_page => per_page),
+      :enrollments_url => api_v1_course_enrollments_url(@context, :include => [:avatar_url, :group_ids], :type => ['StudentEnrollment', 'StudentViewEnrollment'], :per_page => per_page),
+      :enrollments_url_with_concluded_enrollments => api_v1_course_enrollments_url(@context, :include => [:avatar_url, :group_ids], :type => ['StudentEnrollment', 'StudentViewEnrollment'], :state => ['active', 'invited', 'completed'], :per_page => per_page),
+      :students_url => api_v1_course_users_url(@context, include: [:avatar_url, :group_ids, :enrollments], enrollment_type: %w[student student_view], :per_page => per_page),
+      :students_url_with_concluded_enrollments => api_v1_course_users_url(@context, include: [:avatar_url, :group_ids, :enrollments], enrollment_type: %w[student student_view], enrollment_state: ['active', 'invited', 'completed'], per_page: per_page),
       :submissions_url => api_v1_course_student_submissions_url(@context, :grouped => '1'),
       :outcome_links_url => api_v1_course_outcome_group_links_url(@context, :outcome_style => :full),
       :outcome_rollups_url => api_v1_course_outcome_rollups_url(@context, :per_page => 100),
@@ -338,7 +341,8 @@ class GradebooksController < ApplicationController
       :gradebook_column_order_settings => @current_user.preferences[:gradebook_column_order].try(:[], @context.id),
       :gradebook_column_order_settings_url => save_gradebook_column_order_course_gradebook_url,
       :gradebook_performance_enabled => @context.feature_enabled?(:gradebook_performance),
-      :all_grading_periods_totals => @context.feature_enabled?(:all_grading_periods_totals)
+      :all_grading_periods_totals => @context.feature_enabled?(:all_grading_periods_totals),
+      :sections => sections_json(@context.active_course_sections, @current_user, session),
     }
   end
 

@@ -570,8 +570,8 @@ define [
         current_user_id: 1
         context_asset_string: 'course_1'
         GRADEBOOK_OPTIONS: {
-          students_url: '/api/v1/enrollments'
-          students_url_with_concluded_enrollments: '/api/v1/concluded_enrollments'
+          enrollments_url: '/api/v1/enrollments'
+          enrollments_url_with_concluded_enrollments: '/api/v1/concluded_enrollments'
           assignment_groups_url: '/api/v1/assignment_groups'
           submissions_url: '/api/v1/submissions'
           sections_url: '/api/v1/sections'
@@ -588,12 +588,12 @@ define [
         }
       }
 
-    ajax.defineFixture window.ENV.GRADEBOOK_OPTIONS.students_url,
+    ajax.defineFixture window.ENV.GRADEBOOK_OPTIONS.enrollments_url,
       response: clone students
       jqXHR: { getResponseHeader: -> {} }
       textStatus: 'success'
 
-    ajax.defineFixture window.ENV.GRADEBOOK_OPTIONS.students_url_with_concluded_enrollments,
+    ajax.defineFixture window.ENV.GRADEBOOK_OPTIONS.enrollments_url_with_concluded_enrollments,
       response: clone concludedStudents
       jqXHR: { getResponseHeader: -> {} }
       textStatus: 'success'
