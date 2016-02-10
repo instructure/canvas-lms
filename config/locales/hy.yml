@@ -20,7 +20,7 @@ hy:
     bad_max_appts: "Դուք պետք է յուրաքանչյուր մասնակցի համար  նախատեսեք առնվազն մեկ հանդիպում "
     bad_per_slot: "Դուք պետք է յուրաքանչյուր ժամանակահատվածի համար նախատեսեք առնվազն մեկ հանդիպում "
     context_required: "Դուք պետք է ընտրեք օրացույցը"
-    select_calendars: "Ընտրեք օրացույցները"
+    select_calendars: "Ընտրել օրացույցները"
   EditGroupAssignmentView: 
     move_to: "Տեղափոխել դեպի "
   GroupDetailView: 
@@ -34,7 +34,7 @@ hy:
       one: "% {count}  օգտագործողներ"
   GroupUserCollection: 
     flash: 
-      userAlreadyInGroup: "ՆԱԽԱԶԳՈՒՇԱՑՈՒՄ. %{user}ը արդեն %{group}ի անդամ է"
+      userAlreadyInGroup: "ՆԱԽԱԶԳՈՒՇԱՑՈՒՄ. %{user}ը արդեն %{group} խմբի անդամ է"
   LongTextEditor: 
     cancel: "Չեղյալ համարել"
     save: Պահպանել
@@ -10119,7 +10119,7 @@ hy:
       submission_comment_for_teacher: "Ուղարկված աշխատանքների մեկնաբանություն դասախոսի համար"
       submission_grade_changed: "Ուղարկվածի գնահատականը փոխվել է"
       submission_graded: "Ուղարկվածը գնահատվել է"
-      submission_needs_grading: "Ուղարկվածը պետք է գնահատվի"
+      submission_needs_grading: "Ուղարկվածը աշխատանքները ենթակա են գնահատման"
       summaries: Ամփոփագրեր
       updated_wiki_page: "Թարմացված վիկի էջ"
       web_conference_invitation: "Վեբ-կոնֆերանսի հրավեր"
@@ -13614,7 +13614,7 @@ hy:
         due: "Ավարտման ժամկետ"
       needs_grading_count: 
         one: "1 պետք է գնահատվի"
-        other: "%{count} պետք է գնահատվի"
+        other: "%{count} աշխատանք ենթակա է գնահատման"
     menu_enrollment: 
       labels: 
         enrolled_as: "գրանցված է որպես"
@@ -14871,7 +14871,7 @@ hy:
   turnitin: 
     error_1007: "Բեռնվող ֆայլը չափազանց մեծ է:"
     error_1009: "Ֆայլի սխալ տեսակ:  (Ֆայլերի ընդունելի տեսակներն են՝ MS Word, Acrobat PDF, Postscript, Text, HTML, WordPerfect (WPD) և Rich Text Format:)"
-    error_1013: "Ունկնդրի ուղարկած ֆայլը պետք է քսան բառից ավել լինի, որպեսզի գնահատվի turnitin-ի կողմից:"
+    error_1013: "Ունկնդրի ուղարկած աշխատանքը պետք է գերազանցի քսան բառը, որպեսզի գնահատվի turnitin-ի կողմից:"
     error_1023: "PDF ֆայլը հնարավոր չէ կարդալ: Ստուգեք, արդյոք ֆայլը գաղտնաբառով պաշտանված չէ: "
     error_216: "Այս հաշվի համար ուսանողական սահմանաչափը լրացված է: Խնդրում ենք դիմել ձեր հաշվի ադմինիստրատորին: "
     error_217: "Այս հաշվի համար  turnitin պրոդուկտի գործողության ժամկետը լրացել է: Խնդրում ենք դիմել ձեր վաճառքի գործակալին նորացնելու  turnitin պրոդուկտը: "
