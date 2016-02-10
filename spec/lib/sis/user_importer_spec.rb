@@ -26,8 +26,8 @@ describe SIS::UserImporter do
 
     it "should split into transactions based on time elapsed" do
       account_model
-      messages = []
       Setting.set('sis_transaction_seconds', '1')
+      messages = []
       # this is the fun bit where we get to stub User.new to insert a sleep into
       # the transaction loop.
 
@@ -41,6 +41,39 @@ describe SIS::UserImporter do
         importer.add_user(*"U003,user3,active,User,Three,user3@example.com".split(','))
       end
       # we don't actually save them, so don't bother checking the results
+    end
+  end
+
+  context "when the unique_id is invalid the error message reported to the user" do
+
+    before(:all) do
+      @user_id = 'sis_id1'
+      @login_id = '--*(&*(&%^&*%..-'
+      messages = []
+      account_model
+      Setting.set('sis_transaction_seconds', '1')
+
+      SIS::UserImporter.new(@account, {}).process(2, messages) do |importer|
+        importer.add_user(@user_id, @login_id, 'active','User','One','user1@example.com')
+      end
+
+      @message = messages.first
+    end
+
+    it 'must include the login_id' do
+      expect(@message).to include(@login_id)
+    end
+
+    it 'must include the user_id field' do
+      expect(@message).to include(@user_id)
+    end
+
+    it 'must include the developer error message' do
+      expect(@message).to include('#<SIS::ImportError: unique_id is invalid>')
+    end
+
+    it 'must include the text "Invalid login_id"' do
+      expect(@message).to include('Invalid login_id')
     end
   end
 

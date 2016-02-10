@@ -37,22 +37,42 @@ class GradebookImporter
     end
   end
 
-  attr_reader :context, :contents, :assignments, :students, :submissions, :missing_assignments, :missing_students
+  attr_reader :context, :contents, :attachment, :assignments, :students,
+              :submissions, :missing_assignments, :missing_students, :upload
 
-  def self.create_from(progress, course, user, attachment)
-    uploaded_gradebook = new(course, attachment, user, progress)
-    uploaded_gradebook.parse!
+  # TODO: reduce these to "gradebook_upload" and "attachment" once job queue
+  # is clear of old enqueued jobs
+  def self.create_from(progress, gradebook_upload_or_course, user, attachment_or_contents)
+    self.new(gradebook_upload_or_course, attachment_or_contents, user, progress).parse!
   end
 
-  def initialize(context=nil, csv=nil, user=nil, progress=nil)
-    raise ArgumentError, "Must provide a valid context for this gradebook." unless valid_context?(context)
-    raise ArgumentError, "Must provide CSV contents." unless csv
-    @context = context
+  def initialize(context=nil, csv_contents_or_attachment=nil, user=nil, progress=nil)
+    # TODO: change the parameter to "gradebook_upload", and remove these conditionals
+    # once we know the S3 pipeline works and old jobs are cleared
+    if context.is_a?(GradebookUpload)
+      @upload = context
+      @context = @upload.course
+    else
+      @context = context
+    end
+
+    raise ArgumentError, "Must provide a valid context for this gradebook." unless valid_context?(@context)
+    # TODO: Change this error to "Must provide attachment id when we're sure S3 pipeline works"
+    raise ArgumentError, "Must provide CSV contents or attachment." unless csv_contents_or_attachment
+
     @user = user
-    @contents = csv
+    # TODO: change the parameter to "attachment", and remove these conditionals
+    # once we know the S3 pipeline works and old jobs are cleared
+    if csv_contents_or_attachment.is_a?(Attachment)
+      @attachment = csv_contents_or_attachment
+    else
+      @contents = csv_contents_or_attachment
+    end
     @progress = progress
 
-    @upload = GradebookUpload.new course: @context, user: @user, progress: @progress
+    # TODO: remove this line entirely
+    # once we know the S3 pipeline works and old jobs are cleared
+    @upload ||= GradebookUpload.new course: @context, user: @user, progress: @progress
 
     if @context.feature_enabled?(:differentiated_assignments)
       @visible_assignments = AssignmentStudentVisibility.visible_assignment_ids_in_course_by_user(
@@ -80,24 +100,19 @@ class GradebookImporter
       .select(['users.id', :name, :sortable_name])
       .index_by(&:id)
 
-    csv = CSV.parse(contents, :converters => :nil)
-    @assignments = process_header(csv)
+    @assignments = nil
     @root_accounts = {}
     @pseudonyms_by_sis_id = {}
     @pseudonyms_by_login_id = {}
     @students = []
     @pp_row = []
-    csv.each do |row|
-      if row[0] =~ /Points Possible/
-        row.shift(@student_columns)
-        process_pp(row)
-        next
+
+    csv_stream do |row|
+      already_processed = check_for_non_student_row(row)
+      unless already_processed
+        @students << process_student(row)
+        process_submissions(row, @students.last)
       end
-
-      next if row.compact.all? { |c| c.strip =~ /^(Muted|)$/i }
-
-      @students << process_student(row)
-      process_submissions(row, @students.last)
     end
 
     @assignments_outside_current_periods = []
@@ -202,8 +217,7 @@ class GradebookImporter
     end
   end
 
-  def process_header(csv)
-    row = csv.shift
+  def process_header(row)
     raise "Couldn't find header row" unless header?(row)
 
     row = strip_non_assignment_columns(row)
@@ -357,6 +371,53 @@ class GradebookImporter
   end
 
   protected
+
+  CSV_PARSE_OPTIONS = {
+    converters: :nil,
+    skip_lines: /^[, ]*$/
+  }.freeze
+
+  def check_for_non_student_row(row)
+    # check if this is the first row, a header row
+    if @assignments.nil?
+      @assignments = process_header(row)
+      return true
+    end
+
+
+    if row[0] =~ /Points Possible/
+      # this row is describing the assignment, has no student data
+      row.shift(@student_columns)
+      process_pp(row)
+      return true
+    end
+
+    if row.compact.all? { |c| c.strip =~ /^(Muted|)$/i }
+      # this row is muted or empty and should not be processed at all
+      return true
+    end
+
+    false # nothing unusual, signal to process as a student row
+  end
+
+  def csv_stream
+    if contents # TODO: remove this branch entirely when S3 is proved to work
+      CSV.parse(contents, CSV_PARSE_OPTIONS) do |row|
+        yield row
+      end
+    elsif attachment
+      csv_file = attachment.open(need_local_file: true)
+      # using "foreach" rather than "parse" processes a chunk of the
+      # file at a time rather than loading the whole file into memory
+      # at once, a boon for memory consumption
+      CSV.foreach(csv_file.path, CSV_PARSE_OPTIONS) do |row|
+        yield row
+      end
+    else
+      raise "We have no gradebook input to iterate over..."
+    end
+  end
+
   def add_root_account_to_pseudonym_cache(root_account)
     pseudonyms = root_account.shard.activate do
       root_account.pseudonyms

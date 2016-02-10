@@ -582,7 +582,7 @@ class Attachment < ActiveRecord::Base
 
           if context.is_a?(User)
             excluded_attachment_ids = context.attachments.joins(:attachment_associations).where("attachment_associations.context_type = ?", "Submission").pluck(:id)
-            attachment_scope = attachment_scope.where("id NOT IN (?)", excluded_attachment_ids)
+            attachment_scope = attachment_scope.where("id NOT IN (?)", excluded_attachment_ids) if excluded_attachment_ids.any?
           end
 
           min = self.minimum_size_for_quota
