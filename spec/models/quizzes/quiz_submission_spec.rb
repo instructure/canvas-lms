@@ -1040,23 +1040,6 @@ describe Quizzes::QuizSubmission do
         submission.update_submission_version(vs.last, [:score])
         expect(submission.versions.map{ |s| s.model.score }).to eq [15, 25]
       end
-
-      context "when loading UTF-8 data" do
-        it "should strip bad chars" do
-          version = submission.versions.last
-
-          # inject bad byte into yaml
-          submission.submission_data = ["placeholder"]
-          submission.update_submission_version(version, [:submission_data])
-          version.yaml = version.yaml.sub("placeholder", "bad\x81byte")
-
-          # reload yaml by setting a different column
-          submission.score = 20
-          submission.update_submission_version(version, [:score])
-
-          expect(submission.versions.map{ |s| s.model.submission_data }).to eq [nil, ["badbyte"]]
-        end
-      end
     end
 
     describe "#submitted_attempts" do

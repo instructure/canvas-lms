@@ -384,16 +384,19 @@ describe ActiveRecord::Base do
   end
 
   describe "find_ids_in_ranges" do
+    before :once do
+      @ids = []
+      10.times { @ids << User.create!().id }
+    end
+
     it "should return ids from the table in ranges" do
-      ids = []
-      10.times { ids << User.create!().id }
       batches = []
-      User.where(id: ids).find_ids_in_ranges(:batch_size => 4) do |*found_ids|
+      User.where(id: @ids).find_ids_in_ranges(:batch_size => 4) do |*found_ids|
         batches << found_ids
       end
-      expect(batches).to eq [ [ids[0], ids[3]],
-                          [ids[4], ids[7]],
-                          [ids[8], ids[9]] ]
+      expect(batches).to eq [ [@ids[0], @ids[3]],
+                          [@ids[4], @ids[7]],
+                          [@ids[8], @ids[9]] ]
     end
 
     it "should work with scopes" do
@@ -403,6 +406,30 @@ describe ActiveRecord::Base do
       User.active.where(id: [user, user2]).find_ids_in_ranges do |*found_ids|
         expect(found_ids).to eq [user.id, user.id]
       end
+    end
+
+    it "should accept an option to start searching at a given id" do
+      batches = []
+      User.where(id: @ids).find_ids_in_ranges(:batch_size => 4, :start_at => @ids[3]) do |*found_ids|
+        batches << found_ids
+      end
+      expect(batches).to eq [ [@ids[3], @ids[6]], [@ids[7], @ids[9]] ]
+    end
+
+    it "should accept an option to end at a given id" do
+      batches = []
+      User.where(id: @ids).find_ids_in_ranges(:batch_size => 4, :end_at => @ids[5]) do |*found_ids|
+        batches << found_ids
+      end
+      expect(batches).to eq [ [@ids[0], @ids[3]], [@ids[4], @ids[5]] ]
+    end
+
+    it "should accept both options to start and end at given ids" do
+      batches = []
+      User.where(id: @ids).find_ids_in_ranges(:batch_size => 4, :start_at => @ids[2], :end_at => @ids[7]) do |*found_ids|
+        batches << found_ids
+      end
+      expect(batches).to eq [ [@ids[2], @ids[5]], [@ids[6], @ids[7]] ]
     end
   end
 

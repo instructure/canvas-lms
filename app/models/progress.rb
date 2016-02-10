@@ -90,8 +90,11 @@ class Progress < ActiveRecord::Base
     end
 
     def perform
+      self.args[0] = @progress if self.args[0] == @progress # maintain the same object reference
       @progress.start
-      super.tap { @progress.complete }
+      super
+      @progress.reload
+      @progress.complete
     end
 
     def on_permanent_failure(error)

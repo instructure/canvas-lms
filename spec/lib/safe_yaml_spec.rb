@@ -19,25 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe "safe_yaml" do
-  it "should be used by default" do
-    yaml = <<-YAML
---- !ruby/object:ActionController::Base
-real_format:
-YAML
-    expect { YAML.load yaml }.to raise_error
-    result = YAML.unsafe_load yaml
-    expect(result.class).to eq ActionController::Base
-  end
-
-  it "doesn't allow deserialization of arbitrary classes" do
-    expect { YAML.load(YAML.dump(ActionController::Base)) }.to raise_error
-  end
-
-  it "allows deserialization of arbitrary classes when unsafe_loading" do
-    expect(YAML.unsafe_load(YAML.dump(ActionController::Base))).to eq ActionController::Base
-  end
-
-  it "should allow some whitelisted classes" do
+  let(:test_yaml) {
     yaml = <<-YAML
 ---
 hwia: !map:HashWithIndifferentAccess
@@ -92,8 +74,29 @@ verbose_symbol: !ruby/symbol blah
 oo: !ruby/object:OpenObject
   table:
     :a: 1
+    YAML
+  }
+
+  it "should be used by default" do
+    yaml = <<-YAML
+--- !ruby/object:ActionController::Base
+real_format:
 YAML
-    result = YAML.load yaml
+    expect { YAML.load yaml }.to raise_error
+    result = YAML.unsafe_load yaml
+    expect(result.class).to eq ActionController::Base
+  end
+
+  it "doesn't allow deserialization of arbitrary classes" do
+    expect { YAML.load(YAML.dump(ActionController::Base)) }.to raise_error
+  end
+
+  it "allows deserialization of arbitrary classes when unsafe_loading" do
+    expect(YAML.unsafe_load(YAML.dump(ActionController::Base))).to eq ActionController::Base
+  end
+
+  it "should allow some whitelisted classes" do
+    result = YAML.load(test_yaml)
 
     def verify(result, key, klass)
       obj = result[key]
@@ -138,5 +141,31 @@ YAML
 
     oo = verify(result, 'oo', OpenObject)
     expect(oo.a).to eq 1
+  end
+
+  it "should allow some whitelisted classes through psych" do
+    old_result = YAML.load(test_yaml)
+    psych_yaml = YAML.dump(old_result)
+    expect(Psych.load(psych_yaml)).to eq old_result
+    expect(YAML.load(psych_yaml)).to eq old_result
+  end
+
+  it "should seamlessly dump yaml into a psych-compatible format (and be cross-compatible)" do
+    yaml = "--- \nsadness: \"\\xF0\\x9F\\x98\\x82\"\n"
+    hash = YAML.load(yaml)
+
+    psych_dump = "---\nsadness: \"\\U0001F602\"\n#{Syckness::TAG}"
+    expect(hash.to_yaml).to eq psych_dump
+    expect(YAML.dump(hash)).to eq psych_dump
+
+    expect(YAML.load(psych_dump)).to eq hash
+    expect(YAML.unsafe_load(psych_dump)).to eq hash
+  end
+
+  it "should work with aliases" do
+    hash = {:a => 1}.with_indifferent_access
+    obj = {:blah => hash, :bloop => hash}.with_indifferent_access
+    yaml = Psych.dump(obj)
+    expect(YAML.load(yaml)).to eq obj
   end
 end

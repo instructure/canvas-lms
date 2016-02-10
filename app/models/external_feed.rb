@@ -103,7 +103,7 @@ class ExternalFeed < ActiveRecord::Base
       end
       if entry
         entry.update_feed_attributes(
-          :title => item.title,
+          :title => item.title.to_s,
           :message => description,
           :url => item.link
         )
@@ -115,7 +115,7 @@ class ExternalFeed < ActiveRecord::Base
       description = "<a href='#{ERB::Util.h(item.link)}'>#{ERB::Util.h(t(:original_article, "Original article"))}</a><br/><br/>"
       description += format_description(item.description || item.title)
       entry = self.external_feed_entries.new(
-        :title => item.title,
+        :title => item.title.to_s,
         :message => description,
         :source_name => feed.channel.title,
         :source_url => feed.channel.link,
@@ -136,7 +136,7 @@ class ExternalFeed < ActiveRecord::Base
       end
       if entry
         entry.update_feed_attributes(
-          :title => item.title,
+          :title => item.title.to_s,
           :message => description,
           :url => item.links.alternate.to_s,
           :author_name => author.name,
@@ -153,7 +153,7 @@ class ExternalFeed < ActiveRecord::Base
       entry = self.external_feed_entries.new(
         :title => item.title,
         :message => description,
-        :source_name => feed.title,
+        :source_name => feed.title.to_s,
         :source_url => feed.links.alternate.to_s,
         :posted_at => item.published,
         :url => item.links.alternate.to_s,

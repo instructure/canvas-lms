@@ -594,7 +594,11 @@ class ActiveRecord::Base
   def self.find_ids_in_ranges(options = {})
     batch_size = options[:batch_size].try(:to_i) || 1000
     subquery_scope = all.except(:select).select("#{quoted_table_name}.#{primary_key} as id").reorder(primary_key).limit(batch_size)
-    ids = connection.select_rows("select min(id), max(id) from (#{subquery_scope.to_sql}) as subquery").first
+    subquery_scope = subquery_scope.where("#{quoted_table_name}.#{primary_key} <= ?", options[:end_at]) if options[:end_at]
+
+    first_subquery_scope = options[:start_at] ? subquery_scope.where("#{quoted_table_name}.#{primary_key} >= ?", options[:start_at]) : subquery_scope
+    ids = connection.select_rows("select min(id), max(id) from (#{first_subquery_scope.to_sql}) as subquery").first
+
     while ids.first.present?
       ids.map!(&:to_i) if columns_hash[primary_key.to_s].type == :integer
       yield(*ids)

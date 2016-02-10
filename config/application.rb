@@ -159,6 +159,14 @@ module CanvasRails
       val.constantize
     end
 
+    # TODO: Use this instead of the above block when we switch to Psych
+    Psych.add_domain_type("ruby/object", "Class") do |_type, val|
+      if SafeYAML.safe_parsing && !Canvas::Migration.valid_converter_classes.include?(val)
+        raise "Cannot load class #{val} from YAML"
+      end
+      val.constantize
+    end
+
     # Extend any base classes, even gem classes
     Dir.glob("#{Rails.root}/lib/ext/**/*.rb").each { |file| require file }
 

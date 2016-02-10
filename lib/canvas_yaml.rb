@@ -23,6 +23,7 @@
 # is switched to Syck. Otherwise we
 # won't have access to (safe|unsafe)_load.
 require 'yaml'
+
 require 'syck'
 YAML::ENGINE.yamler = 'syck' if defined?(YAML::ENGINE)
 
@@ -32,6 +33,7 @@ trusted_tags = SafeYAML::TRUSTED_TAGS.dup
 trusted_tags << 'tag:yaml.org,2002:merge'
 SafeYAML.send(:remove_const, :TRUSTED_TAGS)
 SafeYAML.const_set(:TRUSTED_TAGS, trusted_tags.freeze)
+
 module FixSafeYAMLNullMerge
   def merge_into_hash(hash, array)
     return unless array
@@ -65,5 +67,97 @@ SafeYAML::OPTIONS.merge!(
         tag:ruby.yaml.org,2002:object:URI::HTTPS
         tag:ruby.yaml.org,2002:object:OpenObject
         tag:yaml.org,2002:map:WeakParameters
+      ] + %w[
+        !ruby/symbol
+        !binary
+        !float
+        !float#exp
+        !float#inf
+        !str
+        !timestamp
+        !timestamp#iso8601
+        !timestamp#spaced
+        !map:HashWithIndifferentAccess
+        !map:ActiveSupport::HashWithIndifferentAccess
+        !map:WeakParameters
+        !ruby/hash:HashWithIndifferentAccess
+        !ruby/hash:ActiveSupport::HashWithIndifferentAccess
+        !ruby/hash:WeakParameters
+        !ruby/object:Class
+        !ruby/object:OpenStruct
+        !ruby/object:Scribd::Document
+        !ruby/object:Mime::Type
+        !ruby/object:URI::HTTP
+        !ruby/object:URI::HTTPS
+        !ruby/object:OpenObject
+        !ruby/object:DateTime
       ]
 )
+
+module Syckness
+  TAG = "#GETDOWNWITHTHESYCKNESS\n"
+
+  module SyckDumper
+    def dump(*args)
+      Psych.dump(*args)
+    end
+  end
+
+  module PsychDumper
+    def dump(*args)
+      yaml = super
+      yaml += TAG if yaml.is_a?(String)
+      yaml
+    end
+  end
+
+  module SafeLoader
+    require "safe_yaml/psych_resolver"
+    require "safe_yaml/safe_to_ruby_visitor"
+
+    def load(yaml, *args)
+      if yaml.is_a?(String) && yaml.end_with?(TAG)
+        SafeYAML::PsychResolver.new.resolve_node(Psych.parse(yaml))
+      else
+        super
+      end
+    end
+  end
+
+  module UnsafeLoader
+    def unsafe_load(yaml, *args)
+      if yaml.is_a?(String) && yaml.end_with?(TAG)
+        Psych.load(yaml)
+      else
+        super
+      end
+    end
+  end
+end
+
+[Object, Hash, Struct, Array, Exception, String, Symbol, Range, Regexp, Time,
+  Date, Integer, Float, Rational, Complex, TrueClass, FalseClass, NilClass].each do |klass|
+  klass.class_eval do
+    alias :to_yaml :psych_to_yaml
+  end
+end
+
+Syck.singleton_class.prepend(Syckness::SyckDumper)
+Psych.singleton_class.prepend(Syckness::PsychDumper)
+SafeYAML.singleton_class.prepend(Syckness::SafeLoader)
+YAML.singleton_class.prepend(Syckness::UnsafeLoader)
+
+SafeYAML::PsychResolver.class_eval do
+  attr_accessor :aliased_nodes
+end
+
+module MaintainAliases
+  def accept(node)
+    if node.respond_to?(:anchor) && node.anchor && @resolver.get_node_type(node) != :alias
+      @resolver.aliased_nodes[node.anchor] = node
+    end
+    super
+  end
+end
+SafeYAML::SafeToRubyVisitor.prepend(MaintainAliases)
+

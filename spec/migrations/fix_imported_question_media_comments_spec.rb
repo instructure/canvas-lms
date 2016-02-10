@@ -2,6 +2,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe DataFixup::FixImportedQuestionMediaComments do
   it 'should fix broken yaml in questions and quizzes' do
+    skip("Rails 4.0 specific") unless CANVAS_RAILS4_0
+
     course
     placeholder = "SOMETEXT"
     bank = @course.assessment_question_banks.create!(:title => 'bank')
@@ -25,12 +27,9 @@ describe DataFixup::FixImportedQuestionMediaComments do
     #just in case someone tries to run this spec in the past
     updated_at = ActiveRecord::Base.connection.quote(DateTime.parse('2015-10-16'))
     # deliberately create broken yaml
-    ActiveRecord::Base.connection.execute("UPDATE #{AssessmentQuestion.quoted_table_name} SET updated_at = #{updated_at},
-      question_data = '#{aq['question_data'].to_yaml.gsub(placeholder, broken_link)}' WHERE id = #{aq.id}")
-    ActiveRecord::Base.connection.execute("UPDATE #{Quizzes::QuizQuestion.quoted_table_name} SET updated_at = #{updated_at},
-      question_data = '#{qq['question_data'].to_yaml.gsub(placeholder, broken_link)}' WHERE id = #{qq.id}")
-    ActiveRecord::Base.connection.execute("UPDATE #{Quizzes::Quiz.quoted_table_name} SET updated_at = #{updated_at},
-      quiz_data = '#{quiz['quiz_data'].to_yaml.gsub(placeholder, broken_link)}' WHERE id = #{quiz.id}")
+    AssessmentQuestion.where(:id => aq).update_all(:question_data => aq['question_data'].to_yaml.gsub(placeholder, broken_link), :updated_at => updated_at)
+    Quizzes::QuizQuestion.where(:id => qq).update_all(:question_data => qq['question_data'].to_yaml.gsub(placeholder, broken_link), :updated_at => updated_at)
+    Quizzes::Quiz.where(:id => quiz).update_all(:quiz_data => quiz['quiz_data'].to_yaml.gsub(placeholder, broken_link), :updated_at => updated_at)
 
     aq = AssessmentQuestion.where(:id => aq).first
     qq = Quizzes::QuizQuestion.where(:id => qq).first
