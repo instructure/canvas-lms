@@ -55,9 +55,7 @@ module.exports = {
   },
   module: {
     preLoaders: [],
-    noParse: [
-      /react-bootstrap-table/
-    ],
+    noParse: [],
     loaders: [
       {
         test: /\.js$/,
