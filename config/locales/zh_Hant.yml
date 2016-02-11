@@ -2292,7 +2292,7 @@ zh_Hant:
   before_publishing_this_file_you_must_specify_usage_2229d20b: 在發佈該檔案之前，您必須指定使用權。
   before_publishing_you_must_set_usage_rights_on_you_dcd7b567: 在發佈之前，您必須在您的檔案上設置使用權。
   before_using_this_feature_we_recommend_trying_the__1dea6042: "在使用本功能之前，我們建議您嘗試 **%{t_theme_editor}** 進行配置測試。使用本功能后，用戶可向主題編輯器中上傳定制JavaScript和CSS文檔。然而採用本方式所做的修改可能與未來Canvas Dom構架 (例如基本班級名稱或HTML構架) 衝突，并不被支持。使用本功能的用戶應當精通JavaScript和CSS編程，并必須能維護自己的定制代碼。*風險由使用者自負!*"
-  before_using_this_feature_we_recommend_trying_the__7e6f194e: "在使用本功能前，我們建議您利用*********%{t_theme_editor}********* 嘗試進行所有的個性化設置操作。啟用本功能允許上傳定制的JavaScript和CSS文檔至主題編輯器。以這種方式做的改動有可能與未來Canvas DOM的改動相衝突(例如：課程名稱或HTML架構等元素) 並導致得不到支持。此外，您需要確保您做的所有改動開放可由他人讀取，例如那些使用 *屏幕閱讀器* 和 **那些** ***需要*** 依賴 ****高顯示對比度功能****的用戶。網站對您所做的任何改動均不負責任。您需要負責保證所做改動符合t *****任何***** ******法規****** *******標準******* ，依照您所在國法律的具體規定。 使用本功能的用戶應精通JavaScript 和 CSS ，並保存自己的代碼。 ********使用風險自負！********"
+  before_using_this_feature_we_recommend_trying_the__7e6f194e: "在使用本功能前，我們建議您利用*********%{t_theme_editor}*********嘗試進行所有的個性化設置操作。啟用本功能允許上傳定制的JavaScript和CSS文檔至主題編輯器。以這種方式做的改動有可能與未來Canvas DOM的改動相衝突(例如：課程名稱或HTML架構等元素) 並導致得不到支持。此外，您需要確保您做的所有改動開放可由他人讀取，例如那些使用 *屏幕閱讀器* 和 **那些** ***需要*** 依賴 ****高顯示對比度功能****的用戶。網站對您所做的任何改動均不負責任。您需要負責保證所做改動符合t *****任何***** ******法規****** *******標準******* ，依照您所在國法律的具體規定。 使用本功能的用戶應精通JavaScript 和 CSS ，並保存自己的代碼。 ********使用風險自負！********"
   before_you_can_edit_your_profile_you_need_to_verif_4fd9143e: "在您可以修改個人檔案之前，您需要透過按一下我們傳送給您的電子郵件中的連結以驗證您的電子郵件地址 (%{email})。如果您你沒有看到它，*按一下重新傳送電子郵件*，並請務必檢查您的垃圾郵件箱。"
   beginning_date_2d2a29ac: 開始日期
   below_this_search_field_is_a_list_of_content_type__58aaa03f: "此搜索欄位下方是 %{content_type} 列表。當您輸入時，將篩選該列表以匹配您的查詢。將按您所選擇的任何選項來篩選交談訊息。"
@@ -10133,7 +10133,7 @@ zh_Hant:
   more_than_9_submissions_need_grading_30157d49: "超過 9個提交件需要被評分"
   more_than_a19b440: "%{more_than}+"
   most_recent_result_counts_as_calculation_int_of_ma_13628bf0: "最近的成績按照%{calculation_int}% o的權重計入總分，其餘成績的平均分按照 %{remainder}% o 的權重計分。生成總分前，必須輸入至少2組成績。"
-  most_recent_result_counts_as_calculation_int_of_ma_a734a4db: "最近的成績按照%{calculation_int}% o的權重計入總分，其餘成績的平均分按照 %{remainder}% o 的權重計分。如果只有一個結果，分數將會被返回。"
+  most_recent_result_counts_as_calculation_int_of_ma_a734a4db: "最近的成績按照%{calculation_int}% o的權重計入總分，其餘成績的平均分按照 %{remainder}% o的權重計分。如果只有一個結果，分數將會被返回。"
   most_recent_score_13a87e8c: 最近的分數
   move_abf00365: 移動
   move_dialog: 
@@ -11691,7 +11691,7 @@ zh_Hant:
   published_click_to_unpublish_ec4495b5: 已發佈。點擊以解除發佈。
   published_click_to_unpublish_item_name_aaa804b0: "已發佈。按一下以解除發佈%{item_name}。"
   published_click_to_unpublish_module_name_eddd07bb: "已發佈。按一下以解除發佈%{module_name}."
-  published_click_to_unpublish_name_9bdd66cf: "已發佈。按一下以取消發佈%{name}"
+  published_click_to_unpublish_name_9bdd66cf: "已發佈。按一下以取消發佈 %{name}"
   published_status_icon_78f998a: 已發佈狀態圖標
   publishing_is_disabled_for_this_item_efa7803f: 已停用此項目的發佈
   publishing_item_name_is_disabled_8207a9e7: "已停用%{item_name} 的發佈"
@@ -13022,7 +13022,7 @@ zh_Hant:
   range_56b2f310: 範圍
   range_8760934b: 範圍：
   range_name_90614433: 範圍名稱
-  ratio_answered_correctly_b0c1e7d: " %{ratio}% a回答正確"
+  ratio_answered_correctly_b0c1e7d: "%{ratio}% a回答正確"
   ratio_responded_correctly_6d890107: " %{ratio}% 回答正確"
   re_activate_user_f7d77c9a: 重新啟用用戶
   re_submit_assignment_b3e2bd28: 重新提交任務
