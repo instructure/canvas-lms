@@ -63,7 +63,7 @@ describe "Wiki Pages" do
       fj('.btn.button-sidebar-wide:contains("Choose Home Page")').click
       fj('input[type=radio][value=wiki]').click
       fj('button.btn.btn-primary.button_type_submit.ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-text-only').click
-      f('.home').click
+      get "/courses/#{@course.id}"
       wait_for_ajaximations
       # validations
       expect(element_exists('.al-trigger')).to be_truthy
@@ -87,7 +87,7 @@ describe "Wiki Pages" do
       fj('.btn.button-sidebar-wide:contains("Choose Home Page")').click
       fj('input[type=radio][value=wiki]').click
       fj('button.btn.btn-primary.button_type_submit.ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-text-only').click
-      f('.home').click
+      get "/courses/#{@course.id}"
       wait_for_ajaximations
       expect(f('.public-license-text').text).to include('This course content is offered under a')
     end
