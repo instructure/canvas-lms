@@ -10168,7 +10168,7 @@ es:
   most_recent_result_counts_as_calculation_int_of_ma_13628bf0: |-
       Los resultados más recientes cuenta como el                    
       %{calculation_int}% del valor del dominio, el promedio de todos los otros resultados cuenta como el %{remainder}% del valor. Debe haber al menos 2 resultados para que aparezca una puntuación.
-  most_recent_result_counts_as_calculation_int_of_ma_a734a4db: "La mayoría de los recuentos de resultados recientes como %{calculation_int}% la poderación del dominio, el promedio de todos los demás resultados cuentan como%{remainder}% de la ponderación. Si sólo hay un resultado, se devolverá la puntuación individual."
+  most_recent_result_counts_as_calculation_int_of_ma_a734a4db: "La mayoría de los recuentos de resultados recientes como %{calculation_int}% de la poderación del dominio, promedia todos los demás recuentos de resultados como %{remainder}% de la ponderación. Si sólo hay un resultado, se devolverá la puntuación individual."
   most_recent_score_13a87e8c: "Puntuación más reciente"
   move_abf00365: Mover
   move_dialog: 
