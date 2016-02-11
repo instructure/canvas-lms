@@ -30,7 +30,7 @@ define ->
           allSelections.push matchData[1] if value is "1"
         newData[key] = value
 
-    for own allSelection in allSelections
+    for allSelection in allSelections
       delete newData.items_to_copy[allSelection]
 
     newData

@@ -198,9 +198,9 @@ define [
           close: ->
             $mediaPlayer = $this.data('mediaelementplayer')
             $mediaPlayer.pause() if $mediaPlayer
-          open: (ev) -> $(ev.currentTarget).parent()
-                          .find('.ui-dialog-titlebar-close')
-                          .focus()
+          open: (ev) -> $(ev.currentTarget).parent().
+                          find('.ui-dialog-titlebar-close').
+                          focus()
 
         # Populate dialog box with a video
         $dialog.disableWhileLoading getSourcesAndTracks(id).done (sourcesAndTracks) ->
