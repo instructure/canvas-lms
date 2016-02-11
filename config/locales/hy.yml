@@ -3361,7 +3361,7 @@ hy:
       headings: 
         prior_users: "Նախորդ օգտատերեր"
       links: 
-        back_to_people: "Վերադառնալ օգտատերերին"
+        back_to_people: "Վերադառնալ մարդկանց ցանկին"
       titles: 
         prior_users: "Նախորդ օգտատերեր"
     roster: 
@@ -4076,7 +4076,7 @@ hy:
   course_navigation_dd035109: "Նավարկում դասընթացում"
   course_outcomes_7dc1cbc7: "Դասընթացի արդյունքներ"
   course_pages_449f1dd4: "Դասընթացի էջեր"
-  course_people_3058c948: "Դասընթացի մարդիկ"
+  course_people_3058c948: "Դասընթացն անցնող մարդիկ"
   course_quizzes_c337653c: "Դասընթացի թեստեր"
   course_restore: 
     restore_error: "Դասընթացը վերականգնելիս սխալ է տեղի ունեցել: Դասընթացը չի վերականգնվել:"
@@ -6908,7 +6908,7 @@ hy:
   group_name_group_files_f8b0c078: "%{group_name} - Խմբային ֆայլեր"
   group_name_group_home_21f8a655: "%{group_name} - Խմբի հիմնական էջ"
   group_name_group_pages_def16554: "%{group_name} - Խմբի էջեր"
-  group_name_group_people_e9d548c1: "%{group_name} - Խմբում ընդգրկված անդամներ"
+  group_name_group_people_e9d548c1: "%{group_name} - Խմբում ընդգրկված մարդիկ"
   group_name_in_group_category_name_group_category_29bf3254: "%{group_name} խումբը %{group_category_name} խմբի կատեգորիայում"
   group_name_is_required_5547bc0b: "Անհրաժեշտ է նշել խմբի անունը"
   group_set_name_2aed2347: "Խմբերի շարքի անվանումը"
