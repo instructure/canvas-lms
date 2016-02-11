@@ -247,8 +247,8 @@ shared_examples_for "permission tests" do
       let!(:role) { add_new_course_role role_name }
 
       before do
-        f("#course_role_link").click
         get url
+        f("#course_role_link").click
       end
 
       it "enables a permission" do
