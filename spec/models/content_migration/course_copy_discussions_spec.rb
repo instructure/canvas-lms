@@ -208,5 +208,27 @@ describe ContentMigration do
       expect(decoy_ag.reload.name).not_to eql group.name
     end
 
+    it "should copy references to locked discussions even if manage_content is not true" do
+      @role = Account.default.roles.build :name => 'SuperTeacher'
+      @role.base_role_type = 'TeacherEnrollment'
+      @role.save!
+      @copy_to.enroll_user(@user, 'TeacherEnrollment', :role => @role)
+
+      Account.default.role_overrides.create!(:permission => "manage_content", :role => teacher_role, :enabled => false)
+
+      topic = @copy_from.discussion_topics.build(:title => "topic")
+      topic.locked = true
+      topic.save!
+
+      @copy_from.syllabus_body = "<p><a href=\"/courses/#{@copy_from.id}/discussion_topics/#{topic.id}\">link</a></p>"
+      @copy_from.save!
+
+      run_course_copy
+
+      topic2 = @copy_to.discussion_topics.where(:migration_id => mig_id(topic)).first
+
+      @copy_to.reload
+      expect(@copy_to.syllabus_body).to be_include("/courses/#{@copy_to.id}/discussion_topics/#{topic2.id}")
+    end
   end
 end

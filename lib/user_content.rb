@@ -210,8 +210,8 @@ module UserContent
       return true unless user
       # if user given, check that the user is allowed to manage all
       # context content, or read that specific item (and it's not locked)
-      @manage_content ||= context.grants_right?(user, :manage_content)
-      return true if @manage_content
+      @read_as_admin = context.grants_right?(user, :read_as_admin) if @read_as_admin.nil?
+      return true if @read_as_admin
       content ||= get_content.call
       allow = true if content.respond_to?(:grants_right?) && content.grants_right?(user, :read)
       allow = false if allow && content.respond_to?(:locked_for?) && content.locked_for?(user)
