@@ -4,7 +4,7 @@
 ar: 
   1_item_scores_5512cd03: "1- درجات العنصر"
   1st_reviewer_3c1d0119: "المراجع الأول"
-  25th_75th_percentile_aa4c11f2: "المئين 25 - 75"
+  25th_75th_percentile_aa4c11f2: "المئين 25-75"
   2_final_score_7b0fd15e: "2- الدرجة النهائية"
   2nd_reviewer_94fdbcd: "المراجع الثاني"
   451_message: 
@@ -10587,7 +10587,7 @@ ar:
   more_than_9_submissions_need_grading_30157d49: "أكثر من 9 إرسالات تتطلب التقييم"
   more_than_a19b440: "%{more_than}+"
   most_recent_result_counts_as_calculation_int_of_ma_13628bf0: "تساوي أحدث نتيجة %{calculation_int}% من نتيجة الإتقان، بينما يساوي متوسط كل النتائج الأخرى %{remainder}% من النتيجة. يتعين وجود نتيجتين على الأقل قبل إرجاع النتيجة."
-  most_recent_result_counts_as_calculation_int_of_ma_a734a4db: "تساوي أحدث نتيجة %{calculation_int} % من نتيجة الإتقان، بينما يساوي متوسط كل النتائج الأخرى %{remainder} % من النتيجة. إذا كانت هناك نتيجة واحدة فقط، سيتم إرجاع الدرجة."
+  most_recent_result_counts_as_calculation_int_of_ma_a734a4db: "تساوي أحدث نتيجة %{calculation_int}% من نتيجة الإتقان، بينما يساوي متوسط كل النتائج الأخرى %{remainder}% من النتيجة. إذا كانت هناك نتيجة واحدة فقط، سيتم إرجاع الدرجة."
   most_recent_score_13a87e8c: "أحدث درجة"
   move_abf00365: نقل
   move_dialog: 
@@ -13659,8 +13659,8 @@ ar:
   range_56b2f310: النطاق
   range_8760934b: "النطاق:"
   range_name_90614433: "اسم النطاق"
-  ratio_answered_correctly_b0c1e7d: "تمت الإجابة على %{ratio} % بشكل صحيح"
-  ratio_responded_correctly_6d890107: "تمت الإجابة على %{ratio} % بشكل صحيح"
+  ratio_answered_correctly_b0c1e7d: "تمت الإجابة على %{ratio}% بشكل صحيح"
+  ratio_responded_correctly_6d890107: "تمت الإجابة على %{ratio}% بشكل صحيح"
   re_activate_user_f7d77c9a: "إلغاء تعطيل المستخدم"
   re_submit_assignment_b3e2bd28: "إعادة إرسال المهمة"
   re_upload_submissions_125e415d: "إعادة تحميل الإرسالات"
