@@ -318,7 +318,7 @@ define [
       calculationSetup.call this
 
   test 'calculates final grade', ->
-    equal @srgb.get('students.firstObject.total_percent'), 79.5
+    equal @srgb.get('students.firstObject.total_percent'), 79.55
 
   module 'grade calc with 0s',
     setup: ->

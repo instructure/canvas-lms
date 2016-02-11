@@ -25,7 +25,6 @@ define [
   # http://emberjs.com/api/classes/Ember.ArrayController.html
   # http://emberjs.com/api/classes/Ember.ObjectController.html
 
-
   studentsUniqByEnrollments = (args...)->
     hiddenNameCounter = 1
     options =
@@ -304,7 +303,7 @@ define [
             set(submissionData.submission, 'drop', submissionData.drop)
         result = result[finalOrCurrent]
 
-        percent = round (result.score / result.possible * 100), 1
+        percent = round (result.score / result.possible * 100), 2
         percent = 0 if isNaN(percent)
         setProperties student,
           total_grade: result
