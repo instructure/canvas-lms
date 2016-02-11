@@ -1685,9 +1685,9 @@ de:
       one: "1 Gruppe"
       other: "%{count} Gruppen"
     assignment_list_item: 
-      assignment_delete: "Aufgabe %{name} löschen"
-      assignment_edit: "Aufgabe %{name} bearbeiten"
-      assignment_move: "Aufgabe %{name} verschieben"
+      assignment_delete: "Löschen der Aufgabe %{name}"
+      assignment_edit: "Bearbeitung der Aufgabe %{name} "
+      assignment_move: "Verschieben der Aufgabe %{name}"
       delete: Löschen
       edit: Bearbeiten
       module: Modul
@@ -2287,7 +2287,7 @@ de:
   before_publishing_this_file_you_must_specify_usage_2229d20b: "Vor dem Veröffentlichen dieser Datei müssen Sie Nutzungsrechte festlegen. "
   before_publishing_you_must_set_usage_rights_on_you_dcd7b567: "Vor der Veröffentlichung müssen Sie Nutzungsrechte für Ihre Dateien festlegen."
   before_using_this_feature_we_recommend_trying_the__1dea6042: "Bevor Sie dieses Feature nutzen, raten wir Ihnen für jedwede Markenpräsenz **%{t_theme_editor}** auszuprobieren. Durch Aktivierung dieses Features können Sie angepasste JavaScript und CSS-Dateien in den Theme Editor hochladen. Alle mit dieser Methode durchgeführten Änderungen können zu Konflikten mit zukünftigen Änderungen im Canvas DOM führen (z.B. Elementklassen-Namen oder HTML-Struktur) und sind daher nicht unterstützt. Jeder, der dieses Feature nutzt, sollte fortgeschrittene JavaScript- und CSS-Kenntnisse haben und muss seinen eigenen Code bewahren. *Nutzung auf eigene Gefahr!*"
-  before_using_this_feature_we_recommend_trying_the__7e6f194e: "Bevor Sie dieses Feature verwenden, empfehlen wir, zur Markenbildung den *********%{t_theme_editor}********* auszuprobieren. Aktivierung dieses Features ermöglicht das Hochladen von benutzerdefinierten JavaScript und CSS Dateien in den Theme Editor. Alle mit dieser Methode ausgeführten Veränderungen können weitere Veränderungen des Canvas DOM behindern (z.B. Element-Klassennamen oder HTML-Struktur) und sind daher nicht unterstützt. Des Weiteren müssen Sie sicherstellen, dass jede Änderung für jedermann zugänglich ist, inkl. z.B. alle, die *Bildschirmleser* und **alle, die ** dem ** ****Feature hoher Kontrast**** ***vertrauen*** nutzen. Instructure lehnt jede Haftung für irgendwelche von Ihnen durchgeführten Änderungen ab. Sie sind dafür verantwortlich, sicherzustellen, dass Sie *****alle***** ******Compliance****** *******Standards******* einhalten, die in Ihrem juristischen Geltungsbereich verlangt werden. Personen, die mit diesem Feature arbeiten möchten, sollten sich sehr gut mit JavaScript und CSS auskennen und müssen Ihren eigenen Code pflegen. ********Nutzung auf eigenen Gefahr!********"
+  before_using_this_feature_we_recommend_trying_the__7e6f194e: "Bevor Sie dieses Feature verwenden, empfehlen wir, zur Markenbildung den *********%{t_theme_editor}********* auszuprobieren. Aktivierung dieses Features ermöglicht das Hochladen von benutzerdefinierten JavaScript und CSS Dateien in den Theme Editor. Alle mit dieser Methode ausgeführten Veränderungen können weitere Veränderungen des Canvas DOM behindern (z.B. Element-Klassennamen oder HTML-Struktur) und sind daher nicht unterstützt. Des Weiteren müssen Sie sicherstellen, dass jede Änderung für jedermann zugänglich ist, inkl. z.B. alle, die *Bildschirmleser* und alle, die **dem ** ***Feature hoher Kontrast*** ****vertrauen**** nutzen. Instructure lehnt jede Haftung für irgendwelche von Ihnen durchgeführten Änderungen ab. Sie sind dafür verantwortlich, sicherzustellen, dass Sie *****alle***** ******Compliance****** *******Standards******* einhalten, die in Ihrem juristischen Geltungsbereich verlangt werden. Personen, die mit diesem Feature arbeiten möchten, sollten sich sehr gut mit JavaScript und CSS auskennen und müssen Ihren eigenen Code pflegen. ********Nutzung auf eigene Gefahr!********"
   before_you_can_edit_your_profile_you_need_to_verif_4fd9143e: "Bevor Sie Ihr Profil bearbeiten können, müssen Sie Ihre E-Mail Adresse (%{email}) bestätigen, indem Sie in der Ihnen zugesandten E-Mail auf den Aktivierungslink klicken. Falls Sie diese E-mail nicht erhalten haben, *Klicken sie hier zum Neuversenden* und überprüfen Sie Ihren Spamordner."
   beginning_date_2d2a29ac: Anfangsdatum
   below_this_search_field_is_a_list_of_content_type__58aaa03f: "Unter diesem Suchfeld finden Sie eine Liste mit %{content_type}. Beim Eingeben von Text wird die Liste gefiltert und an Ihre Anfrage angepasst. Die Konversationsnachrichten werden entsprechend der von Ihnen ausgewählten Option gefiltert."
@@ -2814,7 +2814,7 @@ de:
   can_t_perform_diffing_against_more_than_one_file_o_44475c0d: "Kann Diffing nicht bei mehr als eienr Datei des selben Dateityps ausführen"
   can_t_unpublish_if_there_are_student_submissions_2d7cd742: "Veröffentlichung kann nicht rückgängig gemacht werden, wenn Einsendungen von Studenten vorhanden sind"
   can_t_unpublish_item_name_if_there_are_student_sub_b83c7a9f: "Veröffentlichung von %{item_name} kann nicht rückgängig gemacht werden, wenn Einsendungen von Studenten vorhanden sind"
-  can_t_unpublish_name_if_there_are_student_submissi_8ab8086c: "Veröffentlichung %{name} kann nicht rückgängig gemacht werden, wenn Einsendungen von Studenten vorhanden sind"
+  can_t_unpublish_name_if_there_are_student_submissi_8ab8086c: "Veröffentlichen von %{name} kann nicht rückgängig gemacht werden, wenn Einsendungen von Studenten vorhanden sind"
   cancel_caeb1e68: Abbrechen
   cannot_be_nil_when_account_id_is_nil_be6d1d60: "darf nicht null sein, wenn Account_ID null ist"
   cannot_be_nil_when_course_id_is_nil_f539388: "darf nicht null sein, wenn course_id null ist"
@@ -6521,7 +6521,7 @@ de:
   google_drive_7cb003c9: "Google Drive"
   gpa_scale_a6d1cdea: GPA-Skala
   grade_9c6f076d: Note
-  grade_assignment_7c1abc11: "Note %{assignment}"
+  grade_assignment_7c1abc11: "%{assignment} benoten"
   grade_display_warning_dialog: 
     grade_display_warning: 
       checkbox: "Für diesen Kurs nicht mehr anzeigen."
@@ -9980,7 +9980,7 @@ de:
   mobile_homescreen_icon_f85d6b63: "Mobiler Homescreen-Icon"
   mobile_javascript_file_c429158d: "Mobile JavaScript-Datei"
   model_is_already_located_in_newgroup_e5cea361: "%{model} befindet sich bereits in %{newGroup}"
-  moderate_assignment_ccb00173: "Mittel %{assignment}"
+  moderate_assignment_ccb00173: "Moderieren %{assignment}"
   moderate_assignment_name_cf59e0a7: "Moderieren %{assignment_name}"
   moderate_d0c85e92: Moderieren
   moderate_grades_4f43f85d: "Benotungen moderieren"
@@ -10175,8 +10175,8 @@ de:
   multi_factor_authentication_configured_865b1bde: "Mehrstufige Authentifizierung konfiguriert"
   multiple_due_dates_6b0d75c6: "Mehrere Abgabefristen"
   must_achieve_mastery_at_least_count_times_scores_a_628db168: 
-    one: "Das Leistungsziel muss mind. einmal erreicht werden. Für Punktzahlen über dem Leistungsziel wird ein Mittelwert ermittelt, um die Gesamtpunktzahl zu berechnen."
-    other: "Das Leistungsziel muss mind. %{count} Mal erreicht werden. Für Punktzahlen über dem Leistungsziel wird ein Mittelwert ermittelt, um die Gesamtpunktzahl zu berechnen."
+    one: "Das Leistungsziel muss mindestens einmal erreicht werden. Für Punktzahlen über dem Leistungsziel wird ein Mittelwert ermittelt, um die Gesamtpunktzahl zu berechnen."
+    other: "Das Leistungsziel muss mindestens %{count} Mal erreicht werden. Für Punktzahlen über dem Leistungsziel wird ein Mittelwert ermittelt, um die Gesamtpunktzahl zu berechnen."
   must_contribute_to_the_page_fff632c: "muss an der Seite mitwirken"
   must_mark_as_done_91cff799: "Muss als fertig markiert werden"
   must_mark_as_done_bf6cc563: "muss als fertig markiert werden"
@@ -11713,7 +11713,7 @@ de:
   published_click_to_unpublish_ec4495b5: "Veröffentlicht. Zum Rückgängigmachen klicken."
   published_click_to_unpublish_item_name_aaa804b0: "Veröffentlicht. Zum Rückgängigmachen von %{item_name} klicken."
   published_click_to_unpublish_module_name_eddd07bb: "Veröffentlicht. Zum Rückgängigmachen von %{module_name} klicken."
-  published_click_to_unpublish_name_9bdd66cf: "Veröffentlicht. Um Veröffentlichung von %{name} rückgängig zu machen, klicken"
+  published_click_to_unpublish_name_9bdd66cf: "Veröffentlicht. Hier klicken, um veröffentlichen von                %{name} rückgängig zu machen"
   published_status_icon_78f998a: "veröffentlichter Status Icon"
   publishing_is_disabled_for_this_item_efa7803f: "Die Veröffentlichung ist für dieses Element deaktiviert"
   publishing_item_name_is_disabled_8207a9e7: "Die Veröffentlichung von %{item_name} ist deaktiviert"
@@ -15417,7 +15417,7 @@ de:
   unpublished_click_to_publish_c073631a: "Nicht veröffentlicht. Zum Veröffentlichen klicken."
   unpublished_click_to_publish_item_name_614c4952: "Nicht veröffentlicht. Zum Veröffentlichen von %{item_name} klicken."
   unpublished_click_to_publish_module_name_89f8601c: "Nicht veröffentlicht. Zum Veröffentlichen von %{module_name} klicken."
-  unpublished_click_to_publish_name_10104b5c: "Nicht veröffentlicht. Zum Veröffentlichen von %{name}, klicken"
+  unpublished_click_to_publish_name_10104b5c: "Nicht veröffentlicht. Hier klicken, um %{name} zu veröffentlichen"
   unpublished_courses_title: "Nicht veröffentlichte Kurse"
   unpublished_dfd8801: "nicht veröffentlicht"
   unread_e9c1b19c: Ungelesen
