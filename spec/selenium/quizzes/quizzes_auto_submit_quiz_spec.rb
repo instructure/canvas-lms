@@ -64,28 +64,6 @@ describe 'taking a quiz' do
           verify_quiz_submission_is_late_in_speedgrader
         end
       end
-
-      context 'when the quiz has a future due date' do
-        let(:quiz_due_in_future) do
-          quiz_due_in_future = quiz_with_lock_date
-          quiz_due_in_future.due_at = default_time_for_due_date(Time.zone.now + 2.days)
-          quiz_due_in_future.save!
-          quiz_due_in_future.reload
-        end
-
-        it 'automatically submits the quiz once the quiz is locked', priority: "1", test_id: 553013 do
-          auto_submit_quiz(quiz_due_in_future)
-
-          verify_quiz_is_locked
-          verify_quiz_is_submitted
-          verify_quiz_submission_is_not_late
-        end
-
-        it 'doesn\'t mark the quiz submission as "late"', priority: "1", test_id: 553507 do
-          auto_submit_quiz(quiz_due_in_future)
-          verify_quiz_submission_is_not_late_in_speedgrader
-        end
-      end
     end
 
     context 'when the quiz doesn\'t have a lock date' do
