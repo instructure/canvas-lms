@@ -19,13 +19,14 @@ $footer-links-border-color:         lighten($ic-color-dark, 16);
 @if $use_new_styles {
   body {
     min-height: 100vh;
-    min-width: 768px;
+    &:not(.is-inside-submission-frame) { min-width: 768px; }
   }
 }
 @else { body, html { height: 100%; } }
 
 body {
   @if $use_new_styles == false { min-width: $min_main_width; }
+
   @if $use_high_contrast { background: white; }
   @else {
     @if $use_new_styles {
@@ -34,6 +35,7 @@ body {
     }
     @else { background-color: $ic-body-background-color; }
   }
+
   &.no-headers, &.embedded {
     #header, #topbar, #left-side, #breadcrumbs { display: none !important; }
     @if $use_new_styles {
@@ -141,7 +143,13 @@ body {
 }
 
 #content {
-  @if $use_new_styles { padding: $ic-sp*2; }
+  @if $use_new_styles {
+    padding: $ic-sp*2;
+    body.is-inside-submission-frame & {
+      padding-left: $ic-sp;
+      padding-right: $ic-sp;
+    }
+  }
   @else {
     padding: 1em;
     overflow: hidden;

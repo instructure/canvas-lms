@@ -1,6 +1,7 @@
 <%
   currently_peer_reviewing = @assessment_request.try(:assigned?)
   js_bundle :rubric_assessment, :submissions
+  css_bundle :submission
   js_env({
     :RUBRIC_ASSESSMENT => {
       :assessment_user_id => @submission.user_id,
@@ -29,8 +30,8 @@
   </style>
 <% end %>
 
-  <div style="padding: 0px 20px 3px;" class="submission_details">
-    <div style="float: right;">
+  <div class="submission-details-header submission_details">
+    <div class="submission-details-header__grade-summary">
       <% if @assignment.muted? %>
         <p style="width: 200px"><%= t(:student_mute_notification, "Grades are unavailable because the instructor is working on them.") %></p>
       <% end %>
@@ -49,7 +50,7 @@
           <% end %>
           <br/>
         <% if can_do(@assignment, @current_user, :grade) %>
-               <span class="published_score" style="<%= hidden if @assignment.grading_type == 'points' %>"><% if @submission.published_score? %><%= @submission.published_score.round(2)%><% end %></span>
+          <span class="published_score" style="<%= hidden if @assignment.grading_type == 'points' %>"><% if @submission.published_score? %><%= @submission.published_score.round(2)%><% end %></span>
         <% elsif @submission.user_can_read_grade?(@current_user, session) %>
           <span class="score" style="<%= hidden if @assignment.grading_type == 'points' %>"><% if @submission.score? %><%=@submission.score.round(2) %><% end %></span>
         <% end %>
@@ -72,7 +73,7 @@
       <% end %>
     </div>
     <h2 class="submission_header" style="margin-bottom: 0;"><%= @assessment_request ? t('peer_review', "Peer Review") : t('submission_details', "Submission Details") %></h2>
-        <span style="padding-left: 10px; line-height: 0.7em; font-size: 0.8em;"><%= @assignment.title %>, <%= submission_author_name_for @assessment_request %></span>
+    <span style="padding-left: 10px; line-height: 0.7em; font-size: 0.8em;"><%= @assignment.title %>, <%= submission_author_name_for @assessment_request %></span>
 
     <span style="padding-left: 10px; line-height: 0.7em; font-size: 0.8em; <%= 'color: #800; font-weight: bold;' if @submission.late? %> <%= hidden unless @submission.submitted_at %>">
       <%= t('submitted_at', 'submitted %{submit_date}', :submit_date => datetime_string(@submission.submitted_at)) %>
@@ -161,14 +162,14 @@
     <% end %>
     <a style="display: none;" href="<%= context_url(@context, :context_assignment_submission_url, @submission.assignment_id, @submission.user_id) %>" class="submission_data_url">&nbsp;</a>
   </div>
-  <div style="border-top: 2px solid #ccc;">
-    <div style="float: left; width: 75%;">
-      <iframe id="preview_frame" src="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, @submission.user_id, :preview => 1, :rand => rand(999999)) %>" frameborder="0" style="border: 0; width: 100%; height: 300px;" title="<%= t('Preview') %>"></iframe>
+  <div class="submission-details-container">
+    <div class="submission-details-frame">
+      <iframe id="preview_frame" src="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, @submission.user_id, :preview => 1, :rand => rand(999999)) %>" frameborder="0" style="border: 0; width: 100%; height: 300px; display: block;" title="<%= t('Preview') %>"></iframe>
     </div>
-    <div style="float: left; width: 25%;">
+    <div class="submission-details-comments">
       <div style="background-color: #fff;">
         <a href="#" class="comments_link" style="display: none; <%= 'font-weight: bold;' unless @submission.submission_comments.empty? %>">Comments <% unless @submission.submission_comments.empty? %>(<%= @submission.submission_comments.length %>)<% end %></a>
-        <div class="comments" style="border-left: 2px solid #ccc; height: 300px; overflow: auto; background-color: #f0f0f0;">
+        <div class="comments">
           <button type="button" class="btn button-secondary cancel_comment_button" style="display: none; float: right; margin-right:0 !important;"><%= image_tag("delete_circle.png") %></button>
           <div class="comment_list" aria-live="polite" style="padding: 10px; clear:right;">
             <% unless @submission.user_can_read_grade?(@current_user, session) %>
@@ -239,7 +240,7 @@
           <div style="padding: 10px; <%= hidden unless can_do(@submission, @current_user, :comment) %>" id="add_comment_form">
             <strong><%= before_label('add_a_comment', 'Add a Comment') %></strong>
             <span><br/><%= t('teachers_notified_of_comments', 'Teachers and submitter will be notified of all comments.') %></span>
-            <textarea style="width: 95%;" class="grading_comment"></textarea>
+            <textarea class="ic-Input grading_comment"></textarea>
             <div class="comment_attachments">
             </div>
             <div class="clearfix" style="text-align: right;">
@@ -256,7 +257,7 @@
               </label>
             <% end %>
             <div class="button-container">
-              <button type="button" class="btn btn-small save_comment_button"><%= t('buttons.save', 'Save') %></button>
+              <button type="button" class="Button Button--primary save_comment_button"><%= t('buttons.save', 'Save') %></button>
             </div>
           </div>
         </div>

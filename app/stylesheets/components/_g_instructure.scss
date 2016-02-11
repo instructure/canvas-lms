@@ -639,8 +639,10 @@ body .disabled_link {
   margin: 20px auto;
   &.paper {
     min-width: 400px;
-    padding: 10px 20px;
-    border: 1px solid #aaa;
+    @if $use_new_styles == false {
+      padding: 10px 20px;
+      border: 1px solid #aaa;
+    }
   }
   &.plain_text {
     width: 90%;
