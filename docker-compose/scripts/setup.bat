@@ -67,19 +67,25 @@ if [ "$(uname)" == "Darwin" ]; then
   cd $canvas_src_path
   cp -a docker-compose/config/* config/
   docker-compose build --no-cache || { echo >&2 "Error: docker-compose build --no-cache failed."; exit 1; }
+  docker-compose run --rm web /bin/bash -c "bundle install" || { echo >&2 "Error: bundle install failed."; exit 1; }
+  docker-compose run --rm web /bin/bash -c "npm install" || { echo >&2 "Error: npm install failed"; exit 1; }
 
   #####
   #TODO: pull staging database instead of using rake db:initial_setup script
   ####
-  docker-compose run --rm web /bin/bash -c "bundle install; npm install; bundle exec rake db:create; bundle exec rake db:migrate; echo 'Choose whatever email/password/name you want for your local Canvas'; bundle exec rake db:initial_setup; bundle exec rake canvas:compile_assets"
+  docker-compose run --rm web /bin/bash -c "bundle exec rake db:create; bundle exec rake db:migrate; echo 'Choose whatever email/password/name you want for your local Canvas'; bundle exec rake db:initial_setup;"
   if [ $? -ne 0 ]
   then
-     echo "Error: docker-compose run --rm web /bin/bash failed to run and configure the containers."
+     echo "Error: could not setup Canvas database."
      exit 1;
   fi
+
+  docker-compose run --rm web /bin/bash -c "bundle exec rake canvas:compile_assets" || { echo >&2 "Error: bundle exec rake canvas:compile_assets failed."; exit 1; }
+
   docker-compose up -d || { echo >&2 "Error: docker-compose up failed. A possible cause is that files use Windows newlines (CRLF). Check that all files in the docker-compose directory use Unix newlines (LF).  E.g. find . -name ""*"" -type f -exec dos2unix {} \;."; exit 1; }
   open http://canvas.docker/
   echo "It'll say Bad Gateway.  Wait a couple of minutes and refresh.  If it doesn't work, ensure the canvas web container is running using docker ps""
+
 elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
   # GNU/Linux platform
   echo "ERROR: setup script not written for Linux.  Please write it!"
