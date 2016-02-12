@@ -257,8 +257,6 @@ class StreamItem < ActiveRecord::Base
 
       # do the bulk insert in user id order to avoid locking problems on postges < 9.3 (foreign keys)
       user_ids_subset.sort!
-      #find out what the current largest stream item instance is so that we can delete them all once the new ones are created
-      greatest_existing_id = StreamItemInstance.where(:stream_item_id => stream_item_id, :user_id => user_ids_subset).maximum(:id) || 0
 
       inserts = user_ids_subset.map do |user_id|
         {
@@ -271,19 +269,15 @@ class StreamItem < ActiveRecord::Base
         }
       end
 
-      StreamItemInstance.bulk_insert(inserts)
+      StreamItemInstance.unique_constraint_retry do
+        StreamItemInstance.where(:stream_item_id => stream_item_id, :user_id => user_ids_subset).delete_all
+        StreamItemInstance.bulk_insert(inserts)
+      end
 
       #reset caches manually because the observer wont trigger off of the above mass inserts
       user_ids_subset.each do |user_id|
         StreamItemCache.invalidate_recent_stream_items(user_id, l_context_type, l_context_id)
       end
-
-      # Then delete any old instances from these users' streams.
-      # This won't actually delete StreamItems out of the table, it just deletes
-      # the join table entries.
-      # Old stream items are deleted in a periodic job.
-      StreamItemInstance.where("user_id in (?) AND stream_item_id = ? AND id <= ?",
-            user_ids_subset, stream_item_id, greatest_existing_id).delete_all
 
       # touch all the users to invalidate the cache
       User.where(id: user_ids_subset).touch_all
