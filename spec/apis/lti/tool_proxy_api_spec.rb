@@ -19,10 +19,11 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../../lti_spec_helper.rb')
 require 'webmock'
+WebMock.allow_net_connect!
 
 module Lti
   describe ToolProxyController, type: :request do
-    before(:all){ WebMock.allow_net_connect! }
+
     let(:account) { Account.create }
 
     describe "#destroy" do

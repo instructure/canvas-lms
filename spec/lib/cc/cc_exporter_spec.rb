@@ -2,9 +2,9 @@ require File.expand_path(File.dirname(__FILE__) + '/cc_spec_helper')
 
 require 'nokogiri'
 require 'webmock'
+WebMock.allow_net_connect!
 
 describe "Common Cartridge exporting" do
-  before(:all){ WebMock.allow_net_connect! }
 
   it "should collect errors and finish running" do
     course = course_model
