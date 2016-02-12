@@ -13,7 +13,7 @@ kinesis:
   build: ./docker-compose/kinesalite
   command: "--path /var/lib/kinesalite"
   volumes:
-    - "tmp/cache:/var/lib/kinesalite"
+    - "${CANVAS_SRC_PATH}/tmp/cache:/var/lib/kinesalite"
   ports:
     - "4567:4567"
   environment:
@@ -26,7 +26,7 @@ web:
   ports:
     - "3000:3000"
   volumes:
-    - ".:/app"
+    - "${CANVAS_SRC_PATH}:/app"
   links:
     - postgres
     - redis
@@ -40,7 +40,7 @@ jobs:
   build: ./docker-compose
   command: bundle exec script/delayed_job run
   volumes:
-    - ".:/app"
+    - "${CANVAS_SRC_PATH}:/app"
   links:
     - postgres
     - redis
@@ -59,6 +59,6 @@ guard:
   ports:
     - "4000:4000"
   volumes:
-    - ".:/app"
+    - "${CANVAS_SRC_PATH}:/app"
   environment:
     RACK_ENV: development

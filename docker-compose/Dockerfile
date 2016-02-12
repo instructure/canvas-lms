@@ -19,8 +19,11 @@ ENV LC_ALL     en_US.UTF-8
 RUN dpkg-reconfigure locales
 
 # Canvas requires bundler 1.7.10
+#RUN gem uninstall bundler \
+#  && gem install bundler -v 1.7.10
+# 1.7.10 has a bug preventing bundle install to work.  Error is "NoMethodError: undefined method `spec' for nil:NilClass"
 RUN gem uninstall bundler \
-  && gem install bundler -v 1.7.10
+  && gem install bundler -v 1.7.15
 
 RUN mkdir /app
 WORKDIR /app
