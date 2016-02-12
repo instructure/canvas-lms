@@ -32,7 +32,12 @@ CompiledReferencePlugin.prototype.apply = function(compiler){
     nmf.plugin("before-resolve", function(result, callback) {
       var requestString = result.request;
 
-      if(/^compiled\//.test(requestString)){
+      if(/^jsx\//.test(requestString)){
+        // this is a jsx file in canvas. We have to require it with it's full
+        // extension while we still have a require-js build or we risk loading
+        // it's compiled js instead
+        result.request = requestString + ".jsx"
+      } else if(/^compiled\//.test(requestString)){
         // this references a coffesscript file in canvas
         result.request = requestString.replace("compiled/", "coffeescripts/");
       }else if(/^spec\/javascripts\/compiled/.test(requestString)){
