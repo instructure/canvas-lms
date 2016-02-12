@@ -252,10 +252,10 @@ module PostgreSQLAdapterExtensions
 
   private
 
-  OID = ActiveRecord::ConnectionAdapters::PostgreSQLAdapter::OID if Rails.version >= '4'
+  OID = ActiveRecord::ConnectionAdapters::PostgreSQLAdapter::OID
 
   def initialize_type_map(*args)
-    return super if Rails.version >= '4.2'
+    return super unless CANVAS_RAILS4_0
 
     known_type_names = OID::NAMES.keys.map { |n| "'#{n}'" } + OID::NAMES.keys.map { |n| "'_#{n}'" }
     known_type_names.concat(%w{'name' 'oidvector' 'int2vector' 'line' 'point' 'box' 'lseg'})
@@ -267,7 +267,7 @@ module PostgreSQLAdapterExtensions
     result = execute(sql, 'SCHEMA')
     leaves, nodes = result.partition { |row| row['typelem'] == '0' }
 
-    if Rails.version < '4.1'
+    if CANVAS_RAILS4_0
       # populate the leaf nodes
       leaves.find_all { |row| OID.registered_type? row['typname'] }.each do |row|
         OID::TYPE_MAP[row['oid'].to_i] = OID::NAMES[row['typname']]

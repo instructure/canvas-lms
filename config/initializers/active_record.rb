@@ -1339,42 +1339,6 @@ ActiveRecord::Associations::CollectionAssociation.class_eval do
   end
 end
 
-if Rails.version >= '3' && Rails.version < '4'
-  ActiveRecord::Sanitization::ClassMethods.module_eval do
-    def quote_bound_value_with_relations(value, c = connection)
-      if ActiveRecord::Relation === value
-        value.to_sql
-      else
-        quote_bound_value_without_relations(value, c)
-      end
-    end
-    alias_method_chain :quote_bound_value, :relations
-  end
-end
-
-if Rails.version < '4'
-  klass = ActiveRecord::ConnectionAdapters::Mysql2Column if defined?(ActiveRecord::ConnectionAdapters::Mysql2Column)
-  klass = ActiveRecord::ConnectionAdapter::AbstractMysqlAdapter::Column if defined?(ActiveRecord::ConnectionAdapter::AbstractMysqlAdapter::Column)
-  if klass
-    klass.class_eval do
-      def extract_default(default)
-        if sql_type =~ /blob/i || type == :text
-          if default.blank?
-            # CHANGED - don't believe the '' default
-            return nil
-          else
-            raise ArgumentError, "#{type} columns cannot have a default value: #{default.inspect}"
-          end
-        elsif missing_default_forged_as_empty_string?(default)
-          nil
-        else
-          super
-        end
-      end
-    end
-  end
-end
-
 module UnscopeCallbacks
   if CANVAS_RAILS4_0
     def run_callbacks(kind)
