@@ -40,12 +40,18 @@ module Api::V1::Role
     json
   end
 
-  def permission_json(permission, current_user, session)
+  def permission_json(permission, _current_user, _session)
     permission = permission.dup
+
+    if permission[:enabled]
+      permission[:applies_to_self] = permission[:enabled].include?(:self)
+      permission[:applies_to_descendants] = permission[:enabled].include?(:descendants)
+    end
     permission[:enabled] = !!permission[:enabled]
     permission[:prior_default] = !!permission[:prior_default]
     permission.delete(:prior_default) unless permission[:explicit]
-    permission.slice(:enabled, :locked, :readonly, :explicit, :prior_default)
+    permission.slice(:enabled, :locked, :readonly, :explicit, :prior_default,
+                     :applies_to_descendants, :applies_to_self)
   end
 end
 
