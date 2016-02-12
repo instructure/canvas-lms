@@ -55,6 +55,36 @@ Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
 
 ActionView::TestCase::TestController.view_paths = ApplicationController.view_paths
 
+# this makes sure that a broken transaction becomes functional again
+# by the time we hit rescue_action_in_public, so that the error report
+# can be recorded
+ActionController::Base.set_callback(:process_action, :around, ->(_r, block) do
+  exception = nil
+  ActiveRecord::Base.transaction(joinable: false, requires_new: true) do
+    begin
+      if Rails.version < '5'
+        # that transaction didn't count as a "real" transaction within the test
+        test_open_transactions = ActiveRecord::Base.connection.instance_variable_get(:@test_open_transactions)
+        ActiveRecord::Base.connection.instance_variable_set(:@test_open_transactions, test_open_transactions.to_i - 1)
+        begin
+          block.call
+        ensure
+          ActiveRecord::Base.connection.instance_variable_set(:@test_open_transactions, test_open_transactions)
+        end
+      else
+        block.call
+      end
+    rescue ActiveRecord::StatementInvalid
+      # these need to properly roll back the transaction
+      raise
+    rescue
+      # anything else, the transaction needs to commit, but we need to re-raise outside the transaction
+      exception = $!
+    end
+  end
+  raise exception if exception
+end)
+
 module RSpec::Core::Hooks
 class AfterContextHook < Hook
   def run(example)

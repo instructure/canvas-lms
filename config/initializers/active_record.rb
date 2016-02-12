@@ -699,7 +699,8 @@ ActiveRecord::Relation.class_eval do
     (connection.adapter_name == 'PostgreSQL' &&
       (Shackles.environment == :slave ||
         connection.readonly? ||
-        connection.open_transactions > (Rails.env.test? ? 1 : 0)))
+        (!Rails.env.test? && connection.open_transactions > 0) ||
+        in_transaction_in_test?))
   end
 
   def find_in_batches_with_cursor(options = {})
@@ -737,7 +738,7 @@ ActiveRecord::Relation.class_eval do
     # changing the name (and source location) of this method
     transaction_regex = /^#{Regexp.escape(transaction_method)}:\d+:in `transaction/.freeze
     # transactions due to spec fixtures are _not_in the callstack, so we only need to find 1
-    !!caller.find { |s| s =~ transaction_regex }
+    !!caller.find { |s| s =~ transaction_regex && !s.include?('spec_helper.rb') }
   end
 
   def find_in_batches_with_temp_table(options = {})
