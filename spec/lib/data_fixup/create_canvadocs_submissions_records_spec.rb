@@ -40,5 +40,7 @@ describe DataFixup::CreateCanvadocsSubmissionsRecords do
     test_associations('crocodoc_document')
   end
 
-  class CanvadocsSubmission < ActiveRecord::Base; end
+  class CanvadocsSubmission < ActiveRecord::Base
+    strong_params
+  end
 end
