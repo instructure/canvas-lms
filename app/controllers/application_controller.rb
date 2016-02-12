@@ -243,7 +243,7 @@ class ApplicationController < ActionController::Base
 
     filtered_events = []
     events.each do |event|
-      if event.assignment_overrides
+      if (event.respond_to? :assignment_overrides) && event.assignment_overrides
         # assignments are a completely different kind of object... we need to make sure it filters
         # the overrides intelligently
         if event.assignment_overrides.empty?
