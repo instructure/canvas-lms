@@ -2018,7 +2018,7 @@ nb:
         anonymous_peer_reviews: "Hverandrevurderinger vises anonymt"
         automatically_assign_peer_reviews: "Automatisk tildele hverandrevurderere"
         manually_assign_peer_reviews: "Manuelt tildele hverandrevurderere"
-        require_peer_reviews: "Krev hevrandrevurderinger"
+        require_peer_reviews: "Krev hverandrevurderinger"
       locked_until: "Tildele vurderinger"
       peer_reviews_assign_at_explanation: "Må komme etter forfallsdato. Hvis blank, brukes fristdato."
       peer_reviews_header: Hverandrevurderinger
@@ -4697,7 +4697,7 @@ nb:
           select_content: "Velg det du vil vise på hjemmesiden."
         options: 
           assignments: Oppgaveliste
-          course_activity_stream: "Kurset Aktivitet Strømmen"
+          course_activity_stream: "Kursets aktivitetsstrøm"
           custom_page: "Sider forside"
           modules: Kursmoduler
           syllabus: Pensum
@@ -13518,7 +13518,7 @@ nb:
         warning: Advarsel
     components: 
       final_grade: 
-        final_grade: "Slutt Grade:"
+        final_grade: "Sluttvurdering:"
     content_selection: 
       assignment: 
         select_assignment: "Velg et oppdrag"
@@ -13530,7 +13530,7 @@ nb:
         select_student: "Velg en student"
     grading: 
       empty_submission_selection: "Velg en student og en oppgave å vise og redigere karakterer."
-      grade_for: "Grade for: %{name}"
+      grade_for: "Vurdering for: %{name}"
       grading: Karaktersetting
       is_dropped: "Denne karakteren er for tiden droppet for denne studenten."
       is_late: "Dette innlevering var sent."
@@ -13587,7 +13587,7 @@ nb:
       assignment_groups: 
         ag_group_grade: Karakter
         ag_group_name: Oppgavegruppe
-        ag_group_percent_grade: "% av Grade"
+        ag_group_percent_grade: "% av karakter"
         ag_letter_grade: Bokstavkarakter
       details: 
         hidden: skjult
@@ -16253,7 +16253,10 @@ nb:
   your_content_has_been_exported_bbb57764: "Innholdet ditt er eksportert."
   your_custom_theme_has_been_successfully_applied_eaa0fc82: "Din definerte temaet har blitt brukt."
   your_email_b5364bee: "Din e-post"
-  your_file_is_being_uploaded_to_the_gradebook_and_y_aa5edfc6: "Filen din blir lastet opp til Gradebook, og du kan forlate denne siden når som helst. Om du har en stor CSV-fil, kan dine endringer ta et par minutter å oppdateres. For å forhindre at noendata blir overskrivet, vennligst bekreft at opplastingen har fullført og din Gradebook er riktig før du gjør ytterligere endringer."
+  your_file_is_being_uploaded_to_the_gradebook_and_y_aa5edfc6: |-
+      Filen din blir lastet opp til karakterboken, og du kan forlate denne siden når som helst. Om du har en stor CSV-fil, kan dine endringer ta et par minutter å
+      oppdateres. For å forhindre at noen data blir overskrivet, vennligst bekreft at
+      opplastingen er fullført og at karakterboken er riktig før du gjør ytterligere endringer.
   your_message_has_been_sent_thank_you_e0284316: "Din melding er sendt. Takk!"
   your_name_7665e1d8: "Ditt navn"
   your_profile_photo_could_not_be_uploaded_you_may_h_1c90540c: "Profilbildet ditt kunne ikke lastes opp. Du kan ha overskredet grensen for opplasting."
