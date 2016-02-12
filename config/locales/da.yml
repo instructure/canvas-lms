@@ -816,7 +816,7 @@ da:
       add_a_custom_help_link: "Tilføj et tilpasset hjælpelink"
       add_admin_title: "Tilføj Konti Admins"
       add_announcement_button: "Tilføj Meddelelse"
-      add_announcement_link: "Tilføj en Ny Meddelelse"
+      add_announcement_link: "Tilføj en ny meddelelse"
       add_ip_filter_link: "Tilføj endnu et filter"
       alert_icon_calendar_option: kalender
       alert_icon_error_option: fejl
@@ -1819,7 +1819,7 @@ da:
       freeze_properties: "Lås opgave egenskaber når kopieret"
       notify_content_change: "Giv bruger besked om, at dette indhold er blevet ændret"
       points_possible: Points
-      post_to_sis: "Inkluder karakterene for denen opgave når du indtaster det i din uddannelsesinsstitutions Studenter Information System"
+      post_to_sis: "Inkluder karaktererne for denne opgave når du indtaster det i dit studieadministrative system."
       warnings: 
         assignment_is_frozen: "Visse indstillinger er blevet låst administrativt."
     errors: 
@@ -2012,9 +2012,9 @@ da:
       how_to_peer_review: "Hvordan tildeles peer reviews"
       labels: 
         anonymous_peer_reviews: "Peer Review forekommer anonymt"
-        automatically_assign_peer_reviews: "Automatis tildel peer reviews"
+        automatically_assign_peer_reviews: "Automatisk tildel peer reviews"
         manually_assign_peer_reviews: "Manuelt tildel peer reviews"
-        require_peer_reviews: "Behøver peer reviews"
+        require_peer_reviews: "Benyt peer reviews"
       locked_until: "Tildel evalueringer"
       peer_reviews_assign_at_explanation: "Skal komme efter forfaldsdato. Hvis tomt, benyttes forfaldsdato."
       peer_reviews_header: "Peer Reviews"
@@ -2954,7 +2954,7 @@ da:
       cannot_load_collaboration: "Kan ikke loade samarbejde"
       create_failed: "Samarbejdsoprettelse mislykkedes"
       no_name: "Indtast venligst et navn for dette samarbejde."
-      not_enabled: "Samarbejder er endnu ikke blevet aktiveret for denne Canvas side"
+      not_enabled: "Samarbejde er endnu ikke blevet aktiveret for denne Canvas side"
       title_too_long: "Benyt venligst %{maxLength} karaktere eller mindre for navn. Brug beskrivelse for yderligere indhold."
       update_failed: "Samarbejdsopdatering mislykkedes"
     forms: 
@@ -3013,7 +3013,7 @@ da:
       links: 
         delete: "Slet dette samarbejde"
         edit: "Rediger dette samarbejde"
-        new: "Start et nyt samrabejde"
+        new: "Start et nyt samarbejde"
       page_title: Samarbejde
       started_by: "Startet af *%{user}*, %{at}"
       titles: 
@@ -4087,7 +4087,7 @@ da:
   course_atom_feed_9d95214e: "Kursus Atom feed"
   course_calendar_7d3cba7b: Kursuskalender
   course_catalog_4cc7c8ce: Kursuskatalog
-  course_collaborations_dadb327e: "Kursus samarbejder"
+  course_collaborations_dadb327e: "Kursus samarbejde"
   course_conferences_3d914c96: "Kursus konferencer"
   course_content_a92eca20: "Kursus indhold"
   course_copy_argument_error: "En kursus kopi kræver et kildekursus."
@@ -4228,7 +4228,7 @@ da:
   course_name_successfully_added_48116a50: "%{course_name} er tilføjet successfuldt!"
   course_navigation_dd035109: Kursusnavigation
   course_option_links_a79d263d: Kursusmulighedlinks
-  course_outcomes_7dc1cbc7: "Kursus indlæringsmål"
+  course_outcomes_7dc1cbc7: Kursets læringsmål
   course_pages_449f1dd4: "Kursus sider"
   course_people_3058c948: "Kursus personer"
   course_quizzes_c337653c: "Kursus quizzer"
@@ -4697,7 +4697,7 @@ da:
         headings: 
           set_layout: "Indstil hjemmeside layout"
         labels: 
-          select_content: "Vælg hvad du ønsker at vise på hjemmesiden."
+          select_content: "Vælg hvad du ønsker at vise på forsiden."
         options: 
           assignments: Opgaveliste
           course_activity_stream: "Kursus aktivitetsstrøm"
@@ -4716,12 +4716,12 @@ da:
       importing: "Kursus kopiering/overførsels i gang. Dette betyder, at noget af indholdet  midlertidig ikke er tilgængelig. "
       license_notice: "Dette kursusindhold er tilbudt under en %{license_type} licens. Indholdet i dette kursus kan anses for værende under denne licens med mindre andet er anført."
       links: 
-        choose_home_page: "Valgte hjemmeside"
+        choose_home_page: "Vælg forside"
         course_setup: "Kursus tjekliste"
         drop_course: "Drop dette kursus"
         join_course: "Tilmeld dig til dette kursus"
-        new_announcement: "Ny Meddelelse"
-        view_course_stream: "Se kursusstrøm"
+        new_announcement: "Ny meddelelse"
+        view_course_stream: "Se kursus aktivitetsstrøm"
       re_sending: Gen-send
       send_done: "Udført! Besked kan tage et par minutter."
       send_failed: "Forespørgsel mislykkedes. Prøv igen."
@@ -4832,7 +4832,7 @@ da:
     announcements: Meddelelser
     assignments: Opgaver
     calendar_events: Kalenderbegivenhed
-    collaborations: Samarbejder
+    collaborations: Samarbejde
     conferences: Konferencer
     confirmation: Bekræftelse
     copy_course: "Kopier kursus"
@@ -6027,8 +6027,8 @@ da:
       what: 
         details1: |-
             ePortfolios er et sted, hvor du kan vise og diskutere de signifikante
-            indsendelser og oplevelser, der sker under din indlæringsproces.
-            Du kan bruge en ePortfolio til at
+            indsendelser og oplevelser, der sker under din læringsproces.
+            Du kan bruge en ePortfolio til at:
             
             * Vise de opgaver du er stolt af for andre end blot din instruktør
             * Tale om alle de tanker og arbejde, der gik forud for din klasse indsendelser
@@ -6346,14 +6346,14 @@ da:
     high_contrast: "Høj kontrast UI"
     html5_first_videos: "Foretrækker HTML5 for videoafspilning"
     k12: "K-12 Specifikke funktioner"
-    learning_mastery_gradebook: "Indlæringsbeherskelse Gradebook"
+    learning_mastery_gradebook: Målopfyldelsesrapport
     lor: "LOR eksternt værktøj"
     multiple_grading_periods: "Flere bedømmelsesperioder"
     new_quiz_statistics: "Ny quiz statistikside"
     post_grades: "Poster karaktere til SIS"
     quiz_log_auditing: "Quiz log revision"
     student_groups: "Ny studerendes gruppeside"
-    student_outcome_gradebook: "Studerndes indlæringsbeherskelse Gradebook"
+    student_outcome_gradebook: "Studerendes målopfyldelsesrapport"
   field_name_31fff38e: Feltnavn
   file_content_a99b5c6b: Filindhold
   file_filename_could_not_be_included_in_the_epub_do_4bf71a87: "Fil %{filename} kan ikke blive inkluderet i ePub dokument. Se venligst separat zip fil for adgang."
@@ -6821,7 +6821,7 @@ da:
         only_graded: "Beregnet på basis af bedømte opgaver "
         total: Total
         your_score: "Din score"
-      learning_outcomes: Indlæringsbeherskelse
+      learning_outcomes: Målopfyldelse
       links: 
         click_to_view: "Klik her for at se"
         download: "Download %{attachment}"
@@ -6858,7 +6858,7 @@ da:
       hide_student_names: "Skjul studerendes navne"
       include_ungraded: "Tildel 0 point til ikke-bedømte"
       individual_view: "Individuel visning"
-      learning_mastery: Indlæringsbeherskelse
+      learning_mastery: Målopfyldelse
       page_header_title: Karakterbog
       publish_to_sis: "Offentliggør karakterer til SIS"
       set_group_weights: "Sæt gruppevægtninger"
@@ -6907,7 +6907,7 @@ da:
       filter_by_student: "Filtrer efter studerendes navn eller sekundært ID"
       grades: Karakterer
       individual_view: "Individuel visning"
-      learning_mastery: Indlæringsbeherskelse
+      learning_mastery: Målopfyldelse
       page_header_title: Gradebook
       publish_to_sis: "Offentliggør karakterer til SIS"
       set_group_weights: "Opsæt gruppevægtninger"
@@ -6928,7 +6928,7 @@ da:
         mute_assignment: "Afbryd opgave"
         unmute_assignment: "Genoptag opgave"
       headers: 
-        anonymous_submission: "Denne studerendes svar er skjult, fordi denen opgave er anonym."
+        anonymous_submission: "Denne studerendes svar er skjult, fordi denne opgave er anonym."
         assessment: Bedømmelse
         grading: Bedømmelse
         no_group_submission: "Denne grupper har ingen indsendelser for denne opgave"
@@ -7012,7 +7012,7 @@ da:
       comments_made: 
         one: "1 kommentar foretaget"
         other: "%{count} kommentare foretaget"
-      done: "Gjort! Vi tog filerne du uploaded og vedhæftede dem med en kort kommentar til hver brugers indsendelsesside for denen opgave. Studerende vil få en notifikation, om at en ny kommentar blev tilføjet."
+      done: "Gjort! Vi tog filerne du uploadede og vedhæftede dem med en kort kommentar til hver brugers indsendelsesside for denne opgave. Studerende vil få en notifikation, om at en ny kommentar er blevet tilføjet."
       failures: "Der var nogle filer, vi ikke vidste hvad vi skulle gøre med. De er ikke blevet tilføjet til nogens indsendeslesside. Du kan se listen til venstre."
       files_ignored: 
         one: "1 Fil ignoreret"
@@ -7077,7 +7077,7 @@ da:
       grading_scheme_info: "Se/rediger bedømmelsesskema"
   grading_type_type_7d8b42d7: "Bedømmelsestype: %{type}"
   graphs_89fcfeb: Grafer
-  great_so_you_ve_got_a_course_now_what_well_before__38cfba67: "Godt, så du har nu et kursus. Hvad så? Vel, før du offentliggøre det til hele verdenen, skal du muligvis tjekke og være sikker på, at du har det basale lagt ud. Arbejd gennem listen til venstre for at sikre at dit kurus er parat til brug."
+  great_so_you_ve_got_a_course_now_what_well_before__38cfba67: "Godt, så du har nu et kursus. Hvad så? Før du offentliggøre det til hele verdenen, skal du muligvis tjekke og være sikker på, at du har det basale lagt ud. Arbejd gennem listen til venstre for at sikre at dit kursus er parat til brug."
   green_15af4778: Grøn
   group: 
     greater_than_1: "Skal være større end 1"
@@ -7464,7 +7464,7 @@ da:
       coming_up: "Kommende aktiviteter"
       edit_group: "Rediger gruppe"
       group_atom_feed: "Gruppe Atom feed"
-      new_announcement: "Ny Meddelelse"
+      new_announcement: "Ny meddelelse"
     status: 
       assigning_students: "Udpege studerende..."
       creating_groups: "Opretter kategori..."
@@ -7479,10 +7479,10 @@ da:
     unassigned_users: "Ikke udpegede brugere (%{count})"
   groups_6c90e26a: Grupper
   groups_are_a_good_place_to_collaborate_on_projects_7386830f: |-
-      Grupper er et godt sted for samrabejde på projekter eller til at planlægge studiemøder
-      og lignedne. Hver gruppe får en kalender, en wiki, diskussionsforum og en lille smule plads til at gemme
+      Grupper er et godt sted for samarbejde på projekter eller til at planlægge studiemøder
+      og lignendne. Hver gruppe får en kalender, en wiki, diskussionsforum og en lille smule plads til at gemme
       filer. Grupper kan samarbejde på dokumenter, eller endda planlægge webkonferencer.
-      Det er virkelig som et mini-kursus hvor du kan arbejde med et mindre antal af studrende på et
+      Det er virkelig som et mini-kursus hvor du kan arbejde med et mindre antal af studerende på et
       mere fokuseret projekt.
   help_4c4968b1: Hjælp
   help_dialog: 
@@ -7669,7 +7669,7 @@ da:
   include_deleted_enrollments_1c87684a: "Inkluder slettede tilmeldelser"
   include_deleted_objects_3cced3b5: "Inkluder slettede objekter;"
   include_scores_when_alerting_about_grade_changes_623ec201: "Inkluder score når der notificeres om karakterændringer."
-  include_this_assignment_s_grades_when_posting_to_y_6bff3323: "Inkluder karakterene for denen opgave når du indtaster det i din uddannelsesinsstitutions Studenter Information System"
+  include_this_assignment_s_grades_when_posting_to_y_6bff3323: "Inkluder karaktererne for denne opgave når du indtaster det i dit studieadministrative system."
   include_unpublished_assignments_83ebbaec: "Inkluder ikke offentliggjorte opgaver"
   include_unpublished_courses_7a0e7aab: "Inkluder ikke offentliggjorte kurser"
   incorrect_username_and_or_password_2de73abb: "Forkert brugernavn og/eller adgangskode"
@@ -10487,7 +10487,7 @@ da:
       migration_import_failed: "Overførselsimport mislykkedes"
       migration_import_finished: "Overførselsimport fuldført"
       new_account_user: "Ny kontobruger"
-      new_announcement: "Ny Meddelelse"
+      new_announcement: "Ny meddelelse"
       new_context_group_membership: "Ny kontekst gruppemedlemsskab"
       new_context_group_membership_invitation: "Ny kontekst gruppemedlemsskab invitation"
       new_course: "Nyt kursus"
@@ -11409,7 +11409,7 @@ da:
     confirms: 
       delete_access_key: "Er du sikker på, at du ønsker at slette denne adgangsnøgle?"
       delete_login: "Er du sikker på, at du ønsker at slette dette login?"
-      regenerate_token: "Er du sikker på, at du ønkser at genskabe dette token? Alt hvad der bruger dette token skal opdateres."
+      regenerate_token: "Er du sikker på, at du ønsker at genskabe dette token? Alt hvad der bruger dette token skal opdateres."
       unregister_service: "Er du sikker på, at du ønsker at afmelde denne service?"
     crumb: "%{user}'s indstillinger"
     crumbs: 
@@ -11802,7 +11802,7 @@ da:
     buttons: 
       submit_copying: 
         one: "Kopiere spørgsmål..."
-        other: "Kopierer sprøgsmål..."
+        other: "Kopierer spørgsmål..."
       submit_copying_failed: 
         one: "Kopiering af sprøgsmål mislykkedes, prøv venligst igen"
         other: "Kopiering af spørgsmål mislykkedes, prøv venligst igen"
@@ -12242,7 +12242,7 @@ da:
     question_colon: "Spørgsmål:"
     question_count: 
       one: "et spørgsmål"
-      other: "%{count} sprøgsmål"
+      other: "%{count} spørgsmål"
     question_limit_reached: |-
         Du har nået det maksimale antal af spørgsmål tilladt for en quiz (%{count}/%{limit}).
         
@@ -12441,7 +12441,7 @@ da:
         explanations: 
           calculated: "Indtast dit spørgsmål, byg en formel og generer et sæt af mulige svar kombinationer. Studrende vil se spørgsmål med et tilfældig valgt sæt af variable og skal indtasste det korrekte nummeriske svar."
           equations: "Du kan definere variable ved at indtaste variabelnavne omgivet med paranteser"
-          essay: "Studerende vil blive givet en tekstfil til at angive deres svar i."
+          essay: "Studerende vil blive givet et tekstfelt til at angive deres svar i."
           file_upload: "Studerende vil være i stand til at uploade en fil for hver at deres svar."
           fill_in_multiple_blanks: "Indtast dit spørgsmål, specificer hvor hver tomt felt skal være. Derefter definer det mulige korrekte svar for hver tomt felt. Studrende skal indtaste korrekte svar ind i tekstboksene for hver blankt felt."
           formula_definition: "Derefter skal du skrive formel eller formler benyttet til at beregne det korrekte svar. Benyt blot den samme variabelnanve listet ovenfor."
@@ -12491,7 +12491,7 @@ da:
           calculated: "Formel spørgsmål"
           essay: "Stil spørgsmål"
           file_upload: "Fil upload spørgsmål"
-          fill_in_multiple_blanks: "Fil i flere Blanks"
+          fill_in_multiple_blanks: "Udfyld flere banke felter"
           matching: Matcher
           missing_word: "Manglende ord"
           multiple_answers: "Flere svar"
@@ -12821,7 +12821,7 @@ da:
         labels: 
           final_score: "Endelig score"
           fudge_points: "Snyde points"
-          fudge_points_changed_points_quiz: "Siden %{user} tog denen quiz er antallet af mulige points ændret med %{difference}. Du kan justere for denne ændring og manuelt tilføje positive eller negative poinst ved at benytte denne boks."
+          fudge_points_changed_points_quiz: "Siden %{user} tog denne quiz er antallet af mulige points ændret med %{difference}. Du kan justere for denne ændring og manuelt tilføje positive eller negative points ved at benytte denne boks."
           fudge_points_changed_points_survey: "Siden %{user} tog denne spørgeundersøgelse er antallet af mulige points ændret med %{difference}. Du kan justere for denne ændring og manuelt tilføje positive eller negative points ved at benytte denne boks."
           fudge_points_generic_explanation: "Du kan manuelt justere scoer ved at tilføje positive eller negative poinst til denne boks."
           questions_need_review: "De følgende spørgsmål behøver evaluering"
@@ -13311,7 +13311,7 @@ da:
       change_course_state: "Ændre kursusstatus"
       comment_on_others_submissions: "Se alle studerendes indsendelser og kommenter på dem"
       create_accounts: "Opret nye rodkonti"
-      create_collaborations: "Opret samarbejder mellem studerende"
+      create_collaborations: "Opret samarbejde mellem studerende"
       create_conferences: "Opret webkonferencer"
       manage_account_memberships: "Tilføj/fjern andre admins for konto"
       manage_account_settings: "Administrer kontonniveau indstillinger"
@@ -13585,7 +13585,7 @@ da:
       result_sub_count: "Totale resultater:"
     screenreader_gradebook: 
       assignments: Opgaver
-      learning_mastery: Indlæringsbeherskelse
+      learning_mastery: Målopfyldelse
     settings: 
       assignment_toggles_and_actions: 
         download_current_scores: "Download nuværende score (.csv)"
@@ -14353,7 +14353,7 @@ da:
       external_tool_item: "Eksternt Værktøj"
       external_tool_notice: "Vælg et værktøj fra nedenstående liste, eller indtast URL for et eksternt værktøj du allerede ved er konfiguret med Basic LTI for at tiljøfe et link til dette *modul*."
       external_url_item: "Eksternt URL"
-      external_url_notice: "Indtast et URL og sidenavn for tilføjelse af link til enhver webside URL til dette *modul*."
+      external_url_notice: "Indtast en URL og sidetitel for tilføjelse af link til webside til dette *modul*."
       file_item: Fil
       file_notice: "Vælg den fil du ønsker at associere med dette *modul*, eller tilføj en fil ved at vælge \"Ny fil\"."
       indent_level: 
@@ -14489,7 +14489,7 @@ da:
         announcements_page: Meddelelsesliste
         assignments: Opgaveliste
         assignments_page: Opgaveliste
-        collaborations_page: Samarbejder
+        collaborations_page: Samarbejde
         discussions: "Diskussions indeks"
         discussions_page: "Diskussions indeks"
         files_page: "Fil Indeks"
@@ -14739,7 +14739,7 @@ da:
   student_name_hidden_b894d102: "studerende (navn skjult)"
   student_names_must_be_hidden_because_anonymous_gra_d2ca7255: "Studerendes navne skal være skjult, fordi anonym bedømmelse er nødvendig."
   student_names_must_be_hidden_because_this_is_an_an_3c82287d: "Studerendes navne  skal være skjult, fordi dette er en anonym spørgeundersøgelse."
-  student_outcome_gradebook_description: "Studerendes indlæringsbeherskelses Gradebook giver en måde for den studrende til hurtigt at se fremskridt i kurus indlæringsresultater. Læringsmål er præsenteret i en karakterbogslignedne format og fremgang er vist både som en numerisk score og som behersket / næsten behersket / special."
+  student_outcome_gradebook_description: "Studerendes målopfyldelsesrapport giver en måde for den studerende til hurtigt at se progression i kursernes læringsresultater. Læringsmål er præsenteret i en karakterbogslignende format og fremgang er vist både som en numerisk score og som behersket / næsten behersket / speciel."
   student_summary: 
     student_summary_table_ascending: "Studerendes resume tabel sorteret  stigende efter %{sortText}"
     student_summary_table_descending: "Studerendes resume tabel sorteret faldende efter %{sortText}"
@@ -14769,7 +14769,7 @@ da:
       subaccount_has_courses: "Du kan ikke slette en underkonto, der indeholder kurser"
       subaccount_has_subaccounts: "Du kan ikke slette en underkonto, der har underkonti"
     confirms: 
-      delete_subaccount: "Er du sikker på, at du ønkser at slette denne underkonto?"
+      delete_subaccount: "Er du sikker på, at du ønsker at slette denne underkonto?"
     courses_count: 
       one: "1 Kursus"
       other: "%{count} Kurser"
@@ -14973,7 +14973,7 @@ da:
   tabs: 
     announcements: Meddelelser
     assignments: Opgaver
-    collaborations: Samarbejder
+    collaborations: Samarbejde
     conferences: Konferencer
     course_assignments: "Kursus opgaver"
     course_grades: Kursuskaraktere
@@ -15364,7 +15364,7 @@ da:
   title: 
     edit_announcement: "Rediger meddelelse"
     edit_topic: "Rediger diskussionsemne"
-    new_announcement: "Ny Meddelelse"
+    new_announcement: "Ny meddelelse"
     new_topic: "Nyt diskussionsemne"
   title_52b8638d: "Titel:"
   title_is_off_6c823e2d: "%{title} er slået fra"
@@ -15381,7 +15381,7 @@ da:
     error_reports: Fejlrapporter
     learning_outcomes: Læringsmål
     messages: Beskeder
-    outcome_artifacts: "Indlæringmsål artefakter"
+    outcome_artifacts: "Læringsmål artefakter"
     people: Personer
     view_in_separate_window: "Se i seperat vindue"
   to_35c6baa2: til
