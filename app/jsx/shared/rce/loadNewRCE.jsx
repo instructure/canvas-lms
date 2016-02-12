@@ -5,7 +5,7 @@ define([
     serviceRCELoader.loadOnTarget(
       target,
       tinyMCEInitOptions,
-      window.ENV.RICH_CONTENT_APP_HOST
+      window.ENV.RICH_CONTENT_CDN_HOST || window.ENV.RICH_CONTENT_APP_HOST
     )
   }
 

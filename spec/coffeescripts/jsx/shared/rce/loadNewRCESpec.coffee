@@ -19,6 +19,11 @@ define [
     loadNewRCE("fakeTarget", {})
     ok serviceRCELoader.loadOnTarget.calledWith("fakeTarget", {}, "http://fakehost.com")
 
+  test 'CDN host overrides app host', ->
+    ENV.RICH_CONTENT_CDN_HOST = "http://fakecdn.net"
+    loadNewRCE("fakeTarget", {})
+    ok serviceRCELoader.loadOnTarget.calledWith("fakeTarget", {}, "http://fakecdn.net")
+
   module 'loadRCE: RCS Disabled',
     setup: ->
       fakeENV.setup()
