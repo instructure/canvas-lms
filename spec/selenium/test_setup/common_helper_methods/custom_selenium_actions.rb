@@ -9,61 +9,82 @@ module CustomSeleniumActions
   end
 
   def find(css)
+    raise 'need to do a get to use find' unless @click_ready
     driver.find(css)
   end
 
   def find_all(css)
+    raise 'need to do a get to use find' unless @click_ready
     driver.find_all(css)
   end
 
   def not_found(css)
+    raise 'need to do a get to use find' unless @click_ready
     driver.not_found(css)
   end
 
   def find_radio_button_by_value(value, scope = nil)
+    raise 'need to do a get to use find' unless @click_ready
     fj("input[type=radio][value=#{value}]", scope)
   end
 
   # f means "find" this is a shortcut to finding elements
   def f(selector, scope = nil)
-    (scope || driver).find_element :css, selector
-  rescue
-    nil
+    raise 'need to do a get to use find' unless @click_ready
+    begin
+      (scope || driver).find_element :css, selector
+    rescue
+      nil
+    end
   end
 
   # short for find with link
   def fln(link_text, scope = nil)
-    (scope || driver).find_element :link, link_text
-  rescue
-    nil
+    raise 'need to do a get to use find' unless @click_ready
+    begin
+      (scope || driver).find_element :link, link_text
+    rescue
+      nil
+    end
   end
 
   # short for find with jquery
   def fj(selector, scope = nil)
-    find_with_jquery selector, scope
-  rescue
-    nil
+    raise 'need to do a get to use find' unless @click_ready
+    begin
+      find_with_jquery selector, scope
+    rescue
+      nil
+    end
   end
 
   # same as `f` except tries to find several elements instead of one
   def ff(selector, scope = nil)
-    (scope || driver).find_elements :css, selector
-  rescue
-    []
+    raise 'need to do a get to use find' unless @click_ready
+    begin
+      (scope || driver).find_elements :css, selector
+    rescue
+      []
+    end
   end
 
   # same as find with jquery but tries to find several elements instead of one
   def ffj(selector, scope = nil)
-    find_all_with_jquery selector, scope
-  rescue
-    []
+    raise 'need to do a get to use find' unless @click_ready
+    begin
+      find_all_with_jquery selector, scope
+    rescue
+      []
+    end
   end
 
   def find_with_jquery(selector, scope = nil)
+    raise 'need to do a get to use find' unless @click_ready
     driver.execute_script("return $(arguments[0], arguments[1] && $(arguments[1]))[0];", selector, scope)
   end
 
   def find_all_with_jquery(selector, scope = nil)
+    raise 'need to do a get to use find' unless @click_ready
     driver.execute_script("return $(arguments[0], arguments[1] && $(arguments[1])).toArray();", selector, scope)
   end
 
