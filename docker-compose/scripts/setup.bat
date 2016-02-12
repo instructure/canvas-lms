@@ -82,9 +82,9 @@ if [ "$(uname)" == "Darwin" ]; then
 
   docker-compose run --rm web /bin/bash -c "bundle exec rake canvas:compile_assets" || { echo >&2 "Error: bundle exec rake canvas:compile_assets failed."; exit 1; }
 
-  docker-compose up -d || { echo >&2 "Error: docker-compose up failed. A possible cause is that files use Windows newlines (CRLF). Check that all files in the docker-compose directory use Unix newlines (LF).  E.g. find . -name ""*"" -type f -exec dos2unix {} \;."; exit 1; }
+  docker-compose up -d || { echo >&2 "Error: docker-compose up failed. A possible cause is that files use Windows newlines \(CRLF\). Check that all files in the docker-compose directory use Unix newlines \(LF\)."; exit 1; }
   open http://canvas.docker/
-  echo "It'll say Bad Gateway.  Wait a couple of minutes and refresh.  If it doesn't work, ensure the canvas web container is running using docker ps""
+  echo "It'll say Bad Gateway.  Wait a couple of minutes and refresh.  If it doesn't work, ensure the canvas web container is running using docker ps"
 
 elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
   # GNU/Linux platform
