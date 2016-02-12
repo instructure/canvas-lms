@@ -11565,7 +11565,7 @@ en-GB:
       titles: 
         access_token_details: "Access token details"
         authorize_google_docs: "Authorise Google Docs"
-        authorize_google_drive: "Authorie Google Drive"
+        authorize_google_drive: "Authorise Google Drive"
         authorize_linkedin: "Authorise LinkedIn"
         authorize_twitter: "Authorise Twitter"
         authorize_yo: "Yo Login"
