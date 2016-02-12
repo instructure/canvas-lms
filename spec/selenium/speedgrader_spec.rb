@@ -384,56 +384,55 @@ describe 'Speedgrader' do
     expect(f('#after_fudge_points_total').text). to eq '10'
   end
 
-  it 'should have working student drop-down arrows ', priority: "1", test_id: 164018 do
-    init_course_with_students 2
-    assignment = create_assignment_with_type('letter_grade')
+  context 'Student drop-down' do
+    before :each do
+      init_course_with_students 2
+      assignment = create_assignment_with_type('letter_grade')
 
-    # see first student
-    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{assignment.id}#"
-    keep_trying_until { expect(fj('span.ui-selectmenu-item-header')).to include_text(@students[0].name) }
-    expect(f('#x_of_x_students_frd')).to include_text('Student 1 of 2')
+      # see first student
+      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{assignment.id}#"
+      keep_trying_until { f(selectedStudent).text.include?(@students[0].name) }
+    end
 
-    # click next to second student
-    fj('.next').click
-    expect(fj('span.ui-selectmenu-item-header')).to include_text(@students[1].name)
-    expect(f('#x_of_x_students_frd')).to include_text('Student 2 of 2')
+    let(:selectedStudent) {'span.ui-selectmenu-item-header'}
+    let(:studentXofXlabel) {'#x_of_x_students_frd'}
+    let(:studentDropdownMenu) {'div.ui-selectmenu-menu.ui-selectmenu-open'}
+    let(:studentDropdown) {'a.ui-selectmenu'}
+    let(:next_) {'.next'}
+    let(:previous) {'.prev'}
 
-    # go bak to the first student
-    fj('.prev').click
-    expect(fj('span.ui-selectmenu-item-header')).to include_text(@students[0].name)
-    expect(f('#x_of_x_students_frd')).to include_text('Student 1 of 2')
-  end
+    it 'has working next and previous arrows ', priority: "1", test_id: 164018 do
+      # click next to second student
+      expect(cycle_students_correctly(next_))
 
-  it 'Student drop-down arrows should wrap around to start when you reach the last student', priority: "1", test_id: 272512 do
-    init_course_with_students 2
-    assignment = create_assignment_with_type('letter_grade')
+      # go bak to the first student
+      expect(cycle_students_correctly(previous))
+    end
 
-    # see first student
-    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{assignment.id}#"
-    keep_trying_until { expect(fj('span.ui-selectmenu-item-header')).to include_text(@students[0].name) }
-    expect(f('#x_of_x_students_frd')).to include_text('Student 1 of 2')
+    it 'arrows wrap around to start when you reach the last student', priority: "1", test_id: 272512 do
+      # click next to second student
+      expect(cycle_students_correctly(next_))
 
-    # click next to second student
-    fj('.next').click
-    expect(fj('span.ui-selectmenu-item-header')).to include_text(@students[1].name)
-    expect(f('#x_of_x_students_frd')).to include_text('Student 2 of 2')
+      # wrap around to the first student
+      expect(cycle_students_correctly(next_))
+    end
 
-    # wrap around to the first student
-    fj('.next').click
-    expect(fj('span.ui-selectmenu-item-header')).to include_text(@students[0].name)
-    expect(f('#x_of_x_students_frd')).to include_text('Student 1 of 2')
-  end
+    it 'list all students', priority: "1", test_id: 164206 do
+      f(studentDropdown).click
 
-  it 'Student drop-down should list all students', priority: "1", test_id: 164206 do
-    init_course_with_students 2
-    assignment = create_assignment_with_type('letter_grade')
+      expect(f(studentDropdownMenu)).to include_text(@students[0].name)
+      expect(f(studentDropdownMenu)).to include_text(@students[1].name)
+    end
 
-    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{assignment.id}#"
-    keep_trying_until { expect(fj('span.ui-selectmenu-item-header')).to include_text(@students[0].name) }
+    it 'list alias when hide student name is selected', priority: "2", test_id: 164208 do
+      f('#settings_link').click
+      f('#hide_student_names').click
+      expect_new_page_load { fj('.ui-dialog-buttonset .ui-button:visible:last').click }
 
-    f('a.ui-selectmenu').click
-    expect(fj('div.ui-selectmenu-menu.ui-selectmenu-open')).to include_text(@students[0].name)
-    expect(fj('div.ui-selectmenu-menu.ui-selectmenu-open')).to include_text(@students[1].name)
+      f(studentDropdown).click
+      expect(f(studentDropdownMenu)).to include_text('Student 1')
+      expect(f(studentDropdownMenu)).to include_text('Student 2')
+    end
   end
 
   context 'submissions' do
