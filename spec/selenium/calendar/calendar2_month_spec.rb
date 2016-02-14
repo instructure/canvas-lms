@@ -58,18 +58,17 @@ describe "calendar2" do
         create_middle_day_assignment
       end
 
-      it 'should translate time string in event details', priority: "2", test_id: 467482 do
-        skip('Fails with webpack enabled')
+      it 'should translate am/pm time strings in assignment event datepicker', priority: "2", test_id: 467482 do
         @user.locale = 'fa-IR'
         @user.save!
-        create_course_event
-        # course event created with pm timestamp
         load_month_view
-        fj('.fc-content').click
+        f('#create_new_event_link').click
+        f('#edit_event .edit_assignment_option').click
+        f('#assignment_title').send_keys('test assignment')
+        f('#edit_assignment_form .ui-datepicker-trigger.btn').click
         wait_for_ajaximations
-        event_details = fj('.event-details')
-        # literal translation of expectation is afternoon and pm when applied to a time
-        expect(event_details.find('.date-range')).to include_text('بعد از ظهر')
+        expect(f('#ui-datepicker-div .ui-datepicker-time-ampm')).to include_text('قبل از ظهر')
+        expect(f('#ui-datepicker-div .ui-datepicker-time-ampm')).to include_text('بعد از ظهر')
       end
 
       context "drag and drop" do
