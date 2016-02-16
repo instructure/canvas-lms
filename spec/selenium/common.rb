@@ -65,7 +65,7 @@ shared_context "in-process server selenium tests" do
   # set up so you can use rails urls helpers in your selenium tests
   include Rails.application.routes.url_helpers
 
-  def check_exception(exception)
+  def maybe_recover_from_exception(exception)
     case exception
     when EOFError, Errno::ECONNREFUSED, Net::ReadTimeout
       if $selenium_driver && !RSpec.world.wants_to_quit && exception.backtrace.grep(/selenium-webdriver/).present?
@@ -73,18 +73,20 @@ shared_context "in-process server selenium tests" do
         # this will cause the selenium driver to get re-initialized if it
         # crashes for some reason
         $selenium_driver = nil
+        return true
       end
     end
+    false
   end
 
   around do |example|
     begin
       example.run
     rescue # before/after/around ... always re-raise so the example fails
-      check_exception $ERROR_INFO
+      maybe_recover_from_exception $ERROR_INFO
       raise
     end
-    check_exception example.example.exception
+    maybe_recover_from_exception example.example.exception
   end
 
   prepend_before :each do
@@ -96,10 +98,19 @@ shared_context "in-process server selenium tests" do
   end
 
   append_before :all do
-    $selenium_driver ||= setup_selenium
-    default_url_options[:host] = $app_host_and_port
-    close_modal_if_present
-    resize_screen_to_normal
+    retry_count = 0
+    begin
+      $selenium_driver ||= setup_selenium
+      default_url_options[:host] = $app_host_and_port
+      close_modal_if_present
+      resize_screen_to_normal
+    rescue
+      if maybe_recover_from_exception($ERROR_INFO) && (retry_count += 1) < 3
+        retry
+      else
+        raise
+      end
+    end
   end
 
   append_before :each do
