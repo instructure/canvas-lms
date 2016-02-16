@@ -14,8 +14,6 @@ describe DiscussionTopicsApiController do
       post 'add_entry', :format => 'json', :topic_id => @topic.id, :course_id => @course.id, :user_id => @user.id, :message => 'message', :read_state => 'read'
     end
 
-    after { Setting.set 'enable_page_views', 'false' }
-
     it 'creates a new discussion entry' do
       entry = assigns[:entry]
       expect(entry.discussion_topic).to eq @topic

@@ -956,7 +956,7 @@ class ApplicationController < ActionController::Base
   #
   # If asset is an AR model, then its asset_string will be used. If it's an array,
   # it should look like [ "subtype", context ], like [ "pages", course ].
-  def log_asset_access(asset, asset_category, asset_group=nil, level=nil, membership_type=nil)
+  def log_asset_access(asset, asset_category, asset_group=nil, level=nil, membership_type=nil, overwrite:true)
     user = @current_user
     user ||= User.where(id: session['file_access_user_id']).first if session['file_access_user_id'].present?
     return unless user && @context && asset
@@ -978,14 +978,16 @@ class ApplicationController < ActionController::Base
                    'unknown'
                  end
 
-    @accessed_asset = {
-      :user => user,
-      :code => code,
-      :group_code => group_code,
-      :category => asset_category,
-      :membership_type => membership_type,
-      :level => level
-    }
+    if !@accessed_asset || overwrite
+      @accessed_asset = {
+        :user => user,
+        :code => code,
+        :group_code => group_code,
+        :category => asset_category,
+        :membership_type => membership_type,
+        :level => level
+      }
+    end
 
     Canvas::LiveEvents.asset_access(asset, asset_category, membership_type, level)
 
@@ -1327,7 +1329,7 @@ class ApplicationController < ActionController::Base
         flash[:error] = t "#application.errors.invalid_external_tool", "Couldn't find valid settings for this link"
         redirect_to named_context_url(context, error_redirect_symbol)
       else
-        log_asset_access(@tool, "external_tools", "external_tools")
+        log_asset_access(@tool, "external_tools", "external_tools", overwrite: false)
         @opaque_id = @tool.opaque_identifier_for(@tag)
 
         @lti_launch = @tool.settings['post_only'] ? Lti::Launch.new(post_only: true) : Lti::Launch.new

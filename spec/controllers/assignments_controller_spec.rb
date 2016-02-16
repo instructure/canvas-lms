@@ -175,7 +175,12 @@ describe AssignmentsController do
 
     it "should require login for external tools in a public course" do
       @course.update_attribute(:is_public, true)
-      @course.context_external_tools.create!(:shared_secret => 'test_secret', :consumer_key => 'test_key', :name => 'test tool', :domain => 'example.com')
+      @course.context_external_tools.create!(
+        :shared_secret => 'test_secret',
+        :consumer_key => 'test_key',
+        :name => 'test tool',
+        :domain => 'example.com'
+      )
       @assignment.submission_types = 'external_tool'
       @assignment.build_external_tool_tag(:url => "http://example.com/test")
       @assignment.save!
@@ -198,6 +203,37 @@ describe AssignmentsController do
 
       expect(response).to be_success
       expect(assigns(:user_has_google_drive)).to be true
+    end
+
+    context "page views enabled" do
+      before do
+        Setting.set('enable_page_views', 'db')
+        @old_thread_context = Thread.current[:context]
+        Thread.current[:context] = { request_id: SecureRandom.uuid }
+      end
+
+      after do
+        Thread.current[:context] = @old_thread_context
+      end
+
+      it "should log an AUA as an assignment view for an external tool assignment" do
+        user_session(@student)
+        @course.context_external_tools.create!(
+          :shared_secret => 'test_secret',
+          :consumer_key => 'test_key',
+          :name => 'test tool',
+          :domain => 'example.com'
+        )
+        @assignment.submission_types = 'external_tool'
+        @assignment.build_external_tool_tag(:url => "http://example.com/test")
+        @assignment.save!
+
+        get 'show', :course_id => @course.id, :id => @assignment.id
+        expect(response).to be_success
+        aua = AssetUserAccess.where(user_id: @student, context_type: 'Course', context_id: @course).first
+        expect(aua.asset_category).to eq 'assignments'
+        expect(aua.asset_code).to eq @assignment.asset_string
+      end
     end
 
   end
