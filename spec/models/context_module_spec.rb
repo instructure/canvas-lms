@@ -1290,4 +1290,14 @@ describe ContextModule do
     expect(@module.context_module_progressions.reload.size).to eq 1
     expect(@module.context_module_progressions.first).to be_unlocked
   end
+
+  it "allows teachers with concluded enrollments to :read unpublished modules" do
+    course_with_teacher.complete!
+    m = @course.context_modules.create!
+    m.workflow_state = 'unpublished'
+    m.save!
+    expect(m.grants_right?(@teacher, :read)).to eq true
+    expect(m.grants_right?(@teacher, :read_as_admin)).to eq true
+    expect(m.grants_right?(@teacher, :manage_content)).to eq false
+  end
 end

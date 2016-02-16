@@ -211,7 +211,7 @@ class ContextModule < ActiveRecord::Base
     can :read and can :create and can :update and can :delete and can :read_as_admin
 
     given {|user, session| self.context.grants_right?(user, session, :read_as_admin) }
-    can :read_as_admin
+    can :read and can :read_as_admin
 
     given {|user, session| self.context.grants_right?(user, session, :view_unpublished_items) }
     can :view_unpublished_items
