@@ -1700,7 +1700,7 @@ ar:
       many: "%{count} طالبًا"
       one: "%{count} طالب واحد"
       other: "%{count} طالب"
-      two: طالبين
+      two: "%{count} طالبين"
       zero: "%{count} طالب"
   assignment_selection_6bff05c4: "تحديد المهمة"
   assignment_was_deleted_8320d26d: "تم حذف المهمة"
@@ -5783,8 +5783,10 @@ ar:
     like_count: 
       few: "(%{count} إعجابات)"
       many: "(%{count} إعجاباً)"
-      two: (إعجابين)
-      zero: "(لا توجد إعجابات)"
+      one: " (%{count} إعجاب واحد)"
+      other: "(%{count} إعجاب)"
+      two: "(%{count} إعجابين)"
+      zero: "(%{count} لا توجد إعجابات)"
     mark_as_read: "وضع علامة كمقروء"
     mark_as_unread: "وضع علامة كغير مقروء"
     no_content: "لا يوجد محتوى"
