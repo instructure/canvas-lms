@@ -102,6 +102,7 @@ class AccountsController < ApplicationController
   before_filter :rich_content_service_config, only: [:settings]
 
   include Api::V1::Account
+  include CustomSidebarLinksHelper
 
   INTEGER_REGEX = /\A[+-]?\d+\z/
 

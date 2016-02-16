@@ -2421,6 +2421,13 @@ describe CoursesController, type: :request do
         expect(json.map{|x| x['id']}.length).to eq 1
         expect(json.map{|x| x['id']}).to eq [@target.id]
       end
+
+      it "includes custom links if requested" do
+        json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json?include[]=custom_links",
+                        { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s,
+                          :format => 'json', :include => %w(custom_links) })
+        expect(json.first).to have_key 'custom_links'
+      end
     end
 
     it "should include observed users in the enrollments if requested" do

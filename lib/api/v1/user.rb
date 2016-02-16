@@ -116,6 +116,10 @@ module Api::V1::User
       if includes.include?('terms_of_use')
         json[:terms_of_use] = !!user.preferences[:accepted_terms]
       end
+
+      if includes.include?('custom_links')
+        json[:custom_links] = roster_user_custom_links(user)
+      end
     end
   end
 

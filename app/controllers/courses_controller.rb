@@ -287,6 +287,7 @@ require 'securerandom'
 class CoursesController < ApplicationController
   include SearchHelper
   include ContextExternalToolsHelper
+  include CustomSidebarLinksHelper
 
   before_filter :require_user, :only => [:index]
   before_filter :require_user_or_observer, :only=>[:user_index]
@@ -767,7 +768,7 @@ class CoursesController < ApplicationController
   #   'StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'ObserverEnrollment',
   #   or 'DesignerEnrollment'.
   #
-  # @argument include[] [String, "email"|"enrollments"|"locked"|"avatar_url"|"test_student"|"bio"]
+  # @argument include[] [String, "email"|"enrollments"|"locked"|"avatar_url"|"test_student"|"bio"|"custom_links"]
   #   - "email": Optional user email.
   #   - "enrollments":
   #   Optionally include with each Course the user's current and invited
@@ -780,7 +781,8 @@ class CoursesController < ApplicationController
   #   - "bio": Optionally include each user's bio.
   #   - "test_student": Optionally include the course's Test Student,
   #   if present. Default is to not include Test Student.
-  #
+  #   - "custom_links": Optionally include plugin-supplied custom links for each student,
+  #   such as analytics information
   # @argument user_id [String]
   #   If included, the user will be queried and if the user is part of the
   #   users set, the page parameter will be modified so that the page

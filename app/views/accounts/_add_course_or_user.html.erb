@@ -4,7 +4,6 @@
   show_user = !hide_add_user && can_do(@account.root_account, @current_user, :manage_user_logins)
 %>
 
-<% if show_course || show_user %>
 <div class="rs-margin-all">
   <% if show_course %>
     <a href="#" role="button" class="add_course_link btn button-sidebar-wide"><i class="icon-add"></i> <%= t(:add_course_link, "Add a New Course") %></a>
@@ -12,8 +11,12 @@
   <% if show_user %>
     <a href="#" role="button" class="add_user_link btn button-sidebar-wide"><i class="icon-user-add"></i> <%= t(:add_user_link, "Add a New User") %></a>
   <% end %>
+  <% account_custom_links.each do |link| %>
+    <a href="<%= link[:url] %>" role="button" class="btn button-sidebar-wide"><i class="<%= link[:icon_class] %>" role="presentation"></i> <%= link[:text] %></a>
+  <% end %>
 </div>
 
+<% if show_course || show_user %>
 <div style="display: none;">
   <div id="current_enrollment_term_id"><%= @term && @term.id %></div>
   <div id="add_user_dialog">

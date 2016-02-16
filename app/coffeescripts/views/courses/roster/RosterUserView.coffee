@@ -72,6 +72,7 @@ define [
           ENV.permissions.manage_admin_users
         else
           ENV.permissions.manage_students
+      json.customLinks = @model.get('custom_links')
 
       if json.canViewLoginIdColumn
         json.canViewLoginId = true

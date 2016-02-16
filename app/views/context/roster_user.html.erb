@@ -36,6 +36,9 @@
     <% if @user.grants_right?(@current_user, :view_statistics) %>
       <a href="<%= user_path(@user.id) %>"><i class="icon-user"></i> <%= t('links.user_account_details', %{User Account Details}) %></a>
     <% end %>
+    <% roster_user_custom_links(@user).each do |link| %>
+      <a href="<%= link[:url] %>"><i class="<%= link[:icon_class] %>" role="presentation"></i> <%= link[:text] %></a>
+    <% end %>
   </div>
   <a href="<%= user_profile_path(@current_user) %>" class="profile_url" style="display: none;">&nbsp;</a>
   <h2><%= t 'headings.user_services', "Registered Web Services" %></h2>
