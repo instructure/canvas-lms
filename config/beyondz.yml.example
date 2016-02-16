@@ -3,6 +3,7 @@ development:
   change_password_path: /users/edit
   nonexistent_user_path: /users/not_on_lms
   bitly_access_token: 12345689assdfe
+  help_url: http://localhost
 
 test:
   base_url: https://test.bebraven.org/
@@ -22,3 +23,5 @@ production:
   change_password_path: /users/edit
   nonexistent_user_path: /users/not_on_lms
   bitly_access_token: 12345689assdfe
+  help_url: https://help.bebraven.org
+
