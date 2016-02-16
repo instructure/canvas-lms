@@ -258,6 +258,7 @@ module FilesCommon
       ff(".ui-tabs-anchor")[1].click
     end
     ff(".name.text")[0].click
+    wait_for_ajaximations
     ff(".name.text")[1].click
     wait_for_ajaximations
     ff(".name.text")[2].click
