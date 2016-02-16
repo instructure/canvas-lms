@@ -37,7 +37,11 @@ module Api::V1::Submission
           end
         end
       else
-        hash['submission_history'] = submission.submission_history.map do |ver|
+        histories = submission.submission_history
+        if includes.include?("group")
+          ActiveRecord::Associations::Preloader.new.preload(histories, :group)
+        end
+        hash['submission_history'] = histories.map do |ver|
           ver.without_versioned_attachments do
             submission_attempt_json(ver, assignment, current_user, session, context)
           end
@@ -90,6 +94,7 @@ module Api::V1::Submission
 
   def submission_attempt_json(attempt, assignment, user, session, context = nil)
     context ||= assignment.context
+    includes = Array.wrap(params[:include])
 
     json_fields = SUBMISSION_JSON_FIELDS
     json_methods = SUBMISSION_JSON_METHODS.dup # dup because AR#to_json modifies the :methods param in-place
@@ -111,6 +116,7 @@ module Api::V1::Submission
       hash['body'] = api_user_content(hash['body'], context, user)
     end
 
+    hash['group'] = submission_minimal_group_json(attempt) if includes.include?("group")
 
     unless params[:exclude_response_fields] && params[:exclude_response_fields].include?('preview_url')
       preview_args = { 'preview' => '1' }
@@ -158,6 +164,16 @@ module Api::V1::Submission
     end
 
     hash
+  end
+
+  def submission_minimal_group_json(attempt)
+    # If one is including the group in the submission response, we can
+    # assume they want the information for identification and sorting
+    # issues and not the full group object.
+    {
+      id: attempt.group_id,
+      name: attempt.group.try(:name)
+    }
   end
 
   def quiz_submission_attempt_json(attempt, assignment, user, session, context = nil)
