@@ -17,8 +17,7 @@
 #
 
 class RoleOverride < ActiveRecord::Base
-  belongs_to :context, :polymorphic => true
-  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Account']
+  belongs_to :context, polymorphic: [:account]
 
   belongs_to :role
   include Role::AssociationHelper

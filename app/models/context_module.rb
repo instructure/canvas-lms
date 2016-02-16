@@ -21,8 +21,7 @@ class ContextModule < ActiveRecord::Base
   include SearchTermHelper
   attr_accessible :context, :name, :unlock_at, :require_sequential_progress,
                   :completion_requirements, :prerequisites, :publish_final_grade, :requirement_count
-  belongs_to :context, :polymorphic => true
-  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course']
+  belongs_to :context, polymorphic: [:course]
   has_many :context_module_progressions, :dependent => :destroy
   has_many :content_tags, -> { order('content_tags.position, content_tags.title') }, dependent: :destroy
   acts_as_list scope: { context: self, workflow_state: ['active', 'unpublished'] }

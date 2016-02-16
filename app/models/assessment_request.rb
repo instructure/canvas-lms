@@ -22,12 +22,9 @@ class AssessmentRequest < ActiveRecord::Base
   attr_accessible :rubric_assessment, :user, :asset, :assessor_asset, :comments, :rubric_association, :assessor
 
   belongs_to :user
-  belongs_to :asset, :polymorphic => true
-  validates_inclusion_of :asset_type, :allow_nil => true, :in => ['Submission']
-  belongs_to :assessor_asset, :polymorphic => true
-  validates_inclusion_of :assessor_asset_type, :allow_nil => true, :in => ['Submission', 'User']
+  belongs_to :asset, polymorphic: [:submission]
+  belongs_to :assessor_asset, polymorphic: [:submission, :user], polymorphic_prefix: true
   belongs_to :assessor, :class_name => 'User'
-  belongs_to :submission, :foreign_key => 'asset_id'
   belongs_to :rubric_association
   has_many :submission_comments
   has_many :ignores, as: :asset

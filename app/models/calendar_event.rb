@@ -38,8 +38,8 @@ class CalendarEvent < ActiveRecord::Base
   include Workflow
 
 
-  belongs_to :context, :polymorphic => true
-  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'User', 'Group', 'AppointmentGroup', 'CourseSection']
+  belongs_to :context, polymorphic: [:course, :user, :group, :appointment_group, :course_section],
+             polymorphic_prefix: true
   belongs_to :user
   belongs_to :parent_event, :class_name => 'CalendarEvent', :foreign_key => :parent_calendar_event_id, :inverse_of => :child_events
   has_many :child_events, -> { where("calendar_events.workflow_state <> 'deleted'") }, class_name: 'CalendarEvent', foreign_key: :parent_calendar_event_id, inverse_of: :parent_event

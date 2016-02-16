@@ -21,11 +21,10 @@ class GradingStandard < ActiveRecord::Base
 
   attr_accessible :title, :standard_data, :data
 
-  belongs_to :context, :polymorphic => true
+  belongs_to :context, polymorphic: [:account, :course]
   belongs_to :user
   has_many :assignments
 
-  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Account', 'Course']
   validates_presence_of :context_id, :context_type, :workflow_state, :data
   validate :valid_grading_scheme_data
 

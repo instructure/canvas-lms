@@ -166,6 +166,7 @@ class Course < ActiveRecord::Base
   has_many :messages, :as => :context, :dependent => :destroy
   has_many :context_external_tools, -> { order('name') }, as: :context, dependent: :destroy
   belongs_to :wiki
+  has_many :wiki_pages, foreign_key: 'wiki_id', primary_key: 'wiki_id'
   has_many :quizzes, -> { order('lock_at, title, id') }, class_name: 'Quizzes::Quiz', as: :context, dependent: :destroy
   has_many :quiz_questions, :class_name => 'Quizzes::QuizQuestion', :through => :quizzes
   has_many :active_quizzes, -> { preload(:assignment).where("quizzes.workflow_state<>'deleted'").order(:created_at) }, class_name: 'Quizzes::Quiz', as: :context
@@ -209,7 +210,7 @@ class Course < ActiveRecord::Base
   has_many :progresses, as: :context
   has_many :gradebook_csvs, inverse_of: :course
 
-  include Profile::Association
+  prepend Profile::Association
 
   before_save :assign_uuid
   before_validation :assert_defaults

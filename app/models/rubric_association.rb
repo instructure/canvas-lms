@@ -24,11 +24,11 @@ class RubricAssociation < ActiveRecord::Base
   attr_accessor :skip_updating_points_possible
   attr_accessible :rubric, :association_object, :context, :use_for_grading, :title, :description, :summary_data, :purpose, :url, :hide_score_total, :bookmarked
   belongs_to :rubric
-  belongs_to :association_object, :polymorphic => true, :foreign_type => :association_type, :foreign_key => :association_id
-  validates_inclusion_of :association_type, 'allow_nil' => true, :in => ['Account', 'Course', 'Assignment']
+  belongs_to :association_object, polymorphic: [:account, :course, :assignment],
+             foreign_type: :association_type, foreign_key: :association_id,
+             polymorphic_prefix: :association
 
-  belongs_to :context, :polymorphic => true
-  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'Account']
+  belongs_to :context, polymorphic: [:course, :account]
   has_many :rubric_assessments, :dependent => :nullify
   has_many :assessment_requests, :dependent => :destroy
 

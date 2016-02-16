@@ -18,7 +18,7 @@
 
 class ContentExport < ActiveRecord::Base
   include Workflow
-  belongs_to :context, :polymorphic => true
+  belongs_to :context, polymorphic: [:course, :group, { context_user: 'User' }]
   belongs_to :user
   belongs_to :attachment
   belongs_to :content_migration
@@ -28,7 +28,6 @@ class ContentExport < ActiveRecord::Base
   serialize :settings
   attr_accessible :context, :export_type, :user, :selected_content, :progress
   validates_presence_of :context_id, :workflow_state
-  validates_inclusion_of :context_type, :in => ['Course', 'Group', 'User']
 
   has_one :job_progress, :class_name => 'Progress', :as => :context
 
@@ -85,10 +84,6 @@ class ContentExport < ActiveRecord::Base
     # non-admins can create zip or user-data exports, but not other types
     given { |user, session| [ZIP, USER_DATA].include?(self.export_type) && self.context.grants_right?(user, session, :read) }
     can :create
-  end
-
-  def course
-    raise "Use context instead"
   end
 
   def export(opts={})

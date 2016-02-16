@@ -472,55 +472,79 @@ class ActiveRecord::Base
   #   belongs_to :context, polymorphic: [:course, :account]
   def self.belongs_to(name, scope = nil, options={})
     options = scope if scope.is_a?(Hash)
+    polymorphic_prefix = options.delete(:polymorphic_prefix)
+    exhaustive = options.delete(:exhaustive)
 
-    if options[:polymorphic].is_a?(Array)
-      add_polymorph_methods(name, options[:polymorphic])
+    reflection = super
+
+    if reflection.options[:polymorphic].is_a?(Array) ||
+        reflection.options[:polymorphic].is_a?(Hash)
+      reflection.options[:exhaustive] = exhaustive
+      reflection.options[:polymorphic_prefix] = polymorphic_prefix
+      add_polymorph_methods(reflection)
     end
-    super
+    reflection
   end
 
-  def self.add_polymorph_methods(generic, specifics)
+  def self.add_polymorph_methods(reflection)
     unless @polymorph_module
       @polymorph_module = Module.new
       include(@polymorph_module)
     end
 
-    specific_classes = specifics.map(&:to_s).map(&:classify).sort
-    validates "#{generic}_type", inclusion: { in: specific_classes }, allow_nil: true
-
-    @polymorph_module.class_eval <<-RUBY, __FILE__, __LINE__ + 1
-      def #{generic}=(record)
-        if record && [#{specific_classes.join(', ')}].none? { |klass| record.is_a?(klass) }
-          message = "one of #{specific_classes.join(', ')} expected, got \#{record.class}"
-          raise ActiveRecord::AssociationTypeMismatch, message
-        end
-        super
+    specifics = []
+    Array.wrap(reflection.options[:polymorphic]).map do |name|
+      if name.is_a?(Hash)
+        specifics.concat(name.to_a)
+      else
+        specifics << [name, name.to_s.camelize]
       end
-    RUBY
+    end
 
-    specifics.each do |specific|
-      class_name = specific.to_s.classify
-
-      # ensure we capture this class's table name
-      table_name = self.table_name
-      belongs_to specific, -> { where(table_name => { "#{generic}_type" => class_name }) }, foreign_key: "#{generic}_id"
-
-      correct_type = "#{generic}_type && self.class.send(:compute_type, #{generic}_type) <= #{class_name}"
+    unless reflection.options[:exhaustive] == false
+      specific_classes = specifics.map(&:last).sort
+      validates reflection.foreign_type, inclusion: { in: specific_classes }, allow_nil: true
 
       @polymorph_module.class_eval <<-RUBY, __FILE__, __LINE__ + 1
-      def #{specific}
-        #{generic} if #{correct_type}
+        def #{reflection.name}=(record)
+          if record && [#{specific_classes.join(', ')}].none? { |klass| record.is_a?(klass) }
+            message = "one of #{specific_classes.join(', ')} expected, got \#{record.class}"
+            raise ActiveRecord::AssociationTypeMismatch, message
+          end
+          super
+        end
+      RUBY
+    end
+
+    if reflection.options[:polymorphic_prefix] == true
+      prefix = "#{reflection.name}_"
+    elsif reflection.options[:polymorphic_prefix]
+      prefix = "#{reflection.options[:polymorphic_prefix]}_"
+    end
+
+    specifics.each do |(name, class_name)|
+      # ensure we capture this class's table name
+      table_name = self.table_name
+      belongs_to :"#{prefix}#{name}", -> { where(table_name => { reflection.foreign_type => class_name }) },
+                 foreign_key: reflection.foreign_key,
+                 class_name: class_name
+
+      correct_type = "#{reflection.foreign_type} && self.class.send(:compute_type, #{reflection.foreign_type}) <= #{class_name}"
+
+      @polymorph_module.class_eval <<-RUBY, __FILE__, __LINE__ + 1
+      def #{prefix}#{name}
+        #{reflection.name} if #{correct_type}
       end
 
-      def #{specific}=(record)
+      def #{prefix}#{name}=(record)
         # we don't want to unset it if it's currently some other type, i.e.
         # foo.bar = Bar.new
         # foo.baz = nil
         # foo.bar.should_not be_nil
         return if record.nil? && !(#{correct_type})
-        association(:#{specific}).send(:raise_on_type_mismatch!, record) if record
+        association(:#{prefix}#{name}).send(:raise_on_type_mismatch!, record) if record
 
-        self.#{generic} = record
+        self.#{reflection.name} = record
       end
 
       RUBY

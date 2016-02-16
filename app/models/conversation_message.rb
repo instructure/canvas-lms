@@ -27,8 +27,7 @@ class ConversationMessage < ActiveRecord::Base
 
   belongs_to :conversation
   belongs_to :author, :class_name => 'User'
-  belongs_to :context, :polymorphic => true
-  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Account']
+  belongs_to :context, polymorphic: [:account]
   has_many :conversation_message_participants
   has_many :attachment_associations, :as => :context
   # we used to attach submission comments to conversations via this asset

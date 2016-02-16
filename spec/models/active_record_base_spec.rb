@@ -660,5 +660,29 @@ describe ActiveRecord::Base do
       si.discussion_topic = nil
       expect(si.asset).to eq nil
     end
+
+    it "prefixes specific associations" do
+      expect(AssessmentRequest.reflections.keys).to be_include(:assessor_asset_user)
+    end
+
+    it "prefixes specific associations with an explicit name" do
+      expect(LearningOutcomeResult.reflections.keys).to be_include(:association_assignment)
+    end
+
+    it "passes the correct foreign key down to specific associations" do
+      expect(LearningOutcomeResult.reflections[:association_assignment].foreign_key).to eq :association_id
+    end
+
+    it "handles class resolution that doesn't match the association name" do
+      expect(Attachment.reflections[:quiz].klass).to eq Quizzes::Quiz
+    end
+
+    it "doesn't validate the type field for non-exhaustive associations" do
+      u = User.create!
+      v = Version.new
+      v.versionable = u
+      expect(v.versionable_type).to eq 'User'
+      expect(v).to be_valid
+    end
   end
 end

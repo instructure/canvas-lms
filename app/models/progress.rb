@@ -17,13 +17,10 @@
 #
 
 class Progress < ActiveRecord::Base
-  validates :context_type, inclusion: {
-    in: [
-      'ContentMigration', 'Course', 'User', 'Quizzes::QuizStatistics', 'Account',
-      'GroupCategory', 'ContentExport', 'Assignment', 'Attachment', 'EpubExport'
-    ]
-  }, allow_nil: true
-  belongs_to :context, :polymorphic => true
+  belongs_to :context, polymorphic:
+      [:content_migration, :course, :account, :group_category, :content_export,
+       :assignment, :attachment, :epub_export,
+       { context_user: 'User', quiz_statistics: 'Quizzes::QuizStatistics' }]
   belongs_to :user
   attr_accessible :context, :tag, :completion, :message
 

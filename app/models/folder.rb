@@ -31,8 +31,7 @@ class Folder < ActiveRecord::Base
   MY_FILES_FOLDER_NAME = "my files"
   CONVERSATION_ATTACHMENTS_FOLDER_NAME = "conversation attachments"
 
-  belongs_to :context, :polymorphic => true
-  validates_inclusion_of :context_type, :allow_nil => true, :in => ['User', 'Group', 'Account', 'Course']
+  belongs_to :context, polymorphic: [:user, :group, :account, :course]
   belongs_to :cloned_item
   belongs_to :parent_folder, :class_name => "Folder"
   has_many :file_attachments, :class_name => "Attachment"

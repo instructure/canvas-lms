@@ -56,8 +56,7 @@ class DiscussionTopic < ActiveRecord::Base
   has_many :root_discussion_entries, -> { preload(:user).where("discussion_entries.parent_id IS NULL AND discussion_entries.workflow_state<>'deleted'") }, class_name: 'DiscussionEntry'
   has_one :external_feed_entry, :as => :asset
   belongs_to :external_feed
-  belongs_to :context, :polymorphic => true
-  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'Group']
+  belongs_to :context, polymorphic: [:course, :group]
   belongs_to :attachment
   belongs_to :assignment
   belongs_to :editor, :class_name => 'User'

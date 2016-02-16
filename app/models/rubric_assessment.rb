@@ -28,8 +28,8 @@ class RubricAssessment < ActiveRecord::Base
   belongs_to :rubric_association
   belongs_to :user
   belongs_to :assessor, :class_name => 'User'
-  belongs_to :artifact, :polymorphic => true, :touch => true
-  validates_inclusion_of :artifact_type, :allow_nil => true, :in => ['Submission', 'Assignment', 'ModeratedGrading::ProvisionalGrade']
+  belongs_to :artifact, touch: true,
+             polymorphic: [:submission, :assignment, { provisional_grade: 'ModeratedGrading::ProvisionalGrade' }]
   has_many :assessment_requests, :dependent => :destroy
   serialize_utf8_safe :data
 

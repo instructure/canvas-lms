@@ -23,8 +23,7 @@ class Conversation < ActiveRecord::Base
   has_many :conversation_messages, -> { order("created_at DESC, id DESC") }, dependent: :delete_all
   has_many :conversation_message_participants, :through => :conversation_messages
   has_one :stream_item, :as => :asset
-  belongs_to :context, :polymorphic => true
-  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Account', 'Course', 'Group']
+  belongs_to :context, polymorphic: [:account, :course, :group]
 
   validates_length_of :subject, :maximum => maximum_string_length, :allow_nil => true
 

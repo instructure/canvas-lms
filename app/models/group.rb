@@ -34,8 +34,7 @@ class Group < ActiveRecord::Base
   has_many :users, -> { where("users.workflow_state<>'deleted'") }, through: :group_memberships
   has_many :participating_group_memberships, -> { where(workflow_state: 'accepted') }, class_name: "GroupMembership"
   has_many :participating_users, :source => :user, :through => :participating_group_memberships
-  belongs_to :context, :polymorphic => true
-  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'Account']
+  belongs_to :context, polymorphic: [:course, { context_account: 'Account' }]
   belongs_to :group_category
   belongs_to :account
   belongs_to :root_account, :class_name => "Account"
@@ -56,6 +55,7 @@ class Group < ActiveRecord::Base
   has_many :external_feeds, :as => :context, :dependent => :destroy
   has_many :messages, :as => :context, :dependent => :destroy
   belongs_to :wiki
+  has_many :wiki_pages, foreign_key: 'wiki_page', primary_key: 'wiki_page'
   has_many :web_conferences, :as => :context, :dependent => :destroy
   has_many :collaborations, -> { order('title, created_at') }, as: :context, dependent: :destroy
   has_many :media_objects, :as => :context

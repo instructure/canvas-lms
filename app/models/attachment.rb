@@ -39,7 +39,14 @@ class Attachment < ActiveRecord::Base
   # this is a gross hack to work around freaking SubmissionComment#attachments=
   attr_accessor :ok_for_submission_comment
 
-  belongs_to :context, :polymorphic => true
+  belongs_to :context, exhaustive: false, polymorphic:
+      [:account, :assessment_question, :assignment, :attachment,
+       :content_export, :content_migration, :course, :eportfolio, :epub_export,
+       :gradebook_upload, :group, :submission, :zip_file_import,
+       { context_folder: 'Folder', context_sis_batch: 'SisBatch',
+         context_user: 'User', quiz: 'Quizzes::Quiz',
+         quiz_statistics: 'Quizzes::QuizStatistics',
+         quiz_submission: 'Quizzes::QuizSubmission' }]
   belongs_to :cloned_item
   belongs_to :folder
   belongs_to :user

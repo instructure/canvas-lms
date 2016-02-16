@@ -20,8 +20,7 @@ class AssessmentQuestionBank < ActiveRecord::Base
   include Workflow
   attr_accessible :context, :title, :user, :alignments
 
-  belongs_to :context, :polymorphic => true
-  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Account', 'Course']
+  belongs_to :context, polymorphic: [:account, :course]
   has_many :assessment_questions, -> { order('assessment_questions.name, assessment_questions.position, assessment_questions.created_at') }
   has_many :assessment_question_bank_users
   has_many :learning_outcome_alignments, -> { where("content_tags.tag_type='learning_outcome' AND content_tags.workflow_state<>'deleted'").preload(:learning_outcome) }, as: :content, class_name: 'ContentTag'
