@@ -126,7 +126,8 @@ class RoleOverride < ActiveRecord::Base
           'DesignerEnrollment',
           'TeacherEnrollment',
           'AccountAdmin'
-        ]
+        ],
+        :restrict_future_enrollments => true
       },
       :moderate_forum => {
         :label => lambda { t('permissions.moderate_form', "Moderate discussions ( delete / edit other's posts, lock topics)") },

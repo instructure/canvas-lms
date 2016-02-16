@@ -24,7 +24,7 @@ describe "discussions" do
 
   it "should be accessible for student in the main section", priority: "1", test_id: 304663 do
     @student1 = user_with_pseudonym(username: 'student1@example.com', active_all: 1)
-    student_in_course(course: @course, user: @student1)
+    student_in_course(course: @course, user: @student1).accept!
     user_session(@student1)
     find_vdd_time(@assignment)
     get "/courses/#{@course.id}/discussion_topics"

@@ -1093,7 +1093,8 @@ class Course < ActiveRecord::Base
     can :read_syllabus
 
     RoleOverride.permissions.each do |permission, details|
-      given {|user| (self.active_enrollment_allows(user, permission) || self.account_membership_allows(user, permission)) && (!details[:if] || send(details[:if])) }
+      given {|user| (self.active_enrollment_allows(user, permission, !details[:restrict_future_enrollments]) || self.account_membership_allows(user, permission)) &&
+        (!details[:if] || send(details[:if])) }
       can permission
     end
 
@@ -1215,7 +1216,7 @@ class Course < ActiveRecord::Base
     !large_roster?
   end
 
-  def active_enrollment_allows(user, permission)
+  def active_enrollment_allows(user, permission, allow_future=true)
     return false unless user && permission
 
     @enrollment_lookup ||= {}
@@ -1223,7 +1224,7 @@ class Course < ActiveRecord::Base
       self.enrollments.active_or_pending.for_user(user).reject { |e| [:inactive, :completed].include?(e.state_based_on_date)}
     end
 
-    @enrollment_lookup[user.id].any? {|e| e.has_permission_to?(permission) }
+    @enrollment_lookup[user.id].any? {|e| (allow_future || e.state_based_on_date == :active) && e.has_permission_to?(permission) }
   end
 
   def self.find_all_by_context_code(codes)

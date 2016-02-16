@@ -130,6 +130,26 @@ describe Enrollment do
       course_with_student(:active_all => true)
     end
 
+    it "should allow post_to_forum permission on a course if date is current" do
+      @enrollment.start_at = 2.days.ago
+      @enrollment.end_at = 4.days.from_now
+      @enrollment.workflow_state = 'active'
+      @enrollment.save!
+
+      expect(@enrollment.reload.state_based_on_date).to eq :active
+      expect(@course.grants_right?(@enrollment.user, :post_to_forum)).to eql(true)
+    end
+
+    it "should not allow post_to_forum permission on a course if date in future" do
+      @enrollment.start_at = 2.days.from_now
+      @enrollment.end_at = 4.days.from_now
+      @enrollment.workflow_state = 'active'
+      @enrollment.save!
+
+      expect(@enrollment.reload.state_based_on_date).to eq :accepted
+      expect(@course.grants_right?(@enrollment.user, :post_to_forum)).to eql(false)
+    end
+
     it "should not allow read permission on a course if date inactive" do
       @enrollment.start_at = 2.days.from_now
       @enrollment.end_at = 4.days.from_now
