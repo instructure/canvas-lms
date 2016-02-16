@@ -265,10 +265,7 @@ class AssignmentGroupsController < ApplicationController
 
   def assignment_visibilities(course, assignments)
     if include_visibility? && differentiated_assignments?
-      AssignmentStudentVisibility.users_with_visibility_by_assignment(
-        course_id: course.id,
-        assignment_id: assignments.map(&:id)
-      )
+      AssignmentStudentVisibility.assignments_with_user_visibilities(course, assignments)
     else
       params.fetch(:include, []).delete('assignment_visibility')
       AssignmentStudentVisibility.none

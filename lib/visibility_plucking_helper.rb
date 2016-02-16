@@ -8,7 +8,7 @@ module VisibilityPluckingHelper
       check_args(opts, :user_id)
       vis_hash = pluck_own_and_user_ids(column_to_pluck, opts).group_by{|record| record["user_id"]}
       format_visibility_hash!(vis_hash, column_to_pluck.to_s)
-      # if users have no visibilit ies add their keys to the hash with an empty array
+      # if users have no visibilities add their keys to the hash with an empty array
       vis_hash.reverse_merge!(empty_id_hash(opts[:user_id]))
     end
 

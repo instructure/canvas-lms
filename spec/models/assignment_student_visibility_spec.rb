@@ -1,4 +1,4 @@
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+require_relative '../spec_helper'
 
 # need tests for:
 # overrides that arent date related
@@ -168,7 +168,6 @@ describe "differentiated_assignments" do
     it "doesnt allow deletion" do
       expect {@visibility_object.destroy}.to raise_error(ActiveRecord::ReadOnlyRecord)
     end
-
   end
 
   context "course_with_differentiated_assignments_enabled" do
@@ -422,4 +421,85 @@ describe "differentiated_assignments" do
       end
     end
   end
+
+  describe AssignmentStudentVisibility do
+      let!(:course) do
+        course = Course.create!
+        course.enroll_student(first_student)
+        course.enroll_student(second_student)
+        course
+      end
+
+      let(:assignment) do
+        assignment = course.assignments.create!({
+          only_visible_to_overrides: false,
+          points_possible: 5,
+          submission_types: "online_text_entry",
+          title: "assignment"
+        })
+        assignment.publish
+        assignment.save!
+        assignment
+      end
+      let(:first_student) { User.create! }
+      let(:second_student) { User.create! }
+      let(:fake_student) { User.create! }
+
+    describe ".assignments_visible_to_all_students" do
+      let(:assignments_visible_to_all_students) do
+        AssignmentStudentVisibility.assignments_visible_to_all_students([assignment])
+      end
+
+      it "returns a hash with an empty visibility array for each assignment" do
+        expect(assignments_visible_to_all_students).to eq({ assignment.id => [] })
+      end
+    end
+
+    describe ".assignments_with_user_visibilities" do
+      let(:assignment_only_visible_to_overrides) do
+        assignment = course.assignments.create!({
+          only_visible_to_overrides: true,
+          points_possible: 5,
+          submission_types: "online_text_entry",
+          title: "assignment only visible to overrides"
+        })
+        override = assignment.assignment_overrides.create!(set_type: "ADHOC")
+        override.assignment_override_students.create!(user: first_student)
+        assignment
+      end
+
+      let(:assignments_with_visibilities) do
+        AssignmentStudentVisibility
+          .assignments_with_user_visibilities(course, [assignment, assignment_only_visible_to_overrides])
+      end
+
+      it "returns a hash with assignment ids and their associated user ids " \
+      "(or an empty array if the assignment is visible to everyone)" do
+        expected_visibilities = {
+          assignment.id => [],
+          assignment_only_visible_to_overrides.id => [first_student.id]
+        }
+        expect(assignments_with_visibilities).to eq expected_visibilities
+      end
+
+      it "excludes student ids for deleted enrollments" do
+        course.enrollments.find_by(user_id: first_student).destroy
+        expected_visibilities = {
+          assignment.id => [],
+          assignment_only_visible_to_overrides.id => []
+        }
+        expect(assignments_with_visibilities).to eq expected_visibilities
+      end
+
+      it "does not call AssignmentStudentVisibility.users_with_visibility_by_assignment " \
+      "if all assignments are visible to everyone" do
+        AssignmentStudentVisibility.expects(:users_with_visibility_by_assignment).never
+        # change this assignment so that it is visible to all students
+        assignment_only_visible_to_overrides.only_visible_to_overrides = false
+        assignment_only_visible_to_overrides.save!
+        assignments_with_visibilities
+      end
+    end
+  end
+
 end
