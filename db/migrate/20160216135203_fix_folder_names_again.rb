@@ -1,4 +1,4 @@
-class FixFolderNames < ActiveRecord::Migration
+class FixFolderNamesAgain < ActiveRecord::Migration
   tag :postdeploy
   def up
     DataFixup::FixFolderNames.send_later_if_production_enqueue_args(:run,
