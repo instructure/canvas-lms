@@ -161,7 +161,11 @@ module.exports = {
     new webpack.IgnorePlugin(/(CHANGELOG|LICENSE|README)$/),
     new webpack.IgnorePlugin(/package.json/),
     new WebpackOnBuildPlugin(function(stats){
-      child_process.spawn("gulp", ["rev"]);
+      if(process.env.SKIP_JS_REV){
+        console.log("skipping rev...");
+      }else{
+        child_process.spawn("gulp", ["rev"]);
+      }
     }),
     new webpack.PrefetchPlugin("./app/coffeescripts/calendar/ContextSelector.coffee"),
     new webpack.PrefetchPlugin("./app/coffeescripts/calendar/TimeBlockRow.coffee"),
