@@ -235,6 +235,9 @@ class ApplicationController < ActionController::Base
     @current_user.ta_enrollments.each do |e|
       user_section_ids << e.course_section_id
     end
+    @current_user.student_enrollments.each do |e|
+      user_section_ids << e.course_section_id
+    end
 
     # Also relying on Canvas' built-in filtering in the event
     # of no TA (coach) enrollments found because we want to use
@@ -246,17 +249,17 @@ class ApplicationController < ActionController::Base
       if (event.respond_to? :assignment_overrides) && event.assignment_overrides
         # assignments are a completely different kind of object... we need to make sure it filters
         # the overrides intelligently
-        if event.assignment_overrides.empty?
+        if !event.applied_overrides.present?
           filtered_events << event
         else
           filtered_overrides = []
-          event.assignment_overrides.each do |o|
+          event.applied_overrides.each do |o|
             if user_section_ids.include?(o.set_id)
               filtered_overrides << o
             end
           end
-          if filtered_overrides.length
-            event.assignment_overrides = filtered_overrides
+          if !filtered_overrides.empty?
+            event.assignment_overrides_filtered = filtered_overrides
             filtered_events << event
           end
         end
@@ -268,6 +271,8 @@ class ApplicationController < ActionController::Base
     end
     filtered_events
   end
+
+  helper_method :filter_other_sections_from_events
 
 
   # we track the cost of each request in Canvas::RequestThrottle in order

@@ -59,7 +59,7 @@ class Assignment < ActiveRecord::Base
     pass_fail percent letter_grade gpa_scale points not_graded
   )
 
-  attr_accessor :previous_id, :updating_user, :copying, :user_submitted
+  attr_accessor :previous_id, :updating_user, :copying, :user_submitted, :assignment_overrides_filtered
 
   attr_reader :assignment_changed
 
