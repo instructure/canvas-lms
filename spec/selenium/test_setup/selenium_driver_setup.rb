@@ -5,6 +5,8 @@ module SeleniumDriverSetup
   RECENT_SPEC_RUNS_LIMIT = 500
   # Number of identical failures in a row before we abort this worker
   RECENT_SPEC_FAILURE_LIMIT = 10
+  # Number of failures to record
+  MAX_FAILURES_TO_RECORD = 20
 
   def setup_selenium
 
@@ -16,8 +18,7 @@ module SeleniumDriverSetup
       Selenium::WebDriver.const_get(browser.to_s.capitalize).path = path
     end
 
-    run_headless = ENV.key?("TEST_ENV_NUMBER")
-    set_up_display_buffer if run_headless
+    SeleniumDriverSetup.set_up_display_buffer if run_headless?
 
     driver = if browser == :firefox
                firefox_driver
@@ -27,7 +28,7 @@ module SeleniumDriverSetup
                ie_driver
              end
 
-    focus_viewport driver if run_headless
+    focus_viewport driver if run_headless?
 
     driver.manage.timeouts.implicit_wait = 10
     driver.manage.timeouts.script_timeout = 60
@@ -35,7 +36,19 @@ module SeleniumDriverSetup
     driver
   end
 
-  def set_up_display_buffer
+  def run_headless?
+    ENV.key?("TEST_ENV_NUMBER")
+  end
+
+  def capture_screenshots?
+    ENV["CAPTURE_SCREENSHOTS"]
+  end
+
+  def capture_video?
+    capture_screenshots? && run_headless?
+  end
+
+  def self.set_up_display_buffer
     require "headless"
 
     test_number = ENV["TEST_ENV_NUMBER"]
@@ -44,8 +57,31 @@ module SeleniumDriverSetup
     # start at 21 to avoid conflicts with other test runner Xvfb stuff
 
     display = 20 + test_number
-    Headless.new(display: display, dimensions: "2000x2000x24").start
+    @headless = Headless.new(
+      display: display,
+      dimensions: "1920x1080x24",
+      video: {
+        provider: :ffmpeg,
+        # yay interframe compression
+        codec: 'libx264',
+        # use less CPU. doesn't actually shrink the resulting file much.
+        frame_rate: 4,
+        extra: [
+          # quicktime doesn't understand the default yuv422p
+          '-pix_fmt', 'yuv420p',
+          # limit videos to 1 minute 20 seconds in case something bad happens and we forget to stop recording
+          '-t', '80',
+          # use less CPU
+          '-preset', 'superfast'
+        ]
+      }
+    )
+    @headless.start
     puts "Setting up DISPLAY=#{ENV['DISPLAY']}"
+  end
+
+  def self.headless
+    @headless
   end
 
   def focus_viewport(driver)
@@ -231,39 +267,68 @@ module SeleniumDriverSetup
     end
   end
 
+  def start_capturing_video
+    SeleniumDriverSetup.headless.video.start_capture if capture_video?
+  end
+
   def record_errors(example, exception, log_messages)
     js_errors = driver.execute_script("return window.JSErrorCollector_errors && window.JSErrorCollector_errors.pump()") || []
-    return unless js_errors.present? || exception
 
     # always send js errors to stdout, even if the spec passed. we have to
     # empty the JSErrorCollector anyway, so we might as well show it.
     meta = example.metadata
-    puts meta[:location]
+    puts meta[:location] if js_errors.present? || exception
     js_errors.each do |error|
       puts "  JS Error: #{error["errorMessage"]} (#{error["sourceName"]}:#{error["lineNumber"]})"
     end
 
-    return unless exception && ENV["CAPTURE_SCREENSHOTS"]
+    SeleniumDriverSetup.number_of_failures ||= 0
+    SeleniumDriverSetup.number_of_failures += 1 if exception
 
-    errors_path = Rails.root.join("log/seleniumfailures")
-    FileUtils.mkdir_p(errors_path)
+    if capture_screenshots? || capture_video?
+      if exception
+        errors_path = Rails.root.join("log/seleniumfailures")
+        FileUtils.mkdir_p(errors_path)
 
-    summary_name = meta[:location].sub(/\A[.\/]+/, "").gsub(/\//, ":")
-    screenshot_name = summary_name + ".png"
-    driver.save_screenshot(errors_path.join(screenshot_name))
+        summary_name = meta[:location].sub(/\A[.\/]+/, "").gsub(/\//, ":")
+        include_recordings = SeleniumDriverSetup.number_of_failures <= MAX_FAILURES_TO_RECORD
 
-    recent_spec_runs = SeleniumDriverSetup.recent_spec_runs
+        if capture_screenshots? && include_recordings
+          screenshot_name = summary_name + ".png"
+          driver.save_screenshot(errors_path.join(screenshot_name))
+        end
 
-    log_message_formatter = EscapeCode::HtmlFormatter.new(log_messages.join("\n"))
+        if capture_video?
+          if include_recordings
+            screen_capture_name = summary_name + ".mp4"
+            SeleniumDriverSetup.headless.video.stop_and_save(errors_path.join(screen_capture_name))
+          else
+            SeleniumDriverSetup.headless.video.stop_and_discard
+          end
+        end
 
-    # make a nice little html file for jenkins
-    File.open(errors_path.join(summary_name + ".html"), "w") do |file|
-      output_buffer = nil # Erubis wants this local var
-      file.write SeleniumDriverSetup.error_template.result(binding)
+        recent_spec_runs = SeleniumDriverSetup.recent_spec_runs
+
+        log_message_formatter = EscapeCode::HtmlFormatter.new(log_messages.join("\n"))
+
+        # make a nice little html file for jenkins
+        File.open(errors_path.join(summary_name + ".html"), "w") do |file|
+          output_buffer = nil # Erubis wants this local var
+          file.write SeleniumDriverSetup.error_template.result(binding)
+        end
+
+        puts meta[:location]
+        if include_recordings
+          puts "  Screenshot: #{errors_path.join(screenshot_name)}" if capture_screenshots?
+          puts "  Screen capture: #{errors_path.join(screen_capture_name)}" if capture_video?
+        else
+          puts "  Screenshot skipped because we had more than #{MAX_FAILURES_TO_RECORD} failures" if capture_screenshots?
+          puts "  Screen capture skipped because we had more than #{MAX_FAILURES_TO_RECORD} failures" if capture_video?
+        end
+      else
+        SeleniumDriverSetup.headless.video.stop_and_discard if capture_video?
+      end
     end
-
-    puts meta[:location]
-    puts "  Screenshot: #{errors_path.join(screenshot_name)}"
   end
 
   def self.setup_host_and_port
@@ -370,6 +435,7 @@ module SeleniumDriverSetup
 
   class << self
     attr_reader :recent_spec_runs
+    attr_accessor :number_of_failures
 
     def disallow_requests!
       # ensure the current in-flight request (if any, AJAX or otherwise)

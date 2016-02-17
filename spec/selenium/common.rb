@@ -163,6 +163,10 @@ shared_context "in-process server selenium tests" do
     end
   end
 
+  before do |example|
+    start_capturing_video
+  end
+
   after(:each) do |example|
     begin
       clear_timers!

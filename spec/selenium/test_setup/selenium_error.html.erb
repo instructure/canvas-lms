@@ -44,8 +44,20 @@
   "#{run[:location]}#{result}"
 end.join("\n") %>
 (oldest)</pre>
+    <% if !include_recordings && (capture_screenshots? || capture_video?) %>
+      /o\ Screenshot and screen capture skipped because we had too many failures this run
+      (this was failure #<%= SeleniumDriverSetup.number_of_failures %>)
+    <% end %>
 
-    <h2>Screenshot</h2>
-    <img style="border:1px solid #000" src="./<%= screenshot_name %>" />
+    <% if screen_capture_name %>
+      <h2>Screen Capture</h2>
+      <a href="./<%= screen_capture_name %>">here</a>
+    <% end %>
+
+    <% if screenshot_name %>
+      <h2>Screenshot</h2>
+      <img style="border:1px solid #000" src="./<%= screenshot_name %>" />
+    <% end %>
   </body>
 </html>
+
