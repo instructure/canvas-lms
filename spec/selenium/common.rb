@@ -138,7 +138,7 @@ shared_context "in-process server selenium tests" do
           if conn.respond_to?(method_name, true) && !conn.respond_to?("#{method_name}_with_synchronization", true)
             arg_list = "*args"
             arg_list << ", &Proc.new" if method_name == "transaction"
-            conn.class.class_eval <<-RUBY
+            conn.class.class_eval <<-RUBY, __FILE__, __LINE__ + 1
               def #{method_name}_with_synchronization(*args)
                 SeleniumDriverSetup.request_mutex.synchronize { #{method_name}_without_synchronization(#{arg_list}) }
               end
