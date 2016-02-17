@@ -886,7 +886,7 @@ class User < ActiveRecord::Base
         # make sure to hit all shards
         enrollment_scope = self.enrollments.shard(self)
         pseudonym_scope = self.pseudonyms.active.shard(self)
-        account_user_scope = self.account_users.shard(self)
+        account_users = self.account_users.shard(self)
         has_other_root_accounts = false
       else
         # make sure to do things on the root account's shard. but note,
@@ -896,13 +896,15 @@ class User < ActiveRecord::Base
         # right shard
         enrollment_scope = fake_student? ? self.enrollments : root_account.enrollments.where(user_id: self)
         pseudonym_scope = root_account.pseudonyms.active.where(user_id: self)
-        account_user_scope = root_account.account_users.where(user_id: self)
+
+        account_users = root_account.account_users.where(user_id: self).to_a +
+          self.account_users.shard(root_account).where(:account_id => root_account.all_accounts).to_a
         has_other_root_accounts = self.associated_accounts.shard(self).where('accounts.id <> ?', root_account).exists?
       end
 
       self.delete_enrollments(enrollment_scope)
       pseudonym_scope.each(&:destroy)
-      account_user_scope.each(&:destroy)
+      account_users.each(&:destroy)
 
       # only delete the user's communication channels when the last account is
       # removed (they don't belong to any particular account). they will always
