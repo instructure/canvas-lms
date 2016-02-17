@@ -36,7 +36,7 @@ describe "speed grader - discussion submissions" do
         create!(:user => student, :message => @first_message)
     entry.update_topic
     entry.context_module_action
-    @attachment_thing = attachment_model(:context => student_2, :filename => 'horse.js')
+    @attachment_thing = attachment_model(:context => student_2, :filename => 'horse.doc', :content_type => 'application/msword')
     entry_2 = @discussion_topic.discussion_entries.
         create!(:user => student_2, :message => @second_message, :attachment => @attachment_thing)
     entry_2.update_topic

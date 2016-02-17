@@ -1578,7 +1578,10 @@ define([
       // show the first scridbable doc if there is one
       // then show the first image if there is one,
       // if not load the generic thing for the current submission (by not passing a value)
-      this.loadAttachmentInline(inlineableAttachments[0] || browserableAttachments[0]);
+      var preview_attachment = null;
+      if (submission.submission_type != 'discussion_topic')
+        preview_attachment = inlineableAttachments[0] || browserableAttachments[0];
+      this.loadAttachmentInline(preview_attachment);
 
       // if there is any submissions after this one, show a notice that they are not looking at the newest
       $submission_not_newest_notice.showIf($submission_to_view.filter(":visible").find(":selected").nextAll().length);
