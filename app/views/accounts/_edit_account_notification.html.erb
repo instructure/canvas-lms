@@ -48,7 +48,7 @@
   <div class="ic-Form-control">
     <div class="ic-Label" id="aria-announcements-send-to-group">
       <%= t "Send to" %>
-      <span><%= t "(will send to everyone if no selections are made)" %></span>
+      <%= roles_message(@account) %>
     </div>
     <div class="grid-row">
       <div class="col-xs-12 col-lg-4">
@@ -67,16 +67,18 @@
               </label>
             </div>
           <% end %>
-          <% nil_role_checked = role_ids.include? nil %>
-          <div class="ic-Form-control ic-Form-control--checkbox">
-            <%= check_box_tag "account_notification_roles[]", "NilEnrollment", nil_role_checked, { :class => "account_notification_role_cbx", :id => "account_notification_role_NilEnrollment_cbx_#{announcement.id}" } %>
-            <label class="ic-Label" for="<%= "account_notification_role_NilEnrollment_cbx_#{announcement.id}" %>">
-              <%= t "Unenrolled users" %>
-              <span class="screenreader-only">
-                <%=t "Send this announcement to unenrolled users" %>
-              </span>
-            </label>
-          </div>
+          <% if @account.root_account? %>
+            <% nil_role_checked = role_ids.include? nil %>
+            <div class="ic-Form-control ic-Form-control--checkbox">
+              <%= check_box_tag "account_notification_roles[]", "NilEnrollment", nil_role_checked, { :class => "account_notification_role_cbx", :id => "account_notification_role_NilEnrollment_cbx_#{announcement.id}" } %>
+              <label class="ic-Label" for="<%= "account_notification_role_NilEnrollment_cbx_#{announcement.id}" %>">
+                <%= t "Unenrolled users" %>
+                <span class="screenreader-only">
+                  <%=t "Send this announcement to unenrolled users" %>
+                </span>
+              </label>
+            </div>
+          <% end %>
         </div>
       </div>
       <div class="col-xs-12 col-lg-4">
