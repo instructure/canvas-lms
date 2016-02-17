@@ -67,6 +67,7 @@ describe "help dialog" do
 
     it "should allow sending the teacher a message" do
       Setting.set('show_feedback_link', 'true')
+      course_with_ta(course: @course)
       get "/courses/#{@course.id}"
       expect(element_exists("#help-dialog")).to be_falsey
       trigger = f('.help_dialog_trigger')
@@ -85,6 +86,7 @@ describe "help dialog" do
       expect(feedback_form).not_to be_displayed
       cm = ConversationMessage.last
       expect(cm.recipients).to eq @course.instructors
+      expect(cm.recipients.count).to eq 2
       expect(cm.body).to match(/test message/)
     end
 
