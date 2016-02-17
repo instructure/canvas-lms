@@ -562,6 +562,9 @@ class Message < ActiveRecord::Base
     end
 
     if user && user.account.feature_enabled?(:notification_service) && path_type != "yo"
+      if Setting.get("notification_service_traffic", '').present?
+        send(delivery_method)
+      end
       enqueue_to_sqs
     else
       send(delivery_method)

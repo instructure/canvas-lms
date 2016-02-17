@@ -74,5 +74,12 @@ describe NotificationService do
       expect(@message.transmission_errors).to include("AWS::SQS::Errors::ServiceError")
       expect(@message.workflow_state).to eql("staged")
     end
+    it "will send to both services" do
+      Setting.set("notification_service_traffic", "true")
+      @queue.expects(:send_message).once
+      @message.path_type = "email"
+      @message.expects(:deliver_via_email).once
+      expect{@message.deliver}.not_to raise_error
+    end
   end
 end
