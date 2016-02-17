@@ -238,4 +238,28 @@ describe CourseLinkValidator do
     links = CourseLinkValidator.current_progress(@course).results[:issues].first[:invalid_links].map{|l| l[:url]}
     expect(links).to match_array [link]
   end
+
+  it "should not flag links to public paths" do
+    course
+    @course.syllabus_body = %{<a href='/images/avatar-50.png'>link</a>}
+    @course.save!
+
+    CourseLinkValidator.queue_course(@course)
+    run_jobs
+
+    issues = CourseLinkValidator.current_progress(@course).results[:issues]
+    expect(issues).to be_empty
+  end
+
+  it "should flag sneaky links" do
+    course
+    @course.syllabus_body = %{<a href='/../app/models/user.rb'>link</a>}
+    @course.save!
+
+    CourseLinkValidator.queue_course(@course)
+    run_jobs
+
+    issues = CourseLinkValidator.current_progress(@course).results[:issues]
+    expect(issues.count).to eq 1
+  end
 end
