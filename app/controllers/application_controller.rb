@@ -272,6 +272,8 @@ class ApplicationController < ActionController::Base
     filtered_events
   end
 
+  helper_method :filter_other_sections_from_events
+
 
   # we track the cost of each request in Canvas::RequestThrottle in order
   # to rate limit clients that are abusing the API.  Some actions consume
