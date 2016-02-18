@@ -154,6 +154,10 @@ shared_context "in-process server selenium tests" do
     end
   end
 
+  before do |example|
+    SeleniumDriverSetup.note_recent_spec_run(example)
+  end
+
   after(:each) do |example|
     clear_timers!
     # while disallow_requests! would generally get these, there's a small window

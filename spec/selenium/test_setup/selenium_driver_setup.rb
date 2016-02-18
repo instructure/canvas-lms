@@ -1,6 +1,8 @@
 require "fileutils"
 
 module SeleniumDriverSetup
+  RECENT_SPEC_RUNS_LIMIT = 10
+
   def setup_selenium
 
     browser = $selenium_config[:browser].try(:to_sym) || :firefox
@@ -201,6 +203,12 @@ module SeleniumDriverSetup
     "http://#{$app_host_and_port}"
   end
 
+  def self.note_recent_spec_run(example)
+    @recent_spec_runs ||= []
+    @recent_spec_runs << example.metadata[:location]
+    @recent_spec_runs = @recent_spec_runs.last(RECENT_SPEC_RUNS_LIMIT)
+  end
+
   def self.error_template
     @error_template ||= begin
       layout_path = Rails.root.join("spec/selenium/test_setup/selenium_error.html.erb")
@@ -228,6 +236,8 @@ module SeleniumDriverSetup
     summary_name = meta[:location].sub(/\A[.\/]+/, "").gsub(/\//, ":")
     screenshot_name = summary_name + ".png"
     driver.save_screenshot(errors_path.join(screenshot_name))
+
+    recent_spec_runs = SeleniumDriverSetup.recent_spec_runs
 
     # make a nice little html file for jenkins
     File.open(errors_path.join(summary_name + ".html"), "w") do |file|
@@ -342,6 +352,8 @@ module SeleniumDriverSetup
   end
 
   class << self
+    attr_reader :recent_spec_runs
+
     def disallow_requests!
       # ensure the current in-flight request (if any, AJAX or otherwise)
       # finishes up its work, and prevent any subsequent requests before the
