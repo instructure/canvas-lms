@@ -73,10 +73,13 @@ class GradeSummaryPresenter
     observed_students.keys.select{ |student| observed_students[student].all? { |e| e.grants_right?(@current_user, :read_grades) } }
   end
 
+  def student_enrollment_for(course, user)
+    course.all_student_enrollments.where(user_id: user).where.not(:workflow_state => "inactive").first
+  end
+
   def selectable_courses
     courses_with_grades.to_a.select do |course|
-      student_enrollment = course.all_student_enrollments.where(user_id: student).first
-      student_enrollment.grants_right?(@current_user, :read_grades)
+      student_enrollment_for(course, student).grants_right?(@current_user, :read_grades)
     end
   end
 
@@ -85,11 +88,11 @@ class GradeSummaryPresenter
       if @id_param # always use id if given
         validate_id
         user_id = Shard.relative_id_for(@id_param, @context.shard, @context.shard)
-        @context.shard.activate { @context.all_student_enrollments.where(user_id: user_id).first }
+        @context.shard.activate { student_enrollment_for(@context, user_id) }
       elsif observed_students.present? # otherwise try to find an observed student
         observed_student
       else # or just fall back to @current_user
-        @context.shard.activate { @context.all_student_enrollments.where(user_id: @current_user).first }
+        @context.shard.activate { student_enrollment_for(@context, @current_user) }
       end
     end
   end
