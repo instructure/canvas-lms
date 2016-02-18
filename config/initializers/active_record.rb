@@ -695,9 +695,10 @@ ActiveRecord::Relation.class_eval do
             batch = connection.uncached { klass.find_by_sql("FETCH FORWARD #{batch_size} FROM #{cursor}") }
           end
         end
-        # not ensure; if the transaction rolls back due to another exception, it will
-        # automatically close
-        connection.execute("CLOSE #{cursor}")
+      ensure
+        unless $!.is_a?(ActiveRecord::StatementInvalid)
+          connection.execute("CLOSE #{cursor}")
+        end
       end
     end
   end
@@ -809,8 +810,10 @@ ActiveRecord::Relation.class_eval do
         end
       end
     ensure
-      temporary = "TEMPORARY " if connection.adapter_name == 'Mysql2'
-      connection.execute "DROP #{temporary}TABLE #{table}"
+      unless $!.is_a?(ActiveRecord::StatementInvalid)
+        temporary = "TEMPORARY " if connection.adapter_name == 'Mysql2'
+        connection.execute "DROP #{temporary}TABLE #{table}"
+      end
     end
   end
 
