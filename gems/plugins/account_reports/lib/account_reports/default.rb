@@ -47,6 +47,10 @@ module AccountReports
       CourseReports.new(account_report).public_courses
     end
 
+    def self.course_storage_csv(account_report)
+      CourseReports.new(account_report).course_storage
+    end
+
     def self.unused_courses_csv(account_report)
       CourseReports.new(account_report).unused_courses
     end
