@@ -16,17 +16,20 @@ describe 'publishing a quiz' do
     context 'when on the quiz show page' do
       before(:each) do
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
-        f('#quiz-publish-link').click
       end
 
       context 'before the ajax calls finish' do
         it 'temporarily changes the button text to |Publishing...|', priority: "1", test_id: 398935 do
-          expect(fj('.publish-text', '#quiz-publish-link').text).to include_text 'Publishing...'
+          pause_ajax do
+            f('#quiz-publish-link').click
+            expect(fj('.publish-text', '#quiz-publish-link').text).to include_text 'Publishing...'
+          end
         end
       end
 
       context 'after the ajax calls finish' do
         before(:each) do
+          f('#quiz-publish-link').click
           wait_for_ajaximations
           wait_for_quiz_publish_button_to_populate
         end

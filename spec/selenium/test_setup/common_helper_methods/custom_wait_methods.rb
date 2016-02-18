@@ -114,6 +114,10 @@ module CustomWaitMethods
     wait_for_animations(wait_start)
   end
 
+  def pause_ajax
+    SeleniumDriverSetup.request_mutex.synchronize { yield }
+  end
+
   def keep_trying_until(seconds = SECONDS_UNTIL_GIVING_UP)
     val = false
     seconds.times do |i|
