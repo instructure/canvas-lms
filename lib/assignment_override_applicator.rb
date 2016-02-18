@@ -78,19 +78,29 @@ module AssignmentOverrideApplicator
     Rails.cache.fetch(cache_key) do
       next [] if self.has_invalid_args?(assignment_or_quiz, user)
       context = assignment_or_quiz.context
-      overrides = []
+      visible_user_ids = UserSearch.scope_for(context, user, { force_users_visible_to: true }).map(&:id)
 
       if context.grants_right?(user, :read_as_admin)
         overrides = assignment_or_quiz.assignment_overrides
         if assignment_or_quiz.current_version?
-          overrides = overrides.loaded? ?
-            overrides.select{|o| o.workflow_state == 'active'} :
-            overrides.active.to_a
+          overrides = if overrides.loaded?
+                        ovs = overrides.select do |ov|
+                          ov.workflow_state == 'active' &&
+                          ov.set_type != 'ADHOC'
+                        end
+                        ovs + overrides.select{ |ov| ov.visible_student_overrides(visible_user_ids) }
+                      else
+                        ovs = overrides.active.where.not(set_type: 'ADHOC').to_a
+                        ovs + overrides.active.visible_students_only(visible_user_ids).to_a
+                      end
         else
           overrides = current_override_version(assignment_or_quiz, overrides)
         end
+
         return overrides
       end
+
+      overrides = []
 
       # priority: adhoc, group, section (do not exclude deleted)
       adhoc = adhoc_override(assignment_or_quiz, user)

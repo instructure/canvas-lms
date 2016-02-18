@@ -19,7 +19,7 @@
 module Api::V1::AssignmentOverride
   include Api::V1::Json
 
-  def assignment_override_json(override)
+  def assignment_override_json(override, visible_users=nil)
     fields = [:id, :assignment_id, :title]
     fields.concat([:due_at, :all_day, :all_day_date]) if override.due_at_overridden
     fields << :unlock_at if override.unlock_at_overridden
@@ -27,7 +27,12 @@ module Api::V1::AssignmentOverride
     api_json(override, @current_user, session, :only => fields).tap do |json|
       case override.set_type
       when 'ADHOC'
-        json[:student_ids] = override.assignment_override_students.map(&:user_id)
+        students = if visible_users
+                     override.assignment_override_students.where(user_id: visible_users)
+                   else
+                     override.assignment_override_students
+                   end
+        json[:student_ids] = students.map(&:user_id)
       when 'Group'
         json[:group_id] = override.set_id
       when 'CourseSection'
@@ -36,8 +41,12 @@ module Api::V1::AssignmentOverride
     end
   end
 
-  def assignment_overrides_json(overrides)
-    overrides.map{ |override| assignment_override_json(override) }
+  def assignment_overrides_json(overrides, user = nil)
+    visible_users = if user && !overrides.empty?
+                      context = overrides.first.assignment.context
+                      UserSearch.scope_for(context, user, { force_users_visible_to: true }).map(&:id)
+                    end
+    overrides.map{ |override| assignment_override_json(override, visible_users) }
   end
 
   def assignment_override_collection(assignment, include_students=false)
@@ -102,8 +111,10 @@ module Api::V1::AssignmentOverride
         errors << "invalid student_ids #{student_ids.inspect}"
         students = []
       else
-        # look up the students
-        students = api_find_all(assignment.context.students_visible_to(@current_user, include: :priors), student_ids).uniq
+        # look up all the active students since the assignment will affect all
+        # active students in the course on this override and not just what the
+        # teacher can see that were sent in the request object
+        students = api_find_all(assignment.context.students.active, student_ids).uniq
 
         # make sure they were all valid
         found_ids = students.map{ |s| [
@@ -232,18 +243,57 @@ module Api::V1::AssignmentOverride
     return false
   end
 
-  def batch_update_assignment_overrides(assignment, overrides_params)
-    override_param_ids = overrides_params.map{ |ov| ov[:id] }
-    existing_overrides = assignment.assignment_overrides.active
+  def invisible_users_and_overrides_for_user(context, user, existing_overrides)
+    # get the student overrides the user can't see and ensure those overrides are included
+    visible_user_ids = UserSearch.scope_for(context, user, { force_users_visible_to: true }).map(&:id)
+    invisible_user_ids = context.users.pluck(:id) - visible_user_ids
+    invisible_override_ids = existing_overrides.select{ |ov|
+      ov.set_type == 'ADHOC' &&
+      !ov.visible_student_overrides(visible_user_ids)
+    }.map(&:id)
+    return invisible_user_ids, invisible_override_ids
+  end
 
+  def overrides_after_defunct_removed(assignment, existing_overrides, overrides_params, invisible_override_ids)
+    override_param_ids = invisible_override_ids + overrides_params.map{ |ov| ov[:id] }
     remaining_overrides = destroy_defunct_overrides(assignment, override_param_ids, existing_overrides)
     ActiveRecord::Associations::Preloader.new.preload(remaining_overrides, :assignment_override_students)
+    remaining_overrides
+  end
+
+  def update_override_with_invisible_data(override_params, override, invisible_override_ids, invisible_user_ids)
+    return override_params = override if invisible_override_ids.include?(override.id)
+    # add back in the invisible students for this override if any found
+    hidden_ids = override.assignment_override_students.where(user_id: invisible_user_ids).pluck(:user_id)
+    unless hidden_ids.empty?
+      override_params[:student_ids] = (override_params[:student_ids] + hidden_ids)
+      overrides_size = override_params[:student_ids].size
+      override_params[:title] = t({ one: '1 student', other: "%{count} students" }, count: overrides_size)
+    end
+  end
+
+  def batch_update_assignment_overrides(assignment, overrides_params, user)
+    existing_overrides = assignment.assignment_overrides.active
+    invisible_user_ids, invisible_override_ids = invisible_users_and_overrides_for_user(
+      assignment.context,
+      user,
+      existing_overrides
+    )
+    remaining_overrides = overrides_after_defunct_removed(assignment,
+                                                          existing_overrides,
+                                                          overrides_params,
+                                                          invisible_override_ids)
 
     overrides = overrides_params.map do |override_params|
       override = get_override_from_params(override_params, assignment, remaining_overrides)
+      update_override_with_invisible_data(override_params, override, invisible_override_ids, invisible_user_ids)
+
       data, errors = interpret_assignment_override_data(assignment, override_params, override.set_type)
       if errors
-        override.errors.add(errors)
+        # add the errors to the assignment so that they are caught on
+        # the Api::V1::Assignment#update_api_assignment
+        # to enact intended behavior
+        assignment.errors.add(:base, errors.join(','))
       else
         update_assignment_override_without_save(override, data)
       end

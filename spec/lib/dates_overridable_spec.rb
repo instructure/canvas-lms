@@ -98,6 +98,102 @@ shared_examples_for "an object whose dates are overridable" do
     end
   end
 
+  describe "override teacher visibility" do
+    context "when teacher restricted" do
+      before do
+        2.times{ course.course_sections.create! }
+        @section_invisible = course.active_course_sections[2]
+        @section_visible = course.active_course_sections.second
+
+        @student_invisible = student_in_section(@section_invisible)
+        @student_visible = student_in_section(@section_visible, user: user)
+        @teacher = teacher_in_section(@section_visible, user: user)
+
+        enrollment = @teacher.enrollments.first
+        enrollment.limit_privileges_to_course_section = true
+        enrollment.save!
+      end
+
+      it "returns empty for overrides of student in other section" do
+        override.set_type = "ADHOC"
+        @override_student = override.assignment_override_students.build
+        @override_student.user = @student_invisible
+        @override_student.save!
+
+        expect(overridable.overrides_for(@teacher)).to be_empty
+      end
+
+      it "returns not empty for overrides of student in same section" do
+        override.set_type = "ADHOC"
+        @override_student = override.assignment_override_students.build
+        @override_student.user = @student_visible
+        @override_student.save!
+
+        expect(overridable.overrides_for(@teacher)).to_not be_empty
+      end
+
+      it "returns the correct student for override with students in same and different section" do
+        override.set_type = "ADHOC"
+        @override_student = override.assignment_override_students.build
+        @override_student.user = @student_visible
+        @override_student.save!
+
+        @override_student = override.assignment_override_students.build
+        @override_student.user = @student_invisible
+        @override_student.save!
+
+        expect(overridable.overrides_for(@teacher).size).to eq 1
+        ov = overridable.overrides_for(@teacher).first
+        s_id = ov.assignment_override_students.first.user_id
+        expect(s_id).to eq @student_visible.id
+      end
+    end
+
+    context "when teacher not restricted" do
+      before do
+        course.course_sections.create!
+        course.course_sections.create!
+        @section_invisible = course.active_course_sections[2]
+        @section_visible = course.active_course_sections.second
+
+        @student_invisible = student_in_section(@section_invisible)
+        @student_visible = student_in_section(@section_visible, user: user)
+        @teacher = teacher_in_section(@section_visible, user: user)
+      end
+
+      it "returns not empty for overrides of student in other section" do
+        override.set_type = "ADHOC"
+        @override_student = override.assignment_override_students.build
+        @override_student.user = @student_invisible
+        @override_student.save!
+
+        expect(overridable.overrides_for(@teacher)).to_not be_empty
+      end
+
+      it "returns not empty for overrides of student in same section" do
+        override.set_type = "ADHOC"
+        @override_student = override.assignment_override_students.build
+        @override_student.user = @student_visible
+        @override_student.save!
+
+        expect(overridable.overrides_for(@teacher)).to_not be_empty
+      end
+
+      it "returns two for override of student in same section and different section" do
+        override.set_type = "ADHOC"
+        @override_student = override.assignment_override_students.build
+        @override_student.user = @student_visible
+        @override_student.save!
+
+        @override_student = override.assignment_override_students.build
+        @override_student.user = @student_invisible
+        @override_student.save!
+
+        expect(overridable.overrides_for(@teacher).size).to eq 2
+      end
+    end
+  end
+
   describe "has_overrides?" do
     subject { overridable.has_overrides? }
 

@@ -422,7 +422,8 @@ class AssignmentsController < ApplicationController
         }),
         :ASSIGNMENT_OVERRIDES =>
           (assignment_overrides_json(
-            @assignment.overrides_for(@current_user, ensure_set_not_empty: true)
+            @assignment.overrides_for(@current_user, ensure_set_not_empty: true),
+            @current_user
             )),
         :ASSIGNMENT_INDEX_URL => polymorphic_url([@context, :assignments]),
         :DIFFERENTIATED_ASSIGNMENTS_ENABLED => @context.feature_enabled?(:differentiated_assignments),

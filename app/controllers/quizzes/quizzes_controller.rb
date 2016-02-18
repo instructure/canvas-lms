@@ -279,7 +279,9 @@ class Quizzes::QuizzesController < ApplicationController
 
       hash = {
         :ASSIGNMENT_ID => @assignment.present? ? @assignment.id : nil,
-        :ASSIGNMENT_OVERRIDES => assignment_overrides_json(@quiz.overrides_for(@current_user, ensure_set_not_empty: true)),
+        :ASSIGNMENT_OVERRIDES => assignment_overrides_json(@quiz.overrides_for(@current_user,
+                                                           ensure_set_not_empty: true),
+                                                           @current_user),
         :DIFFERENTIATED_ASSIGNMENTS_ENABLED => @context.feature_enabled?(:differentiated_assignments),
         :QUIZ => quiz_json(@quiz, @context, @current_user, session),
         :SECTION_LIST => sections.map { |section|
@@ -335,7 +337,7 @@ class Quizzes::QuizzesController < ApplicationController
       params[:quiz].delete(:only_visible_to_overrides) unless @context.feature_enabled?(:differentiated_assignments)
       @quiz.transaction do
         @quiz.update_attributes!(params[:quiz])
-        batch_update_assignment_overrides(@quiz,overrides) unless overrides.nil?
+        batch_update_assignment_overrides(@quiz, overrides, @current_user) unless overrides.nil?
       end
       if Assignment.sis_grade_export_enabled?(@context) && @quiz.assignment
         post_to_sis = nil
@@ -412,7 +414,7 @@ class Quizzes::QuizzesController < ApplicationController
             @quiz.assignment.save
           end
 
-          batch_update_assignment_overrides(@quiz,overrides) unless overrides.nil?
+          batch_update_assignment_overrides(@quiz, overrides, @current_user) unless overrides.nil?
 
           # quiz.rb restricts all assignment broadcasts if notify_of_update is
           # false, so we do the same here
@@ -781,7 +783,6 @@ class Quizzes::QuizzesController < ApplicationController
   def delete_override_params
     # nil represents the fact that we don't want to update the overrides
     return nil unless params[:quiz].has_key?(:assignment_overrides)
-
     overrides = params[:quiz].delete(:assignment_overrides)
     overrides = deserialize_overrides(overrides)
 

@@ -87,7 +87,7 @@ module Api::V1::Assignment
     hash['has_submitted_submissions'] = assignment.has_submitted_submissions?
 
     if !opts[:overrides].blank?
-      hash['overrides'] = assignment_overrides_json(opts[:overrides])
+      hash['overrides'] = assignment_overrides_json(opts[:overrides], user)
     end
 
     if !assignment.user_submitted.nil?
@@ -329,7 +329,7 @@ module Api::V1::Assignment
     if overrides
       assignment.transaction do
         assignment.save_without_broadcasting!
-        batch_update_assignment_overrides(assignment, overrides)
+        batch_update_assignment_overrides(assignment, overrides, user)
       end
       assignment.do_notifications!(old_assignment, assignment_params[:notify_of_update])
     else
@@ -337,6 +337,7 @@ module Api::V1::Assignment
     end
 
     return true
+    # some values need to be removed before sending the error
   rescue ActiveRecord::RecordInvalid
     return false
   end

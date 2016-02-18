@@ -74,7 +74,7 @@ class AssignmentOverride < ActiveRecord::Base
   def set_not_empty?
     overridable = assignment? ? assignment : quiz
     ['CourseSection', 'Group'].include?(self.set_type) ||
-    set.any? && overridable.context.current_enrollments.where(user_id: set).exists?
+    (set.any? && overridable.context.current_enrollments.where(user_id: set).exists?)
   end
 
   def update_cached_due_dates
@@ -111,6 +111,14 @@ class AssignmentOverride < ActiveRecord::Base
   end
 
   scope :active, -> { where(:workflow_state => 'active') }
+
+  scope :visible_students_only, -> (visible_ids) do
+    select("#{AssignmentOverride.quoted_table_name}.*").
+    joins(:assignment_override_students).
+    where(
+      assignment_override_students: { user_id: visible_ids },
+    )
+  end
 
   before_validation :default_values
   def default_values
@@ -172,6 +180,12 @@ class AssignmentOverride < ActiveRecord::Base
     end
 
     scope "overriding_#{field}", -> { where("#{field}_overridden" => true) }
+  end
+
+  def visible_student_overrides(visible_student_ids)
+    assignment_override_students.any? do |aos|
+      visible_student_ids.include?(aos.user_id)
+    end
   end
 
   override :due_at
