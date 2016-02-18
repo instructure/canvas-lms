@@ -26,7 +26,7 @@ class GradebookExporter
   end
 
   def to_csv
-    collection = @options[:include_priors] ? @course.all_student_enrollments : @course.student_enrollments
+    collection = @options[:include_priors] ? @course.all_student_enrollments : @course.admin_visible_student_enrollments
     enrollments_scope = @course.apply_enrollment_visibility(collection, @user)
     student_enrollments = enrollments_for_csv(enrollments_scope, @options)
 

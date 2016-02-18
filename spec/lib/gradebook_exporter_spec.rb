@@ -181,5 +181,20 @@ describe GradebookExporter do
         end
       end
     end
+
+    it "should include inactive students" do
+      assmt = @course.assignments.create!(:title => "assmt", :points_possible => 10)
+
+      student1 = student_in_course(:course => @course, :active_all => true).user
+      student2 = student_in_course(:course => @course, :active_all => true).user
+
+      assmt.grade_student(student1, :grade => 1)
+      assmt.grade_student(student1, :grade => 2)
+
+      csv = exporter.to_csv
+      rows = CSV.parse(csv, headers: true)
+
+      expect([rows[1]["ID"], rows[2]["ID"]]).to match_array([student1.id.to_s, student2.id.to_s])
+    end
   end
 end
