@@ -254,6 +254,63 @@ describe Assignment do
     end
   end
 
+  describe "#all_context_module_tags" do
+    let(:assignment) { Assignment.new }
+    let(:content_tag) { ContentTag.new }
+
+    it "returns the context module tags for a 'normal' assignment" \
+      "(non-quiz and non-discussion topic)" do
+      assignment.submission_types = "online_text_entry"
+      assignment.context_module_tags << content_tag
+      expect(assignment.all_context_module_tags).to eq [content_tag]
+    end
+
+    it "returns the context_module_tags on the quiz if the assignment is" \
+      "associated with a quiz" do
+      quiz = assignment.build_quiz
+      quiz.context_module_tags << content_tag
+      assignment.submission_types = "online_quiz"
+      expect(assignment.all_context_module_tags).to eq([content_tag])
+    end
+
+    it "returns the context_module_tags on the discussion topic if the" \
+      "assignment is associated with a discussion topic" do
+      assignment.submission_types = "discussion_topic"
+      discussion_topic = assignment.build_discussion_topic
+      discussion_topic.context_module_tags << content_tag
+      expect(assignment.all_context_module_tags).to eq([content_tag])
+    end
+  end
+
+  describe "#discussion_topic?" do
+    subject(:assignment) { Assignment.new }
+
+    it "returns false if an assignment does not have a discussion topic" \
+      "or a submission_types of 'discussion_topic'" do
+      is_expected.to_not be_discussion_topic
+    end
+
+    it "returns true if the assignment has an associated discussion topic," \
+      "and it has its submission_types set to 'discussion_topic'" do
+      assignment.submission_types = "discussion_topic"
+      assignment.build_discussion_topic
+      expect(assignment).to be_discussion_topic
+    end
+
+    it "returns false if an assignment does not have its submission_types" \
+      "set to 'discussion_topic', even if it has an associated discussion topic" do
+      assignment.build_discussion_topic
+      expect(assignment).to_not be_discussion_topic
+    end
+
+    it "returns false if an assignment does not have an associated" \
+      "discussion topic even if it has submission_types set to" \
+      "'discussion_topic'" do
+      assignment.submission_types = "discussion_topic"
+      expect(assignment).to_not be_discussion_topic
+    end
+  end
+
   it "should update a submission's graded_at when grading it" do
     setup_assignment_with_homework
     @assignment.grade_student(@user, :grade => 1)
