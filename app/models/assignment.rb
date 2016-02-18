@@ -496,14 +496,15 @@ class Assignment < ActiveRecord::Base
     self.grading_standard.save! if self.grading_standard
   end
 
+  def all_context_module_tags
+    all_tags = context_module_tags.to_a
+    all_tags.concat(discussion_topic.context_module_tags) if discussion_topic?
+    all_tags.concat(quiz.context_module_tags) if quiz?
+    all_tags
+  end
+
   def context_module_action(user, action, points=nil)
-    tags_to_update = self.context_module_tags.to_a
-    if self.submission_types == 'discussion_topic' && self.discussion_topic
-      tags_to_update += self.discussion_topic.context_module_tags
-    elsif self.submission_types == 'online_quiz' && self.quiz
-      tags_to_update += self.quiz.context_module_tags
-    end
-    tags_to_update.each { |tag| tag.context_module_action(user, action, points) }
+    all_context_module_tags.each { |tag| tag.context_module_action(user, action, points) }
   end
 
   # this is necessary to generate new permissions cache keys for students
@@ -2213,7 +2214,11 @@ class Assignment < ActiveRecord::Base
   end
 
   def quiz?
-    self.submission_types == 'online_quiz' && self.quiz.present?
+    submission_types == 'online_quiz' && quiz.present?
+  end
+
+  def discussion_topic?
+    submission_types == 'discussion_topic' && discussion_topic.present?
   end
 
   def self.sis_grade_export_enabled?(context)
