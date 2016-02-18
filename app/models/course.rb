@@ -107,6 +107,8 @@ class Course < ActiveRecord::Base
   has_many :prior_enrollments, -> { preload(:user, :course).where(workflow_state: 'completed') }, class_name: 'Enrollment'
   has_many :prior_users, :through => :prior_enrollments, :source => :user
   has_many :students, :through => :student_enrollments, :source => :user
+  has_many :admin_visible_students, :through => :admin_visible_student_enrollments, :source => :user
+
   has_many :self_enrolled_students, -> { where("self_enrolled") }, through: :student_enrollments, source: :user
   has_many :all_students, :through => :all_student_enrollments, :source => :user
   has_many :participating_students, -> { where(enrollments: { type: ['StudentEnrollment', 'StudentViewEnrollment'], workflow_state: 'active' }) }, through: :enrollments, source: :user
@@ -2048,13 +2050,20 @@ class Course < ActiveRecord::Base
   end
 
   # returns a scope, not an array of users/enrollments
-  def students_visible_to(user, include_priors=false)
-    scope = include_priors ? self.all_students : self.students
-    self.apply_enrollment_visibility(scope, user)
+  def students_visible_to(user, include: nil)
+    scope = case include
+            when :priors
+              self.all_students
+            when :inactive
+              self.admin_visible_students
+            else
+              self.students
+            end
+    self.apply_enrollment_visibility(scope, user, nil, include: include)
   end
 
   # can apply to user scopes as well if through enrollments (e.g. students, teachers)
-  def apply_enrollment_visibility(scope, user, section_ids=nil)
+  def apply_enrollment_visibility(scope, user, section_ids=nil, include: nil)
     if section_ids
       scope = scope.where('enrollments.course_section_id' => section_ids.to_a)
     end
@@ -2065,6 +2074,10 @@ class Course < ActiveRecord::Base
     # teachers, account admins, and student view students can see student view students
     if !visibilities.any?{|v|v[:admin] || v[:type] == 'StudentViewEnrollment' } && !account_admin
       scope = scope.where("enrollments.type<>'StudentViewEnrollment'")
+    end
+
+    if include == :inactive && ![:full, :sections].include?(visibility_level)
+      scope = scope.where("enrollments.workflow_state <> 'inactive'") # don't really include inactive unless user is able to view them
     end
     # See also MessageableUser::Calculator (same logic used to get users across multiple courses) (should refactor)
     case visibility_level

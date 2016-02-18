@@ -1661,7 +1661,7 @@ class Assignment < ActiveRecord::Base
   def visible_students_for_speed_grader(user)
     @visible_students_for_speed_grader ||= {}
     @visible_students_for_speed_grader[user.global_id] ||= (
-      student_scope = user ? context.students_visible_to(user) : context.participating_students
+      student_scope = user ? context.students_visible_to(user, include: :inactive) : context.participating_students
       students_with_visibility(student_scope)
     ).order_by_sortable_name.uniq.to_a
   end

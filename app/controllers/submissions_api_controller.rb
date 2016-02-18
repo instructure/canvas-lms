@@ -684,7 +684,7 @@ class SubmissionsApiController < ApplicationController
     if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
       @assignment = @context.assignments.active.find(params[:assignment_id])
       includes = Array(params[:include])
-      student_scope = context.students_visible_to(@current_user)
+      student_scope = context.students_visible_to(@current_user, include: :inactive)
       student_scope = @assignment.students_with_visibility(student_scope)
       student_scope = student_scope.order(:id)
       students = Api.paginate(student_scope, self, api_v1_course_assignment_gradeable_students_url(@context, @assignment))
@@ -830,7 +830,7 @@ class SubmissionsApiController < ApplicationController
   end
 
   def get_user_considering_section(user_id)
-    students = @context.students_visible_to(@current_user, true)
+    students = @context.students_visible_to(@current_user, include: :priors)
     if @section
       students = students.where(:enrollments => { :course_section_id => @section })
     end

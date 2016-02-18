@@ -60,7 +60,7 @@ class ModerationSetController < ApplicationController
         pluck(:student_id)
       new_student_ids = params[:student_ids].map(&:to_i) - current_selections
 
-      students = @context.students_visible_to(@current_user).
+      students = @context.students_visible_to(@current_user, include: :inactive).
         where(id: new_student_ids).to_a
       students.each do |student|
         @assignment.moderated_grading_selections.create! student: student

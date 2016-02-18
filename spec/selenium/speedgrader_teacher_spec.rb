@@ -220,6 +220,28 @@ describe "speed grader" do
     expect(fj('#students_selectmenu #section-menu')).to be_nil # doesn't get inserted into the menu
   end
 
+  it "works for inactive students" do
+    student_submission(:username => 'inactivestudent@example.com')
+    en = @student.student_enrollments.first
+    en.deactivate
+
+    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+    wait_for_ajaximations
+
+    keep_trying_until { ffj('#students_selectmenu option').size > 0 }
+    expect(ffj('#students_selectmenu option').size).to eq 1 # just the one student
+
+    replace_content f('#grading-box-extended'), "5", tab_out: true
+    wait_for_ajaximations
+    @submission.reload
+    expect(@submission.score).to eq 5
+
+    f('#speedgrader_comment_textarea').send_keys('srsly')
+    f('#add_a_comment button[type="submit"]').click
+    wait_for_ajaximations
+    expect(@submission.submission_comments.first.comment).to eq 'srsly'
+  end
+
   context "multiple enrollments" do
     before(:each) do
       student_in_course

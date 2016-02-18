@@ -564,7 +564,7 @@ class Quizzes::QuizzesController < ApplicationController
   def managed_quiz_data
     extend Api::V1::User
     if authorized_action(@quiz, @current_user, [:grade, :read_statistics])
-      student_scope = @context.students_visible_to(@current_user)
+      student_scope = @context.students_visible_to(@current_user, include: :inactive)
       if @quiz.differentiated_assignments_applies?
         student_scope = student_scope.able_to_see_quiz_in_course_with_da(@quiz.id, @context.id)
       end
@@ -682,7 +682,7 @@ class Quizzes::QuizzesController < ApplicationController
 
   def moderate
     if authorized_action(@quiz, @current_user, :grade)
-      @students = @context.students_visible_to(@current_user).uniq.order_by_sortable_name
+      @students = @context.students_visible_to(@current_user, include: :inactive).uniq.order_by_sortable_name
       @students = @students.order(:uuid) if @quiz.survey? && @quiz.anonymous_submissions
       last_updated_at = Time.parse(params[:last_updated_at]) rescue nil
       respond_to do |format|
@@ -909,7 +909,7 @@ class Quizzes::QuizzesController < ApplicationController
 
   # counts of submissions queried in #managed_quiz_data
   def submission_counts
-    submitted_with_submissions = @context.students_visible_to(@current_user).
+    submitted_with_submissions = @context.students_visible_to(@current_user, include: :inactive).
         joins(:quiz_submissions).
         where("quiz_submissions.quiz_id=? AND quiz_submissions.workflow_state<>'settings_only'", @quiz)
     @submitted_student_count = submitted_with_submissions.count(:id, :distinct => true)

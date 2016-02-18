@@ -1389,7 +1389,7 @@ class Submission < ActiveRecord::Base
     grade_data.each do |assignment_id, user_grades|
       assignment = preloaded_assignments[assignment_id.to_i]
 
-      scope = assignment.students_with_visibility(context.students_visible_to(grader))
+      scope = assignment.students_with_visibility(context.students_visible_to(grader, include: :inactive))
       if section
         scope = scope.where(:enrollments => { :course_section_id => section })
       end
