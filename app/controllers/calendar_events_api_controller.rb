@@ -310,6 +310,8 @@ class CalendarEventsApiController < ApplicationController
     events = apply_assignment_overrides(events) if @type == :assignment
     mark_submitted_assignments(@current_user, events) if @type == :assignment
 
+    events = filter_other_sections_from_events(events)
+
     if @errors.empty?
       render :json => events.map { |event| event_json(event, @current_user, session) }
     else

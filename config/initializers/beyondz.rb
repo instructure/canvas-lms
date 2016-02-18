@@ -17,4 +17,9 @@ class BeyondZConfiguration
   def self.bitly_access_token
     @config[:bitly_access_token]
   end
+
+  # Returns the URL of teh Braven Help site.  e.g. https://help.bebraven.org
+  def self.help_url
+    @config[:help_url]
+  end
 end
