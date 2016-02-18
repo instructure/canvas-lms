@@ -387,6 +387,7 @@ describe "Wiki Pages" do
         ff(".revision-details")[1].click
         expect(f('.restore-link')).to be_present
         f('.restore-link').click
+        wait_for_ajaximations
         f('.close-button').click
         wait_for_ajaximations
         f('.icon-edit').click
