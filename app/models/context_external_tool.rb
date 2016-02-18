@@ -41,13 +41,27 @@ class ContextExternalTool < ActiveRecord::Base
     can :read and can :update and can :delete
   end
 
-  EXTENSION_TYPES = [
-    :user_navigation, :course_navigation, :account_navigation, :resource_selection,
-    :editor_button, :homework_submission, :migration_selection, :course_home_sub_navigation,
-    :course_settings_sub_navigation, :global_navigation,
-    :assignment_menu, :file_menu, :discussion_topic_menu, :module_menu, :quiz_menu, :wiki_page_menu,
-    :tool_configuration, :link_selection, :assignment_selection, :post_grades
-  ].freeze
+  EXTENSION_TYPES = [:account_navigation,
+                     :assignment_menu,
+                     :assignment_selection,
+                     :collaboration,
+                     :course_home_sub_navigation,
+                     :course_navigation,
+                     :course_settings_sub_navigation,
+                     :discussion_topic_menu,
+                     :editor_button,
+                     :file_menu,
+                     :global_navigation,
+                     :homework_submission,
+                     :link_selection,
+                     :migration_selection,
+                     :module_menu,
+                     :post_grades,
+                     :quiz_menu,
+                     :resource_selection,
+                     :tool_configuration,
+                     :user_navigation,
+                     :wiki_page_menu].freeze
 
   CUSTOM_EXTENSION_KEYS = {:file_menu => [:accept_media_types].freeze}.freeze
 

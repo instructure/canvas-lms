@@ -167,5 +167,25 @@ describe CollaborationsController do
       expect(assigns[:collaboration].collaboration_type).to eql('EtherPad')
       expect(Collaboration.find(assigns[:collaboration].id)).to be_is_a(EtherpadCollaboration)
     end
+
+    it "should create a collaboration using content-item" do
+      user_session(@teacher)
+      contentItems = [
+          {
+              title: 'my collab',
+              text:'collab description',
+              url: 'http://example.invalid/test'
+          }
+      ]
+      post 'create', :course_id => @course.id, :contentItems => contentItems.to_json
+      collaboration = Collaboration.find(assigns[:collaboration].id)
+      expect(assigns[:collaboration]).not_to be_nil
+      expect(assigns[:collaboration].class).to eql(ExternalToolCollaboration)
+      expect(collaboration).to be_is_a(ExternalToolCollaboration)
+      expect(collaboration.title).to eq contentItems.first[:title]
+      expect(collaboration.description).to eq contentItems.first[:text]
+      expect(collaboration.url).to include "retrieve?display=borderless&url=http%3A%2F%2Fexample.invalid%2Ftest"
+    end
+
   end
 end

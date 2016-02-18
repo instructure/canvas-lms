@@ -18,6 +18,11 @@
             <option value="<%= collab_type['name'] %>"><%= collab_type['name'] %></option>
           <% end %>
         <% end %>
+        <% ContextExternalTool.all_tools_for(@context, placements: :collaboration).each do |tool| %>
+          <option value="<%= tool.name %>" data-launch-url="<%= polymorphic_url([@context, :external_tool], id: tool.id, display: 'borderless', launch_type: 'collaboration') %>">
+            <%= tool.name %>
+          </option>
+        <% end %>
       </select>
     </td>
   </tr><tr id="google_docs_description" style="display: none;" class="collaboration_type <%= 'unauthorized' unless @user_has_google_drive %>">
@@ -70,6 +75,7 @@ HEREDOC
     </td>
   </tr>
 </table>
+<iframe class="tool_launch" id="lti_new_collaboration_iframe"></iframe>
 <% end %>
 <div id="delete_collaboration_dialog" style="display: none;">
   <%= image_tag "google_docs.png", :style => "float: left;" %>

@@ -166,10 +166,12 @@ class Collaboration < ActiveRecord::Base
   # Public: Determine if any collaborations plugin is enabled.
   #
   # Returns true/false.
-  def self.any_collaborations_configured?
-    collaboration_types.any? do |type|
+  def self.any_collaborations_configured?(context)
+    plugin_collabs = collaboration_types.any? do |type|
       collaboration_class(type['type'].titleize.gsub(/\s/, '')).present?
     end
+    external_tool_collabs = ContextExternalTool.all_tools_for(context, placements: :collaboration).any?
+    plugin_collabs || external_tool_collabs
   end
 
   # Public: Declare excluded serialization fields.

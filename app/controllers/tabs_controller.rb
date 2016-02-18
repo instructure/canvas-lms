@@ -177,7 +177,7 @@ class TabsController < ApplicationController
   def context_tabs
     tabs = @context.tabs_available(@current_user, :include_external => true, :api => true).select do |tab|
       if (tab[:id] == @context.class::TAB_COLLABORATIONS rescue false)
-        tab[:href] && tab[:label] && Collaboration.any_collaborations_configured?
+        tab[:href] && tab[:label] && Collaboration.any_collaborations_configured?(@context)
       elsif (tab[:id] == @context.class::TAB_CONFERENCES rescue false)
         tab[:href] && tab[:label] && feature_enabled?(:web_conferences)
       else
