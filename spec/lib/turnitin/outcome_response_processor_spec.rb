@@ -72,7 +72,32 @@ module Turnitin
         attachment = lti_assignment.attachments.first
         expect(submission.turnitin_data[attachment.asset_string][:status]).to eq 'pending'
       end
+    end
 
+    describe "#process with request errors" do
+      it 'creates an attachment for "Faraday::TimeoutError"' do
+        TurnitinApi::OutcomesResponseTransformer.any_instance.expects(:original_submission).raises(Faraday::TimeoutError, 'Net::ReadTimeout')
+        expect { subject.process_without_send_later }.to raise_error
+        attachment = lti_assignment.attachments.first
+        expect(lti_assignment.attachments.count).to eq 1
+        expect(attachment.display_name).to eq "Failed turnitin submission"
+      end
+
+      it 'creates an attachment for "Errno::ETIMEDOUT"' do
+        TurnitinApi::OutcomesResponseTransformer.any_instance.expects(:original_submission).raises(Errno::ETIMEDOUT, 'Connection timed out - connect(2) for "api.turnitin.com" port 443')
+        expect { subject.process_without_send_later }.to raise_error
+        attachment = lti_assignment.attachments.first
+        expect(lti_assignment.attachments.count).to eq 1
+        expect(attachment.display_name).to eq "Failed turnitin submission"
+      end
+
+      it 'creates an attachment for "Faraday::ConnectionFailed"' do
+        TurnitinApi::OutcomesResponseTransformer.any_instance.expects(:original_submission).raises(Faraday::ConnectionFailed, 'Connection reset by peer')
+        expect { subject.process_without_send_later }.to raise_error
+        attachment = lti_assignment.attachments.first
+        expect(lti_assignment.attachments.count).to eq 1
+        expect(attachment.display_name).to eq "Failed turnitin submission"
+      end
     end
 
     describe "#update_originality_data" do
