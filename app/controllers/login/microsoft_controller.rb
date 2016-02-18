@@ -16,32 +16,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'oauth2'
-require 'canvas/core_ext/oauth2'
-
-class AccountAuthorizationConfig::Oauth < AccountAuthorizationConfig::Delegated
-
-  SENSITIVE_PARAMS = [ :consumer_secret ].freeze
-
-  # rename DB fields to something that makes sense for OAuth2
-  def consumer_key=(val)
-    self.entity_id = val
-  end
-
-  def consumer_key
-    entity_id
-  end
-
-  alias_method :consumer_secret=, :auth_password=
-  alias_method :consumer_secret, :auth_decrypted_password
-
-  def consumer
-    @client ||= OAuth::Consumer.new(consumer_key, consumer_secret, consumer_options)
-  end
-
-  protected
-
-  def token_options
-    {}
-  end
+module Login
+  MicrosoftController = Oauth2Controller
 end

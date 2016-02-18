@@ -684,6 +684,8 @@ CanvasRails::Application.routes.draw do
   get 'login/google' => 'login/google#new', as: :google_login
   get 'login/google/:id' => 'login/google#new'
   get 'login/linkedin' => 'login/linkedin#new', as: :linkedin_login
+  get 'login/microsoft' => 'login/microsoft#new'
+  get 'login/microsoft/:id' => 'login/microsoft#new', as: :microsoft_login
   get 'login/openid_connect' => 'login/openid_connect#new'
   get 'login/openid_connect/:id' => 'login/openid_connect#new', as: :openid_connect_login
   get 'login/twitter' => 'login/twitter#new', as: :twitter_login

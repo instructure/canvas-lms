@@ -105,6 +105,14 @@ module AccountsAuthConfigsCommon
     submit_form(linkedin_form)
   end
 
+  def add_microsoft_config
+    get "/accounts/#{Account.default.id}/authentication_providers"
+    add_auth_type('Microsoft')
+    microsoft_form = f('#new_microsoft')
+    microsoft_form.find_element(:id, 'authentication_provider_application_id').send_keys('1234')
+    submit_form(microsoft_form)
+  end
+
   def add_openid_connect_config
     get "/accounts/#{Account.default.id}/authentication_providers"
     add_auth_type('OpenID Connect')
