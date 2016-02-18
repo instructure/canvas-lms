@@ -20,7 +20,7 @@
          :user => submission_comment_submittor(asset, user),
          :assignment => asset.submission.assignment.title %></p>
 
-<p><%= asset.comment.gsub(/\n/,'</p><p>') %></p>
+<%= format_message(asset.comment).first %>
 
 <% if asset.can_read_author?(user, nil) %>
   <% if avatar_enabled? %>
