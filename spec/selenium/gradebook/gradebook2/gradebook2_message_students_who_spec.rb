@@ -54,6 +54,7 @@ describe "gradebook2 - message students who" do
 
     open_assignment_options(1)
     f('[data-action="messageStudentsWho"]').click
+
     expect {
       message_form = f('#message_assignment_recipients')
       click_option('#message_assignment_recipients .message_types', 'Scored more than')
@@ -179,5 +180,29 @@ describe "gradebook2 - message students who" do
     end
 
     expect(message_form.find_element(:css, '.send_button')).not_to be_enabled
+  end
+
+  it "should not send messages to inactive students" do
+    en = @student_1.student_enrollments.first
+    en.deactivate
+
+    message_text = "This is a message"
+    get "/courses/#{@course.id}/gradebook2"
+
+    open_assignment_options(1)
+    f('[data-action="messageStudentsWho"]').click
+
+    message_form = f('#message_assignment_recipients')
+    click_option('#message_assignment_recipients .message_types', 'Scored more than')
+    message_form.find_element(:css, '.cutoff_score').send_keys('3') # both assignments have score of 5
+    message_form.find_element(:css, '#body').send_keys(message_text)
+
+    expect(f('#message_students_dialog .student_list')).to_not include_text(@student_1.name)
+
+    submit_form(message_form)
+    wait_for_ajax_requests
+    run_jobs
+
+    expect(ConversationBatch.last.recipient_ids).to_not include(@student_1.id)
   end
 end

@@ -341,8 +341,13 @@ define [
           @studentViewStudents[student.id] ||= htmlEscape(student)
         else
           @students[student.id] ||= htmlEscape(student)
-        @student(student.id).sections ||= []
-        @student(student.id).sections.push(studentEnrollment.course_section_id)
+
+        student = @student(student.id)
+        student.enrollment_states ||= []
+        student.enrollment_states.push(studentEnrollment.enrollment_state)
+
+        student.sections ||= []
+        student.sections.push(studentEnrollment.course_section_id)
 
     gotAllStudents: ->
       @withAllStudents (students) =>
@@ -355,6 +360,7 @@ define [
           student.computed_current_score ||= 0
           student.computed_final_score ||= 0
           student.secondary_identifier = student.sis_login_id || student.login_id
+          student.is_inactive = _.all student.enrollment_states, (state) -> state == 'inactive'
 
           if @sections_enabled
             mySections = (@sections[sectionId].name for sectionId in student.sections when @sections[sectionId])
