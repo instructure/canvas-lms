@@ -421,7 +421,17 @@ END
       beta: true,
       development: true,
       root_opt_in: false
-    }
+    },
+    'conditional_release' =>
+    {
+      display_name: -> { I18n.t('Conditional Release') },
+      description: -> { I18n.t('Configure individual learning paths for students based on assessment results.') },
+      applies_to: 'Course',
+      state: 'hidden',
+      beta: true,
+      development: true,
+      root_opt_in: false,
+    },
   )
 
   def self.definitions
