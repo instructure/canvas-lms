@@ -376,7 +376,7 @@ $gradebook_checkbox_width: 16px;
 .minimized {
   background-image: url("/images/4_percent_opacity.png");
   .gradebook-cell {
-    font-size: 0px;
+    @include fontSize(0px);
     * {
       display: none;
     }
@@ -438,7 +438,7 @@ $gradebook_checkbox_width: 16px;
 }
 
 @mixin gradebook_menu_label($fontsize) {
-  font-size: $fontsize;
+  @include fontSize($fontsize);
   font-weight: bold;
   margin-bottom: 0;
   vertical-align: 0px !important;
