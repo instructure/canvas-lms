@@ -631,8 +631,14 @@ class RoleOverride < ActiveRecord::Base
         :true_for => %w(AccountAdmin),
         :available_to => %w(AccountAdmin AccountMembership),
       },
+      :import_sis => {
+        :label => lambda { t('Import SIS data') },
+        :account_only => :root,
+        :true_for => %w(AccountAdmin),
+        :available_to => %w(AccountAdmin AccountMembership),
+      },
       :manage_sis => {
-        :label => lambda { t('permissions.manage_sis', "Import and manage SIS data") },
+        :label => lambda { t('permissions.manage_sis', "Manage SIS data") },
         :account_only => true,
         :true_for => %w(AccountAdmin),
         :available_to => %w(AccountAdmin AccountMembership),

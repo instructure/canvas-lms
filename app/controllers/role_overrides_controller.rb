@@ -222,6 +222,7 @@ class RoleOverridesController < ApplicationController
   #
   #     [For Account-Level Roles Only]
   #     become_user                      -- Become other users
+  #     import_sis                       -- Import SIS data
   #     manage_account_memberships       -- Add/remove other admins for the account
   #     manage_account_settings          -- Manage account-level settings
   #     manage_alerts                    -- Manage global alerts
@@ -231,7 +232,7 @@ class RoleOverridesController < ApplicationController
   #     manage_jobs                      -- Manage background jobs
   #     manage_role_overrides            -- Manage permissions
   #     manage_storage_quotas            -- Set storage quotas for courses, groups, and users
-  #     manage_sis                       -- Import and manage SIS data
+  #     manage_sis                       -- Manage SIS data
   #     manage_site_settings             -- Manage site-wide and plugin settings
   #     manage_user_logins               -- Modify login details for users
   #     read_course_content              -- View course content

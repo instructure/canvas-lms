@@ -4,74 +4,78 @@
 
 <div>
   <h1><%= t(:title, "SIS Import") %></h1>
+  <% if can_do(@account, @current_user, :import_sis) %>
+    <div class="sis_messages" style="<%= hidden %>">
+      <div class="ui-state-error sis_error_message" style="padding: 0.5em 1em"></div>
+      <%= link_to t(:try_import_again_link, "Try import again"), account_sis_import_path %>
+    </div>
 
-  <div class="sis_messages" style="<%= hidden %>">
-    <div class="ui-state-error sis_error_message" style="padding: 0.5em 1em"></div>
-    <%= link_to t(:try_import_again_link, "Try import again"), account_sis_import_path %>
-  </div>
-
-  <div class="form" style="<%= hidden if @current_batch && @current_batch.importing? %>">
-    <%= form_tag account_sis_imports_path(@account.id), :multipart => true, :id => "sis_importer" do %>
-      <p class="instruction"><%= mt(:select_file_instructions,
-                                    "Select the zip file that you want imported.  \n" +
-      "For a description of how to generate these zip files, [please see this documentation](%{url}).",
-      :url => "/doc/api/sis_csv.html") %></p>
-      <div>
-        <input type="file" name="attachment" style="font-size: 1.2em;"/><p/>
-        <label for="import_type"><%= before_label(t(:import_type_label, "Import type")) %></label>
-        <select id="import_type" name="import_type">
-          <% SisBatch.valid_import_types.each do |type, data| %>
-            <option value="<%= type %>"<% if data[:default] %> selected<% end %>><%= data[:name].respond_to?(:call) ? data[:name].call() : data[:name] %></option>
-          <% end %>
-        </select>
-
-        <p/>
-        <div id="batch_check">
-          <input type="checkbox" name="batch_mode" value="1" id="batch_mode"/>
-          <label for="batch_mode"><%= t(:batch_mode_label, "This is a full batch update") %></label>
-          <br>
-          <p class='instruction'>
-            <%= mt(:batch_import_instructions,
-            "If selected, this will delete everything for this term, which includes all courses and enrollments that are not in the selected import file above.  \nSee the documentation for details.") %>
-          </p>
-          <select id="batch_mode_term_id" name="batch_mode_term_id">
-            <%= options_from_collection_for_select(@terms, :id, :name, @terms.first.try(:id)) %>
+    <div class="form" style="<%= hidden if @current_batch && @current_batch.importing? %>">
+      <%= form_tag account_sis_imports_path(@account.id), :multipart => true, :id => "sis_importer" do %>
+        <p class="instruction"><%= mt(:select_file_instructions,
+                                      "Select the zip file that you want imported.  \n" +
+                                          "For a description of how to generate these zip files, [please see this documentation](%{url}).",
+                                      :url => "/doc/api/sis_csv.html") %></p>
+        <div>
+          <input type="file" name="attachment" style="font-size: 1.2em;"/>
+          <p/>
+          <label for="import_type"><%= before_label(t(:import_type_label, "Import type")) %></label>
+          <select id="import_type" name="import_type">
+            <% SisBatch.valid_import_types.each do |type, data| %>
+              <option value="<%= type %>"
+              <% if data[:default] %> selected
+              <% end %>><%= data[:name].respond_to?(:call) ? data[:name].call() : data[:name] %></option>
+            <% end %>
           </select>
-        </div>
 
-        <div id="stickiness_options">
-          <div id="override_sis_stickiness_container">
-            <input type="checkbox" name="override_sis_stickiness" value="1" id="override_sis_stickiness"/>
-            <label for="override_sis_stickiness"><%= t(:override_sis_stickiness_label, "Override UI changes") %></label>
+          <p/>
+          <div id="batch_check">
+            <input type="checkbox" name="batch_mode" value="1" id="batch_mode"/>
+            <label for="batch_mode"><%= t(:batch_mode_label, "This is a full batch update") %></label>
+            <br>
             <p class='instruction'>
-              <%= mt(:override_sis_stickiness_instructions,
-              "By default, UI changes have priority over SIS import changes; for a number of fields, the SIS import will not change that field's data if an admin has changed that field through the UI. If you select this option, this SIS import will override UI changes.  \nSee the documentation for details.") %>
+              <%= mt(:batch_import_instructions,
+                     "If selected, this will delete everything for this term, which includes all courses and enrollments that are not in the selected import file above.  \nSee the documentation for details.") %>
             </p>
-            <div id="add_sis_stickiness_container" style="padding-left: 20px;">
-              <input type="checkbox" name="add_sis_stickiness" value="1" id="add_sis_stickiness"/>
-              <label for="add_sis_stickiness"><%= t(:add_sis_stickiness_label, "Process as UI changes") %></label>
+            <select id="batch_mode_term_id" name="batch_mode_term_id">
+              <%= options_from_collection_for_select(@terms, :id, :name, @terms.first.try(:id)) %>
+            </select>
+          </div>
+
+          <div id="stickiness_options">
+            <div id="override_sis_stickiness_container">
+              <input type="checkbox" name="override_sis_stickiness" value="1" id="override_sis_stickiness"/>
+              <label for="override_sis_stickiness"><%= t(:override_sis_stickiness_label, "Override UI changes") %></label>
               <p class='instruction'>
-                <%= mt(:add_sis_stickiness_instructions,
-                "With this option selected, changes made through this SIS import will be processed as if they are UI changes, preventing subsequent non-overriding SIS imports from changing the fields changed here.") %>
+                <%= mt(:override_sis_stickiness_instructions,
+                       "By default, UI changes have priority over SIS import changes; for a number of fields, the SIS import will not change that field's data if an admin has changed that field through the UI. If you select this option, this SIS import will override UI changes.  \nSee the documentation for details.") %>
               </p>
-            </div>
-            <div id="clear_sis_stickiness_container" style="padding-left: 20px;">
-              <input type="checkbox" name="clear_sis_stickiness" value="1" id="clear_sis_stickiness"/>
-              <label for="clear_sis_stickiness"><%= t(:clear_sis_stickiness_label, "Clear UI-changed state") %></label>
-              <p class='instruction'>
-                <%= mt(:clear_sis_stickiness_instructions,
-                "With this option selected, all fields in all records touched by this SIS import will be able to be changed in future non-overriding SIS imports.") %>
-              </p>
+              <div id="add_sis_stickiness_container" style="padding-left: 20px;">
+                <input type="checkbox" name="add_sis_stickiness" value="1" id="add_sis_stickiness"/>
+                <label for="add_sis_stickiness"><%= t(:add_sis_stickiness_label, "Process as UI changes") %></label>
+                <p class='instruction'>
+                  <%= mt(:add_sis_stickiness_instructions,
+                         "With this option selected, changes made through this SIS import will be processed as if they are UI changes, preventing subsequent non-overriding SIS imports from changing the fields changed here.") %>
+                </p>
+              </div>
+              <div id="clear_sis_stickiness_container" style="padding-left: 20px;">
+                <input type="checkbox" name="clear_sis_stickiness" value="1" id="clear_sis_stickiness"/>
+                <label for="clear_sis_stickiness"><%= t(:clear_sis_stickiness_label, "Clear UI-changed state") %></label>
+                <p class='instruction'>
+                  <%= mt(:clear_sis_stickiness_instructions,
+                         "With this option selected, all fields in all records touched by this SIS import will be able to be changed in future non-overriding SIS imports.") %>
+                </p>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      <div>
-        <button type="submit" class="submit_button btn btn-primary"><%= t(:process_data_button, "Process Data") %></button>
-      </div>
-      <div class="clear"></div>
-    <% end %>
-  </div>
+        <div>
+          <button type="submit" class="submit_button btn btn-primary"><%= t(:process_data_button, "Process Data") %></button>
+        </div>
+        <div class="clear"></div>
+      <% end %>
+    </div>
+  <% end %>
 
   <div class="progress_bar_holder" style="<%= hidden unless @current_batch && @current_batch.importing? %> margin-top: 10px;">
       <div class="copy_progress"></div>

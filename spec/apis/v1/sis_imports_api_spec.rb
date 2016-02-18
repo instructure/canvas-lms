@@ -607,4 +607,28 @@ describe SisImportsApiController, type: :request do
                     expected_status: 403)
     expect(json['errors'].first).to eq "SIS imports are not enabled for this account"
   end
+
+  it "should error on user with no sis permissions" do
+    account_admin_user_with_role_changes(account: @account, role_changes: {manage_sis: true, import_sis: false})
+    api_call(:post,
+             "/api/v1/accounts/#{@account.id}/sis_imports.json",
+             {controller: 'sis_imports_api', action: 'create',
+              format: 'json', account_id: @account.id.to_s},
+             {import_type: 'instructure_csv',
+              attachment: fixture_file_upload("files/sis/test_user_1.csv", 'text/csv')},
+             {},
+             expected_status: 401)
+  end
+
+  it "should work with import permissions" do
+    account_admin_user_with_role_changes(user: @user, role_changes: {manage_sis: false, import_sis: true})
+    api_call(:post,
+             "/api/v1/accounts/#{@account.id}/sis_imports.json",
+             {controller: 'sis_imports_api', action: 'create',
+              format: 'json', account_id: @account.id.to_s},
+             {import_type: 'instructure_csv',
+              attachment: fixture_file_upload("files/sis/test_user_1.csv", 'text/csv')},
+             {},
+             expected_status: 200)
+  end
 end
