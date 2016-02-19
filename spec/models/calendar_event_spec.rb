@@ -234,6 +234,21 @@ describe CalendarEvent do
         expect(ev.description).to include("verifier")
       end
 
+      it "should work with media comments in course section events" do
+        course_model
+        @course.offer
+        @course.is_public = true
+
+        @course.media_objects.create!(:media_id => '0_12345678')
+        event = @course.default_section.calendar_events.create!(:start_at => "Sep 3 2008 12:00am",
+          :description => %{<p><a id="media_comment_0_12345678" class="instructure_inline_media_comment video_comment" href="/media_objects/0_12345678">media comment</a></p>})
+        event.effective_context_code = @course.asset_string
+        event.save!
+
+        ics = event.to_ics
+        expect(ics.gsub(/\s+/, '')).to include("/courses/#{@course.id}/media_download?entryId=0_12345678")
+      end
+
       it "should add a course code to the summary of an event that has a course as an effective_context" do
         course_model
         calendar_event_model(:start_at => "Sep 3 2008 12:00am")
