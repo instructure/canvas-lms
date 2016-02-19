@@ -1,27 +1,39 @@
-<body style="font-family:sans-serif;line-height:1.25;font-size:14px">
-  <h1><%= meta[:full_description] %></h1>
+<html>
+  <head>
+    <style>
+      <%= log_message_formatter.generate_stylesheet %>
+    </style>
+  </head>
+  <body style="font-family:sans-serif;line-height:1.25;font-size:14px">
+    <h1><%= meta[:full_description] %></h1>
 
-  <code><b>bin/rspec <%= meta[:location] %></b></code>
+    <code><b>bin/rspec <%= meta[:location] %></b></code>
 
-  <h2>Ruby Error</h2>
-  <pre style="overflow:auto; max-height: 300px;">
-<b><%= example.exception.class.name %> <%= example.exception.message %></b>
-<%= example.exception.backtrace.join("\n") %>
-  </pre>
+    <h2>Ruby Error</h2>
+    <pre style="overflow:auto; max-height: 300px;">
+  <b><%= example.exception.class.name %> <%= example.exception.message %></b>
+  <%= example.exception.backtrace.join("\n") %>
+    </pre>
 
-  <% if js_errors.present? %>
-    <h2>JS Errors</h2>
-    <ul>
-      <% js_errors.each do |error| %>
-        <li><%= error["errorMessage"] %> (<%= error["sourceName"] %>:<%= error["lineNumber"] %>)
-      <% end %>
-    </ul>
+    <% if js_errors.present? %>
+      <h2>JS Errors</h2>
+      <ul>
+        <% js_errors.each do |error| %>
+          <li><%= error["errorMessage"] %> (<%= error["sourceName"] %>:<%= error["lineNumber"] %>)
+        <% end %>
+      </ul>
 
-  <% end %>
+    <% end %>
 
-  <h2>Previous Spec Runs</h2>
-  <pre><%= recent_spec_runs.join("\n") %></pre>
+    <h2>Rails Log</h2>
+    <pre style="overflow:auto; max-height: 300px;">
+<%= log_message_formatter.generate.html_safe %>
+    </pre>
 
-  <h2>Screenshot</h2>
-  <img style="border:1px solid #000" src="./<%= screenshot_name %>" />
-</body>
+    <h2>Previous Spec Runs</h2>
+    <pre><%= recent_spec_runs.join("\n") %></pre>
+
+    <h2>Screenshot</h2>
+    <img style="border:1px solid #000" src="./<%= screenshot_name %>" />
+  </body>
+</html>

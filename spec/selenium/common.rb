@@ -154,6 +154,12 @@ shared_context "in-process server selenium tests" do
     end
   end
 
+  around do |example|
+    Rails.logger.capture_messages do
+      example.run
+    end
+  end
+
   before do |example|
     SeleniumDriverSetup.note_recent_spec_run(example)
   end
@@ -168,7 +174,7 @@ shared_context "in-process server selenium tests" do
       # we want to ignore selenium errors when attempting to wait here
       nil
     end
-    record_errors(example)
+    record_errors(example, Rails.logger.captured_messages)
     SeleniumDriverSetup.disallow_requests!
     truncate_all_tables unless self.use_transactional_fixtures
   end

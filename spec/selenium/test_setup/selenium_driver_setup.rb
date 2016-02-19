@@ -216,7 +216,7 @@ module SeleniumDriverSetup
     end
   end
 
-  def record_errors(example)
+  def record_errors(example, log_messages)
     js_errors = driver.execute_script("return window.JSErrorCollector_errors && window.JSErrorCollector_errors.pump()") || []
     return unless js_errors.present? || example.exception
 
@@ -238,6 +238,8 @@ module SeleniumDriverSetup
     driver.save_screenshot(errors_path.join(screenshot_name))
 
     recent_spec_runs = SeleniumDriverSetup.recent_spec_runs
+
+    log_message_formatter = EscapeCode::HtmlFormatter.new(log_messages.join("\n"))
 
     # make a nice little html file for jenkins
     File.open(errors_path.join(summary_name + ".html"), "w") do |file|
