@@ -66,9 +66,9 @@
     "webpack": "webpack --progress --color --watch",
     "webpack-development": "webpack --progress --color",
     "webpack-stats": "webpack --profile --json",
-    "webpack-test": "NODE_ENV=test webpack --progress --color --config webpack.test.config.js",
-    "webpack-test-ember": "NODE_ENV=test WEBPACK_TEST_BUNDLE=ember webpack --progress --color --config webpack.test.config.js",
-    "webpack-test-watch": "NODE_ENV=test webpack --progress --color --watch --config webpack.test.config.js",
-    "webpack-production": "NODE_ENV=production webpack --progress --color --config webpack.production.config.js"
+    "webpack-test": "NODE_ENV=test webpack --progress --color --config webpack.test.config.babel.js",
+    "webpack-test-ember": "NODE_ENV=test WEBPACK_TEST_BUNDLE=ember webpack --progress --color --config webpack.test.config.babel.js",
+    "webpack-test-watch": "NODE_ENV=test webpack --progress --color --watch --config webpack.test.config.babel.js",
+    "webpack-production": "NODE_ENV=production webpack --progress --color --config webpack.production.config.babel.js"
   }
 }
