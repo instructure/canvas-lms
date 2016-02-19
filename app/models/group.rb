@@ -557,13 +557,21 @@ class Group < ActiveRecord::Base
     return false unless user.present? && self.context.present?
     return true if self.group_category.try(:communities?)
     if self.context.is_a?(Course)
-      return self.context.enrollments.not_fake.except(:preload).where(:user_id => user.id).exists?
+      return self.context.enrollments.not_fake.except(:preload).where(:user_id => user.id).any?(&:participating?)
     elsif self.context.is_a?(Account)
       return self.context.root_account.user_account_associations.where(:user_id => user.id).exists?
     end
     return false
   end
   private :can_participate?
+
+  def can_join?(user)
+    if self.context.is_a?(Course)
+      self.context.enrollments.not_fake.except(:preload).where(:user_id => user.id).exists?
+    else
+      can_participate?(user)
+    end
+  end
 
   def user_can_manage_own_discussion_posts?(user)
     return true unless self.context.is_a?(Course)

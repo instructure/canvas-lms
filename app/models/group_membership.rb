@@ -197,7 +197,7 @@ class GroupMembership < ActiveRecord::Base
   set_policy do
     # for non-communities, people can be put into groups by users who can manage groups at the context level,
     # but not moderators (hence :manage_groups)
-    given { |user, session| user && self.user && self.group && !self.group.group_category.try(:communities?) && ((user == self.user && self.group.grants_right?(user, session, :join)) || (self.group.grants_right?(self.user, session, :participate) && self.group.context && self.group.context.grants_right?(user, session, :manage_groups))) }
+    given { |user, session| user && self.user && self.group && !self.group.group_category.try(:communities?) && ((user == self.user && self.group.grants_right?(user, session, :join)) || (self.group.can_join?(self.user) && self.group.context && self.group.context.grants_right?(user, session, :manage_groups))) }
     can :create
 
     # for communities, users must initiate in order to be added to a group
