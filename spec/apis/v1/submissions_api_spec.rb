@@ -506,7 +506,7 @@ describe 'Submissions API', type: :request do
       "id" => @student.id,
       "display_name" => "User",
       "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@student.id}",
-      "avatar_image_url" => User.avatar_fallback_url
+      "avatar_image_url" => User.avatar_fallback_url(nil, request)
     })
   end
 
@@ -668,7 +668,7 @@ describe 'Submissions API', type: :request do
               "id" => @teacher.id,
               "display_name" => "User",
               "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@teacher.id}",
-              "avatar_image_url" => User.avatar_fallback_url
+              "avatar_image_url" => User.avatar_fallback_url(nil, request)
            },
            "author_name"=>"User",
            "id" => comment.id,
@@ -939,7 +939,7 @@ describe 'Submissions API', type: :request do
              "id" => @teacher.id,
              "display_name" => "User",
              "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@teacher.id}",
-             "avatar_image_url" => User.avatar_fallback_url
+             "avatar_image_url" => User.avatar_fallback_url(nil, request)
            },
            "author_name"=>"User",
            "id"=>comment.id,
@@ -1331,7 +1331,7 @@ describe 'Submissions API', type: :request do
 
         user = json.first['user']
         expect(user['display_name']).to eql @student.name
-        expect(user['avatar_image_url']).to eql "https://localhost/images/messages/avatar-50.png"
+        expect(user['avatar_image_url']).to eql "http://www.example.com/images/messages/avatar-50.png"
         expect(user['html_url']).to eql polymorphic_url([@course, @student])
       end
     end
@@ -3355,7 +3355,7 @@ describe 'Submissions API', type: :request do
         expect(json).to match_array(
           [{"id"=>@student1.id,
             "display_name"=>"User",
-            "avatar_image_url"=>"https://localhost/images/messages/avatar-50.png",
+            "avatar_image_url"=>"http://www.example.com/images/messages/avatar-50.png",
             "html_url"=>"http://www.example.com/courses/#{@course.id}/users/#{@student1.id}",
             "in_moderation_set"=>true,
             "selected_provisional_grade_id"=>pg.id,
@@ -3370,7 +3370,7 @@ describe 'Submissions API', type: :request do
                 "speedgrader_url"=>"http://www.example.com/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#%7B%22student_id%22:#{@student1.id},%22provisional_grade_id%22:#{pg.id}%7D"}]},
            {"id"=>@student2.id,
             "display_name"=>"User",
-            "avatar_image_url"=>"https://localhost/images/messages/avatar-50.png",
+            "avatar_image_url"=>"http://www.example.com/images/messages/avatar-50.png",
             "html_url"=>"http://www.example.com/courses/#{@course.id}/users/#{@student2.id}",
             "in_moderation_set"=>false,
             "selected_provisional_grade_id"=>nil,

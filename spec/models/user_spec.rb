@@ -1138,6 +1138,8 @@ describe User do
     end
 
     it "should return a useful avatar_fallback_url" do
+      HostUrl.stubs(:protocol).returns('https')
+
       expect(User.avatar_fallback_url).to eq(
         "https://#{HostUrl.default_host}/images/messages/avatar-50.png"
       )

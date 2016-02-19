@@ -20,9 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../locked_spec')
 
 describe "Pages API", type: :request do
   include Api::V1::User
-  def avatar_url_for_user(user, *a)
-    User.avatar_fallback_url
-  end
+  include AvatarHelper
 
   def blank_fallback
     nil
