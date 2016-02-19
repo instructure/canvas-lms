@@ -34,13 +34,12 @@ kinesis:
     VIRTUAL_HOST: kinesis.docker
     VIRTUAL_PORT: 4567
 
-web:
+web: &WEB
   build: ./docker-compose
-  command: bundle exec bin/rails s
-  ports:
-    - "3000:3000"
   volumes:
-    - ".:/app"
+    - "canvas-gems:/home/docker/.gem/ruby/2.1.0"
+    - "canvas-node_modules:/usr/src/app/node_modules"
+    - ".:/usr/src/app"
   links:
     - consul
     - postgres
@@ -57,26 +56,12 @@ web:
     # USE_WEBPACK: true
 
 jobs:
-  build: ./docker-compose
+  <<: *WEB
   command: bundle exec script/delayed_job run
-  volumes:
-    - ".:/app"
-  links:
-    - postgres
-    - redis
-    - kinesis
-  environment:
-    RACK_ENV: development
 
 guard:
-  build: ./docker-compose
+  <<: *WEB
   command: bundle exec guard -i
-  ports:
-    - "4000:4000"
-  volumes:
-    - ".:/app"
-  environment:
-    RACK_ENV: development
 
 # Uncomment this entry to run qunit tests built from webpack
 # js-tests:
