@@ -30,7 +30,7 @@ class TermsController < ApplicationController
     @course_counts_by_term = EnrollmentTerm.course_counts(@terms)
     @user_counts_by_term = EnrollmentTerm.user_counts(@root_account, @terms)
   end
-  
+
   # @API Create enrollment term
   #
   # Create a new enrollment term for the specified account.
@@ -55,7 +55,7 @@ class TermsController < ApplicationController
     @term = @context.enrollment_terms.active.build
     save_and_render_response
   end
-  
+
   # @API Update enrollment term
   #
   # Update an existing enrollment term for the specified account.
@@ -80,7 +80,7 @@ class TermsController < ApplicationController
     @term = api_find(@context.enrollment_terms.active, params[:id])
     save_and_render_response
   end
-  
+
   # @API Delete enrollment term
   #
   # Delete the specified enrollment term.
@@ -106,6 +106,9 @@ class TermsController < ApplicationController
   def save_and_render_response
     overrides = params[:enrollment_term].delete(:overrides)
     sis_id = params[:enrollment_term].delete(:sis_source_id) || params[:enrollment_term].delete(:sis_term_id)
+    if sis_id && !(sis_id.is_a?(String) || sis_id.is_a?(Numeric))
+      return render :json => {:message => "Invalid SIS ID"}, :status => :bad_request
+    end
     handle_sis_id_param(sis_id)
     if @term.update_attributes(params[:enrollment_term])
       @term.set_overrides(@context, overrides)
