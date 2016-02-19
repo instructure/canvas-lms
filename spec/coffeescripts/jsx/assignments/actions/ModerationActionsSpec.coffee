@@ -1,7 +1,6 @@
 define [
-  "when"
-  "jsx/assignments/actions/ModerationActions",
-], (whenJS, ModerationActions) ->
+  "jsx/assignments/actions/ModerationActions"
+], (ModerationActions) ->
 
   module "ModerationActions - Action Creators"
 
@@ -133,14 +132,12 @@ define [
 
   module "ModerationActions#apiGetStudents",
     setup: ->
-      @client = {
+      @client =
         get: ->
-          dfd = whenJS.defer()
-          setTimeout ->
-            dfd.resolve('test')
-          , 100
-          dfd.promise()
-      }
+          new Promise (resolve) ->
+            setTimeout ->
+              resolve('test')
+            , 100
 
   test "returns a function", ->
     ok typeof ModerationActions.apiGetStudents() == 'function'
@@ -159,7 +156,7 @@ define [
       payload:
         students: ['test']
 
-    sinon.stub(@client, 'get').returns(whenJS(fakeResponse))
+    sinon.stub(@client, 'get').returns(Promise.resolve(fakeResponse))
     ModerationActions.apiGetStudents(@client)((action) ->
       deepEqual action, gotStudentsAction
       start()
@@ -177,7 +174,7 @@ define [
     fakeResponse = {data: ['test'], headers: fakeHeaders}
 
     callCount = 0
-    sinon.stub(@client, 'get').returns(whenJS(fakeResponse))
+    sinon.stub(@client, 'get').returns(Promise.resolve(fakeResponse))
     ModerationActions.apiGetStudents(@client)((action) ->
       callCount++
       if callCount >= 2
@@ -189,11 +186,10 @@ define [
     setup: ->
       @client = {
         post: ->
-          dfd = whenJS.defer()
-          setTimeout ->
-            dfd.resolve('test')
-          , 100
-          dfd.promise()
+          new Promise (resolve) ->
+            setTimeout ->
+              resolve('test')
+            , 100
       }
 
   test "returns a function", ->
@@ -210,7 +206,7 @@ define [
       payload:
         message: 'Success! Grades were published to the grade book.'
 
-    sinon.stub(@client, 'post').returns(whenJS(fakeResponse))
+    sinon.stub(@client, 'post').returns(Promise.resolve(fakeResponse))
     ModerationActions.publishGrades(@client)((action) ->
       equal action.type, publishGradesAction.type, 'type matches'
       equal action.payload.message, publishGradesAction.payload.message, 'has proper message'
@@ -229,7 +225,7 @@ define [
       payload:
         message: 'Assignment grades have already been published.'
 
-    sinon.stub(@client, 'post').returns(whenJS.reject(fakeResponse))
+    sinon.stub(@client, 'post').returns(Promise.reject(fakeResponse))
     ModerationActions.publishGrades(@client)((action) ->
       equal action.type, publishGradesAction.type, 'type matches'
       equal action.payload.message, publishGradesAction.payload.message, 'has proper message'
@@ -248,7 +244,7 @@ define [
       payload:
         message: 'An error occurred publishing grades.'
 
-    sinon.stub(@client, 'post').returns(whenJS.reject(fakeResponse))
+    sinon.stub(@client, 'post').returns(Promise.reject(fakeResponse))
     ModerationActions.publishGrades(@client)((action) ->
       equal action.type, publishGradesAction.type, 'type matches'
       equal action.payload.message, publishGradesAction.payload.message, 'has proper message'
@@ -257,14 +253,12 @@ define [
 
   module "ModerationActions#addStudentToModerationSet",
     setup: ->
-      @client = {
+      @client =
         post: ->
-          dfd = whenJS.defer()
-          setTimeout ->
-            dfd.resolve('test')
-          , 100
-          dfd.promise()
-      }
+          new Promise (resolve) ->
+            setTimeout ->
+              resolve('test')
+            , 100
 
   test "returns a function", ->
     ok typeof ModerationActions.addStudentToModerationSet() == 'function'
@@ -288,7 +282,7 @@ define [
       payload:
         message: 'Reviewers successfully added'
 
-    fakePost = sinon.stub(@client, 'post').returns(whenJS(fakeResponse))
+    fakePost = sinon.stub(@client, 'post').returns(Promise.resolve(fakeResponse))
     ModerationActions.addStudentToModerationSet(@client)((action) ->
       ok fakePost.calledWith(fakeUrl, {student_ids: [1, 2]}), 'called with the correct params'
       equal action.type, moderationSetUpdatedAction.type, 'type matches'
@@ -313,7 +307,7 @@ define [
       payload:
         message: 'A problem occurred adding reviewers.'
 
-    sinon.stub(@client, 'post').returns(whenJS.reject(fakeResponse))
+    sinon.stub(@client, 'post').returns(Promise.reject(fakeResponse))
     ModerationActions.addStudentToModerationSet(@client)((action) ->
       equal action.type, moderationSetUpdateFailedAction.type, 'type matches'
       equal action.payload.message, moderationSetUpdateFailedAction.payload.message, 'has proper message'
@@ -322,14 +316,12 @@ define [
 
   module "ModerationActions#selectProvisionalGrade",
     setup: ->
-      @client = {
+      @client =
         put: ->
-          dfd = whenJS.defer()
-          setTimeout ->
-            dfd.resolve('test')
-          , 100
-          dfd.promise()
-      }
+          new Promise (resolve) ->
+            setTimeout ->
+              resolve('test')
+            , 100
 
   test "returns a function", ->
     ok typeof ModerationActions.selectProvisionalGrade(1) == 'function'
@@ -349,7 +341,7 @@ define [
         student_id: 1
         selected_provisional_grade_id: 42
 
-    fakePost = sinon.stub(@client, 'put').returns(whenJS(fakeResponse))
+    fakePost = sinon.stub(@client, 'put').returns(Promise.resolve(fakeResponse))
     ModerationActions.selectProvisionalGrade(42, @client)((action) ->
       ok fakePost.calledWith(fakeUrl+"/"+ "42"+"/select"), 'called with the correct params'
       equal action.type, ModerationActions.SELECT_MARK, 'type matches'
@@ -370,7 +362,7 @@ define [
     fakeResponse =
       status: 404
 
-    fakePost = sinon.stub(@client, 'put').returns(whenJS(fakeResponse))
+    fakePost = sinon.stub(@client, 'put').returns(Promise.resolve(fakeResponse))
     ModerationActions.selectProvisionalGrade(42, @client)((action) ->
       ok fakePost.calledWith(fakeUrl+"/"+ "42"+"/select"), 'called with the correct params'
       equal action.type, ModerationActions.SELECTING_PROVISIONAL_GRADES_FAILED, 'type matches'
