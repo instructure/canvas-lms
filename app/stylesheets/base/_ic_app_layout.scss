@@ -188,6 +188,7 @@ $ic-left-side-width: $ic-sp*15;
   padding: 0;
   width: $ic-sp*3; height: ($ic-sp*3) - ($ic-sp/2);
   @include overwrite-default-icon-size(22px);
+  i[class*=icon-], i[class^=icon-] { margin-right: 0; }
 }
 
 .ic-app-crumbs {
