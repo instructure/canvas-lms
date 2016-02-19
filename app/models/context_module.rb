@@ -456,7 +456,7 @@ class ContextModule < ActiveRecord::Base
       added_item.content_type = 'ExternalUrl'
       added_item.context_module_id = self.id
       added_item.indent = params[:indent] || 0
-      added_item.workflow_state = 'unpublished'
+      added_item.workflow_state = 'unpublished' if added_item.new_record?
       added_item.save
       added_item
     elsif params[:type] == 'context_external_tool' || params[:type] == 'external_tool' || params[:type] == 'lti/message_handler'
@@ -479,7 +479,7 @@ class ContextModule < ActiveRecord::Base
       }
       added_item.context_module_id = self.id
       added_item.indent = params[:indent] || 0
-      added_item.workflow_state = 'unpublished'
+      added_item.workflow_state = 'unpublished' if added_item.new_record?
       added_item.save
       added_item
     elsif params[:type] == 'context_module_sub_header' || params[:type] == 'sub_header'
@@ -495,7 +495,7 @@ class ContextModule < ActiveRecord::Base
       added_item.content_type = 'ContextModuleSubHeader'
       added_item.context_module_id = self.id
       added_item.indent = params[:indent] || 0
-      added_item.workflow_state = 'unpublished'
+      added_item.workflow_state = 'unpublished' if added_item.new_record?
       added_item.save
       added_item
     else
@@ -511,7 +511,7 @@ class ContextModule < ActiveRecord::Base
       }
       added_item.context_module_id = self.id
       added_item.indent = params[:indent] || 0
-      added_item.workflow_state = workflow_state
+      added_item.workflow_state = workflow_state if added_item.new_record?
       added_item.save
       added_item
     end

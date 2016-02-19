@@ -97,7 +97,7 @@ module Importers
       migration.add_imported_item(item)
       item.name = hash[:title] || hash[:description]
       if hash[:workflow_state] == 'unpublished'
-        item.workflow_state = 'unpublished'
+        item.workflow_state = 'unpublished' if item.new_record? # otherwise leave it alone
       else
         item.workflow_state = 'active'
       end
@@ -121,9 +121,6 @@ module Importers
         end
         item.prerequisites = preqs if preqs.length > 0
       end
-
-      # Clear the old tags to be replaced by new ones
-      item.content_tags.destroy_all
       item.save!
 
       item_map = {}
@@ -132,13 +129,18 @@ module Importers
       items = hash[:items] || []
       items = items.map{|item| self.flatten_item(item, 0)}.flatten
 
+      imported_migration_ids = []
+
       items.each do |tag_hash|
         begin
-          self.add_module_item_from_migration(item, tag_hash, 0, context, item_map, migration)
+          tag = self.add_module_item_from_migration(item, tag_hash, 0, context, item_map, migration)
+          imported_migration_ids << tag.migration_id if tag
         rescue
           migration.add_import_warning(t(:migration_module_item_type, "Module Item"), tag_hash[:title], $!)
         end
       end
+
+      item.content_tags.where.not(:migration_id => imported_migration_ids).destroy_all # clear out missing items afterwards
 
       if hash[:completion_requirements]
         c_reqs = []
@@ -166,11 +168,6 @@ module Importers
       existing_item = context_module.content_tags.where(id: hash[:id]).first if hash[:id].present?
       existing_item ||= context_module.content_tags.where(migration_id: hash[:migration_id]).first if hash[:migration_id]
       existing_item ||= ContentTag.new(:context_module => context_module, :context => context)
-      if hash[:workflow_state] == 'unpublished'
-        existing_item.workflow_state = 'unpublished'
-      else
-        existing_item.workflow_state = 'active'
-      end
       migration.add_imported_item(existing_item)
       existing_item.migration_id = hash[:migration_id]
       hash[:indent] = [hash[:indent] || 0, level].max
@@ -294,7 +291,9 @@ module Importers
         item.migration_id = hash[:migration_id]
         item.new_tab = hash[:new_tab]
         item.position = (context_module.item_migration_position ||= context_module.content_tags.not_deleted.map(&:position).compact.max || 0)
-        item.workflow_state = hash[:workflow_state] if hash[:workflow_state]
+        if hash[:workflow_state] && !['active', 'published'].include?(item.workflow_state)
+          item.workflow_state = hash[:workflow_state]
+        end
         context_module.item_migration_position += 1
         item.save!
       end

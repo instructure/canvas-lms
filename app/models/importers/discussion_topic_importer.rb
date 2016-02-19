@@ -95,7 +95,7 @@ module Importers
       item.last_reply_at   = nil if item.new_record?
 
       if options[:workflow_state].present?
-        item.workflow_state = options[:workflow_state]
+        item.workflow_state = options[:workflow_state] if (options[:workflow_state] != 'unpublished') || item.new_record?
       elsif item.should_not_post_yet
         item.workflow_state = 'post_delayed'
       else

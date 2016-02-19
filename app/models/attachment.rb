@@ -252,7 +252,11 @@ class Attachment < ActiveRecord::Base
     existing ||= self.cloned_item_id ? context.attachments.where(cloned_item_id: self.cloned_item_id).first : nil
     dup ||= Attachment.new
     dup = existing if existing && options[:overwrite]
-    dup.assign_attributes(self.attributes.except(*EXCLUDED_COPY_ATTRIBUTES), :without_protection => true)
+
+    excluded_atts = EXCLUDED_COPY_ATTRIBUTES
+    excluded_atts += ["locked", "hidden"] if dup == existing
+    dup.assign_attributes(self.attributes.except(*excluded_atts), :without_protection => true)
+
     dup.write_attribute(:filename, self.filename)
     # avoid cycles (a -> b -> a) and self-references (a -> a) in root_attachment_id pointers
     if dup.new_record? || ![self.id, self.root_attachment_id].include?(dup.id)
