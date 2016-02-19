@@ -135,6 +135,12 @@ module CustomWaitMethods
     val
   end
 
+  # alias for Selenium::WebDriver::Wait.new(opts).until { ... }, but wait 10 seconds by default
+  def wait_until(opts = {})
+    opts.reverse_merge!(timeout: 10)
+    Selenium::WebDriver::Wait.new(opts).until { yield }
+  end
+
   # pass in an Element pointing to the textarea that is tinified.
   def wait_for_tiny(element)
     # TODO: Better to wait for an event from tiny?
