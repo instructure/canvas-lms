@@ -446,7 +446,7 @@ h2.subject {
       width: 100%;
 
       &:before {
-        font-size: 120px;
+        @include fontSize(120px);
       }
     }
   }
