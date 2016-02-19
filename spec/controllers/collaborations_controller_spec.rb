@@ -168,23 +168,48 @@ describe CollaborationsController do
       expect(Collaboration.find(assigns[:collaboration].id)).to be_is_a(EtherpadCollaboration)
     end
 
-    it "should create a collaboration using content-item" do
-      user_session(@teacher)
-      contentItems = [
+    context "content_items" do
+
+      let(:content_items) do
+        [
           {
-              title: 'my collab',
-              text:'collab description',
-              url: 'http://example.invalid/test'
+            title: 'my collab',
+            text: 'collab description',
+            url: 'http://example.invalid/test'
           }
-      ]
-      post 'create', :course_id => @course.id, :contentItems => contentItems.to_json
-      collaboration = Collaboration.find(assigns[:collaboration].id)
-      expect(assigns[:collaboration]).not_to be_nil
-      expect(assigns[:collaboration].class).to eql(ExternalToolCollaboration)
-      expect(collaboration).to be_is_a(ExternalToolCollaboration)
-      expect(collaboration.title).to eq contentItems.first[:title]
-      expect(collaboration.description).to eq contentItems.first[:text]
-      expect(collaboration.url).to include "retrieve?display=borderless&url=http%3A%2F%2Fexample.invalid%2Ftest"
+        ]
+      end
+
+      it "should create a collaboration using content-item" do
+        user_session(@teacher)
+
+        post 'create', :course_id => @course.id, :contentItems => content_items.to_json
+        collaboration = Collaboration.find(assigns[:collaboration].id)
+        expect(assigns[:collaboration]).not_to be_nil
+        expect(assigns[:collaboration].class).to eql(ExternalToolCollaboration)
+        expect(collaboration).to be_is_a(ExternalToolCollaboration)
+        expect(collaboration.title).to eq content_items.first[:title]
+        expect(collaboration.description).to eq content_items.first[:text]
+        expect(collaboration.url).to include "retrieve?display=borderless&url=http%3A%2F%2Fexample.invalid%2Ftest"
+      end
+
+      it "should callback on success" do
+        user_session(@teacher)
+        content_item_util_stub = mock('ContentItemUtil')
+        content_item_util_stub.expects(:success_callback)
+        Lti::ContentItemUtil.stubs(:new).returns(content_item_util_stub)
+        post 'create', :course_id => @course.id, :contentItems => content_items.to_json
+      end
+
+      it "should callback on failure" do
+        user_session(@teacher)
+        Collaboration.any_instance.expects(:save).returns(false)
+        content_item_util_stub = mock('ContentItemUtil')
+        content_item_util_stub.expects(:failure_callback)
+        Lti::ContentItemUtil.stubs(:new).returns(content_item_util_stub)
+        post 'create', :course_id => @course.id, :contentItems => content_items.to_json
+      end
+
     end
 
   end
