@@ -97,7 +97,7 @@ $page-dark: #ebeff2;
   color: $font-color;
 
   &:before {
-    font-size: 28px;
+    @include fontSize(28px);
   }
 }
 
