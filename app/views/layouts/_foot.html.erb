@@ -43,3 +43,22 @@
   check();
 }).call(this);
 </script>
+
+<div id="bz-tz-warning" style="display: none;">
+  We noticed that your current timezone doesn't match your <a href="/profile/settings">settings</a>. Consider changing your <a href="/profile/settings">settings</a> so your due dates show the right time!
+  <button type="button" onclick="localStorage.skipTzWarning = 'yes'; this.parentNode.style.display = 'none';">Don't tell me again</button>
+</div>
+
+<script>
+  if(ENV["TIMEZONE_OFFSET"] && localStorage.skipTzWarning != "yes") {
+    // JS gives minutes, Rails gives seconds, and they come from other directions
+    // so the negative and divide make them match up
+    var rails_tz = -ENV["TIMEZONE_OFFSET"] / 60;
+    var offset = new Date().getTimezoneOffset();
+    if(rails_tz != offset) {
+      var t = document.getElementById("bz-tz-warning");
+      if(t)
+        t.style.display = "";
+    }
+  }
+</script>
