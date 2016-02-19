@@ -305,8 +305,8 @@ class GradeSummaryPresenter
       next -1 if a_tags.present? && b_tags.empty?
       next 1 if a_tags.empty? && b_tags.present?
       # if both assignments do not belong to a module, compare by
-      # assignment position
-      next a.position <=> b.position if a_tags.empty? && b_tags.empty?
+      # assignment title
+      next a.title.downcase <=> b.title.downcase if a_tags.empty? && b_tags.empty?
 
       # if both assignments belong to modules, compare the module
       # position of the first module they each belong to
