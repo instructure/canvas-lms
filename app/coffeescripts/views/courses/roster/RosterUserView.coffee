@@ -59,7 +59,10 @@ define [
 
       json.canRemoveUsers = _.all @model.get('enrollments'), (e) -> e.can_be_removed
       json.canResendInvitation = !json.isInactive
-      json.canEditRoles = !(_.any(@model.get('enrollments'), (e) -> (e.type == 'ObserverEnrollment' && e.associated_user_id)))
+
+      if json.canRemoveUsers && !ENV.course.concluded
+        json.canEditRoles = !(_.any(@model.get('enrollments'), (e) -> (e.type == 'ObserverEnrollment' && e.associated_user_id)))
+
       json.canEditSections = !json.isInactive && !(_.isEmpty(@model.sectionEditableEnrollments()))
       json.canLinkStudents = json.isObserver && !ENV.course.concluded
       json.canViewLoginIdColumn = ENV.permissions.manage_admin_users || ENV.permissions.manage_students
