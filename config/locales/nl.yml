@@ -4717,7 +4717,7 @@ nl:
       links: 
         choose_home_page: "Startpagina kiezen"
         course_setup: "Controlelijst voor cursus-setup"
-        drop_course: "Deze cursus neerzetten"
+        drop_course: "Uitschrijven voor deze cursus"
         join_course: "Deze cursus volgen"
         new_announcement: "Nieuwe aankondiging"
         view_course_stream: "Gegevensstroom over de cursus bekijken"
@@ -4726,7 +4726,7 @@ nl:
       send_failed: "Verzoek mislukt. Probeer het opnieuw."
       teachers_only: "Alleen docenten kunnen deze cursus zien totdat deze *gepubliceerd* is"
       titles: 
-        drop_course: "Deze cursus neerzetten"
+        drop_course: "Uitschrijven voor deze cursus"
         recent_feedback: "Recente feedback"
     sidebar_weighting: 
       default_name: Groep
