@@ -44,6 +44,11 @@ describe GradebooksController do
   end
 
   describe "GET 'grade_summary'" do
+    it "redirects to the login page if the user is logged out" do
+      get 'grade_summary', :course_id => @course.id, :id => @student.id
+      expect(response).to redirect_to(login_url)
+    end
+
     it "redirects teacher to gradebook" do
       user_session(@teacher)
       get 'grade_summary', :course_id => @course.id, :id => nil

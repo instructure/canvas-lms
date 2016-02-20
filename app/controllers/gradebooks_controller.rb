@@ -707,8 +707,8 @@ class GradebooksController < ApplicationController
   end
 
   def presenter_options
-    order_preferences = @current_user.preferences[:course_grades_assignment_order]
-    saved_order = order_preferences && order_preferences[@context.id]
+    order_preferences = @current_user && @current_user.preferences[:course_grades_assignment_order]
+    saved_order = order_preferences && @context && order_preferences[@context.id]
     saved_order ? { assignment_order: saved_order } : {}
   end
 end
