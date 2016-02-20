@@ -261,7 +261,7 @@
   }
 
   h2.author {
-    font-size: 13px;
+    @include fontSize(13px);
     font-weight: bold;
     line-height: 20px;
     margin: 0px;
@@ -280,7 +280,7 @@
   }
 
   p {
-    font-size: 12px;
+    @include fontSize($ic-font-size--xsmall);
     line-height: 16px;
     margin-bottom: 8px;
   }
@@ -299,12 +299,12 @@
 
 h3.subject {
  margin: 0px 0px 8px 0;
- font-size: 13px;
+ @include fontSize(13px);
  line-height: 20px;
 }
 
 h2.subject {
-  font-size: 13px;
+  @include fontSize(13px);
   font-weight: bold;
   margin: 0px;
 }
@@ -318,7 +318,7 @@ h2.subject {
 }
 
 .message-count {
-  font-size: 11px;
+  @include fontSize(11px);
   position: absolute;
   right: 13px;
   top: 43%;
@@ -368,7 +368,7 @@ h2.subject {
     color: $ic-color-dark;
     display: inline-block;
     font-family: 'Hiragino Kaku Gothic Pro', 'Lucida Sans Unicode', 'Arial Unicode MS';
-    font-size: 16px;
+    @include fontSize($ic-font-size--medium);
     left: -9999em;
 
     &:hover {
@@ -434,7 +434,7 @@ h2.subject {
   .no-messages {
     color: #bbbbbb;
     display: block;
-    font-size: 20px;
+    @include fontSize(20px);
     font-weight: bold;
     margin-top: 5%;
     text-align: center;

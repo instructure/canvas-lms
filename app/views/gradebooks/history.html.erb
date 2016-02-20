@@ -25,11 +25,11 @@
           <li class='gradebook-history-assignment'>
             <div class="assignment_header">
               <span class="changes ui-state-highlight ui-corner-all"><%= t(:submission_count, "change", :count => assignment.submission_count) %></span>
-              <a href="<%= context_url(@context, :context_assignment_url, assignment.assignment_id) %>" class="assignment-header"><%= assignment.name %></a>
+              <a href="<%= context_url(@context, :context_assignment_url, assignment.assignment_id) %>" class="assignment-header" aria-controls="assignment_<%= assignment.assignment_id %>" aria-expanded="false" aria-label="Grade History Toggle" tabindex="0"><%= assignment.name %></a>
               <span class="ui-icon ui-icon-circle-arrow-s"></span>
               <br class="clear" />
             </div>
-            <div class="assignment_details" style="display:none;">
+            <div id="assignment_<%= assignment.assignment_id %>"class="assignment_details" style="display:none;">
               <% if use_new_styles? %>
                 <table class="ic-Table ic-Table--condensed ic-Table--hover-row ic-Table--striped">
                   <thead>

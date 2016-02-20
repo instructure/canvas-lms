@@ -26,20 +26,6 @@ class Account < ActiveRecord::Base
     :default_storage_quota_mb, :storage_quota, :ip_filters, :default_locale,
     :default_user_storage_quota_mb, :default_group_storage_quota_mb, :integration_id, :brand_config_md5
 
-  EXPORTABLE_ATTRIBUTES = [:id, :name, :created_at, :updated_at, :workflow_state, :deleted_at,
-    :default_time_zone, :external_status, :storage_quota,
-    :enable_user_notes, :allowed_services, :turnitin_pledge, :turnitin_comments,
-    :turnitin_account_id, :allow_sis_import, :sis_source_id, :equella_endpoint,
-    :settings, :uuid, :default_locale, :default_user_storage_quota, :turnitin_host,
-    :created_by_id, :lti_guid, :default_group_storage_quota, :lti_context_id
-  ]
-
-  EXPORTABLE_ASSOCIATIONS = [
-    :courses, :group_categories, :groups, :enrollment_terms, :enrollments, :account_users, :course_sections,
-    :pseudonyms, :attachments, :folders, :active_assignments, :grading_standards, :assessment_question_banks,
-    :roles, :announcements, :alerts, :course_account_associations, :user_account_associations
-  ]
-
   INSTANCE_GUID_SUFFIX = 'canvas-lms'
 
   include Workflow
@@ -179,6 +165,7 @@ class Account < ActiveRecord::Base
   add_setting :fft_registration_url, root_only: true
 
   add_setting :restrict_student_future_view, :boolean => true, :default => false, :inheritable => true
+  add_setting :restrict_student_future_listing, :boolean => true, :default => false, :inheritable => true
   add_setting :restrict_student_past_view, :boolean => true, :default => false, :inheritable => true
 
   add_setting :teachers_can_create_courses, :boolean => true, :root_only => true, :default => false
@@ -675,36 +662,47 @@ class Account < ActiveRecord::Base
   end
 
   def self.account_chain(starting_account_id)
-    return [] unless starting_account_id
+    chain = []
 
-    if ActiveRecord::Base.configurations[Rails.env]['adapter'] == 'postgresql'
-      chain = Shard.shard_for(starting_account_id).activate do
-        Account.find_by_sql(<<-SQL)
-              WITH RECURSIVE t AS (
-                SELECT * FROM #{Account.quoted_table_name} WHERE id=#{Shard.local_id_for(starting_account_id).first}
-                UNION
-                SELECT accounts.* FROM #{Account.quoted_table_name} INNER JOIN t ON accounts.id=t.parent_account_id
-              )
-              SELECT * FROM t
-        SQL
-      end
-    else
-      account = Account.find(starting_account_id)
-      chain = [account]
-      while account.parent_account
-        account = account.parent_account
+    if (starting_account_id.is_a?(Account))
+      chain << starting_account_id
+      starting_account_id = starting_account_id.parent_account_id
+    end
+
+    if starting_account_id
+      if ActiveRecord::Base.configurations[Rails.env]['adapter'] == 'postgresql'
+        chain.concat(Shard.shard_for(starting_account_id).activate do
+          Account.find_by_sql(<<-SQL)
+                WITH RECURSIVE t AS (
+                  SELECT * FROM #{Account.quoted_table_name} WHERE id=#{Shard.local_id_for(starting_account_id).first}
+                  UNION
+                  SELECT accounts.* FROM #{Account.quoted_table_name} INNER JOIN t ON accounts.id=t.parent_account_id
+                )
+                SELECT * FROM t
+          SQL
+        end)
+      else
+        account = Account.find(starting_account_id)
         chain << account
+        while account.parent_account
+          account = account.parent_account
+          chain << account
+        end
       end
     end
     chain
   end
 
-  def account_chain(opts = {})
-    @account_chain ||= [self] + Account.account_chain(self.parent_account_id)
-    results = @account_chain.dup
-    results << self.root_account if !results.map(&:id).include?(self.root_account_id) && !root_account?
-    results << Account.site_admin if opts[:include_site_admin] && !self.site_admin?
-    results
+  def self.add_site_admin_to_chain!(chain)
+    chain << Account.site_admin unless chain.last.site_admin?
+    chain
+  end
+
+  def account_chain(include_site_admin: false)
+    @account_chain ||= Account.account_chain(self)
+    result = @account_chain.dup
+    Account.add_site_admin_to_chain!(result) if include_site_admin
+    result
   end
 
   def account_chain_loop
@@ -776,7 +774,7 @@ class Account < ActiveRecord::Base
   end
 
   def available_custom_account_roles(include_inactive=false)
-    available_custom_roles(include_inactive).for_accounts
+    available_custom_roles(include_inactive).for_accounts.to_a
   end
 
   def available_account_roles(include_inactive=false, user = nil)
@@ -789,7 +787,7 @@ class Account < ActiveRecord::Base
   end
 
   def available_custom_course_roles(include_inactive=false)
-    available_custom_roles(include_inactive).for_courses
+    available_custom_roles(include_inactive).for_courses.to_a
   end
 
   def available_course_roles(include_inactive=false)
@@ -914,7 +912,7 @@ class Account < ActiveRecord::Base
   # returns all account users for this entire account tree
   def all_account_users_for(user)
     raise "must be a root account" unless self.root_account?
-    Shard.partition_by_shard([self, Account.site_admin].uniq) do |accounts|
+    Shard.partition_by_shard(account_chain(include_site_admin: true).uniq) do |accounts|
       next unless user.associated_shards.include?(Shard.current)
       AccountUser.eager_load(:account).where("user_id=? AND (root_account_id IN (?) OR account_id IN (?))", user, accounts, accounts)
     end
@@ -1084,17 +1082,26 @@ class Account < ActiveRecord::Base
       end
     end
 
+    def special_account_list
+      @special_account_list ||= []
+    end
+
     def clear_special_account_cache!(force = false)
       special_account_timed_cache.clear(force)
     end
 
     def define_special_account(key, name = nil)
       name ||= key.to_s.titleize
-      instance_eval <<-RUBY
+      self.special_account_list << key
+      instance_eval <<-RUBY, __FILE__, __LINE__ + 1
         def self.#{key}(force_create = false)
           get_special_account(:#{key}, #{name.inspect}, force_create)
         end
       RUBY
+    end
+
+    def all_special_accounts
+      special_account_list.map { |key| send(key) }
     end
   end
   define_special_account(:default, 'Default Account')

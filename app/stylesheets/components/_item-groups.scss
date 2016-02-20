@@ -193,7 +193,7 @@
 
 .ig-header .name {
   color: #3d454c;
-  font-size: 15px;
+  @include fontSize(15px);
   text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.5);
   font-weight: bold;
 }
@@ -216,7 +216,7 @@
 
   .ig-header-title {
     text-decoration: none;
-    font-size: 15px;
+    @include fontSize(15px);
     font-weight: bold;
     line-height: 20px;
     margin: auto;
@@ -278,12 +278,9 @@
     text-decoration: none;
   }
 
-  .ellipses { 
+  .ellipses {
     @include item-group-ellipses;
   }
-
-  // Handle Firefox white space bug that affects .ellipses class
-  @include firefox-white-space-bug-fix($ic-color-light, $ic-list-item-background--hover);
 
   &:hover {
     background-color: $ic-list-item-background--hover;
@@ -334,6 +331,9 @@
   flex: 1;
   box-sizing: border-box;
   padding-right: $ic-sp;
+  // firefox flex breaks the parent container
+  min-width: 1px;
+
   @include breakpoint(desktop) { flex: 0 0 34%; }
   @include breakpoint(wide) { flex: 0 0 40%; }
   @if $use_new_styles { font-weight: 500; }
@@ -341,10 +341,13 @@
 }
 
 .ig-details {
-  font-size: 11px;
+  @include fontSize(11px);
   flex: 0.66;
   line-height: 1.5;
   box-sizing: border-box;
+  // firefox flex breaks the parent container
+  min-width: 1px;
+
   @include breakpoint(desktop) {
     flex: 1;
     display: flex;
@@ -369,7 +372,7 @@
     margin-right: $ic-sp/2;
     @include breakpoint(desktop) { margin-right: $ic-sp; }
     i[class*=icon-]:before,
-    i[class^=icon-]:before { font-size: 18px; }
+    i[class^=icon-]:before { @include fontSize(18px); }
   }
 }
 
@@ -396,5 +399,5 @@
 
 .ig-text {
   color: #3d454c;
-  font-size: 15px;
+  @include fontSize(15px);
 }

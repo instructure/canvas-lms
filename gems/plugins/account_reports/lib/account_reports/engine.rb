@@ -26,6 +26,7 @@ module AccountReports
       require 'account_reports/report_helper'
       require 'account_reports/sis_exporter'
       require 'account_reports/student_reports'
+      require 'account_reports/lti_reports'
 
       AccountReports.configure_account_report 'Default', {
         'grade_export_csv' => {
@@ -292,6 +293,10 @@ module AccountReports
           :description_partial => true,
           :parameters => {
           }
+        },
+        'lti_report_csv' => {
+          :title => proc { I18n.t('LTI Report') },
+          :description_partial => true
         }
       }
     end

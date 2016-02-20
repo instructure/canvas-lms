@@ -17,7 +17,7 @@ module EpubExports
 
     private
     def courses_without_epub_exports
-      @_courses_without_epub_exports ||= current_user.current_and_concluded_courses
+      @_courses_without_epub_exports ||= current_user.current_and_concluded_courses.to_a
     end
 
     def courses_with_feature_enabled

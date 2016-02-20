@@ -48,12 +48,13 @@ describe "dashboard" do
       due_date = Time.now.utc + 2.days
       @assignment = assignment_model({:due_at => due_date, :course => @course})
       get "/"
-      expect(f('.events_list .event a')).to include_text(@assignment.title)
+      event = f('.events_list .event a')
+      expect(event).to include_text(@assignment.title)
       # use jQuery to get the text since selenium can't figure it out when the elements aren't displayed
-      expect(driver.execute_script("return $('.event a .tooltip_text').text()")).to match(@course.short_name)
+      expect(event).to include_text(@course.short_name)
     end
 
-    it "should display quiz submissions with essay questions as submitted in coming up list", priority: "1", test_id: 216395 do
+    it "should display quiz submissions with essay questions with points in coming up list", priority: "1", test_id: 216395 do
       quiz_with_graded_submission([:question_data => {:id => 31,
                                                       :name => "Quiz Essay Question 1",
                                                       :question_type => 'essay_question',
@@ -70,9 +71,8 @@ describe "dashboard" do
       @assignment.save!
 
       get "/"
-      keep_trying_until { expect(ffj(".events_list .event .tooltip_wrap").size).to be > 0 }
-      driver.execute_script("$('.events_list .event .tooltip_wrap, .events_list .event .tooltip_text').css('visibility', 'visible')")
-      expect(f('.events_list .event .tooltip_wrap')).to include_text 'submitted'
+      keep_trying_until { expect(ffj(".events_list .event-details").size).to be > 0 }
+      expect(f('.events_list .event-details')).to include_text '10 points'
     end
   end
 end

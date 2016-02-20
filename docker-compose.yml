@@ -4,6 +4,16 @@ postgres:
 redis:
   image: redis:2.6
 
+# To add cassandra
+# - Uncomment this configuration
+# - Uncomment cassandra line in 'web' below
+# - Uncomment configuration in config/cassandra.yml
+# - See config/cassandra.yml.example for further setup instructions
+# cassandra:
+#   image: cassandra:2.2
+#   environment:
+#     CASSANDRA_START_RPC: 'true'
+
 consul:
   build: ./docker-compose/consul
 
@@ -37,6 +47,7 @@ web:
     - consul
     - postgres
     - redis
+#    - cassandra
 #    - selenium
     - kinesis
   environment:

@@ -4,8 +4,10 @@ class DropOldSortableNameIndex < ActiveRecord::Migration
   disable_ddl_transaction!
 
   def self.up
-    remove_index "users", :name => "index_users_on_sortable_name_old"
-    remove_index "users", :name => "index_attachments_on_folder_id_and_file_state_and_display_name2"
+    if connection.adapter_name == "PostgreSQL" && connection.extension_installed?(:pg_collkey)
+      remove_index "users", :name => "index_users_on_sortable_name_old"
+      remove_index "attachments", :name => "index_attachments_on_folder_id_and_file_state_and_display_name2"
+    end
   end
 
   def self.down

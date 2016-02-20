@@ -65,21 +65,21 @@
 {{/if}}
 
 {{#if can_move}}
-  <a href="#" style="float:right" class="move_button ui-button ui-widget ui-state-default ui-corner-all" role="button">
-    {{#t}}Move Outcome{{/t}}
-  </a>
-
-  {{#if can_edit}}
-    <a href="#" style="float:right" class="edit_button ui-button ui-widget ui-state-default ui-corner-all" role="button"
-      {{#if assessedInContext}} disabled tabindex="-1" aria-hidden="true" {{/if}}>
-      {{#t "links.edit_outcome"}}Edit Outcome{{/t}}
-    </a>
-  {{/if}}
-
-  {{#if can_remove}}
-    <a href="#" style="float:right" class="delete_button ui-button ui-widget ui-state-default ui-corner-all" role="button"
-      {{#if assessedInContext}} disabled tabindex="-1" aria-hidden="true" {{/if}}>
-      {{#t "links.delete_outcome"}}Delete Outcome{{/t}}
-    </a>
-  {{/if}}
+  <div class="pull-right">
+    {{#if can_remove}}
+      <button class="delete_button ui-button ui-widget ui-state-default ui-corner-all"
+        {{#if assessedInContext}} disabled {{/if}}>
+        {{#t "links.delete_outcome"}}Delete Outcome{{/t}}
+      </button>
+    {{/if}}
+    {{#if can_edit}}
+      <button class="edit_button ui-button ui-widget ui-state-default ui-corner-all"
+        {{#if assessedInContext}} disabled {{/if}}>
+        {{#t "links.edit_outcome"}}Edit Outcome{{/t}}
+      </button>
+    {{/if}}
+    <button class="move_button ui-button ui-widget ui-state-default ui-corner-all">
+      {{#t}}Move Outcome{{/t}}
+    </button>
+  </div>
 {{/if}}

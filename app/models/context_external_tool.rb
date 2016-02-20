@@ -108,13 +108,13 @@ class ContextExternalTool < ActiveRecord::Base
 
   def sync_placements!(placements)
     old_placements = self.context_external_tool_placements.pluck(:placement_type)
-    (placements - old_placements).each do |new_placement|
-      self.context_external_tool_placements.new(:placement_type => new_placement)
-    end
     placements_to_delete = EXTENSION_TYPES.map(&:to_s) - placements
     if placements_to_delete.any?
       self.context_external_tool_placements.where(placement_type: placements_to_delete).delete_all if self.persisted?
-      self.context_external_tool_placements.delete_if{|p| placements_to_delete.include?(p.placement_type)}
+      self.context_external_tool_placements.reload if self.context_external_tool_placements.loaded?
+    end
+    (placements - old_placements).each do |new_placement|
+      self.context_external_tool_placements.new(:placement_type => new_placement)
     end
   end
   private :sync_placements!
@@ -229,8 +229,8 @@ class ContextExternalTool < ActiveRecord::Base
 
     converter = CC::Importer::BLTIConverter.new
     tool_hash = if config_type == 'by_url'
-                  uri = URI.parse(config_url)
-                  raise URI::Error unless uri.host && uri.port
+                  uri = Addressable::URI.parse(config_url)
+                  raise URI::Error unless uri.host
                   converter.retrieve_and_convert_blti_url(config_url)
                 else
                   converter.convert_blti_xml(config_xml)
@@ -365,7 +365,7 @@ class ContextExternalTool < ActiveRecord::Base
   #This aggressively updates the domain on all URLs in this tool
   def change_domain!(new_domain)
     replace_host = lambda do |url, host|
-      uri = URI.parse(url)
+      uri = Addressable::URI.parse(url)
       uri.host = host
       uri.to_s
     end
@@ -389,9 +389,9 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   def self.standardize_url(url)
-    return "" if url.empty?
+    return "" if url.blank?
     url = "http://" + url unless url.match(/:\/\//)
-    res = URI.parse(url).normalize
+    res = Addressable::URI.parse(url).normalize
     res.query = res.query.split(/&/).sort.join('&') if !res.query.blank?
     res.to_s
   end
@@ -435,26 +435,26 @@ class ContextExternalTool < ActiveRecord::Base
       return true if url == standard_url
     elsif standard_url.present?
       if !defined?(@url_params)
-        res = URI.parse(standard_url)
+        res = Addressable::URI.parse(standard_url)
         @url_params = res.query.present? ? res.query.split(/&/) : []
       end
-      res = URI.parse(url).normalize
+      res = Addressable::URI.parse(url).normalize
       res.query = res.query.split(/&/).select{|p| @url_params.include?(p)}.sort.join('&') if res.query.present?
       res.query = nil if res.query.blank?
       res.normalize!
       return true if res.to_s == standard_url
     end
-    host = URI.parse(url).host rescue nil
+    host = Addressable::URI.parse(url).host rescue nil
     !!(host && ('.' + host).match(/\.#{domain}\z/))
   end
 
   def matches_domain?(url)
     url = ContextExternalTool.standardize_url(url)
-    host = URI.parse(url).host
+    host = Addressable::URI.parse(url).host
     if domain
       domain == host
     elsif standard_url
-      URI.parse(standard_url).host == host
+      Addressable::URI.parse(standard_url).host == host
     else
       false
     end
@@ -664,7 +664,7 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   def self.global_navigation_tools(root_account, visibility)
-    tools = root_account.context_external_tools.active.having_setting(:global_navigation)
+    tools = root_account.context_external_tools.active.having_setting(:global_navigation).to_a
     if visibility == 'members'
       # reject the admin only tools
       tools.reject!{|tool| tool.global_navigation[:visibility] == 'admins'}

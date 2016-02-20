@@ -17,14 +17,14 @@
 #
 
 class Quizzes::QuizSubmissionEventsController < ApplicationController
-  include Filters::Quizzes
-  include Filters::QuizSubmissions
+  include ::Filters::Quizzes
+  include ::Filters::QuizSubmissions
 
   before_filter :require_user, :require_context
   before_filter :require_quiz, :only => [ :index ]
   before_filter :require_quiz_submission, :only => [ :index ]
 
-  protect_from_forgery :only => [ :index ]
+  protect_from_forgery :only => [ :index ], with: :exception
 
   def index
     if authorized_action(@quiz_submission, @current_user, :view_log)

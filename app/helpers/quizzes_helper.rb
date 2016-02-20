@@ -451,6 +451,7 @@ module QuizzesHelper
     question = hash_get(options, :question)
     answers  = hash_get(options, :answers)
     answer_list = hash_get(options, :answer_list)
+    editable = hash_get(options, :editable)
     res      = user_content hash_get(question, :question_text)
     index  = 0
     doc = Nokogiri::HTML.fragment(res)
@@ -464,9 +465,18 @@ module QuizzesHelper
         a = hash_get(answers, question_id)
       end
 
-      # If existing answer is one of the options, select it
-      if opt_tag = s.children.css("option[value='#{a}']").first
-        opt_tag["selected"] = "selected"
+      if editable
+        # If existing answer is one of the options, select it
+        if (opt_tag = s.children.css("option[value='#{a}']").first)
+          opt_tag["selected"] = "selected"
+        end
+      else
+        # If existing answer is one of the options, replace it with a span
+        if (opt_tag = s.children.css("option[value='#{a}']").first)
+          s.replace(<<-HTML)
+            <span>#{opt_tag.content}</span>
+          HTML
+        end
       end
     end
     doc.to_s.html_safe

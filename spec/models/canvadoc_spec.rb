@@ -43,13 +43,13 @@ describe 'Canvadoc' do
   describe "#upload" do
     it "uploads" do
       @doc.upload
-      expect(@doc.document_id).to eq 123456
+      expect(@doc.document_id.to_s).to eq "123456"
     end
 
     it "doesn't upload again" do
       @doc.update_attribute :document_id, 999999
       @doc.upload
-      expect(@doc.document_id).to eq 999999  # not 123456
+      expect(@doc.document_id.to_s).to eq "999999"  # not 123456
     end
 
     it "doesn't upload when canvadocs isn't configured" do

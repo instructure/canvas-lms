@@ -12,7 +12,8 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
     class_name: 'ModeratedGrading::Selection',
     foreign_key: :selected_provisional_grade_id
 
-  belongs_to :source_provisional_grade, :class_name => 'ModeratedGrading::ProvisionalGrade'
+  belongs_to :source_provisional_grade,
+    class_name: 'ModeratedGrading::ProvisionalGrade'
 
   validates :scorer, presence: true
   validates :submission, presence: true
@@ -107,6 +108,10 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
       :crocodoc_url => attachment.crocodoc_available? &&
                        attachment.crocodoc_url(user, annotators.map(&:crocodoc_id!))
     }
+  end
+
+  def comments_for(_)
+    submission_comments
   end
 
   private

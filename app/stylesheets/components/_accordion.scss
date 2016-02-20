@@ -124,7 +124,7 @@ Simply add the **.ui-accordion--mini** class to the parent **.accordion** elemen
       transition: color 0.2s;
       padding: $ic-sp/2 $ic-sp;
       font-weight: normal;
-      font-size: 16px;
+      @include fontSize($ic-font-size--medium);
       text-shadow: none;
       line-height: 1;
       outline: none;
@@ -140,7 +140,7 @@ Simply add the **.ui-accordion--mini** class to the parent **.accordion** elemen
       padding: 0;
       border-radius: $ic-border-radius/2;
       a {
-        font-size: 13px;
+        @include fontSize(13px);
         padding: $ic-sp/2 $ic-sp $ic-sp/2 $ic-sp*2;
 
       }
@@ -149,7 +149,7 @@ Simply add the **.ui-accordion--mini** class to the parent **.accordion** elemen
     .ui-accordion-content {
       &.ui-accordion-content-active {
         border-bottom-left-radius: $ic-border-radius/2;
-        border-bottom-right-radius: $ic-border-radius/2;  
+        border-bottom-right-radius: $ic-border-radius/2;
       }
     } 
   }

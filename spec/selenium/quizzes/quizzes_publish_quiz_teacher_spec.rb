@@ -27,7 +27,15 @@ describe 'publishing a quiz' do
       end
 
       context 'after the ajax calls finish' do
-        before(:each) { wait_for_ajaximations }
+        before(:each) do
+          wait_for_ajaximations
+          wait = Selenium::WebDriver::Wait.new(timeout: 5)
+          wait.until do
+            f('#quiz-publish-link').present? &&
+            f('#quiz-publish-link').text.present? &&
+            f('#quiz-publish-link').text.strip!.split("\n") != []
+          end
+        end
 
         it 'changes the button\'s text to \'Published\'', priority: "1", test_id: 140649 do
           driver.mouse.move_to f('#footer')

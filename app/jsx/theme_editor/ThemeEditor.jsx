@@ -358,15 +358,27 @@ define([
                   { this.props.allowGlobalIncludes ?
                     <div id="te-upload-panel" className="Theme__editor-tabs_panel">
                       <div className="Theme__editor-upload-overrides">
+                        <div className="Theme__editor-upload-warning">
+                          <div className="Theme__editor-upload-warning_icon">
+                            <i className="icon-warning" />
+                          </div>
+                          <div>
+                            <p className="Theme__editor-upload-warning_text-emphasis">
+                              Custom CSS and Javascript may cause accessibility issues or conflicts with future Canvas updates!
+                            </p>
+                            <p>Before implementing custom CSS or Javascript, please refer to <a href="https://community.canvaslms.com/docs/DOC-3010" target="_blank"> our documentation</a>.
+                            </p>
+                          </div>
+                        </div>
 
                         <div className="Theme__editor-upload-overrides_header">
-                          { I18n.t('Upload CSS and JavaScript files to include on all page loads for your account') }
+                          { I18n.t('File(s) will be included on all pages in the Canvas desktop application.') }
                         </div>
 
                         <div className="Theme__editor-upload-overrides_form">
 
                           <ThemeEditorFileUpload
-                            label={I18n.t('CSS')}
+                            label={I18n.t('CSS file')}
                             accept=".css"
                             name="css_overrides"
                             currentValue={this.props.brandConfig.css_overrides}
@@ -375,7 +387,7 @@ define([
                           />
 
                           <ThemeEditorFileUpload
-                            label={I18n.t('JavaScript')}
+                            label={I18n.t('JavaScript file')}
                             accept=".js"
                             name="js_overrides"
                             currentValue={this.props.brandConfig.js_overrides}
@@ -388,13 +400,13 @@ define([
                       <div className="Theme__editor-upload-overrides">
 
                         <div className="Theme__editor-upload-overrides_header">
-                          { I18n.t('CSS and JavaScript to load when user content is displayed in the canvas iOS or Android native apps') }
+                          { I18n.t('File(s) will be included when user content is displayed within Canvas iOS or Android apps.') }
                         </div>
 
                         <div className="Theme__editor-upload-overrides_form">
 
                           <ThemeEditorFileUpload
-                            label={I18n.t('CSS')}
+                            label={I18n.t('Mobile CSS file')}
                             accept=".css"
                             name="mobile_css_overrides"
                             currentValue={this.props.brandConfig.mobile_css_overrides}
@@ -403,7 +415,7 @@ define([
                           />
 
                           <ThemeEditorFileUpload
-                            label={I18n.t('JavaScript')}
+                            label={I18n.t('Mobile JavaScript file')}
                             accept=".js"
                             name="mobile_js_overrides"
                             currentValue={this.props.brandConfig.mobile_js_overrides}

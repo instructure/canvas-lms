@@ -72,7 +72,7 @@
 #
 class Quizzes::QuizGroupsController < ApplicationController
   include Api::V1::QuizGroup
-  include Filters::Quizzes
+  include ::Filters::Quizzes
 
   before_filter :require_context, :require_quiz
 

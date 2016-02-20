@@ -17,18 +17,18 @@
 
 .outcome-details, .outcome-details-dialog {
   .title {
-    font-size: 14px;
+    @include fontSize(14px);
     padding-bottom: 10px;
     border-bottom: 1px solid #b0afaf;
     margin-bottom: 10px;
   }
   .chart {
-    font-size: 11px;
+    @include fontSize(11px);
     text-align: center;
     height: 150px
   }
   .line-graph {
-    font-size: 10px;
+    @include fontSize(10px);
     .guides {
       .tick {
         stroke: lightgrey;

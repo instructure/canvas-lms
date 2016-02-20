@@ -34,7 +34,10 @@ class ApplicationController < ActionController::Base
   helper :all
 
   include AuthenticationMethods
-  protect_from_forgery
+
+  include Canvas::RequestForgeryProtection
+  protect_from_forgery with: :exception
+
   # load_user checks masquerading permissions, so this needs to be cleared first
   before_filter :clear_cached_contexts
   prepend_before_filter :load_user, :load_account
@@ -249,13 +252,13 @@ class ApplicationController < ActionController::Base
 
   protected
 
-  # we track the cost of each request in Canvas::RequestThrottle in order
+  # we track the cost of each request in RequestThrottle in order
   # to rate limit clients that are abusing the API.  Some actions consume
   # time or resources that are not well represented by simple time/cpu
   # benchmarks, so you can use this method to increase the perceived cost
   # of a request by an arbitrary amount.  For an anchor, rate limiting
   # kicks in when a user has exceeded 600 arbitrary units of cost (it's
-  # a leaky bucket, go see Canvas::RequestThrottle), so using an 'amount'
+  # a leaky bucket, go see RequestThrottle), so using an 'amount'
   # param of 600, for example, would max out the bucket immediately
   def increment_request_cost(amount)
     current_cost = request.env['extra-request-cost'] || 0
@@ -411,7 +414,7 @@ class ApplicationController < ActionController::Base
   # the vendor/plugins/adheres_to_policy plugin.  If authorized,
   # returns true, otherwise renders unauthorized messages and returns
   # false.  To be used as follows:
-  # if authorized_action(object, @current_user, session, :update)
+  # if authorized_action(object, @current_user, :update)
   #   render
   # end
   def authorized_action(object, actor, rights)
@@ -698,7 +701,7 @@ class ApplicationController < ActionController::Base
     if @just_viewing_one_course
 
       # fake assignment used for checking if the @current_user can read unpublished assignments
-      fake = @context.assignments.scope.new
+      fake = @context.assignments.temp_record
       fake.workflow_state = 'unpublished'
 
       assignment_scope = :active_assignments
@@ -708,7 +711,7 @@ class ApplicationController < ActionController::Base
       end
 
       @groups = @context.assignment_groups.active
-      @assignments = AssignmentGroup.visible_assignments(@current_user, @context, @groups)
+      @assignments = AssignmentGroup.visible_assignments(@current_user, @context, @groups).to_a
     else
       assignments_and_groups = Shard.partition_by_shard(@courses) do |courses|
         [[Assignment.published.for_course(courses).all,
@@ -1145,6 +1148,10 @@ class ApplicationController < ActionController::Base
     if request.xhr? || request.format == :text
       message = exception.xhr_message if exception.respond_to?(:xhr_message)
       render_xhr_exception(error, message, status, status_code)
+    elsif exception.is_a?(ActionController::InvalidAuthenticityToken) && cookies[:_csrf_token].blank?
+      redirect_to login_url(needs_cookies: '1')
+      reset_session
+      return
     else
       request.format = :html
       template = exception.error_template if exception.respond_to?(:error_template)
@@ -1237,35 +1244,6 @@ class ApplicationController < ActionController::Base
     session[:claimed_course_uuids].uniq!
     session.delete(:claim_course_uuid)
     session.delete(:course_uuid)
-  end
-
-  # Had to overwrite this method so we can say you don't need to have an
-  # authenticity_token if the request is coming from an api request.
-  # we also check for the session token not being set at all here, to catch
-  # those who have cookies disabled.
-  def verify_authenticity_token
-    token = params[request_forgery_protection_token].try(:gsub, " ", "+")
-    params[request_forgery_protection_token] = token if token
-
-    if    protect_against_forgery? &&
-          !request.get? &&
-          !api_request?
-      if cookies[:_csrf_token].nil? && session.empty? && !request.xhr? && !api_request?
-        # the session should have the token stored by now, but doesn't? sounds
-        # like the user doesn't have cookies enabled.
-        redirect_to(login_url(:needs_cookies => '1'))
-        return false
-      else
-        raise(ActionController::InvalidAuthenticityToken) unless CanvasBreachMitigation::MaskingSecrets.valid_authenticity_token?(session, cookies, form_authenticity_param) ||
-          CanvasBreachMitigation::MaskingSecrets.valid_authenticity_token?(session, cookies, request.headers['X-CSRF-Token'])
-      end
-    end
-    Rails.logger.warn("developer_key id: #{@developer_key.id}") if @developer_key
-    return true
-  end
-
-  def form_authenticity_token
-    masked_authenticity_token
   end
 
   API_REQUEST_REGEX = %r{\A/api/}

@@ -328,38 +328,5 @@
     </div>
   <% end %>
 
-  <% content_for :keyboard_navigation do %>
-    <ul class="navigation_list" tabindex="-1">
-      <li>
-        <span class="keycode">j</span>
-        <span class="colon">:</span>
-        <span class="description"><%= t :next_message, "Next Message" %></span>
-      </li>
-      <li>
-        <span class="keycode">k</span>
-        <span class="colon">:</span>
-        <span class="description"><%= t :previous_message, "Previous Message" %></span>
-      </li>
-      <li>
-        <span class="keycode">e</span>
-        <span class="colon">:</span>
-        <span class="description"><%= t :edit_current_message, "Edit Current Message" %></span>
-      </li>
-      <li>
-        <span class="keycode">d</span>
-        <span class="colon">:</span>
-        <span class="description"><%= t :delete_current_message, "Delete Current Message" %></span>
-      </li>
-      <li>
-        <span class="keycode">r</span>
-        <span class="colon">:</span>
-        <span class="description"><%= t :reply_to_message, "Reply to Current Message" %></span>
-      </li>
-      <li>
-        <span class="keycode">n</span>
-        <span class="colon">:</span>
-        <span class="description"><%= t :reply_to_topic, "Reply to Topic" %></span>
-      </li>
-    </ul>
-  <% end %>
+  <div id="keyboard-shortcut-modal"></div>
 <% end %>

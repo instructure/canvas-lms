@@ -26,9 +26,6 @@ class Conversation < ActiveRecord::Base
   belongs_to :context, :polymorphic => true
   validates_inclusion_of :context_type, :allow_nil => true, :in => ['Account', 'Course', 'Group']
 
-  EXPORTABLE_ATTRIBUTES = [:id, :has_attachments, :has_media_objects, :tags, :root_account_ids, :subject, :context_type, :context_id]
-  EXPORTABLE_ASSOCATIONS = [:context]
-
   validates_length_of :subject, :maximum => maximum_string_length, :allow_nil => true
 
   # see also MessageableUser

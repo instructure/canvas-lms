@@ -62,7 +62,7 @@ module AccountReports
         headers << I18n.t('#account_reports.report_header_end_date', 'end date')
         csv << headers
         Shackles.activate(:slave) do
-          @total = courses.count
+          @total = courses.count(:all)
           i = 0
 
           courses.find_each do |c|

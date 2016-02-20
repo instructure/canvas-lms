@@ -195,7 +195,6 @@ describe CoursesController do
         expect(assigns[:current_enrollments]).to be_empty
         expect(assigns[:future_enrollments]).to be_empty
 
-        $bloo = true
         user_session(teacher)
         get 'index'
         expect(response).to be_success

@@ -250,10 +250,29 @@ describe Pseudonym do
     p = Pseudonym.create!(unique_id: 'jt@instructure.com', user: u)
     p.sis_user_id = 'jt'
     expect(p).not_to be_managed_password
-    p.account.authentication_providers.create!(auth_type: 'ldap')
+    ap = p.account.authentication_providers.create!(auth_type: 'ldap')
     expect(p).to be_managed_password
     p.sis_user_id = nil
     expect(p).not_to be_managed_password
+    p.authentication_provider = ap
+    expect(p).to be_managed_password
+    p.sis_user_id = 'jt'
+    p.authentication_provider = p.account.canvas_authentication_provider
+  end
+
+  it "should determine if the password is settable" do
+    u = User.create!
+    p = Pseudonym.create!(unique_id: 'jt@instructure.com', user: u)
+    expect(p).to be_passwordable
+    ap = p.account.authentication_providers.create!(auth_type: 'ldap')
+    expect(p).to be_passwordable
+    p.authentication_provider = ap
+    expect(p).to_not be_passwordable
+    p.account.canvas_authentication_provider.destroy
+    p.authentication_provider = nil
+    p.save!
+    p.reload
+    expect(p).to_not be_passwordable
   end
 
   context "login assertions" do

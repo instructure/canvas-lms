@@ -123,7 +123,7 @@ class GradeChangeAuditApiController < AuditorApiController
   # @argument start_time [DateTime]
   #   The beginning of the time range from which you want events.
   #
-  # @argument end_time [Datetime]
+  # @argument end_time [DateTime]
   #   The end of the time range from which you want events.
   #
   # @returns [GradeChangeEvent]
@@ -148,7 +148,7 @@ class GradeChangeAuditApiController < AuditorApiController
   # @argument start_time [DateTime]
   #   The beginning of the time range from which you want events.
   #
-  # @argument end_time [Datetime]
+  # @argument end_time [DateTime]
   #   The end of the time range from which you want events.
   #
   # @returns [GradeChangeEvent]
@@ -170,7 +170,7 @@ class GradeChangeAuditApiController < AuditorApiController
   # @argument start_time [DateTime]
   #   The beginning of the time range from which you want events.
   #
-  # @argument end_time [Datetime]
+  # @argument end_time [DateTime]
   #   The end of the time range from which you want events.
   #
   # @returns [GradeChangeEvent]
@@ -195,7 +195,7 @@ class GradeChangeAuditApiController < AuditorApiController
   # @argument start_time [DateTime]
   #   The beginning of the time range from which you want events.
   #
-  # @argument end_time [Datetime]
+  # @argument end_time [DateTime]
   #   The end of the time range from which you want events.
   #
   # @returns [GradeChangeEvent]

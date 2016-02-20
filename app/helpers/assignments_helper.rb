@@ -43,12 +43,16 @@ module AssignmentsHelper
     link_to submission_author_name_for(assessment), context_url(context, :context_assignment_submission_url, assignment.id, assessment.asset.user_id), link_options
   end
 
-  def due_at(assignment, user, format='datetime')
+  def due_at(assignment, user)
     if assignment.multiple_due_dates_apply_to?(user)
       multiple_due_dates(assignment)
     else
       assignment = assignment.overridden_for(user)
-      send("#{format}_string", assignment.due_at, :short)
+      if assignment.due_at
+        datetime_string(assignment.due_at)
+      else
+        I18n.t('No Due Date')
+      end
     end
   end
 

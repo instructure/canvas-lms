@@ -916,6 +916,33 @@ describe CoursesController, type: :request do
       end
     end
 
+    context "a designer" do
+      before(:once) do
+        course_with_designer(:course => @course, :active_all => true)
+        @standard = @course.account.grading_standards.create!(:title => "account standard", :standard_data => {:a => {:name => 'A', :value => '95'}, :b => {:name => 'B', :value => '80'}, :f => {:name => 'F', :value => ''}})
+      end
+
+      it "should require :manage_grades rights if the grading standard is changing" do
+        json = api_call_as_user(@designer, :put, @path, @params, { :course => { :grading_standard_id => @standard.id, :apply_assignment_group_weights => true } }, {}, { :expected_status => 401 })
+      end
+
+      it "should not require :manage_grades rights if the grading standard is not changing" do
+        @course.grading_standard = @standard
+        @course.save!
+        json = api_call_as_user(@designer, :put, @path, @params, :course => { :grading_standard_id => @standard.id, :apply_assignment_group_weights => true })
+        @course.reload
+        expect(@course.apply_group_weights?).to eq true
+        expect(@course.grading_standard).to eq @standard
+      end
+
+      it "should not require :manage_grades rights if the grading standard isn't changing (null)" do
+        json = api_call_as_user(@designer, :put, @path, @params, :course => { :grading_standard_id => nil, :apply_assignment_group_weights => true })
+        @course.reload
+        expect(@course.apply_group_weights?).to eq true
+        expect(@course.grading_standard).to be_nil
+      end
+    end
+
     context "a teacher" do
       before :once do
         user
@@ -1416,7 +1443,8 @@ describe CoursesController, type: :request do
           'current_period_computed_final_score',
           'current_period_computed_current_grade',
           'current_period_computed_final_grade',
-          'current_grading_period_title' ]
+          'current_grading_period_title',
+          'current_grading_period_id' ]
       end
 
       before(:once) do
@@ -1429,7 +1457,7 @@ describe CoursesController, type: :request do
       "and 'current_grading_period_scores' are requested" do
         json_response = courses_api_index_call(includes: ['total_scores', 'current_grading_period_scores'])
         enrollment_json = enrollment(json_response)
-        expect(enrollment_json).to include *grading_period_keys
+        expect(enrollment_json).to include(*grading_period_keys)
         current_grading_period_title = 'Course Period 2: current period'
         expect(enrollment_json['current_grading_period_title']).to eq(current_grading_period_title)
       end
@@ -1438,7 +1466,7 @@ describe CoursesController, type: :request do
       "not requested, even if 'current_grading_period_scores' are requested" do
         json_response = courses_api_index_call(includes: ['current_grading_period_scores'])
         enrollment_json = enrollment(json_response)
-        expect(enrollment_json).to_not include *grading_period_keys
+        expect(enrollment_json).to_not include(*grading_period_keys)
       end
 
       it "does not include current grading period scores if final grades are hidden, " \
@@ -1447,7 +1475,7 @@ describe CoursesController, type: :request do
         @course2.save
         json_response = courses_api_index_call(includes: ['total_scores', 'current_grading_period_scores'])
         enrollment_json = enrollment(json_response)
-        expect(enrollment_json).to_not include *grading_period_keys
+        expect(enrollment_json).to_not include(*grading_period_keys)
       end
 
       it "returns true for 'multiple_grading_periods_enabled' if the course has Multiple Grading Periods enabled" do

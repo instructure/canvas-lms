@@ -117,6 +117,12 @@ Rails.configuration.after_initialize do
     end
   end
 
+  if NotificationFailureProcessor.enabled?
+    Delayed::Periodic.cron 'NotificationFailureProcessor.process', '*/5 * * * *' do
+      NotificationFailureProcessor.process
+    end
+  end
+
   Delayed::Periodic.cron 'Quizzes::QuizSubmissionEventPartitioner.process', '0 0 * * *' do
     with_each_shard_by_database(Quizzes::QuizSubmissionEventPartitioner, :process)
   end

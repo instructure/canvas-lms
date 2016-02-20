@@ -22,7 +22,7 @@ describe "AddManageRubricsPermission" do
 
     AddManageRubricsPermission.up
 
-    new_role_overrides = RoleOverride.find(:all, :conditions => {:permission => 'manage_rubrics'})
+    new_role_overrides = RoleOverride.where(:permission => 'manage_rubrics').to_a
 
     expect(role_overrides.count).to eq new_role_overrides.count
     role_overrides.each do |old_role_override|

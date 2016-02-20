@@ -41,13 +41,6 @@ class Folder < ActiveRecord::Base
   has_many :sub_folders, :class_name => "Folder", :foreign_key => "parent_folder_id", :dependent => :destroy
   has_many :active_sub_folders, -> { where("folders.workflow_state<>'deleted'") }, class_name: "Folder", foreign_key: "parent_folder_id", dependent: :destroy
 
-  EXPORTABLE_ATTRIBUTES = [
-    :id, :name, :full_name, :context_id, :context_type, :parent_folder_id, :workflow_state, :created_at, :updated_at, :deleted_at, :locked,
-    :lock_at, :unlock_at, :last_lock_at, :last_unlock_at, :cloned_item_id, :position
-  ]
-
-  EXPORTABLE_ASSOCIATIONS = [:context, :cloned_item, :parent_folder, :file_attachments, :sub_folders]
-
   acts_as_list :scope => :parent_folder
 
   before_save :infer_full_name

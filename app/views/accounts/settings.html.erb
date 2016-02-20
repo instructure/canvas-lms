@@ -187,12 +187,12 @@ TEXT
             <% end %>
             <% unless @account.site_admin? %>
               <%= f.fields_for :settings do |settings| %>
-                <%= settings.fields_for :restrict_student_past_view do |r| %>
-                  <% hash = @account.restrict_student_past_view %>
+                <%= settings.fields_for :restrict_student_future_view do |r| %>
+                  <% hash = @account.restrict_student_future_view %>
                   <% disabled = hash[:locked] && hash[:inherited] %>
                   <tr>
                     <td colspan="2"><%= r.check_box :value, :checked => hash[:value], :disabled => disabled %>
-                      <%= r.label :restrict_student_past_view, :en => "Restrict students from viewing courses after end date" %>
+                      <%= r.label :restrict_student_future_view, :en => "Restrict students from accessing courses before start date" %>
                     </td>
                   </tr>
                   <% unless disabled %>
@@ -205,12 +205,30 @@ TEXT
                   <% end %>
                 <% end %>
 
-                <%= settings.fields_for :restrict_student_future_view do |r| %>
-                  <% hash = @account.restrict_student_future_view %>
+                <%= settings.fields_for :restrict_student_future_listing do |r| %>
+                  <% hash = @account.restrict_student_future_listing %>
+                  <% disabled = hash[:locked] && hash[:inherited] %>
+                  <tr class="future_listing">
+                    <td colspan="2"><%= r.check_box :value, :checked => hash[:value], :disabled => disabled %>
+                      <%= r.label :restrict_student_future_listing, :en => "Restrict students from viewing future courses in enrollments list" %>
+                    </td>
+                  </tr>
+                  <% unless disabled %>
+                    <tr class="future_listing">
+                      <td colspan="2" class="sub_checkbox">
+                        <%= r.check_box :locked, :checked => hash[:locked] %>
+                        <%= r.label :locked, t("Lock this setting for sub-accounts") %>
+                      </td>
+                    </tr>
+                  <% end %>
+                <% end %>
+
+                <%= settings.fields_for :restrict_student_past_view do |r| %>
+                  <% hash = @account.restrict_student_past_view %>
                   <% disabled = hash[:locked] && hash[:inherited] %>
                   <tr>
                     <td colspan="2"><%= r.check_box :value, :checked => hash[:value], :disabled => disabled %>
-                      <%= r.label :restrict_student_future_view, :en => "Restrict students from viewing courses before start date" %>
+                      <%= r.label :restrict_student_past_view, :en => "Restrict students from accessing courses after end date" %>
                     </td>
                   </tr>
                   <% unless disabled %>
@@ -227,7 +245,7 @@ TEXT
           </table>
         </fieldset>
 
-        <%= render :partial => 'additional_settings' %>
+        <%= render partial: 'additional_settings', locals: { f: f } %>
 
         <% if !@account.site_admin? &&
                @account.root_account? &&
@@ -318,7 +336,7 @@ TEXT
                   <% if use_new_styles? %>
                     <div id="global_includes_warning_message" class="account_settings__help-text">
                       <%= t do %>
-                      Before using this feature, we recommend trying the <%= link_to t("Theme Editor"), account_theme_editor_path(@account) %> to do any branding. Enabling this feature provides the ability to upload custom JavaScript and CSS files in the Theme Editor. Modifications made with this method may conflict with future changes to the Canvas DOM (eg: element class names or HTML structure) and are therefore not supported. Those using this feature should have advanced understanding of JavaScript and CSS and must maintain their own code.
+                      Before using this feature, we recommend trying the <%= link_to t("Theme Editor"), account_theme_editor_path(@account) %> to do any branding. Enabling this feature provides the ability to upload custom JavaScript and CSS files in the Theme Editor. Modifications made with this method may conflict with future changes to the Canvas DOM (eg: element class names or HTML structure) and are therefore not supported. Also, you need to make sure that whatever modifications you make are accessible to all, including, for example, those using <a href="http://webaim.org/techniques/screenreader/">screen readers</a> and <a href="http://www.w3.org/TR/WCAG20/#visual-audio-contrast-contrast">those</a> <a href="http://webaim.org/blog/wcag-2-0-and-link-colors/">relying</a> on the <a href="https://community.canvaslms.com/search.jspa?q=high+contrast&type=document">high contrast feature</a>. Instructure disclaims any liability for any changes you make. It is your responsibility to ensure they meet <a href="http://webaim.org/resources/evalquickref/">any</a> <a href="http://www.access-board.gov/guidelines-and-standards/communications-and-it/about-the-section-508-standards/section-508-standards#subpart_b">compliance</a> <a href="http://www.w3.org/TR/WCAG20/">standards</a> that may be required in your jurisdiction. Those using this feature should have advanced understanding of JavaScript and CSS and must maintain their own code.
                       <div>
                         <strong>Use at your own risk!</strong>
                       </div>
@@ -453,14 +471,21 @@ TEXT
                   <% hash = @account.sis_default_grade_export %>
                   <% disabled = hash[:locked] && hash[:inherited] %>
                   <tr>
-                    <td colspan="2"><%= r.check_box :value, :checked => hash[:value], :disabled => disabled %>
-                      <%= r.label :sis_default_grade_export, :en => "\"Post Grades to SIS\" checkbox is enabled by default for assignments, graded discussions, and quizzes" %>
-                    </td>
+                    <td colspan="2">
+                      <div class="ic-Checkbox-group">
+                        <div class="ic-Form-control ic-Form-control--checkbox">
+                          <%= r.check_box :value, :checked => hash[:value], :disabled => disabled %>
+                          <label class="ic-Label" for="account_settings_sis_default_grade_export_value" />
+                          <%= t("\"Post Grades to SIS\" checkbox is enabled by default for assignments, graded discussions, and quizzes") %>
+                        </label>
+                      </div>
+                    </div>
+                  </td>
                   </tr>
                   <% unless disabled %>
                     <tr>
                       <td colspan="2" class="sub_checkbox">
-                        <%= r.check_box :locked, :checked => hash[:locked] %>
+                        <%= r.check_box :locked, :checked => hash[:locked], :id => "account_settings_sis_default_grade_export_locked_for_sub_accounts" %>
                         <%= r.label :locked_for_sub_accounts, :en => "Lock this setting for sub-accounts" %>
                       </td>
                     </tr>

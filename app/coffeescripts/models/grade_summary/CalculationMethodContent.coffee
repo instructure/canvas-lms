@@ -65,7 +65,7 @@ define [
         calculationIntLabel: I18n.t("Last Item: ")
         calculationIntDescription: I18n.t('Between 1% and 99%')
         exampleText: I18n.t(
-          "Most recent result counts as %{calculation_int}% of mastery weight, average of all other results count as %{remainder}% of weight. There must be at least 2 results before a score is returned.", {
+          "Most recent result counts as %{calculation_int}% of mastery weight, average of all other results count as %{remainder}% of weight. If there is only one result, the single score will be returned.", {
             calculation_int: @calculation_int
             remainder: 100 - @calculation_int
           }
@@ -73,17 +73,22 @@ define [
         exampleScores: @exampleScoreIntegers().join(', '),
         exampleResult: @decayingAverage()
       n_mastery:
-        method: I18n.t("Achieve mastery %{count} times", {
+        method: I18n.t({
+          one: "Achieve mastery one time",
+          other: "Achieve mastery %{count} times"
+        }, {
           count: @calculation_int
         })
         friendlyCalculationMethod: I18n.t("n Number of Times")
         calculationIntLabel: I18n.t('Items: ')
-        calculationIntDescription: I18n.t('Between 2 and 5')
+        calculationIntDescription: I18n.t('Between 1 and 5')
         exampleText: I18n.t(
-          "Must achieve mastery at least %{count} times. Scores above mastery will be averaged to calculate final score.", {
-            count: @calculation_int
-          }
-        ),
+          {
+            one: "Must achieve mastery at least one time. Scores above mastery will be averaged to calculate final score.",
+            other: "Must achieve mastery at least %{count} times. Scores above mastery will be averaged to calculate final score."
+          }, {
+              count: @calculation_int
+          }),
         exampleScores: @exampleScoreIntegers().join(', '),
         exampleResult: @nMastery()
       latest:

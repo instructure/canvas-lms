@@ -137,7 +137,7 @@ class SectionsController < ApplicationController
   #
   # @returns Section
   def create
-    if authorized_action(@context.course_sections.scope.new, @current_user, :create)
+    if authorized_action(@context.course_sections.temp_record, @current_user, :create)
       sis_section_id = params[:course_section].try(:delete, :sis_section_id)
       can_manage_sis = api_request? && sis_section_id.present? &&
         @context.root_account.grants_right?(@current_user, session, :manage_sis)

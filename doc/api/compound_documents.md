@@ -30,8 +30,10 @@ Secondary collections should never be considered as ordered or complete.
 
 Example:
 
-    {
-      "meta": {"primaryCollection": "comments"},
-      "comments": [...],
-      "authors": [...]
-    }
+```json
+{
+  "meta": {"primaryCollection": "comments"},
+  "comments": [...],
+  "authors": [...]
+}
+```

@@ -61,25 +61,6 @@ class Submission < ActiveRecord::Base
   has_and_belongs_to_many :canvadocs,
     join_table: :canvadocs_submissions
 
-  EXPORTABLE_ATTRIBUTES = [
-    :id, :body, :url, :attachment_id, :grade, :score, :submitted_at,
-    :assignment_id, :user_id, :submission_type, :workflow_state,
-    :created_at, :updated_at, :group_id, :attachment_ids, :processed,
-    :process_attempts, :grade_matches_current_submission, :published_score,
-    :published_grade, :graded_at, :student_entered_score, :grader_id,
-    :media_comment_id, :media_comment_type, :quiz_submission_id,
-    :submission_comments_count, :has_rubric_assessment, :attempt,
-    :context_code, :media_object_id, :turnitin_data, :has_admin_comment,
-    :cached_due_date, :graded_anonymously
-  ].freeze
-
-  EXPORTABLE_ASSOCIATIONS = [
-    :attachment, :assignment, :user, :grader, :group, :media_object,
-    :student, :submission_comments, :assessment_requests,
-    :assigned_assessments, :quiz_submission, :rubric_assessment,
-    :rubric_assessments, :attachments, :content_participations
-  ].freeze
-
   serialize :turnitin_data, Hash
 
   validates_presence_of :assignment_id, :user_id
@@ -593,12 +574,7 @@ class Submission < ActiveRecord::Base
     self.quiz_submission.reload if self.quiz_submission_id
     self.workflow_state = 'unsubmitted' if self.submitted? && !self.has_submission?
     self.workflow_state = 'graded' if self.grade && self.score && self.grade_matches_current_submission
-
-    if self.submission_type == 'online_quiz' &&
-       self.quiz_submission.try(:latest_submitted_attempt).try(:pending_review?)
-      self.workflow_state = 'pending_review'
-    end
-
+    self.workflow_state = 'pending_review' if self.submission_type == 'online_quiz' && self.quiz_submission.try(:latest_submitted_attempt).try(:pending_review?)
     if self.workflow_state_changed? && self.graded?
       self.graded_at = Time.now
     end
@@ -716,8 +692,7 @@ class Submission < ActiveRecord::Base
   end
 
   def versioned_attachments=(attachments)
-    attachments.compact!
-    @versioned_attachments = Array(attachments).select { |a|
+    @versioned_attachments = Array(attachments).compact.select { |a|
       (a.context_type == 'User' && a.context_id == user_id) ||
       (a.context_type == 'Group' && a.context_id == group_id) ||
       (a.context_type == 'Assignment' && a.context_id == assignment_id && a.available?)

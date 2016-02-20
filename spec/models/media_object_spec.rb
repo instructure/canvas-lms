@@ -98,6 +98,42 @@ describe MediaObject do
     end
   end
 
+  describe '#transcoded_details' do
+    it 'returns the mp3 info' do
+      mo = MediaObject.create!(:context => user, :media_id => "test")
+      expect(mo.transcoded_details).to be_nil
+      mo.data = { extensions: { mov: { id: "t-xxx" } } }
+      expect(mo.transcoded_details).to be_nil
+      mo.data = { extensions: { mp3: { id: "t-yyy" } } }
+      expect(mo.transcoded_details).to eq(id: "t-yyy")
+    end
+
+    it 'returns the mp4 info' do
+      mo = MediaObject.create!(:context => user, :media_id => "test")
+      mo.data = { extensions: { mp4: { id: "t-yyy" } } }
+      expect(mo.transcoded_details).to eq(id: "t-yyy")
+    end
+  end
+
+  describe '#retrieve_details_ensure_codecs' do
+    it "retries later when the transcode isn't available" do
+      Timecop.freeze do
+        mo = MediaObject.create!(:context => user, :media_id => "test")
+        mo.expects(:retrieve_details)
+        mo.expects(:send_at).with(5.minutes.from_now, :retrieve_details_ensure_codecs, 2)
+        mo.retrieve_details_ensure_codecs(1)
+      end
+    end
+
+    it "verifies existence of the transcoded details" do
+      mo = MediaObject.create!(:context => user, :media_id => "test")
+      mo.data = { extensions: { mp4: { id: "t-yyy" } } }
+      mo.expects(:retrieve_details)
+      mo.expects(:send_at).never
+      mo.retrieve_details_ensure_codecs(1)
+    end
+  end
+
   context "permissions" do
     context "captions" do
       it "should allow course admin users to add_captions to userless objects" do

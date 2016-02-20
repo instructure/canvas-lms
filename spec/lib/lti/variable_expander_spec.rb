@@ -453,6 +453,7 @@ module Lti
         end
 
         it 'has substitution for $Person.email.primary' do
+          user.save
           user.email = 'someone@somewhere'
           exp_hash = {test: '$Person.email.primary'}
           subject.expand_variables!(exp_hash)

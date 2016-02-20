@@ -362,6 +362,15 @@ describe "better_file_browsing" do
         set_value f('.UsageRightsSelectBox__select'), 'fair_use'
         expect(f('.UsageRightsSelectBox__creativeCommons')).to eq(nil)
       end
+      it "should publish warning when usage rights is not selected", priority: "2", test_id: 133135 do
+        expect(f('.icon-warning')).to be_present
+        f('.icon-publish').click
+        wait_for_ajaximations
+        f('.form-controls .btn-primary').click
+        keep_trying_until do
+           expect(f('.errorBox')).to be_present
+        end
+      end
     end
 
     before :each do

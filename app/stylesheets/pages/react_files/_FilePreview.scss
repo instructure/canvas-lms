@@ -75,7 +75,7 @@ $preview-html-background: whitesmoke;
   background-color: $preview-bg;
 }
 .ef-file-preview-header-filename {
-  font-size: 18px;
+  @include fontSize(18px);
   padding: 0;
   padding-left: 24px;
   margin: 0;
@@ -112,7 +112,7 @@ $preview-html-background: whitesmoke;
   color: darken($preview-font-color, 45);
   cursor: pointer;
   padding: 0 12px;
-  font-size: 14px;
+  @include fontSize($ic-font-size--small);
   border: none;
   text-align: center;
   align-items: center;

@@ -1,7 +1,8 @@
 @import 'base/environment';
 
 .tree {
-  font-size: 12px;
+  outline: none;
+  @include fontSize(12px);
   &, ul {
     @include reset-list;
   }
@@ -11,6 +12,9 @@
     display: flex;
     white-space: nowrap;
     &.active { background-color: $activeBG; }
+  }
+  li[aria-selected="true"] > a {
+    @include tab-focus();
   }
   .preview-thumbnail-holder {
     display: inline-block;
@@ -23,7 +27,7 @@
     }
   }
   .icon-folder:before {
-    font-size: 11px;
+    @include fontSize(11px);
   }
 
   i[class*=icon-], i[class^=icon-] { color: $ic-font-color-dark }

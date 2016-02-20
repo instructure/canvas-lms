@@ -147,6 +147,7 @@ describe "Files API", type: :request do
     it "should render the response as text/html when in app" do
       s3_storage!
       FilesController.any_instance.stubs(:in_app?).returns(true)
+      FilesController.any_instance.stubs(:verified_request?).returns(true)
 
       AWS::S3::S3Object.any_instance.expects(:head).returns({
                                           :content_type => 'text/plain',
@@ -794,6 +795,8 @@ describe "Files API", type: :request do
 
     it "should omit verifier in-app" do
       FilesController.any_instance.stubs(:in_app?).returns(true)
+      FilesController.any_instance.stubs(:verified_request?).returns(true)
+
       new_params = {:locked => 'true'}
       json = api_call(:put, @file_path, @file_path_options, new_params)
       expect(json['url']).not_to include 'verifier='

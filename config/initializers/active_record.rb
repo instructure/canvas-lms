@@ -7,6 +7,8 @@ class ActiveRecord::Base
 
   class << self
     delegate :distinct_on, to: :all
+
+    attr_accessor :in_migration
   end
 
   def read_or_initialize_attribute(attr_name, default_value)
@@ -427,13 +429,12 @@ class ActiveRecord::Base
     }
   end
 
-  def self.distinct(column, options={})
+  def self.distinct_values(column, include_nil: false)
     column = column.to_s
-    options = {:include_nil => false}.merge(options)
 
     result = if ActiveRecord::Base.configurations[Rails.env]['adapter'] == 'postgresql'
       sql = ''
-      sql << "SELECT NULL AS #{column} WHERE EXISTS (SELECT * FROM #{quoted_table_name} WHERE #{column} IS NULL) UNION ALL (" if options[:include_nil]
+      sql << "SELECT NULL AS #{column} WHERE EXISTS (SELECT * FROM #{quoted_table_name} WHERE #{column} IS NULL) UNION ALL (" if include_nil
       sql << <<-SQL
         WITH RECURSIVE t AS (
           SELECT MIN(#{column}) AS #{column} FROM #{quoted_table_name}
@@ -444,10 +445,10 @@ class ActiveRecord::Base
         )
         SELECT #{column} FROM t WHERE #{column} IS NOT NULL
       SQL
-      sql << ")" if options[:include_nil]
+      sql << ")" if include_nil
       find_by_sql(sql)
     else
-      conditions = "#{column} IS NOT NULL" unless options[:include_nil]
+      conditions = "#{column} IS NOT NULL" unless include_nil
       find(:all, :select => "DISTINCT #{column}", :conditions => conditions, :order => column)
     end
     result.map(&column.to_sym)
@@ -679,7 +680,30 @@ ActiveRecord::Relation.class_eval do
     end
   end
 
+  # determines if someone started a transaction in addition to the spec fixture transaction
+  # impossible to just count open transactions, cause by default it won't nest a transaction
+  # unless specifically requested
+  def in_transaction_in_test?
+    return false unless Rails.env.test?
+    transaction_method = ActiveRecord::ConnectionAdapters::DatabaseStatements.instance_method(:transaction).source_location.first
+    # don't anchor the end of the regex; test_after_commit does an alias_method_chain, thus
+    # changing the name (and source location) of this method
+    transaction_regex = /^#{Regexp.escape(transaction_method)}:\d+:in `transaction/.freeze
+    # transactions due to spec fixtures are _not_in the callstack, so we only need to find 1
+    !!caller.find { |s| s =~ transaction_regex }
+  end
+
   def find_in_batches_with_temp_table(options = {})
+    can_do_it = Rails.env.production? || ActiveRecord::Base.in_migration || in_transaction_in_test?
+    raise "find_in_batches_with_temp_table probably won't work outside a migration
+           and outside a transaction. Unfortunately, it's impossible to automatically
+           determine a better way to do it that will work correctly. You can try
+           switching to slave first (then switching to master if you modify anything
+           inside your loop), wrapping in a transaction (but be wary of locking records
+           for the duration of your query if you do any writes in your loop), or not
+           forcing find_in_batches to use a temp table (avoiding custom selects,
+           group, or order)." unless can_do_it
+
     if options[:pluck]
       pluck = Array(options[:pluck])
       pluck_for_select = pluck.map do |column_name|
@@ -959,6 +983,11 @@ ActiveRecord::Associations::CollectionProxy.class_eval do
       (load_target && target.respond_to?(name, include_private)) ||
       proxy_association.klass.respond_to?(name, include_private)
   end
+
+  def temp_record(*args)
+    # creates a record with attributes like a child record but is not added to the collection for autosaving
+    klass.unscoped.merge(scope).new(*args)
+  end
 end
 
 ActiveRecord::ConnectionAdapters::AbstractAdapter.class_eval do
@@ -1141,41 +1170,20 @@ class ActiveRecord::MigrationProxy
   end
 end
 
+module MigratorCache
+  def migrations(paths)
+    @@migrations_hash ||= {}
+    @@migrations_hash[paths] ||= super
+  end
+
+  def migrations_paths
+    @@migrations_paths ||= [File.join(Rails.root, "db/migrate")]
+  end
+end
+ActiveRecord::Migrator.singleton_class.prepend(MigratorCache)
+
 class ActiveRecord::Migrator
   cattr_accessor :migrated_versions
-
-  def self.migrations_paths
-    @@migration_paths ||= []
-  end
-
-  def migrations
-    @@migrations ||= begin
-      @migrations_path ||= File.join(Rails.root, 'db/migrate')
-      files = ([@migrations_path].compact + self.class.migrations_paths).uniq.
-        map { |p| Dir["#{p}/[0-9]*_*.rb"] }.flatten
-
-      migrations = files.inject([]) do |klasses, file|
-        version, name, scope = file.scan(/([0-9]+)_([_a-z0-9]*)\.?([_a-z0-9]*)?\.rb\z/).first
-
-        raise ActiveRecord::IllegalMigrationNameError.new(file) unless version
-        version = version.to_i
-
-        if klasses.detect { |m| m.version == version }
-          raise ActiveRecord::DuplicateMigrationVersionError.new(version)
-        end
-
-        if klasses.detect { |m| m.name == name.camelize }
-          raise ActiveRecord::DuplicateMigrationNameError.new(name.camelize)
-        end
-
-        klasses << ActiveRecord::MigrationProxy.new(name.camelize, version, file, scope)
-        klasses
-      end
-
-      migrations = migrations.sort_by(&:version)
-      down? ? migrations.reverse : migrations
-    end
-  end
 
   def pending_migrations_with_runnable
     pending_migrations_without_runnable.reject { |m| !m.runnable? }
@@ -1213,6 +1221,7 @@ class ActiveRecord::Migrator
       next if !migration.runnable?
 
       begin
+        old_in_migration, ActiveRecord::Base.in_migration = ActiveRecord::Base.in_migration, true
         if down? && !Rails.env.test? && !$confirmed_migrate_down
           require 'highline'
           if HighLine.new.ask("Revert migration #{migration.name} (#{migration.version}) ? [y/N/a] > ") !~ /^([ya])/i
@@ -1230,6 +1239,8 @@ class ActiveRecord::Migrator
       rescue => e
         canceled_msg = use_transaction?(migration)? "this and " : ""
         raise StandardError, "An error has occurred, #{canceled_msg}all later migrations canceled:\n\n#{e}", e.backtrace
+      ensure
+        ActiveRecord::Base.in_migration = old_in_migration
       end
     end
   end
@@ -1237,6 +1248,9 @@ end
 
 ActiveRecord::Migrator.migrations_paths.concat Dir[Rails.root.join('vendor', 'plugins', '*', 'db', 'migrate')]
 ActiveRecord::Migrator.migrations_paths.concat Dir[Rails.root.join('gems', 'plugins', '*', 'db', 'migrate')]
+
+ActiveRecord::Tasks::DatabaseTasks.migrations_paths = ActiveRecord::Migrator.migrations_paths
+
 ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
   def add_index_with_length_raise(table_name, column_name, options = {})
     unless options[:name].to_s =~ /^temp_/
@@ -1246,7 +1260,7 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
       if index_name.length > index_name_length
         raise(ArgumentError, "Index name '#{index_name}' on table '#{table_name}' is too long; the limit is #{index_name_length} characters.")
       end
-      if index_exists?(table_name, index_name, false)
+      if index_exists?(table_name, column_names, :name => index_name)
         raise(ArgumentError, "Index name '#{index_name}' on table '#{table_name}' already exists.")
       end
     end
@@ -1257,11 +1271,12 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
   # in anticipation of having to re-run migrations due to integrity violations or
   # killing stuff that is holding locks too long
   def add_foreign_key_if_not_exists(from_table, to_table, options = {})
-    column  = options[:column] || "#{to_table.to_s.singularize}_id"
+    options[:column] ||= "#{to_table.to_s.singularize}_id"
+    column = options[:column]
     case self.adapter_name
     when 'SQLite'; return
     when 'PostgreSQL'
-      foreign_key_name = foreign_key_name(from_table, column, options)
+      foreign_key_name = CANVAS_RAILS4_0 ? foreign_key_name(from_table, column, options) : foreign_key_name(from_table, options)
       query = supports_delayed_constraint_validation? ? 'convalidated' : 'conname'
       schema = @config[:use_qualified_names] ? quote(shard.name) : 'current_schema()'
       value = select_value("SELECT #{query} FROM pg_constraint INNER JOIN pg_namespace ON pg_namespace.oid=connamespace WHERE conname='#{foreign_key_name}' AND nspname=#{schema}")
@@ -1292,28 +1307,6 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
     execute("SELECT COUNT(*) FROM #{quote_table_name(table)} WHERE #{column} IS NULL") if open_transactions == 0
     change_column_null table, column, false
   end
-
-  def index_exists_with_options?(table_name, column_name, options = {})
-    if options.is_a?(Hash)
-      index_exists_without_options?(table_name, column_name, options)
-    else
-      # in ActiveRecord 2.3, the second argument is index_name
-      name = column_name.to_s
-      index_exists_without_options?(table_name, nil, {:name => name})
-    end
-  end
-  alias_method_chain :index_exists?, :options
-
-  # in ActiveRecord 3.2, it will raise an ArgumentError if the index doesn't exist
-  def remove_index(table_name, options)
-    name = index_name(table_name, options)
-    unless index_exists?(table_name, nil, {:name => name})
-      @logger.warn("Index name '#{name}' on table '#{table_name}' does not exist. Skipping.")
-      return
-    end
-    remove_index!(table_name, name)
-  end
-
 end
 
 ActiveRecord::Associations::CollectionAssociation.class_eval do
@@ -1435,3 +1428,39 @@ unless CANVAS_RAILS4_0
   end
   ActiveRecord::Base.include(DefineAttributeMethods)
 end
+
+module SkipTouchCallbacks
+  module Base
+    def skip_touch_callbacks(name)
+      if CANVAS_RAILS4_0
+        self.suspend_callbacks("(belongs_to_touch_after_save_or_destroy_for_#{name})") do
+          yield
+        end
+      else
+        @skip_touch_callbacks ||= Set.new
+        if @skip_touch_callbacks.include?(name)
+          yield
+        else
+          @skip_touch_callbacks << name
+          yield
+          @skip_touch_callbacks.delete(name)
+        end
+      end
+    end
+
+    def touch_callbacks_skipped?(name)
+      (@skip_touch_callbacks && @skip_touch_callbacks.include?(name)) ||
+        (self.superclass < ActiveRecord::Base && self.superclass.touch_callbacks_skipped?(name))
+    end
+  end
+
+  module BelongsTo
+    def touch_record(o, foreign_key, name, *args)
+      return if o.class.touch_callbacks_skipped?(name)
+      super
+    end
+  end
+end
+
+ActiveRecord::Base.singleton_class.include(SkipTouchCallbacks::Base)
+ActiveRecord::Associations::Builder::BelongsTo.singleton_class.prepend(SkipTouchCallbacks::BelongsTo) unless CANVAS_RAILS4_0

@@ -22,16 +22,15 @@ describe DataFixup::FixImportedQuestionMediaComments do
 
     broken_link = "<a class=\"media_comment\" href=\"stuff\">stuff</a>"
 
+    #just in case someone tries to run this spec in the past
+    updated_at = ActiveRecord::Base.connection.quote(DateTime.parse('2015-10-16'))
     # deliberately create broken yaml
-    AssessmentQuestion.where(:id => aq).update_all(
-      :question_data => aq['question_data'].to_yaml.gsub(placeholder, broken_link),
-      :updated_at => DateTime.parse('2015-10-16')) #just in case someone tries to run this spec in the past
-    Quizzes::QuizQuestion.where(:id => qq).update_all(
-      :question_data => qq['question_data'].to_yaml.gsub(placeholder, broken_link),
-      :updated_at => DateTime.parse('2015-10-16'))
-    Quizzes::Quiz.where(:id => quiz).update_all(
-      :quiz_data => quiz['quiz_data'].to_yaml.gsub(placeholder, broken_link),
-      :updated_at => DateTime.parse('2015-10-16'))
+    ActiveRecord::Base.connection.execute("UPDATE #{AssessmentQuestion.quoted_table_name} SET updated_at = #{updated_at},
+      question_data = '#{aq['question_data'].to_yaml.gsub(placeholder, broken_link)}' WHERE id = #{aq.id}")
+    ActiveRecord::Base.connection.execute("UPDATE #{Quizzes::QuizQuestion.quoted_table_name} SET updated_at = #{updated_at},
+      question_data = '#{qq['question_data'].to_yaml.gsub(placeholder, broken_link)}' WHERE id = #{qq.id}")
+    ActiveRecord::Base.connection.execute("UPDATE #{Quizzes::Quiz.quoted_table_name} SET updated_at = #{updated_at},
+      quiz_data = '#{quiz['quiz_data'].to_yaml.gsub(placeholder, broken_link)}' WHERE id = #{quiz.id}")
 
     aq = AssessmentQuestion.where(:id => aq).first
     qq = Quizzes::QuizQuestion.where(:id => qq).first

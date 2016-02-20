@@ -192,7 +192,7 @@ class ErrorReport < ActiveRecord::Base
   end
 
   def self.categories
-    distinct('category')
+    distinct_values('category')
   end
 
   # Send the error report based on configuration either via a POST or email to an external location.

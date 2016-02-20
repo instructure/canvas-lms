@@ -516,3 +516,31 @@ define [
         all_grading_periods_totals: true
 
     notOk @hideAggregateColumns.call(self)
+
+  module 'Gradebook#getVisibleGradeGridColumns',
+    setup: ->
+      @getVisibleGradeGridColumns = Gradebook.prototype.getVisibleGradeGridColumns
+      @makeColumnSortFn = Gradebook.prototype.makeColumnSortFn
+      @compareAssignmentPositions = Gradebook.prototype.compareAssignmentPositions
+      @wrapColumnSortFn = Gradebook.prototype.wrapColumnSortFn
+      @allAssignmentColumns = [
+          { object: { assignment_group: { position: 1 }, position: 1, name: "first" } },
+          { object: { assignment_group: { position: 1 }, position: 2, name: "second" } },
+          { object: { assignment_group: { position: 1 }, position: 3, name: "third" } }
+        ]
+      @aggregateColumns = []
+      @parentColumns = []
+      @customColumnDefinitions = -> []
+      spy = @spy(this, 'makeColumnSortFn')
+    teardown: ->
+
+  test 'It sorts columns when there is a sortType', ->
+    @gradebookColumnOrderSettings = { sortType: 'assignment_group' }
+    @getVisibleGradeGridColumns()
+    ok @makeColumnSortFn.calledOnce
+
+
+  test 'It does not sort columns when gradebookColumnOrderSettings is undefined', ->
+    @gradebookColumnOrderSettings = undefined
+    @getVisibleGradeGridColumns()
+    notOk @makeColumnSortFn.called

@@ -609,8 +609,13 @@ define([
       if(limitToOneRubric && $("#rubrics .rubric:visible").length > 0) { return; }
       var $rubric = rubricEditing.addRubric();
       $("#rubrics").append($rubric.show());
-      $rubric.find('.find_rubric_link:visible:first').focus();
       $(".add_rubric_link").hide();
+      var $target = $rubric.find('.find_rubric_link:visible:first');
+      if ($target.length > 0) {
+        $target.focus();
+      } else {
+        $rubric.find(":text:first").focus().select();
+      }
     });
 
     $("#rubric_dialog")
@@ -922,7 +927,7 @@ define([
     }).delegate('.rating', 'mouseout', function(event) {
       $(this).data('hover_offset', null).data('hover_width', null);
     }).delegate('.delete_rating_link', 'click', function(event) {
-      var $target = $(this).closest('tr');
+      var $target = $(this).closest('td').next().find('.edit_rating_link');
       event.preventDefault();
       rubricEditing.hideCriterionAdd($(this).parents(".rubric"));
       $(this).parents(".rating").fadeOut(function() {
@@ -943,7 +948,6 @@ define([
     $(".criterion_points").keydown(function(event) {
       if(event.keyCode == 13) {
         rubricEditing.updateCriterionPoints($(this).parents(".criterion"));
-        $(this).blur();
       }
     }).blur(function(event) {
       rubricEditing.updateCriterionPoints($(this).parents(".criterion"));

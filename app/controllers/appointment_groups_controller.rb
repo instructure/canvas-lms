@@ -93,19 +93,19 @@
 #         },
 #         "reserved_times": {
 #           "description": "The start and end times of slots reserved by the current user as well as the id of the calendar event for the reservation (see include[] argument)",
-#           "example": "[{\"id\"=>987, \"start_at\"=>\"2012-07-20T15:00:00-06:00\", \"end_at\"=>\"2012-07-20T15:00:00-06:00\"}]",
+#           "example": [{"id": 987, "start_at": "2012-07-20T15:00:00-06:00", "end_at": "2012-07-20T15:00:00-06:00"}],
 #           "type": "array",
 #           "items": {"$ref": "Appointment"}
 #         },
 #         "context_codes": {
 #           "description": "The context codes (i.e. courses) this appointment group belongs to. Only people in these courses will be eligible to sign up.",
-#           "example": "[course_123]",
+#           "example": ["course_123"],
 #           "type": "array",
 #           "items": {"type": "string"}
 #         },
 #         "sub_context_codes": {
 #           "description": "The sub-context codes (i.e. course sections and group categories) this appointment group is restricted to",
-#           "example": "[course_section_234]",
+#           "example": ["course_section_234"],
 #           "type": "array",
 #           "items": {"type": "integer"}
 #         },
@@ -133,13 +133,13 @@
 #         },
 #         "appointments": {
 #           "description": "Calendar Events representing the time slots (see include[] argument) Refer to the Calendar Events API for more information",
-#           "example": "[]",
+#           "example": [],
 #           "type": "array",
 #           "items": {"$ref": "CalendarEvent"}
 #         },
 #         "new_appointments": {
 #           "description": "Newly created time slots (same format as appointments above). Only returned in Create/Update responses where new time slots have been added",
-#           "example": "[]",
+#           "example": [],
 #           "type": "array",
 #           "items": {"$ref": "CalendarEvent"}
 #         },

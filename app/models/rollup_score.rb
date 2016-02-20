@@ -18,6 +18,8 @@
 class RollupScore
   include RollupScoreAggregatorHelper
 
+  PRECISION = 2
+
   attr_reader :outcome_results, :outcome, :score, :count, :title, :submitted_at
   def initialize(outcome_results, opts={})
     @outcome_results = outcome_results
@@ -34,7 +36,7 @@ class RollupScore
     # decaying average is default for new outcomes
     case @calculation_method
     when 'decaying_average'
-      return nil if @outcome_results.length < 2
+      return nil if @outcome_results.empty?
       decaying_average
     when 'n_mastery'
       return nil if @outcome_results.length < @calculation_int
@@ -51,7 +53,7 @@ class RollupScore
     cutoff_score = @outcome.rubric_criterion[:mastery_points]
     tmp_scores = scores.compact.delete_if{|score| score < cutoff_score}
     return nil if tmp_scores.length < @calculation_int
-    (tmp_scores.sum.to_f / tmp_scores.size).round(2)
+    (tmp_scores.sum.to_f / tmp_scores.size).round(PRECISION)
   end
 
   def decaying_average
@@ -64,9 +66,12 @@ class RollupScore
     #default grading method with weight of 65 if none selected.
     weight = @calculation_int || 65
     tmp_scores = scores
-    latest_weighted = tmp_scores.pop * (0.01 * weight)
+    latest = tmp_scores.pop
+    return latest.round(PRECISION) if tmp_scores.empty?
+
+    latest_weighted = latest * (0.01 * weight)
     older_avg_weighted = (tmp_scores.sum / tmp_scores.length) * (0.01 * (100 - weight))
-    (latest_weighted + older_avg_weighted).round(2)
+    (latest_weighted + older_avg_weighted).round(PRECISION)
   end
 
 

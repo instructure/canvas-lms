@@ -46,7 +46,7 @@
 .react-select-box-label,
 .react-select-box-option {
   line-height: 16px;
-  font-size: 12px;
+  @include fontSize($ic-font-size--xsmall);
   font-weight: bold;
   color: #7B8E9B;
 }
@@ -92,7 +92,7 @@
   z-index: 1;
   background-color: #7B8E9B;
   border-radius: 100%;
-  font-size: 13px;
+  @include fontSize(13px);
   color: #fff;
   line-height: 1;
   width: 15px;

@@ -362,13 +362,13 @@ table.full_assignment_table {
       font-weight: bold;
       padding-left: 28px;
       background: url(/images/file.png) no-repeat 10px center;
-      font-size: 16px;
+      @include fontSize($ic-font-size--medium);
     }
     &.url_submission {
       font-weight: bold;
       padding-left: 28px;
       background: url(/images/link.png) no-repeat 10px center;
-      font-size: 16px;
+      @include fontSize($ic-font-size--medium);
     }
   }
   &.has_submission {
@@ -382,7 +382,7 @@ table.full_assignment_table {
     .tool {
       display: block;
       padding: 2px 5px;
-      font-size: 14px;
+      @include fontSize($ic-font-size--small);
       img {
         vertical-align: middle;
       }

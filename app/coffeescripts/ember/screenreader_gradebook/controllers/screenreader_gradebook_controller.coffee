@@ -160,9 +160,8 @@ define [
       whitelist                   = ['online_upload','online_text_entry', 'online_url']
       submissionTypes             = @get('selectedAssignment.submission_types')
       submissionTypesOnWhitelist  = _.intersection(submissionTypes, whitelist)
-      hasWhitelistedSubmissions   = submissionTypesOnWhitelist.length == submissionTypes.length
 
-      hasSubmittedSubmissions and hasWhitelistedSubmissions
+      hasSubmittedSubmissions and submissionTypesOnWhitelist != []
     ).property('selectedAssignment')
 
     hideStudentNames: false

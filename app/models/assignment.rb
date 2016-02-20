@@ -44,22 +44,9 @@ class Assignment < ActiveRecord::Base
     :external_tool_tag_attributes, :freeze_on_copy,
     :only_visible_to_overrides, :post_to_sis, :integration_id, :integration_data, :moderated_grading
 
-  EXPORTABLE_ATTRIBUTES = [
-    :id, :title, :description, :due_at, :unlock_at, :lock_at, :points_possible, :min_score, :max_score, :mastery_score, :grading_type,
-    :submission_types, :workflow_state, :context_id, :context_type, :assignment_group_id, :grading_scheme_id, :grading_standard_id, :location, :created_at,
-    :updated_at, :group_category, :submissions_downloads, :peer_review_count, :peer_reviews_due_at, :peer_reviews_assigned, :peer_reviews, :automatic_peer_reviews,
-    :all_day, :all_day_date, :could_be_locked, :cloned_item_id, :context_code, :position, :grade_group_students_individually, :anonymous_peer_reviews, :time_zone_edited,
-    :turnitin_enabled, :allowed_extensions, :needs_grading_count, :turnitin_settings, :muted, :group_category_id, :freeze_on_copy, :copied, :only_visible_to_overrides, :integration_id, :integration_data
-  ]
-
-  EXPORTABLE_ASSOCIATIONS = [
-    :submissions, :attachments, :quiz, :assignment_group, :discussion_topic, :learning_outcome_alignments,
-    :rubric, :context, :grading_standard, :group_category
-  ]
-
   ALLOWED_GRADING_TYPES = %w(
     pass_fail percent letter_grade gpa_scale points not_graded
-  )
+  ).freeze
 
   attr_accessor :previous_id, :updating_user, :copying, :user_submitted
 
@@ -507,14 +494,15 @@ class Assignment < ActiveRecord::Base
     self.grading_standard.save! if self.grading_standard
   end
 
+  def all_context_module_tags
+    all_tags = context_module_tags.to_a
+    all_tags.concat(discussion_topic.context_module_tags) if discussion_topic?
+    all_tags.concat(quiz.context_module_tags) if quiz?
+    all_tags
+  end
+
   def context_module_action(user, action, points=nil)
-    tags_to_update = self.context_module_tags.to_a
-    if self.submission_types == 'discussion_topic' && self.discussion_topic
-      tags_to_update += self.discussion_topic.context_module_tags
-    elsif self.submission_types == 'online_quiz' && self.quiz
-      tags_to_update += self.quiz.context_module_tags
-    end
-    tags_to_update.each { |tag| tag.context_module_action(user, action, points) }
+    all_context_module_tags.each { |tag| tag.context_module_action(user, action, points) }
   end
 
   # this is necessary to generate new permissions cache keys for students
@@ -848,9 +836,16 @@ class Assignment < ActiveRecord::Base
     read_attribute(:all_day) || (self.new_record? && self.due_at && (self.due_at.strftime("%H:%M") == '23:59' || self.due_at.strftime("%H:%M") == '00:00'))
   end
 
-  def self.preload_context_module_tags(assignments)
+  def self.preload_context_module_tags(assignments, include_context_modules: false)
+    module_tags_include =
+      if include_context_modules
+        { context_module_tags: :context_module }
+      else
+        :context_module_tags
+      end
+
     ActiveRecord::Associations::Preloader.new.preload(assignments, [
-      :context_module_tags,
+      module_tags_include,
       { :discussion_topic => :context_module_tags },
       { :quiz => :context_module_tags }
     ])
@@ -1018,7 +1013,7 @@ class Assignment < ActiveRecord::Base
       students = group.users
         .joins(:enrollments)
         .where(:enrollments => { :course_id => self.context})
-        .where(Course.reflections[:student_enrollments].options[:conditions])
+        .merge(Course.instance_exec(&Course.reflections[CANVAS_RAILS4_0 ? :student_enrollments : 'student_enrollments'].scope).only(:where))
         .order("users.id") # this helps with preventing deadlock with other things that touch lots of users
         .uniq
         .to_a
@@ -1118,9 +1113,6 @@ class Assignment < ActiveRecord::Base
             submission.grade_matches_current_submission) &&
             ((submission.score && submission.grade) || submission.excused?)
           submission.workflow_state = "graded"
-          if submission.quiz_submission
-            submission.quiz_submission.complete
-          end
         end
         submission.group = group
         submission.graded_at = Time.zone.now if did_grade
@@ -1230,7 +1222,7 @@ class Assignment < ActiveRecord::Base
       opts[:assessment_request].complete unless opts[:assessment_request].rubric_association
     end
 
-    if (opts['comment'] && Canvas::Plugin.value_to_boolean(opts['group_comment']))
+    if (opts[:comment] && Canvas::Plugin.value_to_boolean(opts[:group_comment]))
       uuid = CanvasSlug.generate_securish_uuid
       res = find_or_create_submissions(students) do |s|
         s.group = group
@@ -1238,7 +1230,7 @@ class Assignment < ActiveRecord::Base
         opts[:group_comment_id] = uuid if group
         s.add_comment(opts)
         # SubmissionComment updates the submission directly in the db
-        # in an after_save, ande Rails doesn't preload the reverse association
+        # in an after_save, and Rails doesn't preload the reverse association
         # on new objects so it can't set it on this object
         s.reload
       end
@@ -1270,7 +1262,6 @@ class Assignment < ActiveRecord::Base
     group, students = group_students(original_student)
     homeworks = []
     primary_homework = nil
-    ts = Time.now.to_s
     submitted = case opts[:submission_type]
                 when "online_text_entry"
                   opts[:body].present?
@@ -1381,7 +1372,7 @@ class Assignment < ActiveRecord::Base
 
     attachment_fields = [:id, :comment_id, :content_type, :context_id, :context_type,
                          :display_name, :filename, :mime_class,
-                         :size, :submitter_id, :workflow_state].freeze
+                         :size, :submitter_id, :workflow_state, :viewed_at].freeze
 
     res = as_json(
       :include => {
@@ -1469,9 +1460,22 @@ class Assignment < ActiveRecord::Base
         json.merge! provisional_grade.grade_attributes
       end
 
-      json[:submission_comments] = (provisional_grade || sub).submission_comments.as_json(:include_root => false,
-                                                                                          :methods => submission_comment_methods,
-                                                                                          :only => comment_fields)
+      if grade_as_group?
+        group_id = (provisional_grade || sub).group_id
+        json[:submission_comments] = unique_comments(group_id).as_json(
+          :include_root => false,
+          :methods => submission_comment_methods,
+          :only => comment_fields
+        )
+      else
+        json[:submission_comments] = (provisional_grade || sub)
+          .submission_comments
+          .as_json(
+            :include_root => false,
+            :methods => submission_comment_methods,
+            :only => comment_fields
+          )
+      end
 
       json['attachments'] = sub.attachments.map{|att| att.as_json(
           :only => [:mime_class, :comment_id, :id, :submitter_id ]
@@ -1581,10 +1585,9 @@ class Assignment < ActiveRecord::Base
     submissions_with_qs = student_submissions.select do |sub|
       quiz && sub.quiz_submission && !too_many_qs_versions
     end
-    qs_versions = Version.where(
-      "versionable_type IN ('QuizSubmission', 'Quizzes::QuizSubmission') AND versionable_id IN (?)",
-      submissions_with_qs.map {|submission| submission.quiz_submission.id }
-    ).order("number")
+    qs_versions = Version.where(versionable_type: 'Quizzes::QuizSubmission',
+                                versionable_id: submissions_with_qs.map(&:quiz_submission)).
+                          order(:number)
 
     qs_versions.each_with_object({}) do |version, hash|
       hash[version.versionable_id] ||= []
@@ -2209,7 +2212,11 @@ class Assignment < ActiveRecord::Base
   end
 
   def quiz?
-    self.submission_types == 'online_quiz' && self.quiz.present?
+    submission_types == 'online_quiz' && quiz.present?
+  end
+
+  def discussion_topic?
+    submission_types == 'discussion_topic' && discussion_topic.present?
   end
 
   def self.sis_grade_export_enabled?(context)
@@ -2217,4 +2224,15 @@ class Assignment < ActiveRecord::Base
       context.root_account.feature_enabled?(:bulk_sis_grade_export) ||
       Lti::AppLaunchCollator.any?(context, [:post_grades])
   end
+
+  private
+
+  def unique_comments(group_id)
+    submissions.where(group_id: group_id)
+      .map(&:submission_comments)
+      .flatten
+      .uniq { |comment| [comment.author_id, comment.comment] }
+      .sort_by(&:updated_at)
+  end
+
 end

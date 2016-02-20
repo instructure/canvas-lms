@@ -54,8 +54,8 @@ $ic-color-success:                  #008a14; // green
 
 $ic-color-neutral:                  hsl(0,0,90%);
 
-$ic-color-action:                   #ba3fa5; // magenta
-@if $use_high_contrast { $ic-color-action: #a23891; }
+$ic-color-action:                   #ee0097; // magenta
+@if $use_high_contrast { $ic-color-action: #d00084; }
 
 $ic-color-danger:                   #ad393a; // red
 @if $use_high_contrast { $ic-color-danger: #a03536; }
@@ -100,7 +100,8 @@ $contentBoxPadding:         8px;
 // Placeholder for old bootstrap variable; deprecated, but still in use some places
 // Once all of those have been adjusted to use the new variable we can get rid of this
 $ic-line-height: 1.5;
-@if not $use_new_styles {$ic-line-height: 20px;}
+@if not $use_new_styles { $ic-line-height: 20px; }
+
 $ic-font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 $ic-font-weight: 500; // instead of "bold"
 

@@ -159,6 +159,10 @@ describe PeerReviewsApiController, type: :request do
         create_peer_review(@admin, @section_resource_path, @resource_params)
       end
 
+      it 'should not create peer review where the reviewer and student are same' do
+        api_call(:post, @resource_path, @resource_params, {user_id: @student1.id}, {}, {:expected_status => 400})
+      end
+
     end
 
     context 'with teacher context' do

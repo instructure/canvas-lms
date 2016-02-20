@@ -122,7 +122,7 @@ class ContextModulesController < ApplicationController
   end
 
   def create
-    if authorized_action(@context.context_modules.scope.new, @current_user, :create)
+    if authorized_action(@context.context_modules.temp_record, @current_user, :create)
       @module = @context.context_modules.build
       @module.workflow_state = 'unpublished'
       @module.attributes = params[:context_module]
@@ -139,7 +139,7 @@ class ContextModulesController < ApplicationController
   end
 
   def reorder
-    if authorized_action(@context.context_modules.scope.new, @current_user, :update)
+    if authorized_action(@context.context_modules.temp_record, @current_user, :update)
       m = @context.context_modules.not_deleted.first
 
       m.update_order(params[:order].split(","))

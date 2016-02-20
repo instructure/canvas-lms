@@ -23,7 +23,7 @@ legend {
   width: 100%;
   padding: 0;
   margin-bottom: $baseLineHeight;
-  font-size: $baseFontSize * 1.5;
+  @include fontSize($baseFontSize * 1.5);
   line-height: $baseLineHeight * 2;
   color: $grayDark;
   border: 0;
@@ -31,7 +31,7 @@ legend {
 
   // Small
   small {
-    font-size: $baseLineHeight * .75;
+    @include fontSize($baseLineHeight * .75);
     color: $grayLight;
   }
 }
@@ -82,7 +82,7 @@ input[type="color"],
   height: $baseLineHeight;
   padding: 8px;
   margin-bottom: $baseLineHeight / 2;
-  font-size: $baseFontSize;
+  @include fontSize($baseFontSize);
   line-height: $baseLineHeight;
   color: $gray;
   @include border-radius($inputBorderRadius);
@@ -442,7 +442,7 @@ This is the standard form actions button bar at the bottom of every content form
   select,
   .uneditable-input,
   .dropdown-menu {
-    font-size: $baseFontSize;
+    @include fontSize($baseFontSize);
   }
 
   input,
@@ -464,7 +464,7 @@ This is the standard form actions button bar at the bottom of every content form
     height: $baseLineHeight;
     min-width: 16px;
     padding: 8px;
-    font-size: $baseFontSize;
+    @include fontSize($baseFontSize);
     font-weight: normal;
     line-height: $baseLineHeight;
     text-align: center;

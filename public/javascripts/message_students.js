@@ -95,13 +95,8 @@ define([
       modal: true
     }).dialog('open').dialog('option', 'title', I18n.t("message_student", "Message Students for %{course_name}", {course_name: title}));
   };
+
   $(document).ready(function() {
-    $message_students_dialog.find(".cutoff_score").bind('change blur keyup', function() {
-      $message_students_dialog.find("select").change();
-    });
-    $message_students_dialog.find(".cancel_button").click(function() {
-      $message_students_dialog.dialog('close');
-    });
     $("#message_assignment_recipients").formSubmit({
       processData: function(data) {
         var ids = [];
@@ -124,8 +119,9 @@ define([
         $(this).find(".button-container button").attr('disabled', false).filter(".send_button").text(I18n.t("buttons.send_message_failed", "Sending Message Failed, please try again"));
       }
     });
-    $message_students_dialog.find("select").change(function() {
-      var idx = parseInt($(this).val(), 10) || 0;
+
+    var showStudentsMessageSentTo = function() {
+      var idx = parseInt($message_students_dialog.find("select").val(), 10) || 0;
       var option = currentSettings.options[idx];
       var students_hash = $message_students_dialog.data('students_hash'),
           cutoff = parseFloat($message_students_dialog.find(".cutoff_score").val(), 10);
@@ -163,8 +159,26 @@ define([
       for(var idx in students_hash) {
         students_hash[idx].showIf(student_ids_hash[idx]);
       }
-      checkSendable();
-    });
+    };
+
+    var focusOnCutoffScore = function() {
+      var idx = parseInt($message_students_dialog.find("select").val(), 10) || 0;
+      var option = currentSettings.options[idx];
+      if (option.cutoff) {
+        $(".cutoff_score").focus();
+      }
+    };
+
+    var closeDialog = function() {
+      $message_students_dialog.dialog('close');
+    };
+
+    $message_students_dialog.find(".cancel_button").click(closeDialog);
+    $message_students_dialog.find("select").change(showStudentsMessageSentTo)
+      .change(focusOnCutoffScore)
+      .change(checkSendable);
+    $message_students_dialog.find(".cutoff_score").bind('change blur keyup', showStudentsMessageSentTo)
+      .bind('change blur keyup', checkSendable);
     $message_students_dialog.find("#body").bind('change blur keyup', checkSendable);
   });
 

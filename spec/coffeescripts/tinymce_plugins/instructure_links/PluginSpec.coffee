@@ -91,7 +91,7 @@ define [
     EditorLinks.bindLinkSubmit(@box, @editor, @fetchClasses, (()->))
     @form.trigger('submit')
 
-  module "InstructureLinks Tinymce Plugin: buildLinkClasses",
+  module "InstructureLinks Tinymce Plugin: buildLinkClasses"
 
   test "it removes any existing link-specific classes", ->
     box = $("<div></div>")

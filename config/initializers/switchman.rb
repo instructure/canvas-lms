@@ -13,7 +13,8 @@ Rails.application.config.to_prepare do
         end
 
         def activate!(categories)
-          if !categories[:delayed_jobs] && categories[:default] && !@skip_delayed_job_auto_activation
+          if !@skip_delayed_job_auto_activation && !categories[:delayed_jobs] &&
+              categories[:default] && categories[:default] != active_shards[:default] # only activate if it changed
             skip_delayed_job_auto_activation do
               categories[:delayed_jobs] = categories[:default].delayed_jobs_shard
             end

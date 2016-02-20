@@ -32,17 +32,32 @@
 #         "locked": {
 #           "description": "Whether the permission is locked by this role",
 #           "example": false,
-#           "type": "boolean"
+#           "type": "boolean",
+#           "default": false
+#         },
+#         "applies_to_self": {
+#           "description": "Whether the permission applies to the account this role is in. Only present if enabled is true",
+#           "example": true,
+#           "type": "boolean",
+#           "default": true
+#         },
+#         "applies_to_descendants": {
+#           "description": "Whether the permission cascades down to sub accounts of the account this role is in. Only present if enabled is true",
+#           "example": false,
+#           "type": "boolean",
+#           "default": true
 #         },
 #         "readonly": {
 #           "description": "Whether the permission can be modified in this role (i.e. whether the permission is locked by an upstream role).",
 #           "example": false,
-#           "type": "boolean"
+#           "type": "boolean",
+#           "default": false
 #         },
 #         "explicit": {
 #           "description": "Whether the value of enabled is specified explicitly by this role, or inherited from an upstream role.",
 #           "example": true,
-#           "type": "boolean"
+#           "type": "boolean",
+#           "default": false
 #         },
 #         "prior_default": {
 #           "description": "The value that would have been inherited from upstream if the role had not explicitly set a value. Only present if explicit is true.",
@@ -54,7 +69,7 @@
 #
 # @model Role
 #     {
-#       "id": 1,
+#       "id": "Role",
 #       "description": "",
 #       "properties": {
 #         "label": {
@@ -74,7 +89,8 @@
 #         },
 #         "account": {
 #           "description": "JSON representation of the account the role is in.",
-#           "example": "{\"id\"=>1019, \"name\"=>\"CGNU\", \"parent_account_id\"=>73, \"root_account_id\"=>1, \"sis_account_id\"=>\"cgnu\"}",
+#           "example": {"id": 1019, "name": "CGNU", "parent_account_id": 73, "root_account_id": 1, "sis_account_id": "cgnu"},
+#           "type": "object",
 #           "$ref": "Account"
 #         },
 #         "workflow_state": {
@@ -84,8 +100,8 @@
 #         },
 #         "permissions": {
 #           "description": "A dictionary of permissions keyed by name (see permissions input parameter in the 'Create a role' API).",
-#           "example": "{\"read_course_content\"=>{\"enabled\"=>true, \"locked\"=>false, \"readonly\"=>false, \"explicit\"=>true, \"prior_default\"=>false}, \"read_course_list\"=>{\"enabled\"=>true, \"locked\"=>true, \"readonly\"=>true, \"explicit\"=>false}, \"read_question_banks\"=>{\"enabled\"=>false, \"locked\"=>true, \"readonly\"=>false, \"explicit\"=>true, \"prior_default\"=>false}, \"read_reports\"=>{\"enabled\"=>true, \"locked\"=>false, \"readonly\"=>false, \"explicit\"=>false}}",
-#           "type": "map",
+#           "example": {"read_course_content": {"enabled": true, "locked": false, "readonly": false, "explicit": true, "prior_default": false}, "read_course_list": {"enabled": true, "locked": true, "readonly": true, "explicit": false}, "read_question_banks": {"enabled": false, "locked": true, "readonly": false, "explicit": true, "prior_default": false}, "read_reports": {"enabled": true, "locked": false, "readonly": false, "explicit": false}},
+#           "type": "object",
 #           "key": { "type": "string" },
 #           "value": { "$ref": "RolePermissions" }
 #         }
@@ -274,6 +290,16 @@ class RoleOverridesController < ApplicationController
   #   <X> is left unlocked. Ignored if permission <X> is already locked
   #   upstream. May occur multiple times with unique values for <X>.
   #
+  # @argument permissions[<X>][applies_to_self] [Boolean]
+  #   If the value is 1, permission <X> applies to the account this role is in.
+  #   The default value is 1. Must be true if applies_to_descendants is false.
+  #   This value is only returned if enabled is true.
+  #
+  # @argument permissions[<X>][applies_to_descendants] [Boolean]
+  #   If the value is 1, permission <X> cascades down to sub accounts of the
+  #   account this role is in. The default value is 1.  Must be true if
+  #   applies_to_self is false.This value is only returned if enabled is true.
+  #
   # @example_request
   #   curl 'https://<canvas>/api/v1/accounts/<account_id>/roles.json' \
   #        -H "Authorization: Bearer <token>" \
@@ -314,7 +340,10 @@ class RoleOverridesController < ApplicationController
     end
 
     # allow setting permissions immediately through API
-    set_permissions_for(role, @context, params[:permissions])
+    result = set_permissions_for(role, @context, params[:permissions])
+    unless result
+      return render json: {message: t('Permission must be enabled for someone')}, status: :bad_request
+    end
 
     # Add base_role_type_label for this role
     json = role_json(@context, role, @current_user, session)
@@ -395,6 +424,16 @@ class RoleOverridesController < ApplicationController
   #   These arguments are described in the documentation for the
   #   {api:RoleOverridesController#add_role add_role method}.
   #
+  # @argument permissions[<X>][applies_to_self] [Boolean]
+  #   If the value is 1, permission <X> applies to the account this role is in.
+  #   The default value is 1. Must be true if applies_to_descendants is false.
+  #   This value is only returned if enabled is true.
+  #
+  # @argument permissions[<X>][applies_to_descendants] [Boolean]
+  #   If the value is 1, permission <X> cascades down to sub accounts of the
+  #   account this role is in. The default value is 1.  Must be true if
+  #   applies_to_self is false.This value is only returned if enabled is true.
+  #
   # @example_request
   #   curl https://<canvas>/api/v1/accounts/:account_id/roles/2 \
   #     -X PUT \
@@ -422,8 +461,11 @@ class RoleOverridesController < ApplicationController
         end
       end
     end
+    result = set_permissions_for(@role, @context, params[:permissions])
 
-    set_permissions_for(@role, @context, params[:permissions])
+    unless result
+      return render json: {message: t('Permission must be enabled for someone')}, status: :bad_request
+    end
     RoleOverride.clear_cached_contexts
     render :json => role_json(@context, @role, @current_user, session)
   end
@@ -509,7 +551,7 @@ class RoleOverridesController < ApplicationController
   #
   # Returns nothing.
   def set_permissions_for(role, context, permissions)
-    return unless permissions.present?
+    return true unless permissions.present?
 
     if role.course_role?
       manageable_permissions = RoleOverride.manageable_permissions(context, role.base_role_type)
@@ -523,10 +565,20 @@ class RoleOverridesController < ApplicationController
           if settings.has_key?(:enabled) && value_to_boolean(settings[:explicit])
             override = value_to_boolean(settings[:enabled])
           end
-          locked = value_to_boolean(settings[:locked]) if settings.has_key?(:locked)
+          locked = value_to_boolean(settings[:locked]) if settings.key?(:locked)
+          applies_to_self = value_to_boolean(settings[:applies_to_self]) if settings.key? :applies_to_self
+          if settings.key? :applies_to_descendants
+            applies_to_descendants = value_to_boolean(settings[:applies_to_descendants])
+          end
+
+          if applies_to_descendants == false && applies_to_self == false
+            return false
+          end
 
           RoleOverride.manage_role_override(context, role, permission.to_s,
-            :override => override, :locked => locked)
+                                            override: override, locked: locked,
+                                            applies_to_self: applies_to_self,
+                                            applies_to_descendants: applies_to_descendants)
         end
       end
     end
@@ -567,7 +619,7 @@ class RoleOverridesController < ApplicationController
     res
   end
 
-  # Returns a hash with the avalible permissions grouped by groups of permissions. Permission hash looks like this
+  # Returns a hash with the available permissions grouped by groups of permissions. Permission hash looks like this
   #
   # ie:
   #   {

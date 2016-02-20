@@ -11,10 +11,11 @@ For example, consider an assignment description containing a link to a wiki page
 the same course.  The description returned by the Get Assignment API might look
 like this:
 
-    !!!javascript
-    <a href="http://canvas.example.com/courses/123/pages/a-wiki-page"
-       data-api-endpoint="http://canvas.example.com/api/v1/courses/123/pages/a-wiki-page"
-       data-api-returntype="Page">More information here</a>
+```html
+<a href="http://canvas.example.com/courses/123/pages/a-wiki-page"
+   data-api-endpoint="http://canvas.example.com/api/v1/courses/123/pages/a-wiki-page"
+   data-api-returntype="Page">More information here</a>
+```
 
 The currently supported `data-api-returntype` values are:
 

@@ -20,7 +20,7 @@ hy:
     bad_max_appts: "Դուք պետք է յուրաքանչյուր մասնակցի համար  նախատեսեք առնվազն մեկ հանդիպում "
     bad_per_slot: "Դուք պետք է յուրաքանչյուր ժամանակահատվածի համար նախատեսեք առնվազն մեկ հանդիպում "
     context_required: "Դուք պետք է ընտրեք օրացույցը"
-    select_calendars: "Ընտրեք օրացույցները"
+    select_calendars: "Ընտրել օրացույցները"
   EditGroupAssignmentView: 
     move_to: "Տեղափոխել դեպի "
   GroupDetailView: 
@@ -34,7 +34,7 @@ hy:
       one: "% {count}  օգտագործողներ"
   GroupUserCollection: 
     flash: 
-      userAlreadyInGroup: "ՆԱԽԱԶԳՈՒՇԱՑՈՒՄ. %{user}ը արդեն %{group}ի անդամ է"
+      userAlreadyInGroup: "ՆԱԽԱԶԳՈՒՇԱՑՈՒՄ. %{user}ը արդեն %{group} խմբի անդամ է"
   LongTextEditor: 
     cancel: "Չեղյալ համարել"
     save: Պահպանել
@@ -3361,7 +3361,7 @@ hy:
       headings: 
         prior_users: "Նախորդ օգտատերեր"
       links: 
-        back_to_people: "Վերադառնալ օգտատերերին"
+        back_to_people: "Վերադառնալ մարդկանց ցանկին"
       titles: 
         prior_users: "Նախորդ օգտատերեր"
     roster: 
@@ -4076,7 +4076,7 @@ hy:
   course_navigation_dd035109: "Նավարկում դասընթացում"
   course_outcomes_7dc1cbc7: "Դասընթացի արդյունքներ"
   course_pages_449f1dd4: "Դասընթացի էջեր"
-  course_people_3058c948: "Դասընթացի մարդիկ"
+  course_people_3058c948: "Դասընթացն անցնող մարդիկ"
   course_quizzes_c337653c: "Դասընթացի թեստեր"
   course_restore: 
     restore_error: "Դասընթացը վերականգնելիս սխալ է տեղի ունեցել: Դասընթացը չի վերականգնվել:"
@@ -4288,7 +4288,7 @@ hy:
       invitation_accepted: "Հրավերը ընդունված է: Բարի գալուստ %{course}:"
       invitation_cancelled: "Հրավերը չեղյալ է համարվել:"
       login_to_accept: "Գրանցումը ընդունելուց առաջ դուք պետք է մուտք գործեք համակարգ:"
-      preview_course: "Դուք հրավիրված եք այս դասընթացին մասնակցելու: Դուք կարող եք դրան մասնակցելու վերաներյալ որոշում կայացնել, սակայն մասնակցությունից առաջ պետք է ընդունեք գրանցման հրավերը: "
+      preview_course: "Դուք հրավիրված եք այս դասընթացին մասնակցելու: Դուք կարող եք դրան մասնակցելու վերաբերյալ որոշում կայացնել, սակայն մասնակցությունից առաջ պետք է ընդունեք գրանցման հրավերը: "
       reset_test_student: "Թեստավորվող ունկնդիրը հաջողությամբ բերվել է սկզբնական վիճակին"
       unconcluded: "Դասընթացը չի ավարտվել"
       updated: "Դասընթացը հաջողությամբ թարմացվել է:"
@@ -6908,7 +6908,7 @@ hy:
   group_name_group_files_f8b0c078: "%{group_name} - Խմբային ֆայլեր"
   group_name_group_home_21f8a655: "%{group_name} - Խմբի հիմնական էջ"
   group_name_group_pages_def16554: "%{group_name} - Խմբի էջեր"
-  group_name_group_people_e9d548c1: "%{group_name} - Խմբում ընդգրկված անդամներ"
+  group_name_group_people_e9d548c1: "%{group_name} - Խմբում ընդգրկված մարդիկ"
   group_name_in_group_category_name_group_category_29bf3254: "%{group_name} խումբը %{group_category_name} խմբի կատեգորիայում"
   group_name_is_required_5547bc0b: "Անհրաժեշտ է նշել խմբի անունը"
   group_set_name_2aed2347: "Խմբերի շարքի անվանումը"
@@ -10119,7 +10119,7 @@ hy:
       submission_comment_for_teacher: "Ուղարկված աշխատանքների մեկնաբանություն դասախոսի համար"
       submission_grade_changed: "Ուղարկվածի գնահատականը փոխվել է"
       submission_graded: "Ուղարկվածը գնահատվել է"
-      submission_needs_grading: "Ուղարկվածը պետք է գնահատվի"
+      submission_needs_grading: "Ուղարկվածը աշխատանքները ենթակա են գնահատման"
       summaries: Ամփոփագրեր
       updated_wiki_page: "Թարմացված վիկի էջ"
       web_conference_invitation: "Վեբ-կոնֆերանսի հրավեր"
@@ -12945,7 +12945,7 @@ hy:
       removeError: "Հնարավոր չէ ջնջել օգտատիրոջը: Կրկին փորձեք ավելի ուշ:"
       removed: "Օգտատերը հաջողությամբ ջնջված է:"
     greater_than_three: "Որոնման համար մուտքագրեք բառը, կազմված երեք կամ ավելի նշաններից: "
-    invitations_re_sent: "Հրավիրատոմսերը հաջողությամբ ուղարկված են:"
+    invitations_re_sent: "Հրավերները հաջողությամբ ուղարկված են:"
     nobody: "ոչ ոք"
     observing_user: "%{user_name}-ի դիտում"
     unknown_error: "Ձեր որոնումների ժամանակ ինչ-որ բան սխալ է գնացել, փորձեք նորից:"
@@ -13231,7 +13231,7 @@ hy:
         crosslist_this_section: "Այս բաժինը ընդգրկել խաչաձև ցուցակում"
         current_enrollments: "Ընթացիկ գրանցումներ"
         decrosslist_section: "Այս բաժինը ջնջել խաչաձև ցուցակից"
-  see_some_lti_tools_that_work_great_with_canvas_16ef75a0: "*Որոշ LTI գործիքներ* որոօնք գերազանց են աշխատում Canvas -ի հետ:"
+  see_some_lti_tools_that_work_great_with_canvas_16ef75a0: "*Որոշ LTI գործիքներ* որոնք գերազանց են աշխատում Canvas -ի հետ:"
   select_a_grading_period_5ea50f1: "Ընտրել գնահատման ժամանակահատված..."
   select_a_grading_period_aab25483: "Ընտրել գնահատման ժամանակահատվածը"
   select_a_predefined_color_c77ab2f5: "Ընտրել նախընտրած գույնը:"
@@ -13601,7 +13601,7 @@ hy:
       body_ta: "Դուք հրավիրված եք մասնակցելու %{course} որպես **ասիստենտ**  **%{email_address}**օգտատիրոջ հաշվի ներքո:"
       body_teacher: "Դուք հրավիրված եք մասնակցելու %{course} որպես **դասավանդող**  **%{email_address}**օգտատիրոջ հաշվի ներքո:"
       buttons: 
-        accept: "Ընդունել հրավերքը"
+        accept: "Ընդունել հրավերը"
         reject: "Մերժել հրավերը"
       wander_around_dont_get_lost: "Մի քաշվեք [շրջագայելու](%{link_to_course}) -ով և տեսնելու, թե դա ինչ է:"
     keyboard_navigation_hint: 
@@ -13614,7 +13614,7 @@ hy:
         due: "Ավարտման ժամկետ"
       needs_grading_count: 
         one: "1 պետք է գնահատվի"
-        other: "%{count} պետք է գնահատվի"
+        other: "%{count} աշխատանք ենթակա է գնահատման"
     menu_enrollment: 
       labels: 
         enrolled_as: "գրանցված է որպես"
@@ -14871,7 +14871,7 @@ hy:
   turnitin: 
     error_1007: "Բեռնվող ֆայլը չափազանց մեծ է:"
     error_1009: "Ֆայլի սխալ տեսակ:  (Ֆայլերի ընդունելի տեսակներն են՝ MS Word, Acrobat PDF, Postscript, Text, HTML, WordPerfect (WPD) և Rich Text Format:)"
-    error_1013: "Ունկնդրի ուղարկած ֆայլը պետք է քսան բառից ավել լինի, որպեսզի գնահատվի turnitin-ի կողմից:"
+    error_1013: "Ունկնդրի ուղարկած աշխատանքը պետք է գերազանցի քսան բառը, որպեսզի գնահատվի turnitin-ի կողմից:"
     error_1023: "PDF ֆայլը հնարավոր չէ կարդալ: Ստուգեք, արդյոք ֆայլը գաղտնաբառով պաշտանված չէ: "
     error_216: "Այս հաշվի համար ուսանողական սահմանաչափը լրացված է: Խնդրում ենք դիմել ձեր հաշվի ադմինիստրատորին: "
     error_217: "Այս հաշվի համար  turnitin պրոդուկտի գործողության ժամկետը լրացել է: Խնդրում ենք դիմել ձեր վաճառքի գործակալին նորացնելու  turnitin պրոդուկտը: "

@@ -61,7 +61,7 @@ describe "Favorites API", type: :request do
                                 :controller=>"favorites", :include => [ "observed_users" ],
                                 :action=>"list_favorite_courses", :format=>"json")
 
-        expect(json[0]['enrollments']).to eq [{
+        expect(json[0]['enrollments']).to match_array [{
            "type" => "observer",
            "role" => @assigned_observer_enrollment.role.name,
            "role_id" => @assigned_observer_enrollment.role.id,

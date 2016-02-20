@@ -90,9 +90,13 @@ describe 'taking a quiz one question at a time' do
         it_should_show_cant_go_back_warning
         accept_cant_go_back_warning
 
-        expect_new_page_load(true) { fj('a:contains(\'Quizzes\')').click }
+        expect_new_page_load(true) do
+          click_quiz_link("Quizzes")
+        end
 
-        expect_new_page_load { fj('a:contains(\'OQAAT quiz\')').click }
+        expect_new_page_load do
+          click_quiz_link("OQAAT quiz")
+        end
 
         fj('#not_right_side .take_quiz_button a:contains(\'Resume Quiz\')').click
 

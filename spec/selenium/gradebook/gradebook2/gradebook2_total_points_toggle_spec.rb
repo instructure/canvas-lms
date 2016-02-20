@@ -25,6 +25,12 @@ describe "gradebook2 - total points toggle" do
     submit_dialog(dialog, '.ui-button')
   end
 
+  def close_dialog_and_dont_show_again
+    dialog = fj('.ui-dialog:visible')
+    fj("#hide_warning").click
+    submit_dialog(dialog, '.ui-button')
+  end
+
   it "should warn the teacher that studens will see a change" do
     get "/courses/#{@course.id}/gradebook2"
     open_display_dialog
@@ -47,12 +53,25 @@ describe "gradebook2 - total points toggle" do
     should_show_percentages
   end
 
+  it 'should change the text on the toggle option when toggling' do
+    get "/courses/#{@course.id}/gradebook"
+    dropdown_text = []
+    f("#total_dropdown").click
+    dropdown_text << f(".toggle_percent").text
+    f(".toggle_percent").click
+    close_dialog_and_dont_show_again
+    f("#total_dropdown").click
+    dropdown_text << f(".toggle_percent").text
+    f(".toggle_percent").click
+    f("#total_dropdown").click
+    dropdown_text << f(".toggle_percent").text
+    expect(dropdown_text).to eq ["Switch to points", "Switch to percent", "Switch to points"]
+  end
+
   it 'should not show the warning once dont show is checked' do
     get "/courses/#{@course.id}/gradebook2"
     open_display_dialog
-    dialog = fj('.ui-dialog:visible')
-    fj("#hide_warning").click
-    submit_dialog(dialog, '.ui-button')
+    close_dialog_and_dont_show_again
 
     open_display_dialog
     dialog = fj('.ui-dialog:visible')

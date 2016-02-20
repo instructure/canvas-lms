@@ -172,7 +172,7 @@ $subtleBorderColor: #e5e5e5;
   }
 
   .attachment-name {
-    font-size: 12px;
+    @include fontSize($ic-font-size--xsmall);
     line-height: 12px;
     text-align: center;
     white-space: normal;

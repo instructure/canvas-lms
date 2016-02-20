@@ -63,7 +63,7 @@
 #         },
 #         "grading_scheme": {
 #           "description": "A list of GradingSchemeEntry that make up the Grading Standard as an array of values with the scheme name and value",
-#           "example": "[{\"name\":\"A\", \"value\":0.9}, {\"name\":\"B\", \"value\":0.8}, {\"name\":\"C\", \"value\":0.7}, {\"name\":\"D\", \"value\":0.6}]",
+#           "example": [{"name":"A", "value":0.9}, {"name":"B", "value":0.8}, {"name":"C", "value":0.7}, {"name":"D", "value":0.6}],
 #           "type": "array",
 #           "items": {"$ref": "GradingSchemeEntry"}
 #         }

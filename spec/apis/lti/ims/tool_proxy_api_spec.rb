@@ -48,12 +48,12 @@ module Lti
         end
 
         it 'the tool proxy raw data' do
-          get "api/lti/tool_proxy/#{tool_proxy.guid}", tool_proxy_guid: tool_proxy.guid
+          get "/api/lti/tool_proxy/#{tool_proxy.guid}", tool_proxy_guid: tool_proxy.guid
           expect(JSON.parse(body)).to eq tool_proxy.raw_data
         end
 
         it 'has the correct content-type' do
-          get "api/lti/tool_proxy/#{tool_proxy.guid}", tool_proxy_guid: tool_proxy.guid
+          get "/api/lti/tool_proxy/#{tool_proxy.guid}", tool_proxy_guid: tool_proxy.guid
           expect(response.headers['Content-Type']).to include 'application/vnd.ims.lti.v2.toolproxy+json'
         end
 

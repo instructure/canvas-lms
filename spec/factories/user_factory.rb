@@ -17,7 +17,10 @@
 #
 
 def user_model(opts={})
+  email = opts.delete(:email)
   @user = factory_with_protected_attributes(User, valid_user_attributes.merge(opts))
+  @user.email = email if email # set e-mail after record creation
+  @user
 end
 
 def tie_user_to_account(user, opts={})

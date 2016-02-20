@@ -245,7 +245,7 @@ define([
 
 
       },
-      showMoveModule: function ($module) {
+      showMoveModule: function ($module, returnFocusTo) {
         var $form = $('#move_context_module_form');
         $form.data('current_module', $module);
         // Set the module name
@@ -274,6 +274,7 @@ define([
           height: 300,
           close: function () {
             modules.hideMoveModule(true);
+            returnFocusTo.focus();
           }
         }).dialog('open');
         $module.removeClass('dont_remove');
@@ -402,7 +403,7 @@ define([
         });
         $module.addClass('dont_remove');
         $form.find(".module_name").toggleClass('lonely_entry', isNew);
-
+        var $toFocus = $('.ig-header-admin .al-trigger', $module);
         $form.dialog({
           autoOpen: false,
           modal: true,
@@ -411,6 +412,7 @@ define([
           height: (isNew ? 400 : 600),
           close: function() {
             modules.hideEditModule(true);
+            $toFocus.focus();
           },
           open: function(){
             $(this).find('input[type=text],textarea,select').first().focus();
@@ -976,12 +978,18 @@ define([
       event.preventDefault();
       var $elem = $(this).closest(".criteria_list");
       var $requirement = $(this).parents('.completion_entry');
-      $(this).parents(".criterion").slideUp(function() {
+      var $criterion = $(this).closest(".criterion");
+      var $prevCriterion = $criterion.prev();
+      var $toFocus = $prevCriterion.length ?
+        $(".delete_criterion_link", $prevCriterion) :
+        $(".add_prerequisite_or_requirement_link", $(this).closest(".form-section"));
+      $criterion.slideUp(function() {
         $(this).remove();
         // Hides radio button and checkbox if there are no requirements
         if ($elem.html().length === 0 && $requirement.length !== 0) {
           $(".requirement-count-radio").fadeOut("fast");
         }
+        $toFocus.focus();
       })
     });
 
@@ -991,6 +999,9 @@ define([
       $(this).parents(".context_module").confirmDelete({
         url: $(this).attr('href'),
         message: I18n.t('confirm.delete', "Are you sure you want to delete this module?"),
+        cancelled: function() {
+          $('.ig-header-admin .al-trigger', $(this)).focus();
+        },
         success: function(data) {
           var id = data.context_module.id;
           $(".context_module .prerequisites .criterion").each(function() {
@@ -999,9 +1010,13 @@ define([
               $(this).remove();
             }
           });
+          var $prevModule = $(this).prev();
+          var $addModuleButton = $("#content .header-bar .add_module_link");
+          var $toFocus = $prevModule.length ? $(".ig-header-admin .al-trigger", $prevModule) : $addModuleButton;
           $(this).slideUp(function() {
             $(this).remove();
             modules.updateTaggedItems();
+            $toFocus.focus();
           });
           $.flashMessage(I18n.t("Module %{module_name} was successfully deleted.", {module_name: data.context_module.name}));
         }
@@ -1150,7 +1165,8 @@ define([
 
     $('.move_module_link').on('click keyclick', function (event) {
       event.preventDefault();
-      modules.showMoveModule($(this).parents('.context_module'));
+      var $cogLink = $(this).closest('.ig-header-admin').children('.al-trigger');
+      modules.showMoveModule($(this).parents('.context_module'), $cogLink);
     });
 
     $('#move_context_module_form').on('submit', function (event) {

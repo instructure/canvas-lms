@@ -6,7 +6,8 @@ define [
 
   TestUtils = React.addons.TestUtils
 
-  module 'ModalContent',
+  module 'ModalContent'
+
   test "applies className to parent node", ->
     ModalContentElement = React.createElement(ModalContent, className: 'cat')
     component = TestUtils.renderIntoDocument(ModalContentElement)

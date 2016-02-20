@@ -51,6 +51,8 @@ describe "calendar2" do
         replace_content(f('#calendar_event_location_name'), location_name)
         replace_content(f('#calendar_event_location_address'), location_address)
         expect_new_page_load { submit_form(f('#editCalendarEventFull')) }
+        wait = Selenium::WebDriver::Wait.new(timeout: 5)
+        wait.until { !fj('.fc-event:visible').nil? }
         fj('.fc-event:visible').click
         event_content = fj('.event-details-content:visible')
         expect(event_content).to include_text(location_name)

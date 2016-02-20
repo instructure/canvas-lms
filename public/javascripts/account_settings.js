@@ -1,6 +1,8 @@
 define([
   'i18n!account_settings',
   'jquery', // $
+  'jsx/shared/rce/loadNewRCE',
+  'jsx/shared/rce/preloadRCE',
   'jquery.ajaxJSON', // ajaxJSON
   'jquery.instructure_date_and_time', // date_field, time_field, datetime_field, /\$\.datetime/
   'jquery.instructure_forms', // formSubmit, getFormData, validateForm
@@ -13,9 +15,24 @@ define([
   'vendor/date', // Date.parse
   'vendor/jquery.scrollTo', // /\.scrollTo/
   'jqueryui/tabs' // /\.tabs/
-], function(I18n, $) {
+], function(I18n, $, loadNewRCE, preloadRCE) {
+
+  // optimization so user isn't waiting on RCS to
+  // respond when they hit announcements
+  preloadRCE()
 
   $(document).ready(function() {
+    checkFutureListingSetting = function() {
+
+      if ($('#account_settings_restrict_student_future_view_value').is(':checked')) {
+        $('.future_listing').show();
+      } else {
+        $('.future_listing').hide();
+      }
+    };
+    checkFutureListingSetting();
+    $('#account_settings_restrict_student_future_view_value').change(checkFutureListingSetting);
+
     $("#account_settings").submit(function() {
       var $this = $(this);
       $(".ip_filter .value").each(function() {
@@ -41,7 +58,10 @@ define([
       }
     });
     $(".datetime_field").datetime_field();
-    $("#add_notification_form textarea").editorBox().width('100%');
+
+    $("#add_notification_form textarea").width('100%');
+    loadNewRCE($("#add_notification_form textarea"))
+
     $("#add_notification_form").submit(function(event) {
       var $this = $(this);
       var $confirmation = $this.find('#confirm_global_announcement:visible:not(:checked)');

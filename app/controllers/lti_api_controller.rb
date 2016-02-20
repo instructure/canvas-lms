@@ -160,7 +160,7 @@ class LtiApiController < ApplicationController
     timestamp = Time.zone.at(@signature.request.timestamp.to_i)
     # 90 minutes is suggested by the LTI spec
     allowed_delta = Setting.get('oauth.allowed_timestamp_delta', 90.minutes.to_s).to_i
-    if timestamp < allowed_delta.seconds.ago || timestamp > allowed_delta.from_now
+    if timestamp < allowed_delta.seconds.ago || timestamp > allowed_delta.seconds.from_now
       Canvas::Errors::Reporter.raise_canvas_error(BasicLTI::BasicOutcomes::Unauthorized, "Timestamp too old or too far in the future, request has expired", oauth_error_info)
     end
 

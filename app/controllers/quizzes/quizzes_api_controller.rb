@@ -227,7 +227,8 @@
 #         "question_types": {
 #           "description": "List of question types in the quiz",
 #           "example": ["mutliple_choice", "essay"],
-#           "type": "array"
+#           "type": "array",
+#           "items": {"type": "string"}
 #         }
 #       }
 #     }
@@ -277,7 +278,7 @@
 #
 class Quizzes::QuizzesApiController < ApplicationController
   include Api::V1::Quiz
-  include Filters::Quizzes
+  include ::Filters::Quizzes
 
   before_filter :require_context
   before_filter :require_quiz, :only => [:show, :update, :destroy, :reorder, :validate_access_code]
@@ -383,13 +384,13 @@ class Quizzes::QuizzesApiController < ApplicationController
   #   until they submit the last attempt for the quiz.
   #   Defaults to false.
   #
-  # @argument quiz[show_correct_answers_at] [Timestamp]
+  # @argument quiz[show_correct_answers_at] [DateTime]
   #   Only valid if show_correct_answers=true
   #   If set, the correct answers will be visible by students only after this
   #   date, otherwise the correct answers are visible once the student hands in
   #   their quiz submission.
   #
-  # @argument quiz[hide_correct_answers_at] [Timestamp]
+  # @argument quiz[hide_correct_answers_at] [DateTime]
   #   Only valid if show_correct_answers=true
   #   If set, the correct answers will stop being visible once this date has
   #   passed. Otherwise, the correct answers will be visible indefinitely.
@@ -430,15 +431,15 @@ class Quizzes::QuizzesApiController < ApplicationController
   #   For no IP filter restriction, set to null.
   #   Defaults to null.
   #
-  # @argument quiz[due_at] [Timestamp]
+  # @argument quiz[due_at] [DateTime]
   #   The day/time the quiz is due.
   #   Accepts times in ISO 8601 format, e.g. 2011-10-21T18:48Z.
   #
-  # @argument quiz[lock_at] [Timestamp]
+  # @argument quiz[lock_at] [DateTime]
   #   The day/time the quiz is locked for students.
   #   Accepts times in ISO 8601 format, e.g. 2011-10-21T18:48Z.
   #
-  # @argument quiz[unlock_at] [Timestamp]
+  # @argument quiz[unlock_at] [DateTime]
   #   The day/time the quiz is unlocked for students.
   #   Accepts times in ISO 8601 format, e.g. 2011-10-21T18:48Z.
   #
@@ -456,7 +457,7 @@ class Quizzes::QuizzesApiController < ApplicationController
   #
   # @returns Quiz
   def create
-    if authorized_action(@context.quizzes.scope.new, @current_user, :create)
+    if authorized_action(@context.quizzes.temp_record, @current_user, :create)
       @quiz = @context.quizzes.build
       update_api_quiz(@quiz, params)
       unless @quiz.new_record?

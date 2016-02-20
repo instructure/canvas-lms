@@ -86,3 +86,8 @@ for you and for us:
       will review the changes as well to make sure it is consistent with our product direction
     - Once all these things have occurred then an engineer will merge your commit into the repository.
     - Congratulations! You are now a Canvas contributor!  Thank you for helping make Canvas great.
+
+Guidelines
+----------
+
+- All new UI should be built in [React](https://github.com/instructure/canvas-lms/tree/stable/app/jsx) using the documented [API](https://canvas.instructure.com/doc/api/).

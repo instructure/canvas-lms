@@ -31,7 +31,7 @@
   text-transform: uppercase;
   font-weight: bold;
   color: #000;
-  font-size: 12px;
+  @include fontSize(12px);
 }
 
 .ui-menu-item span.ui-menu-input-group { padding-left: 2em; }
@@ -95,7 +95,7 @@ $kyle-menu-carat-size: 8px;
   @else {
     background-color: $kyle-menu-bg-color;
     border: 1px solid $kyle-menu-border-color;
-    font-size: 12px;
+    @include fontSize(12px);
     color: #525252;
     border-radius:  $kyle-menu-border-radius + 1;
     box-shadow: 0px 2px 4px -1px rgba(0,0,0,.4);
@@ -140,7 +140,7 @@ $kyle-menu-carat-size: 8px;
 }
 
 .ui-menu-small {
-  font-size: 11px;
+  @include fontSize(11px);
   font-weight: normal;
   white-space: nowrap;
   .ui-state-focus {font-weight: normal; text-shadow: none;}

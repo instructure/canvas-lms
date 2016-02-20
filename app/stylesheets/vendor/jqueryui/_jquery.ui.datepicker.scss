@@ -79,7 +79,7 @@
   }
   .ui-datepicker-header {
     @extend .ui-dialog-titlebar;
-    font-size: 12px;
+    @include fontSize(12px);
   }
 }
 .ui-datepicker-today .ui-state-highlight:not(.ui-state-active){

@@ -58,8 +58,7 @@ namespace :i18n do
     Bundler.setup
     # for consistency in how canvas does json ... this way our specs can
     # verify _core_en is up to date
-    ActiveSupport::JSON.backend = :oj
-    MultiJson.dump_options = {:escape_mode => :xss_safe}
+    require 'config/initializers/json'
 
     # set up rails i18n paths ... normally rails env does this for us :-/
     require 'action_controller'

@@ -110,14 +110,6 @@ module AuthenticationMethods
     end
   end
 
-  def masked_authenticity_token
-    session_options = CanvasRails::Application.config.session_options
-    options = session_options.slice(:domain, :secure)
-    options[:httponly] = HostUrl.is_file_host?(request.host_with_port)
-    CanvasBreachMitigation::MaskingSecrets.masked_authenticity_token(cookies, options)
-  end
-  private :masked_authenticity_token
-
   def load_user
     @current_user = @current_pseudonym = nil
 
@@ -174,14 +166,6 @@ module AuthenticationMethods
         return redirect_to(login_url(:needs_cookies => '1'))
       end
       @current_user = @current_pseudonym && @current_pseudonym.user
-
-      if api_request?
-        request.get? ||
-          !allow_forgery_protection ||
-          CanvasBreachMitigation::MaskingSecrets.valid_authenticity_token?(session, cookies, form_authenticity_param) ||
-          CanvasBreachMitigation::MaskingSecrets.valid_authenticity_token?(session, cookies, request.headers['X-CSRF-Token']) ||
-          raise(AccessTokenError)
-      end
     end
 
     if @current_user && @current_user.unavailable?

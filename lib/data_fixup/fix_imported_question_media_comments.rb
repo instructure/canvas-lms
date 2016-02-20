@@ -1,6 +1,6 @@
 module DataFixup
   module FixImportedQuestionMediaComments
-    def self.get_fixed_yaml(bad_yaml)
+    def self.get_fixed_hash(bad_yaml)
       return unless bad_yaml
       placeholders = []
 
@@ -22,7 +22,7 @@ module DataFixup
 
       # now make the substitutions correctly and return the serialized yaml
       Importers::LinkReplacer.new(nil).recursively_sub_placeholders!(hash, placeholders)
-      hash.to_yaml
+      hash
     end
 
     def self.run
@@ -38,12 +38,12 @@ module DataFixup
             where("updated_at > ?", date_of_sadness).where("question_data LIKE ?", "%media_comment%").each do |aq|
           next unless (aq['question_data'] rescue nil).nil? # deserializing the attribute will fail silently in Rails 3 but not Rails 4
 
-          unless yaml = get_fixed_yaml(aq.attributes_before_type_cast['question_data'])
+          unless hash = get_fixed_hash(aq.attributes_before_type_cast['question_data'])
             still_broken_aq_ids << aq.id
             next
           end
 
-          AssessmentQuestion.where(:id => aq).update_all(:question_data => yaml)
+          AssessmentQuestion.where(:id => aq).update_all(:question_data => CANVAS_RAILS4_0 ? hash.to_yaml : hash)
         end
       end
 
@@ -52,25 +52,25 @@ module DataFixup
             where("updated_at > ?", date_of_sadness).where("question_data LIKE ?", "%media_comment%").each do |qq|
           next unless (qq['question_data'] rescue nil).nil?
 
-          unless yaml = get_fixed_yaml(qq.attributes_before_type_cast['question_data'])
+          unless hash = get_fixed_hash(qq.attributes_before_type_cast['question_data'])
             still_broken_qq_ids << qq.id
             next
           end
 
           quiz_ids_to_fix << qq.quiz_id
-          Quizzes::QuizQuestion.where(:id => qq).update_all(:question_data => yaml)
+          Quizzes::QuizQuestion.where(:id => qq).update_all(:question_data => CANVAS_RAILS4_0 ? hash.to_yaml : hash)
         end
       end
 
       quiz_ids_to_fix.uniq.each_slice(100) do |quiz_ids|
         Quizzes::Quiz.where("quiz_data IS NOT NULL").where(:id => quiz_ids).each do |quiz|
           next unless (quiz['quiz_data'] rescue nil).nil?
-          unless yaml = get_fixed_yaml(quiz.attributes_before_type_cast['quiz_data'])
+          unless hash = get_fixed_hash(quiz.attributes_before_type_cast['quiz_data'])
             still_broken_quiz_ids << quiz.id
             next
           end
 
-          Quizzes::Quiz.where(:id => quiz).update_all(:quiz_data => yaml)
+          Quizzes::Quiz.where(:id => quiz).update_all(:quiz_data => CANVAS_RAILS4_0 ? hash.to_yaml : hash)
         end
       end
 

@@ -127,8 +127,7 @@ This enables an updated navigation, new dashboard and a simpler, more modern loo
 END
       applies_to: 'RootAccount',
       state: 'allowed',
-      root_opt_in: true,
-      beta: true
+      root_opt_in: true
     },
     'epub_export' =>
     {
@@ -353,7 +352,7 @@ END
     'notification_service' =>
     {
       display_name: -> { I18n.t('Use remote service for notifications') },
-      description: -> { I18n.t('Allow the ability to send notifications through our a dispatch queue') },
+      description: -> { I18n.t('Allow the ability to send notifications through our dispatch queue') },
       applies_to: 'RootAccount',
       state: 'hidden',
       beta: true,

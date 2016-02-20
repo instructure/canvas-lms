@@ -33,9 +33,6 @@ class Wiki < ActiveRecord::Base
 
   has_many :wiki_pages, :dependent => :destroy
 
-  EXPORTABLE_ATTRIBUTES = [:id, :title, :created_at, :updated_at, :front_page_url, :has_no_front_page]
-  EXPORTABLE_ASSOCIATIONS = [:wiki_pages]
-
   before_save :set_has_no_front_page_default
   after_save :update_contexts
 
@@ -84,7 +81,7 @@ class Wiki < ActiveRecord::Base
 
     # return an implicitly created page if a page could not be found
     unless page
-      page = self.wiki_pages.scope.new(:title => url.titleize, :url => url)
+      page = self.wiki_pages.temp_record(:title => url.titleize, :url => url)
       page.wiki = self
     end
     page

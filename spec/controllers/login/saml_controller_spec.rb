@@ -343,6 +343,19 @@ describe Login::SamlController do
           expect(response).to be_redirect
           expect(response.location).to match %r{^https://example.com/idp2/slo\?SAMLResponse=}
         end
+
+        it "returns bad request if SAMLRequest parameter doesn't match an AAC" do
+          @stub_hash[:id] = '_42'
+          @stub_hash[:issuer] = "hahahahahahaha"
+          Onelogin::Saml::LogoutRequest.stubs(:parse).returns(
+            stub('request', @stub_hash)
+          )
+
+          controller.request.env['canvas.domain_root_account'] = @account
+          get :destroy, :SAMLRequest => "foo"
+
+          expect(response.status).to eq 400
+        end
       end
     end
   end

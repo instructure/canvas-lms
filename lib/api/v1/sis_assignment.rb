@@ -70,6 +70,12 @@ module Api::V1::SisAssignment
   end
 
   def sis_assignment_course_sections_json(course_sections, assignment)
+    if assignment.only_visible_to_overrides
+      section_ids = active_assignment_overrides_for(assignment).map { |o| o.set_id if o.set_type == 'CourseSection' }
+      section_ids = Set.new(section_ids.compact)
+      course_sections = course_sections.select { |section| section_ids.include?(section.id) }
+    end
+
     course_sections.map { |s| sis_assignment_course_section_json(s, assignment) }
   end
 

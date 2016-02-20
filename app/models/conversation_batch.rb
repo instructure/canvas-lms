@@ -7,13 +7,6 @@ class ConversationBatch < ActiveRecord::Base
   belongs_to :context, :polymorphic => true
   validates_inclusion_of :context_type, :allow_nil => true, :in => ['Account', 'Course', 'Group']
 
-  EXPORTABLE_ATTRIBUTES = [
-    :id, :workflow_state, :user_id, :recipient_ids, :root_conversation_message_id, :conversation_message_ids, :tags, :created_at, :updated_at, :context_type,
-    :context_id, :subject, :group, :generate_user_note
-  ]
-
-  EXPORTABLE_ASSOCIATIONS = [:user, :root_conversation_message, :context]
-
   before_save :serialize_conversation_message_ids
   after_create :queue_delivery
 

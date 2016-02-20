@@ -2,7 +2,6 @@ class DropUnusedIndices < ActiveRecord::Migration
   tag :postdeploy
 
   def self.up
-    remove_index :abstract_courses, :workflow_state
     remove_index :abstract_courses, :enrollment_term_id
     remove_index :abstract_courses, :account_id
     remove_index :appointment_group_sub_contexts, :id

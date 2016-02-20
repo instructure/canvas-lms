@@ -409,8 +409,12 @@ describe Enrollment do
         @enrollment.end_at = 4.days.from_now
         @enrollment.save!
         expect(@enrollment.reload.state).to eql(:invited)
-        expect(@enrollment.state_based_on_date).to eql(:invited)
-        expect(@enrollment.accept).to be_truthy
+        if @enrollment.admin?
+          expect(@enrollment.state_based_on_date).to eq(:inactive)
+        else
+          expect(@enrollment.state_based_on_date).to eql(:invited)
+          expect(@enrollment.accept).to be_truthy
+        end
       end
 
       def course_section_availability_test(should_be_invited=false)
@@ -564,9 +568,12 @@ describe Enrollment do
         @enrollment.save!
         @enrollment.reload
         expect(@enrollment.state).to eql(:invited)
-        expect(@enrollment.state_based_on_date).to eql(:invited)
-        expect(@enrollment.accept).to be_truthy
-
+        if @enrollment.admin?
+          expect(@enrollment.state_based_on_date).to eql(:inactive)
+        else
+          expect(@enrollment.state_based_on_date).to eql(:invited)
+          expect(@enrollment.accept).to be_truthy
+        end
         @course.restrict_student_future_view = true
         @course.save!
         @enrollment.update_attribute(:workflow_state, 'active')
@@ -684,7 +691,7 @@ describe Enrollment do
           @enrollment.end_at = 4.days.from_now
           @enrollment.save!
           expect(@enrollment.reload.state).to eql(:active)
-          expect(@enrollment.state_based_on_date).to eql(:accepted)
+          expect(@enrollment.state_based_on_date).to eql(@enrollment.admin? ? :inactive : :accepted)
         end
 
         it "should return inactive for students (accepted for admins) if upcoming and not available" do
@@ -694,7 +701,7 @@ describe Enrollment do
           @course.restrict_student_future_view = true
           @course.save!
           expect(@enrollment.reload.state).to eql(:active)
-          expect(@enrollment.state_based_on_date).to eql(@enrollment.admin? ? :accepted : :inactive)
+          expect(@enrollment.state_based_on_date).to eql(:inactive)
         end
       end
 
@@ -722,7 +729,7 @@ describe Enrollment do
           expect(@enrollment.state_based_on_date).to eql(:completed)
         end
 
-        it "should return accepted for students (active for admins) if upcoming and available" do
+        it "should return accepted for students (inactive for admins) if upcoming and available" do
           @term.start_at = 2.days.from_now
           @term.end_at = 4.days.from_now
           @term.reset_touched_courses_flag
@@ -731,7 +738,7 @@ describe Enrollment do
           expect(@enrollment.state_based_on_date).to eql(@enrollment.admin? ? :active : :accepted)
         end
 
-        it "should return inactive for students (active for admins) if upcoming and not available" do
+        it "should return inactive for all users if upcoming and not available" do
           @term.start_at = 2.days.from_now
           @term.end_at = 4.days.from_now
           @term.reset_touched_courses_flag
@@ -769,16 +776,16 @@ describe Enrollment do
           expect(@enrollment.state_based_on_date).to eql(:completed)
         end
 
-        it "should return accepted if upcoming and available" do
+        it "should return accepted if upcoming and available (and inactive for admins)" do
           @override.start_at = 2.days.from_now
           @override.end_at = 4.days.from_now
           @term.reset_touched_courses_flag
           @override.save!
           expect(@enrollment.reload.state).to eql(:active)
-          expect(@enrollment.state_based_on_date).to eql(:accepted)
+          expect(@enrollment.state_based_on_date).to eql(@enrollment.admin? ? :inactive : :accepted)
         end
 
-        it "should return inactive for students (accepted for admins) if upcoming and not available" do
+        it "should return inactive for all users if upcoming and not available" do
           @override.start_at = 2.days.from_now
           @override.end_at = 4.days.from_now
           @term.reset_touched_courses_flag
@@ -786,7 +793,7 @@ describe Enrollment do
           @course.restrict_student_future_view = true
           @course.save!
           expect(@enrollment.reload.state).to eql(:active)
-          expect(@enrollment.state_based_on_date).to eql(@enrollment.admin? ? :accepted : :inactive)
+          expect(@enrollment.state_based_on_date).to eql(:inactive)
         end
       end
     end
@@ -1880,6 +1887,62 @@ describe Enrollment do
       DueDateCacher.expects(:recompute).never
       DueDateCacher.expects(:recompute_course).never
       @enrollment.save
+    end
+  end
+
+  describe "#student_with_conditions?" do
+    it "returns false if the enrollment is neither a student enrollment nor a fake student enrollment" do
+      @enrollment.stubs(:student?).returns(false)
+      @enrollment.stubs(:fake_student?).returns(false)
+      expect(@enrollment.student_with_conditions?(include_future: true, include_fake_student: true)).to eq(false)
+    end
+
+    context "the enrollment is a student enrollment" do
+      before(:each) do
+        @enrollment.stubs(:student?).returns(true)
+        @enrollment.stubs(:fake_student?).returns(false)
+      end
+
+      it "returns true if include_future is true" do
+        expect(@enrollment.student_with_conditions?(include_future: true, include_fake_student: false)).to eq(true)
+      end
+
+      it "returns true if include_future is false and the enrollment is active" do
+        @enrollment.stubs(:participating?).returns(true)
+        expect(@enrollment.student_with_conditions?(include_future: false, include_fake_student: false)).to eq(true)
+      end
+
+      it "returns false if include_future is false and the enrollment is inactive" do
+        @enrollment.stubs(:participating?).returns(false)
+        expect(@enrollment.student_with_conditions?(include_future: false, include_fake_student: false)).to eq(false)
+      end
+    end
+
+    context "the enrollment is a fake student enrollment" do
+      before(:each) do
+        @enrollment.stubs(:student?).returns(false)
+        @enrollment.stubs(:fake_student?).returns(true)
+      end
+
+      it "returns false if include_fake_student is false" do
+        expect(@enrollment.student_with_conditions?(include_future: true, include_fake_student: false)).to eq(false)
+      end
+
+      context "include_fake_student is passed in as true" do
+        it "returns true if include_future is true" do
+          expect(@enrollment.student_with_conditions?(include_future: true, include_fake_student: true)).to eq(true)
+        end
+
+        it "returns true if include_future is false and the enrollment is active" do
+          @enrollment.stubs(:participating?).returns(true)
+          expect(@enrollment.student_with_conditions?(include_future: false, include_fake_student: true)).to eq(true)
+        end
+
+        it "returns false if include_future is false and the enrollment is inactive" do
+          @enrollment.stubs(:participating?).returns(false)
+          expect(@enrollment.student_with_conditions?(include_future: false, include_fake_student: true)).to eq(false)
+        end
+      end
     end
   end
 end

@@ -1151,8 +1151,10 @@ Reduce the width of your screen to see how the example components below both sca
 
 */
 
-$ic-Input-border: lighten($ic-color-dark, 65);
-@if $use_high_contrast {$ic-Input-border: $ic-color-dark;}
+
+@if $use_high_contrast { $ic-Input-border: $ic-color-dark; }
+@else { $ic-Input-border: lighten($ic-color-dark, 65); }
+$ic-Input-standard-height: 38px;
 
 @mixin ic-input-variant($border-color: $ic-Input-border, $color: $ic-brand-primary) {
   border-color: $border-color;
@@ -1183,7 +1185,7 @@ input[type="tel"], input[type="color"], .uneditable-input {
 
   &.ic-Input {
     // Overwrite legacy forms styles from Bootstrap 2.
-    width: 100%; height: auto;
+    width: 100%; height: $ic-Input-standard-height;
     display: block;
     margin-top: 0;
     margin-bottom: 0;
@@ -1198,7 +1200,6 @@ input[type="tel"], input[type="color"], .uneditable-input {
     outline-offset: -$ic-sp;
     background: $ic-color-light;
     padding: 8px 12px;
-    min-height: 38px;
 
     // Remove the webkit gloss in iOS
     -webkit-appearance: none;
@@ -1253,8 +1254,12 @@ input[type="tel"], input[type="color"], .uneditable-input {
 
 // special styles for select
 select.ic-Input, input[type="file"].ic-Input {
-  height: 38px;
   padding: 0 0 0 $ic-sp;
+}
+
+// special styles for textarea
+textarea.ic-Input {
+  height: auto;
 }
 
 
@@ -1388,7 +1393,7 @@ select.ic-Input:not(*:root) {
   display: flex;
   align-items: center;
   padding: ($ic-sp - 4) ($ic-sp - 4) ($ic-sp - 4) 0;
-  font-size: $baseFontSize - 2;
+  @include fontSize($ic-font-size--xsmall);
   line-height: 1.2;
   color: $ic-color-light;
   box-shadow: 0 2px 2px rgba(black, 0.2);
@@ -1501,7 +1506,7 @@ form.ic-Form-group { margin: 0; }
   display: block;
   line-height: $ic-label-line-height;
   font-weight: 500;
-  font-size: $baseFontSize;
+  @include fontSize($ic-font-size--small);
 }
 
 .ic-Form-actions {
@@ -1726,7 +1731,7 @@ form.ic-Form-group { margin: 0; }
 
   .ic-Input-group__add-on,
   .ic-Label {
-    height: 38px;
+    height: $ic-Input-standard-height;
     background: $ic-color-light;
     border: 1px solid $ic-Input-border;
     display: flex;

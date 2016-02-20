@@ -71,7 +71,9 @@ end
 module ActiveRecord::Coders
   class Utf8SafeYAMLColumn < YAMLColumn
     def load(*args)
-      Utf8Cleaner.recursively_strip_invalid_utf8!(super, true)
+      val = super
+      Utf8Cleaner.recursively_strip_invalid_utf8!(val, true) if val
+      val
     end
   end
 end

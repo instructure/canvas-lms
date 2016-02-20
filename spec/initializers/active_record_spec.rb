@@ -58,6 +58,15 @@ module ActiveRecord
       end
 
       describe "with temp table" do
+        around do |example|
+          begin
+            ActiveRecord::Base.in_migration = true
+            example.run
+          ensure
+            ActiveRecord::Base.in_migration = false
+          end
+        end
+
         it "should use a temp table when you select without an id" do
           User.create!
           User.select(:name).find_in_batches do |batch|

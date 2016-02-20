@@ -8,7 +8,7 @@ module Canvas::Plugins::TicketingSystem
     describe "#to_document" do
       it "translates an error_report to a json-able hash" do
         expect(delegate.to_document).to eq({:subject=>nil, :description=>nil,
-           :report_type=>"ERROR", :error_message=>nil, :perceived_severity=>nil,
+           :report_type=>"ERROR", :error_message=>nil, :perceived_severity=>'',
            :account_id=>nil, :account_domain=>nil, :report_origin_url=>nil,
            :reporter=>
              {:canvas_id=>"", :email=>"unknown-unknowndomain-example-com@instructure.example.com",

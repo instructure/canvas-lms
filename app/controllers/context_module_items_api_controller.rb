@@ -165,12 +165,12 @@
 #         },
 #         "completion_requirement": {
 #           "description": "Completion requirement for this module item",
-#           "example": "{\"type\"=>\"min_score\", \"min_score\"=>10, \"completed\"=>true}",
+#           "example": {"type": "min_score", "min_score": 10, "completed": true},
 #           "$ref": "CompletionRequirement"
 #         },
 #         "content_details": {
 #           "description": "(Present only if requested through include[]=content_details) If applicable, returns additional details specific to the associated object",
-#           "example": "{\"points_possible\"=>20, \"due_at\"=>\"2012-12-31T06:00:00-06:00\", \"unlock_at\"=>\"2012-12-31T06:00:00-06:00\", \"lock_at\"=>\"2012-12-31T06:00:00-06:00\"}",
+#           "example": {"points_possible": 20, "due_at": "2012-12-31T06:00:00-06:00", "unlock_at": "2012-12-31T06:00:00-06:00", "lock_at": "2012-12-31T06:00:00-06:00"},
 #           "$ref": "ContentDetails"
 #         }
 #       }
@@ -183,8 +183,9 @@
 #       "properties": {
 #         "items": {
 #           "description": "an array containing one hash for each appearence of the asset in the module sequence (up to 10 total)",
-#           "example": "[{\"prev\"=>nil, \"current\"=>{\"id\"=>768, \"module_id\"=>123, \"title\"=>\"A lonely page\", \"type\"=>\"Page\"}, \"next\"=>{\"id\"=>769, \"module_id\"=>127, \"title\"=>\"Project 1\", \"type\"=>\"Assignment\"}}]",
-#           "type": "string"
+#           "example": [{"prev": null, "current": {"id": 768, "module_id": 123, "title": "A lonely page", "type": "Page"}, "next": {"id": 769, "module_id": 127, "title": "Project 1", "type": "Assignment"}}],
+#           "type": "array",
+#           "items": { "type": "object" }
 #         },
 #         "modules": {
 #           "description": "an array containing each Module referenced above",

@@ -74,13 +74,20 @@ class ContentZipper
 
     filename    = assignment_zip_filename(assignment)
     user        = zip_attachment.user
-    
+
+    # It is possible to get this far if an assignment allows the
+    # downloadable submissions below as well as those that can't be
+    # downloaded. In that case, only retrieve the ones that can be
+    # downloaded.
+    downloadable_submissions = ["online_upload", "online_url", "online_text_entry"]
     if @context.completed?
-      submissions = assignment.submissions
-      students = User.where(id: submissions.pluck(:user_id)).index_by(&:id) # This neglects the complexity of group assignments
+      submissions = assignment.submissions.where(submission_type: downloadable_submissions)
+      # This neglects the complexity of group assignments
+      students = User.where(id: submissions.pluck(:user_id)).index_by(&:id)
     else
       students    = assignment.representatives(user).index_by(&:id)
-      submissions = assignment.submissions.where(:user_id => students.keys)
+      submissions = assignment.submissions.where(user_id: students.keys,
+                                                 submission_type: downloadable_submissions)
     end
 
     make_zip_tmpdir(filename) do |zip_name|
@@ -353,7 +360,7 @@ class ContentZipper
     #
     # All other attachments toss on the static attachment pile for
     # later processing.
-    if entry.content.present?
+    if entry.content.is_a?(Array) && entry.content.present?
       entry.content.select { |c| c[:section_type] == "rich_text" }.each do |rt|
         rt[:content].gsub!(StaticAttachment::FILES_REGEX) do |match|
           att = Attachment.find_by_id(Regexp.last_match(:obj_id))

@@ -29,14 +29,6 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
 
   GRACEFUL_FINISHED_AT_DRIFT_PERIOD = 5.minutes
 
-  EXPORTABLE_ATTRIBUTES = [
-    :id, :quiz_id, :quiz_version, :user_id, :submission_data, :submission_id, :score, :kept_score, :quiz_data, :started_at, :end_at, :finished_at, :attempt, :workflow_state,
-    :created_at, :updated_at, :fudge_points, :quiz_points_possible, :extra_attempts, :temporary_user_code, :extra_time, :manually_unlocked, :manually_scored, :score_before_regrade, :was_preview,
-    :has_seen_results
-  ]
-
-  EXPORTABLE_ASSOCIATIONS = [:quiz, :user, :submission, :attachments]
-
   validates_presence_of :quiz_id
   validates_numericality_of :extra_time, greater_than_or_equal_to: 0,
     less_than_or_equal_to: 10080, # one week
@@ -211,7 +203,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
        (
          quiz_submissions.workflow_state = 'completed'
          AND quiz_submissions.submission_data IS NOT NULL
-       )", {time: Time.now})
+       )", {time: Time.now}).to_a
      resp.select! { |qs| qs.needs_grading? }
      resp
    end
@@ -268,7 +260,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
 
     self.class.where(id: self).
         where("workflow_state NOT IN ('complete', 'pending_review')").
-        update_all(user_id: user_id, submission_data: new_params.to_yaml)
+        update_all(user_id: user_id, submission_data: CANVAS_RAILS4_0 ? new_params.to_yaml : new_params)
 
     record_answer(new_params)
 

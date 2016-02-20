@@ -79,22 +79,6 @@ class Course < ActiveRecord::Base
                   :time_zone,
                   :organize_epub_by_content_type
 
-  EXPORTABLE_ATTRIBUTES = [
-    :id, :name, :account_id, :group_weighting_scheme, :workflow_state, :uuid, :start_at, :conclude_at, :grading_standard_id, :is_public, :allow_student_wiki_edits,
-    :created_at, :updated_at, :show_public_context_messages, :syllabus_body, :allow_student_forum_attachments, :default_wiki_editing_roles, :wiki_id, :allow_student_organized_groups,
-    :course_code, :default_view, :root_account_id, :enrollment_term_id, :sis_source_id, :sis_batch_id, :show_all_discussion_entries, :open_enrollment, :storage_quota,
-    :tab_configuration, :allow_wiki_comments, :turnitin_comments, :self_enrollment, :license, :indexed, :restrict_enrollments_to_course_dates, :template_course_id,
-    :locale, :settings, :replacement_course_id,  :public_description, :self_enrollment_code, :self_enrollment_limit, :abstract_course_id, :course_account_associations, :lti_context_id
-  ]
-
-  EXPORTABLE_ASSOCIATIONS = [
-    :abstract_course, :root_account, :enrollment_term, :grading_standard, :template_course, :course_sections, :enrollments, :custom_gradebook_columns,
-    :group_categories, :groups, :assignments, :assignment_groups, :calendar_events, :submissions, :discussion_topics, :discussion_entries, :announcements,
-    :attachments, :folders, :wiki, :quizzes, :assessment_question_banks, :grading_standards, :web_conferences,
-    :collaborations, :context_modules, :context_module_tags, :media_objects, :page_views, :asset_user_accesses, :role_overrides, :alerts,
-    :appointment_groups, :content_participation_counts
-  ]
-
   time_zone_attribute :time_zone
   def time_zone_with_root_account
     if read_attribute(:time_zone)
@@ -638,9 +622,15 @@ class Course < ActiveRecord::Base
     return unless user
     RequestCache.cache('user_is_student', self, user, opts) do
       Rails.cache.fetch([self, user, "course_user_is_student", opts[:include_future]].cache_key) do
-        user.cached_current_enrollments(:preload_dates => true, :include_future => opts[:include_future]).any? { |e|
-          e.course_id == self.id && (opts[:include_future] ? e.student? : e.participating_student?)
-        }
+        current_enrollments = user.cached_current_enrollments(
+          preload_dates: true, include_future: opts[:include_future])
+        current_enrollments.any? do |enrollment|
+          enrollment.course_id == self.id &&
+            enrollment.student_with_conditions?(
+              include_future: opts[:include_future],
+              include_fake_student: opts[:include_fake_student]
+            )
+        end
       end
     end
   end
@@ -1291,9 +1281,11 @@ class Course < ActiveRecord::Base
     end
   end
 
-  def account_chain
+  def account_chain(include_site_admin: false)
     @account_chain ||= Account.account_chain(account_id)
-    @account_chain.dup
+    result = @account_chain.dup
+    Account.add_site_admin_to_chain!(result) if include_site_admin
+    result
   end
 
   def institution_name
@@ -1303,7 +1295,8 @@ class Course < ActiveRecord::Base
 
   def account_users_for(user)
     return [] unless user
-    @associated_account_ids ||= (self.associated_accounts + [Account.site_admin]).map { |a| a.active? ? a.id : nil }.compact
+    @associated_account_ids ||= (self.associated_accounts + root_account.account_chain(include_site_admin: true)).
+        uniq.map { |a| a.active? ? a.id : nil }.compact
     @account_users ||= {}
     @account_users[user.global_id] ||= Shard.partition_by_shard(@associated_account_ids) do |account_chain_ids|
       if account_chain_ids == [Account.site_admin.id]
@@ -2422,7 +2415,7 @@ class Course < ActiveRecord::Base
             tabs.delete_if {|t| [TAB_PEOPLE, TAB_OUTCOMES].include?(t[:id]) }
           end
 
-          unless discussion_topics.scope.new.grants_right?(user, :read)
+          unless discussion_topics.temp_record.grants_right?(user, :read)
             tabs.delete_if { |t| t[:id] == TAB_ANNOUNCEMENTS }
           end
 

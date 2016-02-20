@@ -22,9 +22,6 @@ class AbstractCourse < ActiveRecord::Base
 
   attr_accessible :name, :account, :short_name, :enrollment_term, :root_account
 
-  EXPORTABLE_ATTRIBUTES = [:id, :sis_source_id, :sis_batch_id, :account_id, :root_account_id, :short_name, :name, :created_at, :updated_at, :enrollment_term_id, :workflow_state]
-  EXPORTABLE_ASSOCATIONS = [:root_account, :account, :enrollment_term, :courses]
-
   belongs_to :root_account, :class_name => 'Account'
   belongs_to :account
   belongs_to :enrollment_term

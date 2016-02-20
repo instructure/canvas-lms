@@ -5,7 +5,7 @@
 </div>
 <% end %>
 
-<%= render :partial => 'courses/assignments_needing_grading', :locals => {:contexts => nil} %>
+<%= render :partial => 'courses/to_do_list', :locals => {:contexts => nil} %>
 <% locals = {
     :title => t('coming_up', "Coming Up"),
     :period => :one_week,

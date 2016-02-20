@@ -67,12 +67,12 @@ private
 
   def locking_account_in_chain
     if locking_account_id.present?
-      account = if context.respond_to?(:parent_account)
-                  context.parent_account || Account.site_admin
-                else
-                  context.account
-                end
-      account_chain_ids = account.account_chain(include_site_admin: true).map(&:id)
+      if context.is_a?(User)
+        account_chain_ids = [Account.site_admin.id]
+      else
+        account_chain_ids = context.account_chain(include_site_admin: true).map(&:id)
+        account_chain_ids.shift if context.is_a?(Account)
+      end
       errors.add(:locking_account_id, "not in account chain") unless account_chain_ids.include?(locking_account_id)
     end
   end

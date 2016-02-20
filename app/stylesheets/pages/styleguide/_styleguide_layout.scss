@@ -76,7 +76,7 @@ body.Sg-only {
 }
 .Sg-header__Navigation-item {
   color: $sg-header-navigation-item;
-  font-size: 16px;
+  @include fontSize($ic-font-size--medium);
   padding: 13px 15px;
   text-transform: capitalize;  
   text-decoration: none;  
@@ -107,7 +107,7 @@ body.Sg-only {
   &:active,
   &:visited,
   &:focus {
-    font-size: 13px;
+    @include fontSize(13px);
     padding: 8px 10px;
     font-weight: 500;
     color: $sg-header-subnavigation-item;
@@ -129,7 +129,7 @@ body.Sg-only {
   > h1 {
     background: $sg-content-title-background;
     color: $sg-content-title-font-color;
-    font-size: 48px;
+    @include fontSize(48px);
     font-weight: 100;
     text-align: center;
     padding: 40px 0;
@@ -139,20 +139,20 @@ body.Sg-only {
     padding: 3px 0;
     margin: 25px 0;
     text-transform: capitalize;
-    font-size: 20px;
+    @include fontSize(20px);
     text-align: center;
     border-top: 1px solid $sg-title-border;
     border-bottom: 1px solid $sg-title-border;
   }
   > p {
-    font-size: 16px;
+    @include fontSize($ic-font-size--medium);
     text-align: center;
     margin: 0;
   }  
   > ul, > dl, > ol {
     margin: 10px 20px;
     li {
-      font-size: 16px;
+      @include fontSize($ic-font-size--medium);
     }
   }
   & > hr {

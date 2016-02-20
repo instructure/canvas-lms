@@ -170,12 +170,12 @@
 #           "computed_current_score": {
 #             "description": "optional: The student's score in the course, ignoring ungraded assignments. (applies only to student enrollments, and only available in course endpoints)",
 #             "example": 90.25,
-#             "type": "float"
+#             "type": "number"
 #           },
 #           "computed_final_score": {
 #             "description": "optional: The student's score in the course including ungraded assignments with a score of 0. (applies only to student enrollments, and only available in course endpoints)",
 #             "example": 80.67,
-#             "type": "float"
+#             "type": "number"
 #           },
 #           "computed_current_grade": {
 #             "description": "optional: The letter grade equivalent of computed_current_score, if available. (applies only to student enrollments, and only available in course endpoints)",
@@ -202,15 +202,20 @@
 #             "example": "Fall Grading Period",
 #             "type": "string"
 #           },
+#           "current_grading_period_id": {
+#             "description": "optional: The id of the currently active grading period, if one exists. If the course the enrollment belongs to does not have Multiple Grading Periods enabled, or if no currently active grading period exists, the value will be null. (applies only to student enrollments, and only available in course endpoints)",
+#             "example": 5,
+#             "type": "integer"
+#           },
 #           "current_period_computed_current_score": {
 #             "description": "optional: The student's score in the course for the current grading period, ignoring ungraded assignments. If the course the enrollment belongs to does not have Multiple Grading Periods enabled, or if no currently active grading period exists, the value will be null. (applies only to student enrollments, and only available in course endpoints)",
 #             "example": 95.80,
-#             "type": "float"
+#             "type": "number"
 #           },
 #           "current_period_computed_final_score": {
 #             "description": "optional: The student's score in the course for the current grading period, including ungraded assignments with a score of 0. If the course the enrollment belongs to does not have Multiple Grading Periods enabled, or if no currently active grading period exists, the value will be null. (applies only to student enrollments, and only available in course endpoints)",
 #             "example": 85.25,
-#             "type": "float"
+#             "type": "number"
 #           },
 #           "current_period_computed_current_grade": {
 #             "description": "optional: The letter grade equivalent of current_period_computed_current_score, if available. If the course the enrollment belongs to does not have Multiple Grading Periods enabled, or if no currently active grading period exists, the value will be null. (applies only to student enrollments, and only available in course endpoints)",
@@ -341,14 +346,13 @@ class EnrollmentsApiController < ApplicationController
   # @argument id [Required, Integer]
   #  The ID of the enrollment object
   # @returns Enrollment
-
   def show
-    enrollment = Enrollment.find(params[:id])
-    if enrollment.user_id == @current_user.id || enrollment.root_account == @context && authorized_action(@context, @current_user, [:read_roster])
-      #render enrollment object if requesting user is the current_user or user is authorized to read enrollment.
+    enrollment = @context.all_enrollments.find(params[:id])
+    if enrollment.user_id == @current_user.id || authorized_action(@context, @current_user, :read_roster)
       render :json => enrollment_json(enrollment, @current_user, session)
     end
   end
+
   # @API Enroll a user
   # Create a new user enrollment for a course or section.
   #

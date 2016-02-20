@@ -1,5 +1,5 @@
 <% define_content :link do %>
-  <%= polymorphic_url([asset.group.context, :groups]) %>
+  <%= polymorphic_url([asset.group.context, asset.group]) %>
 <% end %>
 <% define_content :subject do %>
   <%= t :subject, "New Group Membership for %{course_or_account}", :course_or_account => asset.group.context.name %>
@@ -16,11 +16,4 @@
     end
 %>
 
-<%=
-    case asset.group.context_type
-    when 'Account'
-      t("You can see which groups you're a part of for this account by clicking this link: %{link}.", link: content(:link))
-    else
-      t("You can see which groups you're a part of for this course by clicking this link: %{link}.", link: content(:link))
-    end
-%>
+<%= t("You can check out the group by clicking this link: %{link}", link: content(:link)) %>

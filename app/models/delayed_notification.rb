@@ -35,9 +35,6 @@ class DelayedNotification < ActiveRecord::Base
 
   serialize :recipient_keys
 
-  include PolymorphicTypeOverride
-  override_polymorphic_types asset_type: {'QuizSubmission' => 'Quizzes::QuizSubmission'}
-
   workflow do
     state :to_be_processed do
       event :do_process, :transitions_to => :processed

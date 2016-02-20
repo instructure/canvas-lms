@@ -5,8 +5,7 @@ define(function(require) {
   var Question = require('jsx!../question');
   var QuestionHeader = require('jsx!./header');
   var CorrectAnswerDonut = require('jsx!../charts/correct_answer_donut');
-  var AnswerBars = require('jsx!../charts/answer_bars');
-  var Answers = require('jsx!./multiple_choice/answers');
+  var AnswerTable = require('jsx!./answer_table');
   var calculateResponseRatio = require('../../models/ratio_calculator');
   var round = require('canvas_quizzes/util/round');
   var classSet = require('canvas_quizzes/util/class_set');
@@ -31,7 +30,9 @@ define(function(require) {
         return answerSet.id === answerSetId;
       })[0] || { answers: [] };
       if(answerSet.answers){
-        answerSet.answers.forEach(function(answer){answer.poolId = answerSet.id})
+        answerSet.answers.forEach(function(answer) {
+          answer.poolId = answerSet.id;
+        });
       }
       return answerSet.answers;
     },
@@ -52,31 +53,43 @@ define(function(require) {
       var answerPool = this.getAnswerPool();
 
       return(
-        <Question expanded={this.props.expanded}>
-          <QuestionHeader
-            responseCount={this.props.responses}
-            participantCount={this.props.participantCount}
-            onToggleDetails={this.props.onToggleDetails}
-            expanded={this.props.expanded}
-            questionText={this.props.questionText}
-            position={this.props.position} />
+        <Question>
+          <div className="grid-row">
+            <div className="col-sm-8 question-top-left">
+              <QuestionHeader
+                responseCount={this.props.responses}
+                participantCount={this.props.participantCount}
+                questionText={this.props.questionText}
+                position={this.props.position} />
 
-          <nav className="row-fluid answer-set-tabs">
-            {this.props.answerSets.map(this.renderAnswerSetTab)}
-          </nav>
+              <div
+                className="question-text"
+                aria-hidden
+                dangerouslySetInnerHTML={{ __html: this.props.questionText }} />
 
-          <div key="charts">
-            <CorrectAnswerDonut
-              correctResponseRatio={crr}
-              label={I18n.t('correct_multiple_response_ratio',
-                '%{ratio}% of your students responded correctly.', {
-                ratio: round(crr * 100.0, 0)
-              })} />
+              <nav className="row-fluid answer-set-tabs">
+                {this.props.answerSets.map(this.renderAnswerSetTab)}
+              </nav>
+            </div>
 
-            <AnswerBars answers={answerPool} />
+            <div className="col-sm-4 question-top-right"></div>
           </div>
 
-          {this.props.expanded && <Answers answers={answerPool} />}
+          <div className="grid-row">
+            <div className="col-sm-8 question-bottom-left">
+              <AnswerTable answers={answerPool} />
+            </div>
+
+            <div className="col-sm-4 question-bottom-right">
+              <CorrectAnswerDonut
+                correctResponseRatio={crr}
+                label={I18n.t(
+                  '%{ratio}% responded correctly', {
+                    ratio: round(crr * 100.0, 0)
+                  }
+                )} />
+            </div>
+          </div>
         </Question>
       );
     },

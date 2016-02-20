@@ -12,7 +12,7 @@
 
 .ui-dialog .ui-dialog-title {
   float: left; margin: 0 16px 0 0;
-  font-size: 18px;
+  @include fontSize(18px);
   font-weight: normal;
 }
 .ui-dialog .ui-dialog-titlebar-close { position: absolute; right: .3em; top: 50%; width: 19px; margin: -10px 0 0 0; padding: 1px; height: 18px; }
@@ -84,5 +84,5 @@
   border-top: 0; border-left: 0; border-right: 0;
   border-bottom-left-radius: 0; border-bottom-right-radius: 0;
   font-weight: bold;
-  font-size: 14px;
+  @include fontSize(14px);
 }

@@ -20,7 +20,7 @@ require 'ims/lti'
 IMS::LTI::Models::ContentItems::ContentItem.add_attribute :canvas_url, json_key: 'canvasURL'
 
 class ExternalContentController < ApplicationController
-  protect_from_forgery :except => [:selection_test, :success]
+  protect_from_forgery :except => [:selection_test, :success], with: :exception
 
   def success
     normalize_deprecated_data!

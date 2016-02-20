@@ -30,7 +30,7 @@ module Api::V1::QuizSubmissionQuestion
   # @param [Boolean] meta[:censored] if answer correctness should be censored out
   def quiz_submission_questions_json(quiz_questions, quiz_submission, meta = {})
     meta[:censored] ||= true
-    quiz_questions = [ quiz_questions ] unless quiz_questions.kind_of?(Array)
+    quiz_questions = Array(quiz_questions) unless quiz_questions.kind_of?(Array)
     includes = (meta[:includes] || []) & INCLUDABLES
 
     data = {}

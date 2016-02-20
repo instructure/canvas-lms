@@ -44,14 +44,6 @@ class Enrollment < ActiveRecord::Base
   has_many :course_account_associations, :foreign_key => 'course_id', :primary_key => 'course_id'
   has_many :grading_period_grades, dependent: :destroy
 
-  EXPORTABLE_ATTRIBUTES = [
-    :id, :user_id, :course_id, :type, :uuid, :workflow_state, :created_at, :updated_at, :associated_user_id, :sis_source_id, :sis_batch_id, :start_at, :end_at,
-    :course_section_id, :root_account_id, :computed_final_score, :completed_at, :self_enrolled, :computed_current_score, :grade_publishing_status, :last_publish_attempt_at,
-    :grade_publishing_message, :limit_privileges_to_course_section, :role_id, :last_activity_at
-  ]
-
-  EXPORTABLE_ASSOCIATIONS = [:course, :course_section, :root_account, :user, :role_overrides, :pseudonyms]
-
   validates_presence_of :user_id, :course_id, :type, :root_account_id, :course_section_id, :workflow_state, :role_id
   validates_inclusion_of :limit_privileges_to_course_section, :in => [true, false]
   validates_inclusion_of :associated_user_id, :in => [nil],
@@ -675,7 +667,7 @@ class Enrollment < ActiveRecord::Base
       self.restrict_past_view? ? :inactive : :completed
     elsif self.fake_student? # Allow student view students to use the course before the term starts
       state
-    elsif !self.restrict_future_view?
+    elsif view_restrictable? && !self.restrict_future_view?
       self.available_at = global_start_at
       if state == :active
         # an accepted enrollment state means they still can't participate yet,
@@ -703,6 +695,10 @@ class Enrollment < ActiveRecord::Base
     self.view_restrictable? && RequestCache.cache('restrict_student_future_view', self.global_course_id) do
       self.course.restrict_student_future_view?
     end
+  end
+
+  def restrict_future_listing?
+    self.restrict_future_view? && self.course.account.restrict_student_future_listing[:value]
   end
 
   def active?
@@ -942,6 +938,15 @@ class Enrollment < ActiveRecord::Base
 
   def fake_student?
     false
+  end
+
+  def student_with_conditions?(include_future:, include_fake_student:)
+    return false unless student? || fake_student?
+    if include_fake_student
+      include_future || participating?
+    else
+      include_future ? student? : participating_student?
+    end
   end
 
   def observer?

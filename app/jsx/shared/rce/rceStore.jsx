@@ -19,6 +19,12 @@ define([
       if (!rce) { return null }
 
       let fnString = args[0]
+
+      // since exists? has a ? and cant be a regular function (yet
+      // we want the same signature as editorbox) just return true
+      // rather than calling as a fn on rceWrapper
+      if (fnString === "exists?") {return true}
+
       let fnArgs = _.rest(args)
       return rce[fnString](...fnArgs)
     },

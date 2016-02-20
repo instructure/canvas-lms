@@ -25,9 +25,6 @@ class RoleOverride < ActiveRecord::Base
 
   attr_accessible :context, :permission, :role, :enabled, :applies_to_self, :applies_to_descendants
 
-  EXPORTABLE_ATTRIBUTES = [:id, :enrollment_type, :permission, :enabled, :locked, :context_id, :context_type, :created_at, :updated_at, :applies_to_self, :applies_to_descendants]
-  EXPORTABLE_ASSOCIATIONS = [:context]
-
   validate :must_apply_to_something
 
   def must_apply_to_something
@@ -742,6 +739,13 @@ class RoleOverride < ActiveRecord::Base
         :label => -> { t('Moderate Grades') },
         :true_for => %w(AccountAdmin TeacherEnrollment),
         :available_to => %w(AccountAdmin AccountMembership TeacherEnrollment TaEnrollment)
+      },
+      :reset_any_mfa => {
+        :label => -> { t('Reset Multi-Factor Authentication') },
+        :account_only => :root,
+        :true_for => %w(AccountAdmin),
+        :available_to => %w(AccountAdmin AccountMembership),
+        :account_allows => lambda {|a| a.mfa_settings != :disabled}
       }
     })
 
@@ -854,12 +858,11 @@ class RoleOverride < ActiveRecord::Base
     @@role_override_chain ||= {}
     overrides = @@role_override_chain[permissionless_key] ||= begin
       context.shard.activate do
-        accounts = context.account_chain
-        overrides = RoleOverride.where(:context_id => accounts, :context_type => 'Account', :role_id => role)
-
-        if role_context == Account.site_admin && !accounts.include?(Account.site_admin)
-          accounts << Account.site_admin
-          overrides += Account.site_admin.role_overrides.where(:role_id => role)
+        accounts = context.account_chain(include_site_admin: true)
+        overrides = Shard.partition_by_shard(accounts) do |shard_accounts|
+          # skip loading from site admin if the role is not from site admin
+          next if shard_accounts == [Account.site_admin] && role_context != Account.site_admin
+          RoleOverride.where(:context_id => accounts, :context_type => 'Account', :role_id => role)
         end
 
         accounts.reverse!
@@ -889,7 +892,15 @@ class RoleOverride < ActiveRecord::Base
       # keep track of the value for the parent
       generated_permission[:prior_default] = generated_permission[:enabled]
 
-      unless override.enabled.nil?
+      if override.new_record?
+        if last_override
+          if generated_permission[:enabled] == [:descendants]
+            generated_permission[:enabled] = [:self, :descendants]
+          elsif generated_permission[:enabled] == [:self]
+            generated_permission[:enabled] = nil
+          end
+        end
+      else
         generated_permission[:explicit] = true if last_override
         if hit_role_context
           generated_permission[:enabled] ||= override.enabled? ? override.applies_to : nil
@@ -944,6 +955,10 @@ class RoleOverride < ActiveRecord::Base
           :role => role)
         role_override.enabled = settings[:override] unless settings[:override].nil?
         role_override.locked = settings[:locked] unless settings[:locked].nil?
+        role_override.applies_to_self = settings[:applies_to_self] unless settings[:applies_to_self].nil?
+        unless settings[:applies_to_descendants].nil?
+          role_override.applies_to_descendants = settings[:applies_to_descendants]
+        end
         role_override.save!
       elsif role_override
         role_override.destroy

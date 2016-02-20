@@ -56,8 +56,8 @@ describe StreamItem do
 
   describe "destroy_stream_items_using_setting" do
     it "should have a default ttl" do
-      si1 = StreamItem.create! { |si| si.asset_type = 'Message'; si.data = {} }
-      si2 = StreamItem.create! { |si| si.asset_type = 'Message'; si.data = {} }
+      si1 = StreamItem.create! { |si| si.asset_type = 'Message'; si.data = { notification_id: nil } }
+      si2 = StreamItem.create! { |si| si.asset_type = 'Message'; si.data = { notification_id: nil } }
       StreamItem.where(:id => si2).update_all(:updated_at => 1.year.ago)
       expect {
         StreamItem.destroy_stream_items_using_setting

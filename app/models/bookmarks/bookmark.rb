@@ -1,5 +1,6 @@
 class Bookmarks::Bookmark < ActiveRecord::Base
   acts_as_list scope: :user_id
+  strong_params
 
   def data
     json ? JSON.parse(json) : nil

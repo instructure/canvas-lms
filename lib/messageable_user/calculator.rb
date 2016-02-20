@@ -165,9 +165,7 @@ class MessageableUser
 
     def count_messageable_users_in_scope(scope)
       if scope
-        # convert the group by into a select distinct
-        group_as_select = scope.group_values
-        scope.except(:select, :group, :order).select(group_as_select).uniq.count
+        scope.except(:select, :group, :order).uniq.count
       else
         0
       end

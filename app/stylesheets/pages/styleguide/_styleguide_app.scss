@@ -110,7 +110,7 @@ $sg-Header-height: 85px;
 
 .sg-bg-color-example {
   background: $ic-bg-light-primary;
-  font-size: 14px;
+  @include fontSize($ic-font-size--small);
   color: $ic-brand-primary;
   padding: $ic-sp;
   &--neutral {

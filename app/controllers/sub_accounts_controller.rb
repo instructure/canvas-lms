@@ -80,7 +80,7 @@ class SubAccountsController < ApplicationController
         group('course_account_associations.account_id').
         where("course_account_associations.account_id IN (?) AND " +
                     "course_account_associations.depth=0 AND courses.workflow_state<>'deleted'", @accounts[:all_account_ids]).
-        count(:id, :distinct => true)
+        distinct.count(:id)
     counts.each do |account_id, count|
       @accounts[account_id][:course_count] = count
     end

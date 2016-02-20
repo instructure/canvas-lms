@@ -274,6 +274,52 @@ describe Login::OtpController do
       expect(@other_user.otp_communication_channel).not_to be_nil
     end
 
+    it "should be able to delete another user with permission" do
+      @other_user = @user
+      @admin = user_with_pseudonym(active_all: 1, unique_id: 'user2')
+      mfa_role = custom_account_role('mfa_role', account: Account.default)
+
+      Account.default.role_overrides.create!(role: mfa_role, permission: 'reset_any_mfa', enabled: true)
+      Account.default.account_users.create!(user: @admin, role: mfa_role)
+
+      user_session(@admin)
+      delete :destroy, user_id: @other_user.id
+      expect(response).to be_success
+      expect(@other_user.reload.otp_secret_key).to be_nil
+      expect(@other_user.otp_communication_channel).to be_nil
+    end
+
+    it "should be able to delete another user with site_admin" do
+      @other_user = @user
+      @admin = user_with_pseudonym(active_all: 1, unique_id: 'user2', account: Account.site_admin)
+      mfa_role = custom_account_role('mfa_role', account: Account.site_admin)
+
+      Account.site_admin.role_overrides.create!(role: mfa_role, permission: 'reset_any_mfa', enabled: true)
+      Account.site_admin.account_users.create!(user: @admin, role: mfa_role)
+
+      user_session(@admin)
+      delete :destroy, user_id: @other_user.id
+      expect(response).to be_success
+      expect(@other_user.reload.otp_secret_key).to be_nil
+      expect(@other_user.otp_communication_channel).to be_nil
+    end
+
+    it "should not be able to delete another user from different account" do
+      @other_user = @user
+      account1 = Account.create!
+      @admin = user_with_pseudonym(active_all: 1, unique_id: 'user2', account: account1)
+      mfa_role = custom_account_role('mfa_role', account: account1)
+
+      account1.role_overrides.create!(role: mfa_role, permission: 'reset_any_mfa', enabled: true)
+      account1.account_users.create!(user: @admin, role: mfa_role)
+      user_session(@admin)
+
+      delete :destroy, user_id: @other_user.id
+      expect(response).not_to be_success
+      expect(@other_user.reload.otp_secret_key).not_to be_nil
+      expect(@other_user.otp_communication_channel).not_to be_nil
+    end
+
     it "should be able to delete another user as admin" do
       # even if required
       Account.default.settings[:mfa_settings] = :required

@@ -32,7 +32,10 @@ module ContextModuleProgressions
         if existing_progressions.include?(mod.id)
           progression = existing_progressions[mod.id]
         else
-          progression = mod.context_module_progressions.create!(user: user)
+          ContextModuleProgression.unique_constraint_retry do |retry_count|
+            progression = mod.context_module_progressions.where(user_id: user).first if retry_count > 0
+            progression ||= mod.context_module_progressions.create!(user: user)
+          end
         end
         progression.context_module = mod
         progression

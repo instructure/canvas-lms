@@ -26,7 +26,9 @@ define(function(require) {
       type: Subject
     });
 
-    it('should render', function() {});
+    it('should render', function() {
+      expect(subject.isMounted()).toEqual(true);
+    });
     it('renders a tab for each answer set', function() {
       setProps({
         answerSets: [
@@ -52,42 +54,25 @@ define(function(require) {
       expect(find('.answer-set-tabs .active').innerText).toMatch('size');
     });
 
-    it('shows answer drilldown per answer set', function() {
+    it('shows answer text per answer set', function() {
       setProps({
-        expanded: true,
         answerSets: answerSetFixture,
       });
 
+      debugger;
       expect(find('.answer-set-tabs .active').innerText).toMatch('color');
-      expect(find('.answer-drilldown').innerText).toContain('red');
-      expect(find('.answer-drilldown').innerText).toContain('green');
-      expect(find('.answer-drilldown').innerText).toContain('blue');
+      var answerTextMatches = findAll("th.answer-textfield");
+      expect(answerTextMatches[0].innerText).toEqual('red');
+      expect(answerTextMatches[1].innerText).toEqual('green');
+      expect(answerTextMatches[2].innerText).toEqual('blue');
 
       click('.answer-set-tabs button:contains("size")');
 
       expect(find('.answer-set-tabs .active').innerText).toMatch('size');
-      expect(find('.answer-drilldown').innerText).toContain('S');
-      expect(find('.answer-drilldown').innerText).toContain('M');
-      expect(find('.answer-drilldown').innerText).toContain('L');
-    });
-
-    it('updates the charts based on the active set', function() {
-      setProps({
-        participantCount: 4,
-        answerSets: answerSetFixture,
-      });
-
-      expect(find('.correct-answer-ratio-section').innerText)
-        .toMatch('100% of your students responded correctly.');
-      expect(find('.answer-distribution-section .auxiliary').innerText)
-        .toMatch('100%' + '4 students' + 'red');
-
-      click('.answer-set-tabs button:contains("size")');
-
-      expect(find('.correct-answer-ratio-section').innerText)
-        .toMatch('75% of your students responded correctly.');
-      expect(find('.answer-distribution-section .auxiliary').innerText)
-        .toMatch('75%' + '3 students' + 'L');
+      answerTextMatches = findAll("th.answer-textfield");
+      expect(answerTextMatches[0].innerText).toEqual('S');
+      expect(answerTextMatches[1].innerText).toEqual('M');
+      expect(answerTextMatches[2].innerText).toEqual('L');
     });
   });
 });

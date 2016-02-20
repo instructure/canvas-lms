@@ -9,7 +9,7 @@
     if @current_user_submissions
       submission = @current_user_submissions.detect { |s| s.assignment_id == recent_event.id }
     elsif @current_user
-      submission = @current_user.submissions.select([:id, :assignment_id, :score, :workflow_state, :updated_at]).where(:assignment_id => recent_event).first
+      submission = @current_user.submissions.select([:id, :assignment_id, :score, :grade, :workflow_state, :updated_at]).where(:assignment_id => recent_event).first
     end
 
     if is_assignment
@@ -17,7 +17,8 @@
     end
   end
 
-  cache([ 'recent_event_render2',
+  cache([ 'recent_event_render3',
+          @current_user, # needs to be here to bust the cache when the user changes course nicknames
           submission || 'no_submission',
           recent_event || 'blank_event',
           (recent_event.due_at if is_assignment),
@@ -32,50 +33,39 @@
                                                               :recent_event => recent_event,
                                                               :submission => submission,
                                                               :show_assignment_type_icon => true)
+    if is_calendar_event
+      context = recent_event.effective_context
+    else
+      context = recent_event.context
+    end
 
 %>
 
   <a
     data-track-category="dashboard"
     data-track-label="recent event"
-    class="tooltip" href="<%= recent_event_url(recent_event) %>"
+    href="<%= recent_event_url(recent_event) %>"
   >
-    <span class="tooltip_wrap">
-      <span class='tooltip-carat'></span>
-      <span class="tooltip_text">
-        <% if is_assignment %>
-          <span style="display: block;"><%= t(:due, "due") %>:
-            <%= due_at(recent_event, @current_user) %>
-          </span>
-          <% if icon_explanation %>
-            <span style="display: block; font-style: italic;"><%= icon_explanation %></span>
-          <% end %>
-          <% if recent_event.points_possible %>
-            <span style="display: block;"><%= t 'submission_score', %{%{score} *out of %{points_possible}*},
-              :score => "<strong>#{render_score(submission.score) if submission && !recent_event.muted?}</strong>".html_safe,
-              :points_possible => recent_event.points_possible,
-              :wrapper => '<span style="font-size: 0.8em;">\1</span>' %></span>
-          <% end %>
-        <% else %>
-          <span style="display: block;"><%= datetime_string(recent_event.start_at, :event, recent_event.end_at) %></span>
-        <% end %>
-        <% if show_context %>
-          <span style="display: block; font-size: 0.8em;">
-            <%= is_calendar_event ? recent_event.effective_context.short_name : recent_event.context.short_name %>
-          </span>
-        <% end %>
-      </span>
-    </span>
     <i class="<%= icon_class %>" aria-label="<%= icon_aria_label %>"></i>
     <div class="event-details">
       <b><%= recent_event.title %></b>
-      <em>
+      <% if show_context %>
+        <p><%= context.nickname_for(@current_user) %></p>
+      <% end %>
+      <p>
         <% if is_assignment %>
-          <%= due_at(recent_event, @current_user, 'date') %>
+          <% if submission && readable_grade(submission) && !recent_event.muted? %>
+            <%= readable_grade(submission) %>
+            &bullet;
+          <% elsif recent_event.points_possible %>
+            <%= t({one: '1 point', other: '%{count} points'}, count: recent_event.points_possible) %>
+            &bullet;
+          <% end %>
+          <%= due_at(recent_event, @current_user) %>
         <% else %>
-          <%= datetime_string(recent_event.start_at, :short ) %>
+          <%= datetime_string(recent_event.start_at) %>
         <% end %>
-      </em>
+      </p>
     </div>
   </a>
 

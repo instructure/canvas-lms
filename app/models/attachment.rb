@@ -25,21 +25,7 @@ class Attachment < ActiveRecord::Base
     col = table ? "#{table}.display_name" : 'display_name'
     best_unicode_collation_key(col)
   end
-  attr_accessible :context, :folder, :filename, :display_name, :user, :locked, :position, :lock_at, :unlock_at, :uploaded_data, :hidden
-  EXPORTABLE_ATTRIBUTES = [
-    :id, :context_id, :context_type, :size, :folder_id, :content_type,
-    :filename, :uuid, :display_name, :created_at, :updated_at,
-    :workflow_state, :user_id, :locked, :file_state, :deleted_at,
-    :position, :lock_at, :unlock_at, :last_lock_at, :last_unlock_at,
-    :could_be_locked, :root_attachment_id, :cloned_item_id,
-    :namespace, :media_entry_id, :encoding, :need_notify, :upload_error_message
-  ].freeze
-
-  EXPORTABLE_ASSOCIATIONS = [:context, :folder, :user, :media_object, :submission].freeze
-
-  include PolymorphicTypeOverride
-  override_polymorphic_types context_type: {'QuizStatistics' => 'Quizzes::QuizStatistics',
-                                            'QuizSubmission' => 'Quizzes::QuizSubmission'}
+  attr_accessible :context, :folder, :filename, :display_name, :user, :locked, :position, :lock_at, :unlock_at, :uploaded_data, :hidden, :viewed_at
 
   EXCLUDED_COPY_ATTRIBUTES = %w{id root_attachment_id uuid folder_id user_id
                                 filename namespace workflow_state}
@@ -816,8 +802,7 @@ class Attachment < ActiveRecord::Base
 
         # now generate the notification
         record = Attachment.find(attachment_id)
-        notification = BroadcastPolicy.notification_finder.by_name(count.to_i > 1 ? 'New Files Added' : 'New File Added')
-
+        next if record.context.is_a?(Course) && (!record.context.available? || record.context.concluded?)
         if record.context.is_a?(Course) && (record.folder.locked? || record.context.tab_hidden?(Course::TAB_FILES))
           # only notify course students if they are able to access it
           to_list = record.context.participating_admins - [record.user]
@@ -827,6 +812,7 @@ class Attachment < ActiveRecord::Base
         recipient_keys = (to_list || []).compact.map(&:asset_string)
         next if recipient_keys.empty?
 
+        notification = BroadcastPolicy.notification_finder.by_name(count.to_i > 1 ? 'New Files Added' : 'New File Added')
         asset_context = record.context
         data = { :count => count }
         DelayedNotification.send_later_if_production_enqueue_args(

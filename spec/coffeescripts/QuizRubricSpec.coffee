@@ -19,7 +19,6 @@ define ['quiz_rubric', 'jquery'], (QuizRubric, $)->
     "</div>"
 
   module "QuizRubric",
-
     setup: ->
       $("#fixtures").append(defaultRubric)
 

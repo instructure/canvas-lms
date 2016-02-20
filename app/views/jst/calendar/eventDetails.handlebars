@@ -103,10 +103,10 @@
   <div class="popover-links-holder event-details-footer">
     <div class="pull-right">
       {{#if can_delete }}
-        <a href="#" class="event_button btn button-secondary btn-small delete_event_link">{{#t "links.delete"}}Delete{{/t}}</a>
+        <button class="event_button Button Button--small delete_event_link">{{#t "links.delete"}}Delete{{/t}}</button>
       {{/if}}
       {{#if can_edit }}
-        <a href="#" class="event_button edit_event_link btn btn-primary btn-small">{{#t "links.edit"}}Edit{{/t}}</a>
+        <button class="event_button edit_event_link Button Button--small Button--primary">{{#t "links.edit"}}Edit{{/t}}</button>
       {{/if}}
     </div>
     <div class="event-details-links">
@@ -115,15 +115,15 @@
           <label for="appointment-comment"><b>{{#t}}Comments{{/t}}</b></label><br />
           <textarea id="appointment-comment" maxlength="255" name="appointment-comment"/>
         </p>
-        <a href="#" class="reserve_event_link"><strong>{{#t "links.reserve"}}Reserve{{/t}}</strong></a>
+        <button class="reserve_event_link Button Button--small Button--link"><strong>{{#t "links.reserve"}}Reserve{{/t}}</strong></button>
       {{/if}}
       {{#if can_unreserve }}
-        <a href="#" class="unreserve_event_link">{{#t "links.unreserve"}}Un-reserve{{/t}}</a>
+        <button class="unreserve_event_link Button Button--small Button--link">{{#t "links.unreserve"}}Un-reserve{{/t}}</button>
       {{/if}}
       {{#if reservations }}
-        <a href="#" class="message_students">
+        <button class="message_students Button Button--small Button--link">
           {{#t "message_students"}}Message students{{/t}}
-        </a>
+        </button>
       {{/if}}
     </div>
   </div>

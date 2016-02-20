@@ -32,7 +32,7 @@
   padding: 20px;
   color: $gray;
   font-weight: 200;
-  font-size: 15px;
+  @include fontSize(15px);
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
   // When a rule is used, it should have less margin in the popups
   hr {
@@ -80,6 +80,7 @@ i.usher-close {
       width: 20px !important;
       height: 20px !important;
       font-size: 20px !important;
+      font-size: 1.3rem !important;
     }
   }
 }
@@ -115,7 +116,7 @@ i.usher-close {
   }
   
   p {
-    font-size: 14px;
+    @include fontSize($ic-font-size--small);
     padding-right: 5px;
   }
 
@@ -127,7 +128,10 @@ i.usher-close {
   .hide-tour-link {
     text-align: right;
     padding-right: 10px;
-    button {font-size: 12px;text-decoration: underline;}
+    button {
+      @include fontSize($ic-font-size--xsmall);
+      text-decoration: underline;
+    }
   }
 }
 // Tour Step Counter

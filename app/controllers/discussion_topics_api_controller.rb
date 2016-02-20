@@ -379,7 +379,7 @@ class DiscussionTopicsApiController < ApplicationController
   #   ]
   def entry_list
     ids = Array(params[:ids])
-    entries = @topic.discussion_entries.find(ids, :order => :id)
+    entries = @topic.discussion_entries.order(:id).find(ids)
     @entries = Api.paginate(entries, self, entry_pagination_url(@topic))
     render :json => discussion_entry_api_json(@entries, @context, @current_user, session, [])
   end

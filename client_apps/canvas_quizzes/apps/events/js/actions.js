@@ -1,5 +1,5 @@
 define(function(require) {
-  var Dispatcher = require('canvas_quizzes/core/dispatcher');
+  var Dispatcher = require('./core/dispatcher');
   var EventStore = require('./stores/events');
   var Actions = {};
 

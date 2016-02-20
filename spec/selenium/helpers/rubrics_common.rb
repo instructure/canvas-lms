@@ -5,6 +5,7 @@ module RubricsCommon
     get rubric_url
 
     f("#right-side-wrapper .add_rubric_link").click
+    check_element_has_focus(fj("#rubric_new :text:first"))
     criterion_points = f("#criterion_1 .criterion_points")
     set_value(criterion_points, points.to_s)
     criterion_points.send_keys(:return)

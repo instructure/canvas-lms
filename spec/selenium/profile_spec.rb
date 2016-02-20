@@ -196,15 +196,17 @@ describe "profile" do
     it "should toggle service visibility" do
       get "/profile/settings"
       add_skype_service
-      initial_state = @user.show_user_services
-
-      f('#show_user_services').click
+      selector = "#show_user_services"
+      expect(f(selector).selected?).to be_truthy
+      f(selector).click
       wait_for_ajaximations
-      expect(@user.reload.show_user_services).not_to eq initial_state
+      refresh_page
+      expect(f(selector).selected?).to be_falsey
 
-      f('#show_user_services').click
+      f(selector).click
       wait_for_ajaximations
-      expect(@user.reload.show_user_services).to eq initial_state
+      refresh_page
+      expect(f(selector).selected?).to be_truthy
     end
 
     it "should generate a new access token" do
@@ -413,4 +415,3 @@ describe "profile" do
     end
   end
 end
-

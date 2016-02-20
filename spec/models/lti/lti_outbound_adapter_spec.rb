@@ -261,16 +261,21 @@ describe Lti::LtiOutboundAdapter do
   end
 
   describe ".consumer_instance_class" do
+    around do |example|
+      orig_class = Lti::LtiOutboundAdapter.consumer_instance_class
+      example.run
+      Lti::LtiOutboundAdapter.consumer_instance_class = orig_class
+    end
+
     it "returns the custom instance class if defined" do
       some_class = Class.new
       Lti::LtiOutboundAdapter.consumer_instance_class = some_class
 
       expect(Lti::LtiOutboundAdapter.consumer_instance_class).to eq some_class
-
-      Lti::LtiOutboundAdapter.consumer_instance_class = nil
     end
 
     it "returns the LtiOutbound::LTIConsumerInstance if none defined" do
+      Lti::LtiOutboundAdapter.consumer_instance_class = nil
       expect(Lti::LtiOutboundAdapter.consumer_instance_class).to eq LtiOutbound::LTIConsumerInstance
     end
   end

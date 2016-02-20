@@ -7,8 +7,9 @@ require [
 ], ($, WikiPage, WikiPageView, MarkAsDone) ->
 
   $ ->
-    $('#mark-as-done-checkbox').click ->
+    $('#content').on('click', '#mark-as-done-checkbox', ->
       MarkAsDone.toggle(this)
+    )
 
   $('body').addClass('show')
 

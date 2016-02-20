@@ -3,13 +3,6 @@ class AccountNotification < ActiveRecord::Base
     :account, :account_notification_roles, :user, :start_at, :end_at,
     :required_account_service, :months_in_display_cycle
 
-  EXPORTABLE_ATTRIBUTES = [
-    :id, :user_id, :account_id, :subject, :icon, :message, :start_at,
-    :end_at, :required_account_service, :months_in_display_cycle, :created_at, :updated_at
-  ]
-
-  EXPORTABLE_ASSOCIATIONS = [:account, :user, :account_notification_roles]
-
   validates_presence_of :start_at, :end_at, :subject, :message, :account_id
   validate :validate_dates
   belongs_to :account, :touch => true
@@ -104,7 +97,7 @@ class AccountNotification < ActiveRecord::Base
       # this allows us to make a global announcement that is filtered to only accounts with this flag
       enabled_flags = ACCOUNT_SERVICE_NOTIFICATION_FLAGS & account.allowed_services_hash.keys.map(&:to_s)
 
-      Shard.partition_by_shard([Account.site_admin, account]) do |accounts|
+      Shard.partition_by_shard(account.account_chain(include_site_admin: true).reverse) do |accounts|
         AccountNotification.where("account_id IN (?) AND start_at <? AND end_at>?", accounts, now, now).
           where("required_account_service IS NULL OR required_account_service IN (?)", enabled_flags).
           order('start_at DESC').

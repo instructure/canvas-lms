@@ -713,6 +713,12 @@ describe ContextExternalTool do
       expect(url).to eql(ContextExternalTool.standardize_url("http://www.google.com/?b=2&a=1"))
       expect(url).to eql(ContextExternalTool.standardize_url("www.google.com/?b=2&a=1"))
     end
+
+    it 'handles underscores in the domain' do
+      url = ContextExternalTool.standardize_url("http://sub_underscore.google.com?a=1&b=2")
+      expect(url).to eql('http://sub_underscore.google.com/?a=1&b=2')
+    end
+
   end
 
   describe "default_label" do

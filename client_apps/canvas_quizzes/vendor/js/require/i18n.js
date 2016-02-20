@@ -24,7 +24,7 @@ define([], function() {
         return true;
       if (maybeOptions)
         return true;
-      if (typeof keyOrDefault === 'string' && keyOrDefault.match(this.keyPattern))
+      if (typeof keyOrDefault === 'string' && keyOrDefault.match(KEY_PATTERN))
         return true;
       return false;
     },
@@ -49,6 +49,7 @@ define([], function() {
       var t = function() {
         var args = i18n.inferArguments([].slice.call(arguments));
         var defaultValue = args[0];
+        defaultValue = defaultValue || "";
         var options = args[1] || {};
         var countKey;
 

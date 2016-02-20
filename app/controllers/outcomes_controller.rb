@@ -21,6 +21,7 @@ class OutcomesController < ApplicationController
   before_filter :require_context, :except => [:build_outcomes]
   add_crumb(proc { t "#crumbs.outcomes", "Outcomes" }, :except => [:destroy, :build_outcomes]) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_outcomes_path }
   before_filter { |c| c.active_tab = "outcomes" }
+  before_filter :rich_content_service_config, only: [:show, :index]
 
   def index
     return unless authorized_action(@context, @current_user, :read)
@@ -110,7 +111,7 @@ class OutcomesController < ApplicationController
     elsif @context.is_a?(Course)
       @user = @context.users.find(user_id)
     else
-      @user = @context.all_users.find(user_id)
+      @user = @context.all_users.find_by!(id: user_id)
     end
 
     return unless authorized_action(@context, @current_user, :manage)
@@ -198,15 +199,31 @@ class OutcomesController < ApplicationController
       redirect_to named_context_url(@result.context, :context_assignment_submission_url, @submission.assignment_id, @submission.user_id)
     elsif @result.artifact.is_a?(Quizzes::QuizSubmission) && @result.associated_asset
       @submission = @result.artifact
-      @question = @result.associated_asset
+      @asset = @result.associated_asset
       if @submission.attempt <= @result.attempt
         @submission_version = @submission
       else
         @submission_version = @submission.submitted_attempts.detect{|s| s.attempt >= @result.attempt }
       end
-      question = @submission.quiz_data.detect{|q| q['assessment_question_id'] == @question.data[:id] }
-      question_id = (question && question['id']) || @question.data[:id]
-      redirect_to named_context_url(@result.context, :context_quiz_history_url, @submission.quiz_id, :quiz_submission_id => @submission.id, :version => @submission_version.version_number, :anchor => "question_#{question_id}")
+      if @asset.is_a?(Quizzes::Quiz) && @result.alignment && @result.alignment.content_type == 'AssessmentQuestionBank'
+        # anchor to first question in aligned bank
+        question_bank_id = @result.alignment.content_id
+        first_aligned_question = Quizzes::QuizQuestion.where(quiz_id: @asset.id)
+          .joins(:assessment_question)
+          .where(assessment_questions: { assessment_question_bank_id: question_bank_id })
+          .order(:position)
+          .first
+        anchor = first_aligned_question ? "question_#{first_aligned_question.id}" : nil
+      elsif @asset.is_a? AssessmentQuestion
+        question = @submission.quiz_data.detect{|q| q['assessment_question_id'] == @asset.data[:id] }
+        question_id = (question && question['id']) || @asset.data[:id]
+        anchor = "question_#{question_id}"
+      end
+      redirect_to named_context_url(
+        @result.context, :context_quiz_history_url, @submission.quiz_id,
+        :quiz_submission_id => @submission.id,
+        :version => @submission_version.version_number,
+        :anchor => anchor)
     else
       flash[:error] = "Unrecognized artifact type: #{@result.try(:artifact_type) || 'nil'}"
       redirect_to named_context_url(@context, :context_outcome_url, @outcome.id)
@@ -284,5 +301,10 @@ class OutcomesController < ApplicationController
       end
       format.html { redirect_to named_context_url(@context, :context_outcomes_url) }
     end
+  end
+
+  protected
+  def rich_content_service_config
+    js_env(Services::RichContent.env_for(@domain_root_account))
   end
 end

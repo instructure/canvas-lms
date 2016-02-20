@@ -14,7 +14,7 @@ $section_tabs_to_be_hidden_color: $ic-font-color--subdued;
 }
 
 #course-status {
-  font-size: 14px !important;
+  font-size: 0.875rem !important;
   font-weight: normal;
 }
 
@@ -22,7 +22,7 @@ $section_tabs_to_be_hidden_color: $ic-font-color--subdued;
   border: 1px solid #CCC;
   margin-bottom: 1.4em;
   h3, .h3 {
-    font-size: 18px;
+    @include fontSize(18px);
     margin: 0;
     padding: 8px;
     background-color: #F7F7F7;
@@ -210,7 +210,7 @@ ul.user_list div.enrollment_type.pending {
     color: $section_tabs_color;
     cursor: pointer;
     display: block;
-    font-size: 14px;
+    @include fontSize($ic-font-size--small);
     padding: 4px 0 4px 25px;
     border: solid $section_tabs_border_bottom_color;
     border-width: 0 1px 1px;
@@ -273,7 +273,7 @@ ul.user_list div.enrollment_type.pending {
     line-height: inherit;
     @if $use_new_styles {
       margin: 0;
-      font-size: 13px;
+      @include fontSize(13px);
       font-weight: 500;
     }
     @else {
@@ -286,7 +286,7 @@ ul.user_list div.enrollment_type.pending {
 .course-settings-sub-navigation-lti .new_badge {
   background-color: #BC3AA6;
   color: white;
-  font-size: 10px;
+  @include fontSize(10px);
   font-weight: normal;
   text-transform: uppercase;
   top: 1px;

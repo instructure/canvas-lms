@@ -121,7 +121,7 @@ describe Quizzes::QuizSubmissionService do
     context 'as an anonymous participant' do
       before :each do
         participant.user = nil
-        quiz.context = Course.new
+        quiz.context = Account.default.courses.new
       end
 
       it 'should allow taking a quiz in a public course' do
