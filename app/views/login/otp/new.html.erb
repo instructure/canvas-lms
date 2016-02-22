@@ -47,7 +47,7 @@ secret key **%{secret_key}**.
             </div>
             <div class="ic-Form-control">
               <%= f.blabel :carrier, :en => 'Carrier', :class => 'ic-Label' %>
-              <%= f.select :carrier, CommunicationChannel.sms_carriers, {}, { :class => 'ic-Input' } %>
+              <%= f.select :carrier, CommunicationChannel.sms_carriers_by_name, {}, { :class => 'ic-Input' } %>
             </div>
             <div class="control-group">
               <div class="controls">

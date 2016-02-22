@@ -136,9 +136,7 @@ class Login::OtpController < ApplicationController
 
   def send_otp(cc = nil)
     cc ||= @current_user.otp_communication_channel
-    cc.try(:send_later_if_production_enqueue_args, :send_otp!,
-      { :priority => Delayed::HIGH_PRIORITY, :max_attempts => 1 },
-      ROTP::TOTP.new(secret_key).now)
+    cc&.send_otp!(ROTP::TOTP.new(secret_key).now, @domain_root_account)
   end
 
   def secret_key

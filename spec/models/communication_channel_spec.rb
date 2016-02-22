@@ -554,4 +554,32 @@ describe CommunicationChannel do
       end
     end
   end
+
+  describe "#send_otp!" do
+    let(:cc) do
+      cc = CommunicationChannel.new
+      cc.path = '8015555555@txt.att.net'
+      cc
+    end
+
+    it "sends directly via SMS if configured" do
+      expect(cc.e164_path).to eq '+18015555555'
+      account = double()
+      allow(account).to receive(:feature_enabled?).and_return(true)
+      expect(Services::NotificationService).to receive(:process).with(
+        "otp:#{cc.global_id}",
+        anything,
+        'sms',
+        cc.e164_path
+      )
+      expect(cc).to receive(:send_otp_via_sms_gateway!).never
+      cc.send_otp!('123456', account)
+    end
+
+    it "sends via email if not configured" do
+      expect(Services::NotificationService).to receive(:process).never
+      expect(cc).to receive(:send_otp_via_sms_gateway!).once
+      cc.send_otp!('123456')
+    end
+  end
 end

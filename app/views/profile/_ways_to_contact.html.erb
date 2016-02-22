@@ -202,7 +202,7 @@
       <div class="controls">
         <select class="user_selected carrier" id='communication_channel_carrier'>
           <option value="other"><%= t(:default_carrier_option, '[Select Carrier]') %></option>
-          <% CommunicationChannel.sms_carriers.each do |(carrier, domain)| %>
+          <% CommunicationChannel.sms_carriers_by_name.each do |(carrier, domain)| %>
             <option value="#@<%= domain %>"><%= carrier %></option>
           <% end %>
           <option value="other"><%= t('Other Carrier') %></option>
