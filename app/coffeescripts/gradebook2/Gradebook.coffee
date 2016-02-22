@@ -701,7 +701,7 @@ define [
         sectionOverrides: {}
       }
       _.each @assignments, (assignment) ->
-        if assignment.has_overrides
+        if assignment.has_overrides && assignment.overrides
           _.each assignment.overrides, (override) ->
             if override.student_ids
               indexed.studentOverrides[assignment.id] ?= {}
@@ -727,7 +727,7 @@ define [
       gradingPeriod = gradingPeriods[selectedPeriodId]
       effectiveDueAt = assignment.due_at
 
-      if assignment.has_overrides
+      if assignment.has_overrides && assignment.overrides
         IDsByOverrideType = {
           "sectionOverrides": student.sections
           "groupOverrides": student.group_ids

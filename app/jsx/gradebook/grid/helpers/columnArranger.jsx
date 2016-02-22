@@ -25,7 +25,11 @@ define([
     },
 
     hasMultipleDueDates: function(assignment) {
-      return assignment.has_overrides && assignment.overrides.length > 1;
+      return !!(
+        assignment.has_overrides &&
+        assignment.overrides &&
+        assignment.overrides.length > 1
+      );
     },
 
     getDueDateFromAssignment: function(assignment) {
