@@ -52,6 +52,7 @@ class CourseLinkValidator
 
     # Assessment questions
     self.course.assessment_questions.active.each do |aq|
+      next if aq.assessment_question_bank.deleted?
       check_question(aq)
     end
     progress.update_completion! 15

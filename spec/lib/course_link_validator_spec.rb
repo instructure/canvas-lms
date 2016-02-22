@@ -80,6 +80,30 @@ describe CourseLinkValidator do
 
   end
 
+  it "should not run on assessment questions in deleted banks" do
+    CourseLinkValidator.any_instance.stubs(:reachable_url?).returns(false) # don't actually ping the links for the specs
+    html = %{<a href='http://www.notarealsitebutitdoesntmattercauseimstubbingitanwyay.com'>linky</a>}
+
+    course
+    bank = @course.assessment_question_banks.create!(:title => 'bank')
+    aq = bank.assessment_questions.create!(:question_data => {'name' => 'test question',
+      'question_text' => html, 'answers' => [{'id' => 1}, {'id' => 2}]})
+
+    CourseLinkValidator.queue_course(@course)
+    run_jobs
+
+    issues = CourseLinkValidator.current_progress(@course).results[:issues]
+    expect(issues.count).to eq 1
+
+    bank.destroy
+
+    CourseLinkValidator.queue_course(@course)
+    run_jobs
+
+    issues = CourseLinkValidator.current_progress(@course).results[:issues]
+    expect(issues).to be_empty
+  end
+
   it "should not care if it can reach it" do
     CourseLinkValidator.any_instance.stubs(:reachable_url?).returns(true)
 
