@@ -74,6 +74,27 @@ define [
     comparisonVal = ColumnArranger.compareByDueDate(assignment1, assignment2)
     ok comparisonVal < 0
 
+  test 'hasMultipleDueDates returns false when provided an empty object', ->
+    assignment = {}
+    notOk ColumnArranger.hasMultipleDueDates(assignment)
+
+  test 'hasMultipleDueDates returns false when provided just has_overrides', ->
+    assignment = { has_overrides: true }
+    notOk ColumnArranger.hasMultipleDueDates(assignment)
+
+  test 'hasMultipleDueDates returns false when provided an empty overrides', ->
+    assignment = { has_overrides: true, overrides: [] }
+    notOk ColumnArranger.hasMultipleDueDates(assignment)
+
+  test 'hasMultipleDueDates returns false when provided overrides with a length of 1', ->
+    assignment = { has_overrides: true, overrides: [{ title: 'section 1' }] }
+    notOk ColumnArranger.hasMultipleDueDates(assignment)
+
+  test 'hasMultipleDueDates returns true when provided overrides with a length greater than 1', ->
+    overrides = [{ title: 'section 1' }, { title: 'section 2' }]
+    assignment = { has_overrides: true, overrides: overrides }
+    ok ColumnArranger.hasMultipleDueDates(assignment)
+
   test 'treats assignments with a single override with a null date as' +
   '"greater" than assignments with multiple overrides', ->
     assignment1 = generateAssignment({ due_at: null, has_overrides: true })
@@ -158,6 +179,13 @@ define [
     assignment2.overrides[0].due_at = '2015-04-05T06:59:00Z'
     comparisonVal = ColumnArranger.compareByDueDate(assignment1, assignment2)
     ok comparisonVal > 0
+
+  test 'handles assignments with "has_overrides" set to true but without an overrides array', ->
+    assignment1 = generateAssignment({ due_at: null, has_overrides: true })
+    assignment1.overrides = null
+    assignment2 = generateAssignment({ due_at: null, has_overrides: false })
+    comparisonVal = ColumnArranger.compareByDueDate(assignment1, assignment2)
+    ok comparisonVal == 0
 
   module 'columnArranger#compareByAssignmentGroup',
     setup: ->
