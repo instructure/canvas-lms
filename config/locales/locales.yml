@@ -22,14 +22,20 @@ pl:
   locales:
     pl: Polski
   qualified_locale: pl-PL
-zh:
+zh-Hans:
   locales:
-    zh: 简体中文
+    zh-Hans: 简体中文
   qualified_locale: zh-CN
-zh_Hant:
+zh:
+  qualified_locale: zh-CN
+  deprecated_for: zh-Hans
+zh-Hant:
   locales:
-    zh_Hant: 繁體中文
+    zh-Hant: 繁體中文
   qualified_locale: zh-HK
+zh_Hant:
+  qualified_locale: zh-HK
+  deprecated_for: zh-Hant
 ar:
   locales:
     ar: العربية
@@ -77,11 +83,15 @@ tr:
     tr: Türkçe (crowd-sourced)
   qualified_locale: tr-TR
   crowdsourced: true
-fa-IR:
+fa:
   locales:
-    fa-IR: فارسی (crowd-sourced)
+    fa: فارسی (crowd-sourced)
+  qualified_locale: fa
+  crowdsourced: true
+fa-IR:
   qualified_locale: fa-IR
   crowdsourced: true
+  deprecated_for: fa
 da:
   locales:
     da: Dansk
