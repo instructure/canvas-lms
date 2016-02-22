@@ -149,7 +149,7 @@
     margin-top: 1em;
     margin-bottom: 1em;
   }
-  table {
+  table:not([cellpadding]) {
     margin-left: 5px;
     td {
       padding: 2px;
