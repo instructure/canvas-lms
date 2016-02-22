@@ -238,7 +238,7 @@ class CourseLinkValidator
         result = :missing_file
       end
     when /\/courses\/\d+\/(pages|wiki)\/([^\s"<'\?\/#]*)/
-      if obj = self.course.wiki.find_page($2)
+      if obj = self.course.wiki.find_page(CGI.unescape($2))
         if obj.workflow_state == 'unpublished'
           result = :unpublished_item
         end

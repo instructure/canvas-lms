@@ -286,4 +286,18 @@ describe CourseLinkValidator do
     issues = CourseLinkValidator.current_progress(@course).results[:issues]
     expect(issues.count).to eq 1
   end
+
+  it "should not flag wiki pages with url encoding" do
+    course
+    page = @course.wiki.wiki_pages.create!(:title => "semi;colon", :body => 'sutff')
+
+    @course.syllabus_body = %{<a href='/courses/#{@course.id}/pages/#{CGI.escape(page.title)}'>link</a>}
+    @course.save!
+
+    CourseLinkValidator.queue_course(@course)
+    run_jobs
+
+    issues = CourseLinkValidator.current_progress(@course).results[:issues]
+    expect(issues).to be_empty
+  end
 end
