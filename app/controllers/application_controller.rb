@@ -235,6 +235,7 @@ class ApplicationController < ActionController::Base
     # the full list too so they can see all sections, even
     # if they aren't specifically in that section.
     return events if @current_user.teacher_enrollments.any?
+    return events if @current_user.designer_enrollments.any?
 
     user_section_ids = []
     @current_user.ta_enrollments.each do |e|
