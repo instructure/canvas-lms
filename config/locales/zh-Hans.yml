@@ -1,7 +1,7 @@
 # This YAML file is auto-generated from a Transifex import.
 # Do not edit it by hand, your changes will be overwritten.
 --- 
-zh: 
+zh-Hans:
   1_item_scores_5512cd03: "1- 项目分数"
   1st_reviewer_3c1d0119: 第1个审阅者
   25th_75th_percentile_aa4c11f2: 第25-75百分点
