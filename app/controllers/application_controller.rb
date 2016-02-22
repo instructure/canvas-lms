@@ -233,16 +233,13 @@ class ApplicationController < ActionController::Base
     return events if !@current_user
 
     user_section_ids = []
-    @current_user.ta_enrollments.each do |e|
-      user_section_ids << e.course_section_id
-    end
-    @current_user.student_enrollments.each do |e|
+    @current_user.enrollments.each do |e|
       user_section_ids << e.course_section_id
     end
 
     # Also relying on Canvas' built-in filtering in the event
-    # of no TA (coach) enrollments found because we want to use
-    # other rolls for other purposes like general administration
+    # of no enrollments found because we want to use
+    # other roles for other purposes like general administration
     return events if user_section_ids.empty?
 
     filtered_events = []
