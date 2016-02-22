@@ -120,9 +120,9 @@ define [
     deepEqual result, true
 
   module "Gradebook2#submissionOutsideOfGradingPeriod - assignment with one student override that applies to the student",
-    setupThis: (options) ->
+    setupThis: (options, overrides) ->
       customOptions = options || {}
-      assignments = { '1': { id: '1', has_overrides: true, due_at: tz.parse('2015-05-15T06:00:00Z') } }
+      assignments = { '1': { id: '1', has_overrides: true, due_at: tz.parse('2015-05-15T06:00:00Z'), overrides: overrides } }
       defaults =
         mgpEnabled: true
         assignments: assignments
@@ -152,7 +152,7 @@ define [
 
   test 'returns false if the due_at on the override falls within the grading period', ->
     overrides = @generateOverrides('2015-04-15T06:00:00Z')
-    self = @setupThis(dateIsInGradingPeriod: -> true)
+    self = @setupThis({ dateIsInGradingPeriod: -> true }, overrides)
     dateIsInGradingPeriodSpy = @spy(self, 'dateIsInGradingPeriod')
     isOutsidePeriod = @subOutsideOfPeriod.bind(self)
     result = isOutsidePeriod(@submission, @student, @gradingPeriods, overrides)
@@ -163,7 +163,7 @@ define [
 
   test 'returns true if the due_at on the override falls outside of the grading period', ->
     overrides = @generateOverrides('2015-06-15T06:00:00Z')
-    self = @setupThis()
+    self = @setupThis({}, overrides)
     dateIsInGradingPeriodSpy = @spy(self, 'dateIsInGradingPeriod')
     isOutsidePeriod = @subOutsideOfPeriod.bind(self)
     result = isOutsidePeriod(@submission, @student, @gradingPeriods, overrides)
@@ -174,7 +174,7 @@ define [
 
   test 'returns true if the due_at on the override is null and the grading period is not the last', ->
     overrides = @generateOverrides(null)
-    self = @setupThis()
+    self = @setupThis({}, overrides)
     dateIsInGradingPeriodSpy = @spy(self, 'dateIsInGradingPeriod')
     isOutsidePeriod = @subOutsideOfPeriod.bind(self)
     result = isOutsidePeriod(@submission, @student, @gradingPeriods, overrides)
@@ -185,7 +185,7 @@ define [
 
   test 'returns false if the due_at on the override is null and the grading period is the last', ->
     overrides = @generateOverrides(null)
-    self = @setupThis(gradingPeriodToShow: '10', lastGradingPeriodAndDueAtNull: -> true)
+    self = @setupThis({ gradingPeriodToShow: '10', lastGradingPeriodAndDueAtNull: -> true }, overrides)
     lastGradingPeriodAndDueAtNullSpy = @spy(self, 'lastGradingPeriodAndDueAtNull')
     isOutsidePeriod = @subOutsideOfPeriod.bind(self)
     result = isOutsidePeriod(@submission, @student, @gradingPeriods, overrides)
@@ -195,9 +195,9 @@ define [
     deepEqual result, false
 
   module "Gradebook2#submissionOutsideOfGradingPeriod - assignment with one section override that applies to the student",
-    setupThis: (options) ->
+    setupThis: (options, overrides) ->
       customOptions = options || {}
-      assignments = { '1': { id: '1', has_overrides: true, due_at: tz.parse('2015-05-15T06:00:00Z') } }
+      assignments = { '1': { id: '1', has_overrides: true, due_at: tz.parse('2015-05-15T06:00:00Z'), overrides: overrides } }
       defaults =
         mgpEnabled: true
         assignments: assignments
@@ -227,7 +227,7 @@ define [
 
   test 'returns false if the due_at on the override falls within the grading period', ->
     overrides = @generateOverrides('2015-04-15T06:00:00Z')
-    self = @setupThis(dateIsInGradingPeriod: -> true)
+    self = @setupThis({ dateIsInGradingPeriod: -> true }, overrides)
     dateIsInGradingPeriodSpy = @spy(self, 'dateIsInGradingPeriod')
     isOutsidePeriod = @subOutsideOfPeriod.bind(self)
     result = isOutsidePeriod(@submission, @student, @gradingPeriods, overrides)
@@ -238,7 +238,7 @@ define [
 
   test 'returns true if the due_at on the override falls outside of the grading period', ->
     overrides = @generateOverrides('2015-06-15T06:00:00Z')
-    self = @setupThis()
+    self = @setupThis({}, overrides)
     dateIsInGradingPeriodSpy = @spy(self, 'dateIsInGradingPeriod')
     isOutsidePeriod = @subOutsideOfPeriod.bind(self)
     result = isOutsidePeriod(@submission, @student, @gradingPeriods, overrides)
@@ -249,7 +249,7 @@ define [
 
   test 'returns true if the due_at on the override is null and the grading period is not the last', ->
     overrides = @generateOverrides(null)
-    self = @setupThis()
+    self = @setupThis({}, overrides)
     dateIsInGradingPeriodSpy = @spy(self, 'dateIsInGradingPeriod')
     isOutsidePeriod = @subOutsideOfPeriod.bind(self)
     result = isOutsidePeriod(@submission, @student, @gradingPeriods, overrides)
@@ -260,7 +260,7 @@ define [
 
   test 'returns false if the due_at on the override is null and the grading period is the last', ->
     overrides = @generateOverrides(null)
-    self = @setupThis(gradingPeriodToShow: '10', lastGradingPeriodAndDueAtNull: -> true)
+    self = @setupThis({ gradingPeriodToShow: '10', lastGradingPeriodAndDueAtNull: -> true }, overrides)
     lastGradingPeriodAndDueAtNullSpy = @spy(self, 'lastGradingPeriodAndDueAtNull')
     isOutsidePeriod = @subOutsideOfPeriod.bind(self)
     result = isOutsidePeriod(@submission, @student, @gradingPeriods, overrides)
@@ -271,9 +271,9 @@ define [
 
 
   module "Gradebook2#submissionOutsideOfGradingPeriod - assignment with one group that applies to the student",
-    setupThis: (options) ->
+    setupThis: (options, overrides) ->
       customOptions = options || {}
-      assignments = { '1': { id: '1', has_overrides: true, due_at: tz.parse('2015-05-15T06:00:00Z') } }
+      assignments = { '1': { id: '1', has_overrides: true, due_at: tz.parse('2015-05-15T06:00:00Z'), overrides: overrides } }
       defaults =
         mgpEnabled: true
         assignments: assignments
@@ -303,7 +303,7 @@ define [
 
   test 'returns false if the due_at on the override falls within the grading period', ->
     overrides = @generateOverrides('2015-04-15T06:00:00Z')
-    self = @setupThis(dateIsInGradingPeriod: -> true)
+    self = @setupThis({ dateIsInGradingPeriod: -> true }, overrides)
     dateIsInGradingPeriodSpy = @spy(self, 'dateIsInGradingPeriod')
     isOutsidePeriod = @subOutsideOfPeriod.bind(self)
     result = isOutsidePeriod(@submission, @student, @gradingPeriods, overrides)
@@ -314,7 +314,7 @@ define [
 
   test 'returns true if the due_at on the override falls outside of the grading period', ->
     overrides = @generateOverrides('2015-06-15T06:00:00Z')
-    self = @setupThis()
+    self = @setupThis({}, overrides)
     dateIsInGradingPeriodSpy = @spy(self, 'dateIsInGradingPeriod')
     isOutsidePeriod = @subOutsideOfPeriod.bind(self)
     result = isOutsidePeriod(@submission, @student, @gradingPeriods, overrides)
@@ -325,7 +325,7 @@ define [
 
   test 'returns true if the due_at on the override is null and the grading period is not the last', ->
     overrides = @generateOverrides(null)
-    self = @setupThis()
+    self = @setupThis({}, overrides)
     dateIsInGradingPeriodSpy = @spy(self, 'dateIsInGradingPeriod')
     isOutsidePeriod = @subOutsideOfPeriod.bind(self)
     result = isOutsidePeriod(@submission, @student, @gradingPeriods, overrides)
@@ -336,7 +336,7 @@ define [
 
   test 'returns false if the due_at on the override is null and the grading period is the last', ->
     overrides = @generateOverrides(null)
-    self = @setupThis(gradingPeriodToShow: '10', lastGradingPeriodAndDueAtNull: -> true)
+    self = @setupThis({ gradingPeriodToShow: '10', lastGradingPeriodAndDueAtNull: -> true }, overrides)
     lastGradingPeriodAndDueAtNullSpy = @spy(self, 'lastGradingPeriodAndDueAtNull')
     isOutsidePeriod = @subOutsideOfPeriod.bind(self)
     result = isOutsidePeriod(@submission, @student, @gradingPeriods, overrides)
@@ -423,9 +423,9 @@ define [
     deepEqual result, false
 
   module "Gradebook2#submissionOutsideOfGradingPeriod - assignment with two overrides that apply to the student",
-    setupThis: (options) ->
+    setupThis: (options, overrides) ->
       customOptions = options || {}
-      assignments = { '1': { id: '1', has_overrides: true, due_at: tz.parse('2015-05-15T06:00:00Z') } }
+      assignments = { '1': { id: '1', has_overrides: true, due_at: tz.parse('2015-05-15T06:00:00Z'), overrides: overrides } }
       defaults =
         mgpEnabled: true
         assignments: assignments
@@ -455,7 +455,7 @@ define [
 
   test 'returns false if the latest date of the two overrides falls within the grading period', ->
     overrides = @generateOverrides('2015-03-01T06:00:00Z', '2015-04-15T06:00:00Z')
-    self = @setupThis(dateIsInGradingPeriod: -> true)
+    self = @setupThis({ dateIsInGradingPeriod: -> true }, overrides)
     isOutsidePeriod = @subOutsideOfPeriod.bind(self)
     dateIsInGradingPeriodSpy = @spy(self, 'dateIsInGradingPeriod')
     result = isOutsidePeriod(@submission, @student, @gradingPeriods, overrides)
@@ -467,7 +467,7 @@ define [
   test 'returns true if the latest date of the two overrides falls outside the grading period' +
   '(even if the earlier date falls within the grading period)', ->
     overrides = @generateOverrides('2015-04-15T06:00:00Z', '2015-05-15T06:00:00Z')
-    self = @setupThis()
+    self = @setupThis({}, overrides)
     isOutsidePeriod = @subOutsideOfPeriod.bind(self)
     dateIsInGradingPeriodSpy = @spy(self, 'dateIsInGradingPeriod')
     result = isOutsidePeriod(@submission, @student, @gradingPeriods, overrides)
@@ -478,7 +478,7 @@ define [
 
   test 'returns false if either date is null and the last grading period is selected', ->
     overrides = @generateOverrides(null, '2015-05-15T06:00:00Z')
-    self = @setupThis(gradingPeriodToShow: '10', lastGradingPeriodAndDueAtNull: -> true)
+    self = @setupThis({ gradingPeriodToShow: '10', lastGradingPeriodAndDueAtNull: -> true }, overrides)
     isOutsidePeriod = @subOutsideOfPeriod.bind(self)
     lastGradingPeriodAndDueAtNullSpy = @spy(self, 'lastGradingPeriodAndDueAtNull')
     result = isOutsidePeriod(@submission, @student, @gradingPeriods, overrides)
@@ -489,7 +489,7 @@ define [
 
   test 'returns true if either date is null and the last grading period is not selected', ->
     overrides = @generateOverrides(null, '2015-05-15T06:00:00Z')
-    self = @setupThis()
+    self = @setupThis({}, overrides)
     isOutsidePeriod = @subOutsideOfPeriod.bind(self)
     dateIsInGradingPeriodSpy = @spy(self, 'dateIsInGradingPeriod')
     result = isOutsidePeriod(@submission, @student, @gradingPeriods, overrides)
