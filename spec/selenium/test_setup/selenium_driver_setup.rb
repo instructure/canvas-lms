@@ -48,6 +48,13 @@ module SeleniumDriverSetup
     capture_screenshots? && run_headless?
   end
 
+  # prevents specs failing because tooltips are showing etc.
+  def move_mouse_to_known_position
+    if run_headless?
+      raise "couldn't move mouse (xdotool missing?)" unless system('xdotool mousemove --sync 5000 0')
+    end
+  end
+
   def self.set_up_display_buffer
     require "headless"
 
