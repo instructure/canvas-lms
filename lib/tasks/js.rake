@@ -345,7 +345,7 @@ namespace :js do
     dirs = [["#{Rails.root}/app/jsx", "#{Rails.root}/public/javascripts/jsx"],
             ["#{Rails.root}/spec/javascripts/jsx", "#{Rails.root}/spec/javascripts/compiled"]]
     # Get files that need compilation in plugins
-    plugin_jsx_dirs = Dir.glob("#{Rails.root}/gems/plugins/**/jsx")
+    plugin_jsx_dirs = Dir.glob("#{Rails.root}/gems/plugins/*/**/jsx")
     plugin_jsx_dirs.each do |directory|
       plugin_name = directory.match(/gems\/plugins\/([^\/]+)\//)[1]
       destination = "#{Rails.root}/public/javascripts/plugins/#{plugin_name}/compiled/jsx"
