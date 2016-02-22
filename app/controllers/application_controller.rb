@@ -235,14 +235,14 @@ class ApplicationController < ActionController::Base
     # If this user is a teacher or a designer, give them
     # the full list too so they can see all sections, even
     # if they aren't specifically in that section.
-    return events if @current_user.teacher_enrollments.any?
-    return events if @current_user.designer_enrollments.any?
+    return events if @current_user.teacher_enrollments.current.any?
+    return events if @current_user.designer_enrollments.current.any?
 
     user_section_ids = []
-    @current_user.ta_enrollments.each do |e|
+    @current_user.ta_enrollments.current.each do |e|
       user_section_ids << e.course_section_id
     end
-    @current_user.student_enrollments.each do |e|
+    @current_user.student_enrollments.current.each do |e|
       user_section_ids << e.course_section_id
     end
 
