@@ -232,14 +232,25 @@ class ApplicationController < ActionController::Base
     # already does a good job with all those users
     return events if !@current_user
 
+    # If this user is a teacher or a designer, give them
+    # the full list too so they can see all sections, even
+    # if they aren't specifically in that section.
+    return events if @current_user.teacher_enrollments.any?
+    return events if @current_user.designer_enrollments.any?
+
     user_section_ids = []
-    @current_user.enrollments.each do |e|
+    @current_user.ta_enrollments.each do |e|
+      user_section_ids << e.course_section_id
+    end
+    @current_user.student_enrollments.each do |e|
       user_section_ids << e.course_section_id
     end
 
     # Also relying on Canvas' built-in filtering in the event
-    # of no enrollments found because we want to use
-    # other roles for other purposes like general administration
+    # of no TA (coach) enrollments found because we want to use
+    # other rolls for other purposes like general administration.
+    # Teachers and admins, in particular, should see everything even
+    # if they aren't enrolled.
     return events if user_section_ids.empty?
 
     filtered_events = []
