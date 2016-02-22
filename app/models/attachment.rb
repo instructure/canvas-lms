@@ -1035,8 +1035,10 @@ class Attachment < ActiveRecord::Base
 
   # prevent an access attempt shortly before unlock_at from caching permissions beyond that time
   def touch_on_unlock
-    send_later_enqueue_args(:touch, { :run_at => unlock_at,
-                                      :singleton => "touch_on_unlock_attachment_#{global_id}" })
+    Shackles.activate(:master) do
+      send_later_enqueue_args(:touch, { :run_at => unlock_at,
+                                        :singleton => "touch_on_unlock_attachment_#{global_id}" })
+    end
   end
 
   def locked_for?(user, opts={})
