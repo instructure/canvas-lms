@@ -22,7 +22,7 @@ class RoleOverride < ActiveRecord::Base
   belongs_to :role
   include Role::AssociationHelper
 
-  attr_accessible :context, :permission, :role, :enabled, :applies_to_self, :applies_to_descendants
+  attr_accessible :context, :permission, :role, :enabled, :locked, :applies_to_self, :applies_to_descendants
   validates :enabled, inclusion: [true, false]
   validates :locked, inclusion: [true, false]
 
@@ -924,7 +924,8 @@ class RoleOverride < ActiveRecord::Base
       # keep track of the value for the parent
       generated_permission[:prior_default] = generated_permission[:enabled]
 
-      if override.new_record?
+      # override.enabled.nil? is no longer possible, but is important for the migration that removes nils
+      if override.new_record? || override.enabled.nil?
         if last_override
           if generated_permission[:enabled] == [:descendants]
             generated_permission[:enabled] = [:self, :descendants]
