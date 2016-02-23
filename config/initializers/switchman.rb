@@ -1,6 +1,19 @@
 Rails.application.config.after_initialize do
   Switchman.cache = -> { MultiCache.cache }
 
+  # WillPaginate needs to allow args to Relation#to_a
+  WillPaginate::ActiveRecord::RelationMethods.class_eval do
+    def to_a(*args)
+      if current_page.nil? then super # workaround for Active Record 3.0
+      else
+        ::WillPaginate::Collection.create(current_page, limit_value) do |col|
+          col.replace super
+          col.total_entries ||= total_entries
+        end
+      end
+    end
+  end
+
   module Canvas
     module Shard
       module ClassMethods
