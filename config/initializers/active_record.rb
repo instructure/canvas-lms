@@ -1215,7 +1215,7 @@ class ActiveRecord::MigrationProxy
   def load_migration
     load(filename)
     @migration = name.constantize
-    raise "#{self.name} (#{self.version}) is not tagged as predeploy or postdeploy!" if (@migration.tags & ActiveRecord::Migration::DEPLOY_TAGS).empty?
+    raise "#{self.name} (#{self.version}) is not tagged as exactly one of predeploy or postdeploy!" unless (@migration.tags & ActiveRecord::Migration::DEPLOY_TAGS).length == 1
     @migration
   end
 end
@@ -1232,69 +1232,31 @@ module MigratorCache
 end
 ActiveRecord::Migrator.singleton_class.prepend(MigratorCache)
 
-class ActiveRecord::Migrator
-  cattr_accessor :migrated_versions
-
-  def pending_migrations_with_runnable
-    pending_migrations_without_runnable.reject { |m| !m.runnable? }
+module Migrator
+  def pending_migrations
+    super.select(&:runnable?)
   end
-  alias_method_chain :pending_migrations, :runnable
 
-  def migrate(tag = nil)
-    current = migrations.detect { |m| m.version == current_version }
-    target = migrations.detect { |m| m.version == @target_version }
+  def runnable
+    super.select(&:runnable?)
+  end
 
-    if target.nil? && !@target_version.nil? && @target_version > 0
-      raise UnknownMigrationVersionError.new(@target_version)
+  def execute_migration_in_transaction(migration, direct)
+    old_in_migration, ActiveRecord::Base.in_migration = ActiveRecord::Base.in_migration, true
+    if down? && !Rails.env.test? && !$confirmed_migrate_down
+      require 'highline'
+      if HighLine.new.ask("Revert migration #{migration.name} (#{migration.version}) ? [y/N/a] > ") !~ /^([ya])/i
+        raise("Revert not confirmed")
+      end
+      $confirmed_migrate_down = true if $1.downcase == 'a'
     end
 
-    start = up? ? 0 : (migrations.index(current) || 0)
-    finish = migrations.index(target) || migrations.size - 1
-    runnable = migrations[start..finish]
-
-    # skip the last migration if we're headed down, but not ALL the way down
-    runnable.pop if down? && !target.nil?
-
-    runnable.each do |migration|
-      ActiveRecord::Base.logger.info "Migrating to #{migration.name} (#{migration.version})"
-
-      # On our way up, we skip migrating the ones we've already migrated
-      next if up? && migrated.include?(migration.version.to_i)
-
-      # On our way down, we skip reverting the ones we've never migrated
-      if down? && !migrated.include?(migration.version.to_i)
-        migration.announce 'never migrated, skipping'; migration.write
-        next
-      end
-
-      next if !tag.nil? && !migration.tags.include?(tag)
-      next if !migration.runnable?
-
-      begin
-        old_in_migration, ActiveRecord::Base.in_migration = ActiveRecord::Base.in_migration, true
-        if down? && !Rails.env.test? && !$confirmed_migrate_down
-          require 'highline'
-          if HighLine.new.ask("Revert migration #{migration.name} (#{migration.version}) ? [y/N/a] > ") !~ /^([ya])/i
-            raise("Revert not confirmed")
-          end
-          $confirmed_migrate_down = true if $1.downcase == 'a'
-        end
-
-        ddl_transaction(migration) do
-          self.class.migrated_versions = @migrated_versions
-          migration.migrate(@direction)
-          @migrated_versions = self.class.migrated_versions
-          record_version_state_after_migrating(migration.version) unless tag == :predeploy && migration.tags.include?(:postdeploy)
-        end
-      rescue => e
-        canceled_msg = use_transaction?(migration)? "this and " : ""
-        raise StandardError, "An error has occurred, #{canceled_msg}all later migrations canceled:\n\n#{e}", e.backtrace
-      ensure
-        ActiveRecord::Base.in_migration = old_in_migration
-      end
-    end
+    super
+  ensure
+    ActiveRecord::Base.in_migration = old_in_migration
   end
 end
+ActiveRecord::Migrator.prepend(Migrator)
 
 ActiveRecord::Migrator.migrations_paths.concat Dir[Rails.root.join('vendor', 'plugins', '*', 'db', 'migrate')]
 ActiveRecord::Migrator.migrations_paths.concat Dir[Rails.root.join('gems', 'plugins', '*', 'db', 'migrate')]
