@@ -22,13 +22,13 @@ define [
       @server.respondWith "GET", "/api/v1/courses/1/users?user_ids%5B%5D=2&user_ids%5B%5D=5&enrollment_type=student", [200, {"Content-Type":"application/json"}, JSON.stringify(@response)]
       # by name
       @server.respondWith "GET", "/api/v1/courses/1/search_users", [200, {"Content-Type":"application/json"}, JSON.stringify(@response)]
-      @server.respondWith "GET", "/api/v1/courses/1/search_users?search_term=publiu&enrollment_type=student", [200, {"Content-Type":"application/json"}, JSON.stringify(@response)]
+      @server.respondWith "GET", "/api/v1/courses/1/search_users?search_term=publiu&enrollment_type=student&include_inactive=false", [200, {"Content-Type":"application/json"}, JSON.stringify(@response)]
       @server.respondWith "GET", "/api/v1/courses/1/search_users?search_term=publiu", [200, {"Content-Type":"application/json"}, JSON.stringify(@response)]
       # by course
-      @server.respondWith "GET", "/api/v1/courses/1/users?per_page=50&page=1&enrollment_type=student", [200, {"Content-Type":"application/json"}, JSON.stringify([])]
-      @server.respondWith "GET", "/api/v1/courses/1/users?per_page=50&page=2&enrollment_type=student", [200, {"Content-Type":"application/json"}, JSON.stringify([])]
-      @server.respondWith "GET", "/api/v1/courses/1/users?per_page=50&page=3&enrollment_type=student", [200, {"Content-Type":"application/json"}, JSON.stringify([])]
-      @server.respondWith "GET", "/api/v1/courses/1/users?per_page=50&page=4&enrollment_type=student", [200, {"Content-Type":"application/json"}, JSON.stringify([])]
+      @server.respondWith "GET", "/api/v1/courses/1/users?per_page=50&page=1&enrollment_type=student&include_inactive=false", [200, {"Content-Type":"application/json"}, JSON.stringify([])]
+      @server.respondWith "GET", "/api/v1/courses/1/users?per_page=50&page=2&enrollment_type=student&include_inactive=false", [200, {"Content-Type":"application/json"}, JSON.stringify([])]
+      @server.respondWith "GET", "/api/v1/courses/1/users?per_page=50&page=3&enrollment_type=student&include_inactive=false", [200, {"Content-Type":"application/json"}, JSON.stringify([])]
+      @server.respondWith "GET", "/api/v1/courses/1/users?per_page=50&page=4&enrollment_type=student&include_inactive=false", [200, {"Content-Type":"application/json"}, JSON.stringify([])]
 
     teardown: ->
       @server.restore()

@@ -96,6 +96,27 @@ describe "assignment groups" do
         to eq other_section_due.to_date.strftime('%b %-d, %y')
     end
 
+    it "should not show inactive students when setting overrides" do
+      student_in_course(:course => @course, :name => "real student")
+      enrollment = student_in_course(:course => @course, :name => "inactive student")
+      enrollment.deactivate
+
+      assign = create_assignment!
+      visit_assignment_edit_page(assign)
+
+      wait_for_ajaximations
+
+      add_override
+      wait_for_ajaximations
+
+      driver.switch_to.default_content
+      fj('.ic-tokeninput-input:last').send_keys('student')
+      wait_for_ajaximations
+      students = ffj(".ic-tokeninput-option:visible")
+      expect(students.length).to eq 1
+      expect(students.first).to include_text("real")
+    end
+
     it "should validate override dates against proper section", priority: "1", test_id: 216350 do
       date = Time.zone.now
       date2 = Time.zone.now - 10.days
