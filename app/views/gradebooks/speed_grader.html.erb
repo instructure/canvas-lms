@@ -37,6 +37,12 @@
       </div>
     </div>
     <div class="right">
+      <div class="left">
+        <button id="keyboard-shortcut-info-icon" class="Button Button--icon-action-rev" type="button">
+          <span class="screenreader-only"><%= t('Keyboard Shortcuts') %></span>
+          <i class="icon-info"></i>
+        </button>
+      </div>
       <a data-muted="<%= @assignment.muted? ? "true" : "false" %>" id="mute_link" href="#"><span class="ui-icon ui-icon-volume-<%= @assignment.muted? ? "on" : "off" %>"></span><span class=mute_label><%= @assignment.muted? ? t("gradebook.unmute_assignment", "Unmute Assignment") : t("gradebook.mute_assignment", "Mute Assignment") %></span></a>
       <a id="settings_link" href="#"><span class="ui-icon ui-icon-wrench"></span><%= t('links.settings', "Settings") %></a>
       <% if help_link %>

@@ -392,6 +392,9 @@ define([
       settings: {
         form: $('#settings_form'),
         link: $('#settings_link')
+      },
+      keyinfo: {
+        icon: $('#keyboard-shortcut-info-icon')
       }
     },
     courseId: utils.getParam('courses'),
@@ -408,6 +411,7 @@ define([
       this.elements.mute.link.click($.proxy(this.onMuteClick, this));
       this.elements.settings.form.submit(this.submitSettingsForm.bind(this));
       this.elements.settings.link.click(this.showSettingsModal.bind(this));
+      this.elements.keyinfo.icon.click(this.keyboardShortcutInfoModal.bind(this));
     },
     addSpinner: function(){
       this.elements.mute.link.append(this.elements.spinner.el);
@@ -447,6 +451,11 @@ define([
     toAssignment: function(e){
       e.preventDefault();
       EG[e.target.getAttribute('class')]();
+    },
+
+    keyboardShortcutInfoModal: function(e) {
+      var questionMarkKeyDown = $.Event('keydown', { keyCode: 191 });
+      $(document).trigger(questionMarkKeyDown);
     },
 
     submitSettingsForm: function(e){

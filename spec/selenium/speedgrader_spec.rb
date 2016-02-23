@@ -471,10 +471,37 @@ describe 'Speedgrader' do
       user_session(teacher)
 
       get "/courses/#{test_course.id}/gradebook/speed_grader?assignment_id=#{assignment.id}"
-      fj('#submission_to_view').click
+      f('#submission_to_view').click
       click_option('#submission_to_view', '0', :value)
       wait_for_ajaximations
-      expect(fj('#submission_files_list .submission-file .display_name')).to include_text('unknown.loser')
+      expect(f('#submission_files_list .submission-file .display_name')).to include_text('unknown.loser')
+    end
+  end
+
+  context 'speedgrader nav bar' do
+    # set up course, users and assignment
+    let(:test_course) { course() }
+    let(:teacher)     { user(active_all: true) }
+    let(:student)     { user(active_all: true) }
+    let!(:enroll_teacher_and_students) do
+      test_course.enroll_user(teacher, 'TeacherEnrollment', enrollment_state: 'active')
+      test_course.enroll_user(student, 'StudentEnrollment', enrollment_state: 'active')
+    end
+    let!(:assignment) do
+      test_course.assignments.create!(
+        title: 'Assignment A',
+        submission_types: 'online_text_entry,online_upload'
+      )
+    end
+
+    it 'displays keyboard shortcut modal when clicking blue info icon', priority: "2", test_id: 759319 do
+      user_session(teacher)
+      get "/courses/#{test_course.id}/gradebook/speed_grader?assignment_id=#{assignment.id}"
+
+      shortcut_modal = f('#keyboard_navigation')
+      f('#keyboard-shortcut-info-icon').click
+      
+      expect(shortcut_modal).to be_displayed
     end
   end
 end
