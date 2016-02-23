@@ -29,7 +29,8 @@ class NotificationService
       'type' => type,
       'delivery' => { 'remote' => remote },
       'message' => body,
-      'target' => to
+      'target' => to,
+      'request_id' => RequestContextGenerator.request_id
     }.to_json)
   end
 
