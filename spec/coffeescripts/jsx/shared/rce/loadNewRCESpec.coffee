@@ -11,18 +11,24 @@ define [
       ENV.RICH_CONTENT_APP_HOST = "http://fakehost.com"
       @originalLoadOnTarget = serviceRCELoader.loadOnTarget
       serviceRCELoader.loadOnTarget = sinon.stub()
+      @validTarget = document.createElement('textarea')
     teardown: ->
       serviceRCELoader.loadOnTarget = @originalLoadOnTarget
       fakeENV.teardown()
+      @validTarget.remove()
 
   test 'calls serviceRCELoader.loadOnTarget with a target and host', ->
-    loadNewRCE("fakeTarget", {})
-    ok serviceRCELoader.loadOnTarget.calledWith("fakeTarget", {}, "http://fakehost.com")
+    loadNewRCE(@validTarget, {})
+    ok serviceRCELoader.loadOnTarget.calledWith(@validTarget, {}, "http://fakehost.com")
 
   test 'CDN host overrides app host', ->
     ENV.RICH_CONTENT_CDN_HOST = "http://fakecdn.net"
-    loadNewRCE("fakeTarget", {})
-    ok serviceRCELoader.loadOnTarget.calledWith("fakeTarget", {}, "http://fakecdn.net")
+    loadNewRCE(@validTarget, {})
+    ok serviceRCELoader.loadOnTarget.calledWith(@validTarget, {}, "http://fakecdn.net")
+
+  test 'skips instantiation when called with empty target', ->
+    loadNewRCE(".invalidTarget", {})
+    ok !serviceRCELoader.loadOnTarget.called
 
   module 'loadRCE: RCS Disabled',
     setup: ->
