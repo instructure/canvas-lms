@@ -145,7 +145,7 @@ span.agendaView--no-assignments {
     .ui-button {
       padding: 8px;
       i:before {
-        @include fontSize(10px);
+        @include fontSize(12px);
       }
     }
   }
