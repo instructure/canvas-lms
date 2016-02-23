@@ -2,7 +2,7 @@ $gradebook_letter-grade-font: lighten($ic-color-dark, 8%);
 
 a#accessibility_warning {
   @include accessibility-prompt;
-  @include fontSize($ic-font-size--small);
+  @include fontSize(14px);
 }
 
 #footer {
@@ -76,13 +76,13 @@ $cell_height: 33px;
 }
 
 .student-section {
-  margin-top: -7px;
-  @include fontSize(10px);
+  margin-top: -5px;
+  @include fontSize(12px);
 }
 
 .secondary_identifier_cell, .custom_column {
   color: #333333;
-  @include fontSize(10px);
+  @include fontSize(12px);
   text-align: center;
   line-height: 35px;
 }
@@ -109,7 +109,7 @@ $cell_height: 33px;
   background-color: #f3f4f8;
   background-image: none;
   padding: 10px;
-  @include fontSize($ic-font-size--xsmall);
+  @include fontSize(12px);
   text-align: center;
   font-weight: normal;
   // override jqueryUI style
@@ -147,7 +147,7 @@ $cell_height: 33px;
   }
   .assignment-points-possible {
     font-weight: normal;
-    @include fontSize(10px);
+    @include fontSize(12px);
     margin: {
       left: 10px;
       right: 14px;
@@ -474,7 +474,7 @@ $cell_height: 33px;
     border: none;
     text-align: center;
     outline: none;
-    @include fontSize($ic-font-size--xsmall);
+    @include fontSize(12px);
     width: 100%;
     padding: 0;
     margin: 0;
@@ -524,7 +524,7 @@ $cell_height: 33px;
       border: none;
       text-align: right;
       outline: none;
-      @include fontSize($ic-font-size--xsmall);
+      @include fontSize(12px);
     }
     .grade::-webkit-outer-spin-button {
       display: none;
@@ -687,7 +687,7 @@ $gradebook_checkbox_width: 16px;
 .letter-grade-points,
 .gpa-scale-points {
   position: absolute;
-  @include fontSize(11px);
+  @include fontSize(12px);
   padding-left: 8px;
   line-height: 19px;
   color: $gradebook_letter-grade-font;
