@@ -584,6 +584,8 @@ module QuizzesCommon
     move_to_question question_id
     source = "#question_#{question_id} .draggable-handle"
     target = "#group_top_#{group_id}"
+    # drag math gets off if we don't do this and things end up dropped in the wrong place
+    scroll_page_to_top
     js_drag_and_drop source, target
     wait_for_ajax_requests
   end
@@ -607,6 +609,8 @@ module QuizzesCommon
     move_to_question id
     source = "#question_#{id} .draggable-handle"
     target = '#questions > *'
+    # drag math gets off if we don't do this and things end up dropped in the wrong place
+    scroll_page_to_top
     js_drag_and_drop source, target
     wait_for_ajax_requests
   end
@@ -617,6 +621,8 @@ module QuizzesCommon
     move_to_group id
     source = "#group_top_#{id} .draggable-handle"
     target = '#questions > *'
+    # drag math gets off if we don't do this and things end up dropped in the wrong place
+    scroll_page_to_top
     js_drag_and_drop source, target
     wait_for_ajax_requests
   end
@@ -627,6 +633,8 @@ module QuizzesCommon
     move_to_question question_id
     source = "#question_#{question_id} .draggable-handle"
     target = "#group_top_#{group_id} + *"
+    # drag math gets off if we don't do this and things end up dropped in the wrong place
+    scroll_page_to_top
     js_drag_and_drop source, target
   end
 
