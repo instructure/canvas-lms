@@ -1937,8 +1937,9 @@ class ApplicationController < ActionController::Base
   end
 
   def set_js_assignment_data
-    rights = [:manage_assignments, :manage_grades, :read_grades]
+    rights = [:manage_assignments, :manage_grades, :read_grades, :manage]
     permissions = @context.rights_status(@current_user, *rights)
+    permissions[:manage_course] = permissions[:manage]
     permissions[:manage] = permissions[:manage_assignments]
     js_env({
       :URLS => {

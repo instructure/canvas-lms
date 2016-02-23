@@ -70,6 +70,7 @@ describe AssignmentsController do
         expect(assigns[:js_env][:PERMISSIONS][:manage_grades]).to be_truthy
         expect(assigns[:js_env][:PERMISSIONS][:manage_assignments]).to be_falsey
         expect(assigns[:js_env][:PERMISSIONS][:manage]).to be_falsey
+        expect(assigns[:js_env][:PERMISSIONS][:manage_course]).to be_truthy
       end
     end
   end
