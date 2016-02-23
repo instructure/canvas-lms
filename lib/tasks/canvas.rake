@@ -239,6 +239,17 @@ namespace :db do
     end
   end
 
+  desc "Shows skipped db migrations."
+  task :skipped_migrations => :environment do
+    migrations = ActiveRecord::Migrator.migrations(ActiveRecord::Migrator.migrations_paths)
+    skipped_migrations = ActiveRecord::Migrator.new(:up, migrations).skipped_migrations
+    skipped_migrations.each do |skipped_migration|
+      tags = skipped_migration.tags
+      tags = " (#{tags.join(', ')})" unless tags.empty?
+      puts '  %4d %s%s' % [skipped_migration.version, skipped_migration.name, tags]
+    end
+  end
+
   namespace :migrate do
     desc "Run all pending predeploy migrations"
     task :predeploy => [:environment, :load_config] do
@@ -282,6 +293,6 @@ Switchman::Rake.filter_database_servers do |servers, block|
   block.call(servers)
 end
 
-%w{db:pending_migrations db:migrate:predeploy}.each { |task_name| Switchman::Rake.shardify_task(task_name) }
+%w{db:pending_migrations db:skipped_migrations db:migrate:predeploy}.each { |task_name| Switchman::Rake.shardify_task(task_name) }
 
 end

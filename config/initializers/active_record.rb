@@ -1234,8 +1234,13 @@ end
 ActiveRecord::Migrator.singleton_class.prepend(MigratorCache)
 
 module Migrator
-  def pending_migrations
-    super.select(&:runnable?)
+  def skipped_migrations
+    pending_migrations(call_super: true).reject(&:runnable?)
+  end
+
+  def pending_migrations(call_super: false)
+    return super() if call_super
+    super().select(&:runnable?)
   end
 
   def runnable
