@@ -18,7 +18,7 @@
   <% end %>
 <% end -%>
 
-<div id="dashboard" class="ic-Dashboard-container">
+<div id="dashboard">
   <%= render :partial => 'shared/dashboard_invitation', :collection => @pending_invitations %>
   <%= render :partial => 'shared/dashboard_messages' %>
 
@@ -37,6 +37,7 @@
       <%= render :partial => 'shared/recent_activity' %>
     </div>
     <%= render :partial => 'shared/dashboard_card' %>
+
   <% else %>
     <%= render :partial => 'shared/recent_activity' %>
   <% end %>
