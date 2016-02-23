@@ -830,7 +830,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def include_description?(user)
-    user && !self.locked_for?(user)
+    user && !self.locked_for?(user, :check_policies => true)
   end
 
   def all_day
