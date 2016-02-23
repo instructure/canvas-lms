@@ -374,7 +374,7 @@ define [
     ModerationActions.selectProvisionalGrade(42, @client)((action) ->
       ok fakePost.calledWith(fakeUrl+"/"+ "42"+"/select"), 'called with the correct params'
       equal action.type, ModerationActions.SELECTING_PROVISIONAL_GRADES_FAILED, 'type matches'
-      equal action.payload.message,'An error accurred selecting provisional grades' , 'has correct payload'
+      equal action.payload.message,'An error occurred selecting provisional grades' , 'has correct payload'
       ok action.payload instanceof Error, "is an error object"
       equal action.error, true, 'has correct payload'
       start()

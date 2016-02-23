@@ -97,10 +97,63 @@ define [
     equal gradeColumns[0].props.children[1].props.children, 4
     React.unmountComponentAtNode(studentList.getDOMNode().parentNode)
 
+  test 'does not show radio button if there is only one provisional grade', ->
+    newFakeStudentList = _.extend({}, fakeStudentList)
+    studentList = TestUtils.renderIntoDocument(React.createElement(ModeratedStudentList,
+        urls: {assignment_speedgrader_url: 'blah'},
+        includeModerationSetColumns: true,
+        studentList: newFakeStudentList,
+        assignment: {published: false},
+        handleCheckbox: () => 'stub'
+        onSelectProvisionalGrade: () => 'stub'
+      )
+    )
+
+    markColumns = TestUtils.scryRenderedDOMComponentsWithClass(studentList, 'ModeratedAssignmentList__Mark')
+    equal TestUtils.scryRenderedDOMComponentsWithTag(markColumns[0], 'input').length, 0, 'does not render any radio buttons'
+    React.unmountComponentAtNode(studentList.getDOMNode().parentNode)
+
+  test 'shows radio button if there is more than 1 provisional grade', ->
+    newFakeStudentList = _.extend({}, fakeStudentList)
+    newFakeStudentList.students[0].provisional_grades.push({
+      'grade': '4'
+      'score': 4
+      'graded_at': '2015-09-11T15:42:28Z'
+      'scorer_id': 1
+      'final': false
+      'provisional_grade_id': 11
+      'grade_matches_current_submission': true
+      'speedgrader_url': 'http://example.com'
+    })
+    studentList = TestUtils.renderIntoDocument(React.createElement(ModeratedStudentList,
+        urls: {assignment_speedgrader_url: 'blah'},
+        includeModerationSetColumns: true,
+        studentList: newFakeStudentList,
+        assignment: {published: false},
+        handleCheckbox: () => 'stub'
+        onSelectProvisionalGrade: () => 'stub'
+      )
+    )
+
+    inputs = TestUtils.scryRenderedDOMComponentsWithTag(studentList, 'input')
+    radioInputs = inputs.filter((input) -> input.getDOMNode().type == 'radio')
+    equal radioInputs.length, 2, 'renders two radio buttons'
+    React.unmountComponentAtNode(studentList.getDOMNode().parentNode)
+
   module 'Persist provisional grades'
 
   test 'selecting provisional grade triggers handleSelectProvisionalGrade handler', ->
     newFakeStudentList = _.extend({}, fakeStudentList)
+    newFakeStudentList.students[0].provisional_grades.push({
+      'grade': '4'
+      'score': 4
+      'graded_at': '2015-09-11T15:42:28Z'
+      'scorer_id': 1
+      'final': false
+      'provisional_grade_id': 11
+      'grade_matches_current_submission': true
+      'speedgrader_url': 'http://example.com'
+    })
     newFakeStudentList.students[0].in_moderation_set = true
     callback = sinon.spy()
     studentList = TestUtils.renderIntoDocument(React.createElement(ModeratedStudentList, onSelectProvisionalGrade: callback, urls: {provisional_grades_base_url: 'blah'}, includeModerationSetColumns: true, studentList: newFakeStudentList, assignment: {published: false},handleCheckbox: () => 'stub' ))

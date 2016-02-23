@@ -46,13 +46,17 @@ define([
           return (
             <div className='col-xs-2' role="gridcell">
               <div className='ModeratedAssignmentList__Mark'>
-                <input
-                  type='radio'
-                  name={`mark_${student.id}`}
-                  disabled={this.props.assignment.published}
-                  onChange={this.props.onSelectProvisionalGrade.bind(this, provisionalGradeId)}
-                  checked={this.isProvisionalGradeChecked(provisionalGradeId, student)}
-                />
+                {
+                  student.provisional_grades.length > 1 && (
+                    <input
+                      type='radio'
+                      name={`mark_${student.id}`}
+                      disabled={this.props.assignment.published}
+                      onChange={this.props.onSelectProvisionalGrade.bind(this, provisionalGradeId)}
+                      checked={this.isProvisionalGradeChecked(provisionalGradeId, student)}
+                    />
+                  )
+                }
                   <a target='_blank' href={student.provisional_grades[markIndex].speedgrader_url}>
                     <span className='screenreader-only'>{I18n.t('Score of %{score}. View in SpeedGrader', {score: student.provisional_grades[markIndex].score})}</span>
                     <span aria-hidden='true'>{student.provisional_grades[markIndex].score}</span>
@@ -98,10 +102,14 @@ define([
     },
 
     renderFinalGrade (student) {
-      if (student.selected_provisional_grade_id) {
+      if (student.selected_provisional_grade_id || (student.provisional_grades && student.provisional_grades.length < 2)) {
         var grade = _.find(student.provisional_grades, (pg) => {
           return pg.provisional_grade_id === student.selected_provisional_grade_id;
         });
+        // If they only have one provisional grade show that as the grade
+        if (student.provisional_grades.length < 2) {
+          grade = student.provisional_grades[0]
+        }
         return (
           <div className='col-xs-2' role="gridcell">
             <div className='AssignmentList_Grade'>
