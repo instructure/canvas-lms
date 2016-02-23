@@ -289,12 +289,18 @@ module QuizzesCommon
     submit = opts.fetch(:submit, true)
     access_code = opts.fetch(:access_code, nil)
 
-    begin_quiz(access_code)
+    begin_quiz(access_code, opts)
     complete_and_submit_quiz(submit)
   end
 
-  def begin_quiz(access_code=nil)
+  def begin_quiz(access_code=nil, opts={})
     get take_quiz_url
+
+    # do this as close to submission creation as possible to avoid being locked by the time the page loads
+    if opts[:lock_after]
+      @quiz.lock_at = Time.now + opts[:lock_after]
+      @quiz.save!
+    end
 
     if access_code.nil?
       expect_new_page_load { f('#take_quiz_link').click }

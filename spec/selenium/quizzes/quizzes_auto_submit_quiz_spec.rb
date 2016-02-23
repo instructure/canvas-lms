@@ -14,7 +14,7 @@ describe 'taking a quiz' do
     before(:each) { user_session(@student) }
 
     def auto_submit_quiz(quiz)
-      take_and_answer_quiz(submit: false, quiz: quiz)
+      take_and_answer_quiz(submit: false, quiz: quiz, lock_after: 10.seconds)
       verify_times_up_dialog
       expect_new_page_load { close_times_up_dialog }
     end
@@ -28,10 +28,10 @@ describe 'taking a quiz' do
     end
 
     context 'when the quiz has a lock date' do
-      let(:quiz_with_lock_date) { quiz_create(course: @course, lock_at: Time.zone.now.utc + 10.seconds) }
+      let(:quiz) { quiz_create(course: @course) }
 
       it 'automatically submits the quiz once the quiz is locked', priority: "1", test_id: 209407 do
-        auto_submit_quiz(quiz_with_lock_date)
+        auto_submit_quiz(quiz)
 
         verify_quiz_is_locked
         verify_quiz_is_submitted
@@ -39,13 +39,13 @@ describe 'taking a quiz' do
       end
 
       it 'doesn\'t mark the quiz submission as "late"', priority: "1", test_id: 552276 do
-        auto_submit_quiz(quiz_with_lock_date)
+        auto_submit_quiz(quiz)
         verify_quiz_submission_is_not_late_in_speedgrader
       end
 
       context 'when the quiz is past due' do
         let(:quiz_past_due) do
-          quiz_past_due = quiz_with_lock_date
+          quiz_past_due = quiz
           quiz_past_due.due_at = default_time_for_due_date(Time.zone.now - 2.days)
           quiz_past_due.save!
           quiz_past_due.reload
