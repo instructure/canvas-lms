@@ -205,8 +205,16 @@ module SeleniumDriverSetup
 
   def self.note_recent_spec_run(example)
     @recent_spec_runs ||= []
-    @recent_spec_runs << example.metadata[:location]
+    @recent_spec_runs << { location: example.metadata[:location], exception: example.exception }
     @recent_spec_runs = @recent_spec_runs.last(RECENT_SPEC_RUNS_LIMIT)
+
+    if ENV["ABORT_ON_CONSISTENT_BADNESS"]
+      recent_errors = @recent_spec_runs.map { |run| run[:exception] && run[:exception].to_s }.compact
+      if recent_errors.size >= RECENT_SPEC_RUNS_LIMIT && recent_errors.uniq.size == 1
+        $stderr.puts "ERROR: got the same failure #{RECENT_SPEC_RUNS_LIMIT} times in a row, aborting"
+        RSpec.world.wants_to_quit = true
+      end
+    end
   end
 
   def self.error_template
@@ -237,7 +245,7 @@ module SeleniumDriverSetup
     screenshot_name = summary_name + ".png"
     driver.save_screenshot(errors_path.join(screenshot_name))
 
-    recent_spec_runs = SeleniumDriverSetup.recent_spec_runs
+    recent_spec_runs = SeleniumDriverSetup.recent_spec_runs.map { |r| r[:location] }
 
     log_message_formatter = EscapeCode::HtmlFormatter.new(log_messages.join("\n"))
 
