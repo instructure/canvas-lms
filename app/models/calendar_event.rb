@@ -61,6 +61,101 @@ class CalendarEvent < ActiveRecord::Base
   after_save :sync_parent_event
   after_update :sync_child_events
 
+  before_update :sync_google_calendar
+  before_save :sync_google_calendar
+
+  def sync_google_calendar
+    obj = {}
+
+    client = Google::APIClient.new(:application_name => 'Braven Canvas')
+
+    file_store = Google::APIClient::FileStore.new(File.join(Rails.root, "config", "google_calendar_auth.json"))
+    storage = Google::APIClient::Storage.new(file_store)
+    client.authorization = storage.authorize
+    calendar_api = client.discovered_api('calendar', 'v3')
+
+    event = {
+      'summary' => title,
+      'start' => {
+        'dateTime' => start_at,
+        'timeZone' => 'America/Los_Angeles',
+      },
+      'end' => {
+        'dateTime' => end_at,
+        'timeZone' => 'America/Los_Angeles',
+      }
+    }
+
+    event['attendees'] = []
+
+    if context_type == 'CourseSection'
+      CourseSection.find(context_id).students.all.each do |user|
+        event['attendees'] << { email: user.email }
+      end
+    end
+
+    if context_type == 'Course'
+      Course.find(context_id).students.all.each do |user|
+        event['attendees'] << { email: user.email }
+      end
+    end
+
+    # note: we can set event.reminder_overrides[].minutes to change the time, but I'm leaving default for now
+
+  #reminders: {
+    #use_default: false,
+    #overrides: [
+      #{method' => 'email', 'minutes: 24 * 60},
+      #{method' => 'popup', 'minutes: 10},
+    #],
+  #},
+
+
+    params = {
+      :calendarId => 'primary',
+      :sendNotifications => true
+    }
+
+    if google_calendar_id
+      params[:eventId] = google_calendar_id
+    end
+
+    results = client.execute!(
+      :api_method => google_calendar_id ? calendar_api.events.update : calendar_api.events.insert,
+      :parameters => params,
+      :body_object => event)
+
+    event = results.data
+
+    self.google_calendar_id = event.id
+  end
+
+  def get_gcal_rsvp_status
+    return [] if !google_calendar_id
+
+    client = Google::APIClient.new(:application_name => 'Braven Canvas')
+
+    file_store = Google::APIClient::FileStore.new(File.join(Rails.root, "config", "google_calendar_auth.json"))
+    storage = Google::APIClient::Storage.new(file_store)
+    client.authorization = storage.authorize
+    calendar_api = client.discovered_api('calendar', 'v3')
+
+    params = {
+      :calendarId => 'primary',
+      :eventId => google_calendar_id
+    }
+
+    results = client.execute!(
+      :api_method => calendar_api.events.get,
+      :parameters => params)
+
+    event = results.data
+
+    # array of json objects with email, displayName, responseStatus
+    # (and other things we don't really care about)
+    return event.attendees
+  end
+
   # when creating/updating a calendar_event, you can give it a list of child
   # events. these will update/replace any existing child events. the format is:
   # [{:start_at => start_at, :end_at => end_at, :context_code => context_code},
