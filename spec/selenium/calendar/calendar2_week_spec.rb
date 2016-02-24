@@ -20,7 +20,7 @@ describe "calendar2" do
 
     context "week view" do
 
-      it "should navigate to week view when week button is clicked", priority: "2" do
+      it "should navigate to week view when week button is clicked", priority: "2", test_id: 766945 do
         load_week_view
         expect(fj('.fc-agendaWeek-view:visible')).to be_present
       end
@@ -59,15 +59,15 @@ describe "calendar2" do
         submit_form(assignment_form)
         wait_for_ajaximations
         quick_jump_to_date("Dec 26, 2015")
-        fj('.fc-event').click
+        f('.fc-event').click
         wait_for_ajaximations
 
-        expect(fj('.event-details-timestring')).to include_text("Due: #{due_date}")
+        expect(f('.event-details-timestring')).to include_text("Due: #{due_date}")
       end
 
-      it "should show short events at full height" do
+      it "should show short events at full height", priority: "3", test_id: 767454 do
         noon = Time.now.at_beginning_of_day + 12.hours
-        event = @course.calendar_events.create! :title => "ohai", :start_at => noon, :end_at => noon + 5.minutes
+        @course.calendar_events.create! :title => "ohai", :start_at => noon, :end_at => noon + 5.minutes
 
         load_week_view
 
@@ -75,16 +75,16 @@ describe "calendar2" do
         expect(elt.size.height).to be >= 18
       end
 
-      it "should fix up the event's data-start for events after 11:30pm" do
+      it "should fix up the event's data-start for events after 11:30pm", priority: "3", test_id: 768979 do
         time = Time.zone.now.at_beginning_of_day + 23.hours + 45.minutes
         @course.calendar_events.create! title: 'ohai', start_at: time, end_at: time + 5.minutes
 
         load_week_view
 
-        expect(fj('.fc-event .fc-time').attribute('data-start')).to eq('11:45')
+        expect(f('.fc-event .fc-time').attribute('data-start')).to eq('11:45')
       end
 
-      it "should stagger pseudo-overlapping short events" do
+      it "should stagger pseudo-overlapping short events", priority: "3", test_id: 768980 do
         noon = Time.now.at_beginning_of_day + 12.hours
         first_event = @course.calendar_events.create! :title => "ohai", :start_at => noon, :end_at => noon + 5.minutes
         second_start = first_event.start_at + 6.minutes
@@ -99,7 +99,7 @@ describe "calendar2" do
         expect(elt_lefts.size).to eql(elts.size)
       end
 
-      it "should not change duration when dragging a short event" do
+      it "should not change duration when dragging a short event", priority: "2", test_id: 768981 do
         skip("dragging events doesn't seem to work")
         noon = Time.zone.now.at_beginning_of_day + 12.hours
         event = @course.calendar_events.create! :title => "ohai", :start_at => noon, :end_at => noon + 5.minutes
@@ -112,7 +112,7 @@ describe "calendar2" do
         expect(event.reload.end_at).to eql(noon + 1.hour + 5.minutes)
       end
 
-      it "doesn't change the time when dragging an event close to midnight" do
+      it "doesn't change the time when dragging an event close to midnight", priority: "3", test_id: 768982 do
         # Choose a fixed date to avoid periodic end-of-week failures
         close_to_midnight = Time.zone.parse('2015-1-1').beginning_of_day + 1.day - 20.minutes
 
@@ -139,7 +139,7 @@ describe "calendar2" do
         expect(event2.end_at).to eql(close_to_midnight + 1.day + 15.minutes)
       end
 
-      it "should show the right times in the tool tips for short events" do
+      it "should show the right times in the tool tips for short events", priority: "2", test_id: 768983 do
         noon = Time.zone.now.at_beginning_of_day + 12.hours
         event = @course.calendar_events.create! :title => "ohai", :start_at => noon, :end_at => noon + 5.minutes
         load_week_view
@@ -201,7 +201,7 @@ describe "calendar2" do
       expect(ff(".fc-agendaWeek-view .fc-today").size).to eq 2
     end
 
-    it "should show the location when clicking on a calendar event" do
+    it "should show the location when clicking on a calendar event", priority: "2", test_id: 768984 do
       location_name = "brighton"
       location_address = "cottonwood"
 
@@ -217,7 +217,7 @@ describe "calendar2" do
       expect(f('.event-details-content').text).to include_text(location_address)
     end
 
-    it "should bring up a calendar date picker when clicking on the week range" do
+    it "should bring up a calendar date picker when clicking on the week range", priority: "2", test_id: 768985 do
       load_week_view
       # Click on the week header
       f('.navigation_title').click
@@ -320,6 +320,16 @@ describe "calendar2" do
         # Calendar item time should stay at 9:00am
         event1.reload
         expect(event1.start_at).to eql(@two_days_later)
+      end
+
+      it "should extend all day event by dragging", priority: "2", test_id: 138884 do
+        start_at_time = Time.zone.today.at_beginning_of_week.beginning_of_day
+        event = make_event(title: 'Event1', start: start_at_time, all_day: true)
+        load_week_view
+        drag_and_drop_element(f('.fc-resizer'),
+                              f('.fc-row .fc-content-skeleton td:nth-of-type(5)'))
+        event.reload
+        expect(event.end_at).to eq(start_at_time + 3.days)
       end
     end
   end
