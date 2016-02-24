@@ -59,8 +59,10 @@ class CalendarEvent < ActiveRecord::Base
   after_save :touch_context
   after_save :replace_child_events
   after_save :sync_parent_event
-  before_update :sync_google_calendar
   after_update :sync_child_events
+
+  before_update :sync_google_calendar
+  before_save :sync_google_calendar
 
   def sync_google_calendar
     obj = {}
@@ -126,6 +128,32 @@ class CalendarEvent < ActiveRecord::Base
     event = results.data
 
     self.google_calendar_id = event.id
+  end
+
+  def get_gcal_rsvp_status
+    return [] if !google_calendar_id
+
+    client = Google::APIClient.new(:application_name => 'Braven Canvas')
+
+    file_store = Google::APIClient::FileStore.new(File.join(Rails.root, "config", "google_calendar_auth.json"))
+    storage = Google::APIClient::Storage.new(file_store)
+    client.authorization = storage.authorize
+    calendar_api = client.discovered_api('calendar', 'v3')
+
+    params = {
+      :calendarId => 'primary',
+      :eventId => google_calendar_id
+    }
+
+    results = client.execute!(
+      :api_method => calendar_api.events.get,
+      :parameters => params)
+
+    event = results.data
+
+    # array of json objects with email, displayName, responseStatus
+    # (and other things we don't really care about)
+    return event.attendees
   end
 
   # when creating/updating a calendar_event, you can give it a list of child
