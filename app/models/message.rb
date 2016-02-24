@@ -64,8 +64,8 @@ class Message < ActiveRecord::Base
   validates :to, length: {maximum: maximum_text_length}, allow_nil: true, allow_blank: true
   validates :from, length: {maximum: maximum_text_length}, allow_nil: true, allow_blank: true
   validates :url, length: {maximum: maximum_text_length}, allow_nil: true, allow_blank: true
-  validates :subject, length: {maximum: maximum_string_length}, allow_nil: true, allow_blank: true
-  validates :from_name, length: {maximum: maximum_string_length}, allow_nil: true, allow_blank: true
+  validates :subject, length: {maximum: maximum_text_length}, allow_nil: true, allow_blank: true
+  validates :from_name, length: {maximum: maximum_text_length}, allow_nil: true, allow_blank: true
   validates :reply_to_name, length: {maximum: maximum_string_length}, allow_nil: true, allow_blank: true
 
   # Stream policy
