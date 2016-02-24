@@ -39,8 +39,10 @@ describe "eportfolios" do
       get "/eportfolios/#{@eportfolio.id}"
       f(".wizard_popup_link").click
       wait_for_animations
-      expect(f("#wizard_box")).to be_displayed
-      f(".close_wizard_link").click
+      keep_trying_until do
+        expect(f("#wizard_box")).to be_displayed
+        f(".close_wizard_link").click
+      end
       wait_for_animations
       expect(f("#wizard_box")).not_to be_displayed
     end
