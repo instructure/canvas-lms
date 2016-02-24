@@ -32,31 +32,26 @@ module AccountReports
       file = AccountReports.generate_file(@account_report)
       CSV.open(file, "w") do |csv|
 
-        headers = [ 'context_type', 'context_id', 'account_name', 'course_name', 'tool_type_name',
-                    'tool_type_id', 'tool_created_at', 'privacy_level', 'launch_url', 'custom_fields' ]
+        headers = ['context_type', 'context_id', 'account_name', 'course_name', 'tool_type_name',
+                   'tool_type_id', 'tool_created_at', 'privacy_level', 'launch_url', 'custom_fields']
 
         csv << headers
 
         tools = ContextExternalTool.active.
           where("context_type = 'Account' OR context_type = 'Course'").
-          joins(
-            "LEFT OUTER JOIN #{Course.quoted_table_name} ON context_id=courses.id AND context_type='Course'",
-            "LEFT OUTER JOIN #{Account.quoted_table_name} ON context_id=accounts.id AND context_type='Account'").
+          joins("LEFT OUTER JOIN #{Course.quoted_table_name} ON context_id=courses.id AND context_type='Course'",
+                "LEFT OUTER JOIN #{Account.quoted_table_name} ON context_id=accounts.id AND context_type='Account'").
           select("context_external_tools.*, courses.name AS course_name, accounts.name AS account_name")
-          if account.root_account?
-            tools.where!("courses.root_account_id= :root OR
-                accounts.root_account_id = :root OR accounts.id = :root", {root: root_account})
-          else
-            tools.where("EXISTS (?) OR EXISTS
-              (
-                WITH RECURSIVE t AS (
-                  SELECT * FROM #{Account.quoted_table_name} WHERE id=?
-                  UNION
-                  SELECT accounts.* FROM #{Account.quoted_table_name} INNER JOIN t ON accounts.parent_account_id=t.id
-                )
-              SELECT * FROM t)",
-              CourseAccountAssociation.where("course_id=courses.id").where(account_id: account), account)
-          end
+        if account.root_account?
+          tools.where!("courses.root_account_id= :root OR
+                        accounts.root_account_id = :root OR accounts.id = :root", {root: root_account})
+        else
+          tools.where!("accounts.id IN (#{Account.sub_account_ids_recursive_sql(account.id)})
+                        OR accounts.id=?
+                        OR EXISTS (?)",
+                       account,
+                       CourseAccountAssociation.where("course_id=courses.id").where(account_id: account))
+        end
 
         Shackles.activate(:slave) do
           tools.find_each do |t|
