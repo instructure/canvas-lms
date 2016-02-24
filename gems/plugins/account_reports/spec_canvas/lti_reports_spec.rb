@@ -25,10 +25,11 @@ describe 'lti report' do
     @type = 'lti_report_csv'
     @account = Account.create(name: 'New Account', default_time_zone: 'UTC')
     @sub_account = Account.create(parent_account: @account, name: 'Sub Account')
+    @sub_account2 = Account.create(parent_account: @account, name: 'Sister Sub Account')
+    @course2 = Course.create(name: 'New Course', account: @sub_account2)
     @course = Course.create(name: 'New Course', account: @sub_account)
 
     @t1 = ContextExternalTool.new.tap do |t|
-      t.id = 1
       t.context_id = @account.id
       t.context_type = 'Account'
       t.name = 'Account Tool'
@@ -40,7 +41,6 @@ describe 'lti report' do
     end
 
     @t2 = ContextExternalTool.new.tap do |t|
-      t.id = 2
       t.context_id = @course.id
       t.context_type = 'Course'
       t.name = 'Course Tool'
@@ -50,11 +50,22 @@ describe 'lti report' do
       t.url = 'https://launch_url.test'
       t.save
     end
+
+    @t3 = ContextExternalTool.new.tap do |t|
+      t.context_id = @course2.id
+      t.context_type = 'Course'
+      t.name = 'Course Tool2'
+      t.consumer_key = 'key'
+      t.shared_secret = 'secret'
+      t.tool_id = 'Youtube'
+      t.url = 'https://launch_url.test'
+      t.save
+    end
   end
 
   it 'should run on a root account' do
-    parsed = read_report(@type, {order: [0, 1]})
-    expect(parsed.length).to eq 2
+    parsed = read_report(@type, {order: 4})
+    expect(parsed.length).to eq 3
     expect(parsed[0]).to eq([
       @t1.context_type,
       @t1.context_id.to_s,
@@ -70,9 +81,9 @@ describe 'lti report' do
   end
 
   it 'should run on a sub account' do
-    parsed = read_report(@type, {order: [0, 1], account: @sub_account})
-    expect(parsed.length).to eq 2
-    expect(parsed[1]).to eq([
+    parsed = read_report(@type, {order: 4, account: @sub_account})
+    expect(parsed.length).to eq 1
+    expect(parsed[0]).to eq([
       @t2.context_type,
       @t2.context_id.to_s,
       nil,
