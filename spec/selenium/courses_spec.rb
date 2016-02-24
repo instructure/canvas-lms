@@ -131,47 +131,10 @@ describe "courses" do
         expect(f("#wizard_#{item}.ic-wizard-box__content-trigger--checked")).to be_nil
       end
 
-      it "should open and close wizard after initial close" do
-        # For now we are not allowing the wizard to popup automatically
-        # so this spec doesn't apply, it may in the future though.
-        pending
-        def find_wizard_box
-          wizard_box = keep_trying_until do
-            wizard_box = f(".ic-wizard-box")
-            expect(wizard_box).to be_displayed
-            wizard_box
-          end
-          wizard_box
-        end
-
-        course_with_teacher_logged_in
-        create_new_course
-
-        wait_for_ajaximations
-        wizard_box = find_wizard_box
-        f(".ic-wizard-box__close a").click
-        wait_for_ajaximations
-        wizard_box = f(".ic-wizard-box")
-        expect(wizard_box).to eq nil
-        checklist_button = f('.wizard_popup_link')
-        expect(checklist_button).to be_displayed
-        checklist_button.click
-        wait_for_ajaximations
-        wizard_box = find_wizard_box
-        f(".ic-wizard-box__close a").click
-        wait_for_ajaximations
-        wizard_box = f(".ic-wizard-box")
-        expect(wizard_box).to eq nil
-        expect(checklist_button).to be_displayed
-      end
-
       it "should open up the choose home page dialog from the wizard" do
         course_with_teacher_logged_in
         create_new_course
 
-        # Because of the specs about automatically opening are currently
-        # pending, we need to cause the wizard to open by way of click. When
-        # those specs are no longer pendings, the click line should be removed.
         go_to_checklist
 
         f("#wizard_home_page").click
