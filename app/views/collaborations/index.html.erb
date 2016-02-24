@@ -6,7 +6,7 @@
   <div class="rs-margin-all">
     <p><%= mt :description_rs, <<-HEREDOC, :google_url => "http://docs.google.com"
 Free online web tools like [Google Docs](%{google_url}) are an excellent place for students to work on group projects or papers, take shared notes, etc.
-Teacher *or* students can set up group collaborations.
+Teachers *or* students can set up group collaborations.
 HEREDOC
        %>
     </p>
@@ -28,11 +28,10 @@ HEREDOC
 <div id="no_collaborations_message" style="<%= hidden unless @collaborations.empty? %>">
   <% if can_do(@context, @current_user, :manage_content) %>
     <p><%= mt :description_teacher, <<-HEREDOC, :google_url => "http://docs.google.com"
-**What do we mean by collaborations?**  We're talking about web-based tools that most
-likely your students are already familiar with.  Students can use resources like
+**What do we mean by collaborations?**  We're talking about web-based tools that your students are likely already familiar with.  Students can use resources like
 [Google Docs](%{google_url})
-to work collaboratively on tasks like group papers or note-taking.  This page gives them
-(and you) an easy place to keep track of those collaborations, and also to set them
+collaborate on tasks like group papers or note-taking.  This page gives them
+(and you) an easy place to keep track of those collaborations, and to set them
 up without having to swap emails.
 HEREDOC
         %></p>
@@ -41,15 +40,15 @@ HEREDOC
 **What do we mean by collaborations?**  We're talking about web-based tools for
 working together on a shared document.  You can use resources like
 [Google Docs](%{google_url})
-to work collaboratively on tasks like group papers or note-taking.  This page is
-an easy place to keep track of those collaborations, and also to set them
+to collaborate on tasks like group papers or note-taking.  This page is
+an easy place to keep track of those collaborations, and to set them
 up without having to swap emails.
 HEREDOC
         %></p>
   <% end %>
   <% if can_do(@context, @current_user, :create_collaborations) && !@hide_create_ui %>
     <p>
-      <%= t :how_to_start_a_new_collaboration, 'To find out more about a particular type of collaboration, click "Start a New Collaboration" and then choose that type in the dropdown list.' %>
+      <%= t :how_to_start_a_new_collaboration, 'To find out more about a particular type of collaboration, click "Start a New Collaboration" and then choose that type from the dropdown list.' %>
     </p>
   <% end %>
 </div>
@@ -85,7 +84,7 @@ HEREDOC
         <div class="collaboration <%= collaboration.style_class %> collaboration_<%= collaboration.id %>" data-id="<%= collaboration.id %>">
           <h3><%= collaboration.title %></h3>
           <div style="margin-bottom: 5px;" class="description">
-            <a href="<%= oauth_url(:service => :google_drive, :return_to => (request.url)) %>"><%= t 'google.drive.upgrade.description', "To access this collaboration you must authorize Canvas to access your Google Drive account" %></a>
+            <a href="<%= oauth_url(:service => :google_drive, :return_to => (request.url)) %>"><%= t 'google.drive.upgrade.description', "To access this Collaboration you must authorize Canvas to access your Google Drive account" %></a>
           </div>
           <small <%= context_sensitive_datetime_title(collaboration.created_at, @context) %>>
             <%= t :started_by, "Started by *%{user}*, %{at}",
