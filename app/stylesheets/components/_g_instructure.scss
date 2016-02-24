@@ -329,10 +329,10 @@
     @else { margin-bottom: 20px; }
     .event-list-view-calendar {
       float: right;
-      @include fontSize(10px);
+      @include fontSize(12px);
       font-weight: normal;
       &[class*=icon-]:before, &[class^=icon-]:before {
-        @include fontSize($ic-font-size--medium);
+        @include fontSize(16px);
         vertical-align: middle;
       }
     }
