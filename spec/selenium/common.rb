@@ -31,7 +31,6 @@ include I18nUtilities
 $selenium_config = ConfigFile.load("selenium") || {}
 SERVER_IP = $selenium_config[:server_ip] || UDPSocket.open { |s| s.connect('8.8.8.8', 1); s.addr.last }
 BIND_ADDRESS = $selenium_config[:bind_address] || '0.0.0.0'
-SECONDS_UNTIL_COUNTDOWN = 5
 SECONDS_UNTIL_GIVING_UP = 20
 MAX_SERVER_START_TIME = 15
 

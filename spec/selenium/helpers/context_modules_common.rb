@@ -187,4 +187,10 @@ module ContextModulesCommon
     # before it adds click handlers and drag/drop
     sleep 2
   end
+
+  # so terrible
+  def get(url)
+    super
+    wait_for_modules_ui if url =~ %r{\A/courses/\d+/modules\z}
+  end
 end
