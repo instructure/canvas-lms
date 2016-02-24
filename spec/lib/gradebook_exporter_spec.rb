@@ -183,18 +183,41 @@ describe GradebookExporter do
     end
 
     it "should include inactive students" do
-      assmt = @course.assignments.create!(:title => "assmt", :points_possible => 10)
+      assmt = @course.assignments.create!(title: "assmt", points_possible: 10)
 
-      student1 = student_in_course(:course => @course, :active_all => true).user
-      student2 = student_in_course(:course => @course, :active_all => true).user
+      student1_enrollment = student_in_course(course: @course, active_all: true)
+      student1 = student1_enrollment.user
+      student2_enrollment = student_in_course(course: @course, active_all: true)
+      student2 = student2_enrollment.user
 
-      assmt.grade_student(student1, :grade => 1)
-      assmt.grade_student(student1, :grade => 2)
+      assmt.grade_student(student1, grade: 1)
+      assmt.grade_student(student2, grade: 2)
+
+      student1_enrollment.deactivate
+      student2_enrollment.deactivate
 
       csv = exporter.to_csv
       rows = CSV.parse(csv, headers: true)
 
       expect([rows[1]["ID"], rows[2]["ID"]]).to match_array([student1.id.to_s, student2.id.to_s])
+    end
+  end
+
+  context "a course with a student whose name starts with an equals sign" do
+    let(:student) do
+      user = user(name: "=sum(A)", active_user: true)
+      course_with_student(course: course, user: user)
+      user
+    end
+    let(:course) { @course }
+    let(:assignment) { course.assignments.create!(title: "Assignment", points_possible: 4) }
+
+    it "quotes the name that starts with an equals so it's not considered a formula" do
+      assignment.grade_student(student, grade: 1)
+      csv = GradebookExporter.new(course, @teacher, {}).to_csv
+      rows = CSV.parse(csv, headers: true)
+
+      expect(rows[1][0]).to eql('="=sum(A)"')
     end
   end
 end

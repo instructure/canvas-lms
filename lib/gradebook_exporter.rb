@@ -150,7 +150,7 @@ class GradebookExporter
               end
             end
           end
-          row = [student.send(name_method), student.id]
+          row = [student_name(student), student.id]
           pseudonym = SisPseudonym.for(student, @course, include_root_account)
           row << pseudonym.try(:sis_user_id) if include_sis_id
           pseudonym ||= student.find_pseudonym_for_account(@course.root_account, include_root_account)
@@ -198,7 +198,14 @@ class GradebookExporter
     @course.feature_enabled?(:all_grading_periods_totals)
   end
 
-  def name_method
-    @course.list_students_by_sortable_name? ? :sortable_name : :name
+  STARTS_WITH_EQUAL = /^\s*=/
+
+  # Returns the student name to use for the export.  If the name
+  # starts with =, quote it so anyone pulling the data into Excel
+  # doesn't have a formula execute.
+  def student_name(student)
+    name = @course.list_students_by_sortable_name? ? student.sortable_name : student.name
+    name = "=\"#{name}\"" if name =~ STARTS_WITH_EQUAL
+    name
   end
 end
