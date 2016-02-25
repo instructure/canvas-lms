@@ -76,7 +76,7 @@ describe "courses/_to_do_list.html.erb" do
         expect(response).to include "7 submissions need grading"
       end
 
-      it "shows 9+ when there are more than 9 to grade" do
+      it "shows 999+ when there are more than 999 to grade" do
         course_with_student(active_all: true)
         due_date = 2.days.from_now
         assignment_model(course: @course,
@@ -84,7 +84,7 @@ describe "courses/_to_do_list.html.erb" do
                          submission_types: "online_text_entry",
                          points_possible: 15,
                          title: "GradeMe",
-                         needs_grading_count: 10)
+                         needs_grading_count: 1000)
         @user = @teacher
         @user.course_nicknames[@course.id] = "My Awesome Course"
         @user.save!
@@ -95,8 +95,8 @@ describe "courses/_to_do_list.html.erb" do
         expect(response).to include "15 points"
         expect(response).to include "My Awesome Course"
         expect(response).to include due_at(@assignment, @user)
-        expect(response).to include "9+"
-        expect(response).to include "More than 9 submissions need grading"
+        expect(response).to include "999+"
+        expect(response).to include "More than 999 submissions need grading"
       end
     end
 

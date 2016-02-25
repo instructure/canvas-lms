@@ -172,8 +172,8 @@
   }
   &.to-do-list, &.events {
     i {
-      width: 25px;
-      min-width: 25px;
+      width: 40px;
+      min-width: 40px;
     }
     .event > a {
       display: flex;
@@ -181,7 +181,7 @@
     .todo-badge-wrapper {
       display: inline-block;
       vertical-align: top;
-      min-width: 25px;
+      min-width: 40px;
     }
   }
   &.to-do-list {
