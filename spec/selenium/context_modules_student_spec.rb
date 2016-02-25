@@ -104,6 +104,26 @@ describe "context modules" do
       validate_context_module_status_icon(@module_3.id, @completed_icon)
     end
 
+    it "should not cache a changed module requirement" do
+      other_assmt = @course.assignments.create!(:title => "assignment")
+      other_tag = @module_1.add_item({:id => other_assmt.id, :type => 'assignment'})
+      @module_1.completion_requirements = {@tag_1.id => {:type => 'must_view'}, other_tag.id => {:type => 'must_view'}}
+      @module_1.save!
+
+      get "/courses/#{@course.id}/assignments/#{@assignment_1.id}"
+
+      # fulfill the must_view
+      go_to_modules
+      validate_context_module_item_icon(@tag_1.id, @completed_icon)
+
+      # change the req
+      @module_1.completion_requirements = {@tag_1.id => {:type => 'must_submit'}, other_tag.id => {:type => 'must_view'}}
+      @module_1.save!
+
+      go_to_modules
+      validate_context_module_item_icon(@tag_1.id, @open_item_icon)
+    end
+
     it "should show progression in large_roster courses" do
       @course.large_roster = true
       @course.save!

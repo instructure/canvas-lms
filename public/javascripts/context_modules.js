@@ -153,7 +153,7 @@ define([
                 $user_progression_list.append($user_progression);
               }
               if($user_progression.length > 0) {
-                progression.requirements_met = $.map(progression.requirements_met || [], function(r) { return r.id }).join(",");
+                $user_progression.data('requirements_met', progression.requirements_met);
                 $user_progression.data('incomplete_requirements', progression.incomplete_requirements);
                 $user_progression.fillTemplateData({data: progression});
               }
@@ -556,7 +556,7 @@ define([
       updateProgressionState: function($module) {
         var id = $module.attr('id').substring(15);
         var $progression = $("#current_user_progression_list .progression_" + id);
-        var data = $progression.getTemplateData({textValues: ['context_module_id', 'workflow_state', 'requirements_met', 'collapsed', 'current_position']});
+        var data = $progression.getTemplateData({textValues: ['context_module_id', 'workflow_state', 'collapsed', 'current_position']});
         var $module = $("#context_module_" + data.context_module_id);
         var progression_state = data.workflow_state
         var progression_state_capitalized = progression_state && progression_state.charAt(0).toUpperCase() + progression_state.substring(1);
@@ -574,9 +574,9 @@ define([
         }
         $module.fillTemplateData({data: {progression_state: progression_state}});
 
-        var reqs_met = [];
-        if (data.requirements_met) {
-          reqs_met = data.requirements_met.split(",");
+        var reqs_met = $progression.data('requirements_met');
+        if (reqs_met == null) {
+          reqs_met = [];
         }
 
         var incomplete_reqs = $progression.data('incomplete_requirements');
@@ -594,7 +594,10 @@ define([
           var $icon_container = $mod_item.find('.module-item-status-icon');
           var mod_id = $mod_item.getTemplateData({textValues: ['id']}).id;
 
-          if ($.inArray(mod_id, reqs_met) != -1) {
+          var completed = _.any(reqs_met, function(req) {
+            return (req.id == mod_id && $mod_item.hasClass(req.type + "_requirement"));
+          });
+          if (completed)  {
             $mod_item.addClass('completed_item');
             addIcon($icon_container, 'icon-check', I18n.t('Completed'));
           } else if (progression_state == 'completed') {
