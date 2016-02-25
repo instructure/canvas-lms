@@ -313,9 +313,11 @@
   <% end %>
   <div id='aria_alerts' class='hide-text affix' role="alert" aria-live="assertive"></div>
   <%= render :partial => 'layouts/foot', :locals => { :include_common_bundle => true } %>
+  <% if BeyondZConfiguration.help_url %> 
   <div id="bz-help-button">
-    <a target="_BLANK" href="https://help.bebraven.org/questions/ask/">Help</a>
+    <a target="_BLANK" href="<%= BeyondZConfiguration.help_url %>/questions/ask/">Help</a>
   </div>
+  <% end %>
 </div> <!-- #application -->
 </body>
 </html>

@@ -144,7 +144,12 @@ module Api::V1::CalendarEvent
     hash['start_at'] = hash['end_at'] = assignment.due_at
     hash['url'] = api_v1_calendar_event_url("assignment_#{assignment.id}")
     hash['html_url'] = hash['assignment']['html_url'] if hash['assignment'].include?('html_url')
-    if assignment.applied_overrides.present?
+    if assignment.assignment_overrides_filtered
+      hash['assignment_overrides'] = assignment.assignment_overrides_filtered.map { |o| assignment_override_json(o) }
+    #if assignment.applied_overrides.present?
+      #hash['assignment_overrides'] = assignment.applied_overrides.map { |o| assignment_override_json(o) }
+    #end
+    elsif assignment.applied_overrides.present?
       hash['assignment_overrides'] = assignment.applied_overrides.map { |o| assignment_override_json(o) }
     end
     hash

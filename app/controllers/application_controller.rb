@@ -133,6 +133,7 @@ class ApplicationController < ActionController::Base
     @js_env[:context_asset_string] = @context.try(:asset_string) if !@js_env[:context_asset_string]
     @js_env[:ping_url] = polymorphic_url([:api_v1, @context, :ping]) if @context.is_a?(Course)
     @js_env[:TIMEZONE] = Time.zone.tzinfo.identifier if !@js_env[:TIMEZONE]
+    @js_env[:TIMEZONE_OFFSET] = Time.zone.utc_offset if !@js_env[:TIMEZONE_OFFSET]
     @js_env[:CONTEXT_TIMEZONE] = @context.time_zone.tzinfo.identifier if !@js_env[:CONTEXT_TIMEZONE] && @context.respond_to?(:time_zone) && @context.time_zone.present?
     @js_env[:LOCALE] = I18n.qualified_locale if !@js_env[:LOCALE]
     @js_env[:TOURS] = tours_to_run
@@ -223,6 +224,65 @@ class ApplicationController < ActionController::Base
   end
 
   protected
+
+  def filter_other_sections_from_events(events)
+    return events if events.nil? || events.empty?
+
+    # No need to filter anyone other than TAs because Canvas
+    # already does a good job with all those users
+    return events if !@current_user
+
+    # If this user is a teacher or a designer, give them
+    # the full list too so they can see all sections, even
+    # if they aren't specifically in that section.
+    return events if @current_user.teacher_enrollments.current.any?
+    return events if @current_user.designer_enrollments.current.any?
+
+    user_section_ids = []
+    @current_user.ta_enrollments.current.each do |e|
+      user_section_ids << e.course_section_id
+    end
+    @current_user.student_enrollments.current.each do |e|
+      user_section_ids << e.course_section_id
+    end
+
+    # Also relying on Canvas' built-in filtering in the event
+    # of no TA (coach) enrollments found because we want to use
+    # other rolls for other purposes like general administration.
+    # Teachers and admins, in particular, should see everything even
+    # if they aren't enrolled.
+    return events if user_section_ids.empty?
+
+    filtered_events = []
+    events.each do |event|
+      if (event.respond_to? :assignment_overrides) && event.assignment_overrides
+        # assignments are a completely different kind of object... we need to make sure it filters
+        # the overrides intelligently
+        if !event.applied_overrides.present?
+          filtered_events << event
+        else
+          filtered_overrides = []
+          event.applied_overrides.each do |o|
+            if user_section_ids.include?(o.set_id)
+              filtered_overrides << o
+            end
+          end
+          if !filtered_overrides.empty?
+            event.assignment_overrides_filtered = filtered_overrides
+            filtered_events << event
+          end
+        end
+      else
+        unless event.context_type == 'CourseSection' && !user_section_ids.include?(event.context_id)
+          filtered_events << event
+        end
+      end
+    end
+    filtered_events
+  end
+
+  helper_method :filter_other_sections_from_events
+
 
   # we track the cost of each request in Canvas::RequestThrottle in order
   # to rate limit clients that are abusing the API.  Some actions consume

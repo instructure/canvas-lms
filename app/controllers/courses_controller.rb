@@ -1545,6 +1545,7 @@ class CoursesController < ApplicationController
         @groups = @context.assignment_groups.active.order(:position, AssignmentGroup.best_unicode_collation_key('name')).all
         @events = @context.calendar_events.active.to_a
         @events.concat @context.assignments.active.to_a
+        @events = filter_other_sections_from_events(@events)
         @undated_events = @events.select {|e| e.start_at == nil}
         @dates = (@events.select {|e| e.start_at != nil}).map {|e| e.start_at.to_date}.uniq.sort.sort
       else
