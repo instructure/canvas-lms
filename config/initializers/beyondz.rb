@@ -19,6 +19,9 @@ class BeyondZConfiguration
   end
 
   def self.production?
+    # This is the value of a setting we set on production
+    # remember to edit this if we ever rebrand again so this
+    # setting always matches
     @config[:base_url] == 'https://join.bebraven.org/'
   end
 
