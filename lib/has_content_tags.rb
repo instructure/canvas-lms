@@ -17,15 +17,15 @@
 #
 
 module HasContentTags
-  
+
   def update_associated_content_tags_later
     send_later(:update_associated_content_tags) if @associated_content_tags_need_updating != false
   end
-  
+
   def update_associated_content_tags
     ContentTag.update_for(self) if @associated_content_tags_need_updating
   end
-  
+
   def check_if_associated_content_tags_need_updating
     @associated_content_tags_need_updating = false
     return if self.new_record?
@@ -37,18 +37,24 @@ module HasContentTags
     @associated_content_tags_need_updating = true if self.respond_to?(:workflow_state_changed?) && self.workflow_state_changed? || self.workflow_state == 'deleted'
     @associated_content_tags_need_updating = true if self.is_a?(Attachment) && self.locked_changed?
   end
-  
+
   def self.included(klass)
     klass.send(:after_save, :update_associated_content_tags)
     klass.send(:before_save, :check_if_associated_content_tags_need_updating)
   end
-  
+
   def locked_cache_key(user)
     ['_locked_for2', self, user].cache_key
   end
-  
+
   def clear_locked_cache(user)
     Rails.cache.delete locked_cache_key(user)
   end
 
+  def relock_modules!
+    relocked_modules = []
+    ContextModule.where(:id => ContentTag.where(:content_id => self, :content_type => self.class.to_s).not_deleted.select(:context_module_id)).each do |mod|
+      mod.relock_progressions(relocked_modules)
+    end
+  end
 end

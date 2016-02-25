@@ -331,6 +331,7 @@ module Api::V1::Assignment
         assignment.save_without_broadcasting!
         batch_update_assignment_overrides(assignment, overrides, user)
       end
+
       assignment.do_notifications!(old_assignment, assignment_params[:notify_of_update])
     else
       assignment.save!

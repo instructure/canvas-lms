@@ -910,6 +910,8 @@ describe Quizzes::QuizzesController do
       section = @course.course_sections.create!
       course_due_date = 3.days.from_now.iso8601
       section_due_date = 5.days.from_now.iso8601
+      Quizzes::Quiz.any_instance.expects(:relock_modules!).once
+
       post 'create', :course_id => @course.id,
         :quiz => {
           :title => "overridden quiz",
@@ -919,6 +921,7 @@ describe Quizzes::QuizzesController do
             :due_at => section_due_date,
           }]
         }
+
       expect(response).to be_success
       quiz = assigns[:quiz].overridden_for(@teacher)
       overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(quiz, @teacher)

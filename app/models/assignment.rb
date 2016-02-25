@@ -2237,6 +2237,12 @@ class Assignment < ActiveRecord::Base
       Lti::AppLaunchCollator.any?(context, [:post_grades])
   end
 
+  def run_if_overrides_changed!
+    self.relock_modules!
+    self.discussion_topic.relock_modules! if self.discussion_topic
+    self.quiz.relock_modules! if self.quiz
+  end
+
   private
 
   def unique_comments(group_id)

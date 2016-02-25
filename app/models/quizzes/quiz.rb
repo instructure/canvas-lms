@@ -1304,4 +1304,8 @@ class Quizzes::Quiz < ActiveRecord::Base
     'quizzes:quiz'
   end
 
+  def run_if_overrides_changed!
+    self.relock_modules!
+    self.assignment.relock_modules! if self.assignment
+  end
 end
