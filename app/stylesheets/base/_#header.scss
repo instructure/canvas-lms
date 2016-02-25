@@ -107,8 +107,9 @@ $masquerade-link-color: $ic-color-alert;
       color: white;
       float: left;
       line-height: 1em;
-      margin: 5px 8px 5px 0;
+      margin: 5px 8px 7px 0;
       padding-left: 8px;
+      padding-top: 5px;
 
     &.first, &#identity-help-container {
       border-left: none;
@@ -142,7 +143,11 @@ $masquerade-link-color: $ic-color-alert;
       }
     }
     .unread-messages-count {
-      @include ic-badge-maker;
+      @include ic-badge-maker(
+      14px);
+      padding: 1px 5px;
+      vertical-align: top;
+      margin-top: -2px;
     }
   }
   #identity-help-container a {
