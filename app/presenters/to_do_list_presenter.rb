@@ -96,16 +96,16 @@ class ToDoListPresenter
     end
 
     def needs_grading_badge
-      if needs_grading_count > 9
-        I18n.t('%{more_than}+', more_than: 9)
+      if needs_grading_count > 999
+        I18n.t('%{more_than}+', more_than: 999)
       else
         needs_grading_count
       end
     end
 
     def needs_grading_label
-      if needs_grading_count > 9
-        I18n.t('More than 9 submissions need grading')
+      if needs_grading_count > 999
+        I18n.t('More than 999 submissions need grading')
       else
         I18n.t({one: '1 submission needs grading', other: '%{count} submissions need grading'}, count: assignment.needs_grading_count)
       end
