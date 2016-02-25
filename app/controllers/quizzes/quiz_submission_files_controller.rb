@@ -64,8 +64,7 @@ class Quizzes::QuizSubmissionFilesController < ApplicationController
     raise ActiveRecord::RecordNotFound unless quiz_submission
 
     if authorized_action(quiz, @current_user, :submit)
-      json =  api_attachment_preflight_json quiz_submission, request,
-                :check_quota => true, :file_param => 'file'
+      json =  api_attachment_preflight_json quiz_submission, request, :file_param => 'file'
 
       render :json => json
     end

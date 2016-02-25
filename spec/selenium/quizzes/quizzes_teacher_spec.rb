@@ -584,6 +584,9 @@ describe "quizzes" do
       q.generate_quiz_data
       q.save!
       _filename, @fullpath, _data = get_file "testfile1.txt"
+
+      Setting.set('context_default_quota', '1') # shouldn't check quota
+
       user_session(@student)
       get "/courses/#{@course.id}/quizzes/#{q.id}/take"
       expect_new_page_load do
