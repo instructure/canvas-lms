@@ -25,7 +25,8 @@ class BeyondZConfiguration
   def self.safe_to_email?(email)
     # If we are on production, we can email anybody, but on staging or dev,
     # we should only email staff members or Adam's local domain test accounts.
-    self.production? || email.include? '@bebraven.org' || email.include? '@arsdnet.net'
+    return self.production? || email.include?('@bebraven.org') || email.include?('@arsdnet.net')
+  end
 
   # Returns the URL of teh Braven Help site.  e.g. https://help.bebraven.org
   def self.help_url
