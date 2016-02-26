@@ -26,6 +26,7 @@ class BeyondZConfiguration
   end
 
   def self.safe_to_email?(email)
+    return false if email.nil? || email.empty?
     # If we are on production, we can email anybody, but on staging or dev,
     # we should only email staff members or Adam's local domain test accounts.
     return self.production? || email.include?('@bebraven.org') || email.include?('@arsdnet.net')
