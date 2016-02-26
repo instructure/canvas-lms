@@ -744,16 +744,7 @@ class Account < ActiveRecord::Base
 
   def self.sub_account_ids_recursive(parent_account_id)
     if connection.adapter_name == 'PostgreSQL'
-      sql = "
-          WITH RECURSIVE t AS (
-            SELECT id, parent_account_id FROM #{Account.quoted_table_name}
-            WHERE parent_account_id = #{parent_account_id} AND workflow_state <> 'deleted'
-            UNION
-            SELECT accounts.id, accounts.parent_account_id FROM #{Account.quoted_table_name}
-            INNER JOIN t ON accounts.parent_account_id = t.id
-            WHERE accounts.workflow_state <> 'deleted'
-          )
-          SELECT id FROM t"
+      sql = Account.sub_account_ids_recursive_sql(parent_account_id)
       Account.find_by_sql(sql).map(&:id)
     else
       account_descendants = lambda do |ids|
@@ -762,6 +753,18 @@ class Account < ActiveRecord::Base
       end
       account_descendants.call([parent_account_id])
     end
+  end
+
+  def self.sub_account_ids_recursive_sql(parent_account_id)
+    "WITH RECURSIVE t AS (
+       SELECT id, parent_account_id FROM #{Account.quoted_table_name}
+       WHERE parent_account_id = #{parent_account_id} AND workflow_state <> 'deleted'
+       UNION
+       SELECT accounts.id, accounts.parent_account_id FROM #{Account.quoted_table_name}
+       INNER JOIN t ON accounts.parent_account_id = t.id
+       WHERE accounts.workflow_state <> 'deleted'
+     )
+     SELECT id FROM t"
   end
 
   def associated_accounts
