@@ -49,6 +49,7 @@ zh-Hans:
   a_full_size_logo_that_appears_in_the_right_sidebar_18873685: "全幅的标志出现在Canvas右侧的控制板上。理想的尺寸是 360 × 140 像素。可接受的格式：svg, png, jpeg, gif"
   a_handy_key_value_dump_of_a_host_of_interesting_en_d0518dfe: 一台为用户报告有趣的环境信息的主机中的一个方便键/定值转储
   a_message_is_required_129e1814: 需要消息
+  a_new_assignment_has_been_created_for_your_course__12b72639: "已为您的课程创建了新作业，%{course_name}。"
   a_problem_occurred_adding_reviewers_57b083d9: 添加审阅者时出错。
   a_table_containing_the_name_of_the_grading_scheme__2c25dc3: 一个表格，包含评分方案名称和用于编辑或删除该方案的图标。
   a_table_containing_the_name_of_the_grading_scheme__8e6d32f8: 一份包含评分方案名称和编辑按钮或删除方案的表格。
@@ -794,16 +795,16 @@ zh-Hans:
             field: "班级 ID"
     settings: 
       about_google_docs: |-
-          谷歌文档预览允许用户从
-          Canvas内查看文档，而不要下载它们
-          并在相应的程序中打开(如，Word或Excel)。
+          谷歌文档预览允许用户从Canvas查看文件,
+          而不必下载它们
+          以及打开相应的程序 (例如 Word 或 Excel).
           
-          谷歌文档预览也可以呈现
-          Canvas文档预览器不支持的文件类型。
+          谷歌文档预览还可以令文件的类型
+          不被Canvas文件预览者的支持.
           
-          通过使用该服务，
-          确认您已阅读并同意
-          [Google Docs Viewer Terms of Service](%{terms_url})
+          要使用此服务，您
+          就要确认您已经阅读并同意
+           [谷歌文档查看器的服务条款](%{terms_url})。
       about_google_docs_tooltip: "关于 Google Docs Previews"
       account_admins_title: 帐户管理员
       account_quotas: 
@@ -1611,6 +1612,7 @@ zh-Hans:
       grading_scheme_info: 查看/编辑评分方案
   assignment_976578a8: 作业
   assignment_comments_e43ed898: 作业评论
+  assignment_created_assignment_name_course_name_324a5639: "作业已创建 - %{assignment_name}, %{course_name}"
   assignment_details: 
     no_graded_submissions: 无已评分作业
   assignment_details_bc488179: 作业详情
@@ -2286,6 +2288,7 @@ zh-Hans:
   back_2900f52a: 后退
   back_to_announcements_1036e43e: 返回通告
   back_to_app_center_95420d83: "返回 App Center"
+  back_to_ref_title_377ea1f0: "回到%{ref_title}"
   back_to_table_of_contents_d878b315: 返回目录表
   back_to_title_39e7a8f4: "回到%{title}"
   background_color_b92b52ac: 背景颜色
@@ -2896,7 +2899,7 @@ zh-Hans:
   change_name_to_568374c8: "把\"%{name}\" 改为"
   change_points_possible_to_match_rubric_dialog: 
     prompts: 
-      update_assignment_points: "这份作业可能有 %{assignmentPoints} 分，您是否希望改变它以获得 %{rubricPoints} 分以匹配评分标准?"
+      update_assignment_points: "在%{assignmentPoints} 留下的作业总分，以及在%{rubricPoints}的评分细则总分将为学生的提交评分构成%{toPercentage_pointRatio}的最大可能得分。"
     titles: 
       update_assignment_points: 更改作业分值以配合评分细则？
   changes_will_still_apply_if_you_leave_this_page_935cedc6: 如果您离开这个页面，更改将仍然适用。
@@ -4251,6 +4254,7 @@ zh-Hans:
   course_modules_795cb95e: 课程单元
   course_name_63b973d1: 课程名称
   course_name_is_required_90919349: 课程名称是必需的
+  course_name_successfully_added_48116a50: "%{course_name}成功添加！"
   course_navigation_dd035109: 课程导航
   course_option_links_a79d263d: 课程选项链接
   course_outcomes_7dc1cbc7: 课程成果
@@ -8108,6 +8112,7 @@ zh-Hans:
           password: 密码
           remember_me: 保持登入
         log_in: 登录
+        login_handle: "输入您的%{login_handle_name}，然后我们会向您发送一个更改密码的链接。"
       mobile_login: 
         back_to_login: 返回登录
         buttons: 
@@ -8142,6 +8147,7 @@ zh-Hans:
           password: 密码
           remember_me: 保持登入
         log_in: 登录
+        login_handle: "输入您的%{login_handle_name}，然后我们会向您发送一个更改密码的链接。"
         open_source_learning_management_system: 打开LMS资源
     logout_confirm: 
       cancel: 取消
@@ -13308,6 +13314,7 @@ zh-Hans:
   regular_style_checkbox_ee3d71c1: 常规式的复选框
   remind_me_next_time_6402eb7d: 下次提醒我
   remove_attachment_ceae0973: 删除附件
+  remove_c_name_section_d8eabd3a: "删除%{c.name} 部分"
   remove_contact_method_ca890ba3: 移除联系方式
   remove_empty_attachment_b2aea632: 删除空白的附件
   remove_f47dc62a: 删除
@@ -13320,6 +13327,7 @@ zh-Hans:
   remove_these_dates_48453a81: 删除这些日期
   remove_this_section_9a88ca43: 删除此部分
   rename_45608f54: 重命名
+  rename_c_name_section_e0e92c97: "重新命名%{c.name}部分"
   rename_this_section_73065edd: 重新命名此部分
   replace_e61834a7: 替代
   replaces_the_current_folder_tree_with_a_new_access_6f9d15c2: 使用一个新的更方便和更多功能的丰富的文件夹系统替换目前的文件夹系统。
@@ -13716,6 +13724,7 @@ zh-Hans:
   search_entries_or_author_63fb0a86: 搜索条目或作者
   search_for_files_7541fb28: 搜索文件
   search_groups_or_people_6c15d6ad: 搜索组或人员
+  search_term_must_be_at_least_num_characters_669098ed: "检索词都必须至少为%{num}个字符"
   search_title_body_or_author_1d26711f: 搜索标题、正文或作者
   search_users_48b1789e: 搜索用户...
   searching_b0207e7f: 正在搜索
