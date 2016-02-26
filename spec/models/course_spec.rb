@@ -1313,7 +1313,6 @@ describe Course, "gradebook_to_csv" do
 
     before :once do
       course_with_teacher(:active_all => true)
-      @course.enable_feature!(:differentiated_assignments)
       setup_DA
       @assignment.grade_student(@student1, :grade => "3")
       @assignment2.grade_student(@student2, :grade => "3")

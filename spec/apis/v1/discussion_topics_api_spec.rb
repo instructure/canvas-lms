@@ -978,70 +978,49 @@ describe DiscussionTopicsController, type: :request do
       @observer_enrollment.update_attribute(:associated_user_id, @student_with_override.id)
     end
 
-    context "feature flag on" do
-      before {@course.enable_feature!(:differentiated_assignments)}
-      it "lets the teacher see all topics" do
-        @user = @teacher
-        [@topic_with_restricted_access,@topic_visible_to_all].each{|t| calls_display_topic(t) }
-      end
-
-      it "lets students with visibility see topics" do
-        @user = @student_with_override
-        [@topic_with_restricted_access,@topic_visible_to_all].each{|t| calls_display_topic(t) }
-      end
-
-      it 'gives observers the same visibility as their student' do
-        @user = @observer
-        [@topic_with_restricted_access,@topic_visible_to_all].each{|t| calls_display_topic(t, except: [:add_entry, :add_reply] ) }
-      end
-
-      it 'observers without students see all' do
-        @observer_enrollment.update_attribute(:associated_user_id, nil)
-        @user = @observer
-        [@topic_with_restricted_access,@topic_visible_to_all].each{|t| calls_display_topic(t, except: [:add_entry, :add_reply] ) }
-      end
-
-      it "restricts access to students without visibility" do
-        @user = @student_without_override
-        calls_do_not_show_topic(@topic_with_restricted_access)
-        calls_display_topic(@topic_visible_to_all)
-      end
-
-      it "doesnt show extra assignments with overrides in the index" do
-        @assignment_3, @topic_assigned_to_empty_section = create_graded_discussion_for_da(title: "assigned to none", only_visible_to_overrides: true)
-        @unassigned_section = @course.course_sections.create!(name: "unassigned section")
-        create_section_override_for_assignment(@assignment_3, {course_section: @unassigned_section})
-
-        @user = @student_with_override
-        get_index(@course)
-        expect(JSON.parse(response.body).to_s).not_to include("#{@assignment_3.title}")
-      end
-
-      it "doesnt hide topics without assignment" do
-        @non_graded_topic = @course.discussion_topics.create!(:user => @teacher, :title => "non_graded_topic", :message => "hi")
-
-        @user = @student_without_override
-        get_index(@course)
-        expect(JSON.parse(response.body).to_s).to include("#{@non_graded_topic.title}")
-      end
+    it "lets the teacher see all topics" do
+      @user = @teacher
+      [@topic_with_restricted_access,@topic_visible_to_all].each{|t| calls_display_topic(t) }
     end
 
-    context "feature flag off" do
-      before {@course.disable_feature!(:differentiated_assignments)}
-      it "lets the teacher see all topics" do
-        @user = @teacher
-        [@topic_with_restricted_access,@topic_visible_to_all].each{|t| calls_display_topic(t) }
-      end
+    it "lets students with visibility see topics" do
+      @user = @student_with_override
+      [@topic_with_restricted_access,@topic_visible_to_all].each{|t| calls_display_topic(t) }
+    end
 
-      it "lets students with visibility see topics" do
-        @user = @student_with_override
-        [@topic_with_restricted_access,@topic_visible_to_all].each{|t| calls_display_topic(t) }
-      end
+    it 'gives observers the same visibility as their student' do
+      @user = @observer
+      [@topic_with_restricted_access,@topic_visible_to_all].each{|t| calls_display_topic(t, except: [:add_entry, :add_reply] ) }
+    end
 
-      it "lets students without visibility see all topics" do
-        @user = @student_without_override
-        [@topic_with_restricted_access,@topic_visible_to_all].each{|t| calls_display_topic(t) }
-      end
+    it 'observers without students see all' do
+      @observer_enrollment.update_attribute(:associated_user_id, nil)
+      @user = @observer
+      [@topic_with_restricted_access,@topic_visible_to_all].each{|t| calls_display_topic(t, except: [:add_entry, :add_reply] ) }
+    end
+
+    it "restricts access to students without visibility" do
+      @user = @student_without_override
+      calls_do_not_show_topic(@topic_with_restricted_access)
+      calls_display_topic(@topic_visible_to_all)
+    end
+
+    it "doesnt show extra assignments with overrides in the index" do
+      @assignment_3, @topic_assigned_to_empty_section = create_graded_discussion_for_da(title: "assigned to none", only_visible_to_overrides: true)
+      @unassigned_section = @course.course_sections.create!(name: "unassigned section")
+      create_section_override_for_assignment(@assignment_3, {course_section: @unassigned_section})
+
+      @user = @student_with_override
+      get_index(@course)
+      expect(JSON.parse(response.body).to_s).not_to include("#{@assignment_3.title}")
+    end
+
+    it "doesnt hide topics without assignment" do
+      @non_graded_topic = @course.discussion_topics.create!(:user => @teacher, :title => "non_graded_topic", :message => "hi")
+
+      @user = @student_without_override
+      get_index(@course)
+      expect(JSON.parse(response.body).to_s).to include("#{@non_graded_topic.title}")
     end
   end
 

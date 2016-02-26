@@ -62,10 +62,8 @@ TEXT
     class="ig-list <%= 'editable' if can_do(@context, @current_user, :manage_content) %>"
   >
     <% editable = can_do(@context, @current_user, :manage_content) %>
-    <% differentiated_assignments_on = @context.feature_enabled?(:differentiated_assignments) %>
-    <% visible_assignments = differentiated_assignments_on ? @current_user.try(:assignment_and_quiz_visibilities, @context) : true %>
-    <% cache_key_items = [@context.cache_key, editable, 'all_context_modules_draft_8', collection_cache_key(@modules), Time.zone]%>
-    <% cache_key_items << Digest::MD5.hexdigest(visible_assignments.to_s) if differentiated_assignments_on %>
+    <% visible_assignments = @current_user.try(:assignment_and_quiz_visibilities, @context) %>
+    <% cache_key_items = [@context.cache_key, editable, 'all_context_modules_draft_8', collection_cache_key(@modules), Time.zone, Digest::MD5.hexdigest(visible_assignments.to_s)] %>
     <% cache_key = cache_key_items.join('/') %>
     <% cache_key = add_menu_tools_to_cache_key(cache_key) %>
     <% cache(cache_key) do %>

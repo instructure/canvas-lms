@@ -85,7 +85,6 @@ htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, Missin
         canModerate: @permissions.CAN_MODERATE
         isLargeRoster: ENV?.IS_LARGE_ROSTER || false
         threaded: data.discussion_type is "threaded"
-        differentiatedAssignmentsEnabled: @model.differentiatedAssignmentsEnabled()
       json.assignment = json.assignment.toView()
       json
 
@@ -228,8 +227,7 @@ htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, Missin
       data.unlock_at = defaultDate?.get('unlock_at') or null
       data.due_at = defaultDate?.get('due_at') or null
       data.assignment_overrides = @dueDateOverrideView.getOverrides()
-      if ENV?.DIFFERENTIATED_ASSIGNMENTS_ENABLED
-        data.only_visible_to_overrides = @dueDateOverrideView.containsSectionsWithoutOverrides()
+      data.only_visible_to_overrides = @dueDateOverrideView.containsSectionsWithoutOverrides()
 
       assignment = @model.get('assignment')
       assignment or= @model.createAssignment()
@@ -249,7 +247,6 @@ htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, Missin
         missingDateDialog = new MissingDateDialog
           validationFn: -> sections
           labelFn: (section) -> section.get 'name'
-          da_enabled: ENV?.DIFFERENTIATED_ASSIGNMENTS_ENABLED
           success: =>
             missingDateDialog.$dialog.dialog('close').remove()
             @model.get('assignment')?.setNullDates()

@@ -1331,7 +1331,7 @@ describe Quizzes::QuizSubmission do
       end
 
       it 'sends a notification if the submission needs manual review' do
-        quiz_with_graded_submission([{:question_data => {:name => 'question 1', :points_possible => 1, 'question_type' => 'essay_question'}}], course: @course, user: @user)
+        quiz_with_graded_submission([{:question_data => {:name => 'question 1', :points_possible => 1, 'question_type' => 'essay_question'}}], course: @course)
         expect(@quiz_submission.reload.messages_sent.keys).to include 'Submission Needs Grading'
       end
 

@@ -288,7 +288,6 @@ describe ContextModule do
     it "should load visibilities for each model" do
       course_module
       assignment_model(course: @course, submission_types: "online_url", workflow_state: "published", only_visible_to_overrides: false)
-      @course.enable_feature!(:differentiated_assignments)
 
       @module = ContextModule.find(@module.id) #clear cache of visibilities
 
@@ -299,7 +298,6 @@ describe ContextModule do
     it "should load visibilities for each model with cache" do
       course_module
       assignment_model(course: @course, submission_types: "online_url", workflow_state: "published", only_visible_to_overrides: false)
-      @course.enable_feature!(:differentiated_assignments)
 
       @module = ContextModule.find(@module.id) #clear old cache of visibilities
       @module.cache_visibilities_for_students([@user.id]) #make updated cache

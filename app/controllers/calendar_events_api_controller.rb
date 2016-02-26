@@ -865,7 +865,6 @@ class CalendarEventsApiController < ApplicationController
       # context can sometimes be a user, so must filter those out
       select{|context| context.is_a? Course }.
       reject{|course|
-       !course.feature_enabled?(:differentiated_assignments) ||
        courses_to_not_filter.include?(course.id)
       }
 

@@ -1951,7 +1951,6 @@ class ApplicationController < ActionController::Base
       },
       :POST_TO_SIS => Assignment.sis_grade_export_enabled?(@context),
       :PERMISSIONS => permissions,
-      :DIFFERENTIATED_ASSIGNMENTS_ENABLED => @context.feature_enabled?(:differentiated_assignments),
       :MULTIPLE_GRADING_PERIODS_ENABLED => @context.feature_enabled?(:multiple_grading_periods),
       :VALID_DATE_RANGE => CourseDateRange.new(@context),
       :assignment_menu_tools => external_tools_display_hashes(:assignment_menu),

@@ -431,7 +431,7 @@ describe Assignment do
         setup_differentiated_assignments
       end
 
-      context "differentiated_assignment on" do
+      context "differentiated_assignment" do
         it "should return assignments only when a student has overrides" do
           expect(@assignment.students_with_visibility.include?(@student1)).to be_truthy
           expect(@assignment.students_with_visibility.include?(@student2)).to be_falsey
@@ -442,17 +442,8 @@ describe Assignment do
         end
       end
 
-      context "differentiated_assignment off" do
-        before {@course.disable_feature!(:differentiated_assignments)}
-        it "should return all published assignments" do
-          expect(@assignment.students_with_visibility.include?(@student1)).to be_truthy
-          expect(@assignment.students_with_visibility.include?(@student2)).to be_truthy
-        end
-      end
-
       context "permissions" do
         before :once do
-          @course.enable_feature!(:differentiated_assignments)
           @assignment.submission_types = "online_text_entry"
           @assignment.save!
         end
@@ -1233,23 +1224,6 @@ describe Assignment do
         end
 
       end
-      context "feature off" do
-        before :once do
-          @course.disable_feature!(:differentiated_assignments)
-          @assignment.reload
-        end
-
-        it "should assign peer reviews to any student with a submission" do
-          @assignment.peer_review_count = 1
-
-          res = @assignment.assign_peer_reviews
-          expect(res.length).to eql(@submissions.length)
-          @submissions.each do |s|
-            expect(res.map{|a| a.asset}).to be_include(s)
-            expect(res.map{|a| a.assessor_asset}).to be_include(s)
-          end
-        end
-      end
     end
   end
 
@@ -1689,97 +1663,56 @@ describe Assignment do
   end
 
   context "participants" do
-    describe "with differentiated_assignments on" do
-      before :once do
-        setup_differentiated_assignments(ta: true)
-      end
-
-      it 'returns users with visibility' do
-        expect(@assignment.participants.length).to eq(4) #teacher, TA, 2 students
-      end
-
-      it 'includes students with visibility' do
-        expect(@assignment.participants.include?(@student1)).to be_truthy
-      end
-
-      it 'excludes students without visibility' do
-        expect(@assignment.participants.include?(@student2)).to be_falsey
-      end
-
-      it 'includes admins with visibility' do
-        expect(@assignment.participants.include?(@teacher)).to be_truthy
-        expect(@assignment.participants.include?(@ta)).to be_truthy
-      end
-
-      context "including observers" do
-        before do
-          oe = @assignment.context.enroll_user(user_with_pseudonym(active_all: true), 'ObserverEnrollment',:enrollment_state => 'active')
-          @course_level_observer = oe.user
-
-          oe = @assignment.context.enroll_user(user_with_pseudonym(active_all: true), 'ObserverEnrollment',:enrollment_state => 'active')
-          oe.associated_user_id = @student1.id
-          oe.save!
-          @student1_observer = oe.user
-
-          oe = @assignment.context.enroll_user(user_with_pseudonym(active_all: true), 'ObserverEnrollment',:enrollment_state => 'active')
-          oe.associated_user_id = @student2.id
-          oe.save!
-          @student2_observer = oe.user
-        end
-
-        it "should include course_level observers" do
-          expect(@assignment.participants(include_observers: true).include?(@course_level_observer)).to be_truthy
-        end
-
-        it "should exclude student observers if their student does not have visibility" do
-          expect(@assignment.participants(include_observers: true).include?(@student1_observer)).to be_truthy
-          expect(@assignment.participants(include_observers: true).include?(@student2_observer)).to be_falsey
-        end
-
-        it "should exclude all observers unless opt is given" do
-          expect(@assignment.participants.include?(@student1_observer)).to be_falsey
-          expect(@assignment.participants.include?(@student2_observer)).to be_falsey
-          expect(@assignment.participants.include?(@course_level_observer)).to be_falsey
-        end
-      end
+    before :once do
+      setup_differentiated_assignments(ta: true)
     end
 
-    describe "with differentiated_assignments off" do
-      before :once do
-        setup_differentiated_assignments
-        @course.disable_feature!(:differentiated_assignments)
+    it 'returns users with visibility' do
+      expect(@assignment.participants.length).to eq(4) #teacher, TA, 2 students
+    end
+
+    it 'includes students with visibility' do
+      expect(@assignment.participants.include?(@student1)).to be_truthy
+    end
+
+    it 'excludes students without visibility' do
+      expect(@assignment.participants.include?(@student2)).to be_falsey
+    end
+
+    it 'includes admins with visibility' do
+      expect(@assignment.participants.include?(@teacher)).to be_truthy
+      expect(@assignment.participants.include?(@ta)).to be_truthy
+    end
+
+    context "including observers" do
+      before do
+        oe = @assignment.context.enroll_user(user_with_pseudonym(active_all: true), 'ObserverEnrollment',:enrollment_state => 'active')
+        @course_level_observer = oe.user
+
+        oe = @assignment.context.enroll_user(user_with_pseudonym(active_all: true), 'ObserverEnrollment',:enrollment_state => 'active')
+        oe.associated_user_id = @student1.id
+        oe.save!
+        @student1_observer = oe.user
+
+        oe = @assignment.context.enroll_user(user_with_pseudonym(active_all: true), 'ObserverEnrollment',:enrollment_state => 'active')
+        oe.associated_user_id = @student2.id
+        oe.save!
+        @student2_observer = oe.user
       end
 
-      it 'normally returns all users in the course' do
-        expect(@assignment.participants.length).to eq 4
+      it "should include course_level observers" do
+        expect(@assignment.participants(include_observers: true).include?(@course_level_observer)).to be_truthy
       end
 
-      it "should exclude students when given the option" do
-        expect( @assignment.participants(excluded_user_ids: [@student1.id]) ).to_not be_include(@student1)
-        expect( @assignment.participants(excluded_user_ids: [@student1.id]) ).to be_include(@student2)
+      it "should exclude student observers if their student does not have visibility" do
+        expect(@assignment.participants(include_observers: true).include?(@student1_observer)).to be_truthy
+        expect(@assignment.participants(include_observers: true).include?(@student2_observer)).to be_falsey
       end
 
-      context "including observers" do
-        before :once do
-          oe = @assignment.context.enroll_user(user_with_pseudonym, 'ObserverEnrollment',:enrollment_state => 'active')
-          @course_level_observer = oe.user
-
-          oe = @assignment.context.enroll_user(user_with_pseudonym, 'ObserverEnrollment',:enrollment_state => 'active')
-          oe.associated_user_id = @student1.id
-          oe.save!
-          @student1_observer = oe.user
-        end
-        it "should include course_level observers" do
-          expect( @assignment.participants(include_observers: true) ).to be_include(@course_level_observer)
-        end
-        it "should include student observers if their student is participating" do
-          expect( @assignment.participants(include_observers: true) ).to be_include(@student1)
-          expect( @assignment.participants(include_observers: true) ).to be_include(@student1_observer)
-        end
-        it "should exclude student observers if their student is explicitly excluded" do
-          expect( @assignment.participants(include_observers: true, excluded_user_ids: [@student1.id]) ).to_not be_include(@student1)
-          expect( @assignment.participants(include_observers: true, excluded_user_ids: [@student1.id]) ).to_not be_include(@student1_observer)
-        end
+      it "should exclude all observers unless opt is given" do
+        expect(@assignment.participants.include?(@student1_observer)).to be_falsey
+        expect(@assignment.participants.include?(@student2_observer)).to be_falsey
+        expect(@assignment.participants.include?(@course_level_observer)).to be_falsey
       end
     end
   end
@@ -1979,7 +1912,6 @@ describe Assignment do
         end
 
         it "should notify the correct people with differentiated_assignments enabled" do
-          @assignment.context.root_account.enable_feature!(:differentiated_assignments)
           section = @course.course_sections.create!(name: 'Lonely Section')
           student = student_in_section(section)
           @assignment.do_notifications!
@@ -2227,15 +2159,7 @@ describe Assignment do
       [@assignment, @assignment2, @assignment3].each(&:save!)
     end
 
-    it "returns active_course_sections with differentiated assignments off" do
-      @course.disable_feature!(:differentiated_assignments)
-      expect(@assignment.sections_with_visibility(@teacher)).to eq @course.course_sections
-      expect(@assignment2.sections_with_visibility(@teacher)).to eq @course.course_sections
-      expect(@assignment3.sections_with_visibility(@teacher)).to eq @course.course_sections
-    end
-
     it "returns only sections with overrides with differentiated assignments on" do
-      @course.enable_feature!(:differentiated_assignments)
       expect(@assignment.sections_with_visibility(@teacher)).to eq [@section]
       expect(@assignment2.sections_with_visibility(@teacher)).to eq []
       expect(@assignment3.sections_with_visibility(@teacher)).to eq @course.course_sections
@@ -2752,18 +2676,7 @@ describe Assignment do
         create_section_override_for_assignment(@assignment, {course_section: @section1})
       end
 
-      it "should include all students and sections with DA off" do
-        @course.disable_feature!(:differentiated_assignments)
-        json = @assignment.speed_grader_json(@teacher)
-
-        expect(json[:context][:students].map{|s| s[:id]}.include?(@student1.id)).to be_truthy
-        expect(json[:context][:students].map{|s| s[:id]}.include?(@student2.id)).to be_truthy
-        expect(json[:context][:active_course_sections].map{|cs| cs[:id]}.include?(@section1.id)).to be_truthy
-        expect(json[:context][:active_course_sections].map{|cs| cs[:id]}.include?(@section2.id)).to be_truthy
-      end
-
       it "should include only students and sections with overrides when DA is on" do
-        @course.enable_feature!(:differentiated_assignments)
         json = @assignment.speed_grader_json(@teacher)
 
         expect(json[:context][:students].map{|s| s[:id]}.include?(@student1.id)).to be_truthy
@@ -2773,7 +2686,6 @@ describe Assignment do
       end
 
       it "should include all students when is only_visible_to_overrides false" do
-        @course.enable_feature!(:differentiated_assignments)
         @assignment.only_visible_to_overrides = false
         @assignment.save!
         json = @assignment.speed_grader_json(@teacher)
@@ -3882,7 +3794,7 @@ end
 
 def setup_differentiated_assignments(opts={})
   if !opts[:course]
-    course_with_teacher(active_all: true, differentiated_assignments: true)
+    course_with_teacher(active_all: true)
   end
 
   @section1 = @course.course_sections.create!(name: 'Section One')

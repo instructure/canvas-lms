@@ -62,9 +62,7 @@ class GradeCalculator
       load_assignment_visibilities_for_users(batched_ids)
       batched_ids.each do |user_id|
         user_submissions = submissions_by_user[user_id] || []
-        if differentiated_assignments_on?
-          user_submissions.select!{|s| assignment_ids_visible_to_user(user_id).include?(s.assignment_id)}
-        end
+        user_submissions.select!{|s| assignment_ids_visible_to_user(user_id).include?(s.assignment_id)}
         current, current_groups = calculate_current_score(user_id, user_submissions)
         final, final_groups = calculate_final_score(user_id, user_submissions)
         scores << [[current, current_groups], [final, final_groups]]
@@ -80,10 +78,6 @@ class GradeCalculator
   end
 
   private
-
-  def differentiated_assignments_on?
-    @differentiated_assignments_enabled ||= @course.feature_enabled?(:differentiated_assignments)
-  end
 
   def save_scores
     raise "Can't save scores when ignore_muted is false" unless @ignore_muted
@@ -128,9 +122,7 @@ class GradeCalculator
   # each group
   def create_group_sums(submissions, user_id, ignore_ungraded=true)
     visible_assignments = @assignments
-    if differentiated_assignments_on?
-      visible_assignments = visible_assignments.select{|a| assignment_ids_visible_to_user(user_id).include?(a.id)}
-    end
+    visible_assignments = visible_assignments.select{|a| assignment_ids_visible_to_user(user_id).include?(a.id)}
 
     if @grading_period
       user = @course.users.find(user_id)
@@ -188,12 +180,7 @@ class GradeCalculator
 
   def load_assignment_visibilities_for_users(user_ids)
     @assignment_ids_visible_to_user ||= begin
-      if differentiated_assignments_on?
-        AssignmentStudentVisibility.visible_assignment_ids_in_course_by_user(course_id: @course.id, user_id: user_ids)
-      else
-        assignment_ids = @assignments.map(&:id)
-        user_ids.reduce({}){|hash, id| hash[id] = assignment_ids; hash}
-      end
+      AssignmentStudentVisibility.visible_assignment_ids_in_course_by_user(course_id: @course.id, user_id: user_ids)
     end
   end
 

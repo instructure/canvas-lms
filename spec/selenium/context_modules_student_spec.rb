@@ -203,7 +203,6 @@ describe "context modules" do
       @assignment_2.only_visible_to_overrides = true
       @assignment_2.save!
 
-      @course.enable_feature!(:differentiated_assignments)
       @student.enrollments.each(&:destroy)
       @overriden_section = @course.course_sections.create!(name: "test section")
       student_in_section(@overriden_section, user: @student)

@@ -67,9 +67,7 @@ class Quizzes::QuizzesController < ApplicationController
     # overrides later using the API:
     scope = scope.available unless can_manage
 
-    if @context.feature_enabled?(:differentiated_assignments)
-      scope = DifferentiableAssignment.scope_filter(scope, @current_user, @context)
-    end
+    scope = DifferentiableAssignment.scope_filter(scope, @current_user, @context)
 
     quizzes = scope.sort_by do |quiz|
       due_date = quiz.assignment ? quiz.assignment.due_at : quiz.lock_at
@@ -282,7 +280,6 @@ class Quizzes::QuizzesController < ApplicationController
         :ASSIGNMENT_OVERRIDES => assignment_overrides_json(@quiz.overrides_for(@current_user,
                                                            ensure_set_not_empty: true),
                                                            @current_user),
-        :DIFFERENTIATED_ASSIGNMENTS_ENABLED => @context.feature_enabled?(:differentiated_assignments),
         :QUIZ => quiz_json(@quiz, @context, @current_user, session),
         :SECTION_LIST => sections.map { |section|
           {
@@ -334,7 +331,6 @@ class Quizzes::QuizzesController < ApplicationController
       @quiz.content_being_saved_by(@current_user)
       @quiz.infer_times
       overrides = delete_override_params
-      params[:quiz].delete(:only_visible_to_overrides) unless @context.feature_enabled?(:differentiated_assignments)
       @quiz.transaction do
         @quiz.update_attributes!(params[:quiz])
         batch_update_assignment_overrides(@quiz, overrides, @current_user) unless overrides.nil?
@@ -396,7 +392,6 @@ class Quizzes::QuizzesController < ApplicationController
 
           auto_publish = @quiz.published?
           @quiz.with_versioning(auto_publish) do
-            params[:quiz].delete(:only_visible_to_overrides) unless @context.feature_enabled?(:differentiated_assignments)
             # using attributes= here so we don't need to make an extra
             # database call to get the times right after save!
             @quiz.attributes = params[:quiz]

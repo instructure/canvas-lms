@@ -276,12 +276,8 @@ shared_examples_for "an object whose dates are overridable" do
         course.enroll_user(@observer, "ObserverEnrollment")
         override.delete
       end
-      it "returns a date with DA off" do
-        course.disable_feature!(:differentiated_assignments)
-        expect(overridable.all_dates_visible_to(@observer).size).to eq 1
-      end
-      it "returns a date with DA on" do
-        course.enable_feature!(:differentiated_assignments)
+
+      it "returns a date with DA" do
         expect(overridable.all_dates_visible_to(@observer).size).to eq 1
       end
     end
@@ -457,41 +453,27 @@ shared_examples_for "an object whose dates are overridable" do
       course_with_student(:course => course)
     end
 
-    context "when feature flag is off" do
-      it "returns false" do
+    it "returns false when there is no assignment" do
+      if overridable_type == :quiz
+        as = overridable.assignment
+        overridable.assignment = nil # a survey quiz
         expect(overridable.differentiated_assignments_applies?).to be_falsey
       end
     end
 
-    context "when feature flag is on" do
-      before do
-        course.enable_feature!(:differentiated_assignments)
+    it "returns the value of only_visible_to_overrides on the assignment" do
+      if overridable_type == :quiz && overridable.try(:assignment) # not a survey quiz
+        overridable.assignment.only_visible_to_overrides = true
+        expect(overridable.differentiated_assignments_applies?).to be_truthy
+        overridable.assignment.only_visible_to_overrides = false
+        expect(overridable.differentiated_assignments_applies?).to be_falsey
+      elsif overridable_type == :assignment
+        overridable.only_visible_to_overrides = true
+        expect(overridable.differentiated_assignments_applies?).to be_truthy
+        overridable.only_visible_to_overrides = false
+        expect(overridable.differentiated_assignments_applies?).to be_falsey
       end
-
-      it "returns false when there is no assignment" do
-        if overridable_type == :quiz
-          as = overridable.assignment
-          overridable.assignment = nil # a survey quiz
-          expect(overridable.differentiated_assignments_applies?).to be_falsey
-        end
-      end
-
-      it "returns the value of only_visible_to_overrides on the assignment" do
-        if overridable_type == :quiz && overridable.try(:assignment) # not a survey quiz
-          overridable.assignment.only_visible_to_overrides = true
-          expect(overridable.differentiated_assignments_applies?).to be_truthy
-          overridable.assignment.only_visible_to_overrides = false
-          expect(overridable.differentiated_assignments_applies?).to be_falsey
-        elsif overridable_type == :assignment
-          overridable.only_visible_to_overrides = true
-          expect(overridable.differentiated_assignments_applies?).to be_truthy
-          overridable.only_visible_to_overrides = false
-          expect(overridable.differentiated_assignments_applies?).to be_falsey
-        end
-      end
-
     end
-
   end
 end
 

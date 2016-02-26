@@ -498,8 +498,9 @@ class ContentTag < ActiveRecord::Base
 
     opts ||= self.context_module.visibility_for_user(user)
     return false unless opts[:can_read]
-    return false unless self.published? || opts[:can_read_as_admin]
-    return true unless opts[:differentiated_assignments]
+
+    return true if opts[:can_read_as_admin]
+    return false unless self.published?
 
     if self.assignment
       self.assignment.visible_to_user?(user, opts)

@@ -3,6 +3,10 @@ require_relative '../../../spec_helper.rb'
 class AssignmentApiHarness
   include Api::V1::Assignment
 
+  def value_to_boolean(value)
+    Canvas::Plugin.value_to_boolean(value)
+  end
+
   def api_user_content(description, course, user, _)
     "api_user_content(#{description}, #{course.id}, #{user.id})"
   end

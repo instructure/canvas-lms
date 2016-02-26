@@ -54,14 +54,19 @@ describe "courses/_to_do_list.html.erb" do
   context "as a teacher" do
     describe "assignments to grade" do
       it "shows assignment data" do
-        course_with_student(active_all: true)
+        course(active_all: true)
         due_date = 2.days.from_now
         assignment_model(course: @course,
                          due_at: due_date,
                          submission_types: "online_text_entry",
                          points_possible: 15,
-                         title: "GradeMe",
-                         needs_grading_count: 7)
+                         title: "GradeMe")
+
+        2.times do
+          @course.enroll_student(user).accept!
+          @assignment.submit_homework(@user, {:submission_type => 'online_text_entry', :body => 'blah'})
+        end
+
         @user = @teacher
         @user.course_nicknames[@course.id] = "My Awesome Course"
         @user.save!
@@ -72,8 +77,8 @@ describe "courses/_to_do_list.html.erb" do
         expect(response).to include "15 points"
         expect(response).to include "My Awesome Course"
         expect(response).to include due_at(@assignment, @user)
-        expect(response).to include "7"
-        expect(response).to include "7 submissions need grading"
+        expect(response).to include "2"
+        expect(response).to include "2 submissions need grading"
       end
 
       it "shows 999+ when there are more than 999 to grade" do
@@ -85,6 +90,7 @@ describe "courses/_to_do_list.html.erb" do
                          points_possible: 15,
                          title: "GradeMe",
                          needs_grading_count: 1000)
+        Assignments::NeedsGradingCountQuery.any_instance.stubs(:count).returns(1000)
         @user = @teacher
         @user.course_nicknames[@course.id] = "My Awesome Course"
         @user.save!

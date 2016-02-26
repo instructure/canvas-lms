@@ -385,7 +385,7 @@ define [
     defaultSortType: 'assignment_group'
 
     studentsThatCanSeeAssignment: (potential_students, assignment) ->
-      if ENV.GRADEBOOK_OPTIONS.differentiated_assignments_enabled
+      if assignment.only_visible_to_overrides
         _.pick potential_students, assignment.assignment_visibility...
       else
         potential_students

@@ -190,10 +190,8 @@ class GradeSummaryPresenter
       .where("assignments.workflow_state != 'deleted'")
       .where(user_id: student).to_a
 
-      if @context.feature_enabled?(:differentiated_assignments)
-        visible_assignment_ids = AssignmentStudentVisibility.visible_assignment_ids_for_user(student_id, @context.id)
-        ss.select!{ |submission| visible_assignment_ids.include?(submission.assignment_id) }
-      end
+      visible_assignment_ids = AssignmentStudentVisibility.visible_assignment_ids_for_user(student_id, @context.id)
+      ss.select!{ |submission| visible_assignment_ids.include?(submission.assignment_id) }
 
       assignments_index = assignments.index_by(&:id)
 

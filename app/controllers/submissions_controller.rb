@@ -147,7 +147,7 @@ class SubmissionsController < ApplicationController
             @submission = @submission.submission_history[params[:version].to_i]
           end
 
-          if @context.feature_enabled?(:differentiated_assignments) && @submission && !@assignment.visible_to_user?(@current_user)
+          if @submission && !@assignment.visible_to_user?(@current_user)
             flash[:notice] = t 'notices.submission_doesnt_count', "This assignment will no longer count towards your grade."
           end
 

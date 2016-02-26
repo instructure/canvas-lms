@@ -125,19 +125,16 @@ class GradebookExporter
 
       student_enrollments.each_slice(100) do |student_enrollments_batch|
 
-        da_enabled = @course.feature_enabled?(:differentiated_assignments)
-        if da_enabled
-          visible_assignments = AssignmentStudentVisibility.visible_assignment_ids_in_course_by_user(
-            user_id: student_enrollments_batch.map(&:user_id),
-            course_id: @course.id
-          )
-        end
+        visible_assignments = AssignmentStudentVisibility.visible_assignment_ids_in_course_by_user(
+          user_id: student_enrollments_batch.map(&:user_id),
+          course_id: @course.id
+        )
 
         student_enrollments_batch.each do |student_enrollment|
           student = student_enrollment.user
           student_sections = student_section_names[student.id].sort.to_sentence
           student_submissions = assignments.map do |a|
-            if da_enabled && visible_assignments[student.id] && !visible_assignments[student.id].include?(a.id)
+            if visible_assignments[student.id] && !visible_assignments[student.id].include?(a.id)
               "N/A"
             else
               submission = submissions[[student.id, a.id]]

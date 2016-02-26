@@ -48,8 +48,7 @@ class CalendarEventsController < ApplicationController
     @event = @context.calendar_events.temp_record
     add_crumb(t('crumbs.new', "New Calendar Event"), named_context_url(@context, :new_context_calendar_event_url))
     @event.assign_attributes(params.slice(:title, :start_at, :end_at, :location_name, :location_address))
-    js_env(:DIFFERENTIATED_ASSIGNMENTS_ENABLED => @context.feature_enabled?(:differentiated_assignments),
-     :RECURRING_CALENDAR_EVENTS_ENABLED => @context.feature_enabled?(:recurring_calendar_events))
+    js_env(:RECURRING_CALENDAR_EVENTS_ENABLED => @context.feature_enabled?(:recurring_calendar_events))
     authorized_action(@event, @current_user, :create)
   end
 
@@ -76,7 +75,6 @@ class CalendarEventsController < ApplicationController
     if @event.grants_right?(@current_user, session, :update)
       @event.update_attributes!(params.slice(:title, :start_at, :end_at, :location_name, :location_address))
     end
-    js_env(:DIFFERENTIATED_ASSIGNMENTS_ENABLED => @context.feature_enabled?(:differentiated_assignments))
     if authorized_action(@event, @current_user, :update_content)
       render :new
     end

@@ -420,8 +420,8 @@ class DiscussionTopicsController < ApplicationController
                      reject { |category| category.student_organized? }.
                      map { |category| { id: category.id, name: category.name } },
                  CONTEXT_ID: @context.id,
-                 CONTEXT_ACTION_SOURCE: :discussion_topic,
-                 DIFFERENTIATED_ASSIGNMENTS_ENABLED: @context.feature_enabled?(:differentiated_assignments)}
+                 CONTEXT_ACTION_SOURCE: :discussion_topic
+      }
 
       post_to_sis = Assignment.sis_grade_export_enabled?(@context)
       js_hash[:POST_TO_SIS] = post_to_sis

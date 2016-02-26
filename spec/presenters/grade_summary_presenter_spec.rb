@@ -61,8 +61,8 @@ describe GradeSummaryPresenter do
   describe '#assignment_stats' do
     before(:each) do
       teacher_in_course
-      @course.disable_feature!(:differentiated_assignments)
     end
+
     it 'works' do
       s1, s2, s3, s4 = n_students_in_course(4)
       a = @course.assignments.create! points_possible: 10

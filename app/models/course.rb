@@ -312,9 +312,7 @@ class Course < ActiveRecord::Base
       tags = self.context_module_tags.active.joins(:context_module).where(:context_modules => {:workflow_state => 'active'})
     end
 
-    if self.feature_enabled?(:differentiated_assignments)
-      tags = DifferentiableAssignment.scope_filter(tags, user, self, is_teacher: user_is_teacher)
-    end
+    tags = DifferentiableAssignment.scope_filter(tags, user, self, is_teacher: user_is_teacher)
 
     tags
   end

@@ -283,9 +283,7 @@ class GradebooksController < ApplicationController
     @gradebook_is_editable = @context.grants_right?(@current_user, session, :manage_grades)
     per_page = Setting.get('api_max_per_page', '50').to_i
     teacher_notes = @context.custom_gradebook_columns.not_deleted.where(:teacher_notes=> true).first
-    ag_includes = [:assignments]
-    ag_includes << :assignment_visibility if @context.feature_enabled?(:differentiated_assignments)
-    ag_includes << 'overrides' if @context.feature_enabled?(:differentiated_assignments)
+    ag_includes = [:assignments, :assignment_visibility, 'overrides']
     chunk_size = if @context.assignments.published.count < Setting.get('gradebook2.assignments_threshold', '20').to_i
       Setting.get('gradebook2.submissions_chunk_size', '35').to_i
     else
@@ -318,7 +316,6 @@ class GradebooksController < ApplicationController
       :publish_to_sis_enabled => @context.allows_grade_publishing_by(@current_user) && @gradebook_is_editable,
       :publish_to_sis_url => context_url(@context, :context_details_url, :anchor => 'tab-grade-publishing'),
       :speed_grader_enabled => @context.allows_speed_grader?,
-      :differentiated_assignments_enabled => @context.feature_enabled?(:differentiated_assignments),
       :multiple_grading_periods_enabled => multiple_grading_periods?,
       :active_grading_periods => active_grading_periods,
       :latest_end_date_of_admin_created_grading_periods_in_the_past => latest_end_date_of_admin_created_grading_periods_in_the_past,

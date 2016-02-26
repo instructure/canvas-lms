@@ -1407,13 +1407,7 @@ describe "context modules" do
       remove_user_session
     end
 
-    it "loads page with differentiated assignments on" do
-      @course.enable_feature!(:differentiated_assignments)
-      assert_page_loads
-    end
-
-    it "loads page with differentiated assignments on" do
-      @course.disable_feature!(:differentiated_assignments)
+    it "loads page with differentiated assignments" do
       assert_page_loads
     end
   end

@@ -29,10 +29,6 @@ def course(opts={})
       e.save!
       @teacher = u
     end
-    if opts[:differentiated_assignments]
-      account.allow_feature!(:differentiated_assignments)
-      @course.enable_feature!(:differentiated_assignments)
-    end
     create_grading_periods_for(@course, opts) if opts[:grading_periods]
   end
   @course

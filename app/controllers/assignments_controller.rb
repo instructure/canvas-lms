@@ -64,9 +64,7 @@ class AssignmentsController < ApplicationController
       return
     end
     if authorized_action(@assignment, @current_user, :read)
-      if (da_on = @context.feature_enabled?(:differentiated_assignments)) &&
-           @current_user && @assignment &&
-           !@assignment.visible_to_user?(@current_user, differentiated_assignments: da_on)
+      if @current_user && @assignment && !@assignment.visible_to_user?(@current_user)
         respond_to do |format|
           flash[:error] = t 'notices.assignment_not_available', "The assignment you requested is not available to your course section."
           format.html { redirect_to named_context_url(@context, :context_assignments_url) }
@@ -426,7 +424,6 @@ class AssignmentsController < ApplicationController
             @current_user
             )),
         :ASSIGNMENT_INDEX_URL => polymorphic_url([@context, :assignments]),
-        :DIFFERENTIATED_ASSIGNMENTS_ENABLED => @context.feature_enabled?(:differentiated_assignments),
         :VALID_DATE_RANGE => CourseDateRange.new(@context)
       }
 

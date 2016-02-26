@@ -1430,9 +1430,7 @@ class User < ActiveRecord::Base
   def assignments_visible_in_course(course)
     return course.active_assignments if course.grants_any_right?(self, :read_as_admin, :manage_grades, :manage_assignments)
     published_visible_assignments = course.active_assignments.published
-    if course.feature_enabled?(:differentiated_assignments)
-      published_visible_assignments = DifferentiableAssignment.scope_filter(published_visible_assignments,self,course, is_teacher: false)
-    end
+    published_visible_assignments = DifferentiableAssignment.scope_filter(published_visible_assignments,self,course, is_teacher: false)
     published_visible_assignments
   end
 
@@ -1470,9 +1468,8 @@ class User < ActiveRecord::Base
       due_before = options[:due_before] || 1.week.from_now
 
       courses = Course.find(options[:shard_course_ids])
-      courses_with_da = courses.select{|c| c.feature_enabled?(:differentiated_assignments)}
       assignments = assignment_scope.
-        filter_by_visibilities_in_given_courses(self.id, courses_with_da.map(&:id)).
+        filter_by_visibilities_in_given_courses(self.id, courses.map(&:id)).
         published.
         due_between_with_overrides(due_after, due_before).
         expecting_submission.

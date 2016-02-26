@@ -718,8 +718,6 @@ describe AssignmentOverridesController, type: :request do
       end
 
       it "should relock modules when changing overrides" do
-        @course.enable_feature!(:differentiated_assignments)
-
         @assignment.only_visible_to_overrides = true
         @assignment.save!
 
