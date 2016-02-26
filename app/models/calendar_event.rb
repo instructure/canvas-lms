@@ -137,8 +137,8 @@ class CalendarEvent < ActiveRecord::Base
 
     event = results.data
 
-    if !google_calendar_id && location.empty?
-      self.location = event.hangout_link
+    if !google_calendar_id && location_name.empty?
+      self.location_name = event.hangout_link
     end
 
     self.google_calendar_id = event.id
