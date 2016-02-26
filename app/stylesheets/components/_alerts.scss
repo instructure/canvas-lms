@@ -97,11 +97,9 @@
 
 .ic-flash-info, .ic-flash-success, .ic-flash-warning, .ic-flash-error {
   position: relative;
-
-  color: #ffffff;
+  color: $ic-color-light;
   font-weight: bold;
-
-  padding: 4px 40px 4px 8px;
+  padding: 6px 40px 6px 8px;
   margin: 0 auto;
   width: 475px;
   min-height: 20px;
@@ -109,13 +107,15 @@
   zoom: 1;
   vertical-align: middle;
   text-align: center;
-
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.25);
   border-bottom-color: rgba(0, 0, 0, 0.5);
+  @if $use_new_styles { font-weight: 500; }
+  @else { font-weight: bold; }
 
   a {
     text-decoration: underline;
     color: inherit;
+    &:focus, &:hover { color: inherit; }
   }
   a.close_link {
     position: absolute;
@@ -147,20 +147,31 @@
 }
 
 .ic-flash-success {
-  background-color: $successText;
+  background-color: $ic-color-success;
 }
 
 .ic-flash-warning {
-  color: #472a0e;
-  background-color: #ffb700;
+  background-color: $ic-color-alert;
 }
 
 .ic-flash-error {
-  background-color: #b94a48;
+  background-color: $ic-color-danger;
 }
 
 .ic-flash--Theme-Editor {
   background-color: $ic-color-dark;
+}
+
+.ic-flash__headline {
+  margin: 0;
+  @if $use_new_styles { font-weight: 500; }
+  @else { font-weight: bold; }
+}
+
+.ic-flash__text {
+  margin: $ic-sp/2 0;
+  &:first-of-type { margin-top: 0; }
+  &:last-child { margin-bottom: 0; }
 }
 
 // Buttons in Flash actions
@@ -172,7 +183,7 @@ a.Button--flash {
 }
 
 // .ic-alert-masquerade-student-view is used when a user is
-// masquerading or using student view. In the new UI, it gives 
+// masquerading or using student view. In the new UI, it gives
 // Canvas the appearance of being inside a 3px frame.
 .ic-alert-masquerade-student-view {
   padding: $ic-sp/2 $ic-sp;
