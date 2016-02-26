@@ -49,6 +49,7 @@ class BzController < ApplicationController
     event = results.data
 
     obj['link'] = event.hangout_link
+    obj['gcal_id'] = event.id
     render :json => obj
   end
 
