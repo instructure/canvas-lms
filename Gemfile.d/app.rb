@@ -25,7 +25,7 @@ gem 'authlogic', '3.4.6'
 gem 'active_model-better_errors', '1.6.7', require: 'active_model/better_errors'
 gem 'dynamic_form', '1.1.4', require: false
 gem 'rails-patch-json-encode', '0.0.1'
-gem 'switchman', '1.4.4'
+gem 'switchman', '1.5.0'
 gem 'folio-pagination', '0.0.11', require: 'folio/rails'
   # for folio, see the folio README
   gem 'will_paginate', '3.0.7', require: false
@@ -93,7 +93,7 @@ gem 'rubycas-client', '2.3.9', require: false
 gem 'rubyzip', '1.1.1', require: 'zip'
 gem 'safe_yaml', '1.0.4', require: false
 gem 'sanitize', '2.0.6', require: false
-gem 'shackles', '1.0.10'
+gem 'shackles', '1.1.0'
 
 gem 'useragent', '0.10.0', require: false
 
