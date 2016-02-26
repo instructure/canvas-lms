@@ -5312,7 +5312,7 @@ tr:
       drag_up_or_down_to_reorder: "Yeniden düzenlemek için yukarı veya aşağı sürükleyin"
       locked: "Bu konu yoruma kapalıdır"
       manage: Yönet
-      open_to_comments: "Yorumlara aç"
+      open_to_comments: "Yorumlara Aç"
       this_topic_is_used_for_grading: "Bu konu değerlendirmek için kullanılıyor"
       topic_podcast_feed: "Konu Podcast Akışı"
     this_is_a_group_discussion: "Bu bir Grup Tartışmasıdır"
@@ -5401,7 +5401,9 @@ tr:
     unsubscribe: "Bu başlığı artık takip etmiyorsunuz"
     unsubscribed: "Takip Edilmiyor"
     unsubscribed_hint: "Bu başlığı takip etmiyorsunuz. Takip etmek için tıklayınız."
+  dismiss_dacdb625: Yoksay
   display_course_catalog: "Bu kök hesapta \"Bu dersi herkese açık dersler listesi\" işareti etkinleştirilmiş olarak aranabilir ders listesi göster."
+  display_name_b80c243e: "Görünen Ad"
   distribution_of_current_grades_in_courses_across_a_e6c82f5d: |-
       Bölüm derslerinde kayıtlı tüm öğrenciler arasında derslerdeki güncel
       notların dağılımı.
@@ -5412,7 +5414,10 @@ tr:
   don_t_show_again_15d8253e: "bir daha gösterme"
   done_54e3d4b6: Tamam
   done_8af51c9b: Tamam
+  done_editing_9f7379d9: "Düzenleme Tamamlandı"
   down_5831a426: Aşağı
+  download_c7ffdfb9: İndir
+  download_course_content_7f66edc9: "Ders İçeriğini İndir"
   download_scores_generated_on_date_ff5b9cd2: "%{date} tarihinde Üretilen Puanları İndir"
   download_submissions_7454665f: "Gönderileri İndir"
   dropdown_option_1_e6ff2fc: "Açılır liste seçenek 1"
@@ -5546,10 +5551,12 @@ tr:
   element_option_missing_error_an_element_to_attach__be433478: "`öğe` seçeneği eksik hatası: BBTreeBrowserView için dönüştürme seçeneği 'evet' olarak ayarlanacaksa TreeBrowserView'e eklenecek bir öğe beliritlmeli."
   email: 
     default_from_name: "Instructure Canvas"
+  email_22a7d52d: Eposta
   email_address_6e0443a5: "Eposta adresi"
   email_already_in_use_330248e: "Eposta adresi zaten kullanılıyor"
   email_e366fa29: eposta
   email_is_invalid_e0d982eb: "Eposta adresi geçersiz!"
+  email_is_required_736ac26b: "Eposta gereklidir"
   ember_modules_description: "Ember'de yeniden yazılan Modüller. Harici konumlardan sürüklemeyi etkinleştirmek için gömülü sürükle bırak API'sini kullanır."
   enable_6f5d1328: Etkin
   enable_feature_title_987d8e9a: "Şu özelliği etkinleştir: %{title}"
@@ -5597,6 +5604,7 @@ tr:
       delete_default_term: "Varsayılan dönem silinemez"
       delete_term_with_courses: "Etki dersleri içeren bir dönem silinemez"
       not_unique: "ÖBS ID \"%{sis_source_id}\" zaten kullanılıyor"
+  enrollments_e250c9c3: Kayıtlar
   enter_a_hexcode_here_to_use_a_custom_color_51ecccce: "İsteğe bağlı bir renk kullanmak için bir hexcode girin."
   eportfolio: 
     buttons: 
@@ -5854,6 +5862,7 @@ tr:
         body1: "Bu sayfanın en altında sınıfınızdan en güncel gönderi listesini fark etmişsinizdir (%{showme}). Portfolyonuzdaki yeni sayfalara buradan hızlı bir şekilde gönderiler ekleyebilirsiniz. Eklemek istediğiniz gönderiye tıkladığınızda küçük diyalog kutusu belirecektir."
         body2: "Harika! Gönderiyi eklemeyi tamamlamak için hangi bölüme eklemek istediğinizi seçip sayfaya isim vermelisiniz. \"Sayfa Ekle\" ye tıkladıktan sonra dilerseniz daha ayrıntılı düzenlemeniz için yeni sayfaya yönlendirileceksiniz."
   eportfolios_f6dc4579: ePortfolyolar
+  error_98e81528: Hata
   error_deleting_name_reason_11f9d399: "%{name}'i silerken hata oluştu: %{reason}"
   error_message_2b9d12ee: "Hata: %{message}"
   error_uploading_file_e2d31b56: "Dosya yüklemesinde hata."
@@ -5892,6 +5901,8 @@ tr:
       not_a_number: "sayı değil"
       not_an_integer: "sayısal değer olmalıdır"
       odd: "tek sayı olmalı"
+      present: "boş bırakılmalıdır"
+      taken: "önceden alınmış"
       too_long: "çok uzun (maksimum %{count} karakter)"
       too_short: "çok kısa (minimum %{count} karakter)"
       wrong_length: "yanlış uzunluk (%{count} karakter olmalıdır)"
@@ -5907,6 +5918,7 @@ tr:
   event_date_f05219e7: "Olay Tarihi:"
   event_end_time_ef830e66: "Olay Bitiş Zamanı"
   event_start_time_441b491f: "Olay Başlama Zamanı"
+  every_665d821e: Her
   everyone_854554dd: Herkes
   everyone_else_6c6dc7b6: "Geri kalan herkes"
   example_84698b7d: Örnek
