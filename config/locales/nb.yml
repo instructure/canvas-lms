@@ -2870,6 +2870,7 @@ nb:
   catalog_name_46d37909: Katalog-navn
   catalog_url_a01655dd: "Katalog URL"
   catalog_users_already_exist_2894b8c4: "Katalog-brukere eksisterer allerede"
+  category_b9a94408: Kategori
   cc: 
     by: "CC Navngivelse BY"
     by_nc: "CC Attribution Ikke-Kommersiell"
@@ -3985,6 +3986,8 @@ nb:
   couldn_t_find_canvas_csv_import_headers_487f1b6c: "Fant ikke Canvas CSV importere overskrifter"
   couldn_t_generate_diff_message_a0528b20: "Kunne ikke generere diff: %{message}"
   couldn_t_update_standards_for_authority_auth_81206187: "Klarte ikke å oppdatere standarder for autoriteten %{auth}"
+  count_assignments_found_17520826: 
+    one: "1 oppgave funnet"
   count_assignments_with_errors_e8f3c18c: 
     one: "1 Oppdraget med feil"
     other: "%{count} Oppdrager med feil"
@@ -5056,6 +5059,7 @@ nb:
       - November
       - Desember
   date_created_87e265bc: "Dato opprettet"
+  date_ee500367: Dato
   date_error_7b38f8ff: "Dato Feil"
   date_modified_e1c8ac8f: "Dato redigert"
   date_of_most_recent_bounce_b23d0119: "Dato for siste avvisning"
@@ -5123,6 +5127,7 @@ nb:
   define_text_to_go_before_and_after_the_dropdown_an_be8d16e2: "Skriv inn teksten som skal stå før og etter nedtrekksmenyen, sett sammen et knippe mulige svar."
   delay_posting_this_topic_until_aa483eec: "Avvent publisering av dette emnet til"
   delete_a6efa79d: Slette
+  delete_assignment_name_deec56e3: "Slett oppgave %{name}"
   delete_current_message_5da0221a: "Slett denne meldingen"
   delete_current_module_item_21fefc54: "Slett nåværende modul/element"
   delete_grading_period_dba36e59: "Slett vurderingsperioden"
@@ -5133,6 +5138,7 @@ nb:
   delete_selected_a023ccf8: "Slett valgt"
   delete_survey_56fddbbd: "Slett undersøkelse"
   delete_this_answer_f1802eaa: "Slett dette svaret"
+  delete_this_question_8f955ceb: "Slett dette spørsmålet"
   delete_tool_app_9c9f6d35: "Slett %{tool} App?"
   delete_toolname_app_85f9d4ee: "Slett %{toolName} App"
   deleted_ce03674d: slettet
@@ -5680,6 +5686,7 @@ nb:
       criterion_long_description: "Lang beskrivelse av kriterium"
       find_existing_rubric: "Finner eksisterende vurderingsskjemaer"
   edit_survey_b0d6890d: "Rediger undersøkelse"
+  edit_this_question_1c82c3cf: "Rediger dette spørsmålet"
   edit_toolname_app_23cfbb8: "Rediger %{toolName} App"
   edit_your_catalog_account_cce59310: "Redigere din Catalog-konto"
   editing_permissions_for_name_3503e235: "Redigerer rettigheter for: %{name}"
@@ -6529,6 +6536,10 @@ nb:
       om at de trenger å oppdatere sin Google Docs integrasjon.
   google_docs_preview_9f41b23c: "Google Docs forhåndsvisning"
   google_drive_7cb003c9: "Google Drive"
+  goto_first_page_650f1638: "Gå til første side"
+  goto_last_page_405adce9: "Gå til siste side"
+  goto_next_page_e8e1ae6f: "Gå til neste side"
+  goto_page_page_num_bd656bd5: "Gå til side %{page_num}"
   gpa_scale_a6d1cdea: GPA-skala
   grade_9c6f076d: Karakter
   grade_assignment_7c1abc11: "Vurdere %{assignment}"
@@ -7568,6 +7579,7 @@ nb:
   hide_courses_without_enrollments_6df4dfad: "Skjul kurs uten påmeldinger"
   hide_notes_column_7749f408: "Skjule Notater Column"
   hide_student_names_3e59e862: "Skjul Student-navn"
+  high_b5cbd048: Høy
   high_contrast_description: "Høy kontrast fremhever fargekontrasten på UI (tekst, knapper osv.), gjør disse mer synlige og lettere å identifisere. Merk: Merkevarebygging av institusjoner vil bli deaktivert."
   high_score_47924c1a: "Høy: %{score}"
   highest_28ad71e6: Høyest
@@ -8156,6 +8168,7 @@ nb:
   login_with_provider_3fd3998e: "Logg inn med %{provider}"
   logout_a9312e35: "Logg ut"
   looks_great_e4d883ed: "Ser bra ut!"
+  low_eab1cadd: Lav
   low_score_4eeb95b2: "Lav: %{score}"
   lower_bound_to_upper_bound_48d093c2: "%{lower_bound} til %{upper_bound}"
   lower_limit_of_range_6ddd4983: "Nedre grense for utvalg"
@@ -11351,6 +11364,7 @@ nb:
   press_the_esc_key_to_close_this_modal_14d10601: "Trykk esc-tasten for å lukke denne boksen"
   preview_53003fd2: Forhåndsvisning
   preview_your_changes_373557d8: "Forhåndsvis dine endringer"
+  previous_bd2ac015: Forrige
   previous_message_8804f87e: "Forrige melding"
   previous_module_item_2bb5e499: "Forrige modul/element"
   previous_time_cc96b361: "Forrige (%{time})"
