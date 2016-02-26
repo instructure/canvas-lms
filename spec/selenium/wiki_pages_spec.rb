@@ -58,7 +58,7 @@ describe "Wiki Pages" do
       front.set_as_front_page!
       front.save!
       get "/courses/#{@course.id}/wiki"
-      f('.home').click
+      fln('Home').click
       # setting front-page as home page
       fj('.btn.button-sidebar-wide:contains("Choose Home Page")').click
       fj('input[type=radio][value=wiki]').click
@@ -405,7 +405,7 @@ describe "Wiki Pages" do
 
       it "should alert user if navigating away from page with unsaved RCE changes", priority: "1", test_id: 267612 do
         add_text_to_tiny("derp")
-        f('.home').click
+        fln('Home').click
         expect(driver.switch_to.alert.text).to be_present
         driver.switch_to.alert.accept
       end
@@ -413,7 +413,7 @@ describe "Wiki Pages" do
       it "should alert user if navigating away from page with unsaved html changes", priority: "1", test_id: 126838 do
         toggle_html_mode
         f('textarea').send_keys("derp")
-        f('.home').click
+        fln('Home').click
         expect(driver.switch_to.alert.text).to be_present
         driver.switch_to.alert.accept
       end
@@ -421,7 +421,7 @@ describe "Wiki Pages" do
       it "should not save changes when navigating away and not saving", priority: "1", test_id: 267613 do
         toggle_html_mode
         f('textarea').send_keys('derp')
-        f('.home').click
+        fln('Home').click
         expect(driver.switch_to.alert.text).to be_present
         driver.switch_to.alert.accept
         get "/courses/#{@course.id}/pages/bar/edit"
@@ -432,7 +432,7 @@ describe "Wiki Pages" do
         toggle_html_mode
         f('.title').clear()
         f('.title').send_keys("derpy-title")
-        f('.home').click
+        fln('Home').click
         expect(driver.switch_to.alert.text).to be_present
         driver.switch_to.alert.accept
       end
