@@ -346,10 +346,6 @@ describe "content migrations", :non_parallel do
       @copy_from.enroll_teacher(@user).accept
     end
 
-    after :all do
-      truncate_all_tables
-    end
-
     it "should show warning before self-copy" do
       visit_page
       select_migration_type
