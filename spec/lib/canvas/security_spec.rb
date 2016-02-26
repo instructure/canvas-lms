@@ -81,46 +81,60 @@ describe Canvas::Security do
     end
 
     describe "decoding" do
+      let(:key){ "mykey" }
+
+      def test_jwt(claims={})
+        JSON::JWT.new({ a: 1 }.merge(claims)).sign(key, :HS256).to_s
+      end
+
       around(:example) do |example|
         Timecop.freeze(Time.utc(2013,3,13,9,12)) do
-          @key = "mykey"
-          @token_no_expiration = JSON::JWT.new({ a: 1 }).sign(@key, :HS256).to_s
-          @token_expired = JSON::JWT.new({ a: 1, 'exp' => 1.hour.ago.to_i }).sign(@key, :HS256).to_s
-          @token_not_expired = JSON::JWT.new({ a: 1, 'exp' => 1.hour.from_now.to_i }).sign(@key, :HS256).to_s
           example.run
         end
       end
 
       it "should decode token" do
-        body = Canvas::Security.decode_jwt(@token_no_expiration, [ @key ])
+        body = Canvas::Security.decode_jwt(test_jwt, [ key ])
         expect(body).to eq({ "a" => 1 })
       end
 
       it "should return token body with indifferent access" do
-        body = Canvas::Security.decode_jwt(@token_no_expiration, [ @key ])
+        body = Canvas::Security.decode_jwt(test_jwt, [ key ])
         expect(body[:a]).to eq(1)
         expect(body["a"]).to eq(1)
       end
 
       it "should check using past keys" do
-        body = Canvas::Security.decode_jwt(@token_no_expiration, [ "newkey", @key ])
+        body = Canvas::Security.decode_jwt(test_jwt, [ "newkey", key ])
         expect(body).to eq({ "a" => 1 })
       end
 
       it "should raise on an expired token" do
-        expect { Canvas::Security.decode_jwt(@token_expired, [ @key ]) }.to raise_error(Canvas::Security::TokenExpired)
+        expired_jwt = test_jwt(exp: 1.hour.ago)
+        expect { Canvas::Security.decode_jwt(expired_jwt, [ key ]) }.to(
+          raise_error(Canvas::Security::TokenExpired)
+        )
       end
 
       it "should not raise an error on a token with expiration in the future" do
-        body = Canvas::Security.decode_jwt(@token_not_expired, [ @key ])
+        valid_jwt = test_jwt(exp: 1.hour.from_now)
+        body = Canvas::Security.decode_jwt(valid_jwt, [ key ])
         expect(body[:a]).to eq(1)
+      end
+
+      it "errors if the 'nbf' claim is in the future" do
+        back_to_the_future_jwt = test_jwt(exp: 1.hour.from_now, nbf: 30.minutes.from_now)
+        expect { Canvas::Security.decode_jwt(back_to_the_future_jwt, [ key ]) }.to(
+          raise_error(Canvas::Security::InvalidToken)
+        )
       end
 
       it "produces an InvalidToken error if string isn't a jwt (even if it looks like one)" do
         # this is an example token which base64_decodes to a thing that looks like a jwt because of the periods
         not_a_jwt = Canvas::Security.base64_decode("1050~LvwezC5Dd3ZK9CR1lusJTRv24dN0263txia3KF3mU6pDjOv5PaoX8Jv4ikdcvoiy")
-        expect { Canvas::Security.decode_jwt(not_a_jwt, [ @key ]) }.to raise_error(Canvas::Security::InvalidToken)
+        expect { Canvas::Security.decode_jwt(not_a_jwt, [ key ]) }.to raise_error(Canvas::Security::InvalidToken)
       end
+
     end
   end
 

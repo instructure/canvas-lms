@@ -308,14 +308,25 @@ module Canvas::Security
 
   def self.verify_jwt(body)
     if body[:exp].present?
-      if timestamp_is_exipred?(body[:exp])
+      if timestamp_is_expired?(body[:exp])
         raise Canvas::Security::TokenExpired
+      end
+    end
+
+    if body[:nbf].present?
+      if timestamp_is_future?(body[:nbf])
+        raise Canvas::Security::TokenInvalid
       end
     end
   end
 
-  def self.timestamp_is_exipred?(exp_val)
+  def self.timestamp_is_expired?(exp_val)
     now = Time.zone.now
     (exp_val.is_a?(Time) && exp_val <= now) || exp_val <= now.to_i
+  end
+
+  def self.timestamp_is_future?(nbf_val)
+    now = Time.zone.now
+    (nbf_val.is_a?(Time) && nbf_val > now) || nbf_val > now.to_i
   end
 end

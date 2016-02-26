@@ -525,6 +525,7 @@ describe "API Authentication", type: :request do
       get "/api/v1/courses", nil, {
         'HTTP_AUTHORIZATION' => "Bearer #{wrapped_jwt_from_service}"
       }
+      assert_status(200)
       expect(JSON.parse(response.body).size).to eq 1
     end
 
