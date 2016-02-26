@@ -90,12 +90,14 @@ class CalendarEvent < ActiveRecord::Base
 
     if context_type == 'CourseSection'
       CourseSection.find(context_id).students.all.each do |user|
+        next if !BeyondZConfiguration.safe_to_email? user.email
         event['attendees'] << { email: user.email }
       end
     end
 
     if context_type == 'Course'
       Course.find(context_id).students.all.each do |user|
+        next if !BeyondZConfiguration.safe_to_email? user.email
         event['attendees'] << { email: user.email }
       end
     end
