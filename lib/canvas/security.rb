@@ -92,6 +92,24 @@ module Canvas::Security
     false
   end
 
+  def self.sign_hmac_sha512(string_to_sign, signing_secret=services_signing_secret)
+    OpenSSL::HMAC.digest('sha512', signing_secret, string_to_sign)
+  end
+
+  def self.verify_hmac_sha512(message, signature, signing_secret=services_signing_secret)
+    comparison = sign_hmac_sha512(message, signing_secret)
+
+    if CANVAS_RAILS4_0
+      return false unless signature.bytesize == comparison.bytesize
+      l = signature.unpack "C#{signature.bytesize}"
+      res = 0
+      comparison.each_byte { |byte| res |= byte ^ l.shift }
+      res == 0
+    else
+      ActiveSupport::SecurityUtils.secure_compare(signature, comparison)
+    end
+  end
+
   # Creates a JWT token string
   #
   # body (Hash) - The contents of the JWT token
@@ -158,8 +176,8 @@ module Canvas::Security
   end
 
   def self.decrypt_services_jwt(token, signing_secret=nil, encryption_secret=nil)
-    signing_secret ||= Canvas::DynamicSettings.from_cache("canvas")["signing-secret"]
-    encryption_secret ||= Canvas::DynamicSettings.from_cache("canvas")["encryption-secret"]
+    signing_secret ||= services_signing_secret
+    encryption_secret ||= services_encryption_secret
     begin
       signed_coded_jwt = JSON::JWT.decode(token, encryption_secret)
       raw_jwt = JSON::JWT.decode(signed_coded_jwt.plain_text, signing_secret)
@@ -304,29 +322,40 @@ module Canvas::Security
     "login_attempts:#{pseudonym.global_id}"
   end
 
-  private
 
-  def self.verify_jwt(body)
-    if body[:exp].present?
-      if timestamp_is_expired?(body[:exp])
-        raise Canvas::Security::TokenExpired
+  class << self
+    private
+    def verify_jwt(body)
+      if body[:exp].present?
+        if timestamp_is_expired?(body[:exp])
+          raise Canvas::Security::TokenExpired
+        end
+      end
+
+      if body[:nbf].present?
+        if timestamp_is_future?(body[:nbf])
+          raise Canvas::Security::TokenInvalid
+        end
       end
     end
 
-    if body[:nbf].present?
-      if timestamp_is_future?(body[:nbf])
-        raise Canvas::Security::TokenInvalid
-      end
+    def timestamp_is_expired?(exp_val)
+      now = Time.zone.now
+      (exp_val.is_a?(Time) && exp_val <= now) || exp_val <= now.to_i
+    end
+
+    def timestamp_is_future?(nbf_val)
+      now = Time.zone.now
+      (nbf_val.is_a?(Time) && nbf_val > now) || nbf_val > now.to_i
+    end
+
+    def services_encryption_secret
+      Canvas::DynamicSettings.from_cache("canvas")["encryption-secret"]
+    end
+
+    def services_signing_secret
+      Canvas::DynamicSettings.from_cache("canvas")["signing-secret"]
     end
   end
 
-  def self.timestamp_is_expired?(exp_val)
-    now = Time.zone.now
-    (exp_val.is_a?(Time) && exp_val <= now) || exp_val <= now.to_i
-  end
-
-  def self.timestamp_is_future?(nbf_val)
-    now = Time.zone.now
-    (nbf_val.is_a?(Time) && nbf_val > now) || nbf_val > now.to_i
-  end
 end

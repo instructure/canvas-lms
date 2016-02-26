@@ -138,6 +138,23 @@ describe Canvas::Security do
     end
   end
 
+  describe "hmac_sha512" do
+    it "verifies items signed with the same secret" do
+      message = "asdf1234"
+      shared_secret = "super-sekrit"
+      signature = Canvas::Security.sign_hmac_sha512(message, shared_secret)
+      verification = Canvas::Security.verify_hmac_sha512(message, signature, shared_secret)
+      expect(verification).to be_truthy
+    end
+
+    it "rejects items signed with different secrets" do
+      message = "asdf1234"
+      signature = Canvas::Security.sign_hmac_sha512(message, "super-sekrit")
+      verification = Canvas::Security.verify_hmac_sha512(message, signature, "sekrit-super")
+      expect(verification).to be_falsey
+    end
+  end
+
   if Canvas.redis_enabled?
     describe "max login attempts" do
       before do
