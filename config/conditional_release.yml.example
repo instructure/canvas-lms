@@ -1,0 +1,15 @@
+development:
+  # required to enable the feature. default is false.
+  enabled: false
+
+  # required. no default.
+  host: conditional_release.docker
+
+  # optional. default matches Canvas
+  protocol: http
+
+  # optional. default is 'javascripts/edit_defaults.js'.
+  configure_defaults_app_path: javascripts/edit_defaults.js
+
+  # optional. default is 'javascripts/edit_object_score_ranges.js'.
+  edit_object_score_ranges_path: javascripts/edit_object_score_ranges.js
