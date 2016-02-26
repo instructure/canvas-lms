@@ -19,7 +19,7 @@ module Services
       end
 
       def service_settings
-        settings = Canvas::DynamicSettings.find("rich-content-service")
+        settings = Canvas::DynamicSettings.from_cache("rich-content-service", expires_in: 5.minutes)
         {
           RICH_CONTENT_APP_HOST: settings["app-host"],
           RICH_CONTENT_CDN_HOST: settings["cdn-host"]

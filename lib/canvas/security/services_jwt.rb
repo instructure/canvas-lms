@@ -71,11 +71,11 @@ module Canvas
       end
 
       def self.encryption_secret
-        Canvas::DynamicSettings.find("canvas")["encryption-secret"]
+        Canvas::DynamicSettings.from_cache("canvas")["encryption-secret"]
       end
 
       def self.signing_secret
-        Canvas::DynamicSettings.find("canvas")["signing-secret"]
+        Canvas::DynamicSettings.from_cache("canvas")["signing-secret"]
       end
     end
   end

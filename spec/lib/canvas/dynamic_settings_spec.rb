@@ -16,6 +16,8 @@ module Canvas
       end
     end
 
+    let(:diplomat_read_options){ { recurse: true, consistency: 'stale' } }
+
     describe ".config=" do
 
       let(:valid_config) do
@@ -69,7 +71,7 @@ module Canvas
       it "loads the children of a k/v node as a hash" do
         DynamicSettings.config = {} # just to be not nil
         parent_key = "rich-content-service"
-        Diplomat::Kv.stubs(:get).with("/config/canvas/#{parent_key}", recurse: true).returns(
+        Diplomat::Kv.stubs(:get).with("/config/canvas/#{parent_key}", diplomat_read_options).returns(
           [
             { key: "#{parent_key}/app-host", value: "rce.insops.com"},
             { key: "#{parent_key}/cdn-host", value: "asdfasdf.cloudfront.com"}
@@ -80,6 +82,76 @@ module Canvas
           "app-host" => "rce.insops.com",
           "cdn-host" => "asdfasdf.cloudfront.com"
         })
+      end
+    end
+
+    describe ".from_cache" do
+      before(:each){ DynamicSettings.config = {} } # just to be not nil
+      after(:each){ DynamicSettings.reset_cache! }
+
+      let(:parent_key){ "rich-content-service" }
+
+      def stub_consul_with(value)
+        Diplomat::Kv.stubs(:get).with("/config/canvas/#{parent_key}", diplomat_read_options).returns(
+          [{ key: "#{parent_key}/app-host", value: value}]
+        )
+      end
+
+      it "only queries consul the first time" do
+        Diplomat::Kv.expects(:get).
+          with("/config/canvas/#{parent_key}", diplomat_read_options).
+          once. # and only once, going to hit it several times
+          returns([{ key: "#{parent_key}/app-host", value: "rce.insops.com"}])
+        5.times{ DynamicSettings.from_cache(parent_key) }
+        value = DynamicSettings.from_cache(parent_key)
+        expect(value["app-host"]).to eq("rce.insops.com")
+      end
+
+      it "definitely doesnt pickup new values once cached" do
+        stub_consul_with("rce.insops.com")
+        value = DynamicSettings.from_cache(parent_key)
+        expect(value["app-host"]).to eq("rce.insops.com")
+        stub_consul_with("CHANGED VALUE")
+        value = DynamicSettings.from_cache(parent_key)
+        expect(value["app-host"]).to eq("rce.insops.com")
+      end
+
+      it "returns new values after a cache clear" do
+        stub_consul_with("rce.insops.com")
+        DynamicSettings.from_cache(parent_key)
+        stub_consul_with("CHANGED VALUE")
+        DynamicSettings.reset_cache!
+        value = DynamicSettings.from_cache(parent_key)
+        expect(value["app-host"]).to eq("CHANGED VALUE")
+      end
+
+      it "caches values with timeouts" do
+        stub_consul_with("rce.insops.com")
+        value = DynamicSettings.from_cache(parent_key, expires_in: 5.minutes)
+        expect(value["app-host"]).to eq("rce.insops.com")
+        stub_consul_with("CHANGED VALUE")
+        value = DynamicSettings.from_cache(parent_key, expires_in: 5.minutes)
+        expect(value["app-host"]).to eq("rce.insops.com")
+      end
+
+      it "loads new values when timeout is past" do
+        stub_consul_with("rce.insops.com")
+        value = DynamicSettings.from_cache(parent_key, expires_in: 5.minutes)
+        Timecop.travel(Time.zone.now + 6.minutes) do
+          stub_consul_with("CHANGED VALUE")
+          value = DynamicSettings.from_cache(parent_key, expires_in: 5.minutes)
+          expect(value["app-host"]).to eq("CHANGED VALUE")
+        end
+      end
+
+      it "accepts a timeout on a previously inifinity key" do
+        stub_consul_with("rce.insops.com")
+        value = DynamicSettings.from_cache(parent_key)
+        Timecop.travel(Time.zone.now + 11.minutes) do
+          stub_consul_with("CHANGED VALUE")
+          value = DynamicSettings.from_cache(parent_key, expires_in: 10.minutes)
+          expect(value["app-host"]).to eq("CHANGED VALUE")
+        end
       end
     end
 
