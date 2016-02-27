@@ -5935,6 +5935,7 @@ tr:
   expand_or_collapse_undated_items_b901de09: "Tarihi belirlenmemiş öğeleri genişlet veya topla"
   expand_subdiscussion_cd226ed4: "Alt tartışmaları Göster"
   export_de71cd8e: "Dışa Aktar"
+  exporting_b1eab154: "Dışarı aktarılıyor"
   external_apps_f5490181: "Harici Uygulamalar"
   external_content: 
     cancel: 
@@ -6080,6 +6081,7 @@ tr:
     submit: Gönder
     user_navigation_configured: "Kullanıcı gezinme menüsü yapılandırıldı"
     wiki_page_menu_configured: "Wiki sayfa menüsü ayarlandı"
+  failed_307449e1: "Başarısız:"
   failed_to_import_media_objects_4c1fcb4f: "Ortam nesnelerinin içe aktarımı başarısız"
   fair_use_bee47d77: "Adil Kullanım"
   feature_flags: 
@@ -6120,6 +6122,7 @@ tr:
     student_groups: "Yeni Öğrenci Grubu Sayfası"
     student_outcome_gradebook: "Öğrenci Öğrenme Yeterlilik Not Defteri"
   file_list_updated_38e2a5ad: "Dosya listesi güncellendi"
+  file_menu_cc0ca54: "Dosya Menüsü"
   file_not_found_9eec054c: "Dosya bulunamadı"
   file_preview: 
     file_preview_headerbutton_close: Kapat
@@ -6205,7 +6208,9 @@ tr:
   filter_by_name_34cbe139: "İsme göre filtrele"
   filter_discussions_by_assignments_757924ed: "tartışmaları ödevlere göre filtrele"
   filter_discussions_by_unread_6c48322: "tartışmaları okunmamışlara göre filtrele"
+  filter_e3398407: Filtre
   filter_replies_by_unread_caf870ea: "Yanıtları okunmamışlara göre filtrele"
+  find_8d605019: Ara
   find_flickr_image_view: 
     find_cc_on_flickr: "Flickr'da Creative Commons Lisanslı görseller bul"
     search: Ara
@@ -6226,6 +6231,7 @@ tr:
       invalid_recursion: "Bir klasör kendisinin üst klasörü olamaz"
       invalid_root_folder_name: "Kök dizini ismi değiştirilemez"
     folder_created: "\"%{name}\" Klasörü oluşturuldu"
+  folder_705fd2d7: Klasör
   folders: 
     event_updated: "Olay başarıyla güncellendi."
     file_zip_in_process: "Dosya sıkıştırma süreci devam ediyor..."
@@ -6235,7 +6241,9 @@ tr:
     no_deleting_root: "Kök dizini silemezsiniz"
     only_one_folder: "Dizin yolu ve dizin numarası ayarlanamıyor"
   for: için
+  for_974cbb84: "Kim için"
   for_all_devices_1f603968: "Tüm Aygıtlar İçin"
+  forgot_password_url_3f9c04b: "Parola Hatırlatma URL'si"
   from_fdd4956d: Kimden
   from_from_to_to_e31f6422: "%{from}'dan %{to}'a"
   global_message_icons: 
@@ -6246,6 +6254,8 @@ tr:
     invitation: davet
     question: soru
     warning: uyarı
+  go_30af2a7b: Git
+  good_284a7a8f: İyi
   google_docs_40374e65: "Google Docs"
   google_docs_domain_restriction_description: |-
       Google Docs Alan Adı Sınırlaması Google Docs gönderileri ve işbirliklerinin tek bir alan
@@ -7189,6 +7199,8 @@ tr:
     which_course_is_this_question_about: "Bu soru hangi dersle ilgili?"
     your_email_address: "Eposta adresiniz"
   helpers: 
+    accessible_date_format: "YYYY-AA-GG ss:dd"
+    accessible_date_only_format: YYYY-AA-GG
     button: 
       create: "%{model} Oluştur"
       submit: "%{model} Kaydet"
@@ -7230,6 +7242,7 @@ tr:
       update: "%{model} Güncelle"
   here_are_your_assignments_listed_by_due_date_7d8e98e6: "Teslim tarihine göre sıralanmış Ödevleriniz şunlar."
   here_s_a_great_chance_to_get_to_know_the_calendar__187ce49: "Takvimi daha iyi anlamak ve ödev olmayan olayları dersinize eklemek için harika bir fırsat. Merak etmeyin, size bu konuda yardımcı olacağız."
+  hidden_14a032a7: Gizli
   hidden_available_with_a_link_click_to_modify_184990e7: "Gizli. Link ile kullanılabilir - Değiştirmek için tıklayın"
   hidden_files_inside_will_be_available_with_links_9bdf702b: "Gizlidir, buradaki dosyalar bağlantılar ile kullanılabilir."
   high_contrast_description: |-
@@ -7609,7 +7622,10 @@ tr:
       feedback: "Ne olduğunu bize bildirmek için buraya tıklayın"
     show_me_where: "Nerede Olduğunu Göster"
   links_14b70841: Bağlantılar
+  load_more_9ca37ccc: "Daha fazla yükle..."
   loading_25990131: Yükleniyor...
+  loading_bde52856: Yükleniyor
+  loading_more_results_def6df65: "Daha fazla sonuç yükleniyor..."
   locales: 
     tr: "Türkçe (crowd-sourced)"
   lock_date_cannot_be_after_course_end_a473158b: "Kilitleme tarihi dersin bitiş tarihinden sonra olamaz"
@@ -7625,6 +7641,7 @@ tr:
         buttons: 
           request_password: "Şifremi Gönder"
         labels: 
+          password: Şifre
           remember_me: "Oturumunuz açık kalsın"
         log_in: "Oturum Aç"
         login_handle: "%{login_handle_name}'nızı girerseniz şifrenizi değiştirebileceğiniz bağlantıyı size gönderelim."
@@ -7656,9 +7673,11 @@ tr:
         buttons: 
           request_password: "Şifremi Gönder"
         labels: 
+          password: Şifre
           remember_me: "Oturumunuz açık kalsın"
         log_in: "Oturum Aç"
         login_handle: "%{login_handle_name}'nızı girerseniz şifrenizi değiştirebileceğiniz bağlantıyı size gönderelim."
+        open_source_learning_management_system: "Açık Kaynak ÖYS"
     logout_confirm: 
       cancel: İptal
       details: 
@@ -7710,6 +7729,7 @@ tr:
   login_with_auth_type_a0aaa52a: "*%{auth_type}* ile oturum aç"
   login_with_provider_3fd3998e: "%{provider} ile oturum aç"
   logout_a9312e35: "Oturumu Kapat"
+  low_eab1cadd: Düşük
   low_score_4eeb95b2: "En Düşük : %{score}"
   lower_limit_of_range_6ddd4983: "Aralık alt sınırı"
   lti: 
@@ -7733,6 +7753,7 @@ tr:
     prompts: 
       delete_avatar: "Bu kullanıcının profil resmini silmek istediğinize emin misiniz?"
       lock_avatar: "Bu resmi kilitlerseniz onaylanır ve kullanıcı güncelleyemez. Devam edilsin mi?"
+  manage_b88f7150: Yönet
   manage_group_group_name_ac8578c6: "%{group_name} grubunu yönet"
   manage_usage_rights_c5a8c216: "Kullanım Şartlarını Yönet"
   manual_entry_e4a4f99a: "Elle Giriş"
@@ -9506,8 +9527,12 @@ tr:
   migration_issues: 
     errors: 
       valid_workflow_state: "Geçerli bir iş akış durumu göndermeli"
+  migration_selection_5f1c5f55: "Aktarım Seçimi"
+  minutes_per_slot_5b7169e5: "Aralık başına dakika sayısı"
   missing_percent_94534638: "Kayıp: %{percent}"
+  mobile_css_file_b86ded7f: "Mobil CSS dosya"
   model_is_already_located_in_newgroup_e5cea361: "%{model} zaten %{newGroup} içinde var"
+  moderate_d0c85e92: Yönet
   module_item_types: 
     assignment: Ödev
     disuccsion: Tartışma
@@ -10549,6 +10574,9 @@ tr:
       description: "[Yo api token](%{yo_url}) a ihtiyacınız olacak."
       labels: 
         api_token: "Api token"
+    zendesk_settings: 
+      labels: 
+        password: Şifre
   points_bb475533: Puanlar
   points_possible_must_be_0_or_more_for_selected_gra_f96a04e3: "Seçili notlandırma türü için olası puanlar 0 veya daha fazla olmalı"
   polling: 
@@ -14952,6 +14980,7 @@ tr:
   your_search_encountered_the_following_errors_fc3e5e7f: 
     one: "Aramanızda hata oluştu:"
     other: "Aramanızda hatalar oluştu:"
+  yyyy_mm_dd_hh_mm_a01b6081: "YYYY-AA-GG ss:dd"
   zero_activity_title: "Sıfır Aktivite"
   zip_argument_error: ".zip uzantılı dosyayı yüklemeniz için klasör gerekmektedir."
   zip_file_description: ".zip dosyalarını bir dersin, grubun veya kullanıcı dosyalarının içinde açmak için aktarma eklentisi"
