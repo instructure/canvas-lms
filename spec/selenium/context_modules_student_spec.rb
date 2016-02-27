@@ -255,6 +255,8 @@ describe "context modules" do
       validate_context_module_status_icon(@module_2.id, @completed_icon)
       validate_context_module_status_icon(@module_3.id, @no_icon)
 
+      scroll_page_to_bottom
+
       navigate_to_module_item(2, @quiz_1.title)
       validate_context_module_status_icon(@module_1.id, @completed_icon)
       validate_context_module_status_icon(@module_2.id, @completed_icon)

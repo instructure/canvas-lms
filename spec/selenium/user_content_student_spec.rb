@@ -28,11 +28,12 @@ describe "user_content" do
       wait_for_ajaximations
       name = ff(".user_content_iframe").first.attribute('name')
       in_frame(name) do
-        keep_trying_until { expect(driver.current_url).to match("/object_snippet") }
-        html = Nokogiri::HTML(driver.page_source)
-        obj = html.at_css('object')
-        expect(obj).not_to be_nil
-        expect(obj['data']).to eq '/javascripts/swfobject/test.swf'
+        keep_trying_until do
+          html = Nokogiri::HTML(driver.page_source)
+          obj = html.at_css('object')
+          expect(obj).not_to be_nil
+          expect(obj['data']).to eq '/javascripts/swfobject/test.swf'
+        end
       end
     end
 
@@ -47,11 +48,12 @@ describe "user_content" do
       wait_for_ajaximations
       name = keep_trying_until { ff(".user_content_iframe").first.attribute('name') }
       in_frame(name) do
-        keep_trying_until { expect(driver.current_url).to match("/object_snippet") }
-        html = Nokogiri::HTML(driver.page_source)
-        obj = html.at_css('object')
-        expect(obj).not_to be_nil
-        expect(obj['data']).to eq '/javascripts/swfobject/test.swf'
+        keep_trying_until do
+          html = Nokogiri::HTML(driver.page_source)
+          obj = html.at_css('object')
+          expect(obj).not_to be_nil
+          expect(obj['data']).to eq '/javascripts/swfobject/test.swf'
+        end
       end
     end
   end

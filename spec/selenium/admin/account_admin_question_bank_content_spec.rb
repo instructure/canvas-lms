@@ -248,8 +248,6 @@ describe "account admin question bank" do
 
     it "should change the outcome set mastery score" do
       skip_if_chrome('issue with add_outcome_to_bank method')
-      f(".add_outcome_link").click
-      wait_for_ajax_requests
       add_outcome_to_bank(@outcome, 40)
       expect(fj("[data-id=#{@outcome.id}]:visible .content")).to include_text("mastery at 40%")
       learning_outcome_tag = AssessmentQuestionBank.last.learning_outcome_alignments.where(mastery_score: 0.4).first

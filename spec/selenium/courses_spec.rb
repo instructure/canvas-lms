@@ -117,8 +117,8 @@ describe "courses" do
       def go_to_checklist
         get "/courses/#{@course.id}"
         f(".wizard_popup_link").click()
-        wizard_box = f(".ic-wizard-box")
-        keep_trying_until { expect(wizard_box).to be_displayed }
+        keep_trying_until { expect(f(".ic-wizard-box")).to be_displayed }
+        wait_for_ajaximations(500)
       end
 
       def check_if_item_complete(item)
@@ -197,6 +197,7 @@ describe "courses" do
 
       it "should complete 'Add Course Calendar Events' checklist item" do
         skip_if_chrome('research')
+
         course_with_teacher_logged_in
         get "/courses/#{@course.id}"
 
@@ -224,6 +225,7 @@ describe "courses" do
         # Publish from Checklist
         go_to_checklist
         f('#wizard_publish_course').click
+        wait_for_ajaximations
         f('.ic-wizard-box__message-button button').click
 
         go_to_checklist

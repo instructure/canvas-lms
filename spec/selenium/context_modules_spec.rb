@@ -551,8 +551,8 @@ describe "context modules" do
       wait_for_ajaximations
 
       # Select other radio button
-      radio_to_click = f('#context_module_requirement_count_1')
-      driver.action.move_to(radio_to_click).click.perform
+      move_to_click('label[for=context_module_requirement_count_1]')
+
       submit_form(edit_form)
       wait_for_ajaximations
 

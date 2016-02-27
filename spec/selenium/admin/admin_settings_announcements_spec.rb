@@ -40,7 +40,10 @@ describe "settings tabs" do
       f("#account_notification_icon .warning").click
       textarea_selector = "textarea#account_notification_message_#{notification.id}"
       type_in_tiny(textarea_selector, "edited message", clear: true)
-      f(".account_notification_role_cbx").click
+
+      cb = f(".account_notification_role_cbx")
+      f("label[for=#{cb['id']}]").click
+
       ff(".edit_notification_form .ui-datepicker-trigger")[0].click
       fln("2").click
       ff(".edit_notification_form .ui-datepicker-trigger")[1].click

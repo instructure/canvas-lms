@@ -383,6 +383,7 @@ module OutcomeCommon
   end
 
   def should_create_an_outcome_group_nested
+    make_full_screen
     get outcome_url
 
     ## when
@@ -394,12 +395,17 @@ module OutcomeCommon
     f(".submit_button").click
     wait_for_ajaximations
 
+    if link = f('.ic-flash-success .close_link')
+      link.click
+    end
+
     # create nested group
     f('.add_outcome_group').click
     nested_group_title = 'my nested group'
     replace_content f('.outcomes-content input[name=title]'), nested_group_title
     # submit
     f(".submit_button").click
+    wait_for_ajaximations
 
     refresh_page
     wait_for_ajaximations

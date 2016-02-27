@@ -34,7 +34,8 @@ describe "new account course search" do
 
     expect(get_rows.count).to eq 2
 
-    move_to_click('.course_search_bar input[type=checkbox]')
+    cb = f('.course_search_bar input[type=checkbox]')
+    move_to_click("label[for=#{cb['id']}]")
     move_to_click('.course_search_bar button')
     wait_for_ajaximations
 

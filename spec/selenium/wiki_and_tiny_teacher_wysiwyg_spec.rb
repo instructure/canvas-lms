@@ -252,10 +252,22 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
         keep_trying_until { @image_list.find_elements(:css, '.img') }
 
         @image_list.find_element(:css, '.img_link').click
-        select_all_wiki
+
+        wait_for_ajaximations
+
+        in_frame wiki_page_body_ifr_id do
+          f("#tinymce img").click
+        end
+
         f(".mce-i-align#{setting}").click
 
-        validate_wiki_style_attrib("text-align", setting, "p")
+        if setting == 'center'
+          in_frame wiki_page_body_ifr_id do
+            expect(f("#tinymce img").attribute('style')).to eq "display: block; margin-left: auto; margin-right: auto;"
+          end
+        else
+          validate_wiki_style_attrib("float", setting, "img")
+        end
       end
     end
 

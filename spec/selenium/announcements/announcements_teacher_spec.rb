@@ -35,7 +35,7 @@ describe "announcements" do
 
       it "should bulk lock topics", priority: "1", test_id: 220361 do
         5.times { |i| @checkboxes[i].click }
-        move_to_click('#lock')
+        move_to_click('label[for=lock]')
         wait_for_ajax_requests
         #TODO: check the UI to make sure the topics have a locked symbol
         expect(what_to_create.where(locked: true).count).to eq 5

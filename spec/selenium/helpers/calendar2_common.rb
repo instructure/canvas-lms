@@ -149,7 +149,7 @@ module Calendar2Common
     replace_content(title, assignment_title)
     add_date(middle_number) if should_add_date
     publish_toggle = edit_assignment_form.find('#assignment_published')
-    driver.action.move_to(publish_toggle).click.perform if publish
+    move_to_click('label[for=assignment_published]') if publish
     submit_form(edit_assignment_form)
     keep_trying_until { expect(f('.fc-month-view .fc-title')).to include_text(assignment_title) }
   end

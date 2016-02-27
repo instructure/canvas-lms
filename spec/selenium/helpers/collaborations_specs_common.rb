@@ -82,7 +82,7 @@ module CollaborationsSpecsCommon
 
     f('.edit_collaboration_link').click
     wait_for_ajaximations
-    move_to_click("#groups-filter-btn-#{@collaboration.id}")
+    move_to_click("label[for=groups-filter-btn-#{@collaboration.id}]")
     wait_for_ajaximations
 
     groups = ffj('.available-groups:visible a')
