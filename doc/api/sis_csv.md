@@ -143,6 +143,14 @@ SSO protocol.</p>
 </td>
 </tr>
 <tr>
+<td>ssha_password</td>
+<td>text</td>
+<td>Instead of a plain-text password, you can pass a pre-hashed password using
+the SSHA password generation scheme in this field. While better than passing
+a plain text password, you should still encourage users to change their
+password after logging in for the first time.</td>
+</tr>
+<tr>
 <td>authentication_provider_id</td>
 <td>text or integer</td>
 <td>
