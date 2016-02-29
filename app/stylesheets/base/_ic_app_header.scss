@@ -78,10 +78,6 @@
     display: block;
     position: relative;
     color: $ic-brand-global-nav-menu-item__text-color;
-    @include breakpoint(short) {
-      padding-top: $ic-sp/2;
-      padding-bottom: $ic-sp/2;
-    }
 
     &:hover, &:focus {
       background-color: $ic-global-nav-link-hover;
