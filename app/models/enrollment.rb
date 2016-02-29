@@ -193,7 +193,7 @@ class Enrollment < ActiveRecord::Base
     }
 
     p.dispatch :enrollment_accepted
-    p.to {self.course.admins - [self.user] }
+    p.to {self.course.participating_admins - [self.user] }
     p.whenever { |record|
       record.course &&
       !record.observer? &&

@@ -81,7 +81,7 @@ class GroupMembership < ActiveRecord::Base
     p.whenever {|record| record.changed_state(:rejected, :requested) }
 
     p.dispatch :new_student_organized_group
-    p.to { self.group.context.admins }
+    p.to { self.group.context.participating_admins }
     p.whenever {|record|
       record.group.context &&
       record.group.context.is_a?(Course) &&
