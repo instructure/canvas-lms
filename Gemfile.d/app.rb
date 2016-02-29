@@ -7,7 +7,7 @@ if CANVAS_RAILS4_0
   gem 'tzinfo', '0.3.43'
   gem 'foreigner', '0.9.2'
 else
-  gem 'rails', '4.2.5.1'
+  gem 'rails', '4.2.5.2'
   gem 'rack', '1.6.4'
   gem 'builder', '3.1.4'
   gem 'protected_attributes', '1.1.3'
