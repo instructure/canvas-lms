@@ -223,7 +223,11 @@ class ContextController < ApplicationController
         }
       })
     elsif @context.is_a?(Group)
-      @users         = @context.participating_users.order_by_sortable_name.uniq
+      if @context.grants_right?(@current_user, :read_as_admin)
+        @users = @context.participating_users.order_by_sortable_name.uniq
+      else
+        @users = @context.participating_users_in_context(sort: true).uniq
+      end
       @primary_users = { t('roster.group_members', 'Group Members') => @users }
       if course = @context.context.try(:is_a?, Course) && @context.context
         @secondary_users = { t('roster.teachers_and_tas', 'Teachers & TAs') => course.instructors.order_by_sortable_name.uniq }

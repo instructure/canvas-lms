@@ -44,8 +44,11 @@ module Api::V1::Group
     hash['leader'] = group.leader ? user_display_json(group.leader, group) : nil
 
     if includes.include?('users')
+      users = group.grants_right?(@current_user, :read_as_admin) ?
+        group.users.order_by_sortable_name.uniq : group.participating_users_in_context(sort: true).uniq
+
       # TODO: this should be switched to user_display_json
-      hash['users'] = group.users.map{ |u| user_json(u, user, session) }
+      hash['users'] = users.map{ |u| user_json(u, user, session) }
     end
     if includes.include?('group_category')
       hash['group_category'] = group.group_category && group_category_json(group.group_category, user, session)
