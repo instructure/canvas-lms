@@ -50,7 +50,7 @@
 <% if @submission.pending_review? %>
   <% if editable %>
     <% if @quiz.changed_significantly_since?(@submission.quiz_version) %>
-      <%= image_tag "pending_review.png" %> <%= t(:quiz_submission_needs_review, "The quiz has changed significantly since this submission was made. This submission may need re-grading.") %><br/>
+      <%= image_tag "pending_review.png", :alt => '' %> <%= t(:quiz_submission_needs_review, "The quiz has changed significantly since this submission was made. This submission may need re-grading.") %><br/>
     <% end %>
     <% questions_needing_review = submission_data.find_all do |answer|
          question_data = submission_questions_hash[answer[:question_id]]

@@ -88,8 +88,8 @@
         use the dropdown for each assignment to set everyone as present or
         absent.
         DETAILS
-        :present_icon => image_tag("graded.16px.png"),
-        :absent_icon => image_tag("not_graded.16px.png")) %></p>
+        :present_icon => image_tag("graded.16px.png", :alt => t('Graded')),
+        :absent_icon => image_tag("not_graded.16px.png", :alt => t('Not graded'))) %></p>
       <h3><%= t('headers.edit_attendance', "Edit Attendance Details") %></h3>
       <p><%= t(:edit_attendance_info, "To edit the details for an attendance assignment, click the dropdown icon just below the assignment's name and then click \"Edit Assignment\".") %></p>
     </div>

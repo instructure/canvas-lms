@@ -386,7 +386,7 @@ module ApplicationHelper
 
   def license_help_link
     @include_license_dialog = true
-    link_to(image_tag('help.png'), '#', :class => 'license_help_link no-hover', :title => "Help with content licensing")
+    link_to(image_tag('help.png', :alt => I18n.t("Help with content licensing")), '#', :class => 'license_help_link no-hover', :title => I18n.t("Help with content licensing"))
   end
 
   def equella_enabled?

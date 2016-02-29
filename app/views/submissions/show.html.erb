@@ -170,7 +170,7 @@
       <div style="background-color: #fff;">
         <a href="#" class="comments_link" style="display: none; <%= 'font-weight: bold;' unless @submission.submission_comments.empty? %>">Comments <% unless @submission.submission_comments.empty? %>(<%= @submission.submission_comments.length %>)<% end %></a>
         <div class="comments">
-          <button type="button" class="btn button-secondary cancel_comment_button" style="display: none; float: right; margin-right:0 !important;"><%= image_tag("delete_circle.png") %></button>
+          <button type="button" class="btn button-secondary cancel_comment_button" style="display: none; float: right; margin-right:0 !important;"><%= image_tag("delete_circle.png", :alt => t('Delete')) %></button>
           <div class="comment_list" aria-live="polite" style="padding: 10px; clear:right;">
             <% unless @submission.user_can_read_grade?(@current_user, session) %>
               <% if @assignment.muted? %>
@@ -231,7 +231,7 @@
           </div>
           <div class="comment_attachment_input nobr" id="comment_attachment_input_blank" style="display: none;">
             <input type="file" name="attachments[-1][uploaded_data]"/>
-            <a href="#" class="delete_comment_attachment_link no-hover"><%= image_tag "delete_circle.png" %></a>
+            <a href="#" class="delete_comment_attachment_link no-hover"><%= image_tag "delete_circle.png", :alt => t('Delete') %></a>
           </div>
           <div id="media_media_recording" style="display: none;">
             <div class="media_recording">

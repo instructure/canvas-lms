@@ -1,3 +1,3 @@
 <% if @assignment.has_group_category? && !@assignment.grade_group_students_individually %>
-  <div style="padding:1em;" class="ui-state-highlight"><%= image_tag "warning.png" %> <%= t 'warnings.group_submission', "Keep in mind, this submission will count for everyone in your %{group_type} group.", :group_type => @assignment.group_category.name %></div>
+  <div style="padding:1em;" class="ui-state-highlight"><%= image_tag "warning.png", :alt => '' %> <%= t 'warnings.group_submission', "Keep in mind, this submission will count for everyone in your %{group_type} group.", :group_type => @assignment.group_category.name %></div>
 <% end %>

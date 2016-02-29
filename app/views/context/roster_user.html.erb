@@ -46,7 +46,8 @@
     <% if can_do(@membership, @current_user, :read_services) && !@membership.user.user_services.empty? %>
       <p>
       <% @membership.user.user_services.each do |service| %>
-        <a href="<%= service.service_user_link %>" title="<%= service.service.titleize rescue 'Unknown' %>" class="no-hover"><%= image_tag "#{service.service}_icon.png" %></a>
+        <% service_name = service.service.titleize rescue 'Unknown' %>
+        <a href="<%= service.service_user_link %>" title="<%= service_name %>" class="no-hover"><%= image_tag "#{service.service}_icon.png", :alt => service_name %></a>
       <% end %>
       </p>
     <% else %>

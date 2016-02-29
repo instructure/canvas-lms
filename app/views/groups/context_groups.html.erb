@@ -50,7 +50,7 @@
 
     <%= form_for :group, :url => context_url(@context, :context_groups_url), :html => {:id => "add_group_form", :style => "display: none;"} do |f| %>
     <h2><%= t 'headings.new_group', 'Make a New Group' %></h2>
-    <%= image_tag "warning.png" %>
+    <%= image_tag "warning.png", :alt => '' %>
     <%= t :student_group_warning, <<-TEXT
     If your teacher has talked about putting you into
     groups as part of an assignment, this is not the way to make that happen.
