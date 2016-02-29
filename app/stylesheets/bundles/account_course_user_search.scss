@@ -65,11 +65,6 @@
   border: none;
 }
 
-.input-hint {
-  @include fontSize(10px);
-  color: $ic-hint-text;
-}
-
 .flex-grow-2 {
   flex-grow: 2;
 }

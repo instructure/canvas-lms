@@ -49,7 +49,7 @@ define([
       var labelElement = label &&
         <label htmlFor={this.id} className="ic-Label">{label}</label>;
 
-      var hintElement = !!hint && <div className="input-hint">{hint}</div>
+      var hintElement = !!hint && <div className="hint-text">{hint}</div>
 
       return (
         <div className={classnames("ic-Form-control", controlClassName, {"ic-Form-control--has-error": error})}>

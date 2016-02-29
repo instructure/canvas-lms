@@ -66,13 +66,13 @@ input[type=text].loading {
 // Hint Text
 
 .hint-text {
-  @include fontSize(10px);
+  @include fontSize(12px);
   color: $ic-hint-text;
 }
 
 input + .hint-text {
   /* pull up into the input */
-  margin-top: -10px;
+  margin-top: -8px;
   /* replace the inputs margin-bottom */
   margin-bottom: 10px;
 }
