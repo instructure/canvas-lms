@@ -18,15 +18,6 @@ describe 'publishing a quiz' do
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
       end
 
-      context 'before the ajax calls finish' do
-        it 'temporarily changes the button text to |Publishing...|', priority: "1", test_id: 398935 do
-          pause_ajax do
-            f('#quiz-publish-link').click
-            expect(fj('.publish-text', '#quiz-publish-link').text).to include_text 'Publishing...'
-          end
-        end
-      end
-
       context 'after the ajax calls finish' do
         before(:each) do
           f('#quiz-publish-link').click

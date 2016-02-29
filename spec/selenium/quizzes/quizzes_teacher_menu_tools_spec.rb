@@ -27,7 +27,7 @@ describe 'quizzes' do
     @quiz = @course.quizzes.create!(title: 'score 10')
   end
 
-  it 'shows tool launch links in the gear for items on the index', priority: "1", test_id: 209942 do
+  it 'shows tool launch links in the gear for items on the index', priority: "2", test_id: 209942 do
     get "/courses/#{@course.id}/quizzes"
     wait_for_ajaximations
 
