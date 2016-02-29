@@ -38,7 +38,7 @@ module Lti
       },
       {
         id: 'ToolProxy.item',
-        endpoint: 'api/lti/tool_proxy/{tool_proxy_guid',
+        endpoint: 'api/lti/tool_proxy/{tool_proxy_guid}',
         format: ['application/vnd.ims.lti.v2.toolproxy+json'],
         action: ['GET']
       },
