@@ -63,6 +63,36 @@ describe RoleOverride do
     expect(permissions[:explicit]).to eq false
   end
 
+  it "should be able to be disabled for a custom course role even if enabled from above on the role account (if not locked)" do
+    a1 = account_model
+    c1 = course(:account => a1)
+    a2 = account_model(:parent_account => a1)
+    c2 = course(:account => a2)
+
+    role = custom_student_role("some role", :account => a1)
+    u1 = user
+    c1.enroll_student(u1, :role => role)
+    u2 = user
+    c2.enroll_student(u2, :role => role)
+
+    ro = RoleOverride.create!(:context => a1, :permission => 'moderate_forum',
+      :role => role, :enabled => true)
+    RoleOverride.create!(:context => a2, :permission => 'moderate_forum',
+      :role => role, :enabled => false)
+
+    expect(c1.grants_right?(u1, :moderate_forum)).to be_truthy
+    expect(c2.grants_right?(u2, :moderate_forum)).to be_falsey
+
+    ro.locked = true
+    ro.save!
+
+    AdheresToPolicy::Cache.clear
+    RoleOverride.clear_cached_contexts
+    c2 = Course.find(c2)
+
+    expect(c2.grants_right?(u2, :moderate_forum)).to be_truthy
+  end
+
   it "should not fail when a context's associated accounts are missing" do
     group_model
     @group.stubs(:account).returns(nil)
