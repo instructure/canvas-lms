@@ -58,6 +58,7 @@ module BroadcastPolicies
     private
     def broadcasting_grades?
       course.available? &&
+      !course.concluded? &&
       !assignment.muted? &&
       assignment.published? &&
       submission.quiz_submission.nil? &&

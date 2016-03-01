@@ -3,10 +3,24 @@ require File.expand_path('../../spec_helper', File.dirname(__FILE__))
 module BroadcastPolicies
   describe WikiPagePolicy do
 
+    let(:course) do
+      mock("Course").tap do |c|
+        c.stubs(:unpublished?).returns(false)
+        c.stubs(:concluded?).returns(false)
+      end
+    end
+
+    let(:wiki) do
+      mock("Wiki").tap do |w|
+        w.stubs(:context).returns(course)
+      end
+    end
+
     let(:wiki_page) do
       mock("WikiPage").tap do |w|
         w.stubs(:created_at).returns(1.hour.ago)
         w.stubs(:published?).returns(true)
+        w.stubs(:wiki).returns(wiki)
       end
     end
     let(:policy) { WikiPagePolicy.new(wiki_page) }
@@ -37,6 +51,8 @@ module BroadcastPolicies
       specify { wont_send_when { wiki_page.stubs(:published?).returns false } }
       specify { wont_send_when { wiki_page.stubs(:wiki_page_changed).returns false } }
       specify { wont_send_when { wiki_page.stubs(:prior_version).returns nil } }
+      specify { wont_send_when { course.stubs(:unpublished?).returns true } }
+      specify { wont_send_when { course.stubs(:concluded?).returns true } }
     end
   end
 end

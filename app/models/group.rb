@@ -188,7 +188,7 @@ class Group < ActiveRecord::Base
     return false unless self.context
     case self.context
     when Course
-      self.context.available?
+      self.context.available? && (!self.context.respond_to?(:concluded?) || !self.context.concluded?)
     else
       true
     end
