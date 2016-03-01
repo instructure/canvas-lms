@@ -82,9 +82,6 @@ $ic-DashboardCard-toggle-size: 60px;
   box-sizing: border-box;
   height: 150px;
   border: 1px solid rgba(black, 0.1);
-  @include breakpoint(short) {
-    height: 138px;
-  }
 }
 
 .ic-DashboardCard__header_content {
@@ -92,10 +89,6 @@ $ic-DashboardCard-toggle-size: 60px;
   padding: $ic-sp*1.5 $ic-sp*1.5 0;
   background: $ic-color-light;
   height: 80px;
-  @include breakpoint(short) {
-    height: 70px;
-    padding-top: $ic-sp;
-  }
 }
 
 .ic-DashboardCard__header-button {
