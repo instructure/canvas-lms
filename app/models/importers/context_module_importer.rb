@@ -273,7 +273,9 @@ module Importers
         end
       elsif resource_class == DiscussionTopic
         topic = context_module.context.discussion_topics.where(migration_id: hash[:linked_resource_id]).first if hash[:linked_resource_id]
-        if topic
+        if topic && topic.is_announcement
+          migration.add_warning(t("The announcement \"%{title}\" could not be linked to the module \"%{mod_title}\"", :title => hash[:title], :mod_title => context_module.name))
+        elsif topic
           item = context_module.add_item({
             :title => topic.title.presence || hash[:title] || hash[:linked_resource_title],
             :type => 'discussion_topic',
