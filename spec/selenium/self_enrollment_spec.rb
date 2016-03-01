@@ -57,7 +57,7 @@ describe "self enrollment" do
       get "/"
       assert_valid_dashboard
     end
-  
+
     it "should register an authenticated user" do
       user_logged_in
       get "/enroll/#{@course.self_enrollment_code}"
@@ -83,7 +83,7 @@ describe "self enrollment" do
       expect_new_page_load {
         submit_form("#enroll_form")
       }
-      expect(f('.form-horizontal p').text).to include("You are already enrolled")
+      expect(f('#enroll_form p').text).to include("You are already enrolled")
       expect(f('.btn-primary').text).to eq primary_action
       get "/"
       assert_valid_dashboard
@@ -121,7 +121,7 @@ describe "self enrollment" do
       get "/"
       assert_valid_dashboard
     end
-  
+
     it "should register an authenticated user" do
       user_logged_in
       get "/enroll/#{@course.self_enrollment_code}"
@@ -145,7 +145,7 @@ describe "self enrollment" do
       expect_new_page_load {
         submit_form("#enroll_form")
       }
-      expect(f('.form-horizontal p').text).to include("You are already enrolled")
+      expect(f('#enroll_form p').text).to include("You are already enrolled")
       expect(f('.btn-primary').text).to eq primary_action
       get "/"
       assert_valid_dashboard
@@ -159,7 +159,7 @@ describe "self enrollment" do
     let(:assert_valid_dashboard) {
       expect(f('#courses_menu_item')).to include_text("Courses")
     }
-    
+
     context "with open registration" do
       include_examples "open registration"
     end
