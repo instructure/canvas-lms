@@ -601,7 +601,10 @@ define [
       @getVisibleGradeGridColumns = Gradebook.prototype.getVisibleGradeGridColumns
       @makeColumnSortFn = Gradebook.prototype.makeColumnSortFn
       @compareAssignmentPositions = Gradebook.prototype.compareAssignmentPositions
+      @compareAssignmentDueDates = Gradebook.prototype.compareAssignmentDueDates
       @wrapColumnSortFn = Gradebook.prototype.wrapColumnSortFn
+      @getStoredSortOrder = Gradebook.prototype.getStoredSortOrder
+      @defaultSortType = 'assignment_group'
       @allAssignmentColumns = [
           { object: { assignment_group: { position: 1 }, position: 1, name: "first" } },
           { object: { assignment_group: { position: 1 }, position: 2, name: "second" } },
@@ -610,14 +613,22 @@ define [
       @aggregateColumns = []
       @parentColumns = []
       @customColumnDefinitions = -> []
-      spy = @spy(this, 'makeColumnSortFn')
+      @spy(this, 'makeColumnSortFn')
     teardown: ->
 
-  test 'It sorts columns when there is a sortType', ->
-    @gradebookColumnOrderSettings = { sortType: 'assignment_group' }
+  test 'It sorts columns when there is a valid sortType', ->
+    @isInvalidCustomSort = -> false
+    @columnOrderHasNotBeenSaved = -> false
+    @gradebookColumnOrderSettings = { sortType: 'due_date' }
     @getVisibleGradeGridColumns()
-    ok @makeColumnSortFn.calledOnce
+    ok @makeColumnSortFn.calledWith { sortType: 'due_date' }
 
+  test 'It falls back to the default sort type if the custom sort type does not have a customOrder property', ->
+    @isInvalidCustomSort = -> true
+    @gradebookColumnOrderSettings = { sortType: 'custom' }
+    @makeCompareAssignmentCustomOrderFn = Gradebook.prototype.makeCompareAssignmentCustomOrderFn
+    @getVisibleGradeGridColumns()
+    ok @makeColumnSortFn.calledWith { sortType: 'assignment_group' }
 
   test 'It does not sort columns when gradebookColumnOrderSettings is undefined', ->
     @gradebookColumnOrderSettings = undefined

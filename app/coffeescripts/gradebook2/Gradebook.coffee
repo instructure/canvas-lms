@@ -1289,7 +1289,7 @@ define [
                                 submissionType is "attendance" and not @show_attendance
 
       if @gradebookColumnOrderSettings?.sortType
-        columns.sort @makeColumnSortFn(@gradebookColumnOrderSettings)
+        columns.sort @makeColumnSortFn(@getStoredSortOrder())
 
       columns = columns.concat(@aggregateColumns)
       headers = @parentColumns.concat(@customColumnDefinitions())
