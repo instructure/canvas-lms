@@ -1,11 +1,11 @@
 module Services
   class RichContent
 
-    def self.env_for(root_account)
+    def self.env_for(root_account, risk_level: :highrisk)
       enabled = check_feature_flag(root_account, :rich_content_service)
       env_hash = { RICH_CONTENT_SERVICE_ENABLED: enabled }
       if enabled
-        env_hash = env_hash.merge(fine_grained_flags(root_account))
+        env_hash = env_hash.merge(fine_grained_flags(root_account, risk_level))
         env_hash = env_hash.merge(service_settings)
       end
       env_hash
@@ -34,10 +34,18 @@ module Services
         }
       end
 
-      def fine_grained_flags(root_account)
+      def fine_grained_flags(root_account, risk_level)
+        medium_risk_flag = check_feature_flag(root_account, :rich_content_service_with_sidebar)
+        high_risk_flag = check_feature_flag(root_account, :rich_content_service_high_risk)
+        contextually_on = (
+          risk_level == :basic ||
+          (risk_level == :sidebar && medium_risk_flag) ||
+          high_risk_flag
+        )
         {
-          RICH_CONTENT_SIDEBAR_ENABLED: check_feature_flag(root_account, :rich_content_service_with_sidebar),
-          RICH_CONTENT_HIGH_RISK_ENABLED: check_feature_flag(root_account, :rich_content_service_high_risk)
+          RICH_CONTENT_SIDEBAR_ENABLED: medium_risk_flag,
+          RICH_CONTENT_HIGH_RISK_ENABLED: high_risk_flag,
+          RICH_CONTENT_SERVICE_CONTEXTUALLY_ENABLED: contextually_on
         }
       end
     end

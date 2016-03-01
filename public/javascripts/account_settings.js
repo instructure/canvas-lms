@@ -1,8 +1,7 @@
 define([
   'i18n!account_settings',
   'jquery', // $
-  'jsx/shared/rce/loadNewRCE',
-  'jsx/shared/rce/preloadRCE',
+  'jsx/shared/rce/RichContentEditor',
   'tinymce.config',
   'jquery.ajaxJSON', // ajaxJSON
   'jquery.instructure_date_and_time', // date_field, time_field, datetime_field, /\$\.datetime/
@@ -16,11 +15,12 @@ define([
   'vendor/date', // Date.parse
   'vendor/jquery.scrollTo', // /\.scrollTo/
   'jqueryui/tabs' // /\.tabs/
-], function(I18n, $, loadNewRCE, preloadRCE, EditorConfig) {
+], function(I18n, $, RichContentEditor, EditorConfig) {
 
   // optimization so user isn't waiting on RCS to
   // respond when they hit announcements
-  preloadRCE()
+  richContentEditor = new RichContentEditor({riskLevel: "basic"})
+  richContentEditor.preloadRemoteModule()
 
   EditorConfig.prototype.balanceButtonsOverride = function(instructure_buttons) {
     var instBtnGroup = "table,instructure_links,unlink" + instructure_buttons;
@@ -111,7 +111,7 @@ define([
     });
 
     $("#add_notification_form textarea").width('100%');
-    loadNewRCE($("textarea.edit_notification_form, #add_notification_form textarea"));
+    richContentEditor.loadNewEditor($("textarea.edit_notification_form, #add_notification_form textarea"))
 
     $("#add_notification_form, .edit_notification_form").submit(function(event) {
       var $this = $(this);

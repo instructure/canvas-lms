@@ -214,6 +214,6 @@ class EportfoliosController < ApplicationController
 
   protected
   def rich_content_service_config
-    js_env(Services::RichContent.env_for(@domain_root_account))
+    js_env(Services::RichContent.env_for(@domain_root_account, risk_level: :basic))
   end
 end

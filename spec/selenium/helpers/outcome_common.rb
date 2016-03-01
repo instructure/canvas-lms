@@ -391,7 +391,7 @@ module OutcomeCommon
     group_title = 'my group'
     replace_content f('.outcomes-content input[name=title]'), group_title
     # submit
-    driver.execute_script("$('.submit_button').click()")
+    f(".submit_button").click
     wait_for_ajaximations
 
     # create nested group
@@ -399,9 +399,8 @@ module OutcomeCommon
     nested_group_title = 'my nested group'
     replace_content f('.outcomes-content input[name=title]'), nested_group_title
     # submit
-    driver.execute_script("$('.submit_button').click()")
+    f(".submit_button").click
 
-    driver.execute_script("$('.submit_button').click()") unless f('.submit_button').nil?
     refresh_page
     wait_for_ajaximations
 

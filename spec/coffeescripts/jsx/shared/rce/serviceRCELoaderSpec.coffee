@@ -4,6 +4,8 @@ define [
 ], ($, RCELoader) ->
   module 'loadRCE',
     setup: ->
+      # make sure we don't get a cached thing from other tests
+      RCELoader.setCache(null)
       @elementInFixtures = (type) ->
         newElement = document.createElement(type)
         fixtureDiv = document.getElementById("fixtures")
@@ -84,20 +86,16 @@ define [
     customFn = ()->
       return "someCustomTarget"
 
-    originalLoadRCE = RCELoader.loadRCE
-    RCELoader.loadRCE = sinon.spy()
-
+    loadingSpy = sinon.stub(RCELoader, "loadRCE")
     renderIntoDivSpy = sinon.spy()
     fakeRCE = { renderIntoDiv: renderIntoDivSpy}
 
     # execute renderIntoDivSpy
     RCELoader.loadOnTarget(ta, {getRenderingTarget: customFn}, "www.some-host.com")
-    call = RCELoader.loadRCE.getCall(0)
+    call = loadingSpy.getCall(0)
     call.args[1](fakeRCE)
-
     ok renderIntoDivSpy.calledWith("someCustomTarget")
-
-    RCELoader.loadOnTarget = originalLoadRCE
+    RCELoader.loadRCE.restore()
 
   # propsForRCE construction
 

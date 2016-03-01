@@ -284,6 +284,7 @@ class AssignmentsController < ApplicationController
   end
 
   def syllabus
+    js_env(Services::RichContent.env_for(@domain_root_account, risk_level: :sidebar))
     add_crumb t '#crumbs.syllabus', "Syllabus"
     active_tab = "Syllabus"
     if authorized_action(@context, @current_user, [:read, :read_syllabus])
