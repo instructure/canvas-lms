@@ -206,7 +206,7 @@ describe 'Student Gradebook' do
   end
 
   describe "Arrange By dropdown" do
-    before :all do
+    before :once do
       course_with_student(name: "Student", active_all: true)
 
       # create multiple assignments in different modules and assignment groups
