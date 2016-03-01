@@ -899,6 +899,21 @@ describe Account do
       expect(Account.default.grants_right?(@user, :read_sis)).to be_truthy
     end
 
+    it "should be able to disable :read_sis for custom teachers" do
+      user_with_pseudonym(:active_all => 1)
+      role = custom_teacher_role("teecher", :account => Account.default)
+
+      @course = Account.default.courses.create!
+      @course.enroll_teacher(@user, :role => role).accept!
+      expect(Account.default.grants_right?(@user, :read_sis)).to be_truthy
+
+      Account.default.role_overrides.create!(:permission => "read_sis", :role => role, :enabled => false)
+      AdheresToPolicy::Cache.clear
+      RoleOverride.clear_cached_contexts
+      
+      expect(Account.default.grants_right?(@user, :read_sis)).to be_falsey
+    end
+
     it "should grant :read_global_outcomes to any user iff site_admin" do
       @site_admin = Account.site_admin
       expect(@site_admin.grants_right?(User.new, :read_global_outcomes)).to be_truthy

@@ -930,10 +930,12 @@ class Account < ActiveRecord::Base
       next unless details[:account_only]
       ((details[:available_to] | details[:true_for]) & enrollment_types).each do |role_name|
         given { |user|
-          user && RoleOverride.permission_for(self, permission, Role.get_built_in_role(role_name))[:enabled] &&
-          self.course_account_associations.joins("INNER JOIN #{Enrollment.quoted_table_name} ON course_account_associations.course_id=enrollments.course_id").
-            where("enrollments.type=? AND enrollments.workflow_state IN ('active', 'completed') AND user_id=?", role_name, user).first &&
-          (!details[:if] || send(details[:if])) }
+          if user && (!details[:if] || send(details[:if]))
+            role_ids = self.course_account_associations.joins("INNER JOIN #{Enrollment.quoted_table_name} ON course_account_associations.course_id=enrollments.course_id").
+              where("enrollments.type=? AND enrollments.workflow_state IN ('active', 'completed') AND user_id=?", role_name, user).distinct.pluck(:role_id)
+            role_ids.any?{|role_id| RoleOverride.permission_for(self, permission, self.get_role_by_id(role_id))[:enabled] }
+          end
+        }
         can permission
       end
     end
