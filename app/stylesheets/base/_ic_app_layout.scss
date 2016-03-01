@@ -101,7 +101,6 @@ $ic-left-side-width: $ic-sp*15;
     opacity: 1;
     transform: translate3d(0,0,0);
   }
-  @include breakpoint(short) { padding-top: $ic-sp; }
 }
 
 .ic-app-main-content {
