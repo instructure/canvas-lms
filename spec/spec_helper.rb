@@ -435,6 +435,7 @@ RSpec.configure do |config|
     Delayed::Job.redis.flushdb if Delayed::Job == Delayed::Backend::Redis::Job
     Rails::logger.try(:info, "Running #{self.class.description} #{@method_name}")
     Attachment.domain_namespace = nil
+    Canvas::DynamicSettings.reset_cache!
     $spec_api_tokens = {}
   end
 
