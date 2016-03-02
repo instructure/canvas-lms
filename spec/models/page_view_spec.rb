@@ -546,4 +546,32 @@ describe PageView do
       end
     end
   end
+
+  context "pv4" do
+    before do
+      PageView.stubs(:pv4?).returns(true)
+      PageView.stubs(:page_view_method).returns(:pv4)
+    end
+
+    it "store doesn't do anything" do
+      pv = PageView.new
+      pv.expects(:save).never
+      pv.expects(:store_page_view_to_user_counts)
+      pv.user = User.new
+      pv.store
+    end
+
+    it "do_update still updates fields" do
+      pv = PageView.new
+      pv.do_update('interaction_seconds' => 5)
+      expect(pv.is_update).to eq true
+      expect(pv.interaction_seconds).to eq 5
+    end
+
+    it "find_for_update returns a dummy record" do
+      pv = PageView.find_for_update('someuuid')
+      expect(pv).to_not be_nil
+      expect(pv.id).to eq 'someuuid'
+    end
+  end
 end
