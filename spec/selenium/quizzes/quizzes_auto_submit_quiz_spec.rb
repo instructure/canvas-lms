@@ -70,11 +70,10 @@ describe 'taking a quiz' do
       context 'when the quiz is nearly due' do
         let(:quiz_nearly_due) { quiz_create(course: @course, due_at: Time.zone.now + 2.seconds) }
 
-        it 'doesn\'t automatically submit once the due date passes', priority: "1", test_id: 551293 do
-          skip('This spec takes too long to execute')
-
+        it 'doesn\'t automatically submit once the due date passes', priority: "2", test_id: 551293 do
           take_and_answer_quiz(submit: false, quiz: quiz_nearly_due)
 
+          # TODO: refactor with timecop
           # wait at least one minute for the due date to pass
           sleep(65)
 
@@ -84,11 +83,10 @@ describe 'taking a quiz' do
           verify_quiz_submission_is_late
         end
 
-        it 'marks the quiz submission as "late"', priority: "1", test_id: 551785 do
-          skip('This spec takes too long to execute')
-
+        it 'marks the quiz submission as "late"', priority: "2", test_id: 551785 do
           take_and_answer_quiz(submit: false, quiz: quiz_nearly_due)
 
+          # TODO: refactor with timecop
           # wait at least one minute for the due date to pass
           sleep(65)
 
