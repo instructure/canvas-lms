@@ -105,8 +105,12 @@ describe 'taking a quiz' do
 
         ensure
           # This prevents selenium from freezing when the dialog appears upon leaving the quiz
-          fln('Quizzes').click
-          driver.switch_to.alert.accept
+          begin
+            fln('Quizzes').click
+            driver.switch_to.alert.accept
+          rescue Selenium::WebDriver::Error::NoAlertOpenError
+            # Do nothing
+          end
         end
 
         def verify_access_code_prompt
@@ -114,7 +118,6 @@ describe 'taking a quiz' do
         end
 
         it 'prompts for access code upon resuming the quiz', priority: "1", test_id: 421218 do
-          skip('Known issue CNVS-24622')
           start_and_exit_quiz do
             expect_new_page_load { fj('a.ig-title', '#assignment-quizzes').click }
             expect_new_page_load { fln('Resume Quiz').click }
@@ -123,7 +126,6 @@ describe 'taking a quiz' do
         end
 
         it 'prompts for an access code upon resuming the quiz via the browser back button', priority: "1", test_id: 421222 do
-          skip('Known issue CNVS-24622')
           start_and_exit_quiz do
             expect_new_page_load { driver.navigate.back }
             verify_access_code_prompt

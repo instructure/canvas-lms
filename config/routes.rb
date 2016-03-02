@@ -314,6 +314,7 @@ CanvasRails::Application.routes.draw do
       resources :quiz_submissions, controller: 'quizzes/quiz_submissions', path: :submissions do
         collection do
           put :backup
+          post :backup
         end
         member do
           get :record_answer

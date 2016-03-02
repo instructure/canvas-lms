@@ -120,12 +120,6 @@ describe 'quizzes' do
           end
 
           expect_new_page_load { submit_dialog('#deauthorized_dialog') }
-
-          # log back in
-          login_as(@pseudonym.unique_id, @pseudonym.password)
-
-          # we should be back at the quiz show page
-          expect(fln('Resume Quiz')).to be_present
         end
       end
     end
