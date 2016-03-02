@@ -38,7 +38,6 @@ web: &WEB
   build: ./docker-compose
   volumes:
     - "canvas-gems:/home/docker/.gem/ruby/2.1.0"
-    - "canvas-node_modules:/usr/src/app/node_modules"
     - ".:/usr/src/app"
   links:
     - consul
