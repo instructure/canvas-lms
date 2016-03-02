@@ -66,6 +66,10 @@ shared_context "in-process server selenium tests" do
 
   def maybe_recover_from_exception(exception)
     case exception
+    when Errno::ENOMEM
+      # no sense trying anymore, give up and hope that other nodes pick up the slack
+      puts "Error: got `#{exception}`, aborting"
+      RSpec.world.wants_to_quit = true
     when EOFError, Errno::ECONNREFUSED, Net::ReadTimeout
       if $selenium_driver && !RSpec.world.wants_to_quit && exception.backtrace.grep(/selenium-webdriver/).present?
         puts "SELENIUM: webdriver is misbehaving.  Will try to re-initialize."
