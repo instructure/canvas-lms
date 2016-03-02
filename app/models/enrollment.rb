@@ -450,7 +450,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   def cancel_future_appointments
-    if workflow_state_changed? && completed?
+    if workflow_state_changed? && %w{completed deleted}.include?(workflow_state)
       course.appointment_participants.active.current.for_context_codes(user.asset_string).update_all(:workflow_state => 'deleted')
     end
   end
