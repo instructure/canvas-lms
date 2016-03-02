@@ -129,8 +129,12 @@ define([
         }
         item_data['item[url]'] = $("#content_tag_create_url").val();
         item_data['item[title]'] = $("#content_tag_create_title").val();
-        submit(item_data);
 
+        if (item_data['item[url]'] === '') {
+          $("#content_tag_create_url").errorBox(I18n.t("URL is required"));
+        } else {
+          submit(item_data);
+        }
       } else if(item_type == 'context_external_tool') {
 
         var tool = $("#context_external_tools_select .tools .tool.selected").data('tool');

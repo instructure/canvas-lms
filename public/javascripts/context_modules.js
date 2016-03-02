@@ -1071,6 +1071,7 @@ define([
           $(this).find('input[type=text],textarea,select').first().focus();
         },
         close: function () {
+          $("#edit_item_form").hideErrors();
            $cogLink.focus();
         },
         minWidth: 320

@@ -358,6 +358,9 @@ class ContextModulesController < ApplicationController
     @module = @context.context_modules.not_deleted.find(params[:context_module_id])
     if authorized_action(@module, @current_user, :update)
       @tag = @module.add_item(params[:item])
+      unless @tag.valid?
+        return render :json => @tag.errors, :status => :bad_request
+      end
       json = @tag.as_json
       json['content_tag'].merge!(
           publishable: module_item_publishable?(@tag),
@@ -387,7 +390,11 @@ class ContextModulesController < ApplicationController
       @tag.url = params[:content_tag][:url] if %w(ExternalUrl ContextExternalTool).include?(@tag.content_type) && params[:content_tag] && params[:content_tag][:url]
       @tag.indent = params[:content_tag][:indent] if params[:content_tag] && params[:content_tag][:indent]
       @tag.new_tab = params[:content_tag][:new_tab] if params[:content_tag] && params[:content_tag][:new_tab]
-      @tag.save
+
+      unless @tag.save
+        return render :json => @tag.errors, :status => :bad_request
+      end
+
       @tag.update_asset_name! if params[:content_tag][:title]
       render :json => @tag
     end

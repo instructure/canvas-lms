@@ -1132,6 +1132,30 @@ describe "context modules" do
       expect(fln('Google')).to be_displayed
     end
 
+    it "should require a url for external url items" do
+      get "/courses/#{@course.id}/modules"
+      add_module('Module')
+      f('.ig-header-admin .al-trigger').click
+      wait_for_ajaximations
+      f('.add_module_item_link').click
+      wait_for_ajaximations
+
+      click_option('#add_module_item_select', 'external_url', :value)
+      wait_for_ajaximations
+
+      title_input = fj('input[name="title"]:visible')
+      replace_content(title_input, 'some title')
+
+      fj('.add_item_button.ui-button').click
+      wait_for_ajaximations
+
+      keep_trying_until do
+        expect(ff('.errorBox').any?(&:displayed?)).to be_truthy
+      end
+
+      expect(f("#select_context_content_dialog")).to be_displayed
+    end
+
     it "should add an external tool item to a module from apps", priority: "1", test_id: 126706 do
       get "/courses/#{@course.id}/settings"
       make_full_screen
