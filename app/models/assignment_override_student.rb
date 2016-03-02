@@ -27,7 +27,8 @@ class AssignmentOverrideStudent < ActiveRecord::Base
 
   attr_accessible :user
   validates_presence_of :assignment_override, :user
-  validates_uniqueness_of :user_id, :scope => [:assignment_id, :quiz_id]
+  validates_uniqueness_of :user_id, :scope => [:assignment_id, :quiz_id],
+    :message => 'already belongs to an assignment override'
 
   validate :assignment_override do |record|
     if record.assignment_override && record.assignment_override.set_type != 'ADHOC'

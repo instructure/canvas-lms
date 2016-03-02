@@ -553,7 +553,11 @@ describe AssignmentOverridesController, type: :request do
       @user = @teacher
 
       raw_api_create_override(@course, @assignment, :assignment_override => { :student_ids => [@student.id], :title => 'adhoc title' })
-      expect_errors("assignment_override_students" => [{ "attribute"=>"assignment_override_students", "type"=>"invalid", "message"=>"invalid" }])
+      expect_errors("assignment_override_students" => [{
+        "attribute"=>"assignment_override_students",
+        "type"=>"taken",
+        "message"=>"already belongs to an assignment override"
+      }])
     end
 
     context "overridden due_at" do
@@ -755,7 +759,11 @@ describe AssignmentOverridesController, type: :request do
         @user = @teacher
 
         raw_api_update_override(@course, @assignment, @original_override, :assignment_override => { :student_ids => [@student.id] })
-        expect_errors("assignment_override_students" => [{ "attribute"=>"assignment_override_students", "type"=>"invalid", "message"=>"invalid" }])
+        expect_errors("assignment_override_students" => [{
+          "attribute"=>"assignment_override_students",
+          "type"=>"taken",
+          "message"=>"already belongs to an assignment override"
+        }])
       end
     end
 

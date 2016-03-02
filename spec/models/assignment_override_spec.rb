@@ -144,6 +144,14 @@ describe AssignmentOverride do
       (model.maximum(:id) || 0) + 1
     end
 
+    it "should propagate student errors" do
+      student = student_in_course(course: @override.assignment.context, name: 'Johnny Manziel').user
+      @override.assignment_override_students.create(user: student)
+      @override.assignment_override_students.build(user: student)
+      expect(@override).not_to be_valid
+      expect(@override.errors[:assignment_override_students].first.type).to eq :taken
+    end
+
     it "should reject non-nil set_id with an adhoc set" do
       @override.set_id = 1
       expect(@override).not_to be_valid

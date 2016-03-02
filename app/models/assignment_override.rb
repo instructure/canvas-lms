@@ -29,8 +29,7 @@ class AssignmentOverride < ActiveRecord::Base
   belongs_to :assignment
   belongs_to :quiz, class_name: 'Quizzes::Quiz'
   belongs_to :set, :polymorphic => true
-  has_many :assignment_override_students, :dependent => :destroy
-
+  has_many :assignment_override_students, :dependent => :destroy, :validate => false
   validates_presence_of :assignment_version, :if => :assignment
   validates_presence_of :title, :workflow_state
   validates_inclusion_of :set_type, :in => %w(CourseSection Group ADHOC)
@@ -65,6 +64,16 @@ class AssignmentOverride < ActiveRecord::Base
   validate do |record|
     if [record.assignment, record.quiz].all?(&:nil?)
       record.errors.add :base, "assignment or quiz required"
+    end
+  end
+
+  validate do |record|
+    record.assignment_override_students.each do |s|
+      next if s.valid?
+      s.errors.each do |_, error|
+        record.errors.add(:assignment_override_students, error.type,
+          message: error.message)
+      end
     end
   end
 
