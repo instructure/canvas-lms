@@ -72,6 +72,15 @@ guard:
 #    NODE_ENV: CI
 #    USE_WEBPACK: true
 
+# Uncomment this entry to run qunit tests Headlessly
+#phantomjs-tests:
+#  build: ./docker-compose/phantomjs-karma
+#  volumes:
+#    - ".:/app"
+#  environment:
+#    NODE_ENV: CI
+#    VIRTUAL_HOST: phantom.docker
+
 # Uncomment below to run the LTI test tool for integration tests
 # lti-test-tool:
 #   image: instructure/lti_tool_provider_example
