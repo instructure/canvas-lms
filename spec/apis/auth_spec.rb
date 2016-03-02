@@ -592,6 +592,12 @@ describe "API Authentication", type: :request do
       expect(JSON.parse(response.body).size).to eq 1
     end
 
+    it "recovers gracefully if consul is missing encryption data" do
+      Diplomat::Kv.stubs(:get).raises(Diplomat::KeyNotFound, "cannot find some secret")
+      check_used { get "/api/v1/courses", nil, { 'HTTP_AUTHORIZATION' => "Bearer #{@token.full_token}" } }
+      assert_status(200)
+    end
+
     it "should allow passing the access token in the post body" do
       @me = @user
       Account.default.account_users.create!(user: @user)
