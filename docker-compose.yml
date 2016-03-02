@@ -49,10 +49,6 @@ web: &WEB
   environment:
     RACK_ENV: development
     VIRTUAL_HOST: .canvas.docker
-    ECOSYSTEM_SECRET: 7hZoK4DZyrH+A7nxLhC=fVeRQq79oCqq]QK92M?LGPh/tKQv]Q
-    ECOSYSTEM_KEY: +h+oJTJ)(AcfUxGNUy7Pk2zRTwPaTeqA;&MQ3Gx6936VfvHumn
-    # uncomment if primarily using webpack in development
-    # USE_WEBPACK: true
 
 jobs:
   <<: *WEB
@@ -69,7 +65,6 @@ guard:
 #    - ".:/app"
 #  environment:
 #    NODE_ENV: CI
-#    USE_WEBPACK: true
 
 # Uncomment this entry to run qunit tests Headlessly
 #phantomjs-tests:
