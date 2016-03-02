@@ -504,46 +504,6 @@ class Quizzes::QuizzesController < ApplicationController
 
   # student_analysis report
   def statistics
-    if @context.feature_enabled?(:quiz_stats)
-      return statistics_cqs
-    end
-
-    if authorized_action(@quiz, @current_user, :read_statistics)
-      respond_to do |format|
-        format.html {
-          all_versions = params[:all_versions] == '1'
-          add_crumb(@quiz.title, named_context_url(@context, :context_quiz_url, @quiz))
-          add_crumb(t(:statistics_crumb, "Statistics"), named_context_url(@context, :context_quiz_statistics_url, @quiz))
-
-          if !@context.large_roster?
-            @statistics = @quiz.statistics(all_versions)
-            user_ids = @statistics[:submission_user_ids]
-            @submitted_users = User.where(:id => user_ids.to_a).order_by_sortable_name
-            #include logged out users
-            @submitted_users += @statistics[:submission_logged_out_users]
-            @users = Hash[
-              @submitted_users.map { |u| [u.id, u] }
-            ]
-          end
-
-          js_env quiz_reports: Quizzes::QuizStatistics::REPORTS.map { |report_type|
-            report = @quiz.current_statistics_for(report_type, {
-              includes_all_versions: all_versions
-            })
-
-            Quizzes::QuizReportSerializer.new(report, {
-              controller: self,
-              scope: @current_user,
-              root: false,
-              includes: %w[ file progress ]
-            }).as_json
-          }
-        }
-      end
-    end
-  end
-
-  def statistics_cqs
     if authorized_action(@quiz, @current_user, :read_statistics)
       respond_to do |format|
         format.html {

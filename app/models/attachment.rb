@@ -1494,7 +1494,6 @@ class Attachment < ActiveRecord::Base
   def set_publish_state_for_usage_rights
     if self.context &&
        self.context.respond_to?(:feature_enabled?) &&
-       self.context.feature_enabled?(:better_file_browsing) &&
        self.context.feature_enabled?(:usage_rights_required)
       self.locked = self.usage_rights.nil?
     end

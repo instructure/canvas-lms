@@ -865,7 +865,7 @@ class Message < ActiveRecord::Base
           Canvas::Twilio.deliver(
             to,
             body,
-            from_recipient_country: user.account.feature_enabled?(:international_sms_from_recipient_country)
+            from_recipient_country: true
           )
         end
       rescue StandardError => e
