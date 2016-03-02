@@ -1437,7 +1437,7 @@ class Assignment < ActiveRecord::Base
         map{|s| s.as_json(:include_root => false, :only => [:user_id, :course_section_id]) }
     res[:context][:quiz] = self.quiz.as_json(:include_root => false, :only => [:anonymous_submissions])
 
-    includes = [:versions, :quiz_submission]
+    includes = [:versions, :quiz_submission, :user]
     includes << (grading_role == :grader ? :submission_comments : :all_submission_comments)
     submissions = self.submissions.where(:user_id => students).preload(*includes)
 
@@ -1524,6 +1524,12 @@ class Assignment < ActiveRecord::Base
                                    elsif quiz && sub.quiz_submission
                                      qs_versions[sub.quiz_submission.id].map do |v|
                                        qs = v.model
+                                       # copy already-loaded associations over to the
+                                       # model so we don't have to load them again
+                                       # when qs.late? gets called
+                                       qs.quiz = quiz
+                                       qs.submission = sub
+
                                        {submission: {
                                          grade: qs.score,
                                          show_grade_in_dropdown: true,
