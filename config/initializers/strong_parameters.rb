@@ -25,7 +25,7 @@ module ForbiddenAttributesProtectionWithoutAttrAccessible
     end
 
     def strong_params?
-      !!@strong_params
+      !!@strong_params || (self != ActiveRecord::Base && superclass.strong_params?)
     end
   end
 
