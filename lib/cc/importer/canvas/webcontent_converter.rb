@@ -88,12 +88,12 @@ module CC::Importer::Canvas
       make_export_dir
       path = get_full_path(WEB_RESOURCES_FOLDER)
       Zip::File.open(zip_file, 'w') do |zipfile|
-        Dir["#{path}/**/**"].each do |file|
+        Dir.glob("#{path}/**/**", File::FNM_DOTMATCH).each do |file|
+          next if File.directory?(file)
           file_path = file.sub(path+'/', '')
           zipfile.add(file_path, file)
         end
       end
-
       File.expand_path(zip_file)
     end
 
