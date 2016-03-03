@@ -206,6 +206,7 @@ class Account < ActiveRecord::Base
   add_setting :author_email_in_notifications, boolean: true, root_only: true, default: false
   add_setting :include_students_in_global_survey, boolean: true, root_only: true, default: false
   add_setting :trusted_referers, root_only: true
+  add_setting :app_center_access_token
 
   def use_new_styles_or_allow_global_includes?
     feature_enabled?(:use_new_styles) || allow_global_includes?
