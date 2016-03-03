@@ -5,8 +5,12 @@ define [
   'Backbone'
   'compiled/fn/preventDefault'
   'compiled/views/editor/KeyboardShortcuts'
+  'jsx/shared/rce/RichContentEditor'
   'tinymce.editor_box'
-], (_, I18n, $, Backbone, preventDefault, KeyboardShortcuts) ->
+], (_, I18n, $, Backbone, preventDefault, KeyboardShortcuts, RichContentEditor) ->
+
+  richContentEditor = new RichContentEditor({riskLevel: "highrisk"})
+  richContentEditor.preloadRemoteModule()
 
   ###
   xsslint safeString.property content
@@ -63,7 +67,7 @@ define [
       opts = {focus: true, tinyOptions: {}}
       if @options.editorBoxLabel
         opts.tinyOptions.aria_label = @options.editorBoxLabel
-      @textArea.editorBox opts
+      richContentEditor.loadNewEditor(@textArea, opts)
       @editing = true
       @trigger 'edit'
 
@@ -135,7 +139,7 @@ define [
       $switchViewsContainer = $('<div/>', style: "float: right")
       $switchViewsContainer.append($switchToHtmlLink, $switchToVisualLink)
       $switchViewsContainer.find('a').click preventDefault (e) =>
-        @textArea.editorBox('toggle')
+        richContentEditor.callOnRCE(@textarea, 'toggle')
         # hide the clicked link, and show the other toggle link.
         # todo: replace .andSelf with .addBack when JQuery is upgraded.
         $(e.currentTarget).siblings('a').andSelf().toggle()

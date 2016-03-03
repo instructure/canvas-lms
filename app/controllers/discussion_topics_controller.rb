@@ -237,6 +237,7 @@ require 'atom'
 #
 class DiscussionTopicsController < ApplicationController
   before_filter :require_context_and_read_access, :except => :public_feed
+  before_filter :rich_content_service_config
 
   include Api::V1::DiscussionTopics
   include Api::V1::Assignment
@@ -816,6 +817,10 @@ class DiscussionTopicsController < ApplicationController
   end
 
   protected
+
+  def rich_content_service_config
+    js_env(Services::RichContent.env_for(@domain_root_account, risk_level: :highrisk))
+  end
 
   def cancel_redirect_url
     topic_type = @topic.is_announcement ? :announcements : :discussion_topics

@@ -26,6 +26,7 @@ define([
   'compiled/userSettings',
   'str/htmlEscape',
   'wikiSidebar',
+  'jsx/shared/rce/RichContentEditor',
   'instructure_helper',
   'jqueryui/draggable',
   'jquery.ajaxJSON' /* ajaxJSON */,
@@ -53,7 +54,10 @@ define([
   'compiled/behaviors/trackEvent',
   'compiled/badge_counts',
   'vendor/jquery.placeholder'
-], function(KeyboardNavDialog, INST, I18n, $, _, tz, userSettings, htmlEscape, wikiSidebar) {
+], function(KeyboardNavDialog, INST, I18n, $, _, tz, userSettings, htmlEscape, wikiSidebar, RichContentEditor) {
+
+  var richContentEditor = new RichContentEditor({riskLevel: "sidebar", sidebar: wikiSidebar})
+  richContentEditor.preloadRemoteModule()
 
   $.trackEvent('Route', location.pathname.replace(/\/$/, '').replace(/\d+/g, '--') || '/');
 
@@ -479,22 +483,19 @@ define([
       if(!$editor || $editor.length === 0) { return; }
       $editor = $($editor);
       if(!$editor || $editor.length === 0) { return; }
-      $editor.editorBox();
-      $editor.editorBox('focus', true);
-      if(wikiSidebar) {
-        wikiSidebar.attachToEditor($editor);
+      richContentEditor.loadNewEditor($editor)
+      richContentEditor.callOnRCE($editor, 'focus', true)
+      richContentEditor.initSidebar()
+      richContentEditor.attachSidebarTo($editor, function(){
         $("#sidebar_content").hide();
-        wikiSidebar.show();
-      }
+      })
     }).bind('richTextEnd', function(event, $editor) {
       if(!$editor || $editor.length === 0) { return; }
       $editor = $($editor);
       if(!$editor || $editor.length === 0) { return; }
-      $editor.editorBox('destroy');
-      if(wikiSidebar) {
-        $("#sidebar_content").show();
-        wikiSidebar.hide();
-      }
+      richContentEditor.callOnRCE($editor, 'destroy');
+      richContentEditor.hideSidebar()
+      $("#sidebar_content").show();
     });
 
     $(".cant_record_link").click(function(event) {
