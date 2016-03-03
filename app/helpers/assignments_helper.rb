@@ -64,7 +64,7 @@ module AssignmentsHelper
     if assignment.expects_submission? && can_do(assignment, user, :submit)
       submit_text = user_submission.try(:has_submission?) ? I18n.t("Re-submit Assignment") : I18n.t("Submit Assignment")
       late = user_submission.try(:late?) ? "late" : ""
-      link_to(submit_text, '#', :class => "btn btn-primary submit_assignment_link #{late}", :style => "margin-top: 5px")
+      link_to(submit_text, '#', :class => "btn btn-primary submit_assignment_link #{late}")
     end
   end
 
