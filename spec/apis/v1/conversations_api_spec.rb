@@ -1406,7 +1406,6 @@ describe ConversationsController, type: :request do
       expect(MediaObject.count).to eql 1
     end
 
-
     it "should add recipients to the conversation" do
       conversation = conversation(@bob, @billy)
 
@@ -1452,6 +1451,21 @@ describe ConversationsController, type: :request do
           {"id" => conversation.messages.first.id, "created_at" => conversation.messages.first.created_at.to_json[1, 20], "body" => "jane, joe, and tommy were added to the conversation by nobody@example.com", "author_id" => @me.id, "generated" => true, "media_comment" => nil, "forwarded_messages" => [], "attachments" => [], "participating_user_ids" => [@me.id, @billy.id, @bob.id, @jane.id, @joe.id, @tommy.id].sort}
         ]
       })
+    end
+
+    it "should not cache an old audience when adding recipients" do
+      enable_cache do
+        Timecop.freeze(5.seconds.ago) do
+          @conversation = conversation(@bob, @billy)
+          # prime the paticipants cache
+          @conversation.participants
+        end
+
+        json = api_call(:post, "/api/v1/conversations/#{@conversation.conversation_id}/add_recipients",
+          { :controller => 'conversations', :action => 'add_recipients', :id => @conversation.conversation_id.to_s, :format => 'json' },
+          { :recipients => [@jane.id.to_s, "course_#{@course.id}"] })
+        expect(json["audience"]).to match_array [@billy.id, @bob.id, @jane.id, @joe.id, @tommy.id]
+      end
     end
 
     it "should update the conversation" do
