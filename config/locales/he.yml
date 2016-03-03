@@ -45,7 +45,7 @@ he:
     cancel: ביטול
     save: שמירה
   a_calculation_value_is_not_used_with_this_calculat_b1e854b4: "בשיטת חישוב זו אין שימוש בערך מחושב"
-  a_file_named_itemname_already_exists_in_this_folde_b0dc7185: " מסמך בשם %{itemName} \\ כבר קיים בתיקיה זו"
+  a_file_named_itemname_already_exists_in_this_folde_b0dc7185: " מסמך בשם %{itemName}  כבר קיים בתיקיה זו"
   a_full_size_logo_that_appears_in_the_right_sidebar_18873685: "לוגו בגודל מלא אשר מופיע בצידו של הנווט הצידי בלוח המחוונים של קנבס. הגודל המיטבי הנו  140 * 360 פיקסלים. הפורמטים האפשרים:   svg, png, jpeg, gif"
   a_handy_key_value_dump_of_a_host_of_interesting_en_d0518dfe: "רשימה שימושית של הצירוף מפתח/ערך של מידע בעל ענין מתוך סביבת המחשב המארח עבור המשתמש המדווח"
   a_message_is_required_129e1814: "נדרש להקליד תוכן הודעה"
@@ -1750,7 +1750,7 @@ he:
       tooltips: 
         target_group: "בחירת הקבוצה אליה תועבר משימה זו"
       warnings: 
-        delete_assignment_group: "את/ה עומד/ת לבטל את *%{name}*, הכולל **%{assignment_count}** \\ משימות."
+        delete_assignment_group: "את/ה עומד/ת לבטל את *%{name}*, הכולל **%{assignment_count}**  משימות."
       would_you_like: "האם תרצו ל:"
     drop_highest_rule: 
       one: "השמטת הציון הגבוה ביותר"
@@ -1825,7 +1825,7 @@ he:
     grade_percent_screenreader: "ציון: %{grade}%"
     grading_type_selector: 
       display_grade_as: "הצג ציונים כ-"
-      gpa_scale_explainer: "סולם ההערכה של הGPA תוכנן לבתי ספר אשר משתמשים בסולם 4.0 (או 5.0/6.0) לכל המשימות. סכימת דירוג זו דומה לתצוגת סכימת ההערכה המילולית \\ אך עם כמה הבדלים משמעותיים:"
+      gpa_scale_explainer: "סולם ההערכה של הGPA תוכנן לבתי ספר אשר משתמשים בסולם 4.0 (או 5.0/6.0) לכל המשימות. סכימת דירוג זו דומה לתצוגת סכימת ההערכה המילולית  אך עם כמה הבדלים משמעותיים:"
       gpa_scale_input_explainer: "הציונים הם על בסיס סולם 4.0. למשל, אם למשימה 100 נקודות, השקלול של 3.5 מתוך 4.0 הוא 87%, וכו'. "
       gpa_scale_letters_explainer: "ניתן להשתמש בהערכה מילולית בנוסף לציונים המספריים."
       gpa_scale_percentage_explainer: "אין אפשרות להקליד ניקוד באופן ישיר, אך אפשר להקליד אחוזים. למשל, אם המשימה היא מתוך 50 נקודות, \"40\" לא יעבוד, אך 80% כן."
@@ -2257,7 +2257,7 @@ he:
     recording_setting: מקליט
     recording_setting_enabled_description: "הפעלת אפשרות הקלטה בשיחת ועידה זו"
   blackboard: 
-    no_manifest: "קובץ ה Blackboard בפורמט זיפ הזה אינו כולל את הקבץ imsmanifest.xml \\ בתיקית הבסיס."
+    no_manifest: "קובץ ה Blackboard בפורמט זיפ הזה אינו כולל את הקבץ imsmanifest.xml  בתיקית הבסיס."
   blue_daf8fea9: כחול
   body_shadow_d36e8c2e: "צללית גוף"
   bookmark_service: 
@@ -2270,10 +2270,10 @@ he:
   broken_file_link_found_in_your_course_7cc24395: "קישור שגוי לקובץ נמצא בקורס שלך"
   bucket_name_must_be_one_of_the_following_bucket_na_81c1be40: "שם הסל צריך להיות אחד מהרשימה הבאה: %{bucket_names}"
   bulk_course_migration: 
-    export_failed: "אירעה שגיאה בעת ייצוא הקורס מ Blackboard עם bb_lcid במזהה %{id} \\ "
+    export_failed: "אירעה שגיאה בעת ייצוא הקורס מ Blackboard עם bb_lcid במזהה %{id}  "
     export_failed_no_id: "אירעה שגיאה בעת ייבוא קורס"
-    export_failed_not_found: "הקורס עם bb_lcid במזהה %{id} לא אותר ב Blackboard  למשתמש \\ %{user_name}"
-    export_failed_with_id: "אירעה שגיאה בעת ייבוא הקורס לקנבס עם bb_lcid במזהה %{id} \\ ."
+    export_failed_not_found: "הקורס עם bb_lcid במזהה %{id} לא אותר ב Blackboard  למשתמש  %{user_name}"
+    export_failed_with_id: "אירעה שגיאה בעת ייבוא הקורס לקנבס עם bb_lcid במזהה %{id}  ."
     no_course_found: "לא נמצא קורס עם %{id_type} של %{id}"
     no_course_id_given: "אין קורס קנבס המזוהה עם bb_lcid של %{id}"
     no_credentials_found: "לא נמצאו הרשאות למשתמש בשם %{user_name}"
@@ -2304,7 +2304,7 @@ he:
         migrate_courses: "הגירת קורסים"
       column_name: "שם עמודה"
       course_id_description: "מזהה קנבס של הקורס אליו יש לייבא."
-      credential_description: "כלי זה יאפשר לך להגר נתוני קורסים מרובים בבת אחת ממערכת Blackboard Vista/CE . יש להוסיף מערך הרשאות למערכת ה  Blackboard שלך ואז להוסיף \\ לתבנית ה CSV המסופקת את מזהי הקורס של קנבס  לצורך הגירת הקורסים שלך."
+      credential_description: "כלי זה יאפשר לך להגר נתוני קורסים מרובים בבת אחת ממערכת Blackboard Vista/CE . יש להוסיף מערך הרשאות למערכת ה  Blackboard שלך ואז להוסיף  לתבנית ה CSV המסופקת את מזהי הקורס של קנבס  לצורך הגירת הקורסים שלך."
       csv_description: "ניתן להוסיף כל עמודה אחרת אך אלו לא ילקחו בחשבון. זוהי דוגמה של קובץ CSV פשוט עבור 3 קורסים של החשבון עבור המשתמש \"גרג\":"
       csv_template: "תבנית CSV"
       current_migration_batch: "תהליך אצבה להגירה הנוכחית"
@@ -2380,7 +2380,7 @@ he:
   c_2001_acme_inc_283f7f80: "(c) 2001 Acme Inc."
   c_modal_form: 
     close: סגירה
-  calculation_int_is_not_a_valid_value_for_this_calc_1de6e060: "'%{calculation_int}' \\ אינו ערך חוקי לשיטת חישוב זו. הערך חייב להיות בין  '%{valid_calculation_ints_min}' ל '%{valid_calculation_ints_max}'"
+  calculation_int_is_not_a_valid_value_for_this_calc_1de6e060: "'%{calculation_int}'  אינו ערך חוקי לשיטת חישוב זו. הערך חייב להיות בין  '%{valid_calculation_ints_min}' ל '%{valid_calculation_ints_max}'"
   calculation_method_fe281f9: "שיטת חישוב"
   calculation_method_must_be_one_of_the_following_ca_d8ae5dac: "שיטת החישוב צריכה להיות אחת מהרשימה הבאה:  %{calc_methods}"
   calculator: 
@@ -6159,7 +6159,7 @@ he:
     student_outcome_gradebook: "ספר הציונים של למידת תלמידים להתמחות"
   field_name_31fff38e: "שם שדה"
   file_content_a99b5c6b: "תוכן קובץ"
-  file_filename_could_not_be_included_in_the_epub_do_4bf71a87: "הקובץ %{filename} \\ לא ניתן לשילוב במסמך ה ePub. יש לעיין בקובץ זיפ נפרד כדי לגשת אליו. "
+  file_filename_could_not_be_included_in_the_epub_do_4bf71a87: "הקובץ %{filename}  לא ניתן לשילוב במסמך ה ePub. יש לעיין בקובץ זיפ נפרד כדי לגשת אליו. "
   file_list_350d08df: "רשימת קבצים"
   file_list_updated_38e2a5ad: "רשימת קבצים עודכנה"
   file_menu_cc0ca54: "תפריט קבצים"
@@ -6335,8 +6335,8 @@ he:
   gradebook: 
     alerts: 
       no_active_students: "מצטערים, או שאין תלמידים פעילים בקורס או שאף אחד מהם אינו בר הערכה על ידך."
-      no_students_in_groups_back: "לצערנו, הגשות של משימה זו לא ניתן להעריך ב Speedgrader \\ כיון שאין משתמשים מוקצים. יש להקצות משתמשים לאוסף קבוצות זה ולנסות מחדש. לחזרה יש להקיש כן (OK) "
-      no_students_in_groups_close: "לצערנו, הגשות של משימה זו לא ניתן להעריך ב Speedgrader \\ כיון שאין משתמשים מוקצים. יש להקצות משתמשים לאוסף קבוצות זה ולנסות מחדש. לסגירת חלון זה יש להקיש כן (OK) "
+      no_students_in_groups_back: "לצערנו, הגשות של משימה זו לא ניתן להעריך ב Speedgrader  כיון שאין משתמשים מוקצים. יש להקצות משתמשים לאוסף קבוצות זה ולנסות מחדש. לחזרה יש להקיש כן (OK) "
+      no_students_in_groups_close: "לצערנו, הגשות של משימה זו לא ניתן להעריך ב Speedgrader  כיון שאין משתמשים מוקצים. יש להקצות משתמשים לאוסף קבוצות זה ולנסות מחדש. לסגירת חלון זה יש להקיש כן (OK) "
       no_students_in_section: "לא נמצאו תלמידים בהקבצה זו. חזרה להצגת כלל ההקבצות"
     allow_message: "הקלק/י על הכפתור \"אפשר\" כדי להתחיל בהקלטה."
     begin_record_prompt: "הקלק/י על הכפתור \"הקלטה\" כדי להתחיל. "
@@ -6891,7 +6891,7 @@ he:
   group_category_locked: "הקטגוריה הקבוצתית אינה יכולה להשתנות כיון שתלמידים כבר בצעו הגשות למשימה זו."
   group_group_name_is_for_a_different_section_4d84d256: "הקבוצה %{group_name}  מיועדת להקבצה אחרת"
   group_group_name_is_full_297880d6: "הקבוצה %{group_name}  כבר מלאה"
-  group_group_name_is_joined_by_invitation_only_4ac2a9e5: "ההצטרפות לקבוצה %{group_name} \\ בהזמנה בלבד"
+  group_group_name_is_joined_by_invitation_only_4ac2a9e5: "ההצטרפות לקבוצה %{group_name}  בהזמנה בלבד"
   group_is_for_a_different_section_6a843a4d: "הקבוצה מיועדת להקבצה אחרת"
   group_is_full_56849d78: "הקבוצה מלאה"
   group_is_joined_by_invitation_only_d00f5a63: "ההצטרפות לקבוצה בהזמנה בלבד"
@@ -7740,7 +7740,7 @@ he:
         subject: "מענה להודעה נכשל: %{subject}"
       locked_topic: 
         body: |-
-            ההודעה עם הכותרת "%{subject}" לא הגיעה ליעדה כיון שנושא הדיון נעול. \ אם ברצונך להתקשר למישהו באמצעות קנבס ניתן לנסות להתחבר לחשבונך ולשלוח הודעה דרך תיבת הדוא"ל הנכנס הפנימי 
+            ההודעה עם הכותרת "%{subject}" לא הגיעה ליעדה כיון שנושא הדיון נעול.  אם ברצונך להתקשר למישהו באמצעות קנבס ניתן לנסות להתחבר לחשבונך ולשלוח הודעה דרך תיבת הדוא"ל הנכנס הפנימי 
             תודה, 
             סיוע טכני קנבס
         subject: "מענה להודעה נכשל: %{subject}"
@@ -7871,7 +7871,7 @@ he:
               הזדהות רב-מימדית מגבירה את הבטיחות בכך שדורשת הימצאות
                רכיב פיזי ברשותך, בנוסף לידיעת הסיסמה, כדי להתחבר לקנבס.
               זה יכול להיות מכשיר אשר מייצר קודי אימות, או מכשיר טלפון שיכול לקבל הודעות טקסט. אפליקצית ההזדהות של גוגל [לאייפון](%{iphone_url}) 
-              או [לאנדרואיד](%{android_url}) \ ניתנות לקינפוג בעזרת סריקת קוד ה QR שבהמשך. אסימונים אחרים יכולים להיות מקונפגים ע"י הזנת
+              או [לאנדרואיד](%{android_url})  ניתנות לקינפוג בעזרת סריקת קוד ה QR שבהמשך. אסימונים אחרים יכולים להיות מקונפגים ע"י הזנת
               המפתח הסודי **%{secret_key}**.
           mfa_required: "יש צורך להגדיר אימות הזדהות רב מימדי"
           otp_on_device: "נא להזין את קוד האימות אשר האסימון שלך מראה."
@@ -10457,7 +10457,7 @@ he:
   please_add_at_least_one_non_blank_answer_213c2c8e: "בבקשה להוסיף לפחות תשובה אחת עם תוכן"
   please_add_at_least_one_non_blank_answer_for_each__a05a55f9: "בבקשה להוסיף לפחות תשובה אחת עם תוכן לכל משתנה"
   please_enter_your_label_name_7745272d: "בבקשה לספק את ה %{label_name}: שלך"
-  please_enter_your_label_name_and_password_5c56be80: "בבקשה לספק את ה %{label_name} \\ והסיסמה שלך"
+  please_enter_your_label_name_and_password_5c56be80: "בבקשה לספק את ה %{label_name}  והסיסמה שלך"
   please_let_them_know_which_page_you_were_viewing_a_c9816406: "נא לאפשר להם לדעת באיזה דף עיינת והקישור עליו הקלקת. "
   please_wait_e6355980: "בבקשה להמתין..."
   plugins: 
@@ -11846,7 +11846,7 @@ he:
       form_answer: 
         answer_in_range_accessible: "בין *תחילת תחום*  ו #סיום תחום#"
         answer_with_precision_accessible: "*תשובה מדויקת* עם רמת דיוק של #דיוק#"
-        exact_answer_with_error_margin_accessible: "*תשובה מדויקת* עם שולי טעות של \\ #שולי טעות#"
+        exact_answer_with_error_margin_accessible: "*תשובה מדויקת* עם שולי טעות של  #שולי טעות#"
         labels: 
           answer_comments: "הערות, אם התלמיד בוחר תשובה זו"
           answer_in_range: "תשובה בתחום"
@@ -14986,7 +14986,7 @@ he:
       image_reported: "תמונה זו דווחה"
   user_name_just_added_you_to_a_conversation_in_canv_7b278b51: "%{user_name} הוסיף אותך כרגע לשיחת קנבס. להצגת השיחה יש להקליק על הקישור הזה: %{link}."
   user_name_successfully_added_79af8365: "%{user_name} נתווסף בהצלחה!"
-  user_name_you_ll_need_to_log_in_before_you_can_vie_164c8e30: "%{user_name}, תצטרך/י \\ *להתחבר* לפני שתוכל/י לעיין בדף הזה."
+  user_name_you_ll_need_to_log_in_before_you_can_vie_164c8e30: "%{user_name}, תצטרך/י  *להתחבר* לפני שתוכל/י לעיין בדף הזה."
   user_navigation_a097be0f: "ניווט משתמש"
   user_not_authorized_to_manage_sis_data_account_sis_47bd4eec: "המשתמש אינו מורשה לנהל את נתוני המערכת הבית ספרית - חשבון[sis_account_id]"
   user_notes: 
@@ -15385,7 +15385,7 @@ he:
       upload_media_track_form_description: "ברגע שיש לך ערוץ כתוביות בפורמט SRT או *WebVTT*, ניתן להעלות זאת לכאן."
       upload_media_track_form_description_1: "העתקת כתובת הוידאו הזו:"
       upload_media_track_form_description_2: "כדי ליצור כתוביות קובץ יש להקליק על הקישור הזה, ולעקוב אחר ההוראות."
-      upload_media_track_form_description_3: "העלאת ערוץ כתוביות המשנה בפורמט SRT \\ או *WebVTT*"
+      upload_media_track_form_description_3: "העלאת ערוץ כתוביות המשנה בפורמט SRT  או *WebVTT*"
       upload_media_track_form_step1_label: "שלב 1:"
       upload_media_track_form_step2_label: "שלב 2:"
       upload_media_track_form_step3_label: "שלב 3:"
