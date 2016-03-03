@@ -120,6 +120,7 @@ class Conversation < ActiveRecord::Base
   end
 
   def add_participants(current_user, users, options={})
+    message = nil
     self.shard.activate do
       user_ids = users.map(&:id).uniq
       raise "can't add participants to a private conversation" if private?
@@ -171,10 +172,12 @@ class Conversation < ActiveRecord::Base
           SQL
 
           # announce their arrival
-          add_event_message(current_user, {:event_type => :users_added, :user_ids => user_ids}, options)
+          message = add_event_message(current_user, {:event_type => :users_added, :user_ids => user_ids}, options)
         end
       end
+      self.touch
     end
+    message
   end
 
   def add_event_message(current_user, event_data={}, options={})
