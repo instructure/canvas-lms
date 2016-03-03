@@ -22,7 +22,9 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 shared_examples_for 'Takeable Quiz Services' do
 
   it 'should deny access to locked quizzes' do
-    quiz.stubs(:locked?).returns true
+    quiz.stubs(:locked_for?).returns true
+    quiz.stubs(:grants_right?)
+    .with(anything, anything, :manage).returns(false)
 
     expect { service_action.call }.to raise_error(RequestError, /is locked/i)
   end
@@ -115,6 +117,27 @@ describe Quizzes::QuizSubmissionService do
             subject.create quiz
           end.to raise_error(RequestError, /already exists/i)
         end
+
+        it 'should work with multiple sections' do
+          active_course_section   = CourseSection.new(start_at:Time.zone.now - 3.days, end_at:Time.zone.now + 3.days, restrict_enrollments_to_section_dates:true)
+          inactive_course_section = CourseSection.new(start_at:Time.zone.now - 6.days, end_at:Time.zone.now - 3.days, restrict_enrollments_to_section_dates:true)
+
+          quiz.context = Account.default.courses.new
+
+          quiz.context.save!
+          participant.user = user
+          quiz.context.enroll_user(participant.user)
+
+          quiz.stubs(:grants_right?).returns(true)
+          quiz.stubs(:grants_right?).with(anything, anything, :manage).returns(false)
+
+          participant.user.stubs(:sections_for_course).returns([inactive_course_section, active_course_section])
+          participant.user.stubs(:new_record?).returns(false)
+
+          expect do
+            subject.create quiz
+          end.not_to raise_error
+        end
       end
     end
 
@@ -125,6 +148,7 @@ describe Quizzes::QuizSubmissionService do
       end
 
       it 'should allow taking a quiz in a public course' do
+        quiz.stubs(:grants_right?).returns true
         quiz.context.is_public = true
 
         expect { subject.create quiz }.to_not raise_error
