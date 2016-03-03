@@ -85,6 +85,7 @@ describe "calendar2" do
           @initial_time = Time.zone.parse('2015-1-1').beginning_of_day + 9.hours
           @initial_time_str = @initial_time.strftime('%Y-%m-%d')
           @one_day_later = @initial_time + 24.hours
+          @one_day_later_str = @one_day_later.strftime('%Y-%m-%d')
           @three_days_earlier = @initial_time - 72.hours
         end
 
@@ -205,6 +206,22 @@ describe "calendar2" do
           original_day_text = format_time_for_view(date_of_middle_day.to_datetime)
           extended_day_text = format_time_for_view(date_of_next_day.to_datetime + 1.day)
           expect(f('.event-details-timestring .date-range').text).to eq("#{original_day_text} - #{extended_day_text}")
+        end
+
+        it "allows dropping onto the minical" do
+          # fullcalendar drop onto minical doesn't work under webpack. We should figure out why...
+          pending("fullcalendar drop onto minical doesn't work under webpack") if CANVAS_WEBPACK
+
+          event = make_event(start: @initial_time)
+          load_month_view
+          quick_jump_to_date(@initial_time_str)
+
+          drag_and_drop_element(f('.calendar .fc-event'), fj("#minical .fc-day-number[data-date=#{@one_day_later_str}]"))
+          keep_trying_until { fj("#minical .fc-bg .fc-day.event[data-date=#{@one_day_later_str}]") }
+          wait_for_ajaximations
+
+          event.reload
+          expect(event.start_at).to eq(@one_day_later)
         end
       end
 

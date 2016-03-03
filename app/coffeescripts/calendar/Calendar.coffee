@@ -411,7 +411,7 @@ define [
       originalEnd = fcUtil.clone(event.end)
       @copyYMD(event.start, date)
       @copyYMD(event.end, date)
-      @_eventDrop(event, 0, false, =>
+      @_eventDrop(event, moment.duration(event.start.diff(originalStart)).asMinutes(), false, =>
         event.start = originalStart
         event.end = originalEnd
         @updateEvent(event)
