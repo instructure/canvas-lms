@@ -371,6 +371,7 @@ class AssignmentsController < ApplicationController
   end
 
   def edit
+    js_env(Services::RichContent.env_for(@domain_root_account, risk_level: :highrisk))
     @assignment ||= @context.assignments.active.find(params[:id])
     if authorized_action(@assignment, @current_user, @assignment.new_record? ? :create : :update)
       @assignment.title = params[:title] if params[:title]

@@ -5,6 +5,7 @@ define [
   'underscore'
   'jquery'
   'wikiSidebar'
+  'jsx/shared/rce/RichContentEditor'
   'jst/assignments/EditView'
   'compiled/userSettings'
   'compiled/models/TurnitinSettings'
@@ -20,9 +21,12 @@ define [
   'jqueryui/dialog'
   'jquery.toJSON'
   'compiled/jquery.rails_flash_notifications'
-], (INST, I18n, ValidatedFormView, _, $, wikiSidebar, template,
+], (INST, I18n, ValidatedFormView, _, $, wikiSidebar, RichContentEditor, template,
 userSettings, TurnitinSettings, TurnitinSettingsDialog, preventDefault, MissingDateDialog,
 AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly, RCEKeyboardShortcuts) ->
+
+  richContentEditor = new RichContentEditor({riskLevel: "highrisk", sidebar: wikiSidebar})
+  richContentEditor.preloadRemoteModule()
 
   class EditView extends ValidatedFormView
 
@@ -248,19 +252,17 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly, RCEKeyboardSho
         submissionTypesFrozen: _.include(data.frozenAttributes, 'submission_types')
 
     _attachEditorToDescription: =>
-      @$description.editorBox()
+      richContentEditor.loadNewEditor(@$description)
       $('.rte_switch_views_link').click (e) =>
         e.preventDefault()
-        @$description.editorBox 'toggle'
+        richContentEditor.callOnRCE(@$description, 'toggle')
         # hide the clicked link, and show the other toggle link.
         $(e.currentTarget).siblings('.rte_switch_views_link').andSelf().toggle()
 
     _initializeWikiSidebar: =>
-      # $("#sidebar_content").hide()
-      unless wikiSidebar.inited
-        wikiSidebar.init()
-        $.scrollSidebar()
-      wikiSidebar.attachToEditor(@$description).show()
+      richContentEditor.initSidebar()
+      $.scrollSidebar()
+      richContentEditor.attachSidebarTo(@$description)
 
     addTinyMCEKeyboardShortcuts: =>
       keyboardShortcutsView = new RCEKeyboardShortcuts()
