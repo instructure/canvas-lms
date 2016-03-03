@@ -716,7 +716,8 @@ describe Api do
       let(:collection) { [1, 2, 3] }
 
       it "should not raise Folio::InvalidPage for pages past the end" do
-        expect(Api.paginate(collection, controller, 'example.com', page: collection.size + 1, per_page: 1)).
+        controller = stub('controller', request: request, response: response, params: {per_page: 1})
+        expect(Api.paginate(collection, controller, 'example.com', page: collection.size + 1)).
           to eq []
       end
 
@@ -736,6 +737,42 @@ describe Api do
       it "should raise Folio::InvalidPage for non-integer pages" do
         expect{ Api.paginate(collection, controller, 'example.com', page: 'abc') }.
           to raise_error(Folio::InvalidPage)
+      end
+    end
+
+    describe "page size limits" do
+      let(:collection) { (1..101).to_a }
+
+      context "with no max_per_page argument" do
+        it "should limit to the default max_per_page" do
+          controller = stub('controller', request: request, response: response, params: {per_page: Api.max_per_page + 5})
+          expect(Api.paginate(collection, controller, 'example.com').size).
+            to eq Api.max_per_page
+        end
+      end
+
+      context "with no per_page parameter" do
+        it "should limit to the default per_page" do
+          controller = stub('controller', request: request, response: response, params: {})
+          expect(Api.paginate(collection, controller, 'example.com').size).
+            to eq Api.per_page
+        end
+      end
+
+      context "with per_page parameter > max_per_page argument" do
+        let(:controller) { stub('controller', request: request, response: response, params: {per_page: 100}) }
+        it "should take the smaller of the max_per_page arugment and the per_page param" do
+          expect(Api.paginate(collection, controller, 'example.com', {max_per_page: 75}).size).
+            to eq 75
+        end
+      end
+
+      context "with per_page parameter < max_per_page argument" do
+        let(:controller) { stub('controller', request: request, response: response, params: {per_page: 75}) }
+        it "should take the smaller of the max_per_page arugment and the per_page param" do
+          expect(Api.paginate(collection, controller, 'example.com', {max_per_page: 100}).size).
+            to eq 75
+        end
       end
     end
   end

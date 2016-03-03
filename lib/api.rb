@@ -257,10 +257,14 @@ module Api
     Setting.get('api_max_per_page', '50').to_i
   end
 
+  def self.per_page
+    Setting.get('api_per_page', '10').to_i
+  end
+
   def self.per_page_for(controller, options={})
-    per_page = controller.params[:per_page] || options[:default] || Setting.get('api_per_page', '10')
+    per_page_requested = controller.params[:per_page] || options[:default] || per_page
     max = options[:max] || max_per_page
-    [[per_page.to_i, 1].max, max.to_i].min
+    [[per_page_requested.to_i, 1].max, max.to_i].min
   end
 
   # Add [link HTTP Headers](http://www.w3.org/Protocols/9707-link-header.html) for pagination
