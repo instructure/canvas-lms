@@ -709,24 +709,36 @@ module ApplicationHelper
 
   def get_global_includes
     return @global_includes if defined?(@global_includes)
-    chain = (@domain_root_account || Account.site_admin).account_chain(include_site_admin: true).reverse
-    @global_includes = chain.map(&:global_includes_hash)
-    if @domain_root_account.try(:sub_account_includes?)
+    @global_includes = if @domain_root_account.try(:sub_account_includes?)
       # get the deepest account to start looking for branding
       if (acct = Context.get_account(@context))
+
+        # cache via the id because it could be that the root account js changes
+        # but the cache is for the sub-account, and we'd rather have everything
+        # reset after 15 minutes then have some places update immediately and
+        # some places wait.
         key = [acct.id, 'account_context_global_includes'].cache_key
-        includes = Rails.cache.fetch(key, :expires_in => 15.minutes) do
-          acct.account_chain.reverse.map(&:global_includes_hash)
+        Rails.cache.fetch(key, :expires_in => 15.minutes) do
+          acct.account_chain(include_site_admin: true).
+            reverse.map(&:global_includes_hash)
         end
-        @global_includes.concat(includes)
       elsif @current_user.present?
-        key = [@domain_root_account.id, 'common_account_global_includes', @current_user.id].cache_key
-        includes = Rails.cache.fetch(key, :expires_in => 15.minutes) do
-          @current_user.common_account_chain(@domain_root_account).map(&:global_includes_hash)
+        key = [
+          @domain_root_account.id,
+          'common_account_global_includes',
+          @current_user.id
+        ].cache_key
+        Rails.cache.fetch(key, :expires_in => 15.minutes) do
+          chain = @domain_root_account.account_chain(include_site_admin: true).reverse
+          chain.concat(@current_user.common_account_chain(@domain_root_account))
+          chain.uniq.map(&:global_includes_hash)
         end
-        @global_includes.concat(includes)
       end
     end
+
+    @global_includes ||= (@domain_root_account || Account.site_admin).
+      account_chain(include_site_admin: true).
+      reverse.map(&:global_includes_hash)
     @global_includes.uniq!
     @global_includes.compact!
     @global_includes
