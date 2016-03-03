@@ -1270,6 +1270,7 @@ class Assignment < ActiveRecord::Base
     group, students = group_students(original_student)
     homeworks = []
     primary_homework = nil
+    ts = Time.now.to_s
     submitted = case opts[:submission_type]
                 when "online_text_entry"
                   opts[:body].present?
@@ -1468,23 +1469,9 @@ class Assignment < ActiveRecord::Base
         json.merge! provisional_grade.grade_attributes
       end
 
-      if grade_as_group?
-        group_id = (provisional_grade || sub).group_id
-        json[:submission_comments] = unique_comments(group_id)
-          .as_json(
-            :include_root => false,
-            :methods => submission_comment_methods,
-            :only => comment_fields
-          )
-      else
-        json[:submission_comments] = (provisional_grade || sub)
-          .comments_for(@current_user)
-          .as_json(
-            :include_root => false,
-            :methods => submission_comment_methods,
-            :only => comment_fields
-          )
-      end
+      json[:submission_comments] = (provisional_grade || sub).submission_comments.as_json(:include_root => false,
+                                                                                          :methods => submission_comment_methods,
+                                                                                          :only => comment_fields)
 
       json['attachments'] = sub.attachments.map{|att| att.as_json(
           :only => [:mime_class, :comment_id, :id, :submitter_id ]
@@ -2248,15 +2235,4 @@ class Assignment < ActiveRecord::Base
     self.discussion_topic.relock_modules! if self.discussion_topic
     self.quiz.relock_modules! if self.quiz
   end
-
-  private
-
-  def unique_comments(group_id)
-    submissions.where(group_id: group_id)
-      .map(&:submission_comments)
-      .flatten
-      .uniq { |comment| [comment.author_id, comment.comment] }
-      .sort_by(&:updated_at)
-  end
-
 end
