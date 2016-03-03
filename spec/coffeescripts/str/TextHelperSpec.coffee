@@ -38,3 +38,6 @@ define [ 'compiled/str/TextHelper' ], ({delimit, truncateText, formatMessage}) -
   test 'truncateText: should break up the first word if it exceeds max', ->
     equal truncateText("zomgzomg", max: 6), "zom..."
     equal truncateText("zomgzomg", max: 7), "zomg..."
+
+  test 'formatMessage: prepends http:// to a link to example.com/things', ->
+    equal formatMessage('example.com/things'), "<a href='http:&#x2F;&#x2F;example.com&#x2F;things'>example.com&#x2F;things</a>"
