@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 describe Assignment do
   before :once do
     course_with_teacher(active_all: true)
-    student_in_course(active_all: true, user_name: "some user")
+    student_in_course(active_all: true, user_name: 'a student')
   end
 
   it "should create a new instance given valid attributes" do
@@ -2647,6 +2647,122 @@ describe Assignment do
   end
 
   describe "speed_grader_json" do
+    context "create and publish a course with 2 students " do
+      let_once(:student_A) do
+        course_with_student(course: @course, user_name: "Student A")
+        @student
+      end
+      let_once(:student_B) do
+        course_with_student(course: @course, user_name: "Student B")
+        @student
+      end
+      let_once(:teacher) do
+        course_with_teacher(course: @course, user_name: "an teacher")
+        @teacher
+      end
+
+      context "add students to the group" do
+        let(:category) { @course.group_categories.create! name: "Assignment Groups" }
+        let(:assignment) do
+          @course.assignments.create!(
+            group_category_id: category.id,
+            grade_group_students_individually: false,
+            submission_types: %w(text_entry)
+          )
+        end
+        let(:homework_params) do
+          {
+            submission_type: 'online_text_entry',
+            body: 'blah',
+            comment: 'a group comment during submission from student A',
+            group_comment: true
+          }.freeze
+        end
+        let(:comment_two_to_group_params) do
+          {
+            comment: 'a group comment from student A',
+            user_id:  student_A.id,
+            group_comment: true
+          }.freeze
+        end
+        let(:comment_three_to_group_params) do
+          {
+            comment: 'a group comment from student B',
+            user_id:  student_B.id,
+            group_comment: true
+          }.freeze
+        end
+        let(:comment_four_private_params) do
+          {
+            comment: 'a private comment from student A',
+            user_id:  student_A.id,
+          }.freeze
+        end
+        let(:comment_five_private_params) do
+          {
+            comment: 'a private comment from student B',
+            user_id:  student_B.id,
+          }.freeze
+        end
+        let(:comment_six_to_group_params) do
+          {
+            comment: 'a group comment from teacher',
+            user_id:  teacher.id,
+            group_comment: true
+          }.freeze
+        end
+        let(:comment_seven_private_params) do
+          {
+            comment: 'a private comment from teacher',
+            user_id:  teacher.id,
+          }.freeze
+        end
+
+        before do
+          group = category.groups.create!(name: 'a group', context: @course)
+          group.add_user(student_A)
+          group.add_user(student_B)
+          assignment.submit_homework(student_A, homework_params.dup)
+          assignment.update_submission(student_A, comment_two_to_group_params.dup)
+          assignment.update_submission(student_A, comment_three_to_group_params.dup)
+          assignment.update_submission(student_A, comment_four_private_params.dup)
+          assignment.update_submission(student_A, comment_five_private_params.dup)
+          assignment.update_submission(student_A, comment_six_to_group_params.dup)
+          assignment.update_submission(student_A, comment_seven_private_params.dup)
+        end
+
+        it "only shows group comments" do
+          json = assignment.speed_grader_json(@user)
+          comments = json.fetch(:submissions).first.fetch(:submission_comments).map do |comment|
+            comment.slice(:author_id, :comment)
+          end
+          expect(comments).to include({
+            "author_id" => student_A.id,
+            "comment" => homework_params.fetch(:comment)
+          },{
+            "author_id" => comment_two_to_group_params.fetch(:user_id),
+            "comment" => comment_two_to_group_params.fetch(:comment)
+          },{
+            "author_id" => comment_three_to_group_params.fetch(:user_id),
+            "comment" => comment_three_to_group_params.fetch(:comment)
+          },{
+            "author_id" => comment_six_to_group_params.fetch(:user_id),
+            "comment" => comment_six_to_group_params.fetch(:comment)
+          })
+          expect(comments).not_to include({
+            "author_id" => comment_four_private_params.fetch(:user_id),
+            "comment" => comment_four_private_params.fetch(:comment)
+          },{
+            "author_id" => comment_five_private_params.fetch(:user_id),
+            "comment" => comment_five_private_params.fetch(:comment)
+          },{
+            "author_id" => comment_seven_private_params.fetch(:user_id),
+            "comment" => comment_seven_private_params.fetch(:comment)
+          })
+        end
+      end
+    end
+
     it "should include comments' created_at" do
       setup_assignment_with_homework
       @submission = @assignment.submissions.first
