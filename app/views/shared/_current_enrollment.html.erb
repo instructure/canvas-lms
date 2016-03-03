@@ -42,10 +42,14 @@
         <%= "course-list-not-favoritable" unless @show_star_column %>">
         <% if show_link %><a href="<%= course_path(current_enrollment.course_id) %>"><% end %>
         <span class="name">
-          <%= current_enrollment.long_name %>
+          <%= current_enrollment.course.name %>
         </span>
         <% if show_link %></a>
         <% end %>
+      </td>
+
+      <td class="course-list-no-left-border course-list-nickname-column">
+        <%= current_enrollment.course.nickname_for(@current_user, nil) %>
       </td>
 
       <td class="course-list-no-left-border course-list-term-column">

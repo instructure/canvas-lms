@@ -10,16 +10,19 @@
     color: $ic-color-icon-disabled;
   }
   .course-list-term-column,
-  .course-list-enrolled-as-column,
-  .course-list-published-column {
-    width: 16%;
+  .course-list-enrolled-as-column {
+    width: 15%;
+  }
+.course-list-published-column {
+    width: 7%;
+  }
+  .course-list-nickname-column {
+    width: 25%;
   }
   .course-list-course-title-column,
-  .course-list-not-favoritable {
-    width: 49%;
-  }
+  .course-list-not-favoritable,
   .course-list-group-column {
-    width: 32%;
+    width: 35%;
   }
 
   .course-list-no-left-border {
