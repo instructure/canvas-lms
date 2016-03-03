@@ -1278,6 +1278,65 @@ describe "context modules" do
       expect(f('.points_possible_display').text).to include_text "10 pts"
     end
   end
+  context 'edit inline items on module page' do
+    before(:once) do
+      course(:active_course => true)
+      @course.context_modules.create! name: 'Module 2'
+      @mod = @course.context_modules.first
+    end
+
+    before(:each) do
+      course_with_teacher_logged_in(:course => @course, :active_enrollment => true)
+    end
+
+    it 'edit text header module item inline', priority: "2", test_id: 132487 do
+      @mod.add_item(title: 'EditMe text header', type: 'sub_header')
+      go_to_modules
+      verify_edit_item_form
+    end
+
+    it 'edit assignment module item inline', priority: "2", test_id: 132485 do
+      @edit_assignment = Assignment.create!(context: @course, title: 'EditMe Assignment')
+      @mod.add_item(type: 'assignment', id: @edit_assignment.id)
+      go_to_modules
+      verify_edit_item_form
+    end
+
+    it 'edit quiz module item inline', priority: "2", test_id: 132486 do
+      @edit_quiz = Quizzes::Quiz.create!(context: @course, title: 'EditMe Quiz')
+      @mod.add_item(type: 'quiz', id: @edit_quiz.id)
+      go_to_modules
+      verify_edit_item_form
+    end
+
+    it 'edit content page module item inline', priority: "2", test_id: 132491 do
+      @edit_page = @course.wiki.wiki_pages.create!(title: 'EditMe Page')
+      @mod.add_item(type: 'wiki_page', id: @edit_page.id)
+      go_to_modules
+      verify_edit_item_form
+    end
+
+    it 'edit discussion module item inline', priority: "2", test_id: 132490 do
+      @edit_discussion = @course.discussion_topics.create!(title: 'EditMe Discussion')
+      @mod.add_item(type: 'discussion_topic', id: @edit_discussion.id)
+      go_to_modules
+      verify_edit_item_form
+    end
+
+    it 'edit external tool module item inline', priority: "2", test_id: 132488 do
+      @edit_tool = @course.context_external_tools.create! name: 'WHAT', consumer_key: 'what', shared_secret: 'what', url: 'http://what.example.org'
+      @mod.add_item(title: 'EditMe Tool', type: 'external_tool', id: @edit_tool.id, url: 'http://what.example.org/')
+      go_to_modules
+      verify_edit_item_form
+    end
+
+    it 'edit external URL module item inline', priority: "2", test_id: 132489 do
+      go_to_modules
+      add_new_external_item('External URL', 'www.google.com', 'Google')
+      verify_edit_item_form
+    end
+  end
+
   describe "files" do
     FILE_NAME = 'some test file'
 
@@ -1326,6 +1385,12 @@ describe "context modules" do
       get "/courses/#{@course.id}/files/folder/unfiled"
       icon_class = 'icon-files-copyright'
       expect(f(".UsageRightsIndicator__openModal i.#{icon_class}")).to be_displayed
+    end
+
+    it 'edit file module item inline', priority: "2", test_id: 132492 do
+      get "/courses/#{@course.id}/modules"
+      add_existing_module_item('#attachments_select', 'File', FILE_NAME)
+      verify_edit_item_form
     end
   end
 
