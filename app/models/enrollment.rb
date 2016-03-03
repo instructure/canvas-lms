@@ -677,17 +677,37 @@ class Enrollment < ActiveRecord::Base
       self.restrict_past_view? ? :inactive : :completed
     elsif self.fake_student? # Allow student view students to use the course before the term starts
       state
-    elsif view_restrictable? && !self.restrict_future_view?
-      self.available_at = global_start_at
-      if state == :active
-        # an accepted enrollment state means they still can't participate yet,
-        # but should be able to view just like an invited enrollment
-        :accepted
-      else
-        state
-      end
     else
-      :inactive
+      self.available_at = global_start_at
+      if view_restrictable? && !self.restrict_future_view?
+        if state == :active
+          # an accepted enrollment state means they still can't participate yet,
+          # but should be able to view just like an invited enrollment
+          :accepted
+        else
+          state
+        end
+      else
+        :inactive
+      end
+    end
+  end
+
+  def readable_state_based_on_date
+    # when view restrictions are in place, the effective state_based_on_date is :inactive, but
+    # to admins we should show that they are :completed or :pending
+
+    if state == :completed || ([:invited, :active].include?(state) && self.course.completed?)
+      :completed
+    else
+      date_state = state_based_on_date
+      if self.available_at
+        :pending
+      elsif self.soft_completed_at
+        :completed
+      else
+        date_state
+      end
     end
   end
 
@@ -855,10 +875,6 @@ class Enrollment < ActiveRecord::Base
       when 'inactive'
         t('#enrollment.workflow.inactive', "Inactive")
     end
-  end
-
-  def workflow_readable_type
-    Enrollment.workflow_readable_type(self.workflow_state)
   end
 
   def readable_role_name
