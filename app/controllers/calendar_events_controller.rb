@@ -18,6 +18,7 @@
 
 class CalendarEventsController < ApplicationController
   before_filter :require_context
+  before_filter :rich_content_service_config, only: [:new, :edit]
 
   add_crumb(proc { t(:'#crumbs.calendar_events', "Calendar Events")}, :only => [:show, :new, :edit]) { |c| c.send :calendar_url_for, c.instance_variable_get("@context") }
 
@@ -111,4 +112,8 @@ class CalendarEventsController < ApplicationController
     end
   end
 
+  protected
+  def rich_content_service_config
+    js_env(Services::RichContent.env_for(@domain_root_account, risk_level: :sidebar))
+  end
 end
