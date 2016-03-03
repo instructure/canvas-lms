@@ -142,7 +142,7 @@
     overflow: hidden;
     border-radius: 100%;
     border: 2px solid $ic-brand-global-nav-avatar-border;
-    width: $ic-sp*4; height: $ic-sp*4;
+    width: 50px; height: 50px;
     box-sizing: border-box;
     display: inline-block;
     vertical-align: middle;
@@ -296,18 +296,49 @@
   }
 
   .ReactTray__header {
-    display: flex;
-    align-items: center;
     border-bottom: 1px solid $ic-border-light;
-    padding-bottom: $ic-sp;
     margin-bottom: $ic-sp;
+
+    &:not(.ReactTray__header--is-profile) {
+      padding-bottom: $ic-sp;
+      display: flex;
+      align-items: flex-start;
+
+      .ReactTray__headline {
+        flex: 1;
+        min-width: 1px;
+      }
+
+    }
+
+    &.ReactTray__header--is-profile {
+      text-align: center;
+      padding-bottom: $ic-sp*2;
+
+      .ic-avatar {
+        border: none;
+        background-color: $ic-bg-light-neutral;
+        width: 72px; height: 72px;
+      }
+    }
+
+  }
+
+  .ReactTray-profile-header-avatar-image {
+    min-width: 72px; min-height: 72px;
+  }
+
+  .ReactTray-profile-header-close { text-align: right; }
+
+  .ReactTray-profile-header-logout-form {
+    margin-top: $ic-sp;
+    margin-bottom: 0;
   }
 
   .ReactTray__headline {
+    @include fontSize(21px);
     box-sizing: border-box;
     margin: 0;
-    line-height: 1.1;
-    flex: 1;
   }
 
   .ReactTray-list-item__helper-text {
