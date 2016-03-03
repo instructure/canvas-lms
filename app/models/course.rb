@@ -1645,6 +1645,7 @@ class Course < ActiveRecord::Base
       e.start_at = start_at
       e.end_at = end_at
       if e.changed?
+        e.need_touch_user = true if opts[:skip_touch_user]
         transaction do
           # without this, inserting/updating on enrollments will share lock the course, but then
           # it tries to touch the course, which will deadlock with another transaction doing the

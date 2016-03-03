@@ -69,7 +69,7 @@ class Enrollment < ActiveRecord::Base
   after_save :update_assignment_overrides_if_needed
   after_destroy :update_assignment_overrides_if_needed
 
-  attr_accessor :already_enrolled, :available_at, :soft_completed_at
+  attr_accessor :already_enrolled, :available_at, :soft_completed_at, :need_touch_user
   attr_accessible :user, :course, :workflow_state, :course_section, :limit_privileges_to_course_section, :already_enrolled, :start_at, :end_at
 
   scope :current, -> { joins(:course).where(QueryBuilder.new(:active).conditions).readonly(false) }
