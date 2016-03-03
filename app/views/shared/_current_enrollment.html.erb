@@ -35,46 +35,53 @@
             <%= tooltip_message %>
           </span>
         </span>
-
       </td>
       <% end %>
-      <td class="course-list-course-title-column ellipsis
+      <td class="course-list-course-title-column
         <%= "course-list-no-left-border" if @show_star_column %>
         <%= "course-list-not-favoritable" unless @show_star_column %>">
         <% if show_link %><a href="<%= course_path(current_enrollment.course_id) %>"><% end %>
-        <span class="name" title="<%= current_enrollment.long_name %>">
+        <span class="name">
           <%= current_enrollment.long_name %>
         </span>
+        <% if show_link %></a>
+        <% end %>
+      </td>
 
-        <% unless current_enrollment.course.enrollment_term.default_term? %>
-          <span class="subtitle ellipsis course-list-term"><%= current_enrollment.course.enrollment_term.name %></span>
-        <% end %>
-        <% if show_link %></a><% end %>
+      <td class="course-list-no-left-border course-list-term-column">
+      <% if current_enrollment.course.enrollment_term.default_term? %>
+        <span class="screenreader-only"><%= current_enrollment.course.enrollment_term.name %></span>
+      <% else %>
+        <%= current_enrollment.course.enrollment_term.name %>
+      <% end %>
       </td>
-      <td class="course-list-unpublished-column course-list-no-left-border">
-        <% if current_enrollment.course.created? || current_enrollment.course.claimed? %>
-            <span data-tooltip title="<%= t('unpublished_course_tooltip', "This course has not been published. Students should contact the course instructor for access.") %>"
-             class="label label-hollow"><%= t('unpublished_course', "unpublished") %></span>
-             <span class="screenreader-only"><%= t('unpublished_course_tooltip', "This course has not been published. Students should contact the course instructor for access.") %></span>
-        <% end %>
-      </td>
-      <td class="course-list-enrolled-as-column course-list-no-left-border">
+
+      <td class="course-list-no-left-border course-list-enrolled-as-column">
         <%
-           message = t('enrolled_as_student', "Enrolled as a student")
+           message = t('enrolled_as_student', "Student")
            case current_enrollment.type
            when 'TeacherEnrollment'
-             message = t('enrolled_as_teacher', "Enrolled as a teacher")
+             message = t('enrolled_as_teacher', "Teacher")
            when 'TaEnrollment'
-             message = t('enrolled_as_ta', "Enrolled as a TA")
+             message = t('enrolled_as_ta', "TA")
            when 'ObserverEnrollment'
-             message = t('enrolled_as_observer', "Enrolled as an observer")
+             message = t('enrolled_as_observer', "Observer")
            when 'DesignerEnrollment'
-             message = t('enrolled_as_designer', "Enrolled as a designer")
+             message = t('enrolled_as_designer', "Designer")
            end
         %>
-        <span class="subtitle ellipsis"><%= message %></span>
+        <%= message %>
       </td>
 
+      <td class="course-list-no-left-border course-list-published-column ">
+        <% if current_enrollment.course.created? || current_enrollment.course.claimed? %>
+            <span data-tooltip title="<%= t('unpublished_course_tooltip', "This course has not been published. Students should contact the course instructor for access.") %>"><%= t('unpublished_course', "No") %></span>
+             <span class="screenreader-only"><%= t('unpublished_course_tooltip', "This course has not been published. Students should contact the course instructor for access.") %></span>
+        <% else %>
+            <span data-tooltip title="<%= t('published_course_tooltip', "This course has been published.") %>"><%= t('published_course', "Yes") %></span>
+             <span class="screenreader-only"><%= t('published_course_tooltip', "This course has been published.") %></span>
+        <% end %>
+      </td>
 
 <% end %>
 <% unless dashboard %>

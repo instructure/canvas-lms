@@ -1,66 +1,45 @@
 @import "base/environment";
 
-table.course-list-table {
-  &.table-layout-fixed { table-layout: fixed; }
-  td.course-list-star-column {
-    @if $use_new_styles {
-      color: $ic-color-icon-disabled;
-      width: $ic-sp*2;
-    }
-    @else {
-      padding-left: 15px;
-      width: 3%;
-      color: #eee;
-      text-shadow: -1px 0 #eee, 0 1px #eee, 1px 0 #eee, 0 -1px #eee;
-    }
+.course-list-table {
+  table-layout: fixed;
+  white-space: nowrap;
+
+  /* Column widths are based on these cells */
+  .course-list-star-column {
+    width: 3%;
+    color: $ic-color-icon-disabled;
   }
-  td.course-list-enrolled-as-column {
-    text-align: right;
-    padding-right: 15px;
-    @if $use_new_styles == false {
-      width: 20%;
-      font-style: italic;
-      @include fontSize(12px);
-    }
+  .course-list-term-column,
+  .course-list-enrolled-as-column,
+  .course-list-published-column {
+    width: 16%;
   }
-  td.course-list-course-title-column {
-    @if $use_new_styles { width: 45%; }
-    @else { width: 57%; }
+  .course-list-course-title-column,
+  .course-list-not-favoritable {
+    width: 49%;
   }
-  td.course-list-unpublished-column {
-    @if $use_new_styles == false { width: 20%; }
+  .course-list-group-column {
+    width: 32%;
   }
-  td.course-list-no-left-border {
+
+  .course-list-no-left-border {
     border-left: 0;
   }
-  .course-list-not-favoritable {
-    width: 60%;
-  }
+
   .course-list-table-row:hover {
-    @if $use_new_styles { background-color: $lightBackground; }
-    @else { background-color: #eee; }
+    background-color: $lightBackground;
   }
+}
+.course-list-table td {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .course-list-favorite-course {
-  @if $use_new_styles {
-    color: $ic-color-alert;
-  }
-  @else {
-    color: #ffdba1;
-    text-shadow: none;
-  }
+  color: $ic-color-alert;
 }
 
-.course-list-label-hollow {
-  background: none;
-  border: 2px solid #999;
-  color: #999;
-  text-shadow: none;
-}
-
-.course-list-term {
-  color: #555;
-  @include fontSize(12px);
-  font-style: italic;
+.content--hasMarginTop {
+  margin-top: $ic-sp*2;
 }
