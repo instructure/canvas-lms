@@ -106,6 +106,7 @@ span.agendaView--no-assignments {
     box-shadow: none;
     background: none;
     border-radius: 3px;
+    cursor: pointer;
     padding: $ic-sp/2;
 
     &:hover, &:focus {
