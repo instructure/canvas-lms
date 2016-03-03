@@ -436,6 +436,7 @@ define([
         var $section = $(this).data("section");
         $section.find(".uploading_file").text(I18n.t('errors.upload_failed', "Upload Failed."));
         $section.addClass('failed');
+        $(this).remove();
         $section.formErrors(data.errors || data);
       }
     });

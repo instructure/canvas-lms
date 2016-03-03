@@ -887,18 +887,24 @@ class FilesController < ApplicationController
           end
         end
         if params[:attachment][:uploaded_data]
-          success = @attachment.update_attributes(params[:attachment])
-          @attachment.errors.add(:base, t('errors.server_error', "Upload failed, server error, please try again.")) unless success
+          if Attachment.over_quota?(@context, params[:attachment][:uploaded_data].size)
+            @attachment.errors.add(:base, t('Upload failed, quota exceeded'))
+          else
+            success = @attachment.update_attributes(params[:attachment])
+            @attachment.errors.add(:base, t('errors.server_error', "Upload failed, server error, please try again.")) unless success
+          end
         else
           @attachment.errors.add(:base, t('errors.missing_field', "Upload failed, expected form field missing"))
         end
-        deleted_attachments = @attachment.handle_duplicates(duplicate_handling)
+        deleted_attachments = @attachment.handle_duplicates(duplicate_handling) if success
         unless @attachment.downloadable?
           success = false
-          if (params[:attachment][:uploaded_data].size == 0 rescue false)
-            @attachment.errors.add(:base, t('errors.empty_file', "That file is empty.  Please upload a different file."))
-          else
-            @attachment.errors.add(:base, t('errors.upload_failed', "Upload failed, please try again."))
+          unless @attachment.errors.any?
+            if (params[:attachment][:uploaded_data].size == 0 rescue false)
+              @attachment.errors.add(:base, t('errors.empty_file', "That file is empty.  Please upload a different file."))
+            else
+              @attachment.errors.add(:base, t('errors.upload_failed', "Upload failed, please try again."))
+            end
           end
           unless @attachment.new_record?
             @attachment.destroy rescue @attachment.delete
@@ -915,8 +921,8 @@ class FilesController < ApplicationController
           end
         else
           format.html { render :new }
-          format.json { render :json => @attachment.errors }
-          format.text { render :json => @attachment.errors }
+          format.json { render :json => @attachment.errors, :status => :bad_request }
+          format.text { render :json => @attachment.errors, :status => :bad_request }
         end
       end
     end

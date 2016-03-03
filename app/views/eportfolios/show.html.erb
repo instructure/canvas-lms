@@ -292,13 +292,13 @@
         <%= before_label(:file_upload, "Or upload a new file") %><br/>
         <%= file_field :attachment, :uploaded_data, :class => "file_upload", :style => "padding-left: 50px;" %>
         <div style="font-size: 0.8em; margin-left: 20px;">
-          <%= t("limit %{file_size_limit} per file",
+          <%= t("%{file_size_limit} user file quota applies",
                 file_size_limit: number_to_human_size(@current_user.quota)) %>
         </div>
       </div>
       <div class='button-container button-container-right-aligned'>
         <button type="button" class="upload_file_button btn btn-small"><%= t('buttons.upload_file', "Select/Upload File") %></button>
-        <button type="button" class="cancel_content_button btn button-secondary"><%= t('#buttons.cancel', "Cancel") %></button>
+        <button type="button" class="cancel_content_button btn btn-small"><%= t('#buttons.cancel', "Cancel") %></button>
       </div>
     </div>
     <div class="loading_submission" style="text-align: center;">
