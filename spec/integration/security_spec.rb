@@ -991,7 +991,14 @@ describe "security" do
         expect(response.body).to match /Copy this Course/
         expect(response.body).not_to match /Import Content into this Course/
         expect(response.body).to match /Export Course Content/
+        expect(response.body).to_not match /Delete this Course/
+
+        add_permission :change_course_state
+
+        get "/courses/#{@course.id}/details"
+        expect(response).to be_success
         expect(response.body).to match /Delete this Course/
+
         html = Nokogiri::HTML(response.body)
         expect(html.css('#course_account_id')).not_to be_empty
         expect(html.css('#course_enrollment_term_id')).not_to be_empty

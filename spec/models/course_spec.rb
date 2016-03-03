@@ -228,9 +228,9 @@ describe Course do
     it "should grant delete to the proper individuals" do
       @role1 = custom_account_role('managecourses', :account => Account.default)
       @role2 = custom_account_role('managesis', :account => Account.default)
-      account_admin_user_with_role_changes(:role => @role1, :role_changes => {:manage_courses => true})
+      account_admin_user_with_role_changes(:role => @role1, :role_changes => {:manage_courses => true, :change_course_state => true})
       @admin1 = @admin
-      account_admin_user_with_role_changes(:role => @role2, :role_changes => {:manage_sis => true})
+      account_admin_user_with_role_changes(:role => @role2, :role_changes => {:manage_sis => true, :change_course_state => true})
       @admin2 = @admin
       course_with_teacher(:active_all => true)
       @designer = user(:active_all => true)
@@ -281,6 +281,61 @@ describe Course do
       expect(@course.grants_right?(@ta, :delete)).to be_falsey
       expect(@course.grants_right?(@admin1, :delete)).to be_truthy
       expect(@course.grants_right?(@admin2, :delete)).to be_truthy
+    end
+
+    it "should not grant delete to anyone without :change_course_state rights" do
+      @role1 = custom_account_role('managecourses', :account => Account.default)
+      @role2 = custom_account_role('managesis', :account => Account.default)
+      account_admin_user_with_role_changes(:role => @role1, :role_changes => {:manage_courses => true})
+      @admin1 = @admin
+      account_admin_user_with_role_changes(:role => @role2, :role_changes => {:manage_sis => true})
+      @admin2 = @admin
+      course_with_teacher(:active_all => true)
+      @designer = user(:active_all => true)
+      @course.enroll_designer(@designer).accept!
+
+      Account.default.role_overrides.create!(:role => teacher_role, :permission => :change_course_state, :enabled => false)
+      Account.default.role_overrides.create!(:role => designer_role, :permission => :change_course_state, :enabled => false)
+
+      # active, non-sis course
+      expect(@course.grants_right?(@teacher, :delete)).to be_falsey
+      expect(@course.grants_right?(@designer, :delete)).to be_falsey
+      expect(@course.grants_right?(@admin1, :delete)).to be_falsey
+      expect(@course.grants_right?(@admin2, :delete)).to be_falsey
+
+      # active, sis course
+      @course.sis_source_id = 'sis_id'
+      @course.save!
+      [@course, @teacher, @designer, @admin1, @admin2].each(&:reload)
+
+      clear_permissions_cache
+      expect(@course.grants_right?(@teacher, :delete)).to be_falsey
+      expect(@course.grants_right?(@designer, :delete)).to be_falsey
+      expect(@course.grants_right?(@admin1, :delete)).to be_falsey
+      expect(@course.grants_right?(@admin2, :delete)).to be_falsey
+
+      # completed, non-sis course
+      @course.sis_source_id = nil
+      @course.complete!
+      [@course, @teacher, @designer, @admin1, @admin2].each(&:reload)
+
+      clear_permissions_cache
+      expect(@course.grants_right?(@teacher, :delete)).to be_falsey
+      expect(@course.grants_right?(@designer, :delete)).to be_falsey
+      expect(@course.grants_right?(@admin1, :delete)).to be_falsey
+      expect(@course.grants_right?(@admin2, :delete)).to be_falsey
+      @course.clear_permissions_cache(@user)
+
+      # completed, sis course
+      @course.sis_source_id = 'sis_id'
+      @course.save!
+      [@course, @teacher, @designer, @admin1, @admin2].each(&:reload)
+
+      clear_permissions_cache
+      expect(@course.grants_right?(@teacher, :delete)).to be_falsey
+      expect(@course.grants_right?(@designer, :delete)).to be_falsey
+      expect(@course.grants_right?(@admin1, :delete)).to be_falsey
+      expect(@course.grants_right?(@admin2, :delete)).to be_falsey
     end
 
     it "should grant reset_content to the proper individuals" do
