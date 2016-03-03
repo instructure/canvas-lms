@@ -492,9 +492,6 @@ class CoursesController < ApplicationController
   # @API Create a new course
   # Create a new course
   #
-  # @argument account_id [Required, Integer]
-  #   The unique ID of the account to create to course under.
-  #
   # @argument course[name] [String]
   #   The name of the course. If omitted, the course will be named "Unnamed
   #   Course."
@@ -1896,7 +1893,7 @@ class CoursesController < ApplicationController
   # editable through this endpoint will be "syllabus_body"
   #
   # @argument course[account_id] [Integer]
-  #   The unique ID of the account to create to course under.
+  #   The unique ID of the account to move the course to.
   #
   # @argument course[name] [String]
   #   The name of the course. If omitted, the course will be named "Unnamed
