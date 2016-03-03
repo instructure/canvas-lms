@@ -1949,6 +1949,15 @@ describe CoursesController, type: :request do
         expect(ta_users).not_to be_empty
       end
 
+      it "returns enrollments when filtering by enrollment_state" do
+        @ta.enrollments.each(&:conclude)
+
+        json = api_call(:get, api_url, api_route, :enrollment_state => ["completed"], :include => ["enrollments"], :search_term => "TAP")
+        ta_users = json.select{ |u| u["name"] == "TAPerson" }
+        expect(ta_users).not_to be_empty
+        expect(ta_users.first['enrollments']).to be_present
+      end
+
       it "returns active and invited enrollments if no enrollment state is given" do
         json = api_call(:get, api_url, api_route, :search_term => "TAP")
         ta_users = json.select{ |u| u["name"] == "TAPerson" }

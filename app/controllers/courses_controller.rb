@@ -839,7 +839,12 @@ class CoursesController < ApplicationController
         enrollment_scope = @context.enrollments.
           where(user_id: users).
           preload(:course)
-        enrollment_scope = include_inactive ? enrollment_scope.all_active_or_pending : enrollment_scope.active_or_pending
+
+        if search_params[:enrollment_state]
+          enrollment_scope = enrollment_scope.where(:workflow_state => search_params[:enrollment_state])
+        else
+          enrollment_scope = include_inactive ? enrollment_scope.all_active_or_pending : enrollment_scope.active_or_pending
+        end
         enrollments_by_user = enrollment_scope.group_by(&:user_id)
       end
       render :json => users.map { |u|
