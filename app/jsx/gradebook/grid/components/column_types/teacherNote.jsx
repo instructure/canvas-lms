@@ -8,13 +8,15 @@ define([
   'jsx/gradebook/grid/actions/customColumnsActions',
   'react-modal',
   'jsx/gradebook/grid/constants',
+  'compiled/gradebook2/GradebookHelpers',
   'compiled/jquery.rails_flash_notifications'
-], function(React, _, $, I18n, Reflux, GradebookToolbarStore, CustomColumnsActions, Modal, GradebookConstants) {
+], function(React, _, $, I18n, Reflux, GradebookToolbarStore,
+  CustomColumnsActions, Modal, GradebookConstants, GradebookHelpers) {
 
   const modalOverrides = {
     overlay : {
       backgroundColor: 'rgba(0,0,0,0.5)'
-    },  
+    },
     content : {
       position: 'static',
       top: '0',
@@ -54,18 +56,12 @@ define([
       this.setState({ showModal: false, content: this.props.note });
     },
 
-    noErrorsOnPage() {
-      return $('.ic-flash-error').length === 0;
-    },
-
     updateContent(event) {
-      var newContent = event.target.value,
-        maxLength  = GradebookConstants.MAX_NOTE_LENGTH;
-
-      if (newContent.length <= maxLength) {
-        this.setState({ content: event.target.value });
-      } else if(this.noErrorsOnPage()) {
-        $.flashError(I18n.t('Note length cannot exceed %{maxLength} characters.', { maxLength: maxLength }));
+      let newNote = event.target.value;
+      if (GradebookHelpers.textareaIsLessThanOrEqualToMaxLength(newNote.length)) {
+        this.setState({ content: newNote });
+      } else if(GradebookHelpers.maxLengthErrorShouldBeShown(newNote.length)) {
+        GradebookHelpers.flashMaxLengthError();
       }
     },
 

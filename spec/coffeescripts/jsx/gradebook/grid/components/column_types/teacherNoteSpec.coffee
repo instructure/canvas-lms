@@ -4,8 +4,10 @@ define [
   'jsx/gradebook/grid/components/column_types/teacherNote'
   'react-modal'
   'helpers/fakeENV'
-  'jsx/gradebook/grid/constants',
-], (React, _, TeacherNote, Modal, fakeENV, GradebookConstants) ->
+  'jsx/gradebook/grid/constants'
+  'compiled/gradebook2/GradebookHelpers'
+], (React, _, TeacherNote, Modal, fakeENV, GradebookConstants,
+  GradebookHelpers) ->
 
   TestUtils = React.addons.TestUtils
   Simulate = TestUtils.Simulate
@@ -67,35 +69,31 @@ define [
 
     deepEqual title, 'Notes for student (name hidden)'
 
-  test '#updateContent sets the new content if it is an appropriate length', ->
-    component = renderComponent()
-    newNote = 'I am less than 255 characters.'
-    fakeEvent = { target: { value: newNote } }
-    component.updateContent(fakeEvent)
-
-    deepEqual component.state.content, newNote
-
-  test '#updateContent shows an error message if the new content is too long', ->
+  test '#updateContent shows an error message if the new content greater than the max allowed length', ->
     component = renderComponent()
     flashError = @stub($, 'flashError')
-    newNote = 'I am more than 255 characters. I am more than 255 characters.
-      I am more than 255 characters. I am more than 255 characters. I am more than 255 characters.
-      I am more than 255 characters. I am more than 255 characters. I am more than 255 characters.
-      I am more than 255 characters. '
+    newNote = 'a'.repeat(GradebookConstants.MAX_NOTE_LENGTH + 1)
     fakeEvent = { target: { value: newNote } }
     component.updateContent(fakeEvent)
 
     ok flashError.called
     deepEqual component.state.content, 'Great work!'
 
+  test '#updateContent does not show an error message if the new content is exactly the max allowed length', ->
+    component = renderComponent()
+    flashError = @stub($, 'flashError')
+    newNote = 'a'.repeat(GradebookConstants.MAX_NOTE_LENGTH)
+    fakeEvent = { target: { value: newNote } }
+    component.updateContent(fakeEvent)
+
+    notOk flashError.called
+    deepEqual component.state.content, newNote
+
   test '#updateContent does not show an error message if the new content is too long, but an error is already showing', ->
     component = renderComponent()
     flashError = @stub($, 'flashError')
-    @stub(component, 'noErrorsOnPage', -> false)
-    newNote = 'I am more than 255 characters. I am more than 255 characters.
-      I am more than 255 characters. I am more than 255 characters. I am more than 255 characters.
-      I am more than 255 characters. I am more than 255 characters. I am more than 255 characters.
-      I am more than 255 characters. '
+    @stub(GradebookHelpers, 'noErrorsOnPage', -> false)
+    newNote = 'a'.repeat(GradebookConstants.MAX_NOTE_LENGTH + 1)
     fakeEvent = { target: { value: newNote } }
     component.updateContent(fakeEvent)
 
