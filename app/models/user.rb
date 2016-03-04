@@ -2050,7 +2050,11 @@ class User < ActiveRecord::Base
       group_admin_courses.each do |c|
         context_groups += c.active_groups
       end
-      self.courses + (self.groups.active + context_groups).uniq
+      active_courses = cached_current_enrollments(preload_dates: true, preload_courses: true).
+                       select(&:participating?).
+                       map(&:course).
+                       uniq
+      active_courses + (self.groups.active + context_groups).uniq
     end
   end
 

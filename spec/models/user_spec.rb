@@ -1676,6 +1676,17 @@ describe User do
         expect(events.first).to eq assignment2
       end
 
+      it "doesn't include events for enrollments that are inactive due to date" do
+        @enrollment.start_at = 1.day.ago
+        @enrollment.end_at = 2.days.from_now
+        @enrollment.save!
+        event = @course.calendar_events.create!(title: 'published', start_at: 4.days.from_now)
+        expect(@user.upcoming_events).to include(event)
+        Timecop.freeze(3.days.from_now) do
+          expect(User.find(@user).upcoming_events).not_to include(event) # re-find user to clear cached_contexts
+        end
+      end
+
       context "after db section context_code filtering" do
         before do
           course_with_teacher(:active_all => true)
