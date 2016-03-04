@@ -167,7 +167,7 @@ describe "quizzes" do
       keep_trying_until { expect(f("#quiz_display_points_possible .points_possible").text).to eq "2" }
     end
 
-    it "should not let you exceed the question limit", priority: "3", test_id: 210062 do
+    it "should not let you exceed the question limit", priority: "2", test_id: 210062 do
       get "/courses/#{@course.id}/quizzes/new"
 
       click_questions_tab

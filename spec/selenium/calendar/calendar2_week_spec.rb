@@ -65,7 +65,7 @@ describe "calendar2" do
         expect(f('.event-details-timestring')).to include_text("Due: #{due_date}")
       end
 
-      it "should show short events at full height", priority: "3", test_id: 767454 do
+      it "should show short events at full height", priority: "2", test_id: 767454 do
         noon = Time.now.at_beginning_of_day + 12.hours
         @course.calendar_events.create! :title => "ohai", :start_at => noon, :end_at => noon + 5.minutes
 
@@ -75,7 +75,7 @@ describe "calendar2" do
         expect(elt.size.height).to be >= 18
       end
 
-      it "should fix up the event's data-start for events after 11:30pm", priority: "3", test_id: 768979 do
+      it "should fix up the event's data-start for events after 11:30pm", priority: "2", test_id: 768979 do
         time = Time.zone.now.at_beginning_of_day + 23.hours + 45.minutes
         @course.calendar_events.create! title: 'ohai', start_at: time, end_at: time + 5.minutes
 
@@ -84,7 +84,7 @@ describe "calendar2" do
         expect(f('.fc-event .fc-time').attribute('data-start')).to eq('11:45')
       end
 
-      it "should stagger pseudo-overlapping short events", priority: "3", test_id: 768980 do
+      it "should stagger pseudo-overlapping short events", priority: "2", test_id: 768980 do
         noon = Time.now.at_beginning_of_day + 12.hours
         first_event = @course.calendar_events.create! :title => "ohai", :start_at => noon, :end_at => noon + 5.minutes
         second_start = first_event.start_at + 6.minutes
@@ -112,7 +112,7 @@ describe "calendar2" do
         expect(event.reload.end_at).to eql(noon + 1.hour + 5.minutes)
       end
 
-      it "doesn't change the time when dragging an event close to midnight", priority: "3", test_id: 768982 do
+      it "doesn't change the time when dragging an event close to midnight", priority: "2", test_id: 768982 do
         # Choose a fixed date to avoid periodic end-of-week failures
         close_to_midnight = Time.zone.parse('2015-1-1').beginning_of_day + 1.day - 20.minutes
 
