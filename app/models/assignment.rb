@@ -1933,8 +1933,8 @@ class Assignment < ActiveRecord::Base
     chain = api_needed_fields.
       where("(SELECT COUNT(id) FROM #{Submission.quoted_table_name}
             WHERE assignment_id = assignments.id
-            AND submission_type IS NOT NULL
-            AND user_id = ?) = 0", user_id).
+            AND (submission_type IS NOT NULL OR excused = ?)
+            AND user_id = ?) = 0", true, user_id).
       limit(limit).
       order("assignments.due_at")
 
