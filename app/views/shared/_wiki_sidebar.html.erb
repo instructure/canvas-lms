@@ -29,12 +29,12 @@
         <div id="pages_tab_panel" role="tabpanel">
             <ul class="wiki_pages page_list">
               <% (@wiki_sidebar_data[:wiki_pages]).each do |wiki_page|  %>
-                <% if can_do(@wiki, @current_user, :manage) || wiki_page.published? %>
+                <% if can_do(@wiki_sidebar_data[:wiki], @current_user, :manage) || wiki_page.published? %>
                   <li title="<%= t('insert.wiki_pages', %{Click to insert a link to this page}) %>"><%= link_to wiki_page.title, polymorphic_path([@context, wiki_page]), :role => "button"%></li>
                 <% end %>
               <% end %>
             </ul>
-            <% if can_do(@wiki, @current_user, :create_page) %>
+            <% if can_do(@wiki_sidebar_data[:wiki], @current_user, :create_page) %>
               <%= link_to t('links.new_page', "Link to a New Page"), "#", :id => 'new_page_link', :class => "add" %>
               <form id="new_page_drop_down" style="display:none; margin: 5px;">
                 <div class="row-fluid">
