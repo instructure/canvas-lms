@@ -4,40 +4,75 @@
 <% content_for :right_side do %>
 <% end %>
 
-<% css_bundle :context_list %>
+<% css_bundle :course_list %>
 
-
-<h2><%= t :heading_current_groups, 'Current Groups' %></h2>
-<%= t(:no_groups, "No Groups") if @current_groups.empty? %>
-<ul class="context_list">
-  <% @current_groups.each do |group| %>
-    <li>
-      <%= link_to group.name, group_path(group) %>
-      <span class="subtitle"><%= group.context.name %></span>
-      <% if group.context_type == 'Course' && !group.context.enrollment_term.default_term? %>
-        <span class="subtitle"><%= group.context.enrollment_term.name %></span>
-      <% end %>
-    </li>
+  <h2><%= t :heading_current_groups, 'Current Groups' %></h2>
+  <% if @current_groups.empty? %>
+    <%= t(:no_groups, "No Groups") %>
+  <% else %>
+    <table id="my_groups_table" <% if use_new_styles? %>class="ic-Table ic-Table--bordered" <% else %>class="table table-bordered current_groups course-list-table"<% end %> >
+      <thead>
+        <tr>
+          <th scope="col" class="course-list-group-column"><%= t ('Group') %></th>
+          <th scope="col" class="course-list-course-title-column course-list-no-left-border"><%= t ('Course') %></th>
+          <th scope="col" class="course-list-term-column course-list-no-left-border"><%= t ('Term') %></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @current_groups.each do |group| %>
+          <tr>
+            <td>
+              <%= link_to group.name, group_path(group) %>
+            </td>
+            <td class="course-list-no-left-border">
+              <span class="group-course-name"><%= group.context.name %></span>
+            </td>
+            <td class="course-list-no-left-border">
+              <% if group.context_type == 'Course' && !group.context.enrollment_term.default_term? %>
+               <%= group.context.enrollment_term.name %>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
   <% end %>
-</ul>
 
-<h2><%= t :heading_previous_groups, 'Previous Groups' %></h2>
-<%= t(:no_groups, "No Groups") if @previous_groups.empty? %>
-<ul class="context_list">
-  <% @previous_groups.each do |group| %>
-    <li>
-      <%# Only show a link if the user can read the group - they'll get a permissions error page if they try to %>
-      <%# hit the link otherwise %>
-      <% if group.grants_right?(@current_user, session, :read) %>
-        <%= link_to group.name, group_path(group) %>
-      <% else %>
-        <%= group.name %>
+  <h2><%= t :heading_previous_groups, 'Previous Groups' %></h2>
+  <% if @previous_groups.empty? %>
+    <%= t(:no_groups, "No Groups") %>
+  <% else %>
+    <table id="my_groups_table" <% if use_new_styles? %>class="ic-Table ic-Table--bordered" <% else %>class="table table-bordered previous_groups course-list-table"<% end %> >
+      <thead>
+        <tr>
+          <th scope="col" class="course-list-group-column"><%= t ('Group') %></th>
+          <th scope="col" class="course-list-course-title-column course-list-no-left-border"><%= t ('Course') %></th>
+          <th scope="col" class="course-list-term-column course-list-no-left-border"><%= t ('Term') %></th>
+        </tr>
+      </thead>
+      <% @previous_groups.each do |group| %>
+        <tr>
+          <td>
+            <%# Only show a link if the user can read the group - they'll get a permissions error page if they try to %>
+            <%# hit the link otherwise %>
+            <% if group.grants_right?(@current_user, session, :read) %>
+              <%= link_to group.name, group_path(group) %>
+            <% else %>
+              <%= group.name %>
+            <% end %>
+          </td>
+          <td>
+            <%= group.context.name %>
+          </td>
+          <td>
+            <% if group.context_type == 'Course' && !group.context.enrollment_term.default_term? %>
+              <span class="screenreader-only"><%= group.context.enrollment_term.name %></span>
+            <% else %>
+              <%= group.context.enrollment_term.name %>
+            <% end %>
+          </td>
+        </tr>
       <% end %>
-
-      <span class="subtitle"><%= group.context.name %></span>
-      <% if group.context_type == 'Course' && !group.context.enrollment_term.default_term? %>
-        <span class="subtitle"><%= group.context.enrollment_term.name %></span>
-      <% end %>
-    </li>
+    </table>
   <% end %>
-</ul>
+
