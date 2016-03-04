@@ -7339,6 +7339,7 @@ tr:
       start_a_group: "Grup başlat"
     styleguide: 
       manage: Yönet
+  info_8f47054a: Bilgi
   insert_math_equation_57c6e767: "Matematik Denklemi Ekle"
   insert_row_below_25187f89: "Alta satır ekle"
   installed_7b284a91: Yüklü
@@ -7346,6 +7347,7 @@ tr:
   instructions: 
     authorize_google_docs: "Belgeler üzerinde işbirliği içinde çalışmadan önce Canvas'ın Google Docs hesabınıza erişimine izin vermelisiniz:"
     authorize_google_drive: "Belgeler üzerinde işbirliği halinde çalışmadan önce Canvas'ın Google Drive hesabınıza erişimine izin vermelisiniz:"
+  instructions_2f88ee72: Yönergeler
   instructors_4b491a07: eğitmenler
   instructure: 
     alerts: 
