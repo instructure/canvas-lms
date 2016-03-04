@@ -25,6 +25,7 @@ class WikiPagesController < ApplicationController
   before_filter :set_pandapub_read_token
   before_filter :set_js_rights
   before_filter :set_js_wiki_data
+  before_filter :rich_content_service_config, only: [:edit, :index]
 
   add_crumb(proc { t '#crumbs.wiki_pages', "Pages"}) do |c|
     context = c.instance_variable_get('@context')
@@ -138,6 +139,10 @@ class WikiPagesController < ApplicationController
   end
 
   private
+  def rich_content_service_config
+    js_env(Services::RichContent.env_for(@domain_root_account, risk_level: :sidebar))
+  end
+
   def wiki_page_jsenv(context)
     js_env :wiki_page_menu_tools => external_tools_display_hashes(:wiki_page_menu)
     js_env :DISPLAY_SHOW_ALL_LINK => tab_enabled?(context.class::TAB_PAGES, {no_render: true})

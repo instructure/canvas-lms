@@ -576,7 +576,20 @@ describe "Wiki Pages" do
     it "should embed vimeo video in the page", priority: "1", test_id: 126835 do
       get "/courses/#{@course.id}/pages/Page1/edit"
       fln("HTML Editor").click
-      f("#editor_box_unique_id_1").send_keys('<p><iframe style="width: 640px; height: 480px;" title="Instructure - About Us" src="https://player.vimeo.com/video/58752872" width="300" height="150" allowfullscreen="allowfullscreen" webkitallowfullscreen="webkitallowfullscreen" mozallowfullscreen="mozallowfullscreen"></iframe></p>')
+      html_contents = %q(
+        <p>
+          <iframe style="width: 640px; height: 480px;"
+                  title="Instructure - About Us"
+                  src="https://player.vimeo.com/video/58752872"
+                  width="300"
+                  height="150"
+                  allowfullscreen="allowfullscreen"
+                  webkitallowfullscreen="webkitallowfullscreen"
+                  mozallowfullscreen="mozallowfullscreen">
+          </iframe>
+        </p>
+      )
+      f("#wiki_page_body").send_keys(html_contents)
       f(".btn-primary").click
       wait_for_ajaximations
       expect(f("iframe")).to be_present

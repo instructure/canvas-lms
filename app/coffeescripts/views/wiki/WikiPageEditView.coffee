@@ -3,6 +3,7 @@ define [
   'underscore'
   'Backbone'
   'wikiSidebar'
+  'jsx/shared/rce/RichContentEditor'
   'jst/wiki/WikiPageEdit'
   'compiled/views/ValidatedFormView'
   'compiled/views/wiki/WikiPageDeleteDialog'
@@ -11,7 +12,10 @@ define [
   'compiled/views/editor/KeyboardShortcuts'
   'compiled/tinymce'
   'tinymce.editor_box'
-], ($, _, Backbone, wikiSidebar, template, ValidatedFormView, WikiPageDeleteDialog, WikiPageReloadView, I18n, KeyboardShortcuts) ->
+], ($, _, Backbone, wikiSidebar, RichContentEditor, template, ValidatedFormView, WikiPageDeleteDialog, WikiPageReloadView, I18n, KeyboardShortcuts) ->
+
+  richContentEditor = new RichContentEditor({riskLevel: "sidebar", sidebar: wikiSidebar})
+  richContentEditor.preloadRemoteModule()
 
   class WikiPageEditView extends ValidatedFormView
     @mixin
@@ -90,7 +94,7 @@ define [
     # @api custom backbone override
     afterRender: ->
       super
-      @$wikiPageBody.editorBox()
+      richContentEditor.loadNewEditor(@$wikiPageBody, { manageParent: true })
       @initWikiSidebar()
 
       @checkUnsavedOnLeave = true
@@ -120,18 +124,14 @@ define [
     # Initialize the wiki sidebar
     # @api private
     initWikiSidebar: ->
-      unless wikiSidebar.inited
-        $wikiPageBody = @$wikiPageBody
-        $ ->
-          wikiSidebar.init()
-          $.scrollSidebar()
-          wikiSidebar.attachToEditor($wikiPageBody).show()
-      $ ->
-        wikiSidebar.show()
+      $ ()=>
+        richContentEditor.initSidebar()
+        $.scrollSidebar()
+        richContentEditor.attachSidebarTo(@$wikiPageBody)
 
     switchViews: (event) ->
       event?.preventDefault()
-      @$wikiPageBody.editorBox('toggle')
+      richContentEditor.callOnRCE(@$wikiPageBody, 'toggle')
       # hide the clicked link, and show the other toggle link.
       # todo: replace .andSelf with .addBack when JQuery is upgraded.
       $(event.currentTarget).siblings('a').andSelf().toggle()
@@ -152,7 +152,8 @@ define [
       errors
 
     hasUnsavedChanges: ->
-      dirty = @$wikiPageBody.editorBox('exists?') && @$wikiPageBody.editorBox('is_dirty')
+      hasEditor = richContentEditor.callOnRCE(@$wikiPageBody, 'exists?')
+      dirty =  hasEditor && richContentEditor.callOnRCE(@$wikiPageBody, 'is_dirty')
       if not dirty and @toJSON().CAN.EDIT_TITLE
         dirty = (@model.get('title') || '') isnt (@getFormData().title || '')
       dirty
