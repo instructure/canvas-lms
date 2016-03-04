@@ -24,7 +24,6 @@ define [
   'compiled/util/AvatarWidget'
   'compiled/tinymce'
   'jquery.instructure_forms'
-  'tinymce.editor_box'
 ], (I18n, Backbone, $, addLinkRow, AvatarWidget) ->
 
   class ProfileShow extends Backbone.View
@@ -75,8 +74,6 @@ define [
         @addLinkField()
         @addLinkField()
 
-      # setTimeout so tiny has some width to read
-      #setTimeout -> @$('#profile_bio').editorBox()
       @showEditForm()
 
     cancelEditProfile: ->
