@@ -822,6 +822,7 @@ he:
         add_users: "נראה טוב, הוסף משתמשים אלו"
         continue: המשיכו...
         modify_users: "חזרה לעריכת רשימת המשתמשים"
+      confirm_global_announcement: "הודעה זו תוצג לכל משתמש קנבס. יש לאשר שזה מה שברצונך ליצור."
       confirm_turnitin_settings_link: "אשור הגדרות Turnitin"
       course_roles: "תפקידי הקורס:"
       create_courses_description: "(מנהלי חשבונות יכולים ליצור קורסים תמיד)"
