@@ -259,7 +259,7 @@ describe CoursesController, type: :request do
                                 :format => 'json',
                                 :include => [ "observed_users" ] })
 
-      expect(json['enrollments']).to eq [{
+      expect(json['enrollments']).to match_array [{
          "type" => "observer",
          "role" => @assigned_observer_enrollment.role.name,
          "role_id" => @assigned_observer_enrollment.role.id,
@@ -289,7 +289,7 @@ describe CoursesController, type: :request do
                                 :format => 'json',
                                 :include => [ "observed_users" ] })
 
-      expect(json[0]['enrollments']).to eq [{
+      expect(json[0]['enrollments']).to match_array [{
          "type" => "observer",
          "role" => @assigned_observer_enrollment.role.name,
          "role_id" => @assigned_observer_enrollment.role.id,
@@ -318,7 +318,7 @@ describe CoursesController, type: :request do
                                 :id => @observer_course.to_param,
                                 :format => 'json' })
 
-      expect(json[0]['enrollments']).to eq [{
+      expect(json[0]['enrollments']).to match_array [{
          "type" => "observer",
          "role" => @assigned_observer_enrollment.role.name,
          "role_id" => @assigned_observer_enrollment.role.id,
