@@ -18,7 +18,10 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
-describe CanvasSort::First do
+# First is an instance of FirstClass; need the example group name to be
+# consistent across nodes for test-queue, so we quote it (otherwise you
+# get something like "#<CanvasSort::FirstClass:0x007fd9975b4320>")
+describe "CanvasSort::First" do
   it "should be equal to itself" do
     expect(CanvasSort::First).to eq CanvasSort::First
   end
