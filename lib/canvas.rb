@@ -18,6 +18,8 @@ module Canvas
   def self.redis
     raise "Redis is not enabled for this install" unless Canvas.redis_enabled?
     @redis ||= begin
+      Bundler.require 'redis'
+      Canvas::Redis.patch
       settings = ConfigFile.load('redis')
       Canvas::RedisConfig.from_settings(settings).redis
     end

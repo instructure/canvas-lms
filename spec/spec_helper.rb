@@ -489,7 +489,8 @@ RSpec.configure do |config|
   end
   config.before :each do
     if Canvas.redis_enabled? && Canvas.redis_used
-      Canvas.redis.flushdb
+      # yes, we really mean to run this dangerous redis command
+      Shackles.activate(:deploy) { Canvas.redis.flushdb }
     end
     Canvas.redis_used = false
   end

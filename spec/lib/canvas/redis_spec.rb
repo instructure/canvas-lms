@@ -168,7 +168,7 @@ describe "Canvas::Redis" do
     end
 
     it "should raise on unsupported commands" do
-      expect { Canvas.redis.keys }.to raise_error(Canvas::RedisWrapper::UnsupportedRedisMethod)
+      expect { Canvas.redis.keys }.to raise_error(Canvas::Redis::UnsupportedRedisMethod)
     end
   end
 end
