@@ -171,6 +171,7 @@ module OutcomeCommon
     refresh_page
 
     # select group
+    wait_for_ajaximations
     f('.outcome-group').click
     wait_for_ajaximations
     # select nested outcome

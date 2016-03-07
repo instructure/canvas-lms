@@ -39,7 +39,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       assignment_name = 'first assignment'
       @assignment = @course.assignments.create(:name => assignment_name)
       get "/courses/#{@course.id}/pages/front-page/edit"
-
+      wait_for_ajaximations
       fj('a.switch_views:visible').click
       clear_wiki_rce
       fj('a.switch_views:visible').click
