@@ -1,7 +1,7 @@
 <%
   hide_add_course ||= false; hide_add_user ||= false
   show_course = !hide_add_course && can_do(@account, @current_user, :manage_courses)
-  show_user = !hide_add_user && can_do(@account.root_account, @current_user, :manage_user_logins)
+  show_user = !hide_add_user && @account.root_account? && can_do(@account, @current_user, :manage_user_logins)
 %>
 
 <div class="rs-margin-all">
