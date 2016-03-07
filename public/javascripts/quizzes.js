@@ -41,6 +41,7 @@ define([
   'compiled/views/editor/KeyboardShortcuts',
   'INST', // safari sniffing for VO workarounds
   'quiz_formula_solution',
+  'jsx/shared/rce/RichContentEditor',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_date_and_time' /* time_field, datetime_field */,
   'jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, formErrors, errorBox */,
@@ -62,10 +63,13 @@ define([
             wikiSidebar, Handlebars, DueDateOverrideView, Quiz,
             DueDateList, QuizRegradeView, SectionList,
             MissingDateDialog,MultipleChoiceToggle,EditorToggle,TextHelper,
-            RCEKeyboardShortcuts, INST, QuizFormulaSolution){
+            RCEKeyboardShortcuts, INST, QuizFormulaSolution, RichContentEditor){
 
   var dueDateList, overrideView, quizModel, sectionList, correctAnswerVisibility,
       scoreValidation;
+
+  var richContentEditor = new RichContentEditor({riskLevel: "highrisk", sidebar: wikiSidebar});
+  richContentEditor.preloadRemoteModule();
 
   function adjustOverridesForFormParams(overrides){
     var idx = 0;
@@ -322,9 +326,13 @@ define([
         // we show and then hide the form so that the layout for the editorBox is computed correctly
         $form.show();
         $form.find(".question_content").attr('id', 'question_content_' + quiz.questionContentCounter++);
-        $form.find(".question_content").editorBox({tinyOptions: {aria_label: I18n.t('label.question.instructions', 'Question instructions, rich text area')}});
+        richContentEditor.loadNewEditor($form.find(".question_content"), {
+          tinyOptions: {
+            aria_label: I18n.t('label.question.instructions', 'Question instructions, rich text area')
+          }
+        })
         $form.find(".text_after_answers").attr('id', 'text_after_answers_' + quiz.questionContentCounter++);
-        $form.find(".text_after_answers").editorBox();
+        richContentEditor.loadNewEditor($form.find(".text_after_answers"))
         $form.hide();
       }
       return $form.show();
@@ -1694,7 +1702,7 @@ define([
           return false;
         }
         data['quiz[title]'] = quiz_title;
-        data['quiz[description]'] = $("#quiz_description").editorBox('get_code');
+        data['quiz[description]'] = richContentEditor.callOnRCE($("#quiz_description"), 'get_code');
         if ($("#quiz_notify_of_update").is(':checked')) {
           data['quiz[notify_of_update]'] = $("#quiz_notify_of_update").val();
         }
@@ -3649,39 +3657,41 @@ define([
       }
     });
 
-    if (wikiSidebar) {
-      wikiSidebar.init();
-      wikiSidebar.attachToEditor($("#quiz_description"));
-    }
+    richContentEditor.initSidebar();
+    richContentEditor.attachSidebarTo($("#quiz_description"))
 
     var keyboardShortcutsView = new RCEKeyboardShortcuts();
 
-    $("#quiz_description").editorBox({tinyOptions: {aria_label: I18n.t('label.quiz.instructions', 'Quiz instructions, rich text area')}});
+    richContentEditor.loadNewEditor($("#quiz_description"), {
+      tinyOptions: {
+        aria_label: I18n.t('label.quiz.instructions', 'Quiz instructions, rich text area')
+      }
+    })
     keyboardShortcutsView.render().$el.insertBefore($(".toggle_description_views_link:first"));
 
     $(".toggle_description_views_link").click(function(event) {
       event.preventDefault();
-      $("#quiz_description").editorBox('toggle');
+      richContentEditor.callOnRCE($("#quiz_description"), 'toggle');
       //  todo: replace .andSelf with .addBack when JQuery is upgraded.
       $(this).siblings(".toggle_description_views_link").andSelf().toggle();
     });
 
     $(".toggle_question_content_views_link").click(function(event) {
       event.preventDefault();
-      $(this).parents(".question_form").find(".question_content").editorBox('toggle');
+      richContentEditor.callOnRCE($(this).parents(".question_form").find(".question_content"), 'toggle');
       //  todo: replace .andSelf with .addBack when JQuery is upgraded.
       $(this).siblings(".toggle_question_content_views_link").andSelf().toggle();
     });
 
     $(".toggle_text_after_answers_link").click(function(event) {
       event.preventDefault();
-      $(this).parents(".question_form").find(".text_after_answers").editorBox('toggle');
+      richContentEditor.callOnRCE($(this).parents(".question_form").find(".text_after_answers"), 'toggle');
       //  todo: replace .andSelf with .addBack when JQuery is upgraded.
       $(this).siblings(".toggle_text_after_answers_link").andSelf().toggle();
     });
 
     $(document).bind('editor_box_focus', function(event, $editor) {
-      wikiSidebar.attachToEditor($editor);
+      richContentEditor.attachSidebarTo($editor);
     });
 
     $("#calc_helper_methods").change(function() {
@@ -3718,7 +3728,7 @@ define([
       if (question_type != 'multiple_dropdowns_question' && question_type != 'fill_in_multiple_blanks_question') {
         return;
       }
-      var text = $(this).editorBox('get_code');
+      var text = richContentEditor.callOnRCE($(this), 'get_code');
       var matches = text.match(/\[[A-Za-z0-9_\-.]+\]/g);
       $select.find("option.shown_when_no_other_options_available").remove();
       $select.find("option").addClass('to_be_removed');
@@ -4011,7 +4021,7 @@ define([
       setTimeout(function() {$(event.target).triggerHandler('change')}, 50);
     });
     $question.find(".question_content").bind('change', function(event) {
-      var text = $(this).editorBox('get_code');
+      var text = richContentEditor.callOnRCE($(this), 'get_code');
       var matches = text.match(/\[[A-Za-z][A-Za-z0-9]*\]/g);
       $question.find(".variables").find("tr.variable").addClass('to_be_removed');
       $question.find(".variables").showIf(matches && matches.length > 0);

@@ -28,7 +28,7 @@ class Quizzes::QuizzesController < ApplicationController
   attr_reader :lock_results_if_needed
 
   before_filter :require_context
-  before_filter :rich_content_service_config, only: [:show]
+  before_filter :rich_content_service_config, only: [:show, :new, :edit]
 
   add_crumb(proc { t('#crumbs.quizzes', "Quizzes") }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_quizzes_url }
   before_filter { |c| c.active_tab = "quizzes" }
