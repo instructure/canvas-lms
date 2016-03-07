@@ -22,12 +22,20 @@ class UserMergeData < ActiveRecord::Base
 
   strong_params
 
+  scope :active, -> { where.not(workflow_state: 'deleted') }
+
   def add_more_data(objects)
     objects.each do |o|
       r = self.user_merge_data_records.new(context: o, previous_user_id: o.user_id)
       r.previous_workflow_state = o.workflow_state if o.class.columns_hash.key?('workflow_state')
       r.save!
     end
+  end
+
+  alias_method :destroy_permanently!, :destroy
+  def destroy
+    self.workflow_state = 'deleted'
+    self.save!
   end
 
 end
