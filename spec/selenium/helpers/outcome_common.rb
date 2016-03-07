@@ -270,7 +270,7 @@ module OutcomeCommon
     get outcome_url
     f('.add_outcome_link').click
     # create array of drop down options
-    drop_down = get_options('#calculation_method').map(&:text)
+    drop_down = get_options('#calculation_method').map(&:text).map(&:strip)
     expected_array = ['Decaying Average', 'n Number of Times', 'Most Recent Score', 'Highest Score']
     # expect
     expect(drop_down.length).to eq(4)
