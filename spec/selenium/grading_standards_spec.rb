@@ -149,6 +149,31 @@ describe "grading standards" do
       wait_for_ajax_requests
       expect(@standard.reload.data.length).to eq 3
     end
+
+    context 'course settings' do
+      before :each do
+        course_with_teacher_logged_in
+        get "/courses/#{@course.id}/settings"
+        f('.grading_standard_checkbox').click
+        f('.edit_letter_grades_link').click
+      end
+
+      it "set default grading scheme", priority: "2", test_id: 164234 do
+        expect(f('#edit_letter_grades_form')).to be_displayed
+      end
+
+      it "manage default grading scheme", priority: "2", test_id: 164235 do
+        element = ff('.displaying a').select { |a| a.text == 'manage grading schemes' }
+        element[0].click
+        expect(f('.icon-add')).to be_displayed
+      end
+
+      it "edit current grading scheme", priority: "2", test_id: 164237 do
+        element = ff('.displaying a').select { |a| a.text == '' }
+        element[0].click
+        expect(f('.ui-dialog-titlebar').text).to eq("View/Edit Grading Scheme\nclose")
+      end
+    end
   end
 
   context "with Multiple Grading Periods enabled" do
