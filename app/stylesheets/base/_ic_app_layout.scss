@@ -130,10 +130,6 @@ $ic-left-side-width: $ic-sp*15;
   box-sizing: border-box;
   padding: $ic-sp*2;
   @include breakpoint(desktop) {
-    flex: 0 0 $ic-sp*22;
-    padding-left: $ic-sp;
-  }
-  @include breakpoint(wide) {
     flex: 0 0 $ic-sp*24;
     padding-left: $ic-sp*2;
   }
@@ -177,8 +173,7 @@ $ic-left-side-width: $ic-sp*15;
   align-items: center;
   border-bottom: 1px solid $ic-border-light;
   margin: 0 $ic-sp*2;
-  padding: $ic-sp 0;
-  @include breakpoint(wide) { padding: 16px 0; }
+  padding: 16px 0;
 }
 
 .ic-app-course-nav-toggle {

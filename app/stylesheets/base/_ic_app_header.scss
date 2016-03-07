@@ -25,9 +25,8 @@
     position: fixed;
     top: 0; left: 0;
     height: 100%;
-    width: $ic-header-primary-width - $ic-sp;
+    width: $ic-header-primary-width;
     z-index: 100;
-    @include breakpoint(wide) { width: $ic-header-primary-width; }
   }
 
   .ic-app-header__layout {
@@ -125,28 +124,6 @@
     .ic-icon-svg--lti {width: 26px; height: 29px;}
   }
 
-  .ic-app-header__secondary {
-    transition: all 0.2s ease-out;
-    transform: translate3d(-101%,0,0);
-    box-sizing: border-box;
-    background: $ic-subnav-panel-bgd;
-    position: absolute;
-    top: 0; left: 0;
-    height: 100%;
-    z-index: 1;
-    opacity: 0;
-    overflow: hidden;
-    width: $ic-header-primary-expanded-width + ($ic-header-primary-expanded-width * 1.3);
-    padding: $ic-sp*1.5 $ic-sp*2;
-    left: $ic-header-primary-width - $ic-sp;
-    @include breakpoint(wide) { left: $ic-header-primary-width; }
-
-    body.secondary-nav-expanded & {
-      transform: translate3d(0,0,0);
-      opacity: 1;
-    }
-  }
-
   .ic-app-header__primary {
     box-sizing: border-box;
     background: $ic-brand-global-nav-bgd;
@@ -157,8 +134,7 @@
     display: flex;
     flex-direction: column;
     overflow-y: auto;
-    width: $ic-header-primary-width - $ic-sp;
-    @include breakpoint(wide) { width: $ic-header-primary-width; }
+    width: $ic-header-primary-width;
   }
 
   .ic-avatar {
@@ -259,8 +235,7 @@
     overflow-x: hidden;
     width: $ic-sp*28;
     top: 0; bottom: 0;
-    left: $ic-header-primary-width - $ic-sp;
-    @include breakpoint(wide) { left: $ic-header-primary-width; }
+    left: $ic-header-primary-width;
     @if $use_high_contrast == false {
       &:focus { outline: none; }
     }
