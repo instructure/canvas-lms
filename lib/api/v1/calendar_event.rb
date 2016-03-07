@@ -38,7 +38,7 @@ module Api::V1::CalendarEvent
     context = (options[:context] || event.context)
     participant = nil
 
-    hash = api_json(event, user, session, :only => %w(id created_at updated_at start_at end_at all_day all_day_date title location_address location_name workflow_state))
+    hash = api_json(event, user, session, :only => %w(id created_at updated_at start_at end_at all_day all_day_date title location_address location_name workflow_state google_calendar_id))
     if event.context_type == "CourseSection"
       hash['title'] += " (#{context.name})"
       hash['description'] = api_user_content(event.description, event.context.course)

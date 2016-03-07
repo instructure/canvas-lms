@@ -11,6 +11,7 @@ CanvasRails::Application.routes.draw do
   # BZ custom sesction
   post 'bz/last_user_url' => 'bz#last_user_url'
   post 'bz/video_link' => 'bz#video_link'
+  get 'bz/event_rsvps' => 'bz#event_rsvps'
   # end
 
   get 'inbox' => 'context#inbox'
